@@ -279,37 +279,6 @@ let check_calls_annotations stmt called_functions =
 
 (* -------------------------------- Functor --------------------------------- *)
 
-module type S = sig
-  type state
-
-  val create: state -> kernel_function -> Active_behaviors.t
-  val create_from_spec: state -> spec -> Active_behaviors.t
-
-  val check_fct_preconditions_for_behaviors:
-    kinstr -> kernel_function -> behavior list -> Alarmset.status ->
-    state list -> state list
-
-  val check_fct_preconditions:
-    kinstr -> kernel_function -> Active_behaviors.t -> state -> state list
-
-  val check_fct_postconditions_for_behaviors:
-    kernel_function -> behavior list -> Alarmset.status ->
-    pre_state:state -> post_states:state list -> result:varinfo option ->
-    state list
-
-  val check_fct_postconditions:
-    kernel_function -> Active_behaviors.t -> termination_kind ->
-    pre_state:state -> post_states:state list -> result:varinfo option ->
-    state list
-
-  val evaluate_assumes_of_behavior: state -> behavior -> Alarmset.status
-
-  val interp_annot:
-    record:bool ->
-    kernel_function -> Active_behaviors.t -> stmt -> code_annotation ->
-    initial_state:state -> state list -> state list
-end
-
 module type LogicDomain = sig
   type t
   val top: t

@@ -6,20 +6,26 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
-open Eval
+(** Interpretation of function specification. *)
 
-module Make
-    (Engine: Engine_sig.S)
-    (_ : Transfer_logic.S with type state = Engine.Dom.t)
-  : sig
+(** Subset of [Engine_sig.S] required by this functor. *)
+module type Engine_Subset = sig
+  include Engine_abstractions_sig.S
 
-    val treat_statement_assigns:
-      pos:Position.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
+  (* Used to register read and written zones. *)
+  module Transfer_inout : Engine_sig.Transfer_inout
+    with type location = Loc.location
+     and type value = Val.t
+     and type valuation = Eval.Valuation.t
 
-    val compute_using_specification:
-      warn:bool ->
-      (Engine.Loc.location, Engine.Val.t) call -> spec ->
-      Engine.Dom.t -> (Partition.key*Engine.Dom.t) list
+  (* Used to inject interferences in concurrent programs. *)
+  module Interferences : Engine_sig.Interferences with type state = Dom.t
 
-  end
+  (* Interpretation of pre- and post-conditions. *)
+  module Transfer_logic : Engine_sig.Transfer_logic with type state = Dom.t
+end
+
+module Make (Engine: Engine_Subset) :
+  Engine_sig.Transfer_specification with type state = Engine.Dom.t
+                                     and type value = Engine.Val.t
+                                     and type location = Engine.Loc.location

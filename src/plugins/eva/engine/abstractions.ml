@@ -864,16 +864,6 @@ module type S = sig
      and type context = Ctx.t
 end
 
-module type S_with_evaluation = sig
-  include S
-  module Eval : Evaluation_sig.S
-    with type state = Dom.t
-     and type context = Ctx.t
-     and type value = Val.t
-     and type loc = Loc.location
-     and type origin = Dom.origin
-end
-
 module Hooks = struct
   let hooks = ref []
   type hook = (module S) -> (module S)

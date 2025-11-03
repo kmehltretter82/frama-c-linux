@@ -12,14 +12,6 @@ open Cil_types
 open Eval
 open Eva_ast
 
-module type S = sig
-  type state
-  val initial_state_with_formals :
-    lib_entry:bool -> kernel_function -> state or_bottom
-  val initialize_local_variable:
-    pos:Position.t -> varinfo -> init -> state -> state or_bottom
-end
-
 type padding_initialization = [
   | `Initialized
   | `Uninitialized
@@ -62,22 +54,24 @@ let (>>>) t f = match t with
 
 let counter = ref 0
 
-module Make
-    (Domain: Abstract.Domain.External)
-    (Eva: Evaluation_sig.S with type state = Domain.state
-                            and type loc = Domain.location)
-    (Transfer: Transfer_stmt.S with type state = Domain.t)
-= struct
+
+module type Engine_Subset = sig
+  include Engine_abstractions_sig.S
+  module Transfer_stmt : Engine_sig.Transfer_stmt with type state = Dom.t
+end
+
+module Make (Engine: Engine_Subset) = struct
 
   incr counter;;
+
+  type state = Engine.Dom.t
+  module Domain = Engine.Dom
 
   (* Evaluation in the top state: we do not want a location to depend on
      other globals. *)
   let lval_to_loc lval =
-    fst (Eva.lvaluate ~for_writing:false Domain.top lval)
+    fst (Engine.Eval.lvaluate ~for_writing:false Domain.top lval)
     >>> fun (_valuation, loc) -> loc
-
-  include Cvalue_domain.Getters (Domain)
 
   (* ------------------------- Apply initializer ---------------------------- *)
 
@@ -111,7 +105,7 @@ module Make
   (* Applies a single initializer, using the standard transfer function on
      assignments. Warns if the results is bottom. *)
   let apply_eva_single_initializer ~source ~pos state lval expr =
-    match Transfer.assign state ~pos lval expr with
+    match Engine.Transfer_stmt.assign state ~pos lval expr with
     | `Bottom ->
       if not (Position.is_local pos) then
         Self.warning ~pos ~source ~once:true
@@ -336,7 +330,7 @@ module Make
   (* Use the values supplied in [actuals] for the formals of [kf], and
      bind them in [state] *)
   let add_supplied_main_formals kf actuals state =
-    match get_cvalue with
+    match Engine.Dom.get_cvalue with
     | None -> Self.abort "API function [set_main_args] cannot be \
                           used without the Cvalue domain"
     | Some get_cvalue ->
@@ -441,7 +435,7 @@ module Make
     else `Bottom
 
   let print_initial_cvalue_state state =
-    let cvalue_state = get_cvalue_or_bottom state in
+    let cvalue_state = Engine.Dom.get_cvalue_or_bottom state in
     (* Do not show string literal nor variables from libc specifications. *)
     let print_base base =
       try

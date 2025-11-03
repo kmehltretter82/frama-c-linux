@@ -9,22 +9,6 @@
 open Cil_types
 open Eval
 
-module type S = sig
-  type state
-  type value
-  type loc
-  val assign: pos:Position.t -> state -> lval -> exp -> state or_bottom
-  val assume: pos:Position.t -> state -> exp -> bool -> state or_bottom
-  val call:
-    pos:Position.local -> lval option -> lhost -> exp list -> state ->
-    state Engine_sig.call_result
-  val check_unspecified_sequence:
-    pos:Position.t ->
-    state -> (stmt * lval list * lval list * lval list * stmt ref list) list ->
-    unit or_bottom
-  val enter_scope: pos:Position.t -> varinfo list -> state -> state
-end
-
 (* Reference filled in by the callwise-inout callback *)
 module InOutCallback =
   State_builder.Option_ref (Inout_type)
@@ -87,20 +71,31 @@ let substitution_visitor table =
   in
   { Eva_ast.Rewrite.default with rewrite_varinfo }
 
-module Make (Engine: Engine_sig.S) = struct
+module type Engine_Subset = sig
+  include Engine_abstractions_sig.S
+
+  module Transfer_inout : Engine_sig.Transfer_inout
+    with type location = Loc.location
+     and type value = Val.t
+     and type valuation = Eval.Valuation.t
+
+  module Interferences : Engine_sig.Interferences with type state = Dom.t
+
+  module Compute : Engine_sig.Compute with type state = Dom.t
+                                       and type value = Val.t
+                                       and type loc = Loc.location
+end
+
+module Make (Engine: Engine_Subset) = struct
 
   module Value = Engine.Val
   module Location = Engine.Loc
   module Domain = Engine.Dom
   module Eval = Engine.Eval
   module EvaAstDeps = Eva_ast.MakeDepsOf (Location)
-  module Transfer_inout = Transfer_inout.Make (Engine)
   module Interferences = Engine.Interferences
-  include Cvalue_domain.Getters (Domain)
 
   type state = Domain.t
-  type value = Value.t
-  type loc = Location.location
 
   (* When using a product of domains, a product of states may have no
      concretization (if the domains have inferred incompatible properties)
@@ -244,7 +239,7 @@ module Make (Engine: Engine_sig.S) = struct
       Alarmset.emit ~pos alarms;
       let* assigned, valuation = eval in
       let access =
-        Transfer_inout.register_assign_lval pos valuation lval expr
+        Engine.Transfer_inout.register_assign_lval pos valuation lval expr
       in
       let domain_valuation = Eval.to_domain_valuation valuation in
       let lvalue = { lval; lloc } in
@@ -266,7 +261,7 @@ module Make (Engine: Engine_sig.S) = struct
     (* TODO: check not comparable. *)
     Alarmset.emit ~pos alarms;
     let* valuation = eval in
-    let access = Transfer_inout.register_read_exp pos valuation expr in
+    let access = Engine.Transfer_inout.register_read_exp pos valuation expr in
     let+ state =
       Domain.assume ~pos expr positive (Eval.to_domain_valuation valuation) state
     in
@@ -574,7 +569,7 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* For non scalar expressions, prints the offsetmap of the cvalue domain. *)
   let show_offsm =
-    match get_cvalue, Location.get Main_locations.PLoc.key with
+    match Engine.Dom.get_cvalue, Location.get Main_locations.PLoc.key with
     | None, _ | _, None ->
       fun fmt _ _ _ -> Unicode.pp_top fmt
     | Some get_cvalue, Some get_ploc ->
@@ -676,7 +671,7 @@ module Make (Engine: Engine_sig.S) = struct
     Populate_spec.populate_funspec kf [`Assigns];
     let stmt, callstack = pos in
     let stack_with_call = Callstack.push kf stmt callstack in
-    let cvalue_state = get_cvalue_or_top state in
+    let cvalue_state = Engine.Dom.get_cvalue_or_top state in
     Cvalue_callbacks.apply_call_hooks stack_with_call kf cvalue_state `Builtin;
     Cvalue_callbacks.apply_call_results_hooks stack_with_call kf cvalue_state
       (`Builtin ([cvalue_state], None))
@@ -715,7 +710,8 @@ module Make (Engine: Engine_sig.S) = struct
       let access =
         (* Register call arguments to Inout_access *)
         let+ call, _, valuation = eval in
-        Transfer_inout.register_call_args (Position.of_local pos) valuation call
+        let position = Position.of_local pos in
+        Engine.Transfer_inout.register_call_args position valuation call
       in
       let access = Bottom.value ~bottom:Inout_access.Access.bottom access in
       (* The special Frama_C_ functions to print states are handled here. *)

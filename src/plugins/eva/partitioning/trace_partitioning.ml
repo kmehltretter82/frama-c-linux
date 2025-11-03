@@ -12,7 +12,7 @@ open Partition
 let dkey = Self.dkey_partition
 
 module Make
-    (Abstract: Abstractions.S_with_evaluation)
+    (Abstract: Engine_abstractions_sig.S)
     (Kf : sig val kf: kernel_function end) =
 struct
   module Partition_parameters = Partitioning_parameters.Make (Kf)

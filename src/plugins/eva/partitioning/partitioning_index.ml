@@ -8,7 +8,7 @@
 
 (** Partition of the abstract states, computed for each node by the
     dataflow analysis. *)
-module Make (Domain : Abstract.Domain.External)
+module Make (Domain : Engine_abstractions_sig.Domain)
 = struct
 
   module Index = Hashtbl.Make (Cvalue_domain.Subpart)

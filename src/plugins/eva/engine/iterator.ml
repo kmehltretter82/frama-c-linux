@@ -58,15 +58,18 @@ let record_fireable edge =
   | _ -> ()
 
 
+module type Engine_Subset = sig
+  include Engine_abstractions_sig.S
+  module Initialization : Engine_sig.Initialization with type state = Dom.t
+  module Transfer_stmt : Engine_sig.Transfer_stmt with type state = Dom.t
+  module Transfer_logic : Engine_sig.Transfer_logic with type state = Dom.t
+  module Transfer_specification : sig
+    val treat_statement_assigns: pos:Position.t -> assigns -> Dom.t -> Dom.t
+  end
+end
+
 module Make_Dataflow
-    (Engine : Engine_sig.S)
-    (Transfer : Transfer_stmt.S with type state = Engine.Dom.t)
-    (Init: Initialization.S with type state := Engine.Dom.t)
-    (Logic : Transfer_logic.S with type state = Engine.Dom.t)
-    (Spec: sig
-       val treat_statement_assigns:
-         pos:Position.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
-     end)
+    (Engine : Engine_Subset)
     (AnalysisParam : sig
        val kf: Cil_types.kernel_function
        val callstack: Callstack.t
@@ -76,7 +79,8 @@ module Make_Dataflow
 = struct
 
   module Domain = Engine.Dom
-  include Cvalue_domain.Getters (Domain)
+  module Transfer_stmt = Engine.Transfer_stmt
+  module Transfer_logic = Engine.Transfer_logic
 
   (* --- Analysis parameters --- *)
 
@@ -114,7 +118,7 @@ module Make_Dataflow
 
   (* --- Initial state --- *)
 
-  let active_behaviors = Logic.create AnalysisParam.initial_state kf
+  let active_behaviors = Transfer_logic.create AnalysisParam.initial_state kf
 
   let initial_states =
     let state = AnalysisParam.initial_state
@@ -122,7 +126,7 @@ module Make_Dataflow
     and ab = active_behaviors in
     if Eva_utils.skip_specifications kf
     then [state]
-    else Logic.check_fct_preconditions call_kinstr kf ab state
+    else Transfer_logic.check_fct_preconditions call_kinstr kf ab state
 
   let initial_state =
     match Bottom.of_list ~join:Domain.join initial_states with
@@ -255,16 +259,16 @@ module Make_Dataflow
     (* There should be only one statement contract, if any. *)
     | (_, spec) :: _ ->
       let assigns = Ast_info.merge_assigns_from_spec ~warn:false spec in
-      lift (Spec.treat_statement_assigns ~pos assigns)
+      lift (Engine.Transfer_specification.treat_statement_assigns ~pos assigns)
 
   let transfer_assume ~pos (exp : exp) (kind : guard_kind)
     : transfer_function =
     let positive = (kind = Then) in
-    lift' (fun s -> Transfer.assume ~pos s exp positive)
+    lift' (fun s -> Transfer_stmt.assume ~pos s exp positive)
 
   let transfer_assign ~pos (dest : lval) (exp : exp)
     : transfer_function =
-    lift' (fun s -> Transfer.assign ~pos s dest exp)
+    lift' (fun s -> Transfer_stmt.assign ~pos s dest exp)
 
   (* All variables local to a block are introduced in domain states when
      entering the block. Variables explicitly initialized at declaration time
@@ -275,7 +279,7 @@ module Make_Dataflow
      when entering a block. *)
   let transfer_enter ~pos (block : block) : transfer_function =
     let vars = block.blocals in
-    if vars = [] then id else lift (Transfer.enter_scope ~pos vars)
+    if vars = [] then id else lift (Transfer_stmt.enter_scope ~pos vars)
 
   let transfer_leave ~pos:_ (block : block) : transfer_function =
     let vars = block.blocals in
@@ -283,7 +287,7 @@ module Make_Dataflow
 
   let transfer_call ~pos (dest : lval option) (callee : lhost)
       (args : exp list) (key, state : key * state) : (key * state) list =
-    let result = Transfer.call ~pos dest callee args state in
+    let result = Transfer_stmt.call ~pos dest callee args state in
     if result.cacheable = Eval.NoCacheCallers then
       (* Propagate info that the current call cannot be cached either *)
       cacheable := Eval.NoCacheCallers;
@@ -304,7 +308,7 @@ module Make_Dataflow
       if Eva_utils.skip_specifications kf then
         [state]
       else
-        Logic.check_fct_postconditions kf active_behaviors Normal
+        Transfer_logic.check_fct_postconditions kf active_behaviors Normal
           ~pre_state:initial_state ~post_states:[state]
           ~result:return_var
     (* Assign the return value *)
@@ -317,7 +321,7 @@ module Make_Dataflow
         fun state ->
           let kind = Abstract_domain.Result kf in
           let state = Domain.enter_scope kind [vi_ret] state in
-          let state' = Transfer.assign ~pos state return_lval return_exp in
+          let state' = Transfer_stmt.assign ~pos state return_lval return_exp in
           Bottom.to_list state'
     in
     sequence (lift'' check_postconditions) (lift'' assign_retval)
@@ -332,7 +336,7 @@ module Make_Dataflow
       transfer_assume ~pos exp kind
     | Init (vi, exp, _stmt) ->
       let transfer state =
-        Init.initialize_local_variable ~pos vi exp state
+        Engine.Initialization.initialize_local_variable ~pos vi exp state
       in
       lift' transfer
     | Assign (dest, exp, _stmt) ->
@@ -372,7 +376,7 @@ module Make_Dataflow
     in
     fun state ->
       let interp_annot states ca =
-        Logic.interp_annot
+        Transfer_logic.interp_annot
           ~record kf active_behaviors stmt ca ~initial_state states
       in
       List.fold_left interp_annot [state] annots
@@ -392,7 +396,7 @@ module Make_Dataflow
         let seq = List.map translate_elt seq in
         let check s =
           let pos = Position.local stmt callstack in
-          Transfer.check_unspecified_sequence ~pos s seq = `Value ()
+          Transfer_stmt.check_unspecified_sequence ~pos s seq = `Value ()
         in
         List.filter check states
       | _ -> states
@@ -451,7 +455,7 @@ module Make_Dataflow
       record_fireable e;
     flow
 
-  let gather_cvalues states = match get_cvalue with
+  let gather_cvalues states = match Engine.Dom.get_cvalue with
     | Some get -> List.map get states
     | None -> []
 
@@ -607,7 +611,7 @@ module Make_Dataflow
 
   (* If the postconditions have not been evaluated, mark them as true. *)
   let mark_postconds_as_true () =
-    ignore (Logic.check_fct_postconditions kf active_behaviors Normal
+    ignore (Transfer_logic.check_fct_postconditions kf active_behaviors Normal
               ~pre_state:initial_state ~post_states:[] ~result:None)
 
   let compute () : (key * state) list =
@@ -662,7 +666,7 @@ module Make_Dataflow
         then VertexTable.memo merged_states v get_smashed_store
         else `Bottom
     and lift_to_cvalues table =
-      StmtTable.map (fun _ s -> get_cvalue_or_top s) (Lazy.force table)
+      StmtTable.map (fun _ -> Engine.Dom.get_cvalue_or_top) (Lazy.force table)
     in
     let merged_pre_states = lazy
       (StmtTable.map' (fun s (v,_) -> get_merged_states ~all:true s v) automaton.stmt_table)
@@ -685,29 +689,22 @@ module Make_Dataflow
       Cvalue_callbacks.{ before_stmts = merged_pre_cvalues;
                          after_stmts = merged_post_cvalues }
     in
-    let cvalue_init = get_cvalue_or_top initial_state in
+    let cvalue_init = Engine.Dom.get_cvalue_or_top initial_state in
     let results = `Body (states, Mem_exec.new_counter ()) in
     Cvalue_callbacks.apply_call_results_hooks callstack kf cvalue_init results;
 
 end
 
 
-module Computer
-    (Engine : Engine_sig.S)
-    (Transfer : Transfer_stmt.S with type state = Engine.Dom.t)
-    (Init: Initialization.S with type state := Engine.Dom.t)
-    (Logic : Transfer_logic.S with type state = Engine.Dom.t)
-    (Spec: sig
-       val treat_statement_assigns:
-         pos:Position.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
-     end)
-= struct
+module Make (Engine : Engine_Subset) = struct
+
+  type state = Engine.Dom.t
 
   let compute ~save_results callstack state =
     let kf = Callstack.top_kf callstack in
     let module Dataflow =
       Make_Dataflow
-        (Engine) (Transfer) (Init) (Logic) (Spec)
+        (Engine)
         (struct
           let kf = kf
           let callstack = callstack

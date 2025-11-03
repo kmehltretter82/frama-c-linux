@@ -178,16 +178,28 @@ let precise_loc_of_assign env kind term =
       pp_clause (kind, term) pp_eval_error e;
     None
 
-module Make
-    (Engine: Engine_sig.S)
-    (Logic : Transfer_logic.S with type state = Engine.Dom.t)
-= struct
+
+module type Engine_Subset = sig
+  include Engine_abstractions_sig.S
+  module Transfer_inout : Engine_sig.Transfer_inout
+    with type location = Loc.location
+     and type value = Val.t
+     and type valuation = Eval.Valuation.t
+  module Interferences : Engine_sig.Interferences with type state = Dom.t
+  module Transfer_logic : Engine_sig.Transfer_logic with type state = Dom.t
+end
+
+module Make (Engine: Engine_Subset) = struct
+
+  type state = Engine.Dom.t
+  type value = Engine.Val.t
+  type location = Engine.Loc.location
 
   module Domain = Engine.Dom
   module Location = Engine.Loc
-  module Transfer_inout = Transfer_inout.Make (Engine)
+  module Logic = Engine.Transfer_logic
+  module Transfer_inout = Engine.Transfer_inout
   module Interferences = Engine.Interferences
-  include Cvalue_domain.Getters (Domain)
 
   (* Most transfer functions about logic return a list of states instead of a
      single state, and an empty list instead of bottom. We thus use this monad
@@ -246,7 +258,7 @@ module Make
   let set_location loc = set_ploc (Main_locations.PLoc.make loc)
 
   let make_env state =
-    Eval_terms.env_assigns ~pre:(get_cvalue_or_top state)
+    Eval_terms.env_assigns ~pre:(Engine.Dom.get_cvalue_or_top state)
 
   (* Evaluates the location affected by an assigns, allocates, frees or \from
      clause. Returns None if the clause cannot be interpreted. *)
@@ -346,7 +358,7 @@ module Make
         Bottom.iter (Cvalue.V_Offsetmap.iter_on_values warn) offsm
     in
     let check_one_state state =
-      let cvalue_state = get_cvalue_or_top state in
+      let cvalue_state = Engine.Dom.get_cvalue_or_top state in
       List.iter (check_one_assign cvalue_state) assigns
     in
     List.iter check_one_state states

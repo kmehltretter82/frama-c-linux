@@ -7,7 +7,7 @@
 (**************************************************************************)
 
 module Make
-    (Abstract : Abstractions.S_with_evaluation)
+    (Abstract : Engine_abstractions_sig.S)
     (_ : sig val kf: Cil_types.kernel_function end) :
 sig
   (** The states being partitioned *)

@@ -121,17 +121,6 @@ module type S = sig
      and type context = Ctx.t
 end
 
-(* The three abstractions plus an evaluation engine for these abstractions. *)
-module type S_with_evaluation = sig
-  include S
-  module Eval : Evaluation_sig.S
-    with type state = Dom.t
-     and type context = Ctx.t
-     and type value = Val.t
-     and type loc = Loc.location
-     and type origin = Dom.origin
-end
-
 (** Builds the abstractions according to a configuration. *)
 val make : Config.t -> (module S)
 

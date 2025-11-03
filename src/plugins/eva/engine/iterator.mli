@@ -19,25 +19,22 @@ val signal_reset: unit -> unit
     evaluated to true (resp. false) at least once during the analysis. *)
 val condition_truth_value: stmt -> bool * bool
 
-module Computer
-    (* Abstractions with the evaluator. *)
-    (Engine: Engine_sig.S)
-    (* Transfer functions for statement on the Engine domain. *)
-    (_ : Transfer_stmt.S with type state = Engine.Dom.t
-                          and type value = Engine.Val.t)
-    (* Initialization of local variables. *)
-    (_: Initialization.S with type state := Engine.Dom.t)
-    (* Transfer functions for the logic on the Engine domain. *)
-    (_ : Transfer_logic.S with type state = Engine.Dom.t)
-    (_: sig
-       val treat_statement_assigns:
-         pos:Position.t -> assigns -> Engine.Dom.t -> Engine.Dom.t
-     end)
-  : sig
 
-    val compute:
-      save_results:bool ->
-      Callstack.t -> Engine.Dom.t ->
-      (Partition.key * Engine.Dom.t) list * Eval.cacheable
-
+(** Subset of [Engine_sig.S] required by this functor. *)
+module type Engine_Subset = sig
+  (* Abstractions with the evaluator. *)
+  include Engine_abstractions_sig.S
+  (* Initialization of local variables. *)
+  module Initialization : Engine_sig.Initialization with type state = Dom.t
+  (* Transfer functions on statements. *)
+  module Transfer_stmt : Engine_sig.Transfer_stmt with type state = Dom.t
+  (* Transfer functions on logic annotations. *)
+  module Transfer_logic : Engine_sig.Transfer_logic with type state = Dom.t
+  (* Interpretation of statement assigns. *)
+  module Transfer_specification : sig
+    val treat_statement_assigns: pos:Position.t -> assigns -> Dom.t -> Dom.t
   end
+end
+
+module Make (Engine: Engine_Subset) :
+  Engine_sig.Iterator with type state = Engine.Dom.t

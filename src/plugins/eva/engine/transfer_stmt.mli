@@ -6,36 +6,26 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
-open Eval
-
 val current_kf_inout: unit -> Inout_type.t option
 
-module type S = sig
+(** Subset of [Engine_sig.S] required for this functor. *)
+module type Engine_Subset = sig
+  include Engine_abstractions_sig.S
 
-  type state
-  type value
-  type loc
+  (* Used to register read and written zones. *)
+  module Transfer_inout : Engine_sig.Transfer_inout
+    with type location = Loc.location
+     and type value = Val.t
+     and type valuation = Eval.Valuation.t
 
-  val assign: pos:Position.t -> state -> lval -> exp -> state or_bottom
+  (* Used to inject interferences in concurrent programs. *)
+  module Interferences : Engine_sig.Interferences with type state = Dom.t
 
-  val assume: pos:Position.t -> state -> exp -> bool -> state or_bottom
-
-  val call:
-    pos:Position.local ->
-    lval option -> lhost -> exp list -> state -> state Engine_sig.call_result
-
-  val check_unspecified_sequence:
-    pos:Position.t ->
-    state ->
-    (* TODO *)
-    (stmt * lval list * lval list * lval list * stmt ref list) list ->
-    unit or_bottom
-
-  val enter_scope: pos:Position.t -> varinfo list -> state -> state
+  (** Used to interpret function calls. *)
+  module Compute : Engine_sig.Compute with type state = Dom.t
+                                       and type value = Val.t
+                                       and type loc = Loc.location
 end
 
-module Make (Abstract: Engine_sig.S)
-  : S with type state = Abstract.Dom.t
-       and type value = Abstract.Val.t
-       and type loc = Abstract.Loc.location
+module Make (Engine: Engine_Subset) :
+  Engine_sig.Transfer_stmt with type state = Engine.Dom.t

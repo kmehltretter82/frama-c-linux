@@ -7,6 +7,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Eva_ast_types
 open Eval
 
 (** Kind of function that is analyzed: a body, a specification, a builtin, an
@@ -25,7 +26,158 @@ type 'state call_result = {
   kind: call_kind;
 }
 
-(** Analysis of functions, built by the functor [Compute_functions.Make]. *)
+
+(** Helper module to register read and written memory zones to [Inout_access],
+    built by [Transfer_inout.Make]. *)
+module type Transfer_inout = sig
+  type location
+  type value
+  type valuation
+
+  (** [register_logc_assign pos clause location] registers to [Inout_access]
+      the read and written memory zones at [pos] for the logic assign [clause]
+      to the [location]. The memory accessed by the logic assign is returned. *)
+  val register_logic_assign :
+    Position.t -> location Eval.logic_assign -> location ->
+    Inout_access.t
+
+  (** [register_assign_lval pos valuation lval exp] registers to [Inout_access]
+      the read and written memory zones at [pos] for the assignment from [exp]
+      to [lval] with a given [valuation]. The memory accessed by the assignment
+      is returned. *)
+  val register_assign_lval :
+    Position.t -> valuation ->
+    Eva_ast.lval -> Eva_ast.exp ->
+    Inout_access.t
+
+  (** [register_assign_var pos valuation vi exp] registers to [Inout_access]
+      the read and written memory zones at [pos] for the assignment from [exp]
+      to [vi] with a given [valuation]. The memory accessed by the assignment is
+      returned. *)
+  val register_assign_var :
+    Position.t -> valuation ->
+    Eva_ast.varinfo -> Eva_ast.exp ->
+    Inout_access.t
+
+  (** [register_read_exp pos valuation exp] registers to [Inout_access] the
+      read memory zones at [pos] for reading the expression [exp] with a given
+      [valuation]. The memory accessed by the read is returned. *)
+  val register_read_exp :
+    Position.t -> valuation ->
+    Eva_ast.exp ->
+    Inout_access.t
+
+  (** [register_call_args pos valuation call] registers to [Inout_access] the
+      read and written memory zones at [pos] for the arguments of the given
+      [call] with a given [valuation]. The memory accessed by the call arguments
+      is returned. *)
+  val register_call_args :
+    Position.t -> valuation ->
+    (location, value) Eval.call ->
+    Inout_access.t
+end
+
+
+(** Interpretation of statements, built by functor [Transfer_stmt.Make]. *)
+module type Transfer_stmt = sig
+  type state
+
+  val assign: pos:Position.t -> state -> lval -> exp -> state or_bottom
+
+  val assume: pos:Position.t -> state -> exp -> bool -> state or_bottom
+
+  val call:
+    pos:Position.local ->
+    lval option -> lhost -> exp list -> state -> state call_result
+
+  val check_unspecified_sequence:
+    pos:Position.t ->
+    state ->
+    (* TODO *)
+    (stmt * lval list * lval list * lval list * stmt ref list) list ->
+    unit or_bottom
+
+  val enter_scope: pos:Position.t -> varinfo list -> state -> state
+end
+
+
+(** Interpretation of logic assertions, built by functor [Transfer_logic.Make]. *)
+module type Transfer_logic = sig
+  type state
+
+  val create: state -> kernel_function -> Active_behaviors.t
+  val create_from_spec: state -> spec -> Active_behaviors.t
+
+  val check_fct_preconditions_for_behaviors:
+    kinstr -> kernel_function -> behavior list -> Alarmset.status ->
+    state list -> state list
+
+  val check_fct_preconditions:
+    kinstr -> kernel_function -> Active_behaviors.t ->
+    state -> state list
+
+  val check_fct_postconditions_for_behaviors:
+    kernel_function -> behavior list -> Alarmset.status ->
+    pre_state:state -> post_states:state list -> result:varinfo option ->
+    state list
+
+  val check_fct_postconditions:
+    kernel_function -> Active_behaviors.t -> termination_kind ->
+    pre_state:state -> post_states:state list -> result:varinfo option ->
+    state list
+
+  val evaluate_assumes_of_behavior: state -> behavior -> Alarmset.status
+
+  val interp_annot:
+    record:bool ->
+    kernel_function -> Active_behaviors.t -> stmt -> code_annotation ->
+    initial_state:state -> state list -> state list
+end
+
+
+(** Interpretation of function specification,
+    built by functor [Transfer_specification.Make]. *)
+module type Transfer_specification = sig
+  type value
+  type location
+  type state
+
+  val treat_statement_assigns: pos:Position.t -> assigns -> state -> state
+
+  val compute_using_specification:
+    warn:bool -> (location, value) call -> spec ->
+    state -> (Partition.key * state) list
+end
+
+
+(** Initialization of variables, built by functor [Initialization.Make]. *)
+module type Initialization = sig
+  type state
+
+  (** Compute the initial state for an analysis (as in {!initial_state}),
+      but also bind the formal parameters of the function given as argument. *)
+  val initial_state_with_formals :
+    lib_entry:bool -> Cil_types.kernel_function -> state or_bottom
+
+  (** Initializes a local variable in the current state. *)
+  val initialize_local_variable:
+    pos:Position.t -> varinfo -> init -> state -> state or_bottom
+end
+
+
+(** Analysis of a function body by iteration over its interpreted automata,
+    built by the functor [Iterator.Make]. *)
+module type Iterator = sig
+  type state
+
+  val compute:
+    save_results:bool -> Callstack.t ->
+    state -> (Partition.key * state) list * Eval.cacheable
+end
+
+
+(** Complete analysis of functions,
+    built by the functor [Compute_functions.Make]. *)
 module type Compute =
 sig
   type state
@@ -90,7 +242,25 @@ end
 module type S = sig
   (** The four abstractions: values, locations, states and evaluation context,
       plus the evaluation engine for these abstractions. *)
-  include Abstractions.S_with_evaluation
+  include Engine_abstractions_sig.S
+
+  module Transfer_inout : Transfer_inout
+    with type location = Loc.location
+     and type value = Val.t
+     and type valuation = Eval.Valuation.t
+
+  module Transfer_stmt : Transfer_stmt with type state = Dom.t
+
+  module Transfer_logic : Transfer_logic with type state = Dom.t
+
+  module Transfer_specification : Transfer_specification
+    with type state = Dom.t
+     and type value = Val.t
+     and type location = Loc.location
+
+  module Initialization : Initialization with type state = Dom.t
+
+  module Iterator : Iterator with type state = Dom.t
 
   module Compute : Compute
     with type state = Dom.t

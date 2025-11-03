@@ -8,11 +8,11 @@
 
 module type Engine = Engine_sig.S_with_results
 
-module Make (Abstract: Abstractions.S) : Engine
-  with module Ctx = Abstract.Ctx
-   and module Val = Abstract.Val
-   and module Loc = Abstract.Loc
-   and module Dom = Abstract.Dom
+module Make (Abstract: Abstractions.S) : Engine_sig.S_with_results
+  with type Ctx.t = Abstract.Ctx.t
+   and type Val.t = Abstract.Val.t
+   and type Loc.location = Abstract.Loc.location
+   and type Dom.state = Abstract.Dom.state
 
 val current_analyzer : unit -> (module Engine_sig.S_with_results)
 (** The abstractions used in the latest analysis, and its results. *)
