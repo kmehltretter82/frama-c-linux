@@ -61,7 +61,9 @@ let show main_ui =
     "Muriel Roger";
     "Cécile Ruet-Cros";
     "Julien Signoles";
+    "Fabien Siron";
     "Nicolas Stouls";
+    "Hugo Thievenaz";
     "Kostyantyn Vorobyov";
     "Boris Yakobowski"
   ]
