@@ -574,15 +574,17 @@ let backward_comp_left op l r =
 (* ----------------------------------- Misc --------------------------------- *)
 
 let create_all_values ~signed ~size =
-  let min, max =
-    if signed then
-      let b = Z.two_power_of_int (size - 1) in
-      Z.neg b, Z.pred b
-    else
-      let b = Z.two_power_of_int size in
-      Z.zero, Z.pred b
-  in
-  inject_range (Some min) (Some max)
+  try
+    let min, max =
+      if signed then
+        let b = Z.two_power_of_int (size - 1) in
+        Z.neg b, Z.pred b
+      else
+        let b = Z.two_power_of_int size in
+        Z.zero, Z.pred b
+    in
+    inject_range (Some min) (Some max)
+  with Z.Overflow -> top
 
 let cast_int_to_int ~size ~signed value =
   if equal top value
