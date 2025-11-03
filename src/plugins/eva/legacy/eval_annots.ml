@@ -45,7 +45,7 @@ let mark_unreachable () =
   in
   (* Mark standard code annotations *)
   let do_code_annot stmt _emit ca =
-    if not (Cvalue_results.is_reachable stmt) then begin
+    if not (Results.is_reachable stmt) then begin
       let kf = Kernel_function.find_englobing_kf stmt in
       let ppts = Property.ip_of_code_annot kf stmt ca in
       List.iter mark ppts;
@@ -56,7 +56,7 @@ let mark_unreachable () =
     inherit Visitor.frama_c_inplace
 
     method! vstmt_aux stmt =
-      if not (Cvalue_results.is_reachable stmt) then begin
+      if not (Results.is_reachable stmt) then begin
         let mark_status kf =
           (* Do not mark preconditions as dead if they are not analyzed in
              non-dead code. Otherwise, the consolidation does strange things. *)

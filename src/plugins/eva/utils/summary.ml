@@ -176,7 +176,7 @@ let compute_fun_stats kf =
       List.iter (do_status alarm) l
   in
   let do_stmt stmt =
-    let reachable = Cvalue_results.is_reachable stmt in
+    let reachable = Results.is_reachable stmt in
     Coverage.incr coverage ~reachable;
     Annotations.iter_code_annot (do_annot stmt) stmt
   in
@@ -261,7 +261,7 @@ let compute_statuses ()  =
   in
   let do_property ip =
     let incr stmt statuses =
-      if Cvalue_results.is_reachable stmt then
+      if Results.is_reachable stmt then
         match get_status ip with
         | None -> ()
         | Some status -> Statuses.incr statuses status

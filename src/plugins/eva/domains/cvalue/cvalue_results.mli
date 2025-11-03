@@ -8,8 +8,3 @@
 
 (** Recording of cvalue states during the analysis. *)
 include Domain_store.S with type t := Cvalue.Model.t
-
-(** Returns true if a cvalue state has been recorded for this statement
-    (and so the analysis has reached the statement).
-    If possible, please use {!Results.is_reachable} instead. *)
-val is_reachable: Cil_types.stmt -> bool
