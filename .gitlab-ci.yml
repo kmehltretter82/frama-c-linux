@@ -17,13 +17,17 @@ default:
   interruptible: true
   tags: [ nix-v2 ]
 
+# All pipelines are enabled (including merge request pipelines), except on:
+# - branches other than master or stable (pipelines are created on MR instead)
+# - tags (can't reliably find related commits in external plug-ins)
 workflow:
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == 'push'
+       && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_COMMIT_BRANCH != $DEFAULT
+      when: never
     - if: $CI_COMMIT_TAG
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_BRANCH == $DEFAULT
-    - if: $CI_PIPELINE_SCHEDULE_DESCRIPTION
-    - if: $CI_PIPELINE_TRIGGERED == "true"
+      when: never
+    - when: always
 
 ################################################################################
 ### VARIABLES
