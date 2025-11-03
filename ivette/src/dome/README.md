@@ -39,7 +39,7 @@ use your own scripts. All generated configuration files are borrowed from
 resources located in the `$(DOME)/template` directory. You can extend and modify
 all the generated files, simply follow the comments provided.
 
-Typicall installation places for the Dome framework are:
+Typical installation places for the Dome framework are:
 - `DOME=./dome` for usual application developers;
 - `DOME=./src/dome` for application developers that also have to hack and live-edit the Dome framework;
 - `DOME=.` is also possible to quick test the framework or make a demo in `src/renderer/Application.js`.

@@ -38,7 +38,7 @@
     @since 32.0-Germanium *)
 
 (** [is_supported ()] returns whether the current terminal supports ansi
-    escape sequence, i.e. if it exports a [TERM] environnement
+    escape sequence, i.e. if it exports a [TERM] environment
     variable that is not assigned "DUMB" *)
 val is_supported : unit -> bool
 

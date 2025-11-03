@@ -66,7 +66,7 @@ const STATUS = new Dome.Event<Status>('frama-c.server.status');
 /**
  *  Server is actually started and running.
 
- *  This event is emitted when ther server _enters_ the `ON` or `CMD` state.
+ *  This event is emitted when the server _enters_ the `ON` or `CMD` state.
  *  The server is now ready to handle requests.
  */
 const READY = new Dome.Event('frama-c.server.ready');
@@ -74,7 +74,7 @@ const READY = new Dome.Event('frama-c.server.ready');
 /**
  *  Server Status Notification Event
 
- *  This event is emitted when ther server _leaves_ the `ON` or `CMD` state.
+ *  This event is emitted when the server _leaves_ the `ON` or `CMD` state.
  *  The server is no more able to handle requests until restart.
  */
 const SHUTDOWN = new Dome.Event('frama-c.server.shutdown');

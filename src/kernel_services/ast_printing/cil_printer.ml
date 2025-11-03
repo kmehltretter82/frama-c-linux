@@ -211,7 +211,7 @@ module Precedence = struct
                                   11 [%right BIMPLIES]
                                   12 [%left PIPE]
                                   13 [%left HAT]
-                                  14 [%left STARHAT] (releted to \repeat)
+                                  14 [%left STARHAT] (related to \repeat)
                                   15 [%left AMP] *)
 
   let belongLevel = 72         (* 16 [%nonassoc IN] *)

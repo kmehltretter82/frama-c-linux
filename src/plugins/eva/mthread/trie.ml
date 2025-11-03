@@ -92,7 +92,7 @@ struct
     ins (l,t)
 
   (*s When removing a binding, we take care of not leaving bindings to empty
-      sub-tries in the nodes. Therefore, we test wether the result [t'] of
+      sub-tries in the nodes. Therefore, we test whether the result [t'] of
       the recursive call is the empty trie [empty]: if so, we just remove
       the branching with [M.remove]; otherwise, we modify it with [M.add]. *)
 

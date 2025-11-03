@@ -166,7 +166,7 @@ let test (allowZeroSizeArrays, typ, types, kind) =
     if Cil.isCompleteType typ then begin
       let filename = generate_failure_file false (typ, types) in
       Crowbar.fail
-        ("isCompleteType declared as complate an incomplete type. \
+        ("isCompleteType declared as complete an incomplete type. \
           See example in file '" ^ filename ^
          "', which should trigger an error.")
     end;

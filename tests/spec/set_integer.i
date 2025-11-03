@@ -3,7 +3,7 @@
 /*@ lemma test2: 0 * { 0, 1 } == 0; */
 /*@ lemma test3: {0,1} / 2 == 0; */
 
-//right-hand side is set, left-hand side plain arithmethic type
+//right-hand side is set, left-hand side plain arithmetic type
 /*@ lemma test4: 1 + { 0, 1 } == { 1, 2 }; */
 /*@ lemma test5: { 0, 1 } * 0 == 0; */
 /*@ lemma test6: 0 / {1,2} == 0; */

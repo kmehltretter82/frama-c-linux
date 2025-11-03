@@ -1243,7 +1243,7 @@ let pruning ?(solvers=[]) seq =
         if is_trivial_hsp hsp then
           Wp_parameters.feedback "[Pruning] Trivial"
         else
-          Wp_parameters.feedback "[Pruning] %d branche(s) removed" !tc ;
+          Wp_parameters.feedback "[Pruning] %d branch(es) removed" !tc ;
       let hs,p = hsp in
       sequence hs , p
     end

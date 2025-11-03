@@ -196,9 +196,9 @@ type analysis_state = {
 (* Iterators on threads. We presave the current list of threads so that
    the iterators do not accidentally capture new added threads. (This is not
    important for correctness, but is slightly cleaner.). Threads are sorted,
-   agains for cleanliness reasons. *)
+   again for cleanliness reasons. *)
 let threads analysis =
-  (* the main thread always have the least id and will always be in front of the
+  (* the main thread always has the least id and will always be in front of the
      list *)
   Thread.Hashtbl.fold_sorted
     (fun _ th l -> th :: l)

@@ -30,7 +30,7 @@ void h1(S2_t const* q) {
   // gcc warning: initialization discards ‘const’ qualifier from pointer target type [enabled by default]
 }
 void h2(S2_t const* q) {
-  S1_t *s2 = (S1_t *)(q->p1); // same AST than h1 (cast explicited by the kernel) for the right-value
+  S1_t *s2 = (S1_t *)(q->p1); // same AST than h1 (cast made explicit by the kernel) for the right-value
 }
 void h3(S2_t const* q) {
   S1_t *s3 = (S1_t *)G2.p1;

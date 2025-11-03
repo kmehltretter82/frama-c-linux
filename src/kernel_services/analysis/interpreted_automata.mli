@@ -181,10 +181,10 @@ module WTOIndex : sig
     (** @return the wto_index for a statement *)
     val find : t -> vertex -> wto_index
 
-    (** @return wether [v] is a component head or not *)
+    (** @return whether [v] is a component head or not *)
     val is_head : t -> vertex -> bool
 
-    (** @return wether [v1,v2] is a back edge of a loop, i.e. if the vertex v1
+    (** @return whether [v1,v2] is a back edge of a loop, i.e. if the vertex v1
         is a wto head of any component where v2 is included. This assumes that
         (v1,v2) is actually an edge present in the control flow graph. *)
     val is_back_edge : t -> vertex * vertex -> bool

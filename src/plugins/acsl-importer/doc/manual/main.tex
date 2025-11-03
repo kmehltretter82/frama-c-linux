@@ -362,7 +362,7 @@ From \FramaC kernel, it is possible to identify two kinds of code transformation
 \end{itemize}
 
 The import of ACSL specification files can be viewed as a second class transformation adding to the ACSL annotation to the current AST.
-But, some imports need a code transformation of the first class for beeing performed (i.e. for identifying the statement body of the i$^{th}$ loop).
+But, some imports need a code transformation of the first class for being performed (i.e. for identifying the statement body of the i$^{th}$ loop).
 All syntaxic code transformations of \FramaC kernel (including the deletion of unused C symbols) are processed before the import of ACSL specification files.
 
 The option \verb|-acsl-import-unroll-loop-conditions| transforms \verb|while| loops and and \verb|for| loops into \verb|do-while| loops when the initial loops have no loop annotation.

@@ -229,7 +229,7 @@ module Make_Dataflow
 
   let id : transfer_function = fun (k,x) -> [(k,x)]
 
-  (* Thse lifting function helps to uniformize the transfer functions to a
+  (* These lifting functions help to uniformize the transfer functions to a
      common signature *)
 
   let lift (f : state -> state) : transfer_function =

@@ -223,7 +223,7 @@ __PUSH_FC_STDLIB
 # define SCNuMAX	__PRIMAX_PREFIX "u"
 # define SCNxMAX	__PRIMAX_PREFIX "x"
 
-/* Macros for scaning `intptr_t' and `uintptr_t'.  */
+/* Macros for scanning `intptr_t' and `uintptr_t'.  */
 # define SCNdPTR	__PRIPTR_PREFIX "d"
 # define SCNiPTR	__PRIPTR_PREFIX "i"
 # define SCNoPTR	__PRIPTR_PREFIX "o"

@@ -23,7 +23,7 @@ char *optarg;
 int opterr = 1; // initial value is not zero (zero silences error messages)
 
 /* Note this implementation only supports the POSIXLY_CORRECT behaviour where
-   the processing of arguments stops whenver a nonoption argument is
+   the processing of arguments stops whenever a nonoption argument is
    encountered. A more general implementation would permute the argv contents
    so that eventually all the nonoptions are at the end. */
 

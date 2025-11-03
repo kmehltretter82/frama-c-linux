@@ -89,7 +89,7 @@ let pointed f d = collect f None d
 let rec merge f d1 d2 =
   match d1, d2 with
   | Pure, d | d, Pure -> d
-  | Dvar a, Dvar b -> Dvar (min a b) (* sould never apply *)
+  | Dvar a, Dvar b -> Dvar (min a b) (* should never apply *)
   | Ptr r1, Ptr r2 -> Ptr (f r1 r2)
   | Record m1, Record m2 ->
     Record (Fmap.union (fun _ d1 d2 -> Some (merge f d1 d2)) m1 m2)

@@ -41,7 +41,7 @@ static void *write_value(void *arg) {
   int idx = *(int *)arg;
   pthread_rwlock_t *lock = &locks[idx];
 
-  // Acquire a read lock so that the specification can check `writte[idx]` and
+  // Acquire a read lock so that the specification can check `written[idx]` and
   // `values[idx]`.
   pthread_rwlock_rdlock(lock);
 

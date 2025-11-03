@@ -2,7 +2,7 @@
 
 */
 typedef enum {
-    BDP_BITE_NORMAL, BDP_BITE_ANORMAL, BDP_BITE_TRUC
+    BDP_BYTE_NORMAL, BDP_BYTE_ABNORMAL, BDP_BYTE_TRUC
 } BDP_Te_FunctionCode;
 
 typedef struct {
@@ -20,7 +20,7 @@ void main()
 {
   BDP_Ts_SharedData SharedData;
 
-      SharedData.FunctionCode = BDP_BITE_NORMAL;
+      SharedData.FunctionCode = BDP_BYTE_NORMAL;
       SharedData.MachineNumber = BNR_Ct_MachineNumber;
       SharedData.Line = __LINE__;
 

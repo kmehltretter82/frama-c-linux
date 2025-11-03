@@ -41,7 +41,7 @@ void test_unroll()
   // At the end, we must have both arrays a and b to be fully initialized at 42
 
   // Small loops can be unrolled without giving an unroll amount.
-  // The actual limit of the number of iterations can be overriden with
+  // The actual limit of the number of iterations can be overridden with
   // the option -eva-default-loop-unroll
   // Here -eva-default-loop-unroll is set to a value not high enough to
   // completely unroll the loop thus a warning should be emitted.
@@ -98,8 +98,8 @@ void test_split()
   int j = Frama_C_interval(0,2);
 
   // The splits are done on i and j and undone in the same order
-  // If global dynamic split is done on k, since it is equaly to i, merge i will
-  // have no effects.
+  // If global dynamic split is done on k, since it is equal to i,
+  // merging i will have no effects.
 
   Frama_C_show_each_before_first_split(i,j,k);
   //@ split i;
@@ -159,7 +159,7 @@ void test_loop_split()
   // In this example we can split on the value of the loop index in order to
   // keep the relation between i and the value A[i] found in the array to be
   // equal to 42.
-  // However, since the split is not dynamic, an history partitioning must be
+  // However, since the split is not dynamic, a history partitioning must be
   // added to distinguish between the two states that share i = 9 : those who
   // left the loop at the break point and those who left after the loop test.
 

@@ -12,7 +12,7 @@
     @since 32.0-Germanium *)
 
 (** This function can be used to turn on or off the use of unicode UTF-8
-    caracters in messages.
+    characters in messages.
 *)
 val use_unicode : bool -> unit
 

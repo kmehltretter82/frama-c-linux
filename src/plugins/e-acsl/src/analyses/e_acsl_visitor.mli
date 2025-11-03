@@ -52,7 +52,7 @@ val case_globals :
     accessed through the method [get_akind]. While visiting annotations
     currently not supported by E-ACSL, the [get_visit_error] returns a [not_yet]
     exception. Any visitor that inherits from [E_acsl_visitor.visitor] can
-    decide wether continue its processing or not as it sees fit.
+    decide whether continue its processing or not as it sees fit.
 
     As a result of the custom visit of the AST, the methods [vcode_annot] and
     [vspec] skip their children, since they are already visited by [vstmt_aux].

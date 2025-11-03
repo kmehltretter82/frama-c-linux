@@ -114,14 +114,14 @@ export const Meter = (props: MeterProps): JSX.Element => {
   const min = props.min ?? 0.0;
   const max = props.max ?? 1.0;
   const low = props.low ?? min;
-  const hight = props.high ?? max;
+  const high = props.high ?? max;
   const theClass = classes('dome-xMeter', className);
   let opt: number | undefined;
   if (value !== undefined)
     switch (optimum) {
       case 'LOW': opt = (min + low) / 2; break;
-      case 'MEDIUM': opt = (low + hight) / 2; break;
-      case 'HIGH': opt = (hight + max) / 2; break;
+      case 'MEDIUM': opt = (low + high) / 2; break;
+      case 'HIGH': opt = (high + max) / 2; break;
       default: opt = optimum;
     }
   const mv = value === undefined ? min : Math.min(max, Math.max(min, value));

@@ -192,22 +192,22 @@ let print_delayed job =
 
 let formatter_with_indentation fmt amount =
   let blank = String.make amount ' ' in
-  let begining_of_line = ref false in
+  let beginning_of_line = ref false in
   let rec output old_output text p n =
     if n > 0 then begin
-      (* Output indentation on each begining of a line *)
-      if !begining_of_line then old_output blank 0 amount;
+      (* Output indentation on each beginning of a line *)
+      if !beginning_of_line then old_output blank 0 amount;
       match String.index_from_opt text p '\n' with
       | Some t when t >= 0 && t <= p + n ->
         (* complete line *)
         let len = t + 1 - p in
         old_output text p len;
-        begining_of_line := true;
+        beginning_of_line := true;
         output old_output text (t + 1) (n - len)
       | _ ->
         (* incomplete or last line *)
         old_output text p n;
-        begining_of_line := false;
+        beginning_of_line := false;
     end
   in
   formatter_with ~output fmt
