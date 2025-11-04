@@ -563,7 +563,7 @@ int __gen_e_acsl_fclose(FILE *stream)
     __gen_e_acsl_assert_data.pred_txt = "\\valid(stream)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data.fct = "fclose";
-    __gen_e_acsl_assert_data.line = 146;
+    __gen_e_acsl_assert_data.line = 148;
     __gen_e_acsl_assert_data.name = "valid_stream";
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -586,7 +586,7 @@ int __gen_e_acsl_fclose(FILE *stream)
     __gen_e_acsl_assert_data_2.pred_txt = "\\result == 0 || \\result == -1";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data_2.fct = "fclose";
-    __gen_e_acsl_assert_data_2.line = 148;
+    __gen_e_acsl_assert_data_2.line = 150;
     __gen_e_acsl_assert_data_2.name = "result_zero_or_EOF";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);

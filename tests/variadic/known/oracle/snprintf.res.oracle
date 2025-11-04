@@ -1,21 +1,21 @@
 [kernel] Parsing snprintf.c (with preprocessing)
-[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:233: 
-  Declaration of variadic function fprintf.
 [kernel:variadic] FRAMAC_SHARE/libc/stdio.h:235: 
-  Declaration of variadic function fscanf.
+  Declaration of variadic function fprintf.
 [kernel:variadic] FRAMAC_SHARE/libc/stdio.h:237: 
-  Declaration of variadic function printf.
-[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:238: 
-  Declaration of variadic function scanf.
+  Declaration of variadic function fscanf.
 [kernel:variadic] FRAMAC_SHARE/libc/stdio.h:239: 
-  Declaration of variadic function snprintf.
+  Declaration of variadic function printf.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:240: 
+  Declaration of variadic function scanf.
 [kernel:variadic] FRAMAC_SHARE/libc/stdio.h:241: 
-  Declaration of variadic function sprintf.
+  Declaration of variadic function snprintf.
 [kernel:variadic] FRAMAC_SHARE/libc/stdio.h:243: 
+  Declaration of variadic function sprintf.
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:245: 
   Declaration of variadic function sscanf.
-[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:604: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:606: 
   Declaration of variadic function dprintf.
-[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:666: 
+[kernel:variadic] FRAMAC_SHARE/libc/stdio.h:668: 
   Declaration of variadic function asprintf.
 [kernel:variadic] snprintf.c:12: 
   Translating call to snprintf to a call to the specialized version snprintf_va_1.
@@ -25,7 +25,7 @@
 [eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:147: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] using specification for function snprintf
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/stdio.h:239: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/stdio.h:241: 
   Cannot evaluate range bound format_length(format) - 1 (unsupported ACSL construct: logic function format_length). Approximating.
 [eva:alarm] snprintf.c:12: Warning: 
   function snprintf_va_1: precondition \valid(s + (0 .. n - 1)) ∨

@@ -17,13 +17,13 @@
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdio.h:512: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:514: Warning: 
   no assigns clause generated for function valid_read_string because pointers as arguments is not yet supported
 [e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:282: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdio.h:511: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:513: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/pthread.h:490: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
