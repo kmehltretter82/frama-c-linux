@@ -3,12 +3,19 @@
 
 This document describes the \FramaC/\Region plug-in that creates a map
 dispatching each memory location into regions, modularly for each \C function.
+The \Region plug-in aims at producing a correct, yet optimistic, map of the
+memory. By optimistic, we mean that the plug-in assumes that the programmer
+tries to maximize separation between pointers. Of course, that might not be
+true, thus the plug-in can show what has been computed so that one can provide
+additional annotations to tell the plug-in that some pointer might be in alias.
 
+While the plug-in can be run manually, using the \lstinline{-region} option of
+\FramaC. Its main purpose is to support other analyzers through its API.
 
-The \Region plug-in is distributed with the \FramaC platform.
-It is a dynamically loaded plug-in, distributed with the kernel since the
-\textsf{Gallium} release of \FramaC{}.
-
-One can run the \Region analysis on any C code file with the command line:
-
-\texttt{\$> frama-c -region [files.c]}
+The document is structured as follows:
+\begin{itemize}
+  \item Section~\ref{cha-region-plugin} describes the meaning of memory regions
+        and how these regions are computed from input source code,
+  %\item Section~\ref{region_logic} ...
+  %\item Section~\ref{region_api} ...
+\end{itemize}
