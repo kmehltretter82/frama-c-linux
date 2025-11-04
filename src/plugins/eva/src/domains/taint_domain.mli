@@ -20,3 +20,6 @@ type taint = | Direct | Indirect | Untainted
     If [indirect] is provided, return an [Indirect] taint if [indirect] is
     tainted (either directly or indirectly). *)
 val is_tainted: state -> ?indirect:Locations.Zone.t -> Locations.Zone.t -> taint
+
+(** Returns the list of taint names encountered by the taint analysis. *)
+val taint_names: unit -> string list

@@ -50,6 +50,15 @@ let is_private_namespace = String.equal private_taint_namespace
 let is_public_namespace = String.equal public_taint_namespace
 
 
+module Info = struct
+  let name = "Eva.Taint_domain.TaintNames"
+  let dependencies = [ Self.state ]
+end
+
+(* Stores the set of taint names encountered during an analysis. *)
+module TaintNames = State_builder.Set_ref (Datatype.String.Set) (Info)
+
+
 (* Debug key to also include [assume_stmts] in the output of the
    Frama_C_domain_show_each directive. *)
 let dkey_debug = Self.register_category "d-taint-debug"
@@ -252,6 +261,8 @@ module LatticeMultiTaint = struct
   module TaintNamespace = struct
     include Datatype.String.Map
     include Datatype.String.Map.Make (LatticeSingleTaint)
+
+    let add name = TaintNames.add name; add name
 
     let find_or_empty key map =
       try find key map
@@ -1196,3 +1207,6 @@ let is_tainted state ?indirect zone =
   if Zone.intersects zone locs_data then Direct
   else if Zone.intersects zone locs_control || is_indirect () then Indirect
   else Untainted
+
+let taint_names () =
+  TaintNames.get () |> Datatype.String.Set.elements
