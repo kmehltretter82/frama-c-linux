@@ -1,5 +1,5 @@
 /* run.config
-   ENABLED_IF: (= %{system} linux)
+   ENABLED_IF: (and (= %{system} linux) (= %{architecture} amd64))
    STDOPT: #"-no-frama-c-stdlib" +"-kernel-msg-key=\"-variadic\""
 */
 #include <stdio.h>
