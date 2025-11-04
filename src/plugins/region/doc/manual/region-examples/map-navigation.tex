@@ -6,7 +6,7 @@ an overapproximation of a
 map dispatching memory locations into regions using alias and shape analysis.
 A region map is defined as a graph (acyclic when no pointer is
 involved) whose paths start with program variables represented as labels.
-\begin{table}[h!]
+\begin{table}[ht!]
 \begin{center}
 \begin{tabular}{|m{2cm}|m{10cm}|}
 \hline
@@ -28,7 +28,7 @@ A region label (not a region) representing the program variable \texttt{s}.
 
 \subsection{Region definition}
 
-In any region map, each region is carcterized by (at least) its size,
+In any region map, each region is characterized by (at least) its size,
 its content, and the memory accesses.
 Memory access kinds are: read \texttt{R}, write \texttt{W}, shift
 \texttt{S}, and initialization \texttt{I}. Each access is paired with a C type
@@ -42,9 +42,9 @@ C types, which are represented as
 \texttt{i} for \texttt{int}, \texttt{s} for \texttt{short},
 \texttt{d} for \texttt{double}, \texttt{f} for \texttt{float},
  \texttt{b} for \texttt{bool}, and lastly \texttt{x} for multiple
- heterogenous accesses.
+ heterogeneous accesses.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 \begin{center}
 \begin{tabular}{|m{4cm}|m{10cm}|}
 \hline
@@ -74,11 +74,11 @@ C types, which are represented as
 \hline
     {\centering{\includegraphics[height=1.4cm]{"images/example-garbled-with-more-details.png"}}}
 &
-    Primitive region with heterogenous accesses:
+    Primitive region with heterogeneous accesses:
 
     a 32-bits \texttt{int} and a 32-bits \texttt{float}.
 
-    (red for heterogenous accesses)
+    (red for heterogeneous accesses)
 \\
 \hline
 \end{tabular}
@@ -99,7 +99,7 @@ is interpreted as a pointer read access.
 The representation of pointer referencing is shown in the region arc examples
 in Table \ref{table-region-navigation-arcs}.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 \begin{center}
 \begin{tabular}{|m{1.8cm}|m{10cm}|}
 \hline
@@ -147,7 +147,7 @@ fields of the structure, see Section \ref{sec-region-shape-analysis}.
 
 
 
-\begin{table}[h!]
+\begin{table}[ht!]
 \begin{center}
 \begin{tabular}{|m{2cm}|m{10cm}|}
 \hline
@@ -176,11 +176,11 @@ fields of the structure, see Section \ref{sec-region-shape-analysis}.
 
 \subsection{Region arcs in the region map}
 
-A region map is defined by its regions and the relaitons between them.
-Those relations are represneted as arcs in the region map, as shown in
+A region map is defined by its regions and the relations between them.
+Those relations are represented as arcs in the region map, as shown in
 Table \ref{table-region-navigation-arcs}.
 
-\begin{table}[h!]
+\begin{table}[ht!]
 \begin{center}
 \begin{tabular}{|m{5cm}|m{10cm}|}
 \hline
