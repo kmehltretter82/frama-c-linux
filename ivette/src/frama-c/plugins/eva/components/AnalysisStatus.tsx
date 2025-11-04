@@ -8,7 +8,7 @@
 
 import React from 'react';
 import { Icon } from 'dome/controls/icons';
-import * as Eva from 'frama-c/plugins/eva/api/general';
+import * as Eva from 'frama-c/plugins/eva/api/analysis';
 import { evaBasicStatus } from 'frama-c/plugins/eva/EvaDefinitions';
 import { useSyncValue } from 'frama-c/states';
 

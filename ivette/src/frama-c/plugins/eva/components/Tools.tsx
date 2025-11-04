@@ -12,7 +12,7 @@ import { Hbox } from 'dome/layout/boxes';
 import * as Forms from 'dome/layout/forms';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
-import * as Eva from 'frama-c/plugins/eva/api/general';
+import * as Eva from 'frama-c/plugins/eva/api/analysis';
 import { EvaStatus } from 'frama-c/plugins/eva/components/AnalysisStatus';
 import { SidebarTitle } from 'dome/frame/sidebars';
 import { HelpButton } from 'dome/help';

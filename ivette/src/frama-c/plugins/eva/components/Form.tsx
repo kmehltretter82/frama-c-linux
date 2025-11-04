@@ -16,7 +16,7 @@ import { classes } from 'dome/misc/utils';
 import * as Globals from 'frama-c/kernel/Globals';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
-import * as Eva from 'frama-c/plugins/eva/api/general';
+import * as EvaAst from 'frama-c/plugins/eva/api/ast';
 import * as EvaDef from 'frama-c/plugins/eva/EvaDefinitions';
 import { Icon } from 'dome/controls/icons';
 
@@ -131,7 +131,7 @@ export function EvaFormOptions(
   const showAllFields = Forms.useState(false);
 
   const ker = States.useSyncArrayProxy(Ast.functions);
-  const eva = States.useSyncArrayProxy(Eva.functions);
+  const eva = States.useSyncArrayProxy(EvaAst.functions);
   const fctsList = React.useMemo(() =>
     Globals.computeFcts(ker, eva)
       .filter((fct) => !fct.extern && !fct.stdlib && !fct.builtin)

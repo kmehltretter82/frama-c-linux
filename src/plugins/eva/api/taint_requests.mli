@@ -6,4 +6,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Requests registered to the Frama-C server; nothing is exported. *)
+(** Taint status: untainted, direct taint, indirect taint or error. *)
+module TaintStatus : Server.Data.S
+
+(** Taint status of a logic property. *)
+val is_tainted_property: Property.identified_property -> TaintStatus.t

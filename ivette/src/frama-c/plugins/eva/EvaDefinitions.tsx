@@ -7,7 +7,7 @@
 /* ************************************************************************ */
 
 import * as Forms from 'dome/layout/forms';
-import * as Eva from 'frama-c/plugins/eva/api/general';
+import { computationStateType } from 'frama-c/plugins/eva/api/analysis';
 
 export type KeyVal<A> = {[key: string]: A}
 
@@ -296,7 +296,7 @@ export interface EvaStatusInfos {
 }
 
 export type EvaStatus = {
-  [key in Eva.computationStateType | "undefined"]: EvaStatusInfos
+  [key in computationStateType | "undefined"]: EvaStatusInfos
 }
 
 export const evaBasicStatus: EvaStatus = {

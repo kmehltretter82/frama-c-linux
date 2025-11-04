@@ -24,7 +24,8 @@ import { computeFcts, useFunctionFilter } from 'frama-c/kernel/Globals';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Properties from 'frama-c/kernel/api/properties';
 import * as States from 'frama-c/states';
-import * as Eva from 'frama-c/plugins/eva/api/general';
+import * as EvaAst from 'frama-c/plugins/eva/api/ast';
+import * as EvaStat from 'frama-c/plugins/eva/api/stat';
 import {
   CGNode, CGLink, CGData,
   SelectedNodes,
@@ -55,9 +56,9 @@ import * as CgAPI from './api';
 
 function convertGraph(
   graph: CgAPI.graph | undefined,
-  functionStats: Eva.functionStatsData[],
+  functionStats: EvaStat.functionStatsData[],
   properties: Properties.statusData[],
-  evaps: Eva.propertiesData[],
+  evaps: EvaAst.propertiesData[],
 ): CGData
 {
   const nodes: CGNode[] = [];
@@ -156,14 +157,14 @@ function Callgraph(): JSX.Element {
 
   /** data */
   const graph = States.useSyncValue(CgAPI.callgraph);
-  const alarms = States.useSyncArrayData(Eva.functionStats);
+  const alarms = States.useSyncArrayData(EvaStat.functionStats);
 
   /** Function list and properties */
   const ker = States.useSyncArrayProxy(Ast.functions);
-  const eva = States.useSyncArrayProxy(Eva.functions);
+  const eva = States.useSyncArrayProxy(EvaAst.functions);
   const functions = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
   const properties = States.useSyncArrayData(Properties.status);
-  const evaps = States.useSyncArrayData(Eva.properties);
+  const evaps = States.useSyncArrayData(EvaAst.properties);
   const {
     contextFctFilter, multipleSelection, showFunction } = useFunctionFilter();
 

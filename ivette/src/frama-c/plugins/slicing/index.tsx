@@ -13,7 +13,7 @@ import * as ASTview from 'frama-c/kernel/ASTview';
 
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Slicing from 'frama-c/plugins/slicing/api/slicing';
-import * as Eva from 'frama-c/plugins/eva/api/general';
+import * as Eva from 'frama-c/plugins/eva/api/analysis';
 
 function showInfo(message: string, details: string): void {
   const buttons = [{ label: 'Ok' }];
