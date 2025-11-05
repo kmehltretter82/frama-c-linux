@@ -15,90 +15,14 @@ let package =
   Package.package ~plugin:"eva" ~name:"taint" ~title:"Taint Analysis" ()
 
 
-(* ----- Register Eva taints information ------------------------------------ *)
-
-let expr_of_lval v = Cil.new_exp ~loc:Cil_datatype.Location.unknown (Lval v)
-
-let term_lval_to_lval kf tlval =
-  try
-    let result = Option.bind Eva_utils.find_return_var kf in
-    Logic_to_c.term_lval_to_lval ?result tlval
-  with Logic_to_c.No_conversion -> raise Not_found
-
-module EvaTaints = struct
-  open Results
-
-  let evaluate expr request =
-    let open Option.Operators in
-    let Deps.{ data ; indirect } = expr_dependencies expr request in
-    let* data = is_tainted data request |> Result.to_option in
-    let* indirect = is_tainted indirect request |> Result.to_option in
-    Some (data, indirect)
-
-  let expr_of_marker = let open Printer_tag in function
-      | PLval (_, Kstmt stmt, lval) -> Some (expr_of_lval lval, stmt)
-      | PExp (_, Kstmt stmt, expr) -> Some (expr, stmt)
-      | PVDecl (_, Kstmt stmt, vi) -> Some (expr_of_lval (Var vi, NoOffset), stmt)
-      | PTermLval (kf, Kstmt stmt, _, tlval) ->
-        Some (term_lval_to_lval kf tlval |> expr_of_lval, stmt)
-      | _ -> None
-
-  let of_marker marker =
-    let open Option.Operators in
-    let* expr, stmt = expr_of_marker marker in
-    let* before = evaluate expr (before stmt) in
-    let* after  = evaluate expr (after  stmt) in
-    Some (before, after)
-
-  let to_string = function
-    | Untainted -> "untainted"
-    | Direct -> "direct taint"
-    | Indirect -> "indirect taint"
-
-  let pp fmt = function
-    | taint, Untainted -> Format.fprintf fmt "%s" (to_string taint)
-    | data, indirect ->
-      let sep = match data with Untainted -> "but" | _ -> "and" in
-      Format.fprintf fmt
-        "%s to the value, %s %s to values used to compute lvalues addresses"
-        (to_string data) sep (to_string indirect)
-
-  let print_taint fmt marker =
-    match of_marker marker with
-    | None -> raise Not_found
-    | Some (before, after) ->
-      if before = after
-      then Format.fprintf fmt "%a" pp before
-      else Format.fprintf fmt "Before: %a@\nAfter: %a" pp before pp after
-
-  let eva_taints_descr =
-    "Taint status:\n\
-     - Direct taint: data dependency from values provided by the attacker, \
-     meaning that the attacker may be able to alter this value\n\
-     - Indirect taint: the attacker cannot directly alter this value, but he \
-     may be able to impact the path by which its value is computed.\n\
-     - Untainted: cannot be modified by the attacker."
-
-  let () =
-    let taint_computed = Taint_domain.Store.is_computed in
-    let enable () = Analysis.is_computed () && taint_computed () in
-    Server.Kernel_ast.Information.register
-      ~id:"eva.taint" ~label:"Taint" ~title: "Taint status according to Eva"
-      ~descr:eva_taints_descr ~enable print_taint
-
-  let () =
-    Analysis_requests.register_computation_hook
-      Server.Kernel_ast.Information.update
-end
-
 
 (* ----- Taint statuses ----------------------------------------------------- *)
 
+type taint = Results.taint = Direct | Indirect | Untainted
+type error = NotComputed | Irrelevant | LogicError
+
 module TaintStatus = struct
   open Server.Data
-
-  type taint = Results.taint = Direct | Indirect | Untainted
-  type error = NotComputed | Irrelevant | LogicError
 
   let dictionary = Enum.dictionary ()
 
@@ -147,6 +71,82 @@ module TaintStatus = struct
       ~descr:(Markdown.plain "Taint status of logical properties") dictionary
 
   include (val data : S with type t = (taint, error) result)
+end
+
+
+(* ----- Register Eva taints information ------------------------------------ *)
+
+let expr_of_lval v = Cil.new_exp ~loc:Cil_datatype.Location.unknown (Lval v)
+
+let term_lval_to_lval kf tlval =
+  try
+    let result = Option.bind Eva_utils.find_return_var kf in
+    Logic_to_c.term_lval_to_lval ?result tlval
+  with Logic_to_c.No_conversion -> raise Not_found
+
+module EvaTaints = struct
+
+  let evaluate expr request =
+    let open Option.Operators in
+    let Deps.{ data ; indirect } = Results.expr_dependencies expr request in
+    let* data = is_tainted data request |> Result.to_option in
+    let* indirect = is_tainted indirect request |> Result.to_option in
+    Some (data, indirect)
+
+  let expr_of_marker = let open Printer_tag in function
+      | PLval (_, Kstmt stmt, lval) -> Some (expr_of_lval lval, stmt)
+      | PExp (_, Kstmt stmt, expr) -> Some (expr, stmt)
+      | PVDecl (_, Kstmt stmt, vi) -> Some (expr_of_lval (Var vi, NoOffset), stmt)
+      | PTermLval (kf, Kstmt stmt, _, tlval) ->
+        Some (term_lval_to_lval kf tlval |> expr_of_lval, stmt)
+      | _ -> None
+
+  let of_marker marker =
+    let open Option.Operators in
+    let* expr, stmt = expr_of_marker marker in
+    let* before = evaluate expr (Results.before stmt) in
+    let* after  = evaluate expr (Results.after  stmt) in
+    Some (before, after)
+
+  let to_string = function
+    | Untainted -> "untainted"
+    | Direct -> "direct taint"
+    | Indirect -> "indirect taint"
+
+  let pp fmt = function
+    | taint, Untainted -> Format.fprintf fmt "%s" (to_string taint)
+    | data, indirect ->
+      let sep = match data with Untainted -> "but" | _ -> "and" in
+      Format.fprintf fmt
+        "%s to the value, %s %s to values used to compute lvalues addresses"
+        (to_string data) sep (to_string indirect)
+
+  let print_taint fmt marker =
+    match of_marker marker with
+    | None -> raise Not_found
+    | Some (before, after) ->
+      if before = after
+      then Format.fprintf fmt "%a" pp before
+      else Format.fprintf fmt "Before: %a@\nAfter: %a" pp before pp after
+
+  let eva_taints_descr =
+    "Taint status:\n\
+     - Direct taint: data dependency from values provided by the attacker, \
+     meaning that the attacker may be able to alter this value\n\
+     - Indirect taint: the attacker cannot directly alter this value, but he \
+     may be able to impact the path by which its value is computed.\n\
+     - Untainted: cannot be modified by the attacker."
+
+  let () =
+    let taint_computed = Taint_domain.Store.is_computed in
+    let enable () = Analysis.is_computed () && taint_computed () in
+    Server.Kernel_ast.Information.register
+      ~id:"eva.taint" ~label:"Taint" ~title: "Taint status according to Eva"
+      ~descr:eva_taints_descr ~enable print_taint
+
+  let () =
+    Analysis_requests.register_computation_hook
+      Server.Kernel_ast.Information.update
 end
 
 
@@ -208,7 +208,7 @@ let zone_of_predicate kinstr predicate =
   let logic_deps = Eval_terms.predicate_deps env predicate in
   match Option.map Cil_datatype.Logic_label.Map.bindings logic_deps with
   | Some [ BuiltinLabel Here, zone ] -> Ok zone
-  | _ -> Error TaintStatus.LogicError
+  | _ -> Error LogicError
 
 let get_predicate = function
   | Property.IPCodeAnnot ica ->
@@ -216,11 +216,11 @@ let get_predicate = function
       match ica.ica_ca.annot_content with
       | AAssert (_, predicate) | AInvariant (_, _, predicate) ->
         Ok predicate.tp_statement
-      | _ -> Error TaintStatus.Irrelevant
+      | _ -> Error Irrelevant
     end
-  | IPPropertyInstance { ii_pred = None } -> Error TaintStatus.LogicError
+  | IPPropertyInstance { ii_pred = None } -> Error LogicError
   | IPPropertyInstance { ii_pred = Some ip } -> Ok ip.ip_content.tp_statement
-  | _ -> Error TaintStatus.Irrelevant
+  | _ -> Error Irrelevant
 
 let is_tainted_property ip =
   if Analysis.is_computed () && Taint_domain.Store.is_computed () then
@@ -229,5 +229,5 @@ let is_tainted_property ip =
     let+ predicate = get_predicate ip in
     let+ zone = zone_of_predicate kinstr predicate in
     let result = Results.(before_kinstr kinstr |> is_tainted zone) in
-    Result.map_error (fun _ -> TaintStatus.NotComputed) result
-  else Error TaintStatus.NotComputed
+    Result.map_error (fun _ -> NotComputed) result
+  else Error NotComputed
