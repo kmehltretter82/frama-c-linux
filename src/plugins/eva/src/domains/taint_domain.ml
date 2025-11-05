@@ -1193,7 +1193,7 @@ let () = Abstractions.Hooks.register interpret_taint_logic
 
 type taint = Direct | Indirect | Untainted
 
-let is_tainted state ?indirect zone =
+let is_tainted state zone =
   let taint_state =
     match state with
     | `Top -> LatticeSingleTaint.top
@@ -1202,10 +1202,8 @@ let is_tainted state ?indirect zone =
           LatticeSingleTaint.join state acc) state_map LatticeSingleTaint.empty
   in
   let { locs_data; locs_control } = taint_state in
-  let intersects_any z = Zone.(intersects (join locs_data locs_control) z) in
-  let is_indirect () = Option.fold indirect ~none:false ~some:intersects_any in
   if Zone.intersects zone locs_data then Direct
-  else if Zone.intersects zone locs_control || is_indirect () then Indirect
+  else if Zone.intersects zone locs_control then Indirect
   else Untainted
 
 let taint_names () =

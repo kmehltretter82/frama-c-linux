@@ -16,10 +16,8 @@ val registered: Abstractions.Domain.registered
 
 type taint = | Direct | Indirect | Untainted
 
-(** Is a memory zone tainted according to a given state? 
-    If [indirect] is provided, return an [Indirect] taint if [indirect] is
-    tainted (either directly or indirectly). *)
-val is_tainted: state -> ?indirect:Locations.Zone.t -> Locations.Zone.t -> taint
+(** Is a memory zone tainted according to a given state? *)
+val is_tainted: state -> Locations.Zone.t -> taint
 
 (** Returns the list of taint names encountered by the taint analysis. *)
 val taint_names: unit -> string list
