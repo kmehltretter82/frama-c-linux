@@ -447,6 +447,16 @@ meter::-webkit-meter-even-less-good-value  {
   }
 }
 
+.dome-xIcon-blink {
+    animation: dome-xIcon-blinker 1s linear infinite;
+}
+
+@keyframes dome-xIcon-blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
 
 /* -------------------------------------------------------------------------- */
 /* --- Multiselect                                                        --- */

@@ -21,8 +21,11 @@ import * as Server from 'frama-c/server';
 import * as Params from 'frama-c/kernel/api/parameters';
 
 import { SelectedPlugins, usePluginsContextById } from '.';
-import { State, useServerField, useSyncValue } from '../states';
+import {
+  customSyncError, State, useServerField, useSyncValue
+} from '../states';
 import { Remote } from './actions';
+import { Icon } from 'dome/controls/icons';
 
 const D = new Debug('OptionsForms');
 
@@ -64,13 +67,35 @@ function useField<A>(
   remote: Forms.BufferController,
   state: State<A>,
   defaultValue: A,
+  setIsError?: React.Dispatch<React.SetStateAction<boolean>>
 ): Forms.FieldState<A> {
-  const sField = useServerField(state, defaultValue);
-  return Forms.useBuffer(remote, sField);
+  const [error, setError] = React.useState<string | undefined>(undefined);
+  const sField = useServerField(state, defaultValue, error);
+  const buffer = Forms.useBuffer(remote, sField);
+
+  const onSyncError = React.useCallback((e: CustomEvent<customSyncError>) => {
+    const { name, error } = e.detail;
+    if(name !== state.name) return;
+    setError(`error ${name} : ${error} `);
+    setIsError && setIsError(true);
+  }, [setError, setIsError, state.name]);
+
+  React.useEffect(() => {
+    if(!buffer.error) {
+      setIsError && setIsError(false);
+      setError(undefined);
+    }
+  }, [buffer.error, setIsError]);
+
+  React.useEffect(() => {
+    window.addEventListener("my:syncError", onSyncError);
+    return () => window.removeEventListener("my:syncError", onSyncError);
+  }, [onSyncError]);
+
+  return buffer;
 }
 
 function useIsSet<A>(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   formId: string, sectionId: string, id: string, stateFC: State<A>
 ): boolean {
   const { isSetElement, addPluginsSet } = usePluginsContextById(id);
@@ -110,12 +135,22 @@ function isState<A>(s: State<A>, params: Params.parameter): boolean {
   return !!s;
 }
 
-function getActions<A>(state: Forms.FieldState<A>): JSX.Element | undefined {
+function getActions<A>(
+  state: Forms.FieldState<A>,
+  isError?: boolean
+): JSX.Element | undefined {
   if(!state) return undefined;
   return (
     <Forms.Actions>
       <Forms.ResetButton state={state} title="Reset" />
       <Forms.CommitButton state={state} title="Apply" />
+      {isError &&
+        <Icon
+          id='WARNING'
+          kind='negative'
+          className='dome-xIcon-blink'
+          title="This field has not been updated, the value was not accepted"
+        />}
     </Forms.Actions>
   );
 }
@@ -123,10 +158,12 @@ function getActions<A>(state: Forms.FieldState<A>): JSX.Element | undefined {
 function getClasses<A>(
   state: Forms.FieldState<A>,
   isSet: boolean,
+  isSyncError?: boolean
 ): string | undefined {
   return classes(
     !Forms.isStable(state) && 'modified',
     isSet && 'field-is-set',
+    isSyncError && 'field-error-sync'
   );
 }
 
@@ -160,7 +197,8 @@ function NumberField(props: FieldProps)
   const { name, help, state, range } = props.param;
   const sNumb = Params[state as keyof typeof Params] as State<number>;
   const isSet = useIsSet<number>(formId, sectionId, name, sNumb);
-  const vState = useField(remote, sNumb, 0);
+  const [isError, setIsError] = React.useState<boolean>(false);
+  const vState = useField(remote, sNumb, 0, setIsError);
 
   if(!vState || !isState<number>(sNumb, param)) return null;
 
@@ -183,7 +221,7 @@ function NumberField(props: FieldProps)
       max={max}
       state={vState as Forms.FieldState<number | undefined>}
       className={getClasses(vState, isSet)}
-      actions={getActions(vState)}
+      actions={getActions(vState, isError)}
     />;
 }
 
@@ -193,7 +231,8 @@ function StringField(props: FieldProps)
   const { name, help, state } = param;
   const sStr = Params[state as keyof typeof Params] as State<string>;
   const isSet = useIsSet<string>(formId, sectionId, name, sStr);
-  const vState = useField(remote, sStr, '');
+  const [isError, setIsError] = React.useState<boolean>(false);
+  const vState = useField(remote, sStr, '', setIsError);
 
   if(!vState || !isState<string>(sStr, param)) return null;
   return <Forms.TextField
@@ -202,8 +241,8 @@ function StringField(props: FieldProps)
       title={help}
       state={vState as Forms.FieldState<string | undefined>}
       latency={100}
-      className={getClasses(vState, isSet)}
-      actions={getActions(vState)}
+      className={getClasses(vState, isSet, isError)}
+      actions={getActions(vState, isError)}
     />;
 }
 
