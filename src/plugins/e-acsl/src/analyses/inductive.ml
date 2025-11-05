@@ -174,14 +174,43 @@ end = struct
     preferred ~li usable_modes
 end
 
-(** [Modus.t] is a [mode] enriched with a set of substitutees. When the mode
-    analysis of a constructor finishes by descending to its conclusion, the
-    mode is determined. At that point also the set of variables that are to be
-    to be substituted by the new predicate's/function's formal parameters is
+module Substs = struct
+  include Logic_var.Map
+
+  let of_list pairs =
+    let add substs (v, w) = if mem v substs then substs else add v w substs in
+    List.fold_left add empty pairs
+
+  let unions =
+    let conflict key _ _ =
+      Options.fatal "conflicting substs for %a" Logic_var.pretty key
+    in
+    List.fold_left (union conflict) empty
+
+  let pretty fmt m =
+    let pp_substitution fmt src tgt =
+      Format.fprintf fmt "@[@[%a@] %t @[%a@]@]"
+        Printer.pp_logic_var src
+        Unicode.pp_right_arrow
+        Printer.pp_logic_var tgt
+    in
+    Format.fprintf fmt "@[[";
+    let first = ref true in
+    m |> iter (fun src tgt ->
+        if not !first then Format.fprintf fmt ",@ ";
+        first := false;
+        pp_substitution fmt src tgt);
+    Format.fprintf fmt "]@]"
+end
+
+(** [Modus.t] is a [mode] enriched with a set of future-let-bound variables.
+    When the mode analysis of a constructor finishes by descending to its
+    conclusion, the mode is determined. By that point also the set of variables
+    that will be bound by recursive or foreign predicate applications are
     known. This information is retained along with the mode as it is useful to
     re-use by the normalization. *)
 module Modus : sig
-  type t = {mode : mode; substitutees : Vars.t}
+  type t = {mode : mode; substs : logic_var Substs.t}
 
   val pretty : Format.formatter -> t -> unit
 
@@ -189,7 +218,7 @@ module Modus : sig
   val preferred_opt : t list -> t option
   val preferred : li:logic_info -> t list -> t
 end = struct
-  type t = {mode : mode; substitutees : Vars.t}
+  type t = {mode : mode; substs : logic_var Substs.t}
 
   let compare {mode = m1} {mode = m2} = Mode.compare m1 m2
 
@@ -197,8 +226,7 @@ end = struct
     | [] -> Options.fatal "Modus.unions []"
     | {mode} :: _ as modi ->
       assert (List.for_all (fun m -> m.mode = mode) modi);
-      {mode;
-       substitutees = Vars.unions @@ List.map (fun m -> m.substitutees) modi}
+      {mode; substs = Substs.unions @@ List.map (fun m -> m.substs) modi}
 
   let preferred_opt modes =
     match List.sort compare modes with
@@ -210,10 +238,8 @@ end = struct
     | Some m -> m
     | None -> unsupported "no valid mode found for: %a" Printer.pp_logic_info li
 
-  let pretty fmt {mode; substitutees} =
-    Format.fprintf fmt "%a%a"
-      Mode.pretty mode
-      Vars.pretty substitutees
+  let pretty fmt {mode; substs} =
+    Format.fprintf fmt "%a with %a" Mode.pretty mode Substs.pretty substs
 end
 
 module rec Constructor : sig
@@ -361,19 +387,25 @@ end = struct
           "only \\let expressions that bind terms are supported, not: %a"
           Printer.pp_predicate p
       | Papp (li, _, args) when is_rec_occurrence li -> (* conclusion *)
-        let in_args, _ = Mode.in_out_args ~mode:mode args in
+        let substs =
+          let pairs, _ = Mode.in_out_args ~mode (List.combine args li.l_profile)
+          and var_subst (arg, formal) =
+            Option.map (fun v -> v, formal) (var_of_term arg)
+          in Substs.of_list @@ List.filter_map var_subst pairs
+        in
         let fv = add_fv fv args in
-        let substitutees = Vars.diff (Vars.of_list @@ List.filter_map var_of_term in_args) lb in
-        let unbound = Vars.diff (Vars.diff fv substitutees) lb in
-        let all_bound = Vars.is_empty unbound in
-        if not all_bound then
-          Options.feedback ~dkey ~level:4
-            "mode %a could not bind: %a"
-            Mode.pretty mode
-            Vars.pretty unbound;
-        if all_bound
-        then Some {Modus.mode; substitutees}
-        else None
+        let unbound =
+          Vars.filter (fun v -> not @@ Substs.mem v substs) (Vars.diff fv lb)
+        in
+        if Vars.is_empty unbound
+        then Some {Modus.mode; substs}
+        else
+          let () =
+            Options.feedback ~dkey ~level:4
+              "mode %a could not bind: %a"
+              Mode.pretty mode
+              Vars.pretty unbound;
+          in None
       | Papp _ ->
         unsupported ~loc:p.pred_loc
           "conclusion not an occurrence of the enclosing predicate: %a"
@@ -473,11 +505,11 @@ end = struct
           Printer.pp_predicate p
     in
     let quantifiers, body = extract_foralls predicate in
-    let body = normalize_body ~uv:mode.substitutees body in
+    let body = normalize_body ~uv:(Vars.of_list @@ List.map fst @@ Substs.bindings mode.substs) body in
     let body = Equalities.apply_substitutions !eqs.substitutions body in
     let profile, _ = Mode.in_out_args ~mode:mode.mode li_rec.l_profile in
     let quantifiers =
-      profile @ Vars.elements (Vars.diff quantifiers mode.substitutees)
+      profile @ Vars.elements @@ Vars.filter (fun q -> not @@ Substs.mem q mode.substs) quantifiers
     in
     let quantified =
       {predicate with pred_content = Pforall (quantifiers, body)}
