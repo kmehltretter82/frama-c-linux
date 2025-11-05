@@ -15,6 +15,44 @@ let package =
   Package.package ~plugin:"eva" ~name:"taint" ~title:"Taint Analysis" ()
 
 
+(* ----- Taint names -------------------------------------------------------- *)
+
+let _signal =
+  States.register_value ~package
+    ~name:"taintNames"
+    ~descr:(Markdown.plain "List of taint names")
+    ~output:(module Data.Jlist (Data.Jstring))
+    ~get:Taint_domain.taint_names
+    ~add_hook:Analysis_requests.register_computation_hook
+    ()
+
+module CurrentTaint = struct
+
+  module Info = struct
+    let name = "Eva.Taint_requests.CurrentTaint"
+    let dependencies = [ Self.state ]
+    let default () = ""
+  end
+
+  include State_builder.Ref (Datatype.String) (Info)
+end
+
+let current_taint_signal =
+  States.register_framac_state ~package
+    ~name:"currentTaint"
+    ~descr:(Markdown.plain "Name of the currently selected taint, if any")
+    ~data:Data.jstring
+    (module CurrentTaint)
+
+(* Takes into account the current selected taint. *)
+let is_tainted zone request =
+  let current_name = CurrentTaint.get () in
+  let name = if current_name = "" then None else Some current_name in
+  Results.is_tainted ?name zone request
+
+let register_hook f =
+  Analysis_requests.register_computation_hook f;
+  CurrentTaint.add_hook_on_change (fun _ -> f ())
 
 (* ----- Taint statuses ----------------------------------------------------- *)
 
@@ -144,9 +182,7 @@ module EvaTaints = struct
       ~id:"eva.taint" ~label:"Taint" ~title: "Taint status according to Eva"
       ~descr:eva_taints_descr ~enable print_taint
 
-  let () =
-    Analysis_requests.register_computation_hook
-      Server.Kernel_ast.Information.update
+  let () = register_hook Server.Kernel_ast.Information.update
 end
 
 
@@ -194,7 +230,7 @@ module LvalueTaints = struct
       ~descr:(Markdown.plain "Get the tainted lvalues of a given function")
       ~input:(module (Kernel_ast.Decl))
       ~output:(module (Data.Jlist (Status)))
-      ~signals:[Analysis_requests.computation_signal]
+      ~signals:[Analysis_requests.computation_signal; current_taint_signal]
       (function SFunction kf -> get_tainted_lvals kf | _ -> [])
 
 end
@@ -228,6 +264,6 @@ let is_tainted_property ip =
     let kinstr = Property.get_kinstr ip in
     let+ predicate = get_predicate ip in
     let+ zone = zone_of_predicate kinstr predicate in
-    let result = Results.(before_kinstr kinstr |> is_tainted zone) in
+    let result = Results.before_kinstr kinstr |> is_tainted zone in
     Result.map_error (fun _ -> NotComputed) result
   else Error NotComputed
