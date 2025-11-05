@@ -10,7 +10,7 @@ import React from 'react';
 import { IconButton } from 'dome/controls/buttons';
 import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
-import * as EvaStat from 'frama-c/plugins/eva/api/stat';
+import * as EvaStats from 'frama-c/plugins/eva/api/stats';
 import { FlameGraph } from 'react-flame-graph';
 import AutoSizer, { Size } from 'react-virtualized-auto-sizer';
 import { EvaReady, EvaStatus } from './components/AnalysisStatus';
@@ -22,13 +22,13 @@ interface Flamegraph {
   name: string;
   value: number;
   children: Flamegraph[];
-  info?: EvaStat.flamegraphData;
+  info?: EvaStats.flamegraphData;
 }
 
 const addNodeToFlamegraph = (
   flamegraph: Flamegraph,
   cs: string[],
-  row: EvaStat.flamegraphData,
+  row: EvaStats.flamegraphData,
 ): void => {
   /* Accumulate times for all nodes crossed. We do not rely on [row.totalTime]
      as during the analysis, the flamegraph is incomplete and the total time
@@ -113,7 +113,7 @@ function EvaFlamegraph(props: EvaFlamegraphProps): JSX.Element {
 export function FlamegraphComponent(): JSX.Element {
   const [useScope, flipUseScope] =
     useFlipSettings("eva.flamegraph.scope", true);
-  const model = States.useSyncArrayData(EvaStat.flamegraph);
+  const model = States.useSyncArrayData(EvaStats.flamegraph);
 
   const flameGraph = React.useMemo<Flamegraph | null>(() => {
     if(model.length === 0 ) return null;

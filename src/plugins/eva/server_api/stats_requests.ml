@@ -13,7 +13,7 @@ open Cil_types
 
 let package =
   let title = "Statistics about Eva analysis" in
-  Package.package ~plugin:"eva" ~name:"stat" ~title ()
+  Package.package ~plugin:"eva" ~name:"stats" ~title ()
 
 
 (* ----- Analysis statistics ------------------------------------------------ *)

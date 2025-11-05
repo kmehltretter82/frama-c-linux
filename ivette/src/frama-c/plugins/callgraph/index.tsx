@@ -25,7 +25,7 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import * as Properties from 'frama-c/kernel/api/properties';
 import * as States from 'frama-c/states';
 import * as EvaAst from 'frama-c/plugins/eva/api/ast';
-import * as EvaStat from 'frama-c/plugins/eva/api/stat';
+import * as EvaStats from 'frama-c/plugins/eva/api/stats';
 import {
   CGNode, CGLink, CGData,
   SelectedNodes,
@@ -56,7 +56,7 @@ import * as CgAPI from './api';
 
 function convertGraph(
   graph: CgAPI.graph | undefined,
-  functionStats: EvaStat.functionStatsData[],
+  functionStats: EvaStats.functionStatsData[],
   properties: Properties.statusData[],
   evaps: EvaAst.propertiesData[],
 ): CGData
@@ -157,7 +157,7 @@ function Callgraph(): JSX.Element {
 
   /** data */
   const graph = States.useSyncValue(CgAPI.callgraph);
-  const alarms = States.useSyncArrayData(EvaStat.functionStats);
+  const alarms = States.useSyncArrayData(EvaStats.functionStats);
 
   /** Function list and properties */
   const ker = States.useSyncArrayProxy(Ast.functions);

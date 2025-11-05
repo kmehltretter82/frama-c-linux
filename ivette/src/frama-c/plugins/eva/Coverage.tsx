@@ -12,12 +12,12 @@ import * as Arrays from 'dome/table/arrays';
 import * as Compare from 'dome/data/compare';
 import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
-import * as EvaStat from 'frama-c/plugins/eva/api/stat';
+import * as EvaStats from 'frama-c/plugins/eva/api/stats';
 
 import CoverageMeter, { percent } from './CoverageMeter';
 import { EvaStatus } from './components/AnalysisStatus';
 
-type stats = EvaStat.functionStatsData;
+type stats = EvaStats.functionStatsData;
 
 // --- Coverage Table ---
 
@@ -57,7 +57,7 @@ const ordering: Arrays.ByColumns<stats> = {
 
 export function CoverageTable(): JSX.Element {
 
-  const model = States.useSyncArrayModel(EvaStat.functionStats);
+  const model = States.useSyncArrayModel(EvaStats.functionStats);
   React.useEffect(() => {
     model.setColumnOrder(ordering);
     model.setSorting({ sortBy: 'coverage', sortDirection: 'ASC' });
