@@ -488,7 +488,7 @@ async function _launch(): Promise<void> {
   } else {
     // ensure that sockdomain has a valid value
     if (sockdomain !== 'internet' && sockdomain !== 'unix') {
-      throw new Error("expected 'unix' or 'internet', got: " + sockdomain);
+      throw new Error("expected 'unix' or 'internet'");
     }
   }
 
