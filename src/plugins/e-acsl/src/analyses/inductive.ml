@@ -626,13 +626,15 @@ end = functor (Out : Out_language) -> struct
     let l_type = Option.map (fun l -> l.lv_type) res in
     let is_rec_occurrence li' = Logic_var.equal li'.l_var_info li.l_var_info in
     let extract_ctor (ctor : Constructor.t) next_ctor =
-      let flush_conds ~conds case_true = match conds with
-        | [] -> case_true
-        | c::cs ->
-          let cond =
-            List.fold_right (fun p q -> Logic_const.pand ~loc:q.pred_loc (p,q)) cs c
+      let flush_conds ~conds case_true =
+        if conds = [] then case_true else
+          let conjunction =
+            List.fold_right
+              (fun p q -> Logic_const.pand ~loc:q.pred_loc (q,p))
+              conds
+              Logic_const.ptrue
           in
-          Out.mk_if ~loc:cond.pred_loc cond case_true next_ctor
+          Out.mk_if ~loc:conjunction.pred_loc conjunction case_true next_ctor
       in
       let rec compile ~lb ~conds p =
         let recurse ?(lb = lb) ?(conds = conds) =
