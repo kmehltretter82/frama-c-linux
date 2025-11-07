@@ -371,14 +371,6 @@ class annot_visitor kf flags on_alarm = object (self)
 
 end
 
-let visit_function kf flags on_alarm =
-  if not (Options.use_eva_results () && Eva_analysis.is_computed kf)
-  then match kf.fundec with
-    | Declaration _ -> ()
-    | Definition(f, _) ->
-      let visitor = new annot_visitor kf flags on_alarm in
-      ignore (Visitor.visitFramacFunction visitor f)
-
 let visit_with_stmt visit kf flags on_alarm stmt element =
   if not (Options.use_eva_results () && Eva_analysis.is_computed kf)
   then
@@ -427,6 +419,14 @@ let collector () =
   in pool , on_alarm
 
 let get_annotations_kf ?flags kf =
+  let visit_function kf flags on_alarm =
+    if not (Options.use_eva_results () && Eva_analysis.is_computed kf)
+    then match kf.fundec with
+      | Declaration _ -> ()
+      | Definition(f, _) ->
+        let visitor = new annot_visitor kf flags on_alarm in
+        ignore (Visitor.visitFramacFunction visitor f)
+  in
   let pool,on_alarm = collector () in
   visit_function kf (filter flags) on_alarm ;
   !pool
@@ -485,8 +485,16 @@ let annotate ?flags kf =
      comp Finite_float.accessor flags.finite_float |||
      comp Bool_value.accessor flags.bool_value
   then begin
-    Options.feedback ~dkey:Options.dkey_annot
-      "annotating function %a" Kernel_function.pretty kf;
+    let visit_function kf flags on_alarm =
+      if not (Options.use_eva_results () && Eva_analysis.is_computed kf)
+      then match kf.fundec with
+        | Declaration _ -> ()
+        | Definition(f, _) ->
+          Options.feedback ~dkey:Options.dkey_annot
+            "annotating function %a" Kernel_function.pretty kf;
+          let visitor = new annot_visitor kf flags on_alarm in
+          ignore (Visitor.visitFramacFunction visitor f)
+    in
     let warn = Options.Warn.get () in
     let on_alarm stmt ~invalid alarm =
       let ca, _ = register Generator.emitter kf stmt ~invalid alarm in
