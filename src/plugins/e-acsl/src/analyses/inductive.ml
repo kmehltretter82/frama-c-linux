@@ -680,7 +680,7 @@ end = functor (Out : Out_language) -> struct
                 Logic_const.term ~loc:p.pred_loc (Tapp (li, labels, args)) res.term_type
               in
               match var_of_term res with
-              | Some v when not @@ Vars.mem v lb ->
+              | Some v when not @@ Vars.mem v (Vars.union lb formals) ->
                 let li = {(Cil_const.make_logic_info_local v.lv_name)
                           with l_var_info = v;
                                l_body = LBterm rec_call;

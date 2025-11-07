@@ -55,7 +55,7 @@ inductive P(integer x, integer y) {
  */
 /*@
 predicate P(integer x, integer y) =
-  x >= 0 && (\let x = fibo_fun2(0); y == x + x);
+  x >= 0 && fibo_fun2(0) == x && y == x + x;
  */
 int __gen_e_acsl_P(int x, int y);
 
@@ -64,7 +64,7 @@ inductive Q(integer x, integer y) {
   case c: \forall integer a; fibo(0, a) ==> Q(a, a + a);
   }
  */
-/*@ predicate Q(integer x, integer y) = \let x = fibo_fun2(0); y == x + x;
+/*@ predicate Q(integer x, integer y) = fibo_fun2(0) == x && y == x + x;
 
 */
 int __gen_e_acsl_Q(int x, int y);
@@ -195,57 +195,42 @@ void __gen_e_acsl_fibo_fun2(__e_acsl_mpz_t *__retres_arg, int i)
 int __gen_e_acsl_P(int x, int y)
 {
   int __gen_e_acsl_and;
+  int __gen_e_acsl_and_2;
   if (x >= 0) {
-    __e_acsl_mpz_t __gen_e_acsl_x;
     __e_acsl_mpz_t __gen_e_acsl_fibo_fun2_6;
-    __e_acsl_mpz_t __gen_e_acsl_y;
-    __e_acsl_mpz_t __gen_e_acsl_add_2;
+    __e_acsl_mpz_t __gen_e_acsl_x;
     int __gen_e_acsl_eq;
     __gen_e_acsl_fibo_fun2(& __gen_e_acsl_fibo_fun2_6,0);
-    __gmpz_init_set(__gen_e_acsl_x,
-                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_fibo_fun2_6));
-    __gmpz_init_set_si(__gen_e_acsl_y,(long)y);
-    __gmpz_init(__gen_e_acsl_add_2);
-    __gmpz_add(__gen_e_acsl_add_2,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl_x),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl_x));
-    __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_y),
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_2));
+    __gmpz_init_set_si(__gen_e_acsl_x,(long)x);
+    __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_fibo_fun2_6),
+                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_x));
     __gen_e_acsl_and = __gen_e_acsl_eq == 0;
-    __gmpz_clear(__gen_e_acsl_x);
     __gmpz_clear(__gen_e_acsl_fibo_fun2_6);
-    __gmpz_clear(__gen_e_acsl_y);
-    __gmpz_clear(__gen_e_acsl_add_2);
+    __gmpz_clear(__gen_e_acsl_x);
   }
   else __gen_e_acsl_and = 0;
-  return __gen_e_acsl_and;
+  if (__gen_e_acsl_and) __gen_e_acsl_and_2 = y == x + x;
+  else __gen_e_acsl_and_2 = 0;
+  return __gen_e_acsl_and_2;
 }
 
 /*@ assigns \result;
     assigns \result \from x, y; */
 int __gen_e_acsl_Q(int x, int y)
 {
-  __e_acsl_mpz_t __gen_e_acsl_x_2;
   __e_acsl_mpz_t __gen_e_acsl_fibo_fun2_8;
-  __e_acsl_mpz_t __gen_e_acsl_y_2;
-  __e_acsl_mpz_t __gen_e_acsl_add_3;
+  __e_acsl_mpz_t __gen_e_acsl_x_2;
   int __gen_e_acsl_eq_2;
+  int __gen_e_acsl_and_3;
   __gen_e_acsl_fibo_fun2(& __gen_e_acsl_fibo_fun2_8,0);
-  __gmpz_init_set(__gen_e_acsl_x_2,
-                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_fibo_fun2_8));
-  __gmpz_init_set_si(__gen_e_acsl_y_2,(long)y);
-  __gmpz_init(__gen_e_acsl_add_3);
-  __gmpz_add(__gen_e_acsl_add_3,
-             (__e_acsl_mpz_struct const *)(__gen_e_acsl_x_2),
-             (__e_acsl_mpz_struct const *)(__gen_e_acsl_x_2));
-  __gen_e_acsl_eq_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_y_2),
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_3));
-  int __retres = __gen_e_acsl_eq_2 == 0;
-  __gmpz_clear(__gen_e_acsl_x_2);
+  __gmpz_init_set_si(__gen_e_acsl_x_2,(long)x);
+  __gen_e_acsl_eq_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_fibo_fun2_8),
+                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_x_2));
+  if (__gen_e_acsl_eq_2 == 0) __gen_e_acsl_and_3 = y == x + x;
+  else __gen_e_acsl_and_3 = 0;
   __gmpz_clear(__gen_e_acsl_fibo_fun2_8);
-  __gmpz_clear(__gen_e_acsl_y_2);
-  __gmpz_clear(__gen_e_acsl_add_3);
-  return __retres;
+  __gmpz_clear(__gen_e_acsl_x_2);
+  return __gen_e_acsl_and_3;
 }
 
 
