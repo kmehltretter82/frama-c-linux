@@ -10,6 +10,8 @@
 
 open Cil_types
 
+let wkey = Kernel.wkey_attrs
+
 (* Construct sorted lists of attributes *)
 let get_name (an, _) =
   Extlib.strip_underscore an
@@ -113,7 +115,7 @@ let register ?(print=true) ?ignore ac an =
   let attr_ignore = Option.value ~default:(ac=AttrUnknown) ignore in
   let nc = {attr_class = ac; attr_print = print; attr_ignore} in
   if Hashtbl.mem known_table an then
-    Kernel.warning
+    Kernel.warning ~wkey
       "Replacing existing class and status for attribute %s:@ was (%a),@ now \
        (%a)"
       an pp_info (Hashtbl.find known_table an) pp_info nc;
@@ -157,7 +159,7 @@ let partition ~(default:attribute_class) (attrs: attributes) :
         loop (n, add a f, t) rest
       | AttrType -> loop (n, f, add a t) rest
       | AttrStmt ->
-        Kernel.warning "unexpected statement attribute %s" an;
+        Kernel.warning ~wkey "unexpected statement attribute %s" an;
         loop (n,f,t) rest
       | AttrUnknown -> loop (n, f, t) rest
   in

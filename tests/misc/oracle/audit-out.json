@@ -57,9 +57,9 @@
       "enabled": [
         "*", "CERT", "CERT:EXP", "CERT:EXP:46", "CERT:MSC", "CERT:MSC:37",
         "CERT:MSC:38", "acsl-extension", "annot", "annot:missing-spec",
-        "annot:multi-from", "annot-error", "asm", "asm:clobber", "audit",
-        "check", "check:volatile", "cmdline", "extension-unknown", "file",
-        "ghost", "ghost:bad-use", "inline", "libc", "libc:format",
+        "annot:multi-from", "annot-error", "asm", "asm:clobber", "attrs",
+        "audit", "check", "check:volatile", "cmdline", "extension-unknown",
+        "file", "ghost", "ghost:bad-use", "inline", "libc", "libc:format",
         "libc:frama-c", "linker", "linker:drop-conflicting-unused",
         "linker:weak", "mopsa-db", "mopsa-db:missing-library",
         "mopsa-db:non-c-source", "parser", "parser:conditional-feature",

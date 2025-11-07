@@ -248,6 +248,9 @@ val wkey_c11: warn_category
 val wkey_line_directive: warn_category
 (** Warnings related to unknown line directives. *)
 
+val wkey_attrs: warn_category
+(** Warning related to the handling of attributes in Frama-C. *)
+
 val wkey_unknown_attribute: warn_category
 (** Warning emitted when an unknown attribute is encountered during parsing. *)
 
