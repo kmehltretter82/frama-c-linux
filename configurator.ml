@@ -131,12 +131,21 @@ int main(){}
       List.map (fun s -> "-m" ^ s) @@ List.filter_map check archs
   end
 
+  module C2x = struct
+    let code = {|int main(){}|}
+
+    let check configurator preprocessor =
+      let options = ["-std=c2x"] in
+      (C_preprocessor.preprocess configurator preprocessor options code).exit_code = 0
+  end
+
   type t =
     { preprocessor : C_preprocessor.t
     ; default_args : string list
     ; is_gnu_like : bool
     ; keep_comments : bool
     ; supported_archs_opts : string list
+    ; has_c2x : bool
     }
 
   let get configurator =
@@ -146,7 +155,14 @@ int main(){}
     let keep_comments = KeepComments.check configurator preprocessor in
     let supported_archs_opts =
       Archs.supported_archs configurator preprocessor [ "16" ; "32" ; "64" ] in
-    { preprocessor; default_args; is_gnu_like; keep_comments; supported_archs_opts }
+    let has_c2x = C2x.check configurator preprocessor in
+    { preprocessor
+    ; default_args
+    ; is_gnu_like
+    ; keep_comments
+    ; supported_archs_opts
+    ; has_c2x
+    }
 
   let pp_flags fmt =
     let pp_sep fmt () = Format.fprintf fmt " " in
@@ -308,7 +324,10 @@ let configure configurator =
     close_out python;
     let gcc = open_out "gcc-is-genuine" in
     Printf.fprintf gcc "%B" (gcc_is_genuine configurator);
-    close_out gcc
+    close_out gcc;
+    let c2x = open_out "has-c2x-option" in
+    Printf.fprintf c2x "%B" cpp.has_c2x;
+    close_out c2x
 
 let () =
   C.main ~name:"frama_c_config" configure

@@ -1,11 +1,11 @@
 [kernel] Parsing c23-align-kw.c (with preprocessing)
-[kernel] c23-align-kw.c:13: 
+[kernel] c23-align-kw.c:14: 
   syntax error:
-  Location: line 13, between columns 13 and 14, before or at token: =
-  11    #endif
-  12    #ifdef ALIGNAS
-  13      int alignas = 42;
+  Location: line 14, between columns 13 and 14, before or at token: =
+  12    #endif
+  13    #ifdef ALIGNAS
+  14      int alignas = 42;
                      ^
-  14    #endif
-  15    }
+  15    #endif
+  16    }
 [kernel] Frama-C aborted: invalid user input.
