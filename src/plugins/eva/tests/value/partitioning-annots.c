@@ -371,6 +371,23 @@ void test_logic_disjunction(void) {
   Frama_C_show_each(x, y); // There should be 4 precise states.
 }
 
+
+void test_syntactic_plit()
+{
+  int i = Frama_C_interval(0,1);
+  int j = Frama_C_interval(0,2);
+
+  //@ split \branches;
+  if (i != j) {
+    i = j = 3;
+  }
+  Frama_C_show_each(i, j);
+
+  //@ merge \branches;
+
+  Frama_C_show_each(i, j);
+}
+
 void main(void)
 {
   test_slevel();
@@ -381,4 +398,5 @@ void main(void)
   test_splits_post_call();
   test_auto_limit();
   test_logic_disjunction();
+  test_syntactic_plit();
 }

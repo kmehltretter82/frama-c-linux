@@ -167,6 +167,12 @@ type action =
   | Merge of split_term
   (** Forgets the split of an expression: states that were kept separate only
       by the split of this expression will be joined together. *)
+  | SyntacticSplit of int * int
+  (** Record that the state attached to this key have been obtained after
+      taking a if-then-else or switch branch - identified by the vertex id
+      of the split and the edge id of the branch taken. *)
+  | MergeSyntacticSplits
+  (** Forget every syntactic split. *)
   | Update_dynamic_splits
   (** Updates dynamic splits by evaluating the expression and splitting the
       states accordingly. *)

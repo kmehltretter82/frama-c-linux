@@ -19,6 +19,7 @@ let warn ?(current = true) =
 module Make (Kf : sig val kf: kernel_function end) =
 struct
   let kf = Kf.kf
+  let automaton = Eva_automata.get_automaton kf
 
   let widening_delay = WideningDelay.get ()
   let widening_period = WideningPeriod.get ()
@@ -119,41 +120,66 @@ struct
       Partition.Expression (Eva_ast.translate_exp exp), exp.eloc
     | Predicate pred ->
       Partition.Predicate pred, pred.pred_loc
+    | ConditionalBranches ->
+      assert false
 
-  let flow_annotations stmt =
-    let map_annot acc t =
-      try
-        let action =
-          match t with
-          | FlowSplit (term, kind) ->
-            let term, loc = translate_split_term term in
-            let split_monitor =
-              Partition.new_monitor ~limit:split_limit ~kind ~term ~loc
-            in
-            Partition.Split split_monitor
-          | FlowMerge term ->
-            let term, _loc = translate_split_term term in
-            Partition.Merge term
+  let translate_flow_annotation vertex annotation =
+    try
+      match annotation with
+      | FlowSplit (ConditionalBranches, _) ->
+        let do_branch (_src,edge,dest) acc =
+          let source = dest.Eva_automata.vertex_key in
+          let branch = edge.Eva_automata.edge_key in
+          (dest, Partition.SyntacticSplit (source, branch)) :: acc
         in
-        action :: acc
-      with
-        Logic_to_c.No_conversion ->
-        warn "split/merge expressions must be valid expressions; ignoring";
-        acc (* Impossible to convert term to lval *)
+        Eva_automata.G.fold_edges_e do_branch automaton.graph []
+      | FlowMerge (ConditionalBranches) ->
+        [vertex, (Partition.MergeSyntacticSplits)]
+      | FlowSplit (term, kind) ->
+        let term, loc = translate_split_term term in
+        let split_monitor =
+          Partition.new_monitor ~limit:split_limit ~kind ~term ~loc
+        in
+        [vertex, Partition.Split split_monitor]
+      | FlowMerge term ->
+        let term, _loc = translate_split_term term in
+        [vertex, Partition.Merge term]
+    with
+    | Logic_to_c.No_conversion ->
+      warn "split/merge expressions must be valid expressions; ignoring";
+      []
+
+  module VertexTable = Eva_automata.Vertex.Hashtbl
+
+  let flow_annotations_table =
+    let table = VertexTable.create (Eva_automata.G.nb_vertex automaton.graph) in
+    let add_action (vertex, action) =
+      action :: VertexTable.find_default ~default:[] table vertex
+      |> VertexTable.replace table vertex
     in
-    List.fold_left map_annot [] (get_flow_annot stmt)
+    let add_annotations vertex =
+      let stmt = Eva_automata.Vertex.stmt vertex in
+      let annotations = Option.fold ~none:[]~some:get_flow_annot stmt in
+      annotations
+      |> List.concat_map (translate_flow_annotation vertex)
+      |> List.iter add_action
+    in
+    Eva_automata.G.iter_vertex add_annotations automaton.graph;
+    table
 
   let flow_actions vertex =
-    let rationing_parameters, flow_actions =
+    let flow_actions =
+      VertexTable.find_default ~default:[] flow_annotations_table vertex
+    in
+    let rationing_parameters =
       match Eva_automata.Vertex.stmt vertex with
-      | None -> None, []
+      | None -> None
       | Some stmt ->
-        let flow_actions = flow_annotations stmt in
         (* A skip statement is created on each split annotation: do not ration
            states on them to avoid meddling in successive split directives. *)
         if Cil.is_skip stmt.skind && flow_actions <> []
-        then None, flow_actions
-        else Some (slevel stmt, merge stmt), flow_actions
+        then None
+        else Some (slevel stmt, merge stmt)
     in
     let rationing =
       match rationing_parameters with

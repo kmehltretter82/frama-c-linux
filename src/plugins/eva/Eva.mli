@@ -744,10 +744,11 @@ module Eva_annotations: sig
 
   type split_kind = Static | Dynamic
 
-  (** Splits can be performed according to a C expression or an ACSL predicate. *)
+  (** Trace partitioning splits. *)
   type split_term =
-    | Term of Cil_types.term
-    | Predicate of Cil_types.predicate
+    | Term of Cil_types.term (* Split according an ACSL term. *)
+    | Predicate of Cil_types.predicate (* Split according an ACSL predicate. *)
+    | ConditionalBranches (* Split according to a conditional statement. *)
 
   (** Split/merge annotations for value partitioning.  *)
   type flow_annotation =
