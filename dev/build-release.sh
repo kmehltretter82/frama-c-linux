@@ -543,7 +543,7 @@ releases:
       help: Installation instructions
       help_link: ${IVETTE_INSTALL}linux
     - name: macOS universal
-      link: /download/frama-c-ivette-macOS-universal-$VERSION_AND_CODENAME.dmg
+      link: /download/frama-c-ivette-macos-universal-$VERSION_AND_CODENAME.dmg
       help: Installation instructions
       help_link: ${IVETTE_INSTALL}macos
 ---
