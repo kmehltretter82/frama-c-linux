@@ -37,6 +37,9 @@ Options taking a string as argument should preferably be written
                     hold (from evaluation of constant expressions,
                     syntactical rules...) (opposite option is
                     -rte-no-trivial-annotations)
+-rte-use-eva-results  When enabled, do not emit annotations on functions
+                    analyzed by Eva (set by default, opposite option is
+                    -rte-no-use-eva-results)
 -rte-warn           when on (default), emits warning on broken asserts (set
                     by default, opposite option is -rte-no-warn)
 
