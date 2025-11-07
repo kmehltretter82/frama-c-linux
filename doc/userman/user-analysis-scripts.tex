@@ -203,7 +203,7 @@ Its basic usage involving the \texttt{fcmake} alias (equivalent to
 \begin{itemize}
 \item \texttt{fcmake <target>.parse}: parse the sources
 \item \texttt{fcmake <target>.eva}: run Eva
-\item \texttt{fcmake <target>.eva.gui}: open the results in the GUI
+\item \texttt{fcmake <target>.eva.ivette}: open the results in Ivette
 \end{itemize}
 
 This section details how to produce the Makefile, how to define the
@@ -344,9 +344,9 @@ quick iterations during parametrization of the analysis.
   analysis results and a saved session file.
   If the analysis fails, tries to save a partial result in
   \texttt{<target>.eva.error} (when possible).
-\item[<target>.eva.gui]: loads the result of the corresponding
-  \texttt{<target>.eva} session and opens it in the GUI. This allows inspecting
-  the results of \Value. This target always opens the GUI, even when no
+\item[<target>.eva.ivette]: loads the result of the corresponding
+  \texttt{<target>.eva} session and opens it in Ivette. This allows inspecting
+  the results of \Value. This target always opens Ivette, even when no
   changes have happened.
 \item[clean]: removes all results produced by the \texttt{.parse} and
   \texttt{.eva} targets.
@@ -389,9 +389,9 @@ target.wp: target.parse
 In the example above, we define a new stage, \texttt{target.wp}, which depends
 on the parsing stage, runs the \tool{WP} plug-in, and saves the result in a
 session file. This session file can then be loaded by another stage,
-or in the GUI. For instance, the \texttt{.gui} predefined target works out of
-the box in this case: running \texttt{fcmake target.wp.gui} will load the saved
-session in the Frama-C GUI.
+or in the GUI. For instance, the \texttt{.ivette} predefined target works out
+of the box in this case: running \texttt{fcmake target.wp.ivette} will load
+the saved session in Ivette.
 
 \section{Script Descriptions}
 \label{sec:script-descriptions}
