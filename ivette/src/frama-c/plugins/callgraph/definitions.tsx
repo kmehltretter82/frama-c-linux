@@ -8,7 +8,7 @@
 
 import React from 'react';
 import { Edge, Node } from 'dome/graph/graph';
-import * as Eva from 'frama-c/plugins/eva/api/general';
+import * as EvaStats from 'frama-c/plugins/eva/api/stats';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
 import {
@@ -35,9 +35,9 @@ export interface CGNode extends Node {
   /** Coverage of the Eva analysis */
   coverage?: { reachable: number, dead: number };
   /** Alarms raised by the Eva analysis by category */
-  alarmCount?: Eva.alarmEntry[];
+  alarmCount?: EvaStats.alarmEntry[];
   /** Alarms statuses emitted by the Eva analysis */
-  alarmStatuses?: Eva.statusesEntry;
+  alarmStatuses?: EvaStats.statusesEntry;
   /** Taint status */
   taintStatus?: States.Tag[];
   /** is Recursive function */

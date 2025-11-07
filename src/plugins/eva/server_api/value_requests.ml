@@ -6,6 +6,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Server requests about the values inferred by the Eva analysis. *)
+
 open Server
 open Data
 open Cil_types
@@ -21,15 +23,145 @@ module Jstmt = Kernel_ast.Stmt
 module Jmarker = Kernel_ast.Marker
 
 let package =
-  Package.package
-    ~plugin:"eva"
-    ~name:"values"
-    ~title:"Eva Values"
-    ()
+  let title = "Values inferred by the Eva analysis" in
+  Package.package ~plugin:"eva" ~name:"values" ~title ()
+
+(* ----- Simple values information for the Inspector ------------------------ *)
+
+type evaluation_point =
+  | Initial
+  | Pre of kernel_function
+  | Stmt of kernel_function * stmt
+
+let post kf =
+  if Analysis.use_spec_instead_of_definition kf
+  then raise Not_found
+  else
+    try Stmt (kf, Kernel_function.find_return kf)
+    with Kernel_function.No_Statement -> raise Not_found
+
+let request_at = function
+  | Initial -> Results.at_start
+  | Stmt (_, stmt) -> Results.before stmt
+  | Pre kf -> Results.at_start_of kf
+
+let property_evaluation_point = function
+  | Property.IPCodeAnnot { ica_kf = kf; ica_stmt = stmt }
+  | IPPropertyInstance { ii_kf = kf; ii_stmt = stmt } -> Stmt (kf, stmt)
+  | IPPredicate {ip_kf; ip_kind = PKEnsures (_, Normal)} -> post ip_kf
+  | IPPredicate { ip_kf = kf;
+                  ip_kind = PKRequires _ | PKAssumes _ | PKTerminates }
+  | IPAssigns {ias_kf = kf} | IPFrom {if_kf = kf} ->
+    Pre kf
+  | IPPredicate _ | IPComplete _ | IPDisjoint _ | IPDecrease _
+  | IPAxiomatic _ | IPModule _ | IPLemma _
+  | IPTypeInvariant _ | IPGlobalInvariant _
+  | IPOther _ | IPAllocation _ | IPReachable _ | IPExtended _ | IPBehavior _ ->
+    raise Not_found
+
+let marker_evaluation_point = function
+  | Printer_tag.PGlobal _ -> Initial
+  | PStmt (kf, stmt) | PStmtStart (kf, stmt) -> Stmt (kf, stmt)
+  | PVDecl (kf, kinstr, v) when not (v.vformal || v.vglob) ->
+    begin
+      (* Only evaluate declaration of local variable if it is initialized. *)
+      match kf, kinstr with
+      | Some kf, Kstmt ({skind = Instr (Local_init _)} as s) -> Stmt (kf, s)
+      | _ -> raise Not_found
+    end
+  | PLval (kf, ki, _) | PExp (kf, ki, _) | PVDecl (kf, ki, _) ->
+    begin
+      match kf, ki with
+      | Some kf, Kstmt stmt -> Stmt (kf, stmt)
+      | Some kf, Kglobal -> Pre kf
+      | None, Kglobal -> Initial
+      | None, Kstmt _ -> assert false
+    end
+  | PTermLval (_, _, prop, _) | PIP prop -> property_evaluation_point prop
+  | PType _ -> raise Not_found
+
+let term_lval_to_lval kf tlval =
+  try
+    let result = Option.bind Eva_utils.find_return_var kf in
+    Logic_to_c.term_lval_to_lval ?result tlval
+  with Logic_to_c.No_conversion -> raise Not_found
+
+(* Returns the server identifier of marker corresponding to varinfo [vi]
+   at [eval_point]. *)
+let tag_varinfo_as_lval_at eval_point =
+  let kf, kinstr =
+    match eval_point with
+    | Initial -> None, Kglobal
+    | Pre kf -> Some kf, Kglobal
+    | Stmt (kf, stmt) -> Some kf, Kstmt stmt
+  in
+  fun vi ->
+    let marker = Printer_tag.PLval (kf, kinstr, Cil.var vi) in
+    Server.Kernel_ast.Marker.index marker
+
+(* Executes function [f] with an updated global printer which prints
+   any varinfo as a lvalue marker at the given evaluation point. *)
+let with_updated_varinfo_printer eval_point f =
+  let tag_vi = tag_varinfo_as_lval_at eval_point in
+  let module Printer_class(X: Printer.PrinterClass) = struct
+    class printer = object
+      inherit X.printer as super
+
+      method! varinfo fmt vi =
+        Format.fprintf fmt "@{<%s>%a@}" (tag_vi vi) super#varinfo vi;
+    end
+  end in
+  let printer = Printer.current_printer () in
+  let finally () = Printer.set_printer printer in
+  Printer.update_printer (module Printer_class: Printer.PrinterExtension);
+  Fun.protect ~finally f
+
+let print_value fmt loc =
+  let is_scalar = Ast_types.is_scalar in
+  let evaluation_point = marker_evaluation_point loc in
+  let request = request_at evaluation_point in
+  let eval =
+    match loc with
+    | Printer_tag.PLval (_, _, lval) when is_scalar (Cil.typeOfLval lval) ->
+      Results.eval_lval lval
+    | Printer_tag.PExp (_, _, expr) when is_scalar (Cil.typeOf expr) ->
+      Results.eval_exp expr
+    | PVDecl (_, _, vi) when is_scalar vi.vtype ->
+      Results.eval_var vi
+    | PTermLval (kf, _, _ip, tlval) ->
+      let lval = term_lval_to_lval kf tlval in
+      if is_scalar (Cil.typeOfLval lval)
+      then Results.eval_lval lval
+      else raise Not_found
+    | _ -> raise Not_found
+  in
+  let pretty = Cvalue.V_Or_Uninitialized.pretty in
+  let eval_cvalue at = Results.(eval at |> as_cvalue_or_uninitialized) in
+  let before = eval_cvalue request in
+  let print =
+    match evaluation_point with
+    | Initial | Pre _ -> fun () -> pretty fmt before
+    | Stmt (_, stmt) ->
+      let after = eval_cvalue (Results.after stmt) in
+      if Cvalue.V_Or_Uninitialized.equal before after
+      then fun () -> pretty fmt before
+      else fun () ->
+        Format.fprintf fmt "Before: %a@\nAfter:  %a" pretty before pretty after
+  in
+  with_updated_varinfo_printer evaluation_point print
+
+let () =
+  Server.Kernel_ast.Information.register
+    ~id:"eva.value"
+    ~label:"Value"
+    ~title:"Possible values inferred by Eva"
+    ~enable:Analysis.is_computed
+    print_value
+
+
+(* ----- Detailed values by callstack for the values table ------------------ *)
 
 type term = Pexpr of exp | Plval of lval | Ppred of predicate
-type evaluation_point = General_requests.evaluation_point =
-    Initial | Pre of kernel_function | Stmt of kernel_function * stmt
 
 (* A term and the program point where it should be evaluated. *)
 type probe = term * evaluation_point
@@ -108,13 +240,12 @@ let probe_marker = function
   | PStmt (_, s) | PStmtStart (_, s) -> probe_stmt s
   | PVDecl (_, _, v) -> Plval (Var v, NoOffset)
   | PTermLval (kf, _, _, tlval) ->
-    Plval (General_requests.term_lval_to_lval kf tlval)
+    Plval (term_lval_to_lval kf tlval)
   | PIP property -> probe_property property
   | _ -> raise Not_found
 
 let probe marker =
-  try Some (probe_marker marker,
-            General_requests.marker_evaluation_point marker)
+  try Some (probe_marker marker, marker_evaluation_point marker)
   with Not_found -> None
 
 (* -------------------------------------------------------------------------- *)
@@ -428,9 +559,7 @@ module Proxy(A : Analysis.Engine) : EvaProxy = struct
     let alarms = Alarmset.fold f [] alarms |> List.rev in
     let pretty_eval = Bottom.pretty (pp_result typ) in
     let result_to_json () = Data.jpretty pretty_eval result in
-    let value =
-      General_requests.with_updated_varinfo_printer eval_point result_to_json
-    in
+    let value = with_updated_varinfo_printer eval_point result_to_json in
     let pointed_markers = get_pointed_markers eval_point in
     let pointed_vars = Bottom.(map pointed_markers result |> value ~bottom:[]) in
     { value; alarms; pointed_vars }

@@ -18,7 +18,8 @@ import { IconButton } from 'dome/controls/buttons';
 import { Inset } from 'dome/frame/toolbars';
 import * as Ast from 'frama-c/kernel/api/ast';
 import { text } from 'frama-c/kernel/api/data';
-import * as Eva from 'frama-c/plugins/eva/api/general';
+import * as EvaAst from 'frama-c/plugins/eva/api/ast';
+import * as EvaTaint from 'frama-c/plugins/eva/api/taint';
 import * as Properties from 'frama-c/kernel/api/properties';
 import * as Locations from './Locations';
 
@@ -289,7 +290,7 @@ function createMultipleDecorator(): Editor.Extension {
 
 // This field contains the dead code information as inferred by Eva.
 const emptyDeadCode = { reached: [], unreachable: [], nonTerminating: [] };
-const Dead = Editor.createField<Eva.deadCode>(emptyDeadCode);
+const Dead = Editor.createField<EvaAst.deadCode>(emptyDeadCode);
 
 // Comparison function on ranges
 function compareRange(x: Range, y: Range): number {
@@ -478,7 +479,7 @@ export function registerMarkerMenuExtender(e: MarkerMenuExtender): void {
 }
 
 // This field contains all the current function's callers, as inferred by Eva.
-const Callers = Editor.createField<Eva.CallSite[]>([]);
+const Callers = Editor.createField<EvaAst.CallSite[]>([]);
 
 // This field contains the function pointed to by the current hovered marker,
 // as inferred by Eva.
@@ -487,7 +488,7 @@ const Callees = Editor.createField<Ast.decl[]>([]);
 
 export function getMarkerMenuItems(
   marker: Ast.marker,
-  callers?: Eva.CallSite[],
+  callers?: EvaAst.CallSite[],
   callees?: Ast.decl[],
   markerText?: string
 ): Dome.PopupMenuItem[] {
@@ -501,7 +502,7 @@ export function getMarkerMenuItems(
       const descr = `Calls to ${name}`;
       Lodash.forEach(groupedCallers, (group) => {
         const n = group.length;
-        const { call }: Eva.CallSite = group[0];
+        const { call }: EvaAst.CallSite = group[0];
         const { name: fct } = States.getDeclaration(call);
         const caller = `caller ${fct}`;
         const nsites = n > 1 ? `s (${n} call sites)` : '';
@@ -566,10 +567,10 @@ function createContextMenuHandler(): Editor.Extension {
 //  Tainted lvalues
 // -----------------------------------------------------------------------------
 
-type Taints = Eva.LvalueTaints;
+type Taints = EvaTaint.LvalueTaints;
 const TaintedLvalues = Editor.createField<Taints[] | undefined>(undefined);
 
-function textOfTaint(taint: Eva.taintStatus): string {
+function textOfTaint(taint: EvaTaint.taintStatus): string {
   switch (taint) {
     case 'not_computed': return 'The taint has not been computed';
     case 'error': return 'There was an error during the taint computation';
@@ -632,23 +633,23 @@ function useAST(decl: Ast.decl | undefined): text {
 }
 
 // Server request handler returning the given function's callers.
-function useCallers(decl: Decl): Eva.CallSite[] {
-  return States.useRequestValue(Eva.getCallers, decl || undefined);
+function useCallers(decl: Decl): EvaAst.CallSite[] {
+  return States.useRequestValue(EvaAst.getCallers, decl || undefined);
 }
 
 // Server request handler returning the given function's callers.
 function useCallees(marker: Marker): Ast.decl[] {
-  return States.useRequestValue(Eva.getCallees, marker || undefined);
+  return States.useRequestValue(EvaAst.getCallees, marker || undefined);
 }
 
 // Server request handler returning the tainted lvalues.
-function useTaints(decl: Decl): Eva.LvalueTaints[] {
-  return States.useRequestValue(Eva.taintedLvalues, decl || undefined);
+function useTaints(decl: Decl): EvaTaint.LvalueTaints[] {
+  return States.useRequestValue(EvaTaint.taintedLvalues, decl || undefined);
 }
 
 // Server request handler returning the given function's dead code information.
-function useDead(decl: Decl): Eva.deadCode {
-  return States.useRequestValue(Eva.getDeadCode, decl || undefined)
+function useDead(decl: Decl): EvaAst.deadCode {
+  return States.useRequestValue(EvaAst.getDeadCode, decl || undefined)
     ?? emptyDeadCode;
 }
 

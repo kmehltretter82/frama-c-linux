@@ -9,14 +9,14 @@
 import React from 'react';
 import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
-import * as Eva from 'frama-c/plugins/eva/api/general';
+import * as EvaStats from 'frama-c/plugins/eva/api/stats';
 
 import CoverageMeter, { percent } from './CoverageMeter';
 
 import './style_summary.css';
 import { EvaReady, EvaStatus } from './components/AnalysisStatus';
 
-function CoverageTable(data: Eva.programStatsType): JSX.Element {
+function CoverageTable(data: EvaStats.programStatsType): JSX.Element {
   const { progFunCoverage: functions, progStmtCoverage: statements } = data;
   const functionsTotal = functions.reachable + functions.dead;
   const statementsTotal = statements.reachable + statements.dead;
@@ -59,7 +59,7 @@ function plural(count: number): string {
   return count === 1 ? '' : 's';
 }
 
-function Errors(data: Eva.programStatsType): JSX.Element {
+function Errors(data: EvaStats.programStatsType): JSX.Element {
   const { evaEvents: eva, kernelEvents: kernel } = data;
   const total = eva.warnings + eva.errors + kernel.warnings + kernel.errors;
   return (total > 0 ? (
@@ -92,17 +92,17 @@ function Errors(data: Eva.programStatsType): JSX.Element {
   );
 }
 
-function Alarms(data: Eva.programStatsType,
+function Alarms(data: EvaStats.programStatsType,
   categories: Map<string, States.Tag>): JSX.Element {
   const { progAlarms, alarmsStatuses: { invalid, unknown } } = data;
   const total = unknown + invalid;
 
-  const label = (category: Eva.alarmCategory): string | undefined => (
+  const label = (category: EvaStats.alarmCategory): string | undefined => (
     categories.get(category)?.descr
   );
 
-  function order(e1: Eva.alarmEntry, e2: Eva.alarmEntry): number {
-    const { other } = Eva.alarmCategory;
+  function order(e1: EvaStats.alarmEntry, e2: EvaStats.alarmEntry): number {
+    const { other } = EvaStats.alarmCategory;
     const d = e2.count - e1.count;
     if (e1.category === other && e2.category === other)
       return d;
@@ -110,7 +110,7 @@ function Alarms(data: Eva.programStatsType,
       return 1;
     if (e2.category === other)
       return -1;
-    return d || Eva.byAlarmCategory(e1.category, e2.category);
+    return d || EvaStats.byAlarmCategory(e1.category, e2.category);
   }
 
   return (
@@ -136,9 +136,9 @@ function Alarms(data: Eva.programStatsType,
   );
 }
 
-function Statuses(data: Eva.programStatsType): JSX.Element {
+function Statuses(data: EvaStats.programStatsType): JSX.Element {
   const { assertionsStatuses: assertions, precondsStatuses: preconds } = data;
-  const all = (entry: Eva.statusesEntry): number => (
+  const all = (entry: EvaStats.statusesEntry): number => (
     entry.valid + entry.unknown + entry.invalid
   );
   const totalAssertions = all(assertions);
@@ -183,8 +183,8 @@ function Statuses(data: Eva.programStatsType): JSX.Element {
 }
 
 export function EvaSummary(): JSX.Element {
-  const alarmCategories = States.useTags(Eva.alarmCategoryTags);
-  const data = States.useSyncValue(Eva.programStats);
+  const alarmCategories = States.useTags(EvaStats.alarmCategoryTags);
+  const data = States.useSyncValue(EvaStats.programStats);
 
   if (!data || !alarmCategories)
     return (<></>); /* Should not happen if Eva analysis has been computed */

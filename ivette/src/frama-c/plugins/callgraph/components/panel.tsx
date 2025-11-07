@@ -18,7 +18,7 @@ import { Icon } from 'dome/controls/icons';
 import { decl } from 'frama-c/kernel/api/ast';
 import { statusData } from 'frama-c/kernel/api/properties';
 import { onContextMenu, EFilterType } from 'frama-c/kernel/Properties';
-import * as Eva from 'frama-c/plugins/eva/api/general';
+import * as EvaAst from 'frama-c/plugins/eva/api/ast';
 import * as States from 'frama-c/states';
 import {
   renderTaint, useEvaPropertiesFilter, useKindPropertiesFilter, useStatusFilter
@@ -83,7 +83,7 @@ interface IGetElementParams {
   graph?: CGData;
   id?: string;
   properties: statusData[];
-  evaProperties: Eva.propertiesData[];
+  evaProperties: EvaAst.propertiesData[];
   style: CSSStyleDeclaration;
   showStatus: (status: statusData) => boolean;
   showKind: (status: statusData) => boolean;
@@ -184,7 +184,7 @@ interface IGetElementListParams {
   selectedNodes: SelectedNodes;
   graph?: CGData;
   properties: statusData[];
-  evaProperties: Eva.propertiesData[];
+  evaProperties: EvaAst.propertiesData[];
   selected?: number;
   nodes?: number;
   links?: number;
@@ -237,7 +237,7 @@ interface PanelContentProps {
   selectedNodes: SelectedNodes;
   tainted: number;
   properties: statusData[];
-  evaProperties: Eva.propertiesData[];
+  evaProperties: EvaAst.propertiesData[];
   style: CSSStyleDeclaration;
   visibleNodes: number;
   visibleLinks: number;

@@ -36,8 +36,8 @@ import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Locations from 'frama-c/kernel/Locations';
-import { computationState } from 'frama-c/plugins/eva/api/general';
-import * as Eva from 'frama-c/plugins/eva/api/general';
+import { computationState } from 'frama-c/plugins/eva/api/analysis';
+import * as EvaAst from 'frama-c/plugins/eva/api/ast';
 import path from 'path';
 
 
@@ -247,13 +247,13 @@ function FctItem(props: FctItemProps): JSX.Element {
 // --------------------------------------------------------------------------
 
 type functionsData =
-  Ast.functionsData | (Ast.functionsData & Eva.functionsData);
+  Ast.functionsData | (Ast.functionsData & EvaAst.functionsData);
 
 type FctKey = Json.key<'#functions'>;
 
 export function computeFcts(
   ker: States.ArrayProxy<FctKey, Ast.functionsData>,
-  eva: States.ArrayProxy<FctKey, Eva.functionsData>,
+  eva: States.ArrayProxy<FctKey, EvaAst.functionsData>,
 ): functionsData[] {
   const arr: functionsData[] = [];
   ker.forEach((kf) => {
@@ -360,7 +360,7 @@ export function Functions(props: ScrollableParent): JSX.Element {
   const scope = States.useCurrentScope();
 
   const ker = States.useSyncArrayProxy(Ast.functions);
-  const eva = States.useSyncArrayProxy(Eva.functions);
+  const eva = States.useSyncArrayProxy(EvaAst.functions);
   const fcts = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
   const { showFunction, contextFctFilter } = useFunctionFilter();
 
@@ -950,7 +950,7 @@ export function Files(props: FilesProps): JSX.Element {
 
   // functions
   const ker = States.useSyncArrayProxy(Ast.functions);
-  const eva = States.useSyncArrayProxy(Eva.functions);
+  const eva = States.useSyncArrayProxy(EvaAst.functions);
   const fctsSorted = React.useMemo(() =>
     computeFcts(ker, eva)
     .sort((f, g) => alpha(f.name, g.name)

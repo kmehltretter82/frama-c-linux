@@ -11,7 +11,7 @@ import React from 'react';
 import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
 import { GlobalState, useGlobalState } from 'dome/data/states';
-import * as Eva from 'frama-c/plugins/eva/api/general';
+import * as Eva from 'frama-c/plugins/eva/api/analysis';
 import * as Boxes from 'dome/layout/boxes';
 import { HSplit } from 'dome/layout/splitters';
 import { Text } from 'frama-c/richtext';

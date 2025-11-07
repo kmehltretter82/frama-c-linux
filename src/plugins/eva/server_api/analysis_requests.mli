@@ -6,4 +6,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Eva API to Frama-C server. Nothing is exported. *)
+(** Registers a function called each time the computation state of Eva changes. *)
+val register_computation_hook: (unit -> unit) -> unit
+
+(** Signal emitted each time the computation state of Eva changes. *)
+val computation_signal: Server.Request.signal

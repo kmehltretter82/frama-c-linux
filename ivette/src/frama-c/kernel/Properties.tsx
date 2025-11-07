@@ -32,14 +32,15 @@ import { TitleBar } from 'ivette';
 import { menuItem, setting } from './Globals';
 
 import * as Ast from 'frama-c/kernel/api/ast';
-import * as Eva from 'frama-c/plugins/eva/api/general';
+import * as EvaAst from 'frama-c/plugins/eva/api/ast';
+import { taintStatusTags } from 'frama-c/plugins/eva/api/taint';
 import * as Properties from 'frama-c/kernel/api/properties';
 import * as States from 'frama-c/states';
 
 
 type PropKey = Json.key<'#marker'>;
 type Property = Properties.statusData |
-  (Properties.statusData & Eva.propertiesData);
+  (Properties.statusData & EvaAst.propertiesData);
 
 // --------------------------------------------------------------------------
 // --- Filters
@@ -664,7 +665,7 @@ function PropertyColumns(): JSX.Element {
   const statusDict = States.useTags(Properties.propStatusTags);
   const kindDict = States.useTags(Properties.propKindTags);
   const alarmDict = States.useTags(Properties.alarmsTags);
-  const taintDict = States.useTags(Eva.taintStatusTags);
+  const taintDict = States.useTags(taintStatusTags);
 
   const getScope = React.useCallback(
     ({ scope }: { scope: Property['scope'] }) => getDecl(scope)?.name
@@ -721,7 +722,7 @@ function PropertyColumns(): JSX.Element {
         width={30}
         visible={false}
         align="center"
-        getter={(prop: Eva.propertiesData) => prop?.priority}
+        getter={(prop: EvaAst.propertiesData) => prop?.priority}
         render={renderPriority}
       />
       <ColumnTag
@@ -765,7 +766,7 @@ function FilterRatio({ model }: { model: PropertyModel }): JSX.Element {
 // -------------------------------------------------------------------------
 
 type PropsModel = States.ArrayProxy<PropKey, Properties.statusData>;
-type EvapsModel = States.ArrayProxy<PropKey, Eva.propertiesData>;
+type EvapsModel = States.ArrayProxy<PropKey, EvaAst.propertiesData>;
 
 function populateModel(
   model: PropertyModel,
@@ -786,7 +787,7 @@ export default function RenderProperties(): JSX.Element {
   // Hooks
   const model = React.useMemo(() => new PropertyModel(), []);
   const props = States.useSyncArrayProxy(Properties.status);
-  const evaps = States.useSyncArrayProxy(Eva.properties);
+  const evaps = States.useSyncArrayProxy(EvaAst.properties);
   React.useEffect(() => {
     populateModel(model, props, evaps);
   }, [model, props, evaps]);

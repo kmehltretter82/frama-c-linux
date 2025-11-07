@@ -16,7 +16,7 @@ import * as Display from 'ivette/display';
 import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
-import * as Eva from 'frama-c/plugins/eva/api/general';
+import * as Eva from 'frama-c/plugins/eva/api/analysis';
 import * as Values from 'frama-c/plugins/eva/api/values';
 import { EvaReady, EvaStatus } from './components/AnalysisStatus';
 import { current as currentProject } from 'frama-c/kernel/api/project';
