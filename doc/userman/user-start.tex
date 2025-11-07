@@ -50,8 +50,9 @@ and running \FramaC are described below.
   the \texttt{opam} file.
 \end{description}
 
-Other components, such as OcamlGraph, Zarith, Gtk-related packages for the GUI,
-etc., are listed in the \texttt{INSTALL.md} and \texttt{opam} files.
+Other components, such as OcamlGraph and Zarith, are listed in the
+\texttt{opam} file. The file \texttt{reference-configuration.md} contains a set
+of opam packages versions known to be working for Frama-C.
 
 \section{One Framework, Several Executables}\label{sec:modes}
 
@@ -59,7 +60,7 @@ The main executables installed by \FramaC are:
 
 \begin{itemize}
 \item \texttt{frama-c}\codeidx{frama-c}: batch version (command line);
-\item \texttt{frama-c-gui}\codeidx{frama-c-gui}: interactive version (graphical interface).
+\item \texttt{ivette}\codeidx{ivette}: interactive version (graphical interface).
 \end{itemize}
 
 \begin{description}
@@ -101,14 +102,6 @@ binaries:
   utilities related to source preparation, results visualization and analysis
   automation. Run it without arguments to obtain more details.
 \end{itemize}
-
-Finally, note that the two main binaries (\texttt{frama-c} and
-\texttt{frama-c-gui} are also provided in {\em bytecode} version, as
-\texttt{frama-c.byte} and \texttt{frama-c-gui.byte}.
-\index{Native-compiled|bfit}\index{Bytecode|bfit}
-The bytecode is sometimes able to provide better debugging information;
-but since the native-compiled version is usually much faster (10x),
-use the latter unless you have a specific reason to use the bytecode one.
 
 \section{\FramaC Command Line and General Options}\index{Options}
 
@@ -170,7 +163,7 @@ For instance, the batch version can be made to launch the value analysis
 on the \verb|foo.c| file with the command \verb|frama-c -eva foo.c|.
 Although the GUI allows to select files and to
 launch the value analysis interactively, the
-command \verb|frama-c-gui -eva foo.c| can be used to launch the value
+command \verb|ivette -eva foo.c| can be used to launch the value
 analysis on the file \verb|foo.c| and immediately start displaying the results
 in the GUI.
 
