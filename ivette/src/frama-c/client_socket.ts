@@ -57,7 +57,7 @@ class SocketClient extends Client {
         args = ['-server-socket', sockaddr];
         break;
       default:
-        throw new Error("expected 'unix' or 'internet', got: " + domain);
+        throw new Error("expected 'unix' or 'internet'");
     }
     args.push(...prelude);
     args = (params?.length) ?
