@@ -21,4 +21,6 @@ module Trivial : Parameter_sig.Bool
 module Warn : Parameter_sig.Bool
 module FunctionSelection: Parameter_sig.Kernel_function_set
 
+val use_eva_results: unit -> bool
+
 val dkey_annot: category
