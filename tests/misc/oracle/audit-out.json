@@ -32,6 +32,7 @@
       "-warn-signed-downcast": "false",
       "-warn-signed-overflow": "true",
       "-warn-special-float": "non-finite",
+      "-warn-unaligned-pointer": "true",
       "-warn-unsigned-downcast": "false",
       "-warn-unsigned-overflow": "false"
     },

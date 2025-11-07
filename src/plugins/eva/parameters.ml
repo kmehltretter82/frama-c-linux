@@ -26,6 +26,7 @@ let kernel_parameters_correctness = [
   Kernel.SpecialFloat.parameter;
   Kernel.InvalidBool.parameter;
   Kernel.InvalidPointer.parameter;
+  Kernel.UnalignedPointer.parameter;
 ]
 
 let parameters_correctness = ref Typed_parameter.Set.empty
