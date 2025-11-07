@@ -48,20 +48,3 @@ module Scope = struct
     let typ = Datatype.(func unit unit) in
     get ~plugin "rm_asserts" typ ~fallback ()
 end
-
-module RteGen = struct
-  let plugin = "RteGen"
-
-  let all_statuses () =
-    let kf = Kernel_function.ty in
-    let typ =
-      Datatype.(list (triple string (func2 kf bool unit) (func kf bool)))
-    in
-    get ~plugin "all_statuses" typ ~fallback:[]
-
-  let mark_generated_rte () =
-    let list = all_statuses () in
-    let mark kf = List.iter (fun (_kind, set, _get) -> set kf true) list in
-    Globals.Functions.iter
-      (fun kf -> if Function_calls.is_called kf then mark kf)
-end

@@ -29,8 +29,3 @@ module Scope: sig
   (** Removes redundant assertions. Warns if the scope plugin is missing. *)
   val rm_asserts: unit -> unit
 end
-
-module RteGen: sig
-  (** Marks all RTE as generated. Does nothing if the rte plugin is missing. *)
-  val mark_generated_rte: unit -> unit
-end
