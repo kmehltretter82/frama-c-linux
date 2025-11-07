@@ -1,6 +1,4 @@
 [kernel] Parsing printf_no_fc_stdlib.c (with preprocessing)
-[kernel] Warning: unexpected statement attribute cold
-[kernel] Warning: unexpected statement attribute cold
 [kernel:libc:frama-c] Warning: 
   Unable to locate ACSL predicate valid_read_string which should be in the Frama-C LibC. Correct specifications can't be generated.
 [kernel:libc:frama-c] Warning: 
