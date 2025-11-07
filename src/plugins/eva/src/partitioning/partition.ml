@@ -19,19 +19,10 @@ let (<?>) c lcmp =
 type split_kind = Eva_annotations.split_kind = Static | Dynamic
 [@@deriving eq,ord]
 
-(* Same as Eva_annotations.split_term but with Eva_ast. *)
 type split_term =
   | Expression of Eva_ast.Exp.t
   | Predicate of Cil_datatype.PredicateStructEq.t
 [@@deriving eq, ord]
-
-let translate_split_term
-    (term : Eva_annotations.split_term) : split_term * Cil_types.location =
-  match term with
-  | Expression cil_exp ->
-    Expression (Eva_ast.translate_exp cil_exp), cil_exp.eloc
-  | Predicate pred ->
-    Predicate pred, pred.pred_loc
 
 type split_monitor = {
   split_term : split_term;
@@ -45,12 +36,12 @@ type split_monitor = {
 let new_monitor
     ~(limit : int)
     ~(kind : split_kind)
-    ~(term : Eva_annotations.split_term) =
-  let split_term, split_loc = translate_split_term term in
+    ~(term : split_term)
+    ~(loc : Cil_types.location) =
   {
-    split_term;
+    split_term = term;
     split_kind = kind;
-    split_loc;
+    split_loc = loc;
     split_limit = limit;
     split_values = Z.Set.empty;
   }
@@ -413,7 +404,7 @@ type action =
   | Ration of rationing
   | Restrict of Eva_ast.exp * Z.t list
   | Split of split_monitor
-  | Merge of Eva_annotations.split_term
+  | Merge of split_term
   | Update_dynamic_splits
 
 exception InvalidAction
@@ -727,7 +718,6 @@ struct
           { k with ration_stamp = stamp_by_value expr expected_values s}
 
         | Merge term -> fun k _x ->
-          let term, _loc = translate_split_term term in
           { k with splits = SplitMap.remove term k.splits;
                    dynamic_splits = SplitMap.remove term k.dynamic_splits }
       in

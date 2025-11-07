@@ -100,9 +100,11 @@ struct
     let add name l =
       try
         let vi = Globals.Vars.find_from_astinfo name Global in
-        let term = Eva_annotations.Expression (Cil.evar vi)
-        and kind = Partition.Dynamic in
-        let monitor = Partition.new_monitor ~limit:split_limit ~term ~kind in
+        let limit = split_limit
+        and term = Partition.Expression (Eva_ast.Build.var_exp vi)
+        and kind = Partition.Dynamic
+        and loc = Cil_datatype.Location.unknown in
+        let monitor = Partition.new_monitor ~limit ~term ~kind ~loc in
         Partition.Split monitor :: l
       with Not_found ->
         warn ~current:false "cannot find the global variable %s for value \
@@ -111,18 +113,27 @@ struct
     in
     ValuePartitioning.fold add []
 
+  let translate_split_term = function
+    | Term term ->
+      let exp = Logic_to_c.term_to_exp ?result:None term in
+      Partition.Expression (Eva_ast.translate_exp exp), exp.eloc
+    | Predicate pred ->
+      Partition.Predicate pred, pred.pred_loc
+
   let flow_actions stmt =
     let map_annot acc t =
       try
         let action =
           match t with
           | FlowSplit (term, kind) ->
+            let term, loc = translate_split_term term in
             let split_monitor =
-              Partition.new_monitor ~limit:split_limit ~kind ~term
+              Partition.new_monitor ~limit:split_limit ~kind ~term ~loc
             in
             Partition.Split split_monitor
-          | FlowMerge t ->
-            Partition.Merge t
+          | FlowMerge term ->
+            let term, _loc = translate_split_term term in
+            Partition.Merge term
         in
         action :: acc
       with

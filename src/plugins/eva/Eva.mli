@@ -746,7 +746,7 @@ module Eva_annotations: sig
 
   (** Splits can be performed according to a C expression or an ACSL predicate. *)
   type split_term =
-    | Expression of Cil_types.exp
+    | Term of Cil_types.term
     | Predicate of Cil_types.predicate
 
   (** Split/merge annotations for value partitioning.  *)
