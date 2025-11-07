@@ -89,6 +89,10 @@ function Usage
     echo "  FRAMAC_WP_CACHEDIR"
     echo "    Absolute path to wp-cache directory (git clone locally by default)"
     echo ""
+    echo "  FRAMAC_DEVONLY_OPTIONS_PRE"
+    echo "  FRAMAC_DEVONLY_OPTIONS_POST"
+    echo "    Options that frama-c will pre/ap-pend to its actual command-line"
+    echo ""
 }
 
 # --------------------------------------------------------------------------
