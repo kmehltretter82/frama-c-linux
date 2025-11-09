@@ -331,8 +331,7 @@ end = struct
         recurse ~lb ~fv pr
       in
       match p.pred_content with
-      | Pimplies ({pred_content = Pand (p1, p2)} as pl, pr)
-        when predicate_has_rec_occurrence ~lv_rec pl ->
+      | Pimplies ({pred_content = Pand (p1, p2)} as pl, pr) ->
         (* treat  p ∧ q ⇒ r  as  p ⇒ q ⇒ r *)
         let pl' = {pl with pred_content = Pimplies (p2, pr)} in
         let p' = {p with pred_content = Pimplies (p1, pl')} in
