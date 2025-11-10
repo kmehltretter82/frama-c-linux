@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-std=c17"
+   STDOPT: +"-std=c11"
 */
 
 #include <stdalign.h>
