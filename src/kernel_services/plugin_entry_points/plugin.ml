@@ -118,6 +118,16 @@ let is_present s = List.exists (fun p -> p.p_shortname = s) !plugins
 let get_from_name s = List.find (fun p -> p.p_name = s) !plugins
 let get_from_shortname s = List.find (fun p -> p.p_shortname = s) !plugins
 
+let check_shortname =
+  let shortname_reg = Str.regexp {|^[a-z][a-z0-9]*\([-_]+[a-z0-9]+\)*$|} in
+  fun s ->
+    if not (is_kernel ()) && not (Str.string_match shortname_reg s 0) then
+      let msg = Format.sprintf
+          "shortname (%S) must start and finish by a small letter and contain \
+           only small letters, numbers and '-' or '_'" s
+      in
+      raise (Invalid_argument msg)
+
 (* ************************************************************************* *)
 (** {2 Global data structures} *)
 (* ************************************************************************* *)
@@ -239,7 +249,9 @@ struct
     g
 
   let () =
-    (try Cmdline.add_plugin P.name ~short:P.shortname ~help:P.help
+    (try
+       check_shortname P.shortname;
+       Cmdline.add_plugin P.name ~short:P.shortname ~help:P.help
      with Invalid_argument s ->
        L.abort "cannot register plug-in `%s': %s" P.name s);
     kernel_ongoing := is_kernel ();
@@ -735,3 +747,45 @@ struct
   include Plugin_log
 
 end (* Register *)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Tests                                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
+let _test_valid_name s =
+  try check_shortname s; true
+  with Invalid_argument _ -> false
+
+let _test_wrong_name s =
+  try check_shortname s; false
+  with Invalid_argument _ -> true
+
+let%test _ = _test_valid_name "a"
+let%test _ = _test_valid_name "abc"
+let%test _ = _test_valid_name "a--a"
+let%test _ = _test_valid_name "a__a"
+let%test _ = _test_valid_name "kernel"
+let%test _ = _test_valid_name "eva"
+let%test _ = _test_valid_name "e-acsl"
+let%test _ = _test_valid_name "a_long_plug-in_shortname"
+let%test _ = _test_valid_name "jessie3"
+
+let%test _ =
+  kernel := true;
+  let success = _test_valid_name "" in
+  kernel := false;
+  success
+
+let%test _ = _test_wrong_name ""
+let%test _ = _test_wrong_name "-"
+let%test _ = _test_wrong_name "_"
+let%test _ = _test_wrong_name "--"
+let%test _ = _test_wrong_name "__"
+let%test _ = _test_wrong_name "-abc"
+let%test _ = _test_wrong_name "abc-"
+let%test _ = _test_wrong_name "-abc-"
+let%test _ = _test_wrong_name "_abc"
+let%test _ = _test_wrong_name "abc_"
+let%test _ = _test_wrong_name "_abc_"
+let%test _ = _test_wrong_name "3jessie"
+let%test _ = _test_wrong_name "Capital"
