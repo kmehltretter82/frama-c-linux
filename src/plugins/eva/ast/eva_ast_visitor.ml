@@ -99,7 +99,7 @@ struct
 end
 
 
-module Fold =
+module Observe =
 struct
   type 'a visitor = {
     neutral : 'a;
@@ -110,14 +110,14 @@ struct
     offset : offset -> 'a;
   }
 
-  type 'a folder = {
+  type 'a observer = {
     fold_exp : visitor:'a visitor -> exp -> 'a;
     fold_lval : visitor:'a visitor -> lval -> 'a;
     fold_varinfo : visitor:'a visitor -> varinfo -> 'a;
     fold_offset : visitor:'a visitor -> offset -> 'a;
   }
 
-  let bind ~(neutral : 'a) ~(combine : 'a -> 'a -> 'a) (r : 'a folder) =
+  let bind ~(neutral : 'a) ~(combine : 'a -> 'a -> 'a) (r : 'a observer) =
     let rec visitor = {
       neutral; combine;
       exp = (fun e -> r.fold_exp ~visitor e);
@@ -164,8 +164,8 @@ struct
     fold_offset;
   }
 
-  let visit_exp ~neutral ~combine folder =
-    let visitor = bind ~neutral ~combine folder in visitor.exp
-  let visit_lval ~neutral ~combine folder =
-    let visitor = bind ~neutral ~combine folder in visitor.lval
+  let visit_exp ~neutral ~combine observer =
+    let visitor = bind ~neutral ~combine observer in visitor.exp
+  let visit_lval ~neutral ~combine observer =
+    let visitor = bind ~neutral ~combine observer in visitor.lval
 end

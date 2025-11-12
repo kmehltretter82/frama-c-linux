@@ -32,9 +32,9 @@ sig
 end
 
 
-(** Folding visitor *)
+(** Observing visitor *)
 
-module Fold :
+module Observe :
 sig
   type 'a visitor = {
     neutral : 'a;
@@ -45,16 +45,16 @@ sig
     offset : offset -> 'a;
   }
 
-  type 'a folder = {
+  type 'a observer = {
     fold_exp : visitor:'a visitor -> exp -> 'a;
     fold_lval : visitor:'a visitor -> lval -> 'a;
     fold_varinfo : visitor:'a visitor -> varinfo -> 'a;
     fold_offset : visitor:'a visitor -> offset -> 'a;
   }
 
-  val default : 'a folder
+  val default : 'a observer
   val visit_exp : neutral:'a -> combine:('a -> 'a -> 'a) ->
-    'a folder -> exp -> 'a
+    'a observer -> exp -> 'a
   val visit_lval : neutral:'a -> combine:('a -> 'a -> 'a) ->
-    'a folder -> lval -> 'a
+    'a observer -> lval -> 'a
 end

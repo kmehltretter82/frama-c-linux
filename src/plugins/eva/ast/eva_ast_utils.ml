@@ -161,17 +161,17 @@ and height_offset = function
 (* --- Specialized visitors --- *)
 
 let exp_contains_volatile, lval_contains_volatile =
-  let open Eva_ast_visitor.Fold in
+  let open Eva_ast_visitor.Observe in
   let neutral = false and combine b1 b2 = b1 || b2 in
   let fold_lval ~visitor lval =
     Ast_types.is_volatile lval.typ || default.fold_lval ~visitor lval
   in
-  let folder = { default with fold_lval } in
-  visit_exp ~neutral ~combine folder, visit_lval ~neutral ~combine folder
+  let observer = { default with fold_lval } in
+  visit_exp ~neutral ~combine observer, visit_lval ~neutral ~combine observer
 
 let vars_in_exp, vars_in_lval =
   let module VarSet = Cil_datatype.Varinfo.Set in
-  let open Eva_ast_visitor.Fold in
+  let open Eva_ast_visitor.Observe in
   let neutral = VarSet.empty and combine = VarSet.union in
   let fold_lval ~visitor lval =
     let vars = default.fold_lval ~visitor lval in
@@ -179,8 +179,8 @@ let vars_in_exp, vars_in_lval =
     | Var vi -> VarSet.add vi vars
     | Mem _ -> vars
   in
-  let folder = { default with fold_lval } in
-  visit_exp ~neutral ~combine folder, visit_lval ~neutral ~combine folder
+  let observer = { default with fold_lval } in
+  visit_exp ~neutral ~combine observer, visit_lval ~neutral ~combine observer
 
 
 let rec to_integer e =

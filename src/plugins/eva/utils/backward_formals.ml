@@ -20,9 +20,9 @@ let safe_argument expr =
       not (vi.vaddrof || Ast_types.has_qualifier "volatile" vi.vtype || vi.vglob)
     | _, _ -> false
   in
-  let open Eva_ast_visitor.Fold in
-  let folder = { default with fold_lval = is_safe_lval } in
-  visit_exp ~neutral:true ~combine:(&&) folder expr
+  let open Eva_ast_visitor.Observe in
+  let observer = { default with fold_lval = is_safe_lval } in
+  visit_exp ~neutral:true ~combine:(&&) observer expr
 
 let written_formals kf =
   let module S = Cil_datatype.Varinfo.Set in
