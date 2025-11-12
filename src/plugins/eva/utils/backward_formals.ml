@@ -21,7 +21,7 @@ let safe_argument expr =
     | _, _ -> false
   in
   let open Eva_ast_visitor.Observe in
-  let observer = { default with fold_lval = is_safe_lval } in
+  let observer = { default with observe_lval = is_safe_lval } in
   visit_exp ~neutral:true ~combine:(&&) observer expr
 
 let written_formals kf =

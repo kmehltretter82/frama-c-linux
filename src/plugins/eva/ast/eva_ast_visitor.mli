@@ -46,10 +46,10 @@ sig
   }
 
   type 'a observer = {
-    fold_exp : visitor:'a visitor -> exp -> 'a;
-    fold_lval : visitor:'a visitor -> lval -> 'a;
-    fold_varinfo : visitor:'a visitor -> varinfo -> 'a;
-    fold_offset : visitor:'a visitor -> offset -> 'a;
+    observe_exp : visitor:'a visitor -> exp -> 'a;
+    observe_lval : visitor:'a visitor -> lval -> 'a;
+    observe_varinfo : visitor:'a visitor -> varinfo -> 'a;
+    observe_offset : visitor:'a visitor -> offset -> 'a;
   }
 
   val default : 'a observer

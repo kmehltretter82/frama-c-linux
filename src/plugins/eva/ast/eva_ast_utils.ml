@@ -163,23 +163,23 @@ and height_offset = function
 let exp_contains_volatile, lval_contains_volatile =
   let open Eva_ast_visitor.Observe in
   let neutral = false and combine b1 b2 = b1 || b2 in
-  let fold_lval ~visitor lval =
-    Ast_types.is_volatile lval.typ || default.fold_lval ~visitor lval
+  let observe_lval ~visitor lval =
+    Ast_types.is_volatile lval.typ || default.observe_lval ~visitor lval
   in
-  let observer = { default with fold_lval } in
+  let observer = { default with observe_lval } in
   visit_exp ~neutral ~combine observer, visit_lval ~neutral ~combine observer
 
 let vars_in_exp, vars_in_lval =
   let module VarSet = Cil_datatype.Varinfo.Set in
   let open Eva_ast_visitor.Observe in
   let neutral = VarSet.empty and combine = VarSet.union in
-  let fold_lval ~visitor lval =
-    let vars = default.fold_lval ~visitor lval in
+  let observe_lval ~visitor lval =
+    let vars = default.observe_lval ~visitor lval in
     match fst lval.node with
     | Var vi -> VarSet.add vi vars
     | Mem _ -> vars
   in
-  let observer = { default with fold_lval } in
+  let observer = { default with observe_lval } in
   visit_exp ~neutral ~combine observer, visit_lval ~neutral ~combine observer
 
 
