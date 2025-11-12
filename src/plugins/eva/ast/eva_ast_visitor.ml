@@ -99,7 +99,7 @@ struct
 end
 
 
-module Fold =
+module Observe =
 struct
   type 'a visitor = {
     neutral : 'a;
@@ -110,25 +110,25 @@ struct
     offset : offset -> 'a;
   }
 
-  type 'a folder = {
-    fold_exp : visitor:'a visitor -> exp -> 'a;
-    fold_lval : visitor:'a visitor -> lval -> 'a;
-    fold_varinfo : visitor:'a visitor -> varinfo -> 'a;
-    fold_offset : visitor:'a visitor -> offset -> 'a;
+  type 'a observer = {
+    observe_exp : visitor:'a visitor -> exp -> 'a;
+    observe_lval : visitor:'a visitor -> lval -> 'a;
+    observe_varinfo : visitor:'a visitor -> varinfo -> 'a;
+    observe_offset : visitor:'a visitor -> offset -> 'a;
   }
 
-  let bind ~(neutral : 'a) ~(combine : 'a -> 'a -> 'a) (r : 'a folder) =
+  let bind ~(neutral : 'a) ~(combine : 'a -> 'a -> 'a) (r : 'a observer) =
     let rec visitor = {
       neutral; combine;
-      exp = (fun e -> r.fold_exp ~visitor e);
-      lval = (fun lv -> r.fold_lval ~visitor lv);
-      varinfo = (fun vi -> r.fold_varinfo ~visitor vi);
-      offset = (fun o -> r.fold_offset ~visitor o);
+      exp = (fun e -> r.observe_exp ~visitor e);
+      lval = (fun lv -> r.observe_lval ~visitor lv);
+      varinfo = (fun vi -> r.observe_varinfo ~visitor vi);
+      offset = (fun o -> r.observe_offset ~visitor o);
     }
     in
     visitor
 
-  let fold_exp ~visitor exp =
+  let observe_exp ~visitor exp =
     match exp.node with
     | Lval lv | AddrOf lv | StartOf lv ->
       visitor.lval lv
@@ -139,7 +139,7 @@ struct
     | Const _ ->
       visitor.neutral
 
-  let fold_lval ~visitor lval =
+  let observe_lval ~visitor lval =
     let lhost, offset = lval.node in
     let x =
       match lhost with
@@ -148,7 +148,7 @@ struct
     and y = visitor.offset offset in
     visitor.combine x y
 
-  let fold_offset ~visitor offset =
+  let observe_offset ~visitor offset =
     match offset with
     | NoOffset -> visitor.neutral
     | Field (_, o) -> visitor.offset o
@@ -158,14 +158,14 @@ struct
       visitor.combine x y
 
   let default = {
-    fold_exp;
-    fold_lval;
-    fold_varinfo = (fun ~visitor _vi -> visitor.neutral);
-    fold_offset;
+    observe_exp;
+    observe_lval;
+    observe_varinfo = (fun ~visitor _vi -> visitor.neutral);
+    observe_offset;
   }
 
-  let visit_exp ~neutral ~combine folder =
-    let visitor = bind ~neutral ~combine folder in visitor.exp
-  let visit_lval ~neutral ~combine folder =
-    let visitor = bind ~neutral ~combine folder in visitor.lval
+  let visit_exp ~neutral ~combine observer =
+    let visitor = bind ~neutral ~combine observer in visitor.exp
+  let visit_lval ~neutral ~combine observer =
+    let visitor = bind ~neutral ~combine observer in visitor.lval
 end
