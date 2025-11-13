@@ -8,7 +8,7 @@
 
 include Plugin.Register
     (struct
-      let name = "loop"
+      let name = "Loop"
       let shortname = "loop"
       let help = "Find maximum number of iterations in loops"
     end)

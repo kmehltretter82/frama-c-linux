@@ -1,4 +1,4 @@
-Plug-in name: callgraph
+Plug-in name: Callgraph
 Plug-in shortname: cg
 Description:
 automatically compute the callgraph of the program. Using Eva might improve the precision of this plug-in
@@ -41,16 +41,16 @@ Options taking a string as argument should preferably be written
 
 *** DEBUG
 
--cg-debug <n>       level of debug for plug-in callgraph (default to 0)
+-cg-debug <n>       level of debug for plug-in Callgraph (default to 0)
 
 *** GETTING INFORMATION
 
--cg-help            help of plug-in callgraph
+-cg-help            help of plug-in Callgraph
 -cg-h               alias for option -cg-help
 
 *** OUTPUT MESSAGES
 
--cg-log <K_1:file_1,...>  copy log messages from callgraph to a file. <K> is
+-cg-log <K_1:file_1,...>  copy log messages from Callgraph to a file. <K> is
                     a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
                     d: debug       e: user or internal error (same as 'iu')
@@ -63,7 +63,7 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -cg-msg-key help to get a list of
                     available categories, and * to enable all categories
                     (preferably use -cg-msg-key="k1[,...,kn]")
--cg-verbose <n>     level of verbosity for plug-in callgraph (default to 1)
+-cg-verbose <n>     level of verbosity for plug-in Callgraph (default to 1)
 -cg-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category <k1> to
                     <s1>,...,<kn> to <sn>. Use -cg-warn-key help to get a
                     list of available categories, and * to enable all

@@ -11,7 +11,7 @@ let get ~plugin name typ ~fallback =
   with Failure _ | Dynamic.(Unbound_value _ | Incompatible_type _) -> fallback
 
 module Inout = struct
-  let plugin = "inout"
+  let plugin = "Inout"
 
   let register_call_hook f =
     let fallback _ = () in
@@ -32,7 +32,7 @@ module Inout = struct
 end
 
 module Callgraph = struct
-  let plugin = "callgraph"
+  let plugin = "Callgraph"
 
   let iter_in_rev_order f =
     let fallback = Globals.Functions.iter in
@@ -45,7 +45,7 @@ module Callgraph = struct
 end
 
 module Scope = struct
-  let plugin = "scope"
+  let plugin = "Scope"
 
   let rm_asserts () =
     let fallback () =

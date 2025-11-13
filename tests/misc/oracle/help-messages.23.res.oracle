@@ -1,4 +1,4 @@
-Plug-in name: report
+Plug-in name: Report
 Plug-in shortname: report
 Description: Properties Status Report
 
@@ -18,11 +18,11 @@ Options taking a string as argument should preferably be written
 
 *** DEBUG
 
--report-debug <n>   level of debug for plug-in report (default to 0)
+-report-debug <n>   level of debug for plug-in Report (default to 0)
 
 *** GETTING INFORMATION
 
--report-help        help of plug-in report
+-report-help        help of plug-in Report
 -report-h           alias for option -report-help
 
 *** MONITORING OF PROPERTIES, ERRORS AND WARNINGS
@@ -64,7 +64,7 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--report-log <K_1:file_1,...>  copy log messages from report to a file. <K> is
+-report-log <K_1:file_1,...>  copy log messages from Report to a file. <K> is
                     a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
                     d: debug       e: user or internal error (same as 'iu')
@@ -77,7 +77,7 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -report-msg-key help to get a list of
                     available categories, and * to enable all categories
                     (preferably use -report-msg-key="k1[,...,kn]")
--report-verbose <n>  level of verbosity for plug-in report (default to 1)
+-report-verbose <n>  level of verbosity for plug-in Report (default to 1)
 -report-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category
                     <k1> to <s1>,...,<kn> to <sn>. Use -report-warn-key help
                     to get a list of available categories, and * to enable

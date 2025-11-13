@@ -1,7 +1,7 @@
 include
   Plugin.Register
     (struct
-      let name = "a"
+      let name = "A"
       let shortname = "a"
       let help = ""
     end)

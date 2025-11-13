@@ -10,7 +10,7 @@
 
 include Plugin.Register
     (struct
-      let name = "aorai"
+      let name = "Aorai"
       let shortname = "aorai"
       let help = "verification of behavioral properties (experimental)"
     end)

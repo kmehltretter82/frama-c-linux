@@ -1,4 +1,4 @@
-Plug-in name: sparecode
+Plug-in name: Sparecode
 Plug-in shortname: sparecode
 Description: code cleaner
 
@@ -24,16 +24,16 @@ Options taking a string as argument should preferably be written
 
 *** DEBUG
 
--sparecode-debug <n>  level of debug for plug-in sparecode (default to 0)
+-sparecode-debug <n>  level of debug for plug-in Sparecode (default to 0)
 
 *** GETTING INFORMATION
 
--sparecode-help     help of plug-in sparecode
+-sparecode-help     help of plug-in Sparecode
 -sparecode-h        alias for option -sparecode-help
 
 *** OUTPUT MESSAGES
 
--sparecode-log <K_1:file_1,...>  copy log messages from sparecode to a file.
+-sparecode-log <K_1:file_1,...>  copy log messages from Sparecode to a file.
                     <K> is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
                     d: debug       e: user or internal error (same as 'iu')
@@ -46,7 +46,7 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -sparecode-msg-key help to get a list
                     of available categories, and * to enable all categories
                     (preferably use -sparecode-msg-key="k1[,...,kn]")
--sparecode-verbose <n>  level of verbosity for plug-in sparecode (default to
+-sparecode-verbose <n>  level of verbosity for plug-in Sparecode (default to
                     1)
 -sparecode-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category
                     <k1> to <s1>,...,<kn> to <sn>. Use -sparecode-warn-key

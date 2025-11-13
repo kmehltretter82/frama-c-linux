@@ -1,4 +1,4 @@
-Plug-in name: rtegen
+Plug-in name: RteGen
 Plug-in shortname: rte
 Description: generates annotations for runtime error checking
 
@@ -42,16 +42,16 @@ Options taking a string as argument should preferably be written
 
 *** DEBUG
 
--rte-debug <n>      level of debug for plug-in rtegen (default to 0)
+-rte-debug <n>      level of debug for plug-in RteGen (default to 0)
 
 *** GETTING INFORMATION
 
--rte-help           help of plug-in rtegen
+-rte-help           help of plug-in RteGen
 -rte-h              alias for option -rte-help
 
 *** OUTPUT MESSAGES
 
--rte-log <K_1:file_1,...>  copy log messages from rtegen to a file. <K> is a
+-rte-log <K_1:file_1,...>  copy log messages from RteGen to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
                     d: debug       e: user or internal error (same as 'iu')
@@ -64,7 +64,7 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -rte-msg-key help to get a list of
                     available categories, and * to enable all categories
                     (preferably use -rte-msg-key="k1[,...,kn]")
--rte-verbose <n>    level of verbosity for plug-in rtegen (default to 1)
+-rte-verbose <n>    level of verbosity for plug-in RteGen (default to 1)
 -rte-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category <k1>
                     to <s1>,...,<kn> to <sn>. Use -rte-warn-key help to get a
                     list of available categories, and * to enable all

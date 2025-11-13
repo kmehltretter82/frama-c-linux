@@ -6,7 +6,7 @@ open Kernel
 
 module P = Plugin.Register
     (struct
-      let name = "aorai testing module"
+      let name = "Aorai testing module"
       let shortname = "aorai-test"
       let help = "utility script for aorai regtests"
     end)

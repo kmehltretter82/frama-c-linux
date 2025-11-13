@@ -8,7 +8,7 @@
 
 include Plugin.Register
     (struct
-      let name = "sparecode"
+      let name = "Sparecode"
       let shortname = "sparecode"
       let help = "code cleaner"
     end)

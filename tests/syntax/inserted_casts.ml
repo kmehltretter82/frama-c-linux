@@ -1,6 +1,6 @@
 include Plugin.Register
     (struct
-      let name = "test"
+      let name = "Test"
       let shortname = "test"
       let help = "unitary test of inserted cast hook"
     end)

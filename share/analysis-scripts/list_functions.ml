@@ -39,7 +39,7 @@ end
 
 module Self = Plugin.Register
     (struct
-      let name = "list-functions"
+      let name = "List-functions"
       let shortname = "list-functions"
       let help = "prints the list of function definitions and declarations, \
                   along with their locations and number of statements, \

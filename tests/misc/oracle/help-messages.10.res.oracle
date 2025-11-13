@@ -1,4 +1,4 @@
-Plug-in name: impact
+Plug-in name: Impact
 Plug-in shortname: impact
 Description: impact analysis
 
@@ -33,16 +33,16 @@ Options taking a string as argument should preferably be written
 
 *** DEBUG
 
--impact-debug <n>   level of debug for plug-in impact (default to 0)
+-impact-debug <n>   level of debug for plug-in Impact (default to 0)
 
 *** GETTING INFORMATION
 
--impact-help        help of plug-in impact
+-impact-help        help of plug-in Impact
 -impact-h           alias for option -impact-help
 
 *** OUTPUT MESSAGES
 
--impact-log <K_1:file_1,...>  copy log messages from impact to a file. <K> is
+-impact-log <K_1:file_1,...>  copy log messages from Impact to a file. <K> is
                     a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
                     d: debug       e: user or internal error (same as 'iu')
@@ -55,7 +55,7 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -impact-msg-key help to get a list of
                     available categories, and * to enable all categories
                     (preferably use -impact-msg-key="k1[,...,kn]")
--impact-verbose <n>  level of verbosity for plug-in impact (default to 1)
+-impact-verbose <n>  level of verbosity for plug-in Impact (default to 1)
 -impact-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category
                     <k1> to <s1>,...,<kn> to <sn>. Use -impact-warn-key help
                     to get a list of available categories, and * to enable

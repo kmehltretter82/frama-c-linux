@@ -8,7 +8,7 @@
 
 include Plugin.Register
     (struct
-      let name = "occurrence"
+      let name = "Occurrence"
       let shortname = "occurrence"
       let help = "automatically computes where variables are used"
     end)
