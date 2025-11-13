@@ -118,15 +118,19 @@ let is_present s = List.exists (fun p -> p.p_shortname = s) !plugins
 let get_from_name s = List.find (fun p -> p.p_name = s) !plugins
 let get_from_shortname s = List.find (fun p -> p.p_shortname = s) !plugins
 
-let check_shortname =
-  let shortname_reg = Str.regexp {|^[a-z][a-z0-9]*\([-_]+[a-z0-9]+\)*$|} in
-  fun s ->
-    if not (is_kernel ()) && not (Str.string_match shortname_reg s 0) then
-      let msg = Format.sprintf
-          "shortname (%S) must start and finish by a small letter and contain \
-           only small letters, numbers and '-' or '_'" s
-      in
-      raise (Invalid_argument msg)
+let check_shortname s =
+  let shortname_reg = Str.regexp {|^[a-z][a-z0-9]*\([-_][a-z0-9]+\)*$|} in
+  if s = "kernel" then
+    let msg = "shortname \"kernel\" is reserved by Frama-C" in
+    raise (Invalid_argument msg)
+  else if is_kernel () || Str.string_match shortname_reg s 0 then ()
+  else
+    let msg =
+      "shortname '" ^ s
+      ^ "' must start with a lowercase letter and contain only lowercase"
+      ^ " letters and numbers, possibly separated by '-' or '_'"
+    in
+    raise (Invalid_argument msg)
 
 (* ************************************************************************* *)
 (** {2 Global data structures} *)
@@ -762,9 +766,6 @@ let _test_wrong_name s =
 
 let%test _ = _test_valid_name "a"
 let%test _ = _test_valid_name "abc"
-let%test _ = _test_valid_name "a--a"
-let%test _ = _test_valid_name "a__a"
-let%test _ = _test_valid_name "kernel"
 let%test _ = _test_valid_name "eva"
 let%test _ = _test_valid_name "e-acsl"
 let%test _ = _test_valid_name "a_long_plug-in_shortname"
@@ -787,5 +788,8 @@ let%test _ = _test_wrong_name "-abc-"
 let%test _ = _test_wrong_name "_abc"
 let%test _ = _test_wrong_name "abc_"
 let%test _ = _test_wrong_name "_abc_"
+let%test _ = _test_wrong_name "a--a"
+let%test _ = _test_wrong_name "a__a"
+let%test _ = _test_wrong_name "kernel"
 let%test _ = _test_wrong_name "3jessie"
 let%test _ = _test_wrong_name "Capital"
