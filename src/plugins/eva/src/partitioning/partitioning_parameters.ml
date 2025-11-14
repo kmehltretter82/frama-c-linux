@@ -120,7 +120,7 @@ struct
     | Predicate pred ->
       Partition.Predicate pred, pred.pred_loc
 
-  let flow_actions stmt =
+  let flow_annotations stmt =
     let map_annot acc t =
       try
         let action =
@@ -142,6 +142,28 @@ struct
         acc (* Impossible to convert term to lval *)
     in
     List.fold_left map_annot [] (get_flow_annot stmt)
+
+  let flow_actions vertex =
+    let rationing_parameters, flow_actions =
+      match Eva_automata.Vertex.stmt vertex with
+      | None -> None, []
+      | Some stmt ->
+        let flow_actions = flow_annotations stmt in
+        (* A skip statement is created on each split annotation: do not ration
+           states on them to avoid meddling in successive split directives. *)
+        if Cil.is_skip stmt.skind && flow_actions <> []
+        then None, flow_actions
+        else Some (slevel stmt, merge stmt), flow_actions
+    in
+    let rationing =
+      match rationing_parameters with
+      | None -> Partition.new_rationing ~limit:max_int ~merge:false
+      | Some (limit, merge) -> Partition.new_rationing ~limit ~merge
+    in
+    let flow_actions =
+      (Partition.Ration rationing) :: Update_dynamic_splits :: flow_actions
+    in
+    flow_actions, rationing_parameters <> None
 
   let call_return_policy =
     Partition.{

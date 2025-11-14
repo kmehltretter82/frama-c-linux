@@ -64,7 +64,12 @@ type automaton = {
 }
 
 module Transition : Datatype.S with type t = transition
-module Vertex : Datatype.S_with_collections with type t = vertex
+module Vertex : sig
+  include Datatype.S_with_collections with type t = vertex
+  val is_loop_head : t -> bool
+  val stmt : t -> Cil_types.stmt option
+end
+
 module Edge : Datatype.S_with_collections with type t = edge
 module Automaton : Datatype.S with type t = automaton
 

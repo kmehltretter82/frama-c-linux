@@ -27,10 +27,10 @@ sig
 
   (* --- Constructors --- *)
 
-  val empty_store : stmt:Cil_types.stmt option -> is_loop_head:bool -> store
+  val empty_store : Eva_automata.vertex -> store
   val empty_flow : flow
   val empty_tank : unit -> tank
-  val empty_widening : stmt:Cil_types.stmt option -> widening
+  val empty_widening : Eva_automata.vertex -> widening
 
   (** Build the initial tank for the entry point of a function. *)
   val initial_tank : state list -> tank
