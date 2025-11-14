@@ -14,40 +14,43 @@
 [e-acsl:analysis:inductive] no valid mode found for: is_max
 [e-acsl] Warning: Unable to extract executable code from inductive definition of is_max.
   See language reference manual for details on the supported forms.
-[e-acsl] unsupported.c:60: Warning: 
+[e-acsl:analysis:inductive] no valid mode found for: fibo
+[e-acsl] Warning: Unable to extract executable code from inductive definition of fibo.
+  See language reference manual for details on the supported forms.
+[e-acsl] unsupported.c:70: Warning: 
   E-ACSL construct
   `inductive definitions outside of subset described in the reference manual'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] unsupported.c:61: Warning: 
+[e-acsl] unsupported.c:71: Warning: 
   E-ACSL construct
   `inductive definitions outside of subset described in the reference manual'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] unsupported.c:62: Warning: 
+[e-acsl] unsupported.c:72: Warning: 
   E-ACSL construct
   `inductive definitions outside of subset described in the reference manual'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] unsupported.c:63: Warning: 
+[e-acsl] unsupported.c:73: Warning: 
   E-ACSL construct
   `inductive definitions outside of subset described in the reference manual'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] unsupported.c:64: Warning: 
+[e-acsl] unsupported.c:74: Warning: 
   E-ACSL construct
   `inductive definitions outside of subset described in the reference manual'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] unsupported.c:67: Warning: 
+[e-acsl] unsupported.c:77: Warning: 
   E-ACSL construct
   `inductive definitions outside of subset described in the reference manual'
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] unsupported.c:60: Warning: assertion got status unknown.
-[eva:alarm] unsupported.c:61: Warning: assertion got status unknown.
-[eva:alarm] unsupported.c:62: Warning: assertion got status unknown.
-[eva:alarm] unsupported.c:63: Warning: assertion got status unknown.
-[eva:alarm] unsupported.c:64: Warning: assertion got status unknown.
-[eva:alarm] unsupported.c:67: Warning: assertion got status unknown.
+[eva:alarm] unsupported.c:70: Warning: assertion got status unknown.
+[eva:alarm] unsupported.c:71: Warning: assertion got status unknown.
+[eva:alarm] unsupported.c:72: Warning: assertion got status unknown.
+[eva:alarm] unsupported.c:73: Warning: assertion got status unknown.
+[eva:alarm] unsupported.c:74: Warning: assertion got status unknown.
+[eva:alarm] unsupported.c:77: Warning: assertion got status unknown.
