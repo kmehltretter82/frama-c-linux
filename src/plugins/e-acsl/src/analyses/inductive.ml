@@ -20,13 +20,19 @@ end
 
 include struct (* auxiliary functions *)
 
-  let li_use_finder ~res ~lv_rec = object
-    inherit Visitor.frama_c_inplace
-    method! vlogic_info_use li =
-      if Logic_var.equal lv_rec li.l_var_info
-      then (res := true; SkipChildren)
-      else DoChildren
-  end
+  let predicate_has_rec_occurrence ~lv_rec p =
+    let exception Found in
+    let li_use_finder = object
+      inherit Visitor.frama_c_inplace
+      method! vlogic_info_use li =
+        if Logic_var.equal lv_rec li.l_var_info
+        then raise Found
+        else DoChildren
+    end in
+    try
+      ignore @@ Visitor.visitFramacPredicate li_use_finder p;
+      false
+    with Found -> true
 
   (* applies logic variable substitutions [substs] as well as a logic_info
      substitution [(li, li')] *)
@@ -47,11 +53,6 @@ include struct (* auxiliary functions *)
       try ChangeTo (Logic_var.Map.find v substs)
       with Not_found -> DoChildren
   end
-
-  let predicate_has_rec_occurrence ~lv_rec p =
-    let res = ref false in
-    let _ = Visitor.visitFramacPredicate (li_use_finder ~res ~lv_rec) p in
-    !res
 
   let rec extract_foralls = function
     | {pred_content = Pat (p', labels)} as p ->
