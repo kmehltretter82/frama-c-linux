@@ -1,7 +1,7 @@
 /*run.config
-  STDOPT: +"%{dep:../../../share/analysis-scripts/fc_stubs.c}"
-  STDOPT: +"%{dep:../../../share/analysis-scripts/fc_stubs.c}" +"-main eva_main_simple"
-  STDOPT: +"%{dep:../../../share/analysis-scripts/fc_stubs.c}" +"-main eva_main"
+  STDOPT: +"%{dep:../../../share/libc/eva_stubs.c}"
+  STDOPT: +"%{dep:../../../share/libc/eva_stubs.c}" +"-main eva_main_simple"
+  STDOPT: +"%{dep:../../../share/libc/eva_stubs.c}" +"-main eva_main"
 */
 
 #include "unistd.c"

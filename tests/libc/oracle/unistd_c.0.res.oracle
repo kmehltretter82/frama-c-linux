@@ -1,5 +1,5 @@
 [kernel] Parsing unistd_c.c (with preprocessing)
-[kernel] Parsing share/analysis-scripts/fc_stubs.c (with preprocessing)
+[kernel] Parsing share/libc/eva_stubs.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
