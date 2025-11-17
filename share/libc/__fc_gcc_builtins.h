@@ -14,6 +14,12 @@
 #include "__fc_machdep.h"
 #include "features.h"
 
+#if defined(__cplusplus)
+#define BOOL bool
+#else
+#define BOOL _Bool
+#endif
+
 __PUSH_FC_STDLIB
 
 __BEGIN_DECLS
@@ -25,7 +31,7 @@ __BEGIN_DECLS
   ensures res_wrapped: *res == (int)(a + b);
   ensures result_overflow: a + b == (int)(a + b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_sadd_overflow(int a, int b, int* res);
+BOOL __builtin_sadd_overflow(int a, int b, int* res);
 
 /*@
   requires valid_res: \valid(res);
@@ -34,7 +40,7 @@ _Bool __builtin_sadd_overflow(int a, int b, int* res);
   ensures res_wrapped: *res == (long)(a + b);
   ensures result_overflow: a + b == (long)(a + b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_saddl_overflow(long a, long b, long* res);
+BOOL __builtin_saddl_overflow(long a, long b, long* res);
 
 /*@
   requires valid_res: \valid(res);
@@ -43,7 +49,7 @@ _Bool __builtin_saddl_overflow(long a, long b, long* res);
   ensures res_wrapped: *res == (long long)(a + b);
   ensures result_overflow: a + b == (long long)(a + b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_saddll_overflow(long long a, long long b, long long* res);
+BOOL __builtin_saddll_overflow(long long a, long long b, long long* res);
 
 /*@
   requires valid_res: \valid(res);
@@ -52,7 +58,7 @@ _Bool __builtin_saddll_overflow(long long a, long long b, long long* res);
   ensures res_wrapped: *res == (unsigned)(a + b);
   ensures result_overflow: a + b == (unsigned)(a + b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_uadd_overflow(unsigned a, unsigned b, unsigned* res);
+BOOL __builtin_uadd_overflow(unsigned a, unsigned b, unsigned* res);
 
 /*@
   requires valid_res: \valid(res);
@@ -61,7 +67,7 @@ _Bool __builtin_uadd_overflow(unsigned a, unsigned b, unsigned* res);
   ensures res_wrapped: *res == (unsigned long)(a + b);
   ensures result_overflow: a + b == (unsigned long)(a + b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_uaddl_overflow(unsigned long a, unsigned long b, unsigned long* res);
+BOOL __builtin_uaddl_overflow(unsigned long a, unsigned long b, unsigned long* res);
 
 /*@
   requires valid_res: \valid(res);
@@ -70,7 +76,7 @@ _Bool __builtin_uaddl_overflow(unsigned long a, unsigned long b, unsigned long* 
   ensures res_wrapped: *res == (unsigned long long)(a + b);
   ensures result_overflow: a + b == (unsigned long long)(a + b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_uaddll_overflow(unsigned long long a, unsigned long long b, unsigned long long* res);
+BOOL __builtin_uaddll_overflow(unsigned long long a, unsigned long long b, unsigned long long* res);
 
 // NB: technically, the types of a, b and *res could differ, but we assume that
 // this is not the case
@@ -92,7 +98,7 @@ _Bool __builtin_uaddll_overflow(unsigned long long a, unsigned long long b, unsi
   ensures res_wrapped: *res == (int)(a - b);
   ensures result_overflow: a - b == (int)(a - b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_ssub_overflow(int a, int b, int* res);
+BOOL __builtin_ssub_overflow(int a, int b, int* res);
 
 /*@
   requires valid_res: \valid(res);
@@ -101,7 +107,7 @@ _Bool __builtin_ssub_overflow(int a, int b, int* res);
   ensures res_wrapped: *res == (long)(a - b);
   ensures result_overflow: a - b == (long)(a - b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_ssubl_overflow(long a, long b, long* res);
+BOOL __builtin_ssubl_overflow(long a, long b, long* res);
 
 /*@
   requires valid_res: \valid(res);
@@ -110,7 +116,7 @@ _Bool __builtin_ssubl_overflow(long a, long b, long* res);
   ensures res_wrapped: *res == (long long)(a - b);
   ensures result_overflow: a - b == (long long)(a - b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_ssubll_overflow(long long a, long long b, long long* res);
+BOOL __builtin_ssubll_overflow(long long a, long long b, long long* res);
 
 /*@
   requires valid_res: \valid(res);
@@ -119,7 +125,7 @@ _Bool __builtin_ssubll_overflow(long long a, long long b, long long* res);
   ensures res_wrapped: *res == (unsigned)(a - b);
   ensures result_overflow: a - b == (unsigned)(a - b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_usub_overflow(unsigned a, unsigned b, unsigned* res);
+BOOL __builtin_usub_overflow(unsigned a, unsigned b, unsigned* res);
 
 /*@
   requires valid_res: \valid(res);
@@ -128,7 +134,7 @@ _Bool __builtin_usub_overflow(unsigned a, unsigned b, unsigned* res);
   ensures res_wrapped: *res == (unsigned long)(a - b);
   ensures result_overflow: a - b == (unsigned long)(a - b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_usubl_overflow(unsigned long a, unsigned long b, unsigned long* res);
+BOOL __builtin_usubl_overflow(unsigned long a, unsigned long b, unsigned long* res);
 
 /*@
   requires valid_res: \valid(res);
@@ -137,7 +143,7 @@ _Bool __builtin_usubl_overflow(unsigned long a, unsigned long b, unsigned long* 
   ensures res_wrapped: *res == (unsigned long long)(a - b);
   ensures result_overflow: a - b == (unsigned long long)(a - b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_usubll_overflow(unsigned long long a, unsigned long long b, unsigned long long* res);
+BOOL __builtin_usubll_overflow(unsigned long long a, unsigned long long b, unsigned long long* res);
 
 // NB: technically, the types of a, b and *res could differ, but we assume that
 // this is not the case
@@ -159,7 +165,7 @@ _Bool __builtin_usubll_overflow(unsigned long long a, unsigned long long b, unsi
   ensures res_wrapped: *res == (int)(a * b);
   ensures result_overflow: a * b == (int)(a * b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_smul_overflow(int a, int b, int* res);
+BOOL __builtin_smul_overflow(int a, int b, int* res);
 
 /*@
   requires valid_res: \valid(res);
@@ -168,7 +174,7 @@ _Bool __builtin_smul_overflow(int a, int b, int* res);
   ensures res_wrapped: *res == (long)(a * b);
   ensures result_overflow: a * b == (long)(a * b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_smull_overflow(long a, long b, long* res);
+BOOL __builtin_smull_overflow(long a, long b, long* res);
 
 /*@
   requires valid_res: \valid(res);
@@ -177,7 +183,7 @@ _Bool __builtin_smull_overflow(long a, long b, long* res);
   ensures res_wrapped: *res == (long long)(a * b);
   ensures result_overflow: a * b == (long long)(a * b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_smulll_overflow(long long a, long long b, long long* res);
+BOOL __builtin_smulll_overflow(long long a, long long b, long long* res);
 
 /*@
   requires valid_res: \valid(res);
@@ -186,7 +192,7 @@ _Bool __builtin_smulll_overflow(long long a, long long b, long long* res);
   ensures res_wrapped: *res == (unsigned)(a * b);
   ensures result_overflow: a * b == (unsigned)(a * b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_umul_overflow(unsigned a, unsigned b, unsigned* res);
+BOOL __builtin_umul_overflow(unsigned a, unsigned b, unsigned* res);
 
 /*@
   requires valid_res: \valid(res);
@@ -195,7 +201,7 @@ _Bool __builtin_umul_overflow(unsigned a, unsigned b, unsigned* res);
   ensures res_wrapped: *res == (unsigned long)(a * b);
   ensures result_overflow: a * b == (unsigned long)(a * b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_umull_overflow(unsigned long a, unsigned long b, unsigned long* res);
+BOOL __builtin_umull_overflow(unsigned long a, unsigned long b, unsigned long* res);
 
 /*@
   requires valid_res: \valid(res);
@@ -204,7 +210,7 @@ _Bool __builtin_umull_overflow(unsigned long a, unsigned long b, unsigned long* 
   ensures res_wrapped: *res == (unsigned long long)(a * b);
   ensures result_overflow: a * b == (unsigned long long)(a * b) ? \result == 0 : \result == 1;
  */
-_Bool __builtin_umulll_overflow(unsigned long long a, unsigned long long b, unsigned long long* res);
+BOOL __builtin_umulll_overflow(unsigned long long a, unsigned long long b, unsigned long long* res);
 
 // NB: technically, the types of a, b and *res could differ, but we assume that
 // this is not the case
@@ -386,10 +392,10 @@ __UINT64_T __atomic_exchange_8(__UINT64_T* mem, __UINT64_T val, int model);
           indirect: failure_model, indirect: weak;
   assigns \result \from indirect: *mem, indirect: *expected;
 */
-_Bool __atomic_compare_exchange_1(__UINT8_T* mem,
+BOOL __atomic_compare_exchange_1(__UINT8_T* mem,
                                   __UINT8_T* expected,
                                   __UINT8_T desired,
-                                  _Bool weak,
+                                  BOOL weak,
                                   int success_model,
                                   int failure_model);
 
@@ -403,10 +409,10 @@ _Bool __atomic_compare_exchange_1(__UINT8_T* mem,
           indirect: failure_model, indirect: weak;
   assigns \result \from indirect: *mem, indirect: *expected;
 */
-_Bool __atomic_compare_exchange_2(__UINT16_T* mem,
+BOOL __atomic_compare_exchange_2(__UINT16_T* mem,
                                   __UINT16_T* expected,
                                   __UINT16_T desired,
-                                  _Bool weak,
+                                  BOOL weak,
                                   int success_model,
                                   int failure_model);
 
@@ -420,10 +426,10 @@ _Bool __atomic_compare_exchange_2(__UINT16_T* mem,
           indirect: failure_model, indirect: weak;
   assigns \result \from indirect: *mem, indirect: *expected;
 */
-_Bool __atomic_compare_exchange_4(__UINT32_T* mem,
+BOOL __atomic_compare_exchange_4(__UINT32_T* mem,
                                   __UINT32_T* expected,
                                   __UINT32_T desired,
-                                  _Bool weak,
+                                  BOOL weak,
                                   int success_model,
                                   int failure_model);
 
@@ -437,10 +443,10 @@ _Bool __atomic_compare_exchange_4(__UINT32_T* mem,
           indirect: failure_model, indirect: weak;
   assigns \result \from indirect: *mem, indirect: *expected;
 */
-_Bool __atomic_compare_exchange_8(__UINT64_T* mem,
+BOOL __atomic_compare_exchange_8(__UINT64_T* mem,
                                   __UINT64_T* expected,
                                   __UINT64_T desired,
-                                  _Bool weak,
+                                  BOOL weak,
                                   int success_model,
                                   int failure_model);
 
@@ -664,7 +670,7 @@ __UINT16_T __atomic_fetch_nand_2(__UINT16_T* ptr, __UINT16_T val, int model);
     requires initialization: \initialized(ptr);
     assigns \result, *ptr \from *ptr, val, indirect: model;
 */
-__UINT32_T __atomic_fetch_add_4(__UINT32_T* ptr, __UINT32_T val, int model);
+__UINT32_T __atomic_fetch_add_4(volatile __UINT32_T* ptr, __UINT32_T val, int model);
 
 /*@ requires validity: \valid(ptr);
     requires initialization: \initialized(ptr);
@@ -732,16 +738,20 @@ __UINT64_T __atomic_fetch_or_8(__UINT64_T* ptr, __UINT64_T val, int model);
 */
 __UINT64_T __atomic_fetch_nand_8(__UINT64_T* ptr, __UINT64_T val, int model);
 
+#if !defined(__clang__)
+
 /*@ requires validity: \valid((char*)ptr);
     assigns \result \from *((char*)ptr);
     assigns *((char*)ptr) \from \nothing;
 */
-_Bool __atomic_test_and_set(void* ptr, int model);
+BOOL __atomic_test_and_set(void* ptr, int model);
 
 /*@ requires validity: \valid(ptr);
     assigns *ptr \from \nothing;
 */
-void __atomic_clear(_Bool* ptr, int model);
+void __atomic_clear(BOOL* ptr, int model);
+
+#endif
 
 /*@ assigns \nothing; */
 void __atomic_thread_fence(int model);
@@ -750,10 +760,10 @@ void __atomic_thread_fence(int model);
 void __atomic_signal_fence(int model);
 
 /*@ assigns \result \from indirect: size, indirect: ptr; */
-_Bool __atomic_always_lock_free(__SIZE_T size, void* ptr);
+BOOL __atomic_always_lock_free(__SIZE_T size, const volatile void* ptr);
 
 /*@ assigns \result \from indirect: size, indirect: ptr; */
-_Bool __atomic_is_lock_free(__SIZE_T size, void* ptr);
+BOOL __atomic_is_lock_free(__SIZE_T size, const volatile void* ptr);
 
 // According to the GCC docs
 // (https://gcc.gnu.org/onlinedocs/gcc/_005f_005fsync-Builtins.html),
