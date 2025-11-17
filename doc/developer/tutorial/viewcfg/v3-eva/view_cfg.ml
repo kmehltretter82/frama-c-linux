@@ -7,7 +7,7 @@
 open Cil_types
 
 module Self = Plugin.Register(struct
-    let name = "control flow graph"
+    let name = "Control flow graph"
     let shortname = "viewcfg"
     let help = "control flow graph computation and display"
   end)
