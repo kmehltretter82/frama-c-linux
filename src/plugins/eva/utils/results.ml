@@ -9,8 +9,8 @@
 open Lattice_bounds
 
 let are_available kf =
-  Analysis.is_computed () &&
-  match Analysis.status kf with
+  Self.is_computed () &&
+  match Function_calls.analysis_status kf with
   | Analyzed (Complete | Partial) -> true
   | SpecUsed | Builtin _ | Unreachable | Analyzed NoResults -> false
 
@@ -191,14 +191,14 @@ module Make () =
 struct
   open TopBottom.Operators
 
-  module A = (val Analysis.current_analyzer ())
+  module Engine = (val Engine.current ())
 
   module EvalTypes =
   struct
-    type valuation = A.Eval.Valuation.t
-    type exp = (valuation * A.Val.t) Eval.evaluated
-    type lval = (valuation * A.Val.t Eval.flagged_value) Eval.evaluated
-    type loc = (valuation * A.Loc.location) Eval.evaluated
+    type valuation = Engine.Eval.Valuation.t
+    type exp = (valuation * Engine.Val.t) Eval.evaluated
+    type lval = (valuation * Engine.Val.t Eval.flagged_value) Eval.evaluated
+    type loc = (valuation * Engine.Loc.location) Eval.evaluated
   end
 
   type ('a,'c) evaluation =
@@ -214,7 +214,7 @@ struct
     then `Top
     else
       let state = cvalue, Locals_scoping.bottom () in
-      `Value (A.Dom.set Cvalue_domain.State.key state A.Dom.top)
+      `Value (Engine.Dom.set Cvalue_domain.State.key state Engine.Dom.top)
 
   let get_by_callstack (ctx : context) :
     (_, restricted_to_callstack) Response.t =
@@ -222,35 +222,35 @@ struct
     let selection = ctx.selector in
     match ctx.control_point with
     | Before stmt ->
-      A.get_stmt_state_by_callstack ?selection ~after:false stmt
+      Engine.get_stmt_state_by_callstack ?selection ~after:false stmt
       |> by_callstack ctx
     | After stmt ->
-      A.get_stmt_state_by_callstack ?selection ~after:true stmt
+      Engine.get_stmt_state_by_callstack ?selection ~after:true stmt
       |> by_callstack ctx
     | Initial ->
       let thread = Thread.(id main)
       and entry_point = fst (Globals.entry_point ()) in
       let cs = Callstack.init ~thread ~entry_point in
-      A.get_global_state () |> singleton cs
+      Engine.get_global_state () |> singleton cs
     | Start kf ->
-      A.get_initial_state_by_callstack ?selection kf |> by_callstack ctx
+      Engine.get_initial_state_by_callstack ?selection kf |> by_callstack ctx
 
   let get (req : request) : (_, unrestricted_response) Response.t =
     let open Response in
     match req with
-    | Cvalue state -> consolidated ~top:A.Dom.top  (get_from_cvalue state)
+    | Cvalue state -> consolidated ~top:Engine.Dom.top  (get_from_cvalue state)
     | Point req ->
       if req.filter <> [] || Option.is_some req.selector then
         Response.coercion @@ get_by_callstack req
       else
         let state =
           match req.control_point with
-          | Before stmt -> A.get_stmt_state ~after:false stmt
-          | After stmt -> A.get_stmt_state ~after:true stmt
-          | Start kf -> A.get_initial_state kf
-          | Initial -> A.get_global_state ()
+          | Before stmt -> Engine.get_stmt_state ~after:false stmt
+          | After stmt -> Engine.get_stmt_state ~after:true stmt
+          | Start kf -> Engine.get_initial_state kf
+          | Initial -> Engine.get_global_state ()
         in
-        consolidated ~top:A.Dom.top state
+        consolidated ~top:Engine.Dom.top state
 
   let convert : 'a or_top_bottom -> 'a result = function
     | `Top -> Result.error Top
@@ -276,7 +276,7 @@ struct
 
   let equality_class exp req =
     let open Equality in
-    match A.Dom.get Equality_domain.key with
+    match Engine.Dom.get Equality_domain.key with
     | None ->
       Result.error DisabledDomain
     | Some extract ->
@@ -301,7 +301,7 @@ struct
       convert r
 
   let get_cvalue_model req =
-    match A.Dom.get Cvalue_domain.State.key with
+    match Engine.Dom.get Cvalue_domain.State.key with
     | None ->
       Result.error DisabledDomain
     | Some extract ->
@@ -309,12 +309,12 @@ struct
       convert (Response.map_join extract Cvalue.Model.join (get req))
 
   let get_state req key join =
-    match A.Dom.get key with
+    match Engine.Dom.get key with
     | None -> Result.error DisabledDomain
     | Some extract -> convert (Response.map_join extract join (get req))
 
   let print_states ?filter req =
-    let state = Response.map_join (fun x -> x) A.Dom.join (get req) in
+    let state = Response.map_join (fun x -> x) Engine.Dom.join (get req) in
     let print (type s)
         (key: s Abstract.Domain.key)
         (module Domain: Abstract_domain.S with type state = s)
@@ -328,30 +328,30 @@ struct
       let str = Format.asprintf "%a" Domain.pretty state in
       (name, str) :: acc
     in
-    let polymorphic_fold_fun = A.Dom.{ fold = print } in
+    let polymorphic_fold_fun = Engine.Dom.{ fold = print } in
     match state with
     | `Top | `Bottom -> []
-    | `Value state -> A.Dom.fold polymorphic_fold_fun state []
+    | `Value state -> Engine.Dom.fold polymorphic_fold_fun state []
 
   (* Evaluation *)
 
   let eval_lval lval req =
-    let eval state = A.Eval.copy_lvalue state lval in
+    let eval state = Engine.Eval.copy_lvalue state lval in
     LValue (Response.map eval (get req))
 
   let eval_exp exp req =
-    let eval state = A.Eval.evaluate state exp in
+    let eval state = Engine.Eval.evaluate state exp in
     Value (Response.map eval (get req))
 
   let eval_address ~for_writing lval req =
-    let eval state = A.Eval.lvaluate ~for_writing state lval in
+    let eval state = Engine.Eval.lvaluate ~for_writing state lval in
     let access = if for_writing then Locations.Write else Read in
     Address (Response.map eval (get req), access)
 
   let eval_callee f req =
     let join = (@)
     and extract state =
-      let r,_alarms = A.Eval.eval_function f state in
+      let r,_alarms = Engine.Eval.eval_function f state in
       r >>-: List.map fst
     in
     get req |> Response.map_join' extract join |> convert |>
@@ -361,7 +361,7 @@ struct
   (* Conversion *)
 
   let as_cvalue_or_uninitialized res =
-    match A.Val.get Main_values.CVal.key with
+    match Engine.Val.get Main_values.CVal.key with
     | None -> `Top
     | Some get ->
       let make_expr (x, _alarms) =
@@ -384,7 +384,7 @@ struct
       | Value r -> Response.map_join' make_expr join r
 
   let extract_value :
-    type c. (value, c) evaluation -> (A.Val.t or_bottom, c) Response.t =
+    type c. (value, c) evaluation -> (Engine.Val.t or_bottom, c) Response.t =
     let open Bottom.Operators in
     function
     | LValue r ->
@@ -395,7 +395,7 @@ struct
       Response.map extract r
 
   let as_cvalue res =
-    match A.Val.get Main_values.CVal.key with
+    match Engine.Val.get Main_values.CVal.key with
     | None ->
       Result.error DisabledDomain
     | Some get ->
@@ -407,7 +407,7 @@ struct
 
   let extract_loc :
     type c. (address, c) evaluation ->
-    (A.Loc.location or_bottom, c) Response.t * Locations.access =
+    (Engine.Loc.location or_bottom, c) Response.t * Locations.access =
     function
     | Address (r, access) ->
       let extract (x, _alarms) =
@@ -417,7 +417,7 @@ struct
       Response.map extract r, access
 
   let as_precise_loc res =
-    match A.Loc.get Main_locations.PLoc.key with
+    match Engine.Loc.get Main_locations.PLoc.key with
     | None ->
       Result.error DisabledDomain
     | Some get ->
@@ -436,7 +436,7 @@ struct
       extract_loc res |> fst |> Response.map_join' extract join |> convert
 
   let as_location res =
-    match A.Loc.get Main_locations.PLoc.key with
+    match Engine.Loc.get Main_locations.PLoc.key with
     | None ->
       Result.error DisabledDomain
     | Some get ->
@@ -452,7 +452,7 @@ struct
       extract_loc res |> fst |> Response.map_join' extract join |> convert
 
   let as_zone res =
-    match A.Loc.get Main_locations.PLoc.key with
+    match Engine.Loc.get Main_locations.PLoc.key with
     | None ->
       Result.error DisabledDomain
     | Some get ->

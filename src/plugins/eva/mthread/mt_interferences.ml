@@ -7,8 +7,8 @@
 (**************************************************************************)
 
 let concurrent_writes shared_bases =
-  let module Analyzer = (val Analysis.current_analyzer ()) in
-  match Analyzer.Dom.get Mt_domain.Domain.key with
+  let module Engine = (val Engine.current ()) in
+  match Engine.Dom.get Mt_domain.Domain.key with
   (* Domain disabled, no information about writes *)
   | None -> Position.Local.Set.empty
   (* Domain enabled *)
@@ -30,7 +30,7 @@ let concurrent_writes shared_bases =
         | _ -> false
       in
       if is_write_stmt
-      then match Analyzer.get_stmt_state_by_callstack ~after:true stmt with
+      then match Engine.get_stmt_state_by_callstack ~after:true stmt with
         | `Top | `Bottom -> acc (* TODO: handle Tops *)
         | `Value table ->
           Callstack.Hashtbl.fold (add_pos stmt) table acc
@@ -51,11 +51,11 @@ let shared_bases analysis_state =
   | Set zones ->  zones
 
 let add_last_analysis analysis_state =
-  let module Analyzer = (val Analysis.current_analyzer ()) in
+  let module Engine = (val Engine.current ()) in
   let bases = shared_bases analysis_state in
   let writes = concurrent_writes bases in
   let thread = analysis_state.curr_thread.th_eva_thread in
-  match Analyzer.Interferences.add_last_analysis thread writes bases with
+  match Engine.Interferences.add_last_analysis thread writes bases with
   | Updated ->
     Mt_thread.iter_threads analysis_state
       (fun th -> Mt_thread.ThreadState.recompute_because th InterferencesChanged)

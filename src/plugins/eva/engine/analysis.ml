@@ -6,8 +6,128 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
-open Eval
+(* ----- Pre-analysis checks ------------------------------------------------ *)
+
+(* Clear Eva's various caches. Some operations of Eva depend on parameters,
+   such as -ilevel or -plevel, so clearing those caches ensures that those
+   options have the expected effect.
+   Caches are cleared at the beginning of each analysis, and whenever the
+   Frama-C project library changes the local state of Eva. *)
+let clear_caches () =
+  Cvalue.V_Offsetmap.clear_caches ();
+  Cvalue.Model.clear_caches ();
+  Locations.Location_Bytes.clear_caches ();
+  Locations.Zone.clear_caches ();
+  Assigns.Memory.clear_caches ()
+
+let () = State.add_hook_on_update Self.state clear_caches
+
+let floats_ok () =
+  let u = min_float /. 2. in
+  let u = u /. 2. in
+  assert (0. < u && u < min_float)
+
+let need_assigns kf =
+  let spec = Annotations.funspec kf in
+  match Cil.find_default_behavior spec with
+  | None -> true
+  | Some bhv -> bhv.b_assigns = WritesAny
+
+(* Check that we can parse the values specified for the options that require
+   advanced parsing. Just make a query, as this will force the kernel to
+   parse them. *)
+let options_ok () =
+  let check f = try ignore (f ()) with Not_found -> () in
+  check Parameters.SplitReturnFunction.get;
+  check Parameters.BuiltinsOverrides.get;
+  check Parameters.SlevelFunction.get;
+  check Parameters.EqualityCallFunction.get
+
+let plugins_ok () =
+  if not (Plugin.is_present "inout") then
+    Self.warning
+      "The inout plugin is missing: some features are disabled, \
+       and the analysis may have degraded precision and performance."
+
+(* Do something tasteless in case the user did not put a spec on functions
+   for which he set [-eva-use-spec]:  generate an incorrect one ourselves *)
+let generate_specs () =
+  let aux kf =
+    if need_assigns kf then begin
+      Self.warning ~wkey:Self.wkey_missing_assigns
+        "@[No assigns specified for function '%a' for which option %s is set. \
+         Generating potentially incorrect assigns.@]"
+        Kernel_function.pretty kf Parameters.UsePrototype.option_name;
+      Populate_spec.populate_funspec ~do_body:true kf [`Assigns];
+    end
+  in
+  Parameters.UsePrototype.iter aux
+
+let pre_analysis () =
+  Parameters.configure_precision ();
+  Iterator.signal_reset ();
+  floats_ok ();
+  options_ok ();
+  plugins_ok ();
+  Split_return.pretty_strategies ();
+  generate_specs ();
+  Widen.precompute_widen_hints ();
+  Builtins.prepare_builtins ();
+  Statistics.reset_all ();
+  clear_caches ();
+  Eva_utils.DegenerationPoints.clear ();
+  Cvalue_callbacks.apply_at_start_hooks ();
+  Origin.clear ();
+  if not (Kernel.AuditCheck.is_empty ()) then
+    Eva_audit.check_configuration (Kernel.AuditCheck.get ())
+
+(* ----- Post-analysis cleanup ---------------------------------------------- *)
+
+let post_analysis () =
+  (* Garbled mix must be dumped here -- at least before the call to
+     mark_green_and_red -- because fresh ones are created when re-evaluating
+     all the alarms, and we get an unpleasant "ghost effect". *)
+  Self.warning ~wkey:Self.wkey_garbled_mix_summary "%t" Origin.pretty_history;
+  (* Mark unreachable and RTE statuses. Only do this there, not when the
+     analysis was aborted (hence, not in post_cleanup), because the
+     propagation is incomplete. Also do not mark unreachable statutes if
+     there is an alarm in the initializers (bottom initial state), as we
+     would end up marking the alarm as dead. *)
+  Eval_annots.mark_unreachable ();
+  (* Try to refine the 'Unknown' statuses that have been emitted during
+     this analysis. *)
+  Eval_annots.mark_green_and_red ();
+  Eva_dynamic.RteGen.mark_generated_rte ();
+  Mem_exec.cleanup_results ();
+  (* Remove redundant alarms *)
+  if Parameters.RmAssert.get () then Eva_dynamic.Scope.rm_asserts ();
+  (* The above functions may have changed the status of alarms. *)
+  Summary.FunctionStats.recompute_all ();
+  Red_statuses.report ()
+
+(* ----- Signal handling ---------------------------------------------------- *)
+
+(* Registers signal handlers for SIGUSR1 and SIGINT to cleanly abort the Eva
+   analysis. Returns a function that restores previous signal behaviors after
+   the analysis. *)
+let register_signal_handler () =
+  let warn () =
+    Self.warning ~once:true "Stopping analysis at user request@."
+  in
+  let stop _ = warn (); Iterator.signal_abort ~kill:true in
+  let interrupt _ = warn (); raise Sys.Break in
+  let register_handler signal handler =
+    match Sys.signal signal (Sys.Signal_handle handler) with
+    | previous_behavior -> fun () -> Sys.set_signal signal previous_behavior
+    | exception Invalid_argument _ -> fun () -> ()
+    (* Ignore: SIGURSR1 is not available on Windows,
+       and possibly on other platforms. *)
+  in
+  let restore_sigusr1 = register_handler Sys.sigusr1 stop in
+  let restore_sigint = register_handler Sys.sigint interrupt in
+  fun () -> restore_sigusr1 (); restore_sigint ()
+
+(* ----- Analysis status ---------------------------------------------------- *)
 
 type computation_state = Self.computation_state =
   | NotComputed | Computing | Computed | Aborted
@@ -39,176 +159,53 @@ let save_results kf =
   try Function_calls.save_results (Kernel_function.get_definition kf)
   with Kernel_function.No_Definition -> false
 
+(* ----- Running the analysis ------------------------------------------------ *)
 
-module type Engine = Engine_sig.S_with_results
+type 'state engine = (module Engine_sig.S with type Dom.state = 'state)
 
-module Make (Abstract: Abstractions.S) = struct
-
-  module Eval' =
-    Evaluation.Make (Abstract.Ctx) (Abstract.Val) (Abstract.Loc) (Abstract.Dom)
-
-  module rec Transfer_inout' : Engine_sig.Transfer_inout =
-    Transfer_inout.Make (Engine)
-
-  and Transfer_stmt' : Engine_sig.Transfer_stmt =
-    Transfer_stmt.Make (Engine)
-
-  and Transfer_logic' : Engine_sig.Transfer_logic =
-    Transfer_logic.Make (Engine.Dom)
-
-  and Transfer_specification' : Engine_sig.Transfer_specification =
-    Transfer_specification.Make (Engine)
-
-  and Initialization' : Engine_sig.Initialization = Initialization.Make (Engine)
-  and Iterator' : Engine_sig.Iterator  = Iterator.Make (Engine)
-  and Compute' : Engine_sig.Compute = Compute_functions.Make (Engine)
-  and Interference' : Engine_sig.Interferences = Interferences.Make (Engine)
-
-  and Engine : Engine_sig.S_with_results
-    with type Ctx.t = Abstract.Ctx.t
-     and type Val.t = Abstract.Val.t
-     and type Loc.location = Abstract.Loc.location
-     and type Dom.state = Abstract.Dom.state =
-  struct
-
-    module Ctx = Abstract.Ctx
-    module Val = Abstract.Val
-    module Loc = Abstract.Loc
-
-    module Dom = struct
-      include Abstract.Dom
-      include Cvalue_domain.Getters (Abstract.Dom)
-    end
-
-    module Eval = Eval'
-    module Transfer_inout = Transfer_inout'
-    module Transfer_stmt = Transfer_stmt'
-    module Transfer_logic = Transfer_logic'
-    module Transfer_specification = Transfer_specification'
-    module Initialization = Initialization'
-    module Iterator = Iterator'
-    module Compute = Compute'
-    module Interferences = Interference'
-
-    let find stmt f =
-      if is_computed ()
-      then
-        let kf = Kernel_function.find_englobing_kf stmt in
-        match status kf with
-        | Unreachable | SpecUsed | Builtin _ -> `Bottom
-        | Analyzed NoResults -> `Top
-        | Analyzed (Complete | Partial) -> f stmt
-      else `Top
-
-    let get_stmt_state ~after stmt =
-      find stmt (Dom.Store.get_stmt_state ~after :> stmt -> Dom.t or_top_bottom)
-
-    let get_stmt_state_by_callstack ?selection ~after stmt =
-      find stmt (Dom.Store.get_stmt_state_by_callstack ?selection ~after)
-
-    let get_global_state () =
-      (Dom.Store.get_global_state () :> Dom.t or_top_bottom)
-
-    let get_initial_state kf =
-      if is_computed () then
-        if Function_calls.is_called kf
-        then (Dom.Store.get_initial_state kf :> Dom.t or_top_bottom)
-        else `Bottom
-      else `Top
-
-    let get_initial_state_by_callstack ?selection kf =
-      if is_computed () then
-        if Function_calls.is_called kf
-        then Abstract.Dom.Store.get_initial_state_by_callstack ?selection kf
-        else `Bottom
-      else `Top
-
-    let eval_expr state expr = Eval.evaluate state expr >>=: snd
-
-    let copy_lvalue state expr = Eval.copy_lvalue state expr >>=: snd
-
-    let eval_lval_to_loc state lv =
-      let get_loc (_, loc) = loc in
-      let for_writing = false in
-      Eval.lvaluate ~for_writing state lv >>=: get_loc
-
-    let eval_function state ?args lv =
-      Eval.eval_function lv ?args state >>=: (List.map fst)
-
-    let assume_cond ~pos state cond positive =
-      fst (Eval.reduce state cond positive) >>- fun valuation ->
-      let dval = Eval.to_domain_valuation valuation in
-      Dom.assume ~pos cond positive dval state
-  end
-
-  include Engine
-end
-
-
-let default = Abstractions.Config.of_list [Cvalue_domain.registered, None]
-module DefaultAbstractions = (val Abstractions.make default)
-module Default : Engine = Make (DefaultAbstractions)
-
-
-(* Reference to the current configuration (built by Abstractions.configure from
-   the parameters of Eva regarding the abstractions used in the analysis) and
-   the current Analyzer module. *)
-let ref_analyzer = ref (default, (module Default : Engine))
-
-(* Returns the current Analyzer module. *)
-let current_analyzer () = (module (val (snd !ref_analyzer)): Engine)
-
-(* Set of hooks called whenever the current Analyzer module is changed.
-   Useful for the GUI parts that depend on it. *)
-module Analyzer_Hook = Hook.Build (struct type t = (module Engine) end)
-
-(* Register a new hook. *)
-let register_hook = Analyzer_Hook.extend
-
-(* Sets the current Analyzer module for a given configuration.
-   Calls the hooks above. *)
-let set_current_analyzer config (analyzer: (module Engine)) =
-  Analyzer_Hook.apply (module (val analyzer): Engine);
-  ref_analyzer := (config, analyzer)
-
-(* Builds the Analyzer module corresponding to a given configuration,
-   and sets it as the current analyzer. *)
-let make_analyzer config =
-  let analyzer =
-    if Abstractions.Config.(equal config default) then (module Default : Engine)
-    else
-      let module Abstract = (val Abstractions.make config) in
-      let module Analyzer = Make (Abstract) in
-      (module Analyzer)
+let compute_from_init_state (type t) (engine: t engine) kf (init_state: t) =
+  let module Engine = (val engine) in
+  let restore_signals = register_signal_handler () in
+  let compute () =
+    let final_state = Engine.Compute.compute_main_call kf init_state in
+    Engine.Dom.Store.mark_as_computed ();
+    Self.(ComputationState.set Computed);
+    post_analysis ();
+    Engine.Dom.post_analysis final_state;
+    Summary.print ();
+    Statistics.export_as_csv ();
+    restore_signals ()
   in
-  set_current_analyzer config analyzer
+  let cleanup () =
+    Engine.Dom.Store.mark_as_computed ();
+    Self.(ComputationState.set Aborted)
+  in
+  Eva_utils.protect compute ~cleanup
 
-(* Builds the analyzer according to the parameters of Eva. *)
-let reset_analyzer () =
-  let config = Abstractions.Config.configure () in
-  (* If the configuration has not changed, do not reset the Analyzer but uses
-     the reference instead. *)
-  if not (Abstractions.Config.equal config (fst !ref_analyzer))
-  then make_analyzer config
-
-(* Resets the Analyzer when the current project is changed. *)
-let () =
-  Project.register_after_set_current_hook
-    ~user_only:true (fun _ -> reset_analyzer ());
-  Project.register_after_global_load_hook reset_analyzer
+let compute_from_entry_point (module Engine: Engine_sig.S) kf ~lib_entry =
+  Self.feedback "Analyzing a%scomplete application starting at %a"
+    (if lib_entry then "n in" else " ")
+    Kernel_function.pretty kf;
+  match Engine.Initialization.initial_state_with_formals ~lib_entry kf with
+  | `Bottom ->
+    Engine.Dom.Store.mark_as_computed ();
+    Self.(ComputationState.set Aborted);
+    Self.result "Eva not started because globals \
+                 initialization is not computable.";
+    Eval_annots.mark_invalid_initializers ()
+  | `Value initial_state ->
+    compute_from_init_state (module Engine) kf initial_state
 
 (* Builds the analyzer if needed, and run the analysis. *)
 let force_compute () =
   Ast.compute ();
-  Parameters.configure_precision ();
-  if not (Kernel.AuditCheck.is_empty ()) then
-    Eva_audit.check_configuration (Kernel.AuditCheck.get ());
+  pre_analysis ();
   let kf, lib_entry = Globals.entry_point () in
-  reset_analyzer ();
+  Engine.reset ();
   (* The new analyzer can be accessed through hooks *)
   Self.ComputationState.set Computing;
-  let module Analyzer = (val snd !ref_analyzer) in
-  try Analyzer.Compute.compute_from_entry_point ~lib_entry kf
+  let module Engine = (val Engine.current ()) in
+  try compute_from_entry_point (module Engine) ~lib_entry kf
   with Self.Abort ->
     Self.(ComputationState.set Aborted);
     Self.error "The analysis has been aborted: results are incomplete."

@@ -150,8 +150,8 @@ let mthread_run project =
 
   try
     (* We analyse the main thread *)
-    let module Analyzer = (val Analysis.current_analyzer ()) in
-    Analyzer.Interferences.reset ();
+    let module Engine = (val Engine.current ()) in
+    Engine.Interferences.reset ();
     Self.clear_results ();
     Thread.reset_state ();
     Mutex.reset_state ();

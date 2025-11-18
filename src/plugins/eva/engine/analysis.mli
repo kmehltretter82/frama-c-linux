@@ -6,22 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module type Engine = Engine_sig.S_with_results
-
-module Make (Abstract: Abstractions.S) : Engine_sig.S_with_results
-  with type Ctx.t = Abstract.Ctx.t
-   and type Val.t = Abstract.Val.t
-   and type Loc.location = Abstract.Loc.location
-   and type Dom.state = Abstract.Dom.state
-
-val current_analyzer : unit -> (module Engine_sig.S_with_results)
-(** The abstractions used in the latest analysis, and its results. *)
-
-val register_hook: ((module Engine_sig.S_with_results) -> unit) -> unit
-(** Registers a hook that will be called each time the [current] analyzer
-    is changed. This happens when a new analysis is run with different
-    abstractions than before, or when the current project is changed. *)
-
 val force_compute : unit -> unit
 (** Perform a full analysis, starting from the [main] function. *)
 

@@ -45,7 +45,7 @@ let mark_unreachable () =
   in
   (* Mark standard code annotations *)
   let do_code_annot stmt _emit ca =
-    if not (Cvalue_results.is_reachable stmt) then begin
+    if not (Results.is_reachable stmt) then begin
       let kf = Kernel_function.find_englobing_kf stmt in
       let ppts = Property.ip_of_code_annot kf stmt ca in
       List.iter mark ppts;
@@ -56,7 +56,7 @@ let mark_unreachable () =
     inherit Visitor.frama_c_inplace
 
     method! vstmt_aux stmt =
-      if not (Cvalue_results.is_reachable stmt) then begin
+      if not (Results.is_reachable stmt) then begin
         let mark_status kf =
           (* Do not mark preconditions as dead if they are not analyzed in
              non-dead code. Otherwise, the consolidation does strange things. *)
@@ -95,36 +95,32 @@ let mark_unreachable () =
   Visitor.visitFramacFileFunctions unreach (Ast.get ())
 
 let c_labels kf cs =
+  let module LabelMap = Cil_datatype.Logic_label.Map in
   if Function_calls.use_spec_instead_of_definition kf then
-    Cil_datatype.Logic_label.Map.empty
+    LabelMap.empty
   else
     let fdec = Kernel_function.get_definition kf in
     let aux acc stmt =
       if stmt.labels != [] then
-        match Cvalue_results.get_stmt_state_by_callstack ~after:false stmt with
-        | `Bottom | `Top -> acc
-        | `Value hstate ->
-          try
-            let state = Callstack.Hashtbl.find hstate cs in
-            Cil_datatype.Logic_label.Map.add (StmtLabel (ref stmt)) state acc
-          with Not_found -> acc
+        let request = Results.(before stmt |> in_callstack cs) in
+        match Results.get_cvalue_model_result request with
+        | Error _ -> acc
+        | Ok state -> LabelMap.add (StmtLabel (ref stmt)) state acc
       else acc
     in
-    List.fold_left aux Cil_datatype.Logic_label.Map.empty fdec.sallstmts
+    List.fold_left aux LabelMap.empty fdec.sallstmts
 
 (* Evaluates [p] at [stmt], using per callstack states for maximum precision. *)
 (* TODO: we can probably factor some code with the GUI *)
 let eval_by_callstack kf stmt p =
   (* This is actually irrelevant for alarms: they never use \old *)
-  let pre = Cvalue_results.get_initial_state kf in
-  let here = Cvalue_results.get_stmt_state_by_callstack ~after:false stmt in
-  match pre, here with
-  | `Bottom, _
-  | _, (`Top | `Bottom) ->
-    (* Ignore dead statements, those will be marked 'unreachable' elsewhere *)
-    Unknown
-  | `Value pre, `Value states ->
-    let aux_callstack callstack state acc_status =
+  let pre = Results.(at_start_of kf |> get_cvalue_model_result) in
+  match pre with
+  | Error (Bottom | Top | DisabledDomain) -> Unknown
+  | Ok pre ->
+    let requests = Results.(before stmt |> by_callstack) in
+    let aux_callstack acc_status (callstack, request) =
+      let state = Results.get_cvalue_model request in
       let c_labels = c_labels kf callstack in
       let env = Eval_terms.env_annot ~c_labels ~pre ~here:state () in
       let status = Eval_terms.eval_predicate env p in
@@ -134,7 +130,7 @@ let eval_by_callstack kf stmt p =
       | _ as r -> r
     in
     try
-      match Callstack.Hashtbl.fold aux_callstack states `Bottom with
+      match List.fold_left aux_callstack `Bottom requests with
       | `Bottom -> Eval_terms.Unknown (* probably never reached *)
       | `Value status -> status
     with Exit -> Eval_terms.Unknown
@@ -160,10 +156,11 @@ let contains_c_at ca =
    analysis. *)
 let mark_green_and_red () =
   let do_code_annot stmt _e ca  =
+    let is_alarm = Alarms.find ca <> None in
     (* We reevaluate only alarms, in the hope that we can emit an 'invalid'
        status, or user assertions that mention a C label. The latter are
        currently skipped during evaluation. *)
-    if contains_c_at ca || (Alarms.find ca <> None) then
+    if (is_alarm || contains_c_at ca) && Results.is_reachable stmt then
       match ca.annot_content with
       | AAssert (_, p) | AInvariant (_, true, p) ->
         let p = p.tp_statement in

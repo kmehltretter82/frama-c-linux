@@ -184,17 +184,9 @@ sig
   type loc
   type value
 
-  (** Analysis of a program from the given main function. Computed states for
-      each statement are stored in the result tables of each enabled abstract
-      domain. This is called by [Analysis.compute].
-      The initial abstract state is computed according to [lib_entry]:
-      - if false, non-volatile global variables are initialized according
-        to their initializers (zero if no explicit initializer).
-      - if true, non-const global variables are initialized at top. *)
-  val compute_from_entry_point: kernel_function -> lib_entry:bool -> unit
-
-  (** Analysis of a program from the given main function and initial state. *)
-  val compute_from_init_state: kernel_function -> state -> unit
+  (** Analysis of a program from the given main function and initial state.
+      Returns the abstract state infered at the return of the main function. *)
+  val compute_main_call: kernel_function -> state -> state or_bottom
 
   (** Analysis of a function call during the Eva analysis. This function is
       called by [Transfer_stmt] when interpreting a call statement.

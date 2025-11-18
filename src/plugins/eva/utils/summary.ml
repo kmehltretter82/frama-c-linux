@@ -176,7 +176,7 @@ let compute_fun_stats kf =
       List.iter (do_status alarm) l
   in
   let do_stmt stmt =
-    let reachable = Cvalue_results.is_reachable stmt in
+    let reachable = Results.is_reachable stmt in
     Coverage.incr coverage ~reachable;
     Annotations.iter_code_annot (do_annot stmt) stmt
   in
@@ -210,6 +210,15 @@ module FunctionStats = struct
         let dependencies = [ Self.state ]
         let size = 17
       end)
+
+  (* Recompute statistics about a function after each analysis of its body. *)
+  let () =
+    let aux _callstack kf _state results =
+      match results with
+      | `Body _ -> replace kf (compute_fun_stats kf)
+      | `Builtin _ | `Spec _ | `Reuse _ -> ()
+    in
+    Cvalue_callbacks.register_call_results_hook aux
 
   let recompute kf = replace kf (compute_fun_stats kf)
   let recompute_all () = iter (fun kf _ -> recompute kf)
@@ -252,7 +261,7 @@ let compute_statuses ()  =
   in
   let do_property ip =
     let incr stmt statuses =
-      if Cvalue_results.is_reachable stmt then
+      if Results.is_reachable stmt then
         match get_status ip with
         | None -> ()
         | Some status -> Statuses.incr statuses status

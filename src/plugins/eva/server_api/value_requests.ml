@@ -476,7 +476,7 @@ module type EvaProxy = sig
   val evaluate : probe -> Callstack.t option -> evaluations
 end
 
-module Proxy(A : Analysis.Engine) : EvaProxy = struct
+module Proxy(A : Engine_sig.S_with_results) : EvaProxy = struct
 
   open Eval
   type dstate = A.Dom.state or_top_bottom
@@ -649,10 +649,12 @@ module Proxy(A : Analysis.Engine) : EvaProxy = struct
 end
 
 let proxy =
-  let make (a : (module Analysis.Engine)) = (module Proxy(val a) : EvaProxy) in
-  let current = ref (make @@ Analysis.current_analyzer ()) in
+  let make (a : (module Engine_sig.S_with_results)) =
+    (module Proxy (val a) : EvaProxy)
+  in
+  let current = ref (make @@ Engine.current ()) in
   let hook a = current := make a ; Request.emit signal in
-  Analysis.register_hook hook ;
+  Engine.register_hook hook ;
   fun () -> !current
 
 (* -------------------------------------------------------------------------- *)

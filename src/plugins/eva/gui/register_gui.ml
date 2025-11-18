@@ -656,7 +656,7 @@ let add_keyboard_shortcut_evaluate main_ui =
    analysis. This needs to be done each time the abstractions are changed.
    The module [A] is the current analysis module; it contains the
    abstractions used by Eva for the current analysis. *)
-let reset (main_ui:main_ui) (module A: Analysis.Engine) =
+let reset (main_ui:main_ui) (module A: Engine_sig.S_with_results) =
   (* Types of the GUI depending on the abstractions used for the analysis. *)
   let module Gui_Types = Gui_types.Make (A.Val) in
   (* Evaluation functions for the GUI. *)
@@ -716,8 +716,8 @@ let main (main_ui:main_ui) =
     main_ui#file_tree#reset ()
   else
     sync_filetree main_ui#file_tree;
-  reset main_ui (Analysis.current_analyzer ());
-  Analysis.register_hook (reset main_ui);
+  reset main_ui (Engine.current ());
+  Engine.register_hook (reset main_ui);
   Design.register_reset_extension (fun _ -> Gui_callstacks_manager.reset ());
   main_ui#register_source_selector (to_do_on_select );
   main_ui#register_source_highlighter active_highlighter;

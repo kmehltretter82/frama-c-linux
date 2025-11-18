@@ -44,7 +44,7 @@ let focused_callstacks () = !focus
 let focus_on_callstacks cs = focus := cs
 
 let has_matching_callstack ~after csf stmt =
-  let module Results = (val Analysis.current_analyzer ()) in
+  let module Results = (val Engine.current ()) in
   match Results.get_stmt_state_by_callstack ~after stmt with
   | `Top -> true
   | `Bottom -> false
