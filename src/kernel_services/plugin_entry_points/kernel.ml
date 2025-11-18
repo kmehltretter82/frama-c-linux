@@ -1145,7 +1145,7 @@ module Machdep = struct
     Filesystem.file_exists (get_default_file machdep)
 
   let normalize machdep =
-    if is_default machdep then
+    if machdep = "help" || is_default machdep then
       machdep
     else
       Filepath.(of_string machdep |> to_string_abs)
