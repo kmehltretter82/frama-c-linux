@@ -106,7 +106,7 @@ module type S = sig
 
   val eval_function:
     ?subdivnb:int -> lhost -> ?args:exp list -> state ->
-    (Kernel_function.t * Valuation.t) list evaluated
+    (Kernel_function.t * Valuation.t) list or_top_bottom * Alarmset.t
   (** Evaluation of the function argument of a [Call] constructor. *)
 
   val interpret_truth:

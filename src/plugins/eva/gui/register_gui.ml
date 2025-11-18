@@ -510,7 +510,7 @@ module Select (Eval: Eval) = struct
              | `Value state ->
                let funs, _ = Eval.Analysis.eval_function state f in
                match funs with
-               | `Bottom -> ()
+               | `Bottom | `Top -> ()
                | `Value funs ->
                  menu_go_to_fun_definition main_ui menu funs
            end
