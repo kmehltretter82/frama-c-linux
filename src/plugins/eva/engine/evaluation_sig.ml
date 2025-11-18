@@ -107,7 +107,15 @@ module type S = sig
   val eval_function:
     ?subdivnb:int -> lhost -> ?args:exp list -> state ->
     (Kernel_function.t * Valuation.t) list or_top_bottom * Alarmset.t
-  (** Evaluation of the function argument of a [Call] constructor. *)
+  (** Evaluation of the function argument of a [Cil_types.Call] constructor.
+      In case of a function pointer, returns:
+      - the alarms raised by the evaluation of the pointer, plus an alarm
+        [Alarms.Function_pointer] if it may not evaluate to a valid function
+        for arguments [args] (if provided).
+      - `Top if the pointer cannot be evaluated (if cvalue is disabled);
+      - `Bottom if the pointer evaluates to bottom.
+      - or the list of possible functions. Each function [f] is paired with
+        a valuation obtained by assuming the pointer evaluates exactly to [f]. *)
 
   val interpret_truth:
     alarm:(unit -> Alarms.t) -> 'a -> 'a Abstract_value.truth -> 'a evaluated
