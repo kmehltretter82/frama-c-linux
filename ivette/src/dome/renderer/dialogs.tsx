@@ -401,9 +401,17 @@ export function Modal(
 // --------------------------------------------------------------------------
 
 interface PopupProps {
+  /** The top-left position of the popup */
   position: { top: number, left:number } | null;
+  /** Popup reference */
   popupRef: React.RefObject<HTMLDivElement>;
+  /** style inline */
   style?: React.CSSProperties;
+  /** On mouse enter */
+  onMouseEnter?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  /** On mouse leave */
+  onMouseLeave?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  /** Children */
   children?: React.ReactNode;
 }
 
@@ -423,6 +431,8 @@ function Popup(props: PopupProps): JSX.Element | null {
       className="dome-xPopup"
       style={stylePopup}
       onClick={(e: React.MouseEvent) => e.stopPropagation()}
+      onMouseEnter={props.onMouseEnter}
+      onMouseLeave={props.onMouseLeave}
     >{children}</div>,
     document.body
   );
@@ -504,7 +514,7 @@ const defaultPos = { top: 0, left: 0 };
 function usePopupPosition(
   popupRef: React.RefObject<HTMLElement>,
   controlRef: React.RefObject<HTMLElement>,
-  askToOpen: boolean
+  isOpen: boolean
 ): Position {
   const controlRect = useElementRect(controlRef);
   const windowSize = useWindowSize();
@@ -515,7 +525,7 @@ function usePopupPosition(
     const popupElt = popupRef.current;
     const rect = controlElt?.getBoundingClientRect();
 
-    if(!askToOpen || !rect || !controlElt) setPosition(defaultPos);
+    if(!isOpen || !rect || !controlElt) setPosition(defaultPos);
     else {
       const topElement = document.elementFromPoint(
         rect.left + rect.width / 2,
@@ -545,7 +555,7 @@ function usePopupPosition(
         setPosition({ top: rect.bottom, left: rect.left-offset });
       }
     }
-  }, [controlRect, controlRef, popupRef, windowSize, askToOpen]);
+  }, [controlRect, controlRef, popupRef, windowSize, isOpen]);
 
   return position;
 }
@@ -593,26 +603,25 @@ function AnchoredPopup(props: AnchoredPopupProps)
   /** Request to open the positioned popup menu */
   const [ askToOpen, setAskToOpen] = askToOpenState;
 
+  /** if the cursor is on the popup, it will not close */
+  const [ mouseOnPopup, setMouseOnPopup ] = React.useState(false);
+
+  /**
+   * The popup should be opened if askToOpen is true or
+   * if the cursor is on the popup.
+   */
+  const isOpen = React.useMemo(() => askToOpen || mouseOnPopup,
+    [askToOpen, mouseOnPopup]);
+
   /**
    * Top-left corner position of the popup
    * return {top: 0, left: 0} if the popup must be hidden
    */
-  const position = usePopupPosition(popupRef, controlRef, askToOpen);
-
-  const isAnchoredPopupOpen = React.useMemo(() => {
-    return askToOpen && (position.left !== 0 || position.top !== 0);
-  }, [askToOpen, position]);
-
-  /**
-   * The drop-down menu is hidden between the request and opening
-   * because we need to see its dimensions.
-   */
-  const stylePopup = styles(
-    askToOpen && !isAnchoredPopupOpen && { zIndex: '-1' });
+  const position = usePopupPosition(popupRef, controlRef, isOpen);
 
   /** Update the opening request if the position = {top: 0, left: 0} */
   React.useEffect(() => {
-    if(position.left === 0 && position.top === 0) setAskToOpen(false);
+    if(position.left === 0 || position.top === 0) setAskToOpen(false);
   }, [position, setAskToOpen]);
 
   /** Close when clicked outside the anchored popup */
@@ -623,8 +632,12 @@ function AnchoredPopup(props: AnchoredPopupProps)
     <div ref={controlRef} style={{ display: 'flex', alignItems: 'center' }} >
       { control }
     </div>
-    { askToOpen &&
-      <Popup style={stylePopup} popupRef={popupRef} position={position}
+    { isOpen &&
+      <Popup
+        popupRef={popupRef}
+        position={position}
+        onMouseEnter={() => setMouseOnPopup(true)}
+        onMouseLeave={() => setMouseOnPopup(false)}
       >{ children }</Popup>
     }
   </>;
@@ -679,7 +692,8 @@ export function Tooltip(props: TooltipProps): React.ReactNode {
   const [ askToOpen, setAskToOpen] = askToOpenState;
 
   const tooltipControl = React.cloneElement(control, {
-      onMouseLeave: () => setAskToOpen(false),
+      // The timeout allow to delay closing if the mouse moves over the popup.
+      onMouseLeave: () => setTimeout(() => setAskToOpen(false), 50),
       onMouseEnter: () => setAskToOpen(true),
       selected: askToOpen
     });
