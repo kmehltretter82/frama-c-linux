@@ -55,11 +55,17 @@ void main (int c) {
 
  S=1;
  k=1;
- //@ loop unfold "completly", NB_TIMES;
+ //@ loop unfold "completely";
  do {
    S=S*k;
    k++;
  } while (k <= NB_TIMES) ;
+
+ int S2 = 1;
+ //@ loop unfold "erroneous label"; // will result in imprecise analysis
+ for (int i = NB_TIMES; i >= 0; i--) {
+   S2 *= i;
+ }
 
 }
 
