@@ -13,6 +13,7 @@
 #include "ctype.c"
 #include "errno.c"
 #include "error.c"
+//#include "eva_stubs.c" // line needed for grepping by check_full_libc.sh
 #include "fenv.c"
 #include "glob.c"
 #include "inttypes.c"

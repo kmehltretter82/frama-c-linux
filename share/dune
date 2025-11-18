@@ -44,7 +44,6 @@
  (files
   (analysis-scripts/analysis.mk as lib/analysis-scripts/analysis.mk)
   (analysis-scripts/epilogue.mk as lib/analysis-scripts/epilogue.mk)
-  (analysis-scripts/fc_stubs.c as lib/analysis-scripts/fc_stubs.c)
   (analysis-scripts/list_functions.ml as lib/analysis-scripts/list_functions.ml)
   (analysis-scripts/prologue.mk as lib/analysis-scripts/prologue.mk)
   (analysis-scripts/readme-graph.graphml as lib/analysis-scripts/readme-graph.graphml)

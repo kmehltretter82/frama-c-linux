@@ -1,36 +1,36 @@
 [kernel] Parsing unistd_c.c (with preprocessing)
-[kernel] Parsing share/analysis-scripts/fc_stubs.c (with preprocessing)
+[kernel] Parsing share/libc/eva_stubs.c (with preprocessing)
 [eva] Analyzing a complete application starting at eva_main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function Frama_C_interval <- eva_main.
-  Called from share/analysis-scripts/fc_stubs.c:21.
+  Called from share/libc/eva_stubs.c:21.
 [eva] using specification for function Frama_C_interval
-[eva] share/analysis-scripts/fc_stubs.c:21: 
+[eva] share/libc/eva_stubs.c:21: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_make_unknown <- eva_main.
-  Called from share/analysis-scripts/fc_stubs.c:26.
+  Called from share/libc/eva_stubs.c:26.
 [eva] using specification for function Frama_C_make_unknown
-[eva] share/analysis-scripts/fc_stubs.c:26: 
+[eva] share/libc/eva_stubs.c:26: 
   function Frama_C_make_unknown: precondition 'valid_p' got status valid.
 [eva] Done for function Frama_C_make_unknown
 [eva] computing for function Frama_C_make_unknown <- eva_main.
-  Called from share/analysis-scripts/fc_stubs.c:26.
+  Called from share/libc/eva_stubs.c:26.
 [eva] Done for function Frama_C_make_unknown
 [eva] computing for function Frama_C_make_unknown <- eva_main.
-  Called from share/analysis-scripts/fc_stubs.c:26.
+  Called from share/libc/eva_stubs.c:26.
 [eva] Done for function Frama_C_make_unknown
 [eva] computing for function Frama_C_make_unknown <- eva_main.
-  Called from share/analysis-scripts/fc_stubs.c:26.
+  Called from share/libc/eva_stubs.c:26.
 [eva] Done for function Frama_C_make_unknown
 [eva] computing for function Frama_C_make_unknown <- eva_main.
-  Called from share/analysis-scripts/fc_stubs.c:26.
+  Called from share/libc/eva_stubs.c:26.
 [eva] Done for function Frama_C_make_unknown
 [eva] computing for function main <- eva_main.
-  Called from share/analysis-scripts/fc_stubs.c:29.
+  Called from share/libc/eva_stubs.c:29.
 [eva] computing for function getopt <- main <- eva_main.
   Called from unistd_c.c:61.
 [eva] computing for function Frama_C_nondet <- getopt <- main <- eva_main.
