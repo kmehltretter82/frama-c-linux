@@ -14,10 +14,10 @@ module Make (Abstract: Abstractions.S) : Engine_sig.S_with_results
    and type Dom.state = Abstract.Dom.state
 
 (** The current analysis engine, with all abstractions and the results. *)
-val current_analyzer : unit -> (module Engine_sig.S_with_results)
+val current : unit -> (module Engine_sig.S_with_results)
 
 (** Builds the current analysis engine according to the Eva parameters. *)
-val reset_analyzer : unit -> unit
+val reset : unit -> unit
 
 (** Registers a hook that will be called each time the current analyzer
     is changed. This happens when a new analysis is run with different

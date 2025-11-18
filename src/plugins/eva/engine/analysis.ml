@@ -201,10 +201,10 @@ let force_compute () =
   Ast.compute ();
   pre_analysis ();
   let kf, lib_entry = Globals.entry_point () in
-  Engine.reset_analyzer ();
+  Engine.reset ();
   (* The new analyzer can be accessed through hooks *)
   Self.ComputationState.set Computing;
-  let module Engine = (val Engine.current_analyzer ()) in
+  let module Engine = (val Engine.current ()) in
   try compute_from_entry_point (module Engine) ~lib_entry kf
   with Self.Abort ->
     Self.(ComputationState.set Aborted);

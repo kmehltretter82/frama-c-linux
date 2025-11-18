@@ -652,7 +652,7 @@ let proxy =
   let make (a : (module Engine_sig.S_with_results)) =
     (module Proxy (val a) : EvaProxy)
   in
-  let current = ref (make @@ Engine.current_analyzer ()) in
+  let current = ref (make @@ Engine.current ()) in
   let hook a = current := make a ; Request.emit signal in
   Engine.register_hook hook ;
   fun () -> !current

@@ -716,7 +716,7 @@ let main (main_ui:main_ui) =
     main_ui#file_tree#reset ()
   else
     sync_filetree main_ui#file_tree;
-  reset main_ui (Engine.current_analyzer ());
+  reset main_ui (Engine.current ());
   Engine.register_hook (reset main_ui);
   Design.register_reset_extension (fun _ -> Gui_callstacks_manager.reset ());
   main_ui#register_source_selector (to_do_on_select );

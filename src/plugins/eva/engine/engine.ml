@@ -121,47 +121,46 @@ module Default : Engine_sig.S_with_results = Make (DefaultAbstractions)
 
 (* Reference to the current configuration (built by Abstractions.configure from
    the parameters of Eva regarding the abstractions used in the analysis) and
-   the current Analyzer module. *)
-let ref_analyzer = ref (default, (module Default : S))
+   the current Engine module. *)
+let ref_engine = ref (default, (module Default : S))
 
-(* Returns the current Analyzer module. *)
-let current_analyzer () = (module (val (snd !ref_analyzer)): S)
+(* Returns the current Engine module. *)
+let current () = (module (val (snd !ref_engine)): S)
 
-(* Set of hooks called whenever the current Analyzer module is changed.
+(* Set of hooks called whenever the current Engine module is changed.
    Useful for the GUI parts that depend on it. *)
-module Analyzer_Hook = Hook.Build (struct type t = (module S) end)
+module Engine_Hook = Hook.Build (struct type t = (module S) end)
 
 (* Register a new hook. *)
-let register_hook = Analyzer_Hook.extend
+let register_hook = Engine_Hook.extend
 
-(* Sets the current Analyzer module for a given configuration.
+(* Sets the current Engine module for a given configuration.
    Calls the hooks above. *)
-let set_current_analyzer config (analyzer: (module S)) =
-  Analyzer_Hook.apply (module (val analyzer): S);
-  ref_analyzer := (config, analyzer)
+let set_current config (engine: (module S)) =
+  Engine_Hook.apply (module (val engine): S);
+  ref_engine := (config, engine)
 
-(* Builds the Analyzer module corresponding to a given configuration,
-   and sets it as the current analyzer. *)
-let make_analyzer config =
-  let analyzer =
+(* Builds the Engine module corresponding to a given configuration,
+   and sets it as the current engine. *)
+let make config =
+  let engine =
     if Abstractions.Config.(equal config default) then (module Default : S)
     else
       let module Abstract = (val Abstractions.make config) in
-      let module Analyzer = Make (Abstract) in
-      (module Analyzer)
+      let module Engine = Make (Abstract) in
+      (module Engine)
   in
-  set_current_analyzer config analyzer
+  set_current config engine
 
-(* Builds the analyzer according to the parameters of Eva. *)
-let reset_analyzer () =
+(* Builds the engine reference according to the parameters of Eva. *)
+let reset () =
   let config = Abstractions.Config.configure () in
-  (* If the configuration has not changed, do not reset the Analyzer but uses
+  (* If the configuration has not changed, do not reset the engine but uses
      the reference instead. *)
-  if not (Abstractions.Config.equal config (fst !ref_analyzer))
-  then make_analyzer config
+  if not (Abstractions.Config.equal config (fst !ref_engine))
+  then make config
 
-(* Resets the Analyzer when the current project is changed. *)
+(* Resets the Engine reference when the current project is changed. *)
 let () =
-  Project.register_after_set_current_hook
-    ~user_only:true (fun _ -> reset_analyzer ());
-  Project.register_after_global_load_hook reset_analyzer
+  Project.register_after_set_current_hook ~user_only:true (fun _ -> reset ());
+  Project.register_after_global_load_hook reset
