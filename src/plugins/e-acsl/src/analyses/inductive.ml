@@ -313,7 +313,7 @@ end = struct
     (* lb: (future) let-bound variables; do not add variables that have already
        been used before. *)
     let rec test_mode ~lb ~fv p =
-      let recurse ?(lb = lb) ?(fv=fv) = test_mode ~lb ~fv in
+      let recurse ?(lb = lb) ?(fv = fv) = test_mode ~lb ~fv in
       let add_fv fv terms = Vars.unions @@ fv :: List.map free_vars terms in
       Options.debug ~dkey ~level:5 "test_mode@ ~lb:%a ~fv:%a@ ~mode:%a@ %a"
         Vars.pretty lb
@@ -324,10 +324,13 @@ end = struct
         let in_args, out_arg = Mode.in_out_args ~mode args in
         let fv = add_fv fv in_args in
         let lb = match Option.bind var_of_term out_arg with
-          | Some v -> if Vars.mem v fv then lb else Vars.add v lb
-          | None -> lb
+          | Some v when not @@ Vars.mem v fv -> Vars.add v lb
+          | _ -> lb
         in
-        let fv = match out_arg with Some a -> Vars.union fv (free_vars a) | None -> fv in
+        let fv = match out_arg with
+          | Some a -> Vars.union fv (free_vars a)
+          | None -> fv
+        in
         recurse ~lb ~fv pr
       in
       match p.pred_content with
@@ -336,15 +339,17 @@ end = struct
         let pl' = {pl with pred_content = Pimplies (p2, pr)} in
         let p' = {p with pred_content = Pimplies (p1, pl')} in
         recurse p'
-      | Pimplies ({pred_content = Papp (li, _, args)}, pr) when is_rec_occurrence li ->
+      | Pimplies ({pred_content = Papp (li, _, args)}, pr)
+        when is_rec_occurrence li -> (* recursive occurrence *)
         predicate_call ~mode args pr
       | Pimplies (pl, _) when predicate_has_rec_occurrence ~lv_rec pl ->
         unsupported ~loc:p.pred_loc
           "deep recursive occurrence of %a in incomplete mode"
           Printer.pp_logic_var lv_rec;
-      | Pimplies ({pred_content = Papp (li, _, args)}, pr) when is_inductive li -> (* foreign predicate *)
-        let try_with_mode {Modus.mode = m} = predicate_call ~mode:m args pr in
-        let modi = List.filter_map try_with_mode (InductiveDefinition.analyze_modes li) in
+      | Pimplies ({pred_content = Papp (li, _, args)}, pr)
+        when is_inductive li -> (* foreign predicate *)
+        let try_with_mode {Modus.mode} = predicate_call ~mode args pr in
+        let modi = List.filter_map try_with_mode (InductiveDef.analyze_modes li) in
         Modus.preferred_opt modi
       | Pimplies (pl, pr) -> (* simple hypothesis *)
         let fv = Vars.union fv @@ free_vars_pred pl in
@@ -422,7 +427,7 @@ end = struct
         let mode' =
           let all_modes = List.map
               (fun m -> m.Modus.mode)
-              (InductiveDefinition.analyze_modes li)
+              (InductiveDef.analyze_modes li)
           in
           Mode.select_mode ~usable_vars:uv ~li args all_modes
         in
@@ -482,8 +487,8 @@ end = struct
     res
 end
 
-and InductiveDefinition : sig
-  val ctors_of_inductive : logic_info -> Constructor.t list
+and InductiveDef : sig
+  val ctors : logic_info -> Constructor.t list
   val analyze_modes : logic_info -> Modus.t list (* memoized *)
   val normalize : mode:Modus.t -> logic_info -> logic_info
   val clear : unit -> unit
@@ -494,13 +499,14 @@ end = struct (* internal representation of inductives *)
     in
     LBinductive (List.map of_ctor ctors)
 
-  let ctors_of_inductive li =
-    let make (name, labels, poly_id, lemma) =
-      {Constructor.name; labels; poly_id; predicate = lemma}
-    in
-    match li.l_body with
-    | LBinductive ctors -> List.map make ctors
-    | _ -> Options.fatal "not an inductive definition:@ @[%a@]" Printer.pp_logic_info li
+  let ctors = function
+    | {l_body = LBinductive ctors} ->
+      let make (name, labels, poly_id, predicate) =
+        {Constructor.name; labels; poly_id; predicate}
+      in
+      List.map make ctors
+    | li -> Options.fatal "not an inductive definition:@ @[%a@]"
+              Printer.pp_logic_info li
 
   let memo_tbl = Logic_info.Hashtbl.create 9
   let clear () = Logic_info.Hashtbl.clear memo_tbl
@@ -509,7 +515,7 @@ end = struct (* internal representation of inductives *)
     Constructor.analyze_mode ~lv_rec:li.l_var_info p mode
 
   let analyze_modes li = Logic_info.Hashtbl.memo memo_tbl li @@ fun li ->
-    let ctors = ctors_of_inductive li in
+    let ctors = ctors li in
     Options.debug ~dkey ~level:4
       "@[<2>performing mode analysis on inductive:@ @[%a@]@]"
       pp_logic_info li;
@@ -528,18 +534,15 @@ end = struct (* internal representation of inductives *)
     let modes = List.filter_map try_mode (Mode.all_modes ~li) in
     Options.debug ~dkey ~level:3 "possible modes for %a: %a"
       Printer.pp_logic_info li
-      (Pretty_utils.pp_list ~sep:", " Mode.pretty) (List.map (fun {Modus.mode} -> mode) modes);
+      (Pretty_utils.pp_list ~sep:", " Mode.pretty)
+      (List.map (fun {Modus.mode} -> mode) modes);
     modes
 
   let normalize ~mode li =
     Options.debug ~dkey ~level:3 "normalizing %a with modus %a"
       Logic_info.pretty li
       Modus.pretty mode;
-    let ctors =
-      List.map
-        (Constructor.normalize ~li_rec:li ~mode)
-        (ctors_of_inductive li)
-    in
+    let ctors = List.map (Constructor.normalize ~li_rec:li ~mode) (ctors li) in
     {li with l_body = inductive_of_ctors ctors}
 end
 
@@ -612,9 +615,9 @@ end = functor (Out : Out_language) -> struct
       Mode.pretty mode pp_logic_info li;
     let modus = List.find
         (fun m -> m.Modus.mode = mode)
-        (InductiveDefinition.analyze_modes li)
+        (InductiveDef.analyze_modes li)
     in
-    let li = InductiveDefinition.normalize ~mode:modus li in
+    let li = InductiveDef.normalize ~mode:modus li in
     let new_profile = List.map freshen_up_logic_var li.l_profile in
     let li = Visitor.visitFramacLogicInfo (substitute li.l_profile new_profile) li in
     let li = {li with l_profile = new_profile} in
@@ -650,7 +653,7 @@ end = functor (Out : Out_language) -> struct
           let c = recurse ~conds:[] ~lb:(Vars.add li.l_var_info lb) p in
           flush_conds ~conds (Out.mk_let ~loc:p.pred_loc li c)
         | Pimplies ({pred_content = Papp (li, labels, args)} as pl, pr)
-          when is_rec_occurrence li || is_inductive li ->
+          when is_inductive li ->
           let in_out_args, li =
             if is_rec_occurrence li
             then Mode.in_out_args ~mode args, li
@@ -659,7 +662,7 @@ end = functor (Out : Out_language) -> struct
                 let usable_vars = Vars.union formals lb in
                 let available_modes = List.map
                     (fun m -> m.Modus.mode)
-                    (InductiveDefinition.analyze_modes li)
+                    (InductiveDef.analyze_modes li)
                 in
                 Mode.select_mode ~usable_vars ~li args available_modes
               in
@@ -690,7 +693,8 @@ end = functor (Out : Out_language) -> struct
                 let p = Logic_const.prel (Req, rec_call, res) in
                 recurse ~conds:(p :: conds) pr
           end
-        | Pimplies (pl, pr) -> recurse ~conds:(pl :: conds) pr
+        | Pimplies (pl, pr) -> (* simple hypothesis *)
+          recurse ~conds:(pl :: conds) pr
         | Pat (p', labels) -> Out.mk_at labels @@ recurse p'
         | _ -> (* should have been caught in mk_ctor *)
           Options.fatal "unexpected predicate in extraction:@ %a"
@@ -700,10 +704,7 @@ end = functor (Out : Out_language) -> struct
     in
     let body =
       let fallthrough = Out.mk_false l_type in
-      List.fold_right
-        extract_ctor
-        (InductiveDefinition.ctors_of_inductive li)
-        fallthrough
+      List.fold_right extract_ctor (InductiveDef.ctors li) fallthrough
     in
     let li = {li with l_profile; l_type} in
     li.l_body <- Out.mk_logic_body @@ Out.visit (li_use_updater li.l_var_info li) body;
@@ -717,7 +718,7 @@ end = functor (Out : Out_language) -> struct
     let old_name = li.l_var_info.lv_name in
     Option.iter (fun n -> li.l_var_info.lv_name <- n) name;
     Options.feedback ~dkey ~level:2
-      "@[<2>extracted from inductive definition of %s executable definition:@ @[%a@]@]"
+      "@[<2>extracted from inductive definition of %s executable predicate:@ @[%a@]@]"
       old_name
       pp_logic_info li;
     li
@@ -783,7 +784,7 @@ end
       wrapper
 
   let extract li =
-    let modi = InductiveDefinition.analyze_modes li in
+    let modi = InductiveDef.analyze_modes li in
     let mode = Modus.preferred ~li modi in
     extract_with_mode ~mode li
 end
@@ -803,5 +804,5 @@ let clear () =
   Fallthrough_terms.clear ();
   Extractions.clear ();
   Derived_functions.clear ();
-  InductiveDefinition.clear ();
+  InductiveDef.clear ();
   Unsound_predicates.clear ()
