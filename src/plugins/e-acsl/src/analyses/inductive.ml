@@ -157,7 +157,12 @@ end = struct
     in_args, Option.get out_arg
 
   let all_modes ~li =
-    Complete :: List.mapi (fun i _ -> Incomplete (i + 1)) li.l_profile
+    let incomplete_modes =
+      if List.length li.l_profile > 1
+      then List.mapi (fun i _ -> Incomplete (i + 1)) li.l_profile
+      else []
+    in
+    Complete :: incomplete_modes
 
   let select_mode ~usable_vars ~li args modes =
     let check_mode mode =
@@ -621,13 +626,15 @@ end = functor (Out : Out_language) -> struct
     let l_type = Option.map (fun l -> l.lv_type) res in
     let is_rec_occurrence li' = Logic_var.equal li'.l_var_info li.l_var_info in
     let extract_ctor (ctor : Constructor.t) next_ctor =
-      let flush_conds ~conds case_true = match conds with
-        | [] -> case_true
-        | c::cs ->
-          let cond =
-            List.fold_right (fun p q -> Logic_const.pand ~loc:q.pred_loc (p,q)) cs c
+      let flush_conds ~conds case_true =
+        if conds = [] then case_true else
+          let conjunction =
+            List.fold_right
+              (fun p q -> Logic_const.pand ~loc:q.pred_loc (q,p))
+              conds
+              Logic_const.ptrue
           in
-          Out.mk_if ~loc:cond.pred_loc cond case_true next_ctor
+          Out.mk_if ~loc:conjunction.pred_loc conjunction case_true next_ctor
       in
       let rec compile ~lb ~conds p =
         let recurse ?(lb = lb) ?(conds = conds) =
@@ -673,7 +680,7 @@ end = functor (Out : Out_language) -> struct
                 Logic_const.term ~loc:p.pred_loc (Tapp (li, labels, args)) res.term_type
               in
               match var_of_term res with
-              | Some v when not @@ Vars.mem v lb ->
+              | Some v when not @@ Vars.mem v (Vars.union lb formals) ->
                 let li = {(Cil_const.make_logic_info_local v.lv_name)
                           with l_var_info = v;
                                l_body = LBterm rec_call;

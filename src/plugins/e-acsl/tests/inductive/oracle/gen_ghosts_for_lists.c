@@ -33,7 +33,7 @@ struct list *bound) {
 predicate __gen_e_acsl_linked_n_here
   (struct list *root, struct list **cArr, integer index, integer n,
   struct list *bound) =
-  (n == 0 && 0 <= index <= 10 && bound == root) ||
+  (0 <= index <= 10 && n == 0 && bound == root) ||
   (0 < n && 0 <= index && 0 <= index + n <= 10 && \valid(root) &&
    root == *(cArr + index) &&
    __gen_e_acsl_linked_n_here(root->next, cArr, index + 1, n - 1, bound));
@@ -47,7 +47,7 @@ int __gen_e_acsl_linked_n_here(struct list *root, struct list **cArr,
 predicate linked_n{L}
   (struct list *root, struct list **cArr, integer index, integer n,
   struct list *bound) =
-  (n == 0 && 0 <= index <= 10 && bound == root) ||
+  (0 <= index <= 10 && n == 0 && bound == root) ||
   (0 < n && 0 <= index && 0 <= index + n <= 10 && \valid(root) &&
    root == *(cArr + index) &&
    linked_n(root->next, cArr, index + 1, n - 1, bound));
@@ -179,35 +179,35 @@ int __gen_e_acsl_linked_n_here(struct list *root, struct list **cArr,
                                __e_acsl_mpz_struct * n, struct list *bound)
 {
   __e_acsl_mpz_t __gen_e_acsl__2;
-  int __gen_e_acsl_eq;
+  int __gen_e_acsl_le;
+  int __gen_e_acsl_and;
+  int __gen_e_acsl_and_2;
   int __gen_e_acsl_and_3;
   int __gen_e_acsl_or;
   __gmpz_init_set_si(__gen_e_acsl__2,0L);
-  __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(n),
-                               (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
-  if (__gen_e_acsl_eq == 0) {
+  __gen_e_acsl_le = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__2),
+                               (__e_acsl_mpz_struct const *)(index));
+  if (__gen_e_acsl_le <= 0) {
     __e_acsl_mpz_t __gen_e_acsl__3;
-    int __gen_e_acsl_le;
-    int __gen_e_acsl_and;
-    int __gen_e_acsl_and_2;
-    __gmpz_init_set_si(__gen_e_acsl__3,0L);
-    __gen_e_acsl_le = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__3),
-                                 (__e_acsl_mpz_struct const *)(index));
-    if (__gen_e_acsl_le <= 0) {
-      __e_acsl_mpz_t __gen_e_acsl__4;
-      int __gen_e_acsl_le_2;
-      __gmpz_init_set_si(__gen_e_acsl__4,10L);
-      __gen_e_acsl_le_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(index),
-                                     (__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
-      __gen_e_acsl_and = __gen_e_acsl_le_2 <= 0;
-      __gmpz_clear(__gen_e_acsl__4);
-    }
-    else __gen_e_acsl_and = 0;
-    if (__gen_e_acsl_and) __gen_e_acsl_and_2 = bound == root;
-    else __gen_e_acsl_and_2 = 0;
-    __gen_e_acsl_and_3 = __gen_e_acsl_and_2;
+    int __gen_e_acsl_le_2;
+    __gmpz_init_set_si(__gen_e_acsl__3,10L);
+    __gen_e_acsl_le_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(index),
+                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__3));
+    __gen_e_acsl_and = __gen_e_acsl_le_2 <= 0;
     __gmpz_clear(__gen_e_acsl__3);
   }
+  else __gen_e_acsl_and = 0;
+  if (__gen_e_acsl_and) {
+    __e_acsl_mpz_t __gen_e_acsl__4;
+    int __gen_e_acsl_eq;
+    __gmpz_init_set_si(__gen_e_acsl__4,0L);
+    __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(n),
+                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
+    __gen_e_acsl_and_2 = __gen_e_acsl_eq == 0;
+    __gmpz_clear(__gen_e_acsl__4);
+  }
+  else __gen_e_acsl_and_2 = 0;
+  if (__gen_e_acsl_and_2) __gen_e_acsl_and_3 = bound == root;
   else __gen_e_acsl_and_3 = 0;
   if (__gen_e_acsl_and_3) __gen_e_acsl_or = 1;
   else {
