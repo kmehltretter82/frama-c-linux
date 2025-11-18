@@ -118,8 +118,8 @@ let warn_no_default_behavior ~source kf =
     Kernel_function.pretty kf
 
 let warn_no_assigns ~source kf =
-  Self.warning ~wkey:Self.wkey_missing_assigns ~source ~once:true
-    "The builtin for function %a will not be used, as its specification has
+  Self.warning ~wkey:Self.wkey_builtins_missing_spec ~source ~once:true
+    "The builtin for function %a will not be used, as its specification has \
      no assigns clause."
     Kernel_function.pretty kf
 
