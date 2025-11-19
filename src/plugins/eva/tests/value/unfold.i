@@ -67,32 +67,3 @@ void main(int c) {
    for (int i = 0; i <= NB_TIMES; i++);
   }
 }
-
-#if 0
-struct T { unsigned long long addr;
-  unsigned long long size;
-  unsigned long type; } t_biosmap[10];
-
-struct T * const g_biosmap = t_biosmap;
-struct T * biosmap;
-int main2(int c,signed char nr_map) {
-  biosmap = g_biosmap;
-  if (nr_map<2)  return (-1);
-
-//@ loop unfold 200;
-  do {
-    unsigned long long start = biosmap->addr;
-    unsigned long long size = biosmap->size;
-    unsigned long long end = start + size;
-    unsigned long type = biosmap->type;
-    Frama_C_show_each_F(nr_map);
-    if (start>end) return -1;
-    if (c) {
-      start = 0x100000L;
-      size = end - start; continue; };
-    }
-  while (biosmap++,--nr_map);
-
-  return 0;
-}
-#endif
