@@ -1,5 +1,5 @@
 [kernel] Parsing unfold.i (no preprocessing)
-[kernel] unfold.i:54: Warning: 
+[kernel] unfold.i:53: Warning: 
   ignoring unfolding directive (not an understood constant expression)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -9,10 +9,10 @@
   t_biosmap[0..9] ∈ {0}
   g_biosmap ∈ {{ &t_biosmap[0] }}
   biosmap ∈ {0}
-[eva:partition] unfold.i:36: starting to merge loop iterations
-[eva:alarm] unfold.i:39: Warning: signed overflow. assert -2147483648 ≤ j - 1;
-[eva:alarm] unfold.i:37: Warning: signed overflow. assert G + i ≤ 2147483647;
-[eva:alarm] unfold.i:68: Warning: 
+[eva:partition] unfold.i:35: starting to merge loop iterations
+[eva:alarm] unfold.i:38: Warning: signed overflow. assert -2147483648 ≤ j - 1;
+[eva:alarm] unfold.i:36: Warning: signed overflow. assert G + i ≤ 2147483647;
+[eva:alarm] unfold.i:67: Warning: 
   loop invariant got status invalid (stopping propagation).
 [eva] Recording results for main
 [eva] Done for function main
