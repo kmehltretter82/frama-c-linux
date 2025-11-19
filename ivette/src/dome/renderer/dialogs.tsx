@@ -544,7 +544,7 @@ function usePopupPosition(
       if(!visible || isCovered) setPosition(defaultPos);
       else {
         /** The offset is used to prevent the anchored popup from extending
-         * beyond the right edge of the screen. */
+          * beyond the right edge of the screen. */
         let offset = 0;
         if(popupElt) {
           const popupRect = popupElt.getBoundingClientRect();
@@ -594,8 +594,7 @@ interface AnchoredPopupProps {
  * it is opened in the background, the position is calculated,
  * and then the anchored popup is brought to the foreground.
  */
-function AnchoredPopup(props: AnchoredPopupProps)
-: React.ReactNode {
+function AnchoredPopup(props: AnchoredPopupProps): React.ReactNode {
   const { control, askToOpenState, children } = props;
   const controlRef = React.useRef<HTMLDivElement>(null);
   const popupRef = React.useRef<HTMLDivElement>(null);
@@ -619,11 +618,6 @@ function AnchoredPopup(props: AnchoredPopupProps)
    */
   const position = usePopupPosition(popupRef, controlRef, isOpen);
 
-  /** Update the opening request if the position = {top: 0, left: 0} */
-  React.useEffect(() => {
-    if(position.left === 0 || position.top === 0) setAskToOpen(false);
-  }, [position, setAskToOpen]);
-
   /** Close when clicked outside the anchored popup */
   useClickOutsidePopup(popupRef, controlRef, () => setAskToOpen(false));
 
@@ -632,7 +626,7 @@ function AnchoredPopup(props: AnchoredPopupProps)
     <div ref={controlRef} style={{ display: 'flex', alignItems: 'center' }} >
       { control }
     </div>
-    { isOpen &&
+    { isOpen && !(position.left === 0 && position.top === 0) &&
       <Popup
         popupRef={popupRef}
         position={position}
@@ -648,7 +642,12 @@ function AnchoredPopup(props: AnchoredPopupProps)
 // --- Dropdown
 // ----------------------------------------------------------------------------
 
-interface DropdownProps extends Omit<AnchoredPopupProps, 'askToOpenState'> {}
+interface DropdownProps {
+  /** Control button */
+  control: React.JSX.Element;
+  /** Anchored popup content */
+  children: React.ReactNode;
+}
 
 /**
  * This component is based on the anchored popup.
@@ -677,7 +676,12 @@ export function Dropdown(props: DropdownProps): React.ReactNode {
 // --- Tooltip
 // ----------------------------------------------------------------------------
 
-interface TooltipProps extends Omit<AnchoredPopupProps, 'askToOpenState'> {}
+interface TooltipProps {
+  /** Control button */
+  control: React.JSX.Element;
+  /** Anchored popup content */
+  children: React.ReactNode;
+}
 
 /**
  * This component is based on the anchored popup.
