@@ -1,11 +1,11 @@
 [kernel] Parsing unfold.i (no preprocessing)
 [kernel] unfold.i:54: Warning: 
   ignoring unfolding directive (not an understood constant expression)
-[kernel] unfold.i:66: Warning: ignoring invalid unfolding directive
 [eva] Analyzing a complete application starting at main3
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
+  nondet ∈ [--..--]
   t_biosmap[0..9] ∈ {0}
   g_biosmap ∈ {{ &t_biosmap[0] }}
   biosmap ∈ {0}
@@ -31,8 +31,8 @@
   NO EFFECTS
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main3:
-    c; G; i; MAX; JMAX; j; tmp; tmp_unfold_6400; tmp_unfold_6408;
-    tmp_unfold_6416; tmp_unfold_6424; tmp_unfold_6432; tmp_unfold_6440;
-    tmp_unfold_6448; tmp_unfold_6456; tmp_unfold_6464; tmp_unfold_6472
+    c; G; i; MAX; JMAX; j; tmp; tmp_unfold_6484; tmp_unfold_6492;
+    tmp_unfold_6500; tmp_unfold_6508; tmp_unfold_6516; tmp_unfold_6524;
+    tmp_unfold_6532; tmp_unfold_6540; tmp_unfold_6548; tmp_unfold_6556
 [inout] Inputs for function main3:
     \nothing

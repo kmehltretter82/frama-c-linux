@@ -2,7 +2,7 @@
    STDOPT:
    STDOPT: #"-main main3"
 */
-
+int volatile nondet;
 
 enum { NB_TIMES=12, FIFTY_TIMES = 50 };
 void main (int c) {
@@ -55,18 +55,18 @@ void main (int c) {
 
  S=1;
  k=1;
- //@ loop unfold "completely";
+ //@ loop unfold "completely", NB_TIMES;
  do {
    S=S*k;
    k++;
  } while (k <= NB_TIMES) ;
 
- int S2 = 1;
- //@ loop unfold "erroneous label"; // will result in imprecise analysis
- for (int i = NB_TIMES; i >= 0; i--) {
-   S2 *= i;
- }
-
+ if (nondet) {
+   /* The loop is not completely unrolled with NB_TIMES iteration:
+      the loop invariant false introduced by "completely" is reachable. */
+   //@ loop unfold "completely", NB_TIMES;
+   for (int i = 0; i <= NB_TIMES; i++);
+  }
 }
 
 #if 0
