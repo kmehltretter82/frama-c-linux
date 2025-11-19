@@ -101,4 +101,12 @@ sig
   val array : kernel_function States.array
 end
 
+type 'a filter_registration =
+  string -> ?labels:string * string -> ?default:bool ->
+  ?enable:(unit -> bool) -> ?add_hook:((unit -> unit) -> unit) ->
+  ('a -> bool) -> unit
+
+val register_fct_filter: kernel_function filter_registration
+val register_var_filter: varinfo filter_registration
+
 (* -------------------------------------------------------------------------- *)

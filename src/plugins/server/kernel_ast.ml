@@ -634,6 +634,130 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Filters                                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+module MakeFilter (Info: sig type t val name: string end) = struct
+
+  type filter = {
+    name: string;
+    enable: unit -> bool;
+    value: Info.t -> bool;
+    labels: string * string;
+    default: bool * bool;
+  }
+
+  module Filter = struct
+    type t = filter
+
+    let jtype = Package.(Jrecord[
+        "id", Jstring;
+        "enabled", Jboolean;
+        "positive_label", Jstring;
+        "negative_label", Jstring;
+        "positive_default", Jboolean;
+        "negative_default", Jboolean;
+      ])
+
+    let to_json filter = `Assoc [
+        "id", `String filter.name;
+        "enabled", `Bool (filter.enable ());
+        "positive_label", `String (fst filter.labels);
+        "negative_label", `String (snd filter.labels);
+        "positive_default", `Bool (fst filter.default);
+        "negative_default", `Bool (snd filter.default);
+      ]
+
+    let of_json _ = Data.failure "Filter.of_json not implemented"
+  end
+
+  let filters_ref : Filter.t list ref = ref []
+  let hooks_ref : ((unit -> unit) -> unit) list ref = ref []
+
+  let signal =
+    let name = String.lowercase_ascii Info.name ^ "Filters" in
+    let descr = Md.plain ("Signal for " ^ Info.name ^ "filters") in
+    Request.signal ~package ~name ~descr
+
+  let default_labels name =
+    let lower = String.lowercase_ascii in
+    let positive_label = lower name ^ " " ^ lower Info.name in
+    positive_label, "non-" ^ positive_label
+
+  let register name
+      ?(labels = default_labels name) ?default
+      ?(enable=fun _ -> true) ?add_hook f =
+    let default =
+      Option.fold default ~none:(true, true) ~some:(fun b -> b, not b)
+    in
+    let filter = { name; enable; value = f; labels; default } in
+    filters_ref := filter :: !filters_ref;
+    Option.iter (fun f -> hooks_ref := f :: !hooks_ref) add_hook;
+    Option.iter (fun f -> f (fun _ -> Request.emit signal)) add_hook;
+    Request.emit signal
+
+  let () =
+    let name = "get" ^ String.capitalize_ascii Info.name ^ "Filters" in
+    let descr = Md.plain ("List of filters for " ^ Info.name) in
+    Request.register ~package ~kind:`GET ~name ~descr ~signals:[signal]
+      ~input:(module Junit) ~output:(module Jlist (Filter))
+      (fun () -> List.rev !filters_ref)
+
+  let compute_filters elt =
+    let aux acc filter =
+      if filter.enable ()
+      then (filter.name, filter.value elt) :: acc
+      else acc
+    in
+    List.fold_left aux [] !filters_ref
+
+  let add_hook (f: unit -> unit) =
+    List.iter (fun add_hook -> add_hook f) !hooks_ref
+end
+
+module FctFilters = struct
+  include MakeFilter
+      (struct type t = kernel_function let name = "functions" end)
+
+  let get_vi = Kernel_function.get_vi
+
+  let () =
+    register "builtin" (fun kf -> Cil_builtins.has_fc_builtin_attr (get_vi kf))
+      ~labels:("Frama-C builtins", "source functions") ~default:false;
+    register "stdlib" Kernel_function.is_in_libc ~default:false;
+    register "defined" Kernel_function.is_definition
+      ~labels:("defined functions", "undefined functions");
+    register "extern" (fun kf -> (get_vi kf).vstorage = Extern);
+    register "ghost" Kernel_function.is_ghost;
+end
+
+module VarFilters = struct
+  include MakeFilter (struct type t = varinfo let name = "variables" end)
+
+  let () =
+    register "stdlib" ((fun vi -> Cil.is_in_libc vi.vattr)) ~default:false;
+    register "extern" (fun vi -> vi.vstorage = Extern);
+    register "const" (fun vi -> Cil.isGlobalInitConst vi);
+    register "volatile" (fun vi -> Ast_types.is_volatile vi.vtype);
+    register "ghost" (fun vi -> Ast_types.is_ghost vi.vtype);
+    register "init" (fun vi -> Option.is_some (Globals.Vars.find vi).init)
+      ~labels:("variables with explicit initializer",
+               "variables without explicit initializer");
+    register "source" (fun vi -> vi.vsource) ~default:true
+      ~labels:("variables from the source code",
+               "variables generated from analyses");
+end
+
+type 'a filter_registration =
+  string -> ?labels:string * string -> ?default:bool ->
+  ?enable:(unit -> bool) -> ?add_hook:((unit -> unit) -> unit) ->
+  ('a -> bool) -> unit
+
+let register_fct_filter = FctFilters.register
+let register_var_filter = VarFilters.register
+
+
+(* -------------------------------------------------------------------------- *)
 (* --- Functions                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -734,12 +858,17 @@ struct
         ~descr:(Md.plain "Source location")
         ~data:(module Position)
         ~get:(fun kf -> fst (Kernel_function.get_location kf));
+      States.column model
+        ~name:"filters"
+        ~descr:(Md.plain "List of filter values")
+        ~data:(module Data.Jlist (Data.Jpair (Data.Jstring) (Data.Jbool)))
+        ~get:FctFilters.compute_filters;
       States.register_array model
         ~package ~key
         ~name:"functions"
         ~descr:(Md.plain "AST Functions")
         ~iter
-        ~add_reload_hook:ast_update_hook
+        ~add_reload_hook:(fun f -> ast_update_hook f; FctFilters.add_hook f)
     end
 
 end
@@ -814,12 +943,17 @@ module GlobalVars = struct
       ~descr:(Md.plain "Source location")
       ~data:(module Position)
       ~get:(fun vi -> fst vi.vdecl);
+    States.column model
+      ~name:"filters"
+      ~descr:(Md.plain "List of filter values")
+      ~data:(module Data.Jlist (Data.Jpair (Data.Jstring) (Data.Jbool)))
+      ~get:VarFilters.compute_filters;
     States.register_array model
       ~package ~key
       ~name:"globals"
       ~descr:(Md.plain "AST global variables")
       ~iter:(fun f -> Globals.Vars.iter (fun vi _init -> f vi))
-      ~add_reload_hook:ast_update_hook
+      ~add_reload_hook:(fun f -> ast_update_hook f; VarFilters.add_hook f)
 end
 
 (* -------------------------------------------------------------------------- *)

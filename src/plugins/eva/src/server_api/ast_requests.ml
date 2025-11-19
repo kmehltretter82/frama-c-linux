@@ -77,6 +77,14 @@ let () = Request.register ~package
 
 (* ----- Functions ---------------------------------------------------------- *)
 
+let () =
+  Kernel_ast.register_fct_filter "eva_analyzed"
+    ~labels:("functions analyzed by Eva",
+             "functions unreached by Eva")
+    ~enable:Analysis.is_computed
+    ~add_hook:(fun f -> Analysis.register_computation_hook (fun _ -> f ()))
+    Results.is_called
+
 module Functions =
 struct
   let _array : kernel_function States.array =
