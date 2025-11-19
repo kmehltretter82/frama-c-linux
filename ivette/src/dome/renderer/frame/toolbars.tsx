@@ -17,10 +17,13 @@
 
 import React from 'react';
 import * as Dome from 'dome';
-import { SVG } from 'dome/controls/icons';
+import { Icon, SVG } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
 import './style.css';
+import { GlobalState, useGlobalState } from 'dome/data/states';
+import { Tooltip } from 'dome/dialogs';
+import { LED } from 'dome/controls/displays';
 
 // --------------------------------------------------------------------------
 // --- ToolBar Container
@@ -106,6 +109,58 @@ export function Group(props: GroupProps): JSX.Element {
     <div className={allClasses} style={props.style} title={props.title}>
       {props.children}
     </div>
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- ToolBar warning messages
+// --------------------------------------------------------------------------
+
+export interface WarningMessage {
+  id: string,
+  message: string,
+  title?: string,
+  action?: React.JSX.Element
+}
+
+export const warningMessage = new GlobalState<WarningMessage[]>([]);
+
+export function addWarningMessage(
+  id: string,
+  message: string,
+  action?: React.JSX.Element
+): void {
+  const list = [...warningMessage.getValue()];
+  list.push({ id, message, action });
+  warningMessage.setValue(list);
+}
+
+export function delWarningMessage(id: string): void {
+  const list = warningMessage.getValue();
+  const filteredList = [...list.filter(e => e.id !== id)];
+  warningMessage.setValue(filteredList);
+}
+
+export function IconWarning(): React.ReactNode {
+  const icon = <Icon id='WARNING' kind='warning'
+    className='dome-xIcon-warning' size={16} />;
+  const [ messages, ] = useGlobalState(warningMessage);
+
+  if(messages.length <= 0) return null;
+  return (
+    <Tooltip control={icon}>
+      <div className='dome-xIcon-warning-content'>
+        { messages.map(e =>
+            <div key={e.id}>
+              <div className='message' title={e.title}>
+                <LED status='warning'/>
+                <div>{e.message}</div>
+              </div>
+              <div className='action'>{e.action}</div>
+            </div>)
+        }
+      </div>
+    </Tooltip>
   );
 }
 

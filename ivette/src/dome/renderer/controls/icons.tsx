@@ -110,6 +110,10 @@ export interface IconProps extends SVGprops {
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   /** Right-Click callback. */
   onContextMenu?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  /** On mouse enter */
+  onMouseEnter?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  /** On mouse leave */
+  onMouseLeave?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 /**
@@ -122,6 +126,7 @@ export function Icon(props: IconProps): JSX.Element {
     size, className, offset, style,
     visible = true, display = true,
     spinning, onClick, onContextMenu,
+    onMouseEnter, onMouseLeave
   } = props;
   const forceSpinning = Boolean(id === "SPINNER" && spinning === undefined);
   const divClass = classes(
@@ -138,6 +143,8 @@ export function Icon(props: IconProps): JSX.Element {
       style={divStyle}
       onClick={onClick}
       onContextMenu={onContextMenu}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       <SVG id={id} size={size} title={title} offset={offset} />
     </div>

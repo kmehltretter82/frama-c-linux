@@ -62,6 +62,7 @@ export default function Application(): JSX.Element {
         <IvettePrefs.ThemeSwitchTool />
         <IvettePrefs.FontTools />
         <Search.SearchField />
+        <Toolbar.IconWarning />
       </Toolbar.ToolBar>
       <LSplit settings="frama-c.sidebar.split" unfold={sidebar}>
         <Sidebar.Panel />

@@ -788,3 +788,47 @@ input:checked + .dome-xSwitch-slider:before {
     }
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/* --- Warning icon                                                       --- */
+/* -------------------------------------------------------------------------- */
+
+@keyframes blink-animation-slow {
+  5% { opacity: 0; }
+  10% { opacity: 100%;}
+}
+
+.dome-xIcon-warning svg {
+  animation: blink-animation-slow 5s infinite;
+}
+
+.dome-xIcon-warning-content {
+  padding: 5px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  &>div {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+
+    .message {
+      display: flex;
+      flex-direction: row;
+      gap: 5px;
+    }
+
+    .action {
+      min-width: 13px;
+      margin-left: 15px;
+    }
+
+    .dome-xButton-led {
+      height: 8px;
+      width: 8px;
+    }
+  }
+}
