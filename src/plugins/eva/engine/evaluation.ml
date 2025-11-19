@@ -1715,21 +1715,6 @@ module Make
                                       Misc
      ------------------------------------------------------------------------ *)
 
-  (* Aborts the analysis when a function pointer is completely imprecise. *)
-  let top_function_pointer func =
-    if not (Parameters.Domains.mem "cvalue") then
-      Self.abort ~current:true
-        "Calls through function pointers are not supported without the cvalue \
-         domain.";
-    if Function_calls.partial_results () then
-      Self.abort ~current:true
-        "Function pointer evaluates to anything. Try deactivating \
-         option(s) -eva-no-results and -eva-no-results-function."
-    else
-      Self.fatal ~current:true
-        "Function pointer evaluates to anything. function %a"
-        Eva_ast.pp_lhost func
-
   (* For pointer calls, we retro-propagate which function is being called
      in the abstract state. This may be useful:
      - inside the call for languages with OO (think 'self')
@@ -1747,13 +1732,12 @@ module Make
     | Var vinfo ->
       `Value [Globals.Functions.get vinfo, Valuation.empty], Alarmset.none
     | Mem v ->
-      begin
-        let open Evaluated.Operators in
-        let* valuation, value = evaluate ?subdivnb state v in
-        let kfs, alarm = Value.resolve_functions value in
-        match kfs with
-        | `Top -> top_function_pointer func
-        | `Value kfs ->
+      match evaluate ?subdivnb state v with
+      | `Bottom, alarms -> `Bottom, alarms
+      | `Value (valuation, value), alarms ->
+        match Value.resolve_functions value with
+        | `Top, _ -> `Top, Alarmset.all
+        | `Value kfs, alarm ->
           let open Bottom.Operators in
           let args_types = Option.map (List.map (fun e -> e.typ)) args in
           let ftyp = Eva_ast.type_of_lhost func in
@@ -1761,16 +1745,14 @@ module Make
           let kfs, alarm' = compatible_funcs ?args:args_types kfs in
           let reduce = backward_function_pointer valuation state v in
           let reduce kf = let+ value = reduce kf in (kf, value) in
-          let res, status =
-            let res = `Value (Bottom.list_filter_map reduce kfs) in
-            if kfs = [] then `Bottom, Alarmset.False
-            else if alarm || alarm' then res, Alarmset.Unknown
-            else res, Alarmset.True
+          let reduced_kfs = Bottom.list_filter_map reduce kfs in
+          let status =
+            if reduced_kfs = [] then Alarmset.False
+            else if alarm || alarm' then Alarmset.Unknown
+            else Alarmset.True
           in
           let cil_v = Eva_ast.to_cil_exp v in
           let cil_args = Option.map (List.map Eva_ast.to_cil_exp) args in
           let alarm = Alarms.Function_pointer (cil_v, cil_args) in
-          let alarms = Alarmset.singleton ~status alarm in
-          res, alarms
-      end
+          `Value reduced_kfs, Alarmset.set alarm status alarms
 end

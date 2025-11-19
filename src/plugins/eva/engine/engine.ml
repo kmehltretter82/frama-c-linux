@@ -102,7 +102,8 @@ module Make (Abstract: Abstractions.S) = struct
       Eval.lvaluate ~for_writing state lv >>=: get_loc
 
     let eval_function state ?args lv =
-      Eval.eval_function lv ?args state >>=: (List.map fst)
+      let list, alarms = Eval.eval_function lv ?args state in
+      Lattice_bounds.TopBottom.map (List.map fst) list, alarms
 
     let assume_cond ~pos state cond positive =
       fst (Eval.reduce state cond positive) >>- fun valuation ->

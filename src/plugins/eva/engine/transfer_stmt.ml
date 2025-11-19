@@ -678,6 +678,16 @@ module Make (Engine: Engine_Subset) = struct
 
   (* --------------------- Process the call statement ---------------------- *)
 
+  (* Aborts the analysis when a function pointer is completely imprecise. *)
+  let top_function_pointer func =
+    if not (Parameters.Domains.mem "cvalue") then
+      Self.abort ~current:true
+        "Calls through function pointers are not supported without the cvalue \
+         domain."
+    else
+      Self.fatal ~current:true
+        "Function pointer %a evaluates to anything." Eva_ast.pp_lhost func
+
   let join_call_results res1 res2 =
     let states = res2.Engine_sig.states @ res1.Engine_sig.states
     and cacheable =
@@ -693,12 +703,12 @@ module Make (Engine: Engine_Subset) = struct
     in
     Engine_sig.{ states; cacheable; kind }
 
-  let call ~pos lval_option funclv args state =
+  let call ~pos lval_option func args state =
     let stmt = fst pos in
     let subdivnb = subdivide_stmt stmt in
-    (* Resolve [funclv] into the called kernel functions. *)
+    (* Resolve [func] into the called kernel functions. *)
     let functions, alarms =
-      Eval.eval_function ~subdivnb funclv ~args state
+      Eval.eval_function ~subdivnb func ~args state
     in
     Alarmset.emit ~pos:(Position.of_local pos) alarms;
     let bottom =
@@ -737,6 +747,7 @@ module Make (Engine: Engine_Subset) = struct
     in
     match functions with
     | `Bottom -> bottom
+    | `Top -> top_function_pointer func
     | `Value functions ->
       (* Check "calls" annotations, and reduce called functions accordingly. *)
       let functions = Transfer_logic.check_calls_annotations stmt functions in
