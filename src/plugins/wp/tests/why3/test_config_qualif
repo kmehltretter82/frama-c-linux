@@ -1,5 +1,5 @@
 FILEREG: .*\.why
-DEPS: ~/.why3.conf
+DEPS: file:~/.why3.conf
 CMD: why3 -L @PTEST_SHARE_DIR@/why3 prove -P Alt-Ergo,2.5.4
 OPT:
 COMMENT: the filter remove the information about time and steps

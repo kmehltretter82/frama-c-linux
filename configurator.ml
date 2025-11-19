@@ -68,7 +68,8 @@ module C_preprocessor = struct (* This could be put in Dune? *)
          https://stackoverflow.com/questions/9508159).
          Therefore, we try `gcc -E` and `cc -E`, but not 'cpp'.
       *)
-      try List.find finder [("gcc", Some "-E"); ("cc", Some "-E")]
+      try List.find finder [("gcc", Some "-E"); ("cc", Some "-E");
+                            ("x86_64-w64-mingw32-gcc", Some "-E")]
       with Not_found -> C.die "Could not find a C preprocessor"
 
   let write_file name code =
