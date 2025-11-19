@@ -538,7 +538,7 @@ releases:
       link: /download/volatile-manual-$VERSION_AND_CODENAME.pdf
     - name: WP manual
       link: /download/wp-manual-$VERSION_AND_CODENAME.pdf
-  - name: Ivette Packages (experimental)
+  - name: Ivette Packages
     files:
     - name: Linux x86-64 AppImage
       link: /download/frama-c-ivette-linux-x86-64-$VERSION_AND_CODENAME.AppImage
