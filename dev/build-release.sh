@@ -518,6 +518,8 @@ releases:
   - name: Plug-in Manuals
     sort: true
     files:
+    - name: ACSL Importer
+      link: /download/acsl-importer-manual-$VERSION_AND_CODENAME.pdf
     - name: Aoraï manual
       link: /download/aorai-manual-$VERSION_AND_CODENAME.pdf
       help: Aoraï example
@@ -528,8 +530,12 @@ releases:
       link: /download/eva-manual-$VERSION_AND_CODENAME.pdf
     - name: Metrics manual
       link: /download/metrics-manual-$VERSION_AND_CODENAME.pdf
+    - name: Mthread manual
+      link: /download/mthread-manual-$VERSION_AND_CODENAME.pdf
     - name: Rte manual
       link: /download/rte-manual-$VERSION_AND_CODENAME.pdf
+    - name: Volatile manual
+      link: /download/volatile-manual-$VERSION_AND_CODENAME.pdf
     - name: WP manual
       link: /download/wp-manual-$VERSION_AND_CODENAME.pdf
   - name: Ivette Packages (experimental)
