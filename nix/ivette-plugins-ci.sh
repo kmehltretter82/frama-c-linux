@@ -63,13 +63,13 @@ done < "./nix/ivette-plugins.txt"
 for plugin in ${!plugins[@]}; do
   location="${plugins[$plugin]}"
   if [ -n "$location" ] && [ "$location" != "none" ]; then
-    repo="https://git-token:$TOKEN_FOR_API@git.frama-c.com/$location"
+    repo="https://git-token:$FRAMA_CI_BOT_API_TOKEN@git.frama-c.com/$location"
     branch="$(get_matching_branch "$repo" "$git_current_branch")"
     git clone --depth=1 --branch="$branch" "$repo" "src/plugins/$plugin"
   fi
   location="${ivette_plugins[$plugin]}"
   if [ -n "$location" ] && [ "$location" != "none" ]; then
-    repo="https://git-token:$TOKEN_FOR_API@git.frama-c.com/$location"
+    repo="https://git-token:$FRAMA_CI_BOT_API_TOKEN@git.frama-c.com/$location"
     branch="$(get_matching_branch "$repo" "$git_current_branch")"
     git clone --depth=1 --branch="$branch" "$repo" "ivette/src/frama-c/plugins/$plugin"
   fi
