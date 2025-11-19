@@ -405,8 +405,6 @@ module Results: sig
       If the callee expression doesn't always evaluate to a function, those
       spurious values are ignored. If it always evaluate to a non-function value
       then the returned list is empty.
-      Raises [Stdlib.Invalid_argument] if the callee expression is not an lvalue
-      without offset.
       Also see [callee] for a function which applies directly on Call
       statements. *)
   val eval_callee : Cil_types.lhost -> request -> Kernel_function.t list result
