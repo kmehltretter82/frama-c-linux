@@ -24,7 +24,7 @@ int f(int x, int y, float z) {
 
 /*@
   predicate is_valid_int_range(int* p, int n) =
-  (0 <= n) && \valid_range(p,0,n-1) ;
+  (0 <= n) && \valid(p+(0 .. n-1)) ;
 */
 
 

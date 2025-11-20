@@ -1,6 +1,6 @@
 /*@
    predicate is_valid_int_range(int* p, int n) =
-           (pred1:0 <= n) && pred2:\valid_range(p, 0, n-1);
+           (pred1:0 <= n) && pred2:\valid(p+(0 .. n-1));
 */
 
 /*@ predicate P(int *p) = *p ==0 ; */

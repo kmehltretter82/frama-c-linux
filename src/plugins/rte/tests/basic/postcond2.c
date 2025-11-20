@@ -4,7 +4,7 @@
 
 /*@
   requires \valid(x);
-  requires \valid_range(x, 0, 10);
+  requires \valid(x+(0 .. 10));
   assigns *x \from y;
   assigns \result \from *x;
 */

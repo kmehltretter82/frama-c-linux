@@ -9,7 +9,7 @@
 //#include <stdio.h>
 
 
-/*@ requires \valid_range(t,0,max);
+/*@ requires \valid(t+(0 .. max));
   @ requires max>=0;
   @ requires 0<=i<=max;
   @ decreases max-i;
@@ -25,7 +25,7 @@ int isPresentRec(int t[], int i, int max, int val) {
 }
 
 
-/*@ requires \valid_range(t,0,max);
+/*@ requires \valid(t+(0 .. max));
   @ requires max>=0;
   @ ensures 0<=\result<=max || \result==-1 ;
   @ ensures 0<=\result<=max ==> t[\result]==val;

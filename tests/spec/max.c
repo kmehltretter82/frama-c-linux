@@ -13,7 +13,7 @@
   @ }
   @*/
 
-/*@ requires \valid_range(t,0,n-1);
+/*@ requires \valid(t+(0 .. n-1));
   @ behavior nonempty:
   @    assumes n > 0;
   @    ensures 0<= \result < n &&
@@ -43,7 +43,7 @@ int max(int t[], int n) {
 
 int main() {
   int test [] = { 1, 2, 3, 4, 9, 8, 7, 6, 5, 10};
-  /*@ assert \valid_range(test,0,9); */
+  /*@ assert \valid(test+(0 .. 9)); */
   int x = max(test,10);
   /*@ assert test[x] >= 10; */
   return 0;
