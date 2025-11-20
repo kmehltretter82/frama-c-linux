@@ -18,6 +18,8 @@ type value
 
 exception TypeError of Cil_types.location * string
 
+val pattern_loc: pattern -> location
+
 (** Creates an empty environment.
     @before Frama-C+dev the typing context was mandatory.
 *)
@@ -37,6 +39,9 @@ val pa_value : context -> lexpr -> value
 
 (** Return a value that equals the pattern *)
 val self : pattern -> pattern * value
+
+(** Force pattern naming, for debugging purposes *)
+val named : string -> pattern -> pattern
 
 (** Pattern printer *)
 val pp_pattern : Format.formatter -> pattern -> unit

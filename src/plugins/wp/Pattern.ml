@@ -47,6 +47,10 @@ let self p =
   in
   pattern , { loc = p.loc ; value = Pvar self }
 
+let named name p =
+  let x = { loc = p.loc ; value=name } in
+  { loc = p.loc ; value = Named(x, p) }
+
 let unroll op = function
   | { value = Assoc(f,xs) } when f = op -> xs
   | e -> [e]
@@ -71,6 +75,8 @@ type context = {
 
 type pattern = ast
 type value = ast
+
+let pattern_loc p = p.loc
 
 (* -------------------------------------------------------------------------- *)
 (* --- Node Parsing                                                       --- *)
@@ -428,13 +434,16 @@ and pargs env ps trail es =
   | p::ps , e::es -> pmatch env p e ; pargs env ps trail es
   | _ -> raise Not_found
 
-(* Deep matching with marking *)
+(* -------------------------------------------------------------------------- *)
+(* --- Deep matching with marking                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
 let rec pchildren env p e =
   let rs = ref [] in
   Lang.F.lc_iter (fun e -> rs := e :: !rs) e ;
   List.exists (pchild env p) (List.rev !rs)
 
-and pchild env p e =
+and pchild env p e = (* populate content *)
   if Lang.F.lc_closed e then
     not (Lang.F.Tset.mem e env.marked) &&
     begin
@@ -468,6 +477,7 @@ let pclause { head ; pattern ; split } clause sigma prop =
     if t == tprop then Tactical.Clause clause else Tactical.Inside(clause,t) in
   let env = { sigma ; select ; marked = Lang.F.Tset.empty } in
   let pcond t =
+    (* replace ptry with a populating content version *)
     if ptry env pattern t || (not head && pchildren env pattern t)
     then Some env.sigma else None
   in

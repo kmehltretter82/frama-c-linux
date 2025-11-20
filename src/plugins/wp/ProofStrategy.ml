@@ -240,7 +240,7 @@ let parse_alternatives ctxt p =
     [ Provers(prvs,timeout) ]
   | PLapp("\\tactic",[],p::ps) ->
     let tactic = parse_name ctxt ~kind:"tactic" p in
-    [ parse_tactic_params ctxt (Pattern.context ctxt) ~tactic
+    [ parse_tactic_params ctxt (Pattern.context ~tc:ctxt ()) ~tactic
         ~select:[] ~lookup:[] ~params:[] ~children:[] ~default:None ps ]
   | PLapp("\\auto",[],ps) ->
     List.map (fun p -> Auto (parse_name ctxt ~kind:"auto" p)) ps
