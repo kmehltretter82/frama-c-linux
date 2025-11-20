@@ -291,15 +291,6 @@ struct
 
       let reprs = [ empty ]
 
-      let structural_descr =
-        Structural_descr.t_record [|
-          Stamp.packed_descr;
-          BranchList.packed_descr;
-          LoopList.packed_descr;
-          Splits.packed_descr;
-          DSplits.packed_descr;
-        |]
-
       let compare k1 k2 =
         LoopList.compare k1.loops k2.loops
         <?> lazy (Splits.compare k1.splits k2.splits)
