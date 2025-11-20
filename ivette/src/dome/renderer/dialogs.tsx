@@ -618,6 +618,10 @@ function AnchoredPopup(props: AnchoredPopupProps): React.ReactNode {
    */
   const position = usePopupPosition(popupRef, controlRef, isOpen);
 
+  /** Hiding popup if the position = {top: 0, left: 0} */
+  const style = styles(
+    position.left === 0 && position.top === 0 && { zIndex: "-10" });
+
   /** Close when clicked outside the anchored popup */
   useClickOutsidePopup(popupRef, controlRef, () => setAskToOpen(false));
 
@@ -626,8 +630,9 @@ function AnchoredPopup(props: AnchoredPopupProps): React.ReactNode {
     <div ref={controlRef} style={{ display: 'flex', alignItems: 'center' }} >
       { control }
     </div>
-    { isOpen && !(position.left === 0 && position.top === 0) &&
+    { isOpen &&
       <Popup
+        style={style}
         popupRef={popupRef}
         position={position}
         onMouseEnter={() => setMouseOnPopup(true)}
