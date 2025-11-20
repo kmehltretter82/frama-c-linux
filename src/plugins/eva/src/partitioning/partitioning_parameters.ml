@@ -127,12 +127,19 @@ struct
     try
       match annotation with
       | FlowSplit (ConditionalBranches, _) ->
-        let do_branch (_src,edge,dest) acc =
-          let source = dest.Eva_automata.vertex_key in
+        let do_branch (src,edge,dest) =
+          let source = src.Eva_automata.vertex_key in
           let branch = edge.Eva_automata.edge_key in
-          (dest, Partition.SyntacticSplit (source, branch)) :: acc
+          (dest, Partition.SyntacticSplit (source, branch))
         in
-        Eva_automata.G.fold_edges_e do_branch automaton.graph []
+        (* Find first vertex with several successors. *)
+        let rec find_next_branches vertex =
+          match Eva_automata.G.succ_e automaton.graph vertex with
+          | [] -> [] (* No successor, should probably emit a warning? *)
+          | [_, _, v] -> find_next_branches v (* only one successor *)
+          | l -> List.map do_branch l
+        in
+        find_next_branches vertex
       | FlowMerge (ConditionalBranches) ->
         [vertex, (Partition.MergeSyntacticSplits)]
       | FlowSplit (term, kind) ->

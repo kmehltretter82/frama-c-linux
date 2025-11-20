@@ -376,16 +376,26 @@ void test_syntactic_plit()
 {
   int i = Frama_C_interval(0,1);
   int j = Frama_C_interval(0,2);
+  int k;
 
   //@ split \branches;
   if (i != j) {
     i = j = 3;
   }
-  Frama_C_show_each(i, j);
+
+  // This if-then-else should not be impacted by the split annotation above
+  if (i == 0) {
+    k = 0;
+  }
+  else {
+    k = 1;
+  }
+
+  Frama_C_show_each(i, j, k); // Only two states must be printed here
 
   //@ merge \branches;
 
-  Frama_C_show_each(i, j);
+  Frama_C_show_each(i, j, k); // Only on state must be printed here
 }
 
 void main(void)

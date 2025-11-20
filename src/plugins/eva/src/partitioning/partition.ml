@@ -240,7 +240,7 @@ type key = {
   loops : LoopUnrolling.t list;
   splits : Z.t SplitMap.t; (* term -> value *)
   dynamic_splits : split_monitor SplitMap.t; (* term -> monitor *)
-  syntactic_splits :int Int.Map.t; (* split vertex -> edge taken *)
+  syntactic_splits : int Int.Map.t; (* split vertex -> edge taken *)
 }
 
 type call_return_policy = {
@@ -337,15 +337,11 @@ struct
   let exceed_rationing key = key.ration_stamp = None
 
   let combine ~policy ~caller ~callee =
-    let keep_second _ v1 v2 =
-      match v1, v2 with
-      | None, None -> None
-      | Some x, None | (Some _ | None), Some x -> Some x
-    in
-    let combine merge caller_map callee_map =
+    let combine_map merge_map get_map =
+      let keep_second _ v1 v2 = if Option.is_some v2 then v2 else v1 in
       if policy.callee_splits
-      then merge keep_second caller_map callee_map
-      else caller_map
+      then merge_map keep_second (get_map caller) (get_map callee)
+      else get_map caller
     in
     (* There is no need to preserve the uniqueness of ration stamps here, as
        keys will always be given new stamps before the merge of identical keys.
@@ -359,11 +355,9 @@ struct
           (if policy.caller_history then caller.branches else [])
         );
       loops = caller.loops;
-      splits = combine SplitMap.merge caller.splits callee.splits;
-      dynamic_splits = combine SplitMap.merge
-          caller.dynamic_splits callee.dynamic_splits;
-      syntactic_splits = combine Int.Map.merge
-          caller.syntactic_splits callee.syntactic_splits;
+      splits = combine_map SplitMap.merge (fun t -> t.splits);
+      dynamic_splits = combine_map SplitMap.merge (fun t -> t.dynamic_splits);
+      syntactic_splits = combine_map Int.Map.merge (fun t -> t.syntactic_splits);
     }
 end
 

@@ -201,8 +201,6 @@ module Unroll = Register (struct
 
 module SplitTermAnnotation =
 struct
-  (* [split_term] plus the original term before conversion to a C expression,
-     when possible, to avoid changes due to its reconversion to a C term. *)
   type t = split_term
 
   let kind = Here
@@ -268,9 +266,9 @@ let get_slevel_annot stmt =
 let get_unroll_annot stmt = Unroll.get stmt
 
 let get_flow_annot stmt =
-  List.map (fun a-> FlowSplit (a, Static)) (Split.get stmt) @
-  List.map (fun a-> FlowSplit (a, Dynamic)) (DynamicSplit.get stmt) @
-  List.map (fun a-> FlowMerge a) (Merge.get stmt)
+  List.map (fun a -> FlowSplit (a, Static)) (Split.get stmt) @
+  List.map (fun a -> FlowSplit (a, Dynamic)) (DynamicSplit.get stmt) @
+  List.map (fun a -> FlowMerge a) (Merge.get stmt)
 
 
 let add_slevel_annot = Slevel.add
