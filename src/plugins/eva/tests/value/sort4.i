@@ -1,15 +1,15 @@
 /* run.config*
   
+  STDOPT: #"-lib-entry -main sort4_0"
   STDOPT: #"-lib-entry -main sort4_1"
-  STDOPT: #"-lib-entry -main sort4_4"
+  STDOPT: #"-lib-entry -main sort4_2"
   STDOPT: #"-lib-entry -main sort4_3"
 */
-
 /* sort 4 integers */
 
 int a, b, c, d;
 
-void sort4_1() {
+void sort4_0() {
 
   int tmp;
   if (a > b) { tmp = a; a = b; b = tmp; }
@@ -22,9 +22,9 @@ void sort4_1() {
 
 
 
-/*@ requires \valid_range(t,0,3);
+/*@ requires \valid(t+(0..3));
     ensures t[0] <= t[1] <= t[2] <= t[3]; */
-void sort4_4(int t[4]) {
+void sort4_1(int t[4]) {
   int tmp;
   if (t[0] > t[1]) { tmp = t[0]; t[0] = t[1]; t[1] = tmp; }
   if (t[2] > t[3]) { tmp = t[2]; t[2] = t[3]; t[3] = tmp; }
@@ -34,8 +34,8 @@ void sort4_4(int t[4]) {
 }
 
 
-/* commented because of memory explosion */
-#if 0
+
+
 /*@ requires \valid(a) && \valid(b) && \valid(c) && \valid(d) &&
   @   a != b && a != c && a != d && b != c && b != d && c != d;
   @ ensures *a <= *b <= *c <= *d; */
@@ -47,7 +47,7 @@ void sort4_2(int *a, int *b, int *c, int *d) {
   if (*b > *d) { tmp = *b; *b = *d; *d = tmp; }
   if (*b > *c) { tmp = *b; *b = *c; *c = tmp; }
 }
-#endif
+
 
 //@ type Lint = int;
 
