@@ -793,15 +793,6 @@ input:checked + .dome-xSwitch-slider:before {
 /* --- Warning icon                                                       --- */
 /* -------------------------------------------------------------------------- */
 
-@keyframes blink-animation-slow {
-  5% { opacity: 0; }
-  10% { opacity: 100%;}
-}
-
-.dome-xIcon-warning svg {
-  animation: blink-animation-slow 5s infinite;
-}
-
 .dome-xIcon-warning-content {
   padding: 5px 10px;
   display: flex;

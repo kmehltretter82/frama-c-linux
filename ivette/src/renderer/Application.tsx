@@ -59,10 +59,10 @@ export default function Application(): JSX.Element {
         <Toolbar.Filler />
         <Laboratory.Tabs />
         <Toolbar.Filler />
+        <Toolbar.IconWarning />
         <IvettePrefs.ThemeSwitchTool />
         <IvettePrefs.FontTools />
         <Search.SearchField />
-        <Toolbar.IconWarning />
       </Toolbar.ToolBar>
       <LSplit settings="frama-c.sidebar.split" unfold={sidebar}>
         <Sidebar.Panel />
