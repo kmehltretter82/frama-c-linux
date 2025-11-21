@@ -61,23 +61,26 @@ let dummy_edge = {
 let (<?>) c lcmp =
   if c <> 0 then c else Lazy.force lcmp
 
-module Vertex = Datatype.Make_with_collections (struct
-    include Datatype.Serializable_undefined
-    type t = vertex
-    let reprs = [dummy_vertex]
-    let name = "Eva_automata.Vertex"
-    let compare v1 v2 =
-      v1.vertex_key - v2.vertex_key <?>
-      lazy (Kernel_function.compare v1.vertex_kf v2.vertex_kf)
-    let hash v =
-      Hashtbl.hash (Kernel_function.hash v.vertex_kf, v.vertex_key)
-    let equal v1 v2 =
-      v1.vertex_key = v2.vertex_key &&
-      Kernel_function.equal v1.vertex_kf v2.vertex_kf
-    let pretty fmt v =
-      Format.pp_print_int fmt v.vertex_key;
-      Option.iter (fun stmt -> Format.fprintf fmt "@s%d" stmt.sid) v.vertex_start_of
-  end)
+module Vertex = struct
+  include Datatype.Make_with_collections (struct
+      include Datatype.Serializable_undefined
+      type t = vertex
+      let reprs = [dummy_vertex]
+      let name = "Eva_automata.Vertex"
+      let compare v1 v2 =
+        v1.vertex_key - v2.vertex_key <?>
+        lazy (Kernel_function.compare v1.vertex_kf v2.vertex_kf)
+      let hash v =
+        Hashtbl.hash (Kernel_function.hash v.vertex_kf, v.vertex_key)
+      let equal v1 v2 =
+        v1.vertex_key = v2.vertex_key &&
+        Kernel_function.equal v1.vertex_kf v2.vertex_kf
+      let pretty fmt v =
+        Format.pp_print_int fmt v.vertex_key;
+        Option.iter (fun stmt -> Format.fprintf fmt "@s%d" stmt.sid) v.vertex_start_of
+    end)
+  let loc v = v.vertex_start_of |> Option.map Cil_datatype.Stmt.loc
+end
 
 module Transition = Datatype.Make (struct
     include Datatype.Serializable_undefined
@@ -103,22 +106,25 @@ module Transition = Datatype.Make (struct
       | Leave (b)  -> fprintf fmt "Exit %a" print_var_list b.blocals
   end)
 
-module Edge = Datatype.Make_with_collections
-    (struct
-      include Datatype.Serializable_undefined
-      type t = edge
-      let reprs = [dummy_edge]
-      let name = "Eva_automata.Edge"
-      let compare e1 e2 =
-        e1.edge_key - e2.edge_key <?>
-        lazy (Kernel_function.compare e1.edge_kf e2.edge_kf)
-      let hash e =
-        Hashtbl.hash (Kernel_function.hash e.edge_kf, e.edge_key)
-      let equal e1 e2 =
-        e1.edge_key = e2.edge_key &&
-        Kernel_function.equal e1.edge_kf e2.edge_kf
-      let pretty fmt e = Transition.pretty fmt e.edge_transition
-    end)
+module Edge = struct
+  include Datatype.Make_with_collections
+      (struct
+        include Datatype.Serializable_undefined
+        type t = edge
+        let reprs = [dummy_edge]
+        let name = "Eva_automata.Edge"
+        let compare e1 e2 =
+          e1.edge_key - e2.edge_key <?>
+          lazy (Kernel_function.compare e1.edge_kf e2.edge_kf)
+        let hash e =
+          Hashtbl.hash (Kernel_function.hash e.edge_kf, e.edge_key)
+        let equal e1 e2 =
+          e1.edge_key = e2.edge_key &&
+          Kernel_function.equal e1.edge_kf e2.edge_kf
+        let pretty fmt e = Transition.pretty fmt e.edge_transition
+      end)
+  let loc e = Some e.edge_loc
+end
 
 
 (* --- Automata types --- *)
