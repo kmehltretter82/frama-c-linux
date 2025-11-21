@@ -618,9 +618,9 @@ function AnchoredPopup(props: AnchoredPopupProps): React.ReactNode {
    */
   const position = usePopupPosition(popupRef, controlRef, isOpen);
 
-  /** Hiding popup if the position = {top: 0, left: 0} */
-  const style = styles(
-    position.left === 0 && position.top === 0 && { zIndex: "-10" });
+  /** Hiding popup if the position is the default position, only used when
+   * the popup should not be visible. */
+  const style = styles(position === defaultPos && { zIndex: "-10" });
 
   /** Close when clicked outside the anchored popup */
   useClickOutsidePopup(popupRef, controlRef, () => setAskToOpen(false));
