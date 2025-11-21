@@ -93,31 +93,47 @@ let dummy_edge = {
   edge_loc = Cil_datatype.Location.unknown;
 }
 
+(* --- Signatures --- *)
+
+module type Vertex = sig
+  include Datatype.S_with_collections
+  val loc : t -> location option
+end
+
+module type Edge = sig
+  include Datatype.S_with_collections
+  val loc : t -> location option
+end
+
 (* --- Datatypes --- *)
 
 (* Compare function helper *)
 let (<?>) c lcmp =
   if c <> 0 then c else Lazy.force lcmp
 
-module Vertex = Datatype.Make_with_collections (struct
-    include Datatype.Serializable_undefined
-    type t = vertex
-    let reprs = [dummy_vertex]
-    let name = "Interpreted_automata.Vertex"
-    let copy v =
-      { v with vertex_key = v.vertex_key }
-    let compare v1 v2 =
-      v1.vertex_key - v2.vertex_key <?>
-      lazy (Kernel_function.compare v1.vertex_kf v2.vertex_kf)
-    let hash v =
-      Hashtbl.hash (Kernel_function.hash v.vertex_kf, v.vertex_key)
-    let equal v1 v2 =
-      v1.vertex_key = v2.vertex_key &&
-      Kernel_function.equal v1.vertex_kf v2.vertex_kf
-    let pretty fmt v =
-      Format.pp_print_int fmt v.vertex_key;
-      Option.iter (fun stmt -> Format.fprintf fmt "@s%d" stmt.sid) v.vertex_start_of
-  end)
+module Vertex = struct
+  include Datatype.Make_with_collections (struct
+      include Datatype.Serializable_undefined
+      type t = vertex
+      let reprs = [dummy_vertex]
+      let name = "Interpreted_automata.Vertex"
+      let copy v =
+        { v with vertex_key = v.vertex_key }
+      let compare v1 v2 =
+        v1.vertex_key - v2.vertex_key <?>
+        lazy (Kernel_function.compare v1.vertex_kf v2.vertex_kf)
+      let hash v =
+        Hashtbl.hash (Kernel_function.hash v.vertex_kf, v.vertex_key)
+      let equal v1 v2 =
+        v1.vertex_key = v2.vertex_key &&
+        Kernel_function.equal v1.vertex_kf v2.vertex_kf
+      let pretty fmt v =
+        Format.pp_print_int fmt v.vertex_key;
+        Option.iter (fun stmt -> Format.fprintf fmt "@s%d" stmt.sid) v.vertex_start_of
+    end)
+
+  let loc v = v.vertex_start_of |> Option.map Cil_datatype.Stmt.loc
+end
 
 module Transition = Datatype.Make (struct
     include Datatype.Serializable_undefined
@@ -154,23 +170,27 @@ module Transition = Datatype.Make (struct
         | Leave (b)  -> fprintf fmt "Exit %a" pretty_block b
   end)
 
-module Edge = Datatype.Make_with_collections (struct
-    include Datatype.Serializable_undefined
-    type t = vertex edge
-    let reprs = [dummy_edge]
-    let name = "Interpreted_automata.Edge"
-    let copy e = e
-    let compare e1 e2 =
-      e1.edge_key - e2.edge_key <?>
-      lazy (Kernel_function.compare e1.edge_kf e2.edge_kf)
-    let hash e =
-      Hashtbl.hash (Kernel_function.hash e.edge_kf, e.edge_key)
-    let equal e1 e2 =
-      e1.edge_key = e2.edge_key &&
-      Kernel_function.equal e1.edge_kf e2.edge_kf
-    let pretty fmt e =
-      Transition.pretty fmt e.edge_transition
-  end)
+module Edge = struct
+  include Datatype.Make_with_collections (struct
+      include Datatype.Serializable_undefined
+      type t = vertex edge
+      let reprs = [dummy_edge]
+      let name = "Interpreted_automata.Edge"
+      let copy e = e
+      let compare e1 e2 =
+        e1.edge_key - e2.edge_key <?>
+        lazy (Kernel_function.compare e1.edge_kf e2.edge_kf)
+      let hash e =
+        Hashtbl.hash (Kernel_function.hash e.edge_kf, e.edge_key)
+      let equal e1 e2 =
+        e1.edge_key = e2.edge_key &&
+        Kernel_function.equal e1.edge_kf e2.edge_kf
+      let pretty fmt e =
+        Transition.pretty fmt e.edge_transition
+    end)
+
+  let loc e = Some e.edge_loc
+end
 
 
 (* ---------------------------------------------------------------------- *)
@@ -217,7 +237,7 @@ end
 
 module StmtTable = Cil_datatype.Stmt.Hashtbl
 
-module MakeGraph (Vertex : Datatype.S_with_hashtbl) (Edge : Datatype.S) = struct
+module MakeGraph (Vertex : Vertex) (Edge : Edge) = struct
   module G = Graph.Imperative.Digraph.ConcreteBidirectionalLabeled
       (Vertex)
       (struct include Edge let default = List.hd reprs end)
@@ -381,6 +401,7 @@ module MakeGraph (Vertex : Datatype.S_with_hashtbl) (Edge : Datatype.S) = struct
     module States = Vertex.Hashtbl
 
     let compute ~fold_pred graph wto initial_value  =
+      let open Current_loc.Operators in
       let results = States.create (nb_vertex graph) in
 
       let initial_values =
@@ -394,13 +415,18 @@ module MakeGraph (Vertex : Datatype.S_with_hashtbl) (Edge : Datatype.S) = struct
       let process_edge (v,_,_ as e) acc =
         (* Retrieve origin value *)
         let value = States.find_opt results v in
-        let result = Option.bind (D.transfer e) value in
+        let transfer (_,t,_ as e) value =
+          let<?> UpdatedCurrentLoc = Edge.loc t in
+          D.transfer e value
+        in
+        let result = Option.bind (transfer e) value in
         Option.to_list result @ acc
       in
 
       (* Compute the abstract value for the given control point ; compute all
          incoming transfer functions *)
       let process_vertex v =
+        let<?> UpdatedCurrentLoc = Vertex.loc v in
         let incoming = fold_pred process_edge graph v [] in
         match initial_values v @ incoming with
         | [] -> (* Zero incoming values -> Bottom *)
@@ -413,6 +439,7 @@ module MakeGraph (Vertex : Datatype.S_with_hashtbl) (Edge : Datatype.S) = struct
 
       (* widen returns whether it is necessary to continue to iterate or not *)
       let widen v previous =
+        let<?> UpdatedCurrentLoc = Vertex.loc v in
         let current = States.find_opt results v in
         match previous, current with
         | _, None -> false (* Current is bottom, let's quit *)
@@ -1153,19 +1180,25 @@ module UnrollUnnatural  = struct
 
   end
 
-  module Version = Datatype.Pair_with_collections(Vertex)(Vertex_Set)
+  module Version = struct
+    include Datatype.Pair_with_collections(Vertex)(Vertex_Set)
+    let loc (v, _) = v.vertex_start_of |> Option.map Cil_datatype.Stmt.loc
+  end
 
-  module Edge = Datatype.Make_with_collections (struct
-      include Datatype.Serializable_undefined
-      type t = Version.t edge
-      let reprs = [dummy_edge]
-      let name = "Interpreted_automata.UnrollUnnatural.Edge"
-      let copy e = e
-      let compare e1 e2 = e1.edge_key - e2.edge_key
-      let hash e = e.edge_key
-      let equal e1 e2 = e1.edge_key = e2.edge_key
-      let pretty fmt e = Format.pp_print_int fmt e.edge_key
-    end)
+  module Edge = struct
+    include Datatype.Make_with_collections (struct
+        include Datatype.Serializable_undefined
+        type t = Version.t edge
+        let reprs = [dummy_edge]
+        let name = "Interpreted_automata.UnrollUnnatural.Edge"
+        let copy e = e
+        let compare e1 e2 = e1.edge_key - e2.edge_key
+        let hash e = e.edge_key
+        let equal e1 e2 = e1.edge_key = e2.edge_key
+        let pretty fmt e = Format.pp_print_int fmt e.edge_key
+      end)
+    let loc e = Some e.edge_loc
+  end
 
   module OldG = G
 

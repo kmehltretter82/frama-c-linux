@@ -103,11 +103,27 @@ type graph = G.t
     components of the graph, which are themselves WTOs *)
 type wto = vertex Wto.partition
 
+(** Signature for vertices' datatype. *)
+module type Vertex = sig
+  include Datatype.S_with_collections
+
+  val loc : t -> location option
+  (** [loc v] returns the location corresponding to the vertex if it exists. *)
+end
+
 (** Datatype for vertices *)
-module Vertex : Datatype.S_with_collections with type t = vertex
+module Vertex : Vertex with type t = vertex
+
+(** Signature for edges' datatype. *)
+module type Edge = sig
+  include Datatype.S_with_collections
+
+  val loc : t -> location option
+  (** [loc e] returns the location corresponding to the edge if it exists. *)
+end
 
 (** Datatype for edges *)
-module Edge : Datatype.S_with_collections with type t = vertex edge
+module Edge : Edge with type t = vertex edge
 
 
 (** An interpreted automaton for a given function is a graph whose edges are
@@ -349,7 +365,7 @@ module type Graph = sig
 end
 
 (** This functor can be used to build generic control flow graphs *)
-module MakeGraph (Vertex : Datatype.S_with_hashtbl) (Edge : Datatype.S) : Graph
+module MakeGraph (Vertex : Vertex) (Edge : Edge) : Graph
   with type V.t = Vertex.t
    and type E.t = Vertex.t * Edge.t * Vertex.t
    and type V.label = Vertex.t
