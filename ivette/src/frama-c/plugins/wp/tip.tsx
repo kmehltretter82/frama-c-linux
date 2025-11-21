@@ -7,17 +7,14 @@
 /* ************************************************************************ */
 
 import React from 'react';
-import { EditorView, lineNumbers, ViewUpdate } from '@codemirror/view';
-// import { linter, Diagnostic, lintGutter } from "@codemirror/lint";
 
 import * as Dome from 'dome';
-import * as Editor from 'dome/text/editor';
-
 
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
-import { Cell, Item } from 'dome/controls/labels';
+import { Cell, Item, Label, IconKind } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
+import { TextProxy, TextView } from 'dome/text/richtext';
 import {
   ToolBar, Select, Filler,
   Button, ButtonGroup
@@ -40,8 +37,7 @@ import {
   ConfigureTactic
 } from './tac';
 
-import * as PatDebug from 'frama-c/plugins/wp/api/patterndebugger';
-import { StateEffect } from '@codemirror/state';
+import * as WpPattern from 'frama-c/plugins/wp/api/patterndebugger';
 
 /* -------------------------------------------------------------------------- */
 /* --- Sequent Printing Modes                                             --- */
@@ -253,109 +249,40 @@ export function cancelProofTasks(): void {
 /* --- Pattern Debugger                                                   --- */
 /* -------------------------------------------------------------------------- */
 
-// async function patternDiagnostic(view: EditorView): Promise<Diagnostic[]> {
-//   const content = view.state.doc.toString();
-//   const request = Server.send(PatDebug.typecheckPattern, content);
-//   const result = await request;
-//   const diagnostics: Diagnostic[] = [];
-//   if (result !== undefined) {
-//     const [from, to] = result[0];
-//     const message = result[1];
-//     diagnostics.push({
-//       from: from + 1,
-//       to: to + 1,
-//       severity: "error",
-//       message: message
-//     });
-//   }
-//   return diagnostics;
-// }
-
-// function getPatternDiagnostic(node: TIP.node) {
-//   return async (view: EditorView): Promise<Diagnostic[]> => {
-//     const content = view.state.doc.toString();
-
-//     const request = Server.send(PatDebug.startDebug, [content, node]);
-//     const result = await request;
-//     const diagnostics: Diagnostic[] = [];
-//     if (result !== undefined
-//       && result.kind !== PatDebug.rkind.OK
-//       && result.reason !== undefined
-//     ) {
-//       const [from, to] = result.reason[0];
-//       const message = result.reason[1];
-//       const severity =
-//         result.kind === PatDebug.rkind.ERROR ? "error" : "warning";
-//       diagnostics.push({
-//         from: from + 1,
-//         to: to + 1,
-//         severity: severity,
-//         message: message
-//       });
-//     }
-//     return diagnostics;
-//   };
-// }
-
 export interface PatternDebuggerProps {
   node: TIP.node;
 }
 
-// Necessary extensions for our needs.
-const extensions: Editor.Extension[] = [
-  // linter(patternDiagnostic),
-  // lintGutter(),
-  lineNumbers()
-];
+const severityIcon: { [key: string]: string } = {
+  Ok: 'CHECK', Warning: 'WARNING', Error: 'CROSS',
+};
 
-const addUnderline = StateEffect.define<{ from: number, to: number }>({
-  map: ({ from, to }, change) =>
-    ({ from: change.mapPos(from), to: change.mapPos(to) })
-});
+const severityKind: { [key: string]: IconKind } = {
+  Ok: 'positive', Warning: 'warning', Error: 'negative',
+};
 
-const underlineTheme = EditorView.baseTheme({
-  ".cm-underline": { textDecoration: "underline 3px red" }
-});
+const severityClass: { [key: string]: string } = {
+  Ok: 'wp-pattern-ok', Warning: 'wp-pattern-warning', Error: 'wp-pattern-error',
+};
 
 function PatternDebugger(props: PatternDebuggerProps): JSX.Element {
-  const { node } = props;
-
-  const [content, setContent] = React.useState<string>('');
-
-  const extensions: Editor.Extension[] = [
-    lineNumbers(),
-    EditorView.updateListener.of(
-      ({ state }: ViewUpdate) => setContent(state.doc.toString()))
-  ];
-
-  const { Component, view } = Editor.Editor(extensions);
-
-  const result = States.useRequestStable(PatDebug.startDebug, [content, node]);
-
-  console.log('New content:', content);
-
-  // React.useEffect(() => {
-  if (result.reason) {
-    const [from, to] = result.reason[0];
-    const effects: StateEffect<unknown>[] = [
-      addUnderline.of({ from, to })
-    ];
-    console.log('Add underline', from, to);
-    effects.push(StateEffect.appendConfig.of([underlineTheme]));
-    view?.dispatch({ effects });
-  }
-  // });
-
-  React.useEffect(() => {
-    Server.send(PatDebug.getMatches, [content, node]);
-  }, [content, node]);
-
+  const text = React.useMemo(() => new TextProxy(), []);
+  const [pattern, setPattern] = React.useState('');
+  const onChange = React.useCallback(() => {
+    setPattern(text.toString());
+  }, [text]);
+  const { severity, message, details, range } =
+    States.useRequestStable(WpPattern.debug, { pattern, node: props.node });
+  const decorations = React.useMemo(
+    () => range && { style: severityClass[severity], ...range }
+    , [severity, range]);
+  const icon = severityIcon[severity];
+  const kind = severityKind[severity];
   return (
-    <>
-      <Component
-        style={{ width: '50%' }}
-      />
-    </>
+    <Vbox>
+      <TextView text={pattern} onChange={onChange} decorations={decorations} />
+      <Label icon={icon} kind={kind} label={message} title={details} />
+    </Vbox>
   );
 }
 

@@ -9,6 +9,22 @@
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Pattern Debugger                                                   --- */
+/* -------------------------------------------------------------------------- */
+
+.wp-pattern-ok {
+  text-decoration: underline dashed greenyellow;
+}
+
+.wp-pattern-warning {
+  text-decoration: underline wavy orange;
+}
+
+.wp-pattern-error {
+  text-decoration: underline wavy red;
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- Sequent Editor                                                     --- */
 /* -------------------------------------------------------------------------- */
 
