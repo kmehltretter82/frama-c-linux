@@ -20,24 +20,39 @@ end
 
 include struct (* auxiliary functions *)
 
-  let li_use_updater lv li = object
-    inherit Visitor.frama_c_inplace
-    method! vlogic_info_use {l_var_info = lv'} =
-      if Logic_var.equal lv lv' then ChangeTo li else DoChildren
-  end
-
-  let li_use_finder ~res ~lv_rec = object
-    inherit Visitor.frama_c_inplace
-    method! vlogic_info_use li =
-      if Logic_var.equal lv_rec li.l_var_info
-      then (res := true; SkipChildren)
-      else DoChildren
-  end
-
   let predicate_has_rec_occurrence ~lv_rec p =
-    let res = ref false in
-    let _ = Visitor.visitFramacPredicate (li_use_finder ~res ~lv_rec) p in
-    !res
+    let exception Found in
+    let li_use_finder = object
+      inherit Visitor.frama_c_inplace
+      method! vlogic_info_use li =
+        if Logic_var.equal lv_rec li.l_var_info
+        then raise Found
+        else DoChildren
+    end in
+    try
+      ignore @@ Visitor.visitFramacPredicate li_use_finder p;
+      false
+    with Found -> true
+
+  (* applies logic variable substitutions [substs] as well as a logic_info
+     substitution [(li, li')] *)
+  let subst_applier (li, li') substs = object
+    inherit Visitor.frama_c_inplace
+
+    method! vlogic_info_use this_li =
+      if Logic_info.equal this_li li then ChangeTo li' else DoChildren
+
+    method !vquantifiers quantifiers =
+      let apply_subst v =
+        try Logic_var.Map.find v substs
+        with Not_found -> v
+      in
+      ChangeTo (List.map apply_subst quantifiers)
+
+    method !vlogic_var_use v =
+      try ChangeTo (Logic_var.Map.find v substs)
+      with Not_found -> DoChildren
+  end
 
   let rec extract_foralls = function
     | {pred_content = Pat (p', labels)} as p ->
@@ -58,19 +73,6 @@ include struct (* auxiliary functions *)
     Printer.pp_global_annotation fmt (Dfun_or_pred (li, Location.unknown))
 
   let freshen_up_logic_var lv = {lv with lv_id = Cil_const.new_raw_id ()}
-
-  let substitute old_profile new_profile =
-    let formal_substitutions =
-      Logic_var.Map.of_seq @@ List.to_seq @@ List.combine old_profile new_profile
-    in
-    object
-      inherit Visitor.frama_c_inplace
-
-      method! vlogic_var_use lv =
-        match Logic_var.Map.find_opt lv formal_substitutions with
-        | None -> DoChildren
-        | Some lv' -> ChangeTo lv'
-    end
 
   let free_vars = Cil.extract_free_logicvars_from_term
   let free_vars_pred = Cil.extract_free_logicvars_from_predicate
@@ -174,14 +176,48 @@ end = struct
     preferred ~li usable_modes
 end
 
-(** [Modus.t] is a [mode] enriched with a set of substitutees. When the mode
-    analysis of a constructor finishes by descending to its conclusion, the
-    mode is determined. At that point also the set of variables that are to be
-    to be substituted by the new predicate's/function's formal parameters is
+module Substs = struct
+  include Logic_var.Map
+
+  let of_list pairs =
+    let add substs (v, w) = if mem v substs then substs else add v w substs in
+    List.fold_left add empty pairs
+
+  let union =
+    let conflict key _ _ =
+      Options.fatal "conflicting substs for %a" Logic_var.pretty key
+    in
+    union conflict
+
+  let unions = List.fold_left union empty
+
+  let succession first later = (* one substitution applied after another *)
+    union (map (fun v -> try find v later with Not_found -> v) first) later
+
+  let pretty fmt m =
+    let pp_substitution fmt src tgt =
+      Format.fprintf fmt "@[@[%a@] %t @[%a@]@]"
+        Printer.pp_logic_var src
+        Unicode.pp_right_arrow
+        Printer.pp_logic_var tgt
+    in
+    Format.fprintf fmt "@[[";
+    let first = ref true in
+    m |> iter (fun src tgt ->
+        if not !first then Format.fprintf fmt ",@ ";
+        first := false;
+        pp_substitution fmt src tgt);
+    Format.fprintf fmt "]@]"
+end
+
+(** [Modus.t] is a [mode] enriched with a set of future-let-bound variables.
+    When the mode analysis of a constructor finishes by descending to its
+    conclusion, the mode is determined. By that point also the set of variables
+    that will be bound by recursive or foreign predicate applications are
     known. This information is retained along with the mode as it is useful to
     re-use by the normalization. *)
 module Modus : sig
-  type t = {mode : mode; substitutees : Vars.t}
+  type t = {mode : mode; substs : logic_var Substs.t}
 
   val pretty : Format.formatter -> t -> unit
 
@@ -189,7 +225,7 @@ module Modus : sig
   val preferred_opt : t list -> t option
   val preferred : li:logic_info -> t list -> t
 end = struct
-  type t = {mode : mode; substitutees : Vars.t}
+  type t = {mode : mode; substs : logic_var Substs.t}
 
   let compare {mode = m1} {mode = m2} = Mode.compare m1 m2
 
@@ -197,8 +233,7 @@ end = struct
     | [] -> Options.fatal "Modus.unions []"
     | {mode} :: _ as modi ->
       assert (List.for_all (fun m -> m.mode = mode) modi);
-      {mode;
-       substitutees = Vars.unions @@ List.map (fun m -> m.substitutees) modi}
+      {mode; substs = Substs.unions @@ List.map (fun m -> m.substs) modi}
 
   let preferred_opt modes =
     match List.sort compare modes with
@@ -210,10 +245,8 @@ end = struct
     | Some m -> m
     | None -> unsupported "no valid mode found for: %a" Printer.pp_logic_info li
 
-  let pretty fmt {mode; substitutees} =
-    Format.fprintf fmt "%a%a"
-      Mode.pretty mode
-      Vars.pretty substitutees
+  let pretty fmt {mode; substs} =
+    Format.fprintf fmt "%a with %a" Mode.pretty mode Substs.pretty substs
 end
 
 module rec Constructor : sig
@@ -228,12 +261,7 @@ module rec Constructor : sig
   (** determine whether [mode] is a viable mode for predicate [p]. [lv_rec] is
       the inductive definition of the [p]'s constructor. *)
 
-  val normalize : li_rec:logic_info -> mode:Modus.t -> t -> t
-  (* The result is a valid inductive definition except for the fact that all
-     the cases are quantified over the same set of variables, i.e. the formal
-     parameters of the predicate/function being defined.
-     In addition to those quantifiers a case may additional quantifiers proper
-     to itself for each variable that a \let binding is to be generated for. *)
+  val pretty : Format.formatter -> t -> unit
 
 end = struct
   type t = {
@@ -243,68 +271,6 @@ end = struct
     predicate : predicate (* generalized Horn clauses *)
   }
 
-  (* Equalities are a collection of substitutions and equations, generated by
-     the normalization. Substitutions are generated when arguments of the
-     conclusion are quantified variables that will be substituted by the
-     corresponding formal parameters. When such a substitution already exists an
-     equation is generated instead. Example: \forall ℤ a; ... ==> add(a, 0, a);
-     Otherwise equations come from constants as for the second parameter here. *)
-  module Equalities = struct
-    type t = {substitutions : logic_var Logic_var.Map.t;
-              equations : (term * term) list}
-
-    let empty = {substitutions = Logic_var.Map.empty; equations = []}
-
-    let pp_substitution fmt (v, t) =
-      Format.fprintf fmt "@[@[%a@] %t @[%a@]@]"
-        Printer.pp_logic_var v
-        Unicode.pp_right_arrow
-        Printer.pp_logic_var t
-
-    let pp_equation fmt (t1, t2) =
-      Format.fprintf fmt "@[@[%a@] %t @[%a@]@]"
-        Printer.pp_term t1
-        Unicode.pp_eq
-        Printer.pp_term t2
-
-    let pretty fmt {substitutions = subs; equations} =
-      Pretty_utils.pp_list ~sep:"@;<2>" pp_substitution fmt (Logic_var.Map.bindings subs);
-      if equations <> [] then Format.fprintf fmt "@;<2>";
-      Pretty_utils.pp_list ~sep:"@;<2>" pp_equation fmt equations
-
-    let add_equation eq eqs =
-      Options.debug ~dkey ~level:6 "adding equation %a" pp_equation eq;
-      {eqs with equations = eq :: eqs.equations}
-
-    let add_substitution ~loc eqs (orig, by) =
-      Options.debug ~dkey ~level:6 "adding substitution %a" pp_substitution (orig, by);
-      match Logic_var.Map.find_opt orig eqs.substitutions with
-      | Some substitute2 ->
-        let t1 = Logic_const.tvar ~loc by in
-        let t2 = Logic_const.tvar ~loc substitute2 in
-        add_equation (t1, t2) eqs
-      | None -> {eqs with substitutions = Logic_var.Map.add orig by eqs.substitutions}
-
-    let apply_equations ~eqs p =
-      List.fold_left
-        (fun p (lhs, rhs) ->
-           let eq = Logic_const.prel ~loc:lhs.term_loc (Req, lhs, rhs) in
-           {eq with pred_content = Pimplies (eq, p)})
-        p
-        eqs.equations
-
-    let apply_substitutions =
-      let solution_applier substs = object
-        inherit Visitor.frama_c_inplace
-        method !vterm t = match var_of_term t with
-          | None -> DoChildren
-          | Some v ->
-            try ChangeTo (Logic_const.tvar @@ Logic_var.Map.find v substs)
-            with Not_found -> DoChildren
-      end in
-      fun substs -> Visitor.visitFramacPredicate (solution_applier substs)
-  end
-
   let analyze_mode ~lv_rec p mode =
     let is_rec_occurrence li = Logic_var.equal li.l_var_info lv_rec in
     (* fv: free variables that have been used up to the current point *)
@@ -313,7 +279,7 @@ end = struct
     (* lb: (future) let-bound variables; do not add variables that have already
        been used before. *)
     let rec test_mode ~lb ~fv p =
-      let recurse ?(lb = lb) ?(fv=fv) = test_mode ~lb ~fv in
+      let recurse ?(lb = lb) ?(fv = fv) = test_mode ~lb ~fv in
       let add_fv fv terms = Vars.unions @@ fv :: List.map free_vars terms in
       Options.debug ~dkey ~level:5 "test_mode@ ~lb:%a ~fv:%a@ ~mode:%a@ %a"
         Vars.pretty lb
@@ -324,28 +290,32 @@ end = struct
         let in_args, out_arg = Mode.in_out_args ~mode args in
         let fv = add_fv fv in_args in
         let lb = match Option.bind var_of_term out_arg with
-          | Some v -> if Vars.mem v fv then lb else Vars.add v lb
-          | None -> lb
+          | Some v when not @@ Vars.mem v fv -> Vars.add v lb
+          | _ -> lb
         in
-        let fv = match out_arg with Some a -> Vars.union fv (free_vars a) | None -> fv in
+        let fv = match out_arg with
+          | Some a -> Vars.union fv (free_vars a)
+          | None -> fv
+        in
         recurse ~lb ~fv pr
       in
       match p.pred_content with
-      | Pimplies ({pred_content = Pand (p1, p2)} as pl, pr)
-        when predicate_has_rec_occurrence ~lv_rec pl ->
+      | Pimplies ({pred_content = Pand (p1, p2)} as pl, pr) ->
         (* treat  p ∧ q ⇒ r  as  p ⇒ q ⇒ r *)
         let pl' = {pl with pred_content = Pimplies (p2, pr)} in
         let p' = {p with pred_content = Pimplies (p1, pl')} in
         recurse p'
-      | Pimplies ({pred_content = Papp (li, _, args)}, pr) when is_rec_occurrence li ->
+      | Pimplies ({pred_content = Papp (li, _, args)}, pr)
+        when is_rec_occurrence li -> (* recursive occurrence *)
         predicate_call ~mode args pr
       | Pimplies (pl, _) when predicate_has_rec_occurrence ~lv_rec pl ->
         unsupported ~loc:p.pred_loc
           "deep recursive occurrence of %a in incomplete mode"
           Printer.pp_logic_var lv_rec;
-      | Pimplies ({pred_content = Papp (li, _, args)}, pr) when is_inductive li -> (* foreign predicate *)
-        let try_with_mode {Modus.mode = m} = predicate_call ~mode:m args pr in
-        let modi = List.filter_map try_with_mode (InductiveDefinition.analyze_modes li) in
+      | Pimplies ({pred_content = Papp (li, _, args)}, pr)
+        when is_inductive li -> (* foreign predicate *)
+        let try_with_mode {Modus.mode} = predicate_call ~mode args pr in
+        let modi = List.filter_map try_with_mode (InductiveDef.analyze_modes li) in
         Modus.preferred_opt modi
       | Pimplies (pl, pr) -> (* simple hypothesis *)
         let fv = Vars.union fv @@ free_vars_pred pl in
@@ -357,30 +327,33 @@ end = struct
           "only \\let expressions that bind terms are supported, not: %a"
           Printer.pp_predicate p
       | Papp (li, _, args) when is_rec_occurrence li -> (* conclusion *)
-        let in_args, _ = Mode.in_out_args ~mode:mode args in
+        let substs =
+          let pairs, _ = Mode.in_out_args ~mode (List.combine args li.l_profile)
+          and var_subst (arg, formal) =
+            Option.map (fun v -> v, formal) (var_of_term arg)
+          in Substs.of_list @@ List.filter_map var_subst pairs
+        in
         let fv = add_fv fv args in
-        let substitutees = Vars.diff (Vars.of_list @@ List.filter_map var_of_term in_args) lb in
-        let unbound = Vars.diff (Vars.diff fv substitutees) lb in
-        let all_bound = Vars.is_empty unbound in
-        if not all_bound then
-          Options.feedback ~dkey ~level:4
-            "mode %a could not bind: %a"
-            Mode.pretty mode
-            Vars.pretty unbound;
-        if all_bound
-        then Some {Modus.mode; substitutees}
-        else None
+        let unbound =
+          Vars.filter (fun v -> not @@ Substs.mem v substs) (Vars.diff fv lb)
+        in
+        if Vars.is_empty unbound
+        then Some {Modus.mode; substs}
+        else
+          let () =
+            Options.feedback ~dkey ~level:4
+              "mode %a could not bind: %a"
+              Mode.pretty mode
+              Vars.pretty unbound;
+          in None
       | Papp _ ->
         unsupported ~loc:p.pred_loc
           "conclusion not an occurrence of the enclosing predicate: %a"
           Printer.pp_predicate p
       | Pat (p, _label) -> recurse p
-      | _ ->
-        unsupported ~loc:p.pred_loc
-          "unexpected element: %a"
-          Printer.pp_predicate p
+      | _ -> unsupported ~loc:p.pred_loc "unexpected element: %a" Printer.pp_predicate p
     in
-    try test_mode ~lb:Vars.empty ~fv:Vars.empty (without_foralls p)
+    try test_mode ~lb:Vars.empty ~fv:Vars.empty @@ without_foralls p
     with Unsupported ->
       unsupported ~loc:p.pred_loc
         "unsupported form: %a"
@@ -388,120 +361,21 @@ end = struct
 
   let pretty fmt {name; predicate} =
     Format.fprintf fmt "%s: @[%a@]" name Printer.pp_predicate predicate
-
-  let normalize ~li_rec ~mode ({predicate} as ctor) =
-    Options.debug ~dkey ~level:3 "normalizing constructor:@ %a" pretty ctor;
-    let is_rec_occurrence li = Logic_info.equal li li_rec in
-    let eqs = ref Equalities.empty in
-    let rec normalize_body ~uv p =
-      (* Descend to the conclusion keeping track of usable variables (uv);
-         initially these are the variables that are to be substituted by the
-         formal parameters of the new predicate/function; \let-bindings and
-         recursive hypotheses that bind variables add variables to this set.
-         At the conclusion substitutions and equations are generated. Equations
-         are added before the conclusion, while substitutions are applied at
-         the top-level. *)
-      let recurse ?(uv = uv) = normalize_body ~uv in
-      match p.pred_content with
-      | Plet ({l_var_info = v; l_body = LBterm _} as li, pin) ->
-        let pin = recurse ~uv:(Vars.add v uv) pin in
-        {p with pred_content = Plet (li, pin)}
-      | Pimplies ({pred_content = Pand (p1, p2)} as pl, pr)
-        when predicate_has_rec_occurrence ~lv_rec:li_rec.l_var_info pl ->
-        let pl' = {pl with pred_content = Pimplies (p2, pr)} in
-        let p' = {p with pred_content = Pimplies (p1, pl')} in
-        recurse p'
-      | Pimplies ({pred_content = Papp (li, _, args)} as pl, pr) when
-          is_rec_occurrence li ->
-        let uv = match Option.bind var_of_term @@ Mode.out_arg ~mode:mode.Modus.mode args with
-          | Some v -> Vars.add v uv
-          | None -> uv
-        in
-        {p with pred_content = Pimplies (pl, recurse ~uv pr)}
-      | Pimplies ({pred_content = Papp (li, _, args)} as pl, pr) when
-          is_inductive li -> (* foreign predicate *)
-        let mode' =
-          let all_modes = List.map
-              (fun m -> m.Modus.mode)
-              (InductiveDefinition.analyze_modes li)
-          in
-          Mode.select_mode ~usable_vars:uv ~li args all_modes
-        in
-        let out_arg = Mode.out_arg ~mode:mode' args in
-        let uv = match Option.bind var_of_term out_arg with
-          | Some v -> Vars.add v uv
-          | None -> uv
-        in
-        {p with pred_content = Pimplies (pl, recurse ~uv pr)}
-      | Pimplies (pl, pr) -> (* simple hypothesis *)
-        {p with pred_content = Pimplies (pl, recurse pr)}
-      | Pat (p', labels) ->
-        let p' = recurse p' in
-        {p' with pred_content = Pat (p', labels)}
-      | Papp (li, labels, args) when is_rec_occurrence li -> (* conclusion *)
-        let normalize_arg i arg =
-          let formal = List.nth li.l_profile i in
-          match mode.mode with
-          | Incomplete i' when i = i' - 1 -> arg
-          | _ ->
-            let loc = arg.term_loc in
-            let t = Logic_const.tvar ~loc formal in
-            let () =
-              (* after successful mode analysis any argument not in result
-                 position is either a normal (not future let-bound) quantified
-                 variable or a constant. *)
-              match var_of_term arg with
-              | Some v -> eqs :=
-                  Equalities.add_substitution ~loc !eqs (v, formal)
-              | None -> eqs := Equalities.add_equation (t, arg) !eqs
-            in
-            t
-        in
-        let new_args = List.mapi normalize_arg args in
-        Options.debug ~dkey ~level:5
-          "equations/substitutions generated from conclusion: %a"
-          Equalities.pretty !eqs;
-        Equalities.apply_equations ~eqs:!eqs
-          {p with pred_content = Papp (li, labels, new_args)}
-      | _ ->
-        Options.fatal
-          "rewrite_conclusion_and_get_original_args_and_collect_equations %a"
-          Printer.pp_predicate p
-    in
-    let quantifiers, body = extract_foralls predicate in
-    let body = normalize_body ~uv:mode.substitutees body in
-    let body = Equalities.apply_substitutions !eqs.substitutions body in
-    let profile, _ = Mode.in_out_args ~mode:mode.mode li_rec.l_profile in
-    let quantifiers =
-      profile @ Vars.elements (Vars.diff quantifiers mode.substitutees)
-    in
-    let quantified =
-      {predicate with pred_content = Pforall (quantifiers, body)}
-    in
-    let res = {ctor with predicate = quantified} in
-    Options.debug ~dkey ~level:3 "normalized constructor:@ %a" pretty res;
-    res
 end
 
-and InductiveDefinition : sig
-  val ctors_of_inductive : logic_info -> Constructor.t list
+and InductiveDef : sig
+  val ctors : logic_info -> Constructor.t list
   val analyze_modes : logic_info -> Modus.t list (* memoized *)
-  val normalize : mode:Modus.t -> logic_info -> logic_info
   val clear : unit -> unit
 end = struct (* internal representation of inductives *)
-  let inductive_of_ctors ctors =
-    let of_ctor {Constructor.name; labels; poly_id; predicate} =
-      name, labels, poly_id, predicate
-    in
-    LBinductive (List.map of_ctor ctors)
-
-  let ctors_of_inductive li =
-    let make (name, labels, poly_id, lemma) =
-      {Constructor.name; labels; poly_id; predicate = lemma}
-    in
-    match li.l_body with
-    | LBinductive ctors -> List.map make ctors
-    | _ -> Options.fatal "not an inductive definition:@ @[%a@]" Printer.pp_logic_info li
+  let ctors = function
+    | {l_body = LBinductive ctors} ->
+      let make (name, labels, poly_id, predicate) =
+        {Constructor.name; labels; poly_id; predicate}
+      in
+      List.map make ctors
+    | li -> Options.fatal "not an inductive definition:@ @[%a@]"
+              Printer.pp_logic_info li
 
   let memo_tbl = Logic_info.Hashtbl.create 9
   let clear () = Logic_info.Hashtbl.clear memo_tbl
@@ -510,7 +384,7 @@ end = struct (* internal representation of inductives *)
     Constructor.analyze_mode ~lv_rec:li.l_var_info p mode
 
   let analyze_modes li = Logic_info.Hashtbl.memo memo_tbl li @@ fun li ->
-    let ctors = ctors_of_inductive li in
+    let ctors = ctors li in
     Options.debug ~dkey ~level:4
       "@[<2>performing mode analysis on inductive:@ @[%a@]@]"
       pp_logic_info li;
@@ -529,19 +403,9 @@ end = struct (* internal representation of inductives *)
     let modes = List.filter_map try_mode (Mode.all_modes ~li) in
     Options.debug ~dkey ~level:3 "possible modes for %a: %a"
       Printer.pp_logic_info li
-      (Pretty_utils.pp_list ~sep:", " Mode.pretty) (List.map (fun {Modus.mode} -> mode) modes);
+      (Pretty_utils.pp_list ~sep:", " Mode.pretty)
+      (List.map (fun {Modus.mode} -> mode) modes);
     modes
-
-  let normalize ~mode li =
-    Options.debug ~dkey ~level:3 "normalizing %a with modus %a"
-      Logic_info.pretty li
-      Modus.pretty mode;
-    let ctors =
-      List.map
-        (Constructor.normalize ~li_rec:li ~mode)
-        (ctors_of_inductive li)
-    in
-    {li with l_body = inductive_of_ctors ctors}
 end
 
 (* In order to be able to share the code for the extraction of logic functions
@@ -605,27 +469,15 @@ end
 module rec Make_extractor : functor (Out : Out_language) -> sig
   val extract : ?name:string -> mode:mode -> logic_info -> logic_info
 end = functor (Out : Out_language) -> struct
-
   let extract ?name ~mode li = Extractions.memo ~mode li @@ fun ~mode li ->
-    let li_rec = li in
     Options.debug ~dkey ~level:2
       "@[<2>extracting data from inductive using mode %a:@ @[%a@]@]"
       Mode.pretty mode pp_logic_info li;
-    let modus = List.find
-        (fun m -> m.Modus.mode = mode)
-        (InductiveDefinition.analyze_modes li)
-    in
-    let li = InductiveDefinition.normalize ~mode:modus li in
     let new_profile = List.map freshen_up_logic_var li.l_profile in
-    let li = Visitor.visitFramacLogicInfo (substitute li.l_profile new_profile) li in
-    let li = {li with l_profile = new_profile} in
-    Options.debug ~dkey ~level:2
-      "@[<2>after normalization:@ @[%a@]@]" pp_logic_info li;
-    let l_profile, res = Mode.in_out_args ~mode li.l_profile in
-    let formals = Vars.of_list l_profile in
-    let l_type = Option.map (fun l -> l.lv_type) res in
-    let is_rec_occurrence li' = Logic_var.equal li'.l_var_info li.l_var_info in
-    let extract_ctor (ctor : Constructor.t) next_ctor =
+    let new_formals, res = Mode.in_out_args ~mode new_profile in
+    let extract_ctor ({Constructor.predicate = p} as ctor) next_ctor =
+      let li_rec = li in
+      let is_rec_occurrence li' = Logic_var.equal li'.l_var_info li_rec.l_var_info in
       let flush_conds ~conds case_true =
         if conds = [] then case_true else
           let conjunction =
@@ -636,33 +488,51 @@ end = functor (Out : Out_language) -> struct
           in
           Out.mk_if ~loc:conjunction.pred_loc conjunction case_true next_ctor
       in
-      let rec compile ~lb ~conds p =
-        let recurse ?(lb = lb) ?(conds = conds) =
+      let rec compile ~uv ~conds p =
+        let recurse ?(uv = uv) ?(conds = conds) =
           (* conds : gathered hypotheses *)
-          compile ~lb ~conds in
+          compile ~uv ~conds in
         match p.pred_content with
+        | Pimplies ({pred_content = Pand (p1, p2)} as pl, pr) ->
+          (* treat  p ∧ q ⇒ r  as  p ⇒ q ⇒ r *)
+          let pl' = {pl with pred_content = Pimplies (p2, pr)} in
+          recurse {p with pred_content = Pimplies (p1, pl')}
         | Papp (li, _, args) when is_rec_occurrence li -> (* conclusion *)
-          let case_true = Out.mk_concl ~mode args in
-          flush_conds ~conds case_true
+          let eqs = ref [] in
+          let normalize_arg i arg =
+            match mode with
+            | Incomplete i' when i = i' - 1 -> arg
+            | _ ->
+              let formal = List.nth new_profile i in
+              let loc = arg.term_loc in
+              let t = Logic_const.tvar ~loc formal in
+              let () = match var_of_term arg with
+                | Some v when Logic_var.equal v formal -> ()
+                | _ -> eqs := Logic_const.prel ~loc:t.term_loc (Req, t, arg) :: !eqs
+              in
+              t
+          in
+          let new_args = List.mapi normalize_arg args in
+          Options.debug ~dkey ~level:5
+            "equations generated from conclusion: %a"
+            (Pretty_utils.pp_list ~sep:" ∧ " Predicate.pretty) !eqs;
+          let case_true = Out.mk_concl ~mode new_args in
+          flush_conds ~conds:(!eqs @ conds) case_true
         | Plet (li, p) ->
-          if Vars.mem li.l_var_info lb then
-            unsupported "logic variable %a is bound multiple times"
-              Printer.pp_logic_var li.l_var_info;
-          let c = recurse ~conds:[] ~lb:(Vars.add li.l_var_info lb) p in
+          let c = recurse ~uv:(Vars.add li.l_var_info uv) ~conds:[] p in
           flush_conds ~conds (Out.mk_let ~loc:p.pred_loc li c)
         | Pimplies ({pred_content = Papp (li, labels, args)} as pl, pr)
-          when is_rec_occurrence li || is_inductive li ->
+          when is_inductive li ->
           let in_out_args, li =
             if is_rec_occurrence li
             then Mode.in_out_args ~mode args, li
             else (* foreign predicate *)
               let mode' =
-                let usable_vars = Vars.union formals lb in
                 let available_modes = List.map
                     (fun m -> m.Modus.mode)
-                    (InductiveDefinition.analyze_modes li)
+                    (InductiveDef.analyze_modes li)
                 in
-                Mode.select_mode ~usable_vars ~li args available_modes
+                Mode.select_mode ~usable_vars:uv ~li args available_modes
               in
               Mode.in_out_args ~mode:mode' args,
               match mode' with
@@ -680,34 +550,54 @@ end = functor (Out : Out_language) -> struct
                 Logic_const.term ~loc:p.pred_loc (Tapp (li, labels, args)) res.term_type
               in
               match var_of_term res with
-              | Some v when not @@ Vars.mem v (Vars.union lb formals) ->
+              | Some v when not @@ Vars.mem v uv ->
                 let li = {(Cil_const.make_logic_info_local v.lv_name)
                           with l_var_info = v;
                                l_body = LBterm rec_call;
                                l_type = Some res.term_type}
                 in
-                recurse ~conds (Logic_const.plet ~loc:p.pred_loc li pr)
+                recurse (Logic_const.plet ~loc:p.pred_loc li pr)
               | _ ->
                 let p = Logic_const.prel (Req, rec_call, res) in
                 recurse ~conds:(p :: conds) pr
           end
-        | Pimplies (pl, pr) -> recurse ~conds:(pl :: conds) pr
+        | Pimplies (pl, pr) -> (* simple hypothesis *)
+          recurse ~conds:(pl :: conds) pr
         | Pat (p', labels) -> Out.mk_at labels @@ recurse p'
         | _ -> (* should have been caught in mk_ctor *)
           Options.fatal "unexpected predicate in extraction:@ %a"
             Printer.pp_predicate p
       in
-      compile ~lb:Vars.empty ~conds:[] @@ without_foralls ctor.predicate
+      Options.debug ~dkey ~level:3
+        "@[<2>extracting data from constructor %s using modus %a:@ @[%a@]@]"
+        ctor.name Mode.pretty mode Constructor.pretty ctor;
+      compile ~uv:(Vars.of_list new_formals) ~conds:[] @@ without_foralls p
     in
+    let modus = List.find
+        (fun m -> m.Modus.mode = mode)
+        (InductiveDef.analyze_modes li)
+    in
+    Options.debug ~dkey ~level:2
+      "@[<2>extracting data from inductive predicate using mode@ %a:@ @[%a@]@]"
+      Modus.pretty modus pp_logic_info li;
+    let l_type = Option.map (fun l -> l.lv_type) res in
+    let old_profile = li.l_profile in
+    let li = {li with l_profile = new_formals; l_type} in
+    let li_concl_and_formal_substs =
+      let formal_substs = Substs.of_list @@ List.combine old_profile new_profile in
+      (* The substitution (li, li) is meaningful, since li we look to
+         substitute
+         a logic_info of which li is a copy: same logic_var, different record *)
+      subst_applier (li, li) @@ Substs.succession modus.substs formal_substs
+    in
+    (* The substitution (li, li) is meaningful, since li we look to substitute
+       a logic_info of which li is a copy: same logic_var, different record *)
+    let li = Visitor.visitFramacLogicInfo li_concl_and_formal_substs li in
     let body =
       let fallthrough = Out.mk_false l_type in
-      List.fold_right
-        extract_ctor
-        (InductiveDefinition.ctors_of_inductive li)
-        fallthrough
+      List.fold_right extract_ctor (InductiveDef.ctors li) fallthrough
     in
-    let li = {li with l_profile; l_type} in
-    li.l_body <- Out.mk_logic_body @@ Out.visit (li_use_updater li.l_var_info li) body;
+    li.l_body <- Out.mk_logic_body body;
     li.l_var_info <- freshen_up_logic_var li.l_var_info;
     let () = match res with
       | Some res -> (* incomplete mode: change lv_type into function type *)
@@ -718,7 +608,7 @@ end = functor (Out : Out_language) -> struct
     let old_name = li.l_var_info.lv_name in
     Option.iter (fun n -> li.l_var_info.lv_name <- n) name;
     Options.feedback ~dkey ~level:2
-      "@[<2>extracted from inductive definition of %s executable definition:@ @[%a@]@]"
+      "@[<2>extracted from inductive definition of %s executable predicate:@ @[%a@]@]"
       old_name
       pp_logic_info li;
     li
@@ -762,13 +652,13 @@ end
       let mk_concl ~mode:_ _ = mk_true None
     end)
 
-  let extract_with_mode ~mode li =
-    match mode.Modus.mode with
+  let extract_with_mode ~mode:{Modus.mode} li =
+    match mode with
     | Complete ->
       Options.debug ~dkey "predicate extraction in complete mode";
-      Extractor.extract ~mode:mode.Modus.mode li
+      Extractor.extract ~mode li
     | Incomplete i ->
-      let f = FunctionExtractor.extract ~mode:mode.mode li in
+      let f = FunctionExtractor.extract ~mode:mode li in
       let args, res = Mode.incomplete_in_out_args ~mode:i li.l_profile in
       let args = List.map Logic_const.tvar args in
       let tapp = Logic_const.term (Tapp (f, f.l_labels, args)) res.lv_type in
@@ -784,7 +674,7 @@ end
       wrapper
 
   let extract li =
-    let modi = InductiveDefinition.analyze_modes li in
+    let modi = InductiveDef.analyze_modes li in
     let mode = Modus.preferred ~li modi in
     extract_with_mode ~mode li
 end
@@ -804,5 +694,5 @@ let clear () =
   Fallthrough_terms.clear ();
   Extractions.clear ();
   Derived_functions.clear ();
-  InductiveDefinition.clear ();
+  InductiveDef.clear ();
   Unsound_predicates.clear ()

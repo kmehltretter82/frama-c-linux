@@ -54,6 +54,16 @@
   }
 */
 
+// f1 is used too early before being bound by the first recursive occurrence of fibo
+/*@
+  inductive fibo(ℤ i, ℤ x) {
+      case zero: fibo(0, 0);
+      case one: fibo(1, 1);
+      case other: \forall ℤ n, f1, f2;
+        n>1 ==> f1 >= 0 ==> fibo(n-1, f1) ==> fibo(n-2, f2) ==> fibo(n, f1+f2);
+  }
+*/
+
 int t[4] = {1, 3, 2, 4};
 
 int main() {

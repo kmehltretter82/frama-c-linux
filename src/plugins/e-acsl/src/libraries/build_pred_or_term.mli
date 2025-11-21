@@ -23,6 +23,7 @@ module type S = sig
   val mk_at : logic_label -> t -> t
 
   val visit : Visitor.frama_c_visitor -> t -> t
+  val pretty : Format.formatter -> t -> unit
 end
 
 module Predicate : S with type t = predicate

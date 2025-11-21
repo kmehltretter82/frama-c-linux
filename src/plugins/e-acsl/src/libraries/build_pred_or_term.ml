@@ -49,6 +49,7 @@ module type S = sig
   val mk_at : logic_label -> t -> t
 
   val visit : Visitor.frama_c_visitor -> t -> t
+  val pretty : Format.formatter -> t -> unit
 end
 
 module Predicate : S with type t = predicate = struct
@@ -81,6 +82,8 @@ module Predicate : S with type t = predicate = struct
   let mk_at labels p = {p with pred_content = Pat (p, labels)}
 
   let visit = Visitor.visitFramacPredicate
+
+  let pretty = Printer.pp_predicate
 end
 
 module Term : S with type t = term = struct
@@ -109,4 +112,6 @@ module Term : S with type t = term = struct
   let mk_at labels p = {p with term_node = Tat (p, labels)}
 
   let visit = Visitor.visitFramacTerm
+
+  let pretty = Printer.pp_term
 end
