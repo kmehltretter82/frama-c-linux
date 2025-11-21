@@ -7,10 +7,75 @@
 (**************************************************************************)
 
 open Server
+module Md = Markdown
+
+(* -------------------------------------------------------------------------- *)
+(* --- Pattern Diagnostic                                                 --- *)
+(* -------------------------------------------------------------------------- *)
 
 let package =
-  Package.package ~plugin:"wp" ~name:"patterndebugger" ~title:"WP Pattern Debugger" ()
+  Package.package ~plugin:"wp"
+    ~name:"patterndebugger"
+    ~title:"WP Pattern Debugger" ()
 
+type diagnostic = {
+  message : string ;
+  details : string ;
+  severity : [ `Ok | `Warning | `Error ] ;
+  location : Cil_types.location option ;
+}
+
+module Range : Data.S with type t = Cil_types.location =
+struct
+  type t = Cil_types.location
+  let jtype =
+    Data.declare ~package ~name:"range" @@
+    Package.(Jrecord [
+        "offset", Jnumber;
+        "length", Jnumber;
+      ])
+  let to_json (loc : t) =
+    let offset = (fst loc).pos_cnum in
+    let length = (snd loc).pos_cnum - offset in
+    `Assoc [ "offset", `Int offset ; "length", `Int length ]
+
+  let of_json _ = failwith "Wp.PatternDebugger.Range"
+end
+
+module RangeOpt = Data.Joption(Range)
+
+module Diagnostic : Request.Output with type t = diagnostic =
+struct
+  type t = diagnostic
+  let jtype =
+    Data.declare ~package ~name:"diagnostic" @@
+    Package.(Jrecord [
+        "message", Jstring ;
+        "details", Jstring ;
+        "severity", Junion [ Jtag "Ok" ; Jtag "Warning" ; Jtag "Error" ] ;
+        "range", RangeOpt.jtype ;
+        "length", Jnumber ;
+      ])
+  let severity_tag = function
+    | `Ok -> "Ok" | `Warning -> "Warning" | `Error -> "Error"
+  let to_json d = `Assoc [
+      "message" , `String d.message ;
+      "details" , `String d.details ;
+      "severity" , `String (severity_tag d.severity) ;
+      "range" , RangeOpt.to_json d.location
+    ]
+end
+
+let valid ~message ?(details="") () =
+  { severity = `Ok ; message ; details ; location = None }
+let warning ?loc ~message ?(details="") () =
+  { severity = `Warning ; message ; details ; location = loc }
+let error ?loc ~message ?(details="") () =
+  { severity = `Error ; message ; details ; location = loc }
+
+(* -------------------------------------------------------------------------- *)
+(* --- Local Pattern Parser                                               --- *)
+(* -------------------------------------------------------------------------- *)
 
 exception ParseError of Cil_types.location * string
 
@@ -56,161 +121,55 @@ let parse_patterns s =
   with ParseError (loc, msg) | Pattern.TypeError (loc, msg) ->
     Error (loc, msg)
 
+(* -------------------------------------------------------------------------- *)
+(* --- Debug Request                                                      --- *)
+(* -------------------------------------------------------------------------- *)
 
-module Location = Data.Jpair(Data.Jint)(Data.Jint)
+let check_pattern sequent sigma pattern =
+  Pattern.psequent Pattern.{
+      head = false ;
+      goal = true ;
+      hyps = true ;
+      split = true ;
+      pattern
+    } sigma sequent
 
-
-(**************************************************************************)
-(* First strategy ... *)
-
-module Result_S1 = Data.Joption(Data.Jpair(Location)(Data.Jstring))
-
-let () =
-  Request.register ~package ~kind:`GET
-    ~name:"typecheckPattern" ~descr:(Markdown.plain "Typecheck pattern")
-    ~input:(module Data.Jstring)
-    ~output:(module Result_S1)
-    begin function
-      | "" -> None
-      | s ->
-        match parse_patterns s with
-        | Patterns _ -> None
-        | Error ((l1, l2), msg) -> Some ((l1.pos_cnum, l2.pos_cnum), msg)
-    end
-
-(**************************************************************************)
-
-(**************************************************************************)
-(* Second strategy ... *)
-
-module Reason = Data.Joption(Data.Jpair(Location)(Data.Jstring))
-
-type rkind = Error | Warning | Ok
-
-type result = {
-  kind: rkind ;
-  reason: ((int * int) * string) option ;
-}
-
-module Rkind = struct
-  let dictionnary : rkind Data.Enum.dictionary = Data.Enum.dictionary ()
-
-  let tag name value =
-    Data.Enum.tag
-      ~name ~descr:(Markdown.plain ("Case: " ^ name)) ~value dictionnary
-
-  let _tag_error = tag "ERROR" Error
-  let _tag_warning = tag "WARNING" Warning
-  let _tag_ok = tag "OK" Ok
-
-  let enum =
-    Data.Enum.publish
-      ~package ~name:"rkind" ~descr:(Markdown.plain "") dictionnary
-
-  include (val enum)
-end
-
-module Result = struct
-  let signature : result Data.Record.signature = Data.Record.signature ()
-
-  let field_kind =
-    Data.Record.field signature
-      ~name:"kind"
-      ~descr:(Markdown.plain "kind of result")
-      (module Rkind)
-
-  let field_reason =
-    Data.Record.field signature
-      ~name:"reason"
-      ~descr:(Markdown.plain "result data when kind is not OK")
-      (module Reason)
-
-  let record =
-    Data.Record.publish
-      ~package ~name:"result" ~descr:(Markdown.plain "...") signature
-
-  include (val record)
-
-  let make r = default |> set field_kind r.kind |> set field_reason r.reason
-end
-
-let start_debug s n =
-  match parse_patterns s with
-  | Error ((l1, l2), msg) ->
-    { kind = Error ; reason = Some ((l1.pos_cnum, l2.pos_cnum), msg) }
+let debug pattern ?node () =
+  match parse_patterns pattern with
+  | Error (loc, message) -> error ~loc ~message ()
   | Patterns ps ->
-    let lookup pattern =
-      Pattern.{
-        head = false ;
-        goal = true ;
-        hyps = true ;
-        split = true ;
-        pattern
-      } in
-    let ps = List.mapi (fun i -> Pattern.named ("$" ^ string_of_int i)) ps in
-    let sequent = snd @@ Wpo.compute @@ ProofEngine.goal n in
-    let apply_pattern (sigma, result) p =
-      match sigma with
-      | None -> sigma, result
-      | Some sigma ->
-        match Pattern.psequent (lookup p) sigma sequent with
-        | Some sigma -> Some sigma, result
-        | None ->
-          let (l1, l2) = Pattern.pattern_loc p in
-          let loc = l1.pos_cnum, l2.pos_cnum in
-          let msg = "Cannot match term with this pattern" in
-          None, { kind = Warning ; reason = Some (loc, msg) }
-    in
-    snd @@ List.fold_left
-      apply_pattern
-      (Some Pattern.empty, { kind = Ok ; reason = None})
-      ps
+    match node with
+    | None -> valid ~message:"Valid pattern" ()
+    | Some node ->
+      let patterns = List.mapi (fun i -> Pattern.named ("$" ^ string_of_int i)) ps in
+      let sequent = snd @@ Wpo.compute @@ ProofEngine.goal node in
+      let rec apply_all sigma = function
+        | [] ->
+          let details = Format.asprintf "%a" Pattern.pp_sigma sigma in
+          valid ~message:"Applicable pattern" ~details ()
+        | p::ps ->
+          match check_pattern sequent sigma p with
+          | Some sigma -> apply_all sigma ps
+          | None ->
+            let loc = Pattern.pattern_loc p in
+            warning ~loc ~message:"Unmatched pattern" ()
+      in apply_all Pattern.empty patterns
 
 let () =
-  Request.register ~package ~kind:`GET
-    ~name:"startDebug" ~descr:(Markdown.plain "Start debugging")
-    ~input:(module Data.Jpair(Data.Jstring)(WpTipApi.Node))
-    ~output:(module Result)
-    (fun (s, n) -> Result.make @@ start_debug s n)
-
-
-(**************************************************************************)
-(* Small debug tool *)
-
-let () =
-  Request.register ~package ~kind:`GET
-    ~name:"getMatches" ~descr:(Markdown.plain "Show matched terms")
-    ~input:(module Data.Jpair(Data.Jstring)(WpTipApi.Node))
-    ~output:(module Data.Junit)
-    begin function
-      | "", _ -> ()
-      | s, node ->
-        match parse_patterns s with
-        | Error _ | Patterns [] -> ()
-        | Patterns ps ->
-          let ps = List.mapi (fun i -> Pattern.named ("$" ^ string_of_int i)) ps in
-          let sigma = Pattern.empty in
-          let lookup pattern =
-            Pattern.{
-              head = false ;
-              goal = true ;
-              hyps = true ;
-              split = true ;
-              pattern
-            } in
-          let sequent = snd @@ Wpo.compute @@ ProofEngine.goal node in
-          let sigma =
-            List.fold_left
-              begin fun acc p ->
-                match acc with
-                | None -> None
-                | Some sigma -> Pattern.psequent (lookup p) sigma sequent
-              end
-              (Some sigma)
-              ps
-          in
-          match sigma with
-          | None -> ()
-          | Some sigma -> Kernel.feedback "%a" Pattern.pp_sigma sigma
-
+  let signature = Request.signature ~output:(module Diagnostic) () in
+  let get_text = Request.param signature ~name:"pattern"
+      ~descr:(Md.plain "Pattern text")
+      ~default:"" (module Data.Jstring) in
+  let get_node = Request.param_opt signature ~name:"node"
+      ~descr:(Md.plain "Node to check pattern on (optional)")
+      (module WpTipApi.Node) in
+  Request.register_sig ~package ~kind:`GET ~name:"debug"
+    ~descr:(Md.plain "Debug pattern")
+    signature
+    begin fun rq () ->
+      let text = get_text rq in
+      let node = get_node rq in
+      debug text ?node ()
     end
+
+(* -------------------------------------------------------------------------- *)
