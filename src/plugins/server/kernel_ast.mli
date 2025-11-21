@@ -101,12 +101,27 @@ sig
   val array : kernel_function States.array
 end
 
+(** Definition of a filter on elements of type ['a] with a unique name and
+    a boolean function f: 'a -> bool, allowing the user to show/hide elements
+    for which f is true or false.
+    Optional arguments are:
+    - [labels] defines the labels for the positive and negative versions of the
+      filter. By default, they are "<name> elements" and "non-<name> elements".
+    - if [default] is provided, only elements x for which [f x = default] are
+      shown by default. Otherwise, all elements are shown by default.
+    - if [enable] is provided, the filter is active only when [enable ()] is
+      true. Otherwise, the filter is always active.
+    - if [hook] is provided, it is used to register a hook to notify the server
+      of filter updates (i.e. when [f x] has changed for some elements). *)
 type 'a filter_registration =
   string -> ?labels:string * string -> ?default:bool ->
   ?enable:(unit -> bool) -> ?add_hook:((unit -> unit) -> unit) ->
   ('a -> bool) -> unit
 
+(** Registers a new filter on functions. *)
 val register_fct_filter: kernel_function filter_registration
+
+(** Registers a new filter on variables. *)
 val register_var_filter: varinfo filter_registration
 
 (* -------------------------------------------------------------------------- *)
