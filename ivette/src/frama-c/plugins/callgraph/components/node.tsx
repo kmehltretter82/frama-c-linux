@@ -13,17 +13,28 @@ import { classes } from 'dome/misc/utils';
 import { LED } from 'dome/controls/displays';
 import { Icon } from 'dome/controls/icons';
 import { renderTaint } from 'frama-c/kernel/Properties';
+import * as States from 'frama-c/states';
 
 import { SelectedNodes, CGNode, SetSelectedNodes } from "../definitions";
 
-const isTaintedScope = (node: NodeObject3D<CGNode>): boolean => {
-  return Boolean(
-    node.taintStatus && node.taintStatus.length > 0 &&
-    (
-      node.taintStatus.find((elt) => elt.name === "direct_taint") ||
-      node.taintStatus.find((elt) => elt.name === "indirect_taint")
-    )
-  );
+const getRenderTaint = (node: NodeObject3D<CGNode>): JSX.Element | null => {
+  if(!node.taintStatus || node.taintStatus.length < 1) return null;
+
+  const taintTag: States.Tag = { name: '' };
+  if(node.taintStatus.find((elt) => elt.name === "direct_taint")) {
+    taintTag.name = "direct_taint";
+    taintTag.descr = 'Direct taint';
+  }
+  else if(node.taintStatus.find((elt) => elt.name === "indirect_taint")) {
+    taintTag.name = "indirect_taint";
+    taintTag.descr = 'Indirect taint';
+  }
+  else if(node.taintStatus.find((elt) => elt.name === "error")) {
+    taintTag.name = "error";
+    taintTag.descr = 'Error';
+  }
+
+  return taintTag.name !== '' ? renderTaint(taintTag) : null;
 };
 
 const getNodeAlarms = (node: CGNode): JSX.Element => {
@@ -72,7 +83,7 @@ export const getNode = (
         />
       }
       { getNodeAlarms(node) }
-      { isTaintedScope(node) && renderTaint({ name: "direct_taint" }) }
+      { getRenderTaint(node) }
     </div>
   );
 };
