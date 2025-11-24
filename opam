@@ -122,9 +122,9 @@ remove: [
 
 run-test: [
   ["dune" "exec" "--release" "--" "frama-c-ptests" "tests" "src/plugins/*/tests"
-  ] { arch != "ppc64" & arch != "x86_32" & arch != "arm32" & os-distribution != "freebsd"}
+  ] { arch != "ppc64" & arch != "x86_32" & arch != "arm32" & os-distribution != "freebsd" & os-family != "windows"}
   ["dune" "build" "--release" "-j%{jobs}%" "@ptests_config"
-  ] { arch != "ppc64" & arch != "x86_32" & arch != "arm32" & os-distribution != "freebsd"}
+  ] { arch != "ppc64" & arch != "x86_32" & arch != "arm32" & os-distribution != "freebsd" & os-family != "windows"}
 ]
 
 depends: [
@@ -195,4 +195,12 @@ Finalization also requires Node v20 or v22 and Yarn:
 - run 'nvm install 22'
 - run 'nvm use 22'
 - run 'npm install --global yarn'" { success }
+]
+
+x-maintenance-intent: [
+  "(latest).(any)"
+  "(latest-1).(latest)"
+  "(latest-2).(latest)"
+  "(latest-3).(latest)"
+  "(latest-4).(latest)"
 ]

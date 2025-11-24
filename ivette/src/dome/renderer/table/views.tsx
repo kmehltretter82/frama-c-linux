@@ -617,7 +617,7 @@ class TableState<Key, Row> {
     const items: PopupMenu = [
       {
         label: 'Reset ordering',
-        display: hasOrder && this.sorting,
+        display: hasOrder && !!this.sorting,
         onClick: this.onSorting,
       },
       {

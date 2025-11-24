@@ -27,7 +27,17 @@ install::
 	@echo "Warning: not target for Ivette"
 	@echo "  (no PREFIX, nor OPAM_SWITCH_PREFIX)"
 else
-FULLPREFIX := $(if ${DESTDIR},$(patsubst %/,%,${DESTDIR})/${PREFIX},${PREFIX})
+
+ifeq ($(OS),Windows_NT)
+# On Windows, convert every \ to / so that the \ do not need to be escaped
+TMP_PREFIX=$(subst \,/,$(PREFIX))
+TMP_DESTDIR=$(subst \,/,$(DESTDIR))
+else
+TMP_PREFIX=$(PREFIX)
+TMP_DESTDIR=$(DESTDIR)
+endif
+
+FULLPREFIX := $(if ${TMP_DESTDIR},$(patsubst %/,%,${TMP_DESTDIR})/${TMP_PREFIX},${TMP_PREFIX})
 install:: ivette-api
 	@echo "Installing Ivette to ${FULLPREFIX}"
 	@mkdir -p "${FULLPREFIX}/bin"

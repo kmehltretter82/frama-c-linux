@@ -17,5 +17,5 @@
 
 (rule
  (deps VERSION VERSION_CODENAME src/kernel_internals/runtime/system_config.ml.in)
- (targets python-3.10-available gcc-is-genuine system_config.ml)
+ (targets python-3.10-available gcc-is-genuine has-c2x-option system_config.ml)
  (action (run ./configurator.exe)))
