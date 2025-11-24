@@ -274,13 +274,13 @@ function PatternDebugger(props: PatternDebuggerProps): JSX.Element {
   const { severity, message, details, range } =
     States.useRequestStable(WpPattern.debug, { pattern, node: props.node });
   const decorations = React.useMemo(
-    () => range && { style: severityClass[severity], ...range }
+    () => range && { className: severityClass[severity], ...range }
     , [severity, range]);
   const icon = severityIcon[severity];
   const kind = severityKind[severity];
   return (
-    <Vbox>
-      <TextView text={pattern} onChange={onChange} decorations={decorations} />
+    <Vbox style={{ width: 220 }}>
+      <TextView text={text} onChange={onChange} decorations={decorations} />
       <Label icon={icon} kind={kind} label={message} title={details} />
     </Vbox>
   );

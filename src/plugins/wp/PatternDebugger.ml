@@ -52,9 +52,8 @@ struct
     Package.(Jrecord [
         "message", Jstring ;
         "details", Jstring ;
-        "severity", Junion [ Jtag "Ok" ; Jtag "Warning" ; Jtag "Error" ] ;
+        "severity", Junion [ Jtag "Warning" ; Jtag "Error" ; Jtag "Ok" ] ;
         "range", RangeOpt.jtype ;
-        "length", Jnumber ;
       ])
   let severity_tag = function
     | `Ok -> "Ok" | `Warning -> "Warning" | `Error -> "Error"
@@ -87,13 +86,12 @@ let parse_string s =
   let open Current_loc.Operators in
   let pos_path = Filepath.of_string "<user-string>" in
   let s = String.cat s "\n" in
-  let count_lines s =
+  let pos_cnum = String.length s in
+  let pos_lnum =
     let i = ref 0 in
-    String.iter (function '\n' -> incr i | _ -> ()) s ; !i
-  in
-  let pbeg = { Filepath.empty_pos with pos_path ; pos_lnum = 0 } in
-  let pend = { Filepath.empty_pos with pos_path ; pos_lnum = count_lines s } in
-
+    String.iter (function '\n' -> incr i | _ -> ()) s ; !i in
+  let pbeg = { Filepath.empty_pos with pos_path ; pos_cnum = 0 } in
+  let pend = { Filepath.empty_pos with pos_path ; pos_cnum ; pos_lnum } in
   let lb = Lexing.from_string s in
   let get_loc () =
     Cil_datatype.Position.of_lexing_pos @@ Lexing.lexeme_start_p lb,
@@ -107,9 +105,13 @@ let parse_string s =
     raise (ParseError (loc, msg))
   | Logic_lexer.Error (_, msg) ->
     raise (ParseError(get_loc (), msg))
-  | _ ->
-    let msg = Format.asprintf "unexpected token '%s'" (Lexing.lexeme lb) in
-    raise (ParseError (get_loc (), msg))
+  | Parsing.Parse_error ->
+    let loc = get_loc () in
+    let tok = Lexing.lexeme lb in
+    let msg =
+      if tok = "" then "unexpected token" else
+        Printf.sprintf "unexpected token %S" tok in
+    raise (ParseError (loc, msg))
 
 type parse_result =
   | Patterns of Pattern.pattern list
@@ -118,8 +120,7 @@ type parse_result =
 let parse_patterns s =
   let context = Pattern.context () in
   try Patterns (List.map (Pattern.pa_pattern context) @@ parse_string s)
-  with ParseError (loc, msg) | Pattern.TypeError (loc, msg) ->
-    Error (loc, msg)
+  with ParseError (loc, msg) | Pattern.TypeError (loc, msg) -> Error (loc, msg)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Debug Request                                                      --- *)
@@ -136,24 +137,28 @@ let check_pattern sequent sigma pattern =
 
 let debug pattern ?node () =
   match parse_patterns pattern with
+  | exception exn ->
+    let message = Printf.sprintf "Failure (%s)" (Printexc.to_string exn) in
+    error ~message ()
   | Error (loc, message) -> error ~loc ~message ()
   | Patterns ps ->
-    match node with
-    | None -> valid ~message:"Valid pattern" ()
-    | Some node ->
-      let patterns = List.mapi (fun i -> Pattern.named ("$" ^ string_of_int i)) ps in
-      let sequent = snd @@ Wpo.compute @@ ProofEngine.goal node in
-      let rec apply_all sigma = function
-        | [] ->
-          let details = Format.asprintf "%a" Pattern.pp_sigma sigma in
-          valid ~message:"Applicable pattern" ~details ()
-        | p::ps ->
-          match check_pattern sequent sigma p with
-          | Some sigma -> apply_all sigma ps
-          | None ->
-            let loc = Pattern.pattern_loc p in
-            warning ~loc ~message:"Unmatched pattern" ()
-      in apply_all Pattern.empty patterns
+    if ps=[] then warning ~message:"Empty pattern" () else
+      match node with
+      | None -> valid ~message:"Valid pattern" ()
+      | Some node ->
+        let sequent = snd @@ Wpo.compute @@ ProofEngine.goal node in
+        let rec apply_all sigma = function
+          | [] ->
+            let details = Format.asprintf "%a" Pattern.pp_sigma sigma in
+            valid ~message:"Applicable pattern" ~details ()
+          | p::ps ->
+            match check_pattern sequent sigma p with
+            | Some sigma -> apply_all sigma ps
+            | None ->
+              let loc = Pattern.pattern_loc p in
+              warning ~loc ~message:"Unmatched pattern" ()
+        in apply_all Pattern.empty @@
+        List.mapi (fun i -> Pattern.named (Printf.sprintf "$%d" i)) ps
 
 let () =
   let signature = Request.signature ~output:(module Diagnostic) () in
