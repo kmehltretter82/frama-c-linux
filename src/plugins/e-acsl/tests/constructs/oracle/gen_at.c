@@ -73,20 +73,7 @@ void f(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
   }
   /*@ assert \at(A,Here) == 2; */ ;
-  {
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
-      {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"A",0,A);
-    __gen_e_acsl_assert_data_4.blocking = 0;
-    __gen_e_acsl_assert_data_4.kind = "Assertion";
-    __gen_e_acsl_assert_data_4.pred_txt = "\\at(A,Init) == 4";
-    __gen_e_acsl_assert_data_4.file = "at.i";
-    __gen_e_acsl_assert_data_4.fct = "f";
-    __gen_e_acsl_assert_data_4.line = 19;
-    __e_acsl_assert(A == 4,& __gen_e_acsl_assert_data_4);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
-  }
-  /*@ check \at(A,Init) == 4; */ ;
+  /*@ assert \at(A,Init) == 4; */ ;
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
@@ -163,21 +150,7 @@ void f(void)
   {
     int i_0 = 0;
     while (i_0 < 2) {
-      {
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
-          {.values = (void *)0};
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,"i_0",0,
-                                     i_0);
-        __gen_e_acsl_assert_data_10.blocking = 0;
-        __gen_e_acsl_assert_data_10.kind = "Assertion";
-        __gen_e_acsl_assert_data_10.pred_txt = "\\at(i_0,LoopEntry) == 0";
-        __gen_e_acsl_assert_data_10.file = "at.i";
-        __gen_e_acsl_assert_data_10.fct = "f";
-        __gen_e_acsl_assert_data_10.line = 30;
-        __e_acsl_assert(i_0 == 0,& __gen_e_acsl_assert_data_10);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
-      }
-      /*@ check \at(i_0,LoopEntry) == 0; */ ;
+      /*@ assert \at(i_0,LoopEntry) == 0; */ ;
       i_0 ++;
     }
   }
