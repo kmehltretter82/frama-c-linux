@@ -17,32 +17,33 @@ type target_entry = {
   contents: Filepath.t list;
 }
 
-let tables_from_json json =
-  let open Yojson.Basic in
-  let open Util in
+let tables_from_json db_dir json =
+  let open Yojson.Basic.Util in
   let object_map = Hashtbl.create 10 in
   let target_map = Hashtbl.create 3 in
+  let base = db_dir in
   List.iter (fun entry ->
       let filename =
-        entry |> member "filename" |> to_string |> Filepath.of_string
+        entry |> member "filename" |> to_string |> Filepath.of_string ~base
       in
       let typ = entry |> member "type" |> to_string in
       if typ = "object" then begin
         let lang = entry |> member "lang" |> to_string in
         let source =
-          entry |> member "source" |> to_string |> Filepath.of_string
+          entry |> member "source" |> to_string |> Filepath.of_string ~base
         in
         let args = entry |> member "args" |> to_list |> List.map to_string in
-        let _path = entry |> member "path" |> to_string in
+        let _path = entry |> member "path" |> to_string |> Filepath.of_string ~base in
         let entry = { lang; source; args } in
         Kernel.debug
           ~dkey:Kernel.dkey_mopsa_db
           "object_map: adding '%a'" Filepath.pretty_abs filename;
         Hashtbl.replace object_map filename entry;
+        Parse_env.set_workdir source base;
       end else if typ = "executable" || typ = "library" then begin
         let contents =
           entry |> member "contents" |> to_list |>
-          List.map (fun d -> to_string d |> Filepath.of_string)
+          List.map (fun d -> to_string d |> Filepath.of_string ~base)
         in
         let entry = { contents } in
         Kernel.debug
@@ -132,11 +133,11 @@ let acc_deps object_map target_map targets =
   in
   aux ([], Filepath.Set.empty) targets
 
-let calc_deps db_json (module Targets : Parameter_sig.String_list) =
-  let (object_map, target_map) = tables_from_json db_json in
+let calc_deps db_dir db_json (module Targets : Parameter_sig.String_list) =
+  let (object_map, target_map) = tables_from_json db_dir db_json in
   let targets =
     Targets.fold (fun f acc ->
-        let path = Filepath.of_string f in
+        let path = Filepath.of_string ~base:db_dir f in
         match Hashtbl.find_opt target_map path with
         | None ->
           Kernel.abort "executable or library '%a' not found in mopsa-db"
@@ -172,8 +173,6 @@ let join_filtered_args args =
   Buffer.contents buf
 
 let run () =
-  let open Yojson.Basic in
-  let open Util in
   let db_path = Kernel.MopsaDb.get () in
   (* if we entered this function with db_path = empty, then one of the other
      mopsa-related options was set. Assume '.' for db_path. *)
@@ -192,18 +191,20 @@ let run () =
     else
       db_path
   in
+  let db_dir = Filepath.dirname adjusted_db_path in
   let json =
     try
-      from_file (Filepath.to_string_abs adjusted_db_path)
+      Yojson.Basic.from_file (Filepath.to_string_abs adjusted_db_path)
     with
     | Yojson.Json_error s ->
       Kernel.abort "mopsa-db: invalid JSON file '%a': %s"
         Filepath.pretty adjusted_db_path s
   in
+  let open Yojson.Basic.Util in
   let targets =
     json |> member "contents" |> to_list |> filter_map
       (fun o ->
-         match o |> Util.member "type" |> to_string with
+         match o |> member "type" |> to_string with
          | "executable" | "library" -> Some o
          | _ -> None)
   in
@@ -214,7 +215,7 @@ let run () =
   end else
   if not (Kernel.MopsaListDeps.is_empty ()) then begin
     (* 'list-dependencies' mode *)
-    let deps = calc_deps json (module Kernel.MopsaListDeps) in
+    let deps = calc_deps db_dir json (module Kernel.MopsaListDeps) in
     Kernel.result "dependencies:@\n%a"
       (Pretty_utils.pp_list ~sep:"@\n"
          (Pretty_utils.pp_pair ~sep:":\t"
@@ -226,7 +227,7 @@ let run () =
   end
   else if (Kernel.MopsaTarget.get ()) <> [] then begin
     (* '-mopsa-target' mode *)
-    let deps = calc_deps json (module Kernel.MopsaTarget) in
+    let deps = calc_deps db_dir json (module Kernel.MopsaTarget) in
 
     (* Add preprocessing flags for files in the DB *)
     List.iter (fun (fname, args) ->
@@ -258,9 +259,9 @@ let run () =
   end else begin (* 'print-targets' mode *)
     let pp_target fmt target =
       let path =
-        target |> Util.member "filename" |> to_string |> Filepath.of_string
+        target |> member "filename" |> to_string |> Filepath.of_string
       in
-      let ttype = target |> Util.member "type" |> to_string in
+      let ttype = target |> member "type" |> to_string in
       Format.fprintf fmt "[%-10s] %a" ttype Filepath.pretty path
     in
     Kernel.result "targets:@\n%a"

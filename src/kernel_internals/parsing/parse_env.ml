@@ -18,13 +18,13 @@ module SourceFiles =
       let size = 1
     end)
 
-(* maps .i/.pp files to their workdir (when a JCDB is used) *)
+(* maps .i/.pp files to their workdir (when a JCDB/Mopsa-DB is used) *)
 module PreprocessingWorkdir =
   State_builder.Hashtbl(Filepath.Hashtbl)(Filepath)
     (struct
       let name = "PreprocessingWorkdir"
       let dependencies =
-        [ Kernel.Files.self; Kernel.CompilationDb.self ]
+        [ Kernel.CompilationDb.self; Kernel.MopsaDb.self ]
       let size = 2
     end)
 
