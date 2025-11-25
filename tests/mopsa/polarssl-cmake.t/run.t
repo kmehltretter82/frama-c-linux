@@ -43,7 +43,7 @@ messages, such as '-- Configuring done (0.1s)'
     [executable] programs/x509/cert_app
     [executable] programs/x509/crl_app
   $ cd ..
-  $ frama-c -mopsa-db build -mopsa-target build/library/libpolarssl.a
+  $ frama-c -mopsa-db build -mopsa-target library/libpolarssl.a
   [kernel] Parsing library/aes.c (with preprocessing)
   [kernel] Parsing library/arc4.c (with preprocessing)
   [kernel] Parsing library/asn1parse.c (with preprocessing)

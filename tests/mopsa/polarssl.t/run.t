@@ -156,3 +156,9 @@ be "-I '$TESTCASE_ROOT/include'".
     Incorrect type for argument 4. The argument will be cast from unsigned int to int.
   [kernel:typing:variadic] library/x509parse.c:3235: Warning: 
     Incorrect type for argument 2. The argument will be cast from int to unsigned int.
+
+# Test running Frama-C from a directory other than the one containing the
+# mopsa-db.json file
+  $ mkdir -p subdir && cd subdir && frama-c -no-autoload-plugins -load-plugin eva -mopsa-db ../shortened-mopsa-db.json -mopsa-target library/libpolarssl.a -kernel-warn-key typing:variadic=inactive
+  [kernel] Parsing $TESTCASE_ROOT/library/aes.c (with preprocessing)
+  [kernel] Parsing $TESTCASE_ROOT/library/arc4.c (with preprocessing)
