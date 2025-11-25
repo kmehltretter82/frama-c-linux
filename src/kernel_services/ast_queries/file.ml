@@ -554,7 +554,7 @@ let build_cpp_cmd = function
     in
     let workdir, cpp_command_with_chdir = adjust_pwd f cpp_command in
     if workdir <> None then
-      Parse_env.set_workdir ppf (Filepath.to_string_abs (Option.get workdir));
+      Parse_env.set_workdir ppf (Option.get workdir);
     Kernel.feedback ~dkey:Kernel.dkey_pp
       "preprocessing with \"%s\""
       cpp_command_with_chdir;

@@ -8,6 +8,6 @@
 
 val open_source : scan_references:bool -> Filepath.t -> (string, string) result
 
-val set_workdir : Filepath.t -> string -> unit
+val set_workdir : Filepath.t -> Filepath.t -> unit
 
-val get_workdir : Filepath.t -> string option
+val get_workdir : Filepath.t -> Filepath.t option
