@@ -347,7 +347,6 @@ with tempfile.TemporaryDirectory() as tmpdirname:
         if args.verbose:
             print(f"[INFO] running command: {' '.join(cmd)}")
         proc = subprocess.run(cmd, capture_output=True, cwd=tmpdirname)
-        Path(f).with_suffix(".o").unlink(missing_ok=True)
         if typ == "none":
             if proc.returncode != 0:
                 logging.critical("cannot compile sample C file with provided compiler and flags.")
@@ -410,7 +409,6 @@ with tempfile.TemporaryDirectory() as tmpdirname:
         if args.verbose:
             print(f"[INFO] running command: {' '.join(cmd)}")
         proc = subprocess.run(cmd, capture_output=True, cwd=tmpdirname)
-        Path(f).with_suffix(".o").unlink(missing_ok=True)
         return proc.returncode == 0
 
     align_test = 1
