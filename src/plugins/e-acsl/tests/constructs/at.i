@@ -1,5 +1,5 @@
 /* run.config
-   COMMENT: \at
+   COMMENT: \at on supported as well as unsupported labels
 */
 
 int A = 0;
@@ -16,6 +16,7 @@ F:
   /*@ assert \at(A,Pre) == 0; */
   /*@ assert \at(A,F) == 1; */
   /*@ assert \at(A,Here) == 2; */
+  /*@ check \at(A,Init) == 4; */ // Init is not supported
   /*@ assert \at(\at(A,Pre),F) == 0; */
   A = 3;
   /*@ requires \at(A,Here) == 3;
@@ -24,6 +25,10 @@ F:
       ensures \at(A,Post) == 4;
   */
   A = 4;
+  for (int i = 0; i < 2; i++) {
+    // LoopEntry label is not supported
+    //@ check \at(i, LoopEntry) ≡ 0;
+  }
 }
 
 void g(int *p, int *q) {
