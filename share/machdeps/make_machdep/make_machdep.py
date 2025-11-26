@@ -346,7 +346,7 @@ with tempfile.TemporaryDirectory() as tmpdirname:
             cmd = cmd + ["-E"]
         if args.verbose:
             print(f"[INFO] running command: {' '.join(cmd)}")
-        proc = subprocess.run(cmd, capture_output=True)
+        proc = subprocess.run(cmd, capture_output=True, cwd=tmpdirname)
         Path(f).with_suffix(".o").unlink(missing_ok=True)
         if typ == "none":
             if proc.returncode != 0:
@@ -388,7 +388,7 @@ with tempfile.TemporaryDirectory() as tmpdirname:
         find_value(p.stem, typ, proc.stderr.decode())
 
     version_output = subprocess.run(
-        [args.compiler, args.compiler_version], capture_output=True, text=True
+        [args.compiler, args.compiler_version], capture_output=True, text=True, cwd=tmpdirname
     )
     version_lines = version_output.stdout.splitlines()
     if not version_lines:
@@ -409,7 +409,7 @@ with tempfile.TemporaryDirectory() as tmpdirname:
         cmd = compilation_command + [f"-DALIGN_TEST={align_test}", str(f)]
         if args.verbose:
             print(f"[INFO] running command: {' '.join(cmd)}")
-        proc = subprocess.run(cmd, capture_output=True)
+        proc = subprocess.run(cmd, capture_output=True, cwd=tmpdirname)
         Path(f).with_suffix(".o").unlink(missing_ok=True)
         return proc.returncode == 0
 
@@ -435,7 +435,9 @@ with tempfile.TemporaryDirectory() as tmpdirname:
     cmd = compilation_command + ["-dM", "-E", "-"]
     if args.verbose:
         print(f"[INFO] running command: {' '.join(cmd)}")
-    proc = subprocess.run(cmd, stdin=subprocess.DEVNULL, capture_output=True, text=True)
+    proc = subprocess.run(
+        cmd, stdin=subprocess.DEVNULL, capture_output=True, text=True, cwd=tmpdirname
+    )
     if proc.returncode == 0:
         custom = dict()
         for line in proc.stdout.splitlines():
