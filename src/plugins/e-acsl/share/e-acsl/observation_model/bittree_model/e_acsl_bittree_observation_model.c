@@ -301,22 +301,22 @@ void *eacsl_store_block(void *ptr, size_t size) {
     private_abort("Attempt to record NULL block");
   else {
     char *check = (char *)ptr;
-    bt_block *exitsing_block = bt_find(ptr);
-    if (exitsing_block) {
+    bt_block *existing_block = bt_find(ptr);
+    if (existing_block) {
       private_abort("\nRecording %a [%lu] at %s:%d failed."
                     " Overlapping block %a [%lu] found at %s:%d\n",
                     ptr, size, cloc.file, cloc.line, eacsl_base_addr(check),
-                    eacsl_block_length(check), exitsing_block->file,
-                    exitsing_block->line);
+                    eacsl_block_length(check), existing_block->file,
+                    existing_block->line);
     }
     check += size - 1;
-    exitsing_block = bt_find(check);
-    if (exitsing_block) {
+    existing_block = bt_find(check);
+    if (existing_block) {
       private_abort("\nRecording %a [%lu] at %d failed."
                     " Overlapping block %a [%lu] found at %s:%d\n",
                     ptr, size, cloc.file, cloc.line, eacsl_base_addr(check),
-                    eacsl_block_length(check), exitsing_block->file,
-                    exitsing_block->line);
+                    eacsl_block_length(check), existing_block->file,
+                    existing_block->line);
     }
   }
 #endif

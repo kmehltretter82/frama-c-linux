@@ -1,10 +1,10 @@
 /* run.config
- COMMENT: depends from files mentionned into "abs.driver"
+ COMMENT: depends on files mentioned in "abs.driver"
  DEPS: @PTEST_DEPS@ abs.why
    OPT: -wp-driver %{dep:@PTEST_DIR@/abs.driver}
  */
 /* run.config_qualif
- COMMENT: depends from files mentionned into "abs.driver"
+ COMMENT: depends on files mentioned in "abs.driver"
  DEPS: @PTEST_DEPS@ abs.why
    OPT: -wp -wp-driver %{dep:@PTEST_DIR@/abs.driver}
 */

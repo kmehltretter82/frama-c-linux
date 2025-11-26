@@ -175,7 +175,7 @@ let extract_bits ~start ~stop v =
 (* --------- *)
 
 (* Operators are at toplevel but we want to be able to have them without
-   openning everything, so we create an additionnal module. *)
+   opening everything, so we create an additional module. *)
 module Operators = struct
   include Compare
   let ( ~- ) = ( ~- )
@@ -194,7 +194,7 @@ module Operators = struct
   let ( ** ) = ( ** )
 end
 
-(* We also want relationnal operators at top level. *)
+(* We also want relational operators at top level. *)
 include Compare
 
 (* -------- *)

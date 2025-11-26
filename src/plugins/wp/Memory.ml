@@ -294,7 +294,7 @@ sig
   *)
 
   val frame : sigma -> pred list
-  (** Assert the memory is a proper heap state preceeding the function
+  (** Assert the memory is a proper heap state preceding the function
       entry point. *)
 
   val alloc : sigma -> varinfo list -> sigma
@@ -559,7 +559,7 @@ sig
     ?lvars:logic_var list ->
     unit -> env
 
-  (** The {i current} memory state. Must be propertly initialized
+  (** The {i current} memory state. Must be properly initialized
       with a specific {!move} before. *)
   val current : env -> sigma
 

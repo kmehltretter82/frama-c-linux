@@ -1,0 +1,132 @@
+[default.extend-identifiers]
+Cose = "Cose"
+Cristal = "Cristal"
+Cros = "Cros"
+MODULEs = "MODULEs"
+alignd = "alignd"
+classeName = "classeName"
+cose = "cose"
+froms = "froms"
+nd = "nd"
+ot = "ot"
+permut = "permut"
+pn = "pn"
+sav = "sav"
+tio = "tio"
+typ = "typ"
+typs = "typs"
+
+[default.extend-words]
+Aspec = "Aspec" # constructor (A spec)
+Cose = "Cose" # as in CoSE layout, in cytoscape
+Cristal = "Cristal" # old INRIA research team
+Cros = "Cros" # Last name of a Frama-C developer
+ECT = "ECT" # TCP-related acronym
+Ono = "Ono"
+PARMS = "PARMS" # abbr. of parameters
+Padd = "Padd" # constructor for addition
+Referers = "Referers" # apparently the OED now accepts this
+TOU = "TOU" # as in TOC TOU (time-of-check to time-of-use)
+Unsuccess = "Unsuccess" # WP uses this as a PO status
+WHT = "WHT" # part of an identifier in dirent.h
+WRONLY = "WRONLY" # O_WRONLY (write-only)
+Wonce = "Wonce" # Warn-once constructor
+atend = "atend" # "at end", present in PS files
+ba = "ba"
+breal = "breal"
+clen = "clen" # variable name (c len)
+cose = "cose" # as in CoSE layout, in cytoscape
+datas = "datas" # has too many occurrences to be fixed
+eles = "eles" # variable name (elements)
+finitel = "finitel" # C function (finite long double)
+fle = "fle" # floating less than or equal
+flor = "flor" # in Cint, related to f_lor
+fnd = "fnd"
+fo = "fo"
+froms = "froms" # \from clauses in assigns
+iterm = "iterm"
+iy = "iy" # short variable name
+lene = "lene" # variable name (l ene)
+lok = "lok" # variable name (l ok)
+marger = "marger" # something that "creates a margin" in OCaml Format?
+mone = "mone" # minus one
+nd = "nd" # short variable name
+numer = "numer" # as in "numerator"/"denominator" in a division
+ome = "ome" # short variable name
+onef = "onef" # identifier (one float)
+ot = "ot" # short variable name
+padds = "padds" # paddings
+parm = "parm" # abbr. of parameter
+parms = "parms" # abbr. of parameters
+permut = "permut"
+ptd = "ptd" # part of identifier (pointed)
+referers = "referers" # apparently the OED now accepts this
+sav = "sav" # 3-letter extension for save files
+seh = "seh" # variable name
+siz = "siz" # variable name (for 'size')
+tabl = "tabl" # variable name
+templat = "templat" # in ACSL spec; template is a C++ keyword to be avoided
+tha = "tha"
+thex = "thex" # variable name (related to 'hex')
+thi = "thi"
+thm = "thm" # short variable name
+thn = "thn" # thread number n (mthread)
+thq = "thq" # short variable name
+ths = "ths" # short variable name
+tio = "tio" # terminal I/O
+typ = "typ" # type name (must be different from the 'type' keyword)
+typdef = "typdef"
+typs = "typs" # plural of typ
+undet = "undet" # variable name for a non-deterministic value
+unio = "unio" # variable name for a union
+varity = "varity" # related to variadic arguments
+
+[files]
+extend-exclude = [
+"*.svg",
+# exclude generated files
+"*.oracle",
+# excluded because they contain French text, hashes, or contain typos that were
+# not introduced by us and we do not feel like fixing them (e.g. source code
+# written by others)
+"**/*.bib",
+"doc/**/macros_modern.tex",
+"doc/aorai/macros.tex",
+"doc/developer/macros.sty",
+"doc/eva/tutorial/Reference_Implementation/*",
+"doc/makeLatex",
+"doc/pdg/*.tex",
+"doc/scope/M.v",
+"doc/scope/scope.tex",
+"doc/slicing/design-fr/*",
+"doc/slicing/user-manual-fr/*.tex",
+"nix/sources.json",
+"share/libc/netinet/tcp.h",
+"src/plugins/acsl-importer/doc/manual/bib.bib",
+"src/plugins/aorai/path_analysis.ml",
+"src/plugins/e-acsl/contrib/libdlmalloc/dlmalloc.c",
+"src/plugins/e-acsl/doc/doxygen/doxygen.cfg.in",
+"src/plugins/e-acsl/doc/refman/macros_modern.tex",
+"src/plugins/e-acsl/doc/userman/macros.tex",
+"src/plugins/eva/tests/idct/idct.c",
+"src/plugins/eva/tests/idct/idct.c",
+"src/plugins/eva/tests/idct/ieee_1180_1990.c",
+"src/plugins/eva/tests/value/CruiseControl.c",
+"src/plugins/eva/tests/value/CruiseControl.h",
+"src/plugins/volatile/tests/basic/bts_1030.i",
+"src/plugins/wp/tests/wp_gallery/frama_c_exo2_solved.c",
+"src/plugins/wp/tests/wp_gallery/frama_c_exo3_solved.old.c",
+"src/plugins/wp/tests/wp_gallery/frama_c_exo3_solved.old.v2.c",
+"src/plugins/wp/tests/wp_gallery/frama_c_exo3_solved.simplified.c",
+"tests/mopsa/cjson.t/cJSON.h",
+"tests/mopsa/polarssl-cmake.t/*",
+"tests/mopsa/polarssl.t/*",
+"tests/pdg/call.c",
+"tests/pdg/loops.c",
+"tests/pdg/simple_intra_slice.c",
+"tests/slicing/adpcm.c",
+"tests/slicing/simple_intra_slice.ml",
+"tests/spec/enum.c",
+"tests/spec/prototype_assigns.c",
+"tests/syntax/gnu-asm-aesni.c",
+]

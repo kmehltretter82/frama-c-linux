@@ -238,7 +238,7 @@ void c17_6_7_5_2_e(void){
 }
 #endif
 
-// c17_6_7_5_3: _Alignas accepts valid or extended alingment.
+// c17_6_7_5_3: _Alignas accepts valid or extended alignment.
 // --> cf c17_6_2_8_3/4 above
 
 // c17_6_7_5_4: no implementation for testing that

@@ -30,7 +30,7 @@ val do_it:
     message. *)
 
 exception No_simple_translation of predicate
-(** Exceptin raised if [untyped_to_exp] would generate new statements in the
+(** Exception raised if [untyped_to_exp] would generate new statements in the
     environment *)
 
 val untyped_to_exp: predicate -> exp

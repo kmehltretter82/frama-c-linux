@@ -230,7 +230,7 @@ void various_conditions () {
   }
   Frama_C_show_each_12(res);
   res = 0;
-  /* Loops with conjonction of exit conditions. */
+  /* Loops with conjunction of exit conditions. */
   for (int i = 13 ; i-- && undet; ) {
     res ++;
   }

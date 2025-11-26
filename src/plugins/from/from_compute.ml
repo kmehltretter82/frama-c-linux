@@ -369,7 +369,7 @@ struct
               From_memory.compose call_substituted before_call
             in
             let state = {state with deps_table = deps_after_call } in
-            (* Treatement for the possible assignment
+            (* Treatment for the possible assignment
                of the call result *)
             match dest with
             | None -> state

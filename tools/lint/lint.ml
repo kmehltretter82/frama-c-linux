@@ -21,7 +21,7 @@ type tool_cmds =
 (** The only part to modify for adding a new external formatters *)
 
 (** Supported indent formatters *)
-(* if you add formatters or change targetted versions, be sure
+(* if you add formatters or change targeted versions, be sure
    to keep the CI configuration in sync in nix/pkgs.nix.
 *)
 let external_formatters = [

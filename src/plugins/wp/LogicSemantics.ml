@@ -9,7 +9,7 @@
 (* -------------------------------------------------------------------------- *)
 (* --- ACSL Translation                                                   --- *)
 (* --- LogicSemantics and LogicCompiler are mutually recursive (cycle     --- *)
-(* --- closed by "boostrap*" function                                     --- *)
+(* --- closed by "bootstrap*" function                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
 open Cil_types

@@ -183,6 +183,7 @@ ptests_config header_spec=.ignore
 
 /dev/docker/*.sh header_spec=.ignore
 /dev/docker/Dockerfile header_spec=.ignore
+/dev/_typos.toml header_spec=.ignore
 
 /doc/CC-BY-SA-4.0 header_spec=.ignore
 /doc/CHANGES.obfuscator header_spec=.ignore

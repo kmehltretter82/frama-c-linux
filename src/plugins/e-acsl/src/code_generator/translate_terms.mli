@@ -55,7 +55,7 @@ val denominator_zero_guard :
     - [denom]: the term to translate. *)
 
 exception No_simple_translation of term
-(** Exceptin raised if [untyped_to_exp] would generate new statements in
+(** Exception raised if [untyped_to_exp] would generate new statements in
     the environment *)
 
 val untyped_to_exp: typ option -> term -> exp

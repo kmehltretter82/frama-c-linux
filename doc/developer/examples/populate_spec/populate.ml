@@ -1,11 +1,11 @@
 open Cil_types
 
-(* We start by defining all our generation function. Each function takes 2
+(* We start by defining all our generation functions. Each function takes 2
    parameters:
    - the current kernel_function for which we want to generate specifications.
-   - this kernel function specifications.
+   - this kernel function's specifications.
 
-   And returns a new clause, which needs to match the type of clause we are
+   And returns a new clause, which needs to match the type of the clause we are
    currently generating (See Populate_spec.mli for more details.)
 *)
 
@@ -32,15 +32,15 @@ let gen_terminates kf _ =
     None
   else Some(Logic_const.(new_predicate pfalse))
 
-(* Property status to be emitted for the generated clauses. *)
+(* Property statuses to be emitted for the generated clauses. *)
 let status_exits = Property_status.Dont_know
 let status_assigns = Property_status.True
 let status_allocates = Property_status.Dont_know
 let status_terminates = Property_status.Dont_know
 
 (* Main loop, iter on all functions and generate their specification.
-   If [do_body] is false by default, and is used to enable generation for
-   function with bodies.
+   [do_body] is false by default, and is used to enable generation for
+   functions with bodies.
    We also give a list of clauses, which will be generated using the selected
    mode.
 *)
@@ -52,10 +52,10 @@ let run () =
   Globals.Functions.iter generate_spec
 
 (* This function registers a new mode "mymode" which can be selected using
-   command line options. All parameters are optionnals, and if left unspecified,
+   command line options. All parameters are optional, and if left unspecified,
    Frama_C mode will be used to generate the corresponding clauses
-   (emits a warning). Status are also optionnals, but omitting them will results
-   in no emition (emits a warning).
+   (emits a warning). Statuses are also optional, but omitting them will result
+   in no status emission (but emits a warning).
 *)
 let create_mode () =
   Format.printf "Registering a new spec generation mode@.";

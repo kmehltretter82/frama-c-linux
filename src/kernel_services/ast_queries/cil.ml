@@ -3171,7 +3171,7 @@ let foldAlignasToInt = function
   | None -> None
   | Some v ->
     match !constfoldtoint v with
-    | None -> Kernel.fatal "%a should be a constant expresion" !pp_exp_ref v
+    | None -> Kernel.fatal "%a should be a constant expression" !pp_exp_ref v
     | Some v when not @@ Z.fits_int v -> Kernel.fatal "_Alignas is too big"
     | Some v when Z.equal Z.zero v -> None
     | Some v -> Some (Z.to_int v)

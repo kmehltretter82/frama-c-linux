@@ -13,7 +13,7 @@ PLUGIN: e-acsl eva,scope,inout rtegen
 LIBS: @PTEST_SUITE_DIR@/../E_ACSL_test
 LOG: gen_@PTEST_NAME@.c
 
-COMMENT: The dependency to the plugin share directory has not to be explicited
+COMMENT: No need for explicit dependency towards the plugin share directory
 DEPS:
 
 OPT: @GLOBAL@ @EACSL@ -then-last @EVA@ @EVENTUALLY@
