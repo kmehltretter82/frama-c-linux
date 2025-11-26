@@ -29,6 +29,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import tempfile
 import logging
 import yaml
 
@@ -332,147 +333,149 @@ def find_macros_value(output, is_list=False, entry=None):
         print(f"compiler output is:{output}")
 
 
-for f, typ in source_files:
-    p = my_path / f
-    cmd = compilation_command + [str(p)]
-    if typ in ("macro", "macrolist"):
-        # We're just interested in expanding a macro,
-        # treatment is a bit different than the rest.
-        cmd = cmd + ["-E"]
+with tempfile.TemporaryDirectory() as tmpdirname:
     if args.verbose:
-        print(f"[INFO] running command: {' '.join(cmd)}")
-    proc = subprocess.run(cmd, capture_output=True)
-    Path(f).with_suffix(".o").unlink(missing_ok=True)
-    if typ == "none":
-        if proc.returncode != 0:
-            logging.critical("cannot compile sample C file with provided compiler and flags.")
-            logging.info(f"compiler output is:{proc.stderr.decode()}")
-            sys.exit(1)
-        continue
-    if typ == "macro":
-        if proc.returncode != 0:
-            logging.warning(
-                f"error in preprocessing value '{p}', some values won't be filled\ncompiler output is:\n{proc.stderr.decode()}"
-            )
+        print(f"[INFO] created temporary directory {tmpdirname}")
+
+    for f, typ in source_files:
+        p = my_path / f
+        cmd = compilation_command + [str(p)]
+        if typ in ("macro", "macrolist"):
+            # We're just interested in expanding a macro,
+            # treatment is a bit different than the rest.
+            cmd = cmd + ["-E"]
+        if args.verbose:
+            print(f"[INFO] running command: {' '.join(cmd)}")
+        proc = subprocess.run(cmd, capture_output=True)
+        Path(f).with_suffix(".o").unlink(missing_ok=True)
+        if typ == "none":
+            if proc.returncode != 0:
+                logging.critical("cannot compile sample C file with provided compiler and flags.")
+                logging.info(f"compiler output is:{proc.stderr.decode()}")
+                sys.exit(1)
+            continue
+        if typ == "macro":
+            if proc.returncode != 0:
+                logging.warning(
+                    f"error in preprocessing value '{p}', some values won't be filled\ncompiler output is:\n{proc.stderr.decode()}"
+                )
+                name = p.stem
+                if name in machdep:
+                    machdep[name] = ""
+                continue
+            find_macros_value(cleanup_cpp(proc.stdout.decode()))
+            continue
+        if typ == "macrolist":
             name = p.stem
-            if name in machdep:
-                machdep[name] = ""
+            if proc.returncode != 0:
+                logging.warning(
+                    f"error in preprocessing value '{p}', some values might not be filled\ncompiler output is:{proc.stderr.decode()}"
+                )
+                if name in machdep:
+                    machdep[name] = {}
+                continue
+            find_macros_value(cleanup_cpp(proc.stdout.decode()), is_list=True, entry=name)
             continue
-        find_macros_value(cleanup_cpp(proc.stdout.decode()))
-        continue
-    if typ == "macrolist":
-        name = p.stem
-        if proc.returncode != 0:
-            logging.warning(
-                f"error in preprocessing value '{p}', some values might not be filled\ncompiler output is:{proc.stderr.decode()}"
-            )
-            if name in machdep:
-                machdep[name] = {}
+        if typ == "has__builtin_va_list":
+            # Special case: compilation success determines presence or absence
+            machdep["has__builtin_va_list"] = proc.returncode == 0
             continue
-        find_macros_value(cleanup_cpp(proc.stdout.decode()), is_list=True, entry=name)
-        continue
-    if typ == "has__builtin_va_list":
-        # Special case: compilation success determines presence or absence
-        machdep["has__builtin_va_list"] = proc.returncode == 0
-        continue
-    if proc.returncode == 0:
-        # all tests should fail on an appropriate _Static_assert
-        # if compilation succeeds, we have a problem
-        logging.warning(f"could not identify value of '{p.stem}', skipping")
-        continue
-    find_value(p.stem, typ, proc.stderr.decode())
+        if proc.returncode == 0:
+            # all tests should fail on an appropriate _Static_assert
+            # if compilation succeeds, we have a problem
+            logging.warning(f"could not identify value of '{p.stem}', skipping")
+            continue
+        find_value(p.stem, typ, proc.stderr.decode())
 
-version_output = subprocess.run(
-    [args.compiler, args.compiler_version], capture_output=True, text=True
-)
-version_lines = version_output.stdout.splitlines()
-if not version_lines:
-    logging.warning(
-        "could not obtain compiler version with "
-        + f"'{args.compiler_version}'"
-        + ", check option --compiler-version"
+    version_output = subprocess.run(
+        [args.compiler, args.compiler_version], capture_output=True, text=True
     )
-    version = "<unknown>"
-else:
-    version = version_output.stdout.splitlines()[0]
+    version_lines = version_output.stdout.splitlines()
+    if not version_lines:
+        logging.warning(
+            "could not obtain compiler version with "
+            + f"'{args.compiler_version}'"
+            + ", check option --compiler-version"
+        )
+        version = "<unknown>"
+    else:
+        version = version_output.stdout.splitlines()[0]
 
+    # Special case for determining whether extended alignments are supported, and,
+    # if yes what is the maximal value allowed. We assume that it does not depend
+    # on the exact compilation context.
+    def test_possible_alignas(align_test):
+        f = my_path / "max_extended_alignment.c"
+        cmd = compilation_command + [f"-DALIGN_TEST={align_test}", str(f)]
+        if args.verbose:
+            print(f"[INFO] running command: {' '.join(cmd)}")
+        proc = subprocess.run(cmd, capture_output=True)
+        Path(f).with_suffix(".o").unlink(missing_ok=True)
+        return proc.returncode == 0
 
-# Special case for determining whether extended alignments are supported, and,
-# if yes what is the maximal value allowed. We assume that it does not depend
-# on the exact compilation context.
-def test_possible_alignas(align_test):
-    f = my_path / "max_extended_alignment.c"
-    cmd = compilation_command + [f"-DALIGN_TEST={align_test}", str(f)]
+    align_test = 1
+    if machdep["alignof_max_align_t"] is not None:
+        align_test = 2 * machdep["alignof_max_align_t"]
+
+    machdep["max_extended_alignment"] = -1
+
+    while test_possible_alignas(align_test):
+        machdep["max_extended_alignment"] = align_test
+        align_test = 2 * align_test
+
+    machdep["compiler"] = args.compiler
+    machdep["cpp_arch_flags"] = args.cpp_arch_flags
+    machdep["version"] = version
+
+    machdep["custom_defs"] = dict()
+
+    # Extract predefined macros; we're assuming a gcc-like compiler here.
+    # Leave custom_defs empty if this fails.
+
+    cmd = compilation_command + ["-dM", "-E", "-"]
     if args.verbose:
         print(f"[INFO] running command: {' '.join(cmd)}")
-    proc = subprocess.run(cmd, capture_output=True)
-    Path(f).with_suffix(".o").unlink(missing_ok=True)
-    return proc.returncode == 0
+    proc = subprocess.run(cmd, stdin=subprocess.DEVNULL, capture_output=True, text=True)
+    if proc.returncode == 0:
+        custom = dict()
+        for line in proc.stdout.splitlines():
+            # Preprocessor emits a warning if we're trying to #undef
+            # standard macros. Leave them alone.
+            if re.match(r"#define *__STDC", line):
+                continue
+            macro = re.match(r"# *define *([^ ]*) *(.*)", line)
+            if not macro:
+                # This skips over ifndef/endif blocs for msvc, maybe this
+                # will be a problem later.
+                continue
+            macro_var = macro.group(1)
+            macro_val = macro.group(2)
+            # Python >= 3.7: dict is guaranteed to preserve insertion order
+            custom[macro_var] = macro_val
+        machdep["custom_defs"] = custom
+    else:
+        logging.warning(
+            f"could not determine predefined macros. compiler output is:\n{proc.stderr}"
+        )
 
+    if args.from_file and args.in_place:
+        machdep["machdep_name"] = Path(args.from_file).stem
+    elif args.dest_file:
+        machdep["machdep_name"] = Path(args.dest_file.name).stem
+    else:
+        machdep["machdep_name"] = "anonymous_machdep"
 
-align_test = 1
-if machdep["alignof_max_align_t"] is not None:
-    align_test = 2 * machdep["alignof_max_align_t"]
+    def is_optional(field):
+        return "optional" in schema[field] and schema[field]["optional"]
 
-machdep["max_extended_alignment"] = -1
+    machdep = {f: v for [f, v] in machdep.items() if not (is_optional(f) and v is None)}
 
-while test_possible_alignas(align_test):
-    machdep["max_extended_alignment"] = align_test
-    align_test = 2 * align_test
+    missing_fields = [f for [f, v] in machdep.items() if v is None]
 
-machdep["compiler"] = args.compiler
-machdep["cpp_arch_flags"] = args.cpp_arch_flags
-machdep["version"] = version
+    if missing_fields:
+        msg = ", ".join(missing_fields)
+        logging.warning(f"the following fields are missing from the machdep definition: {msg}")
+        for field in missing_fields:
+            machdep[field] = default_value(schema[field]["type"])
 
-machdep["custom_defs"] = dict()
-
-# Extract predefined macros; we're assuming a gcc-like compiler here.
-# Leave custom_defs empty if this fails.
-
-cmd = compilation_command + ["-dM", "-E", "-"]
-if args.verbose:
-    print(f"[INFO] running command: {' '.join(cmd)}")
-proc = subprocess.run(cmd, stdin=subprocess.DEVNULL, capture_output=True, text=True)
-if proc.returncode == 0:
-    custom = dict()
-    for line in proc.stdout.splitlines():
-        # Preprocessor emits a warning if we're trying to #undef
-        # standard macros. Leave them alone.
-        if re.match(r"#define *__STDC", line):
-            continue
-        macro = re.match(r"# *define *([^ ]*) *(.*)", line)
-        if not macro:
-            # This skips over ifndef/endif blocs for msvc, maybe this
-            # will be a problem later.
-            continue
-        macro_var = macro.group(1)
-        macro_val = macro.group(2)
-        # Python >= 3.7: dict is guaranteed to preserve insertion order
-        custom[macro_var] = macro_val
-    machdep["custom_defs"] = custom
-else:
-    logging.warning(f"could not determine predefined macros. compiler output is:\n{proc.stderr}")
-
-if args.from_file and args.in_place:
-    machdep["machdep_name"] = Path(args.from_file).stem
-elif args.dest_file:
-    machdep["machdep_name"] = Path(args.dest_file.name).stem
-else:
-    machdep["machdep_name"] = "anonymous_machdep"
-
-
-def is_optional(field):
-    return "optional" in schema[field] and schema[field]["optional"]
-
-
-machdep = {f: v for [f, v] in machdep.items() if not (is_optional(f) and v is None)}
-
-missing_fields = [f for [f, v] in machdep.items() if v is None]
-
-if missing_fields:
-    msg = ", ".join(missing_fields)
-    logging.warning(f"the following fields are missing from the machdep definition: {msg}")
-    for field in missing_fields:
-        machdep[field] = default_value(schema[field]["type"])
-
-print_machdep(machdep)
+    print_machdep(machdep)
