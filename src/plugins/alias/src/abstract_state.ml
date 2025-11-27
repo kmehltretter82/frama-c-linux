@@ -20,6 +20,7 @@ module EdgeLabel = struct
     | Pointer, Field _ -> -1
     | Field lv, Field rv -> Fieldinfo.compare lv rv
     | Field _, Pointer -> 1
+  let equals l r = compare l r = 0
   let default = Pointer
   let is_pointer = function Pointer -> true | _ -> false
   let is_field = function Field _ -> true | _ -> false
@@ -650,22 +651,19 @@ let is_included s s' =
   assert_invariants s';
   let exception Not_included in
   try
-    let iter_varmap (var : varinfo) v : unit =
+    let check_var (var : varinfo) v : unit =
       let v' = try VarMap.find var s'.varmap with Not_found -> raise Not_included in
-      (* TODO: render correct for structs *)
-      let succs =
-        E.Map.of_seq @@ Seq.map (fun e -> E.label e, E.dst e) @@ List.to_seq @@ G.succ_e s.graph v
-      and succs' =
-        E.Map.of_seq @@ Seq.map (fun e -> E.label e, E.dst e) @@ List.to_seq @@ G.succ_e s'.graph v'
+      let succs' = G.succ_e s'.graph v' in
+      let check_succ (_, l, succ) =
+        match List.find_opt (fun (_, l', _) -> EdgeLabel.equals l l') succs' with
+        | Some (_, _, succ') when
+            V.equal succ succ'
+            && VarSet.subset (VMap.find succ s.vmap) (VMap.find succ' s'.vmap) -> ()
+        | _ -> raise Not_included
       in
-      let check_succs _ succ1 succ2 = match succ1, succ2 with
-        | None, _ -> None
-        | Some _, None -> raise Not_included
-        | Some v1p, Some v2p -> if V.equal v1p v2p then None else raise Not_included
-      in
-      ignore @@ E.Map.merge check_succs succs succs'
+      G.iter_succ_e check_succ s.graph v
     in
-    VarMap.iter iter_varmap s.varmap; true
+    VarMap.iter check_var s.varmap; true
   with Not_included -> false
 
 let empty : state = {graph = G.empty; varmap = VarMap.empty; vmap = VMap.empty}

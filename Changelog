@@ -30,6 +30,7 @@ o   Kernel    [2025-10-22] Frama-C now includes a custom PPX which adds a
 Open Source Release 32.0 (Germanium)
 ###############################################################################
 
+-*  Alias     [2025-11-25] Fix bug in state merging algorithm
 -   Kernel    [2025-10-30] -variadic-translation produces compilable code even
               in presence of -no-frama-c-stdlib. Fixes #@1608
 -   Kernel    [2025-10-29] New machdep for macOS ARM
