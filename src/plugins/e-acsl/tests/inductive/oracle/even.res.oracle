@@ -1,23 +1,29 @@
 [e-acsl] beginning translation.
-[e-acsl:analysis:inductive] predicate extraction in complete mode
+[e-acsl:analysis:inductive] no valid mode found for: even
+[e-acsl] Warning: Unable to extract executable code from inductive definition of even.
+  See language reference manual for details on the supported forms.
+[e-acsl] even.c:20: Warning: 
+  E-ACSL construct
+  `inductive definitions outside of subset described in the reference manual'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] even.c:21: Warning: 
+  E-ACSL construct
+  `inductive definitions outside of subset described in the reference manual'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] even.c:22: Warning: 
+  E-ACSL construct
+  `inductive definitions outside of subset described in the reference manual'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] even.c:23: Warning: 
+  E-ACSL construct
+  `inductive definitions outside of subset described in the reference manual'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva] even.c:11: Warning: 
-  Using specification of function __gen_e_acsl_even
-  for recursive calls of depth 5. Analysis of function __gen_e_acsl_even
-  is thus incomplete and its soundness relies on the written specification.
-[eva] even.c:12: Warning: 
-  Using specification of function __gen_e_acsl_even
-  for recursive calls of depth 5. Analysis of function __gen_e_acsl_even
-  is thus incomplete and its soundness relies on the written specification.
-[eva:alarm] even.c:18: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] even.c:18: Warning: assertion got status unknown.
-[eva:alarm] even.c:19: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] even.c:19: Warning: assertion got status unknown.
-[eva:alarm] even.c:20: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] even.c:20: Warning: assertion got status unknown.
-[eva:alarm] even.c:21: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] even.c:21: Warning: assertion got status unknown.
+[eva:alarm] even.c:22: Warning: assertion got status unknown.
+[eva:alarm] even.c:23: Warning: assertion got status unknown.
