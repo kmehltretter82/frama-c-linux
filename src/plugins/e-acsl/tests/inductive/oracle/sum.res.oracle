@@ -3,7 +3,7 @@
 [e-acsl] Warning: Translation of sum might be unsound (if multiple cases apply to some given arguments simultaneously).
 [e-acsl] sum.c:30: Warning: 
   no assigns clause generated for function sum because pointers as arguments is not yet supported
-[e-acsl] sum.c:13: Warning: 
+[e-acsl] sum.c:17: Warning: 
   no assigns clause generated for function sum because pointers as arguments is not yet supported
 [e-acsl] Warning: Translation of sum might be unsound (if multiple cases apply to some given arguments simultaneously).
 [e-acsl] translation done in project "e-acsl".

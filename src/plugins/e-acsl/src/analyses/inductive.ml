@@ -275,6 +275,7 @@ end = struct
   }
 
   let analyze_mode ~lv_rec p mode =
+    let quantifiers, p = extract_foralls p in
     let is_rec_occurrence li = Logic_var.equal li.l_var_info lv_rec in
     (* fv: free variables that have been used up to the current point *)
     (* they will need to be substituted for in the conclusion unless they have
@@ -337,17 +338,20 @@ end = struct
           in Substs.of_list @@ List.filter_map var_subst pairs
         in
         let fv = add_fv fv args in
-        let unbound =
-          Vars.filter (fun v -> not @@ Substs.mem v substs) (Vars.diff fv lb)
+        let free_quantified_vars = Vars.inter fv quantifiers in
+        let unbound_quantified_vars =
+          Vars.filter
+            (fun v -> not @@ Substs.mem v substs)
+            (Vars.diff free_quantified_vars lb)
         in
-        if Vars.is_empty unbound
+        if Vars.is_empty unbound_quantified_vars
         then Some {Modus.mode; substs}
         else
           let () =
             Options.feedback ~dkey ~level:4
               "mode %a could not bind: %a"
               Mode.pretty mode
-              Vars.pretty unbound;
+              Vars.pretty unbound_quantified_vars;
           in None
       | Papp _ ->
         unsupported ~loc:p.pred_loc
@@ -356,7 +360,7 @@ end = struct
       | Pat (p, _label) -> recurse p
       | _ -> unsupported ~loc:p.pred_loc "unexpected element: %a" Printer.pp_predicate p
     in
-    try test_mode ~lb:Vars.empty ~fv:Vars.empty @@ without_foralls p
+    try test_mode ~lb:Vars.empty ~fv:Vars.empty p
     with Unsupported ->
       unsupported ~loc:p.pred_loc
         "unsupported form: %a"

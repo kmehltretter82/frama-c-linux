@@ -177,7 +177,7 @@ void __gen_e_acsl_sum_fun5_here(__e_acsl_mpz_t *__retres_arg, int *arr,
         __gen_e_acsl_assert_data_2.pred_txt = "Incomplete inductive function";
         __gen_e_acsl_assert_data_2.file = "sum.c";
         __gen_e_acsl_assert_data_2.fct = "sum_fun5_here";
-        __gen_e_acsl_assert_data_2.line = 13;
+        __gen_e_acsl_assert_data_2.line = 17;
         __e_acsl_assert(0,& __gen_e_acsl_assert_data_2);
       }
       __gmpz_init_set_si(__gen_e_acsl__3,0L);
