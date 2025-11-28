@@ -5,7 +5,9 @@
 [e-acsl:analysis:inductive] predicate extraction in complete mode
 [e-acsl:analysis:inductive] function extraction with mode incomplete in 2
 [e-acsl] Warning: Translation of P might be unsound (if multiple cases apply to some given arguments simultaneously).
+[e-acsl] Warning: Translation of fibo might be unsound (if multiple cases apply to some given arguments simultaneously).
 [e-acsl] Warning: Translation of Q might be unsound (if multiple cases apply to some given arguments simultaneously).
+[e-acsl] Warning: Translation of fibo might be unsound (if multiple cases apply to some given arguments simultaneously).
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] substitutions.c:26: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

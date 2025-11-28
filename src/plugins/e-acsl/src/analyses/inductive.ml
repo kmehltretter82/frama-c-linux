@@ -565,9 +565,13 @@ end = functor (Out : Out_language) -> struct
                                l_type = Some res.term_type}
                 in
                 recurse (Logic_const.plet ~loc:p.pred_loc li pr)
-              | _ ->
+              | _ when is_rec_occurrence li ->
                 let p = Logic_const.prel (Req, rec_call (), res) in
                 recurse ~conds:(p :: conds) pr
+              | _ -> (* foreign predicate *)
+                let li' = PredicateExtractor.extract li in
+                let pl = {pl with pred_content = Papp (li', labels, args)} in
+                recurse ~conds:(pl :: conds) pr
           end
         | Pimplies (pl, pr) -> (* simple hypothesis *)
           recurse ~conds:(pl :: conds) pr
@@ -653,7 +657,7 @@ end = struct
     | Incomplete m -> extract_with_mode ~mode:m li
 end
 
-module PredicateExtractor : sig
+and PredicateExtractor : sig
   val extract : logic_info -> logic_info
 end
 = struct
@@ -684,10 +688,12 @@ end
       Unsound_predicates.add wrapper;
       wrapper
 
-  let extract li =
-    let modi = InductiveDef.analyze_modes li in
-    let mode = Modus.preferred ~li modi in
-    extract_with_mode ~mode li
+  let extract =
+    let tbl = Logic_info.Hashtbl.create 7 in
+    fun li -> Logic_info.Hashtbl.memo tbl li @@ fun li ->
+      let modi = InductiveDef.analyze_modes li in
+      let mode = Modus.preferred ~li modi in
+      extract_with_mode ~mode li
 end
 
 let extract_predicate = PredicateExtractor.extract
