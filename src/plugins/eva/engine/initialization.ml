@@ -307,7 +307,7 @@ module Make
         | None -> Cil.makeZeroInit ~loc:vi.vdecl vi.vtype
         | Some (Cil_types.CInit init) -> init
         | Some (Cil_types.StrInit _) ->
-          (* A char array could not be partially but not fully const. *)
+          (* A char array cannot be partially const. *)
           Self.fatal
             "Initializer StrInit for variable %a, which is not a char array"
             Printer.pp_varinfo vi
