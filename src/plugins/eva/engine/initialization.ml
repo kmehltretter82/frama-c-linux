@@ -375,12 +375,13 @@ module Make
     Ast_types.has_qualifier "const" vi.vtype
     && not (Ast_types.has_attribute_memory_block frama_c_mutable vi.vtype)
 
-  let get_cinit vi = function
-    | Cil_types.CInit init -> init
-    | StrInit _ ->
-      Self.fatal
-        "Initializer StrInit for variable %a, which is not a string literal"
-        Printer.pp_varinfo vi
+  (* retrieve the initializer in case some part of the structure is const,
+     hence not subject to -lib-entry. *)
+  let get_cinit = function
+    | Cil_types.CInit init -> Some init
+    | StrInit _ -> None  (* We're initializing an array of char. Either it is fully const,
+                            and we won't initialize it as lib_entry mode, or it is not const
+                            at all, and we don't need the initializer. *)
 
   let initialize_global_variable ~lib_entry vi init state =
     let open Current_loc.Operators in
@@ -388,10 +389,9 @@ module Make
     let pos = Position.global_init vi in
     let state = Domain.enter_scope Abstract_domain.Global [vi] state in
     if vi.vsource then
-      if (lib_entry && not (is_fully_const vi || Ast_info.is_string_literal vi))
-      || vi.vstorage = Extern
+      if (lib_entry && not (is_fully_const vi)) || vi.vstorage = Extern
       then
-        let cinit = Option.map (get_cinit vi) init.init in
+        let cinit = Option.bind get_cinit init.init in
         initialize_var_lib_entry ~pos vi cinit state
       else
         let init = Option.map Eva_ast.translate_init_or_str init.init in
