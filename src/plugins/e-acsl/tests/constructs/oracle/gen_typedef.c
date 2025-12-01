@@ -21,11 +21,13 @@ int main(void)
     __gen_e_acsl_assert_data.pred_txt = "x == 0";
     __gen_e_acsl_assert_data.file = "typedef.i";
     __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 9;
+    __gen_e_acsl_assert_data.line = 10;
     __e_acsl_assert((int)x == 0,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
   /*@ assert x == 0; */ ;
+  __int128 i = (__int128)((int)x + 1);
+  __uint128_t u = (__uint128_t)(i - (__int128)2);
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;
