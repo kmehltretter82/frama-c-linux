@@ -25,6 +25,10 @@ val at_for_stmt: stmt -> At_data.t list
 (** @return the set of labeled predicates and terms to be translated on the
     given statement. *)
 
+val at_for_pot : Pred_or_term.t -> At_data.t
+(** @return the set of labeled predicates and terms to be translated on the
+    given predicate/term. *)
+
 val preprocess: file -> unit
 (** Analyse sources to find the statements where a labeled predicate or term
     should be translated. *)
