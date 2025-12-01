@@ -30,6 +30,7 @@ Plugin E-ACSL 32.0 (Germanium)
 ###############################################################################
 
 -* E-ACSL       [2025-11-26] Unsupported labels no longer generate unsound code
+-* E-ACSL       [2025-11-27] preempt memory overflow during interval analysis
 - E-ACSL        [2025-10-23] New option -e-acsl-interlang-opt. Optimizes out
                              GMP integers when suitable.
 -* E-ACSL       [2025-10-22] Booleans are no longer translated as GMP numbers.
