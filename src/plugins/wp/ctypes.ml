@@ -25,13 +25,15 @@ type c_int =
   | SInt32
   | UInt64
   | SInt64
+  | UInt128
+  | SInt128
 
 let compare_c_int : c_int -> c_int -> _ = Extlib.compare_basic
 
 let signed  = function
   | CBool -> false
-  | UInt8 | UInt16 | UInt32 | UInt64 -> false
-  | SInt8 | SInt16 | SInt32 | SInt64 -> true
+  | UInt8 | UInt16 | UInt32 | UInt64 | UInt128 -> false
+  | SInt8 | SInt16 | SInt32 | SInt64 | SInt128 -> true
 
 let i_bits = function
   | CBool -> 1
@@ -39,6 +41,7 @@ let i_bits = function
   | UInt16 | SInt16 -> 16
   | UInt32 | SInt32 -> 32
   | UInt64 | SInt64 -> 64
+  | UInt128 | SInt128 -> 128
 
 let i_bytes = function
   | CBool -> 1
@@ -46,12 +49,14 @@ let i_bytes = function
   | UInt16 | SInt16 -> 2
   | UInt32 | SInt32 -> 4
   | UInt64 | SInt64 -> 8
+  | UInt128 | SInt128 -> 16
 
 let make_c_int signed = function
   | 1 -> if signed then SInt8 else UInt8
   | 2 -> if signed then SInt16 else UInt16
   | 4 -> if signed then SInt32 else UInt32
   | 8 -> if signed then SInt64 else UInt64
+  | 16 -> if signed then SInt128 else UInt128
   | size -> WpLog.not_yet_implemented "%d-bytes integers" size
 
 let is_char = function
@@ -60,6 +65,7 @@ let is_char = function
   | UInt16 | SInt16
   | UInt32 | SInt32
   | UInt64 | SInt64
+  | UInt128 | SInt128
   | CBool -> false
 
 let c_int ikind =
@@ -76,6 +82,8 @@ let c_int ikind =
   | IULong -> make_c_int false (Machine.Sizeof.long ())
   | ILongLong -> make_c_int true (Machine.Sizeof.longlong ())
   | IULongLong -> make_c_int false (Machine.Sizeof.longlong ())
+  | IInt128 -> make_c_int true 16
+  | IUInt128 -> make_c_int false 16
 
 let c_bool () = c_int IBool
 let c_char () = c_int IChar
@@ -154,9 +162,11 @@ let idx = function
   | UInt64 -> 6
   | SInt64 -> 7
   | CBool -> 8
+  | SInt128 -> 9
+  | UInt128 -> 10
 
 let i_memo f =
-  let m = Array.make 9 None in
+  let m = Array.make 11 None in
   fun i ->
     let k = idx i in
     match m.(k) with
@@ -176,7 +186,7 @@ let f_memo f =
     | None -> let r = f z in m.(k) <- Some r ; r
 
 let i_iter f =
-  List.iter f [CBool;UInt8;SInt8;UInt16;SInt16;UInt32;SInt32;UInt64;SInt64]
+  List.iter f [CBool;UInt8;SInt8;UInt16;SInt16;UInt32;SInt32;UInt64;SInt64;UInt128;SInt128]
 
 let f_iter f =
   List.iter f [Float32;Float64]

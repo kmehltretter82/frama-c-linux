@@ -23,6 +23,8 @@ type c_int =
   | SInt32
   | UInt64
   | SInt64
+  | UInt128
+  | SInt128
 
 (** Runtime floats. *)
 type c_float =

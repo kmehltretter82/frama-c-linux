@@ -156,6 +156,53 @@ module ValueCodec
     forall v: int [decode_sint64 (encode_sint64 v)].
     is_sint64 v -> decode_sint64 (encode_sint64 v) = v
     
+  function decode_uint128 (s: seq int) : int =
+    match s with
+    | L.Cons b0 (L.Cons b1 (L.Cons b2 (L.Cons b3 (L.Cons b4 (L.Cons b5 (L.Cons b6 (L.Cons b7 (L.Cons b8 (L.Cons b9 (L.Cons b10 (L.Cons b11 (L.Cons b12 (L.Cons b13 (L.Cons b14 (L.Cons b15 (L.Nil)))))))))))))))) ->
+      b0 * 0x1 + b1 * 0x100 + b2 * 0x10000 + b3 * 0x1000000 + b4 * 0x100000000 + b5 * 0x10000000000 + b6 * 0x1000000000000 + b7 * 0x100000000000000 + b8 * 0x1 + b9 * 0x100 + b10 * 0x10000 + b11 * 0x1000000 + b12 * 0x100000000 + b13 * 0x10000000000 + b14 * 0x1000000000000 + b15 * 0x100000000000000
+    | _ -> 0
+    end
+    
+  function decode_sint128 (s: seq int) : int =
+    to_sint128 (decode_uint128 s)
+    
+  function encode_uint128 (v: int) : seq int =
+    (L.Cons (mod v 0x100)
+    (L.Cons (mod (div v 0x100) 0x100)
+    (L.Cons (mod (div v 0x10000) 0x100)
+    (L.Cons (mod (div v 0x1000000) 0x100)
+    (L.Cons (mod (div v 0x100000000) 0x100)
+    (L.Cons (mod (div v 0x10000000000) 0x100)
+    (L.Cons (mod (div v 0x1000000000000) 0x100)
+    (L.Cons (mod (div v 0x100000000000000) 0x100)
+    (L.Cons (mod (div v 0x1) 0x100)
+    (L.Cons (mod (div v 0x100) 0x100)
+    (L.Cons (mod (div v 0x10000) 0x100)
+    (L.Cons (mod (div v 0x1000000) 0x100)
+    (L.Cons (mod (div v 0x100000000) 0x100)
+    (L.Cons (mod (div v 0x10000000000) 0x100)
+    (L.Cons (mod (div v 0x1000000000000) 0x100)
+    (L.Cons (mod (div v 0x100000000000000) 0x100) L.Nil))))))))))))))))
+    
+  function encode_sint128 (v: int) : seq int =
+    encode_uint128 (to_uint128 v)
+    
+  lemma decode_uint128_encode_uint128:
+    forall v: int [decode_uint128 (encode_uint128 v)].
+    is_uint128 v -> decode_uint128 (encode_uint128 v) = v
+    
+  lemma decode_sint128_encode_uint128:
+    forall v: int [decode_sint128 (encode_uint128 v)].
+    is_uint128 v -> decode_sint128 (encode_uint128 v) = to_sint128 v
+    
+  lemma decode_uint128_encode_sint128:
+    forall v: int [decode_uint128 (encode_sint128 v)].
+    is_sint128 v -> decode_uint128 (encode_sint128 v) = to_uint128 v
+    
+  lemma decode_sint128_encode_sint128:
+    forall v: int [decode_sint128 (encode_sint128 v)].
+    is_sint128 v -> decode_sint128 (encode_sint128 v) = v
+    
   
 end
 
@@ -219,6 +266,20 @@ module InitCodec
     forall v: bool [decode_init64 (encode_init64 v)].
     decode_init64 (encode_init64 v) = v
     
+  function decode_init128 (s: seq bool) : bool =
+    match s with
+    | L.Cons b0 (L.Cons b1 (L.Cons b2 (L.Cons b3 (L.Cons b4 (L.Cons b5 (L.Cons b6 (L.Cons b7 (L.Cons b8 (L.Cons b9 (L.Cons b10 (L.Cons b11 (L.Cons b12 (L.Cons b13 (L.Cons b14 (L.Cons b15 (L.Nil)))))))))))))))) ->
+      b0 && b1 && b2 && b3 && b4 && b5 && b6 && b7 && b8 && b9 && b10 && b11 && b12 && b13 && b14 && b15
+    | _ -> false
+    end
+    
+  function encode_init128 (v: bool) : seq bool =
+    create v 16
+    
+  lemma decode_init128_encode_init128:
+    forall v: bool [decode_init128 (encode_init128 v)].
+    decode_init128 (encode_init128 v) = v
+    
   
 end
 
@@ -274,6 +335,24 @@ module RWBytes
     (S.L.Cons M.(b[o+1])
     (S.L.Cons M.(b[o  ]) S.L.Nil))))))))
     
+  function bread_128bits (b: block 'a) (o: int) : seq 'a =
+    (S.L.Cons M.(b[o+15])
+    (S.L.Cons M.(b[o+14])
+    (S.L.Cons M.(b[o+13])
+    (S.L.Cons M.(b[o+12])
+    (S.L.Cons M.(b[o+11])
+    (S.L.Cons M.(b[o+10])
+    (S.L.Cons M.(b[o+9])
+    (S.L.Cons M.(b[o+8])
+    (S.L.Cons M.(b[o+7])
+    (S.L.Cons M.(b[o+6])
+    (S.L.Cons M.(b[o+5])
+    (S.L.Cons M.(b[o+4])
+    (S.L.Cons M.(b[o+3])
+    (S.L.Cons M.(b[o+2])
+    (S.L.Cons M.(b[o+1])
+    (S.L.Cons M.(b[o  ]) S.L.Nil))))))))))))))))
+    
   function bwrite_8bits (b: block 'a) (o: int) (s: seq 'a) : block 'a =
     match s with
     | S.L.Cons b0 (_) ->
@@ -299,6 +378,13 @@ module RWBytes
     match s with
     | S.L.Cons b0 (S.L.Cons b1 (S.L.Cons b2 (S.L.Cons b3 (S.L.Cons b4 (S.L.Cons b5 (S.L.Cons b6 (S.L.Cons b7 (_)))))))) ->
       M.(set (set (set (set (set (set (set (set b o b7) (o+1) b6) (o+2) b5) (o+3) b4) (o+4) b3) (o+5) b2) (o+6) b1) (o+7) b0)
+    | _ -> b
+    end
+    
+  function bwrite_128bits (b: block 'a) (o: int) (s: seq 'a) : block 'a =
+    match s with
+    | S.L.Cons b0 (S.L.Cons b1 (S.L.Cons b2 (S.L.Cons b3 (S.L.Cons b4 (S.L.Cons b5 (S.L.Cons b6 (S.L.Cons b7 (S.L.Cons b8 (S.L.Cons b9 (S.L.Cons b10 (S.L.Cons b11 (S.L.Cons b12 (S.L.Cons b13 (S.L.Cons b14 (S.L.Cons b15 (_)))))))))))))))) ->
+      M.(set (set (set (set (set (set (set (set (set (set (set (set (set (set (set (set b o b15) (o+1) b14) (o+2) b13) (o+3) b12) (o+4) b11) (o+5) b10) (o+6) b9) (o+7) b8) (o+8) b7) (o+9) b6) (o+10) b5) (o+11) b4) (o+12) b3) (o+13) b2) (o+14) b1) (o+15) b0)
     | _ -> b
     end
     
@@ -335,6 +421,11 @@ module RWBytes
     sepoffset ow 8 or 1 ->
       bread_8bits (bwrite_64bits b ow s) or = bread_8bits b or
   
+  lemma bread_8bits_bwrite_128bits_sep:
+    forall b: block 'a, or ow: int, s: seq 'a [bread_8bits (bwrite_128bits b ow s) or].
+    sepoffset ow 16 or 1 ->
+      bread_8bits (bwrite_128bits b ow s) or = bread_8bits b or
+  
   lemma bread_16bits_bwrite_16bits_eq:
     forall b: block 'a, o: int, s: seq 'a [bread_16bits (bwrite_16bits b o s) o].
     S.length s = 2 ->
@@ -367,6 +458,11 @@ module RWBytes
     forall b: block 'a, or ow: int, s: seq 'a [bread_16bits (bwrite_64bits b ow s) or].
     sepoffset ow 8 or 2 ->
       bread_16bits (bwrite_64bits b ow s) or = bread_16bits b or
+  
+  lemma bread_16bits_bwrite_128bits_sep:
+    forall b: block 'a, or ow: int, s: seq 'a [bread_16bits (bwrite_128bits b ow s) or].
+    sepoffset ow 16 or 2 ->
+      bread_16bits (bwrite_128bits b ow s) or = bread_16bits b or
   
   lemma bread_32bits_bwrite_32bits_eq:
     forall b: block 'a, o: int, s: seq 'a [bread_32bits (bwrite_32bits b o s) o].
@@ -401,6 +497,11 @@ module RWBytes
     sepoffset ow 8 or 4 ->
       bread_32bits (bwrite_64bits b ow s) or = bread_32bits b or
   
+  lemma bread_32bits_bwrite_128bits_sep:
+    forall b: block 'a, or ow: int, s: seq 'a [bread_32bits (bwrite_128bits b ow s) or].
+    sepoffset ow 16 or 4 ->
+      bread_32bits (bwrite_128bits b ow s) or = bread_32bits b or
+  
   lemma bread_64bits_bwrite_64bits_eq:
     forall b: block 'a, o: int, s: seq 'a [bread_64bits (bwrite_64bits b o s) o].
     S.length s = 8 ->
@@ -434,6 +535,49 @@ module RWBytes
     sepoffset ow 8 or 8 ->
       bread_64bits (bwrite_64bits b ow s) or = bread_64bits b or
   
+  lemma bread_64bits_bwrite_128bits_sep:
+    forall b: block 'a, or ow: int, s: seq 'a [bread_64bits (bwrite_128bits b ow s) or].
+    sepoffset ow 16 or 8 ->
+      bread_64bits (bwrite_128bits b ow s) or = bread_64bits b or
+  
+  lemma bread_128bits_bwrite_128bits_eq:
+    forall b: block 'a, o: int, s: seq 'a [bread_128bits (bwrite_128bits b o s) o].
+    S.length s = 16 ->
+      bread_128bits (bwrite_128bits b o s) o = s
+  
+  let rec lemma bread_128bits_bwrite_seq_sep (b: block 'a)(or ow: int)(s: seq 'a)
+    requires { sepoffset ow (S.length s) or 16 }
+    ensures  { bread_128bits (bwrite_seq b ow s) or = bread_128bits b or }
+    = match s with
+      | S.L.Nil -> ()
+      | S.L.Cons _ tl -> bread_128bits_bwrite_seq_sep b or (ow + 1) tl
+      end
+  
+  lemma bread_128bits_bwrite_8bits_sep:
+    forall b: block 'a, or ow: int, s: seq 'a [bread_128bits (bwrite_8bits b ow s) or].
+    sepoffset ow 1 or 16 ->
+      bread_128bits (bwrite_8bits b ow s) or = bread_128bits b or
+  
+  lemma bread_128bits_bwrite_16bits_sep:
+    forall b: block 'a, or ow: int, s: seq 'a [bread_128bits (bwrite_16bits b ow s) or].
+    sepoffset ow 2 or 16 ->
+      bread_128bits (bwrite_16bits b ow s) or = bread_128bits b or
+  
+  lemma bread_128bits_bwrite_32bits_sep:
+    forall b: block 'a, or ow: int, s: seq 'a [bread_128bits (bwrite_32bits b ow s) or].
+    sepoffset ow 4 or 16 ->
+      bread_128bits (bwrite_32bits b ow s) or = bread_128bits b or
+  
+  lemma bread_128bits_bwrite_64bits_sep:
+    forall b: block 'a, or ow: int, s: seq 'a [bread_128bits (bwrite_64bits b ow s) or].
+    sepoffset ow 8 or 16 ->
+      bread_128bits (bwrite_64bits b ow s) or = bread_128bits b or
+  
+  lemma bread_128bits_bwrite_128bits_sep:
+    forall b: block 'a, or ow: int, s: seq 'a [bread_128bits (bwrite_128bits b ow s) or].
+    sepoffset ow 16 or 16 ->
+      bread_128bits (bwrite_128bits b ow s) or = bread_128bits b or
+  
   
 end
 
@@ -458,6 +602,9 @@ module ValueBlockRW
   function bread_uint64 (b: vblock) (o: int) : int =
     decode_uint64 (bread_64bits b o)
     
+  function bread_uint128 (b: vblock) (o: int) : int =
+    decode_uint128 (bread_128bits b o)
+    
   function bread_sint8 (b: vblock) (o: int) : int =
     decode_sint8 (bread_8bits b o)
     
@@ -469,6 +616,9 @@ module ValueBlockRW
     
   function bread_sint64 (b: vblock) (o: int) : int =
     decode_sint64 (bread_64bits b o)
+    
+  function bread_sint128 (b: vblock) (o: int) : int =
+    decode_sint128 (bread_128bits b o)
     
   function bwrite_uint8 (b: vblock) (o: int) (v: int) : vblock =
     bwrite_8bits b o (encode_uint8 v)
@@ -482,6 +632,9 @@ module ValueBlockRW
   function bwrite_uint64 (b: vblock) (o: int) (v: int) : vblock =
     bwrite_64bits b o (encode_uint64 v)
     
+  function bwrite_uint128 (b: vblock) (o: int) (v: int) : vblock =
+    bwrite_128bits b o (encode_uint128 v)
+    
   function bwrite_sint8 (b: vblock) (o: int) (v: int) : vblock =
     bwrite_8bits b o (encode_sint8 v)
     
@@ -493,6 +646,9 @@ module ValueBlockRW
     
   function bwrite_sint64 (b: vblock) (o: int) (v: int) : vblock =
     bwrite_64bits b o (encode_sint64 v)
+    
+  function bwrite_sint128 (b: vblock) (o: int) (v: int) : vblock =
+    bwrite_128bits b o (encode_sint128 v)
     
   lemma bread_uint8_bwrite_uint8_eq:
     forall b: vblock, o: int, v: int [bread_uint8 (bwrite_uint8 b o v) o].
@@ -529,6 +685,11 @@ module ValueBlockRW
     sepoffset ow 8 or 1 ->
       bread_uint8 (bwrite_uint64 b ow v) or = bread_uint8 b or
     
+  lemma bread_uint8_bwrite_uint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint8 (bwrite_uint128 b ow v) or].
+    sepoffset ow 16 or 1 ->
+      bread_uint8 (bwrite_uint128 b ow v) or = bread_uint8 b or
+    
   lemma bread_uint8_bwrite_sint8_sep:
     forall b: vblock, or ow: int, v: int [bread_uint8 (bwrite_sint8 b ow v) or].
     sepoffset ow 1 or 1 ->
@@ -548,6 +709,11 @@ module ValueBlockRW
     forall b: vblock, or ow: int, v: int [bread_uint8 (bwrite_sint64 b ow v) or].
     sepoffset ow 8 or 1 ->
       bread_uint8 (bwrite_sint64 b ow v) or = bread_uint8 b or
+    
+  lemma bread_uint8_bwrite_sint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint8 (bwrite_sint128 b ow v) or].
+    sepoffset ow 16 or 1 ->
+      bread_uint8 (bwrite_sint128 b ow v) or = bread_uint8 b or
     
   lemma bread_uint16_bwrite_uint16_eq:
     forall b: vblock, o: int, v: int [bread_uint16 (bwrite_uint16 b o v) o].
@@ -584,6 +750,11 @@ module ValueBlockRW
     sepoffset ow 8 or 2 ->
       bread_uint16 (bwrite_uint64 b ow v) or = bread_uint16 b or
     
+  lemma bread_uint16_bwrite_uint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint16 (bwrite_uint128 b ow v) or].
+    sepoffset ow 16 or 2 ->
+      bread_uint16 (bwrite_uint128 b ow v) or = bread_uint16 b or
+    
   lemma bread_uint16_bwrite_sint8_sep:
     forall b: vblock, or ow: int, v: int [bread_uint16 (bwrite_sint8 b ow v) or].
     sepoffset ow 1 or 2 ->
@@ -603,6 +774,11 @@ module ValueBlockRW
     forall b: vblock, or ow: int, v: int [bread_uint16 (bwrite_sint64 b ow v) or].
     sepoffset ow 8 or 2 ->
       bread_uint16 (bwrite_sint64 b ow v) or = bread_uint16 b or
+    
+  lemma bread_uint16_bwrite_sint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint16 (bwrite_sint128 b ow v) or].
+    sepoffset ow 16 or 2 ->
+      bread_uint16 (bwrite_sint128 b ow v) or = bread_uint16 b or
     
   lemma bread_uint32_bwrite_uint32_eq:
     forall b: vblock, o: int, v: int [bread_uint32 (bwrite_uint32 b o v) o].
@@ -639,6 +815,11 @@ module ValueBlockRW
     sepoffset ow 8 or 4 ->
       bread_uint32 (bwrite_uint64 b ow v) or = bread_uint32 b or
     
+  lemma bread_uint32_bwrite_uint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint32 (bwrite_uint128 b ow v) or].
+    sepoffset ow 16 or 4 ->
+      bread_uint32 (bwrite_uint128 b ow v) or = bread_uint32 b or
+    
   lemma bread_uint32_bwrite_sint8_sep:
     forall b: vblock, or ow: int, v: int [bread_uint32 (bwrite_sint8 b ow v) or].
     sepoffset ow 1 or 4 ->
@@ -658,6 +839,11 @@ module ValueBlockRW
     forall b: vblock, or ow: int, v: int [bread_uint32 (bwrite_sint64 b ow v) or].
     sepoffset ow 8 or 4 ->
       bread_uint32 (bwrite_sint64 b ow v) or = bread_uint32 b or
+    
+  lemma bread_uint32_bwrite_sint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint32 (bwrite_sint128 b ow v) or].
+    sepoffset ow 16 or 4 ->
+      bread_uint32 (bwrite_sint128 b ow v) or = bread_uint32 b or
     
   lemma bread_uint64_bwrite_uint64_eq:
     forall b: vblock, o: int, v: int [bread_uint64 (bwrite_uint64 b o v) o].
@@ -694,6 +880,11 @@ module ValueBlockRW
     sepoffset ow 8 or 8 ->
       bread_uint64 (bwrite_uint64 b ow v) or = bread_uint64 b or
     
+  lemma bread_uint64_bwrite_uint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint64 (bwrite_uint128 b ow v) or].
+    sepoffset ow 16 or 8 ->
+      bread_uint64 (bwrite_uint128 b ow v) or = bread_uint64 b or
+    
   lemma bread_uint64_bwrite_sint8_sep:
     forall b: vblock, or ow: int, v: int [bread_uint64 (bwrite_sint8 b ow v) or].
     sepoffset ow 1 or 8 ->
@@ -713,6 +904,76 @@ module ValueBlockRW
     forall b: vblock, or ow: int, v: int [bread_uint64 (bwrite_sint64 b ow v) or].
     sepoffset ow 8 or 8 ->
       bread_uint64 (bwrite_sint64 b ow v) or = bread_uint64 b or
+    
+  lemma bread_uint64_bwrite_sint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint64 (bwrite_sint128 b ow v) or].
+    sepoffset ow 16 or 8 ->
+      bread_uint64 (bwrite_sint128 b ow v) or = bread_uint64 b or
+    
+  lemma bread_uint128_bwrite_uint128_eq:
+    forall b: vblock, o: int, v: int [bread_uint128 (bwrite_uint128 b o v) o].
+    is_uint128 v ->
+      bread_uint128 (bwrite_uint128 b o v) o = v
+    
+  lemma bread_uint128_bwrite_sint128_eq:
+    forall b: vblock, o: int, v: int [bread_uint128 (bwrite_sint128 b o v) o].
+    is_sint128 v ->
+      bread_uint128 (bwrite_sint128 b o v) o = to_uint128 v
+    
+  lemma bread_uint128_bcopy_sep:
+    forall b: vblock, u: S.seq int, or ho: int [bread_uint128 (bwrite_seq b ho u) or].
+    sepoffset or 16 ho (Seq.length u) ->
+      bread_uint128 (bwrite_seq b ho u) or = bread_uint128 b or
+    
+  lemma bread_uint128_bwrite_uint8_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint128 (bwrite_uint8 b ow v) or].
+    sepoffset ow 1 or 16 ->
+      bread_uint128 (bwrite_uint8 b ow v) or = bread_uint128 b or
+    
+  lemma bread_uint128_bwrite_uint16_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint128 (bwrite_uint16 b ow v) or].
+    sepoffset ow 2 or 16 ->
+      bread_uint128 (bwrite_uint16 b ow v) or = bread_uint128 b or
+    
+  lemma bread_uint128_bwrite_uint32_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint128 (bwrite_uint32 b ow v) or].
+    sepoffset ow 4 or 16 ->
+      bread_uint128 (bwrite_uint32 b ow v) or = bread_uint128 b or
+    
+  lemma bread_uint128_bwrite_uint64_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint128 (bwrite_uint64 b ow v) or].
+    sepoffset ow 8 or 16 ->
+      bread_uint128 (bwrite_uint64 b ow v) or = bread_uint128 b or
+    
+  lemma bread_uint128_bwrite_uint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint128 (bwrite_uint128 b ow v) or].
+    sepoffset ow 16 or 16 ->
+      bread_uint128 (bwrite_uint128 b ow v) or = bread_uint128 b or
+    
+  lemma bread_uint128_bwrite_sint8_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint128 (bwrite_sint8 b ow v) or].
+    sepoffset ow 1 or 16 ->
+      bread_uint128 (bwrite_sint8 b ow v) or = bread_uint128 b or
+    
+  lemma bread_uint128_bwrite_sint16_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint128 (bwrite_sint16 b ow v) or].
+    sepoffset ow 2 or 16 ->
+      bread_uint128 (bwrite_sint16 b ow v) or = bread_uint128 b or
+    
+  lemma bread_uint128_bwrite_sint32_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint128 (bwrite_sint32 b ow v) or].
+    sepoffset ow 4 or 16 ->
+      bread_uint128 (bwrite_sint32 b ow v) or = bread_uint128 b or
+    
+  lemma bread_uint128_bwrite_sint64_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint128 (bwrite_sint64 b ow v) or].
+    sepoffset ow 8 or 16 ->
+      bread_uint128 (bwrite_sint64 b ow v) or = bread_uint128 b or
+    
+  lemma bread_uint128_bwrite_sint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_uint128 (bwrite_sint128 b ow v) or].
+    sepoffset ow 16 or 16 ->
+      bread_uint128 (bwrite_sint128 b ow v) or = bread_uint128 b or
     
   lemma bread_sint8_bwrite_sint8_eq:
     forall b: vblock, o: int, v: int [bread_sint8 (bwrite_sint8 b o v) o].
@@ -749,6 +1010,11 @@ module ValueBlockRW
     sepoffset ow 8 or 1 ->
       bread_sint8 (bwrite_uint64 b ow v) or = bread_sint8 b or
     
+  lemma bread_sint8_bwrite_uint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint8 (bwrite_uint128 b ow v) or].
+    sepoffset ow 16 or 1 ->
+      bread_sint8 (bwrite_uint128 b ow v) or = bread_sint8 b or
+    
   lemma bread_sint8_bwrite_sint8_sep:
     forall b: vblock, or ow: int, v: int [bread_sint8 (bwrite_sint8 b ow v) or].
     sepoffset ow 1 or 1 ->
@@ -768,6 +1034,11 @@ module ValueBlockRW
     forall b: vblock, or ow: int, v: int [bread_sint8 (bwrite_sint64 b ow v) or].
     sepoffset ow 8 or 1 ->
       bread_sint8 (bwrite_sint64 b ow v) or = bread_sint8 b or
+    
+  lemma bread_sint8_bwrite_sint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint8 (bwrite_sint128 b ow v) or].
+    sepoffset ow 16 or 1 ->
+      bread_sint8 (bwrite_sint128 b ow v) or = bread_sint8 b or
     
   lemma bread_sint16_bwrite_sint16_eq:
     forall b: vblock, o: int, v: int [bread_sint16 (bwrite_sint16 b o v) o].
@@ -804,6 +1075,11 @@ module ValueBlockRW
     sepoffset ow 8 or 2 ->
       bread_sint16 (bwrite_uint64 b ow v) or = bread_sint16 b or
     
+  lemma bread_sint16_bwrite_uint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint16 (bwrite_uint128 b ow v) or].
+    sepoffset ow 16 or 2 ->
+      bread_sint16 (bwrite_uint128 b ow v) or = bread_sint16 b or
+    
   lemma bread_sint16_bwrite_sint8_sep:
     forall b: vblock, or ow: int, v: int [bread_sint16 (bwrite_sint8 b ow v) or].
     sepoffset ow 1 or 2 ->
@@ -823,6 +1099,11 @@ module ValueBlockRW
     forall b: vblock, or ow: int, v: int [bread_sint16 (bwrite_sint64 b ow v) or].
     sepoffset ow 8 or 2 ->
       bread_sint16 (bwrite_sint64 b ow v) or = bread_sint16 b or
+    
+  lemma bread_sint16_bwrite_sint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint16 (bwrite_sint128 b ow v) or].
+    sepoffset ow 16 or 2 ->
+      bread_sint16 (bwrite_sint128 b ow v) or = bread_sint16 b or
     
   lemma bread_sint32_bwrite_sint32_eq:
     forall b: vblock, o: int, v: int [bread_sint32 (bwrite_sint32 b o v) o].
@@ -859,6 +1140,11 @@ module ValueBlockRW
     sepoffset ow 8 or 4 ->
       bread_sint32 (bwrite_uint64 b ow v) or = bread_sint32 b or
     
+  lemma bread_sint32_bwrite_uint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint32 (bwrite_uint128 b ow v) or].
+    sepoffset ow 16 or 4 ->
+      bread_sint32 (bwrite_uint128 b ow v) or = bread_sint32 b or
+    
   lemma bread_sint32_bwrite_sint8_sep:
     forall b: vblock, or ow: int, v: int [bread_sint32 (bwrite_sint8 b ow v) or].
     sepoffset ow 1 or 4 ->
@@ -878,6 +1164,11 @@ module ValueBlockRW
     forall b: vblock, or ow: int, v: int [bread_sint32 (bwrite_sint64 b ow v) or].
     sepoffset ow 8 or 4 ->
       bread_sint32 (bwrite_sint64 b ow v) or = bread_sint32 b or
+    
+  lemma bread_sint32_bwrite_sint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint32 (bwrite_sint128 b ow v) or].
+    sepoffset ow 16 or 4 ->
+      bread_sint32 (bwrite_sint128 b ow v) or = bread_sint32 b or
     
   lemma bread_sint64_bwrite_sint64_eq:
     forall b: vblock, o: int, v: int [bread_sint64 (bwrite_sint64 b o v) o].
@@ -914,6 +1205,11 @@ module ValueBlockRW
     sepoffset ow 8 or 8 ->
       bread_sint64 (bwrite_uint64 b ow v) or = bread_sint64 b or
     
+  lemma bread_sint64_bwrite_uint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint64 (bwrite_uint128 b ow v) or].
+    sepoffset ow 16 or 8 ->
+      bread_sint64 (bwrite_uint128 b ow v) or = bread_sint64 b or
+    
   lemma bread_sint64_bwrite_sint8_sep:
     forall b: vblock, or ow: int, v: int [bread_sint64 (bwrite_sint8 b ow v) or].
     sepoffset ow 1 or 8 ->
@@ -933,6 +1229,76 @@ module ValueBlockRW
     forall b: vblock, or ow: int, v: int [bread_sint64 (bwrite_sint64 b ow v) or].
     sepoffset ow 8 or 8 ->
       bread_sint64 (bwrite_sint64 b ow v) or = bread_sint64 b or
+    
+  lemma bread_sint64_bwrite_sint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint64 (bwrite_sint128 b ow v) or].
+    sepoffset ow 16 or 8 ->
+      bread_sint64 (bwrite_sint128 b ow v) or = bread_sint64 b or
+    
+  lemma bread_sint128_bwrite_sint128_eq:
+    forall b: vblock, o: int, v: int [bread_sint128 (bwrite_sint128 b o v) o].
+    is_sint128 v ->
+      bread_sint128 (bwrite_sint128 b o v) o = v
+    
+  lemma bread_sint128_bwrite_uint128_eq:
+    forall b: vblock, o: int, v: int [bread_sint128 (bwrite_uint128 b o v) o].
+    is_uint128 v ->
+      bread_sint128 (bwrite_uint128 b o v) o = to_sint128 v
+    
+  lemma bread_sint128_bcopy_sep:
+    forall b: vblock, u: S.seq int, or ho: int [bread_sint128 (bwrite_seq b ho u) or].
+    sepoffset or 16 ho (Seq.length u) ->
+      bread_sint128 (bwrite_seq b ho u) or = bread_sint128 b or
+    
+  lemma bread_sint128_bwrite_uint8_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint128 (bwrite_uint8 b ow v) or].
+    sepoffset ow 1 or 16 ->
+      bread_sint128 (bwrite_uint8 b ow v) or = bread_sint128 b or
+    
+  lemma bread_sint128_bwrite_uint16_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint128 (bwrite_uint16 b ow v) or].
+    sepoffset ow 2 or 16 ->
+      bread_sint128 (bwrite_uint16 b ow v) or = bread_sint128 b or
+    
+  lemma bread_sint128_bwrite_uint32_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint128 (bwrite_uint32 b ow v) or].
+    sepoffset ow 4 or 16 ->
+      bread_sint128 (bwrite_uint32 b ow v) or = bread_sint128 b or
+    
+  lemma bread_sint128_bwrite_uint64_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint128 (bwrite_uint64 b ow v) or].
+    sepoffset ow 8 or 16 ->
+      bread_sint128 (bwrite_uint64 b ow v) or = bread_sint128 b or
+    
+  lemma bread_sint128_bwrite_uint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint128 (bwrite_uint128 b ow v) or].
+    sepoffset ow 16 or 16 ->
+      bread_sint128 (bwrite_uint128 b ow v) or = bread_sint128 b or
+    
+  lemma bread_sint128_bwrite_sint8_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint128 (bwrite_sint8 b ow v) or].
+    sepoffset ow 1 or 16 ->
+      bread_sint128 (bwrite_sint8 b ow v) or = bread_sint128 b or
+    
+  lemma bread_sint128_bwrite_sint16_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint128 (bwrite_sint16 b ow v) or].
+    sepoffset ow 2 or 16 ->
+      bread_sint128 (bwrite_sint16 b ow v) or = bread_sint128 b or
+    
+  lemma bread_sint128_bwrite_sint32_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint128 (bwrite_sint32 b ow v) or].
+    sepoffset ow 4 or 16 ->
+      bread_sint128 (bwrite_sint32 b ow v) or = bread_sint128 b or
+    
+  lemma bread_sint128_bwrite_sint64_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint128 (bwrite_sint64 b ow v) or].
+    sepoffset ow 8 or 16 ->
+      bread_sint128 (bwrite_sint64 b ow v) or = bread_sint128 b or
+    
+  lemma bread_sint128_bwrite_sint128_sep:
+    forall b: vblock, or ow: int, v: int [bread_sint128 (bwrite_sint128 b ow v) or].
+    sepoffset ow 16 or 16 ->
+      bread_sint128 (bwrite_sint128 b ow v) or = bread_sint128 b or
     
   
 end
@@ -959,6 +1325,9 @@ module InitBlockRW
   function bread_init64 (b: iblock) (o: int) : bool =
     decode_init64 (bread_64bits b o)
     
+  function bread_init128 (b: iblock) (o: int) : bool =
+    decode_init128 (bread_128bits b o)
+    
   function bwrite_init8 (b: iblock) (o: int) (init: bool) : iblock =
     bwrite_8bits b o (encode_init8 init)
     
@@ -970,6 +1339,9 @@ module InitBlockRW
     
   function bwrite_init64 (b: iblock) (o: int) (init: bool) : iblock =
     bwrite_64bits b o (encode_init64 init)
+    
+  function bwrite_init128 (b: iblock) (o: int) (init: bool) : iblock =
+    bwrite_128bits b o (encode_init128 init)
     
   lemma bread_init8_bwrite_init8_eq:
     forall b: iblock, o: int, init: bool [bread_init8 (bwrite_init8 b o init) o].
@@ -1000,6 +1372,11 @@ module InitBlockRW
     sepoffset ow 8 or 1 ->
       bread_init8 (bwrite_init64 b ow init) or = bread_init8 b or
     
+  lemma bread_init8_bwrite_init128_sep:
+    forall b: iblock, or ow: int, init: bool [bread_init8 (bwrite_init128 b ow init) or].
+    sepoffset ow 16 or 1 ->
+      bread_init8 (bwrite_init128 b ow init) or = bread_init8 b or
+    
   lemma bread_init16_bwrite_init16_eq:
     forall b: iblock, o: int, init: bool [bread_init16 (bwrite_init16 b o init) o].
     bread_init16 (bwrite_init16 b o init) o = init
@@ -1028,6 +1405,11 @@ module InitBlockRW
     forall b: iblock, or ow: int, init: bool [bread_init16 (bwrite_init64 b ow init) or].
     sepoffset ow 8 or 2 ->
       bread_init16 (bwrite_init64 b ow init) or = bread_init16 b or
+    
+  lemma bread_init16_bwrite_init128_sep:
+    forall b: iblock, or ow: int, init: bool [bread_init16 (bwrite_init128 b ow init) or].
+    sepoffset ow 16 or 2 ->
+      bread_init16 (bwrite_init128 b ow init) or = bread_init16 b or
     
   lemma bread_init32_bwrite_init32_eq:
     forall b: iblock, o: int, init: bool [bread_init32 (bwrite_init32 b o init) o].
@@ -1058,6 +1440,11 @@ module InitBlockRW
     sepoffset ow 8 or 4 ->
       bread_init32 (bwrite_init64 b ow init) or = bread_init32 b or
     
+  lemma bread_init32_bwrite_init128_sep:
+    forall b: iblock, or ow: int, init: bool [bread_init32 (bwrite_init128 b ow init) or].
+    sepoffset ow 16 or 4 ->
+      bread_init32 (bwrite_init128 b ow init) or = bread_init32 b or
+    
   lemma bread_init64_bwrite_init64_eq:
     forall b: iblock, o: int, init: bool [bread_init64 (bwrite_init64 b o init) o].
     bread_init64 (bwrite_init64 b o init) o = init
@@ -1086,6 +1473,45 @@ module InitBlockRW
     forall b: iblock, or ow: int, init: bool [bread_init64 (bwrite_init64 b ow init) or].
     sepoffset ow 8 or 8 ->
       bread_init64 (bwrite_init64 b ow init) or = bread_init64 b or
+    
+  lemma bread_init64_bwrite_init128_sep:
+    forall b: iblock, or ow: int, init: bool [bread_init64 (bwrite_init128 b ow init) or].
+    sepoffset ow 16 or 8 ->
+      bread_init64 (bwrite_init128 b ow init) or = bread_init64 b or
+    
+  lemma bread_init128_bwrite_init128_eq:
+    forall b: iblock, o: int, init: bool [bread_init128 (bwrite_init128 b o init) o].
+    bread_init128 (bwrite_init128 b o init) o = init
+    
+  lemma bread_init128_bcopy_sep:
+    forall b: iblock, u: S.seq bool, or ho: int [bread_init128 (bwrite_seq b ho u) or].
+    sepoffset or 16 ho (Seq.length u) ->
+      bread_init128 (bwrite_seq b ho u) or = bread_init128 b or
+    
+  lemma bread_init128_bwrite_init8_sep:
+    forall b: iblock, or ow: int, init: bool [bread_init128 (bwrite_init8 b ow init) or].
+    sepoffset ow 1 or 16 ->
+      bread_init128 (bwrite_init8 b ow init) or = bread_init128 b or
+    
+  lemma bread_init128_bwrite_init16_sep:
+    forall b: iblock, or ow: int, init: bool [bread_init128 (bwrite_init16 b ow init) or].
+    sepoffset ow 2 or 16 ->
+      bread_init128 (bwrite_init16 b ow init) or = bread_init128 b or
+    
+  lemma bread_init128_bwrite_init32_sep:
+    forall b: iblock, or ow: int, init: bool [bread_init128 (bwrite_init32 b ow init) or].
+    sepoffset ow 4 or 16 ->
+      bread_init128 (bwrite_init32 b ow init) or = bread_init128 b or
+    
+  lemma bread_init128_bwrite_init64_sep:
+    forall b: iblock, or ow: int, init: bool [bread_init128 (bwrite_init64 b ow init) or].
+    sepoffset ow 8 or 16 ->
+      bread_init128 (bwrite_init64 b ow init) or = bread_init128 b or
+    
+  lemma bread_init128_bwrite_init128_sep:
+    forall b: iblock, or ow: int, init: bool [bread_init128 (bwrite_init128 b ow init) or].
+    sepoffset ow 16 or 16 ->
+      bread_init128 (bwrite_init128 b ow init) or = bread_init128 b or
     
   
 end
@@ -1141,6 +1567,9 @@ module MemBytes
   function read_uint64 (m: memory) (a: addr) : int =
     VB.bread_uint64 m[a.base] a.offset
     
+  function read_uint128 (m: memory) (a: addr) : int =
+    VB.bread_uint128 m[a.base] a.offset
+    
   function read_sint8 (m: memory) (a: addr) : int =
     VB.bread_sint8 m[a.base] a.offset
     
@@ -1152,6 +1581,9 @@ module MemBytes
     
   function read_sint64 (m: memory) (a: addr) : int =
     VB.bread_sint64 m[a.base] a.offset
+    
+  function read_sint128 (m: memory) (a: addr) : int =
+    VB.bread_sint128 m[a.base] a.offset
     
   function write_uint8 (m: memory) (a: addr) (v: int) : memory =
     set m a.base (VB.bwrite_uint8 m [a.base] a.offset v)
@@ -1165,6 +1597,9 @@ module MemBytes
   function write_uint64 (m: memory) (a: addr) (v: int) : memory =
     set m a.base (VB.bwrite_uint64 m [a.base] a.offset v)
     
+  function write_uint128 (m: memory) (a: addr) (v: int) : memory =
+    set m a.base (VB.bwrite_uint128 m [a.base] a.offset v)
+    
   function write_sint8 (m: memory) (a: addr) (v: int) : memory =
     set m a.base (VB.bwrite_sint8 m [a.base] a.offset v)
     
@@ -1176,6 +1611,9 @@ module MemBytes
     
   function write_sint64 (m: memory) (a: addr) (v: int) : memory =
     set m a.base (VB.bwrite_sint64 m [a.base] a.offset v)
+    
+  function write_sint128 (m: memory) (a: addr) (v: int) : memory =
+    set m a.base (VB.bwrite_sint128 m [a.base] a.offset v)
     
   lemma read_uint8_write_uint8_eq:
     forall m: memory, a: addr, v: int [read_uint8 (write_uint8 m a v) a].
@@ -1216,6 +1654,11 @@ module MemBytes
     separated aw 8 ar 1 ->
       read_uint8 (write_uint64 m aw v) ar = read_uint8 m ar
     
+  lemma read_uint8_write_uint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint8 (write_uint128 m aw v) ar].
+    separated aw 16 ar 1 ->
+      read_uint8 (write_uint128 m aw v) ar = read_uint8 m ar
+    
   lemma read_uint8_write_sint8_sep:
     forall m: memory, ar aw: addr, v: int [read_uint8 (write_sint8 m aw v) ar].
     separated aw 1 ar 1 ->
@@ -1235,6 +1678,11 @@ module MemBytes
     forall m: memory, ar aw: addr, v: int [read_uint8 (write_sint64 m aw v) ar].
     separated aw 8 ar 1 ->
       read_uint8 (write_sint64 m aw v) ar = read_uint8 m ar
+    
+  lemma read_uint8_write_sint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint8 (write_sint128 m aw v) ar].
+    separated aw 16 ar 1 ->
+      read_uint8 (write_sint128 m aw v) ar = read_uint8 m ar
     
   lemma read_uint16_write_uint16_eq:
     forall m: memory, a: addr, v: int [read_uint16 (write_uint16 m a v) a].
@@ -1275,6 +1723,11 @@ module MemBytes
     separated aw 8 ar 2 ->
       read_uint16 (write_uint64 m aw v) ar = read_uint16 m ar
     
+  lemma read_uint16_write_uint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint16 (write_uint128 m aw v) ar].
+    separated aw 16 ar 2 ->
+      read_uint16 (write_uint128 m aw v) ar = read_uint16 m ar
+    
   lemma read_uint16_write_sint8_sep:
     forall m: memory, ar aw: addr, v: int [read_uint16 (write_sint8 m aw v) ar].
     separated aw 1 ar 2 ->
@@ -1294,6 +1747,11 @@ module MemBytes
     forall m: memory, ar aw: addr, v: int [read_uint16 (write_sint64 m aw v) ar].
     separated aw 8 ar 2 ->
       read_uint16 (write_sint64 m aw v) ar = read_uint16 m ar
+    
+  lemma read_uint16_write_sint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint16 (write_sint128 m aw v) ar].
+    separated aw 16 ar 2 ->
+      read_uint16 (write_sint128 m aw v) ar = read_uint16 m ar
     
   lemma read_uint32_write_uint32_eq:
     forall m: memory, a: addr, v: int [read_uint32 (write_uint32 m a v) a].
@@ -1334,6 +1792,11 @@ module MemBytes
     separated aw 8 ar 4 ->
       read_uint32 (write_uint64 m aw v) ar = read_uint32 m ar
     
+  lemma read_uint32_write_uint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint32 (write_uint128 m aw v) ar].
+    separated aw 16 ar 4 ->
+      read_uint32 (write_uint128 m aw v) ar = read_uint32 m ar
+    
   lemma read_uint32_write_sint8_sep:
     forall m: memory, ar aw: addr, v: int [read_uint32 (write_sint8 m aw v) ar].
     separated aw 1 ar 4 ->
@@ -1353,6 +1816,11 @@ module MemBytes
     forall m: memory, ar aw: addr, v: int [read_uint32 (write_sint64 m aw v) ar].
     separated aw 8 ar 4 ->
       read_uint32 (write_sint64 m aw v) ar = read_uint32 m ar
+    
+  lemma read_uint32_write_sint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint32 (write_sint128 m aw v) ar].
+    separated aw 16 ar 4 ->
+      read_uint32 (write_sint128 m aw v) ar = read_uint32 m ar
     
   lemma read_uint64_write_uint64_eq:
     forall m: memory, a: addr, v: int [read_uint64 (write_uint64 m a v) a].
@@ -1393,6 +1861,11 @@ module MemBytes
     separated aw 8 ar 8 ->
       read_uint64 (write_uint64 m aw v) ar = read_uint64 m ar
     
+  lemma read_uint64_write_uint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint64 (write_uint128 m aw v) ar].
+    separated aw 16 ar 8 ->
+      read_uint64 (write_uint128 m aw v) ar = read_uint64 m ar
+    
   lemma read_uint64_write_sint8_sep:
     forall m: memory, ar aw: addr, v: int [read_uint64 (write_sint8 m aw v) ar].
     separated aw 1 ar 8 ->
@@ -1412,6 +1885,80 @@ module MemBytes
     forall m: memory, ar aw: addr, v: int [read_uint64 (write_sint64 m aw v) ar].
     separated aw 8 ar 8 ->
       read_uint64 (write_sint64 m aw v) ar = read_uint64 m ar
+    
+  lemma read_uint64_write_sint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint64 (write_sint128 m aw v) ar].
+    separated aw 16 ar 8 ->
+      read_uint64 (write_sint128 m aw v) ar = read_uint64 m ar
+    
+  lemma read_uint128_write_uint128_eq:
+    forall m: memory, a: addr, v: int [read_uint128 (write_uint128 m a v) a].
+    is_uint128 v ->
+      read_uint128 (write_uint128 m a v) a = v
+    
+  lemma read_uint128_write_sint128_eq:
+    forall m: memory, a: addr, v: int [read_uint128 (write_sint128 m a v) a].
+    is_sint128 v ->
+      read_uint128 (write_sint128 m a v) a = to_uint128 v
+    
+  lemma read_uint128_copy_sep:
+    forall mw mc: memory, size: int, ar aw ac: addr [read_uint128 (memcpy mw aw mc ac size) ar].
+    separated ar 16 aw size ->
+      read_uint128 (memcpy mw aw mc ac size) ar = read_uint128 mw ar
+    by
+      let ob = mw[aw.base] in
+      let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
+      aw.base = ar.base -> VB.bread_uint128 nb ar.offset = VB.bread_uint128 ob ar.offset
+    
+  lemma read_uint128_write_uint8_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint128 (write_uint8 m aw v) ar].
+    separated aw 1 ar 16 ->
+      read_uint128 (write_uint8 m aw v) ar = read_uint128 m ar
+    
+  lemma read_uint128_write_uint16_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint128 (write_uint16 m aw v) ar].
+    separated aw 2 ar 16 ->
+      read_uint128 (write_uint16 m aw v) ar = read_uint128 m ar
+    
+  lemma read_uint128_write_uint32_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint128 (write_uint32 m aw v) ar].
+    separated aw 4 ar 16 ->
+      read_uint128 (write_uint32 m aw v) ar = read_uint128 m ar
+    
+  lemma read_uint128_write_uint64_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint128 (write_uint64 m aw v) ar].
+    separated aw 8 ar 16 ->
+      read_uint128 (write_uint64 m aw v) ar = read_uint128 m ar
+    
+  lemma read_uint128_write_uint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint128 (write_uint128 m aw v) ar].
+    separated aw 16 ar 16 ->
+      read_uint128 (write_uint128 m aw v) ar = read_uint128 m ar
+    
+  lemma read_uint128_write_sint8_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint128 (write_sint8 m aw v) ar].
+    separated aw 1 ar 16 ->
+      read_uint128 (write_sint8 m aw v) ar = read_uint128 m ar
+    
+  lemma read_uint128_write_sint16_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint128 (write_sint16 m aw v) ar].
+    separated aw 2 ar 16 ->
+      read_uint128 (write_sint16 m aw v) ar = read_uint128 m ar
+    
+  lemma read_uint128_write_sint32_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint128 (write_sint32 m aw v) ar].
+    separated aw 4 ar 16 ->
+      read_uint128 (write_sint32 m aw v) ar = read_uint128 m ar
+    
+  lemma read_uint128_write_sint64_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint128 (write_sint64 m aw v) ar].
+    separated aw 8 ar 16 ->
+      read_uint128 (write_sint64 m aw v) ar = read_uint128 m ar
+    
+  lemma read_uint128_write_sint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_uint128 (write_sint128 m aw v) ar].
+    separated aw 16 ar 16 ->
+      read_uint128 (write_sint128 m aw v) ar = read_uint128 m ar
     
   lemma read_sint8_write_sint8_eq:
     forall m: memory, a: addr, v: int [read_sint8 (write_sint8 m a v) a].
@@ -1452,6 +1999,11 @@ module MemBytes
     separated aw 8 ar 1 ->
       read_sint8 (write_uint64 m aw v) ar = read_sint8 m ar
     
+  lemma read_sint8_write_uint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint8 (write_uint128 m aw v) ar].
+    separated aw 16 ar 1 ->
+      read_sint8 (write_uint128 m aw v) ar = read_sint8 m ar
+    
   lemma read_sint8_write_sint8_sep:
     forall m: memory, ar aw: addr, v: int [read_sint8 (write_sint8 m aw v) ar].
     separated aw 1 ar 1 ->
@@ -1471,6 +2023,11 @@ module MemBytes
     forall m: memory, ar aw: addr, v: int [read_sint8 (write_sint64 m aw v) ar].
     separated aw 8 ar 1 ->
       read_sint8 (write_sint64 m aw v) ar = read_sint8 m ar
+    
+  lemma read_sint8_write_sint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint8 (write_sint128 m aw v) ar].
+    separated aw 16 ar 1 ->
+      read_sint8 (write_sint128 m aw v) ar = read_sint8 m ar
     
   lemma read_sint16_write_sint16_eq:
     forall m: memory, a: addr, v: int [read_sint16 (write_sint16 m a v) a].
@@ -1511,6 +2068,11 @@ module MemBytes
     separated aw 8 ar 2 ->
       read_sint16 (write_uint64 m aw v) ar = read_sint16 m ar
     
+  lemma read_sint16_write_uint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint16 (write_uint128 m aw v) ar].
+    separated aw 16 ar 2 ->
+      read_sint16 (write_uint128 m aw v) ar = read_sint16 m ar
+    
   lemma read_sint16_write_sint8_sep:
     forall m: memory, ar aw: addr, v: int [read_sint16 (write_sint8 m aw v) ar].
     separated aw 1 ar 2 ->
@@ -1530,6 +2092,11 @@ module MemBytes
     forall m: memory, ar aw: addr, v: int [read_sint16 (write_sint64 m aw v) ar].
     separated aw 8 ar 2 ->
       read_sint16 (write_sint64 m aw v) ar = read_sint16 m ar
+    
+  lemma read_sint16_write_sint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint16 (write_sint128 m aw v) ar].
+    separated aw 16 ar 2 ->
+      read_sint16 (write_sint128 m aw v) ar = read_sint16 m ar
     
   lemma read_sint32_write_sint32_eq:
     forall m: memory, a: addr, v: int [read_sint32 (write_sint32 m a v) a].
@@ -1570,6 +2137,11 @@ module MemBytes
     separated aw 8 ar 4 ->
       read_sint32 (write_uint64 m aw v) ar = read_sint32 m ar
     
+  lemma read_sint32_write_uint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint32 (write_uint128 m aw v) ar].
+    separated aw 16 ar 4 ->
+      read_sint32 (write_uint128 m aw v) ar = read_sint32 m ar
+    
   lemma read_sint32_write_sint8_sep:
     forall m: memory, ar aw: addr, v: int [read_sint32 (write_sint8 m aw v) ar].
     separated aw 1 ar 4 ->
@@ -1589,6 +2161,11 @@ module MemBytes
     forall m: memory, ar aw: addr, v: int [read_sint32 (write_sint64 m aw v) ar].
     separated aw 8 ar 4 ->
       read_sint32 (write_sint64 m aw v) ar = read_sint32 m ar
+    
+  lemma read_sint32_write_sint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint32 (write_sint128 m aw v) ar].
+    separated aw 16 ar 4 ->
+      read_sint32 (write_sint128 m aw v) ar = read_sint32 m ar
     
   lemma read_sint64_write_sint64_eq:
     forall m: memory, a: addr, v: int [read_sint64 (write_sint64 m a v) a].
@@ -1629,6 +2206,11 @@ module MemBytes
     separated aw 8 ar 8 ->
       read_sint64 (write_uint64 m aw v) ar = read_sint64 m ar
     
+  lemma read_sint64_write_uint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint64 (write_uint128 m aw v) ar].
+    separated aw 16 ar 8 ->
+      read_sint64 (write_uint128 m aw v) ar = read_sint64 m ar
+    
   lemma read_sint64_write_sint8_sep:
     forall m: memory, ar aw: addr, v: int [read_sint64 (write_sint8 m aw v) ar].
     separated aw 1 ar 8 ->
@@ -1649,6 +2231,80 @@ module MemBytes
     separated aw 8 ar 8 ->
       read_sint64 (write_sint64 m aw v) ar = read_sint64 m ar
     
+  lemma read_sint64_write_sint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint64 (write_sint128 m aw v) ar].
+    separated aw 16 ar 8 ->
+      read_sint64 (write_sint128 m aw v) ar = read_sint64 m ar
+    
+  lemma read_sint128_write_sint128_eq:
+    forall m: memory, a: addr, v: int [read_sint128 (write_sint128 m a v) a].
+    is_sint128 v ->
+      read_sint128 (write_sint128 m a v) a = v
+    
+  lemma read_sint128_write_uint128_eq:
+    forall m: memory, a: addr, v: int [read_sint128 (write_uint128 m a v) a].
+    is_uint128 v ->
+      read_sint128 (write_uint128 m a v) a = to_sint128 v
+    
+  lemma read_sint128_copy_sep:
+    forall mw mc: memory, size: int, ar aw ac: addr [read_sint128 (memcpy mw aw mc ac size) ar].
+    separated ar 16 aw size ->
+      read_sint128 (memcpy mw aw mc ac size) ar = read_sint128 mw ar
+    by
+      let ob = mw[aw.base] in
+      let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
+      aw.base = ar.base -> VB.bread_uint128 nb ar.offset = VB.bread_uint128 ob ar.offset
+    
+  lemma read_sint128_write_uint8_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint128 (write_uint8 m aw v) ar].
+    separated aw 1 ar 16 ->
+      read_sint128 (write_uint8 m aw v) ar = read_sint128 m ar
+    
+  lemma read_sint128_write_uint16_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint128 (write_uint16 m aw v) ar].
+    separated aw 2 ar 16 ->
+      read_sint128 (write_uint16 m aw v) ar = read_sint128 m ar
+    
+  lemma read_sint128_write_uint32_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint128 (write_uint32 m aw v) ar].
+    separated aw 4 ar 16 ->
+      read_sint128 (write_uint32 m aw v) ar = read_sint128 m ar
+    
+  lemma read_sint128_write_uint64_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint128 (write_uint64 m aw v) ar].
+    separated aw 8 ar 16 ->
+      read_sint128 (write_uint64 m aw v) ar = read_sint128 m ar
+    
+  lemma read_sint128_write_uint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint128 (write_uint128 m aw v) ar].
+    separated aw 16 ar 16 ->
+      read_sint128 (write_uint128 m aw v) ar = read_sint128 m ar
+    
+  lemma read_sint128_write_sint8_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint128 (write_sint8 m aw v) ar].
+    separated aw 1 ar 16 ->
+      read_sint128 (write_sint8 m aw v) ar = read_sint128 m ar
+    
+  lemma read_sint128_write_sint16_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint128 (write_sint16 m aw v) ar].
+    separated aw 2 ar 16 ->
+      read_sint128 (write_sint16 m aw v) ar = read_sint128 m ar
+    
+  lemma read_sint128_write_sint32_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint128 (write_sint32 m aw v) ar].
+    separated aw 4 ar 16 ->
+      read_sint128 (write_sint32 m aw v) ar = read_sint128 m ar
+    
+  lemma read_sint128_write_sint64_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint128 (write_sint64 m aw v) ar].
+    separated aw 8 ar 16 ->
+      read_sint128 (write_sint64 m aw v) ar = read_sint128 m ar
+    
+  lemma read_sint128_write_sint128_sep:
+    forall m: memory, ar aw: addr, v: int [read_sint128 (write_sint128 m aw v) ar].
+    separated aw 16 ar 16 ->
+      read_sint128 (write_sint128 m aw v) ar = read_sint128 m ar
+    
   function read_init8 (m: init) (a: addr) : bool =
     IB.bread_init8 m[a.base] a.offset
     
@@ -1661,6 +2317,9 @@ module MemBytes
   function read_init64 (m: init) (a: addr) : bool =
     IB.bread_init64 m[a.base] a.offset
     
+  function read_init128 (m: init) (a: addr) : bool =
+    IB.bread_init128 m[a.base] a.offset
+    
   function write_init8 (m: init) (a: addr) (i: bool) : init =
     set m a.base (IB.bwrite_init8 m [a.base] a.offset i)
     
@@ -1672,6 +2331,9 @@ module MemBytes
     
   function write_init64 (m: init) (a: addr) (i: bool) : init =
     set m a.base (IB.bwrite_init64 m [a.base] a.offset i)
+    
+  function write_init128 (m: init) (a: addr) (i: bool) : init =
+    set m a.base (IB.bwrite_init128 m [a.base] a.offset i)
     
   lemma read_init8_write_init8_eq:
     forall m: init, a: addr, i: bool [read_init8 (write_init8 m a i) a].
@@ -1706,6 +2368,11 @@ module MemBytes
     separated aw 8 ar 1 ->
       read_init8 (write_init64 m aw i) ar = read_init8 m ar
     
+  lemma read_init8_write_init128_sep:
+    forall m: init, ar aw: addr, i: bool [read_init8 (write_init128 m aw i) ar].
+    separated aw 16 ar 1 ->
+      read_init8 (write_init128 m aw i) ar = read_init8 m ar
+    
   lemma read_init16_write_init16_eq:
     forall m: init, a: addr, i: bool [read_init16 (write_init16 m a i) a].
     read_init16 (write_init16 m a i) a = i
@@ -1738,6 +2405,11 @@ module MemBytes
     forall m: init, ar aw: addr, i: bool [read_init16 (write_init64 m aw i) ar].
     separated aw 8 ar 2 ->
       read_init16 (write_init64 m aw i) ar = read_init16 m ar
+    
+  lemma read_init16_write_init128_sep:
+    forall m: init, ar aw: addr, i: bool [read_init16 (write_init128 m aw i) ar].
+    separated aw 16 ar 2 ->
+      read_init16 (write_init128 m aw i) ar = read_init16 m ar
     
   lemma read_init32_write_init32_eq:
     forall m: init, a: addr, i: bool [read_init32 (write_init32 m a i) a].
@@ -1772,6 +2444,11 @@ module MemBytes
     separated aw 8 ar 4 ->
       read_init32 (write_init64 m aw i) ar = read_init32 m ar
     
+  lemma read_init32_write_init128_sep:
+    forall m: init, ar aw: addr, i: bool [read_init32 (write_init128 m aw i) ar].
+    separated aw 16 ar 4 ->
+      read_init32 (write_init128 m aw i) ar = read_init32 m ar
+    
   lemma read_init64_write_init64_eq:
     forall m: init, a: addr, i: bool [read_init64 (write_init64 m a i) a].
     read_init64 (write_init64 m a i) a = i
@@ -1804,6 +2481,49 @@ module MemBytes
     forall m: init, ar aw: addr, i: bool [read_init64 (write_init64 m aw i) ar].
     separated aw 8 ar 8 ->
       read_init64 (write_init64 m aw i) ar = read_init64 m ar
+    
+  lemma read_init64_write_init128_sep:
+    forall m: init, ar aw: addr, i: bool [read_init64 (write_init128 m aw i) ar].
+    separated aw 16 ar 8 ->
+      read_init64 (write_init128 m aw i) ar = read_init64 m ar
+    
+  lemma read_init128_write_init128_eq:
+    forall m: init, a: addr, i: bool [read_init128 (write_init128 m a i) a].
+    read_init128 (write_init128 m a i) a = i
+    
+  lemma read_init128_copy_sep:
+    forall mw mc: init, size: int, ar aw ac: addr [read_init128 (memcpy mw aw mc ac size) ar].
+    separated ar 16 aw size ->
+      read_init128 (memcpy mw aw mc ac size) ar = read_init128 mw ar
+    by
+      let ob = mw[aw.base] in
+      let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
+      aw.base = ar.base -> IB.bread_init128 nb ar.offset = IB.bread_init128 ob ar.offset
+    
+  lemma read_init128_write_init8_sep:
+    forall m: init, ar aw: addr, i: bool [read_init128 (write_init8 m aw i) ar].
+    separated aw 1 ar 16 ->
+      read_init128 (write_init8 m aw i) ar = read_init128 m ar
+    
+  lemma read_init128_write_init16_sep:
+    forall m: init, ar aw: addr, i: bool [read_init128 (write_init16 m aw i) ar].
+    separated aw 2 ar 16 ->
+      read_init128 (write_init16 m aw i) ar = read_init128 m ar
+    
+  lemma read_init128_write_init32_sep:
+    forall m: init, ar aw: addr, i: bool [read_init128 (write_init32 m aw i) ar].
+    separated aw 4 ar 16 ->
+      read_init128 (write_init32 m aw i) ar = read_init128 m ar
+    
+  lemma read_init128_write_init64_sep:
+    forall m: init, ar aw: addr, i: bool [read_init128 (write_init64 m aw i) ar].
+    separated aw 8 ar 16 ->
+      read_init128 (write_init64 m aw i) ar = read_init128 m ar
+    
+  lemma read_init128_write_init128_sep:
+    forall m: init, ar aw: addr, i: bool [read_init128 (write_init128 m aw i) ar].
+    separated aw 16 ar 16 ->
+      read_init128 (write_init128 m aw i) ar = read_init128 m ar
     
   predicate sconst (memory)
   

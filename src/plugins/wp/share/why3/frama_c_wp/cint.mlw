@@ -27,6 +27,8 @@ module Cint
   let constant max_sint32: int = 0x80000000
   let constant max_uint64: int = 0x10000000000000000
   let constant max_sint64: int = 0x8000000000000000
+  let constant max_uint128: int = 0x100000000000000000000000000000000
+  let constant max_sint128: int = 0x80000000000000000000000000000000
 
   (** * C-Integer Ranges * **)
 
@@ -39,6 +41,8 @@ module Cint
   predicate is_sint32(x:int) = -max_sint32 <= x < max_sint32
   predicate is_uint64(x:int) = 0 <= x < max_uint64
   predicate is_sint64(x:int) = -max_sint64 <= x < max_sint64
+  predicate is_uint128(x:int) = 0 <= x < max_uint128
+  predicate is_sint128(x:int) = -max_sint128 <= x < max_sint128
 
   lemma is_bool0: is_bool(0)
   lemma is_bool1: is_bool(1)
@@ -109,6 +113,22 @@ module Cint
     then to_sint64 (x + max_uint64)
     else if x >= max_sint64
     then to_sint64 (x - max_uint64)
+    else x
+
+  let rec function to_uint128 (x: int) : int
+    variant { if x < 0 then max_uint128 - x else x }
+  = if x < 0
+    then to_uint128 (x + max_uint128)
+    else if x >= max_uint128
+    then to_uint128 (x - max_uint128)
+    else x
+
+  let rec function to_sint128 (x: int) : int
+    variant { if x < - max_sint128 then max_sint128 - x else x - max_sint128 }
+  = if x < -max_sint128
+    then to_sint128 (x + max_uint128)
+    else if x >= max_sint128
+    then to_sint128 (x - max_uint128)
     else x
 
   function two_power_abs  int : int
@@ -195,6 +215,24 @@ module Cint
     then is_to_sint64 (x - max_uint64)
     else ()
 
+  let rec lemma is_to_uint128 (x: int)
+    ensures { is_uint128 (to_uint128 x) }
+    variant { if x < 0 then max_uint128 - x else x }
+  = if x < 0
+    then is_to_uint128 (x + max_uint128)
+    else if x >= max_uint128
+    then is_to_uint128 (x - max_uint128)
+    else ()
+
+  let rec lemma is_to_sint128 (x: int)
+    ensures { is_sint128 (to_sint128 x) }
+    variant { if x < - max_sint128 then max_sint128 - x else x - max_sint128 }
+  = if x < -max_sint128
+    then is_to_sint128 (x + max_uint128)
+    else if x >= max_sint128
+    then is_to_sint128 (x - max_uint128)
+    else ()
+
   (** * C-Integer Conversions are identity when in-range * **)
 
   lemma id_uint8 : forall x:int [ to_uint8 x ]. is_uint8 x -> (to_uint8 x) = x
@@ -205,6 +243,8 @@ module Cint
   lemma id_sint32 : forall x:int [ to_sint32 x ]. is_sint32 x -> (to_sint32 x) = x
   lemma id_uint64 : forall x:int [ to_uint64 x ]. is_uint64 x -> (to_uint64 x) = x
   lemma id_sint64 : forall x:int [ to_sint64 x ]. is_sint64 x -> (to_sint64 x) = x
+  lemma id_uint128 : forall x:int [ to_uint128 x ]. is_uint128 x -> (to_uint128 x) = x
+  lemma id_sint128 : forall x:int [ to_sint128 x ]. is_sint128 x -> (to_sint128 x) = x
 
   lemma id_uint8_inl : forall x: int [ to_uint8 x ].
     0 <= x < max_uint8 -> (to_uint8 x) = x
@@ -222,6 +262,10 @@ module Cint
     0 <= x < max_uint64 -> (to_uint64 x) = x
   lemma id_sint64_inl : forall x: int [ to_sint64 x ].
     - max_sint64 <= x < max_sint64 -> (to_sint64 x) = x
+  lemma id_uint128_inl : forall x: int [ to_uint128 x ].
+    0 <= x < max_uint128 -> (to_uint128 x) = x
+  lemma id_sint128_inl : forall x: int [ to_sint128 x ].
+    - max_sint128 <= x < max_sint128 -> (to_sint128 x) = x
 
   (** * C-Integer Conversions are projections * **)
 
@@ -251,6 +295,13 @@ module Cint
     variant { if x < - max_sint64 then max_sint64 - x else x }
   = if x < - max_sint64 then proj_int64 (x + max_uint64) else
     if max_uint64 <= x then proj_int64 (x - max_uint64)
+    else ()
+
+  let rec lemma proj_int128 (x: int)
+    ensures { to_sint128(to_uint128 x) = to_sint128  x }
+    variant { if x < - max_sint128 then max_sint128 - x else x }
+  = if x < - max_sint128 then proj_int128 (x + max_uint128) else
+    if max_uint128 <= x then proj_int128 (x - max_uint128)
     else ()
 
 end

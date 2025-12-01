@@ -124,6 +124,8 @@ struct
     | SInt32 -> 6
     | UInt64 -> 7
     | SInt64 -> 8
+    | UInt128 -> 9
+    | SInt128 -> 10
 
   let rank = function
     | M_int i -> int_rank i
