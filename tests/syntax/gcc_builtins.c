@@ -2,7 +2,6 @@
    STDOPT: +"-machdep gcc_x86_32"
  */
 #include "stdint.h"
-
 #define likely(x)  __builtin_expect((x),1)
 #define unlikely(x)  __builtin_expect((x),0)
 
@@ -194,3 +193,7 @@ void main(void) {
     int y = x;
   }
 }
+
+// Not exactly "builtins", but GCC extensions nevertheless
+__int128 i128 = 1;
+__uint128_t u128 = -1;

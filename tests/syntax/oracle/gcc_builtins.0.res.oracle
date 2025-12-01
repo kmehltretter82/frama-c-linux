@@ -367,4 +367,6 @@ void main(void)
   return;
 }
 
+__int128 i128 = (__int128)1;
+__uint128_t u128 = (__uint128_t)(-1);
 
