@@ -501,9 +501,9 @@ let for_stmt env kf stmt =
     (Labels.at_for_stmt stmt)
 
 let to_exp ~loc ~adata kf env pot label =
-  let kinstr = Env.get_kinstr env in
   let lscope = Env.Logic_scope.get env in
-  let at = At_data.create kf kinstr lscope pot label in
+  let at = Labels.at_for_pot pot in
+  let () = Option.iter raise at.error in
   if is_label_defined label then
     try
       let vi_or_err = At_data.Hashtbl.find translations at in

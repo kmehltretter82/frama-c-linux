@@ -47,6 +47,10 @@ let preprocess_done = ref false
 let at_data_for_stmts: At_data.t list ref Stmt.Hashtbl.t =
   Stmt.Hashtbl.create 17
 
+(** Associate the [at_data] that need to be translated for a predicate/term. *)
+let at_data_for_pots: At_data.t Pred_or_term.Hashtbl.t =
+  Pred_or_term.Hashtbl.create 17
+
 (** Add [data] to the list of [at_data] that must be translated on the
     statement [stmt]. *)
 let add_at_for_stmt data stmt =
@@ -94,6 +98,18 @@ let at_for_stmt stmt =
     retrieve
     stmt
     Printer.pp_stmt
+
+let at_for_pot pot =
+  let retrieve pot =
+    match Pred_or_term.Hashtbl.find_opt at_data_for_pots pot with
+    | Some at -> Result.Ok at
+    | None -> Result.Error (Error.not_memoized ())
+  in
+  Error.retrieve_preprocessing
+    "labels pre-analysis"
+    retrieve
+    pot
+    Pred_or_term.pretty
 
 (**************************************************************************)
 (************************** AST traversal *********************************)
@@ -283,13 +299,12 @@ end = struct
         | _, RTE, _ ->
           Options.fatal "%s" (msg "invalid annotation kind in")
       in
+      let at = At_data.create ?error env.kf env.kinstr env.lscope pot label in
+      Pred_or_term.Hashtbl.add at_data_for_pots pot at;
       begin match dest_stmt_opt with
         | Some dest_stmt ->
           (* Register the current labeled pred_or_term to the destination
              statement for a later translation *)
-          let at =
-            At_data.create ?error env.kf env.kinstr env.lscope pot label
-          in
           add_at_for_stmt at dest_stmt;
         | None ->
           ()
@@ -531,6 +546,7 @@ let preprocess ast =
 
 let reset () =
   preprocess_done := false;
+  Pred_or_term.Hashtbl.clear at_data_for_pots;
   Stmt.Hashtbl.clear at_data_for_stmts
 
 let _debug () =

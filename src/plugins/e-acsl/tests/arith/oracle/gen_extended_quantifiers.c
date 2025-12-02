@@ -51,7 +51,7 @@ int main(void)
     __gen_e_acsl_assert_data.pred_txt = "\\sum(2, 10, \\lambda integer k; 2 * k) == 108";
     __gen_e_acsl_assert_data.file = "extended_quantifiers.c";
     __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 11;
+    __gen_e_acsl_assert_data.line = 14;
     __e_acsl_assert(__gen_e_acsl_accumulator == 108,
                     & __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -105,7 +105,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.pred_txt = "\\sum(2, 35, \\lambda integer k; 18446744073709551615ULL) != 0";
     __gen_e_acsl_assert_data_2.file = "extended_quantifiers.c";
     __gen_e_acsl_assert_data_2.fct = "main";
-    __gen_e_acsl_assert_data_2.line = 12;
+    __gen_e_acsl_assert_data_2.line = 15;
     __e_acsl_assert(__gen_e_acsl_ne != 0,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __gmpz_clear(__gen_e_acsl_lambda_2);
@@ -144,7 +144,7 @@ int main(void)
     __gen_e_acsl_assert_data_3.pred_txt = "\\sum(10, 2, \\lambda integer k; k) == 0";
     __gen_e_acsl_assert_data_3.file = "extended_quantifiers.c";
     __gen_e_acsl_assert_data_3.fct = "main";
-    __gen_e_acsl_assert_data_3.line = 13;
+    __gen_e_acsl_assert_data_3.line = 16;
     __e_acsl_assert(__gen_e_acsl_accumulator_3 == 0,
                     & __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
@@ -203,7 +203,7 @@ int main(void)
     __gen_e_acsl_assert_data_4.pred_txt = "\\sum(x * x, 2, \\lambda integer k; k) == 0";
     __gen_e_acsl_assert_data_4.file = "extended_quantifiers.c";
     __gen_e_acsl_assert_data_4.fct = "main";
-    __gen_e_acsl_assert_data_4.line = 14;
+    __gen_e_acsl_assert_data_4.line = 17;
     __e_acsl_assert(__gen_e_acsl_eq == 0,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     __gmpz_clear(__gen_e_acsl_x);
@@ -259,7 +259,7 @@ int main(void)
     __gen_e_acsl_assert_data_5.pred_txt = "\\sum(18446744073709551615ULL - 5, 18446744073709551615ULL,\n    \\lambda integer k; 1)\n== 6";
     __gen_e_acsl_assert_data_5.file = "extended_quantifiers.c";
     __gen_e_acsl_assert_data_5.fct = "main";
-    __gen_e_acsl_assert_data_5.line = 15;
+    __gen_e_acsl_assert_data_5.line = 18;
     __e_acsl_assert(__gen_e_acsl_accumulator_5 == 6,
                     & __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
@@ -305,7 +305,7 @@ int main(void)
     __gen_e_acsl_assert_data_6.pred_txt = "\\sum(2147483647, 2147483647, \\lambda integer k; k) + 1 > 2147483647";
     __gen_e_acsl_assert_data_6.file = "extended_quantifiers.c";
     __gen_e_acsl_assert_data_6.fct = "main";
-    __gen_e_acsl_assert_data_6.line = 16;
+    __gen_e_acsl_assert_data_6.line = 19;
     __e_acsl_assert(__gen_e_acsl_accumulator_6 + 1U > 2147483647U,
                     & __gen_e_acsl_assert_data_6);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
@@ -357,7 +357,7 @@ int main(void)
     __gen_e_acsl_assert_data_7.pred_txt = "\\let x = 0 == 0 ? 1 : 10; \\sum(x, 10, \\lambda integer k; -2147483647 - 1) < 0";
     __gen_e_acsl_assert_data_7.file = "extended_quantifiers.c";
     __gen_e_acsl_assert_data_7.fct = "main";
-    __gen_e_acsl_assert_data_7.line = 17;
+    __gen_e_acsl_assert_data_7.line = 20;
     __e_acsl_assert(__gen_e_acsl_accumulator_7 < 0L,
                     & __gen_e_acsl_assert_data_7);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
@@ -412,7 +412,7 @@ int main(void)
     __gen_e_acsl_assert_data_8.pred_txt = "\\numof(2, 10, \\lambda integer k; k - 2 >= 0) == 9";
     __gen_e_acsl_assert_data_8.file = "extended_quantifiers.c";
     __gen_e_acsl_assert_data_8.fct = "main";
-    __gen_e_acsl_assert_data_8.line = 20;
+    __gen_e_acsl_assert_data_8.line = 23;
     __e_acsl_assert(__gen_e_acsl_accumulator_8 == 9,
                     & __gen_e_acsl_assert_data_8);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
@@ -458,7 +458,7 @@ int main(void)
     __gen_e_acsl_assert_data_9.pred_txt = "\\numof(4294967295U - 5, 4294967295U, \\lambda integer k; k % 2 == 1) == 3";
     __gen_e_acsl_assert_data_9.file = "extended_quantifiers.c";
     __gen_e_acsl_assert_data_9.fct = "main";
-    __gen_e_acsl_assert_data_9.line = 21;
+    __gen_e_acsl_assert_data_9.line = 24;
     __e_acsl_assert(__gen_e_acsl_accumulator_9 == 3,
                     & __gen_e_acsl_assert_data_9);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
@@ -510,7 +510,7 @@ int main(void)
     __gen_e_acsl_assert_data_10.pred_txt = "\\product(1, 100, \\lambda integer k; k) >= 3628800";
     __gen_e_acsl_assert_data_10.file = "extended_quantifiers.c";
     __gen_e_acsl_assert_data_10.fct = "main";
-    __gen_e_acsl_assert_data_10.line = 25;
+    __gen_e_acsl_assert_data_10.line = 28;
     __e_acsl_assert(__gen_e_acsl_ge >= 0,& __gen_e_acsl_assert_data_10);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
     __gmpz_clear(__gen_e_acsl_lambda_10);
@@ -552,7 +552,7 @@ int main(void)
     __gen_e_acsl_assert_data_11.pred_txt = "\\product(1, 10, \\lambda integer k; k) == 3628800";
     __gen_e_acsl_assert_data_11.file = "extended_quantifiers.c";
     __gen_e_acsl_assert_data_11.fct = "main";
-    __gen_e_acsl_assert_data_11.line = 26;
+    __gen_e_acsl_assert_data_11.line = 29;
     __e_acsl_assert(__gen_e_acsl_accumulator_11 == 3628800UL,
                     & __gen_e_acsl_assert_data_11);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
@@ -600,7 +600,7 @@ int main(void)
     __gen_e_acsl_assert_data_12.pred_txt = "\\product(-10, 10, \\lambda integer k; k) == 0";
     __gen_e_acsl_assert_data_12.file = "extended_quantifiers.c";
     __gen_e_acsl_assert_data_12.fct = "main";
-    __gen_e_acsl_assert_data_12.line = 27;
+    __gen_e_acsl_assert_data_12.line = 30;
     __e_acsl_assert(__gen_e_acsl_eq_2 == 0,& __gen_e_acsl_assert_data_12);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
     __gmpz_clear(__gen_e_acsl_lambda_12);
@@ -695,7 +695,7 @@ int main(void)
     __gen_e_acsl_assert_data_13.pred_txt = "\\product(-20, -1, \\lambda integer k; 2 * k) ==\n\\product(1, 20, \\lambda integer k; 2 * k)";
     __gen_e_acsl_assert_data_13.file = "extended_quantifiers.c";
     __gen_e_acsl_assert_data_13.fct = "main";
-    __gen_e_acsl_assert_data_13.line = 28;
+    __gen_e_acsl_assert_data_13.line = 31;
     __e_acsl_assert(__gen_e_acsl_eq_3 == 0,& __gen_e_acsl_assert_data_13);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
     __gmpz_clear(__gen_e_acsl_lambda_13);

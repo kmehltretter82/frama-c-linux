@@ -37,6 +37,17 @@ let cast ~src ~dst = match src, dst with
        certainly on purpose . *)
     dst
 
+module Z = struct
+  let int_gt = (>)
+
+  include Z (* shadow some definitions of module [Z] *)
+
+  let pow ?(limit = 1024) b e =
+    (* pre-empt a memory overflow due to a huge exponent *)
+    if int_gt e limit && Z.gt (Z.abs b) Z.one then raise Z.Overflow;
+    pow b e
+end
+
 (* a-b; or 0 if negative *)
 let length a b = Z.max Z.zero (Z.succ (Z.sub a b))
 

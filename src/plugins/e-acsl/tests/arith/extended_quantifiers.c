@@ -4,6 +4,9 @@
 
 #include <limits.h>
 
+//@ ensures \result == \product(0, n-1, \lambda integer k; t[k]);
+int array_product(int t[], int n);
+
 int main(void) {
   unsigned long x = UINT_MAX;
   int y = 10;

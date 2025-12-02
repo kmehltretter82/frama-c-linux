@@ -518,21 +518,27 @@ releases:
   - name: Plug-in Manuals
     sort: true
     files:
+    - name: ACSL Importer
+      link: /download/acsl-importer-manual-$VERSION_AND_CODENAME.pdf
     - name: Aoraï manual
       link: /download/aorai-manual-$VERSION_AND_CODENAME.pdf
       help: Aoraï example
       help_link: /download/aorai-example-$VERSION_AND_CODENAME.tar.gz
-    - name: Metrics manual
-      link: /download/metrics-manual-$VERSION_AND_CODENAME.pdf
-    - name: Rte manual
-      link: /download/rte-manual-$VERSION_AND_CODENAME.pdf
-    - name: Eva manual
-      link: /download/eva-manual-$VERSION_AND_CODENAME.pdf
-    - name: WP manual
-      link: /download/wp-manual-$VERSION_AND_CODENAME.pdf
     - name: E-ACSL manual
       link: /download/e-acsl/e-acsl-manual-$VERSION_AND_CODENAME.pdf
-  - name: Ivette Packages (experimental)
+    - name: Eva manual
+      link: /download/eva-manual-$VERSION_AND_CODENAME.pdf
+    - name: Metrics manual
+      link: /download/metrics-manual-$VERSION_AND_CODENAME.pdf
+    - name: Mthread manual
+      link: /download/mthread-manual-$VERSION_AND_CODENAME.pdf
+    - name: Rte manual
+      link: /download/rte-manual-$VERSION_AND_CODENAME.pdf
+    - name: Volatile manual
+      link: /download/volatile-manual-$VERSION_AND_CODENAME.pdf
+    - name: WP manual
+      link: /download/wp-manual-$VERSION_AND_CODENAME.pdf
+  - name: Ivette Packages
     files:
     - name: Linux x86-64 AppImage
       link: /download/frama-c-ivette-linux-x86-64-$VERSION_AND_CODENAME.AppImage
