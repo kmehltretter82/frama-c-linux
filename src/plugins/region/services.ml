@@ -161,6 +161,7 @@ struct
     | IShort | IUShort -> 's'
     | ILong | ILongLong -> 'l'
     | IULong | IULongLong -> 'w'
+    | IInt128 | IUInt128 -> 'q'
 
   let fkind_to_char (fkind : Cil_types.fkind) =
     match fkind with
