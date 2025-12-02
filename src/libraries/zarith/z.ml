@@ -21,6 +21,11 @@ let to_int32_opt = wrap to_int32
 (* Basic functions and utils *)
 (* ------------------------- *)
 
+let pow ?(limit = 99999) b e =
+  if e > limit && gt (abs b) one
+  then raise Overflow
+  else pow b e
+
 let two_power_of_int ?(limit = 1024) k =
   if k > limit then
     raise Overflow

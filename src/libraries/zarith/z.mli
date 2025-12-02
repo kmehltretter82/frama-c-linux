@@ -123,8 +123,13 @@ val is_one : t -> bool
 (** Compute [b - a + 1]. *)
 val length : t -> t -> t
 
+(** [pow n i] computes [n^i]. [?limit] can be used to raise an {!Overflow} if
+    the exponent is too big. Default value is [1024].
+    @raises Overflow if the argument is greater than [?limit] *)
+val pow : ?limit:int -> t -> int -> t
+
 (** Computes [2^n]. [?limit] can be used to raise an {!Overflow} if the exponent
-    is too big. Default value is [1024].
+    is too big. Default value is [99999].
     @raises Overflow if the argument is greater than [?limit]
     @before Frama-C+dev [?limit] argument was not present and all values were
     accepted
