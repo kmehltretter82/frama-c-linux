@@ -51,6 +51,8 @@ let get_set_suffix_and_arg res_ty e =
     "_ui", args_uisi e
   | C_integer (ISChar | IShort | IInt | ILong), _ -> "_si", args_uisi e
   | C_integer (ILongLong | IULongLong as ikind), _ -> raise (Longlong ikind)
+  | C_integer (IInt128 | IUInt128 as ikind), _ ->
+    raise (Longlong ikind) (* TODO: use a more specific exception? *)
   | C_float (FFloat | FFloat32 | FFloat64 | FDouble), _ -> "_d", [ e ]
   (* FFloat is a strict subset of FDouble (modulo exceptional numbers)
      Hence, calling [set_d] for both of them is sound.

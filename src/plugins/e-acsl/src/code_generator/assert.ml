@@ -121,6 +121,8 @@ let ikind_to_string = function
   | IULong -> "ulong"
   | ILongLong -> "longlong"
   | IULongLong -> "ulonglong"
+  | IInt128 -> "int128"
+  | IUInt128 -> "uint128"
 
 let fkind_to_string fk = Format.asprintf "%a" Printer.pp_fkind fk
 
