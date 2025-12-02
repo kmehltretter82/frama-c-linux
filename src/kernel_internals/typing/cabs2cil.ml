@@ -240,13 +240,6 @@ let cabslu s =
  * hold the result of function calls *)
 let callTempVars: unit IH.t = IH.create 13
 
-(* Check that s starts with the prefix p *)
-let prefix p s =
-  let lp = String.length p in
-  let ls = String.length s in
-  lp <= ls && String.sub s 0 lp = p
-
-
 (***** PROCESS PRAGMAS **********)
 
 (* fc_stdlib pragma. Delimits blocks of globals that are declared in
@@ -3267,7 +3260,7 @@ let fieldsToInit
     else if found then
       found, offset :: loff
       (* if this field is an anonymous comp, search for the designator inside *)
-    else if prefix anonCompFieldName f.fname && not found
+    else if String.starts_with ~prefix:anonCompFieldName f.fname && not found
             && f.forig_name <> f.fname then
       match Ast_types.unroll_node f.ftype with
       | TComp comp ->
@@ -3305,7 +3298,8 @@ let find_field_offset cond (fidlist: fieldinfo list) : offset =
       [] -> raise Not_found
     | fid :: _ when cond fid ->
       Field(fid, NoOffset)
-    | fid :: rest when prefix anonCompFieldName fid.fname -> begin
+    | fid :: rest
+      when String.starts_with ~prefix:anonCompFieldName fid.fname -> begin
         match Ast_types.unroll_node fid.ftype with
         | TComp ci ->
           (try
@@ -10505,3 +10499,7 @@ let convFile (path, f) =
     globinit = None;
     globinitcalled = false;
   }
+
+(* Deprecated *)
+
+let prefix prefix s = String.starts_with ~prefix s

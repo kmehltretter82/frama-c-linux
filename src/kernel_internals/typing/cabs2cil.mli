@@ -112,9 +112,6 @@ val typeForInsertedVar: (Cil_types.typ -> Cil_types.typ) ref
     globals and starting with [prefix] *)
 val fresh_global : string -> string
 
-(** Check that [s] starts with the prefix [p]. *)
-val prefix : string -> string -> bool
-
 val anonCompFieldName : string
 
 val find_field_offset:
@@ -199,3 +196,10 @@ val fieldsToInit: Cil_types.compinfo -> string option -> Cil_types.offset list
    @since 25.0-Manganese
 *)
 val func_locs : unit -> (Filepath.position * Filepath.position * string) list
+
+(** Deprecated  *)
+
+(** Check that [s] starts with the prefix [p]. *)
+val prefix : string -> string -> bool
+[@@deprecated "Use String.starts_with instead."]
+[@@migrate { repl = (fun prefix s -> String.starts_with ~prefix s) } ]
