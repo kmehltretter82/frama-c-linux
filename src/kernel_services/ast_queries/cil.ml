@@ -2341,6 +2341,7 @@ let bytesSizeOfInt (ik: ikind): int =
   | IShort | IUShort -> Machine.Sizeof.short ()
   | ILong | IULong -> Machine.Sizeof.long ()
   | ILongLong | IULongLong -> Machine.Sizeof.longlong ()
+  | IInt128 | IUInt128 -> 16
 
 let bitsSizeOfInt ik = 8 * bytesSizeOfInt ik
 
@@ -2363,12 +2364,14 @@ let intKindForSize (s:int) (unsigned:bool) : ikind =
   else if s = Sizeof.longlong () then ILongLong
   else raise Not_found
 
-let uint64_t () = Cil_const.mk_tint (intKindForSize 8 true)
-let uint32_t () = Cil_const.mk_tint (intKindForSize 4 true)
-let uint16_t () = Cil_const.mk_tint (intKindForSize 2 true)
-let int64_t  () = Cil_const.mk_tint (intKindForSize 8 false)
-let int32_t  () = Cil_const.mk_tint (intKindForSize 4 false)
-let int16_t  () = Cil_const.mk_tint (intKindForSize 2 false)
+let uint128_t () = Cil_const.mk_tint (intKindForSize 16 true)
+let uint64_t  () = Cil_const.mk_tint (intKindForSize 8 true)
+let uint32_t  () = Cil_const.mk_tint (intKindForSize 4 true)
+let uint16_t  () = Cil_const.mk_tint (intKindForSize 2 true)
+let int128_t  () = Cil_const.mk_tint (intKindForSize 16 false)
+let int64_t   () = Cil_const.mk_tint (intKindForSize 8 false)
+let int32_t   () = Cil_const.mk_tint (intKindForSize 4 false)
+let int16_t   () = Cil_const.mk_tint (intKindForSize 2 false)
 
 let floatKindForSize (s:int) =
   if s = Machine.Sizeof.double () then FDouble
@@ -2382,13 +2385,15 @@ let isSigned = function
   | IUShort
   | IUInt
   | IULong
-  | IULongLong ->
+  | IULongLong
+  | IUInt128 ->
     false
   | ISChar
   | IShort
   | IInt
   | ILong
-  | ILongLong ->
+  | ILongLong
+  | IInt128 ->
     true
   | IChar ->
     not (Machine.char_is_unsigned ())
@@ -3097,6 +3102,7 @@ let rank : ikind -> int =
   | IInt | IUInt -> 3
   | ILong | IULong -> 4
   | ILongLong | IULongLong -> 5
+  | IInt128 | IUInt128 -> 6
 
 let unsignedVersionOf (ik:ikind): ikind =
   match ik with
@@ -3105,6 +3111,7 @@ let unsignedVersionOf (ik:ikind): ikind =
   | IInt -> IUInt
   | ILong -> IULong
   | ILongLong -> IULongLong
+  | IInt128 -> IUInt128
   | _ -> ik
 
 let frank = function
@@ -3194,6 +3201,8 @@ let rec bytesAlignOf ~standard_or_gcc t =
       Alignof.long ()
     | TInt (ILongLong|IULongLong) ->
       Alignof.longlong ()
+    | TInt (IInt128|IUInt128) ->
+      16
     | TEnum ei ->  bytesAlignOf ~standard_or_gcc (Cil_const.mk_tint ei.ekind)
     | TFloat (FFloat|FFloat32) ->
       Alignof.float ()
@@ -4936,6 +4945,22 @@ let arithmeticConversion t1 t2 = (* c.f. ISO 6.3.1.8 *)
       let t1' = integralPromotion t1 in
       let t2' = integralPromotion t2 in
       match Ast_types.unroll_skel t1', Ast_types.unroll_skel t2' with
+
+      (* 128-bit ints: copied from 'long long'-based lines below *)
+      | TInt IUInt128, _ -> checkToInt t2'; t1'
+      | _, TInt IUInt128 -> checkToInt t1'; t2'
+
+      | TInt IInt128, _
+        when bitsSizeOf t1' <= bitsSizeOf t2' &&
+             (not (isSignedInteger t2')) -> Cil_const.uint128Type
+      | _, TInt IInt128
+        when bitsSizeOf t2' <= bitsSizeOf t1' &&
+             (not (isSignedInteger t1')) -> Cil_const.uint128Type
+
+      | TInt IInt128, _ -> checkToInt t2'; t1'
+      | _, TInt IInt128 -> checkToInt t1'; t2'
+
+
       | TInt IULongLong, _ -> checkToInt t2'; t1'
       | _, TInt IULongLong -> checkToInt t1'; t2'
 

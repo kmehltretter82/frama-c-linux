@@ -628,6 +628,8 @@ class cil_printer () = object (self)
         | IULong -> "UL"
         | ILongLong -> if Machine.msvcMode () then "L" else "LL"
         | IULongLong -> if Machine.msvcMode () then "UL" else "ULL"
+        | IInt128 | IUInt128 ->
+          Kernel.fatal "128-bit constants are not allowed"
         | IInt | IBool | IShort | IUShort | IChar | ISChar | IUChar -> ""
       in
       let prefix =
@@ -1966,6 +1968,8 @@ class cil_printer () = object (self)
          if Machine.msvcMode ()
          then "unsigned __int64"
          else "unsigned long long"
+       | IInt128 -> "__int128"
+       | IUInt128 -> "__uint128_t"
       )
 
   method compkind fmt ci =

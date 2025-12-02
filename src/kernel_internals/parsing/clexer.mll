@@ -184,6 +184,8 @@ let init_lexicon () =
   (*** GCC ***)
   gcc   "__alignof__" (fun loc -> GCC_ALIGNOF loc) ;
   gcc   "__thread" (fun loc -> THREAD loc) ;
+  gcc   "__int128" (fun loc -> INT128 loc) ;
+  gcc   "__uint128_t" (fun loc -> UINT128 loc) ;
   (**** MSVC ***)
   valid "__int64" (fun _ -> INT64 (currentLoc ())) ;
   valid "__int32" (fun loc -> INT loc) ;
@@ -210,9 +212,7 @@ let init_lexicon () =
   unsupported "_Complex" ;
   unsupported "_Decimal32" ;
   unsupported "_Decimal64" ;
-  unsupported "_Imaginary" ;
-  unsupported "__int128" ;
-  unsupported "__uint128_t"
+  unsupported "_Imaginary"
 
 
 

@@ -639,6 +639,7 @@ let format_of_ikind = function
   | IULong -> Some `l, `u
   | ILongLong -> Some `ll, `d
   | IULongLong -> Some `ll, `u
+  | IInt128 | IUInt128 -> Kernel.fatal "128-bit integers not allowed in formats"
 
 let format_of_fkind k = function
   | FFloat   -> None, `f

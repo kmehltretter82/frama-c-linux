@@ -4206,6 +4206,10 @@ let rec doSpecList loc ghost
 
     | [Cabs.Tunsigned; Cabs.Tint64] -> ulongLongType
 
+    (* int128 is a gcc extension *)
+    | [Cabs.Tint128] -> int128Type
+    | [Cabs.Tuint128] -> uint128Type
+
     | [Cabs.Tfloat]   -> floatType
     | [Cabs.Tfloat32] -> float32Type
     | [Cabs.Tfloat64] -> float64Type
@@ -4297,7 +4301,7 @@ let rec doSpecList loc ghost
             if fitsInInt IInt i then IInt
             else if fitsInInt IUInt i then IUInt
             else if fitsInInt ILongLong i then ILongLong
-            else IULongLong
+            else IULongLong (* 128-bit ints not considered here *)
           | "int" -> IInt
           | s ->
             Kernel.fatal ~current:true "Unknown enums representations '%s'" s

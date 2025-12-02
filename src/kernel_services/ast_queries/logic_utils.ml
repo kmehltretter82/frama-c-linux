@@ -1361,10 +1361,12 @@ and is_same_pl_type t1 t2 =
      | ILong, ILong
      | IULong, IULong
      | ILongLong, ILongLong
-     | IULongLong, IULongLong -> true
+     | IULongLong, IULongLong
+     | IInt128, IInt128
+     | IUInt128, IUInt128 -> true
      | (IBool | IChar | ISChar | IUChar | IInt | IUInt
        | IShort | IUShort | ILong
-       | IULong | ILongLong | IULongLong), _ -> false
+       | IULong | ILongLong | IULongLong | IInt128 | IUInt128), _ -> false
     )
   | LTfloat k1, LTfloat k2 ->
     (match k1,k2 with

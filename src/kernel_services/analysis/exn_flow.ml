@@ -283,6 +283,8 @@ let get_type_tag t =
     | TInt IULong -> "ul"
     | TInt ILongLong -> "ll"
     | TInt IULongLong -> "ull"
+    | TInt IInt128 -> "i128"
+    | TInt IUInt128 -> "u128"
     | TFloat FFloat -> "f"
     | TFloat FFloat32 -> "f32"
     | TFloat FFloat64 -> "f64"

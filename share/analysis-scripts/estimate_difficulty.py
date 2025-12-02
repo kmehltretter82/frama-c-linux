@@ -498,8 +498,6 @@ if dyncallees:
 unsupported_keywords = {
     "_Complex": "C11 construct",
     "_Imaginary": "C11 construct",
-    "__int128": "non-standard construct (GNU extension)",
-    "__uint128_t": "non-standard construct (GNU extension)",
 }
 
 for ff in files:
