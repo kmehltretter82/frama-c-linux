@@ -71,15 +71,19 @@ let floatType      = mk_tfloat FFloat
 let longDoubleType = mk_tfloat FLongDouble
 
 module Vid = State_builder.SharedCounter(struct let name = "vid_counter" end)
-module Sid = State_builder.SharedCounter(struct let name = "sid" end)
-module Eid = State_builder.SharedCounter(struct let name = "eid" end)
+module Sid = State_builder.SharedCounter(struct let name = "sid_counter" end)
+module Eid = State_builder.SharedCounter(struct let name = "eid_counter" end)
+
+let new_raw_vid = Vid.next
+let new_raw_sid = Sid.next
+let new_raw_eid = Eid.next
 
 let set_vid v =
-  let n = Vid.next () in
+  let n = new_raw_vid () in
   v.vid <- n
 
 let copy_with_new_vid v =
-  let n = Vid.next () in
+  let n = new_raw_vid () in
   let new_v = { v with vid = n } in
   (match v.vlogic_var_assoc with
    | None -> ()
@@ -94,8 +98,6 @@ let change_varinfo_name vi name =
   match vi.vlogic_var_assoc with
   | None -> ()
   | Some lv -> lv.lv_name <- name
-
-let new_raw_id = Vid.next
 
 (* The next compindo identifier to use. Counts up. *)
 let nextCompinfoKey =
@@ -161,7 +163,7 @@ let copyCompInfo ?(fresh=true) ci cname =
 
 
 let make_logic_var_kind x kind typ =
-  {lv_name = x; lv_id = new_raw_id(); lv_type = typ; lv_kind = kind;
+  {lv_name = x; lv_id = new_raw_vid(); lv_type = typ; lv_kind = kind;
    lv_origin = None; lv_attr = [] }
 
 let make_logic_var_global x t = make_logic_var_kind x LVGlobal t
@@ -189,3 +191,5 @@ let make_logic_type name = {
   lt_def = None ;
   lt_attr = [] ;
 }
+
+let new_raw_id = new_raw_vid

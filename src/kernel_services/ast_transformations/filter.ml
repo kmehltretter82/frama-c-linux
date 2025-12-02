@@ -512,7 +512,7 @@ end = struct
       let old = s.sid in
       let keep = Stmt.Set.mem s keep_stmts in
       keep_stmts <- Stmt.Set.remove s keep_stmts;
-      s.sid <- Cil_const.Sid.next ();
+      s.sid <- Cil_const.new_raw_sid ();
       Visitor_behavior.Set.stmt self#behavior orig s;
       Visitor_behavior.Set_orig.stmt self#behavior s orig;
       if keep then self#add_stmt_keep s;

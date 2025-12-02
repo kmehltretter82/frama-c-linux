@@ -372,7 +372,7 @@ let copy_visit_gen fresh prj =
       try Cil_datatype.Logic_var.Hashtbl.find logic_vars x
       with Not_found ->
         (*      Format.printf "Not found@.";*)
-        let id = if fresh then Cil_const.new_raw_id () else x.lv_id in
+        let id = if fresh then Cil_const.new_raw_vid () else x.lv_id in
         let new_x = { x with lv_id = id } in
         temp_set_logic_var x new_x; temp_set_orig_logic_var new_x x; new_x
     in
@@ -645,7 +645,8 @@ let copy_visit_gen fresh prj =
       else (fun x -> { x with it_id = x.it_id});
     cexpr =
       (fun x ->
-         let id = if fresh then Cil_const.Eid.next () else x.eid in { x with eid = id });
+         let eid = if fresh then Cil_const.new_raw_eid () else x.eid in
+         { x with eid });
     is_copy_behavior = true;
     is_fresh_behavior = fresh;
     project = Some prj;
@@ -749,7 +750,7 @@ let copy_visit_gen fresh prj =
       (fun x ->
          try Cil_datatype.Stmt.Hashtbl.find stmts x
          with Not_found ->
-           let sid = if fresh then Cil_const.Sid.next () else x.sid in
+           let sid = if fresh then Cil_const.new_raw_sid () else x.sid in
            let new_x = { x with sid = sid } in
            Cil_datatype.Stmt.Hashtbl.add stmts x new_x;
            Cil_datatype.Stmt.Hashtbl.add orig_stmts new_x x;

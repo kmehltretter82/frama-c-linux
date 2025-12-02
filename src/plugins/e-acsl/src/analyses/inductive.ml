@@ -72,7 +72,7 @@ include struct (* auxiliary functions *)
   let pp_logic_info fmt li =
     Printer.pp_global_annotation fmt (Dfun_or_pred (li, Location.unknown))
 
-  let freshen_up_logic_var lv = {lv with lv_id = Cil_const.new_raw_id ()}
+  let freshen_up_logic_var lv = {lv with lv_id = Cil_const.new_raw_vid ()}
 
   let free_vars = Cil.extract_free_logicvars_from_term
   let free_vars_pred = Cil.extract_free_logicvars_from_predicate
