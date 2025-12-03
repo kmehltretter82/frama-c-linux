@@ -221,7 +221,7 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
     let adata = Assert.register_pred ~loc env p e adata in
     e, adata, env
   | Pat(p', label) ->
-    if inplace then
+    if inplace || label = BuiltinLabel Here then
       to_exp ~adata kf env p'
     else
       Translate_ats.to_exp ~loc ~adata kf env (PoT_pred p) label

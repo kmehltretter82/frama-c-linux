@@ -912,7 +912,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     e, adata, env, Analyses_types.C_number, ""
   | Tat(t', label) ->
     let e, adata, env =
-      if inplace then
+      if inplace || label = BuiltinLabel Here then
         to_exp ~adata kf env t'
       else
         Translate_ats.to_exp ~loc ~adata kf env (PoT_term t) label
