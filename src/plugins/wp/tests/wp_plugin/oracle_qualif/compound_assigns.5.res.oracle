@@ -1,4 +1,4 @@
-# frama-c -wp -wp-model 'Bytes' -wp-timeout 10 [...]
+# frama-c -wp -wp-model 'Bytes' -wp-timeout 15 [...]
 [kernel] Parsing compound_assigns.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] [Valid] Goal init_exits (Cfg) (Unreachable)

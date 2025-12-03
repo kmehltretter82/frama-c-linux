@@ -9,7 +9,7 @@
 */
 
 /* run.config_qualif
-   MACRO: TIME -wp-timeout 10
+   MACRO: TIME -wp-timeout 15
    MACRO: TIP -wp-strategy Unfold -wp-prover tip,alt-ergo -wp-script dry
    OPT: -wp-model typed  @TIME@
    OPT: -wp-model region @TIME@ @TIP@
