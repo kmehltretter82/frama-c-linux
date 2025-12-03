@@ -531,7 +531,7 @@ end = functor (Out : Out_language) -> struct
           flush_conds ~conds (Out.mk_let ~loc:p.pred_loc li c)
         | Pimplies ({pred_content = Papp (li, labels, args)} as pl, pr)
           when is_inductive li ->
-          let in_out_args, li =
+          let in_out_args', li' =
             if is_rec_occurrence li
             then Mode.in_out_args ~mode args, li
             else (* foreign predicate *)
@@ -549,24 +549,24 @@ end = functor (Out : Out_language) -> struct
                 is_unsound := true;
                 FunctionExtractor.extract ~mode:mode' li
           in
-          begin match in_out_args with
+          begin match in_out_args' with
             | _, None -> (* complete mode *)
-              let pl = {pl with pred_content = Papp (li, labels, args)} in
+              let pl = {pl with pred_content = Papp (li', labels, args)} in
               recurse ~conds:(pl :: conds) pr
-            | args, Some res ->
-              let rec_call =
-                Logic_const.term ~loc:p.pred_loc (Tapp (li, labels, args)) res.term_type
+            | args', Some res ->
+              let rec_call () =
+                Logic_const.term ~loc:p.pred_loc (Tapp (li', labels, args')) res.term_type
               in
               match var_of_term res with
               | Some v when not @@ Vars.mem v uv ->
                 let li = {(Cil_const.make_logic_info_local v.lv_name)
                           with l_var_info = v;
-                               l_body = LBterm rec_call;
+                               l_body = LBterm (rec_call ());
                                l_type = Some res.term_type}
                 in
                 recurse (Logic_const.plet ~loc:p.pred_loc li pr)
               | _ ->
-                let p = Logic_const.prel (Req, rec_call, res) in
+                let p = Logic_const.prel (Req, rec_call (), res) in
                 recurse ~conds:(p :: conds) pr
           end
         | Pimplies (pl, pr) -> (* simple hypothesis *)
