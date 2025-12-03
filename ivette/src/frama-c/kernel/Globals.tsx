@@ -30,13 +30,14 @@ import { Tree, Node } from 'dome/frame/tree';
 import { RState } from 'dome/data/states';
 import { Dropdown } from 'dome/dialogs';
 import { Icon } from 'dome/controls/icons';
+import { Decoder, Encoder, json, JsonTypeError } from 'dome/data/json';
+import { useWindowSettingsData } from 'dome/data/settings';
 
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Locations from 'frama-c/kernel/Locations';
-import { computationState } from 'frama-c/plugins/eva/api/analysis';
 import * as EvaAst from 'frama-c/plugins/eva/api/ast';
 import path from 'path';
 
@@ -243,6 +244,110 @@ function FctItem(props: FctItemProps): JSX.Element {
 }
 
 // --------------------------------------------------------------------------
+// --- Generic filter
+// --------------------------------------------------------------------------
+
+interface Filters {
+  id: string,
+  enabled: boolean,
+  positive_label: string,
+  negative_label: string,
+  positive_default: boolean,
+  negative_default: boolean
+}
+
+interface LocalFilters extends Filters {
+  positiveValue: boolean,
+  negativeValue: boolean
+}
+
+function isVisible(value: object, localFilters: LocalFilters[]): boolean {
+  return localFilters.reduce((prev, f) => {
+      if(!prev) return false;
+      const id = f.id;
+      const { positiveValue, negativeValue } = f;
+      const current = id in value ? value[id as keyof typeof value] : undefined;
+      return (positiveValue || !current) && (negativeValue || !!current);
+    }, true);
+}
+
+function getContextMenu(
+  localFilters: LocalFilters[],
+  set: (id: string, type: "pos" | "neg", newValue: boolean) => void
+): MultiselectItemProps[] {
+  const newMenu: MultiselectItemProps[] = [];
+  localFilters.forEach(filter => {
+      newMenu.push({
+        label: filter.positive_label,
+        enabled: filter.enabled,
+        title: filter.positive_label || '',
+        checked: filter.positiveValue,
+        onClick: () => set(filter.id, 'pos', !filter.positiveValue),
+      });
+      newMenu.push({
+        label: filter.negative_label,
+        enabled: filter.enabled,
+        title: filter.negative_label || '',
+        checked: filter.negativeValue,
+        onClick: () => set(filter.id, 'neg', !filter.negativeValue),
+      });
+      newMenu.push("separator");
+  });
+  return newMenu;
+}
+
+const encodeFilters: Encoder<LocalFilters[]> = (js: LocalFilters[]) => {
+  return JSON.stringify(js);
+};
+const decodeFilters: Decoder<LocalFilters[]> = (js: json) => {
+  if (typeof js === 'string') return Object.values(JSON.parse(js));
+  else throw new JsonTypeError("string", js);
+};
+
+function useFilterLocal(filters: Filters[], type: 'functions' | 'variables'): [
+  LocalFilters[],
+  setFilterValue: (id: string, type: "pos" | "neg", newValue: boolean) => void
+] {
+  const [localFilters, setLocalFilters] = useWindowSettingsData<LocalFilters[]>(
+    `ivette.${type}.filters`,
+    decodeFilters, encodeFilters,
+    []
+  );
+
+  const setFilterValue = React.useCallback(
+    (id: string, type: 'pos' | 'neg', newValue: boolean): void => {
+      const newObj = structuredClone(localFilters);
+      const elt = newObj.findIndex(e => e.id === id);
+      if(elt === -1) return;
+      switch(type) {
+        case 'pos': newObj[elt].positiveValue = newValue; break;
+        case 'neg': newObj[elt].negativeValue = newValue; break;
+      }
+      setLocalFilters(newObj);
+  }, [localFilters, setLocalFilters]);
+
+  React.useEffect(() => {
+    const newFilters: LocalFilters[] = filters
+      .filter(a => !(localFilters.find(b => a.id === b.id)))
+      .map(a => {
+        return {
+          ...a,
+          positiveValue: a.positive_default,
+          negativeValue: a.negative_default
+        };
+      });
+    setLocalFilters([...localFilters, ...newFilters]);
+  }, [filters, localFilters, setLocalFilters ]);
+
+  return [localFilters, setFilterValue];
+}
+
+function useFiltersFlipSettings(label: string, type: string, b: boolean)
+: setting {
+  return Dome.useFlipSettings(`ivette.${type}.${label}`, b);
+}
+
+// --------------------------------------------------------------------------
 // --- Functions Section
 // --------------------------------------------------------------------------
 
@@ -274,7 +379,7 @@ export function useFunctionFilter(): FunctionFilterRet {
   const { scopes } = Locations.useSelection();
   const multipleSelection = React.useMemo(() => scopes || [], [scopes]);
   const multipleSelectionActive = multipleSelection.length > 0;
-  const evaComputed = States.useSyncValue(computationState) === 'computed';
+  // const evaComputed = States.useSyncValue(computationState) === 'computed';
 
   const isSelected = React.useMemo(() => {
     return (fct: functionsData): boolean => {
@@ -283,70 +388,31 @@ export function useFunctionFilter(): FunctionFilterRet {
     };
   }, [multipleSelection]);
 
-  const useFlipSettings = (label: string, b: boolean): setting => {
-    return Dome.useFlipSettings('ivette.functions.' + label, b);
-  };
-
-  const stdlibState = useFlipSettings('stdlib', false);
-  const builtinState = useFlipSettings('builtin', false);
-  const defState = useFlipSettings('def', true);
-  const undefState = useFlipSettings('undef', true);
-  const internState = useFlipSettings('intern', true);
-  const externState = useFlipSettings('extern', true);
-  const evaAnalyzedState = useFlipSettings('eva-analyzed', true);
-  const evaUnreachedState = useFlipSettings('eva-unreached', true);
-  const selectedState = useFlipSettings('selected', false);
-
-  const [stdlib, ] = stdlibState;
-  const [builtin, ] = builtinState;
-  const [def, ] = defState;
-  const [undef, ] = undefState;
-  const [intern, ] = internState;
-  const [extern, ] = externState;
-  const [evaAnalyzed, ] = evaAnalyzedState;
-  const [evaUnreached, ] = evaUnreachedState;
+  const filters = States.useRequestValue(Ast.getFunctionsFilters, null);
+  const [localFilters, setLocalFilters] = useFilterLocal(filters, 'functions');
+  const selectedState = useFiltersFlipSettings('selected', 'functions', false);
   const [selected, ] = selectedState;
 
   const showFunction = React.useMemo(() => {
     return (fct: functionsData): boolean => {
-        const visible =
-          (stdlib || !fct.stdlib)
-          && (builtin || !fct.builtin)
-          && (def || !fct.defined)
-          && (undef || fct.defined)
-          && (intern || fct.extern)
-          && (extern || !fct.extern)
-          && (!multipleSelectionActive || !selected || isSelected(fct))
-          && (evaAnalyzed || !evaComputed ||
-            !('eva_analyzed' in fct && fct.eva_analyzed === true))
-          && (evaUnreached || !evaComputed ||
-            ('eva_analyzed' in fct && fct.eva_analyzed === true));
-        return !!visible;
+        const visible = isVisible(fct, localFilters);
+        const local = !multipleSelectionActive || !selected || isSelected(fct);
+        return !!visible && local;
       };
-  }, [stdlib, builtin, def, undef, intern, extern,
-    evaAnalyzed, evaUnreached, selected,
-    evaComputed, isSelected, multipleSelectionActive
+  }, [localFilters, selected, isSelected, multipleSelectionActive
   ]);
 
-  const contextFctMenuItems: MultiselectItemProps[] = [
-    menuItem({ label: 'Show Frama-C builtins', state: builtinState }),
-    menuItem({ label: 'Show stdlib functions', state: stdlibState }),
-    'separator',
-    menuItem({ label: 'Show defined functions', state: defState }),
-    menuItem({ label: 'Show undefined functions', state: undefState }),
-    'separator',
-    menuItem({ label: 'Show non-extern functions', state: internState }),
-    menuItem({ label: 'Show extern functions', state: externState }),
-    'separator',
-    menuItem({ label: 'Show functions analyzed by Eva',
-              state: evaAnalyzedState, enabled: evaComputed }),
-    menuItem({ label: 'Show functions unreached by Eva',
-              state: evaUnreachedState, enabled: evaComputed }),
-    'separator',
-    menuItem({ label: 'Selected only', state: selectedState,
-              title: 'Show only the functions selected in the Locations panel',
-              enabled: multipleSelectionActive }),
-  ];
+  const contextFctMenuItems: MultiselectItemProps[] = React.useMemo(() => {
+    const dyn = getContextMenu(localFilters, setLocalFilters);
+    dyn.push(
+      menuItem({
+        label: 'Selected only',
+        state: selectedState,
+        title: 'Show only the functions selected in the Locations panel',
+        enabled: multipleSelectionActive })
+    );
+    return dyn;
+  }, [localFilters, setLocalFilters, selectedState, multipleSelectionActive]);
 
   const itemsComp = contextFctMenuItems.map(
     (e, i) => <MultiselectItem key={i} item={e} />);
@@ -424,95 +490,19 @@ interface VariablesFilterRet {
 }
 
 export function useVariableFilter(): VariablesFilterRet {
-  // Filter settings
-  function useFlipSettings(label: string, b: boolean): setting {
-    return Dome.useFlipSettings('ivette.globals.' + label, b);
-  }
-  const stdlibState = useFlipSettings('stdlib', false);
-  const externState = useFlipSettings('extern', true);
-  const nonExternState = useFlipSettings('non-extern', true);
-  const isConstState = useFlipSettings('const', true);
-  const nonConstState = useFlipSettings('non-const', true);
-  const volatileState = useFlipSettings('volatile', true);
-  const nonVolatileState = useFlipSettings('non-volatile', true);
-  const ghostState = useFlipSettings('ghost', true);
-  const nonGhostState = useFlipSettings('non-ghost', true);
-  const initState = useFlipSettings('init', true);
-  const nonInitState = useFlipSettings('non-init', true);
-  const sourceState = useFlipSettings('source', true);
-  const nonSourceState = useFlipSettings('non-source', false);
-
-  const [stdlib, ] = stdlibState;
-  const [extern, ] = externState;
-  const [nonExtern, ] = nonExternState;
-  const [isConst, ] = isConstState;
-  const [nonConst, ] = nonConstState;
-  const [volatile, ] = volatileState;
-  const [nonVolatile, ] = nonVolatileState;
-  const [ghost, ] = ghostState;
-  const [nonGhost, ] = nonGhostState;
-  const [init, ] = initState;
-  const [nonInit, ] = nonInitState;
-  const [source, ] = sourceState;
-  const [nonSource, ] = nonSourceState;
+  const filters = States.useRequestValue(Ast.getVariablesFilters, null);
+  const [localFilters, setLocalFilters] = useFilterLocal(filters, 'variables');
 
   const showVariable = React.useMemo(() => {
     return (vi: Ast.globalsData): boolean => {
-      const visible =
-        /* Never show global variables representing string literals.
-           If needed, add a new filter to show these variables. */
-        !vi.stringLiteral
-        && (stdlib || !vi.stdlib)
-        && (extern || !vi.extern) && (nonExtern || vi.extern)
-        && (isConst || !vi.const) && (nonConst || vi.const)
-        && (volatile || !vi.volatile) && (nonVolatile || vi.volatile)
-        && (ghost || !vi.ghost) && (nonGhost || vi.ghost)
-        && (init || !vi.init) && (nonInit || vi.init)
-        && (source || !vi.source) && (nonSource || vi.source);
-      return !!visible;
+      const visible = isVisible(vi, localFilters);
+      return !vi.stringLiteral && !!visible;
     };
-  }, [stdlib, extern, nonExtern, isConst,
-      nonConst, volatile, nonVolatile, ghost,
-      nonGhost, init, nonInit, source, nonSource
-  ]);
+  }, [localFilters]);
 
-  // Context menu to change filter settings
-  /* eslint-disable max-len */
-  const contextVarMenuItems: MultiselectItemProps[] = [
-    menuItem({ label: 'Show stdlib variables',
-               state: stdlibState }),
-    'separator',
-    menuItem({ label: 'Show extern variables',
-               state: externState }),
-    menuItem({ label: 'Show non-extern variables',
-               state: nonExternState }),
-    'separator',
-    menuItem({ label: 'Show const variables',
-               state: isConstState }),
-    menuItem({ label: 'Show non-const variables',
-               state: nonConstState }),
-    'separator',
-    menuItem({ label: 'Show volatile variables',
-               state: volatileState }),
-    menuItem({ label: 'Show non-volatile variables',
-               state: nonVolatileState }),
-    'separator',
-    menuItem({ label: 'Show ghost variables',
-               state: ghostState }),
-    menuItem({ label: 'Show non-ghost variables',
-               state: nonGhostState }),
-    'separator',
-    menuItem({ label: 'Show variables with explicit initializer',
-               state: initState }),
-    menuItem({ label: 'Show variables without explicit initializer',
-               state: nonInitState }),
-    'separator',
-    menuItem({ label: 'Show variables from the source code',
-               state: sourceState }),
-    menuItem({ label: 'Show variables generated from analyses',
-               state: nonSourceState }),
-  ];
-  /* eslint-enable max-len */
+  const contextVarMenuItems: MultiselectItemProps[] = React.useMemo(() => {
+    return getContextMenu(localFilters, setLocalFilters);
+  }, [localFilters, setLocalFilters]);
 
   const itemsComp = contextVarMenuItems.map(
     (e, i) => <MultiselectItem key={i} item={e} />);
