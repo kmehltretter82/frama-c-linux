@@ -688,7 +688,7 @@ end
         (Result.Error (Error.make_not_yet "unguarded \\exists quantification"))
     | _ -> ()
 
-  let preprocessor = object
+  let preprocessor = object (self)
     inherit E_acsl_visitor.visitor dkey
 
     method !vannotation annot =
@@ -700,6 +700,14 @@ end
       let loc = p.pred_loc in
       let p = Logic_normalizer.get_pred p in
       process_quantif ~loc p;
+      Cil.DoChildren
+
+    method !vlogic_info_use li =
+      let derived = Logic_normalizer.Logic_infos.generated_of li in
+      let visit_logic_info =
+        Visitor.visitFramacLogicInfo (self :> Visitor.frama_c_visitor)
+      in
+      ignore @@ List.map visit_logic_info derived;
       Cil.DoChildren
 
   end
