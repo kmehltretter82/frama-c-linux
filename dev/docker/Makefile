@@ -17,9 +17,9 @@ help:
 	echo "- <version>-all: applies to all distributions"
 	echo ""
 	echo "Currently, three distributions are supported:"
-	echo "- debian-12 (default, i.e. '<v>.debian' is aliased to '<v>')"
-	echo "- fedora-41"
-	echo "- alpine-3.21 (note: E-ACSL disabled due to musl)"
+	echo "- debian-13 (default, i.e. '<v>.debian' is aliased to '<v>')"
+	echo "- fedora-42"
+	echo "- alpine-3.22 (note: E-ACSL disabled due to musl)"
 	echo
 	echo "Base images are ocaml/opam:<distro>-ocaml-<version>"
 	echo "(where <version> is based on Frama-C's reference-configuration.md)"
@@ -36,13 +36,13 @@ help:
 
 DEPS=../../reference-configuration.md Dockerfile $(wildcard *.sh)
 
-%.debian: BUILD_ARGS += --build-arg=DISTRO=debian-12
-%.fedora: BUILD_ARGS += --build-arg=DISTRO=fedora-41
-%.alpine: BUILD_ARGS += --build-arg=DISTRO=alpine-3.21
+%.debian: BUILD_ARGS += --build-arg=DISTRO=debian-13
+%.fedora: BUILD_ARGS += --build-arg=DISTRO=fedora-42
+%.alpine: BUILD_ARGS += --build-arg=DISTRO=alpine-3.22
 
 version_short=$(shell grep -o "^- OCaml [0-9.]\+" "../../reference-configuration.md" | grep -o "[0-9][.][0-9]\+")
 BUILD_ARGS += --build-arg=OCAML_VERSION_SHORT=$(version_short)
-BUILD_ARGS += --build-arg=OPAM=2.3
+BUILD_ARGS += --build-arg=OPAM=2.4
 
 dev-all: dev.debian \
          dev.fedora \
