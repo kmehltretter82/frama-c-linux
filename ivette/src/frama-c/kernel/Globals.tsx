@@ -14,7 +14,6 @@ import React from 'react';
 import InfiniteScroll from 'react-infinite-scroller';
 
 import * as Dome from 'dome';
-import * as Json from 'dome/data/json';
 import { classes } from 'dome/misc/utils';
 import { alpha } from 'dome/data/compare';
 import { Section, Item, SidebarTitle, makeBadge } from 'dome/frame/sidebars';
@@ -38,7 +37,6 @@ import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Locations from 'frama-c/kernel/Locations';
-import * as EvaAst from 'frama-c/plugins/eva/api/ast';
 import path from 'path';
 
 
@@ -206,7 +204,7 @@ function List(props: ListProps): JSX.Element {
 // --------------------------------------------------------------------------
 
 interface FctItemProps {
-  fct: functionsData,
+  fct: Ast.functionsData,
   scope: States.Scope,
   addIcon: boolean
 }
@@ -351,28 +349,11 @@ function useFiltersFlipSettings(label: string, type: string, b: boolean)
 // --- Functions Section
 // --------------------------------------------------------------------------
 
-type functionsData =
-  Ast.functionsData | (Ast.functionsData & EvaAst.functionsData);
-
-type FctKey = Json.key<'#functions'>;
-
-export function computeFcts(
-  ker: States.ArrayProxy<FctKey, Ast.functionsData>,
-  eva: States.ArrayProxy<FctKey, EvaAst.functionsData>,
-): functionsData[] {
-  const arr: functionsData[] = [];
-  ker.forEach((kf) => {
-    const ef = eva.getData(kf.key);
-    arr.push({ ...ef, ...kf });
-  });
-  return arr;
-}
-
 interface FunctionFilterRet {
   contextFctFilter: React.JSX.Element,
   multipleSelection: States.Scope[],
-  showFunction: (fct: functionsData) => boolean,
-  isSelected: (fct: functionsData) => boolean
+  showFunction: (fct: Ast.functionsData) => boolean,
+  isSelected: (fct: Ast.functionsData) => boolean
 }
 
 export function useFunctionFilter(): FunctionFilterRet {
@@ -382,7 +363,7 @@ export function useFunctionFilter(): FunctionFilterRet {
   // const evaComputed = States.useSyncValue(computationState) === 'computed';
 
   const isSelected = React.useMemo(() => {
-    return (fct: functionsData): boolean => {
+    return (fct: Ast.functionsData): boolean => {
       const idx = multipleSelection.findIndex((s) => s === fct.decl);
       return 0 <= idx;
     };
@@ -394,7 +375,7 @@ export function useFunctionFilter(): FunctionFilterRet {
   const [selected, ] = selectedState;
 
   const showFunction = React.useMemo(() => {
-    return (fct: functionsData): boolean => {
+    return (fct: Ast.functionsData): boolean => {
         const visible = isVisible(fct, localFilters);
         const local = !multipleSelectionActive || !selected || isSelected(fct);
         return !!visible && local;
@@ -425,9 +406,7 @@ export function Functions(props: ScrollableParent): JSX.Element {
   // Hooks
   const scope = States.useCurrentScope();
 
-  const ker = States.useSyncArrayProxy(Ast.functions);
-  const eva = States.useSyncArrayProxy(EvaAst.functions);
-  const fcts = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
+  const fcts = States.useSyncArrayData(Ast.functions);
   const { showFunction, contextFctFilter } = useFunctionFilter();
 
   // Filtered
@@ -829,7 +808,7 @@ interface File {
   ext: string,
   path: string[],
   types: Ast.declAttributesData[],
-  fcts: functionsData[],
+  fcts: Ast.functionsData[],
   vars: Ast.globalsData[],
   annot: Ast.declAttributesData[]
 }
@@ -878,7 +857,7 @@ function DirNode(props: {
 
 interface ItemsProps {
   types?: Ast.declAttributesData[],
-  fcts?: functionsData[],
+  fcts?: Ast.functionsData[],
   vars?: Ast.globalsData[],
   annot?: Ast.declAttributesData[]
   addIcon?: boolean;
@@ -912,7 +891,7 @@ type FilesProps = {
   searchByName: string | undefined;
   unfoldAllState: RState<boolean | undefined>;
   showTypesState: [boolean, () => void];
-  showFunction: (fct: functionsData) => boolean;
+  showFunction: (fct: Ast.functionsData) => boolean;
   showFctsState: [boolean, () => void];
   showVariable: (vi: Ast.globalsData) => boolean;
   showVarsState: [boolean, () => void];
@@ -939,12 +918,10 @@ export function Files(props: FilesProps): JSX.Element {
   const scope = States.useCurrentScope();
 
   // functions
-  const ker = States.useSyncArrayProxy(Ast.functions);
-  const eva = States.useSyncArrayProxy(EvaAst.functions);
+  const fcts = States.useSyncArrayData(Ast.functions);
   const fctsSorted = React.useMemo(() =>
-    computeFcts(ker, eva)
-    .sort((f, g) => alpha(f.name, g.name)
-  ), [ker, eva]);
+    fcts.sort((f, g) => alpha(f.name, g.name)
+  ), [fcts]);
   const [showFcts, ] = showFctsState;
   const _fctsFiltered = React.useMemo(() => {
     if(!showFcts) return [];

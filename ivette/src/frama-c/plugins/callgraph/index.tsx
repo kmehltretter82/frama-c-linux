@@ -20,7 +20,7 @@ import {
 import { Icon } from 'dome/controls/icons';
 import * as Themes from 'dome/themes';
 import * as Server from 'frama-c/server';
-import { computeFcts, useFunctionFilter } from 'frama-c/kernel/Globals';
+import { useFunctionFilter } from 'frama-c/kernel/Globals';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Properties from 'frama-c/kernel/api/properties';
 import * as States from 'frama-c/states';
@@ -160,9 +160,7 @@ function Callgraph(): JSX.Element {
   const alarms = States.useSyncArrayData(EvaStats.functionStats);
 
   /** Function list and properties */
-  const ker = States.useSyncArrayProxy(Ast.functions);
-  const eva = States.useSyncArrayProxy(EvaAst.functions);
-  const functions = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
+  const functions = States.useSyncArrayData(Ast.functions);
   const properties = States.useSyncArrayData(Properties.status);
   const evaps = States.useSyncArrayData(EvaAst.properties);
   const {
