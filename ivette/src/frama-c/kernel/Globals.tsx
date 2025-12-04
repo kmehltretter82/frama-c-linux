@@ -278,14 +278,14 @@ function getContextMenu(
   const newMenu: MultiselectItemProps[] = [];
   localFilters.forEach(filter => {
       newMenu.push({
-        label: filter.positive_label,
+        label: "Show " + filter.positive_label,
         enabled: filter.enabled,
         title: filter.positive_label || '',
         checked: filter.positiveValue,
         onClick: () => set(filter.id, 'pos', !filter.positiveValue),
       });
       newMenu.push({
-        label: filter.negative_label,
+        label: "Show " + filter.negative_label,
         enabled: filter.enabled,
         title: filter.negative_label || '',
         checked: filter.negativeValue,
