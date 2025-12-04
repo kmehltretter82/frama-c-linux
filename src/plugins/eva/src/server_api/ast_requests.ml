@@ -85,27 +85,6 @@ let () =
     ~add_hook:(fun f -> Analysis.register_computation_hook (fun _ -> f ()))
     Results.is_called
 
-module Functions =
-struct
-  let _array : kernel_function States.array =
-    let model = States.model () in
-
-    States.column model
-      ~name:"eva_analyzed"
-      ~descr:(Markdown.plain "Has the function been analyzed by Eva")
-      ~data:(module Data.Jbool)
-      ~default:false
-      ~get:Results.is_called;
-
-    States.register_array model
-      ~package
-      ~key:Server.Kernel_ast.Functions.key
-      ~name:"functions"
-      ~descr:(Markdown.plain "AST Functions")
-      ~iter:Server.Kernel_ast.Functions.iter
-      ~add_reload_hook:Analysis_requests.register_computation_hook
-end
-
 
 (* ----- Dead code: unreachable and non-terminating statements -------------- *)
 
