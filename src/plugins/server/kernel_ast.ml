@@ -899,41 +899,6 @@ module GlobalVars = struct
       ~data:(module Jstring)
       ~get:(fun vi -> Rich_text.sprintf "%a" Printer.pp_typ vi.vtype);
     States.column model
-      ~name:"stdlib"
-      ~descr:(Md.plain "Is the variable from the Frama-C stdlib?")
-      ~data:(module Data.Jbool)
-      ~get:(fun vi -> Cil.is_in_libc vi.vattr);
-    States.column model
-      ~name:"extern"
-      ~descr:(Md.plain "Is the variable extern?")
-      ~data:(module Data.Jbool)
-      ~get:(fun vi -> vi.vstorage = Extern);
-    States.column model
-      ~name:"const"
-      ~descr:(Md.plain "Is the variable const?")
-      ~data:(module Data.Jbool)
-      ~get:(fun vi -> Cil.isGlobalInitConst vi);
-    States.column model
-      ~name:"volatile"
-      ~descr:(Md.plain "Is the variable volatile?")
-      ~data:(module Data.Jbool)
-      ~get:(fun vi -> Ast_types.is_volatile vi.vtype);
-    States.column model
-      ~name:"ghost"
-      ~descr:(Md.plain "Is the variable ghost?")
-      ~data:(module Data.Jbool)
-      ~get:(fun vi -> Ast_types.is_ghost vi.vtype);
-    States.column model
-      ~name:"init"
-      ~descr:(Md.plain "Is the variable explicitly initialized?")
-      ~data:(module Data.Jbool)
-      ~get:(fun vi -> Option.is_some (Globals.Vars.find vi).init);
-    States.column model
-      ~name:"source"
-      ~descr:(Md.plain "Is the variable in the source code?")
-      ~data:(module Data.Jbool)
-      ~get:(fun vi -> vi.vsource);
-    States.column model
       ~name:"stringLiteral"
       ~descr:(Md.plain "Does the variable represent a string literal?")
       ~data:(module Data.Jbool)
