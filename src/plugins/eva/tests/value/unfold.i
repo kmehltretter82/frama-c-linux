@@ -1,6 +1,10 @@
+/* Tests Eva analyses with kernel 'loop unfold' annotations. */
+
+int volatile nondet;
+
 enum { NB_TIMES=12, FIFTY_TIMES = 50 };
 
-void main (int c) {
+void main(int c) {
   int G=0,i;
   int MAX = 12;
   int JMAX=5;
@@ -50,39 +54,16 @@ void main (int c) {
 
  S=1;
  k=1;
- //@ loop unfold "completly", NB_TIMES;
+ //@ loop unfold "completely", NB_TIMES;
  do {
    S=S*k;
    k++;
  } while (k <= NB_TIMES) ;
 
+ if (nondet) {
+   /* The loop is not completely unrolled with NB_TIMES iteration:
+      the loop invariant false introduced by "completely" is reachable. */
+   //@ loop unfold "completely", NB_TIMES;
+   for (int i = 0; i <= NB_TIMES; i++);
+  }
 }
-
-#if 0
-struct T { unsigned long long addr;
-  unsigned long long size;
-  unsigned long type; } t_biosmap[10];
-
-struct T * const g_biosmap = t_biosmap;
-struct T * biosmap;
-int main2(int c,signed char nr_map) {
-  biosmap = g_biosmap;
-  if (nr_map<2)  return (-1);
-
-//@ loop unfold 200;
-  do {
-    unsigned long long start = biosmap->addr;
-    unsigned long long size = biosmap->size;
-    unsigned long long end = start + size;
-    unsigned long type = biosmap->type;
-    Frama_C_show_each_F(nr_map);
-    if (start>end) return -1;
-    if (c) {
-      start = 0x100000L;
-      size = end - start; continue; };
-    }
-  while (biosmap++,--nr_map);
-
-  return 0;
-}
-#endif
