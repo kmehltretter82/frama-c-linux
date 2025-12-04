@@ -185,7 +185,7 @@ sig
   type value
 
   (** Analysis of a program from the given main function and initial state.
-      Returns the abstract state infered at the return of the main function. *)
+      Returns the abstract state inferred at the return of the main function. *)
   val compute_main_call: kernel_function -> state -> state or_bottom
 
   (** Analysis of a function call during the Eva analysis. This function is

@@ -591,7 +591,7 @@ let finalize_pdg pdg from_opt =
 
 (*-----------------------------------------------------------------------*)
 
-(** gives needed informations about [lval] :
+(** gives needed information about [lval] :
     = location + exact + dependencies + declarations *)
 let get_lval_infos lval stmt =
   let decl = Cil.extract_varinfos_from_lval lval in

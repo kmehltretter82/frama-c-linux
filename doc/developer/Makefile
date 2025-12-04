@@ -160,5 +160,5 @@ clean:
 	rm -f *.haux *.htoc
 
 distclean dist-clean: clean
-	rm -f $(filter-out mecanism.pdf, $(wildcard *.pdf))
+	rm -f $(filter-out mechanism.pdf, $(wildcard *.pdf))
 	rm -f *.html

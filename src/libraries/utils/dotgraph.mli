@@ -140,7 +140,7 @@ val edge : dot -> node -> node -> attr list -> unit
 (** Link the node sequence with attributed edges *)
 val link : dot -> node list -> attr list -> unit
 
-(** Combinaison of [fresh] and [node] *)
+(** Combination of [fresh] and [node] *)
 val inode : dot -> ?prefix:string -> ?id:node -> attr list -> node
 
 (** {1 Clustering} *)

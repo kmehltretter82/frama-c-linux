@@ -61,7 +61,7 @@ let union expr depth map1 map2 =
   let map = LvalMap.union merge map1 map2 in
   LvalMap.mapi
     (fun lval (e, d, lvs) ->
-       (* Alls lvalues in [expr] now appear in the subexpression of [!top]. *)
+       (* All lvalues in [expr] now appear in the subexpression of [!top]. *)
        let lvs = LvalSet.union lvs !top in
        (* Lvalues in [!deps] should be subdivided with the lvalues in [!top]. *)
        if LvalSet.mem lval !deps then (expr, depth, lvs) else (e, d, lvs))

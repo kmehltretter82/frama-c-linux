@@ -649,7 +649,7 @@ let build_volatile_table vmap =
 
 (*-------------------------------------------------------------------------*)
 
-(* Returne a tuple 'transformed_key, untransformed_key) *)
+(* Returns a tuple 'transformed_key, untransformed_key) *)
 let get_wkeys ~is_complete =
   if is_complete then
     wkey_transformed_access_lvalue_volatile,

@@ -84,7 +84,7 @@ let compute kf =
       | Some SlevelDefault ->
         let top = Stack.pop local_slevel in
         if debug then
-          Format.printf "Visiting merge %d, poping (prev %d)@." s.sid top;
+          Format.printf "Visiting merge %d, popping (prev %d)@." s.sid top;
         (* Store top, ie. the slevel value above s, in h. We will use this
            value in the post function *)
         Cil_datatype.Stmt.Hashtbl.add h_local s top
@@ -94,7 +94,7 @@ let compute kf =
       match get_slevel_annot s with
       | None | Some SlevelMerge -> ()
       | Some (SlevelLocal _ | SlevelFull) ->
-        if debug then Format.printf "Leaving split %d, poping@." s.sid;
+        if debug then Format.printf "Leaving split %d, popping@." s.sid;
         ignore (Stack.pop local_slevel);
       | Some SlevelDefault ->
         (* slevel on nodes above s *)

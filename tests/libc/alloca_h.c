@@ -10,9 +10,9 @@ char *f() {
   return p; // p will be dangling after function exit
 }
 
-char *f2(char *allocaed) { // allocaed must contain at least 2 bytes
-  *allocaed = 42;
-  *(allocaed+1) = 43;
+char *f2(char *allocated) { // allocated must contain at least 2 bytes
+  *allocated = 42;
+  *(allocated+1) = 43;
   char *p = alloca(5);
   return p;
 }

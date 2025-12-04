@@ -14,7 +14,7 @@ module ShouldOutput =
     (struct
       let dependencies = [Eva.Analysis.self] (* To be completed if some computations
                                                 use some other results than Eva *)
-      let name = "Inout.Register.ShouldOuput"
+      let name = "Inout.Register.ShouldOutput"
     end)
 let () = Inout_parameters.Output.add_set_hook
     (fun _ v -> if v then ShouldOutput.set true)

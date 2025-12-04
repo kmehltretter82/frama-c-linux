@@ -26,9 +26,9 @@ import FastCompare from 'react-fast-compare';
    - `compare(x,y) === 0` shall be an equivalence relation
      (reflexive, symmetric, transitive)
    - `compare(x,y) <= 0` shall be a complete order
-     (reflexive, antisymetric, transitive)
+     (reflexive, antisymmetric, transitive)
    - `compare(x,y) < 0` shall be a complete strict order
-     (anti-reflexive, asymmetric, transitive)
+     (anti-reflexive, antisymmetric, transitive)
 */
 export interface Order<A> {
   (x: A, y: A): number;
