@@ -42,13 +42,6 @@ include struct (* auxiliary functions *)
     method! vlogic_info_use this_li =
       if Logic_info.equal this_li li then ChangeTo li' else DoChildren
 
-    method !vquantifiers quantifiers =
-      let apply_subst v =
-        try Logic_var.Map.find v substs
-        with Not_found -> v
-      in
-      ChangeTo (List.map apply_subst quantifiers)
-
     method !vlogic_var_use v =
       try ChangeTo (Logic_var.Map.find v substs)
       with Not_found -> DoChildren
