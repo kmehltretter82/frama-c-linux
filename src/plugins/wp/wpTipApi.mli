@@ -18,6 +18,8 @@ val printStatus : Server.Request.signal
 val selection : ProofEngine.node -> Tactical.selection
 val setSelection : ProofEngine.node -> Tactical.selection -> unit
 
+val lookup_printer: ProofEngine.node -> Ptip.pseq
+
 val runProvers :
   ?mode:VCS.mode ->
   ?timeout:int ->
