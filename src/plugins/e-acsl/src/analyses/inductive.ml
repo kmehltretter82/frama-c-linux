@@ -475,6 +475,7 @@ end = functor (Out : Out_language) -> struct
       Mode.pretty mode pp_logic_info li;
     let new_profile = List.map freshen_up_logic_var li.l_profile in
     let new_formals, res = Mode.in_out_args ~mode new_profile in
+    let is_unsound = ref false in
     let extract_ctor ({Constructor.predicate = p} as ctor) next_ctor =
       let li_rec = li in
       let is_rec_occurrence li' = Logic_var.equal li'.l_var_info li_rec.l_var_info in
@@ -538,7 +539,7 @@ end = functor (Out : Out_language) -> struct
               match mode' with
               | Complete -> Extractions.get ~mode:Complete li
               | _ ->
-                Unsound_predicates.add li_rec;
+                is_unsound := true;
                 FunctionExtractor.extract ~mode:mode' li
           in
           begin match in_out_args with
@@ -607,6 +608,7 @@ end = functor (Out : Out_language) -> struct
     in
     let old_name = li.l_var_info.lv_name in
     Option.iter (fun n -> li.l_var_info.lv_name <- n) name;
+    if !is_unsound then Unsound_predicates.add li;
     Options.feedback ~dkey ~level:2
       "@[<2>extracted from inductive definition of %s executable predicate:@ @[%a@]@]"
       old_name
