@@ -602,6 +602,9 @@ class pseq
       let _,sequent = Wpo.compute w in
       self#pp_sequent fmt sequent
 
+    method pp_step fmt s =
+      pcond#pp_step fmt s
+
   end
 
 (* -------------------------------------------------------------------------- *)

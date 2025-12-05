@@ -148,6 +148,7 @@ class pseq :
 
     method pp_sequent : Conditions.sequent printer
     method pp_goal : Wpo.t printer
+    method pp_step : Conditions.step printer
   end
 
 (* -------------------------------------------------------------------------- *)
