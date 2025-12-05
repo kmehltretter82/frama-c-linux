@@ -1,0 +1,14 @@
+unsupported.c: In function 'P2_fun2'
+unsupported.c:16: Warning: no sound verdict for Assertion (guess: FAIL).
+	the considered predicate is:
+	Incomplete inductive function
+unsupported.c: In function 'P2_fun2'
+unsupported.c:16: Warning: no sound verdict for Assertion (guess: FAIL).
+	the considered predicate is:
+	Incomplete inductive function
+unsupported.c: In function 'main'
+unsupported.c:71: Warning: no sound verdict for Assertion (guess: FAIL).
+	the considered predicate is:
+	P2(7, 13)
+	With values at failure point:
+	- P2(7, 13): 0

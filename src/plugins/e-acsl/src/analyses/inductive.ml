@@ -274,8 +274,24 @@ end = struct
   }
 
   let mk_var_subst (arg, formal) =
-    let solve lhs rhs = match lhs with
-      | {term_node = TLval (TVar v, TNoOffset)} -> Some (v, rhs)
+    let rec solve lhs rhs = match lhs.term_node with
+      | TLval (TVar v, TNoOffset) -> Some (v, rhs)
+      | TBinOp (PlusA, t1, t2) when Vars.is_empty (free_vars t2) ->
+        solve t1 {t2 with term_node = TBinOp (MinusA, rhs, t2)}
+      | TBinOp (PlusA, t1, t2) when Vars.is_empty (free_vars t1) ->
+        solve t2 {t1 with term_node = TBinOp (MinusA, rhs, t1)}
+      | TBinOp (MinusA, t1, t2) when Vars.is_empty (free_vars t2) ->
+        solve t1 {t2 with term_node = TBinOp (PlusA, rhs, t2)}
+      | TBinOp (MinusA, t1, t2) when Vars.is_empty (free_vars t1) ->
+        solve t2 {t1 with term_node = TBinOp (MinusA, t1, rhs)}
+      | TBinOp (Mult, t1, t2) when Vars.is_empty (free_vars t2) ->
+        solve t1 {t2 with term_node = TBinOp (Div, rhs, t2)}
+      | TBinOp (Mult, t1, t2) when Vars.is_empty (free_vars t1) ->
+        solve t2 {t1 with term_node = TBinOp (Div, rhs, t1)}
+      | TBinOp (Div, t1, t2) when Vars.is_empty (free_vars t2) ->
+        solve t1 {t2 with term_node = TBinOp (Mult, rhs, t2)}
+      | TBinOp (Div, t1, t2) when Vars.is_empty (free_vars t1) ->
+        solve t2 {t1 with term_node = TBinOp (Div, t1, rhs)}
       | _ -> None
     in
     solve arg (Logic_const.tvar ~loc:arg.term_loc formal)
