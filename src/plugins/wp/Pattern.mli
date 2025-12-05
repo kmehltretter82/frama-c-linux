@@ -64,6 +64,8 @@ type sigma
 (** Sigma printer *)
 val pp_sigma : Format.formatter -> sigma -> unit
 
+val iter_sigma : (string -> Tactical.selection -> unit) -> sigma -> unit
+
 (** Empty results *)
 val empty : sigma
 

@@ -289,6 +289,8 @@ let pp_sigma fmt s =
     Format.fprintf fmt "@]@ ]@]" ;
   end
 
+let iter_sigma = Vmap.iter
+
 type penv = {
   mutable sigma : sigma ;
   mutable marked : Lang.F.Tset.t ;
