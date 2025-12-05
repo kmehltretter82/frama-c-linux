@@ -18,11 +18,18 @@ let package =
     ~name:"patterndebugger"
     ~title:"WP Pattern Debugger" ()
 
+type matching = {
+  name: string ;
+  pattern: string ;
+  matched: string ;
+  target: Ptip.target ;
+}
+
 type diagnostic = {
   message : string ;
-  details : string ;
   severity : [ `Ok | `Warning | `Error ] ;
   location : Cil_types.location option ;
+  matchings : matching list option ;
 }
 
 module Range : Data.S with type t = Cil_types.location =
@@ -43,6 +50,39 @@ struct
 end
 
 module RangeOpt = Data.Joption(Range)
+module Target = Data.Jpair(WpTipApi.Part)(Data.Joption(WpTipApi.Term))
+
+module Matching : Data.S with type t = matching =
+struct
+  type t = matching
+  let jtype =
+    Data.declare ~package ~name:"matching" @@
+    Package.(Jrecord [
+        "name", Jstring ;
+        "pattern", Jstring ;
+        "matched", Jstring ;
+        "target", Target.jtype ;
+      ])
+  let to_json m =
+    let target =
+      let part = match fst @@ m.target with
+        | Ptip.Term -> `Term
+        | Ptip.Goal -> `Goal
+        | Ptip.Step s -> `Step s.id
+      in
+      part, snd m.target
+    in
+    `Assoc [
+      "name" , `String m.name ;
+      "pattern" , `String m.pattern ;
+      "matched" , `String m.matched ;
+      "target", Target.to_json target ;
+    ]
+
+  let of_json _ = failwith "Wp.PatternDebugger.Matching"
+end
+
+module MatchingsOpt = Data.Joption(Data.Jlist(Matching))
 
 module Diagnostic : Request.Output with type t = diagnostic =
 struct
@@ -51,7 +91,7 @@ struct
     Data.declare ~package ~name:"diagnostic" @@
     Package.(Jrecord [
         "message", Jstring ;
-        "details", Jstring ;
+        "matchings", MatchingsOpt.jtype ;
         "severity", Junion [ Jtag "Warning" ; Jtag "Error" ; Jtag "Ok" ] ;
         "range", RangeOpt.jtype ;
       ])
@@ -59,18 +99,18 @@ struct
     | `Ok -> "Ok" | `Warning -> "Warning" | `Error -> "Error"
   let to_json d = `Assoc [
       "message" , `String d.message ;
-      "details" , `String d.details ;
+      "matchings" , MatchingsOpt.to_json d.matchings ;
       "severity" , `String (severity_tag d.severity) ;
       "range" , RangeOpt.to_json d.location
     ]
 end
 
-let valid ~message ?(details="") () =
-  { severity = `Ok ; message ; details ; location = None }
-let warning ?loc ~message ?(details="") () =
-  { severity = `Warning ; message ; details ; location = loc }
-let error ?loc ~message ?(details="") () =
-  { severity = `Error ; message ; details ; location = loc }
+let valid ~message ~matchings () =
+  { severity = `Ok ; message ; matchings ; location = None }
+let warning ?loc ~message ~matchings () =
+  { severity = `Warning ; message ; matchings = matchings ; location = loc }
+let error ?loc ~message () =
+  { severity = `Error ; message ; matchings = None ; location = loc }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Local Pattern Parser                                               --- *)
@@ -109,7 +149,7 @@ let parse_string s =
     let loc = get_loc () in
     let tok = Lexing.lexeme lb in
     let msg =
-      if tok = "" then "unexpected token" else
+      if tok = "" then "unexpected end of pattern" else
         Printf.sprintf "unexpected token %S" tok in
     raise (ParseError (loc, msg))
 
@@ -135,30 +175,88 @@ let check_pattern sequent sigma pattern =
       pattern
     } sigma sequent
 
+
+(* Custom printers for clause and selection, using TIP printer:
+   we want printed values to be coherent with the current printer. *)
+let pp_clause printer fmt = function
+  | Tactical.Goal p -> Format.fprintf fmt "%a (goal)" printer#pp_pred p
+  | Step s -> Format.fprintf fmt "%a" printer#pp_step s
+
+let rec pp_selection printer fmt = function
+  | Tactical.Empty ->
+    Format.pp_print_string fmt "Empty"
+  | Inside(_c,t) ->
+    Format.fprintf fmt "%a" printer#pp_term t
+  | Clause c ->
+    (pp_clause printer) fmt c
+  | Compose(Cint k) ->
+    Format.fprintf fmt "Constant '%a'" Z.pretty k
+  | Compose(Range(a,b)) ->
+    Format.fprintf fmt "Range '%d..%d'" a b
+  | Compose(Code(_,id,es)) ->
+    Format.fprintf fmt "@[<hov 2>Compose '%s'" id ;
+    List.iter (fun e -> Format.fprintf fmt "(%a)" (pp_selection printer) e) es ;
+    Format.fprintf fmt "@]"
+  | Multi es ->
+    Format.fprintf fmt "@[<hov 2>Multi-selection" ;
+    List.iter (fun e -> Format.fprintf fmt "(%a)" (pp_selection printer) e) es ;
+    Format.fprintf fmt "@]"
+
+let extract_matchings sigma assoc printer =
+  let l = ref [] in
+  let iter name matched =
+    let pp_selection = pp_selection printer in
+    let target = printer#selection_to_target matched in
+    let pattern =
+      match Hashtbl.find_opt assoc name with
+      | Some pattern -> Format.asprintf "%a" Pattern.pp_pattern pattern
+      | None -> name (* this is a user defined name *)
+    in
+    let matched = Format.asprintf "%a" pp_selection matched in
+    l := { name ; pattern ; matched ; target } :: !l
+  in
+  Pattern.iter_sigma iter sigma ;
+  Some !l
+
 let debug pattern ?node () =
+  let preprocess_patterns ps = (* we keep a table name -> pattern for reprint *)
+    let m = Hashtbl.create 17 in
+    let transform i p =
+      let name = Printf.sprintf "$%d" i in
+      let pat = Pattern.named name p in
+      Hashtbl.add m name pat ;
+      pat
+    in
+    List.mapi transform ps, m
+  in
   match parse_patterns pattern with
   | exception exn ->
     let message = Printf.sprintf "Failure (%s)" (Printexc.to_string exn) in
     error ~message ()
   | Error (loc, message) -> error ~loc ~message ()
   | Patterns ps ->
-    if ps=[] then warning ~message:"Empty pattern" () else
+    if ps=[]
+    then warning ~message:"Empty pattern" ~matchings:None ()
+    else
       match node with
-      | None -> valid ~message:"Valid pattern" ()
+      | None -> valid ~message:"Valid pattern" ~matchings:None ()
       | Some node ->
+        let printer = WpTipApi.lookup_printer node in
         let sequent = snd @@ Wpo.compute @@ ProofEngine.goal node in
+        let patterns, assoc = preprocess_patterns ps in
         let rec apply_all sigma = function
           | [] ->
-            let details = Format.asprintf "%a" Pattern.pp_sigma sigma in
-            valid ~message:"Applicable pattern" ~details ()
+            let matchings = extract_matchings sigma assoc printer in
+            valid ~message:"Applicable pattern" ~matchings ()
           | p::ps ->
             match check_pattern sequent sigma p with
-            | Some sigma -> apply_all sigma ps
+            | Some sigma ->
+              apply_all sigma ps
             | None ->
               let loc = Pattern.pattern_loc p in
-              warning ~loc ~message:"Unmatched pattern" ()
-        in apply_all Pattern.empty @@
-        List.mapi (fun i -> Pattern.named (Printf.sprintf "$%d" i)) ps
+              let matchings = extract_matchings sigma assoc printer in
+              warning ~loc ~message:"Unmatched pattern" ~matchings ()
+        in apply_all Pattern.empty patterns
 
 let () =
   let signature = Request.signature ~output:(module Diagnostic) () in

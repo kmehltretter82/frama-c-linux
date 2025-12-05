@@ -249,10 +249,6 @@ export function cancelProofTasks(): void {
 /* --- Pattern Debugger                                                   --- */
 /* -------------------------------------------------------------------------- */
 
-export interface PatternDebuggerProps {
-  node: TIP.node;
-}
-
 const severityIcon: { [key: string]: string } = {
   Ok: 'CHECK', Warning: 'WARNING', Error: 'CROSS',
 };
@@ -265,23 +261,74 @@ const severityClass: { [key: string]: string } = {
   Ok: 'wp-pattern-ok', Warning: 'wp-pattern-warning', Error: 'wp-pattern-error',
 };
 
-function PatternDebugger(props: PatternDebuggerProps): JSX.Element {
+interface MatchingProps {
+  node: TIP.node ;
+  match: WpPattern.matching
+}
+
+function Matching (props: MatchingProps) : JSX.Element {
+  const { pattern, name, matched, target } = props.match ;
+  const node = props.node ;
+  const [ part, term ] = target ;
+  const onClick = React.useCallback(() => {
+      Server.send(TIP.setSelection, { node, part, term });
+    }, [part, term, node]);
+
+  return (
+    <tr>
+      <td><IconButton icon='TARGET' onClick={onClick} enabled={term !== undefined} /></td>
+      <td><Item label={ pattern } title={ 'ID: ' + name } /></td>
+      <td style={{ width: '100%' }}><Item label={ '-> ' + matched } /></td>
+    </tr>
+  );
+}
+
+interface MatchingsProps {
+  node: TIP.node;
+  matchings?: WpPattern.matching[]
+}
+
+function Matchings (props: MatchingsProps) : JSX.Element | null {
+  const { node, matchings } = props ;
+  return (
+    matchings
+      ? <table>
+          <tbody>
+            { matchings.map((m) => <Matching key={m.name} node={node} match={m}/>) }
+          </tbody>
+        </table>
+      : null
+  );
+}
+
+export interface PatternDebuggerProps {
+  goal: WP.goal | undefined;
+}
+
+export function PatternDebugger(props: PatternDebuggerProps): JSX.Element {
+  const { current } = States.useRequestStable(
+    TIP.getProofStatus,
+    props.goal ? { main: props.goal } : undefined,
+  );
   const text = React.useMemo(() => new TextProxy(), []);
   const [pattern, setPattern] = React.useState('');
   const onChange = React.useCallback(() => {
     setPattern(text.toString());
   }, [text]);
-  const { severity, message, details, range } =
-    States.useRequestStable(WpPattern.debug, { pattern, node: props.node });
+  const { severity, message, matchings, range } =
+    States.useRequestStable(WpPattern.debug, { pattern, node: current });
   const decorations = React.useMemo(
-    () => range && { className: severityClass[severity], ...range }
+    () => range ? { className: severityClass[severity], ...range } : []
     , [severity, range]);
   const icon = severityIcon[severity];
   const kind = severityKind[severity];
   return (
-    <Vbox style={{ width: 220 }}>
-      <TextView text={text} onChange={onChange} decorations={decorations} />
-      <Label icon={icon} kind={kind} label={message} title={details} />
+    <Vbox style={{ height: '100%' }}>
+      <TextView style={{ flex: 1 }} text={text} onChange={onChange} decorations={decorations} />
+      <Vbox style={{ flex: 1 }}>
+      <Label icon={icon} kind={kind} label={message} />
+      <Matchings node={current} matchings={matchings} />
+      </Vbox>
     </Vbox>
   );
 }
@@ -537,9 +584,6 @@ export function TIPView(props: TIPProps): JSX.Element {
             setSelected={onSelectedTactic}
           />
         </Vbox>
-        <PatternDebugger
-          node={current}
-        />
       </Hfill>
       <ConfigureAutoProver
         node={current}

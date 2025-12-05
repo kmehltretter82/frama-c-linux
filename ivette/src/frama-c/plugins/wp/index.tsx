@@ -16,6 +16,7 @@ import { Label } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Meter } from 'dome/controls/displays';
 import { Group, Inset } from 'dome/frame/toolbars';
+import { GlobalState, useGlobalState } from 'dome/data/states';
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
@@ -86,11 +87,18 @@ function addGenerateRTEGuardsMenu(
 
 ASTview.registerMarkerMenuExtender(addGenerateRTEGuardsMenu);
 
+
 /* -------------------------------------------------------------------------- */
-/* --- Goal Component                                                     --- */
+/* --- Current Goal                                                       --- */
 /* -------------------------------------------------------------------------- */
 
 type Goal = WP.goal | undefined;
+
+const globalGoalSelection = new GlobalState(undefined);
+
+/* -------------------------------------------------------------------------- */
+/* --- Goal Component                                                     --- */
+/* -------------------------------------------------------------------------- */
 
 type setting = [boolean, () => void]
 function menuItem(label: string, [b, flip]: setting, enabled?: boolean)
@@ -104,6 +112,8 @@ function menuItem(label: string, [b, flip]: setting, enabled?: boolean)
 }
 
 function WPGoals(): JSX.Element {
+  const [current, setCurrent] = useGlobalState<Goal>(globalGoalSelection);
+
   const scopedState = Dome.useFlipSettings('frama-c.wp.goals.scoped');
   const [scoped] = scopedState;
   const failedState = Dome.useFlipSettings('frama-c.wp.goals.failed');
@@ -116,7 +126,6 @@ function WPGoals(): JSX.Element {
   ];
 
   const [tip, setTip] = React.useState(false);
-  const [current, setCurrent] = React.useState<Goal>(undefined);
   Server.useShutdown(() => { setTip(false); setCurrent(undefined); });
   const scope = States.useCurrentScope();
   const [goals, setGoals] = React.useState(0);
@@ -169,6 +178,22 @@ Ivette.registerComponent({
   label: 'WP Goals',
   title: 'WP Generated Verification Conditions',
   children: <WPGoals />,
+});
+
+/* -------------------------------------------------------------------------- */
+/* --- Pattern Debugger Component                                         --- */
+/* -------------------------------------------------------------------------- */
+
+function PatternDebugger(): JSX.Element {
+  const [current, _] = useGlobalState<Goal>(globalGoalSelection);
+  return <TIP.PatternDebugger goal={current} />;
+}
+
+Ivette.registerComponent({
+  id: 'fc.wp.pattern-debugger',
+  label: 'WP Pattern Debugger',
+  title: 'WP Pattern Debugger',
+  children: <PatternDebugger />,
 });
 
 /* -------------------------------------------------------------------------- */
