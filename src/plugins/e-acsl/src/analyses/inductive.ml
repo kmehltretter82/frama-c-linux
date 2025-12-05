@@ -36,15 +36,21 @@ include struct (* auxiliary functions *)
 
   (* applies logic variable substitutions [substs] as well as a logic_info
      substitution [(li, li')] *)
-  let subst_applier (li, li') substs = object
+  let subst_applier ?li_subst substs = object
     inherit Visitor.frama_c_inplace
 
     method! vlogic_info_use this_li =
-      if Logic_info.equal this_li li then ChangeTo li' else DoChildren
+      match li_subst with
+      | Some (li, li') when Logic_info.equal this_li li -> ChangeTo li'
+      | Some _ | None -> DoChildren
 
-    method !vlogic_var_use v =
-      try ChangeTo (Logic_var.Map.find v substs)
-      with Not_found -> DoChildren
+    method !vterm = function
+      | {term_node = TLval (TVar v, TNoOffset); term_loc} ->
+        (try
+           let t = Logic_var.Map.find v substs in
+           ChangeTo {t with term_loc} (* copy *)
+         with Not_found -> DoChildren)
+      | _ -> DoChildren
   end
 
   let rec extract_foralls = function
@@ -188,14 +194,14 @@ module Substs = struct
   let unions = List.fold_left union empty
 
   let succession first later = (* one substitution applied after another *)
-    union (map (fun v -> try find v later with Not_found -> v) first) later
+    union (map (fun t -> Visitor.visitFramacTerm (subst_applier later) t) first) later
 
   let pretty fmt m =
     let pp_substitution fmt src tgt =
       Format.fprintf fmt "@[@[%a@] %t @[%a@]@]"
         Printer.pp_logic_var src
         Unicode.pp_right_arrow
-        Printer.pp_logic_var tgt
+        Printer.pp_term tgt
     in
     Format.fprintf fmt "@[[";
     let first = ref true in
@@ -213,7 +219,7 @@ end
     known. This information is retained along with the mode as it is useful to
     re-use by the normalization. *)
 module Modus : sig
-  type t = {mode : mode; substs : logic_var Substs.t}
+  type t = {mode : mode; substs : term Substs.t}
 
   val pretty : Format.formatter -> t -> unit
 
@@ -221,7 +227,7 @@ module Modus : sig
   val preferred_opt : t list -> t option
   val preferred : li:logic_info -> t list -> t
 end = struct
-  type t = {mode : mode; substs : logic_var Substs.t}
+  type t = {mode : mode; substs : term Substs.t}
 
   let compare {mode = m1} {mode = m2} = Mode.compare m1 m2
 
@@ -266,6 +272,13 @@ end = struct
     poly_id : string list;
     predicate : predicate (* generalized Horn clauses *)
   }
+
+  let mk_var_subst (arg, formal) =
+    let solve lhs rhs = match lhs with
+      | {term_node = TLval (TVar v, TNoOffset)} -> Some (v, rhs)
+      | _ -> None
+    in
+    solve arg (Logic_const.tvar ~loc:arg.term_loc formal)
 
   let analyze_mode ~lv_rec p mode =
     let quantifiers, p = extract_foralls p in
@@ -325,10 +338,8 @@ end = struct
           Printer.pp_predicate p
       | Papp (li, _, args) when is_rec_occurrence li -> (* conclusion *)
         let substs =
-          let pairs, _ = Mode.in_out_args ~mode (List.combine args li.l_profile)
-          and var_subst (arg, formal) =
-            Option.map (fun v -> v, formal) (var_of_term arg)
-          in Substs.of_list @@ List.filter_map var_subst pairs
+          let pairs, _ = Mode.in_out_args ~mode (List.combine args li.l_profile) in
+          Substs.of_list @@ List.filter_map mk_var_subst pairs
         in
         let fv = add_fv fv args in
         let free_quantified_vars = Vars.inter fv quantifiers in
@@ -594,11 +605,14 @@ end = functor (Out : Out_language) -> struct
     let loc = loc_of_inductive li in
     let li = {li with l_profile = new_formals; l_type} in
     let li_concl_and_formal_substs =
-      let formal_substs = Substs.of_list @@ List.combine old_profile new_profile in
-      (* The substitution (li, li) is meaningful, since li we look to
-         substitute
-         a logic_info of which li is a copy: same logic_var, different record *)
-      subst_applier (li, li) @@ Substs.succession modus.substs formal_substs
+      let formal_substs =
+        Substs.of_list @@
+        List.combine old_profile (List.map Logic_const.tvar new_profile)
+      in
+      (* The substitution (li, li) is meaningful, since the logic_info we look
+         to substitute is a copy of li: same logic_var, different record *)
+      let li_subst = li, li in
+      subst_applier ~li_subst @@ Substs.succession modus.substs formal_substs
     in
     (* The substitution (li, li) is meaningful, since li we look to substitute
        a logic_info of which li is a copy: same logic_var, different record *)
