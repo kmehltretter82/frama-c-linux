@@ -135,6 +135,7 @@ int main(void)
   return __retres;
 }
 
+/*@ assigns \result; */
 int __gen_e_acsl_CountInd_here(int *arr, int len, int val, int count)
 {
   __e_acsl_mpz_t __gen_e_acsl_CountInd_fun4_here_6;
@@ -151,6 +152,7 @@ int __gen_e_acsl_CountInd_here(int *arr, int len, int val, int count)
   return __retres;
 }
 
+/*@ assigns (*__retres_arg)[0]; */
 void __gen_e_acsl_CountInd_fun4_here(__e_acsl_mpz_t *__retres_arg, int *arr,
                                      int len, int val)
 {

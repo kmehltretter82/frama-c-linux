@@ -174,6 +174,7 @@ int main(void)
   return __retres;
 }
 
+/*@ assigns \result; */
 int __gen_e_acsl_linked_n_here(struct list *root, struct list **cArr,
                                __e_acsl_mpz_struct * index,
                                __e_acsl_mpz_struct * n, struct list *bound)

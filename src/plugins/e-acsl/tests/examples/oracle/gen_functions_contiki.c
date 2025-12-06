@@ -82,6 +82,7 @@ int main(void)
   return __retres;
 }
 
+/*@ assigns \result; */
 long __gen_e_acsl_length_here(struct list *l)
 {
   long __gen_e_acsl_length_aux_here_4;
@@ -89,6 +90,7 @@ long __gen_e_acsl_length_here(struct list *l)
   return __gen_e_acsl_length_aux_here_4;
 }
 
+/*@ assigns \result; */
 long __gen_e_acsl_length_aux_here(struct list *l, unsigned int n)
 {
   long __gen_e_acsl_if_3;

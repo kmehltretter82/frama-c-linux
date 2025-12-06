@@ -215,22 +215,25 @@ let generate_kf ~loc fname env params_ty ret_ty params_ival li =
            Logic_const.tresult fundec.svar.vtype)
     in
     begin
-      match assigns_from with
-      | None -> ()
-      | Some assigns_from ->
-        let assigns_from =
-          List.map
-            (fun e ->
-               Logic_const.new_identified_term
-                 (Logic_utils.expr_to_term e))
-            assigns_from
-        in
-        Annotations.add_assigns
-          ~keep_empty:false
-          Options.emitter
-          ~behavior:Cil.default_behavior_name
-          kf
-          (Writes [ assigned_var , From assigns_from]);
+      let assigns_from =
+        match assigns_from with
+        | Some assigns_from ->
+          let identified_terms =
+            List.map
+              (fun e ->
+                 Logic_const.new_identified_term
+                   (Logic_utils.expr_to_term e))
+              assigns_from
+          in
+          From identified_terms
+        | None -> FromAny
+      in
+      Annotations.add_assigns
+        ~keep_empty:false
+        Options.emitter
+        ~behavior:Cil.default_behavior_name
+        kf
+        (Writes [assigned_var, assigns_from]);
     end;
     let b, env = generate_body ~loc kf env ret_ty ret_vi li.l_body in
     fundec.sbody <- b;

@@ -111,6 +111,7 @@ int main(void)
   return __retres;
 }
 
+/*@ assigns \result; */
 int __gen_e_acsl_sum_here(int *arr, int low, int high, int len, int res)
 {
   __e_acsl_mpz_t __gen_e_acsl_sum_fun5_here_4;
@@ -126,6 +127,7 @@ int __gen_e_acsl_sum_here(int *arr, int low, int high, int len, int res)
   return __retres;
 }
 
+/*@ assigns (*__retres_arg)[0]; */
 void __gen_e_acsl_sum_fun5_here(__e_acsl_mpz_t *__retres_arg, int *arr,
                                 int low, int high, int len)
 {
