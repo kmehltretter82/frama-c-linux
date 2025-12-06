@@ -129,10 +129,10 @@ int __gen_e_acsl_P_fun3(__e_acsl_mpz_struct * a, __e_acsl_mpz_struct * b)
           {.values = (void *)0};
         __gen_e_acsl_assert_data_3.blocking = 1;
         __gen_e_acsl_assert_data_3.kind = "Assertion";
-        __gen_e_acsl_assert_data_3.pred_txt = "Incomplete axiomatic function";
-        __gen_e_acsl_assert_data_3.file = "<unknown location>";
+        __gen_e_acsl_assert_data_3.pred_txt = "Incomplete inductive function";
+        __gen_e_acsl_assert_data_3.file = "rec_condition.c";
         __gen_e_acsl_assert_data_3.fct = "P_fun3";
-        __gen_e_acsl_assert_data_3.line = 0;
+        __gen_e_acsl_assert_data_3.line = 10;
         __e_acsl_assert(0,& __gen_e_acsl_assert_data_3);
       }
       __gmpz_init_set_si(__gen_e_acsl__13,0L);
@@ -231,10 +231,10 @@ void __gen_e_acsl_P_fun3_2(__e_acsl_mpz_t *__retres_arg,
           {.values = (void *)0};
         __gen_e_acsl_assert_data_2.blocking = 1;
         __gen_e_acsl_assert_data_2.kind = "Assertion";
-        __gen_e_acsl_assert_data_2.pred_txt = "Incomplete axiomatic function";
-        __gen_e_acsl_assert_data_2.file = "<unknown location>";
+        __gen_e_acsl_assert_data_2.pred_txt = "Incomplete inductive function";
+        __gen_e_acsl_assert_data_2.file = "rec_condition.c";
         __gen_e_acsl_assert_data_2.fct = "P_fun3_2";
-        __gen_e_acsl_assert_data_2.line = 0;
+        __gen_e_acsl_assert_data_2.line = 10;
         __e_acsl_assert(0,& __gen_e_acsl_assert_data_2);
       }
       __gmpz_init_set_si(__gen_e_acsl__10,0L);

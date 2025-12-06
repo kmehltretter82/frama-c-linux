@@ -112,10 +112,10 @@ int __gen_e_acsl_P_fun2(int x)
             {.values = (void *)0};
           __gen_e_acsl_assert_data_2.blocking = 1;
           __gen_e_acsl_assert_data_2.kind = "Assertion";
-          __gen_e_acsl_assert_data_2.pred_txt = "Incomplete axiomatic function";
-          __gen_e_acsl_assert_data_2.file = "<unknown location>";
+          __gen_e_acsl_assert_data_2.pred_txt = "Incomplete inductive function";
+          __gen_e_acsl_assert_data_2.file = "two_results.c";
           __gen_e_acsl_assert_data_2.fct = "P_fun2";
-          __gen_e_acsl_assert_data_2.line = 0;
+          __gen_e_acsl_assert_data_2.line = 10;
           __e_acsl_assert(0,& __gen_e_acsl_assert_data_2);
         }
         __gen_e_acsl_if = 0;

@@ -838,7 +838,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       Assert.runtime_check_with_msg
         ~adata
         ~loc
-        "Incomplete axiomatic function"
+        "Incomplete inductive function"
         ~pred_kind:Assert
         annot_kind
         kf

@@ -73,10 +73,10 @@ int __gen_e_acsl_Q_fun2(int x, int z)
         {.values = (void *)0};
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Assertion";
-      __gen_e_acsl_assert_data_2.pred_txt = "Incomplete axiomatic function";
-      __gen_e_acsl_assert_data_2.file = "<unknown location>";
+      __gen_e_acsl_assert_data_2.pred_txt = "Incomplete inductive function";
+      __gen_e_acsl_assert_data_2.file = "2modes.c";
       __gen_e_acsl_assert_data_2.fct = "Q_fun2";
-      __gen_e_acsl_assert_data_2.line = 0;
+      __gen_e_acsl_assert_data_2.line = 9;
       __e_acsl_assert(0,& __gen_e_acsl_assert_data_2);
     }
     __gen_e_acsl_if = 0;
@@ -96,10 +96,10 @@ int __gen_e_acsl_Q_fun3(int x, int y)
         {.values = (void *)0};
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "Assertion";
-      __gen_e_acsl_assert_data_3.pred_txt = "Incomplete axiomatic function";
-      __gen_e_acsl_assert_data_3.file = "<unknown location>";
+      __gen_e_acsl_assert_data_3.pred_txt = "Incomplete inductive function";
+      __gen_e_acsl_assert_data_3.file = "2modes.c";
       __gen_e_acsl_assert_data_3.fct = "Q_fun3";
-      __gen_e_acsl_assert_data_3.line = 0;
+      __gen_e_acsl_assert_data_3.line = 9;
       __e_acsl_assert(0,& __gen_e_acsl_assert_data_3);
     }
     __gen_e_acsl_if_2 = 0;

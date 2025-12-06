@@ -335,10 +335,10 @@ void __gen_e_acsl_CountInd_fun4_here(__e_acsl_mpz_t *__retres_arg, int *arr,
             {.values = (void *)0};
           __gen_e_acsl_assert_data_8.blocking = 1;
           __gen_e_acsl_assert_data_8.kind = "Assertion";
-          __gen_e_acsl_assert_data_8.pred_txt = "Incomplete axiomatic function";
-          __gen_e_acsl_assert_data_8.file = "<unknown location>";
+          __gen_e_acsl_assert_data_8.pred_txt = "Incomplete inductive function";
+          __gen_e_acsl_assert_data_8.file = "count.c";
           __gen_e_acsl_assert_data_8.fct = "CountInd_fun4_here";
-          __gen_e_acsl_assert_data_8.line = 0;
+          __gen_e_acsl_assert_data_8.line = 12;
           __e_acsl_assert(0,& __gen_e_acsl_assert_data_8);
         }
         __gmpz_init_set_si(__gen_e_acsl__3,0L);

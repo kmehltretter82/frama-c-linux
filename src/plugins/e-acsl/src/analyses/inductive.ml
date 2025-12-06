@@ -76,6 +76,9 @@ include struct (* auxiliary functions *)
 
   let free_vars = Cil.extract_free_logicvars_from_term
   let free_vars_pred = Cil.extract_free_logicvars_from_predicate
+  let loc_of_inductive = function
+    | {l_body = LBinductive ((_, _, _, p) :: _)} -> Some p.pred_loc
+    | _ -> None
 end (* auxiliary functions *)
 
 let is_inductive = function {l_body = LBinductive _; _} -> true | _ -> false
@@ -583,6 +586,7 @@ end = functor (Out : Out_language) -> struct
       Modus.pretty modus pp_logic_info li;
     let l_type = Option.map (fun l -> l.lv_type) res in
     let old_profile = li.l_profile in
+    let loc = loc_of_inductive li in
     let li = {li with l_profile = new_formals; l_type} in
     let li_concl_and_formal_substs =
       let formal_substs = Substs.of_list @@ List.combine old_profile new_profile in
@@ -595,7 +599,7 @@ end = functor (Out : Out_language) -> struct
        a logic_info of which li is a copy: same logic_var, different record *)
     let li = Visitor.visitFramacLogicInfo li_concl_and_formal_substs li in
     let body =
-      let fallthrough = Out.mk_false l_type in
+      let fallthrough = Out.mk_false ?loc l_type in
       List.fold_right extract_ctor (InductiveDef.ctors li) fallthrough
     in
     li.l_body <- Out.mk_logic_body body;
@@ -622,8 +626,8 @@ end = struct
   module Extractor = Make_extractor (struct
       include Build_pred_or_term.Term
 
-      let mk_false lty =
-        let t = mk_false lty in
+      let mk_false ?loc lty =
+        let t = mk_false ?loc lty in
         Fallthrough_terms.add t;
         t
 
@@ -661,10 +665,11 @@ end
       Extractor.extract ~mode li
     | Incomplete i ->
       let f = FunctionExtractor.extract ~mode:mode li in
+      let loc = loc_of_inductive li in
       let args, res = Mode.incomplete_in_out_args ~mode:i li.l_profile in
-      let args = List.map Logic_const.tvar args in
-      let tapp = Logic_const.term (Tapp (f, f.l_labels, args)) res.lv_type in
-      let rel = Logic_const.prel (Req, tapp, Logic_const.tvar res) in
+      let args = List.map (Logic_const.tvar ?loc) args in
+      let tapp = Logic_const.term ?loc (Tapp (f, f.l_labels, args)) res.lv_type in
+      let rel = Logic_const.prel ?loc (Req, tapp, Logic_const.tvar ?loc res) in
       let wrapper = {li with l_body = LBpred rel} in
       wrapper.l_var_info <- freshen_up_logic_var li.l_var_info;
       Options.feedback ~dkey ~level:2
