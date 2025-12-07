@@ -1,20 +1,23 @@
 [e-acsl] beginning translation.
 [e-acsl:analysis:inductive] function extraction with mode incomplete in 4
-[e-acsl] count.c:31: Warning: 
+[e-acsl] Warning: Translation of CountInd might be unsound (if multiple cases apply to some given arguments simultaneously).
+[e-acsl] count.c:35: Warning: 
   no assigns clause generated for function CountInd because pointers as arguments is not yet supported
 [e-acsl] <unknown location>: Warning: 
   no assigns clause generated for function CountInd because pointers as arguments is not yet supported
+[e-acsl] Warning: Translation of CountInd might be unsound (if multiple cases apply to some given arguments simultaneously).
+[e-acsl] Warning: Translation of CountInd might be unsound (if multiple cases apply to some given arguments simultaneously).
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] count.c:17: Warning: 
+[eva:alarm] count.c:21: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] count.c:22: Warning: 
+[eva:alarm] count.c:26: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] count.c:31: Warning: 
+[eva:alarm] count.c:35: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] count.c:31: Warning: assertion got status unknown.
-[eva:alarm] count.c:32: Warning: 
+[eva:alarm] count.c:35: Warning: assertion got status unknown.
+[eva:alarm] count.c:36: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] count.c:32: Warning: assertion got status unknown.
-[eva:alarm] count.c:33: Warning: 
+[eva:alarm] count.c:36: Warning: assertion got status unknown.
+[eva:alarm] count.c:37: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] count.c:33: Warning: assertion got status unknown.
+[eva:alarm] count.c:37: Warning: assertion got status unknown.

@@ -3,6 +3,10 @@
    COMMENT: E-ACSL construct `logic functions with labels' is not yet supported.
    STDOPT: +"-eva-unroll-recursive-calls 9"
 */
+/* run.config_dev
+   MACRO: ROOT_EACSL_GCC_OPTS_EXT --no-assert-print-data
+   COMMENT: ptr values may change for each run
+*/
 
 /* logic function that calculates the sum of the elements between indices [low]
    and [high] (inclusively) of an array [a] of length [len] */

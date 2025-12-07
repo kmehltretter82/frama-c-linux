@@ -364,7 +364,11 @@ let get_orig_pred = Predicates.original
 let get_term = Terms.derived
 let get_orig_term = Terms.original
 
-let is_unsound_predicate = Inductive.is_unsound_predicate
+let is_unsound_predicate li =
+  Inductive.is_unsound_predicate li ||
+  match Here_specialized.original_opt li with
+  | Some orig -> Inductive.is_unsound_predicate orig
+  | None -> false
 
 let clear () =
   Terms.clear ();
