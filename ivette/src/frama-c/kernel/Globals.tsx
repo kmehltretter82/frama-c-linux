@@ -254,7 +254,7 @@ interface Filters {
   negative_default: boolean
 }
 
-interface LocalFilters extends Filters {
+export interface LocalFilters extends Filters {
   positiveValue: boolean,
   negativeValue: boolean
 }
@@ -302,7 +302,13 @@ const decodeFilters: Decoder<LocalFilters[]> = (js: json) => {
   else throw new JsonTypeError("string", js);
 };
 
-function useFilterLocal(filters: Filters[], type: 'functions' | 'variables'): [
+type FilterTypes = 'functions' | 'variables'
+
+/**
+ * This hook returns the list of Boolean filters to display and
+ * a function to modify the value of a filter.
+ */
+function useFilterLocal(filters: Filters[], type: FilterTypes): [
   LocalFilters[],
   setFilterValue: (id: string, type: "pos" | "neg", newValue: boolean) => void
 ] {
@@ -311,6 +317,7 @@ function useFilterLocal(filters: Filters[], type: 'functions' | 'variables'): [
     decodeFilters, encodeFilters,
     []
   );
+  const ids = filters.map(e => e.id);
 
   const setFilterValue = React.useCallback(
     (id: string, type: 'pos' | 'neg', newValue: boolean): void => {
@@ -334,10 +341,15 @@ function useFilterLocal(filters: Filters[], type: 'functions' | 'variables'): [
           negativeValue: a.negative_default
         };
       });
+
+    localFilters.forEach(a => {
+      const enabled = filters.find(b => b.id === a.id)?.enabled;
+      if(enabled !== undefined) a.enabled = enabled;
+    });
     setLocalFilters([...localFilters, ...newFilters]);
   }, [filters, localFilters, setLocalFilters ]);
 
-  return [localFilters, setFilterValue];
+  return [localFilters.filter(e => ids.includes(e.id)), setFilterValue];
 }
 
 function useFiltersFlipSettings(label: string, type: string, b: boolean)
@@ -384,7 +396,7 @@ export function useFunctionFilter(): FunctionFilterRet {
   ]);
 
   const contextFctMenuItems: MultiselectItemProps[] = React.useMemo(() => {
-    const dyn = getContextMenu(localFilters, setLocalFilters);
+    const dyn = getContextMenu(localFilters.filter(e => e.id), setLocalFilters);
     dyn.push(
       menuItem({
         label: 'Selected only',
