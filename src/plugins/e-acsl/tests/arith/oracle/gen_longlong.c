@@ -60,14 +60,15 @@ int main(void)
     __gen_e_acsl_mod_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_),
                                         (__e_acsl_mpz_struct const *)(__gen_e_acsl__3));
     __gmpz_init(__gen_e_acsl_mod);
-    /*@ assert E_ACSL: 2 != 0; */
+    /*@ assert E_ACSL: "denominator not zero": 2 != 0; */
     {
       __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "Assertion";
+      __gen_e_acsl_assert_data_2.kind = "RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "2 != 0";
       __gen_e_acsl_assert_data_2.file = "longlong.i";
       __gen_e_acsl_assert_data_2.fct = "main";
       __gen_e_acsl_assert_data_2.line = 19;
+      __gen_e_acsl_assert_data_2.name = "denominator not zero";
       __e_acsl_assert(__gen_e_acsl_mod_guard != 0,
                       & __gen_e_acsl_assert_data_2);
     }

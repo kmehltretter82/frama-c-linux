@@ -290,14 +290,16 @@ int main(void)
     __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_20,
                                 & __gen_e_acsl_assert_data_21);
     __gmpz_init(__gen_e_acsl_div);
-    /*@ assert E_ACSL: y - 123456789123456789 != 0; */
+    /*@ assert E_ACSL: "denominator not zero": y - 123456789123456789 != 0;
+    */
     {
       __gen_e_acsl_assert_data_21.blocking = 1;
-      __gen_e_acsl_assert_data_21.kind = "Assertion";
+      __gen_e_acsl_assert_data_21.kind = "RTE";
       __gen_e_acsl_assert_data_21.pred_txt = "y - 123456789123456789 != 0";
       __gen_e_acsl_assert_data_21.file = "arith.i";
       __gen_e_acsl_assert_data_21.fct = "main";
       __gen_e_acsl_assert_data_21.line = 34;
+      __gen_e_acsl_assert_data_21.name = "denominator not zero";
       __e_acsl_assert(__gen_e_acsl_div_guard != 0,
                       & __gen_e_acsl_assert_data_21);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_21);
@@ -371,14 +373,15 @@ int main(void)
     __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_23,
                                 & __gen_e_acsl_assert_data_24);
     __gmpz_init(__gen_e_acsl_div_2);
-    /*@ assert E_ACSL: y - x != 0; */
+    /*@ assert E_ACSL: "denominator not zero": y - x != 0; */
     {
       __gen_e_acsl_assert_data_24.blocking = 1;
-      __gen_e_acsl_assert_data_24.kind = "Assertion";
+      __gen_e_acsl_assert_data_24.kind = "RTE";
       __gen_e_acsl_assert_data_24.pred_txt = "y - x != 0";
       __gen_e_acsl_assert_data_24.file = "arith.i";
       __gen_e_acsl_assert_data_24.fct = "main";
       __gen_e_acsl_assert_data_24.line = 38;
+      __gen_e_acsl_assert_data_24.name = "denominator not zero";
       __e_acsl_assert(__gen_e_acsl_div_guard_2 != 0,
                       & __gen_e_acsl_assert_data_24);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_24);
