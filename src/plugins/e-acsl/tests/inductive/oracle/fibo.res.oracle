@@ -4,10 +4,31 @@
 [e-acsl:analysis:inductive] 
   extracting function from fibo with mode: incomplete in 2
 [e-acsl] Warning: Negative verdicts of fibo might be unsound
+[e-acsl:analysis:inductive] 
+  extracting predicate from fibo2 using mode: incomplete in 2
+[e-acsl:analysis:inductive] 
+  extracting function from fibo2 with mode: incomplete in 2
+[e-acsl] Warning: Negative verdicts of fibo2 might be unsound
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] fibo.c:17: Warning: 
+[eva:alarm] fibo.c:24: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] fibo.c:17: Warning: assertion got status unknown.
-[eva:alarm] fibo.c:18: Warning: 
+[eva:alarm] fibo.c:24: Warning: assertion got status unknown.
+[eva:alarm] fibo.c:25: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] fibo.c:18: Warning: assertion got status unknown.
+[eva:alarm] fibo.c:25: Warning: assertion got status unknown.
+[eva] fibo.c:18: Warning: 
+  Using specification of function __gen_e_acsl_fibo2_fun2
+  for recursive calls of depth 9. Analysis of function __gen_e_acsl_fibo2_fun2
+  is thus incomplete and its soundness relies on the written specification.
+[eva] fibo.c:18: Warning: 
+  Using specification of function __gen_e_acsl_fibo2_fun2
+  for recursive calls of depth 9. Analysis of function __gen_e_acsl_fibo2_fun2
+  is thus incomplete and its soundness relies on the written specification.
+[eva:alarm] fibo.c:16: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
+[eva:alarm] fibo.c:26: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] fibo.c:26: Warning: assertion got status unknown.
+[eva:alarm] fibo.c:27: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] fibo.c:27: Warning: assertion got status unknown.

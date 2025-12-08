@@ -3,22 +3,6 @@
    STDOPT: +"-eva-unroll-recursive-calls 9"
 */
 
-// impossible without function inversion
-/*@
-  inductive P1(ℤ x) {
-      case c: \forall ℤ a; P1(1/a);
-  }
-@*/
-
-// two complex conclusion arguments
-/*@
-  inductive P2(ℤ i,ℤ x) {
-      case zero: P2(0,0);
-      case one: P2(1,1);
-      case other: \forall ℤ n,f1,f2; n>1 ==> P2(n-1,f1) ==> P2(n-2,f2) ==> P2(n+1,f1+f2);
-  }
-@*/
-
 // impossible without \let inversion
 /*@
   inductive P3(ℤ a, ℤ b) {
@@ -67,8 +51,6 @@
 int t[4] = {1, 3, 2, 4};
 
 int main() {
-  /*@ assert P1(1); @*/
-  /*@ assert P2(7,13); @*/
   /*@ assert P3(2,3); @*/
   /*@ assert eq(2, 2); */
   /*@ assert !eq(2, 3); */
