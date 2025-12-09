@@ -154,27 +154,112 @@ let parse_string s =
     raise (ParseError (loc, msg))
 
 type parse_result =
-  | Patterns of Pattern.pattern list
   | Error of Cil_types.location * string
+  | Patterns of {
+      lookups: Pattern.lookup list ;
+      select: Pattern.value list ;
+      debug_table: (string, Pattern.pattern) Hashtbl.t ;
+    }
+
+type denv = {
+  table: (string, Pattern.pattern) Hashtbl.t ;
+  mutable last: int ;
+}
+
+let parse_name ?check p =
+  let open Logic_ptree in
+  let loc = p.lexpr_loc in
+  match p.lexpr_node with
+  | PLvar value
+  | PLapp(value,[],[])
+  | PLconstant(StringConstant value)
+    ->
+    Option.iter (fun f -> f loc value) check ;
+    (loc, value)
+  | _ ->
+    let msg = Format.asprintf "name expected" in
+    raise (Pattern.TypeError(loc, msg))
+
+let parse_lookup
+    penv denv ?(head=true) ?(goal=false) ?(hyps=false) ?(split=false) p =
+  let name = Format.asprintf "$%d" denv.last in
+  denv.last <- denv.last + 1 ;
+  let pattern = Pattern.(named name @@ pa_pattern penv p) in
+  Hashtbl.add denv.table name pattern ;
+  Pattern.{ goal ; hyps ; head ; split ; pattern }
+
+let autoselect select lookup =
+  match select , lookup with
+  | [] , p::ps ->
+    let q, v = Pattern.self p.Pattern.pattern in
+    [v] , { p with pattern = q }::ps
+  | _ -> select, lookup
+
+let rec parse_tactic_params
+    penv denv ~select ~(lookup:(Pattern.lookup list)) ~params ps =
+  let open Logic_ptree in
+  match ps with
+  | [] ->
+    let select = List.rev select in
+    let lookup = List.rev lookup in
+    autoselect select lookup
+  | p::ps ->
+    let loc = p.lexpr_loc in
+    let cc = parse_tactic_params penv denv in
+    match p.lexpr_node with
+    | PLapp("\\goal",[],qs) ->
+      let qs = List.map (parse_lookup ~goal:true penv denv) qs in
+      let lookup = List.rev_append qs lookup in
+      cc ~select ~lookup ~params ps
+    | PLapp("\\when",[],qs) ->
+      let qs = List.map (parse_lookup ~hyps:true ~split:true penv denv) qs in
+      let lookup = List.rev_append qs lookup in
+      cc ~select ~lookup ~params ps
+    | PLapp("\\ingoal",[],qs) ->
+      let qs = List.map (parse_lookup ~head:false ~goal:true penv denv) qs in
+      let lookup = List.rev_append qs lookup in
+      cc ~select ~lookup ~params ps
+    | PLapp("\\incontext",[],qs) ->
+      let qs =
+        List.map (parse_lookup ~head:false ~hyps:true ~split:true penv denv) qs
+      in
+      let lookup = List.rev_append qs lookup in
+      cc ~select ~lookup ~params ps
+    | PLapp("\\pattern",[],qs) ->
+      let qs = List.map
+          (parse_lookup ~head:false ~goal:true ~hyps:true penv denv) qs in
+      let lookup = List.rev_append qs lookup in
+      cc ~select ~lookup ~params ps
+    | PLapp("\\select",[],vs) ->
+      let vs = List.map (Pattern.pa_value penv) vs in
+      let select = List.rev_append vs select in
+      cc ~select ~lookup ~params ps
+    | PLapp("\\param",[],[param;value]) ->
+      let param = parse_name param in
+      let value = Pattern.pa_value penv value in
+      let params = (param,value)::params in
+      cc ~select ~lookup ~params ps
+    | PLapp("\\child",[],_) ->
+      raise (Pattern.TypeError(loc, "\\child not recognized in debug mode"))
+    | PLapp("\\children",[],_) ->
+      raise (Pattern.TypeError(loc, "\\children not recognized in debug mode"))
+    | _ ->
+      raise (Pattern.TypeError(loc, "Tactic parameter expected"))
 
 let parse_patterns s =
   let context = Pattern.context () in
-  try Patterns (List.map (Pattern.pa_pattern context) @@ parse_string s)
+  let denv = { table = Hashtbl.create 13 ; last = 0 } in
+  try
+    let tokens = parse_string s in
+    let select, lookups =
+      parse_tactic_params context denv ~select:[] ~lookup:[] ~params:[] tokens
+    in
+    Patterns { lookups ; select ; debug_table = denv.table }
   with ParseError (loc, msg) | Pattern.TypeError (loc, msg) -> Error (loc, msg)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Debug Request                                                      --- *)
 (* -------------------------------------------------------------------------- *)
-
-let check_pattern sequent sigma pattern =
-  Pattern.psequent Pattern.{
-      head = false ;
-      goal = true ;
-      hyps = true ;
-      split = true ;
-      pattern
-    } sigma sequent
-
 
 (* Custom printers for clause and selection, using TIP printer:
    we want printed values to be coherent with the current printer. *)
@@ -202,61 +287,67 @@ let rec pp_selection printer fmt = function
     List.iter (fun e -> Format.fprintf fmt "(%a)" (pp_selection printer) e) es ;
     Format.fprintf fmt "@]"
 
-let extract_matchings sigma assoc printer =
-  let l = ref [] in
+let extract_matchings debug_table printer sigma selection =
+  let pp_selection = pp_selection printer in
+  let matchings = ref [] in
+  (* Extracting matchings ... *)
   let iter name matched =
-    let pp_selection = pp_selection printer in
     let target = printer#selection_to_target matched in
     let pattern =
-      match Hashtbl.find_opt assoc name with
+      match Hashtbl.find_opt debug_table name with
       | Some pattern -> Format.asprintf "%a" Pattern.pp_pattern pattern
       | None -> name (* this is a user defined name *)
     in
     let matched = Format.asprintf "%a" pp_selection matched in
-    l := { name ; pattern ; matched ; target } :: !l
+    matchings := { name ; pattern ; matched ; target } :: !matchings
   in
   Pattern.iter_sigma iter sigma ;
-  Some !l
+  (* Extracting selection *)
+  begin match selection with
+    | None | Some [] -> ()
+    | Some l ->
+      let selection =
+        match l with
+        | [v] -> Pattern.select sigma v
+        | vs -> Tactical.Multi (List.map (Pattern.select sigma) vs)
+      in
+      let target = printer#selection_to_target selection in
+      let pattern =
+        Format.asprintf "SELECT: %a"
+          (Pretty_utils.pp_list ~sep:", " Pattern.pp_value) l in
+      let matched = Format.asprintf "%a" pp_selection selection in
+      matchings := { name = "None" ; pattern ; matched ; target } :: !matchings
+  end ;
+  Some !matchings
 
 let debug pattern ?node () =
-  let preprocess_patterns ps = (* we keep a table name -> pattern for reprint *)
-    let m = Hashtbl.create 17 in
-    let transform i p =
-      let name = Printf.sprintf "$%d" i in
-      let pat = Pattern.named name p in
-      Hashtbl.add m name pat ;
-      pat
-    in
-    List.mapi transform ps, m
-  in
+
   match parse_patterns pattern with
   | exception exn ->
     let message = Printf.sprintf "Failure (%s)" (Printexc.to_string exn) in
     error ~message ()
-  | Error (loc, message) -> error ~loc ~message ()
-  | Patterns ps ->
-    if ps=[]
-    then warning ~message:"Empty pattern" ~matchings:None ()
-    else
-      match node with
-      | None -> valid ~message:"Valid pattern" ~matchings:None ()
-      | Some node ->
-        let printer = WpTipApi.lookup_printer node in
-        let sequent = snd @@ Wpo.compute @@ ProofEngine.goal node in
-        let patterns, assoc = preprocess_patterns ps in
-        let rec apply_all sigma = function
-          | [] ->
-            let matchings = extract_matchings sigma assoc printer in
-            valid ~message:"Applicable pattern" ~matchings ()
-          | p::ps ->
-            match check_pattern sequent sigma p with
-            | Some sigma ->
-              apply_all sigma ps
-            | None ->
-              let loc = Pattern.pattern_loc p in
-              let matchings = extract_matchings sigma assoc printer in
-              warning ~loc ~message:"Unmatched pattern" ~matchings ()
-        in apply_all Pattern.empty patterns
+  | Error (loc, message) ->
+    error ~loc ~message ()
+  | Patterns lks ->
+    match node with
+    | None -> valid ~message:"Valid pattern" ~matchings:None ()
+    | Some node ->
+      let printer = WpTipApi.lookup_printer node in
+      let get_matchings = extract_matchings lks.debug_table printer in
+      let sequent = snd @@ Wpo.compute @@ ProofEngine.goal node in
+      let rec apply_all sigma = function
+        | [] ->
+          let matchings = get_matchings sigma (Some lks.select) in
+          valid ~message:"Applicable pattern" ~matchings ()
+        | p::ps ->
+          match Pattern.psequent p sigma sequent with
+          | Some sigma ->
+            apply_all sigma ps
+          | None ->
+            let loc = Pattern.pattern_loc p.pattern in
+            let matchings = get_matchings sigma None in
+            warning ~loc ~message:"Unmatched pattern" ~matchings ()
+      in apply_all Pattern.empty lks.lookups
 
 let () =
   let signature = Request.signature ~output:(module Diagnostic) () in
