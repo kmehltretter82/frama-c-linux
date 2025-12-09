@@ -259,13 +259,17 @@ export interface LocalFilters extends Filters {
   negativeValue: boolean
 }
 
-function isVisible(value: object, localFilters: LocalFilters[]): boolean {
-  return localFilters.reduce((prev, f) => {
+export interface ObjectToBeFiltered {
+  filters: [string, boolean][];
+}
+
+function isVisible(object: ObjectToBeFiltered, localFilters: LocalFilters[])
+: boolean {
+  return localFilters.reduce((prev, filter) => {
       if(!prev) return false;
-      const id = f.id;
-      const { positiveValue, negativeValue } = f;
-      const current = id in value ? value[id as keyof typeof value] : undefined;
-      return (positiveValue || !current) && (negativeValue || !!current);
+      const { id, positiveValue, negativeValue } = filter;
+      const current = object.filters.find(e => e[0] === id)?.[1] ?? true;
+      return (positiveValue || !current) && (negativeValue || current);
     }, true);
 }
 
@@ -372,7 +376,6 @@ export function useFunctionFilter(): FunctionFilterRet {
   const { scopes } = Locations.useSelection();
   const multipleSelection = React.useMemo(() => scopes || [], [scopes]);
   const multipleSelectionActive = multipleSelection.length > 0;
-  // const evaComputed = States.useSyncValue(computationState) === 'computed';
 
   const isSelected = React.useMemo(() => {
     return (fct: Ast.functionsData): boolean => {
