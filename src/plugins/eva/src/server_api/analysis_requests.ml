@@ -63,10 +63,11 @@ let register_computation_hook f =
 
 let clear () =
   if Self.ComputationState.get () <> Computing then
-    let selection = State_selection.with_dependencies Self.state in
-    Project.clear ~selection ();
-    Emitter.clear Eva_utils.emitter;
-    Emitter.clear Eva_utils.export_emitter
+    begin
+      Self.clear_results ();
+      Emitter.clear Eva_utils.emitter;
+      Emitter.clear Eva_utils.export_emitter;
+    end
 
 let () = Request.register ~package
     ~kind:`SET
