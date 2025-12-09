@@ -266,17 +266,22 @@ interface MatchingProps {
   match: WpPattern.matching
 }
 
-function Matching (props: MatchingProps) : JSX.Element {
-  const { pattern, name, matched, target } = props.match ;
-  const node = props.node ;
-  const [ part, term ] = target ;
+function Matching(props: MatchingProps) : JSX.Element {
+  const { pattern, name, matched, target } = props.match;
+  const node = props.node;
+  const [ part, term ] = target;
   const onClick = React.useCallback(() => {
       Server.send(TIP.setSelection, { node, part, term });
     }, [part, term, node]);
 
   return (
     <tr>
-      <td><IconButton icon='TARGET' onClick={onClick} enabled={term !== undefined} /></td>
+      <td>
+        <IconButton
+          icon='TARGET'
+          onClick={onClick}
+          enabled={term !== undefined} />
+      </td>
       <td><Item label={ pattern } title={ 'ID: ' + name } /></td>
       <td style={{ width: '100%' }}><Item label={ '-> ' + matched } /></td>
     </tr>
@@ -288,13 +293,14 @@ interface MatchingsProps {
   matchings?: WpPattern.matching[]
 }
 
-function Matchings (props: MatchingsProps) : JSX.Element | null {
-  const { node, matchings } = props ;
+function Matchings(props: MatchingsProps) : JSX.Element | null {
+  const { node, matchings } = props;
   return (
     matchings
       ? <table>
           <tbody>
-            { matchings.map((m) => <Matching key={m.name} node={node} match={m}/>) }
+            { matchings.map((m) =>
+                <Matching key={m.name} node={node} match={m}/>) }
           </tbody>
         </table>
       : null
@@ -324,7 +330,12 @@ export function PatternDebugger(props: PatternDebuggerProps): JSX.Element {
   const kind = severityKind[severity];
   return (
     <Vbox style={{ height: '100%' }}>
-      <TextView style={{ flex: 1 }} text={text} onChange={onChange} decorations={decorations} />
+      <TextView
+        style={{ flex: 1 }}
+        text={text}
+        onChange={onChange}
+        decorations={decorations}
+      />
       <Vbox style={{ flex: 1 }}>
       <Label icon={icon} kind={kind} label={message} />
       <Matchings node={current} matchings={matchings} />
