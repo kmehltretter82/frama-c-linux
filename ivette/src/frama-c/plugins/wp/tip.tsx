@@ -289,14 +289,14 @@ function Matching(props: MatchingProps) : JSX.Element {
 }
 
 interface MatchingsProps {
-  node: TIP.node;
+  node?: TIP.node;
   matchings?: WpPattern.matching[]
 }
 
 function Matchings(props: MatchingsProps) : JSX.Element | null {
   const { node, matchings } = props;
   return (
-    matchings
+    node && matchings
       ? <table>
           <tbody>
             { matchings.map((m) =>
@@ -312,10 +312,14 @@ export interface PatternDebuggerProps {
 }
 
 export function PatternDebugger(props: PatternDebuggerProps): JSX.Element {
-  const { current } = States.useRequestStable(
-    TIP.getProofStatus,
-    props.goal ? { main: props.goal } : undefined,
-  );
+  const goal = props.goal;
+  const status =
+    States.useRequestStable(
+      TIP.getProofStatus,
+      goal ? { main: goal } : undefined
+    );
+
+  const current = goal ? status.current : undefined;
   const text = React.useMemo(() => new TextProxy(), []);
   const [pattern, setPattern] = React.useState('');
   const onChange = React.useCallback(() => {
