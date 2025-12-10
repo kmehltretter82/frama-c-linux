@@ -170,12 +170,3 @@ let _kf_outputs =
     "kf_outputs"
     Datatype.(func Kernel_function.ty Zone.ty)
     get_internal
-
-(* Only used by the Eva GTK GUI. *)
-let _stmt_outputs =
-  Dynamic.register
-    ~comment:"Returns the memory zone modified by a statement"
-    ~plugin:Inout_parameters.name
-    "stmt_outputs"
-    Datatype.(func Cil_datatype.Stmt.ty Zone.ty)
-    Analysis.statement

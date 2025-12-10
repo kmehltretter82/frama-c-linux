@@ -47,7 +47,6 @@ val dkey_partition : category
 val dkey_split_return : category
 val dkey_precision_settings : category
 val dkey_callstacks : category
-val dkey_callstack_hash : category
 val dkey_include_string_literal: category
 
 (** {2 Warning categories.} *)

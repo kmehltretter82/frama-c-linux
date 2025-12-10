@@ -18,17 +18,10 @@ module Inout = struct
     let typ = Datatype.(func (func Inout_type.ty unit) unit) in
     get ~plugin "register_call_hook" typ ~fallback f
 
-  let fallback _ = Locations.Zone.top
-  let typ arg = Datatype.func arg Locations.Zone.ty
-
-  let kf_inputs kf =
-    get ~plugin "kf_inputs" (typ Kernel_function.ty) ~fallback kf
-
   let kf_outputs kf =
+    let fallback _ = Locations.Zone.top in
+    let typ arg = Datatype.func arg Locations.Zone.ty in
     get ~plugin "kf_outputs" (typ Kernel_function.ty) ~fallback kf
-
-  let stmt_outputs stmt =
-    get ~plugin "stmt_outputs" (typ Cil_datatype.Stmt.ty) ~fallback stmt
 end
 
 module Callgraph = struct

@@ -12,13 +12,6 @@ open Eval
 let save_results f =
   Parameters.ResultsAll.get () && not (Parameters.NoResultsFunctions.mem f)
 
-(* Signal that some results are not stored. The gui or some API calls
-   may fail ungracefully. *)
-let partial_results () =
-  not (Parameters.ResultsAll.get ()) ||
-  not (Parameters.NoResultsFunctions.is_empty ())
-
-
 let info name : (module State_builder.Info_with_size) =
   (module struct
     let name = "Eva.Function_calls." ^ name

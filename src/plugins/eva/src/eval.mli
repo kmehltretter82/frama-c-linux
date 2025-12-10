@@ -109,18 +109,9 @@ type 'a flagged_value = {
   escaping: bool;
 }
 
-module Flagged_Value : sig
-  val bottom: 'a flagged_value
-  val equal:
-    ('a -> 'a -> bool) ->
-    'a flagged_value -> 'a flagged_value -> bool
-  val join:
-    ('a -> 'a -> 'a) ->
-    'a flagged_value -> 'a flagged_value -> 'a flagged_value
-  val pretty:
-    (Format.formatter -> 'a -> unit) ->
-    Format.formatter -> 'a flagged_value -> unit
-end
+val pretty_value_with_flags:
+  (Format.formatter -> 'a -> unit) ->
+  Format.formatter -> 'a flagged_value -> unit
 
 (** Data record associated to each evaluated expression. *)
 type ('a, 'origin) record_val = {

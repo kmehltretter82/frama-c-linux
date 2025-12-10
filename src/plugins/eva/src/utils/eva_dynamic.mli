@@ -13,17 +13,9 @@ module Inout: sig
       plugin for each function call. *)
   val register_call_hook: (Inout_type.t -> unit) -> unit
 
-  (** Returns the memory zone read by the given function (including local
-      and formal variables). Returns Top if the inout plugin is missing. *)
-  val kf_inputs: Kernel_function.t -> Locations.Zone.t
-
   (** Returns the memory zone modified by the given function (including local
       and formal variables). Returns Top if the inout plugin is missing. *)
   val kf_outputs: Kernel_function.t -> Locations.Zone.t
-
-  (** Returns the memory zone modified by the given statement.
-      Returns Top if the inout plugin is missing. *)
-  val stmt_outputs: Cil_types.stmt -> Locations.Zone.t
 end
 
 module Callgraph: sig

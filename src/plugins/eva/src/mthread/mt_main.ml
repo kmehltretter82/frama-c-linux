@@ -70,14 +70,6 @@ let hook_builtins =
   )
 
 let ref_analysis = ref None
-let analysis_hook = ref []
-
-let register_analysis_hook hook =
-  analysis_hook := hook :: !analysis_hook
-
-let apply_analysis_hooks () =
-  let apply analysis = List.iter (fun hook -> hook analysis) !analysis_hook in
-  Option.iter apply !ref_analysis
 
 (* Perform an entire mthread execution, based on the ast and options of the
    given project *)
@@ -139,11 +131,9 @@ let mthread_run project =
   hook_builtins (Some analysis);
 
   ref_analysis := Some analysis;
-  apply_analysis_hooks ();
 
   (* Cleanup function, called at the end or in case of failure or success. *)
   let cleanup () =
-    apply_analysis_hooks ();
     hook_builtins None;
     Project.set_current old_project;
   in

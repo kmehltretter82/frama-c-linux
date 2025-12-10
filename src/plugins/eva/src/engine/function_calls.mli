@@ -11,10 +11,6 @@ open Cil_types
 (** True if the results should be saved for the given function. *)
 val save_results: fundec -> bool
 
-(** True if some results are not stored due to options -eva-no-results
-    or -eva-no-results-function. *)
-val partial_results: unit -> bool
-
 (** What is used for the analysis of a given function:
     - a Cvalue builtin (and other domains use the specification)
     - the function specification
