@@ -12,6 +12,6 @@ The front-end of Dive relies on several external tools and libraries :
   browser
 - yarn: a package manager for javascript modules written for Node.js
 - electron: a javascript framework for gui applications
-- Ivette: the future Frama-C GUI
+- Ivette: the Frama-C GUI
 - Cytoscape: a javascript library to display graphs and interact with them
 - Zmq: a multilanguage framework for common simple networking patterns

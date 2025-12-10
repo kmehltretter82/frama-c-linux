@@ -6,9 +6,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** For internal use only: the Eva gui and optional domains (numerors and apron)
-    are compiled separately from the Eva core. This is used to give them access
-    to the internal modules of Eva they need. *)
+(** For internal use only:  optional domains (numerors and apron) are compiled
+    separately from the Eva core. This is used to give them access to the
+    internal modules of Eva they need. *)
 
 module Abstract = Abstract
 module Abstract_context = Abstract_context

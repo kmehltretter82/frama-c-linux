@@ -67,7 +67,7 @@ module Plugins : sig
   (** Load given plug-in name *)
 
   val load_all: unit -> unit
-  (** Load all plug-ins, do not load GUI plug-in when not in GTK GUI mode *)
+  (** Load all plug-ins. *)
 end
 
 (** Unless you are working in the kernel of Frama-C, you should not use this. *)
