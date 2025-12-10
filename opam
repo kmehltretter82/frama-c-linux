@@ -101,7 +101,6 @@ tags: [
 
 build: [
   ["bash" "dev/disable-plugins.sh" "e-acsl"] { os-family = "windows" }
-  ["bash" "dev/disable-plugins.sh" "gui"] { os = "macos" }
   ["dune" "build" "-j%{jobs}%" "--release" "--promote-install-files=false"
    "@install"
    "@doc" { with-doc }
@@ -177,7 +176,7 @@ Recommended provers are:
 - Z3       (https://github.com/Z3Prover/z3)
 Use 'why3 config detect' to configure new provers.
  " { success }
-"Ivette is a new GUI for Frama-C, currently in development.
+"Ivette is the GUI for Frama-C.
 Run 'ivette' once to finalize installation (requires an internet connection).
 Once finalized, 'ivette' will work offline.
 Finalization also requires Node v20 or v22 and Yarn:
