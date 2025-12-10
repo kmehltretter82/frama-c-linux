@@ -10,6 +10,14 @@ typedef enum RIGHT { CREATE, DELETE } right;
 //@ predicate p3(integer i, integer j, integer k) = 0 <= i < j <= 10 && 1 < k < 11;
 //@ predicate p4(integer i, integer j, integer k) = 0 <= i <= k <= 10 && 1 <= j < k;
 
+int one = 1;
+int* a[2] = {&one, &one};
+// For predicates with a memory property a Here-specialised version is created.
+// Ensure that label analysis and bound-variables are performed on the created predicate.
+/*@ predicate implicitly_labelled =
+  \forall unsigned int i; 0 <= i ==> i <= 1 ==> \valid(a[i]);
+*/
+
 int main(void) {
 
   // simple universal quantifications
@@ -110,6 +118,9 @@ int main(void) {
 
   // Gitlab issue e-acsl#199
   /*@ assert \forall right r; 0 <= r < 1 ==> 1 <= r+1 < 2; */
+
+  // https://git.frama-c.com/pub/frama-c/-/issues/2724#note_270068
+  /*@ assert implicitly_labelled; */
 
   return 0;
 }
