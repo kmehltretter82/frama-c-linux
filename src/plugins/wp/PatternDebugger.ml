@@ -158,6 +158,7 @@ type parse_result =
   | Patterns of {
       lookups: Pattern.lookup list ;
       select: Pattern.value list ;
+      params: (string * Pattern.value) list ;
       debug_table: (string, Pattern.pattern) Hashtbl.t ;
     }
 
@@ -202,7 +203,9 @@ let rec parse_tactic_params
   | [] ->
     let select = List.rev select in
     let lookup = List.rev lookup in
-    autoselect select lookup
+    let select, lookup = autoselect select lookup in
+    let params = List.map (fun ((_, n), v) -> n, v) params in
+    select, params, lookup
   | p::ps ->
     let loc = p.lexpr_loc in
     let cc = parse_tactic_params penv denv in
@@ -251,10 +254,10 @@ let parse_patterns s =
   let denv = { table = Hashtbl.create 13 ; last = 0 } in
   try
     let tokens = parse_string s in
-    let select, lookups =
+    let select, params, lookups =
       parse_tactic_params context denv ~select:[] ~lookup:[] ~params:[] tokens
     in
-    Patterns { lookups ; select ; debug_table = denv.table }
+    Patterns { lookups ; select ; params ; debug_table = denv.table }
   with ParseError (loc, msg) | Pattern.TypeError (loc, msg) -> Error (loc, msg)
 
 (* -------------------------------------------------------------------------- *)
@@ -287,7 +290,7 @@ let rec pp_selection printer fmt = function
     List.iter (fun e -> Format.fprintf fmt "(%a)" (pp_selection printer) e) es ;
     Format.fprintf fmt "@]"
 
-let extract_matchings debug_table printer sigma selection =
+let extract_matchings debug_table printer ?select ?params sigma =
   let pp_selection = pp_selection printer in
   let matchings = ref [] in
   (* Extracting matchings ... *)
@@ -302,8 +305,21 @@ let extract_matchings debug_table printer sigma selection =
     matchings := { name ; pattern ; matched ; target } :: !matchings
   in
   Pattern.iter_sigma iter sigma ;
+  (* Extracting parameters *)
+  begin match params with
+    | None -> ()
+    | Some l ->
+      let to_matching (name, value) =
+        let selection = Pattern.select sigma value in
+        let target = printer#selection_to_target selection in
+        let pattern = Format.asprintf "PARAM: %s" name in
+        let matched = Format.asprintf "%a" pp_selection selection in
+        { name ; pattern ; matched ; target }
+      in
+      matchings := List.rev_append (List.map to_matching l) !matchings
+  end ;
   (* Extracting selection *)
-  begin match selection with
+  begin match select with
     | None | Some [] -> ()
     | Some l ->
       let selection =
@@ -337,7 +353,10 @@ let debug pattern ?node () =
       let sequent = snd @@ Wpo.compute @@ ProofEngine.goal node in
       let rec apply_all sigma = function
         | [] ->
-          let matchings = get_matchings sigma (Some lks.select) in
+          let select = lks.select in
+          let params = lks.params in
+          let matchings =
+            get_matchings ~select ~params sigma in
           valid ~message:"Applicable pattern" ~matchings ()
         | p::ps ->
           match Pattern.psequent p sigma sequent with
@@ -345,7 +364,7 @@ let debug pattern ?node () =
             apply_all sigma ps
           | None ->
             let loc = Pattern.pattern_loc p.pattern in
-            let matchings = get_matchings sigma None in
+            let matchings = get_matchings sigma in
             warning ~loc ~message:"Unmatched pattern" ~matchings ()
       in apply_all Pattern.empty lks.lookups
 
