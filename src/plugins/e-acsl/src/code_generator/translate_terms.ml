@@ -869,15 +869,14 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
   | Tapp(li, _, _)
     when li.l_body = LBnone && li.l_var_info.lv_name = "\\numof" ->
     assert false
-  | Tapp(li, [], args)
-  | Tapp(li, [BuiltinLabel Here], args) ->
+  | Tapp(li, labels, args) when Misc.labels_are_all_here labels ->
     let args = List.map Logic_normalizer.get_term args in
     let e, adata, env =
       Logic_functions.app_to_exp ~adata ~loc ~tapp:t kf env li args
     in
     let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Analyses_types.C_number, "app"
-  | Tapp(_, _ :: _, _) ->
+  | Tapp(_, _, _) ->
     Env.not_yet env "logic functions with labels"
   | Tlambda(_, lt) ->
     let exp, adata, env = to_exp ~adata kf env lt in

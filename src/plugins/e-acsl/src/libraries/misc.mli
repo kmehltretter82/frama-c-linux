@@ -79,3 +79,6 @@ val extract_uncoerced_lval: exp -> exp option
 
     If at some point the expression is neither a [CastE] nor an [Lval], then
     return [None]. *)
+
+val labels_are_all_here : logic_label list -> bool
+(** @return [true] if all labels are the builtin label Here (or list is empty). *)
