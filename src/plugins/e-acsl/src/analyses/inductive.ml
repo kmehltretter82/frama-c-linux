@@ -452,10 +452,14 @@ end
 (* In this implementation the extraction of logic functions is unsound. If
    multiple cases apply for some given arguments the verdict may be wrong.
    So we record here predicates that depend on logic functions. *)
-module Unsound_predicates = struct
+module Unsound_if_false = struct
   open Logic_info.Hashtbl
   let tbl = create 9
-  let add li = add tbl li ()
+  let add li =
+    Options.warning
+      "Negative verdicts of %a might be unsound"
+      Printer.pp_logic_info li;
+    add tbl li ()
   let mem = mem tbl
   let clear () = clear tbl
 end
@@ -482,7 +486,7 @@ end = functor (Out : Out_language) -> struct
       Mode.pretty mode pp_logic_info li;
     let new_profile = List.map freshen_up_logic_var li.l_profile in
     let new_formals, res = Mode.in_out_args ~mode new_profile in
-    let is_unsound = ref false in
+    let is_unsound_if_false = ref false in
     let extract_ctor ({Constructor.predicate = p} as ctor) next_ctor =
       let li_rec = li in
       let is_rec_occurrence li' = Logic_var.equal li'.l_var_info li_rec.l_var_info in
@@ -546,7 +550,7 @@ end = functor (Out : Out_language) -> struct
               match mode' with
               | Complete -> Extractions.get ~mode:Complete li
               | _ ->
-                is_unsound := true;
+                is_unsound_if_false := true;
                 FunctionExtractor.extract ~mode:mode' li
           in
           begin match in_out_args' with
@@ -620,7 +624,7 @@ end = functor (Out : Out_language) -> struct
     in
     let old_name = li.l_var_info.lv_name in
     Option.iter (fun n -> li.l_var_info.lv_name <- n) name;
-    if !is_unsound then Unsound_predicates.add li;
+    if !is_unsound_if_false then Unsound_if_false.add li;
     Options.feedback ~dkey ~level:2
       "@[<2>extracted from inductive definition of %s executable predicate:@ @[%a@]@]"
       old_name
@@ -685,7 +689,7 @@ end
         Printer.pp_logic_info li
         Printer.pp_logic_info f
         pp_logic_info wrapper;
-      Unsound_predicates.add wrapper;
+      Unsound_if_false.add wrapper;
       wrapper
 
   let extract =
@@ -698,18 +702,11 @@ end
 
 let extract_predicate = PredicateExtractor.extract
 
-let is_unsound_predicate li =
-  let res = Unsound_predicates.mem li in
-  if res then
-    Options.warning ~once:true
-      "Translation of %a might be unsound (if multiple cases apply \
-       to some given arguments simultaneously)."
-      Printer.pp_logic_info li;
-  res
+let predicate_is_unsound_if_false = Unsound_if_false.mem
 
 let clear () =
   Fallthrough_terms.clear ();
   Extractions.clear ();
   Derived_functions.clear ();
   InductiveDef.clear ();
-  Unsound_predicates.clear ()
+  Unsound_if_false.clear ()

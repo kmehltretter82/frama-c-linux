@@ -33,8 +33,8 @@ int main(void)
   {
     int __gen_e_acsl_P_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_P_2 = __gen_e_acsl_P(0,0);
+    if (! __gen_e_acsl_P_2) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"P(0, 0)",0,
                                  __gen_e_acsl_P_2);
     __gen_e_acsl_assert_data.blocking = 1;
@@ -51,8 +51,8 @@ int main(void)
     int __gen_e_acsl_P_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_P_4 = __gen_e_acsl_P(1,1);
+    if (! __gen_e_acsl_P_4) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"P(1, 1)",0,
                                  __gen_e_acsl_P_4);
     __gen_e_acsl_assert_data_3.blocking = 1;
@@ -69,8 +69,8 @@ int main(void)
     int __gen_e_acsl_P_6;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_P_6 = __gen_e_acsl_P(0,1);
+    if (! __gen_e_acsl_P_6) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"P(0, 1)",0,
                                  __gen_e_acsl_P_6);
     __gen_e_acsl_assert_data_4.blocking = 1;

@@ -67,8 +67,8 @@ int main(void)
   {
     int __gen_e_acsl_CountInd_here_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_CountInd_here_2 = __gen_e_acsl_CountInd_here(ptr,2,2,1);
+    if (! __gen_e_acsl_CountInd_here_2) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"ptr",
                                  (void *)ptr);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
@@ -88,8 +88,8 @@ int main(void)
     int __gen_e_acsl_CountInd_here_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
       {.values = (void *)0};
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_CountInd_here_4 = __gen_e_acsl_CountInd_here(ptr,2,3,0);
+    if (! __gen_e_acsl_CountInd_here_4) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"ptr",
                                  (void *)ptr);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
@@ -110,8 +110,8 @@ int main(void)
     int __gen_e_acsl_CountInd_here_6;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
       {.values = (void *)0};
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_CountInd_here_6 = __gen_e_acsl_CountInd_here(ptr,4,3,1);
+    if (! __gen_e_acsl_CountInd_here_6) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,"ptr",
                                  (void *)ptr);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,

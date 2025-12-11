@@ -29,7 +29,14 @@ end
     predicate p (from which f has been derived) as a key and f as a value.
     There may be multiple logic functions associated with a predicate. *)
 
-val is_unsound_predicate : logic_info -> bool
+val predicate_is_unsound_if_false : logic_info -> bool
+(** Predicates extracted in incomplete mode rely on function extraction.
+    This extraction may be wrong to assume that the predicate is actually
+    functional w.r.t. to the argument chosen as a result.
+    In the future extracted logic functions should return (lazy) lists instead
+    of just one result. In the meantime whenever such a predicate is false
+    it might be due to its logic function having missed a case that was being
+    shadowed by a preceding case. *)
 
 val extract_predicate : logic_info -> logic_info
 (** transform a [logic_info] containing an inductively defined predicate

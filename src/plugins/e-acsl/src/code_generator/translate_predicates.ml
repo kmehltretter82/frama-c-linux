@@ -90,15 +90,15 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
   | Pfalse -> Cil.zero ~loc, adata, env
   | Ptrue -> Cil.one ~loc, adata, env
   | Papp (li, labels, args) when Misc.labels_are_all_here labels ->
-    let env =
-      if Logic_normalizer.is_unsound_predicate li then
-        Env.add_stmt env @@ Smart_stmt.set_unsound_verdict ~loc
-      else env
-    in
-    let e, adata, env =
-      Logic_functions.app_to_exp ~adata ~loc kf env li args in
+    let e, adata, env = Logic_functions.app_to_exp ~adata ~loc kf env li args in
     let adata = Assert.register_pred ~loc env p e adata in
-    e, adata, env
+    if Logic_normalizer.predicate_is_unsound_if_false li then
+      let cond = Smart_exp.lnot ~loc e in
+      let then_blk = Cil.mkBlock [Smart_stmt.set_unsound_verdict ~loc] in
+      let env = Env.add_stmt env @@ Smart_stmt.if_stmt ~loc ~cond then_blk in
+      e, adata, env
+    else
+      e, adata, env
   | Papp (_, _,_) -> Env.not_yet env "predicates with labels"
   | Pdangling _ -> Env.not_yet env "\\dangling"
   | Pvalid_function _ -> Env.not_yet env "\\valid_function"

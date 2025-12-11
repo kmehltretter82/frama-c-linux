@@ -43,7 +43,7 @@ module Logic_infos : sig
       names of generated logic functions. *)
 end
 
-val is_unsound_predicate : logic_info -> bool
+val predicate_is_unsound_if_false : logic_info -> bool
 
 val get_pred : predicate -> predicate
 (** Retrieve the preprocessed form of a predicate *)

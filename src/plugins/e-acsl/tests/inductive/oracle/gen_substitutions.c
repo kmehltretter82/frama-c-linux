@@ -76,8 +76,8 @@ int main(void)
   {
     int __gen_e_acsl_P_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_P_2 = __gen_e_acsl_P(0,0);
+    if (! __gen_e_acsl_P_2) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"P(0, 0)",0,
                                  __gen_e_acsl_P_2);
     __gen_e_acsl_assert_data.blocking = 1;
@@ -94,8 +94,8 @@ int main(void)
     int __gen_e_acsl_Q_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_Q_2 = __gen_e_acsl_Q(0,0);
+    if (! __gen_e_acsl_Q_2) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"Q(0, 0)",0,
                                  __gen_e_acsl_Q_2);
     __gen_e_acsl_assert_data_3.blocking = 1;
@@ -217,8 +217,8 @@ int __gen_e_acsl_P(int x, int y)
   int __gen_e_acsl_and_2;
   if (x >= 0) {
     int __gen_e_acsl_fibo_2;
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_fibo_2 = __gen_e_acsl_fibo(0,x);
+    if (! __gen_e_acsl_fibo_2) __e_acsl_sound_verdict = 0;
     __gen_e_acsl_and = __gen_e_acsl_fibo_2;
   }
   else __gen_e_acsl_and = 0;
@@ -233,8 +233,8 @@ int __gen_e_acsl_Q(int x, int y)
 {
   int __gen_e_acsl_fibo_4;
   int __gen_e_acsl_and_3;
-  __e_acsl_sound_verdict = 0;
   __gen_e_acsl_fibo_4 = __gen_e_acsl_fibo(0,x);
+  if (! __gen_e_acsl_fibo_4) __e_acsl_sound_verdict = 0;
   if (__gen_e_acsl_fibo_4) __gen_e_acsl_and_3 = y == x + x;
   else __gen_e_acsl_and_3 = 0;
   return __gen_e_acsl_and_3;
