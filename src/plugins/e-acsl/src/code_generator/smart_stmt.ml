@@ -194,3 +194,7 @@ let delete_stmt ?(is_addr=false) vi =
 let mark_readonly vi =
   let loc = vi.vdecl in
   rtl_call ~loc "mark_readonly" [ Cil.evar ~loc vi ]
+
+let set_unsound_verdict ~loc =
+  let sound_verdict_vi = Prepare_ast.sound_verdict () in
+  assigns ~loc ~result:(Cil.var sound_verdict_vi) (Cil.zero ~loc)

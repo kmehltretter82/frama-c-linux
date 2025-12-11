@@ -94,3 +94,7 @@ val initialize: loc:location -> lval -> stmt
 val mark_readonly: varinfo -> stmt
 (** Same as [store_stmt] for [__e_acsl_markreadonly] that observes the
     read-onlyness of the given varinfo. *)
+
+val set_unsound_verdict : loc:location -> stmt
+(** @return a statement that indicates to the user that from here on all
+    verdicts are unsound. *)

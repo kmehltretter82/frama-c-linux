@@ -524,11 +524,7 @@ let update_memory_model ~loc ?result env kf caller args =
       "Memory model not yet supported for standard library function '%s'. \
        Check of memory locations from now on may be incorrect."
       name;
-    let sound_verdict_vi = Prepare_ast.sound_verdict () in
-    let unsound =
-      Smart_stmt.assigns ~loc ~result:(Cil.var sound_verdict_vi) (Cil.zero ~loc)
-    in
-    let env = Env.add_stmt ~post env unsound in
+    let env = Env.add_stmt ~post env @@ Smart_stmt.set_unsound_verdict ~loc in
     result, env
   | _ ->
     (* If this error is raised, check that the call to
