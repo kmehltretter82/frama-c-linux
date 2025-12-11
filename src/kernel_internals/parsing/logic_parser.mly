@@ -1577,6 +1577,9 @@ decl:
 | model_annot {LDmodel_annot $1}
 | logic_def  { $1 }
 | ext_decl { LDextended $1 }
+| logic_fun_decl { $1 }
+| predicate { $1 }
+| type_decl { $1 }
 | deprecated_logic_decl { $1 }
 ;
 
@@ -1743,30 +1746,27 @@ ext_loader:
 | EXT_LOADER_PLUGIN { $1 }
 | IDENTIFIER_LOADER { raise Unknown_ext }
 
-deprecated_logic_decl:
-/* OBSOLETE: logic function declaration */
+logic_fun_decl:
 | LOGIC logic_rt_type poly_id opt_parameters SEMICOLON
-    { let (id, labels, tvars) = $3 in
-      let source = pos $symbolstartpos in
-      exit_type_variables_scope ();
-      obsolete  "logic declaration" ~source ~now:"an axiomatic block";
-      LDlogic_reads (id, labels, tvars, $2, $4, None) }
-/* OBSOLETE: predicate declaration */
+  { let (id, labels, tvars) = $3 in
+    exit_type_variables_scope ();
+    LDlogic_reads (id, labels, tvars, $2, $4, None) }
+
+predicate:
 | PREDICATE poly_id opt_parameters SEMICOLON
-    { let (id,labels,tvars) = $2 in
-      exit_type_variables_scope ();
-      let source = pos $symbolstartpos in
-      obsolete "logic declaration" ~source ~now:"an axiomatic block";
-      LDpredicate_reads (id, labels, tvars, $3, None) }
-/* OBSOLETE: type declaration */
+  { let (id,labels,tvars) = $2 in
+    exit_type_variables_scope ();
+    LDpredicate_reads (id, labels, tvars, $3, None) }
+
+type_decl:
 | TYPE poly_id_type SEMICOLON
-    { let (id,tvars) = $2 in
-      Logic_env.add_typename id ; (* not in a module! *)
-      exit_type_variables_scope ();
-      let source = pos $symbolstartpos in
-      obsolete "logic type declaration" ~source ~now:"an axiomatic block";
-      LDtype(id,tvars,None)
-    }
+  { let (id,tvars) = $2 in
+    Logic_env.add_typename id ; (* not in a module! *)
+    exit_type_variables_scope ();
+    LDtype(id,tvars,None)
+  }
+
+deprecated_logic_decl:
 /* OBSOLETE: axiom */
 | AXIOM poly_id COLON lexpr SEMICOLON
     { let (id,_,_) = $2 in
