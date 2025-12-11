@@ -173,19 +173,6 @@ val integral_cast: Cil_types.typ -> Cil_types.term -> Cil_types.term
 *)
 val allow_return_collapse: tlv:Cil_types.typ -> tf:Cil_types.typ -> bool
 
-val areCompatibleTypes: Cil_types.typ -> Cil_types.typ -> bool
-(** [areCompatibleTypes ot nt] checks that the two given types are
-    compatible (C99, 6.2.7). Note however that we use a slightly relaxed
-    notion of compatibility to cope with de-facto usages.
-    In particular, this function is *not* symmetric: in some cases, when objects
-    of type ot can safely be converted to objects of type nt, we accept them as
-    compatible to avoid spurious casts.
-
-    @since Neon-20140301
-*)
-[@@deprecated "use Cil.areCompatibleTypes instead."]
-[@@migrate { repl = Cil.areCompatibleTypes }]
-
 val stmtFallsThrough: Cil_types.stmt -> bool
 (** returns [true] if the given statement can fall through the next
     syntactical one.

@@ -99,11 +99,3 @@ val add_custom_builtin: (unit -> (string * typ * typ list * bool)) -> unit
 
 (** This is used as the location of the prototypes of builtin functions. *)
 val builtinLoc: location
-
-(** DEPRECATED: does nothing.
-    @before 32.0-Germanium initialize the C built-ins. Should be called once per
-    project, after the machine has been set.
-*)
-val init_builtins: unit -> unit
-[@@deprecated "This function is obsolete and does nothing. Builtins are \
-               initialized via Machine.init."]

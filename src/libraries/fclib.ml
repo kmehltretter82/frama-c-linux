@@ -58,7 +58,6 @@ module State_topological = State_topological
 (** {2 Stdlib} *)
 
 module Extlib = Extlib
-module FCHashtbl = FCHashtbl
 module Hashtbl = Hashtbl
 module Int = Int
 module Integer = Integer [@@deprecated "Use Fclib.Z instead."]

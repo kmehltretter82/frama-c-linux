@@ -75,20 +75,6 @@ val file_exists: Filepath.t -> bool
     @since 32.0-Germanium *)
 val dir_exists: Filepath.t -> bool
 
-(** [is_file f] returns [true] iff [f] points to a regular file
-    (or a symbolic link pointing to a file).
-    Returns [false] if any errors happen when [stat]'ing the file.
-    @since 22.0-Titanium *)
-val is_file: Filepath.t -> bool
-[@@deprecated "use file_exists instead."]
-[@@migrate { repl = Rel.file_exists }]
-
-(** Equivalent to {!Sys.is_directory}.
-    @since 28.0-Nickel *)
-val is_dir: Filepath.t -> bool
-[@@deprecated "use dir_exists instead."]
-[@@migrate { repl = Rel.dir_exists }]
-
 (** Contents of a directory.
     @raise Sys_error if a system error occurred
     @raise Invalid_argument if the path is empty

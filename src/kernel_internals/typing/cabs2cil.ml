@@ -10505,6 +10505,3 @@ let convFile (path, f) =
     globinit = None;
     globinitcalled = false;
   }
-
-(* export function without internal `relaxed' argument. *)
-let areCompatibleTypes t1 t2 = areCompatibleTypes t1 t2

@@ -15,10 +15,9 @@
 
 type t = private
   { pid: int;
-    mutable name: string;
-    mutable unique_name: string
-                         [@deprecated "use pid or get_project_debug_name"] }
+    mutable name: string }
 (** @since Carbon-20101201
+    @before Frama-C+dev Had a mutable field [unique_name]
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 type project = t

@@ -116,10 +116,6 @@ val dkey_rmtmps: category
 
 val dkey_referenced: category
 
-val dkey_task: category
-[@@deprecated "Use Task.dkey via Cmdline.Kernel_log instead."]
-[@@migrate { repl = Task.dkey } ]
-
 val dkey_typing_global: category
 
 val dkey_typing_init: category
@@ -407,14 +403,6 @@ module FloatPrint: Parameter_sig.S with type t = Floating_point.float_display
 (** Behavior of option "-float-print"
     @since 32.0-Germanium *)
 
-module FloatNormal: Parameter_sig.Bool
-(** Behavior of option "-float-normal" *)
-[@@deprecated "Use FloatPrint with 'norm' mode instead."]
-
-module FloatHex: Parameter_sig.Bool
-(** Behavior of option "-float-hex" *)
-[@@deprecated "Use FloatPrint with 'hex' mode instead."]
-
 module BigIntsHex: Parameter_sig.Int
 (** Behavior of option "-hexadecimal-big-integers" *)
 
@@ -607,10 +595,6 @@ module CStd: Parameter_sig.S with type t = iso_c
 (** ISO C version to consider.
     @since 32.0-Germanium
 *)
-
-module JsonCompilationDatabase: Parameter_sig.Filepath
-[@@ ocaml.deprecated "Use CompilationDb instead"]
-(** Deprecated; use "-compilation-db" instead *)
 
 module CompilationDb: Parameter_sig.Filepath
 (** Behavior of option "-compilation-db" *)

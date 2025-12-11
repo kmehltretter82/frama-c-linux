@@ -16,9 +16,7 @@ open Project_output
 (* re-exporting record fields *)
 type project = t = private
   { pid : int;
-    mutable name : string;
-    mutable unique_name : string
-                          [@deprecated "use pid or Project.get_debug_name"] }
+    mutable name : string }
 
 let rehash_ref = ref (fun _ -> assert false)
 
@@ -30,7 +28,6 @@ module D =
       let structural_descr =
         Structural_descr.t_record
           [| Structural_descr.p_int;
-             Structural_descr.p_string;
              Structural_descr.p_string |]
       let reprs = [ dummy ]
       let equal = (==)
@@ -747,20 +744,3 @@ let () =
 
 (* Exporting Datatype for an easy external use *)
 module Datatype = D
-
-
-(** {2 Deprecated functions }*)
-
-let get_unique_name p =
-  begin[@alert "-deprecated"]
-    p.unique_name
-  end
-
-let from_unique_name uname =
-  let is_uname p =
-    begin[@alert "-deprecated"]
-      p.unique_name = uname
-    end
-  in
-  try Q.find is_uname projects
-  with Not_found -> raise Unknown_project

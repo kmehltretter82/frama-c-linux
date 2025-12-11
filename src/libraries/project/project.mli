@@ -26,9 +26,7 @@ module Datatype: Datatype.S_with_collections with type t = Project_skeleton.t
 type project = Project_skeleton.t =
   private
   { pid : int;
-    mutable name : string;
-    mutable unique_name : string
-                          [@deprecated "use pid or Project.get_debug_name"] }
+    mutable name : string }
 
 (** Type of a project. *)
 
@@ -98,12 +96,6 @@ val get_pid: t -> int
 val get_name: t -> string
 (** Project name. Two projects may have the same name. *)
 
-val get_unique_name: t -> string
-(** @return a project name based on {!field:name} but different of each others
-    [unique_name]. *)
-[@@deprecated "use Project.get_pid or Project.get_debug_name instead, \
-               depending on the intended usage."]
-
 val get_debug_name: t -> string
 (** @return a project name appended with its id.
     @since 32.0-Germanium *)
@@ -123,12 +115,6 @@ val from_pid: int -> t
 (** Return a project based on {!pid}.
     @raise Unknown_project if no project has this unique name.
     @since 32.0-Germanium *)
-
-val from_unique_name: string -> t
-(** Return a project based on {!unique_name}.
-    @raise Unknown_project if no project has this unique name. *)
-[@@deprecated "use Project.from_pid or Project.find_all instead, depending on \
-               the intended usage."]
 
 val set_current: ?on:bool -> ?selection:State_selection.t -> t -> unit
 (** Set the current project with the given one.

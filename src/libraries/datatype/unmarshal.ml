@@ -449,7 +449,7 @@ let input_val ch t =
         let clos = intern_rec [] t in
         return stk (Obj.add_offset (Obj.repr clos) ofs)
 
-      | 0x12 | 0x19 (* CODE_CUSTOM (deprecated) or CODE_CUSTOM_FIXED *) ->
+      | 0x19 (* CODE_CUSTOM_FIXED *) ->
         let id = read_customident ch in
         let v = read_custom ch id in
         let dest = !ctr in

@@ -126,9 +126,6 @@ let dkey_prop_status_reg = register_category "prop-status:register"
 
 let dkey_prop_status_graph = register_category "prop-status:graph"
 
-(* Deprecated *)
-let dkey_task = register_category "task"
-
 let dkey_typing_global = register_category "typing:global"
 
 let dkey_typing_init = register_category "typing:initializer"
@@ -898,45 +895,6 @@ module FloatPrint =
     end)
 let () = FloatPrint.add_update_hook (fun _ -> Floating_point.set_float_display)
 
-let () = Parameter_customize.set_group inout_source
-let () = Parameter_customize.do_not_projectify ()
-module FloatNormal =
-  False
-    (struct
-      let option_name = "-float-normal"
-      let module_name = "FloatNormal"
-      let help =
-        "[DEPRECATED] display floats with internal routine. This option is \
-         deprecated, use '-float-print norm' instead."
-    end)
-let () =
-  FloatNormal.add_update_hook (fun _ curr ->
-      warning "Option -float-normal is deprecated. Use -float-print norm \
-               instead.";
-      if curr
-      then FloatPrint.set NormDec
-      else FloatPrint.(set (get_default ()))
-    )
-
-let () = Parameter_customize.set_group inout_source
-let () = Parameter_customize.do_not_projectify ()
-module FloatHex =
-  False
-    (struct
-      let option_name = "-float-hex"
-      let module_name = "FloatHex"
-      let help =
-        "[DEPRECATED] display floats as hexadecimal. This option is \
-         deprecated, use '-float-print hex' instead."
-    end)
-let () =
-  FloatHex.add_update_hook (fun _ curr ->
-      warning "Option -float-hex is deprecated. Use -float-print hex \
-               instead.";
-      if curr
-      then FloatPrint.set NormHex
-      else FloatPrint.(set (get_default ()))
-    )
 
 let () = Parameter_customize.set_group inout_source
 let () = Parameter_customize.do_not_projectify ()
@@ -1325,22 +1283,6 @@ module CStd =
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
-module JsonCompilationDatabase =
-  P.Filepath
-    (struct
-      let option_name = "-json-compilation-database"
-      let arg_name = "path"
-      let file_kind = "directory or json"
-      let existence = Filepath.Must_exist
-      let help =
-        "when set, preprocessing of each file will include corresponding \
-         flags (e.g. -I, -D) from the JSON compilation database \
-         specified by <path>. If <path> is a directory, use \
-         '<path>/compile_commands.json'. Disabled by default."
-    end)
-
-let () = Parameter_customize.set_group parsing
-let () = Parameter_customize.do_not_reset_on_copy ()
 module CompilationDb =
   P.Filepath
     (struct
@@ -1354,13 +1296,6 @@ module CompilationDb =
          specified by <path>. If <path> is a directory, use \
          '<path>/compile_commands.json'. Disabled by default."
     end)
-
-let () =
-  JsonCompilationDatabase.add_set_hook (fun _old new_ ->
-      warning "Option -json-compilation-database is deprecated. \
-               Use -compilation-db instead.";
-      CompilationDb.set new_
-    )
 
 
 let mopsa = add_group "Mopsa"
@@ -1714,24 +1649,6 @@ module VariadicTranslation =
 
 let () = Parameter_customize.set_group normalisation
 let () = Parameter_customize.do_not_reset_on_copy ()
-let () = Parameter_customize.is_invisible ()
-let () = Parameter_customize.set_negative_option_name ""
-module NoVariadicTranslation =
-  False (struct
-    let option_name = "-variadic-no-translation"
-    let module_name = "NoVariadicTranslation"
-    let help = "[DEPRECATED: Use -no-variadic-translation instead.]"
-  end)
-
-let () =
-  NoVariadicTranslation.add_set_hook (fun _old _new ->
-      warning "Option -variadic-no-translation is deprecated. \
-               Use -no-variadic-translation instead.";
-      VariadicTranslation.off ()
-    )
-
-let () = Parameter_customize.set_group normalisation
-let () = Parameter_customize.do_not_reset_on_copy ()
 module VariadicStrict =
   True (struct
     let option_name = "-variadic-strict"
@@ -1741,24 +1658,6 @@ module VariadicStrict =
                 distinct integral types which have the same size and \
                 signedness"
   end)
-
-let () = Parameter_customize.set_group normalisation
-let () = Parameter_customize.do_not_reset_on_copy ()
-let () = Parameter_customize.is_invisible ()
-let () = Parameter_customize.set_negative_option_name ""
-module NoVariadicStrict =
-  False (struct
-    let option_name = "-variadic-no-strict"
-    let module_name = "NoVariadicStrict"
-    let help = "[DEPRECATED: Use -no-variadic-strict instead.]"
-  end)
-
-let () =
-  NoVariadicStrict.add_set_hook (fun _old _new ->
-      warning "Option -variadic-no-strict is deprecated. \
-               Use -no-variadic-strict instead.";
-      VariadicStrict.off ()
-    )
 
 (* ************************************************************************* *)
 (** {2 Analysis Options} *)

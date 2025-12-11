@@ -226,12 +226,6 @@ Options taking a string as argument should preferably be written
 -eager-load-sources  when loading a source, try to load all referenced
                     sources in memory (opposite option is
                     -no-eager-load-sources)
--float-hex          [DEPRECATED] display floats as hexadecimal. This option
-                    is deprecated, use '-float-print hex' instead. (opposite
-                    option is -no-float-hex)
--float-normal       [DEPRECATED] display floats with internal routine. This
-                    option is deprecated, use '-float-print norm' instead.
-                    (opposite option is -no-float-normal)
 -float-print <default|norm|hex>  Control how floats will be printed :
                     'default' will print the float as is, 'norm' will use an
                     internal routine to normalize it using decimals, and
@@ -344,11 +338,6 @@ Options taking a string as argument should preferably be written
                     adds -nostdinc to prevent inconsistent mix of system and
                     Frama-C header files (set by default, opposite option is
                     -no-frama-c-stdlib)
--json-compilation-database <path>  when set, preprocessing of each file will
-                    include corresponding flags (e.g. -I, -D) from the JSON
-                    compilation database specified by <path>. If <path> is a
-                    directory, use '<path>/compile_commands.json'. Disabled
-                    by default.
 -machdep <machine>  use <machine> as the current machine dependent
                     configuration. See "-machdep help" for a list. The
                     environment variable FRAMAC_MACHDEP can be used to

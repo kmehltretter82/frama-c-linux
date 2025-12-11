@@ -581,8 +581,6 @@ module type Builder = sig
   (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   module Empty_string(_: Input_with_arg): String
 
-  module Fc_Filepath = Filepath [@@deprecated "Use Fclib.Filepath instead."]
-
   module Filepath(_: sig
       include Input_with_arg
       val existence: Filepath.existence

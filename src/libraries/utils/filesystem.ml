@@ -81,13 +81,6 @@ let file_exists (p : t) =
 let dir_exists (p : t) =
   file_kind p = Ok (Directory)
 
-let is_file (p : t) =
-  try
-    (Unix.stat (Filepath.to_string_abs p)).Unix.st_kind = Unix.S_REG
-  with _ -> false
-
-let is_dir (p : t) = Sys.is_directory (Filepath.to_string_abs p)
-
 let read_dir (p : t) =
   check_nonempty p;
   Sys.readdir (Filepath.to_string_abs p)

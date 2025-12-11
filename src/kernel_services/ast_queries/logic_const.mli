@@ -357,12 +357,3 @@ val addTermOffset:     term_offset -> term_offset -> term_offset
 (** Equivalent to [addOffsetLval] for terms.
         @since Oxygen-20120901 *)
 val addTermOffsetLval: term_offset -> term_lval -> term_lval
-
-(* ************************************************************************** *)
-(** {2 Deprecated definitions} *)
-(* ************************************************************************** *)
-
-(** makes a predicate with no name. Default location is unknown.*)
-val unamed: ?loc:location -> predicate_node -> predicate
-[@@deprecated "Use unnamed instead."]
-[@@migrate { repl = Rel.unnamed } ]
