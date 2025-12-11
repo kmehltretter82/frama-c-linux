@@ -1,7 +1,5 @@
 # frama-c -wp [...]
 [kernel] Parsing caveat.i (no preprocessing)
-[kernel] caveat.i:41: Warning: 
-  parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
 [wp] Running WP plugin...
 [wp] [Valid] Goal explicit_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal explicit_terminates (Cfg) (Trivial)

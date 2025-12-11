@@ -1,7 +1,5 @@
 # frama-c -wp -wp-model 'Typed (Caveat)' [...]
 [kernel] Parsing caveat.i (no preprocessing)
-[kernel] caveat.i:41: Warning: 
-  parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
 [wp] Running WP plugin...
 .................................................
 ... Ref Usage

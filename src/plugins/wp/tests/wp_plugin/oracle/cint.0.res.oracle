@@ -1,7 +1,5 @@
 # frama-c -wp [...]
 [kernel] Parsing cint.i (no preprocessing)
-[kernel] cint.i:22: Warning: 
-  parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
 [wp] Running WP plugin...
 [wp] [Valid] Goal signed_bitwise_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal signed_bitwise_terminates (Cfg) (Trivial)

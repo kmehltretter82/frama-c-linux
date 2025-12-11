@@ -1,6 +1,4 @@
 [kernel] Parsing assigns.i (no preprocessing)
-[kernel] assigns.i:31: Warning: 
-  parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
