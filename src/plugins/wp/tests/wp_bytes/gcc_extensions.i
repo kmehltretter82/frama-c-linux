@@ -3,7 +3,7 @@
 */
 
 __int128 i128 ;
-__uint128_t u128 ;
+unsigned __int128 u128 ;
 
 void int128(void) {
   i128 = 0x1122334455667788ULL * 2 ;

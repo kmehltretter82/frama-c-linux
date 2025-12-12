@@ -197,3 +197,11 @@ void main(void) {
 // Not exactly "builtins", but GCC extensions nevertheless
 __int128 i128 = 1;
 __uint128_t u128 = -1;
+void int128_ops() {
+  unsigned __int128 u128a = u128 > i128 ? u128 - 1 : i128 + 1;
+  u128a += u128a * 2 / u128;
+  u128a >>= 1;
+  u128a %= u128 + 1234567890ULL;
+  u128a -= 1234567890ULL + i128;
+  i128 = -1 + i128;
+}
