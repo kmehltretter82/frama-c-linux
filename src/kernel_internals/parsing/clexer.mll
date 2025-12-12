@@ -185,7 +185,6 @@ let init_lexicon () =
   gcc   "__alignof__" (fun loc -> GCC_ALIGNOF loc) ;
   gcc   "__thread" (fun loc -> THREAD loc) ;
   gcc   "__int128" (fun loc -> INT128 loc) ;
-  gcc   "__uint128_t" (fun loc -> UINT128 loc) ;
   (**** MSVC ***)
   valid "__int64" (fun _ -> INT64 (currentLoc ())) ;
   valid "__int32" (fun loc -> INT loc) ;

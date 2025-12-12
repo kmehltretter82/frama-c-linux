@@ -94,7 +94,7 @@ type ikind =
   | ILongLong   (** [long long] (or [_int64] on Microsoft Visual C) *)
   | IULongLong  (** [unsigned long long] (or [unsigned _int64] on MSVC) *)
   | IInt128     (** [__int128] (GCC extension) *)
-  | IUInt128    (** [__uint128_t] (GCC extension) *)
+  | IUInt128    (** [unsigned __int128] (GCC extension) *)
 [@@deriving eq]
 
 (** Various kinds of floating-point numbers*)

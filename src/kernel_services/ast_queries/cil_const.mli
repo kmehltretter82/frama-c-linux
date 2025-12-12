@@ -131,7 +131,7 @@ val ulongLongType: typ
     @since Frama-C+dev *)
 val int128Type: typ
 
-(** __uint128_t (GCC extension)
+(** unsigned __int128 (GCC extension)
     @since Frama-C+dev *)
 val uint128Type: typ
 

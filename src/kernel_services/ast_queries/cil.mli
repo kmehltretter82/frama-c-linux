@@ -245,7 +245,7 @@ val uint32_t: unit -> typ
 val uint64_t: unit -> typ
 
 (** Any unsigned integer type of size 128 bits.
-    It is equivalent to the (non-ISO C) GCC __int128 type.
+    It is equivalent to the (non-ISO C) GCC unsigned __int128 type.
     Must only be called if such type exists in the current architecture.
     @since Frama-C+dev
 *)

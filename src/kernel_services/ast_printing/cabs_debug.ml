@@ -58,7 +58,6 @@ let rec pp_typeSpecifier fmt = function
   | Tlong  -> fprintf fmt "Tlong"
   | Tint64 -> fprintf fmt "Tint64"
   | Tint128 -> fprintf fmt "Tint128"
-  | Tuint128 -> fprintf fmt "Tuint128"
   | Tfloat -> fprintf fmt "Tfloat"
   | Tfloat32 -> fprintf fmt "Tfloat32"
   | Tfloat64 -> fprintf fmt "Tfloat64"

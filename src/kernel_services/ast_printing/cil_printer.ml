@@ -1969,7 +1969,7 @@ class cil_printer () = object (self)
          then "unsigned __int64"
          else "unsigned long long"
        | IInt128 -> "__int128"
-       | IUInt128 -> "__uint128_t"
+       | IUInt128 -> "unsigned __int128"
       )
 
   method compkind fmt ci =
