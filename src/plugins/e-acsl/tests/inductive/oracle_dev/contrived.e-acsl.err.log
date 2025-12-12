@@ -1,0 +1,6 @@
+contrived.c: In function 'main'
+contrived.c:88: Warning: no sound verdict for Assertion (guess: FAIL).
+	the considered predicate is:
+	overlap(0, 1)
+	With values at failure point:
+	- overlap(0, 1): 0

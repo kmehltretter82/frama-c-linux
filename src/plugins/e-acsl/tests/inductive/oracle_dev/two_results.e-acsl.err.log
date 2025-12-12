@@ -1,6 +1,0 @@
-two_results.c: In function 'main'
-two_results.c:20: Warning: no sound verdict for Assertion (guess: FAIL).
-	the considered predicate is:
-	P(0, 1)
-	With values at failure point:
-	- P(0, 1): 0
