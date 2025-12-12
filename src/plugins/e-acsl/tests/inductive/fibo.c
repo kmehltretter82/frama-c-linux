@@ -22,8 +22,8 @@
 
 int main() {
   /*@ assert fibo(7, 13); @*/
-  /*@ assert !fibo(7, 12); @*/
   /*@ assert fibo2(7, 13); @*/
+  /*@ assert !fibo(7, 12); @*/
   /*@ assert !fibo2(7, 12); @*/
   return 0;
 }

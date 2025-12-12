@@ -19,8 +19,8 @@
 
 int main() {
   /*@ assert power(2,3,8); @*/
-  /*@ assert !power(2,3,7); @*/
   /*@ assert power2(2,3,8); @*/
+  /*@ assert !power(2,3,7); @*/
   /*@ assert !power2(2,3,7); @*/
   return 0;
 }

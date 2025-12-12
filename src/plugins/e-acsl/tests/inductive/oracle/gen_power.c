@@ -69,41 +69,41 @@ int main(void)
   }
   /*@ assert power(2, 3, 8); */ ;
   {
-    int __gen_e_acsl_power_4;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __gen_e_acsl_power_4 = __gen_e_acsl_power(2,3,7);
-    if (! __gen_e_acsl_power_4) __e_acsl_sound_verdict = 0;
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "power(2, 3, 7)",0,__gen_e_acsl_power_4);
-    __gen_e_acsl_assert_data_2.blocking = 1;
-    __gen_e_acsl_assert_data_2.kind = "Assertion";
-    __gen_e_acsl_assert_data_2.pred_txt = "!power(2, 3, 7)";
-    __gen_e_acsl_assert_data_2.file = "power.c";
-    __gen_e_acsl_assert_data_2.fct = "main";
-    __gen_e_acsl_assert_data_2.line = 22;
-    __e_acsl_assert(! __gen_e_acsl_power_4,& __gen_e_acsl_assert_data_2);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-  }
-  /*@ assert !power(2, 3, 7); */ ;
-  {
     int __gen_e_acsl_power2_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __gen_e_acsl_power2_2 = __gen_e_acsl_power2(2,3,8);
     if (! __gen_e_acsl_power2_2) __e_acsl_sound_verdict = 0;
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "power2(2, 3, 8)",0,__gen_e_acsl_power2_2);
-    __gen_e_acsl_assert_data_3.blocking = 1;
-    __gen_e_acsl_assert_data_3.kind = "Assertion";
-    __gen_e_acsl_assert_data_3.pred_txt = "power2(2, 3, 8)";
-    __gen_e_acsl_assert_data_3.file = "power.c";
-    __gen_e_acsl_assert_data_3.fct = "main";
-    __gen_e_acsl_assert_data_3.line = 23;
-    __e_acsl_assert(__gen_e_acsl_power2_2,& __gen_e_acsl_assert_data_3);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "power2(2, 3, 8)";
+    __gen_e_acsl_assert_data_2.file = "power.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 22;
+    __e_acsl_assert(__gen_e_acsl_power2_2,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
   /*@ assert power2(2, 3, 8); */ ;
+  {
+    int __gen_e_acsl_power_4;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
+    __gen_e_acsl_power_4 = __gen_e_acsl_power(2,3,7);
+    if (! __gen_e_acsl_power_4) __e_acsl_sound_verdict = 0;
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+                                 "power(2, 3, 7)",0,__gen_e_acsl_power_4);
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "!power(2, 3, 7)";
+    __gen_e_acsl_assert_data_4.file = "power.c";
+    __gen_e_acsl_assert_data_4.fct = "main";
+    __gen_e_acsl_assert_data_4.line = 23;
+    __e_acsl_assert(! __gen_e_acsl_power_4,& __gen_e_acsl_assert_data_4);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+  }
+  /*@ assert !power(2, 3, 7); */ ;
   {
     int __gen_e_acsl_power2_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
@@ -252,15 +252,15 @@ void __gen_e_acsl_power2_fun3(__e_acsl_mpz_t *__retres_arg, int x,
     else {
       __e_acsl_mpz_t __gen_e_acsl__7;
       {
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
           {.values = (void *)0};
-        __gen_e_acsl_assert_data_4.blocking = 1;
-        __gen_e_acsl_assert_data_4.kind = "Assertion";
-        __gen_e_acsl_assert_data_4.pred_txt = "Incomplete inductive function";
-        __gen_e_acsl_assert_data_4.file = "power.c";
-        __gen_e_acsl_assert_data_4.fct = "power2_fun3";
-        __gen_e_acsl_assert_data_4.line = 14;
-        __e_acsl_assert(0,& __gen_e_acsl_assert_data_4);
+        __gen_e_acsl_assert_data_3.blocking = 1;
+        __gen_e_acsl_assert_data_3.kind = "Assertion";
+        __gen_e_acsl_assert_data_3.pred_txt = "Incomplete inductive function";
+        __gen_e_acsl_assert_data_3.file = "power.c";
+        __gen_e_acsl_assert_data_3.fct = "power2_fun3";
+        __gen_e_acsl_assert_data_3.line = 14;
+        __e_acsl_assert(0,& __gen_e_acsl_assert_data_3);
       }
       __gmpz_init_set_si(__gen_e_acsl__7,0L);
       __gmpz_init_set(__gen_e_acsl_if_2,
