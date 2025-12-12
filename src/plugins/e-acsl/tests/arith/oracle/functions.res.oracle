@@ -6,10 +6,6 @@
 [e-acsl] functions.c:81: Warning: 
   E-ACSL construct `function application' is not yet supported.
   Ignoring annotation.
-[e-acsl] Varname.of_exp: supply default or extend this function to handle enodes like: Const(CReal(2.,FDouble,None))
-[e-acsl] Varname.of_exp: supply default or extend this function to handle enodes like: Const(CReal(1.,FDouble,None))
-[e-acsl] Varname.of_exp: supply default or extend this function to handle enodes like: Const(CReal(3.,FDouble,None))
-[e-acsl] Varname.of_exp: supply default or extend this function to handle enodes like: Const(CReal(0.,FDouble,None))
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] functions.c:61: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
