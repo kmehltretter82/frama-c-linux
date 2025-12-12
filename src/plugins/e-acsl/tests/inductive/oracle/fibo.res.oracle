@@ -1,5 +1,8 @@
 [e-acsl] beginning translation.
-[e-acsl:analysis:inductive] function extraction with mode incomplete in 2
+[e-acsl:analysis:inductive] 
+  extracting predicate from fibo using mode: incomplete in 2
+[e-acsl:analysis:inductive] 
+  extracting function from fibo with mode: incomplete in 2
 [e-acsl] Warning: Negative verdicts of fibo might be unsound
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] fibo.c:17: Warning: 

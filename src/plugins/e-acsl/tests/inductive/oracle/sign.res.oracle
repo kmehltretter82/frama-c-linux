@@ -1,5 +1,11 @@
 [e-acsl] beginning translation.
-[e-acsl:analysis:inductive] predicate extraction in complete mode
+[e-acsl:analysis:inductive] 
+  extracting predicate from signum using mode: complete
+[e-acsl] Varname.of_exp: supply default or extend this function to handle enodes like: Const(CEnum({eiorig_name=POS;einame=POS;eival={eid=2;enode=Const(CInt64(Integer(0),IInt,None));eloc=};eihost={eorig_name=sign_t;ename=sign_t;eattr=[];ekind=IUInt;};eiloc=;}))
+[e-acsl] Varname.of_exp: supply default or extend this function to handle enodes like: Const(CReal(2.,FDouble,None))
+[e-acsl] Varname.of_exp: supply default or extend this function to handle enodes like: Const(CEnum({eiorig_name=ZERO;einame=ZERO;eival={eid=3;enode=Const(CInt64(Integer(1),IInt,None));eloc=};eihost={eorig_name=sign_t;ename=sign_t;eattr=[];ekind=IUInt;};eiloc=;}))
+[e-acsl] Varname.of_exp: supply default or extend this function to handle enodes like: Const(CReal(0.,FDouble,None))
+[e-acsl] Varname.of_exp: supply default or extend this function to handle enodes like: Const(CEnum({eiorig_name=ZERO;einame=ZERO;eival={eid=3;enode=Const(CInt64(Integer(1),IInt,None));eloc=};eihost={eorig_name=sign_t;ename=sign_t;eattr=[];ekind=IUInt;};eiloc=;}))
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] sign.c:24: Warning: assertion got status unknown.
 [eva:alarm] sign.c:25: Warning: assertion got status unknown.

@@ -1,5 +1,8 @@
 [e-acsl] beginning translation.
-[e-acsl:analysis:inductive] function extraction with mode incomplete in 4
+[e-acsl:analysis:inductive] 
+  extracting predicate from CountInd using mode: incomplete in 4
+[e-acsl:analysis:inductive] 
+  extracting function from CountInd with mode: incomplete in 4
 [e-acsl] Warning: Negative verdicts of CountInd might be unsound
 [e-acsl] count.c:35: Warning: 
   no assigns clause generated for function CountInd because pointers as arguments is not yet supported

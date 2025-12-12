@@ -1,5 +1,8 @@
 [e-acsl] beginning translation.
-[e-acsl:analysis:inductive] function extraction with mode incomplete in 3
+[e-acsl:analysis:inductive] 
+  extracting predicate from linked_ll using mode: incomplete in 3
+[e-acsl:analysis:inductive] 
+  extracting function from linked_ll with mode: incomplete in 3
 [e-acsl] Warning: Negative verdicts of linked_ll might be unsound
 [e-acsl] iFM_esys.c:528: Warning: 
   E-ACSL construct `constructor' is not yet supported. Ignoring annotation.

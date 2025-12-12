@@ -626,7 +626,7 @@ end = functor (Out : Out_language) -> struct
     Option.iter (fun n -> li.l_var_info.lv_name <- n) name;
     if !is_unsound_if_false then Unsound_if_false.add li;
     Options.feedback ~dkey ~level:2
-      "@[<2>extracted from inductive definition of %s executable predicate:@ @[%a@]@]"
+      "@[<2>extracted from inductive definition of %s:@ @[%a@]@]"
       old_name
       pp_logic_info li;
     li
@@ -650,7 +650,10 @@ end = struct
     end)
 
   let extract_with_mode ~mode:m li =
-    Options.debug ~dkey "function extraction with mode incomplete in %d" m;
+    Options.debug ~level:1 ~dkey
+      "extracting function from %a with mode: incomplete in %d"
+      Logic_info.pretty li
+      m;
     let name = li.l_var_info.lv_name ^ "_fun" ^ string_of_int m in
     let f = Extractor.extract ~name ~mode:(Incomplete m) li in
     Derived_functions.add li f;
@@ -671,9 +674,11 @@ end
     end)
 
   let extract_with_mode ~mode:{Modus.mode} li =
+    Options.debug ~dkey "extracting predicate from %a using mode: %a"
+      Logic_info.pretty li
+      Mode.pretty mode;
     match mode with
     | Complete ->
-      Options.debug ~dkey "predicate extraction in complete mode";
       Extractor.extract ~mode li
     | Incomplete i ->
       let f = FunctionExtractor.extract ~mode:mode li in
