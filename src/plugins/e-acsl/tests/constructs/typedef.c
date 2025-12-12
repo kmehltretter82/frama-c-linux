@@ -9,6 +9,7 @@ int main(void) {
   uint8 x = 0;
   /*@ assert x == 0; */;
   __int128 i = x + 1;
-  __uint128_t u = i - 2;
+  //__uint128_t u = i - 2;
+  unsigned __int128 u2 = i + 2;
   return 0;
 }
