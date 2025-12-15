@@ -79,7 +79,10 @@ module Operators : sig
   (** Conversion from [int] using {!of_int}. *)
   val ( ~$ ) : int -> t
 
-  (** Power {!pow}. *)
+  (** Power {!pow}. For coherence, we're using our own {!pow} function, which
+      has a limit. If you want to customize this limit, use the function instead
+      of this operator.
+  *)
   val ( ** ) : t -> int -> t
 end
 
@@ -124,8 +127,11 @@ val is_one : t -> bool
 val length : t -> t -> t
 
 (** [pow n i] computes [n^i]. [?limit] can be used to raise an {!Overflow} if
-    the exponent is too big. Default value is [1024].
-    @raises Overflow if the argument is greater than [?limit] *)
+    the exponent is too big. Default value is [99999].
+    @raises Overflow if the argument is greater than [?limit]
+    @before Frama-C+dev [?limit] argument was not present and all values were
+    accepted
+*)
 val pow : ?limit:int -> t -> int -> t
 
 (** Computes [2^n]. [?limit] can be used to raise an {!Overflow} if the exponent

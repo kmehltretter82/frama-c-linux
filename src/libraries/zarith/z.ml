@@ -26,7 +26,7 @@ let pow ?(limit = 99999) b e =
   then raise Overflow
   else pow b e
 
-let two_power_of_int ?(limit = 1024) k =
+let two_power_of_int ?(limit = 99999) k =
   if k > limit then
     raise Overflow
   else
@@ -196,7 +196,7 @@ module Operators = struct
   let ( lsl ) = ( lsl )
   let ( asr ) = ( asr )
   let ( ~$ ) = ( ~$ )
-  let ( ** ) = ( ** )
+  let ( ** ) b e = pow b e
 end
 
 (* We also want relational operators at top level. *)
