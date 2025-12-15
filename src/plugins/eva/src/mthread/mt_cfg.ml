@@ -219,10 +219,9 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
       (* Specialized case of the above function, that captures the case
          of a function that never returns *)
       let next_call () =
-        if Cvalue.Model.(equal bottom (get_state_after stmt)) then
-          CfgNode.dead
-        else
-          next ()
+        if stmt.succs = [] || Cvalue.Model.(equal bottom (get_state_after stmt))
+        then CfgNode.dead
+        else next ()
       in
 
       match stmt_mt_status subtrace get_state stmt with
