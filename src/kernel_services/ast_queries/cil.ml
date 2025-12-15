@@ -37,7 +37,7 @@ let check_invariants = false
 
 let pp_thisloc fmt = Location.pretty fmt (Current_loc.get ())
 
-let new_exp ~loc e = { eloc = loc; eid = Cil_const.Eid.next (); enode = e }
+let new_exp ~loc e = { eloc = loc; eid = Cil_const.new_raw_eid (); enode = e }
 
 let dummy_exp e = { eid = -1; enode = e; eloc = Cil_datatype.Location.unknown }
 
@@ -91,7 +91,7 @@ let mkStmt ?(ghost=false) ?(valid_sid=false) ?(sattr=[]) (sk: stmtkind) : stmt =
        safely be used in tables. I only do it when performing Jessie
        analysis, as other plugins rely on specific sid values for their tests
        (e.g. slicing). *)
-    sid = if valid_sid then Cil_const.Sid.next () else -1;
+    sid = if valid_sid then Cil_const.new_raw_sid () else -1;
     succs = []; preds = [];
     ghost = ghost;
     sattr = sattr;}
@@ -2681,7 +2681,7 @@ let mkStmtCfg ~before ~(new_stmtkind:stmtkind) ~(ref_stmt:stmt) : stmt =
                labels = [];
                sid = -1; succs = []; preds = []; ghost = false; sattr = [] }
   in
-  new_.sid <- Cil_const.Sid.next ();
+  new_.sid <- Cil_const.new_raw_sid ();
   if before then begin
     new_.succs <- [ref_stmt];
     let old_preds = ref_stmt.preds in
@@ -2710,7 +2710,7 @@ let mkStmtCfg ~before ~(new_stmtkind:stmtkind) ~(ref_stmt:stmt) : stmt =
   new_
 
 let mkStmtCfgBlock sl =
-  let sid = Cil_const.Sid.next () in
+  let sid = Cil_const.new_raw_sid () in
   let n = mkStmt (Block (mkBlock sl)) in
   n.sid <- sid;
   match sl with
@@ -4371,7 +4371,7 @@ let removeOffsetLval ((b, off): lval) : lval * offset =
 class copyVisitExpr = object
   inherit genericCilVisitor (Visitor_behavior.copy (Project.current ()))
   method! vexpr e =
-    ChangeDoChildrenPost ({e with eid = Cil_const.Eid.next ()}, fun x -> x)
+    ChangeDoChildrenPost ({e with eid = Cil_const.new_raw_eid ()}, fun x -> x)
 end
 
 let copy_exp e = visitCilExpr (new copyVisitExpr) e

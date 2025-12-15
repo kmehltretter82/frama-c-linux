@@ -180,13 +180,13 @@ end = struct
   let specialize li =
     let f li =
       let lv_name = Functions.RTL.mk_gen_name (li.l_var_info.lv_name ^ "_here") in
-      let vi = {li.l_var_info with lv_name; lv_id = Cil_const.new_raw_id ()} in
+      let vi = {li.l_var_info with lv_name; lv_id = Cil_const.new_raw_vid ()} in
       let li' = {
         li with
         l_var_info = vi;
         l_labels = [];
         l_profile =
-          List.map (fun lv -> {lv with lv_id = Cil_const.new_raw_id ()}) li.l_profile
+          List.map (fun lv -> {lv with lv_id = Cil_const.new_raw_vid ()}) li.l_profile
       } in
       let li' = Visitor.visitFramacLogicInfo (substitute li li') li' in
       let pred_or_term =
