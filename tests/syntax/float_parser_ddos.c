@@ -1,5 +1,5 @@
 /* run.config
-OPT: -kernel-warn-key parser:decimal-float=warning
+OPT: -kernel-warn-key parser:decimal-float=warning -pow-limit 40000000
 */
 int main() {
   double ok_max = 1e308;

@@ -1928,6 +1928,22 @@ module CacheSize =
 let () = CacheSize.set_range ~min:1 ~max:10
 let () = CacheSize.add_update_hook (fun _ i -> Binary_cache.set_cache_size i)
 
+let () = Parameter_customize.set_group performance
+let () = Parameter_customize.do_not_projectify ()
+module PowLimit =
+  Int(struct
+    let module_name = "PowLimit"
+    let option_name = "-pow-limit"
+    let arg_name = "max"
+    let default = 99999
+    let help =
+      Format.sprintf
+        "for performance reasons, limit the maximum exponent accepted by pow \
+         functions in Z. Must be positive. Default value is %d" default
+  end)
+let () = PowLimit.set_range ~min:0 ~max:max_int
+let () = PowLimit.add_update_hook (fun _ i -> Z.set_pow_exponent_limit i)
+
 (* ************************************************************************* *)
 (** {2 Other options} *)
 (* ************************************************************************* *)
