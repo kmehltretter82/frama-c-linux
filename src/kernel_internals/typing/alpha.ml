@@ -42,21 +42,10 @@ type rename_mode =
   (* systematically adds a _nnn suffix even if the original name
      ends with _mmm *)
 
-let has_generated_prefix n prefix =
-  let prefix_length = String.length prefix in
-  let real_name =
-    if String.contains n ' ' then begin
-      let i = String.rindex n ' ' in
-      String.sub n (i+1) (String.length n - i - 1)
-    end else n
-  in
-  String.length real_name >= prefix_length &&
-  String.sub real_name 0 prefix_length = prefix
-
 let generated_prefixes = [ "__anon"; "__constr_expr" ]
 
 let is_generated_name n =
-  List.exists (has_generated_prefix n) generated_prefixes
+  List.exists (fun prefix -> String.starts_with ~prefix n) generated_prefixes
 
 (* Strip the suffix. Return the prefix, the suffix (including the separator
  * but not the numeric value, possibly empty), and the

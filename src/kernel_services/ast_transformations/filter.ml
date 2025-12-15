@@ -330,14 +330,10 @@ end = struct
       incr lab_num;
       let lname = Printf.sprintf "%s_%d" lab_prefix !lab_num in
       Label (lname, loc, false)
-    method private is_our_label label = match label with
+    method private is_our_label label =
+      match label with
       | Label (lname, _, false) ->
-        let ok =
-          try
-            let prefix = String.sub lname 0 (String.length lab_prefix) in
-            prefix = lab_prefix
-          with Invalid_argument _ -> false
-        in ok
+        String.starts_with ~prefix:lab_prefix lname
       | _ -> false
 
     method private get_finfo () = Option.get fi

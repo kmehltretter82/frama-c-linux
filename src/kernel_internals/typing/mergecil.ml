@@ -46,12 +46,6 @@ let mergeInlinesWithAlphaConvert () = Kernel.AggressiveMerging.get ()
  * but only probabilistically accurate *)
 let mergeGlobals = true
 
-(* Return true if 's' starts with the prefix 'p' *)
-let prefix p s =
-  let lp = String.length p in
-  let ls = String.length s in
-  lp <= ls && String.sub s 0 lp = p
-
 let d_nloc fmt (lo: (location * int) option) =
   match lo with
     None -> Format.fprintf fmt "None"
@@ -359,7 +353,7 @@ module PlainMerging =
       let hash = Hashtbl.hash
       let equal = (=)
       let compare = compare
-      let merge_synonym name = not (prefix "__anon" name)
+      let merge_synonym name = not (String.starts_with ~prefix:"__anon" name)
       let output = Format.pp_print_string
     end)
 
@@ -556,7 +550,7 @@ let same_enum_items oldei ei =
   try have_same_enum_items oldei ei; true
   with Failure _ -> false
 
-let is_anonymous_enum e = prefix "__anonenum" e.ename
+let is_anonymous_enum e = String.starts_with ~prefix:"__anonenum" e.ename
 
 module EnumMerging =
   Merging
