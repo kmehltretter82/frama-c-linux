@@ -17,6 +17,7 @@
 , camlp-streams
 , gnused
 , llvmPackages
+, pcre2
 # Frama-C build
 , apron
 , camlzip
@@ -112,6 +113,7 @@ stdenvNoCC.mkDerivation rec {
     ocaml
     ocamlgraph
     ocp-indent
+    pcre2
     ppx_deriving
     ppx_deriving_yaml
     ppx_deriving_yojson
