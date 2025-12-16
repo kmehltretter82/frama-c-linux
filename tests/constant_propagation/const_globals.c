@@ -19,3 +19,8 @@ size_t f (size_t y)
   size_t tmp2 = (c3[0][2-2][0+0] * y - c2[1] / c3[1-1][1][2] + c2[2-1]);
   return tmp2;
 }
+
+float const F;
+int float_implicit() {
+  return F / 2;
+}

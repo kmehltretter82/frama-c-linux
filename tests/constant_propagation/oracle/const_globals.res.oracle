@@ -10,4 +10,12 @@ size_t f(size_t y)
   return tmp2;
 }
 
+float const F;
+int float_implicit(void)
+{
+  int __retres;
+  __retres = 0;
+  return __retres;
+}
+
 
