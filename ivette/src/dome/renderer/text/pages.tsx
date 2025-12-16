@@ -36,7 +36,7 @@ import { classes } from 'dome/misc/utils';
 import './style.css';
 
 export interface TextProps {
-  /** Additional classe(s). */
+  /** Additional class(es). */
   className?: string;
   /** Additional style properties. */
   style?: React.CSSProperties;

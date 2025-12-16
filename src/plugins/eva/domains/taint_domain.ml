@@ -408,8 +408,8 @@ module TransferSingleTaint = struct
     `Value state
 
   let get_formats_number s =
-    let splitted = String.split_on_char '%' s in
-    List.length splitted - 1
+    let split = String.split_on_char '%' s in
+    List.length split - 1
 
   (* If [kf] is a known variadic function, returns the position of the
      expected string literal argument; returns None otherwise. *)

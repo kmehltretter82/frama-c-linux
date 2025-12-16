@@ -32,7 +32,7 @@ module type Mark = sig
   val merge : t -> t -> t
 
   (** [combine] is used during propagation. It should return
-      [(new_mark, mark_to_prop) = combine old_mak new_mark]
+      [(new_mark, mark_to_prop) = combine old_mark new_mark]
       where [new_mark] is the mark to associate with the node,
       and [mark_to_prop] the mark to propagate to its dependencies.
       If [is_bottom mark_to_prop], the propagation is stopped.

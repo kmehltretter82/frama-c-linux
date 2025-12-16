@@ -282,7 +282,7 @@ class slocVisitor ~libc : sloc_visitor = object(self)
 
   method! vexpr e =
     begin
-      (* Logical ands and ors are lazy and generate two different paths *)
+      (* Logical ANDs and ORs are lazy and generate two different paths *)
       match e.enode with
       | BinOp ((LAnd | LOr), _, _, _) ->
         self#incr_both_metrics incr_dpoints;

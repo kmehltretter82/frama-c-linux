@@ -1889,7 +1889,7 @@ The available cache modes are described below:
 \item [\tt -wp-cache cleanup]: same as \verb+update+ mode but at the end of \textsf{Frama-C} execution, any cache entry that was not used nor updated will be deleted. This mode shall be only used when you want to cleanup your cache with old useless entries, typically at the end of an interactive session.
 \item [\tt -wp-cache replay]: same as \verb+update+ mode but new results are \emph{not} stored in the cache. This mode is useful for continuous integration, when you are not sure your cache is complete but don't want to modify it.
 \item [\tt -wp-cache offline]: similar to \verb+replay+ mode but cache entries are the unique source of results. Provers are never run and missing cache entries would result in a «~Failed~» verdict. This mode is useful to fasten continuous integration and enforcing cache completeness.
-\item [\tt -wp-cache rebuild]: force prover execution and store all results in the cache. Previous results will be replaced with new onces, but entries for non relevant proofs would be kept and you might need a cleanup stage after. This mode is useful when you modify your \textsf{Why-3} or prover installation and you don't want to reuse your previous cache entries.
+\item [\tt -wp-cache rebuild]: force prover execution and store all results in the cache. Previous results will be replaced with new ones, but entries for non relevant proofs would be kept and you might need a cleanup stage after. This mode is useful when you modify your \textsf{Why-3} or prover installation and you don't want to reuse your previous cache entries.
 \item [\tt -wp-cache none]: do not use nor modify cache entries; provers are run normally. This option must be used if you have a session set and you don't want to use the cache, since the default is mode \verb+update+ in this case. But you probably always to benefit from a cache when you have an (interactive) session.
 \end{description}
 
@@ -2240,7 +2240,7 @@ the graphical user interface, like the target of the tactic, as described below.
 is identified by a complex structure
 encoding on which part of the proof obligation it shall be applied. Since the
 exact structure of the proof obligation may vary from time to time, this structure
-allows for searching in the proof obligation a \emph{pattern} that ressemble the
+allows for searching in the proof obligation a \emph{pattern} that resembles the
 original target that was originally selected by the user during an interactive
 session with the \textsf{Frama-C/WP} graphical user interface.
 

@@ -113,7 +113,7 @@ let run () =
         let node1 = Cfg.T.relocate sigma1 node1 in
         let term_1 = Cfg.T.get node1 in
 
-        (*Seconde call*)
+        (*Second call*)
         let seq2 = {Memory.pre = Cfg.node (); post = Cfg.node ()} in
         let env2 = Compiler.empty_env kf  in
         let env2 = Compiler.(env2 @* [Clabels.here,seq2.pre;Clabels.next,seq2.post]) in

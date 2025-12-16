@@ -1,4 +1,4 @@
-function somme:
+function sum:
 at loop 1: invariant i <= a ;
 at loop body 2: invariant j <= b ;
 

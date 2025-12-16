@@ -446,8 +446,8 @@ let input_val ch t =
                 return stk (do_transform t offset_pointer) *)
       | 0x11 (* CODE_INFIXPOINTER *) ->
         let ofs = getword ch in
-        let clos = intern_rec [] t in
-        return stk (Obj.add_offset (Obj.repr clos) ofs)
+        let closure = intern_rec [] t in
+        return stk (Obj.add_offset (Obj.repr closure) ofs)
 
       | 0x19 (* CODE_CUSTOM_FIXED *) ->
         let id = read_customident ch in

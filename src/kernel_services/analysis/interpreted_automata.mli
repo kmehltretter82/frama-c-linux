@@ -37,7 +37,7 @@ type 'a control =
   (** edges are guaranteed to be issued from a `switch()` statement with
       the given cases and default vertices. *)
 
-(** Vertices are control points. When a vertice is the *start* of a statement,
+(** Vertices are control points. When a vertex is the *start* of a statement,
     this statement is kept in [vertex_start_of]. *)
 
 type vertex = private {

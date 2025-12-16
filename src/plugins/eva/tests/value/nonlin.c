@@ -25,7 +25,7 @@ void subdivide_pointer () {
   p = &t[0];
   i = Frama_C_interval(0, 10);
   y = *(p + i - i);
-  /* The splitted lvalue contains a pointer value: no subdivision. */
+  /* The split lvalue contains a pointer value: no subdivision. */
   i = v ? i : (int) &x;
   y = *(p + i - i);
 }

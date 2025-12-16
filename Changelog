@@ -3414,7 +3414,7 @@ o* Kernel     [2011-06-10] Fix dynamic access to function [is_default] of
               parameters.
 o! Kernel     [2011-06-10] New way for handling abstract type in the type
               library.
--* Value      [2011-06-09] Remove some uneeded warnings when comparing function
+-* Value      [2011-06-09] Remove some unneeded warnings when comparing function
               pointers with NULL. Fixes bug #!855.
 -* Kernel     [2011-06-09] Correct syntactic loop unrolling in presence of
               switch. Fixes bug #861.

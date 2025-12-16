@@ -7,7 +7,7 @@
 (**************************************************************************)
 
 let dkey =
-  let help = "prints debug informations about tasks executions" in
+  let help = "prints debug information about task executions" in
   Cmdline.Kernel_log.register_category ~help "task"
 
 (* -------------------------------------------------------------------------- *)

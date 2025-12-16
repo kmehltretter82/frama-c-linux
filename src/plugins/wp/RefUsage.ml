@@ -785,7 +785,7 @@ let compute_usage () =
       fixpoint state_fp.todo
   in fixpoint todo ;
   let u_init = E.cup u_init u_lemmas in
-  (* TODO[LC]: prendre en compte la compilation des fonctions logiques et predicats ; Cf. add_lphi *)
+  (* TODO[LC]: take into account compilation of logic functions and predicates; Cf. add_lphi *)
   let usage =
     KFmap.map
       (fun ctx ->

@@ -578,7 +578,7 @@ struct
             Record_From_Callbacks.apply
               (call_stack, states, Dataflow_arg.callwise_states_with_formals)
           end;
-          let _poped = Stack.pop call_stack in
+          let _popped = Stack.pop call_stack in
           let last_from =
             try
               if Eva.Results.is_reachable ret_id

@@ -168,7 +168,7 @@ module Constraints: sig
 
   (** [check_validity ctxt] checks the validity of the quantification after
       processing.
-      @raises Typing_error if some bound (lower or upper) cound not be extracted
+      @raises Typing_error if some bound (lower or upper) could not be extracted
       from the quantification for each bounded variable. *)
   val check_validity: t -> unit
 

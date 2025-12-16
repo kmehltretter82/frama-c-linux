@@ -9,7 +9,7 @@
 (** High Level Interface to Command.
     @since Carbon-20101201 *)
 
-(** Prints debug informations about tasks.
+(** Prints debug information about tasks.
     @since 32.0-Germanium
 *)
 val dkey : Cmdline.Kernel_log.category

@@ -15,7 +15,7 @@ int while1 (int m, int v)
   return r;
 }
 
-int somme (int a, int b) {
+int sum (int a, int b) {
   int i = 0 ;
   int r = 0 ;
   do {

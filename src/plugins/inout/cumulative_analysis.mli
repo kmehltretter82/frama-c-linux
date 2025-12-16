@@ -14,7 +14,7 @@ open Cil_types
 
     The underlying analysis is supposed to be cumulative at the level
     of a kernel_function (its results are derived from the results on
-    all its statements), and mostly non-contextual (all the informations
+    all its statements), and mostly non-contextual (all the information
     can be gathered using a Cil visitor).
 *)
 

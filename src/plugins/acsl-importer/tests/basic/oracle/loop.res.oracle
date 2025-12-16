@@ -3,7 +3,7 @@
 [acsl-import:trace-transformations] 
   Unrolling loop condition of loop #1 of function "while1".
 [acsl-import:trace-transformations] 
-  Unrolling loop condition of loop #2 of function "somme".
+  Unrolling loop condition of loop #2 of function "sum".
 [acsl-import:trace-transformations] 
   Unrolling loop condition of loop #2 of function "job".
 [acsl-import] Loop condition of loop #3 of function "job" was not unrolled since there is a loop annotation.
@@ -40,18 +40,18 @@
 [acsl-import:trace-actions] MODULE loop
 [acsl-import:trace-actions] Set current scope to function
 [acsl-import:trace-tables] Clear macro table from function scope
-[acsl-import:trace-actions] Set current function to "somme"
+[acsl-import:trace-actions] Set current function to "sum"
 [acsl-import:trace-tables] Indexing the C symbol table...
 [acsl-import:trace-symbols] FunDecl: "f_extern"
 [acsl-import:trace-symbols] Fun: "while1"
-[acsl-import:trace-symbols] Fun: "somme"
+[acsl-import:trace-symbols] Fun: "sum"
 [acsl-import:trace-symbols] Fun: "job"
-[acsl-import:trace-actions] FUNCTION somme
-[acsl-import:trace-table] Computing loop body table for function "somme"
+[acsl-import:trace-actions] FUNCTION sum
+[acsl-import:trace-table] Computing loop body table for function "sum"
 [acsl-import:trace-pasting] 
   Adding invariant annotation:
   invariant i ≤ a;
-[acsl-import:trace-table] Computing loop index table for function "somme"
+[acsl-import:trace-table] Computing loop index table for function "sum"
 [acsl-import:trace-pasting] Converting invariant into loop invariant for loop #1
 [acsl-import:trace-pasting] 
   Adding invariant annotation:
@@ -111,7 +111,7 @@ int while1(int m, int v)
   return r;
 }
 
-int somme(int a, int b)
+int sum(int a, int b)
 {
   int i = 0;
   int r = 0;
