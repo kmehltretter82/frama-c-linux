@@ -628,6 +628,11 @@ extern char *stpncpy(char *restrict dest, const char *restrict src, size_t n);
 
 //extern char *strerror_l(int errnum, locale_t locale);
 
+/*@
+  assigns \result \from indirect:errnum, indirect:buflen;
+  assigns strerrbuf[0 .. buflen-1] \from indirect:errnum, indirect:buflen;
+  //missing: assigns errno (EINVAL, ERANGE)
+*/
 extern int strerror_r(int errnum, char *strerrbuf, size_t buflen);
 
 __FC_EXTERN char __fc_strsignal[64];
