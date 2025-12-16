@@ -5,17 +5,35 @@
   buildDunePackage,
   cmdliner,
   ppxlib,
+  ocaml
 }:
+
+let
+  param =
+    if lib.versionAtLeast ocaml.version "5.04" then
+      {
+        version = "2.8.3+dev";
+        owner = "frama-ci-bot";
+        repo = "bisect_ppx";
+        rev = "ocaml-5.4";
+        hash = "sha256-XrM3Ka/u9D1xcsAbL7QogVl8z+XLY7muHVuRpX6XgKo=";
+      }
+    else
+      {
+        version = "2.8.3";
+        owner = "aantron";
+        repo = "bisect_ppx";
+        rev = "2.8.3";
+        hash = "sha256-3qXobZLPivFDtls/3WNqDuAgWgO+tslJV47kjQPoi6o=";
+      };
+in
 
 buildDunePackage rec {
   pname = "bisect_ppx";
-  version = "2.8.3+dev";
+  inherit (param) version;
 
   src = fetchFromGitHub {
-    owner = "frama-ci-bot";
-    repo = "bisect_ppx";
-    rev = "ocaml-5.4";
-    hash = "sha256-XrM3Ka/u9D1xcsAbL7QogVl8z+XLY7muHVuRpX6XgKo=";
+    inherit (param) owner repo rev hash;
   };
 
   minimalOCamlVersion = "4.11";

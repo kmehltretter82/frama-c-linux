@@ -12,13 +12,27 @@
   ocaml-migrate-parsetree-2,
 }:
 
+let
+  param =
+    if lib.versionAtLeast ocaml.version "5.04" then
+      {
+        version = "0.37.0";
+        sha256 = "sha256-LiI4N+fOzDvISkMkMsCnL04dW+kWXJwzdy8VbbhdsLM=";
+      }
+    else
+      {
+        version = "0.35.0";
+        sha256 = "sha256-2dlZ/J+EJgSH5FaE3HQYmKkvxVBrYaf1ysZdIYMtuSU=";
+      };
+in
+
 buildDunePackage rec {
   pname = "ppxlib";
-  version = "0.37.0";
+  inherit (param) version;
 
   src = fetchurl {
     url = "https://github.com/ocaml-ppx/ppxlib/releases/download/${version}/ppxlib-${version}.tbz";
-    sha256 = "sha256-LiI4N+fOzDvISkMkMsCnL04dW+kWXJwzdy8VbbhdsLM=";
+    inherit (param) sha256;
   };
 
   propagatedBuildInputs = [
