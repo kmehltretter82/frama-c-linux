@@ -1,4 +1,4 @@
-Plug-in name: Semantic constant folding
+Plug-in name: Semantic Constant Folding
 Plug-in shortname: scf
 Description: propagates constants semantically
 
@@ -33,17 +33,17 @@ Options taking a string as argument should preferably be written
 
 *** DEBUG
 
--scf-debug <n>      level of debug for plug-in Semantic constant folding
+-scf-debug <n>      level of debug for plug-in Semantic Constant Folding
                     (default to 0)
 
 *** GETTING INFORMATION
 
--scf-help           help of plug-in Semantic constant folding
+-scf-help           help of plug-in Semantic Constant Folding
 -scf-h              alias for option -scf-help
 
 *** OUTPUT MESSAGES
 
--scf-log <K_1:file_1,...>  copy log messages from Semantic constant folding
+-scf-log <K_1:file_1,...>  copy log messages from Semantic Constant Folding
                     to a file. <K> is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
                     d: debug       e: user or internal error (same as 'iu')
@@ -56,7 +56,7 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -scf-msg-key help to get a list of
                     available categories, and * to enable all categories
                     (preferably use -scf-msg-key="k1[,...,kn]")
--scf-verbose <n>    level of verbosity for plug-in Semantic constant folding
+-scf-verbose <n>    level of verbosity for plug-in Semantic Constant Folding
                     (default to 1)
 -scf-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category <k1>
                     to <s1>,...,<kn> to <sn>. Use -scf-warn-key help to get a

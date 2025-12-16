@@ -130,6 +130,8 @@ let check_shortname s =
   if s = "kernel" then
     let msg = "shortname \"kernel\" is reserved by Frama-C" in
     raise (Invalid_argument msg)
+    (* Kernel's name is the empty string, not "kernel", even if the latter is
+       reserved by Frama-C, so we do not want to check its name. *)
   else if is_kernel () || Str.string_match shortname_reg s 0 then ()
   else
     let msg =
