@@ -17,11 +17,7 @@ let is_fc_or_compiler_builtin vi =
   ||
   Ast_attributes.(contains fc_stdlib_internal vi.vattr)
   ||
-  (let prefix_length = 10 (* number of characters in "__builtin_" *) in
-   String.length vi.vname > prefix_length
-   &&
-   let prefix = String.sub vi.vname 0 prefix_length in
-   Datatype.String.equal prefix "__builtin_")
+  String.starts_with ~prefix:"__builtin_" vi.vname
   ||
   (Options.Replace_libc_functions.get ()
    && Functions.Libc.has_replacement vi.vname)
