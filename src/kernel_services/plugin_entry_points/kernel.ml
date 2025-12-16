@@ -1337,7 +1337,10 @@ module MopsaTarget =
       let arg_name = "target1,target2,..."
       let help = "name of the target(s) present in the mopsa-db for \
                   which the list of sources should be parsed; replaces \
-                  any existing files in the command-line."
+                  any existing files in the command-line. Paths are relative \
+                  to the directory containing the mopsa database, not PWD. \
+                  Note that messages related to mopsa databases are still \
+                  emitted relative to Frama-C's PWD, as usual."
     end)
 
 let () = Parameter_customize.set_group parsing
