@@ -7,6 +7,7 @@ let
   ocamlOverlay = oself: osuper: {
     # External Packages
     alt-ergo = oself.callPackage ./alt-ergo.nix {};
+    bisect_ppx = oself.callPackage ./bisect_ppx.nix {};
     combinetura = oself.callPackage ./combinetura.nix {};
     dolmen = oself.callPackage ./dolmen.nix {};
     mlmpfr = oself.callPackage ./mlmpfr.nix {};
