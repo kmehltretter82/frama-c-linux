@@ -21,7 +21,6 @@
 # Frama-C build
 , apron
 , camlzip
-, camomile
 , clang
 , dune_3
 , dune-configurator
@@ -31,13 +30,11 @@
 , graphviz
 , lablgtk3
 , lablgtk3-sourceview3
-, ltl2ba
 , menhir
 , menhirLib
 , mlmpfr
 , ocaml
 , ocamlgraph
-, ocp-indent
 , ppx_deriving
 , ppx_deriving_yaml
 , ppx_deriving_yojson
@@ -91,7 +88,6 @@ stdenvNoCC.mkDerivation rec {
     camlp5
     camlp-streams
     camlzip
-    camomile
     clang
     cmake
     dune_3
@@ -106,13 +102,11 @@ stdenvNoCC.mkDerivation rec {
     lablgtk3-sourceview3
     llvmPackages.llvm.dev
     llvmPackages.clang-unwrapped.dev
-    ltl2ba
     menhir
     menhirLib
     mlmpfr
     ocaml
     ocamlgraph
-    ocp-indent
     pcre2
     ppx_deriving
     ppx_deriving_yaml
