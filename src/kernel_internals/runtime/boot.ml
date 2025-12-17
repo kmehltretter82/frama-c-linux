@@ -22,7 +22,11 @@ let play_analysis () =
   end;
   try
     Main.apply ();
-    (* Printing code, if required, have to be done at end. *)
+    (* Printing code, if required, have to be done at end. Else, we would need
+       to provide additional -then options to correctly sequence printing, which
+       would be impractical.
+       Furthermore, we cannot easily migrate this to Cmdline without making
+       exception handling more complex. *)
     if Kernel.PrintCode.get () then File.pretty_ast ();
     Log.treat_deferred_error ();
     (* Easier to handle option -set-project-as-default at the last moment:
