@@ -146,66 +146,66 @@ struct
      state given an abstract value input of the header node. *)
   let compile_region_after loop_transfer_functions header tset =
     fun input_term ->
-      let edge_term = N.Edge_Dict.create () in
+    let edge_term = N.Edge_Dict.create () in
 
-      (* The idea is to iterate on each node in topological order, so
-         that we always find the data on input edges. To avoid a
-         topological sort, we allow do_node to call itself on a previous
-         node when the result is not ready, and rely on the fact that
-         edge_term memoizes the results to ensure that do_node is
-         eventually called only once per node. *)
-      let rec do_node n =
-        let input =
-          if n == header then input_term
-          else
-            let inputs = ref [] in
-            N.Graph.iter_preds n (fun pred ->
-                if (N.Set.mem n tset) && (not (is_back_edge pred n))
-                then
-                  let input = get_edge pred n in
-                  inputs := input::!inputs );
-            N.join !inputs
-        in
-        let input = match N.Dict.get loop_transfer_functions n with
-          | None -> input
-          | Some f -> N.mu f input
-        in
-        let outputs = N.compile_node n input in
-        List.iter (fun (edge,output) ->
-            N.Edge_Dict.set edge_term edge output) outputs
-
-      (* Compute for previous node if result not yet available. *)
-      and get_edge pred n =
-        let edge = Region_analysis_sig.Edge(pred, n) in
-        try N.Edge_Dict.get edge_term edge
-        with Not_found -> do_node pred; N.Edge_Dict.get edge_term edge
+    (* The idea is to iterate on each node in topological order, so
+       that we always find the data on input edges. To avoid a
+       topological sort, we allow do_node to call itself on a previous
+       node when the result is not ready, and rely on the fact that
+       edge_term memoizes the results to ensure that do_node is
+       eventually called only once per node. *)
+    let rec do_node n =
+      let input =
+        if n == header then input_term
+        else
+          let inputs = ref [] in
+          N.Graph.iter_preds n (fun pred ->
+              if (N.Set.mem n tset) && (not (is_back_edge pred n))
+              then
+                let input = get_edge pred n in
+                inputs := input::!inputs );
+          N.join !inputs
       in
+      let input = match N.Dict.get loop_transfer_functions n with
+        | None -> input
+        | Some f -> N.mu f input
+      in
+      let outputs = N.compile_node n input in
+      List.iter (fun (edge,output) ->
+          N.Edge_Dict.set edge_term edge output) outputs
 
-      (* We can now iterate on any order. *)
-      N.Set.iter do_node tset;
-      edge_term
+    (* Compute for previous node if result not yet available. *)
+    and get_edge pred n =
+      let edge = Region_analysis_sig.Edge(pred, n) in
+      try N.Edge_Dict.get edge_term edge
+      with Not_found -> do_node pred; N.Edge_Dict.get edge_term edge
+    in
+
+    (* We can now iterate on any order. *)
+    N.Set.iter do_node tset;
+    edge_term
   ;;
 
   (* Given a region that is a natural loop, compute the transfer
      function for the body of the loop. *)
   let compile_loop_transfer_function loop_transfer_functions header tset =
     fun input_term ->
-      let edge_term =
-        compile_region_after loop_transfer_functions header tset input_term in
+    let edge_term =
+      compile_region_after loop_transfer_functions header tset input_term in
 
-      (* Collect the abstract values on the back edges. *)
-      let body_exit_term =
-        let inputs = ref [] in
-        N.Graph.iter_preds header (fun pred ->
-            if (N.Set.mem pred tset) && (is_back_edge pred header)
-            then
-              let edge = Region_analysis_sig.Edge(pred,header) in
-              let input = N.Edge_Dict.get edge_term edge in
-              inputs := input::!inputs );
-        N.join !inputs
-      in
+    (* Collect the abstract values on the back edges. *)
+    let body_exit_term =
+      let inputs = ref [] in
+      N.Graph.iter_preds header (fun pred ->
+          if (N.Set.mem pred tset) && (is_back_edge pred header)
+          then
+            let edge = Region_analysis_sig.Edge(pred,header) in
+            let input = N.Edge_Dict.get edge_term edge in
+            inputs := input::!inputs );
+      N.join !inputs
+    in
 
-      body_exit_term
+    body_exit_term
   ;;
 
   (* Compute the final [loop_transfer_functions]. *)

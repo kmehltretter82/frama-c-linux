@@ -11,7 +11,7 @@
 , gitignoreSource
 , makeWrapper
 , nix-gitignore
-, wrapGAppsHook
+, wrapGAppsHook3
 , writeText
 # Generic
 , findlib
@@ -19,7 +19,6 @@
 , apron
 , bisect_ppx
 , camlzip
-, camomile
 , dune_3
 , dune-configurator
 , dune-site
@@ -28,13 +27,10 @@
 , graphviz
 , lablgtk3
 , lablgtk3-sourceview3
-, ltl2ba
 , menhir
 , menhirLib
-, mlmpfr
 , ocaml
 , ocamlgraph
-, ocp-indent
 , ppx_deriving
 , ppx_deriving_yaml
 , ppx_deriving_yojson
@@ -70,14 +66,13 @@ stdenvNoCC.mkDerivation rec {
 
   nativeBuildInputs = [
     which
-    wrapGAppsHook
+    wrapGAppsHook3
   ];
 
   buildInputs = [
     apron
     bisect_ppx
     camlzip
-    camomile
     dune_3
     dune-configurator
     dune-site
@@ -87,13 +82,10 @@ stdenvNoCC.mkDerivation rec {
     graphviz
     lablgtk3
     lablgtk3-sourceview3
-    ltl2ba
     menhir
     menhirLib
-    mlmpfr
     ocaml
     ocamlgraph
-    ocp-indent
     ppx_deriving
     ppx_deriving_yaml
     ppx_deriving_yojson
