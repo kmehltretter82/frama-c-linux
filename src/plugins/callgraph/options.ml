@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let name = "callgraph"
+let name = "Callgraph"
 
 include
   Plugin.Register

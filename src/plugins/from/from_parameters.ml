@@ -8,7 +8,7 @@
 
 include Plugin.Register
     (struct
-      let name = "from analysis"
+      let name = "From analysis"
       let shortname = "from"
       let help = "functional dependencies"
     end)

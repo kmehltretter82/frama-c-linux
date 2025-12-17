@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2025-12-17] Added explicit rules for plug-in names and
+              shortnames. See developer manual for more information
 o!  Kernel    [2025-10-22] Renamed the module Integer to Z and deprecated
               Integer. Few changes in Z API's compared to Integer, Z is also
               now a Datatype which replaces `Datatype.Integer` (now deprecated

@@ -1,8 +1,8 @@
-let plugin_name = "test"
+let plugin_name = "Test"
 
 include Plugin.Register (struct
     let name = plugin_name
-    let shortname = name
+    let shortname = String.lowercase_ascii plugin_name
     let help = "A fake plugin for test purpose"
   end)
 

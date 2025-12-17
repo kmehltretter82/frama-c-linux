@@ -1,4 +1,4 @@
-Plug-in name: dive
+Plug-in name: Dive
 Plug-in shortname: dive
 Description: An interactive imprecision graph generator for Eva.
 
@@ -32,16 +32,16 @@ Options taking a string as argument should preferably be written
 
 *** DEBUG
 
--dive-debug <n>     level of debug for plug-in dive (default to 0)
+-dive-debug <n>     level of debug for plug-in Dive (default to 0)
 
 *** GETTING INFORMATION
 
--dive-help          help of plug-in dive
+-dive-help          help of plug-in Dive
 -dive-h             alias for option -dive-help
 
 *** OUTPUT MESSAGES
 
--dive-log <K_1:file_1,...>  copy log messages from dive to a file. <K> is a
+-dive-log <K_1:file_1,...>  copy log messages from Dive to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
                     d: debug       e: user or internal error (same as 'iu')
@@ -54,7 +54,7 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -dive-msg-key help to get a list of
                     available categories, and * to enable all categories
                     (preferably use -dive-msg-key="k1[,...,kn]")
--dive-verbose <n>   level of verbosity for plug-in dive (default to 1)
+-dive-verbose <n>   level of verbosity for plug-in Dive (default to 1)
 -dive-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category <k1>
                     to <s1>,...,<kn> to <sn>. Use -dive-warn-key help to get
                     a list of available categories, and * to enable all

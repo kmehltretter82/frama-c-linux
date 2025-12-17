@@ -11,13 +11,13 @@
 
 open Cil_types
 
-let name = "scope"
+let name = "Scope"
 
 module R =
   Plugin.Register
     (struct
       let name = name
-      let shortname = name
+      let shortname = String.lowercase_ascii name
       let help = "data dependencies higher level functions"
     end)
 

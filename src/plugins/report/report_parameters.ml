@@ -8,7 +8,7 @@
 
 include Plugin.Register
     (struct
-      let name = "report"
+      let name = "Report"
       let shortname = "report"
       let help = "Properties Status Report"
     end)

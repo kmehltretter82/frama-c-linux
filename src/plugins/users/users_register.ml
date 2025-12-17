@@ -9,7 +9,7 @@
 include
   Plugin.Register
     (struct
-      let name = "users"
+      let name = "Users"
       let shortname = "users"
       let help = "function callees"
     end)

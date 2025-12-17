@@ -1,4 +1,4 @@
-Plugin: test
+Plugin: Test
   -test-debug: int (0, 4611686018427387903)
   -test-decimal-option: float (0.000000, 1.000000)
   -test-default-range: float

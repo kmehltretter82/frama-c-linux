@@ -1,4 +1,4 @@
-Plug-in name: from analysis
+Plug-in name: From analysis
 Plug-in shortname: from
 Description: functional dependencies
 
@@ -23,11 +23,11 @@ Options taking a string as argument should preferably be written
 
 *** DEBUG
 
--from-debug <n>     level of debug for plug-in from analysis (default to 0)
+-from-debug <n>     level of debug for plug-in From analysis (default to 0)
 
 *** GETTING INFORMATION
 
--from-help          help of plug-in from analysis
+-from-help          help of plug-in From analysis
 -from-h             alias for option -from-help
 
 *** OUTPUT MESSAGES
@@ -36,7 +36,7 @@ Options taking a string as argument should preferably be written
                     opposite option is -no-calldeps-print)
 -deps-print         print results for option -deps (set by default, opposite
                     option is -no-deps-print)
--from-log <K_1:file_1,...>  copy log messages from from analysis to a file.
+-from-log <K_1:file_1,...>  copy log messages from From analysis to a file.
                     <K> is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
                     d: debug       e: user or internal error (same as 'iu')
@@ -49,7 +49,7 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -from-msg-key help to get a list of
                     available categories, and * to enable all categories
                     (preferably use -from-msg-key="k1[,...,kn]")
--from-verbose <n>   level of verbosity for plug-in from analysis (default to
+-from-verbose <n>   level of verbosity for plug-in From analysis (default to
                     1)
 -from-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category <k1>
                     to <s1>,...,<kn> to <sn>. Use -from-warn-key help to get

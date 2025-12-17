@@ -10,7 +10,7 @@ let help_msg = "generates annotations for runtime error checking"
 
 include Plugin.Register
     (struct
-      let name = "rtegen"
+      let name = "RteGen"
       let shortname = "rte"
       let help = help_msg
     end)

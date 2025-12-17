@@ -8,7 +8,7 @@
 
 include Plugin.Register
     (struct
-      let name = "pdg"
+      let name = "Pdg"
       let shortname = "pdg"
       let help = "Program Dependence Graph"
     end)

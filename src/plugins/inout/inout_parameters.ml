@@ -6,12 +6,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let name = "inout"
+let name = "Inout"
 
 include Plugin.Register
     (struct
       let name = name
-      let shortname = name
+      let shortname = String.lowercase_ascii name
       let help = "operational, imperative and all kinds of inputs/outputs"
     end)
 

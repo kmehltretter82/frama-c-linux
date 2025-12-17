@@ -2,7 +2,7 @@ let () = Plugin.is_session_visible ()
 module Self =
   Plugin.Register
     (struct
-      let name = "directories"
+      let name = "Directories"
       let shortname = "dirs"
       let help = ""
     end)

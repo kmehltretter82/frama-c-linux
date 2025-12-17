@@ -8,7 +8,7 @@
 
 include Plugin.Register
     (struct
-      let name = "obfuscator"
+      let name = "Obfuscator"
       let shortname = "obfuscator"
       let help = "obfuscator for confidential code"
     end)

@@ -8,7 +8,7 @@
 
 include Plugin.Register
     (struct
-      let name = "security-slicing"
+      let name = "Security-slicing"
       let shortname = "security-slicing"
       let help = "security slicing (experimental, undocumented)"
     end)

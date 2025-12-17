@@ -1,6 +1,6 @@
 module P =
   Plugin.Register(struct
-    let name = "remove_status_hyps"
+    let name = "Remove_status_hyps"
     let shortname = "rsh"
     let help = ""
   end)

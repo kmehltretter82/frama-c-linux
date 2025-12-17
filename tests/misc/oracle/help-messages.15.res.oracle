@@ -1,4 +1,4 @@
-Plug-in name: metrics
+Plug-in name: Metrics
 Plug-in shortname: metrics
 Description: syntactic metrics
 
@@ -42,11 +42,11 @@ Options taking a string as argument should preferably be written
 
 *** DEBUG
 
--metrics-debug <n>  level of debug for plug-in metrics (default to 0)
+-metrics-debug <n>  level of debug for plug-in Metrics (default to 0)
 
 *** GETTING INFORMATION
 
--metrics-help       help of plug-in metrics
+-metrics-help       help of plug-in Metrics
 -metrics-h          alias for option -metrics-help
 
 *** OUTPUT MESSAGES
@@ -57,7 +57,7 @@ Options taking a string as argument should preferably be written
 -metrics-eva-cover-print  print results for option -metrics-eva-cover (set by
                     default, opposite option is -metrics-no-eva-cover-print)
 -metrics-value-cover-print  alias for option -metrics-eva-cover-print
--metrics-log <K_1:file_1,...>  copy log messages from metrics to a file. <K>
+-metrics-log <K_1:file_1,...>  copy log messages from Metrics to a file. <K>
                     is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
                     d: debug       e: user or internal error (same as 'iu')
@@ -72,7 +72,7 @@ Options taking a string as argument should preferably be written
                     (preferably use -metrics-msg-key="k1[,...,kn]")
 -metrics-print      print results for option -metrics (set by default,
                     opposite option is -metrics-no-print)
--metrics-verbose <n>  level of verbosity for plug-in metrics (default to 1)
+-metrics-verbose <n>  level of verbosity for plug-in Metrics (default to 1)
 -metrics-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category
                     <k1> to <s1>,...,<kn> to <sn>. Use -metrics-warn-key help
                     to get a list of available categories, and * to enable

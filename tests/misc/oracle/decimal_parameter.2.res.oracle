@@ -1,4 +1,4 @@
-Plug-in name: test
+Plug-in name: Test
 Plug-in shortname: test
 Description: A fake plugin for test purpose
 
@@ -19,16 +19,16 @@ Options taking a string as argument should preferably be written
 
 *** DEBUG
 
--test-debug <n>     level of debug for plug-in test (default to 0)
+-test-debug <n>     level of debug for plug-in Test (default to 0)
 
 *** GETTING INFORMATION
 
--test-help          help of plug-in test
+-test-help          help of plug-in Test
 -test-h             alias for option -test-help
 
 *** OUTPUT MESSAGES
 
--test-log <K_1:file_1,...>  copy log messages from test to a file. <K> is a
+-test-log <K_1:file_1,...>  copy log messages from Test to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
                     d: debug       e: user or internal error (same as 'iu')
@@ -41,7 +41,7 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -test-msg-key help to get a list of
                     available categories, and * to enable all categories
                     (preferably use -test-msg-key="k1[,...,kn]")
--test-verbose <n>   level of verbosity for plug-in test (default to 1)
+-test-verbose <n>   level of verbosity for plug-in Test (default to 1)
 -test-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category <k1>
                     to <s1>,...,<kn> to <sn>. Use -test-warn-key help to get
                     a list of available categories, and * to enable all

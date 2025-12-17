@@ -287,13 +287,15 @@ The argument to the \texttt{Plugin.Register} functor is a module with three
 values:
 \begin{itemize}
 \item \texttt{name} is an arbitrary, non-empty string containing the full name
-  of the module.
-\item \texttt{shortname} is a small string containing the {\em short name} of
-  the module, to be used as a prefix for all plug-in options\footnote{\framac
-  does  not enforce that all plug-in options are prefixed with its shortname,
-  but it is customary to do so.}. It cannot contain spaces.
+  of the plug-in. It must start with an uppercase letter.
+\item \texttt{shortname} is a small, non-empty string containing the {\em short
+  name} of the plug-in, to be used as a prefix for all plug-in
+  options\footnote{\framac does not enforce that all plug-in options are
+  prefixed with its shortname, but it is customary to do so.}. It must start
+  with a lowercase letter and only contain lowercase letters and numbers,
+  possibly separated by \texttt{-} or \texttt{\_}.
 \item \texttt{help} is a string containing free-form text, with a
-  description of the module.
+  description of the plug-in.
 \end{itemize}
 
 Visible results of the registration include:

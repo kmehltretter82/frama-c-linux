@@ -10,7 +10,7 @@ open Cil_types
 
 include Plugin.Register
     (struct
-      let name = "dive"
+      let name = "Dive"
       let shortname = "dive"
       let help = "An interactive imprecision graph generator for Eva."
     end)

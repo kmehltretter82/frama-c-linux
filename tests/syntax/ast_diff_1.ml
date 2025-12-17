@@ -3,7 +3,7 @@ open Cil_types
 include Plugin.Register(
   struct
     let name = "AST diff test"
-    let shortname = "AST diff test"
+    let shortname = "adt"
     let help = "Show results of AST diff computation"
   end)
 

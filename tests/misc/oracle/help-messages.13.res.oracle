@@ -1,4 +1,4 @@
-Plug-in name: loop
+Plug-in name: Loop
 Plug-in shortname: loop
 Description: Find maximum number of iterations in loops
 
@@ -17,16 +17,16 @@ Options taking a string as argument should preferably be written
 
 *** DEBUG
 
--loop-debug <n>     level of debug for plug-in loop (default to 0)
+-loop-debug <n>     level of debug for plug-in Loop (default to 0)
 
 *** GETTING INFORMATION
 
--loop-help          help of plug-in loop
+-loop-help          help of plug-in Loop
 -loop-h             alias for option -loop-help
 
 *** OUTPUT MESSAGES
 
--loop-log <K_1:file_1,...>  copy log messages from loop to a file. <K> is a
+-loop-log <K_1:file_1,...>  copy log messages from Loop to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
                     d: debug       e: user or internal error (same as 'iu')
@@ -39,7 +39,7 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -loop-msg-key help to get a list of
                     available categories, and * to enable all categories
                     (preferably use -loop-msg-key="k1[,...,kn]")
--loop-verbose <n>   level of verbosity for plug-in loop (default to 1)
+-loop-verbose <n>   level of verbosity for plug-in Loop (default to 1)
 -loop-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category <k1>
                     to <s1>,...,<kn> to <sn>. Use -loop-warn-key help to get
                     a list of available categories, and * to enable all

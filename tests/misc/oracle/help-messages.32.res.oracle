@@ -1,4 +1,4 @@
-Plug-in name: users
+Plug-in name: Users
 Plug-in shortname: users
 Description: function callees
 
@@ -17,16 +17,16 @@ Options taking a string as argument should preferably be written
 
 *** DEBUG
 
--users-debug <n>    level of debug for plug-in users (default to 0)
+-users-debug <n>    level of debug for plug-in Users (default to 0)
 
 *** GETTING INFORMATION
 
--users-help         help of plug-in users
+-users-help         help of plug-in Users
 -users-h            alias for option -users-help
 
 *** OUTPUT MESSAGES
 
--users-log <K_1:file_1,...>  copy log messages from users to a file. <K> is a
+-users-log <K_1:file_1,...>  copy log messages from Users to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
                     d: debug       e: user or internal error (same as 'iu')
@@ -39,7 +39,7 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -users-msg-key help to get a list of
                     available categories, and * to enable all categories
                     (preferably use -users-msg-key="k1[,...,kn]")
--users-verbose <n>  level of verbosity for plug-in users (default to 1)
+-users-verbose <n>  level of verbosity for plug-in Users (default to 1)
 -users-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category <k1>
                     to <s1>,...,<kn> to <sn>. Use -users-warn-key help to get
                     a list of available categories, and * to enable all

@@ -1,4 +1,4 @@
-Plug-in name: aorai
+Plug-in name: Aorai
 Plug-in shortname: aorai
 Description: verification of behavioral properties (experimental)
 
@@ -52,16 +52,16 @@ Options taking a string as argument should preferably be written
 
 *** DEBUG
 
--aorai-debug <n>    level of debug for plug-in aorai (default to 0)
+-aorai-debug <n>    level of debug for plug-in Aorai (default to 0)
 
 *** GETTING INFORMATION
 
--aorai-help         help of plug-in aorai
+-aorai-help         help of plug-in Aorai
 -aorai-h            alias for option -aorai-help
 
 *** OUTPUT MESSAGES
 
--aorai-log <K_1:file_1,...>  copy log messages from aorai to a file. <K> is a
+-aorai-log <K_1:file_1,...>  copy log messages from Aorai to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
                     d: debug       e: user or internal error (same as 'iu')
@@ -74,7 +74,7 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -aorai-msg-key help to get a list of
                     available categories, and * to enable all categories
                     (preferably use -aorai-msg-key="k1[,...,kn]")
--aorai-verbose <n>  level of verbosity for plug-in aorai (default to 1)
+-aorai-verbose <n>  level of verbosity for plug-in Aorai (default to 1)
 -aorai-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category <k1>
                     to <s1>,...,<kn> to <sn>. Use -aorai-warn-key help to get
                     a list of available categories, and * to enable all

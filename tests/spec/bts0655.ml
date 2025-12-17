@@ -1,7 +1,7 @@
 include
   Plugin.Register
     (struct
-      let name = "bts0655"
+      let name = "Bts0655"
       let shortname = "bts0655"
       let help = "inspects relevant AST parts of bts0655.i"
     end)

@@ -11,7 +11,7 @@ open Cil_datatype
 
 module Self = Plugin.Register
     (struct
-      let name = "nonterm"
+      let name = "Nonterm"
       let shortname = "nonterm"
       let help =
         "Warns when definitively non-terminating functions/loops are \

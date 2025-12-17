@@ -11,7 +11,7 @@ let help_msg = "output a warm welcome message to the user"
 (** Registration of the plug-in to Frama-C. *)
 module Self = Plugin.Register
     (struct
-      let name = "hello world"
+      let name = "Hello world"
       let shortname = "hello"
       let help = help_msg
     end)

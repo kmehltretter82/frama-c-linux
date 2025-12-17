@@ -12,7 +12,7 @@
 
 include Plugin.Register
     (struct
-      let name = "slicing"
+      let name = "Slicing"
       let shortname = "slicing"
       let help = "code slicer"
     end)

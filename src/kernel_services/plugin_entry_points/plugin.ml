@@ -118,6 +118,29 @@ let is_present s = List.exists (fun p -> p.p_shortname = s) !plugins
 let get_from_name s = List.find (fun p -> p.p_name = s) !plugins
 let get_from_shortname s = List.find (fun p -> p.p_shortname = s) !plugins
 
+let check_name s =
+  let name_reg = Str.regexp {|^[A-Z]|} in
+  if is_kernel () || Str.string_match name_reg s 0 then ()
+  else
+    let msg = "name '" ^ s ^ "' must start with an uppercase letter" in
+    raise (Invalid_argument msg)
+
+let check_shortname s =
+  let shortname_reg = Str.regexp {|^[a-z][a-z0-9]*\([-_][a-z0-9]+\)*$|} in
+  if s = "kernel" then
+    let msg = "shortname \"kernel\" is reserved by Frama-C" in
+    raise (Invalid_argument msg)
+    (* Kernel's name is the empty string, not "kernel", even if the latter is
+       reserved by Frama-C, so we do not want to check its name. *)
+  else if is_kernel () || Str.string_match shortname_reg s 0 then ()
+  else
+    let msg =
+      "shortname '" ^ s
+      ^ "' must start with a lowercase letter and contain only lowercase"
+      ^ " letters and numbers, possibly separated by '-' or '_'"
+    in
+    raise (Invalid_argument msg)
+
 (* ************************************************************************* *)
 (** {2 Global data structures} *)
 (* ************************************************************************* *)
@@ -239,7 +262,10 @@ struct
     g
 
   let () =
-    (try Cmdline.add_plugin P.name ~short:P.shortname ~help:P.help
+    (try
+       check_name P.name;
+       check_shortname P.shortname;
+       Cmdline.add_plugin P.name ~short:P.shortname ~help:P.help
      with Invalid_argument s ->
        L.abort "cannot register plug-in `%s': %s" P.name s);
     kernel_ongoing := is_kernel ();
@@ -735,3 +761,53 @@ struct
   include Plugin_log
 
 end (* Register *)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Tests                                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
+let _test_valid_name f s =
+  try f s; true
+  with Invalid_argument _ -> false
+
+let _test_wrong_name f s =
+  try f s; false
+  with Invalid_argument _ -> true
+
+let%test _ = _test_valid_name check_name "A"
+let%test _ = _test_valid_name check_name "AbC"
+let%test _ = _test_valid_name check_name "E-ACSL"
+let%test _ = _test_valid_name check_name "A long plug_in Name"
+let%test _ = _test_valid_name check_name "Jessie3"
+
+let%test _ = _test_valid_name check_shortname "a"
+let%test _ = _test_valid_name check_shortname "abc"
+let%test _ = _test_valid_name check_shortname "e-acsl"
+let%test _ = _test_valid_name check_shortname "a_long_plug-in_shortname"
+let%test _ = _test_valid_name check_shortname "jessie3"
+
+let _test_kernel_name f =
+  kernel := true;
+  let success = _test_valid_name f "" in
+  kernel := false;
+  success
+
+let%test _ = _test_kernel_name check_name
+let%test _ = _test_kernel_name check_shortname
+
+let%test _ = _test_wrong_name check_name ""
+let%test _ = _test_wrong_name check_name "-"
+let%test _ = _test_wrong_name check_name "_"
+let%test _ = _test_wrong_name check_name "-Abc"
+let%test _ = _test_wrong_name check_name "3Jessie"
+let%test _ = _test_wrong_name check_name "minuscule"
+
+let%test _ = _test_wrong_name check_shortname ""
+let%test _ = _test_wrong_name check_shortname "-"
+let%test _ = _test_wrong_name check_shortname "_"
+let%test _ = _test_wrong_name check_shortname "_abc"
+let%test _ = _test_wrong_name check_shortname "abc-"
+let%test _ = _test_wrong_name check_shortname "a-_-a"
+let%test _ = _test_wrong_name check_shortname "kernel"
+let%test _ = _test_wrong_name check_shortname "3jessie"
+let%test _ = _test_wrong_name check_shortname "Capital"

@@ -9,7 +9,7 @@
 (** Constant Propagation *)
 include Plugin.Register
     (struct
-      let name = "semantic constant folding"
+      let name = "Semantic Constant Folding"
       let shortname = "scf"
       let help = "propagates constants semantically"
     end)
