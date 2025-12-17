@@ -52,7 +52,7 @@ let mk_named_type (is_gcc, ttype, types, kind) =
 let mk_comp_type
     cstruct nb_fields (is_gcc, typ1, types1, kind1) (_, typ2, types2, kind2) =
   let mk_field ftype =
-    let fname = field_name () in (fname, ftype, None, [], loc)
+    let fname = field_name () in (fname, ftype, None, None, [], loc)
   in
   let mk_fields _ =
     match nb_fields with

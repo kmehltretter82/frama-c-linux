@@ -44,7 +44,7 @@ let mk_type ftype attr =
   let tname = struct_name () in
   let fname = field_name () in
   let mk_type _ =
-    Some [ fname, ftype, None, attr, loc ]
+    Some [ fname, ftype, None, None, attr, loc ]
   in
   Cil_const.mkCompInfo true tname ~norig:tname mk_type []
 
