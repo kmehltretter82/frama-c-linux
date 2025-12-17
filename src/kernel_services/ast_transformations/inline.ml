@@ -100,7 +100,7 @@ let inline_call loc caller callee return args =
              caller_fd.slocals @ fd.sformals @ fd.slocals;
            let add_init vi arg =
              vi.vdefined <- true;
-             Cil.mkStmtOneInstr ~valid_sid:true
+             Cil.mkStmtOneInstr ~valid_sid:true ~ghost:vi.vghost
                (Local_init (vi,AssignInit (SingleInit arg),loc))
            in
            let inits = List.map2 add_init fd.sformals args in

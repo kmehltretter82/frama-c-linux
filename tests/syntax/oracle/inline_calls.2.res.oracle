@@ -155,4 +155,13 @@ void pre_decl(void)
   return;
 }
 
+void with_ghost_caller(void) /*@ ghost (int param) */
+{
+  {
+    /*@ ghost int param_3 = param; */
+    ;
+  }
+  return;
+}
+
 

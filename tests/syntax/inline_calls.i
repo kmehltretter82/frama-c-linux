@@ -99,3 +99,9 @@ void pre_decl() {
   x++; y++;
   post_decl();
 }
+
+inline void with_ghost_callee (void) /*@ ghost (int param) */{}
+
+void with_ghost_caller (void) /*@ ghost (int param) */{
+  with_ghost_callee() /*@ ghost (param) */;
+}
