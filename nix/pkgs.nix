@@ -10,7 +10,6 @@ let
     bisect_ppx = oself.callPackage ./bisect_ppx.nix {};
     combinetura = oself.callPackage ./combinetura.nix {};
     dolmen = oself.callPackage ./dolmen.nix {};
-    mlmpfr = oself.callPackage ./mlmpfr.nix {};
     ppxlib = oself.callPackage ./ppxlib.nix {};
     why3 = oself.callPackage ./why3.nix {
       coqPackages = pkgs.coqPackages_8_19 ;

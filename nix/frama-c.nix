@@ -29,7 +29,6 @@
 , lablgtk3-sourceview3
 , menhir
 , menhirLib
-, mlmpfr
 , ocaml
 , ocamlgraph
 , ppx_deriving
@@ -85,7 +84,6 @@ stdenvNoCC.mkDerivation rec {
     lablgtk3-sourceview3
     menhir
     menhirLib
-    mlmpfr
     ocaml
     ocamlgraph
     ppx_deriving

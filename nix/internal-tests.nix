@@ -32,7 +32,6 @@
 , lablgtk3-sourceview3
 , menhir
 , menhirLib
-, mlmpfr
 , ocaml
 , ocamlgraph
 , ppx_deriving
@@ -104,7 +103,6 @@ stdenvNoCC.mkDerivation rec {
     llvmPackages.clang-unwrapped.dev
     menhir
     menhirLib
-    mlmpfr
     ocaml
     ocamlgraph
     pcre2
