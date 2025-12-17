@@ -96,3 +96,8 @@ end
 module User_dirs = struct
   include @FRAMAC_TARGET_SYSTEM_CONFIG_INCLUDE@
 end
+
+let gui = ref false
+
+let is_gui () = !gui
+let set_gui value = gui := value

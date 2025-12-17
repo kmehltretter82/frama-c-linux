@@ -31,9 +31,7 @@ let on_reset f = resetdemon := f :: !resetdemon
 let reset () = List.iter (fun f -> f ()) !resetdemon
 let has_dkey (k:category) = is_debug_key_enabled k
 
-let server = ref false
-let () = Server.Main.once (fun () -> server := true)
-let is_interactive () = !server
+let is_interactive () = Server.Main.is_active ()
 
 (* ------------------------------------------------------------------------ *)
 (* ---  WP Generation                                                   --- *)

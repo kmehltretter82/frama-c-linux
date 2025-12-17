@@ -114,3 +114,17 @@ module User_dirs : sig
   val state: unit -> Filepath.t
   (** Where Frama-C should read/write state files *)
 end
+
+val is_gui: unit -> bool
+(** Whether we are running in GUI mode. If you only need to know this, it is
+    fine to use it, but if you have an actual dependency on the Frama-C server,
+    prefer using the Server API.
+    @before Frama-C+dev this was a boolean value and not a function
+*)
+
+(** / **)
+
+val set_gui : bool -> unit
+[@@alert
+  system_config_set_gui
+    "set_gui is for internal use only for the Server plugin."]
