@@ -9,8 +9,8 @@
 (** This module provides a layer above the {!Filesystem} module to handle
     automatic removal of temporary files when the program exits, except when
     exit is caused by a signal or [keep] is given and set to true. If [keep] is
-    omitted, the files are kept only if the debug key
-    {!Kernel.dkey_pp_keep_temp_files} is set. If the file is kept, a message
+    omitted, the files are kept only if the kernel option [-keep-temp-files]
+    is set. If the file is kept, a message
     with the path of the preserved file or directory is emitted. When the
     temporary file or directory cannot be created, these functions abort. *)
 
