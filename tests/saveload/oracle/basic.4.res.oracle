@@ -1,2 +1,2 @@
 [kernel:project] Warning: 
-  9 states in saved file ignored. They are invalid in this Frama-C configuration.
+  11 states in saved file ignored. They are invalid in this Frama-C configuration.

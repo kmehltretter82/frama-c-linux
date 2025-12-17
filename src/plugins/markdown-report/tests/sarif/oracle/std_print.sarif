@@ -28,6 +28,7 @@
       ],
       "originalUriBaseIds": {
         ".": { "uri": "file:///omitted-for-deterministic-output/" },
+        "FRAMAC_LIB": { "uri": "file:///omitted-for-deterministic-output/" },
         "FRAMAC_PLUGIN": {
           "uri": "file:///omitted-for-deterministic-output/"
         },
