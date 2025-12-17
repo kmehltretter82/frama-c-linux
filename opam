@@ -173,7 +173,6 @@ depopts: [
 
 conflicts: [
   "cairo2" { < "0.6.2" }
-  "mlmpfr" { < "4.1.0-bugfix2" }
   "pilat"  { <= "1.6" }
   "result" { < "1.5" }
 ]
