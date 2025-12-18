@@ -259,17 +259,15 @@ export interface LocalFilters extends Filters {
   negativeValue: boolean
 }
 
-export interface ObjectToBeFiltered {
-  filters: [string, boolean][];
-}
-
-function isVisible(object: ObjectToBeFiltered, localFilters: LocalFilters[])
-: boolean {
-  return localFilters.reduce((prev, filter) => {
-      if(!prev) return false;
-      const { id, positiveValue, negativeValue } = filter;
-      const current = object.filters.find(e => e[0] === id)?.[1] ?? true;
-      return (positiveValue || !current) && (negativeValue || current);
+function isVisible(
+  value: { filters: [string, boolean][] },
+  localFilters: LocalFilters[]
+): boolean {
+  return localFilters.every(f => {
+      const { id, positiveValue, negativeValue } = f;
+      const current = value.filters.find(([k, ]) => k === id)?.[1];
+      return current === undefined ? true // default true
+              : (positiveValue && current) || (negativeValue && !current);
     }, true);
 }
 
