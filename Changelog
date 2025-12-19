@@ -109,6 +109,7 @@ o!  Kernel    [2025-09-29] Filepath.t is now abstract. An equivalent result can
 -   Eva       [2025-09-05] The mthread domain is automatically enabled when
               running an Mthread analysis.
 -   Eva       [2025-09-05] Add support of loops to the numerors domain.
+              Dropped dependency on MLMPFR.
 -   Eva       [2025-09-02] On successive analyses (with `-then` or in Ivette),
               Eva now re-evaluates the status of any previous alarms.
 -   Kernel    [2025-08-29] In options -*-warn-key, statuses 'active', 'once'
