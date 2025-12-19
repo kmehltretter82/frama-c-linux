@@ -196,14 +196,26 @@ theory Cbits
   axiom is_uint8_lxor : forall x y:int [to_uint8 (lxor x y)].
     is_uint8 x -> is_uint8 y -> to_uint8 (lxor x y) = lxor x y
 
+  axiom is_uint8_lxor_closure : forall x y:int.
+    is_uint8 x -> is_uint8 y -> is_uint8 (lxor x y)
+
   axiom is_uint8_lor : forall x y:int [to_uint8 (lor x y)].
     is_uint8 x -> is_uint8 y -> to_uint8 (lor x y) = lor x y
+
+  axiom is_uint8_lor_closure : forall x y:int.
+    is_uint8 x -> is_uint8 y -> is_uint8 (lor x y)
 
   axiom is_uint8_land : forall x y:int [to_uint8 (land x y)].
     is_uint8 x -> is_uint8 y -> to_uint8 (land x y) = land x y
 
+  axiom is_uint8_land_closure : forall x y:int.
+    is_uint8 x -> is_uint8 y -> is_uint8 (land x y)
+
   axiom is_uint8_lsr : forall x y:int [to_uint8 (lsr x y)].
     0<=y -> is_uint8 x -> to_uint8 (lsr x y) = lsr x y
+
+  axiom is_uint8_lsr_closure : forall x y:int.
+    0<=y -> is_uint8 x -> is_uint8 (lsr x y)
 
   axiom is_uint8_lsl1_inf : forall y:int [to_uint8 (lsl 1 y)].
     0<=y<8 -> to_uint8 (lsl 1 y) = lsl 1 y
@@ -215,14 +227,26 @@ theory Cbits
   axiom is_uint16_lxor : forall x y:int [to_uint16 (lxor x y)].
     is_uint16 x -> is_uint16 y -> to_uint16 (lxor x y) = lxor x y
 
+  axiom is_uint16_lxor_closure : forall x y:int.
+    is_uint16 x -> is_uint16 y -> is_uint16 (lxor x y)
+
   axiom is_uint16_lor : forall x y:int [to_uint16 (lor x y)].
     is_uint16 x -> is_uint16 y -> to_uint16 (lor x y) = lor x y
+
+  axiom is_uint16_lor_closure : forall x y:int.
+    is_uint16 x -> is_uint16 y -> is_uint16 (lor x y)
 
   axiom is_uint16_land : forall x y:int [to_uint16 (land x y)].
     is_uint16 x -> is_uint16 y -> to_uint16 (land x y) = land x y
 
+  axiom is_uint16_land_closure : forall x y:int.
+    is_uint16 x -> is_uint16 y -> is_uint16 (land x y)
+
   axiom is_uint16_lsr : forall x y:int [to_uint16 (lsr x y)].
     0<=y -> is_uint16 x -> to_uint16 (lsr x y) = lsr x y
+
+  axiom is_uint16_lsr_closure : forall x y:int.
+    0<=y -> is_uint16 x -> is_uint16 (lsr x y)
 
   axiom is_uint16_lsl1_inf : forall y:int [to_uint16 (lsl 1 y)].
     0<=y<16 -> to_uint16 (lsl 1 y) = lsl 1 y
@@ -275,14 +299,26 @@ theory Cbits
   axiom is_sint8_lxor: forall x y:int [to_sint8 (lxor x y)].
     is_sint8 x -> is_sint8 y -> to_sint8 (lxor x y) = lxor x y
 
+  axiom is_sint8_lxor_closure: forall x y:int.
+    is_sint8 x -> is_sint8 y -> is_sint8 (lxor x y)
+
   axiom is_sint8_lor: forall x y:int [to_sint8 (lor x y)].
     is_sint8 x -> is_sint8 y -> to_sint8 (lor x y) = lor x y
+
+  axiom is_sint8_lor_closure: forall x y:int.
+    is_sint8 x -> is_sint8 y -> is_sint8 (lor x y)
 
   axiom is_sint8_land: forall x y:int [to_sint8 (land x y)].
     is_sint8 x -> is_sint8 y -> to_sint8 (land x y) = land x y
 
+  axiom is_sint8_land_closure: forall x y:int.
+    is_sint8 x -> is_sint8 y -> is_sint8 (land x y)
+
   axiom is_sint8_lsr: forall x y:int [to_sint8 (lsr x y)].
     0<=y -> is_sint8 x -> to_sint8 (lsr x y) = lsr x y
+
+  axiom is_sint8_lsr_closure: forall x y:int.
+    0<=y -> is_sint8 x -> is_sint8 (lsr x y)
 
   axiom is_sint8_lsl1 :
     lsl 1 7 = Cint.max_sint8
@@ -300,14 +336,26 @@ theory Cbits
   axiom is_sint16_lxor : forall x y:int [to_sint16 (lxor x y)].
     is_sint16 x -> is_sint16 y -> to_sint16 (lxor x y) = lxor x y
 
+  axiom is_sint16_lxor_closure : forall x y:int.
+    is_sint16 x -> is_sint16 y -> is_sint16 (lxor x y)
+
   axiom is_sint16_lor : forall x y:int [to_sint16 (lor x y)].
     is_sint16 x -> is_sint16 y -> to_sint16 (lor x y) = lor x y
+
+  axiom is_sint16_lor_closure : forall x y:int.
+    is_sint16 x -> is_sint16 y -> is_sint16 (lor x y)
 
   axiom is_sint16_land : forall x y:int [to_sint16 (land x y)].
     is_sint16 x -> is_sint16 y -> to_sint16 (land x y) = land x y
 
+  axiom is_sint16_land_closure : forall x y:int.
+    is_sint16 x -> is_sint16 y -> is_sint16 (land x y)
+
   axiom is_sint16_lsr : forall x y:int [to_sint16 (lsr x y)].
     0<=y -> is_sint16 x -> to_sint16 (lsr x y) = lsr x y
+
+  axiom is_sint16_lsr_closure : forall x y:int.
+    0<=y -> is_sint16 x -> is_sint16 (lsr x y)
 
   axiom is_sint16_lsl1 :
     lsl 1 15 = Cint.max_sint16
