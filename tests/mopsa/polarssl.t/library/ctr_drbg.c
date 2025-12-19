@@ -140,7 +140,7 @@ int block_cipher_df( unsigned char *output,
     /*
      * Reduce data to POLARSSL_CTR_DRBG_SEEDLEN bytes of data
      */
-    //@ loop unroll 3;
+    //@ loop \eva::unroll 3;
     for( j = 0; j < CTR_DRBG_SEEDLEN; j += CTR_DRBG_BLOCKSIZE )
     {
         p = buf;
@@ -149,7 +149,7 @@ int block_cipher_df( unsigned char *output,
 
         while( use_len > 0 )
         {
-            //@ loop unroll 16;
+            //@ loop \eva::unroll 16;
             for( i = 0; i < CTR_DRBG_BLOCKSIZE; i++ )
                 chain[i] ^= p[i];
             p += CTR_DRBG_BLOCKSIZE;
@@ -173,7 +173,7 @@ int block_cipher_df( unsigned char *output,
     iv = tmp + CTR_DRBG_KEYSIZE;
     p = output;
 
-    //@ loop unroll 3;
+    //@ loop \eva::unroll 3;
     for( j = 0; j < CTR_DRBG_SEEDLEN; j += CTR_DRBG_BLOCKSIZE )
     {
         aes_crypt_ecb( &aes_ctx, AES_ENCRYPT, iv, iv );
@@ -193,14 +193,14 @@ int ctr_drbg_update_internal( ctr_drbg_context *ctx,
 
     memset( tmp, 0, CTR_DRBG_SEEDLEN );
 
-    //@ loop unroll 3;
+    //@ loop \eva::unroll 3;
     for( j = 0; j < CTR_DRBG_SEEDLEN; j += CTR_DRBG_BLOCKSIZE )
     {
         /*
          * Increase counter
          */
         i = CTR_DRBG_BLOCKSIZE - 1;
-        //@ loop unroll 16;
+        //@ loop \eva::unroll 16;
         do {
             ctx->counter[i]++;
             cb = ctx->counter[i] == 0;
@@ -214,7 +214,7 @@ int ctr_drbg_update_internal( ctr_drbg_context *ctx,
         p += CTR_DRBG_BLOCKSIZE;
     }
 
-    //@ loop unroll 48;
+    //@ loop \eva::unroll 48;
     for( i = 0; i < CTR_DRBG_SEEDLEN; i++ )
         tmp[i] ^= data[i];
 

@@ -79,7 +79,7 @@ static int tls1_prf( unsigned char *secret, size_t slen, char *label,
      */
     md5_hmac( S1, hs, tmp + 20, nb, 4 + tmp );
 
-    //@ loop unroll 16;
+    //@ loop \eva::unroll 16;
     for( i = 0; i < dlen; i += 16 )
     {
         md5_hmac( S1, hs, 4 + tmp, 16 + nb, h_i );
@@ -87,7 +87,7 @@ static int tls1_prf( unsigned char *secret, size_t slen, char *label,
 
         k = ( i + 16 > dlen ) ? dlen % 16 : 16;
 
-        //@ loop unroll 16;
+        //@ loop \eva::unroll 16;
         for( j = 0; j < k; j++ )
             dstbuf[i + j]  = h_i[j];
     }
@@ -97,7 +97,7 @@ static int tls1_prf( unsigned char *secret, size_t slen, char *label,
      */
     sha1_hmac( S2, hs, tmp + 20, nb, tmp );
 
-    //@ loop unroll 16;
+    //@ loop \eva::unroll 16;
     for( i = 0; i < dlen; i += 20 )
     {
         sha1_hmac( S2, hs, tmp, 20 + nb, h_i );
@@ -105,7 +105,7 @@ static int tls1_prf( unsigned char *secret, size_t slen, char *label,
 
         k = ( i + 20 > dlen ) ? dlen % 20 : 20;
 
-        //@ loop unroll 20;
+        //@ loop \eva::unroll 20;
         for( j = 0; j < k; j++ )
             dstbuf[i + j] = (unsigned char)( dstbuf[i + j] ^ h_i[j] );
     }
@@ -148,7 +148,7 @@ int ssl_derive_keys( ssl_context *ssl )
 
         if( ssl->minor_ver == SSL_MINOR_VERSION_0 )
         {
-            //@ loop unroll 3;
+            //@ loop \eva::unroll 3;
             for( i = 0; i < 3; i++ )
             {
                 memset( padding, 'A' + i, 1 + i );
@@ -196,7 +196,7 @@ int ssl_derive_keys( ssl_context *ssl )
      */
     if( ssl->minor_ver == SSL_MINOR_VERSION_0 )
     {
-        //@ loop unroll 16;
+        //@ loop \eva::unroll 16;
         for( i = 0; i < 16; i++ )
         {
             memset( padding, 'A' + i, 1 + i );
@@ -535,7 +535,7 @@ static int ssl_encrypt_buf( ssl_context *ssl )
 
     ssl->out_msglen += ssl->maclen;
 
-    //@ loop unroll 8;
+    //@ loop \eva::unroll 8;
     for( i = 8; i > 0; i-- )
         if( ++ssl->out_ctr[i - 1] != 0 )
             break;
@@ -568,7 +568,7 @@ static int ssl_encrypt_buf( ssl_context *ssl )
         if( padlen == ssl->ivlen )
             padlen = 0;
 
-        //@ loop unroll 17;
+        //@ loop \eva::unroll 17;
         for( i = 0; i <= padlen; i++ )
             ssl->out_msg[ssl->out_msglen + i] = (unsigned char) padlen;
 
@@ -727,7 +727,7 @@ static int ssl_decrypt_buf( ssl_context *ssl )
             dec_msglen -= ssl->ivlen;
             ssl->in_msglen -= ssl->ivlen;
 
-            //@ loop unroll 16;
+            //@ loop \eva::unroll 16;
             for( i = 0; i < ssl->ivlen; i++ )
                 ssl->iv_dec[i] = ssl->in_msg[i];
         }
@@ -807,11 +807,11 @@ static int ssl_decrypt_buf( ssl_context *ssl )
             size_t pad_count = 0, fake_pad_count = 0;
             size_t padding_idx = ssl->in_msglen - padlen - 1;
 
-            //@ loop unroll 257;
+            //@ loop \eva::unroll 257;
             for( i = 1; i <= padlen; i++ )
                 pad_count += ( ssl->in_msg[padding_idx + i] == padlen - 1 );
 
-            //@ loop unroll 257;
+            //@ loop \eva::unroll 257;
             for( ; i <= 256; i++ )
                 fake_pad_count += ( ssl->in_msg[padding_idx + i] == padlen - 1 );
 
@@ -878,7 +878,7 @@ static int ssl_decrypt_buf( ssl_context *ssl )
             md5_hmac_update( &ctx, ssl->in_ctr,  ssl->in_msglen + 13 );
             md5_hmac_finish( &ctx, ssl->in_msg + ssl->in_msglen );
 
-            //@ loop unroll 255;
+            //@ loop \eva::unroll 255;
             for( j = 0; j < extra_run; j++ )
                 md5_process( &ctx, ssl->in_msg ); 
         }
@@ -889,7 +889,7 @@ static int ssl_decrypt_buf( ssl_context *ssl )
             sha1_hmac_update( &ctx, ssl->in_ctr,  ssl->in_msglen + 13 );
             sha1_hmac_finish( &ctx, ssl->in_msg + ssl->in_msglen );
 
-            //@ loop unroll 255;
+            //@ loop \eva::unroll 255;
             for( j = 0; j < extra_run; j++ )
                 sha1_process( &ctx, ssl->in_msg ); 
         }
@@ -938,7 +938,7 @@ static int ssl_decrypt_buf( ssl_context *ssl )
     else
         ssl->nb_zero = 0;
             
-    //@ loop unroll 8;
+    //@ loop \eva::unroll 8;
     for( i = 8; i > 0; i-- )
         if( ++ssl->in_ctr[i - 1] != 0 )
             break;

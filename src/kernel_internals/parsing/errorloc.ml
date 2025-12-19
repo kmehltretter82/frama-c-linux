@@ -77,9 +77,9 @@ let newline () =
 let setCurrentLine (i: int) =
   currentLine := Some i
 
-let setCurrentWorkingDirectory s =
+let setCurrentWorkingDirectory fp =
   let current = Option.get !current in
-  current.current_working_directory <- Some (Filepath.of_string s)
+  current.current_working_directory <- Some fp
 
 (* preprocessors tend to use '<xxx>' filenames in line directives to
    denote special locations, e.g. builtin or command-line-defined macros.

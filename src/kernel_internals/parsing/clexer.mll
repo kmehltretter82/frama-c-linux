@@ -744,7 +744,7 @@ and file = parse
      the preprocessor when the file was preprocessed. *)
   | '"' ([^ '\012' '\t' '"']* as d) "//\""
     {
-    E.setCurrentWorkingDirectory d ;
+    E.setCurrentWorkingDirectory (Filepath.of_string d) ;
     endline lexbuf
     }
 

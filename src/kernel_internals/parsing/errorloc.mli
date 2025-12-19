@@ -25,7 +25,7 @@ val currentLoc: unit -> Cil_datatype.Location.t
     generated linemarkers in the output that let us know the current
     working directory at the time of preprocessing (option
     -fworking-directory for GNU CPP). *)
-val setCurrentWorkingDirectory: string -> unit
+val setCurrentWorkingDirectory: Filepath.t -> unit
 
 val setCurrentFile: string -> unit
 val setCurrentLine: int -> unit

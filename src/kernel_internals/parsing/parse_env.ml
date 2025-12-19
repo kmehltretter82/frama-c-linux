@@ -18,13 +18,13 @@ module SourceFiles =
       let size = 1
     end)
 
-(* maps .i/.pp files to their workdir (when a JCDB is used) *)
+(* maps .i/.pp files to their workdir (when a JCDB/Mopsa-DB is used) *)
 module PreprocessingWorkdir =
-  State_builder.Hashtbl(Filepath.Hashtbl)(Datatype.String)
+  State_builder.Hashtbl(Filepath.Hashtbl)(Filepath)
     (struct
       let name = "PreprocessingWorkdir"
       let dependencies =
-        [ Kernel.Files.self; Kernel.CompilationDb.self ]
+        [ Kernel.CompilationDb.self; Kernel.MopsaDb.self ]
       let size = 2
     end)
 
@@ -36,8 +36,7 @@ let get_workdir file =
     Some (PreprocessingWorkdir.find file)
   with Not_found -> None
 
-let store_referenced_source fname =
-  let fp = Filepath.of_string fname in
+let store_referenced_source fp =
   if not (Hashtbl.mem referenced_files fp) then begin
     try
       let open Filesystem.Operators in
@@ -47,7 +46,7 @@ let store_referenced_source fname =
       Hashtbl.add referenced_files fp true
     with Sys_error s ->
       Kernel.warning ~once:true ~wkey:Kernel.wkey_file_not_found
-        "Cannot find referenced file %S (%s), ignoring" fname s;
+        "Cannot find referenced file %a (%s), ignoring" Filepath.pretty fp s;
       Hashtbl.add referenced_files fp false
   end
 
@@ -69,8 +68,8 @@ let scan_source_for_references ~workdir contents =
           else file
         in
         let file = if Filename.is_relative file && workdir <> None then
-            (Option.get workdir) ^ "/" ^ file
-          else file
+            Filepath.concat (Option.get workdir) file
+          else Filepath.of_string file
         in
         store_referenced_source file
     ) lines
@@ -88,12 +87,7 @@ let open_source ~scan_references fp =
     let$ inchan = Filesystem.with_open_in_exn ~binary:true fp in
     let contents = really_input_string inchan (in_channel_length inchan) in
     SourceFiles.replace fp contents;
-    let workdir =
-      try
-        Some (PreprocessingWorkdir.find fp)
-      with Not_found ->
-        None
-    in
+    let workdir = PreprocessingWorkdir.find_opt fp in
     if scan_references then
       scan_source_for_references ~workdir contents;
     Ok contents

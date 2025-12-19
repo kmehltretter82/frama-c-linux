@@ -422,12 +422,15 @@ let concat_strs ?(pre="") ?(sep=" ") l =
   else pre ^ (String.concat sep l)
 
 let adjust_pwd fp cpp_command =
-  if Kernel.CompilationDb.is_set () then
+  if Kernel.CompilationDb.is_set () || Kernel.MopsaDb.is_set () then
     let cwd = Filepath.pwd () in
     let dir =
-      match Json_compilation_database.get_dir fp with
-      | None -> cwd
-      | Some d -> d
+      if Kernel.CompilationDb.is_set () then
+        match Json_compilation_database.get_dir fp with
+        | None -> cwd
+        | Some d -> d
+      else (* MopsaDB being used *)
+        Option.value ~default:cwd (Parse_env.get_workdir fp)
     in
     if cwd <> dir then Some dir, "cd " ^ (Filepath.to_string_abs dir) ^ " && " ^ cpp_command
     else None, cpp_command
@@ -554,7 +557,7 @@ let build_cpp_cmd = function
     in
     let workdir, cpp_command_with_chdir = adjust_pwd f cpp_command in
     if workdir <> None then
-      Parse_env.set_workdir ppf (Filepath.to_string_abs (Option.get workdir));
+      Parse_env.set_workdir ppf (Option.get workdir);
     Kernel.feedback ~dkey:Kernel.dkey_pp
       "preprocessing with \"%s\""
       cpp_command_with_chdir;
