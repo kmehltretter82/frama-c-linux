@@ -407,7 +407,7 @@
   out of bounds read. assert \valid_read(arg);
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:313: Warning: 
   unaligned pointer creation.
-  assert \aligned(*((long **)*arg),alignof(wchar_t));
+  assert \aligned(*((wchar_t **)*arg),alignof(wchar_t));
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:313: Warning: 
   unaligned pointer creation.
   assert \aligned(tmp_23,alignof(wchar_t));
