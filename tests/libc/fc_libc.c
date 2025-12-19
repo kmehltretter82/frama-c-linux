@@ -8,7 +8,7 @@
  MODULE: check_parsing_individual_headers
    OPT:
  MODULE: check_libc_anonymous_tags
-   OPT:
+   OPT: -keep-unused-types
  MODULE:
  CMD: %{dep:./check_full_libc.sh} @FRAMAC_SHARE@/libc
    OPT:
