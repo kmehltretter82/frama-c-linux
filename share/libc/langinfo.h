@@ -22,7 +22,7 @@ __BEGIN_DECLS
 #define _NL_ITEM_CATEGORY(item)		((int) (item) >> 16)
 #define _NL_ITEM_INDEX(item)		((int) (item) & 0xffff)
 
-enum
+enum __fc_langinfo_constants
 {
   CODESET = (LC_CTYPE) << 16,
 #define CODESET CODESET

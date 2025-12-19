@@ -32,7 +32,7 @@ struct statvfs {
   unsigned long f_namemax; // Maximum filename length.
 };
 
-enum {
+enum __fc_statvfs_flag {
   ST_RDONLY = 1,
 #define ST_RDONLY    ST_RDONLY
   ST_NOSUID = 2
