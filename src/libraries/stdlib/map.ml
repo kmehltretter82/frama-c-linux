@@ -20,13 +20,8 @@ module Make (Ord : OrderedType) =
 struct
   include Make (Ord)
 
-  let pretty pp_key pp_val fmt map =
-    Format.fprintf fmt  "@[{{ ";
-    iter
-      (fun k v ->
-          Format.fprintf fmt "@[@[%a@] -> @[%a@]@];@ "
-            pp_key k
-            pp_val v)
-      map;
-    Format.fprintf fmt  " }}@]"
+  let pretty pp_key pp_val =
+    Collection.pretty_iter2
+      ~format:"{{ %t }}" ~item:"%a ->@ %a" ~sep:";@ " ~iter
+      pp_key pp_val
 end

@@ -31,12 +31,7 @@ let hash hash_elt l =
            (0,1) l)
   with Too_long n -> n
 
-let pretty f fmt l =
-  Format.fprintf fmt "(@[<hv 2>[ %t ]@])"
-    (fun fmt ->
-       let rec print fmt = function
-         | [] -> ()
-         | [ x ] -> Format.fprintf fmt "%a" f x
-         | x :: l -> Format.fprintf fmt "%a;@;%a" f x print l
-       in
-       print fmt l)
+let pretty pp_elt =
+  Collection.pretty_iter
+    ~format:"[ %t ]" ~item:"%a" ~sep:";@ " ~iter
+    pp_elt

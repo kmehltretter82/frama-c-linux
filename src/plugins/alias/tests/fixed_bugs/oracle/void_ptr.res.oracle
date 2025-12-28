@@ -11,7 +11,7 @@
 [alias] analysing function: enter_dir
 [alias] analysing instruction: enter_dir_ad.fts_ent = ent;
 [alias] May-aliases after instruction  enter_dir_ad.fts_ent = ent;  are
-  { ((struct Active_dir *)enter_dir_entry)->fts_ent; enter_dir_ad.fts_ent; 
+  { ((struct Active_dir *)enter_dir_entry)->fts_ent; enter_dir_ad.fts_ent;
     ent }
 [alias] analysing instruction: void *data = hash_find_entry(fts->ht);
 [alias] analysing function: hash_find_entry
@@ -24,7 +24,7 @@
 [alias] May-aliases at the end of function hash_find_entry:
   { table___0->bucket.data; bucket->data; __retres }
 [alias] May-aliases after instruction  void *data = hash_find_entry(fts->ht);  are
-  { ((struct Active_dir *)enter_dir_entry)->fts_ent; enter_dir_ad.fts_ent; 
+  { ((struct Active_dir *)enter_dir_entry)->fts_ent; enter_dir_ad.fts_ent;
     ent }
   { (fts->ht)->bucket.data; data }
 [alias] analysing instruction: data = enter_dir_entry;

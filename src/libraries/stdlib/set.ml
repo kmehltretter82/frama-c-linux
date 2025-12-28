@@ -23,11 +23,8 @@ struct
   let hash hash_elt set =
     fold (fun e h -> 67 * hash_elt e + h) set 189
 
-  let pretty pp_elt fmt set =
-    let pp_elt fmt v =
-      Format.fprintf fmt "@[%a@]" pp_elt v
-    in
-    Pretty_utils.pp_iter
-      ~pre:"@[<hov 2>{@ " ~sep:";@ " ~suf:"@ }@]"
-      iter pp_elt fmt set
+  let pretty pp_elt =
+    Collection.pretty_iter
+      ~format:"{ %t }" ~item:"%a" ~sep:";@ " ~iter
+      pp_elt
 end
