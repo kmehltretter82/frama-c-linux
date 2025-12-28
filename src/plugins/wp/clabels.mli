@@ -22,8 +22,8 @@ val mem : c_label -> c_label list -> bool
 val equal : c_label -> c_label -> bool
 
 module T : sig type t = c_label val compare : t -> t -> int end
-module LabelMap : Map.S with type key = c_label
-module LabelSet : Set.S with type elt = c_label
+module LabelMap : Stdlib.Map.S with type key = c_label
+module LabelSet : Stdlib.Set.S with type elt = c_label
 
 val pre : c_label
 val here : c_label

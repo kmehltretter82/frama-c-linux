@@ -57,12 +57,15 @@ module State_topological = State_topological
 
 (** {2 Stdlib} *)
 
+module Array = Array
 module Extlib = Extlib
 module Hashtbl = Hashtbl
 module Int = Int
 module Integer = Integer [@@deprecated "Use Fclib.Z instead."]
 module List = List
+module Map = Map
 module Option = Option
+module Set = Set
 module Result = Result
 
 (** {2 Utils} *)

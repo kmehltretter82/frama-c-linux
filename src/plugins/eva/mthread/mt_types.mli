@@ -130,7 +130,7 @@ module type Presence = sig
   type key
   type t
 
-  module KeySet: Set.S with type elt = key
+  module KeySet: Datatype.Set with type elt = key
 
   val pretty: t Pretty_utils.formatter
 

@@ -6,19 +6,27 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Extend the [list] type to a full fleshed monad. This monad can be used
-    to represent non-deterministic computations.
-    @since 31.0-Gallium *)
+include Stdlib.Map
 
-include Monad.S_with_product with type 'a t = 'a list
-include module type of Stdlib.List
+module type S = sig
+  include S
+  val pretty :
+    (Format.formatter -> key -> unit) ->
+    (Format.formatter -> 'a -> unit) ->
+    Format.formatter -> 'a t -> unit
+end
 
-(** Compute a hash for the set given a hash for the elements.
-    @since Frama-C+dev *)
-val hash : ('a -> int) -> 'a t -> int
+module Make (Ord : OrderedType) =
+struct
+  include Make (Ord)
 
-(** Pretty prints a set given a printer for the elements.
-    @since Frama-C+dev *)
-val pretty :
-  (Format.formatter -> 'a -> unit) ->
-  Format.formatter -> 'a t -> unit
+  let pretty pp_key pp_val fmt map =
+    Format.fprintf fmt  "@[{{ ";
+    iter
+      (fun k v ->
+          Format.fprintf fmt "@[@[%a@] -> @[%a@]@];@ "
+            pp_key k
+            pp_val v)
+      map;
+    Format.fprintf fmt  " }}@]"
+end

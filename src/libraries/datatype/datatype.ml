@@ -228,12 +228,16 @@ module Make(X: Make_input) = struct
 
 end
 
+module Fc_set = Set
+
 module type Set = sig
   include Set.S
   val nearest_elt_le: elt -> t -> elt
   val nearest_elt_ge: elt -> t -> elt
   include S with type t := t
 end
+
+module Fc_map = Map
 
 module type Map = sig
   include Map.S
@@ -890,30 +894,13 @@ module Poly_list =
       let mk_compare f l1 l2 =
         if l1 == l2 then 0
         else List.compare f l1 l2
-      exception Too_long of int
-      (* Do not spend too much time hashing long lists... *)
-      let mk_hash f l =
-        try
-          snd (List.fold_left
-                 (fun (length,acc) d ->
-                    if length > 15 then raise (Too_long acc);
-                    length+1, 257 * acc + f d)
-                 (0,1) l)
-        with Too_long n -> n
+      let mk_hash = List.hash
       let map = List.map
-      let mk_pretty f fmt l =
-        Format.fprintf fmt "(@[<hv 2>[ %t ]@])"
-          (fun fmt ->
-             let rec print fmt = function
-               | [] -> ()
-               | [ x ] -> Format.fprintf fmt "%a" f x
-               | x :: l -> Format.fprintf fmt "%a;@;%a" f x print l
-             in
-             print fmt l)
+      let mk_pretty = List.pretty
       let mk_mem_project mem f = List.exists (mem f)
     end)
 
-module Caml_list = List
+module Fc_list = List
 module List = Poly_list.Make
 
 let list (type typ) (ty: typ Type.t) =
@@ -970,27 +957,9 @@ module Poly_array =
               0
             with Early_exit n -> n
       ;;
-      (* Do not spend too much time hashing long arrays... *)
-      let mk_hash f a =
-        let max = max 15 ((Array.length a) - 1) in
-        let acc = ref 1 in
-        for i = 0 to max do acc := 257 * !acc + f a.(i) done;
-        !acc
-      ;;
+      let mk_hash = Array.hash
       let map = Array.map
-      let mk_pretty f =
-        if f == undefined
-        then undefined
-        else fun fmt a ->
-          Format.fprintf fmt "(@[<hv 2>[| %t |]@])"
-            (fun fmt ->
-               let length = Array.length a in
-               match length with
-               | 0 -> ()
-               | _ -> (Format.fprintf fmt "%a" f a.(0);
-                       for i = 1 to (length - 1) do
-                         Format.fprintf fmt ";@;%a" f a.(i)
-                       done))
+      let mk_pretty = Array.pretty
       let mk_mem_project mem f a =
         try
           for i = 0 to (Array.length a - 1) do
@@ -1085,12 +1054,13 @@ struct
         let structural_descr =
           Structural_descr.t_set_unchanged_compares (Descr.str E.datatype_descr)
         open S
-        let reprs = empty :: Caml_list.map (fun r -> singleton r) E.reprs
+        let reprs = empty :: Fc_list.map (fun r -> singleton r) E.reprs
         let compare = S.compare
         let equal = S.equal
         let hash =
-          if E.hash == undefined then undefined
-          else (fun s -> S.fold (fun e h -> 67 * E.hash e + h) s 189)
+          if E.hash == undefined
+          then undefined
+          else S.hash E.hash
         let rehash =
           if Descr.is_unmarshable E.datatype_descr then undefined
           else if Descr.is_abstract E.datatype_descr then identity
@@ -1106,13 +1076,7 @@ struct
         let pretty =
           if E.pretty == undefined
           then undefined
-          else fun fmt s ->
-            let pp_elt pp fmt v =
-              Format.fprintf fmt "@[%a@]" pp v
-            in
-            Pretty_utils.pp_iter
-              ~pre:"@[<hov 2>{@ " ~sep:";@ " ~suf:"@ }@]"
-              S.iter (pp_elt E.pretty) fmt s
+          else S.pretty E.pretty
 
         let mem_project p s =
           try S.iter (fun x -> if E.mem_project p x then raise Exit) s; false
@@ -1156,7 +1120,7 @@ struct
             (Descr.str Key.datatype_descr) d
         open M
         let reprs r =
-          [ Caml_list.fold_left (fun m k -> add k r m) empty Key.reprs ]
+          [ Fc_list.fold_left (fun m k -> add k r m) empty Key.reprs ]
         let mk_compare = M.compare
         let mk_equal = M.equal
         let mk_hash = undefined
@@ -1164,15 +1128,7 @@ struct
         let mk_pretty f_value =
           if Key.pretty == undefined || f_value == undefined
           then undefined
-          else fun fmt map ->
-            Format.fprintf fmt  "@[{{ ";
-            M.iter
-              (fun k v ->
-                 Format.fprintf fmt "@[@[%a@] -> @[%a@]@];@ "
-                   Key.pretty k
-                   f_value v)
-              map;
-            Format.fprintf fmt  " }}@]"
+          else M.pretty Key.pretty f_value
         let mk_mem_project =
           if Key.mem_project == undefined then undefined
           else
@@ -1233,7 +1189,7 @@ struct
         let structural_descr = H.structural_descr
         let reprs x =
           [ let h = H.create 7 in
-            Caml_list.iter (fun k -> H.add h k x) Key.reprs; h ]
+            Fc_list.iter (fun k -> H.add h k x) Key.reprs; h ]
         let mk_compare = undefined
         let mk_equal = from_compare
         let mk_hash = undefined
@@ -1325,7 +1281,7 @@ module Weak(W: Sub_caml_weak_hashtbl)(D: S with type t = W.data) = struct
         include Undefined
         type t = W.t
         let name = "Weak(" ^ D.datatype_name ^ ")"
-        let reprs = let w = W.create 0 in Caml_list.iter (W.add w) D.reprs; [ w ]
+        let reprs = let w = W.create 0 in Fc_list.iter (W.add w) D.reprs; [ w ]
       end)
 end
 
@@ -1346,8 +1302,8 @@ module With_set_and_map(X: S) = struct
   module D = X
   include D
 
-  module Set = Set (Stdlib.Set.Make(D))(D)
-  module Map = Map (Stdlib.Map.Make(D))(D)
+  module Set = Set (Fc_set.Make(D))(D)
+  module Map = Map (Fc_map.Make(D))(D)
 
 end
 

@@ -6,19 +6,21 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Extend the [list] type to a full fleshed monad. This monad can be used
-    to represent non-deterministic computations.
-    @since 31.0-Gallium *)
+include Stdlib.Array
 
-include Monad.S_with_product with type 'a t = 'a list
-include module type of Stdlib.List
+let hash hash_elt a =
+  let max = max 15 ((length a) - 1) in
+  let acc = ref 1 in
+  for i = 0 to max do acc := 257 * !acc + hash_elt (get a i) done;
+  !acc
 
-(** Compute a hash for the set given a hash for the elements.
-    @since Frama-C+dev *)
-val hash : ('a -> int) -> 'a t -> int
-
-(** Pretty prints a set given a printer for the elements.
-    @since Frama-C+dev *)
-val pretty :
-  (Format.formatter -> 'a -> unit) ->
-  Format.formatter -> 'a t -> unit
+let pretty pp_elt fmt a =
+  Format.fprintf fmt "(@[<hv 2>[| %t |]@])"
+    (fun fmt ->
+       let length = length a in
+       match length with
+       | 0 -> ()
+       | _ -> (Format.fprintf fmt "%a" pp_elt (get a 0);
+               for i = 1 to (length - 1) do
+                 Format.fprintf fmt ";@;%a" pp_elt (get a i)
+               done))

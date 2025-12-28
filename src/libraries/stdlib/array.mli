@@ -6,19 +6,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Extend the [list] type to a full fleshed monad. This monad can be used
-    to represent non-deterministic computations.
-    @since 31.0-Gallium *)
-
-include Monad.S_with_product with type 'a t = 'a list
-include module type of Stdlib.List
-
-(** Compute a hash for the set given a hash for the elements.
+(** Extension of OCaml's {!Stdlib.Array} module.
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
     @since Frama-C+dev *)
+
+include module type of Stdlib.Array
+
+(** Compute a hash for the set given a hash for the elements. *)
 val hash : ('a -> int) -> 'a t -> int
 
-(** Pretty prints a set given a printer for the elements.
-    @since Frama-C+dev *)
+(** Pretty prints a set given a printer for the elements. *)
 val pretty :
   (Format.formatter -> 'a -> unit) ->
   Format.formatter -> 'a t -> unit

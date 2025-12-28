@@ -35,7 +35,7 @@ module type Node = sig
     val copy: 'a t -> 'a t (* Shallow copy *)
   end
 
-  module Set : Set.S with type elt = node
+  module Set : Stdlib.Set.S with type elt = node
 
   (* The graph of nodes. *)
   module Graph:sig
