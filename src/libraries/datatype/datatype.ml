@@ -886,16 +886,10 @@ module Poly_list =
       let reprs ty = [ [ ty ] ]
       let structural_descr = Structural_descr.t_list
       let mk_equal f l1 l2 =
-        try List.for_all2 f l1 l2 with Invalid_argument _ -> false
-      let rec mk_compare f l1 l2 =
+        List.equal f l1 l2
+      let mk_compare f l1 l2 =
         if l1 == l2 then 0
-        else match l1, l2 with
-          | [], [] -> assert false
-          | [], _ :: _ -> -1
-          | _ :: _, [] -> 1
-          | x1 :: q1, x2 :: q2 ->
-            let n = f x1 x2 in
-            if n = 0 then mk_compare f q1 q2 else n
+        else List.compare f l1 l2
       exception Too_long of int
       (* Do not spend too much time hashing long lists... *)
       let mk_hash f l =
