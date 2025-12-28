@@ -20,6 +20,9 @@ include Monad.Make_based_on_map_with_product (Minimal)
 
 include Stdlib.List
 
+let fold f l acc =
+  fold_left (fun acc x -> f x acc) acc l
+
 let hash hash_elt l =
   (* Do not spend too much time hashing long lists... *)
   let exception Too_long of int in

@@ -12,6 +12,9 @@
 
 include module type of Stdlib.Array
 
+(** Same as {!Stdlib.Array.fold_left} but with the argument order reversed. *)
+val fold : ('a -> 'acc -> 'acc) -> 'a t -> 'acc -> 'acc
+
 (** Compute a hash for the set given a hash for the elements. *)
 val hash : ('a -> int) -> 'a t -> int
 
