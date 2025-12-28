@@ -20,8 +20,7 @@ module Make (Ord : OrderedType) =
 struct
   include Make (Ord)
 
-  let hash hash_elt set =
-    fold (fun e h -> 67 * hash_elt e + h) set 189
+  let hash = Collection.hash_iter iter
 
   let pretty pp_elt =
     Collection.pretty_iter

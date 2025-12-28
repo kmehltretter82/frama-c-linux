@@ -23,16 +23,7 @@ include Stdlib.List
 let fold f l acc =
   fold_left (fun acc x -> f x acc) acc l
 
-let hash hash_elt l =
-  (* Do not spend too much time hashing long lists... *)
-  let exception Too_long of int in
-  try
-    snd (fold_left
-           (fun (length,acc) d ->
-              if length > 15 then raise (Too_long acc);
-              length+1, 257 * acc + hash_elt d)
-           (0,1) l)
-  with Too_long n -> n
+let hash hash_elt = Collection.hash_iter iter hash_elt
 
 let pretty pp_elt =
   Collection.pretty_iter

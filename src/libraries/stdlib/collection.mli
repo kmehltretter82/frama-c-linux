@@ -45,3 +45,12 @@ val pretty_iter2:
   sep:unit format ->
   iter:(('a -> 'b -> unit) -> 'c -> unit) ->
   'a aformatter -> 'b aformatter -> 'c aformatter
+
+(** [hash_iter iter hash x] hashes a collection [x] given an [iter] function on
+    this collection and a [hash] function on its elements.
+    @param limit is the maximum number of elements used for the hash; if
+    collections bigger than this size are given, the remaining elements are
+    ignored. Defaults to 16. *)
+val hash_iter :
+  ?limit:int ->
+  (('a -> unit) -> 'b -> unit) -> ('a -> int) -> 'b -> int

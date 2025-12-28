@@ -6,6 +6,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** {2 Pretty printing } *)
+
 type 'a aformatter = Format.formatter -> 'a -> unit
 type tformatter = Format.formatter -> unit
 type nonrec 'a format = ('a,Format.formatter,unit) format
@@ -28,3 +30,17 @@ let pretty_iter2 ~format ~item ~sep ~iter pp_key pp_val fmt collection =
   let iter f = iter (fun k v -> f (k,v))
   and pp fmt (k,v) = Format.fprintf fmt item pp_key k pp_val v in
   pretty_iter ~format ~sep ~item:"%a" ~iter pp fmt collection
+
+
+(** {2 Hash } *)
+
+let hash_iter ?(limit=16) iter hash x =
+  let acc = ref 1 in
+  let count = ref 0 in
+  let f x =
+    if !count >= limit then raise Exit;
+    incr count;
+    acc := 257 * !acc + hash x
+  in
+  (try iter f x with Exit -> ());
+  !acc
