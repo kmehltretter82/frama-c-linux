@@ -22,6 +22,9 @@ module type S = sig
     (Format.formatter -> key -> unit) ->
     (Format.formatter -> 'a -> unit) ->
     Format.formatter -> 'a t -> unit
+
+  (** Same as [union f] but when [f] always returns [Some]. *)
+  val closed_union : (key -> 'a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
 end
 
 
