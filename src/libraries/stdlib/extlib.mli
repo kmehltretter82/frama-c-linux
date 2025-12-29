@@ -10,6 +10,7 @@
     This module does not depend of any of frama-c module. *)
 
 val nop: 'a -> unit
+[@@deprecated "Use ignore instead."]
 (** Do nothing. *)
 
 val adapt_filename: string -> string
