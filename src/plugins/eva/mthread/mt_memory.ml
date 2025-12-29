@@ -61,8 +61,7 @@ module Types = struct
       ) h map
 
   let merge_map_functions_states =
-    Cil_datatype.Stmt.Map.merge (Extlib.merge_opt (fun _ -> Cvalue.Model.join))
-
+    Cil_datatype.Stmt.Map.closed_union (fun _ -> Cvalue.Model.join)
 
 
   (* -------------------------------------------------------------------------- *)
