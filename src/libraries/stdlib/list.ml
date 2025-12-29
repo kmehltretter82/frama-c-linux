@@ -24,16 +24,9 @@ include Stdlib.List
 
 (** {2 Datatype functions } *)
 
-let rec compare cmp_elt l1 l2 =
+let compare cmp_elt l1 l2 =
   if l1 == l2 then 0
-  else
-    match l1, l2 with
-    | [], [] -> assert false (* included in l1 == l2 above *)
-    | [], _ :: _ -> -1
-    | _ :: _, [] -> 1
-    | v1::r1, v2::r2 ->
-      let c = cmp_elt v1 v2 in
-      if c = 0 then compare cmp_elt r1 r2 else c
+  else compare cmp_elt l1 l2
 
 let hash hash_elt =
   Collection.hash_iter iter hash_elt
@@ -56,12 +49,7 @@ let find_index f l =
 
 let mapi2 f l1 l2 =
   let i = ref 0 in
-  let rec aux l1 l2 = match l1, l2 with
-    | [], [] -> []
-    | a1 :: l1, a2 :: l2 -> let r = f !i a1 a2 in incr i; r :: aux l1 l2
-    | _, _ -> invalid_arg "List.mapi2"
-  in
-  aux l1 l2
+  map2 (fun x y -> let r = f !i x y in incr i; r) l1 l2
 
 (* used by [map_no_copy] and [concat_map_no_copy] *)
 let rev_until i l =
