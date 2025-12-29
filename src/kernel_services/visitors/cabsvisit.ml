@@ -91,17 +91,17 @@ and childrenTypeSpecifier vis ts =
         in
         if n' != n || eo' != eo then (n', eo') else input
       in
-      let nel' = Extlib.map_no_copy doOneField nel in
+      let nel' = List.map_no_copy doOneField nel in
       if s' != s || nel' != nel then FIELD (s', nel') else input
     | STATIC_ASSERT_FG _ -> input
   in
   match ts with
     Tstruct (n, Some fg, extraAttrs) ->
     (*(trace "sm" (dprintf "visiting struct %s\n" n));*)
-    let fg' = Extlib.map_no_copy childrenFieldGroup fg in
+    let fg' = List.map_no_copy childrenFieldGroup fg in
     if fg' != fg then Tstruct( n, Some fg', extraAttrs) else ts
   | Tunion (n, Some fg, extraAttrs) ->
-    let fg' = Extlib.map_no_copy childrenFieldGroup fg in
+    let fg' = List.map_no_copy childrenFieldGroup fg in
     if fg' != fg then Tunion( n, Some fg', extraAttrs) else ts
   | Tenum (n, Some ei, extraAttrs) ->
     let doOneEnumItem ((s, e, loc) as ei) =
@@ -109,7 +109,7 @@ and childrenTypeSpecifier vis ts =
       if e' != e then (s, e', loc) else ei
     in
     vis#vEnterScope ();
-    let ei' = Extlib.map_no_copy doOneEnumItem ei in
+    let ei' = List.map_no_copy doOneEnumItem ei in
     vis#vExitScope();
     if ei' != ei then Tenum( n, Some ei', extraAttrs) else ts
   | TtypeofE e ->
@@ -141,7 +141,7 @@ and childrenSpecElem (vis: cabsVisitor) (se: spec_elem) : spec_elem =
 
 and visitCabsSpecifier (vis: cabsVisitor) (s: specifier) : specifier =
   doVisit vis vis#vspec childrenSpec s
-and childrenSpec vis s = Extlib.map_no_copy (childrenSpecElem vis) s
+and childrenSpec vis s = List.map_no_copy (childrenSpecElem vis) s
 
 
 and visitCabsDeclType vis (isfundef: bool) (dt: decl_type) : decl_type =
@@ -150,26 +150,26 @@ and childrenDeclType isfundef vis dt =
   match dt with
     JUSTBASE -> dt
   | PARENTYPE (prea, dt1, posta) ->
-    let prea' = Extlib.map_no_copy_list (visitCabsAttribute vis)  prea in
+    let prea' = List.concat_map_no_copy (visitCabsAttribute vis)  prea in
     let dt1' = visitCabsDeclType vis isfundef dt1 in
-    let posta'= Extlib.map_no_copy_list (visitCabsAttribute vis)  posta in
+    let posta'= List.concat_map_no_copy (visitCabsAttribute vis)  posta in
     if prea' != prea || dt1' != dt1 || posta' != posta then
       PARENTYPE (prea', dt1', posta') else dt
   | ARRAY (dt1, al, e) ->
     let dt1' = visitCabsDeclType vis isfundef dt1 in
-    let al' = Extlib.map_no_copy (childrenAttribute vis) al in
+    let al' = List.map_no_copy (childrenAttribute vis) al in
     let e'= visitCabsExpression vis e in
     if dt1' != dt1 || al' != al || e' != e then ARRAY(dt1', al', e') else dt
   | PTR (al, dt1) ->
-    let al' = Extlib.map_no_copy (childrenAttribute vis) al in
+    let al' = List.map_no_copy (childrenAttribute vis) al in
     let dt1' = visitCabsDeclType vis isfundef dt1 in
     if al' != al || dt1' != dt1 then PTR(al', dt1') else dt
   | PROTO (dt1, snl, gsnl, b) ->
     (* Do not propagate isfundef further *)
     let dt1' = visitCabsDeclType vis false dt1 in
     let _ = vis#vEnterScope () in
-    let snl' = Extlib.map_no_copy (childrenSingleName vis NVar) snl in
-    let gsnl' = Extlib.map_no_copy (childrenSingleName vis NVar) gsnl in
+    let snl' = List.map_no_copy (childrenSingleName vis NVar) snl in
+    let gsnl' = List.map_no_copy (childrenSingleName vis NVar) gsnl in
     (* Exit the scope only if not in a function definition *)
     let _ = if not isfundef then vis#vExitScope () in
     if dt1' != dt1 || snl' != snl || gsnl' != gsnl then
@@ -179,7 +179,7 @@ and childrenDeclType isfundef vis dt =
 
 and childrenNameGroup vis (kind: nameKind) ((s, nl) as input) =
   let s' = visitCabsSpecifier vis s in
-  let nl' = Extlib.map_no_copy (visitCabsName vis kind s') nl in
+  let nl' = List.map_no_copy (visitCabsName vis kind s') nl in
   if s' != s || nl' != nl then (s', nl') else input
 
 and visitCabsName vis (k: nameKind) (s: specifier)
@@ -188,7 +188,7 @@ and visitCabsName vis (k: nameKind) (s: specifier)
 and childrenName (_s: specifier) (k: nameKind) vis (n: name) : name =
   let (sn, dt, al, loc) = n in
   let dt' = visitCabsDeclType vis (k = NFun) dt in
-  let al' = Extlib.map_no_copy (childrenAttribute vis) al in
+  let al' = List.map_no_copy (childrenAttribute vis) al in
   if dt' != dt || al' != al then (sn, dt', al', loc) else n
 
 and childrenInitName vis (s: specifier) (inn: init_name) : init_name =
@@ -217,7 +217,7 @@ and childrenDefinition vis d =
 
   | DECDEF (spec,(s, inl), l) ->
     let s' = visitCabsSpecifier vis s in
-    let inl' = Extlib.map_no_copy (childrenInitName vis s') inl in
+    let inl' = List.map_no_copy (childrenInitName vis s') inl in
     if s' != s || inl' != inl then DECDEF (spec,(s', inl'), l) else d
   | TYPEDEF (ng, l) ->
     let ng' = childrenNameGroup vis NType ng in
@@ -233,7 +233,7 @@ and childrenDefinition vis d =
     let e' = visitCabsExpression vis e in
     if e' != e then STATIC_ASSERT (e', s, l) else d
   | LINKAGE (n, l, dl) ->
-    let dl' = Extlib.map_no_copy_list (visitCabsDefinition vis) dl in
+    let dl' = List.concat_map_no_copy (visitCabsDefinition vis) dl in
     if dl' != dl then LINKAGE (n, l, dl') else d
   | GLOBANNOT _ -> d
 
@@ -242,8 +242,8 @@ and visitCabsBlock vis (b: block) : block =
 
 and childrenBlock vis (b: block) : block =
   let _ = vis#vEnterScope () in
-  let battrs' = Extlib.map_no_copy_list (visitCabsAttribute vis) b.battrs in
-  let bstmts' = Extlib.map_no_copy_list (visitCabsStatement vis) b.bstmts in
+  let battrs' = List.concat_map_no_copy (visitCabsAttribute vis) b.battrs in
+  let bstmts' = List.concat_map_no_copy (visitCabsStatement vis) b.bstmts in
   let _ = vis#vExitScope () in
   if battrs' != b.battrs || bstmts' != b.bstmts then
     { blabels = b.blabels; battrs = battrs'; bstmts = bstmts' }
@@ -343,8 +343,8 @@ and childrenStatement vis s =
     let details' = match details with
       | None -> details
       | Some { aoutputs = outl; ainputs = inl; aclobbers = clobs; alabels = labels } ->
-        let outl' = Extlib.map_no_copy childrenIdentStringExp outl in
-        let inl' = Extlib.map_no_copy childrenIdentStringExp inl in
+        let outl' = List.map_no_copy childrenIdentStringExp outl in
+        let inl' = List.map_no_copy childrenIdentStringExp inl in
         if outl' == outl && inl' == inl then
           details
         else
@@ -353,16 +353,16 @@ and childrenStatement vis s =
     if details' != details then
       {s with stmt_node = ASM (sl, b, details', l)} else s
   | THROW (e,l) ->
-    let e' = Extlib.opt_map_no_copy (visitCabsExpression vis) e in
+    let e' = Option.map_no_copy (visitCabsExpression vis) e in
     if e != e' then { s with stmt_node = THROW(e',l) } else s
   | TRY_CATCH(t,l,loc) ->
     let visit_one_catch (v,s as c) =
-      let v' = Extlib.opt_map_no_copy (childrenSingleName vis NVar) v in
+      let v' = Option.map_no_copy (childrenSingleName vis NVar) v in
       let s' = vs loc s in
       if v' != v || s' != s then (v,s) else c
     in
     let t' = vs loc t in
-    let l' = Extlib.map_no_copy visit_one_catch l in
+    let l' = List.map_no_copy visit_one_catch l in
     if t' != t || l' != l then
       { s with stmt_node = TRY_CATCH(t',l',loc) }
     else s
@@ -396,12 +396,12 @@ and childrenExpression vis e =
       { e with expr_node = CAST ((s', dt'), ie')} else e
   | CALL (f, el, gl) ->
     let f' = ve f in
-    let el' = Extlib.map_no_copy ve el in
-    let gl' = Extlib.map_no_copy ve gl in
+    let el' = List.map_no_copy ve el in
+    let gl' = List.map_no_copy ve gl in
     if f' != f || el' != el then
       { e with expr_node = CALL (f', el',gl')} else e
   | COMMA el ->
-    let el' = Extlib.map_no_copy ve el in
+    let el' = List.map_no_copy ve el in
     if el' != el then { e with expr_node = COMMA (el') } else e
   | CONSTANT _ -> e
   | PAREN e1 ->
@@ -477,7 +477,7 @@ and childrenInitExpression vis ie =
       let ie' = visitCabsInitExpression vis ie in
       if iw' != iw || ie' != ie then (iw', ie') else input
     in
-    let il' = Extlib.map_no_copy childrenOne il in
+    let il' = List.map_no_copy childrenOne il in
     if il' != il then COMPOUND_INIT il' else ie
 
 
@@ -485,14 +485,14 @@ and visitCabsAttribute vis (a: attribute) : attribute list =
   doVisitList vis vis#vattr childrenAttribute a
 
 and childrenAttribute vis ((n, el) as input) =
-  let el' = Extlib.map_no_copy (visitCabsExpression vis) el in
+  let el' = List.map_no_copy (visitCabsExpression vis) el in
   if el' != el then (n, el') else input
 
 and visitCabsAttributes vis (al: attribute list) : attribute list =
-  Extlib.map_no_copy_list (visitCabsAttribute vis) al
+  List.concat_map_no_copy (visitCabsAttribute vis) al
 
 let visitCabsFile (vis: cabsVisitor) ((fname, f): file) : file =
-  (fname, Extlib.map_no_copy_list (fun ((ghost,f) as glob) ->
+  (fname, List.concat_map_no_copy (fun ((ghost,f) as glob) ->
        let f' = visitCabsDefinition vis f in
        match f' with
          [f'] when f == f' -> [glob]

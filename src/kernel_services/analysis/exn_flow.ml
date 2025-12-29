@@ -577,7 +577,7 @@ class erase_exn =
         | [x] -> Cil_datatype.Stmt.loc x
         | x::tl ->
           fst (Cil_datatype.Stmt.loc x),
-          snd (Cil_datatype.Stmt.loc (Extlib.last tl))
+          snd (Cil_datatype.Stmt.loc (List.last tl))
       in
       let add_unreachable_block b =
         Cil.mkStmt (If(Cil.zero ~loc, b, Cil.mkBlock [], loc))

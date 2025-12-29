@@ -135,7 +135,7 @@ end
   let get ~vars es =
     let nbparts, parts = extract (partitions ~vars es) in
     let sorted_ts e = List.sort Lang.F.compare @@ Lang.F.Tset.elements e in
-    let sort_es = List.sort (Extlib.list_compare Lang.F.compare) in
+    let sort_es = List.sort (List.compare Lang.F.compare) in
     let parts = sort_es @@ List.map sorted_ts parts in
     nbparts, parts
 end

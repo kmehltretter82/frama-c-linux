@@ -32,7 +32,7 @@ let smooth_expression lst =
   | [expr] -> expr
   | hd :: _ ->
     let beg_loc = fst hd.expr_loc in
-    let end_loc = snd (Extlib.last lst).expr_loc in
+    let end_loc = snd (List.last lst).expr_loc in
     { expr_loc = (beg_loc,end_loc); expr_node = COMMA (lst) }
 
 let merge_string (c1,(b1,_)) (l2,(_,e2)) = c1 :: l2, (b1,e2)
@@ -276,13 +276,13 @@ let in_block sloc l =
   | _::_ ->
     no_ghost_stmt (BLOCK ({ blabels = []; battrs = []; bstmts = l},
                           get_statementloc (List.hd l),
-                          get_statementloc (Extlib.last l)))
+                          get_statementloc (List.last l)))
 
 let in_ghost_block ?(battrs=[]) l =
   let l = in_ghost l in
   ghost_stmt (BLOCK ({ blabels = []; battrs ; bstmts = l},
                      get_statementloc (List.hd l),
-                     get_statementloc (Extlib.last l)))
+                     get_statementloc (List.last l)))
 
 let type_to_expr_for_builtin ~loc ~builtin specifier decl_type =
   (* Prefix the builtin name with __fc_ to avoid collisions with real

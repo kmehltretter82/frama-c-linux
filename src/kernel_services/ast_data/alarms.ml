@@ -166,7 +166,7 @@ module D =
         | Function_pointer (e1, l1), Function_pointer (e2, l2) ->
           let n = Exp.compare e1 e2 in
           if n <> 0 then n
-          else Option.compare (Extlib.list_compare Exp.compare) l1 l2
+          else Option.compare (List.compare Exp.compare) l1 l2
         | Invalid_bool lv1, Invalid_bool lv2 -> Lval.compare lv1 lv2
         | _, (Division_by_zero _ | Memory_access _ |
               Index_out_of_bound _ | Invalid_pointer _ | Unaligned_pointer _ |

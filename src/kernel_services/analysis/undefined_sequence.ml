@@ -50,7 +50,7 @@ let check_sequences file =
   (* checks whether some element of the first list may overlap with some
      element of the second one. *)
   let may_overlap l1 l2 =
-    Extlib.product_fold (fun f e1 e2 -> f || may_overlap_lval e1 e2)
+    List.product_fold (fun f e1 e2 -> f || may_overlap_lval e1 e2)
       false l1 l2
   in
   let check_unspec = object

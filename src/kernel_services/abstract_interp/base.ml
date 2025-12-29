@@ -78,7 +78,7 @@ module Validity = Datatype.Make
         | Invalid -> 37
         | Known (b, e) -> Hashtbl.hash (3, Z.hash b, Z.hash e)
         | Unknown (b, m, e) ->
-          Hashtbl.hash (7, Z.hash b, Extlib.opt_hash Z.hash m, Z.hash e)
+          Hashtbl.hash (7, Z.hash b, Option.hash Z.hash m, Z.hash e)
         | Variable variable_v ->
           Hashtbl.hash (Z.hash variable_v.min_alloc, Z.hash variable_v.max_alloc)
 

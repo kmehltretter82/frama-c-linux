@@ -418,7 +418,7 @@ module Base_checker = struct
               "Statement %a of function %s is registered with a wrong kf"
               Printer.pp_stmt s (Kernel_function.get_name kf);
           let blocks = Kernel_function.find_all_enclosing_blocks s in
-          let b = Extlib.last blocks in
+          let b = List.last blocks in
           let body = Kernel_function.get_definition kf in
           if b != body.sbody then
             check_abort

@@ -415,7 +415,7 @@ module Rewriting = struct
         let value = if sign then value else Arith.neg value in
         (sign, { variables; operation; value }) :: acc
     in
-    Extlib.product_fold aux [] vars1 vars2
+    List.product_fold aux [] vars1 vars2
 
   (* Returns the range of the expression X-Y when the comparison X#Y holds. *)
   let comparison_range =

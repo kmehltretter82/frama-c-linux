@@ -265,7 +265,7 @@ let run () =
       ) defs_without_decls funinfos
   in
   let funinfos = List.sort
-      (fun fi1 fi2 -> Extlib.compare_ignore_case fi1.name fi2.name) funinfos
+      (fun fi1 fi2 -> String.compare_ignore_case fi1.name fi2.name) funinfos
   in
   let outfp = Output.get () in
   if Filepath.is_empty outfp then

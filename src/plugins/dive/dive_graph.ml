@@ -160,7 +160,7 @@ let output_to_dot out_channel g =
   let open Graph.Graphviz.DotAttributes in
   (* let g = add_dummy_nodes g in *)
 
-  let build_label s = `HtmlLabel (Extlib.html_escape s) in
+  let build_label s = `HtmlLabel (String.html_escape s) in
 
   let module FileTable = Datatype.String.Hashtbl in
   let module CallstackTable = Callstack.Hashtbl in

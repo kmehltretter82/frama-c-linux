@@ -387,7 +387,7 @@ module DynamicHintDatatype = Datatype.Make(struct
            IntSet.packed_descr;
            FloatSet.packed_descr |]
     let reprs =
-      Extlib.product
+      List.product_map
         (fun wh fh -> { bases = Base.Hptset.empty;
                         lv = (Exp.dummy, NoOffset);
                         int_thresholds = wh;

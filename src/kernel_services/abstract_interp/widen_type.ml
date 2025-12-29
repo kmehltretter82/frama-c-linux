@@ -60,7 +60,7 @@ include Datatype.Make(struct
            Num_hints_bases_stmt.packed_descr;
            Float_hints_bases_stmt.packed_descr |]
     let reprs =
-      Extlib.product
+      List.product_map
         (fun wh fh ->
            { priority_bases = Stmt.Map.empty;
              default_hints = wh;

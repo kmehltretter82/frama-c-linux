@@ -185,7 +185,7 @@ class visit_adding_code_for_synchronisation =
       let aux_func_pre, pre_block,pre_locals = mk_pre_fct_block kf_pre kf in
       let aux_func_post, post_block,post_locals =
         mk_post_fct_block
-          kf_post kf (Extlib.opt_of_list fun_dec_post.sformals)
+          kf_post kf (List.to_option fun_dec_post.sformals)
       in
       let vis = new change_formals kf kf_pre in (* Replace original formals *)
       fun_dec_pre.slocals <- pre_locals;

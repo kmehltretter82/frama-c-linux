@@ -666,7 +666,7 @@ let dot_fprint_graph fmt start_tg link_stmt =
         | NEOP -> `Invis
         | _ -> `Filled
       in [
-        `Label (Extlib.escape_non_utf8 label);
+        `Label (String.utf8_escaped label);
         `ColorWithTransparency color;
         `Shape shape;
         `Style style;

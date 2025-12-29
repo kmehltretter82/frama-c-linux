@@ -575,7 +575,7 @@ end = struct
   let all_options : (string, cmdline_option) Hashtbl.t = Hashtbl.create 97
 
   let all_plugins () =
-    let cmp p1 p2 = Extlib.compare_ignore_case p1.name p2.name in
+    let cmp p1 p2 = String.compare_ignore_case p1.name p2.name in
     List.sort cmp (Hashtbl.fold (fun _ p acc -> p :: acc) plugins [])
 
   let add ?short name ~help =

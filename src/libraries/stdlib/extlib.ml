@@ -71,165 +71,30 @@ let flatten ((a, b), c) = a, b, c
 (** {2 Lists} *)
 (* ************************************************************************* *)
 
-let as_singleton = function
-  | [a] -> a
-  | _ -> invalid_arg "Extlib.as_singleton"
-
-let rec last = function
-  | [] -> invalid_arg "Extlib.last"
-  | [a] -> a
-  | _ :: l -> last l
-
-let replace cmp x l =
-  let rec aux = function
-    | [] -> [x]
-    | y::l -> if cmp x y then x::l else y :: aux l
-  in aux l
-
-let product_fold f acc e1 e2 =
-  List.fold_left
-    (fun acc e1 -> List.fold_left (fun acc e2 -> f acc e1 e2) acc e2)
-    acc e1
-
-let product f e1 e2 = product_fold (fun acc e1 e2 -> f e1 e2 ::acc) [] e1 e2
-
-let find_index f l =
-  let rec aux i = function
-      [] -> raise Not_found
-    | x::l -> if f x then i else aux (i+1) l
-  in aux 0 l
-
-let rec list_compare cmp_elt l1 l2 =
-  if l1 == l2 then 0
-  else
-    match l1, l2 with
-    | [], [] -> assert false (* included in l1 == l2 above *)
-    | [], _ :: _ -> -1
-    | _ :: _, [] -> 1
-    | v1::r1, v2::r2 ->
-      let c = cmp_elt v1 v2 in
-      if c = 0 then list_compare cmp_elt r1 r2 else c
-
-let opt_of_list =
-  function
-  | [] -> None
-  | [a] -> Some a
-  | _ -> raise (Invalid_argument "Extlib.opt_of_list")
-
-let subsets k l =
-  let rec aux k l len =
-    if k = 0 then [[]]
-    else if len < k then []
-    else if len = k then [l]
-    else
-      match l with
-      | h :: t ->
-        let l1 = List.map (fun sl -> h :: sl) (aux (k-1) t (len-1)) in
-        let l2 = aux k t (len-1)
-        in l1 @ l2
-      | [] -> assert false
-  in aux k l (List.length l)
-
-let list_first_n n l =
-  let rec aux acc n = function
-    | h :: t when n > 0 -> aux (h :: acc) (n-1) t
-    | _ -> acc
-  in
-  List.rev (aux [] n l)
-
-let rec list_remove_first_n n = function
-  | _h :: t when n > 0 -> list_remove_first_n (n-1) t
-  | l -> l
-
-let list_slice ?(first = 0) ?last l =
-  let len = lazy (List.length l) in
-  let normalize i =
-    (* normalize negative values *)
-    if i >= 0
-    then i
-    else
-      let n = Lazy.force len in
-      if i + n >= 0 then i + n else 0
-  in
-  (* Remove first elements *)
-  let first = normalize first in
-  let l = list_remove_first_n first l in
-  (* Remove last elements *)
-  match last with
-  | None -> l
-  | Some n -> list_first_n (normalize n - first) l
-
-let rev_until i l =
-  let rec aux acc =
-    function
-    | [] -> acc
-    | i'::_ when i' == i -> acc
-    | i'::l -> aux (i'::acc) l
-  in aux [] l
-
-(* mapNoCopy is like map but avoid copying the list if the function does not
-   change the elements. *)
-let map_no_copy (f: 'a -> 'a) orig =
-  let rec aux ((acc,has_changed) as res) l =
-    match l with
-    | [] -> if has_changed then List.rev acc else orig
-    | i :: resti ->
-      let i' = f i in
-      if has_changed then
-        aux (i'::acc,true) resti
-      else if i' != i then
-        aux (i'::rev_until i orig,true) resti
-      else
-        aux res resti
-  in aux ([],false) orig
-
-(* Same than map_no_copy but [f] returns a list. *)
-let map_no_copy_list (f: 'a -> 'a list) orig =
-  let rec aux ((acc,has_changed) as res) l =
-    match l with
-    | [] -> if has_changed then List.rev acc else orig
-    | i :: resti ->
-      let l' = f i in
-      if has_changed then
-        aux (List.rev_append l' acc,true) resti
-      else
-        (match l' with
-         | [i'] when i' == i -> aux res resti
-         | _ -> aux (List.rev_append l' (rev_until i orig), true) resti)
-  in aux ([],false) orig
+let as_singleton = List.as_singleton
+let last = List.last
+let replace = List.replace
+let product_fold = List.product_fold
+let product = List.product_map
+let find_index = List.find_index
+let list_compare = List.compare
+let opt_of_list = List.to_option
+let subsets = List.combinations
+let list_first_n = List.take
+let list_slice = List.slice
+let map_no_copy = List.map_no_copy
+let map_no_copy_list = List.concat_map_no_copy
 
 (* ************************************************************************* *)
 (** {2 Options} *)
 (* ************************************************************************* *)
 
-let merge_opt f k o1 o2 =
-  match o1,o2 with
-  | None, None -> None
-  | Some x, None | None, Some x -> Some x
-  | Some x1, Some x2 -> Some (f k x1 x2)
-
-let opt_filter f = function
-  | None -> None
-  | (Some x) as o -> if f x then o else None
-
-let the ~exn = function
-  | None -> raise exn
-  | Some x -> x
-
-let opt_hash hash v = match v with
-  | None -> 31179
-  | Some v -> hash v
-
-let opt_map2 f x y = match x, y with
-  | None, _ | _, None -> None
-  | Some x, Some y -> Some (f x y)
-
-let opt_map_no_copy f o =
-  match o with
-  | None -> o
-  | Some x ->
-    let x' = f x in
-    if x' != x then Some x' else o
+let merge_opt f k = Option.union (fun x1 x2 -> f k x1 x2)
+let opt_filter = Option.filter
+let the ~exn = Option.get ~exn
+let opt_hash = Option.hash
+let opt_map2 = Option.inter
+let opt_map_no_copy = Option.map_no_copy
 
 (* ************************************************************************* *)
 (** {2 Performance} *)
@@ -261,19 +126,12 @@ let safe_at_exit f =
 (** Strings *)
 (* ************************************************************************* *)
 
-let string_del_prefix ?(strict=false) prefix s =
-  if String.starts_with ~prefix s then
-    let n = String.length s in
-    let p = String.length prefix in
-    if not strict || n > p then Some (String.sub s p (n-p)) else None
-  else None
-
-let string_del_suffix ?(strict=false) suffix s =
-  if String.ends_with ~suffix s then
-    let n = String.length s in
-    let p = String.length suffix in
-    if not strict || n > p then Some (String.sub s 0 (n-p)) else None
-  else None
+let string_del_prefix = String.strip_prefix
+let string_del_suffix = String.strip_suffix
+let strip_underscore = String.strip_underscores
+let escape_non_utf8 = String.utf8_escaped
+let html_escape = String.html_escape
+let percent_encode = String.percent_encode
 
 let make_unique_name mem ?(sep=" ") ?(start=2) from =
   let rec build base id =
@@ -281,65 +139,6 @@ let make_unique_name mem ?(sep=" ") ?(start=2) from =
     if mem fullname then build base (succ id) else id,fullname
   in
   if mem from then build from start else (0,from)
-
-let strip_underscore s =
-  let l = String.length s in
-  let rec start i =
-    if i >= l then l
-    else if s.[i] = '_' then start (i + 1) else i
-  in
-  let st = start 0 in
-  if st = l then ""
-  else begin
-    let rec finish i =
-      (* We know that we will stop at >= st >= 0 *)
-      if s.[i] = '_' then finish (i - 1) else i
-    in
-    let fin = finish (l - 1) in
-    String.sub s st (fin - st + 1)
-  end
-
-let escape_non_utf8 s =
-  let escape_char c =
-    if c = '"' then "\\\"" else Char.escaped c
-  in
-  let buffer = Buffer.create (String.length s) in
-  let rec aux i =
-    if i < String.length s then
-      let uchar = String.get_utf_8_uchar s i in
-      let len = Uchar.utf_decode_length uchar in
-      if len = 1
-      then escape_char s.[i] |> Buffer.add_string buffer
-      else Uchar.utf_decode_uchar uchar |> Buffer.add_utf_8_uchar buffer;
-      aux (i + len)
-  in
-  aux 0;
-  Buffer.contents buffer
-
-let html_escape s =
-  let buf = Buffer.create (String.length s) in
-  String.iter
-    (function
-      | '<' -> Buffer.add_string buf "&lt;"
-      | '>' -> Buffer.add_string buf "&gt;"
-      | '&' -> Buffer.add_string buf "&amp;"
-      | c -> Buffer.add_char buf c
-    ) s ;
-  Buffer.contents buf
-
-let percent_encode s =
-  let buf = Buffer.create (String.length s) in
-  String.iter
-    (function
-      | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9'
-      | '-' | '.' | '_' | '~' as c ->
-        Buffer.add_char buf c
-      | c ->
-        let code = Char.code c in
-        let percent_code = Format.asprintf "%%%2X" code in
-        Buffer.add_string buf percent_code)
-    s;
-  Buffer.contents buf
 
 let format_string_of_stag = function
   | Format.String_tag tag -> tag
@@ -351,7 +150,4 @@ let format_string_of_stag = function
 
 external compare_basic: 'a -> 'a -> int = "%compare"
 
-let compare_ignore_case s1 s2 =
-  String.compare
-    (String.lowercase_ascii s1)
-    (String.lowercase_ascii s2)
+let compare_ignore_case = String.compare_ignore_case

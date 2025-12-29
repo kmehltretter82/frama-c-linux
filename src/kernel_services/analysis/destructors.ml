@@ -140,7 +140,7 @@ class vis flag = object(self)
           flag := true;
           if stmts = [] then my_destructors
           else begin
-            let stmt = Extlib.last stmts in
+            let stmt = List.last stmts in
             if Cabs2cil.stmtFallsThrough stmt then stmts @ my_destructors
             else stmts
           end

@@ -66,6 +66,7 @@ module List = List
 module Map = Map
 module Option = Option
 module Set = Set
+module String = String
 module Result = Result
 
 (** {2 Utils} *)

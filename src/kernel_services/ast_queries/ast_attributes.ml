@@ -14,7 +14,7 @@ let wkey = Kernel.wkey_attrs
 
 (* Construct sorted lists of attributes *)
 let get_name (an, _) =
-  Extlib.strip_underscore an
+  String.strip_underscores an
 
 (* Attributes are added as they are (e.g. if we add ["__attr"] and then ["attr"]
    both are added). When checking for the presence of an attribute [x] or trying
@@ -45,7 +45,7 @@ let add_list al0 al =
     List.fold_left (fun acc a -> add a acc) al al0
 
 let drop an al =
-  let an = Extlib.strip_underscore an in
+  let an = String.strip_underscores an in
   List.filter (fun a -> get_name a <> an) al
 
 let rec drop_list anl al =
@@ -62,17 +62,17 @@ let replace_params name params al =
   add (name, params) (drop name al)
 
 let contains an al =
-  let an = Extlib.strip_underscore an in
+  let an = String.strip_underscores an in
   List.exists (fun a -> get_name a = an) al
 
 let find_params an al =
-  let an = Extlib.strip_underscore an in
+  let an = String.strip_underscores an in
   List.fold_left (fun acc ((_, param) as a) ->
       if get_name a = an then param @ acc else acc
     ) [] al
 
 let filter an al =
-  let an = Extlib.strip_underscore an in
+  let an = String.strip_underscores an in
   List.filter (fun a -> get_name a = an) al
 
 (**************************************)

@@ -85,7 +85,7 @@ let nextSync stmt =
       | true -> Stmt s
       | false when s.succs = [] -> Exit
       | _ ->
-        aux (StmtSet.add s visited) (Extlib.as_singleton s.succs)
+        aux (StmtSet.add s visited) (List.as_singleton s.succs)
   in aux StmtSet.empty stmt
 
 let nextNonGhostSync stmt =
@@ -94,7 +94,7 @@ let nextNonGhostSync stmt =
     else begin
       let visited = StmtSet.add stmt visited in
       if not (sync stmt) then
-        do_find (res, visited) (Extlib.as_singleton stmt.succs)
+        do_find (res, visited) (List.as_singleton stmt.succs)
       else if not (stmt.ghost) then StmtSet.add stmt res, visited
       else List.fold_left do_find (res, visited) stmt.succs
     end

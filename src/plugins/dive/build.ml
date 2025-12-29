@@ -569,7 +569,7 @@ let build_node_reads context node =
     let formals = Kernel_function.get_formals callee_kf in
     (* For Frama_C_show_each and functions called through pointers, there may
        be more arguments than formal parameters declared. *)
-    let used_args = Extlib.list_first_n (List.length formals) args in
+    let used_args = List.take (List.length formals) args in
     List.to_seq (List.combine used_args formals) |>
     Seq.flat_map (build_arg_dep callstack stmt zone)
 

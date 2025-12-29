@@ -331,7 +331,7 @@ module Allocation = struct
       let kind = Stmt
 
       let parse ~typing_context:_ = function
-        | [{lexpr_node = PLvar s}] -> Extlib.the ~exn:Parse_error (of_string s)
+        | [{lexpr_node = PLvar s}] -> Option.get ~exn:Parse_error (of_string s)
         | _ -> raise Parse_error
 
       let export alloc_kind =
@@ -385,7 +385,7 @@ module ArraySegmentation = Register (struct
     let parse ~typing_context:context lexprs =
       let open Logic_typing in
       let l = List.map (context.type_term context context.pre_state) lexprs in
-      Extlib.the ~exn:Parse_error (convert l)
+      Option.get ~exn:Parse_error (convert l)
 
     let import = function
       | Ext_terms l -> Option.get (convert l)

@@ -302,7 +302,7 @@ let rec no_ghost_case_breaks = function
   | stmts :: others ->
     if (List.hd stmts).ghost then
       begin
-        match (Extlib.last stmts).skind with
+        match (List.last stmts).skind with
         | Break _ -> false
         | _ -> no_ghost_case_breaks others
       end else true

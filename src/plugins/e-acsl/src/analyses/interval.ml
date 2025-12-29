@@ -282,7 +282,7 @@ let infer_sum_product oper lambda min max = match lambda, min, max with
              | Some z ->
                if Z.sign z = -1 then
                  (* the lower bound is (possibly) negative *)
-                 Extlib.opt_map2
+                 Option.inter
                    (fun m max ->
                       match min_lambda, max_lambda with
                       | Some mil, Some mal when Z.lt (Z.abs mil) (Z.abs mal) ->
@@ -302,7 +302,7 @@ let infer_sum_product oper lambda min max = match lambda, min, max with
                    min
            in
            let ub =
-             Extlib.opt_map2
+             Option.inter
                (fun m max ->
                   match max_lambda with
                   | Some ml when Z.lt ml Z.zero && not (Z.is_one m) ->

@@ -50,7 +50,7 @@ let singleton f loc =
   | _ -> error_lval()
 
 let rec loc_lval_to_lval ?result (lh, lo) =
-  Extlib.product
+  List.product_map
     (fun x y -> (x,y))
     (loc_lhost_to_lhost ?result lh)
     (loc_offset_to_offset ?result lo)
@@ -69,7 +69,7 @@ and loc_offset_to_offset ?result = function
   | TField (fi, lo) ->
     List.map (fun x -> Field (fi,x)) (loc_offset_to_offset ?result lo)
   | TIndex (lexp, lo) ->
-    Extlib.product
+    List.product_map
       (fun x y -> Index(x,y))
       (loc_to_exp ?result lexp)
       (loc_offset_to_offset ?result lo)
@@ -91,7 +91,7 @@ and loc_to_exp ?result {term_node = lnode ; term_type = ltype; term_loc = loc} =
       (fun x -> new_exp ~loc (UnOp (unop, x, logic_type_to_typ ltype)))
       (loc_to_exp ?result lexp)
   | TBinOp (binop, lexp1, lexp2) ->
-    Extlib.product
+    List.product_map
       (fun x y -> new_exp ~loc (BinOp (binop, x,y, logic_type_to_typ ltype)))
       (loc_to_exp ?result lexp1)
       (loc_to_exp ?result lexp2)

@@ -392,7 +392,7 @@ struct
     | FromAny, From _ -> 1
     | From _, FromAny -> -1
     | From l1, From l2 ->
-      Extlib.list_compare compare_it l1 l2
+      List.compare compare_it l1 l2
 
   let compare_from (f1, d1) (f2, d2) =
     let r = compare_it f1 f2 in

@@ -129,13 +129,13 @@ end = struct
       if c <> 0 then c else
         Stdlib.compare b1 b2
     | EnterScope (_, vs1), EnterScope (_, vs2) ->
-      Extlib.list_compare Varinfo.compare vs1 vs2
+      List.compare Varinfo.compare vs1 vs2
     | LeaveScope (_, vs1), LeaveScope (_, vs2) ->
-      Extlib.list_compare Varinfo.compare vs1 vs2
+      List.compare Varinfo.compare vs1 vs2
     | CallDeclared (kf1, es1, lv1), CallDeclared (kf2, es2, lv2) ->
       let c = Kernel_function.compare kf1 kf2 in
       if c <> 0 then c else
-        let c = Extlib.list_compare ExpStructEq.compare es1 es2 in
+        let c = List.compare ExpStructEq.compare es1 es2 in
         if c <> 0 then c else
           Option.compare Lval.compare lv1 lv2
     | Msg s1, Msg s2 ->
@@ -145,7 +145,7 @@ end = struct
       if c <> 0 then c else
         let c = Node.compare s1 s2 in
         if c <> 0 then c else
-          GraphShape.compare (Extlib.list_compare Edge.compare) g1 g2
+          GraphShape.compare (List.compare Edge.compare) g1 g2
     | Assign _, _ -> -1
     | _ , Assign _ -> 1
     | Assume _, _ -> -1
@@ -200,7 +200,7 @@ end = struct
         (fun acc e -> Hashtbl.seeded_hash acc (Varinfo.hash e)) 5 vs
     | CallDeclared (kf, es, lv) ->
       let x = Kernel_function.hash kf in
-      let x = Hashtbl.seeded_hash x (Extlib.opt_hash Lval.hash lv) in
+      let x = Hashtbl.seeded_hash x (Option.hash Lval.hash lv) in
       List.fold_left
         (fun acc e -> Hashtbl.seeded_hash acc (ExpStructEq.hash e)) x es
     | Msg s -> Hashtbl.seeded_hash 7 s

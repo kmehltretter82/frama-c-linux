@@ -254,7 +254,7 @@ let punfold_flexible_struct_pred ?loc the_struct bytes_len pred =
     | Ctype ({ tnode = TComp ci } as t) when Cil.has_flexible_array_member t -> ci
     | _ -> Options.fatal "Unfolding flexible on a non flexible structure"
   in
-  let flex_type = Ctype (Extlib.last (Option.get ci.cfields)).ftype in
+  let flex_type = Ctype (List.last (Option.get ci.cfields)).ftype in
   let flex_len = tminus bytes_len struct_len in
   let pall_fields_pred len =
     pall_fields_pred ?loc ~flex_mem_len:(Some len) 0 the_struct ci pred

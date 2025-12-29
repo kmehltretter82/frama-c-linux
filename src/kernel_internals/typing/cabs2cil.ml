@@ -62,7 +62,7 @@ let func_locs () = FuncLocs.get ()
 let unsupported_attributes = ["vector_size"]
 
 let check_attribute_name s =
-  let res = Extlib.strip_underscore s in
+  let res = String.strip_underscores s in
   if res = "" then
     Kernel.error ~once:true ~current:true "Invalid attribute name %s" s
   else begin
@@ -1600,7 +1600,7 @@ struct
       if c.unspecified_order then begin
         if List.length stmts >= 2 then begin
           let first_stmt =
-            (fun (s,_,_,_,_) -> s) (Extlib.last stmts) in
+            (fun (s,_,_,_,_) -> s) (List.last stmts) in
           Kernel.warning ~wkey:Kernel.wkey_cert_exp_10
             ~source:(fst (Stmt.loc first_stmt))
             "Potential unsequenced side-effects"
@@ -1627,7 +1627,7 @@ struct
       if c.unspecified_order then begin
         if List.length c.stmts >= 2 then begin
           let first_stmt =
-            (fun (s,_,_,_,_) -> s) (Extlib.last c.stmts) in
+            (fun (s,_,_,_,_) -> s) (List.last c.stmts) in
           Kernel.warning ~wkey:Kernel.wkey_cert_exp_10
             ~source:(fst (Stmt.loc first_stmt))
             "Potential unsequenced side-effects" end;
@@ -2028,7 +2028,7 @@ struct
       let n = mkEmptyStmt ~ghost ~valid_sid ~loc () in
       n, [n,[],[],[],[]]
     | s ->
-      let (st,_,_,_,_) = Extlib.last s in
+      let (st,_,_,_,_) = List.last s in
       if not ghost && st.ghost then
         (* non-ghost label in front of a ghost statement. Keep the
            non-ghost status with a Skip.
