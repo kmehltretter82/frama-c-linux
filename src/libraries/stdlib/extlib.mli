@@ -186,6 +186,7 @@ val map_no_copy_list: ('a -> 'a list) -> 'a list -> 'a list
 *)
 val merge_opt:
   ('a -> 'b -> 'b -> 'b) -> 'a -> 'b option -> 'b option -> 'b option
+[@@deprecated "Use Option.map2 or replace map merges by closed_union from Map."]
 
 val opt_filter: ('a -> bool) -> 'a option -> 'a option
 [@@deprecated "Use Option.filter instead."]
