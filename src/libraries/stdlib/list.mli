@@ -39,6 +39,11 @@ val fold : ('a -> 'acc -> 'acc) -> 'a t -> 'acc -> 'acc
     @since Frama-C+dev *)
 val find_index: ('a -> bool) -> 'a list -> int
 
+(** Same as {!Stdlib.List.map2} but gives the index of the current element to
+    [f]
+    @since Frama-C+dev *)
+val mapi2 : (int -> 'a -> 'b -> 'c) -> 'a list -> 'b list -> 'c list
+
 (** Same as {!Stdlib.List.map} but avoid creating a copy of the list's tail if
     the mapped function returns its argument (tested through physical equality).
     @since Frama-C+dev *)
@@ -76,6 +81,12 @@ val take : int -> 'a list -> 'a list
     It is equivalent to [slice ~first:n l].
     @since Frama-C+dev *)
 val drop : int -> 'a list -> 'a list
+
+(** [break n l] returns a couple of the list of the first n elements and the
+    list of the remaining elements. If n is smaller than 0 (resp. greater than
+    the list length) then [([], l)] is returned (resp. [(l, [])]).
+    It is equivalent to [(take n l, drop n l)]. *)
+val break : int -> 'a list -> ('a list * 'a list)
 
 (** [slice ?first ?last l] is equivalent to Python's slice operator
     (l[first:last]): returns the range of the list between [first] (inclusive)

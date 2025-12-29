@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-module List = Extends.List
 module Typ = Extends.Typ
 module Build = Cil_builder.Pure
 

@@ -54,6 +54,15 @@ let find_index f l =
     | x::l -> if f x then i else aux (i+1) l
   in aux 0 l
 
+let mapi2 f l1 l2 =
+  let i = ref 0 in
+  let rec aux l1 l2 = match l1, l2 with
+    | [], [] -> []
+    | a1 :: l1, a2 :: l2 -> let r = f !i a1 a2 in incr i; r :: aux l1 l2
+    | _, _ -> invalid_arg "List.mapi2"
+  in
+  aux l1 l2
+
 (* used by [map_no_copy] and [concat_map_no_copy] *)
 let rev_until i l =
   let rec aux acc =
@@ -113,6 +122,14 @@ let take n l =
 let rec drop n = function
   | _h :: t when n > 0 -> drop (n-1) t
   | l -> l
+
+let rec break n l =
+  if n <= 0 then ([], l)
+  else match l with
+    | [] -> ([], [])
+    | a :: l ->
+      let l1, l2 = break (n - 1) l in
+      (a :: l1, l2)
 
 let slice ?(first = 0) ?last l =
   let len = lazy (length l) in
