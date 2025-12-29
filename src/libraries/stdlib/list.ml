@@ -112,12 +112,9 @@ let rec last = function
   | [a] -> a
   | _ :: l -> last l
 
-let take n l =
-  let rec aux acc n = function
-    | h :: t when n > 0 -> aux (h :: acc) (n-1) t
-    | _ -> acc
-  in
-  rev (aux [] n l)
+let[@tail_mod_cons] rec take n = function
+  | h :: t when n > 0 -> h :: take (n-1) t
+  | _ -> []
 
 let rec drop n = function
   | _h :: t when n > 0 -> drop (n-1) t
