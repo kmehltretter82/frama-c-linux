@@ -281,12 +281,95 @@ module type S_with_collections = sig
 end
 
 (* ****************************************************************************)
-(** {2 Polymorphic signature} *)
+(** {2 Polymorphic} *)
 (* ****************************************************************************)
 
 module type Polymorphic = sig
   include Type.Polymorphic
   module Make(T: S) : S with type t = T.t poly
+end
+
+module type Polymorphic_input = sig
+  include Type.Polymorphic_input
+  val mk_equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
+  val mk_compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
+  val mk_hash: ('a -> int) -> 'a t -> int
+  val map: ('a -> 'b) -> 'a t -> 'b t
+  val mk_pretty:
+    (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
+  val mk_mem_project:
+    ((Project_skeleton.t -> bool) -> 'a -> bool) ->
+    (Project_skeleton.t -> bool) -> 'a t -> bool
+end
+
+module Polymorphic_gen(P: Polymorphic_input) = struct
+
+  include Type.Polymorphic(P)
+
+  module Make_gen(X: S)(R: sig val rehash: X.t poly -> X.t poly end) = struct
+
+    module T = struct
+      type t = X.t P.t
+      let ty, _is_new = instantiate X.ty
+    end
+
+    include T
+    include
+      Build
+        (struct
+          include T
+          let build mk f =
+            if mk == undefined || f == undefined then undefined else mk f
+          let compare = build P.mk_compare X.compare
+          let equal =
+            if P.mk_equal == from_compare then
+              if compare == undefined then undefined else from_compare
+            else build P.mk_equal X.equal
+          let hash = build P.mk_hash X.hash
+          let copy =
+            (* issue #36: do not use [build] here in order to be able to
+               copy an empty datastructure even if the underlying function is
+               undefined. The potential issue would be to not have the invariant
+               that [copy] is [undefined] as soon as the underlying [copy] is;
+               but the kernel does not rely on this behavior for that particular
+               function (and hopefully it will not change in the future). *)
+            if P.map == undefined then undefined
+            else
+              (* [JS 2011/05/31] No optimisation for the special case of
+                 identity, since we really want to perform a DEEP copy. *)
+              (*if f == identity then identity else*)
+              fun x -> P.map X.copy x
+          let rehash = R.rehash
+          let pretty = build P.mk_pretty X.pretty
+          let mem_project =
+            let mk f =
+              if P.mk_mem_project == undefined then undefined
+              else if f == never_any_project then never_any_project
+              else fun p x -> P.mk_mem_project f p x
+            in
+            build mk X.mem_project
+          let reprs = Type.reprs ty
+        end)
+
+    let datatype_descr, packed_descr =
+      mk_full_descr
+        (Descr.of_structural ty
+           (P.structural_descr (Descr.str X.datatype_descr)))
+
+  end
+
+end
+
+module Polymorphic(P: Polymorphic_input) = struct
+  include Polymorphic_gen(P)
+  module Make(X: S) =
+    Make_gen
+      (X)
+      (struct
+        let rehash =
+          if Descr.is_unmarshable X.datatype_descr then undefined
+          else identity
+      end)
 end
 
 (* ****************************************************************************)
@@ -696,93 +779,6 @@ let func4 ?label1 ty1 ?label2 ty2 ?label3 ty3 ?label4 ty4 ty_ret =
 
 let is_function_or_pair ty =
   Type.Function.is_instance_of ty || Poly_pair.is_instance_of ty
-
-(* ****************************************************************************)
-(** {2 Polymorphic generator} *)
-(* ****************************************************************************)
-
-module type Polymorphic_input = sig
-  include Type.Polymorphic_input
-  val mk_equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
-  val mk_compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
-  val mk_hash: ('a -> int) -> 'a t -> int
-  val map: ('a -> 'b) -> 'a t -> 'b t
-  val mk_pretty:
-    (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
-  val mk_mem_project:
-    ((Project_skeleton.t -> bool) -> 'a -> bool) ->
-    (Project_skeleton.t -> bool) -> 'a t -> bool
-end
-
-module Polymorphic_gen(P: Polymorphic_input) = struct
-
-  include Type.Polymorphic(P)
-
-  module Make_gen(X: S)(R: sig val rehash: X.t poly -> X.t poly end) = struct
-
-    module T = struct
-      type t = X.t P.t
-      let ty, _is_new = instantiate X.ty
-    end
-
-    include T
-    include
-      Build
-        (struct
-          include T
-          let build mk f =
-            if mk == undefined || f == undefined then undefined else mk f
-          let compare = build P.mk_compare X.compare
-          let equal =
-            if P.mk_equal == from_compare then
-              if compare == undefined then undefined else from_compare
-            else build P.mk_equal X.equal
-          let hash = build P.mk_hash X.hash
-          let copy =
-            (* issue #36: do not use [build] here in order to be able to
-               copy an empty datastructure even if the underlying function is
-               undefined. The potential issue would be to not have the invariant
-               that [copy] is [undefined] as soon as the underlying [copy] is;
-               but the kernel does not rely on this behavior for that particular
-               function (and hopefully it will not change in the future). *)
-            if P.map == undefined then undefined
-            else
-              (* [JS 2011/05/31] No optimisation for the special case of
-                 identity, since we really want to perform a DEEP copy. *)
-              (*if f == identity then identity else*)
-              fun x -> P.map X.copy x
-          let rehash = R.rehash
-          let pretty = build P.mk_pretty X.pretty
-          let mem_project =
-            let mk f =
-              if P.mk_mem_project == undefined then undefined
-              else if f == never_any_project then never_any_project
-              else fun p x -> P.mk_mem_project f p x
-            in
-            build mk X.mem_project
-          let reprs = Type.reprs ty
-        end)
-
-    let datatype_descr, packed_descr =
-      mk_full_descr
-        (Descr.of_structural ty
-           (P.structural_descr (Descr.str X.datatype_descr)))
-
-  end
-
-end
-
-module Polymorphic(P: Polymorphic_input) = struct
-  include Polymorphic_gen(P)
-  module Make(X: S) =
-    Make_gen
-      (X)
-      (struct
-        let rehash =
-          if Descr.is_unmarshable X.datatype_descr then undefined
-          else identity
-      end)
-end
 
 (* ****************************************************************************)
 (** {3 Reference} *)
