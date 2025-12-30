@@ -390,13 +390,13 @@ end
 module Polymorphic
     (P: sig
        include Type.Polymorphic_input
-       val mk_equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
-       val mk_compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
-       val mk_hash: ('a -> int) -> 'a t -> int
+       val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
+       val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
+       val hash: ('a -> int) -> 'a t -> int
        val map: ('a -> 'b) -> 'a t -> 'b t
-       val mk_pretty:
+       val pretty:
          (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
-       val mk_mem_project:
+       val mem_project:
          ((Project_skeleton.t -> bool) -> 'a -> bool) ->
          (Project_skeleton.t -> bool) -> 'a t -> bool
      end) :
@@ -417,17 +417,17 @@ end
 module Polymorphic2
     (P: sig
        include Type.Polymorphic2_input
-       val mk_equal:
+       val equal:
          ('a -> 'a -> bool) -> ('b -> 'b -> bool) -> ('a, 'b) t -> ('a, 'b) t ->
          bool
-       val mk_compare:
+       val compare:
          ('a -> 'a -> int) -> ('b -> 'b -> int) -> ('a, 'b) t -> ('a, 'b) t -> int
-       val mk_hash: ('a -> int) -> ('b -> int) -> ('a, 'b) t -> int
+       val hash: ('a -> int) -> ('b -> int) -> ('a, 'b) t -> int
        val map: ('a -> 'b) -> ('c -> 'd) -> ('a, 'c) t -> ('b, 'd) t
-       val mk_pretty:
+       val pretty:
          (Format.formatter -> 'a -> unit) -> (Format.formatter -> 'b -> unit) ->
          Format.formatter -> ('a, 'b) t -> unit
-       val mk_mem_project:
+       val mem_project:
          ((Project_skeleton.t -> bool) -> 'a -> bool) ->
          ((Project_skeleton.t -> bool) -> 'b -> bool) ->
          (Project_skeleton.t -> bool) -> ('a, 'b) t -> bool
@@ -450,23 +450,23 @@ end
 module Polymorphic3
     (P: sig
        include Type.Polymorphic3_input
-       val mk_equal:
+       val equal:
          ('a -> 'a -> bool) -> ('b -> 'b -> bool) -> ('c -> 'c -> bool) ->
          ('a, 'b, 'c) t -> ('a, 'b, 'c) t ->
          bool
-       val mk_compare:
+       val compare:
          ('a -> 'a -> int) -> ('b -> 'b -> int) -> ('c -> 'c -> int) ->
          ('a, 'b, 'c) t -> ('a, 'b, 'c) t -> int
-       val mk_hash:
+       val hash:
          ('a -> int) -> ('b -> int) -> ('c -> int) -> ('a, 'b, 'c) t -> int
        val map:
          ('a -> 'b) -> ('c -> 'd) -> ('e -> 'f) -> ('a, 'c, 'e) t -> ('b, 'd, 'f) t
-       val mk_pretty:
+       val pretty:
          (Format.formatter -> 'a -> unit) ->
          (Format.formatter -> 'b -> unit) ->
          (Format.formatter -> 'c -> unit) ->
          Format.formatter -> ('a, 'b, 'c) t -> unit
-       val mk_mem_project:
+       val mem_project:
          ((Project_skeleton.t -> bool) -> 'a -> bool) ->
          ((Project_skeleton.t -> bool) -> 'b -> bool) ->
          ((Project_skeleton.t -> bool) -> 'c -> bool) ->
@@ -491,28 +491,28 @@ end
 module Polymorphic4
     (P: sig
        include Type.Polymorphic4_input
-       val mk_equal:
+       val equal:
          ('a -> 'a -> bool) -> ('b -> 'b -> bool) ->
          ('c -> 'c -> bool) -> ('d -> 'd -> bool) ->
          ('a, 'b, 'c, 'd) t -> ('a, 'b, 'c, 'd) t ->
          bool
-       val mk_compare:
+       val compare:
          ('a -> 'a -> int) -> ('b -> 'b -> int) ->
          ('c -> 'c -> int) -> ('d -> 'd -> int) ->
          ('a, 'b, 'c, 'd) t -> ('a, 'b, 'c, 'd) t -> int
-       val mk_hash:
+       val hash:
          ('a -> int) -> ('b -> int) -> ('c -> int) -> ('d -> int) ->
          ('a, 'b, 'c, 'd) t -> int
        val map:
          ('a -> 'b) -> ('c -> 'd) -> ('e -> 'f) -> ('g -> 'h) ->
          ('a, 'c, 'e, 'g) t -> ('b, 'd, 'f, 'h) t
-       val mk_pretty:
+       val pretty:
          (Format.formatter -> 'a -> unit) ->
          (Format.formatter -> 'b -> unit) ->
          (Format.formatter -> 'c -> unit) ->
          (Format.formatter -> 'd -> unit) ->
          Format.formatter -> ('a, 'b, 'c, 'd) t -> unit
-       val mk_mem_project:
+       val mem_project:
          ((Project_skeleton.t -> bool) -> 'a -> bool) ->
          ((Project_skeleton.t -> bool) -> 'b -> bool) ->
          ((Project_skeleton.t -> bool) -> 'c -> bool) ->

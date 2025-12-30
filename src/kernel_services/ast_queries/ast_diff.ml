@@ -26,28 +26,28 @@ struct
   let name a = Type.name a ^ " correspondence"
   let structural_descr _ = Structural_descr.t_abstract
   let reprs x = [ `Not_present; `Same x]
-  let mk_equal eq x y =
+  let equal eq x y =
     match x,y with
     | `Same x, `Same y -> eq x y
     | `Not_present, `Not_present -> true
     | `Same _, `Not_present
     | `Not_present, `Same _ -> false
-  let mk_compare cmp x y =
+  let compare cmp x y =
     match x,y with
     | `Not_present, `Not_present -> 0
     | `Not_present, `Same _ -> -1
     | `Same x, `Same y -> cmp x y
     | `Same _, `Not_present -> 1
-  let mk_hash h = function
+  let hash h = function
     | `Same x -> 117 * h x
     | `Not_present -> 43
   let map f = function
     | `Same x -> `Same (f x)
     | `Not_present -> `Not_present
-  let mk_pretty pp fmt = function
+  let pretty pp fmt = function
     | `Not_present -> Format.pp_print_string fmt "N/A"
     | `Same x -> Format.fprintf fmt " => %a" pp x
-  let mk_mem_project mem query = function
+  let mem_project mem query = function
     | `Not_present -> false
     | `Same x -> mem query x
 end
@@ -107,14 +107,14 @@ struct
   let name a = Type.name a ^ " code_correspondence"
   let structural_descr _ = Structural_descr.t_abstract
   let reprs = Correspondence_input.reprs
-  let mk_equal eq x y =
+  let equal eq x y =
     match x,y with
     | `Partial(x,pc), `Partial(x',pc') -> eq x x' && (compare_pc pc pc' = 0)
     | `Partial _, _ | _, `Partial _ -> false
     | (#correspondence as c), (#correspondence as c') ->
-      Correspondence_input.mk_equal eq c c'
+      Correspondence_input.equal eq c c'
 
-  let mk_compare cmp x y =
+  let compare cmp x y =
     match x,y with
     | `Partial(x,pc), `Partial(x',pc') ->
       cmp x x' <=> (compare_pc,pc,pc')
@@ -123,24 +123,24 @@ struct
     | `Partial _, `Not_present -> 1
     | `Not_present, `Partial _ -> -1
     | (#correspondence as c), (#correspondence as c') ->
-      Correspondence_input.mk_compare cmp c c'
+      Correspondence_input.compare cmp c c'
 
-  let mk_hash hash = function
+  let hash hash = function
     | `Partial (x,_) -> 57 * hash x
-    | #correspondence as x -> Correspondence_input.mk_hash hash x
+    | #correspondence as x -> Correspondence_input.hash hash x
 
   let map f = function
     | `Partial(x,pc) -> `Partial(f x,pc)
     | (#correspondence as x) -> Correspondence_input.map f x
 
-  let mk_pretty pp fmt = function
+  let pretty pp fmt = function
     | `Partial(x,flags) ->
       Format.fprintf fmt "-> %a %a" pp x pretty_pc flags
-    | #correspondence as x -> Correspondence_input.mk_pretty pp fmt x
+    | #correspondence as x -> Correspondence_input.pretty pp fmt x
 
-  let mk_mem_project f p = function
+  let mem_project f p = function
     | `Partial (x,_) -> f p x
-    | #correspondence as x -> Correspondence_input.mk_mem_project f p x
+    | #correspondence as x -> Correspondence_input.mem_project f p x
 end
 
 module Code_correspondence = Datatype.Polymorphic(Code_correspondence_input)
