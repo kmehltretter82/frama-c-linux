@@ -112,7 +112,7 @@ struct
 
     let pretty fmt m =
       Pretty_utils.pp_iter ~pre:"@[<v>" ~sep:"@ " ~suf:"@]"
-        (Extlib.iter_uncurry2 iter)
+        (fun f -> iter (fun base offset -> f (base, offset)))
         (fun fmt (base, offs) ->
            let typ = Base.typeof base in
            Format.fprintf fmt "@[%a@[%a@]@]" Base.pretty base

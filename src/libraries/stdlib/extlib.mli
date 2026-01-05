@@ -54,6 +54,7 @@ val uncurry: ('a -> 'b -> 'c) -> ('a * 'b) -> 'c
 val iter_uncurry2:
   (('a -> 'b -> unit) -> 'c -> unit) ->
   (('a * 'b -> unit) -> 'c -> unit)
+[@@deprecated "This function will be removed after the next release."]
 
 (* ************************************************************************* *)
 (** {2 Tuples} *)
