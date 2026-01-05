@@ -1,5 +1,5 @@
 open Cil_types
-open Extlib
+open Fun.Operators
 
 let loc = Cil_datatype.Location.dummy
 

@@ -19,7 +19,7 @@
  * definitions in the source files.  It effectively acts like a linker,
  * but at the source code level instead of the object code level. *)
 
-open Extlib
+open Fun.Operators
 open Cil_types
 open Cil
 module H = Hashtbl

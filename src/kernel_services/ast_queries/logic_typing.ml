@@ -15,7 +15,7 @@ open Logic_utils
 
 exception Backtrack
 
-let ($) = Extlib.($)
+let ($) = Fun.compose
 
 let loc_join (b,_) (_,e) = (b,e)
 let unescape s = Logic_lexer.chr (Lexing.from_string s)

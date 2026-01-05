@@ -578,7 +578,7 @@ module Base_checker = struct
         List.iter vextend b.b_extended;
         let old_labels = logic_labels in
         logic_labels <- Logic_const.post_label :: logic_labels;
-        List.iter Extlib.(vpred $ snd) b.b_post_cond;
+        List.iter (Fun.compose vpred snd) b.b_post_cond;
         ignore Visitor.(visitFramacAssigns (self:>frama_c_visitor) b.b_assigns);
         ignore
           Visitor.(visitFramacAllocation (self:>frama_c_visitor) b.b_allocation);

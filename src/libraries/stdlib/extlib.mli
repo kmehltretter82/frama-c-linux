@@ -47,6 +47,8 @@ val mk_fun: string -> ('a -> 'b) ref
 (* ************************************************************************* *)
 
 val ($) : ('b -> 'c) -> ('a -> 'b) -> 'a -> 'c
+[@@deprecated "Use Fun.compose instead."]
+[@@migrate { repl = Fun.compose } ]
 (** Composition. *)
 
 val uncurry: ('a -> 'b -> 'c) -> ('a * 'b) -> 'c

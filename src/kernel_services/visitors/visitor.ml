@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Extlib
+open Fun.Operators
 open Cil
 open Cil_types
 

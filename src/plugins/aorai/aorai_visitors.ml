@@ -9,7 +9,7 @@
 (******************************************************************************)
 
 open Automaton_ast
-open Extlib
+open Fun.Operators
 open Logic_const
 open Cil_types
 open Cil
