@@ -18,7 +18,6 @@
   R0003: ---A 64b ;
   R0004: -R-- q (int *) 64b (*R0003) ;
   R0005: -R-- k (int) 32b ;
-  R0006: ---- 0b ;
 [region] Function modify_result:
   R0001: -R-- q (int *) 64b (*R0002) ;
   R0002: ---A 64b ;

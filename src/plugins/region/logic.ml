@@ -54,7 +54,7 @@ let add_region (m: map) (r : Spec.region) =
 type env = {
   map : map ;
   result : node option ;
-  formal : domain Varinfo.Map.t ;
+  formals : domain Varinfo.Map.t ;
   property : Property.t ;
 }
 
@@ -73,27 +73,29 @@ type lv_value =
 
 let logic_var env lv =
   match lv.lv_origin with
-  | None -> VAL (Memory.add_logic_var env.map lv)
+  | None -> VAL (Memory.add_lvar env.map lv)
   | Some x ->
     if x.vformal then
-      try VAL (Varinfo.Map.find x env.formal) with Not_found -> VAR x
+      try VAL (Varinfo.Map.find x env.formals) with Not_found -> VAR x
     else VAR x
 
-let rec load env lv (ty:typ) r : domain =
+
+(* Load a complete value at l-value lv which has type ty and lives in region r *)
+let rec load env lv (ty,r) : domain =
   match Ast_types.unroll_node ty with
   | TArray(te,_) ->
-    let r' = Memory.add_index r ty in
+    let re = Memory.add_index r ty in
     let ofs = TIndex (Logic_const.trange (None,None), TNoOffset) in
-    let lv = Logic_const.addTermOffsetLval ofs lv in
-    array (load env lv te r')
+    let lve = Logic_const.addTermOffsetLval ofs lv in
+    array (load env lve (te,re))
   | TComp { cfields } ->
     let add_field d fd =
       let ofs = TField (fd,TNoOffset) in
-      let lv = Logic_const.addTermOffsetLval ofs lv in
+      let lvf = Logic_const.addTermOffsetLval ofs lv in
       merge_domain d
       @@ Ldomain.field fd
-      @@ load env lv fd.ftype
-      @@ Memory.add_field r fd
+      @@ load env lvf
+      @@ (fd.ftype, Memory.add_field r fd)
     in List.fold_left add_field pure @@ Option.value ~default:[] cfields
   | _ ->
     let acs = Access.Term (env.property, lv) in
@@ -103,7 +105,7 @@ let rec load env lv (ty:typ) r : domain =
 let rterm = ref (fun _ _ -> assert false)
 
 let rec addr_offset (env:env) (ty:typ) (r:node) = function
-  | TNoOffset -> r
+  | TNoOffset -> ty,r
   | TModel _ -> Options.not_yet_implemented "Model field"
   | TField (f,offset) ->
     addr_offset env f.ftype (Memory.add_field r f) offset
@@ -121,42 +123,46 @@ let rec term_offset (env:env) (d:domain) = function
     ignore @@ !rterm env k ;
     term_offset env (Ldomain.get_index merge d) offset
 
-let get_result env = match env.result with
-  | None -> Memory.add_result env.map
-  | Some r -> r
-
-let add_term_lval (env:env) lv =
-  let (lhost,loffset) = lv in
-  let lvh = (lhost,TNoOffset) in
+let add_term_lval (env:env) (lv : term_lval) : domain =
+  let lhost, loffset = lv in
   match lhost with
-  | TResult ty ->
-    load env lvh ty @@ addr_offset env ty (get_result env) loffset
   | TMem e ->
     let rh = pointer (!rterm env e) in
     let te = Logic_typing.ctype_of_pointed e.term_type in
-    load env lvh te @@ addr_offset env te rh loffset
+    load env lv @@ addr_offset env te rh loffset
+  | TResult ty ->
+    begin match env.result with
+      | None -> Options.fatal "\\result undefined" ;
+      | Some node ->
+        load env lv @@ addr_offset env ty node loffset
+    end
   | TVar v ->
     begin match logic_var env v with
       | VAL d -> term_offset env d loffset
       | VAR x ->
-        let rh = Memory.add_cvar env.map x in
-        load env lvh x.vtype @@ addr_offset env x.vtype rh loffset
+        let r = Memory.add_cvar env.map x in
+        load env lv @@ addr_offset env x.vtype r loffset
     end
 
-let add_addr_lval (env:env) (lhost,loffset) : node =
+let add_addr_lval (env:env) (lv : term_lval) : typ * node =
+  let lhost, loffset = lv in
   match lhost with
-  | TResult ty -> addr_offset env ty (get_result env) loffset
   | TMem e ->
     let rh = pointer (!rterm env e) in
     let te = Logic_typing.ctype_of_pointed e.term_type in
     addr_offset env te rh loffset
-  | TVar lv ->
-    begin match logic_var env lv with
-      | VAL d ->
-        let te = Logic_utils.logicCType lv.lv_type in
-        addr_offset env te (pointer d) loffset
+  | TResult ty ->
+    begin match env.result with
+      | None -> Options.fatal "\\result undefined" ;
+      | Some node -> addr_offset env ty node loffset
+    end
+  | TVar v ->
+    begin match logic_var env v with
+      | VAL _ ->
+        Options.fatal "address of logic value (%a)" Printer.pp_term_lval lv ;
       | VAR x ->
-        addr_offset env x.vtype (Memory.add_cvar env.map x) loffset
+        let r = Memory.add_cvar env.map x in
+        addr_offset env x.vtype r loffset
     end
 
 let rec add_loffset (env:env) loffest d = match loffest with
@@ -168,16 +174,15 @@ let rec add_loffset (env:env) loffest d = match loffest with
 let call (env:env) (l:logic_info) (ds:domain list) : domain =
   let sigma = ref Ldomain.empty in
   let unify = Ldomain.unify merge sigma in
-  List.iter2 (fun x -> unify (Memory.add_logic_var env.map x)) l.l_profile ds ;
-  Ldomain.subst !sigma @@ Memory.add_logic_info env.map l
+  List.iter2 (fun x -> unify (Memory.add_lvar env.map x)) l.l_profile ds ;
+  Ldomain.subst !sigma @@ Memory.add_logic env.map l
 
-let iadd_logic_var m v = ignore @@ add_logic_var m v
+let iadd_logic_var m v = ignore @@ add_lvar m v
 
-let rec add_term (env:env) (t:term) : domain = match t.term_node with
-  | TConst _  | TSizeOf _ | TSizeOfE _ | TAlignOf _ | TAlignOfE _
-  | Tnull | Tempty_set | Ttypeof _ | Ttype _  | Trange _ -> pure
+let rec add_term (env:env) (t:term) : domain =
+  match t.term_node with
   | TLval lval -> add_term_lval env lval
-  | TAddrOf lval | TStartOf lval -> ptr @@ add_addr_lval env lval
+  | TAddrOf lval | TStartOf lval -> ptr @@ snd @@ add_addr_lval env lval
   | Tif (b,ct,cf) ->
     iadd_term env b ;
     let dt = add_term env ct in
@@ -201,11 +206,11 @@ let rec add_term (env:env) (t:term) : domain = match t.term_node with
     add_term env t
   | Tapp(f,_,ts) -> call env f @@ List.map (add_term env) ts
   | Tlambda(q,t) ->
-    Ldomain.arrow (List.map (Memory.add_logic_var env.map) q) @@ add_term env t
+    Ldomain.arrow (List.map (Memory.add_lvar env.map) q) @@ add_term env t
   | Tlet({ l_body ; l_var_info=v },b) ->
     begin match l_body with
       | LBterm a ->
-        let dv = add_logic_var env.map v in
+        let dv = add_lvar env.map v in
         let da = add_term env a in
         let sigma = ref Ldomain.empty in
         Ldomain.unify merge sigma da dv ;
@@ -221,9 +226,12 @@ let rec add_term (env:env) (t:term) : domain = match t.term_node with
     let args = List.map (of_ltype (fresh env)) c.ctor_params in
     let sigma = ref Ldomain.empty in
     List.iter2 (unify merge sigma) ds args ;
-    match c.ctor_type.lt_def with
-    | Some (LTsyn lt) -> of_ltype (fresh env) lt
-    | None | Some (LTsum _) -> pure
+    begin match c.ctor_type.lt_def with
+      | Some (LTsyn lt) -> of_ltype (fresh env) lt
+      | None | Some (LTsum _) -> pure
+    end
+  | TConst _  | TSizeOf _ | TSizeOfE _ | TAlignOf _ | TAlignOfE _
+  | Tnull | Tempty_set | Ttypeof _ | Ttype _  | Trange _ -> pure
 
 and iadd_term env t = ignore @@ add_term env t
 
@@ -247,7 +255,7 @@ and add_predicate (env:env) (p:predicate) = match p.pred_content with
   | Pforall (q,p) | Pexists (q,p) ->
     List.iter (iadd_logic_var env.map) q ; add_predicate env p
   | Plet({ l_var_info = v ; l_body = LBterm t ; },p2) ->
-    let dv = add_logic_var env.map v in
+    let dv = add_lvar env.map v in
     let dt = add_term env t in
     let sigma = ref empty in
     Ldomain.unify merge sigma dt dv ;

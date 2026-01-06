@@ -76,8 +76,8 @@ val iter : map -> (node -> unit) -> unit
 
 val fresh : map -> node
 val add_cvar : map -> Cil_types.varinfo -> node
-val add_logic_var : map -> Cil_types.logic_var -> domain
-val add_logic_info : map -> Cil_types.logic_info -> domain
+val add_lvar : map -> Cil_types.logic_var -> domain
+val add_logic : map -> Cil_types.logic_info -> domain
 val add_result : map -> node
 val add_label : map -> string -> node
 val add_field : node -> fieldinfo -> node
@@ -99,7 +99,7 @@ val merge_domain : domain -> domain -> domain
 
 val cvar : map -> varinfo -> node
 val lvar : map -> logic_var -> domain
-val logic_info : map -> logic_info -> domain
+val logic : map -> logic_info -> domain
 val field : node -> fieldinfo -> node
 val index : node -> typ -> node
 val lval : map -> lval -> node

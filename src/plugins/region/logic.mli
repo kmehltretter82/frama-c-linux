@@ -17,11 +17,11 @@ val add_region : map -> Spec.region -> unit
 type env = {
   map : map ;
   result : node option ;
-  formal : domain Varinfo.Map.t ;
+  formals : domain Varinfo.Map.t ;
   property : Property.t ;
 }
 
-val add_addr_lval : env -> term_lval -> node
+val add_addr_lval : env -> term_lval -> typ * node
 val add_term_lval : env -> term_lval -> domain
 val add_term      : env -> term      -> domain
 val add_predicate : env -> predicate -> unit

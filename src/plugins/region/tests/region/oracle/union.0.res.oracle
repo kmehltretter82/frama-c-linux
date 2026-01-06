@@ -3,4 +3,3 @@
 [region] Function f:
   R0001: -R-- p (union U *) 64b (*R0002) ;
   R0002: -RW- (int) (short) 16b ;
-  R0003: ---- 0b ;

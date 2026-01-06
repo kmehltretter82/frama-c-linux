@@ -12,10 +12,14 @@ open Memory
 
 val add_behavior :
   kf:kernel_function -> ki:kinstr ->
-  ?formal:domain Cil_datatype.Varinfo.Map.t -> result:node option ->
-  iscalled:bool -> map -> funbehavior -> unit
+  formals:domain Cil_datatype.Varinfo.Map.t ->
+  result:node option ->
+  iscalled:bool ->
+  map -> funbehavior -> unit
 
 val add_code_annot :
   kf:kernel_function -> stmt:stmt ->
-  ?formal:domain Cil_datatype.Varinfo.Map.t -> result:node option ->
-  iscalled:bool -> map -> code_annotation -> unit
+  formals:domain Cil_datatype.Varinfo.Map.t ->
+  result:node option ->
+  iscalled:bool ->
+  map -> code_annotation -> unit

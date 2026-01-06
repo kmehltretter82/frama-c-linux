@@ -13,7 +13,8 @@ module Vset = Varinfo.Set
 module Lmap = Map.Make(String)
 module Lset = Set.Make(String)
 module LVmap = Logic_var.Map
-module LVImap = Logic_info.Map
+module Fmap = Logic_info.Map
+
 (* -------------------------------------------------------------------------- *)
 (* --- Region Maps                                                        --- *)
 (* -------------------------------------------------------------------------- *)
@@ -59,7 +60,7 @@ type map = {
   mutable labels: node Lmap.t ;
   mutable cvars: node Vmap.t ;
   mutable lvars: domain LVmap.t ;
-  mutable logics: domain LVImap.t ;
+  mutable logics: domain Fmap.t ;
   mutable result: node option ;
 }
 
@@ -95,7 +96,7 @@ let create () = {
   cvars = Vmap.empty ;
   labels = Lmap.empty ;
   lvars = LVmap.empty ;
-  logics = LVImap.empty ;
+  logics = Fmap.empty ;
   result = None;
 }
 
@@ -211,17 +212,17 @@ let add_cvar (m: map) v =
     update n (fun d -> { d with ccvars = Vset.singleton v }) ;
     m.cvars <- Vmap.add v n m.cvars ; n
 
-let add_logic_info (m: map) f =
-  try LVImap.find f m.logics with Not_found ->
-    let get_type t = Ldomain.of_ltype (new_chunk m.store) t in
-    let d = Option.fold ~none:Ldomain.pure ~some:get_type f.l_type in
-    m.logics <- LVImap.add f d m.logics ; d
-
-let add_logic_var (m: map) lv =
+let add_lvar (m: map) lv =
   try LVmap.find lv m.lvars with Not_found ->
     assert (lv.lv_origin = None);
     let d = Ldomain.of_ltype (new_chunk m.store) lv.lv_type in
     m.lvars <- LVmap.add lv d m.lvars ; d
+
+let add_logic (m: map) f =
+  try Fmap.find f m.logics with Not_found ->
+    let get_type t = Ldomain.of_ltype (new_chunk m.store) t in
+    let d = Option.fold ~none:Ldomain.pure ~some:get_type f.l_type in
+    m.logics <- Fmap.add f d m.logics ; d
 
 let add_result (m: map) =
   let result = match m.result with
@@ -250,7 +251,7 @@ let rec walk (f: node -> bool) n =
 let witer (m:map) (f: node -> bool) =
   Vmap.iter   (fun _x n -> walk f n) m.cvars ;
   LVmap.iter  (fun _ -> Ldomain.iter (walk f)) m.lvars ;
-  LVImap.iter (fun _ -> Ldomain.iter (walk f)) m.logics ;
+  Fmap.iter (fun _ -> Ldomain.iter (walk f)) m.logics ;
   Option.iter (walk f) m.result
 
 let once (f : node -> unit) : node -> bool =
@@ -470,7 +471,7 @@ let points_to (r : node) : node option =
 let pointed_by (r : node) = UF.find_all (UF.get r).cpointed
 let cvar (m: map) (v: varinfo) : node = UF.find @@ Vmap.find v m.cvars
 let lvar (m: map) (v: logic_var) = LVmap.find v m.lvars
-let logic_info (m: map) (l: logic_info) = LVImap.find l m.logics
+let logic (m: map) (l: logic_info) = Fmap.find l m.logics
 
 let rec move (r: node) (p: int) (s: int) =
   match (UF.get r).clayout with

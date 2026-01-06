@@ -10,6 +10,8 @@ open Cil_types
 open Cil_datatype
 open Memory
 
+module Vmap = Varinfo.Map
+
 (* -------------------------------------------------------------------------- *)
 (* ---  L-Values & Expressions                                            --- *)
 (* -------------------------------------------------------------------------- *)
@@ -125,11 +127,11 @@ let add_kf_call ~kf ~stmt map ?property ~result args kfct =
         match property with
         | Some p -> p
         | None -> Property.ip_of_behavior kf ki ~active:[] bhv in
-      let env = Logic.{ map ; formal = Vmap.empty ; property ; result } in
+      let env = Logic.{ map ; formals = Vmap.empty ; property ; result } in
       let d = Logic.add_term env @@ Logic_utils.expr_to_term e in
       Vmap.add arg d formal in
-    let formal = List.fold_left2 add_formal Vmap.empty args fargs in
-    Annot.add_behavior ~iscalled:true ~kf ~ki ~formal ~result map bhv
+    let formals = List.fold_left2 add_formal Vmap.empty args fargs in
+    Annot.add_behavior ~iscalled:true ~kf ~ki ~formals ~result map bhv
   in List.iter add_called_behavior funspec.spec_behavior
 
 let add_call ~kf ~stmt map ~result fct (args: exp list) =
@@ -149,82 +151,87 @@ let add_function (m:map) (s:stmt) (f:lhost) =
   | Var _vf -> ()
   | Mem e -> add_value m s e
 
-let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
+let add_instr ~kf ~stmt (m:map) (instr:instr) =
   match instr with
   | Skip _ -> ()
   | Code_annot (annot,_) ->
-    Annot.add_code_annot ~iscalled:false ~kf ~stmt:s ~result:None m annot
+    Annot.add_code_annot ~iscalled:false ~kf ~stmt ~formals:Vmap.empty ~result:None m annot
 
   | Set(lv,e,_) ->
-    let r = add_lval m s lv in
-    add_write ~map:m ~stmt:s ~acs:(Lval(s,lv)) r e ;
+    let r = add_lval m stmt lv in
+    add_write ~map:m ~stmt:stmt ~acs:(Lval(stmt,lv)) r e ;
 
   | Local_init(x,AssignInit iv,_) ->
-    let acs = Access.Init(s,x) in
-    add_init m s acs (Var x,NoOffset) iv
+    let acs = Access.Init(stmt,x) in
+    add_init m stmt acs (Var x,NoOffset) iv
 
   | Local_init(x,ConsInit (vf,args,kind), loc) ->
     let r = add_cvar m x in
-    Memory.add_init r (Lval (s,Cil.var x)) ;
+    Memory.add_init r (Lval (stmt,Cil.var x)) ;
     Cil.treat_constructor_as_func
       begin fun _res fct args _loc ->
-        add_function m s fct;
-        List.iter (add_value m s) args ;
-        add_call ~kf ~stmt:s m ~result:(Some r) fct args
+        add_function m stmt fct;
+        List.iter (add_value m stmt) args ;
+        add_call ~kf ~stmt:stmt m ~result:(Some r) fct args
       end x vf args kind loc
 
   | Call(lr,f,es,_) ->
-    add_function m s f;
-    List.iter (add_value m s) es ;
+    add_function m stmt f;
+    List.iter (add_value m stmt) es ;
     let result = Option.map
         (fun lv ->
-           let r = add_lval m s lv in
-           Memory.add_write r (Lval(s,lv)) ; r
+           let r = add_lval m stmt lv in
+           Memory.add_write r (Lval(stmt,lv)) ; r
         ) lr
-    in add_call ~kf ~stmt:s m ~result f es
+    in add_call ~kf ~stmt:stmt m ~result f es
 
   | Asm _ ->
-    Options.warning ~source:(fst @@ Stmt.loc s)
+    Options.warning ~source:(fst @@ Stmt.loc stmt)
       "Inline assembly not supported (ignored)"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Statements                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rec add_stmt ~kf (m:map) (s:stmt) =
-  let add_block = add_block ~kf in
-  let add_annot =
-    Annot.add_code_annot ~iscalled:false ~kf ~stmt:s ~result:None m in
-  List.iter add_annot @@ Annotations.code_annot s ;
-  match s.skind with
-  | Instr ki -> add_instr ~kf m s ki ;
+let add_code_annot ~kf ~stmt map =
+  Annot.add_code_annot ~kf ~stmt
+    ~iscalled:false
+    ~formals:Vmap.empty
+    ~result:None map
+
+let rec add_stmt ~kf map stmt =
+  List.iter (add_code_annot ~kf ~stmt map) @@ Annotations.code_annot stmt ;
+  match stmt.skind with
+  | Instr instr -> add_instr ~kf ~stmt map instr ;
+  | Return(None,_) -> ()
   | Return(Some e,_) ->
-    add_write ~map:m ~stmt:s ~acs:(Exp(s,e)) (Memory.add_result m) e ;
-  | Return(None,_) -> ignore @@ Memory.add_result m ;
+    add_write ~map ~stmt ~acs:(Exp(stmt,e)) (Memory.add_result map) e
   | Goto _ | Break _ | Continue _ -> ()
-  | If(e,st,se,_) ->
-    add_value m s e ;
-    add_block m st ;
-    add_block m se ;
+  | If(e,sthen,selse,_) ->
+    add_value map stmt e ;
+    add_block ~kf map sthen ;
+    add_block ~kf map selse ;
   | Switch(e,b,_,_) ->
-    add_value m s e ;
-    add_block m b ;
-  | Block b -> add_block m b
-  | Loop(annots,b,_,_,_) -> List.iter add_annot annots ; add_block m b
+    add_value map stmt e ;
+    add_block ~kf map b ;
+  | Block b -> add_block ~kf map b
+  | Loop(annots,b,_,_,_) ->
+    List.iter (add_code_annot ~kf ~stmt map) annots ;
+    add_block ~kf map b
   | UnspecifiedSequence s ->
-    add_block m @@ Cil.block_from_unspecified_sequence s
-  | Throw(exn,_) -> Option.iter (fun (e,_) -> add_value  m s e) exn
+    add_block ~kf map @@ Cil.block_from_unspecified_sequence s
+  | Throw(exn,_) -> Option.iter (fun (e,_) -> add_value map stmt e) exn
   | TryCatch(b,hs,_)  ->
-    add_block m b ;
-    List.iter (fun (c,b) -> add_catch ~kf m c ; add_block m b) hs ;
+    add_block ~kf map b ;
+    List.iter (fun (c,b) -> add_catch ~kf map c ; add_block ~kf map b) hs
   | TryExcept(a,(ks,e),b,_) ->
-    add_block m a ;
-    List.iter (add_instr ~kf m s) ks ;
-    add_value  m s e ;
-    add_block m b ;
+    add_block ~kf map a ;
+    List.iter (add_instr ~kf ~stmt map) ks ;
+    add_value map stmt e ;
+    add_block ~kf map b ;
   | TryFinally(a,b,_) ->
-    add_block m a ;
-    add_block m b ;
+    add_block ~kf map a ;
+    add_block ~kf map b ;
 
 and add_catch ~kf (m:map) (c:catch_binder) =
   match c with
@@ -238,15 +245,20 @@ and add_block ~kf (m:map) (b:block) =
 (* --- Behavior                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let add_bhv ~kf:_ ~result:_ (m:map) (bhv:behavior) =
+let add_bhv ~kf map (bhv:behavior) =
   List.iter
     (fun e ->
        let rs = Spec.of_extension e in
        if rs <> [] then
          begin
-           List.iter (Logic.add_region m) rs ;
+           List.iter (Logic.add_region map) rs ;
          end
-    ) bhv.b_extended
+    ) bhv.b_extended ;
+  let result =
+    if Kernel_function.returns_void kf then None else
+      Some (Memory.add_result map) in
+  Annot.add_behavior ~kf ~ki:Kglobal
+    ~iscalled:false ~formals:Vmap.empty ~result map bhv
 
 (* -------------------------------------------------------------------------- *)
 (* --- Function                                                           --- *)
@@ -259,10 +271,7 @@ let domain kf =
   begin
     try
       let funspec = Annotations.funspec kf in
-      List.iter (add_bhv ~kf ~result m) funspec.spec_behavior ;
-      let ki = Kinstr.kinstr_of_opt_stmt None in
-      List.iter (Annot.add_behavior ~iscalled:false ~kf ~ki ~result:None m)
-        funspec.spec_behavior ;
+      List.iter (add_bhv ~kf m) funspec.spec_behavior ;
     with Annotations.No_funspec _ -> ()
   end ;
   begin
