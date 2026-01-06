@@ -51,11 +51,9 @@ let add_region (m: map) (r : Spec.region) =
 (* ---  Process ACSL logic terms & predicates                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-type result = node option
-
 type env = {
   map : map ;
-  result : result ;
+  result : node option ;
   formal : domain Varinfo.Map.t ;
   property : Property.t ;
 }
@@ -164,7 +162,7 @@ let add_addr_lval (env:env) (lhost,loffset) : node =
 let rec add_loffset (env:env) loffest d = match loffest with
   | TNoOffset -> d
   | TField(fd,offset) -> Ldomain.field fd @@ add_loffset env offset d
-  | TModel _ -> Options.abort "Region.Logic.add_loffset: TModel not implemented"
+  | TModel _ -> Options.not_yet_implemented "Model field"
   | TIndex(_,offset) -> Ldomain.array @@ add_loffset env offset d
 
 let call (env:env) (l:logic_info) (ds:domain list) : domain =
@@ -232,7 +230,9 @@ and iadd_term env t = ignore @@ add_term env t
 and add_predicate (env:env) (p:predicate) = match p.pred_content with
   | Pfalse | Ptrue -> ()
   | Pseparated ts -> List.iter (iadd_term env) ts
-  | Prel(_,t1,t2) | Pfresh(_,_,t1,t2) -> iadd_term env t1 ; iadd_term env t2
+  | Prel(_,t1,t2) | Pfresh(_,_,t1,t2) ->
+    iadd_term env t1 ;
+    iadd_term env t2 ;
   | Pand(p1,p2) | Por(p1,p2) | Pxor(p1,p2) | Piff(p1,p2) | Pimplies(p1,p2) ->
     add_predicate env p1 ;
     add_predicate env p2 ;
@@ -259,7 +259,8 @@ and add_predicate (env:env) (p:predicate) = match p.pred_content with
   | Plet({ l_body = LBnone ; },p2) ->
     add_predicate env p2
   | Plet _ ->
-    Options.abort "Logic.add_predicate: (%a) not yet implemented"
+    Options.abort
+      "Complex let-bindings not yet implemented@ (%a)"
       Printer.pp_predicate p
   | Papp(f,_,ts) -> ignore @@ call env f @@ List.map (add_term env) ts
 
@@ -269,10 +270,14 @@ let () = rterm := add_term
 (* ---  Process ACSL logic                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-let add_logic_info_body (env:env) (l:logic_info) : domain = match l.l_body with
+let add_logic (env:env) (l:logic_info) : domain =
+  match l.l_body with
   | LBnone -> pure
   | LBpred p -> add_predicate env p ; pure
   | LBterm t -> add_term env t
-  | LBreads ts -> List.iter (fun t -> iadd_term env t.it_content) ts ; pure
+  | LBreads ts ->
+    List.iter (fun t -> iadd_term env t.it_content) ts ; pure
   | LBinductive l ->
     List.iter (fun (_,_,_,t) -> add_predicate env t) l ; pure
+
+(* -------------------------------------------------------------------------- *)

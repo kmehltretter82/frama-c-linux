@@ -81,9 +81,8 @@ let rec add_extension ~kf ?stmt ?(formal=Vmap.empty) ~result map acsl =
   in let property = Property.ip_of_extended extended_loc acsl in
   match acsl.ext_kind with
   | Ext_id _ ->
-    if String.compare acsl.ext_plugin "region" != 0
-    || String.compare acsl.ext_name "region" != 0
-    then Options.warning "unhandled extension @[%s@]::@[%s@]@."
+    if acsl.ext_plugin <> "region" then
+      Options.warning "unhandled extension @[%s@]::@[%s@]@."
         acsl.ext_plugin acsl.ext_name
   | Ext_terms ts ->
     let env = { map ; property ; formal ; result } in
@@ -96,12 +95,14 @@ let rec add_extension ~kf ?stmt ?(formal=Vmap.empty) ~result map acsl =
 
 
 let add_behavior ~kf ~ki ?(formal=Vmap.empty) ~result ~iscalled map bhv =
-  List.iter (add_requires ~map ~kf ~ki ~bhv ~formal ~result) bhv.b_requires ;
-  List.iter (add_assumes ~map ~kf ~ki ~bhv ~formal ~result)  bhv.b_assumes  ;
-  add_post_cond ~map ~kf ~ki ~bhv ~formal ~result            bhv.b_post_cond ;
-  add_assigns ~iscalled ~map ~kf ~ki ~bhv ~formal ~result    bhv.b_assigns ;
-  add_allocation ~map ~kf ~ki ~bhv ~formal ~result           bhv.b_allocation ;
-  List.iter (add_extension ~kf ~formal ~result map)          bhv.b_extended
+  begin
+    List.iter (add_requires ~map ~kf ~ki ~bhv ~formal ~result) bhv.b_requires ;
+    List.iter (add_assumes ~map ~kf ~ki ~bhv ~formal ~result) bhv.b_assumes ;
+    add_post_cond ~map ~kf ~ki ~bhv ~formal ~result bhv.b_post_cond ;
+    add_assigns ~iscalled ~map ~kf ~ki ~bhv ~formal ~result bhv.b_assigns ;
+    add_allocation ~map ~kf ~ki ~bhv ~formal ~result bhv.b_allocation ;
+    List.iter (add_extension ~kf ~formal ~result map) bhv.b_extended ;
+  end
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Process Code Annotation                                           --- *)
@@ -125,7 +126,7 @@ let add_spec ~kf ~ki ?(formal=Vmap.empty) ~result ~iscalled (map:map) (s:spec) =
   List.iter (add_behavior ~iscalled ~kf ~ki ~formal ~result map) s.spec_behavior
 
 (* -------------------------------------------------------------------------- *)
-(* ---  Process Function Body                                             --- *)
+(* ---  Process Code Annotations                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
 let add_code_annot ~kf ~stmt ?(formal=Vmap.empty) ~result ~iscalled map c =
