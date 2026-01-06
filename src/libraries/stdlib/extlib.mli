@@ -52,6 +52,8 @@ val ($) : ('b -> 'c) -> ('a -> 'b) -> 'a -> 'c
 (** Composition. *)
 
 val uncurry: ('a -> 'b -> 'c) -> ('a * 'b) -> 'c
+[@@deprecated "Use Fun.uncurry2 instead."]
+[@@migrate { repl = Fun.uncurry2 } ]
 
 val iter_uncurry2:
   (('a -> 'b -> unit) -> 'c -> unit) ->

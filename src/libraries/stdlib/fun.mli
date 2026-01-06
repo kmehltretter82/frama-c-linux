@@ -16,6 +16,9 @@ include module type of Stdlib.Fun
     minimal supported version is OCaml 5.04. *)
 val compose : ('b -> 'c) -> ('a -> 'b) -> 'a -> 'c
 
+(** Uncurry a function of arity-2 *)
+val uncurry2 : ('a -> 'b -> 'c) -> ('a * 'b) -> 'c
+
 module Operators : sig
   (** Function composition. See {!compose}. *)
   val ($) : ('b -> 'c) -> ('a -> 'b) -> 'a -> 'c

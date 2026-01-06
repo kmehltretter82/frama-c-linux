@@ -10,6 +10,8 @@ include Stdlib.Fun
 
 let compose f g x = f (g x)
 
+let uncurry2 f x = f (fst x) (snd x)
+
 module Operators =
 struct
   let ($) = compose
