@@ -7,4 +7,4 @@
   R0004: -R-- q (int *) 64b (*R0003) ;
   R0005: IRW- s (int) 32b ;
   R0006: IRW- k (int) 32b ;
-  R0007: --W- (int) 32b ;
+  R0007: --W- \result (int) 32b ;

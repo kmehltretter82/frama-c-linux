@@ -28,6 +28,7 @@ type 'a nlayout =
 and 'a nchunk = {
   cparents: 'a list ;
   cpointed: 'a list ;
+  cresult: bool ;
   ccvars: Vset.t ;
   clabels: Lset.t ;
   creads: Access.Set.t ;
@@ -104,6 +105,7 @@ let empty = {
   cid = UF.noid ;
   cparents = [] ;
   cpointed = [] ;
+  cresult = false ;
   ccvars = Vset.empty ;
   clabels = Lset.empty ;
   creads = Access.Set.empty ;
@@ -187,7 +189,8 @@ module SNode = Set.Make(struct
 (* --- Chunk Constructors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let new_chunk (store : UF.store) ?parent ?(size=0) ?ptr ?pointed () =
+let new_chunk store ?parent ?(size=0) ?ptr ?pointed ?(result=false) () =
+  let cresult = result in
   let clayout =
     match ptr with
     | None -> if size = 0 then Blob else Cell(size,None)
@@ -196,7 +199,7 @@ let new_chunk (store : UF.store) ?parent ?(size=0) ?ptr ?pointed () =
   in
   let cparents = match parent with None -> [] | Some root -> [root] in
   let cpointed = match pointed with None -> [] | Some ptr -> [ptr] in
-  UF.fresh store { empty with clayout ; cpointed ; cparents }
+  UF.fresh store { empty with cresult ; clayout ; cpointed ; cparents }
 
 let fresh (m: map) = new_chunk m.store ()
 
@@ -225,10 +228,9 @@ let add_logic (m: map) f =
     m.logics <- Fmap.add f d m.logics ; d
 
 let add_result (m: map) =
-  let result = match m.result with
-    | None -> new_chunk m.store ()
-    | Some r -> r
-  in m.result <- Some result ; result
+  match m.result with Some r -> r | None ->
+    let r = new_chunk m.store ~result:true () in
+    m.result <- Some r ; r
 
 let domain_of_typ (m:map) (typ:typ) =
   Ldomain.of_typ (new_chunk m.store) typ
@@ -357,6 +359,7 @@ let merge_chunk s (q:queue) (root:node)
     cparents = UF.find_all2 a.cparents b.cparents ;
     cpointed = UF.find_all2 a.cpointed b.cpointed ;
     clabels = Lset.union a.clabels b.clabels ;
+    cresult = a.cresult || b.cresult ;
     ccvars = Vset.union a.ccvars b.ccvars ;
     creads = Access.Set.union a.creads b.creads ;
     cwrites = Access.Set.union a.cwrites b.cwrites ;
@@ -460,7 +463,7 @@ let add_init (a: node) acs =
   sized a @@ Access.typeof acs
 
 (* -------------------------------------------------------------------------- *)
-(* --- Lookup                                                            ---- *)
+(* --- Expression Lookup                                                 ---- *)
 (* -------------------------------------------------------------------------- *)
 
 let points_to (r : node) : node option =
@@ -632,24 +635,25 @@ let typed (r:node) =
 (* --- High-Level API                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-type root = Root of {
-    label: string ; (* pretty printed root *)
+type cvar = Cvar of {
     cvar : varinfo ;
+    label : string ;
     cells : int ;
   }
 
 type range = Range of {
-    label: string ; (* pretty printed fields *)
-    offset: int ;
-    length: int ;
-    cells: int ;
-    data: node ;
+    label : string ;
+    offset : int ;
+    length : int ;
+    cells : int ;
+    data : node ;
   }
 
 type region = {
   node: node ;
   parents: node list ;
-  cvars: root list ;
+  cresult: bool ;
+  cvars: cvar list ;
   labels: string list ;
   types: typ list ;
   typed : typ option ;
@@ -699,7 +703,7 @@ let pp_range fmt (Range r) =
   Format.fprintf fmt "@ %d..%d: %a%a;"
     r.offset (r.offset + r.length) pp_node r.data pp_cells r.cells
 
-let pp_root fmt (Root r) =
+let pp_cvar fmt (Cvar r) =
   Format.fprintf fmt "%a%a" Varinfo.pretty r.cvar pp_cells r.cells
 
 let pp_region fmt (m: region) =
@@ -709,7 +713,8 @@ let pp_region fmt (m: region) =
       pp_node m.node (acs 'I' m.inits)
       (acs 'R' m.reads) (acs 'W' m.writes) (acs 'A' m.shifts) ;
     List.iter (Format.fprintf fmt "@ %s:") m.labels ;
-    List.iter (Format.fprintf fmt "@ %a" pp_root) m.cvars ;
+    if m.cresult then Format.fprintf fmt "@ \\result" ;
+    List.iter (Format.fprintf fmt "@ %a" pp_cvar) m.cvars ;
     List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) m.types ;
     Format.fprintf fmt "@ %db" m.sizeof ;
     Option.iter (Format.fprintf fmt "@ (*%a)" pp_node) m.pointed ;
@@ -737,10 +742,10 @@ let pp_node fmt n = pp_node fmt n
 (* --- Consolidated Accessors                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let make_root s (v : Cil_types.varinfo) : root =
+let make_cvar s (v : Cil_types.varinfo) : cvar =
   let cells = if s = 0 then 0 else bitsSizeOf v.vtype / s in
   let label = Format.asprintf "%a%a" Varinfo.pretty v pp_cells cells in
-  Root { cvar = v ; cells ; label }
+  Cvar { cvar = v ; cells ; label }
 
 let make_range fields Ranges.{ length ; offset ; data } : range =
   let s = sizeof (UF.get data).clayout in
@@ -763,7 +768,8 @@ let make_region (n: node) (r: chunk) : region =
   {
     node = n ;
     parents = UF.find_all r.cparents ;
-    cvars = List.map (make_root sizeof) @@ Vset.elements r.ccvars ;
+    cresult = r.cresult ;
+    cvars = List.map (make_cvar sizeof) @@ Vset.elements r.ccvars ;
     labels = Lset.elements r.clabels ;
     reads = Access.Set.elements r.creads ;
     writes = Access.Set.elements r.cwrites ;

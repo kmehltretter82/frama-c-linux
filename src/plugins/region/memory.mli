@@ -10,9 +10,9 @@ open Cil_types
 
 type node
 
-type root = Root of {
-    label : string ;
+type cvar = Cvar of {
     cvar : varinfo ;
+    label : string ;
     cells : int ;
   }
 
@@ -27,7 +27,8 @@ type range = Range of {
 type region = {
   node: node ;
   parents: node list ;
-  cvars: root list ;
+  cresult: bool ;
+  cvars: cvar list ;
   labels: string list ;
   types: typ list ;
   typed : typ option ;

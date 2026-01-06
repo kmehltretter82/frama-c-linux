@@ -8,4 +8,4 @@
   R0005: -R-A Q: (int) 32b ;
   R0006: IRW- s (int) 32b ;
   R0007: IRW- k (int) 32b ;
-  R0008: --W- (int) 32b ;
+  R0008: --W- \result (int) 32b ;

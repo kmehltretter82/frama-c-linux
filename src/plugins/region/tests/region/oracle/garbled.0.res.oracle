@@ -6,4 +6,4 @@
   R0003: -R-- q (int *) 64b (*R0004) ;
   R0004: -R-- (int) 32b ;
   R0005: -RW- __retres (float) 32b ;
-  R0006: --W- (float) 32b ;
+  R0006: --W- \result (float) 32b ;
