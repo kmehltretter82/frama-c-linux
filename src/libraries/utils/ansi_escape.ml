@@ -158,29 +158,29 @@ let styles_of_stag = function
   | Style_tag style -> [style]
   | _ -> raise Not_found
 
-let mark_open_stag state default stag =
+let handle_fallback stag = function None -> "" | Some f -> f stag
+
+let mark_open_stag state fallback stag =
   try
     styles_of_stag stag
     |> List.map (open_style state)
     |> String.concat ""
-  with
-    Not_found -> Format.eprintf "not found@."; default stag
+  with Not_found -> handle_fallback stag fallback
 
-let mark_close_stag state default stag =
+let mark_close_stag state fallback stag =
   try
     styles_of_stag stag
     |> List.rev (* states must be popped in reverse order *)
     |> List.map (close_style state)
     |> String.concat ""
-  with
-    Not_found -> default stag
+  with Not_found -> handle_fallback stag fallback
 
 let is_supported () =
   match Sys.getenv "TERM" with
   | exception Not_found | "dumb" | "" -> false
   | _  -> true
 
-let enable_on formatter =
+let enable_on ?(fallback=false) formatter =
   let state = State.init () in
   let reset () =
     State.reset state;
@@ -188,12 +188,13 @@ let enable_on formatter =
   in
   Format.pp_set_mark_tags formatter true;
   let old = Format.pp_get_formatter_stag_functions formatter () in
+  let dopen = if fallback then Some old.mark_open_stag else None in
+  let dclose = if fallback then Some old.mark_close_stag else None in
   Format.pp_set_formatter_stag_functions formatter
     { old with
-      mark_open_stag = mark_open_stag state old.mark_open_stag;
-      mark_close_stag = mark_close_stag state old.mark_close_stag; };
+      mark_open_stag = mark_open_stag state dopen ;
+      mark_close_stag = mark_close_stag state dclose } ;
   reset
-
 
 (* Tests *)
 
