@@ -18,6 +18,7 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-*  Kernel    [2026-01-07] Fixed ghost parameters inlining
 o!  Kernel    [2025-12-17] Added explicit rules for plug-in names and
               shortnames. See developer manual for more information
 o!  Kernel    [2025-10-22] Renamed the module Integer to Z and deprecated
