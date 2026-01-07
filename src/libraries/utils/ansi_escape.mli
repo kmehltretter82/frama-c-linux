@@ -76,5 +76,19 @@ type style =
   | Foreground of color (** ["fgxxxx"] where ["xxxx"] is the color tag *)
   | Background of color (** ["bgxxxx"] where ["xxxx"] is the color tag *)
 
+(** Associates a style to format tag ["@{<tag>"]. *)
+val add_style : string -> style -> unit
+
+(** Find the style associated to format tag ["@{<tag>"], if any.
+    @raises Not_found *)
+val find_style : string -> style
+
+(** Remove a style. Previous style definition is restored, if any. *)
+val remove_style : string -> unit
+
+(** Reset styles to predefined ones.
+    Removes {i all} the previously added styles. *)
+val reset_styles : unit -> unit
+
 (** Extension of semantic tags for style information *)
 type Format.stag += Style_tag of style
