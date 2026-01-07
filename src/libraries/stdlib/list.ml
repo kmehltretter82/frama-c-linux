@@ -43,8 +43,8 @@ let fold f l acc =
 
 let find_index f l =
   let rec aux i = function
-      [] -> raise Not_found
-    | x::l -> if f x then i else aux (i+1) l
+      [] -> None
+    | x::l -> if f x then Some i else aux (i+1) l
   in aux 0 l
 
 let mapi2 f l1 l2 =

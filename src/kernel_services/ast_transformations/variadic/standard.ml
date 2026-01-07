@@ -265,13 +265,12 @@ let aggregator_call ~builder aggregator vf args =
   (* Compute the size of the aggregation *)
   let size = match a_type with
     | EndedByNull ->
-      begin try
-          find_null (List.drop a_pos args) + 1
-        with Not_found ->
-          Kernel.warning ~current:true
-            "Failed to find a sentinel (NULL pointer) in the argument list.";
-          raise (Translate_call_exn vf.vf_decl);
-      end
+      match find_null (List.drop a_pos args) with
+      | Some i -> i  + 1
+      | None ->
+        Kernel.warning ~current:true
+          "Failed to find a sentinel (NULL pointer) in the argument list.";
+        raise (Translate_call_exn vf.vf_decl);
   in
 
   (* Convert arguments *)

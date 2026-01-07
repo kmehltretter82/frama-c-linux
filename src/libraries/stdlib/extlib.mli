@@ -113,7 +113,8 @@ val product: ('a -> 'b -> 'c) -> 'a list -> 'b list -> 'c list
 
 val find_index: ('a -> bool) -> 'a list -> int
 [@@deprecated "Use List.find_index instead."]
-[@@migrate { repl = List.find_index } ]
+[@@migrate { repl = (fun f l ->
+    List.find_index f l |> Option.get ~exn:Not_found) } ]
 (** returns the index (starting at 0) of the first element verifying the
     condition
     @raise Not_found if no element in the list matches the condition

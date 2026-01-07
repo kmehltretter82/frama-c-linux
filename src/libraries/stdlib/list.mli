@@ -33,11 +33,11 @@ val pretty :
     @since Frama-C+dev *)
 val fold : ('a -> 'acc -> 'acc) -> 'a t -> 'acc -> 'acc
 
-(** returns the index (starting at 0) of the first element verifying the
-    condition
-    @raise Not_found if no element in the list matches the condition
+(** Returns the index (starting at 0) of the first element verifying the
+    condition.
+    Appears in Ocaml 5.1.
     @since Frama-C+dev *)
-val find_index: ('a -> bool) -> 'a list -> int
+val find_index: ('a -> bool) -> 'a list -> int option
 
 (** Same as {!Stdlib.List.map2} but gives the index of the current element to
     [f]

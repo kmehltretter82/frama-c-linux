@@ -603,6 +603,7 @@ let is_formal v kf =  List.exists (fun vv -> v.vid = vv.vid) (get_formals kf)
 
 let get_formal_position v kf =
   List.find_index (fun vv -> v.vid = vv.vid) (get_formals kf)
+  |> Option.get ~exn:Not_found
 
 let is_local v kf = match kf.fundec with
   | Definition(fd, _) -> Ast_info.Function.is_local v fd

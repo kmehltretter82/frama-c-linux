@@ -1879,7 +1879,7 @@ class renameVisitorClass =
         (* Merged with an isomorphic type. Find the appropriate enumitem *)
         let n = List.find_index (fun e -> e.einame = ei.einame)
             ei.eihost.eitems in
-        let ei' = List.nth enum.eitems n in
+        let ei' = List.nth enum.eitems (Option.get ~exn:Not_found n) in
         assert (same_int64 ei.eival ei'.eival);
         Some (CEnum ei')
       end
