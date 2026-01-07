@@ -19,6 +19,7 @@ Open Source Release <next-release>
 ###############################################################################
 
 -!  Gui       [2026-01-07] Removed GTK GUI
+o   Kernel    [2026-01-07] Expose Lib module in plug-in available features
 -*  Kernel    [2026-01-07] Fixed ghost parameters inlining
 o!  Kernel    [2025-12-17] Added explicit rules for plug-in names and
               shortnames. See developer manual for more information
