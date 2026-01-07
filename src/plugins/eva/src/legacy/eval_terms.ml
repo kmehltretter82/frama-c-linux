@@ -1055,7 +1055,8 @@ let rec eval_term ~alarm_mode env t =
     let eunder_loc = make_loc (lval.eunder) size in
     let eunder =
       match Eval_op.find_under_approximation state eunder_loc with
-      | Some eunder -> V_Or_Uninitialized.get_v eunder
+      | Some eunder ->
+        Cvalue_forward.reinterpret typ (V_Or_Uninitialized.get_v eunder)
       | None -> under_from_over eover
     in
     { etype = typ;
