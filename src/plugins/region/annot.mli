@@ -21,5 +21,4 @@ val add_code_annot :
   kf:kernel_function -> stmt:stmt ->
   formals:domain Cil_datatype.Varinfo.Map.t ->
   result:node option ->
-  iscalled:bool ->
   map -> code_annotation -> unit

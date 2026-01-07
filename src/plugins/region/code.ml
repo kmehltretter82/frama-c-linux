@@ -155,7 +155,7 @@ let add_instr ~kf ~stmt (m:map) (instr:instr) =
   match instr with
   | Skip _ -> ()
   | Code_annot (annot,_) ->
-    Annot.add_code_annot ~iscalled:false ~kf ~stmt ~formals:Vmap.empty ~result:None m annot
+    Annot.add_code_annot ~kf ~stmt ~formals:Vmap.empty ~result:None m annot
 
   | Set(lv,e,_) ->
     let r = add_lval m stmt lv in
@@ -195,7 +195,6 @@ let add_instr ~kf ~stmt (m:map) (instr:instr) =
 
 let add_code_annot ~kf ~stmt map =
   Annot.add_code_annot ~kf ~stmt
-    ~iscalled:false
     ~formals:Vmap.empty
     ~result:None map
 

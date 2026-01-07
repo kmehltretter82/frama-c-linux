@@ -79,12 +79,11 @@ let logic_var env lv =
       try VAL (Varinfo.Map.find x env.formals) with Not_found -> VAR x
     else VAR x
 
-
 (* Load a complete value at l-value lv which has type ty and lives in region r *)
 let rec load env lv (ty,r) : domain =
   match Ast_types.unroll_node ty with
   | TArray(te,_) ->
-    let re = Memory.add_index r ty in
+    let re = Memory.add_index r te in
     let ofs = TIndex (Logic_const.trange (None,None), TNoOffset) in
     let lve = Logic_const.addTermOffsetLval ofs lv in
     array (load env lve (te,re))

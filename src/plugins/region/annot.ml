@@ -29,22 +29,69 @@ let add_ipred env ip = add_predicate env ip.ip_content.tp_statement
 let add_write env lv tgt =
   Memory.add_write tgt @@ Access.Term(env.property,lv)
 
+let dpoints_to env deps =
+  merge_points_to @@
+  List.fold_left
+    (fun d t -> merge_domain d (add_iterm env t))
+    pure deps
+
+let add_dpoints_to env tgt = function
+  | Some src -> Memory.add_points_to tgt src
+  | None ->
+    let loc = Property.location env.property in
+    Options.abort ~source:(fst loc)
+      "Missing pointer \\from for pointer assignment"
+
 let add_points_to env tgt = function
   | FromAny ->
     let loc = Property.location env.property in
     Options.abort ~source:(fst loc)
       "Missing \\from for pointer assignment"
   | From deps ->
-    let domain =
-      List.fold_left
-        (fun d t -> merge_domain d (add_iterm env t))
-        pure deps in
-    match merge_points_to domain with
-    | Some src -> Memory.add_points_to tgt src
-    | None ->
-      let loc = Property.location env.property in
-      Options.abort ~source:(fst loc)
-        "Missing pointer \\from for pointer assignment"
+    add_dpoints_to env tgt @@ dpoints_to env deps
+
+let rec store env lv ty tgt deps =
+  match Ast_types.unroll_skel ty with
+  | TNamed _ -> ()
+  | TPtr _ | TFun _ | TBuiltin_va_list ->
+    add_write env lv tgt ;
+    add_dpoints_to env tgt (Lazy.force deps)
+  | TVoid | TInt _ | TFloat _ | TEnum _ -> add_write env lv tgt
+  | TArray(te,_) ->
+    let re = Memory.add_index tgt te in
+    let ofs = TIndex (Logic_const.trange (None,None), TNoOffset) in
+    let lve = Logic_const.addTermOffsetLval ofs lv in
+    store env lve te re deps
+  | TComp { cfields } ->
+    List.iter
+      (fun fd ->
+         let ofs = TField(fd,TNoOffset) in
+         let lvf = Logic_const.addTermOffsetLval ofs lv in
+         let tgf = Memory.add_field tgt fd in
+         store env lvf fd.ftype tgf deps
+      ) @@ Option.value ~default:[] cfields
+
+let is_ctype lt ty =
+  match Ast_types.unroll_logic lt with
+  | Ctype tr -> Cil_datatype.Typ.equal ty tr
+  | _ -> false
+
+let add_write_compound env lv ty tgt from =
+  let copies, others =
+    List.partition_map
+      (fun d ->
+         let t = d.it_content in
+         match t.term_node with
+         | TLval ls when is_ctype t.term_type ty -> Left ls
+         | _ -> Right d)
+      (match from with FromAny -> [] | From ws -> ws) in
+  begin
+    List.iter
+      (fun ls -> Memory.merge tgt @@ snd @@ add_addr_lval env ls)
+      copies ;
+    if copies = [] || others <> [] then
+      store env lv ty tgt (lazy (dpoints_to env others)) ;
+  end
 
 let add_writes_from env (lv : term_lval) ~(from:deps) =
   let ty,tgt = add_addr_lval env lv in
@@ -55,6 +102,8 @@ let add_writes_from env (lv : term_lval) ~(from:deps) =
       add_write env lv tgt ;
       add_points_to env tgt from ;
     end
+  else if Ast_types.is_struct_or_union ty then
+    add_write_compound env lv ty tgt from
   else
     Options.not_yet_implemented "assigns to type (%a)" Printer.pp_typ ty
 
@@ -81,16 +130,6 @@ let rec add_assigns_from env tgt ~from =
       "Non-assignable term (skipped)@ (%a)"
       Printer.pp_term tgt
 
-let add_assigns ~iscalled env = function
-  | WritesAny ->
-    let loc = Property.location env.property in
-    Options.abort ~source:(fst loc) "unprecise assigns are not supported"
-  | Writes ws ->
-    if iscalled then
-      List.iter (fun (t,from) -> add_assigns_from env t.it_content ~from) ws
-    else
-      List.iter (fun (t,_) -> iadd_iterm env t) ws
-
 (* -------------------------------------------------------------------------- *)
 (* ---  Process Behaviors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
@@ -103,11 +142,19 @@ let add_assumes ~map ~kf ~ki ~bhv ~formals ~result ip =
   let property = Property.ip_of_assumes kf ki bhv ip in
   add_ipred { map ; property ; formals ; result } ip
 
-let add_bassigns ~iscalled ~map ~kf ~ki ~bhv ~formals ~result asgn =
-  let bhv = Property.Id_contract (Datatype.String.Set.empty,bhv) in
-  let property = Option.get @@ Property.ip_of_assigns kf ki bhv asgn in
-  let env = { map ; property ; formals ; result } in
-  add_assigns ~iscalled env asgn
+let add_bassigns ~iscalled ~map ~kf ~ki ~bhv ~formals ~result = function
+  | WritesAny ->
+    if iscalled then
+      let loc = Kernel_function.get_location kf in
+      Options.abort ~source:(fst loc) "precise assigns are required for calls"
+  | Writes ws as asgn ->
+    let bhv = Property.Id_contract (Datatype.String.Set.empty,bhv) in
+    let property = Option.get @@ Property.ip_of_assigns kf ki bhv asgn in
+    let env = { map ; property ; formals ; result } in
+    if iscalled then
+      List.iter (fun (t,from) -> add_assigns_from env t.it_content ~from) ws
+    else
+      List.iter (fun (t,_) -> iadd_iterm env t) ws
 
 let add_allocation ~map ~kf ~ki ~bhv ~formals ~result alloc =
   match alloc with
@@ -179,7 +226,7 @@ let add_spec ~kf ~ki ~formals ~result ~iscalled (map:map) (s:spec) =
 (* ---  Process Code Annotations                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let add_code_annot ~kf ~stmt ~formals ~result ~iscalled map c =
+let add_code_annot ~kf ~stmt ~formals ~result map c =
   match c.annot_content with
   | AAssert (_,{ tp_statement = p }) ->
     let property = Property.ip_of_code_annot_single kf stmt c in
@@ -187,7 +234,7 @@ let add_code_annot ~kf ~stmt ~formals ~result ~iscalled map c =
     add_predicate env p
   | AStmtSpec (_,s) ->
     let ki = Cil_datatype.Kinstr.kinstr_of_opt_stmt (Some stmt) in
-    add_spec ~iscalled ~kf ~ki ~formals ~result map s
+    add_spec ~iscalled:false ~kf ~ki ~formals ~result map s
   | AInvariant (_,_,{ tp_statement = p }) ->
     let property = Property.ip_of_code_annot_single kf stmt c in
     let env = { map ; property ; formals ; result } in
@@ -195,10 +242,11 @@ let add_code_annot ~kf ~stmt ~formals ~result ~iscalled map c =
   | AVariant v ->
     let ki = Cil_datatype.Kinstr.kinstr_of_opt_stmt (Some stmt) in
     add_variant ~kf ~ki ~formals ~result map v
-  | AAssigns (_,asgn) ->
+  | AAssigns (_,WritesAny) -> ()
+  | AAssigns (_,Writes ws) ->
     let property = Property.ip_of_code_annot_single kf stmt c in
     let env = { map ; property ; formals ; result } in
-    add_assigns ~iscalled env asgn
+    List.iter (fun (t,_) -> iadd_iterm env t) ws
   | AAllocation (_,FreeAllocAny) -> ()
   | AAllocation (_,(FreeAlloc (its1,its2) as alloc)) ->
     if List.compare_lengths its1 its2 != 0 then
