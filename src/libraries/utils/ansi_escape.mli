@@ -44,8 +44,10 @@ val is_supported : unit -> bool
 
 (** Enable the style output on the given formatter. No support test is
     performed.
+    @param fallback is set to [true], unhandled styles are delegated
+    to the underlying formatter. Default is [false].
     @return a reset function that can be called to reset styles. *)
-val enable_on : Format.formatter -> (unit -> unit)
+val enable_on : ?fallback:bool -> Format.formatter -> (unit -> unit)
 
 (** Output colors. The associated string semantic tag is documented for each
     constructor. Note that there exists variants prefixed with "fg" and "bg"
@@ -76,4 +78,3 @@ type style =
 
 (** Extension of semantic tags for style information *)
 type Format.stag += Style_tag of style
-
