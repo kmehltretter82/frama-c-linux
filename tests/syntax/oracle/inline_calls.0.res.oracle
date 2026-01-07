@@ -378,4 +378,22 @@ void pre_decl(void)
   return;
 }
 
+__inline static void with_ghost_callee__fc_inline(void)
+                                                 /*@ ghost (int param __attribute__((
+                                                            __fc_ghost_formal__))) */
+{
+  return;
+}
+
+void with_ghost_caller(void)
+                      /*@ ghost (int param __attribute__((__fc_ghost_formal__))) */
+{
+  {
+     /* __blockattribute__(__fc_inlined__("with_ghost_callee__fc_inline")) */
+    /*@ ghost int param_3 __attribute__((__fc_ghost_formal__)) = param; */
+    ;
+  }
+  return;
+}
+
 
