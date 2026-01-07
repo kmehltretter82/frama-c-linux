@@ -121,40 +121,58 @@ let close_style state style =
   | None ->
     style |> encode_style_end |> escape_sequence
 
-
 (* Format semantic tags *)
 
-let color_of_string_tag = function
-  | "black" -> Black
-  | "red" -> Red
-  | "green" -> Green
-  | "yellow" -> Yellow
-  | "blue" -> Blue
-  | "magenta" -> Magenta
-  | "cyan" -> Cyan
-  | "white" -> White
-  | "orange" -> Orange
-  | _ -> raise Not_found
+let stylemap = Hashtbl.create 24
+let add_style a sty = Hashtbl.add stylemap a sty
+let find_style = Hashtbl.find stylemap
+let remove_style = Hashtbl.remove stylemap
 
-let style_of_string_tag = function
-  | "bold" -> Bold
-  | "faint" -> Faint
-  | "italic" -> Italic
-  | "underline" -> Underline
-  | "blink" -> Blink
-  | "strike" -> Strike
-  | s when String.starts_with ~prefix:"fg" s ->
-    Foreground (color_of_string_tag (String.sub s 2 (String.length s - 2)))
-  | s when String.starts_with ~prefix:"bg" s ->
-    Background (color_of_string_tag (String.sub s 2 (String.length s - 2)))
-  | s ->
-    Foreground (color_of_string_tag s)
+let styles = [
+  "bold", Bold ;
+  "faint", Faint ;
+  "italic", Italic ;
+  "underline", Underline ;
+  "blink", Blink ;
+  "strike", Strike ;
+]
+
+let colors = [
+  "black", Black ;
+  "red", Red ;
+  "green", Green ;
+  "yellow", Yellow ;
+  "blue", Blue ;
+  "magenta", Magenta ;
+  "cyan", Cyan ;
+  "white", White ;
+  "orange", Orange ;
+]
+
+let populate () =
+  begin
+    List.iter (fun (a,sty) -> Hashtbl.add stylemap a sty) styles ;
+    List.iter
+      (fun (a,color) ->
+         let fg = Foreground color in
+         let bg = Background color in
+         Hashtbl.add stylemap a fg ;
+         Hashtbl.add stylemap ("fg:" ^ a) fg ;
+         Hashtbl.add stylemap ("bg:" ^ a) bg ;
+      ) colors ;
+  end
+
+let reset_styles () =
+  begin
+    Hashtbl.clear stylemap ;
+    populate () ;
+  end
 
 let styles_of_stag = function
   | Format.String_tag s ->
     String.lowercase_ascii s
     |> String.split_on_char ','
-    |> List.map style_of_string_tag
+    |> List.map find_style
   | Style_tag style -> [style]
   | _ -> raise Not_found
 
@@ -186,7 +204,8 @@ let enable_on ?(fallback=false) formatter =
     State.reset state;
     Format.pp_print_string formatter reset_sequence
   in
-  Format.pp_set_mark_tags formatter true;
+  populate () ;
+  Format.pp_set_mark_tags formatter true ;
   let old = Format.pp_get_formatter_stag_functions formatter () in
   let dopen = if fallback then Some old.mark_open_stag else None in
   let dclose = if fallback then Some old.mark_close_stag else None in
