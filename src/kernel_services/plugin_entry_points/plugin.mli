@@ -29,6 +29,11 @@ module type S_no_log = sig
   module Verbose: Parameter_sig.Int
   module Debug: Parameter_sig.Int
 
+  (** Handle the specific `lib' directory of the plug-in.
+      @since Frama-C+dev
+  *)
+  module Lib: Parameter_sig.Site_root
+
   (** Handle the specific `share' directory of the plug-in.
       @since Oxygen-20120901
       @before 30.0-Zinc more modes were allowed

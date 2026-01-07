@@ -28,6 +28,7 @@ module type S_no_log = sig
   val add_group: ?memo:bool -> string -> Cmdline.Group.t
   module Verbose: Parameter_sig.Int
   module Debug: Parameter_sig.Int
+  module Lib: Parameter_sig.Site_root
   module Share: Parameter_sig.Site_root
   module Session: Parameter_sig.User_dir_opt
   module Cache_dir () : Parameter_sig.User_dir_opt
@@ -297,24 +298,32 @@ struct
   (** {3 Specific directories} *)
   (* ************************************************************************ *)
 
-  module Share : Parameter_sig.Site_root = struct
-    let is_visible = !share_visible_ref
+  module Make_site_root
+      (D: sig
+         val name : string
+         val dirs : Fclib.Filepath.t list
+         val is_visible : bool
+       end)
+  =
+  struct
     let is_kernel = is_kernel () (* the side effect must be applied right now *)
 
     let () =
       Parameter_customize.set_cmdline_stage Cmdline.Extended;
-      if is_visible then Parameter_customize.is_reconfigurable ()
+      if D.is_visible then Parameter_customize.is_reconfigurable ()
       else Parameter_customize.is_invisible ()
 
     module Dir_name =
       Filepath
         (struct
-          let option_name = prefix ^ "share"
+          let option_name = prefix ^ D.name
           let arg_name = "dir"
           let help =
-            if is_visible then
-              "set the plug-in share directory to <dir> (may be used if the \
-               plug-in is not installed at the same place as Frama-C)"
+            if D.is_visible then
+              Format.asprintf
+                "set the plug-in %s directory to <dir> (may be used if the \
+                 plug-in is not installed at the same place as Frama-C)"
+                D.name
             else empty_string
           let existence = Fclib.Filepath.Must_exist
           let file_kind = ""
@@ -329,8 +338,8 @@ struct
       else Fclib.Filepath.(path / plugin_subpath)
 
     let dirs () =
-      if is_visible && is_set () then [ get () ]
-      else List.map add_plugin System_config.Share.dirs
+      if D.is_visible && is_set () then [ get () ]
+      else List.map add_plugin D.dirs
 
     let find ~is_dir relative =
       let exception Found of Fclib.Filepath.t * Filesystem.file_kind in
@@ -343,10 +352,11 @@ struct
       try
         List.iter check_presence (dirs ()) ;
         L.abort
-          "Could not find %s %s in Frama-C%s share"
+          "Could not find %s %s in Frama-C%s %s"
           (if is_dir then "directory" else "file")
           relative
           (if is_kernel then "" else "/" ^ P.name)
+          D.name
       with
       | Found (path, file_kind) when is_dir <> (file_kind = Directory) ->
         L.abort "%a is expected to be a %s"
@@ -357,6 +367,22 @@ struct
     let get_dir = find ~is_dir:true
     let get_file = find ~is_dir:false
   end
+
+  module Share =
+    Make_site_root
+      (struct
+        let name = "share"
+        let dirs = System_config.Share.dirs
+        let is_visible = !share_visible_ref
+      end)
+
+  module Lib =
+    Make_site_root
+      (struct
+        let name = "lib"
+        let dirs = System_config.Lib.dirs
+        let is_visible = false (* we do not allow lib override *)
+      end)
 
   module Make_user_dir_root
       (D: sig
