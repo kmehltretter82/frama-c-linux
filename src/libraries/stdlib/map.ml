@@ -22,7 +22,7 @@ struct
   include Make (Ord)
 
   let pretty pp_key pp_val =
-    Collection.pretty_iter2
+    Pretty.pretty_iter2
       ~format:"{{ %t }}" ~item:"%a ->@ %a" ~sep:";@ " ~iter
       pp_key pp_val
 

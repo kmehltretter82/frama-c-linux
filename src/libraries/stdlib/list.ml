@@ -29,10 +29,10 @@ let compare cmp_elt l1 l2 =
   else compare cmp_elt l1 l2
 
 let hash hash_elt =
-  Collection.hash_iter iter hash_elt
+  Hash.hash_iter iter hash_elt
 
 let pretty pp_elt =
-  Collection.pretty_iter
+  Pretty.pretty_iter
     ~format:"[ %t ]" ~item:"%a" ~sep:";@ " ~iter
     pp_elt
 

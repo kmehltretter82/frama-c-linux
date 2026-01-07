@@ -6,24 +6,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Stdlib.Set
-
-module type S = sig
-  include S
-  val hash : (elt -> int) -> t -> int
-  val pretty :
-    (Format.formatter -> elt -> unit) ->
-    Format.formatter -> t -> unit
-end
-
-module Make (Ord : OrderedType) =
-struct
-  include Make (Ord)
-
-  let hash = Hash.hash_iter iter
-
-  let pretty pp_elt =
-    Pretty.pretty_iter
-      ~format:"{ %t }" ~item:"%a" ~sep:";@ " ~iter
-      pp_elt
-end
+let hash_iter ?(limit=16) iter hash x =
+  let acc = ref 1 in
+  let count = ref 0 in
+  let f x =
+    if !count >= limit then raise Exit;
+    incr count;
+    acc := 257 * !acc + hash x
+  in
+  (try iter f x with Exit -> ());
+  !acc

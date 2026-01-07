@@ -6,24 +6,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Stdlib.Set
+(** This modules provides hash functions.
+    @since Frama-C+dev *)
 
-module type S = sig
-  include S
-  val hash : (elt -> int) -> t -> int
-  val pretty :
-    (Format.formatter -> elt -> unit) ->
-    Format.formatter -> t -> unit
-end
-
-module Make (Ord : OrderedType) =
-struct
-  include Make (Ord)
-
-  let hash = Hash.hash_iter iter
-
-  let pretty pp_elt =
-    Pretty.pretty_iter
-      ~format:"{ %t }" ~item:"%a" ~sep:";@ " ~iter
-      pp_elt
-end
+(** [hash_iter iter hash x] hashes a collection [x] given an [iter] function on
+    this collection and a [hash] function on its elements.
+    @param limit is the maximum number of elements used for the hash; if
+    collections bigger than this size are given, the remaining elements are
+    ignored. Defaults to 16. *)
+val hash_iter :
+  ?limit:int ->
+  (('a -> unit) -> 'b -> unit) -> ('a -> int) -> 'b -> int
