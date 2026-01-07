@@ -49,8 +49,8 @@
 (include_subdirs unqualified)
 (subdir tests (include_subdirs no))
 
-(subdir mthread (include_subdirs no))
-(subdir mthread
+(subdir src/mthread (include_subdirs no))
+(subdir src/mthread
  (library
   (name mthread)
   (optional)
@@ -66,8 +66,8 @@
  (libraries frama-c-eva.mthread.core)
  (site (frama-c plugins)))
 
-(subdir domains/apron (include_subdirs no))
-(subdir domains/apron
+(subdir src/domains/apron (include_subdirs no))
+(subdir src/domains/apron
  (library
   (name apron_domain)
   (optional)
@@ -97,13 +97,13 @@
  (mode (promote (only Eva.mli)))
  (deps
   gen_api/Eva.header
-  engine/analysis.mli types/callstack.mli types/deps.mli
-  utils/results.mli parameters.mli
-  utils/eva_perf.mli utils/statistics.mli utils/export.mli
-  utils/eva_annotations.mli eval.mli types/assigns.mli ast/eva_ast.mli
-  domains/cvalue/builtins.mli
-  utils/cvalue_callbacks.mli legacy/logic_inout.mli utils/eva_results.mli
-  utils/unit_tests.mli)
+  src/engine/analysis.mli src/types/callstack.mli src/types/deps.mli
+  src/utils/results.mli src/parameters.mli
+  src/utils/eva_perf.mli src/utils/statistics.mli src/utils/export.mli
+  src/utils/eva_annotations.mli src/eval.mli src/types/assigns.mli src/ast/eva_ast.mli
+  src/domains/cvalue/builtins.mli
+  src/utils/cvalue_callbacks.mli src/legacy/logic_inout.mli src/utils/eva_results.mli
+  src/utils/unit_tests.mli)
  (action (run ./gen_api/gen_api.exe %{deps})))
 
 (install
