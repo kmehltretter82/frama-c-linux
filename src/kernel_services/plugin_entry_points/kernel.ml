@@ -706,10 +706,26 @@ module TTY =
                   use the opposite option for completely disabling the use of \
                   terminal capabilities"
     end)
+
+let () = Parameter_customize.set_group messages
+let () = Parameter_customize.do_not_projectify ()
+let () = Parameter_customize.set_cmdline_stage Cmdline.Early
+module TTY_debug =
+  Bool
+    (struct
+      let option_name = "-tty-debug"
+      let module_name = "TTY_DEBUG"
+      let default = false
+      let help = "print styles that are not handled by the TTY"
+    end)
+
 let () =
-  Cmdline.run_after_early_stage (fun () ->
+  Cmdline.run_after_early_stage
+    begin fun () ->
       if TTY.get () then
-        let _reset = Ansi_escape.enable_on Format.std_formatter in ())
+        let fallback = TTY_debug.get () in
+        let _reset = Ansi_escape.enable_on ~fallback Format.std_formatter in ()
+    end
 
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.do_not_projectify ()
