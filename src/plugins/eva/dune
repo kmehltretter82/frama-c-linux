@@ -49,22 +49,6 @@
 (include_subdirs unqualified)
 (subdir tests (include_subdirs no))
 
-(subdir gui (include_subdirs no))
-(subdir gui
- (library
-  (name eva_gui)
-  (optional)
-  (public_name frama-c-eva.gui)
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva__Private :standard -w -9)
-  (libraries eva frama-c.kernel frama-c.gui)
-  (instrumentation (backend landmarks))))
-
-(plugin
- (name eva-gui)
- (optional)
- (libraries frama-c-eva.gui)
- (site (frama-c plugins_gui)))
-
 (subdir mthread (include_subdirs no))
 (subdir mthread
  (library
@@ -81,22 +65,6 @@
  (optional)
  (libraries frama-c-eva.mthread.core)
  (site (frama-c plugins)))
-
-(subdir mthread/gui (include_subdirs no))
-(subdir mthread/gui
- (library
-  (name mthread_gui)
-  (optional)
-  (public_name frama-c-eva.mthread.gui)
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva__Private -open Mthread :standard -w -9)
-  (libraries eva mthread frama-c.kernel frama-c.gui)
-  (instrumentation (backend landmarks))))
-
-(plugin
- (name eva.mthread-gui)
- (optional)
- (libraries frama-c-eva.mthread.gui)
- (site (frama-c plugins_gui)))
 
 (subdir domains/apron (include_subdirs no))
 (subdir domains/apron

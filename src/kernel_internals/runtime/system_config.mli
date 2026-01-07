@@ -67,7 +67,7 @@ module Plugins : sig
   (** Load given plug-in name *)
 
   val load_all: unit -> unit
-  (** Load all plug-ins, do not load GUI plug-in when not in GTK GUI mode *)
+  (** Load all plug-ins. *)
 end
 
 (** Unless you are working in the kernel of Frama-C, you should not use this. *)
@@ -115,5 +115,16 @@ module User_dirs : sig
   (** Where Frama-C should read/write state files *)
 end
 
-val is_gui: bool
-(** Is the Frama-C GUI running? *)
+val is_gui: unit -> bool
+(** Whether we are running in GUI mode. If you only need to know this, it is
+    fine to use it, but if you have an actual dependency on the Frama-C server,
+    prefer using the Server API.
+    @before Frama-C+dev this was a boolean value and not a function
+*)
+
+(** / **)
+
+val set_gui : bool -> unit
+[@@alert
+  system_config_set_gui
+    "set_gui is for internal use only for the Server plugin."]

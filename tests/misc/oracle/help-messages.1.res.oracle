@@ -235,8 +235,7 @@ Options taking a string as argument should preferably be written
                     -no-keep-comments)
 -ocode <filename>   when printing code, redirects the output to file
                     <filename>
--print              pretty print original code with its comments (opposite
-                    option is -no-print)
+-print              pretty print C code (opposite option is -no-print)
 -print-libc         when pretty-printing C code, keep prototypes coming from
                     Frama-C standard library (opposite option is
                     -no-print-libc)

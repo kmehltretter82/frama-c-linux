@@ -5,8 +5,6 @@ compiling Frama-C 32.0.
 - dune.3.19.1
 - dune-configurator.3.19.1
 - dune-site.3.19.1
-- lablgtk3.3.1.5
-- lablgtk3-sourceview3.3.1.5
 - menhir.20240715
 - ocamlfind.1.9.8
 - ocamlgraph.2.2.0

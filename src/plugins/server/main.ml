@@ -374,12 +374,12 @@ let kill () = raise Killed
 
 let rooters = ref []
 let daemons = ref []
-let active = ref false
 let once callback = rooters := !rooters @ [ callback ]
 let on callback = daemons := !daemons @ [ callback ]
+
 let set_active activity =
   begin
-    active := activity;
+    System_config.set_gui activity [@alert "-system_config_set_gui"] ;
     if activity then
       begin
         List.iter (fun f -> try f () with _ -> ()) !rooters ;
@@ -388,7 +388,7 @@ let set_active activity =
     List.iter (fun f -> try f activity with _ -> ()) !daemons ;
   end
 
-let is_active () = !active
+let is_active () = System_config.is_gui ()
 
 let create ~pretty ?(equal=(=)) ~fetch () =
   let polling = in_range ~min:1 ~max:200 (Senv.Polling.get ()) in

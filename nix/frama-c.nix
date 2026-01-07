@@ -11,7 +11,6 @@
 , gitignoreSource
 , makeWrapper
 , nix-gitignore
-, wrapGAppsHook3
 , writeText
 # Generic
 , findlib
@@ -25,8 +24,6 @@
 , fpath
 , gcc14
 , graphviz
-, lablgtk3
-, lablgtk3-sourceview3
 , menhir
 , menhirLib
 , ocaml
@@ -66,7 +63,6 @@ stdenvNoCC.mkDerivation rec {
 
   nativeBuildInputs = [
     which
-    wrapGAppsHook3
   ];
 
   buildInputs = [
@@ -80,8 +76,6 @@ stdenvNoCC.mkDerivation rec {
     fpath
     gcc14
     graphviz
-    lablgtk3
-    lablgtk3-sourceview3
     menhir
     menhirLib
     ocaml

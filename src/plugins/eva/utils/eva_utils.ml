@@ -52,7 +52,7 @@ module DegenerationPoints =
       let dependencies = [ Self.state ]
     end)
 
-let is_interactive () = System_config.is_gui || Server.Main.is_active ()
+let is_interactive () = Server.Main.is_active ()
 let is_saved () = not (Kernel.SaveState.is_empty ())
 
 let protect_only_once = ref true

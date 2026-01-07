@@ -261,7 +261,6 @@ val waiting : server -> int option
 (* ************************************************************************* *)
 
 val on_idle : ((unit -> bool) -> unit) ref
-(** Typically modified by GUI.
+(** Typically modified by the server.
     [!on_idle f] should repeatedly calls [f] until it returns [false].
-    Default implementation rely on [Unix.sleep 1].
-    See also [Gtk_helper] module implementation. *)
+    Default implementation rely on [Unix.sleep 1]. *)

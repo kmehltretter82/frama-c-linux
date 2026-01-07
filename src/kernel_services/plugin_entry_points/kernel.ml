@@ -776,7 +776,7 @@ module PrintCode =
     (struct
       let module_name = "PrintCode"
       let option_name = "-print"
-      let help = "pretty print original code with its comments"
+      let help = "pretty print C code"
     end)
 
 let () = Parameter_customize.set_group grp_debug
@@ -809,7 +809,7 @@ module PrintLibc =
       let option_name = "-print-libc"
       let help = "when pretty-printing C code, keep prototypes coming \
                   from Frama-C standard library"
-      let default = System_config.is_gui (* always print by default on the GUI *)
+      let default = false
     end)
 
 let () = Parameter_customize.set_group inout_source

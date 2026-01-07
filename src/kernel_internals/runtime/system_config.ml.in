@@ -16,8 +16,6 @@ module Version = struct
   let minor = @MINOR_VERSION@
 end
 
-let is_gui = Frama_c_very_first.Gui_init.is_gui
-
 module Share = struct
   let dirs = List.map Filepath.of_string Config_data.Sites.share
   let path = String.concat ":" (Filepath.to_string_list dirs)
@@ -61,7 +59,6 @@ module Plugins = struct
     (* avoid calling Dune_site.Plugins.load_all () directly, so we can catch
        errors individually *)
     let open Config_data.Plugins in
-    if is_gui then try_load_list Plugins_gui.load Plugins_gui.list;
     try_load_list Plugins.load Plugins.list
 end
 
@@ -99,3 +96,8 @@ end
 module User_dirs = struct
   include @FRAMAC_TARGET_SYSTEM_CONFIG_INCLUDE@
 end
+
+let gui = ref false
+
+let is_gui () = !gui
+let set_gui value = gui := value
