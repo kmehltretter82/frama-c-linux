@@ -13,7 +13,7 @@
 include module type of Stdlib.Fun
 
 (** Same as {!Stdlib.Fun.compose} but made available here until the
-    minimal supported version is OCaml 5.04. *)
+    minimal supported version is OCaml 5.2. *)
 val compose : ('b -> 'c) -> ('a -> 'b) -> 'a -> 'c
 
 (** Uncurry a function of arity-2 *)

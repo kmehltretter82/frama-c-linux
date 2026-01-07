@@ -472,8 +472,8 @@ let censored_macros cpp_args =
        let open Option.Operators in
        let none = acc in
        let some = Fun.flip Datatype.String.Set.add acc in
-       (let+ name = String.strip_prefix "-U" arg in
-        String.strip_underscores name)
+       (let+ name = String.remove_prefix "-U" arg in
+        String.trim_underscores name)
        |> Option.fold ~none ~some)
     known_bad_macros
     (List.(flatten (map (String.split_on_char ' ') cpp_args)))

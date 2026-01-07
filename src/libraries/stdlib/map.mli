@@ -27,5 +27,4 @@ module type S = sig
   val closed_union : (key -> 'a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
 end
 
-
 module Make (Ord: OrderedType) : S with type key = Ord.t

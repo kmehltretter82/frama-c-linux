@@ -59,6 +59,7 @@ module State_topological = State_topological
 
 module Array = Array
 module Extlib = Extlib
+module Fun = Fun
 module Hashtbl = Hashtbl
 module Int = Int
 module Integer = Integer [@@deprecated "Use Fclib.Z instead."]
@@ -76,6 +77,7 @@ module Bag = Bag
 module Binary_cache = Binary_cache
 module Bitvector = Bitvector
 module Channel = Channel
+module Collection = Collection
 module Command = Command
 module Compression = Compression
 module Dotgraph = Dotgraph

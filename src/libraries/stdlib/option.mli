@@ -6,9 +6,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Extend the [option] type to a full fleshed monad. Be wary that the
-    parameters order of the [bind] function are reversed compared to
-    the standard library and that [get] takes a mandatory [exn] argument.
+(** Extension of OCaml's {!Stdlib.Option} module. Be wary that the parameters
+    order of the [bind] function are reversed compared to the standard library
+    and that [get] takes an optional [exn] argument.
+    @see https://frama-c.com/download/frama-c-plugin-development-guide.pdf
     @since 31.0-Gallium *)
 
 include Monad.S_with_product with type 'a t = 'a option
@@ -32,20 +33,22 @@ val get: ?exn:exn -> 'a option -> 'a
 val hash: ('a -> int) -> 'a option -> int
 
 (** Merges two options such that
-    - [union None None = None]
-    - [union (Some a) None = Some a]
-    - [union None (Some b) = Some b]
-    - [union (Some a) (Some b) = Some (f a b)]
+    - [merge None None = None]
+    - [merge (Some a) None = Some a]
+    - [merge None (Some b) = Some b]
+    - [merge (Some a) (Some b) = Some (f a b)]
+      See also {!product} and {!map2} for other ways to combine options.
       @since Frama-C+dev *)
-val union: ('a -> 'a -> 'a) -> 'a option -> 'a option -> 'a option
+val merge: ('a -> 'a -> 'a) -> 'a option -> 'a option -> 'a option
 
-(** Merges two options such that
-    - [inter None None = None]
-    - [inter (Some a) None = None]
-    - [inter None (Some b) = None]
-    - [inter (Some a) (Some b) = Some (f a b)]
+(** Maps two options such that
+    - [map2 None None = None]
+    - [map2 (Some a) None = None]
+    - [map2 None (Some b) = None]
+    - [map2 (Some a) (Some b) = Some (f a b)]
+      See also {!product} and {!merge} for other ways to combine options.
       @since Frama-C+dev *)
-val inter: ('a -> 'b -> 'c) -> 'a option -> 'b option -> 'c option
+val map2: ('a -> 'b -> 'c) -> 'a option -> 'b option -> 'c option
 
 (** Same as {!Stdlib.Option.map} but avoid creating a copy of the option if the
     mapped function returns its argument (tested through physical equality).

@@ -89,11 +89,11 @@ let map_no_copy_list = List.concat_map_no_copy
 (** {2 Options} *)
 (* ************************************************************************* *)
 
-let merge_opt f k = Option.union (fun x1 x2 -> f k x1 x2)
+let merge_opt f k = Option.merge (f k)
 let opt_filter = Option.filter
 let the ~exn = Option.get ~exn
 let opt_hash = Option.hash
-let opt_map2 = Option.inter
+let opt_map2 = Option.map2
 let opt_map_no_copy = Option.map_no_copy
 
 (* ************************************************************************* *)
@@ -126,9 +126,9 @@ let safe_at_exit f =
 (** Strings *)
 (* ************************************************************************* *)
 
-let string_del_prefix = String.strip_prefix
-let string_del_suffix = String.strip_suffix
-let strip_underscore = String.strip_underscores
+let string_del_prefix = String.remove_prefix
+let string_del_suffix = String.remove_suffix
+let strip_underscore = String.trim_underscores
 let escape_non_utf8 = String.utf8_escaped
 let html_escape = String.html_escape
 let percent_encode = String.percent_encode

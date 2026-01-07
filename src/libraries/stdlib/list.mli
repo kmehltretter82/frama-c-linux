@@ -6,9 +6,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Extend the [list] type to a full fleshed monad. This monad can be used
-    to represent non-deterministic computations.
-    @since 31.0-Gallium *)
+(** Extension of OCaml's {!Stdlib.List} module.
+    @see https://frama-c.com/download/frama-c-plugin-development-guide.pdf
+    @since 31.0-Gallium
+*)
 
 (** {2 Monad } *)
 
@@ -28,10 +29,6 @@ val pretty :
   Format.formatter -> 'a t -> unit
 
 (** {2 Iterators } *)
-
-(** Same as {!Stdlib.List.fold_left} but with the argument order reversed.
-    @since Frama-C+dev *)
-val fold : ('a -> 'acc -> 'acc) -> 'a t -> 'acc -> 'acc
 
 (** Returns the index (starting at 0) of the first element verifying the
     condition.
@@ -71,6 +68,9 @@ val last: 'a list -> 'a
     recursive.
     It returns an empty list if [n] is nonpositive and the whole list if [n] is
     greater than [List.length l].
+    This function is introduced in OCaml 5.3 and is made available here until
+    OCaml 5.4 is the minimal supported version. (The 5.3 version is raising
+    exceptions on negative n values)
     It is equivalent to [slice ~last:n l].
     @since Frama-C+dev *)
 val take : int -> 'a list -> 'a list
@@ -78,6 +78,9 @@ val take : int -> 'a list -> 'a list
 (** [drop n l] returns the list without the first [n] elements.
     It returns the whole list if [n] is nonpositive and an empty list if [n] is
     greater than [List.length l].
+    This function is introduced in OCaml 5.3 and is made available here until
+    OCaml 5.4 is the minimal supported version. (The 5.3 version is raising
+    exceptions on negative n values)
     It is equivalent to [slice ~first:n l].
     @since Frama-C+dev *)
 val drop : int -> 'a list -> 'a list
@@ -85,7 +88,8 @@ val drop : int -> 'a list -> 'a list
 (** [break n l] returns a couple of the list of the first n elements and the
     list of the remaining elements. If n is smaller than 0 (resp. greater than
     the list length) then [([], l)] is returned (resp. [(l, [])]).
-    It is equivalent to [(take n l, drop n l)]. *)
+    It is equivalent to [(take n l, drop n l)].
+    @since Frama-C+dev *)
 val break : int -> 'a list -> ('a list * 'a list)
 
 (** [slice ?first ?last l] is equivalent to Python's slice operator

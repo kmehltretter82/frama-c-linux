@@ -11,21 +11,21 @@ include Stdlib.String
 let compare_ignore_case s1 s2 =
   compare (lowercase_ascii s1) (lowercase_ascii s2)
 
-let strip_prefix ?(strict=false) prefix s =
+let remove_prefix ?(strict=false) prefix s =
   if starts_with ~prefix s then
     let n = length s in
     let p = length prefix in
     if not strict || n > p then Some (sub s p (n-p)) else None
   else None
 
-let strip_suffix ?(strict=false) suffix s =
+let remove_suffix ?(strict=false) suffix s =
   if ends_with ~suffix s then
     let n = length s in
     let p = length suffix in
     if not strict || n > p then Some (sub s 0 (n-p)) else None
   else None
 
-let strip_underscores s =
+let trim_underscores s =
   let l = length s in
   let rec start i =
     if i >= l then l

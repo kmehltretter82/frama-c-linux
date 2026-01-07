@@ -138,7 +138,7 @@ end
 (* Returns the list of the subexpressions of [expr] that contain [subexpr],
    without [subexpr] itself. *)
 let compute_englobing_subexpr ~subexpr ~expr =
-  let merge = Option.union (@) in
+  let merge = Option.merge (@) in
   (* Returns [Some] of the list of subexpressions of [expr] that contain
      [subexpr], apart [subexpr] itself, or [None] if [subexpr] does not appear
      in [expr]. *)

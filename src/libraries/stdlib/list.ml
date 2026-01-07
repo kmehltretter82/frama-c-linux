@@ -38,9 +38,6 @@ let pretty pp_elt =
 
 (** {2 Iterators } *)
 
-let fold f l acc =
-  fold_left (fun acc x -> f x acc) acc l
-
 let find_index f l =
   let rec aux i = function
       [] -> None

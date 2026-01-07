@@ -31,11 +31,11 @@ let hash hash v = match v with
   | None -> 31179
   | Some v -> hash v
 
-let union f x y = match x, y with
+let merge f x y = match x, y with
   | x, None | None, x -> x
   | Some x, Some y -> Some (f x y)
 
-let inter f x y = match x, y with
+let map2 f x y = match x, y with
   | None, _ | _, None -> None
   | Some x, Some y -> Some (f x y)
 

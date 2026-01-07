@@ -530,7 +530,7 @@ module Html = struct
       let vertex_name v =
         let s = Format.asprintf "%a" Thread.pretty v in
         (* Surround name with double-quotes so that we can use UTF-8 and other
-           special characters apart from double quotes. [escape_non_utf8] is
+           special characters apart from double quotes. String.utf8_escaped is
            used so that double quote are escaped. *)
         Format.asprintf "\"%s\"" (String.utf8_escaped s)
       let vertex_attributes v =

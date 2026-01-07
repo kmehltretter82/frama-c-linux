@@ -26,5 +26,4 @@ module type S = sig
     Format.formatter -> t -> unit
 end
 
-
 module Make (Ord: OrderedType) : S with type elt = Ord.t

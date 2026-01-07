@@ -22,8 +22,7 @@ type nonrec 'a format = ('a,Format.formatter,unit) format
     printer of its items.
     @param format defines the format used to print the collection, e.g. "@[%t@]"
     @param item defines the format for an item of the collection, e.g. "@[%a@]"
-    @param sep defines the format for the separator between items,
-    e.g "@;,"
+    @param sep defines the format for the separator between items, e.g "@;,"
     @param iter is an iterator over the items of the collection. *)
 val pretty_iter:
   format:(tformatter -> unit) format ->
@@ -36,8 +35,7 @@ val pretty_iter:
     pretty printer of its bindings.
     @param format defines the format used to print the collection, e.g. "@[%t@]"
     @param item defines the format for a binding, e.g. "@[%a ->@ %a@]"
-    @param sep defines the format for the separator between bindings,
-    e.g "@;,"
+    @param sep defines the format for the separator between bindings, e.g "@;,"
     @param iter is an iterator over the elements of the collection. *)
 val pretty_iter2:
   format:(tformatter -> unit) format ->

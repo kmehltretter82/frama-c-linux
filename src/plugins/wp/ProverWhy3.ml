@@ -1203,7 +1203,7 @@ type prover_call = {
 
 let has_model_attr attrs =
   Why3.Ident.Sattr.fold_left (fun acc (e:Why3.Ident.attribute) ->
-      match String.strip_prefix "model_trace:" e.attr_string with
+      match String.remove_prefix "model_trace:" e.attr_string with
       | None -> acc
       | Some _ as a -> a
     ) None attrs

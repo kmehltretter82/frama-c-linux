@@ -11,6 +11,7 @@
 
 val nop: 'a -> unit
 [@@deprecated "Use ignore instead."]
+[@@migrate { repl = ignore }]
 (** Do nothing. *)
 
 val adapt_filename: string -> string
@@ -47,7 +48,7 @@ val mk_fun: string -> ('a -> 'b) ref
 (* ************************************************************************* *)
 
 val ($) : ('b -> 'c) -> ('a -> 'b) -> 'a -> 'c
-[@@deprecated "Use Fun.compose instead."]
+[@@deprecated "Use Fun.Operators.($) or Fun.compose instead."]
 [@@migrate { repl = Fun.compose } ]
 (** Composition. *)
 
@@ -59,6 +60,7 @@ val iter_uncurry2:
   (('a -> 'b -> unit) -> 'c -> unit) ->
   (('a * 'b -> unit) -> 'c -> unit)
 [@@deprecated "This function will be removed after the next release."]
+[@@migrate { repl = (fun iter f v -> iter (fun a b -> f (a, b)) v)}]
 
 (* ************************************************************************* *)
 (** {2 Tuples} *)
@@ -192,7 +194,8 @@ val map_no_copy_list: ('a -> 'a list) -> 'a list -> 'a list
 *)
 val merge_opt:
   ('a -> 'b -> 'b -> 'b) -> 'a -> 'b option -> 'b option -> 'b option
-[@@deprecated "Use Option.map2 or replace map merges by closed_union from Map."]
+[@@deprecated "Use Option.merge or replace map merges by closed_union from Map."]
+[@@migrate { repl = (fun f k -> Option.merge (f k)) } ]
 
 val opt_filter: ('a -> bool) -> 'a option -> 'a option
 [@@deprecated "Use Option.filter instead."]
@@ -213,8 +216,8 @@ val opt_hash: ('a -> int) -> 'a option -> int
 (** @since Sodium-20150201 *)
 
 val opt_map2: ('a -> 'b -> 'c) -> 'a option -> 'b option -> 'c option
-[@@deprecated "Use Option.inter instead."]
-[@@migrate { repl = Option.inter } ]
+[@@deprecated "Use Option.map2 instead."]
+[@@migrate { repl = Option.map2 } ]
 (** @return [f a b] if arguments are [Some a] and [Some b], orelse return
     [None].
     @since 24.0-Chromium *)
@@ -230,15 +233,15 @@ val opt_map_no_copy: ('a -> 'a) -> 'a option -> 'a option
 (* ************************************************************************* *)
 
 val string_del_prefix: ?strict:bool -> string -> string -> string option
-[@@deprecated "Use String.strip_prefix instead."]
-[@@migrate { repl = String.strip_prefix } ]
+[@@deprecated "Use String.remove_prefix instead."]
+[@@migrate { repl = String.remove_prefix } ]
 (** [string_del_prefix ~strict p s] returns [None] if [p] is not a prefix of
     [s] and Some [s1] iff [s=p^s1].
     @since Oxygen-20120901 *)
 
 val string_del_suffix: ?strict:bool -> string -> string -> string option
-[@@deprecated "Use String.strip_suffix instead."]
-[@@migrate { repl = String.strip_suffix } ]
+[@@deprecated "Use String.remove_suffix instead."]
+[@@migrate { repl = String.remove_suffix } ]
 (** [string_del_suffix ~strict suf s] returns [Some s1] when [s = s1 ^ suf]
     and None of [suf] is not a suffix of [s].
     @since Aluminium-20160501
@@ -252,8 +255,8 @@ val make_unique_name:
     @since Oxygen-20120901 *)
 
 val strip_underscore: string -> string
-[@@deprecated "Use String.strip_underscores instead."]
-[@@migrate { repl = String.strip_underscores } ]
+[@@deprecated "Use String.trim_underscore instead."]
+[@@migrate { repl = String.trim_underscore } ]
 (** remove underscores at the beginning and end of a string. If a string
     is composed solely of underscores, return the empty string
 

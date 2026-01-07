@@ -62,7 +62,7 @@ let func_locs () = FuncLocs.get ()
 let unsupported_attributes = ["vector_size"]
 
 let check_attribute_name s =
-  let res = String.strip_underscores s in
+  let res = String.trim_underscores s in
   if res = "" then
     Kernel.error ~once:true ~current:true "Invalid attribute name %s" s
   else begin

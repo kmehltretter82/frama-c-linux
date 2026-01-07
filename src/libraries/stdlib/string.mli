@@ -13,29 +13,24 @@
 
 include module type of Stdlib.String
 
-(** Case-insensitive string comparison. Only ISO-8859-1 accents are handled.
-    @since Silicon-20161101 *)
+(** Case-insensitive string comparison. Only ISO-8859-1 accents are handled. *)
 val compare_ignore_case: string -> string -> int
 
-(** [string_del_prefix ~strict p s] returns [None] if [p] is not a prefix of
-    [s] and Some [s1] iff [s=p^s1].
-    @since Oxygen-20120901 *)
-val strip_prefix: ?strict:bool -> string -> string -> string option
+(** [remove_prefix ~strict prefix s] returns [None] if [prefix] is not a prefix
+    of [s] and [Some s'] iff [s=prefix^s']. *)
+val remove_prefix: ?strict:bool -> string -> string -> string option
 
-(** [string_del_suffix ~strict suf s] returns [Some s1] when [s = s1 ^ suf]
-    and None of [suf] is not a suffix of [s].
-    @since Aluminium-20160501 *)
-val strip_suffix: ?strict:bool -> string -> string -> string option
+(** [remove_suffix ~strict suffix s] returns [None] if [suffix] is not a suffix
+    of [s] and [Some s'] iff [s=s'^suffix]. *)
+val remove_suffix: ?strict:bool -> string -> string -> string option
 
 (** Same as {!String.escaped} but for utf8 encoded strings. Unicode non ASCII
     characters are preserved unescaped. *)
 val utf8_escaped: string -> string
 
 (** remove underscores at the beginning and end of a string. If a string
-    is composed solely of underscores, return the empty string
-
-    @since 18.0-Argon *)
-val strip_underscores: string -> string
+    is composed solely of underscores, return the empty string *)
+val trim_underscores: string -> string
 
 (** Escape string for use in HTML tag. *)
 val html_escape: string -> string
@@ -46,7 +41,5 @@ val html_escape: string -> string
     character is converted to [%20].
 
     Cf. {{:https://datatracker.ietf.org/doc/html/rfc3986#section-2.3}} for the
-    list of unreserved characters.
-
-    @since 32.0-Germanium *)
+    list of unreserved characters. *)
 val percent_encode: string -> string

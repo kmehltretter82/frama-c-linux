@@ -254,7 +254,7 @@ struct
   let reevaluate ~oracle keys (m : t) : t =
     let update _k s acc =
       let merge prev =
-        Option.union (S.unify (M.smash ~oracle)) (Some s) prev
+        Option.merge (S.unify (M.smash ~oracle)) (Some s) prev
       in
       Map.update (S.evaluate keys s) merge acc
     in

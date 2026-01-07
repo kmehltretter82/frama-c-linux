@@ -13,15 +13,12 @@
 include module type of Stdlib.Array
 
 (** Same as {!Stdlib.Array.equal} but made available here until the
-    minimal supported version is OCaml 5.04. *)
+    minimal supported version is OCaml 5.4. *)
 val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
 
 (** Same as {!Stdlib.Array.compare} but made available here until the
-    minimal supported version is OCaml 5.04. *)
+    minimal supported version is OCaml 5.4. *)
 val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
-
-(** Same as {!Stdlib.Array.fold_left} but with the argument order reversed. *)
-val fold : ('a -> 'acc -> 'acc) -> 'a t -> 'acc -> 'acc
 
 (** Compute a hash for the set given a hash for the elements. *)
 val hash : ('a -> int) -> 'a t -> int
