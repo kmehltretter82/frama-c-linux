@@ -407,6 +407,11 @@ let is_fun_ptr t =
   | TPtr t -> is_fun t
   | _ -> false
 
+let is_fun_or_ptr t =
+  match unroll_skel t with
+  | TPtr _ | TFun _ -> true
+  | _ -> false
+
 (* ISO 6.2.5.21 *)
 let is_scalar t =
   is_arithmetic t || is_ptr t
@@ -574,8 +579,14 @@ let rec is_logic_arithmetic t =
   | Ltype (lti, _) -> unroll_logic_aux is_logic_arithmetic lti t
   | Lboolean | Lvar _ | Larrow _ -> false
 
+let is_logic_ptr t =
+  Logic_const.isLogicCType is_ptr t
+
 let is_logic_fun t =
   Logic_const.isLogicCType is_fun t
 
 let is_logic_fun_ptr t =
   Logic_const.isLogicCType is_fun_ptr t
+
+let is_logic_fun_or_ptr t =
+  Logic_const.isLogicCType is_fun_or_ptr t

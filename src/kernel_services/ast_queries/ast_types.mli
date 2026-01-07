@@ -257,6 +257,9 @@ val is_fun : typ -> bool
 (** True if the argument is a function pointer type. *)
 val is_fun_ptr : typ -> bool
 
+(** True if the argument is a pointer {i or} a function type. *)
+val is_fun_or_ptr : typ -> bool
+
 (** True if the argument is a scalar type (i.e. integral, enum, floating point
     or pointer.
 *)
@@ -356,6 +359,11 @@ val is_logic_real_or_float : logic_type -> bool
 *)
 val is_logic_arithmetic : logic_type -> bool
 
+(** True if the argument is a pointer type. Expands the logic type
+    definition if necessary.
+*)
+val is_logic_ptr : logic_type -> bool
+
 (** True if the argument is the logic function type. Expands the logic type
     definition if necessary.
 *)
@@ -365,3 +373,8 @@ val is_logic_fun : logic_type -> bool
     type definition if necessary.
 *)
 val is_logic_fun_ptr : logic_type -> bool
+
+(** True if the argument is a pointer {i or} function type.
+    Expands the logic type definition if necessary.
+*)
+val is_logic_fun_or_ptr : logic_type -> bool

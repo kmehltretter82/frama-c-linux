@@ -96,7 +96,10 @@ val domain_of_ltyp : map -> ?ctxt:context -> logic_type -> domain
 
 val merge : node -> node -> unit
 val merge_all : node list -> unit
+
+val pure : domain
 val merge_domain : domain -> domain -> domain
+val merge_points_to : domain -> node option
 
 val cvar : map -> varinfo -> node
 val lvar : map -> logic_var -> domain

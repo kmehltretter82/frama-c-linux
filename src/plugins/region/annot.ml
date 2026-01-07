@@ -19,24 +19,81 @@ module Vmap = Cil_datatype.Varinfo.Map
 
 let iadd_term env t = ignore @@ add_term env t
 let add_iterm env = function { it_content = t } -> add_term env t
-
+let iadd_iterm env t = ignore @@ add_iterm env t
 let add_ipred env ip = add_predicate env ip.ip_content.tp_statement
+
+(* -------------------------------------------------------------------------- *)
+(* ---  Process Assigns (From)                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+let add_write env lv tgt =
+  Memory.add_write tgt @@ Access.Term(env.property,lv)
+
+let add_points_to env tgt = function
+  | FromAny ->
+    let loc = Property.location env.property in
+    Options.abort ~source:(fst loc)
+      "Missing \\from for pointer assignment"
+  | From deps ->
+    let domain =
+      List.fold_left
+        (fun d t -> merge_domain d (add_iterm env t))
+        pure deps in
+    match merge_points_to domain with
+    | Some src -> Memory.add_points_to tgt src
+    | None ->
+      let loc = Property.location env.property in
+      Options.abort ~source:(fst loc)
+        "Missing pointer \\from for pointer assignment"
+
+let add_writes_from env (lv : term_lval) ~(from:deps) =
+  let ty,tgt = add_addr_lval env lv in
+  if Ast_types.is_arithmetic ty then
+    add_write env lv tgt
+  else if Ast_types.is_fun_or_ptr ty then
+    begin
+      add_write env lv tgt ;
+      add_points_to env tgt from ;
+    end
+  else
+    Options.not_yet_implemented "assigns to type (%a)" Printer.pp_typ ty
+
+let rec add_assigns_from env tgt ~from =
+  match tgt.term_node with
+  | TLval lv -> add_writes_from env lv ~from
+  | Tat(t,_) -> add_assigns_from env ~from t
+  | Tunion ts -> List.iter (add_assigns_from env ~from) ts
+  | Tinter ts ->
+    Options.warning "assigns intersection treated as union" ;
+    List.iter (add_assigns_from env ~from) ts
+  | Tcomprehension _ -> Options.not_yet_implemented "assigns comprehension"
+  | Tlet _ -> Options.not_yet_implemented "let-assigns"
+  | Tif (c,tt,te) ->
+    Options.warning ~source:(fst c.term_loc) "ignored assigns-condition" ;
+    add_assigns_from env tt ~from ;
+    add_assigns_from env te ~from ;
+  | TConst _ | TSizeOf _ | TSizeOfE _ | TAlignOf _ | TAlignOfE _
+  | TUnOp _ | TBinOp _ | TCast _ | TAddrOf _ | TStartOf _
+  | Tapp _ | Tlambda _ | TDataCons _
+  | Tbase_addr _ | Toffset (_, _) | Tblock_length _ | Tnull
+  | TUpdate _ | Ttypeof _ | Ttype _ | Tempty_set | Trange _ ->
+    Options.warning ~source:(fst tgt.term_loc)
+      "Non-assignable term (skipped)@ (%a)"
+      Printer.pp_term tgt
+
+let add_assigns ~iscalled env = function
+  | WritesAny ->
+    let loc = Property.location env.property in
+    Options.abort ~source:(fst loc) "unprecise assigns are not supported"
+  | Writes ws ->
+    if iscalled then
+      List.iter (fun (t,from) -> add_assigns_from env t.it_content ~from) ws
+    else
+      List.iter (fun (t,_) -> iadd_iterm env t) ws
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Process Behaviors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
-
-let iadd_from ~iscalled env (tgt,from) =
-  let d = add_iterm env tgt in
-  match from with
-  | FromAny -> ()
-  | From srcs ->
-    if iscalled then
-      let merge_from env a it =
-        merge_domain a @@ add_iterm env it
-      in ignore @@ List.fold_left (merge_from env) d srcs
-    else
-      List.iter (fun it -> ignore @@ add_iterm env it) srcs
 
 let add_requires ~map ~kf ~ki ~bhv ~formals ~result ip =
   let property = Property.ip_of_requires kf ki bhv ip in
@@ -46,14 +103,11 @@ let add_assumes ~map ~kf ~ki ~bhv ~formals ~result ip =
   let property = Property.ip_of_assumes kf ki bhv ip in
   add_ipred { map ; property ; formals ; result } ip
 
-let add_assigns ~iscalled ~map ~kf ~ki ~bhv ~formals ~result asgn =
-  match asgn with
-  | WritesAny -> ()
-  | Writes ws ->
-    let bhv = Property.Id_contract (Datatype.String.Set.empty,bhv) in
-    let property = Option.get @@ Property.ip_of_assigns kf ki bhv asgn in
-    let env = { map ; property ; formals ; result } in
-    List.iter (iadd_from ~iscalled env) ws
+let add_bassigns ~iscalled ~map ~kf ~ki ~bhv ~formals ~result asgn =
+  let bhv = Property.Id_contract (Datatype.String.Set.empty,bhv) in
+  let property = Option.get @@ Property.ip_of_assigns kf ki bhv asgn in
+  let env = { map ; property ; formals ; result } in
+  add_assigns ~iscalled env asgn
 
 let add_allocation ~map ~kf ~ki ~bhv ~formals ~result alloc =
   match alloc with
@@ -100,7 +154,7 @@ let add_behavior ~kf ~ki ~formals ~result ~iscalled map bhv =
     List.iter (add_requires ~map ~kf ~ki ~bhv ~formals ~result) bhv.b_requires ;
     List.iter (add_assumes ~map ~kf ~ki ~bhv ~formals ~result) bhv.b_assumes ;
     add_post_cond ~map ~kf ~ki ~bhv ~formals ~result bhv.b_post_cond ;
-    add_assigns ~iscalled ~map ~kf ~ki ~bhv ~formals ~result bhv.b_assigns ;
+    add_bassigns ~iscalled ~map ~kf ~ki ~bhv ~formals ~result bhv.b_assigns ;
     add_allocation ~map ~kf ~ki ~bhv ~formals ~result bhv.b_allocation ;
     List.iter (add_extension ~kf ~ki ~formals ~result map) bhv.b_extended ;
   end
@@ -141,11 +195,10 @@ let add_code_annot ~kf ~stmt ~formals ~result ~iscalled map c =
   | AVariant v ->
     let ki = Cil_datatype.Kinstr.kinstr_of_opt_stmt (Some stmt) in
     add_variant ~kf ~ki ~formals ~result map v
-  | AAssigns (_,WritesAny) -> ()
-  | AAssigns (_,Writes asgn) ->
-    let ki = Cil_datatype.Kinstr.kinstr_of_opt_stmt (Some stmt) in
-    let property = Option.get @@ Property.ip_assigns_of_code_annot kf ki c in
-    List.iter (iadd_from ~iscalled { map ; property ; formals ; result }) asgn
+  | AAssigns (_,asgn) ->
+    let property = Property.ip_of_code_annot_single kf stmt c in
+    let env = { map ; property ; formals ; result } in
+    add_assigns ~iscalled env asgn
   | AAllocation (_,FreeAllocAny) -> ()
   | AAllocation (_,(FreeAlloc (its1,its2) as alloc)) ->
     if List.compare_lengths its1 its2 != 0 then

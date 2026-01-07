@@ -392,7 +392,14 @@ let merge_all = function
 
 let merge (a: node) (b: node) : unit = merge_all [a;b]
 
-let merge_domain = Ldomain.merge (fun a b -> merge a b ; min a b)
+(* -------------------------------------------------------------------------- *)
+(* --- Merging Domains                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+let pure : domain = Ldomain.pure
+let dmerge a b = merge a b ; min a b
+let merge_domain = Ldomain.merge dmerge
+let merge_points_to = Ldomain.pointed dmerge
 
 (* -------------------------------------------------------------------------- *)
 (* --- Offset                                                             --- *)
