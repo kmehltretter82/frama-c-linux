@@ -5,7 +5,7 @@
   during initialization of variable 'T3', size of type 'int []' cannot be
   computed (Size of array without number of elements.)
 [eva:unknown-size] extern.i:7: Warning: 
-  during initialization of variable 'T4', size of type 'int const []' cannot be
+  during initialization of variable 'T4', size of type 'int []' cannot be
   computed (Size of array without number of elements.)
 [eva] extern.i:16: 
   problem with array size (not a compile-time constant), assuming 0

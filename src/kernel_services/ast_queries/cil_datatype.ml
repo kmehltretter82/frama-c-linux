@@ -29,7 +29,10 @@ end
 open Cil_types
 let (=?=) = Extlib.compare_basic
 let compare_list = List.compare
-let hash_list f = List.fold_left (fun acc d -> 65537 * acc + f d) 1
+
+let empty_list_hash = 1
+let hash_list f =
+  List.fold_left (fun acc d -> 65537 * acc + f d) empty_list_hash
 
 (* Functions that will clear internal, non-project compliant, caches *)
 let clear_caches = ref []
@@ -557,8 +560,10 @@ let hash_attribute _config (s, _) =
      equal function will be complicated enough in itself *)
   3 * Hashtbl.hash s + 117
 let hash_attributes config l =
-  let attrs = if config.logic_type then !drop_non_logic_attributes l else l in
-  hash_list (hash_attribute config) attrs
+  if config.no_attrs then empty_list_hash
+  else
+    let attrs = if config.logic_type then !drop_non_logic_attributes l else l in
+    hash_list (hash_attribute config) attrs
 
 let rec hash_type config t =
   let t = if config.unroll then !punrollType t else t in
