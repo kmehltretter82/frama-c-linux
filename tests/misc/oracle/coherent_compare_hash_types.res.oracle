@@ -1,0 +1,36 @@
+Checking Cil_datatype.Typ.t
+  The following types were considered equal but have different hashes (only showing the 5 first occurrences):
+    int const, int const __attribute__((__fc_stdlib__))
+    int const, int const __attribute__((__a_new_attr__))
+    int const, int const __attribute__((__fc_stdlib__, __a_new_attr__))
+    int __attribute__((__fc_stdlib__)), int __attribute__((__a_new_attr__))
+    int __attribute__((__fc_stdlib__)), int __attribute__((__fc_stdlib__,
+                                                           __a_new_attr__))
+
+Checking Cil_datatype.TypByName.t
+  The following types were considered equal but have different hashes (only showing the 5 first occurrences):
+    int const, int const __attribute__((__fc_stdlib__))
+    int const, int const __attribute__((__a_new_attr__))
+    int const, int const __attribute__((__fc_stdlib__, __a_new_attr__))
+    int __attribute__((__fc_stdlib__)), int __attribute__((__a_new_attr__))
+    int __attribute__((__fc_stdlib__)), int __attribute__((__fc_stdlib__,
+                                                           __a_new_attr__))
+
+Checking Cil_datatype.TypNoUnroll.t
+  The following types were considered equal but have different hashes (only showing the 5 first occurrences):
+    int const, int const __attribute__((__fc_stdlib__))
+    int const, int const __attribute__((__a_new_attr__))
+    int const, int const __attribute__((__fc_stdlib__, __a_new_attr__))
+    int __attribute__((__fc_stdlib__)), int __attribute__((__a_new_attr__))
+    int __attribute__((__fc_stdlib__)), int __attribute__((__fc_stdlib__,
+                                                           __a_new_attr__))
+
+Checking Cil_datatype.TypNoAttrs.t
+  The following types were considered equal but have different hashes (only showing the 5 first occurrences):
+    int const, int __attribute__((__fc_stdlib__))
+    int const, int __attribute__((__a_new_attr__))
+    int const, int __attribute__((__visibility__))
+    int const, int const __attribute__((__visibility__, __fc_stdlib__,
+                                        __a_new_attr__))
+    int const, int const __attribute__((__visibility__))
+
