@@ -290,6 +290,8 @@ Options taking a string as argument should preferably be written
 -tty                force the use of terminal capabilities for feedback; use
                     the opposite option for completely disabling the use of
                     terminal capabilities (opposite option is -no-tty)
+-tty-debug          print semantic tags that are not handled by the TTY (for
+                    plug-in developers) (opposite option is -no-tty-debug)
 -unicode            use utf8 in messages (set by default, opposite option is
                     -no-unicode)
 -verbose <n>        general level of verbosity
