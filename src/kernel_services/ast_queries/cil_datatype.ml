@@ -550,11 +550,12 @@ and compare_type config t1 t2 =
        TComp _ | TEnum _ | TBuiltin_va_list), _ ->
       index_typ t1 - index_typ t2
 
-and compare_arg_list  config l1 l2 =
+and compare_arg_list config l1 l2 =
   Option.compare
     (compare_list
-       (fun (_n1, t1, _l1) (_n2, t2, _l2) ->
-          compare_type config t1 t2
+       (fun (_n1, t1, l1) (_n2, t2, l2) ->
+          compare_chain (compare_type config) t1 t2
+            (compare_attributes config) l1 l2
        )) l1 l2
 
 let hash_attribute _config (s, _) =

@@ -1,32 +1,11 @@
 Checking Cil_datatype.Typ.t
-  The following types were considered equal but have different hashes (only showing the 5 first occurrences):
-    int (int x const), int (int x __attribute__((__fc_stdlib__)))
-    int (int x const), int (int x __attribute__((__a_new_attr__)))
-    int (int x const), int (int x __attribute__((__visibility__)))
-    int (int x const), int (int x const __attribute__((__a_new_attr__,
-                                                       __fc_stdlib__,
-                                                       __visibility__)))
-    int (int x const), int (int x const __attribute__((__visibility__)))
+  All checks succeeded !
 
 Checking Cil_datatype.TypByName.t
-  The following types were considered equal but have different hashes (only showing the 5 first occurrences):
-    int (int x const), int (int x __attribute__((__fc_stdlib__)))
-    int (int x const), int (int x __attribute__((__a_new_attr__)))
-    int (int x const), int (int x __attribute__((__visibility__)))
-    int (int x const), int (int x const __attribute__((__a_new_attr__,
-                                                       __fc_stdlib__,
-                                                       __visibility__)))
-    int (int x const), int (int x const __attribute__((__visibility__)))
+  All checks succeeded !
 
 Checking Cil_datatype.TypNoUnroll.t
-  The following types were considered equal but have different hashes (only showing the 5 first occurrences):
-    int (int x const), int (int x __attribute__((__fc_stdlib__)))
-    int (int x const), int (int x __attribute__((__a_new_attr__)))
-    int (int x const), int (int x __attribute__((__visibility__)))
-    int (int x const), int (int x const __attribute__((__a_new_attr__,
-                                                       __fc_stdlib__,
-                                                       __visibility__)))
-    int (int x const), int (int x const __attribute__((__visibility__)))
+  All checks succeeded !
 
 Checking Cil_datatype.TypNoAttrs.t
   All checks succeeded !
