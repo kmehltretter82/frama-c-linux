@@ -49,80 +49,64 @@
 [wp] [Valid] Goal xor8s_terminates (Cfg) (Trivial)
 [wp] [Valid] Goal xor8u_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal xor8u_terminates (Cfg) (Trivial)
-[wp] 52 goals scheduled
+[wp] 36 goals scheduled
 [wp] [Valid] typed_xor8u_assert_rte_unsigned_downcast (Alt-Ergo) (Cached)
 [wp] [Valid] typed_xor8u_assert_rte_unsigned_downcast_2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_xor8u_assigns (Qed)
 [wp] [Valid] typed_or8u_assert_rte_unsigned_downcast (Alt-Ergo) (Cached)
 [wp] [Valid] typed_or8u_assert_rte_unsigned_downcast_2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_or8u_assigns (Qed)
 [wp] [Valid] typed_and8u_assert_rte_unsigned_downcast (Alt-Ergo) (Cached)
 [wp] [Valid] typed_and8u_assert_rte_unsigned_downcast_2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_and8u_assigns (Qed)
 [wp] [Valid] typed_sr8u_assert_rte_shift (Alt-Ergo) (Cached)
 [wp] [Valid] typed_sr8u_assert_rte_unsigned_downcast (Alt-Ergo) (Cached)
 [wp] [Valid] typed_sr8u_assert_rte_unsigned_downcast_2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_sr8u_assigns (Qed)
 [wp] [Valid] typed_xor16u_assert_rte_unsigned_downcast (Alt-Ergo) (Cached)
 [wp] [Valid] typed_xor16u_assert_rte_unsigned_downcast_2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_xor16u_assigns (Qed)
 [wp] [Valid] typed_or16u_assert_rte_unsigned_downcast (Alt-Ergo) (Cached)
 [wp] [Valid] typed_or16u_assert_rte_unsigned_downcast_2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_or16u_assigns (Qed)
 [wp] [Valid] typed_and16u_assert_rte_unsigned_downcast (Alt-Ergo) (Cached)
 [wp] [Valid] typed_and16u_assert_rte_unsigned_downcast_2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_and16u_assigns (Qed)
 [wp] [Valid] typed_sr16u_assert_rte_shift (Alt-Ergo) (Cached)
 [wp] [Valid] typed_sr16u_assert_rte_unsigned_downcast (Alt-Ergo) (Cached)
 [wp] [Valid] typed_sr16u_assert_rte_unsigned_downcast_2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_sr16u_assigns (Qed)
 [wp] [Valid] typed_xor8s_assert_rte_signed_downcast (Alt-Ergo) (Cached)
 [wp] [Valid] typed_xor8s_assert_rte_signed_downcast_2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_xor8s_assigns (Qed)
 [wp] [Valid] typed_or8s_assert_rte_signed_downcast (Alt-Ergo) (Cached)
 [wp] [Valid] typed_or8s_assert_rte_signed_downcast_2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_or8s_assigns (Qed)
 [wp] [Valid] typed_and8s_assert_rte_signed_downcast (Alt-Ergo) (Cached)
 [wp] [Valid] typed_and8s_assert_rte_signed_downcast_2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_and8s_assigns (Qed)
 [wp] [Valid] typed_sr8s_assert_rte_shift (Qed)
 [wp] [Valid] typed_sr8s_assert_rte_signed_downcast (Alt-Ergo) (Cached)
 [wp] [Valid] typed_sr8s_assert_rte_signed_downcast_2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_sr8s_assigns (Qed)
 [wp] [Valid] typed_xor16s_assert_rte_signed_downcast (Alt-Ergo) (Cached)
 [wp] [Valid] typed_xor16s_assert_rte_signed_downcast_2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_xor16s_assigns (Qed)
 [wp] [Valid] typed_or16s_assert_rte_signed_downcast (Alt-Ergo) (Cached)
 [wp] [Valid] typed_or16s_assert_rte_signed_downcast_2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_or16s_assigns (Qed)
 [wp] [Valid] typed_and16s_assert_rte_signed_downcast (Alt-Ergo) (Cached)
 [wp] [Valid] typed_and16s_assert_rte_signed_downcast_2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_and16s_assigns (Qed)
 [wp] [Valid] typed_sr16s_assert_rte_shift (Qed)
 [wp] [Valid] typed_sr16s_assert_rte_signed_downcast (Alt-Ergo) (Cached)
 [wp] [Valid] typed_sr16s_assert_rte_signed_downcast_2 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_sr16s_assigns (Qed)
-[wp] Proved goals:   84 / 84
+[wp] Proved goals:   68 / 68
   Terminating:    16
   Unreachable:    16
-  Qed:            18
+  Qed:             2
   Alt-Ergo:       34
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  xor8u                     1        2        3       100%
-  or8u                      1        2        3       100%
-  and8u                     1        2        3       100%
-  sr8u                      1        3        4       100%
-  xor16u                    1        2        3       100%
-  or16u                     1        2        3       100%
-  and16u                    1        2        3       100%
-  sr16u                     1        3        4       100%
-  xor8s                     1        2        3       100%
-  or8s                      1        2        3       100%
-  and8s                     1        2        3       100%
-  sr8s                      2        2        4       100%
-  xor16s                    1        2        3       100%
-  or16s                     1        2        3       100%
-  and16s                    1        2        3       100%
-  sr16s                     2        2        4       100%
+  xor8u                     -        2        2       100%
+  or8u                      -        2        2       100%
+  and8u                     -        2        2       100%
+  sr8u                      -        3        3       100%
+  xor16u                    -        2        2       100%
+  or16u                     -        2        2       100%
+  and16u                    -        2        2       100%
+  sr16u                     -        3        3       100%
+  xor8s                     -        2        2       100%
+  or8s                      -        2        2       100%
+  and8s                     -        2        2       100%
+  sr8s                      1        2        3       100%
+  xor16s                    -        2        2       100%
+  or16s                     -        2        2       100%
+  and16s                    -        2        2       100%
+  sr16s                     1        2        3       100%
 ------------------------------------------------------------
