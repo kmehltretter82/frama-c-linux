@@ -713,7 +713,7 @@ module TTY_debug =
       let option_name = "-tty-debug"
       let module_name = "TTY_DEBUG"
       let default = false
-      let help = "print styles that are not handled by the TTY"
+      let help = "print semantic tags that are not handled by the TTY (for plug-in developers)"
     end)
 
 let () =
