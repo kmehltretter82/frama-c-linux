@@ -12,23 +12,6 @@ open Cil_types
 (* Misc functions *)
 (* ************************************************************************** *)
 
-(* return true if the string s starts with prefix p and false otherwise *)
-let startswith p s =
-  let lp = String.length p in
-  if lp <= String.length s then
-    p = String.sub s 0 lp
-  else
-    false
-
-(* if string s is prefixed with string p, then return s without p, otherwise
- * return s as is *)
-let strip_prefix p s =
-  let lp = String.length p in
-  if startswith p s then
-    String.sub s lp (String.length s - lp)
-  else
-    s
-
 (* True if a named function has a definition and false otherwise *)
 let has_fundef = function
   | Var vi ->
@@ -56,13 +39,15 @@ module RTL = struct
 
   let mk_api_name fname = api_prefix ^ fname
 
-  let is_generated_name name = startswith e_acsl_gen_prefix name
+  let is_generated_name name = String.starts_with ~prefix:e_acsl_gen_prefix name
 
   let mk_gen_name name =
     if is_generated_name name then name else e_acsl_gen_prefix ^ name
 
   let get_original_name kf =
-    strip_prefix e_acsl_gen_prefix (Kernel_function.get_name kf)
+    let name = Kernel_function.get_name kf in
+    String.remove_prefix e_acsl_gen_prefix name
+    |> Option.value ~default:name
 
   let is_generated_kf kf =
     is_generated_name (Kernel_function.get_name kf)
