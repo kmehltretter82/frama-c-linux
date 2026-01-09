@@ -29,8 +29,8 @@ import { Tree, Node } from 'dome/frame/tree';
 import { RState } from 'dome/data/states';
 import { Dropdown } from 'dome/dialogs';
 import { Icon } from 'dome/controls/icons';
-import { Decoder, Encoder, json, JsonTypeError } from 'dome/data/json';
-import { useWindowSettingsData } from 'dome/data/settings';
+import * as Json from 'dome/data/json';
+import { useWindowSettings } from 'dome/data/settings';
 
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
@@ -245,14 +245,14 @@ function FctItem(props: FctItemProps): JSX.Element {
 // --- Generic filter
 // --------------------------------------------------------------------------
 
-export interface LocalFilters extends Ast.filter {
+export interface LocalFilter extends Ast.filter {
   showPositive: boolean,
   showNegative: boolean
 }
 
 function isVisible(
   value: { filters: [string, boolean][] },
-  localFilters: LocalFilters[]
+  localFilters: LocalFilter[]
 ): boolean {
   return localFilters.every(f => {
       const { id, showPositive, showNegative } = f;
@@ -263,7 +263,7 @@ function isVisible(
 }
 
 function getContextMenu(
-  localFilters: LocalFilters[],
+  localFilters: LocalFilter[],
   set: (id: string, type: "pos" | "neg", newValue: boolean) => void
 ): MultiselectItemProps[] {
   const newMenu: MultiselectItemProps[] = [];
@@ -287,62 +287,34 @@ function getContextMenu(
   return newMenu;
 }
 
-const encodeFilters: Encoder<LocalFilters[]> = (js: LocalFilters[]) => {
-  return JSON.stringify(js);
-};
-const decodeFilters: Decoder<LocalFilters[]> = (js: json) => {
-  if (typeof js === 'string') return Object.values(JSON.parse(js));
-  else throw new JsonTypeError("string", js);
-};
-
-type FilterTypes = 'functions' | 'variables'
+type FilterKind = 'functions' | 'variables'
 
 /**
  * This hook returns the list of Boolean filters to display and
  * a function to modify the value of a filter.
  */
-function useFilterLocal(filters: Ast.filter[], type: FilterTypes): [
-  LocalFilters[],
+function useFilterLocal(filters: Ast.filter[], kind: FilterKind): [
+  LocalFilter[],
   setFilterValue: (id: string, type: "pos" | "neg", newValue: boolean) => void
 ] {
-  const [localFilters, setLocalFilters] = useWindowSettingsData<LocalFilters[]>(
-    `ivette.${type}.filters`,
-    decodeFilters, encodeFilters,
-    []
-  );
-  const ids = filters.map(e => e.id);
+  const name = `ivette.${kind}.filters`;
+  const decode = Json.jDict(Json.jBoolean);
+  const [savedFilters, setSavedFilters] = useWindowSettings(name, decode, {});
 
   const setFilterValue = React.useCallback(
     (id: string, type: 'pos' | 'neg', newValue: boolean): void => {
-      const newObj = structuredClone(localFilters);
-      const elt = newObj.findIndex(e => e.id === id);
-      if(elt === -1) return;
-      switch(type) {
-        case 'pos': newObj[elt].showPositive = newValue; break;
-        case 'neg': newObj[elt].showNegative = newValue; break;
-      }
-      setLocalFilters(newObj);
-  }, [localFilters, setLocalFilters]);
+      const newObj = structuredClone(savedFilters);
+      newObj[`${id}.${type}`] = newValue;
+      setSavedFilters(newObj);
+  }, [savedFilters, setSavedFilters]);
 
-  React.useEffect(() => {
-    const newFilters: LocalFilters[] = filters
-      .filter(a => !(localFilters.find(b => a.id === b.id)))
-      .map(a => {
-        return {
-          ...a,
-          showPositive: a.positive_default,
-          showNegative: a.negative_default
-        };
-      });
+  const localFilters = filters.map(f => {
+    const showPositive = savedFilters[`${f.id}.pos`] ?? f.positive_default;
+    const showNegative = savedFilters[`${f.id}.neg`] ?? f.negative_default;
+    return { ...f, showPositive, showNegative };
+  });
 
-    localFilters.forEach(a => {
-      const enabled = filters.find(b => b.id === a.id)?.enabled;
-      if(enabled !== undefined) a.enabled = enabled;
-    });
-    setLocalFilters([...localFilters, ...newFilters]);
-  }, [filters, localFilters, setLocalFilters ]);
-
-  return [localFilters.filter(e => ids.includes(e.id)), setFilterValue];
+  return [localFilters, setFilterValue];
 }
 
 function useFiltersFlipSettings(label: string, type: string, b: boolean)
