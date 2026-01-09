@@ -577,7 +577,23 @@ void reduce_base_addr () {
   Frama_C_show_each(p, q);
 }
 
-void main () {
+int volatile nondet;
+
+/* Tests the absence of crash after specific bug fix. */
+void no_crash (void) {
+  double matrix[10][10] = {1.0};
+  double **p = (double **)matrix;
+  /* The value of p[0] is expected to be a pointer, but is a double.
+     In the logic evaluation, both the over- and under-approximations must be
+     re-interpreted as a pointer to double to avoid cvalue/ival crashes. */
+  /*@ check \valid(p[0]); */
+  /*@ check \valid(p[0] + 1); */
+  if (nondet) {
+    double d = p[0][0]; // emits an invalid alarm
+  }
+}
+
+void main (void) {
   eq_tsets();
   eq_char();
   casts();
@@ -597,4 +613,5 @@ void main () {
   set_comprehension_assigns();
   plet();
   reduce_base_addr();
+  no_crash();
 }
