@@ -7737,8 +7737,11 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
 
   | _ ->
     Errorloc.abort_context
-      "cannot perform the following comparison %a"
+      "unsupported operator for such operands %a \
+       (type of e1: %a, type of e2: %a)"
       Cil_printer.pp_exp (dummy_exp(BinOp(bop,e1,e2,intType)))
+      Cil_printer.pp_typ t1
+      Cil_printer.pp_typ t2
 
 (* Constant fold a conditional. This is because we want to avoid having
  * conditionals in the initializers. So, we try very hard to avoid creating
