@@ -637,6 +637,21 @@ end
 (* --- Filters                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
+
+let filter_jtype =
+  let jtype =
+    Package.Jrecord
+      [ "id", Jstring;
+        "enabled", Jboolean;
+        "positive_label", Jstring;
+        "negative_label", Jstring;
+        "positive_default", Jboolean;
+        "negative_default", Jboolean;
+      ]
+  in
+  let descr = Md.plain "Type of filters that can be applied to AST elements" in
+  Data.declare ~package ~name:"filter" ~descr jtype
+
 module MakeFilter (Info: sig type t val name: string end) = struct
 
   type filter = {
@@ -649,15 +664,7 @@ module MakeFilter (Info: sig type t val name: string end) = struct
 
   module Filter = struct
     type t = filter
-
-    let jtype = Package.(Jrecord[
-        "id", Jstring;
-        "enabled", Jboolean;
-        "positive_label", Jstring;
-        "negative_label", Jstring;
-        "positive_default", Jboolean;
-        "negative_default", Jboolean;
-      ])
+    let jtype = filter_jtype
 
     let to_json filter = `Assoc [
         "id", `String filter.name;

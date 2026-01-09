@@ -245,16 +245,7 @@ function FctItem(props: FctItemProps): JSX.Element {
 // --- Generic filter
 // --------------------------------------------------------------------------
 
-interface Filters {
-  id: string,
-  enabled: boolean,
-  positive_label: string,
-  negative_label: string,
-  positive_default: boolean,
-  negative_default: boolean
-}
-
-export interface LocalFilters extends Filters {
+export interface LocalFilters extends Ast.filter {
   positiveValue: boolean,
   negativeValue: boolean
 }
@@ -310,7 +301,7 @@ type FilterTypes = 'functions' | 'variables'
  * This hook returns the list of Boolean filters to display and
  * a function to modify the value of a filter.
  */
-function useFilterLocal(filters: Filters[], type: FilterTypes): [
+function useFilterLocal(filters: Ast.filter[], type: FilterTypes): [
   LocalFilters[],
   setFilterValue: (id: string, type: "pos" | "neg", newValue: boolean) => void
 ] {
