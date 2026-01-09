@@ -246,8 +246,8 @@ function FctItem(props: FctItemProps): JSX.Element {
 // --------------------------------------------------------------------------
 
 export interface LocalFilters extends Ast.filter {
-  positiveValue: boolean,
-  negativeValue: boolean
+  showPositive: boolean,
+  showNegative: boolean
 }
 
 function isVisible(
@@ -255,11 +255,11 @@ function isVisible(
   localFilters: LocalFilters[]
 ): boolean {
   return localFilters.every(f => {
-      const { id, positiveValue, negativeValue } = f;
+      const { id, showPositive, showNegative } = f;
       const current = value.filters.find(([k, ]) => k === id)?.[1];
       return current === undefined ? true // default true
-              : (positiveValue && current) || (negativeValue && !current);
-    }, true);
+            : (showPositive && current) || (showNegative && !current);
+    });
 }
 
 function getContextMenu(
@@ -272,15 +272,15 @@ function getContextMenu(
         label: "Show " + filter.positive_label,
         enabled: filter.enabled,
         title: filter.positive_label || '',
-        checked: filter.positiveValue,
-        onClick: () => set(filter.id, 'pos', !filter.positiveValue),
+        checked: filter.showPositive,
+        onClick: () => set(filter.id, 'pos', !filter.showPositive),
       });
       newMenu.push({
         label: "Show " + filter.negative_label,
         enabled: filter.enabled,
         title: filter.negative_label || '',
-        checked: filter.negativeValue,
-        onClick: () => set(filter.id, 'neg', !filter.negativeValue),
+        checked: filter.showNegative,
+        onClick: () => set(filter.id, 'neg', !filter.showNegative),
       });
       newMenu.push("separator");
   });
@@ -318,8 +318,8 @@ function useFilterLocal(filters: Ast.filter[], type: FilterTypes): [
       const elt = newObj.findIndex(e => e.id === id);
       if(elt === -1) return;
       switch(type) {
-        case 'pos': newObj[elt].positiveValue = newValue; break;
-        case 'neg': newObj[elt].negativeValue = newValue; break;
+        case 'pos': newObj[elt].showPositive = newValue; break;
+        case 'neg': newObj[elt].showNegative = newValue; break;
       }
       setLocalFilters(newObj);
   }, [localFilters, setLocalFilters]);
@@ -330,8 +330,8 @@ function useFilterLocal(filters: Ast.filter[], type: FilterTypes): [
       .map(a => {
         return {
           ...a,
-          positiveValue: a.positive_default,
-          negativeValue: a.negative_default
+          showPositive: a.positive_default,
+          showNegative: a.negative_default
         };
       });
 
@@ -382,13 +382,13 @@ export function useFunctionFilter(): FunctionFilterRet {
     return (fct: Ast.functionsData): boolean => {
         const visible = isVisible(fct, localFilters);
         const local = !multipleSelectionActive || !selected || isSelected(fct);
-        return !!visible && local;
+        return visible && local;
       };
   }, [localFilters, selected, isSelected, multipleSelectionActive
   ]);
 
   const contextFctMenuItems: MultiselectItemProps[] = React.useMemo(() => {
-    const dyn = getContextMenu(localFilters.filter(e => e.id), setLocalFilters);
+    const dyn = getContextMenu(localFilters, setLocalFilters);
     dyn.push(
       menuItem({
         label: 'Selected only',
@@ -479,7 +479,9 @@ export function useVariableFilter(): VariablesFilterRet {
   const showVariable = React.useMemo(() => {
     return (vi: Ast.globalsData): boolean => {
       const visible = isVisible(vi, localFilters);
-      return !vi.stringLiteral && !!visible;
+      /* Never show global variables representing string literals.
+         If needed, add a new filter to show these variables. */
+      return !vi.stringLiteral && visible;
     };
   }, [localFilters]);
 
@@ -699,7 +701,7 @@ export function useAnnotFilter(): AnnotFilterRet {
         && (lmodel || d.kind !== 'MODEL')
         && (lvolatile || d.kind !== 'VOLATILE')
         && (lextensions || d.kind !== 'EXTENSION');
-        return !!visible;
+        return visible;
       };
   }, [ltypes, lfunPreds, laxiomatics, lemmas, lmodules,
     linvariants, lmodel, lvolatile, lextensions
