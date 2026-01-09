@@ -28,3 +28,27 @@ let pretty_iter2 ~format ~item ~sep ~iter pp_key pp_val fmt collection =
   let iter f = iter (fun k v -> f (k,v))
   and pp fmt (k,v) = Format.fprintf fmt item pp_key k pp_val v in
   pretty_iter ~format ~sep ~item:"%a" ~iter pp fmt collection
+
+let pretty_seq ~format ~item ~sep ?(last=sep) ?empty pp_item fmt seq =
+  match Seq.uncons seq with
+  | Some (first, remaining) ->
+    let pretty_nonempty fmt =
+      Format.fprintf fmt item pp_item first;
+      match Seq.uncons remaining with
+      | None -> () (* Only one element, already printed *)
+      | Some (second, remaining) ->
+        let pp previous current =
+          Format.fprintf fmt sep;
+          Format.fprintf fmt item pp_item previous;
+          current
+        in
+        let last_elt = Seq.fold_left pp second remaining in
+        Format.fprintf fmt last;
+        Format.fprintf fmt item pp_item last_elt
+    in
+    Format.fprintf fmt format pretty_nonempty
+  | None ->
+    (* Empty sequence *)
+    match empty with
+    | None -> Format.fprintf fmt format ignore
+    | Some empty -> Format.fprintf fmt empty

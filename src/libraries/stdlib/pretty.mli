@@ -44,3 +44,17 @@ val pretty_iter2:
   sep:unit format ->
   iter:(('a -> 'b -> unit) -> 'c -> unit) ->
   'a aformatter -> 'b aformatter -> 'c aformatter
+
+(** Pretty prints a sequence.
+    @param format defines the format used to print the collection, e.g. "@[%t@]"
+    @param item defines the format for an item of the collection, e.g. "@[%a@]"
+    @param sep defines the format for the separator between items, e.g "@;,"
+    @param last defines the format for the last separator, defaults to [sep]
+    @param empty defines the format for empty sequences, defaults to [format] *)
+val pretty_seq:
+  format:(tformatter -> unit) format ->
+  item:('a aformatter -> 'a -> unit) format ->
+  sep:unit format ->
+  ?last:unit format ->
+  ?empty:unit format ->
+  'a aformatter -> ('a Seq.t) aformatter
