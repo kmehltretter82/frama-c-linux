@@ -876,6 +876,7 @@ module Poly_list =
       let name ty = Type.par_ty_name is_function_or_pair ty ^ " list"
       let reprs ty = [ [ ty ] ]
       let structural_descr = Structural_descr.t_list
+      let pretty fmt l = pretty fmt l (* discard optional parameters *)
       let mem_project mem f = exists (mem f)
     end)
 
@@ -915,6 +916,7 @@ module Poly_array =
       let compare f a1 a2 =
         if a1 == a2 then 0
         else compare f a1 a2
+      let pretty fmt l = pretty fmt l (* discard optional parameters *)
       let mem_project mem f a =
         exists (mem f) a
     end)
