@@ -130,7 +130,7 @@
         # cvalue: a ∈ {1}
                   c ∈ {0} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: a ∈ {1}
                   c ∈ {0; 2}
 [mt] * Computing cfg

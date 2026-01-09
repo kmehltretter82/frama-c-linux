@@ -196,7 +196,7 @@
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ {0} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ {0}
 [mt] * Computing cfg
@@ -240,7 +240,7 @@
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ {1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ {1}
 [mt] * Computing cfg
@@ -393,7 +393,7 @@
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ {0; 1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ {0; 1}
 [mt] * Computing cfg
@@ -438,7 +438,7 @@
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ {1; 2} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ {1; 2}
 [mt] * Computing cfg
@@ -587,7 +587,7 @@
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ {0; 1; 2} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ {0; 1; 2}
 [mt] * Computing cfg
@@ -631,7 +631,7 @@
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ {1; 2; 3} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ {1; 2; 3}
 [mt] * Computing cfg
@@ -781,7 +781,7 @@
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ [0..2147483647] 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ [0..2147483647]
 [mt] * Computing cfg
@@ -832,7 +832,7 @@
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ [1..2147483647] 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ [1..2147483647]
 [mt] * Computing cfg
@@ -985,7 +985,7 @@
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ [0..2147483647] 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: shared_a ∈ {1}
                   shared_b ∈ [0..2147483647]
 [mt] * Computing cfg

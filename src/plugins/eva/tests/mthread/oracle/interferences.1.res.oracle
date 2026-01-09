@@ -198,7 +198,7 @@
         # cvalue: shared_a ∈ {0}
                   shared_b ∈ {1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: shared_a ∈ {0; 1}
                   shared_b ∈ {0; 1}
 [mt] * Computing cfg
@@ -252,7 +252,7 @@
         # cvalue: shared_a ∈ {0; 1; 2}
                   shared_b ∈ {0; 1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: shared_a ∈ {0; 1; 2}
                   shared_b ∈ {0; 1; 2}
 [mt] * Computing cfg
@@ -417,7 +417,7 @@
         # cvalue: shared_a ∈ {0; 1; 2}
                   shared_b ∈ {0; 1; 2} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: shared_a ∈ {0; 1; 2}
                   shared_b ∈ {0; 1; 2}
 [mt] * Computing cfg
@@ -471,7 +471,7 @@
         # cvalue: shared_a ∈ {0; 1; 2}
                   shared_b ∈ {0; 1; 2} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: shared_a ∈ {0; 1; 2}
                   shared_b ∈ {0; 1; 2}
 [mt] * Computing cfg
@@ -629,7 +629,7 @@
         # cvalue: shared_a ∈ {0; 1; 2}
                   shared_b ∈ {0; 1; 2} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: shared_a ∈ {0; 1; 2}
                   shared_b ∈ {0; 1; 2}
 [mt] * Computing cfg

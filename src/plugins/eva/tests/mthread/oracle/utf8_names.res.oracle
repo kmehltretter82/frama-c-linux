@@ -169,7 +169,7 @@
         b ∈ {0}
         c ∈ {1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         a ∈
          {{ garbled mix of &{"\"\360\220\215\205\" /0"}
@@ -233,7 +233,7 @@
           (origin: Arithmetic {utf8_names.c:23}) }}
         c ∈ {2} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         a ∈
          {{ garbled mix of &{"\"\360\220\215\205\" /0"}
@@ -399,7 +399,7 @@
           (origin: Arithmetic {utf8_names.c:23}) }}
         c ∈ {1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         a ∈
          {{ garbled mix of &{"\"\360\220\215\205\" /0"}
@@ -468,7 +468,7 @@
           (origin: Arithmetic {utf8_names.c:23}) }}
         c ∈ {2} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         a ∈
          {{ garbled mix of &{"\"\360\220\215\205\" /0"}
@@ -635,7 +635,7 @@
           (origin: Arithmetic {utf8_names.c:23}) }}
         c ∈ {1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         a ∈
          {{ garbled mix of &{"\"\360\220\215\205\" /0"}

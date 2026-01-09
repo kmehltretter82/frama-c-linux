@@ -345,7 +345,7 @@
         # cvalue: s1 ∈ {0; 1; 2}
                   s2 ∈ {3} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: s1 ∈ {0; 1; 2}
                   s2 ∈ {3}
 [mt] * Computing cfg
@@ -601,7 +601,7 @@
         # cvalue: s1 ∈ {0; 1; 2}
                   s2 ∈ {0; 3} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: s1 ∈ {0; 1; 2}
                   s2 ∈ {0; 3}
 [mt] * Computing cfg

@@ -34,7 +34,7 @@ let compare f a1 a2 =
 
 let hash hash_elt = Hash.hash_iter iter hash_elt
 
-let pretty pp_elt =
-  Pretty.pretty_iter
-    ~format:"[|@ %t |]" ~item:"%a" ~sep:";@ " ~iter
-    pp_elt
+let pretty pp_elt fmt a =
+  Pretty.pretty_seq
+    ~format:"[|@ %t |]" ~item:"%a" ~sep:";@ " ~empty:"[||]"
+    pp_elt fmt (to_seq a)

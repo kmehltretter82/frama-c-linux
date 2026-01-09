@@ -152,7 +152,7 @@
         # cvalue: a ∈ [--..--]
                   b ∈ {0} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: a ∈ [--..--]
                   b ∈ {0}
 [mt] * Computing cfg
@@ -184,7 +184,7 @@
         # cvalue: a ∈ [--..--]
                   b ∈ [--..--] 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: a ∈ [--..--]
                   b ∈ [--..--]
 [mt] * Computing cfg
@@ -280,7 +280,7 @@
         # cvalue: a ∈ [--..--]
                   b ∈ [--..--] 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: a ∈ [--..--]
                   b ∈ [--..--]
 [mt] * Computing cfg
@@ -313,7 +313,7 @@
         # cvalue: a ∈ [--..--]
                   b ∈ [--..--] 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: a ∈ [--..--]
                   b ∈ [--..--]
 [mt] * Computing cfg

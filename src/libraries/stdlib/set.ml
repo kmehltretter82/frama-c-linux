@@ -22,8 +22,8 @@ struct
 
   let hash = Hash.hash_iter iter
 
-  let pretty pp_elt =
-    Pretty.pretty_iter
-      ~format:"{ %t }" ~item:"%a" ~sep:";@ " ~iter
-      pp_elt
+  let pretty pp_elt fmt s =
+    Pretty.pretty_seq
+      ~format:"{ %t }" ~item:"%a" ~sep:";@ " ~empty:"{}"
+      pp_elt fmt (to_seq s)
 end

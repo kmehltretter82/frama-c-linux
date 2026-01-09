@@ -406,7 +406,7 @@
         e ∈ {1}
         f ∈ {1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -594,7 +594,7 @@
         e ∈ {0; 1}
         f ∈ {0; 1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -698,7 +698,7 @@
         e ∈ {0; 1}
         f ∈ {0; 1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -1066,7 +1066,7 @@
         e ∈ {0; 1}
         f ∈ {0; 1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -1259,7 +1259,7 @@
         e ∈ {0; 1}
         f ∈ {0; 1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -1364,7 +1364,7 @@
         e ∈ {0; 1}
         f ∈ {0; 1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -1722,7 +1722,7 @@
         e ∈ {0; 1}
         f ∈ {0; 1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}
@@ -1906,7 +1906,7 @@
         e ∈ {0; 1}
         f ∈ {0; 1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         global1 ∈ {0; 1}
         global2[0] ∈ {0; 1}

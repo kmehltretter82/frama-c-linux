@@ -144,7 +144,7 @@
       interrupt.c:9:
         # cvalue: interrupt_received ∈ {1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: interrupt_received ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -216,7 +216,7 @@
       interrupt.c:21:
         # cvalue: interrupt_received ∈ {0; 1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: interrupt_received ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -246,7 +246,7 @@
       interrupt.c:9:
         # cvalue: interrupt_received ∈ {0; 1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: interrupt_received ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -326,7 +326,7 @@
       interrupt.c:21:
         # cvalue: interrupt_received ∈ {0; 1} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: interrupt_received ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
