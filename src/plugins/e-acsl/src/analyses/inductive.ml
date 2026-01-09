@@ -304,6 +304,8 @@ end = struct
        been let-bound. *)
     (* lb: (future) let-bound variables; do not add variables that have already
        been used before. *)
+    let free_vars t = Vars.inter quantifiers @@ free_vars t in
+    let free_vars_pred p = Vars.inter quantifiers @@ free_vars_pred p in
     let rec test_mode ~lb ~fv p =
       let recurse ?(lb = lb) ?(fv = fv) = test_mode ~lb ~fv in
       let add_fv fv terms = Vars.unions @@ fv :: List.map free_vars terms in
@@ -358,11 +360,10 @@ end = struct
           Substs.of_list @@ List.filter_map mk_var_subst pairs
         in
         let fv = add_fv fv args in
-        let free_quantified_vars = Vars.inter fv quantifiers in
         let unbound_quantified_vars =
           Vars.filter
             (fun v -> not @@ Substs.mem v substs)
-            (Vars.diff free_quantified_vars lb)
+            (Vars.diff fv lb)
         in
         if Vars.is_empty unbound_quantified_vars
         then Some {Modus.mode; substs}
