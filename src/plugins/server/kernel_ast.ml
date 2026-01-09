@@ -637,16 +637,26 @@ end
 (* --- Filters                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
+(*  Filters can be defined on elements of type ['a] with a unique name and
+    a boolean function f: 'a -> bool, allowing the user to show/hide elements
+    for which f is true or false.
+    Additional information for each filter includes:
+    - whether the filter is currently active;
+    - positive/negative labels shown to the user to show/hide elements
+      for which f is true/false respectively.
+    - default values for the filter, i.e. whether elements for which [f] is
+      true/false are shown or hidden by default.
+*)
 
 let filter_jtype =
   let jtype =
     Package.Jrecord
-      [ "id", Jstring;
-        "enabled", Jboolean;
-        "positive_label", Jstring;
-        "negative_label", Jstring;
-        "positive_default", Jboolean;
-        "negative_default", Jboolean;
+      [ "id", Jstring; (* Unique name. *)
+        "enabled", Jboolean; (* Is the filter currently enabled? *)
+        "positive_label", Jstring; (* Label for positive elements. *)
+        "negative_label", Jstring; (* Label for negative elements. *)
+        "positive_default", Jboolean; (* Are positive elements shown by default? *)
+        "negative_default", Jboolean; (* Are negative elements shown by default? *)
       ]
   in
   let descr = Md.plain "Type of filters that can be applied to AST elements" in
@@ -655,11 +665,11 @@ let filter_jtype =
 module MakeFilter (Info: sig type t val name: string end) = struct
 
   type filter = {
-    name: string;
-    enable: unit -> bool;
-    value: Info.t -> bool;
-    labels: string * string;
-    default: bool * bool;
+    name: string; (* Unique identifiant of the filter *)
+    enable: unit -> bool; (* Is the filter currently enabled? *)
+    value: Info.t -> bool; (* Compute the filter value for an element *)
+    labels: string * string; (* Positive and negative labels shown to the user *)
+    default: bool * bool; (* Are positive/negative elements shown by default? *)
   }
 
   module Filter = struct
@@ -678,19 +688,26 @@ module MakeFilter (Info: sig type t val name: string end) = struct
     let of_json _ = Data.failure "Filter.of_json not implemented"
   end
 
+  (* List of filters registered via [register] below. *)
   let filters_ref : Filter.t list ref = ref []
+
+  (* List of hooks registered via [register] below, used to refresh filter
+     requests whenever a filter changes. *)
   let hooks_ref : ((unit -> unit) -> unit) list ref = ref []
 
+  (* Signal emitted whenever a filter changes. *)
   let signal =
     let name = String.lowercase_ascii Info.name ^ "Filters" in
-    let descr = Md.plain ("Signal for " ^ Info.name ^ "filters") in
+    let descr = Md.plain ("Signal for " ^ Info.name ^ " filters") in
     Request.signal ~package ~name ~descr
 
+  (* Default positive and negative labels for a filter of name [name]. *)
   let default_labels name =
     let lower = String.lowercase_ascii in
     let positive_label = lower name ^ " " ^ lower Info.name in
     positive_label, "non-" ^ positive_label
 
+  (* Registers a new filter. *)
   let register name
       ?(labels = default_labels name) ?default
       ?(enable=fun _ -> true) ?add_hook f =
@@ -703,13 +720,16 @@ module MakeFilter (Info: sig type t val name: string end) = struct
     Option.iter (fun f -> f (fun _ -> Request.emit signal)) add_hook;
     Request.emit signal
 
+  (* GET request listing all registered filters. *)
   let () =
     let name = "get" ^ String.capitalize_ascii Info.name ^ "Filters" in
     let descr = Md.plain ("List of filters for " ^ Info.name) in
-    Request.register ~package ~kind:`GET ~name ~descr ~signals:[signal]
+    Request.register
+      ~package ~kind:`GET ~name ~descr ~signals:[signal]
       ~input:(module Junit) ~output:(module Jlist (Filter))
       (fun () -> List.rev !filters_ref)
 
+  (* Compute the value of each registered filter for an element [elt]. *)
   let compute_filters elt =
     let aux acc filter =
       if filter.enable ()
@@ -722,6 +742,7 @@ module MakeFilter (Info: sig type t val name: string end) = struct
     List.iter (fun add_hook -> add_hook f) !hooks_ref
 end
 
+(* Filters on functions. *)
 module FctFilters = struct
   include MakeFilter
       (struct type t = kernel_function let name = "functions" end)
@@ -738,6 +759,7 @@ module FctFilters = struct
     register "ghost" Kernel_function.is_ghost;
 end
 
+(* Filters on variables. *)
 module VarFilters = struct
   include MakeFilter (struct type t = varinfo let name = "variables" end)
 
