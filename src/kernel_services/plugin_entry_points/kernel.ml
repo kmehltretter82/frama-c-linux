@@ -1679,6 +1679,25 @@ module VariadicStrict =
                 signedness"
   end)
 
+
+(* ************************************************************************* *)
+(** {2 Attribute Registration} *)
+(* ************************************************************************* *)
+
+(* TODO: add a mechanism to allow registrating a full attribute. *)
+let attributes_reg = add_group "Attribute Registration"
+
+let () = Parameter_customize.set_group attributes_reg
+let () = Parameter_customize.do_not_reset_on_copy ()
+module IgnoreAttributes =
+  String_list
+    (struct
+      let option_name = "-ignore-attributes"
+      let module_name = "IgnoreAttributes"
+      let arg_name = "attr1,attr2,..."
+      let help = "Registers attributes to be ignored during type comparison."
+    end)
+
 (* ************************************************************************* *)
 (** {2 Analysis Options} *)
 (* ************************************************************************* *)

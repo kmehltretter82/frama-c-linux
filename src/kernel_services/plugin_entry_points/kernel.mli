@@ -619,11 +619,22 @@ module GeneratedSpecCustom: Parameter_sig.Map
    and type value = string
 (** Behavior of option "-generated-spec-custom". *)
 
+(* ************************************************************************* *)
+(** {2 Variadic Normalization} *)
+(* ************************************************************************* *)
+
 module VariadicTranslation: Parameter_sig.Bool
 (** Behavior of option "-variadic-translation". *)
 
 module VariadicStrict: Parameter_sig.Bool
 (** Behavior of option "-variadic-strict". *)
+
+(* ************************************************************************* *)
+(** {2 Attribute Registration} *)
+(* ************************************************************************* *)
+
+module IgnoreAttributes: Parameter_sig.String_list
+(** Behavior of option "-ignore-attributes" *)
 
 (* ************************************************************************* *)
 (** {3 Customizing cabs2cil options} *)

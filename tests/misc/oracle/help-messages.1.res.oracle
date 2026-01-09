@@ -71,6 +71,12 @@ Options taking a string as argument should preferably be written
 -warn-unsigned-overflow  generate alarms for unsigned operations that
                     overflow (opposite option is -no-warn-unsigned-overflow)
 
+*** ATTRIBUTE REGISTRATION
+
+-ignore-attributes <attr1,attr2,...>  Registers attributes to be ignored
+                    during type comparison. (preferably use
+                    -ignore-attributes="attr1,attr2,...")
+
 *** CUSTOMIZING NORMALIZATION
 
 -aggressive-merging  merge function definitions modulo renaming (defaults to
