@@ -20,7 +20,16 @@ size_t f (size_t y)
   return tmp2;
 }
 
+volatile int nondet;
+
 float const F;
-int float_implicit() {
-  return F / 2;
+float const G[];
+float implicit_float_initializer (void) {
+  int i1 = F / 2;
+  int i2 = G[0] + 1;
+  float f1 = F + 2.;
+  float f2 = G[0] + 1;
+  if (nondet) return F+2;
+  if (nondet) return G[0];
+  return F;
 }
