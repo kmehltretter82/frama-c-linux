@@ -133,8 +133,10 @@ let pairs_fun_typ =
 let pairs_comp_typ = [(tc1, tc2)]
 
 let pairs =
-  pairs_attrs_typ @ pairs_nodes_typ @ pairs_array_typ @ pairs_fun_typ @ pairs_comp_typ
+  pairs_attrs_typ
+  @ pairs_nodes_typ
+  @ pairs_array_typ
+  @ pairs_fun_typ
+  @ pairs_comp_typ
 
-let () = check_all_datatypes pairs
-
-let () = exit 0
+let () = Boot.Main.extend (fun () -> check_all_datatypes pairs)
