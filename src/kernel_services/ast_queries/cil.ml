@@ -3066,7 +3066,7 @@ module SizeOfOrError = Datatype.Make(struct
 
 module TypSize =
   State_builder.Hashtbl
-    (TypNoAttrs.Hashtbl)
+    (Typ.Hashtbl)
     (SizeOfOrError)
     (struct
       let name = "Cil.CompInfoSize"
