@@ -3,10 +3,15 @@ open Cil_const
 
 module type S = Cil_datatype.S_with_collections_pretty with type t = typ
 
+(* Convert a list of elements to a list of all pair combinations of these
+   elements. *)
 let to_pairs l =
   List.combinations 2 l |>
   List.map (function [ t1; t2 ] -> (t1, t2) | _ -> assert false)
 
+(* If two types are considered equal, their hash should also be equal.
+   If this function returns true, it means our compare/hash functions are wrong.
+*)
 let check (module Typ : S) (t1, t2) =
   let h1 = Typ.hash t1 in
   let h2 = Typ.hash t2 in
@@ -77,6 +82,7 @@ let comp1 = {
 }
 let tc1 = mk_tcomp comp1
 
+(* Same name different id *)
 let comp2 = {
   cstruct = true;
   corig_name = "comp_type";
@@ -87,6 +93,18 @@ let comp2 = {
   creferenced = false;
 }
 let tc2 = mk_tcomp comp2
+
+(* Same id different name (should not be possible in practice). *)
+let comp3 = {
+  cstruct = true;
+  corig_name = "comp_type3";
+  cname = "comp_type3";
+  ckey = 42;
+  cfields = None;
+  cattr = [];
+  creferenced = false;
+}
+let tc3 = mk_tcomp comp3
 
 let ti = {
   torig_name = "named_type";
@@ -108,7 +126,7 @@ let pairs_nodes_typ =
   :: [ tn ]
   |> to_pairs
 
-(* Make sure we consider types and len correctly *)
+(* Make sure we consider types and len correctly for arrays. *)
 let pairs_array_typ =
   let loc = Cil_datatype.Location.unknown in
   let len1 = Some (Cil.one ~loc) in
@@ -119,7 +137,9 @@ let pairs_array_typ =
   :: [ mk_tarray intPtrType len1 ]
   |> to_pairs
 
-(* Simple test for va. Ret type does not matter since it is *)
+(* Simple tests for variadic functions, different parameter configuration
+   and also different parameter attributes. Ret types / parameter type do not
+   need to be tested here, we already tested regular node comparisons. *)
 let pairs_fun_typ =
   mk_tfun intType None true
   :: mk_tfun intType None false
@@ -130,7 +150,10 @@ let pairs_fun_typ =
     ) attrs_combinations
   |> to_pairs
 
-let pairs_comp_typ = [(tc1, tc2)]
+(* structs/unions are compared/hashed using their keys/names, it should never be
+   a problem, so we need just a few tests to make sure this is the case.
+*)
+let pairs_comp_typ = [(tc1, tc2); (tc1, tc3); (tc2, tc3)]
 
 let pairs =
   pairs_attrs_typ
