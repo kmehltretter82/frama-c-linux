@@ -13,9 +13,7 @@ Options taking a string as argument should preferably be written
 
 ***** LIST OF AVAILABLE OPTIONS:
 
--server-tsc         Generate TypeScript API (opposite option is
-                    -no-server-tsc)
--server-tsc-out <path>  Output directory (default is 'src')
+-server-tsc <path>  Generate TypeScript API in directory <path>
 
 *** DEBUG
 

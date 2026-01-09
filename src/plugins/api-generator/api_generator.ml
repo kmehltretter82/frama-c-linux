@@ -17,20 +17,13 @@ module Self = Plugin.Register
       let help = "Generate TypeScript API for Server"
     end)
 
-module TSC = Self.Action
+module TSC = Self.Filepath
     (struct
       let option_name = "-server-tsc"
-      let help = "Generate TypeScript API"
-    end)
-
-module OUT = Self.Filepath
-    (struct
-      let option_name = "-server-tsc-out"
       let arg_name = "path"
-      let default = "src"
       let file_kind = "output-dir"
       let existence = Filepath.Indifferent
-      let help = Printf.sprintf "Output directory (default is '%s')" default
+      let help = "Generate TypeScript API in directory <path>"
     end)
 
 module Md = Markdown
@@ -554,13 +547,13 @@ let makePackage pkg path fmt =
 (* -------------------------------------------------------------------------- *)
 
 let generate () =
-  if TSC.get () then
+  let out = TSC.get () in
+  if not (Filepath.is_empty out) then
     begin
       Pkg.iter
         begin fun pkg ->
           let path = pkg_path ~plugin:pkg.p_plugin ~package:pkg.p_package in
           Self.feedback "Package %s" path ;
-          let out = OUT.get () in
           let dir = Filepath.(out / path) in
           let file = Filepath.(dir / "index.ts") in
           Filesystem.make_dir dir ;
