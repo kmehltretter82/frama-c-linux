@@ -1,6 +1,5 @@
-/* run.config
-   PLUGIN: @EVA_PLUGINS@
-   OPT: -eva -eva-precision 2 -warn-special-float none -eva-annot main1,main2,main3 -print
+/* run.config*
+   OPT: -eva -eva-precision 2 -warn-special-float none -eva-annot main1,main2,main3,main4 -print
 */
 
 /* -------------------------------------------------------------------------- */
@@ -53,10 +52,21 @@ void main3(void) {
   }
 }
 
+typedef float T1;
+T1 G[64] = {(float)2.000f};
+static float G1;
+void main4(void){
+  {
+    G1 = (float)G[0];
+  }
+  return;
+}
+
 void main(void) {
   main1();
   main2();
   main3();
+  main4();
 }
 
 /* -------------------------------------------------------------------------- */
