@@ -65,6 +65,7 @@ let pp_mu = pretty "µ" "\\mu"
 (* Other symbols. *)
 
 let pp_right_arrow = pretty "→" "->"
+let pp_maps_to = pretty "↦" "->"
 let pp_plus_minus = pretty "±" "+/-"
 let pp_times = pretty "×" "x"
 let pp_ellipsis = pretty "…" "..."

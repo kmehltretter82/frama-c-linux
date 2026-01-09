@@ -45,6 +45,6 @@ let%test "int,string map" =
   let x = empty |> add 1 "Lorem" |> add 2 "ipsum" |> add 3 "dolor" in
   let pretty = pretty Format.pp_print_int Format.pp_print_string in
   _test_pretty pretty x
-    "{{ 1 -> Lorem; 2 ->\n\
-    \  ipsum; 3 ->\n\
+    "{{ 1 ↦ Lorem; 2 ↦\n\
+    \  ipsum; 3 ↦\n\
     \  dolor }}"

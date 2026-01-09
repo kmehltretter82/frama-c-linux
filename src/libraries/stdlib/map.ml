@@ -29,7 +29,9 @@ struct
 
   let pretty
       ?(format=format_of_string "{{ %t }}")
-      ?(item=format_of_string "%a ->@ %a")
+      ?(item=
+        let mapsto = Format.asprintf "%t" Unicode.pp_maps_to in
+        "%a @<1>" ^^ Scanf.format_from_string mapsto "" ^^ "@ %a")
       ?(sep=format_of_string ";@ ")
       ?(last=sep)
       ?(empty=format_of_string "{{}}")
