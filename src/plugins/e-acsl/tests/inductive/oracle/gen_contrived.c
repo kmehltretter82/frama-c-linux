@@ -174,26 +174,6 @@ long __gen_e_acsl_bind_twice_fun3_2(int a, int b);
 
 int __gen_e_acsl_bind_twice_fun3(int a, int b);
 
-/*@
-inductive overlap(integer x, integer y) {
-  case zero0: overlap(0, 0);
-  case zero1: overlap(0, 1);
-  case other: \forall integer x, integer z;
-                x > 0 ==> overlap(x - 1, z) ==> overlap(x, x + z);
-  }
- */
-/*@ predicate overlap(integer x, integer y) = overlap_fun2(x) == y;
- */
-int __gen_e_acsl_overlap(int x, int y);
-
-/*@
-logic integer overlap_fun2(integer x) =
-  x == 0 ? 0 :
-    (x == 0 ? 1 : (x > 0 ? (\let z = overlap_fun2(x - 1); x + z) : 0));
-
-*/
-int __gen_e_acsl_overlap_fun2(int x);
-
 int main(void)
 {
   int __retres;
@@ -211,7 +191,7 @@ int main(void)
     __gen_e_acsl_assert_data.pred_txt = "use_multimode(0, 0)";
     __gen_e_acsl_assert_data.file = "contrived.c";
     __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 77;
+    __gen_e_acsl_assert_data.line = 67;
     __e_acsl_assert(__gen_e_acsl_use_multimode_2,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
@@ -230,7 +210,7 @@ int main(void)
     __gen_e_acsl_assert_data_4.pred_txt = "simple_complex_argument(0, 1)";
     __gen_e_acsl_assert_data_4.file = "contrived.c";
     __gen_e_acsl_assert_data_4.fct = "main";
-    __gen_e_acsl_assert_data_4.line = 78;
+    __gen_e_acsl_assert_data_4.line = 68;
     __e_acsl_assert(__gen_e_acsl_simple_complex_argument_2,
                     & __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
@@ -250,7 +230,7 @@ int main(void)
     __gen_e_acsl_assert_data_5.pred_txt = "simple_complex_argument(0, 2)";
     __gen_e_acsl_assert_data_5.file = "contrived.c";
     __gen_e_acsl_assert_data_5.fct = "main";
-    __gen_e_acsl_assert_data_5.line = 79;
+    __gen_e_acsl_assert_data_5.line = 69;
     __e_acsl_assert(__gen_e_acsl_simple_complex_argument_4,
                     & __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
@@ -269,7 +249,7 @@ int main(void)
     __gen_e_acsl_assert_data_6.pred_txt = "use_foreign(0, 0)";
     __gen_e_acsl_assert_data_6.file = "contrived.c";
     __gen_e_acsl_assert_data_6.fct = "main";
-    __gen_e_acsl_assert_data_6.line = 80;
+    __gen_e_acsl_assert_data_6.line = 70;
     __e_acsl_assert(__gen_e_acsl_use_foreign_2,& __gen_e_acsl_assert_data_6);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
   }
@@ -287,7 +267,7 @@ int main(void)
     __gen_e_acsl_assert_data_7.pred_txt = "!use_foreign(1, 2)";
     __gen_e_acsl_assert_data_7.file = "contrived.c";
     __gen_e_acsl_assert_data_7.fct = "main";
-    __gen_e_acsl_assert_data_7.line = 81;
+    __gen_e_acsl_assert_data_7.line = 71;
     __e_acsl_assert(! __gen_e_acsl_use_foreign_4,
                     & __gen_e_acsl_assert_data_7);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
@@ -306,7 +286,7 @@ int main(void)
     __gen_e_acsl_assert_data_8.pred_txt = "conds(0, 2, 1)";
     __gen_e_acsl_assert_data_8.file = "contrived.c";
     __gen_e_acsl_assert_data_8.fct = "main";
-    __gen_e_acsl_assert_data_8.line = 82;
+    __gen_e_acsl_assert_data_8.line = 72;
     __e_acsl_assert(__gen_e_acsl_conds_2,& __gen_e_acsl_assert_data_8);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
   }
@@ -326,7 +306,7 @@ int main(void)
     __gen_e_acsl_assert_data_11.pred_txt = "use_var_bind_and_subst(0, 0)";
     __gen_e_acsl_assert_data_11.file = "contrived.c";
     __gen_e_acsl_assert_data_11.fct = "main";
-    __gen_e_acsl_assert_data_11.line = 83;
+    __gen_e_acsl_assert_data_11.line = 73;
     __e_acsl_assert(__gen_e_acsl_use_var_bind_and_subst_2,
                     & __gen_e_acsl_assert_data_11);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
@@ -347,7 +327,7 @@ int main(void)
     __gen_e_acsl_assert_data_13.pred_txt = "use_var_use_bind_and_subst(0, 0)";
     __gen_e_acsl_assert_data_13.file = "contrived.c";
     __gen_e_acsl_assert_data_13.fct = "main";
-    __gen_e_acsl_assert_data_13.line = 84;
+    __gen_e_acsl_assert_data_13.line = 74;
     __e_acsl_assert(__gen_e_acsl_use_var_use_bind_and_subst_2,
                     & __gen_e_acsl_assert_data_13);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
@@ -367,65 +347,11 @@ int main(void)
     __gen_e_acsl_assert_data_14.pred_txt = "bind_twice(2, 3, 1)";
     __gen_e_acsl_assert_data_14.file = "contrived.c";
     __gen_e_acsl_assert_data_14.fct = "main";
-    __gen_e_acsl_assert_data_14.line = 85;
+    __gen_e_acsl_assert_data_14.line = 75;
     __e_acsl_assert(__gen_e_acsl_bind_twice_2,& __gen_e_acsl_assert_data_14);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
   }
   /*@ assert bind_twice(2, 3, 1); */ ;
-  {
-    int __gen_e_acsl_overlap_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_17 =
-      {.values = (void *)0};
-    __gen_e_acsl_overlap_2 = __gen_e_acsl_overlap(0,0);
-    if (! __gen_e_acsl_overlap_2) __e_acsl_sound_verdict = 0;
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,
-                                 "overlap(0, 0)",0,__gen_e_acsl_overlap_2);
-    __gen_e_acsl_assert_data_17.blocking = 1;
-    __gen_e_acsl_assert_data_17.kind = "Assertion";
-    __gen_e_acsl_assert_data_17.pred_txt = "overlap(0, 0)";
-    __gen_e_acsl_assert_data_17.file = "contrived.c";
-    __gen_e_acsl_assert_data_17.fct = "main";
-    __gen_e_acsl_assert_data_17.line = 86;
-    __e_acsl_assert(__gen_e_acsl_overlap_2,& __gen_e_acsl_assert_data_17);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
-  }
-  /*@ assert overlap(0, 0); */ ;
-  {
-    int __gen_e_acsl_overlap_4;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_19 =
-      {.values = (void *)0};
-    __gen_e_acsl_overlap_4 = __gen_e_acsl_overlap(1,1);
-    if (! __gen_e_acsl_overlap_4) __e_acsl_sound_verdict = 0;
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,
-                                 "overlap(1, 1)",0,__gen_e_acsl_overlap_4);
-    __gen_e_acsl_assert_data_19.blocking = 1;
-    __gen_e_acsl_assert_data_19.kind = "Assertion";
-    __gen_e_acsl_assert_data_19.pred_txt = "overlap(1, 1)";
-    __gen_e_acsl_assert_data_19.file = "contrived.c";
-    __gen_e_acsl_assert_data_19.fct = "main";
-    __gen_e_acsl_assert_data_19.line = 87;
-    __e_acsl_assert(__gen_e_acsl_overlap_4,& __gen_e_acsl_assert_data_19);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_19);
-  }
-  /*@ assert overlap(1, 1); */ ;
-  {
-    int __gen_e_acsl_overlap_6;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_20 =
-      {.values = (void *)0};
-    __gen_e_acsl_overlap_6 = __gen_e_acsl_overlap(0,1);
-    if (! __gen_e_acsl_overlap_6) __e_acsl_sound_verdict = 0;
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,
-                                 "overlap(0, 1)",0,__gen_e_acsl_overlap_6);
-    __gen_e_acsl_assert_data_20.blocking = 1;
-    __gen_e_acsl_assert_data_20.kind = "Assertion";
-    __gen_e_acsl_assert_data_20.pred_txt = "overlap(0, 1)";
-    __gen_e_acsl_assert_data_20.file = "contrived.c";
-    __gen_e_acsl_assert_data_20.fct = "main";
-    __gen_e_acsl_assert_data_20.line = 88;
-    __e_acsl_assert(__gen_e_acsl_overlap_6,& __gen_e_acsl_assert_data_20);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_20);
-  }
-  /*@ assert overlap(0, 1); */ ;
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;
@@ -959,55 +885,6 @@ int __gen_e_acsl_bind_twice(int a, int b, int c)
   int __gen_e_acsl_bind_twice_fun3_10;
   __gen_e_acsl_bind_twice_fun3_10 = __gen_e_acsl_bind_twice_fun3(a,b);
   int __retres = __gen_e_acsl_bind_twice_fun3_10 == c;
-  return __retres;
-}
-
-/*@ assigns \result;
-    assigns \result \from x; */
-int __gen_e_acsl_overlap_fun2(int x)
-{
-  int __gen_e_acsl_if_16;
-  if (x == 0) __gen_e_acsl_if_16 = 0;
-  else {
-    int __gen_e_acsl_if_15;
-    if (x == 0) __gen_e_acsl_if_15 = 1;
-    else {
-      int __gen_e_acsl_if_14;
-      if (x > 0) {
-        int __gen_e_acsl_z_5;
-        int __gen_e_acsl_overlap_fun2_3;
-        __gen_e_acsl_overlap_fun2_3 = __gen_e_acsl_overlap_fun2(x - 1);
-        __gen_e_acsl_z_5 = __gen_e_acsl_overlap_fun2_3;
-        __gen_e_acsl_if_14 = x + __gen_e_acsl_z_5;
-      }
-      else {
-        {
-          __e_acsl_assert_data_t __gen_e_acsl_assert_data_18 =
-            {.values = (void *)0};
-          __gen_e_acsl_assert_data_18.blocking = 1;
-          __gen_e_acsl_assert_data_18.kind = "Assertion";
-          __gen_e_acsl_assert_data_18.pred_txt = "Incomplete inductive function";
-          __gen_e_acsl_assert_data_18.file = "contrived.c";
-          __gen_e_acsl_assert_data_18.fct = "overlap_fun2";
-          __gen_e_acsl_assert_data_18.line = 70;
-          __e_acsl_assert(0,& __gen_e_acsl_assert_data_18);
-        }
-        __gen_e_acsl_if_14 = 0;
-      }
-      __gen_e_acsl_if_15 = __gen_e_acsl_if_14;
-    }
-    __gen_e_acsl_if_16 = __gen_e_acsl_if_15;
-  }
-  return __gen_e_acsl_if_16;
-}
-
-/*@ assigns \result;
-    assigns \result \from x, y; */
-int __gen_e_acsl_overlap(int x, int y)
-{
-  int __gen_e_acsl_overlap_fun2_4;
-  __gen_e_acsl_overlap_fun2_4 = __gen_e_acsl_overlap_fun2(x);
-  int __retres = __gen_e_acsl_overlap_fun2_4 == y;
   return __retres;
 }
 

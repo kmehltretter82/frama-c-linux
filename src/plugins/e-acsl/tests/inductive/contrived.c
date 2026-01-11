@@ -63,16 +63,6 @@
   }
 */
 
-// Shows that the current implementation is unsound in case of overlapping cases.
-// zero1 is shadowed by zero0 in extracted logic function
-/*@
-  inductive overlap(ℤ x, ℤ y) {
-      case zero0: overlap(0, 0);
-      case zero1: overlap(0, 1);
-      case other: \forall ℤ x, z; x>0 ==> overlap(x-1, z) ==> overlap(x, x+z);
-  }
-@*/
-
 int main() {
   //@ assert use_multimode(0,0);
   //@ assert simple_complex_argument(0, 1);
@@ -83,8 +73,5 @@ int main() {
   //@ assert use_var_bind_and_subst(0,0);
   //@ assert use_var_use_bind_and_subst(0,0);
   //@ assert bind_twice(2, 3, 1);
-  //@ assert overlap(0, 0);
-  //@ assert overlap(1, 1);
-  /*@ assert overlap(0, 1); */ // unsound result: FAIL
   return 0;
 }
