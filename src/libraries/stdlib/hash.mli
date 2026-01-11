@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This modules provides hash functions.
+(** This module provides hash functions.
     @since Frama-C+dev *)
 
 (** [hash_iter iter hash x] hashes a collection [x] given an [iter] function on

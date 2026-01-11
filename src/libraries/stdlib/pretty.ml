@@ -10,7 +10,7 @@ type 'a aformatter = Format.formatter -> 'a -> unit
 type tformatter = Format.formatter -> unit
 type nonrec 'a format = ('a,Format.formatter,unit) format
 
-(* This functions is inspired by Pretty_utils functions and must be redefined
+(* This function is inspired by Pretty_utils functions and must be redefined
    here to avoid cyclic dependencies as Pretty_utils depends on Array and
    List. *)
 

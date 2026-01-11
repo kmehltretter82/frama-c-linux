@@ -25,8 +25,7 @@ module type S = sig
       @param item defaults to "%a"
       @param sep defaults to ";@ "
       @param last defaults to [sep]
-      @param empty defaults to "{}"
-      @since Frama-C+dev *)
+      @param empty defaults to "{}" *)
   val pretty :
     ?format:(Pretty.tformatter -> unit) Pretty.format ->
     ?item:(elt Pretty.aformatter -> elt -> unit) Pretty.format ->

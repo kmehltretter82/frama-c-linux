@@ -19,11 +19,10 @@ module type S = sig
 
   (** Pretty prints a set given a printer for the elements.
       @param format defaults to "{{ %t }}"
-      @param item defaults to "%a @<1>⟼ %a"
+      @param item defaults to "%a -> %a"
       @param sep defaults to ";@ "
       @param last defaults to [sep]
-      @param empty defaults to "{{}}"
-      @since Frama-C+dev *)
+      @param empty defaults to "{{}}" *)
   val pretty :
     ?format:(Pretty.tformatter -> unit) Pretty.format ->
     ?item:(key Pretty.aformatter -> key -> 'a Pretty.aformatter -> 'a -> unit)

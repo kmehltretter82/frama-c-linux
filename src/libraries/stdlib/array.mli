@@ -28,8 +28,7 @@ val hash : ('a -> int) -> 'a t -> int
     @param item defaults to "%a"
     @param sep defaults to ";@ "
     @param last defaults to [sep]
-    @param empty defaults to "[||]"
-    @since Frama-C+dev *)
+    @param empty defaults to "[||]" *)
 val pretty :
   ?format:(Pretty.tformatter -> unit) Pretty.format ->
   ?item:('a Pretty.aformatter -> 'a -> unit) Pretty.format ->

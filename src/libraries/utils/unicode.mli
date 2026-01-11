@@ -62,7 +62,7 @@ val pp_mu : printer (** µ *)
 (* Other symbols. *)
 
 val pp_right_arrow : printer (** → *)
-val pp_maps_to : printer (** ↦ *)
+val pp_maps_to : printer (** ↦ @since Frama-C+dev *)
 
 val pp_plus_minus : printer (** ± *)
 val pp_times : printer (** × *)

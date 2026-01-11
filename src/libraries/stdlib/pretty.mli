@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This modules provides pretty printing utilities. Same as {!Pretty_utils}
+(** This module provides pretty printing utilities. Same as {!Pretty_utils}
     but without dependencies to {!Fclib.List} or {!Fclib.Array}.
     @since Frama-C+dev *)
 
