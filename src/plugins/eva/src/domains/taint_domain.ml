@@ -420,35 +420,29 @@ module TransferSingleTaint = struct
                  locs_control = update ctrl_tainted state.locs_control; }
 
   let assign ~namespace ~pos lv exp _v valuation state =
-    let state =
-      match Position.stmt pos with
-      | None ->
-        state
-      | Some stmt ->
-        let state = filter_active_tainted_assumes stmt state in
-        let to_loc = loc_of_lval valuation in
-        assign_aux ~namespace ~pos lv.Eval.lval exp valuation to_loc state
-    in
-    `Value state
+    match Position.stmt pos with
+    | None ->
+      state
+    | Some stmt ->
+      let state = filter_active_tainted_assumes stmt state in
+      let to_loc = loc_of_lval valuation in
+      assign_aux ~namespace ~pos lv.Eval.lval exp valuation to_loc state
 
   let assume ~namespace ~pos exp _b valuation state =
-    let state =
-      match Position.stmt pos with
-      | None ->
-        state
-      | Some stmt ->
-        let state = filter_active_tainted_assumes stmt state in
-        (* Add [stmt] as assume statement in [state] as soon as [exp] is tainted. *)
-        let to_loc = loc_of_lval valuation in
-        let exp_zone = Eva_ast.PreciseDepsOf.zone_of_exp to_loc exp in
-        let tainted = LatticeSingleTaint.intersects state exp_zone in
-        if tainted && String.equal namespace private_taint_namespace
-        then warn_assume_interference ~pos exp_zone;
-        if not state.dependent_call && tainted
-        then { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
-        else state
-    in
-    `Value state
+    match Position.stmt pos with
+    | None ->
+      state
+    | Some stmt ->
+      let state = filter_active_tainted_assumes stmt state in
+      (* Add [stmt] as assume statement in [state] as soon as [exp] is tainted. *)
+      let to_loc = loc_of_lval valuation in
+      let exp_zone = Eva_ast.PreciseDepsOf.zone_of_exp to_loc exp in
+      let tainted = LatticeSingleTaint.intersects state exp_zone in
+      if tainted && String.equal namespace private_taint_namespace
+      then warn_assume_interference ~pos exp_zone;
+      if not state.dependent_call && tainted
+      then { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
+      else state
 
   let start_call ~namespace ~pos call _recursion valuation state =
     let stmt = Position.Local.stmt pos in
@@ -457,17 +451,14 @@ module TransferSingleTaint = struct
       state.dependent_call || not (Stmt.Set.is_empty state.assume_stmts)
     in
     let state = { state with assume_stmts = Stmt.Set.empty; dependent_call } in
-    let state =
-      (* Add tainted actual parameters in [state]. *)
-      let to_loc = loc_of_lval valuation in
-      List.fold_left
-        (fun s { Eval.concrete; formal; _ } ->
-           assign_aux ~namespace ~pos:(Position.of_local pos)
-             (Eva_ast.Build.var formal) concrete valuation to_loc s)
-        state
-        call.Eval.arguments
-    in
-    `Value state
+    (* Add tainted actual parameters in [state]. *)
+    let to_loc = loc_of_lval valuation in
+    List.fold_left
+      (fun s { Eval.concrete; formal; _ } ->
+         assign_aux ~namespace ~pos:(Position.of_local pos)
+           (Eva_ast.Build.var formal) concrete valuation to_loc s)
+      state
+      call.Eval.arguments
 
   let get_formats_number s =
     let split = String.split_on_char '%' s in
@@ -578,10 +569,6 @@ end
 
 module TransferMultiTaint = struct
 
-  let get_value v =
-    match v with
-    | `Value res -> res
-
   let update _valuation state_map = `Value state_map
 
   let assign ~pos lv exp v valuation state =
@@ -589,7 +576,6 @@ module TransferMultiTaint = struct
       let open Lattice_bounds.Top.Operators in
       let+ state_map = state in
       let assign_per_taint namespace state =
-        get_value @@
         TransferSingleTaint.assign ~namespace ~pos lv exp v valuation state
       in
       LatticeMultiTaint.mapi assign_per_taint state_map)
@@ -599,7 +585,6 @@ module TransferMultiTaint = struct
       let open Lattice_bounds.Top.Operators in
       let+ state_map = state in
       let assume_per_taint namespace state =
-        get_value @@
         TransferSingleTaint.assume ~namespace ~pos exp b valuation state
       in
       LatticeMultiTaint.mapi assume_per_taint state_map)
@@ -608,10 +593,8 @@ module TransferMultiTaint = struct
     `Value (
       let open Lattice_bounds.Top.Operators in
       let+ state_map = state in
-      let start_call_per_taint namespace state =
-        get_value @@
-        TransferSingleTaint.start_call ~namespace ~pos
-          call recursion valuation state
+      let start_call_per_taint namespace =
+        TransferSingleTaint.start_call ~namespace ~pos call recursion valuation
       in
       LatticeMultiTaint.mapi start_call_per_taint state_map)
 
