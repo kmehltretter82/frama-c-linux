@@ -1,0 +1,9 @@
+2d1
+< [eva:experimental] Warning: The taint domain is experimental.
+24c23,26
+< [eva] funcall3.c:23: Reusing old results for call to set_x
+---
+> [eva] computing for function set_x <- main.
+>   Called from funcall3.c:23.
+> [eva] Recording results for set_x
+> [eva] Done for function set_x

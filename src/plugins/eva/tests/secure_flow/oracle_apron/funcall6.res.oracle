@@ -1,0 +1,14 @@
+2d1
+< [eva:experimental] Warning: The taint domain is experimental.
+22,23c21,28
+< [eva] funcall6.c:37: Reusing old results for call to write_x
+< [eva] funcall6.c:38: Reusing old results for call to write_y
+---
+> [eva] computing for function write_x <- main.
+>   Called from funcall6.c:37.
+> [eva] Recording results for write_x
+> [eva] Done for function write_x
+> [eva] computing for function write_y <- main.
+>   Called from funcall6.c:38.
+> [eva] Recording results for write_y
+> [eva] Done for function write_y

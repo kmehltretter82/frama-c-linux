@@ -1,0 +1,39 @@
+2c2,6
+< [eva:experimental] Warning: The taint domain is experimental.
+---
+> [eva] Analyzing a complete application starting at main
+> [eva] Computing initial state
+> [eva] Initial state computed
+> [eva:initial-state] Values of globals at initialization
+>   secret ∈ [--..--]
+4a9,10
+> [eva] malloc3.c:13: Call to builtin malloc
+> [eva:malloc:new] malloc3.c:13: allocating variable __malloc_main_l13
+7c13,16
+< [eva:alarm] malloc3.c:20: Warning: check got status invalid.
+---
+> [eva] malloc3.c:15: Call to builtin malloc
+> [eva:malloc:new] malloc3.c:15: allocating variable __malloc_main_l15
+> [eva] malloc3.c:17: Call to builtin malloc
+> [eva:malloc:new] malloc3.c:17: allocating variable __malloc_main_l17
+10d18
+< [eva:alarm] malloc3.c:21: Warning: check got status invalid.
+12a21,38
+> [eva:alarm] malloc3.c:24: Warning: out of bounds write. assert \valid(p);
+> [eva:alarm] malloc3.c:26: Warning: out of bounds write. assert \valid(q);
+> [eva] malloc3.c:29: Call to builtin free
+> [eva] malloc3.c:29: function free: precondition 'freeable' got status valid.
+> [eva] malloc3.c:30: Call to builtin free
+> [eva] malloc3.c:30: function free: precondition 'freeable' got status valid.
+> [eva] Recording results for main
+> [eva] Done for function main
+> [eva] ====== VALUES COMPUTED ======
+> [eva:final-states] Values at end of function main:
+>   __fc_heap_status ∈ [--..--]
+>   __fc_errno ∈ [--..--]
+>   p ∈ {{ NULL ; &__malloc_main_l13 ; &__malloc_main_l15 }} or ESCAPINGADDR
+>   q ∈ {{ NULL ; &__malloc_main_l17 }} or ESCAPINGADDR
+>   __retres ∈ {0}
+>   __malloc_main_l13 ∈ {1} or UNINITIALIZED
+>   __malloc_main_l15 ∈ {1} or UNINITIALIZED
+>   __malloc_main_l17 ∈ {2} or UNINITIALIZED

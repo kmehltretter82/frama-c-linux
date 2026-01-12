@@ -1,0 +1,11 @@
+2d1
+< [eva:experimental] Warning: The taint domain is experimental.
+9a9
+> [eva:partition] struct7.c:17: starting to merge loop iterations
+12d11
+< [eva:partition] struct7.c:17: starting to merge loop iterations
+19,20c18
+<   s.a[0] ∈ {0}
+<    .a[1..9] ∈ [0..9]
+---
+>   s.a[0..9] ∈ [0..9]
