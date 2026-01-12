@@ -233,14 +233,6 @@ val should_print : string -> bool
 *)
 val should_ignore : string -> bool
 
-(** If the attribute is not yet registered, [ignore attrname] will register
-    [attrname] with [attr_class] set to [AttrUnknown] and [attr_print] to
-    [false]. Else its field [attr_ignore] will be set to [true] if it is not
-    the case yet.
-    @since Frama-C+dev
-*)
-val ignore : string -> unit
-
 (** Partition the attributes into classes: name, function type and type.
     Statement attributes are removed with a warning, Unknown attributes are
     returned in the `default` attribute class. If this class is [AttrUnknown],

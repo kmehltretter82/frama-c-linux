@@ -29,6 +29,9 @@ val dkey_asm_contracts: category
 
 val dkey_ast: category
 
+val dkey_attrs: category
+(** Display debug information related to attributes in Frama-C. *)
+
 val dkey_builtins: category
 
 val dkey_check: category
@@ -604,8 +607,12 @@ module GeneratedSpecCustom: Parameter_sig.Map
    and type value = string
 (** Behavior of option "-generated-spec-custom". *)
 
-module IgnoreAttributes: Parameter_sig.String_list
-(** Behavior of option "-ignore-attributes" *)
+type attr_info = Default | Class of string | Print of bool | Ignore of bool
+
+module RegisterAttributes: Parameter_sig.Multiple_map
+  with type key = string and type value = attr_info
+(** Behavior of option "-register-attributes"
+    @since Frama-C+dev *)
 
 (* ************************************************************************* *)
 (** {2 Compilation Database} *)

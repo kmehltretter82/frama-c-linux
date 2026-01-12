@@ -39,6 +39,11 @@ let dkey_asm_contracts =
 let dkey_ast =
   register_category ~help:"prints the AST just after Ast.compute" "ast"
 
+let dkey_attrs =
+  register_category
+    ~help:"displays some info related to the handling of attributes"
+    "attrs"
+
 let dkey_builtins =
   register_category ~help:"Cil builtins" "builtins"
 
@@ -1316,15 +1321,74 @@ module CStd =
       let values = [ C11, "c11" ; C17, "c17" ; C23, "c23" ]
     end)
 
+type attr_info =
+    Default | Class of string | Print of bool | Ignore of bool
+
+module AttributeInfo = struct
+  include Datatype.Make (struct
+      include Datatype.Serializable_undefined
+      type t = attr_info
+      let name = "Kernel.AttributeInfo"
+      let reprs = [ Default; Class "unknown"; Print true; Ignore false ]
+      let compare = Stdlib.compare
+      let equal = Datatype.from_compare
+      let hash = Hashtbl.hash
+      let copy = Fun.id
+    end)
+
+  let of_string = function
+    | "default" -> Default
+    | "name" -> Class "name"
+    | "type" -> Class "type"
+    | "funtype" -> Class "funtype"
+    | "stmt" -> Class "stmt"
+    | "unknown" -> Class "unknown"
+    | "print" -> Print true
+    | "noprint" -> Print false
+    | "ignore" -> Ignore true
+    | "noignore" -> Ignore false
+    | s ->
+      let msg = Format.asprintf "unknown attribute info %S" s in
+      raise (P.Cannot_build msg)
+
+  let to_string = function
+    | Default -> "default"
+    | Class s -> s
+    | Print true -> "print"
+    | Print false -> "noprint"
+    | Ignore true -> "ignore"
+    | Ignore false -> "noignore"
+end
+
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
-module IgnoreAttributes =
-  String_list
+module RegisterAttributes =
+  String_multiple_map
+    (AttributeInfo)
     (struct
-      let option_name = "-ignore-attributes"
-      let module_name = "IgnoreAttributes"
-      let arg_name = "attr1,attr2,..."
-      let help = "Registers attributes to be ignored during type comparison."
+      let module_name = "RegisterAttributes"
+      let option_name = "-register-attributes"
+      let help =
+        "Register an attribute so Frama-C knows how to handle it. \
+         Keys are attribute names and values are settings. It takes a list of \
+         attributes, separated by commas, each followed by a list of settings \
+         separated by colons, for example 'attr1:name:print:ignore,\
+         attr2:default'. The possible setting values are:\n\
+         - 'default': to register an attribute with default settings. If the \
+         attribute is already registred, we use its registered settings \
+         instead.\n\
+         - 'name', 'type', 'funtype', 'stmt' or 'unknown': class of the \
+         attribute that specifies on which AST node the attribute should be \
+         attached. Defaults to unknown.\n\
+         - 'print' or 'noprint': should the attribute be printed when \
+         printing the AST? Debug key 'printer:attrs' ignores this information. \
+         Defaults to print.\n\
+         - 'ignore' or 'noignore': should the attribute be ignored when \
+         comparing types? Defaults to 'ignore' if class is 'unknown' and \
+         'noignore' otherwise.\n\
+         Note: using the same setting category several times for the same \
+         attribute is undefined."
+      let arg_name = "k1:v1:v2,k2:v3,..."
     end)
 
 (* ************************************************************************* *)
