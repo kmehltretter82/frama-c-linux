@@ -52,7 +52,7 @@ module Base_checker = struct
       val known_logic_info = Logic_var.Hashtbl.create 7
       val mutable local_vars = Varinfo.Set.empty
       val known_logic_vars = Logic_var.Hashtbl.create 7
-      val switch_cases = ref (Stmt.Hashtbl.create 7)
+      val switch_cases = Stack.create ()
       val unspecified_sequence_calls = Stack.create ()
       val mutable labelled_stmt = []
       val mutable logic_labels = [ BuiltinLabel Init ]
@@ -378,7 +378,8 @@ module Base_checker = struct
 
       method private check_labels s =
         let check_one = function
-          | Case _ | Default _ when not @@ Stmt.Hashtbl.mem !switch_cases s ->
+          | Case _ | Default _
+            when not @@ Stmt.Hashtbl.mem (Stack.top switch_cases) s ->
             check_abort
               "@[<v 2>This switch case is either not referenced by a switch \
                statement or not referenced by the innermost one:@\n%a@]"
@@ -386,7 +387,7 @@ module Base_checker = struct
           | _ -> ()
         in
         List.iter check_one s.labels;
-        Stmt.Hashtbl.remove !switch_cases s
+        Stmt.Hashtbl.remove (Stack.top switch_cases) s
 
       method private check_try_catch_decl (decl,_) =
         match decl with
@@ -443,14 +444,15 @@ module Base_checker = struct
          | Goto (l,_) ->
            self#check_label l; Cil.ChangeDoChildrenPost(s,post_action)
          | Switch(_,_,cases,_) ->
-           let previous_switch_cases = !switch_cases in
-           switch_cases :=
+           let cases =
              List.to_seq cases
              |> Seq.map (fun s -> s, ())
-             |> Stmt.Hashtbl.of_seq;
+             |> Stmt.Hashtbl.of_seq
+           in
+           Stack.push cases switch_cases;
            Cil.ChangeDoChildrenPost(s, fun s ->
-               self#check_switch_post s !switch_cases;
-               switch_cases := previous_switch_cases;
+               self#check_switch_post s (Stack.top switch_cases);
+               Stack.pop switch_cases |> ignore;
                post_action s)
          | UnspecifiedSequence seq ->
            let calls =
