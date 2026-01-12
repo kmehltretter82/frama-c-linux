@@ -48,23 +48,6 @@ let private_taint_namespace = "private"
 let public_taint_namespace = "public"
 
 
-type taint_state = {
-  (* Over-approximation of the memory locations that are tainted due to a data
-     dependency. *)
-  locs_data: Zone.t;
-  (* Over-approximation of the memory locations that are tainted due to a
-     control dependency. *)
-  locs_control: Zone.t;
-  (* Set of assume statements over a tainted expression. This set is needed to
-     implement control-dependency: all left-values appearing in statements whose
-     evaluation depends on at least one of the assume expressions is to be
-     tainted. This set is restricted to statements of the current function. *)
-  assume_stmts: Stmt.Set.t;
-  (* Whether the current call depends on a tainted assume statement: if true,
-     all assignments in the current call should be control tainted. *)
-  dependent_call: bool;
-}
-
 (* Debug key to also include [assume_stmts] in the output of the
    Frama_C_domain_show_each directive. *)
 let dkey_debug = Self.register_category "d-taint-debug"
@@ -93,6 +76,51 @@ let wkey_secure_flow_assume =
     ~help:"warnings related to interference on conditions when \
            performing secure-flow analysis from \"-eva-domains taint\""
 
+let filter_public_zone =
+  let base_is_public base =
+    match Base.typeof base with
+    | None -> false
+    | Some typ -> Ast_types.has_qualifier public_taint_namespace typ
+  in
+  Zone.filter_base base_is_public
+
+let check_assign_interference ~pos ~data_tainted ~ctrl_tainted zone =
+  if (data_tainted || ctrl_tainted) && secure_flow_analysis () then
+    let zone = filter_public_zone zone in
+    if not (Zone.is_bottom zone) then
+      let source = fst (Position.loc pos) in
+      let warn wkey kind zone =
+        Self.warning ~wkey ~source ~once:true
+          "@[<hv 2>%s non-interference violation on@ @[<hov>{%a}@]"
+          kind Zone.pretty zone
+      in
+      if data_tainted then warn wkey_secure_flow_direct "direct" zone;
+      if ctrl_tainted then warn wkey_secure_flow_indirect "indirect" zone
+
+let warn_assume_interference ~pos zone =
+  if secure_flow_analysis () then
+    let source = fst (Position.loc pos) in
+    Self.warning ~wkey:wkey_secure_flow_assume ~source ~once:true
+      "@[<hv 2>non-interference violation on condition involving@ @[<hov>{%a}@]"
+      Zone.pretty zone
+
+
+type taint_state = {
+  (* Over-approximation of the memory locations that are tainted due to a data
+     dependency. *)
+  locs_data: Zone.t;
+  (* Over-approximation of the memory locations that are tainted due to a
+     control dependency. *)
+  locs_control: Zone.t;
+  (* Set of assume statements over a tainted expression. This set is needed to
+     implement control-dependency: all left-values appearing in statements whose
+     evaluation depends on at least one of the assume expressions is to be
+     tainted. This set is restricted to statements of the current function. *)
+  assume_stmts: Stmt.Set.t;
+  (* Whether the current call depends on a tainted assume statement: if true,
+     all assignments in the current call should be control tainted. *)
+  dependent_call: bool;
+}
 
 module LatticeSingleTaint = struct
 
@@ -352,28 +380,6 @@ module TransferSingleTaint = struct
       | `Value v ->
         if Cvalue.V.cardinal_zero_or_one v then bottom_loc else to_loc lval
 
-  let warn_on_assign_interference ~wkey ~pos zone =
-    let base_has_attribute base =
-      match Base.typeof base with
-      | None -> false
-      | Some typ -> Ast_types.has_qualifier public_taint_namespace typ
-    in
-    let has_tainted_public_base =
-      try Zone.fold_bases (fun b acc -> acc || base_has_attribute b) zone false
-      with Abstract_interp.Error_Top -> true
-    in
-    if has_tainted_public_base then
-      let source = fst (Position.loc pos) in
-      let kind =
-        if Self.wkey_name wkey = Self.wkey_name wkey_secure_flow_direct then
-          "direct"
-        else
-          "indirect"
-      in
-      Self.warning ~wkey ~source ~once:true
-        "@[<v>@[<hv 2>%s non-interference violation on@ @[<hov>{%a}@]@]"
-        kind Zone.pretty zone
-
   (* Propagates data- and control-taints for an assignment [lval = exp]. *)
   let assign_aux ~namespace ~pos lval exp v to_loc state =
     let lv_zone, lv_indirect_zone, singleton = compute_lval_zones to_loc lval in
@@ -401,27 +407,17 @@ module TransferSingleTaint = struct
       || Zone.intersects state.locs_control exp_zone
       || LatticeSingleTaint.intersects state lv_indirect_zone
     in
-    let update ~warn tainted locs =
+    if String.equal namespace private_taint_namespace
+    then check_assign_interference ~pos ~data_tainted ~ctrl_tainted lv_zone;
+    let update tainted locs =
       if tainted
-      then begin
-        if secure_flow_analysis ()
-        && String.equal namespace private_taint_namespace then
-          warn ~pos lv_zone;
-        Zone.join locs lv_zone
-      end
+      then Zone.join locs lv_zone
       else if singleton
       then Zone.diff locs lv_zone
       else locs
     in
-    let locs_data =
-      update ~warn:(warn_on_assign_interference ~wkey:wkey_secure_flow_direct)
-        data_tainted state.locs_data
-    in
-    let locs_control =
-      update ~warn:(warn_on_assign_interference ~wkey:wkey_secure_flow_indirect)
-        ctrl_tainted state.locs_control
-    in
-    { state with locs_data; locs_control; }
+    { state with locs_data = update data_tainted state.locs_data;
+                 locs_control = update ctrl_tainted state.locs_control; }
 
   let assign ~namespace ~pos lv exp _v valuation state =
     let state =
@@ -435,13 +431,6 @@ module TransferSingleTaint = struct
     in
     `Value state
 
-  let warn_on_assume_interference ~pos zone =
-    let source = fst (Position.loc pos) in
-    Self.warning ~wkey:wkey_secure_flow_assume ~source ~once:true
-      "@[<v>@[<hv 2>non-interference violation on condition \
-       involving@ @[<hov>{%a}@]@]"
-      Zone.pretty zone
-
   let assume ~namespace ~pos exp _b valuation state =
     let state =
       match Position.stmt pos with
@@ -452,15 +441,11 @@ module TransferSingleTaint = struct
         (* Add [stmt] as assume statement in [state] as soon as [exp] is tainted. *)
         let to_loc = loc_of_lval valuation in
         let exp_zone = Eva_ast.PreciseDepsOf.zone_of_exp to_loc exp in
-        if LatticeSingleTaint.intersects state exp_zone
-        then begin
-          if secure_flow_analysis ()
-          && String.equal namespace private_taint_namespace then
-            warn_on_assume_interference ~pos exp_zone;
-          if not state.dependent_call then
-            { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
-          else state
-        end
+        let tainted = LatticeSingleTaint.intersects state exp_zone in
+        if tainted && String.equal namespace private_taint_namespace
+        then warn_assume_interference ~pos exp_zone;
+        if not state.dependent_call && tainted
+        then { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
         else state
     in
     `Value state
