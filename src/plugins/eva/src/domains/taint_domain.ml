@@ -57,6 +57,10 @@ let wkey =
   Self.register_warn_category "taint"
     ~help:"warnings related to the taint analysis from \"-eva-domains taint\""
 
+(* -------------------------------------------------------------------------- *)
+(*             Checks and warnings related to -eva-secure-flow                *)
+(* -------------------------------------------------------------------------- *)
+
 let _wkey_secure_flow =
   Self.register_warn_category "secure-flow"
     ~help:"warnings related to secure-flow analysis from \"-eva-domains taint\""
@@ -104,6 +108,9 @@ let warn_assume_interference ~pos zone =
       "@[<hv 2>non-interference violation on condition involving@ @[<hov>{%a}@]"
       Zone.pretty zone
 
+(* -------------------------------------------------------------------------- *)
+(*                          Lattice for one taint                             *)
+(* -------------------------------------------------------------------------- *)
 
 type taint_state = {
   (* Over-approximation of the memory locations that are tainted due to a data
@@ -233,6 +240,9 @@ module LatticeSingleTaint = struct
 
 end
 
+(* -------------------------------------------------------------------------- *)
+(*                           Multi-taint lattice                              *)
+(* -------------------------------------------------------------------------- *)
 
 module LatticeMultiTaint = struct
 
@@ -321,6 +331,10 @@ module LatticeMultiTaint = struct
     `Value (Lattice_bounds.Top.narrow TaintNamespace.narrow t1 t2)
 
 end
+
+(* -------------------------------------------------------------------------- *)
+(*                         Propagation of one taint                           *)
+(* -------------------------------------------------------------------------- *)
 
 module TransferSingleTaint = struct
 
@@ -567,6 +581,10 @@ module TransferSingleTaint = struct
     Format.fprintf fmt "%B" (LatticeSingleTaint.intersects state exp_zone)
 end
 
+(* -------------------------------------------------------------------------- *)
+(*                            Multi-taint domain                              *)
+(* -------------------------------------------------------------------------- *)
+
 module TransferMultiTaint = struct
 
   let update _valuation state_map = `Value state_map
@@ -784,6 +802,9 @@ let registered =
   Abstractions.Domain.register ~name ~descr
     ~experimental:true ~auto_enable (module Domain)
 
+(* -------------------------------------------------------------------------- *)
+(*                        Register taint annotations                          *)
+(* -------------------------------------------------------------------------- *)
 
 exception Parse_error of string option
 
@@ -892,6 +913,9 @@ let () =
   Acsl_extension.register_code_annot_next_stmt ~plugin:"eva" "taint"
     (typer `Pre) false
 
+(* -------------------------------------------------------------------------- *)
+(*                     Interpretation of taint annotations                    *)
+(* -------------------------------------------------------------------------- *)
 
 type taint_predicate =
   { namespaces: string list; (* List of taint namespaces. *)
@@ -1146,6 +1170,9 @@ let interpret_taint_logic
 
 let () = Abstractions.Hooks.register interpret_taint_logic
 
+(* -------------------------------------------------------------------------- *)
+(*                                   API                                      *)
+(* -------------------------------------------------------------------------- *)
 
 type taint = Direct | Indirect | Untainted
 
