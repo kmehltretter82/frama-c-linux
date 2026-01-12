@@ -273,7 +273,10 @@ let wkey_attrs =
   register_warn_category
     ~help:"Warnings related to the handling of attributes in Frama-C"
     "attrs"
-let wkey_unknown_attribute = register_warn_category "unknown-attribute"
+let wkey_unknown_attribute =
+  register_warn_category
+    ~help:"Warnings emitted when encountering an unknown attribute"
+    "attrs:unknown"
 
 let wkey_long_double = register_warn_category "typing:long-double-unsupported"
 let () = set_warn_status wkey_long_double Log.Wonce
