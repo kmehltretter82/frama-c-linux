@@ -1555,8 +1555,14 @@ to print bold red text:
 Self.result "Hello, this is @{<bold,red>Foo@} Logs !"
 \end{ocamlcode}
 
-The full list of supported tags is available in
+The list of supported tags is available in
 \texttt{src/libraries/utils/ansi\_escape.mli}.
+Plugins may also extend and manage the set of supported semantic tags
+using this module.
+
+The command line option \texttt{-tty-debug} (hidden for non-developer users)
+can be used to display non-supported semantic tags like HTML tags in the
+standard output.
 
 \subsection{Advanced Logging Services}
 
