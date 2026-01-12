@@ -158,8 +158,8 @@
 [mt] recreation.c:37: Lock locks[2]
 [mt] recreation.c:38: Lock locks[4]
 [kernel:annot:missing-spec] recreation.c:40: Warning: 
-  Neither code nor specification for function random,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function random, generating default
+  assigns. See -generated-spec-* options for more info.
 [eva] using specification for function random
 [mt] recreation.c:44: Lock locks[0]
 [mt] recreation.c:45: Release locks[0]

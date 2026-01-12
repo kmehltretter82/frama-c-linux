@@ -795,9 +795,9 @@ let activated_config kf clauses =
   in
   List.fold_left collect (build_config Skip) clauses
 
-let clauses_fmt =
-  Pretty_utils.pp_list ~pre:"" ~sep:", " ~last:" and " ~suf:""
-    Format.pp_print_string
+let pretty_clauses fmt clauses =
+  List.pretty_text Format.pp_print_string ~sep:", " ~last:" and "
+    fmt (List.rev clauses)
 
 (* Emit warnings if we generated some clauses and if [kf] is a declaration
    and not a builtin of frama-c (cf. {!Make.get_default}).
@@ -809,29 +809,31 @@ let clauses_fmt =
 let do_warning kf ?(loc=Kernel_function.get_location kf) funspec = function
   | None -> ()
   | Some (combined, clauses) ->
-    let n = List.length clauses in
-    let clauses = Format.asprintf "%a" clauses_fmt (List.rev clauses) in
     let msg =
       if Cil.is_empty_funspec funspec then
         Format.asprintf
-          "Neither code nor specification for function %a,@, \
-           generating default %s"
-          Kernel_function.pretty kf clauses
+          "Neither code nor specification for function %a, \
+           generating default %a"
+          Kernel_function.pretty kf
+          pretty_clauses clauses
       else
         let source =
           if combined then
-            if n = 1 then " from the specification"
+            if List.length clauses = 1
+            then " from the specification"
             else " (some from the specification)"
           else ""
         in
         Format.asprintf
-          "Neither code nor explicit %s for function %a,@, generating default \
-           clauses%s"
-          clauses Kernel_function.pretty kf source
+          "Neither code nor explicit %a for function %a, \
+           generating default clauses%s"
+          pretty_clauses clauses
+          Kernel_function.pretty kf source
     in
     Kernel.warning
       ~once:true ~source:(fst loc) ~wkey:Kernel.wkey_missing_spec
-      "%s. See -generated-spec-* options for more info" msg
+      "@[%a.@ See -generated-spec-* options for more info.@]"
+      Format.pp_print_text msg
 
 (* Perform generation of all clauses, add them to the original specification,
    and emit property status for each of them. *)

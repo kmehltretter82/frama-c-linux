@@ -11,8 +11,8 @@
 [eva] computing for function main2 <- main.
   Called from bts0506.i:49.
 [kernel:annot:missing-spec] bts0506.i:15: Warning: 
-  Neither code nor specification for function f1,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function f1, generating default assigns.
+  See -generated-spec-* options for more info.
 [eva] computing for function f1 <- main2 <- main.
   Called from bts0506.i:15.
 [eva] using specification for function f1
@@ -27,8 +27,8 @@
   Called from bts0506.i:18.
 [eva] Done for function f1
 [kernel:annot:missing-spec] bts0506.i:20: Warning: 
-  Neither code nor specification for function f2,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function f2, generating default assigns.
+  See -generated-spec-* options for more info.
 [eva] computing for function f2 <- main2 <- main.
   Called from bts0506.i:20.
 [eva] using specification for function f2
@@ -40,8 +40,8 @@
   Called from bts0506.i:22.
 [eva] Done for function f2
 [kernel:annot:missing-spec] bts0506.i:24: Warning: 
-  Neither code nor specification for function f3,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function f3, generating default assigns.
+  See -generated-spec-* options for more info.
 [eva] computing for function f3 <- main2 <- main.
   Called from bts0506.i:24.
 [eva] using specification for function f3
@@ -50,8 +50,8 @@
   Called from bts0506.i:25.
 [eva] Done for function f3
 [kernel:annot:missing-spec] bts0506.i:27: Warning: 
-  Neither code nor specification for function f4,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function f4, generating default assigns.
+  See -generated-spec-* options for more info.
 [eva] computing for function f4 <- main2 <- main.
   Called from bts0506.i:27.
 [eva] using specification for function f4
@@ -66,8 +66,8 @@
   non-finite float value. assert \is_finite(tmp_9);
                           (tmp_9 from f4())
 [kernel:annot:missing-spec] bts0506.i:30: Warning: 
-  Neither code nor specification for function f5,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function f5, generating default assigns.
+  See -generated-spec-* options for more info.
 [eva] computing for function f5 <- main2 <- main.
   Called from bts0506.i:30.
 [eva] using specification for function f5
@@ -85,8 +85,8 @@
   non-finite double value. assert \is_finite(tmp_11);
                            (tmp_11 from f5())
 [kernel:annot:missing-spec] bts0506.i:33: Warning: 
-  Neither code nor specification for function f6,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function f6, generating default assigns.
+  See -generated-spec-* options for more info.
 [eva] computing for function f6 <- main2 <- main.
   Called from bts0506.i:33.
 [eva] using specification for function f6
@@ -110,8 +110,8 @@
   assert \aligned(tmp_14,alignof(int));
   (tmp_14 from f6())
 [kernel:annot:missing-spec] bts0506.i:37: Warning: 
-  Neither code nor specification for function f7,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function f7, generating default assigns.
+  See -generated-spec-* options for more info.
 [eva] computing for function f7 <- main2 <- main.
   Called from bts0506.i:37.
 [eva] using specification for function f7

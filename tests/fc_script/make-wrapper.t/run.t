@@ -22,8 +22,8 @@ to get a more verbose output for Make.
   [eva] using specification for function large_name_to_force_line_break_in_stack_msg
   [eva] using specification for function specified
   [kernel:annot:missing-spec] make-wrapper.c:29: Failure: 
-    Neither code nor specification for function external,
-     generating default assigns. See -generated-spec-* options for more info
+    Neither code nor specification for function external, generating default
+    assigns. See -generated-spec-* options for more info.
   [kernel] User Error: warning annot:missing-spec treated as fatal error.
   [eva] Clean up and save partial results.
   [kernel] Frama-C aborted: invalid user input.

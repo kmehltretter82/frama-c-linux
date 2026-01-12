@@ -46,8 +46,8 @@
 [pdg] computing for function print
 [from] Computing for function print
 [kernel:annot:missing-spec] top.i:7: Warning: 
-  Neither code nor specification for function print,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function print, generating default
+  assigns. See -generated-spec-* options for more info.
 [from] Done for function print
 [pdg] done for function print
 [sparecode] finalize call input propagation

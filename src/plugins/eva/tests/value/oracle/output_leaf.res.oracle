@@ -44,8 +44,8 @@
 [eva] computing for function main3 <- main.
   Called from output_leaf.i:47.
 [kernel:annot:missing-spec] output_leaf.i:40: Warning: 
-  Neither code nor specification for function f,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function f, generating default assigns.
+  See -generated-spec-* options for more info.
 [eva] computing for function f <- main3 <- main.
   Called from output_leaf.i:40.
 [eva] using specification for function f

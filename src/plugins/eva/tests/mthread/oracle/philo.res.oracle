@@ -57,8 +57,8 @@
 [mt] philo.c:38: Lock locks[4]
 [mt] philo.c:39: Lock locks[1]
 [kernel:annot:missing-spec] philo.c:40: Warning: 
-  Neither code nor specification for function random,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function random, generating default
+  assigns. See -generated-spec-* options for more info.
 [eva] using specification for function random
 [mt] philo.c:44: 
   Sending message on queue, content [0] ∈ {1}

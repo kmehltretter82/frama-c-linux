@@ -10,8 +10,8 @@
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [kernel:annot:missing-spec] read_all.c:25: Warning: 
-  Neither code nor specification for function random,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function random, generating default
+  assigns. See -generated-spec-* options for more info.
 [eva] using specification for function random
 [mt] read_all.c:27: 
   New thread: jobs, fun f, parent <main>, args [0..18446744073709551615]

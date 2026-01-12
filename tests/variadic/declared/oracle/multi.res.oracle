@@ -5,12 +5,12 @@
 [kernel:variadic] multi.i:18: Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [kernel:annot:missing-spec] multi.i:18: Warning: 
-  Neither code nor explicit assigns for function g,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit assigns for function g, generating default clauses.
+  See -generated-spec-* options for more info.
 [eva] using specification for function g
 [kernel:annot:missing-spec] multi.i:9: Warning: 
-  Neither code nor explicit assigns for function f,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit assigns for function f, generating default clauses.
+  See -generated-spec-* options for more info.
 [eva] using specification for function f
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function call1:

@@ -190,8 +190,8 @@
 [eva] computing for function main10 <- main.
   Called from assigns_from.i:291.
 [kernel:annot:missing-spec] assigns_from.i:152: Warning: 
-  Neither code nor specification for function c,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function c, generating default assigns.
+  See -generated-spec-* options for more info.
 [eva] computing for function c <- main10 <- main.
   Called from assigns_from.i:152.
 [eva] using specification for function c

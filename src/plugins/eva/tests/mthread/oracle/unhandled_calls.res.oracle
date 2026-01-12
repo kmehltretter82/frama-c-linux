@@ -16,8 +16,8 @@
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [kernel:annot:missing-spec] unhandled_calls.c:30: Warning: 
-  Neither code nor specification for function random,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function random, generating default
+  assigns. See -generated-spec-* options for more info.
 [eva] using specification for function random
 [eva:alarm] unhandled_calls.c:35: Warning: 
   pointer to function with incompatible type. assert \valid_function(p);
