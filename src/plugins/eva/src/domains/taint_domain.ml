@@ -545,7 +545,7 @@ module TransferSingleTaint = struct
                 dependent_call = pre.dependent_call; }
 
   (* Adds automatic taint from [call] to [state] for some libc functions.
-     Should be called after [finalize_call] only if -eva-auto-taint is set. *)
+     Should be called after [finalize_call] only if -eva-taint-auto is set. *)
   let add_call_auto_taint call state =
     match is_auto_taint_variadic call.Eval.kf with
     | Some str_literal_pos ->
@@ -648,7 +648,7 @@ module TransferMultiTaint = struct
         if LatticeSingleTaint.(equal empty state) then None else Some state
       in
       let map_state = LatticeMultiTaint.merge merge_per_key pre post in
-      (* Adds auto taints if -eva-auto-taint is set. *)
+      (* Adds auto taints if -eva-taint-auto is set. *)
       let map_state =
         if auto_taint () then
           let auto_state = LatticeMultiTaint.find_or_empty "auto" map_state in
