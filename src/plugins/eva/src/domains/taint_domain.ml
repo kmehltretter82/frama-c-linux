@@ -892,10 +892,52 @@ let () =
   Acsl_extension.register_code_annot_next_stmt ~plugin:"eva" "taint"
     (typer `Pre) false
 
+
+type taint_predicate =
+  { namespaces: string list; (* List of taint namespaces. *)
+    name: string; (* \tainted, \tainted_directly or \tainted_indirectly *)
+    arg: term; (* The predicate is applied to this term. *)
+    positive: bool; (* If false, negation of the predicate. *)
+  }
+
 (* The taint namespace of a term is stored as its term name.
    If no term name is present, the term namespace defaults to "default". *)
 let term_taint_namespaces term =
   if term.term_name = [] then [ default_taint_namespace ] else term.term_name
+
+let is_tainted_name = function
+  | "\\tainted" | "\\tainted_directly" | "\\tainted_indirectly" -> true
+  | _ -> false
+
+let find_security_status ~positive term =
+  let is_public lvar = String.equal public_taint_namespace lvar.lv_name in
+  let is_private lvar = String.equal private_taint_namespace lvar.lv_name in
+  match term.term_node with
+  | TLval (TVar lvar, TNoOffset) when is_private lvar -> Some positive
+  | TLval (TVar lvar, TNoOffset) when is_public lvar -> Some (not positive)
+  | _ -> None
+
+(* Returns information [taint_predicate] if [predicate] is a \tainted predicate.
+   Relations such as "security_status(arg) = private" are considered as a
+   \tainted(private:arg) predicate. Returns None if the [predicate] cannot
+   be interpreted as a \tainted predicate. *)
+let find_tainted_predicate ?(positive=true) predicate =
+  match predicate.pred_content with
+  | Papp ({l_var_info = { lv_name }}, _, [arg]) when is_tainted_name lv_name ->
+    let namespaces = term_taint_namespaces arg in
+    Some { namespaces; name = lv_name; arg; positive }
+  | Prel ((Req | Rneq as op), {term_node = Tapp (f, _, [arg])}, t)
+  | Prel ((Req | Rneq as op), t, {term_node = Tapp (f, _, [arg])}) ->
+    if String.equal f.l_var_info.lv_name lf_security_status_name then
+      let open Option.Operators in
+      let+ status = find_security_status ~positive t in
+      let positive = if op = Rneq then not status else status in
+      let namespaces = [ private_taint_namespace ] in
+      let name = "\\tainted" in
+      { namespaces; name; arg; positive }
+    else None
+  | _ -> None
+
 
 (* Interpretation of logic by the taint domain, using the cvalue domain. *)
 module TaintLogic = struct
@@ -922,29 +964,28 @@ module TaintLogic = struct
     | Some _ as x -> x
     | None -> eval_term_deps cvalue_env term
 
-  let reduce_by_taint_predicate cvalue_env state predicate_name term positive =
-    match eval_term_zone cvalue_env term with
+  let reduce_by_taint_predicate cvalue_env state taint_predicate =
+    match eval_term_zone cvalue_env taint_predicate.arg with
     | None -> state
     | Some (under, _over) ->
-      let zone_op = if positive then Zone.join else Zone.diff in
-      match predicate_name with
-      | "\\tainted" ->
-        { state with locs_data = zone_op state.locs_data under;
-                     locs_control = zone_op state.locs_control under; }
-      | "\\tainted_directly" ->
-        { state with locs_data = zone_op state.locs_data under }
-      | "\\tainted_indirectly" ->
-        { state with locs_control = zone_op state.locs_control under }
-      | _ -> state
-
-  let reduce_by_security_status_predicate cvalue_env state term positive =
-    let open Lattice_bounds.Top.Operators in
-    let+ state_map = state in
-    LatticeMultiTaint.mapi (fun key state ->
-        if String.equal key private_taint_namespace then
-          reduce_by_taint_predicate cvalue_env state "\\tainted" term positive
-        else
-          state) state_map
+      let zone_op = if taint_predicate.positive then Zone.join else Zone.diff in
+      let reduce state =
+        match taint_predicate.name with
+        | "\\tainted" ->
+          { state with locs_data = zone_op state.locs_data under;
+                       locs_control = zone_op state.locs_control under; }
+        | "\\tainted_directly" ->
+          { state with locs_data = zone_op state.locs_data under }
+        | "\\tainted_indirectly" ->
+          { state with locs_control = zone_op state.locs_control under }
+        | _ -> state
+      in
+      let open Lattice_bounds.Top.Operators in
+      let+ state_map = state in
+      let should_reduce name = List.mem name taint_predicate.namespaces in
+      LatticeMultiTaint.mapi
+        (fun name state -> if should_reduce name then reduce state else state)
+        state_map
 
   let rec reduce_by_predicate cvalue_env state predicate positive =
     match positive, predicate.pred_content with
@@ -958,39 +999,10 @@ module TaintLogic = struct
       let state2 = reduce_by_predicate cvalue_env state p2 positive in
       join state1 state2
     | _, Pnot p -> reduce_by_predicate cvalue_env state p (not positive)
-    | _, Papp ({l_var_info = {lv_name}}, _labels, [arg]) ->
-      begin
-        match lv_name with
-        | "\\tainted" | "\\tainted_directly" | "\\tainted_indirectly" ->
-          let open Lattice_bounds.Top.Operators in
-          let+ state_map = state in
-          let taint_names = term_taint_namespaces arg in
-          LatticeMultiTaint.mapi (fun key state ->
-              if List.mem key taint_names then
-                reduce_by_taint_predicate cvalue_env state lv_name arg positive
-              else
-                state) state_map
-        | _ -> state
-      end
-    | _, Prel (Rneq, t1, t2)->
-      let p = Logic_const.unnamed ~loc:predicate.pred_loc (Prel (Req, t1, t2)) in
-      reduce_by_predicate cvalue_env state p (not positive)
-    | _, (Prel (Req, {term_node = Tapp (f, _, [arg])}, t)
-         | Prel (Req, t, {term_node = Tapp (f, _, [arg])})) ->
-      if secure_flow_analysis () &&
-         String.equal f.l_var_info.lv_name lf_security_status_name then
-        begin
-          match t.term_node with
-          | TLval (TVar {lv_name}, TNoOffset)
-            when String.equal lv_name public_taint_namespace ->
-            reduce_by_security_status_predicate cvalue_env state arg (not positive)
-          | TLval (TVar {lv_name}, TNoOffset)
-            when String.equal lv_name private_taint_namespace ->
-            reduce_by_security_status_predicate cvalue_env state arg positive
-          | _ -> state
-        end
-      else state
-    | _ -> state
+    | _ ->
+      match find_tainted_predicate ~positive predicate with
+      | Some taint_pred -> reduce_by_taint_predicate cvalue_env state taint_pred
+      | None -> state
 
   let evaluate_taint_term cvalue_env zone term =
     match eval_term_zone cvalue_env term with
@@ -1000,68 +1012,27 @@ module TaintLogic = struct
       then Alarmset.Unknown
       else Alarmset.False
 
-  let evaluate_taint_predicate cvalue_env state predicate_name term =
-    let state =
-      match state with
-      | `Top -> LatticeSingleTaint.top
-      | `Value state_map ->
-        let taint_names = term_taint_namespaces term in
-        let states_list =
-          List.map
-            (fun key -> LatticeMultiTaint.find_or_empty key state_map)
-            taint_names
-        in
-        List.fold_left LatticeSingleTaint.join
-          LatticeSingleTaint.empty states_list
-    in
-    let zone =
-      match predicate_name with
-      | "\\tainted_directly" -> state.locs_data
-      | "\\tainted_indirectly" -> state.locs_control
-      | "\\tainted" | _ -> Zone.join state.locs_data state.locs_control
-    in
-    evaluate_taint_term cvalue_env zone term
-
-  let evaluate_security_status_predicate cvalue_env state arg t =
-    let state =
-      match state with
-      | `Top ->
-        LatticeSingleTaint.top
-      | `Value state_map ->
-        LatticeMultiTaint.find_or_empty private_taint_namespace state_map
-    in
-    let zone = Zone.join state.locs_data state.locs_control in
-    match t.term_node with
-    | TLval (TVar {lv_name}, TNoOffset)
-      when String.equal lv_name private_taint_namespace ->
-      evaluate_taint_term cvalue_env zone arg
-    | TLval (TVar {lv_name}, TNoOffset)
-      when String.equal lv_name public_taint_namespace ->
-      Abstract_interp.inv_truth @@ evaluate_taint_term cvalue_env zone arg
-    | _ -> Unknown
+  let evaluate_taint_predicate cvalue_env state predicate : Alarmset.status =
+    match state with
+    | `Top -> Unknown
+    | `Value state_map ->
+      let get_zone state =
+        match predicate.name with
+        | "\\tainted_directly" -> state.locs_data
+        | "\\tainted_indirectly" -> state.locs_control
+        | "\\tainted" | _ -> Zone.join state.locs_data state.locs_control
+      in
+      let add_zone acc namespace =
+        let state = LatticeMultiTaint.find_or_empty namespace state_map in
+        Zone.join acc (get_zone state)
+      in
+      let zone = List.fold_left add_zone Zone.bottom predicate.namespaces in
+      let truth = evaluate_taint_term cvalue_env zone predicate.arg in
+      if predicate.positive then truth else Abstract_interp.inv_truth truth
 
   let evaluate_predicate cvalue_env state predicate =
-    let rec evaluate predicate =
+    let rec evaluate predicate : Alarmset.status =
       match predicate.pred_content with
-      | Papp ({l_var_info = {lv_name}}, _labels, [arg]) ->
-        begin
-          match lv_name with
-          | "\\tainted" | "\\tainted_directly" | "\\tainted_indirectly" ->
-            evaluate_taint_predicate cvalue_env state lv_name arg
-          | _ -> Unknown
-        end
-      | Prel (Req | Rneq as rop, {term_node = Tapp (f, _, [arg])}, t)
-      | Prel (Req | Rneq as rop, t, {term_node = Tapp (f, _, [arg])}) ->
-        if secure_flow_analysis () &&
-           String.equal f.l_var_info.lv_name lf_security_status_name then
-          let op_truth =
-            match rop with
-            | Req -> Fun.id
-            | Rneq -> Abstract_interp.inv_truth
-            | _ -> assert false
-          in
-          op_truth @@ evaluate_security_status_predicate cvalue_env state arg t
-        else Unknown
       | Ptrue -> True
       | Pfalse -> False
       | Pand (p1, p2) ->
@@ -1079,7 +1050,10 @@ module TaintLogic = struct
           | _ -> Unknown
         end
       | Pnot p -> Abstract_interp.inv_truth (evaluate p)
-      | _ -> Unknown
+      | _ ->
+        match find_tainted_predicate predicate with
+        | Some pred -> evaluate_taint_predicate cvalue_env state pred
+        | None -> Unknown
     in
     evaluate predicate
 
