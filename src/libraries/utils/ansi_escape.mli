@@ -50,7 +50,7 @@ val is_supported : unit -> bool
 val enable_on : ?fallback:bool -> Format.formatter -> (unit -> unit)
 
 (** Output colors. The associated string semantic tag is documented for each
-    constructor. Note that there exists variants prefixed with "fg" and "bg"
+    constructor. Note that there exists variants prefixed with "fg:" and "bg:"
     for each colors, for foreground and background. When no prefix is used,
     it means the foreground color. *)
 type color =
@@ -73,8 +73,8 @@ type style =
   | Underline           (** ["underline"] *)
   | Blink               (** ["blink"] *)
   | Strike              (** ["strike"] *)
-  | Foreground of color (** ["fgxxxx"] where ["xxxx"] is the color tag *)
-  | Background of color (** ["bgxxxx"] where ["xxxx"] is the color tag *)
+  | Foreground of color (** ["fg:xxxx"] where ["xxxx"] is the color tag *)
+  | Background of color (** ["bg:xxxx"] where ["xxxx"] is the color tag *)
 
 (** Associates a style to format tag ["@{<tag>"]. *)
 val add_style : string -> style -> unit

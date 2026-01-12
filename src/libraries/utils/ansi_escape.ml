@@ -176,14 +176,12 @@ let styles_of_stag = function
   | Style_tag style -> [style]
   | _ -> raise Not_found
 
-let handle_fallback stag = function None -> "" | Some f -> f stag
-
 let mark_open_stag state fallback stag =
   try
     styles_of_stag stag
     |> List.map (open_style state)
     |> String.concat ""
-  with Not_found -> handle_fallback stag fallback
+  with Not_found -> fallback stag
 
 let mark_close_stag state fallback stag =
   try
@@ -191,7 +189,7 @@ let mark_close_stag state fallback stag =
     |> List.rev (* states must be popped in reverse order *)
     |> List.map (close_style state)
     |> String.concat ""
-  with Not_found -> handle_fallback stag fallback
+  with Not_found -> fallback stag
 
 let is_supported () =
   match Sys.getenv "TERM" with
@@ -207,8 +205,9 @@ let enable_on ?(fallback=false) formatter =
   populate () ;
   Format.pp_set_mark_tags formatter true ;
   let old = Format.pp_get_formatter_stag_functions formatter () in
-  let dopen = if fallback then Some old.mark_open_stag else None in
-  let dclose = if fallback then Some old.mark_close_stag else None in
+  let dopen,dclose =
+    if fallback then old.mark_open_stag, old.mark_close_stag
+    else let notag _ = "" in notag,notag in
   Format.pp_set_formatter_stag_functions formatter
     { old with
       mark_open_stag = mark_open_stag state dopen ;

@@ -707,11 +707,12 @@ module TTY =
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
+let () = Parameter_customize.is_invisible ()
 module TTY_debug =
   Bool
     (struct
       let option_name = "-tty-debug"
-      let module_name = "TTY_DEBUG"
+      let module_name = "TTY_debug"
       let default = false
       let help = "print semantic tags that are not handled by the TTY (for plug-in developers)"
     end)
