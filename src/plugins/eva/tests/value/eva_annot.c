@@ -1,7 +1,7 @@
-/* run.config
-   PLUGIN: @EVA_PLUGINS@
+/* run.config*
    OPT: -eva -eva-precision 2 -eva-annot main -print
 */
+
 
 /* -------------------------------------------------------------------------- */
 /* --- Testing EVA Annotations                                            --- */
