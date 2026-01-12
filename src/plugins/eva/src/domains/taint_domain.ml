@@ -74,10 +74,9 @@ let wkey =
   Self.register_warn_category "taint"
     ~help:"warnings related to the taint analysis from \"-eva-domains taint\""
 
-let wkey_secure_flow =
+let _wkey_secure_flow =
   Self.register_warn_category "secure-flow"
     ~help:"warnings related to secure-flow analysis from \"-eva-domains taint\""
-[@@ warning "-32"]
 
 let wkey_secure_flow_direct =
   Self.register_warn_category "secure-flow:direct"
