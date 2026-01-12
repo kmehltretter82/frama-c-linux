@@ -347,6 +347,26 @@ module String_list(X: Input_with_arg) =
       include X
     end)
 
+module String_map (X: Input_with_arg) =
+  P.String_map
+    (P.Value_string)
+    (struct
+      let () = Parameter_customize.set_module_name X.module_name
+      include X
+      let default = Datatype.String.Map.empty
+    end)
+
+module String_multiple_map
+    (V: Parameter_sig.Value_datatype)
+    (X: Input_with_arg) =
+  P.String_multiple_map
+    (V)
+    (struct
+      let () = Parameter_customize.set_module_name X.module_name
+      include X
+      let default = Datatype.String.Map.empty
+    end)
+
 module Filepath_list
     (X: sig
        include Input_with_arg
@@ -1645,12 +1665,11 @@ module GeneratedSpecMode =
 let () = Parameter_customize.set_group normalisation
 let () = Parameter_customize.do_not_reset_on_copy ()
 module GeneratedSpecCustom =
-  P.String_map
-    (P.Value_string)
+  String_map
     (struct
+      let module_name = "GeneratedSpecCustom"
       let option_name = "-generated-spec-custom"
       let arg_name = "c1:m1,c2:m2,..."
-      let default = Datatype.String.Map.empty
       let help =
         "Fine-tune missing specification generation by manually selecting \
          modes for each clause. Can be one of: frama-c, acsl, safe, skip or \
