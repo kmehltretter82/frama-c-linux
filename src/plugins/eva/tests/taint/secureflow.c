@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-eva-taint-secureflow"
+   STDOPT: +"-eva-secure-flow"
  */
 
 #define __fc_private __attribute__((private))

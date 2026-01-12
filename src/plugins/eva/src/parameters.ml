@@ -275,14 +275,13 @@ module TaintSingletons =
 let () = add_precision_dep TaintSingletons.parameter
 
 let () = Parameter_customize.set_group domains
-module TaintSecureFlow =
+module SecureFlow =
   False
     (struct
-      let option_name = "-eva-taint-secureflow"
-      let help = "Perform secure-flow (non-interference) analysis via the \
-                  taint domain."
+      let option_name = "-eva-secure-flow"
+      let help = "Perform secure-flow (non-interference) analysis."
     end)
-let () = add_precision_dep TaintSecureFlow.parameter
+let () = add_correctness_dep SecureFlow.parameter
 
 let () = Parameter_customize.set_group domains
 module Numerors_Mode =

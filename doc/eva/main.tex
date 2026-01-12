@@ -4768,8 +4768,8 @@ over-approximation of tainted locations, with respect to direct and indirect
 taints respectively.
 
 \subsubsection{Secure-flow analysis}
-The option \texttt{-eva-taint-secureflow} enables a secure-flow analysis based
-on the taint domain (this option automatically activates the taint domain).
+The option \texttt{-eva-secure-flow} enables a secure-flow analysis based on the
+taint domain (this option automatically activates the taint domain).
 
 This analysis aims at verifying non-interference properties---that is, the
 absence of unauthorized information flows between security levels---and detects
@@ -4842,7 +4842,7 @@ int main(void) {
 \end{listing-nonumber}
 
 \begin{frama-c-commands}
-frama-c -eva -eva-taint-secureflow sf.c
+frama-c -eva -eva-secure-flow sf.c
 \end{frama-c-commands}
 
 \Eva{} emits the following warnings:

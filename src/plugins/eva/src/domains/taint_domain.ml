@@ -38,7 +38,7 @@ let auto_taint_res_functions = (* auto taint the result *) [
 let auto_taint () = Parameters.TaintAuto.get ()
 let ignore_singletons () = not (Parameters.TaintSingletons.get ())
 
-let secure_flow_analysis () = Parameters.TaintSecureFlow.get ()
+let secure_flow_analysis () = Parameters.SecureFlow.get ()
 
 (* Default namespace for taints, when no custom one is provided by the user. *)
 let default_taint_namespace = "default"
@@ -830,7 +830,7 @@ include Domain
 let registered =
   let name = "taint"
   and descr = "Taint analysis" in
-  let auto_enable = Parameters.TaintSecureFlow.get in
+  let auto_enable = Parameters.SecureFlow.get in
   Abstractions.Domain.register ~name ~descr
     ~experimental:true ~auto_enable (module Domain)
 

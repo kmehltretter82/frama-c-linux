@@ -26,7 +26,8 @@ module OctagonCall: Parameter_sig.Bool
 
 module TaintAuto: Parameter_sig.Bool
 module TaintSingletons: Parameter_sig.Bool
-module TaintSecureFlow: Parameter_sig.Bool
+
+module SecureFlow: Parameter_sig.Bool
 
 module TracesUnrollLoop: Parameter_sig.Bool
 module TracesUnifyLoop: Parameter_sig.Bool
