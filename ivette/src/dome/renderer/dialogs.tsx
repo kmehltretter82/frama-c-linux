@@ -544,15 +544,19 @@ function usePopupPosition(
       if(!visible || isCovered) setPosition(defaultPos);
       else {
         /** The offset is used to prevent the anchored popup from extending
-          * beyond the right edge of the screen. */
-        let offset = 0;
+          * beyond the right/bottom edge of the screen. */
+        let offsetX = 0;
+        let offsetY = 0;
         if(popupElt) {
           const popupRect = popupElt.getBoundingClientRect();
           if(rect.left + popupRect.width > windowSize.width) {
-            offset = rect.left + popupRect.width - windowSize.width;
+            offsetX = rect.left + popupRect.width - windowSize.width;
+          }
+          if(rect.bottom + popupRect.height > windowSize.height) {
+            offsetY = rect.height + popupRect.height;
           }
         }
-        setPosition({ top: rect.bottom, left: rect.left-offset });
+        setPosition({ top: rect.bottom-offsetY, left: rect.left-offsetX });
       }
     }
   }, [controlRect, controlRef, popupRef, windowSize, isOpen]);
