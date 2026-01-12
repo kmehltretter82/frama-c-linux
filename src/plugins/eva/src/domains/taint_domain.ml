@@ -750,33 +750,27 @@ module Domain = struct
 
   (* Scoping and Initialization. *)
 
-  let enter_scope kind vars state =
+  let enter_scope _kind vars state =
     if not (secure_flow_analysis ()) then
       state
     else
-      begin
-        match kind with
-        | Abstract_domain.Formal _ | Result _ ->
-          state
-        | Global | Local _ ->
-          let open Lattice_bounds.Top.Operators in
-          let+ state_map = state in
-          let namespace = private_taint_namespace in
-          let taint_state =
-            LatticeMultiTaint.find_or_empty namespace state_map
-          in
-          let locs_data =
-            List.fold_left (fun locs_data vi ->
-                if TransferSingleTaint.has_attribute namespace vi.vtype then
-                  let vi_zone = Locations.zone_of_varinfo vi in
-                  Zone.join locs_data vi_zone
-                else
-                  locs_data)
-              taint_state.locs_data vars
-          in
-          let taint_state = { taint_state with locs_data } in
-          LatticeMultiTaint.add namespace taint_state state_map
-      end
+      let open Lattice_bounds.Top.Operators in
+      let+ state_map = state in
+      let namespace = private_taint_namespace in
+      let taint_state =
+        LatticeMultiTaint.find_or_empty namespace state_map
+      in
+      let locs_data =
+        List.fold_left (fun locs_data vi ->
+            if TransferSingleTaint.has_attribute namespace vi.vtype then
+              let vi_zone = Locations.zone_of_varinfo vi in
+              Zone.join locs_data vi_zone
+            else
+              locs_data)
+          taint_state.locs_data vars
+      in
+      let taint_state = { taint_state with locs_data } in
+      LatticeMultiTaint.add namespace taint_state state_map
 
   let remove_bases_per_taint bases state =
     let remove = Zone.filter_base (fun b -> not (Base.Hptset.mem b bases)) in
