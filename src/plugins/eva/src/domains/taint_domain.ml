@@ -352,18 +352,11 @@ module TransferSingleTaint = struct
       | `Value v ->
         if Cvalue.V.cardinal_zero_or_one v then bottom_loc else to_loc lval
 
-  let rec has_attribute attribute typ =
-    let typ = Ast_types.unroll typ in
-    match typ.tnode with
-    | TArray (base_typ, _) -> has_attribute attribute base_typ
-    | _ -> Ast_types.has_attribute attribute typ
-
-
   let warn_on_assign_interference ~wkey ~pos zone =
     let base_has_attribute base =
       match Base.typeof base with
       | None -> false
-      | Some typ -> has_attribute public_taint_namespace typ
+      | Some typ -> Ast_types.has_qualifier public_taint_namespace typ
     in
     let has_tainted_public_base =
       try Zone.fold_bases (fun b acc -> acc || base_has_attribute b) zone false
@@ -762,7 +755,7 @@ module Domain = struct
       in
       let locs_data =
         List.fold_left (fun locs_data vi ->
-            if TransferSingleTaint.has_attribute namespace vi.vtype then
+            if Ast_types.has_qualifier namespace vi.vtype then
               let vi_zone = Locations.zone_of_varinfo vi in
               Zone.join locs_data vi_zone
             else
