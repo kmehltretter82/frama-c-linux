@@ -360,7 +360,7 @@ module TransferSingleTaint = struct
     in
     let has_tainted_public_base =
       try Zone.fold_bases (fun b acc -> acc || base_has_attribute b) zone false
-      with Abstract_interp.Error_Top -> false
+      with Abstract_interp.Error_Top -> true
     in
     if has_tainted_public_base then
       let source = fst (Position.loc pos) in
