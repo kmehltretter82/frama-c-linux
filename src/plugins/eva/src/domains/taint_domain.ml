@@ -715,23 +715,19 @@ module Domain = struct
     if not (secure_flow_analysis ()) then
       state
     else
-      let open Lattice_bounds.Top.Operators in
-      let+ state_map = state in
       let namespace = private_taint_namespace in
-      let taint_state =
-        LatticeMultiTaint.find_or_empty namespace state_map
-      in
-      let locs_data =
-        List.fold_left (fun locs_data vi ->
-            if Ast_types.has_qualifier namespace vi.vtype then
-              let vi_zone = Locations.zone_of_varinfo vi in
-              Zone.join locs_data vi_zone
-            else
-              locs_data)
-          taint_state.locs_data vars
-      in
-      let taint_state = { taint_state with locs_data } in
-      LatticeMultiTaint.add namespace taint_state state_map
+      let is_private vi = Ast_types.has_qualifier namespace vi.vtype in
+      match List.filter is_private vars with
+      | [] -> state
+      | private_vars ->
+        let var_zones = List.map Locations.zone_of_varinfo private_vars in
+        let private_zone = List.fold_left Zone.join Zone.bottom var_zones in
+        let open Lattice_bounds.Top.Operators in
+        let+ state_map = state in
+        let taint_state = LatticeMultiTaint.find_or_empty namespace state_map in
+        let locs_data = Zone.join taint_state.locs_data private_zone in
+        let taint_state = { taint_state with locs_data } in
+        LatticeMultiTaint.add namespace taint_state state_map
 
   let remove_bases_per_taint bases state =
     let remove = Zone.filter_base (fun b -> not (Base.Hptset.mem b bases)) in
