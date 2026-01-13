@@ -1684,7 +1684,7 @@ module VariadicStrict =
 (** {2 Attribute Registration} *)
 (* ************************************************************************* *)
 
-(* TODO: add a mechanism to allow registrating a full attribute. *)
+(* TODO: add a mechanism to allow registering a full attribute. *)
 let attributes_reg = add_group "Attribute Registration"
 
 let () = Parameter_customize.set_group attributes_reg

@@ -20,7 +20,7 @@ let check (module Typ : S) (t1, t2) =
 let check_all (module Typ : S) typ_pairs =
   Format.printf "@[<v2>Checking %s@;" Typ.datatype_name;
   match List.filter (check (module Typ)) typ_pairs with
-  | [] -> Format.printf "All checks succeeded !@]@\n@."
+  | [] -> Format.printf "All checks succeeded!@]@\n@."
   | l ->
     let max = 5 in
     Format.printf
@@ -54,9 +54,10 @@ let ignored_attr = ("a_new_attr", [])
 let attrs = [ logic_attr; type_attr; internal_attr; ignored_attr ]
 
 let attrs_combinations =
-  [logic_attr] :: [internal_attr] :: [ignored_attr] :: [type_attr] :: attrs
-  :: List.combinations 2 attrs
+  List.combinations 1 attrs
+  @ List.combinations 2 attrs
   @ List.combinations 3 attrs
+  @ [ attrs ]
 
 let mk_types_attrs t =
   List.map (fun attrs -> Ast_types.add_attributes attrs t) attrs_combinations
@@ -94,11 +95,12 @@ let comp2 = {
 }
 let tc2 = mk_tcomp comp2
 
-(* Same id different name (should not be possible in practice). *)
+(* Same name and id, different cstruct. Normally only ckey and cname are used
+   for compare/hash *)
 let comp3 = {
-  cstruct = true;
-  corig_name = "comp_type3";
-  cname = "comp_type3";
+  cstruct = false;
+  corig_name = "comp_type";
+  cname = "comp_type";
   ckey = 42;
   cfields = None;
   cattr = [];
