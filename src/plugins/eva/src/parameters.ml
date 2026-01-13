@@ -279,7 +279,10 @@ module SecureFlow =
   False
     (struct
       let option_name = "-eva-secure-flow"
-      let help = "Perform secure-flow (non-interference) analysis."
+      let help = "Perform secure-flow analysis to prove non-interference \
+                  properties: emit warnings whenever low-security public data \
+                  may depend from high-security private data. Public and private \
+                  data must be specified with public/private attributes. "
     end)
 let () = add_correctness_dep SecureFlow.parameter
 
