@@ -181,8 +181,13 @@ let () =
     (fun () -> Cmdline.at_normal_exit (fun () -> flush_json_files ()))
 
 let run_list_all_plugin_options () =
-  if not (Kernel.AutocompleteHelp.is_empty ()) then begin
+  if Kernel.AutocompleteHelp.is_set () then begin
     let filter = Kernel.AutocompleteHelp.get () in
+    (* special case: kernel's shortname is the empty string, but the user will
+       write 'kernel'. *)
+    let filter =
+      Datatype.String.Set.map (fun p -> if p = "kernel" then "" else p) filter
+    in
     Plugin.iter_on_plugins
       (fun plugin ->
          if Datatype.String.Set.mem plugin.p_shortname filter then begin
