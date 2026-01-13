@@ -59,7 +59,7 @@ export default function Application(): JSX.Element {
         <Toolbar.Filler />
         <Laboratory.Tabs />
         <Toolbar.Filler />
-        <Toolbar.IconWarning />
+        <Toolbar.IconPinnedMessage />
         <IvettePrefs.ThemeSwitchTool />
         <IvettePrefs.FontTools />
         <Search.SearchField />

@@ -790,10 +790,10 @@ input:checked + .dome-xSwitch-slider:before {
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Warning icon                                                       --- */
+/* --- Pinned  icon                                                       --- */
 /* -------------------------------------------------------------------------- */
 
-.dome-xIcon-warning-content {
+.dome-xIcon-pinned-content {
   padding: 5px 10px;
   display: flex;
   flex-direction: column;
