@@ -19,3 +19,17 @@ size_t f (size_t y)
   size_t tmp2 = (c3[0][2-2][0+0] * y - c2[1] / c3[1-1][1][2] + c2[2-1]);
   return tmp2;
 }
+
+volatile int nondet;
+
+float const F;
+float const G[];
+float implicit_float_initializer (void) {
+  int i1 = F / 2;
+  int i2 = G[0] + 1;
+  float f1 = F + 2.;
+  float f2 = G[0] + 1;
+  if (nondet) return F+2;
+  if (nondet) return G[0];
+  return F;
+}

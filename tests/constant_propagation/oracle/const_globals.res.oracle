@@ -10,4 +10,26 @@ size_t f(size_t y)
   return tmp2;
 }
 
+int volatile nondet;
+float const F;
+float const G[];
+float implicit_float_initializer(void)
+{
+  float __retres;
+  int i1 = 0;
+  int i2 = 1;
+  float f1 = 2.f;
+  float f2 = 1.f;
+  if (nondet) {
+    __retres = 2.f;
+    goto return_label;
+  }
+  if (nondet) {
+    __retres = 0.f;
+    goto return_label;
+  }
+  __retres = 0.f;
+  return_label: return __retres;
+}
+
 

@@ -13,6 +13,15 @@ open Cil_types
 open Cil_datatype
 open Cil
 
+let replace_by_zero exp =
+  match Ast_types.unroll_node (Cil.typeOf exp) with
+  | TInt ikind | TEnum { ekind = ikind } ->
+    Cil.ChangeTo (Cil.kinteger ~loc:exp.eloc ikind 0)
+  | TFloat fkind ->
+    Cil.ChangeTo (Cil.kfloat ~loc:exp.eloc fkind 0.)
+  | _ ->
+    Cil.SkipChildren
+
 class constGlobSubstVisitorClass : cilVisitor = object
   inherit nopCilVisitor
 
@@ -60,15 +69,14 @@ class constGlobSubstVisitorClass : cilVisitor = object
         | None ->
           (* Since [vi] is a global, we replace it with the zero expression,
              i.e. the implicit initializer for such globals. *)
-          ChangeTo (zero ~loc)
+          replace_by_zero e
         | Some init ->
           let offset = constFoldOffset true offset in
-          let zero_exp = zero ~loc in
           let rec find_replace current_offset current_init current_newexp =
             match current_init with
             | SingleInit si ->
               if Cil_datatype.OffsetStructEq.equal offset current_offset
-              then new_exp ~loc si.enode
+              then ChangeTo (new_exp ~loc si.enode)
               else current_newexp
             | CompoundInit (ct, initl) ->
               (* We are dealing with an array: recursively [find_replace] among
@@ -85,9 +93,7 @@ class constGlobSubstVisitorClass : cilVisitor = object
                 ~acc:current_newexp
           in
           (match init, offset with
-           | CInit i,_ ->
-             let newexp = find_replace NoOffset i zero_exp in
-             ChangeTo newexp
+           | CInit i,_ -> find_replace NoOffset i (replace_by_zero e)
            | StrInit (Str s), Index (i,NoOffset) ->
              let l = Z.of_int (String.length s) in
              (match Cil.constFoldToInt i with
