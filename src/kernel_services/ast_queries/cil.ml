@@ -3034,7 +3034,7 @@ exception SizeOfError of string * typ
 
 type sizeof_or_error =
   | Size of int
-  | Error of string * typ
+  | SizeError of string * typ
 
 module SizeOfOrError = Datatype.Make(struct
     include Datatype.Undefined
@@ -3043,12 +3043,12 @@ module SizeOfOrError = Datatype.Make(struct
     type t  = sizeof_or_error
     let reprs = [
       Size 0 ;
-      Error ("", Cil_const.voidType)
+      SizeError ("", Cil_const.voidType)
     ]
     let compare a b =
       match a, b with
       | Size a, Size b -> Int.compare a b
-      | Error (sa, ta), Error(sb, tb) ->
+      | SizeError (sa, ta), SizeError(sb, tb) ->
         let s = String.compare sa sb in
         if s = 0 then Cil_datatype.Typ.compare ta tb
         else s
@@ -3075,14 +3075,14 @@ module TypSize =
 let find_sizeof t f =
   try match TypSize.find t with
     | Size size -> size
-    | Error (msg, t') -> raise (SizeOfError(msg, t'))
+    | SizeError (msg, t') -> raise (SizeOfError(msg, t'))
   with Not_found ->
   try
     let t', size = f () in
     TypSize.add t' (Size size) ;
     size
   with SizeOfError(msg, t') as e ->
-    TypSize.add t' (Error (msg, t')) ;
+    TypSize.add t' (SizeError (msg, t')) ;
     raise e
 
 let selfTypSize = TypSize.self
