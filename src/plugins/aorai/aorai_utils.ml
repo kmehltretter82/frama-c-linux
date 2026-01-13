@@ -574,7 +574,7 @@ let crosscond_to_exp generated_kf curr_f curr_status loc cond res =
          let stmts2, vars2, defs2, e2 = expnode_convert c2 in
          stmts1 @ stmts2, vars1 @ vars2,
          Cil_datatype.Varinfo.Set.union defs1 defs2,
-         Cil.mkBinOp ~loc LOr e1 e2
+         Cil.mkBinOp_exn ~loc LOr e1 e2
        | Some i when Z.is_zero i -> expnode_convert c2
        | Some _ -> [], [], Cil_datatype.Varinfo.Set.empty,e1)
     | TAnd (c1, c2) ->
@@ -584,7 +584,7 @@ let crosscond_to_exp generated_kf curr_f curr_status loc cond res =
          let stmts2, vars2, defs2, e2 = expnode_convert c2 in
          stmts1 @ stmts2, vars1 @vars2,
          Cil_datatype.Varinfo.Set.union defs1 defs2,
-         Cil.mkBinOp ~loc LAnd e1 e2
+         Cil.mkBinOp_exn ~loc LAnd e1 e2
        | Some i when Z.is_zero i ->
          [], [], Cil_datatype.Varinfo.Set.empty, e1
        | Some _ -> expnode_convert c2)
@@ -616,7 +616,7 @@ let crosscond_to_exp generated_kf curr_f curr_status loc cond res =
     | TFalse -> [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero ~loc
     | TRel(rel,t1,t2) ->
       [], [], Cil_datatype.Varinfo.Set.empty,
-      Cil.mkBinOp
+      Cil.mkBinOp_exn
         ~loc (rel_convert rel) (term_to_exp t1 res) (term_to_exp t2 res)
   in
   expnode_convert cond
@@ -824,12 +824,12 @@ let is_state_det_stmt state loc =
 let is_state_exp state loc =
   if Aorai_option.Deterministic.get ()
   then
-    Cil.mkBinOp
+    Cil.mkBinOp_exn
       ~loc Eq
       (int2enumstate_exp loc state.nums)
       (Cil.evar ~loc (Data_for_aorai.get_varinfo curState))
   else
-    Cil.mkBinOp
+    Cil.mkBinOp_exn
       ~loc Eq (Cil.evar (Data_for_aorai.get_state_var state)) (Cil.one ~loc)
 
 let is_out_of_state_pred state =
@@ -855,12 +855,12 @@ let is_out_of_state_exp state loc =
 
   if Aorai_option.Deterministic.get ()
   then
-    Cil.mkBinOp
+    Cil.mkBinOp_exn
       ~loc Ne
       (int2enumstate_exp loc state.nums)
       (evar ~loc (Data_for_aorai.get_varinfo curState))
   else
-    Cil.mkBinOp
+    Cil.mkBinOp_exn
       ~loc Eq
       (Cil.evar (Data_for_aorai.get_state_var state))
       (mk_int_exp 0)
@@ -2034,7 +2034,7 @@ let act_convert loc act res =
       Cil.mkStmtOneInstr ~ghost:true
         (Set
            (my_lval,
-            (Cil.mkBinOp
+            (Cil.mkBinOp_exn
                ~loc
                PlusA
                (Cil.new_exp ~loc (Lval my_lval))
@@ -2055,11 +2055,11 @@ let mk_transitions_stmt generated_kf loc f st res trans =
       let (tr_stmts, tr_vars, tr_funcs, exp) =
         crosscond_to_exp generated_kf f st loc trans.cross res
       in
-      let cond = Cil.mkBinOp ~loc LAnd (is_state_exp trans.start loc) exp in
+      let cond = Cil.mkBinOp_exn ~loc LAnd (is_state_exp trans.start loc) exp in
       (tr_stmts @ aux_stmts,
        tr_vars @ aux_vars,
        Cil_datatype.Varinfo.Set.union tr_funcs new_funcs,
-       Cil.mkBinOp ~loc LOr exp_from_trans cond,
+       Cil.mkBinOp_exn ~loc LOr exp_from_trans cond,
        (Cil.copy_exp cond, act_convert loc trans.actions res)
        :: stmt_from_action))
     trans

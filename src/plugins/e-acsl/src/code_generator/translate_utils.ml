@@ -172,7 +172,7 @@ let comparison_to_exp
     | Logic_aggr.NotAggregate, Logic_aggr.NotAggregate -> begin
         match ity with
         | C_integer _ | C_float _ | Nan ->
-          Cil.mkBinOp ~loc bop e1 e2, env
+          Cil.mkBinOp_exn ~loc bop e1 e2, env
         | Gmpz -> Gmp.Z.cmp ~loc name t_opt bop env kf e1 e2
         | Rational -> Gmp.Q.cmp ~loc name t_opt bop env kf e1 e2
         | Real -> Error.not_yet "comparison involving real numbers"

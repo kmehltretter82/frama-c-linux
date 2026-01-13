@@ -18,7 +18,7 @@ let plus_pi ~loc p i =
   if Z.(equal zero i) then
     p
   else
-    Cil.mkBinOp ~loc PlusPI p (Cil.kinteger64 ~loc i)
+    Cil.mkBinOp_exn ~loc PlusPI p (Cil.kinteger64 ~loc i)
 
 (** This visitor also performs a deep copy. *)
 class propagate project fnames ~cast_intro = object(self)

@@ -483,6 +483,8 @@ struct
     with Not_found ->
       typing_error ("no field " ^ s ^ " in " ^ ci.Cil_types.cname)
 
+  let get_result = function Ok e -> e | Error msg -> typing_error msg
+
   let rec build_constant = function
     | CilConstant const -> const
     | Int i -> mk_cint IInt (Z.of_int i)
@@ -514,7 +516,8 @@ struct
           host, Cil.addOffset offset' offset
         | TPtr _ ->
           let base = Cil.new_exp ~loc (Lval lv') in
-          let addr = Cil.mkBinOp ~loc Cil_types.PlusPI base e' in
+          let addr_res = Cil.mkBinOp ~loc Cil_types.PlusPI base e' in
+          let addr = get_result addr_res in
           Cil.mkMem ~addr ~off:Cil_types.NoOffset
         | _ -> typing_error "trying to index an lvalue which is not an array \
                              or a pointer"
@@ -563,7 +566,7 @@ struct
         | MinusPI when not (is_pointer_type e1') -> Cil_types.MinusA
         | op -> op
       in
-      Cil.mkBinOp ~loc op' e1' e2'
+      get_result (Cil.mkBinOp ~loc op' e1' e2')
     | Cast (Cil_types.Ctype newt, e) ->
       Cil.mkCast ~force:false ~newt (build_exp ~scope ~loc e)
     | Cast _ ->

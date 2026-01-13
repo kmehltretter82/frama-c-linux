@@ -818,14 +818,23 @@ val mkAddrOrStartOf: loc:location -> lval -> exp
     StartOf *)
 val mkMem: addr:exp -> off:offset -> lval
 
-(** makes a binary operation and performs const folding.  Inserts
+(** Makes a binary operation and performs const folding.  Inserts
     casts between arithmetic types as needed, or between pointer
     types, but do not attempt to cast pointer to int or
     vice-versa. Use appropriate binop (PlusPI & friends) for that.
+    @before Frama-C+dev the function could raised [AbortFatal] instead of using
+    result type. It still can raise an exception via other function calls.
 *)
-val mkBinOp: loc:location -> binop -> exp -> exp -> exp
+val mkBinOp: loc:location -> binop -> exp -> exp -> (exp, string) result
 
-(** same as {!mkBinOp}, but performs a systematic cast (unless one of the
+(** Same as {!mkBinOp} but handles error cases by throwing an exception with the
+    given message and current location.
+    @raise Abortfatal if {!mkBinOp} fails
+    @since Frama-C+dev
+*)
+val mkBinOp_exn: loc:location -> binop -> exp -> exp -> exp
+
+(** Same as {!mkBinOp}, but performs a systematic cast (unless one of the
     arguments is [0]) of pointers into [uintptr_t] during comparisons,
     making such operation defined even if the pointers do not share
     the same base. This was the behavior of {!mkBinOp} prior to the

@@ -5672,7 +5672,7 @@ let rec castReduce fromsource force =
       end else begin
         Kernel.debug ~dkey
           "bool conversion by checking !=0: %a" !pp_exp_ref e;
-        let cmp = mkBinOp ~loc Ne e (integer ~loc 0) in
+        let cmp = mkBinOp_exn ~loc Ne e (integer ~loc 0) in
         let oldt = typeOf cmp in
         rec_default oldt newt cmp
       end
@@ -5731,9 +5731,11 @@ and mkCast ?(check=true) ?force ~(newt: typ) e =
 (* TODO: unify this with doBinOp in Cabs2cil. *)
 and mkBinOp ~loc op e1 e2 =
   let open Ast_types in
+  let open Result.Operators in
   let t1 = typeOf e1 in
   let t2 = typeOf e2 in
   let machdep = false in
+  let error msg = Format.kasprintf Result.error msg in
   let make_expr common_type res_type =
     constFoldBinOp ~loc machdep op
       (mkCastT ~oldt:t1 ~newt:common_type e1)
@@ -5742,19 +5744,18 @@ and mkBinOp ~loc op e1 e2 =
   in
   let doArithmetic () =
     let tres = arithmeticConversion t1 t2 in
-    make_expr tres tres
+    Ok (make_expr tres tres)
   in
   let doArithmeticComp () =
     let tres = arithmeticConversion t1 t2 in
-    make_expr tres Cil_const.intType
+    Ok (make_expr tres Cil_const.intType)
   in
   let doIntegralArithmetic () =
     let tres = arithmeticConversion t1 t2 in
     if is_integral tres then
-      make_expr tres tres
+      Ok (make_expr tres tres)
     else
-      Kernel.fatal
-        ~current:true
+      error
         "@[mkBinOp: unsupported non integral result type for integral \
          arithmetic@ %a@]"
         !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,Cil_const.intType)))
@@ -5770,21 +5771,22 @@ and mkBinOp ~loc op e1 e2 =
       else
         e1, e2
     in
-    constFoldBinOp ~loc machdep op e1 e2 Cil_const.intType
+    let e = constFoldBinOp ~loc machdep op e1 e2 Cil_const.intType in
+    Ok e
   in
   let check_scalar op e t =
     if not (is_scalar t) then
-      Kernel.fatal ~current:true "operand of %s is not scalar: %a"
-        op !pp_exp_ref e
+      error "operand of %s is not scalar: %a" op !pp_exp_ref e
+    else Ok ()
   in
   match op with
-    (Mult|Div) -> doArithmetic ()
-  | (Mod|BAnd|BOr|BXor) -> doIntegralArithmetic ()
+  | Mult | Div -> doArithmetic ()
+  | Mod | BAnd | BOr | BXor -> doIntegralArithmetic ()
   | LAnd | LOr ->
-    check_scalar "logical operator" e1 t1;
-    check_scalar "logical operator" e2 t2;
+    let* () = check_scalar "logical operator" e1 t1 in
+    let+ () = check_scalar "logical operator" e2 t2 in
     constFoldBinOp ~loc machdep op e1 e2 Cil_const.intType
-  | (Shiftlt|Shiftrt) -> (* ISO 6.5.7. Only integral promotions. The result
+  | Shiftlt | Shiftrt -> (* ISO 6.5.7. Only integral promotions. The result
                           * has the same type as the left hand side *)
     if Machine.msvcMode () then
       (* MSVC has a bug. We duplicate it here *)
@@ -5793,11 +5795,14 @@ and mkBinOp ~loc op e1 e2 =
       let t1' = integralPromotion t1 in
       let t2' = integralPromotion t2 in
       constFoldBinOp ~loc machdep op
-        (mkCastT ~oldt:t1 ~newt:t1' e1) (mkCastT ~oldt:t2 ~newt:t2' e2) t1'
-  | (PlusA|MinusA)
+        (mkCastT ~oldt:t1 ~newt:t1' e1)
+        (mkCastT ~oldt:t2 ~newt:t2' e2)
+        t1'
+      |> Result.ok
+  | PlusA | MinusA
     when is_arithmetic t1 && is_arithmetic t2 -> doArithmetic ()
-  | (PlusPI|MinusPI) when is_ptr t1 && is_integral t2 ->
-    constFoldBinOp ~loc machdep op e1 e2 t1
+  | PlusPI | MinusPI when is_ptr t1 && is_integral t2 ->
+    Ok (constFoldBinOp ~loc machdep op e1 e2 t1)
   | MinusPP when is_ptr t1 && is_ptr t2 ->
     (* ISO C11 6.5.6§3 and 6.5.6§9 : Both types should be compatible and the
        result is of type ptrdiff_t. *)
@@ -5809,8 +5814,9 @@ and mkBinOp ~loc op e1 e2 =
     if compatible then
       constFoldBinOp ~loc machdep op e1 (mkCastT ~oldt:t2 ~newt:t1 e2)
         (Machine.ptrdiff_type ())
+      |> Result.ok
     else
-      Kernel.fatal ~current:true
+      error
         "@[incompatible types in pointer subtraction@ \
          %a@ (type of e1: %a,@ type of e2: %a)@]"
         !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,Cil_const.intType)))
@@ -5835,13 +5841,17 @@ and mkBinOp ~loc op e1 e2 =
       ~cast2:(Machine.uintptr_type ())
       op e1 e2
   | _ ->
-    Kernel.fatal
-      ~current:true
+    error
       "@[mkBinOp: unsupported operator for such operands@ \
        %a@ (type of e1: %a,@ type of e2: %a)@]"
       !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,Cil_const.intType)))
       !pp_typ_ref t1
       !pp_typ_ref t2
+
+and mkBinOp_exn ~loc op e1 e2 =
+  match mkBinOp ~loc op e1 e2 with
+  | Ok e -> e
+  | Error msg -> Kernel.fatal ~current:true "%s" msg
 
 let mkBinOp_safe_ptr_cmp ~loc op e1 e2 =
   let e1, e2 =
@@ -5857,7 +5867,7 @@ let mkBinOp_safe_ptr_cmp ~loc op e1 e2 =
       end else e1, e2
     | _ -> e1, e2
   in
-  mkBinOp ~loc op e1 e2
+  mkBinOp_exn ~loc op e1 e2
 
 type existsAction =
     ExistsTrue                          (* We have found it *)

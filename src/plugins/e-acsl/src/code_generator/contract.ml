@@ -510,7 +510,7 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf env contract 
           (Env.annotation_kind env)
           kf
           env
-          (Cil.mkBinOp ~loc bop active_bhvrs_e (Cil.one ~loc))
+          (Cil.mkBinOp_exn ~loc bop active_bhvrs_e (Cil.one ~loc))
       in
       let assert_complete_stmt, env = create_assert_stmt env Ge complete_msg in
       let assert_disjoint_stmt, env = create_assert_stmt env Le disjoint_msg in
@@ -522,7 +522,7 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf env contract 
           env
           (Smart_stmt.if_stmt
              ~loc
-             ~cond:(Cil.mkBinOp ~loc Ne active_bhvrs_e (Cil.one ~loc))
+             ~cond:(Cil.mkBinOp_exn ~loc Ne active_bhvrs_e (Cil.one ~loc))
              (Cil.mkBlock [ assert_complete_stmt; assert_disjoint_stmt ]))
           (* Otherwise just get the corresponding assertion *)
       else if must_translate_complete then
