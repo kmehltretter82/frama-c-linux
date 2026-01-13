@@ -281,8 +281,8 @@ module SecureFlow =
       let option_name = "-eva-secure-flow"
       let help = "Perform secure-flow analysis to prove non-interference \
                   properties: emit warnings whenever low-security public data \
-                  may depend from high-security private data. Public and private \
-                  data must be specified with public/private attributes. "
+                  may depend on high-security private data. Public and private \
+                  data must be specified using corresponding custom attributes."
     end)
 let () = add_correctness_dep SecureFlow.parameter
 

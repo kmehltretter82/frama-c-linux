@@ -65,9 +65,9 @@ Options taking a string as argument should preferably be written
                     -eva-no-octagon-through-calls)
 -eva-secure-flow    Perform secure-flow analysis to prove non-interference
                     properties: emit warnings whenever low-security public
-                    data may depend from high-security private data. Public
-                    and private data must be specified with public/private
-                    attributes.  (opposite option is -eva-no-secure-flow)
+                    data may depend on high-security private data. Public and
+                    private data must be specified using corresponding custom
+                    attributes. (opposite option is -eva-no-secure-flow)
 -eva-taint-auto     Automatically taint the function parameters of user input
                     based functions (scanf, fgets, etc). (opposite option is
                     -eva-no-taint-auto)
