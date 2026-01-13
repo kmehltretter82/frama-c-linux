@@ -5799,8 +5799,23 @@ and mkBinOp ~loc op e1 e2 =
   | (PlusPI|MinusPI) when is_ptr t1 && is_integral t2 ->
     constFoldBinOp ~loc machdep op e1 e2 t1
   | MinusPP when is_ptr t1 && is_ptr t2 ->
-    (* NB: Same as cabs2cil. Check if this is really what the standard says*)
-    constFoldBinOp ~loc machdep op e1 (mkCastT ~oldt:t2 ~newt:t1 e2) Cil_const.intType
+    (* ISO C11 6.5.6§3 and 6.5.6§9 : Both types should be compatible and the
+       result is of type ptrdiff_t. *)
+    let compatible =
+      areCompatibleTypes
+        (Ast_types.remove_qualifiers_deep t1)
+        (Ast_types.remove_qualifiers_deep t2)
+    in
+    if compatible then
+      constFoldBinOp ~loc machdep op e1 (mkCastT ~oldt:t2 ~newt:t1 e2)
+        (Machine.ptrdiff_type ())
+    else
+      Kernel.fatal ~current:true
+        "@[incompatible types in pointer subtraction@ \
+         %a@ (type of e1: %a,@ type of e2: %a)@]"
+        !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,Cil_const.intType)))
+        !pp_typ_ref t1
+        !pp_typ_ref t2
   | (Eq|Ne|Lt|Le|Ge|Gt)
     when is_arithmetic t1 && is_arithmetic t2 ->
     doArithmeticComp ()
