@@ -31,7 +31,7 @@ let empty = R []
 
 let singleton r =
   if not (0 <= r.offset && 0 < r.length) then
-    raise (Invalid_argument "Region.Ranges.singleton") ;
+    invalid_arg "Region.Ranges.singleton" [@coverage off] ;
   R [r]
 
 let range ?(offset=0) ?(length=1) data = singleton { offset ; length ; data }
