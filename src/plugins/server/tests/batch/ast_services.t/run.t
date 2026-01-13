@@ -21,7 +21,14 @@
               "base": "ast_services.i",
               "file": "ast_services.i",
               "line": 2
-            }
+            },
+            "filters": [
+              [ "builtin", false ],
+              [ "stdlib", false ],
+              [ "defined", true ],
+              [ "extern", false ],
+              [ "ghost", false ]
+            ]
           },
           {
             "key": "kf#21",
@@ -34,7 +41,14 @@
               "base": "ast_services.i",
               "file": "ast_services.i",
               "line": 1
-            }
+            },
+            "filters": [
+              [ "builtin", false ],
+              [ "stdlib", false ],
+              [ "defined", true ],
+              [ "extern", false ],
+              [ "ghost", false ]
+            ]
           }
         ],
         "removed": [],

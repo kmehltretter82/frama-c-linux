@@ -31,9 +31,6 @@ let kernel_dependencies =
 let proxy = State_builder.Proxy.(create "eva" Forward kernel_dependencies)
 let state = State_builder.Proxy.get proxy
 
-let clear_results () =
-  Project.clear ~selection:(State_selection.with_dependencies state) ()
-
 (* Current state of the analysis *)
 type computation_state = NotComputed | Computing | Computed | Aborted
 
@@ -67,6 +64,10 @@ let is_computed () =
   | Computed | Aborted -> true
   | NotComputed | Computing -> false
 
+let clear_results () =
+  Project.clear ~selection:(State_selection.with_dependencies state) ();
+  (* Explicit clear to apply hooks on changes. *)
+  ComputationState.clear ()
 
 (* ----- Debug categories --------------------------------------------------- *)
 

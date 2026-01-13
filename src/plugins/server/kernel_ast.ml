@@ -634,6 +634,159 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Filters                                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+(*  Filters can be defined on elements of type ['a] with a unique name and
+    a boolean function f: 'a -> bool, allowing the user to show/hide elements
+    for which f is true or false.
+    Additional information for each filter includes:
+    - whether the filter is currently active;
+    - positive/negative labels shown to the user to show/hide elements
+      for which f is true/false respectively.
+    - default values for the filter, i.e. whether elements for which [f] is
+      true/false are shown or hidden by default.
+*)
+
+let filter_jtype =
+  let jtype =
+    Package.Jrecord
+      [ "id", Jstring; (* Unique name. *)
+        "enabled", Jboolean; (* Is the filter currently enabled? *)
+        "positive_label", Jstring; (* Label for positive elements. *)
+        "negative_label", Jstring; (* Label for negative elements. *)
+        "positive_default", Jboolean; (* Are positive elements shown by default? *)
+        "negative_default", Jboolean; (* Are negative elements shown by default? *)
+      ]
+  in
+  let descr = Md.plain "Type of filters that can be applied to AST elements" in
+  Data.declare ~package ~name:"filter" ~descr jtype
+
+module MakeFilter (Info: sig type t val name: string end) = struct
+
+  type filter = {
+    name: string; (* Unique identifiant of the filter *)
+    enable: unit -> bool; (* Is the filter currently enabled? *)
+    value: Info.t -> bool; (* Compute the filter value for an element *)
+    labels: string * string; (* Positive and negative labels shown to the user *)
+    default: bool * bool; (* Are positive/negative elements shown by default? *)
+  }
+
+  module Filter = struct
+    type t = filter
+    let jtype = filter_jtype
+
+    let to_json filter = `Assoc [
+        "id", `String filter.name;
+        "enabled", `Bool (filter.enable ());
+        "positive_label", `String (fst filter.labels);
+        "negative_label", `String (snd filter.labels);
+        "positive_default", `Bool (fst filter.default);
+        "negative_default", `Bool (snd filter.default);
+      ]
+
+    let of_json _ = Data.failure "Filter.of_json not implemented"
+  end
+
+  (* List of filters registered via [register] below. *)
+  let filters_ref : Filter.t list ref = ref []
+
+  (* List of hooks registered via [register] below, used to refresh filter
+     requests whenever a filter changes. *)
+  let hooks_ref : ((unit -> unit) -> unit) list ref = ref []
+
+  (* Signal emitted whenever a filter changes. *)
+  let signal =
+    let name = String.lowercase_ascii Info.name ^ "Filters" in
+    let descr = Md.plain ("Signal for " ^ Info.name ^ " filters") in
+    Request.signal ~package ~name ~descr
+
+  (* Default positive and negative labels for a filter of name [name]. *)
+  let default_labels name =
+    let lower = String.lowercase_ascii in
+    let positive_label = lower name ^ " " ^ lower Info.name in
+    positive_label, "non-" ^ positive_label
+
+  (* Registers a new filter. *)
+  let register name
+      ?(labels = default_labels name) ?default
+      ?(enable=fun _ -> true) ?add_hook f =
+    let default =
+      Option.fold default ~none:(true, true) ~some:(fun b -> b, not b)
+    in
+    let filter = { name; enable; value = f; labels; default } in
+    filters_ref := filter :: !filters_ref;
+    Option.iter (fun f -> hooks_ref := f :: !hooks_ref) add_hook;
+    Option.iter (fun f -> f (fun _ -> Request.emit signal)) add_hook;
+    Request.emit signal
+
+  (* GET request listing all registered filters. *)
+  let () =
+    let name = "get" ^ String.capitalize_ascii Info.name ^ "Filters" in
+    let descr = Md.plain ("List of filters for " ^ Info.name) in
+    Request.register
+      ~package ~kind:`GET ~name ~descr ~signals:[signal]
+      ~input:(module Junit) ~output:(module Jlist (Filter))
+      (fun () -> List.rev !filters_ref)
+
+  (* Compute the value of each registered filter for an element [elt]. *)
+  let compute_filters elt =
+    let aux acc filter =
+      if filter.enable ()
+      then (filter.name, filter.value elt) :: acc
+      else acc
+    in
+    List.fold_left aux [] !filters_ref
+
+  let add_hook (f: unit -> unit) =
+    List.iter (fun add_hook -> add_hook f) !hooks_ref
+end
+
+(* Filters on functions. *)
+module FctFilters = struct
+  include MakeFilter
+      (struct type t = kernel_function let name = "functions" end)
+
+  let get_vi = Kernel_function.get_vi
+
+  let () =
+    register "builtin" (fun kf -> Cil_builtins.has_fc_builtin_attr (get_vi kf))
+      ~labels:("Frama-C builtins", "source functions") ~default:false;
+    register "stdlib" Kernel_function.is_in_libc ~default:false;
+    register "defined" Kernel_function.is_definition
+      ~labels:("defined functions", "undefined functions");
+    register "extern" (fun kf -> (get_vi kf).vstorage = Extern);
+    register "ghost" Kernel_function.is_ghost;
+end
+
+(* Filters on variables. *)
+module VarFilters = struct
+  include MakeFilter (struct type t = varinfo let name = "variables" end)
+
+  let () =
+    register "stdlib" ((fun vi -> Cil.is_in_libc vi.vattr)) ~default:false;
+    register "extern" (fun vi -> vi.vstorage = Extern);
+    register "const" (fun vi -> Cil.isGlobalInitConst vi);
+    register "volatile" (fun vi -> Ast_types.is_volatile vi.vtype);
+    register "ghost" (fun vi -> Ast_types.is_ghost vi.vtype);
+    register "init" (fun vi -> Option.is_some (Globals.Vars.find vi).init)
+      ~labels:("variables with explicit initializer",
+               "variables without explicit initializer");
+    register "source" (fun vi -> vi.vsource) ~default:true
+      ~labels:("variables from the source code",
+               "variables generated from analyses");
+end
+
+type 'a filter_registration =
+  string -> ?labels:string * string -> ?default:bool ->
+  ?enable:(unit -> bool) -> ?add_hook:((unit -> unit) -> unit) ->
+  ('a -> bool) -> unit
+
+let register_fct_filter = FctFilters.register
+let register_var_filter = VarFilters.register
+
+
+(* -------------------------------------------------------------------------- *)
 (* --- Functions                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -734,12 +887,17 @@ struct
         ~descr:(Md.plain "Source location")
         ~data:(module Position)
         ~get:(fun kf -> fst (Kernel_function.get_location kf));
+      States.column model
+        ~name:"filters"
+        ~descr:(Md.plain "List of filter values")
+        ~data:(module Data.Jlist (Data.Jpair (Data.Jstring) (Data.Jbool)))
+        ~get:FctFilters.compute_filters;
       States.register_array model
         ~package ~key
         ~name:"functions"
         ~descr:(Md.plain "AST Functions")
         ~iter
-        ~add_reload_hook:ast_update_hook
+        ~add_reload_hook:(fun f -> ast_update_hook f; FctFilters.add_hook f)
     end
 
 end
@@ -770,41 +928,6 @@ module GlobalVars = struct
       ~data:(module Jstring)
       ~get:(fun vi -> Rich_text.sprintf "%a" Printer.pp_typ vi.vtype);
     States.column model
-      ~name:"stdlib"
-      ~descr:(Md.plain "Is the variable from the Frama-C stdlib?")
-      ~data:(module Data.Jbool)
-      ~get:(fun vi -> Cil.is_in_libc vi.vattr);
-    States.column model
-      ~name:"extern"
-      ~descr:(Md.plain "Is the variable extern?")
-      ~data:(module Data.Jbool)
-      ~get:(fun vi -> vi.vstorage = Extern);
-    States.column model
-      ~name:"const"
-      ~descr:(Md.plain "Is the variable const?")
-      ~data:(module Data.Jbool)
-      ~get:(fun vi -> Cil.isGlobalInitConst vi);
-    States.column model
-      ~name:"volatile"
-      ~descr:(Md.plain "Is the variable volatile?")
-      ~data:(module Data.Jbool)
-      ~get:(fun vi -> Ast_types.is_volatile vi.vtype);
-    States.column model
-      ~name:"ghost"
-      ~descr:(Md.plain "Is the variable ghost?")
-      ~data:(module Data.Jbool)
-      ~get:(fun vi -> Ast_types.is_ghost vi.vtype);
-    States.column model
-      ~name:"init"
-      ~descr:(Md.plain "Is the variable explicitly initialized?")
-      ~data:(module Data.Jbool)
-      ~get:(fun vi -> Option.is_some (Globals.Vars.find vi).init);
-    States.column model
-      ~name:"source"
-      ~descr:(Md.plain "Is the variable in the source code?")
-      ~data:(module Data.Jbool)
-      ~get:(fun vi -> vi.vsource);
-    States.column model
       ~name:"stringLiteral"
       ~descr:(Md.plain "Does the variable represent a string literal?")
       ~data:(module Data.Jbool)
@@ -814,12 +937,17 @@ module GlobalVars = struct
       ~descr:(Md.plain "Source location")
       ~data:(module Position)
       ~get:(fun vi -> fst vi.vdecl);
+    States.column model
+      ~name:"filters"
+      ~descr:(Md.plain "List of filter values")
+      ~data:(module Data.Jlist (Data.Jpair (Data.Jstring) (Data.Jbool)))
+      ~get:VarFilters.compute_filters;
     States.register_array model
       ~package ~key
       ~name:"globals"
       ~descr:(Md.plain "AST global variables")
       ~iter:(fun f -> Globals.Vars.iter (fun vi _init -> f vi))
-      ~add_reload_hook:ast_update_hook
+      ~add_reload_hook:(fun f -> ast_update_hook f; VarFilters.add_hook f)
 end
 
 (* -------------------------------------------------------------------------- *)

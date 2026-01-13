@@ -77,26 +77,13 @@ let () = Request.register ~package
 
 (* ----- Functions ---------------------------------------------------------- *)
 
-module Functions =
-struct
-  let _array : kernel_function States.array =
-    let model = States.model () in
-
-    States.column model
-      ~name:"eva_analyzed"
-      ~descr:(Markdown.plain "Has the function been analyzed by Eva")
-      ~data:(module Data.Jbool)
-      ~default:false
-      ~get:Results.is_called;
-
-    States.register_array model
-      ~package
-      ~key:Server.Kernel_ast.Functions.key
-      ~name:"functions"
-      ~descr:(Markdown.plain "AST Functions")
-      ~iter:Server.Kernel_ast.Functions.iter
-      ~add_reload_hook:Analysis_requests.register_computation_hook
-end
+let () =
+  Kernel_ast.register_fct_filter "eva_analyzed"
+    ~labels:("functions analyzed by Eva",
+             "functions unreached by Eva")
+    ~enable:Analysis.is_computed
+    ~add_hook:(fun f -> Analysis.register_computation_hook (fun _ -> f ()))
+    Results.is_called
 
 
 (* ----- Dead code: unreachable and non-terminating statements -------------- *)
