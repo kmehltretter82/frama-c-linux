@@ -418,18 +418,8 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
       s.skind <- Block (scanBlock false b);
       popn popstack;
       scanStmts (s::acc) mainbody 0 rests
-    | [{skind = UnspecifiedSequence seq} as s] when popstack = 0 ->
-      (* see above. *)
-      s.skind <-
-        UnspecifiedSequence
-          (List.concat
-             (List.map (fun (s,m,w,r,c) ->
-                  let res = scanStmts [] mainbody 0 [s] in
-                  (List.hd res,m,w,r,c)::
-                  (List.map (fun x -> x,[],[],[],[]) (List.tl res)))
-                 seq));
-      popn popstack;
-      List.rev (s::acc)
+    (* Don't try to put a return inside a UnspecifiedSequence: this would
+       mean that it could be evaluated at any point of the sequence. *)
     | ({skind = UnspecifiedSequence seq} as s) :: rests ->
       s.skind <-
         UnspecifiedSequence

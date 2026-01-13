@@ -65,13 +65,11 @@ int g(unsigned int size)
   {
     unsigned int __lengthof_unused;
     /*@ assert alloca_bounds: 0 < sizeof(int) * size ≤ 4294967295; */ ;
-    return_label: return_label: return_label: return __retres;
     __lengthof_unused = size;
-    return_label: return_label: return_label: return __retres;
     int *unused = __fc_vla_alloc(sizeof(int) * __lengthof_unused);
-    return_label: return_label: return_label: return __retres;
+    __fc_vla_free((void *)unused);
   }
-  return_label: return_label: return_label: return __retres;
+  return_label: return __retres;
 }
 
 

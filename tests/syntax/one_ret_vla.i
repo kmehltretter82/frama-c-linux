@@ -1,7 +1,3 @@
-/* run.config
-STDOPT: -no-check
-*/
-
 int normal(unsigned size) {
   int unused[size];
   return 3;
