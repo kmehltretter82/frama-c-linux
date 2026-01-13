@@ -639,6 +639,7 @@ let known_logic_funs = [
   "\\sub_double",ACSL;
   "\\mul_double",ACSL;
   "\\div_double",ACSL;
+  "security_status",ACSL;
 ]
 let known_predicates = [
   "\\warning", ACSL;
@@ -1505,6 +1506,9 @@ and eval_known_logic_function ~alarm_mode env li labels args =
         { result with empty = r.empty; ldeps = r.ldeps; }
       with Cvalue.V.Not_based_on_null -> c_alarm ()
     end
+
+  (* Not supported by cvalue, evaluated by the taint domain. *)
+  | "security_status", _, _, [_t] -> einteger Cvalue.V.top_int
 
   | _ -> assert false
 

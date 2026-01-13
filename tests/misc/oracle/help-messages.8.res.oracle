@@ -23,9 +23,6 @@ Options taking a string as argument should preferably be written
 
 *** ABSTRACT DOMAINS
 
--eva-auto-taint     Automatically taints the function parameters of user
-                    input based functions (scanf, fgets, etc). (opposite
-                    option is -eva-no-auto-taint)
 -eva-domains <d1,...,dn>  Enable a list of analysis domains. Available
                     domains are: cvalue, mthread, equality, taint, traces,
                     symbolic-locations, sign, printer, bitwise, octagon,
@@ -66,6 +63,14 @@ Options taking a string as argument should preferably be written
                     octagons inferred at the end. The interprocedural
                     analysis is more precise but slower. (opposite option is
                     -eva-no-octagon-through-calls)
+-eva-secure-flow    Perform secure-flow analysis to prove non-interference
+                    properties: emit warnings whenever low-security public
+                    data may depend on high-security private data. Public and
+                    private data must be specified using corresponding custom
+                    attributes. (opposite option is -eva-no-secure-flow)
+-eva-taint-auto     Automatically taint the function parameters of user input
+                    based functions (scanf, fgets, etc). (opposite option is
+                    -eva-no-taint-auto)
 -eva-traces-dot <FILENAME>  Output to the given filename the Cfg in dot
                     format.
 -eva-traces-project  Try to convert the Cfg into a program in a new project.

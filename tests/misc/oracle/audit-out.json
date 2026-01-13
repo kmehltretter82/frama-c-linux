@@ -13,6 +13,7 @@
       "-eva-initialized-locals": "false",
       "-eva-new-initial-state": "0",
       "-eva-reduce-on-logic-alarms": "false",
+      "-eva-secure-flow": "false",
       "-eva-undefined-pointer-comparison-propagate-all": "false",
       "-eva-use-spec": "",
       "-eva-warn-copy-indeterminate": "",
@@ -41,8 +42,9 @@
         "*", "alarm", "assigns", "assigns:missing", "assigns:missing-result",
         "builtins", "builtins:missing-spec", "builtins:override",
         "ensures-false", "experimental", "libc", "libc:unsupported-spec",
-        "locals-escaping", "malloc", "malloc:imprecise", "signed-overflow",
-        "taint", "unknown-size"
+        "locals-escaping", "malloc", "malloc:imprecise", "secure-flow",
+        "secure-flow:condition", "secure-flow:direct",
+        "secure-flow:indirect", "signed-overflow", "taint", "unknown-size"
       ],
       "disabled": [
         "acsl", "acsl:unsupported", "assigns:invalid-location",

@@ -4687,7 +4687,7 @@ information-flow analysis, that tracks how data originating from untrusted or
 sensitive sources---such as external inputs or secrets---propagate through the
 program and potentially influence its execution.
 
-The initial taint must be specified by the user with ACSL annotations
+The initial taint must be specified by the user with \acsl{} annotations
 \lstinline|//@ taint <lvalues>;| on a statement, or a clause
 \lstinline|taints <lvalues>;| in a function contract.
 
@@ -4708,10 +4708,10 @@ annotation, or at the return of the function with the \texttt{taints} clause.
       int write(char *buf, int n);
 \end{listing-nonumber}
 
-The taint is then propagated during the Eva analysis, which computes an
+The taint is then propagated during the \Eva{} analysis, which computes an
 over-approximation of the set of tainted locations at each program point.
 
-The ACSL predicate \lstinline|\tainted| can be used to verify that some
+The \acsl{} predicate \lstinline|\tainted| can be used to verify that some
 values are \emph{not} tainted.
 Indeed, the domain only infers over-approximations of the tainted locations:
 while locations in the over-approximations \emph{may be} tainted,
@@ -4737,14 +4737,13 @@ not tainted anymore.
 \end{listing-nonumber}
 
 Taint analysis accounts for both data and control dependencies: a value may
-become tainted either directly, through assignments and computations that use
-tainted data, or indirectly, through control flow that depends on tainted
+become tainted either directly, through assignments that use tainted data, or
+indirectly, through control flow and computations that depends on tainted
 values. To reflect this distinction, the predicates
 \lstinline|\tainted_directly| and \lstinline|\tainted_indirectly| refine the
-general \lstinline|\tainted| predicate. In the same spirit as
-\lstinline|\tainted|, \lstinline|\tainted_directly| can be used to verify that a
-value is \emph{not} directly tainted, while \lstinline|\tainted_indirectly| to
-verify that a value is \emph{not} indirectly tainted.
+general \lstinline|\tainted| predicate: \lstinline|\tainted_directly| (resp.
+\lstinline|\tainted_indirectly|) can be used to verify that a value is
+\emph{not} directly (resp. indirectly) tainted.
 
 \begin{listing-nonumber}
   void fun(int a, int b, int t) {
@@ -4764,9 +4763,120 @@ verify that a value is \emph{not} indirectly tainted.
 \end{listing-nonumber}
 
 As with \lstinline|\tainted|, the predicates \lstinline|\tainted_directly| and
-\lstinline|\tainted_indirectly| can be used in ACSL assertions to refine the
+\lstinline|\tainted_indirectly| can be used in \acsl{} assertions to refine the
 over-approximation of tainted locations, with respect to direct and indirect
 taints respectively.
+
+\subsubsection{Secure-flow analysis}
+The option \texttt{-eva-secure-flow} enables a secure-flow analysis based on the
+taint domain (this option automatically activates the taint domain).
+
+This analysis aims at verifying non-interference properties---that is, the
+absence of unauthorized information flows between security levels---and detects
+when they are violated. Non-interference requires that changes to high-security
+\texttt{private} data do not influence low-security \texttt{public} data,
+whether through explicit data dependencies or implicit control dependencies. In
+other words, a program satisfies non-interference if an observer with access
+only to public information cannot deduce anything about private information from
+its behavior.
+
+To instruct the analysis, data may be assigned a security level---either
+\lstinline|private| or \lstinline|public|---by using \lstinline|__attribute__|
+type annotation. A current limitation restricts these annotations to aggregate
+types as a whole; they cannot be specified for individual members or elements
+within an aggregate.
+
+\begin{listing-nonumber}
+  int __attribute__((private)) secret;
+  int __attribute__((public))  nonsecret;
+\end{listing-nonumber}
+
+Non-interference violations are then reported as warnings during the \Eva{}
+analysis. A violation occurs whenever the over-approximation of the set of
+private locations intersects that of public locations---either directly or
+indirectly---or when it influences the program's control flow.
+
+A custom \acsl{} annotation can be used to verify the security status of some
+location.
+
+\begin{listing-nonumber}
+  //@ assert security_status(secret) == private;    // UNKNOWN
+  //@ assert security_status(nonsecret) == public;  // TRUE
+\end{listing-nonumber}
+
+Since secure-flow analysis makes use of the taint domain, it only infers
+over-approximations of the private locations: while locations in the
+over-approximation \emph{may be} private, all other locations are proven to be
+public.
+
+Let us consider the following example:
+\begin{listing-nonumber}
+extern int user_input;
+extern int __attribute__((private)) secret;
+int __attribute__((public)) x, y, z;
+
+int main(void) {
+  int* p;
+
+  if (user_input == secret) {
+    y = 1;
+    p = &y;
+  } else {
+    z = 1;
+    p = &z;
+  }
+  x = 1;
+  /*@ assert security_status(x) == public; */
+  /*@ assert security_status(y) == private; */
+  /*@ assert security_status(z) == private; */
+
+  y = z = 0;
+  /*@ assert security_status(y) == public; */
+  /*@ assert security_status(z) == public; */
+  *p = 1;
+  /*@ assert security_status(p) == private; */
+  /*@ assert security_status(*p) == private; */
+
+  return 0;
+}
+\end{listing-nonumber}
+
+\begin{frama-c-commands}
+frama-c -eva -eva-secure-flow sf.c
+\end{frama-c-commands}
+
+\Eva{} emits the following warnings:
+\begin{logs}
+[eva:secure-flow:condition] sf.c:8: Warning:
+  non-interference violation on condition involving {user_input; secret}
+[eva:secure-flow:indirect] sf.c:9: Warning:
+  indirect non-interference violation on {y}
+[eva:secure-flow:indirect] sf.c:12: Warning:
+  indirect non-interference violation on {z}
+[eva:alarm] sf.c:17: Warning: assertion got status unknown.
+[eva:alarm] sf.c:18: Warning: assertion got status unknown.
+[eva:secure-flow:indirect] sf.c:23: Warning:
+  indirect non-interference violation on {y; z}
+[eva:alarm] sf.c:24: Warning: assertion got status unknown.
+[eva:alarm] sf.c:25: Warning: assertion got status unknown.
+\end{logs}
+
+Warnings classified as \lstinline|eva:secure-flow| are non-interference
+violations. The first warning indicates a control-flow dependency on private
+data, as the branch taken depends on the value of \lstinline|secret|. The
+subsequent two warnings report indirect violations since variables \lstinline|y|
+and \lstinline|z|, which are declared public, are assigned within branches
+controlled by private information. Similarly, the last warning occurs because
+the assignment \lstinline|*p = 1| may write to either \lstinline|y| or
+\lstinline|z| through the pointer \lstinline|p|, which has become private via
+private-dependent control flow.
+
+The assertion warnings reflect the over-approximation inherent in the analysis.
+The assertion on the security status of \lstinline|x| is proven valid because
+\lstinline|x| is assigned independently of any private data. In contrast, since
+\lstinline|y| and \lstinline|z| are in the \emph{over-approximation} of private
+locations, the analysis cannot definitively prove they are private---they may or
+may not be private due to the lack of precision in the analysis.
 
 \subsection{Numerors}
 \label{sec:numerors}

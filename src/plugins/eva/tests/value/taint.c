@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +" -eva-domains taint -eva-msg-key=d-taint,-d-cvalue -eva-auto-loop-unroll 10"
+   STDOPT: +"-eva-domains taint -eva-msg-key=d-taint -eva-msg-key=-d-cvalue -eva-auto-loop-unroll 10"
 */
 
 #include "__fc_builtin.h"

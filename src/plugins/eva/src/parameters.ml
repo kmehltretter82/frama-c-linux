@@ -251,14 +251,14 @@ module OctagonCall =
 let () = add_precision_dep OctagonCall.parameter
 
 let () = Parameter_customize.set_group domains
-module AutoTaint =
+module TaintAuto =
   False
     (struct
-      let option_name = "-eva-auto-taint"
-      let help = "Automatically taints the function parameters of \
+      let option_name = "-eva-taint-auto"
+      let help = "Automatically taint the function parameters of \
                   user input based functions (scanf, fgets, etc)."
     end)
-let () = add_precision_dep AutoTaint.parameter
+let () = add_precision_dep TaintAuto.parameter
 
 let () = Parameter_customize.set_group domains
 let () = Parameter_customize.is_invisible ()
@@ -273,6 +273,18 @@ module TaintSingletons =
                   (such as split annotations)."
     end)
 let () = add_precision_dep TaintSingletons.parameter
+
+let () = Parameter_customize.set_group domains
+module SecureFlow =
+  False
+    (struct
+      let option_name = "-eva-secure-flow"
+      let help = "Perform secure-flow analysis to prove non-interference \
+                  properties: emit warnings whenever low-security public data \
+                  may depend on high-security private data. Public and private \
+                  data must be specified using corresponding custom attributes."
+    end)
+let () = add_correctness_dep SecureFlow.parameter
 
 let () = Parameter_customize.set_group domains
 module Numerors_Mode =
