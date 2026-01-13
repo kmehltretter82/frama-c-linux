@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test function side-effect analysis with structs.
 */
 

@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
 */
 
 int a = 0;
@@ -19,11 +19,11 @@ void main(){
     t[0] = 3;
     t[1] = 4;
 
-    
-    y =  &t; 
-   
+
+    y =  &t;
+
     (*y)[1] = 3;
-    
-    a = t[1]; 
+
+    a = t[1];
     /*@ assert security_status(a) == public; */
 }

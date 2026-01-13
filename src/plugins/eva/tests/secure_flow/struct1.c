@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test basic properties of structure field access.
 */
 

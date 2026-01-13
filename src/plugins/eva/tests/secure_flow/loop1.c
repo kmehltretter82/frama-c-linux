@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test implicit flows due to loops.
     STDOPT: +"-eva-slevel 1"
 */

@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test implicit flows due to simple branching (more complex flows).
 */
 

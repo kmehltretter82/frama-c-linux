@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test flows due to loops in branches and branches in loops.
 */
 

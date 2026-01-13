@@ -1,4 +1,4 @@
-/* run.config
+/* run.config*
    COMMENT: Test basic malloc and calloc calls
    STDOPT: +"-eva-verbose 0 -eva-no-alloc-returns-null" #"-eva-no-alloc-returns-null"
  */

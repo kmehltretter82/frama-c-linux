@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test implicit flows due to continue in a switch in a loop.
     STDOPT: +"-eva-slevel 4"
 */

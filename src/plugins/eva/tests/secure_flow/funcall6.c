@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test function pointers that can be resolved unambiguously.
 */
 

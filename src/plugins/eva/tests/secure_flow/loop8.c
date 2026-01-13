@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test transformation of loops without annotations.
     STDOPT: +"-eva-slevel 1"
 */

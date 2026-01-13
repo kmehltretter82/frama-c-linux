@@ -1,4 +1,4 @@
-/* run.config
+/* run.config*
    COMMENT: Test dynamic allocation and branching
    STDOPT: #"-eva-no-alloc-returns-null" +"-eva-verbose 0 -eva-no-alloc-returns-null"
  */

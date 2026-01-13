@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test assignment of array elements in branches
 */
 

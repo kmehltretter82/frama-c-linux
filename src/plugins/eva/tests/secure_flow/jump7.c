@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test analysis of generalized ||-like jump.
 */
 

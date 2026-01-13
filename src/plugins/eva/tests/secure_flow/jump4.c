@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test side-effect analysis of sensitive updates and gotos.
 */
 

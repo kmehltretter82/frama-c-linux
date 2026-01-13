@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test private array initialization
     STDOPT: +"-eva-auto-loop-unroll 5"
 */

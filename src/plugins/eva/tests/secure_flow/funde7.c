@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
 */
 
 /* TODO: Make sure the program transformation also transforms this contract,

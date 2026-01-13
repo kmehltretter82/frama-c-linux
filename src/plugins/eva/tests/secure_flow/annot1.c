@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test security flow annotations on some types of declarations
 */
 

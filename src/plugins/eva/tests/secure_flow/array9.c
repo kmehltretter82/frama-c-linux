@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test tricky array properties
 */
 

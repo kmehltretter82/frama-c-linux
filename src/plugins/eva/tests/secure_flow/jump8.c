@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test more general jumps from one branch into another.
 */
 

@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
 */
 
 int x[10];
@@ -7,7 +7,7 @@ int *y[10];
 
 int **z[10];
 
-int ***u[10]; 
+int ***u[10];
 
 int ****w;
 
@@ -23,7 +23,7 @@ void main(){
     u[1] = z;
 
     w = u;
-    
+
     a = *(*(*(*(w+1) + 7) + 3) + 2);
     /*@ assert security_status(z[7]) == public; */
 }

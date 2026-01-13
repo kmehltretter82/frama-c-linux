@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test (arrays of) nested structs.
 */
 

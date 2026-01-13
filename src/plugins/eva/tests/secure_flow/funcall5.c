@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test information flow for function return values with pointers.
 */
 

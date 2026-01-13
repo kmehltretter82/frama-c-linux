@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test basic security flow annotations (public, private) on
     COMMENT: globals, locals, arrays, pointers
 */

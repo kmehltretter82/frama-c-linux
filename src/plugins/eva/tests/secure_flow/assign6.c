@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test direct struct assignments. The context flows to all fields.
 */
 

@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test struct array members.
     STDOPT: +"-eva-slevel 1"
 */

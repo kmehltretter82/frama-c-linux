@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
 */
 
 int x[10];

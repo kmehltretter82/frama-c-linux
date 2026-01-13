@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
 */
 
 int a;
@@ -24,4 +24,3 @@ int g(int u, int v){
     int u_status = 0;
     return u_status;
 }
-

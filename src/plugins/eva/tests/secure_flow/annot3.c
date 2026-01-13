@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test aspects of the initialization of label variables.
 */
 

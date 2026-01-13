@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test security annotations in contracts for external functions.
 */
 

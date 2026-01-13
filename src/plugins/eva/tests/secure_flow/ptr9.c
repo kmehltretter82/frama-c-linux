@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test arithmetic on dereference expressions
 */
 

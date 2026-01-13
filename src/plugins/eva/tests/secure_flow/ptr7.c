@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test weak/strong updates for arrays and pointers.
 */
 

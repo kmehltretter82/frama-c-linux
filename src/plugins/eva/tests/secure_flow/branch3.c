@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test pointer-induced implicit flows.
 */
 

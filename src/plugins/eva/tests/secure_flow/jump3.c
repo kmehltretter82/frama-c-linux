@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test side-effect analysis of multiple jumps to same target.
 */
 

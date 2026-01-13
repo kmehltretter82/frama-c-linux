@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test information flow via function pc labels with transitive calls.
 */
 

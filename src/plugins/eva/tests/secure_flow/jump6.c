@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test side-effect analysis of nested loops with jumps.
     STDOPT: +"-eva-slevel 1"
 */

@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test use of variables via pointers before their declaration.
 */
 

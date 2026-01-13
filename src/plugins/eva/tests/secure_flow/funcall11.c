@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Regression test for a fixed bug in the monitor analysis
 */
 

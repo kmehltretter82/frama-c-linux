@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Track security status of loops and branches modifying arrays.
     STDOPT: +"-eva-auto-loop-unroll 10"
 */

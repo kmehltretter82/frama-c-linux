@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test generation of non-interference on conditions
 */
 

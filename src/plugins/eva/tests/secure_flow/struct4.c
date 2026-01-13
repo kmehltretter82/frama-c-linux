@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test complex linked data structures of structs/arrays/pointers.
 */
 

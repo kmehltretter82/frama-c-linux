@@ -1,4 +1,4 @@
-/*  run.config
+/*  run.config*
     COMMENT: Test local initialization of structs.
 */
 
