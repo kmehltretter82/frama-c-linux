@@ -171,7 +171,7 @@ let combinations k l =
     else
       match l with
       | h :: t ->
-        let l1 = List.map (fun sl -> h :: sl) (aux (k-1) t (len-1)) in
+        let l1 = map (fun sl -> h :: sl) (aux (k-1) t (len-1)) in
         let l2 = aux k t (len-1)
         in l1 @ l2
       | [] -> assert false
