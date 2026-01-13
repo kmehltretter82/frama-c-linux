@@ -5799,9 +5799,17 @@ and mkBinOp ~loc op e1 e2 =
         (mkCastT ~oldt:t1 ~newt:t1' e1)
         (mkCastT ~oldt:t2 ~newt:t2' e2)
         t1'
-  | PlusA  | MinusA -> doArithmetic ()
-  | PlusPI | MinusPI when is_ptr t1 && is_integral t2 ->
-    constFoldBinOp op e1 e2 t1
+  | PlusA | MinusA -> doArithmetic ()
+  | PlusPI when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
+    begin match e1.enode with
+      | StartOf lv ->
+        Ok { e1 with enode = AddrOf (addOffsetLval (Index (e2,NoOffset)) lv) }
+      | _ ->
+        constFoldBinOp op e1
+          (mkCastT ~oldt:t2 ~newt:(integralPromotion t2) e2) t1
+    end
+  | MinusPI when is_ptr t1 && is_integral t2 ->
+    constFoldBinOp op e1 (mkCastT ~oldt:t2 ~newt:(integralPromotion t2) e2) t1
   | MinusPP when is_ptr t1 && is_ptr t2 ->
     (* ISO C11 6.5.6§3 and 6.5.6§9 : Both types should be compatible and the
        result is of type ptrdiff_t. *)
