@@ -1,17 +1,17 @@
-8d7
+9d8
 < [eva:loop-unroll:auto] loop7.c:13: Automatic loop unrolling.
-10c9
+11c10
 < [eva:loop-unroll:auto] loop7.c:18: Automatic loop unrolling.
 ---
 > [eva:partition] loop7.c:13: starting to merge loop iterations
-13c12
+14c13
 < [eva:loop-unroll:auto] loop7.c:24: Automatic loop unrolling.
 ---
 > [eva:partition] loop7.c:18: starting to merge loop iterations
-14a14,15
+15a15,16
 > [eva:partition] loop7.c:24: starting to merge loop iterations
 > [eva:alarm] loop7.c:26: Warning: assertion got status unknown.
-20c21,27
+21c22,28
 <   array[0..9] ∈ {0}
 ---
 >   array[0] ∈ {0}

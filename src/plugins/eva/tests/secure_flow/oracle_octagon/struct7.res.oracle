@@ -1,8 +1,8 @@
-9a10
+10a11
 > [eva:partition] struct7.c:17: starting to merge loop iterations
-12d12
+13d13
 < [eva:partition] struct7.c:17: starting to merge loop iterations
-19,20c19
+20,21c20
 <   s.a[0] ∈ {0}
 <    .a[1..9] ∈ [0..9]
 ---

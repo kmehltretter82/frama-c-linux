@@ -1,2 +1,2 @@
 DEPS: security_macro.h
-STDOPT: +"-cpp-extra-args=\"-include security_macro.h\" -eva-msg-key=d-taint -eva-secure-flow"
+STDOPT: +"-commands-file %{dep:test_options.txt}"

@@ -1,3 +1,4 @@
+[kernel] Expanding arguments from test_options.txt
 [kernel] Parsing ptr8.c (with preprocessing)
 [eva:experimental] Warning: The taint domain is experimental.
 [eva] Analyzing a complete application starting at main

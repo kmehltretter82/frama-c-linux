@@ -1,4 +1,4 @@
-2c2,6
+3c3,7
 < [eva:experimental] Warning: The taint domain is experimental.
 ---
 > [eva] Analyzing a complete application starting at main
@@ -6,7 +6,7 @@
 > [eva] Initial state computed
 > [eva:initial-state] Values of globals at initialization
 >   secret ∈ [--..--]
-4a9,22
+5a10,23
 > [eva] malloc4.c:13: Call to builtin malloc
 > [eva:malloc:new] malloc4.c:13: allocating variable __malloc_main_l13
 > [eva:alarm] malloc4.c:14: Warning: out of bounds write. assert \valid(p);

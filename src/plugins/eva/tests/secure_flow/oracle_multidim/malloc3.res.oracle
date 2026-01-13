@@ -1,4 +1,4 @@
-2c2,6
+3c3,7
 < [eva:experimental] Warning: The taint domain is experimental.
 ---
 > [eva] Analyzing a complete application starting at main
@@ -6,19 +6,19 @@
 > [eva] Initial state computed
 > [eva:initial-state] Values of globals at initialization
 >   secret ∈ [--..--]
-4a9,10
+5a10,11
 > [eva] malloc3.c:13: Call to builtin malloc
 > [eva:malloc:new] malloc3.c:13: allocating variable __malloc_main_l13
-7c13,16
+8c14,17
 < [eva:alarm] malloc3.c:20: Warning: check got status invalid.
 ---
 > [eva] malloc3.c:15: Call to builtin malloc
 > [eva:malloc:new] malloc3.c:15: allocating variable __malloc_main_l15
 > [eva] malloc3.c:17: Call to builtin malloc
 > [eva:malloc:new] malloc3.c:17: allocating variable __malloc_main_l17
-10d18
+11d19
 < [eva:alarm] malloc3.c:21: Warning: check got status invalid.
-12a21,38
+13a22,39
 > [eva:alarm] malloc3.c:24: Warning: out of bounds write. assert \valid(p);
 > [eva:alarm] malloc3.c:26: Warning: out of bounds write. assert \valid(q);
 > [eva] malloc3.c:29: Call to builtin free

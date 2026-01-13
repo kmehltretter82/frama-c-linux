@@ -1,3 +1,4 @@
+[kernel] Expanding arguments from test_options.txt
 [kernel] Parsing malloc7.c (with preprocessing)
 [eva:experimental] Warning: The taint domain is experimental.
 [from] Computing for function main

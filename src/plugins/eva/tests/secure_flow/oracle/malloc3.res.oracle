@@ -1,3 +1,4 @@
+[kernel] Expanding arguments from test_options.txt
 [kernel] Parsing malloc3.c (with preprocessing)
 [eva:experimental] Warning: The taint domain is experimental.
 [eva:secure-flow:condition] malloc3.c:12: Warning: 
