@@ -57,7 +57,7 @@ let interesting_float =
    infinity;  2.3e37;  130.;  1.6e-33; +0.; ]
 
 let product itvs =
-  let l = Extlib.product (fun a b -> (a, b)) itvs itvs in
+  let l = List.product_map (fun a b -> (a, b)) itvs itvs in
   List.filter (fun (a, b) -> Float.le a b) l
 
 let interesting = function
@@ -235,7 +235,7 @@ let test_forward_unop () =
 let test_forward_binop () =
   let test_binop ~pow fkind op fval_op str_op =
     let l2 = product (interesting fkind) in
-    let l4 = Extlib.product (fun a b -> (a, b)) l2 l2 in
+    let l4 = List.product_map (fun a b -> (a, b)) l2 l2 in
     let str_op = Format.asprintf "%s%a" str_op pretty_kind fkind in
     List.iter (test_binop_on_itv ~pow fkind op fval_op str_op) l4
   in
@@ -261,7 +261,7 @@ let interesting_for_comp =
 let test_forward_comp () =
   let test_comp ~ne op fval_op str_op =
     let l2 = product interesting_for_comp in
-    let l4 = Extlib.product (fun a b -> (a, b)) l2 l2 in
+    let l4 = List.product_map (fun a b -> (a, b)) l2 l2 in
     List.iter (test_comp_on_itv ~ne op fval_op str_op) l4
   in
   let ne = false in

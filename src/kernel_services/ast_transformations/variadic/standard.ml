@@ -8,7 +8,6 @@
 
 open Cil_types
 open Va_types
-module List = Extends.List
 module Typ = Extends.Typ
 
 let pp_prototype name fmt tparams =
@@ -242,7 +241,7 @@ let fallback_fun_call ~builder ~callee env vf args =
 (* ************************************************************************ *)
 
 let find_null exp_list =
-  List.ifind (fun e -> Cil.isZero (Cil.constFold false e)) exp_list
+  List.find_index (fun e -> Cil.isZero (Cil.constFold false e)) exp_list
 
 
 let aggregator_call ~builder aggregator vf args =
@@ -266,19 +265,19 @@ let aggregator_call ~builder aggregator vf args =
   (* Compute the size of the aggregation *)
   let size = match a_type with
     | EndedByNull ->
-      begin try
-          find_null (List.drop a_pos args) + 1
-        with Not_found ->
-          Kernel.warning ~current:true
-            "Failed to find a sentinel (NULL pointer) in the argument list.";
-          raise (Translate_call_exn vf.vf_decl);
-      end
+      match find_null (List.drop a_pos args) with
+      | Some i -> i  + 1
+      | None ->
+        Kernel.warning ~current:true
+          "Failed to find a sentinel (NULL pointer) in the argument list.";
+        raise (Translate_call_exn vf.vf_decl);
   in
 
   (* Convert arguments *)
   let tparams_left = List.take a_pos tparams in
   let tparams_right = List.drop (a_pos + 1) tparams in
-  let new_tparams = tparams_left @ List.make size ptyp @ tparams_right in
+  let tparams_new = List.init size (fun _ -> ptyp)  in
+  let new_tparams = tparams_left @ tparams_new @ tparams_right in
   let new_args, unused_args = match_args ~callee:vf.vf_decl new_tparams args in
 
   (* Split the arguments *)

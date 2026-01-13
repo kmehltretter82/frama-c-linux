@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-module List = Extends.List
 module Typ = Extends.Typ
 module Build = Cil_builder.Pure
 
@@ -66,7 +65,7 @@ let translate_va_builtin caller inst =
       | [{enode=Lval va_list}] -> va_list
       | _ -> Kernel.abort "Unexpected arguments to va_start"
     and varg =
-      try Extlib.last (Cil.getFormalsDecl caller.svar)
+      try List.last (Cil.getFormalsDecl caller.svar)
       with Invalid_argument _ ->
         Kernel.abort "Using va_start macro in a function which is not variadic."
     in

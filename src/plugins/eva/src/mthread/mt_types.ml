@@ -189,7 +189,7 @@ module Event = struct
       lazy (Locations.Zone.compare z1 z2)
     | Dummy (s1, l1), Dummy (s2, l2) ->
       String.compare s1 s2 <?>
-      lazy ((Extlib.list_compare Cvalue.V.compare) l1 l2)
+      lazy ((List.compare Cvalue.V.compare) l1 l2)
     | (CreateThread _ | StartThread _ | SuspendThread _ | CancelThread _
       | ThreadExit _
       | MutexLock _ | MutexRelease _ | CreateQueue _
@@ -378,7 +378,7 @@ module type Presence = sig
   type key
   type t
 
-  module KeySet: Set.S with type elt = key
+  module KeySet: Datatype.Set with type elt = key
 
   val pretty: t Pretty_utils.formatter
 

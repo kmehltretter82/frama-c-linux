@@ -901,11 +901,11 @@ let compare_logic_signature l1 l2 =
       compare_opt Cil_datatype.Logic_type_ByName.compare l1.l_type l2.l_type
     in
     if res = 0 then
-      let res = Extlib.list_compare String.compare l1.l_tparams l2.l_tparams in
+      let res = List.compare String.compare l1.l_tparams l2.l_tparams in
       if res = 0 then
-        let res = Extlib.list_compare compare_var l1.l_profile l2.l_profile in
+        let res = List.compare compare_var l1.l_profile l2.l_profile in
         if res = 0 then
-          Extlib.list_compare compare_logic_label l1.l_labels l2.l_labels
+          List.compare compare_logic_label l1.l_labels l2.l_labels
         else res
       else res
     else res
@@ -943,7 +943,7 @@ let compare_logic_ctor_info ci1 ci2 =
   if res = 0 then
     let res = String.compare ci1.ctor_type.lt_name ci2.ctor_type.lt_name in
     if res = 0 then
-      Extlib.list_compare
+      List.compare
         Cil_datatype.Logic_type_ByName.compare ci1.ctor_params ci2.ctor_params
     else res
   else res
@@ -1783,8 +1783,8 @@ let rec compare_term t1 t2 =
   | Tapp(f1,labels1, args1), Tapp(f2, labels2, args2) ->
     let res = compare_logic_signature f1 f2 in
     if res = 0 then
-      let res = Extlib.list_compare compare_logic_label labels1 labels2 in
-      if res = 0 then Extlib.list_compare compare_term args1 args2 else res
+      let res = List.compare compare_logic_label labels1 labels2 in
+      if res = 0 then List.compare compare_term args1 args2 else res
     else res
   | Tapp _, _ -> 1
   | _, Tapp _ -> -1
@@ -1814,7 +1814,7 @@ let rec compare_term t1 t2 =
   | Tnull, _ -> 1
   | _, Tnull -> -1
   | Tlambda (v1,t1), Tlambda(v2,t2) ->
-    let res = Extlib.list_compare compare_var v1 v2 in
+    let res = List.compare compare_var v1 v2 in
     if res = 0 then compare_term t1 t2 else res
   | Tlambda _, _ -> 1
   | _, Tlambda _ -> -1
@@ -1834,14 +1834,14 @@ let rec compare_term t1 t2 =
   | _, Ttype _ -> -1
   | TDataCons(ci1,prms1), TDataCons(ci2,prms2) ->
     let res = compare_logic_ctor_info ci1 ci2 in
-    if res = 0 then Extlib.list_compare compare_term prms1 prms2 else res
+    if res = 0 then List.compare compare_term prms1 prms2 else res
   | TDataCons _, _ -> 1
   | _, TDataCons _ -> -1
   | Tempty_set, Tempty_set -> 0
   | Tempty_set, _ -> 1
   | _, Tempty_set -> -1
   | (Tunion l1, Tunion l2) | (Tinter l1, Tinter l2) ->
-    Extlib.list_compare compare_term l1 l2
+    List.compare compare_term l1 l2
   | Tunion _, _ -> 1
   | _, Tunion _ -> -1
   | Tinter _, _ -> 1
@@ -1849,7 +1849,7 @@ let rec compare_term t1 t2 =
   | Tcomprehension(e1,q1,p1), Tcomprehension(e2,q2,p2) ->
     let res = compare_term e1 e2 in
     if res = 0 then
-      let res = Extlib.list_compare compare_var q1 q2 in
+      let res = List.compare compare_var q1 q2 in
       if res = 0 then compare_opt compare_predicate p1 p2 else res
     else res
   | Tcomprehension _, _ -> 1
@@ -1873,7 +1873,7 @@ and compare_logic_body b1 b2 =
   | LBnone, _ -> 1
   | _, LBnone -> -1
   | LBreads l1, LBreads l2 ->
-    Extlib.list_compare compare_identified_term l1 l2
+    List.compare compare_identified_term l1 l2
   | LBreads _, _ -> 1
   | _, LBreads _ -> -1
   | LBterm t1, LBterm t2 -> compare_term t1 t2
@@ -1883,15 +1883,15 @@ and compare_logic_body b1 b2 =
   | LBpred _, _ -> 1
   | _, LBpred _ -> -1
   | LBinductive l1, LBinductive l2 ->
-    Extlib.list_compare compare_indcase l1 l2
+    List.compare compare_indcase l1 l2
 
 and compare_indcase (id1,labs1,typs1,p1) (id2,labs2,typs2,p2) =
   let res = String.compare id1 id2 in
   if res = 0 then
-    let res = Extlib.list_compare compare_logic_label labs1 labs2 in
+    let res = List.compare compare_logic_label labs1 labs2 in
     if res = 0 then
       let res =
-        Extlib.list_compare String.compare typs1 typs2
+        List.compare String.compare typs1 typs2
       in
       if res = 0 then compare_predicate p1 p2 else res
     else res
@@ -1941,8 +1941,8 @@ and compare_predicate_node p1 p2 =
   | Papp(i1,labels1,args1), Papp(i2,labels2,args2) ->
     let res = compare_logic_signature i1 i2 in
     if res = 0 then
-      let res = Extlib.list_compare compare_logic_label labels1 labels2 in
-      if res = 0 then Extlib.list_compare compare_term args1 args2 else res
+      let res = List.compare compare_logic_label labels1 labels2 in
+      if res = 0 then List.compare compare_term args1 args2 else res
     else res
   | Papp _, _ -> 1
   | _, Papp _ -> -1
@@ -1986,7 +1986,7 @@ and compare_predicate_node p1 p2 =
   | Plet _, _ -> 1
   | _, Plet _ -> -1
   | Pforall(q1,p1), Pforall(q2,p2) | Pexists(q1,p1), Pexists(q2,p2) ->
-    let res = Extlib.list_compare compare_var q1 q2 in
+    let res = List.compare compare_var q1 q2 in
     if res = 0 then compare_predicate p1 p2 else res
   | Pforall _, _ -> 1
   | _, Pforall _ -> -1
@@ -2042,15 +2042,15 @@ and compare_predicate_node p1 p2 =
   | Pfresh _, _ -> 1
   | _, Pfresh _ -> -1
   | Pseparated(seps1), Pseparated(seps2) ->
-    Extlib.list_compare compare_term seps1 seps2
+    List.compare compare_term seps1 seps2
 
 and compare_predicate pred1 pred2 =
-  let res = Extlib.list_compare String.compare pred1.pred_name pred2.pred_name in
+  let res = List.compare String.compare pred1.pred_name pred2.pred_name in
   if res = 0 then compare_predicate_node pred1.pred_content pred2.pred_content else res
 
 (* unused for now *)
 (* and compare_identified_predicate p1 p2 =
-   let res = Extlib.list_compare String.compare p1.ip_name p2.ip_name in
+   let res = List.compare String.compare p1.ip_name p2.ip_name in
    if res = 0 then compare_predicate p1.ip_content p2.ip_content else res
 *)
 and compare_identified_term l1 l2 = compare_term l1.it_content l2.it_content

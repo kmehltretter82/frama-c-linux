@@ -340,7 +340,7 @@ let gen_define_macro fmt macro def =
   else gen_define_string fmt macro def
 
 let gen_redefinable_macro fmt macro def =
-  let redef_name = "__FC_FORCE_" ^ Extlib.strip_underscore macro in
+  let redef_name = "__FC_FORCE_" ^ String.trim_underscores macro in
   Format.fprintf fmt "#if defined(%s)@\n" redef_name;
   (* SO's trick to check that the redef macro has an integer value.
      Otherwise (notably if it's empty), we consider that we undef fc_name.
@@ -359,7 +359,7 @@ let gen_redefinable_macro fmt macro def =
 let gen_define_custom_macros fmt censored mach =
   let key_values = mach.custom_defs in
   let is_same_macro m1 m2 =
-    Extlib.strip_underscore m1 = Extlib.strip_underscore m2
+    String.trim_underscores m1 = String.trim_underscores m2
   in
   Format.fprintf fmt "@[<v 0>/* Builtin macros for current machdep */@\n";
   Format.fprintf fmt "#ifndef __FC_BUILTIN_MACROS_H@\n";
@@ -382,8 +382,8 @@ let gen_byte_order fmt mach =
     (if mach.little_endian then "__LITTLE_ENDIAN" else "__BIG_ENDIAN")
 
 let no_signedness s =
-  let s = Option.value  ~default:s (Extlib.string_del_prefix "signed" s) in
-  let s = Option.value  ~default:s (Extlib.string_del_prefix "unsigned" s) in
+  let s = Option.value  ~default:s (String.remove_prefix "signed" s) in
+  let s = Option.value  ~default:s (String.remove_prefix "unsigned" s) in
   let s = String.trim s in
   if s = "" then "int" else s
 

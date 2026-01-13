@@ -15,7 +15,7 @@
 
 let dkey = Kernel.dkey_rmtmps
 
-open Extlib
+open Fun.Operators
 open Cil_types
 open Cil
 

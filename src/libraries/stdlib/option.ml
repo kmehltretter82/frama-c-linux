@@ -18,3 +18,30 @@ include Monad.Make_based_on_bind_with_product (Minimal)
 include Stdlib.Option
 
 let bind = Minimal.bind
+
+let filter f = function
+  | None -> None
+  | (Some x) as o -> if f x then o else None
+
+let get ?(exn=Invalid_argument "option is None") = function
+  | None -> raise exn
+  | Some x -> x
+
+let hash hash v = match v with
+  | None -> 31179
+  | Some v -> hash v
+
+let merge f x y = match x, y with
+  | x, None | None, x -> x
+  | Some x, Some y -> Some (f x y)
+
+let map2 f x y = match x, y with
+  | None, _ | _, None -> None
+  | Some x, Some y -> Some (f x y)
+
+let map_no_copy f o =
+  match o with
+  | None -> o
+  | Some x ->
+    let x' = f x in
+    if x' != x then Some x' else o

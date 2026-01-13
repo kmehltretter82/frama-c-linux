@@ -339,7 +339,8 @@ module Pretty = struct
         (fun lvals -> LSet.cardinal lvals >= 2)
         alias_sets
     in
-    Pretty_utils.pp_list ~empty:"<none>" ~sep:"@;<2>" LSet.pretty fmt alias_sets
+    let pp_set fmt = Format.fprintf fmt "@[<hov 2>%a@]" LSet.pretty in
+    Pretty_utils.pp_list ~empty:"<none>" ~sep:"@;<2>" pp_set fmt alias_sets
 end
 
 (* invariants of type t must be true before and after each function call *)

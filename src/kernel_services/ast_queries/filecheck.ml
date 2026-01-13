@@ -418,7 +418,7 @@ module Base_checker = struct
               "Statement %a of function %s is registered with a wrong kf"
               Printer.pp_stmt s (Kernel_function.get_name kf);
           let blocks = Kernel_function.find_all_enclosing_blocks s in
-          let b = Extlib.last blocks in
+          let b = List.last blocks in
           let body = Kernel_function.get_definition kf in
           if b != body.sbody then
             check_abort
@@ -578,7 +578,7 @@ module Base_checker = struct
         List.iter vextend b.b_extended;
         let old_labels = logic_labels in
         logic_labels <- Logic_const.post_label :: logic_labels;
-        List.iter Extlib.(vpred $ snd) b.b_post_cond;
+        List.iter (Fun.compose vpred snd) b.b_post_cond;
         ignore Visitor.(visitFramacAssigns (self:>frama_c_visitor) b.b_assigns);
         ignore
           Visitor.(visitFramacAllocation (self:>frama_c_visitor) b.b_allocation);

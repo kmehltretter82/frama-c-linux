@@ -21,7 +21,7 @@ let dkey =
 
 let pp_map iteri pp_key pp_val fmt map =
   let pp fmt k v =
-    Format.fprintf fmt "@,%a:@;<1 2>@[<hov>%a@]" pp_key k pp_val v
+    Format.fprintf fmt "@,@[<hov>%a@]:@;<1 2>@[<hov>%a@]" pp_key k pp_val v
   in
   iteri (pp fmt) map
 

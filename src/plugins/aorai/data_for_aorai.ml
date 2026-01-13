@@ -1901,16 +1901,15 @@ let unchanged loc =
   Cil_datatype.Term.Map.add loc (Fixed 0) Cil_datatype.Term.Map.empty
 
 let merge_bindings tbl1 tbl2 =
-  let merge_range loc = Extlib.merge_opt (merge_range loc) in
   let merge_vals loc tbl1 tbl2 =
     match tbl1, tbl2 with
     | None, None -> None
     | Some tbl, None | None, Some tbl ->
       Some
-        (Cil_datatype.Term.Map.merge
+        (Cil_datatype.Term.Map.closed_union
            (merge_range loc) tbl (unchanged loc))
     | Some tbl1, Some tbl2 ->
-      Some (Cil_datatype.Term.Map.merge (merge_range loc) tbl1 tbl2)
+      Some (Cil_datatype.Term.Map.closed_union (merge_range loc) tbl1 tbl2)
   in
   Cil_datatype.Term.Map.merge merge_vals tbl1 tbl2
 
@@ -1997,11 +1996,11 @@ let merge_end_state tbl1 tbl2 =
     let tbl = merge_bindings tbl1 tbl2 in
     (fst, last, tbl)
   in
-  Aorai_state.Map.merge (Extlib.merge_opt merge_stop_state) tbl1 tbl2
+  Aorai_state.Map.closed_union merge_stop_state tbl1 tbl2
 
 let merge_state tbl1 tbl2 =
   let merge_state _ = merge_end_state in
-  Aorai_state.Map.merge (Extlib.merge_opt merge_state) tbl1 tbl2
+  Aorai_state.Map.closed_union merge_state tbl1 tbl2
 
 module Pre_state =
   Kernel_function.Make_Table

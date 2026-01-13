@@ -174,7 +174,8 @@ struct
              ?typ:(Base.typeof base) ?pretty_v ?skip_v ~sep ()) offs
       in
       Pretty_utils.pp_iter ~pre:"@[<v>" ~sep:"@ " ~suf:"@]"
-        (Extlib.iter_uncurry2 LBase.iter) pp_one fmt m
+        (fun f -> LBase.iter (fun base offset -> f (base, offset)))
+        pp_one fmt m
 
   let pretty = pretty_generic_printer ~sep:"FROM" ()
 

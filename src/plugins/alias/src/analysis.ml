@@ -135,7 +135,7 @@ let do_function_call (stmt:stmt) state (res : lval option) (f : lhost) (args: ex
         begin match Stmt_table.find stmt with
           | Some state ->
             let targets = Abstract_state.find_vars lvf state in
-            Options.feedback ~level:3 "%a is an indirect function call to one of %a"
+            Options.feedback ~level:3 "%a is an indirect function call to one of @[%a@]"
               Printer.pp_stmt stmt
               Abstract_state.VarSet.pretty targets;
             let kf_of_var {vname; _} =

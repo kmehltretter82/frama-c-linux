@@ -322,11 +322,11 @@ let add_builtin_if_active b =
       "adding builtin: %a %s(%a%s)"
       Cil_datatype.Typ.pretty (Option.get b.rettype) b.name
       (Pretty_utils.pp_list ~sep:", " Cil_datatype.Typ.pretty)
-      (List.map Option.get b.args)
+      (List.map (Option.get ?exn:None) b.args)
       (if b.variadic then ", ..." else "")
     ;
     add_builtin ~prefix:"" b.name (Option.get b.rettype)
-      ((List.map Option.get) b.args) b.variadic
+      ((List.map (Option.get ?exn:None)) b.args) b.variadic
   end
 
 (* Instantiates builtins according to the types in the template.

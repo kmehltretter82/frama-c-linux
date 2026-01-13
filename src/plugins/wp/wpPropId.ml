@@ -361,7 +361,7 @@ struct
       let ip_string = get_ip pre in
       let ip_string =
         Option.value ~default:ip_string
-          (Extlib.string_del_prefix
+          (String.remove_prefix
              ((Kernel_function.get_name callee_kf)^"_")
              ip_string)
       in

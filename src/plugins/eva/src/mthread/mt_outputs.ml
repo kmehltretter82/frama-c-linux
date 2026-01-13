@@ -31,7 +31,7 @@ end
 (** Module to produce HTML output *)
 module Html = struct
 
-  let escape = Extlib.html_escape
+  let escape = String.html_escape
 
   let pretty_escaped pp fmt v =
     let s = Format.asprintf "%a" pp v in
@@ -80,7 +80,7 @@ module Html = struct
 
   (** [html_fname page_name] returns the page [page_name.html] encoded to be
       used in an HTML URL. *)
-  let html_fname html_page = Extlib.percent_encode html_page.page_name ^ ".html"
+  let html_fname html_page = String.percent_encode html_page.page_name ^ ".html"
 
 
   type html_div = {
@@ -530,12 +530,12 @@ module Html = struct
       let vertex_name v =
         let s = Format.asprintf "%a" Thread.pretty v in
         (* Surround name with double-quotes so that we can use UTF-8 and other
-           special characters apart from double quotes. [escape_non_utf8] is
+           special characters apart from double quotes. String.utf8_escaped is
            used so that double quote are escaped. *)
-        Format.asprintf "\"%s\"" (Extlib.escape_non_utf8 s)
+        Format.asprintf "\"%s\"" (String.utf8_escaped s)
       let vertex_attributes v =
         let s = Format.asprintf "%a" Thread.pretty v in
-        [ `Label (Extlib.escape_non_utf8 s)]
+        [ `Label (String.utf8_escaped s)]
       let get_subgraph _ = None
       let default_edge_attributes _ = [`Style(`Solid);]
       let edge_attributes _ = []

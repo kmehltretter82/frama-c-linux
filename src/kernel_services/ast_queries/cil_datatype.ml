@@ -28,7 +28,7 @@ end
 
 open Cil_types
 let (=?=) = Extlib.compare_basic
-let compare_list = Extlib.list_compare
+let compare_list = List.compare
 let hash_list f = List.fold_left (fun acc d -> 65537 * acc + f d) 1
 
 (* Functions that will clear internal, non-project compliant, caches *)
@@ -1034,7 +1034,7 @@ struct
       begin
         match c1.cfields, c2.cfields with
         | Some c1f, Some c2f when c1.cstruct == c2.cstruct ->
-          Extlib.list_compare
+          List.compare
             (fun f1 f2 -> compare_structural_typ_size f1.ftype f2.ftype)
             c1f c2f
         | _ -> Typ.compare t1 t2
@@ -1678,7 +1678,7 @@ module Model_info = struct
       include Datatype.Undefined
       let name = "model_info"
       let reprs =
-        Extlib.product
+        List.product_map
           (fun base field ->
              { mi_name = "dummy";
                mi_base_type = base;

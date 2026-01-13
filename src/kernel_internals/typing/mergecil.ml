@@ -19,7 +19,7 @@
  * definitions in the source files.  It effectively acts like a linker,
  * but at the source code level instead of the object code level. *)
 
-open Extlib
+open Fun.Operators
 open Cil_types
 open Cil
 module H = Hashtbl
@@ -416,14 +416,14 @@ module ExtMerging =
           | Ext_id i1, Ext_id i2 -> Datatype.Int.compare i1 i2
           | Ext_id _, _ -> 1 | _, Ext_id _ -> -1
           | Ext_terms terms1, Ext_terms terms2 ->
-            Extlib.list_compare Logic_utils.compare_term terms1 terms2
+            List.compare Logic_utils.compare_term terms1 terms2
           | Ext_terms _, _ -> 1 | _, Ext_terms _ -> -1
           | Ext_preds p1, Ext_preds p2 ->
-            Extlib.list_compare Logic_utils.compare_predicate p1 p2
+            List.compare Logic_utils.compare_predicate p1 p2
           | Ext_preds _, _ -> 1 | _, Ext_preds _ -> -1
           | Ext_annot (id1, a1) , Ext_annot (id2, a2)  ->
             match String.compare id1 id2 with
-            | 0 -> Extlib.list_compare compare a1 a2
+            | 0 -> List.compare compare a1 a2
             | n -> n
         in
         let res = Datatype.String.compare e1.ext_name e2.ext_name in
@@ -579,7 +579,7 @@ module EnumMerging =
       let compare e1 e2 =
         if is_anonymous_enum e1 then
           if is_anonymous_enum e2 then
-            Extlib.list_compare compare_enum_item e1.eitems e2.eitems
+            List.compare compare_enum_item e1.eitems e2.eitems
           else -1
         else if is_anonymous_enum e2 then 1
         else String.compare e1.ename e2.ename
@@ -1877,9 +1877,9 @@ class renameVisitorClass =
           Kernel.fatal ~current:true "non constant value for an enum item"
       end else begin
         (* Merged with an isomorphic type. Find the appropriate enumitem *)
-        let n = Extlib.find_index (fun e -> e.einame = ei.einame)
+        let n = List.find_index (fun e -> e.einame = ei.einame)
             ei.eihost.eitems in
-        let ei' = List.nth enum.eitems n in
+        let ei' = List.nth enum.eitems (Option.get ~exn:Not_found n) in
         assert (same_int64 ei.eival ei'.eival);
         Some (CEnum ei')
       end
@@ -2510,7 +2510,7 @@ let equal_str_literal lit1 lit2 =
   match lit1, lit2 with
   | Str s1, Str s2 -> String.equal s1 s2
   | Wstr l1, Wstr l2 ->
-    list_compare Int64.compare l1 l2 = 0
+    List.compare Int64.compare l1 l2 = 0
   | (Str _ | Wstr _), _ -> false
 
 let equal_init_or_str i1 i2 =

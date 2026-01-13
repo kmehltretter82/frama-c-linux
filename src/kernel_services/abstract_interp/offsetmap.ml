@@ -2855,7 +2855,7 @@ module Make_bitwise(V: sig
         if c = 0
         then Z.compare e1 e2
         else c
-      let compare = Extlib.list_compare compare_itv
+      let compare = List.compare compare_itv
     end)
 
   let fold_fuse_same f m acc =

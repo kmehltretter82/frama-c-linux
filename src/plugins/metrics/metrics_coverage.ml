@@ -9,7 +9,7 @@
 open Cil_types
 open Cil_datatype
 
-let compare_vi_names v1 v2 = Extlib.compare_ignore_case v1.vname v2.vname
+let compare_vi_names v1 v2 = String.compare_ignore_case v1.vname v2.vname
 
 class coverageAuxVisitor ~libc = object(self)
   inherit Visitor.frama_c_inplace

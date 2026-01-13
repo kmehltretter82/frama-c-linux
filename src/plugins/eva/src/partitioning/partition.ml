@@ -280,7 +280,7 @@ struct
     | None -> { k with branches = b :: k.branches }
     | Some history_size ->
       if history_size > 0 then
-        let trunc = Extlib.list_first_n (history_size - 1) k.branches in
+        let trunc = List.take (history_size - 1) k.branches in
         { k with branches = b :: trunc }
       else if k.branches <> [] then
         { k with branches = [] }
@@ -361,7 +361,7 @@ struct
     {
       ration_stamp = None;
       branches =
-        Extlib.list_first_n policy.history_size (
+        List.take policy.history_size (
           (if policy.callee_history then callee.branches else []) @
           (if policy.caller_history then caller.branches else [])
         );

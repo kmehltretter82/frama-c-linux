@@ -259,7 +259,7 @@ let cardinal_less_than v n =
   let c =
     match v with
     | Set s -> Z.of_int (Int_set.cardinal s)
-    | Itv i -> Extlib.the ~exn:Not_less_than (Int_interval.cardinal i)
+    | Itv i -> Option.get ~exn:Not_less_than (Int_interval.cardinal i)
   in
   if Z.leq c (Z.of_int n)
   then Z.to_int c (* This is smaller than the original [n] *)

@@ -83,16 +83,16 @@ let compose_bindings map1 loc vals map =
                  orig_base Cil_datatype.Term.Map.empty
              with Not_found -> Cil_datatype.Term.Map.singleton base intv
          in
-         Cil_datatype.Term.Map.merge
-           (Extlib.merge_opt (Data_for_aorai.merge_range loc)) vals' vals
+         Cil_datatype.Term.Map.closed_union
+           (Data_for_aorai.merge_range loc) vals' vals
       )
       vals Cil_datatype.Term.Map.empty
   in
   try
     let vals' = Cil_datatype.Term.Map.find loc map in
     let vals' =
-      Cil_datatype.Term.Map.merge
-        (Extlib.merge_opt (Data_for_aorai.merge_range loc)) vals' vals
+      Cil_datatype.Term.Map.closed_union
+        (Data_for_aorai.merge_range loc) vals' vals
     in
     Cil_datatype.Term.Map.add loc vals' map
   with Not_found ->
@@ -121,12 +121,12 @@ let compose_states
           (fun elt -> compose_actions ~args bindings elt) new_states
       in
       let merge_stop_state _ (fst1, last1, map1) (fst2, last2, map2) =
-        (Data_for_aorai.Aorai_state.Set.union fst1 fst2,
-         Data_for_aorai.Aorai_state.Set.union last1 last2,
-         Data_for_aorai.merge_bindings map1 map2)
+        Some
+          (Data_for_aorai.Aorai_state.Set.union fst1 fst2,
+           Data_for_aorai.Aorai_state.Set.union last1 last2,
+           Data_for_aorai.merge_bindings map1 map2)
       in
-      Data_for_aorai.Aorai_state.Map.merge
-        (Extlib.merge_opt merge_stop_state) composed_actions acc
+      Data_for_aorai.Aorai_state.Map.union merge_stop_state composed_actions acc
     with Not_found -> acc
   in
   let treat_one_start_state start curr_states acc =

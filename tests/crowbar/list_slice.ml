@@ -50,7 +50,7 @@ let test l first last =
     | None ->
       Crowbar.fail ("could not parse python list slice")
     | Some oracle ->
-      let result = Extlib.list_slice ?first ?last l in
+      let result = List.slice ?first ?last l in
       if oracle <> result then
         Crowbar.fail
           (Format.asprintf "oracle: [%a], result: [%a]"
@@ -68,6 +68,6 @@ let mk_arg =
 
 let gen_list = Crowbar.list (Crowbar.range 10000)
 
-let () = Crowbar.add_test ~name:"Extlib.list_slice"
+let () = Crowbar.add_test ~name:"List.slice"
     [ gen_list; mk_arg; mk_arg ] @@
   (fun l first last -> Crowbar.check (test l first last))

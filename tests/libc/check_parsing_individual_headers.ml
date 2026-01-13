@@ -29,7 +29,7 @@ let collect_headers () =
       acc @ headers
     ) base_headers subdirs
   in
-  let all_headers = List.sort Extlib.compare_ignore_case all_headers in
+  let all_headers = List.sort String.compare_ignore_case all_headers in
   let to_skip = blacklist libc_dir in
   List.iter (fun header ->
       let header_path = Filepath.of_string header in

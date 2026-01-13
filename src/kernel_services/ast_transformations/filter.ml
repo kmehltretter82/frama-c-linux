@@ -10,7 +10,7 @@ open Cil
 open Cil_types
 module FC_file = File (* overwritten by Cil_datatype *)
 open Cil_datatype
-open Extlib
+open Fun.Operators
 
 let debug fmt = Kernel.debug ~current:true ~dkey:Kernel.dkey_filter fmt
 

@@ -34,9 +34,8 @@ let interval_to_predicate_opt ~loc te min max =
   and max_predicate =
     int_to_predicate ~loc ~lop:Rle te
   in
-  Extlib.merge_opt
-    (fun _ pmin pmax -> Logic_const.pand ~loc (pmin, pmax))
-    ()
+  Option.merge
+    (fun pmin pmax -> Logic_const.pand ~loc (pmin, pmax))
     (Option.map min_predicate min)
     (Option.map max_predicate max)
 
@@ -80,9 +79,8 @@ let ival_to_predicate_opt ~loc t ival =
       | (min, max, rem, modulo) ->
         let pint = interval_to_predicate_opt ~loc t min max in
         let pcon = congruence_to_predicate_opt ~loc t rem modulo in
-        Extlib.merge_opt
-          (fun _ pint pcon -> Logic_const.pand ~loc (pint, pcon))
-          ()
+        Option.merge
+          (fun pint pcon -> Logic_const.pand ~loc (pint, pcon))
           pint
           pcon
 

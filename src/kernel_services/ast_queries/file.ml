@@ -472,8 +472,8 @@ let censored_macros cpp_args =
        let open Option.Operators in
        let none = acc in
        let some = Fun.flip Datatype.String.Set.add acc in
-       (let+ name = Extlib.string_del_prefix "-U" arg in
-        Extlib.strip_underscore name)
+       (let+ name = String.remove_prefix "-U" arg in
+        String.trim_underscores name)
        |> Option.fold ~none ~some)
     known_bad_macros
     (List.(flatten (map (String.split_on_char ' ') cpp_args)))
@@ -1734,7 +1734,7 @@ let print_all_sources out all_sources_tbl =
       all_sources_tbl []
   in
   let sorted_elems =
-    List.sort (fun (f1, _) (f2, _) -> Extlib.compare_ignore_case f1 f2) elems
+    List.sort (fun (f1, _) (f2, _) -> String.compare_ignore_case f1 f2) elems
   in
   if Filepath.is_special_stdout out then begin
     (* text format, to stdout *)
@@ -1815,7 +1815,7 @@ let check_source_hashes expected actual_table =
   if diffs <> [] then begin
     let diffs =
       List.sort (fun (fp1, _, _) (fp2, _, _) ->
-          Extlib.compare_ignore_case fp1 fp2) diffs
+          String.compare_ignore_case fp1 fp2) diffs
     in
     List.iter (fun (fp, got, expected) ->
         Kernel.warning ~wkey:Kernel.wkey_audit
@@ -1829,7 +1829,7 @@ let check_source_hashes expected actual_table =
       expected_names
   in
   if missing <> [] then begin
-    let missing = List.sort Extlib.compare_ignore_case missing in
+    let missing = List.sort String.compare_ignore_case missing in
     Kernel.warning ~wkey:Kernel.wkey_audit
       "missing files:@\n%a"
       (Pretty_utils.pp_list ~sep:"@\n" Format.pp_print_string) missing

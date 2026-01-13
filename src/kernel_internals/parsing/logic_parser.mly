@@ -128,7 +128,7 @@
                  the location at its old place in the list. This ensures
                  that we get the exact same clause if we try to
                  link the original contract with its pretty-printed version. *)
-              Extlib.replace compare_pair p acc
+              List.replace compare_pair p acc
           | From curl, From newl ->
             let incl l lin =
               List.(for_all (fun e -> exists (is_same_lexpr e) lin) l)
@@ -146,7 +146,7 @@
             end
             else if incl newl curl then begin
               drop curloc newloc;
-              Extlib.replace compare_pair p acc
+              List.replace compare_pair p acc
             end
             else acc @ [p]
       with Not_found -> acc @ [p]

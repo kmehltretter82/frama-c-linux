@@ -99,7 +99,7 @@ module D = Datatype.Make(struct
     let compare lscope1 lscope2 =
       let lscope_vars1 = get_all lscope1 in
       let lscope_vars2 = get_all lscope2 in
-      Extlib.list_compare
+      List.compare
         (fun lscope_var1 lscope_var2 ->
            let r1 = rank_lvar lscope_var1 in
            let r2 = rank_lvar lscope_var2 in

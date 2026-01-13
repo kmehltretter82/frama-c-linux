@@ -796,7 +796,7 @@ module Make (Engine: Engine_Subset) = struct
       let alarm = process_truth ~alarm truth in
       Alarmset.combine alarm acc
     in
-    Extlib.product_fold check Alarmset.none list1 list2
+    List.product_fold check Alarmset.none list1 list2
 
   (* Not currently taking advantage of calls information. But see
      plugin Undefined Order by VP. *)
@@ -822,7 +822,7 @@ module Make (Engine: Engine_Subset) = struct
         Alarmset.combine alarms acc
     in
     try
-      let alarms = Extlib.product_fold check_stmt_pair Alarmset.none seq seq in
+      let alarms = List.product_fold check_stmt_pair Alarmset.none seq seq in
       Alarmset.emit ~pos alarms;
       `Value ()
     with EBottom alarms -> Alarmset.emit ~pos alarms; `Bottom

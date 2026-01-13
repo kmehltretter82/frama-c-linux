@@ -311,7 +311,7 @@ struct
         in
         Option.iter (add_state key) state;
         (* Filter out already propagated states. *)
-        Extlib.opt_filter (fun s -> Index.add s dest.store_index) state
+        Option.filter (fun s -> Index.add s dest.store_index) state
       in
       let flow = Flow.join_duplicate_keys flow_states in
       let flow = Flow.filter_map update flow in
