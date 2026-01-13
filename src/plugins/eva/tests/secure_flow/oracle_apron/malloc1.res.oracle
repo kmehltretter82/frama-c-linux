@@ -1,6 +1,4 @@
-3c3,32
-< [eva:experimental] Warning: The taint domain is experimental.
----
+2a3,32
 > [eva] Analyzing a complete application starting at main
 > [eva] Computing initial state
 > [eva] Initial state computed

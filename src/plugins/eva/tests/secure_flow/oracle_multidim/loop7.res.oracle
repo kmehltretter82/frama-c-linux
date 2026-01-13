@@ -1,19 +1,17 @@
-3d2
-< [eva:experimental] Warning: The taint domain is experimental.
-9d7
+8d7
 < [eva:loop-unroll:auto] loop7.c:13: Automatic loop unrolling.
-11c9
+10c9
 < [eva:loop-unroll:auto] loop7.c:18: Automatic loop unrolling.
 ---
 > [eva:partition] loop7.c:13: starting to merge loop iterations
-14c12
+13c12
 < [eva:loop-unroll:auto] loop7.c:24: Automatic loop unrolling.
 ---
 > [eva:partition] loop7.c:18: starting to merge loop iterations
-15a14,15
+14a14,15
 > [eva:partition] loop7.c:24: starting to merge loop iterations
 > [eva:alarm] loop7.c:26: Warning: assertion got status unknown.
-21c21,27
+20c21,27
 <   array[0..9] ∈ {0}
 ---
 >   array[0] ∈ {0}

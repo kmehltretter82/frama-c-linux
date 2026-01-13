@@ -1,10 +1,10 @@
-15a16
+14a15
 > [eva:partition] jump6.c:11: starting to merge loop iterations
-28a30
+27a29
 > [eva:partition] jump6.c:26: starting to merge loop iterations
-33d34
+32d33
 < [eva:partition] jump6.c:26: starting to merge loop iterations
-46,47c47,48
+45,46c46,47
 <   j ∈ [0..4294967294],0%2
 <   k ∈ [0..4294967294]
 ---

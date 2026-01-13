@@ -1,5 +1,5 @@
-12a13
+11a12
 > [eva:partition] loop3.c:15: starting to merge loop iterations
-16,17d16
+15,16d15
 < [eva] loop3.c:20: assertion got status valid.
 < [eva] loop3.c:21: assertion got status valid.

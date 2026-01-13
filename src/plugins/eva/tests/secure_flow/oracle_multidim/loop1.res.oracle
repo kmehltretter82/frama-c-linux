@@ -1,6 +1,4 @@
-3d2
-< [eva:experimental] Warning: The taint domain is experimental.
-23d21
+22d21
 < [eva:alarm] loop1.c:38: Warning: assertion got status unknown.
-24a23
+23a23
 > [eva:alarm] loop1.c:38: Warning: assertion got status unknown.

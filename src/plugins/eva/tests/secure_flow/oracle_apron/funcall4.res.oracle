@@ -1,13 +1,11 @@
-3d2
-< [eva:experimental] Warning: The taint domain is experimental.
-30c29,32
+29c29,32
 < [eva] funcall4.c:18: Reusing old results for call to set_y
 ---
 > [eva] computing for function set_y <- set_x <- main.
 >   Called from funcall4.c:18.
 > [eva] Recording results for set_y
 > [eva] Done for function set_y
-38c40,43
+37c40,43
 < [eva] funcall4.c:18: Reusing old results for call to set_y
 ---
 > [eva] computing for function set_y <- set_x <- main.

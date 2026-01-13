@@ -1,9 +1,9 @@
-13a14
+12a13
 > [eva:partition] loop4.c:17: starting to merge loop iterations
-15d15
+14d14
 < [eva] loop4.c:29: assertion got status valid.
-18,19d17
+17,18d16
 < [eva] loop4.c:30: assertion got status valid.
 < [eva] loop4.c:31: assertion got status valid.
-22d19
+21d18
 < [eva] loop4.c:32: assertion got status valid.

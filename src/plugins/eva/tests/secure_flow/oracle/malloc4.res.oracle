@@ -1,6 +1,5 @@
 [kernel] Expanding arguments from test_options.txt
 [kernel] Parsing malloc4.c (with preprocessing)
-[eva:experimental] Warning: The taint domain is experimental.
 [eva:secure-flow:condition] malloc4.c:12: Warning: 
   non-interference violation on condition involving {secret}
 [from] Computing for function main
