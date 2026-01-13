@@ -47,6 +47,7 @@ let argsToList :
 
 (* A hack to allow forward reference of d_exp *)
 let pp_typ_ref = Extlib.mk_fun "Cil.pp_typ_ref"
+let pp_binop_ref = Extlib.mk_fun "Cil.pp_binop_ref"
 let pp_global_ref = Extlib.mk_fun "Cil.pp_global_ref"
 let pp_exp_ref = Extlib.mk_fun "Cil.pp_exp_ref"
 let pp_lval_ref = Extlib.mk_fun "Cil.pp_lval_ref"
@@ -5736,29 +5737,25 @@ and mkBinOp ~loc op e1 e2 =
   let t2 = typeOf e2 in
   let machdep = false in
   let error msg = Format.kasprintf Result.error msg in
-  let make_expr common_type res_type =
-    constFoldBinOp ~loc machdep op
-      (mkCastT ~oldt:t1 ~newt:common_type e1)
-      (mkCastT ~oldt:t2 ~newt:common_type e2)
-      res_type
-  in
-  let doArithmetic () =
-    let tres = arithmeticConversion t1 t2 in
-    Ok (make_expr tres tres)
-  in
-  let doArithmeticComp () =
-    let tres = arithmeticConversion t1 t2 in
-    Ok (make_expr tres Cil_const.intType)
-  in
-  let doIntegralArithmetic () =
-    let tres = arithmeticConversion t1 t2 in
-    if is_integral tres then
-      Ok (make_expr tres tres)
+  let check_make_expr ?res ~check name =
+    if check t1 && check t2 then
+      let t = arithmeticConversion t1 t2 in
+      let tres = Option.value ~default:t res in
+      constFoldBinOp ~loc machdep op
+        (mkCastT ~oldt:t1 ~newt:t e1)
+        (mkCastT ~oldt:t2 ~newt:t e2)
+        tres
+      |> Result.ok
     else
       error
-        "@[mkBinOp: unsupported non integral result type for integral \
-         arithmetic@ %a@]"
-        !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,Cil_const.intType)))
+        "%a operator on %s type(s) %a and %a"
+        !pp_binop_ref op name !pp_typ_ref t1 !pp_typ_ref t2
+  in
+  let doArithmetic ?res () =
+    check_make_expr ?res ~check:Ast_types.is_arithmetic "non-arithmetic"
+  in
+  let doIntegralArithmetic () =
+    check_make_expr ~check:Ast_types.is_integral "non-integral"
   in
   let compare_pointer op ?cast1 ?cast2 e1 e2 =
     let do_cast e = function
@@ -5781,7 +5778,7 @@ and mkBinOp ~loc op e1 e2 =
   in
   match op with
   | Mult | Div -> doArithmetic ()
-  | Mod | BAnd | BOr | BXor -> doIntegralArithmetic ()
+  | Mod  | BAnd | BOr | BXor -> doIntegralArithmetic ()
   | LAnd | LOr ->
     let* () = check_scalar "logical operator" e1 t1 in
     let+ () = check_scalar "logical operator" e2 t2 in
@@ -5799,8 +5796,7 @@ and mkBinOp ~loc op e1 e2 =
         (mkCastT ~oldt:t2 ~newt:t2' e2)
         t1'
       |> Result.ok
-  | PlusA | MinusA
-    when is_arithmetic t1 && is_arithmetic t2 -> doArithmetic ()
+  | PlusA  | MinusA -> doArithmetic ()
   | PlusPI | MinusPI when is_ptr t1 && is_integral t2 ->
     Ok (constFoldBinOp ~loc machdep op e1 e2 t1)
   | MinusPP when is_ptr t1 && is_ptr t2 ->
@@ -5822,24 +5818,23 @@ and mkBinOp ~loc op e1 e2 =
         !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,Cil_const.intType)))
         !pp_typ_ref t1
         !pp_typ_ref t2
-  | (Eq|Ne|Lt|Le|Ge|Gt)
-    when is_arithmetic t1 && is_arithmetic t2 ->
-    doArithmeticComp ()
-  | (Eq|Ne) when is_ptr t1 && isZero e2 ->
+  | Eq | Ne when is_ptr t1 && isZero e2 ->
     compare_pointer ~cast2:t1 op e1 (zero ~loc)
-  | (Eq|Ne) when is_ptr t2 && isZero e1 ->
+  | Eq | Ne when is_ptr t2 && isZero e1 ->
     compare_pointer ~cast1:t2 op (zero ~loc) e2
-  | (Eq|Ne) when is_variadic_list t1 && isZero e2 ->
+  | Eq | Ne when is_variadic_list t1 && isZero e2 ->
     Kernel.debug ~level:3 "Comparison of va_list and zero";
     compare_pointer ~cast2:t1 op e1 (zero ~loc)
-  | (Eq|Ne) when is_variadic_list t2 && isZero e1 ->
+  | Eq | Ne when is_variadic_list t2 && isZero e1 ->
     Kernel.debug ~level:3 "Comparison of zero and va_list";
     compare_pointer ~cast1:t2 op (zero ~loc) e2
-  | (Le|Lt|Ge|Gt|Eq|Ne) when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
+  | Eq | Ne | Lt | Le | Ge | Gt
+    when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
     compare_pointer
       ~cast1:(Machine.uintptr_type ())
       ~cast2:(Machine.uintptr_type ())
       op e1 e2
+  | Eq | Ne | Lt | Le | Ge | Gt -> doArithmetic ~res:Cil_const.intType ()
   | _ ->
     error
       "@[mkBinOp: unsupported operator for such operands@ \

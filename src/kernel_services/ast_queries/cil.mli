@@ -2056,6 +2056,7 @@ val separate_if_succs: stmt -> stmt * stmt
 val switch_case_state_self: State.t
 
 val pp_typ_ref: (Format.formatter -> typ -> unit) ref
+val pp_binop_ref: (Format.formatter -> binop -> unit) ref
 val pp_global_ref: (Format.formatter -> global -> unit) ref
 val pp_exp_ref: (Format.formatter -> exp -> unit) ref
 val pp_lval_ref: (Format.formatter -> lval -> unit) ref

@@ -3461,6 +3461,7 @@ include Printer_builder.Make(struct class printer = cil_printer end)
 
 (* initializing Cil's forward references *)
 let () = Cil.pp_typ_ref := pp_typ
+let () = Cil.pp_binop_ref := pp_binop
 let () = Cil.pp_global_ref := pp_global
 let () = Cil.pp_exp_ref := pp_exp
 let () = Cil.pp_lval_ref := pp_lval
