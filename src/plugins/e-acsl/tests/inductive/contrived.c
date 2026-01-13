@@ -24,13 +24,6 @@
   }
 @*/
 
-// depend on a foreign predicate in complete mode
-/*@
-  inductive use_foreign(ℤ x, ℤ y) {
-      case c: \forall ℤ b,c; multimode(0,0,c) ==> use_foreign(b,c);
-  }
-*/
-
 // shows generation of conditions instead of \let
 /*@
   inductive conds(ℤ a, ℤ b, ℤ c) {
@@ -67,8 +60,6 @@ int main() {
   //@ assert use_multimode(0,0);
   //@ assert simple_complex_argument(0, 1);
   //@ assert simple_complex_argument(0, 2);
-  //@ assert use_foreign(0,0);
-  //@ assert !use_foreign(1,2);
   //@ assert conds(0, 2, 1);
   //@ assert use_var_bind_and_subst(0,0);
   //@ assert use_var_use_bind_and_subst(0,0);
