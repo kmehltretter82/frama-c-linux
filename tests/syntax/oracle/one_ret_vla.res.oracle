@@ -50,6 +50,8 @@ int f(unsigned int size)
   int __retres;
   {
     unsigned int __lengthof_unused;
+    __retres = 3;
+    goto return_label;
     /*@ assert alloca_bounds: 0 < sizeof(int) * size ≤ 4294967295; */ ;
     __lengthof_unused = size;
     int *unused = __fc_vla_alloc(sizeof(int) * __lengthof_unused);
@@ -64,6 +66,8 @@ int g(unsigned int size)
   int __retres;
   {
     unsigned int __lengthof_unused;
+    __retres = 3;
+    goto return_label;
     /*@ assert alloca_bounds: 0 < sizeof(int) * size ≤ 4294967295; */ ;
     __lengthof_unused = size;
     int *unused = __fc_vla_alloc(sizeof(int) * __lengthof_unused);

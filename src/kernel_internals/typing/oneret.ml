@@ -124,6 +124,7 @@ let encapsulate_local_vars f =
       method! vstmt s =
         match s.skind with
         | Return _ -> raise (Found (sb, s));
+        | Instr _ -> SkipChildren
         | _ -> DoChildren
     end
     in
@@ -137,7 +138,7 @@ let encapsulate_local_vars f =
     let ret_block = Stack.top stack_block in
     let ret_block_bstmts =
       List.filter
-        (fun s -> not (Cil_datatype.Stmt.equal ret_stmt s))
+        (fun s -> match s.skind with Return _ -> false | _ -> true)
         ret_block.bstmts
     in
     ret_block.bstmts <- ret_block_bstmts;
