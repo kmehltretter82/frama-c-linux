@@ -122,6 +122,15 @@ let rec iter f htr =
     iter f tree0;
     iter f tree1
 
+let rec to_seq htr =
+  match htr with
+  | Empty ->
+    Seq.empty
+  | Leaf (key, data, _) ->
+    Seq.return (key,data)
+  | Branch (_, _, tree0, tree1, _tl) ->
+    Seq.append (to_seq tree0) (to_seq tree1)
+
 module type Id_Datatype = sig
   include Datatype.S
   val id: t -> int
@@ -172,10 +181,11 @@ module Shape(Key: Id_Datatype) = struct
     else compare_v
 
   let pretty pretty_value fmt tree =
-    Pretty_utils.pp_iter2
-      ~pre:"@[<v 3>{[ " ~suf:" ]}@]" ~sep:"@ " ~between:" -> "
-      iter Key.pretty (fun fmt v -> Format.fprintf fmt "@[%a@]" pretty_value v)
-      fmt tree
+    let pp_binding fmt (k,v) =
+      Format.fprintf fmt "%a -> @[%a@]" Key.pretty k pretty_value v
+    in
+    Pretty.pretty_seq ~format:"@[<v 3>{[ %t ]}@]" ~sep:"@ " ~item:"%a"
+      pp_binding fmt (to_seq tree)
 
   let is_empty htr = match htr with
     | Empty ->
