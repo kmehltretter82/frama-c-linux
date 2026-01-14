@@ -111,7 +111,7 @@ let encapsulate_local_vars f =
   if
     List.exists (fun v ->
         Ast_attributes.(contains frama_c_destructor v.vattr)
-      ) f.sbody.blocals
+      ) f.slocals
   then begin
     let exception Found of (block Stack.t * stmt) in
     let vis = object
@@ -124,6 +124,7 @@ let encapsulate_local_vars f =
       method! vstmt s =
         match s.skind with
         | Return _ -> raise (Found (sb, s));
+        | Instr _ -> SkipChildren
         | _ -> DoChildren
     end
     in
@@ -137,7 +138,7 @@ let encapsulate_local_vars f =
     let ret_block = Stack.top stack_block in
     let ret_block_bstmts =
       List.filter
-        (fun s -> not (Cil_datatype.Stmt.equal ret_stmt s))
+        (fun s -> match s.skind with Return _ -> false | _ -> true)
         ret_block.bstmts
     in
     ret_block.bstmts <- ret_block_bstmts;
@@ -418,18 +419,8 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
       s.skind <- Block (scanBlock false b);
       popn popstack;
       scanStmts (s::acc) mainbody 0 rests
-    | [{skind = UnspecifiedSequence seq} as s] when popstack = 0 ->
-      (* see above. *)
-      s.skind <-
-        UnspecifiedSequence
-          (List.concat
-             (List.map (fun (s,m,w,r,c) ->
-                  let res = scanStmts [] mainbody 0 [s] in
-                  (List.hd res,m,w,r,c)::
-                  (List.map (fun x -> x,[],[],[],[]) (List.tl res)))
-                 seq));
-      popn popstack;
-      List.rev (s::acc)
+    (* Don't try to put a return inside a UnspecifiedSequence: this would
+       mean that it could be evaluated at any point of the sequence. *)
     | ({skind = UnspecifiedSequence seq} as s) :: rests ->
       s.skind <-
         UnspecifiedSequence
