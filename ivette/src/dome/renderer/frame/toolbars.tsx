@@ -128,11 +128,9 @@ const pinnedMessage = new GlobalState<PinnedMessage[]>([]);
 
 export function addPinnedMessage(content: PinnedMessage): void {
   const messages = pinnedMessage.getValue();
-  const messageIdExist = messages.findIndex(e => e.id === content.id);
-  if(messageIdExist !== -1) return;
-  const list = [...messages];
-  list.push(content);
-  pinnedMessage.setValue(list);
+  const filteredMessages = messages.filter(e => e.id !== content.id);
+  filteredMessages.push(content);
+  pinnedMessage.setValue(filteredMessages);
 }
 
 export function delPinnedMessage(id: string): void {
