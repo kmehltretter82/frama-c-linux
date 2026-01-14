@@ -221,14 +221,15 @@ int main(void)
     __gen_e_acsl_div_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__10),
                                         (__e_acsl_mpz_struct const *)(__gen_e_acsl__11));
     __gmpz_init(__gen_e_acsl_div);
-    /*@ assert E_ACSL: 3 != 0; */
+    /*@ assert E_ACSL: "denominator not zero": 3 != 0; */
     {
       __gen_e_acsl_assert_data_8.blocking = 1;
-      __gen_e_acsl_assert_data_8.kind = "Assertion";
+      __gen_e_acsl_assert_data_8.kind = "RTE";
       __gen_e_acsl_assert_data_8.pred_txt = "3 != 0";
       __gen_e_acsl_assert_data_8.file = "arith.i";
       __gen_e_acsl_assert_data_8.fct = "main";
       __gen_e_acsl_assert_data_8.line = 17;
+      __gen_e_acsl_assert_data_8.name = "denominator not zero";
       __e_acsl_assert(__gen_e_acsl_div_guard != 0,
                       & __gen_e_acsl_assert_data_8);
     }
@@ -289,14 +290,15 @@ int main(void)
     __gen_e_acsl_mod_guard = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl__13),
                                         (__e_acsl_mpz_struct const *)(__gen_e_acsl__14));
     __gmpz_init(__gen_e_acsl_mod);
-    /*@ assert E_ACSL: 2 != 0; */
+    /*@ assert E_ACSL: "denominator not zero": 2 != 0; */
     {
       __gen_e_acsl_assert_data_11.blocking = 1;
-      __gen_e_acsl_assert_data_11.kind = "Assertion";
+      __gen_e_acsl_assert_data_11.kind = "RTE";
       __gen_e_acsl_assert_data_11.pred_txt = "2 != 0";
       __gen_e_acsl_assert_data_11.file = "arith.i";
       __gen_e_acsl_assert_data_11.fct = "main";
       __gen_e_acsl_assert_data_11.line = 19;
+      __gen_e_acsl_assert_data_11.name = "denominator not zero";
       __e_acsl_assert(__gen_e_acsl_mod_guard != 0,
                       & __gen_e_acsl_assert_data_11);
     }
@@ -706,14 +708,15 @@ int main(void)
     __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_22,
                                 & __gen_e_acsl_assert_data_23);
     __gmpz_init(__gen_e_acsl_div_2);
-    /*@ assert E_ACSL: y != 0; */
+    /*@ assert E_ACSL: "denominator not zero": y != 0; */
     {
       __gen_e_acsl_assert_data_23.blocking = 1;
-      __gen_e_acsl_assert_data_23.kind = "Assertion";
+      __gen_e_acsl_assert_data_23.kind = "RTE";
       __gen_e_acsl_assert_data_23.pred_txt = "y != 0";
       __gen_e_acsl_assert_data_23.file = "arith.i";
       __gen_e_acsl_assert_data_23.fct = "main";
       __gen_e_acsl_assert_data_23.line = 31;
+      __gen_e_acsl_assert_data_23.name = "denominator not zero";
       __e_acsl_assert(__gen_e_acsl_div_guard_2 != 0,
                       & __gen_e_acsl_assert_data_23);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_23);
@@ -774,14 +777,16 @@ int main(void)
     __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_24,
                                 & __gen_e_acsl_assert_data_25);
     __gmpz_init(__gen_e_acsl_div_3);
-    /*@ assert E_ACSL: y - 123456789123456789 != 0; */
+    /*@ assert E_ACSL: "denominator not zero": y - 123456789123456789 != 0;
+    */
     {
       __gen_e_acsl_assert_data_25.blocking = 1;
-      __gen_e_acsl_assert_data_25.kind = "Assertion";
+      __gen_e_acsl_assert_data_25.kind = "RTE";
       __gen_e_acsl_assert_data_25.pred_txt = "y - 123456789123456789 != 0";
       __gen_e_acsl_assert_data_25.file = "arith.i";
       __gen_e_acsl_assert_data_25.fct = "main";
       __gen_e_acsl_assert_data_25.line = 34;
+      __gen_e_acsl_assert_data_25.name = "denominator not zero";
       __e_acsl_assert(__gen_e_acsl_div_guard_3 != 0,
                       & __gen_e_acsl_assert_data_25);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_25);

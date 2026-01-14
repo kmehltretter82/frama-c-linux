@@ -237,12 +237,13 @@ and compile_div_mod ~origin {ity; binop; op1; op2} =
           )
       in
       let p = Logic_const.prel ~loc (Rneq, t2, zero) in
+      let p = { p with pred_name = "denominator not zero" :: p.pred_name } in
       let* cond =
         M.modifying_env @@ fun env ->
         Assert.runtime_check
           ~adata:adata2
           ~pred_kind:Assert
-          (Env.annotation_kind env)
+          RTE
           kf
           env
           guard
