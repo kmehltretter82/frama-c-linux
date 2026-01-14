@@ -17,10 +17,13 @@
 
 import React from 'react';
 import * as Dome from 'dome';
-import { SVG } from 'dome/controls/icons';
+import { Icon, SVG } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
 import './style.css';
+import { GlobalState, useGlobalState } from 'dome/data/states';
+import { Tooltip } from 'dome/dialogs';
+import { LED, LEDstatus } from 'dome/controls/displays';
 
 // --------------------------------------------------------------------------
 // --- ToolBar Container
@@ -106,6 +109,59 @@ export function Group(props: GroupProps): JSX.Element {
     <div className={allClasses} style={props.style} title={props.title}>
       {props.children}
     </div>
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- ToolBar pinned messages
+// --------------------------------------------------------------------------
+
+export interface PinnedMessage {
+  id: string,
+  message: string,
+  statusMessage?: LEDstatus,
+  title?: string,
+  actions?: React.JSX.Element
+}
+
+const pinnedMessage = new GlobalState<PinnedMessage[]>([]);
+
+export function addPinnedMessage(content: PinnedMessage): void {
+  const messages = pinnedMessage.getValue();
+  const filteredMessages = messages.filter(e => e.id !== content.id);
+  filteredMessages.push(content);
+  pinnedMessage.setValue(filteredMessages);
+}
+
+export function delPinnedMessage(id: string): void {
+  const list = pinnedMessage.getValue();
+  const filteredList = list.filter(e => e.id !== id);
+  pinnedMessage.setValue(filteredList);
+}
+
+export function IconPinnedMessage(): React.ReactNode {
+  const icon = <Icon id='PIN' kind='warning'
+    className='dome-xIcon-pinned' size={16} />;
+  const [ messages, ] = useGlobalState(pinnedMessage);
+
+  if(messages.length <= 0) return null;
+  return (
+    <Tooltip control={icon}>
+      <div className='dome-xIcon-pinned-content'>
+        { messages.map(e =>
+            <div key={e.id}>
+              <div className='message' title={e.title}>
+                <LED
+                  status={e.statusMessage ?? 'warning'}
+                  style={{ width: '10px', height: '10px' }}
+                />
+                <div>{e.message}</div>
+              </div>
+              <div className='action'>{e.actions}</div>
+            </div>)
+        }
+      </div>
+    </Tooltip>
   );
 }
 
