@@ -98,9 +98,6 @@
    PLUGIN: studia
    STDOPT: +"-studia-h"
 
-   PLUGIN: users
-   STDOPT: +"-users-h"
-
    PLUGIN: volatile
    STDOPT: +"-volatile-h"
 
