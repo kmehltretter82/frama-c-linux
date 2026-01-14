@@ -1197,7 +1197,6 @@ type toplevel_command =
     bin_files: string list;
     test_name : string ;
     file : string ;
-    nb_files : int ;
     options : string ;
     toplevel: string ;
     filter : string option ;
@@ -1222,9 +1221,7 @@ let make_oracle_file ~env x = Filename.concat (config_name ~env "oracle") x
 
 let gen_prefix gen_file cmd =
   let prefix = gen_file (name_without_extension cmd) in
-  if cmd.nb_files > 1
-  then prefix ^ "." ^ (string_of_int cmd.nth)
-  else prefix
+  prefix ^ "." ^ (string_of_int cmd.nth)
 
 let oracle_prefix ~env = gen_prefix (make_oracle_file ~env)
 let log_prefix ~env = gen_prefix (make_result_file ~env)
@@ -1759,7 +1756,6 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
   let config = Test_config.scan_test_file ~env directory ~file config in
   if not config.dc_dont_run then
     let test_name,config,ptest_vars = Test_config.ptest_vars ~env directory ~file config  in
-    let nb_files = List.length config.dc_commands in
     let make_cmd =
       let i = ref 0 in
       fun { toplevel; opts=options; macros; exit_code; logs; bins; timeout; deps } ->
@@ -1773,7 +1769,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
         update_modules ~file ~modules deps;
         update_enabled_if ~enabled_if deps;
         command_string ~env ~result_fmt ~oracle_fmt
-          { test_name ; file; options; toplevel; nb_files; directory; nth; timeout;
+          { test_name ; file; options; toplevel; directory; nth; timeout;
             macros; log_files; bin_files;
             filter = (* from a global directive applied to all OPT tests  *)
               (match config.dc_filter with None -> None | Some s -> Some (Macros.expand ~file macros s));
@@ -1782,7 +1778,6 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             deps;
           }
     in
-    let nb_files_execnow = List.length config.dc_execnow in
     let make_execnow_cmd =
       let e = ref 0 in
       fun execnow->
@@ -1794,7 +1789,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
           let deps = deps_command ~file macros execnow.ex_deps in
           update_modules ~file ~modules deps;
           update_enabled_if ~enabled_if deps;
-          { test_name; file; nb_files = nb_files_execnow; directory; nth;
+          { test_name; file; directory; nth;
             log_files = [];
             bin_files = [];
             options = "";
