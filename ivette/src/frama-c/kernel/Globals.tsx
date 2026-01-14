@@ -19,7 +19,8 @@ import { alpha } from 'dome/data/compare';
 import { Section, Item, SidebarTitle, makeBadge } from 'dome/frame/sidebars';
 import {
   Button, IconButton, ItemProps,
-  Multiselect, MultiselectItem, MultiselectItemProps
+  Multiselect, MultiselectItem, MultiselectItemProps,
+  PosNegBothButton, PosNegBothButtonSetter,
 } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 import * as Toolbar from 'dome/frame/toolbars';
@@ -261,49 +262,35 @@ function isVisible(
     });
 }
 
-function getContextMenu(
-  localFilters: LocalFilter[],
-  set: (id: string, type: "pos" | "neg", newValue: boolean) => void
-): MultiselectItemProps[] {
-  const newMenu: MultiselectItemProps[] = [];
-  localFilters.forEach(filter => {
-      newMenu.push({
-        label: "Show " + filter.positive_label,
-        enabled: filter.enabled,
-        title: filter.positive_label || '',
-        checked: filter.showPositive,
-        onClick: () => set(filter.id, 'pos', !filter.showPositive),
-      });
-      newMenu.push({
-        label: "Show " + filter.negative_label,
-        enabled: filter.enabled,
-        title: filter.negative_label || '',
-        checked: filter.showNegative,
-        onClick: () => set(filter.id, 'neg', !filter.showNegative),
-      });
-      newMenu.push("separator");
-  });
-  return newMenu;
-}
-
 type FilterKind = 'functions' | 'variables'
 
 /**
  * This hook returns the list of Boolean filters to display and
  * a function to modify the value of a filter.
  */
-function useFilterLocal(filters: Ast.filter[], kind: FilterKind): [
-  LocalFilter[],
-  setFilterValue: (id: string, type: "pos" | "neg", newValue: boolean) => void
-] {
+function useFilterLocal(filters: Ast.filter[], kind: FilterKind)
+: [LocalFilter[], setFilterValue: PosNegBothButtonSetter] {
   const name = `ivette.${kind}.filters`;
   const decode = Json.jDict(Json.jBoolean);
   const [savedFilters, setSavedFilters] = useWindowSettings(name, decode, {});
 
   const setFilterValue = React.useCallback(
-    (id: string, type: 'pos' | 'neg', newValue: boolean): void => {
+    (id: string, type: 'both' |'pos' | 'neg'): void => {
       const newObj = structuredClone(savedFilters);
-      newObj[`${id}.${type}`] = newValue;
+      switch(type) {
+        case 'both':
+          newObj[`${id}.pos`] = true;
+          newObj[`${id}.neg`] = true;
+          break;
+        case 'pos':
+          newObj[`${id}.pos`] = true;
+          newObj[`${id}.neg`] = false;
+          break;
+        case 'neg':
+          newObj[`${id}.pos`] = false;
+          newObj[`${id}.neg`] = true;
+          break;
+      }
       setSavedFilters(newObj);
   }, [savedFilters, setSavedFilters]);
 
@@ -358,21 +345,25 @@ export function useFunctionFilter(): FunctionFilterRet {
   }, [localFilters, selected, isSelected, multipleSelectionActive
   ]);
 
-  const contextFctMenuItems: MultiselectItemProps[] = React.useMemo(() => {
-    const dyn = getContextMenu(localFilters, setLocalFilters);
-    dyn.push(
-      menuItem({
-        label: 'Selected only',
-        state: selectedState,
-        title: 'Show only the functions selected in the Locations panel',
-        enabled: multipleSelectionActive })
-    );
-    return dyn;
-  }, [localFilters, setLocalFilters, selectedState, multipleSelectionActive]);
+  const itemsComp = localFilters.map(
+    (e, i) => <PosNegBothButton
+      key={i}
+      filter={e}
+      set={setLocalFilters}
+      replace='functions' />
+  );
 
-  const itemsComp = contextFctMenuItems.map(
-    (e, i) => <MultiselectItem key={i} item={e} />);
-  const contextFctFilter = <Multiselect>{ itemsComp }</Multiselect>;
+  itemsComp.push(<Toolbar.Button
+      key='selectedOnly'
+      label= 'Selected only'
+      selected={selectedState[0] }
+      onClick={selectedState[1]}
+      title= 'Show only the functions selected in the Locations panel'
+      disabled= {!multipleSelectionActive} />
+  );
+
+  const contextFctFilter = <Multiselect title="Show functions">
+    { itemsComp }</Multiselect>;
 
   return { contextFctFilter, multipleSelection, showFunction, isSelected };
 }
@@ -456,13 +447,12 @@ export function useVariableFilter(): VariablesFilterRet {
     };
   }, [localFilters]);
 
-  const contextVarMenuItems: MultiselectItemProps[] = React.useMemo(() => {
-    return getContextMenu(localFilters, setLocalFilters);
-  }, [localFilters, setLocalFilters]);
-
-  const itemsComp = contextVarMenuItems.map(
-    (e, i) => <MultiselectItem key={i} item={e} />);
-  const contextVarFilter =  <Multiselect>{ itemsComp }</Multiselect>;
+  const itemsComp = localFilters.map(
+    (e, i) => <PosNegBothButton key={i} filter={e} set={setLocalFilters}
+     replace='variables'/>);
+  const contextVarFilter =  <Multiselect title='Show variables'>
+      { itemsComp }
+    </Multiselect>;
 
   return { contextVarFilter, showVariable };
 }

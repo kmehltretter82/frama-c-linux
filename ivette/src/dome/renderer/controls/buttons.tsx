@@ -20,6 +20,8 @@ import { classes } from 'dome/misc/utils';
 import { Vbox } from 'dome/layout/boxes';
 import { Icon } from './icons';
 import './style.css';
+import * as ToolBar from 'dome/frame/toolbars';
+import { LocalFilter } from 'frama-c/kernel/Globals';
 
 interface EVENT {
   stopPropagation: () => void;
@@ -544,8 +546,70 @@ export function MultiselectItem({ item }: {item: MultiselectItemProps})
     </div>;
 }
 
-export function Multiselect({ children }: {children: React.ReactNode})
-: React.JSX.Element { return <Vbox>{ children }</Vbox>; }
+export type PosNegBothButtonSetter =
+  (id: string, type: 'both' | 'pos' | 'neg') => void
+
+export interface PosNegBothButtonProps {
+  filter: LocalFilter,
+  replace?: string,
+  set: PosNegBothButtonSetter
+}
+
+export function PosNegBothButton(props: PosNegBothButtonProps)
+: React.JSX.Element | null {
+  const { filter, set, replace } = props;
+
+  const className = classes(
+    'dome-xMenu-Item',
+    'dome-xMenu-Item-Button',
+    !filter.enabled && 'dome-xMenu-Item-disabled'
+  );
+
+  const posLabel = filter.positive_label.replace(replace ?? "", "")
+    .replace(/\s*\([^)]*\)/g, '');
+  const negLabel = filter.negative_label.replace(replace ?? "", "")
+    .replace(/\s*\([^)]*\)/g, '');
+
+  return <div className={className}>
+    <ToolBar.Button
+      label="Both"
+      selected={filter.showNegative && filter.showPositive}
+      enabled={filter.enabled}
+      onClick={() => set(filter.id, 'both')}
+    />
+    <ToolBar.ButtonGroup enabled={filter.enabled}>
+      <ToolBar.Button
+        label={posLabel}
+        title={filter.positive_label}
+        selected={filter.showPositive && !filter.showNegative}
+        enabled={filter.enabled}
+        onClick={() => set(filter.id, 'pos')}
+        />
+      <ToolBar.Button
+        label={negLabel}
+        title={filter.negative_label}
+        selected={filter.showNegative && !filter.showPositive}
+        enabled={filter.enabled}
+        onClick={() => set(filter.id, 'neg')}
+      />
+    </ToolBar.ButtonGroup>
+  </div>;
+}
+
+export function Multiselect(
+  { title, children }: {title?: string, children: React.ReactNode}
+): React.JSX.Element {
+  return (
+    <Vbox>
+      { title &&
+        <Vbox className='dome-xMenu-Item-title dome-xMenu-Item-separator'>
+          {title}
+        </Vbox>
+      }
+      { children }
+    </Vbox>
+  );
+}
 
 // --------------------------------------------------------------------------
 // --- Spinner

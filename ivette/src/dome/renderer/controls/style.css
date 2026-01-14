@@ -463,6 +463,8 @@ meter::-webkit-meter-even-less-good-value  {
   &:not(.dome-xMenu-Item-disabled) {
     cursor: pointer ;
   }
+
+  .dome-xMenu-Item-Button { gap: 10px; }
 }
 
 .dome-xMenu-Item-disabled {
@@ -470,8 +472,14 @@ meter::-webkit-meter-even-less-good-value  {
   svg { fill: var(--disabled-text); }
 }
 
+.dome-xMenu-Item-title {
+  padding: 5px 10px;
+  font-size: 1.2em;
+  margin-bottom: 5px;
+}
+
 .dome-xMenu-Item-separator {
   border-bottom: solid 1px var(--disabled-text);
 }
-/* } */
+
 /* -------------------------------------------------------------------------- */
