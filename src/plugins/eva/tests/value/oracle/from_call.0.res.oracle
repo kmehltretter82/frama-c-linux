@@ -299,15 +299,6 @@
   AS FROM Ar[0..1]
   f_previous FROM \nothing
 [from] ====== END OF CALLWISE DEPENDENCIES ======
-[users] ====== DISPLAYING USERS ======
-  f: g h
-  dispatcher2: return_A1 return_A2
-  call_dispatcher2: return_A1 return_A2 dispatcher2
-  call_dispatcher2_0: return_A2 dispatcher2
-  call_dispatcher2_1: return_A1 dispatcher2
-  main: g h f dispatcher return_A1 return_A2 dispatcher2 call_dispatcher2_1
-      call_dispatcher2_0 call_dispatcher2 access_tab unavailable_f
-  ====== END OF USERS ==========
 [inout] Inputs for function access_tab:
     tab[0..2]
 [inout] Inputs for function dispatcher:

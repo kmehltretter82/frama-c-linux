@@ -1,6 +1,6 @@
 /* run.config*
-  PLUGIN: @EVA_MAIN_PLUGINS@ from,users
-   OPT: -calldeps -eva @EVA_CONFIG@ -users -then -input
+  PLUGIN: @EVA_MAIN_PLUGINS@ from
+   OPT: -calldeps -eva @EVA_CONFIG@ -then -input
   PLUGIN: @EVA_MAIN_PLUGINS@ from
    OPT: @EVA_CONFIG@ -deps -show-indirect-deps
 */
