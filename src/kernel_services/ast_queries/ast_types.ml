@@ -425,6 +425,11 @@ let is_scalar t =
 let is_object t =
   not (is_fun t)
 
+let is_object_ptr t =
+  match unroll_skel t with
+  | TPtr t -> is_object t
+  | _ -> false
+
 let is_struct t =
   match unroll_skel t with
   | TComp ci -> ci.cstruct

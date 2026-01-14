@@ -5762,19 +5762,6 @@ and mkBinOp ~loc op e1 e2 =
   let doIntegralArithmetic () =
     check_make_expr ~check:Ast_types.is_integral "non-integral"
   in
-  let compare_pointer op ?cast1 ?cast2 e1 e2 =
-    let do_cast e = function
-      | None -> e
-      | Some t' -> mkCast ~force:false ~newt:t' e
-    in
-    let e1, e2 =
-      if need_cast ~force:true (typeOf e1) (typeOf e2) then
-        do_cast e1 cast1, do_cast e2 cast2
-      else
-        e1, e2
-    in
-    constFoldBinOp op e1 e2 Cil_const.intType
-  in
   let check_scalar op e t =
     if not (is_scalar t) then
       error "operand of %s is not scalar: %a" op !pp_exp_ref e
@@ -5828,22 +5815,25 @@ and mkBinOp ~loc op e1 e2 =
         !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,Cil_const.intType)))
         !pp_typ_ref t1
         !pp_typ_ref t2
-  | Eq | Ne when is_ptr t1 && isZero e2 ->
-    compare_pointer ~cast2:t1 op e1 (zero ~loc)
-  | Eq | Ne when is_ptr t2 && isZero e1 ->
-    compare_pointer ~cast1:t2 op (zero ~loc) e2
-  | Eq | Ne when is_variadic_list t1 && isZero e2 ->
-    Kernel.debug ~level:3 "Comparison of va_list and zero";
-    compare_pointer ~cast2:t1 op e1 (zero ~loc)
-  | Eq | Ne when is_variadic_list t2 && isZero e1 ->
-    Kernel.debug ~level:3 "Comparison of zero and va_list";
-    compare_pointer ~cast1:t2 op (zero ~loc) e2
+  | Eq | Ne when (is_ptr t1 || is_variadic_list t1) && isZero e2 ->
+    constFoldBinOp op e1 (mkCast ~newt:t1 e2) Cil_const.intType
+  | Eq | Ne when (is_ptr t2 || is_variadic_list t2) && isZero e1 ->
+    constFoldBinOp op (mkCast ~newt:t2 e1) e2 Cil_const.intType
   | Eq | Ne | Lt | Le | Ge | Gt
     when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
-    compare_pointer
-      ~cast1:(Machine.uintptr_type ())
-      ~cast2:(Machine.uintptr_type ())
-      op e1 e2
+    let e1, e2 =
+      if not (need_cast ~force:true t1 t2) then
+        e1, e2
+      else if areCompatibleTypes t1 t2 then
+        e1, mkCastT ~oldt:t2 ~newt:t1 e2
+      else if Ast_types.is_object_ptr t1 && Ast_types.is_object_ptr t2 then
+        mkCastT ~oldt:t1 ~newt:Cil_const.voidPtrType e1,
+        mkCastT ~oldt:t2 ~newt:Cil_const.voidPtrType e2
+      else
+        mkCastT ~oldt:t1 ~newt:(Machine.uintptr_type ()) e1,
+        mkCastT ~oldt:t2 ~newt:(Machine.uintptr_type ()) e2
+    in
+    constFoldBinOp op e1 e2 Cil_const.intType
   | Eq | Ne | Lt | Le | Ge | Gt -> doArithmetic ~res:Cil_const.intType ()
   | _ ->
     error
