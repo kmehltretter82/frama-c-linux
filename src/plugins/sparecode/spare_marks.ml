@@ -65,8 +65,7 @@ module KfTopVisi = struct
       add proj kf ();
       debug 1 "select '%a' as fully visible (top or called by top)"
         Kernel_function.pretty kf;
-      let callees = Users.Users_register.get kf in
-      Kernel_function.Hptset.iter (set proj) callees
+      Callgraph.Uses.iter_on_callees (set proj) kf
 
   let get proj kf = try find proj kf; true with Not_found -> false
 end
