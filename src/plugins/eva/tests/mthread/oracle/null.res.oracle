@@ -121,7 +121,7 @@
       null.c:16:
         # cvalue: NULL[rbits 800 to 1607] ∈ [--..--] 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: NULL[rbits 800 to 1607] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed

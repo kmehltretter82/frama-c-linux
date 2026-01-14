@@ -3,16 +3,16 @@
 [wp] Running WP plugin...
 [kernel:annot:missing-spec] dispatch_var.i:12: Warning: 
   Neither code nor explicit exits and terminates for function ref_ctr,
-   generating default clauses. See -generated-spec-* options for more info
+  generating default clauses. See -generated-spec-* options for more info.
 [kernel:annot:missing-spec] dispatch_var.i:133: Warning: 
   Neither code nor explicit exits and terminates for function ref_ctr_nr,
-   generating default clauses. See -generated-spec-* options for more info
+  generating default clauses. See -generated-spec-* options for more info.
 [kernel:annot:missing-spec] dispatch_var.i:158: Warning: 
   Neither code nor explicit exits and terminates for function ref_ctr_nstars,
-   generating default clauses. See -generated-spec-* options for more info
+  generating default clauses. See -generated-spec-* options for more info.
 [kernel:annot:missing-spec] dispatch_var.i:83: Warning: 
   Neither code nor explicit exits and terminates for function ref_valid,
-   generating default clauses. See -generated-spec-* options for more info
+  generating default clauses. See -generated-spec-* options for more info.
 [wp] [Valid] Goal array_in_struct_param_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal array_in_struct_param_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards

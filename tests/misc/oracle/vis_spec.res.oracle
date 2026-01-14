@@ -1,7 +1,7 @@
 [kernel] Parsing vis_spec.i (no preprocessing)
 [kernel:annot:missing-spec] vis_spec.i:7: Warning: 
-  Neither code nor explicit exits for function g,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit exits for function g, generating default clauses.
+  See -generated-spec-* options for more info.
 Starting visit
 Considering vspec of function g
 Function prototype; Funspec is 'exits \false;'

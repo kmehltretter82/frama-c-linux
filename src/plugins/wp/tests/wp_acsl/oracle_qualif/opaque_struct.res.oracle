@@ -3,20 +3,20 @@
 [wp] Running WP plugin...
 [rte:annot] annotating function assigned_via_pointer
 [kernel:annot:missing-spec] opaque_struct.i:31: Warning: 
-  Neither code nor explicit exits and terminates for function g,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit exits and terminates for function g, generating
+  default clauses. See -generated-spec-* options for more info.
 [rte:annot] annotating function assigns
 [kernel:annot:missing-spec] opaque_struct.i:20: Warning: 
-  Neither code nor explicit exits and terminates for function f,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit exits and terminates for function f, generating
+  default clauses. See -generated-spec-* options for more info.
 [rte:annot] annotating function assigns_effect
 [kernel:annot:missing-spec] opaque_struct.i:64: Warning: 
   Neither code nor explicit exits and terminates for function assign,
-   generating default clauses. See -generated-spec-* options for more info
+  generating default clauses. See -generated-spec-* options for more info.
 [rte:annot] annotating function chunk_typing
 [kernel:annot:missing-spec] opaque_struct.i:76: Warning: 
-  Neither code nor specification for function use,
-   generating default exits, assigns and terminates. See -generated-spec-* options for more info
+  Neither code nor specification for function use, generating default exits,
+  assigns and terminates. See -generated-spec-* options for more info.
 [rte:annot] annotating function initialized_assigns
 [rte:annot] annotating function uninitialized_assigns
 [wp] 27 goals scheduled

@@ -2,11 +2,11 @@
 [kernel] Parsing terminates_fp.i (no preprocessing)
 [wp] Running WP plugin...
 [kernel:annot:missing-spec] terminates_fp.i:9: Warning: 
-  Neither code nor explicit terminates for function gt,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit terminates for function gt, generating default
+  clauses. See -generated-spec-* options for more info.
 [kernel:annot:missing-spec] terminates_fp.i:11: Warning: 
-  Neither code nor explicit terminates for function ht,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit terminates for function ht, generating default
+  clauses. See -generated-spec-* options for more info.
 [wp] Warning: Missing RTE guards
 [wp] terminates_fp.i:78: Warning: 
   In 'warns_recursive', no 'calls' specification for statement(s) on line(s): 

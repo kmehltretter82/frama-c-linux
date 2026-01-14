@@ -23,7 +23,17 @@ val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
 (** Compute a hash for the set given a hash for the elements. *)
 val hash : ('a -> int) -> 'a t -> int
 
-(** Pretty prints a set given a printer for the elements. *)
+(** Pretty prints an array given a printer for the elements.
+    @param format defaults to "[| %t |]"
+    @param item defaults to "%a"
+    @param sep defaults to ";@ "
+    @param last defaults to [sep]
+    @param empty defaults to "[||]" *)
 val pretty :
+  ?format:(Pretty.tformatter -> unit) Pretty.format ->
+  ?item:('a Pretty.aformatter -> 'a -> unit) Pretty.format ->
+  ?sep:unit Pretty.format ->
+  ?last:unit Pretty.format ->
+  ?empty:unit Pretty.format ->
   (Format.formatter -> 'a -> unit) ->
   Format.formatter -> 'a t -> unit

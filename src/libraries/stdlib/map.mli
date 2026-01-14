@@ -17,8 +17,19 @@ include module type of Stdlib.Map
 module type S = sig
   include S
 
-  (** Pretty prints a set given printers for keys and values. *)
+  (** Pretty prints a set given a printer for the elements.
+      @param format defaults to "{{ %t }}"
+      @param item defaults to "%a -> %a"
+      @param sep defaults to ";@ "
+      @param last defaults to [sep]
+      @param empty defaults to "{{}}" *)
   val pretty :
+    ?format:(Pretty.tformatter -> unit) Pretty.format ->
+    ?item:(key Pretty.aformatter -> key -> 'a Pretty.aformatter -> 'a -> unit)
+        Pretty.format ->
+    ?sep:unit Pretty.format ->
+    ?last:unit Pretty.format ->
+    ?empty:unit Pretty.format ->
     (Format.formatter -> key -> unit) ->
     (Format.formatter -> 'a -> unit) ->
     Format.formatter -> 'a t -> unit

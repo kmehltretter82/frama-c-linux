@@ -2,14 +2,16 @@
 [kernel] Parsing assigns_range.i (no preprocessing)
 [wp] Running WP plugin...
 [kernel:annot:missing-spec] assigns_range.i:11: Warning: 
-  Neither code nor explicit exits and terminates for function assigns_t1_an_element,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit exits and terminates for function
+  assigns_t1_an_element, generating default clauses.
+  See -generated-spec-* options for more info.
 [kernel:annot:missing-spec] assigns_range.i:16: Warning: 
   Neither code nor explicit exits and terminates for function assigns_t2_bound,
-   generating default clauses. See -generated-spec-* options for more info
+  generating default clauses. See -generated-spec-* options for more info.
 [kernel:annot:missing-spec] assigns_range.i:26: Warning: 
-  Neither code nor explicit exits and terminates for function assigns_t4_sup_bound,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit exits and terminates for function
+  assigns_t4_sup_bound, generating default clauses.
+  See -generated-spec-* options for more info.
 [wp] Warning: Missing RTE guards
 [wp] 6 goals scheduled
 [wp] [Unsuccess] typed_call_assigns_t1_assigns_normal (Alt-Ergo) (Cached)

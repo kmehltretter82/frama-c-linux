@@ -28,8 +28,8 @@
 [eva] using specification for function exp
 [eva] Done for function exp
 [kernel:annot:missing-spec] incompatible_builtins.i:42: Warning: 
-  Neither code nor explicit assigns for function sqrt,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit assigns for function sqrt, generating default
+  clauses. See -generated-spec-* options for more info.
 [eva] computing for function sqrt <- main.
   Called from incompatible_builtins.i:42.
 [eva] using specification for function sqrt
@@ -37,15 +37,15 @@
   function sqrt: precondition 'finite_positive_arg' got status valid.
 [eva] Done for function sqrt
 [kernel:annot:missing-spec] incompatible_builtins.i:43: Warning: 
-  Neither code nor explicit assigns for function floor,
-   generating default clauses from the specification. See -generated-spec-* options for more info
+  Neither code nor explicit assigns for function floor, generating default
+  clauses from the specification. See -generated-spec-* options for more info.
 [eva] computing for function floor <- main.
   Called from incompatible_builtins.i:43.
 [eva] using specification for function floor
 [eva] Done for function floor
 [kernel:annot:missing-spec] incompatible_builtins.i:44: Warning: 
-  Neither code nor specification for function ceil,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function ceil, generating default assigns.
+  See -generated-spec-* options for more info.
 [eva] computing for function ceil <- main.
   Called from incompatible_builtins.i:44.
 [eva] using specification for function ceil

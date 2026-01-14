@@ -190,7 +190,7 @@
         # cvalue: interrupt_received_a ∈ {1}
                   interrupt_received_b ∈ {0} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: interrupt_received_a ∈ {1}
                   interrupt_received_b ∈ {0}
 [mt] * Computing cfg
@@ -226,7 +226,7 @@
         # cvalue: interrupt_received_a ∈ {0; 1}
                   interrupt_received_b ∈ {1; 2} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: interrupt_received_a ∈ {0; 1}
                   interrupt_received_b ∈ {1; 2}
 [mt] * Computing cfg
@@ -353,7 +353,7 @@
         interrupt_received_a ∈ {1; 2; 3}
         interrupt_received_b ∈ {0; 1; 2} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         interrupt_received_a ∈ {1; 2; 3}
         interrupt_received_b ∈ {0; 1; 2}
@@ -391,7 +391,7 @@
         interrupt_received_a ∈ {0; 1; 2; 3}
         interrupt_received_b ∈ {1; 2; 3; 4} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         interrupt_received_a ∈ {0; 1; 2; 3}
         interrupt_received_b ∈ {1; 2; 3; 4}
@@ -515,7 +515,7 @@
         interrupt_received_a ∈ {1; 2; 3; 4; 5}
         interrupt_received_b ∈ {0; 1; 2; 3; 4} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         interrupt_received_a ∈ {1; 2; 3; 4; 5}
         interrupt_received_b ∈ {0; 1; 2; 3; 4}
@@ -553,7 +553,7 @@
         interrupt_received_a ∈ {0; 1; 2; 3; 4; 5}
         interrupt_received_b ∈ {1; 2; 3; 4; 5; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         interrupt_received_a ∈ {0; 1; 2; 3; 4; 5}
         interrupt_received_b ∈ {1; 2; 3; 4; 5; 6}
@@ -681,7 +681,7 @@
         interrupt_received_a ∈ [1..2147483647]
         interrupt_received_b ∈ [0..2147483647] 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         interrupt_received_a ∈ [1..2147483647]
         interrupt_received_b ∈ [0..2147483647]
@@ -723,7 +723,7 @@
         interrupt_received_a ∈ [0..2147483647]
         interrupt_received_b ∈ [1..2147483647] 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         interrupt_received_a ∈ [0..2147483647]
         interrupt_received_b ∈ [1..2147483647]
@@ -854,7 +854,7 @@
         interrupt_received_a ∈ [1..2147483647]
         interrupt_received_b ∈ [0..2147483647] 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         interrupt_received_a ∈ [1..2147483647]
         interrupt_received_b ∈ [0..2147483647]

@@ -2,8 +2,8 @@
 [kernel] Parsing post_assigns.i (no preprocessing)
 [wp] Running WP plugin...
 [kernel:annot:missing-spec] post_assigns.i:4: Warning: 
-  Neither code nor explicit exits and terminates for function write,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit exits and terminates for function write, generating
+  default clauses. See -generated-spec-* options for more info.
 [wp] Warning: Missing RTE guards
 [wp] 7 goals scheduled
 [wp] [Valid] typed_receive_terminates (Qed)

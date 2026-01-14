@@ -32,9 +32,13 @@ let compare f a1 a2 =
       0
     with Early_exit n -> n
 
-let hash hash_elt = Collection.hash_iter iter hash_elt
+let hash hash_elt = Hash.hash_iter iter hash_elt
 
-let pretty pp_elt =
-  Collection.pretty_iter
-    ~format:"[|@ %t |]" ~item:"%a" ~sep:";@ " ~iter
-    pp_elt
+let pretty
+    ?(format=format_of_string "[| %t |]")
+    ?(item=format_of_string "%a")
+    ?(sep=format_of_string ";@ ")
+    ?(last=sep)
+    ?(empty=format_of_string "[||]")
+    pp_elt fmt a =
+  Pretty.pretty_seq ~format ~item ~sep ~last ~empty pp_elt fmt (to_seq a)

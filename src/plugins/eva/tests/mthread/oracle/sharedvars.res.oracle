@@ -282,7 +282,7 @@
         # cvalue: s4 ∈ {1}
                   s6 ∈ {0} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: s4 ∈ {-1; 1}
                   s6 ∈ {0}
 [mt] * Computing cfg
@@ -405,7 +405,7 @@
         # cvalue: s4 ∈ {-1; 1; 4}
                   s6 ∈ {4} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: s4 ∈ {-1; 1; 4}
                   s6 ∈ {0; 4}
 [mt] * Computing cfg
@@ -470,7 +470,7 @@
         # cvalue: s4 ∈ {-1; 1; 4}
                   s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: s4 ∈ {-1; 1; 4}
                   s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
@@ -655,7 +655,7 @@
                   s5 ∈ {0}
                   s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: u3 ∈ {1}
                   s4 ∈ {-1; 0; 1; 4}
                   s5 ∈ {0}
@@ -754,7 +754,7 @@
                   s5 ∈ {0}
                   s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: u3 ∈ {1; 3}
                   s4 ∈ {-1; 0; 1; 4}
                   s5 ∈ {0}
@@ -807,7 +807,7 @@
                   s5 ∈ {0}
                   s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: u3 ∈ {1; 3}
                   s4 ∈ {-1; 0; 1; 4}
                   s5 ∈ {0}
@@ -852,7 +852,7 @@
                   s5 ∈ {5}
                   s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: u3 ∈ {1; 3}
                   s4 ∈ {-1; 0; 1; 4}
                   s5 ∈ {5}
@@ -894,7 +894,7 @@
                   s5 ∈ {0; 5}
                   s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: u3 ∈ {1; 3}
                   s4 ∈ {-1; 0; 1; 4}
                   s5 ∈ {0; 5}
@@ -936,7 +936,7 @@
                   s5 ∈ {0; 5}
                   s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: u3 ∈ {1; 3; 31}
                   s4 ∈ {-1; 0; 1; 4}
                   s5 ∈ {0; 5}
@@ -979,7 +979,7 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         u3 ∈ {1; 3; 31}
         s4 ∈ {-1; 0; 1; 4}
@@ -1131,7 +1131,7 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         u3 ∈ {1; 3; 31}
         s4 ∈ {-1; 0; 1; 4}
@@ -1231,7 +1231,7 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         u3 ∈ {1; 3; 31}
         s4 ∈ {-1; 0; 1; 2; 3; 4}
@@ -1287,7 +1287,7 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         u3 ∈ {1; 3; 31}
         s4 ∈ {-1; 0; 1; 2; 3; 4}
@@ -1333,7 +1333,7 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         u3 ∈ {1; 3; 31}
         s4 ∈ {-1; 0; 1; 2; 3; 4}
@@ -1377,7 +1377,7 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         u3 ∈ {1; 3; 31}
         s4 ∈ {-1; 0; 1; 2; 3; 4}
@@ -1420,7 +1420,7 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         u3 ∈ {1; 3; 31}
         s4 ∈ {-1; 0; 1; 2; 3; 4}
@@ -1464,7 +1464,7 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         u3 ∈ {1; 3; 31}
         s4 ∈ {-1; 0; 1; 2; 3; 4}
@@ -1609,7 +1609,7 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         u3 ∈ {1; 3; 31}
         s4 ∈ {-1; 0; 1; 2; 3; 4}
@@ -1706,7 +1706,7 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         u3 ∈ {1; 3; 31}
         s4 ∈ {-1; 0; 1; 2; 3; 4}
@@ -1762,7 +1762,7 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         u3 ∈ {1; 3; 31}
         s4 ∈ {-1; 0; 1; 2; 3; 4}
@@ -1807,7 +1807,7 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         u3 ∈ {1; 3; 31}
         s4 ∈ {-1; 0; 1; 2; 3; 4}
@@ -1849,7 +1849,7 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         u3 ∈ {1; 3; 31}
         s4 ∈ {-1; 0; 1; 2; 3; 4}
@@ -1891,7 +1891,7 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         u3 ∈ {1; 3; 31}
         s4 ∈ {-1; 0; 1; 2; 3; 4}
@@ -1934,7 +1934,7 @@
         s5 ∈ {0; 5; 51}
         s6 ∈ {0; 4; 6} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue:
         u3 ∈ {1; 3; 31}
         s4 ∈ {-1; 0; 1; 2; 3; 4}

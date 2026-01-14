@@ -2,20 +2,22 @@
 [kernel] Parsing unfold_assigns.i (no preprocessing)
 [wp] Running WP plugin...
 [kernel:annot:missing-spec] unfold_assigns.i:92: Warning: 
-  Neither code nor explicit exits and terminates for function f_assigns_with_array,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit exits and terminates for function
+  f_assigns_with_array, generating default clauses.
+  See -generated-spec-* options for more info.
 [kernel:annot:missing-spec] unfold_assigns.i:17: Warning: 
-  Neither code nor explicit exits and terminates for function f,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit exits and terminates for function f, generating
+  default clauses. See -generated-spec-* options for more info.
 [kernel:annot:missing-spec] unfold_assigns.i:20: Warning: 
-  Neither code nor explicit exits and terminates for function g,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit exits and terminates for function g, generating
+  default clauses. See -generated-spec-* options for more info.
 [kernel:annot:missing-spec] unfold_assigns.i:73: Warning: 
   Neither code nor explicit exits and terminates for function f_assigns_range,
-   generating default clauses. See -generated-spec-* options for more info
+  generating default clauses. See -generated-spec-* options for more info.
 [kernel:annot:missing-spec] unfold_assigns.i:108: Warning: 
-  Neither code nor explicit exits and terminates for function f_assigns_range_with_array,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit exits and terminates for function
+  f_assigns_range_with_array, generating default clauses.
+  See -generated-spec-* options for more info.
 [wp] [Valid] Goal ASSIGN_NO_UNFOLD_KO_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal ASSIGN_NO_UNFOLD_KO_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards

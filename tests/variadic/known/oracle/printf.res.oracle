@@ -111,8 +111,8 @@
   has generated a garbled mix of addresses
   for assigns clause __fc_stdout->__fc_FILE_data.
 [kernel:annot:missing-spec] printf.c:71: Warning: 
-  Neither code nor specification for function printf_fallback_1,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function printf_fallback_1, generating
+  default assigns. See -generated-spec-* options for more info.
 [eva:assigns:invalid-location] printf.c:71: 
   Completely invalid destination for assigns clause *(param1 + (0 ..)).
   Ignoring.

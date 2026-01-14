@@ -4,10 +4,10 @@
 [rte:annot] annotating function main
 [kernel:annot:missing-spec] chunk_printing.i:19: Warning: 
   Neither code nor explicit exits and terminates for function get_int,
-   generating default clauses. See -generated-spec-* options for more info
+  generating default clauses. See -generated-spec-* options for more info.
 [kernel:annot:missing-spec] chunk_printing.i:25: Warning: 
   Neither code nor explicit exits and terminates for function get_uint,
-   generating default clauses. See -generated-spec-* options for more info
+  generating default clauses. See -generated-spec-* options for more info.
 ------------------------------------------------------------
   Function main
 ------------------------------------------------------------

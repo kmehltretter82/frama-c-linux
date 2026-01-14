@@ -10,8 +10,8 @@
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [kernel:annot:missing-spec] messy_init.c:15: Warning: 
-  Neither code nor specification for function random,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function random, generating default
+  assigns. See -generated-spec-* options for more info.
 [eva] using specification for function random
 [mt] messy_init.c:16: Initializing mutex lock
 [mt] messy_init.c:19: Lock lock

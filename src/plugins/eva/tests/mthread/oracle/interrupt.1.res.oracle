@@ -149,7 +149,7 @@
       interrupt.c:29:
         # cvalue: interrupt_received ∈ [1..2147483647] 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: interrupt_received ∈ [1..2147483647]
 [mt] * Computing cfg
 [mt] * Cfg computed

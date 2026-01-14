@@ -181,8 +181,8 @@
 [eva] matrix.c:21: Frama_C_show_each: {0}
 [mt] matrix.c:24: Lock locks[0]
 [kernel:annot:missing-spec] matrix.c:28: Warning: 
-  Neither code nor specification for function f,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function f, generating default assigns.
+  See -generated-spec-* options for more info.
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[0]
 [mt] * Starting to save the state of the value analysis
@@ -567,7 +567,7 @@
       matrix.c:42:
         # cvalue: matrix[0..29][0..99] ∈ {0} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: matrix[0..29][0..99] ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -1682,7 +1682,7 @@
       matrix.c:42:
         # cvalue: matrix[0..29][0..99] ∈ [--..--] 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -2456,7 +2456,7 @@
       matrix.c:42:
         # cvalue: matrix[0..29][0..99] ∈ [--..--] 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: matrix[0..29][0..99] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed

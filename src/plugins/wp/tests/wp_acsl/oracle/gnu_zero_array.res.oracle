@@ -3,8 +3,8 @@
 [rte:annot] annotating function main
 [wp] Running WP plugin...
 [kernel:annot:missing-spec] gnu_zero_array.i:9: Warning: 
-  Neither code nor explicit exits and terminates for function alloc,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit exits and terminates for function alloc, generating
+  default clauses. See -generated-spec-* options for more info.
 [wp] gnu_zero_array.i:14: Warning: 
   Cast with incompatible pointers types (source: sint8*) (target: S*)
 ------------------------------------------------------------

@@ -217,7 +217,7 @@
                   c ∈ {3}
                   d ∈ {3} 
     interferences by mutexes:
-      {  }:
+      {}:
         # cvalue: a ∈ {3}
                   b ∈ {0; 3}
                   c ∈ {0; 3}

@@ -42,8 +42,8 @@
   The specification of function execve has generated a garbled mix of addresses
   for assigns clause \result.
 [kernel:annot:missing-spec] exec.c:15: Warning: 
-  Neither code nor specification for function execlp_fallback_1,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function execlp_fallback_1, generating
+  default assigns. See -generated-spec-* options for more info.
 [eva] using specification for function execlp
 [eva:assigns:invalid-location] exec.c:15: 
   Completely invalid destination for assigns clause *(param1 + (0 ..)).

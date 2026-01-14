@@ -4,17 +4,18 @@
   Body of function if_assert falls-through. Adding a return statement
 [wp] Running WP plugin...
 [kernel:annot:missing-spec] stmtcompiler_test.i:103: Warning: 
-  Neither code nor explicit exits, assigns and terminates for function behavior1,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit exits, assigns and terminates for function
+  behavior1, generating default clauses.
+  See -generated-spec-* options for more info.
 [kernel:annot:missing-spec] stmtcompiler_test.i:161: Warning: 
-  Neither code nor explicit terminates for function exit,
-   generating default clauses. See -generated-spec-* options for more info
+  Neither code nor explicit terminates for function exit, generating default
+  clauses. See -generated-spec-* options for more info.
 [kernel:annot:missing-spec] stmtcompiler_test.i:62: Warning: 
   Neither code nor explicit exits and terminates for function assigns_global,
-   generating default clauses. See -generated-spec-* options for more info
+  generating default clauses. See -generated-spec-* options for more info.
 [kernel:annot:missing-spec] stmtcompiler_test.i:38: Warning: 
   Neither code nor explicit exits and terminates for function ensures_result,
-   generating default clauses. See -generated-spec-* options for more info
+  generating default clauses. See -generated-spec-* options for more info.
 [wp] Warning: Missing RTE guards
 [wp] [Valid] Goal compare_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal compare_terminates (Cfg) (Trivial)

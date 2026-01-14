@@ -20,27 +20,42 @@ let _test_pretty pretty x expected =
 
 let%test "string list" =
   let x = [ "Lorem"; "ipsum"; "dolor" ] in
-  _test_pretty (List.pretty Format.pp_print_string) x
+  let pretty = List.pretty Format.pp_print_string in
+  _test_pretty pretty x
     "[ Lorem; ipsum;\n\
     \  dolor ]"
 
 let%test "string array" =
   let x = [| "Lorem"; "ipsum"; "dolor" |] in
-  _test_pretty (Array.pretty Format.pp_print_string) x
+  let pretty = Array.pretty Format.pp_print_string in
+  _test_pretty pretty x
     "[| Lorem; ipsum;\n\
     \  dolor |]"
 
 let%test "string set" =
   let open Set.Make (String) in
   let x = empty |> add "Lorem" |> add "ipsum" |> add "dolor" in
-  _test_pretty (pretty Format.pp_print_string) x
+  let pretty = pretty Format.pp_print_string in
+  _test_pretty pretty x
     "{ Lorem; dolor;\n\
     \  ipsum }"
 
 let%test "int,string map" =
   let open Map.Make (Int) in
   let x = empty |> add 1 "Lorem" |> add 2 "ipsum" |> add 3 "dolor" in
-  _test_pretty (pretty Format.pp_print_int Format.pp_print_string) x
+  let pretty = pretty Format.pp_print_int Format.pp_print_string in
+  _test_pretty pretty x
+    "{{ 1 ↦ Lorem; 2 ↦\n\
+    \  ipsum; 3 ↦\n\
+    \  dolor }}"
+
+let%test "map without unicode" =
+  let open Map.Make (Int) in
+  let x = empty |> add 1 "Lorem" |> add 2 "ipsum" |> add 3 "dolor" in
+  let pretty = pretty Format.pp_print_int Format.pp_print_string in
+  Unicode.use_unicode false;
+  Fun.protect ~finally:(fun () -> Unicode.use_unicode true) @@
+  fun () -> _test_pretty pretty x
     "{{ 1 -> Lorem; 2 ->\n\
     \  ipsum; 3 ->\n\
     \  dolor }}"

@@ -95,10 +95,7 @@ module L = Datatype.Make
         [ Never_tried; Best(True, l); Inconsistent { valid = l; invalid = l } ]
       let mem_project = Datatype.never_any_project
       let pretty fmt s =
-        let pp_emitters fmt l =
-          Pretty_utils.pp_list ~sep:",@ " ~last:" and "
-            Emitter_with_properties.pretty fmt l
-        in
+        let pp_emitters = List.pretty_text Emitter_with_properties.pretty in
         match s with
         | Never_tried -> Format.fprintf fmt "no verification attempted"
         | Best(Dont_know as s, l) ->
@@ -735,9 +732,7 @@ module Consolidation = struct
 
         let mem_project = Datatype.never_any_project
         let pretty fmt s =
-          let pp_emitters f fmt l =
-            Pretty_utils.pp_list ~sep:",@ " ~last:" and " f fmt l
-          in
+          let pp_emitters = List.pretty Usable_emitter.pretty in
           match s with
           | Never_tried -> Format.fprintf fmt "no verification attempted"
           | Considered_valid ->
@@ -751,8 +746,7 @@ module Consolidation = struct
                | Valid _ -> Emitted.True
                | Invalid _ -> Emitted.False_and_reachable
                | _ -> assert false)
-              (pp_emitters Usable_emitter.pretty)
-              (Usable_emitter.Set.elements set)
+              pp_emitters (Usable_emitter.Set.elements set)
           | Valid_under_hyp map | Invalid_under_hyp map ->
             let l = Usable_emitter.Map.fold (fun e _ acc -> e :: acc) map [] in
             Format.fprintf fmt "@[%a@ @[(%a according to %a, but properties \
@@ -763,12 +757,12 @@ module Consolidation = struct
                | Valid_under_hyp _ -> Emitted.True
                | Invalid_under_hyp _ -> Emitted.False_and_reachable
                | _ -> assert false)
-              (pp_emitters Usable_emitter.pretty) l
+              pp_emitters l
           | Unknown map ->
             let l = Usable_emitter.Map.fold (fun e _ acc -> e :: acc) map [] in
             Format.fprintf fmt "@[%a@ @[(tried by %a)@]@]"
               Emitted_status.pretty Emitted.Dont_know
-              (pp_emitters Usable_emitter.pretty) l
+              pp_emitters l
           | Valid_but_dead map
           | Invalid_but_dead map
           | Unknown_but_dead map ->
@@ -780,7 +774,7 @@ module Consolidation = struct
                | Invalid_but_dead _ -> Emitted.False_and_reachable
                | Unknown_but_dead _ -> Emitted.Dont_know
                | _ -> assert false)
-              (pp_emitters Usable_emitter.pretty) l
+              pp_emitters l
           | Inconsistent msg ->
             Format.fprintf fmt "inconsistency detected:\n%s.\n\
                                 Check your axiomatics and implicit hypotheses."
@@ -938,16 +932,14 @@ module Consolidation = struct
            "@[Valid for: %a (at least).@\n\
             Invalid for: %a.@]"
            Usable_emitter.pretty e
-           (Pretty_utils.pp_list ~sep:", " ~last:" and " Usable_emitter.pretty)
-           l)
+           (List.pretty_text Usable_emitter.pretty) l)
     | Valid set, Invalid _ ->
       Inconsistent
         (let l = Usable_emitter.Set.elements set in
          Format.asprintf
            "@[Valid for: %a.@\n\
             Invalid for: %a (at least).@]"
-           (Pretty_utils.pp_list ~sep:", " ~last:" and " Usable_emitter.pretty)
-           l
+           ((List.pretty_text Usable_emitter.pretty)) l
            Usable_emitter.pretty
            e)
 
