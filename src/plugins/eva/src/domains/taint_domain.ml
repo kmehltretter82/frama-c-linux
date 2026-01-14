@@ -838,18 +838,19 @@ let () =
     a_names
 
 (* Registers ACSL logic function security_status. *)
-let lf_security_status_name = "security_status"
+let security_status_lf_name = "security_status"
+let is_security_status = String.equal security_status_lf_name
 let () =
-  let security_status_logic_function =
-    { bl_name = lf_security_status_name;
+  let security_status_lf =
+    { bl_name = security_status_lf_name;
       bl_labels = [];
       bl_params = ["x"];
       bl_type = Some (Ctype Cil_const.intType);
       bl_profile = [("x", Lvar "x")];
     }
   in
-  if not (Logic_env.is_logic_function lf_security_status_name)
-  then Logic_builtin.register security_status_logic_function
+  if not (Logic_env.is_logic_function security_status_lf_name)
+  then Logic_builtin.register security_status_lf
 
 (* Registers ACSL logic constants public/private. *)
 let () =
@@ -954,7 +955,7 @@ let find_tainted_predicate ?(positive=true) predicate =
     Some { namespaces; name = lv_name; arg; positive }
   | Prel ((Req | Rneq as op), {term_node = Tapp (f, _, [arg])}, t)
   | Prel ((Req | Rneq as op), t, {term_node = Tapp (f, _, [arg])}) ->
-    if String.equal f.l_var_info.lv_name lf_security_status_name then
+    if is_security_status f.l_var_info.lv_name then
       let open Option.Operators in
       let+ status = find_security_status ~positive t in
       let positive = if op = Rneq then not status else status in
