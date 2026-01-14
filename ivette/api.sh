@@ -21,5 +21,5 @@ fi
 path=$1
 
 find $path/frama-c -path "*/api/*" -name "*.ts" -exec rm -f {} \;
-	../bin/frama-c -server-tsc -server-tsc-out $path
+	../bin/frama-c -server-tsc $path
 find $path/frama-c -path "*/api/*" -name "*.ts" -exec chmod a-w {} \;
