@@ -944,7 +944,7 @@ let find_security_status ~positive term =
     Some (not positive)
   | _ -> None
 
-(* Returns information [taint_predicate] if [predicate] is a \tainted predicate.
+(* Returns a [taint_predicate] if [predicate] is a \tainted predicate.
    Relations such as "security_status(arg) = private" are considered as a
    \tainted(private:arg) predicate. Returns None if the [predicate] cannot
    be interpreted as a \tainted predicate. *)
