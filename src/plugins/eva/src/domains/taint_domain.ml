@@ -456,7 +456,7 @@ module TransferSingleTaint = struct
       let tainted = LatticeSingleTaint.intersects state exp_zone in
       if tainted && is_private_namespace namespace
       then warn_assume_interference ~pos exp_zone;
-      if not state.dependent_call && tainted
+      if tainted && not state.dependent_call
       then { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
       else state
 
