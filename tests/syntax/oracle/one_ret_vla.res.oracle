@@ -76,4 +76,20 @@ int g(unsigned int size)
   return_label: return __retres;
 }
 
+int h(unsigned int size)
+{
+  int __retres;
+  __retres = 3;
+  goto return_label;
+  {
+    unsigned int __lengthof_unused;
+    /*@ assert alloca_bounds: 0 < sizeof(int) * size ≤ 4294967295; */ ;
+    __lengthof_unused = size;
+    int *unused = __fc_vla_alloc(sizeof(int) * __lengthof_unused);
+    __retres = 4;
+    __fc_vla_free((void *)unused);
+  }
+  return_label: return __retres;
+}
+
 

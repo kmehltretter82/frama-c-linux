@@ -111,7 +111,7 @@ let encapsulate_local_vars f =
   if
     List.exists (fun v ->
         Ast_attributes.(contains frama_c_destructor v.vattr)
-      ) f.sbody.blocals
+      ) f.slocals
   then begin
     let exception Found of (block Stack.t * stmt) in
     let vis = object

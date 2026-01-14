@@ -20,3 +20,11 @@ int g(unsigned size) {
   return 3;
   int unused[size];
 }
+
+int h(unsigned size) {
+  return 3;
+  {
+    int unused[size];
+    return 4;
+  }
+}
