@@ -10,8 +10,8 @@
 [eva] computing for function fn2 <- main.
   Called from funcall10.c:25.
 [kernel:annot:missing-spec] funcall10.c:11: Warning: 
-  Neither code nor specification for function fn1,
-   generating default assigns. See -generated-spec-* options for more info
+  Neither code nor specification for function fn1, generating default assigns.
+  See -generated-spec-* options for more info.
 [eva] computing for function fn1 <- fn2 <- main.
   Called from funcall10.c:11.
 [eva] using specification for function fn1
