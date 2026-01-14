@@ -116,41 +116,37 @@ let add_write ~map ~stmt ~acs (r:node) (e:exp) =
     let v = add_exp map stmt e in
     Option.iter (Memory.add_points_to r) v
 
-let add_kf_call ~kf ~stmt map ?property ~result args kfct =
-  let module Vmap = Cil_datatype.Varinfo.Map in
-  let funspec = Annotations.funspec kfct in
-  let fargs = Kernel_function.get_formals kfct in
-  let ki = Kinstr.kinstr_of_opt_stmt (Some stmt) in
-  let add_called_behavior bhv =
-    let add_formal formal e arg =
-      let property =
-        match property with
-        | Some p -> p
-        | None -> Property.ip_of_behavior kf ki ~active:[] bhv in
-      let env = Logic.{ map ; formals = Vmap.empty ; property ; result } in
-      let d = Logic.add_term env @@ Logic_utils.expr_to_term e in
-      Vmap.add arg d formal in
-    let formals = List.fold_left2 add_formal Vmap.empty args fargs in
-    Annot.add_behavior ~iscalled:true ~kf ~ki ~formals ~result map bhv
-  in
-  List.iter add_called_behavior funspec.spec_behavior
-
-let add_call ~kf ~stmt map ~result fct (args: exp list) =
-  match Kernel_function.get_called fct with
-  | Some kfct -> add_kf_call ~kf ~stmt map ~result args kfct
-  | None ->
-    begin match Dyncall.get stmt with
-      | Some(property,kfcts) ->
-        List.iter (add_kf_call ~kf ~stmt map ~property ~result args) kfcts
-      | None ->
-        Options.abort "Cannot resolve dynamic call for stmt:%a@."
-          Printer.pp_stmt stmt
-    end
-
 let add_function (m:map) (s:stmt) (f:lhost) =
   match f with
   | Var _vf -> ()
   | Mem e -> add_value m s e
+
+let add_result (m:map) (s:stmt) lv =
+  let r = add_lval m s lv in
+  Memory.add_write r (Lval(s,lv)) ; r
+
+let add_formal m s formals x e =
+  Vmap.add x (Ldomain.scalar @@ add_exp m s e) formals
+
+let add_kf_call m s r kf es =
+  let funspec = Annotations.funspec kf in
+  let args = Kernel_function.get_formals kf in
+  let formals = List.fold_left2 (add_formal m s) Vmap.empty args es in
+  let add_called_behavior bhv =
+    Annot.add_behavior ~iscalled:true ~kf ~ki:Kglobal ~formals ~result:r m bhv
+  in List.iter add_called_behavior funspec.spec_behavior
+
+let add_call m s r fct es =
+  match Kernel_function.get_called fct with
+  | Some kf -> add_kf_call m s r kf es
+  | None ->
+    begin
+      match Dyncall.get s with
+      | Some(_,kfs) ->
+        List.iter (fun kf -> add_kf_call m s r kf es) kfs
+      | None ->
+        Options.abort ~source:(fst @@ Stmt.loc s) "Cannot resolve dynamic call"
+    end
 
 let add_instr ~kf ~stmt (m:map) (instr:instr) =
   match instr with
@@ -173,19 +169,13 @@ let add_instr ~kf ~stmt (m:map) (instr:instr) =
       begin fun _res fct args _loc ->
         add_function m stmt fct;
         List.iter (add_value m stmt) args ;
-        add_call ~kf ~stmt:stmt m ~result:(Some r) fct args
+        add_call m stmt (Some r) fct args
       end x vf args kind loc
 
   | Call(lr,f,es,_) ->
     add_function m stmt f;
-    List.iter (add_value m stmt) es ;
-    let result =
-      Option.map
-        (fun lv ->
-           let r = add_lval m stmt lv in
-           Memory.add_write r (Lval(stmt,lv)) ; r
-        ) lr
-    in add_call ~kf ~stmt:stmt m ~result f es
+    let r = Option.map (add_result m stmt) lr in
+    add_call m stmt r f es
 
   | Asm _ ->
     Options.warning ~source:(fst @@ Stmt.loc stmt)
