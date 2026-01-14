@@ -9,7 +9,7 @@ int caller_byref (int k) { int *a; byref(&a,B,k); return *a; }
 int* result(int* q, int k);
 int caller_result (int k) { int *a = result(B,k); return *a; }
 
-// assigns \result;
+//@ assigns \result;
 int* imprecise(int* q, int k);
 int* call_imprecise(int k) { return imprecise(B,k); }
 

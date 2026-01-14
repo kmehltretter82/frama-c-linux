@@ -35,6 +35,7 @@
   R0001: -R-- p (struct S *) 64b (*R0002) ;
   R0002: ---- 0b ;
 [region] Function imprecise:
+  R0001: ---- \result 0b ;
 [region] Function result:
   R0001: ---- \result 0b ;
 [region] Function set_field:

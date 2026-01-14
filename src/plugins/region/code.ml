@@ -129,6 +129,7 @@ let add_formal m s formals x e =
   Vmap.add x (Ldomain.scalar @@ add_exp m s e) formals
 
 let add_kf_call m s r kf es =
+  Populate_spec.populate_funspec kf [`Assigns] ;
   let funspec = Annotations.funspec kf in
   let args = Kernel_function.get_formals kf in
   let formals = List.fold_left2 (add_formal m s) Vmap.empty args es in
