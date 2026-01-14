@@ -378,16 +378,23 @@ module Base_checker = struct
 
       method private check_labels s =
         let check_one = function
-          | Case _ | Default _
-            when not @@ Stmt.Hashtbl.mem (Stack.top switch_cases) s ->
-            check_abort
-              "@[<v 2>This switch case is either not referenced by a switch \
-               statement or not referenced by the innermost one:@\n%a@]"
-              Printer.pp_stmt s
-          | _ -> ()
+          | Label _ -> () (* Nothing to check *)
+          | Case _ | Default _ as label ->
+            match Stack.top_opt switch_cases with
+            | None ->
+              check_abort
+                "@[<v 2>The label %a is outside of a switch statment@]"
+                Printer.pp_label label
+            | Some cases when not @@ Stmt.Hashtbl.mem cases s ->
+              check_abort
+                "@[<v 2>The label %a is not referenced by the (innermost) \
+                 switch statement@]"
+                Printer.pp_label label
+            | Some _ -> ()
         in
         List.iter check_one s.labels;
-        Stmt.Hashtbl.remove (Stack.top switch_cases) s
+        Stack.top_opt switch_cases
+        |> Option.iter (fun cases -> Stmt.Hashtbl.remove cases s)
 
       method private check_try_catch_decl (decl,_) =
         match decl with
@@ -451,8 +458,8 @@ module Base_checker = struct
            in
            Stack.push cases switch_cases;
            Cil.ChangeDoChildrenPost(s, fun s ->
-               self#check_switch_post s (Stack.top switch_cases);
-               Stack.pop switch_cases |> ignore;
+               let remaining_cases = Stack.pop switch_cases in
+               self#check_switch_post s remaining_cases;
                post_action s)
          | UnspecifiedSequence seq ->
            let calls =
