@@ -190,11 +190,11 @@ if [[ "$base" =~ \.i$ ]]; then
     CPP="gcc -fsyntax-only"
 else
     set +e
-    cpp_output=$("$FRAMAC" -print-cpp-commands "$@" "$file" 2>/dev/null)
+    cpp_output=$("$FRAMAC" -keep-temp-files -print-cpp-commands "$@" "$file" 2>/dev/null)
     cpp_retcode=$?
     set -e
     if [ $cpp_retcode -ne 0 ]; then
-        echo "error trying to get preprocessing flags (exit code: $cpp_retcode): $FRAMAC -print-cpp-commands $* $file"
+        echo "error trying to get preprocessing flags (exit code: $cpp_retcode): $FRAMAC -keep-temp-files -print-cpp-commands $* $file"
         exit $cpp_retcode
     fi
     CPP=$(echo "$cpp_output" | \
