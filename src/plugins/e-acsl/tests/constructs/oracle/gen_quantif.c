@@ -376,7 +376,7 @@ int main(void)
   {
     int buf[10];
     __e_acsl_store_block((void *)(buf),40UL);
-    unsigned long len = (unsigned long)9;
+    unsigned long len = 9UL;
     {
       int __gen_e_acsl_forall_9;
       int __gen_e_acsl_i;

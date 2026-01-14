@@ -1641,7 +1641,7 @@ int main(void)
     }
     else 
       if (res != 16) __gen_e_acsl_perror("Unable to lock write_mutex");
-    __gen_e_acsl_usleep((useconds_t)100);
+    __gen_e_acsl_usleep(100U);
     __e_acsl_delete_block((void *)(& res));
   }
   while (1) {
@@ -1662,7 +1662,7 @@ int main(void)
     }
     else 
       if (res_0 != 16) __gen_e_acsl_perror("Unable to lock read_mutex");
-    __gen_e_acsl_usleep((useconds_t)100);
+    __gen_e_acsl_usleep(100U);
     __e_acsl_delete_block((void *)(& res_0));
   }
   __e_acsl_full_init((void *)(& tmp_5));

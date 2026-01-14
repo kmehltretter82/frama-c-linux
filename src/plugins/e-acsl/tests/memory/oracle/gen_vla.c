@@ -49,8 +49,8 @@ int main(int argc, char **argv)
   /*@ assert alloca_bounds: 0 < sizeof(int) * LEN <= 18446744073709551615; */
   ;
   __lengthof_arr = (unsigned long)LEN;
-  int *arr = __builtin_alloca(sizeof(int) * __lengthof_arr);
-  __e_acsl_store_block((void *)arr,sizeof(int) * __lengthof_arr);
+  int *arr = __builtin_alloca(4UL * __lengthof_arr);
+  __e_acsl_store_block((void *)arr,4UL * __lengthof_arr);
   __e_acsl_store_block((void *)(& arr),8UL);
   __e_acsl_full_init((void *)(& arr));
   i = 0;

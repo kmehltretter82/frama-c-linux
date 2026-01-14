@@ -57,7 +57,7 @@ int main(void)
   int b = 222;
   __e_acsl_store_block((void *)(& b),4UL);
   __e_acsl_full_init((void *)(& b));
-  int size = (int)(sizeof(int *) * (unsigned long)2);
+  int size = 16;
   __e_acsl_initialize((void *)(src),sizeof(int *));
   __e_acsl_temporal_store_nblock((void *)(src),(void *)(& a));
   src[0] = & a;

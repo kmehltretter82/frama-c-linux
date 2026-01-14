@@ -101,11 +101,10 @@ int main(int argc, char const **argv)
   char *a;
   __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
   __e_acsl_store_block((void *)(& a),8UL);
-  char **memptr = malloc(sizeof(void *));
+  char **memptr = malloc(8UL);
   __e_acsl_store_block((void *)(& memptr),8UL);
   __e_acsl_full_init((void *)(& memptr));
-  int res2 =
-    __gen_e_acsl_posix_memalign((void **)memptr,(size_t)256,(size_t)15);
+  int res2 = __gen_e_acsl_posix_memalign((void **)memptr,256UL,15UL);
   /*@ assert Eva: initialization: \initialized(memptr); */
   char *p = *memptr;
   __e_acsl_store_block((void *)(& p),8UL);
@@ -222,7 +221,7 @@ int main(int argc, char const **argv)
   }
   /*@ assert !\valid(p); */ ;
   __e_acsl_full_init((void *)(& a));
-  a = (char *)__gen_e_acsl_aligned_alloc((size_t)256,(size_t)12);
+  a = (char *)__gen_e_acsl_aligned_alloc(256UL,12UL);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
@@ -238,7 +237,7 @@ int main(int argc, char const **argv)
   }
   /*@ assert a == \null; */ ;
   __e_acsl_full_init((void *)(& a));
-  a = (char *)__gen_e_acsl_aligned_alloc((size_t)255,(size_t)512);
+  a = (char *)__gen_e_acsl_aligned_alloc(255UL,512UL);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
@@ -254,7 +253,7 @@ int main(int argc, char const **argv)
   }
   /*@ assert a == \null; */ ;
   __e_acsl_full_init((void *)(& a));
-  a = (char *)__gen_e_acsl_aligned_alloc((size_t)0,(size_t)512);
+  a = (char *)__gen_e_acsl_aligned_alloc(0UL,512UL);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
       {.values = (void *)0};
@@ -270,7 +269,7 @@ int main(int argc, char const **argv)
   }
   /*@ assert a == \null; */ ;
   __e_acsl_full_init((void *)(& a));
-  a = (char *)__gen_e_acsl_aligned_alloc((size_t)256,(size_t)512);
+  a = (char *)__gen_e_acsl_aligned_alloc(256UL,512UL);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
       {.values = (void *)0};

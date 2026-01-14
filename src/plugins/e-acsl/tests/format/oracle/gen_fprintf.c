@@ -258,7 +258,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_11 = __gen_e_acsl_fork();
     if (! pid_11) {
-      __e_acsl_builtin_snprintf("s",buf,(size_t)4,"-%s-","123");
+      __e_acsl_builtin_snprintf("s",buf,4UL,"-%s-","123");
       __gen_e_acsl_exit(0);
     }
     else {
@@ -273,7 +273,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_12 = __gen_e_acsl_fork();
     if (! pid_12) {
-      __e_acsl_builtin_snprintf("s",buf,(size_t)5,"-%s-","123");
+      __e_acsl_builtin_snprintf("s",buf,5UL,"-%s-","123");
       __gen_e_acsl_exit(0);
     }
     else {
@@ -288,7 +288,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_13 = __gen_e_acsl_fork();
     if (! pid_13) {
-      __e_acsl_builtin_snprintf("s",pstr,(size_t)6,"-%s-","123");
+      __e_acsl_builtin_snprintf("s",pstr,6UL,"-%s-","123");
       __gen_e_acsl_exit(0);
     }
     else {
@@ -303,7 +303,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_14 = __gen_e_acsl_fork();
     if (! pid_14) {
-      __e_acsl_builtin_snprintf("s",buf,(size_t)6,"-%s-","123");
+      __e_acsl_builtin_snprintf("s",buf,6UL,"-%s-","123");
       __gen_e_acsl_exit(0);
     }
     else {
@@ -318,7 +318,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_15 = __gen_e_acsl_fork();
     if (! pid_15) {
-      __e_acsl_builtin_snprintf("s",(char *)0,(size_t)6,"-%s-","123");
+      __e_acsl_builtin_snprintf("s",(char *)0,6UL,"-%s-","123");
       __gen_e_acsl_exit(0);
     }
     else {
@@ -333,7 +333,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_16 = __gen_e_acsl_fork();
     if (! pid_16) {
-      __e_acsl_builtin_snprintf("s",(char *)0,(size_t)0,"-%s-","123");
+      __e_acsl_builtin_snprintf("s",(char *)0,0UL,"-%s-","123");
       __gen_e_acsl_exit(0);
     }
     else {

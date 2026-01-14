@@ -29,7 +29,7 @@ void read_sensor_4(unsigned int *m)
   /*@ assert Eva: pointer_alignment: \aligned(m,alignof(unsigned int)); */
   __e_acsl_initialize((void *)m,sizeof(unsigned int));
   /*@ assert Eva: pointer_alignment: \aligned(m,alignof(unsigned int)); */
-  *m = (unsigned int)0;
+  *m = 0U;
   __e_acsl_delete_block((void *)(& m));
   return;
 }
@@ -42,7 +42,7 @@ int main(void)
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_store_block((void *)(buf),16UL);
   i = 0;
-  while ((unsigned long)i < sizeof(buf) / (unsigned long)4) {
+  while ((unsigned long)i < 4UL) {
     /*@ assert
           Eva: pointer_alignment:
             \aligned((unsigned char *)buf,alignof(unsigned int));

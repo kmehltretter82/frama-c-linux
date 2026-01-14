@@ -17,7 +17,7 @@ double __gen_e_acsl_avg(double a, double b);
 double avg(double a, double b)
 {
   double __retres;
-  __retres = (a + b) / (double)2;
+  __retres = (a + b) / 2.;
   return __retres;
 }
 

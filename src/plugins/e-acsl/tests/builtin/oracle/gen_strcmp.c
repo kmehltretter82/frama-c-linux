@@ -324,8 +324,8 @@ int main(int argc, char const **argv)
   char ar[4] = {'a', 'b', 'c', '\000'};
   __e_acsl_store_block((void *)(ar),4UL);
   __e_acsl_full_init((void *)(& ar));
-  char *dl = eacsl_test_strdup("abc",(size_t)4);
-  char *dr = eacsl_test_strdup("abc",(size_t)4);
+  char *dl = eacsl_test_strdup("abc",4UL);
+  char *dr = eacsl_test_strdup("abc",4UL);
   {
     pid_t pid = __gen_e_acsl_fork();
     if (! pid) {
@@ -384,7 +384,7 @@ int main(int argc, char const **argv)
     }
   }
   __e_acsl_initialize((void *)(& al[3]),sizeof(char));
-  al[3] = (char)'a';
+  al[3] = (char)97;
   {
     pid_t pid_2 = __gen_e_acsl_fork();
     if (! pid_2) {
@@ -406,7 +406,7 @@ int main(int argc, char const **argv)
     }
   }
   __e_acsl_initialize((void *)(& ar[3]),sizeof(char));
-  ar[3] = (char)'a';
+  ar[3] = (char)97;
   __e_acsl_initialize((void *)(& al[3]),sizeof(char));
   al[3] = (char)0;
   {
@@ -429,7 +429,7 @@ int main(int argc, char const **argv)
       __e_acsl_delete_block((void *)(& process_status_3));
     }
   }
-  *(dl + 3) = (char)'a';
+  *(dl + 3) = (char)97;
   {
     pid_t pid_4 = __gen_e_acsl_fork();
     if (! pid_4) {
@@ -450,7 +450,7 @@ int main(int argc, char const **argv)
       __e_acsl_delete_block((void *)(& process_status_4));
     }
   }
-  *(dr + 3) = (char)'a';
+  *(dr + 3) = (char)97;
   *(dl + 3) = (char)0;
   {
     pid_t pid_5 = __gen_e_acsl_fork();
@@ -556,8 +556,8 @@ int main(int argc, char const **argv)
       __e_acsl_delete_block((void *)(& process_status_9));
     }
   }
-  dl = eacsl_test_strdup("abc",(size_t)4);
-  dr = eacsl_test_strdup("abc",(size_t)4);
+  dl = eacsl_test_strdup("abc",4UL);
+  dr = eacsl_test_strdup("abc",4UL);
   char nal[4] = {'a', 'b', 'c', '\000'};
   __e_acsl_store_block((void *)(nal),4UL);
   __e_acsl_full_init((void *)(& nal));
@@ -569,8 +569,8 @@ int main(int argc, char const **argv)
     if (! pid_10) {
       int tmp_35;
       int tmp_36;
-      tmp_35 = __e_acsl_builtin_strncmp(cl,cr,(size_t)3);
-      tmp_36 = __e_acsl_builtin_strncmp(cl,cr,(size_t)3);
+      tmp_35 = __e_acsl_builtin_strncmp(cl,cr,3UL);
+      tmp_36 = __e_acsl_builtin_strncmp(cl,cr,3UL);
       fail_ncomp(tmp_36 != 0,(char *)"comparison failure: %d == %d\n",tmp_35,
                  0);
       __gen_e_acsl_exit(0);
@@ -590,9 +590,9 @@ int main(int argc, char const **argv)
       int tmp_38;
       int tmp_39;
       tmp_38 = __e_acsl_builtin_strncmp((char const *)(nal),
-                                        (char const *)(nar),(size_t)3);
+                                        (char const *)(nar),3UL);
       tmp_39 = __e_acsl_builtin_strncmp((char const *)(nal),
-                                        (char const *)(nar),(size_t)3);
+                                        (char const *)(nar),3UL);
       fail_ncomp(tmp_39 != 0,(char *)"comparison failure: %d == %d\n",tmp_38,
                  0);
       __gen_e_acsl_exit(0);
@@ -612,9 +612,9 @@ int main(int argc, char const **argv)
       int tmp_41;
       int tmp_42;
       tmp_41 = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                        (size_t)3);
+                                        3UL);
       tmp_42 = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                        (size_t)3);
+                                        3UL);
       fail_ncomp(tmp_42 != 0,(char *)"comparison failure: %d == %d\n",tmp_41,
                  0);
       __gen_e_acsl_exit(0);
@@ -634,9 +634,9 @@ int main(int argc, char const **argv)
       int tmp_44;
       int tmp_45;
       tmp_44 = __e_acsl_builtin_strncmp((char const *)(nal),
-                                        (char const *)(nar),(size_t)6);
+                                        (char const *)(nar),6UL);
       tmp_45 = __e_acsl_builtin_strncmp((char const *)(nal),
-                                        (char const *)(nar),(size_t)6);
+                                        (char const *)(nar),6UL);
       fail_ncomp(tmp_45 != 0,(char *)"comparison failure: %d == %d\n",tmp_44,
                  0);
       __gen_e_acsl_exit(0);
@@ -656,9 +656,9 @@ int main(int argc, char const **argv)
       int tmp_47;
       int tmp_48;
       tmp_47 = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                        (size_t)6);
+                                        6UL);
       tmp_48 = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                        (size_t)6);
+                                        6UL);
       fail_ncomp(tmp_48 != 0,(char *)"comparison failure: %d == %d\n",tmp_47,
                  0);
       __gen_e_acsl_exit(0);
@@ -673,16 +673,16 @@ int main(int argc, char const **argv)
     }
   }
   __e_acsl_initialize((void *)(& nal[3]),sizeof(char));
-  nal[3] = (char)'d';
+  nal[3] = (char)100;
   {
     pid_t pid_15 = __gen_e_acsl_fork();
     if (! pid_15) {
       int tmp_50;
       int tmp_51;
       tmp_50 = __e_acsl_builtin_strncmp((char const *)(nal),
-                                        (char const *)(nar),(size_t)4);
+                                        (char const *)(nar),4UL);
       tmp_51 = __e_acsl_builtin_strncmp((char const *)(nal),
-                                        (char const *)(nar),(size_t)4);
+                                        (char const *)(nar),4UL);
       fail_ncomp(tmp_51 == 0,(char *)"comparison failure: %d != %d\n",tmp_50,
                  0);
       __gen_e_acsl_exit(0);
@@ -697,7 +697,7 @@ int main(int argc, char const **argv)
     }
   }
   __e_acsl_initialize((void *)(& nar[3]),sizeof(char));
-  nar[3] = (char)'d';
+  nar[3] = (char)100;
   __e_acsl_initialize((void *)(& nal[3]),sizeof(char));
   nal[3] = (char)0;
   {
@@ -706,9 +706,9 @@ int main(int argc, char const **argv)
       int tmp_53;
       int tmp_54;
       tmp_53 = __e_acsl_builtin_strncmp((char const *)(nal),
-                                        (char const *)(nar),(size_t)4);
+                                        (char const *)(nar),4UL);
       tmp_54 = __e_acsl_builtin_strncmp((char const *)(nal),
-                                        (char const *)(nar),(size_t)4);
+                                        (char const *)(nar),4UL);
       fail_ncomp(tmp_54 == 0,(char *)"comparison failure: %d != %d\n",tmp_53,
                  0);
       __gen_e_acsl_exit(0);
@@ -722,16 +722,16 @@ int main(int argc, char const **argv)
       __e_acsl_delete_block((void *)(& process_status_16));
     }
   }
-  *(dl + 3) = (char)'d';
+  *(dl + 3) = (char)100;
   {
     pid_t pid_17 = __gen_e_acsl_fork();
     if (! pid_17) {
       int tmp_56;
       int tmp_57;
       tmp_56 = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                        (size_t)4);
+                                        4UL);
       tmp_57 = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                        (size_t)4);
+                                        4UL);
       fail_ncomp(tmp_57 == 0,(char *)"comparison failure: %d != %d\n",tmp_56,
                  0);
       __gen_e_acsl_exit(0);
@@ -745,7 +745,7 @@ int main(int argc, char const **argv)
       __e_acsl_delete_block((void *)(& process_status_17));
     }
   }
-  *(dr + 3) = (char)'d';
+  *(dr + 3) = (char)100;
   *(dl + 3) = (char)0;
   {
     pid_t pid_18 = __gen_e_acsl_fork();
@@ -753,9 +753,9 @@ int main(int argc, char const **argv)
       int tmp_59;
       int tmp_60;
       tmp_59 = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                        (size_t)4);
+                                        4UL);
       tmp_60 = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                        (size_t)4);
+                                        4UL);
       fail_ncomp(tmp_60 == 0,(char *)"comparison failure: %d != %d\n",tmp_59,
                  0);
       __gen_e_acsl_exit(0);
@@ -773,7 +773,7 @@ int main(int argc, char const **argv)
     pid_t pid_19 = __gen_e_acsl_fork();
     if (! pid_19) {
       res = __e_acsl_builtin_strncmp((char const *)(nal),(char const *)(nar),
-                                     (size_t)5);
+                                     5UL);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -786,14 +786,14 @@ int main(int argc, char const **argv)
     }
   }
   __e_acsl_initialize((void *)(& nal[3]),sizeof(char));
-  nal[3] = (char)'d';
+  nal[3] = (char)100;
   __e_acsl_initialize((void *)(& nar[3]),sizeof(char));
   nar[3] = (char)0;
   {
     pid_t pid_20 = __gen_e_acsl_fork();
     if (! pid_20) {
       res = __e_acsl_builtin_strncmp((char const *)(al),(char const *)(ar),
-                                     (size_t)5);
+                                     5UL);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -808,8 +808,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_21 = __gen_e_acsl_fork();
     if (! pid_21) {
-      res = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                     (size_t)5);
+      res = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,5UL);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -821,13 +820,12 @@ int main(int argc, char const **argv)
       __e_acsl_delete_block((void *)(& process_status_21));
     }
   }
-  *(dl + 3) = (char)'d';
+  *(dl + 3) = (char)100;
   *(dr + 3) = (char)0;
   {
     pid_t pid_22 = __gen_e_acsl_fork();
     if (! pid_22) {
-      res = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,
-                                     (size_t)5);
+      res = __e_acsl_builtin_strncmp((char const *)dl,(char const *)dr,5UL);
       __gen_e_acsl_exit(0);
     }
     else {

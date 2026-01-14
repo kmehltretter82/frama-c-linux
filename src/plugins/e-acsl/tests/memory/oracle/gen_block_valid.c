@@ -161,10 +161,10 @@ int main(int argc, char **argv)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
   }
   /*@ assert !\valid(p + 1); */ ;
-  char *pmin = malloc(sizeof(int));
+  char *pmin = malloc(4UL);
   __e_acsl_store_block((void *)(& pmin),8UL);
   __e_acsl_full_init((void *)(& pmin));
-  char *pmax = malloc(sizeof(int));
+  char *pmax = malloc(4UL);
   __e_acsl_store_block((void *)(& pmax),8UL);
   __e_acsl_full_init((void *)(& pmax));
   if ((uintptr_t)pmin > (uintptr_t)pmax) {
@@ -178,9 +178,9 @@ int main(int argc, char **argv)
     __e_acsl_delete_block((void *)(& t));
   }
   __e_acsl_initialize((void *)pmin,sizeof(char));
-  *pmin = (char)'P';
+  *pmin = (char)80;
   __e_acsl_initialize((void *)pmax,sizeof(char));
-  *pmax = (char)'L';
+  *pmax = (char)76;
   int diff = (int)((uintptr_t)pmax - (uintptr_t)pmin);
   {
     int __gen_e_acsl_initialized_3;

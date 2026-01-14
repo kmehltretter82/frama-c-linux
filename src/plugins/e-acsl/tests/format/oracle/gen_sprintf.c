@@ -142,7 +142,7 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
     /*@ assert !\initialized(&buf_0[0 .. 3]); */ ;
-    __e_acsl_builtin_snprintf("d",buf_0,(size_t)2,"%d",10);
+    __e_acsl_builtin_snprintf("d",buf_0,2UL,"%d",10);
     {
       int __gen_e_acsl_size_4;
       int __gen_e_acsl_if_4;
@@ -262,7 +262,7 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
     }
     /*@ assert !\initialized(&buf_1[0 .. 3]); */ ;
-    __e_acsl_builtin_snprintf("d",buf_1,(size_t)4,"%d",10);
+    __e_acsl_builtin_snprintf("d",buf_1,4UL,"%d",10);
     {
       int __gen_e_acsl_size_6;
       int __gen_e_acsl_if_6;

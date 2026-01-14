@@ -634,8 +634,8 @@ int main(void)
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
-  __gen_e_acsl_memchr((void const *)"toto",'o',(size_t)4);
-  __gen_e_acsl_memchr((void const *)"tata",'o',(size_t)4);
+  __gen_e_acsl_memchr((void const *)"toto",111,4UL);
+  __gen_e_acsl_memchr((void const *)"tata",111,4UL);
   __retres = 0;
   __e_acsl_globals_clean();
   __e_acsl_memory_clean();

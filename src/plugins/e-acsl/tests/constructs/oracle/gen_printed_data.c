@@ -157,7 +157,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
   }
   /*@ assert \let x = int_schar; \true; */ ;
-  unsigned char int_uchar = (unsigned char)255U;
+  unsigned char int_uchar = (unsigned char)255;
   __e_acsl_store_block((void *)(& int_uchar),1UL);
   __e_acsl_full_init((void *)(& int_uchar));
   {
@@ -237,7 +237,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
   }
   /*@ assert \let x = int_short; \true; */ ;
-  unsigned short int_ushort = (unsigned short)65535U;
+  unsigned short int_ushort = (unsigned short)65535;
   __e_acsl_store_block((void *)(& int_ushort),2UL);
   __e_acsl_full_init((void *)(& int_ushort));
   {
@@ -370,7 +370,7 @@ int main(void)
     int_mpz != 18446744073709551615ULL;
    */
   ;
-  float real_float = (float)0x1.fffffep+127;
+  float real_float = 3.40282346639e+38f;
   __e_acsl_store_block((void *)(& real_float),4UL);
   __e_acsl_full_init((void *)(& real_float));
   {
@@ -550,7 +550,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_21);
   }
   /*@ assert \let x = struct1; \true; */ ;
-  union U union1 = {.b = (float)1.};
+  union U union1 = {.b = 1.f};
   __e_acsl_store_block((void *)(& union1),4UL);
   __e_acsl_full_init((void *)(& union1));
   {
@@ -569,7 +569,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_22);
   }
   /*@ assert \let x = union1; \true; */ ;
-  enum EBool enum_bool = (enum EBool)EBOOL_MAX;
+  enum EBool enum_bool = 1U;
   __e_acsl_store_block((void *)(& enum_bool),4UL);
   __e_acsl_full_init((void *)(& enum_bool));
   {
@@ -589,7 +589,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_23);
   }
   /*@ assert \let x = enum_bool; \true; */ ;
-  enum EChar enum_char = (enum EChar)ECHAR_MAX;
+  enum EChar enum_char = 127;
   __e_acsl_store_block((void *)(& enum_char),4UL);
   __e_acsl_full_init((void *)(& enum_char));
   {
@@ -609,7 +609,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_24);
   }
   /*@ assert \let x = enum_char; \true; */ ;
-  enum ESChar enum_schar = (enum ESChar)ESCHAR_MAX;
+  enum ESChar enum_schar = 127;
   __e_acsl_store_block((void *)(& enum_schar),4UL);
   __e_acsl_full_init((void *)(& enum_schar));
   {
@@ -629,7 +629,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_25);
   }
   /*@ assert \let x = enum_schar; \true; */ ;
-  enum EUChar enum_uchar = (enum EUChar)EUCHAR_MAX;
+  enum EUChar enum_uchar = 255U;
   __e_acsl_store_block((void *)(& enum_uchar),4UL);
   __e_acsl_full_init((void *)(& enum_uchar));
   {
@@ -649,7 +649,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_26);
   }
   /*@ assert \let x = enum_uchar; \true; */ ;
-  enum EInt enum_int = EINT_MAX;
+  enum EInt enum_int = 2147483647;
   __e_acsl_store_block((void *)(& enum_int),4UL);
   __e_acsl_full_init((void *)(& enum_int));
   {
@@ -669,7 +669,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_27);
   }
   /*@ assert \let x = enum_int; \true; */ ;
-  enum EUInt enum_uint = EUINT_MAX;
+  enum EUInt enum_uint = 4294967295U;
   __e_acsl_store_block((void *)(& enum_uint),4UL);
   __e_acsl_full_init((void *)(& enum_uint));
   {
@@ -689,7 +689,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_28);
   }
   /*@ assert \let x = enum_uint; \true; */ ;
-  enum EShort enum_short = (enum EShort)ESHORT_MAX;
+  enum EShort enum_short = 32767;
   __e_acsl_store_block((void *)(& enum_short),4UL);
   __e_acsl_full_init((void *)(& enum_short));
   {
@@ -709,7 +709,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_29);
   }
   /*@ assert \let x = enum_short; \true; */ ;
-  enum EUShort enum_ushort = (enum EUShort)EUSHORT_MAX;
+  enum EUShort enum_ushort = 65535U;
   __e_acsl_store_block((void *)(& enum_ushort),4UL);
   __e_acsl_full_init((void *)(& enum_ushort));
   {
@@ -729,7 +729,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_30);
   }
   /*@ assert \let x = enum_ushort; \true; */ ;
-  enum ELong enum_long = ELONG_MAX;
+  enum ELong enum_long = 9223372036854775807L;
   __e_acsl_store_block((void *)(& enum_long),8UL);
   __e_acsl_full_init((void *)(& enum_long));
   {
@@ -749,7 +749,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_31);
   }
   /*@ assert \let x = enum_long; \true; */ ;
-  enum EULong enum_ulong = EULONG_MAX;
+  enum EULong enum_ulong = 18446744073709551615UL;
   __e_acsl_store_block((void *)(& enum_ulong),8UL);
   __e_acsl_full_init((void *)(& enum_ulong));
   {
@@ -769,7 +769,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_32);
   }
   /*@ assert \let x = enum_ulong; \true; */ ;
-  enum ELLong enum_llong = ELLONG_MAX;
+  enum ELLong enum_llong = 9223372036854775807LL;
   __e_acsl_store_block((void *)(& enum_llong),8UL);
   __e_acsl_full_init((void *)(& enum_llong));
   {
@@ -789,7 +789,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_33);
   }
   /*@ assert \let x = enum_llong; \true; */ ;
-  enum EULLong enum_ullong = EULLONG_MAX;
+  enum EULLong enum_ullong = 18446744073709551615ULL;
   __e_acsl_store_block((void *)(& enum_ullong),8UL);
   __e_acsl_full_init((void *)(& enum_ullong));
   {

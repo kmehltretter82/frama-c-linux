@@ -640,7 +640,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
   }
   /*@ assert \let i = 3; \at(n + i,L) == 10; */ ;
-  unsigned int m = (unsigned int)3;
+  unsigned int m = 3U;
   G:
   {
     int __gen_e_acsl_k_3;
@@ -652,7 +652,7 @@ int main(void)
     }
   }
   ;
-  m = (unsigned int)(-3);
+  m = 4294967293U;
   {
     int __gen_e_acsl_exists_3;
     int __gen_e_acsl_k_4;

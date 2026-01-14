@@ -349,10 +349,10 @@ int main(void)
   __e_acsl_store_block((void *)(& srcbuf),8UL);
   __e_acsl_full_init((void *)(& srcbuf));
   int loc = 1;
-  char *destbuf = malloc((unsigned long)10 * sizeof(char));
+  char *destbuf = malloc(10UL);
   __e_acsl_store_block((void *)(& destbuf),8UL);
   __e_acsl_full_init((void *)(& destbuf));
-  char ch = (char)'o';
+  char ch = (char)111;
   if (destbuf != (char *)0) {
     i = -1;
     while (i < 0) {
@@ -386,8 +386,7 @@ int main(void)
       if ((int)*(srcbuf + i) == (int)ch) loc = i;
       i ++;
     }
-    __gen_e_acsl_strncpy(destbuf + loc,(char const *)(srcbuf + loc),
-                         (size_t)1);
+    __gen_e_acsl_strncpy(destbuf + loc,(char const *)(srcbuf + loc),1UL);
     free((void *)destbuf);
   }
   __retres = 0;

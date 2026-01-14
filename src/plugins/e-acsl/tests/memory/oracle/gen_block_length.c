@@ -304,7 +304,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
   }
   /*@ assert \block_length(pa + 1) == \block_length(&a[1]); */ ;
-  long l = (long)4;
+  long l = 4L;
   __e_acsl_store_block((void *)(& l),8UL);
   __e_acsl_full_init((void *)(& l));
   char *pl = (char *)(& l);
@@ -440,7 +440,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
   }
   /*@ assert \block_length(pi) == \block_length(&l); */ ;
-  size_t size = (size_t)12;
+  size_t size = 12UL;
   char *p = malloc(size);
   __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
@@ -516,7 +516,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_20);
   }
   /*@ assert \block_length(p + 5) == \block_length(p - 5); */ ;
-  size = (unsigned long)30 * sizeof(long);
+  size = 240UL;
   long *q = malloc(size);
   __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_full_init((void *)(& q));

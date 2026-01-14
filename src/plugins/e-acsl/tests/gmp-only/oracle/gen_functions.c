@@ -329,7 +329,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_g_2);
   }
   /*@ assert g(x) == x; */ ;
-  char c = (char)'c';
+  char c = (char)99;
   {
     __e_acsl_mpz_t __gen_e_acsl_c;
     __e_acsl_mpz_t __gen_e_acsl_h_char_2;

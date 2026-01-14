@@ -456,7 +456,7 @@ int main(void)
   __e_acsl_initialize((void *)(& t2.q),sizeof(char *));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
-  t2.q = (char *)malloc((size_t)4);
+  t2.q = (char *)malloc(4UL);
   __e_acsl_temporal_store_nblock((void *)(& t2.q),(void *)*(& t2.q));
   {
     int __gen_e_acsl_initialized_7;

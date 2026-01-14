@@ -57,7 +57,7 @@ void *write_value(void *arg)
   __e_acsl_store_block((void *)(& idx),4UL);
   __e_acsl_full_init((void *)(& idx));
   __e_acsl_initialize((void *)(& values[idx]),sizeof(int *));
-  values[idx] = (int *)malloc(sizeof(int));
+  values[idx] = (int *)malloc(4UL);
   __e_acsl_initialize((void *)values[idx],sizeof(int));
   *(values[idx]) = idx;
   __e_acsl_full_init((void *)(& __retres));

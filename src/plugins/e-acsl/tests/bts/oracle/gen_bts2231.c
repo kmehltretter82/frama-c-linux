@@ -7,7 +7,7 @@
 #include "time.h"
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
-long A = (long)0;
+long A = 0L;
 int main(void)
 {
   int __retres;

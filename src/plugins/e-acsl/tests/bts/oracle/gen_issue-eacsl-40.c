@@ -55,7 +55,7 @@ int main(void)
     char buf_0[4];
     size_t tmp_0;
     __e_acsl_store_block((void *)(buf_0),4UL);
-    tmp_0 = __gen_e_acsl_fread((void *)(buf_0),(size_t)1,(size_t)4,f);
+    tmp_0 = __gen_e_acsl_fread((void *)(buf_0),1UL,4UL,f);
     int res = (int)tmp_0;
     __gen_e_acsl_fclose(f);
     if (res == 4) {

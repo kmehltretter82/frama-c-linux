@@ -410,7 +410,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
   }
   /*@ assert \base_addr(pa + 2) == \base_addr((int *)a); */ ;
-  long l = (long)4;
+  long l = 4L;
   __e_acsl_store_block((void *)(& l),8UL);
   __e_acsl_full_init((void *)(& l));
   char *pl = (char *)(& l);
@@ -512,7 +512,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_22);
   }
   /*@ assert \base_addr(pl) == \base_addr(&l); */ ;
-  char *p = malloc((size_t)12);
+  char *p = malloc(12UL);
   __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
   char *pd = p;
@@ -636,7 +636,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_27);
   }
   /*@ assert \base_addr(p - 5) == \base_addr(pd); */ ;
-  long *q = malloc((unsigned long)30 * sizeof(long));
+  long *q = malloc(240UL);
   __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_full_init((void *)(& q));
   long *qd = q;

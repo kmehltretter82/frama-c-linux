@@ -19,7 +19,7 @@ struct list *add(struct list *l, int i)
   __e_acsl_store_block((void *)(& new),8UL);
   __e_acsl_store_block((void *)(& l),8UL);
   __e_acsl_full_init((void *)(& new));
-  new = (struct list *)malloc(sizeof(struct list));
+  new = (struct list *)malloc(16UL);
   {
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;

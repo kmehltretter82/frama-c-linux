@@ -132,13 +132,13 @@ void apply_specifier(char *format, int spec)
       if (tmp != (char *)0) __e_acsl_builtin_printf("d",(char const *)format,
                                                     97);
       else 
-        if (spec == 's') __e_acsl_builtin_printf("s",(char const *)format,
+        if (spec == 115) __e_acsl_builtin_printf("s",(char const *)format,
                                                  "foo");
         else 
-          if (spec == 'n') __e_acsl_builtin_printf("i",(char const *)format,
+          if (spec == 110) __e_acsl_builtin_printf("i",(char const *)format,
                                                    & n);
           else 
-            if (spec == 'p') __e_acsl_builtin_printf("p",
+            if (spec == 112) __e_acsl_builtin_printf("p",
                                                      (char const *)format,p);
             else __gen_e_acsl_abort();
       __e_acsl_delete_block((void *)(& tmp));
@@ -198,8 +198,8 @@ void test_specifier_application(char const *allowed, char const *fmt,
    */
   ;
   __lengthof_format = (unsigned long)(len + 1);
-  char *format = __builtin_alloca(sizeof(char) * __lengthof_format);
-  __e_acsl_store_block((void *)format,sizeof(char) * __lengthof_format);
+  char *format = __builtin_alloca(__lengthof_format);
+  __e_acsl_store_block((void *)format,__lengthof_format);
   __e_acsl_store_block((void *)(& format),8UL);
   __e_acsl_full_init((void *)(& format));
   __gen_e_acsl_strcpy(format,fmt);
@@ -864,24 +864,24 @@ int main(int argc, char const **argv)
   void *vptr = (void *)(& argc);
   __e_acsl_store_block((void *)(& vptr),8UL);
   __e_acsl_full_init((void *)(& vptr));
-  char chr = (char)'T';
-  unsigned char uchr = (unsigned char)'U';
+  char chr = (char)84;
+  unsigned char uchr = (unsigned char)85;
   short shrt = (short)4569;
   unsigned short ushrt = (unsigned short)4567;
   int i = 268;
-  unsigned int ui = (unsigned int)516;
-  wint_t wi = (wint_t)123;
-  long li = (long)3134;
-  unsigned long lu = (unsigned long)7845216;
+  unsigned int ui = 516U;
+  wint_t wi = 123U;
+  long li = 3134L;
+  unsigned long lu = 7845216UL;
   long long lli = 123LL;
-  unsigned long long llu = (unsigned long long)123LL;
-  float flt = (float)0.2;
+  unsigned long long llu = 123ULL;
+  float flt = 0.20000000298f;
   double dbl = 0.3;
   long double ldbl = (long double)0.3;
-  intmax_t imax = (intmax_t)10;
-  uintmax_t uimax = (uintmax_t)10;
-  size_t szt = (size_t)10;
-  ptrdiff_t ptrdf = (ptrdiff_t)147;
+  intmax_t imax = 10LL;
+  uintmax_t uimax = 10ULL;
+  size_t szt = 10UL;
+  ptrdiff_t ptrdf = 147L;
   {
     pid_t pid = __gen_e_acsl_fork();
     if (! pid) {
@@ -950,7 +950,7 @@ int main(int argc, char const **argv)
   __e_acsl_store_block((void *)(fmt),7UL);
   __e_acsl_full_init((void *)(& fmt));
   __e_acsl_initialize((void *)(& fmt[6]),sizeof(char));
-  fmt[6] = (char)'a';
+  fmt[6] = (char)97;
   {
     pid_t pid_3 = __gen_e_acsl_fork();
     if (! pid_3) {
@@ -4513,7 +4513,7 @@ int main(int argc, char const **argv)
     }
   }
   __e_acsl_initialize((void *)(& s4[3]),sizeof(char));
-  s4[3] = (char)'s';
+  s4[3] = (char)115;
   {
     pid_t pid_239 = __gen_e_acsl_fork();
     if (! pid_239) {

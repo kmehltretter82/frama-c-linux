@@ -177,12 +177,12 @@ void *write_value(void *arg)
     __gen_e_acsl_perror("Unable to unlock mutex in write_value()");
     __gen_e_acsl_exit(1);
   }
-  __gen_e_acsl_usleep((useconds_t)100);
+  __gen_e_acsl_usleep(100U);
   int idx = *((int *)arg);
   __e_acsl_store_block((void *)(& idx),4UL);
   __e_acsl_full_init((void *)(& idx));
   __e_acsl_initialize((void *)(& values[idx]),sizeof(int *));
-  values[idx] = (int *)malloc(sizeof(int));
+  values[idx] = (int *)malloc(4UL);
   __e_acsl_initialize((void *)values[idx],sizeof(int));
   *(values[idx]) = idx;
   __e_acsl_full_init((void *)(& __retres));
@@ -232,7 +232,7 @@ void *read_value(void *arg)
     __gen_e_acsl_perror("Unable to unlock mutex in read_value()");
     __gen_e_acsl_exit(1);
   }
-  __gen_e_acsl_usleep((useconds_t)100);
+  __gen_e_acsl_usleep(100U);
   {
     int __gen_e_acsl_idx;
     int __gen_e_acsl_initialized;
@@ -2131,7 +2131,7 @@ int main(void)
     }
     else 
       if (res != 16) __gen_e_acsl_perror("Unable to lock write_mutex");
-    __gen_e_acsl_usleep((useconds_t)100);
+    __gen_e_acsl_usleep(100U);
     __e_acsl_delete_block((void *)(& res));
   }
   while (1) {
@@ -2152,7 +2152,7 @@ int main(void)
     }
     else 
       if (res_0 != 16) __gen_e_acsl_perror("Unable to lock read_mutex");
-    __gen_e_acsl_usleep((useconds_t)100);
+    __gen_e_acsl_usleep(100U);
     __e_acsl_delete_block((void *)(& res_0));
   }
   __e_acsl_full_init((void *)(& tmp_5));

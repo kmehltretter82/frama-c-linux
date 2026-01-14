@@ -344,7 +344,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
   }
   /*@ assert fact7 == 5040; */ ;
-  size_t fact18 = __gen_e_acsl_fact2((size_t)18);
+  size_t fact18 = __gen_e_acsl_fact2(18UL);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};

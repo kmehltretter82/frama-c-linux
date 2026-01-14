@@ -11,7 +11,7 @@ int main(void)
 {
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  unsigned long x = (unsigned long)4294967295U;
+  unsigned long x = 4294967295UL;
   int y = 10;
   {
     int __gen_e_acsl_k;

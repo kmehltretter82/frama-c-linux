@@ -177,7 +177,7 @@ int main(void)
     __e_acsl_delete_block((void *)(& static_pair));
   }
   {
-    int32_pair_t *heap_pair = malloc(sizeof(int32_pair_t));
+    int32_pair_t *heap_pair = malloc(8UL);
     __e_acsl_store_block((void *)(& heap_pair),8UL);
     __e_acsl_full_init((void *)(& heap_pair));
     {

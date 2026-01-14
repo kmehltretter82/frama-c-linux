@@ -326,8 +326,8 @@ LONGOPTIONS="help,compile,no-compile,compile-only,debug:,ocode:,oexec:,verbose:,
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,full-mtracking,gmp,
   quiet,logfile:,ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,keep-going,
   frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,concurrency,
-  print-mmodels,rt-debug,rte-select:,then,then-last,e-acsl-extra:,check,fail-with-code:,
-  temporal,weak-validity,stack-size:,heap-size:,zone-sizes:,rt-verbose,
+  print-mmodels,rt-debug,rte-select:,then,then-last,e-acsl-extra:,check,no-constfold,
+  fail-with-code:,temporal,weak-validity,stack-size:,heap-size:,zone-sizes:,rt-verbose,
   free-valid-address,external-assert:,assert-print-data,no-assert-print-data,
   external-print-value:,validate-format-strings,no-trace,libc-replacements,
   with-dlmalloc:,dlmalloc-from-sources,dlmalloc-compile-only,
@@ -368,6 +368,7 @@ OPTION_WEAK_VALIDITY=                    # Use notion of weak validity
 OPTION_RTE=                              # Enable assertion generation
 OPTION_FAIL_WITH_CODE=                   # Exit status code for failures
 OPTION_CHECK=                            # Check AST integrity
+OPTION_CONSTFOLD=1                       # Enable constant folding (default)
 OPTION_NO_TRACE=                         # Disable trace in debug mode
 OPTION_FRAMAC_CPP_EXTRA=                 # Extra CPP flags for Frama-C
 OPTION_FREE_VALID_ADDRESS=  # Fail if NULL is used as input to free
@@ -622,6 +623,11 @@ do
     --check)
       OPTION_CHECK=1
       FRAMAC_FLAGS="-check $FRAMAC_FLAGS"
+      shift;
+    ;;
+    # Disable constant folding (default: enabled)
+    --no-constfold)
+      OPTION_CONSTFOLD=0
       shift;
     ;;
     # Enable instrumentations of temporal validity analysis
@@ -1020,12 +1026,14 @@ compilation of the source code won't be run."
 fi
 
 # Extra Frama-C Flags E-ACSL needs
-FRAMAC_FLAGS="$FRAMAC_FLAGS \
-  -keep-unused-functions none"
+FRAMAC_FLAGS="$FRAMAC_FLAGS -keep-unused-functions none"
 
 if [ -n "$OPTION_VALIDATE_FORMAT_STRINGS" ]; then
-  FRAMAC_FLAGS="$FRAMAC_FLAGS \
-    -no-variadic-translation"
+  FRAMAC_FLAGS="$FRAMAC_FLAGS -no-variadic-translation"
+fi
+
+if [ $OPTION_CONSTFOLD == 1 ]; then
+  FRAMAC_FLAGS="$FRAMAC_FLAGS -constfold"
 fi
 
 # C, CPP and LD flags for compilation of E-ACSL-generated sources
@@ -1083,7 +1091,7 @@ fi
 CONTAINS_PTHREAD=0
 PTHREAD_FOUND_MSG="Turning on option --e-acsl-concurrency."
 if echo "$INSTRUMENT_OUTPUT" | grep -F -q "$PTHREAD_FOUND_MSG"; then
-	CONTAINS_PTHREAD=1
+  CONTAINS_PTHREAD=1
 fi
 
 # Concurrency support

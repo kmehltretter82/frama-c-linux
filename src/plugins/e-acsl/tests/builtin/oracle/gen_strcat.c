@@ -334,7 +334,7 @@ void test_memory_tracking(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
     }
     /*@ assert \initialized(&src_0[0 .. 2]); */ ;
-    __e_acsl_builtin_strncat(dest_0,(char const *)(src_0),(size_t)1);
+    __e_acsl_builtin_strncat(dest_0,(char const *)(src_0),1UL);
     {
       int __gen_e_acsl_size_8;
       int __gen_e_acsl_if_8;
@@ -504,7 +504,7 @@ void test_memory_tracking(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
     }
     /*@ assert \initialized(&src_1[0 .. 1]); */ ;
-    __e_acsl_builtin_strncat(dest_1,(char const *)(src_1),(size_t)2);
+    __e_acsl_builtin_strncat(dest_1,(char const *)(src_1),2UL);
     {
       int __gen_e_acsl_size_12;
       int __gen_e_acsl_if_12;
@@ -844,8 +844,8 @@ int main(int argc, char const **argv)
   __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
   __e_acsl_globals_init();
   char *const_str = (char *)"abcd";
-  char *unalloc_str = malloc((size_t)5);
-  char *_barrier = malloc((size_t)1);
+  char *unalloc_str = malloc(5UL);
+  char *_barrier = malloc(1UL);
   char *empty_str = (char *)"";
   free((void *)unalloc_str);
   {
@@ -1046,7 +1046,7 @@ int main(int argc, char const **argv)
       pid_t pid_10 = __gen_e_acsl_fork();
       if (! pid_10) {
         __e_acsl_initialize((void *)(pd4 + 5),sizeof(char));
-        *(pd4 + 5) = (char)'\000';
+        *(pd4 + 5) = (char)0;
         __e_acsl_builtin_strcat(pd4 + 5,(char const *)pd4);
         __gen_e_acsl_exit(0);
       }
@@ -1098,7 +1098,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_11 = __gen_e_acsl_fork();
       if (! pid_11) {
-        __e_acsl_builtin_strncat(dest1_0,(char const *)const_str,(size_t)4);
+        __e_acsl_builtin_strncat(dest1_0,(char const *)const_str,4UL);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -1113,7 +1113,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_12 = __gen_e_acsl_fork();
       if (! pid_12) {
-        __e_acsl_builtin_strncat(dest2_0,(char const *)const_str,(size_t)4);
+        __e_acsl_builtin_strncat(dest2_0,(char const *)const_str,4UL);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -1129,8 +1129,7 @@ int main(int argc, char const **argv)
       pid_t pid_13 = __gen_e_acsl_fork();
       if (! pid_13) {
         /*@ assert Eva: dangling_pointer: !\dangling(&unalloc_str); */
-        __e_acsl_builtin_strncat(unalloc_str,(char const *)const_str,
-                                 (size_t)1);
+        __e_acsl_builtin_strncat(unalloc_str,(char const *)const_str,1UL);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -1146,7 +1145,7 @@ int main(int argc, char const **argv)
       pid_t pid_14 = __gen_e_acsl_fork();
       if (! pid_14) {
         /*@ assert Eva: dangling_pointer: !\dangling(&unalloc_str); */
-        __e_acsl_builtin_strncat(dest2_0,(char const *)unalloc_str,(size_t)1);
+        __e_acsl_builtin_strncat(dest2_0,(char const *)unalloc_str,1UL);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -1161,7 +1160,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_15 = __gen_e_acsl_fork();
       if (! pid_15) {
-        __e_acsl_builtin_strncat((char *)0,(char const *)const_str,(size_t)1);
+        __e_acsl_builtin_strncat((char *)0,(char const *)const_str,1UL);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -1176,7 +1175,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_16 = __gen_e_acsl_fork();
       if (! pid_16) {
-        __e_acsl_builtin_strncat(dest2_0,(char const *)0,(size_t)1);
+        __e_acsl_builtin_strncat(dest2_0,(char const *)0,1UL);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -1191,7 +1190,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_17 = __gen_e_acsl_fork();
       if (! pid_17) {
-        __e_acsl_builtin_strncat(const_str,(char const *)const_str,(size_t)1);
+        __e_acsl_builtin_strncat(const_str,(char const *)const_str,1UL);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -1206,7 +1205,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_18 = __gen_e_acsl_fork();
       if (! pid_18) {
-        __e_acsl_builtin_strncat(pd1_0,(char const *)pd1_0,(size_t)1);
+        __e_acsl_builtin_strncat(pd1_0,(char const *)pd1_0,1UL);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -1221,7 +1220,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_19 = __gen_e_acsl_fork();
       if (! pid_19) {
-        __e_acsl_builtin_strncat(pd1_0 + 3,(char const *)pd1_0,(size_t)5);
+        __e_acsl_builtin_strncat(pd1_0 + 3,(char const *)pd1_0,5UL);
         __gen_e_acsl_exit(0);
       }
       else {
@@ -1236,7 +1235,7 @@ int main(int argc, char const **argv)
     {
       pid_t pid_20 = __gen_e_acsl_fork();
       if (! pid_20) {
-        __e_acsl_builtin_strncat(pd4_0 + 4,(char const *)pd4_0,(size_t)5);
+        __e_acsl_builtin_strncat(pd4_0 + 4,(char const *)pd4_0,5UL);
         __gen_e_acsl_exit(0);
       }
       else {

@@ -31,7 +31,7 @@ int main(void)
      (char)16};
   __e_acsl_store_block((void *)(chars),16UL);
   __e_acsl_full_init((void *)(& chars));
-  size_t c = _Alignof(char);
+  size_t c = 1UL;
   {
     int __gen_e_acsl_aligned;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};

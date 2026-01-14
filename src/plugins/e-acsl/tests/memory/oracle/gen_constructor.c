@@ -13,7 +13,7 @@ void f(void) __attribute__((__constructor__));
 void f(void)
 {
   printf("f\n"); /* printf_va_1 */
-  char *buf = malloc((unsigned long)10 * sizeof(char));
+  char *buf = malloc(10UL);
   free((void *)buf);
   return;
 }

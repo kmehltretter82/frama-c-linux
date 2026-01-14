@@ -269,7 +269,7 @@ void test_memory_tracking(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     }
     /*@ assert \initialized(&src_0[0 .. 3]); */ ;
-    __e_acsl_builtin_strncpy(dest_0,(char const *)(src_0),(size_t)1);
+    __e_acsl_builtin_strncpy(dest_0,(char const *)(src_0),1UL);
     {
       int __gen_e_acsl_initialized_7;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
@@ -404,7 +404,7 @@ void test_memory_tracking(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
     }
     /*@ assert \initialized(&src_1[0 .. 3]); */ ;
-    __e_acsl_builtin_strncpy(dest_1,(char const *)(src_1),(size_t)3);
+    __e_acsl_builtin_strncpy(dest_1,(char const *)(src_1),3UL);
     {
       int __gen_e_acsl_size_10;
       int __gen_e_acsl_if_10;
@@ -705,9 +705,9 @@ int main(int argc, char const **argv)
   __e_acsl_store_block((void *)(empty_str),1UL);
   __e_acsl_full_init((void *)(& empty_str));
   char *const_str = (char *)"abcd";
-  char *src = eacsl_test_strdup("abcd",(size_t)5);
-  char *dest1 = malloc((size_t)5);
-  char *dest2 = malloc((size_t)4);
+  char *src = eacsl_test_strdup("abcd",5UL);
+  char *dest1 = malloc(5UL);
+  char *dest2 = malloc(4UL);
   char dest3[256] =
     {'a',
      'b',
@@ -967,9 +967,9 @@ int main(int argc, char const **argv)
      '\000'};
   __e_acsl_store_block((void *)(dest3),256UL);
   __e_acsl_full_init((void *)(& dest3));
-  size_t len = (size_t)0;
-  char *unalloc_str = malloc((size_t)5);
-  char *_barrier = malloc((size_t)1);
+  size_t len = 0UL;
+  char *unalloc_str = malloc(5UL);
+  char *_barrier = malloc(1UL);
   free((void *)unalloc_str);
   {
     pid_t pid = __gen_e_acsl_fork();
@@ -1110,7 +1110,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_8 = __gen_e_acsl_fork();
     if (! pid_8) {
-      __e_acsl_builtin_strncpy(dest1,(char const *)src,(size_t)5);
+      __e_acsl_builtin_strncpy(dest1,(char const *)src,5UL);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -1125,7 +1125,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_9 = __gen_e_acsl_fork();
     if (! pid_9) {
-      __e_acsl_builtin_strncpy(dest1,(char const *)src,(size_t)6);
+      __e_acsl_builtin_strncpy(dest1,(char const *)src,6UL);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -1141,7 +1141,7 @@ int main(int argc, char const **argv)
     pid_t pid_10 = __gen_e_acsl_fork();
     if (! pid_10) {
       /*@ assert Eva: dangling_pointer: !\dangling(&unalloc_str); */
-      __e_acsl_builtin_strncpy(unalloc_str,(char const *)src,(size_t)5);
+      __e_acsl_builtin_strncpy(unalloc_str,(char const *)src,5UL);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -1156,7 +1156,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_11 = __gen_e_acsl_fork();
     if (! pid_11) {
-      __e_acsl_builtin_strncpy(const_str,(char const *)src,(size_t)5);
+      __e_acsl_builtin_strncpy(const_str,(char const *)src,5UL);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -1171,7 +1171,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_12 = __gen_e_acsl_fork();
     if (! pid_12) {
-      __e_acsl_builtin_strncpy(src,(char const *)const_str,(size_t)5);
+      __e_acsl_builtin_strncpy(src,(char const *)const_str,5UL);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -1186,7 +1186,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_13 = __gen_e_acsl_fork();
     if (! pid_13) {
-      __e_acsl_builtin_strncpy(src,(char const *)src,(size_t)5);
+      __e_acsl_builtin_strncpy(src,(char const *)src,5UL);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -1201,7 +1201,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_14 = __gen_e_acsl_fork();
     if (! pid_14) {
-      __e_acsl_builtin_strncpy(& dest3[5],(char const *)(dest3),(size_t)5);
+      __e_acsl_builtin_strncpy(& dest3[5],(char const *)(dest3),5UL);
       __gen_e_acsl_exit(0);
     }
     else {
@@ -1216,7 +1216,7 @@ int main(int argc, char const **argv)
   {
     pid_t pid_15 = __gen_e_acsl_fork();
     if (! pid_15) {
-      __e_acsl_builtin_strncpy(& dest3[4],(char const *)(dest3),(size_t)5);
+      __e_acsl_builtin_strncpy(& dest3[4],(char const *)(dest3),5UL);
       __gen_e_acsl_exit(0);
     }
     else {

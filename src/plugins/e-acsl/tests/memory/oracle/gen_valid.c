@@ -436,7 +436,7 @@ int main(void)
   }
   /*@ assert !\valid(a) && !\valid(b) && !\valid(X); */ ;
   __e_acsl_full_init((void *)(& a));
-  a = (int *)malloc(sizeof(int));
+  a = (int *)malloc(4UL);
   {
     int __gen_e_acsl_initialized_3;
     int __gen_e_acsl_and_5;

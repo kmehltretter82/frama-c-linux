@@ -31,7 +31,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
   /*@ assert __e_acsl_heap_allocation_size == 0; */ ;
-  char *a = malloc((size_t)7);
+  char *a = malloc(7UL);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};

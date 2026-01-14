@@ -63,7 +63,7 @@ int main(void)
   __e_acsl_store_block((void *)(c),4UL);
   __e_acsl_store_block((void *)(b),20UL);
   __e_acsl_store_block((void *)(a),2UL);
-  __gen_e_acsl_memset((void *)(a),1,(size_t)1);
+  __gen_e_acsl_memset((void *)(a),1,1UL);
   {
     int __gen_e_acsl_initialized;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
@@ -109,7 +109,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
   /*@ assert !\initialized(&a[1]); */ ;
-  __gen_e_acsl_memset((void *)(& a[1]),1,(size_t)1);
+  __gen_e_acsl_memset((void *)(& a[1]),1,1UL);
   {
     int __gen_e_acsl_initialized_3;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
@@ -133,7 +133,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
   }
   /*@ assert \initialized(&a[1]); */ ;
-  __gen_e_acsl_memset((void *)(& b[2]),42,(unsigned long)2 * sizeof(b[0]));
+  __gen_e_acsl_memset((void *)(& b[2]),42,8UL);
   {
     int __gen_e_acsl_initialized_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
@@ -241,7 +241,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
   }
   /*@ assert !\initialized(&b[4]); */ ;
-  __gen_e_acsl_memcpy((void *)(& c[1]),(void const *)(a),(size_t)2);
+  __gen_e_acsl_memcpy((void *)(& c[1]),(void const *)(a),2UL);
   {
     int __gen_e_acsl_initialized_8;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
@@ -324,7 +324,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
   }
   /*@ assert !\initialized(&c[3]); */ ;
-  __gen_e_acsl_memmove((void *)(c),(void const *)(& c[1]),(size_t)2);
+  __gen_e_acsl_memmove((void *)(c),(void const *)(& c[1]),2UL);
   {
     int __gen_e_acsl_size_3;
     int __gen_e_acsl_if_3;
