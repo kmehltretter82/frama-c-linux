@@ -48,3 +48,14 @@ let%test "int,string map" =
     "{{ 1 ↦ Lorem; 2 ↦\n\
     \  ipsum; 3 ↦\n\
     \  dolor }}"
+
+let%test "map without unicode" =
+  let open Map.Make (Int) in
+  let x = empty |> add 1 "Lorem" |> add 2 "ipsum" |> add 3 "dolor" in
+  let pretty = pretty Format.pp_print_int Format.pp_print_string in
+  Unicode.use_unicode false;
+  Fun.protect ~finally:(fun () -> Unicode.use_unicode true) @@
+  fun () -> _test_pretty pretty x
+    "{{ 1 -> Lorem; 2 ->\n\
+    \  ipsum; 3 ->\n\
+    \  dolor }}"
