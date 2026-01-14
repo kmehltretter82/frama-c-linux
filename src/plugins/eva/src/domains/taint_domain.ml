@@ -88,8 +88,8 @@ let filter_public_zone =
   in
   Zone.filter_base base_is_public
 
-let check_assign_interference ~pos ~data_tainted ~ctrl_tainted zone =
-  if (data_tainted || ctrl_tainted) && secure_flow_analysis () then
+let warn_assign_interference ~pos ~data_tainted ~ctrl_tainted zone =
+  if secure_flow_analysis () && (data_tainted || ctrl_tainted) then
     let zone = filter_public_zone zone in
     if not (Zone.is_bottom zone) then
       let source = fst (Position.loc pos) in
@@ -422,7 +422,7 @@ module TransferSingleTaint = struct
       || LatticeSingleTaint.intersects state lv_indirect_zone
     in
     if String.equal namespace private_taint_namespace
-    then check_assign_interference ~pos ~data_tainted ~ctrl_tainted lv_zone;
+    then warn_assign_interference ~pos ~data_tainted ~ctrl_tainted lv_zone;
     let update tainted locs =
       if tainted
       then Zone.join locs lv_zone
