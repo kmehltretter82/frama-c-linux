@@ -14,7 +14,7 @@
   R0005: --W- \result (int) 32b ;
 [region] Function modify_by_ref:
   R0001: -R-- p (int **) 64b (*R0002) ;
-  R0002: -RW- (int *) 64b (*R0003) ;
+  R0002: --W- (int *) 64b (*R0003) ;
   R0003: ---A 64b ;
   R0004: -R-- q (int *) 64b (*R0003) ;
   R0005: -R-- k (int) 32b ;
@@ -23,4 +23,4 @@
   R0002: ---A 64b ;
   R0003: -R-- k (int) 32b ;
   R0004: -RW- __retres (int *) 64b (*R0002) ;
-  R0005: -RW- \result (int *) 64b (*R0002) ;
+  R0005: --W- \result (int *) 64b (*R0002) ;

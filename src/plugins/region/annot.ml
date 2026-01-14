@@ -26,6 +26,11 @@ let add_ipred env ip = add_predicate env ip.ip_content.tp_statement
 (* ---  Process Assigns (From)                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
+let wkey =
+  Options.register_warn_category
+    ~help:"missing \\from when assigning pointers"
+    ~default:Wonce "froms"
+
 let add_write env lv tgt =
   Memory.add_write tgt @@ Access.Term(env.property,lv)
 
@@ -39,13 +44,13 @@ let add_dpoints_to env tgt = function
   | Some src -> Memory.add_points_to tgt src
   | None ->
     let loc = Property.location env.property in
-    Options.abort ~source:(fst loc)
+    Options.warning ~wkey ~source:(fst loc)
       "Missing pointer \\from for pointer assignment"
 
 let add_points_to env tgt = function
   | FromAny ->
     let loc = Property.location env.property in
-    Options.abort ~source:(fst loc)
+    Options.warning ~wkey ~source:(fst loc)
       "Missing \\from for pointer assignment"
   | From deps ->
     add_dpoints_to env tgt @@ dpoints_to env deps
@@ -72,9 +77,12 @@ let rec store env lv ty tgt deps =
       ) @@ Option.value ~default:[] cfields
 
 let is_ctype lt ty =
-  match Ast_types.unroll_logic lt with
-  | Ctype tr -> Cil_datatype.Typ.equal ty tr
-  | _ -> false
+  Logic_const.plain_or_set
+    (fun lt ->
+       match Ast_types.unroll_logic lt with
+       | Ctype tr -> Cil_datatype.Typ.equal ty tr
+       | _ -> false
+    ) lt
 
 let add_write_compound env lv ty tgt from =
   let copies, others =
@@ -107,20 +115,22 @@ let add_writes_from env (lv : term_lval) ~(from:deps) =
   else
     Options.not_yet_implemented "assigns to type (%a)" Printer.pp_typ ty
 
-let rec add_assigns_from env tgt ~from =
+let rec add_assigns_from env ~iscalled ~from tgt =
   match tgt.term_node with
-  | TLval lv -> add_writes_from env lv ~from
-  | Tat(t,_) -> add_assigns_from env ~from t
-  | Tunion ts -> List.iter (add_assigns_from env ~from) ts
-  | Tinter ts ->
-    Options.warning "assigns intersection treated as union" ;
-    List.iter (add_assigns_from env ~from) ts
+  | TLval lv ->
+    if iscalled then
+      add_writes_from env lv ~from
+    else
+      ignore (add_addr_lval env lv)
+  | Tat(t,_) -> add_assigns_from env ~iscalled ~from t
+  | Tunion ts | Tinter ts -> List.iter (add_assigns_from env ~iscalled ~from) ts
   | Tcomprehension _ -> Options.not_yet_implemented "assigns comprehension"
   | Tlet _ -> Options.not_yet_implemented "let-assigns"
   | Tif (c,tt,te) ->
     Options.warning ~source:(fst c.term_loc) "ignored assigns-condition" ;
-    add_assigns_from env tt ~from ;
-    add_assigns_from env te ~from ;
+    iadd_term env c ;
+    add_assigns_from env ~iscalled ~from tt ;
+    add_assigns_from env ~iscalled ~from te ;
   | TConst _ | TSizeOf _ | TSizeOfE _ | TAlignOf _ | TAlignOfE _
   | TUnOp _ | TBinOp _ | TCast _ | TAddrOf _ | TStartOf _
   | Tapp _ | Tlambda _ | TDataCons _
@@ -151,10 +161,8 @@ let add_bassigns ~iscalled ~map ~kf ~ki ~bhv ~formals ~result = function
     let bhv = Property.Id_contract (Datatype.String.Set.empty,bhv) in
     let property = Option.get @@ Property.ip_of_assigns kf ki bhv asgn in
     let env = { map ; property ; formals ; result } in
-    if iscalled then
-      List.iter (fun (t,from) -> add_assigns_from env t.it_content ~from) ws
-    else
-      List.iter (fun (t,_) -> iadd_iterm env t) ws
+    List.iter
+      (fun (t,from) -> add_assigns_from env ~iscalled ~from t.it_content) ws
 
 let add_allocation ~map ~kf ~ki ~bhv ~formals ~result alloc =
   match alloc with

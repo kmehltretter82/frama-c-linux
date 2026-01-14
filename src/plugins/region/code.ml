@@ -132,7 +132,8 @@ let add_kf_call ~kf ~stmt map ?property ~result args kfct =
       Vmap.add arg d formal in
     let formals = List.fold_left2 add_formal Vmap.empty args fargs in
     Annot.add_behavior ~iscalled:true ~kf ~ki ~formals ~result map bhv
-  in List.iter add_called_behavior funspec.spec_behavior
+  in
+  List.iter add_called_behavior funspec.spec_behavior
 
 let add_call ~kf ~stmt map ~result fct (args: exp list) =
   match Kernel_function.get_called fct with
@@ -178,7 +179,8 @@ let add_instr ~kf ~stmt (m:map) (instr:instr) =
   | Call(lr,f,es,_) ->
     add_function m stmt f;
     List.iter (add_value m stmt) es ;
-    let result = Option.map
+    let result =
+      Option.map
         (fun lv ->
            let r = add_lval m stmt lv in
            Memory.add_write r (Lval(stmt,lv)) ; r

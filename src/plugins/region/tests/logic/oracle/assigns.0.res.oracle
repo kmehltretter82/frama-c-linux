@@ -1,6 +1,25 @@
 [kernel] Parsing assigns.i (no preprocessing)
 [region] Analyzing regions
-[region] Function caller_by_ref:
+[region] Function byref:
+  R0001: -R-- p (int **) 64b (*R0002) ;
+  R0002: ---- 0b ;
+[region] Function call_copy:
+  R0001: ---- a[…] b[…] 0b ;
+[region] Function call_field:
+  R0001: ---- s 320b { .f: R0002; #256b; } ;
+  R0002: --W- (int *) 64b (*R0003) ;
+  R0003: ---- a[…] 0b ;
+[region] Function call_imprecise:
+  R0001: ---- B[…] 0b ;
+  R0002: -R-- k (int) 32b ;
+  R0003: -RW- tmp (int *) 64b (*R0004) ;
+  R0004: ---- 0b ;
+  R0005: --W- \result (int *) 64b (*R0004) ;
+[region] Function call_range:
+  R0001: ---- s 320b { #64b; .g: R0002[4]; } ;
+  R0002: --W- (int *) 64b (*R0003) ;
+  R0003: ---- a[…] 0b ;
+[region] Function caller_byref:
   R0001: -R-- B[64] (int) 32b ;
   R0002: -R-- k (int) 32b ;
   R0003: -RW- a (int *) 64b (*R0001) ;
@@ -12,15 +31,17 @@
   R0003: IRW- a (int *) 64b (*R0001) ;
   R0004: -RW- __retres (int) 32b ;
   R0005: --W- \result (int) 32b ;
-[region] Function modify_by_ref:
-  R0001: -R-- p (int **) 64b (*R0002) ;
-  R0002: -RW- (int *) 64b (*R0003) ;
-  R0003: ---A 64b ;
-  R0004: -R-- q (int *) 64b (*R0003) ;
-  R0005: -R-- k (int) 32b ;
-[region] Function modify_result:
-  R0001: -R-- q (int *) 64b (*R0002) ;
-  R0002: ---A 64b ;
-  R0003: -R-- k (int) 32b ;
-  R0004: -RW- __retres (int *) 64b (*R0002) ;
-  R0005: -RW- \result (int *) 64b (*R0002) ;
+[region] Function copy:
+  R0001: -R-- p (struct S *) 64b (*R0002) ;
+  R0002: ---- 0b ;
+[region] Function imprecise:
+[region] Function result:
+  R0001: ---- \result 0b ;
+[region] Function set_field:
+  R0001: -R-- p (struct S *) 64b (*R0002) ;
+  R0002: ---- 320b { .f: R0003[…]; #256b; } ;
+  R0003: ---- 0b ;
+[region] Function set_range:
+  R0001: -R-- p (struct S *) 64b (*R0002) ;
+  R0002: ---- 320b { #64b; .g: R0003; } ;
+  R0003: ---- 256b ;
