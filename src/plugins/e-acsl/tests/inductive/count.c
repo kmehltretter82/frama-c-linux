@@ -3,6 +3,10 @@
    COMMENT: works thanks to Here-inlining
    STDOPT: +"-eva-unroll-recursive-calls 9"
 */
+/* run.config_dev
+   MACRO: ROOT_EACSL_GCC_OPTS_EXT --no-assert-print-data
+   COMMENT: ptr values may change for each run
+*/
 
 /*@
 

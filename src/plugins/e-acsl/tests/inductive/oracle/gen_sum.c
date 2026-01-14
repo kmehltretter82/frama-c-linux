@@ -68,6 +68,7 @@ int main(void)
   {
     int __gen_e_acsl_sum_here_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_sum_here_2 = __gen_e_acsl_sum_here(ptr,1,2,4,5);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"ptr",
                                  (void *)ptr);
@@ -79,7 +80,7 @@ int main(void)
     __gen_e_acsl_assert_data.pred_txt = "sum(ptr, 1, 2, 4, 5)";
     __gen_e_acsl_assert_data.file = "sum.c";
     __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 26;
+    __gen_e_acsl_assert_data.line = 30;
     __e_acsl_assert(__gen_e_acsl_sum_here_2,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
@@ -88,6 +89,7 @@ int main(void)
     int __gen_e_acsl_sum_here_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
+    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_sum_here_4 = __gen_e_acsl_sum_here(ptr,1,2,4,4);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"ptr",
                                  (void *)ptr);
@@ -99,7 +101,7 @@ int main(void)
     __gen_e_acsl_assert_data_3.pred_txt = "!sum(ptr, 1, 2, 4, 4)";
     __gen_e_acsl_assert_data_3.file = "sum.c";
     __gen_e_acsl_assert_data_3.fct = "main";
-    __gen_e_acsl_assert_data_3.line = 27;
+    __gen_e_acsl_assert_data_3.line = 31;
     __e_acsl_assert(! __gen_e_acsl_sum_here_4,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
   }
