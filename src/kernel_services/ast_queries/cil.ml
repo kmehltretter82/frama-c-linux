@@ -5732,7 +5732,6 @@ and mkCast ?(check=true) ?force ~(newt: typ) e =
 (* TODO: unify this with doBinOp in Cabs2cil. *)
 and mkBinOp ~loc op e1 e2 =
   let open Ast_types in
-  let open Result.Operators in
   let t1 = typeOf e1 in
   let t2 = typeOf e2 in
   let machdep = false in
@@ -5753,7 +5752,7 @@ and mkBinOp ~loc op e1 e2 =
         tres
     else
       error
-        "%a operator on %s type(s) %a and %a"
+        "operator '%a' on %s type(s) '%a' and '%a'"
         !pp_binop_ref op name !pp_typ_ref t1 !pp_typ_ref t2
   in
   let doArithmetic ?res () =
@@ -5762,18 +5761,15 @@ and mkBinOp ~loc op e1 e2 =
   let doIntegralArithmetic () =
     check_make_expr ~check:Ast_types.is_integral "non-integral"
   in
-  let check_scalar op e t =
-    if not (is_scalar t) then
-      error "operand of %s is not scalar: %a" op !pp_exp_ref e
-    else Ok ()
-  in
   match op with
   | Mult | Div -> doArithmetic ()
   | Mod  | BAnd | BOr | BXor -> doIntegralArithmetic ()
   | LAnd | LOr ->
-    let* () = check_scalar "logical operator" e1 t1 in
-    let* () = check_scalar "logical operator" e2 t2 in
-    constFoldBinOp op e1 e2 Cil_const.intType
+    if Ast_types.is_scalar t1 && Ast_types.is_scalar t2 then
+      constFoldBinOp op e1 e2 Cil_const.intType
+    else
+      error "operator '%a' on non-scalar type(s) '%a' and '%a'"
+        !pp_binop_ref op !pp_typ_ref t1 !pp_typ_ref t2
   | Shiftlt | Shiftrt -> (* ISO 6.5.7. Only integral promotions. The result
                           * has the same type as the left hand side *)
     if Machine.msvcMode () then
@@ -5809,12 +5805,8 @@ and mkBinOp ~loc op e1 e2 =
       constFoldBinOp op e1 (mkCastT ~oldt:t2 ~newt:t1 e2)
         (Machine.ptrdiff_type ())
     else
-      error
-        "@[incompatible types in pointer subtraction@ \
-         %a@ (type of e1: %a,@ type of e2: %a)@]"
-        !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,Cil_const.intType)))
-        !pp_typ_ref t1
-        !pp_typ_ref t2
+      error "operator '%a' on incompatible pointer types '%a' and '%a'"
+        !pp_binop_ref op !pp_typ_ref t1 !pp_typ_ref t2
   | Eq | Ne when (is_ptr t1 || is_variadic_list t1) && isZero e2 ->
     constFoldBinOp op e1 (mkCast ~newt:t1 e2) Cil_const.intType
   | Eq | Ne when (is_ptr t2 || is_variadic_list t2) && isZero e1 ->
@@ -5836,17 +5828,15 @@ and mkBinOp ~loc op e1 e2 =
     constFoldBinOp op e1 e2 Cil_const.intType
   | Eq | Ne | Lt | Le | Ge | Gt -> doArithmetic ~res:Cil_const.intType ()
   | _ ->
-    error
-      "@[mkBinOp: unsupported operator for such operands@ \
-       %a@ (type of e1: %a,@ type of e2: %a)@]"
-      !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,Cil_const.intType)))
-      !pp_typ_ref t1
-      !pp_typ_ref t2
+    error "unsupported operator '%a' on expression of types '%a' and '%a'"
+      !pp_binop_ref op !pp_typ_ref t1 !pp_typ_ref t2
 
 and mkBinOp_exn ~loc op e1 e2 =
   match mkBinOp ~loc op e1 e2 with
   | Ok e -> e
-  | Error msg -> Kernel.fatal ~current:true "%s" msg
+  | Error msg ->
+    Kernel.fatal ~current:true "Cil.mkBinOp: typing expression '%a' failed: %s"
+      !pp_exp_ref (dummy_exp(BinOp(op, e1, e2, Cil_const.intType))) msg
 
 let mkBinOp_safe_ptr_cmp ~loc op e1 e2 =
   let e1, e2 =
