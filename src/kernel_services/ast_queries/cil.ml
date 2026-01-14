@@ -5705,20 +5705,17 @@ let rec castReduce fromsource force =
 and mkCastTGen ?(check=true) ?context ?(fromsource=false) ?(force=false)
     ~(oldt: typ) ~(newt: typ) e =
   let dkey = Kernel.dkey_typing_cast in
-  if
-    (if fromsource
-     then not (need_cast ~force oldt newt)
-     else not (need_cast ~force:false oldt newt))
-  then
-    begin
-      Kernel.debug ~dkey "no cast to perform";
-      let returned_type =
-        match newt.tnode with
-        | TNamed _ -> newt
-        | _ -> oldt
-      in
-      (returned_type, e)
-    end
+  let force_cast = fromsource || force in
+  let need_cast = need_cast ~force:force_cast oldt newt in
+  if not need_cast then begin
+    Kernel.debug ~dkey "no cast to perform";
+    let returned_type =
+      match newt.tnode with
+      | TNamed _ -> newt
+      | _ -> oldt
+    in
+    (returned_type, e)
+  end
   else
     let newt = if fromsource then newt else !typeForInsertedCast e oldt newt in
     let nullptr_cast = is_nullptr e in
