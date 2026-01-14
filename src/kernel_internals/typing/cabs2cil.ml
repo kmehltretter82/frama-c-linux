@@ -2099,9 +2099,7 @@ struct
         (* If needed, convert e to type t, and check in case the label
            was too big *)
         let e' = mkCast ~newt:t e in
-        let constFold = constFold true in
-        let e'' = if Machine.lower_constants () then constFold e' else e' in
-        (match constFoldToInt e, constFoldToInt e'' with
+        (match constFoldToInt e, constFoldToInt e' with
          | Some i1, Some i2 when not (Z.equal i1 i2) ->
            Kernel.feedback ~once:true ~source:(fst e.eloc)
              "Case label %a exceeds range of %a for switch expression. \
@@ -2109,7 +2107,7 @@ struct
              Cil_printer.pp_exp e Cil_datatype.Typ.pretty t;
          | _ -> ()
         );
-        Case (e'', loc)
+        Case (e', loc)
     in
     let block = c2block ~ghost body in
     let cases = (* eliminate duplicate entries from body.cases. A statement
@@ -3465,13 +3463,6 @@ let suggestAnonName (nl: Cabs.name list) =
   | [] -> ""
   | (n, _, _, _) :: _ -> n
 
-(** Optional constant folding of binary operations *)
-let optConstFoldBinOp loc machdep bop e1 e2 t =
-  if Machine.lower_constants () then
-    constFoldBinOp ~loc machdep bop e1 e2 t
-  else
-    new_exp ~loc (BinOp(bop, e1, e2, t))
-
 let integral_cast ty t =
   raise
     (Failure
@@ -4339,18 +4330,13 @@ let rec doSpecList loc ghost
         | (kname, e, cloc) :: rest ->
           (* constant-eval 'e' to determine tag value *)
           let e' = getIntConstExp ghost e in
-          let e' = match constFoldToInt e' with
+          begin match constFoldToInt e' with
             | None ->
               Errorloc.abort_context
                 "Constant initializer %a not an integer"
                 Cil_printer.pp_exp e'
-            | Some i ->
-              let ik = updateEnum i in
-              if Machine.lower_constants () then
-                kinteger64 ~loc:e.expr_loc ~kind:ik i
-              else
-                e'
-          in
+            | Some i -> ignore (updateEnum i)
+          end;
           processName kname e' (convLoc cloc) rest
       in
 
@@ -4527,26 +4513,12 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
        unknown. *)
     let rec attrOfExp
         ~(check:bool)
-        ?(foldenum=true)
         (a: Cabs.expression) : attrparam =
       let loc = a.expr_loc in
       match a.expr_node with
-      | Cabs.VARIABLE n -> begin
-          let n' = if check then check_attribute_name n else n in
-          (* See if this is an enumeration *)
-          try
-            if not foldenum then raise Not_found;
-            let env = if ghost then ghost_env else env in
-            match Datatype.String.Hashtbl.find env n' with
-            | EnvEnum item, _ -> begin
-                match constFoldToInt item.eival with
-                | Some i64 when Machine.lower_constants () ->
-                  AInt i64
-                |  _ -> ACons(n', [])
-              end
-            | _ -> ACons (n', [])
-          with Not_found -> ACons(n', [])
-        end
+      | Cabs.VARIABLE n ->
+        let n' = if check then check_attribute_name n else n in
+        ACons(n', [])
       | Cabs.CONSTANT (Cabs.CONST_STRING s) -> AStr s
       | Cabs.CONSTANT (Cabs.CONST_INT str) -> begin
           match parseIntExpRes ~loc str with
@@ -4581,7 +4553,7 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
       | Cabs.UNARY(Cabs.BNOT, aa) -> AUnOp(BNot, ae aa)
       | Cabs.UNARY(Cabs.NOT, aa) -> AUnOp(LNot, ae aa)
       | Cabs.MEMBEROF (e, s) -> ADot (ae e, s)
-      | Cabs.PAREN(e) -> attrOfExp ~check ~foldenum:foldenum e
+      | Cabs.PAREN(e) -> attrOfExp ~check e
       | Cabs.UNARY(Cabs.MEMOF, aa) -> AStar (ae aa)
       | Cabs.UNARY(Cabs.ADDROF, aa) -> AAddrOf (ae aa)
       | Cabs.MEMBEROFPTR (aa1, s) -> ADot(AStar(ae aa1), s)
@@ -4604,13 +4576,13 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
     in
     let fold_attrs f el = List.fold_left (fun acc e -> acc @ arg2attrs (f e)) [] el in
     if s = "__attribute__" then (* Just a wrapper for many attributes*)
-      fold_attrs (attrOfExp ~check:true ~foldenum:false) el
+      fold_attrs (attrOfExp ~check:true) el
     else if s = "__blockattribute__" then (* Another wrapper *)
-      fold_attrs (attrOfExp ~check:true ~foldenum:false) el
+      fold_attrs (attrOfExp ~check:true) el
     else if s = "__declspec" then
-      fold_attrs (attrOfExp ~check:false ~foldenum:false) el
+      fold_attrs (attrOfExp ~check:false) el
     else
-      [(check_attribute_name s, List.map (attrOfExp ~check:false ~foldenum:false) el)]
+      [(check_attribute_name s, List.map (attrOfExp ~check:false) el)]
 
 and doAttributes (ghost:bool) (al: Cabs.attribute list) : attributes =
   List.fold_left (fun acc a ->
@@ -5520,16 +5492,10 @@ and doExp local_env
               (new_exp ~loc (Lval lval)) (dropQualifiers vi.vtype)
           | EnvEnum item, _ ->
             let typ = Cil.typeOf item.eival in
-            (*Kernel.debug "Looking for %s got enum %s : %a of type %a"
-              n item.einame Cil_printer.pp_exp item.eival
-              Cil_datatype.Typ.pretty typ; *)
-            if Machine.lower_constants () then
-              finishExp [] (unspecified_chunk empty) item.eival typ
-            else
-              finishExp []
-                (unspecified_chunk empty)
-                (new_exp ~loc (Const (CEnum item)))
-                typ
+            finishExp []
+              (unspecified_chunk empty)
+              (new_exp ~loc (Const (CEnum item)))
+              typ
           | _ -> raise Not_found
         with Not_found -> begin
             if isOldStyleVarArgName n then
@@ -7617,12 +7583,13 @@ and normalize_binop binop action local_env asconst le re what =
 (* bop is always the arithmetic version. Change it to the appropriate pointer
  * version if necessary *)
 and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
+  let mk_expr bop e1 e2 t = new_exp ~loc (BinOp(bop, e1, e2, t)) in
   let doArithmetic () =
     if Ast_types.is_arithmetic t1 && Ast_types.is_arithmetic t2 then begin
       let tres = arithmeticConversion t1 t2 in
       (* Keep the operator since it is arithmetic *)
       tres,
-      optConstFoldBinOp loc false bop
+      mk_expr bop
         (mkCastT ~oldt:t1 ~newt:tres e1)
         (mkCastT ~oldt:t2 ~newt:tres e2)
         tres
@@ -7635,7 +7602,7 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
     let tres = arithmeticConversion t1 t2 in
     (* Keep the operator since it is arithmetic *)
     intType,
-    optConstFoldBinOp loc false bop
+    mk_expr bop
       (mkCastT ~oldt:t1 ~newt:tres e1)
       (mkCastT ~oldt:t2 ~newt:tres e2)
       intType
@@ -7646,7 +7613,7 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
       match tres.tnode with
       | TInt _ ->
         tres,
-        optConstFoldBinOp loc false bop
+        mk_expr bop
           (mkCastT ~oldt:t1 ~newt:tres e1)
           (mkCastT ~oldt:t2 ~newt:tres e2)
           tres
@@ -7674,15 +7641,14 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
       else e1, e2
     in
     intType,
-    optConstFoldBinOp loc false bop e1' e2' intType
+    mk_expr bop e1' e2' intType
   in
   let do_shift e1 t1 e2 t2 =
     match e1.enode with
     | StartOf lv ->
       { e1 with enode = AddrOf (addOffsetLval (Index (e2,NoOffset)) lv) }
     | _ ->
-      optConstFoldBinOp loc false PlusPI e1
-        (mkCastT ~oldt:t2 ~newt:(integralPromotion t2) e2) t1
+      mk_expr PlusPI e1 (mkCastT ~oldt:t2 ~newt:(integralPromotion t2) e2) t1
   in
   match bop with
   | (Mult|Div) -> doArithmetic ()
@@ -7696,7 +7662,7 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
       let t1' = integralPromotion t1 in
       let t2' = integralPromotion t2 in
       t1',
-      optConstFoldBinOp loc false bop
+      mk_expr bop
         (mkCastT ~oldt:t1 ~newt:t1' e1)
         (mkCastT ~oldt:t2 ~newt:t2' e2)
         t1'
@@ -7712,7 +7678,7 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
     t2, do_shift e2 t2 e1 t1
   | MinusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
     t1,
-    optConstFoldBinOp loc false MinusPI e1
+    mk_expr MinusPI e1
       (mkCastT ~oldt:t2 ~newt:(integralPromotion t2) e2) t1
   | MinusA when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
     if areCompatibleTypes (* C99 6.5.6:3 *)
@@ -7720,7 +7686,7 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
         (Ast_types.remove_qualifiers_deep t2)
     then
       Machine.ptrdiff_type (),
-      optConstFoldBinOp loc false MinusPP e1 e2 (Machine.ptrdiff_type ())
+      mk_expr MinusPP e1 e2 (Machine.ptrdiff_type ())
     else Errorloc.abort_context "incompatible types in pointer subtraction"
 
   (* Two special cases for comparisons with the NULL pointer. We are a bit
@@ -7837,7 +7803,7 @@ and doCondExp local_env asconst
          ConditionalSideEffectHook.apply (orig,e));
       ignore (checkBool t e');
       CEExp (add_reads ~ghost e.expr_loc r se,
-             if asconst <> CNoConst || Machine.lower_constants () then
+             if asconst <> CNoConst then
                constFold true e'
              else e')
   in
@@ -10205,9 +10171,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       Kernel.error ~once:true ~current:true
         "Case statement with a non-constant";
     let chunk =
-      caseRangeChunk ~ghost
-        [if Machine.lower_constants () then constFold false e' else e']
-        loc' (doStatement local_env s)
+      caseRangeChunk ~ghost [e'] loc' (doStatement local_env s)
     in
     (* se has no statement, but can contain local variables, in
        particular in the case of a sizeof with side-effects. *)
