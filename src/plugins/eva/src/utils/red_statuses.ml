@@ -101,13 +101,6 @@ let is_red ip =
     not (Callstacks.is_empty callstacks)
   with Not_found -> false
 
-let is_red_in_callstack kinstr ap callstack =
-  try
-    let map = RedStatusesTable.find kinstr in
-    let callstacks = AlarmOrProp.Map.find ap map in
-    Callstacks.mem (Some callstack) callstacks
-  with Not_found -> false
-
 let get_all () =
   let gather kinstr map acc =
     AlarmOrProp.Map.fold

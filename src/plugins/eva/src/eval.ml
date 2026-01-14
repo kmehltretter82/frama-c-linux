@@ -76,31 +76,18 @@ type 'a flagged_value = {
   escaping: bool;
 }
 
-module Flagged_Value = struct
+let pretty_flags fmt value = match value.initialized, value.escaping with
+  | false, true  -> Format.pp_print_string fmt "UNINITIALIZED or ESCAPINGADDR"
+  | false, false -> Format.pp_print_string fmt "UNINITIALIZED"
+  | true, true   -> Format.pp_print_string fmt "ESCAPINGADDR"
+  | true, false  -> Format.pp_print_string fmt "BOTTOM"
 
-  let bottom = {v = `Bottom; initialized=true; escaping=false; }
-  let equal equal v1 v2  =
-    Bottom.equal equal v1.v v2.v &&
-    v1.initialized = v2.initialized && v1.escaping = v2.escaping
-  let join join v1 v2 =
-    { v = Bottom.join join v1.v v2.v;
-      initialized = v1.initialized && v2.initialized;
-      escaping = v1.escaping || v2.escaping }
-
-  let pretty_flags fmt value = match value.initialized, value.escaping with
-    | false, true  -> Format.pp_print_string fmt "UNINITIALIZED or ESCAPINGADDR"
-    | false, false -> Format.pp_print_string fmt "UNINITIALIZED"
-    | true, true   -> Format.pp_print_string fmt "ESCAPINGADDR"
-    | true, false  -> Format.pp_print_string fmt "BOTTOM"
-
-  let pretty pp fmt value = match value.v with
-    | `Bottom -> pretty_flags fmt value
-    | `Value v ->
-      if value.initialized && not value.escaping
-      then pp fmt v
-      else Format.fprintf fmt "%a or %a" pp v pretty_flags value
-
-end
+let pretty_value_with_flags pp fmt value = match value.v with
+  | `Bottom -> pretty_flags fmt value
+  | `Value v ->
+    if value.initialized && not value.escaping
+    then pp fmt v
+    else Format.fprintf fmt "%a or %a" pp v pretty_flags value
 
 (* Data record associated to each evaluated expression. *)
 type ('a, 'origin) record_val = {

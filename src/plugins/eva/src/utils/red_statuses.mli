@@ -18,20 +18,8 @@ val add_red_property: kinstr -> Property.t -> unit
 
 type alarm_or_property = Alarm of Alarms.t | Prop of Property.t
 
-module AlarmOrProp : Datatype.S with type t := alarm_or_property
-
 (* Whether a red status has been emitted for a property in any callstack. *)
 val is_red: Property.t -> bool
-
-(* Whether a red status has been emitted for an alarm or a property at the given
-   kinstr in the given callstack. *)
-val is_red_in_callstack:
-  kinstr -> alarm_or_property -> Callstack.t -> bool
-
-(* Returns the unsorted list of all alarms and properties for which a red status
-   has been emitted during the analysis. Also returns the kinstr of the alarm or
-   property, and the number of callstacks in which is was invalid.*)
-val get_all: unit -> (kinstr * alarm_or_property * int) list
 
 (* If option -eva-report-red-statuses has been set, reports red statuses in
    a csv file. *)

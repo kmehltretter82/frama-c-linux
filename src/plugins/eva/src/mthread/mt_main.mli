@@ -6,8 +6,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Registers a hook called at the end of the Mthread analysis. *)
-val register_analysis_hook: (Mt_thread.analysis_state -> unit) -> unit
-
-(** Apply registered hooks on the current analysis. *)
-val apply_analysis_hooks : unit -> unit
+(** Runs Mthread analysis: nothing is exported. *)

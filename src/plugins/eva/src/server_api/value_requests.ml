@@ -527,7 +527,8 @@ module Proxy(A : Engine_sig.S_with_results) : EvaProxy = struct
     | Status of truth
 
   let pp_result typ fmt = function
-    | Value v -> (Eval.Flagged_Value.pretty (A.Val.pretty_typ (Some typ))) fmt v
+    | Value v ->
+      (Eval.pretty_value_with_flags (A.Val.pretty_typ (Some typ))) fmt v
     | Offsetmap offsm -> pp_offsetmap typ fmt offsm
     | Status truth -> Alarmset.Status.pretty fmt truth
 
