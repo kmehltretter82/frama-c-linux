@@ -46,6 +46,8 @@ let default_taint_namespace = "default"
 (* Custom taint namespaces for secure-flow/non-interference analysis. *)
 let private_taint_namespace = "private"
 let public_taint_namespace = "public"
+let is_private_namespace = String.equal private_taint_namespace
+let is_public_namespace = String.equal public_taint_namespace
 
 
 (* Debug key to also include [assume_stmts] in the output of the
@@ -421,7 +423,7 @@ module TransferSingleTaint = struct
       || Zone.intersects state.locs_control exp_zone
       || LatticeSingleTaint.intersects state lv_indirect_zone
     in
-    if String.equal namespace private_taint_namespace
+    if is_private_namespace namespace
     then warn_assign_interference ~pos ~data_tainted ~ctrl_tainted lv_zone;
     let update tainted locs =
       if tainted
@@ -452,7 +454,7 @@ module TransferSingleTaint = struct
       let to_loc = loc_of_lval valuation in
       let exp_zone = Eva_ast.PreciseDepsOf.zone_of_exp to_loc exp in
       let tainted = LatticeSingleTaint.intersects state exp_zone in
-      if tainted && String.equal namespace private_taint_namespace
+      if tainted && is_private_namespace namespace
       then warn_assume_interference ~pos exp_zone;
       if not state.dependent_call && tainted
       then { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
@@ -934,11 +936,11 @@ let is_tainted_name = function
   | _ -> false
 
 let find_security_status ~positive term =
-  let is_public lvar = String.equal public_taint_namespace lvar.lv_name in
-  let is_private lvar = String.equal private_taint_namespace lvar.lv_name in
   match term.term_node with
-  | TLval (TVar lvar, TNoOffset) when is_private lvar -> Some positive
-  | TLval (TVar lvar, TNoOffset) when is_public lvar -> Some (not positive)
+  | TLval (TVar { lv_name }, TNoOffset) when is_private_namespace lv_name ->
+    Some positive
+  | TLval (TVar { lv_name }, TNoOffset) when is_public_namespace lv_name ->
+    Some (not positive)
   | _ -> None
 
 (* Returns information [taint_predicate] if [predicate] is a \tainted predicate.
