@@ -58,6 +58,11 @@ val pp_real : printer (** ℝ *)
 val pp_pi : printer (** π *)
 val pp_lambda : printer (** λ *)
 val pp_mu : printer (** µ *)
+val pp_theta : printer (** θ *)
+
+module Capital : sig
+  val pp_theta : printer (** Θ *)
+end
 
 (* Other symbols. *)
 
@@ -66,6 +71,7 @@ val pp_maps_to : printer (** ↦ @since Frama-C+dev *)
 
 val pp_plus_minus : printer (** ± *)
 val pp_times : printer (** × *)
+val pp_multiplication_dot : printer (** ⋅ *)
 
 val pp_ellipsis : printer (** … *)
 

@@ -61,6 +61,11 @@ let pp_real =    pretty Utf8_logic.real "real"
 let pp_pi = pretty Utf8_logic.pi "\\pi"
 let pp_lambda = pretty "λ" "\\lambda"
 let pp_mu = pretty "µ" "\\mu"
+let pp_theta = pretty "θ" "\\theta"
+
+module Capital = struct
+  let pp_theta = pretty "Θ" "\\Theta"
+end
 
 (* Other symbols. *)
 
@@ -68,6 +73,7 @@ let pp_right_arrow = pretty "→" "->"
 let pp_maps_to = pretty "↦" "->"
 let pp_plus_minus = pretty "±" "+/-"
 let pp_times = pretty "×" "x"
+let pp_multiplication_dot = pretty "⋅" "."
 let pp_ellipsis = pretty "…" "..."
 
 let pp_lceil = pretty "⌈" "ceil("
