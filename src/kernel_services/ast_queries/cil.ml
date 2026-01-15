@@ -5737,15 +5737,20 @@ and mkBinOp ~loc op e1 e2 =
   let t2 = typeOf e2 in
   let machdep = false in
   let error msg = Format.kasprintf Result.error msg in
+  let constFoldBinOp bop e1 e2 t =
+    if Kernel.Constfold.get () then
+      Ok (constFoldBinOp ~loc machdep bop e1 e2 t)
+    else
+      Ok (new_exp ~loc (BinOp(bop, e1, e2, t)))
+  in
   let check_make_expr ?res ~check name =
     if check t1 && check t2 then
       let t = arithmeticConversion t1 t2 in
       let tres = Option.value ~default:t res in
-      constFoldBinOp ~loc machdep op
+      constFoldBinOp op
         (mkCastT ~oldt:t1 ~newt:t e1)
         (mkCastT ~oldt:t2 ~newt:t e2)
         tres
-      |> Result.ok
     else
       error
         "%a operator on %s type(s) %a and %a"
@@ -5768,8 +5773,7 @@ and mkBinOp ~loc op e1 e2 =
       else
         e1, e2
     in
-    let e = constFoldBinOp ~loc machdep op e1 e2 Cil_const.intType in
-    Ok e
+    constFoldBinOp op e1 e2 Cil_const.intType
   in
   let check_scalar op e t =
     if not (is_scalar t) then
@@ -5781,8 +5785,8 @@ and mkBinOp ~loc op e1 e2 =
   | Mod  | BAnd | BOr | BXor -> doIntegralArithmetic ()
   | LAnd | LOr ->
     let* () = check_scalar "logical operator" e1 t1 in
-    let+ () = check_scalar "logical operator" e2 t2 in
-    constFoldBinOp ~loc machdep op e1 e2 Cil_const.intType
+    let* () = check_scalar "logical operator" e2 t2 in
+    constFoldBinOp op e1 e2 Cil_const.intType
   | Shiftlt | Shiftrt -> (* ISO 6.5.7. Only integral promotions. The result
                           * has the same type as the left hand side *)
     if Machine.msvcMode () then
@@ -5791,14 +5795,13 @@ and mkBinOp ~loc op e1 e2 =
     else
       let t1' = integralPromotion t1 in
       let t2' = integralPromotion t2 in
-      constFoldBinOp ~loc machdep op
+      constFoldBinOp op
         (mkCastT ~oldt:t1 ~newt:t1' e1)
         (mkCastT ~oldt:t2 ~newt:t2' e2)
         t1'
-      |> Result.ok
   | PlusA  | MinusA -> doArithmetic ()
   | PlusPI | MinusPI when is_ptr t1 && is_integral t2 ->
-    Ok (constFoldBinOp ~loc machdep op e1 e2 t1)
+    constFoldBinOp op e1 e2 t1
   | MinusPP when is_ptr t1 && is_ptr t2 ->
     (* ISO C11 6.5.6§3 and 6.5.6§9 : Both types should be compatible and the
        result is of type ptrdiff_t. *)
@@ -5808,9 +5811,8 @@ and mkBinOp ~loc op e1 e2 =
         (Ast_types.remove_qualifiers_deep t2)
     in
     if compatible then
-      constFoldBinOp ~loc machdep op e1 (mkCastT ~oldt:t2 ~newt:t1 e2)
+      constFoldBinOp op e1 (mkCastT ~oldt:t2 ~newt:t1 e2)
         (Machine.ptrdiff_type ())
-      |> Result.ok
     else
       error
         "@[incompatible types in pointer subtraction@ \
