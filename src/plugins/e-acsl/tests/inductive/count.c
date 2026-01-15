@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: taken from https://github.com/fraunhoferfokus/acsl-by-example/
    COMMENT: works thanks to Here-inlining
-   STDOPT: +"-eva-unroll-recursive-calls 9"
+   STDOPT: +"-eva-unroll-recursive-calls 0"
 */
 /* run.config_dev
    MACRO: ROOT_EACSL_GCC_OPTS_EXT --no-assert-print-data
