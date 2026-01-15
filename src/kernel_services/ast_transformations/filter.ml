@@ -188,6 +188,16 @@ end = struct
       | TryFinally _ | TryExcept _ | TryCatch _ -> (* TODO ? *) ()
     in List.iter (rm_aux cont break) blk.bstmts
 
+  let rm_cases cases =
+    let is_not_a_case_label = function
+      | Default _ | Case _ -> false
+      | Label _ -> true
+    in
+    let rm_one case =
+      case.labels <- List.filter is_not_a_case_label case.labels
+    in
+    List.iter rm_one cases
+
   (** filter [params] according to [ff] input visibility.
    * Can be used to slice both the parameters, the call arguments,
    * and the param types.
@@ -528,9 +538,10 @@ end = struct
            let belse = Cil.visitCilBlock (self:>Cil.cilVisitor) belse in
            let s_orig = Visitor_behavior.Get_orig.stmt self#behavior s in
            optim_if finfo keep_stmts s_orig s None bthen belse loc
-         | Switch (_exp, body, _, loc) ->
+         | Switch (_exp, body, cases, loc) ->
            (* the switch is invisible : it can be translated into a block. *)
            rm_break_cont ~cont:false (self#fresh_label) finfo body;
+           rm_cases cases;
            let block =  Cil.visitCilBlock (self:>Cil.cilVisitor) body in
            (mk_new_block keep_stmts s block loc)
          | Loop (_, body, loc, _lcont, _lbreak) ->
