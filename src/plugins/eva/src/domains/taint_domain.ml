@@ -46,24 +46,9 @@ let default_taint_namespace = "default"
 (* Custom taint namespaces for secure-flow/non-interference analysis. *)
 let private_taint_namespace = "private"
 let public_taint_namespace = "public"
+let is_private_namespace = String.equal private_taint_namespace
+let is_public_namespace = String.equal public_taint_namespace
 
-
-type taint_state = {
-  (* Over-approximation of the memory locations that are tainted due to a data
-     dependency. *)
-  locs_data: Zone.t;
-  (* Over-approximation of the memory locations that are tainted due to a
-     control dependency. *)
-  locs_control: Zone.t;
-  (* Set of assume statements over a tainted expression. This set is needed to
-     implement control-dependency: all left-values appearing in statements whose
-     evaluation depends on at least one of the assume expressions is to be
-     tainted. This set is restricted to statements of the current function. *)
-  assume_stmts: Stmt.Set.t;
-  (* Whether the current call depends on a tainted assume statement: if true,
-     all assignments in the current call should be control tainted. *)
-  dependent_call: bool;
-}
 
 (* Debug key to also include [assume_stmts] in the output of the
    Frama_C_domain_show_each directive. *)
@@ -73,6 +58,10 @@ let dkey_debug = Self.register_category "d-taint-debug"
 let wkey =
   Self.register_warn_category "taint"
     ~help:"warnings related to the taint analysis from \"-eva-domains taint\""
+
+(* -------------------------------------------------------------------------- *)
+(*             Checks and warnings related to -eva-secure-flow                *)
+(* -------------------------------------------------------------------------- *)
 
 let _wkey_secure_flow =
   Self.register_warn_category "secure-flow"
@@ -93,6 +82,54 @@ let wkey_secure_flow_assume =
     ~help:"warnings related to interference on conditions when \
            performing secure-flow analysis from \"-eva-domains taint\""
 
+let filter_public_zone =
+  let base_is_public base =
+    match Base.typeof base with
+    | None -> false
+    | Some typ -> Ast_types.has_qualifier public_taint_namespace typ
+  in
+  Zone.filter_base base_is_public
+
+let warn_assign_interference ~pos ~data_tainted ~ctrl_tainted zone =
+  if secure_flow_analysis () && (data_tainted || ctrl_tainted) then
+    let zone = filter_public_zone zone in
+    if not (Zone.is_bottom zone) then
+      let source = fst (Position.loc pos) in
+      let warn wkey kind zone =
+        Self.warning ~wkey ~source ~once:true
+          "@[<hv 2>%s non-interference violation on@ @[<hov>{%a}@]"
+          kind Zone.pretty zone
+      in
+      if data_tainted then warn wkey_secure_flow_direct "direct" zone;
+      if ctrl_tainted then warn wkey_secure_flow_indirect "indirect" zone
+
+let warn_assume_interference ~pos zone =
+  if secure_flow_analysis () then
+    let source = fst (Position.loc pos) in
+    Self.warning ~wkey:wkey_secure_flow_assume ~source ~once:true
+      "@[<hv 2>non-interference violation on condition involving@ @[<hov>{%a}@]"
+      Zone.pretty zone
+
+(* -------------------------------------------------------------------------- *)
+(*                          Lattice for one taint                             *)
+(* -------------------------------------------------------------------------- *)
+
+type taint_state = {
+  (* Over-approximation of the memory locations that are tainted due to a data
+     dependency. *)
+  locs_data: Zone.t;
+  (* Over-approximation of the memory locations that are tainted due to a
+     control dependency. *)
+  locs_control: Zone.t;
+  (* Set of assume statements over a tainted expression. This set is needed to
+     implement control-dependency: all left-values appearing in statements whose
+     evaluation depends on at least one of the assume expressions is to be
+     tainted. This set is restricted to statements of the current function. *)
+  assume_stmts: Stmt.Set.t;
+  (* Whether the current call depends on a tainted assume statement: if true,
+     all assignments in the current call should be control tainted. *)
+  dependent_call: bool;
+}
 
 module LatticeSingleTaint = struct
 
@@ -205,6 +242,9 @@ module LatticeSingleTaint = struct
 
 end
 
+(* -------------------------------------------------------------------------- *)
+(*                           Multi-taint lattice                              *)
+(* -------------------------------------------------------------------------- *)
 
 module LatticeMultiTaint = struct
 
@@ -294,6 +334,10 @@ module LatticeMultiTaint = struct
 
 end
 
+(* -------------------------------------------------------------------------- *)
+(*                         Propagation of one taint                           *)
+(* -------------------------------------------------------------------------- *)
+
 module TransferSingleTaint = struct
 
   let loc_of_lval valuation lv = valuation.Abstract_domain.find_loc_def lv
@@ -352,28 +396,6 @@ module TransferSingleTaint = struct
       | `Value v ->
         if Cvalue.V.cardinal_zero_or_one v then bottom_loc else to_loc lval
 
-  let warn_on_assign_interference ~wkey ~pos zone =
-    let base_has_attribute base =
-      match Base.typeof base with
-      | None -> false
-      | Some typ -> Ast_types.has_qualifier public_taint_namespace typ
-    in
-    let has_tainted_public_base =
-      try Zone.fold_bases (fun b acc -> acc || base_has_attribute b) zone false
-      with Abstract_interp.Error_Top -> true
-    in
-    if has_tainted_public_base then
-      let source = fst (Position.loc pos) in
-      let kind =
-        if Self.wkey_name wkey = Self.wkey_name wkey_secure_flow_direct then
-          "direct"
-        else
-          "indirect"
-      in
-      Self.warning ~wkey ~source ~once:true
-        "@[<v>@[<hv 2>%s non-interference violation on@ @[<hov>{%a}@]@]"
-        kind Zone.pretty zone
-
   (* Propagates data- and control-taints for an assignment [lval = exp]. *)
   let assign_aux ~namespace ~pos lval exp v to_loc state =
     let lv_zone, lv_indirect_zone, singleton = compute_lval_zones to_loc lval in
@@ -401,69 +423,42 @@ module TransferSingleTaint = struct
       || Zone.intersects state.locs_control exp_zone
       || LatticeSingleTaint.intersects state lv_indirect_zone
     in
-    let update ~warn tainted locs =
+    if is_private_namespace namespace
+    then warn_assign_interference ~pos ~data_tainted ~ctrl_tainted lv_zone;
+    let update tainted locs =
       if tainted
-      then begin
-        if secure_flow_analysis ()
-        && String.equal namespace private_taint_namespace then
-          warn ~pos lv_zone;
-        Zone.join locs lv_zone
-      end
+      then Zone.join locs lv_zone
       else if singleton
       then Zone.diff locs lv_zone
       else locs
     in
-    let locs_data =
-      update ~warn:(warn_on_assign_interference ~wkey:wkey_secure_flow_direct)
-        data_tainted state.locs_data
-    in
-    let locs_control =
-      update ~warn:(warn_on_assign_interference ~wkey:wkey_secure_flow_indirect)
-        ctrl_tainted state.locs_control
-    in
-    { state with locs_data; locs_control; }
+    { state with locs_data = update data_tainted state.locs_data;
+                 locs_control = update ctrl_tainted state.locs_control; }
 
   let assign ~namespace ~pos lv exp _v valuation state =
-    let state =
-      match Position.stmt pos with
-      | None ->
-        state
-      | Some stmt ->
-        let state = filter_active_tainted_assumes stmt state in
-        let to_loc = loc_of_lval valuation in
-        assign_aux ~namespace ~pos lv.Eval.lval exp valuation to_loc state
-    in
-    `Value state
-
-  let warn_on_assume_interference ~pos zone =
-    let source = fst (Position.loc pos) in
-    Self.warning ~wkey:wkey_secure_flow_assume ~source ~once:true
-      "@[<v>@[<hv 2>non-interference violation on condition \
-       involving@ @[<hov>{%a}@]@]"
-      Zone.pretty zone
+    match Position.stmt pos with
+    | None ->
+      state
+    | Some stmt ->
+      let state = filter_active_tainted_assumes stmt state in
+      let to_loc = loc_of_lval valuation in
+      assign_aux ~namespace ~pos lv.Eval.lval exp valuation to_loc state
 
   let assume ~namespace ~pos exp _b valuation state =
-    let state =
-      match Position.stmt pos with
-      | None ->
-        state
-      | Some stmt ->
-        let state = filter_active_tainted_assumes stmt state in
-        (* Add [stmt] as assume statement in [state] as soon as [exp] is tainted. *)
-        let to_loc = loc_of_lval valuation in
-        let exp_zone = Eva_ast.PreciseDepsOf.zone_of_exp to_loc exp in
-        if LatticeSingleTaint.intersects state exp_zone
-        then begin
-          if secure_flow_analysis ()
-          && String.equal namespace private_taint_namespace then
-            warn_on_assume_interference ~pos exp_zone;
-          if not state.dependent_call then
-            { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
-          else state
-        end
-        else state
-    in
-    `Value state
+    match Position.stmt pos with
+    | None ->
+      state
+    | Some stmt ->
+      let state = filter_active_tainted_assumes stmt state in
+      (* Add [stmt] as assume statement in [state] as soon as [exp] is tainted. *)
+      let to_loc = loc_of_lval valuation in
+      let exp_zone = Eva_ast.PreciseDepsOf.zone_of_exp to_loc exp in
+      let tainted = LatticeSingleTaint.intersects state exp_zone in
+      if tainted && is_private_namespace namespace
+      then warn_assume_interference ~pos exp_zone;
+      if tainted && not state.dependent_call
+      then { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
+      else state
 
   let start_call ~namespace ~pos call _recursion valuation state =
     let stmt = Position.Local.stmt pos in
@@ -472,17 +467,14 @@ module TransferSingleTaint = struct
       state.dependent_call || not (Stmt.Set.is_empty state.assume_stmts)
     in
     let state = { state with assume_stmts = Stmt.Set.empty; dependent_call } in
-    let state =
-      (* Add tainted actual parameters in [state]. *)
-      let to_loc = loc_of_lval valuation in
-      List.fold_left
-        (fun s { Eval.concrete; formal; _ } ->
-           assign_aux ~namespace ~pos:(Position.of_local pos)
-             (Eva_ast.Build.var formal) concrete valuation to_loc s)
-        state
-        call.Eval.arguments
-    in
-    `Value state
+    (* Add tainted actual parameters in [state]. *)
+    let to_loc = loc_of_lval valuation in
+    List.fold_left
+      (fun s { Eval.concrete; formal; _ } ->
+         assign_aux ~namespace ~pos:(Position.of_local pos)
+           (Eva_ast.Build.var formal) concrete valuation to_loc s)
+      state
+      call.Eval.arguments
 
   let get_formats_number s =
     let split = String.split_on_char '%' s in
@@ -591,11 +583,11 @@ module TransferSingleTaint = struct
     Format.fprintf fmt "%B" (LatticeSingleTaint.intersects state exp_zone)
 end
 
-module TransferMultiTaint = struct
+(* -------------------------------------------------------------------------- *)
+(*                            Multi-taint domain                              *)
+(* -------------------------------------------------------------------------- *)
 
-  let get_value v =
-    match v with
-    | `Value res -> res
+module TransferMultiTaint = struct
 
   let update _valuation state_map = `Value state_map
 
@@ -604,7 +596,6 @@ module TransferMultiTaint = struct
       let open Lattice_bounds.Top.Operators in
       let+ state_map = state in
       let assign_per_taint namespace state =
-        get_value @@
         TransferSingleTaint.assign ~namespace ~pos lv exp v valuation state
       in
       LatticeMultiTaint.mapi assign_per_taint state_map)
@@ -614,7 +605,6 @@ module TransferMultiTaint = struct
       let open Lattice_bounds.Top.Operators in
       let+ state_map = state in
       let assume_per_taint namespace state =
-        get_value @@
         TransferSingleTaint.assume ~namespace ~pos exp b valuation state
       in
       LatticeMultiTaint.mapi assume_per_taint state_map)
@@ -623,10 +613,8 @@ module TransferMultiTaint = struct
     `Value (
       let open Lattice_bounds.Top.Operators in
       let+ state_map = state in
-      let start_call_per_taint namespace state =
-        get_value @@
-        TransferSingleTaint.start_call ~namespace ~pos
-          call recursion valuation state
+      let start_call_per_taint namespace =
+        TransferSingleTaint.start_call ~namespace ~pos call recursion valuation
       in
       LatticeMultiTaint.mapi start_call_per_taint state_map)
 
@@ -747,23 +735,19 @@ module Domain = struct
     if not (secure_flow_analysis ()) then
       state
     else
-      let open Lattice_bounds.Top.Operators in
-      let+ state_map = state in
       let namespace = private_taint_namespace in
-      let taint_state =
-        LatticeMultiTaint.find_or_empty namespace state_map
-      in
-      let locs_data =
-        List.fold_left (fun locs_data vi ->
-            if Ast_types.has_qualifier namespace vi.vtype then
-              let vi_zone = Locations.zone_of_varinfo vi in
-              Zone.join locs_data vi_zone
-            else
-              locs_data)
-          taint_state.locs_data vars
-      in
-      let taint_state = { taint_state with locs_data } in
-      LatticeMultiTaint.add namespace taint_state state_map
+      let is_private vi = Ast_types.has_qualifier namespace vi.vtype in
+      match List.filter is_private vars with
+      | [] -> state
+      | private_vars ->
+        let var_zones = List.map Locations.zone_of_varinfo private_vars in
+        let private_zone = List.fold_left Zone.join Zone.bottom var_zones in
+        let open Lattice_bounds.Top.Operators in
+        let+ state_map = state in
+        let taint_state = LatticeMultiTaint.find_or_empty namespace state_map in
+        let locs_data = Zone.join taint_state.locs_data private_zone in
+        let taint_state = { taint_state with locs_data } in
+        LatticeMultiTaint.add namespace taint_state state_map
 
   let remove_bases_per_taint bases state =
     let remove = Zone.filter_base (fun b -> not (Base.Hptset.mem b bases)) in
@@ -820,6 +804,9 @@ let registered =
   Abstractions.Domain.register ~name ~descr
     ~experimental:true ~auto_enable (module Domain)
 
+(* -------------------------------------------------------------------------- *)
+(*                        Register taint annotations                          *)
+(* -------------------------------------------------------------------------- *)
 
 exception Parse_error of string option
 
@@ -851,18 +838,19 @@ let () =
     a_names
 
 (* Registers ACSL logic function security_status. *)
-let lf_security_status_name = "security_status"
+let security_status_lf_name = "security_status"
+let is_security_status = String.equal security_status_lf_name
 let () =
-  let security_status_logic_function =
-    { bl_name = lf_security_status_name;
+  let security_status_lf =
+    { bl_name = security_status_lf_name;
       bl_labels = [];
       bl_params = ["x"];
       bl_type = Some (Ctype Cil_const.intType);
       bl_profile = [("x", Lvar "x")];
     }
   in
-  if not (Logic_env.is_logic_function lf_security_status_name)
-  then Logic_builtin.register security_status_logic_function
+  if not (Logic_env.is_logic_function security_status_lf_name)
+  then Logic_builtin.register security_status_lf
 
 (* Registers ACSL logic constants public/private. *)
 let () =
@@ -928,10 +916,55 @@ let () =
   Acsl_extension.register_code_annot_next_stmt ~plugin:"eva" "taint"
     (typer `Pre) false
 
+(* -------------------------------------------------------------------------- *)
+(*                     Interpretation of taint annotations                    *)
+(* -------------------------------------------------------------------------- *)
+
+type taint_predicate =
+  { namespaces: string list; (* List of taint namespaces. *)
+    name: string; (* \tainted, \tainted_directly or \tainted_indirectly *)
+    arg: term; (* The predicate is applied to this term. *)
+    positive: bool; (* If false, negation of the predicate. *)
+  }
+
 (* The taint namespace of a term is stored as its term name.
    If no term name is present, the term namespace defaults to "default". *)
 let term_taint_namespaces term =
   if term.term_name = [] then [ default_taint_namespace ] else term.term_name
+
+let is_tainted_name = function
+  | "\\tainted" | "\\tainted_directly" | "\\tainted_indirectly" -> true
+  | _ -> false
+
+let find_security_status ~positive term =
+  match term.term_node with
+  | TLval (TVar { lv_name }, TNoOffset) when is_private_namespace lv_name ->
+    Some positive
+  | TLval (TVar { lv_name }, TNoOffset) when is_public_namespace lv_name ->
+    Some (not positive)
+  | _ -> None
+
+(* Returns a [taint_predicate] if [predicate] is a \tainted predicate.
+   Relations such as "security_status(arg) = private" are considered as a
+   \tainted(private:arg) predicate. Returns None if the [predicate] cannot
+   be interpreted as a \tainted predicate. *)
+let find_tainted_predicate ?(positive=true) predicate =
+  match predicate.pred_content with
+  | Papp ({l_var_info = { lv_name }}, _, [arg]) when is_tainted_name lv_name ->
+    let namespaces = term_taint_namespaces arg in
+    Some { namespaces; name = lv_name; arg; positive }
+  | Prel ((Req | Rneq as op), {term_node = Tapp (f, _, [arg])}, t)
+  | Prel ((Req | Rneq as op), t, {term_node = Tapp (f, _, [arg])}) ->
+    if is_security_status f.l_var_info.lv_name then
+      let open Option.Operators in
+      let+ status = find_security_status ~positive t in
+      let positive = if op = Rneq then not status else status in
+      let namespaces = [ private_taint_namespace ] in
+      let name = "\\tainted" in
+      { namespaces; name; arg; positive }
+    else None
+  | _ -> None
+
 
 (* Interpretation of logic by the taint domain, using the cvalue domain. *)
 module TaintLogic = struct
@@ -958,29 +991,28 @@ module TaintLogic = struct
     | Some _ as x -> x
     | None -> eval_term_deps cvalue_env term
 
-  let reduce_by_taint_predicate cvalue_env state predicate_name term positive =
-    match eval_term_zone cvalue_env term with
+  let reduce_by_taint_predicate cvalue_env state taint_predicate =
+    match eval_term_zone cvalue_env taint_predicate.arg with
     | None -> state
     | Some (under, _over) ->
-      let zone_op = if positive then Zone.join else Zone.diff in
-      match predicate_name with
-      | "\\tainted" ->
-        { state with locs_data = zone_op state.locs_data under;
-                     locs_control = zone_op state.locs_control under; }
-      | "\\tainted_directly" ->
-        { state with locs_data = zone_op state.locs_data under }
-      | "\\tainted_indirectly" ->
-        { state with locs_control = zone_op state.locs_control under }
-      | _ -> state
-
-  let reduce_by_security_status_predicate cvalue_env state term positive =
-    let open Lattice_bounds.Top.Operators in
-    let+ state_map = state in
-    LatticeMultiTaint.mapi (fun key state ->
-        if String.equal key private_taint_namespace then
-          reduce_by_taint_predicate cvalue_env state "\\tainted" term positive
-        else
-          state) state_map
+      let zone_op = if taint_predicate.positive then Zone.join else Zone.diff in
+      let reduce state =
+        match taint_predicate.name with
+        | "\\tainted" ->
+          { state with locs_data = zone_op state.locs_data under;
+                       locs_control = zone_op state.locs_control under; }
+        | "\\tainted_directly" ->
+          { state with locs_data = zone_op state.locs_data under }
+        | "\\tainted_indirectly" ->
+          { state with locs_control = zone_op state.locs_control under }
+        | _ -> state
+      in
+      let open Lattice_bounds.Top.Operators in
+      let+ state_map = state in
+      let should_reduce name = List.mem name taint_predicate.namespaces in
+      LatticeMultiTaint.mapi
+        (fun name state -> if should_reduce name then reduce state else state)
+        state_map
 
   let rec reduce_by_predicate cvalue_env state predicate positive =
     match positive, predicate.pred_content with
@@ -994,39 +1026,10 @@ module TaintLogic = struct
       let state2 = reduce_by_predicate cvalue_env state p2 positive in
       join state1 state2
     | _, Pnot p -> reduce_by_predicate cvalue_env state p (not positive)
-    | _, Papp ({l_var_info = {lv_name}}, _labels, [arg]) ->
-      begin
-        match lv_name with
-        | "\\tainted" | "\\tainted_directly" | "\\tainted_indirectly" ->
-          let open Lattice_bounds.Top.Operators in
-          let+ state_map = state in
-          let taint_names = term_taint_namespaces arg in
-          LatticeMultiTaint.mapi (fun key state ->
-              if List.mem key taint_names then
-                reduce_by_taint_predicate cvalue_env state lv_name arg positive
-              else
-                state) state_map
-        | _ -> state
-      end
-    | _, Prel (Rneq, t1, t2)->
-      let p = Logic_const.unnamed ~loc:predicate.pred_loc (Prel (Req, t1, t2)) in
-      reduce_by_predicate cvalue_env state p (not positive)
-    | _, (Prel (Req, {term_node = Tapp (f, _, [arg])}, t)
-         | Prel (Req, t, {term_node = Tapp (f, _, [arg])})) ->
-      if secure_flow_analysis () &&
-         String.equal f.l_var_info.lv_name lf_security_status_name then
-        begin
-          match t.term_node with
-          | TLval (TVar {lv_name}, TNoOffset)
-            when String.equal lv_name public_taint_namespace ->
-            reduce_by_security_status_predicate cvalue_env state arg (not positive)
-          | TLval (TVar {lv_name}, TNoOffset)
-            when String.equal lv_name private_taint_namespace ->
-            reduce_by_security_status_predicate cvalue_env state arg positive
-          | _ -> state
-        end
-      else state
-    | _ -> state
+    | _ ->
+      match find_tainted_predicate ~positive predicate with
+      | Some taint_pred -> reduce_by_taint_predicate cvalue_env state taint_pred
+      | None -> state
 
   let evaluate_taint_term cvalue_env zone term =
     match eval_term_zone cvalue_env term with
@@ -1036,68 +1039,27 @@ module TaintLogic = struct
       then Alarmset.Unknown
       else Alarmset.False
 
-  let evaluate_taint_predicate cvalue_env state predicate_name term =
-    let state =
-      match state with
-      | `Top -> LatticeSingleTaint.top
-      | `Value state_map ->
-        let taint_names = term_taint_namespaces term in
-        let states_list =
-          List.map
-            (fun key -> LatticeMultiTaint.find_or_empty key state_map)
-            taint_names
-        in
-        List.fold_left LatticeSingleTaint.join
-          LatticeSingleTaint.empty states_list
-    in
-    let zone =
-      match predicate_name with
-      | "\\tainted_directly" -> state.locs_data
-      | "\\tainted_indirectly" -> state.locs_control
-      | "\\tainted" | _ -> Zone.join state.locs_data state.locs_control
-    in
-    evaluate_taint_term cvalue_env zone term
-
-  let evaluate_security_status_predicate cvalue_env state arg t =
-    let state =
-      match state with
-      | `Top ->
-        LatticeSingleTaint.top
-      | `Value state_map ->
-        LatticeMultiTaint.find_or_empty private_taint_namespace state_map
-    in
-    let zone = Zone.join state.locs_data state.locs_control in
-    match t.term_node with
-    | TLval (TVar {lv_name}, TNoOffset)
-      when String.equal lv_name private_taint_namespace ->
-      evaluate_taint_term cvalue_env zone arg
-    | TLval (TVar {lv_name}, TNoOffset)
-      when String.equal lv_name public_taint_namespace ->
-      Abstract_interp.inv_truth @@ evaluate_taint_term cvalue_env zone arg
-    | _ -> Unknown
+  let evaluate_taint_predicate cvalue_env state predicate : Alarmset.status =
+    match state with
+    | `Top -> Unknown
+    | `Value state_map ->
+      let get_zone state =
+        match predicate.name with
+        | "\\tainted_directly" -> state.locs_data
+        | "\\tainted_indirectly" -> state.locs_control
+        | "\\tainted" | _ -> Zone.join state.locs_data state.locs_control
+      in
+      let add_zone acc namespace =
+        let state = LatticeMultiTaint.find_or_empty namespace state_map in
+        Zone.join acc (get_zone state)
+      in
+      let zone = List.fold_left add_zone Zone.bottom predicate.namespaces in
+      let truth = evaluate_taint_term cvalue_env zone predicate.arg in
+      if predicate.positive then truth else Abstract_interp.inv_truth truth
 
   let evaluate_predicate cvalue_env state predicate =
-    let rec evaluate predicate =
+    let rec evaluate predicate : Alarmset.status =
       match predicate.pred_content with
-      | Papp ({l_var_info = {lv_name}}, _labels, [arg]) ->
-        begin
-          match lv_name with
-          | "\\tainted" | "\\tainted_directly" | "\\tainted_indirectly" ->
-            evaluate_taint_predicate cvalue_env state lv_name arg
-          | _ -> Unknown
-        end
-      | Prel (Req | Rneq as rop, {term_node = Tapp (f, _, [arg])}, t)
-      | Prel (Req | Rneq as rop, t, {term_node = Tapp (f, _, [arg])}) ->
-        if secure_flow_analysis () &&
-           String.equal f.l_var_info.lv_name lf_security_status_name then
-          let op_truth =
-            match rop with
-            | Req -> Fun.id
-            | Rneq -> Abstract_interp.inv_truth
-            | _ -> assert false
-          in
-          op_truth @@ evaluate_security_status_predicate cvalue_env state arg t
-        else Unknown
       | Ptrue -> True
       | Pfalse -> False
       | Pand (p1, p2) ->
@@ -1115,7 +1077,10 @@ module TaintLogic = struct
           | _ -> Unknown
         end
       | Pnot p -> Abstract_interp.inv_truth (evaluate p)
-      | _ -> Unknown
+      | _ ->
+        match find_tainted_predicate predicate with
+        | Some pred -> evaluate_taint_predicate cvalue_env state pred
+        | None -> Unknown
     in
     evaluate predicate
 
@@ -1208,6 +1173,9 @@ let interpret_taint_logic
 
 let () = Abstractions.Hooks.register interpret_taint_logic
 
+(* -------------------------------------------------------------------------- *)
+(*                                   API                                      *)
+(* -------------------------------------------------------------------------- *)
 
 type taint = Direct | Indirect | Untainted
 
