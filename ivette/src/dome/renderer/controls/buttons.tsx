@@ -38,28 +38,18 @@ const TRIGGER = (onClick?: () => void) => (evt?: EVENT) => {
 // --- Button
 // --------------------------------------------------------------------------
 
-const VISIBLE: React.CSSProperties = { visibility: 'visible' };
-const HIDDEN: React.CSSProperties = { visibility: 'hidden' };
-
 interface LABELprops {
   disabled: boolean;
   label: string;
 }
 
-const LABEL = ({ disabled, label }: LABELprops): JSX.Element => (
-  <div className="dome-xButton-label">
-    <div
-      className="dome-xButton-label dome-control-enabled"
-      style={disabled ? HIDDEN : VISIBLE}
-    >{label}
-    </div>
-    <div
-      className="dome-xButton-label dome-control-disabled"
-      style={disabled ? VISIBLE : HIDDEN}
-    >{label}
-    </div>
-  </div>
-);
+const LABEL = ({ disabled, label }: LABELprops): JSX.Element => {
+  const className = classes(
+    'dome-xButton-label',
+    disabled ? 'dome-control-disabled' : 'dome-control-enabled'
+  );
+  return <div className={className}>{ label }</div>;
+};
 
 export type ButtonKind =
   'default' | 'primary' | 'warning' | 'positive' | 'negative';
