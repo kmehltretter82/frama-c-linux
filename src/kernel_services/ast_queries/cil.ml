@@ -5813,6 +5813,12 @@ and mkBinOp ~loc op e1 e2 =
     constFoldBinOp op e1 (mkCast ~newt:t1 e2) Cil_const.intType
   | Eq | Ne when (is_ptr t2 || is_variadic_list t2) && isZero e1 ->
     constFoldBinOp op (mkCast ~newt:t2 e1) e2 Cil_const.intType
+  | Lt | Le | Ge | Gt
+    when Ast_types.is_fun_ptr t1 || Ast_types.is_fun_ptr t2 ->
+    (* ISO 6.5.8§2: both operands should be pointers to qualified or unqualified
+       versions of compatible object types. *)
+    error "operator '%a' on non-object (function) pointer type(s) '%a' and '%a'"
+      !pp_binop_ref op !pp_typ_ref t1 !pp_typ_ref t2
   | Eq | Ne | Lt | Le | Ge | Gt
     when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
     (* We are more lenient than the ISO C here, if two pointers do not
