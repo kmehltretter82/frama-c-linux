@@ -24,9 +24,7 @@ let test =
   fun e1 e2 ->
     incr n;
     let e = Cil.mkBinOp_exn ~loc Cil_types.Eq (e1 ()) (e2 ()) in
-    Format.printf "TEST %d: %a@." !n Exp.pretty e;
-    let e = Cil.mkBinOp_safe_ptr_cmp ~loc Cil_types.Eq (e1()) (e2()) in
-    Format.printf "TEST %d (safe ptr cmp): %a@." !n Exp.pretty e
+    Format.printf "TEST %d: %a@." !n Exp.pretty e
 
 let main () =
   test null null;

@@ -5849,21 +5849,6 @@ and mkBinOp_exn ~loc op e1 e2 =
     Kernel.fatal ~current:true "Cil.mkBinOp: typing expression '%a' failed: %s"
       !pp_exp_ref (dummy_exp(BinOp(op, e1, e2, Cil_const.intType))) msg
 
-let mkBinOp_safe_ptr_cmp ~loc op e1 e2 =
-  let e1, e2 =
-    match op with
-    | (Eq | Ne | Lt | Le | Ge | Gt) ->
-      let t1 = typeOf e1 in
-      let t2 = typeOf e2 in
-      if Ast_types.is_ptr t1 && Ast_types.is_ptr t2
-         && not (isZero e1) && not (isZero e2)
-      then begin
-        mkCast ~force:true ~newt:(Machine.uintptr_type ()) e1,
-        mkCast ~force:true ~newt:(Machine.uintptr_type ()) e2
-      end else e1, e2
-    | _ -> e1, e2
-  in
-  mkBinOp_exn ~loc op e1 e2
 
 type existsAction =
     ExistsTrue                          (* We have found it *)
@@ -6748,3 +6733,7 @@ end
 let typeDeepDropAllAttributes t =
   let vis = new dropAttributes () in
   visitCilType vis t
+
+(* Deprecated *)
+
+let mkBinOp_safe_ptr_cmp = mkBinOp_exn
