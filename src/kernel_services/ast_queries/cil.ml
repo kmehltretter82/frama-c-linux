@@ -5729,7 +5729,6 @@ and mkCastT ?(check=true) ?(force=false) ~(oldt: typ) ~(newt: typ) e =
 and mkCast ?(check=true) ?force ~(newt: typ) e =
   mkCastT ~check ?force ~oldt:(typeOf e) ~newt e
 
-(* TODO: unify this with doBinOp in Cabs2cil. *)
 and mkBinOp ~loc op e1 e2 =
   let open Ast_types in
   let t1 = typeOf e1 in

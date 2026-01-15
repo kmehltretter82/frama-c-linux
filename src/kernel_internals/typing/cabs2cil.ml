@@ -6027,7 +6027,7 @@ and doExp local_env
               List.filter (fun x -> not (Lval.equal x lv)) r
             in
             let tresult, result =
-              doBinOp loc uop' e' t (one ~loc:e'.eloc) intType
+              doBinOp loc uop' e' (one ~loc:e'.eloc)
             in
             finishExp []
               (se' +++
@@ -6060,10 +6060,7 @@ and doExp local_env
             let r' =
               List.filter (fun x -> not (Lval.equal x lv)) r
             in
-            let tresult, opresult =
-              doBinOp loc uop' e' t (one ~loc:e'.eloc)
-                intType
-            in
+            let tresult, opresult = doBinOp loc uop' e' (one ~loc:e'.eloc) in
             let reads, se', result =
               if what <> ADrop && what <> AType then
                 let descr =
@@ -6192,7 +6189,7 @@ and doExp local_env
         check_logical_operand e1 t1;
         check_logical_operand e2 t2;
       end;
-      let tresult, result = doBinOp loc bop' e1' t1 e2' t2 in
+      let tresult, result = doBinOp loc bop' e1' e2' in
       let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
       finishExp (r1 @ r2) ((se0 @@@ se1) @@@ se2) result tresult
 
@@ -6232,9 +6229,9 @@ and doExp local_env
                 authorized_reads =
                   Lval.Set.add lv1 local_env.authorized_reads }
             in
-            let (r2, se2, e2', t2) = doExp local_env CNoConst e2 (AExp None) in
+            let (r2, se2, e2', _t2) = doExp local_env CNoConst e2 (AExp None) in
             let se2 = remove_reads lv1 se2 in
-            let tresult, result = doBinOp loc bop' e1' t1 e2' t2 in
+            let tresult, result = doBinOp loc bop' e1' e2' in
             (* We must cast the result to the type of the lv1, which may be
              * different than t1 if lv1 was a Cast *)
             let _, result' = castTo tresult (typeOfLval lv1) result in
@@ -7580,139 +7577,24 @@ and normalize_binop binop action local_env asconst le re what =
       { local_env with is_paren = local_env.inner_paren; inner_paren = false }
       asconst le what
 
-(* bop is always the arithmetic version. Change it to the appropriate pointer
- * version if necessary *)
-and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
-  let mk_expr bop e1 e2 t = new_exp ~loc (BinOp(bop, e1, e2, t)) in
-  let doArithmetic () =
-    if Ast_types.is_arithmetic t1 && Ast_types.is_arithmetic t2 then begin
-      let tres = arithmeticConversion t1 t2 in
-      (* Keep the operator since it is arithmetic *)
-      tres,
-      mk_expr bop
-        (mkCastT ~oldt:t1 ~newt:tres e1)
-        (mkCastT ~oldt:t2 ~newt:tres e2)
-        tres
-    end else
-      Errorloc.abort_context
-        "%a operator on non-arithmetic type(s) %a and %a"
-        Cil_printer.pp_binop bop Cil_printer.pp_typ t1 Cil_printer.pp_typ t2
+and doBinOp loc (bop: binop) (e1: exp) (e2: exp) =
+  let t1 = Cil.typeOf e1
+  and t2 = Cil.typeOf e2 in
+  let bop, e1, e2 =
+    match bop with
+    | PlusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
+      PlusPI, e1, e2
+    | PlusA when Ast_types.is_ptr t2 && Ast_types.is_integral t1 ->
+      PlusPI, e2, e1
+    | MinusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
+      MinusPI, e1, e2
+    | MinusA  when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
+      MinusPP, e1, e2
+    | _ -> bop, e1, e2
   in
-  let doArithmeticComp () =
-    let tres = arithmeticConversion t1 t2 in
-    (* Keep the operator since it is arithmetic *)
-    intType,
-    mk_expr bop
-      (mkCastT ~oldt:t1 ~newt:tres e1)
-      (mkCastT ~oldt:t2 ~newt:tres e2)
-      intType
-  in
-  let doIntegralArithmetic () =
-    if Ast_types.is_integral t1 && Ast_types.is_integral t2 then begin
-      let tres = Ast_types.unroll (arithmeticConversion t1 t2) in
-      match tres.tnode with
-      | TInt _ ->
-        tres,
-        mk_expr bop
-          (mkCastT ~oldt:t1 ~newt:tres e1)
-          (mkCastT ~oldt:t2 ~newt:tres e2)
-          tres
-      | _ ->
-        Kernel.fatal
-          "conversion of integer types %a and %a returned a non-integer type %a"
-          Cil_printer.pp_typ t1 Cil_printer.pp_typ t2 Cil_printer.pp_typ tres
-    end else
-      Errorloc.abort_context "%a operator on non-integer type(s) %a and %a"
-        Cil_printer.pp_binop bop Cil_printer.pp_typ t1 Cil_printer.pp_typ t2
-  in
-  (* Invariant: t1 and t2 are pointers types *)
-  let pointerComparison e1 t1 e2 t2 =
-    if false then Kernel.debug "%a %a %a %a"
-        Cil_printer.pp_exp e1 Cil_datatype.Typ.pretty t1
-        Cil_printer.pp_exp e2 Cil_datatype.Typ.pretty t2;
-    let t1p = Ast_types.(unroll (direct_pointed_type t1)) in
-    let t2p = Ast_types.(unroll (direct_pointed_type t2)) in
-    (* We are more lenient than the norm here (C99 6.5.8, 6.5.9), and cast
-       arguments with incompatible types to a common type *)
-    let e1', e2' =
-      if not (areCompatibleTypes t1p t2p) then
-        mkCastT ~oldt:t1 ~newt:voidPtrType e1,
-        mkCastT ~oldt:t2 ~newt:voidPtrType e2
-      else e1, e2
-    in
-    intType,
-    mk_expr bop e1' e2' intType
-  in
-  let do_shift e1 t1 e2 t2 =
-    match e1.enode with
-    | StartOf lv ->
-      { e1 with enode = AddrOf (addOffsetLval (Index (e2,NoOffset)) lv) }
-    | _ ->
-      mk_expr PlusPI e1 (mkCastT ~oldt:t2 ~newt:(integralPromotion t2) e2) t1
-  in
-  match bop with
-  | (Mult|Div) -> doArithmetic ()
-  | (Mod|BAnd|BOr|BXor) -> doIntegralArithmetic ()
-  | (Shiftlt|Shiftrt) -> (* ISO 6.5.7. Only integral promotions. The result
-                          * has the same type as the left hand side *)
-    if Machine.msvcMode () then
-      (* MSVC has a bug. We duplicate it here *)
-      doIntegralArithmetic ()
-    else
-      let t1' = integralPromotion t1 in
-      let t2' = integralPromotion t2 in
-      t1',
-      mk_expr bop
-        (mkCastT ~oldt:t1 ~newt:t1' e1)
-        (mkCastT ~oldt:t2 ~newt:t2' e2)
-        t1'
-  | (PlusA|MinusA)
-    when Ast_types.is_arithmetic t1 && Ast_types.is_arithmetic t2 ->
-    doArithmetic ()
-  | (Eq|Ne|Lt|Le|Ge|Gt)
-    when Ast_types.is_arithmetic t1 && Ast_types.is_arithmetic t2 ->
-    doArithmeticComp ()
-  | PlusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
-    t1, do_shift e1 t1 e2 t2
-  | PlusA when Ast_types.is_integral t1 && Ast_types.is_ptr t2 ->
-    t2, do_shift e2 t2 e1 t1
-  | MinusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
-    t1,
-    mk_expr MinusPI e1
-      (mkCastT ~oldt:t2 ~newt:(integralPromotion t2) e2) t1
-  | MinusA when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
-    if areCompatibleTypes (* C99 6.5.6:3 *)
-        (Ast_types.remove_qualifiers_deep t1)
-        (Ast_types.remove_qualifiers_deep t2)
-    then
-      Machine.ptrdiff_type (),
-      mk_expr MinusPP e1 e2 (Machine.ptrdiff_type ())
-    else Errorloc.abort_context "incompatible types in pointer subtraction"
-
-  (* Two special cases for comparisons with the NULL pointer. We are a bit
-     more permissive. *)
-  | (Le|Lt|Ge|Gt|Eq|Ne) when Ast_types.is_ptr t1 && isZero e2 ->
-    pointerComparison e1 t1 (mkCast ~newt:t1 e2) t1
-  | (Le|Lt|Ge|Gt|Eq|Ne) when Ast_types.is_ptr t2 && isZero e1 ->
-    pointerComparison (mkCast ~newt:t2 e1) t2 e2 t2
-
-  | (Le|Lt|Ge|Gt|Eq|Ne) when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
-    pointerComparison e1 t1 e2 t2
-
-  | (Eq|Ne|Le|Lt|Ge|Gt) when
-      Ast_types.is_ptr t1 && Ast_types.is_arithmetic t2 ||
-      Ast_types.is_arithmetic t1 && Ast_types.is_ptr t2 ->
-    Errorloc.abort_context
-      "comparison between pointer and non-pointer: %a"
-      Cil_printer.pp_exp (dummy_exp(BinOp(bop,e1,e2,intType)))
-
-  | _ ->
-    Errorloc.abort_context
-      "unsupported operator for such operands %a \
-       (type of e1: %a, type of e2: %a)"
-      Cil_printer.pp_exp (dummy_exp(BinOp(bop,e1,e2,intType)))
-      Cil_printer.pp_typ t1
-      Cil_printer.pp_typ t2
+  match Cil.mkBinOp ~loc bop e1 e2 with
+  | Ok e -> Cil.typeOf e, e
+  | Error msg -> Errorloc.abort_context "%s" msg
 
 (* Constant fold a conditional. This is because we want to avoid having
  * conditionals in the initializers. So, we try very hard to avoid creating
