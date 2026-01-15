@@ -64,6 +64,10 @@ module Capital : sig
   val pp_theta : printer (** Θ *)
 end
 
+(* Superscript *)
+
+val pp_super_int : Format.formatter -> int -> unit
+
 (* Other symbols. *)
 
 val pp_right_arrow : printer (** → *)
