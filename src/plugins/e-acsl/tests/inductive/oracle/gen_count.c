@@ -67,8 +67,8 @@ int main(void)
   {
     int __gen_e_acsl_CountInd_here_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_CountInd_here_2 = __gen_e_acsl_CountInd_here(ptr,2,2,1);
+    if (! __gen_e_acsl_CountInd_here_2) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"ptr",
                                  (void *)ptr);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
@@ -88,8 +88,8 @@ int main(void)
     int __gen_e_acsl_CountInd_here_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
       {.values = (void *)0};
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_CountInd_here_4 = __gen_e_acsl_CountInd_here(ptr,2,3,0);
+    if (! __gen_e_acsl_CountInd_here_4) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"ptr",
                                  (void *)ptr);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
@@ -110,8 +110,8 @@ int main(void)
     int __gen_e_acsl_CountInd_here_6;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
       {.values = (void *)0};
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_CountInd_here_6 = __gen_e_acsl_CountInd_here(ptr,4,3,1);
+    if (! __gen_e_acsl_CountInd_here_6) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,"ptr",
                                  (void *)ptr);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,
@@ -135,6 +135,7 @@ int main(void)
   return __retres;
 }
 
+/*@ assigns \result; */
 int __gen_e_acsl_CountInd_here(int *arr, int len, int val, int count)
 {
   __e_acsl_mpz_t __gen_e_acsl_CountInd_fun4_here_6;
@@ -151,6 +152,7 @@ int __gen_e_acsl_CountInd_here(int *arr, int len, int val, int count)
   return __retres;
 }
 
+/*@ assigns (*__retres_arg)[0]; */
 void __gen_e_acsl_CountInd_fun4_here(__e_acsl_mpz_t *__retres_arg, int *arr,
                                      int len, int val)
 {
@@ -333,10 +335,10 @@ void __gen_e_acsl_CountInd_fun4_here(__e_acsl_mpz_t *__retres_arg, int *arr,
             {.values = (void *)0};
           __gen_e_acsl_assert_data_8.blocking = 1;
           __gen_e_acsl_assert_data_8.kind = "Assertion";
-          __gen_e_acsl_assert_data_8.pred_txt = "Incomplete axiomatic function";
-          __gen_e_acsl_assert_data_8.file = "<unknown location>";
+          __gen_e_acsl_assert_data_8.pred_txt = "Incomplete inductive function";
+          __gen_e_acsl_assert_data_8.file = "count.c";
           __gen_e_acsl_assert_data_8.fct = "CountInd_fun4_here";
-          __gen_e_acsl_assert_data_8.line = 0;
+          __gen_e_acsl_assert_data_8.line = 16;
           __e_acsl_assert(0,& __gen_e_acsl_assert_data_8);
         }
         __gmpz_init_set_si(__gen_e_acsl__3,0L);

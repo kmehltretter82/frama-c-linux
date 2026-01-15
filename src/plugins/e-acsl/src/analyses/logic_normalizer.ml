@@ -127,8 +127,7 @@ module Here_inliner : sig
 end = struct
 
   let here = BuiltinLabel Here
-  let is_here = (=) here
-  let are_all_here labels = List.length labels > 0 && List.for_all is_here labels
+  let are_all_here ls = List.length ls > 0 && Misc.labels_are_all_here ls
 
   (** substitute occurrences of li_old by li_new; also substitute occurrences
       of li_old's formal parameters by li_new's parameters; li_new does not
@@ -364,10 +363,10 @@ let get_orig_pred = Predicates.original
 let get_term = Terms.derived
 let get_orig_term = Terms.original
 
-let is_unsound_predicate li =
-  Inductive.is_unsound_predicate li ||
+let predicate_is_unsound_if_false li =
+  Inductive.predicate_is_unsound_if_false li ||
   match Here_specialized.original_opt li with
-  | Some orig -> Inductive.is_unsound_predicate orig
+  | Some orig -> Inductive.predicate_is_unsound_if_false orig
   | None -> false
 
 let clear () =

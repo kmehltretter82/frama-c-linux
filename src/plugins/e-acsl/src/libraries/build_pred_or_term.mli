@@ -15,8 +15,8 @@ open Cil_types
 module type S = sig
   type t
 
-  val mk_false : logic_type option -> t
-  val mk_true : logic_type option -> t
+  val mk_false : ?loc:location -> logic_type option -> t
+  val mk_true : ?loc:location -> logic_type option -> t
   val mk_logic_body : t -> logic_body
   val mk_let : ?loc:location -> logic_info -> t -> t
   val mk_if : ?loc:location -> predicate -> t -> t -> t

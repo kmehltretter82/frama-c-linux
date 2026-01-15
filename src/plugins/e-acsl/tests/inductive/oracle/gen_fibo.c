@@ -38,8 +38,8 @@ int main(void)
   {
     int __gen_e_acsl_fibo_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_fibo_2 = __gen_e_acsl_fibo(7,13);
+    if (! __gen_e_acsl_fibo_2) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"fibo(7, 13)",0,
                                  __gen_e_acsl_fibo_2);
     __gen_e_acsl_assert_data.blocking = 1;
@@ -56,8 +56,8 @@ int main(void)
     int __gen_e_acsl_fibo_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_fibo_4 = __gen_e_acsl_fibo(7,12);
+    if (! __gen_e_acsl_fibo_4) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"fibo(7, 12)",
                                  0,__gen_e_acsl_fibo_4);
     __gen_e_acsl_assert_data_3.blocking = 1;
@@ -129,10 +129,10 @@ void __gen_e_acsl_fibo_fun2(__e_acsl_mpz_t *__retres_arg, int i)
             {.values = (void *)0};
           __gen_e_acsl_assert_data_2.blocking = 1;
           __gen_e_acsl_assert_data_2.kind = "Assertion";
-          __gen_e_acsl_assert_data_2.pred_txt = "Incomplete axiomatic function";
-          __gen_e_acsl_assert_data_2.file = "<unknown location>";
+          __gen_e_acsl_assert_data_2.pred_txt = "Incomplete inductive function";
+          __gen_e_acsl_assert_data_2.file = "fibo.c";
           __gen_e_acsl_assert_data_2.fct = "fibo_fun2";
-          __gen_e_acsl_assert_data_2.line = 0;
+          __gen_e_acsl_assert_data_2.line = 9;
           __e_acsl_assert(0,& __gen_e_acsl_assert_data_2);
         }
         __gmpz_init_set_si(__gen_e_acsl__3,0L);

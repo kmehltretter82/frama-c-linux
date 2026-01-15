@@ -1,6 +1,0 @@
-double_bind.c: In function 'main'
-double_bind.c:17: Warning: no sound verdict for Assertion (guess: ok).
-	the considered predicate is:
-	P(2, 3, 1)
-	With values at failure point:
-	- P(2, 3, 1): 1

@@ -68,8 +68,8 @@ int main(void)
   {
     int __gen_e_acsl_sum_here_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_sum_here_2 = __gen_e_acsl_sum_here(ptr,1,2,4,5);
+    if (! __gen_e_acsl_sum_here_2) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"ptr",
                                  (void *)ptr);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
@@ -89,8 +89,8 @@ int main(void)
     int __gen_e_acsl_sum_here_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_sum_here_4 = __gen_e_acsl_sum_here(ptr,1,2,4,4);
+    if (! __gen_e_acsl_sum_here_4) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"ptr",
                                  (void *)ptr);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
@@ -111,6 +111,7 @@ int main(void)
   return __retres;
 }
 
+/*@ assigns \result; */
 int __gen_e_acsl_sum_here(int *arr, int low, int high, int len, int res)
 {
   __e_acsl_mpz_t __gen_e_acsl_sum_fun5_here_4;
@@ -126,6 +127,7 @@ int __gen_e_acsl_sum_here(int *arr, int low, int high, int len, int res)
   return __retres;
 }
 
+/*@ assigns (*__retres_arg)[0]; */
 void __gen_e_acsl_sum_fun5_here(__e_acsl_mpz_t *__retres_arg, int *arr,
                                 int low, int high, int len)
 {
@@ -172,10 +174,10 @@ void __gen_e_acsl_sum_fun5_here(__e_acsl_mpz_t *__retres_arg, int *arr,
           {.values = (void *)0};
         __gen_e_acsl_assert_data_2.blocking = 1;
         __gen_e_acsl_assert_data_2.kind = "Assertion";
-        __gen_e_acsl_assert_data_2.pred_txt = "Incomplete axiomatic function";
-        __gen_e_acsl_assert_data_2.file = "<unknown location>";
+        __gen_e_acsl_assert_data_2.pred_txt = "Incomplete inductive function";
+        __gen_e_acsl_assert_data_2.file = "sum.c";
         __gen_e_acsl_assert_data_2.fct = "sum_fun5_here";
-        __gen_e_acsl_assert_data_2.line = 0;
+        __gen_e_acsl_assert_data_2.line = 17;
         __e_acsl_assert(0,& __gen_e_acsl_assert_data_2);
       }
       __gmpz_init_set_si(__gen_e_acsl__3,0L);

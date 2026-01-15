@@ -216,3 +216,7 @@ let extract_uncoerced_lval e =
     | _ -> None
   in
   aux e
+
+let labels_are_all_here =
+  let is_here l = l = BuiltinLabel Here in
+  fun labels -> List.for_all is_here labels

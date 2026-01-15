@@ -1658,6 +1658,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
   }
 }
 
+/*@ assigns \result; */
 int __gen_e_acsl_valid_or_empty_here(void *s, unsigned long n)
 {
   int __gen_e_acsl_aligned;
@@ -1761,6 +1762,7 @@ int __gen_e_acsl_valid_or_empty_here(void *s, unsigned long n)
   return __gen_e_acsl_and;
 }
 
+/*@ assigns \result; */
 int __gen_e_acsl_valid_read_or_empty_here(void *s, unsigned long n)
 {
   int __gen_e_acsl_aligned;

@@ -33,8 +33,8 @@ int main(void)
   {
     int __gen_e_acsl_power_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_power_2 = __gen_e_acsl_power(2,3,8);
+    if (! __gen_e_acsl_power_2) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"power(2, 3, 8)",
                                  0,__gen_e_acsl_power_2);
     __gen_e_acsl_assert_data.blocking = 1;
@@ -51,8 +51,8 @@ int main(void)
     int __gen_e_acsl_power_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __e_acsl_sound_verdict = 0;
     __gen_e_acsl_power_4 = __gen_e_acsl_power(2,3,7);
+    if (! __gen_e_acsl_power_4) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "power(2, 3, 7)",0,__gen_e_acsl_power_4);
     __gen_e_acsl_assert_data_2.blocking = 1;

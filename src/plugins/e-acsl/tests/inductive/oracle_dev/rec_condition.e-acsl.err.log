@@ -1,6 +1,0 @@
-rec_condition.c: In function 'main'
-rec_condition.c:17: Warning: no sound verdict for Assertion (guess: ok).
-	the considered predicate is:
-	P(0, 2, 1)
-	With values at failure point:
-	- P(0, 2, 1): 1

@@ -76,6 +76,9 @@ include struct (* auxiliary functions *)
 
   let free_vars = Cil.extract_free_logicvars_from_term
   let free_vars_pred = Cil.extract_free_logicvars_from_predicate
+  let loc_of_inductive = function
+    | {l_body = LBinductive ((_, _, _, p) :: _)} -> Some p.pred_loc
+    | _ -> None
 end (* auxiliary functions *)
 
 let is_inductive = function {l_body = LBinductive _; _} -> true | _ -> false
@@ -272,6 +275,7 @@ end = struct
   }
 
   let analyze_mode ~lv_rec p mode =
+    let quantifiers, p = extract_foralls p in
     let is_rec_occurrence li = Logic_var.equal li.l_var_info lv_rec in
     (* fv: free variables that have been used up to the current point *)
     (* they will need to be substituted for in the conclusion unless they have
@@ -334,17 +338,20 @@ end = struct
           in Substs.of_list @@ List.filter_map var_subst pairs
         in
         let fv = add_fv fv args in
-        let unbound =
-          Vars.filter (fun v -> not @@ Substs.mem v substs) (Vars.diff fv lb)
+        let free_quantified_vars = Vars.inter fv quantifiers in
+        let unbound_quantified_vars =
+          Vars.filter
+            (fun v -> not @@ Substs.mem v substs)
+            (Vars.diff free_quantified_vars lb)
         in
-        if Vars.is_empty unbound
+        if Vars.is_empty unbound_quantified_vars
         then Some {Modus.mode; substs}
         else
           let () =
             Options.feedback ~dkey ~level:4
               "mode %a could not bind: %a"
               Mode.pretty mode
-              Vars.pretty unbound;
+              Vars.pretty unbound_quantified_vars;
           in None
       | Papp _ ->
         unsupported ~loc:p.pred_loc
@@ -353,7 +360,7 @@ end = struct
       | Pat (p, _label) -> recurse p
       | _ -> unsupported ~loc:p.pred_loc "unexpected element: %a" Printer.pp_predicate p
     in
-    try test_mode ~lb:Vars.empty ~fv:Vars.empty @@ without_foralls p
+    try test_mode ~lb:Vars.empty ~fv:Vars.empty p
     with Unsupported ->
       unsupported ~loc:p.pred_loc
         "unsupported form: %a"
@@ -445,10 +452,14 @@ end
 (* In this implementation the extraction of logic functions is unsound. If
    multiple cases apply for some given arguments the verdict may be wrong.
    So we record here predicates that depend on logic functions. *)
-module Unsound_predicates = struct
+module Unsound_if_false = struct
   open Logic_info.Hashtbl
   let tbl = create 9
-  let add li = add tbl li ()
+  let add li =
+    Options.warning
+      "Negative verdicts of %a might be unsound"
+      Printer.pp_logic_info li;
+    add tbl li ()
   let mem = mem tbl
   let clear () = clear tbl
 end
@@ -475,7 +486,7 @@ end = functor (Out : Out_language) -> struct
       Mode.pretty mode pp_logic_info li;
     let new_profile = List.map freshen_up_logic_var li.l_profile in
     let new_formals, res = Mode.in_out_args ~mode new_profile in
-    let is_unsound = ref false in
+    let is_unsound_if_false = ref false in
     let extract_ctor ({Constructor.predicate = p} as ctor) next_ctor =
       let li_rec = li in
       let is_rec_occurrence li' = Logic_var.equal li'.l_var_info li_rec.l_var_info in
@@ -524,7 +535,7 @@ end = functor (Out : Out_language) -> struct
           flush_conds ~conds (Out.mk_let ~loc:p.pred_loc li c)
         | Pimplies ({pred_content = Papp (li, labels, args)} as pl, pr)
           when is_inductive li ->
-          let in_out_args, li =
+          let in_out_args', li' =
             if is_rec_occurrence li
             then Mode.in_out_args ~mode args, li
             else (* foreign predicate *)
@@ -539,28 +550,32 @@ end = functor (Out : Out_language) -> struct
               match mode' with
               | Complete -> Extractions.get ~mode:Complete li
               | _ ->
-                is_unsound := true;
+                is_unsound_if_false := true;
                 FunctionExtractor.extract ~mode:mode' li
           in
-          begin match in_out_args with
+          begin match in_out_args' with
             | _, None -> (* complete mode *)
-              let pl = {pl with pred_content = Papp (li, labels, args)} in
+              let pl = {pl with pred_content = Papp (li', labels, args)} in
               recurse ~conds:(pl :: conds) pr
-            | args, Some res ->
-              let rec_call =
-                Logic_const.term ~loc:p.pred_loc (Tapp (li, labels, args)) res.term_type
+            | args', Some res ->
+              let rec_call () =
+                Logic_const.term ~loc:p.pred_loc (Tapp (li', labels, args')) res.term_type
               in
               match var_of_term res with
               | Some v when not @@ Vars.mem v uv ->
                 let li = {(Cil_const.make_logic_info_local v.lv_name)
                           with l_var_info = v;
-                               l_body = LBterm rec_call;
+                               l_body = LBterm (rec_call ());
                                l_type = Some res.term_type}
                 in
                 recurse (Logic_const.plet ~loc:p.pred_loc li pr)
-              | _ ->
-                let p = Logic_const.prel (Req, rec_call, res) in
+              | _ when is_rec_occurrence li ->
+                let p = Logic_const.prel (Req, rec_call (), res) in
                 recurse ~conds:(p :: conds) pr
+              | _ -> (* foreign predicate *)
+                let li' = PredicateExtractor.extract li in
+                let pl = {pl with pred_content = Papp (li', labels, args)} in
+                recurse ~conds:(pl :: conds) pr
           end
         | Pimplies (pl, pr) -> (* simple hypothesis *)
           recurse ~conds:(pl :: conds) pr
@@ -583,6 +598,7 @@ end = functor (Out : Out_language) -> struct
       Modus.pretty modus pp_logic_info li;
     let l_type = Option.map (fun l -> l.lv_type) res in
     let old_profile = li.l_profile in
+    let loc = loc_of_inductive li in
     let li = {li with l_profile = new_formals; l_type} in
     let li_concl_and_formal_substs =
       let formal_substs = Substs.of_list @@ List.combine old_profile new_profile in
@@ -595,7 +611,7 @@ end = functor (Out : Out_language) -> struct
        a logic_info of which li is a copy: same logic_var, different record *)
     let li = Visitor.visitFramacLogicInfo li_concl_and_formal_substs li in
     let body =
-      let fallthrough = Out.mk_false l_type in
+      let fallthrough = Out.mk_false ?loc l_type in
       List.fold_right extract_ctor (InductiveDef.ctors li) fallthrough
     in
     li.l_body <- Out.mk_logic_body body;
@@ -608,7 +624,7 @@ end = functor (Out : Out_language) -> struct
     in
     let old_name = li.l_var_info.lv_name in
     Option.iter (fun n -> li.l_var_info.lv_name <- n) name;
-    if !is_unsound then Unsound_predicates.add li;
+    if !is_unsound_if_false then Unsound_if_false.add li;
     Options.feedback ~dkey ~level:2
       "@[<2>extracted from inductive definition of %s executable predicate:@ @[%a@]@]"
       old_name
@@ -622,8 +638,8 @@ end = struct
   module Extractor = Make_extractor (struct
       include Build_pred_or_term.Term
 
-      let mk_false lty =
-        let t = mk_false lty in
+      let mk_false ?loc lty =
+        let t = mk_false ?loc lty in
         Fallthrough_terms.add t;
         t
 
@@ -645,7 +661,7 @@ end = struct
     | Incomplete m -> extract_with_mode ~mode:m li
 end
 
-module PredicateExtractor : sig
+and PredicateExtractor : sig
   val extract : logic_info -> logic_info
 end
 = struct
@@ -661,10 +677,11 @@ end
       Extractor.extract ~mode li
     | Incomplete i ->
       let f = FunctionExtractor.extract ~mode:mode li in
+      let loc = loc_of_inductive li in
       let args, res = Mode.incomplete_in_out_args ~mode:i li.l_profile in
-      let args = List.map Logic_const.tvar args in
-      let tapp = Logic_const.term (Tapp (f, f.l_labels, args)) res.lv_type in
-      let rel = Logic_const.prel (Req, tapp, Logic_const.tvar res) in
+      let args = List.map (Logic_const.tvar ?loc) args in
+      let tapp = Logic_const.term ?loc (Tapp (f, f.l_labels, args)) res.lv_type in
+      let rel = Logic_const.prel ?loc (Req, tapp, Logic_const.tvar ?loc res) in
       let wrapper = {li with l_body = LBpred rel} in
       wrapper.l_var_info <- freshen_up_logic_var li.l_var_info;
       Options.feedback ~dkey ~level:2
@@ -672,29 +689,24 @@ end
         Printer.pp_logic_info li
         Printer.pp_logic_info f
         pp_logic_info wrapper;
-      Unsound_predicates.add wrapper;
+      Unsound_if_false.add wrapper;
       wrapper
 
-  let extract li =
-    let modi = InductiveDef.analyze_modes li in
-    let mode = Modus.preferred ~li modi in
-    extract_with_mode ~mode li
+  let extract =
+    let tbl = Logic_info.Hashtbl.create 7 in
+    fun li -> Logic_info.Hashtbl.memo tbl li @@ fun li ->
+      let modi = InductiveDef.analyze_modes li in
+      let mode = Modus.preferred ~li modi in
+      extract_with_mode ~mode li
 end
 
 let extract_predicate = PredicateExtractor.extract
 
-let is_unsound_predicate li =
-  let res = Unsound_predicates.mem li in
-  if res then
-    Options.warning ~once:true
-      "Translation of %a might be unsound (if multiple cases apply \
-       to some given arguments simultaneously)."
-      Printer.pp_logic_info li;
-  res
+let predicate_is_unsound_if_false = Unsound_if_false.mem
 
 let clear () =
   Fallthrough_terms.clear ();
   Extractions.clear ();
   Derived_functions.clear ();
   InductiveDef.clear ();
-  Unsound_predicates.clear ()
+  Unsound_if_false.clear ()

@@ -3,6 +3,6 @@
 [e-acsl:analysis:inductive] predicate extraction in complete mode
 [e-acsl:analysis:inductive] function extraction with mode incomplete in 2
 [e-acsl:analysis:inductive] function extraction with mode incomplete in 3
-[e-acsl] Warning: Translation of P might be unsound (if multiple cases apply to some given arguments simultaneously).
+[e-acsl] Warning: Negative verdicts of P might be unsound
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] 2modes.c:19: Warning: assertion got status unknown.
