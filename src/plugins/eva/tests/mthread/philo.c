@@ -12,7 +12,7 @@
 
   frama-c -mthread -mt-threads-lib pthreads -mt-shared-values 2 \
     -mt-shared-accesses-synchronization \
-    $(frama-c-config -print-share-path)/mt/mthread_queue.c \
+    $(frama-c -print-share-path)/mt/mthread_queue.c \
     -eva-verbose 0 -mt-extract html \
     -eva-slevel 15 philo.c > output.txt
 */

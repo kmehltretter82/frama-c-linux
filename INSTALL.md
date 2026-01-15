@@ -526,7 +526,6 @@ available:
 
 - `frama-c`
 - `frama-c-gui`       if available
-- `frama-c-config`    lightweight wrapper used to display configuration paths
 - `frama-c-ptests`    testing tool for Frama-c
 - `frama-c-wtests`    testing tool for Frama-c
 - `frama-c-script`    utilities related to e.g. analysis parametrization
