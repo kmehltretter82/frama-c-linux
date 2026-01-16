@@ -148,6 +148,13 @@ let should_ignore name =
   | None -> true
   | Some info -> info.attr_ignore
 
+let ignore name =
+  match find_known name with
+  | None -> register ~ignore:true AttrUnknown name
+  | Some info ->
+    if not info.attr_ignore then
+      Hashtbl.replace known_table name {info with attr_ignore = true}
+
 let partition ~(default:attribute_class) (attrs: attributes) :
   attributes * attributes * attributes =
   let rec loop (n,f,t) = function
@@ -405,3 +412,11 @@ let () =
   Cil_datatype.drop_ignored_attributes :=
     let keep_attr (name, _) = not (should_ignore name) in
     (fun attributes -> List.filter keep_attr attributes)
+
+(* For now the only action possible via the command line is to ignore an
+   attribute. Ideally we would like to allow a full registration with class,
+   ignore or not, printed or not.
+*)
+let () = Cmdline.run_after_configuring_stage (fun () ->
+    List.iter ignore (Kernel.IgnoreAttributes.get ())
+  )

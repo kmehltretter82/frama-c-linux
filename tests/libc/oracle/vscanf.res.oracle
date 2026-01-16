@@ -181,7 +181,7 @@
   out of bounds read. assert \valid_read(arg);
 [eva:alarm] FRAMAC_SHARE/libc/stdio.c:362: Warning: 
   unaligned pointer creation.
-  assert \aligned(*((size_t **)*arg),alignof(unsigned int));
+  assert \aligned(*((unsigned int **)*arg),alignof(unsigned int));
 [eva] computing for function Frama_C_unsigned_int_interval <- __fc_v_scanf <- 
                           vscanf <- caller_stub_for_vscanf <- main.
   Called from FRAMAC_SHARE/libc/stdio.c:363.
@@ -365,7 +365,7 @@
   out of bounds read. assert \valid_read(arg);
 [eva:alarm] FRAMAC_SHARE/libc/stdio.c:427: Warning: 
   unaligned pointer creation.
-  assert \aligned(*((size_t **)*arg),alignof(wint_t));
+  assert \aligned(*((wint_t **)*arg),alignof(wint_t));
 [eva] computing for function Frama_C_wint_t_interval <- __fc_v_scanf <- vscanf <- 
                           caller_stub_for_vscanf <- main.
   Called from FRAMAC_SHARE/libc/stdio.c:427.

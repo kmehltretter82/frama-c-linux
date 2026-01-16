@@ -1093,8 +1093,6 @@ let () = Plugin.state_ref := State_dir.get
 
 let parsing = add_group "Parsing"
 
-
-
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extended
@@ -1300,6 +1298,23 @@ module CStd =
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
+module IgnoreAttributes =
+  String_list
+    (struct
+      let option_name = "-ignore-attributes"
+      let module_name = "IgnoreAttributes"
+      let arg_name = "attr1,attr2,..."
+      let help = "Registers attributes to be ignored during type comparison."
+    end)
+
+(* ************************************************************************* *)
+(** {2 Compilation Database} *)
+(* ************************************************************************* *)
+
+let database = add_group "Compilation Database"
+
+let () = Parameter_customize.set_group database
+let () = Parameter_customize.do_not_reset_on_copy ()
 module CompilationDb =
   P.Filepath
     (struct
@@ -1314,10 +1329,7 @@ module CompilationDb =
          '<path>/compile_commands.json'. Disabled by default."
     end)
 
-
-let mopsa = add_group "Mopsa"
-
-let () = Parameter_customize.set_group mopsa
+let () = Parameter_customize.set_group database
 let () = Parameter_customize.do_not_reset_on_copy ()
 module MopsaDb =
   P.Filepath
@@ -1334,7 +1346,7 @@ module MopsaDb =
          be parsed and preprocessing flags."
     end)
 
-let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.set_group database
 let () = Parameter_customize.do_not_reset_on_copy ()
 module MopsaListDeps =
   P.String_list
@@ -1345,7 +1357,7 @@ module MopsaListDeps =
                   used by target1,target2,..., then exits."
     end)
 
-let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.set_group database
 let () = Parameter_customize.do_not_reset_on_copy ()
 module MopsaTarget =
   P.String_list
@@ -1360,7 +1372,7 @@ module MopsaTarget =
                   emitted relative to Frama-C's PWD, as usual."
     end)
 
-let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.set_group database
 let () = Parameter_customize.do_not_reset_on_copy ()
 module MopsaExcludeSources =
   P.Filepath_list
@@ -1678,6 +1690,7 @@ module VariadicStrict =
                 distinct integral types which have the same size and \
                 signedness"
   end)
+
 
 (* ************************************************************************* *)
 (** {2 Analysis Options} *)

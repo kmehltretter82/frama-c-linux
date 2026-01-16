@@ -29,7 +29,10 @@ end
 open Cil_types
 let (=?=) = Extlib.compare_basic
 let compare_list = List.compare
-let hash_list f = List.fold_left (fun acc d -> 65537 * acc + f d) 1
+
+let empty_list_hash = 1
+let hash_list f =
+  List.fold_left (fun acc d -> 65537 * acc + f d) empty_list_hash
 
 (* Functions that will clear internal, non-project compliant, caches *)
 let clear_caches = ref []
@@ -432,18 +435,20 @@ type type_compare_config =
     unroll: bool;
     no_attrs:bool; }
 
+let filter_attributes config attrs =
+  let attrs' =
+    if config.logic_type
+    then !drop_non_logic_attributes attrs
+    else !drop_fc_internal_attributes attrs
+  in
+  !drop_ignored_attributes attrs'
+
 let rec compare_attribute config (s1, l1) (s2, l2) =
   compare_chain (=?=) s1 s2 (compare_attrparam_list config) l1 l2
 and compare_attributes config  l1 l2 =
   if config.no_attrs then 0
   else
-    let l1, l2 =
-      if config.logic_type
-      then !drop_non_logic_attributes l1, !drop_non_logic_attributes l2
-      else
-        !drop_fc_internal_attributes l1, !drop_fc_internal_attributes l2
-    in
-    let l1, l2 = !drop_ignored_attributes l1, !drop_ignored_attributes l2 in
+    let l1, l2 = filter_attributes config l1, filter_attributes config l2 in
     compare_list (compare_attribute config) l1 l2
 and compare_attrparam_list config l1 l2 =
   compare_list (compare_attrparam config) l1 l2
@@ -545,11 +550,12 @@ and compare_type config t1 t2 =
        TComp _ | TEnum _ | TBuiltin_va_list), _ ->
       index_typ t1 - index_typ t2
 
-and compare_arg_list  config l1 l2 =
+and compare_arg_list config l1 l2 =
   Option.compare
     (compare_list
-       (fun (_n1, t1, _l1) (_n2, t2, _l2) ->
-          compare_type config t1 t2
+       (fun (_n1, t1, l1) (_n2, t2, l2) ->
+          compare_chain (compare_type config) t1 t2
+            (compare_attributes config) l1 l2
        )) l1 l2
 
 let hash_attribute _config (s, _) =
@@ -557,8 +563,10 @@ let hash_attribute _config (s, _) =
      equal function will be complicated enough in itself *)
   3 * Hashtbl.hash s + 117
 let hash_attributes config l =
-  let attrs = if config.logic_type then !drop_non_logic_attributes l else l in
-  hash_list (hash_attribute config) attrs
+  if config.no_attrs then empty_list_hash
+  else
+    let attrs = filter_attributes config l in
+    hash_list (hash_attribute config) attrs
 
 let rec hash_type config t =
   let t = if config.unroll then !punrollType t else t in

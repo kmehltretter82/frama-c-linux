@@ -365,7 +365,7 @@
   out of bounds read. assert \valid_read(arg);
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:297: Warning: 
   unaligned pointer creation.
-  assert \aligned(*((size_t **)*arg),alignof(wint_t));
+  assert \aligned(*((wint_t **)*arg),alignof(wint_t));
 [eva] computing for function Frama_C_wint_t_interval <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:297.
