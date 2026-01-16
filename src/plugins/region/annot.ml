@@ -90,19 +90,19 @@ let add_write_compound env lv ty tgt from =
       (fun d ->
          let t = d.it_content in
          match t.term_node with
-         | TLval ls when is_ctype t.term_type ty -> Left ls
+         | TLval ls when is_ctype t.term_type ty -> Left (t.term_loc,ls)
          | _ -> Right d)
       (match from with FromAny -> [] | From ws -> ws) in
   begin
     List.iter
-      (fun ls -> Memory.merge tgt @@ snd @@ add_addr_lval env ls)
+      (fun (loc,ls) -> Memory.merge tgt @@ snd @@ add_addr_lval ~loc env ls)
       copies ;
     if copies = [] || others <> [] then
       store env lv ty tgt (lazy (dpoints_to env others)) ;
   end
 
-let add_writes_from env (lv : term_lval) ~(from:deps) =
-  let ty,tgt = add_addr_lval env lv in
+let add_writes_from ~loc env (lv : term_lval) ~(from:deps) =
+  let ty,tgt = add_addr_lval ~loc env lv in
   if Ast_types.is_arithmetic ty then
     add_write env lv tgt
   else if Ast_types.is_fun_or_ptr ty then
@@ -113,19 +113,28 @@ let add_writes_from env (lv : term_lval) ~(from:deps) =
   else if Ast_types.is_struct_or_union ty then
     add_write_compound env lv ty tgt from
   else
-    Options.not_yet_implemented "assigns to type (%a)" Printer.pp_typ ty
+    Options.not_yet_implemented
+      ~source:(fst loc)
+      "Unsupported assigns to type (%a)" Printer.pp_typ ty
 
 let rec add_assigns_from env ~iscalled ~from tgt =
   match tgt.term_node with
   | TLval lv ->
+    let loc = tgt.term_loc in
     if iscalled then
-      add_writes_from env lv ~from
+      add_writes_from env ~loc lv ~from
     else
-      ignore (add_addr_lval env lv)
+      ignore (add_addr_lval ~loc env lv)
   | Tat(t,_) -> add_assigns_from env ~iscalled ~from t
   | Tunion ts | Tinter ts -> List.iter (add_assigns_from env ~iscalled ~from) ts
-  | Tcomprehension _ -> Options.not_yet_implemented "assigns comprehension"
-  | Tlet _ -> Options.not_yet_implemented "let-assigns"
+  | Tcomprehension _ ->
+    Options.not_yet_implemented
+      ~source:(fst tgt.term_loc)
+      "Unsupported set-comprehension"
+  | Tlet _ ->
+    Options.not_yet_implemented
+      ~source:(fst tgt.term_loc)
+      "Unsupported \\let-assigns"
   | Tif (c,tt,te) ->
     Options.warning ~source:(fst c.term_loc) "ignored assigns-condition" ;
     iadd_term env c ;
@@ -156,7 +165,8 @@ let add_bassigns ~iscalled ~map ~kf ~ki ~bhv ~formals ~result = function
   | WritesAny ->
     if iscalled then
       let loc = Kernel_function.get_location kf in
-      Options.abort ~source:(fst loc) "precise assigns are required for calls"
+      Options.warning ~wkey ~source:(fst loc)
+        "precise assigns are required for calls"
   | Writes ws as asgn ->
     let bhv = Property.Id_contract (Datatype.String.Set.empty,bhv) in
     let property = Option.get @@ Property.ip_of_assigns kf ki bhv asgn in

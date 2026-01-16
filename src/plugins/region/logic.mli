@@ -21,8 +21,8 @@ type env = {
   property : Property.t ;
 }
 
-val add_addr_lval : env -> term_lval -> typ * node
-val add_term_lval : env -> term_lval -> domain
+val add_addr_lval : loc:location -> env -> term_lval -> typ * node
+val add_term_lval : loc:location -> env -> term_lval -> domain
 val add_term      : env -> term      -> domain
 val add_predicate : env -> predicate -> unit
 val add_logic     : env -> logic_info -> domain
