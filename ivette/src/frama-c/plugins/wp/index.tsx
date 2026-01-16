@@ -181,19 +181,19 @@ Ivette.registerComponent({
 });
 
 /* -------------------------------------------------------------------------- */
-/* --- Pattern Debugger Component                                         --- */
+/* --- Strategy Debugger Component                                        --- */
 /* -------------------------------------------------------------------------- */
 
-function PatternDebugger(): JSX.Element {
+function StrategyDebugger(): JSX.Element {
   const [current, _] = useGlobalState<Goal>(globalGoalSelection);
-  return <TIP.PatternDebugger goal={current} />;
+  return <TIP.StrategyDebugger goal={current} />;
 }
 
 Ivette.registerComponent({
-  id: 'fc.wp.pattern-debugger',
-  label: 'WP Pattern Debugger',
-  title: 'WP Pattern Debugger',
-  children: <PatternDebugger />,
+  id: 'fc.wp.strategy-debugger',
+  label: 'WP Strategy Debugger',
+  title: 'WP Strategy Debugger',
+  children: <StrategyDebugger />,
 });
 
 /* -------------------------------------------------------------------------- */

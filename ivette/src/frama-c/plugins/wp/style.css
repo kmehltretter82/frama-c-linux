@@ -12,16 +12,36 @@
 /* --- Pattern Debugger                                                   --- */
 /* -------------------------------------------------------------------------- */
 
-.wp-pattern-ok {
-  text-decoration: underline dashed greenyellow;
-}
-
 .wp-pattern-warning {
   text-decoration: underline wavy orange;
 }
 
 .wp-pattern-error {
   text-decoration: underline 2pt red;
+}
+
+.wp-pattern-selected-warning {
+  background-color: rgb(255, 225, 164);
+}
+
+@media (prefers-color-scheme: dark) {
+  .wp-pattern-selected-warning {
+    background-color: rgb(134, 90, 0);
+  }
+}
+
+.wp-pattern-selected-error {
+  background-color: rgb(255, 164, 164) ;
+}
+
+@media (prefers-color-scheme: dark) {
+  .wp-pattern-selected-error {
+    background-color: rgb(164, 0, 0) ;
+  }
+}
+
+.wp-pattern-selected {
+  background-color: var(--background-softer);
 }
 
 /* -------------------------------------------------------------------------- */

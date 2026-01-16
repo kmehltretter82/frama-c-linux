@@ -14,12 +14,12 @@ import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 import { Cell, Item, Label, IconKind } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
-import { TextProxy, TextView } from 'dome/text/richtext';
+import { TextProxy, TextView, Decoration } from 'dome/text/richtext';
 import {
   ToolBar, Select, Filler,
   Button, ButtonGroup
 } from 'dome/frame/toolbars';
-import { Hfill, Vfill, Vbox, Overlay } from 'dome/layout/boxes';
+import { Hfill, Vfill, Vbox, Overlay, Hbox } from 'dome/layout/boxes';
 import { writeClipboardText } from 'dome/system';
 
 import * as Server from 'frama-c/server';
@@ -37,7 +37,7 @@ import {
   ConfigureTactic
 } from './tac';
 
-import * as WpPattern from 'frama-c/plugins/wp/api/patterndebugger';
+import * as WpStrategy from 'frama-c/plugins/wp/api/strategydebugger';
 
 /* -------------------------------------------------------------------------- */
 /* --- Sequent Printing Modes                                             --- */
@@ -250,60 +250,164 @@ export function cancelProofTasks(): void {
 /* -------------------------------------------------------------------------- */
 
 const severityIcon: { [key: string]: string } = {
-  Ok: 'CHECK', Warning: 'WARNING', Error: 'CROSS',
+  Ok: 'CHECK',
+  Ignored: 'CHECK',
+  Warning: 'WARNING',
+  Error: 'CROSS',
+
 };
 
 const severityKind: { [key: string]: IconKind } = {
-  Ok: 'positive', Warning: 'warning', Error: 'negative',
+  Ok: 'positive',
+  Ignored: 'default',
+  Warning: 'warning',
+  Error: 'negative',
 };
 
 const severityClass: { [key: string]: string } = {
-  Ok: 'wp-pattern-ok', Warning: 'wp-pattern-warning', Error: 'wp-pattern-error',
+  Ok: 'wp-pattern-ok',
+  Ignored: 'wp-pattern-ignored',
+  Warning: 'wp-pattern-warning',
+  Error: 'wp-pattern-error',
 };
 
-interface MatchingProps {
-  node: TIP.node ;
-  match: WpPattern.matching
+const selectedSeverityClass: { [key: string]: string } = {
+  Ok: 'wp-pattern-selected-ok',
+  Ignored: 'wp-pattern-selected-ignored',
+  Warning: 'wp-pattern-selected-warning',
+  Error: 'wp-pattern-selected-error',
+};
+
+interface TargetProps {
+  node: TIP.node;
+  target: [TIP.part, TIP.term | undefined];
 }
 
-function Matching(props: MatchingProps) : JSX.Element {
-  const { pattern, name, matched, target } = props.match;
-  const node = props.node;
-  const [ part, term ] = target;
+function Target(props: TargetProps): JSX.Element {
+  const { node, target } = props;
+  const [part, term] = target;
   const onClick = React.useCallback(() => {
-      Server.send(TIP.setSelection, { node, part, term });
-    }, [part, term, node]);
+    Server.send(TIP.setSelection, { node, part, term });
+  }, [part, term, node]);
+  return <IconButton
+    icon='TARGET'
+    onClick={onClick}
+    enabled={term !== undefined} />;
+}
 
+interface DbgEntryProps {
+  node: TIP.node;
+  entry: WpStrategy.debugEntry
+}
+
+function DbgEntry(props: DbgEntryProps): JSX.Element {
+  const { pattern, name, value, target } = props.entry;
+  const node = props.node;
   return (
     <tr>
-      <td>
-        <IconButton
-          icon='TARGET'
-          onClick={onClick}
-          enabled={term !== undefined} />
-      </td>
-      <td><Item label={ pattern } title={ 'ID: ' + name } /></td>
-      <td style={{ width: '100%' }}><Item label={ '-> ' + matched } /></td>
+      <td><Target node={node} target={target} /></td>
+      <td><Item label={pattern} title={'ID: ' + name} /></td>
+      <td style={{ width: '100%' }}><Item label={'-> ' + value} /></td>
     </tr>
   );
 }
 
-interface MatchingsProps {
-  node?: TIP.node;
-  matchings?: WpPattern.matching[]
+interface SelectionProps {
+  node: TIP.node;
+  selection?: WpStrategy.debugEntry;
 }
 
-function Matchings(props: MatchingsProps) : JSX.Element | null {
-  const { node, matchings } = props;
+function Selection(props: SelectionProps): JSX.Element {
+  const { node, selection } = props;
+  return selection
+    ? <DbgEntry node={node} entry={selection} />
+    :
+    <tr>
+      <td><Label label={'No selection'} /></td>
+      <td></td>
+      <td></td>
+    </tr>;
+}
+
+interface DebugProps {
+  node?: TIP.node;
+  debug?: WpStrategy.debugInfo;
+}
+
+function Debug(props: DebugProps): JSX.Element | null {
+  const { node, debug } = props;
+  if (!debug || !node) return null;
+
+  const { selection, params, matched } = debug;
   return (
-    node && matchings
-      ? <table>
-          <tbody>
-            { matchings.map((m) =>
-                <Matching key={m.name} node={node} match={m}/>) }
-          </tbody>
-        </table>
-      : null
+    <>
+      <table>
+        <tbody>
+          <Selection node={node} selection={selection} />
+          {params.map((p) => <DbgEntry key={p.name} node={node} entry={p} />)}
+          {matched.map((m) => <DbgEntry key={m.name} node={node} entry={m} />)}
+        </tbody>
+      </table>
+    </>
+  );
+}
+
+function decorationsOfDiagnostic(
+  diag: WpStrategy.diag, selected: boolean
+): Decoration[] {
+  const { severity, range } = diag;
+  const underline =
+    range
+      ? [{ className: severityClass[severity], ...range }] : [];
+  const highlight =
+    range && selected
+      ? [{ className: selectedSeverityClass[severity], ...range }] : [];
+
+  return underline.concat(highlight);
+}
+
+function decorationsOfAR(
+  ar: WpStrategy.alternativeResult, selected: boolean
+): Decoration[] {
+  return ar.diagnostic.map((d) => decorationsOfDiagnostic(d, selected)).flat();
+}
+
+function decorationsOfAResults(
+  ar: WpStrategy.alternativeResult[], selected: number
+): Decoration[] {
+  let res: Decoration[] = [];
+  for (let i = 0; i < ar.length; i++) {
+    const sel = selected === i;
+    res = res.concat(decorationsOfAR(ar[i], sel));
+  }
+  return res;
+}
+
+function decorations(pres: WpStrategy.result, selected: number): Decoration[] {
+  const ars = decorationsOfAResults(pres.alts, selected);
+  return ars.concat(decorationsOfDiagnostic(pres.diagnostic, false));
+}
+
+interface DiagnosticMessageProps {
+  diag: WpStrategy.diag;
+}
+
+function DiagnosticMessage(props: DiagnosticMessageProps): JSX.Element {
+  const { severity, message } = props.diag;
+  const icon = severityIcon[severity];
+  const kind = severityKind[severity];
+  return <Label icon={icon} kind={kind} label={message} />;
+}
+
+function errors(pres: WpStrategy.result, selected: number): JSX.Element {
+  const diags = pres.alts.length === 0
+    ? [pres.diagnostic]
+    : pres.alts[selected].diagnostic;
+
+  return (
+    <>
+      {diags.map((d, index) => <DiagnosticMessage key={index} diag={d} />)}
+    </>
   );
 }
 
@@ -311,7 +415,7 @@ export interface PatternDebuggerProps {
   goal: WP.goal | undefined;
 }
 
-export function PatternDebugger(props: PatternDebuggerProps): JSX.Element {
+export function StrategyDebugger(props: PatternDebuggerProps): JSX.Element {
   const goal = props.goal;
   const status =
     States.useRequestStable(
@@ -321,28 +425,59 @@ export function PatternDebugger(props: PatternDebuggerProps): JSX.Element {
 
   const current = goal ? status.current : undefined;
   const text = React.useMemo(() => new TextProxy(), []);
-  const [pattern, setPattern] = React.useState('');
+  const [strategy, setStrategy] = React.useState('');
+  const [selected, setSelected] = React.useState(0);
+
   const onChange = React.useCallback(() => {
-    setPattern(text.toString());
+    setStrategy(text.toString());
+    setSelected(0);
   }, [text]);
-  const { severity, message, matchings, range } =
-    States.useRequestStable(WpPattern.debug, { pattern, node: current });
-  const decorations = React.useMemo(
-    () => range ? { className: severityClass[severity], ...range } : []
-    , [severity, range]);
-  const icon = severityIcon[severity];
-  const kind = severityKind[severity];
+
+  const pres =
+    States.useRequestStable(WpStrategy.debug, { strategy, node: current });
+
+  const selRange =
+    pres.alts.length > 0 ? pres.alts[selected].location : undefined;
+
+  const debug =
+    pres.alts.length > 0 ? pres.alts[selected].debug : undefined;
+
+  const selDecoration = React.useMemo(
+    () => selRange ? [{ className: 'wp-pattern-selected', ...selRange }] : []
+    , [selRange]);
+
+  const otherDecorations =
+    React.useMemo(() => decorations(pres, selected), [pres, selected]);
+
+  const allDecorations = otherDecorations.concat(selDecoration);
+
   return (
     <Vbox style={{ height: '100%' }}>
       <TextView
         style={{ flex: 1 }}
         text={text}
         onChange={onChange}
-        decorations={decorations}
+        decorations={allDecorations}
       />
       <Vbox style={{ flex: 1 }}>
-      <Label icon={icon} kind={kind} label={message} />
-      <Matchings node={current} matchings={matchings} />
+        <Hbox>
+          <Vbox>
+            <IconButton
+              icon={'ANGLE.UP'}
+              enabled={selected > 0}
+              onClick={() => { setSelected(selected - 1); }}
+            />
+            <IconButton
+              icon={'ANGLE.DOWN'}
+              enabled={selected < pres.alts.length - 1}
+              onClick={() => { setSelected(selected + 1); }}
+            />
+          </Vbox>
+          <Vbox>
+            {errors(pres, selected)}
+          </Vbox>
+        </Hbox>
+        <Debug node={current} debug={debug} />
       </Vbox>
     </Vbox>
   );
