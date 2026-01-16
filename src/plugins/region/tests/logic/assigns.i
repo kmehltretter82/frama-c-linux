@@ -13,7 +13,6 @@ int call_imprecise (int k) { int *a; imprecise(&a,B,k); return *a; }
 int* result(int* q, int k);
 int caller_result (int k) { int *a = result(B,k); return *a; }
 
-//TODO: shall detect a problem here!
 //@ assigns \result ;
 int* imprecise_result(int* q, int k);
 int* call_imprecise_result(int k) { return imprecise_result(B,k); }

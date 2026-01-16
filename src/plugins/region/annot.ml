@@ -29,7 +29,7 @@ let add_ipred env ip = add_predicate env ip.ip_content.tp_statement
 let wkey =
   Options.register_warn_category
     ~help:"missing \\from when assigning pointers"
-    ~default:Wonce "froms"
+    ~default:Wactive "froms"
 
 let add_write env lv tgt =
   Memory.add_write tgt @@ Access.Term(env.property,lv)
@@ -117,14 +117,20 @@ let add_writes_from ~loc env (lv : term_lval) ~(from:deps) =
       ~source:(fst loc)
       "Unsupported assigns to type (%a)" Printer.pp_typ ty
 
+let is_result = function (TResult _,_) -> true | _ -> false
+
 let rec add_assigns_from env ~iscalled ~from tgt =
   match tgt.term_node with
   | TLval lv ->
-    let loc = tgt.term_loc in
-    if iscalled then
-      add_writes_from env ~loc lv ~from
-    else
-      ignore (add_addr_lval ~loc env lv)
+    begin
+      let loc = tgt.term_loc in
+      match iscalled with
+      | Some result ->
+        if is_result lv then result := true ;
+        add_writes_from env ~loc lv ~from
+      | None ->
+        ignore (add_addr_lval ~loc env lv)
+    end
   | Tat(t,_) -> add_assigns_from env ~iscalled ~from t
   | Tunion ts | Tinter ts -> List.iter (add_assigns_from env ~iscalled ~from) ts
   | Tcomprehension _ ->
@@ -171,8 +177,18 @@ let add_bassigns ~iscalled ~map ~kf ~ki ~bhv ~formals ~result = function
     let bhv = Property.Id_contract (Datatype.String.Set.empty,bhv) in
     let property = Option.get @@ Property.ip_of_assigns kf ki bhv asgn in
     let env = { map ; property ; formals ; result } in
+    let iscalled = if iscalled then Some (ref false) else None in
     List.iter
-      (fun (t,from) -> add_assigns_from env ~iscalled ~from t.it_content) ws
+      (fun (t,from) -> add_assigns_from env ~iscalled ~from t.it_content) ws ;
+    match iscalled with
+    | None -> ()
+    | Some result ->
+      if not !result &&
+         Ast_types.is_fun_or_ptr @@ Kernel_function.get_return_type kf
+      then
+        let loc = Property.location property in
+        Options.warning ~wkey ~source:(fst loc)
+          "Missing assigns \\result \\from for pointer result"
 
 let add_allocation ~map ~kf ~ki ~bhv ~formals ~result alloc =
   match alloc with
