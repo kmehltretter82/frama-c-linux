@@ -5761,6 +5761,13 @@ and mkBinOp ~loc op e1 e2 =
   let doIntegralArithmetic () =
     check_make_expr ~check:Ast_types.is_integral "non-integral"
   in
+  let compatible_pointed_types () =
+    let t1p = Ast_types.direct_pointed_type t1
+    and t2p = Ast_types.direct_pointed_type t2 in
+    areCompatibleTypes
+      (Ast_types.remove_qualifiers_deep t1p)
+      (Ast_types.remove_qualifiers_deep t2p)
+  in
   match op with
   | Mult | Div -> doArithmetic ()
   | Mod  | BAnd | BOr | BXor -> doIntegralArithmetic ()
@@ -5796,12 +5803,7 @@ and mkBinOp ~loc op e1 e2 =
   | MinusPP when is_ptr t1 && is_ptr t2 ->
     (* ISO C11 6.5.6§3 and 6.5.6§9 : Both types should be compatible and the
        result is of type ptrdiff_t. *)
-    let compatible =
-      areCompatibleTypes
-        (Ast_types.remove_qualifiers_deep t1)
-        (Ast_types.remove_qualifiers_deep t2)
-    in
-    if compatible then
+    if compatible_pointed_types () then
       constFoldBinOp op e1 (mkCastT ~oldt:t2 ~newt:t1 e2)
         (Machine.ptrdiff_type ())
     else
@@ -5813,12 +5815,15 @@ and mkBinOp ~loc op e1 e2 =
     constFoldBinOp op (mkCast ~newt:t2 e1) e2 Cil_const.intType
   | Eq | Ne | Lt | Le | Ge | Gt
     when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
+    (* We are more lenient than the ISO C here, if two pointers do not
+       point to compatible types, we cast them to a common type. *)
     let e1, e2 =
       if not (need_cast ~force:true t1 t2) then
         e1, e2
-      else if areCompatibleTypes t1 t2 then
+      else if compatible_pointed_types () then
         e1, mkCastT ~oldt:t2 ~newt:t1 e2
       else if Ast_types.is_object_ptr t1 && Ast_types.is_object_ptr t2 then
+        (* Only object types can safely be casted to void*. *)
         mkCastT ~oldt:t1 ~newt:Cil_const.voidPtrType e1,
         mkCastT ~oldt:t2 ~newt:Cil_const.voidPtrType e2
       else
