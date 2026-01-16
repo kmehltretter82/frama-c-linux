@@ -128,7 +128,7 @@ type taint_state = {
   assume_stmts: Stmt.Set.t;
   (* Whether the current call depends on a tainted assume statement: if true,
      all assignments in the current call should be control tainted. *)
-  dependent_call: bool;
+  tainted_call: bool;
 }
 
 module LatticeSingleTaint = struct
@@ -145,11 +145,11 @@ module LatticeSingleTaint = struct
       "@[<v>@[<hv 2>Locations (data):@ @[<hov>%a@]@]@,\
        @[<hv 2>Locations (control):@ @[<hov>%a@]@]@,\
        @[<hv 2>Assume statements:@ @[<hov>%a@]@]@,\
-       @[<hv 2>Dependent call:@ @[<hov>%b@]@]@]"
+       @[<hv 2>Tainted call:@ @[<hov>%b@]@]@]"
       Zone.pretty t.locs_data
       Zone.pretty t.locs_control
       Stmt.Set.pretty t.assume_stmts
-      t.dependent_call
+      t.tainted_call
 
   (* Frama-C "datatype" for type [taint]. *)
   include Datatype.Make_with_collections (struct
@@ -163,7 +163,7 @@ module LatticeSingleTaint = struct
         [ { locs_data = List.hd Zone.reprs;
             locs_control = List.hd Zone.reprs;
             assume_stmts = Stmt.Set.empty;
-            dependent_call = false; } ]
+            tainted_call = false; } ]
 
       let structural_descr =
         Structural_descr.t_record
@@ -175,7 +175,7 @@ module LatticeSingleTaint = struct
         Zone.compare t1.locs_data t2.locs_data
         <?> (Zone.compare, t1.locs_control, t2.locs_control)
         <?> (Stmt.Set.compare, t1.assume_stmts, t2.assume_stmts)
-        <?> (Datatype.Bool.compare, t1.dependent_call, t2.dependent_call)
+        <?> (Datatype.Bool.compare, t1.tainted_call, t2.tainted_call)
 
       let equal = Datatype.from_compare
 
@@ -189,7 +189,7 @@ module LatticeSingleTaint = struct
           (Zone.hash t.locs_data,
            Zone.hash t.locs_control,
            Stmt.Set.hash t.assume_stmts,
-           t.dependent_call)
+           t.tainted_call)
 
       let copy c = c
 
@@ -200,7 +200,7 @@ module LatticeSingleTaint = struct
     locs_data = Zone.bottom;
     locs_control = Zone.bottom;
     assume_stmts = Stmt.Set.empty;
-    dependent_call = false;
+    tainted_call = false;
   }
 
   (* Top state: everything is tainted. *)
@@ -208,7 +208,7 @@ module LatticeSingleTaint = struct
     locs_data = Zone.top;
     locs_control = Zone.top;
     assume_stmts = Stmt.Set.empty;
-    dependent_call = false;
+    tainted_call = false;
   }
 
   (* Join: keep pointwise over-approximation. *)
@@ -216,7 +216,7 @@ module LatticeSingleTaint = struct
     { locs_data = Zone.join t1.locs_data t2.locs_data;
       locs_control = Zone.join t1.locs_control t2.locs_control;
       assume_stmts = Stmt.Set.union t1.assume_stmts t2.assume_stmts;
-      dependent_call = t1.dependent_call || t2.dependent_call; }
+      tainted_call = t1.tainted_call || t2.tainted_call; }
 
   (* The memory locations are finite, so the ascending chain property is
      already verified. We simply use a join. *)
@@ -227,7 +227,7 @@ module LatticeSingleTaint = struct
       locs_data = Zone.narrow t1.locs_data t2.locs_data;
       locs_control = Zone.narrow t1.locs_control t2.locs_control;
       assume_stmts = Stmt.Set.inter t1.assume_stmts t2.assume_stmts;
-      dependent_call = t1.dependent_call && t2.dependent_call;
+      tainted_call = t1.tainted_call && t2.tainted_call;
     }
 
   (* Inclusion testing: pointwise, on locs only. *)
@@ -396,6 +396,13 @@ module TransferSingleTaint = struct
       | `Value v ->
         if Cvalue.V.cardinal_zero_or_one v then bottom_loc else to_loc lval
 
+  let is_in_tainted_scope state =
+    (* Current state defines a tainted scope if:
+       - the current call depends on a tainted assume statement of a caller;
+       - the current statement depends on a tainted assume statement. *)
+    state.tainted_call
+    || not (Stmt.Set.is_empty state.assume_stmts)
+
   (* Propagates data- and control-taints for an assignment [lval = exp]. *)
   let assign_aux ~namespace ~pos lval exp v to_loc state =
     let lv_zone, lv_indirect_zone, singleton = compute_lval_zones to_loc lval in
@@ -413,13 +420,11 @@ module TransferSingleTaint = struct
     in
     let data_tainted = Zone.intersects state.locs_data exp_zone in
     (* [lval] becomes control-tainted if:
-       - the current call depends on a tainted assume statements of a caller;
-       - the execution of the assignment depends on a tainted assume statement;
+       - the assignment is in a tainted scope;
        - the value of [exp] is control-tainted;
        - the assigned location depends on tainted values. *)
     let ctrl_tainted =
-      state.dependent_call
-      || not (Stmt.Set.is_empty state.assume_stmts)
+      is_in_tainted_scope state
       || Zone.intersects state.locs_control exp_zone
       || LatticeSingleTaint.intersects state lv_indirect_zone
     in
@@ -456,17 +461,15 @@ module TransferSingleTaint = struct
       let tainted = LatticeSingleTaint.intersects state exp_zone in
       if tainted && is_private_namespace namespace
       then warn_assume_interference ~pos exp_zone;
-      if tainted && not state.dependent_call
+      if tainted && not state.tainted_call
       then { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
       else state
 
   let start_call ~namespace ~pos call _recursion valuation state =
     let stmt = Position.Local.stmt pos in
     let state = filter_active_tainted_assumes stmt state in
-    let dependent_call =
-      state.dependent_call || not (Stmt.Set.is_empty state.assume_stmts)
-    in
-    let state = { state with assume_stmts = Stmt.Set.empty; dependent_call } in
+    let tainted_call = is_in_tainted_scope state in
+    let state = { state with assume_stmts = Stmt.Set.empty; tainted_call } in
     (* Add tainted actual parameters in [state]. *)
     let to_loc = loc_of_lval valuation in
     List.fold_left
@@ -534,7 +537,7 @@ module TransferSingleTaint = struct
     (* Recover assume statements from the [pre] abstract state: we assume the
        control-dependency does not extended beyond the function scope. *)
     { post with assume_stmts = pre.assume_stmts;
-                dependent_call = pre.dependent_call; }
+                tainted_call = pre.tainted_call; }
 
   (* Adds automatic taint from [call] to [state] for some libc functions.
      Should be called after [finalize_call] only if -eva-taint-auto is set. *)
