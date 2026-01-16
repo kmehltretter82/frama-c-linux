@@ -21,7 +21,7 @@ and node =
   | Any
   | Pany of ast list
   | Pvar of pvar
-  | Named of pvar * ast
+  | Named of bool * pvar * ast (* boolean is true for debug symbols *)
   | Range of int * int
   | Int of Z.t
   | Bool of bool
@@ -38,18 +38,20 @@ and node =
 and assoc = [ `Add | `Mul | `Concat | `Band | `Bor | `Bxor | `And | `Or ]
 and binop = [ `Div | `Mod | `Repeat | `Eq | `Lt | `Le | `Ne | `Lsl | `Lsr ]
 
+(* this function is used for debugging purposes *)
+let named name p =
+  let x = { loc = p.loc ; value = name } in
+  { loc = p.loc ; value = Named(true, x, p) }
+
 let self p =
   let pattern,self = match p.value with
-    | Named(x,_) | Pvar x -> p , x
+    | Pvar x -> p , x
+    | Named(false, x,_) -> p , x
     | _ ->
       let x = { loc = p.loc ; value= "\\target" } in
-      { loc = p.loc ; value = Named(x,p) } , x
+      { loc = p.loc ; value = Named(false, x, p) } , x
   in
   pattern , { loc = p.loc ; value = Pvar self }
-
-let named name p =
-  let x = { loc = p.loc ; value=name } in
-  { loc = p.loc ; value = Named(x, p) }
 
 let unroll op = function
   | { value = Assoc(f,xs) } when f = op -> xs
@@ -126,7 +128,7 @@ let rec parse ctxt p =
   | PLnamed(x,p) ->
     let pv = pvar ctxt ~loc x in
     let pn = parse ctxt p in
-    { loc ; value = Named(pv,pn) }
+    { loc ; value = Named(false, pv, pn) }
   | PLtrue -> { loc ; value = Bool true }
   | PLfalse -> { loc ; value = Bool false }
   | PLconstant (IntConstant n) ->
@@ -211,7 +213,8 @@ let rec pp fmt (a : ast) =
   match a.value with
   | Any ->  Format.pp_print_string fmt "_"
   | Pvar x -> Format.pp_print_string fmt x.value
-  | Named (x,v) -> Format.fprintf fmt "%s:%a" x.value pp v
+  | Named (true, _,v) -> Format.fprintf fmt "%a" pp v
+  | Named (_, x,v) -> Format.fprintf fmt "%s:%a" x.value pp v
   | Range(a,b) -> Format.fprintf fmt "(%d..%d)" a b
   | Int n -> Z.pretty fmt n
   | Bool b -> Format.pp_print_string fmt (if b then "\\true" else "\\false")
@@ -309,14 +312,14 @@ let merge env (x : pvar) e =
 let rec is_any (p : pattern) =
   match p.value with
   | Any | Pvar _ -> true
-  | Named(_,q) -> is_any q
+  | Named(_,_,q) -> is_any q
   | _ -> false
 
 let rec pmatch env (p : pattern) e =
   match p.value , Lang.F.repr e with
   | Any , _ -> ()
   | Pvar x , _ -> merge env x e
-  | Named(x,p) , _ -> merge env x e ; pmatch env p e
+  | Named(_,x,p) , _ -> merge env x e ; pmatch env p e
   | Range(a,b) , Kint n ->
     begin
       match Z.to_int_opt n with
@@ -566,23 +569,23 @@ let () = Lang.on_field
       Tactical.add_computer id (fun es -> Lang.F.e_getfield (List.hd es) fd)
     end
 
-let error ~loc msg =
+let log_error ~loc msg =
   Wp_parameters.logwith (fun _evt -> raise Not_found) ~source:(fst loc) msg
 
 let getvar env (x : string loc) : Tactical.selection =
   try Vmap.find x.value env
   with Not_found ->
-    error ~loc:x.loc "Pattern variable '%s' not bound" x.value
+    log_error ~loc:x.loc "Pattern variable '%s' not bound" x.value
 
 let rec select (env : sigma) (a : value) =
   let loc = a.loc in
   let cc = select env in
   match a.value with
-  | Any ->  error ~loc "Pattern _ is not a value"
-  | Pany _ ->  error ~loc "Pattern \\any(..) is not a value"
-  | String s -> error ~loc "String %S is not a value" s
+  | Any ->  log_error ~loc "Pattern _ is not a value"
+  | Pany _ ->  log_error ~loc "Pattern \\any(..) is not a value"
+  | String s -> log_error ~loc "String %S is not a value" s
   | Pvar x -> getvar env x
-  | Named (_,v) -> cc v
+  | Named (_,_,v) -> cc v
   | Range(a,b) -> Tactical.range a b
   | Int n -> Tactical.cint n
   | Bool b -> Tactical.compose (if b then "wp:true" else "wp:false") []
@@ -619,18 +622,18 @@ let rec select (env : sigma) (a : value) =
 
 and compose env ~loc id vs =
   match Tactical.compose id (List.map (select env) vs) with
-  | Tactical.Empty -> error ~loc "Computer %S not found" id
+  | Tactical.Empty -> log_error ~loc "Computer %S not found" id
   | result -> result
 
 let bool (a : value) =
   match a.value with
   | Bool b -> b
-  | _ -> error ~loc:a.loc "Not a boolean value (%a)" pp a
+  | _ -> log_error ~loc:a.loc "Not a boolean value (%a)" pp a
 
 let string (a : value) =
   match a.value with
   | String s -> s
-  | _ -> error ~loc:a.loc "Not a string value (%a)" pp a
+  | _ -> log_error ~loc:a.loc "Not a string value (%a)" pp a
 
 (* -------------------------------------------------------------------------- *)
 (* --- Typechecking                                                       --- *)
@@ -701,81 +704,94 @@ let rec vpretty fmt = function
   | Boolean -> Format.fprintf fmt "boolean"
   | Type t -> Lang.F.Tau.pretty fmt t
 
-type env = vtype Vmap.t ref
-let env () = ref Vmap.empty
+type env = {
+  mutable table: vtype Vmap.t ;
+  raise: bool ;
+}
 
-let tc_merge ~loc va vb =
-  let v = vmerge va vb in
+let env ?(raise=false) () = {
+  table = Vmap.empty ;
+  raise ;
+}
+
+let typecheck_error env loc msg =
+  if env.raise
+  then Pretty_utils.ksfprintf (fun e -> raise (TypeError(loc, e))) msg
+  else Wp_parameters.error ~source:(fst loc) msg
+
+let tc_merge env ~loc ~expected va =
+  let v = vmerge va expected in
   if v = Tnone then
-    Wp_parameters.error ~source:(fst loc) "Invalid type %a (expected %a)"
-      vpretty va vpretty vb ; v
+    typecheck_error env loc
+      "Invalid type %a (expected %a)" vpretty va vpretty expected ; v
 
-let tc_var env ~loc vt x =
-  let vx = try Vmap.find x !env with Not_found -> Tany in
-  let vy = tc_merge ~loc vt vx in
-  if vx != vy then env := Vmap.add x vy !env ; vy
+let tc_var env ~loc ~expected x =
+  let vx = try Vmap.find x env.table with Not_found -> Tany in
+  let vy = tc_merge env ~loc ~expected vx in
+  if vx != vy then env.table <- Vmap.add x vy env.table ; vy
 
-let rec typecheck env vt (a : ast) =
+let rec typecheck env expected (a : ast) =
   let loc = a.loc in
   match a.value with
-  | Any -> vt
-  | Pany ps -> List.fold_left (typecheck env) vt ps
-  | Pvar x -> tc_var env ~loc vt x.value
-  | Named(x,v) -> tc_var env ~loc (typecheck env vt v) x.value
+  | Any -> expected
+  | Pany ps -> List.fold_left (typecheck env) expected ps
+  | Pvar x -> tc_var env ~loc ~expected x.value
+  | Named(_,x,v) -> tc_var env ~loc ~expected:(typecheck env expected v) x.value
   | Range(a,b) ->
-    if a > b then Wp_parameters.error ~source:(fst loc)
-        "Invalid range %d..%d" a b ;
-    tc_merge ~loc vt (Type Qed.Logic.Int)
-  | Int _ -> tc_merge ~loc vt vint
-  | Bool _ -> tc_merge ~loc vt vbool
-  | String _ -> tc_merge ~loc vt String
-  | Not a -> typecheck env (tc_merge ~loc vbool vt) a
+    if a > b then
+      typecheck_error env loc "Invalid range %d..%d" a b ;
+    tc_merge env ~loc ~expected vint
+  | Int _ -> tc_merge env ~loc ~expected vint
+  | Bool _ -> tc_merge env ~loc ~expected vbool
+  | String _ -> tc_merge env ~loc ~expected String
+  | Not a -> typecheck env (tc_merge env ~loc ~expected vbool) a
   | Assoc((`And|`Or),vs) ->
-    List.fold_left (typecheck env) (tc_merge ~loc vbool vt) vs
+    List.fold_left (typecheck env) (tc_merge env ~loc ~expected vbool) vs
   | Assoc((`Bor|`Band|`Bxor),vs) ->
-    List.fold_left (typecheck env) (tc_merge ~loc vint vt) vs
+    List.fold_left (typecheck env) (tc_merge env ~loc ~expected vint) vs
   | Assoc((`Add|`Mul),vs) ->
-    List.fold_left (typecheck env) (tc_merge ~loc Numerical vt) vs
+    List.fold_left (typecheck env) (tc_merge env ~loc ~expected Numerical) vs
   | Assoc(`Concat,vs) ->
-    List.fold_left (typecheck env) (tc_merge ~loc vlist vt) vs
+    List.fold_left (typecheck env) (tc_merge env ~loc ~expected vlist) vs
   | Binop(a,(`Eq | `Ne),b) ->
     let va = typecheck env Tany a in
     let vb = typecheck env Tany b in
-    ignore @@ tc_merge ~loc va vb ;
-    tc_merge ~loc vt Boolean
+    ignore @@ tc_merge env ~loc ~expected:va vb ;
+    tc_merge env ~loc ~expected Boolean
   | Binop(a,(`Lt | `Le),b) ->
     let va = typecheck env Numerical a in
     let vb = typecheck env Numerical b in
-    ignore @@ tc_merge ~loc va vb ;
-    tc_merge ~loc vt Boolean
+    ignore @@ tc_merge env ~loc ~expected:va vb ;
+    tc_merge env ~loc ~expected Boolean
   | Binop(a,`Div,b) ->
-    let vn = tc_merge ~loc Numerical vt in
+    let vn = tc_merge env ~loc ~expected Numerical in
     let va = typecheck env vn a in
     let vb = typecheck env vn b in
-    tc_merge ~loc va vb
+    tc_merge env ~loc ~expected:va vb
   | Binop(a,(`Mod|`Lsl|`Lsr),b) ->
     ignore @@ typecheck env vint a ;
     ignore @@ typecheck env vint b ;
-    tc_merge ~loc vt vint
+    tc_merge env ~loc ~expected vint
   | Binop(a,`Repeat,b) ->
     ignore @@ typecheck env vint b ;
-    typecheck env (tc_merge ~loc vlist vt) a
-  | Times(_,v) -> typecheck env (tc_merge ~loc Numerical vt) v
+    typecheck env (tc_merge env ~loc ~expected vlist) a
+  | Times(_,v) -> typecheck env (tc_merge env ~loc ~expected Numerical) v
   | List vs ->
     let ve = List.fold_left (typecheck env) Tany vs in
-    tc_merge ~loc vt (List ve)
+    tc_merge env ~loc ~expected (List ve)
   | Get(a,k) ->
     let vk = typecheck env Tany k in
     begin
-      match typecheck env (Array(vk,vt)) a with
+      match typecheck env (Array(vk,expected)) a with
       | Array(_,ve) -> ve
       | Type(Array(_,te)) -> Type te
-      | va -> Wp_parameters.error ~source:(fst a.loc)
-                "Not an array type (%a)" vpretty va ; vt
+      | va ->
+        typecheck_error env a.loc "Not an array type (%a)" vpretty va ;
+        expected
     end
   | Set(a,k,v) ->
     let vk = typecheck env Tany k in
-    let ve = typecheck env vt v in
+    let ve = typecheck env expected v in
     typecheck env (array vk ve) a
   | Field(v,fid) ->
     begin
@@ -785,15 +801,16 @@ let rec typecheck env vt (a : ast) =
           try
             let (_,ft) =
               List.find (fun (fd,_) -> Lang.name_of_field fd = fid) fds in
-            tc_merge ~loc vt (Type ft)
-          with Not_found -> vt
+            tc_merge env ~loc ~expected (Type ft)
+          with Not_found -> expected
         end
-      | Tany -> vt
-      | vr -> Wp_parameters.error ~source:(fst v.loc)
-                "Not a record type (%a)" vpretty vr ; vt
+      | Tany -> expected
+      | vr ->
+        typecheck_error env v.loc "Not a record type (%a)" vpretty vr ;
+        expected
     end
   | Call(_f,vs,_) ->
-    List.iter (fun v -> ignore @@ typecheck env Tany v) vs ; vt
+    List.iter (fun v -> ignore @@ typecheck env Tany v) vs ; expected
 
 let typecheck_vtau env ?tau v =
   ignore @@ typecheck env (match tau with None -> Tany | Some t -> Type t) v

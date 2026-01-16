@@ -16,7 +16,7 @@ type context
 type pattern
 type value
 
-exception TypeError of Cil_types.location * string
+exception TypeError of location * string
 
 val pattern_loc: pattern -> location
 
@@ -24,6 +24,14 @@ val pattern_loc: pattern -> location
     @before Frama-C+dev the typing context was mandatory.
 *)
 val context : ?tc:Logic_typing.typing_context -> unit -> context
+
+(** Raise a typing error related to patterns.
+    Either the typing context has been built with a logic typing context and it
+    uses it or it raises an exception.
+    @raise TypeError when the context does not have a typing_context
+    @since Frama-C+dev
+*)
+val error: context -> location -> ('a, Format.formatter, unit, 'b) format4 -> 'a
 
 (** Parse a pattern and enrich the environment with pattern variables
     @raise TypeError in case of error when context does not have typing_context
@@ -84,7 +92,18 @@ val string : value -> string
 (** Typechecking *)
 
 type env
-val env : unit -> env
+
+(** [raise] defaults to false *)
+val env : ?raise:bool -> unit -> env
+
+(** Raise a typing error related to patterns.
+    Either the environment has been built with [raise] set to [false] and it
+    logs an error, or it was set to [true] and it raises an exception.
+    @raise TypeError when the environment has [raise] set to [true]
+    @since Frama-C+dev
+*)
+val typecheck_error : env -> location -> ('a, Format.formatter, unit, unit) format4 -> 'a
+
 val typecheck_value : env -> ?tau:Lang.F.tau -> value -> unit
 val typecheck_pattern : env -> ?tau:Lang.F.tau -> pattern -> unit
 val typecheck_lookup : env -> lookup -> unit
