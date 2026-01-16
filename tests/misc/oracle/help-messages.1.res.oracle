@@ -71,12 +71,6 @@ Options taking a string as argument should preferably be written
 -warn-unsigned-overflow  generate alarms for unsigned operations that
                     overflow (opposite option is -no-warn-unsigned-overflow)
 
-*** ATTRIBUTE REGISTRATION
-
--ignore-attributes <attr1,attr2,...>  Registers attributes to be ignored
-                    during type comparison. (preferably use
-                    -ignore-attributes="attr1,attr2,...")
-
 *** COMPILATION DATABASE
 
 -compilation-db <path>  when set, preprocessing of each file will include
@@ -359,6 +353,9 @@ Options taking a string as argument should preferably be written
                     adds -nostdinc to prevent inconsistent mix of system and
                     Frama-C header files (set by default, opposite option is
                     -no-frama-c-stdlib)
+-ignore-attributes <attr1,attr2,...>  Registers attributes to be ignored
+                    during type comparison. (preferably use
+                    -ignore-attributes="attr1,attr2,...")
 -machdep <machine>  use <machine> as the current machine dependent
                     configuration. See "-machdep help" for a list. The
                     environment variable FRAMAC_MACHDEP can be used to

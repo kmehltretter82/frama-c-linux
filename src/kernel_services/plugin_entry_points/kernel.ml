@@ -1093,8 +1093,6 @@ let () = Plugin.state_ref := State_dir.get
 
 let parsing = add_group "Parsing"
 
-
-
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extended
@@ -1296,6 +1294,17 @@ module CStd =
         "Configures the ISO standard to use. Note that your preprocessor must \
          support it, else it will lead to preprocessing failure."
       let values = [ C11, "c11" ; C17, "c17" ; C23, "c23" ]
+    end)
+
+let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.do_not_reset_on_copy ()
+module IgnoreAttributes =
+  String_list
+    (struct
+      let option_name = "-ignore-attributes"
+      let module_name = "IgnoreAttributes"
+      let arg_name = "attr1,attr2,..."
+      let help = "Registers attributes to be ignored during type comparison."
     end)
 
 (* ************************************************************************* *)
@@ -1682,24 +1691,6 @@ module VariadicStrict =
                 signedness"
   end)
 
-
-(* ************************************************************************* *)
-(** {2 Attribute Registration} *)
-(* ************************************************************************* *)
-
-(* TODO: add a mechanism to allow registering a full attribute. *)
-let attributes_reg = add_group "Attribute Registration"
-
-let () = Parameter_customize.set_group attributes_reg
-let () = Parameter_customize.do_not_reset_on_copy ()
-module IgnoreAttributes =
-  String_list
-    (struct
-      let option_name = "-ignore-attributes"
-      let module_name = "IgnoreAttributes"
-      let arg_name = "attr1,attr2,..."
-      let help = "Registers attributes to be ignored during type comparison."
-    end)
 
 (* ************************************************************************* *)
 (** {2 Analysis Options} *)
