@@ -29,6 +29,7 @@ and node =
   | Not of ast
   | Assoc of assoc * ast list
   | Binop of ast * binop * ast
+  | Implies of ast list * ast
   | Call of string * ast list * bool (* trailing .. *)
   | Times of Z.t * ast
   | List of ast list
@@ -61,6 +62,17 @@ let assoc op a b =
   {
     loc = fst a.loc, snd b.loc ;
     value = Assoc(op,unroll op a @ unroll op b) ;
+  }
+
+let implies a b =
+  let rec aux acc l = match l with
+    | { value = Implies (x, tl) } -> aux (List.rev_append x acc) tl
+    | other -> List.rev acc, other
+  in
+  let hs, c = aux [] b in
+  {
+    loc = fst a.loc, snd b. loc ;
+    value = Implies (a :: hs, c) ;
   }
 
 let concat ~loc es =
@@ -183,6 +195,7 @@ let rec parse ctxt p =
   | PLrel(a,Neq,b) -> parse_binop ctxt ~loc `Ne a b
   | PLand(a,b) -> assoc `And (parse ctxt a) (parse ctxt b)
   | PLor(a,b) -> assoc `Or (parse ctxt a) (parse ctxt b)
+  | PLimplies(a, b) -> implies (parse ctxt a) (parse ctxt b)
   | PLempty -> { loc ; value = List [] }
   | PLlist ps -> { loc ; value = List (List.map (parse ctxt) ps) }
   | PLrepeat(p,n) -> parse_binop ctxt ~loc `Repeat p n
@@ -239,6 +252,11 @@ let rec pp fmt (a : ast) =
     Format.fprintf fmt "@[<hov 2>(%a" pp v ;
     List.iter (Format.fprintf fmt "@ %s %a" op pp) vs ;
     Format.fprintf fmt ")@]"
+  | Implies([], p) -> pp fmt p
+  | Implies(hyps, p) ->
+    Format.fprintf fmt "@[<hov 2>%a ==> %a@]"
+      (Pretty_utils.pp_list ~sep:" ==> @," pp) hyps
+      pp p
   | Binop(a,op,b) ->
     let op = match op with
       | `Div -> "/"
@@ -350,6 +368,9 @@ let rec pmatch env (p : pattern) e =
   | Binop(p,`Le,q) , Leq(a,b) -> pbinop env p q a b
   | Binop(p,`Lsl,q) , Fun(lf,[a;b]) when lf == Cint.f_lsl -> pbinop env p q a b
   | Binop(p,`Lsr,q) , Fun(lf,[a;b]) when lf == Cint.f_lsr -> pbinop env p q a b
+  | Implies(hps, cp), Imply(hs, c) ->
+    pac env Lang.F.e_and [] hps hs ;
+    pmatch env cp c
   | Times(b,p) , Times(a,e) ->
     let q,r = Z.div_rem a b in
     if Z.is_zero r then pmatch env p (Lang.F.e_times q e)
@@ -601,6 +622,8 @@ let rec select (env : sigma) (a : value) =
       | `Band -> "lf:land"
       | `Bxor -> "lf:lxor"
     in Tactical.compose op (List.map (cc) vs)
+  | Implies(hyps, c) ->
+    Tactical.compose "wp:imply" (List.rev @@ cc c :: (List.rev_map cc hyps))
   | Binop(a,op,b) ->
     let op = match op with
       | `Div -> "wp:div"
@@ -745,6 +768,11 @@ let rec typecheck env expected (a : ast) =
   | Bool _ -> tc_merge env ~loc ~expected vbool
   | String _ -> tc_merge env ~loc ~expected String
   | Not a -> typecheck env (tc_merge env ~loc ~expected vbool) a
+  | Implies (hyps, c) ->
+    List.fold_left
+      (typecheck env)
+      (tc_merge env ~loc ~expected vbool)
+      (c :: hyps)
   | Assoc((`And|`Or),vs) ->
     List.fold_left (typecheck env) (tc_merge env ~loc ~expected vbool) vs
   | Assoc((`Bor|`Band|`Bxor),vs) ->

@@ -624,6 +624,25 @@ let () = add_composer
 
 let () = add_composer
     (object
+      method id = "wp:imply"
+      method group = "logic"
+      method title = "A ==> B"
+      method descr = ""
+      method arity = 2
+      method filter = List.for_all F.is_prop
+      method compute =
+        let rec aux acc rem =
+          match acc, rem with
+          | _, [] -> F.e_true
+          | [], [ x ] -> x
+          | acc, [ x ] -> F.e_imply (List.rev acc) x
+          | acc, h :: rem -> aux (h :: acc) rem
+        in
+        aux []
+    end)
+
+let () = add_composer
+    (object
       method id = "wp:incr"
       method group = "additive"
       method title = "A+1"
