@@ -4,4 +4,4 @@ COMMENT: Path to the library from the test file
 LIBS: @PTEST_SUITE_DIR@/../Aorai_test
 
 DEPS:
-OPT: -aorai-test-id @PTEST_NUMBER@@PTEST_CONFIG@
+OPT: -constfold -aorai-test-id @PTEST_NUMBER@@PTEST_CONFIG@
