@@ -1298,7 +1298,13 @@ module CStd =
       let values = [ C11, "c11" ; C17, "c17" ; C23, "c23" ]
     end)
 
-let () = Parameter_customize.set_group parsing
+(* ************************************************************************* *)
+(** {2 Compilation Database} *)
+(* ************************************************************************* *)
+
+let database = add_group "Compilation Database"
+
+let () = Parameter_customize.set_group database
 let () = Parameter_customize.do_not_reset_on_copy ()
 module CompilationDb =
   P.Filepath
@@ -1314,10 +1320,7 @@ module CompilationDb =
          '<path>/compile_commands.json'. Disabled by default."
     end)
 
-
-let mopsa = add_group "Mopsa"
-
-let () = Parameter_customize.set_group mopsa
+let () = Parameter_customize.set_group database
 let () = Parameter_customize.do_not_reset_on_copy ()
 module MopsaDb =
   P.Filepath
@@ -1334,7 +1337,7 @@ module MopsaDb =
          be parsed and preprocessing flags."
     end)
 
-let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.set_group database
 let () = Parameter_customize.do_not_reset_on_copy ()
 module MopsaListDeps =
   P.String_list
@@ -1345,7 +1348,7 @@ module MopsaListDeps =
                   used by target1,target2,..., then exits."
     end)
 
-let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.set_group database
 let () = Parameter_customize.do_not_reset_on_copy ()
 module MopsaTarget =
   P.String_list
@@ -1360,7 +1363,7 @@ module MopsaTarget =
                   emitted relative to Frama-C's PWD, as usual."
     end)
 
-let () = Parameter_customize.set_group parsing
+let () = Parameter_customize.set_group database
 let () = Parameter_customize.do_not_reset_on_copy ()
 module MopsaExcludeSources =
   P.Filepath_list

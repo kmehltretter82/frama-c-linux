@@ -596,6 +596,18 @@ module CStd: Parameter_sig.S with type t = iso_c
     @since 32.0-Germanium
 *)
 
+module GeneratedSpecMode: Parameter_sig.String
+(** Behavior of option "-generated-spec-mode". *)
+
+module GeneratedSpecCustom: Parameter_sig.Map
+  with type key = string
+   and type value = string
+(** Behavior of option "-generated-spec-custom". *)
+
+(* ************************************************************************* *)
+(** {2 Compilation Database} *)
+(* ************************************************************************* *)
+
 module CompilationDb: Parameter_sig.Filepath
 (** Behavior of option "-compilation-db" *)
 
@@ -610,14 +622,6 @@ module MopsaTarget: Parameter_sig.String_list
 
 module MopsaExcludeSources: Parameter_sig.Filepath_list
 (** Behavior of option "-mopsa-exclude-sources" *)
-
-module GeneratedSpecMode: Parameter_sig.String
-(** Behavior of option "-generated-spec-mode". *)
-
-module GeneratedSpecCustom: Parameter_sig.Map
-  with type key = string
-   and type value = string
-(** Behavior of option "-generated-spec-custom". *)
 
 (* ************************************************************************* *)
 (** {2 Variadic Normalization} *)
