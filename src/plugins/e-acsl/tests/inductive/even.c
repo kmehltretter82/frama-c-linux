@@ -10,8 +10,8 @@ int zero = 0;
 
   inductive even(ℤ x) {
     case zero: \forall ℤ a; even(zero);
-    case pos: \forall ℤ a; a >= 2 ==> even(a-2) ==> even(a);
-    case neg: \forall ℤ a; a <= -2 ==> even(a+2) ==> even(a);
+    case pos: \forall ℤ a; a >= 0 ==> even(a) ==> even(a+2);
+    case neg: \forall ℤ a; a <= 0 ==> even(a) ==> even(a-2);
   }
 
 @*/

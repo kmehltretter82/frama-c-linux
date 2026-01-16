@@ -7,18 +7,6 @@
 #include "time.h"
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
-/*@ inductive P1(integer x) { case c: \forall integer a; P1(1 / a);
-      }
- */
-/*@
-inductive P2(integer i, integer x) {
-  case zero: P2(0, 0);
-  case one: P2(1, 1);
-  case other: \forall integer n, integer f1, integer f2;
-                n > 1 ==>
-                P2(n - 1, f1) ==> P2(n - 2, f2) ==> P2(n + 1, f1 + f2);
-  }
- */
 /*@
 inductive P3(integer a, integer b) {
   case c: \forall integer x, integer y; \let v = x; P3(v, y);
@@ -94,8 +82,6 @@ int main(void)
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
-  /*@ assert P1(1); */ ;
-  /*@ assert P2(7, 13); */ ;
   /*@ assert P3(2, 3); */ ;
   /*@ assert eq(2, 2); */ ;
   /*@ assert !eq(2, 3); */ ;

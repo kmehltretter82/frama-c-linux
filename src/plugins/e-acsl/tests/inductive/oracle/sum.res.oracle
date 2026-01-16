@@ -1,5 +1,8 @@
 [e-acsl] beginning translation.
-[e-acsl:analysis:inductive] function extraction with mode incomplete in 5
+[e-acsl:analysis:inductive] 
+  extracting predicate from sum using mode: incomplete in 5
+[e-acsl:analysis:inductive] 
+  extracting function from sum with mode: incomplete in 5
 [e-acsl] Warning: Negative verdicts of sum might be unsound
 [e-acsl] sum.c:30: Warning: 
   no assigns clause generated for function sum because pointers as arguments is not yet supported

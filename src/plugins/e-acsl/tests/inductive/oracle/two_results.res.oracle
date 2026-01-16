@@ -1,5 +1,8 @@
 [e-acsl] beginning translation.
-[e-acsl:analysis:inductive] function extraction with mode incomplete in 2
+[e-acsl:analysis:inductive] 
+  extracting predicate from P using mode: incomplete in 2
+[e-acsl:analysis:inductive] 
+  extracting function from P with mode: incomplete in 2
 [e-acsl] Warning: Negative verdicts of P might be unsound
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] two_results.c:18: Warning: assertion got status unknown.

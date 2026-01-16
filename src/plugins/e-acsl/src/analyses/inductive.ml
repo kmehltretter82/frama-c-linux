@@ -36,22 +36,21 @@ include struct (* auxiliary functions *)
 
   (* applies logic variable substitutions [substs] as well as a logic_info
      substitution [(li, li')] *)
-  let subst_applier (li, li') substs = object
+  let subst_applier ?li_subst substs = object
     inherit Visitor.frama_c_inplace
 
     method! vlogic_info_use this_li =
-      if Logic_info.equal this_li li then ChangeTo li' else DoChildren
+      match li_subst with
+      | Some (li, li') when Logic_info.equal this_li li -> ChangeTo li'
+      | Some _ | None -> DoChildren
 
-    method !vquantifiers quantifiers =
-      let apply_subst v =
-        try Logic_var.Map.find v substs
-        with Not_found -> v
-      in
-      ChangeTo (List.map apply_subst quantifiers)
-
-    method !vlogic_var_use v =
-      try ChangeTo (Logic_var.Map.find v substs)
-      with Not_found -> DoChildren
+    method !vterm = function
+      | {term_node = TLval (TVar v, TNoOffset); term_loc} ->
+        (try
+           let t = Logic_var.Map.find v substs in
+           ChangeTo {t with term_loc} (* copy *)
+         with Not_found -> DoChildren)
+      | _ -> DoChildren
   end
 
   let rec extract_foralls = function
@@ -195,14 +194,14 @@ module Substs = struct
   let unions = List.fold_left union empty
 
   let succession first later = (* one substitution applied after another *)
-    union (map (fun v -> try find v later with Not_found -> v) first) later
+    union (map (fun t -> Visitor.visitFramacTerm (subst_applier later) t) first) later
 
   let pretty fmt m =
     let pp_substitution fmt src tgt =
       Format.fprintf fmt "@[@[%a@] %t @[%a@]@]"
         Printer.pp_logic_var src
         Unicode.pp_right_arrow
-        Printer.pp_logic_var tgt
+        Printer.pp_term tgt
     in
     Format.fprintf fmt "@[[";
     let first = ref true in
@@ -220,7 +219,7 @@ end
     known. This information is retained along with the mode as it is useful to
     re-use by the normalization. *)
 module Modus : sig
-  type t = {mode : mode; substs : logic_var Substs.t}
+  type t = {mode : mode; substs : term Substs.t}
 
   val pretty : Format.formatter -> t -> unit
 
@@ -228,7 +227,7 @@ module Modus : sig
   val preferred_opt : t list -> t option
   val preferred : li:logic_info -> t list -> t
 end = struct
-  type t = {mode : mode; substs : logic_var Substs.t}
+  type t = {mode : mode; substs : term Substs.t}
 
   let compare {mode = m1} {mode = m2} = Mode.compare m1 m2
 
@@ -274,6 +273,29 @@ end = struct
     predicate : predicate (* generalized Horn clauses *)
   }
 
+  let mk_var_subst (arg, formal) =
+    let rec solve lhs rhs = match lhs.term_node with
+      | TLval (TVar v, TNoOffset) -> Some (v, rhs)
+      | TBinOp (PlusA, t1, t2) when Vars.is_empty (free_vars t2) ->
+        solve t1 {t2 with term_node = TBinOp (MinusA, rhs, t2)}
+      | TBinOp (PlusA, t1, t2) when Vars.is_empty (free_vars t1) ->
+        solve t2 {t1 with term_node = TBinOp (MinusA, rhs, t1)}
+      | TBinOp (MinusA, t1, t2) when Vars.is_empty (free_vars t2) ->
+        solve t1 {t2 with term_node = TBinOp (PlusA, rhs, t2)}
+      | TBinOp (MinusA, t1, t2) when Vars.is_empty (free_vars t1) ->
+        solve t2 {t1 with term_node = TBinOp (MinusA, t1, rhs)}
+      | TBinOp (Mult, t1, t2) when Vars.is_empty (free_vars t2) ->
+        solve t1 {t2 with term_node = TBinOp (Div, rhs, t2)}
+      | TBinOp (Mult, t1, t2) when Vars.is_empty (free_vars t1) ->
+        solve t2 {t1 with term_node = TBinOp (Div, rhs, t1)}
+      | TBinOp (Div, t1, t2) when Vars.is_empty (free_vars t2) ->
+        solve t1 {t2 with term_node = TBinOp (Mult, rhs, t2)}
+      | TBinOp (Div, t1, t2) when Vars.is_empty (free_vars t1) ->
+        solve t2 {t1 with term_node = TBinOp (Div, t1, rhs)}
+      | _ -> None
+    in
+    solve arg (Logic_const.tvar ~loc:arg.term_loc formal)
+
   let analyze_mode ~lv_rec p mode =
     let quantifiers, p = extract_foralls p in
     let is_rec_occurrence li = Logic_var.equal li.l_var_info lv_rec in
@@ -282,6 +304,8 @@ end = struct
        been let-bound. *)
     (* lb: (future) let-bound variables; do not add variables that have already
        been used before. *)
+    let free_vars t = Vars.inter quantifiers @@ free_vars t in
+    let free_vars_pred p = Vars.inter quantifiers @@ free_vars_pred p in
     let rec test_mode ~lb ~fv p =
       let recurse ?(lb = lb) ?(fv = fv) = test_mode ~lb ~fv in
       let add_fv fv terms = Vars.unions @@ fv :: List.map free_vars terms in
@@ -332,17 +356,14 @@ end = struct
           Printer.pp_predicate p
       | Papp (li, _, args) when is_rec_occurrence li -> (* conclusion *)
         let substs =
-          let pairs, _ = Mode.in_out_args ~mode (List.combine args li.l_profile)
-          and var_subst (arg, formal) =
-            Option.map (fun v -> v, formal) (var_of_term arg)
-          in Substs.of_list @@ List.filter_map var_subst pairs
+          let pairs, _ = Mode.in_out_args ~mode (List.combine args li.l_profile) in
+          Substs.of_list @@ List.filter_map mk_var_subst pairs
         in
         let fv = add_fv fv args in
-        let free_quantified_vars = Vars.inter fv quantifiers in
         let unbound_quantified_vars =
           Vars.filter
             (fun v -> not @@ Substs.mem v substs)
-            (Vars.diff free_quantified_vars lb)
+            (Vars.diff fv lb)
         in
         if Vars.is_empty unbound_quantified_vars
         then Some {Modus.mode; substs}
@@ -601,11 +622,14 @@ end = functor (Out : Out_language) -> struct
     let loc = loc_of_inductive li in
     let li = {li with l_profile = new_formals; l_type} in
     let li_concl_and_formal_substs =
-      let formal_substs = Substs.of_list @@ List.combine old_profile new_profile in
-      (* The substitution (li, li) is meaningful, since li we look to
-         substitute
-         a logic_info of which li is a copy: same logic_var, different record *)
-      subst_applier (li, li) @@ Substs.succession modus.substs formal_substs
+      let formal_substs =
+        Substs.of_list @@
+        List.combine old_profile (List.map Logic_const.tvar new_profile)
+      in
+      (* The substitution (li, li) is meaningful, since the logic_info we look
+         to substitute is a copy of li: same logic_var, different record *)
+      let li_subst = li, li in
+      subst_applier ~li_subst @@ Substs.succession modus.substs formal_substs
     in
     (* The substitution (li, li) is meaningful, since li we look to substitute
        a logic_info of which li is a copy: same logic_var, different record *)
@@ -626,7 +650,7 @@ end = functor (Out : Out_language) -> struct
     Option.iter (fun n -> li.l_var_info.lv_name <- n) name;
     if !is_unsound_if_false then Unsound_if_false.add li;
     Options.feedback ~dkey ~level:2
-      "@[<2>extracted from inductive definition of %s executable predicate:@ @[%a@]@]"
+      "@[<2>extracted from inductive definition of %s:@ @[%a@]@]"
       old_name
       pp_logic_info li;
     li
@@ -650,7 +674,10 @@ end = struct
     end)
 
   let extract_with_mode ~mode:m li =
-    Options.debug ~dkey "function extraction with mode incomplete in %d" m;
+    Options.debug ~level:1 ~dkey
+      "extracting function from %a with mode: incomplete in %d"
+      Logic_info.pretty li
+      m;
     let name = li.l_var_info.lv_name ^ "_fun" ^ string_of_int m in
     let f = Extractor.extract ~name ~mode:(Incomplete m) li in
     Derived_functions.add li f;
@@ -671,9 +698,11 @@ end
     end)
 
   let extract_with_mode ~mode:{Modus.mode} li =
+    Options.debug ~dkey "extracting predicate from %a using mode: %a"
+      Logic_info.pretty li
+      Mode.pretty mode;
     match mode with
     | Complete ->
-      Options.debug ~dkey "predicate extraction in complete mode";
       Extractor.extract ~mode li
     | Incomplete i ->
       let f = FunctionExtractor.extract ~mode:mode li in

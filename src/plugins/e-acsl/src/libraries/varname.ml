@@ -61,11 +61,36 @@ let of_unop = function
   | BNot -> "not"
   | LNot -> "not"
 
+(* we try to use the constant value as a suffix; but if it is not a viable for
+   variable name we do not use any suffix *)
+let suffix suf =
+  let is_alphanum c =
+    c = '_' ||
+    'a' <= c && c <= 'z' ||
+    'A' <= c && c <= 'Z' ||
+    '0' <= c && c <= '9'
+  in
+  if String.for_all is_alphanum suf
+  then suf
+  else
+    let () = Kernel.warning "invalid suffix: %s" suf in
+    ""
+
+let point = Str.regexp_string "\\."
+let trailing_point = Str.regexp_string "\\.$"
+
 let rec of_exp ?default exp = match exp.enode with
   | Lval (Var {vorig_name}, NoOffset) -> vorig_name
-  | Const (CInt64 (i, _, _)) -> "const_" ^ Z.to_string i
-  | BinOp (op, x, y, _) -> of_binop op ^ of_exp x ^ "_" ^ of_exp y
-  | UnOp (op, x, _) -> of_unop op ^ of_exp x
+  | Const (CInt64 (i, _, _)) -> "const_" ^ suffix (Z.to_string i)
+  | Const (CReal (float, _, txt)) ->
+    let suf = Option.value ~default:(Float.to_string float) txt in
+    let suf = Str.global_replace trailing_point suf "" in
+    let suf = Str.global_replace point suf "p" in
+    "real" ^ suffix suf
+  | Const (CEnum {einame}) -> "enum" ^ suffix ("_" ^ einame)
+  | Const (CChr c) -> "char" ^ suffix (Z.to_string @@ Cil.charConstToInt c)
+  | BinOp (op, x, y, _) -> of_binop op ^ "_" ^ of_exp x ^ "_" ^ of_exp y
+  | UnOp (op, x, _) -> of_unop op ^ "_" ^ of_exp x
   | e ->
     match default with
     | None ->
