@@ -3,28 +3,42 @@
 [region] Function byref:
   R0001: -R-- p (int **) 64b (*R0002) ;
   R0002: ---- 0b ;
+[region] Function call_byref:
+  R0001: -R-- B[64] (int) 32b ;
+  R0002: -R-- k (int) 32b ;
+  R0003: -RW- a (int *) 64b (*R0001) ;
+  R0004: -RW- __retres (int) 32b ;
+  R0005: --W- \result (int) 32b ;
 [region] Function call_copy:
   R0001: ---- a[…] b[…] 0b ;
 [region] Function call_field:
   R0001: ---- s 320b { .f: R0002; #256b; } ;
   R0002: --W- (int *) 64b (*R0003) ;
   R0003: ---- a[…] 0b ;
+[region:froms] assigns.i:8: Warning: 
+  Missing \from for pointer assignment
+  (warn-once: no further messages from category 'froms' will be emitted)
 [region] Function call_imprecise:
+  R0001: ---- B[…] 0b ;
+  R0002: -R-- k (int) 32b ;
+  R0003: -RW- a (int *) 64b (*R0004) ;
+  R0004: -R-- (int) 32b ;
+  R0005: -RW- __retres (int) 32b ;
+  R0006: --W- \result (int) 32b ;
+[region] Function call_imprecise_result:
   R0001: ---- B[…] 0b ;
   R0002: -R-- k (int) 32b ;
   R0003: -RW- tmp (int *) 64b (*R0004) ;
   R0004: ---- 0b ;
   R0005: --W- \result (int *) 64b (*R0004) ;
+[region] Function call_nothing:
+  R0001: -RW- tmp (int *) 64b (*R0002) ;
+  R0002: ---- 0b ;
+  R0003: --W- \result (int *) 64b (*R0002) ;
 [region] Function call_range:
   R0001: ---- s 320b { #64b; .g: R0002[4]; } ;
   R0002: --W- (int *) 64b (*R0003) ;
   R0003: ---- a[…] 0b ;
-[region] Function caller_byref:
-  R0001: -R-- B[64] (int) 32b ;
-  R0002: -R-- k (int) 32b ;
-  R0003: -RW- a (int *) 64b (*R0001) ;
-  R0004: -RW- __retres (int) 32b ;
-  R0005: --W- \result (int) 32b ;
 [region] Function caller_result:
   R0001: -R-- B[64] (int) 32b ;
   R0002: -R-- k (int) 32b ;
@@ -35,6 +49,11 @@
   R0001: -R-- p (struct S *) 64b (*R0002) ;
   R0002: ---- 0b ;
 [region] Function imprecise:
+  R0001: -R-- p (int **) 64b (*R0002) ;
+  R0002: ---- 0b ;
+[region] Function imprecise_result:
+  R0001: ---- \result 0b ;
+[region] Function nothing:
   R0001: ---- \result 0b ;
 [region] Function result:
   R0001: ---- \result 0b ;

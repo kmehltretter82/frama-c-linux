@@ -3,15 +3,24 @@ int B[64];
 
 //@ assigns *p \from q, k ;
 void byref(int** p, int* q, int k);
-int caller_byref (int k) { int *a; byref(&a,B,k); return *a; }
+int call_byref (int k) { int *a; byref(&a,B,k); return *a; }
+
+//@ assigns *p ;
+void imprecise(int** p, int* q, int k);
+int call_imprecise (int k) { int *a; imprecise(&a,B,k); return *a; }
 
 //@ assigns \result \from q, k ;
 int* result(int* q, int k);
 int caller_result (int k) { int *a = result(B,k); return *a; }
 
-//@ assigns \result;
-int* imprecise(int* q, int k);
-int* call_imprecise(int k) { return imprecise(B,k); }
+//TODO: shall detect a problem here!
+//@ assigns \result ;
+int* imprecise_result(int* q, int k);
+int* call_imprecise_result(int k) { return imprecise_result(B,k); }
+
+//@ assigns \result \from \nothing ;
+int* nothing(void);
+int* call_nothing(int k) { return nothing(); }
 
 struct S { int *f; int *g[4]; };
 
