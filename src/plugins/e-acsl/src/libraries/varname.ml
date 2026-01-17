@@ -96,6 +96,7 @@ let rec of_exp ?default exp = match exp.enode with
   | Const (CChr c) -> "char" ^ suffix (Z.to_string @@ Cil.charConstToInt c)
   | BinOp (op, x, y, _) -> of_binop op ^ "_" ^ of_exp x ^ "_" ^ of_exp y
   | UnOp (op, x, _) -> of_unop op ^ "_" ^ of_exp x
+  | CastE (_, exp) -> of_exp ?default exp
   | e ->
     match default with
     | None ->
