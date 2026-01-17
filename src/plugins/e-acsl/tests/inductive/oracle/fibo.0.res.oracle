@@ -13,44 +13,17 @@
 [e-acsl] Warning: Unable to extract executable code from inductive definition of is_fibo.
   See language reference manual for details on the supported forms.
 [e-acsl:analysis:inductive] extracting predicate from lucas using mode: complete
-[e-acsl:analysis:inductive] no valid mode found for: fibo
-[e-acsl] Warning: Unable to extract executable code from inductive definition of lucas.
-  See language reference manual for details on the supported forms.
+[e-acsl:analysis:inductive] 
+  extracting function from fibo with mode: incomplete in 2
+[e-acsl:analysis:inductive] 
+  extracting function from fibo with mode: incomplete in 2
+[e-acsl] Warning: Negative verdicts of lucas might be unsound
 [e-acsl] fibo.c:48: Warning: 
   E-ACSL construct
   `inductive definitions outside of subset described in the reference manual'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] fibo.c:50: Warning: 
-  E-ACSL construct
-  `inductive definitions outside of subset described in the reference manual'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] fibo.c:51: Warning: 
-  E-ACSL construct
-  `inductive definitions outside of subset described in the reference manual'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] fibo.c:52: Warning: 
-  E-ACSL construct
-  `inductive definitions outside of subset described in the reference manual'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] fibo.c:53: Warning: 
-  E-ACSL construct
-  `inductive definitions outside of subset described in the reference manual'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] fibo.c:54: Warning: 
-  E-ACSL construct
-  `inductive definitions outside of subset described in the reference manual'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] fibo.c:58: Warning: 
-  E-ACSL construct
-  `inductive definitions outside of subset described in the reference manual'
-  is not yet supported.
-  Ignoring annotation.
+[e-acsl] Varname.of_exp: supply default or extend this function to handle enodes like: CastE({tnode=TInt(ILong);tattr=[];},{eid=701;enode=Lval((Var({vname=one;vid=1147}), NoOffset));eloc=})
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] fibo.c:46: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
@@ -70,9 +43,17 @@
 [eva:alarm] fibo.c:47: Warning: assertion got status unknown.
 [eva:alarm] fibo.c:48: Warning: assertion got status unknown.
 [eva:alarm] fibo.c:50: Warning: assertion got status unknown.
+[eva:alarm] fibo.c:51: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] fibo.c:51: Warning: assertion got status unknown.
+[eva:alarm] fibo.c:52: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] fibo.c:52: Warning: assertion got status unknown.
+[eva:alarm] fibo.c:53: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] fibo.c:53: Warning: assertion got status unknown.
+[eva:alarm] fibo.c:54: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] fibo.c:54: Warning: assertion got status unknown.
 [eva:alarm] fibo.c:56: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
@@ -80,4 +61,6 @@
 [eva:alarm] fibo.c:57: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] fibo.c:57: Warning: assertion got status unknown.
+[eva:alarm] fibo.c:58: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] fibo.c:58: Warning: assertion got status unknown.

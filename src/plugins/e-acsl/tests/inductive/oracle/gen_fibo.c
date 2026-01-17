@@ -23,7 +23,10 @@ logic integer fibo_fun2(integer i) =
        (i > 1 ?
           (\let f1 = fibo_fun2(i - 1); \let f2 = fibo_fun2(i - 2); f1 + f2) :
           (fallthrough: 0)));
- */
+
+*/
+void __gen_e_acsl_fibo_fun2_7(__e_acsl_mpz_t *__retres_arg, long i);
+
 void __gen_e_acsl_fibo_fun2(__e_acsl_mpz_t *__retres_arg, int i);
 
 /*@ predicate fibo(integer i, integer x) = fibo_fun2(i) == x;
@@ -76,13 +79,22 @@ inductive lucas{L}(integer i, integer x) {
   }
  */
 /*@
-inductive __gen_e_acsl_lucas_here(integer i, integer x) {
-  case zero{L}: \at(__gen_e_acsl_lucas_here(0, 2),Here);
-  case more{L}: \at(\forall integer n, integer f1, integer f2;
-                      fibo(n - one, f1) ==>
-                      fibo(n + 1, f2) ==> __gen_e_acsl_lucas_here(n, f1 + f2),
-                    Here);
-  }
+predicate __gen_e_acsl_lucas_here(integer i, integer x) =
+  \at((i == 0 && x == 2) ||
+      \at(\let f1 = fibo_fun2(i - one);
+          \let f2 = fibo_fun2(i + 1); x == f1 + f2,
+          Here),
+      Here);
+ */
+int __gen_e_acsl_lucas_here(int i, int x);
+
+/*@
+predicate lucas{L}(integer i, integer x) =
+  \at((i == 0 && x == 2) ||
+      \at(\let f1 = fibo_fun2(i - one);
+          \let f2 = fibo_fun2(i + 1); x == f1 + f2,
+          L),
+      L);
 
 */
 int main(void)
@@ -125,47 +137,150 @@ int main(void)
   }
   /*@ assert fibo2(7, 13); */ ;
   /*@ assert is_fibo(13); */ ;
+  {
+    int __gen_e_acsl_lucas_here_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+      {.values = (void *)0};
+    __gen_e_acsl_lucas_here_2 = __gen_e_acsl_lucas_here(0,2);
+    if (! __gen_e_acsl_lucas_here_2) __e_acsl_sound_verdict = 0;
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"lucas(0, 2)",
+                                 0,__gen_e_acsl_lucas_here_2);
+    __gen_e_acsl_assert_data_7.blocking = 1;
+    __gen_e_acsl_assert_data_7.kind = "Assertion";
+    __gen_e_acsl_assert_data_7.pred_txt = "lucas(0, 2)";
+    __gen_e_acsl_assert_data_7.file = "fibo.c";
+    __gen_e_acsl_assert_data_7.fct = "main";
+    __gen_e_acsl_assert_data_7.line = 50;
+    __e_acsl_assert(__gen_e_acsl_lucas_here_2,& __gen_e_acsl_assert_data_7);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+  }
   /*@ assert lucas(0, 2); */ ;
+  {
+    int __gen_e_acsl_lucas_here_4;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+      {.values = (void *)0};
+    __gen_e_acsl_lucas_here_4 = __gen_e_acsl_lucas_here(1,1);
+    if (! __gen_e_acsl_lucas_here_4) __e_acsl_sound_verdict = 0;
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"lucas(1, 1)",
+                                 0,__gen_e_acsl_lucas_here_4);
+    __gen_e_acsl_assert_data_9.blocking = 1;
+    __gen_e_acsl_assert_data_9.kind = "Assertion";
+    __gen_e_acsl_assert_data_9.pred_txt = "lucas(1, 1)";
+    __gen_e_acsl_assert_data_9.file = "fibo.c";
+    __gen_e_acsl_assert_data_9.fct = "main";
+    __gen_e_acsl_assert_data_9.line = 51;
+    __e_acsl_assert(__gen_e_acsl_lucas_here_4,& __gen_e_acsl_assert_data_9);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
+  }
   /*@ assert lucas(1, 1); */ ;
+  {
+    int __gen_e_acsl_lucas_here_6;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
+      {.values = (void *)0};
+    __gen_e_acsl_lucas_here_6 = __gen_e_acsl_lucas_here(2,3);
+    if (! __gen_e_acsl_lucas_here_6) __e_acsl_sound_verdict = 0;
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,"lucas(2, 3)",
+                                 0,__gen_e_acsl_lucas_here_6);
+    __gen_e_acsl_assert_data_10.blocking = 1;
+    __gen_e_acsl_assert_data_10.kind = "Assertion";
+    __gen_e_acsl_assert_data_10.pred_txt = "lucas(2, 3)";
+    __gen_e_acsl_assert_data_10.file = "fibo.c";
+    __gen_e_acsl_assert_data_10.fct = "main";
+    __gen_e_acsl_assert_data_10.line = 52;
+    __e_acsl_assert(__gen_e_acsl_lucas_here_6,& __gen_e_acsl_assert_data_10);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
+  }
   /*@ assert lucas(2, 3); */ ;
+  {
+    int __gen_e_acsl_lucas_here_8;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+      {.values = (void *)0};
+    __gen_e_acsl_lucas_here_8 = __gen_e_acsl_lucas_here(3,4);
+    if (! __gen_e_acsl_lucas_here_8) __e_acsl_sound_verdict = 0;
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,"lucas(3, 4)",
+                                 0,__gen_e_acsl_lucas_here_8);
+    __gen_e_acsl_assert_data_11.blocking = 1;
+    __gen_e_acsl_assert_data_11.kind = "Assertion";
+    __gen_e_acsl_assert_data_11.pred_txt = "lucas(3, 4)";
+    __gen_e_acsl_assert_data_11.file = "fibo.c";
+    __gen_e_acsl_assert_data_11.fct = "main";
+    __gen_e_acsl_assert_data_11.line = 53;
+    __e_acsl_assert(__gen_e_acsl_lucas_here_8,& __gen_e_acsl_assert_data_11);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
+  }
   /*@ assert lucas(3, 4); */ ;
+  {
+    int __gen_e_acsl_lucas_here_10;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
+      {.values = (void *)0};
+    __gen_e_acsl_lucas_here_10 = __gen_e_acsl_lucas_here(4,7);
+    if (! __gen_e_acsl_lucas_here_10) __e_acsl_sound_verdict = 0;
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,"lucas(4, 7)",
+                                 0,__gen_e_acsl_lucas_here_10);
+    __gen_e_acsl_assert_data_12.blocking = 1;
+    __gen_e_acsl_assert_data_12.kind = "Assertion";
+    __gen_e_acsl_assert_data_12.pred_txt = "lucas(4, 7)";
+    __gen_e_acsl_assert_data_12.file = "fibo.c";
+    __gen_e_acsl_assert_data_12.fct = "main";
+    __gen_e_acsl_assert_data_12.line = 54;
+    __e_acsl_assert(__gen_e_acsl_lucas_here_10,& __gen_e_acsl_assert_data_12);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
+  }
   /*@ assert lucas(4, 7); */ ;
   {
     int __gen_e_acsl_fibo_4;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
       {.values = (void *)0};
     __gen_e_acsl_fibo_4 = __gen_e_acsl_fibo(7,12);
     if (! __gen_e_acsl_fibo_4) __e_acsl_sound_verdict = 0;
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,"fibo(7, 12)",
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,"fibo(7, 12)",
                                  0,__gen_e_acsl_fibo_4);
-    __gen_e_acsl_assert_data_12.blocking = 1;
-    __gen_e_acsl_assert_data_12.kind = "Assertion";
-    __gen_e_acsl_assert_data_12.pred_txt = "!fibo(7, 12)";
-    __gen_e_acsl_assert_data_12.file = "fibo.c";
-    __gen_e_acsl_assert_data_12.fct = "main";
-    __gen_e_acsl_assert_data_12.line = 56;
-    __e_acsl_assert(! __gen_e_acsl_fibo_4,& __gen_e_acsl_assert_data_12);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
+    __gen_e_acsl_assert_data_13.blocking = 1;
+    __gen_e_acsl_assert_data_13.kind = "Assertion";
+    __gen_e_acsl_assert_data_13.pred_txt = "!fibo(7, 12)";
+    __gen_e_acsl_assert_data_13.file = "fibo.c";
+    __gen_e_acsl_assert_data_13.fct = "main";
+    __gen_e_acsl_assert_data_13.line = 56;
+    __e_acsl_assert(! __gen_e_acsl_fibo_4,& __gen_e_acsl_assert_data_13);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
   }
   /*@ assert !fibo(7, 12); */ ;
   {
     int __gen_e_acsl_fibo2_4;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
       {.values = (void *)0};
     __gen_e_acsl_fibo2_4 = __gen_e_acsl_fibo2(7,12);
     if (! __gen_e_acsl_fibo2_4) __e_acsl_sound_verdict = 0;
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,
                                  "fibo2(7, 12)",0,__gen_e_acsl_fibo2_4);
-    __gen_e_acsl_assert_data_13.blocking = 1;
-    __gen_e_acsl_assert_data_13.kind = "Assertion";
-    __gen_e_acsl_assert_data_13.pred_txt = "!fibo2(7, 12)";
-    __gen_e_acsl_assert_data_13.file = "fibo.c";
-    __gen_e_acsl_assert_data_13.fct = "main";
-    __gen_e_acsl_assert_data_13.line = 57;
-    __e_acsl_assert(! __gen_e_acsl_fibo2_4,& __gen_e_acsl_assert_data_13);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
+    __gen_e_acsl_assert_data_14.blocking = 1;
+    __gen_e_acsl_assert_data_14.kind = "Assertion";
+    __gen_e_acsl_assert_data_14.pred_txt = "!fibo2(7, 12)";
+    __gen_e_acsl_assert_data_14.file = "fibo.c";
+    __gen_e_acsl_assert_data_14.fct = "main";
+    __gen_e_acsl_assert_data_14.line = 57;
+    __e_acsl_assert(! __gen_e_acsl_fibo2_4,& __gen_e_acsl_assert_data_14);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
   }
   /*@ assert !fibo2(7, 12); */ ;
+  {
+    int __gen_e_acsl_lucas_here_12;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
+      {.values = (void *)0};
+    __gen_e_acsl_lucas_here_12 = __gen_e_acsl_lucas_here(4,5);
+    if (! __gen_e_acsl_lucas_here_12) __e_acsl_sound_verdict = 0;
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"lucas(4, 5)",
+                                 0,__gen_e_acsl_lucas_here_12);
+    __gen_e_acsl_assert_data_15.blocking = 1;
+    __gen_e_acsl_assert_data_15.kind = "Assertion";
+    __gen_e_acsl_assert_data_15.pred_txt = "!lucas(4, 5)";
+    __gen_e_acsl_assert_data_15.file = "fibo.c";
+    __gen_e_acsl_assert_data_15.fct = "main";
+    __gen_e_acsl_assert_data_15.line = 58;
+    __e_acsl_assert(! __gen_e_acsl_lucas_here_12,
+                    & __gen_e_acsl_assert_data_15);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
+  }
   /*@ assert !lucas(4, 5); */ ;
   __retres = 0;
   __e_acsl_memory_clean();
@@ -248,6 +363,85 @@ void __gen_e_acsl_fibo_fun2(__e_acsl_mpz_t *__retres_arg, int i)
   __gmpz_init_set(*__retres_arg,
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_if_3));
   __gmpz_clear(__gen_e_acsl_if_3);
+  return;
+}
+
+/*@ assigns (*__retres_arg)[0];
+    assigns (*__retres_arg)[0] \from i; */
+void __gen_e_acsl_fibo_fun2_7(__e_acsl_mpz_t *__retres_arg, long i)
+{
+  __e_acsl_mpz_t __gen_e_acsl_if_10;
+  if (i == 0L) {
+    __e_acsl_mpz_t __gen_e_acsl__13;
+    __gmpz_init_set_si(__gen_e_acsl__13,0L);
+    __gmpz_init_set(__gen_e_acsl_if_10,
+                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__13));
+    __gmpz_clear(__gen_e_acsl__13);
+  }
+  else {
+    __e_acsl_mpz_t __gen_e_acsl_if_9;
+    if (i == 1L) {
+      __e_acsl_mpz_t __gen_e_acsl__14;
+      __gmpz_init_set_si(__gen_e_acsl__14,1L);
+      __gmpz_init_set(__gen_e_acsl_if_9,
+                      (__e_acsl_mpz_struct const *)(__gen_e_acsl__14));
+      __gmpz_clear(__gen_e_acsl__14);
+    }
+    else {
+      __e_acsl_mpz_t __gen_e_acsl_if_8;
+      if (i > 1L) {
+        __e_acsl_mpz_t __gen_e_acsl_f1_4;
+        __e_acsl_mpz_t __gen_e_acsl_fibo_fun2_9;
+        __e_acsl_mpz_t __gen_e_acsl_f2_3;
+        __e_acsl_mpz_t __gen_e_acsl_fibo_fun2_11;
+        __e_acsl_mpz_t __gen_e_acsl_add_4;
+        __gen_e_acsl_fibo_fun2_7(& __gen_e_acsl_fibo_fun2_9,i - 1L);
+        __gmpz_init_set(__gen_e_acsl_f1_4,
+                        (__e_acsl_mpz_struct const *)(__gen_e_acsl_fibo_fun2_9));
+        __gen_e_acsl_fibo_fun2_7(& __gen_e_acsl_fibo_fun2_11,i - 2L);
+        __gmpz_init_set(__gen_e_acsl_f2_3,
+                        (__e_acsl_mpz_struct const *)(__gen_e_acsl_fibo_fun2_11));
+        __gmpz_init(__gen_e_acsl_add_4);
+        __gmpz_add(__gen_e_acsl_add_4,
+                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_f1_4),
+                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_f2_3));
+        __gmpz_init_set(__gen_e_acsl_if_8,
+                        (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_4));
+        __gmpz_clear(__gen_e_acsl_f1_4);
+        __gmpz_clear(__gen_e_acsl_fibo_fun2_9);
+        __gmpz_clear(__gen_e_acsl_f2_3);
+        __gmpz_clear(__gen_e_acsl_fibo_fun2_11);
+        __gmpz_clear(__gen_e_acsl_add_4);
+      }
+      else {
+        __e_acsl_mpz_t __gen_e_acsl__15;
+        {
+          __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+            {.values = (void *)0};
+          __gen_e_acsl_assert_data_8.blocking = 1;
+          __gen_e_acsl_assert_data_8.kind = "Assertion";
+          __gen_e_acsl_assert_data_8.pred_txt = "Incomplete inductive function";
+          __gen_e_acsl_assert_data_8.file = "fibo.c";
+          __gen_e_acsl_assert_data_8.fct = "fibo_fun2_7";
+          __gen_e_acsl_assert_data_8.line = 9;
+          __e_acsl_assert(0,& __gen_e_acsl_assert_data_8);
+        }
+        __gmpz_init_set_si(__gen_e_acsl__15,0L);
+        __gmpz_init_set(__gen_e_acsl_if_8,
+                        (__e_acsl_mpz_struct const *)(__gen_e_acsl__15));
+        __gmpz_clear(__gen_e_acsl__15);
+      }
+      __gmpz_init_set(__gen_e_acsl_if_9,
+                      (__e_acsl_mpz_struct const *)(__gen_e_acsl_if_8));
+      __gmpz_clear(__gen_e_acsl_if_8);
+    }
+    __gmpz_init_set(__gen_e_acsl_if_10,
+                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_if_9));
+    __gmpz_clear(__gen_e_acsl_if_9);
+  }
+  __gmpz_init_set(*__retres_arg,
+                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_if_10));
+  __gmpz_clear(__gen_e_acsl_if_10);
   return;
 }
 
@@ -443,6 +637,46 @@ int __gen_e_acsl_fibo2(int i, int x)
   __gmpz_clear(__gen_e_acsl_fibo2_fun2_6);
   __gmpz_clear(__gen_e_acsl_x_2);
   return __retres;
+}
+
+/*@ assigns \result;
+    assigns \result \from i, x; */
+int __gen_e_acsl_lucas_here(int i, int x)
+{
+  int __gen_e_acsl_and;
+  int __gen_e_acsl_or;
+  if (i == 0) __gen_e_acsl_and = x == 2; else __gen_e_acsl_and = 0;
+  if (__gen_e_acsl_and) __gen_e_acsl_or = 1;
+  else {
+    __e_acsl_mpz_t __gen_e_acsl_f1_3;
+    __e_acsl_mpz_t __gen_e_acsl_fibo_fun2_12;
+    __e_acsl_mpz_t __gen_e_acsl_f2_4;
+    __e_acsl_mpz_t __gen_e_acsl_fibo_fun2_14;
+    __e_acsl_mpz_t __gen_e_acsl_x_3;
+    __e_acsl_mpz_t __gen_e_acsl_add_5;
+    int __gen_e_acsl_eq_6;
+    __gen_e_acsl_fibo_fun2_7(& __gen_e_acsl_fibo_fun2_12,i - (long)one);
+    __gmpz_init_set(__gen_e_acsl_f1_3,
+                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_fibo_fun2_12));
+    __gen_e_acsl_fibo_fun2(& __gen_e_acsl_fibo_fun2_14,i + 1);
+    __gmpz_init_set(__gen_e_acsl_f2_4,
+                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_fibo_fun2_14));
+    __gmpz_init_set_si(__gen_e_acsl_x_3,(long)x);
+    __gmpz_init(__gen_e_acsl_add_5);
+    __gmpz_add(__gen_e_acsl_add_5,
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl_f1_3),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl_f2_4));
+    __gen_e_acsl_eq_6 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_x_3),
+                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_5));
+    __gen_e_acsl_or = __gen_e_acsl_eq_6 == 0;
+    __gmpz_clear(__gen_e_acsl_f1_3);
+    __gmpz_clear(__gen_e_acsl_fibo_fun2_12);
+    __gmpz_clear(__gen_e_acsl_f2_4);
+    __gmpz_clear(__gen_e_acsl_fibo_fun2_14);
+    __gmpz_clear(__gen_e_acsl_x_3);
+    __gmpz_clear(__gen_e_acsl_add_5);
+  }
+  return __gen_e_acsl_or;
 }
 
 

@@ -62,8 +62,6 @@ include struct (* auxiliary functions *)
       Vars.union (Vars.of_list qs) qs', p'
     | p -> Vars.empty, p
 
-  let without_foralls p = snd @@ extract_foralls p
-
   let var_of_term t = match t.term_node with
     | TLval (TVar v, TNoOffset) -> Some v
     | _ -> None
@@ -485,6 +483,8 @@ end = functor (Out : Out_language) -> struct
     let new_formals, res = Mode.in_out_args ~mode new_profile in
     let is_unsound_if_false = ref false in
     let extract_ctor ({Constructor.predicate = p} as ctor) next_ctor =
+      let quantifiers, p = extract_foralls p in
+      let free_vars t = Vars.inter quantifiers @@ free_vars t in
       let li_rec = li in
       let is_rec_occurrence li' = Logic_var.equal li'.l_var_info li_rec.l_var_info in
       let flush_conds ~conds case_true =
@@ -589,7 +589,7 @@ end = functor (Out : Out_language) -> struct
       Options.debug ~dkey ~level:3
         "@[<2>extracting data from constructor %s using modus %a:@ @[%a@]@]"
         ctor.name Mode.pretty mode Constructor.pretty ctor;
-      compile ~uv:(Vars.of_list new_formals) ~conds:[] @@ without_foralls p
+      compile ~uv:(Vars.of_list new_formals) ~conds:[] p
     in
     let modus = List.find
         (fun m -> m.Modus.mode = mode)
