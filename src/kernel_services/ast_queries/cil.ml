@@ -6655,6 +6655,25 @@ let extract_free_logicvars_from_term t =
 let extract_free_logicvars_from_predicate p =
   free_vars_predicate Logic_var.Set.empty p
 
+let extract_applied_logic_infos_from_predicate p =
+  let visitor = object
+    inherit nopCilVisitor
+    val mutable logic_infos = Logic_info.Set.empty;
+    method logic_infos = logic_infos
+    method! vpredicate_node = function
+      | Papp (li, _, _) ->
+        logic_infos <- Logic_info.Set.add li logic_infos;
+        DoChildren
+      | _ -> DoChildren
+    method! vterm_node = function
+      | Tapp (li, _, _) ->
+        logic_infos <- Logic_info.Set.add li logic_infos;
+        DoChildren
+      | _ -> DoChildren
+  end in
+  ignore @@ visitCilPredicate (visitor :> nopCilVisitor) p;
+  visitor#logic_infos
+
 class extract_labels = object
   inherit nopCilVisitor
   val mutable labels = Logic_label.Set.empty;
