@@ -16,18 +16,12 @@
 [e-acsl:analysis:inductive] 
   extracting predicate from use_var_bind_and_subst using mode: complete
 [e-acsl:analysis:inductive] 
-  extracting function from fibo with mode: incomplete in 2
-[e-acsl:analysis:inductive] 
   extracting predicate from fibo using mode: incomplete in 2
 [e-acsl:analysis:inductive] 
   extracting function from fibo with mode: incomplete in 2
 [e-acsl] Warning: Negative verdicts of fibo might be unsound
-[e-acsl] Warning: Negative verdicts of use_var_bind_and_subst might be unsound
 [e-acsl:analysis:inductive] 
   extracting predicate from use_var_use_bind_and_subst using mode: complete
-[e-acsl:analysis:inductive] 
-  extracting function from fibo with mode: incomplete in 2
-[e-acsl] Warning: Negative verdicts of use_var_use_bind_and_subst might be unsound
 [e-acsl:analysis:inductive] 
   extracting predicate from bind_twice using mode: incomplete in 3
 [e-acsl:analysis:inductive] 

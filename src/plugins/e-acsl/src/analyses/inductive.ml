@@ -73,6 +73,8 @@ include struct (* auxiliary functions *)
 
   let free_vars = Cil.extract_free_logicvars_from_term
   let free_vars_pred = Cil.extract_free_logicvars_from_predicate
+  let applied_logic_infos_pred = Cil.extract_applied_logic_infos_from_predicate
+
   let loc_of_inductive = function
     | {l_body = LBinductive ((_, _, _, p) :: _)} -> Some p.pred_loc
     | _ -> None
@@ -485,6 +487,7 @@ end = functor (Out : Out_language) -> struct
     let extract_ctor ({Constructor.predicate = p} as ctor) next_ctor =
       let quantifiers, p = extract_foralls p in
       let free_vars t = Vars.inter quantifiers @@ free_vars t in
+      let free_vars_pred p = Vars.inter quantifiers @@ free_vars_pred p in
       let li_rec = li in
       let is_rec_occurrence li' = Logic_var.equal li'.l_var_info li_rec.l_var_info in
       let flush_conds ~conds case_true =
@@ -530,6 +533,20 @@ end = functor (Out : Out_language) -> struct
         | Plet (li, p) ->
           let c = recurse ~uv:(Vars.add li.l_var_info uv) ~conds:[] p in
           flush_conds ~conds (Out.mk_let ~loc:p.pred_loc li c)
+        | Pimplies (pl, pr) when (* simple hypothesis *)
+            Vars.subset (free_vars_pred pl) uv &&
+            not (Logic_info.Set.mem li @@ applied_logic_infos_pred pl) ->
+          let extractor = object
+            inherit Visitor.frama_c_inplace
+
+            method !vpredicate p = match p.pred_content with
+              | Papp (li, labels, args) when is_inductive li ->
+                let li' = PredicateExtractor.extract li in
+                ChangeTo {p with pred_content = Papp (li', labels, args)}
+              | _ -> DoChildren
+          end in
+          let pl' = Visitor.visitFramacPredicate extractor pl in
+          recurse ~conds:(pl' :: conds) pr
         | Pimplies ({pred_content = Papp (li, labels, args)} as pl, pr)
           when is_inductive li ->
           let in_out_args', li' =
@@ -579,10 +596,8 @@ end = functor (Out : Out_language) -> struct
                 let pl = {pl with pred_content = Papp (li', labels, args)} in
                 recurse ~conds:(pl :: conds) pr
           end
-        | Pimplies (pl, pr) -> (* simple hypothesis *)
-          recurse ~conds:(pl :: conds) pr
         | Pat (p', labels) -> Out.mk_at labels @@ recurse p'
-        | _ -> (* should have been caught in mk_ctor *)
+        | _ -> (* should have been caught by the mode analysis *)
           Options.fatal "unexpected predicate in extraction:@ %a"
             Printer.pp_predicate p
       in

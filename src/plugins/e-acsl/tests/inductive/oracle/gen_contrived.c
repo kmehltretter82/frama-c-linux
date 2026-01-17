@@ -229,7 +229,6 @@ int main(void)
       {.values = (void *)0};
     __gen_e_acsl_use_var_bind_and_subst_2 = __gen_e_acsl_use_var_bind_and_subst
     (0,0);
-    if (! __gen_e_acsl_use_var_bind_and_subst_2) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
                                  "use_var_bind_and_subst(0, 0)",0,
                                  __gen_e_acsl_use_var_bind_and_subst_2);
@@ -250,7 +249,6 @@ int main(void)
       {.values = (void *)0};
     __gen_e_acsl_use_var_use_bind_and_subst_2 = __gen_e_acsl_use_var_use_bind_and_subst
     (0,0);
-    if (! __gen_e_acsl_use_var_use_bind_and_subst_2) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
                                  "use_var_use_bind_and_subst(0, 0)",0,
                                  __gen_e_acsl_use_var_use_bind_and_subst_2);
