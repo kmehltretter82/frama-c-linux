@@ -107,7 +107,7 @@ module Mode : sig
   val in_out_args : mode:t -> 'a list -> 'a list * 'a option
   val out_arg : mode:t -> 'a list -> 'a option
   val incomplete_in_out_args : mode:int -> 'a list -> 'a list * 'a
-  val select_mode : usable_vars:Vars.t -> li:logic_info -> term list -> t list -> t
+  val preferred : li:logic_info -> t list -> t
   val all_modes : li:logic_info -> t list
 end = struct
   type t = mode
@@ -167,15 +167,6 @@ end = struct
       else []
     in
     Complete :: incomplete_modes
-
-  let select_mode ~usable_vars ~li args modes =
-    let check_mode mode =
-      let in_args, _ = in_out_args ~mode args in
-      let fvs = Vars.unions @@ List.map free_vars in_args in
-      Vars.subset fvs usable_vars
-    in
-    let usable_modes = List.filter check_mode modes in
-    preferred ~li usable_modes
 end
 
 module Substs = struct
@@ -550,7 +541,12 @@ end = functor (Out : Out_language) -> struct
                     (fun m -> m.Modus.mode)
                     (InductiveDef.analyze_modes li)
                 in
-                Mode.select_mode ~usable_vars:uv ~li args available_modes
+                let check_mode mode =
+                  let in_args, _ = Mode.in_out_args ~mode args in
+                  let fvs = Vars.unions @@ List.map free_vars in_args in
+                  Vars.subset fvs uv
+                in
+                Mode.preferred ~li @@ List.filter check_mode available_modes
               in
               Mode.in_out_args ~mode:mode' args,
               match mode' with
