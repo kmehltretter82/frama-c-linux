@@ -258,7 +258,7 @@ end
 let preprocess_pred ~loc p =
   Here_inliner.(bind preprocess_pred) p @@
   match p.pred_content with
-  | Papp(li , labels, args) when Inductive.is_inductive li ->
+  | Papp (li, labels, args) when Inductive.is_inductive li ->
     Inductive_extractions.extract_predicate li |> Option.map @@ fun li ->
     {p with pred_content = Papp (li, labels, args)}
   | Pvalid_read(BuiltinLabel Here as llabel, t)
@@ -313,10 +313,7 @@ let preprocess_term ~loc t =
 let preprocessor = object
   inherit E_acsl_visitor.visitor dkey
 
-  method !vannotation annot =
-    match annot with
-    | Dfun_or_pred _ -> Cil.DoChildren
-    | _ -> Cil.SkipChildren
+  method !vannotation _ = Cil.SkipChildren
 
   method !vpredicate p =
     let loc = p.pred_loc in

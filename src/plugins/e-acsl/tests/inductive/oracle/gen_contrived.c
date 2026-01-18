@@ -12,8 +12,6 @@ inductive multimode(integer x, integer y, integer z) {
   case zero: \forall integer x; multimode(x, 0, 0);
   }
  */
-/*@ predicate multimode(integer x, integer y, integer z) = y == 0 && z == 0;
- */
 /*@
 logic integer multimode_fun2(integer x, integer z) =
   z == 0 ? 0 : (fallthrough: 0);
@@ -93,10 +91,6 @@ logic integer fibo_fun2(integer i) =
           (fallthrough: 0)));
  */
 void __gen_e_acsl_fibo_fun2(__e_acsl_mpz_t *__retres_arg, int i);
-
-/*@ predicate fibo(integer i, integer x) = fibo_fun2(i) == x;
- */
-int __gen_e_acsl_fibo(int i, int x);
 
 /*@
 inductive use_var_bind_and_subst(integer x, integer y) {
