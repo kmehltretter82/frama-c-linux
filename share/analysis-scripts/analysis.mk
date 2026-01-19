@@ -186,11 +186,11 @@ SHELL        := $(shell which bash)
 	      -print -ocode $@/framac.ast -then -no-print \
 	    || ($(RM) -r $@; false) # Ensures target failure
 	} 2>&1 |
-	  $(SED_UNBUFFERED) '/\[metrics\]/,999999d' |
+	  $(SED_UNBUFFERED) '/\[metrics/,999999d' |
 	  tee $@/parse.log
 	{
 	  printf 'timestamp=%q\n' "$(HR_TIMESTAMP)";
-	  printf 'warnings=%s\n' "`cat $@/warnings.log | grep '^ *\[kernel\]' | wc -l`";
+	  printf 'warnings=%s\n' "`cat $@/warnings.log | grep '^ *\[kernel' | wc -l`";
 	  printf 'cmd_args=%q\n' "$(subst ",\",$(wordlist 2,999,$(PARSE)))"
 	} >> $@/stats.txt
 	mv $@/{running,command}
@@ -233,12 +233,11 @@ endef
 	        $(RM) $@/stats.txt &&
 	        false) # Prevents having error code reporting in stats.txt
 	} 2>&1 |
-	  $(SED_UNBUFFERED) '/\[eva\] Values at end of function/,999999d' |
 	  tee $@/eva.log
 	$(SHELL) $(DIR)parse-coverage.sh $@/eva.log $@/stats.txt
 	{
 	  printf 'timestamp=%q\n' "$(HR_TIMESTAMP)";
-	  printf 'warnings=%s\n' "`cat $@/warnings.log | grep '^ *\[\(eva\|kernel\|from\)\]' | wc -l`";
+	  printf 'warnings=%s\n' "`cat $@/warnings.log | grep '^ *\[\(eva\|kernel\|from\)' | wc -l`";
 	  printf 'alarms=%s\n' "`expr $$(cat $@/alarms.csv | wc -l) - 1`";
 	  printf 'cmd_args=%q\n' "$(subst ",\",$(wordlist 2,999,$(EVA)))";
 	  printf 'benchmark_tag=%s' "$(BENCHMARK)"
@@ -271,7 +270,7 @@ endef
 	  tee $@/wp.log
 	{
 	  printf 'timestamp=%q\n' "$(HR_TIMESTAMP)";
-	  printf 'warnings=%s\n' "`cat $@/warnings.log | grep '^ *\[\(wp\|kernel\)\]' | wc -l`";
+	  printf 'warnings=%s\n' "`cat $@/warnings.log | grep '^ *\[\(wp\|kernel\)' | wc -l`";
 	  printf 'alarms=%s\n' "`expr $$(cat $@/alarms.csv | wc -l) - 1`";
 	  printf 'cmd_args=%q\n' "$(subst ",\",$(wordlist 2,999,$(WP)))";
 	  printf 'benchmark_tag=%s' "$(BENCHMARK)"
