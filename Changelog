@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-!  Users     [2026-01-19] Remove obsolete `Users` plug-in. Please use
+              `Callgraph.Uses` instead.
 -   Eva       [2026-01-13] New `-eva-secure-flow` option to prove
               non-interference properties: emit warnings whenever low-security
               public data may depend on high-security private data. Public and

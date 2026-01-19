@@ -11,7 +11,7 @@
  (deps (universe))
  (action (progn
           (echo "Sparecode:" %{lib-available:frama-c-sparecode.core} "\n")
-          (echo "  - Users:" %{lib-available:frama-c-users.core} "\n")
+          (echo "  - Callgraph:" %{lib-available:frama-c-callgraph.core} "\n")
           (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
           (echo "  - Inout:" %{lib-available:frama-c-inout.core} "\n")
           (echo "  - Pdg:" %{lib-available:frama-c-pdg.core} "\n")
@@ -34,7 +34,7 @@
   (public_name frama-c-sparecode.core)
   (private_modules sparecode_params globs spare_marks transform register)
   (flags :standard -open Frama_c_kernel)
-  (libraries frama-c.kernel frama-c-users.core frama-c-eva.core frama-c-pdg.core frama-c-inout.core)
+  (libraries frama-c.kernel frama-c-callgraph.core frama-c-eva.core frama-c-pdg.core frama-c-inout.core)
   (instrumentation (backend landmarks))
   (instrumentation (backend bisect_ppx))
 )
