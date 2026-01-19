@@ -390,7 +390,7 @@ let split_storage_modifiers al =
   let isstoragemod ((an, _) : attribute) : bool =
     match (Hashtbl.find known_table an).attr_class with
     | exception Not_found -> false
-    | AttrName issm -> issm
+    | AttrName issm | AttrFunType issm -> issm
     | _ -> false
   in
   let stom, rest = List.partition isstoragemod al in
