@@ -33,6 +33,7 @@ LOCAL_WP_CACHE=$(pwd -P)/.wp-cache
 FRAMAC_WP_CACHE_GIT=git@git.frama-c.com:frama-c/wp-cache.git
 
 TEST_DIRS="tests src/plugins/*"
+KERNEL_TEST_ALIASES="@src/runtest-frama_c_kernel @run-kernel-tests"
 
 # --------------------------------------------------------------------------
 # ---  Help Message
@@ -52,6 +53,8 @@ function Usage
     echo "  <DIR>     all tests in <DIR>,"
     echo "            or in directory tests/<DIR> (if it exists)"
     echo "            or in plugin src/plugins/<DIR> (if it exists)"
+    echo "  kernel    all kernel tests, i.e. all tests in tests/, inline tests"
+    echo "            and any test declared in kernel sources."
     echo ""
     echo "  -a|--all            run all config"
     echo "  -d|--default        run tests from default config only (by default)"
@@ -219,6 +222,10 @@ do
                 TESTS+=("tests/$1")
             elif [ -d "src/plugins/$1" ]; then
                 TESTS+=("src/plugins/$1")
+            elif [ "$1" == "kernel" ]; then
+                Head "Register kernel tests"
+                TESTS+=("tests/")
+                DUNE_ALIAS+=("$KERNEL_TEST_ALIASES")
             else
                 ErrorUsage "'$1' is neither a file/directory or a dune alias"
             fi
