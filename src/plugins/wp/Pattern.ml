@@ -36,6 +36,8 @@ and node =
   | Field of ast * string
   | Get of ast * ast
   | Set of ast * ast * ast
+  | Forall of quantifiers * ast
+  | Exists of quantifiers * ast
 and assoc = [ `Add | `Mul | `Concat | `Band | `Bor | `Bxor | `And | `Or ]
 and binop = [ `Div | `Mod | `Repeat | `Eq | `Lt | `Le | `Ne | `Lsl | `Lsr ]
 
@@ -208,6 +210,8 @@ let rec parse ctxt p =
       | _ ->
         { loc ; value = Get(parse ctxt a,parse ctxt b) }
     end
+  | PLforall (qs,p) -> { loc ; value = Forall(qs,parse ctxt p) }
+  | PLexists (qs,p) -> { loc ; value = Exists(qs,parse ctxt p) }
   | _ ->
     error ctxt loc
       (if ctxt.value then "Invalid value" else "Invalid pattern")
@@ -290,6 +294,12 @@ let rec pp fmt (a : ast) =
     Format.fprintf fmt "@[<hov 2>\\any(%a" pp v ;
     List.iter (Format.fprintf fmt ",@ %a" pp) vs ;
     Format.fprintf fmt ")@]"
+  | Forall(qs,p) ->
+    Format.fprintf fmt "@[<hov 2>\\exists %a;@ %a@]"
+      Logic_print.print_quantifiers qs pp p
+  | Exists(qs,p) ->
+    Format.fprintf fmt "@[<hov 2>\\forall %a;@ %a@]"
+      Logic_print.print_quantifiers qs pp p
 
 let pp_value = pp
 let pp_pattern = pp
@@ -603,8 +613,10 @@ let rec select (env : sigma) (a : value) =
   let cc = select env in
   match a.value with
   | Any ->  log_error ~loc "Pattern _ is not a value"
-  | Pany _ ->  log_error ~loc "Pattern \\any(..) is not a value"
-  | String s -> log_error ~loc "String %S is not a value" s
+  | Pany _ ->  log_error ~loc "Pattern \\any(…) is not a value"
+  | Forall _ -> log_error ~loc "Pattern \\forall is not a value"
+  | Exists _ -> log_error ~loc "Pattern \\exists is not a value"
+  | String s -> log_error ~loc "Pattern %S can not be used as value" s
   | Pvar x -> getvar env x
   | Named (_,_,v) -> cc v
   | Range(a,b) -> Tactical.range a b
@@ -839,6 +851,9 @@ let rec typecheck env expected (a : ast) =
     end
   | Call(_f,vs,_) ->
     List.iter (fun v -> ignore @@ typecheck env Tany v) vs ; expected
+  | Forall(_,p) | Exists(_,p) ->
+    ignore @@ typecheck env Boolean p ;
+    tc_merge env ~loc ~expected (Type Prop)
 
 let typecheck_vtau env ?tau v =
   ignore @@ typecheck env (match tau with None -> Tany | Some t -> Type t) v
