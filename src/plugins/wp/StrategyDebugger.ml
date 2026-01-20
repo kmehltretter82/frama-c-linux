@@ -273,6 +273,12 @@ let parse_string s =
         Printf.sprintf "unexpected token %S" tok in
     raise (ParseError (loc, msg))
 
+let parse_string s =
+  Logic_env.builtin_types_as_typenames () ;
+  let finally = Logic_env.reset_typenames in
+  let work () = parse_string s in
+  Fun.protect ~finally work
+
 (* -------------------------------------------------------------------------- *)
 (* --- Debugger                                                           --- *)
 (* -------------------------------------------------------------------------- *)
