@@ -34,3 +34,7 @@ void call_range(void) { struct S s; int a; set_range(&s,&a); return; }
 //@ assigns *p \from *q;
 void copy(struct S *p, struct S *q);
 void call_copy(void) { struct S a,b; copy(&a,&b); return; }
+
+//@ assigns *p \from q;
+void write(struct S *p, int *q);
+void call_write(void) { struct S a; int b; write(&a,&b); return; }
