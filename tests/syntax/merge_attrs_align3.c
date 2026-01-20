@@ -7,7 +7,7 @@ typedef struct __attribute__((packed)){
   short b __attribute__((aligned(2))); // offset: 2
 } s;
 
-s s1;
+extern s s1;
 
 // for testing with GCC/Clang
 #ifndef __FRAMAC__
