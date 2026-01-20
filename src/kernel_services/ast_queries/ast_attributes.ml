@@ -11,6 +11,7 @@
 open Cil_types
 
 let wkey = Kernel.wkey_attrs
+let dkey = Kernel.dkey_attrs
 
 (* Construct sorted lists of attributes *)
 let get_name (an, _) =
@@ -100,7 +101,7 @@ let pp_class fmt = function
   | AttrUnknown   -> Format.fprintf fmt "AttrUnknown"
 
 let pp_info fmt ai =
-  Format.fprintf fmt "{attr_class: %a; attr_ignore: %b; attr_print: %b}"
+  Format.fprintf fmt "Class: %a, Ignored: %B, Printed: %B"
     pp_class ai.attr_class
     ai.attr_ignore
     ai.attr_print
@@ -114,12 +115,25 @@ let known_table : (string, attribute_info) Hashtbl.t = Hashtbl.create 59
 let register ?(print=true) ?ignore ac an =
   let attr_ignore = Option.value ~default:(ac=AttrUnknown) ignore in
   let nc = {attr_class = ac; attr_print = print; attr_ignore} in
-  if Hashtbl.mem known_table an then
-    Kernel.warning ~wkey
+  match Hashtbl.find_opt known_table an with
+  | None ->
+    Kernel.debug ~dkey "Registering attribute %S with information@ %a"
+      an pp_info nc;
+    Hashtbl.add known_table an nc
+  | Some info
+    when info.attr_class = ac
+      && info.attr_ignore = attr_ignore
+      && info.attr_print = print ->
+    Kernel.debug ~dkey
+      "Attribute %S already registered with information %a. Nothing to do"
+      an pp_info nc;
+    ()
+  | Some info ->
+    Kernel.debug ~dkey
       "Replacing existing class and status for attribute %s:@ was (%a),@ now \
        (%a)"
-      an pp_info (Hashtbl.find known_table an) pp_info nc;
-  Hashtbl.replace known_table an nc
+      an pp_info info pp_info nc;
+    Hashtbl.replace known_table an nc
 
 let register_noprint = register ~print:false
 
@@ -147,13 +161,6 @@ let should_ignore name =
   match find_known name with
   | None -> true
   | Some info -> info.attr_ignore
-
-let ignore name =
-  match find_known name with
-  | None -> register ~ignore:true AttrUnknown name
-  | Some info ->
-    if not info.attr_ignore then
-      Hashtbl.replace known_table name {info with attr_ignore = true}
 
 let partition ~(default:attribute_class) (attrs: attributes) :
   attributes * attributes * attributes =
@@ -383,7 +390,7 @@ let split_storage_modifiers al =
   let isstoragemod ((an, _) : attribute) : bool =
     match (Hashtbl.find known_table an).attr_class with
     | exception Not_found -> false
-    | AttrName issm -> issm
+    | AttrName issm | AttrFunType issm -> issm
     | _ -> false
   in
   let stom, rest = List.partition isstoragemod al in
@@ -413,10 +420,37 @@ let () =
     let keep_attr (name, _) = not (should_ignore name) in
     (fun attributes -> List.filter keep_attr attributes)
 
-(* For now the only action possible via the command line is to ignore an
-   attribute. Ideally we would like to allow a full registration with class,
-   ignore or not, printed or not.
-*)
-let () = Cmdline.run_after_configuring_stage (fun () ->
-    List.iter ignore (Kernel.IgnoreAttributes.get ())
-  )
+(* Registering attributes from -register-attributes *)
+
+let class_of_string = function
+  | "name" -> AttrName false
+  | "type" -> AttrType
+  | "funtype" -> AttrFunType false
+  | "stmt" -> AttrStmt
+  | "unknown" -> AttrUnknown
+  | _ -> assert false
+
+let fold_attr attr values =
+  let init =
+    match find_known attr with
+    | None -> (AttrUnknown, None, None)
+    | Some info ->
+      (info.attr_class, Some info.attr_ignore, Some info.attr_print)
+  in
+  List.fold_left (fun (c, i, p) v ->
+      match v with
+      | Kernel.Default -> (c, i, p)
+      | Class s -> ((class_of_string s), i, p)
+      | Ignore b -> (c, Some b, p)
+      | Print b -> (c, i, Some b)
+    ) init values
+
+let () =
+  Cmdline.run_after_configuring_stage (fun () ->
+      Kernel.RegisterAttributes.iter (fun (name, values) ->
+          let (attr_class, ignore, print) = fold_attr name values in
+          register ?ignore ?print attr_class name
+        )
+    )
+
+

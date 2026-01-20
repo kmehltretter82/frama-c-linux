@@ -353,9 +353,6 @@ Options taking a string as argument should preferably be written
                     adds -nostdinc to prevent inconsistent mix of system and
                     Frama-C header files (set by default, opposite option is
                     -no-frama-c-stdlib)
--ignore-attributes <attr1,attr2,...>  Registers attributes to be ignored
-                    during type comparison. (preferably use
-                    -ignore-attributes="attr1,attr2,...")
 -machdep <machine>  use <machine> as the current machine dependent
                     configuration. See "-machdep help" for a list. The
                     environment variable FRAMAC_MACHDEP can be used to
@@ -367,6 +364,28 @@ Options taking a string as argument should preferably be written
                     -cpp-frama-c-compliant) (opposite option is -no-pp-annot)
 -print-cpp-commands  prints the preprocessing command(s) used by Frama-C and
                     exits. (opposite option is -no-print-cpp-commands)
+-register-attributes <k1:v1:v2,k2:v3,...>  Register an attribute so Frama-C
+                    knows how to handle it. Keys are attribute names and
+                    values are settings. It takes a list of attributes,
+                    separated by commas, each followed by a list of settings
+                    separated by colons, for example
+                    'attr1:name:print:ignore,attr2:default'. The possible
+                    setting values are:
+                    - 'default': to register an attribute with default
+                    settings. If the attribute is already registred, we use
+                    its registered settings instead.
+                    - 'name', 'type', 'funtype', 'stmt' or 'unknown': class
+                    of the attribute that specifies on which AST node the
+                    attribute should be attached. Defaults to unknown.
+                    - 'print' or 'noprint': should the attribute be printed
+                    when printing the AST? Debug key 'printer:attrs' ignores
+                    this information. Defaults to print.
+                    - 'ignore' or 'noignore': should the attribute be ignored
+                    when comparing types? Defaults to 'ignore' if class is
+                    'unknown' and 'noignore' otherwise.
+                    Note: using the same setting category several times for
+                    the same attribute is undefined. (preferably use
+                    -register-attributes="k1:v1:v2,k2:v3,...")
 -std <c11|c17|c23>  Configures the ISO standard to use. Note that your
                     preprocessor must support it, else it will lead to
                     preprocessing failure.
