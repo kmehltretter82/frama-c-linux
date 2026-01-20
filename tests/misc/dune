@@ -15,7 +15,7 @@
 
 ; Generic dependencies for all tests
 (cram
-  (deps ../../src/init/boot/empty_file.exe)
+  (deps (package frama-c))
 )
 
 (cram
