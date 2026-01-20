@@ -234,25 +234,6 @@ and add_block ~kf (m:map) (b:block) =
   List.iter (add_stmt ~kf m) b.bstmts
 
 (* -------------------------------------------------------------------------- *)
-(* --- Behavior                                                           --- *)
-(* -------------------------------------------------------------------------- *)
-
-let add_bhv ~kf map (bhv:behavior) =
-  List.iter
-    (fun e ->
-       let rs = Spec.of_extension e in
-       if rs <> [] then
-         begin
-           List.iter (Logic.add_region map) rs ;
-         end
-    ) bhv.b_extended ;
-  let result =
-    if Kernel_function.returns_void kf then None else
-      Some (Memory.add_result map) in
-  Annot.add_behavior ~kf ~ki:Kglobal
-    ~iscalled:false ~formals:Vmap.empty ~result map bhv
-
-(* -------------------------------------------------------------------------- *)
 (* --- Function                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -263,7 +244,15 @@ let domain kf =
   begin
     try
       let funspec = Annotations.funspec kf in
-      List.iter (add_bhv ~kf m) funspec.spec_behavior ;
+      let ki = Kglobal in
+      let iscalled = false in
+      let formals = Vmap.empty in
+      let result =
+        if Kernel_function.returns_void kf then None else
+          Some (Memory.add_result m) in
+      List.iter
+        (Annot.add_behavior ~kf ~ki ~iscalled ~formals ~result m)
+        funspec.spec_behavior ;
     with Annotations.No_funspec _ -> ()
   end ;
   begin

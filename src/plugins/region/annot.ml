@@ -19,7 +19,6 @@ module Vmap = Cil_datatype.Varinfo.Map
 
 let iadd_term env t = ignore @@ add_term env t
 let add_iterm env = function { it_content = t } -> add_term env t
-let iadd_iterm env t = ignore @@ add_iterm env t
 let add_ipred env ip = add_predicate env ip.ip_content.tp_statement
 
 (* -------------------------------------------------------------------------- *)
@@ -193,16 +192,22 @@ let add_bassigns ~iscalled ~map ~kf ~ki ~bhv ~formals ~result = function
 let add_allocation ~map ~kf ~ki ~bhv ~formals ~result alloc =
   match alloc with
   | FreeAllocAny -> ()
-  | FreeAlloc (its1, its2) ->
-    let bhv = Property.Id_contract (Datatype.String.Set.empty,bhv) in
-    let property = Option.get @@ Property.ip_of_allocation kf ki bhv alloc in
-    let env = { map ; property ; formals ; result } in
-    let add_alloc env it1 it2 =
-      let d1 = add_iterm env it1 in
-      let d2 = add_iterm env it2 in
-      ignore @@ merge_domain d1 d2
-    in
-    List.iter2 (add_alloc env) its1 its2
+  | FreeAlloc _ ->
+    ignore map ; ignore ki ; ignore bhv ; ignore formals ; ignore result ;
+    let loc = Kernel_function.get_location kf in
+    Options.not_yet_implemented ~source:(fst loc )
+      "Unsupported \\allocates and \\free"
+(* | FreeAlloc (its1, its2) ->
+   let bhv = Property.Id_contract (Datatype.String.Set.empty,bhv) in
+   let property = Option.get @@ Property.ip_of_allocation kf ki bhv alloc in
+   let env = { map ; property ; formals ; result } in
+   (*TODO: FIX THIS, Cf. assigns *)
+   let add_alloc env it1 it2 =
+   let d1 = add_iterm env it1 in
+   let d2 = add_iterm env it2 in
+   ignore @@ merge_domain d1 d2
+   in
+   List.iter2 (add_alloc env) its1 its2 *)
 
 let add_post_cond ~map ~kf ~ki ~bhv ~formals ~result cs =
   let property = Property.ip_of_behavior kf ki ~active:[] bhv in
@@ -214,12 +219,17 @@ let rec add_extension ~kf ~ki ~formals ~result map acsl =
     match ki with
     | Kglobal -> Property.ELContract kf
     | Kstmt stmt -> Property.ELStmt (kf, stmt)
-  in let property = Property.ip_of_extended extended_loc acsl in
+  in
+  let property = Property.ip_of_extended extended_loc acsl in
   match acsl.ext_kind with
-  | Ext_id _ ->
-    if acsl.ext_plugin <> "region" then
-      Options.warning "unhandled extension @[%s@]::@[%s@]@."
-        acsl.ext_plugin acsl.ext_name
+  | Ext_id id ->
+    if acsl.ext_plugin = "region" then
+      List.iter (Logic.add_region map) (Spec.of_extid id)
+    else
+      let loc = Property.location property in
+      Options.not_yet_implemented ~source:(fst loc)
+        "Unsupported \\%s:%s extensions" acsl.ext_plugin acsl.ext_name
+
   | Ext_terms ts ->
     let env = { map ; property ; formals ; result } in
     List.iter (iadd_term env) ts
@@ -228,7 +238,6 @@ let rec add_extension ~kf ~ki ~formals ~result map acsl =
     List.iter (add_predicate env) ps
   | Ext_annot (_,acsls) ->
     List.iter (add_extension ~kf ~ki ~formals ~result map) acsls
-
 
 let add_behavior ~kf ~ki ~formals ~result ~iscalled map bhv =
   begin
@@ -280,20 +289,17 @@ let add_code_annot ~kf ~stmt ~formals ~result map c =
   | AAssigns (_,Writes ws) ->
     let property = Property.ip_of_code_annot_single kf stmt c in
     let env = { map ; property ; formals ; result } in
-    List.iter (fun (t,_) -> iadd_iterm env t) ws
+    List.iter
+      begin fun (tgt,_) ->
+        add_assigns_from env ~iscalled:None tgt.it_content ~from:FromAny
+      end ws
   | AAllocation (_,FreeAllocAny) -> ()
-  | AAllocation (_,(FreeAlloc (its1,its2) as alloc)) ->
-    if List.compare_lengths its1 its2 != 0 then
-      Options.warning "FreeAlloc lengths not equal" ;
-    let bol = Property.Id_loop c in
-    let ki = Cil_datatype.Kinstr.kinstr_of_opt_stmt (Some stmt) in
-    let property = Option.get @@ Property.ip_of_allocation kf ki bol alloc in
-    let add_alloc env it1 it2 =
-      let d1 = add_iterm env it1 in
-      let d2 = add_iterm env it2 in
-      ignore @@ merge_domain d1 d2
-    in
-    List.iter2 (add_alloc { map ; property ; formals ; result }) its1 its2
+  | AAllocation (_,FreeAlloc _) ->
+    let loc = Cil_datatype.Stmt.loc stmt in
+    Options.not_yet_implemented
+      ~source:(fst loc)
+      "Unsupported \\freee and \\allocates" ;
+    (*TODO FIX THIS, Cf. assigns & add_allocates *)
   | AExtended (_,_, acsl) ->
     let ki = Cil_datatype.Kinstr.kinstr_of_opt_stmt (Some stmt) in
     add_extension ~kf ~ki ~formals ~result map acsl
