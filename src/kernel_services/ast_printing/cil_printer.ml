@@ -157,8 +157,8 @@ let pretty_C_constant suffix k fmt i =
        so we do what's done in limits.h, and print (-2147483467-1); *)
     (* in gcc this avoids a warning, but it might avoid a real
        problem on another compiler or a 64-bit architecture *)
-    Format.fprintf fmt "(-%a-1)"
-      Z.pretty (Z.pred max_strict_signed)
+    Format.fprintf fmt "(-%a%s-1%s)"
+      Z.pretty (Z.pred max_strict_signed) suffix suffix
   else
     Format.fprintf fmt "%a%s" Z.pretty i suffix
 
