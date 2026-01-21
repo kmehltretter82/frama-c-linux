@@ -804,7 +804,7 @@ let registered =
   let name = "taint"
   and descr = "Taint analysis" in
   let auto_enable = Parameters.SecureFlow.get in
-  Abstractions.Domain.register ~name ~descr
+  Abstractions.Domain.register ~name ~descr ~priority:6
     ~experimental:true ~auto_enable (module Domain)
 
 (* -------------------------------------------------------------------------- *)

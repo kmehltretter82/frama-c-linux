@@ -20,10 +20,10 @@ module Domain : sig
       - [experimental] is false by default. If set to true, a warning is emitted
         when the domain is enabled.
       - [priority] can be any integer; domains with higher priority are always
-        processed first. The domains currently provided by Eva have priority
-        ranging between 1 and 19, so a priority of 0 (respectively 20) ensures
-        that a new domain is processed after (respectively before) the classic
-        Eva domains. The default priority is 0.
+        processed first, and help messages list domains by decreasing priority.
+        Current domains have priorities ranging from 1 to 10, so a priority of 0
+        (respectively 11) ensures that a domain is processed after (respectively
+        before) the classic Eva domains. Default priority is 0.
       - [auto_enable] is called during domain configuration; if it returns true,
         the domain is automatically enabled. Always [false] by default. *)
   val register :

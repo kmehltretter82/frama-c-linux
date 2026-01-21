@@ -1926,4 +1926,4 @@ let registered =
     "Infers relations between scalar variables of the form b ≤ ±X ± Y ≤ e, \
      where X, Y are program variables and b, e are constants."
   in
-  Abstractions.Domain.register ~name ~descr ~priority:6 (module Domain)
+  Abstractions.Domain.register ~name ~descr ~priority:8 (module Domain)

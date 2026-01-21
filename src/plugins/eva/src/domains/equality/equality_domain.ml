@@ -561,10 +561,10 @@ module Functor = struct
 end
 
 let registered =
-  let name = "equality" and priority = 8 in
+  let name = "equality" in
   let descr =
     "Infers equalities between syntactic C expressions. \
      Makes the analysis less dependent on temporary variables and \
      intermediate computations."
   in
-  Abstractions.Domain.register_functor ~name ~priority ~descr (module Functor)
+  Abstractions.Domain.register_functor ~name ~priority:9 ~descr (module Functor)

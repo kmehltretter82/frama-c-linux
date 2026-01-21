@@ -708,12 +708,12 @@ let () = Floating_point.set_rounding_mode Nearest_even
 
 let make (module Man: Input) =
   let module Domain = Make (Man) in
-  let experimental = true and priority = 1 in
+  let name = Man.name in
   let descr =
     "Binding to the " ^ Man.name ^ " domain of the Apron library. " ^
     "See http://apron.cri.ensmp.fr/library for more details."
   in
-  Abstractions.Domain.register ~name:Man.name ~descr ~experimental ~priority
+  Abstractions.Domain.register ~name ~descr ~experimental:true ~priority:3
     (module Domain)
 
 let octagon = make (module Apron_Octagon)

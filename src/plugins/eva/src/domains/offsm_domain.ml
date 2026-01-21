@@ -213,4 +213,4 @@ let registered =
   and descr =
     "Infers bitwise information to interpret more precisely bitwise operators."
   in
-  Abstractions.Domain.register ~name ~descr ~priority:3 (module D)
+  Abstractions.Domain.register ~name ~descr ~priority:6 (module D)

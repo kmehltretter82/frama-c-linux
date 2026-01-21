@@ -12,8 +12,6 @@ t[0..63] ∈ [--..--] or UNINITIALIZED
 b1 ∈ {0; 1}
 b2 ∈ {0; 1}
 scalar ∈ UNINITIALIZED
-# equality:
-{k = ((i - j) + 1) + j}
 # symbolic-locations:
 V: {[ t[i] -> [-2147483648..2147483647]
       t[i] / i -> [-2147483648..2147483647]
@@ -31,6 +29,8 @@ S: {[ i -> {t[i], t[i] / i, i - j}
       j -> {i - j}
       k -> {t[k - 1]}
       t -> {t[i], t[i] / i, t[k - 1]} ]}
+# equality:
+{k = ((i - j) + 1) + j}
 # octagon:
 {[ i + j ∈ [11..309]
    j + k ∈ [12..310]
@@ -45,15 +45,6 @@ V: [{[ a -> {8}
        b1 -> {0; 1}
        b2 -> {0; 1} ]}]
 
-# sign:
-{[ a -> +
-   i -> +
-   j -> +
-   r -> 0+ ]}
-# bitwise:
-a[bits 0 to 2] ∈ {0}
- [bits 3 to 3] ∈ {1}
- [bits 4 to 31] ∈ {0}
 # multidim:
 ({[ a -> ({8}, {})
     i -> ([1..99], {t})
@@ -70,3 +61,12 @@ a[bits 0 to 2] ∈ {0}
     b2 -> ({0; 1}, {})
     scalar -> (UNINITIALIZED, {}) ]},
    None)
+# bitwise:
+a[bits 0 to 2] ∈ {0}
+ [bits 3 to 3] ∈ {1}
+ [bits 4 to 31] ∈ {0}
+# sign:
+{[ a -> +
+   i -> +
+   j -> +
+   r -> 0+ ]}

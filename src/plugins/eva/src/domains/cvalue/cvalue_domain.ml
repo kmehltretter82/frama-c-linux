@@ -476,7 +476,7 @@ let registered =
   and descr =
     "Main analysis domain, enabled by default. Should not be disabled."
   in
-  Abstractions.Domain.register ~name ~descr ~priority:9 (module State)
+  Abstractions.Domain.register ~name ~descr ~priority:10 (module State)
 
 
 type prefix = Hptmap.prefix

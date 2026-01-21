@@ -264,5 +264,4 @@ include Domain
 let registered =
   let name = "inout"
   and descr = "Infers the inputs and outputs of each function." in
-  Abstractions.Domain.register ~name ~descr ~priority:5 ~experimental:true
-    (module Domain)
+  Abstractions.Domain.register ~name ~descr ~experimental:true (module Domain)

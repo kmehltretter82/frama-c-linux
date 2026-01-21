@@ -965,6 +965,7 @@ let registered =
   and descr = "Improve the precision over arrays of structures \
                or multidimensional arrays."
   in
-  Abstractions.Domain.register ~name ~descr ~experimental:true (module Domain)
+  Abstractions.Domain.register ~name ~descr ~experimental:true ~priority:7
+    (module Domain)
 
 let () = Abstractions.Hooks.register multidim_hook
