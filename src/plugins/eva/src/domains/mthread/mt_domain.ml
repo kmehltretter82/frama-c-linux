@@ -406,7 +406,10 @@ let have_interrupt_handlers () =
 
 let domain =
   let name = "mthread" in
-  let descr = "Mthread domain" in
+  let descr =
+    "Domain for the analysis of concurrent programs. \
+     Automatically enabled by the -mthread parameter."
+  in
   let auto_enable () =
     (* TODO: When the options of Mthread are merged with Eva options, reassess
        how the domain should be enabled (only automatic detection, only specific
