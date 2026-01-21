@@ -1,4 +1,5 @@
 /* run.config
+   COMMENT: fully supported in complete mode
    STDOPT: +"-eva-unroll-recursive-calls 5"
 */
 

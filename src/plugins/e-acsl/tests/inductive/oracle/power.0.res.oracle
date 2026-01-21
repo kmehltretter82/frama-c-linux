@@ -10,23 +10,23 @@
   extracting function from power2 with mode: incomplete in 3
 [e-acsl] Warning: Negative verdicts of power2 might be unsound
 [e-acsl] translation done in project "e-acsl".
-[eva] power.c:9: Warning: 
+[eva] power.c:10: Warning: 
   Using specification of function __gen_e_acsl_power_fun3
   for recursive calls of depth 5. Analysis of function __gen_e_acsl_power_fun3
-  is thus incomplete and its soundness relies on the written specification.
-[eva:alarm] power.c:21: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] power.c:21: Warning: assertion got status unknown.
-[eva] power.c:15: Warning: 
-  Using specification of function __gen_e_acsl_power2_fun3
-  for recursive calls of depth 5. Analysis of function __gen_e_acsl_power2_fun3
   is thus incomplete and its soundness relies on the written specification.
 [eva:alarm] power.c:22: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] power.c:22: Warning: assertion got status unknown.
+[eva] power.c:16: Warning: 
+  Using specification of function __gen_e_acsl_power2_fun3
+  for recursive calls of depth 5. Analysis of function __gen_e_acsl_power2_fun3
+  is thus incomplete and its soundness relies on the written specification.
 [eva:alarm] power.c:23: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] power.c:23: Warning: assertion got status unknown.
 [eva:alarm] power.c:24: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] power.c:24: Warning: assertion got status unknown.
+[eva:alarm] power.c:25: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] power.c:25: Warning: assertion got status unknown.

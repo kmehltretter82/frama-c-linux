@@ -45,7 +45,7 @@ int main(void)
     __gen_e_acsl_assert_data.pred_txt = "add(2, 3, 5)";
     __gen_e_acsl_assert_data.file = "add.c";
     __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 28;
+    __gen_e_acsl_assert_data.line = 29;
     __e_acsl_assert(__gen_e_acsl_add_8,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     __gmpz_clear(__gen_e_acsl_);
@@ -70,7 +70,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.pred_txt = "!add(2, 3, 4)";
     __gen_e_acsl_assert_data_2.file = "add.c";
     __gen_e_acsl_assert_data_2.fct = "main";
-    __gen_e_acsl_assert_data_2.line = 29;
+    __gen_e_acsl_assert_data_2.line = 30;
     __e_acsl_assert(! __gen_e_acsl_add_10,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __gmpz_clear(__gen_e_acsl__8);

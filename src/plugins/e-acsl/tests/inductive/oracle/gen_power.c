@@ -65,7 +65,7 @@ int main(void)
     __gen_e_acsl_assert_data.pred_txt = "power(2, 3, 8)";
     __gen_e_acsl_assert_data.file = "power.c";
     __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 21;
+    __gen_e_acsl_assert_data.line = 22;
     __e_acsl_assert(__gen_e_acsl_power_2,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
@@ -83,7 +83,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.pred_txt = "power2(2, 3, 8)";
     __gen_e_acsl_assert_data_2.file = "power.c";
     __gen_e_acsl_assert_data_2.fct = "main";
-    __gen_e_acsl_assert_data_2.line = 22;
+    __gen_e_acsl_assert_data_2.line = 23;
     __e_acsl_assert(__gen_e_acsl_power2_2,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
@@ -101,7 +101,7 @@ int main(void)
     __gen_e_acsl_assert_data_4.pred_txt = "!power(2, 3, 7)";
     __gen_e_acsl_assert_data_4.file = "power.c";
     __gen_e_acsl_assert_data_4.fct = "main";
-    __gen_e_acsl_assert_data_4.line = 23;
+    __gen_e_acsl_assert_data_4.line = 24;
     __e_acsl_assert(! __gen_e_acsl_power_4,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
   }
@@ -119,7 +119,7 @@ int main(void)
     __gen_e_acsl_assert_data_5.pred_txt = "!power2(2, 3, 7)";
     __gen_e_acsl_assert_data_5.file = "power.c";
     __gen_e_acsl_assert_data_5.fct = "main";
-    __gen_e_acsl_assert_data_5.line = 24;
+    __gen_e_acsl_assert_data_5.line = 25;
     __e_acsl_assert(! __gen_e_acsl_power2_4,& __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
   }
@@ -261,7 +261,7 @@ void __gen_e_acsl_power2_fun3(__e_acsl_mpz_t *__retres_arg, int x,
         __gen_e_acsl_assert_data_3.pred_txt = "Incomplete inductive function";
         __gen_e_acsl_assert_data_3.file = "power.c";
         __gen_e_acsl_assert_data_3.fct = "power2_fun3";
-        __gen_e_acsl_assert_data_3.line = 14;
+        __gen_e_acsl_assert_data_3.line = 15;
         __e_acsl_assert(0,& __gen_e_acsl_assert_data_3);
       }
       __gmpz_init_set_si(__gen_e_acsl__7,0L);
