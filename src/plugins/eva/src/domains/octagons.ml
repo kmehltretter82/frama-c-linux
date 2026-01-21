@@ -1923,7 +1923,9 @@ include Domain
 let registered =
   let name = "octagon"
   and descr =
-    "Infers relations between scalar variables of the form b ≤ ±X ± Y ≤ e, \
-     where X, Y are program variables and b, e are constants."
+    Format.asprintf
+      "Infers integer relations of the form b < %tX %t Y < e, \
+       where X, Y are program lvalues and b, e are constants."
+      Unicode.pp_plus_minus Unicode.pp_plus_minus
   in
   Abstractions.Domain.register ~name ~descr ~priority:8 (module Domain)
