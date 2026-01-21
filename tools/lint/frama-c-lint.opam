@@ -27,4 +27,5 @@ depends: [
   "camomile"
   "conf-clang-format"
   "ocp-indent" { = "1.9.0" }
+  "ppx_deriving_yojson"
 ]
