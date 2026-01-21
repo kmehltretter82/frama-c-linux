@@ -66,34 +66,31 @@ let builtin_names_and_replacements () =
   List.sort String.compare stand_alone,
   List.sort (fun (name1, _) (name2, _) -> String.compare name1 name2) replacements
 
+let print_builtin_list fmt =
+  let stand_alone, replacements = builtin_names_and_replacements () in
+  let pp_replacement fmt (name, rep_by) =
+    if rep_by = "Frama_C_" ^ name
+    then Format.fprintf fmt "%s" name
+    else Format.fprintf fmt "%s (replaced by: %s)" name rep_by
+  in
+  let pp_list = Pretty_utils.pp_list ~sep:",@ " in
+  Format.fprintf fmt
+    "@;@[<v 3>** Automatic replacements:@;\
+     (unless otherwise specified, \
+     function <f> is replaced by builtin Frama_C_<f>)@;@;%a@]@;@;"
+    (pp_list pp_replacement) replacements;
+  Format.fprintf fmt
+    "@[<v 3>** Full list of builtins (configurable via -eva-builtin):@;@;%a@]"
+    (pp_list Format.pp_print_string) stand_alone
+
+let print_builtins_and_exit () =
+  let header fmt = Format.fprintf fmt "List of Eva builtins:" in
+  Self.printf ~header "@[<v>%t@]" print_builtin_list;
+  raise Cmdline.Exit
+
 let () =
   Cmdline.run_after_configuring_stage
-    (fun () ->
-       if Parameters.BuiltinsList.get () then begin
-         let stand_alone, replacements = builtin_names_and_replacements () in
-         Log.print_on_output
-           (fun fmt ->
-              Format.fprintf fmt "@[*** LIST OF EVA BUILTINS@\n@\n\
-                                  ** Replacements set -eva-builtins-auto:\
-                                  @\n   unless otherwise specified, \
-                                  function <f> is replaced by builtin \
-                                  Frama_C_<f>:@\n@\n   @[%a@]@]@\n"
-                (Pretty_utils.pp_list ~sep:",@ "
-                   (fun fmt (name, rep_by) ->
-                      if rep_by = "Frama_C_" ^ name then
-                        Format.fprintf fmt "%s" name
-                      else
-                        Format.fprintf fmt "%s (replaced by: %s)" name rep_by))
-                replacements);
-         Log.print_on_output
-           (fun fmt ->
-              Format.fprintf fmt "@\n@[** Full list of builtins \
-                                  (configurable via -eva-builtin):@\n\
-                                  @\n   @[%a@]@]@\n"
-                (Pretty_utils.pp_list ~sep:",@ "
-                   Format.pp_print_string) stand_alone);
-         raise Cmdline.Exit
-       end)
+    (fun () -> if Parameters.BuiltinsList.get () then print_builtins_and_exit ())
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prepare builtins for an analysis                                   --- *)
