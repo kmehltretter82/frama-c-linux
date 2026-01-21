@@ -55,7 +55,7 @@ type env = {
   map : map ;
   result : node option ;
   formals : domain Varinfo.Map.t ;
-  property : Property.t ;
+  context : Access.clause ;
 }
 
 let fresh env () = Memory.fresh env.map
@@ -97,7 +97,7 @@ let rec load env lv (ty,r) : domain =
       @@ (fd.ftype, Memory.add_field r fd)
     in List.fold_left add_field pure @@ Option.value ~default:[] cfields
   | _ ->
-    let acs = Access.Term (env.property, lv) in
+    let acs = Access.Term (env.context, lv) in
     Memory.add_read r acs ;
     Ldomain.scalar @@ Memory.add_value r ty
 
@@ -290,7 +290,7 @@ let add_body map (l:logic_info) (d:domain) =
     map ;
     result = None ;
     formals = Varinfo.Map.empty ;
-    property = assert false ;
+    context = Body l ;
   } in
   match l.l_body with
   | LBnone -> ()

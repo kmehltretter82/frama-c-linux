@@ -16,9 +16,9 @@ val add_region : map -> Spec.region -> unit
 
 type env = {
   map : map ;
-  result : node option ;
+  result : node option ; (* where returned value is stored *)
   formals : domain Varinfo.Map.t ;
-  property : Property.t ;
+  context : Access.clause ;
 }
 
 val add_addr_lval : loc:location -> env -> term_lval -> typ * node
