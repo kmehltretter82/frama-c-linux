@@ -839,8 +839,9 @@ val mkBinOp: loc:location -> binop -> exp -> exp -> (exp, string) result
 *)
 val mkBinOp_exn: loc:location -> binop -> exp -> exp -> exp
 
-(** Same as {!mkBinOp_exn}, but performs a systematic cast (unless one of the
-    arguments is [0]) of pointers into [uintptr_t] during comparisons,
+(** Same as {!mkBinOp_exn}
+    @before Frama-C+dev Performed a systematic cast (unless one of the
+    arguments was [0]) of pointers into [uintptr_t] during comparisons,
     making such operation defined even if the pointers do not share
     the same base. This was the behavior of {!mkBinOp} prior to the
     introduction of this function.
