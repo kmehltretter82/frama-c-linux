@@ -772,6 +772,12 @@ val constFoldOffset: bool -> offset -> offset
     will also compute compiler-dependent expressions such as [sizeof]. *)
 val constFoldBinOp: loc:location -> bool -> binop -> exp -> exp -> typ -> exp
 
+(** Convert an expression [e] to a boolean expression [e != 0] if [e] is not
+    already a boolean.
+    @since Frama-C+dev
+*)
+val expression_to_bool: exp -> exp
+
 (** [true] if the two constant are equal.
     @since Nitrogen-20111001
 *)

@@ -5667,13 +5667,13 @@ let rec castReduce fromsource force =
     | TFun _, TPtr { tnode = TFun _ }, Lval lv -> mkAddrOf ~loc lv
 
     | _, TInt IBool, _ when Ast_types.is_scalar oldt' ->
-      if is_boolean_result e then begin
+      let cmp = expression_to_bool e in
+      if Exp.equal e cmp then begin
         Kernel.debug ~dkey "Explicit cast to Boolean: %a" !pp_exp_ref e;
         res e
       end else begin
         Kernel.debug ~dkey
           "bool conversion by checking !=0: %a" !pp_exp_ref e;
-        let cmp = mkBinOp_exn ~loc Ne e (integer ~loc 0) in
         let oldt = typeOf cmp in
         rec_default oldt newt cmp
       end
@@ -5772,7 +5772,8 @@ and mkBinOp ~loc op e1 e2 =
   | Mod  | BAnd | BOr | BXor -> doIntegralArithmetic ()
   | LAnd | LOr ->
     if Ast_types.is_scalar t1 && Ast_types.is_scalar t2 then
-      constFoldBinOp op e1 e2 Cil_const.intType
+      constFoldBinOp op (expression_to_bool e1) (expression_to_bool e2)
+        Cil_const.intType
     else
       error "operator '%a' on non-scalar type(s) '%a' and '%a'"
         !pp_binop_ref op !pp_typ_ref t1 !pp_typ_ref t2
@@ -5848,6 +5849,22 @@ and mkBinOp_exn ~loc op e1 e2 =
     Kernel.fatal ~current:true "Cil.mkBinOp: typing expression '%a' failed: %s"
       !pp_exp_ref (dummy_exp(BinOp(op, e1, e2, Cil_const.intType))) msg
 
+and expression_to_bool e =
+  if is_boolean_result e then e
+  else begin
+    let loc = e.eloc in
+    let zero =
+      match Ast_types.unroll_node (typeOf e) with
+      | TInt ik -> kinteger ~loc ik 0
+      | TEnum ei -> kinteger ~loc ei.ekind 0
+      | TFloat fk -> kfloat ~loc fk 0.0
+      | TPtr _ -> kinteger ~loc (Machine.uintptr_kind()) 0
+      | _ ->
+        Kernel.fatal "expression_to_bool: called on non-scalar expression '%a'"
+          !pp_exp_ref e
+    in
+    mkBinOp_exn ~loc Ne e zero
+  end
 
 type existsAction =
     ExistsTrue                          (* We have found it *)

@@ -6266,11 +6266,7 @@ and doExp local_env
           (* already normalized to 0 or 1 *)
           finishExp [] se e intType
         | CEExp (se, e) ->
-          let e' =
-            let te = typeOf e in
-            let _, zte = castTo intType te (zero ~loc:e.eloc) in
-            new_exp ~loc (BinOp(Ne, e, zte, intType))
-          in
+          let e' = Cil.expression_to_bool e in
           finishExp [] se e' intType
         | _ ->
           let tmp =
