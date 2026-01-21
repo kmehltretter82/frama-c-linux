@@ -24,9 +24,9 @@ Options taking a string as argument should preferably be written
 *** ABSTRACT DOMAINS
 
 -eva-domains <d1,...,dn>  Enable a list of analysis domains. Available
-                    domains are: cvalue, mthread, equality, taint, traces,
-                    symbolic-locations, sign, printer, bitwise, octagon,
-                    multidim, inout, gauges, numerors. Use -eva-domains help
+                    domains are: cvalue, equality, symbolic-locations,
+                    gauges, octagon, inout, sign, bitwise, printer, traces,
+                    mthread, multidim, numerors, taint. Use -eva-domains help
                     to print a short description of each domain.
 -eva-domains-function <d:f>  Enable a domain only for the given functions.
                     <d:f+> enables the domain [d] from function [f] (the

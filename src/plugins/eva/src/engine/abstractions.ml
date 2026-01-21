@@ -505,7 +505,7 @@ module Domain = struct
       ?(experimental=false) ?(priority=0) ?(auto_enable=fun () -> false)
       ~name ~descr domain =
     let descr = if experimental then "Experimental. " ^ descr else descr in
-    Parameters.register_domain ~name ~descr;
+    Parameters.register_domain ~name ~descr ~priority;
     let info = { name ; experimental ; priority } in
     let registered = { info ; domain ; auto_enable } in
     domains_list := registered :: !domains_list;

@@ -120,20 +120,32 @@ module NoResultsDomains =
     end)
 let () = add_dep NoResultsDomains.parameter
 
-(* List (name, descr) of available domains. *)
-let domains_ref = ref []
+(* List ((name, descr), priority) of available domains. *)
+let domains_ref : ((string * string) * int) list ref = ref []
+
+(* Sort domains by decreasing priority. *)
+let sorted_domains () =
+  let cmp_domain ((name1, _), prio1) ((name2, _), prio2) =
+    let b = prio2 - prio1 in
+    if b <> 0 then b else Stdlib.String.compare name1 name2
+  in
+  List.fast_sort cmp_domain !domains_ref |> List.map fst
+
+(* Print registered domain names by decreasing priority. *)
+let pp_domain_names fmt =
+  let names = sorted_domains () |> List.map fst in
+  Pretty_utils.pp_list ~sep:", " Format.pp_print_string fmt names
 
 (* Help message for the -eva-domains option, with the list of currently
    available domains. *)
 let domains_help () =
-  let pp_str_list = Pretty_utils.pp_list ~sep:", " Format.pp_print_string in
   Format.asprintf
-    "Enable a list of analysis domains. Available domains are: %a. \
+    "Enable a list of analysis domains. Available domains are: %t. \
      Use -eva-domains help to print a short description of each domain."
-    pp_str_list (List.rev_map fst !domains_ref)
+    pp_domain_names
 
 (* Prints the list of available domains with their description. *)
-let domains_list () =
+let print_domains_and_exit () =
   let pp_dom fmt (name, descr) =
     Format.fprintf fmt "%-20s @[%t@]" name
       (fun fmt -> Format.pp_print_text fmt descr)
@@ -141,25 +153,24 @@ let domains_list () =
   feedback ~level:0
     "List of available domains:@,%a"
     (Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@," ~suf:"@]" pp_dom)
-    (List.rev !domains_ref);
+    (sorted_domains ());
   raise Cmdline.Exit
 
 (* Registers a new domain. Updates the help message of -eva-domains. *)
-let register_domain ~name ~descr =
+let register_domain ~name ~descr ~priority =
   create_domain_option name;
-  domains_ref := (name, descr) :: !domains_ref;
+  domains_ref := ((name, descr), priority) :: !domains_ref;
   Cmdline.replace_option_help
     Domains.option_name ~plugin:"eva" ~group:domains (domains_help ())
 
 (* Checks that a domain has been registered. *)
 let check_domain option_name domain =
   if domain = "help" || domain = "list"
-  then domains_list ()
-  else if not (List.exists (fun (name, _) -> name = domain) !domains_ref)
+  then print_domains_and_exit ()
+  else if not (List.exists (fun ((name, _), _) -> name = domain) !domains_ref)
   then
-    let pp_str_list = Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string in
-    abort "invalid domain %S for option %s.@.Possible domains are: %a"
-      domain option_name pp_str_list (List.rev_map fst !domains_ref)
+    abort "invalid domain %S for option %s.@\nAvailable domains are: %t"
+      domain option_name pp_domain_names
 
 let () =
   let hook option_name = fun _old domains ->
@@ -200,7 +211,7 @@ let enabled_domains () =
   List.filter
     (fun (name, _) -> Datatype.String.Set.mem name domains
                       || Datatype.String.Map.mem name domains_by_fct)
-    !domains_ref
+    (sorted_domains ())
 
 let () = Parameter_customize.set_group domains
 module EqualityCall =
