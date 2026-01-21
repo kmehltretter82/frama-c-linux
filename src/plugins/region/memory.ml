@@ -221,11 +221,14 @@ let add_lvar (m: map) lv =
     let d = Ldomain.of_ltype (new_chunk m.store) lv.lv_type in
     m.lvars <- LVmap.add lv d m.lvars ; d
 
+let add_body = ref (fun _ _ _ -> assert false)
+
 let add_logic (m: map) f =
   try Fmap.find f m.logics with Not_found ->
     let get_type t = Ldomain.of_ltype (new_chunk m.store) t in
     let d = Option.fold ~none:Ldomain.pure ~some:get_type f.l_type in
-    m.logics <- Fmap.add f d m.logics ; d
+    m.logics <- Fmap.add f d m.logics ;
+    !add_body m f d ; d
 
 let add_result (m: map) =
   match m.result with Some r -> r | None ->

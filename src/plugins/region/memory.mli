@@ -128,3 +128,8 @@ val types : node -> typ list
 val typed : node -> typ option
 
 val bitsSizeOf : typ -> int
+
+
+(**/**)
+val add_body : (map -> logic_info -> domain -> unit) ref
+(**/***)

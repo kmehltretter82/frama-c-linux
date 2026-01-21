@@ -285,14 +285,22 @@ let () = rterm := add_term
 (* ---  Process ACSL logic                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-let add_logic (env:env) (l:logic_info) : domain =
+let add_body map (l:logic_info) (d:domain) =
+  let env = {
+    map ;
+    result = None ;
+    formals = Varinfo.Map.empty ;
+    property = assert false ;
+  } in
   match l.l_body with
-  | LBnone -> pure
-  | LBpred p -> add_predicate env p ; pure
-  | LBterm t -> add_term env t
+  | LBnone -> ()
+  | LBpred p -> add_predicate env p
+  | LBterm t -> ignore @@ Memory.merge_domain d (add_term env t)
   | LBreads ts ->
-    List.iter (fun t -> iadd_term env t.it_content) ts ; pure
+    List.iter (fun t -> iadd_term env t.it_content) ts
   | LBinductive l ->
-    List.iter (fun (_,_,_,t) -> add_predicate env t) l ; pure
+    List.iter (fun (_,_,_,t) -> add_predicate env t) l
+
+let () = Memory.add_body := add_body
 
 (* -------------------------------------------------------------------------- *)
