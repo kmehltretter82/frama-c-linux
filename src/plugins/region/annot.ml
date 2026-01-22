@@ -196,7 +196,7 @@ let add_allocation ~map ~kf ~ki ~bhv ~formals ~result alloc =
     ignore map ; ignore ki ; ignore bhv ; ignore formals ; ignore result ;
     let loc = Kernel_function.get_location kf in
     Options.not_yet_implemented ~source:(fst loc )
-      "Unsupported \\allocates and \\free"
+      "Unsupported \\allocates and \\frees"
 (* | FreeAlloc (its1, its2) ->
    let bhv = Property.Id_contract (Datatype.String.Set.empty,bhv) in
    let property = Option.get @@ Property.ip_of_allocation kf ki bhv alloc in
