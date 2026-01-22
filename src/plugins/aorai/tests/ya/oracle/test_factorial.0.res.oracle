@@ -136,7 +136,7 @@ int decode_int(char *s)
   int __retres;
   char c;
   /*@ ghost decode_int_pre_func(s); */
-  int intmax = ~ (1 << (sizeof(int) * (unsigned long)8 - (unsigned long)1));
+  int intmax = 2147483647;
   int cutlim = intmax % 10;
   int cutoff = intmax / 10;
   int value = 0;
@@ -156,25 +156,25 @@ int decode_int(char *s)
     {
       int v = 0;
       switch ((int)c) {
-        case '0': v = 0;
+        case 48: v = 0;
         break;
-        case '1': v = 1;
+        case 49: v = 1;
         break;
-        case '2': v = 2;
+        case 50: v = 2;
         break;
-        case '3': v = 3;
+        case 51: v = 3;
         break;
-        case '4': v = 4;
+        case 52: v = 4;
         break;
-        case '5': v = 5;
+        case 53: v = 5;
         break;
-        case '6': v = 6;
+        case 54: v = 6;
         break;
-        case '7': v = 7;
+        case 55: v = 7;
         break;
-        case '8': v = 8;
+        case 56: v = 8;
         break;
-        case '9': v = 9;
+        case 57: v = 9;
         break;
         default: __retres = -1;
         goto return_label;

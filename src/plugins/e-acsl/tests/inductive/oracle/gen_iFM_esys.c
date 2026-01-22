@@ -336,7 +336,7 @@ struct __anonstruct_IESYS_SESSION_1 {
    IESYSC_PARAM_DECRYPT decrypt ;
    IESYSC_TYPE_POLICY_AUTH type_policy_session ;
    UINT16 sizeSessionValue ;
-   BYTE sessionValue[(unsigned long)2 * sizeof(TPMU_HA)] ;
+   BYTE sessionValue[2UL * sizeof(TPMU_HA)] ;
    UINT16 sizeHmacValue ;
 };
 typedef struct __anonstruct_IESYS_SESSION_1 IESYS_SESSION;

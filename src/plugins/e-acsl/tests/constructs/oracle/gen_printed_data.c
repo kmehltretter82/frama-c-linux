@@ -19,11 +19,11 @@ enum EBool {
     EBOOL_MAX = (_Bool)1
 };
 enum EChar {
-    ECHAR_MIN = (char)(-127 - 1),
+    ECHAR_MIN = (char)(-127-1),
     ECHAR_MAX = (char)127
 };
 enum ESChar {
-    ESCHAR_MIN = (signed char)(-127 - 1),
+    ESCHAR_MIN = (signed char)(-127-1),
     ESCHAR_MAX = (signed char)127
 };
 enum EUChar {
@@ -31,7 +31,7 @@ enum EUChar {
     EUCHAR_MAX = (unsigned char)255U
 };
 enum EInt {
-    EINT_MIN = -2147483647 - 1,
+    EINT_MIN = (-2147483647-1),
     EINT_MAX = 2147483647
 };
 enum EUInt {
@@ -39,7 +39,7 @@ enum EUInt {
     EUINT_MAX = 4294967295U
 };
 enum EShort {
-    ESHORT_MIN = (short)(-32767 - 1),
+    ESHORT_MIN = (short)(-32767-1),
     ESHORT_MAX = (short)32767
 };
 enum EUShort {
@@ -47,7 +47,7 @@ enum EUShort {
     EUSHORT_MAX = (unsigned short)65535U
 };
 enum ELong {
-    ELONG_MIN = -9223372036854775807L - 1L,
+    ELONG_MIN = (-9223372036854775807-1),
     ELONG_MAX = 9223372036854775807L
 };
 enum EULong {
@@ -55,7 +55,7 @@ enum EULong {
     EULONG_MAX = 18446744073709551615UL
 };
 enum ELLong {
-    ELLONG_MIN = -9223372036854775807LL - 1LL,
+    ELLONG_MIN = (-9223372036854775807-1),
     ELLONG_MAX = 9223372036854775807LL
 };
 enum EULLong {

@@ -1,5 +1,0 @@
-30a31,34
-> [kernel:approximation] pointer_comp.c:43: 
->   imprecise size for variable g (Undefined sizeof on a function.)
-> [kernel:approximation] pointer_comp.c:43: 
->   imprecise size for variable f (Undefined sizeof on a function.)

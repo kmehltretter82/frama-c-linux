@@ -366,7 +366,7 @@ float square_root(float n)
 {
   float tmp;
   /*@ ghost square_root_pre_func(n); */
-  tmp = square_root_aux((float)1.0,n);
+  tmp = square_root_aux(1.f,n);
   /*@ ghost square_root_post_func(tmp); */
   return tmp;
 }

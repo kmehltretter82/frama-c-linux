@@ -25,25 +25,17 @@
   assert \pointer_comparable((void *)(&str1), (void *)(&str2));
 [eva:alarm] pointer_comp.c:42: Warning: 
   pointer comparison. assert \pointer_comparable((void *)(&s1), (void *)(&s2));
-[eva:alarm] pointer_comp.c:43: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void (*)())(&f), (void (*)())(&g));
-[eva:alarm] pointer_comp.c:46: Warning: 
+[eva:alarm] pointer_comp.c:45: Warning: 
   pointer comparison. assert \pointer_comparable((void *)(&s1), (void *)0);
-[eva:alarm] pointer_comp.c:47: Warning: 
+[eva:alarm] pointer_comp.c:46: Warning: 
   pointer comparison. assert \pointer_comparable((void *)(&s1 + 1), (void *)0);
-[eva:alarm] pointer_comp.c:48: Warning: 
+[eva:alarm] pointer_comp.c:47: Warning: 
   pointer comparison. assert \pointer_comparable((void *)(&s2[8]), (void *)0);
-[eva:alarm] pointer_comp.c:50: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void (*)())(&f), (void (*)())0);
-[eva:alarm] pointer_comp.c:51: Warning: 
-  pointer comparison. assert \pointer_comparable((void (*)())p, (void (*)())0);
 [eva:progress] Recording results for main
 [eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  i ∈ {0; 1}
+  i ∈ {0}
   p ∈ {{ &f ; &g }}
 [from] Computing for function main
 [from] Done for function main
@@ -106,34 +98,19 @@ void main(void)
   */
   i = (void *)(& s1) < (void *)(& s2);
   /*@ assert
-        Eva: ptr_comparison:
-          \pointer_comparable((void (*)())(&f), (void (*)())(&g));
-  */
-  i = & f < & g;
-  /*@ assert
         Eva: ptr_comparison: \pointer_comparable((void *)(&s1), (void *)0);
   */
-  i = & s1 > (struct s *)0;
+  i = (void *)(& s1) > (void *)0;
   /*@ assert
         Eva: ptr_comparison:
           \pointer_comparable((void *)(&s1 + 1), (void *)0);
   */
-  i = & s1 + 1 > (struct s *)0;
+  i = (void *)(& s1 + 1) > (void *)0;
   /*@ assert
         Eva: ptr_comparison: \pointer_comparable((void *)(&s2[8]), (void *)0);
   */
-  i = & s2[8] > (struct s *)0;
+  i = (void *)(& s2[8]) > (void *)0;
   i = & f == (void (*)(void))0;
-  /*@ assert
-        Eva: ptr_comparison:
-          \pointer_comparable((void (*)())(&f), (void (*)())0);
-  */
-  i = & f > (void (*)(void))0;
-  /*@ assert
-        Eva: ptr_comparison:
-          \pointer_comparable((void (*)())p, (void (*)())0);
-  */
-  i = p > (void (*)(void))0;
   return;
 }
 

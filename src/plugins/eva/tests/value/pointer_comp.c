@@ -40,14 +40,11 @@ void main () {
   // Invalid
   i = (&str1 < &str2);
   i = (&s1 < &s2);
-  i = (&f < &g);
 
   // ?
   i = (&s1 > NULL);
   i = (&s1+1 > NULL);
   i = (&s2[8] > NULL);
   i = (&f == NULL); // Cabs2cil typing bug here; tolerated for now
-  i = (&f > NULL); // Same
-  i = (p > NULL);
 
 }
