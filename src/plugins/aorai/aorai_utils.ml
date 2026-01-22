@@ -678,6 +678,7 @@ let add_global glob = globals_queue := glob :: !globals_queue
 let add_gvar ?init vi =
   let initinfo = {Cil_types.init} in
   vi.vstorage <- NoStorage;
+  vi.vdefined <- true;
   add_global (GVar(vi,initinfo,vi.vdecl));
   Globals.Vars.add vi initinfo;
   set_varinfo vi.vname vi
@@ -2183,6 +2184,7 @@ let mk_non_deterministic_body generated_kf loc f st status res =
            let state_var = Data_for_aorai.get_state_var st in
            let copy = Cil.copyVarinfo state_var (state_var.vname ^ "_tmp") in
            copy.vglob <- false;
+           copy.vdefined <- false;
            (st,copy))
         states
     in bindings, snd (List.split bindings)
