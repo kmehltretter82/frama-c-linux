@@ -324,23 +324,50 @@ let iter_sigma = Vmap.iter
 
 type penv = {
   mutable sigma : sigma ;
+  mutable binders : Lang.F.term Vmap.t ;
+  mutable bvars : Lang.F.Vars.t ;
   mutable marked : Lang.F.Tset.t ;
   select : Lang.F.term -> Tactical.selection ;
 }
 
+let get env (x : pvar) =
+  try Some (Vmap.find x.value env.binders) with Not_found ->
+  try Some (Tactical.selected @@ Vmap.find x.value env.sigma) with Not_found ->
+    None
+
+let bind env (x : string) (v : Lang.F.var) =
+  let { binders ; bvars } = env in
+  begin
+    env.binders <- Vmap.add x (Lang.F.e_var v) binders ;
+    env.bvars <- Lang.F.Vars.add v bvars ;
+    binders, bvars
+  end
+
+let unbind env (binders,bvars) =
+  begin
+    env.binders <- binders ;
+    env.bvars <- bvars ;
+  end
+
 let merge env (x : pvar) e =
-  try
-    let s = Vmap.find x.value env.sigma in
-    let v = Tactical.selected s in
-    if not (Lang.F.equal v e) then
-      raise Not_found
-  with Not_found ->
-    env.sigma <- Vmap.add x.value (env.select e) env.sigma
+  if not @@ Lang.F.Vars.intersect env.bvars (Lang.F.vars e) then
+    match get env x with
+    | Some v -> if not (Lang.F.equal v e) then raise Not_found
+    | None ->
+      env.sigma <- Vmap.add x.value (env.select e) env.sigma
 
 let rec is_any (p : pattern) =
   match p.value with
   | Any | Pvar _ -> true
   | Named(_,_,q) -> is_any q
+  | _ -> false
+
+let is_type (lt : logic_type) (t : Lang.F.tau) =
+  match lt , t with
+  | LTreal , Real
+  | LTinteger , Int
+  | LTboolean , (Bool | Prop)
+    -> true
   | _ -> false
 
 let rec pmatch env (p : pattern) e =
@@ -381,6 +408,8 @@ let rec pmatch env (p : pattern) e =
   | Implies(hps, cp), Imply(hs, c) ->
     pac env Lang.F.e_and [] hps hs ;
     pmatch env cp c
+  | Forall(qs,p) , _ -> pbind env p.loc Qed.Logic.Forall qs p e
+  | Exists(qs,p) , _ -> pbind env p.loc Qed.Logic.Exists qs p e
   | Times(b,p) , Times(a,e) ->
     let q,r = Z.div_rem a b in
     if Z.is_zero r then pmatch env p (Lang.F.e_times q e)
@@ -450,9 +479,13 @@ and pac env op rps ps es =
 
 (* Match with backtracking *)
 and ptry env p e =
-  let s0 = env.sigma in
+  let sigma = env.sigma in
+  let binders = env.binders in
   try pmatch env p e ; true
-  with Not_found -> env.sigma <- s0 ; false
+  with Not_found ->
+    env.sigma <- sigma ;
+    env.binders <- binders ;
+    false
 
 (* Matching any-patterns rs with es *)
 and pany env op rs es =
@@ -469,6 +502,18 @@ and pargs env ps trail es =
   | [] , _ when trail -> ()
   | p::ps , e::es -> pmatch env p e ; pargs env ps trail es
   | _ -> raise Not_found
+
+and pbind env loc q qs p e =
+  match qs with
+  | [] -> pmatch env p e
+  | (lt,x)::qs ->
+    match Lang.F.repr e with
+    | Bind(qe,tau,lc) when qe = q && is_type lt tau ->
+      let var = Lang.freshvar ~basename:x tau in
+      let state = bind env x var in
+      pbind env loc q qs p @@ Lang.F.QED.e_unbind var lc ;
+      unbind env state
+    | _ -> raise Not_found
 
 (* -------------------------------------------------------------------------- *)
 (* --- Deep matching with marking                                         --- *)
@@ -511,7 +556,12 @@ let pclause { head ; pattern ; split } clause sigma prop =
   let tprop = Lang.F.e_prop prop in
   let select t =
     if t == tprop then Tactical.Clause clause else Tactical.Inside(clause,t) in
-  let env = { sigma ; select ; marked = Lang.F.Tset.empty } in
+  let env = {
+    sigma ; select ;
+    binders = Vmap.empty ;
+    bvars = Lang.F.Vars.empty ;
+    marked = Lang.F.Tset.empty ;
+  } in
   let pcond t =
     (* replace ptry with a populating content version *)
     if ptry env pattern t || (not head && pchildren env pattern t)
