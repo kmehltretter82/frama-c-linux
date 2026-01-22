@@ -13,7 +13,27 @@
     completely ignore them.
     @since 31.0-Gallium *)
 
+module type Helpers = sig
+  type 'a t
 
+  (** monadic convenience functions around booleans *)
+  module Bool : sig
+    val only_if : bool -> unit t -> unit t
+  end
+
+  (** applying monadic functions to the option type *)
+  module Option : sig
+    val iter : ('a -> unit t) -> 'a option -> unit t
+    val map : ('a -> 'b t) -> 'a option -> 'b option t
+  end
+
+  (** applying monadic functions to lists *)
+  module List : sig
+    val iter : ('a -> unit t) -> 'a list -> unit t
+    val map : ('a -> 'b t) -> 'a list -> 'b list t
+    val fold_left : ('a -> 'b -> 'a t) -> 'a -> 'b list -> 'a t
+  end
+end
 
 (** {2 Monad signature with let-bindings}
 
@@ -50,23 +70,7 @@ module type S = sig
   val map  : ('a -> 'b  ) -> 'a t -> 'b t
   val bind : ('a -> 'b t) -> 'a t -> 'b t
 
-  (** monadic convenience functions around booleans *)
-  module Bool : sig
-    val only_if : bool -> unit t -> unit t
-  end
-
-  (** applying monadic functions to the option type *)
-  module Option : sig
-    val iter : ('a -> unit t) -> 'a option -> unit t
-    val map : ('a -> 'b t) -> 'a option -> 'b option t
-  end
-
-  (** applying monadic functions to lists *)
-  module List : sig
-    val iter : ('a -> unit t) -> 'a list -> unit t
-    val map : ('a -> 'b t) -> 'a list -> 'b list t
-    val fold_left : ('a -> 'b -> 'a t) -> 'a -> 'b list -> 'a t
-  end
+  module Monad: Helpers with type 'a t := 'a t
 
   module Operators : sig
     val ( >>-  ) : 'a t -> ('a -> 'b t) -> 'b t
@@ -98,20 +102,7 @@ module type S_with_product = sig
   val bind : ('a -> 'b t) -> 'a t -> 'b t
   val product : 'a t -> 'b t -> ('a * 'b) t
 
-  module Bool : sig
-    val only_if : bool -> unit t -> unit t
-  end
-
-  module Option : sig
-    val iter : ('a -> unit t) -> 'a option -> unit t
-    val map : ('a -> 'b t) -> 'a option -> 'b option t
-  end
-
-  module List : sig
-    val iter : ('a -> unit t) -> 'a list -> unit t
-    val map : ('a -> 'b t) -> 'a list -> 'b list t
-    val fold_left : ('a -> 'b -> 'a t) -> 'a -> 'b list -> 'a t
-  end
+  module Monad: Helpers with type 'a t := 'a t
 
   module Operators : sig
     val ( >>-  ) : 'a t -> ('a -> 'b t) -> 'b t

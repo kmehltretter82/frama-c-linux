@@ -39,7 +39,7 @@ end
 (* Complete signature *)
 module type S = sig
   include Basic
-  include Helpers with type 'a t := 'a t
+  module Monad: Helpers with type 'a t := 'a t
   module Operators : sig
     val ( >>-  ) : 'a t -> ('a -> 'b t) -> 'b t
     val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
@@ -52,7 +52,7 @@ end
 module type S_with_product = sig
   include Basic
   val product : 'a t -> 'b t -> ('a * 'b) t
-  include Helpers with type 'a t := 'a t
+  module Monad: Helpers with type 'a t := 'a t
   module Operators : sig
     val ( >>-  ) : 'a t -> ('a -> 'b t) -> 'b t
     val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
@@ -159,9 +159,11 @@ end
 module Make_based_on_bind (M : Based_on_bind) = struct
   module Basic = Basic_based_on_bind (M)
   module Operators = Make_operators (Basic)
-  module Bool = Make_bool (Basic)
-  module Option = Make_option (Basic)
-  module List = Make_list (Basic)
+  module Monad = struct
+    module Bool = Make_bool (Basic)
+    module Option = Make_option (Basic)
+    module List = Make_list (Basic)
+  end
   include Basic
 end
 
@@ -169,9 +171,11 @@ end
 module Make_based_on_map (M : Based_on_map) = struct
   module Basic = Basic_based_on_map (M)
   module Operators = Make_operators (Basic)
-  module Bool = Make_bool (Basic)
-  module Option = Make_option (Basic)
-  module List = Make_list (Basic)
+  module Monad = struct
+    module Bool = Make_bool (Basic)
+    module Option = Make_option (Basic)
+    module List = Make_list (Basic)
+  end
   include Basic
 end
 
