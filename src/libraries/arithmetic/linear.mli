@@ -112,6 +112,9 @@ module Space (Field : Field.S) : sig
         ensured. *)
     val ( * ) : ('n, 'm) matrix -> ('m, 'p) matrix -> ('n, 'p) matrix
 
+    (** Componentwise division. *)
+    val ( / ) : ('n, 'm) matrix -> ('n, 'm) matrix -> ('n, 'm) matrix
+
     (** Scalar multiplication. *)
     val ( ** ) : scalar -> ('n, 'm) matrix  -> ('n, 'm) matrix
 

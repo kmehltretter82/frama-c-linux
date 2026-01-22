@@ -96,6 +96,11 @@ module Space (Field : Field.S) = struct
       let elt i k = Finite.for_each (folder i k) m Field.zero in
       init n p elt
 
+    type ('n, 'm) div = ('n, 'm) matrix -> ('n, 'm) matrix -> ('n, 'm) matrix
+    let ( / ) : type n m. (n, m) div = fun (M l) (M r) ->
+      let ( / ) i j = Field.(get i j (M l) / get i j (M r)) in
+      init l.rows l.cols ( / )
+
     let ( ** ) : type n m. scalar -> (n, m) matrix -> (n, m) matrix =
       fun l (M m) -> M { m with data = Parray.map (Field.( * ) l) m.data }
 
