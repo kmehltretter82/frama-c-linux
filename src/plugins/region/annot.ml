@@ -44,13 +44,14 @@ let add_dpoints_to env tgt = function
   | None ->
     let loc = Property.location env.property in
     Options.warning ~wkey ~source:(fst loc)
-      "Missing pointer \\from for pointer assignment"
+      "No pointer values found in \\from for pointer assignment"
 
 let add_points_to env tgt = function
   | FromAny ->
     let loc = Property.location env.property in
     Options.warning ~wkey ~source:(fst loc)
       "Missing \\from for pointer assignment"
+  | From [] -> () (* avoid warning for purely allocating functions *)
   | From deps ->
     add_dpoints_to env tgt @@ dpoints_to env deps
 

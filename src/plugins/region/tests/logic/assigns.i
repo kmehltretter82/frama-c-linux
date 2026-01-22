@@ -17,9 +17,13 @@ int caller_result (int k) { int *a = result(B,k); return *a; }
 int* imprecise_result(int* q, int k);
 int* call_imprecise_result(int k) { return imprecise_result(B,k); }
 
+//@ assigns \result \from p ;
+int* suspicious(int p);
+int* call_suspiscious(int k) { return suspicious(k); }
+
 //@ assigns \result \from \nothing ;
-int* nothing(void);
-int* call_nothing(int k) { return nothing(); }
+int* malloc(int size);
+int* call_malloc(int n) { return malloc(n); }
 
 struct S { int *f; int *g[4]; };
 

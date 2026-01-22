@@ -31,16 +31,22 @@
   R0003: -RW- tmp (int *) 64b (*R0004) ;
   R0004: ---- 0b ;
   R0005: --W- \result (int *) 64b (*R0004) ;
-[region:froms] assigns.i:21: Warning: 
-  Missing pointer \from for pointer assignment
-[region] Function call_nothing:
-  R0001: -RW- tmp (int *) 64b (*R0002) ;
-  R0002: ---- 0b ;
-  R0003: --W- \result (int *) 64b (*R0002) ;
+[region] Function call_malloc:
+  R0001: -R-- n (int) 32b ;
+  R0002: -RW- tmp (int *) 64b (*R0003) ;
+  R0003: ---- 0b ;
+  R0004: --W- \result (int *) 64b (*R0003) ;
 [region] Function call_range:
   R0001: ---- s 320b { #64b; .g: R0002[4]; } ;
   R0002: --W- (int *) 64b (*R0003) ;
   R0003: ---- a[…] 0b ;
+[region:froms] assigns.i:21: Warning: 
+  No pointer values found in \from for pointer assignment
+[region] Function call_suspiscious:
+  R0001: -R-- k (int) 32b ;
+  R0002: -RW- tmp (int *) 64b (*R0003) ;
+  R0003: ---- 0b ;
+  R0004: --W- \result (int *) 64b (*R0003) ;
 [region] Function call_write:
   R0001: ---- a 320b { .f: R0002; .g: R0004[4]; } ;
   R0002: --W- (int *) 64b (*R0003) ;
@@ -60,7 +66,7 @@
   R0002: ---- 0b ;
 [region] Function imprecise_result:
   R0001: ---- \result 0b ;
-[region] Function nothing:
+[region] Function malloc:
   R0001: ---- \result 0b ;
 [region] Function result:
   R0001: ---- \result 0b ;
@@ -72,6 +78,8 @@
   R0001: -R-- p (struct S *) 64b (*R0002) ;
   R0002: ---- 320b { #64b; .g: R0003; } ;
   R0003: ---- 256b ;
+[region] Function suspicious:
+  R0001: ---- \result 0b ;
 [region] Function write:
   R0001: -R-- p (struct S *) 64b (*R0002) ;
   R0002: ---- 0b ;
