@@ -10,6 +10,8 @@ open Cil_types
 open Cil_datatype
 open Memory
 
+module Vmap = Varinfo.Map
+
 (* -------------------------------------------------------------------------- *)
 (* ---  L-Values & Expressions                                            --- *)
 (* -------------------------------------------------------------------------- *)
@@ -19,7 +21,7 @@ type value = node option
 let pointer v =
   match v with
   | Some p -> p
-  | None -> Options.abort "Not a pointer value"
+  | None -> Options.fatal "Not a pointer value"
 
 let rec add_lval (m:map) (s:stmt) (lv:lval) : node =
   let h = fst lv in
@@ -114,139 +116,122 @@ let add_write ~map ~stmt ~acs (r:node) (e:exp) =
     let v = add_exp map stmt e in
     Option.iter (Memory.add_points_to r) v
 
-let add_kf_call ~kf ~stmt map ?property ~result args kfct =
-  let module Vmap = Cil_datatype.Varinfo.Map in
-  let funspec = Annotations.funspec kfct in
-  let fargs = Kernel_function.get_formals kfct in
-  let ki = Kinstr.kinstr_of_opt_stmt (Some stmt) in
-  let add_called_behavior bhv =
-    let add_formal formal e arg =
-      let property =
-        match property with
-        | Some p -> p
-        | None -> Property.ip_of_behavior kf ki ~active:[] bhv in
-      let env = Logic.{ map ; formal = Vmap.empty ; property ; result } in
-      let d = Logic.add_term env @@ Logic_utils.expr_to_term e in
-      Vmap.add arg d formal in
-    let formal = List.fold_left2 add_formal Vmap.empty args fargs in
-    Annot.add_behavior ~iscalled:true ~kf ~ki ~formal ~result map bhv
-  in List.iter add_called_behavior funspec.spec_behavior
-
-let add_call ~kf ~stmt map ~result fct (args: exp list) =
-  match Kernel_function.get_called fct with
-  | Some kfct -> add_kf_call ~kf ~stmt map ~result args kfct
-  | None ->
-    begin match Dyncall.get stmt with
-      | Some(property,kfcts) ->
-        List.iter (add_kf_call ~kf ~stmt map ~property ~result args) kfcts
-      | None ->
-        Options.abort "Cannot resolve dynamic call for stmt:%a@."
-          Printer.pp_stmt stmt
-    end
-
 let add_function (m:map) (s:stmt) (f:lhost) =
   match f with
   | Var _vf -> ()
   | Mem e -> add_value m s e
 
-let add_instr ~kf (m:map) (s:stmt) (instr:instr) =
-  match instr with
+let add_returned (m:map) (s:stmt) lv =
+  let r = add_lval m s lv in
+  Memory.add_write r (Lval(s,lv)) ; r
+
+let add_kf_call m s r kf vs =
+  Populate_spec.populate_funspec kf [`Assigns] ;
+  let spec = Annotations.funspec kf in
+  let formals =
+    let rec bind fm xs vs =
+      match xs , vs with
+      | [] , _ -> fm
+      | x::xs , [] -> bind (Vmap.add x pure fm) xs []
+      | x::xs , v::vs -> bind (Vmap.add x v fm) xs vs in
+    bind Vmap.empty (Kernel_function.get_formals kf) vs
+  in Annot.add_spec ~map:m ~called:s ~kf ~formals ~result:r spec
+
+let add_call m s r fct es =
+  let vs = List.map (fun e -> Ldomain.scalar @@ add_exp m s e) es in
+  match Kernel_function.get_called fct with
+  | Some kf -> add_kf_call m s r kf vs
+  | None ->
+    begin
+      match Dyncall.get s with
+      | Some(_,kfs) ->
+        List.iter (fun kf -> add_kf_call m s r kf vs) kfs
+      | None ->
+        Options.not_yet_implemented
+          ~source:(fst @@ Stmt.loc s)
+          "Dynamic call without @call annotation"
+    end
+
+let add_instr ~map ~stmt = function
   | Skip _ -> ()
-  | Code_annot (annot,_) ->
-    Annot.add_code_annot ~iscalled:false ~kf ~stmt:s ~result:None m annot
 
   | Set(lv,e,_) ->
-    let r = add_lval m s lv in
-    add_write ~map:m ~stmt:s ~acs:(Lval(s,lv)) r e ;
+    let r = add_lval map stmt lv in
+    add_write ~map ~stmt ~acs:(Lval(stmt,lv)) r e ;
 
   | Local_init(x,AssignInit iv,_) ->
-    let acs = Access.Init(s,x) in
-    add_init m s acs (Var x,NoOffset) iv
+    let acs = Access.Init(stmt,x) in
+    add_init map stmt acs (Var x,NoOffset) iv
 
   | Local_init(x,ConsInit (vf,args,kind), loc) ->
-    let r = add_cvar m x in
-    Memory.add_init r (Lval (s,Cil.var x)) ;
+    let r = add_cvar map x in
+    Memory.add_init r (Lval (stmt,Cil.var x)) ;
     Cil.treat_constructor_as_func
       begin fun _res fct args _loc ->
-        add_function m s fct;
-        List.iter (add_value m s) args ;
-        add_call ~kf ~stmt:s m ~result:(Some r) fct args
+        add_function map stmt fct;
+        List.iter (add_value map stmt) args ;
+        add_call map stmt (Some r) fct args
       end x vf args kind loc
 
   | Call(lr,f,es,_) ->
-    add_function m s f;
-    List.iter (add_value m s) es ;
-    let result = Option.map
-        (fun lv ->
-           let r = add_lval m s lv in
-           Memory.add_write r (Lval(s,lv)) ; r
-        ) lr
-    in add_call ~kf ~stmt:s m ~result f es
+    add_function map stmt f;
+    let r = Option.map (add_returned map stmt) lr in
+    add_call map stmt r f es
 
+  | Code_annot _ -> ()
   | Asm _ ->
-    Options.warning ~source:(fst @@ Stmt.loc s)
+    Options.warning ~source:(fst @@ Stmt.loc stmt)
       "Inline assembly not supported (ignored)"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Statements                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rec add_stmt ~kf (m:map) (s:stmt) =
-  let add_block = add_block ~kf in
-  let add_annot =
-    Annot.add_code_annot ~iscalled:false ~kf ~stmt:s ~result:None m in
-  List.iter add_annot @@ Annotations.code_annot s ;
-  match s.skind with
-  | Instr ki -> add_instr ~kf m s ki ;
-  | Return(Some e,_) ->
-    add_write ~map:m ~stmt:s ~acs:(Exp(s,e)) (Memory.add_result m) e ;
-  | Return(None,_) -> ignore @@ Memory.add_result m ;
-  | Goto _ | Break _ | Continue _ -> ()
-  | If(e,st,se,_) ->
-    add_value m s e ;
-    add_block m st ;
-    add_block m se ;
-  | Switch(e,b,_,_) ->
-    add_value m s e ;
-    add_block m b ;
-  | Block b -> add_block m b
-  | Loop(annots,b,_,_,_) -> List.iter add_annot annots ; add_block m b
-  | UnspecifiedSequence s ->
-    add_block m @@ Cil.block_from_unspecified_sequence s
-  | Throw(exn,_) -> Option.iter (fun (e,_) -> add_value  m s e) exn
-  | TryCatch(b,hs,_)  ->
-    add_block m b ;
-    List.iter (fun (c,b) -> add_catch ~kf m c ; add_block m b) hs ;
-  | TryExcept(a,(ks,e),b,_) ->
-    add_block m a ;
-    List.iter (add_instr ~kf m s) ks ;
-    add_value  m s e ;
-    add_block m b ;
-  | TryFinally(a,b,_) ->
-    add_block m a ;
-    add_block m b ;
-
-and add_catch ~kf (m:map) (c:catch_binder) =
-  match c with
-  | Catch_all -> ()
-  | Catch_exn(_,xbs) -> List.iter (fun (_,b) -> add_block ~kf m b) xbs
-
-and add_block ~kf (m:map) (b:block) =
-  List.iter (add_stmt ~kf m) b.bstmts
-
-(* -------------------------------------------------------------------------- *)
-(* --- Behavior                                                           --- *)
-(* -------------------------------------------------------------------------- *)
-
-let add_bhv ~kf:_ ~result:_ (m:map) (bhv:behavior) =
+let rec add_stmt ~map ~kf ~result stmt =
   List.iter
-    (fun e ->
-       let rs = Spec.of_extension e in
-       if rs <> [] then
-         begin
-           List.iter (Logic.add_region m) rs ;
-         end
-    ) bhv.b_extended
+    (Annot.add_code_annot ~map ~kf ~stmt ~result)
+    (Annotations.code_annot stmt) ;
+  match stmt.skind with
+  | Instr instr -> add_instr ~map ~stmt instr ;
+  | Return(None,_) -> ()
+  | Return(Some e,_) ->
+    add_write ~map ~stmt ~acs:(Exp(stmt,e)) (Option.get result) e
+  | Goto _ | Break _ | Continue _ -> ()
+  | If(e,sthen,selse,_) ->
+    add_value map stmt e ;
+    add_block ~map ~kf ~result sthen ;
+    add_block ~map ~kf ~result selse ;
+  | Switch(e,b,_,_) ->
+    add_value map stmt e ;
+    add_block ~map ~kf ~result b ;
+  | Block b -> add_block ~map ~kf ~result b
+  | Loop(_,b,_,_,_) -> add_block ~map ~kf ~result b
+  | UnspecifiedSequence s ->
+    add_block ~map ~kf ~result @@ Cil.block_from_unspecified_sequence s
+  | Throw(exn,_) -> Option.iter (fun (e,_) -> add_value map stmt e) exn
+  | TryCatch(b,handlers,_)  ->
+    add_block ~map ~kf ~result b ;
+    List.iter
+      (fun (c,b) ->
+         add_catch ~map ~kf ~result c ;
+         add_block ~map ~kf ~result b
+      ) handlers
+  | TryExcept(a,(ks,e),b,_) ->
+    add_block ~map ~kf ~result a ;
+    List.iter (add_instr ~map ~stmt) ks ;
+    add_value map stmt e ;
+    add_block ~map ~kf ~result b ;
+  | TryFinally(a,b,_) ->
+    add_block ~kf ~map ~result a ;
+    add_block ~kf ~map ~result b ;
+
+and add_catch ~map ~kf ~result = function
+  | Catch_all -> ()
+  | Catch_exn(_,xbs) ->
+    List.iter (fun (_,b) -> add_block ~map ~kf ~result b) xbs
+
+and add_block ~map ~kf ~result b =
+  List.iter (add_stmt ~map ~kf ~result) b.bstmts
 
 (* -------------------------------------------------------------------------- *)
 (* --- Function                                                           --- *)
@@ -255,22 +240,23 @@ let add_bhv ~kf:_ ~result:_ (m:map) (bhv:behavior) =
 type domain = map
 
 let domain kf =
-  let m = Memory.create () in
+  let map = Memory.create () in
+  let result =
+    if Kernel_function.returns_void kf
+    then None
+    else  Some (Memory.add_result map) in
   begin
     try
-      let funspec = Annotations.funspec kf in
-      List.iter (add_bhv ~kf ~result m) funspec.spec_behavior ;
-      let ki = Kinstr.kinstr_of_opt_stmt None in
-      List.iter (Annot.add_behavior ~iscalled:false ~kf ~ki ~result:None m)
-        funspec.spec_behavior ;
+      let spec = Annotations.funspec kf in
+      Annot.add_spec ~map ~kf ~result spec ;
     with Annotations.No_funspec _ -> ()
   end ;
   begin
     try
-      let fundec = Kernel_function.get_definition kf in
-      add_block ~kf m fundec.sbody ;
+      let decl = Kernel_function.get_definition kf in
+      add_block ~map ~kf ~result decl.sbody ;
     with Kernel_function.No_Definition -> ()
   end ;
-  Memory.lock m ; m
+  Memory.lock map ; map
 
 (* -------------------------------------------------------------------------- *)

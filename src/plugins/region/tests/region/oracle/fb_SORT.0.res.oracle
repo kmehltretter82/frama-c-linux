@@ -43,4 +43,3 @@
   R001d: IR-- out (SN *) 64b (*R000a) ;
   R001e: IR-- idx (SL *) 64b (*R0014) ;
   R001f: IRW- i (int) 32b ;
-  R0020: ---- 0b ;

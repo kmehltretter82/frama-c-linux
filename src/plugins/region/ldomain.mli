@@ -41,6 +41,7 @@ val get_index : ('a -> 'a -> 'a) -> 'a t -> 'a t
 
 val iter : ('a -> unit) -> 'a t -> unit
 
+(** Polymorphic context *)
 type 'a context
 
 val empty : 'a context

@@ -71,13 +71,15 @@ struct
 
   let check ~fn (m : store) (m' : store) =
     if m == m' then m else
-      let msg = Printf.sprintf "Region.Store.%s (inconsistent maps)" fn in
-      raise (Invalid_argument msg)
+      invalid_arg
+        (Printf.sprintf "Region.Store.%s (inconsistent maps)" fn)
+      [@ coverage off]
 
   let checklock ~fn store =
     if Hashtbl.length store.keymap > 0 then
-      let msg = Printf.sprintf "Region.Store.%s (locked map)" fn in
-      raise (Invalid_argument msg)
+      invalid_arg
+        (Printf.sprintf "Region.Store.%s (locked map)" fn)
+      [@ coverage off]
 
   let create () = { values = Ufind.new_store () ; keymap = Hashtbl.create 0 }
 
@@ -131,7 +133,7 @@ struct
   let id a = checklock ~fn:"id" a.store ; D.get_id @@ get a
   let of_id store k =
     try Hashtbl.find store.keymap k
-    with Not_found -> raise (Invalid_argument "Region.Store.of_id")
+    with Not_found -> invalid_arg "Region.Store.of_id" [@ coverage off]
 
   let pretty fmt a =
     if is_locked a.store then

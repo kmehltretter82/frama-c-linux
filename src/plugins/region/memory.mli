@@ -10,9 +10,9 @@ open Cil_types
 
 type node
 
-type root = Root of {
-    label : string ;
+type cvar = Cvar of {
     cvar : varinfo ;
+    label : string ;
     cells : int ;
   }
 
@@ -27,7 +27,8 @@ type range = Range of {
 type region = {
   node: node ;
   parents: node list ;
-  cvars: root list ;
+  cresult: bool ;
+  cvars: cvar list ;
   labels: string list ;
   types: typ list ;
   typed : typ option ;
@@ -76,8 +77,8 @@ val iter : map -> (node -> unit) -> unit
 
 val fresh : map -> node
 val add_cvar : map -> Cil_types.varinfo -> node
-val add_logic_var : map -> Cil_types.logic_var -> domain
-val add_logic_info : map -> Cil_types.logic_info -> domain
+val add_lvar : map -> Cil_types.logic_var -> domain
+val add_logic : map -> Cil_types.logic_info -> domain
 val add_result : map -> node
 val add_label : map -> string -> node
 val add_field : node -> fieldinfo -> node
@@ -95,11 +96,14 @@ val domain_of_ltyp : map -> ?ctxt:context -> logic_type -> domain
 
 val merge : node -> node -> unit
 val merge_all : node list -> unit
+
+val pure : domain
 val merge_domain : domain -> domain -> domain
+val merge_points_to : domain -> node option
 
 val cvar : map -> varinfo -> node
 val lvar : map -> logic_var -> domain
-val logic_info : map -> logic_info -> domain
+val logic : map -> logic_info -> domain
 val field : node -> fieldinfo -> node
 val index : node -> typ -> node
 val lval : map -> lval -> node
@@ -124,3 +128,8 @@ val types : node -> typ list
 val typed : node -> typ option
 
 val bitsSizeOf : typ -> int
+
+
+(**/**)
+val add_body : (map -> logic_info -> domain -> unit) ref
+(**/***)

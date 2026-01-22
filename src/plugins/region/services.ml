@@ -27,10 +27,10 @@ end
 module NodeOpt = Data.Joption(Node)
 module NodeList = Data.Jlist(Node)
 
-module Root : Data.S with type t = Memory.root =
+module Cvar : Data.S with type t = Memory.cvar =
 struct
-  type t = Memory.root
-  let jtype = Data.declare ~package ~name:"root" @@
+  type t = Memory.cvar
+  let jtype = Data.declare ~package ~name:"cvar" @@
     Jrecord [
       "name", Jstring ;
       "label", Jstring ;
@@ -38,20 +38,20 @@ struct
       "cells", Jnumber ;
     ]
 
-  let title (Memory.Root r) =
+  let title (Memory.Cvar r) =
     Format.asprintf "%a (%db) (%d cells)"
       Typ.pretty r.cvar.vtype
       (Memory.bitsSizeOf r.cvar.vtype)
       r.cells
 
-  let to_json (Memory.Root r as root) =
+  let to_json (Memory.Cvar r as cvar) =
     Json.of_fields [
       "name", Json.of_string r.cvar.vname ;
       "label", Json.of_string r.label ;
-      "title", Json.of_string (title root) ;
+      "title", Json.of_string (title cvar) ;
       "cells", Json.of_int r.cells ;
     ]
-  let of_json _ = failwith "Region.Root.of_json"
+  let of_json _ = failwith "Region.Cvar.of_json"
 end
 
 
@@ -78,7 +78,7 @@ struct
   let of_json _ = failwith "Region.Range.of_json"
 end
 
-module Roots = Data.Jlist(Root)
+module Cvars = Data.Jlist(Cvar)
 module Ranges = Data.Jlist(Range)
 
 module Region: Data.S with type t = Memory.region =
@@ -92,10 +92,8 @@ struct
     match ikind with
     | IBool | IUChar -> 'b'
     | IChar | ISChar -> 'c'
-    | IInt -> 'i'
-    | IUInt -> 'u'
-    | IShort -> 's'
-    | IUShort -> 'r'
+    | IInt -> 'i' | IUInt -> 'u'
+    | IShort | IUShort -> 's'
     | ILong | ILongLong -> 'l'
     | IULong | IULongLong -> 'w'
 
@@ -162,7 +160,8 @@ struct
   let jtype = Data.declare ~package ~name:"region" @@
     Jrecord [
       "node", Node.jtype ;
-      "roots", Roots.jtype ;
+      "result", Jboolean ;
+      "cvars", Cvars.jtype ;
       "labels", Jarray Jalpha ;
       "parents", NodeList.jtype ;
       "sizeof", Jnumber ;
@@ -179,7 +178,8 @@ struct
   let to_json (m: Memory.region) =
     Json.of_fields [
       "node", Node.to_json m.node ;
-      "roots", Roots.to_json m.cvars ;
+      "result", Json.of_bool m.cresult ;
+      "cvars", Cvars.to_json m.cvars ;
       "labels", labels_to_json m.labels ;
       "parents", NodeList.to_json m.parents ;
       "sizeof", Json.of_int @@ m.sizeof ;

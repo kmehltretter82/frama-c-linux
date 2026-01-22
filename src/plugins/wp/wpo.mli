@@ -200,17 +200,17 @@ val pp_flow : Format.formatter -> unit
 class type generator =
   object
     method model : WpContext.model
+
     (** Generate VCs for the given Property. *)
-
     method compute_ip : Property.t -> t Bag.t
-    (** Generate VCs for call preconditions at the given statement. *)
 
+    (** Generate VCs for call preconditions at the given statement. *)
     method compute_call : stmt -> t Bag.t
+
     (** Generate VCs for all functions
         matching provided behaviors and property names.
         For `~bhv` and `~prop` optional arguments,
         default and empty list means {i all} properties. *)
-
     method compute_main :
       ?fct:Wp_parameters.functions ->
       ?bhv:string list ->

@@ -76,7 +76,17 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
     });
     // --- Roots
     const R: Dot.Node = { id: '', shape: 'cds', font: 'mono' };
-    r.roots.forEach(r => {
+    // --- Roots: Result
+    if (r.result) {
+      const rid = '\\result';
+      nodes.push({ ...R, id: rid, label: rid, title: "Returned value" });
+      edges.push({
+        source: rid, target: id,
+        headAnchor: "e", head: 'none', color: 'grey'
+      });
+    }
+    // --- Roots: Variables
+    r.cvars.forEach(r => {
       const xid = `X${r.name}`;
       nodes.push({ ...R, id: xid, label: r.label, title: r.title });
       edges.push({

@@ -10,9 +10,18 @@ open Cil_types
 
 open Memory
 
-val add_behavior : kf:kernel_function -> ki:kinstr ->
-  ?formal:domain Cil_datatype.Varinfo.Map.t -> result:Logic.result ->
-  iscalled:bool -> map -> funbehavior -> unit
-val add_code_annot : kf:kernel_function -> stmt:stmt ->
-  ?formal:domain Cil_datatype.Varinfo.Map.t -> result:Logic.result ->
-  iscalled:bool -> map -> code_annotation -> unit
+val add_spec :
+  map:map ->
+  ?called:stmt ->
+  kf:kernel_function ->
+  ?ki:kinstr ->
+  ?formals:domain Cil_datatype.Varinfo.Map.t ->
+  result:node option ->
+  spec -> unit
+
+val add_code_annot :
+  map:map ->
+  kf:kernel_function ->
+  stmt:stmt ->
+  result:node option ->
+  code_annotation -> unit
