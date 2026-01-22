@@ -15,7 +15,8 @@
   R0001: ---- s 320b { .f: R0002; #256b; } ;
   R0002: --W- (int *) 64b (*R0003) ;
   R0003: ---- a[…] 0b ;
-[region:froms] assigns.i:8: Warning: Missing \from for pointer assignment
+[region:froms] assigns.i:8: Warning: 
+  Missing \from in assigns to pointer location(s)
 [region] Function call_imprecise:
   R0001: ---- B[…] 0b ;
   R0002: -R-- k (int) 32b ;
@@ -24,7 +25,7 @@
   R0005: -RW- __retres (int) 32b ;
   R0006: --W- \result (int) 32b ;
 [region:froms] assigns.i:17: Warning: 
-  Missing assigns \result \from for pointer result
+  Missing assigns \result \from for returned pointer
 [region] Function call_imprecise_result:
   R0001: ---- B[…] 0b ;
   R0002: -R-- k (int) 32b ;
@@ -41,7 +42,7 @@
   R0002: --W- (int *) 64b (*R0003) ;
   R0003: ---- a[…] 0b ;
 [region:froms] assigns.i:21: Warning: 
-  No pointer values found in \from for pointer assignment
+  No pointer found in assigns-\from to pointer location(s)
 [region] Function call_suspiscious:
   R0001: -R-- k (int) 32b ;
   R0002: -RW- tmp (int *) 64b (*R0003) ;

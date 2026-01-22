@@ -1,2 +1,2 @@
 PLUGIN: region
-OPT: -region
+OPT: -region -region-warn-key froms=warning

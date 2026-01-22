@@ -65,7 +65,7 @@ let merge a b = Memory.merge a b ; min a b
 let pointer (d:domain) : node =
   match Ldomain.pointed merge d with
   | Some p -> p
-  | None -> Options.abort "Not a pointer value"
+  | None -> Options.fatal "Not a pointer value"
 
 type lv_value =
   | VAL of domain

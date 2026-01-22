@@ -27,8 +27,8 @@ let add_ipred env ip = add_predicate env ip.ip_content.tp_statement
 
 let wkey =
   Options.register_warn_category
-    ~help:"missing \\from when assigning pointers"
-    ~default:Wactive "froms"
+    ~help:"Missing assigns or assigns-\\from"
+    ~default:Werror "froms"
 
 let add_write env lv tgt =
   Memory.add_write tgt @@ Access.Term(env.context,lv)
@@ -44,13 +44,13 @@ let add_dpoints_to env tgt = function
   | None ->
     let loc = Access.location env.context in
     Options.warning ~wkey ~source:(fst loc)
-      "No pointer values found in \\from for pointer assignment"
+      "No pointer found in assigns-\\from to pointer location(s)"
 
 let add_points_to env tgt = function
   | FromAny ->
     let loc = Access.location env.context in
     Options.warning ~wkey ~source:(fst loc)
-      "Missing \\from for pointer assignment"
+      "Missing \\from in assigns to pointer location(s)"
   | From [] -> () (* avoid warning for purely allocating functions *)
   | From deps ->
     add_dpoints_to env tgt @@ dpoints_to env deps
@@ -142,7 +142,6 @@ let rec add_assigns_from env ~iscalled ~from tgt =
       ~source:(fst tgt.term_loc)
       "Unsupported \\let-assigns"
   | Tif (c,tt,te) ->
-    Options.warning ~source:(fst c.term_loc) "ignored assigns-condition" ;
     iadd_term env c ;
     add_assigns_from env ~iscalled ~from tt ;
     add_assigns_from env ~iscalled ~from te ;
@@ -177,7 +176,7 @@ let add_bassigns ~called ~map ~kf ~ki ~bhv ~formals ~result = function
     if called <> None then
       let loc = Kernel_function.get_location kf in
       Options.warning ~wkey ~source:(fst loc)
-        "precise assigns are required for calls"
+        "Precise assigns are required for calls"
   | Writes ws as asgn ->
     let bhv = Property.Id_contract (Datatype.String.Set.empty,bhv) in
     let ip = Option.get @@ Property.ip_of_assigns kf ki bhv asgn in
@@ -194,7 +193,7 @@ let add_bassigns ~called ~map ~kf ~ki ~bhv ~formals ~result = function
       then
         let loc = Access.location context in
         Options.warning ~wkey ~source:(fst loc)
-          "Missing assigns \\result \\from for pointer result"
+          "Missing assigns \\result \\from for returned pointer"
 
 let add_allocation ~map ~called ~kf ~ki ~bhv ~formals ~result alloc =
   match alloc with
@@ -314,7 +313,7 @@ let add_code_annot ~map ~kf ~stmt ~result ca =
     let loc = Cil_datatype.Stmt.loc stmt in
     Options.not_yet_implemented
       ~source:(fst loc)
-      "Unsupported \\freee and \\allocates" ;
+      "Unsupported \\allocates and \\frees" ;
     (*TODO FIX THIS, Cf. assigns & add_allocates *)
   | AExtended (_,_, acsl) ->
     add_extension ~map ~called:None ~kf ~ki ~formals ~result acsl

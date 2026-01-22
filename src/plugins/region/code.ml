@@ -21,7 +21,7 @@ type value = node option
 let pointer v =
   match v with
   | Some p -> p
-  | None -> Options.abort "Not a pointer value"
+  | None -> Options.fatal "Not a pointer value"
 
 let rec add_lval (m:map) (s:stmt) (lv:lval) : node =
   let h = fst lv in
@@ -147,7 +147,9 @@ let add_call m s r fct es =
       | Some(_,kfs) ->
         List.iter (fun kf -> add_kf_call m s r kf vs) kfs
       | None ->
-        Options.abort ~source:(fst @@ Stmt.loc s) "Cannot resolve dynamic call"
+        Options.not_yet_implemented
+          ~source:(fst @@ Stmt.loc s)
+          "Dynamic call without @call annotation"
     end
 
 let add_instr ~map ~stmt = function
