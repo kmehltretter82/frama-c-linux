@@ -56,11 +56,11 @@ let add_points_to env tgt = function
 
 let rec store env lv ty tgt deps =
   match Ast_types.unroll_skel ty with
-  | TNamed _ -> ()
+  | TNamed _ | TVoid -> () (* should not occur *)
   | TPtr _ | TFun _ | TBuiltin_va_list ->
     add_write env lv tgt ;
     add_dpoints_to env tgt (Lazy.force deps)
-  | TVoid | TInt _ | TFloat _ | TEnum _ -> add_write env lv tgt
+  | TInt _ | TFloat _ | TEnum _ -> add_write env lv tgt
   | TArray(te,_) ->
     let re = Memory.add_index tgt te in
     let ofs = TIndex (Logic_const.trange (None,None), TNoOffset) in
