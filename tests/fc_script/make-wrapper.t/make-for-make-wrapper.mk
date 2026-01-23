@@ -1,6 +1,6 @@
 # Customized makefile template for testing 'frama-c-script make-wrapper'.
 
-include $(shell frama-c-config -print-lib-path)/analysis-scripts/prologue.mk
+include $(shell frama-c -print-lib-path)/analysis-scripts/prologue.mk
 
 # Note: the -no-autoload-plugins line is necessary for Cram testing, otherwise
 #       the test dependencies would need to explicitly enumerate each
@@ -22,5 +22,5 @@ make-for-make-wrapper.parse: \
   # make-wrapper3.c is deliberately absent of this list
 
 ### Epilogue. Do not modify this block. #######################################
-include $(shell frama-c-config -print-lib-path)/analysis-scripts/epilogue.mk
+include $(shell frama-c -print-lib-path)/analysis-scripts/epilogue.mk
 ###############################################################################

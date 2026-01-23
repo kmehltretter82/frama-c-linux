@@ -1,4 +1,4 @@
-FRAMAC_SHARE:=$(shell frama-c-config -print-share-path)
+FRAMAC_SHARE:=$(shell frama-c -print-share-path)
 
 ## Common definitions
 

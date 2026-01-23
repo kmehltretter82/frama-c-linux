@@ -1,4 +1,4 @@
-  $ export FRAMAC_SHARE="$(frama-c-config -print-share-path)"
+  $ export FRAMAC_SHARE="$(frama-c -print-share-path)"
   $ export BUILD_PATH_PREFIX_MAP="\$FRAMAC_SHARE=${FRAMAC_SHARE}:$BUILD_PATH_PREFIX_MAP"
 
   $ frama-c -check -no-autoload-plugins cpp-command.c -machdep x86_32 -cpp-frama-c-compliant -cpp-command "echo [\$(basename '%1') \$(basename '%1') \$(basename '%i') \$(basename '%input')] ['%2' '%2' '%o' '%output'] ['%args']" | python3 filter.py

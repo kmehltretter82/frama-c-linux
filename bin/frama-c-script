@@ -100,10 +100,10 @@ fi
 DIR="$( cd "$( dirname "$0" )" && pwd )"
 
 # All scripts called by frama-c-script may rely on FRAMAC_BIN pointing to the
-# directory containing frama-c, frama-c-config and frama-c-script.
+# directory containing frama-c and frama-c-script.
 export FRAMAC_BIN="$DIR"
-FRAMAC_LIB=$("${DIR}/frama-c-config" -print-lib-path)
-FRAMAC_SHARE=$("${DIR}/frama-c-config" -print-share-path)
+FRAMAC_LIB=$("${DIR}/frama-c" -print-lib-path)
+FRAMAC_SHARE=$("${DIR}/frama-c" -print-share-path)
 ANALYSIS_SCRIPTS_DIR="${FRAMAC_LIB}/analysis-scripts"
 if [ -z ${FRAMAC_SESSION+x} ]; then
     FRAMAC_SESSION="./.frama-c";

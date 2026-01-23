@@ -7,4 +7,5 @@
 #                                                                        #
 ##########################################################################
 
+>&2 echo "Warning: frama-c-config is deprecated, use 'frama-c' or 'frama-c -no-autoload-plugins' instead."
 exec $(dirname $0)/frama-c -no-autoload-plugins "$@"
