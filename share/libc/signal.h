@@ -188,6 +188,9 @@ struct sigaction {
                void     (*sa_sigaction)(int, siginfo_t *, void *);
                sigset_t   sa_mask;
                int        sa_flags;
+#ifdef __linux__
+               void     (*sa_restorer)(void); /* Non-POSIX */
+#endif
            };
 
 /*@
