@@ -151,7 +151,11 @@ inductive subst_let(integer x, integer y) {
  */
 /*@
 predicate subst_let(integer x, integer y) =
-  0 < x ? (\let two = 2; x < y || (x == 4 && y == 2)) : x == 4 && y == 2;
+  0 < x
+    ?
+    (\let two = 2; (x < two && y == two) || (x == 4 && y == 2))
+    :
+    x == 4 && y == 2;
 
 */
 int __gen_e_acsl_subst_let(int x, int y);
@@ -838,20 +842,23 @@ int __gen_e_acsl_subst_let(int x, int y)
   int __gen_e_acsl_if_14;
   if (0 < x) {
     int __gen_e_acsl_two;
+    int __gen_e_acsl_and_6;
     int __gen_e_acsl_or_6;
     __gen_e_acsl_two = 2;
-    if (x < y) __gen_e_acsl_or_6 = 1;
+    if (x < __gen_e_acsl_two) __gen_e_acsl_and_6 = y == __gen_e_acsl_two;
+    else __gen_e_acsl_and_6 = 0;
+    if (__gen_e_acsl_and_6) __gen_e_acsl_or_6 = 1;
     else {
-      int __gen_e_acsl_and_6;
-      if (x == 4) __gen_e_acsl_and_6 = y == 2; else __gen_e_acsl_and_6 = 0;
-      __gen_e_acsl_or_6 = __gen_e_acsl_and_6;
+      int __gen_e_acsl_and_7;
+      if (x == 4) __gen_e_acsl_and_7 = y == 2; else __gen_e_acsl_and_7 = 0;
+      __gen_e_acsl_or_6 = __gen_e_acsl_and_7;
     }
     __gen_e_acsl_if_14 = __gen_e_acsl_or_6;
   }
   else {
-    int __gen_e_acsl_and_7;
-    if (x == 4) __gen_e_acsl_and_7 = y == 2; else __gen_e_acsl_and_7 = 0;
-    __gen_e_acsl_if_14 = __gen_e_acsl_and_7;
+    int __gen_e_acsl_and_8;
+    if (x == 4) __gen_e_acsl_and_8 = y == 2; else __gen_e_acsl_and_8 = 0;
+    __gen_e_acsl_if_14 = __gen_e_acsl_and_8;
   }
   return __gen_e_acsl_if_14;
 }

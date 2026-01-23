@@ -264,9 +264,9 @@ end = struct
     predicate : predicate (* generalized Horn clauses *)
   }
 
-  let mk_var_subst (arg, formal) =
+  let mk_var_subst quantifiers (arg, formal) =
     let rec solve lhs rhs = match lhs.term_node with
-      | TLval (TVar v, TNoOffset) -> Some (v, rhs)
+      | TLval (TVar v, TNoOffset) when Vars.mem v quantifiers -> Some (v, rhs)
       | TBinOp (PlusA, t1, t2) when Vars.is_empty (free_vars t2) ->
         solve t1 {t2 with term_node = TBinOp (MinusA, rhs, t2)}
       | TBinOp (PlusA, t1, t2) when Vars.is_empty (free_vars t1) ->
@@ -348,7 +348,7 @@ end = struct
       | Papp (li, _, args) when is_rec_occurrence li -> (* conclusion *)
         let substs =
           let pairs, _ = Mode.in_out_args ~mode (List.combine args li.l_profile) in
-          Substs.of_list @@ List.filter_map mk_var_subst pairs
+          Substs.of_list @@ List.filter_map (mk_var_subst quantifiers) pairs
         in
         let fv = add_fv fv args in
         let unbound_quantified_vars =
