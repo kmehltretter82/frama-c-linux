@@ -56,6 +56,14 @@
   }
 */
 
+// let-bound variable are not to be substituted
+/*@
+  inductive subst_let(ℤ x, ℤ y) {
+    case c: ∀ ℤ x; 0 < x ==> \let two = 2; x < two ==> subst_let(x, two);
+    case d: subst_let(4, 2);
+  }
+*/
+
 int main() {
   //@ assert use_multimode(0,0);
   //@ assert simple_complex_argument(0, 1);
@@ -64,5 +72,6 @@ int main() {
   //@ assert use_var_bind_and_subst(0,0);
   //@ assert use_var_use_bind_and_subst(0,0);
   //@ assert bind_twice(2, 3, 1);
+  //@ assert subst_let(1,2);
   return 0;
 }

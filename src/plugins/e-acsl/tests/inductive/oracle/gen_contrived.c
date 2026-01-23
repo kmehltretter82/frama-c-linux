@@ -139,9 +139,22 @@ int __gen_e_acsl_bind_twice_fun3(int a, int b);
 /*@
 predicate bind_twice(integer a, integer b, integer c) =
   bind_twice_fun3(a, b) == c;
+ */
+int __gen_e_acsl_bind_twice(int a, int b, int c);
+
+/*@
+inductive subst_let(integer x, integer y) {
+  case c: \forall integer x;
+            0 < x ==> (\let two = 2; x < two ==> subst_let(x, two));
+  case d: subst_let(4, 2);
+  }
+ */
+/*@
+predicate subst_let(integer x, integer y) =
+  0 < x ? (\let two = 2; x < y || (x == 4 && y == 2)) : x == 4 && y == 2;
 
 */
-int __gen_e_acsl_bind_twice(int a, int b, int c);
+int __gen_e_acsl_subst_let(int x, int y);
 
 int main(void)
 {
@@ -160,7 +173,7 @@ int main(void)
     __gen_e_acsl_assert_data.pred_txt = "use_multimode(0, 0)";
     __gen_e_acsl_assert_data.file = "contrived.c";
     __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 60;
+    __gen_e_acsl_assert_data.line = 68;
     __e_acsl_assert(__gen_e_acsl_use_multimode_2,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
@@ -179,7 +192,7 @@ int main(void)
     __gen_e_acsl_assert_data_4.pred_txt = "simple_complex_argument(0, 1)";
     __gen_e_acsl_assert_data_4.file = "contrived.c";
     __gen_e_acsl_assert_data_4.fct = "main";
-    __gen_e_acsl_assert_data_4.line = 61;
+    __gen_e_acsl_assert_data_4.line = 69;
     __e_acsl_assert(__gen_e_acsl_simple_complex_argument_2,
                     & __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
@@ -199,7 +212,7 @@ int main(void)
     __gen_e_acsl_assert_data_5.pred_txt = "simple_complex_argument(0, 2)";
     __gen_e_acsl_assert_data_5.file = "contrived.c";
     __gen_e_acsl_assert_data_5.fct = "main";
-    __gen_e_acsl_assert_data_5.line = 62;
+    __gen_e_acsl_assert_data_5.line = 70;
     __e_acsl_assert(__gen_e_acsl_simple_complex_argument_4,
                     & __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
@@ -218,7 +231,7 @@ int main(void)
     __gen_e_acsl_assert_data_6.pred_txt = "conds(0, 2, 1)";
     __gen_e_acsl_assert_data_6.file = "contrived.c";
     __gen_e_acsl_assert_data_6.fct = "main";
-    __gen_e_acsl_assert_data_6.line = 63;
+    __gen_e_acsl_assert_data_6.line = 71;
     __e_acsl_assert(__gen_e_acsl_conds_2,& __gen_e_acsl_assert_data_6);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
   }
@@ -237,7 +250,7 @@ int main(void)
     __gen_e_acsl_assert_data_9.pred_txt = "use_var_bind_and_subst(0, 0)";
     __gen_e_acsl_assert_data_9.file = "contrived.c";
     __gen_e_acsl_assert_data_9.fct = "main";
-    __gen_e_acsl_assert_data_9.line = 64;
+    __gen_e_acsl_assert_data_9.line = 72;
     __e_acsl_assert(__gen_e_acsl_use_var_bind_and_subst_2,
                     & __gen_e_acsl_assert_data_9);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
@@ -257,7 +270,7 @@ int main(void)
     __gen_e_acsl_assert_data_11.pred_txt = "use_var_use_bind_and_subst(0, 0)";
     __gen_e_acsl_assert_data_11.file = "contrived.c";
     __gen_e_acsl_assert_data_11.fct = "main";
-    __gen_e_acsl_assert_data_11.line = 65;
+    __gen_e_acsl_assert_data_11.line = 73;
     __e_acsl_assert(__gen_e_acsl_use_var_use_bind_and_subst_2,
                     & __gen_e_acsl_assert_data_11);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
@@ -277,11 +290,29 @@ int main(void)
     __gen_e_acsl_assert_data_12.pred_txt = "bind_twice(2, 3, 1)";
     __gen_e_acsl_assert_data_12.file = "contrived.c";
     __gen_e_acsl_assert_data_12.fct = "main";
-    __gen_e_acsl_assert_data_12.line = 66;
+    __gen_e_acsl_assert_data_12.line = 74;
     __e_acsl_assert(__gen_e_acsl_bind_twice_2,& __gen_e_acsl_assert_data_12);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
   }
   /*@ assert bind_twice(2, 3, 1); */ ;
+  {
+    int __gen_e_acsl_subst_let_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
+      {.values = (void *)0};
+    __gen_e_acsl_subst_let_2 = __gen_e_acsl_subst_let(1,2);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,
+                                 "subst_let(1, 2)",0,
+                                 __gen_e_acsl_subst_let_2);
+    __gen_e_acsl_assert_data_15.blocking = 1;
+    __gen_e_acsl_assert_data_15.kind = "Assertion";
+    __gen_e_acsl_assert_data_15.pred_txt = "subst_let(1, 2)";
+    __gen_e_acsl_assert_data_15.file = "contrived.c";
+    __gen_e_acsl_assert_data_15.fct = "main";
+    __gen_e_acsl_assert_data_15.line = 75;
+    __e_acsl_assert(__gen_e_acsl_subst_let_2,& __gen_e_acsl_assert_data_15);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
+  }
+  /*@ assert subst_let(1, 2); */ ;
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;
@@ -798,6 +829,31 @@ int __gen_e_acsl_bind_twice(int a, int b, int c)
   __gen_e_acsl_bind_twice_fun3_10 = __gen_e_acsl_bind_twice_fun3(a,b);
   int __retres = __gen_e_acsl_bind_twice_fun3_10 == c;
   return __retres;
+}
+
+/*@ assigns \result;
+    assigns \result \from x, y; */
+int __gen_e_acsl_subst_let(int x, int y)
+{
+  int __gen_e_acsl_if_14;
+  if (0 < x) {
+    int __gen_e_acsl_two;
+    int __gen_e_acsl_or_6;
+    __gen_e_acsl_two = 2;
+    if (x < y) __gen_e_acsl_or_6 = 1;
+    else {
+      int __gen_e_acsl_and_6;
+      if (x == 4) __gen_e_acsl_and_6 = y == 2; else __gen_e_acsl_and_6 = 0;
+      __gen_e_acsl_or_6 = __gen_e_acsl_and_6;
+    }
+    __gen_e_acsl_if_14 = __gen_e_acsl_or_6;
+  }
+  else {
+    int __gen_e_acsl_and_7;
+    if (x == 4) __gen_e_acsl_and_7 = y == 2; else __gen_e_acsl_and_7 = 0;
+    __gen_e_acsl_if_14 = __gen_e_acsl_and_7;
+  }
+  return __gen_e_acsl_if_14;
 }
 
 
