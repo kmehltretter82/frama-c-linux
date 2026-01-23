@@ -12,6 +12,11 @@
 /* --- Pattern Debugger                                                   --- */
 /* -------------------------------------------------------------------------- */
 
+.wp-select-pattern:hover {
+  cursor: pointer;
+  background-color: var(--background-button-hover);
+}
+
 .wp-pattern-warning {
   text-decoration: underline wavy orange;
 }

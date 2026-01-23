@@ -10,27 +10,8 @@ open Server
 module Md = Markdown
 
 (* -------------------------------------------------------------------------- *)
-(* --- Strategy debug information                                         --- *)
+(* --- Strategy Information                                               --- *)
 (* -------------------------------------------------------------------------- *)
-
-type debug_entry = {
-  name: string ; (* empty for selection *)
-  pattern: string ;
-  value: string ;
-  target: Ptip.target ;
-}
-
-type debug_info = {
-  selection: debug_entry option ;
-  params: debug_entry list ;
-  matched: debug_entry list ;
-}
-
-let empty_debug_info = {
-  selection = None ;
-  params = [] ;
-  matched = [] ;
-}
 
 type diagnostic = {
   message : string ;
@@ -50,23 +31,25 @@ let warning ~loc ~message =
 let error ~loc ~message =
   { message ; severity = `Error ; location = Some loc }
 
-type alternative_result = {
+type field = {
+  label: string ;
+  title: string ;
+  value: string ;
+  debug: string ;
+  target: Ptip.target ;
+}
+
+type alternative = {
   location: Cil_types.location option ;
   diagnostic: diagnostic list ;
-  debug: debug_info ;
+  fields: field list ;
 }
 
-let alt_result ?loc ?(debug=empty_debug_info) diagnostic =
-  { location = loc ; diagnostic ; debug }
+let result ?loc ?(fields=[]) diagnostic =
+  { location = loc ; diagnostic ; fields }
 
-type result = {
-  diagnostic: diagnostic ;
-  alts: alternative_result list ;
-}
-
-let failed_strategy ?loc ~message () =
-  let diagnostic = { message ; severity = `Error ; location = loc } in
-  { diagnostic ; alts = [] }
+let failed ?loc message =
+  result ?loc [{ message ; severity = `Error ; location = loc }]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Ivette Serializers                                                 --- *)
@@ -82,155 +65,130 @@ struct
   type t = Cil_types.location
   let jtype =
     Data.declare ~package ~name:"range" @@
-    Package.(Jrecord [
-        "offset", Jnumber;
-        "length", Jnumber;
-      ])
+    Jrecord [ "offset", Jnumber ; "length", Jnumber ]
 
   let to_json (loc : t) =
     let offset = (fst loc).pos_cnum in
     let length = (snd loc).pos_cnum - offset in
     `Assoc [ "offset", `Int offset ; "length", `Int length ]
 
-  let of_json _ = failwith "Wp.PatternDebugger.Range"
+  let of_json _ = failwith "Wp.StrategyDebugger.Range"
 end
 
-module Target = Data.Jpair(WpTipApi.Part)(Data.Joption(WpTipApi.Term))
-
-module Debug_entry : Data.S with type t = debug_entry =
+module Target : Data.S with type t = Ptip.target =
 struct
-  type t = debug_entry
+  type t = Ptip.target
+  module WpTipApioTerm = Data.Joption(WpTipApi.Term)
   let jtype =
-    Data.declare ~package ~name:"debugEntry" @@
-    Package.(Jrecord [
-        "name", Jstring ;
-        "pattern", Jstring ;
-        "value", Jstring ;
-        "target", Target.jtype ;
-      ])
-
-  let to_json m =
-    let target =
-      let part = match fst @@ m.target with
-        | Ptip.Term -> `Term
-        | Ptip.Goal -> `Goal
-        | Ptip.Step s -> `Step s.id
-      in
-      part, snd m.target
-    in
-    `Assoc [
-      "name" , `String m.name ;
-      "pattern" , `String m.pattern ;
-      "value" , `String m.value ;
-      "target", Target.to_json target ;
+    Data.declare ~package ~name:"target" @@
+    Jrecord [
+      "part", WpTipApi.Part.jtype ;
+      "term", WpTipApioTerm.jtype ;
     ]
 
-  let of_json _ = failwith "Wp.PatternDebugger.Debug_entry"
-end
-
-module Debug_entry_opt = Data.Joption(Debug_entry)
-module Debug_entry_list = Data.Jlist(Debug_entry)
-
-module Debug_info : Data.S with type t = debug_info =
-struct
-  type t = debug_info
-  let jtype =
-    Data.declare ~package ~name:"debugInfo" @@
-    Package.(Jrecord [
-        "selection", Debug_entry_opt.jtype ;
-        "params", Debug_entry_list.jtype ;
-        "matched", Debug_entry_list.jtype ;
-      ])
-
-  let to_json { selection ; params ; matched } =
+  let to_json tgt =
+    let part = match fst tgt with
+      | Ptip.Term -> `Term
+      | Ptip.Goal -> `Goal
+      | Ptip.Step s -> `Step s.id in
+    let term = snd tgt in
     `Assoc [
-      "selection" , Debug_entry_opt.to_json selection ;
-      "params" , Debug_entry_list.to_json params ;
-      "matched" , Debug_entry_list.to_json matched ;
+      "part" , WpTipApi.Part.to_json part ;
+      "term" , WpTipApioTerm.to_json term ;
     ]
 
-  let of_json _ = failwith "Wp.PatternDebugger.Debug_info"
+  let of_json _ = failwith "Wp.StrategyDebugger.Target"
 end
 
+module Field : Data.S with type t = field =
+struct
+  type t = field
+
+  let jtype =
+    Data.declare ~package ~name:"field" @@
+    Jrecord [
+      "label", Jstring ;
+      "title", Jstring ;
+      "value", Jstring ;
+      "debug", Jstring ;
+      "target" , Target.jtype ;
+    ]
+
+  let to_json fd =
+    `Assoc [
+      "label" , `String fd.label ;
+      "title" , `String fd.title ;
+      "value" , `String fd.value ;
+      "debug" , `String fd.debug ;
+      "target" , Target.to_json fd.target ;
+    ]
+
+  let of_json _ = failwith "Wp.StrategyDebugger.Field"
+end
+
+module Fields = Data.Jlist(Field)
 module RangeOpt = Data.Joption(Range)
 
 module Diagnostic : Data.S with type t = diagnostic =
 struct
   type t = diagnostic
+
+  let jseverity_tag = function
+    | `Ok -> "Ok"
+    | `Ignored -> "Ignored"
+    | `Warning -> "Warning"
+    | `Error -> "Error"
+
+  let jseverity =
+    Data.declare ~package ~name:"severity" @@
+    Junion [
+      Jtag "Ok" ;
+      Jtag "Ignored" ;
+      Jtag "Warning" ;
+      Jtag "Error" ;
+    ]
+
   let jtype =
-    let union =
-      Package.Junion [
-        Jtag "Warning" ;
-        Jtag "Error" ;
-        Jtag "Ok" ;
-        Jtag "Ignored"
-      ]
-    in
-    Data.declare ~package ~name:"diag" @@
+    Data.declare ~package ~name:"diagnostic" @@
     Package.(Jrecord [
         "message", Jstring ;
-        "severity", union ;
+        "severity", jseverity ;
         "range", RangeOpt.jtype ;
       ])
 
-  let severity_tag = function
-    | `Ok -> "Ok"
-    | `Warning -> "Warning"
-    | `Error -> "Error"
-    | `Ignored -> "Ignored"
-
-  let to_json d = `Assoc [
-      "message" , `String d.message ;
-      "severity" , `String (severity_tag d.severity) ;
-      "range" , RangeOpt.to_json d.location
+  let to_json diag = `Assoc [
+      "severity" , `String (jseverity_tag diag.severity) ;
+      "message" , `String diag.message ;
+      "range" , RangeOpt.to_json diag.location ;
     ]
 
-  let of_json _ = failwith "Wp.PatternDebugger.Diag"
+  let of_json _ = failwith "Wp.StrategyDebugger.Diag"
 end
 
-module Diagnostic_list = Data.Jlist(Diagnostic)
+module Diagnostics = Data.Jlist(Diagnostic)
 
-module Alternative_result : Data.S with type t = alternative_result =
+module Alternative : Data.S with type t = alternative =
 struct
-  type t = alternative_result
+  type t = alternative
   let jtype =
-    Data.declare ~package ~name:"alternativeResult" @@
+    Data.declare ~package ~name:"alternative" @@
     Package.(Jrecord [
         "location", RangeOpt.jtype ;
-        "diagnostic", Diagnostic_list.jtype ;
-        "debug", Debug_info.jtype ;
+        "diagnostics", Diagnostics.jtype ;
+        "fields", Fields.jtype ;
       ])
 
-  let to_json ar =
+  let to_json alt =
     `Assoc [
-      "location" , RangeOpt.to_json ar.location ;
-      "diagnostic" , Diagnostic_list.to_json ar.diagnostic ;
-      "debug", Debug_info.to_json ar.debug ;
+      "location" , RangeOpt.to_json alt.location ;
+      "diagnostics" , Diagnostics.to_json alt.diagnostic ;
+      "fields", Fields.to_json alt.fields ;
     ]
 
-  let of_json _ = failwith "Wp.PatternDebugger.Alternative_result"
+  let of_json _ = failwith "Wp.StrategyDebugger.Alternative_result"
 end
 
-module Alternative_result_list = Data.Jlist(Alternative_result)
-
-module Result : Data.S with type t = result =
-struct
-  type t = result
-  let jtype =
-    Data.declare ~package ~name:"result" @@
-    Package.(Jrecord [
-        "diagnostic", Diagnostic.jtype ;
-        "alts", Alternative_result_list.jtype ;
-      ])
-
-  let to_json r =
-    `Assoc [
-      "diagnostic" , Diagnostic.to_json r.diagnostic ;
-      "alts", Alternative_result_list.to_json r.alts ;
-    ]
-
-  let of_json _ = failwith "Wp.PatternDebugger.Result"
-end
+module Alternatives = Data.Jlist(Alternative)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Local tokenizer                                                    --- *)
@@ -286,63 +244,60 @@ let parse_string s =
 (* Custom printers for clause and selection, using TIP printer:
    we want printed values to be consistent with the current printer. *)
 
-let rec pp_selection printer fmt = function
+let rec pp_selection (printer : Ptip.pseq) fmt = function
   | Tactical.Empty ->
     Format.pp_print_string fmt "None."
   | Inside(_,t) ->
-    Format.fprintf fmt "Term:  %a" printer#pp_term t
-  | Clause (Goal p) -> Format.fprintf fmt "Goal:  %a" printer#pp_pred p
+    Format.fprintf fmt "Term: %a" printer#pp_term t
+  | Clause (Goal p) -> Format.fprintf fmt "Goal: %a" printer#pp_pred p
   | Clause (Step s) -> printer#pp_step fmt s
   | Compose(Cint k) ->
-    Format.fprintf fmt "Const: %a" Z.pretty k
+    Format.fprintf fmt "Value: %a" Z.pretty k
   | Compose(Range(a,b)) ->
     Format.fprintf fmt "Range: %d..%d" a b
   | Compose(Code(e,_,_)) ->
-    Format.fprintf fmt "@[<hov 2>Calc:  %a@]" printer#pp_term e ;
+    Format.fprintf fmt "@[<hov 2>Calc: %a@]" printer#pp_term e ;
   | Multi es ->
     Format.fprintf fmt "@[<hov 2>Multi:" ;
     List.iter (Format.fprintf fmt "@ %a;" @@ pp_selection printer) es ;
     Format.fprintf fmt "@]"
 
-let extract_matchings debug_table printer ?select ?params sigma =
-  let pp_selection = pp_selection printer in
-  let matched = ref [] in
-  (* Extracting matchings ... *)
-  let iter name m =
-    let target = printer#selection_to_target m in
-    let pattern =
-      match Hashtbl.find_opt debug_table name with
-      | Some pattern -> Format.asprintf "%a" Pattern.pp_pattern pattern
-      | None -> name (* this is a user defined name *)
-    in
-    let value = Format.asprintf "%a" pp_selection m in
-    matched := { name ; pattern ; value ; target } :: !matched
-  in
-  Pattern.iter_sigma iter sigma ;
-  let params =
-    (* Extracting parameters *)
-    match params with
-    | None -> []
-    | Some l ->
-      let to_matching (name, selection) =
-        let target = printer#selection_to_target selection in
-        let pattern = Format.asprintf "Parameter %S" name in
-        let value = Format.asprintf "%a" pp_selection selection in
-        { name ; pattern ; value ; target }
-      in
-      List.map to_matching l
-  in
+let field ~label ?(title="") (printer : Ptip.pseq) pvalue =
+  let value = Format.asprintf "%a" (pp_selection printer) pvalue in
+  let debug = Format.asprintf "%a" Tactical.pp_selection pvalue in
+  let target = printer#selection_to_target pvalue in
+  { label ; title ; value ; debug ; target }
+
+let extract_matchings debug_table printer ?select ?(params=[]) sigma =
   let selection =
     (* Extracting selection *)
     match select with
-    | None -> None
-    | Some selection ->
-      let target = printer#selection_to_target selection in
-      let pattern = "Selection" in
-      let value = Format.asprintf "%a" pp_selection selection in
-      Some { name = "None" ; pattern ; value ; target }
+    | None -> []
+    | Some pvalue -> [field ~label:"Selection" printer pvalue] in
+  let params =
+    (* Extracting parameters *)
+    List.map
+      (fun (name,pvalue) ->
+         let label = Format.asprintf "Parameter %S" name in
+         field ~label printer pvalue
+      ) params
   in
-  { selection ; params ; matched = !matched }
+  let matched = ref [] in
+  Pattern.iter_sigma
+    (fun name pvalue ->
+       let label =
+         if name = "" then "Pattern" else
+         if name.[0] = '$' then Printf.sprintf "Pattern %s" name else
+           Printf.sprintf "Variable %s" name in
+       let title =
+         match Hashtbl.find_opt debug_table name with
+         | None -> "Pattern variable"
+         | Some pattern -> Format.asprintf "%a" Pattern.pp_pattern pattern
+       in let fd = field ~label ~title printer pvalue in
+       matched := fd :: !matched
+    ) sigma ;
+  let by_name f g = String.compare f.label g.label in
+  selection @ params @ List.sort by_name !matched
 
 let configure env sigma tactical params =
   let fold_parameter (diags, sels) (a, v) =
@@ -374,7 +329,7 @@ let debug_apply ~loc (tactical : Tactical.tactical) select sequent =
 
 let debug_tactic env ctxt loc (tac: ProofStrategy.tactic) node =
   match node with
-  | None -> alt_result ~loc [valid ~loc ~message:"Valid tactic (syntax only)"]
+  | None -> result ~loc [valid ~loc ~message:"Valid tactic (syntax only)"]
   | Some node ->
     let printer = WpTipApi.lookup_printer node in
     let dtable = ProofStrategy.debug_table ctxt in
@@ -385,11 +340,11 @@ let debug_tactic env ctxt loc (tac: ProofStrategy.tactic) node =
         let tactical = ProofStrategy.tactical tac.tactic in
         let select = ProofStrategy.select sigma ?goal tac.select in
         let diags, params = configure env sigma tactical tac.params in
-        let debug = extract_matchings dtable printer ~select ~params sigma in
+        let fields = extract_matchings dtable printer ~select ~params sigma in
         if diags <> [] then
-          alt_result ~loc ~debug diags
+          result ~loc ~fields diags
         else
-          alt_result ~loc ~debug @@ debug_apply ~loc tactical select sequent
+          result ~loc ~fields @@ debug_apply ~loc tactical select sequent
 
       | p::ps ->
         match Pattern.psequent p sigma sequent with
@@ -397,14 +352,14 @@ let debug_tactic env ctxt loc (tac: ProofStrategy.tactic) node =
           apply_all sigma ps
         | None -> (* we failed to match all patterns *)
           let loc = Pattern.pattern_loc p.pattern in
-          let debug = extract_matchings dtable printer sigma in
+          let fields = extract_matchings dtable printer sigma in
           let diag = warning ~loc ~message:"Unmatched pattern" in
-          alt_result ~loc ~debug [diag]
+          result ~loc ~fields [diag]
 
     in apply_all Pattern.empty tac.lookup
 
 let debug_alternative env ctxt strategy node alt =
-  let mk_result diags = Some (alt_result ~loc:alt.ProofStrategy.loc diags) in
+  let mk_result diags = Some (result ~loc:alt.ProofStrategy.loc diags) in
   try
     match alt with
     | ProofStrategy.{ value = Default } ->
@@ -456,25 +411,17 @@ let debug strategy ?node () =
       "", ProofStrategy.parse_alternatives ctxt ps
   in
   match parse strategy with
+  | exception Empty -> []
   | exception ParseError (loc, message)
-  | exception Pattern.TypeError (loc, message) ->
-    failed_strategy ~loc ~message ()
-  | exception Empty ->
-    let diagnostic =
-      { message = "Empty strategy" ; severity = `Ignored ; location = None } in
-    { diagnostic ; alts = []}
+  | exception Pattern.TypeError (loc, message) -> [ failed ~loc message ]
   | exception exn ->
-    let message = Printf.sprintf "Failure (%s)" (Printexc.to_string exn) in
-    failed_strategy ~message ()
+    [ failed @@ Printf.sprintf "Failure (%s)" (Printexc.to_string exn) ]
   | strategy, alternatives ->
-    let diagnostic = { message = "" ; severity = `Ok ; location = None } in
-    let alts =
-      List.filter_map
-        (debug_alternative env ctxt strategy node) alternatives in
-    { diagnostic ; alts }
+    List.filter_map
+      (debug_alternative env ctxt strategy node) alternatives
 
 let () =
-  let signature = Request.signature ~output:(module Result) () in
+  let signature = Request.signature ~output:(module Alternatives) () in
   let get_text = Request.param signature ~name:"strategy"
       ~descr:(Md.plain "Strategy text")
       ~default:"" (module Data.Jstring) in

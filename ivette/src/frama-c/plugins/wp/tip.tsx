@@ -278,136 +278,92 @@ const selectedSeverityClass: { [key: string]: string } = {
   Error: 'wp-pattern-selected-error',
 };
 
-interface TargetProps {
-  node: TIP.node;
-  target: [TIP.part, TIP.term | undefined];
+interface FieldProps {
+  node?: TIP.node;
+  field: WpStrategy.field
 }
 
-function Target(props: TargetProps): JSX.Element {
-  const { node, target } = props;
-  const [part, term] = target;
-  const onClick = React.useCallback(() => {
-    Server.send(TIP.setSelection, { node, part, term });
-  }, [part, term, node]);
-  return <IconButton
-    icon='TARGET'
-    onClick={onClick}
-    enabled={term !== undefined} />;
-}
-
-interface DbgEntryProps {
-  node: TIP.node;
-  entry: WpStrategy.debugEntry
-}
-
-function DbgEntry(props: DbgEntryProps): JSX.Element {
-  const { pattern, name, value, target } = props.entry;
+function Field(props: FieldProps): JSX.Element {
   const node = props.node;
+  const { label, title, value, debug, target } = props.field;
+  const { part, term } = target;
+  const selectable = node && term;
+  const icon = selectable ? 'TARGET' : 'TERMINAL';
+  const className = selectable && 'wp-select-pattern';
+  const onClick = selectable && (() => {
+    Server.send(TIP.setSelection, { node, part, term });
+  });
   return (
     <tr>
-      <td><Target node={node} target={target} /></td>
-      <td><Item label={pattern} title={'ID: ' + name} /></td>
-      <td style={{ width: '100%' }}><Item label={'-> ' + value} /></td>
+      <td className={className}>
+        <Item icon={icon} label={label} title={title} onClick={onClick} />
+      </td>
+      <td style={{ width: '100%' }}>
+        <Cell label={value} title={debug} />
+      </td>
     </tr>
   );
 }
 
-interface SelectionProps {
-  node: TIP.node;
-  selection?: WpStrategy.debugEntry;
-}
-
-function Selection(props: SelectionProps): JSX.Element {
-  const { node, selection } = props;
-  return selection
-    ? <DbgEntry node={node} entry={selection} />
-    :
-    <tr>
-      <td><Label label={'No selection'} /></td>
-      <td></td>
-      <td></td>
-    </tr>;
-}
-
 interface DebugProps {
   node?: TIP.node;
-  debug?: WpStrategy.debugInfo;
+  fields?: WpStrategy.field[];
 }
 
-function Debug(props: DebugProps): JSX.Element | null {
-  const { node, debug } = props;
-  if (!debug || !node) return null;
-
-  const { selection, params, matched } = debug;
+function Fields(props: DebugProps): JSX.Element | null {
+  const { node, fields = [] } = props;
+  if (!fields) return null;
   return (
     <>
       <table>
         <tbody>
-          <Selection node={node} selection={selection} />
-          {params.map((p) => <DbgEntry key={p.name} node={node} entry={p} />)}
-          {matched.map((m) => <DbgEntry key={m.name} node={node} entry={m} />)}
+          {fields.map((p) => <Field key={p.label} node={node} field={p} />)}
         </tbody>
       </table>
     </>
   );
 }
 
-function decorationsOfDiagnostic(
-  diag: WpStrategy.diag, selected: boolean
-): Decoration[] {
+function decorateDiagnostic(
+  buffer: Decoration[], diag: WpStrategy.diagnostic, selected: boolean
+): void {
   const { severity, range } = diag;
-  const underline =
-    range
-      ? [{ className: severityClass[severity], ...range }] : [];
-  const highlight =
-    range && selected
-      ? [{ className: selectedSeverityClass[severity], ...range }] : [];
-
-  return underline.concat(highlight);
+  if (range)
+    buffer.push({ className: severityClass[severity], ...range });
+  if (range && selected)
+    buffer.push({ className: selectedSeverityClass[severity], ...range });
 }
 
-function decorationsOfAR(
-  ar: WpStrategy.alternativeResult, selected: boolean
-): Decoration[] {
-  return ar.diagnostic.map((d) => decorationsOfDiagnostic(d, selected)).flat();
+function decorateAlternatives(
+  buffer: Decoration[], alt: WpStrategy.alternative[], selected: number
+): void {
+  alt.forEach((a, k) => {
+    const sel = (k === selected);
+    a.diagnostics.forEach((d) => decorateDiagnostic(buffer, d, sel));
+  });
 }
 
-function decorationsOfAResults(
-  ar: WpStrategy.alternativeResult[], selected: number
-): Decoration[] {
-  let res: Decoration[] = [];
-  for (let i = 0; i < ar.length; i++) {
-    const sel = selected === i;
-    res = res.concat(decorationsOfAR(ar[i], sel));
-  }
-  return res;
+function decorateSelection(
+  buffer: Decoration[], selRange: WpStrategy.range | undefined
+): void {
+  if (selRange)
+    buffer.push({ className: 'wp-pattern-selected', ...selRange });
 }
 
-function decorations(pres: WpStrategy.result, selected: number): Decoration[] {
-  const ars = decorationsOfAResults(pres.alts, selected);
-  return ars.concat(decorationsOfDiagnostic(pres.diagnostic, false));
-}
-
-interface DiagnosticMessageProps {
-  diag: WpStrategy.diag;
-}
-
-function DiagnosticMessage(props: DiagnosticMessageProps): JSX.Element {
-  const { severity, message } = props.diag;
+function Diagnostic(props: WpStrategy.diagnostic): JSX.Element {
+  const { severity, message } = props;
   const icon = severityIcon[severity];
   const kind = severityKind[severity];
   return <Label icon={icon} kind={kind} label={message} />;
 }
 
-function errors(pres: WpStrategy.result, selected: number): JSX.Element {
-  const diags = pres.alts.length === 0
-    ? [pres.diagnostic]
-    : pres.alts[selected].diagnostic;
+interface ErrorsProps { errors: WpStrategy.diagnostic[] }
 
+function Errors(props: ErrorsProps): JSX.Element {
   return (
-    <>
-      {diags.map((d, index) => <DiagnosticMessage key={index} diag={d} />)}
-    </>
+    <Vbox>
+      {props.errors.map((d, k) => <Diagnostic key={k} {...d} />)}
+    </Vbox>
   );
 }
 
@@ -433,23 +389,19 @@ export function StrategyDebugger(props: PatternDebuggerProps): JSX.Element {
     setSelected(0);
   }, [text]);
 
-  const pres =
+  const alternatives =
     States.useRequestStable(WpStrategy.debug, { strategy, node: current });
 
-  const selRange =
-    pres.alts.length > 0 ? pres.alts[selected].location : undefined;
-
-  const debug =
-    pres.alts.length > 0 ? pres.alts[selected].debug : undefined;
-
-  const selDecoration = React.useMemo(
-    () => selRange ? [{ className: 'wp-pattern-selected', ...selRange }] : []
-    , [selRange]);
-
-  const otherDecorations =
-    React.useMemo(() => decorations(pres, selected), [pres, selected]);
-
-  const allDecorations = otherDecorations.concat(selDecoration);
+  const alternative = alternatives[selected];
+  const errors = alternative?.diagnostics || [];
+  const fields = alternative?.fields || [];
+  const range = alternative?.location;
+  const decorations = React.useMemo(() => {
+    const buffer: Decoration[] = [];
+    decorateSelection(buffer, range);
+    decorateAlternatives(buffer, alternatives, selected);
+    return buffer;
+  }, [alternatives, range, selected]);
 
   return (
     <Vbox style={{ height: '100%' }}>
@@ -457,27 +409,25 @@ export function StrategyDebugger(props: PatternDebuggerProps): JSX.Element {
         style={{ flex: 1 }}
         text={text}
         onChange={onChange}
-        decorations={allDecorations}
+        decorations={decorations}
       />
       <Vbox style={{ flex: 1 }}>
-        <Hbox>
-          <Vbox>
-            <IconButton
-              icon={'ANGLE.UP'}
-              enabled={selected > 0}
-              onClick={() => { setSelected(selected - 1); }}
-            />
-            <IconButton
-              icon={'ANGLE.DOWN'}
-              enabled={selected < pres.alts.length - 1}
-              onClick={() => { setSelected(selected + 1); }}
-            />
-          </Vbox>
-          <Vbox>
-            {errors(pres, selected)}
-          </Vbox>
+        <Label display={!alternatives.length} label="No selection" />
+        <Hbox display={alternatives.length > 1} className="labview-titlebar" >
+          <IconButton
+            icon={'ANGLE.LEFT'}
+            enabled={selected > 0}
+            onClick={() => { setSelected(selected - 1); }}
+          />
+          <IconButton
+            icon={'ANGLE.RIGHT'}
+            enabled={selected < alternatives.length - 1}
+            onClick={() => { setSelected(selected + 1); }}
+          />
+          <Label>Alternative #{selected + 1} / {alternatives.length} </Label>
         </Hbox>
-        <Debug node={current} debug={debug} />
+        <Errors errors={errors} />
+        <Fields node={current} fields={fields} />
       </Vbox>
     </Vbox>
   );
