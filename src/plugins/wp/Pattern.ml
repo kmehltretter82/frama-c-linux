@@ -478,10 +478,12 @@ and pac env op rps ps es =
 (* Match with backtracking *)
 and ptry env p e =
   let sigma = env.sigma in
+  let bvars = env.bvars in
   let binders = env.binders in
   try pmatch env p e ; true
   with Not_found ->
     env.sigma <- sigma ;
+    env.bvars <- bvars ;
     env.binders <- binders ;
     false
 
