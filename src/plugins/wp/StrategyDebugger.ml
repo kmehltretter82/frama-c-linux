@@ -56,7 +56,7 @@ type alternative_result = {
   debug: debug_info ;
 }
 
-let alternative_result ?loc diagnostic ?(debug=empty_debug_info) () =
+let alt_result ?loc diagnostic ?(debug=empty_debug_info) () =
   { location = loc ; diagnostic ; debug }
 
 type result = {
@@ -355,19 +355,15 @@ let parameters env sigma tactical params =
   in
   List.fold_left fold_parameter ([], []) params
 
-let pool sequent =
-  Lang.new_pool ~vars:(Conditions.vars_seq sequent) ()
-
-
 let debug_tactic env ctxt loc (t: ProofStrategy.tactic) node =
-  let result = alternative_result ~loc in
   match node with
-  | None -> result [valid ~loc ~message:"Valid tactic"] ()
+  | None -> alt_result ~loc [valid ~loc ~message:"Valid tactic (syntax only)"] ()
   | Some node ->
     let printer = WpTipApi.lookup_printer node in
     let debug_table = ProofStrategy.debug_table ctxt in
     let get_matchings = extract_matchings debug_table printer in
     let sequent = snd @@ Wpo.compute @@ ProofEngine.goal node in
+    let pool = Lang.new_pool ~vars:(Conditions.vars_seq sequent) () in
     let rec apply_all sigma = function
       | [] -> (* we successfully matched all patterns *)
         let goal = if t.lookup = [] then Some (snd sequent) else None in
@@ -377,9 +373,8 @@ let debug_tactic env ctxt loc (t: ProofStrategy.tactic) node =
         let debug = get_matchings ~select ~params sigma in
         begin match diags with
           | _ :: _ -> (* parameters configuration failed *)
-            result diags ~debug ()
+            alt_result ~loc diags ~debug ()
           | [] -> (* now try to apply the tactic *)
-            let pool = pool sequent in
             let console = new ProofScript.console ~pool ~title:"debug" in
             let diagnositc =
               match Lang.local ~pool (tactical#select console) select with
@@ -396,7 +391,7 @@ let debug_tactic env ctxt loc (t: ProofStrategy.tactic) node =
               | Applicable _ ->
                 [ valid ~loc ~message:"Applicable tactic" ]
             in
-            result diagnositc ~debug ()
+            alt_result ~loc diagnositc ~debug ()
         end
 
       | p::ps ->
@@ -407,14 +402,12 @@ let debug_tactic env ctxt loc (t: ProofStrategy.tactic) node =
           let loc = Pattern.pattern_loc p.pattern in
           let debug = get_matchings sigma in
           let diag = warning ~loc ~message:"Unmatched pattern" in
-          result [diag] ~debug ()
+          alt_result ~loc [diag] ~debug ()
+
     in apply_all Pattern.empty t.lookup
 
 let debug_alternative env ctxt strategy node alt =
-
-  let mk_result diag =
-    Some (alternative_result ~loc:alt.ProofStrategy.loc diag ())
-  in
+  let mk_result diag = Some (alt_result ~loc:alt.ProofStrategy.loc diag ()) in
   try
     match alt with
     | ProofStrategy.{ value = Default } ->

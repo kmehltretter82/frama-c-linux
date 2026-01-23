@@ -258,8 +258,8 @@ let rec pp fmt (a : ast) =
     Format.fprintf fmt ")@]"
   | Implies([], p) -> pp fmt p
   | Implies(hyps, p) ->
-    Format.fprintf fmt "@[<hov 2>%a ==> %a@]"
-      (Pretty_utils.pp_list ~sep:" ==> @," pp) hyps
+    Format.fprintf fmt "@[<hov 2>%a@ ==> %a@]"
+      (Pretty_utils.pp_list ~sep:"@ && " pp) hyps
       pp p
   | Binop(a,op,b) ->
     let op = match op with
@@ -295,10 +295,10 @@ let rec pp fmt (a : ast) =
     List.iter (Format.fprintf fmt ",@ %a" pp) vs ;
     Format.fprintf fmt ")@]"
   | Forall(qs,p) ->
-    Format.fprintf fmt "@[<hov 2>\\exists %a;@ %a@]"
+    Format.fprintf fmt "@[<hov 2>\\forall %a;@ %a@]"
       Logic_print.print_quantifiers qs pp p
   | Exists(qs,p) ->
-    Format.fprintf fmt "@[<hov 2>\\forall %a;@ %a@]"
+    Format.fprintf fmt "@[<hov 2>\\exists %a;@ %a@]"
       Logic_print.print_quantifiers qs pp p
 
 let pp_value = pp
@@ -323,11 +323,12 @@ let pp_sigma fmt s =
 let iter_sigma = Vmap.iter
 
 type penv = {
+  pool : Lang.F.pool ;
+  select : Lang.F.term -> Tactical.selection ;
   mutable sigma : sigma ;
   mutable binders : Lang.F.term Vmap.t ;
   mutable bvars : Lang.F.Vars.t ;
   mutable marked : Lang.F.Tset.t ;
-  select : Lang.F.term -> Tactical.selection ;
 }
 
 let get env (x : pvar) =
@@ -509,7 +510,7 @@ and pbind env loc q qs p e =
   | (lt,x)::qs ->
     match Lang.F.repr e with
     | Bind(qe,tau,lc) when qe = q && is_type lt tau ->
-      let var = Lang.freshvar ~basename:x tau in
+      let var = Lang.F.fresh env.pool ~basename:x tau in
       let state = bind env x var in
       pbind env loc q qs p @@ Lang.F.QED.e_unbind var lc ;
       unbind env state
@@ -552,12 +553,12 @@ type lookup = {
   pattern: pattern ;
 }
 
-let pclause { head ; pattern ; split } clause sigma prop =
+let pclause ~pool { head ; pattern ; split } clause sigma prop =
   let tprop = Lang.F.e_prop prop in
   let select t =
     if t == tprop then Tactical.Clause clause else Tactical.Inside(clause,t) in
   let env = {
-    sigma ; select ;
+    pool ; sigma ; select ;
     binders = Vmap.empty ;
     bvars = Lang.F.Vars.empty ;
     marked = Lang.F.Tset.empty ;
@@ -604,35 +605,36 @@ let pstep ctxt sigma (step : Conditions.step) =
 
 (* --- Sequence Matching --- *)
 
-let rec psequence ctxt sigma (seq : Conditions.sequence) =
+let rec psequence ~pool ctxt sigma (seq : Conditions.sequence) =
   let steps = List.sort priority (Conditions.list seq) in
-  match plist (pstep ctxt sigma) steps with
+  match plist (pstep ~pool ctxt sigma) steps with
   | Some _ as result ->
     Queue.clear queue ; result
   | None ->
     List.iter push steps ;
     if Queue.is_empty queue then None else
-      psequence ctxt sigma (Queue.pop queue)
+      psequence ~pool ctxt sigma (Queue.pop queue)
 
 (* --- Hypotheses Matching --- *)
 
-let phyps ctxt sigma (seq : Conditions.sequent) =
+let phyps ~pool ctxt sigma (seq : Conditions.sequent) =
   if not ctxt.hyps then None else
-    psequence ctxt sigma (fst seq)
+    psequence ~pool ctxt sigma (fst seq)
 
-let pgoal ctxt sigma (seq : Conditions.sequent) =
+let pgoal ~pool ctxt sigma (seq : Conditions.sequent) =
   if not ctxt.goal then None else
     let goal = snd seq in
     let clause = Tactical.Goal goal in
-    pclause ctxt clause sigma goal
+    pclause ~pool ctxt clause sigma goal
 
 let empty = Vmap.empty
 
 let psequent ctxt sigma (seq : Conditions.sequent) =
   Conditions.index seq ;
-  match pgoal ctxt sigma seq with
+  let pool = Lang.new_pool ~vars:(Conditions.vars_seq seq) () in
+  match pgoal ~pool ctxt sigma seq with
   | Some _ as result -> result
-  | None -> phyps ctxt sigma seq
+  | None -> phyps ~pool ctxt sigma seq
 
 (* -------------------------------------------------------------------------- *)
 (* --- Composing Values                                                   --- *)
