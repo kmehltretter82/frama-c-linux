@@ -16,7 +16,7 @@
 FRAMAC ?= frama-c # FRAMAC is defined in path.mk when it is included, but the
                   # user can override it in the command-line.
 ifeq ($(FRAMAC_LIB),)
-  FRAMAC_LIB := $(shell $(FRAMAC)-config -print-lib-path)
+  FRAMAC_LIB := $(shell $(FRAMAC) -print-lib-path)
 endif
 include $(FRAMAC_LIB)/analysis-scripts/prologue.mk
 ###############################################################################
