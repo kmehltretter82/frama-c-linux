@@ -77,8 +77,21 @@ module Vertex = struct
         Kernel_function.equal v1.vertex_kf v2.vertex_kf
       let pretty fmt v =
         Format.pp_print_int fmt v.vertex_key;
-        Option.iter (fun stmt -> Format.fprintf fmt "@s%d" stmt.sid) v.vertex_start_of
+        Option.iter
+          (fun stmt -> Format.fprintf fmt "@s%d" stmt.sid)
+          v.vertex_start_of
     end)
+
+  let stmt v =
+    match v.vertex_info with
+    | LoopHead { stmt } -> Some stmt
+    | NoneInfo -> v.vertex_start_of
+
+  let is_loop_head v =
+    match v.vertex_info with
+    | LoopHead _ -> true
+    | NoneInfo -> false
+
   let loc v = v.vertex_start_of |> Option.map Cil_datatype.Stmt.loc
 end
 

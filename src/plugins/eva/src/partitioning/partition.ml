@@ -19,19 +19,10 @@ let (<?>) c lcmp =
 type split_kind = Eva_annotations.split_kind = Static | Dynamic
 [@@deriving eq,ord]
 
-(* Same as Eva_annotations.split_term but with Eva_ast. *)
 type split_term =
   | Expression of Eva_ast.Exp.t
   | Predicate of Cil_datatype.PredicateStructEq.t
 [@@deriving eq, ord]
-
-let translate_split_term
-    (term : Eva_annotations.split_term) : split_term * Cil_types.location =
-  match term with
-  | Expression cil_exp ->
-    Expression (Eva_ast.translate_exp cil_exp), cil_exp.eloc
-  | Predicate pred ->
-    Predicate pred, pred.pred_loc
 
 type split_monitor = {
   split_term : split_term;
@@ -45,12 +36,12 @@ type split_monitor = {
 let new_monitor
     ~(limit : int)
     ~(kind : split_kind)
-    ~(term : Eva_annotations.split_term) =
-  let split_term, split_loc = translate_split_term term in
+    ~(term : split_term)
+    ~(loc : Cil_types.location) =
   {
-    split_term;
+    split_term = term;
     split_kind = kind;
-    split_loc;
+    split_loc = loc;
     split_limit = limit;
     split_values = Z.Set.empty;
   }
@@ -189,6 +180,7 @@ end
 
 (* --- Keys --- *)
 
+module Int = Datatype.Int
 module SplitMap = SplitTerm.Map
 
 type branch =
@@ -248,6 +240,7 @@ type key = {
   loops : LoopUnrolling.t list;
   splits : Z.t SplitMap.t; (* term -> value *)
   dynamic_splits : split_monitor SplitMap.t; (* term -> monitor *)
+  syntactic_splits : int Int.Map.t; (* split vertex -> edge taken *)
 }
 
 type call_return_policy = {
@@ -259,12 +252,13 @@ type call_return_policy = {
 
 module Key =
 struct
-  module IntPair = Datatype.Pair (Datatype.Int) (Datatype.Int)
+  module IntPair = Datatype.Pair (Int) (Int)
   module Stamp = Datatype.Option (IntPair)
   module BranchList = Datatype.List (BranchDatatype)
   module LoopList = Datatype.List (LoopUnrolling)
   module Splits = SplitMap.Make (Z)
   module DSplits = SplitMap.Make (SplitMonitor)
+  module SSplits = Int.Map.Make (Int)
 
   (* Initial key, before any partitioning *)
   let empty = {
@@ -273,6 +267,7 @@ struct
     loops = [];
     splits = SplitMap.empty;
     dynamic_splits = SplitMap.empty;
+    syntactic_splits = Int.Map.empty;
   }
 
   let add_branch ?history_size b k =
@@ -296,15 +291,6 @@ struct
 
       let reprs = [ empty ]
 
-      let structural_descr =
-        Structural_descr.t_record [|
-          Stamp.packed_descr;
-          BranchList.packed_descr;
-          LoopList.packed_descr;
-          Splits.packed_descr;
-          DSplits.packed_descr;
-        |]
-
       let compare k1 k2 =
         LoopList.compare k1.loops k2.loops
         <?> lazy (Splits.compare k1.splits k2.splits)
@@ -314,6 +300,7 @@ struct
         <?> lazy (BranchList.compare k1.branches k2.branches)
         <?> lazy (Stdlib.Option.compare IntPair.compare
                     k1.ration_stamp k2.ration_stamp)
+        <?> lazy (SSplits.compare k1.syntactic_splits k2.syntactic_splits)
 
       let equal = Datatype.from_compare
 
@@ -323,7 +310,8 @@ struct
           BranchList.hash k.branches,
           LoopList.hash k.loops,
           Splits.hash k.splits,
-          DSplits.hash k.dynamic_splits) (* Monitors probably shouldn't be hashed *)
+          DSplits.hash k.dynamic_splits, (* Monitors probably shouldn't be hashed *)
+          SSplits.hash k.syntactic_splits)
 
       let pretty fmt key =
         begin match key.ration_stamp with
@@ -349,10 +337,11 @@ struct
   let exceed_rationing key = key.ration_stamp = None
 
   let combine ~policy ~caller ~callee =
-    let keep_second _ v1 v2 =
-      match v1, v2 with
-      | None, None -> None
-      | Some x, None | (Some _ | None), Some x -> Some x
+    let combine_map merge_map get_map =
+      let keep_second _ v1 v2 = if Option.is_some v2 then v2 else v1 in
+      if policy.callee_splits
+      then merge_map keep_second (get_map caller) (get_map callee)
+      else get_map caller
     in
     (* There is no need to preserve the uniqueness of ration stamps here, as
        keys will always be given new stamps before the merge of identical keys.
@@ -366,14 +355,9 @@ struct
           (if policy.caller_history then caller.branches else [])
         );
       loops = caller.loops;
-      splits =
-        if policy.callee_splits
-        then SplitMap.merge keep_second caller.splits callee.splits
-        else caller.splits;
-      dynamic_splits =
-        if policy.callee_splits
-        then SplitMap.merge keep_second caller.dynamic_splits callee.dynamic_splits
-        else caller.dynamic_splits;
+      splits = combine_map SplitMap.merge (fun t -> t.splits);
+      dynamic_splits = combine_map SplitMap.merge (fun t -> t.dynamic_splits);
+      syntactic_splits = combine_map Int.Map.merge (fun t -> t.syntactic_splits);
     }
 end
 
@@ -413,7 +397,9 @@ type action =
   | Ration of rationing
   | Restrict of Eva_ast.exp * Z.t list
   | Split of split_monitor
-  | Merge of Eva_annotations.split_term
+  | Merge of split_term
+  | SyntacticSplit of int * int
+  | MergeSyntacticSplits
   | Update_dynamic_splits
 
 exception InvalidAction
@@ -724,12 +710,22 @@ struct
             fun k _ -> { k with ration_stamp = stamp () }
 
         | Restrict (expr, expected_values) -> fun k s ->
-          { k with ration_stamp = stamp_by_value expr expected_values s}
+          { k with ration_stamp = stamp_by_value expr expected_values s }
 
         | Merge term -> fun k _x ->
-          let term, _loc = translate_split_term term in
-          { k with splits = SplitMap.remove term k.splits;
-                   dynamic_splits = SplitMap.remove term k.dynamic_splits }
+          { k with
+            splits = SplitMap.remove term k.splits;
+            dynamic_splits = SplitMap.remove term k.dynamic_splits;
+          }
+
+        | SyntacticSplit (vertex, branch) -> fun k _x ->
+          { k with
+            syntactic_splits = Int.Map.add vertex branch k.syntactic_splits
+          }
+
+        | MergeSyntacticSplits -> fun k _x ->
+          { k with syntactic_splits = Int.Map.empty }
+
       in
       map_keys transfer p
 

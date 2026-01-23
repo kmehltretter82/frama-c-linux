@@ -171,33 +171,16 @@ module Make_Dataflow
   let e_table : tank EdgeTable.t =
     EdgeTable.create transition_count
 
-  let vertex_stmt (v : vertex) : stmt option =
-    match v.vertex_info with
-    | LoopHead { stmt } -> Some stmt
-    | NoneInfo -> v.vertex_start_of
-
-  let is_loop_head (v : vertex) : bool =
-    match v.vertex_info with
-    | LoopHead _ -> true
-    | NoneInfo -> false
-
-  (* Default (initial) stores on vertex and edges *)
-  let default_vertex_store (v : vertex) () : store =
-    let stmt = vertex_stmt v in
-    let is_loop_head = is_loop_head v in
-    Partitioning.empty_store ~stmt ~is_loop_head
-  let default_vertex_widening (v : vertex) () : widening =
-    Partitioning.empty_widening ~stmt:(vertex_stmt v)
-  let default_edge_tank () : tank =
-    Partitioning.empty_tank ()
-
   (* Get the stores associated to a control point or edge *)
   let get_vertex_store (v : vertex) : store =
-    VertexTable.find_or_add v_table v ~default:(default_vertex_store v)
+    let default () = Partitioning.empty_store v in
+    VertexTable.find_or_add v_table v ~default
   let get_vertex_widening (v : vertex) : widening =
-    VertexTable.find_or_add w_table v ~default:(default_vertex_widening v)
+    let default () = Partitioning.empty_widening v in
+    VertexTable.find_or_add w_table v ~default
   let get_edge_data (e : edge) : tank =
-    EdgeTable.find_or_add e_table e ~default:default_edge_tank
+    let default = Partitioning.empty_tank in
+    EdgeTable.find_or_add e_table e ~default
   let get_succ_tanks (v : vertex) : tank list =
     List.map (fun (_,e,_) -> get_edge_data e) (G.succ_e graph v)
 
@@ -467,7 +450,7 @@ module Make_Dataflow
 
   let update_vertex ?(widening : bool = false) (v : vertex)
       (sources : ('branch * flow) list) : bool =
-    let current_stmt = vertex_stmt v in
+    let current_stmt = Eva_automata.Vertex.stmt v in
     Option.iter (fun stmt -> current_ki := Kstmt stmt) current_stmt;
     let current_location = Option.map Cil_datatype.Stmt.loc current_stmt in
     let open Current_loc.Operators in
@@ -573,7 +556,7 @@ module Make_Dataflow
         not (process_vertex ~widening:true v) || !iteration_count = 0
       do
         Self.debug ~dkey "iteration %d" !iteration_count;
-        Option.iter (Statistics.(incr iterations)) (vertex_stmt v);
+        Option.iter (Statistics.(incr iterations)) (Eva_automata.Vertex.stmt v);
         iterate_list w;
         incr iteration_count;
       done;

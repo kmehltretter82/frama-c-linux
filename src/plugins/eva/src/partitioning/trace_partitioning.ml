@@ -58,30 +58,13 @@ struct
 
   (* Constructors *)
 
-  let empty_store ~(stmt : stmt option) ~(is_loop_head : bool) : store =
-    let rationing_parameters, flow_actions = match stmt with
-      | None -> None, []
-      | Some stmt ->
-        let flow_actions = flow_actions stmt in
-        (* A skip statement is created on each split annotation: do not ration
-           states on them to avoid meddling in successive split directives. *)
-        if Cil.is_skip stmt.skind && flow_actions <> []
-        then None, flow_actions
-        else Some (slevel stmt, merge stmt), flow_actions
-    in
-    let rationing =
-      match rationing_parameters with
-      | None -> Partition.new_rationing ~limit:max_int ~merge:false
-      | Some (limit, merge) -> Partition.new_rationing ~limit ~merge
-    in
-    let flow_actions =
-      (Ration rationing) :: Update_dynamic_splits :: flow_actions
-    in
+  let empty_store (v : Eva_automata.vertex) : store =
+    let flow_actions, rationing = flow_actions v in
     {
       flow_actions;
-      rationing = rationing_parameters <> None;
-      store_stmt = stmt;
-      store_is_loop_head = is_loop_head;
+      rationing;
+      store_stmt = Eva_automata.Vertex.stmt v;
+      store_is_loop_head = Eva_automata.Vertex.is_loop_head v;
       store_index = Index.empty ();
       store_partition = Partition.empty;
       incoming_states = 0;
@@ -92,7 +75,8 @@ struct
   let empty_tank () : tank =
     { tank_states = Partition.empty }
 
-  let empty_widening ~(stmt : stmt option) : widening =
+  let empty_widening (vertex : Eva_automata.vertex) : widening =
+    let stmt = Eva_automata.Vertex.stmt vertex in
     {
       widening_stmt = Option.value ~default:Cil.invalidStmt stmt;
       widening_partition = Partition.empty;

@@ -102,6 +102,11 @@ type unroll_limit =
       states are then split or merged accordingly. *)
 type split_kind = Eva_annotations.split_kind = Static | Dynamic
 
+(* Same as Eva_annotations.split_term but with Eva_ast. *)
+type split_term =
+  | Expression of Eva_ast.Exp.t
+  | Predicate of Cil_datatype.PredicateStructEq.t
+
 (** Split monitor: prevents splits from generating too many states. *)
 type split_monitor
 
@@ -110,7 +115,8 @@ type split_monitor
 val new_monitor:
   limit:int ->
   kind:split_kind ->
-  term:Eva_annotations.split_term ->
+  term:split_term ->
+  loc:Cil_types.location ->
   split_monitor
 
 (** These actions redefine the partitioning by updating keys or splitting
@@ -158,9 +164,15 @@ type action =
       evaluates to different values will be kept separate. Gives up the split
       if [term] evaluates to more than [limit] values. A same monitor can
       be used for successive splits on different flows. *)
-  | Merge of Eva_annotations.split_term
+  | Merge of split_term
   (** Forgets the split of an expression: states that were kept separate only
       by the split of this expression will be joined together. *)
+  | SyntacticSplit of int * int
+  (** Record that the state attached to this key have been obtained after
+      taking a if-then-else or switch branch - identified by the vertex id
+      of the split and the edge id of the branch taken. *)
+  | MergeSyntacticSplits
+  (** Forget every syntactic split. *)
   | Update_dynamic_splits
   (** Updates dynamic splits by evaluating the expression and splitting the
       states accordingly. *)
