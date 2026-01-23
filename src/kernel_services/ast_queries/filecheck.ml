@@ -994,6 +994,9 @@ module Base_checker = struct
                    v.vname v.vid
              end);
           Cil.DoChildren
+        | GVar(v,_,_) when not v.vdefined ->
+          check_abort "Variable %a has a definition, but is considered as not defined"
+            Printer.pp_varinfo v
         | GVarDecl(v,_) | GVar(v,_,_) ->
           if Ast_types.is_fun v.vtype then
             check_abort "Variable %a has function type" Printer.pp_varinfo v;

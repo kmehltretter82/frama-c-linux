@@ -3,6 +3,12 @@
 #include "string.h"
 #include "time.h"
 #include "wchar.h"
+typedef int test[sizeof("string-lit-typedef")];
+struct S {
+   int test[sizeof("string-lit-field")] ;
+};
+test a = {1};
+struct S s;
 int main(void)
 {
   int __retres;
@@ -14,6 +20,7 @@ int main(void)
   wchar_t const (*latest)[] =
     (wchar_t const (*)[])(& L"address of wide string literal");
   /*@ assert (long)(*atest)[0] ≡ (*latest)[0]; */ ;
+  s.test[0] = 42;
   __retres = 0;
   return __retres;
 }

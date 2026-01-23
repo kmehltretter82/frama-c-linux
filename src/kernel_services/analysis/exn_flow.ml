@@ -551,6 +551,7 @@ class erase_exn =
         let exn =
           Cil.makeGlobalVar "__fc_exn" (Cil_const.mk_tcomp s)
         in
+        exn.vdefined <- true;
         self#update_enum_bindings e exns;
         self#update_union_bindings u exns;
         exn_struct <- Some s;
