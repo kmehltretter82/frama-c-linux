@@ -711,7 +711,7 @@ let make (module Man: Input) =
   let name = Man.name in
   let descr =
     "Binding to the " ^ Man.name ^ " domain of the Apron library. " ^
-    "See http://apron.cri.ensmp.fr/library for more details."
+    "See https://antoinemine.github.io/Apron/doc/ for more details."
   in
   Abstractions.Domain.register ~name ~descr ~experimental:true ~priority:3
     (module Domain)
