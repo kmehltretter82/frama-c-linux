@@ -378,7 +378,7 @@ void test_syntactic_plit()
   int j = Frama_C_interval(0,2);
   int k;
 
-  //@ split \branches;
+  //@ split \cases;
   if (i != j) {
     i = j = 3;
   }
@@ -393,7 +393,7 @@ void test_syntactic_plit()
 
   Frama_C_show_each(i, j, k); // Only two states must be printed here
 
-  //@ merge \branches;
+  //@ merge \cases;
 
   Frama_C_show_each(i, j, k); // Only on state must be printed here
 }

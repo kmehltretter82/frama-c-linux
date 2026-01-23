@@ -120,13 +120,13 @@ struct
       Partition.Expression (Eva_ast.translate_exp exp), exp.eloc
     | Predicate pred ->
       Partition.Predicate pred, pred.pred_loc
-    | ConditionalBranches ->
+    | ConditionalCases ->
       assert false
 
   let translate_flow_annotation vertex annotation =
     try
       match annotation with
-      | FlowSplit (ConditionalBranches, _) ->
+      | FlowSplit (ConditionalCases, _) ->
         let do_branch (src,edge,dest) =
           let source = src.Eva_automata.vertex_key in
           let branch = edge.Eva_automata.edge_key in
@@ -140,7 +140,7 @@ struct
           | l -> List.map do_branch l
         in
         find_next_branches vertex
-      | FlowMerge (ConditionalBranches) ->
+      | FlowMerge (ConditionalCases) ->
         [vertex, (Partition.MergeSyntacticSplits)]
       | FlowSplit (term, kind) ->
         let term, loc = translate_split_term term in

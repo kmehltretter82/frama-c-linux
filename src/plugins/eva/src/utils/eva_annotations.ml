@@ -24,7 +24,7 @@ type split_kind = Static | Dynamic
 type split_term =
   | Term of Cil_types.term
   | Predicate of Cil_types.predicate
-  | ConditionalBranches
+  | ConditionalCases
 
 type flow_annotation =
   | FlowSplit of split_term * split_kind
@@ -206,8 +206,8 @@ struct
   let kind = Here
 
   let parse ~typing_context:context = function
-    | [{lexpr_node = PLvar "\\branches"}] ->
-      ConditionalBranches
+    | [{lexpr_node = PLvar "\\cases"}] ->
+      ConditionalCases
     | [t] ->
       begin
         let open Logic_typing in
@@ -230,10 +230,10 @@ struct
   let export = function
     | Term term -> Ext_terms [term]
     | Predicate pred -> Ext_preds [pred]
-    | ConditionalBranches -> Ext_terms [ Logic_const.tstring "\\branches" ]
+    | ConditionalCases -> Ext_terms [ Logic_const.tstring "\\cases" ]
 
   let import = function
-    | Ext_terms [{term_node=TConst (LStr "\\branches")}] -> ConditionalBranches
+    | Ext_terms [{term_node=TConst (LStr "\\cases")}] -> ConditionalCases
     | Ext_terms [term] -> Term term
     | Ext_preds [pred] -> Predicate pred
     | _ -> assert false
@@ -241,7 +241,7 @@ struct
   let print fmt = function
     | Term term -> Printer.pp_term fmt term
     | Predicate pred -> Printer.pp_predicate fmt pred
-    | ConditionalBranches -> Format.pp_print_string fmt "\\branches"
+    | ConditionalCases -> Format.pp_print_string fmt "\\cases"
 end
 
 module Split = Register (struct

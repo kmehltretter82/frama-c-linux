@@ -748,7 +748,7 @@ module Eva_annotations: sig
   type split_term =
     | Term of Cil_types.term (* Split according an ACSL term. *)
     | Predicate of Cil_types.predicate (* Split according an ACSL predicate. *)
-    | ConditionalBranches (* Split according to a conditional statement. *)
+    | ConditionalCases (* Split according to a conditional statement. *)
 
   (** Split/merge annotations for value partitioning.  *)
   type flow_annotation =
