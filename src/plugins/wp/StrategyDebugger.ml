@@ -33,7 +33,7 @@ let empty_debug_info = {
 }
 
 type diagnostic = {
-  message: string ;
+  message : string ;
   severity : [ `Ok | `Ignored | `Warning | `Error ] ;
   location : Cil_types.location option ;
 }
@@ -56,7 +56,7 @@ type alternative_result = {
   debug: debug_info ;
 }
 
-let alt_result ?loc diagnostic ?(debug=empty_debug_info) () =
+let alt_result ?loc ?(debug=empty_debug_info) diagnostic =
   { location = loc ; diagnostic ; debug }
 
 type result = {
@@ -344,7 +344,7 @@ let extract_matchings debug_table printer ?select ?params sigma =
   in
   { selection ; params ; matched = !matched }
 
-let parameters env sigma tactical params =
+let configure env sigma tactical params =
   let fold_parameter (diags, sels) (a, v) =
     let sels = (a.ProofStrategy.value, Pattern.select sigma v) :: sels in
     let diags =
@@ -355,44 +355,41 @@ let parameters env sigma tactical params =
   in
   List.fold_left fold_parameter ([], []) params
 
-let debug_tactic env ctxt loc (t: ProofStrategy.tactic) node =
+let debug_apply ~loc (tactical : Tactical.tactical) select sequent =
+  let pool = Lang.new_pool ~vars:(Conditions.vars_seq sequent) () in
+  let console = new ProofScript.console ~pool ~title:"debug" in
+  match Lang.local ~pool (tactical#select console) select with
+  | exception exn ->
+    let message =
+      Format.asprintf
+        "Tactic configuration error (%s)"
+        (Printexc.to_string exn) in
+    [ error ~loc ~message ]
+  | Not_configured ->
+    [ error ~loc ~message:"Tactic configuration error" ]
+  | Not_applicable ->
+    [ warning ~loc ~message:"Tactic cannot be applied" ]
+  | Applicable _ ->
+    [ valid ~loc ~message:"Applicable tactic" ]
+
+let debug_tactic env ctxt loc (tac: ProofStrategy.tactic) node =
   match node with
-  | None -> alt_result ~loc [valid ~loc ~message:"Valid tactic (syntax only)"] ()
+  | None -> alt_result ~loc [valid ~loc ~message:"Valid tactic (syntax only)"]
   | Some node ->
     let printer = WpTipApi.lookup_printer node in
-    let debug_table = ProofStrategy.debug_table ctxt in
-    let get_matchings = extract_matchings debug_table printer in
+    let dtable = ProofStrategy.debug_table ctxt in
     let sequent = snd @@ Wpo.compute @@ ProofEngine.goal node in
-    let pool = Lang.new_pool ~vars:(Conditions.vars_seq sequent) () in
     let rec apply_all sigma = function
       | [] -> (* we successfully matched all patterns *)
-        let goal = if t.lookup = [] then Some (snd sequent) else None in
-        let tactical = ProofStrategy.tactical t.tactic in
-        let select = ProofStrategy.select sigma ?goal t.select in
-        let diags, params = parameters env sigma tactical t.params in
-        let debug = get_matchings ~select ~params sigma in
-        begin match diags with
-          | _ :: _ -> (* parameters configuration failed *)
-            alt_result ~loc diags ~debug ()
-          | [] -> (* now try to apply the tactic *)
-            let console = new ProofScript.console ~pool ~title:"debug" in
-            let diagnositc =
-              match Lang.local ~pool (tactical#select console) select with
-              | exception exn ->
-                let message =
-                  Format.asprintf
-                    "Tactic configuration error (%s)"
-                    (Printexc.to_string exn) in
-                [ error ~loc ~message ]
-              | Not_configured ->
-                [ error ~loc ~message:"Tactic configuration error" ]
-              | Not_applicable ->
-                [ warning ~loc ~message:"Tactic cannot be applied" ]
-              | Applicable _ ->
-                [ valid ~loc ~message:"Applicable tactic" ]
-            in
-            alt_result ~loc diagnositc ~debug ()
-        end
+        let goal = if tac.lookup = [] then Some (snd sequent) else None in
+        let tactical = ProofStrategy.tactical tac.tactic in
+        let select = ProofStrategy.select sigma ?goal tac.select in
+        let diags, params = configure env sigma tactical tac.params in
+        let debug = extract_matchings dtable printer ~select ~params sigma in
+        if diags <> [] then
+          alt_result ~loc ~debug diags
+        else
+          alt_result ~loc ~debug @@ debug_apply ~loc tactical select sequent
 
       | p::ps ->
         match Pattern.psequent p sigma sequent with
@@ -400,14 +397,14 @@ let debug_tactic env ctxt loc (t: ProofStrategy.tactic) node =
           apply_all sigma ps
         | None -> (* we failed to match all patterns *)
           let loc = Pattern.pattern_loc p.pattern in
-          let debug = get_matchings sigma in
+          let debug = extract_matchings dtable printer sigma in
           let diag = warning ~loc ~message:"Unmatched pattern" in
-          alt_result ~loc [diag] ~debug ()
+          alt_result ~loc ~debug [diag]
 
-    in apply_all Pattern.empty t.lookup
+    in apply_all Pattern.empty tac.lookup
 
 let debug_alternative env ctxt strategy node alt =
-  let mk_result diag = Some (alt_result ~loc:alt.ProofStrategy.loc diag ()) in
+  let mk_result diags = Some (alt_result ~loc:alt.ProofStrategy.loc diags) in
   try
     match alt with
     | ProofStrategy.{ value = Default } ->
@@ -429,7 +426,9 @@ let debug_alternative env ctxt strategy node alt =
         with Pattern.TypeError (loc, message) -> Some(error ~loc ~message)
       in
       let reason = "Debugging does not execute provers" in
-      mk_result @@ begin match List.filter_map diag provers with
+      mk_result @@
+      begin
+        match List.filter_map diag provers with
         | [] -> [ignored ~loc:alt.loc ~reason]
         | l -> l
       end
