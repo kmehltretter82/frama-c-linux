@@ -1,12 +1,4 @@
 [kernel] Parsing logic_type.c (with preprocessing)
-[kernel] logic_type.c:1: Warning: 
-  parsing obsolete ACSL construct 'logic type declaration'. 'an axiomatic block' should be used instead.
-[kernel] logic_type.c:2: Warning: 
-  parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
-[kernel] logic_type.c:3: Warning: 
-  parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
-[kernel] logic_type.c:7: Warning: 
-  parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
 [kernel:annot-error] logic_type.c:3: Warning: 
   no such type t1. Ignoring global annotation
 [kernel:annot-error] logic_type.c:6: Warning: 

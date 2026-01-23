@@ -1,5 +1,5 @@
 
-/*@ axiom l: // must be rejected as axiom outside an axiomatic
+/*@ axiom l: // no longer rejected; axioms allowed outside an axiomatic
     \forall int i; i < 0;
  */
 

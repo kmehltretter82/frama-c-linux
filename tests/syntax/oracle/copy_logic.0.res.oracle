@@ -1,8 +1,4 @@
 [kernel] Parsing copy_logic.i (no preprocessing)
-[kernel] copy_logic.i:5: Warning: 
-  parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
-[kernel] copy_logic.i:7: Warning: 
-  parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
 [eva] Analyzing a complete application starting at main
 [eva:initial-state] Values of globals at initialization
   

@@ -3,7 +3,7 @@
 */
 
 typedef double typetab[2];
-/*@ requires \valid(t) && \valid_range(&*t,0,0) && \valid_range((double *)t,0,1); */ 
+/*@ requires \valid(t) && \valid(&*t) && \valid((double *)t+(0 .. 1)); */
 double g4(typetab *t)
 {
 double y;

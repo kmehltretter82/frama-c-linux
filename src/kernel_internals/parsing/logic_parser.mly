@@ -1575,9 +1575,8 @@ decl:
 | VOLATILE ne_zones volatile_opt SEMICOLON { LDvolatile ($2, $3) }
 | type_annot {LDtype_annot $1}
 | model_annot {LDmodel_annot $1}
-| logic_def  { $1 }
+| logic_decl { $1 }
 | ext_decl { LDextended $1 }
-| deprecated_logic_decl { $1 }
 ;
 
 ext_decl:
@@ -1742,39 +1741,6 @@ ext_loader:
 | EXT_LOADER COLON  { $1 }
 | EXT_LOADER_PLUGIN { $1 }
 | IDENTIFIER_LOADER { raise Unknown_ext }
-
-deprecated_logic_decl:
-/* OBSOLETE: logic function declaration */
-| LOGIC logic_rt_type poly_id opt_parameters SEMICOLON
-    { let (id, labels, tvars) = $3 in
-      let source = pos $symbolstartpos in
-      exit_type_variables_scope ();
-      obsolete  "logic declaration" ~source ~now:"an axiomatic block";
-      LDlogic_reads (id, labels, tvars, $2, $4, None) }
-/* OBSOLETE: predicate declaration */
-| PREDICATE poly_id opt_parameters SEMICOLON
-    { let (id,labels,tvars) = $2 in
-      exit_type_variables_scope ();
-      let source = pos $symbolstartpos in
-      obsolete "logic declaration" ~source ~now:"an axiomatic block";
-      LDpredicate_reads (id, labels, tvars, $3, None) }
-/* OBSOLETE: type declaration */
-| TYPE poly_id_type SEMICOLON
-    { let (id,tvars) = $2 in
-      Logic_env.add_typename id ; (* not in a module! *)
-      exit_type_variables_scope ();
-      let source = pos $symbolstartpos in
-      obsolete "logic type declaration" ~source ~now:"an axiomatic block";
-      LDtype(id,tvars,None)
-    }
-/* OBSOLETE: axiom */
-| AXIOM poly_id COLON lexpr SEMICOLON
-    { let (id,_,_) = $2 in
-      raise
-	(Not_well_formed
-	   (loc $sloc,"Axiom " ^ id ^ " is declared outside of an axiomatic."))
-    }
-;
 
 
 logic_decls:

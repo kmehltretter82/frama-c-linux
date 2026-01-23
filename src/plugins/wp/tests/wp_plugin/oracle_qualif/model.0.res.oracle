@@ -1,7 +1,5 @@
 # frama-c -wp [...]
 [kernel] Parsing model.i (no preprocessing)
-[kernel] model.i:10: Warning: 
-  parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
 [wp] Running WP plugin...
 [wp] [Valid] Goal f_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal f_terminates (Cfg) (Trivial)

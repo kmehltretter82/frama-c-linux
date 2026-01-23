@@ -2,9 +2,9 @@ typedef int foo[4];
 
 foo X = {0,1,2,3};
 
-/*@ predicate p1(int* a) = \valid_range(a,0,3); */
+/*@ predicate p1(int* a) = \valid(a + (0 .. 3)); */
 
-/*@ predicate q1(int* a) = \valid(a + (0..3)); */
+/*@ predicate q1(int* a) = \valid(a + (0 .. 3)); */
 
 // [VP] Incompatible with the idea that foo denotes a logic array which can
 // not be seen as a pointer.

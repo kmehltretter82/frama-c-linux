@@ -308,7 +308,6 @@ __BEGIN_DECLS
 __END_DECLS
 
 #define FRAMA_C_PTR __declspec(valid)
-#define FRAMA_C_ARRAY(n) __declspec(valid_range(0,n))
 #define FRAMA_C_STRING __declspec(valid_string)
 #define FRAMA_C_STRING_OR_NULL __declspec(valid_string_or_null)
 #define FRAMA_C_WSTRING __declspec(valid_wstring)

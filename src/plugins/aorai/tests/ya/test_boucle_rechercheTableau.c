@@ -4,7 +4,7 @@
 
 
 
-/*@ requires \valid_range(t,0,max);
+/*@ requires \valid(t+(0 .. max));
   @ requires max>=0;
   @ ensures 0<=\result<=max || \result==-1 ;
   @ ensures 0<=\result<=max ==> t[\result]==val;
@@ -14,7 +14,7 @@ int isPresent(int t[], int max, int val) {
   int i=0;
   /*@ loop invariant inv : 
     @      0<=i<=max
-    @   && \valid_range(t,0,max)
+    @   && \valid(t+(0 .. max))
     @   && max>=0
     @   && (\forall integer j; 0<=j<=i-1 ==> t[j]!=val);
     @  loop variant v : max-i ;

@@ -1,8 +1,8 @@
 /*@
    predicate is_valid_int_range(int* p, int n) =
-           (0 <= n) && \valid_range(p,0,n-1);
+           (0 <= n) && \valid(p+(0 .. n-1));
 
-   lemma foo: \forall int* p,n; is_valid_int_range(p,n) <==> \valid_range(p,0,n-1);
+   lemma foo: \forall int* p,n; is_valid_int_range(p,n) <==> \valid(p+(0 .. n-1));
 
    
 */
@@ -185,7 +185,7 @@ int max_element(const int* a, int n)
 
 /*@
    requires n > 0;
-   requires \valid(p+ (0..n-1));
+   requires \valid(p+ (0 .. n-1));
 
    assigns \nothing;
 
