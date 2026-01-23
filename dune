@@ -19,3 +19,30 @@
  (deps VERSION VERSION_CODENAME src/kernel_internals/runtime/system_config.ml.in)
  (targets python-3.10-available gcc-is-genuine has-c2x-option system_config.ml)
  (action (run ./configurator.exe)))
+
+(executable
+ (name tests_configurator)
+ (libraries dune-configurator str)
+ (modules tests_configurator))
+
+(rule
+ (deps
+  ; universe dependency to check installed apps everytime
+  (universe)
+  ; reads targets of configurator.exe
+  python-3.10-available gcc-is-genuine has-c2x-option)
+ (targets
+  tests-dependencies-available
+  tests-dependencies-comment
+  tests-eva-deps-available
+  tests-markdown-report-deps-available
+  tests-fc_scripts-deps-available
+  tests-jcdb-deps-available
+  tests-libc-deps-available
+  tests-metrics-deps-available
+  tests-misc-deps-available
+  tests-mopsa-deps-available
+  tests-spec-deps-available
+  tests-syntax-deps-available)
+ (action (run ./tests_configurator.exe)))
+

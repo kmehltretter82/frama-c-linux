@@ -1,3 +1,18 @@
+; Test dependencies
+(rule
+ (alias frama-c-configure)
+ (deps
+  (universe)
+  (alias ../frama-c-configure-tests))
+ (action (progn
+            (echo "  - tests/misc/:" %{read:../../tests-misc-deps-available} "\n")
+            (echo "    - gcc:" %{bin-available:gcc} "\n")
+            (echo "    - socat:" %{bin-available:socat} "\n")
+            ; If you add some dependencies here, do not forget to add them to
+            ; tests_configurator.ml
+  ))
+)
+
 ; Generic dependencies for all tests
 (cram
   (deps ../../src/init/boot/empty_file.exe)
