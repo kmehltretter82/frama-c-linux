@@ -457,14 +457,16 @@ class console ~pool ~title =
       ignore range ; ignore filter ;
       ()
 
-    val mutable errors = false
-    method has_error = errors
+    val mutable errors = None
+    method has_error = errors <> None
+    method get_error = errors
     method set_error
       : 'a. 'a formatter
       = fun msg ->
         Pretty_utils.ksfprintf
-          (fun s -> errors <- true ;
-            Wp_parameters.warning "[%s] %s" title s)
+          (fun msg ->
+             errors <- Some msg ;
+             Wp_parameters.warning "[%s] %s" title msg)
           msg
 
   end

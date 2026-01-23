@@ -321,7 +321,11 @@ let debug_apply ~loc (tactical : Tactical.tactical) select sequent =
         (Printexc.to_string exn) in
     [ error ~loc ~message ]
   | Not_configured ->
-    [ error ~loc ~message:"Tactic configuration error" ]
+    let message =
+      match console#get_error with
+      | Some msg -> msg
+      | None -> "Tactic configuration error"
+    in [ error ~loc ~message ]
   | Not_applicable ->
     [ warning ~loc ~message:"Tactic cannot be applied" ]
   | Applicable _ ->

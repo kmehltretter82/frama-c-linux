@@ -367,6 +367,7 @@ class type feedback =
     method interactive : bool
     method get_title : string
     method has_error : bool
+    method get_error : string option
     method set_title : 'a. 'a formatter
     method set_descr : 'a. 'a formatter
     method set_error : 'a. 'a formatter

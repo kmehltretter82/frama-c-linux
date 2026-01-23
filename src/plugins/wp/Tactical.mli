@@ -150,6 +150,9 @@ class type feedback =
     method has_error : bool
     (** Retrieve the errors *)
 
+    method get_error : string option
+    (** Retrieve the error message, if any *)
+
     method set_title : 'a. 'a formatter
     (** Update the title {i wrt} current selection & tuning *)
 
