@@ -284,30 +284,24 @@ let parse_string s =
 (* -------------------------------------------------------------------------- *)
 
 (* Custom printers for clause and selection, using TIP printer:
-   we want printed values to be coherent with the current printer. *)
-
-let pp_clause printer fmt = function
-  | Tactical.Goal p -> Format.fprintf fmt "%a (goal)" printer#pp_pred p
-  | Step s -> Format.fprintf fmt "%a" printer#pp_step s
+   we want printed values to be consistent with the current printer. *)
 
 let rec pp_selection printer fmt = function
   | Tactical.Empty ->
-    Format.pp_print_string fmt "Empty"
-  | Inside(_c,t) ->
-    Format.fprintf fmt "%a" printer#pp_term t
-  | Clause c ->
-    (pp_clause printer) fmt c
+    Format.pp_print_string fmt "None."
+  | Inside(_,t) ->
+    Format.fprintf fmt "Term:  %a" printer#pp_term t
+  | Clause (Goal p) -> Format.fprintf fmt "Goal:  %a" printer#pp_pred p
+  | Clause (Step s) -> printer#pp_step fmt s
   | Compose(Cint k) ->
-    Format.fprintf fmt "Constant '%a'" Z.pretty k
+    Format.fprintf fmt "Const: %a" Z.pretty k
   | Compose(Range(a,b)) ->
-    Format.fprintf fmt "Range '%d..%d'" a b
-  | Compose(Code(_,id,es)) ->
-    Format.fprintf fmt "@[<hov 2>Compose '%s'" id ;
-    List.iter (fun e -> Format.fprintf fmt "(%a)" (pp_selection printer) e) es ;
-    Format.fprintf fmt "@]"
+    Format.fprintf fmt "Range: %d..%d" a b
+  | Compose(Code(e,_,_)) ->
+    Format.fprintf fmt "@[<hov 2>Calc:  %a@]" printer#pp_term e ;
   | Multi es ->
-    Format.fprintf fmt "@[<hov 2>Multi-selection" ;
-    List.iter (fun e -> Format.fprintf fmt "(%a)" (pp_selection printer) e) es ;
+    Format.fprintf fmt "@[<hov 2>Multi:" ;
+    List.iter (Format.fprintf fmt "@ %a;" @@ pp_selection printer) es ;
     Format.fprintf fmt "@]"
 
 let extract_matchings debug_table printer ?select ?params sigma =
