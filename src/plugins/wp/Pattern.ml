@@ -67,14 +67,11 @@ let assoc op a b =
   }
 
 let implies a b =
-  let rec aux acc l = match l with
-    | { value = Implies (x, tl) } -> aux (List.rev_append x acc) tl
-    | other -> List.rev acc, other
-  in
-  let hs, c = aux [] b in
+  let hs = unroll `And a in
+  let hs,p = match b.value with Implies(rs,p) -> hs @ rs , p | _ -> hs, b in
   {
-    loc = fst a.loc, snd b. loc ;
-    value = Implies (a :: hs, c) ;
+    loc = fst a.loc, snd b.loc ;
+    value = Implies (hs, p) ;
   }
 
 let concat ~loc es =
@@ -149,7 +146,7 @@ let rec parse ctxt p =
     { loc ; value = Int (pinteger ctxt ~loc n) }
   | PLconstant (StringConstant s) ->
     { loc ; value = String s }
-  | PLrange(Some a,Some b) when not ctxt.value ->
+  | PLrange(Some a,Some b) ->
     { loc ; value = Range(pbound ctxt a,pbound ctxt b) }
   | PLapp("\\any",[],ps) when not ctxt.value ->
     { loc ; value = Pany (List.map (parse ctxt) ps) }
