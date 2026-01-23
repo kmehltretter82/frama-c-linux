@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-*  Kernel    [2026-01-23] Fixes issue in string literal management (#@2755)
+o   Kernel    [2026-01-23] -check now checks GVar introduces a vdefined varinfo
 -!  Kernel    [2026-01-23] Logic declarations (types, functions, predicates,
               axioms) outside axiomatic blocks are no longer deprecated.
 -!  Users     [2026-01-19] Remove obsolete `Users` plug-in. Please use
