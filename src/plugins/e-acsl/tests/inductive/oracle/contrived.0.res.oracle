@@ -29,10 +29,15 @@
 [e-acsl] Warning: Negative verdicts of bind_twice might be unsound
 [e-acsl:analysis:inductive] 
   extracting predicate from subst_let using mode: complete
+[e-acsl:analysis:inductive] 
+  extracting predicate from dupl using mode: incomplete in 2
+[e-acsl:analysis:inductive] 
+  extracting function from dupl with mode: incomplete in 2
+[e-acsl] Warning: Negative verdicts of dupl might be unsound
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] contrived.c:68: Warning: assertion got status unknown.
-[eva:alarm] contrived.c:69: Warning: assertion got status unknown.
-[eva:alarm] contrived.c:70: Warning: assertion got status unknown.
+[eva:alarm] contrived.c:77: Warning: assertion got status unknown.
+[eva:alarm] contrived.c:78: Warning: assertion got status unknown.
+[eva:alarm] contrived.c:79: Warning: assertion got status unknown.
 [eva] contrived.c:31: Warning: 
   Using specification of function __gen_e_acsl_conds_fun3_2
   for recursive calls of depth 9.
@@ -45,14 +50,15 @@
   and its soundness relies on the written specification.
 [eva:alarm] contrived.c:30: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.
-[eva:alarm] contrived.c:71: Warning: 
+[eva:alarm] contrived.c:80: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] contrived.c:71: Warning: assertion got status unknown.
-[eva:alarm] contrived.c:72: Warning: 
+[eva:alarm] contrived.c:80: Warning: assertion got status unknown.
+[eva:alarm] contrived.c:81: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] contrived.c:72: Warning: assertion got status unknown.
-[eva:alarm] contrived.c:73: Warning: 
+[eva:alarm] contrived.c:81: Warning: assertion got status unknown.
+[eva:alarm] contrived.c:82: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] contrived.c:73: Warning: assertion got status unknown.
-[eva:alarm] contrived.c:74: Warning: assertion got status unknown.
-[eva:alarm] contrived.c:75: Warning: assertion got status unknown.
+[eva:alarm] contrived.c:82: Warning: assertion got status unknown.
+[eva:alarm] contrived.c:83: Warning: assertion got status unknown.
+[eva:alarm] contrived.c:84: Warning: assertion got status unknown.
+[eva:alarm] contrived.c:85: Warning: assertion got status unknown.

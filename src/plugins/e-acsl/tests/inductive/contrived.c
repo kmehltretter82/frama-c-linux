@@ -64,6 +64,15 @@
   }
 */
 
+// Hypothesis gathering is interrupted by binding hypothesis.
+// Leads to a duplication of constructor d.
+/*@
+  inductive dupl(ℤ a, ℤ b) {
+    case c: ∀ ℤ x, y; x < 0 ⇒ dupl(1-x, y) ⇒ y < 9 ⇒ dupl(x, y+y);
+    case d: ∀ ℤ x, y; x >= 0 ⇒ dupl(x, 1/x);
+  }
+*/
+
 int main() {
   //@ assert use_multimode(0,0);
   //@ assert simple_complex_argument(0, 1);
@@ -73,5 +82,6 @@ int main() {
   //@ assert use_var_use_bind_and_subst(0,0);
   //@ assert bind_twice(2, 3, 1);
   //@ assert subst_let(1,2);
+  //@ assert dupl(-1, 1/2 + 1/2);
   return 0;
 }
