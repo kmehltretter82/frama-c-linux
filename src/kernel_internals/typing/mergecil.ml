@@ -947,7 +947,12 @@ let checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f1 f2 =
     | _ -> raise (Failure "incompatible _Alignas specification");
   end;
 
-  if mustCheckOffsets || not (equal_attributes_for_merge f1.fattr f2.fattr) then
+  if mustCheckOffsets ||
+     not (equal_attributes_for_merge f1.fattr f2.fattr) ||
+     not
+       (equal_attributes_for_merge
+          (Ast_types.get_attributes f1.ftype) (Ast_types.get_attributes f2.ftype))
+  then
     (* different attributes: check if the difference is only due
        to aligned/packed attributes, and if the offsets are the same,
        in which case the difference may be safely ignored *)

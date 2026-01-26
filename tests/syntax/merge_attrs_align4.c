@@ -9,7 +9,7 @@ typedef struct {
   short b; // offset: 1 (packed)
 } s;
 
-s s1;
+extern s s1;
 
 // for testing with GCC/Clang
 #ifndef __FRAMAC__

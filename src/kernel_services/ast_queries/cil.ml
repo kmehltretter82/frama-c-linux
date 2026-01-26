@@ -3545,7 +3545,11 @@ and bitsSizeOf t =
             * is 32 and is not padded  *)
            t, 32
          else
-           t, addTrailing lastoff.oaFirstFree (8 * bytesAlignOf ~standard_or_gcc:`Standard t))
+           (* Add final padding bits according to the struct alignment, but not
+              according to possible alignment attributes of type [t]. *)
+           let struct_typ = Cil_const.mk_tcomp comp in
+           let alignof = bytesAlignOf ~standard_or_gcc:`Standard struct_typ in
+           t, addTrailing lastoff.oaFirstFree (8 * alignof))
 
   | TComp comp -> (* Union *)
     find_sizeof t
@@ -3566,7 +3570,9 @@ and bitsSizeOf t =
          (* Note: we treat None above *)
          let max = List.fold_left fold 0 (Option.get comp.cfields) in
          (* Add trailing by simulating adding an extra field *)
-         t, addTrailing max (8 * bytesAlignOf ~standard_or_gcc:`Standard t))
+         let union_typ = Cil_const.mk_tcomp comp in
+         let alignof = bytesAlignOf ~standard_or_gcc:`Standard union_typ in
+         t, addTrailing max (8 * alignof))
 
   | TArray(bt, Some len) ->
     find_sizeof t

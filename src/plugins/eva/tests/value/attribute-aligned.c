@@ -104,6 +104,75 @@ static void typedef_with_aligned(void) {
 
 //--------------------------------------------------------------------
 
+/* Test the aligned attribute applied either on struct type or on variables. */
+
+#include <stdalign.h>
+
+/* Aligned attribute on the struct type: final padding bits are added to match
+   the struct alignment, so the size of the struct is 4 bytes. */
+
+struct s4 { char c; } __attribute__((aligned(4)));
+struct s4 struct_aligned1;
+
+typedef struct { char c; } __attribute__((aligned(4))) ts4;
+ts4 struct_aligned2;
+
+struct { char c; } __attribute__((aligned(4))) struct_aligned3;
+
+/* Aligned attribute on the variable: only impact the alignment of the variable,
+   but its type is unchanged and its size is 1 byte. */
+
+struct s1 { char c; };
+struct s1 __attribute__((aligned(4))) var_aligned1;
+
+typedef struct { char c; } ts1;
+ts1 __attribute__((aligned(4))) var_aligned2;
+
+struct { char c; } (__attribute__((aligned(4))) var_aligned3);
+
+void struct_aligned (void) {
+  struct_aligned1.c = 1;
+  struct_aligned2.c = 2;
+  struct_aligned3.c = 3;
+  var_aligned1.c = 1;
+  var_aligned2.c = 2;
+  var_aligned3.c = 3;
+
+  /* Size of aligned structs must be 4. */
+  Frama_C_show_each_4(sizeof(struct_aligned1), sizeof(struct_aligned2),
+                      sizeof(struct_aligned3));
+
+  /* Size of aligned variables must be 1. */
+  Frama_C_show_each_1(sizeof(var_aligned1), sizeof(var_aligned2),
+                      sizeof(var_aligned3));
+
+  /* All alignments must be 4. */
+  Frama_C_show_each_4(alignof(struct_aligned1), alignof(struct_aligned2),
+                      alignof(struct_aligned3), alignof(var_aligned1),
+                      alignof(var_aligned1), alignof(var_aligned1));
+
+  /* No alarm as all alignments are 4. */
+  int *ptr4;
+  ptr4 = (int *)&struct_aligned1.c;
+  ptr4 = (int *)&struct_aligned2.c;
+  ptr4 = (int *)&struct_aligned3.c;
+  ptr4 = (int *)&var_aligned1.c;
+  ptr4 = (int *)&var_aligned1.c;
+  ptr4 = (int *)&var_aligned1.c;
+
+  /* Alignment alarms at each line, as all alignments are 4. */
+  int __attribute((aligned(8))) *ptr8;
+  ptr8 = (long *)&struct_aligned1.c;
+  ptr8 = (long *)&struct_aligned2.c;
+  ptr8 = (long *)&struct_aligned3.c;
+  ptr8 = (long *)&var_aligned1.c;
+  ptr8 = (long *)&var_aligned1.c;
+  ptr8 = (long *)&var_aligned1.c;
+}
+
+//--------------------------------------------------------------------
+
+
 int main(void)
 {
   ct();
@@ -114,5 +183,6 @@ int main(void)
   st();
   tt();
   typedef_with_aligned();
+  struct_aligned();
   return 0;
 }
