@@ -646,8 +646,8 @@ int vfwscanf(FILE *restrict stream, const wchar_t *restrict format,
 int vswprintf(wchar_t *restrict wcs, size_t maxlen,
               const wchar_t *restrict format, va_list args);
 
-// This function cannot currently have a sound specification due to not being
-// able to 'assigns args'.
+/*@ assigns \result \from indirect:stream[0..], indirect:format[0..],
+                          indirect:args; //missing: 'assigns args' */
 int vswscanf(const wchar_t *restrict stream, const wchar_t *restrict format,
              va_list args);
 

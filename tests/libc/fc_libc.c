@@ -8,7 +8,9 @@
  MODULE: check_parsing_individual_headers
    OPT:
  MODULE: check_libc_anonymous_tags
-   OPT:
+   OPT: -keep-unused-types
+ MODULE: check_assigns
+   OPT: -cpp-extra-args="-DHEADERS_ONLY" -keep-unused-functions all
  MODULE:
  CMD: %{dep:./check_full_libc.sh} @FRAMAC_SHARE@/libc
    OPT:
@@ -27,9 +29,9 @@
 // functions.
 #define _XOPEN_SOURCE 600
 #define _GNU_SOURCE 1
-
+#ifndef HEADERS_ONLY
 #include "__fc_runtime.c"
-
+#endif
 #include "aio.h"
 #include "alloca.h"
 #include "argz.h"

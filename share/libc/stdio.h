@@ -279,10 +279,10 @@ extern int vsprintf(char * restrict s,
      const char * restrict format,
      va_list arg);
 
-/* TODO: assigns arg ; */
+/*@ //missing: assigns arg
+  assigns \result \from indirect:s[0..], indirect:format[0..], indirect:arg; */
 extern int vsscanf(const char * restrict s,
-     const char * restrict format,
-     va_list arg);
+     const char * restrict format, va_list arg);
 
 /*@
   requires valid_stream: \valid(stream);

@@ -19,8 +19,8 @@ typedef struct entry {
   void    *data;
 } ENTRY;
 
-typedef enum { FIND, ENTER } ACTION;
-typedef enum { preorder, postorder, endorder, leaf } VISIT;
+typedef enum __fc_search_action { FIND, ENTER } ACTION;
+typedef enum __fc_search_visit { preorder, postorder, endorder, leaf } VISIT;
 
 __FC_EXTERN volatile char __fc_search_key[64];
 __FC_EXTERN volatile char __fc_search_data[64];
