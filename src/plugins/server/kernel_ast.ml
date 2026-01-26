@@ -138,9 +138,10 @@ struct
   module STATE = State_builder.Ref(TYPE)
       (struct
         let name = Printf.sprintf "Server.Kernel_ast.%s.STATE" module_name
-        let dependencies = []
+        let dependencies = [ Ast.self ]
         let default = index
       end)
+  let () = Ast.add_monotonic_state STATE.self
 
   let iter f =
     T.H.iter (fun key str -> f (key, str)) (STATE.get ()).tags
