@@ -32,10 +32,10 @@
   ; reads targets of configurator.exe
   python-3.10-available gcc-is-genuine has-c2x-option)
  (targets
+  ; Global
   tests-dependencies-available
   tests-dependencies-comment
-  tests-eva-deps-available
-  tests-markdown-report-deps-available
+  ; Kernel
   tests-fc_scripts-deps-available
   tests-jcdb-deps-available
   tests-libc-deps-available
@@ -43,6 +43,11 @@
   tests-misc-deps-available
   tests-mopsa-deps-available
   tests-spec-deps-available
-  tests-syntax-deps-available)
+  tests-syntax-deps-available
+  ; Plug-ins
+  tests-eva-deps-available
+  tests-markdown-report-deps-available
+  tests-server-deps-available
+  )
  (action (run ./tests_configurator.exe)))
 
