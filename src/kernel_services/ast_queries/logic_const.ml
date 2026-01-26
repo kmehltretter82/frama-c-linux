@@ -327,103 +327,141 @@ let rec is_exit_status t = match t.term_node with
 (** {2 Predicate constructors} *)
 (* empty line for ocamldoc *)
 
-let unnamed ?(loc=Cil_datatype.Location.unknown) p =
-  {pred_content = p ; pred_loc = loc; pred_name = [] }
+let pred ?(loc=Cil_datatype.Location.unknown) ?(names=[]) p =
+  { pred_content = p ; pred_loc = loc ; pred_name = names }
+
+let unnamed ?loc p = pred ?loc p
+
+let prepend_names ?(names=[]) p = { p with pred_name = names @ p.pred_name }
 
 let ptrue = unnamed Ptrue
 let pfalse = unnamed Pfalse
 
-let pold ?(loc=Cil_datatype.Location.unknown) p = match p.pred_content with
+let pold ?loc ?names p = match p.pred_content with
   | Ptrue | Pfalse -> p
-  | _ -> {p with pred_content = Pat(p, old_label); pred_loc = loc}
+  | _ -> pred ?loc ?names (Pat(p, old_label))
 
-let papp ?loc (p,lab,a) =
-  unnamed ?loc (Papp(p,lab,a))
+let papp ?loc ?names (p,lab,a) =
+  pred ?loc ?names (Papp(p,lab,a))
 
-let pand ?loc (p1, p2) =
-  match p1.pred_content, p2.pred_content with
-  | Ptrue, _ -> p2
-  | _, Ptrue -> p1
-  | Pfalse, _ -> p1
-  | _, Pfalse -> p2
-  | _, _ -> unnamed ?loc (Pand (p1, p2))
+let pand ?loc ?names (p1, p2) =
+  let p =
+    match p1.pred_content, p2.pred_content with
+    | Ptrue, _ -> prepend_names ?names p2
+    | _, Ptrue -> p1
+    | Pfalse, _ -> p1
+    | _, Pfalse -> p2
+    | _, _ -> unnamed ?loc (Pand (p1, p2))
+  in
+  prepend_names ?names p
 
-let por ?loc (p1, p2) =
-  match p1.pred_content, p2.pred_content with
-  | Ptrue, _ -> p1
-  | _, Ptrue -> p2
-  | Pfalse, _ -> p2
-  | _, Pfalse -> p1
-  | _, _ -> unnamed ?loc (Por (p1, p2))
+let por ?loc ?names (p1, p2) =
+  let p =
+    match p1.pred_content, p2.pred_content with
+    | Ptrue, _ -> p1
+    | _, Ptrue -> p2
+    | Pfalse, _ -> p2
+    | _, Pfalse -> p1
+    | _, _ -> unnamed ?loc (Por (p1, p2))
+  in
+  prepend_names ?names p
 
-let pxor ?loc (p1, p2) =
-  match p1.pred_content, p2.pred_content with
-  | Ptrue, Ptrue -> unnamed ?loc Pfalse
-  | Ptrue, _ -> p1
-  | _, Ptrue -> p2
-  | Pfalse, _ -> p2
-  | _, Pfalse -> p1
-  | _,_ -> unnamed ?loc (Pxor (p1,p2))
+let pxor ?loc ?names (p1, p2) =
+  let p =
+    match p1.pred_content, p2.pred_content with
+    | Ptrue, Ptrue -> unnamed ?loc Pfalse
+    | Ptrue, _ -> p1
+    | _, Ptrue -> p2
+    | Pfalse, _ -> p2
+    | _, Pfalse -> p1
+    | _,_ -> unnamed ?loc (Pxor (p1,p2))
+  in
+  prepend_names ?names p
 
-let pnot ?(loc=Cil_datatype.Location.unknown) p2 = match p2.pred_content with
-  | Ptrue -> {p2 with pred_content = Pfalse; pred_loc = loc }
-  | Pfalse ->  {p2 with pred_content = Ptrue; pred_loc = loc }
-  | Pnot p -> p
-  | _ -> unnamed ~loc (Pnot p2)
+let pnot ?(loc=Cil_datatype.Location.unknown) ?names p2 =
+  let p =
+    match p2.pred_content with
+    | Ptrue -> { p2 with pred_content = Pfalse; pred_loc = loc }
+    | Pfalse ->  { p2 with pred_content = Ptrue; pred_loc = loc }
+    | Pnot p -> p
+    | _ -> unnamed ~loc (Pnot p2)
+  in
+  prepend_names ?names p
 
-let pands l = List.fold_right (fun p1 p2 -> pand (p1, p2)) l ptrue
-let pors l = List.fold_right (fun p1 p2 -> por (p1, p2)) l pfalse
+let pands ?names l =
+  let p = List.fold_right (fun p1 p2 -> pand (p1, p2)) l ptrue in
+  prepend_names ?names p
+let pors ?names l =
+  let p = List.fold_right (fun p1 p2 -> por (p1, p2)) l pfalse in
+  prepend_names ?names p
 
-let plet ?loc v p = match p.pred_content with
-  | Ptrue -> p
-  | _ -> unnamed ?loc (Plet (v, p))
+let plet ?loc ?names v p = match p.pred_content with
+  | Ptrue -> prepend_names ?names p
+  | _ -> pred ?loc ?names (Plet (v, p))
 
-let pimplies ?(loc=Cil_datatype.Location.unknown) (p1,p2) =
-  match p1.pred_content, p2.pred_content with
-  | Ptrue, _ | _, Ptrue -> p2
-  | Pfalse, _ -> { pred_name = p1.pred_name; pred_loc = loc; pred_content = Ptrue }
-  | _, _ -> unnamed ~loc (Pimplies (p1, p2))
+let pimplies ?(loc=Cil_datatype.Location.unknown) ?names (p1,p2) =
+  let p =
+    match p1.pred_content, p2.pred_content with
+    | Ptrue, _ | _, Ptrue -> p2
+    | Pfalse, _ -> { p1 with pred_loc = loc; pred_content = Ptrue }
+    | _, _ -> unnamed ~loc (Pimplies (p1, p2))
+  in
+  prepend_names ?names p
 
-let pif ?loc (t,p2,p3) =
-  match (p2.pred_content, p3.pred_content) with
-  | Ptrue, Ptrue  -> ptrue
-  | Pfalse, Pfalse -> pfalse
-  | _,_ -> unnamed ?loc (Pif (t,p2,p3))
+let pif ?loc ?names (t,p2,p3) =
+  let p =
+    match (p2.pred_content, p3.pred_content) with
+    | Ptrue, Ptrue  -> ptrue
+    | Pfalse, Pfalse -> pfalse
+    | _,_ -> unnamed ?loc (Pif (t,p2,p3))
+  in
+  prepend_names ?names p
 
-let piff ?loc (p2,p3) =
-  match p2.pred_content, p3.pred_content with
-  | Pfalse, Pfalse -> ptrue
-  | Ptrue, _  -> p3
-  | _, Ptrue -> p2
-  | _,_ -> unnamed ?loc (Piff (p2,p3))
+let piff ?loc ?names (p2,p3) =
+  let p =
+    match p2.pred_content, p3.pred_content with
+    | Pfalse, Pfalse -> ptrue
+    | Ptrue, _  -> p3
+    | _, Ptrue -> p2
+    | _,_ -> unnamed ?loc (Piff (p2,p3))
+  in
+  prepend_names ?names p
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-let prel ?loc (a,b,c) =
-  unnamed ?loc (Prel(a,b,c))
+let prel ?loc ?names (a,b,c) =
+  pred ?loc ?names (Prel(a,b,c))
 
-let pforall ?loc (l,p) = match l with
-  | [] -> p
-  | _ :: _ ->
-    match p.pred_content with
-    | Ptrue -> p
-    | _ -> unnamed ?loc (Pforall (l,p))
+let pforall ?loc ?names (l,p) =
+  let p =
+    match l with
+    | [] -> p
+    | _ :: _ ->
+      match p.pred_content with
+      | Ptrue -> p
+      | _ -> unnamed ?loc (Pforall (l,p))
+  in
+  prepend_names ?names p
 
-let pexists ?loc (l,p) = match l with
-  | [] -> p
-  | _ :: _ -> match p.pred_content with
-    | Pfalse -> p
-    | _ -> unnamed ?loc (Pexists (l,p))
+let pexists ?loc ?names (l,p) =
+  let p =
+    match l with
+    | [] -> p
+    | _ :: _ -> match p.pred_content with
+      | Pfalse -> p
+      | _ -> unnamed ?loc (Pexists (l,p))
+  in
+  prepend_names ?names p
 
-let pfresh ?loc (l1,l2,p,n) = unnamed ?loc (Pfresh (l1,l2,p,n))
-let pallocable ?loc (l,p) = unnamed ?loc (Pallocable (l,p))
-let pfreeable ?loc (l,p) = unnamed ?loc (Pfreeable (l,p))
-let pvalid ?loc (l,p) = unnamed ?loc (Pvalid (l,p))
-let pvalid_read ?loc (l,p) = unnamed ?loc (Pvalid_read (l,p))
-let pobject_pointer ?loc (l,p) = unnamed ?loc (Pobject_pointer (l,p))
-let pvalid_function ?loc p = unnamed ?loc (Pvalid_function p)
+let pfresh ?loc ?names (l1,l2,p,n) = pred ?loc ?names (Pfresh (l1,l2,p,n))
+let pallocable ?loc ?names (l,p) = pred ?loc ?names (Pallocable (l,p))
+let pfreeable ?loc ?names (l,p) = pred ?loc ?names (Pfreeable (l,p))
+let pvalid ?loc ?names (l,p) = pred ?loc ?names (Pvalid (l,p))
+let pvalid_read ?loc ?names (l,p) = pred ?loc ?names (Pvalid_read (l,p))
+let pobject_pointer ?loc ?names (l,p) = pred ?loc ?names (Pobject_pointer (l,p))
+let pvalid_function ?loc ?names p = pred ?loc ?names (Pvalid_function p)
 
 (* the index should be an integer or a range of integers *)
-let pvalid_index ?loc (l,t1,t2) =
+let pvalid_index ?loc ?names (l,t1,t2) =
   let ty1 = t1.term_type in
   let ty2 = t2.term_type in
   let t, ty =(match t1.term_node with
@@ -432,19 +470,20 @@ let pvalid_index ?loc (l,t1,t2) =
       | _ -> TBinOp (PlusPI, t1, t2)),
              set_conversion ty1 ty2 in
   let t = term ?loc t ty in
-  pvalid ?loc (l,t)
+  pvalid ?loc ?names (l,t)
 (* the range should be a range of integers *)
-let pvalid_range ?loc (l,t1,b1,b2) =
+let pvalid_range ?loc ?names (l,t1,b1,b2) =
   let t2 = trange ((Some b1), (Some b2)) in
-  pvalid_index ?loc (l,t1,t2)
-let pat ?loc (p,q) = unnamed ?loc (Pat (p,q))
-let pinitialized ?loc (l,p) =
-  unnamed ?loc (Pinitialized (l,p))
-let pdangling ?loc (l,p) =
-  unnamed ?loc (Pdangling (l,p))
+  pvalid_index ?loc ?names (l,t1,t2)
+let pat ?loc ?names (p,q) = pred ?loc ?names (Pat (p,q))
+let pinitialized ?loc ?names (l,p) =
+  pred ?loc ?names (Pinitialized (l,p))
+let pdangling ?loc ?names (l,p) =
+  pred ?loc ?names (Pdangling (l,p))
 
-let pseparated ?loc seps =
-  unnamed ?loc (Pseparated seps)
+let pseparated ?loc ?names seps =
+  pred ?loc ?names (Pseparated seps)
 
-let paligned ?loc (p, n) =
-  unnamed ?loc (Paligned(p, n))
+let paligned ?loc ?names (p, n) =
+  pred ?loc ?names (Paligned(p, n))
+

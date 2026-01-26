@@ -65,7 +65,7 @@ module Predicate : S with type t = predicate = struct
 
   let mk_logic_body pred = LBpred pred
 
-  let mk_let = Logic_const.plet
+  let mk_let ?loc li = Logic_const.plet ?loc li
 
   let mk_if ?loc p_cond t_true t_false =
     match (t_true.pred_content, t_false.pred_content) with
