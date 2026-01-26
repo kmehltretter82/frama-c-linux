@@ -16,14 +16,12 @@ let requires loc _ s1 s2 len =
   List.map new_predicate [
     { (pcorrect_len_bytes ~loc s1.term_type len)
       with pred_name = ["aligned_end"] } ;
-    { (Logic_const.pand ~loc (
-          pobject_pointer ~loc here_label s1,
-          pvalid_read_len_bytes ~loc here_label s1 len))
-      with pred_name = ["valid_read_s1"] } ;
-    { (Logic_const.pand ~loc (
-          pobject_pointer ~loc here_label s2,
-          pvalid_read_len_bytes ~loc here_label s2 len))
-      with pred_name = ["valid_read_s2"] } ;
+    Logic_const.pand ~loc ~names:["valid_read_s1"] (
+      pobject_pointer ~loc here_label s1,
+      pvalid_read_len_bytes ~loc here_label s1 len);
+    Logic_const.pand ~loc ~names:["valid_read_s2"] (
+      pobject_pointer ~loc here_label s2,
+      pvalid_read_len_bytes ~loc here_label s2 len);
   ]
 
 let presult_memcmp ?loc p1 p2 len =
