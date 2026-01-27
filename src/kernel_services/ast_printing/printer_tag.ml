@@ -381,6 +381,7 @@ let definition_of_localizable = function
     else
       Some (PVDecl(kf,ki,vi))
   | PType ty -> definition_of_type ty
+  | PGlobal (GType _ | GCompTag _ | GEnumTag _) as loc -> Some loc
   | PStmt _ | PStmtStart _ | PVDecl _
   | PExp _ | PLval _ | PTermLval _ | PGlobal _ | PIP _
     -> None
@@ -914,7 +915,9 @@ struct
         current_ca <- None
 
     method! typeref t pp fmt x =
-      Format.fprintf fmt "@{<%s>%a@}" (Info.tag (PType t)) pp x
+      match definition_of_type t with
+      | None -> Format.fprintf fmt "@{<%s>%a@}" (Info.tag (PType t)) pp x
+      | Some loc -> Format.fprintf fmt "@{<%s>%a@}" (Info.tag loc) pp x
 
     method! typedef g pp fmt x =
       Format.fprintf fmt "@{<%s>%a@}" (Info.tag (PGlobal g)) pp x
