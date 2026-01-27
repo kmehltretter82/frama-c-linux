@@ -47,12 +47,6 @@ type localizable =
   | PIP of Property.t
   | PType of typ
 
-(** Prints the global declaration of the declaration. *)
-val pp_signature : Format.formatter -> declaration -> unit
-
-(** Prints the global definition of the declaration. *)
-val pp_definition : Format.formatter -> declaration -> unit
-
 (** Prints the signature of the localizable. *)
 val pp_localizable: Format.formatter -> localizable -> unit
 
@@ -88,17 +82,13 @@ val declaration_of_global : global -> declaration option
 val declaration_of_property : Property.t -> declaration option
 val declaration_of_localizable : localizable -> declaration option
 
-val definition_of_type : typ -> localizable option
 val definition_of_localizable : localizable -> localizable option
 
 val loc_of_declaration : declaration -> location
 
-val name_of_type : typ -> string option
-val name_of_global : global -> string option
 val name_of_declaration : declaration -> string
 val name_of_localizable : localizable -> string option
 
-val signature_of_declaration : declaration -> global
 val definition_of_declaration : declaration -> global
 
 val localizable_of_kf : kernel_function -> localizable
@@ -109,7 +99,6 @@ val localizable_of_declaration : declaration -> localizable
 val kf_of_localizable : localizable -> kernel_function option
 val ki_of_localizable : localizable -> kinstr
 val varinfo_of_localizable : localizable -> varinfo option
-val typ_of_localizable: localizable -> typ option
 val loc_of_localizable : localizable -> location
 (** Might return [Location.unknown] *)
 

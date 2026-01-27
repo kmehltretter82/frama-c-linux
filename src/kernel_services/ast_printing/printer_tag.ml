@@ -158,9 +158,6 @@ let definition_of_declaration = function
   | SFunction kf -> Kernel_function.get_global kf
   | other -> signature_of_declaration other
 
-let pp_signature fmt d = Printer.pp_global fmt @@ signature_of_declaration d
-let pp_definition fmt d = Printer.pp_global fmt @@ definition_of_declaration d
-
 let pp_global_annotation_decl fmt = function
   | Dfun_or_pred (li, _) | Dinvariant (li, _) | Dtype_annot (li, _) ->
     Logic_info.pretty fmt { li with l_body = LBnone }
@@ -473,11 +470,6 @@ let varinfo_of_localizable = function
       GVar (vi, _, _) | GVarDecl (vi, _) |
       GFun ({svar = vi },_) | GFunDecl (_, vi, _)
     ) -> Some vi
-  | _ -> None
-
-let typ_of_localizable = function
-  | PLval (_, _, lval) -> Some (Cil.typeOfLval lval)
-  | PExp (_, _, expr) -> Some (Cil.typeOf expr)
   | _ -> None
 
 let loc_of_localizable = function
