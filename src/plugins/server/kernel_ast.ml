@@ -1126,25 +1126,25 @@ let () = Information.register
       let typ =
         match loc with
         | PType typ -> typ
-        | PVDecl(_,_,vi) -> vi.vtype
+        | PVDecl(_,_,vi) when Ast_types.is_object vi.vtype -> vi.vtype
         | PGlobal (GType(ti,_)) -> ti.ttype
         | PGlobal (GCompTagDecl(ci,_) | GCompTag(ci,_)) -> Cil_const.mk_tcomp ci
         | PGlobal (GEnumTagDecl(ei,_) | GEnumTag(ei,_)) -> Cil_const.mk_tenum ei
         | _ -> raise Not_found
       in
-      let bits =
-        try Cil.bitsSizeOf typ
-        with Cil.SizeOfError _ -> raise Not_found
-      in
-      let bytes = bits / 8 in
-      let rbits = bits mod 8 in
-      if rbits > 0 then
-        if bytes > 0 then
-          Format.fprintf fmt "%d bytes + %d bits" bytes rbits
+      try
+        let bits = Cil.bitsSizeOf typ in
+        let bytes = bits / 8 in
+        let rbits = bits mod 8 in
+        if rbits > 0 then
+          if bytes > 0 then
+            Format.fprintf fmt "%d bytes + %d bits" bytes rbits
+          else
+            Format.fprintf fmt "%d bits" rbits
         else
-          Format.fprintf fmt "%d bits" rbits
-      else
-        Format.fprintf fmt "%d bytes" bytes
+          Format.fprintf fmt "%d bytes" bytes
+      with Cil.SizeOfError (msg, _) ->
+        Format.fprintf fmt "Unknown size: %s" msg
     end
 
 
