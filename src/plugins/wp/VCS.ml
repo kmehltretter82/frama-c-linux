@@ -35,9 +35,7 @@ let parse_prover = function
   | name ->
     match Why3Provers.lookup name with
     | Some p -> Some (Why3 p)
-    | None ->
-      Wp_parameters.error ~once:true
-        "Prover '%s' not found in why3.conf" name ; None
+    | None -> None
 
 let parse_mode m =
   match String.lowercase_ascii m with
