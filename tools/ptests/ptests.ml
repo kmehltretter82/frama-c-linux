@@ -158,80 +158,77 @@ let test_file_regexp = ".*\\.\\(c\\|i\\)$"
 let example_msg =
   Format.sprintf
     "@.@[<v 0>\
-     Build the dune files allowing running the test suite contained into directories (defaults to ./tests).@ @ \
+     Create dune files to run the test suites in the specified directories (defaults to ./tests).@ @ \
      @[<v 1>\
      Directives of the \"ptests_config\" files:@  \
      # <comment>                 @[<v 0># Just a comment line.@]@  \
      DEFAULT_SUITES = <suite>... @[<v 0># Cumulative list of subdirectories containing test suites (specified by \"test_config\" files).@]@  \
      <mode>_SUITES = <suite>...  @[<v 0># Cumulative list of subdirectories containing test suites (specified by \"test_config_<mode>\" files).@]@  \
      IGNORE = <mode>_SUITE = <suite>...   @[<v 0># Cumulative list of ignored test suites.@]@  \
-     DUNE_ALIAS = <alias-name>   @[<v 0># The dune alias @@<alias-name> has to be used to executes the next defined suites (defaults to \"ptests\").@]@  \
+     DUNE_ALIAS = <alias-name>   @[<v 0># Dune alias @@<alias-name> has to be used to execute the next defined suites (defaults to \"ptests\").@]@  \
      @]@ \
      @[<v 1>\
      Directives of \"test_config[_<mode>]\" files:@  \
      COMMENT: <comment>  @[<v 0># Just a comment line.@]@  \
-     FILEREG: <regexp>   @[<v 0># Ignores the files in suites whose name doesn't match the pattern.@]@  \
-     DONTRUN:            @[<v 0># Ignores the file.@]@  \
-     EXECNOW: ([LOG|BIN] <file>)+ <command>  @[<v 0># Defines the command to execute to build a 'LOG' (textual) 'BIN' (binary) targets.@ \
-     # Note: the textual targets are compared to oracles.@]@  \
+     FILEREG: <regexp>   @[<v 0># Only files matching this regex are considered as tests (default: .*\\.\\(c\\|i\\)).@]@  \
+     DONTRUN:            @[<v 0># Ignores the file containing this directive.@]@  \
+     EXECNOW: ([LOG|BIN] <file>)+ <command>  @[<v 0># Defines the command to execute to build a 'LOG' (text) or 'BIN' (binary) targets.@ \
+     # Note: text targets are compared to oracles.@]@  \
      DEPS: <file>...     @[<v 0># Adds a dependency to next sub-test and execnow commands.@ \
      # Notes: a dependency to the included file can be added with this directive.@ \
      # That is not necessary for files mentioned into the command or options when using the %%{dep:<file>} feature of dune.@]@  \
-     ENABLED_IF: <cond>  @[<v 0># Adds an enabling conditions to next sub-test and execnow commands (defaults to \"true\").@]@  \
+     ENABLED_IF: <cond>  @[<v 0># Condition for following sub-tests and execnow commands to be enabled (defaults to \"true\").@]@  \
      BIN: <file>...      @[<v 0># Defines binary targets built by the next sub-test command.@]@  \
-     LOG: <file>...      @[<v 0># Defines textual targets built by the next sub-test command.@ \
-     # Note: the textual targets are compared to oracles.@]@  \
+     LOG: <file>...      @[<v 0># Defines text targets built by the next sub-test command.@ \
+     # Note: the text targets are compared to oracles.@]@  \
      CMD: <command>      @[<v 0># Defines the command to execute for all tests in order to get results to be compared to oracles.@]@  \
      OPT: <options>      @[<v 0># Defines a sub-test using the 'CMD' definition: <command> <options>@]@  \
-     STDOPT: +<extra>    @[<v 0># Defines a sub-test and append the extra to the current option.@]@  \
-     STDOPT: #<extra>    @[<v 0># Defines a sub-test and prepend the extra to the current option.@]@  \
-     PLUGIN: <plugin>... @[<v 0># Adds a dependency and set the macro @@PTEST_PLUGIN@@ defining the '-load-plugins' option used in the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
-     LIBRARY: <pkg.lib>... @[<v 0># Adds a dependency and set the macro @@PTEST_LIBRARY@@ defining the '-load-library' option used in the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
-     MODULE: <module>... @[<v 0># Adds a dependency and adds the corresponding '-load-module' option into the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
-     SCRIPT: <module>... @[alias 'MODULE' directive (DEPRECATED).@]@  \
-     LIBS: <module>...   @[<v 0># Like 'MODULE' directive but for modules that can be shared between several test files.@]@  \
-     EXIT: <number>      @[<v 0># Defines the exit code required for the next sub-test commands.@]@  \
-     FILTER: <cmd>       @[<v 0># Performs a transformation on the test result files before the comparison from the oracles.@ \
+     STDOPT: +<extra>    @[<v 0># Defines a sub-test and appends <extra> to the current options.@]@  \
+     STDOPT: #<extra>    @[<v 0># Defines a sub-test and prepends <extra> to the current options.@]@  \
+     PLUGIN: <plugin>... @[<v 0># Adds a dependency and sets macro @@PTEST_PLUGIN@@ defining the '-load-plugins' option used in the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
+     LIBRARY: <pkg.lib>... @[<v 0># Adds a dependency and sets macro @@PTEST_LIBRARY@@ defining the '-load-library' option used in the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
+     MODULE: <module>... @[<v 0># Adds a dependency and adds the corresponding '-load-module' option to the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
+     LIBS: <module>...   @[<v 0># Like 'MODULE' directive, but for modules that can be shared between several test files.@]@  \
+     EXIT: <number>      @[<v 0># Defines the exit code required for the following sub-test commands.@]@  \
+     FILTER: <cmd>       @[<v 0># Performs a transformation on the test result files before comparing with oracles.@ \
      # The oracle will be compared from the standard output of the command: cat <test-output-file> | <cmd> .@ \
-     # Chaining multiple filter commands is possible in defining several FILTER directives.@ \
-     # An empty command drops the previous FILTER directives.@ \
+     # Chaining multiple filter commands is possible by defining several FILTER directives.@ \
+     # An empty command drops previous FILTER directives.@ \
      # Note: in such a command, the macros @@PTEST_ORACLE@@ and @@PTEST_RESULT_FILE@@ are set respectively to the basename of the oracle and the basename of the result.@ \
      # This allows running a 'diff' command with the oracle/result of another test configuration:@ \
      #    FILTER: diff --new-file %%{dep:@@PTEST_SUITE_DIR@@/result_configuration/@@PTEST_RESULT_FILE@@} - @]@  \
      # It is recommended to diff against the result of another configuration so that the dependencies between configurations are correctly set up.
-     TIMEOUT: <delay>    @[<v 0># Set a timeout for all sub-test.@]@  \
+     TIMEOUT: <delay>    @[<v 0># Set a timeout for all sub-tests.@]@  \
      NOFRAMAC:           @[<v 0># Drops previous sub-test definitions and considers that there is no defined default sub-test.@]@  \
-     GCC:                @[<v 0># Deprecated.@]@  \
-     MACRO: <name> <def> @[<v 0># Set a definition to the macro @@<name>@@.@]@  \
+     MACRO: <name> <def> @[<v 0># Defines macro @@<name>@@ as <def>.@]@  \
      @]@ \
      @[<v 1>\
      Some predefined macros can be used in test directives:@  \
      @@PTEST_DIR@@             # Path to the test file from the execution directory (./).@  \
-     @@PTEST_FILE@@            # Substituted by the test filename.@  \
+     @@PTEST_FILE@@            # Test filename.@  \
      @@PTEST_NAME@@            # Basename of the test file.@  \
      @@PTEST_NUMBER@@          # Test command number.@  \
      @@PTEST_CONFIG@@          # Test configuration suffix.@  \
-     @@PTEST_SUITE_DIR@@       # Path to the directory contained the source of the test file (../).@  \
+     @@PTEST_SUITE_DIR@@       # Path to the directory containing the source of the test file (../).@  \
      @@PTEST_RESULT_DIR@@      # Shorthand alias to @@PTEST_SUITE_DIR@@/result@@PTEST_CONFIG@@ (the result directory dedicated to the tested configuration).@  \
      @@PTEST_ORACLE@@          # Basename of the current oracle file (macro only usable in FILTER directives).@  \
      @@PTEST_RESULT_FILE@@     # Basename of the current result file (macro only usable in FILTER directives).@  \
-     @@PTEST_DEFAULT_OPTIONS@@ # The default option list: %s@  \
-     @@PTEST_LIBS@@            # The current list of modules defined by the LIBS directive.@  \
-     @@PTEST_LIBRARY@@         # The current list of modules defined by the LIBRARY directive.@  \
-     @@PTEST_DEPS@@            # The current list of dependencies defined by the DEPS directive.@  \
-     @@PTEST_ENABLED_IF@@      # The current value of ENABLED_IF directive.@  \
-     @@PTEST_MODULE@@          # The current list of modules defined by the MODULE directive.@  \
-     @@PTEST_SCRIPT@@          # The current list of modules defined by the SCRIPT directive (DEPRECATED).@  \
-     @@PTEST_PLUGIN@@          # The current list of plugins set by the PLUGIN directive.@  \
+     @@PTEST_DEFAULT_OPTIONS@@ # Default option list: %s@  \
+     @@PTEST_LIBS@@            # Current list of modules defined by the LIBS directive.@  \
+     @@PTEST_LIBRARY@@         # Current list of modules defined by the LIBRARY directive.@  \
+     @@PTEST_DEPS@@            # Current list of dependencies defined by the DEPS directive.@  \
+     @@PTEST_ENABLED_IF@@      # Current value of ENABLED_IF directive.@  \
+     @@PTEST_MODULE@@          # Current list of modules defined by the MODULE directive.@  \
+     @@PTEST_PLUGIN@@          # Current list of plugins set by the PLUGIN directive.@  \
      @]@ \
      @[<v 1>\
      Other macros can only be used in test commands (CMD and EXECNOW directives):@  \
-     @@PTEST_LOAD_OPTIONS@@ # The current list of options related to PLUGIN, LIBRARY, MODULE, SCRIPT and LIBS to load.@  \
-     @@PTEST_OPTIONS@@  # The current list of options related to OPT and STDOPT directives (for CMD directives).@  \
-     @@frama-c-exe@@    # Shortcut defined as follow: %s@  \
-     @@frama-c@@        # Shortcut defined as follow: %s@  \
-     @@frama-c-cmd@@    # Shortcut defined as follow: %s@  \
-     @@FRAMAC_SHARE@@   # Shortcut defined as follow: %s@  \
+     @@PTEST_LOAD_OPTIONS@@ # Crrent list of options related to PLUGIN, LIBRARY, MODULE and LIBS to load.@  \
+     @@PTEST_OPTIONS@@  # Current list of options related to OPT and STDOPT directives (for CMD directives).@  \
+     @@frama-c-exe@@    # Shortcut defined as follows: %s@  \
+     @@frama-c@@        # Shortcut defined as follows: %s@  \
+     @@frama-c-cmd@@    # Shortcut defined as follows: %s@  \
+     @@FRAMAC_SHARE@@   # Shortcut defined as follows: %s@  \
      @@PTEST_SHARE_DIR@@   # Path to the share directory of the related plugin.@  \
      @@DEV_NULL@@       # Set to 'NUL' for Windows platforms and to '/dev/null' otherwise.@  \
      @]@ \
@@ -526,7 +523,7 @@ module Macros = struct
       let nb_loops = ref 0 in
       let rec aux s =
         if !nb_loops > 100 then
-          fail (file ^ ": possible infinite recursivity in macro expands: "^ s)
+          fail (file ^ ": possible infinite recursion in macro expansion: "^ s)
         else incr nb_loops ;
         let expand_macro = function
           | Str.Text s -> s
