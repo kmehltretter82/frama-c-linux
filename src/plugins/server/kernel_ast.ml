@@ -1147,6 +1147,40 @@ let () = Information.register
         Format.fprintf fmt "%d bytes" bytes
     end
 
+
+let () = Information.register
+    ~id:"kernel.ast.alignof"
+    ~label:"Alignof"
+    ~title:"Alignment of a C type, variable or field"
+    begin fun fmt loc ->
+      let print kind alignof elt =
+        try
+          Format.fprintf fmt "%d bytes (%s alignment)" (alignof elt) kind
+        with Cil.SizeOfError (msg, _typ) ->
+          Format.fprintf fmt "Unknown alignment: %s" msg
+      in
+      match loc with
+      | PType typ
+      | PGlobal (GType ( { ttype=typ }, _ )) ->
+        print "type" Cil.bytesAlignOf typ
+      | PVDecl (_, _, vi)
+      | PLval (_, _, (Var vi, NoOffset))
+      | PGlobal (GVarDecl (vi, _) | GVar (vi, _, _))
+        when Ast_types.is_object vi.vtype ->
+        print "variable" Cil.bytesAlignOfVarinfo vi
+      | PLval (_, _, lval) ->
+        begin
+          match Cil.lastOffset (snd lval) with
+          | Field (fi, NoOffset) -> print "field" Cil.bytesAlignOfField fi
+          | _ -> raise Not_found
+        end
+      | PGlobal (GCompTagDecl (ci, _) | GCompTag (ci, _)) ->
+        print "type" Cil.bytesAlignOf (Cil_const.mk_tcomp ci)
+      | PGlobal (GEnumTagDecl (ei, _) | GEnumTag (ei, _)) ->
+        print "type" Cil.bytesAlignOf (Cil_const.mk_tenum ei)
+      | _ -> raise Not_found
+    end
+
 let () = Information.register
     ~id:"kernel.ast.propertyStatus"
     ~label:"Status"
