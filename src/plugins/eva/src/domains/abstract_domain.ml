@@ -59,7 +59,7 @@
     {!Domain_lift.Make}, and be combined through {!Domain_product.Make}.
 
     Finally, a new domain can be registered in the Eva engine via
-    {!Abstractions.register}. See abstractions.mli for more details.
+    {!Abstractions.Domain.register}. See abstractions.mli for more details.
 *)
 
 (* The types of the Cil AST. *)

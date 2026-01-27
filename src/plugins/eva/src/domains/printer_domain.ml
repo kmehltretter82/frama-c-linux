@@ -120,4 +120,4 @@ let registered =
     "Debug domain, only useful for developers. Prints the transfer functions \
      used during the analysis."
   in
-  Abstractions.Domain.register ~name ~descr ~priority:2 (module Domain)
+  Abstractions.Domain.register ~name ~descr (module Domain)

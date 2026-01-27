@@ -9,45 +9,45 @@
 [eva] domains.i:50: 
   Frama_C_domain_show_each:
   a : # cvalue: {8}
-      # equality: 
       # symbolic-locations: (not implemented)
+      # equality: 
       # octagon: (not implemented)
       # gauges: (not implemented)
-      # sign: +
-      # bitwise: (not implemented)
       # multidim: {8}
+      # bitwise: (not implemented)
+      # sign: +
   i : # cvalue: [1..99]
-      # equality: 
       # symbolic-locations: (not implemented)
+      # equality: 
       # octagon: (not implemented)
       # gauges: (not implemented)
-      # sign: +
-      # bitwise: (not implemented)
       # multidim: [1..99]
-  j : # cvalue: [10..210]
-      # equality: 
-      # symbolic-locations: (not implemented)
-      # octagon: (not implemented)
-      # gauges: (not implemented)
+      # bitwise: (not implemented)
       # sign: +
-      # bitwise: (not implemented)
-      # multidim: [10..210]
-  k : # cvalue: [2..100]
-      # equality: {k = ((i - j) + 1) + j}
+  j : # cvalue: [10..210]
       # symbolic-locations: (not implemented)
-      # octagon: (not implemented)
-      # gauges: (not implemented)
-      # sign: -0+
-      # bitwise: (not implemented)
-      # multidim: [2..100]
-  r : # cvalue: {1}
       # equality: 
-      # symbolic-locations: (not implemented)
       # octagon: (not implemented)
       # gauges: (not implemented)
-      # sign: 0+
+      # multidim: [10..210]
       # bitwise: (not implemented)
+      # sign: +
+  k : # cvalue: [2..100]
+      # symbolic-locations: (not implemented)
+      # equality: {k = ((i - j) + 1) + j}
+      # octagon: (not implemented)
+      # gauges: (not implemented)
+      # multidim: [2..100]
+      # bitwise: (not implemented)
+      # sign: -0+
+  r : # cvalue: {1}
+      # symbolic-locations: (not implemented)
+      # equality: 
+      # octagon: (not implemented)
+      # gauges: (not implemented)
       # multidim: {1}
+      # bitwise: (not implemented)
+      # sign: 0+
 [eva] domains.i:51: 
   Frama_C_dump_each:
   # cvalue:
@@ -63,8 +63,6 @@
   b1 ∈ {0; 1}
   b2 ∈ {0; 1}
   scalar ∈ UNINITIALIZED
-  # equality:
-  {k = ((i - j) + 1) + j}
   # symbolic-locations:
   V: {[ t[i] -> [-2147483648..2147483647]
         t[i] / i -> [-2147483648..2147483647]
@@ -82,6 +80,8 @@
         j -> {i - j}
         k -> {t[k - 1]}
         t -> {t[i], t[i] / i, t[k - 1]} ]}
+  # equality:
+  {k = ((i - j) + 1) + j}
   # octagon:
   {[ i + j ∈ [11..309]
      j + k ∈ [12..310]
@@ -96,15 +96,6 @@
          b1 -> {0; 1}
          b2 -> {0; 1} ]}]
   
-  # sign:
-  {[ a -> +
-     i -> +
-     j -> +
-     r -> 0+ ]}
-  # bitwise:
-  a[bits 0 to 2] ∈ {0}
-   [bits 3 to 3] ∈ {1}
-   [bits 4 to 31] ∈ {0}
   # multidim:
   ({[ a -> ({8}, {})
       i -> ([1..99], {t})
@@ -121,6 +112,15 @@
       b2 -> ({0; 1}, {})
       scalar -> (UNINITIALIZED, {}) ]},
      None)
+  # bitwise:
+  a[bits 0 to 2] ∈ {0}
+   [bits 3 to 3] ∈ {1}
+   [bits 4 to 31] ∈ {0}
+  # sign:
+  {[ a -> +
+     i -> +
+     j -> +
+     r -> 0+ ]}
   ==END OF DUMP==
 [eva] domains.i:52: Dumping state in file 'domains_dump_0'
 [eva] domains.i:57: 
@@ -129,13 +129,13 @@
                      [bits 8 to 15] ∈ {42}
                      [bits 16 to 31]# ∈ {65537}%32, bits 16 to 31 
                      This amounts to: {76289}
-           # equality: 
            # symbolic-locations: (not implemented)
+           # equality: 
            # octagon: (not implemented)
            # gauges: (not implemented)
-           # sign: -0+
-           # bitwise: (not implemented)
            # multidim: T
+           # bitwise: (not implemented)
+           # sign: -0+
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

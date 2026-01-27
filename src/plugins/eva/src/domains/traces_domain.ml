@@ -1302,5 +1302,4 @@ let registered =
   and descr =
     "Builds an over-approximation of all the traces that lead to a statement."
   in
-  Abstractions.Domain.register ~name ~descr ~priority:2 ~experimental:true
-    (module D)
+  Abstractions.Domain.register ~name ~descr ~experimental:true (module D)

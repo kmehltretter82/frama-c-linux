@@ -157,8 +157,9 @@ let descr =
 
 (* Registration of the Numerors abstract domain and its reduced product. *)
 let registered =
-  let name = "numerors" and experimental = true in
+  let name = "numerors" in
   let module Name = (struct let name = name end) in
   let module Domain = Simple_memory.Make_Domain (Name) (Value) in
   Abstractions.Hooks.register (fun (module A) -> (module Reduce_Cast (A))) ;
-  Abstractions.Domain.register ~name ~experimental ~descr (module Domain)
+  Abstractions.Domain.register ~name ~descr ~experimental:true ~priority:5
+    (module Domain)

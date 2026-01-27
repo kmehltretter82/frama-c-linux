@@ -635,4 +635,4 @@ let registered =
     "Infers values of symbolic locations represented by imprecise lvalues, \
      such as t[i] or *p when the possible values of [i] or [p] are imprecise."
   in
-  Abstractions.Domain.register ~name ~descr ~priority:7 (module D)
+  Abstractions.Domain.register ~name ~descr ~priority:9 (module D)

@@ -1279,4 +1279,4 @@ let registered =
     "Infers linear inequalities between the variables modified within a loop \
      and a special loop counter."
   in
-  Abstractions.Domain.register ~name ~descr ~priority:6 (module D)
+  Abstractions.Domain.register ~name ~descr ~priority:8 (module D)

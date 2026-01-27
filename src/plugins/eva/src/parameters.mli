@@ -162,7 +162,7 @@ val change_correctness: unit -> unit
 val register_builtin: string -> unit
 
 (** Registers available domain names for the -eva-domains option. *)
-val register_domain: name:string -> descr:string -> unit
+val register_domain: name:string -> descr:string -> priority:int -> unit
 
 (** Annotation Generator *)
 
