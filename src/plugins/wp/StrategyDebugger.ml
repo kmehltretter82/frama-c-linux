@@ -72,7 +72,8 @@ struct
     let length = (snd loc).pos_cnum - offset in
     `Assoc [ "offset", `Int offset ; "length", `Int length ]
 
-  let of_json _ = failwith "Wp.StrategyDebugger.Range"
+  let of_json _ =
+    failwith "Wp.StrategyDebugger.Range" [@coverage off]
 end
 
 module Target : Data.S with type t = Ptip.target =
@@ -97,7 +98,8 @@ struct
       "term" , WpTipApioTerm.to_json term ;
     ]
 
-  let of_json _ = failwith "Wp.StrategyDebugger.Target"
+  let of_json _ =
+    failwith "Wp.StrategyDebugger.Target" [@coverage off]
 end
 
 module Field : Data.S with type t = field =
@@ -123,7 +125,8 @@ struct
       "target" , Target.to_json fd.target ;
     ]
 
-  let of_json _ = failwith "Wp.StrategyDebugger.Field"
+  let of_json _ =
+    failwith "Wp.StrategyDebugger.Field" [@coverage off]
 end
 
 module Fields = Data.Jlist(Field)
@@ -162,7 +165,8 @@ struct
       "range" , RangeOpt.to_json diag.location ;
     ]
 
-  let of_json _ = failwith "Wp.StrategyDebugger.Diag"
+  let of_json _ =
+    failwith "Wp.StrategyDebugger.Diag" [@coverage off]
 end
 
 module Diagnostics = Data.Jlist(Diagnostic)
@@ -185,7 +189,8 @@ struct
       "fields", Fields.to_json alt.fields ;
     ]
 
-  let of_json _ = failwith "Wp.StrategyDebugger.Alternative_result"
+  let of_json _ =
+    failwith "Wp.StrategyDebugger.Alternative_result" [@coverage off]
 end
 
 module Alternatives = Data.Jlist(Alternative)
@@ -440,5 +445,144 @@ let () =
       let node = get_node rq in
       debug text ?node ()
     end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Tests                                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
+(* These tests do not cover *)
+
+module Test =
+struct
+  [@@@ coverage off]
+
+  (* We ignore locations and targets that are too fragile. *)
+  let equal_diagnostic d1 d2 =
+    let r = d1.severity = d2.severity in
+    if r then String.equal d1.message d2.message else r
+
+  let equal_field f1 f2 =
+    (* Fast enough for testing. *)
+    let l1 = [ f1.label ; f1.title ; f1.value ; f1.debug ] in
+    let l2 = [ f2.label ; f2.title ; f2.value ; f2.debug ] in
+    List.equal String.equal l1 l2
+
+  let equal_alternative a1 a2 =
+    let r = List.equal equal_diagnostic a1.diagnostic a2.diagnostic in
+    if r then List.equal equal_field a1.fields a2.fields
+    else r
+
+  let equal_alternatives l1 l2 = List.equal equal_alternative l1 l2
+
+  let error = error ~loc:Cil_datatype.Location.unknown
+  let ignored = ignored ~loc:Cil_datatype.Location.unknown
+  let valid = valid ~loc:Cil_datatype.Location.unknown
+
+  let debug ?node content () =
+    let res = debug ?node content () in
+    ignore @@ Alternatives.to_json res ; (* check that it does not fail only *)
+    res
+end
+
+let%test "Empty alternatives" =
+  let content = {||} in
+  let alts = Test.debug content () in
+  let expected = [] in
+  Test.equal_alternatives alts expected
+
+let%test "Silently ignore default" =
+  let content = {|\default|} in
+  let alts = Test.debug content () in
+  let expected = [] in
+  Test.equal_alternatives alts expected
+
+let%test "Recursion (ignored)" =
+  let content = {|name: name|} in
+  let alts = Test.debug content () in
+  let ignored = Test.ignored ~reason:"Debugging is not recursively applied" in
+  let expected = [result [ignored]] in
+  Test.equal_alternatives alts expected
+
+let%test "Syntax error: unexpected end" =
+  let content = {|\tactic(|} in
+  let alts = Test.debug content () in
+  let error = Test.error ~message:"unexpected end of strategy" in
+  let expected = [result [error]] in
+  Test.equal_alternatives alts expected
+
+let%test "Syntax error: unexpected token" =
+  let content = {|name: +,|} in
+  let alts = Test.debug content () in
+  let error = Test.error ~message:"unexpected token \",\"" in
+  let expected = [result [error]] in
+  Test.equal_alternatives alts expected
+
+let%test "Syntax error: wide strings" =
+  let content = {|L"name": a|} in
+  let alts = Test.debug content () in
+  let error = Test.error ~message:"Wide strings are not allowed as labels." in
+  let expected = [result [error]] in
+  Test.equal_alternatives alts expected
+
+let%test "Lexer error" =
+  let content = {|name: */|} in
+  let alts = Test.debug content () in
+  let error = Test.error ~message:"lexical error, unexpected block-comment closing" in
+  let expected = [result [error]] in
+  Test.equal_alternatives alts expected
+
+let%test "Unexisting strategy" =
+  let content = {|name: unexisting|} in
+  let alts = Test.debug content () in
+  let error = Test.error ~message:"Strategy 'unexisting' undefined (skipped)." in
+  let expected = [result [error]] in
+  Test.equal_alternatives alts expected
+
+let%test "Existing strategy" = true (* cannot be easily tested *)
+
+let%test "Unexisting deprecated strategy" =
+  let content = {|\auto("unexisting")|} in
+  let alts = Test.debug content () in
+  let error = Test.error ~message:"Auto-Strategy 'unexisting' not found (skipped)." in
+  let expected = [result [error]] in
+  Test.equal_alternatives alts expected
+
+let%test "Existing deprecated strategy" =
+  let content = {|\auto("wp:bitrange")|} in
+  let alts = Test.debug content () in
+  let ignored = Test.ignored ~reason:"Debugging is not recursively applied" in
+  let expected = [result [ignored]] in
+  Test.equal_alternatives alts expected
+
+let%test "Unexisting provers" =
+  let content = {|\prover("alt-ergo", "fake", "other")|} in
+  let alts = Test.debug content () in
+  let unknown_prover name =
+    Test.error
+      ~message:(Format.asprintf "Prover '%s' not found (skipped)." name)
+  in
+  let expected = [result @@ List.map unknown_prover [ "fake" ; "other" ]] in
+  Test.equal_alternatives alts expected
+
+let%test "Existing provers" =
+  let content = {|\prover("alt-ergo")|} in
+  let alts = Test.debug content () in
+  let ignored = Test.ignored ~reason:"Debugging does not execute provers" in
+  let expected = [result [ignored]] in
+  Test.equal_alternatives alts expected
+
+let%test "Basic type error in pattern" =
+  let content = {|\tactic("Wp.range", \pattern( (0..x) ))|} in
+  let alts = Test.debug content () in
+  let error = Test.error ~message:"Invalid bound (int expected)" in
+  let expected = [result [error]] in
+  Test.equal_alternatives alts expected
+
+let%test "Syntactically correct tactic" =
+  let content = {|\tactic("Wp.range", \pattern(_))|} in
+  let alts = Test.debug content () in
+  let valid = Test.valid ~message:"Valid tactic (syntax only)" in
+  let expected = [result [valid]] in
+  Test.equal_alternatives alts expected
 
 (* -------------------------------------------------------------------------- *)
