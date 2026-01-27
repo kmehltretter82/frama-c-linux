@@ -491,10 +491,6 @@ module Macros = struct
     in
     StringMap.empty
     |> deprecate "PTEST_RESULT" "Please use PTEST_RESULT_DIR instead" `Fail
-    |> deprecate "PTEST_SCRIPT"
-      "Please use PTEST_MODULE macro instead (or MODULE: directive instead of \
-       SCRIPT:)"
-      `Continue
 
   let warn_if_deprecated file macro =
     try
@@ -604,7 +600,6 @@ module Macros = struct
         "PTEST_DEPS",   "";
         "PTEST_LIBS",   "";
         "PTEST_MODULE", "";
-        "PTEST_SCRIPT", "";
         "PTEST_PLUGIN", "";
         "PTEST_LIBRARY", "";
         "PTEST_ENABLED_IF", "true";
@@ -1027,11 +1022,6 @@ end = struct
          let s = Macros.expand ~file current.dc_macros s in
          { current with dc_exit_code = Some s });
 
-      "GCC",
-      (fun ~drop:_ ~file ~dir:_ _ acc ->
-         Format.eprintf "%s: GCC directive (DEPRECATED)@." file;
-         acc);
-
       "COMMENT",
       (fun ~drop:_ ~file:_ ~dir:_ _ acc -> acc);
 
@@ -1051,7 +1041,6 @@ end = struct
       "DEPS", config_deps;
       "ENABLED_IF", config_enabled_if;
       "MODULE", config_module "PTEST_MODULE";
-      "SCRIPT", config_module "PTEST_SCRIPT";
       "PLUGIN", config_plugin;
       "LIBRARY", config_library;
 
