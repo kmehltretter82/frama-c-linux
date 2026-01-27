@@ -193,6 +193,7 @@ Ivette.registerComponent({
   id: 'fc.wp.strategy-debugger',
   label: 'WP Strategy Debugger',
   title: 'WP Strategy Debugger',
+  help: 'wp-strat-debug',
   children: <StrategyDebugger />,
 });
 
