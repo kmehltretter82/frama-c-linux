@@ -927,7 +927,7 @@ module GlobalVars = struct
       ~name:"type"
       ~descr:(Md.plain "Type")
       ~data:(module Jstring)
-      ~get:(fun vi -> Rich_text.sprintf "%a" Printer.pp_typ vi.vtype);
+      ~get:(fun vi -> Rich_text.sprintf "%a" PrinterTag.pp_typ vi.vtype);
     States.column model
       ~name:"stringLiteral"
       ~descr:(Md.plain "Does the variable represent a string literal?")
@@ -1097,12 +1097,12 @@ let () = Information.register
     ~label:"Type"
     ~title:"Type of C/ACSL expression"
     begin fun fmt loc ->
-      let open Printer in
       match loc with
-      | PExp (_, _, e) -> pp_typ fmt (Cil.typeOf e)
-      | PLval (_, _, lval) -> pp_typ fmt (Cil.typeOfLval lval)
-      | PTermLval(_,_,_,lv) -> pp_logic_type fmt (Cil.typeOfTermLval lv)
-      | PVDecl (_,_,vi) -> pp_typ fmt vi.vtype
+      | PExp (_, _, e) -> PrinterTag.pp_typ fmt (Cil.typeOf e)
+      | PLval (_, _, lval) -> PrinterTag.pp_typ fmt (Cil.typeOfLval lval)
+      | PVDecl (_, _, vi) -> PrinterTag.pp_typ fmt vi.vtype
+      | PTermLval (_, _, _, tlval) ->
+        PrinterTag.pp_logic_type fmt (Cil.typeOfTermLval tlval)
       | _ -> raise Not_found
     end
 
@@ -1114,14 +1114,7 @@ let () = Information.register
       match loc with
       | PType ({ tnode = TNamed _ } as ty)
       | PGlobal (GType({ ttype = ty },_)) ->
-        begin
-          let tdef = Ast_types.unroll ty in
-          match Printer_tag.definition_of_type tdef with
-          | Some marker ->
-            let tag = Marker.index marker in
-            Format.fprintf fmt "@{<%s>%a@}" tag Printer.pp_typ tdef
-          | None -> PrinterTag.pp_typ fmt tdef
-        end
+        PrinterTag.pp_typ fmt (Ast_types.unroll ty)
       | _ -> raise Not_found
     end
 
