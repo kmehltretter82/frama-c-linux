@@ -13,11 +13,8 @@
   Given arguments:
          open(char const *, int, char const *)
 [kernel:variadic] open_wrong.c:13: 
-  Fallback translation of call open to a call to the specialized version open_fallback_1.
+  Fallback translation of call open to a call to the specialized version open_fallback_1. Generating default assigns that may be inaccurate.
 [eva] Analyzing a complete application starting at main
-[kernel:annot:missing-spec] open_wrong.c:13: Warning: 
-  Neither code nor specification for function open_fallback_1, generating
-  default assigns. See -generated-spec-* options for more info.
 [eva] using specification for function open
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

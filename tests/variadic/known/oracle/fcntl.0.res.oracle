@@ -20,7 +20,7 @@
   Given arguments:
          fcntl(int, int, int, int)
 [kernel:variadic] fcntl.c:16: 
-  Fallback translation of call fcntl to a call to the specialized version fcntl_fallback_1.
+  Fallback translation of call fcntl to a call to the specialized version fcntl_fallback_1. Generating default assigns that may be inaccurate.
 [kernel:variadic] fcntl.c:20: 
   Translating call to the specialized version fcntl(int, int).
 [kernel:variadic] fcntl.c:24: 
@@ -34,22 +34,16 @@
   Given arguments:
          fcntl(int, int, double)
 [kernel:variadic] fcntl.c:28: 
-  Fallback translation of call fcntl to a call to the specialized version fcntl_fallback_2.
+  Fallback translation of call fcntl to a call to the specialized version fcntl_fallback_2. Generating default assigns that may be inaccurate.
 [eva] Analyzing a complete application starting at main
 [eva] using specification for function __va_fcntl_void
 [eva] using specification for function __va_fcntl_int
 [eva] using specification for function __va_fcntl_flock
-[kernel:annot:missing-spec] fcntl.c:16: Warning: 
-  Neither code nor specification for function fcntl_fallback_1, generating
-  default assigns. See -generated-spec-* options for more info.
 [eva] using specification for function fcntl
 [eva:alarm] fcntl.c:20: Warning: 
   function __va_fcntl_void: precondition 'cmd_has_void_arg' got status invalid.
 [eva:alarm] fcntl.c:24: Warning: 
   function __va_fcntl_flock: precondition 'cmd_as_flock_arg' got status invalid.
-[kernel:annot:missing-spec] fcntl.c:28: Warning: 
-  Neither code nor specification for function fcntl_fallback_2, generating
-  default assigns. See -generated-spec-* options for more info.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   fl ∈ [--..--] or UNINITIALIZED
