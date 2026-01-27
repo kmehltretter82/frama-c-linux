@@ -359,7 +359,8 @@ let resolve_strategy name =
   find name.value
 
 let resolve_auto name =
-  Some (Strategy.lookup ~id:name.value)
+  try Some (Strategy.lookup ~id:name.value)
+  with Not_found -> None
 
 let resolve_prover name =
   VCS.parse_prover name.value
