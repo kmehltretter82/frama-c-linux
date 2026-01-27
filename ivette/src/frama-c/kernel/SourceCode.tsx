@@ -165,7 +165,7 @@ export default function SourceCode(): JSX.Element {
   const isTop = isToplevelDecl(kind);
   React.useEffect(() => {
     if (server !== 'ON') setFloc(undefined);
-    else setFloc(sloc);
+    else if (sloc !== undefined) setFloc(sloc);
   }, [sloc, server]);
   const file = floc?.file;
   const filename = floc?.base;
