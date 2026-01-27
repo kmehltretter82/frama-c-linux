@@ -412,7 +412,10 @@ export function StrategyDebugger(props: PatternDebuggerProps): JSX.Element {
         decorations={decorations}
       />
       <Vbox style={{ flex: 1 }}>
-        <Label display={!alternatives.length} label="No selection" />
+        <Label
+          display={!alternatives.length}
+          label={strategy === '' ? "No strategy" : "No selection"}
+        />
         <Hbox display={alternatives.length > 1} className="labview-titlebar" >
           <IconButton
             icon={'ANGLE.LEFT'}
