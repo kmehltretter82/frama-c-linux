@@ -7,218 +7,184 @@
 (**************************************************************************)
 
 (* Notations and conventions :
-   - I is the identity matrix ;
-   - A is the filter's state matrix ;
-   - B is the filter's measure matrix ;
-   - S is the filter's shift ;
-   - ε is an infinite sequence of measures ;
-   - C is the center of the measures' box ;
-   - R is the radius of the measures' box ;
-   - Everytime a radius is mentionned, it is always supposed all positive ;
-   - |.| is the componentwise absolute value on matrices and vectors. *)
+ * - I is the identity matrix ;
+ * - A is the system's state matrix ;
+ * - B is the system's input matrix ;
+ * - S is the system's shift ;
+ * - μ is an infinite sequence of inputs ;
+ * - C is the center of the inputs ball ;
+ * - R is the radius of the inputs ball ;
+ * - Everytime a radius is mentionned, it is always supposed all positive ;
+ * - |.| is the componentwise absolute value on matrices and vectors. *)
 
 module Make (K : Field.S) = struct
 
+  (** Preliminary declarations **)
+
   module Linear = Linear.Space (K)
+  module Ball = Ball.Make (K)
+  open Option.Operators
   open Linear
 
-  (* A 'n box is a 'n vector of intervals that, instead of being described as
-     'n intervals, is described as a 'n vector center and a 'n vector radius. *)
-  type 'n box = { center : 'n vector ; radius : 'n vector }
-
-  (* Utilitary functions on boxes. The radius is forced to be all positive by
-     the box constructor. Inclusion is componentwise. *)
-  module Box = struct
-    let ( < ) = Matrix.all_components_lower_than
-    let make center radius = { center ; radius = Matrix.abs radius }
-    let shift delta box = { box with center = Matrix.(box.center + delta) }
-    let lower { center ; radius } = Matrix.(center - radius)
-    let upper { center ; radius } = Matrix.(center + radius)
-    let is_included l r = lower r < lower l && upper l < upper r
-  end
+  type 'n ball = 'n Ball.t =
+    { center : 'n vector ; radius : 'n vector }
 
 
+  (** Types specifications **)
 
-  (* A filter is composed of an initial state, a state related structure and
-     a measures related structure. *)
-  type ('n, 'm) filter =
-    { initial : 'n vector ; state : 'n state ; measure : ('n, 'm) measure }
+  (* A LTI system full specification. *)
+  type ('n, 'm) system =
+    { state_matrix  : ('n, 'n) matrix
+    ; input_matrix  : ('n, 'm) matrix
+    ; input_space   : 'm ball
+    ; shift         : 'n vector
+    ; initial_state : 'n vector
+    }
 
-  (* State related data are the filter's shift and its state matrix. *)
-  and 'n state =
-    { shift : 'n vector ; matrix : ('n, 'n) matrix }
+  (* Knowledge on LTI systems shared accross the module's functions:
+   * - [n] is the system's order ;
+   * - [center] corresponds to the constant part added at each iteration
+   *   and is computed as {m B C + S} ;
+   * - [radius] is simply {m |R|}. *)
+  type ('n, 'm) knowledge =
+    { n : 'n Nat.nat ; center : 'n vector ; radius : 'm vector }
 
-  (* Measures related data are the measure space's box and the measure matrix. *)
-  and ('n, 'm) measure =
-    { space : 'm box ; matrix : ('n, 'm) matrix }
+  (* Information on an iteration {m n} of the system:
+   * - [state_power] corresponds to the computation {m A^n}.
+   * - [perturbations] corresponds to the maximal cumulative contributions of
+   *   all previous inputs, which is a ball with center and radius computed
+   *   respectively as {m ∑ A^t (B C + S)} and {m ∑ |A^t B| |R|},
+   *   where {m t} is between {m 0} and {m n - 1}. *)
+  type 'n iteration =
+    { state_power : ('n, 'n) matrix ; perturbations : 'n ball }
 
-  (* Filter's constructor. *)
-  let create ~initial ~shift
-      ~measure_center ~measure_radius
-      ~measure_matrix ~state_matrix =
-    let state = { shift ; matrix = state_matrix } in
-    let space = Box.make measure_center measure_radius in
-    let measure = { space ; matrix = measure_matrix } in
-    { initial ; state ; measure }
+  (* Behavior of the system, described as a transition phase of unrolled
+   * iterations, and a permanent phase described by a unique overapproximated
+   * ball. The spectral exponent used to computed the permanent abstraction
+   * is also given. *)
+  type 'n behavior =
+    { transition : 'n ball list ; permanent : 'n ball }
 
 
+  (** Behavior computation **)
 
-  (* Let binding operator memoizing sequences' elements. *)
-  let ( let@ ) seq f = f (Seq.memoize seq)
+  (* Computes the limit center. The computation is lazy for two reasons:
+   * - The result is valid iif {m ρ(A) < 1}, which will eventually be
+   *   proven through the limit computation.
+   * - Proving {m ρ(A) < 1} comes down to finding a {m q ∈ ℕ} such
+   *   as {m ||A^q||₁ < 1}. The limit center can then be computed
+   *   as {m (I - A^q)^(-1) (∑ A^t (B C + S))} for {m t} between {m 0}
+   *   and {m q - 1}. But, this computation's result is the same for
+   *   all {m q} once the necessary condition is proven, so we only
+   *   need to compute it as {m (I - A)^(-1) (B C + S)}.
+   * Relying on lazyness is then a simple way to wait for a proof of
+   * the necessary condition {m ρ(A) < 1} and then compute the
+   * limit center only once. *)
+  let compute_center_limit system knowledge = Lazy.from_fun @@ fun () ->
+    let+ limit = Matrix.(inverse (id knowledge.n - system.state_matrix)) in
+    Matrix.(limit * knowledge.center)
 
-  (* Returns the first non none element of a sequence, if any. Do not terminate
-     on an infinite sequence of nones. *)
-  let first s = Option.map fst Seq.(filter_map Datatype.identity s |> uncons)
+  (* Computes the systems iterations as a memoized infinite sequence
+   * of [iteration] structures. *)
+  let compute_iterations s { n ; center ; radius } =
+    let zero = { state_power = Matrix.id n ; perturbations = Ball.zero n } in
+    let compute_next_iteration { state_power ; perturbations } =
+      let center = Matrix.(state_power * center) in
+      let radius = Matrix.(abs (state_power * s.input_matrix) * radius) in
+      let perturbations = Ball.(perturbations + make center radius) in
+      (* Updating [state_power] at the end as [perturbations] is the sum
+       * of all *previous* iterations contributions. *)
+      let state_power = Matrix.(s.state_matrix * state_power) in
+      { state_power ; perturbations }
+    in Seq.(iterate compute_next_iteration zero |> memoize)
 
-  (* Returns the first window satisfying a given predicate until completed
-     if any. For instance, using the predicate [x < 3] and the completion
-     condition [start = length] on the sequence [5, 1, 4, 2, 3, 1, 4, ...],
-     the returned window will be { start = 3 ; length = 3 }. The function
-     stops the sequence evaluation as soon as a valid window is found.
-     Do not terminate on a infinite sequence with no valid window. *)
-  type window = { start : int ; length : int }
-  let find_window pred completed seq =
-    let exception Found of window in
-    let incr w = { w with length = w.length + 1 } in
-    let search window i data =
+  (* Computes a ball overapproximating the system's behavior as the iteration
+   * goes to infinity. The center of this ball is computed as described in
+   * the [compute_center_limit] function. Its radius is an overapproximation
+   * of the supremum for all possible input sequence {m μ} of the limit of
+   * {m ∑ A^t B μ_(n - 1 - t)} with {m t} between {m 0} and {n - 1}.
+   * The computation is done as follows:
+   * - To prove that {m ρ(A) < 1}, the fonction searches for a {m q ∈ ℕ}
+   *   such as {m ||A^q||₁ < 1}.
+   * - The infinite sum is then divided in two: a finite sum of the {m q}
+   *   first elements and the infinite reminding sum. Indeed, as {m q} grows,
+   *   the finite sum becomes a better and better underapproximation of the
+   *   limit radius, and the infinite reminder becomes smaller and smaller.
+   * - The infinite reminder is approximated by the computation
+   *   {m (I - |A^q|)^(-1) |A^q| (∑ |A^t B| |R|)}.
+   * - The function checks that the overapproximated reminder does not count
+   *   for more than a specified percentage of the limit ball's radius. *)
+  let limit_behavior s ({ n ; _ } as knowledge) error_target iterations =
+    let center_limit = compute_center_limit s knowledge in
+    let ( let<?> ) b f = if b then f () else None in
+    let compute_limit q { state_power ; perturbations } =
+      let () = Async.yield () in
+      let<?> () = K.(Matrix.norm_one state_power < one) in
+      let abs_power = Matrix.abs state_power in
+      let* center_limit = Lazy.force center_limit in
+      let* limit = Matrix.(inverse (id n - abs_power)) in
+      let underapprox = Ball.make center_limit perturbations.radius in
+      let reminder = Matrix.(limit * abs_power * perturbations.radius) in
+      let overapprox = Ball.(underapprox + make (Vector.zero n) reminder) in
+      let error = Matrix.(K.of_int 100 ** reminder / overapprox.radius) in
+      let<?> () = K.(Vector.norm error < error_target) in
+      Some (q, overapprox)
+    in
+    (* The sequence of limit overapproximations converges to the actual one,
+     * but its not monotonous, and local minimums that are too precise to
+     * work with may be there. To avoid this, we look for the worst
+     * overapproximation in the first 10 candidates. *)
+    let limits = Seq.(mapi compute_limit iterations |> filter_map Fun.id) in
+    let limits = Seq.take 10 limits in
+    let worst acc (q, candidate) =
+      let () = Async.yield () in
+      match acc with
+      | None -> Some (q, candidate)
+      | Some (q', worst) ->
+        if Ball.is_included worst candidate
+        then Some (q, candidate)
+        else Some (q', worst)
+    in Seq.fold_left worst None limits
+
+  (* Searches for the first valid unrolling stop point for a given [limit]
+   * found at the exponent [spectral]. A stop point [k] is valid if the
+   * system behavior is included in [limit] for iteration [k] and for
+   * the [spectral] following iterations. *)
+  let search_unrolling_stop spectral limit iterations =
+    let exception Found of int in
+    let in_limit abst = Ball.is_included abst limit in
+    let search window n abst =
       let () = Async.yield () in
       match window with
-      | None -> if pred data then Some { start = i ; length = 1 } else None
-      | Some window when completed window -> raise (Found window)
-      | Some window -> if pred data then Some (incr window) else None
+      | None -> if in_limit abst then Some (n, 1) else None
+      | Some (start, l) when l = spectral -> raise (Found start)
+      | Some (start, l) -> if in_limit abst then Some (start, l + 1) else None
     in
-    try Seq.fold_lefti search None seq |> ignore ; None
-    with Found window -> Some window
+    try ignore (Seq.fold_lefti search None iterations) ; None
+    with Found stop -> Some (Seq.take stop iterations |> List.of_seq)
 
+  (* Computation of the system's behavior. No termination guarantee. *)
+  let behavior_unbounded ~error_target (s : ('n, 'm) system) =
+    let n = Vector.size s.initial_state in
+    let radius = Matrix.(abs s.input_space.radius) in
+    let center = Matrix.(s.input_matrix * s.input_space.center + s.shift) in
+    let knowledge = { n ; radius ; center } in
+    let iterations = compute_iterations s knowledge in
+    let* spectral, limit = limit_behavior s knowledge error_target iterations in
+    let reminder it = Matrix.(it.state_power * s.initial_state) in
+    let abstraction it = Ball.(constant (reminder it) + it.perturbations) in
+    let iterations = Seq.map abstraction iterations in
+    let+ transition = search_unrolling_stop spectral limit iterations in
+    { transition ; permanent = limit }
 
-
-  (* This function performs a dichotomy search in the interval [0 .. 1] for
-     as long as the given [duration], evaluating the given [compute] function
-     at each step and returning the last result found. The first computed
-     value is with the input one, then a half if the computation lead to
-     a result, and so on and so forth. The implementation relies on the
-     [Async] module and thus should be portable on Windows. *)
-  let rec timed_dichotomy compute duration =
+  (* Behavior computation with timeout mecanism. *)
+  let behavior ?(timeout = 1.0) ~completion_target =
     let start = (Unix.times ()).tms_utime in
     let elapsed_time () = (Unix.times ()).tms_utime -. start in
-    let cancel () = if elapsed_time () > duration then Async.cancel () in
-    let start () = try compute K.one with Async.Cancel -> None in
-    let job () = start () |> cancelable_dichotomy compute K.zero K.one in
-    Async.with_progress cancel job ()
-
-  (* Each dichotomy step is wrapped in a try-with that returns the last known
-     result if the exception [Async.Cancel] is catched. *)
-  and cancelable_dichotomy compute lower upper acc =
-    try dichotomy_step compute lower upper acc
-    with Async.Cancel -> acc
-
-  (* At each step, if the computation leads to a result for the half-point
-     candidate, the next step is perform on the lower half interval.
-     Conservely, if no result is obtained, the next step is perform on the
-     upper half interval. *)
-  and dichotomy_step compute lower upper acc =
-    let current = K.((upper + lower) / (of_int 2)) in
-    let () = Async.yield () in
-    match compute current with
-    | None -> cancelable_dichotomy compute current upper acc
-    | acc  -> cancelable_dichotomy compute lower current acc
-
-
-
-  (* Let n ∈ ℕ, [state_power] be A^n and [measure] be the cumulated
-     overapproximation of the n first measures represented as a box
-     of center γ and of radius σ.
-     The result of [limit state_power measure] is, assuming that the
-     norm one of A^n is strictly lower than one, an overapproximation
-     of the permanent behavior computed as the following box :
-     { center = (I - A^n)^{-1} γ ; radius = (I - |A^n|)^{-1} σ }. *)
-  let limit state_power measure =
-    let open Option.Operators in
-    let norm = Matrix.norm_one state_power in
-    let n, _ = Matrix.dimensions state_power in
-    let* state_power = if K.(norm < one) then Some state_power else None in
-    let* center_shift = Matrix.(id n - state_power |> inverse) in
-    let+ radius_shift = Matrix.(id n - abs state_power |> inverse) in
-    let center = Matrix.(center_shift * measure.center) in
-    let radius = Matrix.(radius_shift * measure.radius) in
-    Box.make center radius
-
-  (* Search for the first valid unrolling stop point, returning it along
-     the permanent phase's overapproximation for which the unrolling stop
-     point is valid. *)
-  let stop_point state_powers measures abstractions max_unrolling threshold =
-    let open Option.Operators in
-    let below norm = K.(norm < threshold) in
-    (* Compute the sequence of ||A^q|| here instead of in the map_fold to
-       memoize the results. Not a huge optimization, but an easy one. *)
-    let@ norms = Seq.map Matrix.norm_one state_powers in
-    (* Simulate a map_fold using the three sequences and the iteration as
-       the propagated state. At each step, we thus check if the assumptions
-       on ||A^n|| is verified, compute the limit and check if we can find n
-       consecutive iterations that are included in the limit. We have to cut
-       the infinite sequence of abstractions here to ensure that we actually
-       try to unroll more. Indeed, there is examples where, for a given
-       iteration, there is no such window even if one can be found if we
-       unroll once more. *)
-    let folder (state_powers, measures, norms, spectral) =
-      let* state_power, state_powers = Seq.uncons state_powers in
-      let* measure, measures = Seq.uncons measures in
-      let* norm, norms = Seq.uncons norms in
-      let result =
-        if below norm && Seq.(take spectral norms |> for_all below) then
-          let* limit = limit state_power measure in
-          let completed window = spectral = window.length in
-          let is_included abstraction = Box.is_included abstraction limit in
-          let abstractions = Seq.take (spectral + max_unrolling) abstractions in
-          let+ window = find_window is_included completed abstractions in
-          window.start, limit
-        else None
-      in Some (result, (state_powers, measures, norms, spectral + 1))
-    in Seq.unfold folder (state_powers, measures, norms, 0) |> first
-
-
-
-  (* A filter behavior is described as a transition phase and a permanent
-     phase. The first one is a list of abstractions corresponding to the
-     unrolled iterations. The second is an overapproximation of the filter's
-     behavior up to infinity. *)
-  type 'n bounds = 'n vector Field.bounds
-  type 'n behavior = { transition : 'n bounds list ; permanent : 'n bounds }
-
-  (* Behavior computation. Comes down to build the needed sequences, then use
-     the timed dichotomic search to find the stop point and the limit. As the
-     infinite sequence of unrolled abstractions is needed to search for the
-     stop point, once it is found, we just have to gather the results. *)
-  let behavior ?(timeout = 1.0) ?(maximal_unrolling = 200) f =
-    let open Option.Operators in
-    let dim = Vector.size f.initial in
-    (* Sequence of all A^n. *)
-    let power = Matrix.( * ) f.state.matrix in
-    let@ state_powers = Seq.iterate power (Matrix.id dim) in
-    (* Sequence of all A^n × X0. *)
-    let reminder p = Matrix.(p * f.initial) in
-    let@ initial_state_reminder = Seq.map reminder state_powers in
-    (* Sequence of all ∑ A^t (B C + S) for t between 0 and n - 1. *)
-    let measure_center = Matrix.(f.measure.matrix * f.measure.space.center) in
-    let measure_center_shift = Matrix.(measure_center + f.state.shift) in
-    let next_center center p = Matrix.(center + p * measure_center_shift) in
-    let measures_center = Seq.scan next_center (Vector.zero dim) state_powers in
-    (* Sequence of all ∑ |A^t| |B| |R| for t between 0 and n - 1. *)
-    let delta = Matrix.(abs f.measure.matrix * abs f.measure.space.radius) in
-    let next_radius radius p = Matrix.(radius + abs p * delta) in
-    let measures_radius = Seq.scan next_radius (Vector.zero dim) state_powers in
-    (* Sequence of overapproximating boxes related to measures, i.e without
-       taking the initial state into account. *)
-    let@ measures = Seq.map2 Box.make measures_center measures_radius in
-    (* Sequence of complete overapproximations for each iterations, i.e
-       including the initial state contributions. *)
-    let@ abstractions = Seq.map2 Box.shift initial_state_reminder measures in
-    (* Dichotomic search of the stop point. *)
-    let search = stop_point state_powers measures abstractions in
-    let+ until, limit = timed_dichotomy (search maximal_unrolling) timeout in
-    (* Building the behavior data structure. *)
-    let bounds box = Field.{ lower = Box.lower box ; upper = Box.upper box } in
-    let transition = Seq.(take until abstractions |> map bounds) in
-    { transition = List.of_seq transition ; permanent = bounds limit }
+    let cancel () = if elapsed_time () > timeout then Async.cancel () in
+    Async.with_progress cancel @@ fun system ->
+    let error_target = K.of_float (100.0 -. completion_target) in
+    try behavior_unbounded ~error_target system
+    with Async.Cancel -> None
 
 end
