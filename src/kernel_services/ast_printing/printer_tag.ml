@@ -145,18 +145,23 @@ let loc_of_global_annotation = function
   | Dmodel_annot (_, loc) | Dextended (_, _, loc)
     -> loc
 
-let signature_of_declaration = function
-  | SEnum ei -> GEnumTagDecl(ei,Location.unknown)
-  | SComp ci -> GCompTagDecl(ci,Location.unknown)
-  | SType ti -> GType(ti,Location.unknown)
-  | SGlobal vi -> GVarDecl(vi,vi.vdecl)
-  | SFunction kf -> let vi = Kernel_function.get_vi kf in GVarDecl(vi,vi.vdecl)
-  | SGAnnot ga ->  GAnnot (ga, loc_of_global_annotation ga)
-
-let definition_of_declaration = function
+let global_of_declaration decl =
+  let global_type namespace name =
+    try Globals.Types.global namespace name
+    with Not_found -> Kernel.fatal "Unknown type %a" pp_declaration decl
+  in
+  match decl with
   | SGlobal vi -> Ast.def_or_last_decl vi
   | SFunction kf -> Kernel_function.get_global kf
-  | other -> signature_of_declaration other
+  | SType ti -> global_type Logic_typing.Typedef ti.torig_name
+  | SComp ci ->
+    let namespace = if ci.cstruct then Logic_typing.Struct else Union in
+    let name = if ci.corig_name <> "" then ci.corig_name else ci.cname in
+    global_type namespace name
+  | SEnum ei ->
+    let name = if ei.eorig_name <> "" then ei.eorig_name else ei.ename in
+    global_type Logic_typing.Enum name
+  | SGAnnot ga -> GAnnot (ga, loc_of_global_annotation ga)
 
 let pp_global_annotation_decl fmt = function
   | Dfun_or_pred (li, _) | Dinvariant (li, _) | Dtype_annot (li, _) ->
@@ -356,13 +361,14 @@ let declaration_of_localizable = function
   | PLval(None,_,_) | PExp(None,_,_)
   | PType _ -> None
 
-let definition_of_type t =
-  match t.tnode with
+let definition_of_type typ =
+  let global decl = Some (PGlobal (global_of_declaration decl)) in
+  match typ.tnode with
   | TVoid | TInt _ | TFloat _ | TPtr _
   | TArray _ | TFun _ | TBuiltin_va_list -> None
-  | TNamed ti -> Some (PGlobal(GType(ti,Location.unknown)))
-  | TComp  ci -> Some (PGlobal(GCompTag(ci,Location.unknown)))
-  | TEnum  ei -> Some (PGlobal(GEnumTag(ei,Location.unknown)))
+  | TNamed ti -> global (SType ti)
+  | TComp ci -> global (SComp ci)
+  | TEnum ei -> global (SEnum ei)
 
 let definition_of_localizable = function
   | PLval(kf,ki,(Var vi,NoOffset))
@@ -428,17 +434,11 @@ let name_of_localizable = function
   | PExp _ | PLval _ | PTermLval _ | PIP _
     -> None
 
-let loc_of_type space name =
-  try Global.loc @@ Globals.Types.global space name
-  with Not_found -> Location.unknown
-
 let loc_of_declaration = function
-  | SEnum ei -> loc_of_type Enum ei.ename
-  | SComp ci -> loc_of_type (if ci.cstruct then Struct else Union) ci.cname
-  | SType ti -> loc_of_type Typedef ti.tname
   | SGlobal vi -> vi.vdecl
   | SFunction kf -> Kernel_function.get_location kf
   | SGAnnot annot -> loc_of_global_annotation annot
+  | decl -> Global.loc (global_of_declaration decl)
 
 let kf_of_localizable = function
   | PLval (kf_opt, _, _)
@@ -511,9 +511,7 @@ let localizable_of_global g =
 let localizable_of_declaration = function
   | SFunction kf -> localizable_of_kf kf
   | SGlobal vi -> PVDecl(None,Kglobal,vi)
-  | SComp ci -> PType(Cil_const.mk_tcomp ci)
-  | SEnum ei -> PType(Cil_const.mk_tenum ei)
-  | SType ti -> PType(Cil_const.mk_tnamed ti)
+  | SComp _ | SEnum _ | SType _ as decl -> PGlobal (global_of_declaration decl)
   | SGAnnot ga -> PGlobal (GAnnot (ga, loc_of_global_annotation ga))
 
 (* -------------------------------------------------------------------------- *)

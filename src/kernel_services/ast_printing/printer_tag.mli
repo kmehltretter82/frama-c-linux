@@ -89,7 +89,7 @@ val loc_of_declaration : declaration -> location
 val name_of_declaration : declaration -> string
 val name_of_localizable : localizable -> string option
 
-val definition_of_declaration : declaration -> global
+val global_of_declaration : declaration -> global
 
 val localizable_of_kf : kernel_function -> localizable
 val localizable_of_global : global -> localizable

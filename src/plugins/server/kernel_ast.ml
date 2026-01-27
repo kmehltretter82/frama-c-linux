@@ -447,7 +447,7 @@ let () = Request.register ~package
     ~descr:(Md.plain "Prints an AST Declaration")
     ~signals:[ast_changed_signal]
     ~input:(module Decl) ~output:(module Jtext)
-    (fun d -> print_global_ast @@ Printer_tag.definition_of_declaration d)
+    (fun d -> print_global_ast @@ Printer_tag.global_of_declaration d)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Marker Attributes                                                  --- *)
