@@ -51,10 +51,11 @@ and add_exp (m: map) (s:stmt) (e:exp) : value =
     Memory.add_read rv (Lval(s,lv)) ;
     Memory.add_value rv @@ Cil.typeOfLval lv
 
-  | BinOp((PlusPI|MinusPI),p,k,_) ->
+  | BinOp((PlusPI|MinusPI),p,k,tr) ->
     add_value m s k ;
     let vp = add_exp m s p in
-    Memory.add_shift (pointer vp) (Exp(s,e)) ; vp
+    let te = Ast_types.pointed_type tr in
+    Memory.add_shift (pointer vp) (Exp(s,e)) te ; vp
 
   | UnOp(_,e,_) ->
     add_value m s e ; None
@@ -91,7 +92,7 @@ let rec add_init (m:map) (s:stmt) (acs:Access.acs) (lv:lval) (iv:init) =
 
   | SingleInit e ->
     let r = add_lval m s lv in
-    Memory.add_init r acs ;
+    Memory.add_init r acs @@ Cil.typeOfLval lv ;
     Option.iter (Memory.add_points_to r) (add_exp m s e)
 
   | CompoundInit(_,fvs) ->
@@ -165,7 +166,7 @@ let add_instr ~map ~stmt = function
 
   | Local_init(x,ConsInit (vf,args,kind), loc) ->
     let r = add_cvar map x in
-    Memory.add_init r (Lval (stmt,Cil.var x)) ;
+    Memory.add_init r (Lval (stmt,Cil.var x)) x.vtype ;
     Cil.treat_constructor_as_func
       begin fun _res fct args _loc ->
         add_function map stmt fct;

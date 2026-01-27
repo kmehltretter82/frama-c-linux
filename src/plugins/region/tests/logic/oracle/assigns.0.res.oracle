@@ -10,15 +10,15 @@
   R0004: -RW- __retres (int) 32b ;
   R0005: --W- \result (int) 32b ;
 [region] Function call_copy:
-  R0001: ---- a[…] b[…] 0b ;
+  R0001: ---- a b 320b ;
 [region] Function call_field:
   R0001: ---- s 320b { .f: R0002; #256b; } ;
   R0002: --W- (int *) 64b (*R0003) ;
-  R0003: ---- a[…] 0b ;
+  R0003: ---- a 32b ;
 [region:froms] assigns.i:8: Warning: 
   Missing \from in assigns to pointer location(s)
 [region] Function call_imprecise:
-  R0001: ---- B[…] 0b ;
+  R0001: ---- B 2048b ;
   R0002: -R-- k (int) 32b ;
   R0003: -RW- a (int *) 64b (*R0004) ;
   R0004: -R-- (int) 32b ;
@@ -27,7 +27,7 @@
 [region:froms] assigns.i:17: Warning: 
   Missing assigns \result \from for returned pointer
 [region] Function call_imprecise_result:
-  R0001: ---- B[…] 0b ;
+  R0001: ---- B 2048b ;
   R0002: -R-- k (int) 32b ;
   R0003: -RW- tmp (int *) 64b (*R0004) ;
   R0004: ---- 0b ;
@@ -40,7 +40,7 @@
 [region] Function call_range:
   R0001: ---- s 320b { #64b; .g: R0002[4]; } ;
   R0002: --W- (int *) 64b (*R0003) ;
-  R0003: ---- a[…] 0b ;
+  R0003: ---- a 32b ;
 [region:froms] assigns.i:21: Warning: 
   No pointer found in assigns-\from to pointer location(s)
 [region] Function call_suspiscious:
@@ -51,7 +51,7 @@
 [region] Function call_write:
   R0001: ---- a 320b { .f: R0002; .g: R0004[4]; } ;
   R0002: --W- (int *) 64b (*R0003) ;
-  R0003: ---- b[…] 0b ;
+  R0003: ---- b 32b ;
   R0004: --W- (int *) 64b (*R0003) ;
 [region] Function caller_result:
   R0001: -R-- B[64] (int) 32b ;

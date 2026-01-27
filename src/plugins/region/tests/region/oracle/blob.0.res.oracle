@@ -8,5 +8,5 @@
   R0002: ---- 0b ;
   R0003: I--- p (int *) 64b (*R0002) ;
 [region] Function var_blob:
-  R0001: ---- x[…] 0b ;
+  R0001: ---- x 32b ;
   R0002: I--- p (int *) 64b (*R0001) ;

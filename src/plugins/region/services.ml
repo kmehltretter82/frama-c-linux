@@ -124,16 +124,17 @@ struct
   let label (m: Memory.region) =
     let buffer = Buffer.create 4 in
     (* if m.singleton then Buffer.add_string buffer "!" ; *)
+    if m.inits <> [] then Buffer.add_char buffer 'I' ;
     if m.reads <> [] then Buffer.add_char buffer 'R' ;
     if m.writes <> [] then Buffer.add_char buffer 'W' ;
-    if m.pointed <> None then Buffer.add_char buffer '*'
-    else if m.reads <> [] || m.writes <> [] then
+    if m.pointed <> None then Buffer.add_string buffer "(*)"
+    else if m.inits <> [] || m.reads <> [] || m.writes <> [] then
       begin
         Buffer.add_char buffer '(' ;
         Buffer.add_char buffer @@ typs_to_char m.types ;
         Buffer.add_char buffer ')' ;
       end ;
-    Buffer.contents buffer
+    if Buffer.length buffer > 0 then Buffer.contents buffer else "…"
 
   let pp_typ_layout s0 fmt ty =
     let s = Memory.bitsSizeOf ty in
