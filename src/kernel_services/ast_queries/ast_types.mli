@@ -254,6 +254,11 @@ val is_wchar_array : typ -> bool
 (** True if the argument is a function type. *)
 val is_fun : typ -> bool
 
+(** True if the argument is a variadic function type.
+    @since Frama-C+dev
+*)
+val is_variadic : typ -> bool
+
 (** True if the argument is a function pointer type. *)
 val is_fun_ptr : typ -> bool
 

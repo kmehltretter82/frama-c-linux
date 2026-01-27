@@ -5,32 +5,25 @@ open Cil_types
    functions will be the .c files, and not the .h where assigns are missing.
 *)
 
-let is_known_variadic env kf =
-  let vi = Kernel_function.get_vi kf in
-  match Classify.classify env vi with
-  | Some _ -> true
-  | None -> false
+let is_known_variadic _env kf =
+  Kernel_function.get_vi kf
+  |> Classify.is_variadic_function
 
 let run () =
   let file = Ast.get () in
   let env = Environment.from_file file in
   let check_assigns kf acc =
-    let kf_name = Kernel_function.get_name kf in
-    if kf_name = "main" ||
-       is_known_variadic env kf
+    if is_known_variadic env kf
     then (* skip *) acc
     else
       let spec = Annotations.funspec kf in
-      let default = List.find_opt (fun b ->
-          b.b_name = Cil.default_behavior_name
-        ) spec.spec_behavior
-      in
       let loc = Kernel_function.get_location kf in
-      match default with
-      | None -> (kf_name, loc) :: acc
+      let name = Kernel_function.get_name kf in
+      match Cil.find_default_behavior spec with
+      | None -> (name, loc) :: acc
       | Some default ->
         if default.b_assigns = WritesAny then
-          (kf_name, loc) :: acc
+          (name, loc) :: acc
         else acc
   in
   let todo = Globals.Functions.fold check_assigns [] in

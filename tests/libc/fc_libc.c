@@ -206,6 +206,6 @@
 
 
 
-
+//@ assigns \nothing;
 void main() {
 }

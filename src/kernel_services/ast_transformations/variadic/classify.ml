@@ -155,10 +155,7 @@ let classify_std env vi = match vi.vname with
   (* Anything else *)
   | _ -> if is_frama_c_builtin vi then Builtin else Unknown
 
-let is_variadic_function vi =
-  match Ast_types.unroll_node vi.vtype with
-  | TFun (_, _, b) -> b
-  |  _ -> false
+let is_variadic_function vi = Ast_types.is_variadic vi.vtype
 
 let classify env vi =
   if is_variadic_function vi then begin
