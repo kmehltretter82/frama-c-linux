@@ -339,6 +339,7 @@ sig
   type source = [exp | `indirect of exp]
   val indirect: [< source] -> [> source]
   val assigns: [< exp] list -> [< exp | `indirect of [< exp]] list -> unit
+  val infer_assigns: unit -> unit (* Uses Infer_assigns.from_prototype *)
   val requires: [< exp] -> unit
   val ensures: [< exp] -> unit
 

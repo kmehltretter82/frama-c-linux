@@ -1397,10 +1397,17 @@ struct
     match (src :> source ) with
     | #exp as it | `indirect it -> `indirect it
 
+  let append_assigns new_assigns =
+    let b = current_behavior () in
+    let previous_assigns = match b.b_assigns with
+      | WritesAny -> []
+      | Writes l -> l
+    in
+    b.b_assigns <- Writes (previous_assigns @ new_assigns)
+
   let assigns dests sources =
     let open Cil_types in
-    let b = current_behavior ()
-    and restyp = get_return_type ()
+    let restyp = get_return_type ()
     and loc = current_loc () in
     let map_source src =
       match (src :> source) with
@@ -1415,11 +1422,14 @@ struct
     in
     let dests' = List.map map_dest dests
     and sources' = List.map map_source sources in
-    let previous = match b.b_assigns with
-      | WritesAny -> []
-      | Writes l -> l
-    and newones = List.map (fun dst -> dst, From sources') dests' in
-    b.b_assigns <- Writes (previous @ newones)
+    let new_assigns = List.map (fun dst -> dst, From sources') dests' in
+    append_assigns new_assigns
+
+  let infer_assigns () =
+    let fundec = get_owner ()
+    and b = current_behavior () in
+    let assigns = Infer_assigns.from_prototype_vi fundec.svar in
+    b.b_assigns <- Writes assigns
 
   let requires pred =
     let open Cil_types in
