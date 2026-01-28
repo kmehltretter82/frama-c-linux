@@ -16,6 +16,10 @@
 include Monad.S_with_product with type 'a t = 'a list
 include module type of Stdlib.List
 
+module Make_monadic_iterators (M : Monad.S) : Monad.Iterators
+  with type 'a iterable := 'a list
+   and type 'a monad := 'a M.t
+
 (** {2 Datatype functions } *)
 
 (** Compute a hash for the list given a hash for the elements.

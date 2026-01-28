@@ -226,30 +226,20 @@ module Make_based_on_map_with_product (M : Based_on_map_with_product) :
   S_with_product with type 'a t = 'a M.t
 
 
+(** {3 Monadic iterators signature}
 
-(** {3 Helpers on monadic nested structures}
-
-    Handling the interactions between monads and data structures like lists
-    can be difficult. To help alleviate this, functors are proposed that
-    build iterators and other helpers for some of those complex interactions. *)
-
-(** Make iterators to handle options of monadic elements and monadic options.
-    @since Frama-C+dev
-*)
-module Make_option_iterators (M : S) : sig
-  val map : ('a -> 'b M.t) -> 'a option -> 'b option M.t
-  val iter : ('a -> unit M.t) -> 'a option -> unit M.t
+    Handling the interaction beween monads and iterable data structures
+    like lists can be difficult. On the other hand, all iterators
+    concerning a monad over an iterable have the same signature, thus
+    we provide a generic signature for all three standard iterators.
+    @since Frama-C+dev *)
+module type Iterators = sig
+  type 'a iterable
+  type 'a monad
+  val fold : ('a -> 'b -> 'a monad) -> 'a -> 'b iterable -> 'a monad
+  val map  : ('a -> 'b monad) -> 'a iterable -> 'b iterable monad
+  val iter : ('a -> unit monad) -> 'a iterable -> unit monad
 end
-
-(** Make iterators to handle lists of monadic elements and monadic lists.
-    @since Frama-C+dev
-*)
-module Make_list_iterators (M : S) : sig
-  val map : ('a -> 'b M.t) -> 'a list -> 'b list M.t
-  val iter : ('a -> unit M.t) -> 'a list -> unit M.t
-  val fold_left : ('a -> 'b -> 'a M.t) -> 'a -> 'b list -> 'a M.t
-end
-
 
 
 (** {3 Detailed explanations and category theory}

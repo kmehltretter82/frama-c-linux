@@ -15,6 +15,10 @@
 include Monad.S_with_product with type 'a t = 'a option
 include module type of Stdlib.Option
 
+module Make_monadic_iterators (M : Monad.S) : Monad.Iterators
+  with type 'a iterable := 'a option
+   and type 'a monad := 'a M.t
+
 (** The call [opt <? default] is equivalent to [value ~default opt].
     @since Frama-C+dev
 *)
