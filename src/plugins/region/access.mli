@@ -15,6 +15,7 @@ type clause =
 
 type acs =
   | Exp of stmt * exp
+  | Ret of stmt * exp
   | Lval of stmt * lval
   | Init of stmt * varinfo
   | Term of clause * term_lval
@@ -27,8 +28,10 @@ val compare_clause : clause -> clause -> int
 val pretty : Format.formatter -> acs -> unit
 val pp_label : Format.formatter -> stmt -> unit
 val pp_clause : Format.formatter -> clause -> unit
+val pp_access : Format.formatter -> acs -> unit
 val pp_source : Format.formatter -> acs -> unit
 
+val rank : acs -> int
 val marker : acs -> Printer_tag.localizable
 val location : clause -> location
 

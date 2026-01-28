@@ -31,6 +31,7 @@ let compare_clause a b =
 
 type acs =
   | Exp of Stmt.t * exp
+  | Ret of Stmt.t * exp
   | Lval of Stmt.t * lval
   | Init of Stmt.t * varinfo
   | Term of clause * term_lval
@@ -54,6 +55,12 @@ let compare a b =
     if cmp <> 0 then cmp else Exp.compare ea eb
   | Exp _ , _ -> (-1)
   | _ , Exp _ -> (+1)
+
+  | Ret(sa,ea), Ret(sb,eb) ->
+    let cmp = Stmt.compare sa sb in
+    if cmp <> 0 then cmp else Exp.compare ea eb
+  | Ret _ , _ -> (-1)
+  | _ , Ret _ -> (+1)
 
   | Term(ca,ta), Term(cb,tb) ->
     let cmp = compare_clause ca cb in
@@ -83,16 +90,37 @@ let pretty fmt = function
     Format.fprintf fmt "%a@%a" Lval.pretty l pp_label s
   | Exp(s,e) ->
     Format.fprintf fmt "(%a)@%a" Exp.pretty e pp_label s
+  | Ret(s,e) ->
+    Format.fprintf fmt "(return %a)@%a" Exp.pretty e pp_label s
   | Term(c,l) ->
     Format.fprintf fmt "(%a)@%a" Term_lval.pretty l pp_clause c
 
-let pp_source fmt = function
-  | Init( { skind = Instr (Local_init _ as instr) },_) ->
-    Printer.pp_instr fmt instr
-  | Init(_,x) -> Format.fprintf fmt "%a initialization" Varinfo.pretty x
+let pp_access fmt = function
+  | Init(_,x) -> Printer.pp_vdecl fmt x
   | Exp(_,e) -> Printer.pp_exp fmt e
+  | Ret(_,e) -> Format.fprintf fmt "return %a" Printer.pp_exp e
   | Lval(_,l) -> Printer.pp_lval fmt l
-  | Term(_,t) -> Printer.pp_term_lval fmt t
+  | Term(Prop _,t) -> Printer.pp_term_lval fmt t
+  | Term(Body fn,t) ->
+    Format.fprintf fmt "%a { %a }" Logic_info.pretty fn Printer.pp_term_lval t
+  | Term(Call(_,kf,_),t) ->
+    Format.fprintf fmt "%a { %a }" Kernel_function.pretty kf Printer.pp_term_lval t
+
+let pp_line fmt stmt =
+  let loc = Stmt.loc stmt in
+  List.iter (Format.fprintf fmt "%a: " Printer.pp_label) stmt.labels ;
+  Format.fprintf fmt "s%d, line %d" stmt.sid (fst loc).pos_lnum
+
+let pp_source fmt = function
+  | Init(stmt,_) | Ret(stmt,_) | Exp(stmt,_) | Lval(stmt,_) -> pp_line fmt stmt
+  | Term(Prop ip,_) -> Property.short_pretty fmt ip
+  | Term(Body fn,_) ->
+    if fn.l_type = None then
+      Format.fprintf fmt "predicate %a" Logic_info.pretty fn
+    else
+      Format.fprintf fmt "logic %a" Logic_info.pretty fn
+  | Term(Call(stmt,_,_),_) ->
+    Format.fprintf fmt "call at %a" pp_line stmt
 
 let ctype_of = function
   | Ctype t -> t
@@ -105,16 +133,20 @@ let location = function
 let typeof = function
   | Init(_,x) -> x.vtype
   | Lval(_,lv) -> Cil.typeOfLval lv
-  | Exp(_,e) -> Cil.typeOf e
+  | Exp(_,e) | Ret(_,e) -> Cil.typeOf e
   | Term(_,lv) ->
     Logic_const.plain_or_set ctype_of @@ Cil.typeOfTermLval lv
 
 open Printer_tag
 
 let marker = function
-  | Exp(stmt,e) -> PExp(None,Kstmt stmt,e)
-  | Lval(stmt,lv) -> PLval(None,Kstmt stmt,lv)
+  | Exp(stmt,e) | Ret(stmt,e) -> PExp(None,Kstmt stmt,e)
   | Init (stmt,vi) -> PVDecl(None,Kstmt stmt,vi)
-  | Term (Call (stmt, _, _), _) -> PStmt(Kernel_function.find_englobing_kf stmt, stmt)
+  | Lval(stmt,_) | Term (Call (stmt, _, _), _) ->
+    PStmtStart(Kernel_function.find_englobing_kf stmt, stmt)
   | Term (Body fn, _) -> PGlobal(GAnnot(Dfun_or_pred(fn,Location.dummy),Location.dummy))
   | Term (Prop ip, _) -> PIP ip
+
+let rank = function
+  | Term (Body _, _) | Term(Prop _, _) -> 0
+  | Exp(s,_) | Ret(s,_) | Init(s,_) | Lval(s,_) | Term(Call(s,_,_),_) -> s.sid

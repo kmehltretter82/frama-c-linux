@@ -83,12 +83,16 @@ struct
   type t = Access.acs
   let jtype = Data.declare ~package ~name:"access" @@
     Jrecord [
+      "rank", Jnumber ;
+      "access", Jstring ;
       "source", Jstring ;
       "marker", Kernel_ast.Marker.jtype ;
     ]
 
   let to_json acs =
     `Assoc [
+      "rank", `Int (Access.rank acs) ;
+      "access", `String (Format.asprintf "%a" Access.pp_access acs) ;
       "source", `String (Format.asprintf "%a" Access.pp_source acs) ;
       "marker", Kernel_ast.Marker.to_json @@ Access.marker acs ;
     ]

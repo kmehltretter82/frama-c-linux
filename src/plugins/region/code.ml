@@ -196,7 +196,7 @@ let rec add_stmt ~map ~kf ~result stmt =
   | Instr instr -> add_instr ~map ~stmt instr ;
   | Return(None,_) -> ()
   | Return(Some e,_) ->
-    add_write ~map ~stmt ~acs:(Exp(stmt,e)) (Option.get result) e
+    add_write ~map ~stmt ~acs:(Ret(stmt,e)) (Option.get result) e
   | Goto _ | Break _ | Continue _ -> ()
   | If(e,sthen,selse,_) ->
     add_value map stmt e ;
