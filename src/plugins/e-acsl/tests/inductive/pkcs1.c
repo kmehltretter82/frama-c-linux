@@ -1,7 +1,7 @@
 /* run.config
    COMMENT: Formal Verification of PKCS#1 Signature Parser using Frama-C
    COMMENT: https://doi.org/10.1007/978-3-032-10794-7_17
-   COMMENT: not translatable: prev_pars, nest_prev_pars cannot be bound
+   COMMENT: artificially rendered translatable: bound prev_pars, nest_prev_pars
    STDOPT: +"-eva-unroll-recursive-calls 5"
 */
 
@@ -99,6 +99,10 @@ case new_tlv_child_not_incl:
   \forall u1* start, integer prev_pars, integer size_pars,
     integer tlv_num_pars, integer tlv_id;
   \let tlv_cur = g_tlv_spec[tlv_id];
+
+  // MODIFICATION REQUIRED FOR TRANSLATION TO WORK
+  \let prev_pars = 0;
+
   0 <= tlv_num_pars < tlv_cur[OFF_COUNT] &&
   valid_tlv(start, prev_pars, size_pars, tlv_num_pars, tlv_id, \true) &&
   start[size_pars] == (u1)tlv_cur[OFF_TAG + tlv_num_pars*SPEC_ITEM_SZ]
@@ -121,6 +125,10 @@ case last_tlv_constr_incl_child:
     integer tlv_num_pars, integer tlv_id, integer nest_prev_pars;
   \let tlv_cur = g_tlv_spec[tlv_id];
   \let tlv_link = tlv_cur[OFF_LINK + (tlv_num_pars-1)*SPEC_ITEM_SZ];
+
+  // MODIFICATION REQUIRED FOR TRANSLATION TO WORK
+  \let nest_prev_pars = 0;
+
   1 <= tlv_num_pars &&
   valid_tlv(start, prev_pars, size_pars, tlv_num_pars, tlv_id, \false) &&
   (u1)tlv_cur[OFF_TYPE + (tlv_num_pars-1)*SPEC_ITEM_SZ] == CONSTR &&
@@ -149,6 +157,10 @@ case gh_new_tlv_child_not_incl:
   \forall u1* start, integer prev_pars, integer size_pars,
     integer tlv_num_pars, integer tlv_id;
   \let tlv_cur = g_tlv_spec[tlv_id];
+
+  // MODIFICATION REQUIRED FOR TRANSLATION TO WORK
+  \let prev_pars = 0;
+
   0 <= tlv_num_pars < tlv_cur[OFF_COUNT] &&
   prim_gh_set(start, prev_pars, size_pars, tlv_num_pars, tlv_id, \true)
   ==>
@@ -170,6 +182,10 @@ case gh_last_tlv_constr_incl_child:
     integer tlv_num_pars, integer tlv_id, integer nest_prev_pars;
   \let tlv_cur = g_tlv_spec[tlv_id];
   \let tlv_link = tlv_cur[OFF_LINK + (tlv_num_pars-1)*SPEC_ITEM_SZ];
+
+  // MODIFICATION REQUIRED FOR TRANSLATION TO WORK
+  \let nest_prev_pars = 0;
+
   1 <= tlv_num_pars &&
   prim_gh_set(start, prev_pars, size_pars, tlv_num_pars, tlv_id, \false) &&
   (u1)tlv_cur[OFF_TYPE + (tlv_num_pars-1)*SPEC_ITEM_SZ] == CONSTR &&
