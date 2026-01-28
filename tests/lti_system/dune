@@ -1,5 +1,4 @@
-(tests (names circle random_3D simple)
-  (libraries frama-c.init frama-c.kernel "frama-c-eva.core" "frama-c-from.core" "frama-c-inout.core" "frama-c-scope.core")
-  (flags :standard -open Frama_c_kernel)
-)
-
+(tests
+ (names circle random_3D simple)
+ (libraries frama-c.init frama-c.kernel)
+ (flags :standard -open Frama_c_kernel))
