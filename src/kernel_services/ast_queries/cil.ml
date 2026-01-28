@@ -5812,23 +5812,23 @@ and mkBinOp ?(constfold=false) ~loc op e1 e2 =
         !pp_binop_ref op name !pp_typ_ref t1 !pp_typ_ref t2
   in
   let doArithmetic ?res () =
-    check_make_expr ?res ~check:Ast_types.is_arithmetic "non-arithmetic"
+    check_make_expr ?res ~check:is_arithmetic "non-arithmetic"
   in
   let doIntegralArithmetic () =
-    check_make_expr ~check:Ast_types.is_integral "non-integral"
+    check_make_expr ~check:is_integral "non-integral"
   in
   let compatible_pointed_types () =
-    let t1p = Ast_types.direct_pointed_type t1
-    and t2p = Ast_types.direct_pointed_type t2 in
+    let t1p = direct_pointed_type t1
+    and t2p = direct_pointed_type t2 in
     areCompatibleTypes
-      (Ast_types.remove_qualifiers_deep t1p)
-      (Ast_types.remove_qualifiers_deep t2p)
+      (remove_qualifiers_deep t1p)
+      (remove_qualifiers_deep t2p)
   in
   match op with
   | Mult | Div -> doArithmetic ()
   | Mod  | BAnd | BOr | BXor -> doIntegralArithmetic ()
   | LAnd | LOr ->
-    if Ast_types.is_scalar t1 && Ast_types.is_scalar t2 then
+    if is_scalar t1 && is_scalar t2 then
       constFoldBinOp op (expression_to_bool e1) (expression_to_bool e2)
         Cil_const.intType
     else
@@ -5847,7 +5847,7 @@ and mkBinOp ?(constfold=false) ~loc op e1 e2 =
         (mkCastT ~oldt:t2 ~newt:t2' e2)
         t1'
   | PlusA | MinusA -> doArithmetic ()
-  | PlusPI when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
+  | PlusPI when is_ptr t1 && is_integral t2 ->
     begin match e1.enode with
       | StartOf lv ->
         Ok { e1 with enode = AddrOf (addOffsetLval (Index (e2,NoOffset)) lv) }
@@ -5870,14 +5870,12 @@ and mkBinOp ?(constfold=false) ~loc op e1 e2 =
     constFoldBinOp op e1 (mkCast ~newt:t1 e2) Cil_const.intType
   | Eq | Ne when (is_ptr t2 || is_variadic_list t2) && isZero e1 ->
     constFoldBinOp op (mkCast ~newt:t2 e1) e2 Cil_const.intType
-  | Lt | Le | Ge | Gt
-    when Ast_types.is_fun_ptr t1 || Ast_types.is_fun_ptr t2 ->
+  | Lt | Le | Ge | Gt when is_fun_ptr t1 || is_fun_ptr t2 ->
     (* ISO 6.5.8§2: both operands should be pointers to qualified or unqualified
        versions of compatible object types. *)
     error "operator '%a' on non-object (function) pointer type(s) '%a' and '%a'"
       !pp_binop_ref op !pp_typ_ref t1 !pp_typ_ref t2
-  | Eq | Ne | Lt | Le | Ge | Gt
-    when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
+  | Eq | Ne | Lt | Le | Ge | Gt when is_ptr t1 && is_ptr t2 ->
     (* We are more lenient than the ISO C here, if two pointers do not
        point to compatible types, we cast them to a common type. *)
     let e1, e2 =
@@ -5885,7 +5883,7 @@ and mkBinOp ?(constfold=false) ~loc op e1 e2 =
         e1, e2
       else if compatible_pointed_types () then
         e1, mkCastT ~oldt:t2 ~newt:t1 e2
-      else if Ast_types.is_object_ptr t1 && Ast_types.is_object_ptr t2 then
+      else if is_object_ptr t1 && is_object_ptr t2 then
         (* Only object types can safely be casted to void*. *)
         mkCastT ~oldt:t1 ~newt:Cil_const.voidPtrType e1,
         mkCastT ~oldt:t2 ~newt:Cil_const.voidPtrType e2
