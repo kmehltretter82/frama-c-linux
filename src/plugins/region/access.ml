@@ -59,6 +59,8 @@ let compare a b =
     let cmp = compare_clause ca cb in
     if cmp <> 0 then cmp else Term_lval.compare ta tb
 
+module Set = Set.Make(struct type t = acs let compare = compare end)
+
 let pp_label fmt (s : stmt) =
   match s.labels with
   | Label(l,_,_)::_ -> Format.pp_print_string fmt l
@@ -84,6 +86,13 @@ let pretty fmt = function
   | Term(c,l) ->
     Format.fprintf fmt "(%a)@%a" Term_lval.pretty l pp_clause c
 
+let pp_source fmt = function
+  | Init( { skind = Instr (Local_init _ as instr) },_) ->
+    Printer.pp_instr fmt instr
+  | Init(_,x) -> Format.fprintf fmt "%a initialization" Varinfo.pretty x
+  | Exp(_,e) -> Printer.pp_exp fmt e
+  | Lval(_,l) -> Printer.pp_lval fmt l
+  | Term(_,t) -> Printer.pp_term_lval fmt t
 
 let ctype_of = function
   | Ctype t -> t
@@ -100,4 +109,12 @@ let typeof = function
   | Term(_,lv) ->
     Logic_const.plain_or_set ctype_of @@ Cil.typeOfTermLval lv
 
-module Set = Set.Make(struct type t = acs let compare = compare end)
+open Printer_tag
+
+let marker = function
+  | Exp(stmt,e) -> PExp(None,Kstmt stmt,e)
+  | Lval(stmt,lv) -> PLval(None,Kstmt stmt,lv)
+  | Init (stmt,vi) -> PVDecl(None,Kstmt stmt,vi)
+  | Term (Call (stmt, _, _), _) -> PStmt(Kernel_function.find_englobing_kf stmt, stmt)
+  | Term (Body fn, _) -> PGlobal(GAnnot(Dfun_or_pred(fn,Location.dummy),Location.dummy))
+  | Term (Prop ip, _) -> PIP ip

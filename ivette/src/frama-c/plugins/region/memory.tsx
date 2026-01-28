@@ -52,13 +52,15 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
   regions.forEach(r => {
     const id = `n${r.node}`;
     // --- Color
+    const rd = r.reads.length > 0;
+    const wr = r.writes.length > 0;
     const color =
-      (!r.writes && !r.reads) ? undefined :
+      (!wr && !rd) ? undefined :
         !r.typed ? 'red' :
           r.pointed !== undefined
-            ? (r.writes ? 'orange' : 'yellow')
-            : (r.writes && r.reads) ? 'green' :
-              r.writes ? 'pink' : 'grey';
+            ? (wr ? 'orange' : 'yellow')
+            : (wr && rd) ? 'green' :
+              wr ? 'pink' : 'grey';
     // --- Shape
     const font = r.ranges.length > 0 ? 'mono' : 'sans';
     const cells = makeRecord(edges, id, r.sizeof, r.ranges);
