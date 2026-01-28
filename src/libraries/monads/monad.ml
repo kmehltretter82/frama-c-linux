@@ -6,27 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Helpers signature *)
-module type Helpers = sig
-  type 'a t
-
-  module Bool : sig
-    val only_if : bool -> unit t -> unit t
-  end
-
-  module Option : sig
-    val iter : ('a -> unit t) -> 'a option -> unit t
-    val map : ('a -> 'b t) -> 'a option -> 'b option t
-  end
-
-  module List : sig
-    val iter : ('a -> unit t) -> 'a list -> unit t
-    val map : ('a -> 'b t) -> 'a list -> 'b list t
-    val fold_left : ('a -> 'b -> 'a t) -> 'a -> 'b list -> 'a t
-  end
-
-end
-
 (* Basic signature with all monadic functions *)
 module type Basic = sig
   type 'a t
@@ -39,7 +18,6 @@ end
 (* Complete signature *)
 module type S = sig
   include Basic
-  module Monad: Helpers with type 'a t := 'a t
   module Operators : sig
     val ( >>-  ) : 'a t -> ('a -> 'b t) -> 'b t
     val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
@@ -52,7 +30,6 @@ end
 module type S_with_product = sig
   include Basic
   val product : 'a t -> 'b t -> ('a * 'b) t
-  module Monad: Helpers with type 'a t := 'a t
   module Operators : sig
     val ( >>-  ) : 'a t -> ('a -> 'b t) -> 'b t
     val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
@@ -123,47 +100,12 @@ module Make_operators (M : Basic) = struct
   let ( let+ ) m f = M.map  f m
 end
 
-module Make_bool (M : Basic) = struct
-  let only_if b m = if b then m else M.return ()
-end
-
-module Make_option (M : Basic) = struct
-
-  let iter f = function
-    | None -> M.return ()
-    | Some x -> f x
-
-  let map f = function
-    | None -> M.return None
-    | Some x -> M.map (fun x -> Some x) (f x)
-
-end
-
-module Make_list (M : Basic) = struct
-
-  let fold_left f acc xs =
-    let f acc x = M.bind (fun acc -> f acc x) acc in
-    Stdlib.List.fold_left f (M.return acc) xs
-
-  let iter f xs =
-    fold_left (fun () -> f) () xs
-
-  let map f xs =
-    let f rs x = M.map (fun r -> r :: rs) (f x) in
-    M.map Stdlib.List.rev (fold_left f [] xs)
-
-end
 
 
 (* Extend a basic monad based on bind minimal monad *)
 module Make_based_on_bind (M : Based_on_bind) = struct
   module Basic = Basic_based_on_bind (M)
   module Operators = Make_operators (Basic)
-  module Monad = struct
-    module Bool = Make_bool (Basic)
-    module Option = Make_option (Basic)
-    module List = Make_list (Basic)
-  end
   include Basic
 end
 
@@ -171,11 +113,6 @@ end
 module Make_based_on_map (M : Based_on_map) = struct
   module Basic = Basic_based_on_map (M)
   module Operators = Make_operators (Basic)
-  module Monad = struct
-    module Bool = Make_bool (Basic)
-    module Option = Make_option (Basic)
-    module List = Make_list (Basic)
-  end
   include Basic
 end
 

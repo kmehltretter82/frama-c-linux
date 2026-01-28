@@ -19,6 +19,8 @@ include Stdlib.Option
 
 let bind = Minimal.bind
 
+let ( <? ) opt default = value ~default opt
+
 let filter f = function
   | None -> None
   | (Some x) as o -> if f x then o else None

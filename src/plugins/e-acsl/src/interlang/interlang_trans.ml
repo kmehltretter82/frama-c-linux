@@ -50,7 +50,7 @@ module M = struct
 
   let do_if_registering_adata m =
     let* env = read in
-    Monad.Bool.only_if env.adata_register m
+    if env.adata_register then m else return ()
 
   let get_logic_env = let* {env} = get in return @@ Env.Logic_env.get env
 
@@ -185,12 +185,12 @@ and compile_context_insensitive {Interlang.enode; origin} =
     let* lval, name = M.without_registering_adata @@ compile_lval lval in
     let* {loc} = M.read in
     let e = Smart_exp.lval ~loc lval in
-    let* () = M.Monad.Option.iter (assert_register_term ~loc e) origin in
+    let* () = Option.(map (assert_register_term ~loc e) origin <? M.return ()) in
     M.return (e, Some (Analyses_types.C_number, name))
   | SizeOf ty ->
     let e = Cil.sizeOf ~loc ty in
     let* () =
-      M.Monad.Option.iter (assert_register_term ~loc ~force:true e) origin
+      Option.(map (assert_register_term ~loc ~force:true e) origin <? M.return ())
     in
     M.return (e, Some (Analyses_types.C_number, "sizeof"))
 

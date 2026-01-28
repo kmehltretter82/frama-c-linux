@@ -15,6 +15,11 @@
 include Monad.S_with_product with type 'a t = 'a option
 include module type of Stdlib.Option
 
+(** The call [opt <? default] is equivalent to [value ~default opt].
+    @since Frama-C+dev
+*)
+val ( <? ) : 'a t -> 'a -> 'a
+
 (** Reverse {!Stdlib.Option.bind} parameters for monad compatibility.
     [bind f o] is [f v] if [o] is [Some v] and [None] if [o] is [None].
 *)
