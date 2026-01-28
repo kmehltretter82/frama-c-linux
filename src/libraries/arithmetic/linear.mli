@@ -35,6 +35,10 @@ module Space (Field : Field.S) : sig
     (** The call [zero n] returns the 0 vector in 𝕂ⁿ. *)
     val zero   : 'n succ nat -> 'n succ vector
 
+    (** Build a vector from an array. Raise out of bounds
+        exceptions if the array is not well formed. *)
+    val of_array : 'n succ nat -> string array -> 'n succ vector
+
     (** The call [repeat x n] returns a vector in 𝕂ⁿ which each dimension
         containing the scalar x. *)
     val repeat : scalar -> 'n succ nat -> 'n succ vector
@@ -76,6 +80,10 @@ module Space (Field : Field.S) : sig
 
     (** The call [zero n m] returns the 0 matrix in 𝕂ⁿˣᵐ. *)
     val zero : 'n succ nat -> 'm succ nat -> ('n succ, 'm succ) matrix
+
+    (** Build a matrix from a 2 dimensionnal array. Raise out of bounds
+        exceptions if the array is not well formed. *)
+    val of_array : 'n succ nat -> 'm succ nat -> string array array -> ('n succ, 'm succ) matrix
 
     (** The call [get i j m] returns the coefficient of the i-th row and
         the j-th column. *)

@@ -17,10 +17,12 @@ module Make (K : Field.S) = struct
   let constant v = make v Vector.(size v |> zero)
   let ( + ) l r = make Matrix.(l.center + r.center) Matrix.(l.radius + r.radius)
 
+  let lower { center ; radius } = Matrix.(center - radius)
+  let upper { center ; radius } = Matrix.(center + radius)
+  let bounds ball = lower ball, upper ball
+
   let is_included l r =
     let ( < ) = Matrix.all_components_lower_than in
-    let lower { center ; radius } = Matrix.(center - radius) in
-    let upper { center ; radius } = Matrix.(center + radius) in
     lower r < lower l && upper l < upper r
 
   let pretty fmt ball =

@@ -17,6 +17,9 @@ module Make (K : Field.S) : sig
   val zero : 'n succ nat -> 'n succ t
   val constant : 'n succ vector -> 'n succ t
   val pretty : 'n succ t Pretty_utils.formatter
+  val lower : 'n t -> 'n vector
+  val upper : 'n t -> 'n vector
+  val bounds : 'n t -> 'n vector * 'n vector
   val is_included : 'n t -> 'n t -> bool
   val ( + ) : 'n t -> 'n t -> 'n t
 end

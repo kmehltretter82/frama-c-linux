@@ -187,4 +187,22 @@ module Make (K : Field.S) = struct
     try behavior_unbounded ~error_target system
     with Async.Cancel -> None
 
+  (* Pretty print a behavior. Used for test and debug purposes. *)
+  let pretty_behavior fmt = function
+    | None -> Unicode.pp_top fmt
+    | Some { transition ; permanent } ->
+      let lower, upper = Ball.bounds permanent in
+      let pretty i () =
+        Format.fprintf fmt "* %d : [%a .. %a]@ "
+          (Finite.to_int i)
+          K.pretty (Vector.get i lower)
+          K.pretty (Vector.get i upper)
+      in
+      Format.fprintf fmt "@[<v>" ;
+      Format.fprintf fmt "Transition duration : %d iterations@ "
+        (List.length transition) ;
+      Format.fprintf fmt "State space invariant :@ " ;
+      Finite.for_each pretty (Vector.size lower) () ;
+      Format.fprintf fmt "@]"
+
 end

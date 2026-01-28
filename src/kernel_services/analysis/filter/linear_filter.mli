@@ -89,4 +89,7 @@ module Make (K : Field.S) : sig
     ('n succ, 'm succ) system ->
     'n succ behavior option
 
+  (** Pretty print a behavior. Used for test and debug purposes. *)
+  val pretty_behavior : 'n behavior option Pretty_utils.formatter
+
 end

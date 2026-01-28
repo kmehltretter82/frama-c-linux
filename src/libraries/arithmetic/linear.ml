@@ -76,6 +76,9 @@ module Space (Field : Field.S) = struct
     let zero n m = init n m (fun _ _ -> Field.zero)
     let id n = Finite.for_each (fun i m -> set i i Field.one m) n (zero n n)
 
+    let of_array n m rows = init n m @@ fun i j ->
+      Field.of_string rows.(Finite.to_int i).(Finite.to_int j)
+
     let transpose : type n m. (n, m) matrix -> (m, n) matrix =
       fun (M m) -> init m.cols m.rows (fun j i -> get i j (M m))
 
@@ -222,6 +225,9 @@ module Space (Field : Field.S) = struct
       let set i data = Parray.set data (Finite.to_int i) (f i) in
       let data = Finite.for_each set size data in
       M { data ; rows = size ; cols = Nat.one }
+
+    let of_array size t =
+      init size (fun i -> Field.of_string t.(Finite.to_int i))
 
     let size (type n) (M vector : n vector) : n nat = vector.rows
     let repeat n size = init size (fun _ -> n)
