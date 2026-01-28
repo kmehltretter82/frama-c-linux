@@ -367,6 +367,7 @@ class type feedback =
     method interactive : bool
     method get_title : string
     method has_error : bool
+    method get_error : string option
     method set_title : 'a. 'a formatter
     method set_descr : 'a. 'a formatter
     method set_error : 'a. 'a formatter
@@ -620,6 +621,25 @@ let () = add_composer
       method arity = 2
       method filter = List.for_all F.is_prop
       method compute = F.e_or
+    end)
+
+let () = add_composer
+    (object
+      method id = "wp:imply"
+      method group = "logic"
+      method title = "A ==> B"
+      method descr = ""
+      method arity = 2
+      method filter = List.for_all F.is_prop
+      method compute =
+        let rec aux acc rem =
+          match acc, rem with
+          | _, [] -> F.e_true
+          | [], [ x ] -> x
+          | acc, [ x ] -> F.e_imply (List.rev acc) x
+          | acc, h :: rem -> aux (h :: acc) rem
+        in
+        aux []
     end)
 
 let () = add_composer

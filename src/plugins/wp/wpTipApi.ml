@@ -392,6 +392,9 @@ let lookup (node : ProofEngine.node) : printer =
     pp#on_selection (fun () -> R.emit printStatus) ;
     Hashtbl.add registry wpo.po_gid pp ; pp
 
+(* for external use *)
+let lookup_printer = lookup
+
 let selection node = (lookup node)#selection
 let setSelection node = (lookup node)#set_selection
 

@@ -7,17 +7,19 @@
 /* ************************************************************************ */
 
 import React from 'react';
+
 import * as Dome from 'dome';
 
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
-import { Cell, Item } from 'dome/controls/labels';
+import { Cell, Item, Label, IconKind } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
+import { TextProxy, TextView, Decoration } from 'dome/text/richtext';
 import {
   ToolBar, Select, Filler,
   Button, ButtonGroup
 } from 'dome/frame/toolbars';
-import { Hfill, Vfill, Vbox, Overlay } from 'dome/layout/boxes';
+import { Hfill, Vfill, Vbox, Overlay, Hbox } from 'dome/layout/boxes';
 import { writeClipboardText } from 'dome/system';
 
 import * as Server from 'frama-c/server';
@@ -27,12 +29,15 @@ import * as TIP from 'frama-c/plugins/wp/api/tip';
 
 import { getStatus } from './goals';
 import { GoalView } from './seq';
-import { Provers,
-         Tactics,
-         ConfigureAutoProver,
-         ConfigureInteractiveProver,
-         ConfigureTactic
-       } from './tac';
+import {
+  Provers,
+  Tactics,
+  ConfigureAutoProver,
+  ConfigureInteractiveProver,
+  ConfigureTactic
+} from './tac';
+
+import * as WpStrategy from 'frama-c/plugins/wp/api/strategydebugger';
 
 /* -------------------------------------------------------------------------- */
 /* --- Sequent Printing Modes                                             --- */
@@ -238,6 +243,197 @@ export function useServerActivity(): ServerActivity {
 
 export function cancelProofTasks(): void {
   Server.send(WP.cancelProofTasks, null);
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Pattern Debugger                                                   --- */
+/* -------------------------------------------------------------------------- */
+
+const severityIcon: { [key: string]: string } = {
+  Ok: 'CHECK',
+  Ignored: 'CHECK',
+  Warning: 'WARNING',
+  Error: 'CROSS',
+
+};
+
+const severityKind: { [key: string]: IconKind } = {
+  Ok: 'positive',
+  Ignored: 'default',
+  Warning: 'warning',
+  Error: 'negative',
+};
+
+const severityClass: { [key: string]: string } = {
+  Ok: 'wp-pattern-ok',
+  Ignored: 'wp-pattern-ignored',
+  Warning: 'wp-pattern-warning',
+  Error: 'wp-pattern-error',
+};
+
+const selectedSeverityClass: { [key: string]: string } = {
+  Ok: 'wp-pattern-selected-ok',
+  Ignored: 'wp-pattern-selected-ignored',
+  Warning: 'wp-pattern-selected-warning',
+  Error: 'wp-pattern-selected-error',
+};
+
+interface FieldProps {
+  node?: TIP.node;
+  field: WpStrategy.field
+}
+
+function Field(props: FieldProps): JSX.Element {
+  const node = props.node;
+  const { label, title, value, debug, target } = props.field;
+  const { part, term } = target;
+  const selectable = node && term;
+  const icon = selectable ? 'TARGET' : 'TERMINAL';
+  const className = selectable && 'wp-select-pattern';
+  const onClick = selectable && (() => {
+    Server.send(TIP.setSelection, { node, part, term });
+  });
+  return (
+    <tr>
+      <td className={className}>
+        <Item icon={icon} label={label} title={title} onClick={onClick} />
+      </td>
+      <td style={{ width: '100%' }}>
+        <Cell label={value} title={debug} />
+      </td>
+    </tr>
+  );
+}
+
+interface DebugProps {
+  node?: TIP.node;
+  fields?: WpStrategy.field[];
+}
+
+function Fields(props: DebugProps): JSX.Element | null {
+  const { node, fields = [] } = props;
+  if (!fields) return null;
+  return (
+    <>
+      <table>
+        <tbody>
+          {fields.map((p) => <Field key={p.label} node={node} field={p} />)}
+        </tbody>
+      </table>
+    </>
+  );
+}
+
+function decorateDiagnostic(
+  buffer: Decoration[], diag: WpStrategy.diagnostic, selected: boolean
+): void {
+  const { severity, range } = diag;
+  if (range)
+    buffer.push({ className: severityClass[severity], ...range });
+  if (range && selected)
+    buffer.push({ className: selectedSeverityClass[severity], ...range });
+}
+
+function decorateAlternatives(
+  buffer: Decoration[], alt: WpStrategy.alternative[], selected: number
+): void {
+  alt.forEach((a, k) => {
+    const sel = (k === selected);
+    a.diagnostics.forEach((d) => decorateDiagnostic(buffer, d, sel));
+  });
+}
+
+function decorateSelection(
+  buffer: Decoration[], selRange: WpStrategy.range | undefined
+): void {
+  if (selRange)
+    buffer.push({ className: 'wp-pattern-selected', ...selRange });
+}
+
+function Diagnostic(props: WpStrategy.diagnostic): JSX.Element {
+  const { severity, message } = props;
+  const icon = severityIcon[severity];
+  const kind = severityKind[severity];
+  return <Label icon={icon} kind={kind} label={message} />;
+}
+
+interface ErrorsProps { errors: WpStrategy.diagnostic[] }
+
+function Errors(props: ErrorsProps): JSX.Element {
+  return (
+    <Vbox>
+      {props.errors.map((d, k) => <Diagnostic key={k} {...d} />)}
+    </Vbox>
+  );
+}
+
+export interface PatternDebuggerProps {
+  goal: WP.goal | undefined;
+}
+
+export function StrategyDebugger(props: PatternDebuggerProps): JSX.Element {
+  const goal = props.goal;
+  const status =
+    States.useRequestStable(
+      TIP.getProofStatus,
+      goal ? { main: goal } : undefined
+    );
+
+  const current = goal ? status.current : undefined;
+  const text = React.useMemo(() => new TextProxy(), []);
+  const [strategy, setStrategy] = React.useState('');
+  const [selected, setSelected] = React.useState(0);
+
+  const onChange = React.useCallback(() => {
+    setStrategy(text.toString());
+    setSelected(0);
+  }, [text]);
+
+  const alternatives =
+    States.useRequestStable(WpStrategy.debug, { strategy, node: current });
+
+  const alternative = alternatives[selected];
+  const errors = alternative?.diagnostics || [];
+  const fields = alternative?.fields || [];
+  const range = alternative?.location;
+  const decorations = React.useMemo(() => {
+    const buffer: Decoration[] = [];
+    decorateSelection(buffer, range);
+    decorateAlternatives(buffer, alternatives, selected);
+    return buffer;
+  }, [alternatives, range, selected]);
+
+  return (
+    <Vbox style={{ height: '100%' }}>
+      <TextView
+        style={{ flex: 1 }}
+        text={text}
+        onChange={onChange}
+        decorations={decorations}
+      />
+      <Vbox style={{ flex: 1 }}>
+        <Label
+          display={!alternatives.length}
+          label={strategy === '' ? "No strategy" : "No selection"}
+        />
+        <Hbox display={alternatives.length > 1} className="labview-titlebar" >
+          <IconButton
+            icon={'ANGLE.LEFT'}
+            enabled={selected > 0}
+            onClick={() => { setSelected(selected - 1); }}
+          />
+          <IconButton
+            icon={'ANGLE.RIGHT'}
+            enabled={selected < alternatives.length - 1}
+            onClick={() => { setSelected(selected + 1); }}
+          />
+          <Label>Alternative #{selected + 1} / {alternatives.length} </Label>
+        </Hbox>
+        <Errors errors={errors} />
+        <Fields node={current} fields={fields} />
+      </Vbox>
+    </Vbox>
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -510,6 +706,7 @@ export function TIPView(props: TIPProps): JSX.Element {
         setSelected={onSelectedTactic}
       />
     </Vfill>
+
   );
 }
 

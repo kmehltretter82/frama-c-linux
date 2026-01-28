@@ -51,7 +51,7 @@ In the second situation, you can probably file a bug report on
 By double-clicking on a goal (or selecting it and then clicking [icon-MEDIA.PLAY]),
 you can open the TIP view for this goal.
 
-## TIP view
+## TIP view {#wp-tip}
 
 The TIP view shows the goal (which is basically the formula to prove) and
 provides tactics to solve it interactively. The top bar indicates the name
@@ -80,3 +80,47 @@ One can select by clicking on it.
 
 Finally, the right column contains the proof steps, one can navigate through the
 different steps of the script by clicking on the elements of the list.
+
+## Strategy debugger {#wp-strat-debug}
+
+**This component is not enabled by default**, it is available in the "Views &
+Components" panel, in "Other Plugins", "WP Strategy Debugger".
+
+The component has two parts:
+- an editor where one can write a strategy,
+- a feedback zone that gives information about the strategy.
+
+The editor waits for a strategy (without the `strategy` keyword), where the name
+of the strategy *can* be omitted, thus just a list alternative, for example:
+```
+name: (optional)
+  \tactic(
+    "Wp.range",
+    \pattern(i <= 31),
+    \param("inf", 0),
+    \param("sup", 31)),
+  \tactic(
+    "Wp.split",
+    \pattern(A && B)),
+  existing_strategy
+```
+
+If the strategy is syntactically incorrect, the error is displayed. Else, the
+debugger goes further by *separately* analyzing each alternative. If several
+alternatives are available, buttons ([icon-ANGLE.LEFT]/[icon-ANGLE.RIGHT])
+appear to navigate between alternatives in the title bar and the currently
+selected alternative is highlighted in the editor. All errors and warnings are
+underlined in the editor, but the displayed messages are related to the
+currently selected alternative.
+
+For sub-strategies and provers, the debugger just checked for their existence.
+For tactics, the debugger can go further, in particular when a proof node is
+selected. It will:
+- apply the patterns and raise a warning when a pattern cannot be applied,
+- check parameters typing,
+- check selection typing,
+- display the terms matched and built via the tactic.
+
+For each selection, parameter and pattern, it can be selected in the current
+node by clicking on it when the icon is [icon-TARGET], for non-selectable
+values the icon is [icon-TERMINAL].

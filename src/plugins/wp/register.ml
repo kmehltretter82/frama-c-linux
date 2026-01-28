@@ -577,7 +577,11 @@ let compute_provers ~mode ~script =
   script.provers <- List.fold_right
       begin fun pname prvs ->
         match VCS.parse_prover pname with
-        | None -> prvs
+        | None ->
+          if pname <> "" && pname <> "none" then
+            Wp_parameters.error ~once:true
+              "Prover '%s' not found in why3.conf" pname ;
+          prvs
         | Some VCS.Tactical ->
           script.proverscript <- true ;
           if pname = "tip" then script.strategies <- true ;

@@ -8,7 +8,6 @@
 
 open Cil_types
 open Cil_datatype
-open Logic_typing
 open Logic_ptree
 open Pattern
 module D = Datatype
@@ -19,10 +18,21 @@ module D = Datatype
 
 type 'a loc = { loc : location ; value : 'a }
 
+let localize ~loc value = { loc ; value }
+
 (* Abstract Syntax Tree: must be stdlib-marshallable *)
 type strategy = {
   name: string loc ;
-  alternatives: alternative list ;
+  alternatives: alternative loc list ;
+}
+
+and tactic = {
+  tactic : string loc ;
+  lookup : lookup list ;
+  select : value list ;
+  params : (string loc * value) list ;
+  children : (string loc * string loc) list ; (* name prefix and strategy *)
+  default: string loc option; (* None is default *)
 }
 
 and alternative =
@@ -30,14 +40,7 @@ and alternative =
   | Strategy of string loc
   | Provers of string loc list * float option (* timeout *)
   | Auto of string loc (* deprecated -wp-auto *)
-  | Tactic of {
-      tactic : string loc ;
-      lookup : lookup list ;
-      select : value list ;
-      params : (string loc * value) list ;
-      children : (string loc * string loc) list ; (* name prefix and strategy *)
-      default: string loc option; (* None is default *)
-    }
+  | Tactic of tactic
 
 type hint = string * string list (* strategy name, targets *)
 
@@ -84,7 +87,7 @@ let pp_child fmt (p,s) =
 let pp_children fmt s =
   Format.fprintf fmt "\\children(%a)" pp_name s
 
-let pp_alternative fmt = function
+let pp_alternative_node fmt = function
   | Default -> Format.fprintf fmt "\\default"
   | Strategy s -> pp_name fmt s
   | Auto { value = s } -> Format.fprintf fmt "\\auto(%S)" s
@@ -107,6 +110,8 @@ let pp_alternative fmt = function
     Option.iter (Format.fprintf fmt ",@ %a" pp_children) default ;
     Format.fprintf fmt "@,)@]"
 
+let pp_alternative fmt a = pp_alternative_node fmt a.value
+
 let pp_strategy fmt s =
   Format.fprintf fmt "%s:@ " s.name.value ;
   Pretty_utils.pp_list ~sep:",@ " pp_alternative fmt s.alternatives
@@ -127,6 +132,22 @@ let pp_hint fmt ((s,ps): hint) =
 (* --- Alternative Parser                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
+type context = {
+  p_ctxt: Pattern.context ;
+  dbg_tbl: (string, Pattern.pattern) Hashtbl.t ;
+  mutable last: int ;
+}
+
+let context ?tc () =
+  { p_ctxt = Pattern.context ?tc () ;
+    dbg_tbl = Hashtbl.create 17 ;
+    last = 0 ;
+  }
+
+let debug_table context = context.dbg_tbl
+
+let error ctxt = error ctxt.p_ctxt
+
 let debug fmt p =
   Format.fprintf fmt "@[<hov 2>at: %a@]" Logic_print.print_lexpr p
 
@@ -137,19 +158,19 @@ let rec parse_provers ctxt provers timeout = function
     match p.lexpr_node with
     | PLconstant (IntConstant t) ->
       let time = try int_of_string t with Invalid_argument _ ->
-        ctxt.error loc "Invalid timeout" in
-      if time < 0 then ctxt.error loc "Invalid timeout" ;
-      if timeout <> None then ctxt.error loc "Duplicate timeout" ;
+        error ctxt loc "Invalid timeout" in
+      if time < 0 then error ctxt loc "Invalid timeout" ;
+      if timeout <> None then error ctxt loc "Duplicate timeout" ;
       parse_provers ctxt provers (Some (float time)) ps
     | PLconstant (FloatConstant t) ->
       let time = try float_of_string t with Invalid_argument _ ->
-        ctxt.error loc "Invalid timeout" in
-      if time < 0.0 then ctxt.error loc "Invalid timeout" ;
-      if timeout <> None then ctxt.error loc "Duplicate timeout" ;
+        error ctxt loc "Invalid timeout" in
+      if time < 0.0 then error ctxt loc "Invalid timeout" ;
+      if timeout <> None then error ctxt loc "Duplicate timeout" ;
       parse_provers ctxt provers (Some time) ps
     | PLconstant (StringConstant value) ->
       parse_provers ctxt ( { loc ; value } :: provers ) timeout ps
-    | _ -> ctxt.error loc "Invalid prover specification (%a)" debug p
+    | _ -> error ctxt loc "Invalid prover specification (%a)" debug p
 
 let parse_name ctxt ~kind ?check p =
   let loc = p.lexpr_loc in
@@ -160,11 +181,15 @@ let parse_name ctxt ~kind ?check p =
     ->
     Option.iter (fun f -> f loc value) check ;
     { loc ; value }
-  | _ -> ctxt.error loc "%s name expected (%a)" kind debug p
+  | _ -> error ctxt loc "%s name expected (%a)" kind debug p
 
-let parse_lookup penv
+let parse_lookup ctxt
     ?(head=true) ?(goal=false) ?(hyps=false) ?(split=false) p =
-  { goal ; hyps ; head ; split ; pattern = Pattern.pa_pattern penv p }
+  let name = Format.asprintf "$%d" ctxt.last in
+  ctxt.last <- ctxt.last + 1 ;
+  let pattern = Pattern.(named name @@ pa_pattern ctxt.p_ctxt p) in
+  Hashtbl.add ctxt.dbg_tbl name pattern ;
+  Pattern.{ goal ; hyps ; head ; split ; pattern }
 
 let autoselect select lookup =
   match select , lookup with
@@ -173,7 +198,7 @@ let autoselect select lookup =
     [v] , { p with pattern = q }::ps
   | _ -> select, lookup
 
-let rec parse_tactic_params ctxt penv
+let rec parse_tactic_params ctxt
     ~tactic ~select ~lookup ~params ~children ~default ps =
   match ps with
   | [] ->
@@ -188,36 +213,36 @@ let rec parse_tactic_params ctxt penv
     }
   | p::ps ->
     let loc = p.lexpr_loc in
-    let cc = parse_tactic_params ctxt penv ~tactic in
+    let cc = parse_tactic_params ctxt ~tactic in
     match p.lexpr_node with
     | PLapp("\\goal",[],qs) ->
-      let qs = List.map (parse_lookup ~goal:true penv) qs in
+      let qs = List.map (parse_lookup ~goal:true ctxt) qs in
       let lookup = List.rev_append qs lookup in
       cc ~select ~lookup ~params ~children ~default ps
     | PLapp("\\when",[],qs) ->
-      let qs = List.map (parse_lookup ~hyps:true ~split:true penv) qs in
+      let qs = List.map (parse_lookup ~hyps:true ~split:true ctxt) qs in
       let lookup = List.rev_append qs lookup in
       cc ~select ~lookup ~params ~children ~default ps
     | PLapp("\\ingoal",[],qs) ->
-      let qs = List.map (parse_lookup ~head:false ~goal:true penv) qs in
+      let qs = List.map (parse_lookup ~head:false ~goal:true ctxt) qs in
       let lookup = List.rev_append qs lookup in
       cc ~select ~lookup ~params ~children ~default ps
     | PLapp("\\incontext",[],qs) ->
-      let qs = List.map (parse_lookup ~head:false ~hyps:true ~split:true penv) qs in
+      let qs = List.map (parse_lookup ~head:false ~hyps:true ~split:true ctxt) qs in
       let lookup = List.rev_append qs lookup in
       cc ~select ~lookup ~params ~children ~default ps
     | PLapp("\\pattern",[],qs) ->
       let qs = List.map
-          (parse_lookup ~head:false ~goal:true ~hyps:true penv) qs in
+          (parse_lookup ~head:false ~goal:true ~hyps:true ctxt) qs in
       let lookup = List.rev_append qs lookup in
       cc ~select ~lookup ~params ~children ~default ps
     | PLapp("\\select",[],vs) ->
-      let vs = List.map (Pattern.pa_value penv) vs in
+      let vs = List.map (Pattern.pa_value ctxt.p_ctxt) vs in
       let select = List.rev_append vs select in
       cc ~select ~lookup ~params ~children ~default ps
     | PLapp("\\param",[],[param;value]) ->
       let param = parse_name ctxt ~kind:"Parameter" param in
-      let value = Pattern.pa_value penv value in
+      let value = Pattern.pa_value ctxt.p_ctxt value in
       let params = (param,value)::params in
       cc ~select ~lookup ~params ~children ~default ps
     | PLapp("\\child",[],[prefix;strategy]) ->
@@ -226,46 +251,53 @@ let rec parse_tactic_params ctxt penv
       let children = (subgoal,strategy)::children in
       cc ~select ~lookup ~params ~children ~default ps
     | PLapp("\\children",[],[strategy]) ->
-      if default <> None then ctxt.error loc "Duplicate \\children parameter" ;
+      if default <> None then error ctxt loc "Duplicate \\children parameter" ;
       let default = Some (parse_name ctxt ~kind:"Strategy" strategy) in
       cc ~select ~lookup ~params ~children ~default ps
-    | _ -> ctxt.error loc "Tactic parameter expected (%a)" debug p
+    | _ -> error ctxt loc "Tactic parameter expected (%a)" debug p
 
-let parse_alternatives ctxt p =
+let parse_alternative ctxt p =
   let loc = p.lexpr_loc in
   match p.lexpr_node with
-  | PLvar("\\default") -> [ Default ]
+  | PLvar("\\default") -> [ localize ~loc Default ]
   | PLapp("\\prover",[],ps) ->
     let prvs,timeout = parse_provers ctxt [] None ps in
-    [ Provers(prvs,timeout) ]
+    [ localize ~loc @@ Provers(prvs,timeout) ]
   | PLapp("\\tactic",[],p::ps) ->
     let tactic = parse_name ctxt ~kind:"tactic" p in
-    [ parse_tactic_params ctxt (Pattern.context ctxt) ~tactic
+    [ localize ~loc @@
+      parse_tactic_params ctxt ~tactic
         ~select:[] ~lookup:[] ~params:[] ~children:[] ~default:None ps ]
   | PLapp("\\auto",[],ps) ->
-    List.map (fun p -> Auto (parse_name ctxt ~kind:"auto" p)) ps
-  | PLvar value | PLapp(value,[],[]) -> [ Strategy { loc ; value } ]
-  | _ -> ctxt.error loc "Strategy definition expected (%a)" debug p
+    List.map
+      (fun p -> localize ~loc @@ Auto (parse_name ctxt ~kind:"auto" p))
+      ps
+  | PLvar value | PLapp(value,[],[]) ->
+    [ localize ~loc @@ Strategy { loc ; value } ]
+  | _ -> error ctxt loc "Strategy definition expected (%a)" debug p
 
 (* -------------------------------------------------------------------------- *)
 (* --- Strategy Parser                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
 let parse_strategy_name ctxt loc = function
-  | [] -> ctxt.error loc "Empty strategy"
+  | [] -> error ctxt loc "Empty strategy"
   | p::ps ->
     match p.lexpr_node with
     | PLnamed(value,p) -> { loc ; value }, p::ps
-    | _ -> ctxt.error loc "Missing strategy name (%a)" debug p
+    | _ -> error ctxt loc "Missing strategy name (%a)" debug p
+
+let parse_alternatives ctxt ps =
+  List.concat @@ List.map (parse_alternative ctxt) ps
 
 let parse_strategy ctxt loc ps =
   let name,ps = parse_strategy_name ctxt loc ps in
   try
     let old = Hashtbl.find strategies name.value in
-    ctxt.error loc "Duplicate strategy definition ('%s', at %a)"
+    error ctxt loc "Duplicate strategy definition ('%s', at %a)"
       name.value Location.pretty old.name.loc
   with Not_found ->
-    let alternatives = List.concat @@ List.map (parse_alternatives ctxt) ps in
+    let alternatives = parse_alternatives ctxt ps in
     let strategy = { name ; alternatives } in
     let id = incr kid ; !kid in
     Hashtbl.add strategies name.value strategy ;
@@ -280,13 +312,13 @@ let parse_hints ctxt p =
   match p.lexpr_node with
   | PLvar x -> [x]
   | PLconstant(StringConstant x) -> String.split_on_char ',' x
-  | _ -> ctxt.error loc "Proof hint expected (see -wp-prop) (%a)" debug p
+  | _ -> error ctxt loc "Proof hint expected (see -wp-prop) (%a)" debug p
 
 let parse_proofs ctxt loc ps =
   let name , ps = parse_strategy_name ctxt loc ps in
   let strategy = name.value in
   if not (Hashtbl.mem strategies strategy) then
-    ctxt.error name.loc "Unknown strategy '%s'" strategy ;
+    error ctxt name.loc "Unknown strategy '%s'" strategy ;
   let props = List.concat @@ List.map (parse_hints ctxt) ps in
   let hint = (strategy, props) in
   revhints := hint :: !revhints ;
@@ -302,6 +334,8 @@ let register () =
   if not !registered && Wp_parameters.StrategyEngine.get () then
     begin
       registered := true ;
+      let parse_strategy tc = parse_strategy (context ~tc ()) in
+      let parse_proofs tc = parse_proofs (context ~tc ()) in
       let printer hmap pp _ fmt = function
         | Ext_id id -> Option.iter (pp fmt) (Hashtbl.find_opt hmap id)
         | _ -> () in
@@ -320,72 +354,75 @@ let () = Cmdline.run_after_configuring_stage register
 let name s = s.name.value
 let loc s = s.name.loc
 let find = Hashtbl.find_opt strategies
-let resolve name =
-  try Some (Hashtbl.find strategies name.value)
-  with Not_found ->
-    Wp_parameters.error ~source:(fst name.loc) ~once:true
-      "Strategy '%s' undefined (skipped)." name.value ;
-    None
+
+let resolve_strategy name =
+  find name.value
 
 let resolve_auto name =
   try Some (Strategy.lookup ~id:name.value)
-  with Not_found ->
-    Wp_parameters.error ~source:(fst name.loc) ~once:true
-      "Auto-Strategy '%s' not found (skipped)." name.value ;
-    None
+  with Not_found -> None
 
 let resolve_prover name =
-  let result = VCS.parse_prover name.value in
-  if result = None then
-    Wp_parameters.error ~source:(fst name.loc) ~once:true
-      "Prover '%s' not found (skipped)." name.value ;
-  result
+  VCS.parse_prover name.value
 
 let resolve_tactic name =
   try Some (Tactical.lookup ~id:name.value)
-  with Not_found ->
-    Wp_parameters.error ~source:(fst name.loc) ~once:true
-      "Tactical '%s' not found (skipped alternative)." name.value ;
-    None
+  with Not_found -> None
 
 (* -------------------------------------------------------------------------- *)
 (* --- Strategy Checking                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-let check_prover p = ignore @@ resolve_prover p
-let check_strategy s = ignore @@ resolve s
+let typecheck_strategy env s =
+  if Option.is_none @@ resolve_strategy s then
+    Pattern.typecheck_error env s.loc
+      "Strategy '%s' undefined (skipped)." s.value
 
-let check_parameter env (t : Tactical.tactical) (p,v) =
+let typecheck_prover env p =
+  if Option.is_none @@ resolve_prover p then
+    Pattern.typecheck_error env p.loc
+      "Prover '%s' not found (skipped)." p.value
+
+let typecheck_auto env a =
+  if Option.is_none @@ resolve_auto a then
+    Pattern.typecheck_error env a.loc
+      "Auto-Strategy '%s' not found (skipped)." a.value
+
+let typecheck_parameter env (t : Tactical.tactical) (p,v) =
   try
     let prm = List.find (fun q -> Tactical.pident q = p.value) t#params in
     match prm with
     | Checkbox _ -> Pattern.typecheck_value env ~tau:Qed.Logic.Bool v
     | _ -> ()
   with Not_found ->
-    Wp_parameters.error ~source:(fst p.loc) ~once:true
+    Pattern.typecheck_error env p.loc
       "Parameter '%s' not found in tactic '%s'"
       p.value t#id
 
-let check_alternative = function
-  | Default -> ()
-  | Strategy s -> ignore @@ resolve s
-  | Auto s -> ignore @@ resolve_auto s
-  | Provers(pvs,_) -> List.iter check_prover pvs
-  | Tactic { tactic ; lookup ; params ; children ; default } ->
-    begin
-      let env = Pattern.env () in
-      List.iter (Pattern.typecheck_lookup env) lookup ;
-      Option.iter
-        (fun tactical ->
-           List.iter (check_parameter env tactical) params ;
-        ) (resolve_tactic tactic) ;
-      List.iter (fun (_,s) -> check_strategy s) children ;
-      Option.iter check_strategy default ;
-    end
+let typecheck_tactic env { tactic ; lookup ; params ; children ; default } =
+  List.iter (Pattern.typecheck_lookup env) lookup ;
+  begin match resolve_tactic tactic with
+    | None ->
+      Pattern.typecheck_error env tactic.loc
+        "Tactical '%s' not found (skipped alternative)." tactic.value ;
+    | Some tactical ->
+      List.iter (typecheck_parameter env tactical) params ;
+  end ;
+  List.iter (fun (_,s) -> typecheck_strategy env s) children ;
+  Option.iter (typecheck_strategy env) default
 
-let typecheck () =
+let typecheck_alternative_node env = function
+  | Default -> ()
+  | Strategy s -> typecheck_strategy env s
+  | Auto s -> typecheck_auto env s
+  | Provers(pvs,_) -> List.iter (typecheck_prover env) pvs
+  | Tactic t -> typecheck_tactic env t
+
+let typecheck_alternative env a = typecheck_alternative_node env a.value
+
+let typecheck ?(env=Pattern.env ()) () =
   Hashtbl.iter
-    (fun _ s -> List.iter check_alternative s.alternatives) strategies
+    (fun _ s -> List.iter (typecheck_alternative env) s.alternatives) strategies
 
 (* -------------------------------------------------------------------------- *)
 (* --- Strategy Hints                                                     --- *)
@@ -441,20 +478,26 @@ let alternatives s = s.alternatives
 let timeout = function
   | Some tm -> tm | None -> float @@ Wp_parameters.Timeout.get ()
 
-let provers ?(default=[]) = function
+let provers ?(default=[]) alt =
+  match alt.value with
   | Provers([],tm) -> default, timeout tm
   | Provers(ps,tm) -> List.filter_map resolve_prover ps, timeout tm
   | Default | Strategy _ | Tactic _ | Auto _ -> [],0.0
 
-let fallback = function
-  | Strategy s -> resolve s
+let fallback alt =
+  match alt.value with
+  | Strategy s -> resolve_strategy s
   | Tactic _ | Auto _ | Provers _ -> None
-  | Default -> Some {
-      name = { value = "\\default" ; loc = Position.(unknown,unknown) } ;
-      alternatives = List.map (fun s -> Strategy s.name) @@ default () ;
+  | Default ->
+    let loc = Position.(unknown, unknown) in
+    Some {
+      name = { value = "\\default" ; loc } ;
+      alternatives =
+        List.map (fun s -> localize ~loc @@ Strategy s.name) @@ default () ;
     }
 
-let auto = function
+let auto alt =
+  match alt.value with
   | Default | Strategy _  | Tactic _ | Provers _ -> None
   | Auto s -> resolve_auto s
 
@@ -467,10 +510,10 @@ let dkey_tactical = Wp_parameters.register_category "tactical"
 let tactical a =
   match resolve_tactic a with None -> raise Not_found | Some t -> t
 
-let parameter (t : Tactical.tactical) a =
+let parameter env (t : Tactical.tactical) a =
   try List.find (fun p -> Tactical.pident p = a.value) t#params
   with Not_found ->
-    Wp_parameters.error ~source:(fst a.loc) ~once:true
+    typecheck_error env a.loc
       "Parameter '%s' not found (skipped alternative)." a.value ;
     raise Not_found
 
@@ -497,13 +540,13 @@ let select sigma ?goal = function
   | [v] -> Pattern.select sigma v
   | vs -> Tactical.Multi (List.map (Pattern.select sigma) vs)
 
-let configure tactic sigma (a,v) =
-  match parameter tactic a with
+let configure env tactic sigma (a,v) =
+  match parameter env tactic a with
   | Checkbox fd ->
     begin
       try tactic#set_field fd (Pattern.bool v)
       with Not_found ->
-        Wp_parameters.error ~source:(fst a.loc)
+        typecheck_error env a.loc
           "Expected boolean for parameter '%s' (%a)" a.value
           Pattern.pp_value v ;
         raise Not_found
@@ -514,12 +557,13 @@ let configure tactic sigma (a,v) =
       match Tactical.get_int value with
       | Some v -> tactic#set_field fd v
       | None ->
-        Wp_parameters.error ~source:(fst a.loc)
+        typecheck_error env a.loc
           "Expected integer for parameter '%s'@ (%a)" a.value
           Tactical.pp_selection value ;
         raise Not_found
     end
-  | Composer(fd,_) -> tactic#set_field fd (Pattern.select sigma v)
+  | Composer(fd,_) ->
+    tactic#set_field fd (Pattern.select sigma v)
   | Selector(fd,vs,_) ->
     begin
       try
@@ -527,7 +571,7 @@ let configure tactic sigma (a,v) =
         let v = List.find (fun v -> v.Tactical.vid = id) vs in
         tactic#set_field fd v.value
       with Not_found ->
-        Wp_parameters.error ~source:(fst a.loc)
+        typecheck_error env a.loc
           "Expected string for parameter '%s'@ (%a)" a.value
           Pattern.pp_value v ;
         raise Not_found
@@ -539,7 +583,7 @@ let configure tactic sigma (a,v) =
         let v = lookup id in
         tactic#set_field fd (Some v)
       with Not_found ->
-        Wp_parameters.error ~source:(fst a.loc)
+        typecheck_error env a.loc
           "Expected string for parameter '%s'@ (%a)" a.value
           Pattern.pp_value v ;
         raise Not_found
@@ -560,7 +604,8 @@ let subgoal (children : (string loc * string loc) list)
       else ProofEngine.set_hint node s.value
   end ; node
 
-let tactic tree node strategy = function
+let tactic tree node strategy alt =
+  match alt.value with
   | Default | Strategy _ | Auto _ | Provers _ -> None
   | Tactic t ->
     try
@@ -572,10 +617,11 @@ let tactic tree node strategy = function
       let console = new ProofScript.console ~pool ~title in
       let subgoals = WpContext.on_context ctxt
           begin fun () ->
+            let env = Pattern.env () in
             let sigma = bind Pattern.empty sequent t.lookup in
             let goal = if t.lookup = [] then Some (snd sequent) else None in
             let selection = select sigma ?goal t.select in
-            List.iter (configure tactic sigma) t.params ;
+            List.iter (configure env tactic sigma) t.params ;
             match Lang.local ~pool (tactic#select console) selection with
             | exception (Not_found | Exit) -> raise Not_found
             | Not_applicable ->

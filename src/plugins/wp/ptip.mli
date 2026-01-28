@@ -140,6 +140,7 @@ class pseq :
     method sequent : Conditions.sequent
     method selection : Tactical.selection
     method set_selection : Tactical.selection -> unit
+    method selection_to_target : Tactical.selection -> target
     method highlight : Tactical.selection -> unit
 
     method pp_term : F.term printer
@@ -148,6 +149,7 @@ class pseq :
 
     method pp_sequent : Conditions.sequent printer
     method pp_goal : Wpo.t printer
+    method pp_step : Conditions.step printer
   end
 
 (* -------------------------------------------------------------------------- *)

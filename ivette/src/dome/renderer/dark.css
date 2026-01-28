@@ -7,11 +7,12 @@
     --info-text-discrete: #778094;
     --text-highlighted: rgb(80, 220, 255);
 
+    --caret-color: white;
     --code-hover: #005137;
     --code-select: #4f3d24;
     --code-select-hover: #5f4d34;
     --dead-code: #777;
-    --non-terminating: #d84954;
+    --non-terminating: #634c4e;
     --highlighted-marker: #5f611b;
     --code-bullet: #0a2234;
 

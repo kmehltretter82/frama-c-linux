@@ -335,6 +335,9 @@
 %type <Logic_ptree.lexpr> lexpr_eof
 %start lexpr_eof
 
+%type <Logic_ptree.lexpr list> lexpr_list_eof
+%start lexpr_list_eof
+
 %type <Logic_ptree.annot> annot
 %start annot
 
@@ -347,6 +350,9 @@
 %%
 
 /*** predicates and terms ***/
+
+lexpr_list_eof:
+| lexpr_list EOF { $1 }
 
 lexpr_list:
 | /* epsilon */ { [] }

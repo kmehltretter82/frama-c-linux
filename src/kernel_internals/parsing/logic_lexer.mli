@@ -9,6 +9,8 @@
 
 (** Lexer for logic annotations *)
 
+exception Error of (int * int) * string
+
 val token : Lexing.lexbuf -> Logic_parser.token
 (** For plugins that need to call functions of [Logic_parser] themselves *)
 

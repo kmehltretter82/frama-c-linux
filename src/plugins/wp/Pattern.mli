@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Logic_typing
 open Logic_ptree
 
 (* -------------------------------------------------------------------------- *)
@@ -17,17 +16,40 @@ type context
 type pattern
 type value
 
-(** Creates an empty environment *)
-val context : typing_context -> context
+exception TypeError of location * string
 
-(** Parse a pattern and enrich the environment with pattern variables *)
+val pattern_loc: pattern -> location
+
+(** Creates an empty environment.
+    @before Frama-C+dev the typing context was mandatory.
+*)
+val context : ?tc:Logic_typing.typing_context -> unit -> context
+
+(** Raise a typing error related to patterns.
+    Either the typing context has been built with a logic typing context and it
+    uses it or it raises an exception.
+    @raise TypeError when the context does not have a typing_context
+    @since Frama-C+dev
+*)
+val error: context -> location -> ('a, Format.formatter, unit, 'b) format4 -> 'a
+
+(** Parse a pattern and enrich the environment with pattern variables
+    @raise TypeError in case of error when context does not have typing_context
+    @before Frama-C+dev it used to always use the typing_context for errors
+*)
 val pa_pattern : context -> lexpr -> pattern
 
-(** Parse value according to the environment *)
+(** Parse value according to the environment
+    @raise TypeError in case of error when context does not have typing_context
+    @before Frama-C+dev it used to always use the typing_context for errors
+*)
 val pa_value : context -> lexpr -> value
 
 (** Return a value that equals the pattern *)
 val self : pattern -> pattern * value
+
+(** Force pattern naming, for debugging purposes *)
+val named : string -> pattern -> pattern
 
 (** Pattern printer *)
 val pp_pattern : Format.formatter -> pattern -> unit
@@ -50,6 +72,8 @@ type sigma
 (** Sigma printer *)
 val pp_sigma : Format.formatter -> sigma -> unit
 
+val iter_sigma : (string -> Tactical.selection -> unit) -> sigma -> unit
+
 (** Empty results *)
 val empty : sigma
 
@@ -68,7 +92,18 @@ val string : value -> string
 (** Typechecking *)
 
 type env
-val env : unit -> env
+
+(** [raise] defaults to false *)
+val env : ?raise:bool -> unit -> env
+
+(** Raise a typing error related to patterns.
+    Either the environment has been built with [raise] set to [false] and it
+    logs an error, or it was set to [true] and it raises an exception.
+    @raise TypeError when the environment has [raise] set to [true]
+    @since Frama-C+dev
+*)
+val typecheck_error : env -> location -> ('a, Format.formatter, unit, unit) format4 -> 'a
+
 val typecheck_value : env -> ?tau:Lang.F.tau -> value -> unit
 val typecheck_pattern : env -> ?tau:Lang.F.tau -> pattern -> unit
 val typecheck_lookup : env -> lookup -> unit
