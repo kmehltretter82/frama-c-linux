@@ -429,32 +429,40 @@ function RunAlias
 
 function TestDir
 {
-    local alias cfg test
+    local alias cfg oracle
     case "$CONFIG" in
         "<all>")
             alias=$1/${ALIAS_NAME}
             cfg="(all configs)"
+            oracle="*/oracle*"
             ;;
         "<default>")
             alias=$1/${ALIAS_NAME}_config
             cfg="(default config)"
+            oracle="*/oracle"
             ;;
         *)
             alias=$1/${ALIAS_NAME}_config_$CONFIG
             cfg="(config $CONFIG)"
+            oracle="*/oracle_$CONFIG"
             ;;
     esac
 
     FindPtestDir "$1"
+
+    if [ -n "$(find -L "$1" -type d -path "$oracle")" ]; then
+        Head "Register test on directory $1 $cfg"
+        DUNE_ALIAS+=("@$alias")
+    else
+        Head "Register test on directory $1 (no ptests config)"
+        # Non-ptests tests are registered below
+    fi
 
     # Add the runtest target for the given test directory to add all non-ptests
     # tests to the run (cram tests, inline tests, etc.)
     if [[ ! "${DUNE_ALIAS[*]}" =~ "@runtest" ]]; then
         DUNE_ALIAS+=("@$1/runtest")
     fi
-
-    Head "Register test on directory $1 $cfg"
-    DUNE_ALIAS+=("@$alias")
 }
 
 # --------------------------------------------------------------------------
