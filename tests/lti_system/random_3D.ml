@@ -5,7 +5,7 @@
    with E1 ∈ [-99 .. 101], E2 ∈ [-101 .. -99] and E3 ∈ [199 .. 201]
     and [ X0 ; Y0 ; Z0 ] = [ 1000 ; 1000 ; 2000 ]. *)
 
-module System = Linear_filter.Make (Rational)
+module System = Lti_system.Make (Rational)
 open System.Linear
 open System
 

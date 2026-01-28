@@ -4,7 +4,7 @@
    with E ∈ [-0.1 .. 0.1]
     and [ X0 ; Y0 ] = [ 0 ; 0 ] *)
 
-module System = Linear_filter.Make (Rational)
+module System = Lti_system.Make (Rational)
 open System.Linear
 open System
 
