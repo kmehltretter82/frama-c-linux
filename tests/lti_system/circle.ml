@@ -12,13 +12,13 @@ let n = Nat.(succ one)
 
 let state_matrix =
   Matrix.of_array n n
-  [| [| "0.68" ; "-0.68" |]
-   ; [| "0.68" ;  "0.68" |] |]
+    [| [| "0.68" ; "-0.68" |]
+     ; [| "0.68" ;  "0.68" |] |]
 
 let input_matrix =
   Matrix.of_array n n
-  [| [| "1" ; "0" |]
-   ; [| "0" ; "1" |] |]
+    [| [| "1" ; "0" |]
+     ; [| "0" ; "1" |] |]
 
 let input_space =
   let center = Vector.zero n in

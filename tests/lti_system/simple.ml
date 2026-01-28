@@ -13,8 +13,8 @@ let m = Nat.one
 
 let state_matrix =
   Matrix.of_array n n
-  [| [| "1.5" ; "-0.7" |]
-   ; [| "1.0" ;  "0.0" |] |]
+    [| [| "1.5" ; "-0.7" |]
+     ; [| "1.0" ;  "0.0" |] |]
 
 let input_matrix =
   Vector.of_array n [| "1" ; "0" |]
