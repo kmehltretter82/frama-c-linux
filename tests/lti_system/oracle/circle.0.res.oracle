@@ -1,6 +1,0 @@
-[kernel] Parsing circle.i (no preprocessing)
-[kernel] Circle :
-  Transition duration : 237 iterations
-  State space invariant :
-  * 0 : [-31.4731675688 .. 31.4731675688]
-  * 1 : [-31.4731675688 .. 31.4731675688]

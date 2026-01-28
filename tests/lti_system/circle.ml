@@ -31,9 +31,8 @@ let initial_state =
 let shift =
   Vector.zero n
 
-let run () =
+let () =
   let s = { state_matrix ; input_matrix ; input_space ; initial_state ; shift } in
   let behavior = behavior ~completion_target:99.0 s in
-  Kernel.result "@[<v>Circle :@,%a@,@]" pretty_behavior behavior
+  Format.printf "@[<v>Circle :@,%a@,@]" pretty_behavior behavior
 
-let () = Boot.Main.extend run
