@@ -137,3 +137,33 @@ module Make_based_on_map_with_product (M : Based_on_map_with_product) = struct
     let ( and+ ) l r = product l r
   end
 end
+
+
+(* Make iterators to handle options of monadic elements and monadic options. *)
+module Make_option_iterators (M : S) = struct
+
+  let iter f = function
+    | None -> M.return ()
+    | Some x -> f x
+
+  let map f = function
+    | None -> M.return None
+    | Some x -> M.map (fun x -> Some x) (f x)
+
+end
+
+(* Make iterators to handle lists of monadic elements and monadic lists. *)
+module Make_list_iterators (M : S) = struct
+
+  let fold_left f acc xs =
+    let f acc x = M.bind (fun acc -> f acc x) acc in
+    Stdlib.List.fold_left f (M.return acc) xs
+
+  let map f xs =
+    let f rs x = M.map (fun r -> r :: rs) (f x) in
+    M.map Stdlib.List.rev (fold_left f [] xs)
+
+  let iter f xs =
+    fold_left (fun () -> f) () xs
+
+end

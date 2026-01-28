@@ -227,6 +227,31 @@ module Make_based_on_map_with_product (M : Based_on_map_with_product) :
 
 
 
+(** {3 Helpers on monadic nested structures}
+
+    Handling the interactions between monads and data structures like lists
+    can be difficult. To help alleviate this, functors are proposed that
+    build iterators and other helpers for some of those complex interactions. *)
+
+(** Make iterators to handle options of monadic elements and monadic options.
+    @since Frama-C+dev
+*)
+module Make_option_iterators (M : S) : sig
+  val map : ('a -> 'b M.t) -> 'a option -> 'b option M.t
+  val iter : ('a -> unit M.t) -> 'a option -> unit M.t
+end
+
+(** Make iterators to handle lists of monadic elements and monadic lists.
+    @since Frama-C+dev
+*)
+module Make_list_iterators (M : S) : sig
+  val map : ('a -> 'b M.t) -> 'a list -> 'b list M.t
+  val iter : ('a -> unit M.t) -> 'a list -> unit M.t
+  val fold_left : ('a -> 'b -> 'a M.t) -> 'a -> 'b list -> 'a M.t
+end
+
+
+
 (** {3 Detailed explanations and category theory}
 
     To be pedantic, the map based approach defines a monad as a categoric
