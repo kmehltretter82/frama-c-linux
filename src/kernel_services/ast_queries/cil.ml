@@ -5475,6 +5475,61 @@ let areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
     ignore (compatibleTypes ?strictReturnTypes ?context t1 t2); true
   with Cannot_combine _ -> false
 
+(***************** Completness ******)
+
+let rec has_flexible_array_member t =
+  let is_flexible_array t =
+    match Ast_types.unroll_skel t with
+    | TArray (_, None) -> true
+    | TArray (_, Some z) -> Machine.(msvcMode() || gccMode()) && isZero z
+    | _ -> false
+  in
+  match Ast_types.unroll_skel t with
+  | TComp { cfields = Some ((_::_) as l) } ->
+    let last = (List.last l).ftype in
+    is_flexible_array last ||
+    (Machine.(gccMode() || msvcMode()) && has_flexible_array_member last)
+  | _ -> false
+
+(* last_field is [true] if the given type is the type of the last field of
+   a struct (which could be a FAM, making the whole struct complete even if
+   the array type isn't. *)
+let rec isCompleteType ?(allowZeroSizeArrays=Machine.gccMode ())
+    ?(last_field=false) t =
+  match Ast_types.unroll_node t with
+  | TVoid -> false (* void is an incomplete type by definition (6.2.5§19) *)
+  | TArray(t, None) ->
+    last_field && is_complete_agg_member ~allowZeroSizeArrays ~last_field  t
+  | TArray(t, Some z) when isZero z ->
+    allowZeroSizeArrays &&
+    is_complete_agg_member ~allowZeroSizeArrays ~last_field t
+  | TArray(t, Some _) ->
+    is_complete_agg_member ~allowZeroSizeArrays ~last_field t
+  | TComp { cfields = None } -> false
+  | TComp { cstruct ; cfields = Some flds } -> (* Struct or union *)
+    complete_type_fields ~allowZeroSizeArrays cstruct flds
+  | TEnum {eitems = []} -> false
+  | TEnum _ -> true
+  | TInt _ | TFloat _ | TPtr _ | TBuiltin_va_list -> true
+  | TFun _ -> true (* only object types can be incomplete (6.2.5§1) *)
+  | TNamed _ -> assert false (* unroll should have removed it. *)
+
+and complete_type_fields ~allowZeroSizeArrays is_struct fields =
+  let rec aux is_first l =
+    let last_field = is_struct && not is_first in
+    match l with
+    | [] -> true
+    | [ f ] ->
+      is_complete_agg_member ~allowZeroSizeArrays ~last_field f.ftype
+    | f :: tl ->
+      is_complete_agg_member ~allowZeroSizeArrays f.ftype && aux false tl
+  in
+  aux true fields
+
+and is_complete_agg_member ~allowZeroSizeArrays ?last_field t =
+  isCompleteType ~allowZeroSizeArrays ?last_field t &&
+  (allowZeroSizeArrays || not (has_flexible_array_member t))
+
 (******************** CASTING *****)
 
 let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
@@ -6071,59 +6126,6 @@ let foldLeftCompound
       (fun acc (o, i) -> doinit o i (getTypeOffset o) acc) acc initl
 
   | _ -> Kernel.fatal ~current:true "Type of Compound is not array or struct or union"
-
-let rec has_flexible_array_member t =
-  let is_flexible_array t =
-    match Ast_types.unroll_skel t with
-    | TArray (_, None) -> true
-    | TArray (_, Some z) -> Machine.(msvcMode() || gccMode()) && isZero z
-    | _ -> false
-  in
-  match Ast_types.unroll_skel t with
-  | TComp { cfields = Some ((_::_) as l) } ->
-    let last = (List.last l).ftype in
-    is_flexible_array last ||
-    (Machine.(gccMode() || msvcMode()) && has_flexible_array_member last)
-  | _ -> false
-
-(* last_field is [true] if the given type is the type of the last field of
-   a struct (which could be a FAM, making the whole struct complete even if
-   the array type isn't. *)
-let rec isCompleteType ?(allowZeroSizeArrays=Machine.gccMode ())
-    ?(last_field=false) t =
-  match Ast_types.unroll_node t with
-  | TVoid -> false (* void is an incomplete type by definition (6.2.5§19) *)
-  | TArray(t, None) ->
-    last_field && is_complete_agg_member ~allowZeroSizeArrays ~last_field  t
-  | TArray(t, Some z) when isZero z ->
-    allowZeroSizeArrays &&
-    is_complete_agg_member ~allowZeroSizeArrays ~last_field t
-  | TArray(t, Some _) ->
-    is_complete_agg_member ~allowZeroSizeArrays ~last_field t
-  | TComp { cfields = None } -> false
-  | TComp { cstruct ; cfields = Some flds } -> (* Struct or union *)
-    complete_type_fields ~allowZeroSizeArrays cstruct flds
-  | TEnum {eitems = []} -> false
-  | TEnum _ -> true
-  | TInt _ | TFloat _ | TPtr _ | TBuiltin_va_list -> true
-  | TFun _ -> true (* only object types can be incomplete (6.2.5§1) *)
-  | TNamed _ -> assert false (* unroll should have removed it. *)
-
-and complete_type_fields ~allowZeroSizeArrays is_struct fields =
-  let rec aux is_first l =
-    let last_field = is_struct && not is_first in
-    match l with
-    | [] -> true
-    | [ f ] ->
-      is_complete_agg_member ~allowZeroSizeArrays ~last_field f.ftype
-    | f :: tl ->
-      is_complete_agg_member ~allowZeroSizeArrays f.ftype && aux false tl
-  in
-  aux true fields
-
-and is_complete_agg_member ~allowZeroSizeArrays ?last_field t =
-  isCompleteType ~allowZeroSizeArrays ?last_field t &&
-  (allowZeroSizeArrays || not (has_flexible_array_member t))
 
 let pointer_decay t =
   let t' = Ast_types.unroll t in
