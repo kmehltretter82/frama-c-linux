@@ -16,6 +16,9 @@
 include Monad.S_with_product with type 'a t = 'a list
 include module type of Stdlib.List
 
+(** Make iterators to handle lists of monadic elements and monadic lists.
+    @since Frama-C+dev
+*)
 module Make_monadic_iterators (M : Monad.S) : Monad.Iterators
   with type 'a iterable := 'a list
    and type 'a monad := 'a M.t

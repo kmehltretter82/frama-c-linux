@@ -15,6 +15,9 @@
 include Monad.S_with_product with type 'a t = 'a option
 include module type of Stdlib.Option
 
+(** Make iterators to handle options of monadic elements and monadic options.
+    @since Frama-C+dev
+*)
 module Make_monadic_iterators (M : Monad.S) : Monad.Iterators
   with type 'a iterable := 'a option
    and type 'a monad := 'a M.t
