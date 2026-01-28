@@ -108,12 +108,12 @@ let pp_access fmt = function
 
 let pp_line fmt stmt =
   let loc = Stmt.loc stmt in
-  List.iter (Format.fprintf fmt "%a: " Printer.pp_label) stmt.labels ;
+  List.iter (Format.fprintf fmt "%a " Printer.pp_label) stmt.labels ;
   Format.fprintf fmt "s%d, line %d" stmt.sid (fst loc).pos_lnum
 
 let pp_source fmt = function
   | Init(stmt,_) | Ret(stmt,_) | Exp(stmt,_) | Lval(stmt,_) -> pp_line fmt stmt
-  | Term(Prop ip,_) -> Property.short_pretty fmt ip
+  | Term(Prop ip,_) -> Description.pp_local fmt ip
   | Term(Body fn,_) ->
     if fn.l_type = None then
       Format.fprintf fmt "predicate %a" Logic_info.pretty fn
