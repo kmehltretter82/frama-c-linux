@@ -1,7 +1,7 @@
 Test error messages when a builtin or a specification is used for the main function.
 
 Eva should not crash when a builtin is used for the main function.
-  $ frama-c main_checks.i -eva -main strlen -autoload-plugins -load-module eva,inout,scope
+  $ frama-c -no-autoload-plugins -load-module eva,inout,scope main_checks.i -eva -main strlen
   [kernel] Parsing main_checks.i (no preprocessing)
   [eva] Analyzing a complete application starting at strlen
   [eva:initial-state] Values of globals at initialization
@@ -12,8 +12,9 @@ Eva should not crash when a builtin is used for the main function.
   [kernel] Plug-in eva aborted: invalid user input.
   [1]
 
+
 Mthread should not crash when a specification is used for the main function.
-  $ frama-c main_checks.i -mthread -eva-use-spec main -autoload-plugins -load-module eva.mthread,inout,scope
+  $ frama-c -no-autoload-plugins -load-module eva.mthread,inout,scope main_checks.i -mthread -eva-use-spec main
   [mt] Preparing sources for Mthread with builtins only
   [kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
   [kernel] Parsing main_checks.i (no preprocessing)
@@ -25,7 +26,7 @@ Mthread should not crash when a specification is used for the main function.
   [3]
 
 Mthread should not crash when the main function has no body.
-  $ frama-c main_checks.i -mthread -main spec_only -autoload-plugins -load-module eva.mthread,inout,scope
+  $ frama-c -no-autoload-plugins -load-module eva.mthread,inout,scope main_checks.i -mthread -main spec_only
   [mt] Preparing sources for Mthread with builtins only
   [kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
   [kernel] Parsing main_checks.i (no preprocessing)
@@ -37,7 +38,7 @@ Mthread should not crash when the main function has no body.
   [3]
 
 Mthread should not crash when a builtin is used for the main function.
-  $ frama-c main_checks.i -mthread -main strlen -autoload-plugins -load-module eva.mthread,inout,scope
+  $ frama-c -no-autoload-plugins -load-module eva.mthread,inout,scope main_checks.i -mthread -main strlen
   [mt] Preparing sources for Mthread with builtins only
   [kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
   [kernel] Parsing main_checks.i (no preprocessing)
