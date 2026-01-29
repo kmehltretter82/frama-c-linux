@@ -1,3 +1,0 @@
-(lang dune 3.13)
-(name frama-c-coherent-compare-hash-types)
-(package (name frama-c-coherent-compare-hash-types))

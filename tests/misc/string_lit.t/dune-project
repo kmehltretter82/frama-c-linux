@@ -1,3 +1,0 @@
-(lang dune 3.13)
-(name frama-c-string-literal)
-(package (name frama-c-string-literal))

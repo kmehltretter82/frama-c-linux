@@ -1,8 +1,0 @@
-(executable
-  (name "coherent_compare_hash_types")
-  (modules "coherent_compare_hash_types")
-  (modes plugin)
-  (libraries frama-c.init frama-c.kernel)
-  (flags -open Frama_c_kernel :standard)
-  (promote (until-clean))
-)

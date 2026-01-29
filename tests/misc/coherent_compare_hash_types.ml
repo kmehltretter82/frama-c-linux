@@ -164,4 +164,6 @@ let pairs =
   @ pairs_fun_typ
   @ pairs_comp_typ
 
-let () = Boot.Main.extend (fun () -> check_all_datatypes pairs)
+let () =
+  Kernel.(add_debug_keys dkey_print_attrs);
+  check_all_datatypes pairs

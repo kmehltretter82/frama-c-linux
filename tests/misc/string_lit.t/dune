@@ -1,8 +1,0 @@
-(executable
-  (name "string_literal")
-  (modules "string_literal")
-  (modes plugin)
-  (libraries frama-c.init frama-c.kernel)
-  (flags -open Frama_c_kernel :standard)
-  (promote (until-clean))
-)

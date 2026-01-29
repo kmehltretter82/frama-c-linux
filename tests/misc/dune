@@ -13,7 +13,7 @@
   ))
 )
 
-; Generic dependencies for all tests
+; Generic dependencies for all cram tests
 (cram
   (deps (package frama-c))
 )
@@ -66,3 +66,9 @@
     (package frama-c-scope)
   )
 )
+
+(tests
+ (names coherent_compare_hash_types string_literal)
+ (deps (package frama-c))
+ (libraries frama-c.init frama-c.kernel)
+ (flags :standard -open Frama_c_kernel))
