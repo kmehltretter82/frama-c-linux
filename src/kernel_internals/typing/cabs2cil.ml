@@ -5974,7 +5974,7 @@ and doExp local_env
               | _ :: rest -> getLast rest
             in
             let last = getLast !currentFunctionFDEC.sformals in
-            let res = mkAddrOfAndMark e.expr_loc (var last) in
+            let res = mkAddrOfAndMark loc (var last) in
             let tres = typeOf res in
             let tres', res' = castTo tres ulongType res in
             (* Now we must add to this address to point to the next
@@ -6007,9 +6007,6 @@ and doExp local_env
             let (r, se, e', t) =
               doExp local_env CNoConst e (AExp None)
             in
-            (* ignore (E.log "ADDROF on %a : %a\n" Cil_printer.pp_exp e'
-               Cil_datatype.Typ.pretty t); *)
-            let loc = e'.eloc in
             match e'.enode with
             | Lval x | CastE(_, {enode = Lval x}) | StartOf x ->
               (* Recover type qualifiers that were dropped by dropQualifiers
