@@ -539,10 +539,18 @@ function FindPtestDir
 
 function Register
 {
+    local extension dir file
     while [ "$1" != "" ]
     do
-        if [ -e "$1" ] && [ "${1##*.}" == "t" ]; then
+        extension="${1##*.}"
+        if [ "${extension}" == "t" ]; then
+            Head "Register cramtest on file $1"
             DUNE_ALIAS+=("@${1%.*}")
+        elif [ "${extension}" == "ml" ]; then
+            dir=$(dirname "$1")
+            file=$(basename "$1")
+            Head "Register dune test on file $1"
+            DUNE_ALIAS+=("@${dir}/runtest-${file%.*}")
         elif [ -d "$1" ]; then
             TestDir "$1"
         elif [ -f "$1" ]; then
