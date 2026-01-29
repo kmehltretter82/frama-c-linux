@@ -834,13 +834,16 @@ val mkMem: addr:exp -> off:offset -> lval
     - If both types are object pointers, cast to [void*]
     - Else cast to [uintptr_t]
 
+    The [Result.Error] contains an optionnal [location] to target a specific
+    operand and an error message.
+
     @before Frama-C+dev the function could raised [AbortFatal] instead of using
     result type. It still can raise an exception via sub-function calls. The
     parameter [?constfold] was not present and we always applied constant
     folding.
 *)
 val mkBinOp: ?constfold:bool -> loc:location -> binop -> exp -> exp ->
-  (exp, string) result
+  (exp, (location option * string)) result
 
 (** Same as {!mkBinOp} but handles [Error] by throwing an exception with the
     given message and current location.

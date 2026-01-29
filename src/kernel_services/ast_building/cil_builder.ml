@@ -483,7 +483,7 @@ struct
     with Not_found ->
       typing_error ("no field " ^ s ^ " in " ^ ci.Cil_types.cname)
 
-  let get_result = function Ok e -> e | Error msg -> typing_error msg
+  let get_result = function Ok e -> e | Error (_, msg) -> typing_error msg
 
   let rec build_constant = function
     | CilConstant const -> const

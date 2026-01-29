@@ -7585,7 +7585,7 @@ and doBinOp loc (bop: binop) (e1: exp) (e2: exp) =
   in
   match Cil.mkBinOp ~loc bop e1 e2 with
   | Ok e -> Cil.typeOf e, e
-  | Error msg -> Errorloc.abort_context "%s" msg
+  | Error (loc, msg) -> Errorloc.abort_context ?loc "%s" msg
 
 (* Constant fold a conditional. This is because we want to avoid having
  * conditionals in the initializers. So, we try very hard to avoid creating
