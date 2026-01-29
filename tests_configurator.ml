@@ -74,17 +74,7 @@ let dep file = Dep file
 
 (** {2 Checking availability of dependencies for test folders} *)
 
-let tests_eva_deps_available configurator =
-  let dot = bin "dot" ["--version"] in
-  let gcc = bin "gcc" ["--version"] in
-  test_aux "tests-eva-deps-available" configurator
-    [dot; gcc]
-
-let tests_markdown_report_deps_available configurator =
-  let check_jsonschema = bin "check-jsonschema" ["--version"] in
-  let jq = bin "jq" ["--version"] in
-  test_aux "tests-markdown-report-deps-available" configurator
-    [check_jsonschema; jq]
+(** {3 Kernel tests}  *)
 
 let tests_fc_scripts_deps_available configurator =
   let python = dep "python-3.10-available" in
@@ -137,11 +127,29 @@ let tests_syntax_deps_available configurator =
   test_aux "tests-syntax-deps-available" configurator
     [clang; gcc; genuine_gcc; python; has_c2x_option]
 
+(** {3 Plug-ins tests}  *)
+
+let tests_eva_deps_available configurator =
+  let dot = bin "dot" ["--version"] in
+  let gcc = bin "gcc" ["--version"] in
+  test_aux "tests-eva-deps-available" configurator
+    [dot; gcc]
+
+let tests_markdown_report_deps_available configurator =
+  let check_jsonschema = bin "check-jsonschema" ["--version"] in
+  let jq = bin "jq" ["--version"] in
+  test_aux "tests-markdown-report-deps-available" configurator
+    [check_jsonschema; jq]
+
+let tests_server_deps_available configurator =
+  (* No dependancy for now *)
+  test_aux "tests-server-deps-available" configurator
+    [ ]
+
 let tests_deps_available configurator =
   let tests = [
-    tests_eva_deps_available
-  ; tests_markdown_report_deps_available
-  ; tests_fc_scripts_deps_available
+    (* Kernel *)
+    tests_fc_scripts_deps_available
   ; tests_jcdb_deps_available
   ; tests_libc_deps_available
   ; tests_metrics_deps_available
@@ -149,6 +157,10 @@ let tests_deps_available configurator =
   ; tests_mopsa_deps_available
   ; tests_spec_deps_available
   ; tests_syntax_deps_available
+  (* Plug-ins *)
+  ; tests_eva_deps_available
+  ; tests_markdown_report_deps_available
+  ; tests_server_deps_available
   ] in
   (* Use fold instead of for_all so that every function in tests is called and
      *-deps-available files are generated *)

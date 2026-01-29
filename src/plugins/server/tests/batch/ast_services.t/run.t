@@ -1,4 +1,4 @@
-  $ dune exec -- frama-c -no-autoload-plugins -load-plugin server ast_services.i -server-batch ast_services.json -server-msg-key use-relative-filepath
+  $ dune exec --cache=disabled -- frama-c -no-autoload-plugins -load-plugin server ast_services.i -server-batch ast_services.json -server-msg-key use-relative-filepath
   [kernel] Parsing ast_services.i (no preprocessing)
   [server] Script "ast_services.json"
   [server] [GET] kernel.ast.fetchFunctions

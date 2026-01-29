@@ -15,47 +15,14 @@
 )
 
 (cram
+  (deps ; generic dependencies for all tests
+    (package frama-c)
+    ;(package mopsa) ; cannot optionally depend on it, so omitted for now
+  )
+)
+
+(cram
   (applies_to polarssl-cmake)
   (enabled_if (and %{bin-available:mopsa-build} %{bin-available:mopsa-db}
     %{bin-available:cmake}))
-  (deps
-    ../../src/init/boot/empty_file.exe
-    ;(package mopsa) ; cannot optionally depend on it, so omitted for now
-  )
-)
-
-(cram
-  (applies_to polarssl)
-  (deps
-    ../../src/init/boot/empty_file.exe
-    ;(package mopsa) ; cannot optionally depend on it, so omitted for now
-  )
-)
-
-(cram
-  (applies_to cjson)
-  (deps
-    ../../src/init/boot/empty_file.exe
-  )
-)
-
-(cram
-  (applies_to tbl-no-crash)
-  (deps
-    ../../src/init/boot/empty_file.exe
-  )
-)
-
-(cram
-  (applies_to langs)
-  (deps
-    ../../src/init/boot/empty_file.exe
-  )
-)
-
-(cram
-  (applies_to no-duplicate-sources)
-  (deps
-    ../../src/init/boot/empty_file.exe
-  )
 )

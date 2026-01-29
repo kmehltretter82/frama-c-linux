@@ -1,5 +1,5 @@
 Run Eva and save statistics file.
-  $ frama-c -eva statistics.i -eva-statistics-file stats.csv -no-autoload-plugins -load-module eva,inout,scope
+  $ frama-c -no-autoload-plugins -load-module eva,inout,scope -eva statistics.i -eva-statistics-file stats.csv
   [kernel] Parsing statistics.i (no preprocessing)
   [eva] Analyzing a complete application starting at main
   [eva:initial-state] Values of globals at initialization
