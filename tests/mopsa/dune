@@ -17,6 +17,7 @@
 (cram
   (deps ; generic dependencies for all tests
     (package frama-c)
+    (package frama-c-eva)
     ;(package mopsa) ; cannot optionally depend on it, so omitted for now
   )
 )
