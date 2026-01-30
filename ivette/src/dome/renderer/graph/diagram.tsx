@@ -178,7 +178,7 @@ class Builder {
   index(id: string): string {
     const n = this.imap.get(id);
     if (n !== undefined) return n;
-    const m = `n${this.kid++}`;
+    const m = `DNODE_${this.kid++}`;
     this.imap.set(id, m);
     this.rmap.set(m, id);
     return m;
@@ -293,12 +293,14 @@ class Builder {
         .attr('tooltip', n.title ?? n.id);
     } else {
       this
-        .attr('label', n.label ?? n.id)
+        .attr('label', n.label || n.id)
         .attr('shape', n.shape)
-        .attr('tooltip', n.title ?? n.label ?? n.id);
+        .attr('tooltip', n.title || n.label || n.id);
     }
-    const color = n.color ??
-      ( n.id === this.selected ? EColor.SELECTED : EColor.DEFAULT );
+    const color =
+      ( n.id === this.selected
+        ? EColor.SELECTED
+        : (n.color ?? EColor.DEFAULT) );
     this
       .attr('fontcolor', this.colors.FGCOLOR[color])
       .attr('fillcolor', this.colors.BGCOLOR[color])

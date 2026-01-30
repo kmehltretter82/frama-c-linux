@@ -216,12 +216,13 @@ let add_allocation ~map ~called ~kf ~ki ~bhv ~formals ~result alloc =
    in
    List.iter2 (add_alloc env) its1 its2 *)
 
-let add_post_cond ~map ~called ~kf ~ki ~bhv ~formals ~result postconditions =
-  let ip = Property.ip_of_behavior kf ki ~active:[] bhv in
-  let context = context ~called ~kf ip in
+let add_ensures ~map ~called ~kf ~ki ~bhv ~formals ~result ensures =
   List.iter
-    (fun (_,ip) -> add_ipred { map ; context ; formals ; result } ip)
-    postconditions
+    (fun kp ->
+       let ip = Property.ip_of_ensures kf ki bhv kp in
+       let context = context ~called ~kf ip in
+       add_ipred { map ; context ; formals ; result } (snd kp)
+    ) ensures
 
 let rec add_extension ~map ~called ~kf ~ki ~formals ~result acsl =
   let eloc =
@@ -251,7 +252,7 @@ let add_behavior ~map ~called ~kf ~ki ~formals ~result bhv =
   begin
     List.iter (add_requires ~map ~called ~kf ~ki ~bhv ~formals ~result) bhv.b_requires ;
     List.iter (add_assumes ~map ~called ~kf ~ki ~bhv ~formals ~result) bhv.b_assumes ;
-    add_post_cond ~map ~called ~kf ~ki ~bhv ~formals ~result bhv.b_post_cond ;
+    add_ensures ~map ~called ~kf ~ki ~bhv ~formals ~result bhv.b_post_cond ;
     add_bassigns ~map ~called ~kf ~ki ~bhv ~formals ~result bhv.b_assigns ;
     add_allocation ~map ~called ~kf ~ki ~bhv ~formals ~result bhv.b_allocation ;
     List.iter (add_extension ~map ~called ~kf ~ki ~formals ~result) bhv.b_extended ;

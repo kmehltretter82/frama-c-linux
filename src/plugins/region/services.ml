@@ -78,8 +78,33 @@ struct
   let of_json _ = failwith "Region.Range.of_json"
 end
 
+module ACCESS: Data.S with type t = Access.acs =
+struct
+  type t = Access.acs
+  let jtype = Data.declare ~package ~name:"access" @@
+    Jrecord [
+      "rank", Jnumber ;
+      "access", Jstring ;
+      "source", Jstring ;
+      "typeof", Jstring ;
+      "marker", Kernel_ast.Marker.jtype ;
+    ]
+
+  let to_json acs =
+    let to_string pp = Format.asprintf "%a" pp in
+    `Assoc [
+      "rank", `Int (Access.rank acs) ;
+      "access", `String (to_string Access.pp_access acs) ;
+      "source", `String (to_string Access.pp_source acs) ;
+      "typeof", `String (to_string Printer.pp_typ @@ Access.typeof acs) ;
+      "marker", Kernel_ast.Marker.to_json @@ Access.marker acs ;
+    ]
+  let of_json _ = failwith "Region.Access.of_json"
+end
+
 module Cvars = Data.Jlist(Cvar)
 module Ranges = Data.Jlist(Range)
+module ACS = Data.Jlist(ACCESS)
 
 module Region: Data.S with type t = Memory.region =
 struct
@@ -168,8 +193,9 @@ struct
       "sizeof", Jnumber ;
       "ranges", Ranges.jtype ;
       "pointed", NodeOpt.jtype ;
-      "reads", Jboolean ;
-      "writes", Jboolean ;
+      "reads", ACS.jtype ;
+      "writes", ACS.jtype ;
+      "inits", ACS.jtype ;
       "typed", Jboolean ;
       "singleton", Jboolean ;
       "label", Jstring ;
@@ -186,8 +212,9 @@ struct
       "sizeof", Json.of_int @@ m.sizeof ;
       "ranges", Ranges.to_json @@ m.ranges ;
       "pointed", NodeOpt.to_json @@ m.pointed ;
-      "reads", Json.of_bool (m.reads <> []) ;
-      "writes", Json.of_bool (m.writes <> []) ;
+      "reads", ACS.to_json m.reads ;
+      "writes", ACS.to_json m.writes ;
+      "inits", ACS.to_json m.inits ;
       "typed", Json.of_bool (m.typed <> None) ;
       "singleton", Json.of_bool m.singleton ;
       "label", Json.of_string @@ label m ;

@@ -11,16 +11,18 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
+import * as Dome from 'dome';
+import * as Tools from 'dome/frame/toolbars';
 import { Label } from 'dome/controls/labels';
 import { LCD } from 'dome/controls/displays';
 import { IconButton } from 'dome/controls/buttons';
-import * as Dome from 'dome';
-import * as Tools from 'dome/frame/toolbars';
+import { Vfill, Vbox } from 'dome/layout/boxes';
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as Region from './api';
 import { MemoryView } from './memory';
+import { AccessList } from './access';
 import './style.css';
 
 function RegionAnalys(): JSX.Element {
@@ -28,11 +30,14 @@ function RegionAnalys(): JSX.Element {
   const [kfName, setName] = React.useState<string>();
   const [pinned, setPinned] = React.useState(false);
   const [running, setRunning] = React.useState(false);
+  const [selected, setSelected] = React.useState<Region.node>();
   const setComputing = Dome.useProtected(setRunning);
   const { scope, marker } = States.useCurrentLocation();
   const { kind, name } = States.useDeclaration(scope);
   const regions = States.useRequestStable(Region.regions, kf);
-  const node = States.useRequestStable(Region.localize, marker);
+  const localized = States.useRequestStable(Region.localize, marker);
+  const filter = selected ?? localized;
+  const region = regions.find(r => r.node === filter);
   const { descr: label } = States.useMarker(marker);
   React.useEffect(() => {
     if (!pinned && kind === 'FUNCTION' && scope !== kf) {
@@ -56,7 +61,7 @@ function RegionAnalys(): JSX.Element {
     <>
       <Tools.ToolBar>
         <Label label='Function' />
-        <LCD className='region-lcd' label={kfName ?? '---'} />
+        <LCD className='wp-region-lcd' label={kfName ?? '---'} />
         <Tools.Button
           icon={running ? 'EXECUTE' : 'MEDIA.PLAY'}
           title='Run region analysis on the selected function'
@@ -72,7 +77,16 @@ function RegionAnalys(): JSX.Element {
           onClick={() => setPinned(!pinned)}
         />
       </Tools.ToolBar>
-      <MemoryView regions={regions} node={node} label={label} />
+      <Vfill>
+        <MemoryView regions={regions}
+          label={label}
+          localized={localized}
+          selected={selected}
+          onSelection={setSelected} />
+      </Vfill>
+      <Vbox>
+        <AccessList region={region} selection={marker} />
+      </Vbox>
     </>
   );
 }
