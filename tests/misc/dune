@@ -56,5 +56,7 @@
   (applies_to commands_file)
   (deps
     (package frama-c-eva)
+    (package frama-c-inout)
+    (package frama-c-scope)
   )
 )
