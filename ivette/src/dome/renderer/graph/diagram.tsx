@@ -436,6 +436,7 @@ function GraphvizView(props: GraphvizProps): JSX.Element {
     setError(undefined);
     graphviz(href, {
       useWorker: false,
+      tweenShapes: false,
       fit: false, zoom: true, width, height,
     }).onerror(setError)
       .renderDot(model).on('end', function () {
