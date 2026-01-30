@@ -148,13 +148,17 @@ module CounterExamples: Parameter_sig.Bool
 
 (** {2 Getters} *)
 
-val has_out : unit -> bool
 val has_session : unit -> bool
 val get_session : force:bool -> unit -> Filepath.t
 val get_session_dir : force:bool -> string -> Filepath.t
-val get_output : unit -> Filepath.t
-val get_output_dir : string -> Filepath.t
-val make_output_dir : Filepath.t -> unit
+
+module Output : sig
+  val exists: unit -> bool
+  val get : unit -> Filepath.t
+  val get_dir : string -> Filepath.t
+  val mkdir : Filepath.t -> unit
+  val add_update_hook : (Filepath.t -> Filepath.t -> unit) -> unit
+end
 
 (** {2 Debugging Categories} *)
 

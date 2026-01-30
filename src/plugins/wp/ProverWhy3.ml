@@ -1489,7 +1489,7 @@ let interactive ~mode ~config wpo pconf driver prover task =
 
 let automated ~config ~probes ~timeout ~steplimit ~memlimit
     wpo pconf drv prover task =
-  if Wp_parameters.has_out () then output_task wpo drv prover task;
+  if Wp_parameters.Output.exists () then output_task wpo drv prover task;
   if Probe.Map.is_empty probes then
     Cache.get_result
       ~digest:(digest_task wpo drv)
@@ -1510,9 +1510,9 @@ let is_trivial (t : Why3.Task.task) =
 let print_debug_task wpo drv prover task =
   let pp_task fmt task =
     ignore @@ Why3.Driver.print_task_prepared drv fmt task in
-  if Wp_parameters.has_out () then
+  if Wp_parameters.Output.exists () then
     let out_dir =
-      Wp_parameters.get_output_dir (WpContext.MODEL.id wpo.Wpo.po_model) in
+      Wp_parameters.Output.get_dir (WpContext.MODEL.id wpo.Wpo.po_model) in
     let prover = Why3Provers.title prover in
     let goal = Wpo.get_gid wpo ^ "_" ^ prover in
     let filename = Why3.Driver.file_of_task drv "" goal task in

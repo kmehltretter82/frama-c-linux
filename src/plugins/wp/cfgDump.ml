@@ -22,7 +22,8 @@ let fopen kf bhv =
       | None -> Kernel_function.get_name kf
       | Some bname -> Kernel_function.get_name kf ^ "_" ^ bname
     in
-    let file = Filepath.(Wp_parameters.get_output () / filename |> to_string_abs) in
+    let file =
+      Filepath.(Wp_parameters.Output.get () / filename |> to_string_abs) in
     Wp_parameters.feedback "CFG %a -> %s@." Kernel_function.pretty kf filename ;
     let fout = open_out (file ^ ".dot") in
     fc := Some (fout,file) ;

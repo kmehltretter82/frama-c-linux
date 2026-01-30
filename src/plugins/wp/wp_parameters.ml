@@ -1048,17 +1048,6 @@ module CheckMemoryContext =
     end)
 
 let () = Parameter_customize.set_group wp_po
-module OutputDir =
-  Filepath(struct
-    let existence = Fclib.Filepath.Indifferent
-    let option_name = "-wp-out"
-    let arg_name = "dir"
-    let file_kind = "directory"
-    let help = "Set working directory for generated files.\n\
-                Defaults to some temporary directory."
-  end)
-
-let () = Parameter_customize.set_group wp_po
 module Probes =
   True
     (struct
@@ -1077,6 +1066,17 @@ module CounterExamples =
 (* -------------------------------------------------------------------------- *)
 (* --- Output Dir                                                         --- *)
 (* -------------------------------------------------------------------------- *)
+
+let () = Parameter_customize.set_group wp_po
+module OutputDir =
+  Filepath(struct
+    let existence = Fclib.Filepath.Indifferent
+    let option_name = "-wp-out"
+    let arg_name = "dir"
+    let file_kind = "directory"
+    let help = "Set working directory for generated files.\n\
+                Defaults to system temporary directory."
+  end)
 
 let dkey = register_category "output"
 
@@ -1146,6 +1146,15 @@ let get_output_dir d =
   let base = get_output () in
   let path = Fclib.Filepath.(base / d) in
   make_output_dir path ; path
+
+module Output = (* exported *)
+struct
+  let exists = has_out
+  let get = get_output
+  let get_dir = get_output_dir
+  let mkdir = make_output_dir
+  let add_update_hook = OutputDir.add_update_hook
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Session dir                                                        --- *)
