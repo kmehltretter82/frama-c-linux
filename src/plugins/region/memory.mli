@@ -88,8 +88,8 @@ val add_value : node -> typ -> node option
 
 val add_read : node -> Access.acs -> unit
 val add_write : node -> Access.acs -> unit
-val add_shift : node -> Access.acs -> unit
-val add_init : node -> Access.acs -> unit
+val add_shift : node -> Access.acs -> typ -> unit
+val add_init : node -> Access.acs -> typ -> unit
 
 val domain_of_typ : map -> typ -> domain
 val domain_of_ltyp : map -> ?ctxt:context -> logic_type -> domain

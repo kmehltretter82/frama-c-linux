@@ -20,7 +20,7 @@ module Fmap = Logic_info.Map
 (* -------------------------------------------------------------------------- *)
 
 type 'a nlayout =
-  | Blob
+  | Blob of int
   | Cell of int * 'a option
   | Compound of int * Fields.domain * 'a Ranges.t
   (* must only contain strict sub-ranges *)
@@ -74,10 +74,11 @@ let bitsSizeOf ty =
   | Cil.SizeOfError (_, { tnode = TFun _ }) -> Machine.Sizeof.func () * 8
   | Cil.SizeOfError (_, { tnode = TVoid  }) -> Machine.Sizeof.void () * 8
 
-let sizeof = function Blob -> 0 | Cell(s,_) | Compound(s,_,_) -> s
-let cranges = function Blob | Cell _ -> [] | Compound(_,_,R rs) -> rs
-let cfields = function Blob | Cell _ -> Fields.empty | Compound(_,fds,_) -> fds
-let cpointed = function Blob | Compound _ -> None | Cell(_,p) -> p
+let sizeof = function Blob s | Cell(s,_) | Compound(s,_,_) -> s
+let cranges = function Blob _ | Cell _ -> [] | Compound(_,_,R rs) -> rs
+let cfields = function Blob _ | Cell _ -> Fields.empty | Compound(_,fds,_) -> fds
+let cvalue = function Blob _ | Compound _ -> false | Cell _ -> true
+let cpointed = function Blob _ | Compound _ -> None | Cell(_,p) -> p
 
 let ctypes (m : chunk) : typ list =
   let pool = ref Typ.Set.empty in
@@ -112,7 +113,7 @@ let empty = {
   cwrites = Access.Set.empty ;
   cshifts = Access.Set.empty ;
   cinits = Access.Set.empty ;
-  clayout = Blob ;
+  clayout = Blob 0 ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -138,7 +139,8 @@ let pp_field fields fmt fd =
 
 let pp_layout fmt =
   function
-  | Blob -> Format.pp_print_string fmt "<blob>"
+  | Blob 0 -> Format.pp_print_string fmt "{}"
+  | Blob s -> Format.fprintf fmt "{%04d}" s
   | Cell(s,None) -> Format.fprintf fmt "<%04d>" s
   | Cell(s,Some n) -> Format.fprintf fmt "<%04d>(*%a)" s pp_node n
   | Compound(s,fields,rg) ->
@@ -189,11 +191,12 @@ module SNode = Set.Make(struct
 (* --- Chunk Constructors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let new_chunk store ?parent ?(size=0) ?ptr ?pointed ?(result=false) () =
+let new_chunk store ?parent ?(size=0) ?(value=false) ?ptr ?pointed ?(result=false) () =
   let cresult = result in
   let clayout =
     match ptr with
-    | None -> if size = 0 then Blob else Cell(size,None)
+    | None ->
+      if not value then Blob size else Cell(size,None)
     | Some _ ->
       Cell(Ranges.gcd size (bitsSizeOf Cil_const.voidPtrType), ptr)
   in
@@ -211,7 +214,8 @@ let add_label (m: map) a =
 
 let add_cvar (m: map) v =
   try Vmap.find v m.cvars with Not_found ->
-    let n = new_chunk m.store () in
+    let size = Cil.bitsSizeOf v.vtype in
+    let n = new_chunk m.store ~size () in
     update n (fun d -> { d with ccvars = Vset.singleton v }) ;
     m.cvars <- Vmap.add v n m.cvars ; n
 
@@ -249,7 +253,7 @@ let domain_of_ltyp (m:map) ?(ctxt) (lt:logic_type) =
 let rec walk (f: node -> bool) n =
   if not (f n) then
     match (UF.get n).clayout with
-    | Blob -> ()
+    | Blob _ -> ()
     | Cell(_,p) -> Option.iter (walk f) p
     | Compound(_,_,rg) -> Ranges.iter (walk f) rg
 
@@ -280,10 +284,15 @@ let labels (r: node) = Lset.elements (UF.get r).clabels
 (* -------------------------------------------------------------------------- *)
 
 type queue = (node * node) Queue.t
-type cell = { mutable size : int ; mutable ptr : node option }
-let new_cell ?(size=0) ?ptr () = { size ; ptr }
-let cell_layout { size ; ptr } =
-  if size = 0 && ptr = None then Blob else Cell(size,ptr)
+type buffer = {
+  mutable size : int ;
+  mutable value : bool ;
+  mutable ptr : node option ;
+}
+
+let temporary ?(size=0) ?(value=false) ?ptr () = { size ; value ; ptr }
+let contents { size ; value ; ptr } =
+  if not value && ptr = None then Blob size else Cell(size,ptr)
 
 let merge_push (q: queue) (a: node) (b: node) : unit =
   if not @@ equal a b then Queue.push (a,b) q
@@ -296,14 +305,15 @@ let merge_opt (q: queue) (pa : node option) (pb : node option) : node option =
   | None, p | p, None -> p
   | Some pa, Some pb -> Some (merge_node q pa pb)
 
-let merge_cell (q:queue) cell root r =
+let add_region (q:queue) buffer root r =
   let node = UF.get r in
   let s = sizeof node.clayout in
   let p = cpointed node.clayout in
   begin
     merge_push q root r ;
-    cell.size <- Ranges.gcd cell.size s ;
-    cell.ptr <- merge_opt q cell.ptr p ;
+    buffer.size <- Ranges.gcd buffer.size s ;
+    buffer.ptr <- merge_opt q buffer.ptr p ;
+    buffer.value <- buffer.value || cvalue node.clayout ;
   end
 
 let merge_range s (q: queue) (ra : rg) (rb : rg) : node =
@@ -335,26 +345,31 @@ let merge_ranges s (q: queue) (root: node)
       Compound(sa, fields, ranges)
   else
     let size = Ranges.gcd sa sb in
-    let cell = new_cell ~size () in
-    Ranges.iter (merge_cell q cell root) wa ;
-    Ranges.iter (merge_cell q cell root) wb ;
-    cell_layout cell
+    let buffer = temporary ~size () in
+    Ranges.iter (add_region q buffer root) wa ;
+    Ranges.iter (add_region q buffer root) wb ;
+    contents buffer
 
 let merge_layout s (q:queue) (root:node) (a:layout) (b:layout) : layout =
   match a, b with
-  | Blob, c | c, Blob -> c
-
+  | Blob sa , Blob sb -> Blob (Ranges.gcd sa sb)
+  | Blob s , Cell(sv,pv) | Cell(sv,pv) , Blob s -> Cell(Ranges.gcd s sv,pv)
   | Cell(sa,pa) , Cell(sb,pb) -> Cell(Ranges.gcd sa sb, merge_opt q pa pb)
 
   | Compound(sa,fa,wa), Compound(sb,fb,wb) ->
     merge_ranges s q root sa fa wa sb fb wb
 
-  | Compound(sr,_,wr), Cell(sx,ptr)
-  | Cell(sx,ptr), Compound(sr,_,wr) ->
-    let size = Ranges.gcd sx sr in
-    let cell = new_cell ~size ?ptr () in
-    Ranges.iter (merge_cell q cell root) wr ;
-    cell_layout cell
+  | (Compound(sr,_,_) as r), Blob sx
+  | Blob sx , (Compound(sr,_,_) as r)
+    when Ranges.gcd sr sx = sr -> r
+
+  | Compound(sr,_,wr), r | r, Compound(sr,_,wr) ->
+    let value = cvalue r in
+    let ptr = cpointed r in
+    let size = Ranges.gcd sr (sizeof r) in
+    let buffer = temporary ~size ~value ?ptr () in
+    Ranges.iter (add_region q buffer root) wr ;
+    contents buffer
 
 let merge_chunk s (q:queue) (root:node)
     (a : chunk) (b : chunk) : chunk =
@@ -449,28 +464,29 @@ let add_value (rv:node) (ty:typ) : node option =
 (* --- Access                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let sized (a:node) (ty: typ) =
+let sized (a:node) ~value (ty: typ) =
   if Ast_types.is_scalar ty then
-    let sr = sizeof (UF.get a).clayout in
+    let layout = (UF.get a).clayout in
+    let sr = sizeof layout in
     let size = Ranges.gcd sr (bitsSizeOf ty) in
-    if sr <> size then ignore (merge a (new_chunk (UF.store a) ~size ()))
+    if size <> sr || (value && not (cvalue layout)) then
+      ignore (merge a (new_chunk (UF.store a) ~value ~size ()))
 
 let add_read (a: node) acs =
   let r = UF.get a in
   UF.set a { r with creads = Access.Set.add acs r.creads } ;
-  sized a @@ Access.typeof acs
-
+  sized a ~value:true @@ Access.typeof acs
 let add_write (a: node) acs =
   update a (fun r -> { r with cwrites = Access.Set.add acs r.cwrites }) ;
-  sized a @@ Access.typeof acs
+  sized a ~value:true @@ Access.typeof acs
 
-let add_shift (a: node) acs =
-  update a (fun r -> { r with cshifts = Access.Set.add acs r.cshifts }) ;
-  sized a @@ Access.typeof acs
-
-let add_init (a: node) acs =
+let add_init (a: node) acs te =
   update a (fun r -> { r with cinits = Access.Set.add acs r.cinits });
-  sized a @@ Access.typeof acs
+  sized a ~value:true te
+
+let add_shift (a: node) acs te =
+  update a (fun r -> { r with cshifts = Access.Set.add acs r.cshifts }) ;
+  sized a ~value:false te
 
 (* -------------------------------------------------------------------------- *)
 (* --- Expression Lookup                                                 ---- *)
@@ -478,7 +494,7 @@ let add_init (a: node) acs =
 
 let points_to (r : node) : node option =
   match (UF.get r).clayout with
-  | Blob | Compound _ | Cell(_,None) -> None
+  | Blob _ | Compound _ | Cell(_,None) -> None
   | Cell(_,Some r) -> Some (UF.find r)
 
 let pointed_by (r : node) = UF.find_all (UF.get r).cpointed
@@ -488,7 +504,7 @@ let logic (m: map) (l: logic_info) = Fmap.find l m.logics
 
 let rec move (r: node) (p: int) (s: int) =
   match (UF.get r).clayout with
-  | Blob | Cell _ -> r
+  | Blob _ | Cell _ -> r
   | Compound(s0,_,rgs) ->
     if s0 <= s then r else
       let rg = Ranges.find p rgs in
@@ -511,7 +527,7 @@ let footprint (r: node) : node list =
         visited := SNode.add n !visited ;
       match (UF.get n).clayout with
       | Compound (_, _, range) -> Ranges.iter visit range
-      | Blob | Cell (_,_) -> leaves := n :: !leaves
+      | Blob _ | Cell (_,_) -> leaves := n :: !leaves
     in visit r ; !leaves
   with Not_found -> []
 
@@ -581,7 +597,7 @@ let separated r1 r2 =
 
 let single_path r0 r s =
   match (UF.get r0).clayout with
-  | Blob -> true
+  | Blob _ -> true
   | Cell(s0,_) -> s = s0
   | Compound(_,_,R rgs) ->
     List.for_all
