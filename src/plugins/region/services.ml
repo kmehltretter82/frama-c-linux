@@ -86,14 +86,17 @@ struct
       "rank", Jnumber ;
       "access", Jstring ;
       "source", Jstring ;
+      "typeof", Jstring ;
       "marker", Kernel_ast.Marker.jtype ;
     ]
 
   let to_json acs =
+    let to_string pp = Format.asprintf "%a" pp in
     `Assoc [
       "rank", `Int (Access.rank acs) ;
-      "access", `String (Format.asprintf "%a" Access.pp_access acs) ;
-      "source", `String (Format.asprintf "%a" Access.pp_source acs) ;
+      "access", `String (to_string Access.pp_access acs) ;
+      "source", `String (to_string Access.pp_source acs) ;
+      "typeof", `String (to_string Printer.pp_typ @@ Access.typeof acs) ;
       "marker", Kernel_ast.Marker.to_json @@ Access.marker acs ;
     ]
   let of_json _ = failwith "Region.Access.of_json"

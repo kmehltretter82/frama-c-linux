@@ -8,6 +8,10 @@ table.wp-access-list {
   padding: 4px 8px;
 }
 
+.wp-access-list .dimmed {
+  color: var(--dead-code);
+}
+
 .wp-access-list tr.selected {
   background: var(--code-select);
 }

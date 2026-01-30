@@ -28,8 +28,7 @@ const order = (a: AccessKind, b: AccessKind): number => {
   return 0;
 };
 
-function collect(r : Region.region | undefined): AccessKind[]
-{
+function collect(r: Region.region | undefined): AccessKind[] {
   const buffer: AccessKind[] = [];
   if (r) {
     r.inits.forEach(r => buffer.push({ kind: 'Init', ...r }));
@@ -56,10 +55,20 @@ function Access(props: AccessProps): JSX.Element {
       onClick={onClick}
       title={`Click to select source ${access.marker}`}
     >
-      <td><Label label={access.kind} /></td>
-      <td><Cell label={access.access} /></td>
-      <td><Cell label={access.source} /></td>
-      <td style={fullWidth}/>
+      <td><Label
+        label={access.kind}
+        title="Access kind (R/W/I)" /></td>
+      <td><Cell
+        className="dimmed"
+        label={`( ${access.typeof} )`}
+        title="Access type (l-value)" /></td>
+      <td><Cell
+        label={access.access}
+        title="Accessed expression, l-value or term" /></td>
+      <td><Cell
+        label={access.source}
+        title="Origin of the access (statement, property, call)" /></td>
+      <td style={fullWidth} />
     </tr>
   );
 }
