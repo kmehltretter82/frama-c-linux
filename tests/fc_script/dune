@@ -24,6 +24,22 @@
 )
 
 (cram
+  (applies_to analysis-template)
+  (deps
+    (package frama-c-eva)
+    (package frama-c-inout)
+    (package frama-c-nonterm)
+  )
+)
+
+(cram
+  (applies_to estimate-difficulty)
+  (deps
+    (package frama-c-callgraph)
+  )
+)
+
+(cram
   (applies_to make-machdep)
   (enabled_if (and %{bin-available:clang} %{bin-available:yq}))
 )
