@@ -26,13 +26,19 @@
 (cram ; macOS ARM has a different memory layout
   (applies_to pragma-pack-gcc)
   (enabled_if (and %{bin-available:gcc} (<> %{system} macosx)))
-  (deps pragma-pack.c pragma-pack-utils.h)
+  (deps
+    pragma-pack.c pragma-pack-utils.h
+    (package frama-c-eva) (package frama-c-inout) (package frama-c-scope)
+  )
 )
 
 (cram
   (applies_to pragma-pack-macos-arm-gcc)
   (enabled_if (and %{bin-available:gcc} (= %{system} macosx) (= %{architecture} arm64)))
-  (deps pragma-pack.c pragma-pack-utils.h)
+  (deps
+    pragma-pack.c pragma-pack-utils.h
+    (package frama-c-eva) (package frama-c-inout) (package frama-c-scope)
+  )
 )
 
 (cram
@@ -56,5 +62,7 @@
   (applies_to commands_file)
   (deps
     (package frama-c-eva)
+    (package frama-c-inout)
+    (package frama-c-scope)
   )
 )

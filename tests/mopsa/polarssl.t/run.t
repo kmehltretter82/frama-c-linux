@@ -18,7 +18,7 @@ Test error message: dir does not contain mopsa-db.json
   [kernel] Frama-C aborted: invalid user input.
   [1]
 
-  $ frama-c -mopsa-db mopsa-db.json
+  $ frama-c -no-autoload-plugins -mopsa-db mopsa-db.json
   [kernel] targets:
     [library   ] library/libpolarssl.a
     [executable] programs/aes/aescrypt2
@@ -58,7 +58,7 @@ Test error message: dir does not contain mopsa-db.json
 The 'sed' below is necessary to ensure both the normalized and non-normalized
 mopsa-dbs output the same paths. Otherwise, the "-I 'include'" path would
 be "-I '$TESTCASE_ROOT/include'".
-  $ frama-c -mopsa-db mopsa-db.json -mopsa-list-deps programs/ssl/ssl_client1 | sed "s|$PWD/||g"
+  $ frama-c -no-autoload-plugins -mopsa-db mopsa-db.json -mopsa-list-deps programs/ssl/ssl_client1 | sed "s|$PWD/||g"
   [kernel] dependencies:
     library/aes.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
     library/arc4.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
@@ -98,7 +98,7 @@ be "-I '$TESTCASE_ROOT/include'".
     library/x509parse.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
     library/xtea.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
     programs/ssl/ssl_client1.c:	 -I 'include' -D '_FILE_OFFSET_BITS=64'
-  $ frama-c -mopsa-db mopsa-db.json -mopsa-target programs/ssl/ssl_client1 dummy.c
+  $ frama-c -no-autoload-plugins -load-plugin eva -mopsa-db mopsa-db.json -mopsa-target programs/ssl/ssl_client1 dummy.c
   [kernel] Parsing library/aes.c (with preprocessing)
   [kernel] Parsing library/arc4.c (with preprocessing)
   [kernel] Parsing library/asn1parse.c (with preprocessing)
