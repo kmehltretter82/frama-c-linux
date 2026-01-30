@@ -447,7 +447,7 @@ let () = Request.register ~package
     ~descr:(Md.plain "Prints an AST Declaration")
     ~signals:[ast_changed_signal]
     ~input:(module Decl) ~output:(module Jtext)
-    (fun d -> print_global_ast @@ Printer_tag.definition_of_declaration d)
+    (fun d -> print_global_ast @@ Printer_tag.global_of_declaration d)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Marker Attributes                                                  --- *)
@@ -927,7 +927,7 @@ module GlobalVars = struct
       ~name:"type"
       ~descr:(Md.plain "Type")
       ~data:(module Jstring)
-      ~get:(fun vi -> Rich_text.sprintf "%a" Printer.pp_typ vi.vtype);
+      ~get:(fun vi -> Rich_text.sprintf "%a" PrinterTag.pp_typ vi.vtype);
     States.column model
       ~name:"stringLiteral"
       ~descr:(Md.plain "Does the variable represent a string literal?")
@@ -1097,12 +1097,12 @@ let () = Information.register
     ~label:"Type"
     ~title:"Type of C/ACSL expression"
     begin fun fmt loc ->
-      let open Printer in
       match loc with
-      | PExp (_, _, e) -> pp_typ fmt (Cil.typeOf e)
-      | PLval (_, _, lval) -> pp_typ fmt (Cil.typeOfLval lval)
-      | PTermLval(_,_,_,lv) -> pp_logic_type fmt (Cil.typeOfTermLval lv)
-      | PVDecl (_,_,vi) -> pp_typ fmt vi.vtype
+      | PExp (_, _, e) -> PrinterTag.pp_typ fmt (Cil.typeOf e)
+      | PLval (_, _, lval) -> PrinterTag.pp_typ fmt (Cil.typeOfLval lval)
+      | PVDecl (_, _, vi) -> PrinterTag.pp_typ fmt vi.vtype
+      | PTermLval (_, _, _, tlval) ->
+        PrinterTag.pp_logic_type fmt (Cil.typeOfTermLval tlval)
       | _ -> raise Not_found
     end
 
@@ -1114,14 +1114,7 @@ let () = Information.register
       match loc with
       | PType ({ tnode = TNamed _ } as ty)
       | PGlobal (GType({ ttype = ty },_)) ->
-        begin
-          let tdef = Ast_types.unroll ty in
-          match Printer_tag.definition_of_type tdef with
-          | Some marker ->
-            let tag = Marker.index marker in
-            Format.fprintf fmt "@{<%s>%a@}" tag Printer.pp_typ tdef
-          | None -> PrinterTag.pp_typ fmt tdef
-        end
+        PrinterTag.pp_typ fmt (Ast_types.unroll ty)
       | _ -> raise Not_found
     end
 
@@ -1133,25 +1126,59 @@ let () = Information.register
       let typ =
         match loc with
         | PType typ -> typ
-        | PVDecl(_,_,vi) -> vi.vtype
+        | PVDecl(_,_,vi) when Ast_types.is_object vi.vtype -> vi.vtype
         | PGlobal (GType(ti,_)) -> ti.ttype
         | PGlobal (GCompTagDecl(ci,_) | GCompTag(ci,_)) -> Cil_const.mk_tcomp ci
         | PGlobal (GEnumTagDecl(ei,_) | GEnumTag(ei,_)) -> Cil_const.mk_tenum ei
         | _ -> raise Not_found
       in
-      let bits =
-        try Cil.bitsSizeOf typ
-        with Cil.SizeOfError _ -> raise Not_found
-      in
-      let bytes = bits / 8 in
-      let rbits = bits mod 8 in
-      if rbits > 0 then
-        if bytes > 0 then
-          Format.fprintf fmt "%d bytes + %d bits" bytes rbits
+      try
+        let bits = Cil.bitsSizeOf typ in
+        let bytes = bits / 8 in
+        let rbits = bits mod 8 in
+        if rbits > 0 then
+          if bytes > 0 then
+            Format.fprintf fmt "%d bytes + %d bits" bytes rbits
+          else
+            Format.fprintf fmt "%d bits" rbits
         else
-          Format.fprintf fmt "%d bits" rbits
-      else
-        Format.fprintf fmt "%d bytes" bytes
+          Format.fprintf fmt "%d bytes" bytes
+      with Cil.SizeOfError (msg, _) ->
+        Format.fprintf fmt "Unknown size: %s" msg
+    end
+
+
+let () = Information.register
+    ~id:"kernel.ast.alignof"
+    ~label:"Alignof"
+    ~title:"Alignment of a C type, variable or field"
+    begin fun fmt loc ->
+      let print kind alignof elt =
+        try
+          Format.fprintf fmt "%d bytes (%s alignment)" (alignof elt) kind
+        with Cil.SizeOfError (msg, _typ) ->
+          Format.fprintf fmt "Unknown alignment: %s" msg
+      in
+      match loc with
+      | PType typ
+      | PGlobal (GType ( { ttype=typ }, _ )) ->
+        print "type" Cil.bytesAlignOf typ
+      | PVDecl (_, _, vi)
+      | PLval (_, _, (Var vi, NoOffset))
+      | PGlobal (GVarDecl (vi, _) | GVar (vi, _, _))
+        when Ast_types.is_object vi.vtype ->
+        print "variable" Cil.bytesAlignOfVarinfo vi
+      | PLval (_, _, lval) ->
+        begin
+          match Cil.lastOffset (snd lval) with
+          | Field (fi, NoOffset) -> print "field" Cil.bytesAlignOfField fi
+          | _ -> raise Not_found
+        end
+      | PGlobal (GCompTagDecl (ci, _) | GCompTag (ci, _)) ->
+        print "type" Cil.bytesAlignOf (Cil_const.mk_tcomp ci)
+      | PGlobal (GEnumTagDecl (ei, _) | GEnumTag (ei, _)) ->
+        print "type" Cil.bytesAlignOf (Cil_const.mk_tenum ei)
+      | _ -> raise Not_found
     end
 
 let () = Information.register
