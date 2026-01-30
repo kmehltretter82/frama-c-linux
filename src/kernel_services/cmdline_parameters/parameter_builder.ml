@@ -651,15 +651,14 @@ struct
           let file_kind = ""
         end)
 
+    include Dir_name
+
     let get () =
       if Dir_name.is_set () then Dir_name.get ()
       else
         match Option.bind Sys.getenv_opt Info.env with
         | Some s when s <> "" -> of_string s
         | _ -> Parent.get_dir Info.dirname
-
-    let set = Dir_name.set
-    let is_set = Dir_name.is_set
 
     let expected ~dir path =
       if dir <> Filesystem.dir_exists path then

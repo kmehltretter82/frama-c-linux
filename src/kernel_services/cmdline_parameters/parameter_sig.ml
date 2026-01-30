@@ -318,6 +318,8 @@ end
     @since 30.0-Zinc
 *)
 module type Site_root = sig
+  include S with type t = Filepath.t
+
   val set: Filepath.t -> unit
   (** Sets the <dune-site-dir> directory (without creating it). *)
 
@@ -367,6 +369,7 @@ end
 *)
 module type User_dir_opt = sig
   include User_dir
+  include S with type t = Filepath.t
 
   val set: Filepath.t -> unit
   (** Sets the <user-dir> directory (without creating it). *)

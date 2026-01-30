@@ -329,9 +329,7 @@ struct
           let file_kind = ""
         end)
 
-    let set filepath = Dir_name.set filepath
-    let get () = Dir_name.get ()
-    let is_set () = Dir_name.is_set ()
+    include Dir_name
 
     let add_plugin path =
       if is_kernel then path
@@ -423,15 +421,14 @@ struct
           let file_kind = ""
         end)
 
+    include Dir_name
+
     let get () =
       if Dir_name.is_set () then Dir_name.get ()
       else match Sys.getenv_opt var_name with
         | Some s when s <> "" -> Fclib.Filepath.of_string s
         | _ when is_kernel -> D.default_root ()
         | _ -> Fclib.Filepath.(D.kernel_get () / P.shortname)
-
-    let set = Dir_name.set
-    let is_set = Dir_name.is_set
 
     let expected ~dir path =
       if dir <> Filesystem.dir_exists path then
