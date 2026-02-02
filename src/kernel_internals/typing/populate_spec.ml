@@ -162,8 +162,7 @@ let compare_it it1 it2 =
 
 (* Return true if [kf] is a builtin of Frama-C. *)
 let is_frama_c_builtin kf =
-  let v = Kernel_function.get_vi kf in
-  Cil_builtins.is_builtin v || Cil_builtins.is_special_builtin v.vname
+  Kernel_function.get_vi kf |> Cil_builtins.is_builtin
 
 (* This module is used to define clauses generators. *)
 module type Generator =

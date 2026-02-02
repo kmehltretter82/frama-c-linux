@@ -5,15 +5,10 @@ open Cil_types
    functions will be the .c files, and not the .h where assigns are missing.
 *)
 
-let is_known_variadic _env kf =
-  Kernel_function.get_vi kf
-  |> Classify.is_variadic_function
 
 let run () =
-  let file = Ast.get () in
-  let env = Environment.from_file file in
   let check_assigns kf acc =
-    if is_known_variadic env kf
+    if Kernel_function.is_variadic kf
     then (* skip *) acc
     else
       let spec = Annotations.funspec kf in

@@ -161,10 +161,6 @@ let inline_call loc caller callee return args =
   in
   callee_fd.sbody
 
-let is_variadic_function vi = match vi.vtype.tnode with
-  | TFun(_, _, is_v) -> is_v
-  | _ -> false
-
 let inliner functions_to_inline = object (self)
   inherit Visitor.frama_c_inplace
 
@@ -198,7 +194,7 @@ let inliner functions_to_inline = object (self)
     if Kernel_function.Set.mem callee functions_to_inline &&
        not (self#recursive_call_limit callee)
     then begin
-      if is_variadic_function f then begin
+      if Ast_types.is_variadic f.vtype then begin
         Kernel.warning ~wkey ~current:true ~once:true
           "Ignoring inlining option for variadic function %a"
           Printer.pp_varinfo f;

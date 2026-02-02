@@ -168,17 +168,11 @@ let get_called_kf call_stmt = match call_stmt.skind with
   | Instr (Local_init(_, ConsInit (f, _, _), _)) -> Globals.Functions.get f
   | _ -> invalid_arg "Not a call statement !"
 
-let is_variadic kf =
-  let varf = Kernel_function.get_vi kf in
-  match varf.vtype.tnode with
-  | TFun (_, _, is_variadic) -> is_variadic
-  | _ -> assert false
-
 (** get the [fct_info] of the called function, if we know it *)
 let get_fi_call call =
   try
     let kf = get_called_kf call in
-    if is_variadic kf then None
+    if Kernel_function.is_variadic kf then None
     else
       let fct_info = get_kf_fi kf in
       Some fct_info

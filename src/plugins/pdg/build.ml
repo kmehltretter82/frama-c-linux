@@ -40,13 +40,6 @@ let pretty_node ?(key=false) fmt n =
   if key then
     Format.fprintf fmt ": %a" PdgIndex.Key.pretty (PdgTypes.Node.elem_key n)
 
-let is_variadic kf =
-  let varf = Kernel_function.get_vi kf in
-  match varf.vtype.tnode with
-  | TFun (_, _, is_variadic) -> is_variadic
-  | _ -> Pdg_parameters.fatal
-           "The variable of a kernel_function has to be a function !"
-
 (* -------------------------------------------------------------------------- *)
 (* --- Auxiliary functions                                                --- *)
 (* -------------------------------------------------------------------------- *)
@@ -990,7 +983,7 @@ let compute_pdg kf =
   if not (Eva.Analysis.is_computed ()) then Eva.Analysis.compute ();
   Pdg_parameters.feedback "computing for function %a" Kernel_function.pretty kf;
   try
-    if is_variadic kf then
+    if Kernel_function.is_variadic kf then
       Pdg_parameters.not_yet_implemented "variadic function";
     let pdg = compute_pdg_for_f kf in
     Pdg_parameters.feedback "done for function %a" Kernel_function.pretty kf;

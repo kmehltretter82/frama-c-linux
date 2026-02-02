@@ -168,6 +168,10 @@ val is_in_libc : t -> bool
 (** @return true iff the given function attributes contain libc indicators.
     @since 24.0-Chromium *)
 
+val is_variadic : t -> bool
+(** @return true iff the given function is a variadic function
+    @since Frama-C+dev *)
+
 val has_noreturn_attr : t -> bool
 (** @return true iff the given function contain the noreturn attribute.
     @since 30.0-Zinc *)
