@@ -594,7 +594,7 @@ module AutocompleteHelp =
       let arg_name = "p1,p2,..."
       let help = "displays all Frama-C options, used for shell autocompletion. \
                   Prints options for the specified plugin names (or '@all' for \
-                  all plugins). Note: for the kernel, use an empty string."
+                  all plugins)."
     end)
 
 let _ =
@@ -606,6 +606,7 @@ let _ =
         Plugin.fold_on_plugins (fun p acc -> f p.Plugin.p_shortname acc) acc
       method mem name =
         try
+          if name = "kernel" then raise Exit;
           Plugin.iter_on_plugins
             (fun p -> if name = p.Plugin.p_shortname then raise Exit);
           false

@@ -218,8 +218,7 @@ Options taking a string as argument should preferably be written
 --plugins           alias for option --list-plugins
 -autocomplete <p1,p2,...>  displays all Frama-C options, used for shell
                     autocompletion. Prints options for the specified plugin
-                    names (or '@all' for all plugins). Note: for the kernel,
-                    use an empty string. (preferably use
+                    names (or '@all' for all plugins). (preferably use
                     -autocomplete="p1,p2,...")
 -explain            prints the help message for each option given in the
                     command line
