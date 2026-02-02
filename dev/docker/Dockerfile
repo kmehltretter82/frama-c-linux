@@ -56,7 +56,7 @@ if [ "${from_archive}" != "git" ]; then \
 ; fi
 
 # E-ACSL (incompatible with musl-libc) is disabled on Alpine
-RUN eval $(opam env) && cd /frama-c && ./dev/disable-plugins.sh gui $([ -e /etc/alpine-release ] && echo "e-acsl") && make clean && make && make install
+RUN eval $(opam env) && cd /frama-c $([ -e /etc/alpine-release ] && echo "&& ./dev/disable-plugins.sh e-acsl") && make clean && make && make install
 
 ## Run quick sanity checks
 ## Note: E-ACSL tests are disabled on Alpine
