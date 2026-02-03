@@ -7577,14 +7577,10 @@ and doBinOp loc (bop: binop) (e1: exp) (e2: exp) =
   and t2 = Cil.typeOf e2 in
   let bop, e1, e2 =
     match bop with
-    | PlusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
-      PlusPI, e1, e2
-    | PlusA when Ast_types.is_ptr t2 && Ast_types.is_integral t1 ->
-      PlusPI, e2, e1
-    | MinusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
-      MinusPI, e1, e2
-    | MinusA when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
-      MinusPP, e1, e2
+    | PlusA when Ast_types.is_ptr t1 -> PlusPI, e1, e2
+    | PlusA when Ast_types.is_ptr t2 -> PlusPI, e2, e1
+    | MinusA when Ast_types.(is_ptr t1 && is_ptr t2) -> MinusPP, e1, e2
+    | MinusA when Ast_types.is_ptr t1 -> MinusPI, e1, e2
     | _ -> bop, e1, e2
   in
   match Cil.mkBinOp ~loc bop e1 e2 with
