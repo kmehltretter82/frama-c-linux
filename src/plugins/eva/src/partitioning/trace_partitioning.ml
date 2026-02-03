@@ -285,7 +285,7 @@ struct
             else begin
               (* Propagate the join of the two states *)
               if dest.store_is_loop_head then
-                Self.feedback ~dkey ~level:1 ~once:true ~current:true
+                Self.feedback ~dkey ~once:true ~current:true
                   "starting to merge loop iterations";
               Some (Domain.join previous_state current_state)
             end
@@ -322,8 +322,7 @@ struct
           Some curr
           (* Apply widening *)
         else begin
-          Self.feedback ~level:1 ~once:true ~current:true
-            ~dkey:Self.dkey_widening
+          Self.feedback ~once:true ~current:true ~dkey:Self.dkey_widening
             "applying a widening at this point";
           (* We join the previous widening state with the previous iteration
              state so as to allow the intermediate(s) iteration(s) (between
