@@ -1,11 +1,22 @@
 # frama-c -wp [...]
-[kernel] Parsing unit_ptrcast.i (no preprocessing)
+[kernel] Parsing unit_ptrcast.c (with preprocessing)
 [wp] Running WP plugin...
-[wp] 1 goal scheduled
+[wp] [Valid] Goal locally_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal locally_terminates (Cfg) (Trivial)
+[wp] Warning: Missing RTE guards
+[wp] 2 goals scheduled
 [wp] [Valid] typed_lemma_pcast (Qed)
-[wp] Proved goals:    1 / 1
+[wp] [NoResult] typed_locally_assert_ko (Qed)
+[wp] Proved goals:    3 / 4
+  Terminating:     1
+  Unreachable:     1
   Qed:             1
+  Unsuccess:       1
+  Missing:         1
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
   Lemma                     1        -        1       100%
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  locally                   -        -        1       0.0%
 ------------------------------------------------------------
