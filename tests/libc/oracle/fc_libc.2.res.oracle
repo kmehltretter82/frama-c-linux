@@ -34,6 +34,7 @@
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_ssize_t.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_stat.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_suseconds_t.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/libc/__fc_define_sys_wait_macros.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_time_t.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_timer_t.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_timespec.h (with preprocessing)

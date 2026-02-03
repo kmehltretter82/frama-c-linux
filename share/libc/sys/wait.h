@@ -12,27 +12,27 @@
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
 
-// The values for the constants/macros below are based on the glibc on
-// an x86 Linux, declared in the order given by POSIX.1-2008.
-
-#define WNOHANG    1
-#define WCONTINUED 8
-#define WUNTRACED  2
-
-#define WEXITSTATUS(status)  (((status) & 0xff00) >> 8)
-#define WIFCONTINUED(status) ((status) == 0xffff)
-#define WIFEXITED(status)    (((status) & 0x7f) == 0)
-#define WIFSIGNALED(status)  (((signed char) (((status) & 0x7f) + 1) >> 1) > 0)
-#define WIFSTOPPED(status)   (((status) & 0xff) == 0x7f)
-#define WSTOPSIG(status)     WEXITSTATUS(status)
-#define WTERMSIG(status)     ((status) & 0x7f)
+#include "../__fc_define_sys_wait_macros.h"
 
 #define WEXITED 4
 #define WNOWAIT 0x01000000
 #define WSTOPPED 2
 
-// Non-POSIX
-#define WCOREDUMP(status) ((status) & 0x80)
+#define WCONTINUED 8
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #include "../__fc_define_id_t.h"
 #include "../__fc_define_pid_t.h"

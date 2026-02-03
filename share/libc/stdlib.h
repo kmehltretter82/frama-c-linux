@@ -13,12 +13,12 @@
 __PUSH_FC_STDLIB
 #include "__fc_machdep.h"
 #include "__fc_define_size_t.h"
+#include "__fc_define_sys_wait_macros.h"
 #include "__fc_define_wchar_t.h"
 #include "__fc_alloc_axiomatic.h"
 #include "__fc_string_axiomatic.h"
 #include "errno.h"
 #include <stddef.h>
-
 __BEGIN_DECLS
 
 #ifndef __div_t_defined

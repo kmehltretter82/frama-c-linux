@@ -82,6 +82,7 @@
 #include "__fc_define_ssize_t.h"
 #include "__fc_define_stat.h"
 #include "__fc_define_suseconds_t.h"
+#include "__fc_define_sys_wait_macros.h"
 #include "__fc_define_time_t.h"
 #include "__fc_define_timer_t.h"
 #include "__fc_define_timespec.h"
@@ -198,7 +199,6 @@
 #include "wchar.h"
 #include "wctype.h"
 #include "wordexp.h"
-
 
 
 
