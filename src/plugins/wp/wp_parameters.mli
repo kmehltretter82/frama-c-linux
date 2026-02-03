@@ -118,13 +118,17 @@ module TimeMargin: Parameter_sig.String
 module Steps: Parameter_sig.Int
 module Procs: Parameter_sig.Int
 module ProofTrace: Parameter_sig.Bool
-module Why3Flags: Parameter_sig.String_list
-module Why3ExtraConfig: Parameter_sig.String_list
 
 module Auto: Parameter_sig.String_list
 module AutoDepth: Parameter_sig.Int
 module AutoWidth: Parameter_sig.Int
 module BackTrack: Parameter_sig.Int
+
+(** {2 Why3 configuration} *)
+
+module Why3Config: Parameter_sig.Filepath
+module Why3ExtraConfig: Parameter_sig.String_list
+module Why3Flags: Parameter_sig.String_list
 
 (** {2 Proof Obligations} *)
 

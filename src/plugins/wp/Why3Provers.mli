@@ -7,6 +7,7 @@
 (**************************************************************************)
 
 val why3_version : string
+
 val config : unit -> Why3.Whyconf.config
 val configure : unit -> unit
 val set_procs : int -> unit

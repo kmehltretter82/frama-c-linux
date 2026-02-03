@@ -6,6 +6,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Plugin overrides this ... *)
+module Fc_Filepath = Filepath
+
 let () = Plugin.is_share_visible ()
 let () = Plugin.is_session_visible ()
 include Plugin.Register
@@ -871,12 +874,6 @@ module ProofTrace =
       let help = "Keeps output of provers for valid POs (default: no)"
     end)
 
-(* ------------------------------------------------------------------------ *)
-(* ---  Prover Options                                                  --- *)
-(* ------------------------------------------------------------------------ *)
-
-let wp_prover_options = add_group "Why3 Options"
-
 let () = Parameter_customize.set_group wp_prover
 module Auto = String_list
     (struct
@@ -920,7 +917,28 @@ module BackTrack = Int
          Limits backtracking when applying strategies."
     end)
 
-let () = Parameter_customize.set_group wp_prover_options
+(* ------------------------------------------------------------------------ *)
+(* ---  Why3 Options                                                    --- *)
+(* ------------------------------------------------------------------------ *)
+
+let wp_why3_options = add_group "Why3 Options"
+
+let () = Parameter_customize.set_group wp_why3_options
+let () = Parameter_customize.no_category ()
+module Why3Config =
+  Filepath
+    (struct
+      let option_name = "-wp-why3-config"
+      let arg_name = "file"
+      let file_kind = "why3 configuration"
+      let help =
+        "Set the Why3 configuration file to use. By default, WP uses the \
+         default Why3 configuration file. WP will also detect existing provers
+        anyway."
+      let existence = Fc_Filepath.Must_exist
+    end)
+
+let () = Parameter_customize.set_group wp_why3_options
 let () = Parameter_customize.no_category ()
 module Why3Flags =
   String_list
@@ -930,7 +948,7 @@ module Why3Flags =
       let help = "Additional options for Why3"
     end)
 
-let () = Parameter_customize.set_group wp_prover_options
+let () = Parameter_customize.set_group wp_why3_options
 let () = Parameter_customize.no_category ()
 module Why3ExtraConfig =
   String_list

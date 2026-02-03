@@ -6,29 +6,71 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
-(* --- Why3 Config & Provers                                              --- *)
-(* -------------------------------------------------------------------------- *)
+open Why3
 
-let cfg = lazy
-  begin
-    let extra_config = Wp_parameters.Why3ExtraConfig.get () in
-    try Why3.Whyconf.init_config ~extra_config None
-    with exn ->
-      Wp_parameters.abort "%a" Why3.Exn_printer.exn_printer exn
-  end
+(* -------------------------------------------------------------------------- *)
+(* --- Why3 Config                                                        --- *)
+(* -------------------------------------------------------------------------- *)
 
 let why3_version = Why3.Config.version
-let config () = Lazy.force cfg
 
-let set_procs = Why3.Controller_itp.set_session_max_tasks
+let file () =
+  let param = Wp_parameters.Why3Config.get () in
+  if Filepath.is_empty param
+  then None
+  else Some (Filepath.to_string_abs param)
+
+(* brittle but the best we can do with the current API *)
+let extend_config config =
+  let data = Why3.Autodetection.read_auto_detection_data config in
+  let provers = Why3.Autodetection.find_provers data in
+  let to_rc provers =
+    let to_section (path, name, version) =
+      let set_string f v s = Why3.Rc.set_string s f v in
+      Why3.Rc.empty_section |>
+      set_string "name" name |>
+      set_string "path" path |>
+      set_string "version" version
+    in
+    let sections = List.map to_section provers in
+    Why3.Rc.set_simple_family Why3.Rc.empty "partial_prover" sections
+  in
+  !Whyconf.provers_from_detected_provers config (to_rc provers)
+
+let the_config = ref None
+
+let () =
+  let must_reload_config _ _ = the_config := None in
+  Wp_parameters.Why3Config.add_update_hook must_reload_config ;
+  Wp_parameters.Why3ExtraConfig.add_update_hook must_reload_config
+
+let config () =
+  if Option.is_none !the_config then
+    begin try
+        let file = file () in
+        let extra_config = Wp_parameters.Why3ExtraConfig.get () in
+        let config = Why3.Whyconf.init_config ~extra_config file in
+        let config =
+          if Option.is_none file then config
+          else extend_config config
+        in
+        the_config := Some config ;
+      with exn ->
+        Wp_parameters.abort "%a" Why3.Exn_printer.exn_printer exn
+    end ;
+  Option.get !the_config
+
+let flags_changed = ref true
+
+let () =
+  let must_reconfigure _ _ = flags_changed := true in
+  Wp_parameters.Why3Flags.add_update_hook must_reconfigure
 
 let configure =
-  let todo = ref true in
   begin fun () ->
-    if !todo then
+    if !flags_changed then
       begin
-        let commands = "why3"::Wp_parameters.Why3Flags.get () in
+        let commands = "why3" :: Wp_parameters.Why3Flags.get () in
         let args = Array.of_list commands in
         begin try
             (* Ensure that an error message generating directly by why3 is
@@ -42,9 +84,15 @@ let configure =
         end;
         ignore (Why3.Debug.Args.option_list ());
         Why3.Debug.Args.set_flags_selected ();
-        todo := false
+        flags_changed := false
       end
   end
+
+let set_procs = Why3.Controller_itp.set_session_max_tasks
+
+(* -------------------------------------------------------------------------- *)
+(* --- Why3 Provers                                                       --- *)
+(* -------------------------------------------------------------------------- *)
 
 type t = Why3.Whyconf.prover
 
