@@ -1,0 +1,23 @@
+# frama-c -wp [...]
+[kernel] Parsing unit_ptrcast.c (with preprocessing)
+[wp] Running WP plugin...
+[wp] [Valid] Goal locally_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal locally_terminates (Cfg) (Trivial)
+[wp] Warning: Missing RTE guards
+------------------------------------------------------------
+  Global
+------------------------------------------------------------
+
+Goal Lemma 'pcast':
+Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function locally
+------------------------------------------------------------
+
+Goal Assertion 'ko' (file unit_ptrcast.c, line 8):
+Assume { (* Heap *) Type: region(m.base) <= 0. }
+Prove: 0 <= to_sint64(int_of_addr(m)).
+
+------------------------------------------------------------

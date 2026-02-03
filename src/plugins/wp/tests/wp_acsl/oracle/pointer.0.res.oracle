@@ -217,22 +217,14 @@ Prove: addr_le(p, shift_sint32(global(G_t_22), 0)).
 ------------------------------------------------------------
 
 Goal Post-condition 'qed_ok,Bool' in 'null':
-Let x = int_of_addr(p).
-Assume { Type: is_sint32(x). (* Heap *) Type: region(p.base) <= 0. }
-Prove: (x != 0) <-> (null != p).
+Assume { (* Heap *) Type: region(p.base) <= 0. }
+Prove: (to_sint32(int_of_addr(p)) != 0) <-> (null != p).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'qed_ok,NotNull' in 'null':
-Let x = int_of_addr(p).
-Assume {
-  Type: is_sint32(x).
-  (* Heap *)
-  Type: region(p.base) <= 0.
-  (* Goal *)
-  When: null != p.
-}
-Prove: x != 0.
+Assume { (* Heap *) Type: region(p.base) <= 0. (* Goal *) When: null != p. }
+Prove: to_sint32(int_of_addr(p)) != 0.
 
 ------------------------------------------------------------
 

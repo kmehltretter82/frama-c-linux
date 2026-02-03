@@ -923,7 +923,7 @@ let cast s l =
     end
 
 let loc_of_int _ v = MemAddr.addr_of_int v
-let int_of_loc _ l = MemAddr.int_of_addr l
+let int_of_loc iota l = Cint.of_integer iota @@ MemAddr.int_of_addr l
 
 (* -------------------------------------------------------------------------- *)
 (* --- Chunk element type                                                 --- *)
