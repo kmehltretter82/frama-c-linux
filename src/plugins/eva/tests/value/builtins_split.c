@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-eva-show-progress -eva-slevel 100"
+   STDOPT: +"-eva-slevel 100"
 */
 
 int *p;
@@ -79,7 +79,7 @@ void test3() {
   if (v) {
     if (s5.p->p->v == 1) {
       /* Fonctionne déjà (avec un if, pas avec un assert). */
-      Frama_C_show_each_s_1(&s5.p->p, s5.p->p->v); 
+      Frama_C_show_each_s_1(&s5.p->p, s5.p->p->v);
     }
   }
 
@@ -88,7 +88,7 @@ void test3() {
   if (v) {
     if (ps->p->p->v == 1) {
       // Fonctionne actuellement (avec un if, pas un assert
-      Frama_C_show_each_s_2(&ps->p, &ps->p->p, &ps->p->p->v, ps->p->p->v); 
+      Frama_C_show_each_s_2(&ps->p, &ps->p->p, &ps->p->p->v, ps->p->p->v);
     }
   }
 

@@ -1,6 +1,6 @@
 /*run.config
 PLUGIN: @PTEST_PLUGIN@ from,inout,eva,scope
-OPT: -eva -eva-show-progress -then -loop
+OPT: -eva -eva-msg-key=progress -then -loop
 */
 void f1(int n) {
   for (int i = 1; i < n+2; i++); // i IN [1..6] (6)

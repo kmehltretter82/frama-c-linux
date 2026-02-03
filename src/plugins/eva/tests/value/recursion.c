@@ -2,10 +2,10 @@
    DONTRUN: The Apron and multidim domains do not support recursion.
 */
 /* run.config*
-   STDOPT: +"-eva-no-show-progress -eva-unroll-recursive-calls 0"
-   STDOPT: +"-eva-no-show-progress -eva-unroll-recursive-calls 20"
+   STDOPT: +"-eva-msg-key=-progress -eva-unroll-recursive-calls 0"
+   STDOPT: +"-eva-msg-key=-progress -eva-unroll-recursive-calls 20"
    EXIT: 1
-   STDOPT: +"-eva-no-show-progress -eva-unroll-recursive-calls 5 -main main_fail"
+   STDOPT: +"-eva-msg-key=-progress -eva-unroll-recursive-calls 5 -main main_fail"
 */
 
 #include "__fc_builtin.h"

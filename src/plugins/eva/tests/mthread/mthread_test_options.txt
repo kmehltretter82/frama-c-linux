@@ -12,6 +12,5 @@
 # Verbosity options
 -mt-verbose 3
 -eva-verbose 3
--eva-no-show-progress
 -eva-msg-key interferences,-summary
 -eva-warn-key experimental=inactive
