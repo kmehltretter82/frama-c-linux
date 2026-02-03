@@ -454,8 +454,5 @@ let print_stats fmt stats =
 let print () =
   let stats = compute_stats () in
   let dkey = Self.dkey_summary in
-  let level =
-    if Parameters.ForcePrintSummary.get () then 0 else 1
-  in
   let header fmt = Format.fprintf fmt " ====== ANALYSIS SUMMARY ======" in
-  Self.printf ~header ~dkey ~level "  @[<v>%a@]" print_stats stats
+  Self.printf ~header ~dkey "  @[<v>%a@]" print_stats stats

@@ -123,7 +123,6 @@ module ShowSlevel: Parameter_sig.Int
 module PrintCallstacks: Parameter_sig.Bool
 module ReportRedStatuses: Parameter_sig.Filepath
 module StatisticsFile: Parameter_sig.Filepath
-module ForcePrintSummary: Parameter_sig.Bool
 
 module MemExecAll: Parameter_sig.Bool
 

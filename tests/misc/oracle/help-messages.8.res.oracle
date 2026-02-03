@@ -148,9 +148,6 @@ Options taking a string as argument should preferably be written
 -eva-flamegraph <file>  Dump a summary of the time spent analyzing function
                     calls in a format suitable for the Flamegraph tool
                     (http://www.brendangregg.com/flamegraphs.html)
--eva-force-print-summary  Print the analysis summary even when '-eva-verbose
-                    0' is set (opposite option is
-                    -eva-no-force-print-summary)
 -eva-log <K_1:file_1,...>  copy log messages from Eva to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

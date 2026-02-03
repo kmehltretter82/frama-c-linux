@@ -1095,14 +1095,6 @@ module StatisticsFile =
       let help = "Dump some internal statistics about the analysis"
     end)
 
-let () = Parameter_customize.set_group messages
-module ForcePrintSummary =
-  False
-    (struct
-      let option_name = "-eva-force-print-summary"
-      let help = "Print the analysis summary even when '-eva-verbose 0' is set"
-    end)
-
 
 (* ------------------------------------------------------------------------- *)
 (* --- Interpreter mode                                                  --- *)
@@ -1307,6 +1299,24 @@ let () =
     Self.Message_category.set (prefix ^ "progress");
   in
   ValShowProgress.add_set_hook hook
+
+let () = Parameter_customize.set_group messages
+let () = Parameter_customize.is_invisible ()
+module ForcePrintSummary =
+  False
+    (struct
+      let option_name = "-eva-force-print-summary"
+      let help = "Deprecated: use -eva-msg-key=summary instead."
+    end)
+let () =
+  let hook _previous enabled =
+    let prefix = if enabled then "+" else "-" in
+    warning "Option -eva%s-force-print-summary is deprecated. \
+             Please use -eva-msg-key=%ssummary instead."
+      (if enabled then "" else "-no") prefix;
+    Self.Message_category.set (prefix ^ "summary");
+  in
+  ForcePrintSummary.add_set_hook hook
 
 let deprecated_aliases : ((module Parameter_sig.S) * string) list =
   [ (module SemanticUnrollingLevel), "-slevel"
