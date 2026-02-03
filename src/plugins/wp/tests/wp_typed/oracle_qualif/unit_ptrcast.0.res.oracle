@@ -6,13 +6,12 @@
 [wp] Warning: Missing RTE guards
 [wp] 2 goals scheduled
 [wp] [Valid] typed_lemma_pcast (Qed)
-[wp] [NoResult] typed_locally_assert_ko (Qed)
+[wp] [Unsuccess] typed_locally_assert_ko (Alt-Ergo) (Cached)
 [wp] Proved goals:    3 / 4
   Terminating:     1
   Unreachable:     1
   Qed:             1
   Unsuccess:       1
-  Missing:         1
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
   Lemma                     1        -        1       100%
