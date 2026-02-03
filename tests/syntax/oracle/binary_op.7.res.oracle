@@ -1,0 +1,11 @@
+[kernel] Parsing binary_op.c (with preprocessing)
+[kernel] binary_op.c:66: User Error: 
+  operand of operator '<=' with non-object (function) pointer type 'int (*)
+  (void)'
+  64    #ifdef CMP1
+  65    // Cannot compare function pointers
+  66    int y(void) { return 0 <= y; }
+                                  ^
+  67    #endif
+  68
+[kernel] Frama-C aborted: invalid user input.

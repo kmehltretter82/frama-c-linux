@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"-warn-invalid-pointer -print"
+STDOPT: +"-machdep gcc_x86_64 -warn-invalid-pointer -print"
 */
 
 struct S { void (*f)(void); } s;

@@ -1,0 +1,9 @@
+[kernel] Parsing binary_op.c (with preprocessing)
+[kernel] binary_op.c:81: User Error: 
+  operator '>=' on types 'int *' and 'int', both should be either arithmetic or pointer types
+  79    #ifdef CMP4
+  80    // Both operands should be either pointers or arithmetics
+  81    int y(void) { return ptr >= 0; }
+                             ^^^^^^^^
+  82    #endif
+[kernel] Frama-C aborted: invalid user input.
