@@ -18,23 +18,15 @@ import * as States from 'frama-c/states';
 import { SelectedNodes, CGNode, SetSelectedNodes } from "../definitions";
 
 const getRenderTaint = (node: NodeObject3D<CGNode>): JSX.Element | null => {
-  if(!node.taintStatus || node.taintStatus.length < 1) return null;
+  function find(name:string) : States.Tag | undefined {
+    return node.taintStatus?.find((elt) => elt.name === name);
+  }
+  const tag = find("direct_taint") ?? find("indirect_taint") ?? find("error");
+  if(!tag) return null;
 
-  const taintTag: States.Tag = { name: '' };
-  if(node.taintStatus.find((elt) => elt.name === "direct_taint")) {
-    taintTag.name = "direct_taint";
-    taintTag.descr = 'Direct taint';
-  }
-  else if(node.taintStatus.find((elt) => elt.name === "indirect_taint")) {
-    taintTag.name = "indirect_taint";
-    taintTag.descr = 'Indirect taint';
-  }
-  else if(node.taintStatus.find((elt) => elt.name === "error")) {
-    taintTag.name = "error";
-    taintTag.descr = 'Error';
-  }
-
-  return taintTag.name !== '' ? renderTaint(taintTag) : null;
+  const clean = tag.name.replace(/_/g, ' ');
+  const descr = clean[0].toUpperCase() + clean.slice(1);
+  return renderTaint({ ...tag, descr });
 };
 
 const getNodeAlarms = (node: CGNode): JSX.Element => {

@@ -32,7 +32,7 @@ async function getTaints(
   callback(taints);
 }
 
-const pinnedMessageId = 'FCFilterTaint';
+const pinnedMessageId = 'EvaFilterTaint';
 
 function addTaintMessage(name: string, remove: () => void): void {
   const pinnedMessageButton =
@@ -67,17 +67,19 @@ function Taints(): React.JSX.Element {
   }, [current, setCurrent]);
 
   React.useEffect(() => {
-    if(evaStatus === 'computed') getTaints(setTaints);
-    else setTaints([]);
+    if(evaStatus === 'computed' || evaStatus === 'aborted')
+      getTaints(setTaints);
+    else
+      setTaints([]);
   }, [evaStatus]);
 
-  const selection = React.useCallback((v: string) => {
+  const onSelection = React.useCallback((v: string) => {
     if(v === current) setCurrent('');
     else setCurrent(v);
   }, [current, setCurrent]);
 
   return (<>
-    <SidebarTitle label='Taint' >
+    <SidebarTitle label='Taints' >
       <Button
         label='Select All'
         disabled={current===''}
@@ -91,7 +93,7 @@ function Taints(): React.JSX.Element {
             title={name}
             label={name}
             selected={current === name}
-            onSelection={() => selection(name)}
+            onSelection={() => onSelection(name)}
           >{(current === name || current === '') &&
               <Icon id='CHECK' kind='positive' />
           }</Item>
@@ -102,7 +104,7 @@ function Taints(): React.JSX.Element {
 }
 
 registerSidebar({
-  id: 'fc.kernel.filter.taints',
+  id: 'fc.eva.filter.taints',
   label: 'Taints',
   icon: 'DROP.EMPTY',
   title: 'Taints',
