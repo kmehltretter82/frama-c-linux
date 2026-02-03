@@ -15,7 +15,7 @@ __BEGIN_DECLS
 #include "errno.h"
 #include "sys/socket.h"
 
-struct if_nameidx {unsigned if_index; char *if_name;};
+struct if_nameindex {unsigned if_index; char *if_name;};
 #define IF_NAMESIZE 16
 
 // represents the state of 'system hardware interfaces'
