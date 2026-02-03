@@ -143,6 +143,53 @@ let register_category ?(level=11) ~help name =
 let register_warn_category ~help = register_warn_category ~help
 
 
+(* ----- Help message about categories -------------------------------------- *)
+
+let is_domain_category name = Stdlib.String.starts_with ~prefix:"d-" name
+
+let print_all_categories () =
+  let get_info category = dkey_name category, get_category_help category in
+  let list = get_all_categories () |> List.map get_info in
+  let length = Stdlib.String.length in
+  let max = List.fold_left (fun m (name, _) -> max m (length name)) 0 list in
+  let print_one_elt fmt (name, help) =
+    Format.fprintf fmt "%-*s : %s" max name help
+  in
+  let is_domain (name, _) = is_domain_category name in
+  let domains, others = List.partition is_domain list in
+  feedback ~level:0 "@[<v>Standard Eva message categories are:@;%a@]"
+    (Format.pp_print_list print_one_elt) others;
+  feedback ~level:0
+    "@[<v>Additional message categories for printing domain states:@;%a@]"
+    (Format.pp_print_list print_one_elt) domains
+
+let print_categories_by_verbosity () =
+  let pp_level fmt (level, list) =
+    let is_no_domain c = not (is_domain_category (dkey_name c)) in
+    let list = List.filter is_no_domain list in
+    Format.fprintf fmt "%2i: %a" level
+      (Pretty_utils.pp_list ~sep:" " pp_category) list
+  in
+  let cmp (l1, _) (l2, _) = Datatype.Int.compare l1 l2 in
+  let list = Hashtbl.to_seq dkey_verbosity |> List.of_seq |> List.sort cmp in
+  feedback ~level:0
+    "@[<v>Message categories by verbosity::@;%a@]"
+    (Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@;" ~suf:"@]" pp_level) list;
+  printf "-eva-verbose N automatically enables all message categories \
+          with a verbosity equal to or less than N. Default to %i."
+    default_verbosity
+
+let print_categories () =
+  print_all_categories ();
+  print_categories_by_verbosity ();
+  raise Cmdline.Exit
+
+(* Hook to register categories set by the user. *)
+let () =
+  Message_category.add_set_hook
+    (fun _ s -> if s = "help" then print_categories ())
+
+
 (* ----- Message categories ------------------------------------------------- *)
 
 (* Each message category is automatically enabled at a given level of verbosity:
