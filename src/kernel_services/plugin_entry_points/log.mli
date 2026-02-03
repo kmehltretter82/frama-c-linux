@@ -307,6 +307,11 @@ sig
       @since 18.0-Argon
   *)
 
+  val get_category_help: category -> string
+  (** returns the category help as a string.
+      @since Frama-C+dev
+  *)
+
   val is_registered_category: string -> bool
   (** true iff the string corresponds to a registered category
       @since Chlorine-20180501
