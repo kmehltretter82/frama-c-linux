@@ -30,4 +30,6 @@
 #define C_ISLNK  0120000
 #define C_ISSOCK 0140000
 
+#define MAGIC "070707"
+
 #endif

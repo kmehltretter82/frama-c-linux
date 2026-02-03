@@ -34,6 +34,22 @@ enum __fc_fe_error
 #define FE_ALL_EXCEPT \
 	(FE_INEXACT | FE_DIVBYZERO | FE_UNDERFLOW | FE_OVERFLOW | FE_INVALID)
 
+enum __fc_rounding_modes
+  {
+    FE_TONEAREST =
+#define FE_TONEAREST 0
+    FE_TONEAREST,
+    FE_DOWNWARD =
+#define FE_DOWNWARD  0x400
+    FE_DOWNWARD,
+    FE_UPWARD =
+#define FE_UPWARD    0x800
+    FE_UPWARD,
+    FE_TOWARDZERO =
+#define FE_TOWARDZERO 0xc00
+    FE_TOWARDZERO
+  };
+
 /* Type representing floating-point environment.  This structure
    corresponds to the layout of the block written by the `fstenv'
    instruction and has additional fields for the contents of the MXCSR
@@ -58,6 +74,8 @@ typedef struct __fc_fenv_t
 #endif
   }
 fenv_t;
+
+#define FE_DFL_ENV ((const fenv_t *) -1)
 
 // From POSIX 1-2017:
 // - "fexcept_t does not have to be an integer type."
