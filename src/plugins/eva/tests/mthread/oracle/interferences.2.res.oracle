@@ -26,7 +26,6 @@
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by <main> at interferences.c:129 <- main_thread_loop
@@ -52,7 +51,6 @@
 [eva:show] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0}
 [eva:show] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a:
@@ -84,7 +82,6 @@
 [eva:show] interferences.c:118: Frama_C_show_each_fjoblooped_start: {0}, {0}
 [eva:show] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0}, {1}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a:
@@ -142,7 +139,6 @@
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by <main> at interferences.c:129 <- main_thread_loop
@@ -172,7 +168,6 @@
   inject threads interferences at this point
 [eva:show] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a:
@@ -216,7 +211,6 @@
   inject threads interferences at this point
 [eva:show] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0; 1}, {1}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a:
@@ -339,7 +333,6 @@
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1}
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by <main> at interferences.c:129 <- main_thread_loop
@@ -369,7 +362,6 @@
   inject threads interferences at this point
 [eva:show] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0; 1}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a:
@@ -415,7 +407,6 @@
   inject threads interferences at this point
 [eva:show] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0; 1}, {1; 2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a:
@@ -534,7 +525,6 @@
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1; 2}
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by <main> at interferences.c:129 <- main_thread_loop
@@ -566,7 +556,6 @@
 [eva:show] interferences.c:113: 
   Frama_C_show_each_fjoboneshot_end: {1}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a:
@@ -612,7 +601,6 @@
 [eva:show] interferences.c:121: 
   Frama_C_show_each_fjoblooped_end: {0; 1}, {1; 2; 3}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a:
@@ -733,7 +721,6 @@
 [eva:show] interferences.c:135: 
   Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by <main> at interferences.c:129 <- main_thread_loop
@@ -765,7 +752,6 @@
 [eva:show] interferences.c:113: 
   Frama_C_show_each_fjoboneshot_end: {1}, {0; 1; 2; 3}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a:
@@ -815,7 +801,6 @@
 [eva:show] interferences.c:121: 
   Frama_C_show_each_fjoblooped_end: {0; 1}, [1..2147483647]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a:
@@ -940,7 +925,6 @@
 [eva:show] interferences.c:135: 
   Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by <main> at interferences.c:129 <- main_thread_loop
@@ -971,7 +955,6 @@
 [eva:show] interferences.c:113: 
   Frama_C_show_each_fjoboneshot_end: {1}, [0..2147483647]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a:

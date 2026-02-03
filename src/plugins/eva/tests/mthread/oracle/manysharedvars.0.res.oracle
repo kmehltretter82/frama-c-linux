@@ -16,7 +16,6 @@
 [mt] manysharedvars.c:49: Release lock
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
@@ -93,7 +92,6 @@
 [eva:alarm] manysharedvars.c:30: Warning: 
   signed overflow. assert s[i].data2 + 3 ≤ 2147483647;
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
@@ -186,7 +184,6 @@
 [mt] manysharedvars.c:46: Lock lock
 [mt] manysharedvars.c:49: Release lock
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
@@ -267,7 +264,6 @@
 [eva:alarm] manysharedvars.c:30: Warning: 
   signed overflow. assert s[i].data2 + 3 ≤ 2147483647;
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
@@ -2280,7 +2276,6 @@
 [eva:alarm] manysharedvars.c:47: Warning: 
   signed overflow. assert t + s[i].data ≤ 2147483647;
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;

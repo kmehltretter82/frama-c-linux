@@ -52,7 +52,6 @@
 [mt] matrix2.c:58: Release locks[4]
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -127,7 +126,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -160,7 +158,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[1]:
@@ -193,7 +190,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[2]:
@@ -226,7 +222,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[3]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[3]:
@@ -259,7 +254,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[4]:
@@ -342,7 +336,6 @@
   assert \pointer_comparable((void *)pj_unfold_8, (void *)(&matrix[150]));
 [mt] matrix2.c:58: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -415,7 +408,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -575,7 +567,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[1]:
@@ -735,7 +726,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[2]:
@@ -895,7 +885,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[3]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[3]:
@@ -1055,7 +1044,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[4]:
@@ -1873,7 +1861,6 @@
   assert \pointer_comparable((void *)pj_unfold_8, (void *)(&matrix[150]));
 [mt] matrix2.c:58: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -1946,7 +1933,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -1987,7 +1973,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[1]:
@@ -2028,7 +2013,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[2]:
@@ -2069,7 +2053,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[3]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[3]:
@@ -2110,7 +2093,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[4]:
@@ -2919,7 +2901,6 @@
   assert \pointer_comparable((void *)pj_unfold_8, (void *)(&matrix[150]));
 [mt] matrix2.c:58: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -2991,7 +2972,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -3030,7 +3010,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[1]:
@@ -3069,7 +3048,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[2]:

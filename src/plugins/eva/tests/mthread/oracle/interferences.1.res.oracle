@@ -19,7 +19,6 @@
 [eva:show] interferences.c:106: Frama_C_show_each_main_end: {0}, {0}
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a: read by <main> at interferences.c:106 <- main_ptr_write
@@ -45,7 +44,6 @@
 [eva:show] interferences.c:82: Frama_C_show_each_fjobptr1_end: {0}, {1}
 [eva:show] interferences.c:82: Frama_C_show_each_fjobptr1_end: {1}, {0}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by jobptr1 at interferences.c:77 <- fjobptr1
@@ -81,7 +79,6 @@
 [eva:show] interferences.c:94: Frama_C_show_each_fjobptr2_end: {2}, {0}
 [eva:show] interferences.c:94: Frama_C_show_each_fjobptr2_end: {0}, {2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by jobptr2 at interferences.c:89 <- fjobptr2
@@ -135,7 +132,6 @@
 [mt] interferences.c:102: Start thread jobptr2
 [eva:show] interferences.c:106: Frama_C_show_each_main_end: {0}, {0}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a: read by <main> at interferences.c:106 <- main_ptr_write
@@ -165,7 +161,6 @@
 [eva:show] interferences.c:82: Frama_C_show_each_fjobptr1_end: {0}, {1}
 [eva:show] interferences.c:82: Frama_C_show_each_fjobptr1_end: {1}, {0}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by jobptr1 at interferences.c:77 <- fjobptr1
@@ -219,7 +214,6 @@
 [eva:show] interferences.c:94: Frama_C_show_each_fjobptr2_end: {0; 1; 2}, {0; 1}
 [eva:show] interferences.c:94: Frama_C_show_each_fjobptr2_end: {0; 1}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by jobptr2 at interferences.c:89 <- fjobptr2
@@ -355,7 +349,6 @@
   New context for jobptr2, fun fjobptr2, parent <main>, args {0}
 [eva:show] interferences.c:106: Frama_C_show_each_main_end: {0; 1; 2}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a: read by <main> at interferences.c:106 <- main_ptr_write
@@ -386,7 +379,6 @@
 [eva:show] interferences.c:82: 
   Frama_C_show_each_fjobptr1_end: {0; 1; 2}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by jobptr1 at interferences.c:77 <- fjobptr1
@@ -442,7 +434,6 @@
 [eva:show] interferences.c:94: 
   Frama_C_show_each_fjobptr2_end: {0; 1; 2}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by jobptr2 at interferences.c:89 <- fjobptr2
@@ -572,7 +563,6 @@
 [mt] interferences.c:102: Start thread jobptr2
 [eva:show] interferences.c:106: Frama_C_show_each_main_end: {0; 1; 2}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a: read by <main> at interferences.c:106 <- main_ptr_write
@@ -602,7 +592,6 @@
 [eva:show] interferences.c:94: 
   Frama_C_show_each_fjobptr2_end: {0; 1; 2}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by jobptr2 at interferences.c:89 <- fjobptr2

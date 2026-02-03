@@ -29,7 +29,6 @@
 [mt] recreation.c:66: Start thread jobs[2]
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: read by <main> at recreation.c:68 <- main
@@ -60,7 +59,6 @@
 [mt] recreation.c:25: New thread: jobs[5], fun job, parent jobs[0], args {5}
 [mt] recreation.c:25: Start thread jobs[5]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: read by jobs[0] at recreation.c:28 <- job
@@ -90,7 +88,6 @@
 [mt] recreation.c:25: New thread: jobs[8], fun job, parent jobs[1], args {8}
 [mt] recreation.c:25: Start thread jobs[8]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: read by jobs[1] at recreation.c:28 <- job
@@ -120,7 +117,6 @@
 [mt] recreation.c:25: New thread: jobs[11], fun job, parent jobs[2], args {11}
 [mt] recreation.c:25: Start thread jobs[11]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: read by jobs[2] at recreation.c:28 <- job
@@ -166,7 +162,6 @@
 [mt] recreation.c:48: Release locks[2]
 [mt] recreation.c:49: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[3] at recreation.c:40 <- job
@@ -209,7 +204,6 @@
 [mt] recreation.c:48: Release locks[3]
 [mt] recreation.c:49: Release locks[5]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[4] at recreation.c:40 <- job
@@ -252,7 +246,6 @@
 [mt] recreation.c:48: Release locks[4]
 [mt] recreation.c:49: Release locks[6]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[5] at recreation.c:40 <- job
@@ -295,7 +288,6 @@
 [mt] recreation.c:48: Release locks[5]
 [mt] recreation.c:49: Release locks[7]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[6] at recreation.c:40 <- job
@@ -338,7 +330,6 @@
 [mt] recreation.c:48: Release locks[6]
 [mt] recreation.c:49: Release locks[8]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[7] at recreation.c:40 <- job
@@ -381,7 +372,6 @@
 [mt] recreation.c:48: Release locks[7]
 [mt] recreation.c:49: Release locks[9]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[8] at recreation.c:40 <- job
@@ -424,7 +414,6 @@
 [mt] recreation.c:48: Release locks[8]
 [mt] recreation.c:49: Release locks[10]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[9] at recreation.c:40 <- job
@@ -467,7 +456,6 @@
 [mt] recreation.c:48: Release locks[9]
 [mt] recreation.c:49: Release locks[11]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[10] at recreation.c:40 <- job
@@ -518,7 +506,6 @@
 [eva] FRAMAC_SHARE/mt/mthread_pthread.c:56: Warning: 
   The mutex locks[0] is already unlocked.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[11] at recreation.c:40 <- job
@@ -586,7 +573,6 @@
 [mt] recreation.c:66: Thread jobs[2], fun job, parent <main>, args {2}
 [mt] recreation.c:66: Start thread jobs[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: read by <main> at recreation.c:68 <- main
@@ -619,7 +605,6 @@
 [mt] recreation.c:25: Start thread jobs[5]
 [eva:interferences] recreation.c:28: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: read by jobs[0] at recreation.c:28 <- job
@@ -652,7 +637,6 @@
 [mt] recreation.c:25: Start thread jobs[8]
 [eva:interferences] recreation.c:28: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: read by jobs[1] at recreation.c:28 <- job
@@ -685,7 +669,6 @@
 [mt] recreation.c:25: Start thread jobs[11]
 [eva:interferences] recreation.c:28: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: read by jobs[2] at recreation.c:28 <- job
@@ -719,7 +702,6 @@
 [mt] recreation.c:48: Release locks[2]
 [mt] recreation.c:49: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[3] at recreation.c:40 <- job
@@ -770,7 +752,6 @@
 [mt] recreation.c:48: Release locks[3]
 [mt] recreation.c:49: Release locks[5]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[4] at recreation.c:40 <- job
@@ -821,7 +802,6 @@
 [mt] recreation.c:48: Release locks[4]
 [mt] recreation.c:49: Release locks[6]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[5] at recreation.c:40 <- job
@@ -872,7 +852,6 @@
 [mt] recreation.c:48: Release locks[5]
 [mt] recreation.c:49: Release locks[7]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[6] at recreation.c:40 <- job
@@ -923,7 +902,6 @@
 [mt] recreation.c:48: Release locks[6]
 [mt] recreation.c:49: Release locks[8]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[7] at recreation.c:40 <- job
@@ -974,7 +952,6 @@
 [mt] recreation.c:48: Release locks[7]
 [mt] recreation.c:49: Release locks[9]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[8] at recreation.c:40 <- job
@@ -1025,7 +1002,6 @@
 [mt] recreation.c:48: Release locks[8]
 [mt] recreation.c:49: Release locks[10]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[9] at recreation.c:40 <- job
@@ -1076,7 +1052,6 @@
 [mt] recreation.c:48: Release locks[9]
 [mt] recreation.c:49: Release locks[11]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[10] at recreation.c:40 <- job
@@ -1135,7 +1110,6 @@
 [eva] FRAMAC_SHARE/mt/mthread_pthread.c:56: Warning: 
   The mutex locks[0] is already unlocked.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[11] at recreation.c:40 <- job
@@ -1291,7 +1265,6 @@
 [mt] recreation.c:66: New context for jobs[2], fun job, parent <main>, args {2}
 [eva:interferences] recreation.c:68: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: read by <main> at recreation.c:68 <- main
@@ -1327,7 +1300,6 @@
 [mt] recreation.c:25: New context for jobs[5], fun job, parent jobs[0], args {5}
 [eva:interferences] recreation.c:28: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: read by jobs[0] at recreation.c:28 <- job
@@ -1364,7 +1336,6 @@
 [mt] recreation.c:25: New context for jobs[8], fun job, parent jobs[1], args {8}
 [eva:interferences] recreation.c:28: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: read by jobs[1] at recreation.c:28 <- job
@@ -1403,7 +1374,6 @@
   New context for jobs[11], fun job, parent jobs[2], args {11}
 [eva:interferences] recreation.c:28: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: read by jobs[2] at recreation.c:28 <- job
@@ -1437,7 +1407,6 @@
 [mt] recreation.c:48: Release locks[2]
 [mt] recreation.c:49: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[3] at recreation.c:40 <- job
@@ -1488,7 +1457,6 @@
 [mt] recreation.c:48: Release locks[3]
 [mt] recreation.c:49: Release locks[5]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[4] at recreation.c:40 <- job
@@ -1539,7 +1507,6 @@
 [mt] recreation.c:48: Release locks[4]
 [mt] recreation.c:49: Release locks[6]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[5] at recreation.c:40 <- job
@@ -1590,7 +1557,6 @@
 [mt] recreation.c:48: Release locks[5]
 [mt] recreation.c:49: Release locks[7]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[6] at recreation.c:40 <- job
@@ -1641,7 +1607,6 @@
 [mt] recreation.c:48: Release locks[6]
 [mt] recreation.c:49: Release locks[8]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[7] at recreation.c:40 <- job
@@ -1692,7 +1657,6 @@
 [mt] recreation.c:48: Release locks[7]
 [mt] recreation.c:49: Release locks[9]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[8] at recreation.c:40 <- job
@@ -1743,7 +1707,6 @@
 [mt] recreation.c:48: Release locks[8]
 [mt] recreation.c:49: Release locks[10]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[9] at recreation.c:40 <- job
@@ -1794,7 +1757,6 @@
 [mt] recreation.c:48: Release locks[9]
 [mt] recreation.c:49: Release locks[11]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[10] at recreation.c:40 <- job
@@ -1853,7 +1815,6 @@
 [eva] FRAMAC_SHARE/mt/mthread_pthread.c:56: Warning: 
   The mutex locks[0] is already unlocked.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end: write by jobs[11] at recreation.c:40 <- job

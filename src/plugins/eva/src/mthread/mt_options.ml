@@ -30,6 +30,10 @@ module KeepProjects =
   end)
 ;;
 let () = KeepProjects.set_possible_values ["all"; "last"; "none"]
+let () = KeepProjects.add_set_hook
+    (fun _old _new ->
+       warning "Option -mt-keep-analyses is now deprecated.@ \
+                Thread analyses are no longer run in separate projects.")
 
 let () = Parameter_customize.set_group grp_debug
 let () = Parameter_customize.set_negative_option_name "-mt-projects-together"

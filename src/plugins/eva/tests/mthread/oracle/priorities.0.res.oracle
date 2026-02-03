@@ -26,7 +26,6 @@
 [mt] priorities.c:67: Release m2
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: write by <main> at priorities.c:64 <- main
@@ -74,7 +73,6 @@
 [mt] priorities.c:22: Lock m1
 [mt] priorities.c:24: Release m1
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: read by jobs1 at priorities.c:23 <- f1
@@ -103,7 +101,6 @@
 [mt] priorities.c:30: Lock m2
 [mt] priorities.c:31: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   m2:
@@ -129,7 +126,6 @@
   inject threads interferences at the start of f3 for thread jobs3
 [mt] Setting priority to 0
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs3 at priorities.c:37 <- f3
@@ -153,7 +149,6 @@
 [mt] priorities.c:44: Lock m2
 [mt] priorities.c:46: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs4 at priorities.c:45 <- f4
@@ -208,7 +203,6 @@
 [mt] priorities.c:66: Release m1
 [mt] priorities.c:67: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: write by <main> at priorities.c:64 <- main
@@ -265,7 +259,6 @@
 [eva:interferences] priorities.c:23: inject threads interferences at this point
 [mt] priorities.c:24: Release m1
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: read by jobs1 at priorities.c:23 <- f1
@@ -296,7 +289,6 @@
 [mt] priorities.c:30: Lock m2
 [mt] priorities.c:31: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   m2:
@@ -325,7 +317,6 @@
   inject threads interferences at the start of f3 for thread jobs3
 [eva:interferences] priorities.c:37: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs3 at priorities.c:37 <- f3
@@ -359,7 +350,6 @@
 [eva:interferences] priorities.c:45: inject threads interferences at this point
 [mt] priorities.c:46: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs4 at priorities.c:45 <- f4
@@ -449,7 +439,6 @@
 [mt] priorities.c:66: Release m1
 [mt] priorities.c:67: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: write by <main> at priorities.c:64 <- main
@@ -506,7 +495,6 @@
 [eva:interferences] priorities.c:23: inject threads interferences at this point
 [mt] priorities.c:24: Release m1
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: read by jobs1 at priorities.c:23 <- f1
@@ -537,7 +525,6 @@
 [mt] priorities.c:30: Lock m2
 [mt] priorities.c:31: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   m2:
@@ -566,7 +553,6 @@
   inject threads interferences at the start of f3 for thread jobs3
 [eva:interferences] priorities.c:37: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs3 at priorities.c:37 <- f3
@@ -600,7 +586,6 @@
 [eva:interferences] priorities.c:45: inject threads interferences at this point
 [mt] priorities.c:46: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs4 at priorities.c:45 <- f4
@@ -683,7 +668,6 @@
 [mt] priorities.c:66: Release m1
 [mt] priorities.c:67: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: write by <main> at priorities.c:64 <- main
@@ -739,7 +723,6 @@
 [eva:interferences] priorities.c:23: inject threads interferences at this point
 [mt] priorities.c:24: Release m1
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: read by jobs1 at priorities.c:23 <- f1
@@ -769,7 +752,6 @@
 [mt] priorities.c:30: Lock m2
 [mt] priorities.c:31: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   m2:
@@ -797,7 +779,6 @@
   inject threads interferences at the start of f3 for thread jobs3
 [eva:interferences] priorities.c:37: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs3 at priorities.c:37 <- f3

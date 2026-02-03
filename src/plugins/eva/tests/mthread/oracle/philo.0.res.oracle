@@ -30,7 +30,6 @@
   No value to receive (yet?).
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs[0..4]:
@@ -66,7 +65,6 @@
 [mt] philo.c:46: Release locks[1]
 [mt] philo.c:47: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[0] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -103,7 +101,6 @@
 [mt] philo.c:46: Release locks[2]
 [mt] philo.c:47: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -141,7 +138,6 @@
 [mt] philo.c:46: Release locks[3]
 [mt] philo.c:47: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[2] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -181,7 +177,6 @@
 [mt] philo.c:46: Release locks[4]
 [mt] philo.c:47: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[3] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -221,7 +216,6 @@
 [mt] philo.c:46: Release locks[0]
 [mt] philo.c:47: Release locks[3]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[4] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -289,7 +283,6 @@
   From thread jobs[4]: [0] ∈ {5}
                        [1] ∈ UNINITIALIZED
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: read by <main> at philo.c:72 <- main
@@ -354,7 +347,6 @@
   From thread jobs[4]: [0] ∈ {5}
                        [1] ∈ UNINITIALIZED
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: read by <main> at philo.c:72 <- main
@@ -390,7 +382,6 @@
 [mt] philo.c:46: Release locks[1]
 [mt] philo.c:47: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[0] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -434,7 +425,6 @@
 [mt] philo.c:46: Release locks[2]
 [mt] philo.c:47: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -475,7 +465,6 @@
 [mt] philo.c:46: Release locks[3]
 [mt] philo.c:47: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[2] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -523,7 +512,6 @@
 [mt] philo.c:46: Release locks[4]
 [mt] philo.c:47: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[3] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -571,7 +559,6 @@
 [mt] philo.c:46: Release locks[0]
 [mt] philo.c:47: Release locks[3]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[4] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -676,7 +663,6 @@
                        [1] ∈ UNINITIALIZED
 [eva:interferences] philo.c:72: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: read by <main> at philo.c:72 <- main
@@ -711,7 +697,6 @@
 [mt] philo.c:46: Release locks[1]
 [mt] philo.c:47: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[0] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -755,7 +740,6 @@
 [mt] philo.c:46: Release locks[2]
 [mt] philo.c:47: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -796,7 +780,6 @@
 [mt] philo.c:46: Release locks[3]
 [mt] philo.c:47: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[2] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -844,7 +827,6 @@
 [mt] philo.c:46: Release locks[4]
 [mt] philo.c:47: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[3] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -892,7 +874,6 @@
 [mt] philo.c:46: Release locks[0]
 [mt] philo.c:47: Release locks[3]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[4] at philo.c:43 <- aux :: philo.c:56 <- job

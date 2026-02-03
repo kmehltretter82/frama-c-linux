@@ -44,8 +44,7 @@ digraph G {
         color="#000000FF", label="t += s1.data;\nreads s1.data",
         style="filled", ];
   v340 [URL="code.html#sid96", fillcolor="#CCCCFFFF", shape=box,
-        color="#000000FF",
-        label="/*@ assert Eva: signed_overflow: t + s1.data2 <= 2147483647; */\nt += s1.data2;\nreads s1.data2",
+        color="#000000FF", label="t += s1.data2;\nreads s1.data2",
         style="filled", ];
   v341 [URL="code.html#sid97", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_unlock(& lock1);",
@@ -62,12 +61,10 @@ digraph G {
   v352 [URL="code.html#sid31", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
   v343 [URL="code.html#sid99", fillcolor="#CCCCFFFF", shape=box,
-        color="#000000FF",
-        label="/*@ assert Eva: signed_overflow: t + s2.data <= 2147483647; */\nt += s2.data;\nreads s2.data",
+        color="#000000FF", label="t += s2.data;\nreads s2.data",
         style="filled", ];
   v344 [URL="code.html#sid100", fillcolor="#CCCCFFFF", shape=box,
-        color="#000000FF",
-        label="/*@ assert Eva: signed_overflow: t + s2.data2 <= 2147483647; */\nt += s2.data2;\nreads s2.data2",
+        color="#000000FF", label="t += s2.data2;\nreads s2.data2",
         style="filled", ];
   v345 [URL="code.html#sid101", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_unlock(& lock2);",
@@ -186,11 +183,11 @@ digraph G {
         color="#AAAAAAFF", label="return", style="filled", ];
   v323 [URL="code.html#sid73", fillcolor="#CCCCFFFF", shape=box,
         color="#000000FF",
-        label="/*@ assert Eva: signed_overflow: s2.data + 1 <= 2147483647; */\n(s2.data) ++;\nreads s2.data,\nwrites s2.data",
+        label="(s2.data) ++;\nreads s2.data,\nwrites s2.data",
         style="filled", ];
   v324 [URL="code.html#sid74", fillcolor="#CCCCFFFF", shape=box,
         color="#000000FF",
-        label="/*@ assert Eva: signed_overflow: s2.data2 + 3 <= 2147483647; */\ns2.data2 += 3;\nreads s2.data2,\nwrites s2.data2",
+        label="s2.data2 += 3;\nreads s2.data2,\nwrites s2.data2",
         style="filled", ];
   v325 [URL="code.html#sid75", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_unlock(& lock2);",

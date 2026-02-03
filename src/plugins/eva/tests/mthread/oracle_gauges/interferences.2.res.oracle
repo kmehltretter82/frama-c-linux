@@ -1,14 +1,14 @@
 26d25
 < [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
-143d141
+140d138
 < [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
-340d337
+334d331
 < [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1}
-535d531
+526d522
 < [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1; 2}
-733,734d728
+721,722d716
 < [eva:show] interferences.c:135: 
 <   Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
-938,939d931
+923,924d916
 < [eva:show] interferences.c:135: 
 <   Frama_C_show_each_main_end: {0; 1}, [0..2147483647]

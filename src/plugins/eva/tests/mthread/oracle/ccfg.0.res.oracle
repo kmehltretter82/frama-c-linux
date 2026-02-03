@@ -32,7 +32,6 @@
 [mt] Warning: During unknown event: invalid event name. When decoding string, incorrect value '{{ &event }}'. Ignoring.
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs[0]:
@@ -74,7 +73,6 @@
 [eva:interferences] 
   inject threads interferences at the start of fjob for thread jobs[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   global1: read by jobs[0] at ccfg.c:19 <- fjob
@@ -96,7 +94,6 @@
 [eva:interferences] 
   inject threads interferences at the start of fjob for thread jobs[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   global1: read by jobs[1] at ccfg.c:19 <- fjob
@@ -118,7 +115,6 @@
 [eva:interferences] 
   inject threads interferences at the start of fjob for thread jobs[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   global1: read by jobs[2] at ccfg.c:19 <- fjob
@@ -140,7 +136,6 @@
 [eva:interferences] 
   inject threads interferences at the start of fjob for thread jobs[3]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   global1: read by jobs[3] at ccfg.c:19 <- fjob
@@ -167,7 +162,6 @@
 [mt] ccfg.c:57: Release lock
 [eva] using specification for function g5
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   x: read by job_f1 at ccfg.c:56 <- f1
@@ -206,7 +200,6 @@
 [mt] ccfg.c:67: Release lock
 [eva] using specification for function g5
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   x: read by job_f2 at ccfg.c:66 <- f2
@@ -273,7 +266,6 @@
 [mt] Monitored event: main event without argument
 [mt] Warning: During unknown event: invalid event name. When decoding string, incorrect value '{{ &event }}'. Ignoring.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs[0]:
@@ -429,7 +421,6 @@
   inject threads interferences at the start of fjob for thread jobs[0]
 [eva:interferences] ccfg.c:19: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   global1: read by jobs[0] at ccfg.c:19 <- fjob
@@ -453,7 +444,6 @@
   inject threads interferences at the start of fjob for thread jobs[1]
 [eva:interferences] ccfg.c:19: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   global1: read by jobs[1] at ccfg.c:19 <- fjob
@@ -477,7 +467,6 @@
   inject threads interferences at the start of fjob for thread jobs[2]
 [eva:interferences] ccfg.c:19: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   global1: read by jobs[2] at ccfg.c:19 <- fjob
@@ -501,7 +490,6 @@
   inject threads interferences at the start of fjob for thread jobs[3]
 [eva:interferences] ccfg.c:19: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   global1: read by jobs[3] at ccfg.c:19 <- fjob
@@ -534,7 +522,6 @@
 [eva:interferences] ccfg.c:50: inject threads interferences at this point
 [eva:interferences] ccfg.c:59: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   x: read by job_f1 at ccfg.c:56 <- f1
@@ -638,7 +625,6 @@
 [eva:interferences] ccfg.c:50: inject threads interferences at this point
 [eva:interferences] ccfg.c:69: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   x: read by job_f2 at ccfg.c:66 <- f2
@@ -933,7 +919,6 @@
 [mt] Monitored event: main event without argument
 [mt] Warning: During unknown event: invalid event name. When decoding string, incorrect value '{{ &event }}'. Ignoring.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs[0]:
@@ -1089,7 +1074,6 @@
   inject threads interferences at the start of fjob for thread jobs[0]
 [eva:interferences] ccfg.c:19: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   global1: read by jobs[0] at ccfg.c:19 <- fjob
@@ -1114,7 +1098,6 @@
   inject threads interferences at the start of fjob for thread jobs[1]
 [eva:interferences] ccfg.c:19: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   global1: read by jobs[1] at ccfg.c:19 <- fjob
@@ -1139,7 +1122,6 @@
   inject threads interferences at the start of fjob for thread jobs[2]
 [eva:interferences] ccfg.c:19: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   global1: read by jobs[2] at ccfg.c:19 <- fjob
@@ -1164,7 +1146,6 @@
   inject threads interferences at the start of fjob for thread jobs[3]
 [eva:interferences] ccfg.c:19: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   global1: read by jobs[3] at ccfg.c:19 <- fjob
@@ -1199,7 +1180,6 @@
 [eva:interferences] ccfg.c:50: inject threads interferences at this point
 [eva:interferences] ccfg.c:59: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   x: read by job_f1 at ccfg.c:56 <- f1
@@ -1304,7 +1284,6 @@
 [eva:interferences] ccfg.c:50: inject threads interferences at this point
 [eva:interferences] ccfg.c:69: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   x: read by job_f2 at ccfg.c:66 <- f2
@@ -1589,7 +1568,6 @@
 [mt] Monitored event: main event without argument
 [mt] Warning: During unknown event: invalid event name. When decoding string, incorrect value '{{ &event }}'. Ignoring.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs[0]:
@@ -1744,7 +1722,6 @@
   inject threads interferences at the start of fjob for thread jobs[0]
 [eva:interferences] ccfg.c:19: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   global1: read by jobs[0] at ccfg.c:19 <- fjob
@@ -1767,7 +1744,6 @@
   inject threads interferences at the start of fjob for thread jobs[1]
 [eva:interferences] ccfg.c:19: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   global1: read by jobs[1] at ccfg.c:19 <- fjob
@@ -1790,7 +1766,6 @@
   inject threads interferences at the start of fjob for thread jobs[2]
 [eva:interferences] ccfg.c:19: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   global1: read by jobs[2] at ccfg.c:19 <- fjob
@@ -1813,7 +1788,6 @@
   inject threads interferences at the start of fjob for thread jobs[3]
 [eva:interferences] ccfg.c:19: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   global1: read by jobs[3] at ccfg.c:19 <- fjob
@@ -1846,7 +1820,6 @@
 [eva:interferences] ccfg.c:50: inject threads interferences at this point
 [eva:interferences] ccfg.c:59: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   x: read by job_f1 at ccfg.c:56 <- f1

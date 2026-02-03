@@ -35,7 +35,6 @@
 [mt] one_var_multiple_threads.c:56: Release lock2
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
@@ -78,7 +77,6 @@
 [mt] one_var_multiple_threads.c:21: Lock lock1
 [mt] one_var_multiple_threads.c:24: Release lock1
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data:
@@ -113,7 +111,6 @@
 [eva:alarm] one_var_multiple_threads.c:33: Warning: 
   assertion 'missing_return' got status invalid (stopping propagation).
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2.data:
@@ -173,7 +170,6 @@
 [mt] one_var_multiple_threads.c:53: Lock lock2
 [mt] one_var_multiple_threads.c:56: Release lock2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
@@ -220,7 +216,6 @@
   inject threads interferences at this point
 [mt] one_var_multiple_threads.c:24: Release lock1
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data:
@@ -274,7 +269,6 @@
 [eva:alarm] one_var_multiple_threads.c:33: Warning: 
   assertion 'missing_return' got status invalid (stopping propagation).
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2.data:
@@ -401,7 +395,6 @@
   inject threads interferences at this point
 [mt] one_var_multiple_threads.c:56: Release lock2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
@@ -448,7 +441,6 @@
   inject threads interferences at this point
 [mt] one_var_multiple_threads.c:24: Release lock1
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data:
@@ -508,7 +500,6 @@
 [eva:alarm] one_var_multiple_threads.c:33: Warning: 
   assertion 'missing_return' got status invalid (stopping propagation).
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2.data:
@@ -634,7 +625,6 @@
   inject threads interferences at this point
 [mt] one_var_multiple_threads.c:56: Release lock2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
@@ -681,7 +671,6 @@
   inject threads interferences at this point
 [mt] one_var_multiple_threads.c:24: Release lock1
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data:
@@ -741,7 +730,6 @@
 [eva:alarm] one_var_multiple_threads.c:33: Warning: 
   assertion 'missing_return' got status invalid (stopping propagation).
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2.data:
@@ -875,7 +863,6 @@
   inject threads interferences at this point
 [mt] one_var_multiple_threads.c:56: Release lock2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
@@ -926,7 +913,6 @@
   inject threads interferences at this point
 [mt] one_var_multiple_threads.c:24: Release lock1
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data:
@@ -992,7 +978,6 @@
 [eva:alarm] one_var_multiple_threads.c:33: Warning: 
   assertion 'missing_return' got status invalid (stopping propagation).
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2.data:
@@ -1129,7 +1114,6 @@
   inject threads interferences at this point
 [mt] one_var_multiple_threads.c:56: Release lock2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
@@ -1179,7 +1163,6 @@
   inject threads interferences at this point
 [mt] one_var_multiple_threads.c:24: Release lock1
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data:

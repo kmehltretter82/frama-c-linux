@@ -12,8 +12,3 @@
 module Html : sig
   val output_threads : Mt_thread.analysis_state -> unit ;;
 end
-
-(** {2 Superposes the results of Value in the analysis project} *)
-module Eva_results : sig
-  val display: Mt_thread.analysis_state -> unit ;;
-end

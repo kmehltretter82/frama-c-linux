@@ -26,7 +26,6 @@
 [mt] philo_nofifo.c:37: Start thread jobs[4]
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs[0..4]:
@@ -54,7 +53,6 @@
 [mt] philo_nofifo.c:14: Release locks[1]
 [mt] philo_nofifo.c:15: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[1]:
@@ -96,7 +94,6 @@
 [mt] philo_nofifo.c:14: Release locks[2]
 [mt] philo_nofifo.c:15: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -138,7 +135,6 @@
 [mt] philo_nofifo.c:14: Release locks[3]
 [mt] philo_nofifo.c:15: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[1]:
@@ -180,7 +176,6 @@
 [mt] philo_nofifo.c:14: Release locks[4]
 [mt] philo_nofifo.c:15: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[2]:
@@ -222,7 +217,6 @@
 [mt] philo_nofifo.c:14: Release locks[0]
 [mt] philo_nofifo.c:15: Release locks[3]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:

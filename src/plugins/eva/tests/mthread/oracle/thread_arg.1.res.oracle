@@ -21,7 +21,6 @@
 [mt] thread_arg.c:48: Release locks[1]
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0..1]:
@@ -54,7 +53,6 @@
 [eva] using specification for function Frama_C_interval
 [mt] thread_arg.c:27: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -88,7 +86,6 @@
 [eva] using specification for function Frama_C_interval
 [mt] thread_arg.c:27: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -144,7 +141,6 @@
 [mt] thread_arg.c:48: Release locks[0]
 [mt] thread_arg.c:48: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0..1]:
@@ -179,7 +175,6 @@
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -229,7 +224,6 @@
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -342,7 +336,6 @@
 [mt] thread_arg.c:48: Release locks[0]
 [mt] thread_arg.c:48: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0..1]:
@@ -377,7 +370,6 @@
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -430,7 +422,6 @@
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -542,7 +533,6 @@
 [mt] thread_arg.c:48: Release locks[0]
 [mt] thread_arg.c:48: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0..1]:
@@ -577,7 +567,6 @@
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -636,7 +625,6 @@
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -748,7 +736,6 @@
 [mt] thread_arg.c:48: Release locks[0]
 [mt] thread_arg.c:48: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0..1]:
@@ -786,7 +773,6 @@
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -841,7 +827,6 @@
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -953,7 +938,6 @@
 [mt] thread_arg.c:48: Release locks[0]
 [mt] thread_arg.c:48: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0..1]:

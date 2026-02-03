@@ -280,8 +280,6 @@ let basic_thread eva_thread stack func state params parent = {
   th_cfg = Mt_cfg_types.CfgNode.dead;
   th_read_written_cfg = Mt_cfg_types.AccessesByZoneNode.empty_map;
   th_values_written = Cvalue.Model.empty_map;
-  th_projects = [];
-  th_value_results = None;
   th_priority= PDefault;
 }
 

@@ -49,32 +49,14 @@ let record_end_of_thread_analysis analysis =
   Mt_self.feedback ~level:2
     "* Starting to save the state of the value analysis";
 
-  let results = Eva_results.get_results () in
-  th.th_value_results <- Some results;
-
-  if Mt_options.ToDisk.get () then
+  if Mt_options.ToDisk.get () then begin
     let th = ThreadState.label th |> Filepath.sanitize_filename in
     let name = Format.sprintf "%s%s_iteration_%d.sav"
         (Mt_options.ToDiskPrefix.get ())
         th analysis.iteration in
-    Project.save (Filepath.of_string name)
-  else begin
-    let p = lazy(
-      let pname = Format.asprintf "%a, iteration %d"
-          ThreadState.pretty th analysis.iteration
-      in
-      Project.create_by_copy ~last:false pname)
-    in
-    match Mt_options.KeepProjects.get () with
-    | "all" ->
-      th.th_projects <- Lazy.force p :: th.th_projects
-    | "last" ->
-      List.iter (fun project -> Project.remove ~project ()) th.th_projects;
-      th.th_projects <- [Lazy.force p]
-    | "none" -> ()
-    | _ -> assert false (* checked by the command-line *)
+    Project.save (Filepath.of_string name);
+    Mt_self.feedback ~level:2 "* state saved";
   end;
-  Mt_self.feedback ~level:2 "* state saved";
 
   mark_new_messages_received analysis;
 

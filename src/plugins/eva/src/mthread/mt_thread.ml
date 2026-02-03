@@ -92,8 +92,6 @@ type thread_state = {
   mutable th_cfg: CfgNode.t;
   mutable th_read_written_cfg: AccessesByZoneNode.map;
   mutable th_values_written: Mt_memory.Types.state;
-  mutable th_projects: Project.t list;
-  mutable th_value_results: Eva_results.results option;
   mutable th_priority: priority;
 }
 

@@ -27,7 +27,6 @@
   Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   r: write by <main> at read_all.c:29 <- main
@@ -56,7 +55,6 @@
   no \from part for clause 'assigns *p, r;'.
   Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   r: write by jobs at read_all.c:19 <- f
@@ -107,7 +105,6 @@
   no \from part for clause 'assigns *p, r;'.
   Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   r: write by <main> at read_all.c:29 <- main
@@ -142,7 +139,6 @@
   Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
 [eva:interferences] read_all.c:19: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   r: write by jobs at read_all.c:19 <- f
@@ -209,7 +205,6 @@
   Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
 [eva:interferences] read_all.c:29: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   r: write by <main> at read_all.c:29 <- main

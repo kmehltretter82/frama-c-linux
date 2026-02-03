@@ -36,7 +36,6 @@
 [mt] matrix.c:59: Release locks[4]
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]: read by <main> at matrix.c:58 <- main
@@ -186,7 +185,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]:
@@ -228,7 +226,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[1][0..99]:
@@ -270,7 +267,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[2][0..99]:
@@ -312,7 +308,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[3]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[3][0..99]:
@@ -354,7 +349,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[4][0..99]:
@@ -432,7 +426,6 @@
 [mt] matrix.c:54: Lock locks[4]
 [mt] matrix.c:59: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]: read by <main> at matrix.c:58 <- main
@@ -585,7 +578,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]:
@@ -733,7 +725,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[1][0..99]:
@@ -881,7 +872,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[2][0..99]:
@@ -1029,7 +1019,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[3]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[3][0..99]:
@@ -1177,7 +1166,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[4][0..99]:
@@ -1547,7 +1535,6 @@
 [mt] matrix.c:54: Lock locks[4]
 [mt] matrix.c:59: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]: read by <main> at matrix.c:58 <- main
@@ -1701,7 +1688,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]:
@@ -1766,7 +1752,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[1][0..99]:
@@ -1831,7 +1816,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[2][0..99]:
@@ -1896,7 +1880,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[3]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[3][0..99]:
@@ -1961,7 +1944,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[4][0..99]:
@@ -2321,7 +2303,6 @@
 [mt] matrix.c:54: Lock locks[4]
 [mt] matrix.c:59: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]: read by <main> at matrix.c:58 <- main
@@ -2473,7 +2454,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]:
@@ -2536,7 +2516,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[1][0..99]:
@@ -2599,7 +2578,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[2][0..99]:

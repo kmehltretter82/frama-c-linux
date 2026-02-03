@@ -19,7 +19,6 @@
 [mt] protect.c:30: Release lock2
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   lock1:
@@ -52,7 +51,6 @@
 [eva:interferences] 
   inject threads interferences at the start of job for thread tjob
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   t[0..9]: read by tjob at protect.c:12 <- job
@@ -96,7 +94,6 @@
 [mt] protect.c:28: Lock lock2
 [mt] protect.c:30: Release lock2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   lock1:
@@ -152,7 +149,6 @@
   inject threads interferences at the start of job for thread tjob
 [eva:interferences] protect.c:12: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   t[0..9]: read by tjob at protect.c:12 <- job
@@ -207,7 +203,6 @@
   inject threads interferences at the start of job for thread tjob
 [eva:interferences] protect.c:12: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   t[0..9]: read by tjob at protect.c:12 <- job

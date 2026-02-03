@@ -23,7 +23,6 @@
 [mt] sharedarray.c:60: Start thread jobs6
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs1:
@@ -62,7 +61,6 @@
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread jobs1
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   t[1]: write by jobs1 at sharedarray.c:22 <- f1
@@ -84,7 +82,6 @@
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread jobs2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   t[1]: write by jobs2 at sharedarray.c:28 <- f2
@@ -105,7 +102,6 @@
 [eva:interferences] 
   inject threads interferences at the start of f3 for thread jobs3
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   t[0..3]: write by jobs3 at sharedarray.c:33 <- f3
@@ -126,7 +122,6 @@
 [eva:interferences] 
   inject threads interferences at the start of f4 for thread jobs4
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   tt[0..25]: write by jobs4 at sharedarray.c:39 <- f4
@@ -147,7 +142,6 @@
 [eva:interferences] 
   inject threads interferences at the start of f5 for thread jobs5
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   tt[0..25]: write by jobs5 at sharedarray.c:45 <- f5
@@ -168,7 +162,6 @@
 [eva:interferences] 
   inject threads interferences at the start of f6 for thread jobs6
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
