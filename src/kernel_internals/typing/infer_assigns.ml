@@ -10,8 +10,7 @@ open Cil
 open Cil_types
 open Logic_const
 
-let from_prototype kf =
-  let vi = Kernel_function.get_vi kf in
+let from_prototype_vi vi =
   let formals =
     try
       let formals = getFormalsDecl vi in
@@ -140,3 +139,7 @@ let from_prototype kf =
     let loc = vi.vdecl in
     let result = Logic_const.(new_identified_term (tresult ~loc rtyp)) in
     (result, From (inputs vi.vghost)):: arguments
+
+let from_prototype kf =
+  let vi = Kernel_function.get_vi kf in
+  from_prototype_vi vi

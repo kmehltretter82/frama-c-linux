@@ -162,8 +162,7 @@ let compare_it it1 it2 =
 
 (* Return true if [kf] is a builtin of Frama-C. *)
 let is_frama_c_builtin kf =
-  let v = Kernel_function.get_vi kf in
-  Cil_builtins.is_builtin v || Cil_builtins.is_special_builtin v.vname
+  Kernel_function.get_vi kf |> Cil_builtins.is_builtin
 
 (* This module is used to define clauses generators. *)
 module type Generator =
@@ -772,6 +771,9 @@ let get_config_custom () =
   in
   Kernel.GeneratedSpecCustom.fold collect default
 
+let libc_mode kf =
+  if Kernel_function.is_variadic kf then Frama_C else ACSL
+
 (* Create the final configuration used for the specification.
    First we create the configuration to be used (either from command line
    parameters, or specific modes for builtins and frama-c's stdlib).
@@ -781,8 +783,7 @@ let get_config_custom () =
 let activated_config kf clauses =
   let default =
     if is_frama_c_builtin kf then build_config Frama_C
-    (* TODO: Use ACSL mode for frama-c's libc once all assigns are written. *)
-    else if Kernel_function.is_in_libc kf then build_config Frama_C
+    else if Kernel_function.is_in_libc kf then build_config (libc_mode kf)
     else get_config_custom ()
   in
   let collect config clause =

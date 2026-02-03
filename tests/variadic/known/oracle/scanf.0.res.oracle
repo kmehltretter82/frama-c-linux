@@ -29,7 +29,7 @@
   Note that due to cleanup, the type may have been defined in the original code but not used anywhere.
   Did you include <stdint.h> ?
 [kernel:variadic] scanf.c:25: 
-  Fallback translation of call scanf to a call to the specialized version scanf_fallback_1.
+  Fallback translation of call scanf to a call to the specialized version scanf_fallback_1. Generating default assigns that may be inaccurate.
 [eva] Analyzing a complete application starting at main
 [eva] using specification for function scanf
 [eva] ====== VALUES COMPUTED ======
@@ -117,6 +117,10 @@ int main(void)
   return __retres;
 }
 
+/*@ assigns \result, *param0;
+    assigns \result \from *(format + (0 ..)), *param0;
+    assigns *param0 \from *(format + (0 ..)), *param0;
+ */
 int scanf_fallback_1(char const * restrict format, int *param0);
 
 void warn_about_intmax_t(void)

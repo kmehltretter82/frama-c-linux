@@ -560,10 +560,10 @@ let is_in_libc kf =
   in Cil.is_in_libc attrs
 
 let has_noreturn_attr kf =
-  match kf.fundec with
-  | Definition ({ svar = vi },_)
-  | Declaration (_, vi, _, _) ->
-    Ast_types.has_attribute "noreturn" vi.vtype
+  Ast_types.has_attribute "noreturn" (get_type kf)
+
+let is_variadic kf =
+  Ast_types.is_variadic (get_type kf)
 
 let is_first_stmt kf stmt =
   try

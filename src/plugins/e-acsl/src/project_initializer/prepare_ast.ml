@@ -560,11 +560,6 @@ let sound_verdict_vi =
 
 let sound_verdict () = Lazy.force sound_verdict_vi
 
-let is_variadic_function vi =
-  match Ast_types.unroll_node vi.vtype with
-  | TFun(_, _, variadic) -> variadic
-  | _ -> false
-
 (* set of functions that must never be duplicated *)
 let unduplicable_functions =
   let white_list =
@@ -617,7 +612,7 @@ let must_duplicate kf vi =
   && (* it is duplicable *)
   not (Datatype.String.Set.mem vi.vname unduplicable_functions)
   && (* it is not a variadic function *)
-  not (is_variadic_function vi)
+  not (Ast_types.is_variadic vi.vtype)
   && (* it is not a built-in *)
   not (Misc.is_fc_or_compiler_builtin vi)
   && (* it is not a generated function *)

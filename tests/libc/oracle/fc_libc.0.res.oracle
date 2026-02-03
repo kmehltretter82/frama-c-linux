@@ -126,6 +126,7 @@
 #include "wchar.h"
 #include "wctype.h"
 #include "wordexp.h"
+/*@ assigns \nothing; */
 void main(void)
 {
   return;

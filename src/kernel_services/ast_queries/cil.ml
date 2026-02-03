@@ -61,13 +61,11 @@ let pp_from_ref = Extlib.mk_fun "Cil.pp_from_ref"
 let pp_behavior_ref = Extlib.mk_fun "Cil.pp_behavior_ref"
 
 let default_behavior_name = "default!"
-let is_default_mk_behavior ~name ~assumes = name = default_behavior_name && assumes = []
-let is_default_behavior b = is_default_mk_behavior ~name:b.b_name ~assumes:b.b_assumes
+let is_default_behavior b =
+  default_behavior_name = b.b_name && b.b_assumes = []
 
 let find_default_behavior spec =
-  try
-    Some (List.find is_default_behavior spec.spec_behavior)
-  with Not_found -> None
+  List.find_opt is_default_behavior spec.spec_behavior
 
 let find_default_requires behaviors =
   try (List.find is_default_behavior behaviors).b_requires

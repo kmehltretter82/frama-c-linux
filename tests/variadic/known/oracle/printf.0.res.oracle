@@ -85,7 +85,7 @@
 [kernel:libc:format] printf.c:71: Warning: 
   Flag ' ' and conversion specifier x are not compatible.
 [kernel:variadic] printf.c:71: 
-  Fallback translation of call printf to a call to the specialized version printf_fallback_1.
+  Fallback translation of call printf to a call to the specialized version printf_fallback_1. Generating default assigns that may be inaccurate.
 [kernel:variadic] printf.c:74: 
   Translating call to printf to a call to the specialized version printf_va_27.
 [kernel:variadic] printf.c:75: 
@@ -110,9 +110,6 @@
   The specification of function printf_va_25
   has generated a garbled mix of addresses
   for assigns clause __fc_stdout->__fc_FILE_data.
-[kernel:annot:missing-spec] printf.c:71: Warning: 
-  Neither code nor specification for function printf_fallback_1, generating
-  default assigns. See -generated-spec-* options for more info.
 [eva:assigns:invalid-location] printf.c:71: 
   Completely invalid destination for assigns clause *(param1 + (0 ..)).
   Ignoring.

@@ -402,6 +402,11 @@ let is_fun t =
   | TFun _ -> true
   | _ -> false
 
+let is_variadic t =
+  match unroll_skel t with
+  | TFun (_, _, va) -> va
+  | _ -> false
+
 let is_fun_ptr t =
   match unroll_skel t with
   | TPtr t -> is_fun t
