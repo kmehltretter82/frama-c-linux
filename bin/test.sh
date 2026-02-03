@@ -12,7 +12,7 @@ CONFIG="<default>"
 VERBOSE=
 CLEAN=
 PREPARE=
-PULLCACHE=
+USEWPCACHE=
 UPDATE=
 GENERATE=
 LOGS=
@@ -66,7 +66,7 @@ function Usage
     echo "  -n|--name <alias>   set dune alias name (default to ptests)"
     echo "  -r|--clean          clean (remove all) test results (includes -p)"
     echo "  -p|--ptests         prepare (all) dune files"
-    echo "  -w|--wp-cache       prepare (pull) WP-cache"
+    echo "  -w|--wp-cache       use (clone/pull/update) WP-cache"
     echo "  -l|--logs           print output of tests (single file, no diff)"
     echo "  -u|--update         update oracles (and WP-cache)"
     echo "  -g|--generate       Generate new oracles and update oracles"
@@ -173,7 +173,7 @@ do
             PREPARE=yes
             ;;
         "-w"|"--wp-cache")
-            PULLCACHE=yes
+            USEWPCACHE=yes
             ;;
         "-u"|"--update")
             UPDATE=yes
@@ -299,11 +299,17 @@ function CloneCache
 
 function PullCache
 {
-    if [ "$PULLCACHE" = "yes" ]
-    then
-        Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
-        RequiredTools git
-        Run git -C "$FRAMAC_WP_CACHEDIR" pull --rebase
+    Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
+    RequiredTools git
+    Run git -C "$FRAMAC_WP_CACHEDIR" pull --rebase
+}
+
+function PrepareWPCache
+{
+    if [ "$USEWPCACHE" = "yes" ]; then
+        SetEnv
+        CloneCache
+        PullCache
     fi
 }
 
@@ -626,7 +632,7 @@ function Status
     fi
 
     #-- Check wp-cache status
-    if [ "$UPDATE" = "yes" ]; then
+    if [ "$USEWPCACHE" = "yes" ] && [ "$UPDATE" = "yes" ]; then
         Head "Update $FRAMAC_WP_CACHEDIR and check status"
         RequiredTools git
         Run git -C "$FRAMAC_WP_CACHEDIR" add -A
@@ -638,9 +644,7 @@ function Status
 # ---  Main Program
 # --------------------------------------------------------------------------
 
-SetEnv
-CloneCache
-PullCache
+PrepareWPCache
 PrepareCoverage
 PrepareTests
 CheckDuneFiles
