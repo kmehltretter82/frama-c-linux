@@ -79,6 +79,9 @@ let is_session_visible () = session_visible_ref := true
 let plugin_subpath_ref = ref None
 let plugin_subpath s = plugin_subpath_ref := Some s
 
+let default_verbose_level = ref 1
+let set_default_verbose_level n = default_verbose_level := n
+
 let default_msg_keys_ref = ref []
 
 let reset_plugin () =
@@ -86,6 +89,7 @@ let reset_plugin () =
   share_visible_ref := false;
   session_visible_ref := false;
   plugin_subpath_ref := None;
+  default_verbose_level := 1;
   default_msg_keys_ref := [];
 ;;
 
@@ -190,7 +194,10 @@ module Register
      end) =
 struct
 
-  let verbose_level = ref (fun () -> 1)
+  let verbose_level =
+    let default = !default_verbose_level in
+    ref (fun () -> default)
+
   let debug_level = ref (fun () -> 0)
 
   (* unused by the kernel: it uses Cmdline.Kernel_log instead;
@@ -617,7 +624,12 @@ struct
            else "level of verbosity for plug-in " ^ P.name)
           ^ " (default to " ^ string_of_int default ^ ")"
       end)
-    let get () = if is_set () then get () else Cmdline.Verbose_level.get ()
+
+    let get () =
+      match !Cmdline.Verbose_level.value_if_set with
+      | Some level -> if is_set () then get () else level
+      | None -> get ()
+
     let () =
       verbose_level := get;
       (* line order below matters *)

@@ -149,6 +149,11 @@ val plugin_subpath: string -> unit
     directories [Share], [Session] and [Config] above.
     @since Neon-20140301 *)
 
+val set_default_verbose_level: int -> unit
+(** Set the default level of the -<plug-in>-verbose parameter.
+    To be called just before applying {!Register} to create plug-in services.
+    @since Frama-C+dev *)
+
 (* ************************************************************************* *)
 (** {2 Handling plugins} *)
 (* ************************************************************************* *)
