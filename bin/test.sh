@@ -429,32 +429,40 @@ function RunAlias
 
 function TestDir
 {
-    local alias cfg test
+    local alias cfg oracle
     case "$CONFIG" in
         "<all>")
             alias=$1/${ALIAS_NAME}
             cfg="(all configs)"
+            oracle="*/oracle*"
             ;;
         "<default>")
             alias=$1/${ALIAS_NAME}_config
             cfg="(default config)"
+            oracle="*/oracle"
             ;;
         *)
             alias=$1/${ALIAS_NAME}_config_$CONFIG
             cfg="(config $CONFIG)"
+            oracle="*/oracle_$CONFIG"
             ;;
     esac
 
     FindPtestDir "$1"
+
+    if [ -n "$(find -L "$1" -type d -path "$oracle")" ]; then
+        Head "Register test on directory $1 $cfg"
+        DUNE_ALIAS+=("@$alias")
+    else
+        Head "Register test on directory $1 (no ptests config)"
+        # Non-ptests tests are registered below
+    fi
 
     # Add the runtest target for the given test directory to add all non-ptests
     # tests to the run (cram tests, inline tests, etc.)
     if [[ ! "${DUNE_ALIAS[*]}" =~ "@runtest" ]]; then
         DUNE_ALIAS+=("@$1/runtest")
     fi
-
-    Head "Register test on directory $1 $cfg"
-    DUNE_ALIAS+=("@$alias")
 }
 
 # --------------------------------------------------------------------------
@@ -531,10 +539,18 @@ function FindPtestDir
 
 function Register
 {
+    local extension dir file
     while [ "$1" != "" ]
     do
-        if [ -e "$1" ] && [ "${1##*.}" == "t" ]; then
+        extension="${1##*.}"
+        if [ "${extension}" == "t" ]; then
+            Head "Register cramtest on file $1"
             DUNE_ALIAS+=("@${1%.*}")
+        elif [ "${extension}" == "ml" ]; then
+            dir=$(dirname "$1")
+            file=$(basename "$1")
+            Head "Register dune test on file $1"
+            DUNE_ALIAS+=("@${dir}/runtest-${file%.*}")
         elif [ -d "$1" ]; then
             TestDir "$1"
         elif [ -f "$1" ]; then

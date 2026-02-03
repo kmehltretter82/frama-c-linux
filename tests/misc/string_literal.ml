@@ -23,4 +23,4 @@ let main () =
   Demote_string_literal.demote wstr_lit;
   File.pretty_ast ()
 
-let () = Boot.Main.extend main
+let () = main ()
