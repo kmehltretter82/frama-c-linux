@@ -1019,20 +1019,6 @@ let () = ArrayPrecisionLevel.add_update_hook
 (* ------------------------------------------------------------------------- *)
 
 let () = Parameter_customize.set_group messages
-module ValShowProgress =
-  False
-    (struct
-      let option_name = "-eva-show-progress"
-      let help = "Show progression messages during analysis"
-    end)
-let () =
-  let hook _previous enabled =
-    let prefix = if enabled then "+" else "-" in
-    Self.Message_category.set (prefix ^ "progress");
-  in
-  ValShowProgress.add_set_hook hook
-
-let () = Parameter_customize.set_group messages
 module ValShowPerf =
   False
     (struct
@@ -1303,6 +1289,24 @@ let () =
     (fun _old _new ->
        warning "Option -eva-all-rounding-modes-constants is now deprecated.@ \
                 Please contact us if you need it.")
+
+let () = Parameter_customize.set_group messages
+let () = Parameter_customize.is_invisible ()
+module ValShowProgress =
+  False
+    (struct
+      let option_name = "-eva-show-progress"
+      let help = "Deprecated: use -eva-msg-key=progress instead."
+    end)
+let () =
+  let hook _previous enabled =
+    let prefix = if enabled then "+" else "-" in
+    warning "Option -eva%s-show-progress is deprecated. \
+             Please use -eva-msg-key=%sprogress instead."
+      (if enabled then "" else "-no") prefix;
+    Self.Message_category.set (prefix ^ "progress");
+  in
+  ValShowProgress.add_set_hook hook
 
 let deprecated_aliases : ((module Parameter_sig.S) * string) list =
   [ (module SemanticUnrollingLevel), "-slevel"

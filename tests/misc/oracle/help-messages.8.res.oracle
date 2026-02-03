@@ -176,8 +176,6 @@ Options taking a string as argument should preferably be written
                     investigated first.
 -eva-show-perf      Compute and show a summary of the time spent analyzing
                     function calls (opposite option is -eva-no-show-perf)
--eva-show-progress  Show progression messages during analysis (opposite
-                    option is -eva-no-show-progress)
 -eva-show-slevel <n>  Period for showing consumption of the allotted slevel
                     during analysis
 -eva-statistics-file <file.csv>  Dump some internal statistics about the
