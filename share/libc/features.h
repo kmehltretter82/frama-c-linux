@@ -101,6 +101,20 @@
 #define restrict __restrict
 #define __restrict__ __restrict
 
+#if defined __GNUC__ && defined __GNUC_MINOR__
+# define __GNUC_PREREQ(maj, min) \
+  ((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
+#else
+# define __GNUC_PREREQ(maj, min) 0
+#endif
+
+#if defined __clang_major__ && defined __clang_minor__
+# define __glibc_clang_prereq(maj, min)                                 \
+  ((__clang_major__ << 16) + __clang_minor__ >= ((maj) << 16) + (min))
+#else
+# define __glibc_clang_prereq(maj, min) 0
+#endif
+
 #define __USE_ISOC99	1
 
 // When linking code including Frama-C's libc, we avoid adding 'extern'
