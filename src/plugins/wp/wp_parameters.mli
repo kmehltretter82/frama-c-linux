@@ -127,6 +127,7 @@ module BackTrack: Parameter_sig.Int
 (** {2 Why3 configuration} *)
 
 module Why3Config: Parameter_sig.Filepath
+module Why3Autodetect: Parameter_sig.Bool
 module Why3ExtraConfig: Parameter_sig.String_list
 module Why3Flags: Parameter_sig.String_list
 

@@ -932,11 +932,19 @@ module Why3Config =
       let arg_name = "file"
       let file_kind = "why3 configuration"
       let help =
-        "Set the Why3 configuration file to use. By default, WP uses the \
-         default Why3 configuration file. WP will also detect existing provers
-        anyway."
+        "Use Why3 configuration file (default $HOME/.why3.conf)."
       let existence = Fc_Filepath.Must_exist
     end)
+
+let () = Parameter_customize.set_group wp_why3_options
+let () = Parameter_customize.no_category ()
+module Why3Autodetect =
+  True
+    (struct
+      let option_name = "-wp-why3-detect"
+      let help = "Detect provers from $PATH"
+    end)
+
 
 let () = Parameter_customize.set_group wp_why3_options
 let () = Parameter_customize.no_category ()
