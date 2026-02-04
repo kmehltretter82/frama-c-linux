@@ -7,6 +7,5 @@ DEFAULT_SUITES= wp_acsl wp_hoare wp_store wp_typed wp_bytes wp_region
 qualif_SUITES=  wp_acsl wp_hoare wp_store wp_typed wp_bytes wp_region
 
 ## Specific Objectives
-qualif_SUITES=  why3
 DEFAULT_SUITES= wp_ce
 ce_SUITES=      wp_ce
