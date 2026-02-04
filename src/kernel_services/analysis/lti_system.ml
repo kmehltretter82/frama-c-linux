@@ -191,17 +191,15 @@ module Make (K : Field.S) = struct
     | None -> Unicode.pp_top fmt
     | Some { transition ; permanent } ->
       let lower, upper = Ball.bounds permanent in
-      let pretty i =
-        Format.fprintf fmt "* %d : [%a .. %a]@ "
-          (Finite.to_int i)
-          K.pretty (Vector.get i lower)
-          K.pretty (Vector.get i upper)
-      in
+      let n = Vector.size lower and unrolled = List.length transition in
+      let lower fmt i = K.pretty fmt (Vector.get i lower) in
+      let upper fmt i = K.pretty fmt (Vector.get i upper) in
+      let bounds fmt i = Format.fprintf fmt "[%a .. %a]" lower i upper i in
+      let pretty i = Format.fprintf fmt "* %d : %a@ " (Finite.to_int i) bounds i in
       Format.fprintf fmt "@[<v>" ;
-      Format.fprintf fmt "Transition duration : %d iterations@ "
-        (List.length transition) ;
+      Format.fprintf fmt "Transition duration : %d iterations@ " unrolled ;
       Format.fprintf fmt "State space invariant :@ " ;
-      Finite.iter pretty (Vector.size lower) ;
+      Finite.iter pretty n ;
       Format.fprintf fmt "@]"
 
 end
