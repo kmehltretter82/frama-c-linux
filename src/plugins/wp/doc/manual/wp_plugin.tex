@@ -1402,11 +1402,11 @@ See \texttt{-wp-interactive <mode>} option for details.
   session (see option \texttt{-wp-session <dir>}).
   In case option \verb|-wp-cache-env| is set, the script mode is taken from environment
   variable \verb|FRAMAC_WP_SCRIPT| instead.
-\item[\tt -wp-detect] lists the provers available for \textsf{Why-3}.
-  This command can only work if \textsf{why3} API was installed before building and
-  installing \textsf{Frama-C}.
-  The option reads your \textsf{Why-3} configuration and prints the available
-  provers with their \verb+-wp-prover <p>+ code names.
+\item[\tt -wp-list-provers] lists all available provers.
+  The option prints all the available provers from \textsf{Why3} configuration and from
+  the current \texttt{PATH} with their respective version and \verb+-wp-prover <p>+
+  code name. See \verb+-wp-why3-config+ and \verb+-wp-why3-detect+ for
+  details.
 \item[\tt -wp-(no)-run-all-provers] Run all specified provers on each goal not
   proved by Qed. When a prover succeeds in proving the goal, the others are not
   stopped. (default is: no).
@@ -1447,6 +1447,12 @@ See \texttt{-wp-interactive <mode>} option for details.
   Default is \verb+5s+.
 \item[\tt -wp-steps <$n$>] sets the maximal number of prover
   steps. This can be used as a machine-independent alternative to timeout.
+\item[\tt -wp-why3-config=<file>] use the specified \textsf{Why3} configuration
+  file for configuring provers. By default, uses \verb+'$HOME/.why3.conf'+
+  if it exists.
+\item[\tt -wp-(no)-why3-detect] collect all available provers from \verb+$PATH+
+  in addition to the specified or default \textsf{Why3} configuration
+  (set by default).
 \item[\tt -wp-why3-opt='options,...'] provides additional options to the
   \verb+why3+ command.
 \item[\tt -wp-why3-extra-config='files,...'] provides additional configuration
@@ -1464,7 +1470,7 @@ See \texttt{-wp-interactive <mode>} option for details.
 Suppose you have the following configuration:
 
 \begin{logs}
-# frama-c -wp-detect
+# frama-c -wp-list-provers
 [wp] Prover   Alt-Ergo 2.0.0  [alt-ergo|altergo|Alt-Ergo:2.0.0]
 [wp] Prover       CVC4 1.6    [cvc4|CVC4:1.6]
 [wp] Prover       CVC4 1.6    [cvc4-ce|CVC4:1.6,counterexamples]

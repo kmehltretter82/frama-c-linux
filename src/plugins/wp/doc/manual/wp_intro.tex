@@ -60,15 +60,11 @@ order to fulfill proof obligations. An easy choice is to install the
   \url{https://alt-ergo.ocamlpro.com/}}. When using the \textsf{Opam} package
   manager, these tools are automatically installed with \textsf{Frama-C}.
 
-When updating or installing \textsf{Why-3}, the following command should be
-run to detect available provers:
+\emph{Introduced since Frama-C 33.0 (Arsenic)}
 
-\begin{lstlisting}[basicstyle=\ttfamily]
-rm -f ~/.why3.conf ; why3 config detect
-\end{lstlisting}
-
-See the documentation of \textsf{Why-3} to install other provers.
-
+\textsf{WP} automatically detects available provers from \verb+$PATH+. It
+also uses any prover configured from the default \textsf{Why3} configuration
+or any additional configuration provided by the user (see options).
 
 %-----------------------------------------------------------------------------
 \section{Tutorial}
