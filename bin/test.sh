@@ -288,28 +288,24 @@ function SetEnv
     esac
 }
 
-function CloneCache
+function GetCache
 {
     if [ ! -d "$FRAMAC_WP_CACHEDIR" ]; then
         Head "Cloning WP cache (from $FRAMAC_WP_CACHE_GIT to $FRAMAC_WP_CACHEDIR)..."
         RequiredTools git
         Cmd git clone "$FRAMAC_WP_CACHE_GIT" "$FRAMAC_WP_CACHEDIR"
+    else
+        Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
+        RequiredTools git
+        Run git -C "$FRAMAC_WP_CACHEDIR" pull --rebase
     fi
-}
-
-function PullCache
-{
-    Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
-    RequiredTools git
-    Run git -C "$FRAMAC_WP_CACHEDIR" pull --rebase
 }
 
 function PrepareWPCache
 {
     if [ "$USEWPCACHE" = "yes" ]; then
         SetEnv
-        CloneCache
-        PullCache
+        GetCache
     fi
 }
 
