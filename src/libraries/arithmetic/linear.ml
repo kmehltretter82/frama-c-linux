@@ -44,8 +44,7 @@ module Space (Field : Field.S) = struct
     let boxing : type n m. n finite -> n nat -> (n, m) boxing = fun i rows ->
       let i = Finite.to_int i and rows = Nat.to_int rows in
       let pp_vec pp fmt v = Format.fprintf fmt "[%a]" pp v in
-      if Stdlib.(i < 0 || rows < 1) then assert false
-      else if Stdlib.(i == 0 && rows == 1) then pp_vec
+      if Stdlib.(i == 0 && rows == 1) then pp_vec
       else if Stdlib.(i == 0) then Unicode.pp_ceil
       else if Stdlib.(i == rows - 1) then Unicode.pp_floor
       else (fun pp fmt v -> Format.fprintf fmt "|%a|" pp v)
