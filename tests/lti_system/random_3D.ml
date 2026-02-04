@@ -26,7 +26,7 @@ let input_matrix =
 let input_space =
   let center = Vector.of_array n [| "100" ; "-100" ; "200" |] in
   let radius = Vector.repeat Rational.one n in
-  Ball.make center radius
+  Box.make center radius
 
 let initial_state =
   Vector.of_array n [| "1000" ; "1000" ; "2000" |]

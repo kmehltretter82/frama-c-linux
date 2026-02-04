@@ -28,7 +28,7 @@
       filter to converge. Conversely, there is no hypothesis on {m B}.
       If the procedure cannot prove easily that this hypothesis is
       satisfied, it will simply return [None].
-    - All input vectors are supposed belonging to a ∞-norm ball in {m 𝕂^m}.
+    - All input vectors are supposed belonging to a box in {m 𝕂^m}.
     - Most presentations of LTI systems describe them using two equations,
       a recursive one equivalent to the one presented here and focused on
       the hidden state vector, and an output non recursive equation focused
@@ -47,31 +47,31 @@ module Make (K : Field.S) : sig
 
   (** The linear space in which the systems are defined. *)
   module Linear : module type of Linear.Space (K)
-  module Ball : module type of Ball.Make (K)
+  module Box : module type of Box.Make (K)
   open Linear
   open Nat
 
-  type 'n ball = 'n Ball.t
+  type 'n box = 'n Box.t
 
   (* A LTI system full specification. *)
   type ('n, 'm) system =
     { state_matrix  : ('n, 'n) matrix
     ; input_matrix  : ('n, 'm) matrix
-    ; input_space   : 'm ball
+    ; input_space   : 'm box
     ; shift         : 'n vector
     ; initial_state : 'n vector
     }
 
   (** Representation of a LTI system's behavior. The fields are as follows:
-      - [transition] represents the transition phase as a list of balls,
+      - [transition] represents the transition phase as a list of boxes,
         one for each iteration that cannot be proven contained in the
         permanent phase. The length of the list, i.e the number of unrolled
         iterations, depends on the system's parameters and on the precision
         of the permanent phase's abstraction.
-      - [permanent] represents the permanent phase as a unique ball, which
+      - [permanent] represents the permanent phase as a unique box, which
         is an invariant for the filter for all iterations after the ones
         unrolled through the transition phase. *)
-  type 'n behavior = { transition : 'n ball list ; permanent : 'n ball }
+  type 'n behavior = { transition : 'n box list ; permanent : 'n box }
 
   (** Behavior computation. As stated above, a complete documentation of the
       underlying theory will be provided. The optionnal parameters are as
@@ -79,7 +79,7 @@ module Make (K : Field.S) : sig
       - [timeout] specifies the maximum analysis duration. It is expressed
         in seconds, and its default value is one second.
       - [completion_target] specifies the relative completion of the permanent
-        phase that must be achieved, i.e how much of the permanent ball is
+        phase that must be achieved, i.e how much of the permanent box is
         proven to be a valid and reachable state of the system.
         It is expressed in percentage between 0 and 100. *)
   val behavior :

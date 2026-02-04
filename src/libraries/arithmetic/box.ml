@@ -19,17 +19,17 @@ module Make (K : Field.S) = struct
 
   let lower { center ; radius } = Matrix.(center - radius)
   let upper { center ; radius } = Matrix.(center + radius)
-  let bounds ball = lower ball, upper ball
+  let bounds box = lower box, upper box
 
   let is_included l r =
     let ( < ) = Matrix.all_components_lower_than in
     lower r < lower l && upper l < upper r
 
-  let pretty fmt ball =
-    let n = Vector.size ball.center in
+  let pretty fmt box =
+    let n = Vector.size box.center in
     let pretty i =
-      let c = Vector.get i ball.center in
-      let r = Vector.get i ball.radius in
+      let c = Vector.get i box.center in
+      let r = Vector.get i box.radius in
       if Finite.(i != first) then Format.fprintf fmt " ; " ;
       Format.fprintf fmt "%a ± %a" K.pretty c K.pretty r ;
     in

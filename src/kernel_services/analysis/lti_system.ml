@@ -12,8 +12,8 @@
  * - B is the system's input matrix ;
  * - S is the system's shift ;
  * - μ is an infinite sequence of inputs ;
- * - C is the center of the inputs ball ;
- * - R is the radius of the inputs ball ;
+ * - C is the center of the inputs box ;
+ * - R is the radius of the inputs box ;
  * - Everytime a radius is mentionned, it is always supposed all positive ;
  * - |.| is the componentwise absolute value on matrices and vectors. *)
 
@@ -22,11 +22,11 @@ module Make (K : Field.S) = struct
   (** Preliminary declarations **)
 
   module Linear = Linear.Space (K)
-  module Ball = Ball.Make (K)
+  module Box = Box.Make (K)
   open Option.Operators
   open Linear
 
-  type 'n ball = 'n Ball.t
+  type 'n box = 'n Box.t
 
 
   (** Types specifications **)
@@ -35,7 +35,7 @@ module Make (K : Field.S) = struct
   type ('n, 'm) system =
     { state_matrix  : ('n, 'n) matrix
     ; input_matrix  : ('n, 'm) matrix
-    ; input_space   : 'm ball
+    ; input_space   : 'm box
     ; shift         : 'n vector
     ; initial_state : 'n vector
     }
@@ -51,16 +51,16 @@ module Make (K : Field.S) = struct
   (* Information on an iteration {m k} of the system:
    * - [state_power] corresponds to the computation {m A^k}.
    * - [perturbations] corresponds to the maximal cumulative contributions of
-   *   all previous inputs, which is a ball with center and radius computed
+   *   all previous inputs, which is a box with center and radius computed
    *   respectively as {m ∑ A^t (B C + S)} and {m ∑ |A^t B| |R|},
    *   where {m t} is between {m 0} and {m k - 1}. *)
   type 'n iteration =
-    { state_power : ('n, 'n) matrix ; perturbations : 'n ball }
+    { state_power : ('n, 'n) matrix ; perturbations : 'n box }
 
   (* Behavior of the system, described as a transition phase of unrolled
-   * iterations, and a permanent phase described by an overapproximated ball. *)
+   * iterations, and a permanent phase described by an overapproximated box. *)
   type 'n behavior =
-    { transition : 'n ball list ; permanent : 'n ball }
+    { transition : 'n box list ; permanent : 'n box }
 
 
   (** Behavior computation **)
@@ -84,20 +84,20 @@ module Make (K : Field.S) = struct
   (* Computes the systems iterations as a memoized infinite sequence
    * of [iteration] structures. *)
   let compute_iterations s { n ; center ; radius } =
-    let zero = { state_power = Matrix.id n ; perturbations = Ball.zero n } in
+    let zero = { state_power = Matrix.id n ; perturbations = Box.zero n } in
     let compute_next_iteration { state_power ; perturbations } =
       let center = Matrix.(state_power * center) in
       let radius = Matrix.(abs (state_power * s.input_matrix) * radius) in
-      let perturbations = Ball.(perturbations + make center radius) in
+      let perturbations = Box.(perturbations + make center radius) in
       (* Updating [state_power] at the end as [perturbations] is the sum
        * of all *previous* iterations contributions. *)
       let state_power = Matrix.(s.state_matrix * state_power) in
       { state_power ; perturbations }
     in Seq.(iterate compute_next_iteration zero |> memoize)
 
-  (* Computes a ball overapproximating the system's behavior as the iteration
+  (* Computes a box overapproximating the system's behavior as the iteration
    * goes to infinity, along with the spectral exponent {m q} with which the
-   * overapproximation has been computed. The center of this ball is computed
+   * overapproximation has been computed. The center of this box is computed
    * as described in the [compute_center_limit] function. Its radius is an
    * overapproximation of the supremum for all possible input sequence {m μ}
    * of the limit as {m k} tends toward infinity of {m ∑ A^t B μ_(k - 1 - t)},
@@ -112,7 +112,7 @@ module Make (K : Field.S) = struct
    * - The infinite remainder is approximated by the computation
    *   {m (I - |A^q|)^(-1) |A^q| (∑ |A^t B| |R|)}.
    * - The function checks that the overapproximated remainder does not count
-   *   for more than a specified percentage of the limit ball's radius. *)
+   *   for more than a specified percentage of the limit box's radius. *)
   let limit_behavior s ({ n ; _ } as knowledge) error_target iterations =
     let center_limit = compute_center_limit s knowledge in
     let ( let<?> ) b f = if b then f () else None in
@@ -122,9 +122,9 @@ module Make (K : Field.S) = struct
       let abs_power = Matrix.abs state_power in
       let* center_limit = Lazy.force center_limit in
       let* limit = Matrix.(inverse (id n - abs_power)) in
-      let underapprox = Ball.make center_limit perturbations.radius in
+      let underapprox = Box.make center_limit perturbations.radius in
       let remainder = Matrix.(limit * abs_power * perturbations.radius) in
-      let overapprox = Ball.(underapprox + make (Vector.zero n) remainder) in
+      let overapprox = Box.(underapprox + make (Vector.zero n) remainder) in
       let error = Matrix.(scale (K.of_int 100) remainder / overapprox.radius) in
       let<?> () = K.(Vector.norm error < error_target) in
       Some (q, overapprox)
@@ -140,7 +140,7 @@ module Make (K : Field.S) = struct
       match acc with
       | None -> Some (q, candidate)
       | Some (q', worst) ->
-        if Ball.is_included worst candidate
+        if Box.is_included worst candidate
         then Some (q, candidate)
         else Some (q', worst)
     in Seq.fold_left worst None limits
@@ -151,7 +151,7 @@ module Make (K : Field.S) = struct
    * the [spectral - 1] following iterations. *)
   let search_unrolling_stop spectral limit iterations =
     let exception Found of int in
-    let in_limit abst = Ball.is_included abst limit in
+    let in_limit abst = Box.is_included abst limit in
     let search window n abst =
       let () = Async.yield () in
       match window with
@@ -171,7 +171,7 @@ module Make (K : Field.S) = struct
     let iterations = compute_iterations s knowledge in
     let* spectral, limit = limit_behavior s knowledge error_target iterations in
     let remainder it = Matrix.(it.state_power * s.initial_state) in
-    let abstraction it = Ball.(point (remainder it) + it.perturbations) in
+    let abstraction it = Box.(point (remainder it) + it.perturbations) in
     let iterations = Seq.map abstraction iterations in
     let+ transition = search_unrolling_stop spectral limit iterations in
     { transition ; permanent = limit }
@@ -190,7 +190,7 @@ module Make (K : Field.S) = struct
   let pretty_behavior fmt = function
     | None -> Unicode.pp_top fmt
     | Some { transition ; permanent } ->
-      let lower, upper = Ball.bounds permanent in
+      let lower, upper = Box.bounds permanent in
       let n = Vector.size lower and unrolled = List.length transition in
       let lower fmt i = K.pretty fmt (Vector.get i lower) in
       let upper fmt i = K.pretty fmt (Vector.get i upper) in

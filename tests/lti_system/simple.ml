@@ -22,7 +22,7 @@ let input_matrix =
 let input_space =
   let center = Vector.zero m in
   let radius = Vector.repeat (Rational.of_string "0.1") m in
-  Ball.make center radius
+  Box.make center radius
 
 let initial_state =
   Vector.zero n
