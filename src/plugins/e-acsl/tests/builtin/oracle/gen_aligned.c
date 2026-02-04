@@ -327,7 +327,7 @@ int main(void)
       __gen_e_acsl_assert_data_12.fct = "main";
       __gen_e_acsl_assert_data_12.line = 17;
       __gen_e_acsl_assert_data_12.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_12);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_12);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
     }
     /*@ assert Eva: pointer_alignment: \aligned(i0,alignof(int)); */
@@ -356,7 +356,7 @@ int main(void)
         __gen_e_acsl_assert_data_13.fct = "main";
         __gen_e_acsl_assert_data_13.line = 17;
         __gen_e_acsl_assert_data_13.name = "denominator not zero";
-        __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_13);
+        __e_acsl_assert(1,& __gen_e_acsl_assert_data_13);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
       }
       /*@ assert Eva: pointer_alignment: \aligned(i1,alignof(int)); */

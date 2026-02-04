@@ -646,7 +646,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
       __gen_e_acsl_assert_data_6.fct = "memcpy";
       __gen_e_acsl_assert_data_6.line = 111;
       __gen_e_acsl_assert_data_6.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_6);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_6);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     }
     __gen_e_acsl_aligned = __e_acsl_aligned(dest,_Alignof(char));
@@ -713,7 +713,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
       __gen_e_acsl_assert_data_9.fct = "memcpy";
       __gen_e_acsl_assert_data_9.line = 111;
       __gen_e_acsl_assert_data_9.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_9);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_9);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
     }
     __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)src,_Alignof(char));
@@ -771,7 +771,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
       __gen_e_acsl_assert_data_11.fct = "memcpy";
       __gen_e_acsl_assert_data_11.line = 111;
       __gen_e_acsl_assert_data_11.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_11);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_11);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
     }
     __gen_e_acsl_aligned_3 = __e_acsl_aligned(dest,_Alignof(char));
@@ -806,7 +806,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
       __gen_e_acsl_assert_data_13.fct = "memcpy";
       __gen_e_acsl_assert_data_13.line = 111;
       __gen_e_acsl_assert_data_13.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_13);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_13);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
     }
     __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)src,_Alignof(char));
@@ -909,7 +909,7 @@ int __gen_e_acsl_valid_or_empty_here(void *s, unsigned long n)
     __gen_e_acsl_assert_data_3.fct = "valid_or_empty_here";
     __gen_e_acsl_assert_data_3.line = 29;
     __gen_e_acsl_assert_data_3.name = "denominator not zero";
-    __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
   }
   __gen_e_acsl_aligned = __e_acsl_aligned(s,_Alignof(char));
@@ -952,7 +952,7 @@ int __gen_e_acsl_valid_or_empty_here(void *s, unsigned long n)
       __gen_e_acsl_assert_data_5.fct = "valid_or_empty_here";
       __gen_e_acsl_assert_data_5.line = 29;
       __gen_e_acsl_assert_data_5.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     }
     __gen_e_acsl_aligned_2 = __e_acsl_aligned(s,_Alignof(char));
@@ -1013,7 +1013,7 @@ int __gen_e_acsl_valid_read_or_empty_here(void *s, unsigned long n)
     __gen_e_acsl_assert_data_4.fct = "valid_read_or_empty_here";
     __gen_e_acsl_assert_data_4.line = 32;
     __gen_e_acsl_assert_data_4.name = "denominator not zero";
-    __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_4);
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
   }
   __gen_e_acsl_aligned = __e_acsl_aligned(s,_Alignof(char));
@@ -1056,7 +1056,7 @@ int __gen_e_acsl_valid_read_or_empty_here(void *s, unsigned long n)
       __gen_e_acsl_assert_data_6.fct = "valid_read_or_empty_here";
       __gen_e_acsl_assert_data_6.line = 32;
       __gen_e_acsl_assert_data_6.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_6);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_6);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     }
     __gen_e_acsl_aligned_2 = __e_acsl_aligned(s,_Alignof(char));

@@ -80,8 +80,7 @@ int find_last_of(int const *a, int len, int value)
           __gen_e_acsl_assert_data_4.fct = "find_last_of";
           __gen_e_acsl_assert_data_4.line = 10;
           __gen_e_acsl_assert_data_4.name = "denominator not zero";
-          __e_acsl_assert(_Alignof(int const) != 0UL,
-                          & __gen_e_acsl_assert_data_4);
+          __e_acsl_assert(1,& __gen_e_acsl_assert_data_4);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
         }
         __gen_e_acsl_aligned = __e_acsl_aligned((void *)(a + __gen_e_acsl_i_2),
@@ -207,8 +206,7 @@ int find_last_of(int const *a, int len, int value)
           __gen_e_acsl_assert_data_8.fct = "find_last_of";
           __gen_e_acsl_assert_data_8.line = 10;
           __gen_e_acsl_assert_data_8.name = "denominator not zero";
-          __e_acsl_assert(_Alignof(int const) != 0UL,
-                          & __gen_e_acsl_assert_data_8);
+          __e_acsl_assert(1,& __gen_e_acsl_assert_data_8);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
         }
         __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)(a + __gen_e_acsl_i_4),

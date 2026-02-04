@@ -5733,7 +5733,7 @@ and mkBinOp ?(constfold=false) ~loc op e1 e2 =
   let open Ast_types in
   let t1 = typeOf e1 in
   let t2 = typeOf e2 in
-  let machdep = false in
+  let machdep = true in
   let error msg = Format.kasprintf Result.error msg in
   let constFoldBinOp bop e1 e2 t =
     if constfold then

@@ -317,8 +317,7 @@ int __gen_e_acsl_linked_n_here(struct list *root, struct list **cArr,
         __gen_e_acsl_assert_data_4.fct = "linked_n_here";
         __gen_e_acsl_assert_data_4.line = 33;
         __gen_e_acsl_assert_data_4.name = "denominator not zero";
-        __e_acsl_assert(_Alignof(struct list *) != 0UL,
-                        & __gen_e_acsl_assert_data_4);
+        __e_acsl_assert(1,& __gen_e_acsl_assert_data_4);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
       }
       __gen_e_acsl_aligned = __e_acsl_aligned((void *)(cArr + __gen_e_acsl_index),
@@ -355,8 +354,7 @@ int __gen_e_acsl_linked_n_here(struct list *root, struct list **cArr,
         __gen_e_acsl_assert_data_6.fct = "linked_n_here";
         __gen_e_acsl_assert_data_6.line = 33;
         __gen_e_acsl_assert_data_6.name = "denominator not zero";
-        __e_acsl_assert(_Alignof(struct list) != 0UL,
-                        & __gen_e_acsl_assert_data_6);
+        __e_acsl_assert(1,& __gen_e_acsl_assert_data_6);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
       }
       /*@ assert Eva: mem_access: \valid_read(cArr + __gen_e_acsl_index); */

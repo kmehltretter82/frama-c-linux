@@ -1349,7 +1349,7 @@ int __gen_e_acsl_implicitly_labelled_here(void)
         __gen_e_acsl_assert_data_40.fct = "implicitly_labelled_here";
         __gen_e_acsl_assert_data_40.line = 18;
         __gen_e_acsl_assert_data_40.name = "denominator not zero";
-        __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_40);
+        __e_acsl_assert(1,& __gen_e_acsl_assert_data_40);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_40);
       }
       __gen_e_acsl_aligned = __e_acsl_aligned((void *)a[(int)__gen_e_acsl_i_15],
