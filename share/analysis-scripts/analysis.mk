@@ -96,7 +96,7 @@ define display_command
   @{
     echo '';
     [ -t 1 ] && tput setaf 4;
-    echo "Command: $(strip $(1))";
+    echo 'Command: $(strip $(1))';
     [ -t 1 ] && tput sgr0;
     echo '';
   }
