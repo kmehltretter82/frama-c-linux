@@ -15,7 +15,7 @@ module Make (K : Field.S) : sig
   type 'n t = { center : 'n vector ; radius : 'n vector }
   val make : 'n succ vector -> 'n succ vector -> 'n succ t
   val zero : 'n succ nat -> 'n succ t
-  val constant : 'n succ vector -> 'n succ t
+  val point : 'n succ vector -> 'n succ t
   val pretty : 'n succ t Pretty_utils.formatter
   val lower : 'n t -> 'n vector
   val upper : 'n t -> 'n vector

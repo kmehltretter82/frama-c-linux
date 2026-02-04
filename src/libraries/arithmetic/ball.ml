@@ -14,7 +14,7 @@ module Make (K : Field.S) = struct
 
   let make center radius = { center ; radius = Matrix.abs radius }
   let zero n = make (Vector.zero n) (Vector.zero n)
-  let constant v = make v Vector.(size v |> zero)
+  let point v = make v Vector.(size v |> zero)
   let ( + ) l r = make Matrix.(l.center + r.center) Matrix.(l.radius + r.radius)
 
   let lower { center ; radius } = Matrix.(center - radius)
