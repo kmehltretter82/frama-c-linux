@@ -56,10 +56,18 @@ val of_int : 'n succ nat -> int -> 'n succ finite option
     is O(1). *)
 val to_int : 'n finite -> int
 
-(** The call [for_each f limit acc] folds over each finite elements of a set of
-    cardinal limit, computing f at each step.
+(** The call [fold f limit acc] folds over each finite elements of a set of
+    cardinal [limit], computing f at each step.
     The function complexity is O(n). *)
-val for_each : ('n finite -> 'a -> 'a) -> 'n nat -> 'a -> 'a
+val fold : ('n finite -> 'a -> 'a) -> 'n nat -> 'a -> 'a
+
+(** The call [iter f limit] iterates over each finite elements of a set of
+    cardinal [limit]. *)
+val iter : ('n finite -> unit) -> 'n nat -> unit
+
+(** The call [forall f limit] returns true if and only [f i] is true for all
+    element [i] of a set of cardinal [limit]. *)
+val forall : ('n finite -> bool) -> 'n nat -> bool
 
 (** {2 Relational operators.} *)
 

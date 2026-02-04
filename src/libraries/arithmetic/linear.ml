@@ -53,16 +53,16 @@ module Space (Field : Field.S) = struct
     let pp_row_unboxed : type n m. n finite -> (n, m) formatter = fun i fmt (M m) ->
       let scalar fmt j = Field.pretty fmt (get i j (M m)) in
       let spacer fmt j = if j != last m.cols then Format.fprintf fmt " ; " in
-      let pp_elt j () = Format.fprintf fmt "%a%a" scalar j spacer j in
-      Finite.for_each pp_elt m.cols ()
+      let pp_elt j = Format.fprintf fmt "%a%a" scalar j spacer j in
+      Finite.iter pp_elt m.cols
 
     let pp_row : type n m. n finite -> (n, m) formatter = fun i fmt (M m) ->
       boxing i m.rows (pp_row_unboxed i) fmt (M m)
 
     let pretty : type n m. (n, m) formatter = fun fmt (M m) ->
       let cut fmt i = if i != last m.rows then Format.pp_print_cut fmt () in
-      let row i () = Format.fprintf fmt "@[<h>%a@]%a" (pp_row i) (M m) cut i in
-      Finite.for_each row m.rows ()
+      let row i = Format.fprintf fmt "@[<h>%a@]%a" (pp_row i) (M m) cut i in
+      Finite.iter row m.rows
 
 
     let init n m init =
@@ -70,11 +70,11 @@ module Space (Field : Field.S) = struct
       let t = Parray.init (rows * cols) (fun _ -> Field.zero) in
       let index i j = index m (Finite.to_int i) (Finite.to_int j) in
       let set i j data = Parray.set data (index i j) (init i j) in
-      let data = Finite.(for_each (fun i t -> for_each (set i) m t) n t) in
+      let data = Finite.(fold (fun i t -> fold (set i) m t) n t) in
       M { data ; rows = n ; cols = m }
 
     let zero n m = init n m (fun _ _ -> Field.zero)
-    let id n = Finite.for_each (fun i m -> set i i Field.one m) n (zero n n)
+    let id n = Finite.fold (fun i m -> set i i Field.one m) n (zero n n)
 
     let of_array n m rows = init n m @@ fun i j ->
       Field.of_string rows.(Finite.to_int i).(Finite.to_int j)
@@ -96,7 +96,7 @@ module Space (Field : Field.S) = struct
     let ( * ) : type n m p. (n, m, p) mul = fun (M l) (M r) ->
       let n = l.rows and m = l.cols and p = r.cols in
       let folder i k j acc = Field.(get i j (M l) * get j k (M r) + acc) in
-      let elt i k = Finite.for_each (folder i k) m Field.zero in
+      let elt i k = Finite.fold (folder i k) m Field.zero in
       init n p elt
 
     type ('n, 'm) div = ('n, 'm) matrix -> ('n, 'm) matrix -> ('n, 'm) matrix
@@ -113,27 +113,27 @@ module Space (Field : Field.S) = struct
     let all_components_lower_than l r =
       let rows, cols = dimensions l in
       let lower i j acc = acc && Field.(get i j l < get i j r) in
-      let do_row i = Finite.for_each (lower i) cols in
-      Finite.for_each do_row rows true
+      let do_row i = Finite.fold (lower i) cols in
+      Finite.fold do_row rows true
 
     let norm_inf : type n m. (n, m) matrix -> scalar = fun (M m) ->
       let sum j i acc = Field.(abs (get i j (M m)) + acc) in
-      let col j = Finite.for_each (sum j) m.rows Field.zero in
+      let col j = Finite.fold (sum j) m.rows Field.zero in
       let max j res = Field.max res (col j) in
-      Finite.for_each max m.cols Field.zero
+      Finite.fold max m.cols Field.zero
 
     let norm_one : type n m. (n, m) matrix -> scalar = fun (M m) ->
       let sum i j acc = Field.(abs (get i j (M m)) + acc) in
-      let row i = Finite.for_each (sum i) m.cols Field.zero in
+      let row i = Finite.fold (sum i) m.cols Field.zero in
       let max i res = Field.max res (row i) in
-      Finite.for_each max m.rows Field.zero
+      Finite.fold max m.rows Field.zero
 
 
     let swap_rows (M m) r r' =
       let swap c m =
         let elt = get r c m and elt' = get r' c m in
         m |> set r c elt' |> set r' c elt
-      in Finite.for_each swap m.cols (M m)
+      in Finite.fold swap m.cols (M m)
 
     let argmax (M m) starting_row col =
       let max row argmax_row =
@@ -142,13 +142,13 @@ module Space (Field : Field.S) = struct
           let row_value = Field.abs (get row col (M m)) in
           if Field.(argmax_value < row_value) then row else argmax_row
         else argmax_row
-      in Finite.for_each max m.rows starting_row
+      in Finite.fold max m.rows starting_row
 
     let equal : type n m. (n, m) matrix -> (n, m) matrix -> bool = fun l r ->
       let rows, cols = dimensions l in
-      let equal_elt row col eq = eq && Field.(get row col l = get row col r) in
-      let equal_row row eq = eq && Finite.for_each (equal_elt row) cols eq in
-      Finite.for_each equal_row rows true
+      let equal_elt row col = Field.(get row col l = get row col r) in
+      let equal_row row = Finite.forall (equal_elt row) cols in
+      Finite.forall equal_row rows
 
     let rec back_propagation (M _ as m) inverse start =
       let size, _ = dimensions m in
@@ -157,12 +157,12 @@ module Space (Field : Field.S) = struct
           if Finite.(r < start) then
             let f = Field.(get r start m / get start start m) in
             let compute c m = set r c Field.(get r c m - f * get start c m) m in
-            let inverse = Finite.for_each compute size inverse in
-            let m = Finite.for_each compute size m in
+            let inverse = Finite.fold compute size inverse in
+            let m = Finite.fold compute size m in
             (m, inverse)
           else (m, inverse)
         in
-        let m, inverse = Finite.for_each propagate size (m, inverse) in
+        let m, inverse = Finite.fold propagate size (m, inverse) in
         back_propagation m inverse Finite.(prev start |> weaken)
       else if equal m (id size) then Some inverse else None
 
@@ -182,9 +182,9 @@ module Space (Field : Field.S) = struct
         let value = get i_max k m in
         let divide col m = Field.(get i_max col m / value) in
         let normalize col m = set i_max col (divide col m) m in
-        let m = Finite.for_each normalize size m in
+        let m = Finite.fold normalize size m in
         let m = swap_rows m h i_max in
-        let inverse = Finite.for_each normalize size inverse in
+        let inverse = Finite.fold normalize size inverse in
         let inverse = swap_rows inverse h i_max in
         (* For all rows below pivot, fill with zeros and update remaining
            elements in the row. *)
@@ -193,8 +193,8 @@ module Space (Field : Field.S) = struct
             let f = Field.(get i k m / get h k m) in
             let m = set i k Field.zero m in
             let on_row bypass = remaining_current_row bypass f i in
-            let m = Finite.for_each (on_row false) size m in
-            let inverse = Finite.for_each (on_row true) size inverse in
+            let m = Finite.fold (on_row false) size m in
+            let inverse = Finite.fold (on_row true) size inverse in
             (m, inverse)
           else (m, inverse)
         (* Update remaining elements in the current row. *)
@@ -203,7 +203,7 @@ module Space (Field : Field.S) = struct
           then set i j Field.(get i j m - f * get h j m) m
           else m
         in
-        let m, inverse = Finite.for_each below_pivot size (m, inverse) in
+        let m, inverse = Finite.fold below_pivot size (m, inverse) in
         let- `Callback = m, inverse in
         let* h = Finite.(next h |> strengthen size) in
         let+ k = Finite.(next k |> strengthen size) in
@@ -223,7 +223,7 @@ module Space (Field : Field.S) = struct
     let init size f =
       let data = Parray.init (Nat.to_int size) (fun _ -> Field.zero) in
       let set i data = Parray.set data (Finite.to_int i) (f i) in
-      let data = Finite.for_each set size data in
+      let data = Finite.fold set size data in
       M { data ; rows = size ; cols = Nat.one }
 
     let of_array size t =
@@ -244,7 +244,7 @@ module Space (Field : Field.S) = struct
 
     let norm (type n) (v : n vector) : scalar =
       let max i r = Field.(max (abs (get i v)) r) in
-      Finite.for_each max (size v) Field.zero
+      Finite.fold max (size v) Field.zero
 
     let max (type n) (M l : n vector) (M r : n vector) : n vector =
       init l.rows @@ fun i -> Field.max (get i (M l)) (get i (M r))

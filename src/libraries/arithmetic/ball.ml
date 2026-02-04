@@ -27,14 +27,14 @@ module Make (K : Field.S) = struct
 
   let pretty fmt ball =
     let n = Vector.size ball.center in
-    let pretty i () =
+    let pretty i =
       let c = Vector.get i ball.center in
       let r = Vector.get i ball.radius in
       if Finite.(i != first) then Format.fprintf fmt " ; " ;
       Format.fprintf fmt "%a ± %a" K.pretty c K.pretty r ;
     in
     Format.fprintf fmt "@[[" ;
-    Finite.for_each pretty n () ;
+    Finite.iter pretty n ;
     Format.fprintf fmt "]@]"
 
 end
