@@ -40,8 +40,8 @@
       can easily take it into account, and thus make it more general.
 
     A complete documentation on the underlying theory will be added in a
-    near future. For an example using this module, one can check
-    {!Linear_filter_test}. *)
+    near future. For an example using this module, one can check its tests,
+    located in {!test/lti_system}. *)
 
 module Make (K : Field.S) : sig
 
@@ -69,13 +69,13 @@ module Make (K : Field.S) : sig
         iterations, depends on the system's parameters and on the precision
         of the permanent phase's abstraction.
       - [permanent] represents the permanent phase as a unique ball, which
-        is an invariant for the filter for all iterations after the one
+        is an invariant for the filter for all iterations after the ones
         unrolled through the transition phase. *)
   type 'n behavior = { transition : 'n ball list ; permanent : 'n ball }
 
   (** Behavior computation. As stated above, a complete documentation of the
       underlying theory will be provided. The optionnal parameters are as
-      follows :
+      follows:
       - [timeout] specifies the maximum analysis duration. It is expressed
         in seconds, and its default value is one second.
       - [completion_target] specifies the relative completion of the permanent

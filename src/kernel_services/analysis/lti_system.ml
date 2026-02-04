@@ -48,19 +48,17 @@ module Make (K : Field.S) = struct
   type ('n, 'm) knowledge =
     { n : 'n Nat.nat ; center : 'n vector ; radius : 'm vector }
 
-  (* Information on an iteration {m n} of the system:
-   * - [state_power] corresponds to the computation {m A^n}.
+  (* Information on an iteration {m k} of the system:
+   * - [state_power] corresponds to the computation {m A^k}.
    * - [perturbations] corresponds to the maximal cumulative contributions of
    *   all previous inputs, which is a ball with center and radius computed
    *   respectively as {m ∑ A^t (B C + S)} and {m ∑ |A^t B| |R|},
-   *   where {m t} is between {m 0} and {m n - 1}. *)
+   *   where {m t} is between {m 0} and {m k - 1}. *)
   type 'n iteration =
     { state_power : ('n, 'n) matrix ; perturbations : 'n ball }
 
   (* Behavior of the system, described as a transition phase of unrolled
-   * iterations, and a permanent phase described by a unique overapproximated
-   * ball. The spectral exponent used to computed the permanent abstraction
-   * is also given. *)
+   * iterations, and a permanent phase described by an overapproximated ball. *)
   type 'n behavior =
     { transition : 'n ball list ; permanent : 'n ball }
 
@@ -98,20 +96,22 @@ module Make (K : Field.S) = struct
     in Seq.(iterate compute_next_iteration zero |> memoize)
 
   (* Computes a ball overapproximating the system's behavior as the iteration
-   * goes to infinity. The center of this ball is computed as described in
-   * the [compute_center_limit] function. Its radius is an overapproximation
-   * of the supremum for all possible input sequence {m μ} of the limit of
-   * {m ∑ A^t B μ_(n - 1 - t)} with {m t} between {m 0} and {n - 1}.
+   * goes to infinity, along with the spectral exponent {m q} with which the
+   * overapproximation has been computed. The center of this ball is computed
+   * as described in the [compute_center_limit] function. Its radius is an
+   * overapproximation of the supremum for all possible input sequence {m μ}
+   * of the limit as {m k} tends toward infinity of {m ∑ A^t B μ_(k - 1 - t)},
+   * with {m t} between {m 0} and {m k - 1}.
    * The computation is done as follows:
-   * - To prove that {m ρ(A) < 1}, the fonction searches for a {m q ∈ ℕ}
-   *   such as {m ||A^q||₁ < 1}.
+   * - To prove that {m ρ(A) < 1}, the fonction searches for a spectral
+   *   exponent, i.e a {m q ∈ ℕ} such as {m ||A^q||₁ < 1}.
    * - The infinite sum is then divided in two: a finite sum of the {m q}
-   *   first elements and the infinite reminding sum. Indeed, as {m q} grows,
+   *   first elements and the infinite remainding sum. Indeed, as {m q} grows,
    *   the finite sum becomes a better and better underapproximation of the
-   *   limit radius, and the infinite reminder becomes smaller and smaller.
-   * - The infinite reminder is approximated by the computation
+   *   limit radius, and the infinite remainder becomes smaller and smaller.
+   * - The infinite remainder is approximated by the computation
    *   {m (I - |A^q|)^(-1) |A^q| (∑ |A^t B| |R|)}.
-   * - The function checks that the overapproximated reminder does not count
+   * - The function checks that the overapproximated remainder does not count
    *   for more than a specified percentage of the limit ball's radius. *)
   let limit_behavior s ({ n ; _ } as knowledge) error_target iterations =
     let center_limit = compute_center_limit s knowledge in
@@ -123,9 +123,9 @@ module Make (K : Field.S) = struct
       let* center_limit = Lazy.force center_limit in
       let* limit = Matrix.(inverse (id n - abs_power)) in
       let underapprox = Ball.make center_limit perturbations.radius in
-      let reminder = Matrix.(limit * abs_power * perturbations.radius) in
-      let overapprox = Ball.(underapprox + make (Vector.zero n) reminder) in
-      let error = Matrix.(scale (K.of_int 100) reminder / overapprox.radius) in
+      let remainder = Matrix.(limit * abs_power * perturbations.radius) in
+      let overapprox = Ball.(underapprox + make (Vector.zero n) remainder) in
+      let error = Matrix.(scale (K.of_int 100) remainder / overapprox.radius) in
       let<?> () = K.(Vector.norm error < error_target) in
       Some (q, overapprox)
     in
@@ -170,8 +170,8 @@ module Make (K : Field.S) = struct
     let knowledge = { n ; radius ; center } in
     let iterations = compute_iterations s knowledge in
     let* spectral, limit = limit_behavior s knowledge error_target iterations in
-    let reminder it = Matrix.(it.state_power * s.initial_state) in
-    let abstraction it = Ball.(point (reminder it) + it.perturbations) in
+    let remainder it = Matrix.(it.state_power * s.initial_state) in
+    let abstraction it = Ball.(point (remainder it) + it.perturbations) in
     let iterations = Seq.map abstraction iterations in
     let+ transition = search_unrolling_stop spectral limit iterations in
     { transition ; permanent = limit }
