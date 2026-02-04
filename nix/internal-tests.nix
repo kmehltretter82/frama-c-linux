@@ -152,7 +152,6 @@ stdenvNoCC.mkDerivation rec {
     export HOME=$(pwd)/home
     export FONTCONFIG_FILE="${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
     export FONTCONFIG_PATH="${pkgs.fontconfig.out}/etc/fonts/"
-    why3 config detect
     export FRAMAC_WP_CACHE=offline
     export FRAMAC_WP_CACHEDIR=$wp_cache
   '';

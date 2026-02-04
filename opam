@@ -174,8 +174,7 @@ Recommended provers are:
 - CVC4     (https://cvc4.github.io)
 - CVC5     (https://cvc5.github.io)
 - Z3       (https://github.com/Z3Prover/z3)
-Use 'why3 config detect' to configure new provers.
- " { success }
+" { success }
 "Ivette is the GUI for Frama-C.
 Run 'ivette' once to finalize installation (requires an internet connection).
 Once finalized, 'ivette' will work offline.
