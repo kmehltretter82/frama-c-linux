@@ -50,10 +50,7 @@ let config () =
         let file = file () in
         let extra_config = Wp_parameters.Why3ExtraConfig.get () in
         let config = Why3.Whyconf.init_config ~extra_config file in
-        let config =
-          if Option.is_none file then config
-          else extend_config config
-        in
+        let config = extend_config config in
         the_config := Some config ;
       with exn ->
         Wp_parameters.abort "%a" Why3.Exn_printer.exn_printer exn
