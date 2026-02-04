@@ -51,8 +51,7 @@ module Make (K : Field.S) : sig
   open Linear
   open Nat
 
-  type 'n ball = 'n Ball.t =
-    { center : 'n vector ; radius : 'n vector }
+  type 'n ball = 'n Ball.t
 
   (* A LTI system full specification. *)
   type ('n, 'm) system =

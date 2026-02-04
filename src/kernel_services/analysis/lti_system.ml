@@ -26,8 +26,7 @@ module Make (K : Field.S) = struct
   open Option.Operators
   open Linear
 
-  type 'n ball = 'n Ball.t =
-    { center : 'n vector ; radius : 'n vector }
+  type 'n ball = 'n Ball.t
 
 
   (** Types specifications **)
