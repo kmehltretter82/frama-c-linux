@@ -15,12 +15,12 @@
 [wp] [Valid] typed_target5_extra_match_assigns (Qed)
 [wp] [Unsuccess] typed_target4_exact_match_ensures_post (Tactic) (Qed)
 [wp] [Unsuccess] typed_target5_extra_match_ensures_post (Tactic) (Qed)
+[wp] User Error: Missing Test Results (1)
 [wp] Proved goals:    9 / 12
   Terminating:     3
   Unreachable:     3
   Qed:             3
   Unsuccess:       3
-  Missing:         1
 ------------------------------------------------------------
   Function target3_no_match
 ------------------------------------------------------------
@@ -141,3 +141,6 @@ Prove: false.
   target4_exact_match       1        -        2      50.0%
   target5_extra_match       1        -        2      50.0%
 ------------------------------------------------------------
+[wp] Deferred error message was emitted during execution:
+  Missing Test Results (1)
+[kernel] Plug-in wp aborted: invalid user input.

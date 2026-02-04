@@ -487,7 +487,10 @@ let do_report_scheduled (stats : stats) =
         if smoked > 0 then
           add_line "Smoke Tests" !smoked_passed
             (fun fmt -> Format.fprintf fmt " / %d" smoked) ;
-        if proofs.noresult > 0 then add_line "Missing" proofs.noresult none ;
+        if proofs.noresult > 0 then
+          if shell
+          then Wp_parameters.error "Missing Test Results (%d)" proofs.noresult
+          else add_line "Missing" proofs.noresult none ;
         let iter f = List.iter f (List.rev !lines) in
         let title (p,_,_) = p in
         let pp_title fmt p = Format.fprintf fmt "%s:" p in
