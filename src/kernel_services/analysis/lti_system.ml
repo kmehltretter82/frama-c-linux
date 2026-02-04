@@ -148,7 +148,7 @@ module Make (K : Field.S) = struct
   (* Searches for the first valid unrolling stop point for a given [limit]
    * found at the exponent [spectral]. A stop point [k] is valid if the
    * system behavior is included in [limit] for iteration [k] and for
-   * the [spectral] following iterations. *)
+   * the [spectral - 1] following iterations. *)
   let search_unrolling_stop spectral limit iterations =
     let exception Found of int in
     let in_limit abst = Ball.is_included abst limit in
