@@ -585,7 +585,7 @@ module Provers = String_list
          - 'none' (no prover run)\n\
          - 'script' (replay all session scripts)\n\
          - 'tip' (replay or init scripts for failed goals)\n\
-         - '<why3-prover>' (any Why3 prover, see -wp-detect)\n\
+         - '<why3-prover>' (any Why3 prover, see -wp-list-provers)\n\
         "
     end)
 
@@ -733,12 +733,12 @@ module DryFinalizeScripts = False
     end)
 
 let () = Parameter_customize.set_group wp_prover
-module Detect = Action
+module ListProvers = Action
     (struct
-      let option_name = "-wp-detect"
-      let help = "List installed provers."
+      let option_name = "-wp-list-provers"
+      let help = "List available provers."
     end)
-let () = on_reset Detect.clear
+let () = on_reset ListProvers.clear
 
 let () = Parameter_customize.set_group wp_prover
 module Library =

@@ -192,7 +192,7 @@ Options taking a string as argument should preferably be written
                     performed
                     when the value equals to zero (default: 60).
 -wp-out <dir>       Set working directory for generated files.
-                    Defaults to some temporary directory.
+                    Defaults to system temporary directory.
 -wp-print           Pretty-prints proof obligations on standard output.
                     (opposite option is -wp-no-print)
 -wp-probes          Activate user-defines probes (@probe) (default: yes) (set
@@ -243,8 +243,6 @@ Options taking a string as argument should preferably be written
                     -wp-no-cache-env)
 -wp-cache-print     Show cache directory (opposite option is
                     -wp-no-cache-print)
--wp-detect          List installed provers. (opposite option is
-                    -wp-no-detect)
 -wp-driver <file,...>  Load drivers for linking to external libraries
                     (preferably use -wp-driver="file,...")
 -wp-dry-finalize-scripts  Scripts that might be removed by
@@ -271,6 +269,8 @@ Options taking a string as argument should preferably be written
                     of interactive provers (default: 30).
 -wp-library <dir,...>  Load path for importing why3 theories (preferably use
                     -wp-library="dir,...")
+-wp-list-provers    List available provers. (opposite option is
+                    -wp-no-list-provers)
 -wp-memlimit <m>    Set the memory limit (in Mb) for provers (default: 1000).
 -wp-par <p>         Number of parallel proof process (default: <nproc>)
 -wp-prepare-scripts  Initialize a script tracking directory in the session
@@ -281,7 +281,7 @@ Options taking a string as argument should preferably be written
                     - 'none' (no prover run)
                     - 'script' (replay all session scripts)
                     - 'tip' (replay or init scripts for failed goals)
-                    - '<why3-prover>' (any Why3 prover, see -wp-detect)
+                    - '<why3-prover>' (any Why3 prover, see -wp-list-provers)
                      (preferably use -wp-prover="dp,...")
 -wp-run-all-provers  Run all specified provers on each goal not proved by
                     Qed. Do not stop when a prover succeeds. (default: no)
@@ -361,6 +361,10 @@ Options taking a string as argument should preferably be written
 
 *** WHY3 OPTIONS
 
+-wp-why3-config <file>  Use Why3 configuration file (default
+                    $HOME/.why3.conf).
+-wp-why3-detect     Detect provers from $PATH (set by default, opposite
+                    option is -wp-no-why3-detect)
 -wp-why3-extra-config <file,...>  Additional config files for Why3
                     (preferably use -wp-why3-extra-config="file,...")
 -wp-why3-opt <option,...>  Additional options for Why3 (preferably use

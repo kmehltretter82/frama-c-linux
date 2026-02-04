@@ -580,7 +580,7 @@ let compute_provers ~mode ~script =
         | None ->
           if pname <> "" && pname <> "none" then
             Wp_parameters.error ~once:true
-              "Prover '%s' not found in why3.conf" pname ;
+              "Prover '%s' not found." pname ;
           prvs
         | Some VCS.Tactical ->
           script.proverscript <- true ;
@@ -900,7 +900,7 @@ let () = Cmdline.run_after_setting_files
 let () = Cmdline.run_after_configuring_stage Why3Provers.configure
 
 let do_prover_detect () =
-  if Wp_parameters.Detect.get () && not @@ Wp_parameters.is_interactive () then
+  if Wp_parameters.ListProvers.get () && not @@ Wp_parameters.is_interactive () then
     let provers =
       List.filter Why3Provers.is_mainstream @@ Why3Provers.provers () in
     if provers = [] then
