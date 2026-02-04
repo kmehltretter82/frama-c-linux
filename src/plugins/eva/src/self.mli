@@ -54,9 +54,14 @@ val dkey_include_string_literal: category
 
 (** {2 Warning categories.} *)
 
-(** Same as Log's {!register_warn_category}, but [help] is mandatory. *)
+(* Default status of warning categories: feedback is associated to a verbosity
+   level. *)
+type warn_default = Inactive | Feedback of int | Error
+
+(** Same as Log's {!register_warn_category}, but [help] is mandatory and the
+    [Feedback] default status is associated to a verbosity level. *)
 val register_warn_category:
-  help:string -> ?default:Log.warn_status -> string -> warn_category
+  help:string -> ?default:warn_default -> string -> warn_category
 
 val wkey_alarm: warn_category
 val wkey_locals_escaping: warn_category

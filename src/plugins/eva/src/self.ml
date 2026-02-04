@@ -95,40 +95,59 @@ let clear_results () =
 
 (* ----- Verbosity configuration -------------------------------------------- *)
 
-(* List of message categories manually set by the user via -eva-msg-key.
-   In Log, message categories are not projectified nor saved on disk, so we
+(* List of message and warn categories manually set by the user via -eva-msg-key
+   or -eva-warn-key. Here, names of both category kinds are in the same list,
+   assuming no messages and warnings share the same category name.
+   In Log, enabled categories are not projectified nor saved on disk, so we
    simply use a reference. *)
 let user_categories : string list ref = ref []
 let add_user_category s = user_categories := s :: !user_categories
 
 (* Avoid enabling/disabling categories set by the user. *)
-let is_used_category c =
-  dkey_name c |> split_category |>
+let is_used_category name =
+  split_category name |>
   List.exists (fun name -> List.mem name !user_categories)
 
 (* Hook to register categories set by the user. *)
 let () =
-  Message_category.add_set_hook
-    (fun _ s -> parse_categories s |> List.iter add_user_category)
+  let hook _ s = parse_categories s |> List.iter add_user_category in
+  Message_category.add_set_hook hook;
+  Warn_category.add_set_hook hook
+
 
 (* Each Eva message category is bound to a verbosity level, at which the
    key is automatically enabled. *)
 let dkey_verbosity : (int, category list) Hashtbl.t = Hashtbl.create 11
 
+(* Some Eva warning category are feedback by default. These warning categories
+   are bound to a verbosity level, as for message categories. *)
+let wkey_verbosity : (int, warn_category list) Hashtbl.t = Hashtbl.create 11
+
 let add_dkey_verbosity level category =
   let list = try Hashtbl.find dkey_verbosity level with Not_found -> [] in
   Hashtbl.replace dkey_verbosity level (category :: list)
+
+let add_wkey_verbosity level category =
+  let list = try Hashtbl.find wkey_verbosity level with Not_found -> [] in
+  Hashtbl.replace wkey_verbosity level (category :: list)
 
 (* Enable/disable all message categories according to -eva-verbose,
    except for categories manually set by the user via -eva-msg-key. *)
 let configure_verbosity () =
   let level = Verbose.get () in
-  let change positive category =
-    if not (is_used_category category) then
+  let change_message positive category =
+    if not (is_used_category (dkey_name category)) then
       (if positive then add_debug_keys else del_debug_keys) category
   in
-  let enable i list = List.iter (change (i <= level)) list in
-  Hashtbl.iter enable dkey_verbosity
+  let enable i list = List.iter (change_message (i <= level)) list in
+  Hashtbl.iter enable dkey_verbosity;
+  let change_warning positive warn_category =
+    if not (is_used_category (wkey_name warn_category)) then
+      let status = if positive then Log.Wfeedback else Log.Winactive in
+      set_warn_status warn_category status
+  in
+  let enable i list = List.iter (change_warning (i <= level)) list in
+  Hashtbl.iter enable wkey_verbosity
 
 (* Makes the help message of various categories mandatory.
    Also associates each category to a verbosity level. *)
@@ -139,9 +158,23 @@ let register_category ?(level=11) ~help name =
   add_dkey_verbosity level category;
   category
 
-(* Makes the help message of various categories mandatory. *)
-let register_warn_category ~help = register_warn_category ~help
+(* Default status of warning categories: feedback is associated to a verbosity
+   level. *)
+type warn_default = Inactive | Feedback of int | Error
 
+(* Makes the help message of various categories mandatory, and adds a verbosity
+   level to the Feedback default status. *)
+let register_warn_category ~help ?default name =
+  let default, level =
+    match default with
+    | None -> None, None
+    | Some Inactive -> Some Log.Winactive, None
+    | Some Error -> Some Log.Werror, None
+    | Some (Feedback level) -> Some Log.Wfeedback, Some level
+  in
+  let category = register_warn_category ~help ?default name in
+  Option.iter (fun level -> add_wkey_verbosity level category) level;
+  category
 
 (* ----- Help message about categories -------------------------------------- *)
 
@@ -288,22 +321,21 @@ let _wkey_garbled_mix =
   register_warn_category "garbled-mix"
     ~help:"warnings about very imprecise values inferred for pointers, \
            named garbled mix"
-    ~default:Log.Wfeedback
 
 let wkey_garbled_mix_write =
   register_warn_category "garbled-mix:write"
     ~help:"the interpretation of an assignment creates a garbled mix"
-    ~default:Log.Wfeedback
+    ~default:(Feedback 3)
 
 let wkey_garbled_mix_assigns =
   register_warn_category "garbled-mix:assigns"
     ~help:"the interpretation of a specification creates a garbled mix"
-    ~default:Log.Wfeedback
+    ~default:(Feedback 3)
 
 let wkey_garbled_mix_summary =
   register_warn_category "garbled-mix:summary"
     ~help:"list the origins of garbled mix at the end of an analysis"
-    ~default:Log.Wfeedback
+    ~default:(Feedback 3)
 
 let _wkey_builtins =
   register_warn_category "builtins"
@@ -328,27 +360,27 @@ let wkey_libc_unsupported_spec =
 
 let _wkey_loop_unroll =
   register_warn_category "loop-unroll"
-    ~help:"messages about automatic loop unrolling from option \
-           -eva-auto-loop-unroll"
-    ~default:Log.Wfeedback
+    ~help:"messages about loop unrolling"
 
 let wkey_loop_unroll_auto =
   register_warn_category "loop-unroll:auto"
-    ~help:"a loop is automatically unrolled by the analysis"
+    ~help:"a loop is automatically unrolled by -eva-auto-loop-unroll"
+    ~default:(Feedback 4)
 
 let wkey_loop_unroll_partial =
   register_warn_category "loop-unroll:partial"
     ~help:"a loop has been partially but not completely unrolled"
+    ~default:(Feedback 4)
 
 let wkey_missing_loop_unroll =
   register_warn_category "loop-unroll:missing"
     ~help:"a loop has no unroll annotation"
-    ~default:Log.Winactive
+    ~default:Inactive
 
 let wkey_missing_loop_unroll_for =
   register_warn_category "loop-unroll:missing:for"
     ~help:"a for loop has no unroll annotation"
-    ~default:Log.Winactive
+    ~default:Inactive
 
 let wkey_signed_overflow =
   register_warn_category "signed-overflow"
@@ -364,13 +396,13 @@ let wkey_invalid_assigns =
   register_warn_category "assigns:invalid-location"
     ~help:"the memory location targeted by an assigns clause is invalid \
            in at least one analysis state"
-    ~default:Log.Wfeedback
+    ~default:(Feedback 4)
 
 let wkey_missing_assigns =
   register_warn_category "assigns:missing"
     ~help:"assigns clauses are missing or incomplete from an ACSL \
            specification on which the analysis soundness relies"
-    ~default:Log.Werror
+    ~default:Error
 
 let wkey_missing_assigns_result =
   register_warn_category "assigns:missing-result"
@@ -394,22 +426,22 @@ let wkey_ensures_false =
 let wkey_watchpoint =
   register_warn_category "watchpoint"
     ~help:"undocumented"
-    ~default:Log.Wfeedback
+    ~default:(Feedback 2)
 
 let wkey_recursion =
   register_warn_category "recursion"
     ~help:"a recursive call is analyzed"
-    ~default:Log.Wfeedback
+    ~default:(Feedback 3)
 
 let wkey_acsl =
   register_warn_category "acsl"
     ~help:"messages about evaluation of ACSL terms and predicates"
-    ~default:Log.Wfeedback
+    ~default:(Feedback 4)
 
 let wkey_acsl_unsupported =
   register_warn_category "acsl:unsupported"
     ~help:"messages about ACSL terms not supported by Eva"
-    ~default:Log.Wfeedback
+    ~default:(Feedback 4)
 
 (* ----- Log with positions ------------------------------------------------- *)
 

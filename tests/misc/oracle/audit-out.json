@@ -41,16 +41,16 @@
       "enabled": [
         "*", "alarm", "assigns", "assigns:missing", "assigns:missing-result",
         "builtins", "builtins:missing-spec", "builtins:override",
-        "ensures-false", "experimental", "libc", "libc:unsupported-spec",
-        "locals-escaping", "malloc", "malloc:imprecise", "secure-flow",
-        "secure-flow:condition", "secure-flow:direct",
-        "secure-flow:indirect", "signed-overflow", "taint", "unknown-size"
+        "ensures-false", "experimental", "garbled-mix", "libc",
+        "libc:unsupported-spec", "locals-escaping", "loop-unroll", "malloc",
+        "malloc:imprecise", "secure-flow", "secure-flow:condition",
+        "secure-flow:direct", "secure-flow:indirect", "signed-overflow",
+        "taint", "unknown-size"
       ],
       "disabled": [
         "acsl", "acsl:unsupported", "assigns:invalid-location",
-        "garbled-mix", "garbled-mix:assigns", "garbled-mix:summary",
-        "garbled-mix:write", "loop-unroll", "loop-unroll:auto",
-        "loop-unroll:missing", "loop-unroll:missing:for",
+        "garbled-mix:assigns", "garbled-mix:summary", "garbled-mix:write",
+        "loop-unroll:auto", "loop-unroll:missing", "loop-unroll:missing:for",
         "loop-unroll:partial", "malloc:weak", "recursion", "watchpoint"
       ]
     }

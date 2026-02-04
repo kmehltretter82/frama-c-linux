@@ -29,7 +29,7 @@ let wkey_weak_alloc =
   Self.register_warn_category "malloc:weak"
     ~help:"a same \"weak\" variable is used to represent multiple dynamic \
            allocations, which is rather imprecise"
-    ~default:Log.Winactive
+    ~default:Inactive
 
 let wkey_imprecise_alloc =
   Self.register_warn_category "malloc:imprecise"
