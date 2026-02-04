@@ -11,8 +11,7 @@ open Finite
 
 
 
-(** Definition of a linear space over a field. Used by {!Linear_filter} to
-    represent and compute linear filters invariants. *)
+(** Definition of a linear space over a field. *)
 
 module Space (Field : Field.S) : sig
 
@@ -30,7 +29,7 @@ module Space (Field : Field.S) : sig
 
   module Vector : sig
 
-    val pretty : Format.formatter -> 'n vector -> unit
+    val pretty : Format.formatter -> 'n succ vector -> unit
 
     (** The call [zero n] returns the 0 vector in 𝕂ⁿ. *)
     val zero   : 'n succ nat -> 'n succ vector
@@ -73,7 +72,7 @@ module Space (Field : Field.S) : sig
 
   module Matrix : sig
 
-    val pretty : Format.formatter -> ('n, 'm) matrix -> unit
+    val pretty : Format.formatter -> ('n succ, 'm succ) matrix -> unit
 
     (** The call [id n] returns the identity matrix in 𝕂ⁿˣⁿ. *)
     val id : 'n succ nat -> ('n succ, 'n succ) matrix
@@ -81,8 +80,10 @@ module Space (Field : Field.S) : sig
     (** The call [zero n m] returns the 0 matrix in 𝕂ⁿˣᵐ. *)
     val zero : 'n succ nat -> 'm succ nat -> ('n succ, 'm succ) matrix
 
-    (** Build a matrix from a 2 dimensionnal array. Raise out of bounds
-        exceptions if the array is not well formed. *)
+    (** Build a matrix from a 2 dimensionnal array of strings. Strings are
+        used here to ensure that no rounding is performed prior of the
+        ones that may be introduced by the underlying field.
+        Raise out of bounds exceptions if the array is not well formed. *)
     val of_array : 'n succ nat -> 'm succ nat -> string array array -> ('n succ, 'm succ) matrix
 
     (** The call [get i j m] returns the coefficient of the i-th row and
@@ -124,10 +125,10 @@ module Space (Field : Field.S) : sig
     val ( / ) : ('n, 'm) matrix -> ('n, 'm) matrix -> ('n, 'm) matrix
 
     (** Scalar multiplication. *)
-    val ( ** ) : scalar -> ('n, 'm) matrix  -> ('n, 'm) matrix
+    val scale : scalar -> ('n, 'm) matrix  -> ('n, 'm) matrix
 
     (** Matrix inverse. Returns None if the input matrix is singular. *)
-    val inverse : ('n, 'n) matrix -> ('n, 'n) matrix option
+    val inverse : ('n succ, 'n succ) matrix -> ('n succ, 'n succ) matrix option
 
     (** The call [abs m] returns a matrix for which each coordinate is the
         absolute value of the corresponding coordinate of [m]. *)

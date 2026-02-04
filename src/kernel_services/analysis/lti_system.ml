@@ -125,7 +125,7 @@ module Make (K : Field.S) = struct
       let underapprox = Ball.make center_limit perturbations.radius in
       let reminder = Matrix.(limit * abs_power * perturbations.radius) in
       let overapprox = Ball.(underapprox + make (Vector.zero n) reminder) in
-      let error = Matrix.(K.of_int 100 ** reminder / overapprox.radius) in
+      let error = Matrix.(scale (K.of_int 100) reminder / overapprox.radius) in
       let<?> () = K.(Vector.norm error < error_target) in
       Some (q, overapprox)
     in
