@@ -205,7 +205,7 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
     in
     let stmts, env =
       if check_lower_bound then begin
-        let lower_guard = Cil.mkBinOp_exn ~loc Ge e (Cil.zero ~loc) in
+        let lower_guard = Misc.make_binop ~loc Ge e (Cil.zero ~loc) in
         let lower_guard_pp =
           Logic_const.prel ~loc (Rge, t, Cil.lzero ~loc ())
         in
@@ -232,7 +232,7 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
           Cil.kinteger64 ~loc ~kind:sizet_kind sizet_max_z
         in
         let upper_guard_pp = Logic_const.prel ~loc (Rle, t, sizet_max_t) in
-        let upper_guard = Cil.mkBinOp_exn ~loc Le e sizet_max_e in
+        let upper_guard = Misc.make_binop ~loc Le e sizet_max_e in
         let adata, env = Assert.empty ~loc kf env in
         let adata = Assert.register_term ~loc t e adata in
         let adata =
@@ -288,7 +288,7 @@ let process_strcat ~loc ?result env kf ?size_e dest_e src_e =
       let src_size_if_stmt =
         Smart_stmt.if_stmt
           ~loc
-          ~cond:(Cil.mkBinOp_exn ~loc Lt size_e src_size_e)
+          ~cond:(Misc.make_binop ~loc Lt size_e src_size_e)
           (Cil.mkBlock [
               Smart_stmt.assigns ~loc ~result:(Cil.var src_size_vi) size_e
             ])
@@ -443,7 +443,7 @@ let update_memory_model ~loc ?result env kf caller args =
     let if_res_pos_stmt =
       Smart_stmt.if_stmt
         ~loc
-        ~cond:(Cil.mkBinOp_exn ~loc Ge result_e (Cil.zero ~loc))
+        ~cond:(Misc.make_binop ~loc Ge result_e (Cil.zero ~loc))
         then_blk
     in
     let env = Env.add_stmt ~post env if_res_pos_stmt in
@@ -492,7 +492,7 @@ let update_memory_model ~loc ?result env kf caller args =
     let assigns_n_stmt =
       Smart_stmt.if_stmt
         ~loc
-        ~cond:(Cil.mkBinOp_exn ~loc Le size_e result_e)
+        ~cond:(Misc.make_binop ~loc Le size_e result_e)
         (Cil.mkBlock [ Smart_stmt.assigns ~loc ~result:(Cil.var n_vi) size_e ])
         ~else_blk:assigns_res_plus_one_blk
     in
@@ -506,12 +506,12 @@ let update_memory_model ~loc ?result env kf caller args =
     let blk, env =
       Env.pop_and_get env blk_stmt ~global_clear:false Env.Middle
     in
-    let res_pos = Cil.mkBinOp_exn ~loc Ge result_e (Cil.zero ~loc) in
-    let size_strict_pos = Cil.mkBinOp_exn ~loc Gt size_e (Cil.zero ~loc) in
+    let res_pos = Misc.make_binop ~loc Ge result_e (Cil.zero ~loc) in
+    let size_strict_pos = Misc.make_binop ~loc Gt size_e (Cil.zero ~loc) in
     let if_res_pos_stmt =
       Smart_stmt.if_stmt
         ~loc
-        ~cond:(Cil.mkBinOp_exn ~loc LAnd res_pos size_strict_pos)
+        ~cond:(Misc.make_binop ~loc LAnd res_pos size_strict_pos)
         blk
     in
     let env = Env.add_stmt ~post env if_res_pos_stmt in

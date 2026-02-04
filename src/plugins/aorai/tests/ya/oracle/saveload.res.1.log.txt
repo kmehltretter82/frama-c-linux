@@ -33,7 +33,7 @@
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   6 functions analyzed (out of 6): 100% coverage.
-  In these functions, 35 statements reached (out of 43): 81% coverage.
+  In these functions, 31 statements reached (out of 35): 89% coverage.
   ----------------------------------------------------------------------------
   No errors or warnings raised during the analysis.
   ----------------------------------------------------------------------------

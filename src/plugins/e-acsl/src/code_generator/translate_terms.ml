@@ -139,7 +139,7 @@ let affect_binop ~loc var_as_varinfo var_as_exp binop exp_type exp1 exp2 =
   else
     Smart_stmt.assigns ~loc
       ~result:(Cil.var var_as_varinfo)
-      (Cil.mkBinOp_exn ~loc binop exp1 exp2 )
+      (Misc.make_binop ~loc binop exp1 exp2 )
 
 let rec thost_to_host kf env th = match th with
   | TVar { lv_origin = Some v } ->
@@ -282,7 +282,7 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
        interpretation. *)
     let cond_as_exp =
       if Gmp_types.Z.is_t ty_k then
-        (Cil.mkBinOp_exn ~loc Gt cond_as_exp (Cil.zero ~loc))
+        (Misc.make_binop ~loc Gt cond_as_exp (Cil.zero ~loc))
       else
         cond_as_exp
     in

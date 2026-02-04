@@ -28,14 +28,14 @@ enum ESChar {
 };
 enum EUChar {
     EUCHAR_MIN = (unsigned char)0,
-    EUCHAR_MAX = (unsigned char)255U
+    EUCHAR_MAX = (unsigned char)255
 };
 enum EInt {
     EINT_MIN = (-2147483647-1),
     EINT_MAX = 2147483647
 };
 enum EUInt {
-    EUINT_MIN = (unsigned int)0,
+    EUINT_MIN = 0U,
     EUINT_MAX = 4294967295U
 };
 enum EShort {
@@ -44,14 +44,14 @@ enum EShort {
 };
 enum EUShort {
     EUSHORT_MIN = (unsigned short)0,
-    EUSHORT_MAX = (unsigned short)65535U
+    EUSHORT_MAX = (unsigned short)65535
 };
 enum ELong {
     ELONG_MIN = (-9223372036854775807L-1L),
     ELONG_MAX = 9223372036854775807L
 };
 enum EULong {
-    EULONG_MIN = (unsigned long)0,
+    EULONG_MIN = 0UL,
     EULONG_MAX = 18446744073709551615UL
 };
 enum ELLong {
@@ -59,7 +59,7 @@ enum ELLong {
     ELLONG_MAX = 9223372036854775807LL
 };
 enum EULLong {
-    EULLONG_MIN = (unsigned long long)0,
+    EULLONG_MIN = 0ULL,
     EULLONG_MAX = 18446744073709551615ULL
 };
 void f(void)

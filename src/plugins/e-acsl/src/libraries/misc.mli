@@ -64,6 +64,10 @@ val term_has_lv_from_vi: term -> bool
 val name_of_binop: binop -> string
 (** @return the name of the given binop as a string. *)
 
+val make_binop: loc:location -> binop -> exp -> exp -> exp
+(** Calls {!Cil.mkBinOp_exn} with [constfold] set to [true].
+    @since Frama-C+dev *)
+
 val finite_min_and_max: Ival.t -> Z.t * Z.t
 (** [finite_min_and_max i] takes the finite ival [i] and returns its bounds. *)
 

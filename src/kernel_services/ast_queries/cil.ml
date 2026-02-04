@@ -4401,12 +4401,12 @@ class constFoldVisitorClass (machdep: bool) : cilVisitor = object
     (* Do it bottom up *)
     ChangeDoChildrenPost (e, constFold machdep)
 
-  (* Optimization: only visits function and variable definitions. *)
   method! vglob = function
-    | GFun _ | GVar _ -> DoChildren
+    | GFun _ | GVar _ | GVarDecl _ | GType _ | GCompTag _ | GCompTagDecl _
+    | GEnumTag _ | GEnumTagDecl _ ->
+      DoChildren
     | _ -> SkipChildren
 
-  method! vtype _ = SkipChildren
   method! vspec _ = SkipChildren
   method! vcode_annot _ = SkipChildren
 end
@@ -5729,14 +5729,14 @@ and mkCastT ?(check=true) ?(force=false) ~(oldt: typ) ~(newt: typ) e =
 and mkCast ?(check=true) ?force ~(newt: typ) e =
   mkCastT ~check ?force ~oldt:(typeOf e) ~newt e
 
-and mkBinOp ~loc op e1 e2 =
+and mkBinOp ?(constfold=false) ~loc op e1 e2 =
   let open Ast_types in
   let t1 = typeOf e1 in
   let t2 = typeOf e2 in
   let machdep = false in
   let error msg = Format.kasprintf Result.error msg in
   let constFoldBinOp bop e1 e2 t =
-    if Kernel.Constfold.get () then
+    if constfold then
       Ok (constFoldBinOp ~loc machdep bop e1 e2 t)
     else
       Ok (new_exp ~loc (BinOp(bop, e1, e2, t)))
@@ -5842,8 +5842,8 @@ and mkBinOp ~loc op e1 e2 =
     error "unsupported operator '%a' on expression of types '%a' and '%a'"
       !pp_binop_ref op !pp_typ_ref t1 !pp_typ_ref t2
 
-and mkBinOp_exn ~loc op e1 e2 =
-  match mkBinOp ~loc op e1 e2 with
+and mkBinOp_exn ?constfold ~loc op e1 e2 =
+  match mkBinOp ?constfold ~loc op e1 e2 with
   | Ok e -> e
   | Error msg ->
     Kernel.fatal ~current:true "Cil.mkBinOp: typing expression '%a' failed: %s"
@@ -6752,4 +6752,4 @@ let typeDeepDropAllAttributes t =
 
 (* Deprecated *)
 
-let mkBinOp_safe_ptr_cmp = mkBinOp_exn
+let mkBinOp_safe_ptr_cmp = mkBinOp_exn ~constfold:false

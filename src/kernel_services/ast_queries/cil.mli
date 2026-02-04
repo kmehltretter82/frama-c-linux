@@ -824,8 +824,9 @@ val mkAddrOrStartOf: loc:location -> lval -> exp
     StartOf *)
 val mkMem: addr:exp -> off:offset -> lval
 
-(** Makes a binary operation and performs const folding if [-constfold] is used.
-    Inserts casts as needed. Use appropriate binop ([PlusPI] & friends).
+(** Makes a binary operation and performs constant folding if [?constfold] is
+    [true] (defaults to [false]). Inserts casts as needed. Use appropriate binop
+    ([PlusPI] & friends).
 
     For pointer comparisons we do the following:
     - If both types are equal, do dothing
@@ -834,16 +835,19 @@ val mkMem: addr:exp -> off:offset -> lval
     - Else cast to [uintptr_t]
 
     @before Frama-C+dev the function could raised [AbortFatal] instead of using
-    result type. It still can raise an exception via sub-function calls.
+    result type. It still can raise an exception via sub-function calls. The
+    parameter [?constfold] was not present and we always applied constant
+    folding.
 *)
-val mkBinOp: loc:location -> binop -> exp -> exp -> (exp, string) result
+val mkBinOp: ?constfold:bool -> loc:location -> binop -> exp -> exp ->
+  (exp, string) result
 
 (** Same as {!mkBinOp} but handles [Error] by throwing an exception with the
     given message and current location.
     @raise Abortfatal if {!mkBinOp} fails
     @since Frama-C+dev
 *)
-val mkBinOp_exn: loc:location -> binop -> exp -> exp -> exp
+val mkBinOp_exn: ?constfold:bool -> loc:location -> binop -> exp -> exp -> exp
 
 (** Same as {!mkBinOp_exn}
     @before Frama-C+dev Performed a systematic cast (unless one of the
@@ -853,7 +857,8 @@ val mkBinOp_exn: loc:location -> binop -> exp -> exp -> exp
     introduction of this function.
     @since Chlorine-20180501
 *)
-val mkBinOp_safe_ptr_cmp: loc:location -> binop -> exp -> exp -> exp
+val mkBinOp_safe_ptr_cmp: loc:location -> binop -> exp ->
+  exp -> exp
 [@@deprecated "Use mkBinOp_exn instead, which is now safe to use."]
 [@@migrate { repl = Rel.mkBinOp_exn }]
 

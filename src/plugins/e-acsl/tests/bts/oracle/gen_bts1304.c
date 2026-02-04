@@ -37,7 +37,7 @@ void read_sensor_4(unsigned int *m)
 int main(void)
 {
   int __retres;
-  unsigned char buf[sizeof(union msg)];
+  unsigned char buf[16UL];
   int i;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_store_block((void *)(buf),16UL);
