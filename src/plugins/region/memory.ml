@@ -258,10 +258,12 @@ let rec walk (f: node -> bool) n =
     | Compound(_,_,rg) -> Ranges.iter (walk f) rg
 
 let witer (m:map) (f: node -> bool) =
-  Vmap.iter   (fun _x n -> walk f n) m.cvars ;
-  LVmap.iter  (fun _ -> Domain.iter (walk f)) m.lvars ;
-  Fmap.iter (fun _ -> Domain.iter (walk f)) m.logics ;
-  Option.iter (walk f) m.result
+  begin
+    Vmap.iter   (fun _x n -> walk f n) m.cvars ;
+    LVmap.iter  (fun _ -> Domain.iter (walk f)) m.lvars ;
+    Fmap.iter (fun _ -> Domain.iter (walk f)) m.logics ;
+    Option.iter (walk f) m.result ;
+  end
 
 let once (f : node -> unit) : node -> bool =
   let h = ref Z.zero in

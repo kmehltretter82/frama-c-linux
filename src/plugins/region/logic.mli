@@ -11,7 +11,7 @@ open Cil_datatype
 
 open Memory
 
-val add_path : map -> Spec.path -> node
+val add_spec : map -> Spec.spec -> node
 val add_region : map -> Spec.region -> unit
 
 type env = {

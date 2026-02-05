@@ -17,33 +17,33 @@ open Domain
 (* ---  Process ACSL region annotations                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rec add_path (m:map) (p:path): node =
-  match p.step with
+let rec add_spec (m:map) (s:spec): node =
+  match s.step with
   | Var x -> add_cvar m x
-  | Field(lv,fd) -> Memory.add_field (add_path m lv) fd
-  | Index(lv,_) -> Memory.add_index (add_path m lv) lv.typ
+  | Field(lv,fd) -> Memory.add_field (add_spec m lv) fd
+  | Index(lv,_) -> Memory.add_index (add_spec m lv) lv.typ
   | Star e | Cast(_,e) -> add_pointer m e
   | Shift _ | AddrOf _ ->
-    Options.error ~source:(fst p.loc)
+    Options.error ~source:(fst s.loc)
       "Unexpected expression (l-value expected)" ;
     Memory.fresh m
-and add_pointer (m:map) (p:path): Memory.node =
-  match add_exp m p with
+
+and add_pointer (m:map) (s:spec): Memory.node =
+  match add_exp m s with
   | None -> Memory.fresh m
   | Some r -> r
 
-and add_exp (m:map) (p:path): Memory.node option =
-  match p.step with
+and add_exp (m:map) (s:spec): Memory.node option =
+  match s.step with
   | (Var _ | Field _ | Index _ | Star _ | Cast _) ->
-    let r = add_path m p in
-    add_value r p.typ
-  | AddrOf p -> Some (add_path m p)
+    add_value (add_spec m s) s.typ
+  | AddrOf p -> Some (add_spec m p)
   | Shift p -> add_exp m p
 
 let add_region (m: map) (r : Spec.region) =
-  let rs = List.map (add_path m) r.rpath in
+  let rs = List.map (add_spec m) r.spec in
   merge_all @@
-  match r.rname with
+  match r.name with
   | None -> rs
   | Some a -> add_label m a :: rs
 

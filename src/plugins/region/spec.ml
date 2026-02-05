@@ -14,24 +14,24 @@ open Cil_datatype
 (* ---  Region Specifications                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-type path = {
-  loc : location ;
-  typ : typ ;
-  step: step ;
+type spec = {
+  loc  : location ;
+  typ  : typ ;
+  step : step ;
 }
 
 and step =
   | Var of varinfo
-  | AddrOf of path
-  | Star of path
-  | Shift of path
-  | Index of path * int
-  | Field of path * fieldinfo
-  | Cast of typ * path
+  | AddrOf of spec
+  | Star of spec
+  | Shift of spec
+  | Index of spec * int (* size *)
+  | Field of spec * fieldinfo
+  | Cast of typ * spec
 
 type region = {
-  rname: string option ;
-  rpath: path list ;
+  name : string option ;
+  spec : spec list ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -65,12 +65,12 @@ and pp_path fmt a = pp_step fmt a.step
 let pp_named fmt = function None -> () | Some a -> Format.fprintf fmt "%s: " a
 
 let pp_region fmt r =
-  match r.rpath with
+  match r.spec with
   | [] -> Format.pp_print_string fmt "\null"
   | p::ps ->
     begin
       Format.fprintf fmt "@[<hov 2>" ;
-      pp_named fmt r.rname ;
+      pp_named fmt r.name ;
       pp_path fmt p ;
       List.iter (Format.fprintf fmt ",@ %a" pp_path) ps ;
       Format.fprintf fmt "@]" ;
@@ -93,7 +93,7 @@ let pp_regions fmt = function
 type env = {
   context: Logic_typing.typing_context ;
   mutable named: string option ;
-  mutable paths: path list ;
+  mutable paths: spec list ;
   mutable specs: region list ;
 }
 
@@ -193,7 +193,7 @@ let rec parse_named_lpath (env:env) p =
   | PLnamed( name , p ) ->
     if env.named <> None && env.paths <> [] then
       begin
-        env.specs <- { rname = env.named ; rpath = env.paths } :: env.specs ;
+        env.specs <- { name = env.named ; spec = env.paths } :: env.specs ;
         env.paths <- [] ;
       end ;
     env.named <- Some name ;
@@ -227,7 +227,7 @@ let typecheck typing_context _loc ps =
   } in
   List.iter (parse_named_lpath env) ps ;
   let id = !kspec in incr kspec ;
-  let specs = { rname = env.named ; rpath = env.paths } :: env.specs in
+  let specs = { name = env.named ; spec = env.paths } :: env.specs in
   Hashtbl.add registry id @@ List.rev specs ;
   Ext_id id
 
