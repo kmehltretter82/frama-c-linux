@@ -254,38 +254,40 @@ DUNE_OPT_POST=("$@")
 # ---  WP Cache Environment
 # --------------------------------------------------------------------------
 
-function SetEnv
+function SetWPCache
 {
     if [ "$FRAMAC_WP_CACHE" = "" ]; then
-        if [ "$UPDATE" = "yes" ]; then
-            Head "FRAMAC_WP_CACHE=update"
-            export FRAMAC_WP_CACHE=update
-        else
-            export FRAMAC_WP_CACHE=offline
-        fi
+        Head "FRAMAC_WP_CACHE=$1"
+        export FRAMAC_WP_CACHE="$1"
+    elif [ "$FRAMAC_WP_CACHE" = "$1" ]; then
+        Head "FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE"
     else
-        if [ "$UPDATE" = "yes" ]; then
-            Head "FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE (overrides -u)"
-        else
-            Head "FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE"
-        fi
+        Head "FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE (overrides $1)"
+    fi
+}
+
+function SetEnv
+{
+    if [ "$USEWPCACHE" = "yes" ] && [ "$UPDATE" = "yes" ]; then
+        SetWPCache "update"
+    else
+        SetWPCache "offline"
     fi
 
     if [ "$FRAMAC_WP_QUALIF" != "" ]; then
         export FRAMAC_WP_CACHEDIR="$FRAMAC_WP_QUALIF"
-        Echo "# FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
-    elif [ "$FRAMAC_WP_CACHEDIR" = "" ]; then
+    else
         export FRAMAC_WP_CACHEDIR="$LOCAL_WP_CACHE"
-        Echo "# FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
+    fi
+    Echo "# FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
+
+    if [ -f "$FRAMAC_WP_CACHEDIR" ]; then
+        Error "$FRAMAC_WP_CACHEDIR is not a directory"
     fi
 
-    [ ! -f "$FRAMAC_WP_CACHEDIR" ] || [ -d "$FRAMAC_WP_CACHEDIR" ] \
-        || Error "$FRAMAC_WP_CACHEDIR is not a directory"
-
-    case "$FRAMAC_WP_CACHEDIR" in
-        /*);;
-        *) Error "Requires an absolute path to $FRAMAC_WP_CACHEDIR";;
-    esac
+    if ! [ "$1" = "${1#/}" ]; then
+        Error "Requires an absolute path to $FRAMAC_WP_CACHEDIR"
+    fi
 }
 
 function GetCache
@@ -303,8 +305,8 @@ function GetCache
 
 function PrepareWPCache
 {
+    SetEnv
     if [ "$USEWPCACHE" = "yes" ]; then
-        SetEnv
         GetCache
     fi
 }
