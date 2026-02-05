@@ -228,7 +228,9 @@ module Transfer = struct
   let update _ state = `Value state
 
   let assign_return lval result return =
-    let main_return = Mt_thread.return_lval (Thread.current ()) in
+    let main = Thread.entry_point (Thread.current ()) in
+    let main_retres = Library_functions.get_retres_vi main in
+    let main_return = Option.map Eva_ast.Build.var main_retres in
     if Option.equal Eva_ast.Lval.equal main_return (Some lval) then
       let bottom = Value.{ standard = bottom } in
       let f value = { standard = value } in

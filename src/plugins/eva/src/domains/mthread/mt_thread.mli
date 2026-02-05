@@ -12,8 +12,6 @@ type value = Value.t
 type thread = Thread.t
 type status = { running : Trilean.t ; canceled : Trilean.t }
 
-val return_lval : Thread.t -> Eva_ast.lval option
-
 module Register : sig
   include Datatype.S_with_collections
   val id : t -> int

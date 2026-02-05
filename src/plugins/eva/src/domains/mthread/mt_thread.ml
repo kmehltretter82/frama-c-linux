@@ -12,10 +12,6 @@ type value = Cvalue.V.t
 type thread = Thread.t
 
 
-let return_lval thread =
-  let kf = Thread.entry_point thread in
-  Option.map Eva_ast.Build.var (Library_functions.get_retres_vi kf)
-
 module Thread =
 struct
   include Thread
