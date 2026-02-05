@@ -151,20 +151,21 @@ module Identities = State_builder.Hashtbl (Identity.Hashtbl) (Thread)
    the analysis *)
 
 module PosSet = Position.Local.Set
+module Varinfo = Cil_datatype.Varinfo
+
+type properties = {
+  entry_point : Kernel_function.t;
+  spawn_points : PosSet.t;
+  arguments : (Varinfo.t * Cvalue.V.t) list;
+}
 
 module Properties =
 struct
   module Prototype =
   struct
-    module Varinfo = Cil_datatype.Varinfo
-
     include Datatype.Serializable_undefined
 
-    type t = {
-      entry_point : Kernel_function.t;
-      spawn_points : PosSet.t;
-      arguments : (Varinfo.t * Cvalue.V.t) list;
-    }
+    type t = properties
 
     let name = "Eva.Thread.Properties"
     let reprs = [{
@@ -301,11 +302,11 @@ let reset_state () =
   State.clear ();
   set_current main
 
-let get_properties thread =
+let properties thread =
   match thread.kind with
   | Main -> Properties.main_properties ()
   | InterruptHandler kf -> Properties.interrupt_properties kf
   | Thread _ -> State.find thread
 
 let entry_point th =
-  (get_properties th).entry_point
+  (properties th).entry_point

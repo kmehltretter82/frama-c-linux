@@ -95,9 +95,4 @@ val save_results: Cil_types.kernel_function -> bool
     of mthread. It is likely that in the future, the fixpoint of cucurrent
     programs will be directly computed inside Eva's engine. *)
 
-val compute_thread :
-  Thread.t ->
-  Cil_types.kernel_function ->
-  Cvalue_callbacks.state ->
-  Cvalue.V.t list ->
-  unit
+val compute_thread : Thread.t -> Cvalue_callbacks.state -> unit

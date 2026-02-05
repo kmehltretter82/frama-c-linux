@@ -124,8 +124,7 @@ let compute_thread analysis th =
   analysis.curr_events_stack <- [];
   Datatype.Int.Hashtbl.clear analysis.memexec_cache;
 
-  Analysis.compute_thread
-    th.th_eva_thread th.th_fun th.th_init_state th.th_params;
+  Analysis.compute_thread th.th_eva_thread th.th_init_state;
 
   if Mt_options.ShowTime.get () then
     Mt_self.feedback ~level:2

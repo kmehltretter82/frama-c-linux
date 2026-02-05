@@ -232,14 +232,15 @@ let abort () =
 
 (* Mthread entry point *)
 
-let compute_thread thread kf initial_state args =
+let compute_thread thread initial_state =
   (* We set the parameters for the value analysis *)
+  let Thread.{ entry_point; arguments } = Thread.properties thread in
   Eva_results.set_initial_state initial_state;
-  Eva_results.set_main_args args;
+  Eva_results.set_main_args (List.map snd arguments);
   Thread.set_current thread;
 
   let module Engine = (val Engine.current ()) in
-  try compute_from_entry_point (module Engine) ~lib_entry:false kf
+  try compute_from_entry_point (module Engine) ~lib_entry:false entry_point
   with Self.Abort ->
     Self.(ComputationState.set Aborted);
     Self.error "The analysis has been aborted: results are incomplete."
