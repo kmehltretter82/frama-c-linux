@@ -43,8 +43,8 @@ type region = {
   pointed: node option ;
 }
 
-type domain = node Ldomain.t
-type context = node Ldomain.context
+type domain = node Domain.t
+type context = node Domain.context
 
 type map
 

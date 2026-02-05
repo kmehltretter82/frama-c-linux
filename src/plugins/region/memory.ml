@@ -53,8 +53,8 @@ type chunk = node nchunk
 type layout = node nlayout
 type rg = node Ranges.range
 
-type domain = node Ldomain.t
-type context = node Ldomain.context
+type domain = node Domain.t
+type context = node Domain.context
 
 type map = {
   store: UF.store ;
@@ -222,15 +222,15 @@ let add_cvar (m: map) v =
 let add_lvar (m: map) lv =
   try LVmap.find lv m.lvars with Not_found ->
     assert (lv.lv_origin = None);
-    let d = Ldomain.of_ltype (new_chunk m.store) lv.lv_type in
+    let d = Domain.of_ltype (new_chunk m.store) lv.lv_type in
     m.lvars <- LVmap.add lv d m.lvars ; d
 
 let add_body = ref (fun _ _ _ -> assert false)
 
 let add_logic (m: map) f =
   try Fmap.find f m.logics with Not_found ->
-    let get_type t = Ldomain.of_ltype (new_chunk m.store) t in
-    let d = Option.fold ~none:Ldomain.pure ~some:get_type f.l_type in
+    let get_type t = Domain.of_ltype (new_chunk m.store) t in
+    let d = Option.fold ~none:Domain.pure ~some:get_type f.l_type in
     m.logics <- Fmap.add f d m.logics ;
     !add_body m f d ; d
 
@@ -240,11 +240,11 @@ let add_result (m: map) =
     m.result <- Some r ; r
 
 let domain_of_typ (m:map) (typ:typ) =
-  Ldomain.of_typ (new_chunk m.store) typ
+  Domain.of_typ (new_chunk m.store) typ
 
 let domain_of_ltyp (m:map) ?(ctxt) (lt:logic_type) =
-  let d : domain = Ldomain.of_ltype (new_chunk m.store) lt in
-  Option.fold ~none:d ~some:(fun (c:context) -> Ldomain.subst c d) ctxt
+  let d : domain = Domain.of_ltype (new_chunk m.store) lt in
+  Option.fold ~none:d ~some:(fun (c:context) -> Domain.subst c d) ctxt
 
 (* -------------------------------------------------------------------------- *)
 (* --- Iterator                                                           --- *)
@@ -259,8 +259,8 @@ let rec walk (f: node -> bool) n =
 
 let witer (m:map) (f: node -> bool) =
   Vmap.iter   (fun _x n -> walk f n) m.cvars ;
-  LVmap.iter  (fun _ -> Ldomain.iter (walk f)) m.lvars ;
-  Fmap.iter (fun _ -> Ldomain.iter (walk f)) m.logics ;
+  LVmap.iter  (fun _ -> Domain.iter (walk f)) m.lvars ;
+  Fmap.iter (fun _ -> Domain.iter (walk f)) m.logics ;
   Option.iter (walk f) m.result
 
 let once (f : node -> unit) : node -> bool =
@@ -414,10 +414,10 @@ let merge (a: node) (b: node) : unit = merge_all [a;b]
 (* --- Merging Domains                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-let pure : domain = Ldomain.pure
+let pure : domain = Domain.pure
 let dmerge a b = merge a b ; min a b
-let merge_domain = Ldomain.merge dmerge
-let merge_points_to = Ldomain.pointed dmerge
+let merge_domain = Domain.merge dmerge
+let merge_points_to = Domain.pointed dmerge
 
 (* -------------------------------------------------------------------------- *)
 (* --- Offset                                                             --- *)

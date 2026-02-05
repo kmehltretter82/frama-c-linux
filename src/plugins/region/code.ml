@@ -139,7 +139,7 @@ let add_kf_call m s r kf vs =
   in Annot.add_spec ~map:m ~called:s ~kf ~formals ~result:r spec
 
 let add_call m s r fct es =
-  let vs = List.map (fun e -> Ldomain.scalar @@ add_exp m s e) es in
+  let vs = List.map (fun e -> Domain.scalar @@ add_exp m s e) es in
   match Kernel_function.get_called fct with
   | Some kf -> add_kf_call m s r kf vs
   | None ->

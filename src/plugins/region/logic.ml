@@ -11,7 +11,7 @@ open Cil_datatype
 
 open Spec
 open Memory
-open Ldomain
+open Domain
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Process ACSL region annotations                                   --- *)
@@ -63,7 +63,7 @@ let fresh env () = Memory.fresh env.map
 let merge a b = Memory.merge a b ; min a b
 
 let pointer (d:domain) : node =
-  match Ldomain.pointed merge d with
+  match Domain.pointed merge d with
   | Some p -> p
   | None -> Options.fatal "Not a pointer value"
 
@@ -92,14 +92,14 @@ let rec load env lv (ty,r) : domain =
       let ofs = TField (fd,TNoOffset) in
       let lvf = Logic_const.addTermOffsetLval ofs lv in
       merge_domain d
-      @@ Ldomain.field fd
+      @@ Domain.field fd
       @@ load env lvf
       @@ (fd.ftype, Memory.add_field r fd)
     in List.fold_left add_field pure @@ Option.value ~default:[] cfields
   | _ ->
     let acs = Access.Term (env.context, lv) in
     Memory.add_read r acs ;
-    Ldomain.scalar @@ Memory.add_value r ty
+    Domain.scalar @@ Memory.add_value r ty
 
 let rterm = ref (fun _ _ -> assert false)
 
@@ -119,10 +119,10 @@ let rec term_offset ~loc (env:env) (d:domain) = function
   | TModel _ ->
     Options.not_yet_implemented ~source:(fst loc) "Unsupported model fields"
   | TField (f,offset) ->
-    term_offset ~loc env (Ldomain.get_field merge d f) offset
+    term_offset ~loc env (Domain.get_field merge d f) offset
   | TIndex(k,offset) ->
     ignore @@ !rterm env k ;
-    term_offset ~loc env (Ldomain.get_index merge d) offset
+    term_offset ~loc env (Domain.get_index merge d) offset
 
 let add_term_lval ~loc (env:env) (lv : term_lval) : domain =
   let lhost, loffset = lv in
@@ -169,16 +169,16 @@ let add_addr_lval ~loc (env:env) (lv : term_lval) : typ * node =
 let rec add_loffset ~loc (env:env) loffest d =
   match loffest with
   | TNoOffset -> d
-  | TField(fd,offset) -> Ldomain.field fd @@ add_loffset ~loc env offset d
+  | TField(fd,offset) -> Domain.field fd @@ add_loffset ~loc env offset d
   | TModel _ ->
     Options.not_yet_implemented ~source:(fst loc) "Unsupported model fields"
-  | TIndex(_,offset) -> Ldomain.array @@ add_loffset ~loc env offset d
+  | TIndex(_,offset) -> Domain.array @@ add_loffset ~loc env offset d
 
 let call (env:env) (l:logic_info) (ds:domain list) : domain =
-  let sigma = ref Ldomain.empty in
-  let unify = Ldomain.unify merge sigma in
+  let sigma = ref Domain.empty in
+  let unify = Domain.unify merge sigma in
   List.iter2 (fun x -> unify (Memory.add_lvar env.map x)) l.l_profile ds ;
-  Ldomain.subst !sigma @@ Memory.add_logic env.map l
+  Domain.subst !sigma @@ Memory.add_logic env.map l
 
 let iadd_logic_var m v = ignore @@ add_lvar m v
 
@@ -212,15 +212,15 @@ let rec add_term (env:env) (t:term) : domain =
     add_term env t
   | Tapp(f,_,ts) -> call env f @@ List.map (add_term env) ts
   | Tlambda(q,t) ->
-    Ldomain.arrow (List.map (Memory.add_lvar env.map) q) @@ add_term env t
+    Domain.arrow (List.map (Memory.add_lvar env.map) q) @@ add_term env t
   | Tlet({ l_body ; l_var_info=v },b) ->
     begin match l_body with
       | LBterm a ->
         let dv = add_lvar env.map v in
         let da = add_term env a in
-        let sigma = ref Ldomain.empty in
-        Ldomain.unify merge sigma da dv ;
-        Ldomain.subst !sigma @@ add_term env b
+        let sigma = ref Domain.empty in
+        Domain.unify merge sigma da dv ;
+        Domain.subst !sigma @@ add_term env b
       | LBpred p ->
         iadd_logic_var env.map v ;
         add_predicate env p ;
@@ -232,7 +232,7 @@ let rec add_term (env:env) (t:term) : domain =
   | TDataCons(c,ts) ->
     let ds = List.map (add_term env) ts in
     let args = List.map (of_ltype (fresh env)) c.ctor_params in
-    let sigma = ref Ldomain.empty in
+    let sigma = ref Domain.empty in
     List.iter2 (unify merge sigma) ds args ;
     begin match c.ctor_type.lt_def with
       | Some (LTsyn lt) -> of_ltype (fresh env) lt
@@ -266,7 +266,7 @@ and add_predicate (env:env) (p:predicate) = match p.pred_content with
     let dv = add_lvar env.map v in
     let dt = add_term env t in
     let sigma = ref empty in
-    Ldomain.unify merge sigma dt dv ;
+    Domain.unify merge sigma dt dv ;
     add_predicate env p2
   | Plet({ l_var_info = v ; l_body = LBpred p1 ; },p2) ->
     iadd_logic_var env.map v ;
