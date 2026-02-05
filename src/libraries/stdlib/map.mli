@@ -17,7 +17,7 @@ include module type of Stdlib.Map
 module type S = sig
   include S
 
-  (** Pretty prints a set given a printer for the elements.
+  (** Pretty prints a map given a printer for the keys and one for the values.
       @param format defaults to "{{ %t }}"
       @param item defaults to "%a -> %a"
       @param sep defaults to ";@ "
