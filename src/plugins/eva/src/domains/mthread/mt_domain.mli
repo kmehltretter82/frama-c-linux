@@ -12,8 +12,8 @@ type return = { standard : Value.t }
 
 module Domain : sig
   include Datatype.S_with_collections
-  val threads : t -> Mt_thread.Register.t
-  val mutexes : t -> Mt_mutex.Register.t
+  val threads : t -> Mt_register.Thread.t
+  val mutexes : t -> Mt_register.Mutex.t
   val return  : t -> return
   val key : t Structure.Key_Domain.key
   val empty : unit -> t
