@@ -233,7 +233,12 @@ let rec add_extension ~map ~called ~kf ~ki ~formals ~result acsl =
   match acsl.ext_kind with
   | Ext_id id ->
     if acsl.ext_plugin = "region" then
-      List.iter (Logic.add_region map) (Spec.of_extid id)
+      match called with
+      | None -> List.iter (Logic.add_region map) (Spec.of_extid id)
+      | Some stmt ->
+        let loc = Cil_datatype.Stmt.loc stmt in
+        Options.not_yet_implemented ~source:(fst loc)
+          "Unsupported region specification for calls"
     else
       let loc = Access.location context in
       Options.not_yet_implemented ~source:(fst loc)
