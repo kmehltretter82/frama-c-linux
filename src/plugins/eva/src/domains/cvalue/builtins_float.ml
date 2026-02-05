@@ -72,7 +72,7 @@ let arity1 name fk caml_fun _state actuals =
         if Cvalue.V.is_bottom arg then begin
           V.bottom
         end else begin
-          Self.result ~once:true ~current:true
+          Self.result ~level:3 ~once:true ~current:true
             "function %s applied to address" name;
           Cvalue.V.topify Origin.Arith arg
         end

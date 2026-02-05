@@ -594,7 +594,7 @@ struct
           if Cvalue.V.cardinal_zero_or_one (get value)
           then Some (stamp, 0)
           else begin
-            Self.result ~once:true ~current:true
+            Self.result ~level:3 ~once:true ~current:true
               "cannot properly split on \\result == %a"
               Z.pretty i;
             None

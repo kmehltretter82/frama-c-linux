@@ -88,7 +88,7 @@ module Make (Engine: Engine_sig.S) = struct
     then Self.abort "Library function call. Stopping.";
     let vi = Kernel_function.get_vi call.kf in
     (* Use vorig_name to avoid message duplication due to variadic renaming. *)
-    Self.feedback ~once:true
+    Self.feedback ~level:3 ~once:true
       "@[using specification for function %a@]"
       Printer.pp_varname vi.vorig_name;
     if Cil.is_in_libc vi.vattr then

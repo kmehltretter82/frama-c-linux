@@ -50,7 +50,7 @@ let () =
 
 let warning warn s =
   if warn then
-    Self.result ~current:true ~once:true s
+    Self.result ~level:3 ~current:true ~once:true s
   else
     Pretty_utils.nullprintf s
 

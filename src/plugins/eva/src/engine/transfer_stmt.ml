@@ -109,7 +109,7 @@ module Make (Engine: Engine_Subset) = struct
   let notify_unreachability fmt =
     if Domain.log_category = Domain_product.product_category
     then
-      Self.feedback ~level:1 ~current:true ~once:true
+      Self.feedback ~level:4 ~current:true ~once:true
         "The evaluation of %(%a%)@ led to bottom without alarms:@ at this point \
          the product of states has no possible concretization.@."
         fmt
