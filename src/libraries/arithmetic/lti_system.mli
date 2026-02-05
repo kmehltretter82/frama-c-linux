@@ -53,7 +53,12 @@ module Make (K : Field.S) : sig
 
   type 'n box = 'n Box.t
 
-  (* A LTI system full specification. *)
+  (** A LTI system full specification. The fields are as follows:
+      - [state_matrix]: the system's state matrix {m A};
+      - [input_matrix]: the system's input matrix {m B};
+      - [input_space]: the box containing all input vectors;
+      - [shift]: the system's shift vector {m S};
+      - [initial_state]: the system's initial state {m X[0]}. *)
   type ('n, 'm) system =
     { state_matrix  : ('n, 'n) matrix
     ; input_matrix  : ('n, 'm) matrix
