@@ -12,7 +12,7 @@ CONFIG="<default>"
 VERBOSE=
 CLEAN=
 PREPARE=
-PULLCACHE=
+USEWPCACHE=
 UPDATE=
 GENERATE=
 LOGS=
@@ -66,7 +66,7 @@ function Usage
     echo "  -n|--name <alias>   set dune alias name (default to ptests)"
     echo "  -r|--clean          clean (remove all) test results (includes -p)"
     echo "  -p|--ptests         prepare (all) dune files"
-    echo "  -w|--wp-cache       prepare (pull) WP-cache"
+    echo "  -w|--wp-cache       use (clone/pull/update) WP-cache"
     echo "  -l|--logs           print output of tests (single file, no diff)"
     echo "  -u|--update         update oracles (and WP-cache)"
     echo "  -g|--generate       Generate new oracles and update oracles"
@@ -173,7 +173,7 @@ do
             PREPARE=yes
             ;;
         "-w"|"--wp-cache")
-            PULLCACHE=yes
+            USEWPCACHE=yes
             ;;
         "-u"|"--update")
             UPDATE=yes
@@ -254,56 +254,60 @@ DUNE_OPT_POST=("$@")
 # ---  WP Cache Environment
 # --------------------------------------------------------------------------
 
-function SetEnv
+function SetWPCache
 {
     if [ "$FRAMAC_WP_CACHE" = "" ]; then
-        if [ "$UPDATE" = "yes" ]; then
-            Head "FRAMAC_WP_CACHE=update"
-            export FRAMAC_WP_CACHE=update
-        else
-            export FRAMAC_WP_CACHE=offline
-        fi
+        Head "FRAMAC_WP_CACHE=$1"
+        export FRAMAC_WP_CACHE="$1"
+    elif [ "$FRAMAC_WP_CACHE" = "$1" ]; then
+        Head "FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE"
     else
-        if [ "$UPDATE" = "yes" ]; then
-            Head "FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE (overrides -u)"
-        else
-            Head "FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE"
-        fi
+        Head "FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE (overrides $1)"
+    fi
+}
+
+function SetEnv
+{
+    if [ "$USEWPCACHE" = "yes" ] && [ "$UPDATE" = "yes" ]; then
+        SetWPCache "update"
+    else
+        SetWPCache "offline"
     fi
 
     if [ "$FRAMAC_WP_QUALIF" != "" ]; then
         export FRAMAC_WP_CACHEDIR="$FRAMAC_WP_QUALIF"
-        Echo "# FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
-    elif [ "$FRAMAC_WP_CACHEDIR" = "" ]; then
+    else
         export FRAMAC_WP_CACHEDIR="$LOCAL_WP_CACHE"
-        Echo "# FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
+    fi
+    Echo "# FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
+
+    if [ -f "$FRAMAC_WP_CACHEDIR" ]; then
+        Error "$FRAMAC_WP_CACHEDIR is not a directory"
     fi
 
-    [ ! -f "$FRAMAC_WP_CACHEDIR" ] || [ -d "$FRAMAC_WP_CACHEDIR" ] \
-        || Error "$FRAMAC_WP_CACHEDIR is not a directory"
-
-    case "$FRAMAC_WP_CACHEDIR" in
-        /*);;
-        *) Error "Requires an absolute path to $FRAMAC_WP_CACHEDIR";;
-    esac
+    if ! [ "$1" = "${1#/}" ]; then
+        Error "Requires an absolute path to $FRAMAC_WP_CACHEDIR"
+    fi
 }
 
-function CloneCache
+function GetCache
 {
     if [ ! -d "$FRAMAC_WP_CACHEDIR" ]; then
         Head "Cloning WP cache (from $FRAMAC_WP_CACHE_GIT to $FRAMAC_WP_CACHEDIR)..."
         RequiredTools git
         Cmd git clone "$FRAMAC_WP_CACHE_GIT" "$FRAMAC_WP_CACHEDIR"
-    fi
-}
-
-function PullCache
-{
-    if [ "$PULLCACHE" = "yes" ]
-    then
+    else
         Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
         RequiredTools git
         Run git -C "$FRAMAC_WP_CACHEDIR" pull --rebase
+    fi
+}
+
+function PrepareWPCache
+{
+    SetEnv
+    if [ "$USEWPCACHE" = "yes" ]; then
+        GetCache
     fi
 }
 
@@ -626,7 +630,7 @@ function Status
     fi
 
     #-- Check wp-cache status
-    if [ "$UPDATE" = "yes" ]; then
+    if [ "$USEWPCACHE" = "yes" ] && [ "$UPDATE" = "yes" ]; then
         Head "Update $FRAMAC_WP_CACHEDIR and check status"
         RequiredTools git
         Run git -C "$FRAMAC_WP_CACHEDIR" add -A
@@ -638,9 +642,7 @@ function Status
 # ---  Main Program
 # --------------------------------------------------------------------------
 
-SetEnv
-CloneCache
-PullCache
+PrepareWPCache
 PrepareCoverage
 PrepareTests
 CheckDuneFiles
