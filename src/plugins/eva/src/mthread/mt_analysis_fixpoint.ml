@@ -124,23 +124,16 @@ let compute_thread analysis th =
   analysis.curr_events_stack <- [];
   Datatype.Int.Hashtbl.clear analysis.memexec_cache;
 
-  (* We reset the concurrent Eva analysis (necessary because sometimes,
-     only the hooks have changed, and this is not captured by the project
-     infrastructure) *)
-  Self.clear_results ();
-
-  (* We set the parameters for the value analysis *)
-  Globals.set_entry_point (Kernel_function.get_name th.th_fun) false;
-  Eva_results.set_initial_state th.th_init_state;
-  Eva_results.set_main_args th.th_params;
-  Thread.set_current th.th_eva_thread;
-
-  Analysis.compute ();
+  Analysis.compute_thread
+    th.th_eva_thread th.th_fun th.th_init_state th.th_params;
 
   if Mt_options.ShowTime.get () then
     Mt_self.feedback ~level:2
       "* Value analysis computed for thread %a, %f sec"
       ThreadState.pretty th (Sys.time () -. time);
+
+  (* We save all our results *)
+  record_end_of_thread_analysis analysis;
 ;;
 
 let recompute_shared_vars_changed analysis before =
@@ -316,8 +309,6 @@ let one_iteration analysis =
 
              compute_thread analysis th;
 
-             (* We save all our results *)
-             record_end_of_thread_analysis analysis;
              Mt_self.feedback "*** Thread %a computed" ThreadState.pretty th;
            ) else (
              Mt_self.feedback "@[<hov 2>*** Thread %a has been@ created but@ \

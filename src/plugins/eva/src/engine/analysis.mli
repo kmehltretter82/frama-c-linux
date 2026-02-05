@@ -87,3 +87,17 @@ val use_spec_instead_of_definition: Cil_types.kernel_function -> bool
     to known whether results are available for a given function. *)
 val save_results: Cil_types.kernel_function -> bool
 [@@@ api_end]
+
+(** {2 Mthread entry point}
+
+    The following functions are exported to allow mthread to run thread-modular
+    analyses. They are provided as a way to keep the legacy fixpoint computation
+    of mthread. It is likely that in the future, the fixpoint of cucurrent
+    programs will be directly computed inside Eva's engine. *)
+
+val compute_thread :
+  Thread.t ->
+  Cil_types.kernel_function ->
+  Cvalue_callbacks.state ->
+  Cvalue.V.t list ->
+  unit
