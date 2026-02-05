@@ -494,6 +494,7 @@ module type Hashtbl = sig
   val remove: key -> unit
   val to_seq: unit -> (key * data) Seq.t
   val add_hook_on_change: ((key, data) hashtbl_event -> unit) -> unit
+  val pretty: Format.formatter -> unit
 end
 
 module Fc_hashtbl = Hashtbl
@@ -564,6 +565,7 @@ struct
   let fold f acc = H.fold f !state acc
   let fold_sorted ?cmp f acc = H.fold_sorted ?cmp f !state acc
   let to_seq () = H.to_seq !state
+  let pretty fmt = H.pretty H.Key.pretty Data.pretty fmt !state
 
   let memo ?change f key =
     try

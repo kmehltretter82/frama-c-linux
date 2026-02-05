@@ -1124,7 +1124,10 @@ struct
           let h2 = H.create (H.length tbl) (* may be very memory-consuming *) in
           H.iter (fun k v -> H.add h2 k v) h;
           h2
-        let pretty = undefined
+        let pretty f_value =
+          if Key.pretty == undefined || f_value == undefined
+          then undefined
+          else H.pretty Key.pretty f_value
         let mem_project =
           if Key.mem_project == undefined then undefined
           else
