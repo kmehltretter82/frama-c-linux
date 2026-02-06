@@ -332,7 +332,7 @@ let pred ?(loc=Cil_datatype.Location.unknown) ?(names=[]) p =
 
 let unnamed ?loc p = pred ?loc p
 
-let prepend_names ?(names=[]) p = { p with pred_name = names @ p.pred_name }
+let prepend_names ~names p = { p with pred_name = names @ p.pred_name }
 
 let ptrue = unnamed Ptrue
 let pfalse = unnamed Pfalse
@@ -344,18 +344,18 @@ let pold ?loc ?names p = match p.pred_content with
 let papp ?loc ?names (p,lab,a) =
   pred ?loc ?names (Papp(p,lab,a))
 
-let pand ?loc ?names (p1, p2) =
+let pand ?loc ?(names=[]) (p1, p2) =
   let p =
     match p1.pred_content, p2.pred_content with
-    | Ptrue, _ -> prepend_names ?names p2
+    | Ptrue, _ -> p2
     | _, Ptrue -> p1
     | Pfalse, _ -> p1
     | _, Pfalse -> p2
     | _, _ -> unnamed ?loc (Pand (p1, p2))
   in
-  prepend_names ?names p
+  prepend_names ~names p
 
-let por ?loc ?names (p1, p2) =
+let por ?loc ?(names=[]) (p1, p2) =
   let p =
     match p1.pred_content, p2.pred_content with
     | Ptrue, _ -> p1
@@ -364,9 +364,9 @@ let por ?loc ?names (p1, p2) =
     | _, Pfalse -> p1
     | _, _ -> unnamed ?loc (Por (p1, p2))
   in
-  prepend_names ?names p
+  prepend_names ~names p
 
-let pxor ?loc ?names (p1, p2) =
+let pxor ?loc ?(names=[]) (p1, p2) =
   let p =
     match p1.pred_content, p2.pred_content with
     | Ptrue, Ptrue -> unnamed ?loc Pfalse
@@ -376,9 +376,9 @@ let pxor ?loc ?names (p1, p2) =
     | _, Pfalse -> p1
     | _,_ -> unnamed ?loc (Pxor (p1,p2))
   in
-  prepend_names ?names p
+  prepend_names ~names p
 
-let pnot ?(loc=Cil_datatype.Location.unknown) ?names p2 =
+let pnot ?(loc=Cil_datatype.Location.unknown) ?(names=[]) p2 =
   let p =
     match p2.pred_content with
     | Ptrue -> { p2 with pred_content = Pfalse; pred_loc = loc }
@@ -386,38 +386,38 @@ let pnot ?(loc=Cil_datatype.Location.unknown) ?names p2 =
     | Pnot p -> p
     | _ -> unnamed ~loc (Pnot p2)
   in
-  prepend_names ?names p
+  prepend_names ~names p
 
-let pands ?names l =
+let pands ?(names=[]) l =
   let p = List.fold_right (fun p1 p2 -> pand (p1, p2)) l ptrue in
-  prepend_names ?names p
-let pors ?names l =
+  prepend_names ~names p
+let pors ?(names=[]) l =
   let p = List.fold_right (fun p1 p2 -> por (p1, p2)) l pfalse in
-  prepend_names ?names p
+  prepend_names ~names p
 
-let plet ?loc ?names v p = match p.pred_content with
-  | Ptrue -> prepend_names ?names p
-  | _ -> pred ?loc ?names (Plet (v, p))
+let plet ?loc ?(names=[]) v p = match p.pred_content with
+  | Ptrue -> prepend_names ~names p
+  | _ -> pred ?loc ~names (Plet (v, p))
 
-let pimplies ?(loc=Cil_datatype.Location.unknown) ?names (p1,p2) =
+let pimplies ?(loc=Cil_datatype.Location.unknown) ?(names=[]) (p1,p2) =
   let p =
     match p1.pred_content, p2.pred_content with
     | Ptrue, _ | _, Ptrue -> p2
     | Pfalse, _ -> { p1 with pred_loc = loc; pred_content = Ptrue }
     | _, _ -> unnamed ~loc (Pimplies (p1, p2))
   in
-  prepend_names ?names p
+  prepend_names ~names p
 
-let pif ?loc ?names (t,p2,p3) =
+let pif ?loc ?(names=[]) (t,p2,p3) =
   let p =
     match (p2.pred_content, p3.pred_content) with
     | Ptrue, Ptrue  -> ptrue
     | Pfalse, Pfalse -> pfalse
     | _,_ -> unnamed ?loc (Pif (t,p2,p3))
   in
-  prepend_names ?names p
+  prepend_names ~names p
 
-let piff ?loc ?names (p2,p3) =
+let piff ?loc ?(names=[]) (p2,p3) =
   let p =
     match p2.pred_content, p3.pred_content with
     | Pfalse, Pfalse -> ptrue
@@ -425,13 +425,13 @@ let piff ?loc ?names (p2,p3) =
     | _, Ptrue -> p2
     | _,_ -> unnamed ?loc (Piff (p2,p3))
   in
-  prepend_names ?names p
+  prepend_names ~names p
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 let prel ?loc ?names (a,b,c) =
   pred ?loc ?names (Prel(a,b,c))
 
-let pforall ?loc ?names (l,p) =
+let pforall ?loc ?(names=[]) (l,p) =
   let p =
     match l with
     | [] -> p
@@ -440,9 +440,9 @@ let pforall ?loc ?names (l,p) =
       | Ptrue -> p
       | _ -> unnamed ?loc (Pforall (l,p))
   in
-  prepend_names ?names p
+  prepend_names ~names p
 
-let pexists ?loc ?names (l,p) =
+let pexists ?loc ?(names=[]) (l,p) =
   let p =
     match l with
     | [] -> p
@@ -450,7 +450,7 @@ let pexists ?loc ?names (l,p) =
       | Pfalse -> p
       | _ -> unnamed ?loc (Pexists (l,p))
   in
-  prepend_names ?names p
+  prepend_names ~names p
 
 let pfresh ?loc ?names (l1,l2,p,n) = pred ?loc ?names (Pfresh (l1,l2,p,n))
 let pallocable ?loc ?names (l,p) = pred ?loc ?names (Pallocable (l,p))
