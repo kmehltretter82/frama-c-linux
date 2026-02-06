@@ -102,7 +102,7 @@ let pre_analysis () =
   if Mt_options.Enabled.get ()
   then begin
     Mt_self.warning
-      "Mthread is an experimental plugin and is still in development.";
+      "Analysis of concurrent programs is an experimental feature.";
     Mt_lib.check_mthread_library ();
     check_options ();
     let analysis = make_analysis_state () in

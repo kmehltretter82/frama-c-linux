@@ -1,9 +1,9 @@
 [kernel] Expanding arguments from mthread_test_options.txt
-[eva] Preparing sources for Mthread with lib pthreads
+[eva] Preparing sources for the analysis of concurrent program with lib pthreads
 [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing model.c (with preprocessing)
-[eva] Warning: Mthread is an experimental plugin and is still in development.
+[eva] Warning: Analysis of concurrent programs is an experimental feature.
 [eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
