@@ -127,10 +127,6 @@
 [eva:interferences] 
   inject threads interferences at the start of interrupt_incr for thread <interrupt_handler interrupt_incr>
 [eva:interferences] interrupt.c:29: inject threads interferences at this point
-[eva:alarm] interrupt.c:29: Warning: 
-  assertion 'Eva,signed_overflow' got status unknown.
-[eva:alarm] interrupt.c:29: Warning: 
-  signed overflow. assert interrupt_received + 1 ≤ 2147483647;
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables

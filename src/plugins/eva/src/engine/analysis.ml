@@ -233,11 +233,6 @@ let abort () =
 (* Mthread entry point *)
 
 let compute_thread thread kf initial_state args =
-  (* We reset the concurrent Eva analysis (necessary because sometimes,
-     only the hooks have changed, and this is not captured by the project
-     infrastructure) *)
-  Self.clear_results ();
-
   (* We set the parameters for the value analysis *)
   Eva_results.set_initial_state initial_state;
   Eva_results.set_main_args args;
