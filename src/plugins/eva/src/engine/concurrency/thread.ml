@@ -62,7 +62,7 @@ module ThreadsById = State_builder.Hashtbl (Datatype.Int.Hashtbl) (Thread)
       let size = 13
     end)
 
-let last_thread_id = ref 1
+let last_thread_id = ref main.id
 
 let create kind =
   incr last_thread_id;
