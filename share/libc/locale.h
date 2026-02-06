@@ -117,6 +117,8 @@ struct lconv
                                   | LC_IDENTIFICATION_MASK      \
                                   )
 
+#define LC_GLOBAL_LOCALE ((locale_t) -1L)
+
 __FC_EXTERN struct lconv* __fc_locale;
 __FC_EXTERN char*__fc_locale_names[512];
 

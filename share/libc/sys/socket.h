@@ -141,6 +141,11 @@ extern struct cmsghdr *CMSG_NXTHDR(const struct msghdr *msgh,
 #define PF_QIPCRTR 42
 #define PF_MAX 43
 
+/* socket creation flags */
+#define SOCK_CLOEXEC 02000000
+#define SOCK_NONBLOCK 00004000
+// SOCK_CLOFORK required by POSIX but unsupported and unimplemented by Linux
+
 /* Address families (only AF_INET, AF_INET6, AF_UNIX and AF_UNSPEC are
    described in POSIX; AF_INET6 is optional) */
 #define AF_UNSPEC 0
@@ -434,6 +439,7 @@ extern int listen(int sockfd, int backlog);
 #define MSG_BATCH        0x40000
 #define MSG_FASTOPEN     0x20000000
 #define MSG_CMSG_CLOEXEC 0x40000000
+// MSG_CMSG_CLOFORK required by POSIX but unsupported and unimplemented by Linux
 
 
 /*@
