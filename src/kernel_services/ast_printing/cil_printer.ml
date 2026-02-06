@@ -1936,7 +1936,10 @@ class cil_printer () = object (self)
     fprintf fmt "%s"
       (match c with
        | IChar -> "char"
-       | IBool -> "_Bool"
+       | IBool ->
+         if let std = Kernel.CStd.get () in std = C11 || std = C17
+         then "_Bool"
+         else "bool"
        | ISChar -> "signed char"
        | IUChar -> "unsigned char"
        | IInt -> "int"
@@ -1946,9 +1949,13 @@ class cil_printer () = object (self)
        | ILong -> "long"
        | IULong -> "unsigned long"
        | ILongLong ->
-         if Machine.msvcMode () then "__int64" else "long long"
+         if Machine.msvcMode ()
+         then "__int64"
+         else "long long"
        | IULongLong ->
-         if Machine.msvcMode () then "unsigned __int64" else "unsigned long long"
+         if Machine.msvcMode ()
+         then "unsigned __int64"
+         else "unsigned long long"
       )
 
   method compkind fmt ci =

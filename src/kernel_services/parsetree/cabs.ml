@@ -277,6 +277,7 @@ and cabsexp =
   | GENERIC of (expression * (((specifier * decl_type) option * expression) list))
 
 and constant =
+  | CONST_BOOL of bool
   | CONST_INT of string   (* the textual representation *)
   | CONST_FLOAT of string (* the textual representation *)
   | CONST_CHAR of int64 list

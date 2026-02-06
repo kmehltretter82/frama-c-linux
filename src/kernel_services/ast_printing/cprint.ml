@@ -355,6 +355,7 @@ and print_expression_level (lvl: int) fmt (exp : expression) =
     | CALL (exp, args, ghost_args) ->
       fprintf fmt "%a(@[@;%a@]) /*@@@ ghost (@[@;%a@]) */"
         print_expression exp print_comma_exps args print_comma_exps ghost_args
+    | CONSTANT (CONST_BOOL b) -> pp_print_bool fmt b
     | CONSTANT (CONST_INT i) -> pp_print_string fmt i
     | CONSTANT (CONST_FLOAT f) -> pp_print_string fmt f
     | CONSTANT (CONST_CHAR c) -> fprintf fmt "'%s'" (escape_wstring c)
