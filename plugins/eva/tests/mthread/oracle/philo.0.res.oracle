@@ -3,7 +3,7 @@
 [kernel] Parsing FRAMAC_SHARE/eva/mthread.c (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/eva/mthread_pthread.c (with preprocessing)
 [kernel] Parsing philo.c (with preprocessing)
-[kernel] Parsing "FRAMAC_SHARE/eva"/mthread_queue.c (with preprocessing)
+[kernel] Parsing "FRAMAC_SHARE"/eva/mthread_queue.c (with preprocessing)
 [eva] Warning: Mthread is an experimental plugin and is still in development.
 [eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain

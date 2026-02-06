@@ -12,7 +12,7 @@
 let find_mthread_global_var name =
   try Globals.Vars.find_from_astinfo name Global
   with Not_found ->
-    let mthread_c = Mt_self.Share.get_file "mthread.c" in
+    let mthread_c = Self.Share.get_file "mthread.c" in
     Mt_self.abort
       "Variable %S not found. \
        It should be in file %a, required for the Mthread analysis. \
@@ -51,20 +51,19 @@ let pp_threads_lib fmt lib =
   | Pthreads -> Format.pp_print_string fmt "lib pthreads"
 
 let threads_lib_files lib =
-  let mthread_c = Mt_self.Share.get_file "mthread.c" in
+  let mthread_c = Self.Share.get_file "mthread.c" in
   match lib with
   | BuiltinsOnly ->
     Filepath.Set.singleton mthread_c
   | Pthreads ->
-    let mthread_pthread_c = Mt_self.Share.get_file "mthread_pthread.c" in
+    let mthread_pthread_c = Self.Share.get_file "mthread_pthread.c" in
     Filepath.Set.of_list [ mthread_c ; mthread_pthread_c ]
 
 let load_threads_library lib =
   Mt_self.feedback "Preparing sources for Mthread with %a" pp_threads_lib lib;
   (* Add Mthread folder to the include path. *)
   let mt_include_dir =
-    Format.asprintf "-I%a"
-      Filepath.pretty_abs (Mt_self.Share.get_dir ".")
+    Format.asprintf "-I%a" Filepath.pretty_abs (Self.Share.get_dir ".")
   in
   Kernel.CppExtraArgs.add mt_include_dir;
   (* Add the stubbed library files to the list of files to parse. *)

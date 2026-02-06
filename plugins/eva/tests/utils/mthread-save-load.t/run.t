@@ -46,7 +46,7 @@ Parse file with Mthread builtins and pthreads stubs.
 
 Load parsed file and run Mthread, with minimal verbosity.
 The analysis succeeds and two alarms are emitted.
-  $ frama-c -no-autoload-plugins -load-module eva,inout,scope -load parsed.sav -eva -mthread -eva-verbose 0 -mt-verbose 0
+  $ frama-c -no-autoload-plugins -load-module eva,inout,scope -load parsed.sav -eva -mthread -eva-verbose 0
   [eva:experimental] Warning: The mthread domain is experimental.
   [eva] Warning: Mthread is an experimental plugin and is still in development.
   [eva:alarm] file.c:13: Warning: signed overflow. assert x + 1 ≤ 2147483647;

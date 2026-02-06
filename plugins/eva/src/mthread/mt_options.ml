@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Mt_self
+open Self
 
 let grp_models = add_group "Extraction of models"
 let grp_cfg = add_group "Multithreaded control-flow-graph"

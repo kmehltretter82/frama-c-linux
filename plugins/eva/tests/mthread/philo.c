@@ -1,7 +1,7 @@
 /* run.config*
    ENABLED_IF: %{bin-available:dot}
    LOG: @LOG_MT_DOT_FILES_FILENAME@
-   STDOPT: #"@PTEST_SHARE_DIR@/mthread/mthread_queue.c" +"@LOG_MT_DOT_FILES_OPTS@"
+   STDOPT: #"@PTEST_SHARE_DIR@/eva/mthread_queue.c" +"@LOG_MT_DOT_FILES_OPTS@"
 */
 /*
   THIS FILE IS USED AS AN EXAMPLE FOR THE WEBSITE. DO NOT FORGET TO UPDATE THE

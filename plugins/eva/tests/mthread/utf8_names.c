@@ -1,7 +1,7 @@
 /* run.config
    ENABLED_IF: %{bin-available:dot}
    LOG: @LOG_MT_DOT_FILES_FILENAME@
-   STDOPT: +"-eva-verbose 0 -mt-verbose 1 @LOG_MT_DOT_FILES_OPTS@"
+   STDOPT: +"-eva-verbose 1 @LOG_MT_DOT_FILES_OPTS@"
 */
 /* run.config*
    COMMENT: Deactivate alternative configurations.

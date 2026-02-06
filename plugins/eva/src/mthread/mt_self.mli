@@ -6,4 +6,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Plugin.General_services
+include module type of Self

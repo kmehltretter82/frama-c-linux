@@ -620,7 +620,7 @@ module Html = struct
      not needed *)
   let css_content =
     lazy (
-      let css_file = Mt_self.Share.get_file "mthread.css" in
+      let css_file = Self.Share.get_file "mthread.css" in
       try
         let open Filesystem.Operators in
         let b =

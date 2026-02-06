@@ -8,7 +8,7 @@
   int (*)(msgqueue_t *q, int size)
   and
   int (*)(void *, int )
-[kernel] Parsing "FRAMAC_SHARE/eva"/mthread_queue.c (with preprocessing)
+[kernel] Parsing "FRAMAC_SHARE"/eva/mthread_queue.c (with preprocessing)
 [eva] Warning: Mthread is an experimental plugin and is still in development.
 [eva] ******* Starting mthread
 [eva] Found concurrency builtins: enabling mthread domain

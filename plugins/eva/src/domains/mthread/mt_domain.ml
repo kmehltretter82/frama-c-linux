@@ -401,14 +401,7 @@ let have_builtins_in_globals () =
   Globals.Functions.fold (fun kf acc -> acc || is_builtin kf) false
 
 let have_interrupt_handlers () =
-  if Plugin.is_present "mt" then
-    (* TODO: when -mt-interrupt-handlers becomes an Eva option, use it directly
-       instead of using Dynamic.*)
-    let opt_name = "-mt-interrupt-handlers" in
-    let p =  Dynamic.Parameter.get_parameter opt_name in
-    p.is_set ()
-  else
-    false
+  not (Mt_options.InterruptHandlers.is_empty ())
 
 let domain =
   let name = "mthread" in

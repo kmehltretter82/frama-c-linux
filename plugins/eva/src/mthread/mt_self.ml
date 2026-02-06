@@ -6,11 +6,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let () = Plugin.is_share_visible ()
-
-include Plugin.Register
-    (struct
-      let name = "Mthread"
-      let shortname = "mt"
-      let help = "Experimental tools for multi-threaded programs"
-    end)
+include Self

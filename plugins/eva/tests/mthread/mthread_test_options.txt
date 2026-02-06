@@ -9,9 +9,8 @@
 -no-warn-unaligned-pointer
 # Parsing
 -mt-threads-lib pthreads
--add-symbolic-path ../../../share/mthread:"FRAMAC_SHARE/mt"
+-add-symbolic-path ../../../share:"FRAMAC_SHARE"
 # Verbosity options
--mt-verbose 3
 -eva-verbose 3
 -eva-msg-key interferences,-summary
 -eva-warn-key experimental=inactive

@@ -1075,9 +1075,12 @@
 [eva] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] recreation.c:25: New context for jobs[3], fun job, parent jobs[0], args {3}
-[eva] recreation.c:25: New context for jobs[4], fun job, parent jobs[0], args {4}
-[eva] recreation.c:25: New context for jobs[5], fun job, parent jobs[0], args {5}
+[eva] recreation.c:25: 
+  New context for jobs[3], fun job, parent jobs[0], args {3}
+[eva] recreation.c:25: 
+  New context for jobs[4], fun job, parent jobs[0], args {4}
+[eva] recreation.c:25: 
+  New context for jobs[5], fun job, parent jobs[0], args {5}
 [eva] * Computing shared variables
 [eva] Globals accessed by thread:
   end: read by jobs[0] at recreation.c:28 <- job
@@ -1099,9 +1102,12 @@
 [eva] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] recreation.c:25: New context for jobs[6], fun job, parent jobs[1], args {6}
-[eva] recreation.c:25: New context for jobs[7], fun job, parent jobs[1], args {7}
-[eva] recreation.c:25: New context for jobs[8], fun job, parent jobs[1], args {8}
+[eva] recreation.c:25: 
+  New context for jobs[6], fun job, parent jobs[1], args {6}
+[eva] recreation.c:25: 
+  New context for jobs[7], fun job, parent jobs[1], args {7}
+[eva] recreation.c:25: 
+  New context for jobs[8], fun job, parent jobs[1], args {8}
 [eva] * Computing shared variables
 [eva] Globals accessed by thread:
   end: read by jobs[1] at recreation.c:28 <- job
@@ -1123,7 +1129,8 @@
 [eva] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva] recreation.c:25: New context for jobs[9], fun job, parent jobs[2], args {9}
+[eva] recreation.c:25: 
+  New context for jobs[9], fun job, parent jobs[2], args {9}
 [eva] recreation.c:25: 
   New context for jobs[10], fun job, parent jobs[2], args {10}
 [eva] recreation.c:25: 

@@ -8,6 +8,7 @@
 
 let default_verbosity = 5
 let () = Plugin.set_default_verbose_level default_verbosity
+let () = Plugin.is_share_visible ()
 
 include Plugin.Register
     (struct

@@ -9,7 +9,4 @@
 (install
  (package frama-c-eva)
  (section (site (frama-c share)))
- (files
-  (share/mthread/mthread.css as mt/mthread.css)
-  (glob_files (share/mthread/*.{h,c} with_prefix mt))
-))
+ (source_trees (share/eva as eva)))

@@ -50,9 +50,6 @@
    PLUGIN: metrics
    STDOPT: +"-metrics-h"
 
-   PLUGIN: eva
-   STDOPT: +"-mt-h"
-
    PLUGIN: nonterm
    STDOPT: +"-nonterm-h"
 

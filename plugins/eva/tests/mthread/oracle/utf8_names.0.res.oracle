@@ -7,7 +7,9 @@
   Conversion from a pointer to an integer without an explicit cast
 [eva] Warning: Mthread is an experimental plugin and is still in development.
 [eva] ******* Starting mthread
+[eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
+[eva] Analyzing a complete application starting at main
 [eva] New thread: <main>, fun main
 [eva] Initializing mutex mutex / "𐍅"
 [eva] New thread: job / "𐍅" f1, fun f1, parent <main>, args {0}
@@ -27,6 +29,8 @@
 [eva] ******* Starting to iterate
 [eva] ***** Iteration 1
 [eva] *** Computing thread job / "𐍅" f1, iteration 1 (first iteration)
+[eva] Analyzing a complete application starting at f1
+[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread job / "𐍅" f1
 [eva:alarm] utf8_names.c:23: Warning: 
@@ -53,6 +57,8 @@
     interferences by mutexes:
 [eva] *** Thread job / "𐍅" f1 computed
 [eva] *** Computing thread job / "𐍅" f2, iteration 1 (first iteration)
+[eva] Analyzing a complete application starting at f2
+[eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread job / "𐍅" f2
 [eva] Sending message on queue / "𐍅", content
@@ -83,6 +89,8 @@
 [eva] ***** Iteration 2
 [eva] *** Computing thread <main>, iteration 2 (new message received and potential
     shared vars changed)
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [eva] Thread <main>, fun main
 [eva] Thread job / "𐍅" f1, fun f1, parent <main>, args {0}
 [eva] Thread job / "𐍅" f2, fun f2, parent <main>, args {0}
@@ -119,6 +127,8 @@
 [eva] *** Thread <main> computed
 [eva] *** Computing thread job / "𐍅" f1, iteration 2 (potential shared vars changed
     and interferences changed)
+[eva] Analyzing a complete application starting at f1
+[eva] Initial state supplied by user
 [eva:interferences] utf8_names.c:23: inject threads interferences at this point
 [eva:interferences] utf8_names.c:27: inject threads interferences at this point
 [eva:interferences] utf8_names.c:29: inject threads interferences at this point
@@ -161,6 +171,8 @@
 [eva] *** Thread job / "𐍅" f1 computed
 [eva] *** Computing thread job / "𐍅" f2, iteration 2 (potential shared vars changed
     and interferences changed)
+[eva] Analyzing a complete application starting at f2
+[eva] Initial state supplied by user
 [eva:interferences] utf8_names.c:37: inject threads interferences at this point
 [eva:interferences] utf8_names.c:39: inject threads interferences at this point
 [eva:interferences] 
@@ -267,6 +279,8 @@
 [eva] ***** Iteration 3
 [eva] *** Computing thread <main>, iteration 3 (shared vars values changed and
     interferences changed)
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [eva] New context for job / "𐍅" f2, fun f2, parent <main>, args {0}
 [eva:interferences] utf8_names.c:59: inject threads interferences at this point
 [eva:interferences] 
@@ -278,6 +292,8 @@
 [eva] *** Thread <main> computed
 [eva] *** Computing thread job / "𐍅" f1, iteration 3 (shared vars values changed
     and interferences changed)
+[eva] Analyzing a complete application starting at f1
+[eva] Initial state supplied by user
 [eva:interferences] 
   Interferences from thread job / "𐍅" f1
     concurrent writes:
@@ -325,6 +341,8 @@
 [eva] *** Thread job / "𐍅" f1 computed
 [eva] *** Computing thread job / "𐍅" f2, iteration 3 (shared vars values changed,
     thread initial memory state changed and interferences changed)
+[eva] Analyzing a complete application starting at f2
+[eva] Initial state supplied by user
 [eva:interferences] 
   Interferences from thread job / "𐍅" f2
     concurrent writes:
@@ -415,6 +433,8 @@
 [eva] ***** Shared variables computed
 [eva] ***** Iteration 4
 [eva] *** Computing thread <main>, iteration 4 (interferences changed)
+[eva] Analyzing a complete application starting at main
+[eva] Initial state supplied by user
 [eva:interferences] 
   Interferences from thread <main>
     concurrent writes:
@@ -423,6 +443,8 @@
     interferences by mutexes:
 [eva] *** Thread <main> computed
 [eva] *** Computing thread job / "𐍅" f1, iteration 4 (interferences changed)
+[eva] Analyzing a complete application starting at f1
+[eva] Initial state supplied by user
 [eva:interferences] 
   Interferences from thread job / "𐍅" f1
     concurrent writes:
