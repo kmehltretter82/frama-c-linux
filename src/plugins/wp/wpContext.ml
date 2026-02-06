@@ -140,7 +140,7 @@ let get_scope () = get_context () |> snd
 let compute_hypotheses m f =
   on_context (m,Kf f) m.hypotheses MemoryContext.empty
 
-let directory () = get_model () |> MODEL.id |> Wp_parameters.get_output_dir
+let directory () = get_model () |> MODEL.id |> Wp_parameters.Output.get_dir
 
 module type Entries =
 sig

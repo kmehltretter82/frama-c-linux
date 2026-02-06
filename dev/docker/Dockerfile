@@ -27,7 +27,7 @@ COPY opam-install-fc-deps-from-ref-config.sh /init/
 RUN sudo chmod a+rx /init/opam-install-fc-deps-from-ref-config.sh
 RUN /init/opam-install-fc-deps-from-ref-config.sh
 
-RUN eval $(opam env) && why3 config detect
+RUN eval $(opam env)
 
 # Stage 2: install Frama-C itself
 

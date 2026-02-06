@@ -100,7 +100,7 @@ let dump_buffer buffer = function
     if n > 0 then
       Filesystem.with_open_out_exn log
         (fun out -> Buffer.output_buffer out buffer)
-    else if Wp_parameters.has_out () then
+    else if Wp_parameters.Output.exists () then
       Filesystem.remove_file log
 
 let echo_buffer buffer =

@@ -166,7 +166,7 @@ let save ~stdout wpo js =
 let get_marks_dir ~force =
   let scripts = Wp_parameters.get_session_dir ~force "script" in
   let path = Filepath.(scripts / ".marks") in
-  if force then Wp_parameters.make_output_dir path ;
+  if force then Wp_parameters.Output.mkdir path ;
   path
 
 let remove_marks ~dry =

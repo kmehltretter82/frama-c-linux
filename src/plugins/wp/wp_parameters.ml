@@ -6,6 +6,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Plugin overrides this ... *)
+module Fc_Filepath = Filepath
+
 let () = Plugin.is_share_visible ()
 let () = Plugin.is_session_visible ()
 include Plugin.Register
@@ -582,7 +585,7 @@ module Provers = String_list
          - 'none' (no prover run)\n\
          - 'script' (replay all session scripts)\n\
          - 'tip' (replay or init scripts for failed goals)\n\
-         - '<why3-prover>' (any Why3 prover, see -wp-detect)\n\
+         - '<why3-prover>' (any Why3 prover, see -wp-list-provers)\n\
         "
     end)
 
@@ -730,12 +733,12 @@ module DryFinalizeScripts = False
     end)
 
 let () = Parameter_customize.set_group wp_prover
-module Detect = Action
+module ListProvers = Action
     (struct
-      let option_name = "-wp-detect"
-      let help = "List installed provers."
+      let option_name = "-wp-list-provers"
+      let help = "List available provers."
     end)
-let () = on_reset Detect.clear
+let () = on_reset ListProvers.clear
 
 let () = Parameter_customize.set_group wp_prover
 module Library =
@@ -871,12 +874,6 @@ module ProofTrace =
       let help = "Keeps output of provers for valid POs (default: no)"
     end)
 
-(* ------------------------------------------------------------------------ *)
-(* ---  Prover Options                                                  --- *)
-(* ------------------------------------------------------------------------ *)
-
-let wp_prover_options = add_group "Why3 Options"
-
 let () = Parameter_customize.set_group wp_prover
 module Auto = String_list
     (struct
@@ -920,7 +917,36 @@ module BackTrack = Int
          Limits backtracking when applying strategies."
     end)
 
-let () = Parameter_customize.set_group wp_prover_options
+(* ------------------------------------------------------------------------ *)
+(* ---  Why3 Options                                                    --- *)
+(* ------------------------------------------------------------------------ *)
+
+let wp_why3_options = add_group "Why3 Options"
+
+let () = Parameter_customize.set_group wp_why3_options
+let () = Parameter_customize.no_category ()
+module Why3Config =
+  Filepath
+    (struct
+      let option_name = "-wp-why3-config"
+      let arg_name = "file"
+      let file_kind = "why3 configuration"
+      let help =
+        "Use Why3 configuration file (default $HOME/.why3.conf)."
+      let existence = Fc_Filepath.Must_exist
+    end)
+
+let () = Parameter_customize.set_group wp_why3_options
+let () = Parameter_customize.no_category ()
+module Why3Autodetect =
+  True
+    (struct
+      let option_name = "-wp-why3-detect"
+      let help = "Detect provers from $PATH"
+    end)
+
+
+let () = Parameter_customize.set_group wp_why3_options
 let () = Parameter_customize.no_category ()
 module Why3Flags =
   String_list
@@ -930,7 +956,7 @@ module Why3Flags =
       let help = "Additional options for Why3"
     end)
 
-let () = Parameter_customize.set_group wp_prover_options
+let () = Parameter_customize.set_group wp_why3_options
 let () = Parameter_customize.no_category ()
 module Why3ExtraConfig =
   String_list
@@ -1048,17 +1074,6 @@ module CheckMemoryContext =
     end)
 
 let () = Parameter_customize.set_group wp_po
-module OutputDir =
-  Filepath(struct
-    let existence = Fclib.Filepath.Indifferent
-    let option_name = "-wp-out"
-    let arg_name = "dir"
-    let file_kind = "directory"
-    let help = "Set working directory for generated files.\n\
-                Defaults to some temporary directory."
-  end)
-
-let () = Parameter_customize.set_group wp_po
 module Probes =
   True
     (struct
@@ -1077,6 +1092,17 @@ module CounterExamples =
 (* -------------------------------------------------------------------------- *)
 (* --- Output Dir                                                         --- *)
 (* -------------------------------------------------------------------------- *)
+
+let () = Parameter_customize.set_group wp_po
+module OutputDir =
+  Filepath(struct
+    let existence = Fclib.Filepath.Indifferent
+    let option_name = "-wp-out"
+    let arg_name = "dir"
+    let file_kind = "directory"
+    let help = "Set working directory for generated files.\n\
+                Defaults to system temporary directory."
+  end)
 
 let dkey = register_category "output"
 
@@ -1146,6 +1172,15 @@ let get_output_dir d =
   let base = get_output () in
   let path = Fclib.Filepath.(base / d) in
   make_output_dir path ; path
+
+module Output = (* exported *)
+struct
+  let exists = has_out
+  let get = get_output
+  let get_dir = get_output_dir
+  let mkdir = make_output_dir
+  let add_update_hook = OutputDir.add_update_hook
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Session dir                                                        --- *)

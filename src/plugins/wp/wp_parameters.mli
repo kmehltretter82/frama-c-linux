@@ -86,7 +86,7 @@ module TerminatesVariantHyp : Parameter_sig.Bool
 
 (** {2 Prover Interface} *)
 
-module Detect: Parameter_sig.Bool
+module ListProvers: Parameter_sig.Bool
 module Tactics: Parameter_sig.String_list
 module Generate:Parameter_sig.Bool
 module ScriptOnStdout: Parameter_sig.Bool
@@ -118,13 +118,18 @@ module TimeMargin: Parameter_sig.String
 module Steps: Parameter_sig.Int
 module Procs: Parameter_sig.Int
 module ProofTrace: Parameter_sig.Bool
-module Why3Flags: Parameter_sig.String_list
-module Why3ExtraConfig: Parameter_sig.String_list
 
 module Auto: Parameter_sig.String_list
 module AutoDepth: Parameter_sig.Int
 module AutoWidth: Parameter_sig.Int
 module BackTrack: Parameter_sig.Int
+
+(** {2 Why3 configuration} *)
+
+module Why3Config: Parameter_sig.Filepath
+module Why3Autodetect: Parameter_sig.Bool
+module Why3ExtraConfig: Parameter_sig.String_list
+module Why3Flags: Parameter_sig.String_list
 
 (** {2 Proof Obligations} *)
 
@@ -148,13 +153,17 @@ module CounterExamples: Parameter_sig.Bool
 
 (** {2 Getters} *)
 
-val has_out : unit -> bool
 val has_session : unit -> bool
 val get_session : force:bool -> unit -> Filepath.t
 val get_session_dir : force:bool -> string -> Filepath.t
-val get_output : unit -> Filepath.t
-val get_output_dir : string -> Filepath.t
-val make_output_dir : Filepath.t -> unit
+
+module Output : sig
+  val exists: unit -> bool
+  val get : unit -> Filepath.t
+  val get_dir : string -> Filepath.t
+  val mkdir : Filepath.t -> unit
+  val add_update_hook : (Filepath.t -> Filepath.t -> unit) -> unit
+end
 
 (** {2 Debugging Categories} *)
 
