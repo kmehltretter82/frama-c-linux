@@ -854,11 +854,11 @@ let removeUnmarked isRoot ast reachable_tbl =
               with Not_found ->
                 Kernel.debug ~dkey
                   "GFunDecl: %a (no associated kernel function)@."
-                  Printer.pp_varinfo vi;
+                  Cil_printer.pp_varinfo vi;
             end
           | _ -> ()
         end;
-        Kernel.debug ~dkey "kept global %s (%a)" (global_type_and_name rg) Printer.pp_global rg
+        Kernel.debug ~dkey "kept global %s (%a)" (global_type_and_name rg) Cil_printer.pp_global rg
       ) keptGlobals;
   end
 
