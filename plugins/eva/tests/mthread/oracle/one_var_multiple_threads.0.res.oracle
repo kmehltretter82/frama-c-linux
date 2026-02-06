@@ -8,29 +8,31 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[eva] New thread: <main>, fun main
-[eva] one_var_multiple_threads.c:38: Initializing mutex lock1
-[eva] one_var_multiple_threads.c:39: Initializing mutex lock2
-[eva] one_var_multiple_threads.c:42: 
+[eva:thread] New thread: <main>, fun main
+[eva:mutex] one_var_multiple_threads.c:38: Initializing mutex lock1
+[eva:mutex] one_var_multiple_threads.c:39: Initializing mutex lock2
+[eva:thread] one_var_multiple_threads.c:42: 
   New thread: jobs, fun f, parent <main>, args {0}
-[eva] one_var_multiple_threads.c:42: Start thread jobs
-[eva] one_var_multiple_threads.c:44: 
+[eva:thread] one_var_multiple_threads.c:42: Start thread jobs
+[eva:thread] one_var_multiple_threads.c:44: 
   New thread: jobs, fun g, parent <main>, args {0}
-[eva] one_var_multiple_threads.c:44: Start thread jobs
-[eva] one_var_multiple_threads.c:42: Thread jobs, fun f, parent <main>, args {0}
-[eva] one_var_multiple_threads.c:42: 
+[eva:thread] one_var_multiple_threads.c:44: Start thread jobs
+[eva:thread] one_var_multiple_threads.c:42: 
+  Thread jobs, fun f, parent <main>, args {0}
+[eva:thread] one_var_multiple_threads.c:42: 
   New context for jobs, fun f, parent <main>, args {0}
 [eva] FRAMAC_SHARE/eva/mthread_pthread.c:17: Warning: 
   The thread jobs is already registered.
 [eva] FRAMAC_SHARE/eva/mthread_pthread.c:20: Warning: 
   The thread jobs is already running.
-[eva] one_var_multiple_threads.c:44: Thread jobs, fun g, parent <main>, args {0}
-[eva] one_var_multiple_threads.c:44: 
+[eva:thread] one_var_multiple_threads.c:44: 
+  Thread jobs, fun g, parent <main>, args {0}
+[eva:thread] one_var_multiple_threads.c:44: 
   New context for jobs, fun g, parent <main>, args {0}
-[eva] one_var_multiple_threads.c:49: Lock lock1
-[eva] one_var_multiple_threads.c:52: Release lock1
-[eva] one_var_multiple_threads.c:53: Lock lock2
-[eva] one_var_multiple_threads.c:56: Release lock2
+[eva:mutex] one_var_multiple_threads.c:49: Lock lock1
+[eva:mutex] one_var_multiple_threads.c:52: Release lock1
+[eva:mutex] one_var_multiple_threads.c:53: Lock lock2
+[eva:mutex] one_var_multiple_threads.c:56: Release lock2
 [eva] Globals accessed by thread:
   s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
   s1.data2: read by <main> at one_var_multiple_threads.c:51 <- main
@@ -63,8 +65,8 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f for thread jobs
-[eva] one_var_multiple_threads.c:21: Lock lock1
-[eva] one_var_multiple_threads.c:24: Release lock1
+[eva:mutex] one_var_multiple_threads.c:21: Lock lock1
+[eva:mutex] one_var_multiple_threads.c:24: Release lock1
 [eva] Globals accessed by thread:
   s1.data:
     read by jobs at one_var_multiple_threads.c:22 <- f
@@ -88,8 +90,8 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of g for thread jobs
-[eva] one_var_multiple_threads.c:29: Lock lock2
-[eva] one_var_multiple_threads.c:32: Release lock2
+[eva:mutex] one_var_multiple_threads.c:29: Lock lock2
+[eva:mutex] one_var_multiple_threads.c:32: Release lock2
 [eva:alarm] one_var_multiple_threads.c:33: Warning: 
   assertion 'missing_return' got status invalid (stopping propagation).
 [eva] Globals accessed by thread:
@@ -123,7 +125,7 @@
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Thread <main>, fun main
+[eva:thread] Thread <main>, fun main
 [eva] Globals accessed by thread:
   s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
   s1.data2: read by <main> at one_var_multiple_threads.c:51 <- main

@@ -6,15 +6,15 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[eva] New thread: <main>, fun main
-[eva] protect.c:19: Initializing mutex lock1
-[eva] protect.c:20: Initializing mutex lock2
-[eva] protect.c:22: New thread: tjob, fun job, parent <main>, args {0}
-[eva] protect.c:22: Start thread tjob
-[eva] protect.c:24: Lock lock1
-[eva] protect.c:26: Release lock1
-[eva] protect.c:28: Lock lock2
-[eva] protect.c:30: Release lock2
+[eva:thread] New thread: <main>, fun main
+[eva:mutex] protect.c:19: Initializing mutex lock1
+[eva:mutex] protect.c:20: Initializing mutex lock2
+[eva:thread] protect.c:22: New thread: tjob, fun job, parent <main>, args {0}
+[eva:thread] protect.c:22: Start thread tjob
+[eva:mutex] protect.c:24: Lock lock1
+[eva:mutex] protect.c:26: Release lock1
+[eva:mutex] protect.c:28: Lock lock2
+[eva:mutex] protect.c:30: Release lock2
 [eva] Globals accessed by thread:
   lock1:
     read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-
@@ -60,8 +60,8 @@
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Thread <main>, fun main
-[eva] protect.c:22: Thread tjob, fun job, parent <main>, args {0}
+[eva:thread] Thread <main>, fun main
+[eva:thread] protect.c:22: Thread tjob, fun job, parent <main>, args {0}
 [eva] Globals accessed by thread:
   lock1:
     read by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:46 <-

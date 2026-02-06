@@ -295,6 +295,19 @@ let dkey_include_string_literal =
     ~help:"when printing a state, \
            also include globals representing string literals"
 
+(* ----- Mthread message categories ----------------------------------------- *)
+
+let dkey_thread =
+  register_category "thread" ~level:4
+    ~help:"show each operation on threads interpreted by the analysis"
+
+let dkey_mutex =
+  register_category "mutex" ~level:8
+    ~help:"show each operation on mutexes interpreted by the analysis"
+
+let dkey_queue =
+  register_category "queue" ~level:8
+    ~help:"show each operation on message queues interpreted by the analysis"
 
 (* ----- Warning categories ------------------------------------------------- *)
 

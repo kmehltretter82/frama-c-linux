@@ -5,15 +5,19 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main_interrupt_cross_incr
-[eva] New thread: <main>, fun main_interrupt_cross_incr
-[eva] New thread: <interrupt_handler interrupt_cross_incr1>,
+[eva:thread] New thread: <main>, fun main_interrupt_cross_incr
+[eva:thread] 
+  New thread: <interrupt_handler interrupt_cross_incr1>,
   fun interrupt_cross_incr1
-[eva] New thread: <interrupt_handler interrupt_cross_incr2>,
+[eva:thread] 
+  New thread: <interrupt_handler interrupt_cross_incr2>,
   fun interrupt_cross_incr2
-[eva] New context for <main>, fun main_interrupt_cross_incr
-[eva] New context for <interrupt_handler interrupt_cross_incr2>,
+[eva:thread] New context for <main>, fun main_interrupt_cross_incr
+[eva:thread] 
+  New context for <interrupt_handler interrupt_cross_incr2>,
     fun interrupt_cross_incr2
-[eva] New context for <interrupt_handler interrupt_cross_incr1>,
+[eva:thread] 
+  New context for <interrupt_handler interrupt_cross_incr1>,
     fun interrupt_cross_incr1
 [eva:show] interrupt.c:49: Frama_C_show_each_a: {0}
 [eva:show] interrupt.c:52: Frama_C_show_each_b: {0}
@@ -30,7 +34,7 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of main_interrupt_cross_incr for thread <main>
-[eva] Thread <main>, fun main_interrupt_cross_incr
+[eva:thread] Thread <main>, fun main_interrupt_cross_incr
 [eva:show] interrupt.c:49: Frama_C_show_each_a: {0}
 [eva:show] interrupt.c:52: Frama_C_show_each_b: {0}
 [eva] Globals accessed by thread:

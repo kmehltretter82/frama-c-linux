@@ -52,6 +52,10 @@ val dkey_progress : category
 val dkey_callstacks : category
 val dkey_include_string_literal: category
 
+val dkey_thread : category
+val dkey_mutex : category
+val dkey_queue : category
+
 (** {2 Warning categories.} *)
 
 (* Default status of warning categories: feedback is associated to a verbosity

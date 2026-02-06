@@ -31,7 +31,7 @@ Load parsed file and run Mthread: failure as pthreads stubs are missing.
     y ∈ {0}
     job1 ∈ {0}
     job2 ∈ {0}
-  [eva] New thread: <main>, fun main
+  [eva:thread] New thread: <main>, fun main
   [eva] file.c:18: User Error: 
     Call to pthread_create from the pthreads library, whose Mthread files are missing. Use '-mt-threads-lib pthreads' to enable the support of pthreads, or write a C stub for this function using Mthread primitives.
   [eva] Clean up partial results.

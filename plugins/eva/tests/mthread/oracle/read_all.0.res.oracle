@@ -6,14 +6,14 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[eva] New thread: <main>, fun main
+[eva:thread] New thread: <main>, fun main
 [kernel:annot:missing-spec] read_all.c:25: Warning: 
   Neither code nor specification for function random, generating default
   assigns. See -generated-spec-* options for more info.
 [eva] using specification for function random
-[eva] read_all.c:27: 
+[eva:thread] read_all.c:27: 
   New thread: jobs, fun f, parent <main>, args [0..18446744073709551615]
-[eva] read_all.c:27: Start thread jobs
+[eva:thread] read_all.c:27: Start thread jobs
 [eva] read_all.c:29: User Error: 
   read of the whole memory. Ignoring to allow Mthread to continue, but the analysis is unsound.
 [eva] using specification for function g
@@ -60,8 +60,8 @@
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Thread <main>, fun main
-[eva] read_all.c:27: 
+[eva:thread] Thread <main>, fun main
+[eva:thread] read_all.c:27: 
   Thread jobs, fun f, parent <main>, args [0..18446744073709551615]
 [eva] Globals accessed by thread:
   r: write by <main> at read_all.c:29 <- main

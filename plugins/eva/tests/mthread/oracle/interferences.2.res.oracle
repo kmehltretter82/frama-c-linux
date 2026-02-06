@@ -6,15 +6,15 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main_thread_loop
-[eva] New thread: <main>, fun main_thread_loop
+[eva:thread] New thread: <main>, fun main_thread_loop
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
-[eva] interferences.c:128: 
+[eva:thread] interferences.c:128: 
   New thread: joboneshot, fun fjoboneshot, parent <main>, args {0}
-[eva] interferences.c:128: Start thread joboneshot
-[eva] interferences.c:130: 
+[eva:thread] interferences.c:128: Start thread joboneshot
+[eva:thread] interferences.c:130: 
   New thread: joblooped, fun fjoblooped, parent <main>, args {0}
-[eva] interferences.c:130: Start thread joblooped
-[eva] interferences.c:130: 
+[eva:thread] interferences.c:130: Start thread joblooped
+[eva:thread] interferences.c:130: 
   Thread joblooped, fun fjoblooped, parent <main>, args {0}
 [eva] FRAMAC_SHARE/eva/mthread_pthread.c:17: Warning: 
   The thread joblooped is already registered.
@@ -93,9 +93,9 @@
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
-[eva] Thread <main>, fun main_thread_loop
+[eva:thread] Thread <main>, fun main_thread_loop
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
-[eva] interferences.c:128: 
+[eva:thread] interferences.c:128: 
   Thread joboneshot, fun fjoboneshot, parent <main>, args {0}
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
@@ -247,7 +247,7 @@
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
-[eva] interferences.c:130: 
+[eva:thread] interferences.c:130: 
   New context for joblooped, fun fjoblooped, parent <main>, args {0}
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1}
 [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1}

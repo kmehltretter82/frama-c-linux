@@ -6,21 +6,21 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[eva] New thread: <main>, fun main
-[eva] mutex2.c:48: Initializing mutex m1
-[eva] mutex2.c:49: Initializing mutex m2
-[eva] mutex2.c:51: New thread: jobs1, fun f1, parent <main>, args {0}
-[eva] mutex2.c:51: Start thread jobs1
-[eva] mutex2.c:52: New thread: jobs2, fun f2, parent <main>, args {0}
-[eva] mutex2.c:52: Start thread jobs2
-[eva] mutex2.c:53: New thread: jobs3, fun f3, parent <main>, args {0}
-[eva] mutex2.c:53: Start thread jobs3
-[eva] mutex2.c:54: New thread: jobs4, fun f4, parent <main>, args {0}
-[eva] mutex2.c:54: Start thread jobs4
-[eva] mutex2.c:56: Lock m1
-[eva] mutex2.c:57: Lock m2
-[eva] mutex2.c:60: Release m1
-[eva] mutex2.c:61: Release m2
+[eva:thread] New thread: <main>, fun main
+[eva:mutex] mutex2.c:48: Initializing mutex m1
+[eva:mutex] mutex2.c:49: Initializing mutex m2
+[eva:thread] mutex2.c:51: New thread: jobs1, fun f1, parent <main>, args {0}
+[eva:thread] mutex2.c:51: Start thread jobs1
+[eva:thread] mutex2.c:52: New thread: jobs2, fun f2, parent <main>, args {0}
+[eva:thread] mutex2.c:52: Start thread jobs2
+[eva:thread] mutex2.c:53: New thread: jobs3, fun f3, parent <main>, args {0}
+[eva:thread] mutex2.c:53: Start thread jobs3
+[eva:thread] mutex2.c:54: New thread: jobs4, fun f4, parent <main>, args {0}
+[eva:thread] mutex2.c:54: Start thread jobs4
+[eva:mutex] mutex2.c:56: Lock m1
+[eva:mutex] mutex2.c:57: Lock m2
+[eva:mutex] mutex2.c:60: Release m1
+[eva:mutex] mutex2.c:61: Release m2
 [eva] Globals accessed by thread:
   s1: read by <main> at mutex2.c:58 <- main
   s2: read by <main> at mutex2.c:59 <- main
@@ -57,8 +57,8 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread jobs1
-[eva] mutex2.c:20: Lock m1
-[eva] mutex2.c:22: Release m1
+[eva:mutex] mutex2.c:20: Lock m1
+[eva:mutex] mutex2.c:22: Release m1
 [eva] Globals accessed by thread:
   s1: write by jobs1 at mutex2.c:21 <- f1
   m1:
@@ -77,8 +77,8 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread jobs2
-[eva] mutex2.c:27: Lock m2
-[eva] mutex2.c:29: Release m2
+[eva:mutex] mutex2.c:27: Lock m2
+[eva:mutex] mutex2.c:29: Release m2
 [eva] Globals accessed by thread:
   s1: write by jobs2 at mutex2.c:28 <- f2
   m2:
@@ -110,8 +110,8 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f4 for thread jobs4
-[eva] mutex2.c:40: Lock m2
-[eva] mutex2.c:42: Release m2
+[eva:mutex] mutex2.c:40: Lock m2
+[eva:mutex] mutex2.c:42: Release m2
 [eva] Globals accessed by thread:
   s2: write by jobs4 at mutex2.c:41 <- f4
   m2:
@@ -138,11 +138,11 @@
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Thread <main>, fun main
-[eva] mutex2.c:51: Thread jobs1, fun f1, parent <main>, args {0}
-[eva] mutex2.c:52: Thread jobs2, fun f2, parent <main>, args {0}
-[eva] mutex2.c:53: Thread jobs3, fun f3, parent <main>, args {0}
-[eva] mutex2.c:54: Thread jobs4, fun f4, parent <main>, args {0}
+[eva:thread] Thread <main>, fun main
+[eva:thread] mutex2.c:51: Thread jobs1, fun f1, parent <main>, args {0}
+[eva:thread] mutex2.c:52: Thread jobs2, fun f2, parent <main>, args {0}
+[eva:thread] mutex2.c:53: Thread jobs3, fun f3, parent <main>, args {0}
+[eva:thread] mutex2.c:54: Thread jobs4, fun f4, parent <main>, args {0}
 [eva] Globals accessed by thread:
   s1: read by <main> at mutex2.c:58 <- main
   s2: read by <main> at mutex2.c:59 <- main
@@ -310,9 +310,9 @@
     interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] mutex2.c:52: New context for jobs2, fun f2, parent <main>, args {0}
-[eva] mutex2.c:53: New context for jobs3, fun f3, parent <main>, args {0}
-[eva] mutex2.c:54: New context for jobs4, fun f4, parent <main>, args {0}
+[eva:thread] mutex2.c:52: New context for jobs2, fun f2, parent <main>, args {0}
+[eva:thread] mutex2.c:53: New context for jobs3, fun f3, parent <main>, args {0}
+[eva:thread] mutex2.c:54: New context for jobs4, fun f4, parent <main>, args {0}
 [eva:interferences] mutex2.c:58: inject threads interferences at this point
 [eva:interferences] mutex2.c:59: inject threads interferences at this point
 [eva] Globals accessed by thread:

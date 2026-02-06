@@ -6,11 +6,11 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[eva] New thread: <main>, fun main
-[eva] nice_offsets.c:19: Initializing mutex t[0].a1
-[eva] nice_offsets.c:20: Initializing mutex t[1].b1[2].a0
-[eva] nice_offsets.c:21: Initializing mutex t[1].b1[4].b0
-[eva] nice_offsets.c:22: Initializing mutex t[2].c1
+[eva:thread] New thread: <main>, fun main
+[eva:mutex] nice_offsets.c:19: Initializing mutex t[0].a1
+[eva:mutex] nice_offsets.c:20: Initializing mutex t[1].b1[2].a0
+[eva:mutex] nice_offsets.c:21: Initializing mutex t[1].b1[4].b0
+[eva:mutex] nice_offsets.c:22: Initializing mutex t[2].c1
 [eva] Globals accessed by thread:
 [eva:interferences] 
   Interferences from thread <main>

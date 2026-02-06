@@ -5,14 +5,14 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[eva] New thread: <main>, fun main
-[eva] init.c:22: Initializing mutex locks[0]
-[eva] init.c:22: Initializing mutex locks[1]
-[eva] init.c:22: Initializing mutex locks[2]
-[eva] init.c:25: Initializing mutex mu1
-[eva] init.c:25: Initializing mutex mu2
-[eva] init.c:25: Initializing mutex mu3
-[eva] init.c:29: Initializing mutex 0
+[eva:thread] New thread: <main>, fun main
+[eva:mutex] init.c:22: Initializing mutex locks[0]
+[eva:mutex] init.c:22: Initializing mutex locks[1]
+[eva:mutex] init.c:22: Initializing mutex locks[2]
+[eva:mutex] init.c:25: Initializing mutex mu1
+[eva:mutex] init.c:25: Initializing mutex mu2
+[eva:mutex] init.c:25: Initializing mutex mu3
+[eva:mutex] init.c:29: Initializing mutex 0
 [eva] init.c:29: Warning: 
   Trying to initialize mutex 0, but it might already be unlocked (and initialized).
 [eva] init.c:15: Warning: The mutex 0 is already registered.

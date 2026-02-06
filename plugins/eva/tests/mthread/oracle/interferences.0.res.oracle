@@ -6,17 +6,20 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[eva] New thread: <main>, fun main
-[eva] New thread: <interrupt_handler interrupt>, fun interrupt
-[eva] New context for <main>, fun main
-[eva] New context for <interrupt_handler interrupt>, fun interrupt
+[eva:thread] New thread: <main>, fun main
+[eva:thread] New thread: <interrupt_handler interrupt>, fun interrupt
+[eva:thread] New context for <main>, fun main
+[eva:thread] New context for <interrupt_handler interrupt>, fun interrupt
 [eva:show] interferences.c:56: Frama_C_show_each_main_start: {0}, {0}, {0}
-[eva] interferences.c:59: New thread: job1, fun fjob1, parent <main>, args {0}
-[eva] interferences.c:59: Start thread job1
-[eva] interferences.c:63: New thread: job2, fun fjob2, parent <main>, args {0}
-[eva] interferences.c:63: Start thread job2
-[eva] interferences.c:64: New thread: job3, fun fjob3, parent <main>, args {0}
-[eva] interferences.c:64: Start thread job3
+[eva:thread] interferences.c:59: 
+  New thread: job1, fun fjob1, parent <main>, args {0}
+[eva:thread] interferences.c:59: Start thread job1
+[eva:thread] interferences.c:63: 
+  New thread: job2, fun fjob2, parent <main>, args {0}
+[eva:thread] interferences.c:63: Start thread job2
+[eva:thread] interferences.c:64: 
+  New thread: job3, fun fjob3, parent <main>, args {0}
+[eva:thread] interferences.c:64: Start thread job3
 [eva:show] interferences.c:47: Frama_C_show_each_a: {1}
 [eva:show] interferences.c:48: Frama_C_show_each_b: {0}
 [eva:show] interferences.c:49: Frama_C_show_each_c: {0}
@@ -50,16 +53,16 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of main for thread <main>
-[eva] Thread <main>, fun main
+[eva:thread] Thread <main>, fun main
 [eva:show] interferences.c:56: Frama_C_show_each_main_start: {0}, {0}, {0}
-[eva] interferences.c:59: Thread job1, fun fjob1, parent <main>, args {0}
-[eva] interferences.c:59: 
+[eva:thread] interferences.c:59: Thread job1, fun fjob1, parent <main>, args {0}
+[eva:thread] interferences.c:59: 
   New context for job1, fun fjob1, parent <main>, args {0}
-[eva] interferences.c:63: Thread job2, fun fjob2, parent <main>, args {0}
-[eva] interferences.c:63: 
+[eva:thread] interferences.c:63: Thread job2, fun fjob2, parent <main>, args {0}
+[eva:thread] interferences.c:63: 
   New context for job2, fun fjob2, parent <main>, args {0}
-[eva] interferences.c:64: Thread job3, fun fjob3, parent <main>, args {0}
-[eva] interferences.c:64: 
+[eva:thread] interferences.c:64: Thread job3, fun fjob3, parent <main>, args {0}
+[eva:thread] interferences.c:64: 
   New context for job3, fun fjob3, parent <main>, args {0}
 [eva:show] interferences.c:47: Frama_C_show_each_a: {1}
 [eva:show] interferences.c:48: Frama_C_show_each_b: {0}

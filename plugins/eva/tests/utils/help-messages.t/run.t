@@ -119,6 +119,8 @@ Help message about message categories.
     malloc:automatic-free   : messages emitted when bases are automatically freed
                               (alloca or VLA)
     malloc:new              : messages emitted at the creation of new bases
+    mutex                   : show each operation on mutexes interpreted by the
+                              analysis
     nonlin                  : messages about evaluation of subdivisions enabled
                               by -eva-subdivide-non-linear
     partition               : messages about states partitioning
@@ -127,12 +129,16 @@ Help message about message categories.
     precision-settings      : messages about the automatic configuration of the
                               analysis by option -eva-precision
     progress                : messages about the analysis progress in the C code
+    queue                   : show each operation on message queues interpreted
+                              by the analysis
     show                    : show values/states inferred by the analysis on
                               directives such as Frama_C_show_each and
                               Frama_C_dump_each
     split-return            : messages related to option -eva-split-return
     summary                 : print a summary of the analysis at the end,
                               including coverage and alarm numbers
+    thread                  : show each operation on threads interpreted by the
+                              analysis
     widen-hints             : debug messages when failing to use widen_hints
                               annotations
     widening                : print a message at each point where the analysis
@@ -163,11 +169,11 @@ Help message about message categories.
      1: summary
      2: show
      3: malloc:new precision-settings
-     4: malloc:automatic-free split-return partition
+     4: malloc:automatic-free thread split-return partition
      5: final-states initial-state
      6: imprecision malloc
      7: widen-hints widening pointer-comparison
-     8: nonlin
+     8: nonlin queue mutex
      9: callstack-hash callstacks
     10: progress
     11: cardinal include-string-literals

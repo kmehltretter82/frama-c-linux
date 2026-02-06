@@ -6,9 +6,9 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[eva] New thread: <main>, fun main
-[eva] memexec.c:32: New thread: th1, fun t1, parent <main>, args {0}
-[eva] memexec.c:32: Start thread th1
+[eva:thread] New thread: <main>, fun main
+[eva:thread] memexec.c:32: New thread: th1, fun t1, parent <main>, args {0}
+[eva:thread] memexec.c:32: Start thread th1
 [eva] Globals accessed by thread:
   a: read by <main> at memexec.c:33 <- main
   c: read by <main> at memexec.c:33 <- main
@@ -50,8 +50,8 @@
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Thread <main>, fun main
-[eva] memexec.c:32: Thread th1, fun t1, parent <main>, args {0}
+[eva:thread] Thread <main>, fun main
+[eva:thread] memexec.c:32: Thread th1, fun t1, parent <main>, args {0}
 [eva] Globals accessed by thread:
   a: read by <main> at memexec.c:33 <- main
   c: read by <main> at memexec.c:33 <- main

@@ -6,19 +6,25 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[eva] New thread: <main>, fun main
-[eva] sharedvars.c:105: New thread: jobs1, fun f1, parent <main>, args {0}
-[eva] sharedvars.c:105: Start thread jobs1
-[eva] sharedvars.c:110: New thread: jobs2, fun f2, parent <main>, args {0}
-[eva] sharedvars.c:110: Start thread jobs2
-[eva] sharedvars.c:111: New thread: jobs3, fun f3, parent <main>, args {0}
-[eva] sharedvars.c:111: Start thread jobs3
-[eva] sharedvars.c:114: New thread: jobs4, fun f4, parent <main>, args {0}
-[eva] sharedvars.c:114: Start thread jobs4
-[eva] sharedvars.c:117: New thread: jobs5, fun f5, parent <main>, args {0}
-[eva] sharedvars.c:117: Start thread jobs5
-[eva] sharedvars.c:118: New thread: jobs6, fun f6, parent <main>, args {0}
-[eva] sharedvars.c:118: Start thread jobs6
+[eva:thread] New thread: <main>, fun main
+[eva:thread] sharedvars.c:105: 
+  New thread: jobs1, fun f1, parent <main>, args {0}
+[eva:thread] sharedvars.c:105: Start thread jobs1
+[eva:thread] sharedvars.c:110: 
+  New thread: jobs2, fun f2, parent <main>, args {0}
+[eva:thread] sharedvars.c:110: Start thread jobs2
+[eva:thread] sharedvars.c:111: 
+  New thread: jobs3, fun f3, parent <main>, args {0}
+[eva:thread] sharedvars.c:111: Start thread jobs3
+[eva:thread] sharedvars.c:114: 
+  New thread: jobs4, fun f4, parent <main>, args {0}
+[eva:thread] sharedvars.c:114: Start thread jobs4
+[eva:thread] sharedvars.c:117: 
+  New thread: jobs5, fun f5, parent <main>, args {0}
+[eva:thread] sharedvars.c:117: Start thread jobs5
+[eva:thread] sharedvars.c:118: 
+  New thread: jobs6, fun f6, parent <main>, args {0}
+[eva:thread] sharedvars.c:118: Start thread jobs6
 [eva] Globals accessed by thread:
   u2:
     read by <main> at sharedvars.c:108 <- main
@@ -83,8 +89,9 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f3 for thread jobs3
-[eva] sharedvars.c:62: New thread: jobs31, fun f31, parent jobs3, args {0}
-[eva] sharedvars.c:62: Start thread jobs31
+[eva:thread] sharedvars.c:62: 
+  New thread: jobs31, fun f31, parent jobs3, args {0}
+[eva:thread] sharedvars.c:62: Start thread jobs31
 [eva] Globals accessed by thread:
   u3: write by jobs3 at sharedvars.c:61 <- f3
   jobs31:
@@ -119,8 +126,9 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f5 for thread jobs5
-[eva] sharedvars.c:83: New thread: jobs51, fun f51, parent jobs5, args {0}
-[eva] sharedvars.c:83: Start thread jobs51
+[eva:thread] sharedvars.c:83: 
+  New thread: jobs51, fun f51, parent jobs5, args {0}
+[eva:thread] sharedvars.c:83: Start thread jobs51
 [eva] Globals accessed by thread:
   s5: write by jobs5 at sharedvars.c:84 <- f5
   jobs51:
@@ -160,13 +168,13 @@
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Thread <main>, fun main
-[eva] sharedvars.c:105: Thread jobs1, fun f1, parent <main>, args {0}
-[eva] sharedvars.c:110: Thread jobs2, fun f2, parent <main>, args {0}
-[eva] sharedvars.c:111: Thread jobs3, fun f3, parent <main>, args {0}
-[eva] sharedvars.c:114: Thread jobs4, fun f4, parent <main>, args {0}
-[eva] sharedvars.c:117: Thread jobs5, fun f5, parent <main>, args {0}
-[eva] sharedvars.c:118: Thread jobs6, fun f6, parent <main>, args {0}
+[eva:thread] Thread <main>, fun main
+[eva:thread] sharedvars.c:105: Thread jobs1, fun f1, parent <main>, args {0}
+[eva:thread] sharedvars.c:110: Thread jobs2, fun f2, parent <main>, args {0}
+[eva:thread] sharedvars.c:111: Thread jobs3, fun f3, parent <main>, args {0}
+[eva:thread] sharedvars.c:114: Thread jobs4, fun f4, parent <main>, args {0}
+[eva:thread] sharedvars.c:117: Thread jobs5, fun f5, parent <main>, args {0}
+[eva:thread] sharedvars.c:118: Thread jobs6, fun f6, parent <main>, args {0}
 [eva] Globals accessed by thread:
   u2:
     read by <main> at sharedvars.c:108 <- main
@@ -238,8 +246,9 @@
     interferences changed)
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
-[eva] sharedvars.c:62: Thread jobs31, fun f31, parent jobs3, args {0}
-[eva] sharedvars.c:62: New context for jobs31, fun f31, parent jobs3, args {0}
+[eva:thread] sharedvars.c:62: Thread jobs31, fun f31, parent jobs3, args {0}
+[eva:thread] sharedvars.c:62: 
+  New context for jobs31, fun f31, parent jobs3, args {0}
 [eva] Globals accessed by thread:
   u3: write by jobs3 at sharedvars.c:61 <- f3
   jobs31:
@@ -287,8 +296,9 @@
     interferences changed)
 [eva] Analyzing a complete application starting at f5
 [eva] Initial state supplied by user
-[eva] sharedvars.c:83: Thread jobs51, fun f51, parent jobs5, args {0}
-[eva] sharedvars.c:83: New context for jobs51, fun f51, parent jobs5, args {0}
+[eva:thread] sharedvars.c:83: Thread jobs51, fun f51, parent jobs5, args {0}
+[eva:thread] sharedvars.c:83: 
+  New context for jobs51, fun f51, parent jobs5, args {0}
 [eva] Globals accessed by thread:
   s5: write by jobs5 at sharedvars.c:84 <- f5
   jobs51:
@@ -400,13 +410,18 @@
     interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] sharedvars.c:110: New context for jobs2, fun f2, parent <main>, args {0}
-[eva] sharedvars.c:111: New context for jobs3, fun f3, parent <main>, args {0}
+[eva:thread] sharedvars.c:110: 
+  New context for jobs2, fun f2, parent <main>, args {0}
+[eva:thread] sharedvars.c:111: 
+  New context for jobs3, fun f3, parent <main>, args {0}
 [eva:interferences] sharedvars.c:113: inject threads interferences at this point
-[eva] sharedvars.c:114: New context for jobs4, fun f4, parent <main>, args {0}
+[eva:thread] sharedvars.c:114: 
+  New context for jobs4, fun f4, parent <main>, args {0}
 [eva:interferences] sharedvars.c:115: inject threads interferences at this point
-[eva] sharedvars.c:117: New context for jobs5, fun f5, parent <main>, args {0}
-[eva] sharedvars.c:118: New context for jobs6, fun f6, parent <main>, args {0}
+[eva:thread] sharedvars.c:117: 
+  New context for jobs5, fun f5, parent <main>, args {0}
+[eva:thread] sharedvars.c:118: 
+  New context for jobs6, fun f6, parent <main>, args {0}
 [eva] Globals accessed by thread:
   u2:
     read by <main> at sharedvars.c:108 <- main
@@ -710,7 +725,8 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:interferences] sharedvars.c:103: inject threads interferences at this point
-[eva] sharedvars.c:105: New context for jobs1, fun f1, parent <main>, args {0}
+[eva:thread] sharedvars.c:105: 
+  New context for jobs1, fun f1, parent <main>, args {0}
 [eva] Globals accessed by thread:
   u2:
     read by <main> at sharedvars.c:108 <- main

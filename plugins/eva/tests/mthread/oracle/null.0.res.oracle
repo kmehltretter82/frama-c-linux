@@ -6,9 +6,9 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[eva] New thread: <main>, fun main
-[eva] null.c:24: New thread: tjob0, fun job0, parent <main>, args {0}
-[eva] null.c:24: Start thread tjob0
+[eva:thread] New thread: <main>, fun main
+[eva:thread] null.c:24: New thread: tjob0, fun job0, parent <main>, args {0}
+[eva:thread] null.c:24: Start thread tjob0
 [eva:alarm] null.c:27: Warning: 
   out of bounds read. assert \valid_read((char *)i);
 [eva] Globals accessed by thread:
@@ -48,8 +48,8 @@
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Thread <main>, fun main
-[eva] null.c:24: Thread tjob0, fun job0, parent <main>, args {0}
+[eva:thread] Thread <main>, fun main
+[eva:thread] null.c:24: Thread tjob0, fun job0, parent <main>, args {0}
 [eva] Globals accessed by thread:
   NULL[100..200]: read by <main> at null.c:27 <- main
   v: read by <main> at null.c:26 <- main

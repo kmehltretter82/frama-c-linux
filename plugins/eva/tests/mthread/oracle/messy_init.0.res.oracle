@@ -6,17 +6,18 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[eva] New thread: <main>, fun main
+[eva:thread] New thread: <main>, fun main
 [kernel:annot:missing-spec] messy_init.c:15: Warning: 
   Neither code nor specification for function random, generating default
   assigns. See -generated-spec-* options for more info.
 [eva] using specification for function random
-[eva] messy_init.c:16: Initializing mutex lock
-[eva] messy_init.c:19: Lock lock
-[eva] messy_init.c:22: New thread: job, fun fjob, parent <main>, args {0}
-[eva] messy_init.c:22: Start thread job
-[eva] messy_init.c:22: Thread job, fun fjob, parent <main>, args {0}
-[eva] messy_init.c:22: New context for job, fun fjob, parent <main>, args {0}
+[eva:mutex] messy_init.c:16: Initializing mutex lock
+[eva:mutex] messy_init.c:19: Lock lock
+[eva:thread] messy_init.c:22: New thread: job, fun fjob, parent <main>, args {0}
+[eva:thread] messy_init.c:22: Start thread job
+[eva:thread] messy_init.c:22: Thread job, fun fjob, parent <main>, args {0}
+[eva:thread] messy_init.c:22: 
+  New context for job, fun fjob, parent <main>, args {0}
 [eva] Globals accessed by thread:
 [eva:interferences] 
   Interferences from thread <main>
@@ -32,7 +33,7 @@
 [eva] messy_init.c:10: Warning: Trying to lock a possibly uninitialized mutex.
 [eva] messy_init.c:10: Warning: 
   Trying to lock mutex lock, but unable to check its precise status (internal value {0; 1} should be 1).
-[eva] messy_init.c:10: Lock lock
+[eva:mutex] messy_init.c:10: Lock lock
 [eva] FRAMAC_SHARE/eva/mthread_pthread.c:46: Warning: Not a valid mutex id '0'.
 [eva] Globals accessed by thread:
   lock:

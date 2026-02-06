@@ -6,19 +6,25 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[eva] New thread: <main>, fun main
-[eva] sharedarray.c:55: New thread: jobs1, fun f1, parent <main>, args {0}
-[eva] sharedarray.c:55: Start thread jobs1
-[eva] sharedarray.c:56: New thread: jobs2, fun f2, parent <main>, args {0}
-[eva] sharedarray.c:56: Start thread jobs2
-[eva] sharedarray.c:57: New thread: jobs3, fun f3, parent <main>, args {0}
-[eva] sharedarray.c:57: Start thread jobs3
-[eva] sharedarray.c:58: New thread: jobs4, fun f4, parent <main>, args {0}
-[eva] sharedarray.c:58: Start thread jobs4
-[eva] sharedarray.c:59: New thread: jobs5, fun f5, parent <main>, args {0}
-[eva] sharedarray.c:59: Start thread jobs5
-[eva] sharedarray.c:60: New thread: jobs6, fun f6, parent <main>, args {0}
-[eva] sharedarray.c:60: Start thread jobs6
+[eva:thread] New thread: <main>, fun main
+[eva:thread] sharedarray.c:55: 
+  New thread: jobs1, fun f1, parent <main>, args {0}
+[eva:thread] sharedarray.c:55: Start thread jobs1
+[eva:thread] sharedarray.c:56: 
+  New thread: jobs2, fun f2, parent <main>, args {0}
+[eva:thread] sharedarray.c:56: Start thread jobs2
+[eva:thread] sharedarray.c:57: 
+  New thread: jobs3, fun f3, parent <main>, args {0}
+[eva:thread] sharedarray.c:57: Start thread jobs3
+[eva:thread] sharedarray.c:58: 
+  New thread: jobs4, fun f4, parent <main>, args {0}
+[eva:thread] sharedarray.c:58: Start thread jobs4
+[eva:thread] sharedarray.c:59: 
+  New thread: jobs5, fun f5, parent <main>, args {0}
+[eva:thread] sharedarray.c:59: Start thread jobs5
+[eva:thread] sharedarray.c:60: 
+  New thread: jobs6, fun f6, parent <main>, args {0}
+[eva:thread] sharedarray.c:60: Start thread jobs6
 [eva] Globals accessed by thread:
   jobs1:
     write by <main> at FRAMAC_SHARE/eva/mthread_pthread.c:19 <-

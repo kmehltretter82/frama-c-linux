@@ -5,10 +5,12 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main_interrupt_one_shot
-[eva] New thread: <main>, fun main_interrupt_one_shot
-[eva] New thread: <interrupt_handler interrupt_oneshot>, fun interrupt_oneshot
-[eva] New context for <main>, fun main_interrupt_one_shot
-[eva] New context for <interrupt_handler interrupt_oneshot>, fun interrupt_oneshot
+[eva:thread] New thread: <main>, fun main_interrupt_one_shot
+[eva:thread] 
+  New thread: <interrupt_handler interrupt_oneshot>, fun interrupt_oneshot
+[eva:thread] New context for <main>, fun main_interrupt_one_shot
+[eva:thread] 
+  New context for <interrupt_handler interrupt_oneshot>, fun interrupt_oneshot
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0}
 [eva] Globals accessed by thread:
 [eva:interferences] 
@@ -23,7 +25,7 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of main_interrupt_one_shot for thread <main>
-[eva] Thread <main>, fun main_interrupt_one_shot
+[eva:thread] Thread <main>, fun main_interrupt_one_shot
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0}
 [eva] Globals accessed by thread:
   interrupt_received:

@@ -6,9 +6,9 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[eva] New thread: <main>, fun main
-[eva] model.c:20: New thread: job1, fun f1, parent <main>, args {0}
-[eva] model.c:20: Start thread job1
+[eva:thread] New thread: <main>, fun main
+[eva:thread] model.c:20: New thread: job1, fun f1, parent <main>, args {0}
+[eva:thread] model.c:20: Start thread job1
 [eva] using specification for function rand
 [eva] Globals accessed by thread:
 [eva:interferences] 

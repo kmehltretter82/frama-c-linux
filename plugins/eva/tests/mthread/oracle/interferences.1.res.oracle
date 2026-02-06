@@ -6,14 +6,14 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main_ptr_write
-[eva] New thread: <main>, fun main_ptr_write
+[eva:thread] New thread: <main>, fun main_ptr_write
 [eva:show] interferences.c:99: Frama_C_show_each_main_start: {0}, {0}
-[eva] interferences.c:101: 
+[eva:thread] interferences.c:101: 
   New thread: jobptr1, fun fjobptr1, parent <main>, args {0}
-[eva] interferences.c:101: Start thread jobptr1
-[eva] interferences.c:102: 
+[eva:thread] interferences.c:101: Start thread jobptr1
+[eva:thread] interferences.c:102: 
   New thread: jobptr2, fun fjobptr2, parent <main>, args {0}
-[eva] interferences.c:102: Start thread jobptr2
+[eva:thread] interferences.c:102: Start thread jobptr2
 [eva:show] interferences.c:106: Frama_C_show_each_main_end: {0}, {0}
 [eva] Globals accessed by thread:
   shared_a: read by <main> at interferences.c:106 <- main_ptr_write
@@ -93,10 +93,12 @@
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main_ptr_write
 [eva] Initial state supplied by user
-[eva] Thread <main>, fun main_ptr_write
+[eva:thread] Thread <main>, fun main_ptr_write
 [eva:show] interferences.c:99: Frama_C_show_each_main_start: {0}, {0}
-[eva] interferences.c:101: Thread jobptr1, fun fjobptr1, parent <main>, args {0}
-[eva] interferences.c:102: Thread jobptr2, fun fjobptr2, parent <main>, args {0}
+[eva:thread] interferences.c:101: 
+  Thread jobptr1, fun fjobptr1, parent <main>, args {0}
+[eva:thread] interferences.c:102: 
+  Thread jobptr2, fun fjobptr2, parent <main>, args {0}
 [eva:show] interferences.c:106: Frama_C_show_each_main_end: {0}, {0}
 [eva] Globals accessed by thread:
   shared_a: read by <main> at interferences.c:106 <- main_ptr_write
@@ -274,7 +276,7 @@
 [eva] Analyzing a complete application starting at main_ptr_write
 [eva] Initial state supplied by user
 [eva:show] interferences.c:99: Frama_C_show_each_main_start: {0}, {0}
-[eva] interferences.c:102: 
+[eva:thread] interferences.c:102: 
   New context for jobptr2, fun fjobptr2, parent <main>, args {0}
 [eva:show] interferences.c:106: Frama_C_show_each_main_end: {0; 1; 2}, {0; 1; 2}
 [eva] Globals accessed by thread:

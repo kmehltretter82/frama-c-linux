@@ -8,13 +8,14 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[eva] New thread: <main>, fun main
-[eva] Initializing mutex mutex / "𐍅"
-[eva] New thread: job / "𐍅" f1, fun f1, parent <main>, args {0}
-[eva] Start thread job / "𐍅" f1
-[eva] New thread: job / "𐍅" f2, fun f2, parent <main>, args {0}
-[eva] Start thread job / "𐍅" f2
-[eva] Receiving message on queue / "𐍅", max size 20, stored in &buf.
+[eva:thread] New thread: <main>, fun main
+[eva:mutex] Initializing mutex mutex / "𐍅"
+[eva:thread] New thread: job / "𐍅" f1, fun f1, parent <main>, args {0}
+[eva:thread] Start thread job / "𐍅" f1
+[eva:thread] New thread: job / "𐍅" f2, fun f2, parent <main>, args {0}
+[eva:thread] Start thread job / "𐍅" f2
+[eva:queue] 
+  Receiving message on queue / "𐍅", max size 20, stored in &buf.
   No value to receive (yet?).
 [eva:interferences] 
   Interferences from thread <main>
@@ -30,9 +31,10 @@
 [eva:alarm] utf8_names.c:23: Warning: 
   pointer downcast.
   assert (unsigned long)(&"\"\360\220\215\205\" /0"[*from]) ≤ 2147483647;
-[eva] Lock mutex / "𐍅"
-[eva] Release mutex / "𐍅"
-[eva] Sending message on queue / "𐍅", content
+[eva:mutex] Lock mutex / "𐍅"
+[eva:mutex] Release mutex / "𐍅"
+[eva:queue] 
+  Sending message on queue / "𐍅", content
   [0] ∈ {34}
   [1] ∈ {-16}
   [2] ∈ {-112}
@@ -54,7 +56,8 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread job / "𐍅" f2
-[eva] Sending message on queue / "𐍅", content
+[eva:queue] 
+  Sending message on queue / "𐍅", content
   [0] ∈ {34}
   [1] ∈ {-16}
   [2] ∈ {-112}
@@ -79,10 +82,11 @@
     shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Thread <main>, fun main
-[eva] Thread job / "𐍅" f1, fun f1, parent <main>, args {0}
-[eva] Thread job / "𐍅" f2, fun f2, parent <main>, args {0}
-[eva] Receiving message on queue / "𐍅", max size 20, stored in &buf.
+[eva:thread] Thread <main>, fun main
+[eva:thread] Thread job / "𐍅" f1, fun f1, parent <main>, args {0}
+[eva:thread] Thread job / "𐍅" f2, fun f2, parent <main>, args {0}
+[eva:queue] 
+  Receiving message on queue / "𐍅", max size 20, stored in &buf.
   Possible  values:
   From thread job / "𐍅" f1:
   [0] ∈ {34}
@@ -262,7 +266,7 @@
     interferences changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] New context for job / "𐍅" f2, fun f2, parent <main>, args {0}
+[eva:thread] New context for job / "𐍅" f2, fun f2, parent <main>, args {0}
 [eva:interferences] utf8_names.c:59: inject threads interferences at this point
 [eva:interferences] 
   Interferences from thread <main>

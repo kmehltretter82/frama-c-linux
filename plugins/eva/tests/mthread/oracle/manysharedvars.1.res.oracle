@@ -6,12 +6,13 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[eva] New thread: <main>, fun main
-[eva] manysharedvars.c:42: Initializing mutex lock
-[eva] manysharedvars.c:43: New thread: jobs, fun f, parent <main>, args {0}
-[eva] manysharedvars.c:43: Start thread jobs
-[eva] manysharedvars.c:46: Lock lock
-[eva] manysharedvars.c:49: Release lock
+[eva:thread] New thread: <main>, fun main
+[eva:mutex] manysharedvars.c:42: Initializing mutex lock
+[eva:thread] manysharedvars.c:43: 
+  New thread: jobs, fun f, parent <main>, args {0}
+[eva:thread] manysharedvars.c:43: Start thread jobs
+[eva:mutex] manysharedvars.c:46: Lock lock
+[eva:mutex] manysharedvars.c:49: Release lock
 [eva] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
     [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
@@ -74,8 +75,8 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f for thread jobs
-[eva] manysharedvars.c:28: Lock lock
-[eva] manysharedvars.c:31: Release lock
+[eva:mutex] manysharedvars.c:28: Lock lock
+[eva:mutex] manysharedvars.c:31: Release lock
 [eva] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
     [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
@@ -149,8 +150,8 @@
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Thread <main>, fun main
-[eva] manysharedvars.c:43: Thread jobs, fun f, parent <main>, args {0}
+[eva:thread] Thread <main>, fun main
+[eva:thread] manysharedvars.c:43: Thread jobs, fun f, parent <main>, args {0}
 [eva] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
     [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;

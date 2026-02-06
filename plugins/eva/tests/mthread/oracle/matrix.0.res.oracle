@@ -6,32 +6,32 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
-[eva] New thread: <main>, fun main
-[eva] matrix.c:37: Initializing mutex locks[0]
-[eva] matrix.c:37: Initializing mutex locks[1]
-[eva] matrix.c:37: Initializing mutex locks[2]
-[eva] matrix.c:37: Initializing mutex locks[3]
-[eva] matrix.c:37: Initializing mutex locks[4]
-[eva] matrix.c:45: New thread: jobs[0], fun job, parent <main>, args {0}
-[eva] matrix.c:45: Start thread jobs[0]
-[eva] matrix.c:45: New thread: jobs[1], fun job, parent <main>, args {1}
-[eva] matrix.c:45: Start thread jobs[1]
-[eva] matrix.c:45: New thread: jobs[2], fun job, parent <main>, args {2}
-[eva] matrix.c:45: Start thread jobs[2]
-[eva] matrix.c:45: New thread: jobs[3], fun job, parent <main>, args {3}
-[eva] matrix.c:45: Start thread jobs[3]
-[eva] matrix.c:45: New thread: jobs[4], fun job, parent <main>, args {4}
-[eva] matrix.c:45: Start thread jobs[4]
-[eva] matrix.c:54: Lock locks[0]
-[eva] matrix.c:59: Release locks[0]
-[eva] matrix.c:54: Lock locks[1]
-[eva] matrix.c:59: Release locks[1]
-[eva] matrix.c:54: Lock locks[2]
-[eva] matrix.c:59: Release locks[2]
-[eva] matrix.c:54: Lock locks[3]
-[eva] matrix.c:59: Release locks[3]
-[eva] matrix.c:54: Lock locks[4]
-[eva] matrix.c:59: Release locks[4]
+[eva:thread] New thread: <main>, fun main
+[eva:mutex] matrix.c:37: Initializing mutex locks[0]
+[eva:mutex] matrix.c:37: Initializing mutex locks[1]
+[eva:mutex] matrix.c:37: Initializing mutex locks[2]
+[eva:mutex] matrix.c:37: Initializing mutex locks[3]
+[eva:mutex] matrix.c:37: Initializing mutex locks[4]
+[eva:thread] matrix.c:45: New thread: jobs[0], fun job, parent <main>, args {0}
+[eva:thread] matrix.c:45: Start thread jobs[0]
+[eva:thread] matrix.c:45: New thread: jobs[1], fun job, parent <main>, args {1}
+[eva:thread] matrix.c:45: Start thread jobs[1]
+[eva:thread] matrix.c:45: New thread: jobs[2], fun job, parent <main>, args {2}
+[eva:thread] matrix.c:45: Start thread jobs[2]
+[eva:thread] matrix.c:45: New thread: jobs[3], fun job, parent <main>, args {3}
+[eva:thread] matrix.c:45: Start thread jobs[3]
+[eva:thread] matrix.c:45: New thread: jobs[4], fun job, parent <main>, args {4}
+[eva:thread] matrix.c:45: Start thread jobs[4]
+[eva:mutex] matrix.c:54: Lock locks[0]
+[eva:mutex] matrix.c:59: Release locks[0]
+[eva:mutex] matrix.c:54: Lock locks[1]
+[eva:mutex] matrix.c:59: Release locks[1]
+[eva:mutex] matrix.c:54: Lock locks[2]
+[eva:mutex] matrix.c:59: Release locks[2]
+[eva:mutex] matrix.c:54: Lock locks[3]
+[eva:mutex] matrix.c:59: Release locks[3]
+[eva:mutex] matrix.c:54: Lock locks[4]
+[eva:mutex] matrix.c:59: Release locks[4]
 [eva] Globals accessed by thread:
   matrix[0][0..99]: read by <main> at matrix.c:58 <- main
   matrix[1][0..99]: read by <main> at matrix.c:58 <- main
@@ -167,12 +167,12 @@
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[0]
 [eva:show] matrix.c:21: Frama_C_show_each: {0}
-[eva] matrix.c:24: Lock locks[0]
+[eva:mutex] matrix.c:24: Lock locks[0]
 [kernel:annot:missing-spec] matrix.c:28: Warning: 
   Neither code nor specification for function f, generating default assigns.
   See -generated-spec-* options for more info.
 [eva] using specification for function f
-[eva] matrix.c:29: Release locks[0]
+[eva:mutex] matrix.c:29: Release locks[0]
 [eva] Globals accessed by thread:
   matrix[0][0..99]:
     read by jobs[0] at matrix.c:28 <- job
@@ -204,8 +204,8 @@
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[1]
 [eva:show] matrix.c:21: Frama_C_show_each: {1}
-[eva] matrix.c:24: Lock locks[1]
-[eva] matrix.c:29: Release locks[1]
+[eva:mutex] matrix.c:24: Lock locks[1]
+[eva:mutex] matrix.c:29: Release locks[1]
 [eva] Globals accessed by thread:
   matrix[1][0..99]:
     read by jobs[1] at matrix.c:28 <- job
@@ -237,8 +237,8 @@
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[2]
 [eva:show] matrix.c:21: Frama_C_show_each: {2}
-[eva] matrix.c:24: Lock locks[2]
-[eva] matrix.c:29: Release locks[2]
+[eva:mutex] matrix.c:24: Lock locks[2]
+[eva:mutex] matrix.c:29: Release locks[2]
 [eva] Globals accessed by thread:
   matrix[2][0..99]:
     read by jobs[2] at matrix.c:28 <- job
@@ -270,8 +270,8 @@
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[3]
 [eva:show] matrix.c:21: Frama_C_show_each: {3}
-[eva] matrix.c:24: Lock locks[3]
-[eva] matrix.c:29: Release locks[3]
+[eva:mutex] matrix.c:24: Lock locks[3]
+[eva:mutex] matrix.c:29: Release locks[3]
 [eva] Globals accessed by thread:
   matrix[3][0..99]:
     read by jobs[3] at matrix.c:28 <- job
@@ -303,8 +303,8 @@
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[4]
 [eva:show] matrix.c:21: Frama_C_show_each: {4}
-[eva] matrix.c:24: Lock locks[4]
-[eva] matrix.c:29: Release locks[4]
+[eva:mutex] matrix.c:24: Lock locks[4]
+[eva:mutex] matrix.c:29: Release locks[4]
 [eva] Globals accessed by thread:
   matrix[4][0..99]:
     read by jobs[4] at matrix.c:28 <- job
@@ -343,12 +343,12 @@
 [eva] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva] Thread <main>, fun main
-[eva] matrix.c:45: Thread jobs[0], fun job, parent <main>, args {0}
-[eva] matrix.c:45: Thread jobs[1], fun job, parent <main>, args {1}
-[eva] matrix.c:45: Thread jobs[2], fun job, parent <main>, args {2}
-[eva] matrix.c:45: Thread jobs[3], fun job, parent <main>, args {3}
-[eva] matrix.c:45: Thread jobs[4], fun job, parent <main>, args {4}
+[eva:thread] Thread <main>, fun main
+[eva:thread] matrix.c:45: Thread jobs[0], fun job, parent <main>, args {0}
+[eva:thread] matrix.c:45: Thread jobs[1], fun job, parent <main>, args {1}
+[eva:thread] matrix.c:45: Thread jobs[2], fun job, parent <main>, args {2}
+[eva:thread] matrix.c:45: Thread jobs[3], fun job, parent <main>, args {3}
+[eva:thread] matrix.c:45: Thread jobs[4], fun job, parent <main>, args {4}
 [eva] Globals accessed by thread:
   matrix[0][0..99]: read by <main> at matrix.c:58 <- main
   matrix[1][0..99]: read by <main> at matrix.c:58 <- main
@@ -1349,11 +1349,16 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:interferences] matrix.c:42: inject threads interferences at this point
-[eva] matrix.c:45: New context for jobs[0], fun job, parent <main>, args {0}
-[eva] matrix.c:45: New context for jobs[1], fun job, parent <main>, args {1}
-[eva] matrix.c:45: New context for jobs[2], fun job, parent <main>, args {2}
-[eva] matrix.c:45: New context for jobs[3], fun job, parent <main>, args {3}
-[eva] matrix.c:45: New context for jobs[4], fun job, parent <main>, args {4}
+[eva:thread] matrix.c:45: 
+  New context for jobs[0], fun job, parent <main>, args {0}
+[eva:thread] matrix.c:45: 
+  New context for jobs[1], fun job, parent <main>, args {1}
+[eva:thread] matrix.c:45: 
+  New context for jobs[2], fun job, parent <main>, args {2}
+[eva:thread] matrix.c:45: 
+  New context for jobs[3], fun job, parent <main>, args {3}
+[eva:thread] matrix.c:45: 
+  New context for jobs[4], fun job, parent <main>, args {4}
 [eva:interferences] matrix.c:58: inject threads interferences at this point
 [eva] Globals accessed by thread:
   matrix[0][0..99]: read by <main> at matrix.c:58 <- main
