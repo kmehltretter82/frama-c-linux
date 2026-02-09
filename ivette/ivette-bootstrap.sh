@@ -19,7 +19,7 @@ USERCWD=`pwd`
 function InstallHelp()
 {
     echo "Ivette Requirements:"
-    echo "  - node v22"
+    echo "  - node v22 or later"
     echo "  - yarn (any version)"
     echo "Recommended Installation:"
     echo "  - install nvm (https://github.com/nvm-sh/nvm)"
@@ -35,7 +35,7 @@ echo "[1/3] Configuring"
 
 NODEJS=`node --version`
 case $NODEJS in
-    v22.*|v23.*|v24.*)
+    v22.*|v23.*|v24.*|v25.*)
         echo " - node $NODEJS found"
         ;;
     *)
