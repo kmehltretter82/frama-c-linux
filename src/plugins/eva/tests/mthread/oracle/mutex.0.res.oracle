@@ -208,8 +208,6 @@
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[eva:interferences] mutex.c:7: inject threads interferences at this point
-[eva:interferences] mutex.c:8: inject threads interferences at this point
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread jobs1
 [mt] mutex.c:23: Lock m1
@@ -253,8 +251,6 @@
 [mt] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[eva:interferences] mutex.c:7: inject threads interferences at this point
-[eva:interferences] mutex.c:8: inject threads interferences at this point
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread jobs2
 [mt] mutex.c:32: Lock m1
@@ -286,8 +282,6 @@
 [mt] * Computing value analysis for thread jobs3
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
-[eva:interferences] mutex.c:7: inject threads interferences at this point
-[eva:interferences] mutex.c:8: inject threads interferences at this point
 [eva:interferences] 
   inject threads interferences at the start of f3 for thread jobs3
 [eva:interferences] mutex.c:40: inject threads interferences at this point
@@ -316,8 +310,6 @@
 [mt] * Computing value analysis for thread jobs4
 [eva] Analyzing a complete application starting at f4
 [eva] Initial state supplied by user
-[eva:interferences] mutex.c:7: inject threads interferences at this point
-[eva:interferences] mutex.c:8: inject threads interferences at this point
 [eva:interferences] 
   inject threads interferences at the start of f4 for thread jobs4
 [mt] * Starting to save the state of the value analysis
@@ -370,8 +362,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva:interferences] mutex.c:7: inject threads interferences at this point
-[eva:interferences] mutex.c:8: inject threads interferences at this point
 [mt] Thread <main>, fun main
 [mt] mutex.c:51: Initializing mutex m1
 [mt] mutex.c:52: Initializing mutex m2
@@ -415,8 +405,6 @@
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[eva:interferences] mutex.c:7: inject threads interferences at this point
-[eva:interferences] mutex.c:8: inject threads interferences at this point
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread jobs1
 [mt] mutex.c:23: Lock m1
@@ -461,8 +449,6 @@
 [mt] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[eva:interferences] mutex.c:7: inject threads interferences at this point
-[eva:interferences] mutex.c:8: inject threads interferences at this point
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread jobs2
 [mt] mutex.c:32: Lock m1
@@ -494,8 +480,6 @@
 [mt] * Computing value analysis for thread jobs3
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
-[eva:interferences] mutex.c:7: inject threads interferences at this point
-[eva:interferences] mutex.c:8: inject threads interferences at this point
 [eva:interferences] 
   inject threads interferences at the start of f3 for thread jobs3
 [eva:interferences] mutex.c:40: inject threads interferences at this point
@@ -525,8 +509,6 @@
 [mt] * Computing value analysis for thread jobs4
 [eva] Analyzing a complete application starting at f4
 [eva] Initial state supplied by user
-[eva:interferences] mutex.c:7: inject threads interferences at this point
-[eva:interferences] mutex.c:8: inject threads interferences at this point
 [eva:interferences] 
   inject threads interferences at the start of f4 for thread jobs4
 [mt] * Starting to save the state of the value analysis
@@ -575,8 +557,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva:interferences] mutex.c:7: inject threads interferences at this point
-[eva:interferences] mutex.c:8: inject threads interferences at this point
 [mt] Thread <main>, fun main
 [mt] mutex.c:51: Initializing mutex m1
 [mt] mutex.c:52: Initializing mutex m2

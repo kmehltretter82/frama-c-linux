@@ -316,24 +316,12 @@
 [mt] matrix2.c:52: Lock locks[0]
 [mt] matrix2.c:58: Release locks[0]
 [mt] matrix2.c:52: Lock locks[1]
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_32, (void *)(&matrix[150]));
 [mt] matrix2.c:58: Release locks[1]
 [mt] matrix2.c:52: Lock locks[2]
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_24, (void *)(&matrix[150]));
 [mt] matrix2.c:58: Release locks[2]
 [mt] matrix2.c:52: Lock locks[3]
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_16, (void *)(&matrix[150]));
 [mt] matrix2.c:58: Release locks[3]
 [mt] matrix2.c:52: Lock locks[4]
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_8, (void *)(&matrix[150]));
 [mt] matrix2.c:58: Release locks[4]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
@@ -1829,36 +1817,24 @@
   signed overflow. assert -2147483648 ≤ sum + *pj_unfold_32;
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert sum + *pj_unfold_32 ≤ 2147483647;
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_32, (void *)(&matrix[150]));
 [mt] matrix2.c:58: Release locks[1]
 [mt] matrix2.c:52: Lock locks[2]
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert -2147483648 ≤ sum + *pj_unfold_24;
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert sum + *pj_unfold_24 ≤ 2147483647;
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_24, (void *)(&matrix[150]));
 [mt] matrix2.c:58: Release locks[2]
 [mt] matrix2.c:52: Lock locks[3]
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert -2147483648 ≤ sum + *pj_unfold_16;
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert sum + *pj_unfold_16 ≤ 2147483647;
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_16, (void *)(&matrix[150]));
 [mt] matrix2.c:58: Release locks[3]
 [mt] matrix2.c:52: Lock locks[4]
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert -2147483648 ≤ sum + *pj_unfold_8;
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert sum + *pj_unfold_8 ≤ 2147483647;
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_8, (void *)(&matrix[150]));
 [mt] matrix2.c:58: Release locks[4]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
@@ -2859,46 +2835,14 @@
 [eva] using specification for function completed
 [mt] matrix2.c:52: Lock locks[0]
 [eva:interferences] matrix2.c:55: inject threads interferences at this point
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert -2147483648 ≤ sum + *pj_unfold_40;
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert sum + *pj_unfold_40 ≤ 2147483647;
 [mt] matrix2.c:58: Release locks[0]
 [mt] matrix2.c:52: Lock locks[1]
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert -2147483648 ≤ sum + *pj_unfold_32;
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert sum + *pj_unfold_32 ≤ 2147483647;
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_32, (void *)(&matrix[150]));
 [mt] matrix2.c:58: Release locks[1]
 [mt] matrix2.c:52: Lock locks[2]
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert -2147483648 ≤ sum + *pj_unfold_24;
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert sum + *pj_unfold_24 ≤ 2147483647;
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_24, (void *)(&matrix[150]));
 [mt] matrix2.c:58: Release locks[2]
 [mt] matrix2.c:52: Lock locks[3]
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert -2147483648 ≤ sum + *pj_unfold_16;
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert sum + *pj_unfold_16 ≤ 2147483647;
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_16, (void *)(&matrix[150]));
 [mt] matrix2.c:58: Release locks[3]
 [mt] matrix2.c:52: Lock locks[4]
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert -2147483648 ≤ sum + *pj_unfold_8;
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert sum + *pj_unfold_8 ≤ 2147483647;
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_8, (void *)(&matrix[150]));
 [mt] matrix2.c:58: Release locks[4]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables

@@ -1551,19 +1551,11 @@
 [mt] ccfg.c:90: Start thread job_f2
 [mt] ccfg.c:92: Lock lock
 [eva:interferences] ccfg.c:93: inject threads interferences at this point
-[eva:alarm] ccfg.c:94: Warning: signed overflow. assert -2147483648 ≤ sum + b;
-[eva:alarm] ccfg.c:94: Warning: signed overflow. assert sum + b ≤ 2147483647;
 [eva:interferences] ccfg.c:94: inject threads interferences at this point
 [mt] ccfg.c:95: Release lock
-[eva:alarm] ccfg.c:96: Warning: signed overflow. assert -2147483648 ≤ sum + c;
-[eva:alarm] ccfg.c:96: Warning: signed overflow. assert sum + c ≤ 2147483647;
 [eva:interferences] ccfg.c:96: inject threads interferences at this point
-[eva:alarm] ccfg.c:97: Warning: signed overflow. assert -2147483648 ≤ sum + d;
-[eva:alarm] ccfg.c:97: Warning: signed overflow. assert sum + d ≤ 2147483647;
 [eva:interferences] ccfg.c:97: inject threads interferences at this point
-[eva:alarm] ccfg.c:98: Warning: signed overflow. assert sum + e ≤ 2147483647;
 [eva:interferences] ccfg.c:98: inject threads interferences at this point
-[eva:alarm] ccfg.c:99: Warning: signed overflow. assert sum + f ≤ 2147483647;
 [eva:interferences] ccfg.c:99: inject threads interferences at this point
 [mt] Monitored event: main event without argument
 [mt] Warning: During unknown event: invalid event name. When decoding string, incorrect value '{{ &event }}'. Ignoring.

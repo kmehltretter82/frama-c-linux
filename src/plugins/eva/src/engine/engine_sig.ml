@@ -154,10 +154,17 @@ end
 module type Initialization = sig
   type state
 
-  (** Compute the initial state for an analysis (as in {!initial_state}),
-      but also bind the formal parameters of the function given as argument. *)
+  (** Compute the initial state for an analysis, but also bind the formal
+      parameters of the function given as argument.
+      @param cvalue_state if given, replace the computed initial cvalue state
+      with this one.
+      @param arguments if given, use these arguments values instead of
+      generating ad hoc values. *)
   val initial_state_with_formals :
-    lib_entry:bool -> Cil_types.kernel_function -> state or_bottom
+    ?cvalue_state: Cvalue.Model.t ->
+    ?arguments: Cvalue.V.t list ->
+    lib_entry:bool ->
+    Cil_types.kernel_function -> state or_bottom
 
   (** Initializes a local variable in the current state. *)
   val initialize_local_variable:

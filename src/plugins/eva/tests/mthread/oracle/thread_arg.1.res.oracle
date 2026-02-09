@@ -731,8 +731,6 @@
 [mt] thread_arg.c:42: Lock locks[0]
 [mt] thread_arg.c:42: Lock locks[1]
 [eva:interferences] thread_arg.c:45: inject threads interferences at this point
-[eva:alarm] thread_arg.c:45: Warning: 
-  signed overflow. assert sum + vars[i_2] ≤ 2147483647;
 [mt] thread_arg.c:48: Release locks[0]
 [mt] thread_arg.c:48: Release locks[1]
 [mt] * Starting to save the state of the value analysis
@@ -766,10 +764,6 @@
 [mt] thread_arg.c:25: Lock locks[0]
 [eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[eva:alarm] thread_arg.c:26: Warning: 
-  signed overflow.
-  assert vars[i] + tmp ≤ 2147483647;
-  (tmp from Frama_C_interval(0, 10))
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[0]
 [mt] * Starting to save the state of the value analysis
@@ -820,10 +814,6 @@
 [mt] thread_arg.c:25: Lock locks[1]
 [eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[eva:alarm] thread_arg.c:26: Warning: 
-  signed overflow.
-  assert vars[i] + tmp ≤ 2147483647;
-  (tmp from Frama_C_interval(0, 10))
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [mt] thread_arg.c:27: Release locks[1]
 [mt] * Starting to save the state of the value analysis
@@ -933,8 +923,6 @@
 [mt] thread_arg.c:42: Lock locks[0]
 [mt] thread_arg.c:42: Lock locks[1]
 [eva:interferences] thread_arg.c:45: inject threads interferences at this point
-[eva:alarm] thread_arg.c:45: Warning: 
-  signed overflow. assert sum + vars[i_2] ≤ 2147483647;
 [mt] thread_arg.c:48: Release locks[0]
 [mt] thread_arg.c:48: Release locks[1]
 [mt] * Starting to save the state of the value analysis

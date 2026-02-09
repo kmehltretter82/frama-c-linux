@@ -357,8 +357,8 @@ module Make (Engine: Engine_Subset) = struct
       let set_domain = Domain.set Cvalue_domain.State.key in
       set_domain (cvalue_state, Locals_scoping.bottom ()) state
 
-  let add_main_formals kf state =
-    match Eva_results.get_main_args () with
+  let add_main_formals ?arguments kf state =
+    match arguments with
     | None -> compute_main_formals kf state
     | Some actuals -> add_supplied_main_formals kf actuals state
 
@@ -445,9 +445,9 @@ module Make (Engine: Engine_Subset) = struct
                   "Values of globals at initialization")
       "@[  %a@]" Cvalue.Model.pretty cvalue_state
 
-  let initial_state_with_formals ~lib_entry kf =
+  let initial_state_with_formals ?cvalue_state ?arguments ~lib_entry kf =
     let init_state =
-      match Eva_results.get_initial_state () with
+      match cvalue_state with
       | Some cvalue_state ->
         Self.feedback "Initial state supplied by user";
         let* state = global_state ~lib_entry in
@@ -461,6 +461,6 @@ module Make (Engine: Engine_Subset) = struct
     let b = Parameters.ResultsAll.get () in
     Domain.Store.register_global_state b init_state;
     print_initial_cvalue_state init_state;
-    init_state >>-: add_main_formals kf
+    init_state >>-: add_main_formals ?arguments kf
 
 end

@@ -259,10 +259,6 @@
 [eva:interferences] manysharedvars.c:30: 
   inject threads interferences at this point
 [mt] manysharedvars.c:31: Release lock
-[eva:alarm] manysharedvars.c:29: Warning: 
-  signed overflow. assert s[i].data + 1 ≤ 2147483647;
-[eva:alarm] manysharedvars.c:30: Warning: 
-  signed overflow. assert s[i].data2 + 3 ≤ 2147483647;
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:

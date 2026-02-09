@@ -183,11 +183,14 @@ let compute_from_init_state (type t) (engine: t engine) kf (init_state: t) =
   in
   Eva_utils.protect compute ~cleanup
 
-let compute_from_entry_point (module Engine: Engine_sig.S) kf ~lib_entry =
+let compute_from_entry_point (module Engine: Engine_sig.S)
+    ?cvalue_state ?arguments kf =
+  let lib_entry = Kernel.LibEntry.get () in
   Self.feedback "Analyzing a%scomplete application starting at %a"
     (if lib_entry then "n in" else " ")
     Kernel_function.pretty kf;
-  match Engine.Initialization.initial_state_with_formals ~lib_entry kf with
+  match Engine.Initialization.initial_state_with_formals
+          ?cvalue_state ?arguments ~lib_entry kf with
   | `Bottom ->
     Engine.Dom.Store.mark_as_computed ();
     Self.(ComputationState.set Aborted);
@@ -201,13 +204,18 @@ let compute_from_entry_point (module Engine: Engine_sig.S) kf ~lib_entry =
 let force_compute () =
   Ast.compute ();
   pre_analysis ();
-  let kf, lib_entry = Globals.entry_point () in
+  let kf = fst @@ Globals.entry_point () in
   Engine.reset ();
   (* The new analyzer can be accessed through hooks *)
   Self.ComputationState.set Computing;
   let module Engine = (val Engine.current ()) in
-  try compute_from_entry_point (module Engine) ~lib_entry kf
+  let cvalue_state = Eva_results.get_initial_state ()
+  and arguments = Eva_results.get_main_args () in
+  try
+    compute_from_entry_point (module Engine)
+      ?cvalue_state ?arguments kf
   with Self.Abort ->
+    Engine.Dom.Store.mark_as_computed ();
     Self.(ComputationState.set Aborted);
     Self.error "The analysis has been aborted: results are incomplete."
 
@@ -232,15 +240,14 @@ let abort () =
 
 (* Mthread entry point *)
 
-let compute_thread thread initial_state =
-  (* We set the parameters for the value analysis *)
-  let Thread.{ entry_point; arguments } = Thread.properties thread in
-  Eva_results.set_initial_state initial_state;
-  Eva_results.set_main_args (List.map snd arguments);
+let compute_thread thread cvalue_state =
   Thread.set_current thread;
-
+  let Thread.{ entry_point; arguments } = Thread.properties thread in
+  let arguments = List.map snd arguments in
   let module Engine = (val Engine.current ()) in
-  try compute_from_entry_point (module Engine) ~lib_entry:false entry_point
+  try
+    compute_from_entry_point (module Engine)
+      ~cvalue_state ~arguments entry_point
   with Self.Abort ->
     Self.(ComputationState.set Aborted);
     Self.error "The analysis has been aborted: results are incomplete."

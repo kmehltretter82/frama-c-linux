@@ -75,8 +75,6 @@
 [mt] Thread <main>, fun main
 [mt] null.c:24: Thread tjob0, fun job0, parent <main>, args {0}
 [mt] null.c:24: Start thread tjob0
-[eva:alarm] null.c:27: Warning: 
-  out of bounds read. assert \valid_read((char *)i);
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -99,7 +97,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of job0 for thread tjob0
-[eva:alarm] null.c:16: Warning: out of bounds write. assert \valid((char *)i);
 [eva:interferences] null.c:16: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
@@ -153,8 +150,6 @@
 [mt] Thread <main>, fun main
 [mt] null.c:24: Thread tjob0, fun job0, parent <main>, args {0}
 [mt] null.c:24: Start thread tjob0
-[eva:alarm] null.c:27: Warning: 
-  out of bounds read. assert \valid_read((char *)i);
 [eva:interferences] null.c:27: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables

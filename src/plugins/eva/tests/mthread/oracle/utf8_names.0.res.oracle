@@ -54,9 +54,6 @@
 [mt] *** Computing thread job / "𐍅" f2, iteration 1 (first iteration)
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread job / "𐍅" f2
-[eva:alarm] utf8_names.c:23: Warning: 
-  pointer downcast.
-  assert (unsigned long)(&"\"\360\220\215\205\" /0"[*from]) ≤ 2147483647;
 [mt] Lock mutex / "𐍅"
 [mt] Release mutex / "𐍅"
 [mt] Sending message on queue / "𐍅", content
@@ -128,9 +125,6 @@
     (potential shared vars changed, interferences changed)
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread job / "𐍅" f1
-[eva:alarm] utf8_names.c:23: Warning: 
-  pointer downcast.
-  assert (unsigned long)(&"\"\360\220\215\205\" /0"[*from]) ≤ 2147483647;
 [eva:interferences] utf8_names.c:23: inject threads interferences at this point
 [eva:interferences] utf8_names.c:27: inject threads interferences at this point
 [mt] Lock mutex / "𐍅"
@@ -188,9 +182,6 @@
     (potential shared vars changed, interferences changed)
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread job / "𐍅" f2
-[eva:alarm] utf8_names.c:23: Warning: 
-  pointer downcast.
-  assert (unsigned long)(&"\"\360\220\215\205\" /0"[*from]) ≤ 2147483647;
 [eva:interferences] utf8_names.c:23: inject threads interferences at this point
 [eva:interferences] utf8_names.c:37: inject threads interferences at this point
 [mt] Lock mutex / "𐍅"
@@ -354,9 +345,6 @@
     (shared vars values changed, interferences changed)
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread job / "𐍅" f1
-[eva:alarm] utf8_names.c:23: Warning: 
-  pointer downcast.
-  assert (unsigned long)(&"\"\360\220\215\205\" /0"[*from]) ≤ 2147483647;
 [eva:interferences] utf8_names.c:23: inject threads interferences at this point
 [eva:interferences] utf8_names.c:27: inject threads interferences at this point
 [mt] Lock mutex / "𐍅"
@@ -423,9 +411,6 @@
      interferences changed)
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread job / "𐍅" f2
-[eva:alarm] utf8_names.c:23: Warning: 
-  pointer downcast.
-  assert (unsigned long)(&"\"\360\220\215\205\" /0"[*from]) ≤ 2147483647;
 [eva:interferences] utf8_names.c:23: inject threads interferences at this point
 [eva:interferences] utf8_names.c:37: inject threads interferences at this point
 [mt] Lock mutex / "𐍅"
@@ -590,9 +575,6 @@
 [mt] *** Computing thread job / "𐍅" f1, iteration 4 (interferences changed)
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread job / "𐍅" f1
-[eva:alarm] utf8_names.c:23: Warning: 
-  pointer downcast.
-  assert (unsigned long)(&"\"\360\220\215\205\" /0"[*from]) ≤ 2147483647;
 [eva:interferences] utf8_names.c:23: inject threads interferences at this point
 [eva:interferences] utf8_names.c:27: inject threads interferences at this point
 [mt] Lock mutex / "𐍅"
