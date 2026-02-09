@@ -121,6 +121,11 @@ let dkey_print_vid = register_category "printer:vid"
 
 let dkey_print_field_offsets = register_category "printer:field-offsets"
 
+let dkey_printer_too_early =
+  register_category "printer:too-early"
+    ~help:"raise fatal error when Printer is used in early parsing stages, \
+           where Cil_printer would be more adequate"
+
 let dkey_prop_status = register_category "prop-status"
 
 let dkey_prop_status_emit = register_category "prop-status:emit"
