@@ -184,13 +184,13 @@ let compute_from_init_state (type t) (engine: t engine) kf (init_state: t) =
   Eva_utils.protect compute ~cleanup
 
 let compute_from_entry_point (module Engine: Engine_sig.S)
-    ?cvalue_state ?arguments kf =
+    ?cvalue_state ?arguments entry_point =
   let lib_entry = Kernel.LibEntry.get () in
   Self.feedback "Analyzing a%scomplete application starting at %a"
     (if lib_entry then "n in" else " ")
-    Kernel_function.pretty kf;
+    Kernel_function.pretty entry_point;
   match Engine.Initialization.initial_state_with_formals
-          ?cvalue_state ?arguments ~lib_entry kf with
+          ?cvalue_state ?arguments ~lib_entry entry_point with
   | `Bottom ->
     Engine.Dom.Store.mark_as_computed ();
     Self.(ComputationState.set Aborted);
@@ -198,22 +198,20 @@ let compute_from_entry_point (module Engine: Engine_sig.S)
                  initialization is not computable.";
     Eval_annots.mark_invalid_initializers ()
   | `Value initial_state ->
-    compute_from_init_state (module Engine) kf initial_state
+    compute_from_init_state (module Engine) entry_point initial_state
 
 (* Builds the analyzer if needed, and run the analysis. *)
-let force_compute () =
+let compute_from ?cvalue_state ?arguments entry_point =
+  Self.clear_results ();
   Ast.compute ();
   pre_analysis ();
-  let kf = fst @@ Globals.entry_point () in
   Engine.reset ();
   (* The new analyzer can be accessed through hooks *)
   Self.ComputationState.set Computing;
   let module Engine = (val Engine.current ()) in
-  let cvalue_state = Eva_results.get_initial_state ()
-  and arguments = Eva_results.get_main_args () in
   try
     compute_from_entry_point (module Engine)
-      ?cvalue_state ?arguments kf
+      ?cvalue_state ?arguments entry_point
   with Self.Abort ->
     Engine.Dom.Store.mark_as_computed ();
     Self.(ComputationState.set Aborted);
@@ -223,7 +221,11 @@ let compute () =
   (* Nothing to recompute when Eva has already been computed. This boolean
       is automatically cleared when an option of Eva changes, because they
       are registered as dependencies on [Self.state] in {!Parameters}.*)
-  if not (is_computed ()) then force_compute ()
+  if not (is_computed ()) then
+    let cvalue_state = Eva_results.get_initial_state ()
+    and arguments = Eva_results.get_main_args ()
+    and entry_point = fst @@ Globals.entry_point () in
+    compute_from ?cvalue_state ?arguments entry_point
 
 let compute =
   let name = "Eva.Analysis.compute" in

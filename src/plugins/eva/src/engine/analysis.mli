@@ -6,9 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val force_compute : unit -> unit
-(** Perform a full analysis, starting from the [main] function. *)
-
 val abort : unit -> unit
 (** Cleanly abort the analysis at the next safe point: partial results will be
     saved and Frama-C is not killed. *)
@@ -24,6 +21,14 @@ val is_computed : unit -> bool
 (** Return [true] iff the Eva analysis has been done.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
+
+val compute_from :
+  ?cvalue_state:Cvalue.Model.t ->
+  ?arguments:Cvalue.V.t list ->
+  Cil_types.kernel_function ->
+  unit
+(** Computes the Eva analysis from a given CValue state, an argument list for
+    the entry point and the entry point. *)
 
 val self : State.t
 (** Internal state of Eva analysis from projects viewpoint. *)
