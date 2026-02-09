@@ -178,10 +178,10 @@ Recommended provers are:
 "Ivette is the GUI for Frama-C.
 Run 'ivette' once to finalize installation (requires an internet connection).
 Once finalized, 'ivette' will work offline.
-Finalization also requires Node v20 or v22 and Yarn:
+Finalization also requires Node 24 and Yarn:
 - install NVM (https://github.com/nvm-sh/nvm)
-- run 'nvm install 22'
-- run 'nvm use 22'
+- run 'nvm install 24'
+- run 'nvm use 24'
 - run 'npm install --global yarn'" { success }
 ]
 
