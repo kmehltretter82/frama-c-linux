@@ -175,13 +175,8 @@ let compute_from_init_state (type t) (engine: t engine) kf (init_state: t) =
     Engine.Dom.post_analysis final_state;
     Summary.print ();
     Statistics.export_as_csv ();
-    restore_signals ()
   in
-  let cleanup () =
-    Engine.Dom.Store.mark_as_computed ();
-    Self.(ComputationState.set Aborted)
-  in
-  Eva_utils.protect compute ~cleanup
+  Fun.protect ~finally:restore_signals compute
 
 let compute_from_entry_point (module Engine: Engine_sig.S)
     ?cvalue_state ?arguments entry_point =
@@ -207,15 +202,19 @@ let compute_from ?cvalue_state ?arguments entry_point =
   pre_analysis ();
   Engine.reset ();
   (* The new analyzer can be accessed through hooks *)
-  Self.ComputationState.set Computing;
   let module Engine = (val Engine.current ()) in
   try
+    Self.ComputationState.set Computing;
     compute_from_entry_point (module Engine)
-      ?cvalue_state ?arguments entry_point
-  with Self.Abort ->
+      ?cvalue_state ?arguments entry_point;
+    Engine.Dom.Store.mark_as_computed ();
+    Self.ComputationState.set Computed;
+  with exn ->
     Engine.Dom.Store.mark_as_computed ();
     Self.(ComputationState.set Aborted);
-    Self.error "The analysis has been aborted: results are incomplete."
+    match exn with
+    | Self.Abort -> () (* do not re-raise Self.Abort *)
+    | exn -> raise exn
 
 let compute () =
   (* Nothing to recompute when Eva has already been computed. This boolean
@@ -248,8 +247,14 @@ let compute_thread thread cvalue_state =
   let arguments = List.map snd arguments in
   let module Engine = (val Engine.current ()) in
   try
+    Self.ComputationState.set Computing;
     compute_from_entry_point (module Engine)
-      ~cvalue_state ~arguments entry_point
-  with Self.Abort ->
+      ~cvalue_state ~arguments entry_point;
+    Engine.Dom.Store.mark_as_computed ();
+    Self.ComputationState.set Computed;
+  with exn ->
+    Engine.Dom.Store.mark_as_computed ();
     Self.(ComputationState.set Aborted);
-    Self.error "The analysis has been aborted: results are incomplete."
+    match exn with
+    | Self.Abort -> () (* do not reraise Self.Abort *)
+    | exn -> raise exn
