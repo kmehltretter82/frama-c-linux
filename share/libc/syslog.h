@@ -11,7 +11,7 @@
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_null.h"
-#include "stdarg.h"
+#include <stdarg.h>
 
 __BEGIN_DECLS
 

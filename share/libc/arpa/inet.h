@@ -11,7 +11,7 @@
 
 #ifndef __FC_ARPA_INET_H
 #define __FC_ARPA_INET_H
-#include "features.h"
+#include "../features.h"
 __PUSH_FC_STDLIB
 #include "../__fc_inet.h"
 __POP_FC_STDLIB

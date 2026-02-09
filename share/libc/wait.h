@@ -8,4 +8,4 @@
 
 // This file is neither in the C standard nor is POSIX;
 // it exists for compatibility purposes
-#include "sys/wait.h"
+#include <sys/wait.h>

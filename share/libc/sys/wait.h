@@ -37,7 +37,7 @@ __BEGIN_DECLS
 #include "../__fc_define_id_t.h"
 #include "../__fc_define_pid_t.h"
 #include "../__fc_define_uid_and_gid.h"
-#include "../signal.h"
+#include <signal.h>
 
 # ifndef __ENUM_IDTYPE_T
 # define __ENUM_IDTYPE_T 1
@@ -86,7 +86,7 @@ extern int waitid(idtype_t idtype, id_t id, siginfo_t *infop, int options);
 */
 extern pid_t waitpid(pid_t pid, int *stat_loc, int options);
 
-#include "resource.h"
+#include <sys/resource.h>
 // non-POSIX
 /*@
   assigns \result, *wstatus, *rusage \from options;

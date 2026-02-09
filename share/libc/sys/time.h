@@ -227,7 +227,7 @@ extern int _timercmp(struct timeval *a, struct timeval *b);
 // From POSIX, and for better compatibility with existing code bases:
 // "Inclusion of the <sys/time.h> header may make visible all symbols
 // from the <sys/select.h> header."
-#include "select.h"
+#include <sys/select.h>
 
 __END_DECLS
 __POP_FC_STDLIB

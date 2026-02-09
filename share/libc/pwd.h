@@ -15,9 +15,9 @@ __PUSH_FC_STDLIB
 #include "__fc_define_uid_and_gid.h"
 #include "__fc_string_axiomatic.h"
 
-#include "errno.h"
+#include <errno.h>
 // for size_t
-#include "stddef.h"
+#include <stddef.h>
 __BEGIN_DECLS
 
 struct passwd {

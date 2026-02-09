@@ -8,9 +8,9 @@
 
 #ifndef __FC_SYS_TIMEX_H
 #define __FC_SYS_TIMEX_H
-#include "features.h"
-#include "stdint.h"
-#include "time.h"
+#include "../features.h"
+#include <stdint.h>
+#include <sys/time.h>
 __PUSH_FC_STDLIB
 
 __BEGIN_DECLS

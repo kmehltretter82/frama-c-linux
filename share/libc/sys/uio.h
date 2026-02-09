@@ -15,7 +15,7 @@ __PUSH_FC_STDLIB
 #include "../__fc_define_size_t.h"
 #include "../__fc_define_iovec.h"
 #include "../__fc_define_fds.h"
-#include "../limits.h"
+#include <limits.h>
 
 __BEGIN_DECLS
 

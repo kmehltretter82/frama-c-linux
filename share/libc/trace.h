@@ -14,7 +14,7 @@ __PUSH_FC_STDLIB
 #include "__fc_define_pthread_types.h"
 #include "__fc_define_size_t.h"
 #include "__fc_define_timespec.h"
-#include "limits.h"
+#include <limits.h>
 
 __BEGIN_DECLS
 

@@ -17,7 +17,7 @@ __PUSH_FC_STDLIB
 #include "__fc_define_wchar_t.h"
 #include "__fc_alloc_axiomatic.h"
 #include "__fc_string_axiomatic.h"
-#include "errno.h"
+#include <errno.h>
 #include <stddef.h>
 __BEGIN_DECLS
 
@@ -51,7 +51,7 @@ typedef struct __fc_lldiv_t {
 #define EXIT_FAILURE 1
 #define EXIT_SUCCESS 0
 
-#include "limits.h"
+#include <limits.h>
 
 #define RAND_MAX __FC_RAND_MAX
 #define MB_CUR_MAX __FC_MB_CUR_MAX

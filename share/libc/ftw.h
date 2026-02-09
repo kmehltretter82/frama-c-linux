@@ -10,10 +10,10 @@
 #define __FC_FTW_H
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "errno.h"
+#include <errno.h>
 // From POSIX 1.2008: "Inclusion of the <ftw.h> header may also make visible
 //                     all symbols from <sys/stat.h>".
-#include "sys/stat.h"
+#include <sys/stat.h>
 
 __BEGIN_DECLS
 

@@ -9,7 +9,7 @@
 #ifndef __FC_RESOLV_H
 #define __FC_RESOLV_H
 #include "features.h"
-#include "stdint.h" // for uint32_t
+#include <stdint.h> // for uint32_t
 #include "__fc_inet.h" // for struct sockaddr_in
 
 __PUSH_FC_STDLIB

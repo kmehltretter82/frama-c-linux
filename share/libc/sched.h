@@ -13,7 +13,7 @@ __PUSH_FC_STDLIB
 
 #include "__fc_define_timespec.h"
 #include "__fc_define_pid_t.h"
-#include "errno.h"
+#include <errno.h>
 
 __BEGIN_DECLS
 

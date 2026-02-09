@@ -27,13 +27,13 @@ support them.
 #ifndef __FC_GCC_BUILTIN_MACROS_H
 #define __FC_GCC_BUILTIN_MACROS_H
 
-#include "ctype.h"
-#include "inttypes.h"
-#include "math.h"
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
-#include "wctype.h"
+#include <ctype.h>
+#include <inttypes.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wctype.h>
 
 #define __builtin_abort abort
 #define __builtin_abs abs

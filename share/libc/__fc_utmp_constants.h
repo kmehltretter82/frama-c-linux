@@ -11,7 +11,7 @@
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
-#include "stdio.h"
+#include <stdio.h>
 
 #define _PATH_UTMP "/var/run/utmp"
 #define UTMP_FILE     _PATH_UTMP

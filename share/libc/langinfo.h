@@ -11,8 +11,8 @@
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_locale_t.h"
-#include "nl_types.h"
-#include "locale.h" // for LC_CTYPE and other constants
+#include <nl_types.h>
+#include <locale.h> // for LC_CTYPE and other constants
 __BEGIN_DECLS
 
 

@@ -10,7 +10,7 @@
 #define __FC_ULIMIT_H
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "errno.h"
+#include <errno.h>
 
 __BEGIN_DECLS
 

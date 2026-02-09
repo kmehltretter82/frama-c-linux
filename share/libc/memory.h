@@ -7,4 +7,4 @@
 /**************************************************************************/
 
 // This file is not in the C standard; it exists for compatibility purposes
-#include "string.h"
+#include <string.h>

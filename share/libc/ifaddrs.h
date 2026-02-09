@@ -12,7 +12,7 @@
 __PUSH_FC_STDLIB
 
 #include "__fc_define_sockaddr.h"
-#include "errno.h"
+#include <errno.h>
 
 __BEGIN_DECLS
 

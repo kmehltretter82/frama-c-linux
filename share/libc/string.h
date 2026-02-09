@@ -13,8 +13,8 @@
 __PUSH_FC_STDLIB
 #include "__fc_string_axiomatic.h"
 #include "__fc_alloc_axiomatic.h"
-#include "stddef.h"
-#include "limits.h"
+#include <stddef.h>
+#include <limits.h>
 
 __BEGIN_DECLS
 
@@ -652,7 +652,7 @@ __END_DECLS
 
 /* Include strings.h: this is what BSD does, and glibc does something
    equivalent (having copied prototypes to string.h). */
-#include "strings.h"
+#include <strings.h>
 
 __POP_FC_STDLIB
 #endif /* _STRING_H_ */

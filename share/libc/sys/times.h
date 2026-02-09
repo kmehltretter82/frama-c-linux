@@ -12,7 +12,7 @@
 #include "../features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
-#include "../time.h"
+#include <time.h>
 
 struct tms
 {

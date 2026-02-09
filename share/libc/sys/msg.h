@@ -14,7 +14,7 @@ __PUSH_FC_STDLIB
 #include "__fc_define_size_t.h"
 #include "__fc_define_ssize_t.h"
 #include "__fc_define_time_t.h"
-#include "ipc.h"
+#include <sys/ipc.h>
 
 __BEGIN_DECLS
 

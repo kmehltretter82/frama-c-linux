@@ -10,7 +10,7 @@
 #define __FC_ALLOCA_H
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "stdlib.h"
+#include <stdlib.h>
 
 __BEGIN_DECLS
 

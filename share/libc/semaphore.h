@@ -12,7 +12,7 @@
 #define __FC_SEMAPHORE_H
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "time.h"
+#include <time.h>
 
 __BEGIN_DECLS
 

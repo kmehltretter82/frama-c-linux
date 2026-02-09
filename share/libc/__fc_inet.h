@@ -24,9 +24,9 @@ __BEGIN_DECLS
 
 #include "__fc_string_axiomatic.h"
 #include "__fc_define_pthread_types.h"
-#include "inttypes.h"
-#include "signal.h"
-#include "sys/socket.h"
+#include <inttypes.h>
+#include <signal.h>
+#include <sys/socket.h>
 
 ////////// DEFINITIONS BELOW WERE ORIGINALLY IN <netinet/in.h>
 

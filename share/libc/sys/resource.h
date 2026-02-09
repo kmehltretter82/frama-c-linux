@@ -10,7 +10,7 @@
 #define __FC_SYS_RESOURCE_H
 #include "../features.h"
 __PUSH_FC_STDLIB
-#include "time.h"
+#include <sys/time.h>
 #include "../__fc_define_id_t.h"
 
 #define PRIO_PROCESS    0

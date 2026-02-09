@@ -40,7 +40,7 @@
 #ifndef __FC_NETINET_TCP_H
 #define __FC_NETINET_TCP_H
 
-#include <features.h>
+#include "../features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
 

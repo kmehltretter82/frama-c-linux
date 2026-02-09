@@ -13,9 +13,9 @@
 __PUSH_FC_STDLIB
 #include "__fc_machdep.h"
 #include "__fc_string_axiomatic.h"
-#include "stdarg.h"
-#include "stddef.h"
-#include "errno.h"
+#include <stdarg.h>
+#include <stddef.h>
+#include <errno.h>
 #include "__fc_define_at.h"
 #include "__fc_define_fds.h"
 #include "__fc_define_stat.h"
