@@ -164,6 +164,8 @@ let save_results kf =
 
 type 'state engine = (module Engine_sig.S with type Dom.state = 'state)
 
+exception Error
+
 let compute_from_init_state (type t) (engine: t engine) kf (init_state: t) =
   let module Engine = (val engine) in
   let restore_signals = register_signal_handler () in
@@ -187,11 +189,10 @@ let compute_from_entry_point (module Engine: Engine_sig.S)
   match Engine.Initialization.initial_state_with_formals
           ?cvalue_state ?arguments ~lib_entry entry_point with
   | `Bottom ->
-    Engine.Dom.Store.mark_as_computed ();
-    Self.(ComputationState.set Aborted);
-    Self.result "Eva not started because globals \
-                 initialization is not computable.";
-    Eval_annots.mark_invalid_initializers ()
+    Eval_annots.mark_invalid_initializers ();
+    Self.error "Eva not started because globals \
+                initialization is not computable.";
+    raise Error
   | `Value initial_state ->
     compute_from_init_state (module Engine) entry_point initial_state
 
@@ -213,7 +214,7 @@ let compute_from ?cvalue_state ?arguments entry_point =
     Engine.Dom.Store.mark_as_computed ();
     Self.(ComputationState.set Aborted);
     match exn with
-    | Self.Abort -> () (* do not re-raise Self.Abort *)
+    | Error | Self.Abort -> () (* do not re-raise  *)
     | exn -> raise exn
 
 let compute () =
@@ -256,5 +257,5 @@ let compute_thread thread cvalue_state =
     Engine.Dom.Store.mark_as_computed ();
     Self.(ComputationState.set Aborted);
     match exn with
-    | Self.Abort -> () (* do not reraise Self.Abort *)
+    | Error | Self.Abort -> () (* do not re-raise *)
     | exn -> raise exn

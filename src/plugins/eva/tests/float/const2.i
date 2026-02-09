@@ -1,3 +1,7 @@
+/* run.config*
+   EXIT: 1
+   STDOPT:
+*/
 float f1 = 1e-40f;
 float f2 = 1e40f;
 
