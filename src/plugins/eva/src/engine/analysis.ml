@@ -170,18 +170,13 @@ let compute_from_init_state (type t) (engine: t engine) kf (init_state: t) =
   let module Engine = (val engine) in
   let restore_signals = register_signal_handler () in
   let compute () =
-    let final_state = Engine.Compute.compute_main_call kf init_state in
-    Engine.Dom.Store.mark_as_computed ();
-    Self.(ComputationState.set Computed);
-    post_analysis ();
-    Engine.Dom.post_analysis final_state;
-    Summary.print ();
-    Statistics.export_as_csv ();
+    Engine.Compute.compute_main_call kf init_state
   in
   Fun.protect ~finally:restore_signals compute
 
-let compute_from_entry_point (module Engine: Engine_sig.S)
+let compute_from_entry_point  (type t) (engine: t engine)
     ?cvalue_state ?arguments entry_point =
+  let module Engine = (val engine) in
   let lib_entry = Kernel.LibEntry.get () in
   Self.feedback "Analyzing a%scomplete application starting at %a"
     (if lib_entry then "n in" else " ")
@@ -206,10 +201,14 @@ let compute_from ?cvalue_state ?arguments entry_point =
   let module Engine = (val Engine.current ()) in
   try
     Self.ComputationState.set Computing;
-    compute_from_entry_point (module Engine)
-      ?cvalue_state ?arguments entry_point;
+    let final_state = compute_from_entry_point (module Engine)
+        ?cvalue_state ?arguments entry_point in
     Engine.Dom.Store.mark_as_computed ();
-    Self.ComputationState.set Computed;
+    Self.(ComputationState.set Computed);
+    post_analysis ();
+    Engine.Dom.post_analysis final_state;
+    Summary.print ();
+    Statistics.export_as_csv ();
   with exn ->
     Engine.Dom.Store.mark_as_computed ();
     Self.(ComputationState.set Aborted);
@@ -248,14 +247,23 @@ let compute_thread thread cvalue_state =
   let arguments = List.map snd arguments in
   let module Engine = (val Engine.current ()) in
   try
+    (* In multi thread analyses, Memexec cache must be invalidated *)
+    Mem_exec.cleanup_results ();
     Self.ComputationState.set Computing;
-    compute_from_entry_point (module Engine)
-      ~cvalue_state ~arguments entry_point;
+    let final_state = compute_from_entry_point (module Engine)
+        ~cvalue_state ~arguments entry_point in
     Engine.Dom.Store.mark_as_computed ();
     Self.ComputationState.set Computed;
+    (* Display the final state of each thread main function *)
+    Engine.Dom.post_analysis final_state
   with exn ->
     Engine.Dom.Store.mark_as_computed ();
     Self.(ComputationState.set Aborted);
     match exn with
     | Error | Self.Abort -> () (* do not re-raise *)
     | exn -> raise exn
+
+let mthread_post_analysis () =
+  post_analysis ();
+  Summary.print ();
+  Statistics.export_as_csv ();

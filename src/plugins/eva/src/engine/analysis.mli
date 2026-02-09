@@ -101,3 +101,5 @@ val save_results: Cil_types.kernel_function -> bool
     programs will be directly computed inside Eva's engine. *)
 
 val compute_thread : Thread.t -> Cvalue_callbacks.state -> unit
+
+val mthread_post_analysis: unit -> unit

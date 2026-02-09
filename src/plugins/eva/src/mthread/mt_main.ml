@@ -158,6 +158,7 @@ let mthread_run project =
 
     (* We perform the analysis iterations *)
     Mt_analysis_fixpoint.reach_fixpoint analysis;
+    Analysis.mthread_post_analysis ();
 
     (* In the cfgs, mark whether the accesses are concurrent or not,
        and remove superfluous node *)
