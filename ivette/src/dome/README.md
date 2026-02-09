@@ -7,7 +7,7 @@ The proposed framework is based on **React** [1] and **Electron** [2].
 
 We strongly recommend to use **Yarn** [3] for installing the
 necessary **Node** packages and their dependencies. Both shall be installed
-with decently recent versions (`yarn -v 1.5.*` and `node -v 8.*`).
+with decently recent versions (`yarn -v 1.5.*` and `node -v 22.*`).
 
 Then, prepare a directory for developing your application, and download
 the Dome Application Framework into sub-directory `dome`.

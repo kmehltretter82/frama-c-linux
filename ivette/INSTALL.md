@@ -1,7 +1,7 @@
 # Dependencies
 
 Required package to be installed:
-- `node` version 20.x or 22.x;
+- `node` version 22.x or later;
 - `yarn` for node package management;
 - `pandoc` for generating the documentation.
 

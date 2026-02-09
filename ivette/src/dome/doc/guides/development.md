@@ -13,9 +13,9 @@ framework.
 The Web environment for designing your application is based on the following
 framework:
 
-- **Electron** [v5.0+](https://electronjs.org) runtime environment (packaging Chrome and Node)
-- **Node** [v12.0+](https://nodejs.org/dist/latest-v12.x/docs/api) provided by Electron
-- **Chromium** [v73.0+](https://www.chromium.org/Home) HTML rendering engine provided by Electron
+- [**Electron**](https://electronjs.org) runtime environment (packaging Chrome and Node)
+- [**Node**](https://nodejs.org/dist/latest-v12.x/docs/api) provided by Electron
+- [**Chromium**](https://www.chromium.org/Home) HTML rendering engine provided by Electron
 
 You will write your application in a an environment setup with the following
 JavaScript features:
