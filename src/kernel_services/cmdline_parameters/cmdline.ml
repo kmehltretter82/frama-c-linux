@@ -274,13 +274,13 @@ let all_options = match Array.to_list Sys.argv with
   | _binary :: l ->
     let all =
       match Sys.getenv_opt "FRAMAC_DEVONLY_OPTIONS_PRE" with
-      | Some s -> String.split_on_char ' ' s @ l
-      | None -> l
+      | Some s when s <> "" -> String.split_on_char ' ' s @ l
+      | _ -> l
     in
     let all =
       match Sys.getenv_opt "FRAMAC_DEVONLY_OPTIONS_POST" with
-      | Some s -> all @ String.split_on_char ' ' s
-      | None -> all
+      | Some s when s <> "" -> all @ String.split_on_char ' ' s
+      | _ -> all
     in
     all
 
