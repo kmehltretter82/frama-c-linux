@@ -197,6 +197,9 @@ Options taking a string as argument should preferably be written
 -copy               always perform a copy of the original AST before analysis
                     begin (opposite option is -no-copy)
 -debug <n>          general level of debug
+-debug-interpreted-automata  outputs each interpreted automata built into a
+                    dot file (opposite option is
+                    -no-debug-interpreted-automata)
 -deterministic      undocumented
 -dump-dependencies <s>  undocumented
 -keep-temp-files    Keep temporary intermediate files (opposite option is
