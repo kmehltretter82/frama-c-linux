@@ -33,7 +33,7 @@ let warn_pure_exp f e =
   let loc = e.eloc in
   Kernel.warning ~source:(fst loc)
     "[SH]: function %s, pure expression %a is dropped"
-    f (Printer.pp_exp) e
+    f (Cil_printer.pp_exp) e
 ;;
 
 Cabs2cil.register_ignore_pure_exp_hook warn_pure_exp;;
@@ -68,7 +68,7 @@ let warn_drop_effect olde e =
   Kernel.warning ~source:(fst e.eloc)
     "[SH]: dropping side effect in sizeof: %a is converted to %a"
     Cprint.print_expression olde
-    Printer.pp_exp e
+    Cil_printer.pp_exp e
 ;;
 
 Cabs2cil.register_ignore_side_effect_hook warn_drop_effect

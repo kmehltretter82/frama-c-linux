@@ -387,7 +387,7 @@ module LogicMerging =
           in
           aux li1.l_profile li2.l_profile
       let merge_synonym _ = true
-      let output = Cil_datatype.Logic_info.pretty
+      let output = Cil_printer.pp_logic_info
     end)
 
 let hash_list f l =
@@ -681,13 +681,13 @@ let mergeSpec vi_ref vi_disc spec =
         let my_vars = Cil.getFormalsDecl vi_disc in
         let to_rename = Cil.getFormalsDecl vi_ref in
         Kernel.debug ~dkey:Kernel.dkey_linker "Renaming arguments: %a -> %a"
-          (Pretty_utils.pp_list ~sep:",@ " Cil_datatype.Varinfo.pretty)
+          (Pretty_utils.pp_list ~sep:",@ " Cil_printer.pp_varinfo)
           my_vars
-          (Pretty_utils.pp_list ~sep:",@ " Cil_datatype.Varinfo.pretty)
+          (Pretty_utils.pp_list ~sep:",@ " Cil_printer.pp_varinfo)
           to_rename;
         let alpha = Cil.create_alpha_renaming my_vars to_rename in
         Kernel.debug ~dkey:Kernel.dkey_linker
-          "Renaming spec of function %a" Cil_datatype.Varinfo.pretty vi_disc;
+          "Renaming spec of function %a" Cil_printer.pp_varinfo vi_disc;
         Kernel.debug  ~dkey:Kernel.dkey_linker
           "original spec is %a" Cil_printer.pp_funspec spec;
         try
@@ -972,7 +972,7 @@ let checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f1 f2 =
     with Not_found ->
       Kernel.fatal
         "field offset not found in table: %a or %a"
-        Printer.pp_field f1 Printer.pp_field f2
+        Cil_printer.pp_field f1 Cil_printer.pp_field f2
 
 module Fidx: sig
   val get_oldfidx : unit -> int
@@ -1099,10 +1099,10 @@ let matchCompInfoGen (combineF : combineFunction)
                      (Failure
                         (let attrs = drop_attributes_for_merge ci.cattr in
                          let oldattrs = drop_attributes_for_merge oldci.cattr in
-                         (* we do not use Cil_datatype.Attributes.pretty because it
+                         (* we do not use Cil_printer.pp_attributes because it
                             may not print some relevant attributes *)
                          let pp_attrs =
-                           Pretty_utils.pp_list ~sep:", " Printer.pp_attribute
+                           Pretty_utils.pp_list ~sep:", " Cil_printer.pp_attribute
                          in
                          Format.asprintf
                            "different/incompatible composite type attributes: \
@@ -1687,7 +1687,7 @@ let oneFilePass1 (f:file) : unit =
              this non-weak definition. @ \
              Please exchange command-line arguments to put '%a' \
              before '%a'.@."
-            Printer.pp_location oldvi.vdecl
+            Cil_printer.pp_location oldvi.vdecl
             Filepath.pretty newpath Filepath.pretty oldpath
         end;
       newrep.ndata.vattr <- Ast_attributes.add_list oldvi.vattr vi.vattr;

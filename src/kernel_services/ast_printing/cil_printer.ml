@@ -3474,3 +3474,5 @@ let () = Cil.pp_identified_term_ref := pp_identified_term
 let () = Cil.pp_location_ref := pp_location
 let () = Cil.pp_from_ref := pp_from
 let () = Cil.pp_behavior_ref := pp_behavior
+let () = Cil.pp_block_ref := pp_block
+let () = Cil.pp_varinfo_ref := pp_varinfo

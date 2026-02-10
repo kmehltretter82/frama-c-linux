@@ -29,7 +29,6 @@ let valid_sid = false
 (* All statements generated here must have an invalid sid. Use this variable
    for the valid_sid label of Cil.mkStmt*. *)
 open Cil_types
-open Cil_datatype
 open Cil_const
 
 (* Maps the start and end positions of a function declaration or definition
@@ -1024,7 +1023,7 @@ let newAlphaName
           "redefinition of '%s'%s in the same scope.@ \
            Previous declaration was at %a"
           origname (if is_same_kind kind info then "" else " with different kind")
-          Cil_datatype.Location.pretty oldloc
+          Cil_printer.pp_location oldloc
     with
     | Not_found -> () (* no clash of identifiers *)
     | Failure _ ->
@@ -1337,7 +1336,7 @@ let fail_if_incompatible_sizeof ~ensure_complete op typ =
       (Machdep.allowed_machdep "GCC/MSVC");
   if ensure_complete && not (Cil.isCompleteType typ) && not is_void then
     Kernel.abort ~current:true
-      "%s on incomplete type '%a'" op Cil_datatype.Typ.pretty typ
+      "%s on incomplete type '%a'" op Cil_printer.pp_typ typ
 
 (******** CASTS *********)
 
@@ -1355,7 +1354,7 @@ let dropQualifiers = Ast_types.remove_qualifiers
 let checkBool (ot : typ) (_ : exp) =
   if not (Ast_types.is_scalar ot) then
     Errorloc.abort_context "cannot cast expr of type %a into a boolean value"
-      Cil_datatype.Typ.pretty ot
+      Cil_printer.pp_typ ot
 
 (* Evaluate constants to CTrue (non-zero) or CFalse (zero) *)
 let rec isConstTrueFalse c: [ `CTrue | `CFalse ] =
@@ -1602,7 +1601,7 @@ struct
           let first_stmt =
             (fun (s,_,_,_,_) -> s) (List.last stmts) in
           Kernel.warning ~wkey:Kernel.wkey_cert_exp_10
-            ~source:(fst (Stmt.loc first_stmt))
+            ~source:(fst (Cil_datatype.Stmt.loc first_stmt))
             "Potential unsequenced side-effects"
         end;
         let b =
@@ -1629,7 +1628,7 @@ struct
           let first_stmt =
             (fun (s,_,_,_,_) -> s) (List.last c.stmts) in
           Kernel.warning ~wkey:Kernel.wkey_cert_exp_10
-            ~source:(fst (Stmt.loc first_stmt))
+            ~source:(fst (Cil_datatype.Stmt.loc first_stmt))
             "Potential unsequenced side-effects" end;
         let kind = UnspecifiedSequence (List.rev c.stmts) in
         if c.locals <> [] || c.statics <> [] then begin
@@ -1645,7 +1644,7 @@ struct
 
   let merge_effects (m1,w1,r1,c1) (m2,w2,r2,c2) =
     let add_uniq l x =
-      if List.exists (Lval.equal x) l then l else x::l
+      if List.exists (Cil_datatype.Lval.equal x) l then l else x::l
     in
     List.fold_left add_uniq m1 m2,
     List.fold_left add_uniq w1 w2,
@@ -1852,7 +1851,7 @@ struct
       "Removing %a from chunk@\n%a@."
       Cil_printer.pp_lval lv d_chunk c;
     let remove_list =
-      List.filter (fun x -> not (LvalStructEq.equal lv x))
+      List.filter (fun x -> not (Cil_datatype.LvalStructEq.equal lv x))
     in
     let remove_from_reads =
       List.map (fun (s,m,w,r,c) -> (s,lv::m,w,remove_list r,c)) in
@@ -2104,7 +2103,7 @@ struct
            Kernel.feedback ~once:true ~source:(fst e.eloc)
              "Case label %a exceeds range of %a for switch expression. \
               Nothing to worry."
-             Cil_printer.pp_exp e Cil_datatype.Typ.pretty t;
+             Cil_printer.pp_exp e Cil_printer.pp_typ t;
          | _ -> ()
         );
         Case (e', loc)
@@ -2472,7 +2471,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
       if oldvi.vghost <> vi.vghost then
         Errorloc.abort_context "Inconsistent ghost specification for %s.@ \
                                 Previous declaration was at: %a"
-          vi.vname Cil_datatype.Location.pretty oldloc ;
+          vi.vname Cil_printer.pp_location oldloc ;
 
       Kernel.debug ~dkey:Kernel.dkey_typing_global
         "  %s(%d) already in the env at loc %a"
@@ -2609,8 +2608,8 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                     Errorloc.abort_context
                       "Function %a redeclared with incompatible ghost status \
                        in formals (original declaration was at %a)"
-                      Cil_datatype.Varinfo.pretty vi
-                      Cil_datatype.Location.pretty oldloc
+                      Cil_printer.pp_varinfo vi
+                      Cil_printer.pp_location oldloc
                   else if name <> "" then begin
                     Kernel.debug ~dkey:Kernel.dkey_typing_global
                       "replacing formal %s with %s" old.vname name;
@@ -2741,13 +2740,13 @@ let conditionalConversion (t2: typ) (t3: typ) : typ =
         try combineTypes CombineOther t2' t3'
         with Cannot_combine msg -> begin
             Kernel.warning ~current:true "A.QUESTION: %a does not match %a (%s)"
-              Cil_datatype.Typ.pretty t2' Cil_datatype.Typ.pretty t3' msg;
+              Cil_printer.pp_typ t2' Cil_printer.pp_typ t3' msg;
             t2 (* Just pick one *)
           end
       end
     | _, _ ->
       Errorloc.abort_context "invalid implicit conversion from %a to %a"
-        Cil_datatype.Typ.pretty t2 Cil_datatype.Typ.pretty t3
+        Cil_printer.pp_typ t2 Cil_printer.pp_typ t3
   in
   tresult
 
@@ -2755,7 +2754,7 @@ let logicConditionalConversion t1 t2 =
   match Ast_types.unroll_node t1, Ast_types.unroll_node t2 with
   | TPtr _ , TInt _ | TInt _, TPtr _ ->
     Errorloc.abort_context "invalid implicit conversion from %a to %a"
-      Cil_datatype.Typ.pretty t2 Cil_datatype.Typ.pretty t1
+      Cil_printer.pp_typ t2 Cil_printer.pp_typ t1
   | _ -> conditionalConversion t1 t2
 
 (* Some utilities for doing initializers *)
@@ -2933,18 +2932,18 @@ let rec collectInitializer
   let loc = Current_loc.get() in
   if this = NoInitPre then begin
     Kernel.debug ~dkey "zero-initializing object of type %a"
-      Cil_datatype.Typ.pretty thistype;
+      Cil_printer.pp_typ thistype;
     (makeZeroInit ~loc thistype), thistype, reads
   end else
     match Ast_types.unroll thistype, this with
     | _ , SinglePre (e, r) ->
       Kernel.debug ~dkey "Initializing object of type %a to %a"
-        Cil_datatype.Typ.pretty thistype Cil_printer.pp_exp e;
+        Cil_printer.pp_typ thistype Cil_printer.pp_exp e;
       SingleInit e, thistype, Cil_datatype.Lval.Set.union r reads
     | { tnode = TArray (bt, leno); tattr }, CompoundPre (pMaxIdx, pArray) ->
       Kernel.debug ~dkey
         "Initialization of an array object of type %a with index max %d"
-        Cil_datatype.Typ.pretty thistype !pMaxIdx;
+        Cil_printer.pp_typ thistype !pMaxIdx;
       let len, initializer_len_used =
         (* normal case: use array's declared length, newtype=thistype *)
         match leno with
@@ -3017,7 +3016,7 @@ let rec collectInitializer
                a non-empty initializer (len > 0) *)
             Kernel.debug ~dkey
               "Detected initialization of a flexible array member \
-               (length %d, parenttype %a)" len Cil_datatype.Typ.pretty parenttype;
+               (length %d, parenttype %a)" len Cil_printer.pp_typ parenttype;
             Kernel.error ~once:true ~current:true
               "static initialization of flexible array members is an \
                unsupported GNU extension";
@@ -3044,7 +3043,7 @@ let rec collectInitializer
       CompoundPre (pMaxIdx, pArray) when comp.cstruct ->
       Kernel.debug ~dkey
         "Initialization of an object of type %a with at least %d components"
-        Cil_datatype.Typ.pretty thistype !pMaxIdx;
+        Cil_printer.pp_typ thistype !pMaxIdx;
       let rec collect (idx: int) reads = function
           [] -> [], reads
         | [ _ ] when Cil.has_flexible_array_member t && idx > !pMaxIdx ->
@@ -3072,7 +3071,7 @@ let rec collectInitializer
     | { tnode = TComp comp }, CompoundPre (pMaxIdx, pArray) when not comp.cstruct ->
       Kernel.debug ~dkey
         "Initialization of an object of type %a with at least %d components"
-        Cil_datatype.Typ.pretty thistype !pMaxIdx;
+        Cil_printer.pp_typ thistype !pMaxIdx;
       (* Find the field to initialize *)
       let rec findField (idx: int) = function
         | [] ->
@@ -3467,7 +3466,7 @@ let integral_cast ty t =
   raise
     (Failure
        (Format.asprintf "term %a has type %a, but %a is expected"
-          Cil_printer.pp_term t Cil_printer.pp_logic_type Linteger Cil_datatype.Typ.pretty ty))
+          Cil_printer.pp_term t Cil_printer.pp_logic_type Linteger Cil_printer.pp_typ ty))
 
 (* Exception raised by the instance of Logic_typing local to this module.
    See document of [error] below. *)
@@ -3606,7 +3605,7 @@ let continueUsed () =
 
 
 type local_env =
-  { authorized_reads: Lval.Set.t;
+  { authorized_reads: Cil_datatype.Lval.Set.t;
     known_behaviors: string list;
     is_ghost: bool;
     is_paren: bool; (* true for expressions whose parent is Cabs.PAREN *)
@@ -3616,7 +3615,7 @@ type local_env =
   }
 
 let empty_local_env =
-  { authorized_reads = Lval.Set.empty;
+  { authorized_reads = Cil_datatype.Lval.Set.empty;
     known_behaviors = [];
     is_ghost = false;
     is_paren = false;
@@ -3647,14 +3646,14 @@ let rec compute_from_root f = function
   (* We have a label, perhaps we can jump here *)
   | s :: rest when s.labels <> [] ->
     Kernel.debug ~level:4 "computeFromRoot call f from stmt %a"
-      Cil_printer.pp_location (Stmt.loc s);
+      Cil_printer.pp_location (Cil_datatype.Stmt.loc s);
     f (s :: rest)
 
   | _ :: rest -> compute_from_root f rest
 
 let rec stmtFallsThrough (s: stmt) : bool =
   Kernel.debug ~level:4 "stmtFallsThrough stmt %a"
-    Cil_printer.pp_location (Stmt.loc s);
+    Cil_printer.pp_location (Cil_datatype.Stmt.loc s);
   match s.skind with
   | Instr il -> Cil.instr_falls_through il
   | UnspecifiedSequence seq ->
@@ -3704,7 +3703,7 @@ and blockFallsThrough b =
 (* will we leave this statement or block with a break command? *)
 and stmtCanBreak (s: stmt) : bool =
   Kernel.debug ~level:4 "stmtCanBreak stmt %a"
-    Cil_printer.pp_location (Stmt.loc s);
+    Cil_printer.pp_location (Cil_datatype.Stmt.loc s);
   match s.skind with
   | Instr _ | Return _ | Continue _ | Goto _ | Throw _ -> false
   | Break _ -> true
@@ -3728,7 +3727,7 @@ and blockCanBreak b =
       [] -> false
     | s::tl ->
       Kernel.debug ~level:4 "blockCanBreak from stmt %a"
-        Cil_printer.pp_location (Stmt.loc s);
+        Cil_printer.pp_location (Cil_datatype.Stmt.loc s);
       stmtCanBreak s ||
       (if stmtFallsThrough s then aux tl
        else compute_from_root aux tl)
@@ -3940,7 +3939,7 @@ let checkTypedefSize name typ =
         Kernel.warning ~current:true
           "bad type '%a' (%d bits) for typedef '%s' using machdep %s;@ \
            check for mismatch between -machdep flag and headers used"
-          Typ.pretty typ size name (Machine.machdep_name ())
+          Cil_printer.pp_typ typ size name (Machine.machdep_name ())
     with
     (* Not a standard integer type, ignore it. *)
       Not_found -> ()
@@ -4517,7 +4516,7 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
       let loc = a.expr_loc in
       match a.expr_node with
       | Cabs.VARIABLE n ->
-        let n' = if check then check_attribute_name n else n in
+          let n' = if check then check_attribute_name n else n in
         ACons(n', [])
       | Cabs.CONSTANT (Cabs.CONST_STRING s) -> AStr s
       | Cabs.CONSTANT (Cabs.CONST_INT str) -> begin
@@ -4714,11 +4713,11 @@ and doType (ghost:bool) (context: type_context)
       if Ast_types.is_fun bt then
         Kernel.error ~once:true ~current:true
           "declaration of array of function type '%a`"
-          Cil_datatype.Typ.pretty bt
+          Cil_printer.pp_typ bt
       else if not (Cil.isCompleteType ~allowZeroSizeArrays:true bt) then
         Kernel.error ~once:true ~current:true
           "declaration of array of incomplete type '%a`"
-          Cil_datatype.Typ.pretty bt
+          Cil_printer.pp_typ bt
       else if not allowZeroSizeArrays &&
               not (Cil.isCompleteType ~allowZeroSizeArrays:false bt)
       then
@@ -4728,12 +4727,12 @@ and doType (ghost:bool) (context: type_context)
           Kernel.warning ~once:true ~current:true
             "declaration of array of 'zero-length arrays' ('%a`);@ \
              zero-length arrays are a compiler extension"
-            Cil_datatype.Typ.pretty bt
+            !Cil.pp_typ_ref bt
         else
           Kernel.error ~once:true ~current:true
             "declaration of array of 'zero-length arrays' ('%a`);@ \
              zero-length arrays are not allowed in C99"
-            Cil_datatype.Typ.pretty bt;
+            !Cil.pp_typ_ref bt;
       let lo =
         match len.expr_node with
         | Cabs.NOTHING -> None
@@ -5111,12 +5110,12 @@ and makeCompType loc ghost (isstruct: bool)
             Kernel.error ~source
               "flexible array member '%s' (type %a) \
                not allowed in otherwise empty struct"
-              n Cil_datatype.Typ.pretty ftype
+              n Cil_printer.pp_typ ftype
           else (* valid flexible array member *) ()
         else
           Kernel.error ~source
             "field '%s' is declared with incomplete type '%a'"
-            n Cil_datatype.Typ.pretty ftype
+            n Cil_printer.pp_typ ftype
       end;
       let fbitfield, ftype =
         match widtho with
@@ -5141,11 +5140,11 @@ and makeCompType loc ghost (isstruct: bool)
                   if s > Cil.bitsSizeOf ftype then
                     Kernel.error ~source
                       "bitfield width (%d) exceeds its type (%a, %d bits)"
-                      s Cil_datatype.Typ.pretty ftype (Cil.bitsSizeOf ftype)
+                      s Cil_printer.pp_typ ftype (Cil.bitsSizeOf ftype)
                 with
                   SizeOfError _ ->
                   Kernel.fatal ~source
-                    "Unable to compute size of %a" Cil_datatype.Typ.pretty ftype
+                    "Unable to compute size of %a" Cil_printer.pp_typ ftype
               end;
               let ftype =
                 Ast_types.add_attributes
@@ -5251,7 +5250,7 @@ and makeCompType loc ghost (isstruct: bool)
       Kernel.error ~source
         "field %s occurs multiple times in aggregate %a. \
          Previous occurrence is at line %d."
-        f.fname Cil_datatype.Typ.pretty (mk_tcomp comp)
+        f.fname Cil_printer.pp_typ (mk_tcomp comp)
         (fst oldf.floc).Filepath.pos_lnum
     with Not_found ->
       (* Do not add unnamed bitfields: they can share the empty name. *)
@@ -5442,7 +5441,7 @@ and doExp local_env
            +++
            (mkStmtOneInstr ~ghost ~valid_sid (Set(lv, e'', Current_loc.get ())),
             writes,writes,
-            List.filter (fun x -> not (LvalStructEq.equal x lv)) r @ reads),
+            List.filter (fun x -> not (Cil_datatype.LvalStructEq.equal x lv)) r @ reads),
            e'', t'')
 
       end
@@ -5479,7 +5478,7 @@ and doExp local_env
                    no read/write interference is possible. *)
                 Ast_types.is_array vi.vtype ||
                 Ast_types.is_fun vi.vtype ||
-                Lval.Set.mem lval local_env.authorized_reads
+                Cil_datatype.Lval.Set.mem lval local_env.authorized_reads
               then []
               else [ lval ]
             in
@@ -5492,10 +5491,10 @@ and doExp local_env
               (new_exp ~loc (Lval lval)) (dropQualifiers vi.vtype)
           | EnvEnum item, _ ->
             let typ = Cil.typeOf item.eival in
-            finishExp []
-              (unspecified_chunk empty)
-              (new_exp ~loc (Const (CEnum item)))
-              typ
+              finishExp []
+                (unspecified_chunk empty)
+                (new_exp ~loc (Const (CEnum item)))
+                typ
           | _ -> raise Not_found
         with Not_found -> begin
             if isOldStyleVarArgName n then
@@ -5530,7 +5529,7 @@ and doExp local_env
               "Expecting exactly one pointer type in array access %a[%a] (%a \
                and %a)"
               Cil_printer.pp_exp e1' Cil_printer.pp_exp e2'
-              Cil_datatype.Typ.pretty t1 Cil_datatype.Typ.pretty t2
+              Cil_printer.pp_typ t1 Cil_printer.pp_typ t2
         in
         (* We have to distinguish the construction based on the type of e1'' *)
         let res =
@@ -5545,7 +5544,7 @@ and doExp local_env
         (* Do some optimization of StartOf *)
         let reads =
           let l = r1 @ r2 in
-          if Lval.Set.mem res local_env.authorized_reads
+          if Cil_datatype.Lval.Set.mem res local_env.authorized_reads
           then l
           else res :: l
         in
@@ -5563,11 +5562,11 @@ and doExp local_env
         | _ ->
           Errorloc.abort_context
             "attempted to dereference an expression of non-pointer type %a"
-            Cil_datatype.Typ.pretty t
+            Cil_printer.pp_typ t
       in
       let res = mkMem ~addr:e' ~off:NoOffset in
       let reads =
-        if Lval.Set.mem res local_env.authorized_reads
+        if Cil_datatype.Lval.Set.mem res local_env.authorized_reads
         then r
         else res :: r
       in
@@ -5591,7 +5590,7 @@ and doExp local_env
       in
       (* We're not reading the whole lval, just a chunk of it. *)
       let r =
-        List.filter (fun x -> not (Lval.equal x lv)) r
+        List.filter (fun x -> not (Cil_datatype.Lval.equal x lv)) r
       in
       let field_offset =
         match Ast_types.unroll_node t' with
@@ -5602,7 +5601,7 @@ and doExp local_env
       let lv' = addOffsetLval field_offset lv in
       let field_type = typeOfLval lv' in
       let reads =
-        if Lval.Set.mem lv' local_env.authorized_reads
+        if Cil_datatype.Lval.Set.mem lv' local_env.authorized_reads
         then r
         else lv':: r
       in
@@ -5626,12 +5625,12 @@ and doExp local_env
         | t ->
           Errorloc.abort_context
             "expecting a struct with field %s. Found %a. t1 is %a"
-            str Cil_datatype.Typ.pretty t Cil_datatype.Typ.pretty t'
+            str Cil_printer.pp_typ t Cil_printer.pp_typ t'
       in
       let lv' = mkMem ~addr:e' ~off:field_offset in
       let field_type = typeOfLval lv' in
       let reads =
-        if Lval.Set.mem lv' local_env.authorized_reads
+        if Cil_datatype.Lval.Set.mem lv' local_env.authorized_reads
         then r
         else lv' :: r
       in
@@ -5794,7 +5793,7 @@ and doExp local_env
       let typ = doOnlyType loc local_env.is_ghost specs dt in
       if not (Cil.isCompleteType typ) then
         Kernel.error ~current:true "__builtin_va_arg on incomplete type '%a'"
-          Cil_datatype.Typ.pretty typ;
+          Cil_printer.pp_typ typ;
       let res = new_exp ~loc (SizeOf typ) in
       finishExp [] (unspecified_chunk empty) res (Machine.sizeof_type ())
     (* End of special casts. *)
@@ -5991,7 +5990,7 @@ and doExp local_env
               in
               let reads =
                 match r with
-                | x' :: r when LvalStructEq.equal x x' -> r
+                | x' :: r when Cil_datatype.LvalStructEq.equal x x' -> r
                 | _ -> r
               in
               finishExp reads se (mkAddrOfAndMark loc x) (mk_tptr tres)
@@ -6024,7 +6023,7 @@ and doExp local_env
             let lv = get_lval_compound_assigned "++ or --" e' in
             let se' = remove_reads lv se in
             let r' =
-              List.filter (fun x -> not (Lval.equal x lv)) r
+              List.filter (fun x -> not (Cil_datatype.Lval.equal x lv)) r
             in
             let tresult, result =
               doBinOp loc uop' e' (one ~loc:e'.eloc)
@@ -6058,7 +6057,7 @@ and doExp local_env
             let lv = get_lval_compound_assigned "++ or --" e' in
             let se' = remove_reads lv se in
             let r' =
-              List.filter (fun x -> not (Lval.equal x lv)) r
+              List.filter (fun x -> not (Cil_datatype.Lval.equal x lv)) r
             in
             let tresult, opresult = doBinOp loc uop' e' (one ~loc:e'.eloc) in
             let reads, se', result =
@@ -6126,11 +6125,11 @@ and doExp local_env
                   Cil_printer.pp_exp e1'
             in
             let se1' = remove_reads lv se1 in
-            let r1' = List.filter (fun x -> not (Lval.equal x lv)) r1 in
+            let r1' = List.filter (fun x -> not (Cil_datatype.Lval.equal x lv)) r1 in
             let local_env =
               { local_env with
                 authorized_reads =
-                  Lval.Set.add lv local_env.authorized_reads }
+                  Cil_datatype.Lval.Set.add lv local_env.authorized_reads }
             in
             (*[BM]: is this useful?
               let (_, _, _) = doExp ghost false e2 (ASet(lv, lvt)) in*)
@@ -6223,11 +6222,11 @@ and doExp local_env
             let (r1,se1, e1', t1) = doExp local_env CNoConst e (AExp None) in
             let lv1 = get_lval_compound_assigned "assignment with arith" e1' in
             let se1' = remove_reads lv1 se1 in
-            let r1' = List.filter (fun x -> not (Lval.equal x lv1)) r1 in
+            let r1' = List.filter (fun x -> not (Cil_datatype.Lval.equal x lv1)) r1 in
             let local_env =
               { local_env with
                 authorized_reads =
-                  Lval.Set.add lv1 local_env.authorized_reads }
+                  Cil_datatype.Lval.Set.add lv1 local_env.authorized_reads }
             in
             let (r2, se2, e2', _t2) = doExp local_env CNoConst e2 (AExp None) in
             let se2 = remove_reads lv1 se2 in
@@ -6404,7 +6403,7 @@ and doExp local_env
               in
               let vi, _ = lookupVar ghost n in
               let reads =
-                if Lval.Set.mem
+                if Cil_datatype.Lval.Set.mem
                     (var vi) local_env.authorized_reads
                    ||
                    (vi.vglob && Ast_types.is_fun vi.vtype)
@@ -6462,12 +6461,12 @@ and doExp local_env
             | x ->
               Errorloc.abort_context
                 "Unexpected type of the called function %a: %a"
-                Cil_printer.pp_exp f' Cil_datatype.Typ.pretty x
+                Cil_printer.pp_exp f' Cil_printer.pp_typ x
           end
         | x ->
           Errorloc.abort_context
             "Unexpected type of the called function %a: %a"
-            Cil_printer.pp_exp f' Cil_datatype.Typ.pretty x
+            Cil_printer.pp_exp f' Cil_printer.pp_typ x
       in
       let argTypesList = argsToList argTypes in
       (* Drop certain qualifiers from the result type *)
@@ -6527,7 +6526,7 @@ and doExp local_env
              if a'' = a', no check needs to be done (no cast was introduced).
              Note: this check is conservative (it may not emit warnings when
              it should), and compilers can often detect more errors. *)
-          if not (Exp.equal a' a'') &&
+          if not (Cil_datatype.Exp.equal a' a'') &&
              match Ast_types.is_arithmetic texpected, Ast_types.is_arithmetic att with
              | true, true -> (* never a problem *) false
              | true, false -> true
@@ -6544,8 +6543,8 @@ and doExp local_env
                let ok1 =
                  (* accept literal strings even when expecting non-const char*;
                     equivalent to GCC's default behavior (-Wno-write-strings) *)
-                 (Typ.equal (Ast_types.unroll texpected) charPtrType &&
-                  Typ.equal (Ast_types.unroll att) charConstPtrType) ||
+                 (Cil_datatype.Typ.equal (Ast_types.unroll texpected) charPtrType &&
+                  Cil_datatype.Typ.equal (Ast_types.unroll att) charConstPtrType) ||
                  (* all pointers are convertible to void* *)
                  (Ast_types.is_void_ptr texpected && Ast_types.is_ptr att) ||
                  (* allow implicit void* -> char* conversion *)
@@ -6572,8 +6571,8 @@ and doExp local_env
                    Kernel.warning ~wkey:Kernel.wkey_implicit_conv_void_ptr
                      ~current:true ~once:true
                      "implicit conversion from %a to %a"
-                     Cil_datatype.Typ.pretty voidPtrType
-                     Cil_datatype.Typ.pretty texpected;
+                     Cil_printer.pp_typ voidPtrType
+                     Cil_printer.pp_typ texpected;
                    true
                  end else
                    false
@@ -6583,7 +6582,7 @@ and doExp local_env
             Kernel.warning ~wkey:Kernel.wkey_incompatible_types_call
               ~current:true ~once:true
               "expected '%a' but got argument of type '%a': %a"
-              Cil_datatype.Typ.pretty texpected Cil_datatype.Typ.pretty att
+              Cil_printer.pp_typ texpected Cil_printer.pp_typ att
               Cil_printer.pp_exp a';
           (ss @@@ (sa, ghost), a'' :: args')
 
@@ -6932,8 +6931,8 @@ and doExp local_env
                      pres := e;
                      Kernel.error ~once:true ~current:true
                        "Unable to compute offset %a in type %a: %s"
-                       Cil_datatype.Offset.pretty offset
-                       Cil_datatype.Typ.pretty typ
+                       Cil_printer.pp_offset offset
+                       Cil_printer.pp_typ typ
                        s;
                  end
                | _ ->
@@ -7430,15 +7429,15 @@ and doExp local_env
                 if not (Cil.isCompleteType t) then
                   Errorloc.abort_context
                     "generic association with incomplete type '%a'"
-                    Cil_datatype.Typ.pretty t
+                    Cil_printer.pp_typ t
                 else if (Ast_types.is_fun t) then
                   Errorloc.abort_context
                     "generic association with function type '%a'"
-                    Cil_datatype.Typ.pretty t
+                    Cil_printer.pp_typ t
                 else if (Cil.is_variably_modified_type t) then
                   Errorloc.abort_context
                     "generic association with variably modified type '%a'"
-                    Cil_datatype.Typ.pretty t
+                    Cil_printer.pp_typ t
                 else begin
                   (* Check if current type is compatible with one of the
                      previous associations. Note: this is quadratic in terms of
@@ -7577,14 +7576,14 @@ and doBinOp loc (bop: binop) (e1: exp) (e2: exp) =
   let t1 = Cil.typeOf e1
   and t2 = Cil.typeOf e2 in
   let bop, e1, e2 =
-    match bop with
-    | PlusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
+  match bop with
+  | PlusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
       PlusPI, e1, e2
     | PlusA when Ast_types.is_ptr t2 && Ast_types.is_integral t1 ->
       PlusPI, e2, e1
-    | MinusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
+  | MinusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
       MinusPI, e1, e2
-    | MinusA  when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
+  | MinusA when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
       MinusPP, e1, e2
     | _ -> bop, e1, e2
   in
@@ -7828,7 +7827,7 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
     in
     Kernel.debug ~dkey:Kernel.dkey_typing_init
       "Finished the initializer for %s@\n  init=%a@\n  typ=%a@\n  acc=%a@\n"
-      vi.vname Cil_printer.pp_init init Cil_datatype.Typ.pretty typ' d_chunk acc;
+      vi.vname Cil_printer.pp_init init Cil_printer.pp_typ typ' d_chunk acc;
     empty @@@ (acc, local_env.is_ghost), CInit init, typ'', reads
   in
   let array_error () =
@@ -7837,7 +7836,7 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
   in
   Kernel.debug ~dkey:Kernel.dkey_typing_init
     "@\nStarting a new initializer for %s : %a@\n"
-    vi.vname Cil_datatype.Typ.pretty vi.vtype;
+    vi.vname Cil_printer.pp_typ vi.vtype;
   if Ast_types.is_array vi.vtype then begin
     let telem, size = Ast_types.array_elem_type_and_size vi.vtype in
     let warn_if_bigger l =
@@ -7864,7 +7863,7 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
              in
              { vi.vtype with tnode = TArray(telem,Some size) }
          in
-         empty, StrInit (Str s), typ, Lval.Set.empty
+         empty, StrInit (Str s), typ, Cil_datatype.Lval.Set.empty
        | CONSTANT (CONST_WSTRING l) ->
          let sz = List.length l + 1 in
          warn_if_bigger sz;
@@ -7876,10 +7875,10 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
              in
              { vi.vtype with tnode = TArray(telem,Some size) }
          in
-         empty, StrInit (Wstr l), typ, Lval.Set.empty
+         empty, StrInit (Wstr l), typ, Cil_datatype.Lval.Set.empty
        | _ ->
          array_error ();
-         empty, (CInit (CompoundInit(vi.vtype,[]))), vi.vtype,Lval.Set.empty)
+         empty, (CInit (CompoundInit(vi.vtype,[]))), vi.vtype,Cil_datatype.Lval.Set.empty)
   end else normal_init vi inite
 
 (* Consume some initializers. This is used by both global and local variables
@@ -7931,7 +7930,7 @@ and doInit local_env asconst preinit so acc initl =
         preprocessCast expr_loc ghost specs dt (Cabs.COMPOUND_INIT ci)
       in
       let typ = doOnlyType expr_loc ghost s' dt' in
-      if Typ.equal
+      if Cil_datatype.Typ.equal
           (Cil.typeDeepDropAllAttributes typ)
           (Cil.typeDeepDropAllAttributes so.soTyp)
       then
@@ -8141,8 +8140,8 @@ and doInit local_env asconst preinit so acc initl =
     in
     let r = Cil_datatype.Lval.Set.of_list r in
     Kernel.debug ~dkey:Kernel.dkey_typing_init "oneinit'=%a, t'=%a, so.soTyp=%a"
-      Cil_printer.pp_exp oneinit' Cil_datatype.Typ.pretty t'
-      Cil_datatype.Typ.pretty so.soTyp;
+      Cil_printer.pp_exp oneinit' Cil_printer.pp_typ t'
+      Cil_printer.pp_typ so.soTyp;
     let init_expr =
       if Machine.insert_implicit_casts () then snd (castTo t' so.soTyp oneinit')
       else oneinit'
@@ -8200,11 +8199,11 @@ and doInit local_env asconst preinit so acc initl =
       | [] ->
         Errorloc.abort_context "Cannot find matching union field in cast"
       | fi :: _rest when
-          Typ.equal (Cil.typeDeepDropAllAttributes fi.ftype) t'noattr -> fi
+          Cil_datatype.Typ.equal (Cil.typeDeepDropAllAttributes fi.ftype) t'noattr -> fi
       | _ :: rest -> findField rest
     in
     (* If this is a cast from union X to union X *)
-    if Typ.equal t'noattr (Cil.typeDeepDropAllAttributes soTyp') then
+    if Cil_datatype.Typ.equal t'noattr (Cil.typeDeepDropAllAttributes soTyp') then
       doInit local_env asconst preinit so acc
         [(Cabs.NEXT_INIT, Cabs.SINGLE_INIT oneinit)]
     else
@@ -8262,7 +8261,7 @@ and doInit local_env asconst preinit so acc initl =
       with Not_found ->
         Errorloc.abort_context
           "scalar value (of type %a) initialized by compound initializer"
-          Cil_datatype.Typ.pretty soTyp'
+          Cil_printer.pp_typ soTyp'
     end
   (* We have a designator *)
   | _, (what, ie) :: restil when what != Cabs.NEXT_INIT ->
@@ -8380,7 +8379,7 @@ and doInit local_env asconst preinit so acc initl =
     expandRange (fun x -> x) what
   | _, (_what, _ie) :: _ ->
     Errorloc.abort_context "doInit: cases for t=%a"
-      Cil_datatype.Typ.pretty soTyp'
+      Cil_printer.pp_typ soTyp'
 
 
 (* Create and add to the file (if not already added) a global. Return the
@@ -9238,15 +9237,8 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
             Errorloc.abort_context
               "There is a definition already for %s \
                (previous definition was at %a)."
-              n Cil_datatype.Location.pretty loc));
+              n Cil_printer.pp_location loc));
       H.add alreadyDefined !currentFunctionFDEC.svar.vname idloc;
-
-
-          (*
-            ignore (E.log "makefunvar:%s@\n type=%a@\n vattr=%a@\n"
-            n Cil_datatype.Typ.pretty thisFunctionVI.vtype
-            d_attrlist thisFunctionVI.vattr);
-          *)
 
       (* makeGlobalVarinfo might have changed the type of the function
        * (when combining it with the type of the prototype). So get the
@@ -9305,9 +9297,6 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
           let args = Some (List.map (fun f -> (f.vname, f.vtype, f.vattr)) formals) in
           mk_tfun ~tattr:funta returnType args isvararg
         in
-
-        (*log "Funtype of %s: %a\n" n Cil_datatype.Typ.pretty ftype;*)
-
         (* Now fix the names of the formals in the type of the function
          * as well *)
         Cil.update_var_type !currentFunctionFDEC.svar ftype;
@@ -9631,13 +9620,13 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
               Kernel.error ~current:true
                 "redefinition of type '%s' in the same scope with conflicting type.@ \
                  Previous declaration was at %a"
-                n Cil_datatype.Location.pretty oldloc
+                n Cil_printer.pp_location oldloc
             in
             let warn_c11_redefinition () =
               Kernel.warning ~wkey:Kernel.wkey_c11 ~current:true
                 "redefinition of type '%s' in the same scope is only allowed \
                  in C11.@ Previous declaration was at %a" n
-                Cil_datatype.Location.pretty oldloc
+                Cil_printer.pp_location oldloc
             in
             (* Tested with GCC+Clang: redefinition of compatible types in same scope:
                - enums are NOT allowed, except if they refer to the exact same
@@ -9667,7 +9656,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                         warn_c11_redefinition ()
                     | _ -> (* because of the compatibility test, this should not happen *)
                       Kernel.fatal ~current:true "typeinfo.ttype (%a) should be TComp"
-                        Cil_datatype.Typ.pretty typeinfo.ttype
+                        Cil_printer.pp_typ typeinfo.ttype
                   end
                 | TEnum newei -> (* GCC/Clang: "conflicting types" *)
                   let t = Ast_types.unroll typeinfo.ttype in
@@ -9681,7 +9670,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                    | _ ->
                      Kernel.fatal
                        ~current:true "typeinfo.ttype (%a) should be an Enum"
-                       Cil_datatype.Typ.pretty t)
+                       Cil_printer.pp_typ t)
                 | TInt _ ->
                   let t = Ast_types.unroll typeinfo.ttype in
                   (match t.tnode with
@@ -9690,7 +9679,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                    | _ ->
                      Kernel.fatal
                        ~current:true "typeinfo.ttype (%a) should be an int"
-                       Cil_datatype.Typ.pretty t
+                       Cil_printer.pp_typ t
                   )
                 | _ -> (* redeclaration in same scope valid only in C11 *)
                   warn_c11_redefinition ()
@@ -9699,7 +9688,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
         else if declared_in_current_scope ~ghost n then
           Kernel.error ~current:true
             "redefinition of type '%s' in the same scope with incompatible type.@ \
-             Previous declaration was at %a" n Cil_datatype.Location.pretty oldloc;
+             Previous declaration was at %a" n Cil_printer.pp_location oldloc;
       end
     else (* effectively create new type *) begin
       let n', _  = newAlphaName ghost true "type" n in
@@ -10009,7 +9998,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     if not (Ast_types.is_void !currentReturnType) then
       Kernel.error ~current:true
         "Return statement without a value in function returning %a\n"
-        Cil_datatype.Typ.pretty !currentReturnType;
+        Cil_printer.pp_typ !currentReturnType;
     returnChunk ~ghost None loc'
 
   | Cabs.RETURN (e, loc) ->

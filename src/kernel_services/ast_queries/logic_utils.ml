@@ -101,7 +101,7 @@ let type_of_array_elem =
          Ctype (Ast_types.direct_element_type ty)
        | _ ->
          Kernel.fatal ~current:true "type %a is not an array type"
-           Cil_datatype.Logic_type.pretty t)
+           !Cil.pp_logic_type_ref t)
 
 let type_of_pointed =
   Logic_const.transform_element
@@ -111,7 +111,7 @@ let type_of_pointed =
          Ctype (Ast_types.direct_pointed_type ty)
        | _ ->
          Kernel.fatal ~current:true "type %a is not a pointer type"
-           Cil_datatype.Logic_type.pretty t)
+           !Cil.pp_logic_type_ref t)
 
 let isLogicType f t = plain_or_set (Logic_const.isLogicCType f) t
 
@@ -2163,7 +2163,7 @@ let pp_old_loc fmt oldloc =
     Format.ifprintf fmt ""
   else
     Format.fprintf fmt " (old location: %a)"
-      Cil_datatype.Location.pretty oldloc
+      !Cil.pp_location_ref oldloc
 
 let merge_behaviors ?(oldloc=Cil_datatype.Location.unknown) ~silent old_behaviors fresh_behaviors =
   old_behaviors @
@@ -2257,7 +2257,7 @@ let lhost_c_type thost =
     match Logic_const.plain_or_set get lty with
     | None ->
       Kernel.fatal "[lhost_c_type] logic type %a does not represent a C type"
-        Cil_datatype.Logic_type.pretty lty
+        !Cil.pp_logic_type_ref lty
     | Some ty ->
       ty
   in

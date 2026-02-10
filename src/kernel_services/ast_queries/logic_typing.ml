@@ -762,7 +762,7 @@ let rec mk_cast_conf integral_cast
          "term %a has type %a, but %a is expected"
           Cil_printer.pp_term e
           Cil_printer.pp_logic_type Linteger
-          Cil_datatype.Typ.pretty t
+          Cil_printer.pp_typ t
       *)
       (try integral_cast t e
        with Failure s -> typing_error loc "%s" s)
@@ -822,7 +822,7 @@ let mk_cast =
         "term %a has type %a, but %a is expected"
         Cil_printer.pp_term t
         Cil_printer.pp_logic_type Linteger
-        Cil_datatype.Typ.pretty ty
+        Cil_printer.pp_typ ty
     in
     raise (Failure message)
   in
@@ -1074,7 +1074,7 @@ struct
   let check_fun_ptr loc ty =
     if not (Logic_utils.isLogicType Ast_types.is_fun_ptr ty) then
       C.error loc "expecting a function pointer, found %a"
-        Cil_datatype.Logic_type.pretty ty
+        Cil_printer.pp_logic_type ty
 
   let check_object_ptr loc ty =
     let is_object_ptr t =
@@ -1084,7 +1084,7 @@ struct
     in
     if not (Logic_utils.isLogicType is_object_ptr ty) then
       C.error loc "expecting a pointer to an object, found %a"
-        Cil_datatype.Logic_type.pretty ty
+        Cil_printer.pp_logic_type ty
 
   let check_logic_pointer ~check_non_void loc t =
     if Logic_utils.is_C_array t then
@@ -4244,7 +4244,7 @@ struct
     if ko then
       C.error loc
         "ill-formed inductive definition: %a should not be used %s"
-        Cil_datatype.Logic_var.pretty v msg
+        Cil_printer.pp_logic_var v msg
 
   let update_use new_v ~polarity ~pos_use ~neg_use v =
     let open Cil_datatype.Logic_var.Set in
@@ -4554,7 +4554,7 @@ struct
     let conclusion_neg_pred p =
       C.error pred.pred_loc
         "ill-formed inductive declaration: %a shouldn't be used in conclusion"
-        Cil_datatype.Logic_info.pretty p
+        Cil_printer.pp_logic_info p
     in
     match pred.pred_content with
     | Pfalse | Ptrue -> ()
@@ -4786,7 +4786,7 @@ struct
         C.error loc "%a %s is already registered as %a (%a)"
           Cil_printer.pp_lemma_kind kind name
           Cil_printer.pp_lemma_kind old_kind
-          Cil_datatype.Location.pretty old_loc
+          Cil_printer.pp_location old_loc
       end;
       let labels,env = global_annot_env loc labels poly in
       let p = Logic_const.toplevel_predicate ~kind (predicate env e) in

@@ -236,7 +236,7 @@ let fallback_fun_call ~builder ~callee env vf args =
   Kernel.result ~current:true ~dkey:Kernel.dkey_variadic
     "Fallback translation of call %s to a call to the specialized version %a. \
      Generating default assigns that may be inaccurate."
-    vf.vf_decl.vorig_name Build.pretty new_callee;
+    vf.vf_decl.vorig_name Cil_printer.pp_varinfo (Build.cil_varinfo new_callee);
   Build.(translated_call new_callee (List.map of_exp args))
 
 
