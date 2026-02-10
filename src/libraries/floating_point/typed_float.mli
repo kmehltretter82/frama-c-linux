@@ -143,8 +143,12 @@ type parsed_result =
 val parse : string -> (parsed_result, string) result
 
 (** Calls {!parse} and evaluates the result type.
-    @raise Log.AbortError if the parsing fails. *)
+    @raise Failure if the parsing fails.
+    @before Frama-C+dev emitted a {!Kernel.failure} instead
+*)
 val parse_exn : string -> parsed_result
+[@@deprecated "Use parse instead."]
+[@@migrate { repl = (fun s -> Rel.parse s |> Result.get_ok) } ]
 
 (** Returns the floating-point kind parsed by [parse]. *)
 val parsed_fkind : ('k, 'f) parsed_format -> Cil_types.fkind

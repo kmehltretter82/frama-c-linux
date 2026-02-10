@@ -479,6 +479,4 @@ let parse str =
       cannot_be_parsed str resulting_format
 
 let parse_exn str =
-  match parse str with
-  | Ok parsed -> parsed
-  | Error msg -> Kernel_log.abort ~current:true "%s" msg
+  Result.value_or_else ~error:failwith (parse str)
