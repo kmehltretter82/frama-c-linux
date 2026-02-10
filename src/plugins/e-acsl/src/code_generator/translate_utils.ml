@@ -80,10 +80,8 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
     if check_lower_bound then begin
       let zero_term = Cil.lzero ~loc () in
       let pred_name = Format.sprintf "%s_greater_or_eq_than_0" name in
-      let lower_guard_pp = Logic_const.prel ~loc (Rge, pp, zero_term) in
       let lower_guard_pp =
-        { lower_guard_pp with
-          pred_name = pred_name :: lower_guard_pp.pred_name }
+        Logic_const.prel ~loc ~names:[pred_name] (Rge, pp, zero_term)
       in
       let lower_guard = Logic_const.prel ~loc (Rge, t, zero_term) in
       Typing.preprocess_predicate ~logic_env lower_guard;
@@ -110,10 +108,8 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
     Logic_const.tint ~loc (Cil.max_unsigned_number (Cil.bitsSizeOf sizet))
   in
   let pred_name = Format.sprintf "%s_lesser_or_eq_than_SIZE_MAX" name in
-  let upper_guard_pp = Logic_const.prel ~loc (Rle, pp, sizet_max) in
   let upper_guard_pp =
-    { upper_guard_pp with
-      pred_name = pred_name :: upper_guard_pp.pred_name }
+    Logic_const.prel ~loc ~names:[pred_name] (Rle, pp, sizet_max)
   in
   let upper_guard = Logic_const.prel ~loc (Rle, t, sizet_max) in
   Typing.preprocess_predicate ~logic_env upper_guard;

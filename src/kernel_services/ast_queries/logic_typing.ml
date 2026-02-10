@@ -3516,9 +3516,10 @@ struct
       let t = term_ptr ~check_non_void t in
       let l = find_current_logic_label loc env label in
       (* higher-order funs do not mix well with (optional) labels,
-         hence the binding below. *)
+         hence the bindings below. *)
       let loc = Some loc in
-      fpred ?loc (l,t)
+      let names = None in
+      fpred ?loc ?names (l,t)
     in
     match p0.lexpr_node with
     | PLfalse -> unnamed ~loc Pfalse

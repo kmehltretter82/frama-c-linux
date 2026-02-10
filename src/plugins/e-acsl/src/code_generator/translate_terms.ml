@@ -612,11 +612,10 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
         let pred =
           Logic_const.pand
             ~loc
+            ~names:[bop_name ^ "_rhs_fits_in_mp_bitcnt_t"]
             (Logic_const.prel ~loc (Rle, zero, t2),
              Logic_const.prel ~loc (Rle, t2, max_bitcnt_term))
         in
-        let pname = bop_name ^ "_rhs_fits_in_mp_bitcnt_t" in
-        let pred = { pred with pred_name = pname :: pred.pred_name } in
         Typing.preprocess_predicate ~logic_env:(Env.Logic_env.get env) pred;
         let cond, env =
           Assert.runtime_check

@@ -9033,9 +9033,9 @@ and createLocal ghost ((_, sto, _, _, _) as specs)
                 let max_bound =  Logic_const.tint ~loc:castloc (Cil.max_unsigned_number szTo) in
                 Logic_const.prel ~loc:castloc (Rle, talloca_size, max_bound)
               in
-              let alloca_bounds = Logic_const.pand ~loc:castloc (pos_size, max_size) in
               let alloca_bounds =
-                { alloca_bounds with pred_name = ["alloca_bounds"] }
+                Logic_const.pand ~loc:castloc ~names:["alloca_bounds"]
+                  (pos_size, max_size)
               in
               let alloca_bounds =
                 Logic_const.toplevel_predicate alloca_bounds
@@ -9644,8 +9644,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
         let protect_return,retval =
           (* Guard the [return] instructions we add with an
              [\assert \false]*)
-          let pfalse = Logic_const.unnamed ~loc Pfalse in
-          let pfalse = { pfalse with pred_name = ["missing_return"] } in
+          let pfalse = Logic_const.pred ~loc ~names:["missing_return"] Pfalse in
           let pfalse = Logic_const.toplevel_predicate pfalse in
           let assert_false () =
             let annot =

@@ -45,9 +45,7 @@ let negate_behavior_preconds bhv =
       (fun e -> (Logic_const.pnot (e.ip_content.tp_statement)))
       (bhv.b_requires @ bhv.b_assumes)
   in
-  let pred = Logic_const.pors neg_preconds in
-  let name = "not_" ^ bhv.b_name in
-  let pred = { pred with pred_name = name :: pred.pred_name } in
+  let pred = Logic_const.pors ~names:["not_" ^ bhv.b_name] neg_preconds in
   Logic_const.new_predicate pred
 
 let are_complete_disjoint spec behaviors =

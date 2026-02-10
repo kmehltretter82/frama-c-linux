@@ -255,8 +255,9 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
       List.fold_left
         (fun env t ->
            let name = "separated_guard" in
-           let p = Logic_const.pvalid_read ~loc (BuiltinLabel Here, t) in
-           let p = { p with pred_name = name :: p.pred_name } in
+           let p =
+             Logic_const.pvalid_read ~loc ~names:[name] (BuiltinLabel Here, t)
+           in
            let tp = Logic_const.toplevel_predicate ~kind:Assert p in
            let annot = Logic_const.new_code_annotation (AAssert ([],tp)) in
            Typing.preprocess_rte ~logic_env:(Env.Logic_env.get env) annot;

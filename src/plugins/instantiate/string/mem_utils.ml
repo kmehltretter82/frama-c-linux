@@ -66,14 +66,12 @@ let memcpy_memmove_common_requires loc _ dest src len =
   List.map new_predicate [
     { (pcorrect_len_bytes ~loc dest.term_type len)
       with pred_name = ["aligned_end"] } ;
-    { (Logic_const.pand ~loc (
-          pobject_pointer ~loc here_label dest,
-          pvalid_len_bytes ~loc here_label dest len))
-      with pred_name = ["valid_dest"] } ;
-    { (Logic_const.pand ~loc (
-          pobject_pointer ~loc here_label src,
-          pvalid_read_len_bytes ~loc here_label src len))
-      with pred_name = ["valid_read_src"] } ;
+    Logic_const.pand ~loc ~names:["valid_dest"] (
+      pobject_pointer ~loc here_label dest,
+      pvalid_len_bytes ~loc here_label dest len);
+    Logic_const.pand ~loc ~names:["valid_read_src"] (
+      pobject_pointer ~loc here_label src,
+      pvalid_read_len_bytes ~loc here_label src len);
   ]
 
 let memcpy_memmove_common_assigns loc t dest src len =

@@ -97,8 +97,17 @@ val init_label: logic_label
 (** {2 Predicates} *)
 (* ************************************************************************** *)
 
+(** makes a predicate with the given names and location. Default name is empty
+    and default location is unknown.
+    @since Frama-C+dev *)
+val pred: ?loc:location -> ?names:string list -> predicate_node -> predicate
+
 (** makes a predicate with no name. Default location is unknown.*)
 val unnamed: ?loc:location -> predicate_node -> predicate
+
+(** prepend the given [names] to the the predicate's names.
+    @since Frama-C+dev *)
+val prepend_names: names:string list -> predicate -> predicate
 
 (** \true *)
 val ptrue: predicate
@@ -107,98 +116,119 @@ val ptrue: predicate
 val pfalse: predicate
 
 (** \old *)
-val pold: ?loc:location -> predicate -> predicate
+val pold: ?loc:location -> ?names:string list -> predicate -> predicate
 
 (** application of predicate*)
 val papp:
-  ?loc:location ->
+  ?loc:location -> ?names:string list ->
   logic_info * logic_label list * term list ->
   predicate
 
 (** && *)
-val pand: ?loc:location -> predicate * predicate -> predicate
+val pand:
+  ?loc:location -> ?names:string list -> predicate * predicate -> predicate
 
 (** || *)
-val por: ?loc:location -> predicate * predicate -> predicate
+val por:
+  ?loc:location -> ?names:string list -> predicate * predicate -> predicate
 
 (** ^^ *)
-val pxor: ?loc:location -> predicate * predicate -> predicate
+val pxor:
+  ?loc:location -> ?names:string list -> predicate * predicate -> predicate
 
 (** ! *)
-val pnot: ?loc:location -> predicate -> predicate
+val pnot: ?loc:location -> ?names:string list -> predicate -> predicate
 
 (** Folds && over a list of predicates. *)
-val pands: predicate list -> predicate
+val pands: ?names:string list -> predicate list -> predicate
 
 (** Folds || over a list of predicates. *)
-val pors: predicate list -> predicate
+val pors: ?names:string list -> predicate list -> predicate
 
 (** local binding *)
 val plet:
-  ?loc:location -> logic_info -> predicate -> predicate
+  ?loc:location -> ?names:string list -> logic_info -> predicate -> predicate
 
 (** ==> *)
 val pimplies :
-  ?loc:location -> predicate * predicate -> predicate
+  ?loc:location -> ?names:string list -> predicate * predicate -> predicate
 
 (** ? : *)
 val pif:
-  ?loc:location -> term * predicate * predicate -> predicate
+  ?loc:location -> ?names:string list ->
+  term * predicate * predicate -> predicate
 
 (** <==> *)
-val piff: ?loc:location -> predicate * predicate -> predicate
+val piff:
+  ?loc:location -> ?names:string list -> predicate * predicate -> predicate
 
 (** Binary relation.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-val prel: ?loc:location -> relation * term * term -> predicate
+val prel:
+  ?loc:location -> ?names:string list -> relation * term * term -> predicate
 
 (** \forall *)
-val pforall: ?loc:location -> quantifiers * predicate -> predicate
+val pforall:
+  ?loc:location -> ?names:string list -> quantifiers * predicate -> predicate
 
 (** \exists *)
-val pexists: ?loc:location -> quantifiers * predicate -> predicate
+val pexists:
+  ?loc:location -> ?names:string list -> quantifiers * predicate -> predicate
 
 (** \fresh(pt,size) *)
-val pfresh: ?loc:location -> logic_label * logic_label * term * term -> predicate
+val pfresh:
+  ?loc:location -> ?names:string list ->
+  logic_label * logic_label * term * term -> predicate
 
 (** \allocable *)
-val pallocable: ?loc:location -> logic_label * term -> predicate
+val pallocable:
+  ?loc:location -> ?names:string list -> logic_label * term -> predicate
 
 (** \freeable *)
-val pfreeable: ?loc:location -> logic_label * term -> predicate
+val pfreeable:
+  ?loc:location -> ?names:string list -> logic_label * term -> predicate
 
 (** \valid_read *)
-val pvalid_read: ?loc:location -> logic_label * term -> predicate
+val pvalid_read:
+  ?loc:location -> ?names:string list -> logic_label * term -> predicate
 
 (** \valid *)
-val pvalid: ?loc:location -> logic_label * term -> predicate
+val pvalid:
+  ?loc:location -> ?names:string list -> logic_label * term -> predicate
 
 (** \object_pointer *)
-val pobject_pointer: ?loc:location -> logic_label * term -> predicate
+val pobject_pointer:
+  ?loc:location -> ?names:string list -> logic_label * term -> predicate
 
 (** \valid_function *)
-val pvalid_function: ?loc:location -> term -> predicate
+val pvalid_function: ?loc:location -> ?names:string list -> term -> predicate
 
 (** \initialized *)
-val pinitialized: ?loc:location -> logic_label * term -> predicate
+val pinitialized:
+  ?loc:location -> ?names:string list -> logic_label * term -> predicate
 
 (** \dangling *)
-val pdangling: ?loc:location -> logic_label * term -> predicate
+val pdangling:
+  ?loc:location -> ?names:string list -> logic_label * term -> predicate
 
 (** \aligned *)
-val paligned: ?loc:location -> term * term -> predicate
+val paligned: ?loc:location -> ?names:string list -> term * term -> predicate
 
 (** \at *)
-val pat: ?loc:location -> predicate * logic_label -> predicate
+val pat:
+  ?loc:location -> ?names:string list -> predicate * logic_label -> predicate
 
 (** \valid_index: requires index having integer type or set of integers *)
-val pvalid_index: ?loc:location -> logic_label * term * term -> predicate
+val pvalid_index:
+  ?loc:location -> ?names:string list -> logic_label * term * term -> predicate
 
 (** \valid_range: requires bounds having integer type *)
-val pvalid_range: ?loc:location -> logic_label * term * term * term -> predicate
+val pvalid_range:
+  ?loc:location -> ?names:string list ->
+  logic_label * term * term * term -> predicate
 
 (** \separated *)
-val pseparated: ?loc:location -> term list -> predicate
+val pseparated: ?loc:location -> ?names:string list -> term list -> predicate
 
 (* ************************************************************************** *)
 (** {2 Logic types} *)

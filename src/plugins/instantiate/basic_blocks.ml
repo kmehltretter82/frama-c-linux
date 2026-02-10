@@ -171,7 +171,10 @@ let plet_len_div_size ?loc ?name_ext t bytes_len pred =
 
 let pgeneric_valid_buffer ?loc validity lbl ptr len =
   let buffer = tbuffer_range ?loc ptr len in
-  validity ?loc (lbl, buffer)
+  (* higher-order funs do not mix well with optional labels, hence the binding
+     below *)
+  let names = None in
+  validity ?loc ?names (lbl, buffer)
 
 let pgeneric_valid_len_bytes ?loc validity lbl ptr bytes_len =
   plet_len_div_size ?loc ptr.term_type bytes_len
