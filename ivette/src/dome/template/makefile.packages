@@ -11,13 +11,13 @@
 # --------------------------------------------------------------------------
 
 DOME_DEV_PACKAGES= \
-	electron@^28 \
-	electron-builder@^24 \
-	electron-vite@^2 \
+	electron@^40 \
+	electron-builder@^26 \
+	electron-vite@^5 \
 	electron-devtools-installer \
 	@types/lodash@^4 \
 	@types/react@^18 \
-	@types/node@^18 \
+	@types/node@^24 \
 	@types/react-dom@^18 \
 	@types/react-virtualized@^9.21.8 \
 	@types/diff@^5 \
@@ -29,7 +29,7 @@ DOME_APP_PACKAGES= \
 	react@^18 \
 	react-dom@^18 \
 	source-map-support \
-	lodash@^4 \
+	lodash@^4.17.23 \
 	react-virtualized@9.22.5 \
 	react-draggable \
 	react-fast-compare \

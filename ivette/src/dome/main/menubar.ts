@@ -15,6 +15,7 @@
 import {
   app,
   ipcMain,
+  BaseWindow,
   BrowserWindow,
   Menu,
   MenuItem,
@@ -43,7 +44,7 @@ function reloadWindow(): void {
 
 function toggleFullScreen(
   _item: MenuItem,
-  focusedWindow: BrowserWindow | undefined,
+  focusedWindow: BaseWindow | undefined,
   _evt: KeyboardEvent,
 ): void {
   if (focusedWindow)
@@ -52,19 +53,19 @@ function toggleFullScreen(
 
 function toggleDevTools(
   _item: MenuItem,
-  focusedWindow: BrowserWindow | undefined,
+  focusedWindow: BaseWindow | undefined,
   _evt: KeyboardEvent,
 ): void {
-  if (focusedWindow)
+  if (focusedWindow instanceof BrowserWindow)
     focusedWindow.webContents.toggleDevTools();
 }
 
 function userFindInfo(
   _item: MenuItem,
-  focusedWindow: BrowserWindow | undefined,
+  focusedWindow: BaseWindow | undefined,
   _evt: KeyboardEvent,
 ): void {
-  if (focusedWindow)
+  if (focusedWindow instanceof BrowserWindow)
     focusedWindow.webContents.send('dome.ipc.find');
 }
 
@@ -382,9 +383,12 @@ export function addMenuItem(custom: CustomMenuItemSpec): void {
       if (!spec.click && !spec.role)
         spec.click = (
           _item: MenuItem,
-          window: BrowserWindow | undefined,
+          window: BaseWindow | undefined,
           _evt: KeyboardEvent,
-        ) => window?.webContents.send('dome.ipc.menu.clicked', id);
+        ) => {
+          if (window instanceof BrowserWindow)
+            window.webContents.send('dome.ipc.menu.clicked', id);
+        };
       customItems.set(id, { menu, spec });
       menuSpec.push(spec);
     }
@@ -407,9 +411,9 @@ export function setMenuItem({ id, ...options }: CustomMenuItem): void {
 // --------------------------------------------------------------------------
 
 function template(): CustomMenu[] {
-  const helpMenu: CustomMenu[] =  [];
-  const helpMenuMacOs: CustomMenu[] =  [];
-  if(helpMenuItemsCustom.length > 0) {
+  const helpMenu: CustomMenu[] = [];
+  const helpMenuMacOs: CustomMenu[] = [];
+  if (helpMenuItemsCustom.length > 0) {
     helpMenu.push({ label: 'Help', submenu: helpMenuItemsCustom });
     helpMenuMacOs.push({
       label: 'Help', role: 'help', submenu: helpMenuItemsCustom
