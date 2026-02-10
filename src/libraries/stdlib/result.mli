@@ -25,3 +25,10 @@ module Operators : sig
   val ( and* ) : ('a, 'e) result -> ('b, 'e) result -> ('a * 'b, 'e) result
   val ( and+ ) : ('a, 'e) result -> ('b, 'e) result -> ('a * 'b, 'e) result
 end
+
+(** [value_or_else ~error r] is equivalent to [fold ~ok:Fun.id ~error r]. It is
+    similar to {!value} but uses a function to compute the default value.
+    @since Frama-C+dev
+*)
+val value_or_else : error:('e -> 'a) -> ('a, 'e) result -> 'a
+

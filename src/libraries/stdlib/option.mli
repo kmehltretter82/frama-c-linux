@@ -40,6 +40,12 @@ val bind: ('a -> 'b t) -> 'a t -> 'b t
 *)
 val get: ?exn:exn -> 'a option -> 'a
 
+(** [value_or_else ~none o] is similar to {!value} but uses a function to
+    compute the default value.
+    @since Frama-C+dev
+*)
+val value_or_else : none:(unit -> 'a) -> 'a option -> 'a
+
 (** Compute a hash for the option given a hash for the element.
     @since Frama-C+dev *)
 val hash: ('a -> int) -> 'a option -> int
