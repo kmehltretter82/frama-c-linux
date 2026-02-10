@@ -29,7 +29,7 @@ usage() {
    echo "  - creduce [[file] args]"
    echo "      Uses the external tool C-Reduce to minimize C files when"
    echo "      debugging crashes and fatal errors."
-   echo "      Run 'frama-c-script c-reduce' without arguments for more details."
+   echo "      Run 'frama-c-script creduce' without arguments for more details."
    echo ""
    echo "  - estimate-difficulty file..."
    echo "      Applies several heuristics to try and estimate the difficulty"
@@ -207,8 +207,8 @@ configure_for_frama_c() {
         machdep=x86_64
     fi
     fc_machdep_dir=$(mktemp -d "${TMPDIR:-/tmp/}__fc_script_configure_machdepXXXXXX.dir")
-    "$FRAMAC_BIN/frama-c" -machdep "$machdep" -print-machdep-header > "$fc_machdep_dir/__fc_machdep.h"
-    "$FRAMAC_BIN/frama-c" -machdep "$machdep" -print-machdep-builtin-macros > "$fc_machdep_dir/__fc_builtin_macros.h"
+    "${DIR}/frama-c" -machdep "$machdep" -print-machdep-header > "$fc_machdep_dir/__fc_machdep.h"
+    "${DIR}/frama-c" -machdep "$machdep" -print-machdep-builtin-macros > "$fc_machdep_dir/__fc_builtin_macros.h"
     mkdir -p "$fc_machdep_dir/wrappers"
     for p in cc gcc clang; do
         cat > "$fc_machdep_dir/wrappers/$p" <<EOF
