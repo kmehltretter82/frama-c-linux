@@ -69,6 +69,14 @@ let is_nan f =
   | _ -> false
 
 
+(* Floats should be printed with the nearest-even rounding mode. This function
+   temporarily changes this mode, prints and then switches it back. *)
+let pretty_rounding_mode pretty =
+  let old_mode = get_rounding_mode () in
+  let finally () = set_rounding_mode old_mode in
+  let work () = set_rounding_mode Nearest_even; pretty () in
+  Fun.protect ~finally work
+
 let pretty_normal ~use_hex fmt f =
   let open Stdlib in
   let double_norm = Int64.shift_left 1L 52 in
@@ -102,25 +110,10 @@ let pretty_normal ~use_hex fmt f =
       else Format.fprintf fmt "%s%d.%016Ld*2^%d" s firstdigit decdigits exp
     else Format.fprintf fmt "%s0x%d.%013Lxp%d" s firstdigit man exp
 
-
-let string_of_rounding_mode = function
-  | Nearest_even -> "FE_TONEAREST"
-  | Upward -> "FE_UPWARD"
-  | Downward -> "FE_DOWNWARD"
-  | Toward_zero -> "FE_TOWARDZERO"
-
-let ensure_round_nearest_even () =
-  if Stdlib.(get_rounding_mode () <> Nearest_even) then
-    let mode = string_of_rounding_mode (get_rounding_mode ()) in
-    let () =
-      Kernel_log.failure
-        "pretty: rounding mode (%s) <> FE_TONEAREST" mode
-    in
-    set_rounding_mode Nearest_even
+let pretty_normal ~use_hex fmt f =
+  pretty_rounding_mode (fun () -> pretty_normal ~use_hex fmt f)
 
 let pretty fmt f =
-  (* should always arrive here with nearest_even *)
-  ensure_round_nearest_even () ;
   match !float_print_mode with
   | Default ->
     let r = Format.sprintf "%.*g" 12 f in
@@ -131,6 +124,8 @@ let pretty fmt f =
   | NormDec -> pretty_normal ~use_hex:false fmt f
   | NormHex -> pretty_normal ~use_hex:true fmt f
 
+let pretty fmt f =
+  pretty_rounding_mode (fun () -> pretty fmt f)
 
 let suffix_of_fkind = function
   | Cil_types.FFloat   -> "F"
@@ -147,28 +142,26 @@ let has_suffix fkind literal =
 let extract_single_letter_sufix s len =
   let last = String.sub s (len - 1) 1 in
   match last with
-  | "f" | "F" -> (String.sub s 0 (len - 1), last, Cil_types.FFloat)
+  | "f" | "F" -> Some (String.sub s 0 (len - 1), last, Cil_types.FFloat)
   (* Note: 'd' is accepted as a GCC extension, but also always
      accepted in ACSL *)
-  | "d" | "D" -> (String.sub s 0 (len - 1), last, Cil_types.FDouble)
-  | "l" | "L" -> (String.sub s 0 (len - 1), last, Cil_types.FLongDouble)
+  | "d" | "D" -> Some (String.sub s 0 (len - 1), last, Cil_types.FDouble)
+  | "l" | "L" -> Some (String.sub s 0 (len - 1), last, Cil_types.FLongDouble)
   | "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "." ->
-    (s, "", Cil_types.FDouble)
-  | _ ->
-    Cmdline.Kernel_log.abort "extract_single_letter_suffix: unexpected '%s'"
-      last
+    Some (s, "", Cil_types.FDouble)
+  | _ -> None
 
 let extract_suffix s =
   let len = String.length s in
-  if len = 0 then (s, "", Cil_types.FDouble)
+  if len = 0 then Some (s, "", Cil_types.FDouble)
   else if len <= 3 then
     extract_single_letter_sufix s len
   else
     (* look for a 3-letter suffix, then for a 1-letter suffix *)
     let last3 = String.sub s (len - 3) 3 in
     match last3 with
-    | "f32" | "F32" -> (String.sub s 0 (len - 3), last3, Cil_types.FFloat32)
-    | "f64" | "F64" -> (String.sub s 0 (len - 3), last3, Cil_types.FFloat64)
+    | "f32" | "F32" -> Some (String.sub s 0 (len - 3), last3, Cil_types.FFloat32)
+    | "f64" | "F64" -> Some (String.sub s 0 (len - 3), last3, Cil_types.FFloat64)
     | _             -> extract_single_letter_sufix s len
 
 type format = Single | Double
