@@ -642,15 +642,24 @@ function Status
 # ---  Main Program
 # --------------------------------------------------------------------------
 
+# Preparations
 PrepareWPCache
 PrepareCoverage
 PrepareTests
 CheckDuneFiles
 Register "${TESTS[@]}"
 CreateMissingOracles
+
+# Running the tests
 RunAlias $(IFS=$'\n'; sort -u <<<"${DUNE_ALIAS[*]}")
+TESTS_STATUS=$?
+
+# Post-treatments
 RemoveMissingOracles
 Status "$DUNE_LOG"
 GenerateCoverage
+
+# Exit with dune exit status
+exit $TESTS_STATUS
 
 # --------------------------------------------------------------------------
