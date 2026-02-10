@@ -14,40 +14,6 @@ open Memory
 open Domain
 
 (* -------------------------------------------------------------------------- *)
-(* ---  Process ACSL region annotations                                   --- *)
-(* -------------------------------------------------------------------------- *)
-
-let rec add_spec (m:map) (s:spec): node =
-  match s.step with
-  | Var x -> add_cvar m x
-  | Field(lv,fd) -> Memory.add_field (add_spec m lv) fd
-  | Index(lv,_) -> Memory.add_index (add_spec m lv) lv.typ
-  | Star e | Cast(_,e) -> add_pointer m e
-  | Shift _ | AddrOf _ ->
-    Options.error ~source:(fst s.loc)
-      "Unexpected expression (l-value expected)" ;
-    Memory.fresh m
-
-and add_pointer (m:map) (s:spec): Memory.node =
-  match add_exp m s with
-  | None -> Memory.fresh m
-  | Some r -> r
-
-and add_exp (m:map) (s:spec): Memory.node option =
-  match s.step with
-  | (Var _ | Field _ | Index _ | Star _ | Cast _) ->
-    add_value (add_spec m s) s.typ
-  | AddrOf p -> Some (add_spec m p)
-  | Shift p -> add_exp m p
-
-let add_region (m: map) (r : Spec.region) =
-  let rs = List.map (add_spec m) r.spec in
-  merge_all @@
-  match r.name with
-  | None -> rs
-  | Some a -> add_label m a :: rs
-
-(* -------------------------------------------------------------------------- *)
 (* ---  Process ACSL logic terms & predicates                             --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -280,6 +246,20 @@ and add_predicate (env:env) (p:predicate) = match p.pred_content with
   | Papp(f,_,ts) -> ignore @@ call env f @@ List.map (add_term env) ts
 
 let () = rterm := add_term
+
+(* -------------------------------------------------------------------------- *)
+(* ---  Process ACSL region annotations                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+let add_path (env: env) = function
+  | Spec.Alias(loc,lv) -> snd @@ add_addr_lval ~loc env lv
+
+let add_region (env: env) (r : Spec.region) =
+  let rs = List.map (add_path env) r.paths in
+  merge_all @@
+  match r.name with
+  | None -> rs
+  | Some a -> add_label env.map a :: rs
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Process ACSL logic                                                --- *)

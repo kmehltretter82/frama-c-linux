@@ -8,76 +8,51 @@
 
 open Logic_ptree
 open Cil_types
-open Cil_datatype
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Region Specifications                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-type spec = {
-  loc  : location ;
-  typ  : typ ;
-  step : step ;
-}
-
-and step =
-  | Var of varinfo
-  | AddrOf of spec
-  | Star of spec
-  | Shift of spec
-  | Index of spec * int (* size *)
-  | Field of spec * fieldinfo
-  | Cast of typ * spec
+type path =
+  | Alias of location * term_lval
 
 type region = {
   name : string option ;
-  spec : spec list ;
+  paths : path list ;
 }
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Printers                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let atomic = function
-  | Var _ | AddrOf _ | Star _ | Index _ | Field _ -> true
-  | Shift _ | Cast _ -> false
-
-let rec pp_step fmt = function
-  | Var x -> Varinfo.pretty fmt x
-  | Field(p,f) -> pfield p f fmt
-  | Index(a,n) -> Format.fprintf fmt "%a[%d]" pp_atom a n
-  | Shift a -> Format.fprintf fmt "%a+(..)" pp_atom a
-  | Star a -> Format.fprintf fmt "*%a" pp_atom a
-  | AddrOf a -> Format.fprintf fmt "&%a" pp_atom a
-  | Cast(t,a) -> Format.fprintf fmt "(%a)@,%a" Typ.pretty t pp_atom a
-
-and pfield p fd fmt =
-  match p.step with
-  | Star p -> Format.fprintf fmt "%a->%a" pp_atom p Fieldinfo.pretty fd
-  | _ -> Format.fprintf fmt "%a.%a" pp_atom p Fieldinfo.pretty fd
-
-and pp_atom fmt a =
-  if atomic a.step then pp_step fmt a.step
-  else Format.fprintf fmt "@[<hov 2>(%a)@]" pp_step a.step
-
-and pp_path fmt a = pp_step fmt a.step
-
 let pp_named fmt = function None -> () | Some a -> Format.fprintf fmt "%s: " a
 
+let pp_path fmt = function
+  (* | Array(a,p,q) ->
+     Format.fprintf fmt "%a[%a..%a]"
+      Printer.pp_term a
+      Printer.pp_term p
+      Printer.pp_term q
+     | Field(a,f,g) ->
+     Format.fprintf fmt "%a.%a..%a.%a"
+      Printer.pp_term a Fieldinfo.pretty f
+      Printer.pp_term a Fieldinfo.pretty g *)
+  | Alias(_,lv) ->
+    Printer.pp_term_lval fmt lv
+
 let pp_region fmt r =
-  match r.spec with
-  | [] -> Format.pp_print_string fmt "\null"
+  match r.paths with
+  | [] -> Format.pp_print_string fmt "\\empty"
   | p::ps ->
     begin
       Format.fprintf fmt "@[<hov 2>" ;
-      pp_named fmt r.name ;
-      pp_path fmt p ;
+      pp_named fmt r.name ; pp_path fmt p ;
       List.iter (Format.fprintf fmt ",@ %a" pp_path) ps ;
       Format.fprintf fmt "@]" ;
     end
 
 let pp_regions fmt = function
-  | [] -> Format.pp_print_string fmt "\null"
+  | [] -> Format.pp_print_string fmt "\\empty"
   | r::rs ->
     begin
       Format.fprintf fmt "@[<hv 0>" ;
@@ -93,114 +68,37 @@ let pp_regions fmt = function
 type env = {
   context: Logic_typing.typing_context ;
   mutable named: string option ;
-  mutable paths: spec list ;
-  mutable specs: region list ;
+  mutable rpaths: path list ;
+  mutable regions: region list ;
 }
 
 let error (env:env) ~loc msg = env.context.error loc msg
 
-let parse_variable (env:env) ~loc x =
-  match env.context.find_var x with
-  | { lv_origin = Some v } -> { loc ; typ = v.vtype ; step = Var v }
-  | _ -> error env ~loc "Variable '%s' is not a C-variable" x
-
-let parse_field env ~loc comp f =
-  try Cil.getCompField comp f with Not_found ->
-    error env ~loc "No field '%s' in compound type '%s'" f comp.cname
-
-let parse_compinfo env ~loc typ =
-  try Cil.getCompType typ with Not_found ->
-    error env ~loc "Expected compound type for term"
-
-let parse_lrange (env: env) (e : lexpr) =
-  match e.lexpr_node with
-  | PLrange(None,None) -> ()
-  | _ ->
-    error env ~loc:e.lexpr_loc "Unexpected index (use unspecified range only)"
-
-let parse_typ env ~loc t =
+let parse_term env t =
   let open Logic_typing in
   let g = env.context in
-  let t = g.logic_type g loc g.pre_state t in
-  match Ast_types.unroll_logic t with
-  | Ctype typ -> typ
-  | _ -> error env ~loc "C-type expected for casting l-values"
+  g.type_term g g.pre_state t
 
-let rec parse_lpath (env:env) (e: lexpr) =
-  let loc = e.lexpr_loc in
-  match e.lexpr_node with
-  | PLvar x -> parse_variable env ~loc x
-  | PLunop( Ustar , p ) ->
-    let lv = parse_lpath env p in
-    if Ast_types.is_ptr lv.typ then
-      let te = Ast_types.direct_pointed_type lv.typ in
-      { loc ; step = Star lv ; typ = te }
-    else
-      error env ~loc "Pointer-type expected for operator '*'"
-  | PLunop( Uamp , p ) ->
-    let lv = parse_lpath env p in
-    let typ = Cil_const.mk_tptr lv.typ in
-    { loc ; step = AddrOf lv ; typ }
-  | PLbinop( p , Badd , rg ) ->
-    parse_lrange env rg ;
-    let { typ } as lv = parse_lpath env p in
-    if Ast_types.is_ptr typ then
-      { loc ; step = Shift lv ; typ = typ }
-    else
-    if Ast_types.is_array typ then
-      let te = Ast_types.direct_element_type typ in
-      { loc ; step = Shift lv ; typ =  Cil_const.mk_tptr te }
-    else
-      error env ~loc "Pointer-type expected for operator '+'"
-  | PLdot( p , f ) ->
-    let lv = parse_lpath env p in
-    let comp = parse_compinfo env ~loc:lv.loc lv.typ in
-    let fd = parse_field env ~loc comp f in
-    { loc ; step = Field(lv,fd) ; typ = fd.ftype }
-  | PLarrow( p , f ) ->
-    let sp = { lexpr_loc = loc ; lexpr_node = PLunop(Ustar,p) } in
-    let pf = { lexpr_loc = loc ; lexpr_node = PLdot(sp,f) } in
-    parse_lpath env pf
-  | PLarrget( p , rg ) ->
-    parse_lrange env rg ;
-    let { typ } as lv = parse_lpath env p in
-    if Ast_types.is_ptr typ then
-      let pointed = Ast_types.direct_pointed_type typ in
-      let ls = { loc ; step = Shift lv ; typ } in
-      { loc ; step = Star ls ; typ = pointed }
-    else
-    if Ast_types.is_array typ then
-      let elt,size = Ast_types.array_elem_type_and_size typ in
-      let size =
-        match Option.bind Cil.constFoldToInt size with
-        | Some size -> size
-        | None ->
-          Kernel.fatal "parse_lpath: array type %a without a size"
-            Cil_printer.pp_typ typ
-      in
-      { loc ; step = Index(lv,Z.to_int size) ; typ = elt }
-    else
-      error env ~loc:lv.loc "Pointer or array type expected"
-  | PLcast( t , a ) ->
-    let lv = parse_lpath env a in
-    let ty = parse_typ env ~loc t in
-    { loc ; step = Cast(ty,lv) ; typ = ty }
-  | _ ->
-    error env ~loc "Unexpected expression for region spec"
-
-let rec parse_named_lpath (env:env) p =
+let rec parse_region (env:env) p =
   match p.lexpr_node with
   | PLnamed( name , p ) ->
-    if env.named <> None && env.paths <> [] then
+    if env.named <> None && env.rpaths <> [] then
       begin
-        env.specs <- { name = env.named ; spec = env.paths } :: env.specs ;
-        env.paths <- [] ;
+        env.regions <- {
+          name = env.named ;
+          paths = List.rev env.rpaths ;
+        } :: env.regions ;
+        env.rpaths <- [] ;
       end ;
     env.named <- Some name ;
-    parse_named_lpath env p
+    parse_region env p
   | _ ->
-    let path = parse_lpath env p in
-    env.paths <- path :: env.paths
+    let t = parse_term env p in
+    match t.term_node with
+    | TLval lv ->
+      env.rpaths <- Alias(t.term_loc,lv) :: env.rpaths
+    | _ ->
+      error env ~loc:p.lexpr_loc "Expected l-value for region path"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Spec Typechecking & Printing                                       --- *)
@@ -223,12 +121,15 @@ let typecheck typing_context _loc ps =
   let env = {
     named = None ;
     context = typing_context ;
-    paths = [] ; specs = [] ;
+    rpaths = [] ; regions = [] ;
   } in
-  List.iter (parse_named_lpath env) ps ;
+  List.iter (parse_region env) ps ;
   let id = !kspec in incr kspec ;
-  let specs = { name = env.named ; spec = env.paths } :: env.specs in
-  Hashtbl.add registry id @@ List.rev specs ;
+  let regions =
+    if env.rpaths <> [] then
+      { name = env.named ; paths = List.rev env.rpaths } :: env.regions
+    else env.regions in
+  Hashtbl.add registry id @@ List.rev regions ;
   Ext_id id
 
 let printer _pp fmt = function

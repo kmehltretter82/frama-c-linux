@@ -234,7 +234,9 @@ let rec add_extension ~map ~called ~kf ~ki ~formals ~result acsl =
   | Ext_id id ->
     if acsl.ext_plugin = "region" then
       match called with
-      | None -> List.iter (Logic.add_region map) (Spec.of_extid id)
+      | None ->
+        let env = { map ; context ; formals ; result } in
+        List.iter (Logic.add_region env) (Spec.of_extid id)
       | Some stmt ->
         let loc = Cil_datatype.Stmt.loc stmt in
         Options.not_yet_implemented ~source:(fst loc)

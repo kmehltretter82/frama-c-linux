@@ -8,11 +8,7 @@
 
 open Cil_types
 open Cil_datatype
-
 open Memory
-
-val add_spec : map -> Spec.spec -> node
-val add_region : map -> Spec.region -> unit
 
 type env = {
   map : map ;
@@ -25,3 +21,5 @@ val add_addr_lval : loc:location -> env -> term_lval -> typ * node
 val add_term_lval : loc:location -> env -> term_lval -> domain
 val add_term      : env -> term      -> domain
 val add_predicate : env -> predicate -> unit
+val add_path : env -> Spec.path -> node
+val add_region : env -> Spec.region -> unit
