@@ -734,9 +734,9 @@ end
 module BUILD(Info : INFO)(X: Printer.PrinterClass) : Printer.PrinterClass =
 struct
 
-  class printer : Printer.extensible_printer = object(self)
+  class printer () : Printer.extensible_printer = object(self)
 
-    inherit X.printer as super
+    inherit X.printer () as super
 
     val mutable current_property = None
 
@@ -1093,7 +1093,7 @@ struct
       let unfold s = !unfold s
     end in
     let module TagPrinterClass = BUILD(INFO)(PP) in
-    new TagPrinterClass.printer
+    new TagPrinterClass.printer ()
 
   let with_unfold_precond unfolder f fmt x =
     let stack = !unfold in

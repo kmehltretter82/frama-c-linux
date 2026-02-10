@@ -219,8 +219,8 @@ let define_string_lit fmt v =
 
 module UpdatePrinter (X: Printer.PrinterClass) = struct
   (* obfuscated printer *)
-  class printer = object(self)
-    inherit X.printer as super
+  class printer () = object(self)
+    inherit X.printer () as super
 
     method! file fmt ast =
       let literal_strings =

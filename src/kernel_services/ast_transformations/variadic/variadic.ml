@@ -20,8 +20,8 @@ let change_printer =
     if !first then begin
       first := false;
       let module Printer_class(X: Printer.PrinterClass) = struct
-        class printer = object
-          inherit X.printer as super
+        class printer () = object
+          inherit X.printer () as super
 
           method !instr fmt i =
             match i with

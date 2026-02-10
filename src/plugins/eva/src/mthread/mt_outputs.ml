@@ -676,7 +676,7 @@ module Html = struct
     buf_append (mk_mqueues_summary (mk_div "Queue operations") th_list);
   ;;
 
-  class tagPrinterClass = object(self)
+  class tagPrinterClass () = object(self)
     inherit Printer.extensible_printer () as super
 
     method! next_stmt next fmt current =
@@ -720,7 +720,7 @@ module Html = struct
     let fmt = page.page_fmt in
     Format.pp_set_formatter_stag_functions fmt html_stag_functions;
     Format.pp_set_tags fmt true;
-    let pp = new tagPrinterClass in
+    let pp = new tagPrinterClass () in
     Format.fprintf fmt "<pre>@,%a</pre>@?" pp#file (Ast.get ());
     pp_page page
   ;;

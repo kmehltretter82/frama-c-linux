@@ -81,7 +81,8 @@ class printer_with_annot () = object (self)
         if not (Ast.is_computed ()) then
           Kernel.fatal
             "Call to Printer while AST is not fully initialized, \
-             this can lead to unexpected crash. Use Cil_printer instead."
+             this can lead to unexpected crash. Use Cil_printer instead.@\n%s"
+            (Printexc.get_backtrace())
       with Project.NoProject -> () (* weird case when using inline tests, disable
                                       the check altogether. *)
     end

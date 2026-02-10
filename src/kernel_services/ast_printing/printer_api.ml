@@ -537,7 +537,7 @@ module type S = sig
 
   (** Auxiliary module type for a pretty-printer *)
   module type PrinterClass = sig
-    class printer : extensible_printer_type
+    class printer : unit -> extensible_printer_type
   end
 
   (** Signature for extending an existing pretty-printer. OCaml forbids
@@ -554,8 +554,8 @@ module type S = sig
 
       {[
         module PrinterClassDeferred (X: Printer.PrinterClass) = struct
-          class printer : Printer.extensible_printer = object(self)
-            inherit X.printer as super
+          class printer () : Printer.extensible_printer = object(self)
+            inherit X.printer () as super
             (* Override the standard methods *)
           end
         end

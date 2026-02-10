@@ -103,8 +103,8 @@ let change_printer =
     if !first then begin
       first := false;
       let module Printer_class(X: Printer.PrinterClass) = struct
-        class printer = object
-          inherit X.printer as super
+        class printer () = object
+          inherit X.printer () as super
 
           method !varinfo fmt vi =
             if Functions.Libc.is_vla_alloc_name vi.Cil_types.vname then

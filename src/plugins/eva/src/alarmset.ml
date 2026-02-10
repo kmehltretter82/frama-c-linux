@@ -176,8 +176,8 @@ let for_all test ~default = function
 let emitter = Eva_utils.emitter
 
 (* Printer that shows additional information about temporaries *)
-let local_printer: Printer.extensible_printer =
-  let open Cil_types in object (self)
+let local_printer: Printer.extensible_printer Lazy.t =
+  let open Cil_types in lazy object (self)
     inherit Printer.extensible_printer () as super
 
     (* Temporary variables for which we want to print more information *)
@@ -213,7 +213,7 @@ let local_printer: Printer.extensible_printer =
       super#logic_var fmt lvi
   end
 
-let pr_annot = local_printer#code_annotation
+let pr_annot fmt a = (Lazy.force local_printer)#code_annotation fmt a
 
 (* Default behaviour: print one alarm per kinstr. *)
 module Alarm_key = Datatype.Pair_with_collections (Cil_datatype.Kinstr) (Alarms)
