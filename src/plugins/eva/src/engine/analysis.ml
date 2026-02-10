@@ -146,7 +146,7 @@ type 'state engine = (module Engine_sig.S with type Dom.state = 'state)
 exception Error
 
 let compute_from_entry_point  (type t) (engine: t engine)
-    ?cvalue_state ?arguments entry_point =
+    ?(thread=Thread.main) ?cvalue_state ?arguments entry_point =
   let module Engine = (val engine) in
   let lib_entry = Kernel.LibEntry.get () in
   Self.feedback "Analyzing a%scomplete application starting at %a"
@@ -160,7 +160,7 @@ let compute_from_entry_point  (type t) (engine: t engine)
                 initialization is not computable.";
     raise Error
   | `Value initial_state ->
-    Engine.Compute.compute_main_call entry_point initial_state
+    Engine.Compute.compute_main_call ~thread entry_point initial_state
 
 (* Builds the analyzer if needed, and run the analysis. *)
 let compute_from ?cvalue_state ?arguments entry_point =
@@ -216,7 +216,6 @@ let abort () =
 (* Mthread entry point *)
 
 let compute_thread thread cvalue_state =
-  Thread.set_current thread;
   let Thread.{ entry_point; arguments } = Thread.properties thread in
   let arguments = List.map snd arguments in
   let module Engine = (val Engine.current ()) in
@@ -225,7 +224,7 @@ let compute_thread thread cvalue_state =
     Mem_exec.cleanup_results ();
     Self.ComputationState.set Computing;
     let final_state = compute_from_entry_point (module Engine)
-        ~cvalue_state ~arguments entry_point in
+        ~thread ~cvalue_state ~arguments entry_point in
     Engine.Dom.Store.mark_as_computed ();
     Self.ComputationState.set Computed;
     (* Display the final state of each thread main function *)

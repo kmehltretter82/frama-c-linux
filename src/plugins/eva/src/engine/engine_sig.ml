@@ -193,7 +193,8 @@ sig
 
   (** Analysis of a program from the given main function and initial state.
       Returns the abstract state inferred at the return of the main function. *)
-  val compute_main_call: kernel_function -> state -> state or_bottom
+  val compute_main_call:
+    thread:Thread.t -> kernel_function -> state -> state or_bottom
 
   (** Analysis of a function call during the Eva analysis. This function is
       called by [Transfer_stmt] when interpreting a call statement.
@@ -228,13 +229,13 @@ sig
       infer that no other thread can interfere with the current thread. *)
   val inject_init_state : Thread.t -> kernel_function -> state -> state
 
-  (** [inject_after_change access state] injects current interferences to the
-      given [state] that has just been changed by a transfer function with the
-      given [access]es. If enabled, the Mthread domain helps filtering
-      applicable interferences. This function is the identity if the Mthread
-      domain can infer that no shared memory has been read or written during
-      the last transfer function. *)
-  val inject_after_change : Inout_access.t -> state -> state
+  (** [inject_after_change th access state] injects current interferences to the
+      given [state] of the analysis for thread [th] that has just been changed
+      by a transfer function with the given [access]es. If enabled, the
+      Mthread domain helps filtering applicable interferences. This function
+      is the identity if the Mthread domain can infer that no shared memory
+      has been read or written during the last transfer function. *)
+  val inject_after_change : Thread.t ->  Inout_access.t -> state -> state
 end
 
 

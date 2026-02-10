@@ -301,7 +301,7 @@ struct
 
   (* Interference injection *)
 
-  let applicable (state : state) : Interference.t or_bottom =
+  let applicable current_thread (state : state) : Interference.t or_bottom =
     let threads, mutexes = match Dom.get Mt_domain.Domain.key with
       (* Domain disabled, no information about threads and mutexes *)
       | None -> Mt_register.Thread.empty, Mutex.Set.empty
@@ -320,7 +320,7 @@ struct
         acc_interference
     in
     let add_thread thread interferences_map acc_interference =
-      let is_current_thread = Thread.(equal thread (current ())) in
+      let is_current_thread = Thread.(equal thread current_thread) in
       let maybe_running =
         match Mt_register.Thread.find thread threads with
         (* Thread status is unknown, consider that the thread might be running*)
@@ -338,8 +338,8 @@ struct
       current.interferences_by_mutexes
       `Bottom
 
-  let inject state =
-    match applicable state with
+  let inject current_thread state =
+    match applicable current_thread state with
     | `Bottom -> state
     | `Value { state = `Top; _ } -> Dom.top
     | `Value { state = `Value interferences_state; access; _ } ->
@@ -366,10 +366,10 @@ struct
         "inject threads interferences at the start of %a for thread %a"
         Kernel_function.pretty kf
         Thread.pretty th;
-      inject state
+      inject th state
     end
 
-  let inject_after_change access state =
+  let inject_after_change current_thread access state =
     let need_injection () =
       let access = Inout_access.keep_globals_only access in
       let zone = Locations.Zone.join access.read access.write in
@@ -392,7 +392,7 @@ struct
     else begin
       Self.debug ~dkey ~current:true ~once:true
         "inject threads interferences at this point";
-      inject state
+      inject current_thread state
     end
 
 end

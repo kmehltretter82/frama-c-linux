@@ -16,6 +16,9 @@ val is_main : t -> bool
 val id : t -> int
 val label : t -> string
 val find : int -> t option
+val in_callstack : Callstack.t -> t
+val in_local_position : Position.local -> t
+val in_position : Position.t -> t
 
 (** [spawn al name kf args] registers the creation of a thread encountered
     in Eva analysis, and either add this spawn to an existing thread analysis
@@ -50,8 +53,6 @@ val interrupt_handlers : unit -> t list
 val register_interrupt_handlers : Kernel_function.Set.t -> unit
 
 val reset_state : unit -> unit
-val current : unit -> t
-val set_current : t -> unit
 
 type properties = {
   entry_point : Cil_types.kernel_function;

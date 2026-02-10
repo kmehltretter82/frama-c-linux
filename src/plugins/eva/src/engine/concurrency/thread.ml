@@ -73,13 +73,16 @@ let create kind =
 let find id =
   if Int.equal id main.id then Some main else ThreadsById.find_opt id
 
+let in_callstack cs =
+  find cs.Callstack.thread |> Option.get
 
-(* --- Current Thread --- *)
+let in_local_position pos =
+  Position.Local.callstack pos
+  |> in_callstack
 
-let current, set_current =
-  let r = ref main in
-  (fun () -> !r), (fun id -> r := id)
-
+let in_position pos =
+  Position.callstack pos
+  |> Option.fold ~some:in_callstack ~none:main
 
 (* --- Thread identity --- *)
 
@@ -299,8 +302,7 @@ let reset_state () =
   last_thread_id := 1;
   ThreadsById.clear ();
   Identities.clear ();
-  State.clear ();
-  set_current main
+  State.clear ()
 
 let properties thread =
   match thread.kind with

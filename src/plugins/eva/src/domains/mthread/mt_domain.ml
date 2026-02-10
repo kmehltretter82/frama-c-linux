@@ -227,8 +227,8 @@ module Transfer = struct
 
   let update _ state = `Value state
 
-  let assign_return lval result return =
-    let main = Thread.entry_point (Thread.current ()) in
+  let assign_return current_thread lval result return =
+    let main = Thread.entry_point current_thread in
     let main_retres = Library_functions.get_retres_vi main in
     let main_return = Option.map Eva_ast.Build.var main_retres in
     if Option.equal Eva_ast.Lval.equal main_return (Some lval) then
@@ -242,7 +242,9 @@ module Transfer = struct
     | false -> `Value state
     | true ->
       let { return } = reset state in
-      let return = assign_return lval (Eval.value_assigned assigned) return in
+      let current_thread = Thread.in_position pos in
+      let value = Eval.value_assigned assigned in
+      let return = assign_return current_thread lval value return in
       `Value { state with return }
 
   let assume ~pos:_ _ _ _ state = `Value state
@@ -355,9 +357,11 @@ module Domain = struct
   let thread_suspend = thread_update Mt_register.Thread.suspend
   let thread_cancel  = thread_update Mt_register.Thread.cancel
 
-  let thread_id ~pos:_ state = function
-    | [] -> Result.ok (state, Thread.current () |> Thread.id |> Value.of_int)
-    | _ -> Result.error "Invalid parameters@."
+  let thread_id ~pos state = function
+    | [] ->
+      let cs = Position.Local.callstack pos in
+      Result.ok (state, cs.thread |> Value.of_int)
+    | _ :: _ -> Result.error "Invalid parameters@."
 
   let mutex_init ~pos state = function
     | (name, _) :: [] ->
