@@ -274,7 +274,7 @@ module Make (Engine: Engine_Subset) = struct
 
   (* Returns the result of a call. *)
   let process_call ~pos call recursion valuation access state =
-    let process () =
+    try
       let domain_valuation = Eval.to_domain_valuation valuation in
       (* Process the call according to the domain decision. *)
       match Domain.start_call ~pos call recursion domain_valuation state with
@@ -284,9 +284,9 @@ module Make (Engine: Engine_Subset) = struct
         Engine.Compute.compute_call call recursion state
       | `Bottom ->
         { states = []; cacheable = Cacheable; kind = `Bottom }
-    in
-    Eva_utils.protect process
-      ~cleanup:(fun () -> InOutCallback.clear ())
+    with exn ->
+      InOutCallback.clear ();
+      raise exn
 
   (* ------------------- Retro propagation on formals ----------------------- *)
 

@@ -12,17 +12,6 @@ open Eva_automata
 open Lattice_bounds
 open Bottom.Operators
 
-type signal = Abort | Kill
-
-let signal_emitted = ref None
-let signal_abort ~kill = signal_emitted := Some (if kill then Kill else Abort)
-let signal_reset () = signal_emitted := None
-
-let check_signals () =
-  Option.iter
-    (fun signal -> raise (if signal = Kill then Sys.Break else Self.Abort))
-    !signal_emitted
-
 let dkey = Self.dkey_iterator
 
 let blocks_share_locals b1 b2 =
@@ -425,7 +414,7 @@ module Make_Dataflow
     let tank = get_edge_data e in
     let flow = Partitioning.drain tank in
     Async.yield ();
-    check_signals ();
+    Signal.check ();
     current_ki := kinstr;
     let open Current_loc.Operators in
     let<> UpdatedCurrentLoc = e.edge_loc in
@@ -708,8 +697,9 @@ module Make (Engine : Engine_Subset) = struct
       results, !Dataflow.cacheable
     in
     let cleanup () =
+      Self.feedback ~once:true "Clean up and save partial results.";
       Dataflow.mark_degeneration ();
       Dataflow.merge_results ~save_results
     in
-    Eva_utils.protect compute ~cleanup
+    Signal.protect compute ~cleanup
 end

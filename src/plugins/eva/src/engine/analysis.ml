@@ -66,7 +66,7 @@ let generate_specs () =
 let pre_analysis () =
   Self.configure_verbosity ();
   Parameters.configure_precision ();
-  Iterator.signal_reset ();
+  Signal.reset ();
   floats_ok ();
   options_ok ();
   plugins_ok ();
@@ -106,27 +106,6 @@ let post_analysis () =
   Summary.FunctionStats.recompute_all ();
   Red_statuses.report ()
 
-(* ----- Signal handling ---------------------------------------------------- *)
-
-(* Registers signal handlers for SIGUSR1 and SIGINT to cleanly abort the Eva
-   analysis. Returns a function that restores previous signal behaviors after
-   the analysis. *)
-let register_signal_handler () =
-  let warn () =
-    Self.warning ~once:true "Stopping analysis at user request@."
-  in
-  let stop _ = warn (); Iterator.signal_abort ~kill:true in
-  let interrupt _ = warn (); raise Sys.Break in
-  let register_handler signal handler =
-    match Sys.signal signal (Sys.Signal_handle handler) with
-    | previous_behavior -> fun () -> Sys.set_signal signal previous_behavior
-    | exception Invalid_argument _ -> fun () -> ()
-    (* Ignore: SIGURSR1 is not available on Windows,
-       and possibly on other platforms. *)
-  in
-  let restore_sigusr1 = register_handler Sys.sigusr1 stop in
-  let restore_sigint = register_handler Sys.sigint interrupt in
-  fun () -> restore_sigusr1 (); restore_sigint ()
 
 (* ----- Analysis status ---------------------------------------------------- *)
 
@@ -197,7 +176,7 @@ let compute_from ?cvalue_state ?arguments entry_point =
   in
   try
     Self.ComputationState.set Computing;
-    let restore_signals = register_signal_handler () in
+    let restore_signals = Signal.setup () in
     let final_state = Fun.protect ~finally:restore_signals compute in
     Self.(ComputationState.set Computed);
     Engine.Dom.Store.mark_as_computed ();
@@ -232,8 +211,7 @@ let main () = if Parameters.ForceValues.get () then compute ()
 let () = Boot.Main.extend main
 
 let abort () =
-  if Self.ComputationState.get () = Computing
-  then Iterator.signal_abort ~kill:false
+  Signal.abort ()
 
 (* Mthread entry point *)
 

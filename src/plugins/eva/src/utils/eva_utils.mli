@@ -24,11 +24,6 @@ val get_subdivision: stmt -> int
 val pretty_actuals :
   Format.formatter -> (Eva_ast.exp * Cvalue.V.t) list -> unit
 
-(** [protect f ~cleanup] runs [f]. On a user interruption or a Frama-C error,
-    if option -save is set, applies [cleanup]. This is used to clean up and
-    save partial results when the analysis is aborted. *)
-val protect: (unit -> 'a) -> cleanup:(unit -> unit) -> 'a
-
 (* Statements for which the analysis has degenerated. [true] means that this is
    the statement on which the degeneration occurred, or a statement above in
    the callstack *)
