@@ -976,8 +976,7 @@ module AstDiff =
                   from the current one"
     end)
 
-let () = Parameter_customize.set_group inout_source
-
+let () = Parameter_customize.set_group grp_debug
 module DebugInterpretedAutomata =
   False
     (struct
