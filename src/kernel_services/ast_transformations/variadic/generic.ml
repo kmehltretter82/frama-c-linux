@@ -95,9 +95,9 @@ let translate_va_builtin caller inst =
           "Wrong type argument in va_start: %a is promoted to %a when used \
            in the variadic part of the arguments. (You should pass %a to \
            va_start)"
-          Printer.pp_typ ty
-          Printer.pp_typ promoted_type
-          Printer.pp_typ promoted_type
+          Cil_printer.pp_typ ty
+          Cil_printer.pp_typ promoted_type
+          Cil_printer.pp_typ promoted_type
     end;
     (* Build the replacing instruction *)
     let va_list, ty, lv = Build.(of_lval va_list, of_ctyp ty, of_lval lv) in
