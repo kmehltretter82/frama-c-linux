@@ -977,12 +977,12 @@ module AstDiff =
     end)
 
 let () = Parameter_customize.set_group grp_debug
-module DebugInterpretedAutomata =
+module DumpInterpretedAutomata =
   False
     (struct
-      let option_name = "-debug-interpreted-automata"
-      let module_name = "DebugInterpretedAutomata"
-      let help = "outputs each interpreted automata built into a dot file"
+      let option_name = "-dump-interpreted-automata"
+      let module_name = "DumpInterpretedAutomata"
+      let help = "dumps each interpreted automata built into a dot file"
     end)
 
 (* ************************************************************************* *)

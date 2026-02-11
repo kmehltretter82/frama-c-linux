@@ -1058,7 +1058,7 @@ let build_automaton ~annotations kf =
   in
 
   (* Debug output *)
-  if Kernel.DebugInterpretedAutomata.get () then begin
+  if Kernel.DumpInterpretedAutomata.get () then begin
     let function_name = Kernel_function.get_name kf in
     let file_name, file_out = Filename.open_temp_file function_name ".dot" in
     Kernel.result "Output the interpreted automaton for %s into %s"
