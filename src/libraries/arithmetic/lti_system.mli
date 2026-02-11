@@ -78,9 +78,9 @@ module Make (K : Field.S) : sig
         unrolled through the transition phase. *)
   type 'n behavior = { transition : 'n box list ; permanent : 'n box }
 
-  (** Behavior computation. As stated above, a complete documentation of the
-      underlying theory will be provided. The optionnal parameters are as
-      follows:
+  (** Behavior computation. See module-level documentation for a general
+      overview and a link to the underlying theory. The optionnal parameters
+      are as follows:
       - [timeout] specifies the maximum analysis duration. It is expressed
         in seconds, and its default value is one second.
       - [completion_target] specifies the relative completion of the permanent

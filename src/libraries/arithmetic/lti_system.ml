@@ -106,7 +106,7 @@ module Make (K : Field.S) = struct
    * - To prove that {m ρ(A) < 1}, the fonction searches for a spectral
    *   exponent, i.e a {m q ∈ ℕ} such as {m ||A^q||₁ < 1}.
    * - The infinite sum is then divided in two: a finite sum of the {m q}
-   *   first elements and the infinite remainding sum. Indeed, as {m q} grows,
+   *   first elements and the infinite remaining sum. Indeed, as {m q} grows,
    *   the finite sum becomes a better and better underapproximation of the
    *   limit radius, and the infinite remainder becomes smaller and smaller.
    * - The infinite remainder is approximated by the computation

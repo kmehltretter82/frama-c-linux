@@ -35,7 +35,7 @@ module Make (K : Field.S) : sig
 
   (** Boxes can also be seen as a collection of intervals. The call [bounds b]
       returns thus the bounds in each dimension of the closed space defined
-      by [b]. The [lower b] (reps. [upper b]) function returns only the lower
+      by [b]. The [lower b] (resp. [upper b]) function returns only the lower
       bounds (resp. upper bounds). *)
   val bounds : 'n t -> 'n vector * 'n vector
   val lower : 'n t -> 'n vector
