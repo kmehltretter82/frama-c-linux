@@ -37,7 +37,7 @@ val dkey_summary : category
 (** {2 Debug categories.} *)
 
 (** Same as Log's {!register_category}, but [help] is mandatory, and a verbosity
-    level is associated to the category. *)
+    level can be associated to the category. *)
 val register_category: ?level:int -> help:string -> string -> category
 
 val dkey_show: category

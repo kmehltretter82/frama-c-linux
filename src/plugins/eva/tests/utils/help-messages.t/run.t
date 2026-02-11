@@ -161,10 +161,10 @@ Help message about message categories.
      3: malloc:new precision-settings
      4: malloc:automatic-free split-return partition
      5: final-states initial-state
-     6: malloc widening
-     7: imprecision nonlin widen-hints pointer-comparison
-     8: interferences
+     6: imprecision malloc
+     7: widen-hints widening pointer-comparison
+     8: nonlin
      9: callstack-hash callstacks
     10: progress
-    11: cardinal domain_product include-string-literals iterator
+    11: cardinal include-string-literals
   -eva-verbose N automatically enables all message categories with a verbosity equal to or less than N. Default to 5.

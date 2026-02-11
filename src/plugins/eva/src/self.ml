@@ -116,7 +116,7 @@ let () =
 
 module IntTbl = Hashtbl.Make (Datatype.Int)
 
-(* Each Eva message category is bound to a verbosity level, at which the key
+(* Eva message category can be bound to a verbosity level, at which the key
    is automatically enabled. This table binds each verbosity level to the list
    of message keys enabled at this level. *)
 let dkey_by_verbosity : category list IntTbl.t = IntTbl.create 11
@@ -126,7 +126,7 @@ let dkey_by_verbosity : category list IntTbl.t = IntTbl.create 11
    level to the list of warning keys enabled as feedback at this level. *)
 let wkey_by_verbosity : warn_category list IntTbl.t = IntTbl.create 11
 
-let add_dkey_verbosity level category =
+let add_dkey_verbosity category level =
   let list = IntTbl.find_default ~default:[] dkey_by_verbosity level in
   IntTbl.replace dkey_by_verbosity level (category :: list)
 
@@ -134,8 +134,8 @@ let add_wkey_verbosity level category =
   let list = IntTbl.find_default ~default:[] wkey_by_verbosity level in
   IntTbl.replace wkey_by_verbosity level (category :: list)
 
-(* Enable/disable all message categories according to -eva-verbose,
-   except for categories manually set by the user via -eva-msg-key. *)
+(* Enable/disable message and warning categories according to -eva-verbose,
+   except for categories manually set by the user. *)
 let configure_verbosity () =
   let level = Verbose.get () in
   let change_message positive category =
@@ -152,13 +152,11 @@ let configure_verbosity () =
   let enable i list = List.iter (change_warning (i <= level)) list in
   IntTbl.iter enable wkey_by_verbosity
 
-(* Makes the help message of various categories mandatory.
-   Also associates each category to a verbosity level. *)
-let register_category ?(level=11) ~help name =
-  assert (level >= 0 && level <= 11);
-  let default = level <= default_verbosity in
+(* Makes the help message mandatory and adds an optional verbosity level. *)
+let register_category ?level ~help name =
+  let default = Option.fold ~none:false ~some:((>=) default_verbosity) level in
   let category = register_category ~help ~default name in
-  add_dkey_verbosity level category;
+  Option.iter (add_dkey_verbosity category) level;
   category
 
 (* Default status of warning categories: feedback is associated to a verbosity
@@ -234,9 +232,9 @@ let () =
    3-4: Important information about the analysis: partitioning, imprecisions…
    5: Initial and final states.
    6-8: Advanced information about automatic behaviors.
-   9: Progress of the analysis (equivalent to -eva-show-progress).
-   10: Additional information such as callstacks in messages.
-   11: All messages.
+   9: Additional information such as callstacks in messages.
+   10: Progress of the analysis (equivalent to -eva-show-progress).
+   11: All messages (except debug messages).
 *)
 
 let dkey_show =
@@ -268,12 +266,12 @@ let dkey_cvalue_domain =
     ~help:"print states of the cvalue domain"
 
 let dkey_iterator =
-  register_category "iterator" ~level:11
+  register_category "iterator"
     ~help:"debug messages about the fixpoint engine on the control-flow graph \
            of functions"
 
 let dkey_widening =
-  register_category "widening" ~level:6
+  register_category "widening" ~level:7
     ~help:"print a message at each point where the analysis applies a widening"
 
 let dkey_partition =
@@ -302,7 +300,7 @@ let dkey_callstack_hash =
     ~help:"additionally print the current callstack hash in some messages"
 
 let dkey_include_string_literal =
-  register_category "include-string-literals"
+  register_category "include-string-literals" ~level:11
     ~help:"when printing a state, \
            also include globals representing string literals"
 

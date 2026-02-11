@@ -8,7 +8,7 @@
 
 open Eval
 
-let dkey = Self.register_category "nonlin" ~level:7
+let dkey = Self.register_category "nonlin" ~level:8
     ~help:"messages about evaluation of subdivisions enabled by -eva-subdivide-non-linear"
 
 (* ----------------- Occurrences of lvalues in expressions ------------------ *)

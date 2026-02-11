@@ -15,7 +15,7 @@ open Locations
 let register_builtin name ?replace builtin =
   Builtins.register_builtin name ?replace Cacheable builtin
 
-let dkey = Self.register_category "imprecision" ~level:7
+let dkey = Self.register_category "imprecision" ~level:6
     ~help:"messages related to possible imprecision of builtins interpreting \
            memcpy, memmove and memset"
 
