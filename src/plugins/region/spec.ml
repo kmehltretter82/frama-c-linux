@@ -65,7 +65,7 @@ let pp_regions fmt = function
     end
 
 (* -------------------------------------------------------------------------- *)
-(* ---  Parsers                                                           --- *)
+(* ---  Parsing Environment                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
 type env = {
@@ -76,6 +76,30 @@ type env = {
 }
 
 let error (env:env) ~loc msg = env.context.error loc msg
+
+(* -------------------------------------------------------------------------- *)
+(* ---  Syntactic Filter                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let lrange env (e: lexpr) =
+  match e.lexpr_node with
+  | PLrange(None,None) -> ()
+  | _ -> error env ~loc:e.lexpr_loc "Range [..] expected"
+
+let rec lpath env (e: lexpr) =
+  let loc = e.lexpr_loc in
+  match e.lexpr_node with
+  | PLvar _ -> ()
+  | PLdot( p , _ ) | PLarrow( p , _ )
+  | PLunop( Ustar , p ) | PLunop( Uamp , p ) -> lpath env p
+  | PLbinop( p , Badd , rg ) | PLarrget(p,rg) -> lpath env p ; lrange env rg
+  | PLcast( _ , p ) -> lpath env p
+  | _ ->
+    error env ~loc "Unexpected l-value for region spec"
+
+(* -------------------------------------------------------------------------- *)
+(* ---  Parsers                                                           --- *)
+(* -------------------------------------------------------------------------- *)
 
 let parse_term env t =
   let open Logic_typing in
@@ -124,7 +148,7 @@ let rec parse_region (env:env) p =
       error env ~loc:p.lexpr_loc "Field range from different region paths" ;
     env.rpaths <- Field(p.lexpr_loc,l1,f,g) :: env.rpaths
   | _ ->
-    let lv = parse_lval env p in
+    let lv = lpath env p ; parse_lval env p in
     env.rpaths <- Alias(p.lexpr_loc,lv) :: env.rpaths
 
 (* -------------------------------------------------------------------------- *)
