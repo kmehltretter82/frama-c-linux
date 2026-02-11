@@ -155,7 +155,6 @@ Help message about message categories.
     d-traces                : print states of the traces domain
     d-unit                  : print states of the unit domain
   [eva] Message categories by verbosity:
-     0: 
      1: summary
      2: show
      3: malloc:new precision-settings

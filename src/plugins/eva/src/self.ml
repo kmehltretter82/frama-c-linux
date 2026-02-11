@@ -41,6 +41,7 @@ include Plugin.Register
 let () =
   add_plugin_output_aliases ~visible:false ~deprecated:true [ "value" ; "val" ]
 
+let () = Verbose.set_range ~min:0 ~max:11
 
 (* ----- Analysis state ----------------------------------------------------- *)
 
@@ -126,13 +127,13 @@ let dkey_by_verbosity : category list IntTbl.t = IntTbl.create 11
    level to the list of warning keys enabled as feedback at this level. *)
 let wkey_by_verbosity : warn_category list IntTbl.t = IntTbl.create 11
 
-let add_dkey_verbosity category level =
-  let list = IntTbl.find_default ~default:[] dkey_by_verbosity level in
-  IntTbl.replace dkey_by_verbosity level (category :: list)
-
-let add_wkey_verbosity level category =
-  let list = IntTbl.find_default ~default:[] wkey_by_verbosity level in
-  IntTbl.replace wkey_by_verbosity level (category :: list)
+let register_key_verbosity tbl category level =
+  assert (level >= 0 && level <= 11);
+  (* No need to register keys with a verbosity level of 0,
+     as they are always enabled. *)
+  if level > 0 then
+    let list = IntTbl.find_default ~default:[] tbl level in
+    IntTbl.replace tbl level (category :: list)
 
 (* Enable/disable message and warning categories according to -eva-verbose,
    except for categories manually set by the user. *)
@@ -156,7 +157,7 @@ let configure_verbosity () =
 let register_category ?level ~help name =
   let default = Option.fold ~none:false ~some:((>=) default_verbosity) level in
   let category = register_category ~help ~default name in
-  Option.iter (add_dkey_verbosity category) level;
+  Option.iter (register_key_verbosity dkey_by_verbosity category) level;
   category
 
 (* Default status of warning categories: feedback is associated to a verbosity
@@ -174,7 +175,7 @@ let register_warn_category ~help ?default name =
     | Some (Feedback level) -> Some Log.Wfeedback, Some level
   in
   let category = register_warn_category ~help ?default name in
-  Option.iter (fun level -> add_wkey_verbosity level category) level;
+  Option.iter (register_key_verbosity wkey_by_verbosity category) level;
   category
 
 (* ----- Help message about categories -------------------------------------- *)
