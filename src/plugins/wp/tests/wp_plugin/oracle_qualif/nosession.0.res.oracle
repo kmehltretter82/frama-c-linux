@@ -6,8 +6,11 @@
 [wp] Warning: Missing RTE guards
 [wp] 1 goal scheduled
 [wp] [NoResult] typed_f_ensures (Qed)
+[wp] User Error: Missing Test Results (1)
 [wp] Proved goals:    2 / 3
   Terminating:     1
   Unreachable:     1
   Unsuccess:       1
-  Missing:         1
+[wp] Deferred error message was emitted during execution:
+  Missing Test Results (1)
+[kernel] Plug-in wp aborted: invalid user input.

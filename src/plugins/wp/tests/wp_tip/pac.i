@@ -3,6 +3,7 @@
 */
 
 /* run.config_qualif
+   EXIT: 1
    OPT: -wp-status -wp-prover tip -wp-script dry
  */
 
