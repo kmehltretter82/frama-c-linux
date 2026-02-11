@@ -82,6 +82,7 @@ val add_logic : map -> Cil_types.logic_info -> domain
 val add_result : map -> node
 val add_label : map -> string -> node
 val add_field : node -> fieldinfo -> node
+val add_field_range : node -> fieldinfo -> fieldinfo -> node
 val add_index : node -> typ -> node
 val add_points_to : node -> node -> unit
 val add_value : node -> typ -> node option

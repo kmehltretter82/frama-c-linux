@@ -76,8 +76,14 @@ let span fields rg =
     | lr :: _ ->
       pad p lr.offset @@ Field lr.data :: pad (last lr) q []
 
+let pp_slices fmt = function
+  | [Field f] -> Format.fprintf fmt ".%s" f.fname
+  | [Field f;Field g] | [Field f;_ ;Field g] ->
+    Format.fprintf fmt "(%s-%s)" f.fname g.fname
+  | slices -> List.iter (pp_slice fmt) slices
+
 let pretty fields fmt rg =
-  List.iter (pp_slice fmt) @@ span fields rg
+  pp_slices fmt @@ span fields rg
 
 let pslice fmt ~fields ~offset ~length =
-  List.iter (pp_slice fmt) @@ span fields { offset ; length ; data = () }
+  pp_slices fmt @@ span fields { offset ; length ; data = () }

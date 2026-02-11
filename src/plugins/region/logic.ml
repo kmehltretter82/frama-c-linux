@@ -253,6 +253,9 @@ let () = rterm := add_term
 
 let add_path (env: env) = function
   | Spec.Alias(loc,lv) -> snd @@ add_addr_lval ~loc env lv
+  | Spec.Field(loc,lv,f,g) ->
+    let r = snd @@ add_addr_lval ~loc env lv in
+    Memory.add_field_range r f g
 
 let add_region (env: env) (r : Spec.region) =
   let rs = List.map (add_path env) r.paths in

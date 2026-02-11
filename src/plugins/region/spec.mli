@@ -10,6 +10,7 @@ open Cil_types
 
 type path =
   | Alias of location * term_lval
+  | Field of location * term_lval * fieldinfo * fieldinfo
 
 type region = {
   name : string option ;

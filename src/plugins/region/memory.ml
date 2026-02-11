@@ -439,6 +439,24 @@ let add_field (r:node) (fd:fieldinfo) : node =
       let nc = UF.fresh store { empty with clayout } in
       merge r nc ; data
 
+let add_field_range (r:node) (f:fieldinfo) (g:fieldinfo) : node =
+  let cf = f.fcomp in
+  let cg = g.fcomp in
+  if not (cf.cstruct && Compinfo.equal cf cg) then
+    raise (Invalid_argument "Region.Memory.add_field_range") ;
+  let store = UF.store r in
+  let size = bitsSizeOf (Cil_const.mk_tcomp cf) in
+  let a, p = Cil.fieldBitsOffset f in
+  let b, q = Cil.fieldBitsOffset g in
+  let offset = min a b in
+  let length = max (a+p) (b+q) - offset in
+  let data = new_chunk store ~parent:r () in
+  let ranges = Ranges.singleton { offset ; length ; data } in
+  let fields = Fields.(union (singleton f) (singleton g)) in
+  let clayout = Compound(size,fields,ranges) in
+  let nc = UF.fresh store { empty with clayout } in
+  merge r nc ; data
+
 let add_index (r:node) (ty:typ) : node =
   let size = bitsSizeOf ty in
   let re = new_chunk (UF.store r) ~size () in
