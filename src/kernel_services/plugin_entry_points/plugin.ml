@@ -196,11 +196,8 @@ module Register
      end) =
 struct
 
-  let verbose_level =
-    let default = !default_verbose_level in
-    ref (fun () -> default)
-
-  let debug_level = ref (fun () -> 0)
+  let verbose_level = Extlib.mk_fun "verbose_level"
+  let debug_level = Extlib.mk_fun "debug_level"
 
   (* unused by the kernel: it uses Cmdline.Kernel_log instead;
      see module [L] below *)
@@ -618,7 +615,7 @@ struct
   module Verbose = struct
     include
       Int(struct
-        let default = !verbose_level ()
+        let default = !default_verbose_level
         let option_name = verbose_optname
         let arg_name = "n"
         let help =
@@ -628,9 +625,9 @@ struct
       end)
 
     let get () =
-      match !Cmdline.Verbose_level.value_if_set with
-      | Some level -> if is_set () then get () else level
-      | None -> get ()
+      if is_set () || Option.is_none !Cmdline.Verbose_level.value_if_set
+      then get ()
+      else Cmdline.Verbose_level.get ()
 
     let () =
       verbose_level := get;
@@ -648,7 +645,7 @@ struct
   module Debug = struct
     include
       Int(struct
-        let default = !debug_level ()
+        let default = 0
         let option_name = debug_optname
         let arg_name = "n"
         let help =
