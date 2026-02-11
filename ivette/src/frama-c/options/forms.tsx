@@ -22,7 +22,7 @@ import * as Params from 'frama-c/kernel/api/parameters';
 
 import { SelectedPlugins, usePluginsContextById } from '.';
 import {
-  customSyncError, State, useServerField, useSyncValue
+  customSyncError, State, syncErrorEvent, useServerField, useSyncValue
 } from '../states';
 import { Remote } from './actions';
 import { Icon } from 'dome/controls/icons';
@@ -88,8 +88,8 @@ function useField<A>(
   }, [buffer.error, setIsError]);
 
   React.useEffect(() => {
-    window.addEventListener("my:syncError", onSyncError);
-    return () => window.removeEventListener("my:syncError", onSyncError);
+    window.addEventListener(syncErrorEvent, onSyncError);
+    return () => window.removeEventListener(syncErrorEvent, onSyncError);
   }, [onSyncError]);
 
   return buffer;
@@ -142,14 +142,13 @@ function getActions<A>(
   if(!state) return undefined;
   return (
     <Forms.Actions>
-      <Forms.ResetButton state={state} title="Reset" />
+      {!isError && <Forms.ResetButton state={state} title="Reset" /> }
       <Forms.CommitButton state={state} title="Apply" />
       {isError &&
         <Icon
           id='WARNING'
           kind='negative'
-          className='dome-xIcon-blink'
-          title="This field has not been updated, the value was not accepted"
+          title="Field not updated: invalid value for this parameter"
         />}
     </Forms.Actions>
   );

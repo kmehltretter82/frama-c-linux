@@ -258,10 +258,12 @@ interface Handler<A> {
 
 enum SyncStatus { OffLine, Loading, Loaded }
 
-export type customSyncError = { name: string, error: unknown }
+export type customSyncError = { name: string, error: string }
+export const syncErrorEvent = 'states:syncError' as const;
+
 declare global {
   interface WindowEventMap {
-    "my:syncError": CustomEvent<customSyncError>;
+    [syncErrorEvent]: CustomEvent<customSyncError>;
   }
 }
 
@@ -323,8 +325,7 @@ class SyncState<A> extends GlobalState<A | undefined> {
         error: "Fail to update state"
       };
       window.dispatchEvent(
-        new CustomEvent<customSyncError>("my:syncError", { detail }));
-      this.setValue(undefined);
+        new CustomEvent<customSyncError>(syncErrorEvent, { detail }));
     }
   }
 
