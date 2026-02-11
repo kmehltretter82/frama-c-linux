@@ -189,14 +189,15 @@ let print_all_categories () =
   let length = Stdlib.String.length in
   let max = List.fold_left (fun m (name, _) -> max m (length name)) 0 list in
   let print_one_elt fmt (name, help) =
-    Format.fprintf fmt "%-*s : %s" max name help
+    Format.fprintf fmt "%-*s : @[<hov>%a@]" max name Format.pp_print_text help
   in
   let is_domain (name, _) = is_domain_category name in
   let domains, others = List.partition is_domain list in
   feedback ~level:0 "@[<v>Standard Eva message categories are:@;%a@]"
     (Format.pp_print_list print_one_elt) others;
   feedback ~level:0
-    "@[<v>Additional message categories for printing domain states:@;%a@]"
+    "@[<v>Additional message categories for printing domain states \
+     on user directives:@;%a@]"
     (Format.pp_print_list print_one_elt) domains
 
 let print_categories_by_verbosity () =
@@ -264,7 +265,7 @@ let dkey_pointer_comparison =
 
 let dkey_cvalue_domain =
   register_category "d-cvalue" ~level:0
-    ~help:"print states of the cvalue domain on some user directives"
+    ~help:"print states of the cvalue domain"
 
 let dkey_iterator =
   register_category "iterator" ~level:11
