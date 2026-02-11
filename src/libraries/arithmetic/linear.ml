@@ -75,6 +75,12 @@ module Space (Field : Field.S) = struct
 
     let transpose m = init m.cols m.rows (fun j i -> get i j m)
 
+    let equal l r =
+      let equal_elt row col = Field.(get row col l = get row col r) in
+      let equal_row row = Finite.for_all (equal_elt row) l.cols in
+      Finite.for_all equal_row l.rows
+
+
     let abs m = { m with data = Parray.map Field.abs m.data }
     let scale k m = { m with data = Parray.map (Field.( * ) k) m.data }
     let ( + ) l r = init l.rows l.cols Field.(fun i j -> get i j l + get i j r)
@@ -86,6 +92,7 @@ module Space (Field : Field.S) = struct
       let folder i k j acc = Field.(get i j l * get j k r + acc) in
       let elt i k = Finite.fold (folder i k) m Field.zero in
       init n p elt
+
 
     let all_components_lower_than l r =
       let lower i j acc = acc && Field.(get i j l < get i j r) in
@@ -105,89 +112,85 @@ module Space (Field : Field.S) = struct
       Finite.fold max m.rows Field.zero
 
 
-    let swap_rows m r r' =
-      let swap c m =
-        let elt = get r c m and elt' = get r' c m in
-        m |> set r c elt' |> set r' c elt
-      in Finite.fold swap m.cols m
+    let rec inverse (matrix : ('n, 'n) matrix) =
+      let inverse = id matrix.rows in
+      let pivot_row = Finite.first in
+      let pivot_col = Finite.first in
+      let matrix, inverse = row_echelon matrix inverse pivot_row pivot_col in
+      back_propagation matrix inverse
 
-    let argmax m starting_row col =
-      let max row argmax_row =
-        if not Finite.(row < starting_row) then
-          let argmax_value = Field.abs (get argmax_row col m) in
-          let row_value = Field.abs (get row col m) in
-          if Field.(argmax_value < row_value) then row else argmax_row
-        else argmax_row
-      in Finite.fold max m.rows starting_row
-
-    let equal l r =
-      let equal_elt row col = Field.(get row col l = get row col r) in
-      let equal_row row = Finite.forall (equal_elt row) l.cols in
-      Finite.forall equal_row l.rows
-
-    let rec back_propagation m inverse start =
-      let size = m.rows in
-      if Finite.(first < start) then
-        let propagate r (m, inverse) =
-          if Finite.(r < start) then
-            let f = Field.(get r start m / get start start m) in
-            let compute c m = set r c Field.(get r c m - f * get start c m) m in
-            let inverse = Finite.fold compute size inverse in
-            let m = Finite.fold compute size m in
-            (m, inverse)
-          else (m, inverse)
-        in
-        let m, inverse = Finite.fold propagate size (m, inverse) in
-        back_propagation m inverse Finite.(prev start |> weaken)
-      else if equal m (id size) then Some inverse else None
-
-    let rec inverse_aux m inverse h k =
-      let open Option.Operators in
-      let size = m.rows in
-      (* Monadic operator to return [Option.value ~default] on the result of f *)
-      let ( let- ) default f = Option.(f `Callback |> value ~default) in
-      (* Find the k-th pivot *)
-      let i_max = argmax m h k in
-      if Field.(get i_max k m = zero) then
-        (* No pivot here, goes to the next. Stop if we've done them all. *)
-        let- `Callback = m, inverse in
-        let+ k = Finite.(next k |> strengthen size) in
-        inverse_aux m inverse h k
+    and row_echelon matrix inverse pivot_row pivot_col =
+      let n = matrix.rows in
+      let incr k = Finite.(next k |> strengthen n) in
+      (* Find the k-th pivot. *)
+      let i_max = argmax_col pivot_col pivot_row (Finite.last n) matrix in
+      (* If the pivot is at zero in this column, try the next one. *)
+      if Field.(get i_max pivot_col matrix = zero) then
+        match incr pivot_col with
+        | Some pivot_col -> row_echelon matrix inverse pivot_row pivot_col
+        | None -> matrix, inverse
       else
-        let value = get i_max k m in
+        (* Normalize all values in pivot row with the pivot value. *)
+        let value = get i_max pivot_col matrix in
         let divide col m = Field.(get i_max col m / value) in
         let normalize col m = set i_max col (divide col m) m in
-        let m = Finite.fold normalize size m in
-        let m = swap_rows m h i_max in
-        let inverse = Finite.fold normalize size inverse in
-        let inverse = swap_rows inverse h i_max in
-        (* For all rows below pivot, fill with zeros and update remaining
-           elements in the row. *)
-        let rec below_pivot i (m, inverse) =
-          if Finite.(h < i) then
-            let f = Field.(get i k m / get h k m) in
-            let m = set i k Field.zero m in
-            let on_row bypass = remaining_current_row bypass f i in
-            let m = Finite.fold (on_row false) size m in
-            let inverse = Finite.fold (on_row true) size inverse in
-            (m, inverse)
-          else (m, inverse)
-        (* Update remaining elements in the current row. *)
-        and remaining_current_row bypass f i j m =
-          if Finite.(k < j) || bypass
-          then set i j Field.(get i j m - f * get h j m) m
-          else m
-        in
-        let m, inverse = Finite.fold below_pivot size (m, inverse) in
-        let- `Callback = m, inverse in
-        let* h = Finite.(next h |> strengthen size) in
-        let+ k = Finite.(next k |> strengthen size) in
-        inverse_aux m inverse h k
+        let matrix  = Finite.fold normalize n matrix  in
+        let inverse = Finite.fold normalize n inverse in
+        (* Swap the pivot row with the argmax row. *)
+        let matrix  = swap_rows pivot_row i_max matrix  in
+        let inverse = swap_rows pivot_row i_max inverse in
+        (* Stop there if we are at the end. *)
+        match incr pivot_row, incr pivot_col with
+        | None, _ | _, None -> matrix, inverse
+        | Some next_pivot_row, Some next_pivot_col ->
+          (* Tools used to update the matrices. *)
+          let pivot_value = get pivot_row pivot_col matrix in
+          let factor i = Field.(get i pivot_col matrix / pivot_value) in
+          let value i j m = Field.(get i j m - factor i * get pivot_row j m) in
+          let update_elt i j m = set i j (value i j m) m in
+          let update_row start i = Finite.fold (update_elt i) ~start n in
+          let for_all_rows_after f = Finite.fold f ~start:next_pivot_row n in
+          (* Fill with zeros the lower part of the pivot column. *)
+          let to_zero i = set i pivot_col Field.zero in
+          let matrix = for_all_rows_after to_zero matrix in
+          (* Update all remaining elements on each row below and for each column
+           * after the pivot column. Thus all columns in the inverse matrix. *)
+          let matrix = for_all_rows_after (update_row next_pivot_col) matrix in
+          let inverse = for_all_rows_after (update_row Finite.first) inverse in
+          row_echelon matrix inverse next_pivot_row next_pivot_col
 
-    let inverse m =
-      let size = m.rows in
-      let m, inverse = inverse_aux m (id size) Finite.first Finite.first in
-      back_propagation m inverse (Finite.last size)
+    and swap_rows row row' matrix =
+      let swap_elt col matrix =
+        let elt  = get row  col matrix in
+        let elt' = get row' col matrix in
+        matrix |> set row col elt' |> set row' col elt
+      in Finite.fold swap_elt matrix.cols matrix
+
+    and argmax_col col start stop matrix =
+      let max row argmax =
+        let argmax_value = Field.abs (get argmax col matrix) in
+        let row_value = Field.abs (get row col matrix) in
+        if Field.(argmax_value < row_value) then row else argmax
+      in Finite.fold max ~start ~stop matrix.rows stop
+
+    and back_propagation matrix inverse =
+      let starts = Finite.fold List.cons matrix.rows [] in
+      let do_all_steps = List.fold_left back_propagation_step in
+      let matrix, inverse = do_all_steps (matrix, inverse) starts in
+      if equal matrix (id matrix.rows) then Some inverse else None
+
+    and back_propagation_step (matrix, inverse) pivot =
+      let n = matrix.rows in
+      let row_substitution row (matrix, inverse) =
+        if Finite.(row < pivot) then
+          let f = Field.(get row pivot matrix / get pivot pivot matrix) in
+          let value col m = Field.(get row col m - f * get pivot col m) in
+          let update col m = set row col (value col m) m in
+          let inverse = Finite.fold update n inverse in
+          let matrix = Finite.fold update n matrix in
+          (matrix, inverse)
+        else (matrix, inverse)
+      in Finite.fold row_substitution n (matrix, inverse)
 
   end
 
@@ -228,7 +231,5 @@ module Space (Field : Field.S) = struct
       zero dimension |> set i Field.one
 
   end
-
-
 
 end
