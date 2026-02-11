@@ -6,25 +6,27 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module F = File
 open Cil_types
+open Cil_datatype
 open Cil
 
 let dkey = Sparecode_params.register_category "globs"
 
 let debug format = Sparecode_params.debug ~dkey ~level:2 format
 
-let used_variables = Hashtbl.create 257
-let var_init = Hashtbl.create 257
-let used_typeinfo = Hashtbl.create 257
-let used_compinfo = Hashtbl.create 257
-let used_enuminfo = Hashtbl.create 257
+let used_variables = Varinfo.Hashtbl.create 257
+let var_init = Varinfo.Hashtbl.create 257
+let used_typeinfo = Typeinfo.Hashtbl.create 257
+let used_compinfo = Compinfo.Hashtbl.create 257
+let used_enuminfo = Enuminfo.Hashtbl.create 257
 
 let clear_tables () =
-  Hashtbl.clear used_variables;
-  Hashtbl.clear var_init;
-  Hashtbl.clear used_typeinfo;
-  Hashtbl.clear used_compinfo;
-  Hashtbl.clear used_enuminfo
+  Varinfo.Hashtbl.clear used_variables;
+  Varinfo.Hashtbl.clear var_init;
+  Typeinfo.Hashtbl.clear used_typeinfo;
+  Compinfo.Hashtbl.clear used_compinfo;
+  Enuminfo.Hashtbl.clear used_enuminfo
 
 class collect_visitor = object (self)
 
@@ -35,24 +37,24 @@ class collect_visitor = object (self)
       (* we use the type name because direct typeinfo comparison
        * doesn't wok. Anyway, CIL renames types if several type have the same
        * name... *)
-      if Hashtbl.mem used_typeinfo ti.tname then SkipChildren
+      if Typeinfo.Hashtbl.mem used_typeinfo ti then SkipChildren
       else begin
         debug "add used typedef %s@." ti.tname;
-        Hashtbl.add used_typeinfo ti.tname ();
+        Typeinfo.Hashtbl.add used_typeinfo ti ();
         ignore (visitCilType (self:>Cil.cilVisitor) ti.ttype);
         DoChildren
       end
     | TEnum ei ->
-      if Hashtbl.mem used_enuminfo ei.ename then SkipChildren
+      if Enuminfo.Hashtbl.mem used_enuminfo ei then SkipChildren
       else begin
         debug "add used enum %s@." ei.ename;
-        Hashtbl.add used_enuminfo ei.ename (); DoChildren
+        Enuminfo.Hashtbl.add used_enuminfo ei (); DoChildren
       end
     | TComp ci ->
-      if Hashtbl.mem used_compinfo ci.cname then SkipChildren
+      if Compinfo.Hashtbl.mem used_compinfo ci then SkipChildren
       else begin
         debug "add used comp %s@." ci.cname;
-        Hashtbl.add used_compinfo ci.cname ();
+        Compinfo.Hashtbl.add used_compinfo ci ();
         List.iter
           (fun f -> ignore (visitCilType (self:>Cil.cilVisitor) f.ftype))
           (Option.value ~default:[] ci.cfields);
@@ -61,12 +63,12 @@ class collect_visitor = object (self)
     | _ -> DoChildren
 
   method! vvrbl v =
-    if v.vglob && not (Hashtbl.mem used_variables v) then begin
+    if v.vglob && not (Varinfo.Hashtbl.mem used_variables v) then begin
       debug "add used var %s@." v.vname;
-      Hashtbl.add used_variables v ();
+      Varinfo.Hashtbl.add used_variables v ();
       ignore (visitCilType (self:>Cil.cilVisitor) v.vtype);
       try
-        let init = Hashtbl.find var_init v in
+        let init = Varinfo.Hashtbl.find var_init v in
         ignore (visitCilInit_or_str (self:>Cil.cilVisitor) v init)
       with Not_found -> ()
     end;
@@ -75,7 +77,7 @@ class collect_visitor = object (self)
   method! vglob_aux g = match g with
     | GFun (f, _) ->
       debug "add function %s@." f.svar.vname;
-      Hashtbl.add used_variables f.svar ();
+      Varinfo.Hashtbl.add used_variables f.svar ();
       Cil.DoChildren
     | GAnnot _ -> Cil.DoChildren
     | GVar (v, init, _) ->
@@ -84,8 +86,8 @@ class collect_visitor = object (self)
         | None -> ()
         | Some init ->
           begin
-            Hashtbl.add var_init v init;
-            if Hashtbl.mem used_variables v then
+            Varinfo.Hashtbl.add var_init v init;
+            if Varinfo.Hashtbl.mem used_variables v then
               (* already used before its initialization (see bug #758) *)
               ignore (visitCilInit_or_str (self:>Cil.cilVisitor) v init)
           end
@@ -105,27 +107,27 @@ class filter_visitor prj = object
       -> Cil.DoChildren (* keep everything *)
     | GVar (v, _, _) (* variable definition *)
     | GVarDecl (v, _) | GFunDecl (_, v, _) -> (* variable/function declaration *)
-      if Hashtbl.mem used_variables v then DoChildren
+      if Varinfo.Hashtbl.mem used_variables v then DoChildren
       else begin
         debug "remove var %s@." v.vname;
         ChangeTo []
       end
     | GType (ti, _loc) (* typedef *) ->
-      if Hashtbl.mem used_typeinfo ti.tname then DoChildren
+      if Typeinfo.Hashtbl.mem used_typeinfo ti then DoChildren
       else begin
         debug "remove typedef %s@." ti.tname;
         ChangeTo []
       end
     | GCompTag (ci, _loc) (* struct/union definition *)
     | GCompTagDecl (ci, _loc) (* struct/union declaration *) ->
-      if Hashtbl.mem used_compinfo ci.cname then DoChildren
+      if Compinfo.Hashtbl.mem used_compinfo ci then DoChildren
       else begin
         debug "remove comp %s@." ci.cname;
         ChangeTo []
       end
     | GEnumTag (ei, _loc) (* enum definition *)
     | GEnumTagDecl (ei, _loc) (* enum declaration *) ->
-      if Hashtbl.mem used_enuminfo ei.ename then DoChildren
+      if Enuminfo.Hashtbl.mem used_enuminfo ei then DoChildren
       else begin
         debug "remove enum %s@." ei.ename;
         DoChildren (* ChangeTo [] *)
@@ -158,7 +160,7 @@ let rm_unused_decl =
        Visitor.visitFramacFileSameGlobals visitor (Ast.get ());
        debug "filtering done@.";
        let visitor = new filter_visitor in
-       let new_prj = File.create_project_from_visitor new_proj_name visitor in
+       let new_prj = F.create_project_from_visitor new_proj_name visitor in
        let ctx = Parameter_state.get_selection_context () in
        Project.copy ~selection:ctx new_prj;
        new_prj)
