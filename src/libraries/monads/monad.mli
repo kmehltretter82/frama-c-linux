@@ -6,15 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This module provides generic signatures for monads along with tools
-    to build them based on minimal definitions. Those tools are provided
-    for advanced users that would like to define their own monads. Any
-    user that only wants to use the monads provided by the kernel can
-    completely ignore them.
-    @since 31.0-Gallium *)
-
-
-
 (** {2 Monad signature with let-bindings}
 
     This signature provides all the usual monadic operators along with
@@ -50,24 +41,6 @@ module type S = sig
   val map  : ('a -> 'b  ) -> 'a t -> 'b t
   val bind : ('a -> 'b t) -> 'a t -> 'b t
 
-  (** monadic convenience functions around booleans *)
-  module Bool : sig
-    val only_if : bool -> unit t -> unit t
-  end
-
-  (** applying monadic functions to the option type *)
-  module Option : sig
-    val iter : ('a -> unit t) -> 'a option -> unit t
-    val map : ('a -> 'b t) -> 'a option -> 'b option t
-  end
-
-  (** applying monadic functions to lists *)
-  module List : sig
-    val iter : ('a -> unit t) -> 'a list -> unit t
-    val map : ('a -> 'b t) -> 'a list -> 'b list t
-    val fold_left : ('a -> 'b -> 'a t) -> 'a -> 'b list -> 'a t
-  end
-
   module Operators : sig
     val ( >>-  ) : 'a t -> ('a -> 'b t) -> 'b t
     val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
@@ -97,21 +70,6 @@ module type S_with_product = sig
   val map  : ('a -> 'b  ) -> 'a t -> 'b t
   val bind : ('a -> 'b t) -> 'a t -> 'b t
   val product : 'a t -> 'b t -> ('a * 'b) t
-
-  module Bool : sig
-    val only_if : bool -> unit t -> unit t
-  end
-
-  module Option : sig
-    val iter : ('a -> unit t) -> 'a option -> unit t
-    val map : ('a -> 'b t) -> 'a option -> 'b option t
-  end
-
-  module List : sig
-    val iter : ('a -> unit t) -> 'a list -> unit t
-    val map : ('a -> 'b t) -> 'a list -> 'b list t
-    val fold_left : ('a -> 'b -> 'a t) -> 'a -> 'b list -> 'a t
-  end
 
   module Operators : sig
     val ( >>-  ) : 'a t -> ('a -> 'b t) -> 'b t
@@ -267,6 +225,21 @@ module Make_based_on_bind_with_product (M : Based_on_bind_with_product) :
 module Make_based_on_map_with_product (M : Based_on_map_with_product) :
   S_with_product with type 'a t = 'a M.t
 
+
+(** {3 Monadic iterators signature}
+
+    Handling the interaction beween monads and iterable data structures
+    like lists can be difficult. On the other hand, all iterators
+    concerning a monad over an iterable have the same signature, thus
+    we provide a generic signature for all three standard iterators.
+    @since Frama-C+dev *)
+module type Iterators = sig
+  type 'a iterable
+  type 'a monad
+  val fold : ('a -> 'b -> 'a monad) -> 'a -> 'b iterable -> 'a monad
+  val map  : ('a -> 'b monad) -> 'a iterable -> 'b iterable monad
+  val iter : ('a -> unit monad) -> 'a iterable -> unit monad
+end
 
 
 (** {3 Detailed explanations and category theory}

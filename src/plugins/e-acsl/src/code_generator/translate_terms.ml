@@ -984,9 +984,9 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
 and to_exp_il ?inplace t =
   let* {env} = M.read in
   let* () =
-    M.Bool.only_if
-      (Env.generate_rte env)
-      (M.not_covered ~pre:"with RTE" Printer.pp_term t)
+    if Env.generate_rte env
+    then M.not_covered ~pre:"with RTE" Printer.pp_term t
+    else M.return ()
   in
   let* e = context_insensitive_term_to_exp_il ?inplace t in
   Options.debug ~dkey ~level:4 "to_exp_il {%a} %a = %a"

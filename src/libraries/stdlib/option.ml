@@ -19,6 +19,8 @@ include Stdlib.Option
 
 let bind = Minimal.bind
 
+let ( <? ) opt default = value ~default opt
+
 let filter f = function
   | None -> None
   | (Some x) as o -> if f x then o else None
@@ -45,3 +47,19 @@ let map_no_copy f o =
   | Some x ->
     let x' = f x in
     if x' != x then Some x' else o
+
+module Make_monadic_iterators (M : Monad.S) = struct
+
+  let fold f acc = function
+    | None -> M.return acc
+    | Some x -> f acc x
+
+  let iter f = function
+    | None -> M.return ()
+    | Some x -> f x
+
+  let map f = function
+    | None -> M.return None
+    | Some x -> M.map (fun x -> Some x) (f x)
+
+end

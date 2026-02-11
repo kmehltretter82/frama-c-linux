@@ -191,3 +191,19 @@ let combinations k l =
       | [] -> assert false
   in aux k l (length l)
 
+
+
+module Make_monadic_iterators (M : Monad.S) = struct
+
+  let fold f acc xs =
+    let f acc x = M.bind (fun acc -> f acc x) acc in
+    fold_left f (M.return acc) xs
+
+  let map f xs =
+    let f rs x = M.map (fun r -> r :: rs) (f x) in
+    M.map rev (fold f [] xs)
+
+  let iter f xs =
+    fold (fun () -> f) () xs
+
+end
