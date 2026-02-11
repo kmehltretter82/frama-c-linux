@@ -95,7 +95,8 @@ module VarMap = struct
     | Some l, Some r -> Some (l,r)
     | _ -> None
 
-  let pretty = let module M = Make (Datatype.Int) in M.pretty
+  let pretty ?format ?item ?sep ?last ?empty =
+    pretty ?format ?item ?sep ?last ?empty Varinfo.pretty Datatype.Int.pretty
 end
 
 type state =
@@ -267,16 +268,13 @@ module Pretty = struct
     Format.fprintf fmt "@[Edges:";
     G.iter_edges_e
       (fun e ->
-         Format.fprintf fmt "@;<3 2>@[%d@ @[%a%t@]@ %d@]"
+         Format.fprintf fmt "@;<2 8>@[%d@ @[%a%t@]@ %d@]"
            (E.src e) E.pretty (E.label e) Unicode.pp_right_arrow (E.dst e))
       s.graph;
     Format.fprintf fmt "@]@;<6>";
-    Format.fprintf fmt "@[VarMap:@;<3 2>";
-    VarMap.pretty fmt s.varmap;
-    Format.fprintf fmt "@]@;<6>";
-    Format.fprintf fmt "@[VMap:@;<2>";
-    VMap.iter (fun v ls -> Format.fprintf fmt "@;<2 2>@[%d:%a@]" v VarSet.pretty ls) s.vmap;
-    Format.fprintf fmt "@]";
+    VarMap.pretty ~format:"@[VarMap:@;<1 2>%t@]@;<6>" ~sep:"@;<2 8>" fmt s.varmap;
+    VMap.pretty ~format:"@[VMap:@;<3 2>%t@]" ~item:"@[%a:%a@]" ~sep:"@;<2 8>"
+      Datatype.Int.pretty VarSet.pretty fmt s.vmap;
     Format.fprintf fmt "@]"
 
   let libc_regexp = Str.regexp "^__fc_"
