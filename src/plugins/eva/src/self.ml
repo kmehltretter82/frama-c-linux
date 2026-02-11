@@ -114,22 +114,25 @@ let () =
   Message_category.add_set_hook hook;
   Warn_category.add_set_hook hook
 
+module IntTbl = Hashtbl.Make (Datatype.Int)
 
-(* Each Eva message category is bound to a verbosity level, at which the
-   key is automatically enabled. *)
-let dkey_verbosity : (int, category list) Hashtbl.t = Hashtbl.create 11
+(* Each Eva message category is bound to a verbosity level, at which the key
+   is automatically enabled. This table binds each verbosity level to the list
+   of message keys enabled at this level. *)
+let dkey_by_verbosity : category list IntTbl.t = IntTbl.create 11
 
-(* Some Eva warning category are feedback by default. These warning categories
-   are bound to a verbosity level, as for message categories. *)
-let wkey_verbosity : (int, warn_category list) Hashtbl.t = Hashtbl.create 11
+(* Some Eva warning categories are feedback by default, and are bound to a
+   verbosity level, as for message categories. This table binds each verbosity
+   level to the list of warning keys enabled as feedback at this level. *)
+let wkey_by_verbosity : warn_category list IntTbl.t = IntTbl.create 11
 
 let add_dkey_verbosity level category =
-  let list = try Hashtbl.find dkey_verbosity level with Not_found -> [] in
-  Hashtbl.replace dkey_verbosity level (category :: list)
+  let list = IntTbl.find_default ~default:[] dkey_by_verbosity level in
+  IntTbl.replace dkey_by_verbosity level (category :: list)
 
 let add_wkey_verbosity level category =
-  let list = try Hashtbl.find wkey_verbosity level with Not_found -> [] in
-  Hashtbl.replace wkey_verbosity level (category :: list)
+  let list = IntTbl.find_default ~default:[] wkey_by_verbosity level in
+  IntTbl.replace wkey_by_verbosity level (category :: list)
 
 (* Enable/disable all message categories according to -eva-verbose,
    except for categories manually set by the user via -eva-msg-key. *)
@@ -140,14 +143,14 @@ let configure_verbosity () =
       (if positive then add_debug_keys else del_debug_keys) category
   in
   let enable i list = List.iter (change_message (i <= level)) list in
-  Hashtbl.iter enable dkey_verbosity;
+  IntTbl.iter enable dkey_by_verbosity;
   let change_warning positive warn_category =
     if not (is_used_category (wkey_name warn_category)) then
       let status = if positive then Log.Wfeedback else Log.Winactive in
       set_warn_status warn_category status
   in
   let enable i list = List.iter (change_warning (i <= level)) list in
-  Hashtbl.iter enable wkey_verbosity
+  IntTbl.iter enable wkey_by_verbosity
 
 (* Makes the help message of various categories mandatory.
    Also associates each category to a verbosity level. *)
@@ -197,19 +200,17 @@ let print_all_categories () =
     (Format.pp_print_list print_one_elt) domains
 
 let print_categories_by_verbosity () =
-  let pp_level fmt (level, list) =
+  let pp_level level list =
     let is_no_domain c = not (is_domain_category (dkey_name c)) in
     let list = List.filter is_no_domain list in
-    Format.fprintf fmt "%2i: %a" level
+    printf ~level:0 "  %2i: %a" level
       (Pretty_utils.pp_list ~sep:" " pp_category) list
   in
-  let cmp (l1, _) (l2, _) = Datatype.Int.compare l1 l2 in
-  let list = Hashtbl.to_seq dkey_verbosity |> List.of_seq |> List.sort cmp in
-  feedback ~level:0
-    "@[<v>Message categories by verbosity::@;%a@]"
-    (Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@;" ~suf:"@]" pp_level) list;
-  printf "-eva-verbose N automatically enables all message categories \
-          with a verbosity equal to or less than N. Default to %i."
+  feedback ~level:0 "Message categories by verbosity:";
+  IntTbl.iter_sorted pp_level dkey_by_verbosity;
+  printf ~level:0
+    "-eva-verbose N automatically enables all message categories \
+     with a verbosity equal to or less than N. Default to %i."
     default_verbosity
 
 let print_categories () =
