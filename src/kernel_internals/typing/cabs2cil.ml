@@ -5673,6 +5673,14 @@ and doExp local_env
 
     | Cabs.CONSTANT ct -> begin
         match ct with
+        | Cabs.CONST_BOOL b ->
+          let const =
+            if b then CInt64 (Z.one, IBool, Some "true")
+            else CInt64 (Z.zero, IBool, Some "false")
+          in
+          let res = new_exp ~loc (Const const) in
+          finishExp [] (unspecified_chunk empty) res (typeOf res)
+
         | Cabs.CONST_INT str -> begin
             let res =
               match parseIntExpRes ~loc str with

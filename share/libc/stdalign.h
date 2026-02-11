@@ -6,10 +6,12 @@
 /*                                                                        */
 /**************************************************************************/
 
-#if __STDC_VERSION__ < 202311L
-
 #ifndef __FC_STDALIGN_H
 #define __FC_STDALIGN_H
+
+#if __STDC_VERSION__ > 201710L
+/* The header is empty after C17 */
+#else
 
 #include "features.h"
 __PUSH_FC_STDLIB

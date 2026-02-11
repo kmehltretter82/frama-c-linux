@@ -28,6 +28,7 @@ let pp_cvspec  fmt = function
   |     CV_GHOST -> fprintf fmt "CV_GHOST"
 
 let pp_const fmt = function
+  |     CONST_BOOL b -> fprintf fmt "CONST_BOOL %B" b
   |     CONST_INT s -> fprintf fmt "CONST_INT %s" s
   |     CONST_FLOAT s -> fprintf fmt "CONST_FLOAT %s" s
   |     CONST_CHAR l ->

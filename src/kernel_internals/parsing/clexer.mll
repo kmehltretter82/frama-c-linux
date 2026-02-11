@@ -124,6 +124,9 @@ let init_lexicon () =
   (* WW: see /usr/include/sys/cdefs.h for why __signed and __volatile
    * are accepted GCC-isms *)
   valid "char" (fun loc -> CHAR loc) ;
+  c23   "bool" (fun loc -> BOOL loc) ;
+  c23   "true" (fun loc -> TRUE loc) ;
+  c23   "false" (fun loc -> FALSE loc) ;
   valid "_Bool" (fun loc -> BOOL loc) ;
   valid "int" (fun loc -> INT loc) ;
   valid "float" (fun loc -> FLOAT loc) ;

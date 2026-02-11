@@ -313,7 +313,7 @@ let type_to_expr_for_builtin ~loc ~builtin specifier decl_type =
 %token <int64 list * Cabs.cabsloc> CST_WSTRING
 
 %token EOF
-%token<Cabs.cabsloc> BOOL CHAR INT DOUBLE FLOAT VOID INT64
+%token<Cabs.cabsloc> BOOL TRUE FALSE CHAR INT DOUBLE FLOAT VOID INT64
 %token<Cabs.cabsloc> ENUM STRUCT TYPEDEF UNION
 %token<Cabs.cabsloc> SIGNED UNSIGNED LONG SHORT
 %token<Cabs.cabsloc> VOLATILE EXTERN STATIC CONST RESTRICT AUTO REGISTER
@@ -727,6 +727,8 @@ assignment_expression:     /*(* 6.5.16 *)*/
 expression: assignment_expression { $1 }
 
 constant:
+| TRUE            {CONST_BOOL (true), $1}
+| FALSE           {CONST_BOOL (false), $1}
 | CST_INT         {CONST_INT (fst $1), snd $1}
 | CST_FLOAT       {CONST_FLOAT (fst $1), snd $1}
 | CST_CHAR        {CONST_CHAR (fst $1), snd $1}
