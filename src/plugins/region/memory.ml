@@ -153,9 +153,14 @@ let pp_layout fmt =
 
 let pp_chunk name fmt (m: chunk) =
   begin
-    let acs r s = if Access.Set.is_empty s then '-' else r in
-    Format.fprintf fmt "@[<hov 2>%s: %c%c%c%c" name
-      (acs 'I' m.cinits) (acs 'R' m.creads) (acs 'W' m.cwrites) (acs 'A' m.cshifts) ;
+    Format.fprintf fmt "@[<hov 2>%s: " name ;
+    let pp_acs fmt r s =
+      Format.pp_print_char fmt @@
+      if not @@ Access.Set.is_empty s then r else '-' in
+    pp_acs fmt 'I' m.cinits ;
+    pp_acs fmt 'R' m.creads ;
+    pp_acs fmt 'W' m.cwrites ;
+    pp_acs fmt 'A' m.cshifts ;
     List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) (ctypes m) ;
     Lset.iter (Format.fprintf fmt "@ %s:") m.clabels ;
     Vset.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.ccvars ;
@@ -202,7 +207,8 @@ let new_chunk store ?parent ?(size=0) ?(value=false) ?ptr ?pointed ?(result=fals
   in
   let cparents = match parent with None -> [] | Some root -> [root] in
   let cpointed = match pointed with None -> [] | Some ptr -> [ptr] in
-  UF.fresh store { empty with cresult ; clayout ; cpointed ; cparents }
+  UF.fresh store
+    { empty with cresult ; clayout ; cpointed ; cparents }
 
 let fresh (m: map) = new_chunk m.store ()
 
@@ -704,6 +710,7 @@ type region = {
   types: typ list ;
   typed : typ option ;
   fields: Fields.domain ;
+  flags : Attr.flags ;
   reads: Access.acs list ;
   writes: Access.acs list ;
   inits: Access.acs list ;
@@ -754,10 +761,14 @@ let pp_cvar fmt (Cvar r) =
 
 let pp_region fmt (m: region) =
   begin
-    let acs r s = if s = [] then '-' else r in
-    Format.fprintf fmt "@[<hov 2>%a: %c%c%c%c"
-      pp_node m.node (acs 'I' m.inits)
-      (acs 'R' m.reads) (acs 'W' m.writes) (acs 'A' m.shifts) ;
+    let pp_acs fmt r s =
+      Format.pp_print_char fmt @@
+      if s <> [] then r else '-' in
+    Format.fprintf fmt "@[<hov 2>%a: " pp_node m.node ;
+    pp_acs fmt 'I' m.inits ;
+    pp_acs fmt 'R' m.reads ;
+    pp_acs fmt 'W' m.writes ;
+    pp_acs fmt 'A' m.shifts ;
     List.iter (Format.fprintf fmt "@ %s:") m.labels ;
     if m.cresult then Format.fprintf fmt "@ \\result" ;
     List.iter (Format.fprintf fmt "@ %a" pp_cvar) m.cvars ;
@@ -779,6 +790,7 @@ let pp_region fmt (m: region) =
         List.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.writes ;
         List.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.shifts ;
       end ;
+    Attr.iter (Format.fprintf fmt "@ %a" Attr.pp_attr) m.flags ;
     Format.fprintf fmt " ;@]" ;
   end
 
@@ -824,6 +836,7 @@ let make_region (n: node) (r: chunk) : region =
     ranges = List.map (make_range fields) (cranges r.clayout) ;
     pointed = Option.map UF.find (cpointed r.clayout) ;
     types ; typed ; singleton ; sizeof ; fields ;
+    flags = Attr.empty ;
   }
 
 let region n = make_region n (UF.get n)

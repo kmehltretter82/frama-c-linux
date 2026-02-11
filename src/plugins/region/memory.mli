@@ -33,6 +33,7 @@ type region = {
   types: typ list ;
   typed : typ option ;
   fields: Fields.domain ;
+  flags : Attr.flags ;
   reads: Access.acs list ;
   writes: Access.acs list ;
   inits: Access.acs list ;
