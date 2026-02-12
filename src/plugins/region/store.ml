@@ -141,4 +141,11 @@ struct
     else
       Format.fprintf fmt "#%04X" (Ufind.id a.rref)
 
+  let once ?(f = ignore) () =
+    let m = ref Z.zero in
+    fun n ->
+      let uid = D.get_id @@ get n in
+      Z.testbit !m uid ||
+      ( m := Z.(!m lor (one lsl uid)) ; f n ; false )
+
 end

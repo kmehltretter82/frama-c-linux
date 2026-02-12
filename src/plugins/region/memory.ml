@@ -45,6 +45,9 @@ and 'a nchunk = {
   cinits: Access.Set.t ;
   clayout: 'a nlayout ;
   mutable cid : int ;
+  mutable cpaths : int ;
+  mutable cdepth : int ;
+  mutable cflags : Attr.flags ;
 }
 
 (* All offsets in bits *)
@@ -125,6 +128,9 @@ let empty = {
   cshifts = Access.Set.empty ;
   cinits = Access.Set.empty ;
   clayout = Blob 0 ;
+  cdepth = 0 ;
+  cpaths = 0 ;
+  cflags = Attr.empty ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -300,17 +306,7 @@ let witer (m:map) (f: node -> bool) =
     Option.iter (walk f) m.result ;
   end
 
-let once (f : node -> unit) : node -> bool =
-  let h = ref Z.zero in
-  fun n ->
-    let uid = (UF.get n).cid in
-    Z.testbit !h uid ||
-    begin
-      h := Z.( !h lor (one lsl uid) ) ;
-      f n ; false
-    end
-
-let iter m f = witer m (once f)
+let iter m f = witer m (UF.once ~f ())
 let size (r: node) = sizeof (UF.get r).clayout
 let parents (r: node) = UF.find_all (UF.get r).cparents
 let cvars (r: node) = Vset.elements (UF.get r).ccvars
@@ -422,7 +418,7 @@ let merge_chunk s (q:queue) (root:node)
     cshifts = Access.Set.union a.cshifts b.cshifts ;
     cinits = Access.Set.union a.cinits b.cinits ;
     clayout = merge_layout s q root a.clayout b.clayout ;
-    cid = UF.noid ;
+    cid = UF.noid ; cdepth = 0 ; cpaths = 0 ; cflags = Attr.empty ;
   }
 
 let do_merge (q: queue) (a: node) (b: node): unit =
@@ -622,26 +618,70 @@ and exp (m: map) (e: exp) : node option =
 let result (m: map) = m.result
 
 (* -------------------------------------------------------------------------- *)
+(* ---  Consolidation                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+let iter_parent_path parent f r s =
+  match parent.clayout with
+  | Blob _ | Cell _ -> ()
+  | Compound(_,_,R rgs) ->
+    List.iter
+      (fun (rg : node Ranges.range) ->
+         if equal r rg.data then f (if rg.length = s then 1 else 2)
+      ) rgs
+
+let rec consolidate once r =
+  once r &&
+  let n = UF.get r in
+  let ps = UF.find_all n.cparents in
+  begin
+    n.cflags <- Attr.bottom ;
+    let flags fs = n.cflags <- Attr.merge n.cflags fs in
+    let path k = n.cpaths <- n.cpaths + k in
+    Vset.iter (fun v -> path 1 ; flags @@ Attr.cvar v) n.ccvars ;
+    Bag.iter (function Root r ->
+        path (if Term.equal r.inf r.sup then 1 else 2) ;
+        flags r.flags
+      ) n.croots ;
+    let s = sizeof n.clayout in
+    List.iter
+      (fun rp ->
+         ignore (consolidate once rp) ;
+         let p = UF.get rp in
+         n.cdepth <- max n.cdepth (succ p.cdepth) ;
+         flags p.cflags ;
+         if n.cpaths <= 1 then
+           if p.cpaths <= 1 then
+             iter_parent_path p path r s
+           else path 2
+      ) ps ;
+  end ;
+  false
+
+(* -------------------------------------------------------------------------- *)
+(* --- Included & Separated                                               --- *)
+(* -------------------------------------------------------------------------- *)
 
 let included source target : bool =
   let exception Reached in
   try
-    let q = Queue.create () in (* only marked nodes *)
-    let push r =
-      let r = UF.find r in
-      if equal target r then raise Reached else Queue.push r q
-    in
-    push source ;
-    let visited = Hashtbl.create 0 in
+    let queue = Queue.create () in (* only marked nodes *)
+    let visit = Hashtbl.create 0 in
+    let depth = (UF.get target).cdepth in
+    let push src =
+      let src = UF.find src in
+      if equal target src then raise Reached else
+        let d = (UF.get src).cdepth in
+        if d <= depth then Queue.push src queue
+    in push source ;
     while true do
-      let node = Queue.pop q in
-      if equal target node then raise Exit else
-        let id = id node in
-        if not @@ Hashtbl.mem visited id then
-          begin
-            Hashtbl.add visited id () ;
-            List.iter push (parents node) ;
-          end
+      let node = Queue.pop queue in
+      let id = id node in
+      if not @@ Hashtbl.mem visit id then
+        begin
+          Hashtbl.add visit id () ;
+          List.iter push (parents node) ;
+        end
     done ;
     assert false
   with
@@ -854,7 +894,8 @@ let make_region (n: node) (r: chunk) : region =
   let typed = typed n in
   let sizeof = sizeof r.clayout in
   let fields = cfields r.clayout in
-  let singleton = singleton n in
+  let singleton = r.cpaths <= 1 in
+  let flags = (* if 0 < r.cpaths then r.cflags else *) Attr.empty in
   {
     node = n ;
     parents = UF.find_all r.cparents ;
@@ -868,8 +909,7 @@ let make_region (n: node) (r: chunk) : region =
     inits = Access.Set.elements r.cinits ;
     ranges = List.map (make_range fields) (cranges r.clayout) ;
     pointed = Option.map UF.find (cpointed r.clayout) ;
-    types ; typed ; singleton ; sizeof ; fields ;
-    flags = Attr.empty ;
+    types ; typed ; singleton ; sizeof ; fields ; flags
   }
 
 let region n = make_region n (UF.get n)
@@ -882,6 +922,8 @@ let regions map =
 let lock m =
   begin
     witer m UF.lock ;
+    let once = UF.once () in
+    witer m (consolidate once) ;
   end
 
 (* -------------------------------------------------------------------------- *)

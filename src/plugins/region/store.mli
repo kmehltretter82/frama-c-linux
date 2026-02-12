@@ -64,4 +64,6 @@ sig
       For non-locked nodes, 'HHHH' is the raw rref of the node, for
       locked nodes, 'hhhh' is the unique identifier of the node. *)
 
+  val once : ?f:(node -> unit) -> unit -> (node -> bool)
+
 end
