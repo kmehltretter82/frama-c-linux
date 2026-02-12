@@ -19,6 +19,14 @@ module Fmap = Logic_info.Map
 (* --- Region Maps                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
+type root = Root of {
+    ip : Property.t ;
+    typ : typ ;
+    ptr : term ;
+    inf : term ;
+    sup : term ;
+  }
+
 type 'a nlayout =
   | Blob of int
   | Cell of int * 'a option
@@ -30,6 +38,7 @@ and 'a nchunk = {
   cpointed: 'a list ;
   cresult: bool ;
   ccvars: Vset.t ;
+  croots: root Bag.t ;
   clabels: Lset.t ;
   creads: Access.Set.t ;
   cwrites: Access.Set.t ;
@@ -59,6 +68,7 @@ type context = node Domain.context
 type map = {
   store: UF.store ;
   mutable labels: node Lmap.t ;
+  mutable roots: (root * node) list ;
   mutable cvars: node Vmap.t ;
   mutable lvars: domain LVmap.t ;
   mutable logics: domain Fmap.t ;
@@ -95,6 +105,7 @@ let ctypes (m : chunk) : typ list =
 
 let create () = {
   store = UF.create () ;
+  roots = [] ;
   cvars = Vmap.empty ;
   labels = Lmap.empty ;
   lvars = LVmap.empty ;
@@ -107,6 +118,7 @@ let empty = {
   cparents = [] ;
   cpointed = [] ;
   cresult = false ;
+  croots = Bag.empty ;
   ccvars = Vset.empty ;
   clabels = Lset.empty ;
   creads = Access.Set.empty ;
@@ -151,6 +163,14 @@ let pp_layout fmt =
       ) rg ;
     Format.fprintf fmt "@ }@]"
 
+let pp_root fmt (Root r) =
+  begin
+    Format.fprintf fmt "@[<hov 2>%a[%a..%a]"
+      Printer.pp_term r.ptr
+      Printer.pp_term r.inf
+      Printer.pp_term r.sup ;
+  end
+
 let pp_chunk name fmt (m: chunk) =
   begin
     Format.fprintf fmt "@[<hov 2>%s: " name ;
@@ -170,6 +190,7 @@ let pp_chunk name fmt (m: chunk) =
         Access.Set.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.creads ;
         Access.Set.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.cwrites ;
         Access.Set.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.cshifts ;
+        Bag.iter (Format.fprintf fmt "@ Root:%a" pp_root) m.croots ;
       end ;
     List.iter (Format.fprintf fmt "@ P:%a" pp_node) m.cparents ;
     Format.fprintf fmt "@ %a ;@]" pp_layout m.clayout ;
@@ -230,6 +251,12 @@ let add_lvar (m: map) lv =
     assert (lv.lv_origin = None);
     let d = Domain.of_ltype (new_chunk m.store) lv.lv_type in
     m.lvars <- LVmap.add lv d m.lvars ; d
+
+let add_root (m: map) (node : node) (root : root) =
+  begin
+    m.roots <- (root,node) :: m.roots ;
+    update node (fun d -> { d with croots = Bag.add root d.croots }) ;
+  end
 
 let add_body = ref (fun _ _ _ -> assert false)
 
@@ -386,6 +413,7 @@ let merge_chunk s (q:queue) (root:node)
     cpointed = UF.find_all2 a.cpointed b.cpointed ;
     clabels = Lset.union a.clabels b.clabels ;
     cresult = a.cresult || b.cresult ;
+    croots = Bag.concat a.croots b.croots ;
     ccvars = Vset.union a.ccvars b.ccvars ;
     creads = Access.Set.union a.creads b.creads ;
     cwrites = Access.Set.union a.cwrites b.cwrites ;
@@ -706,6 +734,7 @@ type region = {
   parents: node list ;
   cresult: bool ;
   cvars: cvar list ;
+  roots: root list ;
   labels: string list ;
   types: typ list ;
   typed : typ option ;
@@ -789,6 +818,7 @@ let pp_region fmt (m: region) =
         List.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.reads ;
         List.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.writes ;
         List.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.shifts ;
+        List.iter (Format.fprintf fmt "@ Root: %a" pp_root) m.roots ;
       end ;
     Attr.iter (Format.fprintf fmt "@ %a" Attr.pp_attr) m.flags ;
     Format.fprintf fmt " ;@]" ;
@@ -828,6 +858,7 @@ let make_region (n: node) (r: chunk) : region =
     parents = UF.find_all r.cparents ;
     cresult = r.cresult ;
     cvars = List.map (make_cvar sizeof) @@ Vset.elements r.ccvars ;
+    roots = Bag.elements r.croots ;
     labels = Lset.elements r.clabels ;
     reads = Access.Set.elements r.creads ;
     writes = Access.Set.elements r.cwrites ;

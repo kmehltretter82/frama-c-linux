@@ -10,6 +10,14 @@ open Cil_types
 
 type node
 
+type root = Root of {
+    ip : Property.t ;
+    typ : typ ;
+    ptr : term ;
+    inf : term ;
+    sup : term ;
+  }
+
 type cvar = Cvar of {
     cvar : varinfo ;
     label : string ;
@@ -29,6 +37,7 @@ type region = {
   parents: node list ;
   cresult: bool ;
   cvars: cvar list ;
+  roots: root list ;
   labels: string list ;
   types: typ list ;
   typed : typ option ;
@@ -82,6 +91,7 @@ val add_lvar : map -> Cil_types.logic_var -> domain
 val add_logic : map -> Cil_types.logic_info -> domain
 val add_result : map -> node
 val add_label : map -> string -> node
+val add_root : map -> node -> root -> unit
 val add_field : node -> fieldinfo -> node
 val add_field_range : node -> fieldinfo -> fieldinfo -> node
 val add_index : node -> typ -> node

@@ -31,6 +31,14 @@ const order = (a: AccessKind, b: AccessKind): number => {
 function collect(r: Region.region | undefined): AccessKind[] {
   const buffer: AccessKind[] = [];
   if (r) {
+    r.roots.forEach(r => buffer.push({
+      rank: -1,
+      kind: 'Region',
+      access: r.range,
+      typeof: r.typeof,
+      source: '',
+      marker: r.marker,
+    }));
     r.inits.forEach(r => buffer.push({ kind: 'Init', ...r }));
     r.reads.forEach(r => buffer.push({ kind: 'Read', ...r }));
     r.writes.forEach(r => buffer.push({ kind: 'Write', ...r }));
@@ -57,17 +65,17 @@ function Access(props: AccessProps): JSX.Element {
     >
       <td><Label
         label={access.kind}
-        title="Access kind (R/W/I)" /></td>
+        title="Access kind" /></td>
       <td><Cell
         className="dimmed"
         label={`( ${access.typeof} )`}
-        title="Access type (l-value)" /></td>
+        title="Type of accessed value" /></td>
       <td><Cell
         label={access.access}
         title="Accessed expression, l-value or term" /></td>
       <td><Cell
         label={access.source}
-        title="Origin of the access (statement, property, call)" /></td>
+        title="Origin or property" /></td>
       <td style={fullWidth} />
     </tr>
   );

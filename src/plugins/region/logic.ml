@@ -252,10 +252,18 @@ let () = rterm := add_term
 (* -------------------------------------------------------------------------- *)
 
 let add_path (env: env) = function
-  | Spec.Alias(loc,lv) -> snd @@ add_addr_lval ~loc env lv
+  | Spec.Alias(loc,lv) ->
+    snd @@ add_addr_lval ~loc env lv
   | Spec.Field(loc,lv,f,g) ->
     let r = snd @@ add_addr_lval ~loc env lv in
     Memory.add_field_range r f g
+  | Spec.Range(_,ptr,typ,inf,sup) ->
+    iadd_term env inf ; iadd_term env sup ;
+    let rp = pointer @@ add_term env ptr in
+    let re = Memory.add_index rp typ in
+    let ip = match env.context with Prop ip -> ip | _ -> assert false in
+    let root = Root { ip ; ptr ; typ ; inf ; sup } in
+    Memory.add_root env.map re root ; re
 
 let add_region (env: env) (r : Spec.region) =
   let rs = List.map (add_path env) r.paths in

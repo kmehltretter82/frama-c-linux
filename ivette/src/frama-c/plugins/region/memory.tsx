@@ -109,6 +109,17 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
         headAnchor: "e", head: 'none', color: 'grey'
       });
     });
+    // --- Roots: Array Ranges
+    const A: Dot.Node = { ...R, color: 'blue' };
+    r.roots.forEach((a, k) => {
+      const aid = `A${r.node}#${k}`;
+      nodes.push({ ...A, id: aid, label: a.range, title: a.typeof });
+      index.set(aid, r.node);
+      edges.push({
+        source: aid, target: id,
+        headAnchor: "e", head: 'none', color: 'grey'
+      });
+    });
     // --- Pointed
     if (r.pointed !== undefined) {
       const pid = `n${r.pointed}`;

@@ -54,6 +54,33 @@ struct
   let of_json _ = failwith "Region.Cvar.of_json"
 end
 
+module Root : Data.S with type t = Memory.root =
+struct
+  type t = Memory.root
+  let jtype = Data.declare ~package ~name:"root" @@
+    Jrecord [
+      "range", Jstring ;
+      "typeof", Jstring ;
+      "marker", Kernel_ast.Marker.jtype ;
+    ]
+
+  let typeof (Memory.Root r) =
+    Format.asprintf "%a[..]" Printer.pp_typ r.typ
+
+  let range (Memory.Root r) =
+    Format.asprintf "%a[%a..%a]"
+      Printer.pp_term r.ptr
+      Printer.pp_term r.inf
+      Printer.pp_term r.sup
+
+  let to_json (Memory.Root r as root) =
+    Json.of_fields [
+      "range", Json.of_string (range root) ;
+      "typeof", Json.of_string (typeof root) ;
+      "marker", Kernel_ast.Marker.to_json (PIP r.ip) ;
+    ]
+  let of_json _ = failwith "Region.Cvar.of_json"
+end
 
 module Range : Data.S with type t = Memory.range =
 struct
@@ -103,6 +130,7 @@ struct
 end
 
 module Cvars = Data.Jlist(Cvar)
+module Roots = Data.Jlist(Root)
 module Ranges = Data.Jlist(Range)
 module ACS = Data.Jlist(ACCESS)
 
@@ -188,6 +216,7 @@ struct
       "node", Node.jtype ;
       "result", Jboolean ;
       "cvars", Cvars.jtype ;
+      "roots", Roots.jtype ;
       "labels", Jarray Jalpha ;
       "parents", NodeList.jtype ;
       "sizeof", Jnumber ;
@@ -207,6 +236,7 @@ struct
       "node", Node.to_json m.node ;
       "result", Json.of_bool m.cresult ;
       "cvars", Cvars.to_json m.cvars ;
+      "roots", Roots.to_json m.roots ;
       "labels", labels_to_json m.labels ;
       "parents", NodeList.to_json m.parents ;
       "sizeof", Json.of_int @@ m.sizeof ;

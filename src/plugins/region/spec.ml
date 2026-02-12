@@ -17,6 +17,7 @@ open Cil_datatype
 type path =
   | Alias of location * term_lval
   | Field of location * term_lval * fieldinfo * fieldinfo
+  | Range of location * term * typ * term * term
 
 type region = {
   name : string option ;
@@ -30,11 +31,6 @@ type region = {
 let pp_named fmt = function None -> () | Some a -> Format.fprintf fmt "%s: " a
 
 let pp_path fmt = function
-  (* | Array(a,p,q) ->
-     Format.fprintf fmt "%a[%a..%a]"
-      Printer.pp_term a
-      Printer.pp_term p
-      Printer.pp_term q *)
   | Alias(_,lv) ->
     Printer.pp_term_lval fmt lv
   | Field(_,lv,f,g) ->
@@ -42,6 +38,11 @@ let pp_path fmt = function
     Format.fprintf fmt "%a..%a"
       Printer.pp_term_lval (field lv f)
       Printer.pp_term_lval (field lv g)
+  | Range(_,p,_,a,b) ->
+    Format.fprintf fmt "%a[%a..%a]"
+      Printer.pp_term p
+      Printer.pp_term a
+      Printer.pp_term b
 
 let pp_region fmt r =
   match r.paths with
@@ -112,6 +113,20 @@ let parse_lval env p =
   | TLval lv -> lv
   | _ -> error env ~loc:p.lexpr_loc "Expected l-value for region path"
 
+let parse_integer env p =
+  let v = parse_term env p in
+  if not @@ Ast_types.is_logic_integral v.term_type then
+    error env ~loc:p.lexpr_loc "Expected integer term for object bounds" ; v
+
+let parse_pointer env p =
+  let loc = p.lexpr_loc in
+  let a = parse_term env p in
+  let te =
+    match Ast_types.unroll_logic a.term_type with
+    | Ctype { tnode = TPtr te } -> te
+    | _ -> error env ~loc "Expected pointer l-value for region object"
+  in te,a
+
 let rec last_field = function
   | TNoOffset | TModel _ -> raise Not_found
   | TField(fd,TNoOffset) -> TNoOffset, fd
@@ -147,6 +162,15 @@ let rec parse_region (env:env) p =
     if not (Term_lval.equal l1 l2) then
       error env ~loc:p.lexpr_loc "Field range from different region paths" ;
     env.rpaths <- Field(p.lexpr_loc,l1,f,g) :: env.rpaths
+  | PLarrget(p,{ lexpr_node = PLrange(Some a,Some b) }) ->
+    let te,q = parse_pointer env p in
+    let a = parse_integer env a in
+    let b = parse_integer env b in
+    env.rpaths <- Range(p.lexpr_loc,q,te,a,b) :: env.rpaths
+  | PLunop(Ustar,p) ->
+    let te,q = parse_pointer env p in
+    let zero = Logic_const.tinteger ~loc:p.lexpr_loc 0 in
+    env.rpaths <- Range(p.lexpr_loc,q,te,zero,zero) :: env.rpaths
   | _ ->
     let lv = lpath env p ; parse_lval env p in
     env.rpaths <- Alias(p.lexpr_loc,lv) :: env.rpaths
