@@ -44,11 +44,17 @@ let significant_of_string significant =
     let shift = pow10 (String.length fractional) in
     Q.(of_string (integer ^ fractional) / shift)
 
+let remove_float_suffix str len =
+  if String.ends_with ~suffix:"f" str then String.sub str 0 (len - 1)
+  else if String.ends_with ~suffix:"f32" str
+       || String.ends_with ~suffix:"f64" str then
+    String.sub str 0 (len - 3)
+  else str
+
 let of_string str =
   let str = String.lowercase_ascii str in
   let length = String.length str in
-  let last = String.get str (length - 1) in
-  let str = if last == 'f' then String.sub str 0 (length - 1) else str in
+  let str = remove_float_suffix str length in
   let significant, e = split_significant_exponent str in
   let significant = significant_of_string significant in
   let shift = if e >= 0 then pow10 e else Q.inv (pow10 ~-e) in
