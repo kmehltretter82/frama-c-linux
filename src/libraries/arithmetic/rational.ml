@@ -45,7 +45,8 @@ let significant_of_string significant =
     Q.(of_string (integer ^ fractional) / shift)
 
 let remove_float_suffix str len =
-  if String.ends_with ~suffix:"f" str then String.sub str 0 (len - 1)
+  if String.ends_with ~suffix:"f" str
+  || String.ends_with ~suffix:"l" str then String.sub str 0 (len - 1)
   else if String.ends_with ~suffix:"f32" str
        || String.ends_with ~suffix:"f64" str then
     String.sub str 0 (len - 3)
