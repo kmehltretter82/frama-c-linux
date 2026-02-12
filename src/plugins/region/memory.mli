@@ -12,10 +12,9 @@ type node
 
 type root = Root of {
     ip : Property.t ;
-    typ : typ ;
-    ptr : term ;
-    inf : term ;
-    sup : term ;
+    named : string ;
+    typ : typ ; ptr : term ; inf : term ; sup : term ;
+    flags : Attr.flags ;
   }
 
 type cvar = Cvar of {

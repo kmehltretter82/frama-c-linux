@@ -251,7 +251,7 @@ let () = rterm := add_term
 (* ---  Process ACSL region annotations                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let add_path (env: env) = function
+let add_path (env: env) Spec.{ named ; flags } = function
   | Spec.Alias(loc,lv) ->
     snd @@ add_addr_lval ~loc env lv
   | Spec.Field(loc,lv,f,g) ->
@@ -262,15 +262,13 @@ let add_path (env: env) = function
     let rp = pointer @@ add_term env ptr in
     let re = Memory.add_index rp typ in
     let ip = match env.context with Prop ip -> ip | _ -> assert false in
-    let root = Root { ip ; ptr ; typ ; inf ; sup } in
+    let root = Root { ip ; named ; ptr ; typ ; inf ; sup ; flags } in
     Memory.add_root env.map re root ; re
 
 let add_region (env: env) (r : Spec.region) =
-  let rs = List.map (add_path env) r.paths in
+  let rs = List.map (add_path env r) r.paths in
   merge_all @@
-  match r.name with
-  | None -> rs
-  | Some a -> add_label env.map a :: rs
+  if r.named = "" then rs else add_label env.map r.named :: rs
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Process ACSL logic                                                --- *)

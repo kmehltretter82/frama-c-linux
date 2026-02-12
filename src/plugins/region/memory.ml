@@ -21,10 +21,9 @@ module Fmap = Logic_info.Map
 
 type root = Root of {
     ip : Property.t ;
-    typ : typ ;
-    ptr : term ;
-    inf : term ;
-    sup : term ;
+    named : string ;
+    typ : typ ; ptr : term ; inf : term ; sup : term ;
+    flags : Attr.flags ;
   }
 
 type 'a nlayout =
@@ -165,10 +164,13 @@ let pp_layout fmt =
 
 let pp_root fmt (Root r) =
   begin
-    Format.fprintf fmt "@[<hov 2>%a[%a..%a]"
+    Format.fprintf fmt "@[<hov 2>%a%a[%a..%a]"
+      Spec.pp_named r.named
       Printer.pp_term r.ptr
       Printer.pp_term r.inf
       Printer.pp_term r.sup ;
+    Attr.iter (Format.fprintf fmt ",@ %a" Attr.pp_attr) r.flags ;
+    Format.fprintf fmt "@]" ;
   end
 
 let pp_chunk name fmt (m: chunk) =
@@ -292,8 +294,8 @@ let rec walk (f: node -> bool) n =
 
 let witer (m:map) (f: node -> bool) =
   begin
-    Vmap.iter   (fun _x n -> walk f n) m.cvars ;
-    LVmap.iter  (fun _ -> Domain.iter (walk f)) m.lvars ;
+    Vmap.iter (fun _x n -> walk f n) m.cvars ;
+    LVmap.iter (fun _ -> Domain.iter (walk f)) m.lvars ;
     Fmap.iter (fun _ -> Domain.iter (walk f)) m.logics ;
     Option.iter (walk f) m.result ;
   end
@@ -663,7 +665,7 @@ let rec singleton r =
   let node = UF.get r in
   (* normalized parents *)
   match UF.find_all node.cparents with
-  | [] -> Vset.cardinal node.ccvars = 1
+  | [] -> Vset.cardinal node.ccvars = 1 && Bag.is_empty node.croots
   | [r0] ->
     Vset.is_empty node.ccvars &&
     single_path r0 r (sizeof node.clayout) &&
@@ -877,6 +879,9 @@ let regions map =
   iter map (fun r -> pool := region r :: !pool) ;
   List.rev !pool
 
-let lock m = witer m UF.lock
+let lock m =
+  begin
+    witer m UF.lock ;
+  end
 
 (* -------------------------------------------------------------------------- *)

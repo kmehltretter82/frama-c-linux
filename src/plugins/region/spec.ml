@@ -20,15 +20,16 @@ type path =
   | Range of location * term * typ * term * term
 
 type region = {
-  name : string option ;
+  named : string ;
   paths : path list ;
+  flags : Attr.flags ;
 }
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Printers                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let pp_named fmt = function None -> () | Some a -> Format.fprintf fmt "%s: " a
+let pp_named fmt a = if a <> "" then Format.fprintf fmt "%s: " a
 
 let pp_path fmt = function
   | Alias(_,lv) ->
@@ -46,17 +47,18 @@ let pp_path fmt = function
 
 let pp_region fmt r =
   match r.paths with
-  | [] -> Format.pp_print_string fmt "\\empty"
+  | [] -> Format.pp_print_string fmt ""
   | p::ps ->
     begin
       Format.fprintf fmt "@[<hov 2>" ;
-      pp_named fmt r.name ; pp_path fmt p ;
+      pp_named fmt r.named ; pp_path fmt p ;
       List.iter (Format.fprintf fmt ",@ %a" pp_path) ps ;
+      Attr.iter (Format.fprintf fmt ",@ %a" Attr.pp_attr) r.flags ;
       Format.fprintf fmt "@]" ;
     end
 
 let pp_regions fmt = function
-  | [] -> Format.pp_print_string fmt "\\empty"
+  | [] -> Format.pp_print_string fmt ""
   | r::rs ->
     begin
       Format.fprintf fmt "@[<hv 0>" ;
@@ -71,7 +73,8 @@ let pp_regions fmt = function
 
 type env = {
   context: Logic_typing.typing_context ;
-  mutable named: string option ;
+  mutable enamed: string ;
+  mutable eflags: Attr.flags ;
   mutable rpaths: path list ;
   mutable regions: region list ;
 }
@@ -143,18 +146,27 @@ let parse_field env p =
   with Not_found ->
     error env ~loc:p.lexpr_loc "Expected field l-value for range path"
 
+let flush env =
+  if env.rpaths <> [] then
+    begin
+      env.regions <- {
+        named = env.enamed ;
+        flags = env.eflags ;
+        paths = List.rev env.rpaths ;
+      } :: env.regions ;
+      env.rpaths <- [] ;
+      env.eflags <- Attr.empty ;
+    end
+
 let rec parse_region (env:env) p =
   match p.lexpr_node with
+  | PLvar "\\nullable" -> env.eflags <- Attr.add `Nullable env.eflags
+  | PLvar "\\dynamic"  -> env.eflags <- Attr.add `Dynamic  env.eflags
+  | PLvar "\\garbage"  -> env.eflags <- Attr.add `Garbage  env.eflags
+  | PLvar "\\readonly" -> env.eflags <- Attr.add `Readonly env.eflags
   | PLnamed( name , p ) ->
-    if env.named <> None && env.rpaths <> [] then
-      begin
-        env.regions <- {
-          name = env.named ;
-          paths = List.rev env.rpaths ;
-        } :: env.regions ;
-        env.rpaths <- [] ;
-      end ;
-    env.named <- Some name ;
+    flush env ;
+    env.enamed <- name ;
     parse_region env p
   | PLrange(Some a,Some b) ->
     let l1,f = parse_field env a in
@@ -194,17 +206,15 @@ let of_behavior bhv = List.concat_map of_extension bhv.b_extended
 
 let typecheck typing_context _loc ps =
   let env = {
-    named = None ;
+    enamed = "" ;
+    eflags = Attr.empty ;
     context = typing_context ;
     rpaths = [] ; regions = [] ;
   } in
   List.iter (parse_region env) ps ;
   let id = !kspec in incr kspec ;
-  let regions =
-    if env.rpaths <> [] then
-      { name = env.named ; paths = List.rev env.rpaths } :: env.regions
-    else env.regions in
-  Hashtbl.add registry id @@ List.rev regions ;
+  flush env ;
+  Hashtbl.add registry id @@ List.rev env.regions ;
   Ext_id id
 
 let printer _pp fmt = function

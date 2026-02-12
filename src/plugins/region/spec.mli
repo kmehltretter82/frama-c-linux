@@ -14,10 +14,12 @@ type path =
   | Range of location * term * typ * term * term
 
 type region = {
-  name : string option ;
+  named : string ;
   paths : path list ;
+  flags : Attr.flags ;
 }
 
+val pp_named : Format.formatter -> string -> unit
 val pp_path : Format.formatter -> path -> unit
 val pp_region : Format.formatter -> region -> unit
 val pp_regions : Format.formatter -> region list -> unit

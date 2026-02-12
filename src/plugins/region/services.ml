@@ -68,7 +68,8 @@ struct
     Format.asprintf "%a[..]" Printer.pp_typ r.typ
 
   let range (Memory.Root r) =
-    Format.asprintf "%a[%a..%a]"
+    Format.asprintf "%a%a[%a..%a]"
+      Spec.pp_named r.named
       Printer.pp_term r.ptr
       Printer.pp_term r.inf
       Printer.pp_term r.sup
