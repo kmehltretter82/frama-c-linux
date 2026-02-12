@@ -1,7 +1,7 @@
 [kernel] Parsing pointer.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
   y ∈ {0}
@@ -11,30 +11,34 @@
   T[0..9] ∈ {0}
   cc1 ∈ {0}
   cc2 ∈ {0}
-[eva] computing for function k <- main.
+[eva:progress] 
+  computing for function k <- main.
   Called from pointer.i:37.
-[eva] computing for function l <- k <- main.
+[eva:progress] 
+  computing for function l <- k <- main.
   Called from pointer.i:29.
-[eva] Recording results for l
-[eva] Done for function l
-[eva] Recording results for k
-[eva] Done for function k
-[eva] computing for function k <- main.
+[eva:progress] Recording results for l
+[eva:progress] Done for function l
+[eva:progress] Recording results for k
+[eva:progress] Done for function k
+[eva:progress] 
+  computing for function k <- main.
   Called from pointer.i:38.
-[eva] computing for function l <- k <- main.
+[eva:progress] 
+  computing for function l <- k <- main.
   Called from pointer.i:29.
-[eva] Recording results for l
-[eva] Done for function l
-[eva] Recording results for k
-[eva] Done for function k
+[eva:progress] Recording results for l
+[eva:progress] Done for function l
+[eva:progress] Recording results for k
+[eva:progress] Done for function k
 [eva:alarm] pointer.i:40: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)((int *)T - 1), (void *)((int *)T));
 [eva:alarm] pointer.i:41: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)((int *)T), (void *)(&T[12]));
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function l:
   x ∈ {19}

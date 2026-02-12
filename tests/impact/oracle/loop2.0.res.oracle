@@ -1,48 +1,53 @@
 [kernel] Parsing loop2.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
   t[0..9] ∈ [--..--]
   u[0..9] ∈ [--..--]
   w[0..9] ∈ [--..--]
-[eva] computing for function init <- main.
+[eva:progress] 
+  computing for function init <- main.
   Called from loop2.i:24.
 [eva:partition] loop2.i:11: starting to merge loop iterations
-[eva] Recording results for init
+[eva:progress] Recording results for init
 [from] Computing for function init
 [from] Done for function init
-[eva] Done for function init
-[eva] computing for function f <- main.
+[eva:progress] Done for function init
+[eva:progress] 
+  computing for function f <- main.
   Called from loop2.i:27.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
+[eva:progress] Done for function f
 [eva:partition] loop2.i:25: starting to merge loop iterations
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from loop2.i:27.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from loop2.i:27.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from loop2.i:27.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] Recording results for main
+[eva:progress] Done for function f
+[eva:progress] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] Done for function main
+[eva:progress] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to init at loop2.i:24 (by main):
   u[0..9] FROM v (and SELF)
@@ -68,83 +73,94 @@
 [impact] analysis done
 [kernel] Parsing loop2.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
   t[0..9] ∈ [--..--]
   u[0..9] ∈ [--..--]
   w[0..9] ∈ [--..--]
-[eva] computing for function init <- main.
+[eva:progress] 
+  computing for function init <- main.
   Called from loop2.i:24.
-[eva] Recording results for init
+[eva:progress] Recording results for init
 [from] Computing for function init
 [from] Done for function init
-[eva] Done for function init
-[eva] computing for function f <- main.
+[eva:progress] Done for function init
+[eva:progress] 
+  computing for function f <- main.
   Called from loop2.i:27.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from loop2.i:27.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from loop2.i:27.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from loop2.i:27.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from loop2.i:27.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from loop2.i:27.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from loop2.i:27.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from loop2.i:27.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from loop2.i:27.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from loop2.i:27.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] Recording results for main
+[eva:progress] Done for function f
+[eva:progress] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] Done for function main
+[eva:progress] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to init at loop2.i:24 (by main):
   u[0..9] FROM v

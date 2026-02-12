@@ -71,7 +71,7 @@ let main () =
     end
   );
   Project.on p (fun () ->
-      Dynamic.Parameter.Bool.set "-eva-show-progress" true;
+      Dynamic.Parameter.String.set "-eva-msg-key" "progress";
       Eva.Analysis.compute ()
     ) ();
   File.pretty_ast ~prj:p ()

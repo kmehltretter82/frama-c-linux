@@ -1,18 +1,18 @@
 [kernel] Parsing forall.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t[0..9] ∈ {0}
   j ∈ [--..--]
 [eva:alarm] forall.i:9: Warning: function main: precondition got status unknown.
-[eva] forall.i:11: assertion got status valid.
-[eva] forall.i:12: assertion got status valid.
-[eva] forall.i:13: assertion got status valid.
+[eva:progress] forall.i:11: assertion got status valid.
+[eva:progress] forall.i:12: assertion got status valid.
+[eva:progress] forall.i:13: assertion got status valid.
 [eva:alarm] forall.i:15: Warning: assertion got status unknown.
 [eva:alarm] forall.i:16: Warning: assertion got status unknown.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   t[0] ∈ {0}

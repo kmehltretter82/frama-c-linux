@@ -1,8 +1,8 @@
-56c56
-< [eva] equality.c:99: Frama_C_show_each_10_19: [10..42]
+65c65
+< [eva:show] equality.c:99: Frama_C_show_each_10_19: [10..42]
 ---
-> [eva] equality.c:99: Frama_C_show_each_10_19: [10..19]
-71,72c71,72
+> [eva:show] equality.c:99: Frama_C_show_each_10_19: [10..19]
+80,81c80,81
 <   y ∈ [0..42] or UNINITIALIZED
 <   w ∈ [0..42] or UNINITIALIZED
 ---

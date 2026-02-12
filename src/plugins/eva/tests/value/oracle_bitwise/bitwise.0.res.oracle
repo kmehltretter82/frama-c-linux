@@ -1,5 +1,5 @@
-96c96,99
-< [eva] bitwise.i:159: Frama_C_show_each_dead: {0}
+115c115,118
+< [eva:show] bitwise.i:159: Frama_C_show_each_dead: {0}
 ---
 > [eva] bitwise.i:157: 
 >   The evaluation of the expression x & 2

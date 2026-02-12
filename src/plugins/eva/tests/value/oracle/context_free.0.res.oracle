@@ -1,9 +1,9 @@
 [kernel] Parsing context_free.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at f
-[eva] Computing initial state
+[eva:progress] Computing initial state
 [eva:initial-state] creating variable S_p_svoid with imprecise size (type void)
 [eva:initial-state] creating variable S_qvoid with imprecise size (type void)
-[eva] Initial state computed
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   a ∈ [--..--]
   b ∈ [--..--]
@@ -87,8 +87,8 @@
   pointer downcast. assert (unsigned int)(&pvoid) ≤ 127;
 [eva:alarm] context_free.i:62: Warning: 
   pointer to function with incompatible type. assert \valid_function(g);
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     Initial state (read in 7 statements, propagated through 5 statements)

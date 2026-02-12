@@ -2,34 +2,37 @@
 [kernel:typing:int-conversion] alloc_weak.c:37: Warning: 
   Conversion from a pointer to an integer without an explicit cast
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva] computing for function main1 <- main.
+[eva:progress] 
+  computing for function main1 <- main.
   Called from alloc_weak.c:93.
-[eva] alloc_weak.c:23: Call to builtin malloc
+[eva:progress] alloc_weak.c:23: Call to builtin malloc
 [eva:malloc:new] alloc_weak.c:23: allocating variable __malloc_main1_l23
-[eva] alloc_weak.c:23: Call to builtin malloc
+[eva:progress] alloc_weak.c:23: Call to builtin malloc
 [eva:malloc:weak] alloc_weak.c:23: marking variable `__malloc_main1_l23' as weak
-[eva] computing for function copy <- main1 <- main.
+[eva:progress] 
+  computing for function copy <- main1 <- main.
   Called from alloc_weak.c:27.
-[eva] alloc_weak.c:14: Call to builtin memcpy
-[eva] alloc_weak.c:14: 
+[eva:progress] alloc_weak.c:14: Call to builtin memcpy
+[eva:progress] alloc_weak.c:14: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] alloc_weak.c:14: 
+[eva:progress] alloc_weak.c:14: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] alloc_weak.c:14: 
+[eva:progress] alloc_weak.c:14: 
   function memcpy: precondition 'separation' got status valid.
 [eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:114: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[eva] Recording results for copy
-[eva] Done for function copy
-[eva] computing for function copy <- main1 <- main.
+[eva:progress] Recording results for copy
+[eva:progress] Done for function copy
+[eva:progress] 
+  computing for function copy <- main1 <- main.
   Called from alloc_weak.c:28.
-[eva] alloc_weak.c:14: Call to builtin memcpy
-[eva] Recording results for copy
-[eva] Done for function copy
+[eva:progress] alloc_weak.c:14: Call to builtin memcpy
+[eva:progress] Recording results for copy
+[eva:progress] Done for function copy
 [eva:alarm] alloc_weak.c:29: Warning: 
   unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] alloc_weak.c:29: Warning: out of bounds write. assert \valid(p);
@@ -37,11 +40,12 @@
   unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:alarm] alloc_weak.c:30: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
-[eva] Recording results for main1
-[eva] Done for function main1
-[eva] computing for function main2 <- main.
+[eva:progress] Recording results for main1
+[eva:progress] Done for function main1
+[eva:progress] 
+  computing for function main2 <- main.
   Called from alloc_weak.c:94.
-[eva] alloc_weak.c:37: Call to builtin malloc
+[eva:progress] alloc_weak.c:37: Call to builtin malloc
 [eva:malloc:new] alloc_weak.c:37: allocating variable __malloc_main2_l37
 [eva:alarm] alloc_weak.c:37: Warning: 
   pointer downcast.
@@ -55,17 +59,18 @@
 [eva:partition] alloc_weak.c:40: Trace partitioning superposing up to 600 states
 [eva:partition] alloc_weak.c:40: Trace partitioning superposing up to 700 states
 [eva:partition] alloc_weak.c:40: Trace partitioning superposing up to 800 states
-[eva] Recording results for main2
-[eva] Done for function main2
-[eva] computing for function main3 <- main.
+[eva:progress] Recording results for main2
+[eva:progress] Done for function main2
+[eva:progress] 
+  computing for function main3 <- main.
   Called from alloc_weak.c:95.
-[eva] alloc_weak.c:51: Call to builtin malloc
+[eva:progress] alloc_weak.c:51: Call to builtin malloc
 [eva:malloc:new] alloc_weak.c:51: allocating variable __malloc_main3_l51
 [eva:partition] alloc_weak.c:50: starting to merge loop iterations
-[eva] alloc_weak.c:51: Call to builtin malloc
+[eva:progress] alloc_weak.c:51: Call to builtin malloc
 [eva:malloc:weak] alloc_weak.c:51: marking variable `__malloc_main3_l51' as weak
-[eva] alloc_weak.c:51: Call to builtin malloc
-[eva] alloc_weak.c:51: Call to builtin malloc
+[eva:progress] alloc_weak.c:51: Call to builtin malloc
+[eva:progress] alloc_weak.c:51: Call to builtin malloc
 [eva:alarm] alloc_weak.c:62: Warning: 
   accessing uninitialized left-value. assert \initialized(&q);
 [eva:alarm] alloc_weak.c:62: Warning: 
@@ -74,50 +79,51 @@
   pointer subtraction. assert \base_addr(q) ≡ \base_addr(r);
 [eva:alarm] alloc_weak.c:63: Warning: 
   pointer comparison. assert \pointer_comparable((void *)q, (void *)r);
-[eva] Recording results for main3
-[eva] Done for function main3
-[eva] computing for function convergence_issue <- main.
+[eva:progress] Recording results for main3
+[eva:progress] Done for function main3
+[eva:progress] 
+  computing for function convergence_issue <- main.
   Called from alloc_weak.c:96.
-[eva] alloc_weak.c:73: Call to builtin calloc
+[eva:progress] alloc_weak.c:73: Call to builtin calloc
 [eva:malloc:new] alloc_weak.c:73: 
   allocating variable __calloc_convergence_issue_l73
-[eva] alloc_weak.c:82: Call to builtin calloc
+[eva:progress] alloc_weak.c:82: Call to builtin calloc
 [eva:malloc:new] alloc_weak.c:82: 
   allocating variable __calloc_convergence_issue_l82
 [eva:partition] alloc_weak.c:74: starting to merge loop iterations
 [eva:alarm] alloc_weak.c:80: Warning: 
   out of bounds read. assert \valid_read((p + size) - 1);
-[eva] alloc_weak.c:82: Call to builtin calloc
+[eva:progress] alloc_weak.c:82: Call to builtin calloc
 [eva:malloc:weak] alloc_weak.c:82: 
   marking variable `__calloc_convergence_issue_l82' as weak
 [eva:malloc] alloc_weak.c:82: 
   resizing variable `__calloc_w_convergence_issue_l82' (0..63) to fit 0..63/95
-[eva] alloc_weak.c:82: Call to builtin calloc
+[eva:progress] alloc_weak.c:82: Call to builtin calloc
 [eva:malloc] alloc_weak.c:82: 
   resizing variable `__calloc_w_convergence_issue_l82'
   (0..63/95) to fit 0..63/127
-[eva] alloc_weak.c:82: Call to builtin calloc
+[eva:progress] alloc_weak.c:82: Call to builtin calloc
 [eva:malloc] alloc_weak.c:82: 
   resizing variable `__calloc_w_convergence_issue_l82'
   (0..63/127) to fit 0..63/159
-[eva] alloc_weak.c:82: Call to builtin calloc
+[eva:progress] alloc_weak.c:82: Call to builtin calloc
 [eva:malloc] alloc_weak.c:82: 
   resizing variable `__calloc_w_convergence_issue_l82'
   (0..63/159) to fit 0..63/191
-[eva] alloc_weak.c:82: Call to builtin calloc
+[eva:progress] alloc_weak.c:82: Call to builtin calloc
 [eva:malloc] alloc_weak.c:82: 
   resizing variable `__calloc_w_convergence_issue_l82'
   (0..63/34359738367) to fit 0..63/2047999
-[eva] alloc_weak.c:82: Call to builtin calloc
+[eva:progress] alloc_weak.c:82: Call to builtin calloc
 [eva:malloc] alloc_weak.c:82: 
   resizing variable `__calloc_w_convergence_issue_l82'
   (0..63/34359738367) to fit 0..63/2047999
 [eva:alarm] alloc_weak.c:85: Warning: out of bounds read. assert \valid_read(q);
 [eva:alarm] alloc_weak.c:88: Warning: out of bounds read. assert \valid_read(q);
-[eva] Recording results for convergence_issue
-[eva] Done for function convergence_issue
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for convergence_issue
+[eva:progress] Done for function convergence_issue
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function convergence_issue:

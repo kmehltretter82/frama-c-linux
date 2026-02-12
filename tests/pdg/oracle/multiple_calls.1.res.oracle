@@ -1,22 +1,24 @@
 [kernel] Parsing multiple_calls.c (with preprocessing)
 [eva] Analyzing a complete application starting at appel_ptr_fct_bis
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G1 ∈ [--..--]
   G2 ∈ [--..--]
   G3 ∈ [--..--]
   G4 ∈ [--..--]
-[eva] computing for function fct1 <- appel_ptr_fct_bis.
+[eva:progress] 
+  computing for function fct1 <- appel_ptr_fct_bis.
   Called from multiple_calls.c:28.
-[eva] Recording results for fct1
-[eva] Done for function fct1
-[eva] computing for function fct2 <- appel_ptr_fct_bis.
+[eva:progress] Recording results for fct1
+[eva:progress] Done for function fct1
+[eva:progress] 
+  computing for function fct2 <- appel_ptr_fct_bis.
   Called from multiple_calls.c:28.
-[eva] Recording results for fct2
-[eva] Done for function fct2
-[eva] Recording results for appel_ptr_fct_bis
-[eva] Done for function appel_ptr_fct_bis
+[eva:progress] Recording results for fct2
+[eva:progress] Done for function fct2
+[eva:progress] Recording results for appel_ptr_fct_bis
+[eva:progress] Done for function appel_ptr_fct_bis
 [from] Computing for function fct1
 [from] Done for function fct1
 [from] Computing for function fct2

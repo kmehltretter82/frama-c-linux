@@ -1,13 +1,13 @@
 [kernel] Parsing deps.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva:partition] deps.i:21: starting to merge loop iterations
 [eva:alarm] deps.i:21: Warning: signed overflow. assert -2147483648 ≤ i - 1;
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ [-2147483648..9]

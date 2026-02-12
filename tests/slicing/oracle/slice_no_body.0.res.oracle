@@ -1,26 +1,31 @@
 [kernel] Parsing slice_no_body.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at h
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ [--..--]
 [kernel:annot:missing-spec] slice_no_body.i:21: Warning: 
   Neither code nor specification for function f, generating default assigns.
   See -generated-spec-* options for more info.
-[eva] computing for function f <- h.
+[eva:progress] 
+  computing for function f <- h.
   Called from slice_no_body.i:21.
 [eva] using specification for function f
-[eva] Done for function f
-[eva] computing for function f <- h.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- h.
   Called from slice_no_body.i:22.
-[eva] Done for function f
-[eva] computing for function f <- h.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- h.
   Called from slice_no_body.i:23.
-[eva] Done for function f
-[eva] computing for function f <- h.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- h.
   Called from slice_no_body.i:24.
-[eva] Done for function f
-[eva] computing for function g <- h.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- h.
   Called from slice_no_body.i:26.
 [eva:alarm] slice_no_body.i:12: Warning: 
   signed overflow. assert c + 1 ≤ 2147483647;
@@ -28,13 +33,14 @@
   signed overflow. assert -2147483648 ≤ c * 2;
 [eva:alarm] slice_no_body.i:13: Warning: 
   signed overflow. assert c * 2 ≤ 2147483647;
-[eva] computing for function f <- g <- h.
+[eva:progress] 
+  computing for function f <- g <- h.
   Called from slice_no_body.i:15.
-[eva] Done for function f
-[eva] Recording results for g
-[eva] Done for function g
-[eva] Recording results for h
-[eva] Done for function h
+[eva:progress] Done for function f
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
+[eva:progress] Recording results for h
+[eva:progress] Done for function h
 [from] Computing for function g
 [from] Computing for function f <-g
 [from] Done for function f

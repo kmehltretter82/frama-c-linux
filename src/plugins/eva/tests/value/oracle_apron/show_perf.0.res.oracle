@@ -1,81 +1,98 @@
-77c77,144
-< [eva] show_perf.i:39: Reusing old results for call to collatz
+95c95,179
+< [eva:progress] show_perf.i:39: Reusing old results for call to collatz
 ---
-> [eva] computing for function collatz <- print_collatz <- main.
+> [eva:progress] 
+>   computing for function collatz <- print_collatz <- main.
 >   Called from show_perf.i:39.
-> [eva] computing for function compute_next <- collatz <- print_collatz <- main.
+> [eva:progress] 
+>   computing for function compute_next <- collatz <- print_collatz <- main.
 >   Called from show_perf.i:31.
-> [eva] Recording results for compute_next
-> [eva] Done for function compute_next
-> [eva] computing for function compute_next <- collatz <- print_collatz <- main.
+> [eva:progress] Recording results for compute_next
+> [eva:progress] Done for function compute_next
+> [eva:progress] 
+>   computing for function compute_next <- collatz <- print_collatz <- main.
 >   Called from show_perf.i:31.
-> [eva] Recording results for compute_next
-> [eva] Done for function compute_next
-> [eva] computing for function compute_next <- collatz <- print_collatz <- main.
+> [eva:progress] Recording results for compute_next
+> [eva:progress] Done for function compute_next
+> [eva:progress] 
+>   computing for function compute_next <- collatz <- print_collatz <- main.
 >   Called from show_perf.i:31.
-> [eva] Recording results for compute_next
-> [eva] Done for function compute_next
-> [eva] computing for function compute_next <- collatz <- print_collatz <- main.
+> [eva:progress] Recording results for compute_next
+> [eva:progress] Done for function compute_next
+> [eva:progress] 
+>   computing for function compute_next <- collatz <- print_collatz <- main.
 >   Called from show_perf.i:31.
-> [eva] Recording results for compute_next
-> [eva] Done for function compute_next
-> [eva] computing for function compute_next <- collatz <- print_collatz <- main.
+> [eva:progress] Recording results for compute_next
+> [eva:progress] Done for function compute_next
+> [eva:progress] 
+>   computing for function compute_next <- collatz <- print_collatz <- main.
 >   Called from show_perf.i:31.
-> [eva] Recording results for compute_next
-> [eva] Done for function compute_next
-> [eva] computing for function compute_next <- collatz <- print_collatz <- main.
+> [eva:progress] Recording results for compute_next
+> [eva:progress] Done for function compute_next
+> [eva:progress] 
+>   computing for function compute_next <- collatz <- print_collatz <- main.
 >   Called from show_perf.i:31.
-> [eva] Recording results for compute_next
-> [eva] Done for function compute_next
-> [eva] computing for function compute_next <- collatz <- print_collatz <- main.
+> [eva:progress] Recording results for compute_next
+> [eva:progress] Done for function compute_next
+> [eva:progress] 
+>   computing for function compute_next <- collatz <- print_collatz <- main.
 >   Called from show_perf.i:31.
-> [eva] Recording results for compute_next
-> [eva] Done for function compute_next
-> [eva] computing for function compute_next <- collatz <- print_collatz <- main.
+> [eva:progress] Recording results for compute_next
+> [eva:progress] Done for function compute_next
+> [eva:progress] 
+>   computing for function compute_next <- collatz <- print_collatz <- main.
 >   Called from show_perf.i:31.
-> [eva] Recording results for compute_next
-> [eva] Done for function compute_next
-> [eva] computing for function compute_next <- collatz <- print_collatz <- main.
+> [eva:progress] Recording results for compute_next
+> [eva:progress] Done for function compute_next
+> [eva:progress] 
+>   computing for function compute_next <- collatz <- print_collatz <- main.
 >   Called from show_perf.i:31.
-> [eva] Recording results for compute_next
-> [eva] Done for function compute_next
-> [eva] computing for function compute_next <- collatz <- print_collatz <- main.
+> [eva:progress] Recording results for compute_next
+> [eva:progress] Done for function compute_next
+> [eva:progress] 
+>   computing for function compute_next <- collatz <- print_collatz <- main.
 >   Called from show_perf.i:31.
-> [eva] Recording results for compute_next
-> [eva] Done for function compute_next
-> [eva] computing for function compute_next <- collatz <- print_collatz <- main.
+> [eva:progress] Recording results for compute_next
+> [eva:progress] Done for function compute_next
+> [eva:progress] 
+>   computing for function compute_next <- collatz <- print_collatz <- main.
 >   Called from show_perf.i:31.
-> [eva] Recording results for compute_next
-> [eva] Done for function compute_next
-> [eva] computing for function compute_next <- collatz <- print_collatz <- main.
+> [eva:progress] Recording results for compute_next
+> [eva:progress] Done for function compute_next
+> [eva:progress] 
+>   computing for function compute_next <- collatz <- print_collatz <- main.
 >   Called from show_perf.i:31.
-> [eva] Recording results for compute_next
-> [eva] Done for function compute_next
-> [eva] computing for function compute_next <- collatz <- print_collatz <- main.
+> [eva:progress] Recording results for compute_next
+> [eva:progress] Done for function compute_next
+> [eva:progress] 
+>   computing for function compute_next <- collatz <- print_collatz <- main.
 >   Called from show_perf.i:31.
-> [eva] Recording results for compute_next
-> [eva] Done for function compute_next
-> [eva] computing for function compute_next <- collatz <- print_collatz <- main.
+> [eva:progress] Recording results for compute_next
+> [eva:progress] Done for function compute_next
+> [eva:progress] 
+>   computing for function compute_next <- collatz <- print_collatz <- main.
 >   Called from show_perf.i:31.
-> [eva] Recording results for compute_next
-> [eva] Done for function compute_next
-> [eva] computing for function compute_next <- collatz <- print_collatz <- main.
+> [eva:progress] Recording results for compute_next
+> [eva:progress] Done for function compute_next
+> [eva:progress] 
+>   computing for function compute_next <- collatz <- print_collatz <- main.
 >   Called from show_perf.i:31.
-> [eva] Recording results for compute_next
-> [eva] Done for function compute_next
-> [eva] computing for function compute_next <- collatz <- print_collatz <- main.
+> [eva:progress] Recording results for compute_next
+> [eva:progress] Done for function compute_next
+> [eva:progress] 
+>   computing for function compute_next <- collatz <- print_collatz <- main.
 >   Called from show_perf.i:31.
-> [eva] Recording results for compute_next
-> [eva] Done for function compute_next
-> [eva] Recording results for collatz
-> [eva] Done for function collatz
-105,106c172,173
+> [eva:progress] Recording results for compute_next
+> [eva:progress] Done for function compute_next
+> [eva:progress] Recording results for collatz
+> [eva:progress] Done for function collatz
+123,124c207,208
 <     | compute_next 16x ?s (?%) | self: ?s (?%)
 <   * compute_next: executed: 16x total: ?s
 ---
 >     | compute_next 32x ?s (?%) | self: ?s (?%)
 >   * compute_next: executed: 32x total: ?s
-114c181
+132c216
 <   | | | * compute_next: executed: 16x total: ?s
 ---
 >   | | | * compute_next: executed: 32x total: ?s

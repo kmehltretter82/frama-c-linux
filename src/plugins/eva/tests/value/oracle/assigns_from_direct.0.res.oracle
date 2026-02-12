@@ -1,62 +1,68 @@
 [kernel] Parsing assigns_from_direct.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function f_valid <- main.
+[eva:progress] 
+  computing for function f_valid <- main.
   Called from assigns_from_direct.i:14.
-[eva] Recording results for f_valid
+[eva:progress] Recording results for f_valid
 [from] Computing for function f_valid
 [from] Done for function f_valid
-[eva] assigns_from_direct.i:21: function f_valid: assigns got status valid.
-[eva] assigns_from_direct.i:21: 
+[eva:progress] assigns_from_direct.i:21: 
+  function f_valid: assigns got status valid.
+[eva:progress] assigns_from_direct.i:21: 
   function f_valid: \from ... part in assign clause got status valid.
-[eva] Done for function f_valid
-[eva] computing for function f_invalid_direct <- main.
+[eva:progress] Done for function f_valid
+[eva:progress] 
+  computing for function f_invalid_direct <- main.
   Called from assigns_from_direct.i:15.
-[eva] Recording results for f_invalid_direct
+[eva:progress] Recording results for f_invalid_direct
 [from] Computing for function f_invalid_direct
 [from] Done for function f_invalid_direct
-[eva] assigns_from_direct.i:30: 
+[eva:progress] assigns_from_direct.i:30: 
   function f_invalid_direct: assigns got status valid.
 [eva:alarm] assigns_from_direct.i:30: Warning: 
   function f_invalid_direct: \from ... part in assign clause got status unknown (cannot validate direct dependencies).
-[eva] Done for function f_invalid_direct
-[eva] computing for function f_invalid_address <- main.
+[eva:progress] Done for function f_invalid_direct
+[eva:progress] 
+  computing for function f_invalid_address <- main.
   Called from assigns_from_direct.i:16.
-[eva] Recording results for f_invalid_address
+[eva:progress] Recording results for f_invalid_address
 [from] Computing for function f_invalid_address
 [from] Done for function f_invalid_address
-[eva] assigns_from_direct.i:39: 
+[eva:progress] assigns_from_direct.i:39: 
   function f_invalid_address: assigns got status valid.
 [eva:alarm] assigns_from_direct.i:39: Warning: 
   function f_invalid_address: \from ... part in assign clause got status unknown (cannot validate indirect dependencies).
-[eva] Done for function f_invalid_address
-[eva] computing for function f_invalid_condition <- main.
+[eva:progress] Done for function f_invalid_address
+[eva:progress] 
+  computing for function f_invalid_condition <- main.
   Called from assigns_from_direct.i:17.
-[eva] Recording results for f_invalid_condition
+[eva:progress] Recording results for f_invalid_condition
 [from] Computing for function f_invalid_condition
 [from] Done for function f_invalid_condition
-[eva] assigns_from_direct.i:48: 
+[eva:progress] assigns_from_direct.i:48: 
   function f_invalid_condition: assigns got status valid.
 [eva:alarm] assigns_from_direct.i:48: Warning: 
   function f_invalid_condition: \from ... part in assign clause got status unknown (cannot validate indirect dependencies).
-[eva] Done for function f_invalid_condition
-[eva] computing for function f_invalid_all <- main.
+[eva:progress] Done for function f_invalid_condition
+[eva:progress] 
+  computing for function f_invalid_all <- main.
   Called from assigns_from_direct.i:18.
-[eva] Recording results for f_invalid_all
+[eva:progress] Recording results for f_invalid_all
 [from] Computing for function f_invalid_all
 [from] Done for function f_invalid_all
-[eva] assigns_from_direct.i:57: 
+[eva:progress] assigns_from_direct.i:57: 
   function f_invalid_all: assigns got status valid.
 [eva:alarm] assigns_from_direct.i:57: Warning: 
   function f_invalid_all: \from ... part in assign clause got status unknown (cannot validate direct and indirect dependencies).
-[eva] Done for function f_invalid_all
-[eva] Recording results for main
+[eva:progress] Done for function f_invalid_all
+[eva:progress] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] Done for function main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f_invalid_address:
   y ∈ {3}

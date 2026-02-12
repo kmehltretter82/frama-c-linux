@@ -1,24 +1,26 @@
 [kernel] Parsing scope.c (with preprocessing)
 [eva] Analyzing a complete application starting at f
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   S1 ∈ {0}
   S2 ∈ {0}
   T[0..99] ∈ {0}
-[eva] computing for function Frama_C_interval <- f.
+[eva:progress] 
+  computing for function Frama_C_interval <- f.
   Called from scope.c:26.
 [eva] using specification for function Frama_C_interval
-[eva] scope.c:26: 
+[eva:progress] scope.c:26: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- f.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- f.
   Called from scope.c:32.
-[eva] scope.c:32: 
+[eva:progress] scope.c:32: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   Frama_C_entropy_source ∈ [--..--]

@@ -1,21 +1,21 @@
 [kernel] Parsing replace_by_show_each.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
-[eva] replace_by_show_each.c:23: Frama_C_show_each_2:
-[eva] replace_by_show_each.c:25: Frama_C_show_each_1:
+[eva:show] replace_by_show_each.c:23: Frama_C_show_each_2:
+[eva:show] replace_by_show_each.c:25: Frama_C_show_each_1:
 [from] Warning: no assigns clauses for function Frama_C_show_each_1.
   Results will be imprecise.
 [inout] Warning: no assigns clauses for function Frama_C_show_each_1.
   Results will be imprecise.
 [eva:alarm] replace_by_show_each.c:26: Warning: 
   signed overflow. assert j + 1 ≤ 2147483647;
-[eva] Recording results for main
+[eva:progress] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] Done for function main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
 Cannot filter: dumping raw memory (including unchanged variables)

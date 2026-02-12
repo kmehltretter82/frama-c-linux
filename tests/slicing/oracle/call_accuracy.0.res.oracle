@@ -1,19 +1,21 @@
 [kernel] Parsing call_accuracy.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   S1 ∈ {0}
   S2 ∈ {0}
   S3 ∈ {0}
   S4 ∈ {0}
-[eva] computing for function test_struct <- main.
+[eva:progress] 
+  computing for function test_struct <- main.
   Called from call_accuracy.i:62.
-[eva] Recording results for test_struct
+[eva:progress] Recording results for test_struct
 [from] Computing for function test_struct
 [from] Done for function test_struct
-[eva] Done for function test_struct
-[eva] computing for function test_cond <- main.
+[eva:progress] Done for function test_struct
+[eva:progress] 
+  computing for function test_cond <- main.
   Called from call_accuracy.i:63.
 [eva:alarm] call_accuracy.i:11: Warning: 
   signed overflow. assert x + 1 ≤ 2147483647;
@@ -21,118 +23,135 @@
   signed overflow. assert y + 1 ≤ 2147483647;
 [eva:alarm] call_accuracy.i:13: Warning: 
   signed overflow. assert z + 1 ≤ 2147483647;
-[eva] computing for function f_cond <- test_cond <- main.
+[eva:progress] 
+  computing for function f_cond <- test_cond <- main.
   Called from call_accuracy.i:14.
 [eva:alarm] call_accuracy.i:5: Warning: 
   signed overflow. assert a + 1 ≤ 2147483647;
 [eva:alarm] call_accuracy.i:6: Warning: 
   signed overflow. assert b + 1 ≤ 2147483647;
-[eva] Recording results for f_cond
+[eva:progress] Recording results for f_cond
 [from] Computing for function f_cond
 [from] Done for function f_cond
-[eva] Done for function f_cond
+[eva:progress] Done for function f_cond
 [eva:alarm] call_accuracy.i:15: Warning: 
   signed overflow. assert y + 1 ≤ 2147483647;
 [eva:alarm] call_accuracy.i:16: Warning: 
   signed overflow. assert x + 1 ≤ 2147483647;
 [eva:alarm] call_accuracy.i:17: Warning: 
   signed overflow. assert z + 1 ≤ 2147483647;
-[eva] computing for function f_cond <- test_cond <- main.
+[eva:progress] 
+  computing for function f_cond <- test_cond <- main.
   Called from call_accuracy.i:18.
-[eva] Recording results for f_cond
+[eva:progress] Recording results for f_cond
 [from] Computing for function f_cond
 [from] Done for function f_cond
-[eva] Done for function f_cond
-[eva] Recording results for test_cond
+[eva:progress] Done for function f_cond
+[eva:progress] Recording results for test_cond
 [from] Computing for function test_cond
 [from] Done for function test_cond
-[eva] Done for function test_cond
-[eva] computing for function test_set <- main.
+[eva:progress] Done for function test_cond
+[eva:progress] 
+  computing for function test_set <- main.
   Called from call_accuracy.i:64.
-[eva] computing for function f_set <- test_set <- main.
+[eva:progress] 
+  computing for function f_set <- test_set <- main.
   Called from call_accuracy.i:32.
-[eva] Recording results for f_set
+[eva:progress] Recording results for f_set
 [from] Computing for function f_set
 [from] Done for function f_set
-[eva] Done for function f_set
-[eva] computing for function f_set <- test_set <- main.
+[eva:progress] Done for function f_set
+[eva:progress] 
+  computing for function f_set <- test_set <- main.
   Called from call_accuracy.i:33.
-[eva] Recording results for f_set
+[eva:progress] Recording results for f_set
 [from] Computing for function f_set
 [from] Done for function f_set
-[eva] Done for function f_set
-[eva] computing for function f_set <- test_set <- main.
+[eva:progress] Done for function f_set
+[eva:progress] 
+  computing for function f_set <- test_set <- main.
   Called from call_accuracy.i:34.
-[eva] Recording results for f_set
+[eva:progress] Recording results for f_set
 [from] Computing for function f_set
 [from] Done for function f_set
-[eva] Done for function f_set
-[eva] computing for function f_set <- test_set <- main.
+[eva:progress] Done for function f_set
+[eva:progress] 
+  computing for function f_set <- test_set <- main.
   Called from call_accuracy.i:35.
-[eva] Recording results for f_set
+[eva:progress] Recording results for f_set
 [from] Computing for function f_set
 [from] Done for function f_set
-[eva] Done for function f_set
-[eva] computing for function f_set <- test_set <- main.
+[eva:progress] Done for function f_set
+[eva:progress] 
+  computing for function f_set <- test_set <- main.
   Called from call_accuracy.i:36.
-[eva] Recording results for f_set
+[eva:progress] Recording results for f_set
 [from] Computing for function f_set
 [from] Done for function f_set
-[eva] Done for function f_set
-[eva] computing for function f_set <- test_set <- main.
+[eva:progress] Done for function f_set
+[eva:progress] 
+  computing for function f_set <- test_set <- main.
   Called from call_accuracy.i:37.
-[eva] Recording results for f_set
+[eva:progress] Recording results for f_set
 [from] Computing for function f_set
 [from] Done for function f_set
-[eva] Done for function f_set
-[eva] computing for function f_set <- test_set <- main.
+[eva:progress] Done for function f_set
+[eva:progress] 
+  computing for function f_set <- test_set <- main.
   Called from call_accuracy.i:38.
-[eva] Recording results for f_set
+[eva:progress] Recording results for f_set
 [from] Computing for function f_set
 [from] Done for function f_set
-[eva] Done for function f_set
-[eva] computing for function f_set <- test_set <- main.
+[eva:progress] Done for function f_set
+[eva:progress] 
+  computing for function f_set <- test_set <- main.
   Called from call_accuracy.i:39.
-[eva] Recording results for f_set
+[eva:progress] Recording results for f_set
 [from] Computing for function f_set
 [from] Done for function f_set
-[eva] Done for function f_set
-[eva] computing for function f_set <- test_set <- main.
+[eva:progress] Done for function f_set
+[eva:progress] 
+  computing for function f_set <- test_set <- main.
   Called from call_accuracy.i:40.
-[eva] Recording results for f_set
+[eva:progress] Recording results for f_set
 [from] Computing for function f_set
 [from] Done for function f_set
-[eva] Done for function f_set
-[eva] computing for function f_set <- test_set <- main.
+[eva:progress] Done for function f_set
+[eva:progress] 
+  computing for function f_set <- test_set <- main.
   Called from call_accuracy.i:41.
-[eva] Recording results for f_set
+[eva:progress] Recording results for f_set
 [from] Computing for function f_set
 [from] Done for function f_set
-[eva] Done for function f_set
-[eva] computing for function f_set <- test_set <- main.
+[eva:progress] Done for function f_set
+[eva:progress] 
+  computing for function f_set <- test_set <- main.
   Called from call_accuracy.i:42.
-[eva] Recording results for f_set
+[eva:progress] Recording results for f_set
 [from] Computing for function f_set
 [from] Done for function f_set
-[eva] Done for function f_set
-[eva] computing for function f_set <- test_set <- main.
+[eva:progress] Done for function f_set
+[eva:progress] 
+  computing for function f_set <- test_set <- main.
   Called from call_accuracy.i:43.
-[eva] Recording results for f_set
+[eva:progress] Recording results for f_set
 [from] Computing for function f_set
 [from] Done for function f_set
-[eva] Done for function f_set
-[eva] computing for function f_set <- test_set <- main.
+[eva:progress] Done for function f_set
+[eva:progress] 
+  computing for function f_set <- test_set <- main.
   Called from call_accuracy.i:44.
-[eva] Recording results for f_set
+[eva:progress] Recording results for f_set
 [from] Computing for function f_set
 [from] Done for function f_set
-[eva] Done for function f_set
-[eva] computing for function f_set <- test_set <- main.
+[eva:progress] Done for function f_set
+[eva:progress] 
+  computing for function f_set <- test_set <- main.
   Called from call_accuracy.i:45.
-[eva] Recording results for f_set
+[eva:progress] Recording results for f_set
 [from] Computing for function f_set
 [from] Done for function f_set
-[eva] Done for function f_set
+[eva:progress] Done for function f_set
 [eva:alarm] call_accuracy.i:49: Warning: 
   signed overflow. assert -2147483648 ≤ b + s1.b;
 [eva:alarm] call_accuracy.i:49: Warning: 
@@ -159,10 +178,10 @@
   assert
   (int)((int)((int)((int)(b + s1.b) + s3.b) + tab[1]) + S1.b) + S2.b ≤
   2147483647;
-[eva] Recording results for test_set
+[eva:progress] Recording results for test_set
 [from] Computing for function test_set
 [from] Done for function test_set
-[eva] Done for function test_set
+[eva:progress] Done for function test_set
 [eva:alarm] call_accuracy.i:65: Warning: 
   signed overflow. assert r1 + r2 ≤ 2147483647;
 [eva:alarm] call_accuracy.i:65: Warning: 
@@ -171,10 +190,10 @@
   signed overflow. assert (int)(r1 + r2) + r3 ≤ 2147483647;
 [eva:alarm] call_accuracy.i:65: Warning: 
   signed overflow. assert (int)((int)(r1 + r2) + r3) + S3.b ≤ 2147483647;
-[eva] Recording results for main
+[eva:progress] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] Done for function main
+[eva:progress] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to f_cond at call_accuracy.i:14 (by test_cond):
   \result FROM c; a

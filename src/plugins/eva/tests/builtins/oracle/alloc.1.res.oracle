@@ -1,7 +1,7 @@
 [kernel] Parsing alloc.c (with preprocessing)
 [eva] Analyzing a complete application starting at main_abs
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   NULL[rbits 2048 to 4103] ∈ [--..--]
   p ∈ {0}
@@ -13,7 +13,7 @@
   u ∈ {0}
   v ∈ {0}
   ch ∈ {44}
-[eva] alloc.c:50: Call to builtin malloc
+[eva:progress] alloc.c:50: Call to builtin malloc
 [eva:malloc:new] alloc.c:50: allocating variable __malloc_main_abs_l50
 [eva:alarm] alloc.c:51: Warning: 
   pointer downcast. assert (unsigned int)q ≤ 2147483647;
@@ -33,8 +33,8 @@
   pointer downcast. assert (unsigned int)r ≤ 2147483647;
 [eva:alarm] alloc.c:56: Warning: signed overflow. assert -2147483648 ≤ *q + 1;
 [eva:alarm] alloc.c:56: Warning: signed overflow. assert *q + 1 ≤ 2147483647;
-[eva] Recording results for main_abs
-[eva] Done for function main_abs
+[eva:progress] Recording results for main_abs
+[eva:progress] Done for function main_abs
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     alloc.c:51: arithmetic operation on addresses

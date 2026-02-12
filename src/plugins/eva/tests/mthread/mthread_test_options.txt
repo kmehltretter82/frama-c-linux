@@ -11,7 +11,6 @@
 -add-symbolic-path ../../../share/mthread:"FRAMAC_SHARE/mt"
 # Verbosity options
 -mt-verbose 3
--eva-verbose 1
--eva-no-show-progress
--eva-msg-key interferences,-summary,-initial-state,-final-states,-partition
+-eva-verbose 3
+-eva-msg-key interferences,-summary
 -eva-warn-key experimental=inactive

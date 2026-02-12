@@ -117,14 +117,12 @@ module SplitReturnFunction:
                      and type value = Split_strategy.t
 module SplitReturn: Parameter_sig.Custom with type t = Split_strategy.t
 
-module ValShowProgress: Parameter_sig.Bool
 module ValShowPerf: Parameter_sig.Bool
 module ValPerfFlamegraphs: Parameter_sig.Filepath
 module ShowSlevel: Parameter_sig.Int
 module PrintCallstacks: Parameter_sig.Bool
 module ReportRedStatuses: Parameter_sig.Filepath
 module StatisticsFile: Parameter_sig.Filepath
-module ForcePrintSummary: Parameter_sig.Bool
 
 module MemExecAll: Parameter_sig.Bool
 

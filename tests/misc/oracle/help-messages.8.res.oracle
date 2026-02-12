@@ -148,9 +148,6 @@ Options taking a string as argument should preferably be written
 -eva-flamegraph <file>  Dump a summary of the time spent analyzing function
                     calls in a format suitable for the Flamegraph tool
                     (http://www.brendangregg.com/flamegraphs.html)
--eva-force-print-summary  Print the analysis summary even when '-eva-verbose
-                    0' is set (opposite option is
-                    -eva-no-force-print-summary)
 -eva-log <K_1:file_1,...>  copy log messages from Eva to a file. <K> is a
                     combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
@@ -176,13 +173,11 @@ Options taking a string as argument should preferably be written
                     investigated first.
 -eva-show-perf      Compute and show a summary of the time spent analyzing
                     function calls (opposite option is -eva-no-show-perf)
--eva-show-progress  Show progression messages during analysis (opposite
-                    option is -eva-no-show-progress)
 -eva-show-slevel <n>  Period for showing consumption of the allotted slevel
                     during analysis
 -eva-statistics-file <file.csv>  Dump some internal statistics about the
                     analysis
--eva-verbose <n>    level of verbosity for plug-in Eva (default to 1)
+-eva-verbose <n>    level of verbosity for plug-in Eva (default to 5)
 -eva-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category <k1>
                     to <s1>,...,<kn> to <sn>. Use -eva-warn-key help to get a
                     list of available categories, and * to enable all

@@ -697,9 +697,8 @@ module Make (Engine : Engine_Subset) = struct
     in
     let compute () =
       let results = Dataflow.compute () in
-      if Parameters.ValShowProgress.get () then
-        Self.feedback "Recording results for %a"
-          Kernel_function.pretty kf;
+      Self.feedback ~dkey:Self.dkey_progress
+        "Recording results for %a" Kernel_function.pretty kf;
       Dataflow.merge_results ~save_results;
       let f = Kernel_function.get_definition kf in
       if Ast_types.has_attribute "noreturn" f.svar.vtype && results <> [] then

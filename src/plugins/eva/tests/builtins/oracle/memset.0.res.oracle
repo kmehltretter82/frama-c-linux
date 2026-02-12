@@ -3,14 +3,14 @@
   A.QUESTION: char * does not match int * (different integer types:
   'char' and 'int')
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
+[eva:progress] Computing initial state
 [eva:initial-state] 
   creating variable S_incomplete_type with imprecise size (type struct incomplete [2])
 [eva:unknown-size] memset.c:29: Warning: 
   during initialization of variable 'incomplete_type', size of
   type 'struct incomplete' cannot be computed
   (abstract type 'struct incomplete')
-[eva] Initial state computed
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   NULL[rbits 128 to 1927] ∈ [--..--]
   t1[0..99] ∈ {0}
@@ -29,117 +29,131 @@
   incomplete_type ∈ {{ NULL ; (struct incomplete *)&S_incomplete_type }}
   vol ∈ [--..--]
   S_incomplete_type[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
-[eva] computing for function test <- main.
+[eva:progress] 
+  computing for function test <- main.
   Called from memset.c:113.
-[eva] memset.c:33: Call to builtin memset
-[eva] memset.c:33: function memset: precondition 'valid_s' got status valid.
+[eva:progress] memset.c:33: Call to builtin memset
+[eva:progress] memset.c:33: 
+  function memset: precondition 'valid_s' got status valid.
 [eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:147: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva:alarm] memset.c:34: Warning: 
   pointer downcast. assert (unsigned int)((int *)t2) ≤ 2147483647;
 [eva:garbled-mix:write] memset.c:34: 
   Assigning imprecise value to s because of arithmetic operation on addresses.
-[eva] memset.c:34: Call to builtin memset
+[eva:progress] memset.c:34: Call to builtin memset
 [eva:alarm] memset.c:34: Warning: 
   function memset: precondition 'valid_s' got status unknown.
-[eva] memset.c:35: Call to builtin memset
+[eva:progress] memset.c:35: Call to builtin memset
 [eva:alarm] memset.c:35: Warning: 
   function memset: precondition 'valid_s' got status unknown.
 [eva:imprecision] memset.c:35: 
   Call to builtin precise_memset(({{ (void *)&t3[10] }},{17},{{ (size_t)&t1 }})) failed; size is imprecise
-[eva] memset.c:38: Call to builtin memset
+[eva:progress] memset.c:38: Call to builtin memset
 [eva:alarm] memset.c:38: Warning: 
   function memset: precondition 'valid_s' got status invalid.
 [eva:alarm] memset.c:41: Warning: 
   pointer downcast. assert (unsigned int)((int *)t1) ≤ 2147483647;
-[eva] memset.c:41: Call to builtin memset
-[eva] memset.c:41: function memset: precondition 'valid_s' got status valid.
+[eva:progress] memset.c:41: Call to builtin memset
+[eva:progress] memset.c:41: 
+  function memset: precondition 'valid_s' got status valid.
 [eva:imprecision] memset.c:41: 
   Call to builtin precise_memset(({{ (void *)&t5 }},{{ (int)&t1 }},{400})) failed; value to write is imprecise
 [eva:garbled-mix:write] memset.c:41: 
   Builtin memset: assigning imprecise value to t5[0]
   because of misaligned read of addresses.
-[eva] memset.c:44: Call to builtin memset
-[eva] memset.c:44: function memset: precondition 'valid_s' got status valid.
+[eva:progress] memset.c:44: Call to builtin memset
+[eva:progress] memset.c:44: 
+  function memset: precondition 'valid_s' got status valid.
 [eva:imprecision] memset.c:44: 
   Call to builtin precise_memset(({{ (void *)&t6[10] ; (void *)&t7 }},{34},
                                   {16})) failed; destination is not exact
-[eva] memset.c:47: Call to builtin memset
+[eva:progress] memset.c:47: Call to builtin memset
 [eva:alarm] memset.c:47: Warning: 
   function memset: precondition 'valid_s' got status unknown.
 [eva:partition] memset.c:50: starting to merge loop iterations
-[eva] memset.c:54: Call to builtin memset
+[eva:progress] memset.c:54: Call to builtin memset
 [eva:alarm] memset.c:54: Warning: 
   function memset: precondition 'valid_s' got status unknown.
 [eva:imprecision] memset.c:54: 
   Call to builtin precise_memset(({{ &t9 + [80..--],0%4 }},{2302},{4})) failed; destination is not exact
-[eva] memset.c:58: Call to builtin memset
-[eva] memset.c:58: function memset: precondition 'valid_s' got status valid.
+[eva:progress] memset.c:58: Call to builtin memset
+[eva:progress] memset.c:58: 
+  function memset: precondition 'valid_s' got status valid.
 [eva:imprecision] memset.c:58: 
   Call to builtin precise_memset(({{ (void *)&t10[4] }},{136},{12; 36})) failed; size is imprecise
-[eva] memset.c:65: Call to builtin memset
-[eva] memset.c:65: function memset: precondition 'valid_s' got status valid.
+[eva:progress] memset.c:65: Call to builtin memset
+[eva:progress] memset.c:65: 
+  function memset: precondition 'valid_s' got status valid.
 [eva:imprecision] memset.c:65: 
   Call to builtin precise_memset(({{ (void *)&t11{[2], [3]} }},{153},{8; 16})) failed; size is imprecise
-[eva] memset.c:68: Call to builtin memset
-[eva] memset.c:68: function memset: precondition 'valid_s' got status valid.
+[eva:progress] memset.c:68: Call to builtin memset
+[eva:progress] memset.c:68: 
+  function memset: precondition 'valid_s' got status valid.
 [eva:alarm] memset.c:71: Warning: assertion 'Assume' got status unknown.
-[eva] memset.c:72: Call to builtin memset
-[eva] memset.c:72: function memset: precondition 'valid_s' got status valid.
+[eva:progress] memset.c:72: Call to builtin memset
+[eva:progress] memset.c:72: 
+  function memset: precondition 'valid_s' got status valid.
 [eva:imprecision] memset.c:72: 
   Call to builtin precise_memset(({{ &t12 + [0..384],0%32 }},{1},{4})) failed; destination is not exact
-[eva] memset.c:74: Call to builtin memset
-[eva] memset.c:74: function memset: precondition 'valid_s' got status valid.
+[eva:progress] memset.c:74: Call to builtin memset
+[eva:progress] memset.c:74: 
+  function memset: precondition 'valid_s' got status valid.
 [eva:imprecision] memset.c:74: 
   Call to builtin precise_memset(({{ (void *)&t1 }},{1},{0})) failed; size is negative or null
-[eva] memset.c:75: Call to builtin memset
+[eva:progress] memset.c:75: Call to builtin memset
 [eva:alarm] memset.c:75: Warning: 
   function memset: precondition 'valid_s' got status unknown.
 [eva:imprecision] memset.c:75: 
   Call to builtin precise_memset(({{ NULL ; (void *)&S_incomplete_type }},
                                   {65},{1})) failed; destination type and size differ
-[eva] memset.c:77: Call to builtin memset
-[eva] memset.c:77: function memset: precondition 'valid_s' got status valid.
+[eva:progress] memset.c:77: Call to builtin memset
+[eva:progress] memset.c:77: 
+  function memset: precondition 'valid_s' got status valid.
 [eva:imprecision] memset.c:77: 
   Call to builtin precise_memset(({16},{66},{2})) failed; destination has an unknown form
-[eva] Recording results for test
+[eva:progress] Recording results for test
 [from] Computing for function test
 [from] Done for function test
-[eva] Done for function test
-[eva] computing for function uninit <- main.
+[eva:progress] Done for function test
+[eva:progress] 
+  computing for function uninit <- main.
   Called from memset.c:114.
 [eva:alarm] memset.c:85: Warning: 
   accessing uninitialized left-value. assert \initialized(&x);
 [eva:alarm] memset.c:89: Warning: 
   accessing uninitialized left-value. assert \initialized(&x);
-[eva] memset.c:89: Call to builtin memset
-[eva] memset.c:89: function memset: precondition 'valid_s' got status valid.
-[eva] Recording results for uninit
+[eva:progress] memset.c:89: Call to builtin memset
+[eva:progress] memset.c:89: 
+  function memset: precondition 'valid_s' got status valid.
+[eva:progress] Recording results for uninit
 [from] Computing for function uninit
 [from] Done for function uninit
-[eva] Done for function uninit
-[eva] computing for function memset_weak_base <- main.
+[eva:progress] Done for function uninit
+[eva:progress] 
+  computing for function memset_weak_base <- main.
   Called from memset.c:115.
-[eva] memset.c:101: Call to builtin malloc
+[eva:progress] memset.c:101: Call to builtin malloc
 [eva:malloc:new] memset.c:101: 
   allocating weak variable __malloc_w_memset_weak_base_l101
-[eva] memset.c:106: Call to builtin memset
-[eva] memset.c:106: function memset: precondition 'valid_s' got status valid.
+[eva:progress] memset.c:106: Call to builtin memset
+[eva:progress] memset.c:106: 
+  function memset: precondition 'valid_s' got status valid.
 [eva:imprecision] memset.c:106: 
   Call to builtin precise_memset(({{ (void *)&__malloc_w_memset_weak_base_l101 }},
                                   {0},{12})) failed; destination is not exact
 [eva:alarm] memset.c:107: Warning: 
   accessing uninitialized left-value. assert \initialized(&s->ptr);
-[eva] Recording results for memset_weak_base
+[eva:progress] Recording results for memset_weak_base
 [from] Computing for function memset_weak_base
 [from] Done for function memset_weak_base
-[eva] Done for function memset_weak_base
+[eva:progress] Done for function memset_weak_base
 [eva:locals-escaping] memset.c:115: Warning: 
   locals {x} escaping the scope of memset_weak_base through __malloc_w_memset_weak_base_l101
-[eva] Recording results for main
+[eva:progress] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] Done for function main
+[eva:progress] Done for function main
 [eva] memset.c:85: assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function memset_weak_base:

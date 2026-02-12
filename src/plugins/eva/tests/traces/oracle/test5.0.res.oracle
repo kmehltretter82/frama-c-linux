@@ -3,106 +3,133 @@
   Calling undeclared function my_switch. Old style K&R code?
 [eva:experimental] Warning: The traces domain is experimental.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [kernel:annot:missing-spec] test5.i:21: Warning: 
   Neither code nor specification for function my_switch, generating default
   assigns. See -generated-spec-* options for more info.
-[eva] computing for function my_switch <- main.
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
 [eva] using specification for function my_switch
-[eva] Done for function my_switch
+[eva:progress] Done for function my_switch
 [eva:alarm] test5.i:21: Warning: 
   signed overflow. assert tmp_0 + tmp ≤ 2147483647;
                    (tmp_0 from my_switch(tmp))
-[eva] computing for function my_switch <- main.
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
+[eva:progress] Done for function my_switch
 [eva:alarm] test5.i:21: Warning: 
   signed overflow.
   assert -2147483648 ≤ tmp_0 + tmp;
   (tmp_0 from my_switch(tmp))
-[eva] computing for function my_switch <- main.
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
+[eva:progress] Done for function my_switch
 [eva:partition] test5.i:20: starting to merge loop iterations
-[eva] computing for function my_switch <- main.
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
+[eva:progress] Done for function my_switch
 [eva:partition] test5.i:19: starting to merge loop iterations
-[eva] computing for function my_switch <- main.
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] computing for function my_switch <- main.
+[eva:progress] Done for function my_switch
+[eva:progress] 
+  computing for function my_switch <- main.
   Called from test5.i:21.
-[eva] Done for function my_switch
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function my_switch
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   tmp ∈ [--..--]

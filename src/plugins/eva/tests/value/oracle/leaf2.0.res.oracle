@@ -1,7 +1,7 @@
 [kernel] Parsing leaf2.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ {0}
   H ∈ {0}
@@ -11,17 +11,18 @@
 [kernel:annot:missing-spec] leaf2.i:6: Warning: 
   Neither code nor specification for function f, generating default assigns.
   See -generated-spec-* options for more info.
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from leaf2.i:6.
 [eva] using specification for function f
 [eva:garbled-mix:assigns] leaf2.i:6: 
   The specification of function f has generated a garbled mix of addresses
   for assigns clause \result.
-[eva] Done for function f
+[eva:progress] Done for function f
 [eva:alarm] leaf2.i:7: Warning: signed overflow. assert -2147483648 ≤ G + 1;
 [eva:alarm] leaf2.i:7: Warning: signed overflow. assert G + 1 ≤ 2147483647;
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     leaf2.i:6: assigns clause on addresses

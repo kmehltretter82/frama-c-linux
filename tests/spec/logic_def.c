@@ -1,6 +1,6 @@
 /* run.config
 PLUGIN: eva,scope inout
-    STDOPT: +"-eva -eva-verbose 2"
+    STDOPT: +"-eva -eva-verbose 6"
 */
 //@ logic integer foo(int x) = x + 2 ;
 

@@ -1,12 +1,12 @@
 [kernel] Parsing bts1248.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at f
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [slicing] Warning: No internal slicing request from the command line.

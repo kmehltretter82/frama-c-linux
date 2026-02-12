@@ -1,7 +1,7 @@
 [kernel] Parsing relation_shift.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   r1 ∈ {0}
   r2 ∈ {0}
@@ -24,7 +24,7 @@
   signed overflow. assert z - y ≤ 2147483647;
 [eva:alarm] relation_shift.i:18: Warning: 
   out of bounds read. assert \valid_read(q);
-[eva] relation_shift.i:19: 
+[eva:show] relation_shift.i:19: 
   Frama_C_dump_each:
   # cvalue:
   r1 ∈ [--..--]
@@ -41,8 +41,8 @@
      [1] ∈ [--..--]
   S_p[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   r1 ∈ [--..--]

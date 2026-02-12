@@ -1,11 +1,14 @@
-13a14,23
+14a15,27
 > [eva:partition] infinite.i:6: starting to merge loop iterations
-> [eva] computing for function pause <- main.
+> [eva:progress] 
+>   computing for function pause <- main.
 >   Called from infinite.i:9.
-> [eva] Done for function pause
-> [eva] computing for function pause <- main.
+> [eva:progress] Done for function pause
+> [eva:progress] 
+>   computing for function pause <- main.
 >   Called from infinite.i:9.
-> [eva] Done for function pause
-> [eva] computing for function pause <- main.
+> [eva:progress] Done for function pause
+> [eva:progress] 
+>   computing for function pause <- main.
 >   Called from infinite.i:9.
-> [eva] Done for function pause
+> [eva:progress] Done for function pause

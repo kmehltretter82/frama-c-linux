@@ -1,43 +1,50 @@
 [kernel] Parsing bts709.c (with preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   inp1 IN {0}
   var1 IN {0}
   var2 IN {0}
-[eva] computing for function inputsOf_testcase_func <- main.
+[eva:progress] 
+  computing for function inputsOf_testcase_func <- main.
   Called from bts709.c:47.
 [kernel:annot:missing-spec] bts709.c:55: Warning: 
   Neither code nor specification for function nondet_int, generating default
   assigns. See -generated-spec-* options for more info.
-[eva] computing for function nondet_int <- inputsOf_testcase_func <- main.
+[eva:progress] 
+  computing for function nondet_int <- inputsOf_testcase_func <- main.
   Called from bts709.c:55.
 [eva] using specification for function nondet_int
-[eva] Done for function nondet_int
-[eva] computing for function nondet_int <- inputsOf_testcase_func <- main.
+[eva:progress] Done for function nondet_int
+[eva:progress] 
+  computing for function nondet_int <- inputsOf_testcase_func <- main.
   Called from bts709.c:56.
-[eva] Done for function nondet_int
-[eva] computing for function nondet_int <- inputsOf_testcase_func <- main.
+[eva:progress] Done for function nondet_int
+[eva:progress] 
+  computing for function nondet_int <- inputsOf_testcase_func <- main.
   Called from bts709.c:57.
-[eva] Done for function nondet_int
-[eva] Recording results for inputsOf_testcase_func
-[eva] Done for function inputsOf_testcase_func
-[eva] computing for function func <- main.
+[eva:progress] Done for function nondet_int
+[eva:progress] Recording results for inputsOf_testcase_func
+[eva:progress] Done for function inputsOf_testcase_func
+[eva:progress] 
+  computing for function func <- main.
   Called from bts709.c:48.
-[eva] computing for function __FC_assert <- func <- main.
+[eva:progress] 
+  computing for function __FC_assert <- func <- main.
   Called from bts709.c:38.
 [eva] using specification for function __FC_assert
 [eva:alarm] bts709.c:38: Warning: 
   function __FC_assert: precondition 'nonnull_c' got status unknown.
-[eva] Done for function __FC_assert
-[eva] Recording results for func
-[eva] Done for function func
+[eva:progress] Done for function __FC_assert
+[eva:progress] Recording results for func
+[eva:progress] Done for function func
 [eva:partition] bts709.c:46: starting to merge loop iterations
-[eva] bts709.c:47: Reusing old results for call to inputsOf_testcase_func
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] bts709.c:47: 
+  Reusing old results for call to inputsOf_testcase_func
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function func

@@ -1,18 +1,19 @@
 [kernel] Parsing abs_addr.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   NULL[rbits 1048576 to 2097151] ∈ [--..--]
   AutoTest[0..999] ∈ {0}
-[eva] computing for function TstRomUcmm <- main.
+[eva:progress] 
+  computing for function TstRomUcmm <- main.
   Called from abs_addr.i:46.
 [eva:partition] abs_addr.i:18: starting to merge loop iterations
 [eva:partition] abs_addr.i:32: starting to merge loop iterations
-[eva] Recording results for TstRomUcmm
-[eva] Done for function TstRomUcmm
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for TstRomUcmm
+[eva:progress] Done for function TstRomUcmm
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function TstRomUcmm:
   AutoTest[0..72] ∈ {0}

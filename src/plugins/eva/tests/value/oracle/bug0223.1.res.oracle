@@ -1,7 +1,7 @@
 [kernel] Parsing bug0223.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   ch1 ∈ {{ NULL ; &S_ch1[0] }}
   ch2 ∈ {{ NULL ; &S_ch2[0] }}
@@ -10,26 +10,30 @@
 [kernel:annot:missing-spec] bug0223.i:33: Warning: 
   Neither code nor specification for function F, generating default assigns.
   See -generated-spec-* options for more info.
-[eva] computing for function F <- main.
+[eva:progress] 
+  computing for function F <- main.
   Called from bug0223.i:33.
 [eva] using specification for function F
-[eva] Done for function F
-[eva] computing for function F <- main.
+[eva:progress] Done for function F
+[eva:progress] 
+  computing for function F <- main.
   Called from bug0223.i:34.
-[eva] Done for function F
-[eva] computing for function h2 <- main.
+[eva:progress] Done for function F
+[eva:progress] 
+  computing for function h2 <- main.
   Called from bug0223.i:35.
 [kernel:annot:missing-spec] bug0223.i:16: Warning: 
   Neither code nor specification for function my_strcnmp, generating default
   assigns. See -generated-spec-* options for more info.
-[eva] computing for function my_strcnmp <- h2 <- main.
+[eva:progress] 
+  computing for function my_strcnmp <- h2 <- main.
   Called from bug0223.i:16.
 [eva] using specification for function my_strcnmp
-[eva] Done for function my_strcnmp
-[eva] Recording results for h2
-[eva] Done for function h2
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function my_strcnmp
+[eva:progress] Recording results for h2
+[eva:progress] Done for function h2
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function h2:
   test ∈ {0; 1}

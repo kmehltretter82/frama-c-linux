@@ -1,11 +1,11 @@
 [kernel] Parsing broken_loop.i (no preprocessing)
 [eva] Analyzing a complete application starting at loop
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   X ∈ {0}
-[eva] Recording results for loop
-[eva] Done for function loop
+[eva:progress] Recording results for loop
+[eva:progress] Done for function loop
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function loop:
   X ∈ {2}

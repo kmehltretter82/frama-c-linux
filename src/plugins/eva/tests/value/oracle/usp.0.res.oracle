@@ -1,7 +1,7 @@
 [kernel] Parsing usp.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   a ∈ {-12}
   b ∈ {0}
@@ -11,8 +11,8 @@
   Y ∈ {0}
   Z ∈ {0}
   T ∈ {0}
-[eva] usp.i:17: Frama_C_show_each: {-1; 5}
-[eva] usp.i:18: 
+[eva:show] usp.i:17: Frama_C_show_each: {-1; 5}
+[eva:show] usp.i:18: 
   Frama_C_dump_each:
   # cvalue:
   a ∈ {-12}
@@ -26,8 +26,8 @@
   c ∈ [--..--]
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   b ∈ {-1; 5}

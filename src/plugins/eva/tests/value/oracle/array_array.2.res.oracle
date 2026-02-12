@@ -1,24 +1,26 @@
 [kernel] Parsing array_array.c (with preprocessing)
 [eva] Analyzing a complete application starting at main3
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   StaticAllocHEAP[0..3] ∈ {2}
                  [4..9999] ∈ {0}
   LIB_MEM_StaticAlloc_next_free ∈ {0}
-[eva] computing for function LIB_MEM_StaticAlloc <- main3.
+[eva:progress] 
+  computing for function LIB_MEM_StaticAlloc <- main3.
   Called from array_array.c:66.
-[eva] array_array.c:13: Frama_C_show_each_ALLOCATION_WITH_STATIC_ALLOC: {24}
-[eva] Recording results for LIB_MEM_StaticAlloc
-[eva] Done for function LIB_MEM_StaticAlloc
+[eva:show] array_array.c:13: 
+  Frama_C_show_each_ALLOCATION_WITH_STATIC_ALLOC: {24}
+[eva:progress] Recording results for LIB_MEM_StaticAlloc
+[eva:progress] Done for function LIB_MEM_StaticAlloc
 [eva:alarm] array_array.c:69: Warning: 
   accessing out of bounds index. assert i < 3;
 [eva:alarm] array_array.c:69: Warning: 
   unaligned pointer creation. assert \aligned(v,alignof(struct S [3]));
 [eva] array_array.c:69: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
-[eva] Recording results for main3
-[eva] Done for function main3
+[eva:progress] Recording results for main3
+[eva:progress] Done for function main3
 [eva] array_array.c:69: assertion 'Eva,index_bound' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function LIB_MEM_StaticAlloc:

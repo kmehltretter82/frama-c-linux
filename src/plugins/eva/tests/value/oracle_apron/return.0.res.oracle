@@ -1,7 +1,8 @@
-12c12,15
-< [eva] return.i:19: Reusing old results for call to f
+13c13,17
+< [eva:progress] return.i:19: Reusing old results for call to f
 ---
-> [eva] computing for function f <- main.
+> [eva:progress] 
+>   computing for function f <- main.
 >   Called from return.i:19.
-> [eva] Recording results for f
-> [eva] Done for function f
+> [eva:progress] Recording results for f
+> [eva:progress] Done for function f

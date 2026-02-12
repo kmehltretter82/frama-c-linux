@@ -1,10 +1,11 @@
 [kernel] Parsing no_results.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t[0..2999] ∈ {0}
-[eva] computing for function init <- main.
+[eva:progress] 
+  computing for function init <- main.
   Called from no_results.c:19.
 [eva:partition] no_results.c:10: Trace partitioning superposing up to 100 states
 [eva:partition] no_results.c:10: Trace partitioning superposing up to 200 states
@@ -57,18 +58,19 @@
   Trace partitioning superposing up to 2900 states
 [eva:partition] no_results.c:10: 
   Trace partitioning superposing up to 3000 states
-[eva] Recording results for init
-[eva] Done for function init
-[eva] computing for function f <- main.
+[eva:progress] Recording results for init
+[eva:progress] Done for function init
+[eva:progress] 
+  computing for function f <- main.
   Called from no_results.c:20.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] Recording results for main
+[eva:progress] Done for function f
+[eva:progress] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] Done for function main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   t[0..1] ∈ {0}

@@ -1,235 +1,260 @@
 [kernel] Parsing wchar_c_h.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   wc ∈ {-1}
   wi ∈ {4294967295}
   t ∈ {0}
   nondet ∈ [--..--]
-[eva] wchar_c_h.c:31: Call to builtin wmemchr
-[eva] wchar_c_h.c:31: function wmemchr: precondition 'valid' got status valid.
-[eva] wchar_c_h.c:31: 
+[eva:progress] wchar_c_h.c:31: Call to builtin wmemchr
+[eva:progress] wchar_c_h.c:31: 
+  function wmemchr: precondition 'valid' got status valid.
+[eva:progress] wchar_c_h.c:31: 
   function wmemchr: precondition 'initialization' got status valid.
-[eva] wchar_c_h.c:31: 
+[eva:progress] wchar_c_h.c:31: 
   function wmemchr: precondition 'danglingness' got status valid.
-[eva] computing for function wmemcmp <- main.
+[eva:progress] 
+  computing for function wmemcmp <- main.
   Called from wchar_c_h.c:32.
 [eva] using specification for function wmemcmp
-[eva] wchar_c_h.c:32: 
+[eva:progress] wchar_c_h.c:32: 
   function wmemcmp: precondition 'valid_s1' got status valid.
-[eva] wchar_c_h.c:32: 
+[eva:progress] wchar_c_h.c:32: 
   function wmemcmp: precondition 'valid_s2' got status valid.
-[eva] wchar_c_h.c:32: 
+[eva:progress] wchar_c_h.c:32: 
   function wmemcmp: precondition 'initialization,s1' got status valid.
-[eva] wchar_c_h.c:32: 
+[eva:progress] wchar_c_h.c:32: 
   function wmemcmp: precondition 'initialization,s2' got status valid.
-[eva] wchar_c_h.c:32: 
+[eva:progress] wchar_c_h.c:32: 
   function wmemcmp: precondition 'danglingness,s1' got status valid.
-[eva] wchar_c_h.c:32: 
+[eva:progress] wchar_c_h.c:32: 
   function wmemcmp: precondition 'danglingness,s2' got status valid.
-[eva] Done for function wmemcmp
-[eva] computing for function wmemcpy <- main.
+[eva:progress] Done for function wmemcmp
+[eva:progress] 
+  computing for function wmemcpy <- main.
   Called from wchar_c_h.c:33.
-[eva] Recording results for wmemcpy
-[eva] Done for function wmemcpy
-[eva] computing for function wmemmove <- main.
+[eva:progress] Recording results for wmemcpy
+[eva:progress] Done for function wmemcpy
+[eva:progress] 
+  computing for function wmemmove <- main.
   Called from wchar_c_h.c:34.
 [eva] using specification for function wmemmove
-[eva] wchar_c_h.c:34: 
+[eva:progress] wchar_c_h.c:34: 
   function wmemmove: precondition 'valid_src' got status valid.
-[eva] wchar_c_h.c:34: 
+[eva:progress] wchar_c_h.c:34: 
   function wmemmove: precondition 'valid_dest' got status valid.
-[eva] Done for function wmemmove
-[eva] computing for function wmemset <- main.
+[eva:progress] Done for function wmemmove
+[eva:progress] 
+  computing for function wmemset <- main.
   Called from wchar_c_h.c:35.
-[eva] Recording results for wmemset
-[eva] Done for function wmemset
-[eva] wchar_c_h.c:36: Call to builtin wcschr
-[eva] wchar_c_h.c:36: 
+[eva:progress] Recording results for wmemset
+[eva:progress] Done for function wmemset
+[eva:progress] wchar_c_h.c:36: Call to builtin wcschr
+[eva:progress] wchar_c_h.c:36: 
   function wcschr: precondition 'valid_wstring_src' got status valid.
-[eva] computing for function wcscmp <- main.
+[eva:progress] 
+  computing for function wcscmp <- main.
   Called from wchar_c_h.c:37.
 [eva] using specification for function wcscmp
-[eva] wchar_c_h.c:37: 
+[eva:progress] wchar_c_h.c:37: 
   function wcscmp: precondition 'valid_wstring_s1' got status valid.
-[eva] wchar_c_h.c:37: 
+[eva:progress] wchar_c_h.c:37: 
   function wcscmp: precondition 'valid_wstring_s2' got status valid.
-[eva] Done for function wcscmp
-[eva] computing for function wcscpy <- main.
+[eva:progress] Done for function wcscmp
+[eva:progress] 
+  computing for function wcscpy <- main.
   Called from wchar_c_h.c:38.
-[eva] Recording results for wcscpy
-[eva] Done for function wcscpy
-[eva] computing for function wcscspn <- main.
+[eva:progress] Recording results for wcscpy
+[eva:progress] Done for function wcscpy
+[eva:progress] 
+  computing for function wcscspn <- main.
   Called from wchar_c_h.c:39.
 [eva] using specification for function wcscspn
-[eva] wchar_c_h.c:39: 
+[eva:progress] wchar_c_h.c:39: 
   function wcscspn: precondition 'valid_wstring_wcs' got status valid.
-[eva] wchar_c_h.c:39: 
+[eva:progress] wchar_c_h.c:39: 
   function wcscspn: precondition 'valid_wstring_accept' got status valid.
-[eva] Done for function wcscspn
-[eva] computing for function wcslcat <- main.
+[eva:progress] Done for function wcscspn
+[eva:progress] 
+  computing for function wcslcat <- main.
   Called from wchar_c_h.c:40.
 [eva] using specification for function wcslcat
-[eva] wchar_c_h.c:40: 
+[eva:progress] wchar_c_h.c:40: 
   function wcslcat: precondition 'valid_nwstring_src' got status valid.
 [eva:alarm] wchar_c_h.c:40: Warning: 
   function wcslcat: precondition 'valid_wstring_dest' got status invalid.
-[eva] wchar_c_h.c:40: 
+[eva:progress] wchar_c_h.c:40: 
   function wcslcat: no state left, precondition 'room_for_concatenation' got status valid.
-[eva] wchar_c_h.c:40: 
+[eva:progress] wchar_c_h.c:40: 
   function wcslcat: no state left, precondition 'separation' got status valid.
-[eva] Done for function wcslcat
-[eva] computing for function wcslcpy <- main.
+[eva:progress] Done for function wcslcat
+[eva:progress] 
+  computing for function wcslcpy <- main.
   Called from wchar_c_h.c:41.
 [eva] using specification for function wcslcpy
-[eva] wchar_c_h.c:41: 
+[eva:progress] wchar_c_h.c:41: 
   function wcslcpy: precondition 'valid_wstring_src' got status valid.
-[eva] wchar_c_h.c:41: 
+[eva:progress] wchar_c_h.c:41: 
   function wcslcpy: precondition 'room_nwstring' got status valid.
-[eva] wchar_c_h.c:41: 
+[eva:progress] wchar_c_h.c:41: 
   function wcslcpy: precondition 'separation,dest,src' got status valid.
-[eva] Done for function wcslcpy
-[eva] wchar_c_h.c:42: Call to builtin wcslen
-[eva] wchar_c_h.c:42: 
+[eva:progress] Done for function wcslcpy
+[eva:progress] wchar_c_h.c:42: Call to builtin wcslen
+[eva:progress] wchar_c_h.c:42: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] computing for function wcsncmp <- main.
+[eva:progress] 
+  computing for function wcsncmp <- main.
   Called from wchar_c_h.c:43.
 [eva] using specification for function wcsncmp
-[eva] wchar_c_h.c:43: 
+[eva:progress] wchar_c_h.c:43: 
   function wcsncmp: precondition 'valid_wstring_s1' got status valid.
-[eva] wchar_c_h.c:43: 
+[eva:progress] wchar_c_h.c:43: 
   function wcsncmp: precondition 'valid_wstring_s2' got status valid.
-[eva] Done for function wcsncmp
-[eva] computing for function wcsncpy <- main.
+[eva:progress] Done for function wcsncmp
+[eva:progress] 
+  computing for function wcsncpy <- main.
   Called from wchar_c_h.c:44.
-[eva] Recording results for wcsncpy
-[eva] Done for function wcsncpy
-[eva] computing for function wcspbrk <- main.
+[eva:progress] Recording results for wcsncpy
+[eva:progress] Done for function wcsncpy
+[eva:progress] 
+  computing for function wcspbrk <- main.
   Called from wchar_c_h.c:45.
 [eva] using specification for function wcspbrk
-[eva] wchar_c_h.c:45: 
+[eva:progress] wchar_c_h.c:45: 
   function wcspbrk: precondition 'valid_wstring_wcs' got status valid.
-[eva] wchar_c_h.c:45: 
+[eva:progress] wchar_c_h.c:45: 
   function wcspbrk: precondition 'valid_wstring_accept' got status valid.
-[eva] Done for function wcspbrk
-[eva] computing for function wcsrchr <- main.
+[eva:progress] Done for function wcspbrk
+[eva:progress] 
+  computing for function wcsrchr <- main.
   Called from wchar_c_h.c:46.
 [eva] using specification for function wcsrchr
-[eva] wchar_c_h.c:46: 
+[eva:progress] wchar_c_h.c:46: 
   function wcsrchr: precondition 'valid_wstring_wcs' got status valid.
-[eva] Done for function wcsrchr
-[eva] computing for function wcsspn <- main.
+[eva:progress] Done for function wcsrchr
+[eva:progress] 
+  computing for function wcsspn <- main.
   Called from wchar_c_h.c:47.
 [eva] using specification for function wcsspn
-[eva] wchar_c_h.c:47: 
+[eva:progress] wchar_c_h.c:47: 
   function wcsspn: precondition 'valid_wstring_wcs' got status valid.
-[eva] wchar_c_h.c:47: 
+[eva:progress] wchar_c_h.c:47: 
   function wcsspn: precondition 'valid_wstring_accept' got status valid.
-[eva] Done for function wcsspn
-[eva] computing for function wcsstr <- main.
+[eva:progress] Done for function wcsspn
+[eva:progress] 
+  computing for function wcsstr <- main.
   Called from wchar_c_h.c:48.
 [eva] using specification for function wcsstr
-[eva] wchar_c_h.c:48: 
+[eva:progress] wchar_c_h.c:48: 
   function wcsstr: precondition 'valid_wstring_haystack' got status valid.
-[eva] wchar_c_h.c:48: 
+[eva:progress] wchar_c_h.c:48: 
   function wcsstr: precondition 'valid_wstring_needle' got status valid.
-[eva] Done for function wcsstr
-[eva] computing for function wcscat <- main.
+[eva:progress] Done for function wcsstr
+[eva:progress] 
+  computing for function wcscat <- main.
   Called from wchar_c_h.c:52.
-[eva] FRAMAC_SHARE/libc/wchar.c:63: Call to builtin wcslen
-[eva] FRAMAC_SHARE/libc/wchar.c:63: 
+[eva:progress] FRAMAC_SHARE/libc/wchar.c:63: Call to builtin wcslen
+[eva:progress] FRAMAC_SHARE/libc/wchar.c:63: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] Recording results for wcscat
-[eva] Done for function wcscat
-[eva] computing for function wcsncat <- main.
+[eva:progress] Recording results for wcscat
+[eva:progress] Done for function wcscat
+[eva:progress] 
+  computing for function wcsncat <- main.
   Called from wchar_c_h.c:54.
-[eva] FRAMAC_SHARE/libc/wchar.c:73: Call to builtin wcslen
-[eva] FRAMAC_SHARE/libc/wchar.c:73: 
+[eva:progress] FRAMAC_SHARE/libc/wchar.c:73: Call to builtin wcslen
+[eva:progress] FRAMAC_SHARE/libc/wchar.c:73: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] Recording results for wcsncat
-[eva] Done for function wcsncat
+[eva:progress] Recording results for wcsncat
+[eva:progress] Done for function wcsncat
 [eva:alarm] wchar_c_h.c:57: Warning: 
   unaligned pointer creation.
   assert \aligned((char const *)"",alignof(wchar_t const));
-[eva] wchar_c_h.c:57: Call to builtin wcslen
+[eva:progress] wchar_c_h.c:57: Call to builtin wcslen
 [eva:alarm] wchar_c_h.c:57: Warning: 
   function wcslen: precondition 'valid_string_s' got status invalid.
 [eva:alarm] wchar_c_h.c:58: Warning: 
   unaligned pointer creation.
   assert \aligned((char const *)"A",alignof(wchar_t const));
-[eva] wchar_c_h.c:58: Call to builtin wcslen
+[eva:progress] wchar_c_h.c:58: Call to builtin wcslen
 [eva:alarm] wchar_c_h.c:58: Warning: 
   function wcslen: precondition 'valid_string_s' got status invalid.
 [eva:alarm] wchar_c_h.c:59: Warning: 
   unaligned pointer creation.
   assert \aligned((char const *)"ABCD",alignof(wchar_t const));
-[eva] wchar_c_h.c:59: Call to builtin wcslen
+[eva:progress] wchar_c_h.c:59: Call to builtin wcslen
 [eva:alarm] wchar_c_h.c:59: Warning: 
   function wcslen: precondition 'valid_string_s' got status invalid.
 [eva:alarm] wchar_c_h.c:61: Warning: 
   unaligned pointer creation.
   assert \aligned((char const *)"",alignof(wchar_t const));
-[eva] wchar_c_h.c:61: Call to builtin wcschr
+[eva:progress] wchar_c_h.c:61: Call to builtin wcschr
 [eva:alarm] wchar_c_h.c:61: Warning: 
   function wcschr: precondition 'valid_wstring_src' got status invalid.
 [eva:alarm] wchar_c_h.c:62: Warning: 
   unaligned pointer creation.
   assert \aligned((char const *)"A",alignof(wchar_t const));
-[eva] wchar_c_h.c:62: Call to builtin wcschr
+[eva:progress] wchar_c_h.c:62: Call to builtin wcschr
 [eva:alarm] wchar_c_h.c:62: Warning: 
   function wcschr: precondition 'valid_wstring_src' got status invalid.
 [eva:alarm] wchar_c_h.c:63: Warning: 
   unaligned pointer creation.
   assert \aligned((char const *)"ABCD",alignof(wchar_t const));
-[eva] wchar_c_h.c:63: Call to builtin wcschr
+[eva:progress] wchar_c_h.c:63: Call to builtin wcschr
 [eva:alarm] wchar_c_h.c:63: Warning: 
   function wcschr: precondition 'valid_wstring_src' got status invalid.
-[eva] wchar_c_h.c:68: Call to builtin wcschr
-[eva] wchar_c_h.c:68: 
+[eva:progress] wchar_c_h.c:68: Call to builtin wcschr
+[eva:progress] wchar_c_h.c:68: 
   function wcschr: precondition 'valid_wstring_src' got status valid.
-[eva] wchar_c_h.c:69: Call to builtin wmemchr
-[eva] wchar_c_h.c:69: function wmemchr: precondition 'valid' got status valid.
-[eva] wchar_c_h.c:69: 
+[eva:progress] wchar_c_h.c:69: Call to builtin wmemchr
+[eva:progress] wchar_c_h.c:69: 
+  function wmemchr: precondition 'valid' got status valid.
+[eva:progress] wchar_c_h.c:69: 
   function wmemchr: precondition 'initialization' got status valid.
-[eva] wchar_c_h.c:69: 
+[eva:progress] wchar_c_h.c:69: 
   function wmemchr: precondition 'danglingness' got status valid.
-[eva] wchar_c_h.c:70: Call to builtin wmemchr
-[eva] wchar_c_h.c:70: function wmemchr: precondition 'valid' got status valid.
-[eva] wchar_c_h.c:70: 
+[eva:progress] wchar_c_h.c:70: Call to builtin wmemchr
+[eva:progress] wchar_c_h.c:70: 
+  function wmemchr: precondition 'valid' got status valid.
+[eva:progress] wchar_c_h.c:70: 
   function wmemchr: precondition 'initialization' got status valid.
-[eva] wchar_c_h.c:70: 
+[eva:progress] wchar_c_h.c:70: 
   function wmemchr: precondition 'danglingness' got status valid.
-[eva] computing for function wcsdup <- main.
+[eva:progress] 
+  computing for function wcsdup <- main.
   Called from wchar_c_h.c:73.
-[eva] FRAMAC_SHARE/libc/wchar.c:87: Call to builtin wcslen
-[eva] FRAMAC_SHARE/libc/wchar.c:87: 
+[eva:progress] FRAMAC_SHARE/libc/wchar.c:87: Call to builtin wcslen
+[eva:progress] FRAMAC_SHARE/libc/wchar.c:87: 
   function wcslen: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/wchar.c:88: Call to builtin malloc
+[eva:progress] FRAMAC_SHARE/libc/wchar.c:88: Call to builtin malloc
 [eva:malloc:new] FRAMAC_SHARE/libc/wchar.c:88: 
   allocating variable __malloc_wcsdup_l88
-[eva] computing for function wmemcpy <- wcsdup <- main.
+[eva:progress] 
+  computing for function wmemcpy <- wcsdup <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:93.
-[eva] Recording results for wmemcpy
-[eva] Done for function wmemcpy
-[eva] Recording results for wcsdup
-[eva] Done for function wcsdup
-[eva] computing for function wcsdup <- main.
+[eva:progress] Recording results for wmemcpy
+[eva:progress] Done for function wmemcpy
+[eva:progress] Recording results for wcsdup
+[eva:progress] Done for function wcsdup
+[eva:progress] 
+  computing for function wcsdup <- main.
   Called from wchar_c_h.c:75.
-[eva] FRAMAC_SHARE/libc/wchar.c:87: Call to builtin wcslen
-[eva] FRAMAC_SHARE/libc/wchar.c:88: Call to builtin malloc
+[eva:progress] FRAMAC_SHARE/libc/wchar.c:87: Call to builtin wcslen
+[eva:progress] FRAMAC_SHARE/libc/wchar.c:88: Call to builtin malloc
 [eva:malloc:new] FRAMAC_SHARE/libc/wchar.c:88: 
   allocating variable __malloc_wcsdup_l88_0
-[eva] computing for function wmemcpy <- wcsdup <- main.
+[eva:progress] 
+  computing for function wmemcpy <- wcsdup <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:93.
-[eva] Recording results for wmemcpy
-[eva] Done for function wmemcpy
-[eva] Recording results for wcsdup
-[eva] Done for function wcsdup
-[eva] wchar_c_h.c:76: Call to builtin free
-[eva] wchar_c_h.c:76: function free: precondition 'freeable' got status valid.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for wmemcpy
+[eva:progress] Done for function wmemcpy
+[eva:progress] Recording results for wcsdup
+[eva:progress] Done for function wcsdup
+[eva:progress] wchar_c_h.c:76: Call to builtin free
+[eva:progress] wchar_c_h.c:76: 
+  function free: precondition 'freeable' got status valid.
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function wcscpy:
   i ∈ {8}

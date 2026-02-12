@@ -1,41 +1,49 @@
 [kernel] Parsing unravel-flavors.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nb_fetch ∈ {0}
-[eva] computing for function fetch <- main.
+[eva:progress] 
+  computing for function fetch <- main.
   Called from unravel-flavors.i:46.
-[eva] computing for function scanf <- fetch <- main.
+[eva:progress] 
+  computing for function scanf <- fetch <- main.
   Called from unravel-flavors.i:37.
 [eva] using specification for function scanf
-[eva] Done for function scanf
+[eva:progress] Done for function scanf
 [eva:alarm] unravel-flavors.i:38: Warning: 
   accessing uninitialized left-value. assert \initialized(&value);
-[eva] Recording results for fetch
-[eva] Done for function fetch
-[eva] computing for function fetch <- main.
+[eva:progress] Recording results for fetch
+[eva:progress] Done for function fetch
+[eva:progress] 
+  computing for function fetch <- main.
   Called from unravel-flavors.i:47.
-[eva] computing for function scanf <- fetch <- main.
+[eva:progress] 
+  computing for function scanf <- fetch <- main.
   Called from unravel-flavors.i:37.
-[eva] Done for function scanf
-[eva] Recording results for fetch
-[eva] Done for function fetch
-[eva] computing for function fetch <- main.
+[eva:progress] Done for function scanf
+[eva:progress] Recording results for fetch
+[eva:progress] Done for function fetch
+[eva:progress] 
+  computing for function fetch <- main.
   Called from unravel-flavors.i:48.
-[eva] computing for function scanf <- fetch <- main.
+[eva:progress] 
+  computing for function scanf <- fetch <- main.
   Called from unravel-flavors.i:37.
-[eva] Done for function scanf
-[eva] Recording results for fetch
-[eva] Done for function fetch
-[eva] computing for function fetch <- main.
+[eva:progress] Done for function scanf
+[eva:progress] Recording results for fetch
+[eva:progress] Done for function fetch
+[eva:progress] 
+  computing for function fetch <- main.
   Called from unravel-flavors.i:49.
-[eva] computing for function scanf <- fetch <- main.
+[eva:progress] 
+  computing for function scanf <- fetch <- main.
   Called from unravel-flavors.i:37.
-[eva] Done for function scanf
-[eva] Recording results for fetch
-[eva] Done for function fetch
+[eva:progress] Done for function scanf
+[eva:progress] Recording results for fetch
+[eva:progress] Done for function fetch
 [eva:alarm] unravel-flavors.i:51: Warning: 
   signed overflow. assert -2147483648 ≤ 2 * red;
 [eva:alarm] unravel-flavors.i:51: Warning: 
@@ -59,40 +67,48 @@
   signed overflow. assert -2147483648 ≤ yellow + green;
 [eva:alarm] unravel-flavors.i:58: Warning: 
   signed overflow. assert yellow + green ≤ 2147483647;
-[eva] computing for function send1 <- main.
+[eva:progress] 
+  computing for function send1 <- main.
   Called from unravel-flavors.i:60.
 [kernel:annot:missing-spec] unravel-flavors.i:19: Warning: 
   Neither code nor specification for function printf, generating default
   assigns. See -generated-spec-* options for more info.
-[eva] computing for function printf <- send1 <- main.
+[eva:progress] 
+  computing for function printf <- send1 <- main.
   Called from unravel-flavors.i:19.
 [eva] using specification for function printf
-[eva] Done for function printf
-[eva] Recording results for send1
-[eva] Done for function send1
-[eva] computing for function send2 <- main.
+[eva:progress] Done for function printf
+[eva:progress] Recording results for send1
+[eva:progress] Done for function send1
+[eva:progress] 
+  computing for function send2 <- main.
   Called from unravel-flavors.i:61.
-[eva] computing for function printf <- send2 <- main.
+[eva:progress] 
+  computing for function printf <- send2 <- main.
   Called from unravel-flavors.i:23.
-[eva] Done for function printf
-[eva] Recording results for send2
-[eva] Done for function send2
-[eva] computing for function send3 <- main.
+[eva:progress] Done for function printf
+[eva:progress] Recording results for send2
+[eva:progress] Done for function send2
+[eva:progress] 
+  computing for function send3 <- main.
   Called from unravel-flavors.i:62.
-[eva] computing for function printf <- send3 <- main.
+[eva:progress] 
+  computing for function printf <- send3 <- main.
   Called from unravel-flavors.i:27.
-[eva] Done for function printf
-[eva] Recording results for send3
-[eva] Done for function send3
-[eva] computing for function send4 <- main.
+[eva:progress] Done for function printf
+[eva:progress] Recording results for send3
+[eva:progress] Done for function send3
+[eva:progress] 
+  computing for function send4 <- main.
   Called from unravel-flavors.i:63.
-[eva] computing for function printf <- send4 <- main.
+[eva:progress] 
+  computing for function printf <- send4 <- main.
   Called from unravel-flavors.i:31.
-[eva] Done for function printf
-[eva] Recording results for send4
-[eva] Done for function send4
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function printf
+[eva:progress] Recording results for send4
+[eva:progress] Done for function send4
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function send4

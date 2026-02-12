@@ -25,8 +25,6 @@
 [eva:assigns:missing] read_all.c:15: User Error: 
   no \from part for clause 'assigns *p, r;'.
   Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
-[eva:assigns:invalid-location] read_all.c:29: 
-  Completely invalid destination for assigns clause *p. Ignoring.
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -57,8 +55,6 @@
 [eva:assigns:missing] read_all.c:15: User Error: 
   no \from part for clause 'assigns *p, r;'.
   Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
-[eva:assigns:invalid-location] read_all.c:19: 
-  Completely invalid destination for assigns clause *p. Ignoring.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -110,8 +106,6 @@
 [eva:assigns:missing] read_all.c:15: User Error: 
   no \from part for clause 'assigns *p, r;'.
   Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
-[eva:assigns:invalid-location] read_all.c:29: 
-  Completely invalid destination for assigns clause *p. Ignoring.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -146,8 +140,6 @@
 [eva:assigns:missing] read_all.c:15: User Error: 
   no \from part for clause 'assigns *p, r;'.
   Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
-[eva:assigns:invalid-location] read_all.c:19: 
-  Completely invalid destination for assigns clause *p. Ignoring.
 [eva:interferences] read_all.c:19: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -215,8 +207,6 @@
 [eva:assigns:missing] read_all.c:15: User Error: 
   no \from part for clause 'assigns *p, r;'.
   Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
-[eva:assigns:invalid-location] read_all.c:29: 
-  Completely invalid destination for assigns clause *p. Ignoring.
 [eva:interferences] read_all.c:29: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved

@@ -5,8 +5,8 @@
 [eva:widen-hints] widen_hints.c:89: 
   adding hint from annotation: ss, { 87 } (for all statements)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {9}
   not_const ∈ {42}
@@ -31,33 +31,38 @@
   adding new base due to dynamic widen hint: iarray, { 87 }
 [eva:partition] widen_hints.c:120: starting to merge loop iterations
 [eva:partition] widen_hints.c:118: starting to merge loop iterations
-[eva] computing for function using_dynamic_global <- main.
+[eva:progress] 
+  computing for function using_dynamic_global <- main.
   Called from widen_hints.c:126.
 [eva:widen-hints] widen_hints.c:60: computing dynamic hints for statement 2
 [eva:widen-hints] widen_hints.c:60: 
   adding new base due to dynamic widen hint: outer_i, { 87 }
-[eva] Recording results for using_dynamic_global
-[eva] Done for function using_dynamic_global
-[eva] computing for function using_dynamic_global <- main.
+[eva:progress] Recording results for using_dynamic_global
+[eva:progress] Done for function using_dynamic_global
+[eva:progress] 
+  computing for function using_dynamic_global <- main.
   Called from widen_hints.c:126.
-[eva] Recording results for using_dynamic_global
-[eva] Done for function using_dynamic_global
+[eva:progress] Recording results for using_dynamic_global
+[eva:progress] Done for function using_dynamic_global
 [eva:partition] widen_hints.c:125: starting to merge loop iterations
-[eva] computing for function using_dynamic_global <- main.
+[eva:progress] 
+  computing for function using_dynamic_global <- main.
   Called from widen_hints.c:126.
 [eva:partition] widen_hints.c:60: starting to merge loop iterations
-[eva] Recording results for using_dynamic_global
-[eva] Done for function using_dynamic_global
-[eva] computing for function using_dynamic_global <- main.
+[eva:progress] Recording results for using_dynamic_global
+[eva:progress] Done for function using_dynamic_global
+[eva:progress] 
+  computing for function using_dynamic_global <- main.
   Called from widen_hints.c:126.
-[eva] Recording results for using_dynamic_global
-[eva] Done for function using_dynamic_global
-[eva] computing for function using_dynamic_global <- main.
+[eva:progress] Recording results for using_dynamic_global
+[eva:progress] Done for function using_dynamic_global
+[eva:progress] 
+  computing for function using_dynamic_global <- main.
   Called from widen_hints.c:126.
-[eva] Recording results for using_dynamic_global
-[eva] Done for function using_dynamic_global
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for using_dynamic_global
+[eva:progress] Done for function using_dynamic_global
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function using_dynamic_global:
   b ∈ [0..2147483647]

@@ -4,8 +4,8 @@
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [kernel] Parsing CruiseControl_const.c (with preprocessing)
 [eva] Analyzing an incomplete application starting at CruiseControl
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   ZeroSpeed ∈ {0}
   SpeedInc ∈ {2.0000000000000000}
@@ -15,25 +15,31 @@
   Kp ∈ {8.1129999160766601}
   Ki ∈ {1.0000000000000000*2^-1}
   RegThrottleMax ∈ {45.0000000000000000}
-[eva] computing for function DetectPedalsPressed <- CruiseControl.
+[eva:progress] 
+  computing for function DetectPedalsPressed <- CruiseControl.
   Called from CruiseControl.c:462.
-[eva] Recording results for DetectPedalsPressed
-[eva] Done for function DetectPedalsPressed
-[eva] computing for function DetectSpeedLimits <- CruiseControl.
+[eva:progress] Recording results for DetectPedalsPressed
+[eva:progress] Done for function DetectPedalsPressed
+[eva:progress] 
+  computing for function DetectSpeedLimits <- CruiseControl.
   Called from CruiseControl.c:473.
-[eva] Recording results for DetectSpeedLimits
-[eva] Done for function DetectSpeedLimits
-[eva] computing for function CruiseStateMgt <- CruiseControl.
+[eva:progress] Recording results for DetectSpeedLimits
+[eva:progress] Done for function DetectSpeedLimits
+[eva:progress] 
+  computing for function CruiseStateMgt <- CruiseControl.
   Called from CruiseControl.c:486.
-[eva] Recording results for CruiseStateMgt
-[eva] Done for function CruiseStateMgt
-[eva] computing for function CruiseSpeedMgt <- CruiseControl.
+[eva:progress] Recording results for CruiseStateMgt
+[eva:progress] Done for function CruiseStateMgt
+[eva:progress] 
+  computing for function CruiseSpeedMgt <- CruiseControl.
   Called from CruiseControl.c:508.
-[eva] Recording results for CruiseSpeedMgt
-[eva] Done for function CruiseSpeedMgt
-[eva] computing for function ThrottleCmd <- CruiseControl.
+[eva:progress] Recording results for CruiseSpeedMgt
+[eva:progress] Done for function CruiseSpeedMgt
+[eva:progress] 
+  computing for function ThrottleCmd <- CruiseControl.
   Called from CruiseControl.c:525.
-[eva] computing for function ThrottleRegulation <- ThrottleCmd <- CruiseControl.
+[eva:progress] 
+  computing for function ThrottleRegulation <- ThrottleCmd <- CruiseControl.
   Called from CruiseControl.c:242.
 [eva:alarm] CruiseControl.c:172: Warning: 
   non-finite float value.
@@ -50,18 +56,19 @@
 [eva:alarm] CruiseControl.c:199: Warning: 
   non-finite float value.
   assert \is_finite(\add_float(_C_->ProportionnalAction, _C_->IntegralAction));
-[eva] computing for function SaturateThrottle <- ThrottleRegulation <- 
+[eva:progress] 
+  computing for function SaturateThrottle <- ThrottleRegulation <- 
                           ThrottleCmd <- CruiseControl.
   Called from CruiseControl.c:202.
 [eva:alarm] CruiseControl.c:162: Warning: assertion got status unknown.
-[eva] Recording results for SaturateThrottle
-[eva] Done for function SaturateThrottle
-[eva] Recording results for ThrottleRegulation
-[eva] Done for function ThrottleRegulation
-[eva] Recording results for ThrottleCmd
-[eva] Done for function ThrottleCmd
-[eva] Recording results for CruiseControl
-[eva] Done for function CruiseControl
+[eva:progress] Recording results for SaturateThrottle
+[eva:progress] Done for function SaturateThrottle
+[eva:progress] Recording results for ThrottleRegulation
+[eva:progress] Done for function ThrottleRegulation
+[eva:progress] Recording results for ThrottleCmd
+[eva:progress] Done for function ThrottleCmd
+[eva:progress] Recording results for CruiseControl
+[eva:progress] Done for function CruiseControl
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function CruiseSpeedMgt:
   __retres ∈ {1}

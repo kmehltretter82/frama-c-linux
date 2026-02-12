@@ -1,28 +1,30 @@
 [kernel] Parsing multiple_calls.c (with preprocessing)
 [eva] Analyzing a complete application starting at appel_ptr_fct
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G1 ∈ [--..--]
   G2 ∈ [--..--]
   G3 ∈ [--..--]
   G4 ∈ [--..--]
-[eva] computing for function fct1 <- appel_ptr_fct.
+[eva:progress] 
+  computing for function fct1 <- appel_ptr_fct.
   Called from multiple_calls.c:23.
-[eva] Recording results for fct1
-[eva] Done for function fct1
-[eva] computing for function fct2 <- appel_ptr_fct.
+[eva:progress] Recording results for fct1
+[eva:progress] Done for function fct1
+[eva:progress] 
+  computing for function fct2 <- appel_ptr_fct.
   Called from multiple_calls.c:23.
-[eva] Recording results for fct2
-[eva] Done for function fct2
+[eva:progress] Recording results for fct2
+[eva:progress] Done for function fct2
 [eva:alarm] multiple_calls.c:24: Warning: 
   signed overflow. assert x + G1 ≤ 2147483647;
 [eva:alarm] multiple_calls.c:24: Warning: 
   signed overflow. assert -2147483648 ≤ (int)(x + G1) + G2;
 [eva:alarm] multiple_calls.c:24: Warning: 
   signed overflow. assert (int)(x + G1) + G2 ≤ 2147483647;
-[eva] Recording results for appel_ptr_fct
-[eva] Done for function appel_ptr_fct
+[eva:progress] Recording results for appel_ptr_fct
+[eva:progress] Done for function appel_ptr_fct
 [from] Computing for function fct1
 [from] Done for function fct1
 [from] Computing for function fct2

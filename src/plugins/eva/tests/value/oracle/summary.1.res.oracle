@@ -1,12 +1,12 @@
 [kernel] Parsing summary.i (no preprocessing)
 [eva] Analyzing a complete application starting at minimal
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   undet ∈ [--..--]
   volatile_d ∈ [--..--]
-[eva] Recording results for minimal
-[eva] Done for function minimal
+[eva:progress] Recording results for minimal
+[eva:progress] Done for function minimal
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function minimal:
   

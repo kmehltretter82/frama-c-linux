@@ -1,19 +1,20 @@
 [kernel] Expanding arguments from test_options.txt
 [kernel] Parsing annot5.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   a ∈ [--..--]
   b ∈ [--..--]
-[eva] annot5.c:12: assertion got status valid.
-[eva] computing for function assign_b <- main.
+[eva:progress] annot5.c:12: assertion got status valid.
+[eva:progress] 
+  computing for function assign_b <- main.
   Called from annot5.c:13.
 [eva] using specification for function assign_b
-[eva] Done for function assign_b
+[eva:progress] Done for function assign_b
 [eva:alarm] annot5.c:16: Warning: assertion got status unknown.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   b ∈ [--..--]

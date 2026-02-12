@@ -1,7 +1,7 @@
 [kernel] Parsing loops.i (no preprocessing)
 [eva] Analyzing a complete application starting at test_infinite_loop_5
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ {0}
   C1 ∈ {1}
@@ -26,8 +26,8 @@
   signed overflow. assert -2147483648 ≤ G + no_data;
 [eva:alarm] loops.i:156: Warning: 
   signed overflow. assert G + no_data ≤ 2147483647;
-[eva] Recording results for test_infinite_loop_5
-[eva] Done for function test_infinite_loop_5
+[eva:progress] Recording results for test_infinite_loop_5
+[eva:progress] Done for function test_infinite_loop_5
 [from] Computing for function test_infinite_loop_5
 [from] Done for function test_infinite_loop_5
 [from] ====== DEPENDENCIES COMPUTED ======

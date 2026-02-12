@@ -1,7 +1,7 @@
 [kernel] Parsing assigns_from.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   u ∈ {0}
   v ∈ {0}
@@ -14,336 +14,377 @@
   nondet ∈ [--..--]
   g ∈ {1}
   h[0..99] ∈ {0}
-[eva] computing for function main1 <- main.
+[eva:progress] 
+  computing for function main1 <- main.
   Called from assigns_from.i:271.
-[eva] computing for function f <- main1 <- main.
+[eva:progress] 
+  computing for function f <- main1 <- main.
   Called from assigns_from.i:30.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] Recording results for main1
+[eva:progress] Done for function f
+[eva:progress] Recording results for main1
 [from] Computing for function main1
 [from] Done for function main1
-[eva] assigns_from.i:12: function main1: assigns got status valid.
-[eva] assigns_from.i:15: 
+[eva:progress] assigns_from.i:12: function main1: assigns got status valid.
+[eva:progress] assigns_from.i:15: 
   function main1, behavior true: assigns got status valid.
-[eva] assigns_from.i:15: 
+[eva:progress] assigns_from.i:15: 
   function main1, behavior true: \from ... part in assign clause got status valid.
-[eva] assigns_from.i:16: 
+[eva:progress] assigns_from.i:16: 
   function main1, behavior true: \from ... part in assign clause got status valid.
-[eva] assigns_from.i:19: 
+[eva:progress] assigns_from.i:19: 
   function main1, behavior ok_too_large: assigns got status valid.
-[eva] assigns_from.i:19: 
+[eva:progress] assigns_from.i:19: 
   function main1, behavior ok_too_large: \from ... part in assign clause got status valid.
-[eva] assigns_from.i:20: 
+[eva:progress] assigns_from.i:20: 
   function main1, behavior ok_too_large: \from ... part in assign clause got status valid.
-[eva] assigns_from.i:23: 
+[eva:progress] assigns_from.i:23: 
   function main1, behavior wrong: assigns got status valid.
-[eva] assigns_from.i:23: 
+[eva:progress] assigns_from.i:23: 
   function main1, behavior wrong: \from ... part in assign clause got status valid.
 [eva:alarm] assigns_from.i:24: Warning: 
   function main1, behavior wrong: \from ... part in assign clause got status unknown (cannot validate direct dependencies).
-[eva] Done for function main1
-[eva] computing for function main15 <- main.
+[eva:progress] Done for function main1
+[eva:progress] 
+  computing for function main15 <- main.
   Called from assigns_from.i:272.
-[eva] Recording results for main15
+[eva:progress] Recording results for main15
 [from] Computing for function main15
 [from] Done for function main15
-[eva] assigns_from.i:37: function main15: assigns got status valid.
-[eva] assigns_from.i:37: 
+[eva:progress] assigns_from.i:37: function main15: assigns got status valid.
+[eva:progress] assigns_from.i:37: 
   function main15: \from ... part in assign clause got status valid.
-[eva] assigns_from.i:37: 
+[eva:progress] assigns_from.i:37: 
   function main15: \from ... part in assign clause got status valid.
-[eva] assigns_from.i:37: 
+[eva:progress] assigns_from.i:37: 
   function main15: \from ... part in assign clause got status valid.
-[eva] Done for function main15
-[eva] computing for function main2 <- main.
+[eva:progress] Done for function main15
+[eva:progress] 
+  computing for function main2 <- main.
   Called from assigns_from.i:273.
-[eva] Recording results for main2
+[eva:progress] Recording results for main2
 [from] Computing for function main2
 [from] Done for function main2
-[eva] assigns_from.i:45: function main2: assigns got status valid.
-[eva] assigns_from.i:45: 
+[eva:progress] assigns_from.i:45: function main2: assigns got status valid.
+[eva:progress] assigns_from.i:45: 
   function main2: \from ... part in assign clause got status valid.
-[eva] assigns_from.i:48: 
+[eva:progress] assigns_from.i:48: 
   function main2, behavior true: assigns got status valid.
-[eva] assigns_from.i:48: 
+[eva:progress] assigns_from.i:48: 
   function main2, behavior true: \from ... part in assign clause got status valid.
 [eva:alarm] assigns_from.i:52: Warning: 
   function main2, behavior wrongassigns: assigns got status unknown.
-[eva] assigns_from.i:52: 
+[eva:progress] assigns_from.i:52: 
   function main2, behavior wrongassigns: \from ... part in assign clause got status valid.
-[eva] assigns_from.i:56: 
+[eva:progress] assigns_from.i:56: 
   function main2, behavior true2: assigns got status valid.
-[eva] assigns_from.i:56: 
+[eva:progress] assigns_from.i:56: 
   function main2, behavior true2: \from ... part in assign clause got status valid.
-[eva] assigns_from.i:60: 
+[eva:progress] assigns_from.i:60: 
   function main2, behavior wrongfrom: assigns got status valid.
 [eva:alarm] assigns_from.i:60: Warning: 
   function main2, behavior wrongfrom: \from ... part in assign clause got status unknown (cannot validate direct dependencies).
-[eva] Done for function main2
-[eva] computing for function Frama_C_interval <- main.
+[eva:progress] Done for function main2
+[eva:progress] 
+  computing for function Frama_C_interval <- main.
   Called from assigns_from.i:274.
 [eva] using specification for function Frama_C_interval
-[eva] Done for function Frama_C_interval
-[eva] computing for function main3 <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function main3 <- main.
   Called from assigns_from.i:275.
-[eva] Recording results for main3
+[eva:progress] Recording results for main3
 [from] Computing for function main3
 [from] Done for function main3
-[eva] assigns_from.i:67: function main3: assigns got status valid.
-[eva] assigns_from.i:67: 
+[eva:progress] assigns_from.i:67: function main3: assigns got status valid.
+[eva:progress] assigns_from.i:67: 
   function main3: \from ... part in assign clause got status valid.
-[eva] Done for function main3
-[eva] computing for function main3 <- main.
+[eva:progress] Done for function main3
+[eva:progress] 
+  computing for function main3 <- main.
   Called from assigns_from.i:276.
-[eva] Recording results for main3
+[eva:progress] Recording results for main3
 [from] Computing for function main3
 [from] Done for function main3
 [eva:alarm] assigns_from.i:67: Warning: 
   function main3: assigns got status unknown.
-[eva] Done for function main3
-[eva] computing for function main4 <- main.
+[eva:progress] Done for function main3
+[eva:progress] 
+  computing for function main4 <- main.
   Called from assigns_from.i:277.
-[eva] Recording results for main4
+[eva:progress] Recording results for main4
 [from] Computing for function main4
 [from] Done for function main4
-[eva] assigns_from.i:78: 
+[eva:progress] assigns_from.i:78: 
   function main4, behavior true: assigns got status valid.
-[eva] assigns_from.i:78: 
+[eva:progress] assigns_from.i:78: 
   function main4, behavior true: \from ... part in assign clause got status valid.
-[eva] assigns_from.i:82: 
+[eva:progress] assigns_from.i:82: 
   function main4, behavior wrong: assigns got status valid.
 [eva:alarm] assigns_from.i:82: Warning: 
   function main4, behavior wrong: \from ... part in assign clause got status unknown (cannot validate direct dependencies).
-[eva] Done for function main4
-[eva] computing for function main5 <- main.
+[eva:progress] Done for function main4
+[eva:progress] 
+  computing for function main5 <- main.
   Called from assigns_from.i:278.
-[eva] Recording results for main5
+[eva:progress] Recording results for main5
 [from] Computing for function main5
 [from] Done for function main5
-[eva] assigns_from.i:92: 
+[eva:progress] assigns_from.i:92: 
   function main5, behavior wrong: assigns got status valid.
 [eva:alarm] assigns_from.i:92: Warning: 
   function main5, behavior wrong: \from ... part in assign clause got status unknown (cannot validate direct dependencies).
-[eva] assigns_from.i:95: 
+[eva:progress] assigns_from.i:95: 
   function main5, behavior true: assigns got status valid.
-[eva] assigns_from.i:95: 
+[eva:progress] assigns_from.i:95: 
   function main5, behavior true: \from ... part in assign clause got status valid.
-[eva] Done for function main5
-[eva] computing for function Frama_C_interval <- main.
+[eva:progress] Done for function main5
+[eva:progress] 
+  computing for function Frama_C_interval <- main.
   Called from assigns_from.i:279.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- main.
   Called from assigns_from.i:280.
-[eva] Done for function Frama_C_interval
-[eva] computing for function main6_right <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function main6_right <- main.
   Called from assigns_from.i:281.
-[eva] Recording results for main6_right
+[eva:progress] Recording results for main6_right
 [from] Computing for function main6_right
 [from] Done for function main6_right
-[eva] assigns_from.i:111: function main6_right: assigns got status valid.
-[eva] Done for function main6_right
-[eva] computing for function main6_wrong <- main.
+[eva:progress] assigns_from.i:111: 
+  function main6_right: assigns got status valid.
+[eva:progress] Done for function main6_right
+[eva:progress] 
+  computing for function main6_wrong <- main.
   Called from assigns_from.i:282.
-[eva] Recording results for main6_wrong
+[eva:progress] Recording results for main6_wrong
 [from] Computing for function main6_wrong
 [from] Done for function main6_wrong
 [eva:alarm] assigns_from.i:102: Warning: 
   function main6_wrong: assigns got status unknown.
-[eva] Done for function main6_wrong
-[eva] computing for function main7 <- main.
+[eva:progress] Done for function main6_wrong
+[eva:progress] 
+  computing for function main7 <- main.
   Called from assigns_from.i:283.
-[eva] Recording results for main7
+[eva:progress] Recording results for main7
 [from] Computing for function main7
 [from] Done for function main7
-[eva] assigns_from.i:119: 
+[eva:progress] assigns_from.i:119: 
   function main7, behavior right: assigns got status valid.
 [eva:alarm] assigns_from.i:122: Warning: 
   function main7, behavior wrong: assigns got status unknown.
-[eva] Done for function main7
-[eva] computing for function main8 <- main.
+[eva:progress] Done for function main7
+[eva:progress] 
+  computing for function main8 <- main.
   Called from assigns_from.i:286.
-[eva] Recording results for main8
+[eva:progress] Recording results for main8
 [from] Computing for function main8
 [from] Done for function main8
-[eva] assigns_from.i:130: function main8: assigns got status valid.
-[eva] assigns_from.i:130: 
+[eva:progress] assigns_from.i:130: function main8: assigns got status valid.
+[eva:progress] assigns_from.i:130: 
   function main8: \from ... part in assign clause got status valid.
-[eva] Done for function main8
-[eva] computing for function main8 <- main.
+[eva:progress] Done for function main8
+[eva:progress] 
+  computing for function main8 <- main.
   Called from assigns_from.i:288.
-[eva] Recording results for main8
+[eva:progress] Recording results for main8
 [from] Computing for function main8
 [from] Done for function main8
 [eva:alarm] assigns_from.i:130: Warning: 
   function main8: assigns got status unknown.
-[eva] Done for function main8
-[eva] computing for function main9 <- main.
+[eva:progress] Done for function main8
+[eva:progress] 
+  computing for function main9 <- main.
   Called from assigns_from.i:290.
-[eva] Recording results for main9
+[eva:progress] Recording results for main9
 [from] Computing for function main9
 [from] Done for function main9
-[eva] assigns_from.i:135: function main9: assigns got status valid.
-[eva] Done for function main9
-[eva] computing for function main10 <- main.
+[eva:progress] assigns_from.i:135: function main9: assigns got status valid.
+[eva:progress] Done for function main9
+[eva:progress] 
+  computing for function main10 <- main.
   Called from assigns_from.i:291.
 [kernel:annot:missing-spec] assigns_from.i:152: Warning: 
   Neither code nor specification for function c, generating default assigns.
   See -generated-spec-* options for more info.
-[eva] computing for function c <- main10 <- main.
+[eva:progress] 
+  computing for function c <- main10 <- main.
   Called from assigns_from.i:152.
 [eva] using specification for function c
-[eva] Done for function c
+[eva:progress] Done for function c
 [eva:partition] assigns_from.i:152: starting to merge loop iterations
-[eva] computing for function c <- main10 <- main.
+[eva:progress] 
+  computing for function c <- main10 <- main.
   Called from assigns_from.i:152.
-[eva] Done for function c
-[eva] computing for function c <- main10 <- main.
+[eva:progress] Done for function c
+[eva:progress] 
+  computing for function c <- main10 <- main.
   Called from assigns_from.i:152.
-[eva] Done for function c
-[eva] computing for function c <- main10 <- main.
+[eva:progress] Done for function c
+[eva:progress] 
+  computing for function c <- main10 <- main.
   Called from assigns_from.i:152.
-[eva] Done for function c
-[eva] computing for function c <- main10 <- main.
+[eva:progress] Done for function c
+[eva:progress] 
+  computing for function c <- main10 <- main.
   Called from assigns_from.i:152.
-[eva] Done for function c
+[eva:progress] Done for function c
 [eva:alarm] assigns_from.i:154: Warning: assertion got status unknown.
-[eva] Recording results for main10
+[eva:progress] Recording results for main10
 [from] Computing for function main10
 [from] Done for function main10
-[eva] Done for function main10
-[eva] computing for function main11 <- main.
+[eva:progress] Done for function main10
+[eva:progress] 
+  computing for function main11 <- main.
   Called from assigns_from.i:292.
-[eva] Recording results for main11
+[eva:progress] Recording results for main11
 [from] Computing for function main11
 [from] Done for function main11
-[eva] assigns_from.i:157: function main11: assigns got status valid.
-[eva] assigns_from.i:157: 
+[eva:progress] assigns_from.i:157: function main11: assigns got status valid.
+[eva:progress] assigns_from.i:157: 
   function main11: \from ... part in assign clause got status valid.
-[eva] Done for function main11
-[eva] computing for function main11 <- main.
+[eva:progress] Done for function main11
+[eva:progress] 
+  computing for function main11 <- main.
   Called from assigns_from.i:293.
-[eva] Recording results for main11
+[eva:progress] Recording results for main11
 [from] Computing for function main11
 [from] Done for function main11
 [eva:alarm] assigns_from.i:157: Warning: 
   function main11: assigns got status unknown.
 [eva:alarm] assigns_from.i:157: Warning: 
   function main11: \from ... part in assign clause got status unknown (cannot validate direct dependencies).
-[eva] Done for function main11
-[eva] computing for function Frama_C_interval <- main.
+[eva:progress] Done for function main11
+[eva:progress] 
+  computing for function Frama_C_interval <- main.
   Called from assigns_from.i:294.
-[eva] Done for function Frama_C_interval
-[eva] computing for function main11 <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function main11 <- main.
   Called from assigns_from.i:294.
-[eva] Recording results for main11
+[eva:progress] Recording results for main11
 [from] Computing for function main11
 [from] Done for function main11
-[eva] Done for function main11
-[eva] computing for function main12 <- main.
+[eva:progress] Done for function main11
+[eva:progress] 
+  computing for function main12 <- main.
   Called from assigns_from.i:295.
-[eva] Recording results for main12
+[eva:progress] Recording results for main12
 [from] Computing for function main12
 [from] Done for function main12
-[eva] assigns_from.i:169: 
+[eva:progress] assigns_from.i:169: 
   function main12, behavior ok: assigns got status valid.
-[eva] assigns_from.i:167: 
+[eva:progress] assigns_from.i:167: 
   function main12, behavior ok: \from ... part in assign clause got status valid.
-[eva] Done for function main12
-[eva] computing for function main13 <- main.
+[eva:progress] Done for function main12
+[eva:progress] 
+  computing for function main13 <- main.
   Called from assigns_from.i:296.
-[eva] Recording results for main13
+[eva:progress] Recording results for main13
 [from] Computing for function main13
 [from] Done for function main13
-[eva] assigns_from.i:179: 
+[eva:progress] assigns_from.i:179: 
   function main13, behavior ok: assigns got status valid.
-[eva] assigns_from.i:174: 
+[eva:progress] assigns_from.i:174: 
   function main13, behavior ok: \from ... part in assign clause got status valid.
-[eva] assigns_from.i:179: 
+[eva:progress] assigns_from.i:179: 
   function main13, behavior bad: assigns got status valid.
 [eva:alarm] assigns_from.i:177: Warning: 
   function main13, behavior bad: \from ... part in assign clause got status unknown (cannot validate direct dependencies).
-[eva] Done for function main13
-[eva] computing for function main14 <- main.
+[eva:progress] Done for function main13
+[eva:progress] 
+  computing for function main14 <- main.
   Called from assigns_from.i:297.
 [eva:partition] assigns_from.i:183: starting to merge loop iterations
-[eva] Recording results for main14
+[eva:progress] Recording results for main14
 [from] Computing for function main14
 [from] Done for function main14
-[eva] assigns_from.i:181: function main14: assigns got status valid.
+[eva:progress] assigns_from.i:181: function main14: assigns got status valid.
 [eva:alarm] assigns_from.i:181: Warning: 
   function main14: \from ... part in assign clause got status unknown (cannot validate direct dependencies).
-[eva] Done for function main14
-[eva] computing for function main16 <- main.
+[eva:progress] Done for function main14
+[eva:progress] 
+  computing for function main16 <- main.
   Called from assigns_from.i:298.
 [eva:partition] assigns_from.i:188: starting to merge loop iterations
-[eva] Recording results for main16
+[eva:progress] Recording results for main16
 [from] Computing for function main16
 [from] Done for function main16
-[eva] assigns_from.i:186: function main16: assigns got status valid.
+[eva:progress] assigns_from.i:186: function main16: assigns got status valid.
 [eva:alarm] assigns_from.i:186: Warning: 
   function main16: \from ... part in assign clause got status unknown (cannot validate direct dependencies).
-[eva] Done for function main16
-[eva] computing for function main17 <- main.
+[eva:progress] Done for function main16
+[eva:progress] 
+  computing for function main17 <- main.
   Called from assigns_from.i:299.
 [eva:partition] assigns_from.i:195: starting to merge loop iterations
-[eva] Recording results for main17
+[eva:progress] Recording results for main17
 [from] Computing for function main17
 [from] Done for function main17
-[eva] assigns_from.i:193: function main17: assigns got status valid.
+[eva:progress] assigns_from.i:193: function main17: assigns got status valid.
 [eva:alarm] assigns_from.i:193: Warning: 
   function main17: \from ... part in assign clause got status unknown (cannot validate direct and indirect dependencies).
-[eva] Done for function main17
-[eva] computing for function main18 <- main.
+[eva:progress] Done for function main17
+[eva:progress] 
+  computing for function main18 <- main.
   Called from assigns_from.i:300.
-[eva] computing for function f18 <- main18 <- main.
+[eva:progress] 
+  computing for function f18 <- main18 <- main.
   Called from assigns_from.i:215.
 [eva] using specification for function f18
 [eva:garbled-mix:assigns] assigns_from.i:215: 
   The specification of function f18 has generated a garbled mix of addresses
   for assigns clause *x.
-[eva] Done for function f18
-[eva] Recording results for main18
+[eva:progress] Done for function f18
+[eva:progress] Recording results for main18
 [from] Computing for function main18
 [from] Done for function main18
-[eva] Done for function main18
-[eva] computing for function main19 <- main.
+[eva:progress] Done for function main18
+[eva:progress] 
+  computing for function main19 <- main.
   Called from assigns_from.i:301.
-[eva] computing for function get_imprecise_pointer <- main19 <- main.
+[eva:progress] 
+  computing for function get_imprecise_pointer <- main19 <- main.
   Called from assigns_from.i:255.
 [eva] using specification for function get_imprecise_pointer
 [eva:garbled-mix:assigns] assigns_from.i:255: 
   The specification of function get_imprecise_pointer
   has generated a garbled mix of addresses for assigns clause \result.
-[eva] Done for function get_imprecise_pointer
-[eva] assigns_from.i:256: 
+[eva:progress] Done for function get_imprecise_pointer
+[eva:show] assigns_from.i:256: 
   Frama_C_show_each_gm:
   {{ garbled mix of &{g; h} (origin: Library function {assigns_from.i:255}) }}
-[eva] computing for function get_exact_pointer <- main19 <- main.
+[eva:progress] 
+  computing for function get_exact_pointer <- main19 <- main.
   Called from assigns_from.i:257.
 [eva] using specification for function get_exact_pointer
-[eva] Done for function get_exact_pointer
-[eva] assigns_from.i:258: Frama_C_show_each_exact: {{ &g ; &h }}
-[eva] computing for function get_valid_pointer <- main19 <- main.
+[eva:progress] Done for function get_exact_pointer
+[eva:show] assigns_from.i:258: Frama_C_show_each_exact: {{ &g ; &h }}
+[eva:progress] 
+  computing for function get_valid_pointer <- main19 <- main.
   Called from assigns_from.i:259.
 [eva] using specification for function get_valid_pointer
-[eva] Done for function get_valid_pointer
-[eva] assigns_from.i:260: Frama_C_show_each_valid: {{ &g ; &h + [0..396],0%4 }}
-[eva] computing for function get_function_pointer <- main19 <- main.
+[eva:progress] Done for function get_valid_pointer
+[eva:show] assigns_from.i:260: 
+  Frama_C_show_each_valid: {{ &g ; &h + [0..396],0%4 }}
+[eva:progress] 
+  computing for function get_function_pointer <- main19 <- main.
   Called from assigns_from.i:262.
 [eva] using specification for function get_function_pointer
-[eva] Done for function get_function_pointer
-[eva] assigns_from.i:263: Frama_C_show_each_fct: {{ &fun ; &fun2 }}
-[eva] Recording results for main19
+[eva:progress] Done for function get_function_pointer
+[eva:show] assigns_from.i:263: Frama_C_show_each_fct: {{ &fun ; &fun2 }}
+[eva:progress] Recording results for main19
 [from] Computing for function main19
 [from] Done for function main19
-[eva] Done for function main19
-[eva] Recording results for main
+[eva:progress] Done for function main19
+[eva:progress] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] Done for function main
+[eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     assigns_from.i:255: assigns clause on addresses

@@ -1,28 +1,31 @@
 [kernel] Parsing false.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [kernel:annot:missing-spec] false.i:18: Warning: 
   Neither code nor explicit assigns for function f, generating default clauses.
   See -generated-spec-* options for more info.
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from false.i:18.
 [eva] using specification for function f
 [eva:alarm] false.i:18: Warning: 
   function f: precondition i ≡ 1 got status invalid.
-[eva] false.i:18: 
+[eva:progress] false.i:18: 
   function f: no state left, precondition i ≡ 1 got status valid.
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from false.i:19.
 [eva:alarm] false.i:10: Warning: function g: postcondition got status invalid.
-[eva] false.i:11: function g: no state left, postcondition got status valid.
-[eva] Recording results for g
-[eva] Done for function g
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] false.i:11: 
+  function g: no state left, postcondition got status valid.
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function g:
   

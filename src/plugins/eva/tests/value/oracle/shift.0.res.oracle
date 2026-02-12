@@ -1,7 +1,7 @@
 [kernel] Parsing shift.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   a ∈ {0}
   b ∈ {0}
@@ -20,22 +20,22 @@
   v ∈ [--..--]
 [eva:alarm] shift.i:21: Warning: 
   invalid RHS operand for shift. assert 0 ≤ c < 32;
-[eva] shift.i:22: assertion got status valid.
+[eva:progress] shift.i:22: assertion got status valid.
 [eva:alarm] shift.i:25: Warning: 
   invalid RHS operand for shift. assert 0 ≤ c < 32;
-[eva] shift.i:26: assertion got status valid.
+[eva:progress] shift.i:26: assertion got status valid.
 [eva:alarm] shift.i:29: Warning: 
   invalid RHS operand for shift. assert 0 ≤ c < 32;
 [eva:alarm] shift.i:31: Warning: 
   invalid LHS operand for left shift. assert 0 ≤ c;
-[eva] shift.i:32: assertion got status valid.
+[eva:progress] shift.i:32: assertion got status valid.
 [eva:alarm] shift.i:35: Warning: 
   invalid RHS operand for shift. assert 0 ≤ 32 < 32;
 [eva:alarm] shift.i:36: Warning: 
   invalid RHS operand for shift. assert 0 ≤ 5555 < 32;
 [eva:alarm] shift.i:40: Warning: 
   invalid RHS operand for shift. assert 0 ≤ b < 32;
-[eva] shift.i:48: 
+[eva:show] shift.i:48: 
   Frama_C_show_each: {{ "ua:%u\nub:%u\n" }}, {1401}, {1073741074}
 [eva:alarm] shift.i:52: Warning: 
   unsigned overflow. assert 0 ≤ (unsigned long)((char *)t) << 8;
@@ -59,8 +59,8 @@
   assert (long)r + (long)((long)((char *)t) << 8) ≤ 2147483647;
 [eva:alarm] shift.i:58: Warning: 
   unsigned overflow. assert 2U << 31 ≤ 4294967295;
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     shift.i:52: arithmetic operation on addresses

@@ -9,7 +9,7 @@
 [eva] Found concurrency builtins: enabling mthread domain
 [eva] Analyzing a complete application starting at main_thread_loop
 [mt] New thread: <main>, fun main_thread_loop
-[eva] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
+[eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
 [mt] interferences.c:128: 
   New thread: joboneshot, fun fjoboneshot, parent <main>, args {0}
 [mt] interferences.c:128: Start thread joboneshot
@@ -22,8 +22,8 @@
   The thread joblooped is already registered.
 [eva] FRAMAC_SHARE/mt/mthread_pthread.c:20: Warning: 
   The thread joblooped is already running.
-[eva] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
-[eva] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
+[eva:show] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
+[eva:show] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -49,8 +49,8 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoboneshot for thread joboneshot
-[eva] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0}
-[eva] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0}
+[eva:show] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0}
+[eva:show] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -81,8 +81,8 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoblooped for thread joblooped
-[eva] interferences.c:118: Frama_C_show_each_fjoblooped_start: {0}, {0}
-[eva] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0}, {1}
+[eva:show] interferences.c:118: Frama_C_show_each_fjoblooped_start: {0}, {0}
+[eva:show] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0}, {1}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -128,7 +128,7 @@
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main_thread_loop
-[eva] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
+[eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
 [mt] interferences.c:128: 
   Thread joboneshot, fun fjoboneshot, parent <main>, args {0}
 [mt] interferences.c:128: Start thread joboneshot
@@ -139,8 +139,8 @@
   The thread joblooped is already registered.
 [eva] FRAMAC_SHARE/mt/mthread_pthread.c:20: Warning: 
   The thread joblooped is already running.
-[eva] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
-[eva] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
+[eva:show] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
+[eva:show] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -165,12 +165,12 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoboneshot for thread joboneshot
-[eva] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0}
+[eva:show] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0}
 [eva:interferences] interferences.c:111: 
   inject threads interferences at this point
 [eva:interferences] interferences.c:112: 
   inject threads interferences at this point
-[eva] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0}
+[eva:show] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -209,12 +209,12 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoblooped for thread joblooped
-[eva] interferences.c:118: Frama_C_show_each_fjoblooped_start: {0; 1}, {0}
+[eva:show] interferences.c:118: Frama_C_show_each_fjoblooped_start: {0; 1}, {0}
 [eva:interferences] interferences.c:119: 
   inject threads interferences at this point
 [eva:interferences] interferences.c:120: 
   inject threads interferences at this point
-[eva] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0; 1}, {1}
+[eva:show] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0; 1}, {1}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -323,7 +323,7 @@
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main_thread_loop
-[eva] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
+[eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
 [mt] interferences.c:128: 
   Thread joboneshot, fun fjoboneshot, parent <main>, args {0}
 [mt] interferences.c:128: Start thread joboneshot
@@ -336,8 +336,8 @@
   The thread joblooped is already registered.
 [eva] FRAMAC_SHARE/mt/mthread_pthread.c:20: Warning: 
   The thread joblooped is already running.
-[eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1}
-[eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1}
+[eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1}
+[eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -362,12 +362,12 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoboneshot for thread joboneshot
-[eva] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0; 1}
+[eva:show] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0; 1}
 [eva:interferences] interferences.c:111: 
   inject threads interferences at this point
 [eva:interferences] interferences.c:112: 
   inject threads interferences at this point
-[eva] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0; 1}
+[eva:show] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0; 1}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -407,12 +407,13 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoblooped for thread joblooped
-[eva] interferences.c:118: Frama_C_show_each_fjoblooped_start: {0; 1}, {0; 1}
+[eva:show] interferences.c:118: 
+  Frama_C_show_each_fjoblooped_start: {0; 1}, {0; 1}
 [eva:interferences] interferences.c:119: 
   inject threads interferences at this point
 [eva:interferences] interferences.c:120: 
   inject threads interferences at this point
-[eva] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0; 1}, {1; 2}
+[eva:show] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0; 1}, {1; 2}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -517,7 +518,7 @@
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main_thread_loop
-[eva] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
+[eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
 [mt] interferences.c:128: 
   Thread joboneshot, fun fjoboneshot, parent <main>, args {0}
 [mt] interferences.c:128: Start thread joboneshot
@@ -530,8 +531,8 @@
   The thread joblooped is already registered.
 [eva] FRAMAC_SHARE/mt/mthread_pthread.c:20: Warning: 
   The thread joblooped is already running.
-[eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1; 2}
-[eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1; 2}
+[eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1; 2}
+[eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -556,12 +557,14 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoboneshot for thread joboneshot
-[eva] interferences.c:110: Frama_C_show_each_fjoboneshot_start: {0}, {0; 1; 2}
+[eva:show] interferences.c:110: 
+  Frama_C_show_each_fjoboneshot_start: {0}, {0; 1; 2}
 [eva:interferences] interferences.c:111: 
   inject threads interferences at this point
 [eva:interferences] interferences.c:112: 
   inject threads interferences at this point
-[eva] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0; 1; 2}
+[eva:show] interferences.c:113: 
+  Frama_C_show_each_fjoboneshot_end: {1}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -600,12 +603,14 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoblooped for thread joblooped
-[eva] interferences.c:118: Frama_C_show_each_fjoblooped_start: {0; 1}, {0; 1; 2}
+[eva:show] interferences.c:118: 
+  Frama_C_show_each_fjoblooped_start: {0; 1}, {0; 1; 2}
 [eva:interferences] interferences.c:119: 
   inject threads interferences at this point
 [eva:interferences] interferences.c:120: 
   inject threads interferences at this point
-[eva] interferences.c:121: Frama_C_show_each_fjoblooped_end: {0; 1}, {1; 2; 3}
+[eva:show] interferences.c:121: 
+  Frama_C_show_each_fjoblooped_end: {0; 1}, {1; 2; 3}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -710,7 +715,7 @@
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main_thread_loop
-[eva] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
+[eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
 [mt] interferences.c:128: 
   Thread joboneshot, fun fjoboneshot, parent <main>, args {0}
 [mt] interferences.c:128: Start thread joboneshot
@@ -723,8 +728,10 @@
   The thread joblooped is already registered.
 [eva] FRAMAC_SHARE/mt/mthread_pthread.c:20: Warning: 
   The thread joblooped is already running.
-[eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
-[eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
+[eva:show] interferences.c:135: 
+  Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
+[eva:show] interferences.c:135: 
+  Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -749,13 +756,14 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoboneshot for thread joboneshot
-[eva] interferences.c:110: 
+[eva:show] interferences.c:110: 
   Frama_C_show_each_fjoboneshot_start: {0}, {0; 1; 2; 3}
 [eva:interferences] interferences.c:111: 
   inject threads interferences at this point
 [eva:interferences] interferences.c:112: 
   inject threads interferences at this point
-[eva] interferences.c:113: Frama_C_show_each_fjoboneshot_end: {1}, {0; 1; 2; 3}
+[eva:show] interferences.c:113: 
+  Frama_C_show_each_fjoboneshot_end: {1}, {0; 1; 2; 3}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -794,7 +802,7 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoblooped for thread joblooped
-[eva] interferences.c:118: 
+[eva:show] interferences.c:118: 
   Frama_C_show_each_fjoblooped_start: {0; 1}, [0..2147483647]
 [eva:alarm] interferences.c:119: Warning: 
   signed overflow. assert shared_a + shared_b ≤ 2147483647;
@@ -804,7 +812,7 @@
   signed overflow. assert shared_b + 1 ≤ 2147483647;
 [eva:interferences] interferences.c:120: 
   inject threads interferences at this point
-[eva] interferences.c:121: 
+[eva:show] interferences.c:121: 
   Frama_C_show_each_fjoblooped_end: {0; 1}, [1..2147483647]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -916,7 +924,7 @@
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main_thread_loop
-[eva] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
+[eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
 [mt] interferences.c:128: 
   Thread joboneshot, fun fjoboneshot, parent <main>, args {0}
 [mt] interferences.c:128: Start thread joboneshot
@@ -927,8 +935,10 @@
   The thread joblooped is already registered.
 [eva] FRAMAC_SHARE/mt/mthread_pthread.c:20: Warning: 
   The thread joblooped is already running.
-[eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
-[eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
+[eva:show] interferences.c:135: 
+  Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
+[eva:show] interferences.c:135: 
+  Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -952,13 +962,13 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of fjoboneshot for thread joboneshot
-[eva] interferences.c:110: 
+[eva:show] interferences.c:110: 
   Frama_C_show_each_fjoboneshot_start: {0}, [0..2147483647]
 [eva:interferences] interferences.c:111: 
   inject threads interferences at this point
 [eva:interferences] interferences.c:112: 
   inject threads interferences at this point
-[eva] interferences.c:113: 
+[eva:show] interferences.c:113: 
   Frama_C_show_each_fjoboneshot_end: {1}, [0..2147483647]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved

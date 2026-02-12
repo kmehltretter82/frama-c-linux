@@ -1,42 +1,46 @@
 [kernel] Parsing memcpy_invalid.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva] computing for function test <- main.
+[eva:progress] 
+  computing for function test <- main.
   Called from memcpy_invalid.c:22.
-[eva] computing for function Frama_C_interval <- test <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- test <- main.
   Called from memcpy_invalid.c:16.
 [eva] using specification for function Frama_C_interval
-[eva] Done for function Frama_C_interval
-[eva] memcpy_invalid.c:17: Call to builtin memcpy
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] memcpy_invalid.c:17: Call to builtin memcpy
 [eva:alarm] memcpy_invalid.c:17: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
 [eva:alarm] memcpy_invalid.c:17: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
-[eva] memcpy_invalid.c:17: 
+[eva:progress] memcpy_invalid.c:17: 
   function memcpy: precondition 'separation' got status valid.
 [eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:114: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[eva] Recording results for test
+[eva:progress] Recording results for test
 [from] Computing for function test
 [from] Done for function test
-[eva] Done for function test
-[eva] computing for function test <- main.
+[eva:progress] Done for function test
+[eva:progress] 
+  computing for function test <- main.
   Called from memcpy_invalid.c:23.
-[eva] computing for function Frama_C_interval <- test <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- test <- main.
   Called from memcpy_invalid.c:16.
-[eva] Done for function Frama_C_interval
-[eva] memcpy_invalid.c:17: Call to builtin memcpy
-[eva] Recording results for test
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] memcpy_invalid.c:17: Call to builtin memcpy
+[eva:progress] Recording results for test
 [from] Computing for function test
 [from] Done for function test
-[eva] Done for function test
-[eva] Recording results for main
+[eva:progress] Done for function test
+[eva:progress] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] Done for function main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function test:
   dst ∈ {0}

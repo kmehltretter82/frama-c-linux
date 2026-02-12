@@ -1,32 +1,35 @@
 [kernel] Parsing bts326.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t[0..1] ∈ {0}
   r ∈ {0}
-[eva] computing for function g <- main.
+[eva:progress] 
+  computing for function g <- main.
   Called from bts326.i:17.
-[eva] computing for function f <- g <- main.
+[eva:progress] 
+  computing for function f <- g <- main.
   Called from bts326.i:12.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] computing for function f <- g <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- g <- main.
   Called from bts326.i:13.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] Recording results for g
+[eva:progress] Done for function f
+[eva:progress] Recording results for g
 [from] Computing for function g
 [from] Done for function g
-[eva] Done for function g
-[eva] Recording results for main
+[eva:progress] Done for function g
+[eva:progress] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] Done for function main
+[eva:progress] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to f at bts326.i:12 (by g):
   t[0] FROM i

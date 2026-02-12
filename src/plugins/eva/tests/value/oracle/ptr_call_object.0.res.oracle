@@ -1,32 +1,35 @@
 [kernel] Parsing ptr_call_object.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function rand <- main.
+[eva:progress] 
+  computing for function rand <- main.
   Called from ptr_call_object.c:30.
 [eva] using specification for function rand
-[eva] Done for function rand
-[eva] computing for function next_1 <- main.
+[eva:progress] Done for function rand
+[eva:progress] 
+  computing for function next_1 <- main.
   Called from ptr_call_object.c:34.
-[eva] ptr_call_object.c:11: 
+[eva:show] ptr_call_object.c:11: 
   Frama_C_show_each_p_in_next_1:
   {{ &o1 }}, .next ∈ {{ &next_1 }}
              .i ∈ UNINITIALIZED
-[eva] Recording results for next_1
-[eva] Done for function next_1
-[eva] computing for function next_0 <- main.
+[eva:progress] Recording results for next_1
+[eva:progress] Done for function next_1
+[eva:progress] 
+  computing for function next_0 <- main.
   Called from ptr_call_object.c:34.
-[eva] ptr_call_object.c:16: 
+[eva:show] ptr_call_object.c:16: 
   Frama_C_show_each_p_in_next_0:
   {{ &o0 }}, .next ∈ {{ &next_0 }}
              .i ∈ UNINITIALIZED
-[eva] Recording results for next_0
-[eva] Done for function next_0
-[eva] ptr_call_object.c:35: Frama_C_show_each_x: {{ &o1 }}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for next_0
+[eva:progress] Done for function next_0
+[eva:show] ptr_call_object.c:35: Frama_C_show_each_x: {{ &o1 }}
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function next_0:
   __retres ∈ {0}

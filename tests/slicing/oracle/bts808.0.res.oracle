@@ -1,20 +1,22 @@
 [kernel] Parsing bts808.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function f0 <- main.
+[eva:progress] 
+  computing for function f0 <- main.
   Called from bts808.i:21.
-[eva] Recording results for f0
-[eva] Done for function f0
-[eva] computing for function f1 <- main.
+[eva:progress] Recording results for f0
+[eva:progress] Done for function f0
+[eva:progress] 
+  computing for function f1 <- main.
   Called from bts808.i:21.
-[eva] Recording results for f1
-[eva] Done for function f1
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for f1
+[eva:progress] Done for function f1
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function main

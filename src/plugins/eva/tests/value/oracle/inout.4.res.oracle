@@ -1,7 +1,7 @@
 [kernel] Parsing inout.i (no preprocessing)
 [eva] Analyzing a complete application starting at call_may_not_terminate
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   Xt ∈ {0}
   Xs ∈ {0}
@@ -20,12 +20,13 @@
       [6] ∈ {25}
       [7] ∈ {40}
   I5_nt ∈ {0}
-[eva] computing for function may_not_terminate <- call_may_not_terminate.
+[eva:progress] 
+  computing for function may_not_terminate <- call_may_not_terminate.
   Called from inout.i:68.
-[eva] Recording results for may_not_terminate
-[eva] Done for function may_not_terminate
-[eva] Recording results for call_may_not_terminate
-[eva] Done for function call_may_not_terminate
+[eva:progress] Recording results for may_not_terminate
+[eva:progress] Done for function may_not_terminate
+[eva:progress] Recording results for call_may_not_terminate
+[eva:progress] Done for function call_may_not_terminate
 [from] Computing for function may_not_terminate
 [from] Done for function may_not_terminate
 [from] Computing for function call_may_not_terminate

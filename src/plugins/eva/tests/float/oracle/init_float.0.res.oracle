@@ -1,7 +1,7 @@
 [kernel] Parsing init_float.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   s.y ∈ [-1.9999998807907104*2^127 .. 1.9999998807907104*2^127]
   r ∈ [-1.9999999999999998*2^1023 .. 1.9999999999999998*2^1023]
@@ -17,8 +17,8 @@
   function main: precondition -1000.0 ≤ x ≤ 1000.0 got status unknown.
 [eva:alarm] init_float.i:17: Warning: 
   function main: precondition 0.0 ≤ s.y ≤ 0.0 got status unknown.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   s.y ∈ [-0.0000000000000000 .. 0.0000000000000000]

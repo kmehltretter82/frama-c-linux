@@ -1,22 +1,22 @@
 [kernel] Parsing bts1347.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at f
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva:alarm] bts1347.i:8: Warning: out of bounds read. assert \valid_read(x);
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva] Analyzing an incomplete application starting at g
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva:alarm] bts1347.i:12: Warning: 
   out of bounds read. assert \valid_read(tmp);
                       (tmp from x++)
-[eva] Recording results for g
-[eva] Done for function g
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
 [report] Computing properties status...
 
 --------------------------------------------------------------------------------
@@ -50,22 +50,22 @@
      4 Total
 --------------------------------------------------------------------------------
 [eva] Analyzing an incomplete application starting at f
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva:alarm] bts1347.i:8: Warning: out of bounds read. assert \valid_read(x);
-[eva] bts1347.i:8: assertion 'emitter' got status valid.
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] bts1347.i:8: assertion 'emitter' got status valid.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva] Analyzing an incomplete application starting at g
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva:alarm] bts1347.i:12: Warning: 
   out of bounds read. assert \valid_read(tmp);
                       (tmp from x++)
-[eva] bts1347.i:12: assertion 'emitter' got status valid.
-[eva] Recording results for g
-[eva] Done for function g
+[eva:progress] bts1347.i:12: assertion 'emitter' got status valid.
+[eva:progress] Recording results for g
+[eva:progress] Done for function g

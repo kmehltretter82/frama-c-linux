@@ -1,7 +1,7 @@
 [kernel] Parsing va_list2.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva:initial-state] 
@@ -16,7 +16,7 @@
   unaligned pointer creation. assert \aligned(*args,alignof(int));
 [eva:alarm] va_list2.c:15: Warning: 
   out of bounds read. assert \valid_read((int *)*args);
-[eva] va_list2.c:16: 
+[eva:show] va_list2.c:16: 
   Frama_C_show_each_i: {{ garbled mix of &{S_0_S___va_params} (origin: Well) }}
 [eva:alarm] va_list2.c:20: Warning: 
   out of bounds read. assert \valid_read(args);
@@ -29,19 +29,19 @@
 [eva:alarm] va_list2.c:20: Warning: 
   non-finite float value. assert \is_finite(tmp_0);
                           (tmp_0 from vararg)
-[eva] va_list2.c:21: 
+[eva:show] va_list2.c:21: 
   Frama_C_show_each_f: {{ garbled mix of &{S_0_S___va_params} (origin: Well) }}
 [eva:partition] va_list2.c:12: starting to merge loop iterations
 [eva:alarm] va_list2.c:13: Warning: out of bounds read. assert \valid_read(fmt);
 [kernel] Warning: Unknown alignment of base S_1_S___va_params: Undefined alignof(void).
-[eva] va_list2.c:16: 
+[eva:show] va_list2.c:16: 
   Frama_C_show_each_i:
   {{ garbled mix of &{S_0_S___va_params; S_1_S___va_params} (origin: Well) }}
-[eva] va_list2.c:21: 
+[eva:show] va_list2.c:21: 
   Frama_C_show_each_f:
   {{ garbled mix of &{S_0_S___va_params; S_1_S___va_params} (origin: Well) }}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     Initial state (read in 6 statements, propagated through 4 statements)

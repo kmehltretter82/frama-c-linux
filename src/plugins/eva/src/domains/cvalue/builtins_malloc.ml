@@ -12,14 +12,13 @@ open Locations
 open Cvalue
 open Lattice_bounds
 
-let dkey = Self.register_category "malloc"
+let dkey = Self.register_category "malloc" ~level:6
     ~help:"messages from the builtins interpreting dynamic allocations"
 
-let dkey_new = Self.register_category "malloc:new" ~default:true
+let dkey_new = Self.register_category "malloc:new" ~level:3
     ~help:"messages emitted at the creation of new bases"
 
-let dkey_auto_free = Self.register_category "malloc:automatic-free"
-    ~default:true
+let dkey_auto_free = Self.register_category "malloc:automatic-free" ~level:4
     ~help:"messages emitted when bases are automatically freed (alloca or VLA)"
 
 let _wkey_malloc =
@@ -30,7 +29,7 @@ let wkey_weak_alloc =
   Self.register_warn_category "malloc:weak"
     ~help:"a same \"weak\" variable is used to represent multiple dynamic \
            allocations, which is rather imprecise"
-    ~default:Log.Winactive
+    ~default:Inactive
 
 let wkey_imprecise_alloc =
   Self.register_warn_category "malloc:imprecise"

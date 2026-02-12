@@ -2,8 +2,8 @@
 [kernel:typing:implicit-function-declaration] cond.i:34: Warning: 
   Calling undeclared function unknf. Old style K&R code?
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ {0}
   x ∈ {0}
@@ -35,31 +35,34 @@
    [12] ∈ {0}
 [eva:alarm] cond.i:14: Warning: out of bounds read. assert \valid_read(argv);
 [eva:alarm] cond.i:14: Warning: out of bounds read. assert \valid_read(*argv);
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from cond.i:20.
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [kernel:annot:missing-spec] cond.i:34: Warning: 
   Neither code nor specification for function unknf, generating default
   assigns. See -generated-spec-* options for more info.
-[eva] computing for function unknf <- main.
+[eva:progress] 
+  computing for function unknf <- main.
   Called from cond.i:34.
 [eva] using specification for function unknf
-[eva] Done for function unknf
-[eva] cond.i:37: Frama_C_show_each_2: {0; 1; 2; 4; 5; 6; 7; 8}
-[eva] cond.i:38: Frama_C_show_each_3: [0..8]
-[eva] cond.i:42: Frama_C_show_each_4: [0..16],0%2
-[eva] cond.i:43: Frama_C_show_each_5: [0..16],0%2
-[eva] cond.i:45: Frama_C_show_each_6: {0; 2; 4; 6; 8; 12; 14; 16}
-[eva] cond.i:46: Frama_C_show_each_7: [0..16],0%2
-[eva] computing for function unknf <- main.
+[eva:progress] Done for function unknf
+[eva:show] cond.i:37: Frama_C_show_each_2: {0; 1; 2; 4; 5; 6; 7; 8}
+[eva:show] cond.i:38: Frama_C_show_each_3: [0..8]
+[eva:show] cond.i:42: Frama_C_show_each_4: [0..16],0%2
+[eva:show] cond.i:43: Frama_C_show_each_5: [0..16],0%2
+[eva:show] cond.i:45: Frama_C_show_each_6: {0; 2; 4; 6; 8; 12; 14; 16}
+[eva:show] cond.i:46: Frama_C_show_each_7: [0..16],0%2
+[eva:progress] 
+  computing for function unknf <- main.
   Called from cond.i:48.
-[eva] Done for function unknf
+[eva:progress] Done for function unknf
 [eva:alarm] cond.i:49: Warning: accessing out of bounds index. assert w < 13;
-[eva] cond.i:52: Frama_C_show_each_w: [1..11]
-[eva] cond.i:53: assertion got status valid.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:show] cond.i:52: Frama_C_show_each_w: [1..11]
+[eva:progress] cond.i:53: assertion got status valid.
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   

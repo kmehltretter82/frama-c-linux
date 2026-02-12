@@ -1,7 +1,7 @@
 [kernel] Parsing memcpy.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   i ∈ [--..--]
   src[0..19] ∈ {0}
@@ -20,95 +20,126 @@
   v4 ∈ {0}
   v5 ∈ {0}
   t[0..3] ∈ {0}
-[eva] computing for function test <- main.
+[eva:progress] 
+  computing for function test <- main.
   Called from memcpy.c:227.
-[eva] computing for function buggy <- test <- main.
+[eva:progress] 
+  computing for function buggy <- test <- main.
   Called from memcpy.c:65.
-[eva] memcpy.c:32: Call to builtin memcpy
+[eva:progress] memcpy.c:32: Call to builtin memcpy
 [eva:alarm] memcpy.c:32: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] memcpy.c:32: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:32: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:32: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:32: 
+  function memcpy: precondition 'separation' got status valid.
 [eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:114: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[eva] Recording results for buggy
+[eva:progress] Recording results for buggy
 [from] Computing for function buggy
 [from] Done for function buggy
-[eva] Done for function buggy
-[eva] computing for function many <- test <- main.
+[eva:progress] Done for function buggy
+[eva:progress] 
+  computing for function many <- test <- main.
   Called from memcpy.c:67.
 [eva:alarm] memcpy.c:48: Warning: assertion got status unknown.
-[eva] memcpy.c:51: Call to builtin memcpy
-[eva] memcpy.c:51: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:51: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:51: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:51: Call to builtin memcpy
+[eva:progress] memcpy.c:51: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:51: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:51: 
+  function memcpy: precondition 'separation' got status valid.
 [kernel:approximation] memcpy.c:51: 
   too many locations to update in array. Approximating.
-[eva] memcpy.c:53: Call to builtin memcpy
-[eva] memcpy.c:53: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:53: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:53: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:53: Call to builtin memcpy
+[eva:progress] memcpy.c:53: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:53: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:53: 
+  function memcpy: precondition 'separation' got status valid.
 [kernel:approximation] memcpy.c:53: 
   too many locations to update in array. Approximating.
 [kernel:approximation] memcpy.c:53: 
   more than 150(1000) locations to update in array. Approximating.
-[eva] memcpy.c:57: Call to builtin memcpy
-[eva] memcpy.c:57: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:57: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:57: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:57: Call to builtin memcpy
+[eva:progress] memcpy.c:57: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:57: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:57: 
+  function memcpy: precondition 'separation' got status valid.
 [kernel:approximation] memcpy.c:57: 
   too many locations to update in array. Approximating.
-[eva] Recording results for many
+[eva:progress] Recording results for many
 [from] Computing for function many
 [from] Done for function many
-[eva] Done for function many
-[eva] computing for function init <- test <- main.
+[eva:progress] Done for function many
+[eva:progress] 
+  computing for function init <- test <- main.
   Called from memcpy.c:69.
 [eva:partition] memcpy.c:24: Trace partitioning superposing up to 100 states
-[eva] Recording results for init
+[eva:progress] Recording results for init
 [from] Computing for function init
 [from] Done for function init
-[eva] Done for function init
+[eva:progress] Done for function init
 [eva:alarm] memcpy.c:71: Warning: assertion got status unknown.
-[eva] memcpy.c:72: Call to builtin memcpy
-[eva] memcpy.c:72: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:72: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:72: function memcpy: precondition 'separation' got status valid.
-[eva] memcpy.c:74: Call to builtin memcpy
+[eva:progress] memcpy.c:72: Call to builtin memcpy
+[eva:progress] memcpy.c:72: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:72: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:72: 
+  function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:74: Call to builtin memcpy
 [eva:alarm] memcpy.c:74: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
 [eva:alarm] memcpy.c:74: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
-[eva] memcpy.c:74: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:74: 
+  function memcpy: precondition 'separation' got status valid.
 [eva:alarm] memcpy.c:76: Warning: assertion got status unknown.
-[eva] memcpy.c:77: Call to builtin memcpy
-[eva] memcpy.c:77: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:77: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:77: function memcpy: precondition 'separation' got status valid.
-[eva] memcpy.c:79: Call to builtin memcpy
+[eva:progress] memcpy.c:77: Call to builtin memcpy
+[eva:progress] memcpy.c:77: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:77: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:77: 
+  function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:79: Call to builtin memcpy
 [eva:alarm] memcpy.c:79: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
 [eva:alarm] memcpy.c:79: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
-[eva] memcpy.c:79: function memcpy: precondition 'separation' got status valid.
-[eva] memcpy.c:87: Call to builtin memcpy
-[eva] memcpy.c:87: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:87: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:87: function memcpy: precondition 'separation' got status valid.
-[eva] memcpy.c:89: Call to builtin memcpy
-[eva] memcpy.c:89: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:89: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:89: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:79: 
+  function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:87: Call to builtin memcpy
+[eva:progress] memcpy.c:87: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:87: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:87: 
+  function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:89: Call to builtin memcpy
+[eva:progress] memcpy.c:89: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:89: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:89: 
+  function memcpy: precondition 'separation' got status valid.
 [eva:alarm] memcpy.c:91: Warning: 
   pointer downcast. assert (unsigned int)((struct t1 *)t) ≤ 2147483647;
 [eva:garbled-mix:write] memcpy.c:91: 
   Assigning imprecise value to src
   because of arithmetic operation on addresses.
-[eva] memcpy.c:91: Call to builtin memcpy
-[eva] memcpy.c:91: function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:91: Call to builtin memcpy
+[eva:progress] memcpy.c:91: 
+  function memcpy: precondition 'valid_dest' got status valid.
 [eva:alarm] memcpy.c:91: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
-[eva] memcpy.c:91: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:91: 
+  function memcpy: precondition 'separation' got status valid.
 [eva:garbled-mix:write] memcpy.c:91: 
   Builtin memcpy: assigning imprecise value to v3
   because of misaligned read of addresses.
@@ -117,11 +148,13 @@
 [eva:garbled-mix:write] memcpy.c:93: 
   Assigning imprecise value to dest
   because of arithmetic operation on addresses.
-[eva] memcpy.c:93: Call to builtin memcpy
+[eva:progress] memcpy.c:93: Call to builtin memcpy
 [eva:alarm] memcpy.c:93: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] memcpy.c:93: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:93: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:93: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:93: 
+  function memcpy: precondition 'separation' got status valid.
 [eva:alarm] memcpy.c:94: Warning: 
   pointer downcast. assert (unsigned int)((struct t1 *)t) ≤ 2147483647;
 [eva:alarm] memcpy.c:95: Warning: 
@@ -129,12 +162,14 @@
 [eva:garbled-mix:write] memcpy.c:95: 
   Assigning imprecise value to dest
   because of arithmetic operation on addresses.
-[eva] memcpy.c:95: Call to builtin memcpy
+[eva:progress] memcpy.c:95: Call to builtin memcpy
 [eva:alarm] memcpy.c:95: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] memcpy.c:95: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:95: function memcpy: precondition 'separation' got status valid.
-[eva] memcpy.c:100: Call to builtin memcpy
+[eva:progress] memcpy.c:95: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:95: 
+  function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:100: Call to builtin memcpy
 [eva:alarm] memcpy.c:100: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
 [eva:alarm] memcpy.c:100: Warning: 
@@ -144,16 +179,22 @@
 [eva:imprecision] memcpy.c:100: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:partition] memcpy.c:99: starting to merge loop iterations
-[eva] memcpy.c:100: Call to builtin memcpy
-[eva] memcpy.c:105: Call to builtin memcpy
-[eva] memcpy.c:105: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:105: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:105: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:100: Call to builtin memcpy
+[eva:progress] memcpy.c:105: Call to builtin memcpy
+[eva:progress] memcpy.c:105: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:105: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:105: 
+  function memcpy: precondition 'separation' got status valid.
 [eva:alarm] memcpy.c:107: Warning: assertion got status unknown.
-[eva] memcpy.c:109: Call to builtin memcpy
-[eva] memcpy.c:109: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:109: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:109: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:109: Call to builtin memcpy
+[eva:progress] memcpy.c:109: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:109: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:109: 
+  function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:109: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:alarm] memcpy.c:113: Warning: 
@@ -163,11 +204,13 @@
 [eva:partition] memcpy.c:114: starting to merge loop iterations
 [eva:alarm] memcpy.c:118: Warning: 
   unaligned pointer creation. assert \aligned(pptop,alignof(int));
-[eva] memcpy.c:118: Call to builtin memcpy
+[eva:progress] memcpy.c:118: Call to builtin memcpy
 [eva:alarm] memcpy.c:118: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] memcpy.c:118: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:118: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:118: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:118: 
+  function memcpy: precondition 'separation' got status valid.
 [kernel:approximation] memcpy.c:118: 
   too many locations to update in array. Approximating.
 [eva:alarm] memcpy.c:121: Warning: 
@@ -177,11 +220,13 @@
 [eva:partition] memcpy.c:122: starting to merge loop iterations
 [eva:alarm] memcpy.c:126: Warning: 
   unaligned pointer creation. assert \aligned(pptop,alignof(int));
-[eva] memcpy.c:126: Call to builtin memcpy
+[eva:progress] memcpy.c:126: Call to builtin memcpy
 [eva:alarm] memcpy.c:126: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] memcpy.c:126: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:126: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:126: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:126: 
+  function memcpy: precondition 'separation' got status valid.
 [kernel:approximation] memcpy.c:126: 
   too many locations to update in array. Approximating.
 [eva:alarm] memcpy.c:129: Warning: 
@@ -193,11 +238,13 @@
 [eva:partition] memcpy.c:130: starting to merge loop iterations
 [eva:alarm] memcpy.c:135: Warning: 
   unaligned pointer creation. assert \aligned(pptop,alignof(int));
-[eva] memcpy.c:135: Call to builtin memcpy
+[eva:progress] memcpy.c:135: Call to builtin memcpy
 [eva:alarm] memcpy.c:135: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] memcpy.c:135: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:135: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:135: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:135: 
+  function memcpy: precondition 'separation' got status valid.
 [kernel:approximation] memcpy.c:135: 
   too many locations to update in array. Approximating.
 [eva:alarm] memcpy.c:138: Warning: 
@@ -209,152 +256,200 @@
 [eva:partition] memcpy.c:139: starting to merge loop iterations
 [eva:alarm] memcpy.c:144: Warning: 
   unaligned pointer creation. assert \aligned(pptop,alignof(int));
-[eva] memcpy.c:144: Call to builtin memcpy
+[eva:progress] memcpy.c:144: Call to builtin memcpy
 [eva:alarm] memcpy.c:144: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
-[eva] memcpy.c:144: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:144: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:144: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:144: 
+  function memcpy: precondition 'separation' got status valid.
 [kernel:approximation] memcpy.c:144: 
   too many locations to update in array. Approximating.
 [eva:alarm] memcpy.c:148: Warning: 
   unaligned pointer creation. assert \aligned(&garbledsize[10],alignof(int));
 [eva:alarm] memcpy.c:149: Warning: 
   unaligned pointer creation. assert \aligned(pgarbledsize,alignof(int));
-[eva] memcpy.c:149: Call to builtin memcpy
+[eva:progress] memcpy.c:149: Call to builtin memcpy
 [eva:alarm] memcpy.c:149: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
 [eva:alarm] memcpy.c:149: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
-[eva] memcpy.c:149: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:149: 
+  function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:149: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:alarm] memcpy.c:154: Warning: assertion got status unknown.
-[eva] memcpy.c:155: Call to builtin memcpy
+[eva:progress] memcpy.c:155: Call to builtin memcpy
 [eva:alarm] memcpy.c:155: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
 [eva:alarm] memcpy.c:155: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
-[eva] memcpy.c:155: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:155: 
+  function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:155: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:alarm] memcpy.c:156: Warning: assertion got status unknown.
-[eva] memcpy.c:157: Call to builtin memcpy
-[eva] memcpy.c:157: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:157: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:157: function memcpy: precondition 'separation' got status valid.
-[eva] Recording results for test
+[eva:progress] memcpy.c:157: Call to builtin memcpy
+[eva:progress] memcpy.c:157: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:157: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:157: 
+  function memcpy: precondition 'separation' got status valid.
+[eva:progress] Recording results for test
 [from] Computing for function test
 [from] Done for function test
-[eva] Done for function test
-[eva] computing for function test_uninit <- main.
+[eva:progress] Done for function test
+[eva:progress] 
+  computing for function test_uninit <- main.
   Called from memcpy.c:228.
-[eva] memcpy.c:176: Call to builtin memcpy
-[eva] memcpy.c:176: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:176: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:176: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:176: Call to builtin memcpy
+[eva:progress] memcpy.c:176: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:176: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:176: 
+  function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:176: 
   In memcpy builtin: precise copy of indeterminate values.
-[eva] memcpy.c:177: assertion got status valid.
-[eva] computing for function itv <- test_uninit <- main.
+[eva:progress] memcpy.c:177: assertion got status valid.
+[eva:progress] 
+  computing for function itv <- test_uninit <- main.
   Called from memcpy.c:178.
 [eva] using specification for function itv
-[eva] Done for function itv
-[eva] memcpy.c:178: Call to builtin memcpy
-[eva] memcpy.c:178: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:178: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:178: function memcpy: precondition 'separation' got status valid.
+[eva:progress] Done for function itv
+[eva:progress] memcpy.c:178: Call to builtin memcpy
+[eva:progress] memcpy.c:178: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:178: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:178: 
+  function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:178: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:imprecision] memcpy.c:178: 
   In memcpy builtin: imprecise copy of indeterminate values.
-[eva] memcpy.c:179: assertion got status valid.
-[eva] computing for function make_unknown <- test_uninit <- main.
+[eva:progress] memcpy.c:179: assertion got status valid.
+[eva:progress] 
+  computing for function make_unknown <- test_uninit <- main.
   Called from memcpy.c:182.
 [eva] using specification for function make_unknown
-[eva] memcpy.c:182: function make_unknown: precondition got status valid.
-[eva] Done for function make_unknown
-[eva] memcpy.c:183: Call to builtin memcpy
-[eva] memcpy.c:183: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:183: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:183: function memcpy: precondition 'separation' got status valid.
-[eva] memcpy.c:184: assertion got status valid.
-[eva] computing for function itv <- test_uninit <- main.
+[eva:progress] memcpy.c:182: 
+  function make_unknown: precondition got status valid.
+[eva:progress] Done for function make_unknown
+[eva:progress] memcpy.c:183: Call to builtin memcpy
+[eva:progress] memcpy.c:183: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:183: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:183: 
+  function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:184: assertion got status valid.
+[eva:progress] 
+  computing for function itv <- test_uninit <- main.
   Called from memcpy.c:185.
-[eva] Done for function itv
-[eva] memcpy.c:185: Call to builtin memcpy
-[eva] memcpy.c:185: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:185: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:185: function memcpy: precondition 'separation' got status valid.
+[eva:progress] Done for function itv
+[eva:progress] memcpy.c:185: Call to builtin memcpy
+[eva:progress] memcpy.c:185: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:185: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:185: 
+  function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:185: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:imprecision] memcpy.c:185: 
   In memcpy builtin: imprecise copy of indeterminate values.
 [eva:alarm] memcpy.c:186: Warning: 
   accessing uninitialized left-value. assert \initialized(&b[11]);
-[eva] computing for function make_unknown <- test_uninit <- main.
+[eva:progress] 
+  computing for function make_unknown <- test_uninit <- main.
   Called from memcpy.c:189.
-[eva] memcpy.c:189: function make_unknown: precondition got status valid.
-[eva] Done for function make_unknown
-[eva] memcpy.c:191: Call to builtin memcpy
-[eva] memcpy.c:191: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:191: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:191: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:189: 
+  function make_unknown: precondition got status valid.
+[eva:progress] Done for function make_unknown
+[eva:progress] memcpy.c:191: Call to builtin memcpy
+[eva:progress] memcpy.c:191: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:191: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:191: 
+  function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:191: 
   In memcpy builtin: precise copy of indeterminate values.
-[eva] memcpy.c:192: assertion got status valid.
-[eva] computing for function itv <- test_uninit <- main.
+[eva:progress] memcpy.c:192: assertion got status valid.
+[eva:progress] 
+  computing for function itv <- test_uninit <- main.
   Called from memcpy.c:194.
-[eva] Done for function itv
-[eva] memcpy.c:194: Call to builtin memcpy
-[eva] memcpy.c:194: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:194: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:194: function memcpy: precondition 'separation' got status valid.
+[eva:progress] Done for function itv
+[eva:progress] memcpy.c:194: Call to builtin memcpy
+[eva:progress] memcpy.c:194: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:194: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:194: 
+  function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:194: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:imprecision] memcpy.c:194: 
   In memcpy builtin: imprecise copy of indeterminate values.
-[eva] memcpy.c:195: assertion got status valid.
+[eva:progress] memcpy.c:195: assertion got status valid.
 [eva:alarm] memcpy.c:196: Warning: 
   accessing uninitialized left-value. assert \initialized(&b[8]);
-[eva] computing for function make_unknown <- test_uninit <- main.
+[eva:progress] 
+  computing for function make_unknown <- test_uninit <- main.
   Called from memcpy.c:200.
-[eva] memcpy.c:200: function make_unknown: precondition got status valid.
-[eva] Done for function make_unknown
-[eva] computing for function make_unknown <- test_uninit <- main.
+[eva:progress] memcpy.c:200: 
+  function make_unknown: precondition got status valid.
+[eva:progress] Done for function make_unknown
+[eva:progress] 
+  computing for function make_unknown <- test_uninit <- main.
   Called from memcpy.c:201.
-[eva] memcpy.c:201: function make_unknown: precondition got status valid.
-[eva] Done for function make_unknown
-[eva] memcpy.c:202: Call to builtin memcpy
-[eva] memcpy.c:202: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:202: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:202: function memcpy: precondition 'separation' got status valid.
-[eva] memcpy.c:203: assertion got status valid.
-[eva] computing for function itv <- test_uninit <- main.
+[eva:progress] memcpy.c:201: 
+  function make_unknown: precondition got status valid.
+[eva:progress] Done for function make_unknown
+[eva:progress] memcpy.c:202: Call to builtin memcpy
+[eva:progress] memcpy.c:202: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:202: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:202: 
+  function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:203: assertion got status valid.
+[eva:progress] 
+  computing for function itv <- test_uninit <- main.
   Called from memcpy.c:204.
-[eva] Done for function itv
-[eva] memcpy.c:204: Call to builtin memcpy
-[eva] memcpy.c:204: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:204: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:204: function memcpy: precondition 'separation' got status valid.
+[eva:progress] Done for function itv
+[eva:progress] memcpy.c:204: Call to builtin memcpy
+[eva:progress] memcpy.c:204: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:204: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:204: 
+  function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:204: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:imprecision] memcpy.c:204: 
   In memcpy builtin: imprecise copy of indeterminate values.
 [eva:alarm] memcpy.c:205: Warning: 
   accessing uninitialized left-value. assert \initialized(&b[11]);
-[eva] Recording results for test_uninit
+[eva:progress] Recording results for test_uninit
 [from] Computing for function test_uninit
 [from] Done for function test_uninit
-[eva] Done for function test_uninit
-[eva] computing for function test_local <- main.
+[eva:progress] Done for function test_uninit
+[eva:progress] 
+  computing for function test_local <- main.
   Called from memcpy.c:229.
-[eva] memcpy.c:213: Call to builtin memcpy
-[eva] memcpy.c:213: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy.c:213: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy.c:213: function memcpy: precondition 'separation' got status valid.
+[eva:progress] memcpy.c:213: Call to builtin memcpy
+[eva:progress] memcpy.c:213: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:213: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy.c:213: 
+  function memcpy: precondition 'separation' got status valid.
 [eva:locals-escaping] memcpy.c:214: Warning: 
   locals {y} escaping the scope of a block of test_local through p
-[eva] memcpy.c:216: 
+[eva:show] memcpy.c:216: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -379,33 +474,35 @@
   p ∈ ESCAPINGADDR
   q ∈ {0}
   ==END OF DUMP==
-[eva] Recording results for test_local
+[eva:progress] Recording results for test_local
 [from] Computing for function test_local
 [from] Done for function test_local
-[eva] Done for function test_local
-[eva] computing for function copy_0 <- main.
+[eva:progress] Done for function test_local
+[eva:progress] 
+  computing for function copy_0 <- main.
   Called from memcpy.c:230.
-[eva] memcpy.c:221: Call to builtin memcpy
+[eva:progress] memcpy.c:221: Call to builtin memcpy
 [eva:alarm] memcpy.c:221: Warning: 
   function memcpy: precondition 'valid_dest' got status invalid.
-[eva] memcpy.c:221: 
+[eva:progress] memcpy.c:221: 
   function memcpy: no state left, precondition 'valid_src' got status valid.
-[eva] memcpy.c:221: 
+[eva:progress] memcpy.c:221: 
   function memcpy: no state left, precondition 'separation' got status valid.
-[eva] memcpy.c:222: Call to builtin memcpy
-[eva] memcpy.c:222: function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy.c:222: Call to builtin memcpy
+[eva:progress] memcpy.c:222: 
+  function memcpy: precondition 'valid_dest' got status valid.
 [eva:alarm] memcpy.c:222: Warning: 
   function memcpy: precondition 'valid_src' got status invalid.
-[eva] memcpy.c:222: 
+[eva:progress] memcpy.c:222: 
   function memcpy: no state left, precondition 'separation' got status valid.
-[eva] Recording results for copy_0
+[eva:progress] Recording results for copy_0
 [from] Computing for function copy_0
 [from] Done for function copy_0
-[eva] Done for function copy_0
-[eva] Recording results for main
+[eva:progress] Done for function copy_0
+[eva:progress] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] Done for function main
+[eva:progress] Done for function main
 [scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function init:

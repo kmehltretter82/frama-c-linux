@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-eva-slevel 10 -eva-verbose 2"
+   STDOPT: +"-eva-slevel 10 -eva-verbose 6"
 */
 
 extern int nondet;
@@ -65,4 +65,3 @@ int main() {
 
   return 0;
 }
-

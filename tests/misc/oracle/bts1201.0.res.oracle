@@ -2,7 +2,6 @@
 [eva] Analyzing a complete application starting at main
 [eva:initial-state] Values of globals at initialization
   
-[eva] bts1201.i:8: assertion got status valid.
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   1 function analyzed (out of 2): 50% coverage.

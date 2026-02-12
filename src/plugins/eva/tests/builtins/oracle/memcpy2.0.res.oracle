@@ -1,22 +1,26 @@
 [kernel] Parsing memcpy2.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function Frama_C_interval <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- main.
   Called from memcpy2.c:9.
 [eva] using specification for function Frama_C_interval
-[eva] memcpy2.c:9: 
+[eva:progress] memcpy2.c:9: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] memcpy2.c:10: Call to builtin memcpy
-[eva] memcpy2.c:10: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy2.c:10: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy2.c:10: function memcpy: precondition 'separation' got status valid.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] memcpy2.c:10: Call to builtin memcpy
+[eva:progress] memcpy2.c:10: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy2.c:10: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy2.c:10: 
+  function memcpy: precondition 'separation' got status valid.
 [eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:114: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[eva] memcpy2.c:12: 
+[eva:show] memcpy2.c:12: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -34,26 +38,34 @@
   S_0_S_v[0..1] ∈ [--..--]
   S_1_S_v[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] computing for function Frama_C_interval <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- main.
   Called from memcpy2.c:14.
-[eva] memcpy2.c:14: 
+[eva:progress] memcpy2.c:14: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] memcpy2.c:15: Call to builtin memcpy
-[eva] memcpy2.c:15: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy2.c:15: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy2.c:15: function memcpy: precondition 'separation' got status valid.
-[eva] computing for function Frama_C_interval <- main.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] memcpy2.c:15: Call to builtin memcpy
+[eva:progress] memcpy2.c:15: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy2.c:15: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy2.c:15: 
+  function memcpy: precondition 'separation' got status valid.
+[eva:progress] 
+  computing for function Frama_C_interval <- main.
   Called from memcpy2.c:17.
-[eva] memcpy2.c:17: 
+[eva:progress] memcpy2.c:17: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] memcpy2.c:18: Call to builtin memcpy
-[eva] memcpy2.c:18: function memcpy: precondition 'valid_dest' got status valid.
-[eva] memcpy2.c:18: function memcpy: precondition 'valid_src' got status valid.
-[eva] memcpy2.c:18: function memcpy: precondition 'separation' got status valid.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] memcpy2.c:18: Call to builtin memcpy
+[eva:progress] memcpy2.c:18: 
+  function memcpy: precondition 'valid_dest' got status valid.
+[eva:progress] memcpy2.c:18: 
+  function memcpy: precondition 'valid_src' got status valid.
+[eva:progress] memcpy2.c:18: 
+  function memcpy: precondition 'separation' got status valid.
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]

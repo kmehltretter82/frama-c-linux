@@ -1,11 +1,11 @@
 [kernel] Parsing linked_list.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   MEMORY[0..0x3FF] ∈ {0}
   malloc_next_free ∈ {0}
-[eva] linked_list.c:40: 
+[eva:show] linked_list.c:40: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[0..0x3FF] ∈ {0}
@@ -40,7 +40,8 @@
   i ∈ {1}
   malloc_next_free ∈ {0}
   ==END OF DUMP==
-[eva] computing for function malloc <- main.
+[eva:progress] 
+  computing for function malloc <- main.
   Called from linked_list.c:41.
 [eva:alarm] FRAMAC_SHARE/libc/stdlib.h:614: Warning: 
   function malloc, behavior allocation: postcondition 'allocation' got status unknown.
@@ -48,9 +49,9 @@
   function malloc, behavior allocation: postcondition 'alignment' got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdlib.h:616: Warning: 
   function malloc, behavior allocation: postcondition 'errno_same' got status unknown.
-[eva] Recording results for malloc
-[eva] Done for function malloc
-[eva] linked_list.c:42: 
+[eva:progress] Recording results for malloc
+[eva:progress] Done for function malloc
+[eva:show] linked_list.c:42: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[0..0x3FF] ∈ {0}
@@ -91,7 +92,7 @@
   unaligned pointer creation. assert \aligned(curr,alignof(item));
 [eva:alarm] linked_list.c:45: Warning: 
   unaligned pointer creation. assert \aligned(curr,alignof(item));
-[eva] linked_list.c:40: 
+[eva:show] linked_list.c:40: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -127,11 +128,12 @@
   i ∈ {2}
   malloc_next_free ∈ {8}
   ==END OF DUMP==
-[eva] computing for function malloc <- main.
+[eva:progress] 
+  computing for function malloc <- main.
   Called from linked_list.c:41.
-[eva] Recording results for malloc
-[eva] Done for function malloc
-[eva] linked_list.c:42: 
+[eva:progress] Recording results for malloc
+[eva:progress] Done for function malloc
+[eva:show] linked_list.c:42: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -169,7 +171,7 @@
   ==END OF DUMP==
 [eva:alarm] linked_list.c:44: Warning: 
   unaligned pointer creation. assert \aligned(head,alignof(item));
-[eva] linked_list.c:40: 
+[eva:show] linked_list.c:40: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -208,11 +210,12 @@
   i ∈ {3}
   malloc_next_free ∈ {16}
   ==END OF DUMP==
-[eva] computing for function malloc <- main.
+[eva:progress] 
+  computing for function malloc <- main.
   Called from linked_list.c:41.
-[eva] Recording results for malloc
-[eva] Done for function malloc
-[eva] linked_list.c:42: 
+[eva:progress] Recording results for malloc
+[eva:progress] Done for function malloc
+[eva:show] linked_list.c:42: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -251,7 +254,7 @@
   i ∈ {3}
   malloc_next_free ∈ {24}
   ==END OF DUMP==
-[eva] linked_list.c:40: 
+[eva:show] linked_list.c:40: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -292,11 +295,12 @@
   i ∈ {4}
   malloc_next_free ∈ {24}
   ==END OF DUMP==
-[eva] computing for function malloc <- main.
+[eva:progress] 
+  computing for function malloc <- main.
   Called from linked_list.c:41.
-[eva] Recording results for malloc
-[eva] Done for function malloc
-[eva] linked_list.c:42: 
+[eva:progress] Recording results for malloc
+[eva:progress] Done for function malloc
+[eva:show] linked_list.c:42: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -337,7 +341,7 @@
   i ∈ {4}
   malloc_next_free ∈ {32}
   ==END OF DUMP==
-[eva] linked_list.c:40: 
+[eva:show] linked_list.c:40: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -380,11 +384,12 @@
   i ∈ {5}
   malloc_next_free ∈ {32}
   ==END OF DUMP==
-[eva] computing for function malloc <- main.
+[eva:progress] 
+  computing for function malloc <- main.
   Called from linked_list.c:41.
-[eva] Recording results for malloc
-[eva] Done for function malloc
-[eva] linked_list.c:42: 
+[eva:progress] Recording results for malloc
+[eva:progress] Done for function malloc
+[eva:show] linked_list.c:42: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -427,7 +432,7 @@
   i ∈ {5}
   malloc_next_free ∈ {40}
   ==END OF DUMP==
-[eva] linked_list.c:40: 
+[eva:show] linked_list.c:40: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -472,11 +477,12 @@
   i ∈ {6}
   malloc_next_free ∈ {40}
   ==END OF DUMP==
-[eva] computing for function malloc <- main.
+[eva:progress] 
+  computing for function malloc <- main.
   Called from linked_list.c:41.
-[eva] Recording results for malloc
-[eva] Done for function malloc
-[eva] linked_list.c:42: 
+[eva:progress] Recording results for malloc
+[eva:progress] Done for function malloc
+[eva:show] linked_list.c:42: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -521,7 +527,7 @@
   i ∈ {6}
   malloc_next_free ∈ {48}
   ==END OF DUMP==
-[eva] linked_list.c:40: 
+[eva:show] linked_list.c:40: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -568,11 +574,12 @@
   i ∈ {7}
   malloc_next_free ∈ {48}
   ==END OF DUMP==
-[eva] computing for function malloc <- main.
+[eva:progress] 
+  computing for function malloc <- main.
   Called from linked_list.c:41.
-[eva] Recording results for malloc
-[eva] Done for function malloc
-[eva] linked_list.c:42: 
+[eva:progress] Recording results for malloc
+[eva:progress] Done for function malloc
+[eva:show] linked_list.c:42: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -619,7 +626,7 @@
   i ∈ {7}
   malloc_next_free ∈ {56}
   ==END OF DUMP==
-[eva] linked_list.c:40: 
+[eva:show] linked_list.c:40: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -668,11 +675,12 @@
   i ∈ {8}
   malloc_next_free ∈ {56}
   ==END OF DUMP==
-[eva] computing for function malloc <- main.
+[eva:progress] 
+  computing for function malloc <- main.
   Called from linked_list.c:41.
-[eva] Recording results for malloc
-[eva] Done for function malloc
-[eva] linked_list.c:42: 
+[eva:progress] Recording results for malloc
+[eva:progress] Done for function malloc
+[eva:show] linked_list.c:42: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -721,7 +729,7 @@
   i ∈ {8}
   malloc_next_free ∈ {64}
   ==END OF DUMP==
-[eva] linked_list.c:40: 
+[eva:show] linked_list.c:40: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -772,11 +780,12 @@
   i ∈ {9}
   malloc_next_free ∈ {64}
   ==END OF DUMP==
-[eva] computing for function malloc <- main.
+[eva:progress] 
+  computing for function malloc <- main.
   Called from linked_list.c:41.
-[eva] Recording results for malloc
-[eva] Done for function malloc
-[eva] linked_list.c:42: 
+[eva:progress] Recording results for malloc
+[eva:progress] Done for function malloc
+[eva:show] linked_list.c:42: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -827,7 +836,7 @@
   i ∈ {9}
   malloc_next_free ∈ {72}
   ==END OF DUMP==
-[eva] linked_list.c:40: 
+[eva:show] linked_list.c:40: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -880,11 +889,12 @@
   i ∈ {10}
   malloc_next_free ∈ {72}
   ==END OF DUMP==
-[eva] computing for function malloc <- main.
+[eva:progress] 
+  computing for function malloc <- main.
   Called from linked_list.c:41.
-[eva] Recording results for malloc
-[eva] Done for function malloc
-[eva] linked_list.c:42: 
+[eva:progress] Recording results for malloc
+[eva:progress] Done for function malloc
+[eva:show] linked_list.c:42: 
   Frama_C_dump_each:
   # cvalue:
   MEMORY[bits 0 to 31] ∈ {1}
@@ -943,45 +953,56 @@
   unaligned pointer creation. assert \aligned(curr,alignof(item));
 [eva:alarm] linked_list.c:51: Warning: 
   unaligned pointer creation. assert \aligned(curr,alignof(item));
-[eva] computing for function printf_va_1 <- main.
+[eva:progress] 
+  computing for function printf_va_1 <- main.
   Called from linked_list.c:51.
 [eva] using specification for function printf
-[eva] linked_list.c:51: function printf_va_1: precondition got status valid.
-[eva] Done for function printf_va_1
+[eva:progress] linked_list.c:51: 
+  function printf_va_1: precondition got status valid.
+[eva:progress] Done for function printf_va_1
 [eva:alarm] linked_list.c:52: Warning: 
   unaligned pointer creation. assert \aligned(curr,alignof(item));
 [eva:alarm] linked_list.c:52: Warning: 
   unaligned pointer creation.
   assert \aligned(curr->next,alignof(struct list_el));
-[eva] computing for function printf_va_1 <- main.
+[eva:progress] 
+  computing for function printf_va_1 <- main.
   Called from linked_list.c:51.
-[eva] Done for function printf_va_1
-[eva] computing for function printf_va_1 <- main.
+[eva:progress] Done for function printf_va_1
+[eva:progress] 
+  computing for function printf_va_1 <- main.
   Called from linked_list.c:51.
-[eva] Done for function printf_va_1
-[eva] computing for function printf_va_1 <- main.
+[eva:progress] Done for function printf_va_1
+[eva:progress] 
+  computing for function printf_va_1 <- main.
   Called from linked_list.c:51.
-[eva] Done for function printf_va_1
-[eva] computing for function printf_va_1 <- main.
+[eva:progress] Done for function printf_va_1
+[eva:progress] 
+  computing for function printf_va_1 <- main.
   Called from linked_list.c:51.
-[eva] Done for function printf_va_1
-[eva] computing for function printf_va_1 <- main.
+[eva:progress] Done for function printf_va_1
+[eva:progress] 
+  computing for function printf_va_1 <- main.
   Called from linked_list.c:51.
-[eva] Done for function printf_va_1
-[eva] computing for function printf_va_1 <- main.
+[eva:progress] Done for function printf_va_1
+[eva:progress] 
+  computing for function printf_va_1 <- main.
   Called from linked_list.c:51.
-[eva] Done for function printf_va_1
-[eva] computing for function printf_va_1 <- main.
+[eva:progress] Done for function printf_va_1
+[eva:progress] 
+  computing for function printf_va_1 <- main.
   Called from linked_list.c:51.
-[eva] Done for function printf_va_1
-[eva] computing for function printf_va_1 <- main.
+[eva:progress] Done for function printf_va_1
+[eva:progress] 
+  computing for function printf_va_1 <- main.
   Called from linked_list.c:51.
-[eva] Done for function printf_va_1
-[eva] computing for function printf_va_1 <- main.
+[eva:progress] Done for function printf_va_1
+[eva:progress] 
+  computing for function printf_va_1 <- main.
   Called from linked_list.c:51.
-[eva] Done for function printf_va_1
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function printf_va_1
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [scope:rm_asserts] removing 4 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function malloc:

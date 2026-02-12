@@ -36,9 +36,11 @@ val dkey_summary : category
 
 (** {2 Debug categories.} *)
 
-(** Same as Log's {!register_category}, but [help] is mandatory. *)
-val register_category: help:string -> ?default:bool -> string -> category
+(** Same as Log's {!register_category}, but [help] is mandatory, and a verbosity
+    level can be associated to the category. *)
+val register_category: ?level:int -> help:string -> string -> category
 
+val dkey_show: category
 val dkey_pointer_comparison: category
 val dkey_cvalue_domain: category
 val dkey_iterator : category
@@ -46,14 +48,20 @@ val dkey_widening : category
 val dkey_partition : category
 val dkey_split_return : category
 val dkey_precision_settings : category
+val dkey_progress : category
 val dkey_callstacks : category
 val dkey_include_string_literal: category
 
 (** {2 Warning categories.} *)
 
-(** Same as Log's {!register_warn_category}, but [help] is mandatory. *)
+(* Default status of warning categories: feedback is associated to a verbosity
+   level. *)
+type warn_default = Inactive | Feedback of int | Error
+
+(** Same as Log's {!register_warn_category}, but [help] is mandatory and the
+    [Feedback] default status is associated to a verbosity level. *)
 val register_warn_category:
-  help:string -> ?default:Log.warn_status -> string -> warn_category
+  help:string -> ?default:warn_default -> string -> warn_category
 
 val wkey_alarm: warn_category
 val wkey_locals_escaping: warn_category
@@ -129,3 +137,8 @@ val failure : 'a pretty_printer
 
 (** Internal error stopping the plug-in. *)
 val fatal   : ('a,'b) pretty_aborter
+
+
+(** Called at the beginning of the analysis to configure Eva verbosity,
+    by automatically enabling/disabling message keys. *)
+val configure_verbosity : unit -> unit

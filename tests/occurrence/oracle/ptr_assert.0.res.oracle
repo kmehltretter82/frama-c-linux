@@ -1,15 +1,15 @@
 [kernel] Parsing ptr_assert.i (no preprocessing)
 [occurrence] beginning analysis
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
   y ∈ {0}
-[eva] ptr_assert.i:11: assertion got status valid.
-[eva] ptr_assert.i:16: assertion got status valid.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] ptr_assert.i:11: assertion got status valid.
+[eva:progress] ptr_assert.i:16: assertion got status valid.
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [occurrence] analysis done
 [occurrence] variable x (global):
     sid 1: x

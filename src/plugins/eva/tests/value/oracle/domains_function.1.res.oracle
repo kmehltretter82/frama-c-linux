@@ -1,34 +1,38 @@
 [kernel] Parsing domains_function.c (with preprocessing)
 [eva] Analyzing a complete application starting at test_successive_runs
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   undet ∈ [--..--]
   i ∈ {0}
   result ∈ {0}
   t[0..9] ∈ {0}
-[eva] computing for function Frama_C_interval <- test_successive_runs.
+[eva:progress] 
+  computing for function Frama_C_interval <- test_successive_runs.
   Called from domains_function.c:141.
 [eva] using specification for function Frama_C_interval
-[eva] domains_function.c:141: 
+[eva:progress] domains_function.c:141: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- test_successive_runs.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- test_successive_runs.
   Called from domains_function.c:142.
-[eva] domains_function.c:142: 
+[eva:progress] domains_function.c:142: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function need_octagon <- test_successive_runs.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function need_octagon <- test_successive_runs.
   Called from domains_function.c:143.
-[eva] Recording results for need_octagon
-[eva] Done for function need_octagon
-[eva] computing for function need_symbolic_locations <- test_successive_runs.
+[eva:progress] Recording results for need_octagon
+[eva:progress] Done for function need_octagon
+[eva:progress] 
+  computing for function need_symbolic_locations <- test_successive_runs.
   Called from domains_function.c:144.
-[eva] Recording results for need_symbolic_locations
-[eva] Done for function need_symbolic_locations
+[eva:progress] Recording results for need_symbolic_locations
+[eva:progress] Done for function need_symbolic_locations
 [eva:alarm] domains_function.c:145: Warning: check got status unknown.
-[eva] Recording results for test_successive_runs
-[eva] Done for function test_successive_runs
+[eva:progress] Recording results for test_successive_runs
+[eva:progress] Done for function test_successive_runs
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function need_octagon:
   __retres ∈ [-200..200]
@@ -42,30 +46,34 @@
   abs_diff ∈ [-200..200]
   bounded ∈ [-200..200]
 [eva] Analyzing a complete application starting at test_successive_runs
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   undet ∈ [--..--]
   i ∈ {0}
   result ∈ {0}
   t[0..9] ∈ {0}
-[eva] computing for function Frama_C_interval <- test_successive_runs.
+[eva:progress] 
+  computing for function Frama_C_interval <- test_successive_runs.
   Called from domains_function.c:141.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- test_successive_runs.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- test_successive_runs.
   Called from domains_function.c:142.
-[eva] Done for function Frama_C_interval
-[eva] computing for function need_octagon <- test_successive_runs.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function need_octagon <- test_successive_runs.
   Called from domains_function.c:143.
-[eva] Recording results for need_octagon
-[eva] Done for function need_octagon
-[eva] computing for function need_symbolic_locations <- test_successive_runs.
+[eva:progress] Recording results for need_octagon
+[eva:progress] Done for function need_octagon
+[eva:progress] 
+  computing for function need_symbolic_locations <- test_successive_runs.
   Called from domains_function.c:144.
-[eva] Recording results for need_symbolic_locations
-[eva] Done for function need_symbolic_locations
-[eva] domains_function.c:145: check got status valid.
-[eva] Recording results for test_successive_runs
-[eva] Done for function test_successive_runs
+[eva:progress] Recording results for need_symbolic_locations
+[eva:progress] Done for function need_symbolic_locations
+[eva:progress] domains_function.c:145: check got status valid.
+[eva:progress] Recording results for test_successive_runs
+[eva:progress] Done for function test_successive_runs
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function need_octagon:
   __retres ∈ [0..200]

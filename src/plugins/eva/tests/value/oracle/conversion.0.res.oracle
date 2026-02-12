@@ -1,10 +1,10 @@
 [kernel] Parsing conversion.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva] conversion.i:16: 
+[eva:show] conversion.i:16: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -14,7 +14,7 @@
   l ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva:alarm] conversion.i:19: Warning: assertion 'ASSUME' got status unknown.
-[eva] conversion.i:21: 
+[eva:show] conversion.i:21: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -24,7 +24,7 @@
   l ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva:alarm] conversion.i:24: Warning: assertion 'ASSUME' got status unknown.
-[eva] conversion.i:26: 
+[eva:show] conversion.i:26: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -34,7 +34,7 @@
   l ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva:alarm] conversion.i:29: Warning: assertion 'ASSUME' got status unknown.
-[eva] conversion.i:31: 
+[eva:show] conversion.i:31: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -44,7 +44,7 @@
   l ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva:alarm] conversion.i:34: Warning: assertion 'ASSUME' got status unknown.
-[eva] conversion.i:36: 
+[eva:show] conversion.i:36: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -55,7 +55,7 @@
   ==END OF DUMP==
 [eva:alarm] conversion.i:38: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
-[eva] conversion.i:40: 
+[eva:show] conversion.i:40: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -64,7 +64,7 @@
   f ∈ {{ (float)&x }}
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] conversion.i:45: 
+[eva:show] conversion.i:45: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -76,7 +76,7 @@
   l ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva:alarm] conversion.i:50: Warning: assertion 'ASSUME' got status unknown.
-[eva] conversion.i:53: 
+[eva:show] conversion.i:53: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -86,8 +86,8 @@
   f ∈ [7.00649232162e-45 .. 2.10194769649e-44] or UNINITIALIZED
   l ∈ [5..15] or UNINITIALIZED
   ==END OF DUMP==
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   x[bits 0 to 15] ∈ {1}
@@ -107,11 +107,11 @@
 [inout] Inputs for function main:
     v
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva] conversion.i:16: 
+[eva:show] conversion.i:16: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -120,7 +120,7 @@
   f ∈ {1.40129846432e-45}
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] conversion.i:21: 
+[eva:show] conversion.i:21: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -131,7 +131,7 @@
   ==END OF DUMP==
 [eva:alarm] conversion.i:25: Warning: 
   non-finite float value. assert \is_finite(*((float *)(&x)));
-[eva] conversion.i:26: 
+[eva:show] conversion.i:26: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -140,7 +140,7 @@
   f ∈ [0. .. 1.40129846432e-44]
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] conversion.i:31: 
+[eva:show] conversion.i:31: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -149,7 +149,7 @@
   f ∈ [0. .. 1.40129846432e-44]
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] conversion.i:36: 
+[eva:show] conversion.i:36: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -164,7 +164,7 @@
   non-finite float value. assert \is_finite(*((float *)(&x)));
 [eva:garbled-mix:write] conversion.i:39: 
   Assigning imprecise value to f because of arithmetic operation on addresses.
-[eva] conversion.i:40: 
+[eva:show] conversion.i:40: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -173,7 +173,7 @@
   f ∈ {{ garbled mix of &{x} (origin: Arithmetic {conversion.i:39}) }}
   l ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] conversion.i:45: 
+[eva:show] conversion.i:45: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -185,7 +185,7 @@
   ==END OF DUMP==
 [eva:alarm] conversion.i:52: Warning: 
   accessing uninitialized left-value. assert \initialized((float *)(&l));
-[eva] conversion.i:53: 
+[eva:show] conversion.i:53: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -195,8 +195,8 @@
   f ∈ [7.00649232162e-45 .. 2.10194769649e-44]
   l ∈ [5..15]
   ==END OF DUMP==
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   x[bits 0 to 15] ∈ {1}

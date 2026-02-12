@@ -1,7 +1,7 @@
 [kernel] Parsing dpds_intra.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ [--..--]
   S ∈ [--..--]
@@ -16,59 +16,66 @@
   signed overflow. assert 2 * a ≤ 2147483647;
 [eva:alarm] dpds_intra.c:124: Warning: 
   signed overflow. assert *p + 1 ≤ 2147483647;
-[eva] computing for function test_struct <- main.
+[eva:progress] 
+  computing for function test_struct <- main.
   Called from dpds_intra.c:126.
-[eva] Recording results for test_struct
-[eva] Done for function test_struct
-[eva] computing for function test_if_simple <- main.
+[eva:progress] Recording results for test_struct
+[eva:progress] Done for function test_struct
+[eva:progress] 
+  computing for function test_if_simple <- main.
   Called from dpds_intra.c:127.
 [eva:alarm] dpds_intra.c:51: Warning: 
   accessing uninitialized left-value. assert \initialized(&x);
-[eva] Recording results for test_if_simple
-[eva] Done for function test_if_simple
-[eva] computing for function test_goto_simple <- main.
+[eva:progress] Recording results for test_if_simple
+[eva:progress] Done for function test_if_simple
+[eva:progress] 
+  computing for function test_goto_simple <- main.
   Called from dpds_intra.c:128.
-[eva] Recording results for test_goto_simple
-[eva] Done for function test_goto_simple
-[eva] computing for function test_goto_arriere <- main.
+[eva:progress] Recording results for test_goto_simple
+[eva:progress] Done for function test_goto_simple
+[eva:progress] 
+  computing for function test_goto_arriere <- main.
   Called from dpds_intra.c:129.
 [eva:alarm] dpds_intra.c:66: Warning: 
   signed overflow. assert -2147483648 ≤ G - 1;
 [eva:alarm] dpds_intra.c:65: Warning: 
   signed overflow. assert x + 1 ≤ 2147483647;
-[eva] Recording results for test_goto_arriere
-[eva] Done for function test_goto_arriere
+[eva:progress] Recording results for test_goto_arriere
+[eva:progress] Done for function test_goto_arriere
 [eva:alarm] dpds_intra.c:129: Warning: 
   signed overflow.
   assert res + tmp_3 ≤ 2147483647;
   (tmp_3 from test_goto_arriere())
-[eva] computing for function test_goto_else <- main.
+[eva:progress] 
+  computing for function test_goto_else <- main.
   Called from dpds_intra.c:130.
-[eva] Recording results for test_goto_else
-[eva] Done for function test_goto_else
+[eva:progress] Recording results for test_goto_else
+[eva:progress] Done for function test_goto_else
 [eva:alarm] dpds_intra.c:130: Warning: 
   signed overflow.
   assert res + tmp_4 ≤ 2147483647;
   (tmp_4 from test_goto_else())
-[eva] computing for function test_simple_loop <- main.
+[eva:progress] 
+  computing for function test_simple_loop <- main.
   Called from dpds_intra.c:131.
 [eva:partition] dpds_intra.c:99: starting to merge loop iterations
 [eva:alarm] dpds_intra.c:100: Warning: 
   signed overflow. assert s + 1 ≤ 2147483647;
-[eva] Recording results for test_simple_loop
-[eva] Done for function test_simple_loop
+[eva:progress] Recording results for test_simple_loop
+[eva:progress] Done for function test_simple_loop
 [eva:alarm] dpds_intra.c:131: Warning: 
   signed overflow.
   assert res + tmp_5 ≤ 2147483647;
   (tmp_5 from test_simple_loop(G))
-[eva] computing for function multiple_global_inputs <- main.
+[eva:progress] 
+  computing for function multiple_global_inputs <- main.
   Called from dpds_intra.c:132.
 [eva:alarm] dpds_intra.c:35: Warning: 
   signed overflow. assert -2147483648 ≤ S.a + G;
 [eva:alarm] dpds_intra.c:35: Warning: 
   signed overflow. assert S.a + G ≤ 2147483647;
-[eva] Recording results for multiple_global_inputs
-[eva] Done for function multiple_global_inputs
+[eva:progress] Recording results for multiple_global_inputs
+[eva:progress] Done for function multiple_global_inputs
 [eva:alarm] dpds_intra.c:132: Warning: 
   signed overflow.
   assert res + tmp_6 ≤ 2147483647;
@@ -77,8 +84,8 @@
   signed overflow. assert -2147483648 ≤ *p + res;
 [eva:alarm] dpds_intra.c:134: Warning: 
   signed overflow. assert *p + res ≤ 2147483647;
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [pdg] computing for function multiple_global_inputs
 [pdg] done for function multiple_global_inputs
 [pdg] PDG for multiple_global_inputs

@@ -1,32 +1,34 @@
 [kernel] Expanding arguments from test_options.txt
 [kernel] Parsing branch7.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   secret ∈ [--..--]
-[eva] branch7.c:28: assertion got status valid.
-[eva] branch7.c:29: assertion got status valid.
+[eva:progress] branch7.c:28: assertion got status valid.
+[eva:progress] branch7.c:29: assertion got status valid.
 [eva:secure-flow:condition] branch7.c:30: Warning: 
   non-interference violation on condition involving {secret}
-[eva] computing for function write_x <- main.
+[eva:progress] 
+  computing for function write_x <- main.
   Called from branch7.c:31.
-[eva] branch7.c:31: function write_x: precondition got status valid.
-[eva] Recording results for write_x
-[eva] Done for function write_x
-[eva] computing for function write_y <- main.
+[eva:progress] branch7.c:31: function write_x: precondition got status valid.
+[eva:progress] Recording results for write_x
+[eva:progress] Done for function write_x
+[eva:progress] 
+  computing for function write_y <- main.
   Called from branch7.c:33.
-[eva] branch7.c:33: function write_y: precondition got status valid.
-[eva] Recording results for write_y
-[eva] Done for function write_y
+[eva:progress] branch7.c:33: function write_y: precondition got status valid.
+[eva:progress] Recording results for write_y
+[eva:progress] Done for function write_y
 [eva:alarm] branch7.c:35: Warning: assertion got status unknown.
 [eva:alarm] branch7.c:36: Warning: assertion got status unknown.
-[eva] branch7.c:40: assertion got status valid.
+[eva:progress] branch7.c:40: assertion got status valid.
 [eva:secure-flow:condition] branch7.c:41: Warning: 
   non-interference violation on condition involving {secret}
 [eva:alarm] branch7.c:48: Warning: assertion got status unknown.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function write_x:

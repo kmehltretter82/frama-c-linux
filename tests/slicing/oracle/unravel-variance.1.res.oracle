@@ -1,22 +1,24 @@
 [kernel] Parsing unravel-variance.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [kernel:annot:missing-spec] unravel-variance.i:31: Warning: 
   Neither code nor specification for function scanf, generating default
   assigns. See -generated-spec-* options for more info.
-[eva] computing for function scanf <- main.
+[eva:progress] 
+  computing for function scanf <- main.
   Called from unravel-variance.i:31.
 [eva] using specification for function scanf
-[eva] Done for function scanf
+[eva:progress] Done for function scanf
 [eva:alarm] unravel-variance.i:32: Warning: 
   accessing uninitialized left-value. assert \initialized(&n);
-[eva] computing for function scanf <- main.
+[eva:progress] 
+  computing for function scanf <- main.
   Called from unravel-variance.i:34.
-[eva] Done for function scanf
+[eva:progress] Done for function scanf
 [eva:alarm] unravel-variance.i:35: Warning: 
   accessing uninitialized left-value. assert \initialized(&x[i]);
 [eva:alarm] unravel-variance.i:35: Warning: 
@@ -24,9 +26,10 @@
 [eva:alarm] unravel-variance.i:36: Warning: 
   non-finite float value. assert \is_finite(\mul_float(x[i], x[i]));
 [eva:partition] unravel-variance.i:32: starting to merge loop iterations
-[eva] computing for function scanf <- main.
+[eva:progress] 
+  computing for function scanf <- main.
   Called from unravel-variance.i:34.
-[eva] Done for function scanf
+[eva:progress] Done for function scanf
 [eva:alarm] unravel-variance.i:35: Warning: 
   non-finite float value. assert \is_finite(\add_float(t1, x[i]));
 [eva:alarm] unravel-variance.i:36: Warning: 
@@ -36,15 +39,18 @@
 [eva:alarm] unravel-variance.i:36: Warning: 
   non-finite float value.
   assert \is_finite(\add_float(ssq, \mul_float(x[i], x[i])));
-[eva] computing for function scanf <- main.
+[eva:progress] 
+  computing for function scanf <- main.
   Called from unravel-variance.i:34.
-[eva] Done for function scanf
-[eva] computing for function scanf <- main.
+[eva:progress] Done for function scanf
+[eva:progress] 
+  computing for function scanf <- main.
   Called from unravel-variance.i:34.
-[eva] Done for function scanf
-[eva] computing for function scanf <- main.
+[eva:progress] Done for function scanf
+[eva:progress] 
+  computing for function scanf <- main.
   Called from unravel-variance.i:34.
-[eva] Done for function scanf
+[eva:progress] Done for function scanf
 [eva:alarm] unravel-variance.i:35: Warning: 
   accessing out of bounds index. assert i < 1024;
 [eva:alarm] unravel-variance.i:38: Warning: 
@@ -126,10 +132,11 @@
 [kernel:annot:missing-spec] unravel-variance.i:52: Warning: 
   Neither code nor specification for function printf1, generating default
   assigns. See -generated-spec-* options for more info.
-[eva] computing for function printf1 <- main.
+[eva:progress] 
+  computing for function printf1 <- main.
   Called from unravel-variance.i:52.
 [eva] using specification for function printf1
-[eva] Done for function printf1
+[eva:progress] Done for function printf1
 [eva:alarm] unravel-variance.i:53: Warning: 
   overflow in conversion from floating-point to integer.
   assert -2147483649 < var3;
@@ -139,10 +146,11 @@
 [kernel:annot:missing-spec] unravel-variance.i:53: Warning: 
   Neither code nor specification for function printf2, generating default
   assigns. See -generated-spec-* options for more info.
-[eva] computing for function printf2 <- main.
+[eva:progress] 
+  computing for function printf2 <- main.
   Called from unravel-variance.i:53.
 [eva] using specification for function printf2
-[eva] Done for function printf2
+[eva:progress] Done for function printf2
 [eva:alarm] unravel-variance.i:54: Warning: 
   overflow in conversion from floating-point to integer.
   assert -2147483649 < var4;
@@ -152,10 +160,11 @@
 [kernel:annot:missing-spec] unravel-variance.i:54: Warning: 
   Neither code nor specification for function printf3, generating default
   assigns. See -generated-spec-* options for more info.
-[eva] computing for function printf3 <- main.
+[eva:progress] 
+  computing for function printf3 <- main.
   Called from unravel-variance.i:54.
 [eva] using specification for function printf3
-[eva] Done for function printf3
+[eva:progress] Done for function printf3
 [eva:alarm] unravel-variance.i:55: Warning: 
   overflow in conversion from floating-point to integer.
   assert -2147483649 < var5;
@@ -165,10 +174,11 @@
 [kernel:annot:missing-spec] unravel-variance.i:55: Warning: 
   Neither code nor specification for function printf4, generating default
   assigns. See -generated-spec-* options for more info.
-[eva] computing for function printf4 <- main.
+[eva:progress] 
+  computing for function printf4 <- main.
   Called from unravel-variance.i:55.
 [eva] using specification for function printf4
-[eva] Done for function printf4
+[eva:progress] Done for function printf4
 [eva:alarm] unravel-variance.i:56: Warning: 
   overflow in conversion from floating-point to integer.
   assert -2147483649 < var1;
@@ -178,12 +188,13 @@
 [kernel:annot:missing-spec] unravel-variance.i:56: Warning: 
   Neither code nor specification for function printf5, generating default
   assigns. See -generated-spec-* options for more info.
-[eva] computing for function printf5 <- main.
+[eva:progress] 
+  computing for function printf5 <- main.
   Called from unravel-variance.i:56.
 [eva] using specification for function printf5
-[eva] Done for function printf5
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function printf5
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [scope:rm_asserts] removing 2 assertion(s)
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...

@@ -1,24 +1,27 @@
 [kernel] Parsing sparecode.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ {0}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from sparecode.i:18.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from sparecode.i:19.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from sparecode.i:20.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   2 functions analyzed (out of 2): 100% coverage.

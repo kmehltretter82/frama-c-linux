@@ -1,26 +1,28 @@
 [kernel] Parsing ilevel.c (with preprocessing)
 [eva] Analyzing a complete application starting at large_ilevel
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   i ∈ {0}
   j ∈ {0}
   k ∈ {0}
   l ∈ {0}
-[eva] computing for function Frama_C_interval <- large_ilevel.
+[eva:progress] 
+  computing for function Frama_C_interval <- large_ilevel.
   Called from ilevel.c:37.
 [eva] using specification for function Frama_C_interval
-[eva] ilevel.c:37: 
+[eva:progress] ilevel.c:37: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- large_ilevel.
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] 
+  computing for function Frama_C_interval <- large_ilevel.
   Called from ilevel.c:39.
-[eva] ilevel.c:39: 
+[eva:progress] ilevel.c:39: 
   function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] Recording results for large_ilevel
-[eva] Done for function large_ilevel
+[eva:progress] Done for function Frama_C_interval
+[eva:progress] Recording results for large_ilevel
+[eva:progress] Done for function large_ilevel
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function large_ilevel:
   Frama_C_entropy_source ∈ [--..--]

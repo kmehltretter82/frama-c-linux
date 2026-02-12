@@ -21,8 +21,8 @@
 [eva:widen-hints] widen_hints2.c:78: 
   adding hint from annotation: glob, { 88 } (for all statements)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t[0..99] ∈ {0}
   x ∈ {9}
@@ -43,21 +43,23 @@
 [eva:widen-hints] widen_hints2.c:79: computing dynamic hints for statement 97
 [eva:partition] widen_hints2.c:79: starting to merge loop iterations
 [eva:partition] widen_hints2.c:80: starting to merge loop iterations
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from widen_hints2.c:85.
 [eva:widen-hints] widen_hints2.c:22: computing dynamic hints for statement 4
 [eva:partition] widen_hints2.c:22: starting to merge loop iterations
 [eva:partition] widen_hints2.c:23: starting to merge loop iterations
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from widen_hints2.c:86.
 [eva:partition] widen_hints2.c:34: starting to merge loop iterations
 [eva:partition] widen_hints2.c:35: starting to merge loop iterations
-[eva] Recording results for g
-[eva] Done for function g
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   tf[0..85] ∈ {1} or UNINITIALIZED

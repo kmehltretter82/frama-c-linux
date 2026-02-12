@@ -312,7 +312,7 @@ let main () =
       if Kernel_function.has_definition kf then
         if Results.are_available kf then
           let fundec = Kernel_function.get_definition kf in
-          Self.feedback "Annotate %a" Kernel_function.pretty kf ;
+          Self.feedback ~level:4 "Annotate %a" Kernel_function.pretty kf ;
           ignore @@ Visitor.visitFramacFunction generator fundec
         else
           Self.warning "Can not annotate %a (no available results)"

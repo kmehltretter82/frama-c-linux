@@ -1,18 +1,20 @@
-69c69,74
-< [eva] from_call.i:20: Reusing old results for call to g
+74c74,80
+< [eva:progress] from_call.i:20: Reusing old results for call to g
 ---
-> [eva] computing for function g <- f <- main.
+> [eva:progress] 
+>   computing for function g <- f <- main.
 >   Called from from_call.i:20.
-> [eva] Recording results for g
+> [eva:progress] Recording results for g
 > [from] Computing for function g
 > [from] Done for function g
-> [eva] Done for function g
-79c84,89
-< [eva] from_call.i:20: Reusing old results for call to g
+> [eva:progress] Done for function g
+86c92,98
+< [eva:progress] from_call.i:20: Reusing old results for call to g
 ---
-> [eva] computing for function g <- f <- main.
+> [eva:progress] 
+>   computing for function g <- f <- main.
 >   Called from from_call.i:20.
-> [eva] Recording results for g
+> [eva:progress] Recording results for g
 > [from] Computing for function g
 > [from] Done for function g
-> [eva] Done for function g
+> [eva:progress] Done for function g

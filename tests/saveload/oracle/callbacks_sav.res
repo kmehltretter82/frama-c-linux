@@ -1,38 +1,42 @@
 [kernel] Parsing callbacks.i (no preprocessing)
 [eva] Analyzing a complete application starting at main1
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
   y ∈ {0}
-[eva] computing for function g1 <- main1.
+[eva:progress] 
+  computing for function g1 <- main1.
   Called from callbacks.i:27.
-[eva] computing for function f <- g1 <- main1.
+[eva:progress] 
+  computing for function f <- g1 <- main1.
   Called from callbacks.i:18.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] Recording results for g1
+[eva:progress] Done for function f
+[eva:progress] Recording results for g1
 [from] Computing for function g1
 [from] Done for function g1
-[eva] Done for function g1
-[eva] computing for function g2 <- main1.
+[eva:progress] Done for function g1
+[eva:progress] 
+  computing for function g2 <- main1.
   Called from callbacks.i:28.
-[eva] computing for function f <- g2 <- main1.
+[eva:progress] 
+  computing for function f <- g2 <- main1.
   Called from callbacks.i:23.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] Recording results for g2
+[eva:progress] Done for function f
+[eva:progress] Recording results for g2
 [from] Computing for function g2
 [from] Done for function g2
-[eva] Done for function g2
-[eva] Recording results for main1
+[eva:progress] Done for function g2
+[eva:progress] Recording results for main1
 [from] Computing for function main1
 [from] Done for function main1
-[eva] Done for function main1
+[eva:progress] Done for function main1
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   4 functions analyzed (out of 6): 67% coverage.

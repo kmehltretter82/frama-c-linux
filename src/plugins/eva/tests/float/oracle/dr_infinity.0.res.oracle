@@ -16,11 +16,11 @@
 [kernel:parser:decimal-float] dr_infinity.i:36: Warning: 
   Floating-point constant 0.001 is not represented exactly. Will use 0x1.0624dd2f1a9fcp-10.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva] dr_infinity.i:9: Frama_C_show_each: {0x1.fffffe0000000p127}
+[eva:show] dr_infinity.i:9: Frama_C_show_each: {0x1.fffffe0000000p127}
 [eva:alarm] dr_infinity.i:11: Warning: 
   non-finite float value.
   assert \is_finite((float)((double)3.402823567797366e+38));
@@ -37,8 +37,8 @@
   assert \is_finite((float)\div_double((double)x, (double)0.001));
 [eva:alarm] dr_infinity.i:41: Warning: 
   non-finite double value. assert \is_finite(\div_double(d, (double)0.));
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] dr_infinity.i:11: 
   assertion 'Eva,is_nan_or_infinite' got final status invalid.
 [eva] dr_infinity.i:16: 

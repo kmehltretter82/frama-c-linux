@@ -1,16 +1,17 @@
 [kernel] Parsing free.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva] computing for function main1 <- main.
+[eva:progress] 
+  computing for function main1 <- main.
   Called from free.c:44.
-[eva] free.c:8: Call to builtin malloc
+[eva:progress] free.c:8: Call to builtin malloc
 [eva:malloc:new] free.c:8: allocating variable __malloc_main1_l8
-[eva] free.c:10: Call to builtin malloc
+[eva:progress] free.c:10: Call to builtin malloc
 [eva:malloc:new] free.c:10: allocating variable __malloc_main1_l10
-[eva] free.c:13: 
+[eva:show] free.c:13: 
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
@@ -32,36 +33,42 @@
                     [2] ∈ {2}
                     [3..9] ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] free.c:14: Call to builtin free
-[eva] free.c:14: function free: precondition 'freeable' got status valid.
+[eva:progress] free.c:14: Call to builtin free
+[eva:progress] free.c:14: 
+  function free: precondition 'freeable' got status valid.
 [eva:malloc] free.c:14: 
   weak free on bases: {__malloc_main1_l8, __malloc_main1_l10}
-[eva] free.c:16: Call to builtin malloc
+[eva:progress] free.c:16: Call to builtin malloc
 [eva:malloc:new] free.c:16: allocating variable __malloc_main1_l16
-[eva] free.c:18: Call to builtin free
-[eva] free.c:18: function free: precondition 'freeable' got status valid.
+[eva:progress] free.c:18: Call to builtin free
+[eva:progress] free.c:18: 
+  function free: precondition 'freeable' got status valid.
 [eva:malloc] free.c:18: strong free on bases: {__malloc_main1_l16}
-[eva] free.c:21: Call to builtin free
-[eva] free.c:21: function free: precondition 'freeable' got status valid.
+[eva:progress] free.c:21: Call to builtin free
+[eva:progress] free.c:21: 
+  function free: precondition 'freeable' got status valid.
 [eva:malloc] free.c:21: strong free on bases: {}
-[eva] free.c:23: Call to builtin malloc
+[eva:progress] free.c:23: Call to builtin malloc
 [eva:malloc:new] free.c:23: allocating variable __malloc_main1_l23
-[eva] free.c:26: Call to builtin free
-[eva] free.c:26: function free: precondition 'freeable' got status valid.
+[eva:progress] free.c:26: Call to builtin free
+[eva:progress] free.c:26: 
+  function free: precondition 'freeable' got status valid.
 [eva:malloc] free.c:26: weak free on bases: {__malloc_main1_l23}
-[eva] Recording results for main1
-[eva] Done for function main1
-[eva] computing for function main2 <- main.
+[eva:progress] Recording results for main1
+[eva:progress] Done for function main1
+[eva:progress] 
+  computing for function main2 <- main.
   Called from free.c:45.
-[eva] free.c:35: Call to builtin malloc
+[eva:progress] free.c:35: Call to builtin malloc
 [eva:malloc:new] free.c:35: allocating variable __malloc_main2_l35
-[eva] free.c:39: Call to builtin free
-[eva] free.c:39: function free: precondition 'freeable' got status valid.
+[eva:progress] free.c:39: Call to builtin free
+[eva:progress] free.c:39: 
+  function free: precondition 'freeable' got status valid.
 [eva:malloc] free.c:39: strong free on bases: {__malloc_main2_l35}
-[eva] Recording results for main2
-[eva] Done for function main2
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main2
+[eva:progress] Done for function main2
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   __fc_heap_status ∈ [--..--]

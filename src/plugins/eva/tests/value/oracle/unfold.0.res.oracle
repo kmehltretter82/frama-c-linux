@@ -2,8 +2,8 @@
 [kernel] unfold.i:53: Warning: 
   ignoring unfolding directive (not an understood constant expression)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [eva:partition] unfold.i:35: starting to merge loop iterations
@@ -11,8 +11,8 @@
 [eva:alarm] unfold.i:36: Warning: signed overflow. assert G + i ≤ 2147483647;
 [eva:alarm] unfold.i:67: Warning: 
   loop invariant got status invalid (stopping propagation).
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   c ∈ {0}

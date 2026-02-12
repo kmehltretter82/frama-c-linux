@@ -1,20 +1,21 @@
 [kernel] Parsing variadic.i (no preprocessing)
 [impact] beginning analysis
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   y ∈ {0}
   z ∈ {0}
 [kernel:annot:missing-spec] variadic.i:12: Warning: 
   Neither code nor specification for function f, generating default assigns.
   See -generated-spec-* options for more info.
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from variadic.i:12.
 [eva] using specification for function f
-[eva] Done for function f
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function f
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [pdg] computing for function main
 [from] Computing for function f
 [from] Done for function f
@@ -26,21 +27,23 @@
 [impact] analysis done
 [impact] beginning analysis
 [eva] Analyzing a complete application starting at main1
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   y ∈ {0}
   z ∈ {0}
-[eva] computing for function g1 <- main1.
+[eva:progress] 
+  computing for function g1 <- main1.
   Called from variadic.i:29.
-[eva] Recording results for g1
-[eva] Done for function g1
-[eva] computing for function g1 <- main1.
+[eva:progress] Recording results for g1
+[eva:progress] Done for function g1
+[eva:progress] 
+  computing for function g1 <- main1.
   Called from variadic.i:30.
-[eva] Recording results for g1
-[eva] Done for function g1
-[eva] Recording results for main1
-[eva] Done for function main1
+[eva:progress] Recording results for g1
+[eva:progress] Done for function g1
+[eva:progress] Recording results for main1
+[eva:progress] Done for function main1
 [pdg] computing for function main1
 [from] Computing for function g1
 [from] Done for function g1
@@ -57,20 +60,22 @@
 [impact] analysis done
 [impact] beginning analysis
 [eva] Analyzing a complete application starting at main2
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   y ∈ {0}
   z ∈ {0}
-[eva] computing for function g2 <- main2.
+[eva:progress] 
+  computing for function g2 <- main2.
   Called from variadic.i:37.
 [eva] using specification for function g2
-[eva] Done for function g2
-[eva] computing for function g2 <- main2.
+[eva:progress] Done for function g2
+[eva:progress] 
+  computing for function g2 <- main2.
   Called from variadic.i:38.
-[eva] Done for function g2
-[eva] Recording results for main2
-[eva] Done for function main2
+[eva:progress] Done for function g2
+[eva:progress] Recording results for main2
+[eva:progress] Done for function main2
 [pdg] computing for function main2
 [from] Computing for function g2
 [from] Done for function g2
@@ -85,37 +90,43 @@
 [impact] analysis done
 [impact] beginning analysis
 [eva] Analyzing a complete application starting at main3
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   y ∈ {0}
   z ∈ {0}
-[eva] computing for function aux3 <- main3.
+[eva:progress] 
+  computing for function aux3 <- main3.
   Called from variadic.i:57.
-[eva] computing for function g1 <- aux3 <- main3.
+[eva:progress] 
+  computing for function g1 <- aux3 <- main3.
   Called from variadic.i:51.
-[eva] Recording results for g1
-[eva] Done for function g1
-[eva] computing for function g1 <- aux3 <- main3.
+[eva:progress] Recording results for g1
+[eva:progress] Done for function g1
+[eva:progress] 
+  computing for function g1 <- aux3 <- main3.
   Called from variadic.i:52.
-[eva] Recording results for g1
-[eva] Done for function g1
-[eva] Recording results for aux3
-[eva] Done for function aux3
-[eva] computing for function aux3 <- main3.
+[eva:progress] Recording results for g1
+[eva:progress] Done for function g1
+[eva:progress] Recording results for aux3
+[eva:progress] Done for function aux3
+[eva:progress] 
+  computing for function aux3 <- main3.
   Called from variadic.i:58.
-[eva] computing for function g1 <- aux3 <- main3.
+[eva:progress] 
+  computing for function g1 <- aux3 <- main3.
   Called from variadic.i:51.
-[eva] Recording results for g1
-[eva] Done for function g1
-[eva] computing for function g1 <- aux3 <- main3.
+[eva:progress] Recording results for g1
+[eva:progress] Done for function g1
+[eva:progress] 
+  computing for function g1 <- aux3 <- main3.
   Called from variadic.i:52.
-[eva] Recording results for g1
-[eva] Done for function g1
-[eva] Recording results for aux3
-[eva] Done for function aux3
-[eva] Recording results for main3
-[eva] Done for function main3
+[eva:progress] Recording results for g1
+[eva:progress] Done for function g1
+[eva:progress] Recording results for aux3
+[eva:progress] Done for function aux3
+[eva:progress] Recording results for main3
+[eva:progress] Done for function main3
 [pdg] computing for function aux3
 [from] Computing for function g1
 [from] Done for function g1
@@ -137,26 +148,29 @@
 [impact] analysis done
 [impact] beginning analysis
 [eva] Analyzing a complete application starting at main4
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   y ∈ {0}
   z ∈ {0}
-[eva] computing for function aux4bis <- main4.
+[eva:progress] 
+  computing for function aux4bis <- main4.
   Called from variadic.i:73.
-[eva] computing for function aux4 <- aux4bis <- main4.
+[eva:progress] 
+  computing for function aux4 <- aux4bis <- main4.
   Called from variadic.i:68.
-[eva] Recording results for aux4
-[eva] Done for function aux4
-[eva] Recording results for aux4bis
-[eva] Done for function aux4bis
-[eva] computing for function aux4bis <- main4.
+[eva:progress] Recording results for aux4
+[eva:progress] Done for function aux4
+[eva:progress] Recording results for aux4bis
+[eva:progress] Done for function aux4bis
+[eva:progress] 
+  computing for function aux4bis <- main4.
   Called from variadic.i:74.
-[eva] variadic.i:68: Reusing old results for call to aux4
-[eva] Recording results for aux4bis
-[eva] Done for function aux4bis
-[eva] Recording results for main4
-[eva] Done for function main4
+[eva:progress] variadic.i:68: Reusing old results for call to aux4
+[eva:progress] Recording results for aux4bis
+[eva:progress] Done for function aux4bis
+[eva:progress] Recording results for main4
+[eva:progress] Done for function main4
 [pdg] computing for function aux4
 [pdg] done for function aux4
 [pdg] computing for function aux4bis

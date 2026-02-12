@@ -1,7 +1,7 @@
-38,39d37
+41,42d40
 < [eva:alarm] alloc_weak.c:30: Warning: 
 <   accessing uninitialized left-value. assert \initialized(p);
-958c956
+964c962
 <   r ∈ [--..--]
 ---
 >   r ∈ {42}

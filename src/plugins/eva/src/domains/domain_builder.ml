@@ -91,7 +91,7 @@ module Complete (Domain: InputDomain) = struct
   let log_category =
     let help =
       Format.asprintf
-        "print states of the %s domain on some user directives" Domain.name
+        "print states of the %s domain" Domain.name
     in
     Self.register_category ("d-" ^ Domain.name) ~help
 

@@ -1,6 +1,6 @@
 /* run.config*
    PLUGIN: @EVA_MAIN_PLUGINS@ inout,slicing
-   OPT: -eva @EVA_CONFIG@ -slice-return main -then-on "Slicing export" -eva -eva-ilevel 16 -eva-show-progress -then-on "default" -eva-ilevel 17 -then -eva-ilevel 48
+   OPT: -eva @EVA_CONFIG@ -slice-return main -then-on "Slicing export" -eva -eva-ilevel 16 -eva-msg-key=progress -then-on "default" -eva-ilevel 17 -then -eva-ilevel 48
    STDOPT: +"-eva-ilevel 400 -main large_ilevel"
 */
 

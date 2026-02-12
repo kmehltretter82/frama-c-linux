@@ -1,21 +1,22 @@
 [kernel] Parsing init_const_guard.i (no preprocessing)
 [eva] Analyzing a complete application starting at f
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
   q ∈ {{ &x }}
   p ∈ {{ &x }}
   v ∈ [--..--]
-[eva] init_const_guard.i:14: function f: postcondition 'Const' got status valid.
-[eva] init_const_guard.i:15: 
+[eva:progress] init_const_guard.i:14: 
+  function f: postcondition 'Const' got status valid.
+[eva:progress] init_const_guard.i:15: 
   function f: postcondition 'Pointed_Valid' got status valid.
-[eva] init_const_guard.i:16: 
+[eva:progress] init_const_guard.i:16: 
   function f: postcondition 'Q_ReadOnly' got status valid.
-[eva] init_const_guard.i:17: 
+[eva:progress] init_const_guard.i:17: 
   function f: postcondition 'Q_NotWrite' got status valid.
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   __retres ∈ {0}
@@ -73,19 +74,20 @@
      9 Total
 --------------------------------------------------------------------------------
 [eva] Analyzing a complete application starting at g
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
   q ∈ {{ &x }}
   p ∈ {{ &x }}
   v ∈ [--..--]
-[eva] init_const_guard.i:32: assertion 'Read' got status valid.
-[eva] init_const_guard.i:33: assertion 'Guard_against_Const' got status valid.
-[eva] init_const_guard.i:27: 
+[eva:progress] init_const_guard.i:32: assertion 'Read' got status valid.
+[eva:progress] init_const_guard.i:33: 
+  assertion 'Guard_against_Const' got status valid.
+[eva:progress] init_const_guard.i:27: 
   function g: postcondition 'P_not_Const' got status valid.
-[eva] Recording results for g
-[eva] Done for function g
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function g:
   x ∈ {0; 2}
@@ -136,16 +138,16 @@
      5 Total
 --------------------------------------------------------------------------------
 [eva] Analyzing an incomplete application starting at f
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ [--..--]
   q ∈ {{ &x }}
   p ∈ {{ NULL ; &S_p[0] }}
   v ∈ [--..--]
   S_p[0..1] ∈ [--..--]
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   __retres ∈ {0}
@@ -207,16 +209,16 @@
     10 Total
 --------------------------------------------------------------------------------
 [eva] Analyzing an incomplete application starting at g
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ [--..--]
   q ∈ {{ &x }}
   p ∈ {{ NULL ; &S_p_0[0] }}
   v ∈ [--..--]
   S_p_0[0..1] ∈ [--..--]
-[eva] Recording results for g
-[eva] Done for function g
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function g:
   x ∈ [--..--]

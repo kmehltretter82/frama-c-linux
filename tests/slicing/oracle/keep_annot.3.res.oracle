@@ -1,8 +1,8 @@
 [kernel] Parsing keep_annot.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing an incomplete application starting at L
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva:alarm] keep_annot.i:40: Warning: 
@@ -17,8 +17,8 @@
                                \mul_double((double)*(dabs + (int)(ii + 1)),
                                           (double)2.0)));
 [eva:alarm] keep_annot.i:42: Warning: assertion got status unknown.
-[eva] Recording results for L
-[eva] Done for function L
+[eva:progress] Recording results for L
+[eva:progress] Done for function L
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function L

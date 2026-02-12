@@ -9,17 +9,19 @@
   Frama-C kernel emits status unknown for property behavior t_not_null
   under 0 hypothesis
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from behavior_statuses.i:26.
 [eva] using specification for function f
 [kernel:prop-status:emit] 
   Call Preconditions emits status unknown for property requires
   \valid_read(filename) under 2 hypothesis
-[eva] behavior_statuses.i:26: function f: precondition got status valid.
+[eva:progress] behavior_statuses.i:26: 
+  function f: precondition got status valid.
 [kernel:prop-status:emit] 
   Eva emits status VALID for property status of 'requires
   \valid_read(filename)' of f at stmt 4 under 0 hypothesis
@@ -35,17 +37,19 @@
 [kernel:prop-status:emit] 
   Eva emits status VALID for property status of 'requires
   \valid_read(t)' of f at stmt 4 under 0 hypothesis
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from behavior_statuses.i:27.
-[eva] behavior_statuses.i:27: function f: precondition got status valid.
+[eva:progress] behavior_statuses.i:27: 
+  function f: precondition got status valid.
 [kernel:prop-status:emit] 
   Eva emits status VALID for property status of 'requires
   \valid_read(filename)' of f at stmt 5 under 0 hypothesis
 [kernel:prop-status:emit] 
   Eva emits status VALID for property status of 'requires
   \valid_read(filename)' of f at stmt 5 under 0 hypothesis
-[eva] behavior_statuses.i:27: 
+[eva:progress] behavior_statuses.i:27: 
   function f, behavior t_not_null: precondition got status valid.
 [kernel:prop-status:emit] 
   Eva emits status VALID for property status of 'requires
@@ -53,9 +57,9 @@
 [kernel:prop-status:emit] 
   Eva emits status VALID for property status of 'requires
   \valid_read(t)' of f at stmt 5 under 0 hypothesis
-[eva] Done for function f
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function f
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   t.t ∈ {1}

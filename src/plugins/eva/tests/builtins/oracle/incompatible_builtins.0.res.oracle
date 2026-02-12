@@ -15,43 +15,48 @@
   Builtin pow will not be used for function pow of incompatible type int 
   (int a, int b).
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function pow <- main.
+[eva:progress] 
+  computing for function pow <- main.
   Called from incompatible_builtins.i:40.
-[eva] Recording results for pow
-[eva] Done for function pow
-[eva] computing for function exp <- main.
+[eva:progress] Recording results for pow
+[eva:progress] Done for function pow
+[eva:progress] 
+  computing for function exp <- main.
   Called from incompatible_builtins.i:41.
 [eva] using specification for function exp
-[eva] Done for function exp
+[eva:progress] Done for function exp
 [kernel:annot:missing-spec] incompatible_builtins.i:42: Warning: 
   Neither code nor explicit assigns for function sqrt, generating default
   clauses. See -generated-spec-* options for more info.
-[eva] computing for function sqrt <- main.
+[eva:progress] 
+  computing for function sqrt <- main.
   Called from incompatible_builtins.i:42.
 [eva] using specification for function sqrt
-[eva] incompatible_builtins.i:42: 
+[eva:progress] incompatible_builtins.i:42: 
   function sqrt: precondition 'finite_positive_arg' got status valid.
-[eva] Done for function sqrt
+[eva:progress] Done for function sqrt
 [kernel:annot:missing-spec] incompatible_builtins.i:43: Warning: 
   Neither code nor explicit assigns for function floor, generating default
   clauses from the specification. See -generated-spec-* options for more info.
-[eva] computing for function floor <- main.
+[eva:progress] 
+  computing for function floor <- main.
   Called from incompatible_builtins.i:43.
 [eva] using specification for function floor
-[eva] Done for function floor
+[eva:progress] Done for function floor
 [kernel:annot:missing-spec] incompatible_builtins.i:44: Warning: 
   Neither code nor specification for function ceil, generating default assigns.
   See -generated-spec-* options for more info.
-[eva] computing for function ceil <- main.
+[eva:progress] 
+  computing for function ceil <- main.
   Called from incompatible_builtins.i:44.
 [eva] using specification for function ceil
-[eva] Done for function ceil
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function ceil
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function pow:
   x ∈ {16}

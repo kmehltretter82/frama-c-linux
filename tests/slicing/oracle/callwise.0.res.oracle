@@ -1,110 +1,125 @@
 [kernel] Parsing callwise.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   a ∈ {1}
   b ∈ {1}
   c ∈ {1}
   d ∈ {1}
   p ∈ {0}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from callwise.i:39.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from callwise.i:40.
-[eva] Recording results for f
+[eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
-[eva] Done for function f
-[eva] computing for function choose <- main.
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function choose <- main.
   Called from callwise.i:42.
-[eva] Recording results for choose
+[eva:progress] Recording results for choose
 [from] Computing for function choose
 [from] Done for function choose
-[eva] Done for function choose
-[eva] computing for function choose <- main.
+[eva:progress] Done for function choose
+[eva:progress] 
+  computing for function choose <- main.
   Called from callwise.i:43.
-[eva] Recording results for choose
+[eva:progress] Recording results for choose
 [from] Computing for function choose
 [from] Done for function choose
-[eva] Done for function choose
-[eva] computing for function fs163_main <- main.
+[eva:progress] Done for function choose
+[eva:progress] 
+  computing for function fs163_main <- main.
   Called from callwise.i:45.
-[eva] computing for function fs163_f <- fs163_main <- main.
+[eva:progress] 
+  computing for function fs163_f <- fs163_main <- main.
   Called from callwise.i:24.
-[eva] Recording results for fs163_f
+[eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
-[eva] Done for function fs163_f
-[eva] computing for function fs163_f <- fs163_main <- main.
+[eva:progress] Done for function fs163_f
+[eva:progress] 
+  computing for function fs163_f <- fs163_main <- main.
   Called from callwise.i:25.
-[eva] Recording results for fs163_f
+[eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
-[eva] Done for function fs163_f
-[eva] computing for function fs163_f <- fs163_main <- main.
+[eva:progress] Done for function fs163_f
+[eva:progress] 
+  computing for function fs163_f <- fs163_main <- main.
   Called from callwise.i:26.
-[eva] Recording results for fs163_f
+[eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
-[eva] Done for function fs163_f
-[eva] computing for function fs163_f <- fs163_main <- main.
+[eva:progress] Done for function fs163_f
+[eva:progress] 
+  computing for function fs163_f <- fs163_main <- main.
   Called from callwise.i:27.
-[eva] Recording results for fs163_f
+[eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
-[eva] Done for function fs163_f
-[eva] computing for function fs163_f <- fs163_main <- main.
+[eva:progress] Done for function fs163_f
+[eva:progress] 
+  computing for function fs163_f <- fs163_main <- main.
   Called from callwise.i:28.
-[eva] Recording results for fs163_f
+[eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
-[eva] Done for function fs163_f
-[eva] computing for function fs163_f <- fs163_main <- main.
+[eva:progress] Done for function fs163_f
+[eva:progress] 
+  computing for function fs163_f <- fs163_main <- main.
   Called from callwise.i:30.
-[eva] Recording results for fs163_f
+[eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
-[eva] Done for function fs163_f
+[eva:progress] Done for function fs163_f
 [eva:partition] callwise.i:29: starting to merge loop iterations
-[eva] computing for function fs163_f <- fs163_main <- main.
+[eva:progress] 
+  computing for function fs163_f <- fs163_main <- main.
   Called from callwise.i:30.
-[eva] Recording results for fs163_f
+[eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
-[eva] Done for function fs163_f
-[eva] computing for function fs163_f <- fs163_main <- main.
+[eva:progress] Done for function fs163_f
+[eva:progress] 
+  computing for function fs163_f <- fs163_main <- main.
   Called from callwise.i:30.
-[eva] Recording results for fs163_f
+[eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
-[eva] Done for function fs163_f
-[eva] computing for function fs163_f <- fs163_main <- main.
+[eva:progress] Done for function fs163_f
+[eva:progress] 
+  computing for function fs163_f <- fs163_main <- main.
   Called from callwise.i:30.
-[eva] Recording results for fs163_f
+[eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
-[eva] Done for function fs163_f
-[eva] computing for function fs163_f <- fs163_main <- main.
+[eva:progress] Done for function fs163_f
+[eva:progress] 
+  computing for function fs163_f <- fs163_main <- main.
   Called from callwise.i:30.
-[eva] Recording results for fs163_f
+[eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
-[eva] Done for function fs163_f
+[eva:progress] Done for function fs163_f
 [eva:alarm] callwise.i:32: Warning: 
   accessing uninitialized left-value. assert \initialized(&T[3]);
-[eva] Recording results for fs163_main
+[eva:progress] Recording results for fs163_main
 [from] Computing for function fs163_main
 [from] Done for function fs163_main
-[eva] Done for function fs163_main
-[eva] Recording results for main
+[eva:progress] Done for function fs163_main
+[eva:progress] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] Done for function main
+[eva:progress] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to fs163_f at callwise.i:24 (by fs163_main):
   A FROM p_0; n

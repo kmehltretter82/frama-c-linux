@@ -1,7 +1,7 @@
 [kernel] Parsing mixed_val.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   T[0] ∈ {97}
    [1..9] ∈ {0}
@@ -10,8 +10,8 @@
   c ∈ {0}
   d ∈ {0}
   e ∈ {0}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   T[0] ∈ {-2999}

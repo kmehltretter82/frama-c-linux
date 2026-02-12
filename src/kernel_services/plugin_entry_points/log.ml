@@ -817,6 +817,7 @@ sig
   val pp_all_categories: unit -> unit
 
   val dkey_name: category -> string
+  val get_category_help: category -> string
 
   val is_registered_category: string -> bool
 

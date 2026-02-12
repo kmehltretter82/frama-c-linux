@@ -6,8 +6,8 @@
     other functions:
     \full_split(@all)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   i2 ∈ [--..--]
   i3 ∈ [--..--]
@@ -16,202 +16,240 @@
   v ∈ [--..--]
   v7 ∈ {0}
   rand ∈ [--..--]
-[eva] computing for function main1 <- main.
+[eva:progress] 
+  computing for function main1 <- main.
   Called from split_return.i:209.
-[eva] computing for function init <- main1 <- main.
+[eva:progress] 
+  computing for function init <- main1 <- main.
   Called from split_return.i:22.
 [eva] using specification for function init
-[eva] Done for function init
-[eva] Recording results for main1
-[eva] Done for function main1
-[eva] computing for function main2 <- main.
+[eva:progress] Done for function init
+[eva:progress] Recording results for main1
+[eva:progress] Done for function main1
+[eva:progress] 
+  computing for function main2 <- main.
   Called from split_return.i:210.
-[eva] computing for function f2 <- main2 <- main.
+[eva:progress] 
+  computing for function f2 <- main2 <- main.
   Called from split_return.i:53.
-[eva] Recording results for f2
-[eva] Done for function f2
-[eva] split_return.i:54: Frama_C_show_each_f2: {0}, {0}
-[eva] split_return.i:54: Frama_C_show_each_f2: {5}, {5}
-[eva] split_return.i:54: Frama_C_show_each_f2: {7}, {5}
-[eva] split_return.i:56: assertion got status valid.
-[eva] split_return.i:58: Frama_C_show_each_f2_2: {5}, {5}
-[eva] split_return.i:58: Frama_C_show_each_f2_2: {7}, {5}
-[eva] split_return.i:59: assertion got status valid.
-[eva] Recording results for main2
-[eva] Done for function main2
-[eva] computing for function main3 <- main.
+[eva:progress] Recording results for f2
+[eva:progress] Done for function f2
+[eva:show] split_return.i:54: Frama_C_show_each_f2: {0}, {0}
+[eva:show] split_return.i:54: Frama_C_show_each_f2: {5}, {5}
+[eva:show] split_return.i:54: Frama_C_show_each_f2: {7}, {5}
+[eva:progress] split_return.i:56: assertion got status valid.
+[eva:show] split_return.i:58: Frama_C_show_each_f2_2: {5}, {5}
+[eva:show] split_return.i:58: Frama_C_show_each_f2_2: {7}, {5}
+[eva:progress] split_return.i:59: assertion got status valid.
+[eva:progress] Recording results for main2
+[eva:progress] Done for function main2
+[eva:progress] 
+  computing for function main3 <- main.
   Called from split_return.i:211.
-[eva] computing for function f3 <- main3 <- main.
+[eva:progress] 
+  computing for function f3 <- main3 <- main.
   Called from split_return.i:78.
-[eva] Recording results for f3
-[eva] Done for function f3
-[eva] split_return.i:79: Frama_C_show_each_f3: {7}, {5}
-[eva] split_return.i:79: Frama_C_show_each_f3: {-2}, {0}
-[eva] split_return.i:81: assertion got status valid.
-[eva] split_return.i:83: assertion got status valid.
-[eva] Recording results for main3
-[eva] Done for function main3
-[eva] computing for function main3 <- main.
+[eva:progress] Recording results for f3
+[eva:progress] Done for function f3
+[eva:show] split_return.i:79: Frama_C_show_each_f3: {7}, {5}
+[eva:show] split_return.i:79: Frama_C_show_each_f3: {-2}, {0}
+[eva:progress] split_return.i:81: assertion got status valid.
+[eva:progress] split_return.i:83: assertion got status valid.
+[eva:progress] Recording results for main3
+[eva:progress] Done for function main3
+[eva:progress] 
+  computing for function main3 <- main.
   Called from split_return.i:211.
-[eva] computing for function f3 <- main3 <- main.
+[eva:progress] 
+  computing for function f3 <- main3 <- main.
   Called from split_return.i:78.
-[eva] Recording results for f3
-[eva] Done for function f3
-[eva] split_return.i:79: Frama_C_show_each_f3: {7}, {5}
-[eva] split_return.i:79: Frama_C_show_each_f3: {-2}, {0}
-[eva] Recording results for main3
-[eva] Done for function main3
-[eva] computing for function main4 <- main.
+[eva:progress] Recording results for f3
+[eva:progress] Done for function f3
+[eva:show] split_return.i:79: Frama_C_show_each_f3: {7}, {5}
+[eva:show] split_return.i:79: Frama_C_show_each_f3: {-2}, {0}
+[eva:progress] Recording results for main3
+[eva:progress] Done for function main3
+[eva:progress] 
+  computing for function main4 <- main.
   Called from split_return.i:212.
-[eva] computing for function f4 <- main4 <- main.
+[eva:progress] 
+  computing for function f4 <- main4 <- main.
   Called from split_return.i:99.
-[eva] Recording results for f4
-[eva] Done for function f4
-[eva] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
-[eva] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
-[eva] split_return.i:102: assertion got status valid.
-[eva] split_return.i:104: assertion got status valid.
-[eva] Recording results for main4
-[eva] Done for function main4
-[eva] computing for function main4 <- main.
+[eva:progress] Recording results for f4
+[eva:progress] Done for function f4
+[eva:show] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
+[eva:show] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
+[eva:progress] split_return.i:102: assertion got status valid.
+[eva:progress] split_return.i:104: assertion got status valid.
+[eva:progress] Recording results for main4
+[eva:progress] Done for function main4
+[eva:progress] 
+  computing for function main4 <- main.
   Called from split_return.i:212.
-[eva] computing for function f4 <- main4 <- main.
+[eva:progress] 
+  computing for function f4 <- main4 <- main.
   Called from split_return.i:99.
-[eva] Recording results for f4
-[eva] Done for function f4
-[eva] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
-[eva] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
-[eva] Recording results for main4
-[eva] Done for function main4
-[eva] computing for function main4 <- main.
+[eva:progress] Recording results for f4
+[eva:progress] Done for function f4
+[eva:show] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
+[eva:show] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
+[eva:progress] Recording results for main4
+[eva:progress] Done for function main4
+[eva:progress] 
+  computing for function main4 <- main.
   Called from split_return.i:212.
-[eva] computing for function f4 <- main4 <- main.
+[eva:progress] 
+  computing for function f4 <- main4 <- main.
   Called from split_return.i:99.
-[eva] Recording results for f4
-[eva] Done for function f4
-[eva] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
-[eva] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
-[eva] Recording results for main4
-[eva] Done for function main4
-[eva] computing for function main4 <- main.
+[eva:progress] Recording results for f4
+[eva:progress] Done for function f4
+[eva:show] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
+[eva:show] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
+[eva:progress] Recording results for main4
+[eva:progress] Done for function main4
+[eva:progress] 
+  computing for function main4 <- main.
   Called from split_return.i:212.
-[eva] computing for function f4 <- main4 <- main.
+[eva:progress] 
+  computing for function f4 <- main4 <- main.
   Called from split_return.i:99.
-[eva] Recording results for f4
-[eva] Done for function f4
-[eva] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
-[eva] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
-[eva] Recording results for main4
-[eva] Done for function main4
-[eva] computing for function main5 <- main.
+[eva:progress] Recording results for f4
+[eva:progress] Done for function f4
+[eva:show] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
+[eva:show] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
+[eva:progress] Recording results for main4
+[eva:progress] Done for function main4
+[eva:progress] 
+  computing for function main5 <- main.
   Called from split_return.i:213.
-[eva] computing for function f5 <- main5 <- main.
+[eva:progress] 
+  computing for function f5 <- main5 <- main.
   Called from split_return.i:122.
-[eva] Recording results for f5
-[eva] Done for function f5
-[eva] split_return.i:123: Frama_C_show_each_f5: {7}, {5}
-[eva] split_return.i:123: Frama_C_show_each_f5: {-2}, {0}
-[eva] split_return.i:125: assertion got status valid.
-[eva] split_return.i:127: assertion got status valid.
-[eva] Recording results for main5
-[eva] Done for function main5
-[eva] computing for function main6 <- main.
+[eva:progress] Recording results for f5
+[eva:progress] Done for function f5
+[eva:show] split_return.i:123: Frama_C_show_each_f5: {7}, {5}
+[eva:show] split_return.i:123: Frama_C_show_each_f5: {-2}, {0}
+[eva:progress] split_return.i:125: assertion got status valid.
+[eva:progress] split_return.i:127: assertion got status valid.
+[eva:progress] Recording results for main5
+[eva:progress] Done for function main5
+[eva:progress] 
+  computing for function main6 <- main.
   Called from split_return.i:214.
-[eva] computing for function f6 <- main6 <- main.
+[eva:progress] 
+  computing for function f6 <- main6 <- main.
   Called from split_return.i:140.
 [eva:alarm] split_return.i:135: Warning: assertion got status unknown.
-[eva] Recording results for f6
-[eva] Done for function f6
-[eva] Recording results for main6
-[eva] Done for function main6
-[eva] computing for function main6 <- main.
+[eva:progress] Recording results for f6
+[eva:progress] Done for function f6
+[eva:progress] Recording results for main6
+[eva:progress] Done for function main6
+[eva:progress] 
+  computing for function main6 <- main.
   Called from split_return.i:214.
-[eva] computing for function f6 <- main6 <- main.
+[eva:progress] 
+  computing for function f6 <- main6 <- main.
   Called from split_return.i:140.
-[eva] Recording results for f6
-[eva] Done for function f6
-[eva] Recording results for main6
-[eva] Done for function main6
-[eva] computing for function main7 <- main.
+[eva:progress] Recording results for f6
+[eva:progress] Done for function f6
+[eva:progress] Recording results for main6
+[eva:progress] Done for function main6
+[eva:progress] 
+  computing for function main7 <- main.
   Called from split_return.i:215.
-[eva] computing for function f7 <- main7 <- main.
+[eva:progress] 
+  computing for function f7 <- main7 <- main.
   Called from split_return.i:153.
-[eva] Recording results for f7
-[eva] Done for function f7
-[eva] split_return.i:158: Frama_C_show_each_NULL: {{ &v }}, {1}
-[eva] split_return.i:158: Frama_C_show_each_NULL: {0}, {0}
-[eva] Recording results for main7
-[eva] Done for function main7
-[eva] computing for function main7 <- main.
+[eva:progress] Recording results for f7
+[eva:progress] Done for function f7
+[eva:show] split_return.i:158: Frama_C_show_each_NULL: {{ &v }}, {1}
+[eva:show] split_return.i:158: Frama_C_show_each_NULL: {0}, {0}
+[eva:progress] Recording results for main7
+[eva:progress] Done for function main7
+[eva:progress] 
+  computing for function main7 <- main.
   Called from split_return.i:215.
-[eva] computing for function f7 <- main7 <- main.
+[eva:progress] 
+  computing for function f7 <- main7 <- main.
   Called from split_return.i:153.
-[eva] Recording results for f7
-[eva] Done for function f7
-[eva] split_return.i:158: Frama_C_show_each_NULL: {{ &v }}, {1}
-[eva] split_return.i:158: Frama_C_show_each_NULL: {0}, {0}
-[eva] Recording results for main7
-[eva] Done for function main7
-[eva] computing for function main8 <- main.
+[eva:progress] Recording results for f7
+[eva:progress] Done for function f7
+[eva:show] split_return.i:158: Frama_C_show_each_NULL: {{ &v }}, {1}
+[eva:show] split_return.i:158: Frama_C_show_each_NULL: {0}, {0}
+[eva:progress] Recording results for main7
+[eva:progress] Done for function main7
+[eva:progress] 
+  computing for function main8 <- main.
   Called from split_return.i:216.
-[eva] computing for function f8 <- main8 <- main.
+[eva:progress] 
+  computing for function f8 <- main8 <- main.
   Called from split_return.i:176.
-[eva] Recording results for f8
-[eva] Done for function f8
-[eva] split_return.i:177: Frama_C_show_each_then8: {4}, {{ &x }}
-[eva] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
-[eva] Recording results for main8
-[eva] Done for function main8
-[eva] computing for function main8 <- main.
+[eva:progress] Recording results for f8
+[eva:progress] Done for function f8
+[eva:show] split_return.i:177: Frama_C_show_each_then8: {4}, {{ &x }}
+[eva:show] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
+[eva:progress] Recording results for main8
+[eva:progress] Done for function main8
+[eva:progress] 
+  computing for function main8 <- main.
   Called from split_return.i:216.
-[eva] computing for function f8 <- main8 <- main.
+[eva:progress] 
+  computing for function f8 <- main8 <- main.
   Called from split_return.i:176.
-[eva] Recording results for f8
-[eva] Done for function f8
-[eva] split_return.i:177: Frama_C_show_each_then8: {4}, {{ &x }}
-[eva] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
-[eva] Recording results for main8
-[eva] Done for function main8
-[eva] computing for function main8 <- main.
+[eva:progress] Recording results for f8
+[eva:progress] Done for function f8
+[eva:show] split_return.i:177: Frama_C_show_each_then8: {4}, {{ &x }}
+[eva:show] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
+[eva:progress] Recording results for main8
+[eva:progress] Done for function main8
+[eva:progress] 
+  computing for function main8 <- main.
   Called from split_return.i:216.
-[eva] computing for function f8 <- main8 <- main.
+[eva:progress] 
+  computing for function f8 <- main8 <- main.
   Called from split_return.i:176.
-[eva] Recording results for f8
-[eva] Done for function f8
-[eva] split_return.i:177: Frama_C_show_each_then8: {4}, {{ &x }}
-[eva] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
-[eva] Recording results for main8
-[eva] Done for function main8
-[eva] computing for function main8 <- main.
+[eva:progress] Recording results for f8
+[eva:progress] Done for function f8
+[eva:show] split_return.i:177: Frama_C_show_each_then8: {4}, {{ &x }}
+[eva:show] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
+[eva:progress] Recording results for main8
+[eva:progress] Done for function main8
+[eva:progress] 
+  computing for function main8 <- main.
   Called from split_return.i:216.
-[eva] computing for function f8 <- main8 <- main.
+[eva:progress] 
+  computing for function f8 <- main8 <- main.
   Called from split_return.i:176.
-[eva] Recording results for f8
-[eva] Done for function f8
-[eva] split_return.i:177: Frama_C_show_each_then8: {4}, {{ &x }}
-[eva] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
-[eva] Recording results for main8
-[eva] Done for function main8
-[eva] computing for function main9 <- main.
+[eva:progress] Recording results for f8
+[eva:progress] Done for function f8
+[eva:show] split_return.i:177: Frama_C_show_each_then8: {4}, {{ &x }}
+[eva:show] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
+[eva:progress] Recording results for main8
+[eva:progress] Done for function main8
+[eva:progress] 
+  computing for function main9 <- main.
   Called from split_return.i:217.
-[eva] computing for function uninit <- main9 <- main.
+[eva:progress] 
+  computing for function uninit <- main9 <- main.
   Called from split_return.i:204.
-[eva] Recording results for uninit
-[eva] Done for function uninit
-[eva] computing for function escaping <- main9 <- main.
+[eva:progress] Recording results for uninit
+[eva:progress] Done for function uninit
+[eva:progress] 
+  computing for function escaping <- main9 <- main.
   Called from split_return.i:205.
 [eva:locals-escaping] split_return.i:197: Warning: 
   locals {x} escaping the scope of a block of escaping through p
-[eva] Recording results for escaping
-[eva] Done for function escaping
-[eva] computing for function escaping <- main9 <- main.
+[eva:progress] Recording results for escaping
+[eva:progress] Done for function escaping
+[eva:progress] 
+  computing for function escaping <- main9 <- main.
   Called from split_return.i:205.
-[eva] Recording results for escaping
-[eva] Done for function escaping
-[eva] Recording results for main9
-[eva] Done for function main9
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for escaping
+[eva:progress] Done for function escaping
+[eva:progress] Recording results for main9
+[eva:progress] Done for function main9
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function escaping:
   p ∈ ESCAPINGADDR
@@ -450,8 +488,8 @@
     other functions:
     \full_split(@all)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   i2 ∈ [--..--]
   i3 ∈ [--..--]
@@ -460,188 +498,226 @@
   v ∈ [--..--]
   v7 ∈ {0}
   rand ∈ [--..--]
-[eva] computing for function main1 <- main.
+[eva:progress] 
+  computing for function main1 <- main.
   Called from split_return.i:209.
-[eva] computing for function init <- main1 <- main.
+[eva:progress] 
+  computing for function init <- main1 <- main.
   Called from split_return.i:22.
-[eva] Done for function init
-[eva] Recording results for main1
-[eva] Done for function main1
-[eva] computing for function main2 <- main.
+[eva:progress] Done for function init
+[eva:progress] Recording results for main1
+[eva:progress] Done for function main1
+[eva:progress] 
+  computing for function main2 <- main.
   Called from split_return.i:210.
-[eva] computing for function f2 <- main2 <- main.
+[eva:progress] 
+  computing for function f2 <- main2 <- main.
   Called from split_return.i:53.
-[eva] Recording results for f2
-[eva] Done for function f2
-[eva] split_return.i:54: Frama_C_show_each_f2: {5; 7}, {5}
-[eva] split_return.i:54: Frama_C_show_each_f2: {0}, {0}
-[eva] split_return.i:58: Frama_C_show_each_f2_2: {5; 7}, {5}
-[eva] Recording results for main2
-[eva] Done for function main2
-[eva] computing for function main3 <- main.
+[eva:progress] Recording results for f2
+[eva:progress] Done for function f2
+[eva:show] split_return.i:54: Frama_C_show_each_f2: {5; 7}, {5}
+[eva:show] split_return.i:54: Frama_C_show_each_f2: {0}, {0}
+[eva:show] split_return.i:58: Frama_C_show_each_f2_2: {5; 7}, {5}
+[eva:progress] Recording results for main2
+[eva:progress] Done for function main2
+[eva:progress] 
+  computing for function main3 <- main.
   Called from split_return.i:211.
-[eva] computing for function f3 <- main3 <- main.
+[eva:progress] 
+  computing for function f3 <- main3 <- main.
   Called from split_return.i:78.
-[eva] Recording results for f3
-[eva] Done for function f3
-[eva] split_return.i:79: Frama_C_show_each_f3: {7}, {5}
-[eva] split_return.i:79: Frama_C_show_each_f3: {-2}, {0}
-[eva] Recording results for main3
-[eva] Done for function main3
-[eva] computing for function main3 <- main.
+[eva:progress] Recording results for f3
+[eva:progress] Done for function f3
+[eva:show] split_return.i:79: Frama_C_show_each_f3: {7}, {5}
+[eva:show] split_return.i:79: Frama_C_show_each_f3: {-2}, {0}
+[eva:progress] Recording results for main3
+[eva:progress] Done for function main3
+[eva:progress] 
+  computing for function main3 <- main.
   Called from split_return.i:211.
-[eva] computing for function f3 <- main3 <- main.
+[eva:progress] 
+  computing for function f3 <- main3 <- main.
   Called from split_return.i:78.
-[eva] Recording results for f3
-[eva] Done for function f3
-[eva] split_return.i:79: Frama_C_show_each_f3: {7}, {5}
-[eva] split_return.i:79: Frama_C_show_each_f3: {-2}, {0}
-[eva] Recording results for main3
-[eva] Done for function main3
-[eva] computing for function main4 <- main.
+[eva:progress] Recording results for f3
+[eva:progress] Done for function f3
+[eva:show] split_return.i:79: Frama_C_show_each_f3: {7}, {5}
+[eva:show] split_return.i:79: Frama_C_show_each_f3: {-2}, {0}
+[eva:progress] Recording results for main3
+[eva:progress] Done for function main3
+[eva:progress] 
+  computing for function main4 <- main.
   Called from split_return.i:212.
-[eva] computing for function f4 <- main4 <- main.
+[eva:progress] 
+  computing for function f4 <- main4 <- main.
   Called from split_return.i:99.
-[eva] Recording results for f4
-[eva] Done for function f4
-[eva] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
-[eva] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
-[eva] Recording results for main4
-[eva] Done for function main4
-[eva] computing for function main4 <- main.
+[eva:progress] Recording results for f4
+[eva:progress] Done for function f4
+[eva:show] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
+[eva:show] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
+[eva:progress] Recording results for main4
+[eva:progress] Done for function main4
+[eva:progress] 
+  computing for function main4 <- main.
   Called from split_return.i:212.
-[eva] computing for function f4 <- main4 <- main.
+[eva:progress] 
+  computing for function f4 <- main4 <- main.
   Called from split_return.i:99.
-[eva] Recording results for f4
-[eva] Done for function f4
-[eva] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
-[eva] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
-[eva] Recording results for main4
-[eva] Done for function main4
-[eva] computing for function main4 <- main.
+[eva:progress] Recording results for f4
+[eva:progress] Done for function f4
+[eva:show] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
+[eva:show] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
+[eva:progress] Recording results for main4
+[eva:progress] Done for function main4
+[eva:progress] 
+  computing for function main4 <- main.
   Called from split_return.i:212.
-[eva] computing for function f4 <- main4 <- main.
+[eva:progress] 
+  computing for function f4 <- main4 <- main.
   Called from split_return.i:99.
-[eva] Recording results for f4
-[eva] Done for function f4
-[eva] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
-[eva] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
-[eva] Recording results for main4
-[eva] Done for function main4
-[eva] computing for function main4 <- main.
+[eva:progress] Recording results for f4
+[eva:progress] Done for function f4
+[eva:show] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
+[eva:show] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
+[eva:progress] Recording results for main4
+[eva:progress] Done for function main4
+[eva:progress] 
+  computing for function main4 <- main.
   Called from split_return.i:212.
-[eva] computing for function f4 <- main4 <- main.
+[eva:progress] 
+  computing for function f4 <- main4 <- main.
   Called from split_return.i:99.
-[eva] Recording results for f4
-[eva] Done for function f4
-[eva] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
-[eva] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
-[eva] Recording results for main4
-[eva] Done for function main4
-[eva] computing for function main5 <- main.
+[eva:progress] Recording results for f4
+[eva:progress] Done for function f4
+[eva:show] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
+[eva:show] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
+[eva:progress] Recording results for main4
+[eva:progress] Done for function main4
+[eva:progress] 
+  computing for function main5 <- main.
   Called from split_return.i:213.
-[eva] computing for function f5 <- main5 <- main.
+[eva:progress] 
+  computing for function f5 <- main5 <- main.
   Called from split_return.i:122.
-[eva] Recording results for f5
-[eva] Done for function f5
-[eva] split_return.i:123: Frama_C_show_each_f5: {7}, {5}
-[eva] split_return.i:123: Frama_C_show_each_f5: {-2}, {0}
-[eva] Recording results for main5
-[eva] Done for function main5
-[eva] computing for function main6 <- main.
+[eva:progress] Recording results for f5
+[eva:progress] Done for function f5
+[eva:show] split_return.i:123: Frama_C_show_each_f5: {7}, {5}
+[eva:show] split_return.i:123: Frama_C_show_each_f5: {-2}, {0}
+[eva:progress] Recording results for main5
+[eva:progress] Done for function main5
+[eva:progress] 
+  computing for function main6 <- main.
   Called from split_return.i:214.
-[eva] computing for function f6 <- main6 <- main.
+[eva:progress] 
+  computing for function f6 <- main6 <- main.
   Called from split_return.i:140.
-[eva] Recording results for f6
-[eva] Done for function f6
-[eva] Recording results for main6
-[eva] Done for function main6
-[eva] computing for function main6 <- main.
+[eva:progress] Recording results for f6
+[eva:progress] Done for function f6
+[eva:progress] Recording results for main6
+[eva:progress] Done for function main6
+[eva:progress] 
+  computing for function main6 <- main.
   Called from split_return.i:214.
-[eva] computing for function f6 <- main6 <- main.
+[eva:progress] 
+  computing for function f6 <- main6 <- main.
   Called from split_return.i:140.
-[eva] Recording results for f6
-[eva] Done for function f6
-[eva] Recording results for main6
-[eva] Done for function main6
-[eva] computing for function main7 <- main.
+[eva:progress] Recording results for f6
+[eva:progress] Done for function f6
+[eva:progress] Recording results for main6
+[eva:progress] Done for function main6
+[eva:progress] 
+  computing for function main7 <- main.
   Called from split_return.i:215.
-[eva] computing for function f7 <- main7 <- main.
+[eva:progress] 
+  computing for function f7 <- main7 <- main.
   Called from split_return.i:153.
-[eva] Recording results for f7
-[eva] Done for function f7
-[eva] split_return.i:158: Frama_C_show_each_NULL: {{ &v }}, {1}
-[eva] split_return.i:158: Frama_C_show_each_NULL: {0}, {0}
-[eva] Recording results for main7
-[eva] Done for function main7
-[eva] computing for function main7 <- main.
+[eva:progress] Recording results for f7
+[eva:progress] Done for function f7
+[eva:show] split_return.i:158: Frama_C_show_each_NULL: {{ &v }}, {1}
+[eva:show] split_return.i:158: Frama_C_show_each_NULL: {0}, {0}
+[eva:progress] Recording results for main7
+[eva:progress] Done for function main7
+[eva:progress] 
+  computing for function main7 <- main.
   Called from split_return.i:215.
-[eva] computing for function f7 <- main7 <- main.
+[eva:progress] 
+  computing for function f7 <- main7 <- main.
   Called from split_return.i:153.
-[eva] Recording results for f7
-[eva] Done for function f7
-[eva] split_return.i:158: Frama_C_show_each_NULL: {{ &v }}, {1}
-[eva] split_return.i:158: Frama_C_show_each_NULL: {0}, {0}
-[eva] Recording results for main7
-[eva] Done for function main7
-[eva] computing for function main8 <- main.
+[eva:progress] Recording results for f7
+[eva:progress] Done for function f7
+[eva:show] split_return.i:158: Frama_C_show_each_NULL: {{ &v }}, {1}
+[eva:show] split_return.i:158: Frama_C_show_each_NULL: {0}, {0}
+[eva:progress] Recording results for main7
+[eva:progress] Done for function main7
+[eva:progress] 
+  computing for function main8 <- main.
   Called from split_return.i:216.
-[eva] computing for function f8 <- main8 <- main.
+[eva:progress] 
+  computing for function f8 <- main8 <- main.
   Called from split_return.i:176.
-[eva] Recording results for f8
-[eva] Done for function f8
-[eva] split_return.i:177: Frama_C_show_each_then8: {4}, {{ &x }}
-[eva] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
-[eva] Recording results for main8
-[eva] Done for function main8
-[eva] computing for function main8 <- main.
+[eva:progress] Recording results for f8
+[eva:progress] Done for function f8
+[eva:show] split_return.i:177: Frama_C_show_each_then8: {4}, {{ &x }}
+[eva:show] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
+[eva:progress] Recording results for main8
+[eva:progress] Done for function main8
+[eva:progress] 
+  computing for function main8 <- main.
   Called from split_return.i:216.
-[eva] computing for function f8 <- main8 <- main.
+[eva:progress] 
+  computing for function f8 <- main8 <- main.
   Called from split_return.i:176.
-[eva] Recording results for f8
-[eva] Done for function f8
-[eva] split_return.i:177: Frama_C_show_each_then8: {4}, {{ &x }}
-[eva] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
-[eva] Recording results for main8
-[eva] Done for function main8
-[eva] computing for function main8 <- main.
+[eva:progress] Recording results for f8
+[eva:progress] Done for function f8
+[eva:show] split_return.i:177: Frama_C_show_each_then8: {4}, {{ &x }}
+[eva:show] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
+[eva:progress] Recording results for main8
+[eva:progress] Done for function main8
+[eva:progress] 
+  computing for function main8 <- main.
   Called from split_return.i:216.
-[eva] computing for function f8 <- main8 <- main.
+[eva:progress] 
+  computing for function f8 <- main8 <- main.
   Called from split_return.i:176.
-[eva] Recording results for f8
-[eva] Done for function f8
-[eva] split_return.i:177: Frama_C_show_each_then8: {4}, {{ &x }}
-[eva] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
-[eva] Recording results for main8
-[eva] Done for function main8
-[eva] computing for function main8 <- main.
+[eva:progress] Recording results for f8
+[eva:progress] Done for function f8
+[eva:show] split_return.i:177: Frama_C_show_each_then8: {4}, {{ &x }}
+[eva:show] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
+[eva:progress] Recording results for main8
+[eva:progress] Done for function main8
+[eva:progress] 
+  computing for function main8 <- main.
   Called from split_return.i:216.
-[eva] computing for function f8 <- main8 <- main.
+[eva:progress] 
+  computing for function f8 <- main8 <- main.
   Called from split_return.i:176.
-[eva] Recording results for f8
-[eva] Done for function f8
-[eva] split_return.i:177: Frama_C_show_each_then8: {4}, {{ &x }}
-[eva] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
-[eva] Recording results for main8
-[eva] Done for function main8
-[eva] computing for function main9 <- main.
+[eva:progress] Recording results for f8
+[eva:progress] Done for function f8
+[eva:show] split_return.i:177: Frama_C_show_each_then8: {4}, {{ &x }}
+[eva:show] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
+[eva:progress] Recording results for main8
+[eva:progress] Done for function main8
+[eva:progress] 
+  computing for function main9 <- main.
   Called from split_return.i:217.
-[eva] computing for function uninit <- main9 <- main.
+[eva:progress] 
+  computing for function uninit <- main9 <- main.
   Called from split_return.i:204.
-[eva] Recording results for uninit
-[eva] Done for function uninit
-[eva] computing for function escaping <- main9 <- main.
+[eva:progress] Recording results for uninit
+[eva:progress] Done for function uninit
+[eva:progress] 
+  computing for function escaping <- main9 <- main.
   Called from split_return.i:205.
-[eva] Recording results for escaping
-[eva] Done for function escaping
-[eva] computing for function escaping <- main9 <- main.
+[eva:progress] Recording results for escaping
+[eva:progress] Done for function escaping
+[eva:progress] 
+  computing for function escaping <- main9 <- main.
   Called from split_return.i:205.
-[eva] Recording results for escaping
-[eva] Done for function escaping
-[eva] Recording results for main9
-[eva] Done for function main9
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for escaping
+[eva:progress] Done for function escaping
+[eva:progress] Recording results for main9
+[eva:progress] Done for function main9
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function escaping:
   p ∈ ESCAPINGADDR

@@ -1,16 +1,16 @@
 [kernel] Expanding arguments from test_options.txt
 [kernel] Parsing arith.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   a ∈ {0}
   b ∈ {0}
   c ∈ {{ &a }}
   d ∈ {{ &b }}
-[eva] arith.c:11: assertion got status valid.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] arith.c:11: assertion got status valid.
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   a ∈ {0}

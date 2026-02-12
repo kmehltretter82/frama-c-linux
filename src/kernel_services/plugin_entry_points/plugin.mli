@@ -29,6 +29,9 @@ module type S_no_log = sig
   module Verbose: Parameter_sig.Int
   module Debug: Parameter_sig.Int
 
+  module Message_category: Parameter_sig.String
+  module Warn_category: Parameter_sig.String
+
   (** Handle the specific `lib' directory of the plug-in.
       @since Frama-C+dev
   *)
@@ -148,6 +151,11 @@ val plugin_subpath: string -> unit
     be installed (ie. [share/frama-c/plugin_subpath]...). Relevant for
     directories [Share], [Session] and [Config] above.
     @since Neon-20140301 *)
+
+val set_default_verbose_level: int -> unit
+(** Set the default level of the -<plug-in>-verbose parameter.
+    To be called just before applying {!Register} to create plug-in services.
+    @since Frama-C+dev *)
 
 (* ************************************************************************* *)
 (** {2 Handling plugins} *)

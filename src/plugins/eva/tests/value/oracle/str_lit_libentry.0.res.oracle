@@ -1,7 +1,7 @@
 [kernel] Parsing str_lit_libentry.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   const_global[0] ∈ {99}
               [1] ∈ {111}
@@ -17,32 +17,37 @@
               [11] ∈ {108}
               [12] ∈ {0}
   global[0..6] ∈ [--..--]
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from str_lit_libentry.i:12.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from str_lit_libentry.i:14.
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:partition] str_lit_libentry.i:13: starting to merge loop iterations
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from str_lit_libentry.i:14.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from str_lit_libentry.i:14.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function f <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function f <- main.
   Called from str_lit_libentry.i:14.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] str_lit_libentry.i:14: Reusing old results for call to f
-[eva] str_lit_libentry.i:16: 
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] str_lit_libentry.i:14: Reusing old results for call to f
+[eva:show] str_lit_libentry.i:16: 
   Frama_C_show_each: {99}, [-128..127], {99}, {0; 97; 99; 108; 111}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   __retres ∈ {0; 97; 99; 108; 111}

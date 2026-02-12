@@ -1,7 +1,7 @@
 [kernel] Parsing summary.i (no preprocessing)
 [eva] Analyzing a complete application starting at minimalist
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   undet ∈ [--..--]
   volatile_d ∈ [--..--]
@@ -9,7 +9,7 @@
   Neither code nor specification for function minimalist, generating default
   assigns. See -generated-spec-* options for more info.
 [eva] using specification for function minimalist
-[eva] Done for function minimalist
+[eva:progress] Done for function minimalist
 [eva] ====== VALUES COMPUTED ======
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------

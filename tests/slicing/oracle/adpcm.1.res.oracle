@@ -1,7 +1,7 @@
 [kernel] Parsing adpcm.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   tqmf[0..23] ∈ {0}
   h[0] ∈ {12}
@@ -376,7 +376,8 @@
            [3] ∈ {0}
            [4..9] ∈ {1}
   compressed[0..9] ∈ {0}
-[eva] computing for function encode <- main.
+[eva:progress] 
+  computing for function encode <- main.
   Called from adpcm.c:608.
 [eva:partition] adpcm.c:277: starting to merge loop iterations
 [eva:alarm] adpcm.c:278: Warning: 
@@ -413,7 +414,8 @@
   out of bounds write. assert \valid(tmp_12);
                        (tmp_12 from tqmf_ptr--)
 [eva:alarm] adpcm.c:290: Warning: out of bounds write. assert \valid(tqmf_ptr);
-[eva] computing for function filtez <- encode <- main.
+[eva:progress] 
+  computing for function filtez <- encode <- main.
   Called from adpcm.c:301.
 [eva:partition] adpcm.c:418: starting to merge loop iterations
 [eva:alarm] adpcm.c:419: Warning: 
@@ -422,67 +424,80 @@
 [eva:alarm] adpcm.c:419: Warning: 
   out of bounds read. assert \valid_read(tmp_2);
                       (tmp_2 from dlt_0++)
-[eva] Recording results for filtez
-[eva] Done for function filtez
-[eva] computing for function filtep <- encode <- main.
+[eva:progress] Recording results for filtez
+[eva:progress] Done for function filtez
+[eva:progress] 
+  computing for function filtep <- encode <- main.
   Called from adpcm.c:304.
-[eva] Recording results for filtep
-[eva] Done for function filtep
-[eva] computing for function quantl <- encode <- main.
+[eva:progress] Recording results for filtep
+[eva:progress] Done for function filtep
+[eva:progress] 
+  computing for function quantl <- encode <- main.
   Called from adpcm.c:311.
-[eva] computing for function abs <- quantl <- encode <- main.
+[eva:progress] 
+  computing for function abs <- quantl <- encode <- main.
   Called from adpcm.c:444.
-[eva] Recording results for abs
-[eva] Done for function abs
+[eva:progress] Recording results for abs
+[eva:progress] Done for function abs
 [eva:partition] adpcm.c:453: starting to merge loop iterations
-[eva] Recording results for quantl
-[eva] Done for function quantl
-[eva] computing for function logscl <- encode <- main.
+[eva:progress] Recording results for quantl
+[eva:progress] Done for function quantl
+[eva:progress] 
+  computing for function logscl <- encode <- main.
   Called from adpcm.c:318.
-[eva] Recording results for logscl
-[eva] Done for function logscl
-[eva] computing for function scalel <- encode <- main.
+[eva:progress] Recording results for logscl
+[eva:progress] Done for function logscl
+[eva:progress] 
+  computing for function scalel <- encode <- main.
   Called from adpcm.c:322.
-[eva] Recording results for scalel
-[eva] Done for function scalel
-[eva] computing for function upzero <- encode <- main.
+[eva:progress] Recording results for scalel
+[eva:progress] Done for function scalel
+[eva:progress] 
+  computing for function upzero <- encode <- main.
   Called from adpcm.c:331.
 [eva:partition] adpcm.c:506: starting to merge loop iterations
-[eva] Recording results for upzero
-[eva] Done for function upzero
-[eva] computing for function uppol2 <- encode <- main.
+[eva:progress] Recording results for upzero
+[eva:progress] Done for function upzero
+[eva:progress] 
+  computing for function uppol2 <- encode <- main.
   Called from adpcm.c:335.
-[eva] Recording results for uppol2
-[eva] Done for function uppol2
-[eva] computing for function uppol1 <- encode <- main.
+[eva:progress] Recording results for uppol2
+[eva:progress] Done for function uppol2
+[eva:progress] 
+  computing for function uppol1 <- encode <- main.
   Called from adpcm.c:339.
-[eva] Recording results for uppol1
-[eva] Done for function uppol1
-[eva] computing for function filtez <- encode <- main.
+[eva:progress] Recording results for uppol1
+[eva:progress] Done for function uppol1
+[eva:progress] 
+  computing for function filtez <- encode <- main.
   Called from adpcm.c:352.
-[eva] Recording results for filtez
-[eva] Done for function filtez
-[eva] adpcm.c:354: Reusing old results for call to filtep
-[eva] adpcm.c:370: Reusing old results for call to abs
-[eva] computing for function logsch <- encode <- main.
+[eva:progress] Recording results for filtez
+[eva:progress] Done for function filtez
+[eva:progress] adpcm.c:354: Reusing old results for call to filtep
+[eva:progress] adpcm.c:370: Reusing old results for call to abs
+[eva:progress] 
+  computing for function logsch <- encode <- main.
   Called from adpcm.c:376.
-[eva] Recording results for logsch
-[eva] Done for function logsch
-[eva] computing for function scalel <- encode <- main.
+[eva:progress] Recording results for logsch
+[eva:progress] Done for function logsch
+[eva:progress] 
+  computing for function scalel <- encode <- main.
   Called from adpcm.c:379.
-[eva] Recording results for scalel
-[eva] Done for function scalel
-[eva] computing for function upzero <- encode <- main.
+[eva:progress] Recording results for scalel
+[eva:progress] Done for function scalel
+[eva:progress] 
+  computing for function upzero <- encode <- main.
   Called from adpcm.c:387.
-[eva] Recording results for upzero
-[eva] Done for function upzero
-[eva] adpcm.c:391: Reusing old results for call to uppol2
-[eva] adpcm.c:394: Reusing old results for call to uppol1
-[eva] adpcm.c:262: function encode: postcondition got status valid.
-[eva] Recording results for encode
-[eva] Done for function encode
+[eva:progress] Recording results for upzero
+[eva:progress] Done for function upzero
+[eva:progress] adpcm.c:391: Reusing old results for call to uppol2
+[eva:progress] adpcm.c:394: Reusing old results for call to uppol1
+[eva:progress] adpcm.c:262: function encode: postcondition got status valid.
+[eva:progress] Recording results for encode
+[eva:progress] Done for function encode
 [eva:partition] adpcm.c:607: starting to merge loop iterations
-[eva] computing for function encode <- main.
+[eva:progress] 
+  computing for function encode <- main.
   Called from adpcm.c:608.
 [eva:alarm] adpcm.c:278: Warning: 
   signed overflow.
@@ -524,70 +539,85 @@
   signed overflow. assert -2147483648 ≤ xa - xb;
 [eva:alarm] adpcm.c:294: Warning: 
   signed overflow. assert xa - xb ≤ 2147483647;
-[eva] adpcm.c:301: Reusing old results for call to filtez
-[eva] computing for function filtep <- encode <- main.
+[eva:progress] adpcm.c:301: Reusing old results for call to filtez
+[eva:progress] 
+  computing for function filtep <- encode <- main.
   Called from adpcm.c:304.
-[eva] Recording results for filtep
-[eva] Done for function filtep
-[eva] computing for function quantl <- encode <- main.
+[eva:progress] Recording results for filtep
+[eva:progress] Done for function filtep
+[eva:progress] 
+  computing for function quantl <- encode <- main.
   Called from adpcm.c:311.
-[eva] computing for function abs <- quantl <- encode <- main.
+[eva:progress] 
+  computing for function abs <- quantl <- encode <- main.
   Called from adpcm.c:444.
-[eva] Recording results for abs
-[eva] Done for function abs
-[eva] Recording results for quantl
-[eva] Done for function quantl
-[eva] computing for function logscl <- encode <- main.
+[eva:progress] Recording results for abs
+[eva:progress] Done for function abs
+[eva:progress] Recording results for quantl
+[eva:progress] Done for function quantl
+[eva:progress] 
+  computing for function logscl <- encode <- main.
   Called from adpcm.c:318.
-[eva] Recording results for logscl
-[eva] Done for function logscl
-[eva] computing for function scalel <- encode <- main.
+[eva:progress] Recording results for logscl
+[eva:progress] Done for function logscl
+[eva:progress] 
+  computing for function scalel <- encode <- main.
   Called from adpcm.c:322.
-[eva] Recording results for scalel
-[eva] Done for function scalel
-[eva] computing for function upzero <- encode <- main.
+[eva:progress] Recording results for scalel
+[eva:progress] Done for function scalel
+[eva:progress] 
+  computing for function upzero <- encode <- main.
   Called from adpcm.c:331.
 [eva:partition] adpcm.c:512: starting to merge loop iterations
 [eva:alarm] adpcm.c:514: Warning: 
   signed overflow. assert 255L * (long)*(bli + i) ≤ 2147483647;
-[eva] Recording results for upzero
-[eva] Done for function upzero
-[eva] computing for function uppol2 <- encode <- main.
+[eva:progress] Recording results for upzero
+[eva:progress] Done for function upzero
+[eva:progress] 
+  computing for function uppol2 <- encode <- main.
   Called from adpcm.c:335.
-[eva] Recording results for uppol2
-[eva] Done for function uppol2
-[eva] computing for function uppol1 <- encode <- main.
+[eva:progress] Recording results for uppol2
+[eva:progress] Done for function uppol2
+[eva:progress] 
+  computing for function uppol1 <- encode <- main.
   Called from adpcm.c:339.
-[eva] Recording results for uppol1
-[eva] Done for function uppol1
-[eva] adpcm.c:352: Reusing old results for call to filtez
-[eva] adpcm.c:354: Reusing old results for call to filtep
-[eva] adpcm.c:370: Reusing old results for call to abs
-[eva] computing for function logsch <- encode <- main.
+[eva:progress] Recording results for uppol1
+[eva:progress] Done for function uppol1
+[eva:progress] adpcm.c:352: Reusing old results for call to filtez
+[eva:progress] adpcm.c:354: Reusing old results for call to filtep
+[eva:progress] adpcm.c:370: Reusing old results for call to abs
+[eva:progress] 
+  computing for function logsch <- encode <- main.
   Called from adpcm.c:376.
-[eva] Recording results for logsch
-[eva] Done for function logsch
-[eva] computing for function scalel <- encode <- main.
+[eva:progress] Recording results for logsch
+[eva:progress] Done for function logsch
+[eva:progress] 
+  computing for function scalel <- encode <- main.
   Called from adpcm.c:379.
-[eva] Recording results for scalel
-[eva] Done for function scalel
-[eva] computing for function upzero <- encode <- main.
+[eva:progress] Recording results for scalel
+[eva:progress] Done for function scalel
+[eva:progress] 
+  computing for function upzero <- encode <- main.
   Called from adpcm.c:387.
-[eva] Recording results for upzero
-[eva] Done for function upzero
-[eva] computing for function uppol2 <- encode <- main.
+[eva:progress] Recording results for upzero
+[eva:progress] Done for function upzero
+[eva:progress] 
+  computing for function uppol2 <- encode <- main.
   Called from adpcm.c:391.
-[eva] Recording results for uppol2
-[eva] Done for function uppol2
-[eva] computing for function uppol1 <- encode <- main.
+[eva:progress] Recording results for uppol2
+[eva:progress] Done for function uppol2
+[eva:progress] 
+  computing for function uppol1 <- encode <- main.
   Called from adpcm.c:394.
-[eva] Recording results for uppol1
-[eva] Done for function uppol1
-[eva] Recording results for encode
-[eva] Done for function encode
-[eva] computing for function encode <- main.
+[eva:progress] Recording results for uppol1
+[eva:progress] Done for function uppol1
+[eva:progress] Recording results for encode
+[eva:progress] Done for function encode
+[eva:progress] 
+  computing for function encode <- main.
   Called from adpcm.c:608.
-[eva] computing for function filtez <- encode <- main.
+[eva:progress] 
+  computing for function filtez <- encode <- main.
   Called from adpcm.c:301.
 [eva:alarm] adpcm.c:416: Warning: 
   signed overflow.
@@ -597,83 +627,101 @@
   signed overflow.
   assert (long)*tmp * (long)*tmp_0 ≤ 2147483647;
   (tmp from bpl++, tmp_0 from dlt_0++)
-[eva] Recording results for filtez
-[eva] Done for function filtez
-[eva] computing for function filtep <- encode <- main.
+[eva:progress] Recording results for filtez
+[eva:progress] Done for function filtez
+[eva:progress] 
+  computing for function filtep <- encode <- main.
   Called from adpcm.c:304.
-[eva] Recording results for filtep
-[eva] Done for function filtep
-[eva] computing for function quantl <- encode <- main.
+[eva:progress] Recording results for filtep
+[eva:progress] Done for function filtep
+[eva:progress] 
+  computing for function quantl <- encode <- main.
   Called from adpcm.c:311.
-[eva] computing for function abs <- quantl <- encode <- main.
+[eva:progress] 
+  computing for function abs <- quantl <- encode <- main.
   Called from adpcm.c:444.
-[eva] Recording results for abs
-[eva] Done for function abs
-[eva] Recording results for quantl
-[eva] Done for function quantl
-[eva] computing for function logscl <- encode <- main.
+[eva:progress] Recording results for abs
+[eva:progress] Done for function abs
+[eva:progress] Recording results for quantl
+[eva:progress] Done for function quantl
+[eva:progress] 
+  computing for function logscl <- encode <- main.
   Called from adpcm.c:318.
-[eva] Recording results for logscl
-[eva] Done for function logscl
-[eva] computing for function scalel <- encode <- main.
+[eva:progress] Recording results for logscl
+[eva:progress] Done for function logscl
+[eva:progress] 
+  computing for function scalel <- encode <- main.
   Called from adpcm.c:322.
-[eva] Recording results for scalel
-[eva] Done for function scalel
-[eva] computing for function upzero <- encode <- main.
+[eva:progress] Recording results for scalel
+[eva:progress] Done for function scalel
+[eva:progress] 
+  computing for function upzero <- encode <- main.
   Called from adpcm.c:331.
 [eva:alarm] adpcm.c:507: Warning: 
   signed overflow. assert 255L * (long)*(bli + i) ≤ 2147483647;
 [eva:alarm] adpcm.c:514: Warning: 
   signed overflow. assert -2147483648 ≤ 255L * (long)*(bli + i);
-[eva] Recording results for upzero
-[eva] Done for function upzero
-[eva] computing for function uppol2 <- encode <- main.
+[eva:progress] Recording results for upzero
+[eva:progress] Done for function upzero
+[eva:progress] 
+  computing for function uppol2 <- encode <- main.
   Called from adpcm.c:335.
-[eva] Recording results for uppol2
-[eva] Done for function uppol2
-[eva] computing for function uppol1 <- encode <- main.
+[eva:progress] Recording results for uppol2
+[eva:progress] Done for function uppol2
+[eva:progress] 
+  computing for function uppol1 <- encode <- main.
   Called from adpcm.c:339.
-[eva] Recording results for uppol1
-[eva] Done for function uppol1
-[eva] computing for function filtez <- encode <- main.
+[eva:progress] Recording results for uppol1
+[eva:progress] Done for function uppol1
+[eva:progress] 
+  computing for function filtez <- encode <- main.
   Called from adpcm.c:352.
-[eva] Recording results for filtez
-[eva] Done for function filtez
-[eva] computing for function filtep <- encode <- main.
+[eva:progress] Recording results for filtez
+[eva:progress] Done for function filtez
+[eva:progress] 
+  computing for function filtep <- encode <- main.
   Called from adpcm.c:354.
-[eva] Recording results for filtep
-[eva] Done for function filtep
-[eva] computing for function abs <- encode <- main.
+[eva:progress] Recording results for filtep
+[eva:progress] Done for function filtep
+[eva:progress] 
+  computing for function abs <- encode <- main.
   Called from adpcm.c:370.
-[eva] Recording results for abs
-[eva] Done for function abs
-[eva] computing for function logsch <- encode <- main.
+[eva:progress] Recording results for abs
+[eva:progress] Done for function abs
+[eva:progress] 
+  computing for function logsch <- encode <- main.
   Called from adpcm.c:376.
-[eva] Recording results for logsch
-[eva] Done for function logsch
-[eva] computing for function scalel <- encode <- main.
+[eva:progress] Recording results for logsch
+[eva:progress] Done for function logsch
+[eva:progress] 
+  computing for function scalel <- encode <- main.
   Called from adpcm.c:379.
-[eva] Recording results for scalel
-[eva] Done for function scalel
-[eva] computing for function upzero <- encode <- main.
+[eva:progress] Recording results for scalel
+[eva:progress] Done for function scalel
+[eva:progress] 
+  computing for function upzero <- encode <- main.
   Called from adpcm.c:387.
-[eva] Recording results for upzero
-[eva] Done for function upzero
-[eva] computing for function uppol2 <- encode <- main.
+[eva:progress] Recording results for upzero
+[eva:progress] Done for function upzero
+[eva:progress] 
+  computing for function uppol2 <- encode <- main.
   Called from adpcm.c:391.
-[eva] Recording results for uppol2
-[eva] Done for function uppol2
-[eva] computing for function uppol1 <- encode <- main.
+[eva:progress] Recording results for uppol2
+[eva:progress] Done for function uppol2
+[eva:progress] 
+  computing for function uppol1 <- encode <- main.
   Called from adpcm.c:394.
-[eva] Recording results for uppol1
-[eva] Done for function uppol1
+[eva:progress] Recording results for uppol1
+[eva:progress] Done for function uppol1
 [eva:alarm] adpcm.c:262: Warning: 
   function encode: postcondition got status unknown.
-[eva] Recording results for encode
-[eva] Done for function encode
-[eva] computing for function encode <- main.
+[eva:progress] Recording results for encode
+[eva:progress] Done for function encode
+[eva:progress] 
+  computing for function encode <- main.
   Called from adpcm.c:608.
-[eva] computing for function filtez <- encode <- main.
+[eva:progress] 
+  computing for function filtez <- encode <- main.
   Called from adpcm.c:301.
 [eva:alarm] adpcm.c:419: Warning: 
   signed overflow.
@@ -691,164 +739,200 @@
   signed overflow.
   assert zl + (long)((long)*tmp_1 * (long)*tmp_2) ≤ 2147483647;
   (tmp_1 from bpl++, tmp_2 from dlt_0++)
-[eva] Recording results for filtez
-[eva] Done for function filtez
-[eva] computing for function filtep <- encode <- main.
+[eva:progress] Recording results for filtez
+[eva:progress] Done for function filtez
+[eva:progress] 
+  computing for function filtep <- encode <- main.
   Called from adpcm.c:304.
-[eva] Recording results for filtep
-[eva] Done for function filtep
-[eva] computing for function quantl <- encode <- main.
+[eva:progress] Recording results for filtep
+[eva:progress] Done for function filtep
+[eva:progress] 
+  computing for function quantl <- encode <- main.
   Called from adpcm.c:311.
-[eva] computing for function abs <- quantl <- encode <- main.
+[eva:progress] 
+  computing for function abs <- quantl <- encode <- main.
   Called from adpcm.c:444.
-[eva] Recording results for abs
-[eva] Done for function abs
-[eva] Recording results for quantl
-[eva] Done for function quantl
-[eva] computing for function logscl <- encode <- main.
+[eva:progress] Recording results for abs
+[eva:progress] Done for function abs
+[eva:progress] Recording results for quantl
+[eva:progress] Done for function quantl
+[eva:progress] 
+  computing for function logscl <- encode <- main.
   Called from adpcm.c:318.
-[eva] Recording results for logscl
-[eva] Done for function logscl
-[eva] computing for function scalel <- encode <- main.
+[eva:progress] Recording results for logscl
+[eva:progress] Done for function logscl
+[eva:progress] 
+  computing for function scalel <- encode <- main.
   Called from adpcm.c:322.
-[eva] Recording results for scalel
-[eva] Done for function scalel
-[eva] computing for function upzero <- encode <- main.
+[eva:progress] Recording results for scalel
+[eva:progress] Done for function scalel
+[eva:progress] 
+  computing for function upzero <- encode <- main.
   Called from adpcm.c:331.
 [eva:alarm] adpcm.c:507: Warning: 
   signed overflow. assert -2147483648 ≤ 255L * (long)*(bli + i);
-[eva] Recording results for upzero
-[eva] Done for function upzero
-[eva] computing for function uppol2 <- encode <- main.
+[eva:progress] Recording results for upzero
+[eva:progress] Done for function upzero
+[eva:progress] 
+  computing for function uppol2 <- encode <- main.
   Called from adpcm.c:335.
 [eva:alarm] adpcm.c:534: Warning: 
   signed overflow. assert -2147483648 ≤ (long)plt_0 * (long)plt1_0;
 [eva:alarm] adpcm.c:534: Warning: 
   signed overflow. assert (long)plt_0 * (long)plt1_0 ≤ 2147483647;
-[eva] Recording results for uppol2
-[eva] Done for function uppol2
-[eva] computing for function uppol1 <- encode <- main.
+[eva:progress] Recording results for uppol2
+[eva:progress] Done for function uppol2
+[eva:progress] 
+  computing for function uppol1 <- encode <- main.
   Called from adpcm.c:339.
 [eva:alarm] adpcm.c:558: Warning: 
   signed overflow. assert -2147483648 ≤ (long)plt_0 * (long)plt1_0;
 [eva:alarm] adpcm.c:558: Warning: 
   signed overflow. assert (long)plt_0 * (long)plt1_0 ≤ 2147483647;
-[eva] Recording results for uppol1
-[eva] Done for function uppol1
-[eva] computing for function filtez <- encode <- main.
+[eva:progress] Recording results for uppol1
+[eva:progress] Done for function uppol1
+[eva:progress] 
+  computing for function filtez <- encode <- main.
   Called from adpcm.c:352.
-[eva] Recording results for filtez
-[eva] Done for function filtez
-[eva] computing for function filtep <- encode <- main.
+[eva:progress] Recording results for filtez
+[eva:progress] Done for function filtez
+[eva:progress] 
+  computing for function filtep <- encode <- main.
   Called from adpcm.c:354.
-[eva] Recording results for filtep
-[eva] Done for function filtep
-[eva] computing for function abs <- encode <- main.
+[eva:progress] Recording results for filtep
+[eva:progress] Done for function filtep
+[eva:progress] 
+  computing for function abs <- encode <- main.
   Called from adpcm.c:370.
-[eva] Recording results for abs
-[eva] Done for function abs
-[eva] computing for function logsch <- encode <- main.
+[eva:progress] Recording results for abs
+[eva:progress] Done for function abs
+[eva:progress] 
+  computing for function logsch <- encode <- main.
   Called from adpcm.c:376.
-[eva] Recording results for logsch
-[eva] Done for function logsch
-[eva] computing for function scalel <- encode <- main.
+[eva:progress] Recording results for logsch
+[eva:progress] Done for function logsch
+[eva:progress] 
+  computing for function scalel <- encode <- main.
   Called from adpcm.c:379.
-[eva] Recording results for scalel
-[eva] Done for function scalel
-[eva] computing for function upzero <- encode <- main.
+[eva:progress] Recording results for scalel
+[eva:progress] Done for function scalel
+[eva:progress] 
+  computing for function upzero <- encode <- main.
   Called from adpcm.c:387.
-[eva] Recording results for upzero
-[eva] Done for function upzero
-[eva] computing for function uppol2 <- encode <- main.
+[eva:progress] Recording results for upzero
+[eva:progress] Done for function upzero
+[eva:progress] 
+  computing for function uppol2 <- encode <- main.
   Called from adpcm.c:391.
-[eva] Recording results for uppol2
-[eva] Done for function uppol2
-[eva] computing for function uppol1 <- encode <- main.
+[eva:progress] Recording results for uppol2
+[eva:progress] Done for function uppol2
+[eva:progress] 
+  computing for function uppol1 <- encode <- main.
   Called from adpcm.c:394.
-[eva] Recording results for uppol1
-[eva] Done for function uppol1
-[eva] Recording results for encode
-[eva] Done for function encode
-[eva] computing for function encode <- main.
+[eva:progress] Recording results for uppol1
+[eva:progress] Done for function uppol1
+[eva:progress] Recording results for encode
+[eva:progress] Done for function encode
+[eva:progress] 
+  computing for function encode <- main.
   Called from adpcm.c:608.
-[eva] computing for function filtez <- encode <- main.
+[eva:progress] 
+  computing for function filtez <- encode <- main.
   Called from adpcm.c:301.
-[eva] Recording results for filtez
-[eva] Done for function filtez
-[eva] computing for function filtep <- encode <- main.
+[eva:progress] Recording results for filtez
+[eva:progress] Done for function filtez
+[eva:progress] 
+  computing for function filtep <- encode <- main.
   Called from adpcm.c:304.
-[eva] Recording results for filtep
-[eva] Done for function filtep
-[eva] computing for function quantl <- encode <- main.
+[eva:progress] Recording results for filtep
+[eva:progress] Done for function filtep
+[eva:progress] 
+  computing for function quantl <- encode <- main.
   Called from adpcm.c:311.
-[eva] computing for function abs <- quantl <- encode <- main.
+[eva:progress] 
+  computing for function abs <- quantl <- encode <- main.
   Called from adpcm.c:444.
-[eva] Recording results for abs
-[eva] Done for function abs
-[eva] Recording results for quantl
-[eva] Done for function quantl
-[eva] computing for function logscl <- encode <- main.
+[eva:progress] Recording results for abs
+[eva:progress] Done for function abs
+[eva:progress] Recording results for quantl
+[eva:progress] Done for function quantl
+[eva:progress] 
+  computing for function logscl <- encode <- main.
   Called from adpcm.c:318.
-[eva] Recording results for logscl
-[eva] Done for function logscl
-[eva] computing for function scalel <- encode <- main.
+[eva:progress] Recording results for logscl
+[eva:progress] Done for function logscl
+[eva:progress] 
+  computing for function scalel <- encode <- main.
   Called from adpcm.c:322.
-[eva] Recording results for scalel
-[eva] Done for function scalel
-[eva] computing for function upzero <- encode <- main.
+[eva:progress] Recording results for scalel
+[eva:progress] Done for function scalel
+[eva:progress] 
+  computing for function upzero <- encode <- main.
   Called from adpcm.c:331.
-[eva] Recording results for upzero
-[eva] Done for function upzero
-[eva] computing for function uppol2 <- encode <- main.
+[eva:progress] Recording results for upzero
+[eva:progress] Done for function upzero
+[eva:progress] 
+  computing for function uppol2 <- encode <- main.
   Called from adpcm.c:335.
 [eva:alarm] adpcm.c:536: Warning: 
   signed overflow. assert -2147483648 ≤ (long)plt_0 * (long)plt2_0;
 [eva:alarm] adpcm.c:536: Warning: 
   signed overflow. assert (long)plt_0 * (long)plt2_0 ≤ 2147483647;
-[eva] Recording results for uppol2
-[eva] Done for function uppol2
-[eva] computing for function uppol1 <- encode <- main.
+[eva:progress] Recording results for uppol2
+[eva:progress] Done for function uppol2
+[eva:progress] 
+  computing for function uppol1 <- encode <- main.
   Called from adpcm.c:339.
-[eva] Recording results for uppol1
-[eva] Done for function uppol1
-[eva] adpcm.c:352: Reusing old results for call to filtez
-[eva] computing for function filtep <- encode <- main.
+[eva:progress] Recording results for uppol1
+[eva:progress] Done for function uppol1
+[eva:progress] adpcm.c:352: Reusing old results for call to filtez
+[eva:progress] 
+  computing for function filtep <- encode <- main.
   Called from adpcm.c:354.
-[eva] Recording results for filtep
-[eva] Done for function filtep
-[eva] computing for function abs <- encode <- main.
+[eva:progress] Recording results for filtep
+[eva:progress] Done for function filtep
+[eva:progress] 
+  computing for function abs <- encode <- main.
   Called from adpcm.c:370.
-[eva] Recording results for abs
-[eva] Done for function abs
-[eva] computing for function logsch <- encode <- main.
+[eva:progress] Recording results for abs
+[eva:progress] Done for function abs
+[eva:progress] 
+  computing for function logsch <- encode <- main.
   Called from adpcm.c:376.
-[eva] Recording results for logsch
-[eva] Done for function logsch
-[eva] computing for function scalel <- encode <- main.
+[eva:progress] Recording results for logsch
+[eva:progress] Done for function logsch
+[eva:progress] 
+  computing for function scalel <- encode <- main.
   Called from adpcm.c:379.
-[eva] Recording results for scalel
-[eva] Done for function scalel
-[eva] computing for function upzero <- encode <- main.
+[eva:progress] Recording results for scalel
+[eva:progress] Done for function scalel
+[eva:progress] 
+  computing for function upzero <- encode <- main.
   Called from adpcm.c:387.
-[eva] Recording results for upzero
-[eva] Done for function upzero
-[eva] computing for function uppol2 <- encode <- main.
+[eva:progress] Recording results for upzero
+[eva:progress] Done for function upzero
+[eva:progress] 
+  computing for function uppol2 <- encode <- main.
   Called from adpcm.c:391.
-[eva] Recording results for uppol2
-[eva] Done for function uppol2
-[eva] computing for function uppol1 <- encode <- main.
+[eva:progress] Recording results for uppol2
+[eva:progress] Done for function uppol2
+[eva:progress] 
+  computing for function uppol1 <- encode <- main.
   Called from adpcm.c:394.
-[eva] Recording results for uppol1
-[eva] Done for function uppol1
-[eva] Recording results for encode
-[eva] Done for function encode
-[eva] computing for function encode <- main.
+[eva:progress] Recording results for uppol1
+[eva:progress] Done for function uppol1
+[eva:progress] Recording results for encode
+[eva:progress] Done for function encode
+[eva:progress] 
+  computing for function encode <- main.
   Called from adpcm.c:608.
-[eva] computing for function filtez <- encode <- main.
+[eva:progress] 
+  computing for function filtez <- encode <- main.
   Called from adpcm.c:301.
-[eva] Recording results for filtez
-[eva] Done for function filtez
-[eva] computing for function filtep <- encode <- main.
+[eva:progress] Recording results for filtez
+[eva:progress] Done for function filtez
+[eva:progress] 
+  computing for function filtep <- encode <- main.
   Called from adpcm.c:304.
 [eva:alarm] adpcm.c:430: Warning: 
   signed overflow. assert -2147483648 ≤ 2 * rlt1_0;
@@ -870,109 +954,127 @@
   signed overflow. assert -2147483648 ≤ pl + (long)((long)al2_0 * pl2);
 [eva:alarm] adpcm.c:433: Warning: 
   signed overflow. assert pl + (long)((long)al2_0 * pl2) ≤ 2147483647;
-[eva] Recording results for filtep
-[eva] Done for function filtep
-[eva] computing for function quantl <- encode <- main.
+[eva:progress] Recording results for filtep
+[eva:progress] Done for function filtep
+[eva:progress] 
+  computing for function quantl <- encode <- main.
   Called from adpcm.c:311.
-[eva] computing for function abs <- quantl <- encode <- main.
+[eva:progress] 
+  computing for function abs <- quantl <- encode <- main.
   Called from adpcm.c:444.
-[eva] Recording results for abs
-[eva] Done for function abs
-[eva] Recording results for quantl
-[eva] Done for function quantl
-[eva] computing for function logscl <- encode <- main.
+[eva:progress] Recording results for abs
+[eva:progress] Done for function abs
+[eva:progress] Recording results for quantl
+[eva:progress] Done for function quantl
+[eva:progress] 
+  computing for function logscl <- encode <- main.
   Called from adpcm.c:318.
-[eva] Recording results for logscl
-[eva] Done for function logscl
-[eva] computing for function scalel <- encode <- main.
+[eva:progress] Recording results for logscl
+[eva:progress] Done for function logscl
+[eva:progress] 
+  computing for function scalel <- encode <- main.
   Called from adpcm.c:322.
-[eva] Recording results for scalel
-[eva] Done for function scalel
-[eva] computing for function upzero <- encode <- main.
+[eva:progress] Recording results for scalel
+[eva:progress] Done for function scalel
+[eva:progress] 
+  computing for function upzero <- encode <- main.
   Called from adpcm.c:331.
 [eva:alarm] adpcm.c:513: Warning: 
   signed overflow. assert -2147483648 ≤ (long)dlt_0 * (long)*(dlti + i);
 [eva:alarm] adpcm.c:513: Warning: 
   signed overflow. assert (long)dlt_0 * (long)*(dlti + i) ≤ 2147483647;
-[eva] Recording results for upzero
-[eva] Done for function upzero
-[eva] computing for function uppol2 <- encode <- main.
+[eva:progress] Recording results for upzero
+[eva:progress] Done for function upzero
+[eva:progress] 
+  computing for function uppol2 <- encode <- main.
   Called from adpcm.c:335.
 [eva:alarm] adpcm.c:533: Warning: 
   signed overflow. assert -2147483648 ≤ 4L * (long)al1_0;
 [eva:alarm] adpcm.c:534: Warning: signed overflow. assert -wd2 ≤ 2147483647;
 [eva:alarm] adpcm.c:542: Warning: 
   signed overflow. assert -2147483648 ≤ 127L * (long)al2_0;
-[eva] Recording results for uppol2
-[eva] Done for function uppol2
-[eva] computing for function uppol1 <- encode <- main.
+[eva:progress] Recording results for uppol2
+[eva:progress] Done for function uppol2
+[eva:progress] 
+  computing for function uppol1 <- encode <- main.
   Called from adpcm.c:339.
 [eva:alarm] adpcm.c:557: Warning: 
   signed overflow. assert -2147483648 ≤ (long)al1_0 * 255L;
-[eva] Recording results for uppol1
-[eva] Done for function uppol1
-[eva] computing for function filtez <- encode <- main.
+[eva:progress] Recording results for uppol1
+[eva:progress] Done for function uppol1
+[eva:progress] 
+  computing for function filtez <- encode <- main.
   Called from adpcm.c:352.
-[eva] Recording results for filtez
-[eva] Done for function filtez
-[eva] adpcm.c:354: Reusing old results for call to filtep
-[eva] adpcm.c:370: Reusing old results for call to abs
-[eva] computing for function logsch <- encode <- main.
+[eva:progress] Recording results for filtez
+[eva:progress] Done for function filtez
+[eva:progress] adpcm.c:354: Reusing old results for call to filtep
+[eva:progress] adpcm.c:370: Reusing old results for call to abs
+[eva:progress] 
+  computing for function logsch <- encode <- main.
   Called from adpcm.c:376.
-[eva] Recording results for logsch
-[eva] Done for function logsch
-[eva] computing for function scalel <- encode <- main.
+[eva:progress] Recording results for logsch
+[eva:progress] Done for function logsch
+[eva:progress] 
+  computing for function scalel <- encode <- main.
   Called from adpcm.c:379.
-[eva] Recording results for scalel
-[eva] Done for function scalel
-[eva] computing for function upzero <- encode <- main.
+[eva:progress] Recording results for scalel
+[eva:progress] Done for function scalel
+[eva:progress] 
+  computing for function upzero <- encode <- main.
   Called from adpcm.c:387.
-[eva] Recording results for upzero
-[eva] Done for function upzero
-[eva] computing for function uppol2 <- encode <- main.
+[eva:progress] Recording results for upzero
+[eva:progress] Done for function upzero
+[eva:progress] 
+  computing for function uppol2 <- encode <- main.
   Called from adpcm.c:391.
-[eva] Recording results for uppol2
-[eva] Done for function uppol2
-[eva] computing for function uppol1 <- encode <- main.
+[eva:progress] Recording results for uppol2
+[eva:progress] Done for function uppol2
+[eva:progress] 
+  computing for function uppol1 <- encode <- main.
   Called from adpcm.c:394.
-[eva] Recording results for uppol1
-[eva] Done for function uppol1
-[eva] Recording results for encode
-[eva] Done for function encode
-[eva] computing for function encode <- main.
+[eva:progress] Recording results for uppol1
+[eva:progress] Done for function uppol1
+[eva:progress] Recording results for encode
+[eva:progress] Done for function encode
+[eva:progress] 
+  computing for function encode <- main.
   Called from adpcm.c:608.
-[eva] adpcm.c:301: Reusing old results for call to filtez
-[eva] adpcm.c:304: Reusing old results for call to filtep
-[eva] adpcm.c:311: Reusing old results for call to quantl
-[eva] adpcm.c:318: Reusing old results for call to logscl
-[eva] adpcm.c:322: Reusing old results for call to scalel
-[eva] adpcm.c:331: Reusing old results for call to upzero
-[eva] adpcm.c:335: Reusing old results for call to uppol2
-[eva] adpcm.c:339: Reusing old results for call to uppol1
-[eva] computing for function filtez <- encode <- main.
+[eva:progress] adpcm.c:301: Reusing old results for call to filtez
+[eva:progress] adpcm.c:304: Reusing old results for call to filtep
+[eva:progress] adpcm.c:311: Reusing old results for call to quantl
+[eva:progress] adpcm.c:318: Reusing old results for call to logscl
+[eva:progress] adpcm.c:322: Reusing old results for call to scalel
+[eva:progress] adpcm.c:331: Reusing old results for call to upzero
+[eva:progress] adpcm.c:335: Reusing old results for call to uppol2
+[eva:progress] adpcm.c:339: Reusing old results for call to uppol1
+[eva:progress] 
+  computing for function filtez <- encode <- main.
   Called from adpcm.c:352.
-[eva] Recording results for filtez
-[eva] Done for function filtez
-[eva] adpcm.c:354: Reusing old results for call to filtep
-[eva] adpcm.c:370: Reusing old results for call to abs
-[eva] adpcm.c:376: Reusing old results for call to logsch
-[eva] adpcm.c:379: Reusing old results for call to scalel
-[eva] computing for function upzero <- encode <- main.
+[eva:progress] Recording results for filtez
+[eva:progress] Done for function filtez
+[eva:progress] adpcm.c:354: Reusing old results for call to filtep
+[eva:progress] adpcm.c:370: Reusing old results for call to abs
+[eva:progress] adpcm.c:376: Reusing old results for call to logsch
+[eva:progress] adpcm.c:379: Reusing old results for call to scalel
+[eva:progress] 
+  computing for function upzero <- encode <- main.
   Called from adpcm.c:387.
-[eva] Recording results for upzero
-[eva] Done for function upzero
-[eva] computing for function uppol2 <- encode <- main.
+[eva:progress] Recording results for upzero
+[eva:progress] Done for function upzero
+[eva:progress] 
+  computing for function uppol2 <- encode <- main.
   Called from adpcm.c:391.
-[eva] Recording results for uppol2
-[eva] Done for function uppol2
-[eva] computing for function uppol1 <- encode <- main.
+[eva:progress] Recording results for uppol2
+[eva:progress] Done for function uppol2
+[eva:progress] 
+  computing for function uppol1 <- encode <- main.
   Called from adpcm.c:394.
-[eva] Recording results for uppol1
-[eva] Done for function uppol1
-[eva] Recording results for encode
-[eva] Done for function encode
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for uppol1
+[eva:progress] Done for function uppol1
+[eva:progress] Recording results for encode
+[eva:progress] Done for function encode
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [from] Computing for function abs
 [from] Done for function abs
 [from] Computing for function filtep

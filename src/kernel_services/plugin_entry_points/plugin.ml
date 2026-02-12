@@ -28,6 +28,8 @@ module type S_no_log = sig
   val add_group: ?memo:bool -> string -> Cmdline.Group.t
   module Verbose: Parameter_sig.Int
   module Debug: Parameter_sig.Int
+  module Message_category: Parameter_sig.String
+  module Warn_category: Parameter_sig.String
   module Lib: Parameter_sig.Site_root
   module Share: Parameter_sig.Site_root
   module Session: Parameter_sig.User_dir_opt
@@ -79,6 +81,9 @@ let is_session_visible () = session_visible_ref := true
 let plugin_subpath_ref = ref None
 let plugin_subpath s = plugin_subpath_ref := Some s
 
+let default_verbose_level = ref 1
+let set_default_verbose_level n = default_verbose_level := n
+
 let default_msg_keys_ref = ref []
 
 let reset_plugin () =
@@ -86,6 +91,7 @@ let reset_plugin () =
   share_visible_ref := false;
   session_visible_ref := false;
   plugin_subpath_ref := None;
+  default_verbose_level := 1;
   default_msg_keys_ref := [];
 ;;
 
@@ -190,8 +196,8 @@ module Register
      end) =
 struct
 
-  let verbose_level = ref (fun () -> 1)
-  let debug_level = ref (fun () -> 0)
+  let verbose_level = Extlib.mk_fun "verbose_level"
+  let debug_level = Extlib.mk_fun "debug_level"
 
   (* unused by the kernel: it uses Cmdline.Kernel_log instead;
      see module [L] below *)
@@ -609,7 +615,7 @@ struct
   module Verbose = struct
     include
       Int(struct
-        let default = !verbose_level ()
+        let default = !default_verbose_level
         let option_name = verbose_optname
         let arg_name = "n"
         let help =
@@ -617,7 +623,12 @@ struct
            else "level of verbosity for plug-in " ^ P.name)
           ^ " (default to " ^ string_of_int default ^ ")"
       end)
-    let get () = if is_set () then get () else Cmdline.Verbose_level.get ()
+
+    let get () =
+      if is_set () || Option.is_none !Cmdline.Verbose_level.value_if_set
+      then get ()
+      else Cmdline.Verbose_level.get ()
+
     let () =
       verbose_level := get;
       (* line order below matters *)
@@ -634,7 +645,7 @@ struct
   module Debug = struct
     include
       Int(struct
-        let default = !debug_level ()
+        let default = 0
         let option_name = debug_optname
         let arg_name = "n"
         let help =
@@ -717,7 +728,7 @@ struct
     end
 
   let debug_category_optname = output_mode "Msg_key" "msg-key"
-  module Debug_category =
+  module Message_category =
     Empty_string(struct
       let option_name = debug_category_optname
       let arg_name="k1[,...,kn]"
@@ -730,7 +741,7 @@ struct
 
   let () =
     let is_kernel = is_kernel () in
-    Debug_category.add_set_hook
+    Message_category.add_set_hook
       (fun _ s ->
          match parse_category s with
          | Print_help ->
@@ -775,7 +786,7 @@ struct
     let optname suffix = List.map (fun alias -> "-" ^ alias ^ suffix) aliases in
     Help.add_aliases ?visible ?deprecated (optname "-help");
     Verbose.add_aliases ?visible ?deprecated (optname "-verbose");
-    Debug_category.add_aliases ?visible ?deprecated (optname "-msg-key");
+    Message_category.add_aliases ?visible ?deprecated (optname "-msg-key");
     Warn_category.add_aliases ?visible ?deprecated (optname "-warn-key");
     LogToFile.add_aliases ?visible ?deprecated (optname "-log")
 

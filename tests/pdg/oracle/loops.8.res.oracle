@@ -1,11 +1,11 @@
 [kernel] Parsing loops.c (with preprocessing)
 [eva] Analyzing an incomplete application starting at dead_code
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   after ∈ [--..--]
-[eva] Recording results for dead_code
-[eva] Done for function dead_code
+[eva:progress] Recording results for dead_code
+[eva:progress] Done for function dead_code
 [pdg] computing for function dead_code
 [pdg] done for function dead_code
 [pdg] PDG for dead_code

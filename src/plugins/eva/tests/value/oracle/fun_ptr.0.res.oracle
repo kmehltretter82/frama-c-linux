@@ -7,8 +7,8 @@
 [kernel:typing:incompatible-types-call] fun_ptr.i:56: Warning: 
   expected 'short *' but got argument of type 'int *': & x
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t[0] ∈ {{ (long long)&f }}
    [1] ∈ {{ (long long)&g }}
@@ -16,72 +16,82 @@
   R2 ∈ {0}
   R3 ∈ {0}
   v ∈ [--..--]
-[eva] computing for function test1 <- main.
+[eva:progress] 
+  computing for function test1 <- main.
   Called from fun_ptr.i:78.
 [eva:alarm] fun_ptr.i:28: Warning: 
   pointer to function with incompatible type.
   assert \valid_function((int (*)(int ))t[nd]);
-[eva] computing for function f <- test1 <- main.
+[eva:progress] 
+  computing for function f <- test1 <- main.
   Called from fun_ptr.i:28.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] Recording results for test1
-[eva] Done for function test1
-[eva] computing for function test2 <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] Recording results for test1
+[eva:progress] Done for function test1
+[eva:progress] 
+  computing for function test2 <- main.
   Called from fun_ptr.i:79.
 [eva:alarm] fun_ptr.i:33: Warning: 
   pointer to function with incompatible type.
   assert \valid_function((int (*)(int , int ))t[nd]);
-[eva] fun_ptr.i:33: Reusing old results for call to f
-[eva] computing for function g <- test2 <- main.
+[eva:progress] fun_ptr.i:33: Reusing old results for call to f
+[eva:progress] 
+  computing for function g <- test2 <- main.
   Called from fun_ptr.i:33.
-[eva] Recording results for g
-[eva] Done for function g
-[eva] Recording results for test2
-[eva] Done for function test2
-[eva] computing for function test3 <- main.
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
+[eva:progress] Recording results for test2
+[eva:progress] Done for function test2
+[eva:progress] 
+  computing for function test3 <- main.
   Called from fun_ptr.i:80.
 [eva:alarm] fun_ptr.i:38: Warning: 
   pointer to function with incompatible type.
   assert \valid_function((double (*)(int ))t[nd]);
-[eva] Recording results for test3
-[eva] Done for function test3
+[eva:progress] Recording results for test3
+[eva:progress] Done for function test3
 [eva:alarm] fun_ptr.i:83: Warning: 
   pointer to function with incompatible type.
   assert \valid_function((double (*)(double , double ))ph);
 [eva:alarm] fun_ptr.i:85: Warning: 
   pointer to function with incompatible type.
   assert \valid_function((double (*)(void))ph);
-[eva] computing for function h <- main.
+[eva:progress] 
+  computing for function h <- main.
   Called from fun_ptr.i:87.
-[eva] Recording results for h
-[eva] Done for function h
-[eva] computing for function test_benign <- main.
+[eva:progress] Recording results for h
+[eva:progress] Done for function h
+[eva:progress] 
+  computing for function test_benign <- main.
   Called from fun_ptr.i:89.
 [eva:alarm] fun_ptr.i:56: Warning: 
   pointer to function with incompatible type. assert \valid_function(p);
-[eva] computing for function benign <- test_benign <- main.
+[eva:progress] 
+  computing for function benign <- test_benign <- main.
   Called from fun_ptr.i:56.
-[eva] Recording results for benign
-[eva] Done for function benign
-[eva] Recording results for test_benign
-[eva] Done for function test_benign
-[eva] computing for function test_too_much_benign <- main.
+[eva:progress] Recording results for benign
+[eva:progress] Done for function benign
+[eva:progress] Recording results for test_benign
+[eva:progress] Done for function test_benign
+[eva:progress] 
+  computing for function test_too_much_benign <- main.
   Called from fun_ptr.i:90.
 [eva:alarm] fun_ptr.i:70: Warning: 
   pointer to function with incompatible type.
   assert \valid_function((void (*)(int , int ))p);
-[eva] computing for function too_much <- test_too_much_benign <- main.
+[eva:progress] 
+  computing for function too_much <- test_too_much_benign <- main.
   Called from fun_ptr.i:70.
-[eva] Recording results for too_much
-[eva] Done for function too_much
+[eva:progress] Recording results for too_much
+[eva:progress] Done for function too_much
 [eva:alarm] fun_ptr.i:73: Warning: 
   pointer to function with incompatible type.
   assert \valid_function((void (*)(int , int ))p);
-[eva] Recording results for test_too_much_benign
-[eva] Done for function test_too_much_benign
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for test_too_much_benign
+[eva:progress] Done for function test_too_much_benign
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] fun_ptr.i:38: assertion 'Eva,function_pointer' got final status invalid.
 [eva] fun_ptr.i:73: assertion 'Eva,function_pointer' got final status invalid.
 [eva] fun_ptr.i:83: assertion 'Eva,function_pointer' got final status invalid.

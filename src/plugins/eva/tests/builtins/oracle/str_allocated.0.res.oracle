@@ -1,23 +1,24 @@
 [kernel] Parsing str_allocated.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
-[eva] computing for function memchr_bug <- main.
+[eva:progress] 
+  computing for function memchr_bug <- main.
   Called from str_allocated.c:19.
-[eva] str_allocated.c:12: Call to builtin malloc
+[eva:progress] str_allocated.c:12: Call to builtin malloc
 [eva:malloc:new] str_allocated.c:12: allocating variable __malloc_memchr_bug_l12
 [eva:partition] str_allocated.c:11: starting to merge loop iterations
-[eva] str_allocated.c:12: Call to builtin malloc
+[eva:progress] str_allocated.c:12: Call to builtin malloc
 [eva:malloc:weak] str_allocated.c:12: 
   marking variable `__malloc_memchr_bug_l12' as weak
 [eva:malloc] str_allocated.c:12: 
   resizing variable `__malloc_w_memchr_bug_l12' (0..-1) to fit 0..-1/7
-[eva] str_allocated.c:12: Call to builtin malloc
+[eva:progress] str_allocated.c:12: Call to builtin malloc
 [eva:alarm] str_allocated.c:14: Warning: 
   accessing uninitialized left-value. assert \initialized(&b);
-[eva] str_allocated.c:14: Call to builtin memchr
+[eva:progress] str_allocated.c:14: Call to builtin memchr
 [eva:alarm] str_allocated.c:14: Warning: 
   function memchr: precondition 'valid' got status unknown.
 [eva:alarm] str_allocated.c:14: Warning: 
@@ -28,10 +29,10 @@
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memchr
 [eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:66: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memchr
-[eva] Recording results for memchr_bug
-[eva] Done for function memchr_bug
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for memchr_bug
+[eva:progress] Done for function memchr_bug
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function memchr_bug:
   NON TERMINATING FUNCTION

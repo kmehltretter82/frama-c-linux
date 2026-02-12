@@ -1,53 +1,62 @@
 [kernel] Parsing red_alarms.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
-[eva] computing for function callstack <- main.
+[eva:progress] 
+  computing for function callstack <- main.
   Called from red_alarms.i:96.
-[eva] computing for function maybe_swap <- callstack <- main.
+[eva:progress] 
+  computing for function maybe_swap <- callstack <- main.
   Called from red_alarms.i:24.
-[eva] red_alarms.i:9: check got status valid.
-[eva] red_alarms.i:10: check got status valid.
-[eva] Recording results for maybe_swap
-[eva] Done for function maybe_swap
-[eva] computing for function maybe_swap <- callstack <- main.
+[eva:progress] red_alarms.i:9: check got status valid.
+[eva:progress] red_alarms.i:10: check got status valid.
+[eva:progress] Recording results for maybe_swap
+[eva:progress] Done for function maybe_swap
+[eva:progress] 
+  computing for function maybe_swap <- callstack <- main.
   Called from red_alarms.i:25.
 [eva:alarm] red_alarms.i:10: Warning: check got status unknown.
-[eva] Recording results for maybe_swap
-[eva] Done for function maybe_swap
-[eva] computing for function maybe_swap <- callstack <- main.
+[eva:progress] Recording results for maybe_swap
+[eva:progress] Done for function maybe_swap
+[eva:progress] 
+  computing for function maybe_swap <- callstack <- main.
   Called from red_alarms.i:26.
 [eva:alarm] red_alarms.i:10: Warning: check got status invalid.
-[eva] Recording results for maybe_swap
-[eva] Done for function maybe_swap
-[eva] computing for function maybe_swap <- callstack <- main.
+[eva:progress] Recording results for maybe_swap
+[eva:progress] Done for function maybe_swap
+[eva:progress] 
+  computing for function maybe_swap <- callstack <- main.
   Called from red_alarms.i:27.
 [eva:alarm] red_alarms.i:12: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
-[eva] Recording results for maybe_swap
-[eva] Done for function maybe_swap
-[eva] computing for function maybe_swap <- callstack <- main.
+[eva:progress] Recording results for maybe_swap
+[eva:progress] Done for function maybe_swap
+[eva:progress] 
+  computing for function maybe_swap <- callstack <- main.
   Called from red_alarms.i:28.
-[eva] Recording results for maybe_swap
-[eva] Done for function maybe_swap
-[eva] computing for function maybe_swap <- callstack <- main.
+[eva:progress] Recording results for maybe_swap
+[eva:progress] Done for function maybe_swap
+[eva:progress] 
+  computing for function maybe_swap <- callstack <- main.
   Called from red_alarms.i:29.
 [eva:alarm] red_alarms.i:13: Warning: out of bounds read. assert \valid_read(q);
-[eva] Recording results for maybe_swap
-[eva] Done for function maybe_swap
-[eva] computing for function maybe_swap <- callstack <- main.
+[eva:progress] Recording results for maybe_swap
+[eva:progress] Done for function maybe_swap
+[eva:progress] 
+  computing for function maybe_swap <- callstack <- main.
   Called from red_alarms.i:32.
 [eva:alarm] red_alarms.i:9: Warning: check got status unknown.
 [eva:alarm] red_alarms.i:12: Warning: out of bounds read. assert \valid_read(p);
 [eva:alarm] red_alarms.i:13: Warning: 
   accessing uninitialized left-value. assert \initialized(q);
-[eva] Recording results for maybe_swap
-[eva] Done for function maybe_swap
-[eva] Recording results for callstack
-[eva] Done for function callstack
-[eva] computing for function partitioning <- main.
+[eva:progress] Recording results for maybe_swap
+[eva:progress] Done for function maybe_swap
+[eva:progress] Recording results for callstack
+[eva:progress] Done for function callstack
+[eva:progress] 
+  computing for function partitioning <- main.
   Called from red_alarms.i:97.
 [eva:alarm] red_alarms.i:45: Warning: 
   accessing out of bounds index. assert i < 32;
@@ -71,46 +80,51 @@
   division by zero. assert (int)(i - 10) ≢ 0;
 [eva:alarm] red_alarms.i:67: Warning: 
   division by zero. assert (int)(i - 15) ≢ 0;
-[eva] Recording results for partitioning
-[eva] Done for function partitioning
-[eva] computing for function preconditions <- main.
+[eva:progress] Recording results for partitioning
+[eva:progress] Done for function partitioning
+[eva:progress] 
+  computing for function preconditions <- main.
   Called from red_alarms.i:98.
-[eva] computing for function in_bound <- preconditions <- main.
+[eva:progress] 
+  computing for function in_bound <- preconditions <- main.
   Called from red_alarms.i:79.
-[eva] red_alarms.i:79: 
+[eva:progress] red_alarms.i:79: 
   function in_bound: precondition 'positive' got status valid.
-[eva] red_alarms.i:79: 
+[eva:progress] red_alarms.i:79: 
   function in_bound: precondition 'bounded' got status valid.
-[eva] Recording results for in_bound
-[eva] Done for function in_bound
-[eva] computing for function in_bound <- preconditions <- main.
+[eva:progress] Recording results for in_bound
+[eva:progress] Done for function in_bound
+[eva:progress] 
+  computing for function in_bound <- preconditions <- main.
   Called from red_alarms.i:80.
 [eva:alarm] red_alarms.i:80: Warning: 
   function in_bound: precondition 'positive' got status unknown.
 [eva:alarm] red_alarms.i:80: Warning: 
   function in_bound: precondition 'bounded' got status unknown.
-[eva] Recording results for in_bound
-[eva] Done for function in_bound
-[eva] computing for function in_bound <- preconditions <- main.
+[eva:progress] Recording results for in_bound
+[eva:progress] Done for function in_bound
+[eva:progress] 
+  computing for function in_bound <- preconditions <- main.
   Called from red_alarms.i:82.
 [eva:alarm] red_alarms.i:82: Warning: 
   function in_bound: precondition 'positive' got status invalid.
-[eva] red_alarms.i:82: 
+[eva:progress] red_alarms.i:82: 
   function in_bound: no state left, precondition 'bounded' got status valid.
-[eva] Recording results for in_bound
-[eva] Done for function in_bound
-[eva] Recording results for preconditions
-[eva] Done for function preconditions
-[eva] computing for function user_assertions <- main.
+[eva:progress] Recording results for in_bound
+[eva:progress] Done for function in_bound
+[eva:progress] Recording results for preconditions
+[eva:progress] Done for function preconditions
+[eva:progress] 
+  computing for function user_assertions <- main.
   Called from red_alarms.i:99.
 [eva:alarm] red_alarms.i:87: Warning: check 'indeterminate' got status unknown.
-[eva] red_alarms.i:89: check 'true' got status valid.
+[eva:progress] red_alarms.i:89: check 'true' got status valid.
 [eva:alarm] red_alarms.i:90: Warning: check 'false' got status invalid.
 [eva:alarm] red_alarms.i:92: Warning: check 'maybe' got status unknown.
-[eva] Recording results for user_assertions
-[eva] Done for function user_assertions
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for user_assertions
+[eva:progress] Done for function user_assertions
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] red_alarms.i:45: assertion 'Eva,index_bound' got final status invalid.
 [eva] Listing red statuses in file red_alarms.csv
 [eva] ====== VALUES COMPUTED ======

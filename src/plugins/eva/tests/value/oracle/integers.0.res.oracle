@@ -1,15 +1,15 @@
 [kernel] Parsing integers.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   bin ∈ {0}
   hex ∈ {0}
   oct ∈ {0}
   dec ∈ {0}
-[eva] integers.i:7: assertion got status valid.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] integers.i:7: assertion got status valid.
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   bin ∈ {84}

@@ -1,25 +1,27 @@
 [kernel] Parsing octagons-pointers.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   size ∈ {436}
   buffer[0..435] ∈ {0}
   nondet ∈ [--..--]
-[eva] computing for function init <- main.
+[eva:progress] 
+  computing for function init <- main.
   Called from octagons-pointers.c:39.
 [eva:partition] octagons-pointers.c:18: starting to merge loop iterations
-[eva] Recording results for init
-[eva] Done for function init
-[eva] octagons-pointers.c:46: 
+[eva:progress] Recording results for init
+[eva:progress] Done for function init
+[eva:show] octagons-pointers.c:46: 
   Frama_C_dump_each:
   # octagon:
   {[ buffer - cmd ∈ {-3}
       ]}
   ==END OF DUMP==
-[eva] computing for function cmdRead <- main.
+[eva:progress] 
+  computing for function cmdRead <- main.
   Called from octagons-pointers.c:47.
-[eva] octagons-pointers.c:31: 
+[eva:show] octagons-pointers.c:31: 
   Frama_C_dump_each:
   # octagon:
   {[ buffer - cmd ∈ {-3}
@@ -27,18 +29,19 @@
      cmd - cmd ∈ {0}
       ]}
   ==END OF DUMP==
-[eva] Recording results for cmdRead
-[eva] Done for function cmdRead
-[eva] octagons-pointers.c:46: 
+[eva:progress] Recording results for cmdRead
+[eva:progress] Done for function cmdRead
+[eva:show] octagons-pointers.c:46: 
   Frama_C_dump_each:
   # octagon:
   {[ buffer - cmd ∈ [-436..-6]
      cmd->cmdLen + index ∈ [--..434]
       ]}
   ==END OF DUMP==
-[eva] computing for function cmdRead <- main.
+[eva:progress] 
+  computing for function cmdRead <- main.
   Called from octagons-pointers.c:47.
-[eva] octagons-pointers.c:31: 
+[eva:show] octagons-pointers.c:31: 
   Frama_C_dump_each:
   # octagon:
   {[ buffer - cmd ∈ [-436..-6]
@@ -78,11 +81,11 @@
   out of bounds read. assert \valid_read(elt2);
 [eva:alarm] octagons-pointers.c:35: Warning: 
   out of bounds read. assert \valid_read(elt3);
-[eva] Recording results for cmdRead
-[eva] Done for function cmdRead
+[eva:progress] Recording results for cmdRead
+[eva:progress] Done for function cmdRead
 [eva:loop-unroll:partial] octagons-pointers.c:43: loop not completely unrolled
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cmdRead:
   len ∈ {{ &buffer + [3..433] }}

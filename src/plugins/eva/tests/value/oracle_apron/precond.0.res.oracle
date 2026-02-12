@@ -1,8 +1,9 @@
-47a48,49
-> [eva] computing for function f <- main.
+56a57,59
+> [eva:progress] 
+>   computing for function f <- main.
 >   Called from precond.c:39.
-50c52,53
-< [eva] precond.c:39: Reusing old results for call to f
+60c63,64
+< [eva:progress] precond.c:39: Reusing old results for call to f
 ---
-> [eva] Recording results for f
-> [eva] Done for function f
+> [eva:progress] Recording results for f
+> [eva:progress] Done for function f

@@ -1,7 +1,7 @@
 [kernel] Parsing abstract_struct_1.c (with preprocessing)
 [kernel] Parsing abstract_struct_2.c (with preprocessing)
 [eva] Analyzing an incomplete application starting at main
-[eva] Computing initial state
+[eva:progress] Computing initial state
 [eva:initial-state] 
   creating variable S_data_0_S_repositories with imprecise size (type struct abstracttype [2])
 [eva:unknown-size] abstract_struct_1.c:10: Warning: 
@@ -10,7 +10,7 @@
   (abstract type 'struct abstracttype')
 [eva:initial-state] 
   creating variable S_data_1_S_repositories with imprecise size (type struct abstracttype [2])
-[eva] Initial state computed
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   repositories ∈ {{ NULL ; &S_repositories[0] }}
   S_repositories[0].data ∈
@@ -19,10 +19,10 @@
                 {{ NULL ; (struct abstracttype *)&S_data_1_S_repositories }}
   S_data_0_S_repositories[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
   S_data_1_S_repositories[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
-[eva] abstract_struct_1.c:13: Call to builtin calloc
+[eva:progress] abstract_struct_1.c:13: Call to builtin calloc
 [eva:malloc:new] abstract_struct_1.c:13: allocating variable __calloc_main_l13
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]

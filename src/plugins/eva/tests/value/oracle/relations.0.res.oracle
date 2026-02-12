@@ -1,7 +1,7 @@
 [kernel] Parsing relations.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t[0] ∈ {1}
    [1] ∈ {2}
@@ -49,8 +49,8 @@
   signed overflow. assert u[5] - u[1] ≤ 2147483647;
 [eva:alarm] relations.i:56: Warning: 
   out of bounds read. assert \valid_read(&pCs->L0);
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   t[0..1] ∈ {4}

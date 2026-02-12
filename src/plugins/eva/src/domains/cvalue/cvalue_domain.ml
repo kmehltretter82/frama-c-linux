@@ -8,7 +8,7 @@
 
 open Eval
 
-let dkey_cardinal = Self.register_category "cardinal"
+let dkey_cardinal = Self.register_category "cardinal" ~level:11
     ~help:"estimate the number of concrete states approximated by the analysis \
            at the end of each function"
 

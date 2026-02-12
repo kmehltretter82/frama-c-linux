@@ -1,7 +1,7 @@
 [kernel] Parsing const.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ [--..--]
   I ∈ {2}
@@ -17,125 +17,147 @@
    [4] ∈ {5}
    [5] ∈ {6}
    [6..9] ∈ {0}
-[eva] computing for function const_formal <- main.
+[eva:progress] 
+  computing for function const_formal <- main.
   Called from const.i:116.
-[eva] const.i:20: Frama_C_show_each: [-2147483648..2147483647]
+[eva:show] const.i:20: Frama_C_show_each: [-2147483648..2147483647]
 [eva:alarm] const.i:21: Warning: out of bounds write. assert \valid(&i);
 [eva] const.i:21: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
-[eva] Recording results for const_formal
-[eva] Done for function const_formal
-[eva] computing for function const_formal <- main.
+[eva:progress] Recording results for const_formal
+[eva:progress] Done for function const_formal
+[eva:progress] 
+  computing for function const_formal <- main.
   Called from const.i:117.
-[eva] const.i:20: Frama_C_show_each: {42}
-[eva] Recording results for const_formal
-[eva] Done for function const_formal
-[eva] computing for function modify_I <- main.
+[eva:show] const.i:20: Frama_C_show_each: {42}
+[eva:progress] Recording results for const_formal
+[eva:progress] Done for function const_formal
+[eva:progress] 
+  computing for function modify_I <- main.
   Called from const.i:118.
-[eva] const.i:37: Frama_C_show_each: {2}
-[eva] computing for function pointer_to_const <- modify_I <- main.
+[eva:show] const.i:37: Frama_C_show_each: {2}
+[eva:progress] 
+  computing for function pointer_to_const <- modify_I <- main.
   Called from const.i:38.
-[eva] const.i:25: Frama_C_show_each: {2}
+[eva:show] const.i:25: Frama_C_show_each: {2}
 [eva:alarm] const.i:26: Warning: out of bounds write. assert \valid(p);
 [eva] const.i:26: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
-[eva] Recording results for pointer_to_const
-[eva] Done for function pointer_to_const
-[eva] computing for function const_destination <- modify_I <- main.
+[eva:progress] Recording results for pointer_to_const
+[eva:progress] Done for function pointer_to_const
+[eva:progress] 
+  computing for function const_destination <- modify_I <- main.
   Called from const.i:39.
-[eva] const.i:31: Frama_C_show_each: {2}
+[eva:show] const.i:31: Frama_C_show_each: {2}
 [eva:alarm] const.i:32: Warning: out of bounds write. assert \valid(p);
 [eva] const.i:32: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
-[eva] Recording results for const_destination
-[eva] Done for function const_destination
-[eva] Recording results for modify_I
-[eva] Done for function modify_I
-[eva] computing for function modify_J <- main.
+[eva:progress] Recording results for const_destination
+[eva:progress] Done for function const_destination
+[eva:progress] Recording results for modify_I
+[eva:progress] Done for function modify_I
+[eva:progress] 
+  computing for function modify_J <- main.
   Called from const.i:119.
-[eva] const.i:43: Frama_C_show_each: {8}
-[eva] computing for function pointer_to_const <- modify_J <- main.
+[eva:show] const.i:43: Frama_C_show_each: {8}
+[eva:progress] 
+  computing for function pointer_to_const <- modify_J <- main.
   Called from const.i:45.
-[eva] const.i:25: Frama_C_show_each: {8; 9}
-[eva] const.i:27: Frama_C_show_each_dead:
-[eva] Recording results for pointer_to_const
-[eva] Done for function pointer_to_const
-[eva] computing for function const_destination <- modify_J <- main.
+[eva:show] const.i:25: Frama_C_show_each: {8; 9}
+[eva:show] const.i:27: Frama_C_show_each_dead:
+[eva:progress] Recording results for pointer_to_const
+[eva:progress] Done for function pointer_to_const
+[eva:progress] 
+  computing for function const_destination <- modify_J <- main.
   Called from const.i:46.
-[eva] const.i:31: Frama_C_show_each: {0; 8; 9}
-[eva] const.i:33: Frama_C_show_each: {{ &J }}
-[eva] Recording results for const_destination
-[eva] Done for function const_destination
-[eva] Recording results for modify_J
-[eva] Done for function modify_J
-[eva] computing for function modify_s <- main.
+[eva:show] const.i:31: Frama_C_show_each: {0; 8; 9}
+[eva:show] const.i:33: Frama_C_show_each: {{ &J }}
+[eva:progress] Recording results for const_destination
+[eva:progress] Done for function const_destination
+[eva:progress] Recording results for modify_J
+[eva:progress] Done for function modify_J
+[eva:progress] 
+  computing for function modify_s <- main.
   Called from const.i:120.
-[eva] const.i:50: Frama_C_show_each: {3}
-[eva] computing for function pointer_to_const <- modify_s <- main.
+[eva:show] const.i:50: Frama_C_show_each: {3}
+[eva:progress] 
+  computing for function pointer_to_const <- modify_s <- main.
   Called from const.i:51.
-[eva] const.i:25: Frama_C_show_each: {4}
-[eva] Recording results for pointer_to_const
-[eva] Done for function pointer_to_const
-[eva] computing for function const_destination <- modify_s <- main.
+[eva:show] const.i:25: Frama_C_show_each: {4}
+[eva:progress] Recording results for pointer_to_const
+[eva:progress] Done for function pointer_to_const
+[eva:progress] 
+  computing for function const_destination <- modify_s <- main.
   Called from const.i:52.
-[eva] const.i:31: Frama_C_show_each: {4}
-[eva] Recording results for const_destination
-[eva] Done for function const_destination
-[eva] Recording results for modify_s
-[eva] Done for function modify_s
-[eva] computing for function modify_t <- main.
+[eva:show] const.i:31: Frama_C_show_each: {4}
+[eva:progress] Recording results for const_destination
+[eva:progress] Done for function const_destination
+[eva:progress] Recording results for modify_s
+[eva:progress] Done for function modify_s
+[eva:progress] 
+  computing for function modify_t <- main.
   Called from const.i:121.
-[eva] const.i:56: Frama_C_show_each: {6}
-[eva] computing for function pointer_to_const <- modify_t <- main.
+[eva:show] const.i:56: Frama_C_show_each: {6}
+[eva:progress] 
+  computing for function pointer_to_const <- modify_t <- main.
   Called from const.i:57.
-[eva] const.i:25: Frama_C_show_each: {4}
-[eva] Recording results for pointer_to_const
-[eva] Done for function pointer_to_const
-[eva] computing for function const_destination <- modify_t <- main.
+[eva:show] const.i:25: Frama_C_show_each: {4}
+[eva:progress] Recording results for pointer_to_const
+[eva:progress] Done for function pointer_to_const
+[eva:progress] 
+  computing for function const_destination <- modify_t <- main.
   Called from const.i:58.
-[eva] const.i:31: Frama_C_show_each: {3}
-[eva] Recording results for const_destination
-[eva] Done for function const_destination
-[eva] Recording results for modify_t
-[eva] Done for function modify_t
-[eva] computing for function constrain_G <- main.
+[eva:show] const.i:31: Frama_C_show_each: {3}
+[eva:progress] Recording results for const_destination
+[eva:progress] Done for function const_destination
+[eva:progress] Recording results for modify_t
+[eva:progress] Done for function modify_t
+[eva:progress] 
+  computing for function constrain_G <- main.
   Called from const.i:122.
 [eva:alarm] const.i:67: Warning: assertion got status unknown.
-[eva] const.i:70: Frama_C_show_each: {1; 4}
-[eva] Recording results for constrain_G
-[eva] Done for function constrain_G
-[eva] computing for function pointer_to_const_logic <- main.
+[eva:show] const.i:70: Frama_C_show_each: {1; 4}
+[eva:progress] Recording results for constrain_G
+[eva:progress] Done for function constrain_G
+[eva:progress] 
+  computing for function pointer_to_const_logic <- main.
   Called from const.i:123.
-[eva] Recording results for pointer_to_const_logic
-[eva] Done for function pointer_to_const_logic
-[eva] computing for function local_const <- main.
+[eva:progress] Recording results for pointer_to_const_logic
+[eva:progress] Done for function pointer_to_const_logic
+[eva:progress] 
+  computing for function local_const <- main.
   Called from const.i:124.
-[eva] computing for function f <- local_const <- main.
+[eva:progress] 
+  computing for function f <- local_const <- main.
   Called from const.i:84.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] Recording results for local_const
-[eva] Done for function local_const
-[eva] computing for function ret_const <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] Recording results for local_const
+[eva:progress] Done for function local_const
+[eva:progress] 
+  computing for function ret_const <- main.
   Called from const.i:125.
-[eva] computing for function aux_ret_const <- ret_const <- main.
+[eva:progress] 
+  computing for function aux_ret_const <- ret_const <- main.
   Called from const.i:94.
-[eva] Recording results for aux_ret_const
-[eva] Done for function aux_ret_const
-[eva] Recording results for ret_const
-[eva] Done for function ret_const
-[eva] computing for function build_S <- main.
+[eva:progress] Recording results for aux_ret_const
+[eva:progress] Done for function aux_ret_const
+[eva:progress] Recording results for ret_const
+[eva:progress] Done for function ret_const
+[eva:progress] 
+  computing for function build_S <- main.
   Called from const.i:127.
-[eva] Recording results for build_S
-[eva] Done for function build_S
-[eva] const.i:128: Frama_C_show_each_S1: {1}, {2}
-[eva] computing for function mutable_test <- main.
+[eva:progress] Recording results for build_S
+[eva:progress] Done for function build_S
+[eva:show] const.i:128: Frama_C_show_each_S1: {1}, {2}
+[eva:progress] 
+  computing for function mutable_test <- main.
   Called from const.i:129.
-[eva] Recording results for mutable_test
-[eva] Done for function mutable_test
-[eva] const.i:130: Frama_C_show_each_S2: {45}, {2}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for mutable_test
+[eva:progress] Done for function mutable_test
+[eva:show] const.i:130: Frama_C_show_each_S2: {45}, {2}
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] const.i:21: assertion 'Eva,mem_access' got final status invalid.
 [eva] const.i:26: assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======

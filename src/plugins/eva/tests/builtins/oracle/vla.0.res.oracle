@@ -1,111 +1,120 @@
 [kernel] Parsing vla.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from vla.c:20.
-[eva] vla.c:6: assertion 'alloca_bounds' got status valid.
-[eva] vla.c:6: Call to builtin __fc_vla_alloc
+[eva:progress] vla.c:6: assertion 'alloca_bounds' got status valid.
+[eva:progress] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc:new] vla.c:6: allocating variable __malloc_f_l6
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
-[eva] vla.c:6: Call to builtin __fc_vla_free
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:progress] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:malloc:automatic-free] vla.c:20: freeing automatic bases: {__malloc_f_l6}
 [eva:malloc] vla.c:20: strong free on bases: {__malloc_f_l6}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from vla.c:20.
-[eva] vla.c:6: Call to builtin __fc_vla_alloc
+[eva:progress] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc] vla.c:6: resizing variable `__malloc_f_l6' (0..63) to fit 0..95
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
 [eva:alarm] vla.c:8: Warning: out of bounds write. assert \valid(t + i);
 [eva:alarm] vla.c:9: Warning: out of bounds read. assert \valid_read(t + i);
-[eva] vla.c:6: Call to builtin __fc_vla_free
+[eva:progress] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:malloc] vla.c:20: strong free on bases: {__malloc_f_l6}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from vla.c:20.
-[eva] vla.c:6: Call to builtin __fc_vla_alloc
+[eva:progress] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc] vla.c:6: resizing variable `__malloc_f_l6' (0..63/95) to fit 0..127
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
-[eva] vla.c:6: Call to builtin __fc_vla_free
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:progress] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:malloc] vla.c:20: strong free on bases: {__malloc_f_l6}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from vla.c:20.
-[eva] vla.c:6: Call to builtin __fc_vla_alloc
+[eva:progress] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc] vla.c:6: 
   resizing variable `__malloc_f_l6' (0..63/127) to fit 0..159
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
-[eva] vla.c:6: Call to builtin __fc_vla_free
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:progress] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:malloc] vla.c:20: strong free on bases: {__malloc_f_l6}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from vla.c:20.
-[eva] vla.c:6: Call to builtin __fc_vla_alloc
+[eva:progress] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc] vla.c:6: 
   resizing variable `__malloc_f_l6' (0..63/159) to fit 0..191
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
-[eva] vla.c:6: Call to builtin __fc_vla_free
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:progress] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:malloc] vla.c:20: strong free on bases: {__malloc_f_l6}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from vla.c:20.
-[eva] vla.c:6: Call to builtin __fc_vla_alloc
+[eva:progress] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc] vla.c:6: 
   resizing variable `__malloc_f_l6' (0..63/191) to fit 0..223
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
-[eva] vla.c:6: Call to builtin __fc_vla_free
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:progress] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:malloc] vla.c:20: strong free on bases: {__malloc_f_l6}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from vla.c:20.
-[eva] vla.c:6: Call to builtin __fc_vla_alloc
+[eva:progress] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc] vla.c:6: 
   resizing variable `__malloc_f_l6' (0..63/223) to fit 0..255
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
-[eva] vla.c:6: Call to builtin __fc_vla_free
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:progress] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:malloc] vla.c:20: strong free on bases: {__malloc_f_l6}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from vla.c:20.
-[eva] vla.c:6: Call to builtin __fc_vla_alloc
+[eva:progress] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc] vla.c:6: 
   resizing variable `__malloc_f_l6' (0..63/255) to fit 0..287
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
-[eva] vla.c:6: Call to builtin __fc_vla_free
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:progress] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:malloc] vla.c:20: strong free on bases: {__malloc_f_l6}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from vla.c:20.
-[eva] vla.c:6: Call to builtin __fc_vla_alloc
+[eva:progress] vla.c:6: Call to builtin __fc_vla_alloc
 [eva:malloc] vla.c:6: 
   resizing variable `__malloc_f_l6' (0..63/287) to fit 0..319
-[eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
-[eva] vla.c:6: Call to builtin __fc_vla_free
+[eva:show] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
+[eva:progress] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:malloc] vla.c:20: strong free on bases: {__malloc_f_l6}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   t ∈ ESCAPINGADDR

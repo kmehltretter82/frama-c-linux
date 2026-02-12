@@ -1,7 +1,7 @@
 [kernel] Parsing bitfield_longlong.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   s50.z ∈ {2}
      .[bits 50 to 63] ∈ {0}
@@ -9,11 +9,11 @@
      .[bits 10 to 31] ∈ {0}
   u32.z ∈ {4294967295}
   s32.z ∈ {-1}
-[eva] bitfield_longlong.c:25: 
+[eva:show] bitfield_longlong.c:25: 
   Frama_C_show_each: {{ "%zu %zu %zu %zu\n" }}, {8}, {4}, {8}, {4}
-[eva] bitfield_longlong.c:31: Frama_C_show_each: {{ "%d %d\n" }}, {1}, {0}
-[eva] Recording results for main
-[eva] Done for function main
+[eva:show] bitfield_longlong.c:31: Frama_C_show_each: {{ "%d %d\n" }}, {1}, {0}
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   x ∈ {1}

@@ -1,7 +1,7 @@
 [kernel] Parsing val_if.i (no preprocessing)
 [eva] Analyzing a complete application starting at f
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   i ∈ {0}
   j ∈ {0}
@@ -11,8 +11,8 @@
   m ∈ {0}
   n ∈ {0}
   d ∈ {0}
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   i ∈ {10}

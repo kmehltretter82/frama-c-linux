@@ -1,40 +1,43 @@
 [kernel] Parsing bts283.i (no preprocessing)
 [slicing] slicing requests in progress...
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}
   y ∈ {0}
   z ∈ {0}
   X ∈ {0}
   Y ∈ {0}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from bts283.i:33.
-[eva] bts283.i:33: function f: precondition got status valid.
-[eva] bts283.i:10: function f: postcondition got status valid.
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] bts283.i:33: function f: precondition got status valid.
+[eva:progress] bts283.i:10: function f: postcondition got status valid.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from bts283.i:34.
 [eva] using specification for function g
-[eva] bts283.i:34: function g: precondition 'a' got status valid.
-[eva] bts283.i:34: function g: precondition 'b' got status valid.
-[eva] Done for function g
+[eva:progress] bts283.i:34: function g: precondition 'a' got status valid.
+[eva:progress] bts283.i:34: function g: precondition 'b' got status valid.
+[eva:progress] Done for function g
 [eva:alarm] bts283.i:34: Warning: 
   signed overflow. assert z + tmp ≤ 2147483647;
                    (tmp from g(1, 2))
-[eva] computing for function k <- main.
+[eva:progress] 
+  computing for function k <- main.
   Called from bts283.i:35.
-[eva] bts283.i:35: function k: precondition got status valid.
+[eva:progress] bts283.i:35: function k: precondition got status valid.
 [eva:alarm] bts283.i:27: Warning: signed overflow. assert Y + 1 ≤ 2147483647;
-[eva] bts283.i:22: function k: postcondition got status valid.
+[eva:progress] bts283.i:22: function k: postcondition got status valid.
 [eva:alarm] bts283.i:23: Warning: function k: postcondition got status unknown.
-[eva] Recording results for k
-[eva] Done for function k
+[eva:progress] Recording results for k
+[eva:progress] Done for function k
 [eva:alarm] bts283.i:36: Warning: signed overflow. assert X + z ≤ 2147483647;
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function main

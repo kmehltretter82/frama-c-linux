@@ -1,7 +1,7 @@
 [kernel] Parsing offsetmap.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   TT[0] ∈ {1}
     [1] ∈ {2}
@@ -23,40 +23,46 @@
   b2 ∈ {0}
   a2 ∈ {0}
   s[0..9999999] ∈ {0}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from offsetmap.i:108.
 [eva:partition] offsetmap.i:19: starting to merge loop iterations
 [eva:partition] offsetmap.i:29: starting to merge loop iterations
 [eva:alarm] offsetmap.i:51: Warning: 
   pointer downcast. assert (unsigned int)(&x2) ≤ 2147483647;
-[eva] Recording results for f
-[eva] Done for function f
-[eva] computing for function g <- main.
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
+[eva:progress] 
+  computing for function g <- main.
   Called from offsetmap.i:109.
 [eva:alarm] offsetmap.i:66: Warning: 
   accessing out of bounds index. assert 0 ≤ i_0;
 [eva:alarm] offsetmap.i:66: Warning: 
   accessing out of bounds index. assert i_0 < 10000000;
-[eva] Recording results for g
-[eva] Done for function g
-[eva] computing for function h <- main.
+[eva:progress] Recording results for g
+[eva:progress] Done for function g
+[eva:progress] 
+  computing for function h <- main.
   Called from offsetmap.i:110.
-[eva] computing for function Frama_C_interval <- h <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- h <- main.
   Called from offsetmap.i:87.
 [eva] using specification for function Frama_C_interval
-[eva] Done for function Frama_C_interval
-[eva] offsetmap.i:90: Frama_C_show_each_1_256_257: [-2147483648..2147483647]
+[eva:progress] Done for function Frama_C_interval
+[eva:show] offsetmap.i:90: 
+  Frama_C_show_each_1_256_257: [-2147483648..2147483647]
 [eva:alarm] offsetmap.i:95: Warning: 
   pointer comparison. assert \pointer_comparable((void *)q, (void *)0);
 [eva:alarm] offsetmap.i:95: Warning: out of bounds write. assert \valid(q);
-[eva] computing for function Frama_C_interval <- h <- main.
+[eva:progress] 
+  computing for function Frama_C_interval <- h <- main.
   Called from offsetmap.i:101.
-[eva] Done for function Frama_C_interval
-[eva] offsetmap.i:104: Frama_C_show_each_1_256_257: [-32768..32767]
-[eva] Recording results for h
-[eva] Done for function h
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function Frama_C_interval
+[eva:show] offsetmap.i:104: Frama_C_show_each_1_256_257: [-32768..32767]
+[eva:progress] Recording results for h
+[eva:progress] Done for function h
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     offsetmap.i:94: imprecise merge of addresses

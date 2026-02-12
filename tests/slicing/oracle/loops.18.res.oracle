@@ -1,7 +1,7 @@
 [kernel] Parsing loops.i (no preprocessing)
 [eva] Analyzing an incomplete application starting at stop_f2
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ [--..--]
   C1 ∈ [--..--]
@@ -14,12 +14,13 @@
 [kernel:annot:missing-spec] loops.i:89: Warning: 
   Neither code nor specification for function stop, generating default assigns.
   See -generated-spec-* options for more info.
-[eva] computing for function stop <- stop_f2.
+[eva:progress] 
+  computing for function stop <- stop_f2.
   Called from loops.i:89.
 [eva] using specification for function stop
-[eva] Done for function stop
-[eva] Recording results for stop_f2
-[eva] Done for function stop_f2
+[eva:progress] Done for function stop
+[eva:progress] Recording results for stop_f2
+[eva:progress] Done for function stop_f2
 [from] Computing for function stop_f2
 [from] Computing for function stop <-stop_f2
 [from] Done for function stop

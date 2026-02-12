@@ -82,12 +82,9 @@ let emit_status ppt status =
 
 (* Display the message as result/warning depending on [status] *)
 let msg_status status ?current ?once ?source ?stacktrace fmt =
-  if status = Alarmset.True then
-    if Parameters.ValShowProgress.get ()
-    then Self.result ?current ?once ?source fmt
-    else Self.result ?current ?once ?source ~level:2 fmt
-  else
-    Self.warning ~wkey:Self.wkey_alarm ?current ?once ?source ?stacktrace fmt
+  if status = Alarmset.True
+  then Self.result ~dkey:Self.dkey_progress ?current ?once ?source fmt
+  else Self.warning ~wkey:Self.wkey_alarm ?current ?once ?source ?stacktrace fmt
 
 let behavior_inactive fmt =
   Format.fprintf fmt " (Behavior may be inactive, no reduction performed.)"
@@ -199,7 +196,7 @@ let process_inactive_behavior kf call_ki behavior =
       end
     ) behavior.b_requires;
   if !emitted then
-    Self.result ~once:true ~current:true ~level:2 ~stacktrace:true
+    Self.result ~once:true ~current:true ~level:6 ~stacktrace:true
       "%a: assumes got status invalid; behavior not evaluated."
       (pp_header kf) behavior
 
@@ -221,7 +218,7 @@ let process_inactive_postconds kf inactive_bhvs =
            end
          ) b.b_post_cond;
        if !emitted then
-         Self.result ~once:true ~current:true ~level:2 ~stacktrace:true
+         Self.result ~once:true ~current:true ~level:6 ~stacktrace:true
            "%a: requires got status invalid; postconditions not evaluated."
            (pp_header kf) b;
     ) inactive_bhvs

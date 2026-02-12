@@ -1,7 +1,7 @@
 [kernel] Parsing alias.i (no preprocessing)
 [eva] Analyzing a complete application starting at main8
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   NULL[rbits 0 to 2047] ∈ [--..--]
   A ∈ {0}
@@ -57,8 +57,8 @@
   U ∈ {0}
   char1 ∈ {0}
   ll1 ∈ {0}
-[eva] Recording results for main8
-[eva] Done for function main8
+[eva:progress] Recording results for main8
+[eva:progress] Done for function main8
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main8:
   A ∈ {3; 4}

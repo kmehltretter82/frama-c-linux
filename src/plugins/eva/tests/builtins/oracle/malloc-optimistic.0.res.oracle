@@ -1,103 +1,112 @@
 [kernel] Parsing malloc-optimistic.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
-[eva] computing for function main1 <- main.
+[eva:progress] 
+  computing for function main1 <- main.
   Called from malloc-optimistic.c:135.
-[eva] malloc-optimistic.c:16: Frama_C_show_each_1_1: {1}
-[eva] malloc-optimistic.c:16: Frama_C_show_each_1_1: {0}
+[eva:show] malloc-optimistic.c:16: Frama_C_show_each_1_1: {1}
+[eva:show] malloc-optimistic.c:16: Frama_C_show_each_1_1: {0}
 [eva:builtins:missing-spec] malloc-optimistic.c:6: Warning: 
   No Frama-C libc specification found for function malloc, for which a builtin is used; its soundness relies on the specification provided by the user.
-[eva] malloc-optimistic.c:17: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:17: Call to builtin malloc
 [eva:malloc:new] malloc-optimistic.c:17: allocating variable __malloc_main1_l17
-[eva] malloc-optimistic.c:17: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:17: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:17: 
   resizing variable `__malloc_main1_l17' (0..63) to fit 0..31
-[eva] malloc-optimistic.c:18: Frama_C_show_each_1_2: {1}
-[eva] malloc-optimistic.c:18: Frama_C_show_each_1_2: {0}
+[eva:show] malloc-optimistic.c:18: Frama_C_show_each_1_2: {1}
+[eva:show] malloc-optimistic.c:18: Frama_C_show_each_1_2: {0}
 [eva:alarm] malloc-optimistic.c:19: Warning: 
   out of bounds write. assert \valid(p + i);
-[eva] Recording results for main1
-[eva] Done for function main1
+[eva:progress] Recording results for main1
+[eva:progress] Done for function main1
 [eva:builtins:missing-spec] malloc-optimistic.c:9: Warning: 
   No Frama-C libc specification found for function free, for which a builtin is used; its soundness relies on the specification provided by the user.
-[eva] malloc-optimistic.c:136: Call to builtin free
+[eva:progress] malloc-optimistic.c:136: Call to builtin free
 [eva:malloc] malloc-optimistic.c:136: strong free on bases: {__malloc_main1_l17}
-[eva] computing for function main2 <- main.
+[eva:progress] 
+  computing for function main2 <- main.
   Called from malloc-optimistic.c:137.
-[eva] malloc-optimistic.c:26: Frama_C_show_each_2_1: {1}
-[eva] malloc-optimistic.c:26: Frama_C_show_each_2_1: {2}
-[eva] malloc-optimistic.c:27: Call to builtin malloc
+[eva:show] malloc-optimistic.c:26: Frama_C_show_each_2_1: {1}
+[eva:show] malloc-optimistic.c:26: Frama_C_show_each_2_1: {2}
+[eva:progress] malloc-optimistic.c:27: Call to builtin malloc
 [eva:malloc:new] malloc-optimistic.c:27: allocating variable __malloc_main2_l27
-[eva] malloc-optimistic.c:27: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:27: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:27: 
   resizing variable `__malloc_main2_l27' (0..63) to fit 0..95
-[eva] malloc-optimistic.c:28: Frama_C_show_each_2_2: {1}
-[eva] malloc-optimistic.c:28: Frama_C_show_each_2_2: {2}
+[eva:show] malloc-optimistic.c:28: Frama_C_show_each_2_2: {1}
+[eva:show] malloc-optimistic.c:28: Frama_C_show_each_2_2: {2}
 [eva:alarm] malloc-optimistic.c:29: Warning: 
   out of bounds write. assert \valid(p + i);
-[eva] Recording results for main2
-[eva] Done for function main2
-[eva] malloc-optimistic.c:138: Call to builtin free
+[eva:progress] Recording results for main2
+[eva:progress] Done for function main2
+[eva:progress] malloc-optimistic.c:138: Call to builtin free
 [eva:malloc] malloc-optimistic.c:138: strong free on bases: {__malloc_main2_l27}
-[eva] computing for function main3 <- main.
+[eva:progress] 
+  computing for function main3 <- main.
   Called from malloc-optimistic.c:139.
-[eva] computing for function main_3_aux <- main3 <- main.
+[eva:progress] 
+  computing for function main_3_aux <- main3 <- main.
   Called from malloc-optimistic.c:48.
-[eva] malloc-optimistic.c:34: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:34: Call to builtin malloc
 [eva:malloc:new] malloc-optimistic.c:34: 
   allocating variable __malloc_main_3_aux_l34
-[eva] Recording results for main_3_aux
-[eva] Done for function main_3_aux
-[eva] computing for function main_3_aux <- main3 <- main.
+[eva:progress] Recording results for main_3_aux
+[eva:progress] Done for function main_3_aux
+[eva:progress] 
+  computing for function main_3_aux <- main3 <- main.
   Called from malloc-optimistic.c:48.
-[eva] malloc-optimistic.c:34: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:34: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:34: 
   resizing variable `__malloc_main_3_aux_l34' (0..63) to fit 0..31
-[eva] Recording results for main_3_aux
-[eva] Done for function main_3_aux
-[eva] Recording results for main3
-[eva] Done for function main3
-[eva] malloc-optimistic.c:140: Call to builtin free
+[eva:progress] Recording results for main_3_aux
+[eva:progress] Done for function main_3_aux
+[eva:progress] Recording results for main3
+[eva:progress] Done for function main3
+[eva:progress] malloc-optimistic.c:140: Call to builtin free
 [eva:malloc] malloc-optimistic.c:140: 
   strong free on bases: {__malloc_main_3_aux_l34}
-[eva] computing for function main4 <- main.
+[eva:progress] 
+  computing for function main4 <- main.
   Called from malloc-optimistic.c:141.
-[eva] computing for function main_4_aux <- main4 <- main.
+[eva:progress] 
+  computing for function main_4_aux <- main4 <- main.
   Called from malloc-optimistic.c:56.
-[eva] malloc-optimistic.c:40: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:40: Call to builtin malloc
 [eva:malloc:new] malloc-optimistic.c:40: 
   allocating variable __malloc_main_4_aux_l40
-[eva] Recording results for main_4_aux
-[eva] Done for function main_4_aux
-[eva] computing for function main_4_aux <- main4 <- main.
+[eva:progress] Recording results for main_4_aux
+[eva:progress] Done for function main_4_aux
+[eva:progress] 
+  computing for function main_4_aux <- main4 <- main.
   Called from malloc-optimistic.c:56.
-[eva] malloc-optimistic.c:40: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:40: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:40: 
   resizing variable `__malloc_main_4_aux_l40' (0..63) to fit 0..95
 [eva:alarm] malloc-optimistic.c:41: Warning: 
   out of bounds write. assert \valid(p + i);
-[eva] Recording results for main_4_aux
-[eva] Done for function main_4_aux
-[eva] Recording results for main4
-[eva] Done for function main4
-[eva] malloc-optimistic.c:142: Call to builtin free
+[eva:progress] Recording results for main_4_aux
+[eva:progress] Done for function main_4_aux
+[eva:progress] Recording results for main4
+[eva:progress] Done for function main4
+[eva:progress] malloc-optimistic.c:142: Call to builtin free
 [eva:malloc] malloc-optimistic.c:142: 
   strong free on bases: {__malloc_main_4_aux_l40}
-[eva] computing for function main5 <- main.
+[eva:progress] 
+  computing for function main5 <- main.
   Called from malloc-optimistic.c:144.
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc:new] malloc-optimistic.c:64: allocating variable __malloc_main5_l64
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..63) to fit 0..31
 [eva:alarm] malloc-optimistic.c:65: Warning: 
   out of bounds write. assert \valid(p + i);
 [eva:alarm] malloc-optimistic.c:66: Warning: 
   out of bounds read. assert \valid_read(p + i);
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -110,7 +119,7 @@
   __malloc_main5_l64[0] ∈ UNINITIALIZED
                     [1] ∈ {0}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -122,17 +131,17 @@
   __retres ∈ UNINITIALIZED
   __malloc_main5_l64[0] ∈ {0}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/63) to fit 0..95
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/95) to fit 0..63
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -145,7 +154,7 @@
   __malloc_main5_l64[0..1] ∈ UNINITIALIZED
                     [2] ∈ {1}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -158,17 +167,17 @@
   __malloc_main5_l64[0] ∈ UNINITIALIZED
                     [1] ∈ {1}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/95) to fit 0..127
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/127) to fit 0..95
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -181,7 +190,7 @@
   __malloc_main5_l64[0..2] ∈ UNINITIALIZED
                     [3] ∈ {2}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -194,17 +203,17 @@
   __malloc_main5_l64[0..1] ∈ UNINITIALIZED
                     [2] ∈ {2}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/127) to fit 0..159
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/159) to fit 0..127
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -217,7 +226,7 @@
   __malloc_main5_l64[0..3] ∈ UNINITIALIZED
                     [4] ∈ {3}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -230,17 +239,17 @@
   __malloc_main5_l64[0..2] ∈ UNINITIALIZED
                     [3] ∈ {3}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/159) to fit 0..191
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/191) to fit 0..159
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -253,7 +262,7 @@
   __malloc_main5_l64[0..4] ∈ UNINITIALIZED
                     [5] ∈ {4}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -266,17 +275,17 @@
   __malloc_main5_l64[0..3] ∈ UNINITIALIZED
                     [4] ∈ {4}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/191) to fit 0..223
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/223) to fit 0..191
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -289,7 +298,7 @@
   __malloc_main5_l64[0..5] ∈ UNINITIALIZED
                     [6] ∈ {5}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -302,17 +311,17 @@
   __malloc_main5_l64[0..4] ∈ UNINITIALIZED
                     [5] ∈ {5}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/223) to fit 0..255
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/255) to fit 0..223
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -325,7 +334,7 @@
   __malloc_main5_l64[0..6] ∈ UNINITIALIZED
                     [7] ∈ {6}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -338,17 +347,17 @@
   __malloc_main5_l64[0..5] ∈ UNINITIALIZED
                     [6] ∈ {6}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/255) to fit 0..287
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/287) to fit 0..255
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -361,7 +370,7 @@
   __malloc_main5_l64[0..7] ∈ UNINITIALIZED
                     [8] ∈ {7}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -374,17 +383,17 @@
   __malloc_main5_l64[0..6] ∈ UNINITIALIZED
                     [7] ∈ {7}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/287) to fit 0..319
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/319) to fit 0..287
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -397,7 +406,7 @@
   __malloc_main5_l64[0..8] ∈ UNINITIALIZED
                     [9] ∈ {8}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -410,17 +419,17 @@
   __malloc_main5_l64[0..7] ∈ UNINITIALIZED
                     [8] ∈ {8}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/319) to fit 0..351
-[eva] malloc-optimistic.c:64: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31/351) to fit 0..319
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -433,7 +442,7 @@
   __malloc_main5_l64[0..9] ∈ UNINITIALIZED
                     [10] ∈ {9}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:67: 
+[eva:show] malloc-optimistic.c:67: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -446,24 +455,25 @@
   __malloc_main5_l64[0..8] ∈ UNINITIALIZED
                     [9] ∈ {9}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] malloc-optimistic.c:68: Call to builtin free
+[eva:progress] malloc-optimistic.c:68: Call to builtin free
 [eva:malloc] malloc-optimistic.c:68: strong free on bases: {__malloc_main5_l64}
-[eva] Recording results for main5
-[eva] Done for function main5
-[eva] computing for function main6 <- main.
+[eva:progress] Recording results for main5
+[eva:progress] Done for function main5
+[eva:progress] 
+  computing for function main6 <- main.
   Called from malloc-optimistic.c:145.
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc:new] malloc-optimistic.c:77: allocating variable __malloc_main6_l77
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_main6_l77' (0..63) to fit 0..31
 [eva:alarm] malloc-optimistic.c:78: Warning: 
   out of bounds write. assert \valid(p + i);
 [eva:alarm] malloc-optimistic.c:79: Warning: 
   out of bounds read. assert \valid_read(p + i);
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -476,7 +486,7 @@
   __malloc_main6_l77[0] ∈ UNINITIALIZED
                     [1] ∈ {0}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -488,19 +498,19 @@
   __retres ∈ UNINITIALIZED
   __malloc_main6_l77[0] ∈ {0}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:81: Call to builtin free
+[eva:progress] malloc-optimistic.c:81: Call to builtin free
 [eva:malloc] malloc-optimistic.c:81: strong free on bases: {__malloc_main6_l77}
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc:weak] malloc-optimistic.c:77: 
   marking variable `__malloc_main6_l77' as weak
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/63) to fit 0..95
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/95) to fit 0..63
 [eva:alarm] malloc-optimistic.c:79: Warning: 
   accessing uninitialized left-value. assert \initialized(p + i);
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -514,7 +524,7 @@
                       [1] ∈ {0} or UNINITIALIZED
                       [2] ∈ {1} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -527,15 +537,15 @@
   __malloc_w_main6_l77[0] ∈ UNINITIALIZED
                       [1] ∈ {0; 1} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:81: Call to builtin free
+[eva:progress] malloc-optimistic.c:81: Call to builtin free
 [eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/95) to fit 0..127
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/127) to fit 0..95
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -550,7 +560,7 @@
                       [2] ∈ {1} or UNINITIALIZED
                       [3] ∈ {2} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -564,15 +574,15 @@
                       [1] ∈ {0; 1} or UNINITIALIZED
                       [2] ∈ {1; 2} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:81: Call to builtin free
+[eva:progress] malloc-optimistic.c:81: Call to builtin free
 [eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/127) to fit 0..159
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/159) to fit 0..127
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -588,7 +598,7 @@
                       [3] ∈ {2} or UNINITIALIZED
                       [4] ∈ {3} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -603,15 +613,15 @@
                       [2] ∈ {1; 2} or UNINITIALIZED
                       [3] ∈ {2; 3} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:81: Call to builtin free
+[eva:progress] malloc-optimistic.c:81: Call to builtin free
 [eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/159) to fit 0..191
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/191) to fit 0..159
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -628,7 +638,7 @@
                       [4] ∈ {3} or UNINITIALIZED
                       [5] ∈ {4} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -644,15 +654,15 @@
                       [3] ∈ {2; 3} or UNINITIALIZED
                       [4] ∈ {3; 4} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:81: Call to builtin free
+[eva:progress] malloc-optimistic.c:81: Call to builtin free
 [eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/191) to fit 0..223
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/223) to fit 0..191
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -670,7 +680,7 @@
                       [5] ∈ {4} or UNINITIALIZED
                       [6] ∈ {5} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -687,15 +697,15 @@
                       [4] ∈ {3; 4} or UNINITIALIZED
                       [5] ∈ {4; 5} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:81: Call to builtin free
+[eva:progress] malloc-optimistic.c:81: Call to builtin free
 [eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/223) to fit 0..255
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/255) to fit 0..223
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -714,7 +724,7 @@
                       [6] ∈ {5} or UNINITIALIZED
                       [7] ∈ {6} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -732,15 +742,15 @@
                       [5] ∈ {4; 5} or UNINITIALIZED
                       [6] ∈ {5; 6} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:81: Call to builtin free
+[eva:progress] malloc-optimistic.c:81: Call to builtin free
 [eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/255) to fit 0..287
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/287) to fit 0..255
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -760,7 +770,7 @@
                       [7] ∈ {6} or UNINITIALIZED
                       [8] ∈ {7} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -779,15 +789,15 @@
                       [6] ∈ {5; 6} or UNINITIALIZED
                       [7] ∈ {6; 7} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:81: Call to builtin free
+[eva:progress] malloc-optimistic.c:81: Call to builtin free
 [eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/287) to fit 0..319
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/319) to fit 0..287
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -808,7 +818,7 @@
                       [8] ∈ {7} or UNINITIALIZED
                       [9] ∈ {8} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -828,15 +838,15 @@
                       [7] ∈ {6; 7} or UNINITIALIZED
                       [8] ∈ {7; 8} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:81: Call to builtin free
+[eva:progress] malloc-optimistic.c:81: Call to builtin free
 [eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/319) to fit 0..351
-[eva] malloc-optimistic.c:77: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_w_main6_l77' (0..31/351) to fit 0..319
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -858,7 +868,7 @@
                       [9] ∈ {8} or UNINITIALIZED
                       [10] ∈ {9} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:80: 
+[eva:show] malloc-optimistic.c:80: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -879,22 +889,23 @@
                       [8] ∈ {7; 8} or UNINITIALIZED
                       [9] ∈ {8; 9} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:81: Call to builtin free
+[eva:progress] malloc-optimistic.c:81: Call to builtin free
 [eva:malloc] malloc-optimistic.c:81: weak free on bases: {__malloc_w_main6_l77}
-[eva] Recording results for main6
-[eva] Done for function main6
-[eva] computing for function main7 <- main.
+[eva:progress] Recording results for main6
+[eva:progress] Done for function main6
+[eva:progress] 
+  computing for function main7 <- main.
   Called from malloc-optimistic.c:148.
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc:new] malloc-optimistic.c:90: allocating variable __malloc_main7_l90
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..63) to fit 0..31
 [eva:alarm] malloc-optimistic.c:91: Warning: 
   out of bounds write. assert \valid(p + i);
 [eva:alarm] malloc-optimistic.c:92: Warning: 
   out of bounds read. assert \valid_read(p + i);
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -918,7 +929,7 @@
   __malloc_main7_l90[0] ∈ UNINITIALIZED
                     [1] ∈ {0}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -941,17 +952,17 @@
                       [10] ∈ {9} or UNINITIALIZED
   __malloc_main7_l90[0] ∈ {0}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/63) to fit 0..95
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/95) to fit 0..63
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -975,7 +986,7 @@
   __malloc_main7_l90[0..1] ∈ UNINITIALIZED
                     [2] ∈ {1}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -999,17 +1010,17 @@
   __malloc_main7_l90[0] ∈ UNINITIALIZED
                     [1] ∈ {1}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/95) to fit 0..127
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/127) to fit 0..95
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1033,7 +1044,7 @@
   __malloc_main7_l90[0..2] ∈ UNINITIALIZED
                     [3] ∈ {2}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1057,17 +1068,17 @@
   __malloc_main7_l90[0..1] ∈ UNINITIALIZED
                     [2] ∈ {2}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/127) to fit 0..159
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/159) to fit 0..127
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1091,7 +1102,7 @@
   __malloc_main7_l90[0..3] ∈ UNINITIALIZED
                     [4] ∈ {3}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1115,17 +1126,17 @@
   __malloc_main7_l90[0..2] ∈ UNINITIALIZED
                     [3] ∈ {3}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/159) to fit 0..191
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/191) to fit 0..159
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1149,7 +1160,7 @@
   __malloc_main7_l90[0..4] ∈ UNINITIALIZED
                     [5] ∈ {4}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1173,17 +1184,17 @@
   __malloc_main7_l90[0..3] ∈ UNINITIALIZED
                     [4] ∈ {4}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/191) to fit 0..223
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/223) to fit 0..191
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1207,7 +1218,7 @@
   __malloc_main7_l90[0..5] ∈ UNINITIALIZED
                     [6] ∈ {5}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1231,17 +1242,17 @@
   __malloc_main7_l90[0..4] ∈ UNINITIALIZED
                     [5] ∈ {5}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/223) to fit 0..255
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/255) to fit 0..223
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1265,7 +1276,7 @@
   __malloc_main7_l90[0..6] ∈ UNINITIALIZED
                     [7] ∈ {6}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1289,17 +1300,17 @@
   __malloc_main7_l90[0..5] ∈ UNINITIALIZED
                     [6] ∈ {6}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/255) to fit 0..287
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/287) to fit 0..255
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1323,7 +1334,7 @@
   __malloc_main7_l90[0..7] ∈ UNINITIALIZED
                     [8] ∈ {7}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1347,17 +1358,17 @@
   __malloc_main7_l90[0..6] ∈ UNINITIALIZED
                     [7] ∈ {7}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/287) to fit 0..319
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/319) to fit 0..287
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1381,7 +1392,7 @@
   __malloc_main7_l90[0..8] ∈ UNINITIALIZED
                     [9] ∈ {8}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1405,17 +1416,17 @@
   __malloc_main7_l90[0..7] ∈ UNINITIALIZED
                     [8] ∈ {8}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/319) to fit 0..351
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/351) to fit 0..319
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1439,7 +1450,7 @@
   __malloc_main7_l90[0..9] ∈ UNINITIALIZED
                     [10] ∈ {9}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1463,17 +1474,17 @@
   __malloc_main7_l90[0..8] ∈ UNINITIALIZED
                     [9] ∈ {9}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/351) to fit 0..383
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/383) to fit 0..351
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1497,7 +1508,7 @@
   __malloc_main7_l90[0..10] ∈ UNINITIALIZED
                     [11] ∈ {10}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1521,17 +1532,17 @@
   __malloc_main7_l90[0..9] ∈ UNINITIALIZED
                     [10] ∈ {10}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/383) to fit 0..415
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/415) to fit 0..383
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1555,7 +1566,7 @@
   __malloc_main7_l90[0..11] ∈ UNINITIALIZED
                     [12] ∈ {11}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1579,17 +1590,17 @@
   __malloc_main7_l90[0..10] ∈ UNINITIALIZED
                     [11] ∈ {11}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/415) to fit 0..447
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/447) to fit 0..415
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1613,7 +1624,7 @@
   __malloc_main7_l90[0..12] ∈ UNINITIALIZED
                     [13] ∈ {12}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1637,17 +1648,17 @@
   __malloc_main7_l90[0..11] ∈ UNINITIALIZED
                     [12] ∈ {12}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/447) to fit 0..479
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/479) to fit 0..447
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1671,7 +1682,7 @@
   __malloc_main7_l90[0..13] ∈ UNINITIALIZED
                     [14] ∈ {13}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1695,17 +1706,17 @@
   __malloc_main7_l90[0..12] ∈ UNINITIALIZED
                     [13] ∈ {13}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/479) to fit 0..511
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/511) to fit 0..479
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1729,7 +1740,7 @@
   __malloc_main7_l90[0..14] ∈ UNINITIALIZED
                     [15] ∈ {14}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1753,16 +1764,16 @@
   __malloc_main7_l90[0..13] ∈ UNINITIALIZED
                     [14] ∈ {14}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/511) to fit 0..511/543
 [eva:alarm] malloc-optimistic.c:92: Warning: 
   accessing uninitialized left-value. assert \initialized(p + i);
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1786,13 +1797,13 @@
   __malloc_main7_l90[0..14] ∈ UNINITIALIZED
                     [15..16] ∈ {15} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
 [eva:partition] malloc-optimistic.c:88: starting to merge loop iterations
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/543) to fit 0..511/575
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1816,12 +1827,12 @@
   __malloc_main7_l90[0..14] ∈ UNINITIALIZED
                     [15..17] ∈ {15; 16} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/575) to fit 0..511/607
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1845,12 +1856,12 @@
   __malloc_main7_l90[0..14] ∈ UNINITIALIZED
                     [15..18] ∈ {15; 16; 17} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:90: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/607) to fit 0..511/3231
-[eva] malloc-optimistic.c:93: 
+[eva:show] malloc-optimistic.c:93: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1874,23 +1885,24 @@
   __malloc_main7_l90[0..14] ∈ UNINITIALIZED
                     [15..100] ∈ [15..99] or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:94: Call to builtin free
+[eva:progress] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] Recording results for main7
-[eva] Done for function main7
-[eva] computing for function main8 <- main.
+[eva:progress] Recording results for main7
+[eva:progress] Done for function main7
+[eva:progress] 
+  computing for function main8 <- main.
   Called from malloc-optimistic.c:149.
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc:new] malloc-optimistic.c:103: 
   allocating variable __malloc_main8_l103
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_main8_l103' (0..63) to fit 0..31
 [eva:alarm] malloc-optimistic.c:104: Warning: 
   out of bounds write. assert \valid(p + i);
 [eva:alarm] malloc-optimistic.c:105: Warning: 
   out of bounds read. assert \valid_read(p + i);
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1914,7 +1926,7 @@
   __malloc_main8_l103[0] ∈ UNINITIALIZED
                      [1] ∈ {0}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1937,20 +1949,20 @@
                       [10] ∈ {9} or UNINITIALIZED
   __malloc_main8_l103[0] ∈ {0}
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   strong free on bases: {__malloc_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc:weak] malloc-optimistic.c:103: 
   marking variable `__malloc_main8_l103' as weak
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/63) to fit 0..95
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/95) to fit 0..63
 [eva:alarm] malloc-optimistic.c:105: Warning: 
   accessing uninitialized left-value. assert \initialized(p + i);
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1975,7 +1987,7 @@
                        [1] ∈ {0} or UNINITIALIZED
                        [2] ∈ {1} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -1999,16 +2011,16 @@
   __malloc_w_main8_l103[0] ∈ UNINITIALIZED
                        [1] ∈ {0; 1} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/95) to fit 0..127
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/127) to fit 0..95
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2034,7 +2046,7 @@
                        [2] ∈ {1} or UNINITIALIZED
                        [3] ∈ {2} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2059,16 +2071,16 @@
                        [1] ∈ {0; 1} or UNINITIALIZED
                        [2] ∈ {1; 2} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/127) to fit 0..159
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/159) to fit 0..127
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2095,7 +2107,7 @@
                        [3] ∈ {2} or UNINITIALIZED
                        [4] ∈ {3} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2121,16 +2133,16 @@
                        [2] ∈ {1; 2} or UNINITIALIZED
                        [3] ∈ {2; 3} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/159) to fit 0..191
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/191) to fit 0..159
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2158,7 +2170,7 @@
                        [4] ∈ {3} or UNINITIALIZED
                        [5] ∈ {4} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2185,16 +2197,16 @@
                        [3] ∈ {2; 3} or UNINITIALIZED
                        [4] ∈ {3; 4} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/191) to fit 0..223
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/223) to fit 0..191
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2223,7 +2235,7 @@
                        [5] ∈ {4} or UNINITIALIZED
                        [6] ∈ {5} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2251,16 +2263,16 @@
                        [4] ∈ {3; 4} or UNINITIALIZED
                        [5] ∈ {4; 5} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/223) to fit 0..255
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/255) to fit 0..223
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2290,7 +2302,7 @@
                        [6] ∈ {5} or UNINITIALIZED
                        [7] ∈ {6} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2319,16 +2331,16 @@
                        [5] ∈ {4; 5} or UNINITIALIZED
                        [6] ∈ {5; 6} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/255) to fit 0..287
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/287) to fit 0..255
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2359,7 +2371,7 @@
                        [7] ∈ {6} or UNINITIALIZED
                        [8] ∈ {7} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2389,16 +2401,16 @@
                        [6] ∈ {5; 6} or UNINITIALIZED
                        [7] ∈ {6; 7} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/287) to fit 0..319
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/319) to fit 0..287
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2430,7 +2442,7 @@
                        [8] ∈ {7} or UNINITIALIZED
                        [9] ∈ {8} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2461,16 +2473,16 @@
                        [7] ∈ {6; 7} or UNINITIALIZED
                        [8] ∈ {7; 8} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/319) to fit 0..351
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/351) to fit 0..319
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2503,7 +2515,7 @@
                        [9] ∈ {8} or UNINITIALIZED
                        [10] ∈ {9} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2535,16 +2547,16 @@
                        [8] ∈ {7; 8} or UNINITIALIZED
                        [9] ∈ {8; 9} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/351) to fit 0..383
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/383) to fit 0..351
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2578,7 +2590,7 @@
                        [10] ∈ {9} or UNINITIALIZED
                        [11] ∈ {10} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2611,16 +2623,16 @@
                        [9] ∈ {8; 9} or UNINITIALIZED
                        [10] ∈ {9; 10} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/383) to fit 0..415
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/415) to fit 0..383
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2655,7 +2667,7 @@
                        [11] ∈ {10} or UNINITIALIZED
                        [12] ∈ {11} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2689,16 +2701,16 @@
                        [10] ∈ {9; 10} or UNINITIALIZED
                        [11] ∈ {10; 11} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/415) to fit 0..447
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/447) to fit 0..415
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2734,7 +2746,7 @@
                        [12] ∈ {11} or UNINITIALIZED
                        [13] ∈ {12} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2769,16 +2781,16 @@
                        [11] ∈ {10; 11} or UNINITIALIZED
                        [12] ∈ {11; 12} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/447) to fit 0..479
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/479) to fit 0..447
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2815,7 +2827,7 @@
                        [13] ∈ {12} or UNINITIALIZED
                        [14] ∈ {13} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2851,16 +2863,16 @@
                        [12] ∈ {11; 12} or UNINITIALIZED
                        [13] ∈ {12; 13} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/479) to fit 0..511
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/511) to fit 0..479
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2898,7 +2910,7 @@
                        [14] ∈ {13} or UNINITIALIZED
                        [15] ∈ {14} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2935,13 +2947,13 @@
                        [13] ∈ {12; 13} or UNINITIALIZED
                        [14] ∈ {13; 14} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/511) to fit 0..511/543
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -2980,14 +2992,14 @@
                        [15] ∈ {14; 15} or UNINITIALIZED
                        [16] ∈ {15} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
 [eva:partition] malloc-optimistic.c:101: starting to merge loop iterations
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/543) to fit 0..511/575
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -3026,13 +3038,13 @@
                        [15] ∈ {14; 15; 16} or UNINITIALIZED
                        [16..17] ∈ {15; 16} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/575) to fit 0..511/607
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -3071,13 +3083,13 @@
                        [15] ∈ {14; 15; 16; 17} or UNINITIALIZED
                        [16..18] ∈ {15; 16; 17} or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/607) to fit 0..511/3231
-[eva] malloc-optimistic.c:106: 
+[eva:show] malloc-optimistic.c:106: 
   Frama_C_dump_each:
   # cvalue:
   v ∈ [--..--]
@@ -3116,300 +3128,336 @@
                        [15] ∈ [14..99] or UNINITIALIZED
                        [16..100] ∈ [15..99] or UNINITIALIZED
   ==END OF DUMP==
-[eva] malloc-optimistic.c:107: Call to builtin free
+[eva:progress] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:103: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/3231) to fit 0..511/3231
-[eva] Recording results for main8
-[eva] Done for function main8
-[eva] computing for function main9 <- main.
+[eva:progress] Recording results for main8
+[eva:progress] Done for function main8
+[eva:progress] 
+  computing for function main9 <- main.
   Called from malloc-optimistic.c:150.
-[eva] malloc-optimistic.c:119: Call to builtin malloc
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
 [eva:malloc:new] malloc-optimistic.c:119: 
   allocating variable __malloc_main9_l119
-[eva] malloc-optimistic.c:120: 
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {0}, {{ &__malloc_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: {0}
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: {0}
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
 [eva:malloc:weak] malloc-optimistic.c:119: 
   marking variable `__malloc_main9_l119' as weak
-[eva] malloc-optimistic.c:120: 
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {1}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: {-20; 1}
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: {-20; 1}
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {2}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: {-20; 1; 2}
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: {-20; 1; 2}
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {3}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: {-20; 1; 2; 3}
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: {-20; 1; 2; 3}
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {4}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: {-20; 1; 2; 3; 4}
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: {-20; 1; 2; 3; 4}
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {5}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: {-20; 1; 2; 3; 4; 5}
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: {-20; 1; 2; 3; 4; 5}
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {6}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: {-20; 1; 2; 3; 4; 5; 6}
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: {-20; 1; 2; 3; 4; 5; 6}
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {7}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: {-20; 1; 2; 3; 4; 5; 6; 7}
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: 
+  Frama_C_show_each: {-20; 1; 2; 3; 4; 5; 6; 7}
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {8}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..8]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..8]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {9}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..9]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..9]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {10}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..10]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..10]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {11}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..11]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..11]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {12}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..12]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..12]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {13}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..13]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..13]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {14}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..14]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..14]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {15}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..15]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..15]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {16}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..16]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..16]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {17}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..17]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..17]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {18}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..18]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..18]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {19}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..19]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..19]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {20}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..20]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..20]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {21}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..21]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..21]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {22}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..22]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..22]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {23}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..23]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..23]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {24}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..24]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..24]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {25}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..25]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..25]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {26}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..26]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..26]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {27}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..27]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..27]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {28}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..28]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..28]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {29}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..29]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..29]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {30}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..30]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..30]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
 [eva:partition] malloc-optimistic.c:118: starting to merge loop iterations
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {30; 31}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..31]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..31]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: {30; 31; 32}, {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..32]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..32]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: [30..99], {{ &__malloc_w_main9_l119 }}
-[eva] malloc-optimistic.c:122: Frama_C_show_each: [-20..99]
-[eva] computing for function main9_aux <- main9 <- main.
+[eva:show] malloc-optimistic.c:122: Frama_C_show_each: [-20..99]
+[eva:progress] 
+  computing for function main9_aux <- main9 <- main.
   Called from malloc-optimistic.c:123.
-[eva] Recording results for main9_aux
-[eva] Done for function main9_aux
-[eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:120: 
+[eva:progress] Recording results for main9_aux
+[eva:progress] Done for function main9_aux
+[eva:progress] malloc-optimistic.c:119: Call to builtin malloc
+[eva:show] malloc-optimistic.c:120: 
   Frama_C_show_each: [30..99], {{ &__malloc_w_main9_l119 }}
-[eva] Recording results for main9
-[eva] Done for function main9
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main9
+[eva:progress] Done for function main9
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main9_aux:
   __malloc_w_main9_l119 ∈ [-20..99] or UNINITIALIZED

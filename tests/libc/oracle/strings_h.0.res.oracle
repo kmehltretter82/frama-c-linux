@@ -1,70 +1,78 @@
 [kernel] Parsing strings_h.c (with preprocessing)
 [kernel] strings_h.c:14: Warning: Too many initializers for character array s
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
-[eva] computing for function strcasecmp <- main.
+[eva:progress] 
+  computing for function strcasecmp <- main.
   Called from strings_h.c:15.
 [eva] using specification for function strcasecmp
-[eva] strings_h.c:15: 
+[eva:progress] strings_h.c:15: 
   function strcasecmp: precondition 'valid_string_s1' got status valid.
-[eva] strings_h.c:15: 
+[eva:progress] strings_h.c:15: 
   function strcasecmp: precondition 'valid_string_s2' got status valid.
-[eva] Done for function strcasecmp
-[eva] computing for function strcasecmp <- main.
+[eva:progress] Done for function strcasecmp
+[eva:progress] 
+  computing for function strcasecmp <- main.
   Called from strings_h.c:16.
-[eva] strings_h.c:16: 
+[eva:progress] strings_h.c:16: 
   function strcasecmp: precondition 'valid_string_s1' got status valid.
-[eva] strings_h.c:16: 
+[eva:progress] strings_h.c:16: 
   function strcasecmp: precondition 'valid_string_s2' got status valid.
-[eva] Done for function strcasecmp
-[eva] computing for function strcasecmp <- main.
+[eva:progress] Done for function strcasecmp
+[eva:progress] 
+  computing for function strcasecmp <- main.
   Called from strings_h.c:17.
-[eva] strings_h.c:17: 
+[eva:progress] strings_h.c:17: 
   function strcasecmp: precondition 'valid_string_s1' got status valid.
-[eva] strings_h.c:17: 
+[eva:progress] strings_h.c:17: 
   function strcasecmp: precondition 'valid_string_s2' got status valid.
-[eva] Done for function strcasecmp
-[eva] computing for function strcasecmp <- main.
+[eva:progress] Done for function strcasecmp
+[eva:progress] 
+  computing for function strcasecmp <- main.
   Called from strings_h.c:18.
-[eva] strings_h.c:18: 
+[eva:progress] strings_h.c:18: 
   function strcasecmp: precondition 'valid_string_s1' got status valid.
 [eva:alarm] strings_h.c:18: Warning: 
   function strcasecmp: precondition 'valid_string_s2' got status invalid.
-[eva] Done for function strcasecmp
-[eva] computing for function strncasecmp <- main.
+[eva:progress] Done for function strcasecmp
+[eva:progress] 
+  computing for function strncasecmp <- main.
   Called from strings_h.c:19.
 [eva] using specification for function strncasecmp
-[eva] strings_h.c:19: 
+[eva:progress] strings_h.c:19: 
   function strncasecmp: precondition 'valid_string_s1' got status valid.
-[eva] strings_h.c:19: 
+[eva:progress] strings_h.c:19: 
   function strncasecmp: precondition 'valid_string_s2' got status valid.
-[eva] Done for function strncasecmp
-[eva] computing for function strncasecmp <- main.
+[eva:progress] Done for function strncasecmp
+[eva:progress] 
+  computing for function strncasecmp <- main.
   Called from strings_h.c:20.
-[eva] strings_h.c:20: 
+[eva:progress] strings_h.c:20: 
   function strncasecmp: precondition 'valid_string_s1' got status valid.
 [eva:alarm] strings_h.c:20: Warning: 
   function strncasecmp: precondition 'valid_string_s2' got status invalid.
-[eva] Done for function strncasecmp
-[eva] computing for function strncasecmp <- main.
+[eva:progress] Done for function strncasecmp
+[eva:progress] 
+  computing for function strncasecmp <- main.
   Called from strings_h.c:21.
-[eva] strings_h.c:21: 
+[eva:progress] strings_h.c:21: 
   function strncasecmp: precondition 'valid_string_s1' got status valid.
-[eva] strings_h.c:21: 
+[eva:progress] strings_h.c:21: 
   function strncasecmp: precondition 'valid_string_s2' got status valid.
-[eva] Done for function strncasecmp
-[eva] computing for function bzero <- main.
+[eva:progress] Done for function strncasecmp
+[eva:progress] 
+  computing for function bzero <- main.
   Called from strings_h.c:24.
 [eva] using specification for function bzero
-[eva] strings_h.c:24: 
+[eva:progress] strings_h.c:24: 
   function bzero: precondition 'valid_memory_area' got status valid.
-[eva] Done for function bzero
-[eva] strings_h.c:25: assertion got status valid.
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Done for function bzero
+[eva:progress] strings_h.c:25: assertion got status valid.
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   s1 ∈ {{ "AbC" }}

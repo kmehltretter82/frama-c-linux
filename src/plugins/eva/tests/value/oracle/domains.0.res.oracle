@@ -1,12 +1,12 @@
 [kernel] Parsing domains.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [eva:partition] domains.i:16: starting to merge loop iterations
 [eva:partition] domains.i:34: starting to merge loop iterations
-[eva] domains.i:50: 
+[eva:show] domains.i:50: 
   Frama_C_domain_show_each:
   a : # cvalue: {8}
       # symbolic-locations: (not implemented)
@@ -48,7 +48,7 @@
       # multidim: {1}
       # bitwise: (not implemented)
       # sign: 0+
-[eva] domains.i:51: 
+[eva:show] domains.i:51: 
   Frama_C_dump_each:
   # cvalue:
   nondet ∈ [--..--]
@@ -122,8 +122,8 @@
      j -> +
      r -> 0+ ]}
   ==END OF DUMP==
-[eva] domains.i:52: Dumping state in file 'domains_dump_0'
-[eva] domains.i:57: 
+[eva:show] domains.i:52: Dumping state in file 'domains_dump_0'
+[eva:show] domains.i:57: 
   Frama_C_domain_show_each:
   scalar : # cvalue: [bits 0 to 7]# ∈ {65537}%32, bits 0 to 7 
                      [bits 8 to 15] ∈ {42}
@@ -136,8 +136,8 @@
            # multidim: T
            # bitwise: (not implemented)
            # sign: -0+
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   a ∈ {8}

@@ -1,7 +1,7 @@
 [kernel] Parsing call_simple.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   X ∈ {0}
   c ∈ {0}
@@ -9,14 +9,15 @@
   v ∈ {0}
   w ∈ {0}
   G ∈ {0}
-[eva] computing for function f <- main.
+[eva:progress] 
+  computing for function f <- main.
   Called from call_simple.i:14.
-[eva] Recording results for f
-[eva] Done for function f
+[eva:progress] Recording results for f
+[eva:progress] Done for function f
 [eva:alarm] call_simple.i:15: Warning: 
   signed overflow. assert ll + 1 ≤ 2147483647;
-[eva] Recording results for main
-[eva] Done for function main
+[eva:progress] Recording results for main
+[eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   X ∈ {68}
