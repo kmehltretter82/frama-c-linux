@@ -283,8 +283,6 @@ let compute =
   let name = "Eva.Analysis.compute" in
   fst (State_builder.apply_once name [ Self.state ] compute)
 
-let () = Parameters.ForceValues.set_output_dependencies [Self.state]
-
 let main () = if Parameters.ForceValues.get () then compute ()
 let () = Boot.Main.extend main
 

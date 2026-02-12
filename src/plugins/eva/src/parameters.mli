@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module ForceValues: Parameter_sig.With_output
+module ForceValues: Parameter_sig.Bool
 
 module EnumerateCond: Parameter_sig.Bool
 module OracleDepth: Parameter_sig.Int
