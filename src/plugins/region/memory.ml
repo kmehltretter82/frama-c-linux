@@ -192,9 +192,9 @@ let pp_chunk name fmt (m: chunk) =
         Access.Set.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.creads ;
         Access.Set.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.cwrites ;
         Access.Set.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.cshifts ;
-        Bag.iter (Format.fprintf fmt "@ Root:%a" pp_root) m.croots ;
+        List.iter (Format.fprintf fmt "@ P:%a" pp_node) m.cparents ;
       end ;
-    List.iter (Format.fprintf fmt "@ P:%a" pp_node) m.cparents ;
+    Bag.iter (Format.fprintf fmt "@ %a" pp_root) m.croots ;
     Format.fprintf fmt "@ %a ;@]" pp_layout m.clayout ;
   end
 
@@ -806,6 +806,7 @@ let pp_region fmt (m: region) =
     List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) m.types ;
     Format.fprintf fmt "@ %db" m.sizeof ;
     Option.iter (Format.fprintf fmt "@ (*%a)" pp_node) m.pointed ;
+    List.iter (Format.fprintf fmt "@ %a" pp_root) m.roots ;
     if m.ranges <> [] then
       begin
         Format.fprintf fmt "@ @[<hv 0>@[<hv 2>{" ;
@@ -820,7 +821,6 @@ let pp_region fmt (m: region) =
         List.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.reads ;
         List.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.writes ;
         List.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.shifts ;
-        List.iter (Format.fprintf fmt "@ Root: %a" pp_root) m.roots ;
       end ;
     Attr.iter (Format.fprintf fmt "@ %a" Attr.pp_attr) m.flags ;
     Format.fprintf fmt " ;@]" ;
