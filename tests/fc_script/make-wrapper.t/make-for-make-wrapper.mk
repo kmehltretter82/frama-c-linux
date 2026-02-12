@@ -2,6 +2,8 @@
 
 include $(shell frama-c -print-lib-path)/analysis-scripts/prologue.mk
 
+CPPFLAGS += -D useless_macro
+
 # Note: the -no-autoload-plugins line is necessary for Cram testing, otherwise
 #       the test dependencies would need to explicitly enumerate each
 #       internalized Frama-C plug-in.
