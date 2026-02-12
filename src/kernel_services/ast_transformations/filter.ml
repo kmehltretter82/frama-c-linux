@@ -766,6 +766,7 @@ end = struct
            b.b_assigns <- Writes assigns
          with Info.EraseAssigns -> b.b_assigns <- WritesAny
       );
+      b.b_extended <- List.map (visitCilExtended (self:>Cil.cilVisitor)) b.b_extended;
       SkipChildren (* see the warning on [SkipChildren] in [vspec] ! *)
 
     method! vspec spec =
