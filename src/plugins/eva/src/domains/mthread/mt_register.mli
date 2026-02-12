@@ -6,43 +6,48 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Mt_utils
+type value = Cvalue.V.t
+type 'v result = 'v Mt_utils.Result.t
 
+(* ----- Threads ------------------------------------------------------------ *)
 
-type update_check = Ok | Invalid of (string * bool)
+type thread_status =
+  { running : Mt_utils.trilean ; canceled : Mt_utils.trilean }
 
-module type Key_sig = sig
-  include Hptmap.Id_Datatype
-  val key_name : string
-  val of_value : Value.t -> t list Result.t
-  val to_value : t -> Value.t
-end
-
-module type Status_sig = sig
-  include Lattice_type.Join_Semi_Lattice
-  val default : t
-end
-
-module Make (Key : Key_sig) (Status : Status_sig) : sig
+module Thread : sig
   include Datatype.S_with_collections
-  type status = Status.t
-  type key = Key.t
-
-  val empty : t
   val id : t -> int
-
-  val mem : key -> t -> bool
-  val find : key -> t -> status option
-  val add : key -> status -> t -> t
-
-  val register : key list -> t -> (t * Value.t) Result.t
-  val update : (status -> status) -> (status -> update_check) ->
-    Value.t -> t -> (t * Value.t) Result.t
-
+  val empty : t
   val top : t
   val is_included : t -> t -> bool
-  val narrow : t -> t -> t
   val join : t -> t -> t
+  val narrow : t -> t -> t
+  val find : Thread.t -> t -> thread_status option
 
-  val fold : (key -> status -> 'a -> 'a) -> t -> 'a -> 'a
+  val register : Thread.t list -> t -> (t * value) result
+  val start    : value -> t -> (t * value) result
+  val suspend  : value -> t -> (t * value) result
+  val cancel   : value -> t -> (t * value) result
+end
+
+(* ----- Mutex -------------------------------------------------------------- *)
+
+type mutex_status =
+  | Locked (* Surely locked *)
+  | Unlocked (* Maybe unlocked *)
+
+module Mutex : sig
+  include Datatype.S_with_collections
+  val id : t -> int
+  val empty : t
+  val top : t
+  val is_included : t -> t -> bool
+  val join : t -> t -> t
+  val narrow : t -> t -> t
+
+  val register : Mutex.t list -> t -> (t * value) result
+  val lock     : value -> t -> (t * value) result
+  val unlock   : value -> t -> (t * value) result
+
+  val locked_mutexes : t -> Mutex.Set.t
 end

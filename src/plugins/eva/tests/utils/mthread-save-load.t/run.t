@@ -3,20 +3,20 @@ Parse file without option -mt-threads-lib
   [kernel] Parsing file.c (with preprocessing)
 
 Load parsed file and run Mthread: failure as Mthread files are missing.
-  $ frama-c -no-autoload-plugins -load-module eva.mthread,inout,scope -load parsed.sav -mthread
+  $ frama-c -no-autoload-plugins -load-module eva,inout,scope -load parsed.sav -mthread
   [mt] Warning: Mthread is an experimental plugin and is still in development.
   [mt] User Error: Variable "__fc_mthread_threads" not found. It should be in file FRAMAC_SHARE/mt/mthread.c, required for the Mthread analysis. Use parameter -mt-threads-lib to include this file in the parsing phase.
   [kernel] Plug-in mt aborted: invalid user input.
   [1]
 
 Parse file with Mthread builtins only.
-  $ frama-c -no-autoload-plugins -load-module eva.mthread file.c -save parsed.sav -mt-threads-lib builtins-only
+  $ frama-c -no-autoload-plugins -load-module eva file.c -save parsed.sav -mt-threads-lib builtins-only
   [mt] Preparing sources for Mthread with builtins only
   [kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
   [kernel] Parsing file.c (with preprocessing)
 
 Load parsed file and run Mthread: failure as pthreads stubs are missing.
-  $ frama-c -no-autoload-plugins -load-module eva.mthread,inout,scope -load parsed.sav -mthread
+  $ frama-c -no-autoload-plugins -load-module eva,inout,scope -load parsed.sav -mthread
   [mt] Warning: Mthread is an experimental plugin and is still in development.
   [mt] ******* Starting mthread
   [mt] *** Computing value analysis for main thread
@@ -37,7 +37,7 @@ Load parsed file and run Mthread: failure as pthreads stubs are missing.
   [1]
 
 Parse file with Mthread builtins and pthreads stubs.
-  $ frama-c -no-autoload-plugins -load-module eva.mthread file.c -save parsed.sav -mt-threads-lib pthreads
+  $ frama-c -no-autoload-plugins -load-module eva file.c -save parsed.sav -mt-threads-lib pthreads
   [mt] Preparing sources for Mthread with lib pthreads
   [kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
   [kernel] Parsing FRAMAC_SHARE/mt/mthread_pthread.c (with preprocessing)
@@ -45,7 +45,7 @@ Parse file with Mthread builtins and pthreads stubs.
 
 Load parsed file and run Mthread, with minimal verbosity.
 The analysis succeeds and two alarms are emitted.
-  $ frama-c -no-autoload-plugins -load-module eva.mthread,inout,scope -load parsed.sav -mthread -eva-verbose 0 -mt-verbose 0
+  $ frama-c -no-autoload-plugins -load-module eva,inout,scope -load parsed.sav -mthread -eva-verbose 0 -mt-verbose 0
   [eva:experimental] Warning: The mthread domain is experimental.
   [mt] Warning: Mthread is an experimental plugin and is still in development.
   [eva:alarm] file.c:13: Warning: signed overflow. assert x + 1 ≤ 2147483647;

@@ -64,7 +64,7 @@ struct
       | None -> Mutex.Set.empty
       | Some extract ->
         Mt_domain.Domain.mutexes (extract state)
-        |> Mt_mutex.Register.locked_mutexes
+        |> Mt_register.Mutex.locked_mutexes
 
   (** [equal ~bases l r] returns [true] if the state and accesses of [l] and [r]
       are equal. The states are [project]ed on [bases] before the comparison. *)
@@ -304,12 +304,12 @@ struct
   let applicable (state : state) : Interference.t or_bottom =
     let threads, mutexes = match Dom.get Mt_domain.Domain.key with
       (* Domain disabled, no information about threads and mutexes *)
-      | None -> Mt_thread.Register.empty, Mutex.Set.empty
+      | None -> Mt_register.Thread.empty, Mutex.Set.empty
       (* Domain enabled *)
       | Some extract ->
         let mt_state = extract state in
         Mt_domain.Domain.threads mt_state,
-        Mt_domain.Domain.mutexes mt_state |> Mt_mutex.Register.locked_mutexes
+        Mt_domain.Domain.mutexes mt_state |> Mt_register.Mutex.locked_mutexes
     in
     let add mutexes' interference' acc_interference =
       if Mutex.Set.disjoint mutexes mutexes' then
@@ -322,7 +322,7 @@ struct
     let add_thread thread interferences_map acc_interference =
       let is_current_thread = Thread.(equal thread (current ())) in
       let maybe_running =
-        match Mt_thread.Register.find thread threads with
+        match Mt_register.Thread.find thread threads with
         (* Thread status is unknown, consider that the thread might be running*)
         | None -> true
         (* Thread status is known *)

@@ -1,4 +1,4 @@
-PLUGIN: eva,eva.mthread,inout,scope
+PLUGIN: eva,inout,scope
 
 COMMENT: No generation of dot files in alternative configuration.
 MACRO: LOG_MT_DOT_FILES_FILENAME

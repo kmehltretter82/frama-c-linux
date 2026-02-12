@@ -1,5 +1,5 @@
 Help message about Eva abstract domains.
-  $ frama-c -no-autoload-plugins -load-module eva,eva.mthread,eva.apron -eva-domains help
+  $ frama-c -no-autoload-plugins -load-module eva,eva.apron -eva-domains help
   [eva] List of available domains:
     cvalue               Main analysis domain, enabled by default. Should not be
                          disabled.
@@ -52,7 +52,7 @@ Help message about Eva abstract domains.
                          traces that lead to a statement.
 
 Help message about Eva builtins.
-  $ frama-c -eva-builtins-list -no-autoload-plugins -load-module eva,eva.mthread,eva.apron
+  $ frama-c -eva-builtins-list -no-autoload-plugins -load-module eva,eva.apron
   [eva] List of Eva builtins:
   
   ** Automatic replacements:

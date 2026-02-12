@@ -50,7 +50,7 @@
    PLUGIN: metrics
    STDOPT: +"-metrics-h"
 
-   PLUGIN: eva.mthread
+   PLUGIN: eva
    STDOPT: +"-mt-h"
 
    PLUGIN: nonterm
