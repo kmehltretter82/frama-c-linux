@@ -151,7 +151,8 @@ let mthread_run project =
     Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
 
     Mt_self.feedback "*** Computing value analysis for main thread";
-    Analysis.compute ();
+    Analysis.mthread_pre_analysis ();
+    Analysis.compute_thread Thread.main;
     Mt_self.feedback "*** First value analysis for main thread done." ;
 
     Mt_analysis_fixpoint.record_end_of_thread_analysis analysis;

@@ -215,7 +215,7 @@ let abort () =
 
 (* Mthread entry point *)
 
-let compute_thread thread cvalue_state =
+let compute_thread ?cvalue_state thread =
   let Thread.{ entry_point; arguments } = Thread.properties thread in
   let arguments =
     if Thread.is_main thread
@@ -228,7 +228,7 @@ let compute_thread thread cvalue_state =
     Mem_exec.cleanup_results ();
     Self.ComputationState.set Computing;
     let final_state = compute_from_entry_point (module Engine)
-        ~thread ~cvalue_state ?arguments entry_point in
+        ~thread ?cvalue_state ?arguments entry_point in
     Engine.Dom.Store.mark_as_computed ();
     Self.ComputationState.set Computed;
     (* Display the final state of each thread main function *)
@@ -239,6 +239,12 @@ let compute_thread thread cvalue_state =
     match exn with
     | Error | Self.Abort -> () (* do not re-raise *)
     | exn -> raise exn
+
+let mthread_pre_analysis () =
+  Self.clear_results ();
+  Ast.compute ();
+  pre_analysis ();
+  Engine.reset ()
 
 let mthread_post_analysis () =
   post_analysis ();
