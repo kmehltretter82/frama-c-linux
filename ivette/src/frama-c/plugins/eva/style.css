@@ -603,6 +603,10 @@ tr:first-of-type > .eva-table-callsite-box {
         &.mthread-element-content-column {
           flex-direction: column;
         }
+
+        button label {
+          cursor: pointer ;
+        }
       }
     }
   }
