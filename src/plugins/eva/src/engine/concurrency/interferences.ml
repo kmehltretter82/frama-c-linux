@@ -369,7 +369,7 @@ struct
       inject th state
     end
 
-  let inject_after_change current_thread access state =
+  let inject_after_change ~pos access state =
     let need_injection () =
       let access = Inout_access.keep_globals_only access in
       let zone = Locations.Zone.join access.read access.write in
@@ -392,6 +392,7 @@ struct
     else begin
       Self.debug ~dkey ~current:true ~once:true
         "inject threads interferences at this point";
+      let current_thread = Thread.in_position pos in
       inject current_thread state
     end
 

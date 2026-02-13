@@ -321,9 +321,8 @@ module Make (Engine: Engine_Subset) = struct
     let pre = state in
     let transfer state (clause, location) =
       let access = Transfer_inout.register_logic_assign pos clause location in
-      let current_thread = Thread.in_position pos in
       Domain.logic_assign (Some (clause, pre)) location state
-      |> Interferences.inject_after_change current_thread access
+      |> Interferences.inject_after_change ~pos access
     in
     List.fold_left transfer state evaluated_clauses
 

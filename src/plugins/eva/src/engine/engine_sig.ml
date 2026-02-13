@@ -235,7 +235,7 @@ sig
       Mthread domain helps filtering applicable interferences. This function
       is the identity if the Mthread domain can infer that no shared memory
       has been read or written during the last transfer function. *)
-  val inject_after_change : Thread.t ->  Inout_access.t -> state -> state
+  val inject_after_change : pos:Position.t ->  Inout_access.t -> state -> state
 end
 
 

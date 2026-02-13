@@ -246,8 +246,7 @@ module Make (Engine: Engine_Subset) = struct
       let+ state =
         Domain.assign ~pos lvalue expr assigned domain_valuation state
       in
-      let current_thread = Thread.in_position pos in
-      Interferences.inject_after_change current_thread access state
+      Interferences.inject_after_change ~pos access state
 
   let assign = assign_lv_or_ret ~is_ret:false
   let assign_ret = assign_lv_or_ret ~is_ret:true
@@ -266,8 +265,7 @@ module Make (Engine: Engine_Subset) = struct
     let+ state =
       Domain.assume ~pos expr positive (Eval.to_domain_valuation valuation) state
     in
-    let current_thread = Thread.in_position pos in
-    Interferences.inject_after_change current_thread access state
+    Interferences.inject_after_change ~pos access state
 
 
   (* ------------------------------------------------------------------------ *)
@@ -280,8 +278,8 @@ module Make (Engine: Engine_Subset) = struct
     (* Process the call according to the domain decision. *)
     match Domain.start_call ~pos call recursion domain_valuation state with
     | `Value state ->
-      let current_thread = Thread.in_local_position pos in
-      let state = Interferences.inject_after_change current_thread access state in
+      let pos = Position.of_local pos in
+      let state = Interferences.inject_after_change ~pos access state in
       Domain.Store.register_initial_state call.callstack call.kf state;
       Engine.Compute.compute_call call recursion state
     | `Bottom ->
