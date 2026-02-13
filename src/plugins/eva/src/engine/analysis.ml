@@ -217,14 +217,18 @@ let abort () =
 
 let compute_thread thread cvalue_state =
   let Thread.{ entry_point; arguments } = Thread.properties thread in
-  let arguments = List.map snd arguments in
+  let arguments =
+    if Thread.is_main thread
+    then None (* use generated main arguments *)
+    else Some (List.map snd arguments)
+  in
   let module Engine = (val Engine.current ()) in
   try
     (* In multi thread analyses, Memexec cache must be invalidated *)
     Mem_exec.cleanup_results ();
     Self.ComputationState.set Computing;
     let final_state = compute_from_entry_point (module Engine)
-        ~thread ~cvalue_state ~arguments entry_point in
+        ~thread ~cvalue_state ?arguments entry_point in
     Engine.Dom.Store.mark_as_computed ();
     Self.ComputationState.set Computed;
     (* Display the final state of each thread main function *)
