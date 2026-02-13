@@ -149,8 +149,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread jobs[0], iteration 2
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread jobs[0], iteration 2 (potential shared vars changed and
+    interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
@@ -192,8 +192,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
-[mt] *** Computing thread jobs[1], iteration 2
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread jobs[1], iteration 2 (potential shared vars changed and
+    interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
@@ -290,8 +290,8 @@
   thread_arg.c:26 (for Frama_C_entropy_source)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
-[mt] *** Computing thread <main>, iteration 3
-    (shared vars values changed, interferences changed)
+[mt] *** Computing thread <main>, iteration 3 (shared vars values changed and
+    interferences changed)
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -318,8 +318,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread jobs[0], iteration 3
-    (shared vars values changed, interferences changed)
+[mt] *** Computing thread jobs[0], iteration 3 (shared vars values changed and
+    interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
@@ -361,9 +361,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
-[mt] *** Computing thread jobs[1], iteration 3
-    (shared vars values changed, thread initial memory state changed,
-     interferences changed)
+[mt] *** Computing thread jobs[1], iteration 3 (shared vars values changed, thread
+    initial memory state changed and interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
@@ -449,8 +448,8 @@
   thread_arg.c:26 (for Frama_C_entropy_source)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 4
-[mt] *** Computing thread <main>, iteration 4
-    (shared vars values changed, interferences changed)
+[mt] *** Computing thread <main>, iteration 4 (shared vars values changed and
+    interferences changed)
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -477,8 +476,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread jobs[0], iteration 4
-    (shared vars values changed, interferences changed)
+[mt] *** Computing thread jobs[0], iteration 4 (shared vars values changed and
+    interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
@@ -522,9 +521,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
-[mt] *** Computing thread jobs[1], iteration 4
-    (shared vars values changed, thread initial memory state changed,
-     interferences changed)
+[mt] *** Computing thread jobs[1], iteration 4 (shared vars values changed, thread
+    initial memory state changed and interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user

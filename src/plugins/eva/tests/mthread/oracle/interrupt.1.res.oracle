@@ -26,8 +26,8 @@
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
 [mt] ***** Iteration 1
-[mt] *** Computing thread <main>, iteration 1
-    (thread initial memory state changed)
+[mt] *** Computing thread <main>, iteration 1 (thread initial memory state
+    changed)
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_interrupt_incr
 [eva] Initial state supplied by user
@@ -48,8 +48,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread <interrupt_handler interrupt_incr>, iteration 1
-    (first iteration)
+[mt] *** Computing thread <interrupt_handler interrupt_incr>, iteration 1 (first
+    iteration)
 [mt] * Computing value analysis for thread <interrupt_handler interrupt_incr>
 [eva] Analyzing a complete application starting at interrupt_incr
 [eva] Initial state supplied by user
@@ -109,7 +109,7 @@
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread <interrupt_handler interrupt_incr>, iteration 2
-    (potential shared vars changed, interferences changed)
+    (potential shared vars changed and interferences changed)
 [mt] * Computing value analysis for thread <interrupt_handler interrupt_incr>
 [eva] Analyzing a complete application starting at interrupt_incr
 [eva] Initial state supplied by user
@@ -169,8 +169,8 @@
   interrupt.c:33 (for interrupt_received)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
-[mt] *** Computing thread <main>, iteration 3
-    (shared vars values changed, interferences changed)
+[mt] *** Computing thread <main>, iteration 3 (shared vars values changed and
+    interferences changed)
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_interrupt_incr
 [eva] Initial state supplied by user

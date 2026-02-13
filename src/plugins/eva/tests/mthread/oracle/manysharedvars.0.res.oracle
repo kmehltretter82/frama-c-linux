@@ -239,8 +239,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread jobs, iteration 2
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread jobs, iteration 2 (potential shared vars changed and
+    interferences changed)
 [mt] * Computing value analysis for thread jobs
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
@@ -2240,8 +2240,8 @@
     Read by <main>, Write by jobs: protected by lock
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
-[mt] *** Computing thread <main>, iteration 3
-    (shared vars values changed, interferences changed)
+[mt] *** Computing thread <main>, iteration 3 (shared vars values changed and
+    interferences changed)
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user

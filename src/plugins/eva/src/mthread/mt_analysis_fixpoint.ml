@@ -268,9 +268,7 @@ let one_iteration analysis =
              Mt_self.feedback
                "@[<hov 2>*** Computing thread %a,@ iteration %d@ (%a)@]"
                ThreadState.pretty th analysis.iteration
-               (Pretty_utils.pp_iter ~sep:",@ "
-                  SetRecomputeReason.iter RecomputeReason.pretty)
-               th.th_to_recompute;
+               SetRecomputeReason.pretty th.th_to_recompute;
 
              compute_thread analysis th;
 
@@ -402,9 +400,7 @@ let reach_fixpoint analysis =
             (fun th -> if not (SetRecomputeReason.is_empty th.th_to_recompute) then
                 Format.fprintf fmt "@[<hov 2>Thread %a:@ %a@]@ "
                   ThreadState.pretty_detailed th
-                  (Pretty_utils.pp_iter ~sep:",@ " ~pre:"" ~suf:""
-                     SetRecomputeReason.iter RecomputeReason.pretty)
-                  th.th_to_recompute
+                  SetRecomputeReason.pretty th.th_to_recompute
             )
         ) ()
     else

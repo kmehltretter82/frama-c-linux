@@ -27,10 +27,13 @@ type recompute_reason =
 module RecomputeReason: sig
   type t = recompute_reason
   val compare: t -> t -> int
-  val pretty: t Pretty_utils.formatter
+  val pretty: t Pretty.aformatter
 end
 
-module SetRecomputeReason: Set.S with type elt = recompute_reason
+module SetRecomputeReason: sig
+  include Set.S with type elt = recompute_reason
+  val pretty: t Pretty.aformatter
+end
 
 type priority =
   | PDefault (** No priority specified, but it is possible to specify one *)
