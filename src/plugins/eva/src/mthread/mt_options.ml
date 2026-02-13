@@ -21,6 +21,7 @@ module Enabled =
 ;;
 
 let () = Parameter_customize.set_group grp_debug
+let () = Parameter_customize.is_invisible ()
 module KeepProjects =
   String (struct
     let option_name = "-mt-keep-analyses"

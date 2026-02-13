@@ -48,8 +48,6 @@ Options taking a string as argument should preferably be written
 -mt-debug <n>       level of debug for plug-in Mthread (default to 0)
 -mt-ignore-null     Ignore shared accesses to numeric memory (NULL base)
                     (opposite option is -mt-consider-null)
--mt-keep-analyses <all|last|none>  keep a copy of the analyses done for each
-                    thread (preferably use -mt-keep-analyses="all|last|none")
 -mt-keep-dot-files  Keep dot files used to generate SVG for the html output
                     (opposite option is -mt-no-keep-dot-files)
 -mt-only-threads <th1,...,thn>  only execute the specified threads
