@@ -33,7 +33,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread job1
-[eva] using specification for function rand
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:

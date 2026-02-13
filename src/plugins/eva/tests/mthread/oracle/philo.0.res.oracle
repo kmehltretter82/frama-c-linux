@@ -97,7 +97,6 @@
   inject threads interferences at the start of job for thread jobs[1]
 [mt] philo.c:38: Lock locks[0]
 [mt] philo.c:39: Lock locks[2]
-[eva] using specification for function random
 [mt] philo.c:46: Release locks[2]
 [mt] philo.c:47: Release locks[0]
 [mt] * Starting to save the state of the value analysis
@@ -131,7 +130,6 @@
   inject threads interferences at the start of job for thread jobs[2]
 [mt] philo.c:38: Lock locks[1]
 [mt] philo.c:39: Lock locks[3]
-[eva] using specification for function random
 [mt] philo.c:44: 
   Sending message on queue, content [0] ∈ {3}
                                     [1] ∈ UNINITIALIZED
@@ -170,7 +168,6 @@
   inject threads interferences at the start of job for thread jobs[3]
 [mt] philo.c:38: Lock locks[2]
 [mt] philo.c:39: Lock locks[4]
-[eva] using specification for function random
 [mt] philo.c:44: 
   Sending message on queue, content [0] ∈ {4}
                                     [1] ∈ UNINITIALIZED
@@ -209,7 +206,6 @@
   inject threads interferences at the start of job for thread jobs[4]
 [mt] philo.c:38: Lock locks[3]
 [mt] philo.c:39: Lock locks[0]
-[eva] using specification for function random
 [mt] philo.c:44: 
   Sending message on queue, content [0] ∈ {5}
                                     [1] ∈ UNINITIALIZED
@@ -257,21 +253,11 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main
-[mt] philo.c:65: Initializing mutex locks[0]
-[mt] philo.c:65: Initializing mutex locks[1]
-[mt] philo.c:65: Initializing mutex locks[2]
-[mt] philo.c:65: Initializing mutex locks[3]
-[mt] philo.c:65: Initializing mutex locks[4]
 [mt] philo.c:70: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] philo.c:70: Start thread jobs[0]
 [mt] philo.c:70: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] philo.c:70: Start thread jobs[1]
 [mt] philo.c:70: Thread jobs[2], fun job, parent <main>, args {2}
-[mt] philo.c:70: Start thread jobs[2]
 [mt] philo.c:70: Thread jobs[3], fun job, parent <main>, args {3}
-[mt] philo.c:70: Start thread jobs[3]
 [mt] philo.c:70: Thread jobs[4], fun job, parent <main>, args {4}
-[mt] philo.c:70: Start thread jobs[4]
 [mt] philo.c:73: 
   Receiving message on queue, max size 2, stored in &end. Possible  values:
   From thread jobs[0]: [0] ∈ {1}
@@ -320,32 +306,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main
-[mt] philo.c:65: Initializing mutex locks[0]
-[mt] philo.c:65: Initializing mutex locks[1]
-[mt] philo.c:65: Initializing mutex locks[2]
-[mt] philo.c:65: Initializing mutex locks[3]
-[mt] philo.c:65: Initializing mutex locks[4]
-[mt] philo.c:70: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] philo.c:70: Start thread jobs[0]
-[mt] philo.c:70: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] philo.c:70: Start thread jobs[1]
-[mt] philo.c:70: Thread jobs[2], fun job, parent <main>, args {2}
-[mt] philo.c:70: Start thread jobs[2]
-[mt] philo.c:70: Thread jobs[3], fun job, parent <main>, args {3}
-[mt] philo.c:70: Start thread jobs[3]
-[mt] philo.c:70: Thread jobs[4], fun job, parent <main>, args {4}
-[mt] philo.c:70: Start thread jobs[4]
-[mt] philo.c:73: 
-  Receiving message on queue, max size 2, stored in &end. Possible  values:
-  From thread jobs[0]: [0] ∈ {1}
-                       [1] ∈ UNINITIALIZED
-  From thread jobs[2]: [0] ∈ {3}
-                       [1] ∈ UNINITIALIZED
-  From thread jobs[3]: [0] ∈ {4}
-                       [1] ∈ UNINITIALIZED
-  From thread jobs[4]: [0] ∈ {5}
-                       [1] ∈ UNINITIALIZED
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -369,17 +329,7 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[0]
-[mt] philo.c:38: Lock locks[4]
-[mt] philo.c:39: Lock locks[1]
-[eva] using specification for function random
 [eva:interferences] philo.c:43: inject threads interferences at this point
-[mt] philo.c:44: 
-  Sending message on queue, content [0] ∈ {1}
-                                    [1] ∈ UNINITIALIZED
-[mt] philo.c:46: Release locks[1]
-[mt] philo.c:47: Release locks[4]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -415,13 +365,6 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[1]
-[mt] philo.c:38: Lock locks[0]
-[mt] philo.c:39: Lock locks[2]
-[eva] using specification for function random
-[mt] philo.c:46: Release locks[2]
-[mt] philo.c:47: Release locks[0]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -450,17 +393,6 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[2]
-[mt] philo.c:38: Lock locks[1]
-[mt] philo.c:39: Lock locks[3]
-[eva] using specification for function random
-[eva:interferences] philo.c:43: inject threads interferences at this point
-[mt] philo.c:44: 
-  Sending message on queue, content [0] ∈ {3}
-                                    [1] ∈ UNINITIALIZED
-[mt] philo.c:46: Release locks[3]
-[mt] philo.c:47: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -496,17 +428,6 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[3]
-[mt] philo.c:38: Lock locks[2]
-[mt] philo.c:39: Lock locks[4]
-[eva] using specification for function random
-[eva:interferences] philo.c:43: inject threads interferences at this point
-[mt] philo.c:44: 
-  Sending message on queue, content [0] ∈ {4}
-                                    [1] ∈ UNINITIALIZED
-[mt] philo.c:46: Release locks[4]
-[mt] philo.c:47: Release locks[2]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -542,17 +463,6 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[4]
-[mt] philo.c:38: Lock locks[3]
-[mt] philo.c:39: Lock locks[0]
-[eva] using specification for function random
-[eva:interferences] philo.c:43: inject threads interferences at this point
-[mt] philo.c:44: 
-  Sending message on queue, content [0] ∈ {5}
-                                    [1] ∈ UNINITIALIZED
-[mt] philo.c:46: Release locks[0]
-[mt] philo.c:47: Release locks[3]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -625,36 +535,10 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main
-[mt] philo.c:65: Initializing mutex locks[0]
-[mt] philo.c:65: Initializing mutex locks[1]
-[mt] philo.c:65: Initializing mutex locks[2]
-[mt] philo.c:65: Initializing mutex locks[3]
-[mt] philo.c:65: Initializing mutex locks[4]
-[mt] philo.c:70: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] philo.c:70: Start thread jobs[0]
-[mt] philo.c:70: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] philo.c:70: Start thread jobs[1]
 [mt] philo.c:70: New context for jobs[1], fun job, parent <main>, args {1}
-[mt] philo.c:70: Thread jobs[2], fun job, parent <main>, args {2}
-[mt] philo.c:70: Start thread jobs[2]
 [mt] philo.c:70: New context for jobs[2], fun job, parent <main>, args {2}
-[mt] philo.c:70: Thread jobs[3], fun job, parent <main>, args {3}
-[mt] philo.c:70: Start thread jobs[3]
 [mt] philo.c:70: New context for jobs[3], fun job, parent <main>, args {3}
-[mt] philo.c:70: Thread jobs[4], fun job, parent <main>, args {4}
-[mt] philo.c:70: Start thread jobs[4]
 [mt] philo.c:70: New context for jobs[4], fun job, parent <main>, args {4}
-[mt] philo.c:73: 
-  Receiving message on queue, max size 2, stored in &end. Possible  values:
-  From thread jobs[0]: [0] ∈ {1}
-                       [1] ∈ UNINITIALIZED
-  From thread jobs[2]: [0] ∈ {3}
-                       [1] ∈ UNINITIALIZED
-  From thread jobs[3]: [0] ∈ {4}
-                       [1] ∈ UNINITIALIZED
-  From thread jobs[4]: [0] ∈ {5}
-                       [1] ∈ UNINITIALIZED
 [eva:interferences] philo.c:72: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
@@ -678,17 +562,6 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[0]
-[mt] philo.c:38: Lock locks[4]
-[mt] philo.c:39: Lock locks[1]
-[eva] using specification for function random
-[eva:interferences] philo.c:43: inject threads interferences at this point
-[mt] philo.c:44: 
-  Sending message on queue, content [0] ∈ {1}
-                                    [1] ∈ UNINITIALIZED
-[mt] philo.c:46: Release locks[1]
-[mt] philo.c:47: Release locks[4]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -724,13 +597,6 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[1]
-[mt] philo.c:38: Lock locks[0]
-[mt] philo.c:39: Lock locks[2]
-[eva] using specification for function random
-[mt] philo.c:46: Release locks[2]
-[mt] philo.c:47: Release locks[0]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -759,17 +625,6 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[2]
-[mt] philo.c:38: Lock locks[1]
-[mt] philo.c:39: Lock locks[3]
-[eva] using specification for function random
-[eva:interferences] philo.c:43: inject threads interferences at this point
-[mt] philo.c:44: 
-  Sending message on queue, content [0] ∈ {3}
-                                    [1] ∈ UNINITIALIZED
-[mt] philo.c:46: Release locks[3]
-[mt] philo.c:47: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -805,17 +660,6 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[3]
-[mt] philo.c:38: Lock locks[2]
-[mt] philo.c:39: Lock locks[4]
-[eva] using specification for function random
-[eva:interferences] philo.c:43: inject threads interferences at this point
-[mt] philo.c:44: 
-  Sending message on queue, content [0] ∈ {4}
-                                    [1] ∈ UNINITIALIZED
-[mt] philo.c:46: Release locks[4]
-[mt] philo.c:47: Release locks[2]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -851,17 +695,6 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[4]
-[mt] philo.c:38: Lock locks[3]
-[mt] philo.c:39: Lock locks[0]
-[eva] using specification for function random
-[eva:interferences] philo.c:43: inject threads interferences at this point
-[mt] philo.c:44: 
-  Sending message on queue, content [0] ∈ {5}
-                                    [1] ∈ UNINITIALIZED
-[mt] philo.c:46: Release locks[0]
-[mt] philo.c:47: Release locks[3]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -898,10 +731,6 @@
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: end2
 [mt] <main> reads  end2 ∈ {0; 1}  // philo.c:72 main
-[mt] jobs[0] writes  end2 ∈ {1}  // philo.c:43 aux :: philo.c:56 <- job
-[mt] jobs[2] writes  end2 ∈ {1}  // philo.c:43 aux :: philo.c:56 <- job
-[mt] jobs[3] writes  end2 ∈ {1}  // philo.c:43 aux :: philo.c:56 <- job
-[mt] jobs[4] writes  end2 ∈ {1}  // philo.c:43 aux :: philo.c:56 <- job
 [mt] Possible read/write data races:
   end2:
     read by <main> at philo.c:72, unprotected

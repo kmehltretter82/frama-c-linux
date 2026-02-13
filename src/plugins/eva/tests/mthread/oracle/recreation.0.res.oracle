@@ -198,9 +198,6 @@
   inject threads interferences at the start of job for thread jobs[4]
 [mt] recreation.c:37: Lock locks[3]
 [mt] recreation.c:38: Lock locks[5]
-[eva] using specification for function random
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[3]
 [mt] recreation.c:49: Release locks[5]
 [mt] * Starting to save the state of the value analysis
@@ -240,9 +237,6 @@
   inject threads interferences at the start of job for thread jobs[5]
 [mt] recreation.c:37: Lock locks[4]
 [mt] recreation.c:38: Lock locks[6]
-[eva] using specification for function random
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[4]
 [mt] recreation.c:49: Release locks[6]
 [mt] * Starting to save the state of the value analysis
@@ -282,9 +276,6 @@
   inject threads interferences at the start of job for thread jobs[6]
 [mt] recreation.c:37: Lock locks[5]
 [mt] recreation.c:38: Lock locks[7]
-[eva] using specification for function random
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[5]
 [mt] recreation.c:49: Release locks[7]
 [mt] * Starting to save the state of the value analysis
@@ -324,9 +315,6 @@
   inject threads interferences at the start of job for thread jobs[7]
 [mt] recreation.c:37: Lock locks[6]
 [mt] recreation.c:38: Lock locks[8]
-[eva] using specification for function random
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[6]
 [mt] recreation.c:49: Release locks[8]
 [mt] * Starting to save the state of the value analysis
@@ -366,9 +354,6 @@
   inject threads interferences at the start of job for thread jobs[8]
 [mt] recreation.c:37: Lock locks[7]
 [mt] recreation.c:38: Lock locks[9]
-[eva] using specification for function random
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[7]
 [mt] recreation.c:49: Release locks[9]
 [mt] * Starting to save the state of the value analysis
@@ -408,9 +393,6 @@
   inject threads interferences at the start of job for thread jobs[9]
 [mt] recreation.c:37: Lock locks[8]
 [mt] recreation.c:38: Lock locks[10]
-[eva] using specification for function random
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[8]
 [mt] recreation.c:49: Release locks[10]
 [mt] * Starting to save the state of the value analysis
@@ -450,9 +432,6 @@
   inject threads interferences at the start of job for thread jobs[10]
 [mt] recreation.c:37: Lock locks[9]
 [mt] recreation.c:38: Lock locks[11]
-[eva] using specification for function random
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[9]
 [mt] recreation.c:49: Release locks[11]
 [mt] * Starting to save the state of the value analysis
@@ -492,13 +471,10 @@
   inject threads interferences at the start of job for thread jobs[11]
 [mt] recreation.c:37: Lock locks[10]
 [mt] recreation.c:38: Lock locks[0]
-[eva] using specification for function random
 [mt] recreation.c:44: Warning: 
   Trying to lock mutex locks[0], but it might already be locked (and initialized).
-[mt] recreation.c:44: Lock locks[0]
 [eva] FRAMAC_SHARE/mt/mthread_pthread.c:46: Warning: 
   The mutex locks[0] is already locked.
-[mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[10]
 [mt] recreation.c:49: Warning: 
   Trying to unlock mutex locks[0], but it might already be unlocked (and initialized).
@@ -554,24 +530,9 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main
-[mt] recreation.c:63: Initializing mutex locks[0]
-[mt] recreation.c:63: Initializing mutex locks[1]
-[mt] recreation.c:63: Initializing mutex locks[2]
-[mt] recreation.c:63: Initializing mutex locks[3]
-[mt] recreation.c:63: Initializing mutex locks[4]
-[mt] recreation.c:63: Initializing mutex locks[5]
-[mt] recreation.c:63: Initializing mutex locks[6]
-[mt] recreation.c:63: Initializing mutex locks[7]
-[mt] recreation.c:63: Initializing mutex locks[8]
-[mt] recreation.c:63: Initializing mutex locks[9]
-[mt] recreation.c:63: Initializing mutex locks[10]
-[mt] recreation.c:63: Initializing mutex locks[11]
 [mt] recreation.c:66: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] recreation.c:66: Start thread jobs[0]
 [mt] recreation.c:66: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] recreation.c:66: Start thread jobs[1]
 [mt] recreation.c:66: Thread jobs[2], fun job, parent <main>, args {2}
-[mt] recreation.c:66: Start thread jobs[2]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -594,14 +555,9 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[0]
 [mt] recreation.c:25: Thread jobs[3], fun job, parent jobs[0], args {3}
-[mt] recreation.c:25: Start thread jobs[3]
 [mt] recreation.c:25: Thread jobs[4], fun job, parent jobs[0], args {4}
-[mt] recreation.c:25: Start thread jobs[4]
 [mt] recreation.c:25: Thread jobs[5], fun job, parent jobs[0], args {5}
-[mt] recreation.c:25: Start thread jobs[5]
 [eva:interferences] recreation.c:28: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
@@ -625,15 +581,9 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[1]
 [mt] recreation.c:25: Thread jobs[6], fun job, parent jobs[1], args {6}
-[mt] recreation.c:25: Start thread jobs[6]
 [mt] recreation.c:25: Thread jobs[7], fun job, parent jobs[1], args {7}
-[mt] recreation.c:25: Start thread jobs[7]
 [mt] recreation.c:25: Thread jobs[8], fun job, parent jobs[1], args {8}
-[mt] recreation.c:25: Start thread jobs[8]
-[eva:interferences] recreation.c:28: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -656,15 +606,9 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[2]
 [mt] recreation.c:25: Thread jobs[9], fun job, parent jobs[2], args {9}
-[mt] recreation.c:25: Start thread jobs[9]
 [mt] recreation.c:25: Thread jobs[10], fun job, parent jobs[2], args {10}
-[mt] recreation.c:25: Start thread jobs[10]
 [mt] recreation.c:25: Thread jobs[11], fun job, parent jobs[2], args {11}
-[mt] recreation.c:25: Start thread jobs[11]
-[eva:interferences] recreation.c:28: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -687,16 +631,7 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[3]
-[mt] recreation.c:37: Lock locks[2]
-[mt] recreation.c:38: Lock locks[4]
-[eva] using specification for function random
 [eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[2]
-[mt] recreation.c:49: Release locks[4]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -736,16 +671,6 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[4]
-[mt] recreation.c:37: Lock locks[3]
-[mt] recreation.c:38: Lock locks[5]
-[eva] using specification for function random
-[eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[3]
-[mt] recreation.c:49: Release locks[5]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -785,16 +710,6 @@
 [mt] * Computing value analysis for thread jobs[5]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[5]
-[mt] recreation.c:37: Lock locks[4]
-[mt] recreation.c:38: Lock locks[6]
-[eva] using specification for function random
-[eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[4]
-[mt] recreation.c:49: Release locks[6]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -834,16 +749,6 @@
 [mt] * Computing value analysis for thread jobs[6]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[6]
-[mt] recreation.c:37: Lock locks[5]
-[mt] recreation.c:38: Lock locks[7]
-[eva] using specification for function random
-[eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[5]
-[mt] recreation.c:49: Release locks[7]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -883,16 +788,6 @@
 [mt] * Computing value analysis for thread jobs[7]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[7]
-[mt] recreation.c:37: Lock locks[6]
-[mt] recreation.c:38: Lock locks[8]
-[eva] using specification for function random
-[eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[6]
-[mt] recreation.c:49: Release locks[8]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -932,16 +827,6 @@
 [mt] * Computing value analysis for thread jobs[8]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[8]
-[mt] recreation.c:37: Lock locks[7]
-[mt] recreation.c:38: Lock locks[9]
-[eva] using specification for function random
-[eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[7]
-[mt] recreation.c:49: Release locks[9]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -981,16 +866,6 @@
 [mt] * Computing value analysis for thread jobs[9]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[9]
-[mt] recreation.c:37: Lock locks[8]
-[mt] recreation.c:38: Lock locks[10]
-[eva] using specification for function random
-[eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[8]
-[mt] recreation.c:49: Release locks[10]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -1030,16 +905,6 @@
 [mt] * Computing value analysis for thread jobs[10]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[10]
-[mt] recreation.c:37: Lock locks[9]
-[mt] recreation.c:38: Lock locks[11]
-[eva] using specification for function random
-[eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[9]
-[mt] recreation.c:49: Release locks[11]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -1079,24 +944,6 @@
 [mt] * Computing value analysis for thread jobs[11]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[11]
-[mt] recreation.c:37: Lock locks[10]
-[mt] recreation.c:38: Lock locks[0]
-[eva] using specification for function random
-[eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Warning: 
-  Trying to lock mutex locks[0], but it might already be locked (and initialized).
-[mt] recreation.c:44: Lock locks[0]
-[eva] FRAMAC_SHARE/mt/mthread_pthread.c:46: Warning: 
-  The mutex locks[0] is already locked.
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[10]
-[mt] recreation.c:49: Warning: 
-  Trying to unlock mutex locks[0], but it might already be unlocked (and initialized).
-[mt] recreation.c:49: Release locks[0]
-[eva] FRAMAC_SHARE/mt/mthread_pthread.c:56: Warning: 
-  The mutex locks[0] is already unlocked.
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -1229,26 +1076,7 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main
-[mt] recreation.c:63: Initializing mutex locks[0]
-[mt] recreation.c:63: Initializing mutex locks[1]
-[mt] recreation.c:63: Initializing mutex locks[2]
-[mt] recreation.c:63: Initializing mutex locks[3]
-[mt] recreation.c:63: Initializing mutex locks[4]
-[mt] recreation.c:63: Initializing mutex locks[5]
-[mt] recreation.c:63: Initializing mutex locks[6]
-[mt] recreation.c:63: Initializing mutex locks[7]
-[mt] recreation.c:63: Initializing mutex locks[8]
-[mt] recreation.c:63: Initializing mutex locks[9]
-[mt] recreation.c:63: Initializing mutex locks[10]
-[mt] recreation.c:63: Initializing mutex locks[11]
-[mt] recreation.c:66: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] recreation.c:66: Start thread jobs[0]
-[mt] recreation.c:66: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] recreation.c:66: Start thread jobs[1]
 [mt] recreation.c:66: New context for jobs[1], fun job, parent <main>, args {1}
-[mt] recreation.c:66: Thread jobs[2], fun job, parent <main>, args {2}
-[mt] recreation.c:66: Start thread jobs[2]
 [mt] recreation.c:66: New context for jobs[2], fun job, parent <main>, args {2}
 [eva:interferences] recreation.c:68: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
@@ -1273,18 +1101,9 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[0]
-[mt] recreation.c:25: Thread jobs[3], fun job, parent jobs[0], args {3}
-[mt] recreation.c:25: Start thread jobs[3]
 [mt] recreation.c:25: New context for jobs[3], fun job, parent jobs[0], args {3}
-[mt] recreation.c:25: Thread jobs[4], fun job, parent jobs[0], args {4}
-[mt] recreation.c:25: Start thread jobs[4]
 [mt] recreation.c:25: New context for jobs[4], fun job, parent jobs[0], args {4}
-[mt] recreation.c:25: Thread jobs[5], fun job, parent jobs[0], args {5}
-[mt] recreation.c:25: Start thread jobs[5]
 [mt] recreation.c:25: New context for jobs[5], fun job, parent jobs[0], args {5}
-[eva:interferences] recreation.c:28: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -1308,18 +1127,9 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[1]
-[mt] recreation.c:25: Thread jobs[6], fun job, parent jobs[1], args {6}
-[mt] recreation.c:25: Start thread jobs[6]
 [mt] recreation.c:25: New context for jobs[6], fun job, parent jobs[1], args {6}
-[mt] recreation.c:25: Thread jobs[7], fun job, parent jobs[1], args {7}
-[mt] recreation.c:25: Start thread jobs[7]
 [mt] recreation.c:25: New context for jobs[7], fun job, parent jobs[1], args {7}
-[mt] recreation.c:25: Thread jobs[8], fun job, parent jobs[1], args {8}
-[mt] recreation.c:25: Start thread jobs[8]
 [mt] recreation.c:25: New context for jobs[8], fun job, parent jobs[1], args {8}
-[eva:interferences] recreation.c:28: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -1343,20 +1153,11 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[2]
-[mt] recreation.c:25: Thread jobs[9], fun job, parent jobs[2], args {9}
-[mt] recreation.c:25: Start thread jobs[9]
 [mt] recreation.c:25: New context for jobs[9], fun job, parent jobs[2], args {9}
-[mt] recreation.c:25: Thread jobs[10], fun job, parent jobs[2], args {10}
-[mt] recreation.c:25: Start thread jobs[10]
 [mt] recreation.c:25: 
   New context for jobs[10], fun job, parent jobs[2], args {10}
-[mt] recreation.c:25: Thread jobs[11], fun job, parent jobs[2], args {11}
-[mt] recreation.c:25: Start thread jobs[11]
 [mt] recreation.c:25: 
   New context for jobs[11], fun job, parent jobs[2], args {11}
-[eva:interferences] recreation.c:28: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -1379,16 +1180,6 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[3]
-[mt] recreation.c:37: Lock locks[2]
-[mt] recreation.c:38: Lock locks[4]
-[eva] using specification for function random
-[eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[2]
-[mt] recreation.c:49: Release locks[4]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -1428,16 +1219,6 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[4]
-[mt] recreation.c:37: Lock locks[3]
-[mt] recreation.c:38: Lock locks[5]
-[eva] using specification for function random
-[eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[3]
-[mt] recreation.c:49: Release locks[5]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -1477,16 +1258,6 @@
 [mt] * Computing value analysis for thread jobs[5]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[5]
-[mt] recreation.c:37: Lock locks[4]
-[mt] recreation.c:38: Lock locks[6]
-[eva] using specification for function random
-[eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[4]
-[mt] recreation.c:49: Release locks[6]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -1526,16 +1297,6 @@
 [mt] * Computing value analysis for thread jobs[6]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[6]
-[mt] recreation.c:37: Lock locks[5]
-[mt] recreation.c:38: Lock locks[7]
-[eva] using specification for function random
-[eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[5]
-[mt] recreation.c:49: Release locks[7]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -1575,16 +1336,6 @@
 [mt] * Computing value analysis for thread jobs[7]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[7]
-[mt] recreation.c:37: Lock locks[6]
-[mt] recreation.c:38: Lock locks[8]
-[eva] using specification for function random
-[eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[6]
-[mt] recreation.c:49: Release locks[8]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -1624,16 +1375,6 @@
 [mt] * Computing value analysis for thread jobs[8]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[8]
-[mt] recreation.c:37: Lock locks[7]
-[mt] recreation.c:38: Lock locks[9]
-[eva] using specification for function random
-[eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[7]
-[mt] recreation.c:49: Release locks[9]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -1673,16 +1414,6 @@
 [mt] * Computing value analysis for thread jobs[9]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[9]
-[mt] recreation.c:37: Lock locks[8]
-[mt] recreation.c:38: Lock locks[10]
-[eva] using specification for function random
-[eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[8]
-[mt] recreation.c:49: Release locks[10]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -1722,16 +1453,6 @@
 [mt] * Computing value analysis for thread jobs[10]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[10]
-[mt] recreation.c:37: Lock locks[9]
-[mt] recreation.c:38: Lock locks[11]
-[eva] using specification for function random
-[eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Lock locks[0]
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[9]
-[mt] recreation.c:49: Release locks[11]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -1771,24 +1492,6 @@
 [mt] * Computing value analysis for thread jobs[11]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[11]
-[mt] recreation.c:37: Lock locks[10]
-[mt] recreation.c:38: Lock locks[0]
-[eva] using specification for function random
-[eva:interferences] recreation.c:40: inject threads interferences at this point
-[mt] recreation.c:44: Warning: 
-  Trying to lock mutex locks[0], but it might already be locked (and initialized).
-[mt] recreation.c:44: Lock locks[0]
-[eva] FRAMAC_SHARE/mt/mthread_pthread.c:46: Warning: 
-  The mutex locks[0] is already locked.
-[mt] recreation.c:45: Release locks[0]
-[mt] recreation.c:48: Release locks[10]
-[mt] recreation.c:49: Warning: 
-  Trying to unlock mutex locks[0], but it might already be unlocked (and initialized).
-[mt] recreation.c:49: Release locks[0]
-[eva] FRAMAC_SHARE/mt/mthread_pthread.c:56: Warning: 
-  The mutex locks[0] is already unlocked.
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -1831,15 +1534,6 @@
 [mt] jobs[0] reads  end ∈ {0; 1}  // recreation.c:28 job
 [mt] jobs[1] reads  end ∈ {0; 1}  // recreation.c:28 job
 [mt] jobs[2] reads  end ∈ {0; 1}  // recreation.c:28 job
-[mt] jobs[3] writes  end ∈ {1}  // recreation.c:40 job
-[mt] jobs[4] writes  end ∈ {1}  // recreation.c:40 job
-[mt] jobs[5] writes  end ∈ {1}  // recreation.c:40 job
-[mt] jobs[6] writes  end ∈ {1}  // recreation.c:40 job
-[mt] jobs[7] writes  end ∈ {1}  // recreation.c:40 job
-[mt] jobs[8] writes  end ∈ {1}  // recreation.c:40 job
-[mt] jobs[9] writes  end ∈ {1}  // recreation.c:40 job
-[mt] jobs[10] writes  end ∈ {1}  // recreation.c:40 job
-[mt] jobs[11] writes  end ∈ {1}  // recreation.c:40 job
 [mt] Possible read/write data races:
   end:
     read by <main> at recreation.c:68, unprotected

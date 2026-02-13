@@ -83,7 +83,6 @@
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[1]
 [mt] thread_arg.c:25: Lock locks[1]
-[eva] using specification for function Frama_C_interval
 [mt] thread_arg.c:27: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
@@ -130,16 +129,8 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main
-[mt] thread_arg.c:33: Initializing mutex locks[0]
-[mt] thread_arg.c:33: Initializing mutex locks[1]
 [mt] thread_arg.c:37: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] thread_arg.c:37: Start thread jobs[0]
 [mt] thread_arg.c:37: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] thread_arg.c:37: Start thread jobs[1]
-[mt] thread_arg.c:42: Lock locks[0]
-[mt] thread_arg.c:42: Lock locks[1]
-[mt] thread_arg.c:48: Release locks[0]
-[mt] thread_arg.c:48: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -167,13 +158,8 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[0]
-[mt] thread_arg.c:25: Lock locks[0]
-[eva] using specification for function Frama_C_interval
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[mt] thread_arg.c:27: Release locks[0]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -216,13 +202,6 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[1]
-[mt] thread_arg.c:25: Lock locks[1]
-[eva] using specification for function Frama_C_interval
-[eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[mt] thread_arg.c:27: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -322,19 +301,8 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main
-[mt] thread_arg.c:33: Initializing mutex locks[0]
-[mt] thread_arg.c:33: Initializing mutex locks[1]
-[mt] thread_arg.c:37: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] thread_arg.c:37: Start thread jobs[0]
-[mt] thread_arg.c:37: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] thread_arg.c:37: Start thread jobs[1]
 [mt] thread_arg.c:37: New context for jobs[1], fun job, parent <main>, args {1}
-[mt] thread_arg.c:42: Lock locks[0]
-[mt] thread_arg.c:42: Lock locks[1]
 [eva:interferences] thread_arg.c:45: inject threads interferences at this point
-[mt] thread_arg.c:48: Release locks[0]
-[mt] thread_arg.c:48: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -362,13 +330,6 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[0]
-[mt] thread_arg.c:25: Lock locks[0]
-[eva] using specification for function Frama_C_interval
-[eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[mt] thread_arg.c:27: Release locks[0]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -414,13 +375,6 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[1]
-[mt] thread_arg.c:25: Lock locks[1]
-[eva] using specification for function Frama_C_interval
-[eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[mt] thread_arg.c:27: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -463,18 +417,10 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: Frama_C_entropy_source; vars[0..1]
-[mt] jobs[0] reads  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
-[mt] jobs[1] reads  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
 [mt] <main> reads  vars[0] ∈ [0..10]  // thread_arg.c:45 main
 [mt] jobs[0] reads  vars[0] ∈ [0..10]  // thread_arg.c:26 job
 [mt] <main> reads  vars[1] ∈ [0..10]  // thread_arg.c:45 main
 [mt] jobs[1] reads  vars[1] ∈ [0..10]  // thread_arg.c:26 job
-[mt] jobs[0] writes  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
-[mt] jobs[1] writes  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
 [mt] jobs[0] writes  vars[0] ∈ [0..20]  // thread_arg.c:26 job
 [mt] jobs[1] writes  vars[1] ∈ [0..20]  // thread_arg.c:26 job
 [mt] Possible read/write data races:
@@ -517,21 +463,8 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main
-[mt] thread_arg.c:33: Initializing mutex locks[0]
-[mt] thread_arg.c:33: Initializing mutex locks[1]
-[mt] thread_arg.c:37: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] thread_arg.c:37: Start thread jobs[0]
-[mt] thread_arg.c:37: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] thread_arg.c:37: Start thread jobs[1]
-[mt] thread_arg.c:37: New context for jobs[1], fun job, parent <main>, args {1}
-[mt] thread_arg.c:42: Lock locks[0]
-[mt] thread_arg.c:42: Lock locks[1]
-[eva:interferences] thread_arg.c:45: inject threads interferences at this point
 [eva:alarm] thread_arg.c:45: Warning: 
   signed overflow. assert sum + vars[i_2] ≤ 2147483647;
-[mt] thread_arg.c:48: Release locks[0]
-[mt] thread_arg.c:48: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -559,13 +492,6 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[0]
-[mt] thread_arg.c:25: Lock locks[0]
-[eva] using specification for function Frama_C_interval
-[eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[mt] thread_arg.c:27: Release locks[0]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -613,17 +539,10 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[1]
-[mt] thread_arg.c:25: Lock locks[1]
-[eva] using specification for function Frama_C_interval
-[eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:alarm] thread_arg.c:26: Warning: 
   signed overflow.
   assert vars[i] + tmp ≤ 2147483647;
   (tmp from Frama_C_interval(0, 10))
-[eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[mt] thread_arg.c:27: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -668,18 +587,10 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: Frama_C_entropy_source; vars[0..1]
-[mt] jobs[0] reads  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
-[mt] jobs[1] reads  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
 [mt] <main> reads  vars[0] ∈ [0..2147483647]  // thread_arg.c:45 main
 [mt] jobs[0] reads  vars[0] ∈ [0..20]  // thread_arg.c:26 job
 [mt] <main> reads  vars[1] ∈ [0..2147483647]  // thread_arg.c:45 main
 [mt] jobs[1] reads  vars[1] ∈ [0..2147483647]  // thread_arg.c:26 job
-[mt] jobs[0] writes  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
-[mt] jobs[1] writes  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
 [mt] jobs[0] writes  vars[0] ∈ [0..30]  // thread_arg.c:26 job
 [mt] jobs[1] writes  vars[1] ∈ [0..2147483647]  // thread_arg.c:26 job
 [mt] Possible read/write data races:
@@ -721,18 +632,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main
-[mt] thread_arg.c:33: Initializing mutex locks[0]
-[mt] thread_arg.c:33: Initializing mutex locks[1]
-[mt] thread_arg.c:37: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] thread_arg.c:37: Start thread jobs[0]
-[mt] thread_arg.c:37: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] thread_arg.c:37: Start thread jobs[1]
-[mt] thread_arg.c:42: Lock locks[0]
-[mt] thread_arg.c:42: Lock locks[1]
-[eva:interferences] thread_arg.c:45: inject threads interferences at this point
-[mt] thread_arg.c:48: Release locks[0]
-[mt] thread_arg.c:48: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -759,13 +658,6 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[0]
-[mt] thread_arg.c:25: Lock locks[0]
-[eva] using specification for function Frama_C_interval
-[eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[mt] thread_arg.c:27: Release locks[0]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -809,13 +701,6 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[1]
-[mt] thread_arg.c:25: Lock locks[1]
-[eva] using specification for function Frama_C_interval
-[eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[mt] thread_arg.c:27: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -860,20 +745,8 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: Frama_C_entropy_source; vars[0..1]
-[mt] jobs[0] reads  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
-[mt] jobs[1] reads  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
-[mt] <main> reads  vars[0] ∈ [0..2147483647]  // thread_arg.c:45 main
 [mt] jobs[0] reads  vars[0] ∈ [0..2147483647]  // thread_arg.c:26 job
-[mt] <main> reads  vars[1] ∈ [0..2147483647]  // thread_arg.c:45 main
-[mt] jobs[1] reads  vars[1] ∈ [0..2147483647]  // thread_arg.c:26 job
-[mt] jobs[0] writes  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
-[mt] jobs[1] writes  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
 [mt] jobs[0] writes  vars[0] ∈ [0..2147483647]  // thread_arg.c:26 job
-[mt] jobs[1] writes  vars[1] ∈ [0..2147483647]  // thread_arg.c:26 job
 [mt] Possible read/write data races:
   vars[1]:
     read by <main> at thread_arg.c:45, protected by locks[0] locks[1]
@@ -913,18 +786,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main
-[mt] thread_arg.c:33: Initializing mutex locks[0]
-[mt] thread_arg.c:33: Initializing mutex locks[1]
-[mt] thread_arg.c:37: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] thread_arg.c:37: Start thread jobs[0]
-[mt] thread_arg.c:37: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] thread_arg.c:37: Start thread jobs[1]
-[mt] thread_arg.c:42: Lock locks[0]
-[mt] thread_arg.c:42: Lock locks[1]
-[eva:interferences] thread_arg.c:45: inject threads interferences at this point
-[mt] thread_arg.c:48: Release locks[0]
-[mt] thread_arg.c:48: Release locks[1]
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -952,20 +813,6 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: Frama_C_entropy_source; vars[0..1]
-[mt] jobs[0] reads  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
-[mt] jobs[1] reads  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
-[mt] jobs[0] reads  vars[0] ∈ [0..2147483647]  // thread_arg.c:26 job
-[mt] <main> reads  vars[0] ∈ [0..2147483647]  // thread_arg.c:45 main
-[mt] jobs[1] reads  vars[1] ∈ [0..2147483647]  // thread_arg.c:26 job
-[mt] <main> reads  vars[1] ∈ [0..2147483647]  // thread_arg.c:45 main
-[mt] jobs[0] writes  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
-[mt] jobs[1] writes  Frama_C_entropy_source ∈ [--..--]  // thread_arg.c:26
-  Frama_C_interval :: thread_arg.c:26 <- job
-[mt] jobs[0] writes  vars[0] ∈ [0..2147483647]  // thread_arg.c:26 job
-[mt] jobs[1] writes  vars[1] ∈ [0..2147483647]  // thread_arg.c:26 job
 [mt] Possible read/write data races:
   vars[1]:
     read by jobs[1] at thread_arg.c:26, protected by locks[1]

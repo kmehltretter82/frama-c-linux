@@ -76,7 +76,6 @@
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] memexec.c:32: Thread th1, fun t1, parent <main>, args {0}
-[mt] memexec.c:32: Start thread th1
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
@@ -97,8 +96,6 @@
 [mt] * Computing value analysis for thread th1
 [eva] Analyzing a complete application starting at t1
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of t1 for thread th1
 [eva:interferences] memexec.c:14: inject threads interferences at this point
 [eva:interferences] memexec.c:10: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
@@ -188,9 +185,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main
-[mt] memexec.c:32: Thread th1, fun t1, parent <main>, args {0}
-[mt] memexec.c:32: Start thread th1
 [eva:interferences] memexec.c:33: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
@@ -214,20 +208,6 @@
 [mt] Imprecise locations to watch: a; c
 [mt] <main> reads  a ∈ {0; 1}  // memexec.c:33 main
 [mt] <main> reads  c ∈ {0; 2}  // memexec.c:33 main
-[mt] th1 writes  a ∈ {1}  // memexec.c:14 f :: memexec.c:27 <- t1
-[mt] th1 writes  a ∈ {1}  // memexec.c:14 f :: memexec.c:25 <- t1
-[mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g :: memexec.c:19 <- f :: memexec.c:27 <- t1
-[mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g :: memexec.c:18 <- f :: memexec.c:27 <- t1
-[mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g :: memexec.c:16 <- f :: memexec.c:27 <- t1
-[mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g :: memexec.c:19 <- f :: memexec.c:25 <- t1
-[mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g :: memexec.c:18 <- f :: memexec.c:25 <- t1
-[mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g :: memexec.c:16 <- f :: memexec.c:25 <- t1
 [mt] Possible read/write data races:
   c:
     read by <main> at memexec.c:33, unprotected

@@ -1,10 +1,10 @@
-766a767,770
+727a728,731
 > [eva:show] interferences.c:14: 
 >   Frama_C_show_each_interrupt_start: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
 > [eva:show] interferences.c:16: 
 >   Frama_C_show_each_interrupt_end: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
-1197a1202,1205
-> [eva:show] interferences.c:16: 
->   Frama_C_show_each_interrupt_end: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
+1108a1113,1116
 > [eva:show] interferences.c:14: 
 >   Frama_C_show_each_interrupt_start: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}
+> [eva:show] interferences.c:16: 
+>   Frama_C_show_each_interrupt_end: {0; 1; 2; 3}, {0; 1; 2}, {0; 1}

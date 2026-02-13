@@ -90,9 +90,6 @@ let record_end_of_thread_analysis analysis =
 (* We compute a value analysis for the given thread *)
 let compute_thread analysis th =
   let time = Sys.time () in
-  Project.clear
-    ~selection:(State_selection.with_dependencies Messages.self) ();
-  Messages.reset_once_flag ();
 
   Mt_self.feedback ~level:2 "* Computing value analysis for thread %a"
     Thread.pretty th.th_eva_thread;
