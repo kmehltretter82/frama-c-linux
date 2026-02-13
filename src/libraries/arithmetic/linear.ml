@@ -112,6 +112,7 @@ module Space (Field : Field.S) = struct
       Finite.fold max m.rows Field.zero
 
 
+    (* Compute inverse matrix using Gaussian elimination. *)
     let rec inverse (matrix : ('n, 'n) matrix) =
       let inverse = id matrix.rows in
       let pivot_row = Finite.first in
@@ -130,7 +131,8 @@ module Space (Field : Field.S) = struct
         | Some pivot_col -> row_echelon matrix inverse pivot_row pivot_col
         | None -> matrix, inverse
       else
-        (* Normalize all values in pivot row with the pivot value. *)
+        (* Normalize all values in pivot row with the argmax value to compute
+           the reduced row echelon form. *)
         let value = get i_max pivot_col matrix in
         let divide col m = Field.(get i_max col m / value) in
         let normalize col m = set i_max col (divide col m) m in
@@ -183,7 +185,7 @@ module Space (Field : Field.S) = struct
       let n = matrix.rows in
       let row_substitution row (matrix, inverse) =
         if Finite.(row < pivot) then
-          let f = Field.(get row pivot matrix / get pivot pivot matrix) in
+          let f = get row pivot matrix in
           let value col m = Field.(get row col m - f * get pivot col m) in
           let update col m = set row col (value col m) m in
           let inverse = Finite.fold update n inverse in
