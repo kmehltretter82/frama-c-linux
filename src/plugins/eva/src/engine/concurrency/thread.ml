@@ -62,7 +62,7 @@ module ThreadsById = State_builder.Hashtbl (Datatype.Int.Hashtbl) (Thread)
       let size = 13
     end)
 
-let last_thread_id = ref 1
+let last_thread_id = ref main.id
 
 let create kind =
   incr last_thread_id;
@@ -73,13 +73,24 @@ let create kind =
 let find id =
   if Int.equal id main.id then Some main else ThreadsById.find_opt id
 
+let from_callstack cs =
+  match find cs.Callstack.thread with
+  | Some th -> th
+  | None ->
+    Self.fatal
+      "The thread id (%d) in the considered callstack does not match any \
+       existing thread"
+      cs.thread
 
-(* --- Current Thread --- *)
+let from_local_position pos =
+  Position.Local.callstack pos
+  |> from_callstack
 
-let current, set_current =
-  let r = ref main in
-  (fun () -> !r), (fun id -> r := id)
-
+let from_position pos =
+  Position.callstack pos
+  (* The only position that do not have a callstack associated is GlobalInit.
+     The global variables initialization are done by the main thread. *)
+  |> Option.fold ~some:from_callstack ~none:main
 
 (* --- Thread identity --- *)
 
@@ -151,20 +162,21 @@ module Identities = State_builder.Hashtbl (Identity.Hashtbl) (Thread)
    the analysis *)
 
 module PosSet = Position.Local.Set
+module Varinfo = Cil_datatype.Varinfo
+
+type properties = {
+  entry_point : Kernel_function.t;
+  spawn_points : PosSet.t;
+  arguments : (Varinfo.t * Cvalue.V.t) list;
+}
 
 module Properties =
 struct
   module Prototype =
   struct
-    module Varinfo = Cil_datatype.Varinfo
-
     include Datatype.Serializable_undefined
 
-    type t = {
-      entry_point : Kernel_function.t;
-      spawn_points : PosSet.t;
-      arguments : (Varinfo.t * Cvalue.V.t) list;
-    }
+    type t = properties
 
     let name = "Eva.Thread.Properties"
     let reprs = [{
@@ -298,14 +310,13 @@ let reset_state () =
   last_thread_id := 1;
   ThreadsById.clear ();
   Identities.clear ();
-  State.clear ();
-  set_current main
+  State.clear ()
 
-let get_properties thread =
+let properties thread =
   match thread.kind with
   | Main -> Properties.main_properties ()
   | InterruptHandler kf -> Properties.interrupt_properties kf
   | Thread _ -> State.find thread
 
 let entry_point th =
-  (get_properties th).entry_point
+  (properties th).entry_point

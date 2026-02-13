@@ -6,9 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val force_compute : unit -> unit
-(** Perform a full analysis, starting from the [main] function. *)
-
 val abort : unit -> unit
 (** Cleanly abort the analysis at the next safe point: partial results will be
     saved and Frama-C is not killed. *)
@@ -87,3 +84,15 @@ val use_spec_instead_of_definition: Cil_types.kernel_function -> bool
     to known whether results are available for a given function. *)
 val save_results: Cil_types.kernel_function -> bool
 [@@@ api_end]
+
+(** {2 Mthread entry point}
+
+    The following functions are exported to allow mthread to run thread-modular
+    analyses. They are provided as a way to keep the legacy fixpoint computation
+    of mthread. It is likely that in the future, the fixpoint of cucurrent
+    programs will be directly computed inside Eva's engine. *)
+
+val compute_thread : ?cvalue_state:Cvalue.Model.t -> Thread.t -> unit
+
+val mthread_pre_analysis: unit -> unit
+val mthread_post_analysis: unit -> unit

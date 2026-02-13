@@ -176,12 +176,3 @@ let set_results =
     CallersTable.replace kf callers
   in
   Kernel_function.Map.iter register
-
-let merge_results =
-  let union _kf (status1, callers1) (status2, callers2) =
-    let union_stmt _kf s1 s2 = Some (StmtSet.union s1 s2) in
-    let callers = Kernel_function.Map.union union_stmt callers1 callers2 in
-    let status = merge_status status1 status2 in
-    Some (status, callers)
-  in
-  Kernel_function.Map.union union

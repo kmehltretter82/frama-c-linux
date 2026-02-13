@@ -106,6 +106,8 @@ let read_written_by_thread ?(watch_only=Locations.Zone.top) sm th =
        match pos with
        | RootCall _ -> acc
        | GlobalInit _ -> acc (* never multithreaded. *)
+       | Local (_, cs) when cs.thread <> Thread.id th  ->
+         acc (* Ignore other threads *)
        | Local (stmt, _) ->
          let<> UpdatedCurrentLoc = Stmt.loc stmt in
          if sm stmt then

@@ -6,6 +6,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** {2 Thread id} *)
+
 include Datatype.S_with_collections
 
 val main : t
@@ -14,6 +16,9 @@ val is_main : t -> bool
 val id : t -> int
 val label : t -> string
 val find : int -> t option
+val from_callstack : Callstack.t -> t
+val from_local_position : Position.local -> t
+val from_position : Position.t -> t
 
 (** [spawn al name kf args] registers the creation of a thread encountered
     in Eva analysis, and either add this spawn to an existing thread analysis
@@ -42,13 +47,18 @@ val interrupt_handler : Cil_types.kernel_function -> t
     interrupt handlers. *)
 val interrupt_handlers : unit -> t list
 
-(* Internal state of the current analysis *)
+(** {2 Internal state of the current analysis } *)
 
 (** Register a set of functions serving as interrupt handlers. *)
 val register_interrupt_handlers : Kernel_function.Set.t -> unit
 
 val reset_state : unit -> unit
-val current : unit -> t
-val set_current : t -> unit
 
+type properties = {
+  entry_point : Cil_types.kernel_function;
+  spawn_points : Position.Local.Set.t;
+  arguments : (Cil_types.varinfo * Cvalue.V.t) list;
+}
+
+val properties : t -> properties
 val entry_point : t -> Kernel_function.t

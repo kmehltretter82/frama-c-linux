@@ -79,6 +79,23 @@ module type S = sig
       @since Chlorine-20180501
   *)
 
+  (** Pretty prints a hashtbl given a printer for the keys and one for the
+      values.
+      @param format defaults to "[[ %t ]]"
+      @param item defaults to "%a -> %a"
+      @param sep defaults to ";@ "
+      @param last defaults to [sep]
+      @param empty defaults to "[[]]" *)
+  val pretty :
+    ?format:(Pretty.tformatter -> unit) Pretty.format ->
+    ?item:(key Pretty.aformatter -> key -> 'a Pretty.aformatter -> 'a -> unit)
+        Pretty.format ->
+    ?sep:unit Pretty.format ->
+    ?last:unit Pretty.format ->
+    ?empty:unit Pretty.format ->
+    (Format.formatter -> key -> unit) ->
+    (Format.formatter -> 'a -> unit) ->
+    Format.formatter -> 'a t -> unit
 end
 
 module Make(H: HashedType) : S with type key = H.t

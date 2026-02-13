@@ -1,5 +1,7 @@
 /* run.config*
+  EXIT: 1
   STDOPT: #"-kernel-warn-key parser:decimal-float=warning"
+  EXIT: 0
   STDOPT: #"-kernel-warn-key parser:decimal-float=warning -eva-all-rounding-modes-constants"
 */
 

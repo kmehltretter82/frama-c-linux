@@ -14,7 +14,6 @@
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0}
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
@@ -38,7 +37,6 @@
 [mt] Thread <main>, fun main_interrupt_one_shot
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received:
@@ -62,7 +60,6 @@
 [eva:interferences] 
   inject threads interferences at the start of interrupt_oneshot for thread <interrupt_handler interrupt_oneshot>
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received:
@@ -98,12 +95,8 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_interrupt_one_shot
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of main_interrupt_one_shot for thread <main>
-[mt] Thread <main>, fun main_interrupt_one_shot
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received:
@@ -124,11 +117,8 @@
 [mt] * Computing value analysis for thread <interrupt_handler interrupt_oneshot>
 [eva] Analyzing a complete application starting at interrupt_oneshot
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of interrupt_oneshot for thread <interrupt_handler interrupt_oneshot>
 [eva:interferences] interrupt.c:9: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received:
@@ -188,16 +178,12 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_interrupt_one_shot
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of main_interrupt_one_shot for thread <main>
-[mt] New context for <main>, fun main_interrupt_one_shot
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
 [eva:interferences] interrupt.c:19: inject threads interferences at this point
 [eva:show] interrupt.c:20: Frama_C_show_each: {1}
 [eva:interferences] interrupt.c:21: inject threads interferences at this point
 [eva:show] interrupt.c:22: Frama_C_show_each: {0; 1}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received:
@@ -226,11 +212,7 @@
 [mt] * Computing value analysis for thread <interrupt_handler interrupt_oneshot>
 [eva] Analyzing a complete application starting at interrupt_oneshot
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of interrupt_oneshot for thread <interrupt_handler interrupt_oneshot>
-[eva:interferences] interrupt.c:9: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received:
@@ -298,16 +280,10 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_interrupt_one_shot
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of main_interrupt_one_shot for thread <main>
-[mt] Thread <main>, fun main_interrupt_one_shot
 [eva:show] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
-[eva:interferences] interrupt.c:19: inject threads interferences at this point
 [eva:show] interrupt.c:20: Frama_C_show_each: {0; 1}
-[eva:interferences] interrupt.c:21: inject threads interferences at this point
 [eva:show] interrupt.c:22: Frama_C_show_each: {0; 1}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received:
@@ -336,17 +312,7 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: interrupt_received
-[mt] <main> reads  interrupt_received ∈ {0; 1}  // interrupt.c:18
-  main_interrupt_one_shot
-[mt] <main> reads  interrupt_received ∈ {0; 1}  // interrupt.c:19
-  main_interrupt_one_shot
 [mt] <main> reads  interrupt_received ∈ {0; 1}  // interrupt.c:20
-  main_interrupt_one_shot
-[mt] <main> reads  interrupt_received ∈ {0; 1}  // interrupt.c:22
-  main_interrupt_one_shot
-[mt] <interrupt_handler interrupt_oneshot> writes  interrupt_received ∈ {0; 1} 
-  // interrupt.c:9 interrupt_oneshot
-[mt] <main> writes  interrupt_received ∈ {0; 1}  // interrupt.c:21
   main_interrupt_one_shot
 [mt] Possible read/write data races:
   interrupt_received:

@@ -787,26 +787,3 @@ module Html = struct
   ;;
 
 end
-
-module Eva_results = struct
-  (* Fuses the value analysis results for each thread, reprefix them by
-     a fresh kernel function to have nice callstacks, fuse all the
-     results, and set the result as Value's results. *)
-  let display analysis =
-    let ths = analysis.all_threads in
-    let aux_th eva_th th acc =
-      match th.th_value_results with
-      | None -> acc (* Analysis skipped *)
-      | Some results ->
-        let change cs = Callstack.{ cs with thread = Thread.id eva_th } in
-        let results' = Eva_results.change_callstacks change results in
-        results' :: acc
-    in
-    let all_results = Thread.Hashtbl.fold aux_th ths [] in
-    match all_results with
-    | [] -> Mt_self.error "No results recorded. Nothing to display"
-    | r :: qr ->
-      let all = List.fold_left Eva_results.merge r qr in
-      Eva_results.set_results all
-
-end

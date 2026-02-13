@@ -19,7 +19,6 @@
 [eva:show] interferences.c:106: Frama_C_show_each_main_end: {0}, {0}
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a: read by <main> at interferences.c:106 <- main_ptr_write
@@ -45,7 +44,6 @@
 [eva:show] interferences.c:82: Frama_C_show_each_fjobptr1_end: {0}, {1}
 [eva:show] interferences.c:82: Frama_C_show_each_fjobptr1_end: {1}, {0}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by jobptr1 at interferences.c:77 <- fjobptr1
@@ -81,7 +79,6 @@
 [eva:show] interferences.c:94: Frama_C_show_each_fjobptr2_end: {2}, {0}
 [eva:show] interferences.c:94: Frama_C_show_each_fjobptr2_end: {0}, {2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by jobptr2 at interferences.c:89 <- fjobptr2
@@ -130,12 +127,9 @@
 [mt] Thread <main>, fun main_ptr_write
 [eva:show] interferences.c:99: Frama_C_show_each_main_start: {0}, {0}
 [mt] interferences.c:101: Thread jobptr1, fun fjobptr1, parent <main>, args {0}
-[mt] interferences.c:101: Start thread jobptr1
 [mt] interferences.c:102: Thread jobptr2, fun fjobptr2, parent <main>, args {0}
-[mt] interferences.c:102: Start thread jobptr2
 [eva:show] interferences.c:106: Frama_C_show_each_main_end: {0}, {0}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a: read by <main> at interferences.c:106 <- main_ptr_write
@@ -155,8 +149,6 @@
 [mt] * Computing value analysis for thread jobptr1
 [eva] Analyzing a complete application starting at fjobptr1
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of fjobptr1 for thread jobptr1
 [eva:show] interferences.c:75: Frama_C_show_each_fjobptr1_start: {0}, {0}
 [eva:interferences] interferences.c:76: 
   inject threads interferences at this point
@@ -165,7 +157,6 @@
 [eva:show] interferences.c:82: Frama_C_show_each_fjobptr1_end: {0}, {1}
 [eva:show] interferences.c:82: Frama_C_show_each_fjobptr1_end: {1}, {0}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by jobptr1 at interferences.c:77 <- fjobptr1
@@ -209,17 +200,12 @@
 [mt] * Computing value analysis for thread jobptr2
 [eva] Analyzing a complete application starting at fjobptr2
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of fjobptr2 for thread jobptr2
 [eva:show] interferences.c:87: Frama_C_show_each_fjobptr2_start: {0; 1}, {0; 1}
 [eva:interferences] interferences.c:88: 
-  inject threads interferences at this point
-[eva:interferences] interferences.c:71: 
   inject threads interferences at this point
 [eva:show] interferences.c:94: Frama_C_show_each_fjobptr2_end: {0; 1; 2}, {0; 1}
 [eva:show] interferences.c:94: Frama_C_show_each_fjobptr2_end: {0; 1}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by jobptr2 at interferences.c:89 <- fjobptr2
@@ -345,17 +331,11 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_ptr_write
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main_ptr_write
 [eva:show] interferences.c:99: Frama_C_show_each_main_start: {0}, {0}
-[mt] interferences.c:101: Thread jobptr1, fun fjobptr1, parent <main>, args {0}
-[mt] interferences.c:101: Start thread jobptr1
-[mt] interferences.c:102: Thread jobptr2, fun fjobptr2, parent <main>, args {0}
-[mt] interferences.c:102: Start thread jobptr2
 [mt] interferences.c:102: 
   New context for jobptr2, fun fjobptr2, parent <main>, args {0}
 [eva:show] interferences.c:106: Frama_C_show_each_main_end: {0; 1; 2}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a: read by <main> at interferences.c:106 <- main_ptr_write
@@ -375,18 +355,11 @@
 [mt] * Computing value analysis for thread jobptr1
 [eva] Analyzing a complete application starting at fjobptr1
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of fjobptr1 for thread jobptr1
 [eva:show] interferences.c:75: 
   Frama_C_show_each_fjobptr1_start: {0; 1; 2}, {0; 1; 2}
-[eva:interferences] interferences.c:76: 
-  inject threads interferences at this point
-[eva:interferences] interferences.c:71: 
-  inject threads interferences at this point
 [eva:show] interferences.c:82: 
   Frama_C_show_each_fjobptr1_end: {0; 1; 2}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by jobptr1 at interferences.c:77 <- fjobptr1
@@ -431,18 +404,11 @@
 [mt] * Computing value analysis for thread jobptr2
 [eva] Analyzing a complete application starting at fjobptr2
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of fjobptr2 for thread jobptr2
 [eva:show] interferences.c:87: 
   Frama_C_show_each_fjobptr2_start: {0; 1; 2}, {0; 1; 2}
-[eva:interferences] interferences.c:88: 
-  inject threads interferences at this point
-[eva:interferences] interferences.c:71: 
-  inject threads interferences at this point
 [eva:show] interferences.c:94: 
   Frama_C_show_each_fjobptr2_end: {0; 1; 2}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by jobptr2 at interferences.c:89 <- fjobptr2
@@ -492,22 +458,16 @@
 [mt] jobptr1 reads  shared_a ∈ {0; 1; 2}  // interferences.c:82 fjobptr1
 [mt] jobptr2 reads  shared_a ∈ {0; 1; 2}  // interferences.c:87 fjobptr2
 [mt] jobptr2 reads  shared_a ∈ {0; 1; 2}  // interferences.c:88 fjobptr2
-[mt] jobptr2 reads  shared_a ∈ {0; 1; 2}  // interferences.c:94 fjobptr2
 [mt] <main> reads  shared_b ∈ {0; 1; 2}  // interferences.c:106 main_ptr_write
 [mt] jobptr1 reads  shared_b ∈ {0; 1; 2}  // interferences.c:75 fjobptr1
 [mt] jobptr1 reads  shared_b ∈ {0; 1; 2}  // interferences.c:76 fjobptr1
 [mt] jobptr1 reads  shared_b ∈ {0; 1; 2}  // interferences.c:82 fjobptr1
 [mt] jobptr2 reads  shared_b ∈ {0; 1; 2}  // interferences.c:87 fjobptr2
 [mt] jobptr2 reads  shared_b ∈ {0; 1; 2}  // interferences.c:88 fjobptr2
-[mt] jobptr2 reads  shared_b ∈ {0; 1; 2}  // interferences.c:94 fjobptr2
 [mt] jobptr1 writes  shared_a ∈ {0; 1; 2}  // interferences.c:71
   write :: interferences.c:78 <- fjobptr1
-[mt] jobptr2 writes  shared_a ∈ {0; 1; 2}  // interferences.c:71
-  write :: interferences.c:92 <- fjobptr2
 [mt] jobptr1 writes  shared_b ∈ {0; 1; 2}  // interferences.c:71
   write :: interferences.c:80 <- fjobptr1
-[mt] jobptr2 writes  shared_b ∈ {0; 1; 2}  // interferences.c:71
-  write :: interferences.c:90 <- fjobptr2
 [mt] Possible read/write data races:
   shared_b:
     read by <main> at interferences.c:106, unprotected
@@ -564,15 +524,9 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_ptr_write
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main_ptr_write
 [eva:show] interferences.c:99: Frama_C_show_each_main_start: {0}, {0}
-[mt] interferences.c:101: Thread jobptr1, fun fjobptr1, parent <main>, args {0}
-[mt] interferences.c:101: Start thread jobptr1
-[mt] interferences.c:102: Thread jobptr2, fun fjobptr2, parent <main>, args {0}
-[mt] interferences.c:102: Start thread jobptr2
 [eva:show] interferences.c:106: Frama_C_show_each_main_end: {0; 1; 2}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   shared_a: read by <main> at interferences.c:106 <- main_ptr_write
@@ -591,18 +545,11 @@
 [mt] * Computing value analysis for thread jobptr2
 [eva] Analyzing a complete application starting at fjobptr2
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of fjobptr2 for thread jobptr2
 [eva:show] interferences.c:87: 
   Frama_C_show_each_fjobptr2_start: {0; 1; 2}, {0; 1; 2}
-[eva:interferences] interferences.c:88: 
-  inject threads interferences at this point
-[eva:interferences] interferences.c:71: 
-  inject threads interferences at this point
 [eva:show] interferences.c:94: 
   Frama_C_show_each_fjobptr2_end: {0; 1; 2}, {0; 1; 2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   nondet: read by jobptr2 at interferences.c:89 <- fjobptr2
@@ -646,28 +593,6 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: shared_a; shared_b
-[mt] jobptr1 reads  shared_a ∈ {0; 1; 2}  // interferences.c:75 fjobptr1
-[mt] jobptr1 reads  shared_a ∈ {0; 1; 2}  // interferences.c:76 fjobptr1
-[mt] jobptr1 reads  shared_a ∈ {0; 1; 2}  // interferences.c:82 fjobptr1
-[mt] <main> reads  shared_a ∈ {0; 1; 2}  // interferences.c:106 main_ptr_write
-[mt] jobptr2 reads  shared_a ∈ {0; 1; 2}  // interferences.c:87 fjobptr2
-[mt] jobptr2 reads  shared_a ∈ {0; 1; 2}  // interferences.c:88 fjobptr2
-[mt] jobptr2 reads  shared_a ∈ {0; 1; 2}  // interferences.c:94 fjobptr2
-[mt] jobptr1 reads  shared_b ∈ {0; 1; 2}  // interferences.c:75 fjobptr1
-[mt] jobptr1 reads  shared_b ∈ {0; 1; 2}  // interferences.c:76 fjobptr1
-[mt] jobptr1 reads  shared_b ∈ {0; 1; 2}  // interferences.c:82 fjobptr1
-[mt] <main> reads  shared_b ∈ {0; 1; 2}  // interferences.c:106 main_ptr_write
-[mt] jobptr2 reads  shared_b ∈ {0; 1; 2}  // interferences.c:87 fjobptr2
-[mt] jobptr2 reads  shared_b ∈ {0; 1; 2}  // interferences.c:88 fjobptr2
-[mt] jobptr2 reads  shared_b ∈ {0; 1; 2}  // interferences.c:94 fjobptr2
-[mt] jobptr1 writes  shared_a ∈ {0; 1; 2}  // interferences.c:71
-  write :: interferences.c:78 <- fjobptr1
-[mt] jobptr2 writes  shared_a ∈ {0; 1; 2}  // interferences.c:71
-  write :: interferences.c:92 <- fjobptr2
-[mt] jobptr1 writes  shared_b ∈ {0; 1; 2}  // interferences.c:71
-  write :: interferences.c:80 <- fjobptr1
-[mt] jobptr2 writes  shared_b ∈ {0; 1; 2}  // interferences.c:71
-  write :: interferences.c:90 <- fjobptr2
 [mt] Possible read/write data races:
   shared_b:
     read by jobptr1 at interferences.c:75, unprotected

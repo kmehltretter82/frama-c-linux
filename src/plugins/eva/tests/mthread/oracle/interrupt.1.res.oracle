@@ -14,7 +14,6 @@
 [eva:show] interrupt.c:33: Frama_C_show_each: {0}
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
@@ -38,7 +37,6 @@
 [mt] Thread <main>, fun main_interrupt_incr
 [eva:show] interrupt.c:33: Frama_C_show_each: {0}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received: read by <main> at interrupt.c:33 <- main_interrupt_incr
@@ -62,7 +60,6 @@
 [eva:alarm] interrupt.c:29: Warning: 
   signed overflow. assert interrupt_received + 1 ≤ 2147483647;
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received:
@@ -100,12 +97,8 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_interrupt_incr
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of main_interrupt_incr for thread <main>
-[mt] Thread <main>, fun main_interrupt_incr
 [eva:show] interrupt.c:33: Frama_C_show_each: {0}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received: read by <main> at interrupt.c:33 <- main_interrupt_incr
@@ -124,13 +117,8 @@
 [mt] * Computing value analysis for thread <interrupt_handler interrupt_incr>
 [eva] Analyzing a complete application starting at interrupt_incr
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of interrupt_incr for thread <interrupt_handler interrupt_incr>
 [eva:interferences] interrupt.c:29: inject threads interferences at this point
-[eva:alarm] interrupt.c:29: Warning: 
-  signed overflow. assert interrupt_received + 1 ≤ 2147483647;
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received:
@@ -191,12 +179,8 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_interrupt_incr
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of main_interrupt_incr for thread <main>
-[mt] New context for <main>, fun main_interrupt_incr
 [eva:show] interrupt.c:33: Frama_C_show_each: [0..2147483647]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received: read by <main> at interrupt.c:33 <- main_interrupt_incr
@@ -215,12 +199,8 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: interrupt_received
-[mt] <interrupt_handler interrupt_incr> reads 
-  interrupt_received ∈ [0..2147483647]  // interrupt.c:29 interrupt_incr
 [mt] <main> reads  interrupt_received ∈ [0..2147483647]  // interrupt.c:33
   main_interrupt_incr
-[mt] <interrupt_handler interrupt_incr> writes 
-  interrupt_received ∈ [1..2147483647]  // interrupt.c:29 interrupt_incr
 [mt] Possible read/write data races:
   interrupt_received:
     read by <interrupt_handler interrupt_incr> at interrupt.c:29, unprotected

@@ -52,7 +52,6 @@
 [mt] matrix2.c:58: Release locks[4]
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -127,7 +126,6 @@
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -157,10 +155,8 @@
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[1]
 [mt] matrix2.c:31: Lock locks[1]
-[eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[1]:
@@ -190,10 +186,8 @@
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[2]
 [mt] matrix2.c:31: Lock locks[2]
-[eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[2]:
@@ -223,10 +217,8 @@
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[3]
 [mt] matrix2.c:31: Lock locks[3]
-[eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[3]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[3]:
@@ -256,10 +248,8 @@
 [eva:interferences] 
   inject threads interferences at the start of job for thread jobs[4]
 [mt] matrix2.c:31: Lock locks[4]
-[eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[4]:
@@ -303,46 +293,12 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main
-[mt] matrix2.c:43: Initializing mutex locks[0]
-[mt] matrix2.c:43: Initializing mutex locks[1]
-[mt] matrix2.c:43: Initializing mutex locks[2]
-[mt] matrix2.c:43: Initializing mutex locks[3]
-[mt] matrix2.c:43: Initializing mutex locks[4]
 [mt] matrix2.c:46: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] matrix2.c:46: Start thread jobs[0]
 [mt] matrix2.c:46: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] matrix2.c:46: Start thread jobs[1]
 [mt] matrix2.c:46: Thread jobs[2], fun job, parent <main>, args {2}
-[mt] matrix2.c:46: Start thread jobs[2]
 [mt] matrix2.c:46: Thread jobs[3], fun job, parent <main>, args {3}
-[mt] matrix2.c:46: Start thread jobs[3]
 [mt] matrix2.c:46: Thread jobs[4], fun job, parent <main>, args {4}
-[mt] matrix2.c:46: Start thread jobs[4]
-[eva] using specification for function completed
-[mt] matrix2.c:52: Lock locks[0]
-[mt] matrix2.c:58: Release locks[0]
-[mt] matrix2.c:52: Lock locks[1]
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_32, (void *)(&matrix[150]));
-[mt] matrix2.c:58: Release locks[1]
-[mt] matrix2.c:52: Lock locks[2]
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_24, (void *)(&matrix[150]));
-[mt] matrix2.c:58: Release locks[2]
-[mt] matrix2.c:52: Lock locks[3]
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_16, (void *)(&matrix[150]));
-[mt] matrix2.c:58: Release locks[3]
-[mt] matrix2.c:52: Lock locks[4]
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_8, (void *)(&matrix[150]));
-[mt] matrix2.c:58: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -408,14 +364,8 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[0]
-[mt] matrix2.c:31: Lock locks[0]
 [eva:interferences] matrix2.c:33: inject threads interferences at this point
-[eva] using specification for function compute
-[mt] matrix2.c:34: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -568,14 +518,7 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[1]
-[mt] matrix2.c:31: Lock locks[1]
-[eva:interferences] matrix2.c:33: inject threads interferences at this point
-[eva] using specification for function compute
-[mt] matrix2.c:34: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[1]:
@@ -728,14 +671,7 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[2]
-[mt] matrix2.c:31: Lock locks[2]
-[eva:interferences] matrix2.c:33: inject threads interferences at this point
-[eva] using specification for function compute
-[mt] matrix2.c:34: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[2]:
@@ -888,14 +824,7 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[3]
-[mt] matrix2.c:31: Lock locks[3]
-[eva:interferences] matrix2.c:33: inject threads interferences at this point
-[eva] using specification for function compute
-[mt] matrix2.c:34: Release locks[3]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[3]:
@@ -1048,14 +977,7 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[4]
-[mt] matrix2.c:31: Lock locks[4]
-[eva:interferences] matrix2.c:33: inject threads interferences at this point
-[eva] using specification for function compute
-[mt] matrix2.c:34: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[4]:
@@ -1808,72 +1730,32 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main
-[mt] matrix2.c:43: Initializing mutex locks[0]
-[mt] matrix2.c:43: Initializing mutex locks[1]
-[mt] matrix2.c:43: Initializing mutex locks[2]
-[mt] matrix2.c:43: Initializing mutex locks[3]
-[mt] matrix2.c:43: Initializing mutex locks[4]
-[mt] matrix2.c:46: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] matrix2.c:46: Start thread jobs[0]
-[mt] matrix2.c:46: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] matrix2.c:46: Start thread jobs[1]
 [mt] matrix2.c:46: New context for jobs[1], fun job, parent <main>, args {1}
-[mt] matrix2.c:46: Thread jobs[2], fun job, parent <main>, args {2}
-[mt] matrix2.c:46: Start thread jobs[2]
 [mt] matrix2.c:46: New context for jobs[2], fun job, parent <main>, args {2}
-[mt] matrix2.c:46: Thread jobs[3], fun job, parent <main>, args {3}
-[mt] matrix2.c:46: Start thread jobs[3]
 [mt] matrix2.c:46: New context for jobs[3], fun job, parent <main>, args {3}
-[mt] matrix2.c:46: Thread jobs[4], fun job, parent <main>, args {4}
-[mt] matrix2.c:46: Start thread jobs[4]
 [mt] matrix2.c:46: New context for jobs[4], fun job, parent <main>, args {4}
-[eva] using specification for function completed
-[mt] matrix2.c:52: Lock locks[0]
 [eva:interferences] matrix2.c:55: inject threads interferences at this point
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert -2147483648 ≤ sum + *pj_unfold_40;
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert sum + *pj_unfold_40 ≤ 2147483647;
-[mt] matrix2.c:58: Release locks[0]
-[mt] matrix2.c:52: Lock locks[1]
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert -2147483648 ≤ sum + *pj_unfold_32;
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert sum + *pj_unfold_32 ≤ 2147483647;
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_32, (void *)(&matrix[150]));
-[mt] matrix2.c:58: Release locks[1]
-[mt] matrix2.c:52: Lock locks[2]
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert -2147483648 ≤ sum + *pj_unfold_24;
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert sum + *pj_unfold_24 ≤ 2147483647;
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_24, (void *)(&matrix[150]));
-[mt] matrix2.c:58: Release locks[2]
-[mt] matrix2.c:52: Lock locks[3]
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert -2147483648 ≤ sum + *pj_unfold_16;
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert sum + *pj_unfold_16 ≤ 2147483647;
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_16, (void *)(&matrix[150]));
-[mt] matrix2.c:58: Release locks[3]
-[mt] matrix2.c:52: Lock locks[4]
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert -2147483648 ≤ sum + *pj_unfold_8;
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert sum + *pj_unfold_8 ≤ 2147483647;
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_8, (void *)(&matrix[150]));
-[mt] matrix2.c:58: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -1939,14 +1821,7 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[0]
-[mt] matrix2.c:31: Lock locks[0]
-[eva:interferences] matrix2.c:33: inject threads interferences at this point
-[eva] using specification for function compute
-[mt] matrix2.c:34: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -1980,14 +1855,7 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[1]
-[mt] matrix2.c:31: Lock locks[1]
-[eva:interferences] matrix2.c:33: inject threads interferences at this point
-[eva] using specification for function compute
-[mt] matrix2.c:34: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[1]:
@@ -2021,14 +1889,7 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[2]
-[mt] matrix2.c:31: Lock locks[2]
-[eva:interferences] matrix2.c:33: inject threads interferences at this point
-[eva] using specification for function compute
-[mt] matrix2.c:34: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[2]:
@@ -2062,14 +1923,7 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[3]
-[mt] matrix2.c:31: Lock locks[3]
-[eva:interferences] matrix2.c:33: inject threads interferences at this point
-[eva] using specification for function compute
-[mt] matrix2.c:34: Release locks[3]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[3]:
@@ -2103,14 +1957,7 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[4]
-[mt] matrix2.c:31: Lock locks[4]
-[eva:interferences] matrix2.c:33: inject threads interferences at this point
-[eva] using specification for function compute
-[mt] matrix2.c:34: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[4]:
@@ -2175,38 +2022,6 @@
         [140] ∈ [--..--]
         [145] ∈ [--..--]
    // matrix2.c:55 main
-[mt] jobs[0] reads 
-  matrix[0] ∈ [--..--]
-        [5] ∈ [--..--]
-        [10] ∈ [--..--]
-        [15] ∈ [--..--]
-        [20] ∈ [--..--]
-        [25] ∈ [--..--]
-        [30] ∈ [--..--]
-        [35] ∈ [--..--]
-        [40] ∈ [--..--]
-        [45] ∈ [--..--]
-        [50] ∈ [--..--]
-        [55] ∈ [--..--]
-        [60] ∈ [--..--]
-        [65] ∈ [--..--]
-        [70] ∈ [--..--]
-        [75] ∈ [--..--]
-        [80] ∈ [--..--]
-        [85] ∈ [--..--]
-        [90] ∈ [--..--]
-        [95] ∈ [--..--]
-        [100] ∈ [--..--]
-        [105] ∈ [--..--]
-        [110] ∈ [--..--]
-        [115] ∈ [--..--]
-        [120] ∈ [--..--]
-        [125] ∈ [--..--]
-        [130] ∈ [--..--]
-        [135] ∈ [--..--]
-        [140] ∈ [--..--]
-        [145] ∈ [--..--]
-   // matrix2.c:33 job
 [mt] <main> reads 
   matrix[1] ∈ [--..--]
         [6] ∈ [--..--]
@@ -2239,38 +2054,6 @@
         [141] ∈ [--..--]
         [146] ∈ [--..--]
    // matrix2.c:55 main
-[mt] jobs[1] reads 
-  matrix[1] ∈ [--..--]
-        [6] ∈ [--..--]
-        [11] ∈ [--..--]
-        [16] ∈ [--..--]
-        [21] ∈ [--..--]
-        [26] ∈ [--..--]
-        [31] ∈ [--..--]
-        [36] ∈ [--..--]
-        [41] ∈ [--..--]
-        [46] ∈ [--..--]
-        [51] ∈ [--..--]
-        [56] ∈ [--..--]
-        [61] ∈ [--..--]
-        [66] ∈ [--..--]
-        [71] ∈ [--..--]
-        [76] ∈ [--..--]
-        [81] ∈ [--..--]
-        [86] ∈ [--..--]
-        [91] ∈ [--..--]
-        [96] ∈ [--..--]
-        [101] ∈ [--..--]
-        [106] ∈ [--..--]
-        [111] ∈ [--..--]
-        [116] ∈ [--..--]
-        [121] ∈ [--..--]
-        [126] ∈ [--..--]
-        [131] ∈ [--..--]
-        [136] ∈ [--..--]
-        [141] ∈ [--..--]
-        [146] ∈ [--..--]
-   // matrix2.c:33 job
 [mt] <main> reads 
   matrix[2] ∈ [--..--]
         [7] ∈ [--..--]
@@ -2303,38 +2086,6 @@
         [142] ∈ [--..--]
         [147] ∈ [--..--]
    // matrix2.c:55 main
-[mt] jobs[2] reads 
-  matrix[2] ∈ [--..--]
-        [7] ∈ [--..--]
-        [12] ∈ [--..--]
-        [17] ∈ [--..--]
-        [22] ∈ [--..--]
-        [27] ∈ [--..--]
-        [32] ∈ [--..--]
-        [37] ∈ [--..--]
-        [42] ∈ [--..--]
-        [47] ∈ [--..--]
-        [52] ∈ [--..--]
-        [57] ∈ [--..--]
-        [62] ∈ [--..--]
-        [67] ∈ [--..--]
-        [72] ∈ [--..--]
-        [77] ∈ [--..--]
-        [82] ∈ [--..--]
-        [87] ∈ [--..--]
-        [92] ∈ [--..--]
-        [97] ∈ [--..--]
-        [102] ∈ [--..--]
-        [107] ∈ [--..--]
-        [112] ∈ [--..--]
-        [117] ∈ [--..--]
-        [122] ∈ [--..--]
-        [127] ∈ [--..--]
-        [132] ∈ [--..--]
-        [137] ∈ [--..--]
-        [142] ∈ [--..--]
-        [147] ∈ [--..--]
-   // matrix2.c:33 job
 [mt] <main> reads 
   matrix[3] ∈ [--..--]
         [8] ∈ [--..--]
@@ -2367,38 +2118,6 @@
         [143] ∈ [--..--]
         [148] ∈ [--..--]
    // matrix2.c:55 main
-[mt] jobs[3] reads 
-  matrix[3] ∈ [--..--]
-        [8] ∈ [--..--]
-        [13] ∈ [--..--]
-        [18] ∈ [--..--]
-        [23] ∈ [--..--]
-        [28] ∈ [--..--]
-        [33] ∈ [--..--]
-        [38] ∈ [--..--]
-        [43] ∈ [--..--]
-        [48] ∈ [--..--]
-        [53] ∈ [--..--]
-        [58] ∈ [--..--]
-        [63] ∈ [--..--]
-        [68] ∈ [--..--]
-        [73] ∈ [--..--]
-        [78] ∈ [--..--]
-        [83] ∈ [--..--]
-        [88] ∈ [--..--]
-        [93] ∈ [--..--]
-        [98] ∈ [--..--]
-        [103] ∈ [--..--]
-        [108] ∈ [--..--]
-        [113] ∈ [--..--]
-        [118] ∈ [--..--]
-        [123] ∈ [--..--]
-        [128] ∈ [--..--]
-        [133] ∈ [--..--]
-        [138] ∈ [--..--]
-        [143] ∈ [--..--]
-        [148] ∈ [--..--]
-   // matrix2.c:33 job
 [mt] <main> reads 
   matrix[4] ∈ [--..--]
         [9] ∈ [--..--]
@@ -2431,198 +2150,6 @@
         [144] ∈ [--..--]
         [149] ∈ [--..--]
    // matrix2.c:55 main
-[mt] jobs[4] reads 
-  matrix[4] ∈ [--..--]
-        [9] ∈ [--..--]
-        [14] ∈ [--..--]
-        [19] ∈ [--..--]
-        [24] ∈ [--..--]
-        [29] ∈ [--..--]
-        [34] ∈ [--..--]
-        [39] ∈ [--..--]
-        [44] ∈ [--..--]
-        [49] ∈ [--..--]
-        [54] ∈ [--..--]
-        [59] ∈ [--..--]
-        [64] ∈ [--..--]
-        [69] ∈ [--..--]
-        [74] ∈ [--..--]
-        [79] ∈ [--..--]
-        [84] ∈ [--..--]
-        [89] ∈ [--..--]
-        [94] ∈ [--..--]
-        [99] ∈ [--..--]
-        [104] ∈ [--..--]
-        [109] ∈ [--..--]
-        [114] ∈ [--..--]
-        [119] ∈ [--..--]
-        [124] ∈ [--..--]
-        [129] ∈ [--..--]
-        [134] ∈ [--..--]
-        [139] ∈ [--..--]
-        [144] ∈ [--..--]
-        [149] ∈ [--..--]
-   // matrix2.c:33 job
-[mt] jobs[0] writes 
-  matrix[0] ∈ [--..--]
-        [5] ∈ [--..--]
-        [10] ∈ [--..--]
-        [15] ∈ [--..--]
-        [20] ∈ [--..--]
-        [25] ∈ [--..--]
-        [30] ∈ [--..--]
-        [35] ∈ [--..--]
-        [40] ∈ [--..--]
-        [45] ∈ [--..--]
-        [50] ∈ [--..--]
-        [55] ∈ [--..--]
-        [60] ∈ [--..--]
-        [65] ∈ [--..--]
-        [70] ∈ [--..--]
-        [75] ∈ [--..--]
-        [80] ∈ [--..--]
-        [85] ∈ [--..--]
-        [90] ∈ [--..--]
-        [95] ∈ [--..--]
-        [100] ∈ [--..--]
-        [105] ∈ [--..--]
-        [110] ∈ [--..--]
-        [115] ∈ [--..--]
-        [120] ∈ [--..--]
-        [125] ∈ [--..--]
-        [130] ∈ [--..--]
-        [135] ∈ [--..--]
-        [140] ∈ [--..--]
-        [145] ∈ [--..--]
-   // matrix2.c:33 job
-[mt] jobs[1] writes 
-  matrix[1] ∈ [--..--]
-        [6] ∈ [--..--]
-        [11] ∈ [--..--]
-        [16] ∈ [--..--]
-        [21] ∈ [--..--]
-        [26] ∈ [--..--]
-        [31] ∈ [--..--]
-        [36] ∈ [--..--]
-        [41] ∈ [--..--]
-        [46] ∈ [--..--]
-        [51] ∈ [--..--]
-        [56] ∈ [--..--]
-        [61] ∈ [--..--]
-        [66] ∈ [--..--]
-        [71] ∈ [--..--]
-        [76] ∈ [--..--]
-        [81] ∈ [--..--]
-        [86] ∈ [--..--]
-        [91] ∈ [--..--]
-        [96] ∈ [--..--]
-        [101] ∈ [--..--]
-        [106] ∈ [--..--]
-        [111] ∈ [--..--]
-        [116] ∈ [--..--]
-        [121] ∈ [--..--]
-        [126] ∈ [--..--]
-        [131] ∈ [--..--]
-        [136] ∈ [--..--]
-        [141] ∈ [--..--]
-        [146] ∈ [--..--]
-   // matrix2.c:33 job
-[mt] jobs[2] writes 
-  matrix[2] ∈ [--..--]
-        [7] ∈ [--..--]
-        [12] ∈ [--..--]
-        [17] ∈ [--..--]
-        [22] ∈ [--..--]
-        [27] ∈ [--..--]
-        [32] ∈ [--..--]
-        [37] ∈ [--..--]
-        [42] ∈ [--..--]
-        [47] ∈ [--..--]
-        [52] ∈ [--..--]
-        [57] ∈ [--..--]
-        [62] ∈ [--..--]
-        [67] ∈ [--..--]
-        [72] ∈ [--..--]
-        [77] ∈ [--..--]
-        [82] ∈ [--..--]
-        [87] ∈ [--..--]
-        [92] ∈ [--..--]
-        [97] ∈ [--..--]
-        [102] ∈ [--..--]
-        [107] ∈ [--..--]
-        [112] ∈ [--..--]
-        [117] ∈ [--..--]
-        [122] ∈ [--..--]
-        [127] ∈ [--..--]
-        [132] ∈ [--..--]
-        [137] ∈ [--..--]
-        [142] ∈ [--..--]
-        [147] ∈ [--..--]
-   // matrix2.c:33 job
-[mt] jobs[3] writes 
-  matrix[3] ∈ [--..--]
-        [8] ∈ [--..--]
-        [13] ∈ [--..--]
-        [18] ∈ [--..--]
-        [23] ∈ [--..--]
-        [28] ∈ [--..--]
-        [33] ∈ [--..--]
-        [38] ∈ [--..--]
-        [43] ∈ [--..--]
-        [48] ∈ [--..--]
-        [53] ∈ [--..--]
-        [58] ∈ [--..--]
-        [63] ∈ [--..--]
-        [68] ∈ [--..--]
-        [73] ∈ [--..--]
-        [78] ∈ [--..--]
-        [83] ∈ [--..--]
-        [88] ∈ [--..--]
-        [93] ∈ [--..--]
-        [98] ∈ [--..--]
-        [103] ∈ [--..--]
-        [108] ∈ [--..--]
-        [113] ∈ [--..--]
-        [118] ∈ [--..--]
-        [123] ∈ [--..--]
-        [128] ∈ [--..--]
-        [133] ∈ [--..--]
-        [138] ∈ [--..--]
-        [143] ∈ [--..--]
-        [148] ∈ [--..--]
-   // matrix2.c:33 job
-[mt] jobs[4] writes 
-  matrix[4] ∈ [--..--]
-        [9] ∈ [--..--]
-        [14] ∈ [--..--]
-        [19] ∈ [--..--]
-        [24] ∈ [--..--]
-        [29] ∈ [--..--]
-        [34] ∈ [--..--]
-        [39] ∈ [--..--]
-        [44] ∈ [--..--]
-        [49] ∈ [--..--]
-        [54] ∈ [--..--]
-        [59] ∈ [--..--]
-        [64] ∈ [--..--]
-        [69] ∈ [--..--]
-        [74] ∈ [--..--]
-        [79] ∈ [--..--]
-        [84] ∈ [--..--]
-        [89] ∈ [--..--]
-        [94] ∈ [--..--]
-        [99] ∈ [--..--]
-        [104] ∈ [--..--]
-        [109] ∈ [--..--]
-        [114] ∈ [--..--]
-        [119] ∈ [--..--]
-        [124] ∈ [--..--]
-        [129] ∈ [--..--]
-        [134] ∈ [--..--]
-        [139] ∈ [--..--]
-        [144] ∈ [--..--]
-        [149] ∈ [--..--]
-   // matrix2.c:33 job
 [mt] Possible read/write data races:
   matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54];
          [59]; [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109];
@@ -2858,68 +2385,7 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main
-[mt] matrix2.c:43: Initializing mutex locks[0]
-[mt] matrix2.c:43: Initializing mutex locks[1]
-[mt] matrix2.c:43: Initializing mutex locks[2]
-[mt] matrix2.c:43: Initializing mutex locks[3]
-[mt] matrix2.c:43: Initializing mutex locks[4]
-[mt] matrix2.c:46: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] matrix2.c:46: Start thread jobs[0]
-[mt] matrix2.c:46: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] matrix2.c:46: Start thread jobs[1]
-[mt] matrix2.c:46: Thread jobs[2], fun job, parent <main>, args {2}
-[mt] matrix2.c:46: Start thread jobs[2]
-[mt] matrix2.c:46: Thread jobs[3], fun job, parent <main>, args {3}
-[mt] matrix2.c:46: Start thread jobs[3]
-[mt] matrix2.c:46: Thread jobs[4], fun job, parent <main>, args {4}
-[mt] matrix2.c:46: Start thread jobs[4]
-[eva] using specification for function completed
-[mt] matrix2.c:52: Lock locks[0]
-[eva:interferences] matrix2.c:55: inject threads interferences at this point
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert -2147483648 ≤ sum + *pj_unfold_40;
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert sum + *pj_unfold_40 ≤ 2147483647;
-[mt] matrix2.c:58: Release locks[0]
-[mt] matrix2.c:52: Lock locks[1]
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert -2147483648 ≤ sum + *pj_unfold_32;
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert sum + *pj_unfold_32 ≤ 2147483647;
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_32, (void *)(&matrix[150]));
-[mt] matrix2.c:58: Release locks[1]
-[mt] matrix2.c:52: Lock locks[2]
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert -2147483648 ≤ sum + *pj_unfold_24;
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert sum + *pj_unfold_24 ≤ 2147483647;
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_24, (void *)(&matrix[150]));
-[mt] matrix2.c:58: Release locks[2]
-[mt] matrix2.c:52: Lock locks[3]
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert -2147483648 ≤ sum + *pj_unfold_16;
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert sum + *pj_unfold_16 ≤ 2147483647;
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_16, (void *)(&matrix[150]));
-[mt] matrix2.c:58: Release locks[3]
-[mt] matrix2.c:52: Lock locks[4]
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert -2147483648 ≤ sum + *pj_unfold_8;
-[eva:alarm] matrix2.c:55: Warning: 
-  signed overflow. assert sum + *pj_unfold_8 ≤ 2147483647;
-[eva:alarm] matrix2.c:54: Warning: 
-  pointer comparison.
-  assert \pointer_comparable((void *)pj_unfold_8, (void *)(&matrix[150]));
-[mt] matrix2.c:58: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -2984,14 +2450,7 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[0]
-[mt] matrix2.c:31: Lock locks[0]
-[eva:interferences] matrix2.c:33: inject threads interferences at this point
-[eva] using specification for function compute
-[mt] matrix2.c:34: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -3023,14 +2482,7 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[1]
-[mt] matrix2.c:31: Lock locks[1]
-[eva:interferences] matrix2.c:33: inject threads interferences at this point
-[eva] using specification for function compute
-[mt] matrix2.c:34: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[1]:
@@ -3062,14 +2514,7 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[2]
-[mt] matrix2.c:31: Lock locks[2]
-[eva:interferences] matrix2.c:33: inject threads interferences at this point
-[eva] using specification for function compute
-[mt] matrix2.c:34: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[2]:
@@ -3102,486 +2547,6 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: matrix[0..149]
-[mt] <main> reads 
-  matrix[0] ∈ [--..--]
-        [5] ∈ [--..--]
-        [10] ∈ [--..--]
-        [15] ∈ [--..--]
-        [20] ∈ [--..--]
-        [25] ∈ [--..--]
-        [30] ∈ [--..--]
-        [35] ∈ [--..--]
-        [40] ∈ [--..--]
-        [45] ∈ [--..--]
-        [50] ∈ [--..--]
-        [55] ∈ [--..--]
-        [60] ∈ [--..--]
-        [65] ∈ [--..--]
-        [70] ∈ [--..--]
-        [75] ∈ [--..--]
-        [80] ∈ [--..--]
-        [85] ∈ [--..--]
-        [90] ∈ [--..--]
-        [95] ∈ [--..--]
-        [100] ∈ [--..--]
-        [105] ∈ [--..--]
-        [110] ∈ [--..--]
-        [115] ∈ [--..--]
-        [120] ∈ [--..--]
-        [125] ∈ [--..--]
-        [130] ∈ [--..--]
-        [135] ∈ [--..--]
-        [140] ∈ [--..--]
-        [145] ∈ [--..--]
-   // matrix2.c:55 main
-[mt] jobs[0] reads 
-  matrix[0] ∈ [--..--]
-        [5] ∈ [--..--]
-        [10] ∈ [--..--]
-        [15] ∈ [--..--]
-        [20] ∈ [--..--]
-        [25] ∈ [--..--]
-        [30] ∈ [--..--]
-        [35] ∈ [--..--]
-        [40] ∈ [--..--]
-        [45] ∈ [--..--]
-        [50] ∈ [--..--]
-        [55] ∈ [--..--]
-        [60] ∈ [--..--]
-        [65] ∈ [--..--]
-        [70] ∈ [--..--]
-        [75] ∈ [--..--]
-        [80] ∈ [--..--]
-        [85] ∈ [--..--]
-        [90] ∈ [--..--]
-        [95] ∈ [--..--]
-        [100] ∈ [--..--]
-        [105] ∈ [--..--]
-        [110] ∈ [--..--]
-        [115] ∈ [--..--]
-        [120] ∈ [--..--]
-        [125] ∈ [--..--]
-        [130] ∈ [--..--]
-        [135] ∈ [--..--]
-        [140] ∈ [--..--]
-        [145] ∈ [--..--]
-   // matrix2.c:33 job
-[mt] <main> reads 
-  matrix[1] ∈ [--..--]
-        [6] ∈ [--..--]
-        [11] ∈ [--..--]
-        [16] ∈ [--..--]
-        [21] ∈ [--..--]
-        [26] ∈ [--..--]
-        [31] ∈ [--..--]
-        [36] ∈ [--..--]
-        [41] ∈ [--..--]
-        [46] ∈ [--..--]
-        [51] ∈ [--..--]
-        [56] ∈ [--..--]
-        [61] ∈ [--..--]
-        [66] ∈ [--..--]
-        [71] ∈ [--..--]
-        [76] ∈ [--..--]
-        [81] ∈ [--..--]
-        [86] ∈ [--..--]
-        [91] ∈ [--..--]
-        [96] ∈ [--..--]
-        [101] ∈ [--..--]
-        [106] ∈ [--..--]
-        [111] ∈ [--..--]
-        [116] ∈ [--..--]
-        [121] ∈ [--..--]
-        [126] ∈ [--..--]
-        [131] ∈ [--..--]
-        [136] ∈ [--..--]
-        [141] ∈ [--..--]
-        [146] ∈ [--..--]
-   // matrix2.c:55 main
-[mt] jobs[1] reads 
-  matrix[1] ∈ [--..--]
-        [6] ∈ [--..--]
-        [11] ∈ [--..--]
-        [16] ∈ [--..--]
-        [21] ∈ [--..--]
-        [26] ∈ [--..--]
-        [31] ∈ [--..--]
-        [36] ∈ [--..--]
-        [41] ∈ [--..--]
-        [46] ∈ [--..--]
-        [51] ∈ [--..--]
-        [56] ∈ [--..--]
-        [61] ∈ [--..--]
-        [66] ∈ [--..--]
-        [71] ∈ [--..--]
-        [76] ∈ [--..--]
-        [81] ∈ [--..--]
-        [86] ∈ [--..--]
-        [91] ∈ [--..--]
-        [96] ∈ [--..--]
-        [101] ∈ [--..--]
-        [106] ∈ [--..--]
-        [111] ∈ [--..--]
-        [116] ∈ [--..--]
-        [121] ∈ [--..--]
-        [126] ∈ [--..--]
-        [131] ∈ [--..--]
-        [136] ∈ [--..--]
-        [141] ∈ [--..--]
-        [146] ∈ [--..--]
-   // matrix2.c:33 job
-[mt] <main> reads 
-  matrix[2] ∈ [--..--]
-        [7] ∈ [--..--]
-        [12] ∈ [--..--]
-        [17] ∈ [--..--]
-        [22] ∈ [--..--]
-        [27] ∈ [--..--]
-        [32] ∈ [--..--]
-        [37] ∈ [--..--]
-        [42] ∈ [--..--]
-        [47] ∈ [--..--]
-        [52] ∈ [--..--]
-        [57] ∈ [--..--]
-        [62] ∈ [--..--]
-        [67] ∈ [--..--]
-        [72] ∈ [--..--]
-        [77] ∈ [--..--]
-        [82] ∈ [--..--]
-        [87] ∈ [--..--]
-        [92] ∈ [--..--]
-        [97] ∈ [--..--]
-        [102] ∈ [--..--]
-        [107] ∈ [--..--]
-        [112] ∈ [--..--]
-        [117] ∈ [--..--]
-        [122] ∈ [--..--]
-        [127] ∈ [--..--]
-        [132] ∈ [--..--]
-        [137] ∈ [--..--]
-        [142] ∈ [--..--]
-        [147] ∈ [--..--]
-   // matrix2.c:55 main
-[mt] jobs[2] reads 
-  matrix[2] ∈ [--..--]
-        [7] ∈ [--..--]
-        [12] ∈ [--..--]
-        [17] ∈ [--..--]
-        [22] ∈ [--..--]
-        [27] ∈ [--..--]
-        [32] ∈ [--..--]
-        [37] ∈ [--..--]
-        [42] ∈ [--..--]
-        [47] ∈ [--..--]
-        [52] ∈ [--..--]
-        [57] ∈ [--..--]
-        [62] ∈ [--..--]
-        [67] ∈ [--..--]
-        [72] ∈ [--..--]
-        [77] ∈ [--..--]
-        [82] ∈ [--..--]
-        [87] ∈ [--..--]
-        [92] ∈ [--..--]
-        [97] ∈ [--..--]
-        [102] ∈ [--..--]
-        [107] ∈ [--..--]
-        [112] ∈ [--..--]
-        [117] ∈ [--..--]
-        [122] ∈ [--..--]
-        [127] ∈ [--..--]
-        [132] ∈ [--..--]
-        [137] ∈ [--..--]
-        [142] ∈ [--..--]
-        [147] ∈ [--..--]
-   // matrix2.c:33 job
-[mt] jobs[3] reads 
-  matrix[3] ∈ [--..--]
-        [8] ∈ [--..--]
-        [13] ∈ [--..--]
-        [18] ∈ [--..--]
-        [23] ∈ [--..--]
-        [28] ∈ [--..--]
-        [33] ∈ [--..--]
-        [38] ∈ [--..--]
-        [43] ∈ [--..--]
-        [48] ∈ [--..--]
-        [53] ∈ [--..--]
-        [58] ∈ [--..--]
-        [63] ∈ [--..--]
-        [68] ∈ [--..--]
-        [73] ∈ [--..--]
-        [78] ∈ [--..--]
-        [83] ∈ [--..--]
-        [88] ∈ [--..--]
-        [93] ∈ [--..--]
-        [98] ∈ [--..--]
-        [103] ∈ [--..--]
-        [108] ∈ [--..--]
-        [113] ∈ [--..--]
-        [118] ∈ [--..--]
-        [123] ∈ [--..--]
-        [128] ∈ [--..--]
-        [133] ∈ [--..--]
-        [138] ∈ [--..--]
-        [143] ∈ [--..--]
-        [148] ∈ [--..--]
-   // matrix2.c:33 job
-[mt] <main> reads 
-  matrix[3] ∈ [--..--]
-        [8] ∈ [--..--]
-        [13] ∈ [--..--]
-        [18] ∈ [--..--]
-        [23] ∈ [--..--]
-        [28] ∈ [--..--]
-        [33] ∈ [--..--]
-        [38] ∈ [--..--]
-        [43] ∈ [--..--]
-        [48] ∈ [--..--]
-        [53] ∈ [--..--]
-        [58] ∈ [--..--]
-        [63] ∈ [--..--]
-        [68] ∈ [--..--]
-        [73] ∈ [--..--]
-        [78] ∈ [--..--]
-        [83] ∈ [--..--]
-        [88] ∈ [--..--]
-        [93] ∈ [--..--]
-        [98] ∈ [--..--]
-        [103] ∈ [--..--]
-        [108] ∈ [--..--]
-        [113] ∈ [--..--]
-        [118] ∈ [--..--]
-        [123] ∈ [--..--]
-        [128] ∈ [--..--]
-        [133] ∈ [--..--]
-        [138] ∈ [--..--]
-        [143] ∈ [--..--]
-        [148] ∈ [--..--]
-   // matrix2.c:55 main
-[mt] jobs[4] reads 
-  matrix[4] ∈ [--..--]
-        [9] ∈ [--..--]
-        [14] ∈ [--..--]
-        [19] ∈ [--..--]
-        [24] ∈ [--..--]
-        [29] ∈ [--..--]
-        [34] ∈ [--..--]
-        [39] ∈ [--..--]
-        [44] ∈ [--..--]
-        [49] ∈ [--..--]
-        [54] ∈ [--..--]
-        [59] ∈ [--..--]
-        [64] ∈ [--..--]
-        [69] ∈ [--..--]
-        [74] ∈ [--..--]
-        [79] ∈ [--..--]
-        [84] ∈ [--..--]
-        [89] ∈ [--..--]
-        [94] ∈ [--..--]
-        [99] ∈ [--..--]
-        [104] ∈ [--..--]
-        [109] ∈ [--..--]
-        [114] ∈ [--..--]
-        [119] ∈ [--..--]
-        [124] ∈ [--..--]
-        [129] ∈ [--..--]
-        [134] ∈ [--..--]
-        [139] ∈ [--..--]
-        [144] ∈ [--..--]
-        [149] ∈ [--..--]
-   // matrix2.c:33 job
-[mt] <main> reads 
-  matrix[4] ∈ [--..--]
-        [9] ∈ [--..--]
-        [14] ∈ [--..--]
-        [19] ∈ [--..--]
-        [24] ∈ [--..--]
-        [29] ∈ [--..--]
-        [34] ∈ [--..--]
-        [39] ∈ [--..--]
-        [44] ∈ [--..--]
-        [49] ∈ [--..--]
-        [54] ∈ [--..--]
-        [59] ∈ [--..--]
-        [64] ∈ [--..--]
-        [69] ∈ [--..--]
-        [74] ∈ [--..--]
-        [79] ∈ [--..--]
-        [84] ∈ [--..--]
-        [89] ∈ [--..--]
-        [94] ∈ [--..--]
-        [99] ∈ [--..--]
-        [104] ∈ [--..--]
-        [109] ∈ [--..--]
-        [114] ∈ [--..--]
-        [119] ∈ [--..--]
-        [124] ∈ [--..--]
-        [129] ∈ [--..--]
-        [134] ∈ [--..--]
-        [139] ∈ [--..--]
-        [144] ∈ [--..--]
-        [149] ∈ [--..--]
-   // matrix2.c:55 main
-[mt] jobs[0] writes 
-  matrix[0] ∈ [--..--]
-        [5] ∈ [--..--]
-        [10] ∈ [--..--]
-        [15] ∈ [--..--]
-        [20] ∈ [--..--]
-        [25] ∈ [--..--]
-        [30] ∈ [--..--]
-        [35] ∈ [--..--]
-        [40] ∈ [--..--]
-        [45] ∈ [--..--]
-        [50] ∈ [--..--]
-        [55] ∈ [--..--]
-        [60] ∈ [--..--]
-        [65] ∈ [--..--]
-        [70] ∈ [--..--]
-        [75] ∈ [--..--]
-        [80] ∈ [--..--]
-        [85] ∈ [--..--]
-        [90] ∈ [--..--]
-        [95] ∈ [--..--]
-        [100] ∈ [--..--]
-        [105] ∈ [--..--]
-        [110] ∈ [--..--]
-        [115] ∈ [--..--]
-        [120] ∈ [--..--]
-        [125] ∈ [--..--]
-        [130] ∈ [--..--]
-        [135] ∈ [--..--]
-        [140] ∈ [--..--]
-        [145] ∈ [--..--]
-   // matrix2.c:33 job
-[mt] jobs[1] writes 
-  matrix[1] ∈ [--..--]
-        [6] ∈ [--..--]
-        [11] ∈ [--..--]
-        [16] ∈ [--..--]
-        [21] ∈ [--..--]
-        [26] ∈ [--..--]
-        [31] ∈ [--..--]
-        [36] ∈ [--..--]
-        [41] ∈ [--..--]
-        [46] ∈ [--..--]
-        [51] ∈ [--..--]
-        [56] ∈ [--..--]
-        [61] ∈ [--..--]
-        [66] ∈ [--..--]
-        [71] ∈ [--..--]
-        [76] ∈ [--..--]
-        [81] ∈ [--..--]
-        [86] ∈ [--..--]
-        [91] ∈ [--..--]
-        [96] ∈ [--..--]
-        [101] ∈ [--..--]
-        [106] ∈ [--..--]
-        [111] ∈ [--..--]
-        [116] ∈ [--..--]
-        [121] ∈ [--..--]
-        [126] ∈ [--..--]
-        [131] ∈ [--..--]
-        [136] ∈ [--..--]
-        [141] ∈ [--..--]
-        [146] ∈ [--..--]
-   // matrix2.c:33 job
-[mt] jobs[2] writes 
-  matrix[2] ∈ [--..--]
-        [7] ∈ [--..--]
-        [12] ∈ [--..--]
-        [17] ∈ [--..--]
-        [22] ∈ [--..--]
-        [27] ∈ [--..--]
-        [32] ∈ [--..--]
-        [37] ∈ [--..--]
-        [42] ∈ [--..--]
-        [47] ∈ [--..--]
-        [52] ∈ [--..--]
-        [57] ∈ [--..--]
-        [62] ∈ [--..--]
-        [67] ∈ [--..--]
-        [72] ∈ [--..--]
-        [77] ∈ [--..--]
-        [82] ∈ [--..--]
-        [87] ∈ [--..--]
-        [92] ∈ [--..--]
-        [97] ∈ [--..--]
-        [102] ∈ [--..--]
-        [107] ∈ [--..--]
-        [112] ∈ [--..--]
-        [117] ∈ [--..--]
-        [122] ∈ [--..--]
-        [127] ∈ [--..--]
-        [132] ∈ [--..--]
-        [137] ∈ [--..--]
-        [142] ∈ [--..--]
-        [147] ∈ [--..--]
-   // matrix2.c:33 job
-[mt] jobs[3] writes 
-  matrix[3] ∈ [--..--]
-        [8] ∈ [--..--]
-        [13] ∈ [--..--]
-        [18] ∈ [--..--]
-        [23] ∈ [--..--]
-        [28] ∈ [--..--]
-        [33] ∈ [--..--]
-        [38] ∈ [--..--]
-        [43] ∈ [--..--]
-        [48] ∈ [--..--]
-        [53] ∈ [--..--]
-        [58] ∈ [--..--]
-        [63] ∈ [--..--]
-        [68] ∈ [--..--]
-        [73] ∈ [--..--]
-        [78] ∈ [--..--]
-        [83] ∈ [--..--]
-        [88] ∈ [--..--]
-        [93] ∈ [--..--]
-        [98] ∈ [--..--]
-        [103] ∈ [--..--]
-        [108] ∈ [--..--]
-        [113] ∈ [--..--]
-        [118] ∈ [--..--]
-        [123] ∈ [--..--]
-        [128] ∈ [--..--]
-        [133] ∈ [--..--]
-        [138] ∈ [--..--]
-        [143] ∈ [--..--]
-        [148] ∈ [--..--]
-   // matrix2.c:33 job
-[mt] jobs[4] writes 
-  matrix[4] ∈ [--..--]
-        [9] ∈ [--..--]
-        [14] ∈ [--..--]
-        [19] ∈ [--..--]
-        [24] ∈ [--..--]
-        [29] ∈ [--..--]
-        [34] ∈ [--..--]
-        [39] ∈ [--..--]
-        [44] ∈ [--..--]
-        [49] ∈ [--..--]
-        [54] ∈ [--..--]
-        [59] ∈ [--..--]
-        [64] ∈ [--..--]
-        [69] ∈ [--..--]
-        [74] ∈ [--..--]
-        [79] ∈ [--..--]
-        [84] ∈ [--..--]
-        [89] ∈ [--..--]
-        [94] ∈ [--..--]
-        [99] ∈ [--..--]
-        [104] ∈ [--..--]
-        [109] ∈ [--..--]
-        [114] ∈ [--..--]
-        [119] ∈ [--..--]
-        [124] ∈ [--..--]
-        [129] ∈ [--..--]
-        [134] ∈ [--..--]
-        [139] ∈ [--..--]
-        [144] ∈ [--..--]
-        [149] ∈ [--..--]
-   // matrix2.c:33 job
 [mt] Possible read/write data races:
   matrix{[4]; [9]; [14]; [19]; [24]; [29]; [34]; [39]; [44]; [49]; [54];
          [59]; [64]; [69]; [74]; [79]; [84]; [89]; [94]; [99]; [104]; [109];

@@ -76,12 +76,6 @@ type thread_state = {
 (** Join of all the values written by this thread in shared locations.
     Currently not contextual *);
 
-  mutable th_projects: Project.t list
-(** Copies of the analyses of the thread, most recent first *);
-
-  mutable th_value_results: Eva_results.results option
-(** Result of the last Value analysis of this thread *);
-
   mutable th_priority: priority
 (** determines which threads execute without the possibility of being
     preempted by another thread. *);

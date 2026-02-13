@@ -375,6 +375,11 @@ module type Hashtbl = sig
   (** Add an hook which is applied each time (just after) a (key,value) pair in
       the hashtable changes inside the current project.
       @since 28.0-Nickel *)
+
+  val pretty: Format.formatter -> unit
+  (** Pretty print each value in an user-friendly way. Compatible with ["%t"]
+      format.
+      @since Frama-C+dev *)
 end
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>

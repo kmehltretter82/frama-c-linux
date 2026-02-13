@@ -21,6 +21,7 @@ module Enabled =
 ;;
 
 let () = Parameter_customize.set_group grp_debug
+let () = Parameter_customize.is_invisible ()
 module KeepProjects =
   String (struct
     let option_name = "-mt-keep-analyses"
@@ -30,13 +31,17 @@ module KeepProjects =
   end)
 ;;
 let () = KeepProjects.set_possible_values ["all"; "last"; "none"]
+let () = KeepProjects.add_set_hook
+    (fun _old _new ->
+       warning "Option -mt-keep-analyses is now deprecated.@ \
+                Thread analyses are no longer run in separate projects.")
 
 let () = Parameter_customize.set_group grp_debug
-let () = Parameter_customize.set_negative_option_name "-mt-projects-together"
 module ToDisk =
   False (struct
     let option_name = "-mt-projects-on-disk"
-    let help = "Save the copies of the analyses in a separate file, instead of all together"
+    let help = "After each thread analysis, save the current analysis state \
+                in a separate file"
   end)
 ;;
 

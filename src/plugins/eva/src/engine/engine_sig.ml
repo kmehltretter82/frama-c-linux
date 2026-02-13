@@ -154,10 +154,17 @@ end
 module type Initialization = sig
   type state
 
-  (** Compute the initial state for an analysis (as in {!initial_state}),
-      but also bind the formal parameters of the function given as argument. *)
+  (** Compute the initial state for an analysis, but also bind the formal
+      parameters of the function given as argument.
+      @param cvalue_state if given, replace the computed initial cvalue state
+      with this one.
+      @param arguments if given, use these arguments values instead of
+      generating ad hoc values. *)
   val initial_state_with_formals :
-    lib_entry:bool -> Cil_types.kernel_function -> state or_bottom
+    ?cvalue_state: Cvalue.Model.t ->
+    ?arguments: Cvalue.V.t list ->
+    lib_entry:bool ->
+    Cil_types.kernel_function -> state or_bottom
 
   (** Initializes a local variable in the current state. *)
   val initialize_local_variable:
@@ -186,7 +193,8 @@ sig
 
   (** Analysis of a program from the given main function and initial state.
       Returns the abstract state inferred at the return of the main function. *)
-  val compute_main_call: kernel_function -> state -> state or_bottom
+  val compute_main_call:
+    thread:Thread.t -> kernel_function -> state -> state or_bottom
 
   (** Analysis of a function call during the Eva analysis. This function is
       called by [Transfer_stmt] when interpreting a call statement.
@@ -221,13 +229,13 @@ sig
       infer that no other thread can interfere with the current thread. *)
   val inject_init_state : Thread.t -> kernel_function -> state -> state
 
-  (** [inject_after_change access state] injects current interferences to the
-      given [state] that has just been changed by a transfer function with the
-      given [access]es. If enabled, the Mthread domain helps filtering
-      applicable interferences. This function is the identity if the Mthread
-      domain can infer that no shared memory has been read or written during
-      the last transfer function. *)
-  val inject_after_change : Inout_access.t -> state -> state
+  (** [inject_after_change th access state] injects current interferences to the
+      given [state] of the analysis for thread [th] that has just been changed
+      by a transfer function with the given [access]es. If enabled, the
+      Mthread domain helps filtering applicable interferences. This function
+      is the identity if the Mthread domain can infer that no shared memory
+      has been read or written during the last transfer function. *)
+  val inject_after_change : pos:Position.t ->  Inout_access.t -> state -> state
 end
 
 

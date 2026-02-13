@@ -20,7 +20,6 @@
 [eva] init.c:15: Warning: The mutex 0 is already registered.
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed

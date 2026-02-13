@@ -246,7 +246,7 @@ module Make (Engine: Engine_Subset) = struct
       let+ state =
         Domain.assign ~pos lvalue expr assigned domain_valuation state
       in
-      Interferences.inject_after_change access state
+      Interferences.inject_after_change ~pos access state
 
   let assign = assign_lv_or_ret ~is_ret:false
   let assign_ret = assign_lv_or_ret ~is_ret:true
@@ -265,7 +265,7 @@ module Make (Engine: Engine_Subset) = struct
     let+ state =
       Domain.assume ~pos expr positive (Eval.to_domain_valuation valuation) state
     in
-    Interferences.inject_after_change access state
+    Interferences.inject_after_change ~pos access state
 
 
   (* ------------------------------------------------------------------------ *)
@@ -274,19 +274,16 @@ module Make (Engine: Engine_Subset) = struct
 
   (* Returns the result of a call. *)
   let process_call ~pos call recursion valuation access state =
-    let process () =
-      let domain_valuation = Eval.to_domain_valuation valuation in
-      (* Process the call according to the domain decision. *)
-      match Domain.start_call ~pos call recursion domain_valuation state with
-      | `Value state ->
-        let state = Interferences.inject_after_change access state in
-        Domain.Store.register_initial_state call.callstack call.kf state;
-        Engine.Compute.compute_call call recursion state
-      | `Bottom ->
-        { states = []; cacheable = Cacheable; kind = `Bottom }
-    in
-    Eva_utils.protect process
-      ~cleanup:(fun () -> InOutCallback.clear ())
+    let domain_valuation = Eval.to_domain_valuation valuation in
+    (* Process the call according to the domain decision. *)
+    match Domain.start_call ~pos call recursion domain_valuation state with
+    | `Value state ->
+      let pos = Position.of_local pos in
+      let state = Interferences.inject_after_change ~pos access state in
+      Domain.Store.register_initial_state call.callstack call.kf state;
+      Engine.Compute.compute_call call recursion state
+    | `Bottom ->
+      { states = []; cacheable = Cacheable; kind = `Bottom }
 
   (* ------------------- Retro propagation on formals ----------------------- *)
 
@@ -427,7 +424,6 @@ module Make (Engine: Engine_Subset) = struct
       key, state'
     in
     let states = Bottom.list_filter_map process call_result.states in
-    InOutCallback.clear ();
     { call_result with states }
 
 
@@ -735,9 +731,11 @@ module Make (Engine: Engine_Subset) = struct
         match eval with
         | `Bottom -> bottom
         | `Value (call, recursion, valuation) ->
-          let call_result =
+          let do_one_call () =
             do_one_call ~pos valuation lval_option call recursion access state
           in
+          let finally = InOutCallback.clear in
+          let call_result = Fun.protect ~finally do_one_call in
           let cacheable =
             if call_result.cacheable = NoCacheCallers then NoCacheCallers
             else Cacheable

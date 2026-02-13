@@ -6,23 +6,26 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let concurrent_writes shared_bases =
+let concurrent_writes thread shared_bases =
   let module Engine = (val Engine.current ()) in
   match Engine.Dom.get Mt_domain.Domain.key with
   (* Domain disabled, no information about writes *)
   | None -> Position.Local.Set.empty
   (* Domain enabled *)
   | Some _extract ->
-    let add_pos stmt cs _state acc =
-      let pos = Position.local stmt cs in
-      (* TODO: Maybe take the memory read/written for all callstacks of the
-         given statement? (can be done directly by Inout_access). *)
-      let filter = Inout_access.keep_globals_only in
-      let accesses = Inout_access.at ~filter pos in
-      let written_bases = Locations.Zone.get_bases accesses.write in
-      if Base.SetLattice.(intersects (inject shared_bases) written_bases)
-      then Position.Local.Set.add (stmt, cs) acc
-      else acc
+    let add_pos stmt (cs : Callstack.t) _state acc =
+      if cs.thread <> Thread.id thread
+      then acc
+      else
+        let pos = Position.local stmt cs in
+        (* TODO: Maybe take the memory read/written for all callstacks of the
+           given statement? (can be done directly by Inout_access). *)
+        let filter = Inout_access.keep_globals_only in
+        let accesses = Inout_access.at ~filter pos in
+        let written_bases = Locations.Zone.get_bases accesses.write in
+        if Base.SetLattice.(intersects (inject shared_bases) written_bases)
+        then Position.Local.Set.add (stmt, cs) acc
+        else acc
     in
     let add_stmt acc stmt =
       let is_write_stmt = match stmt.Cil_types.skind with
@@ -50,11 +53,11 @@ let shared_bases analysis_state =
   | Top -> assert false
   | Set zones ->  zones
 
-let add_last_analysis analysis_state =
+let add_last_analysis (analysis_state : Mt_thread.analysis_state) =
+  let thread = analysis_state.curr_thread.th_eva_thread in
   let module Engine = (val Engine.current ()) in
   let bases = shared_bases analysis_state in
-  let writes = concurrent_writes bases in
-  let thread = analysis_state.curr_thread.th_eva_thread in
+  let writes = concurrent_writes thread bases in
   match Engine.Interferences.add_last_analysis thread writes bases with
   | Updated ->
     Mt_thread.iter_threads analysis_state

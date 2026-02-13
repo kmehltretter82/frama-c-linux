@@ -62,4 +62,3 @@ val analysis_status: kernel_function -> analysis_status
 type t
 val get_results: unit -> t
 val set_results: t -> unit
-val merge_results: t -> t -> t

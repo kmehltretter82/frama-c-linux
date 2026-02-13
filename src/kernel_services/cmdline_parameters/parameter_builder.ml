@@ -1851,6 +1851,7 @@ struct
            dependencies change, or the user requests it on the command-line) *)
         ShouldOutput.set false;
         f ();
+        if ShouldOutput.get () then ShouldOutput.set false
       end
 
     let add_aliases ?visible ?deprecated list =

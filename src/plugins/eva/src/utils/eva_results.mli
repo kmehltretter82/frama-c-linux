@@ -52,14 +52,6 @@ val set_results: results -> unit
 
 [@@@ api_end]
 
-val merge: results -> results -> results
-
-(** Change the callstacks for the results for which this is meaningful.
-    For technical reasons, the top of the callstack must currently
-    be preserved. *)
-val change_callstacks:
-  (Callstack.t -> Callstack.t) -> results -> results
-
 val eval_tlval_as_location :
   ?result:Cil_types.varinfo ->
   Cvalue.Model.t ->  Cil_types.term -> Locations.location

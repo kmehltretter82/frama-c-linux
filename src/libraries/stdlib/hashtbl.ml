@@ -29,6 +29,16 @@ module type S = sig
 
   val memo: 'a t -> key -> (key -> 'a) -> 'a
 
+  val pretty :
+    ?format:(Pretty.tformatter -> unit) Pretty.format ->
+    ?item:(key Pretty.aformatter -> key -> 'a Pretty.aformatter -> 'a -> unit)
+        Pretty.format ->
+    ?sep:unit Pretty.format ->
+    ?last:unit Pretty.format ->
+    ?empty:unit Pretty.format ->
+    (Format.formatter -> key -> unit) ->
+    (Format.formatter -> 'a -> unit) ->
+    Format.formatter -> 'a t -> unit
 end
 
 module Make(H: HashedType) : S with type key = H.t  = struct
@@ -69,4 +79,19 @@ module Make(H: HashedType) : S with type key = H.t  = struct
       let v = f k in
       add tbl k v;
       v
+
+  let pretty
+      ?(format=format_of_string "[[ %t ]]")
+      ?(item=
+        let mapsto = Format.asprintf "%t" Unicode.pp_maps_to in
+        "%a @<1>" ^^ Scanf.format_from_string mapsto "" ^^ "@ %a")
+      ?(sep=format_of_string ";@ ")
+      ?(last=sep)
+      ?(empty=format_of_string "[[]]")
+      pp_key pp_val fmt m =
+    let pp_item fmt (k,v) =
+      Format.fprintf fmt item pp_key k pp_val v
+    in
+    Pretty.pretty_seq ~format ~item:"%a" ~sep ~last ~empty
+      pp_item fmt (to_seq m)
 end

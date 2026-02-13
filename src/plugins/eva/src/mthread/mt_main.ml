@@ -151,25 +151,19 @@ let mthread_run project =
     Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
 
     Mt_self.feedback "*** Computing value analysis for main thread";
-    Analysis.compute ();
+    Analysis.mthread_pre_analysis ();
+    Analysis.compute_thread Thread.main;
     Mt_self.feedback "*** First value analysis for main thread done." ;
-
-    (* The hooks of the value analysis have now found the real main thread *)
-    let main_th = analysis.curr_thread in
-    let results = Eva_results.get_results () in
-    main_th.th_value_results <- Some results;
 
     Mt_analysis_fixpoint.record_end_of_thread_analysis analysis;
 
     (* We perform the analysis iterations *)
     Mt_analysis_fixpoint.reach_fixpoint analysis;
+    Analysis.mthread_post_analysis ();
 
     (* In the cfgs, mark whether the accesses are concurrent or not,
        and remove superfluous node *)
     Mt_analysis_fixpoint.mark_shared_nodes_kind analysis;
-
-    (* We display the combination of all analyses *)
-    Mt_outputs.Eva_results.display analysis;
 
     (* Printing results to files *)
     Mt_options.ExtractModels.iter

@@ -14,7 +14,6 @@
 [eva] using specification for function rand
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
@@ -34,9 +33,7 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread job1
-[eva] using specification for function rand
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed

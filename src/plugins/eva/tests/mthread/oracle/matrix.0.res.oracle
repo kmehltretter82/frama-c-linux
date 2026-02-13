@@ -36,7 +36,6 @@
 [mt] matrix.c:59: Release locks[4]
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]: read by <main> at matrix.c:58 <- main
@@ -186,7 +185,6 @@
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]:
@@ -225,10 +223,8 @@
   inject threads interferences at the start of job for thread jobs[1]
 [eva:show] matrix.c:21: Frama_C_show_each: {1}
 [mt] matrix.c:24: Lock locks[1]
-[eva] using specification for function f
 [mt] matrix.c:29: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[1][0..99]:
@@ -267,10 +263,8 @@
   inject threads interferences at the start of job for thread jobs[2]
 [eva:show] matrix.c:21: Frama_C_show_each: {2}
 [mt] matrix.c:24: Lock locks[2]
-[eva] using specification for function f
 [mt] matrix.c:29: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[2][0..99]:
@@ -309,10 +303,8 @@
   inject threads interferences at the start of job for thread jobs[3]
 [eva:show] matrix.c:21: Frama_C_show_each: {3}
 [mt] matrix.c:24: Lock locks[3]
-[eva] using specification for function f
 [mt] matrix.c:29: Release locks[3]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[3][0..99]:
@@ -351,10 +343,8 @@
   inject threads interferences at the start of job for thread jobs[4]
 [eva:show] matrix.c:21: Frama_C_show_each: {4}
 [mt] matrix.c:24: Lock locks[4]
-[eva] using specification for function f
 [mt] matrix.c:29: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[4][0..99]:
@@ -406,33 +396,12 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main
-[mt] matrix.c:37: Initializing mutex locks[0]
-[mt] matrix.c:37: Initializing mutex locks[1]
-[mt] matrix.c:37: Initializing mutex locks[2]
-[mt] matrix.c:37: Initializing mutex locks[3]
-[mt] matrix.c:37: Initializing mutex locks[4]
 [mt] matrix.c:45: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] matrix.c:45: Start thread jobs[0]
 [mt] matrix.c:45: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] matrix.c:45: Start thread jobs[1]
 [mt] matrix.c:45: Thread jobs[2], fun job, parent <main>, args {2}
-[mt] matrix.c:45: Start thread jobs[2]
 [mt] matrix.c:45: Thread jobs[3], fun job, parent <main>, args {3}
-[mt] matrix.c:45: Start thread jobs[3]
 [mt] matrix.c:45: Thread jobs[4], fun job, parent <main>, args {4}
-[mt] matrix.c:45: Start thread jobs[4]
-[mt] matrix.c:54: Lock locks[0]
-[mt] matrix.c:59: Release locks[0]
-[mt] matrix.c:54: Lock locks[1]
-[mt] matrix.c:59: Release locks[1]
-[mt] matrix.c:54: Lock locks[2]
-[mt] matrix.c:59: Release locks[2]
-[mt] matrix.c:54: Lock locks[3]
-[mt] matrix.c:59: Release locks[3]
-[mt] matrix.c:54: Lock locks[4]
-[mt] matrix.c:59: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]: read by <main> at matrix.c:58 <- main
@@ -577,15 +546,9 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[0]
 [eva:show] matrix.c:21: Frama_C_show_each: {0}
-[mt] matrix.c:24: Lock locks[0]
 [eva:interferences] matrix.c:28: inject threads interferences at this point
-[eva] using specification for function f
-[mt] matrix.c:29: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]:
@@ -725,15 +688,8 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[1]
 [eva:show] matrix.c:21: Frama_C_show_each: {1}
-[mt] matrix.c:24: Lock locks[1]
-[eva:interferences] matrix.c:28: inject threads interferences at this point
-[eva] using specification for function f
-[mt] matrix.c:29: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[1][0..99]:
@@ -873,15 +829,8 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[2]
 [eva:show] matrix.c:21: Frama_C_show_each: {2}
-[mt] matrix.c:24: Lock locks[2]
-[eva:interferences] matrix.c:28: inject threads interferences at this point
-[eva] using specification for function f
-[mt] matrix.c:29: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[2][0..99]:
@@ -1021,15 +970,8 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[3]
 [eva:show] matrix.c:21: Frama_C_show_each: {3}
-[mt] matrix.c:24: Lock locks[3]
-[eva:interferences] matrix.c:28: inject threads interferences at this point
-[eva] using specification for function f
-[mt] matrix.c:29: Release locks[3]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[3][0..99]:
@@ -1169,15 +1111,8 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[4]
 [eva:show] matrix.c:21: Frama_C_show_each: {4}
-[mt] matrix.c:24: Lock locks[4]
-[eva:interferences] matrix.c:28: inject threads interferences at this point
-[eva] using specification for function f
-[mt] matrix.c:29: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[4][0..99]:
@@ -1513,41 +1448,14 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main
-[mt] matrix.c:37: Initializing mutex locks[0]
-[mt] matrix.c:37: Initializing mutex locks[1]
-[mt] matrix.c:37: Initializing mutex locks[2]
-[mt] matrix.c:37: Initializing mutex locks[3]
-[mt] matrix.c:37: Initializing mutex locks[4]
 [eva:interferences] matrix.c:42: inject threads interferences at this point
-[mt] matrix.c:45: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] matrix.c:45: Start thread jobs[0]
 [mt] matrix.c:45: New context for jobs[0], fun job, parent <main>, args {0}
-[mt] matrix.c:45: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] matrix.c:45: Start thread jobs[1]
 [mt] matrix.c:45: New context for jobs[1], fun job, parent <main>, args {1}
-[mt] matrix.c:45: Thread jobs[2], fun job, parent <main>, args {2}
-[mt] matrix.c:45: Start thread jobs[2]
 [mt] matrix.c:45: New context for jobs[2], fun job, parent <main>, args {2}
-[mt] matrix.c:45: Thread jobs[3], fun job, parent <main>, args {3}
-[mt] matrix.c:45: Start thread jobs[3]
 [mt] matrix.c:45: New context for jobs[3], fun job, parent <main>, args {3}
-[mt] matrix.c:45: Thread jobs[4], fun job, parent <main>, args {4}
-[mt] matrix.c:45: Start thread jobs[4]
 [mt] matrix.c:45: New context for jobs[4], fun job, parent <main>, args {4}
-[mt] matrix.c:54: Lock locks[0]
 [eva:interferences] matrix.c:58: inject threads interferences at this point
-[mt] matrix.c:59: Release locks[0]
-[mt] matrix.c:54: Lock locks[1]
-[mt] matrix.c:59: Release locks[1]
-[mt] matrix.c:54: Lock locks[2]
-[mt] matrix.c:59: Release locks[2]
-[mt] matrix.c:54: Lock locks[3]
-[mt] matrix.c:59: Release locks[3]
-[mt] matrix.c:54: Lock locks[4]
-[mt] matrix.c:59: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]: read by <main> at matrix.c:58 <- main
@@ -1693,15 +1601,8 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[0]
 [eva:show] matrix.c:21: Frama_C_show_each: {0}
-[mt] matrix.c:24: Lock locks[0]
-[eva:interferences] matrix.c:28: inject threads interferences at this point
-[eva] using specification for function f
-[mt] matrix.c:29: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]:
@@ -1758,15 +1659,8 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[1]
 [eva:show] matrix.c:21: Frama_C_show_each: {1}
-[mt] matrix.c:24: Lock locks[1]
-[eva:interferences] matrix.c:28: inject threads interferences at this point
-[eva] using specification for function f
-[mt] matrix.c:29: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[1][0..99]:
@@ -1823,15 +1717,8 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[2]
 [eva:show] matrix.c:21: Frama_C_show_each: {2}
-[mt] matrix.c:24: Lock locks[2]
-[eva:interferences] matrix.c:28: inject threads interferences at this point
-[eva] using specification for function f
-[mt] matrix.c:29: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[2][0..99]:
@@ -1888,15 +1775,8 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[3]
 [eva:show] matrix.c:21: Frama_C_show_each: {3}
-[mt] matrix.c:24: Lock locks[3]
-[eva:interferences] matrix.c:28: inject threads interferences at this point
-[eva] using specification for function f
-[mt] matrix.c:29: Release locks[3]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[3][0..99]:
@@ -1953,15 +1833,8 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[4]
 [eva:show] matrix.c:21: Frama_C_show_each: {4}
-[mt] matrix.c:24: Lock locks[4]
-[eva:interferences] matrix.c:28: inject threads interferences at this point
-[eva] using specification for function f
-[mt] matrix.c:29: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[4][0..99]:
@@ -2018,15 +1891,10 @@
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: matrix[0..29][0..99]
 [mt] <main> reads  matrix[0][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] jobs[0] reads  matrix[0][0..99] ∈ [--..--]  // matrix.c:28 job
 [mt] <main> reads  matrix[1][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] jobs[1] reads  matrix[1][0..99] ∈ [--..--]  // matrix.c:28 job
 [mt] <main> reads  matrix[2][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] jobs[2] reads  matrix[2][0..99] ∈ [--..--]  // matrix.c:28 job
 [mt] <main> reads  matrix[3][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] jobs[3] reads  matrix[3][0..99] ∈ [--..--]  // matrix.c:28 job
 [mt] <main> reads  matrix[4][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] jobs[4] reads  matrix[4][0..99] ∈ [--..--]  // matrix.c:28 job
 [mt] <main> reads  matrix[5][0..99] ∈ [--..--]  // matrix.c:58 main
 [mt] <main> reads  matrix[6][0..99] ∈ [--..--]  // matrix.c:58 main
 [mt] <main> reads  matrix[7][0..99] ∈ [--..--]  // matrix.c:58 main
@@ -2052,36 +1920,6 @@
 [mt] <main> reads  matrix[27][0..99] ∈ [--..--]  // matrix.c:58 main
 [mt] <main> reads  matrix[28][0..99] ∈ [--..--]  // matrix.c:58 main
 [mt] <main> reads  matrix[29][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] jobs[0] writes  matrix[0][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[1] writes  matrix[1][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[2] writes  matrix[2][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[3] writes  matrix[3][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[4] writes  matrix[4][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[0] writes  matrix[5][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[1] writes  matrix[6][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[2] writes  matrix[7][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[3] writes  matrix[8][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[4] writes  matrix[9][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[0] writes  matrix[10][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[1] writes  matrix[11][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[2] writes  matrix[12][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[3] writes  matrix[13][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[4] writes  matrix[14][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[0] writes  matrix[15][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[1] writes  matrix[16][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[2] writes  matrix[17][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[3] writes  matrix[18][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[4] writes  matrix[19][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[0] writes  matrix[20][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[1] writes  matrix[21][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[2] writes  matrix[22][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[3] writes  matrix[23][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[4] writes  matrix[24][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[0] writes  matrix[25][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[1] writes  matrix[26][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[2] writes  matrix[27][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[3] writes  matrix[28][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[4] writes  matrix[29][0..99] ∈ [--..--]  // matrix.c:28 job
 [mt] Possible read/write data races:
   matrix[29][0..99]:
     read by <main> at matrix.c:58, protected by locks[4]
@@ -2292,36 +2130,7 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main
-[mt] matrix.c:37: Initializing mutex locks[0]
-[mt] matrix.c:37: Initializing mutex locks[1]
-[mt] matrix.c:37: Initializing mutex locks[2]
-[mt] matrix.c:37: Initializing mutex locks[3]
-[mt] matrix.c:37: Initializing mutex locks[4]
-[eva:interferences] matrix.c:42: inject threads interferences at this point
-[mt] matrix.c:45: Thread jobs[0], fun job, parent <main>, args {0}
-[mt] matrix.c:45: Start thread jobs[0]
-[mt] matrix.c:45: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] matrix.c:45: Start thread jobs[1]
-[mt] matrix.c:45: Thread jobs[2], fun job, parent <main>, args {2}
-[mt] matrix.c:45: Start thread jobs[2]
-[mt] matrix.c:45: Thread jobs[3], fun job, parent <main>, args {3}
-[mt] matrix.c:45: Start thread jobs[3]
-[mt] matrix.c:45: Thread jobs[4], fun job, parent <main>, args {4}
-[mt] matrix.c:45: Start thread jobs[4]
-[mt] matrix.c:54: Lock locks[0]
-[eva:interferences] matrix.c:58: inject threads interferences at this point
-[mt] matrix.c:59: Release locks[0]
-[mt] matrix.c:54: Lock locks[1]
-[mt] matrix.c:59: Release locks[1]
-[mt] matrix.c:54: Lock locks[2]
-[mt] matrix.c:59: Release locks[2]
-[mt] matrix.c:54: Lock locks[3]
-[mt] matrix.c:59: Release locks[3]
-[mt] matrix.c:54: Lock locks[4]
-[mt] matrix.c:59: Release locks[4]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]: read by <main> at matrix.c:58 <- main
@@ -2465,15 +2274,8 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[0]
 [eva:show] matrix.c:21: Frama_C_show_each: {0}
-[mt] matrix.c:24: Lock locks[0]
-[eva:interferences] matrix.c:28: inject threads interferences at this point
-[eva] using specification for function f
-[mt] matrix.c:29: Release locks[0]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]:
@@ -2528,15 +2330,8 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[1]
 [eva:show] matrix.c:21: Frama_C_show_each: {1}
-[mt] matrix.c:24: Lock locks[1]
-[eva:interferences] matrix.c:28: inject threads interferences at this point
-[eva] using specification for function f
-[mt] matrix.c:29: Release locks[1]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[1][0..99]:
@@ -2591,15 +2386,8 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job for thread jobs[2]
 [eva:show] matrix.c:21: Frama_C_show_each: {2}
-[mt] matrix.c:24: Lock locks[2]
-[eva:interferences] matrix.c:28: inject threads interferences at this point
-[eva] using specification for function f
-[mt] matrix.c:29: Release locks[2]
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[2][0..99]:
@@ -2655,71 +2443,6 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: matrix[0..29][0..99]
-[mt] <main> reads  matrix[0][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] jobs[0] reads  matrix[0][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] <main> reads  matrix[1][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] jobs[1] reads  matrix[1][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] <main> reads  matrix[2][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] jobs[2] reads  matrix[2][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[3] reads  matrix[3][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] <main> reads  matrix[3][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] jobs[4] reads  matrix[4][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] <main> reads  matrix[4][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[5][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[6][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[7][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[8][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[9][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[10][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[11][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[12][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[13][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[14][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[15][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[16][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[17][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[18][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[19][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[20][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[21][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[22][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[23][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[24][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[25][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[26][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[27][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[28][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] <main> reads  matrix[29][0..99] ∈ [--..--]  // matrix.c:58 main
-[mt] jobs[0] writes  matrix[0][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[1] writes  matrix[1][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[2] writes  matrix[2][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[3] writes  matrix[3][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[4] writes  matrix[4][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[0] writes  matrix[5][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[1] writes  matrix[6][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[2] writes  matrix[7][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[3] writes  matrix[8][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[4] writes  matrix[9][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[0] writes  matrix[10][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[1] writes  matrix[11][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[2] writes  matrix[12][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[3] writes  matrix[13][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[4] writes  matrix[14][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[0] writes  matrix[15][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[1] writes  matrix[16][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[2] writes  matrix[17][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[3] writes  matrix[18][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[4] writes  matrix[19][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[0] writes  matrix[20][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[1] writes  matrix[21][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[2] writes  matrix[22][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[3] writes  matrix[23][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[4] writes  matrix[24][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[0] writes  matrix[25][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[1] writes  matrix[26][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[2] writes  matrix[27][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[3] writes  matrix[28][0..99] ∈ [--..--]  // matrix.c:28 job
-[mt] jobs[4] writes  matrix[29][0..99] ∈ [--..--]  // matrix.c:28 job
 [mt] Possible read/write data races:
   matrix[29][0..99]:
     read by <main> at matrix.c:58, protected by locks[4]

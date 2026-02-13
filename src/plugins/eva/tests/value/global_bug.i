@@ -1,5 +1,6 @@
 /* run.config*
- PLUGIN: @PTEST_PLUGIN@ report
+   EXIT: 1
+   PLUGIN: @PTEST_PLUGIN@ report
    STDOPT: +"-report"
 */
 int i = 1;

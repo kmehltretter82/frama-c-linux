@@ -26,7 +26,6 @@
 [mt] priorities.c:67: Release m2
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: write by <main> at priorities.c:64 <- main
@@ -74,7 +73,6 @@
 [mt] priorities.c:22: Lock m1
 [mt] priorities.c:24: Release m1
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: read by jobs1 at priorities.c:23 <- f1
@@ -99,11 +97,9 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread jobs2
-[mt] Setting priority to 0
 [mt] priorities.c:30: Lock m2
 [mt] priorities.c:31: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   m2:
@@ -127,9 +123,7 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f3 for thread jobs3
-[mt] Setting priority to 0
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs3 at priorities.c:37 <- f3
@@ -149,11 +143,9 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f4 for thread jobs4
-[mt] Setting priority to 0
 [mt] priorities.c:44: Lock m2
 [mt] priorities.c:46: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs4 at priorities.c:45 <- f4
@@ -193,22 +185,11 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main
-[mt] priorities.c:52: Initializing mutex m1
-[mt] priorities.c:53: Initializing mutex m2
 [mt] priorities.c:55: Thread jobs1, fun f1, parent <main>, args {0}
-[mt] priorities.c:55: Start thread jobs1
 [mt] priorities.c:56: Thread jobs2, fun f2, parent <main>, args {0}
-[mt] priorities.c:56: Start thread jobs2
 [mt] priorities.c:57: Thread jobs3, fun f3, parent <main>, args {0}
-[mt] priorities.c:57: Start thread jobs3
 [mt] priorities.c:58: Thread jobs4, fun f4, parent <main>, args {0}
-[mt] priorities.c:58: Start thread jobs4
-[mt] priorities.c:62: Lock m1
-[mt] priorities.c:63: Lock m2
-[mt] priorities.c:66: Release m1
-[mt] priorities.c:67: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: write by <main> at priorities.c:64 <- main
@@ -257,15 +238,8 @@
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[eva:interferences] priorities.c:5: inject threads interferences at this point
-[eva:interferences] priorities.c:6: inject threads interferences at this point
-[eva:interferences] 
-  inject threads interferences at the start of f1 for thread jobs1
-[mt] priorities.c:22: Lock m1
 [eva:interferences] priorities.c:23: inject threads interferences at this point
-[mt] priorities.c:24: Release m1
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: read by jobs1 at priorities.c:23 <- f1
@@ -289,14 +263,7 @@
 [mt] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[eva:interferences] priorities.c:5: inject threads interferences at this point
-[eva:interferences] priorities.c:6: inject threads interferences at this point
-[eva:interferences] 
-  inject threads interferences at the start of f2 for thread jobs2
-[mt] priorities.c:30: Lock m2
-[mt] priorities.c:31: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   m2:
@@ -319,13 +286,8 @@
 [mt] * Computing value analysis for thread jobs3
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
-[eva:interferences] priorities.c:5: inject threads interferences at this point
-[eva:interferences] priorities.c:6: inject threads interferences at this point
-[eva:interferences] 
-  inject threads interferences at the start of f3 for thread jobs3
 [eva:interferences] priorities.c:37: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs3 at priorities.c:37 <- f3
@@ -351,15 +313,8 @@
 [mt] * Computing value analysis for thread jobs4
 [eva] Analyzing a complete application starting at f4
 [eva] Initial state supplied by user
-[eva:interferences] priorities.c:5: inject threads interferences at this point
-[eva:interferences] priorities.c:6: inject threads interferences at this point
-[eva:interferences] 
-  inject threads interferences at the start of f4 for thread jobs4
-[mt] priorities.c:44: Lock m2
 [eva:interferences] priorities.c:45: inject threads interferences at this point
-[mt] priorities.c:46: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs4 at priorities.c:45 <- f4
@@ -426,30 +381,12 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva:interferences] priorities.c:5: inject threads interferences at this point
-[eva:interferences] priorities.c:6: inject threads interferences at this point
-[mt] Thread <main>, fun main
-[mt] priorities.c:52: Initializing mutex m1
-[mt] priorities.c:53: Initializing mutex m2
-[mt] priorities.c:55: Thread jobs1, fun f1, parent <main>, args {0}
-[mt] priorities.c:55: Start thread jobs1
-[mt] priorities.c:56: Thread jobs2, fun f2, parent <main>, args {0}
-[mt] priorities.c:56: Start thread jobs2
 [mt] priorities.c:56: New context for jobs2, fun f2, parent <main>, args {0}
-[mt] priorities.c:57: Thread jobs3, fun f3, parent <main>, args {0}
-[mt] priorities.c:57: Start thread jobs3
 [mt] priorities.c:57: New context for jobs3, fun f3, parent <main>, args {0}
-[mt] priorities.c:58: Thread jobs4, fun f4, parent <main>, args {0}
-[mt] priorities.c:58: Start thread jobs4
 [mt] priorities.c:58: New context for jobs4, fun f4, parent <main>, args {0}
-[mt] priorities.c:62: Lock m1
-[mt] priorities.c:63: Lock m2
 [eva:interferences] priorities.c:64: inject threads interferences at this point
 [eva:interferences] priorities.c:65: inject threads interferences at this point
-[mt] priorities.c:66: Release m1
-[mt] priorities.c:67: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: write by <main> at priorities.c:64 <- main
@@ -498,15 +435,7 @@
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[eva:interferences] priorities.c:5: inject threads interferences at this point
-[eva:interferences] priorities.c:6: inject threads interferences at this point
-[eva:interferences] 
-  inject threads interferences at the start of f1 for thread jobs1
-[mt] priorities.c:22: Lock m1
-[eva:interferences] priorities.c:23: inject threads interferences at this point
-[mt] priorities.c:24: Release m1
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: read by jobs1 at priorities.c:23 <- f1
@@ -530,14 +459,7 @@
 [mt] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[eva:interferences] priorities.c:5: inject threads interferences at this point
-[eva:interferences] priorities.c:6: inject threads interferences at this point
-[eva:interferences] 
-  inject threads interferences at the start of f2 for thread jobs2
-[mt] priorities.c:30: Lock m2
-[mt] priorities.c:31: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   m2:
@@ -560,13 +482,7 @@
 [mt] * Computing value analysis for thread jobs3
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
-[eva:interferences] priorities.c:5: inject threads interferences at this point
-[eva:interferences] priorities.c:6: inject threads interferences at this point
-[eva:interferences] 
-  inject threads interferences at the start of f3 for thread jobs3
-[eva:interferences] priorities.c:37: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs3 at priorities.c:37 <- f3
@@ -592,15 +508,7 @@
 [mt] * Computing value analysis for thread jobs4
 [eva] Analyzing a complete application starting at f4
 [eva] Initial state supplied by user
-[eva:interferences] priorities.c:5: inject threads interferences at this point
-[eva:interferences] priorities.c:6: inject threads interferences at this point
-[eva:interferences] 
-  inject threads interferences at the start of f4 for thread jobs4
-[mt] priorities.c:44: Lock m2
-[eva:interferences] priorities.c:45: inject threads interferences at this point
-[mt] priorities.c:46: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs4 at priorities.c:45 <- f4
@@ -631,9 +539,7 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: s1; s2
-[mt] jobs1 reads  s1 ∈ {0; 1}  // priorities.c:23 f1
 [mt] <main> reads  s2 ∈ {0; 3}  // priorities.c:65 main
-[mt] <main> writes  s1 ∈ {1}  // priorities.c:64 main
 [mt] jobs3 writes  s2 ∈ {0; 3}  // priorities.c:37 f3
 [mt] jobs4 writes  s2 ∈ {0; 3}  // priorities.c:45 f4
 [mt] Possible read/write data races:
@@ -663,27 +569,7 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[eva:interferences] priorities.c:5: inject threads interferences at this point
-[eva:interferences] priorities.c:6: inject threads interferences at this point
-[mt] Thread <main>, fun main
-[mt] priorities.c:52: Initializing mutex m1
-[mt] priorities.c:53: Initializing mutex m2
-[mt] priorities.c:55: Thread jobs1, fun f1, parent <main>, args {0}
-[mt] priorities.c:55: Start thread jobs1
-[mt] priorities.c:56: Thread jobs2, fun f2, parent <main>, args {0}
-[mt] priorities.c:56: Start thread jobs2
-[mt] priorities.c:57: Thread jobs3, fun f3, parent <main>, args {0}
-[mt] priorities.c:57: Start thread jobs3
-[mt] priorities.c:58: Thread jobs4, fun f4, parent <main>, args {0}
-[mt] priorities.c:58: Start thread jobs4
-[mt] priorities.c:62: Lock m1
-[mt] priorities.c:63: Lock m2
-[eva:interferences] priorities.c:64: inject threads interferences at this point
-[eva:interferences] priorities.c:65: inject threads interferences at this point
-[mt] priorities.c:66: Release m1
-[mt] priorities.c:67: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: write by <main> at priorities.c:64 <- main
@@ -731,15 +617,7 @@
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[eva:interferences] priorities.c:5: inject threads interferences at this point
-[eva:interferences] priorities.c:6: inject threads interferences at this point
-[eva:interferences] 
-  inject threads interferences at the start of f1 for thread jobs1
-[mt] priorities.c:22: Lock m1
-[eva:interferences] priorities.c:23: inject threads interferences at this point
-[mt] priorities.c:24: Release m1
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: read by jobs1 at priorities.c:23 <- f1
@@ -762,14 +640,7 @@
 [mt] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[eva:interferences] priorities.c:5: inject threads interferences at this point
-[eva:interferences] priorities.c:6: inject threads interferences at this point
-[eva:interferences] 
-  inject threads interferences at the start of f2 for thread jobs2
-[mt] priorities.c:30: Lock m2
-[mt] priorities.c:31: Release m2
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   m2:
@@ -791,13 +662,7 @@
 [mt] * Computing value analysis for thread jobs3
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
-[eva:interferences] priorities.c:5: inject threads interferences at this point
-[eva:interferences] priorities.c:6: inject threads interferences at this point
-[eva:interferences] 
-  inject threads interferences at the start of f3 for thread jobs3
-[eva:interferences] priorities.c:37: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs3 at priorities.c:37 <- f3
@@ -823,11 +688,6 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: s1; s2
-[mt] jobs1 reads  s1 ∈ {0; 1}  // priorities.c:23 f1
-[mt] <main> reads  s2 ∈ {0; 3}  // priorities.c:65 main
-[mt] <main> writes  s1 ∈ {1}  // priorities.c:64 main
-[mt] jobs4 writes  s2 ∈ {0; 3}  // priorities.c:45 f4
-[mt] jobs3 writes  s2 ∈ {0; 3}  // priorities.c:37 f3
 [mt] Possible read/write data races:
   s2:
     read by <main> at priorities.c:65, protected by m1 m2

@@ -15,7 +15,6 @@
 [mt] join.c:22: Start thread th2
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   th1:
@@ -43,7 +42,6 @@
   inject threads interferences at the start of t1 for thread th1
 [mt] join.c:10: Thread exiting with value {1}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
@@ -64,7 +62,6 @@
   inject threads interferences at the start of t2 for thread th2
 [mt] join.c:15: Thread exiting with value {2}
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed

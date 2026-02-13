@@ -15,7 +15,6 @@
   out of bounds read. assert \valid_read((char *)i);
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   NULL[100..200]: read by <main> at null.c:27 <- main
@@ -39,7 +38,6 @@
   inject threads interferences at the start of job0 for thread tjob0
 [eva:alarm] null.c:16: Warning: out of bounds write. assert \valid((char *)i);
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   NULL[100..200]: write by tjob0 at null.c:16 <- job0
@@ -76,11 +74,7 @@
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] null.c:24: Thread tjob0, fun job0, parent <main>, args {0}
-[mt] null.c:24: Start thread tjob0
-[eva:alarm] null.c:27: Warning: 
-  out of bounds read. assert \valid_read((char *)i);
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   NULL[100..200]: read by <main> at null.c:27 <- main
@@ -100,12 +94,8 @@
 [mt] * Computing value analysis for thread tjob0
 [eva] Analyzing a complete application starting at job0
 [eva] Initial state supplied by user
-[eva:interferences] 
-  inject threads interferences at the start of job0 for thread tjob0
-[eva:alarm] null.c:16: Warning: out of bounds write. assert \valid((char *)i);
 [eva:interferences] null.c:16: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   NULL[100..200]: write by tjob0 at null.c:16 <- job0
@@ -154,14 +144,8 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] Thread <main>, fun main
-[mt] null.c:24: Thread tjob0, fun job0, parent <main>, args {0}
-[mt] null.c:24: Start thread tjob0
-[eva:alarm] null.c:27: Warning: 
-  out of bounds read. assert \valid_read((char *)i);
 [eva:interferences] null.c:27: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
-[mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   NULL[100..200]: read by <main> at null.c:27 <- main
@@ -181,8 +165,6 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: NULL[100..200]
-[mt] <main> reads  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:27 main
-[mt] tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:16 job0
 [mt] Possible read/write data races:
   NULL[100..200]:
     read by <main> at null.c:27, unprotected

@@ -66,7 +66,7 @@ let generate_specs () =
 let pre_analysis () =
   Self.configure_verbosity ();
   Parameters.configure_precision ();
-  Iterator.signal_reset ();
+  Signal.reset ();
   floats_ok ();
   options_ok ();
   plugins_ok ();
@@ -106,27 +106,6 @@ let post_analysis () =
   Summary.FunctionStats.recompute_all ();
   Red_statuses.report ()
 
-(* ----- Signal handling ---------------------------------------------------- *)
-
-(* Registers signal handlers for SIGUSR1 and SIGINT to cleanly abort the Eva
-   analysis. Returns a function that restores previous signal behaviors after
-   the analysis. *)
-let register_signal_handler () =
-  let warn () =
-    Self.warning ~once:true "Stopping analysis at user request@."
-  in
-  let stop _ = warn (); Iterator.signal_abort ~kill:true in
-  let interrupt _ = warn (); raise Sys.Break in
-  let register_handler signal handler =
-    match Sys.signal signal (Sys.Signal_handle handler) with
-    | previous_behavior -> fun () -> Sys.set_signal signal previous_behavior
-    | exception Invalid_argument _ -> fun () -> ()
-    (* Ignore: SIGURSR1 is not available on Windows,
-       and possibly on other platforms. *)
-  in
-  let restore_sigusr1 = register_handler Sys.sigusr1 stop in
-  let restore_sigint = register_handler Sys.sigint interrupt in
-  fun () -> restore_sigusr1 (); restore_sigint ()
 
 (* ----- Analysis status ---------------------------------------------------- *)
 
@@ -164,58 +143,63 @@ let save_results kf =
 
 type 'state engine = (module Engine_sig.S with type Dom.state = 'state)
 
-let compute_from_init_state (type t) (engine: t engine) kf (init_state: t) =
+exception Error
+
+let compute_from_entry_point  (type t) (engine: t engine)
+    ?(thread=Thread.main) ?cvalue_state ?arguments entry_point =
   let module Engine = (val engine) in
-  let restore_signals = register_signal_handler () in
+  let lib_entry = Kernel.LibEntry.get () in
+  Self.feedback "Analyzing a%scomplete application starting at %a"
+    (if lib_entry then "n in" else " ")
+    Kernel_function.pretty entry_point;
+  match Engine.Initialization.initial_state_with_formals
+          ?cvalue_state ?arguments ~lib_entry entry_point with
+  | `Bottom ->
+    Eval_annots.mark_invalid_initializers ();
+    Self.error "Eva not started because globals \
+                initialization is not computable.";
+    raise Error
+  | `Value initial_state ->
+    Engine.Compute.compute_main_call ~thread entry_point initial_state
+
+(* Builds the analyzer if needed, and run the analysis. *)
+let compute_from ?cvalue_state ?arguments entry_point =
+  Self.clear_results ();
+  Ast.compute ();
+  pre_analysis ();
+  Engine.reset ();
+  (* The new analyzer can be accessed through hooks *)
+  let module Engine = (val Engine.current ()) in
   let compute () =
-    let final_state = Engine.Compute.compute_main_call kf init_state in
-    Engine.Dom.Store.mark_as_computed ();
+    compute_from_entry_point (module Engine)
+      ?cvalue_state ?arguments entry_point
+  in
+  try
+    Self.ComputationState.set Computing;
+    let restore_signals = Signal.setup () in
+    let final_state = Fun.protect ~finally:restore_signals compute in
     Self.(ComputationState.set Computed);
+    Engine.Dom.Store.mark_as_computed ();
     post_analysis ();
     Engine.Dom.post_analysis final_state;
     Summary.print ();
     Statistics.export_as_csv ();
-    restore_signals ()
-  in
-  let cleanup () =
-    Engine.Dom.Store.mark_as_computed ();
-    Self.(ComputationState.set Aborted)
-  in
-  Eva_utils.protect compute ~cleanup
-
-let compute_from_entry_point (module Engine: Engine_sig.S) kf ~lib_entry =
-  Self.feedback "Analyzing a%scomplete application starting at %a"
-    (if lib_entry then "n in" else " ")
-    Kernel_function.pretty kf;
-  match Engine.Initialization.initial_state_with_formals ~lib_entry kf with
-  | `Bottom ->
+  with exn ->
     Engine.Dom.Store.mark_as_computed ();
     Self.(ComputationState.set Aborted);
-    Self.result "Eva not started because globals \
-                 initialization is not computable.";
-    Eval_annots.mark_invalid_initializers ()
-  | `Value initial_state ->
-    compute_from_init_state (module Engine) kf initial_state
-
-(* Builds the analyzer if needed, and run the analysis. *)
-let force_compute () =
-  Ast.compute ();
-  pre_analysis ();
-  let kf, lib_entry = Globals.entry_point () in
-  Engine.reset ();
-  (* The new analyzer can be accessed through hooks *)
-  Self.ComputationState.set Computing;
-  let module Engine = (val Engine.current ()) in
-  try compute_from_entry_point (module Engine) ~lib_entry kf
-  with Self.Abort ->
-    Self.(ComputationState.set Aborted);
-    Self.error "The analysis has been aborted: results are incomplete."
+    match exn with
+    | Error | Self.Abort -> () (* do not re-raise  *)
+    | exn -> raise exn
 
 let compute () =
   (* Nothing to recompute when Eva has already been computed. This boolean
       is automatically cleared when an option of Eva changes, because they
       are registered as dependencies on [Self.state] in {!Parameters}.*)
-  if not (is_computed ()) then force_compute ()
+  if not (is_computed ()) then
+    let cvalue_state = Eva_results.get_initial_state ()
+    and arguments = Eva_results.get_main_args ()
+    and entry_point = fst @@ Globals.entry_point () in
+    compute_from ?cvalue_state ?arguments entry_point
 
 let compute =
   let name = "Eva.Analysis.compute" in
@@ -227,5 +211,42 @@ let main () = if Parameters.ForceValues.get () then compute ()
 let () = Boot.Main.extend main
 
 let abort () =
-  if Self.ComputationState.get () = Computing
-  then Iterator.signal_abort ~kill:false
+  Signal.abort ()
+
+(* Mthread entry point *)
+
+let compute_thread ?cvalue_state thread =
+  let Thread.{ entry_point; arguments } = Thread.properties thread in
+  let arguments =
+    if Thread.is_main thread
+    then None (* use generated main arguments *)
+    else Some (List.map snd arguments)
+  in
+  let module Engine = (val Engine.current ()) in
+  try
+    (* In multi thread analyses, Memexec cache must be invalidated *)
+    Mem_exec.cleanup_results ();
+    Self.ComputationState.set Computing;
+    let final_state = compute_from_entry_point (module Engine)
+        ~thread ?cvalue_state ?arguments entry_point in
+    Engine.Dom.Store.mark_as_computed ();
+    Self.ComputationState.set Computed;
+    (* Display the final state of each thread main function *)
+    Engine.Dom.post_analysis final_state
+  with exn ->
+    Engine.Dom.Store.mark_as_computed ();
+    Self.(ComputationState.set Aborted);
+    match exn with
+    | Error | Self.Abort -> () (* do not re-raise *)
+    | exn -> raise exn
+
+let mthread_pre_analysis () =
+  Self.clear_results ();
+  Ast.compute ();
+  pre_analysis ();
+  Engine.reset ()
+
+let mthread_post_analysis () =
+  post_analysis ();
+  Summary.print ();
+  Statistics.export_as_csv ();
