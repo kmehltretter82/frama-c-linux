@@ -34,6 +34,22 @@ module type S = sig
     ?empty:unit Pretty.format ->
     (Format.formatter -> elt -> unit) ->
     Format.formatter -> t -> unit
+
+  (** Pretty prints the list as a user readable text.
+      @param format defaults to "%t"
+      @param item defaults to "%a"
+      @param sep defaults to ",@ "
+      @param last defaults to "@ and@ "
+      @param empty defaults to "<empty>"
+      @since Frama-C+dev *)
+  val pretty_text:
+    ?format:(Pretty.tformatter -> unit) Pretty.format ->
+    ?item:(elt Pretty.aformatter -> elt -> unit) Pretty.format ->
+    ?sep:unit Pretty.format ->
+    ?last:unit Pretty.format ->
+    ?empty:unit Pretty.format ->
+    (Format.formatter -> elt -> unit) ->
+    Format.formatter -> t -> unit
 end
 
 module Make (Ord: OrderedType) : S with type elt = Ord.t
