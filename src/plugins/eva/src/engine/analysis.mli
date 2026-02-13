@@ -22,14 +22,6 @@ val is_computed : unit -> bool
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 
-val compute_from :
-  ?cvalue_state:Cvalue.Model.t ->
-  ?arguments:Cvalue.V.t list ->
-  Cil_types.kernel_function ->
-  unit
-(** Computes the Eva analysis from a given CValue state, an argument list for
-    the entry point and the entry point. *)
-
 val self : State.t
 (** Internal state of Eva analysis from projects viewpoint. *)
 

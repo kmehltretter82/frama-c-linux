@@ -29,23 +29,19 @@ val get_main_args: unit -> Cvalue.V.t list option
 
 (** Specifies the initial cvalue state to use. *)
 val set_initial_state: Cvalue.Model.t -> unit
-[@@deprecated "Use Eva.Analysis.compute_from to pass the initial state"]
 
 (** Ignores previous calls to [set_initial_state] above, and uses the default
     initial state instead. *)
 val use_default_initial_state: unit -> unit
-[@@deprecated "Use Eva.Analysis.compute_from to pass the initial state"]
 
 (** Specifies the values of the main function arguments. Beware that the
     analysis fails if the number of given values is different from the number
     of arguments of the entry point of the analysis. *)
 val set_main_args: Cvalue.V.t list -> unit
-[@@deprecated "Use Eva.Analysis.compute_from to pass the main arguments"]
 
 (** Ignores previous calls to [set_main_args] above, and uses the default
     main argument values instead. *)
 val use_default_main_args: unit -> unit
-[@@deprecated "Use Eva.Analysis.compute_from to pass the main arguments"]
 
 (** {2 Results} *)
 
