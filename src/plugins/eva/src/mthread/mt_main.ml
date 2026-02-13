@@ -69,8 +69,6 @@ let hook_builtins =
     )
   )
 
-let ref_analysis = ref None
-
 (* Perform an entire mthread execution on the current project *)
 let mthread_run () =
   Mt_self.warning
@@ -88,25 +86,13 @@ let mthread_run () =
 
   Mt_self.feedback "******* Starting mthread";
 
-  (* We force the computation of the AST before this stage, so that it does not
-     get recomputed in some other projects later *)
-  Ast.compute ();
-
-  (* Make sure that Mthread won't restart in one of the other projects
-     or once the fixpoint is reached. *)
-  Mt_options.Enabled.set false;
-
   (* We create the record containing the state of the analysis (which must
      remain unique, as it is used to define the callback for the value
      analysis.)
 
      For the current thread field, we use a dummy main thread, that will get
      overwritten once the real one is determined *)
-  let f_main =
-    try fst (Globals.entry_point ())
-    with Globals.No_such_entry_point s ->
-      Mt_self.abort "%s Mthread cannot run" s
-  in
+  let f_main = fst @@ Globals.entry_point () in
   let dummy_main_thread =
     Mt_analysis_hooks.main_thread f_main Cvalue.Model.empty_map in
   let analysis = {
@@ -127,8 +113,6 @@ let mthread_run () =
   (* We register our callback function *)
   hook_builtins (Some analysis);
 
-  ref_analysis := Some analysis;
-
   (* Cleanup function, called at the end or in case of failure or success. *)
   let cleanup () =
     Mt_summary.compute analysis;
@@ -139,7 +123,6 @@ let mthread_run () =
     (* We analyse the main thread *)
     let module Engine = (val Engine.current ()) in
     Engine.Interferences.reset ();
-    Self.clear_results ();
     Thread.reset_state ();
     Mutex.reset_state ();
     Mqueue.reset_state ();
