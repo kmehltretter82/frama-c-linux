@@ -6,10 +6,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module F = File
 open Cil_types
-open Cil_datatype
 open Cil
+
+module Varinfo = Cil_datatype.Varinfo
+module Typeinfo = Cil_datatype.Typeinfo
+module Compinfo = Cil_datatype.Compinfo
+module Enuminfo = Cil_datatype.Enuminfo
 
 let dkey = Sparecode_params.register_category "globs"
 
@@ -160,7 +163,7 @@ let rm_unused_decl =
        Visitor.visitFramacFileSameGlobals visitor (Ast.get ());
        debug "filtering done@.";
        let visitor = new filter_visitor in
-       let new_prj = F.create_project_from_visitor new_proj_name visitor in
+       let new_prj = File.create_project_from_visitor new_proj_name visitor in
        let ctx = Parameter_state.get_selection_context () in
        Project.copy ~selection:ctx new_prj;
        new_prj)
