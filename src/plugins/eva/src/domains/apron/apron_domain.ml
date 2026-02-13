@@ -8,7 +8,7 @@
 
 open Eval
 open Eva_ast
-open Apron
+open Fc_internal_apron
 
 let debug = false
 
@@ -105,11 +105,11 @@ module VarRanges =
     end)
 
 (* is [expr] guaranteed to (statically) fit within [range] *)
-let expr_fits_in_range (expr: Apron.Texpr1.expr) range =
-  let open Apron.Texpr1 in
+let expr_fits_in_range (expr: Texpr1.expr) range =
+  let open Texpr1 in
   match expr with
   | Var v ->
-    let name = Apron.Var.to_string v in
+    let name = Var.to_string v in
     let range_v = VarRanges.find name in
     Eval_typ.range_inclusion range_v range
   | Cst _ | Unop (_,_,_,_) | Binop (_,_,_,_,_) ->
@@ -136,7 +136,7 @@ let reduce eval expr range =
          [scalar_to_mpzf]. Thus we should catch this case here. *)
       if Interval.is_top interval then begin
         if debug then Self.result ~current:true ~once:true
-            "imprecise expr %a" Apron.Texpr1.print_expr expr;
+            "imprecise expr %a" Texpr1.print_expr expr;
         top ()
       end
       else

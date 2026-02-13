@@ -30,12 +30,6 @@ val last   : 'n succ nat -> 'n succ finite
     its successor. *)
 val next   : 'n finite -> 'n succ finite
 
-(** The call [prev f] returns a value encoding the element right before [f] in
-    a finite subset. The type encodes the relations between the cardinal of
-    the finite subset containing [f] and the cardinal of the one containing
-    its predecessor. *)
-val prev   : 'n succ finite -> 'n finite
-
 (** If [f] is an element of any finite subset of cardinal [n], it is also an
     element of any finite subset of cardinal [n + 1]. The call [weaken f]
     allows to prove that fact to the type system. *)
@@ -56,10 +50,36 @@ val of_int : 'n succ nat -> int -> 'n succ finite option
     is O(1). *)
 val to_int : 'n finite -> int
 
-(** The call [for_each f limit acc] folds over each finite elements of a set of
-    cardinal limit, computing f at each step.
+(** The call [fold f ?start ?stop size acc] folds over each elements between
+    [start] and [stop] of a finite set of cardinal [size], computing [f]
+    and accumulating its results at each step, starting with [acc].
+    The default values of start and stop are respectively [Finite.first]
+    and [Finite.last size], i.e by default, [fold] will go through all
+    elements of a finite set of cardinal [size].
     The function complexity is O(n). *)
-val for_each : ('n finite -> 'a -> 'a) -> 'n nat -> 'a -> 'a
+val fold : ('n finite -> 'a -> 'a) ->
+  ?start: 'n finite ->
+  ?stop: 'n finite ->
+  'n nat -> 'a -> 'a
+
+(** The call [iter f ?start ?stop limit] iterates over each elements between
+    [start] and [stop] of a finite set of cardinal [size]. As for [fold], the
+    default values of [start] and [stop] are respectively [Finite.first] and
+    [Finite.last size]. *)
+val iter : ('n finite -> unit) ->
+  ?start: 'n finite ->
+  ?stop: 'n finite ->
+  'n nat -> unit
+
+(** The call [for_all f ?start ?stop limit] returns true if and only if [f i]
+    is true for all elements [i] between [start] and [stop] of a finite set
+    of cardinal [size]. As for [fold], the default values of [start] and [stop]
+    are respectively [Finite.first] and [Finite.last size]. If [size] is zero
+    or [start] is strictly greater than [stop], the call returns true. *)
+val for_all : ('n finite -> bool) ->
+  ?start: 'n finite ->
+  ?stop: 'n finite ->
+  'n nat -> bool
 
 (** {2 Relational operators.} *)
 

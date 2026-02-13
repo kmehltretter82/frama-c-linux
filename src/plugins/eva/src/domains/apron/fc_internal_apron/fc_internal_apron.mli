@@ -6,5 +6,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Tests the Linear_filter module: invariant computation of filters. *)
-val run : unit -> unit
+(** This module/library is used to avoid polluting the namespace with generic
+    names from Apron library
+    @since Frama-C+dev
+*)
+
+include module type of Apron with type 'a Manager.t = 'a Apron.Manager.t
+module Box : module type of Box
+module Oct : module type of Oct
+module Polka : module type of Polka

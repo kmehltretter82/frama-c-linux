@@ -11,8 +11,7 @@ open Finite
 
 
 
-(** Definition of a linear space over a field. Used by {!Linear_filter} to
-    represent and compute linear filters invariants. *)
+(** Definition of a linear space over a field. *)
 
 module Space (Field : Field.S) : sig
 
@@ -30,10 +29,14 @@ module Space (Field : Field.S) : sig
 
   module Vector : sig
 
-    val pretty : Format.formatter -> 'n vector -> unit
+    val pretty : Format.formatter -> 'n succ vector -> unit
 
     (** The call [zero n] returns the 0 vector in 𝕂ⁿ. *)
     val zero   : 'n succ nat -> 'n succ vector
+
+    (** Build a vector from an array. Raise out of bounds
+        exceptions if the array is not well formed. *)
+    val of_array : 'n succ nat -> string array -> 'n succ vector
 
     (** The call [repeat x n] returns a vector in 𝕂ⁿ which each dimension
         containing the scalar x. *)
@@ -69,7 +72,7 @@ module Space (Field : Field.S) : sig
 
   module Matrix : sig
 
-    val pretty : Format.formatter -> ('n, 'm) matrix -> unit
+    val pretty : Format.formatter -> ('n succ, 'm succ) matrix -> unit
 
     (** The call [id n] returns the identity matrix in 𝕂ⁿˣⁿ. *)
     val id : 'n succ nat -> ('n succ, 'n succ) matrix
@@ -77,9 +80,11 @@ module Space (Field : Field.S) : sig
     (** The call [zero n m] returns the 0 matrix in 𝕂ⁿˣᵐ. *)
     val zero : 'n succ nat -> 'm succ nat -> ('n succ, 'm succ) matrix
 
-    (** The call [shift n] returns a square matrix in 𝕂ⁿˣⁿ such as the first row
-        and the last column is all zero, and the remaining is the identity. *)
-    val shift : 'n succ nat -> ('n succ, 'n succ) matrix
+    (** Build a matrix from a 2 dimensionnal array of strings. Strings are
+        used here to ensure that no rounding is performed prior of the
+        ones that may be introduced by the underlying field.
+        Raise out of bounds exceptions if the array is not well formed. *)
+    val of_array : 'n succ nat -> 'm succ nat -> string array array -> ('n succ, 'm succ) matrix
 
     (** The call [get i j m] returns the coefficient of the i-th row and
         the j-th column. *)
@@ -116,21 +121,23 @@ module Space (Field : Field.S) : sig
         ensured. *)
     val ( * ) : ('n, 'm) matrix -> ('m, 'p) matrix -> ('n, 'p) matrix
 
-    (** Scalar multiplication. *)
-    val ( ** ) : scalar -> ('n, 'm) matrix  -> ('n, 'm) matrix
+    (** Componentwise division. *)
+    val ( / ) : ('n, 'm) matrix -> ('n, 'm) matrix -> ('n, 'm) matrix
 
-    (** Matrix exponentiation. The call [power m] returns a memoized function.
-        When one needs to compute several exponentiations of the same matrix,
-        one should perform the call [power m] once and used the returned
-        function each times one needs it. *)
-    val power : ('n, 'n) matrix -> (int -> ('n, 'n) matrix)
+    (** Scalar multiplication. *)
+    val scale : scalar -> ('n, 'm) matrix  -> ('n, 'm) matrix
 
     (** Matrix inverse. Returns None if the input matrix is singular. *)
-    val inverse : ('n, 'n) matrix -> ('n, 'n) matrix option
+    val inverse : ('n succ, 'n succ) matrix -> ('n succ, 'n succ) matrix option
 
     (** The call [abs m] returns a matrix for which each coordinate is the
         absolute value of the corresponding coordinate of [m]. *)
     val abs : ('n, 'm) matrix -> ('n, 'm) matrix
+
+    (** The call [all_components_lower_than l r] return true if and only if
+        each components of [l] are lower or equal to their counterpart in [r],
+        i.e for all i and j, [get i j l] is lower or equal to [get i j r]. *)
+    val all_components_lower_than : ('n, 'm) matrix -> ('n, 'm) matrix -> bool
 
   end
 
