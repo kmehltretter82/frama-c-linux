@@ -14,19 +14,17 @@ include Plugin.Register
     end)
 
 module ForceDeps =
-  WithOutput
+  False
     (struct
       let option_name = "-deps"
       let help = "force dependencies display"
-      let output_by_default = true
     end)
 
 module ForceCallDeps =
-  WithOutput
+  False
     (struct
       let option_name = "-calldeps"
       let help = "force callsite-wise dependencies"
-      let output_by_default = true
     end)
 
 module ShowIndirectDeps =

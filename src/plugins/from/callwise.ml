@@ -17,7 +17,8 @@ module Tbl =
       let size = 17
       let dependencies = [ Eva.Analysis.self ]
     end)
-let () = From_parameters.ForceCallDeps.set_output_dependencies [Tbl.self]
+
+let self = Tbl.self
 
 let merge_call_froms table callsite froms =
   try

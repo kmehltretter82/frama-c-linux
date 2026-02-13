@@ -32,10 +32,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--calldeps-print     print results for option -calldeps (set by default,
-                    opposite option is -no-calldeps-print)
--deps-print         print results for option -deps (set by default, opposite
-                    option is -no-deps-print)
 -from-log <K_1:file_1,...>  copy log messages from From analysis to a file.
                     <K> is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')

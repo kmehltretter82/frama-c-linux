@@ -17,7 +17,6 @@ module Tbl =
       let size = 17
       let dependencies = [ Eva.Analysis.self ]
     end)
-let () = From_parameters.ForceDeps.set_output_dependencies [Tbl.self]
 
 (* Forward reference to a function computing the from for a given function *)
 let force_compute = ref (fun _ -> assert false)
@@ -79,15 +78,11 @@ let self = Tbl.self
 
 let compute kf = ignore (To_Use.memo kf)
 
-let force_compute_all () =
+let compute_all () =
   Eva.Analysis.compute () ;
   Callgraph.Uses.iter_in_rev_order @@ fun kf ->
   let is_definition = Kernel_function.is_definition kf in
   if is_definition && Eva.Results.is_called kf then compute kf
-
-let compute_all =
-  let name = "From.compute_all" in
-  State_builder.apply_once name [Tbl.self] force_compute_all |> fst
 
 let is_computed = Tbl.mem
 

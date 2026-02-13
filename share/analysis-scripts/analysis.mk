@@ -123,7 +123,6 @@ IVETTE     ?= ivette
 EVAFLAGS   ?= \
   -eva-no-print -eva-no-show-progress -eva-msg-key=-initial-state,callstacks \
   -eva-warn-key alarm=inactive \
-  -no-deps-print -no-calldeps-print \
   -eva-warn-key garbled-mix=warning,garbled-mix:write=warning \
   -calldeps -from-verbose 0 \
 	-cache-size 8 \

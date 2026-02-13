@@ -9,11 +9,11 @@
 include Plugin.S
 
 (** Option -deps *)
-module ForceDeps: Parameter_sig.With_output
+module ForceDeps: Parameter_sig.Bool
 
 (** Option -calldeps.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-module ForceCallDeps: Parameter_sig.With_output
+module ForceCallDeps: Parameter_sig.Bool
 
 (** Option -show-indirect-deps *)
 module ShowIndirectDeps: Parameter_sig.Bool
