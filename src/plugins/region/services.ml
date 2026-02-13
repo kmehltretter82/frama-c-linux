@@ -39,10 +39,11 @@ struct
     ]
 
   let title (Memory.Cvar r) =
-    Format.asprintf "%a (%db) (%d cells)"
+    Format.asprintf "%a (%db)%t"
       Typ.pretty r.cvar.vtype
       (Memory.bitsSizeOf r.cvar.vtype)
-      r.cells
+      (fun fmt ->
+         if r.cells > 1 then Format.fprintf fmt " (%d cells)" r.cells)
 
   let to_json (Memory.Cvar r as cvar) =
     Json.of_fields [
@@ -201,7 +202,7 @@ struct
     Format.asprintf "%t (%db)%t"
       begin fun fmt ->
         match m.types with
-        | [] -> Format.pp_print_string fmt "Compound (empty)"
+        | [] -> Format.pp_print_string fmt "(no access)"
         | [ty] -> pp_typ_layout m.sizeof fmt ty ;
         | ty::ts ->
           pp_typ_layout 0 fmt ty ;
@@ -209,7 +210,8 @@ struct
       end
       m.sizeof
       begin fun fmt ->
-        if m.singleton then Format.pp_print_string fmt " (singleton)"
+        if m.types <> [] && m.singleton then Format.pp_print_string fmt " (singleton)" ;
+        Attr.iter (Format.fprintf fmt " (%a)" Attr.pp_attr) m.flags ;
       end
 
   let jtype = Data.declare ~package ~name:"region" @@

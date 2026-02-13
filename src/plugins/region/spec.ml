@@ -53,7 +53,7 @@ let pp_region fmt r =
       Format.fprintf fmt "@[<hov 2>" ;
       pp_named fmt r.named ; pp_path fmt p ;
       List.iter (Format.fprintf fmt ",@ %a" pp_path) ps ;
-      Attr.iter (Format.fprintf fmt ",@ %a" Attr.pp_attr) r.flags ;
+      Attr.iter (Format.fprintf fmt ",@ \\%a" Attr.pp_attr) r.flags ;
       Format.fprintf fmt "@]" ;
     end
 

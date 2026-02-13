@@ -24,7 +24,7 @@ import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as Region from './api';
 import { MemoryView } from './memory';
-import { AccessList } from './access';
+import { AccessList, Attributes } from './access';
 import './style.css';
 
 function saveModel(model: string, fct: string): void {
@@ -107,6 +107,7 @@ function RegionAnalys(): JSX.Element {
           onModelChanged={setModel} />
       </Vfill>
       <Vbox>
+        <Attributes region={region} />
         <AccessList region={region} selection={marker} />
       </Vbox>
     </>

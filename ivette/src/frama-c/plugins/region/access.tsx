@@ -11,10 +11,55 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import { Label, Cell } from 'dome/controls/labels';
+import { Hbox } from 'dome/layout/boxes';
+import { Label, Cell, Code } from 'dome/controls/labels';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as States from 'frama-c/states';
 import * as Region from './api';
+
+/* -------------------------------------------------------------------------- */
+/* --- Region Attributes                                                  --- */
+/* -------------------------------------------------------------------------- */
+
+function ACS(props: { mark: string; kind: string; acs: number }): JSX.Element {
+  return (
+    <Label
+      display={props.acs > 0}
+      title={`Number of {kind}s`}
+    >
+      {props.acs} {props.kind}{props.acs > 1 ? 's' : ''} ({props.mark})
+    </Label>
+  );
+}
+
+export interface AttributesProps {
+  region?: Region.region;
+}
+
+export function Attributes(props: AttributesProps): JSX.Element | null {
+  const { region } = props;
+  if (!region) return null;
+  const garbled =
+    !region.typed &&
+    !region.ranges.length &&
+    (region.inits.length + region.reads.length + region.writes.length > 0);
+  return (
+    <Hbox>
+      <Code icon="COMPONENT" className="dimmed">#{region.node}</Code>
+      <ACS key="I" mark="I" kind="init" acs={region.inits.length} />
+      <ACS key="R" mark="R" kind="read" acs={region.reads.length} />
+      <ACS key="W" mark="W" kind="write" acs={region.writes.length} />
+      <Label icon="WARNING" kind="negative" label="Garbled"
+        title="Untyped region (multiple type access)"
+        display={garbled} />
+      <Label label={region.title} />
+    </Hbox>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Access Lists                                                       --- */
+/* -------------------------------------------------------------------------- */
 
 interface AccessKind extends Region.access { kind: string }
 

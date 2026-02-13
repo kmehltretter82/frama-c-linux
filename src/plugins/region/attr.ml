@@ -27,10 +27,10 @@ let iter f w =
     [ `Nullable ; `Dynamic ; `Garbage ]
 
 let pp_attr fmt = function
-  | `Nullable -> Format.pp_print_string fmt "\\nullable"
-  | `Dynamic  -> Format.pp_print_string fmt "\\dynamic"
-  | `Garbage  -> Format.pp_print_string fmt "\\garbage"
-  | `Readonly -> Format.pp_print_string fmt "\\readonly"
+  | `Nullable -> Format.pp_print_string fmt "nullable"
+  | `Dynamic  -> Format.pp_print_string fmt "dynamic"
+  | `Garbage  -> Format.pp_print_string fmt "garbage"
+  | `Readonly -> Format.pp_print_string fmt "readonly"
 
 let reversed = flag `Readonly
 (* flags that shall be merged with land instead of lor *)
@@ -41,11 +41,15 @@ let merge (A x) (A y) =
   A (flip (flip x lor flip y))
 
 let pretty fmt w =
-  let sep = ref false in
-  let next a =
-    if !sep then Format.fprintf fmt ",@," else sep := true ;
-    pp_attr fmt a in
-  iter next w
+  begin
+    Format.fprintf fmt "@[<hov 2>" ;
+    let sep = ref false in
+    let next a =
+      if !sep then Format.fprintf fmt ",@," else sep := true ;
+      pp_attr fmt a in
+    iter next w ;
+    Format.fprintf fmt "@]" ;
+  end
 
 open Cil_types
 

@@ -306,7 +306,7 @@ let witer (m:map) (f: node -> bool) =
     Option.iter (walk f) m.result ;
   end
 
-let iter m f = witer m (UF.once ~f ())
+let iter m f = witer m (UF.once f)
 let size (r: node) = sizeof (UF.get r).clayout
 let parents (r: node) = UF.find_all (UF.get r).cparents
 let cvars (r: node) = Vset.elements (UF.get r).ccvars
@@ -621,42 +621,46 @@ let result (m: map) = m.result
 (* ---  Consolidation                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-let iter_parent_path parent f r s =
+let iter_parent_path parent f r =
   match parent.clayout with
-  | Blob _ | Cell _ -> ()
+  | Blob _ | Cell _ -> assert false
   | Compound(_,_,R rgs) ->
     List.iter
       (fun (rg : node Ranges.range) ->
-         if equal r rg.data then f (if rg.length = s then 1 else 2)
+         if equal r rg.data then f rg.length
       ) rgs
 
-let rec consolidate once r =
-  once r &&
-  let n = UF.get r in
-  let ps = UF.find_all n.cparents in
-  begin
-    n.cflags <- Attr.bottom ;
-    let flags fs = n.cflags <- Attr.merge n.cflags fs in
-    let path k = n.cpaths <- n.cpaths + k in
-    Vset.iter (fun v -> path 1 ; flags @@ Attr.cvar v) n.ccvars ;
-    Bag.iter (function Root r ->
-        path (if Term.equal r.inf r.sup then 1 else 2) ;
-        flags r.flags
-      ) n.croots ;
-    let s = sizeof n.clayout in
-    List.iter
-      (fun rp ->
-         ignore (consolidate once rp) ;
-         let p = UF.get rp in
-         n.cdepth <- max n.cdepth (succ p.cdepth) ;
-         flags p.cflags ;
-         if n.cpaths <= 1 then
-           if p.cpaths <= 1 then
-             iter_parent_path p path r s
-           else path 2
-      ) ps ;
-  end ;
-  false
+let rec consolidate marked n =
+  if not @@ UF.test_and_mark marked n then
+    let node = UF.get n in
+    let ps = UF.find_all node.cparents in
+    begin
+      node.cflags <- Attr.bottom ;
+      let flags fs = node.cflags <- Attr.merge node.cflags fs in
+      let size = sizeof node.clayout in
+      let path s = node.cpaths <- node.cpaths + (if s = size then 1 else 2) in
+      Vset.iter
+        (fun v ->
+           path @@ bitsSizeOf v.vtype ;
+           flags @@ Attr.cvar v
+        ) node.ccvars ;
+      Bag.iter
+        (function Root r ->
+           path (if Term.equal r.inf r.sup then size else max_int) ;
+           flags r.flags
+        ) node.croots ;
+      List.iter
+        (fun p ->
+           consolidate marked p ;
+           let parent = UF.get p in
+           node.cdepth <- max node.cdepth (succ parent.cdepth) ;
+           flags parent.cflags ;
+           if node.cpaths <= 1 then
+             if parent.cpaths = 1 then
+               iter_parent_path parent path n
+             else path max_int
+        ) ps ;
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Included & Separated                                               --- *)
@@ -691,28 +695,8 @@ let included source target : bool =
 let separated r1 r2 =
   not (included r1 r2) && not (included r2 r1)
 
-let single_path r0 r s =
-  match (UF.get r0).clayout with
-  | Blob _ -> true
-  | Cell(s0,_) -> s = s0
-  | Compound(_,_,R rgs) ->
-    List.for_all
-      (fun (rg : node Ranges.range) ->
-         not (equal r rg.data) || rg.length = s
-      ) rgs
-
-let rec singleton r =
-  let node = UF.get r in
-  (* normalized parents *)
-  match UF.find_all node.cparents with
-  | [] -> Vset.cardinal node.ccvars = 1 && Bag.is_empty node.croots
-  | [r0] ->
-    Vset.is_empty node.ccvars &&
-    single_path r0 r (sizeof node.clayout) &&
-    (* r != r0 && (* This test may be useful to prevent infinity loops. *) *)
-    singleton r0
-  | _ -> false
-
+(* -------------------------------------------------------------------------- *)
+(* --- Consolidated Accessors                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
 let reads (r:node) =
@@ -750,8 +734,11 @@ let typed (r:node) =
     in
     Access.Set.iter check node.creads ;
     Access.Set.iter check node.cwrites ;
+    Access.Set.iter check node.cinits ;
     !types
   with Exit -> None
+
+let singleton n = (UF.get n).cpaths = 1
 
 (* -------------------------------------------------------------------------- *)
 (* --- High-Level API                                                     --- *)
@@ -862,7 +849,8 @@ let pp_region fmt (m: region) =
         List.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.writes ;
         List.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.shifts ;
       end ;
-    Attr.iter (Format.fprintf fmt "@ %a" Attr.pp_attr) m.flags ;
+    if m.singleton then Format.fprintf fmt "@ (singleton)" ;
+    Attr.iter (Format.fprintf fmt "@ (%a)" Attr.pp_attr) m.flags ;
     Format.fprintf fmt " ;@]" ;
   end
 
@@ -894,8 +882,8 @@ let make_region (n: node) (r: chunk) : region =
   let typed = typed n in
   let sizeof = sizeof r.clayout in
   let fields = cfields r.clayout in
-  let singleton = r.cpaths <= 1 in
-  let flags = (* if 0 < r.cpaths then r.cflags else *) Attr.empty in
+  let singleton = r.cpaths = 1 in
+  let flags = r.cflags in
   {
     node = n ;
     parents = UF.find_all r.cparents ;
@@ -922,8 +910,8 @@ let regions map =
 let lock m =
   begin
     witer m UF.lock ;
-    let once = UF.once () in
-    witer m (consolidate once) ;
+    let marks = UF.marks () in
+    iter m (consolidate marks) ;
   end
 
 (* -------------------------------------------------------------------------- *)

@@ -1,69 +1,70 @@
 [kernel] Parsing assigns.i (no preprocessing)
 [region] Analyzing regions
 [region] Function byref:
-  R0001: -R-- p (int **) 64b (*R0002) ;
+  R0001: -R-- p (int **) 64b (*R0002) (singleton) ;
   R0002: ---- 0b ;
 [region] Function call_byref:
   R0001: -R-- B[64] (int) 32b ;
-  R0002: -R-- k (int) 32b ;
-  R0003: -RW- a (int *) 64b (*R0001) ;
-  R0004: -RW- __retres (int) 32b ;
+  R0002: -R-- k (int) 32b (singleton) ;
+  R0003: -RW- a (int *) 64b (*R0001) (singleton) (dynamic) (garbage) ;
+  R0004: -RW- __retres (int) 32b (singleton) (dynamic) (garbage) ;
   R0005: --W- \result (int) 32b ;
 [region] Function call_copy:
-  R0001: ---- a b 320b ;
+  R0001: ---- a b 320b (dynamic) (garbage) ;
 [region] Function call_field:
-  R0001: ---- s 320b { .f: R0002; #256b; } ;
-  R0002: --W- (int *) 64b (*R0003) ;
-  R0003: ---- a 32b ;
+  R0001: ---- s 320b { .f: R0002; #256b; } (singleton) (dynamic) (garbage) ;
+  R0002: --W- (int *) 64b (*R0003) (singleton) (dynamic) (garbage) ;
+  R0003: ---- a 32b (singleton) (dynamic) (garbage) ;
 [region:froms] assigns.i:8: Warning: 
   Missing \from in assigns to pointer location(s)
 [region] Function call_imprecise:
-  R0001: ---- B 2048b ;
-  R0002: -R-- k (int) 32b ;
-  R0003: -RW- a (int *) 64b (*R0004) ;
+  R0001: ---- B 2048b (singleton) ;
+  R0002: -R-- k (int) 32b (singleton) ;
+  R0003: -RW- a (int *) 64b (*R0004) (singleton) (dynamic) (garbage) ;
   R0004: -R-- (int) 32b ;
-  R0005: -RW- __retres (int) 32b ;
+  R0005: -RW- __retres (int) 32b (singleton) (dynamic) (garbage) ;
   R0006: --W- \result (int) 32b ;
 [region:froms] assigns.i:17: Warning: 
   Missing assigns \result \from for returned pointer
 [region] Function call_imprecise_result:
-  R0001: ---- B 2048b ;
-  R0002: -R-- k (int) 32b ;
-  R0003: -RW- tmp (int *) 64b (*R0004) ;
+  R0001: ---- B 2048b (singleton) ;
+  R0002: -R-- k (int) 32b (singleton) ;
+  R0003: -RW- tmp (int *) 64b (*R0004) (singleton) (dynamic) (garbage) ;
   R0004: ---- 0b ;
   R0005: --W- \result (int *) 64b (*R0004) ;
 [region] Function call_malloc:
-  R0001: -R-- n (int) 32b ;
-  R0002: -RW- tmp (int *) 64b (*R0003) ;
+  R0001: -R-- n (int) 32b (singleton) ;
+  R0002: -RW- tmp (int *) 64b (*R0003) (singleton) (dynamic) (garbage) ;
   R0003: ---- 0b ;
   R0004: --W- \result (int *) 64b (*R0003) ;
 [region] Function call_range:
-  R0001: ---- s 320b { #64b; .g: R0002[4]; } ;
-  R0002: --W- (int *) 64b (*R0003) ;
-  R0003: ---- a 32b ;
+  R0001: ---- s 320b { #64b; .g: R0002[4]; } (singleton) (dynamic) (garbage) ;
+  R0002: --W- (int *) 64b (*R0003) (dynamic) (garbage) ;
+  R0003: ---- a 32b (singleton) (dynamic) (garbage) ;
 [region:froms] assigns.i:21: Warning: 
   No pointer found in assigns-\from to pointer location(s)
 [region] Function call_suspiscious:
-  R0001: -R-- k (int) 32b ;
-  R0002: -RW- tmp (int *) 64b (*R0003) ;
+  R0001: -R-- k (int) 32b (singleton) ;
+  R0002: -RW- tmp (int *) 64b (*R0003) (singleton) (dynamic) (garbage) ;
   R0003: ---- 0b ;
   R0004: --W- \result (int *) 64b (*R0003) ;
 [region] Function call_write:
-  R0001: ---- a 320b { .f: R0002; .g: R0004[4]; } ;
-  R0002: --W- (int *) 64b (*R0003) ;
-  R0003: ---- b 32b ;
-  R0004: --W- (int *) 64b (*R0003) ;
+  R0001: ---- a 320b { .f: R0002; .g: R0004[4]; } (singleton) (dynamic)
+    (garbage) ;
+  R0002: --W- (int *) 64b (*R0003) (singleton) (dynamic) (garbage) ;
+  R0003: ---- b 32b (singleton) (dynamic) (garbage) ;
+  R0004: --W- (int *) 64b (*R0003) (dynamic) (garbage) ;
 [region] Function caller_result:
   R0001: -R-- B[64] (int) 32b ;
-  R0002: -R-- k (int) 32b ;
-  R0003: IRW- a (int *) 64b (*R0001) ;
-  R0004: -RW- __retres (int) 32b ;
+  R0002: -R-- k (int) 32b (singleton) ;
+  R0003: IRW- a (int *) 64b (*R0001) (singleton) (dynamic) ;
+  R0004: -RW- __retres (int) 32b (singleton) (dynamic) (garbage) ;
   R0005: --W- \result (int) 32b ;
 [region] Function copy:
-  R0001: -R-- p (struct S *) 64b (*R0002) ;
+  R0001: -R-- p (struct S *) 64b (*R0002) (singleton) ;
   R0002: ---- 0b ;
 [region] Function imprecise:
-  R0001: -R-- p (int **) 64b (*R0002) ;
+  R0001: -R-- p (int **) 64b (*R0002) (singleton) ;
   R0002: ---- 0b ;
 [region] Function imprecise_result:
   R0001: ---- \result 0b ;
@@ -72,15 +73,15 @@
 [region] Function result:
   R0001: ---- \result 0b ;
 [region] Function set_field:
-  R0001: -R-- p (struct S *) 64b (*R0002) ;
+  R0001: -R-- p (struct S *) 64b (*R0002) (singleton) ;
   R0002: ---- 320b { .f: R0003[…]; #256b; } ;
   R0003: ---- 0b ;
 [region] Function set_range:
-  R0001: -R-- p (struct S *) 64b (*R0002) ;
+  R0001: -R-- p (struct S *) 64b (*R0002) (singleton) ;
   R0002: ---- 320b { #64b; .g: R0003; } ;
   R0003: ---- 256b ;
 [region] Function suspicious:
   R0001: ---- \result 0b ;
 [region] Function write:
-  R0001: -R-- p (struct S *) 64b (*R0002) ;
+  R0001: -R-- p (struct S *) 64b (*R0002) (singleton) ;
   R0002: ---- 0b ;

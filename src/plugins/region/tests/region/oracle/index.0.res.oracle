@@ -1,7 +1,0 @@
-[kernel] Parsing index.c (with preprocessing)
-[region] Analyzing regions
-[region] Function f:
-  R0001: -R-- k (int) 32b ;
-  R0002: ---- s 192b { .x: R0003; #32b; .z: R0004[4]; } ;
-  R0003: --W- (int) 32b ;
-  R0004: --W- (int) 32b ;

@@ -28,7 +28,7 @@ function makeRecord(
   const cells: Dot.Cell[] = [];
   let offset = 0;
   ranges.forEach((rg, i) => {
-    const port = `r${i}`;
+    const port = `P${i}`;
     const target = `n${rg.data}`;
     edges.push({
       source, sourcePort: port, target,
