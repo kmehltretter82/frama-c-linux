@@ -242,7 +242,7 @@ module Transfer = struct
     | false -> `Value state
     | true ->
       let { return } = reset state in
-      let current_thread = Thread.in_position pos in
+      let current_thread = Thread.from_position pos in
       let value = Eval.value_assigned assigned in
       let return = assign_return current_thread lval value return in
       `Value { state with return }

@@ -392,7 +392,7 @@ struct
     else begin
       Self.debug ~dkey ~current:true ~once:true
         "inject threads interferences at this point";
-      let current_thread = Thread.in_position pos in
+      let current_thread = Thread.from_position pos in
       inject current_thread state
     end
 

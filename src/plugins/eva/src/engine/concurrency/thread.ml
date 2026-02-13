@@ -73,16 +73,24 @@ let create kind =
 let find id =
   if Int.equal id main.id then Some main else ThreadsById.find_opt id
 
-let in_callstack cs =
-  find cs.Callstack.thread |> Option.get
+let from_callstack cs =
+  match find cs.Callstack.thread with
+  | Some th -> th
+  | None ->
+    Self.fatal
+      "The thread id (%d) in the considered callstack does not match any \
+       existing thread"
+      cs.thread
 
-let in_local_position pos =
+let from_local_position pos =
   Position.Local.callstack pos
-  |> in_callstack
+  |> from_callstack
 
-let in_position pos =
+let from_position pos =
   Position.callstack pos
-  |> Option.fold ~some:in_callstack ~none:main
+  (* The only position that do not have a callstack associated is GlobalInit.
+     The global variables initialization are done by the main thread. *)
+  |> Option.fold ~some:from_callstack ~none:main
 
 (* --- Thread identity --- *)
 

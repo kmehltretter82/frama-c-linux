@@ -16,9 +16,9 @@ val is_main : t -> bool
 val id : t -> int
 val label : t -> string
 val find : int -> t option
-val in_callstack : Callstack.t -> t
-val in_local_position : Position.local -> t
-val in_position : Position.t -> t
+val from_callstack : Callstack.t -> t
+val from_local_position : Position.local -> t
+val from_position : Position.t -> t
 
 (** [spawn al name kf args] registers the creation of a thread encountered
     in Eva analysis, and either add this spawn to an existing thread analysis
