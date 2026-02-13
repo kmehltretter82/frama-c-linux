@@ -37,11 +37,11 @@ let () = KeepProjects.add_set_hook
                 Thread analyses are no longer run in separate projects.")
 
 let () = Parameter_customize.set_group grp_debug
-let () = Parameter_customize.set_negative_option_name "-mt-projects-together"
 module ToDisk =
   False (struct
     let option_name = "-mt-projects-on-disk"
-    let help = "Save the copies of the analyses in a separate file, instead of all together"
+    let help = "After each thread analysis, save the current analysis state \
+                in a separate file"
   end)
 ;;
 

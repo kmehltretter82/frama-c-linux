@@ -52,16 +52,12 @@ Options taking a string as argument should preferably be written
                     (opposite option is -mt-no-keep-dot-files)
 -mt-only-threads <th1,...,thn>  only execute the specified threads
                     (preferably use -mt-only-threads="th1,...,thn")
--mt-projects-on-disk  Save the copies of the analyses in a separate file,
-                    instead of all together (opposite option is
-                    -mt-projects-together)
+-mt-projects-on-disk  After each thread analysis, save the current analysis
+                    state in a separate file (opposite option is
+                    -mt-no-projects-on-disk)
 -mt-projects-on-disk-prefix <prefix>  Prepend <prefix> to the project's
                     filename saved by -mt-projects-on-disk (defaults to th)
                     (preferably use -mt-projects-on-disk-prefix="prefix")
--mt-projects-together  (set by default) opposite of option
-                    -mt-projects-on-disk, whose help message is:
-                    Save the copies of the analyses in a separate file,
-                    instead of all together
 -mt-skip-threads <th1,...,thn>  do not execute the specified threads
                     (preferably use -mt-skip-threads="th1,...,thn")
 -mt-stop-after <i>  Only perform at most i iterations
