@@ -84,7 +84,6 @@ module AlarmsStmt =
   Datatype.Pair_with_collections (Alarms) (Stmt)
 
 type results = {
-  main: Kernel_function.t option (** None means multiple functions *);
   before_states: stmt_by_callstack Stmt.Hashtbl.t;
   after_states: stmt_by_callstack Stmt.Hashtbl.t;
   kf_initial_states: stmt_by_callstack Kernel_function.Hashtbl.t;
@@ -99,7 +98,6 @@ type results = {
 
 let get_results () =
   let vue = Emitter.get Eva_utils.emitter in
-  let main = Some (fst (Globals.entry_point ())) in
   let module CS = Callstack in
   let before_states = Stmt.Hashtbl.create 128 in
   let after_states = Stmt.Hashtbl.create 128 in
@@ -158,7 +156,7 @@ let get_results () =
   in
   Property_status.iter aux_ip;
   { before_states; after_states; kf_initial_states; kf_callers;
-    initial_state; initial_args; alarms; statuses; main }
+    initial_state; initial_args; alarms; statuses; }
 
 let set_results results =
   let selection = State_selection.with_dependencies Self.state in
@@ -215,96 +213,6 @@ let set_results results =
   Self.ComputationState.set Computed;
   Cvalue_results.mark_as_computed ();
 ;;
-
-module HExt (H: Hashtbl.S) =
-struct
-
-  let map ?(fkey=fun k _v -> k) ?(fvalue = fun _k v -> v) h =
-    let h' = H.create (H.length h) in
-    let aux cs v = H.add h' (fkey cs v) (fvalue cs v) in
-    H.iter aux h;
-    h'
-
-  let merge merge h1 h2 =
-    let h = H.create (H.length h1 + H.length h2) in
-    let aux1 key v =
-      let v' =
-        try merge key v (H.find h2 key)
-        with Not_found -> v
-      in
-      H.add h key v'
-    in
-    let aux2 key v =
-      if not (H.mem h1 key) then H.add h key v
-    in
-    H.iter aux1 h1;
-    H.iter aux2 h2;
-    h
-
-  include H
-
-end
-
-module CallstackH = HExt(Callstack.Hashtbl)
-module StmtH = HExt(Stmt.Hashtbl)
-module KfH = HExt(Kernel_function.Hashtbl)
-module PropertyH = HExt(Property.Hashtbl)
-module AlarmsStmtH = HExt(AlarmsStmt.Hashtbl)
-
-
-let change_callstacks f results =
-  let change_callstack h =
-    let fkey cs _ = f cs in
-    CallstackH.map ~fkey h
-  in
-  let fvalue _key hcs = change_callstack hcs in
-  let change_states h = StmtH.map ~fvalue h in
-  let change_kf h = KfH.map ~fvalue h in
-  { results with
-    before_states = change_states results.before_states;
-    after_states = change_states results.after_states;
-    kf_initial_states = change_kf results.kf_initial_states
-  }
-
-let merge r1 r2 =
-  let merge_cs _ = CallstackH.merge (fun _ -> Cvalue.Model.join) in
-  (* Keep the "most informative" status. This is not what we do usually,
-     because here False + Unknown = False, instead of Unknown *)
-  let merge_statuses _ s1 s2 =
-    let open Property_status in
-    match s1, s2 with
-    | False_and_reachable, _ | _, False_and_reachable -> False_and_reachable
-    | False_if_reachable, _ | _, False_if_reachable -> False_if_reachable
-    | Dont_know, _ | _, Dont_know -> Dont_know
-    | True, True -> True
-  in
-  let merge_s_cs = StmtH.merge merge_cs in
-  let main = match r1.main, r2.main with
-    | None, _ | _, None -> None
-    | Some kf1, Some kf2 ->
-      if Kernel_function.equal kf1 kf2 then Some kf1 else None
-  in
-  let before_states = merge_s_cs r1.before_states r2.before_states in
-  let after_states = merge_s_cs r1.after_states r2.after_states in
-  let kf_initial_states =
-    KfH.merge merge_cs r1.kf_initial_states r2.kf_initial_states
-  in
-  let kf_callers = Function_calls.merge_results r1.kf_callers r2.kf_callers in
-  let alarms = AlarmsStmtH.merge merge_statuses r1.alarms r2.alarms in
-  let statuses = PropertyH.merge merge_statuses r1.statuses r2.statuses in
-  let initial_state =
-    Lattice_bounds.Bottom.join Cvalue.Model.join r1.initial_state r2.initial_state
-  in
-  let initial_args =
-    match main, r1.initial_args, r2.initial_args with
-    | None, _, _ | _, None, _ | _, _, None -> None
-    | Some _kf, Some args1, Some args2 ->
-      (* same number of arguments : arity of [_kf] *)
-      try Some (List.map2 Cvalue.V.join args1 args2)
-      with Invalid_argument _ -> None (* should not occur *)
-  in
-  { main; before_states; after_states; kf_initial_states;
-    initial_state; initial_args; alarms; statuses; kf_callers }
 
 let eval_tlval_as_location ?result state term =
   let env = Eval_terms.env_post_f ~pre:state ~post:state ~result () in
