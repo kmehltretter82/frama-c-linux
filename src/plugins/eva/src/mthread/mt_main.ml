@@ -71,9 +71,8 @@ let hook_builtins =
 
 let ref_analysis = ref None
 
-(* Perform an entire mthread execution, based on the ast and options of the
-   given project *)
-let mthread_run project =
+(* Perform an entire mthread execution on the current project *)
+let mthread_run () =
   Mt_self.warning
     "Mthread is an experimental plugin and is still in development.";
 
@@ -85,8 +84,6 @@ let mthread_run project =
       Mt_options.ConcatDotFilesTo.option_name
       Mt_options.ExtractModels.option_name;
 
-  let old_project = Project.current () in
-  Project.set_current project;
   let hook_builtins = Lazy.force hook_builtins in
 
   Mt_self.feedback "******* Starting mthread";
@@ -136,7 +133,6 @@ let mthread_run project =
   let cleanup () =
     Mt_summary.compute analysis;
     hook_builtins None;
-    Project.set_current old_project;
   in
 
   try
@@ -187,7 +183,7 @@ let mthread_run project =
 let compute_mthread_once, _self =
   State_builder.apply_once "mthread_compute"
     [ Ast.self (*; Kernel.MainFunction.self *) ]
-    (fun () -> mthread_run (Project.current ()))
+    (fun () -> mthread_run ())
 
 let () =
   (* Automatically add Mthread shared directory to the include path and add the
