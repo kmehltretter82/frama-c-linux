@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Kernel    [2026-02-16] Updated 'frama-c-script configure' to better match
+              the target configuration w.r.t. Frama-C's libc.
 -   Kernel    [2026-02-11] Natively support bool keywords for C23
 o   Ivette    [2026-02-09] Upgrade to node 24 and electron 40.
 -*  Kernel    [2026-01-23] Fixes issue in string literal management (#@2755)
