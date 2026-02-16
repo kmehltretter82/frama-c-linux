@@ -66,6 +66,7 @@ end
 module Location: sig
   include S_with_collections_pretty with type t = location
   val unknown: t
+  val is_unknown : t -> bool
   val pretty_long : t Pretty_utils.formatter
 
   (** Pretty the location under the form [file <f>, line <l>], without
