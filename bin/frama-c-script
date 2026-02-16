@@ -18,16 +18,18 @@ usage() {
 #   echo "      NOTE: the tool used to produce such files (blug)"
 #   echo "            is not yet publicly available."
 #   echo ""
-   echo "  - configure machdep"
-   echo "      Runs an existing configure script to only consider files"
-   echo "      in Frama-C's libc; this will hopefully disable non-essential"
-   echo "      and non-POSIX external libraries."
-   echo "      (run 'frama-c -machdep help' to get the list of machdeps)."
+   echo "  - configure [--machdep=<mach>] [args]"
+   echo "      Runs an existing configure script with Frama-C's libc having"
+   echo "      higher priority than the system's libc. This helps disable"
+   echo "      some non-POSIX parsing features that Frama-C does not support."
+   echo "      The optional --machdep parameter allows setting the machdep"
+   echo "      (run 'frama-c -machdep help' to get the list of machdeps, or run"
+   echo "      'frama-c-script make-machdep [opts]' to generate a custom one)."
    echo ""
    echo "  - creduce [[file] args]"
    echo "      Uses the external tool C-Reduce to minimize C files when"
    echo "      debugging crashes and fatal errors."
-   echo "      Run 'frama-c-script c-reduce' without arguments for more details."
+   echo "      Run 'frama-c-script creduce' without arguments for more details."
    echo ""
    echo "  - estimate-difficulty file..."
    echo "      Applies several heuristics to try and estimate the difficulty"
@@ -186,14 +188,41 @@ EOF
     fi
 }
 
+# runs `./configure [options]` with a specially wrapper compiler in order
+# to "fool" the script into disabling unsupported features for Frama-C,
+# e.g., non-POSIX syntactic extensions.
+# This is done by including Frama-C's headers before the system's.
+# Note that we cannot simply run `CPPFLAGS=-I<frama-c headers> ./configure`
+# because then the configure will propagate that value into the generated
+# Makefiles, breaking compilation.
 configure_for_frama_c() {
-    if [ "$#" -eq 0 ]; then
-        echo "error: 'configure' command requires a machdep";
+    if [ ! -f configure ]; then
+        echo "error: no configure file found in current directory."
         exit 1
     fi
-    MACHDEP=${1^^} # to uppercase
-    shift
-    CPP="gcc -E -nostdinc -fno-builtin -I${FRAMAC_SHARE}/libc -D__FC_MACHDEP_${MACHDEP}" ./configure "$@"
+    if [[ "$#" -gt 0 && "$1" =~ ^--machdep=(.*) ]]; then
+        machdep="${BASH_REMATCH[1]}]"
+        shift
+    else
+        machdep=x86_64
+    fi
+    fc_machdep_dir=$(mktemp -d "${TMPDIR:-/tmp/}__fc_script_configure_machdepXXXXXX.dir")
+    "${DIR}/frama-c" -machdep "$machdep" -print-machdep-header > "$fc_machdep_dir/__fc_machdep.h"
+    "${DIR}/frama-c" -machdep "$machdep" -print-machdep-builtin-macros > "$fc_machdep_dir/__fc_builtin_macros.h"
+    mkdir -p "$fc_machdep_dir/wrappers"
+    for p in cc gcc clang; do
+        cat > "$fc_machdep_dir/wrappers/$p" <<EOF
+#!/bin/bash -eu
+SCRIPT_DIR=\$( cd -- "\$( dirname -- "\${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+path_without_pwd=\$(echo \$PATH | sed "s|\$SCRIPT_DIR:||")
+PATH=\$path_without_pwd $p -I$fc_machdep_dir -I${FRAMAC_SHARE}/libc "\$@"
+EOF
+        chmod +x "$fc_machdep_dir/wrappers/$p"
+    done
+    set +e
+    PATH=$fc_machdep_dir/wrappers:$PATH ./configure "$@"
+    set -e
+    rm -rf "$fc_machdep_dir"
 }
 
 case "$command" in
