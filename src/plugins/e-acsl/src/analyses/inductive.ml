@@ -27,7 +27,7 @@ include struct (* auxiliary functions *)
       method! vlogic_info_use li =
         if Logic_var.equal lv_rec li.l_var_info
         then raise Found
-        else DoChildren
+        else Cil.DoChildren
     end in
     try
       ignore @@ Visitor.visitFramacPredicate li_use_finder p;
@@ -41,16 +41,16 @@ include struct (* auxiliary functions *)
 
     method! vlogic_info_use this_li =
       match li_subst with
-      | Some (li, li') when Logic_info.equal this_li li -> ChangeTo li'
-      | Some _ | None -> DoChildren
+      | Some (li, li') when Logic_info.equal this_li li -> Cil.ChangeTo li'
+      | Some _ | None -> Cil.DoChildren
 
     method !vterm = function
       | {term_node = TLval (TVar v, TNoOffset); term_loc} ->
         (try
            let t = Logic_var.Map.find v substs in
-           ChangeTo {t with term_loc} (* copy *)
-         with Not_found -> DoChildren)
-      | _ -> DoChildren
+           Cil.ChangeTo {t with term_loc} (* copy *)
+         with Not_found -> Cil.DoChildren)
+      | _ -> Cil.DoChildren
   end
 
   let rec extract_foralls = function

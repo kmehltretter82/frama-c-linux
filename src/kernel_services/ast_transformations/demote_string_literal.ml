@@ -66,7 +66,7 @@ class demote vi =
         when Cil_datatype.Varinfo.equal vi src ->
         let new_init = mk_array_init loc dest src in
         Ast.mark_as_changed();
-        ChangeTo [Local_init(dest,AssignInit new_init,loc)]
+        Cil.ChangeTo [Local_init(dest,AssignInit new_init,loc)]
       | _ -> Cil.SkipChildren
   end
 

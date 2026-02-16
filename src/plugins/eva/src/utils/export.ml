@@ -161,7 +161,7 @@ class collector =
 
     method private add : 'a. lval -> 'a Cil.visitAction =
       fun lv ->
-      if Lvs.mem lv marked then SkipChildren else
+      if Lvs.mem lv marked then Cil.SkipChildren else
         begin
           marked <- Lvs.add lv marked ;
           DoChildrenPost(fun r -> collected <- lv :: collected ; r)
@@ -173,7 +173,7 @@ class collector =
     method! vterm_lval lv =
       begin
         match Logic_to_c.term_lval_to_lval lv with
-        | exception Logic_to_c.No_conversion -> DoChildren
+        | exception Logic_to_c.No_conversion -> Cil.DoChildren
         | lv -> self#add lv
       end
 
@@ -241,8 +241,8 @@ let generator () : visitor =
     inherit Visitor.frama_c_inplace
     val mutable dead = Stmts.empty (* annotated as dead *)
 
-    method! vlval _ = SkipChildren
-    method! vexpr _ = SkipChildren
+    method! vlval _ = Cil.SkipChildren
+    method! vexpr _ = Cil.SkipChildren
 
     method !vstmt_aux stmt =
       match self#current_kf with
@@ -263,8 +263,8 @@ let generator () : visitor =
               ) stmt ;
           end ;
         if is_dead stmt
-        then ( dead <- Stmts.add stmt dead ; SkipChildren )
-        else DoChildren
+        then ( dead <- Stmts.add stmt dead ; Cil.SkipChildren )
+        else Cil.DoChildren
 
   end
 
@@ -276,8 +276,8 @@ let cleaner () : visitor =
   object(self)
     inherit Visitor.frama_c_inplace
 
-    method! vlval _ = SkipChildren
-    method! vexpr _ = SkipChildren
+    method! vlval _ = Cil.SkipChildren
+    method! vexpr _ = Cil.SkipChildren
 
     method !vstmt_aux stmt =
       match self#current_kf with
@@ -288,7 +288,7 @@ let cleaner () : visitor =
              if Emitter.equal e emitter then
                Annotations.remove_code_annot e ~kf stmt ca
           ) stmt ;
-        DoChildren
+        Cil.DoChildren
 
   end
 
