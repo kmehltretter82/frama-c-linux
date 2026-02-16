@@ -320,8 +320,8 @@ let add_builtin_if_active b =
   if is_machdep_active b.compiler then begin
     Kernel.feedback ~dkey:Kernel.dkey_builtins
       "adding builtin: %a %s(%a%s)"
-      Cil_datatype.Typ.pretty (Option.get b.rettype) b.name
-      (Pretty_utils.pp_list ~sep:", " Cil_datatype.Typ.pretty)
+      !Cil.pp_typ_ref (Option.get b.rettype) b.name
+      (Pretty_utils.pp_list ~sep:", " !Cil.pp_typ_ref)
       (List.map (Option.get ?exn:None) b.args)
       (if b.variadic then ", ..." else "")
     ;

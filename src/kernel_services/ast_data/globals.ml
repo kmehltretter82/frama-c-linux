@@ -305,12 +305,12 @@ module Functions = struct
     | Definition (n, l) ->
       Kernel.debug ~dkey:Kernel.dkey_globals
         "@[<hov 2>Register definition %a with specification@. \"%a\"@]"
-        Varinfo.pretty n.svar Cil_printer.pp_funspec n.sspec ;
+        Cil_printer.pp_varinfo n.svar Cil_printer.pp_funspec n.sspec ;
       replace_by_definition n.sspec n l;
     | Declaration (spec, v,_,l) ->
       Kernel.debug ~dkey:Kernel.dkey_globals
         "@[<hov 2>Register declaration %a with specification@ \"%a\"@]"
-        Varinfo.pretty v Cil_printer.pp_funspec spec;
+        Cil_printer.pp_varinfo v Cil_printer.pp_funspec spec;
       replace_by_declaration spec v l
 
   let iter f = Iterator.iter (fun v -> f (State.find v))
