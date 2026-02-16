@@ -61,8 +61,9 @@ module ToDiskPrefix =
     (struct
       let option_name = "-mt-projects-on-disk-prefix"
       let arg_name = "prefix"
-      let default = "th"
-      let help = "Prepend <prefix> to the project's filename saved by -mt-projects-on-disk (defaults to th)"
+      let default = "mthread_"
+      let help = "Prepend <prefix> to the project's filename saved by \
+                  -mt-projects-on-disk (defaults to mthread_)"
     end)
 
 
