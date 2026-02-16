@@ -161,6 +161,7 @@ let get_results () =
 let set_results results =
   let selection = State_selection.with_dependencies Self.state in
   Project.clear ~selection ();
+  Parameters.change_correctness ();
   (* Those two functions may clear Self.state. Start by them *)
   (* Initial state *)
   Cvalue_results.register_global_state true results.initial_state;
