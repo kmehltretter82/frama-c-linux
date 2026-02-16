@@ -13,7 +13,6 @@
 [mt] late_start.c:33: New thread: job2, fun f2, parent <main>, args {0}
 [mt] Start thread job2
 [mt] *** First value analysis for main thread done.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
@@ -35,7 +34,6 @@
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread job2
 [mt] late_start.c:27: Start thread job1
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   job1: read by job2 at late_start.c:27 <- f2
@@ -67,7 +65,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread job1
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed

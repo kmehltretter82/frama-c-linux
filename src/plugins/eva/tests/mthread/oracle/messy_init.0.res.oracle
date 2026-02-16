@@ -20,7 +20,6 @@
 [mt] messy_init.c:22: Thread job, fun fjob, parent <main>, args {0}
 [mt] messy_init.c:22: New context for job, fun fjob, parent <main>, args {0}
 [mt] *** First value analysis for main thread done.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
@@ -45,7 +44,6 @@
   Trying to lock mutex lock, but unable to check its precise status (internal value {0; 1} should be 1).
 [mt] messy_init.c:10: Lock lock
 [eva] FRAMAC_SHARE/mt/mthread_pthread.c:46: Warning: Not a valid mutex id '0'.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   lock:

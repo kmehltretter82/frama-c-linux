@@ -14,7 +14,6 @@
 [mt] assigns.c:31: New thread: jobs2, fun f2, parent <main>, args {0}
 [mt] assigns.c:31: Start thread jobs2
 [mt] *** First value analysis for main thread done.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs1:
@@ -41,7 +40,6 @@
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread jobs1
 [eva] using specification for function g1
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: write by jobs1 at assigns.c:20 <- f1
@@ -63,7 +61,6 @@
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread jobs2
 [eva] using specification for function g2
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: read by jobs2 at assigns.c:25 <- f2
@@ -101,7 +98,6 @@
 [mt] Thread <main>, fun main
 [mt] assigns.c:30: Thread jobs1, fun f1, parent <main>, args {0}
 [mt] assigns.c:31: Thread jobs2, fun f2, parent <main>, args {0}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs1:
@@ -126,7 +122,6 @@
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
 [eva:interferences] assigns.c:20: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: write by jobs1 at assigns.c:20 <- f1
@@ -154,7 +149,6 @@
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
 [eva:interferences] assigns.c:25: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: read by jobs2 at assigns.c:25 <- f2
@@ -215,7 +209,6 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [mt] assigns.c:31: New context for jobs2, fun f2, parent <main>, args {0}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs1:
@@ -239,7 +232,6 @@
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: write by jobs1 at assigns.c:20 <- f1
@@ -267,7 +259,6 @@
 [mt] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: read by jobs2 at assigns.c:25 <- f2
@@ -320,7 +311,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs1:

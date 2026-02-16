@@ -35,7 +35,6 @@
 [mt] matrix.c:54: Lock locks[4]
 [mt] matrix.c:59: Release locks[4]
 [mt] *** First value analysis for main thread done.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]: read by <main> at matrix.c:58 <- main
@@ -184,7 +183,6 @@
   See -generated-spec-* options for more info.
 [eva] using specification for function f
 [mt] matrix.c:29: Release locks[0]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]:
@@ -224,7 +222,6 @@
 [eva:show] matrix.c:21: Frama_C_show_each: {1}
 [mt] matrix.c:24: Lock locks[1]
 [mt] matrix.c:29: Release locks[1]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[1][0..99]:
@@ -264,7 +261,6 @@
 [eva:show] matrix.c:21: Frama_C_show_each: {2}
 [mt] matrix.c:24: Lock locks[2]
 [mt] matrix.c:29: Release locks[2]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[2][0..99]:
@@ -304,7 +300,6 @@
 [eva:show] matrix.c:21: Frama_C_show_each: {3}
 [mt] matrix.c:24: Lock locks[3]
 [mt] matrix.c:29: Release locks[3]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[3][0..99]:
@@ -344,7 +339,6 @@
 [eva:show] matrix.c:21: Frama_C_show_each: {4}
 [mt] matrix.c:24: Lock locks[4]
 [mt] matrix.c:29: Release locks[4]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[4][0..99]:
@@ -401,7 +395,6 @@
 [mt] matrix.c:45: Thread jobs[2], fun job, parent <main>, args {2}
 [mt] matrix.c:45: Thread jobs[3], fun job, parent <main>, args {3}
 [mt] matrix.c:45: Thread jobs[4], fun job, parent <main>, args {4}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]: read by <main> at matrix.c:58 <- main
@@ -548,7 +541,6 @@
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {0}
 [eva:interferences] matrix.c:28: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]:
@@ -689,7 +681,6 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {1}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[1][0..99]:
@@ -830,7 +821,6 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {2}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[2][0..99]:
@@ -971,7 +961,6 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {3}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[3][0..99]:
@@ -1112,7 +1101,6 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {4}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[4][0..99]:
@@ -1455,7 +1443,6 @@
 [mt] matrix.c:45: New context for jobs[3], fun job, parent <main>, args {3}
 [mt] matrix.c:45: New context for jobs[4], fun job, parent <main>, args {4}
 [eva:interferences] matrix.c:58: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]: read by <main> at matrix.c:58 <- main
@@ -1602,7 +1589,6 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {0}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]:
@@ -1660,7 +1646,6 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {1}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[1][0..99]:
@@ -1718,7 +1703,6 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {2}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[2][0..99]:
@@ -1776,7 +1760,6 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {3}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[3][0..99]:
@@ -1834,7 +1817,6 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {4}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[4][0..99]:
@@ -2130,7 +2112,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]: read by <main> at matrix.c:58 <- main
@@ -2275,7 +2256,6 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {0}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[0][0..99]:
@@ -2331,7 +2311,6 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {1}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[1][0..99]:
@@ -2387,7 +2366,6 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:show] matrix.c:21: Frama_C_show_each: {2}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   matrix[2][0..99]:

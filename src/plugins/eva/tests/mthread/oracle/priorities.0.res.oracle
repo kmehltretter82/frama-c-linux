@@ -25,7 +25,6 @@
 [mt] priorities.c:66: Release m1
 [mt] priorities.c:67: Release m2
 [mt] *** First value analysis for main thread done.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: write by <main> at priorities.c:64 <- main
@@ -72,7 +71,6 @@
 [mt] Setting priority to 0
 [mt] priorities.c:22: Lock m1
 [mt] priorities.c:24: Release m1
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: read by jobs1 at priorities.c:23 <- f1
@@ -99,7 +97,6 @@
   inject threads interferences at the start of f2 for thread jobs2
 [mt] priorities.c:30: Lock m2
 [mt] priorities.c:31: Release m2
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   m2:
@@ -123,7 +120,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f3 for thread jobs3
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs3 at priorities.c:37 <- f3
@@ -145,7 +141,6 @@
   inject threads interferences at the start of f4 for thread jobs4
 [mt] priorities.c:44: Lock m2
 [mt] priorities.c:46: Release m2
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs4 at priorities.c:45 <- f4
@@ -189,7 +184,6 @@
 [mt] priorities.c:56: Thread jobs2, fun f2, parent <main>, args {0}
 [mt] priorities.c:57: Thread jobs3, fun f3, parent <main>, args {0}
 [mt] priorities.c:58: Thread jobs4, fun f4, parent <main>, args {0}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: write by <main> at priorities.c:64 <- main
@@ -239,7 +233,6 @@
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
 [eva:interferences] priorities.c:23: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: read by jobs1 at priorities.c:23 <- f1
@@ -263,7 +256,6 @@
 [mt] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   m2:
@@ -287,7 +279,6 @@
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
 [eva:interferences] priorities.c:37: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs3 at priorities.c:37 <- f3
@@ -314,7 +305,6 @@
 [eva] Analyzing a complete application starting at f4
 [eva] Initial state supplied by user
 [eva:interferences] priorities.c:45: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs4 at priorities.c:45 <- f4
@@ -386,7 +376,6 @@
 [mt] priorities.c:58: New context for jobs4, fun f4, parent <main>, args {0}
 [eva:interferences] priorities.c:64: inject threads interferences at this point
 [eva:interferences] priorities.c:65: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: write by <main> at priorities.c:64 <- main
@@ -435,7 +424,6 @@
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: read by jobs1 at priorities.c:23 <- f1
@@ -459,7 +447,6 @@
 [mt] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   m2:
@@ -482,7 +469,6 @@
 [mt] * Computing value analysis for thread jobs3
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs3 at priorities.c:37 <- f3
@@ -508,7 +494,6 @@
 [mt] * Computing value analysis for thread jobs4
 [eva] Analyzing a complete application starting at f4
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs4 at priorities.c:45 <- f4
@@ -569,7 +554,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: write by <main> at priorities.c:64 <- main
@@ -617,7 +601,6 @@
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: read by jobs1 at priorities.c:23 <- f1
@@ -640,7 +623,6 @@
 [mt] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   m2:
@@ -662,7 +644,6 @@
 [mt] * Computing value analysis for thread jobs3
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs3 at priorities.c:37 <- f3

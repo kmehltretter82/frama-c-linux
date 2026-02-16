@@ -29,7 +29,6 @@
   Receiving message on queue, max size 2, stored in &end.
   No value to receive (yet?).
 [mt] *** First value analysis for main thread done.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs[0..4]:
@@ -64,7 +63,6 @@
                                     [1] ∈ UNINITIALIZED
 [mt] philo.c:46: Release locks[1]
 [mt] philo.c:47: Release locks[4]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[0] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -99,7 +97,6 @@
 [mt] philo.c:39: Lock locks[2]
 [mt] philo.c:46: Release locks[2]
 [mt] philo.c:47: Release locks[0]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -135,7 +132,6 @@
                                     [1] ∈ UNINITIALIZED
 [mt] philo.c:46: Release locks[3]
 [mt] philo.c:47: Release locks[1]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[2] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -173,7 +169,6 @@
                                     [1] ∈ UNINITIALIZED
 [mt] philo.c:46: Release locks[4]
 [mt] philo.c:47: Release locks[2]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[3] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -211,7 +206,6 @@
                                     [1] ∈ UNINITIALIZED
 [mt] philo.c:46: Release locks[0]
 [mt] philo.c:47: Release locks[3]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[4] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -268,7 +262,6 @@
                        [1] ∈ UNINITIALIZED
   From thread jobs[4]: [0] ∈ {5}
                        [1] ∈ UNINITIALIZED
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: read by <main> at philo.c:72 <- main
@@ -306,7 +299,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: read by <main> at philo.c:72 <- main
@@ -330,7 +322,6 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] philo.c:43: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[0] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -365,7 +356,6 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -393,7 +383,6 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[2] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -428,7 +417,6 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[3] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -463,7 +451,6 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[4] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -540,7 +527,6 @@
 [mt] philo.c:70: New context for jobs[3], fun job, parent <main>, args {3}
 [mt] philo.c:70: New context for jobs[4], fun job, parent <main>, args {4}
 [eva:interferences] philo.c:72: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: read by <main> at philo.c:72 <- main
@@ -562,7 +548,6 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[0] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -597,7 +582,6 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -625,7 +609,6 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[2] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -660,7 +643,6 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[3] at philo.c:43 <- aux :: philo.c:56 <- job
@@ -695,7 +677,6 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: write by jobs[4] at philo.c:43 <- aux :: philo.c:56 <- job

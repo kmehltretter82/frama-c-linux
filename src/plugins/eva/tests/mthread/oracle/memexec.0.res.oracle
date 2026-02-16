@@ -12,7 +12,6 @@
 [mt] memexec.c:32: New thread: th1, fun t1, parent <main>, args {0}
 [mt] memexec.c:32: Start thread th1
 [mt] *** First value analysis for main thread done.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: read by <main> at memexec.c:33 <- main
@@ -34,7 +33,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of t1 for thread th1
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   v:
@@ -76,7 +74,6 @@
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] memexec.c:32: Thread th1, fun t1, parent <main>, args {0}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: read by <main> at memexec.c:33 <- main
@@ -98,7 +95,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] memexec.c:14: inject threads interferences at this point
 [eva:interferences] memexec.c:10: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   v:
@@ -186,7 +182,6 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:interferences] memexec.c:33: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: read by <main> at memexec.c:33 <- main

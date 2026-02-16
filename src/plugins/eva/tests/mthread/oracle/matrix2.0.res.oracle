@@ -51,7 +51,6 @@
   assert \pointer_comparable((void *)pj_unfold_8, (void *)(&matrix[150]));
 [mt] matrix2.c:58: Release locks[4]
 [mt] *** First value analysis for main thread done.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -125,7 +124,6 @@
   assigns. See -generated-spec-* options for more info.
 [eva] using specification for function compute
 [mt] matrix2.c:34: Release locks[0]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -156,7 +154,6 @@
   inject threads interferences at the start of job for thread jobs[1]
 [mt] matrix2.c:31: Lock locks[1]
 [mt] matrix2.c:34: Release locks[1]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[1]:
@@ -187,7 +184,6 @@
   inject threads interferences at the start of job for thread jobs[2]
 [mt] matrix2.c:31: Lock locks[2]
 [mt] matrix2.c:34: Release locks[2]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[2]:
@@ -218,7 +214,6 @@
   inject threads interferences at the start of job for thread jobs[3]
 [mt] matrix2.c:31: Lock locks[3]
 [mt] matrix2.c:34: Release locks[3]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[3]:
@@ -249,7 +244,6 @@
   inject threads interferences at the start of job for thread jobs[4]
 [mt] matrix2.c:31: Lock locks[4]
 [mt] matrix2.c:34: Release locks[4]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[4]:
@@ -298,7 +292,6 @@
 [mt] matrix2.c:46: Thread jobs[2], fun job, parent <main>, args {2}
 [mt] matrix2.c:46: Thread jobs[3], fun job, parent <main>, args {3}
 [mt] matrix2.c:46: Thread jobs[4], fun job, parent <main>, args {4}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -365,7 +358,6 @@
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
 [eva:interferences] matrix2.c:33: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -518,7 +510,6 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[1]:
@@ -671,7 +662,6 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[2]:
@@ -824,7 +814,6 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[3]:
@@ -977,7 +966,6 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[4]:
@@ -1755,7 +1743,6 @@
   signed overflow. assert -2147483648 ≤ sum + *pj_unfold_8;
 [eva:alarm] matrix2.c:55: Warning: 
   signed overflow. assert sum + *pj_unfold_8 ≤ 2147483647;
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -1821,7 +1808,6 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -1855,7 +1841,6 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[1]:
@@ -1889,7 +1874,6 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[2]:
@@ -1923,7 +1907,6 @@
 [mt] * Computing value analysis for thread jobs[3]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[3]:
@@ -1957,7 +1940,6 @@
 [mt] * Computing value analysis for thread jobs[4]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[4]:
@@ -2385,7 +2367,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -2450,7 +2431,6 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0]:
@@ -2482,7 +2462,6 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[1]:
@@ -2514,7 +2493,6 @@
 [mt] * Computing value analysis for thread jobs[2]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[2]:

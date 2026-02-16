@@ -17,7 +17,6 @@
 [mt] simple.c:49: Lock lock
 [mt] simple.c:51: Release lock
 [mt] *** First value analysis for main thread done.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: read by <main> at simple.c:50 <- main
@@ -55,7 +54,6 @@
 [mt] simple.c:22: Lock lock
 [eva] using specification for function g1
 [mt] simple.c:27: Release lock
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: write by job1 at simple.c:23 <- f1
@@ -87,7 +85,6 @@
 [mt] simple.c:33: Lock lock
 [eva] using specification for function g2
 [mt] simple.c:38: Release lock
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: write by job2 at simple.c:35 <- f2
@@ -133,7 +130,6 @@
 [mt] Thread <main>, fun main
 [mt] simple.c:46: Thread job1, fun f1, parent <main>, args {{ &b }}
 [mt] simple.c:47: Thread job2, fun f2, parent <main>, args {{ &a }}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: read by <main> at simple.c:50 <- main
@@ -170,7 +166,6 @@
 [eva:interferences] simple.c:24: inject threads interferences at this point
 [eva:interferences] simple.c:25: inject threads interferences at this point
 [eva:interferences] simple.c:26: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: write by job1 at simple.c:23 <- f1
@@ -231,7 +226,6 @@
 [eva:interferences] simple.c:35: inject threads interferences at this point
 [eva:interferences] simple.c:36: inject threads interferences at this point
 [eva:interferences] simple.c:37: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: write by job2 at simple.c:35 <- f2
@@ -357,7 +351,6 @@
 [eva] Initial state supplied by user
 [mt] simple.c:47: New context for job2, fun f2, parent <main>, args {{ &a }}
 [eva:interferences] simple.c:50: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: read by <main> at simple.c:50 <- main
@@ -389,7 +382,6 @@
 [mt] * Computing value analysis for thread job1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: write by job1 at simple.c:23 <- f1
@@ -446,7 +438,6 @@
 [mt] * Computing value analysis for thread job2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: write by job2 at simple.c:35 <- f2
@@ -557,7 +548,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   a: read by <main> at simple.c:50 <- main

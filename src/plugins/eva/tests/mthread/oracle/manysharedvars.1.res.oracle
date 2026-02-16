@@ -15,7 +15,6 @@
 [mt] manysharedvars.c:46: Lock lock
 [mt] manysharedvars.c:49: Release lock
 [mt] *** First value analysis for main thread done.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
@@ -87,7 +86,6 @@
   inject threads interferences at the start of f for thread jobs
 [mt] manysharedvars.c:28: Lock lock
 [mt] manysharedvars.c:31: Release lock
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
@@ -175,7 +173,6 @@
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] manysharedvars.c:43: Thread jobs, fun f, parent <main>, args {0}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
@@ -247,7 +244,6 @@
   inject threads interferences at this point
 [eva:interferences] manysharedvars.c:30: 
   inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
@@ -2247,7 +2243,6 @@
   inject threads interferences at this point
 [eva:interferences] manysharedvars.c:48: 
   inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
