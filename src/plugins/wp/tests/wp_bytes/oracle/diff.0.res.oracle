@@ -8,14 +8,14 @@
   Function f
 ------------------------------------------------------------
 
-Goal Post-condition (file diff.c, line 11) in 'f':
+Goal Post-condition (file diff.c, line 12) in 'f':
 Let x = i - j. Assume { Type: is_sint32(i) /\ is_sint32(j). Probe DIFF = x. }
 Prove: (j + to_sint32(x)) = i.
 
 ------------------------------------------------------------
 
 Goal Assigns nothing in 'f':
-Effect at line 19
+Effect at line 20
 Prove: true.
 
 ------------------------------------------------------------

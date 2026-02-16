@@ -4,7 +4,8 @@
 */
 
 /* run.config_qualif
-   DONTRUN:
+   OPT: -wp-model typed
+   OPT: -wp-model bytes
 */
 
 /*@
