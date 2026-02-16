@@ -24,50 +24,38 @@ let () = Cvalue_callbacks.register_call_hook
 let () = Cvalue_callbacks.register_call_results_hook
     (fun args -> !ref_hook_end_function args)
 
+(* Conversion from the simplified type of an mthread function into one suitable
+   as a hook *)
+let wrap_builtin analysis builtin = fun state args ->
+  let state, res =
+    try builtin analysis state args
+    with Mt_analysis_hooks.Hook_failure res ->
+      state, Some (Mt_memory.int_to_value res)
+  in
+  Builtins.Full
+    { c_values = [res, state];
+      c_clobbered = Base.SetLattice.bottom;
+      c_assigns = None;
+    }
 
-let hook_builtins =
-  lazy (
-    (* a generic function that does nothing *)
-    let nop st _args = st, None in
+let register_hooks analysis =
+  ref_hook_call_function :=
+    Mt_analysis_hooks.catch_functions_calls analysis;
+  ref_hook_end_function :=
+    Mt_analysis_hooks.catch_functions_record analysis;
+  let register (name, builtin) =
+    wrap_builtin analysis builtin
+    |> Builtins.register_builtin name NoCacheCallers
+  in
+  List.iter register Mt_analysis_hooks.mthread_builtins
 
-    (* We create a reference for each of our builtin functions *)
-    let lref = List.map (fun e -> (ref nop, e)) Mt_analysis_hooks.mthread_builtins in
-
-    (* We register one hook by function, that simply dereferences the
-       corresponding reference (up to some interface conversion) *)
-    List.iter (fun (r, (s, _)) ->
-        (* Conversion from the simplified type of an mthread function
-           into one suitable as a hook *)
-        Builtins.register_builtin s NoCacheCallers
-          (fun st args ->
-             let st, res =
-               try !r st args
-               with Mt_analysis_hooks.Hook_failure res ->
-                 st, Some (Mt_memory.int_to_value res)
-             in
-             Builtins.Full
-               { c_values = [res, st];
-                 c_clobbered = Base.SetLattice.bottom;
-                 c_assigns = None;
-               }
-          )) lref;
-
-    (* And finally, we return a function that sets all the references either
-       to nop, or to the suitable hook function *)
-    (function
-      | None -> (* Disable the hook *)
-        List.iter (fun (r, _) -> r := nop) lref;
-        ref_hook_call_function := no_hook;
-        ref_hook_end_function := no_hook;
-
-      | Some analysis ->
-        List.iter (fun (r, (_s, f)) -> r:= f analysis) lref;
-        ref_hook_call_function :=
-          Mt_analysis_hooks.catch_functions_calls analysis;
-        ref_hook_end_function :=
-          Mt_analysis_hooks.catch_functions_record analysis;
-    )
-  )
+let unregister_hooks () =
+  ref_hook_call_function := no_hook;
+  ref_hook_end_function := no_hook;
+  let unregister (name, _builtin) =
+    Builtins.unregister_builtin name
+  in
+  List.iter unregister Mt_analysis_hooks.mthread_builtins
 
 (* Perform an entire mthread execution on the current project *)
 let mthread_run () =
@@ -81,8 +69,6 @@ let mthread_run () =
     Mt_self.error "Option %S needs option \"%s html\" to work."
       Mt_options.ConcatDotFilesTo.option_name
       Mt_options.ExtractModels.option_name;
-
-  let hook_builtins = Lazy.force hook_builtins in
 
   Mt_self.feedback "******* Starting mthread";
 
@@ -111,13 +97,7 @@ let mthread_run () =
   } in
 
   (* We register our callback function *)
-  hook_builtins (Some analysis);
-
-  (* Cleanup function, called at the end or in case of failure or success. *)
-  let cleanup () =
-    Mt_summary.compute analysis;
-    hook_builtins None;
-  in
+  register_hooks analysis;
 
   try
     (* We analyse the main thread *)
@@ -158,9 +138,12 @@ let mthread_run () =
            (String.capitalize_ascii s);
       );
 
-    cleanup ();
+    Mt_summary.compute analysis;
+    unregister_hooks ();
 
-  with e -> cleanup (); raise e
+  with e ->
+    unregister_hooks ();
+    raise e
 
 
 let compute_mthread_once, _self =
