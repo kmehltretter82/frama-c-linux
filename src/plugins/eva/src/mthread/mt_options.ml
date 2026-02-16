@@ -10,7 +10,6 @@ open Mt_self
 
 let grp_models = add_group "Extraction of models"
 let grp_cfg = add_group "Multithreaded control-flow-graph"
-(*let grp_misc = add_group "Misc"*)
 let grp_analysis = add_group "Analysis"
 
 module Enabled =
@@ -54,7 +53,6 @@ module IgnoreNull =
   end)
 ;;
 
-
 let () = Parameter_customize.set_group grp_debug
 module ToDiskPrefix =
   String
@@ -65,8 +63,6 @@ module ToDiskPrefix =
       let help = "Prepend <prefix> to the project's filename saved by \
                   -mt-projects-on-disk (defaults to mthread_)"
     end)
-
-
 
 let () = Parameter_customize.set_group grp_analysis
 module ThreadsLib =
@@ -82,8 +78,6 @@ module ThreadsLib =
         (Mt_lib.Pthreads, "pthreads");
       ]
     end)
-
-
 
 let () = Parameter_customize.set_group grp_analysis
 module WriteWriteRaces =
@@ -163,8 +157,6 @@ module OnlyThreads =
     end)
 ;;
 
-
-
 let () = Parameter_customize.set_group grp_debug
 module StopAfter =
   Int (struct
@@ -174,7 +166,6 @@ module StopAfter =
     let arg_name = "i"
   end)
 ;;
-
 
 let () = Parameter_customize.set_group grp_debug
 module ConcatDotFilesTo =
@@ -195,7 +186,6 @@ module KeepDotFiles =
       let option_name = "-mt-keep-dot-files"
       let help = "Keep dot files used to generate SVG for the html output"
     end)
-
 
 let () = Parameter_customize.set_group grp_models
 module ExtractModels =
@@ -238,3 +228,4 @@ module ShowReturnEdges =
     let help = "Show link between a call an a return instruction as a dotted line"
   end)
 ;;
+
