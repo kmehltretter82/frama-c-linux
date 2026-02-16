@@ -145,6 +145,7 @@ export interface MemoryViewProps {
   selected?: Region.node;
   label?: string;
   onSelection?: (node: Region.node | undefined) => void;
+  onModelChanged?: (dot:string) => void;
 }
 
 export function MemoryView(props: MemoryViewProps): JSX.Element {
@@ -166,6 +167,7 @@ export function MemoryView(props: MemoryViewProps): JSX.Element {
     <Dot.Diagram
       selected={selectedId}
       onSelection={onSelectionId}
+      onModelChanged={props.onModelChanged}
       nodes={nodes}
       edges={edges}
     />
