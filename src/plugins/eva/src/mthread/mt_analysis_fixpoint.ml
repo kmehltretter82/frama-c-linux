@@ -45,19 +45,6 @@ let mark_new_messages_received analysis =
 let record_end_of_thread_analysis analysis =
   let th = analysis.curr_thread in
 
-  (* We save the state of the analysis *)
-  Mt_self.feedback ~level:2
-    "* Starting to save the state of the value analysis";
-
-  if Mt_options.ToDisk.get () then begin
-    let th = ThreadState.label th |> Filepath.sanitize_filename in
-    let name = Format.sprintf "%s%s_iteration_%d.sav"
-        (Mt_options.ToDiskPrefix.get ())
-        th analysis.iteration in
-    Project.save (Filepath.of_string name);
-    Mt_self.feedback ~level:2 "* state saved";
-  end;
-
   mark_new_messages_received analysis;
 
   (* We compute the globals variables accessed by the thread *)
@@ -394,6 +381,15 @@ let reach_fixpoint analysis =
     Mt_self.feedback "***** Iteration %d" i;
     analysis.iteration <- i;
     let continue = one_iteration analysis in
+    if Mt_options.ToDisk.get () then begin
+      let filepath =
+        let prefix = Mt_options.ToDiskPrefix.get () in
+        Filepath.of_format "%siteration_%d.sav" prefix i
+      in
+      Project.save filepath;
+      Mt_self.feedback "* Saved iteration %d to file %S" i
+        (Filepath.to_string_rel filepath);
+    end;
     if continue && i < Mt_options.StopAfter.get () then aux (i+1)
     else (* Stop iteration *)
     if continue then

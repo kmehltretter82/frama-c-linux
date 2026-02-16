@@ -71,7 +71,11 @@ let of_string ?(existence=Indifferent) ?base s =
   p
 
 let of_format ?existence ?dir format =
-  Format.kasprintf (of_string ?existence ?base:dir) format
+  let to_filepath s =
+    sanitize_filename s
+    |> of_string ?existence ?base:dir
+  in
+  Format.kasprintf to_filepath format
 
 (* -------------------------------------------------------------------------- *)
 (* --- Datatype                                                           --- *)
