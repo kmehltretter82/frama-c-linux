@@ -176,7 +176,7 @@ type taint =
   (** No taint: the given memory zone cannot be modified by the attacker. *)
 
 (** Evaluates the taint of a given memory zone, according to the taint domain.
-    If [name] is provided, only consider the taint of the given name. Otherwise,
+    Only consider the taint of the given [name], if any. Otherwise,
     a memory zone is tainted as soon as it is tainted for at least one taint.
     Returns an error if the taint domain was not enabled. *)
 val is_tainted :
