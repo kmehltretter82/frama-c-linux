@@ -837,7 +837,7 @@ val mkMem: addr:exp -> off:offset -> lval
     The [Result.Error] contains an optionnal [location] to target a specific
     operand and an error message.
 
-    @before Frama-C+dev the function could raised [AbortFatal] instead of using
+    @before Frama-C+dev the function could raise [AbortFatal] instead of using
     result type. It still can raise an exception via sub-function calls. The
     parameter [?constfold] was not present and we always applied constant
     folding.
