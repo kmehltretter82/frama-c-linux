@@ -51,7 +51,3 @@ val get_results: unit -> results
 val set_results: results -> unit
 
 [@@@ api_end]
-
-val eval_tlval_as_location :
-  ?result:Cil_types.varinfo ->
-  Cvalue.Model.t ->  Cil_types.term -> Locations.location

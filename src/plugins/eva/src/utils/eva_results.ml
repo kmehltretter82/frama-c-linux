@@ -212,10 +212,4 @@ let set_results results =
   Cvalue_domain.State.Store.register_global_state b
     (`Value Cvalue_domain.State.top);
   Self.ComputationState.set Computed;
-  Cvalue_results.mark_as_computed ();
-;;
-
-let eval_tlval_as_location ?result state term =
-  let env = Eval_terms.env_post_f ~pre:state ~post:state ~result () in
-  try Eval_terms.eval_tlval_as_location ~alarm_mode:Ignore env term
-  with Eval_terms.LogicEvalError _ -> raise Logic_to_c.No_conversion
+  Cvalue_results.mark_as_computed ()
