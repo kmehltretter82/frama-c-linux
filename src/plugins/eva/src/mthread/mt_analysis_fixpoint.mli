@@ -7,5 +7,5 @@
 (**************************************************************************)
 
 val mark_shared_nodes_kind : Mt_thread.analysis_state -> unit
-val record_end_of_thread_analysis : Mt_thread.analysis_state -> unit
+val post_thread_analysis : Mt_thread.analysis_state -> unit
 val reach_fixpoint : Mt_thread.analysis_state -> unit

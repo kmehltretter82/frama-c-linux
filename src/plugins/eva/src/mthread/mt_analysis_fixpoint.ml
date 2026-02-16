@@ -42,7 +42,7 @@ let mark_new_messages_received analysis =
       );
 ;;
 
-let record_end_of_thread_analysis analysis =
+let post_thread_analysis analysis =
   let th = analysis.curr_thread in
 
   mark_new_messages_received analysis;
@@ -70,12 +70,10 @@ let record_end_of_thread_analysis analysis =
   Mt_self.feedback ~level:2 "* Computing cfg";
   th.th_cfg <- Mt_cfg.make_cfg th;
   th.th_read_written_cfg <- Mt_cfg.cfg_accesses th.th_eva_thread th.th_cfg;
-  Mt_self.feedback ~level:2 "* Cfg computed";
-;;
+  Mt_self.feedback ~level:2 "* Cfg computed"
 
 (* We compute a value analysis for the given thread *)
-let compute_thread analysis th =
-
+let pre_thread_analysis analysis th =
   Mt_self.feedback ~level:2 "* Computing value analysis for thread %a"
     Thread.pretty th.th_eva_thread;
   Mt_self.debug "@[<hov>Arguments@ %a@]"
@@ -86,10 +84,13 @@ let compute_thread analysis th =
   (* We set the values that depend on the thread analysed *)
   analysis.curr_thread <- th;
   analysis.curr_events_stack <- [];
-  Datatype.Int.Hashtbl.clear analysis.memexec_cache;
+  Datatype.Int.Hashtbl.clear analysis.memexec_cache
+
+let thread_analysis analysis th =
+  pre_thread_analysis analysis th;
 
   let (), analysis_time = Eva_utils.measure_time
-    (Analysis.compute_thread ~cvalue_state:th.th_init_state) th.th_eva_thread in
+      (Analysis.compute_thread ~cvalue_state:th.th_init_state) th.th_eva_thread in
 
   if Mt_options.ShowTime.get () then
     Mt_self.feedback ~level:2
@@ -97,8 +98,8 @@ let compute_thread analysis th =
       ThreadState.pretty th analysis_time;
 
   (* We save all our results *)
-  record_end_of_thread_analysis analysis;
-;;
+  post_thread_analysis analysis
+
 
 let recompute_shared_vars_changed analysis before =
   iter_threads analysis
@@ -109,7 +110,6 @@ let recompute_shared_vars_changed analysis before =
              th.th_read_written ()
        with Exit -> ThreadState.recompute_because th PotentialSharedVarsChanged
     )
-;;
 
 (** Recompute all the threads that are not [th], and that read a value
     that has changed between [before] and [now] *)
@@ -269,7 +269,7 @@ let one_iteration analysis =
                ThreadState.pretty th analysis.iteration
                SetRecomputeReason.pretty th.th_to_recompute;
 
-             compute_thread analysis th;
+             thread_analysis analysis th;
 
              Mt_self.feedback "*** Thread %a computed" ThreadState.pretty th;
            ) else (
@@ -285,8 +285,9 @@ let one_iteration analysis =
          Mt_self.debug "No need to recompute thread %a" ThreadState.pretty th
     );
   Mt_self.feedback "***** Threads computed for iteration %d."
-    analysis.iteration;
+    analysis.iteration
 
+let post_iteration analysis =
   (* We update the locked mutexes and started threads information of the
      cfg. This must obviously be done before shared variables are computed,
      but it supposes the thread creation structure is completely known.
@@ -323,7 +324,6 @@ let one_iteration analysis =
 
   fold_threads analysis false
     (fun th v -> v || not (SetRecomputeReason.is_empty th.th_to_recompute))
-;;
 
 
 (* Remove "white" nodes in the cfg, ie accesses to variables that
@@ -367,8 +367,7 @@ let mark_shared_nodes_kind analysis =
          in
          let cfg = Mt_cfg.remove_superfluous_nodes ~keep th.th_cfg in
          th.th_cfg <- cfg;
-      );
-;;
+      )
 
 
 (* Auxiliary function iterating the analysis until the fixpoint is reached *)
@@ -377,7 +376,8 @@ let reach_fixpoint analysis =
   let rec aux i =
     Mt_self.feedback "***** Iteration %d" i;
     analysis.iteration <- i;
-    let continue = one_iteration analysis in
+    one_iteration analysis;
+    let continue = post_iteration analysis in
     if Mt_options.ToDisk.get () then begin
       let filepath =
         let prefix = Mt_options.ToDiskPrefix.get () in

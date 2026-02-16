@@ -57,18 +57,18 @@ let unregister_hooks () =
   in
   List.iter unregister Mt_analysis_hooks.mthread_builtins
 
-(* Perform an entire mthread execution on the current project *)
-let mthread_run () =
-  Mt_self.warning
-    "Mthread is an experimental plugin and is still in development.";
 
+let checks () =
   Mt_lib.check_mthread_library ();
 
   if not (Mt_options.ConcatDotFilesTo.is_empty ()) &&
      not (Mt_options.ExtractModels.mem "html") then
     Mt_self.error "Option %S needs option \"%s html\" to work."
       Mt_options.ConcatDotFilesTo.option_name
-      Mt_options.ExtractModels.option_name;
+      Mt_options.ExtractModels.option_name
+
+let pre_analysis () =
+  checks ();
 
   Mt_self.feedback "******* Starting mthread";
 
@@ -96,6 +96,34 @@ let mthread_run () =
     concurrent_accesses_by_nodes = [];
   } in
 
+  analysis
+
+let post_analysis analysis =
+  (* In the cfgs, mark whether the accesses are concurrent or not,
+      and remove superfluous node *)
+  Mt_analysis_fixpoint.mark_shared_nodes_kind analysis;
+
+  (* Printing results to files *)
+  Mt_options.ExtractModels.iter
+    (fun s ->
+       Mt_self.feedback "******* Outputting model for %s" s;
+       (match s with
+        | "html" -> Mt_outputs.Html.output_threads analysis;
+        | _ -> Mt_self.error "Unknown model %s specified" s;
+       );
+       Mt_self.feedback "******* %s output done."
+         (String.capitalize_ascii s);
+    );
+
+  Mt_summary.compute analysis
+
+(* Perform an entire mthread execution on the current project *)
+let mthread_run () =
+  Mt_self.warning
+    "Mthread is an experimental plugin and is still in development.";
+
+  let analysis = pre_analysis () in
+
   (* We register our callback function *)
   register_hooks analysis;
 
@@ -116,30 +144,13 @@ let mthread_run () =
     Analysis.compute_thread Thread.main;
     Mt_self.feedback "*** First value analysis for main thread done." ;
 
-    Mt_analysis_fixpoint.record_end_of_thread_analysis analysis;
+    Mt_analysis_fixpoint.post_thread_analysis analysis;
 
     (* We perform the analysis iterations *)
     Mt_analysis_fixpoint.reach_fixpoint analysis;
     Analysis.mthread_post_analysis ();
-
-    (* In the cfgs, mark whether the accesses are concurrent or not,
-       and remove superfluous node *)
-    Mt_analysis_fixpoint.mark_shared_nodes_kind analysis;
-
-    (* Printing results to files *)
-    Mt_options.ExtractModels.iter
-      (fun s ->
-         Mt_self.feedback "******* Outputting model for %s" s;
-         (match s with
-          | "html" -> Mt_outputs.Html.output_threads analysis;
-          | _ -> Mt_self.error "Unknown model %s specified" s;
-         );
-         Mt_self.feedback "******* %s output done."
-           (String.capitalize_ascii s);
-      );
-
-    Mt_summary.compute analysis;
-    unregister_hooks ();
+    post_analysis analysis;
+    unregister_hooks ()
 
   with e ->
     unregister_hooks ();
