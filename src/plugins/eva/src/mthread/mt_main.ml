@@ -126,35 +126,30 @@ let mthread_run () =
 
   (* We register our callback function *)
   register_hooks analysis;
+  Fun.protect ~finally:unregister_hooks @@ fun () ->
 
-  try
-    (* We analyse the main thread *)
-    let module Engine = (val Engine.current ()) in
-    Engine.Interferences.reset ();
-    Thread.reset_state ();
-    Mutex.reset_state ();
-    Mqueue.reset_state ();
-    Mt_summary.clear ();
+  (* We analyse the main thread *)
+  let module Engine = (val Engine.current ()) in
+  Engine.Interferences.reset ();
+  Thread.reset_state ();
+  Mutex.reset_state ();
+  Mqueue.reset_state ();
+  Mt_summary.clear ();
 
-    (* Let Eva know about interrupt handlers. *)
-    Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
+  (* Let Eva know about interrupt handlers. *)
+  Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
 
-    Mt_self.feedback "*** Computing value analysis for main thread";
-    Analysis.mthread_pre_analysis ();
-    Analysis.compute_thread Thread.main;
-    Mt_self.feedback "*** First value analysis for main thread done." ;
+  Mt_self.feedback "*** Computing value analysis for main thread";
+  Analysis.mthread_pre_analysis ();
+  Analysis.compute_thread Thread.main;
+  Mt_self.feedback "*** First value analysis for main thread done." ;
 
-    Mt_analysis_fixpoint.post_thread_analysis analysis;
+  Mt_analysis_fixpoint.post_thread_analysis analysis;
 
-    (* We perform the analysis iterations *)
-    Mt_analysis_fixpoint.reach_fixpoint analysis;
-    Analysis.mthread_post_analysis ();
-    post_analysis analysis;
-    unregister_hooks ()
-
-  with e ->
-    unregister_hooks ();
-    raise e
+  (* We perform the analysis iterations *)
+  Mt_analysis_fixpoint.reach_fixpoint analysis;
+  Analysis.mthread_post_analysis ();
+  post_analysis analysis
 
 
 let compute_mthread_once, _self =
