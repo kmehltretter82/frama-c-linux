@@ -297,14 +297,16 @@ class do_it cp =
          | Writes assigns' ->
            let aux l =
              try
-               let loc = Eva_results.eval_tlval_as_location state l in
+               let env = Eval_terms.env_assigns ~pre:state in
+               let alarm_mode = Eval_terms.Ignore in
+               let loc = Eval_terms.eval_tlval_as_location ~alarm_mode env l in
                let loc = remove_uninteresting_variables_loc loc in
                let loc = Locations.(valid_part Write loc) in
                let z = Locations.(enumerate_valid_bits Write loc) in
                self#add_access (Write loc) z
-             with Logic_to_c.No_conversion ->
+             with Eval_terms.LogicEvalError _ ->
                Mt_self.warning ~once:true
-                 "unsupported@ assigns@ clause@ for@ function %a;@ Ignoring it."
+                 "Unsupported assigns clause for function %a. Ignoring it."
                  Kernel_function.pretty kf;
            in
            List.iter

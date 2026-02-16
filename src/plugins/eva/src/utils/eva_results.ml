@@ -8,26 +8,6 @@
 
 open Cil_datatype
 
-(* {2 Termination.} *)
-
-let partition_terminating_instr stmt =
-  match Cvalue_results.get_stmt_state_by_callstack ~after:true stmt with
-  | `Bottom | `Top -> ([], [])
-  | `Value h ->
-    let terminating = ref [] in
-    let non_terminating = ref [] in
-    let add x xs = xs := x :: !xs in
-    Callstack.Hashtbl.iter (fun cs state ->
-        if Cvalue.Model.is_reachable state
-        then add cs terminating
-        else add cs non_terminating) h;
-    (!terminating, !non_terminating)
-
-let is_non_terminating_instr stmt =
-  match partition_terminating_instr stmt with
-  | [], _ -> true
-  | _, _ -> false
-
 (* {2 Global state.} *)
 
 (* Option_ref that calls [Parameters.change_correctness] when its state
@@ -161,6 +141,7 @@ let get_results () =
 let set_results results =
   let selection = State_selection.with_dependencies Self.state in
   Project.clear ~selection ();
+  Parameters.change_correctness ();
   (* Those two functions may clear Self.state. Start by them *)
   (* Initial state *)
   Cvalue_results.register_global_state true results.initial_state;
@@ -211,10 +192,4 @@ let set_results results =
   Cvalue_domain.State.Store.register_global_state b
     (`Value Cvalue_domain.State.top);
   Self.ComputationState.set Computed;
-  Cvalue_results.mark_as_computed ();
-;;
-
-let eval_tlval_as_location ?result state term =
-  let env = Eval_terms.env_post_f ~pre:state ~post:state ~result () in
-  try Eval_terms.eval_tlval_as_location ~alarm_mode:Ignore env term
-  with Eval_terms.LogicEvalError _ -> raise Logic_to_c.No_conversion
+  Cvalue_results.mark_as_computed ()

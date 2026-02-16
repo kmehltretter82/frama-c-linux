@@ -6,13 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
-
-val is_non_terminating_instr: stmt -> bool
-(** Returns [true] iff there exists executions of the statement that does
-    not always fail/loop (for function calls). Must be called *only* on
-    statements that are instructions. *)
-
 (** Returns the initial state provided by [set_initial_state] below, if any. *)
 val get_initial_state: unit -> Cvalue.Model.t option
 
@@ -51,7 +44,3 @@ val get_results: unit -> results
 val set_results: results -> unit
 
 [@@@ api_end]
-
-val eval_tlval_as_location :
-  ?result:Cil_types.varinfo ->
-  Cvalue.Model.t ->  Cil_types.term -> Locations.location
