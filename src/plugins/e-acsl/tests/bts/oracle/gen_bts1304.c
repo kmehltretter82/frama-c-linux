@@ -29,7 +29,7 @@ void read_sensor_4(unsigned int *m)
   /*@ assert Eva: pointer_alignment: \aligned(m,alignof(unsigned int)); */
   __e_acsl_initialize((void *)m,sizeof(unsigned int));
   /*@ assert Eva: pointer_alignment: \aligned(m,alignof(unsigned int)); */
-  *m = (unsigned int)0;
+  *m = 0U;
   __e_acsl_delete_block((void *)(& m));
   return;
 }
@@ -37,12 +37,12 @@ void read_sensor_4(unsigned int *m)
 int main(void)
 {
   int __retres;
-  unsigned char buf[sizeof(union msg)];
+  unsigned char buf[16UL];
   int i;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_store_block((void *)(buf),16UL);
   i = 0;
-  while ((unsigned long)i < sizeof(buf) / (unsigned long)4) {
+  while ((unsigned long)i < 4UL) {
     /*@ assert
           Eva: pointer_alignment:
             \aligned((unsigned char *)buf,alignof(unsigned int));
@@ -72,8 +72,7 @@ int main(void)
       __gen_e_acsl_assert_data_3.fct = "main";
       __gen_e_acsl_assert_data_3.line = 32;
       __gen_e_acsl_assert_data_3.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(union msg) != 0UL,
-                      & __gen_e_acsl_assert_data_3);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     }
     __gen_e_acsl_aligned = __e_acsl_aligned((void *)(buf),

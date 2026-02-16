@@ -98,7 +98,7 @@ int main(void)
       __gen_e_acsl_assert_data_5.fct = "main";
       __gen_e_acsl_assert_data_5.line = 15;
       __gen_e_acsl_assert_data_5.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     }
     __gen_e_acsl_aligned = __e_acsl_aligned((void *)PA,_Alignof(int));
@@ -152,7 +152,7 @@ int main(void)
       __gen_e_acsl_assert_data_8.fct = "main";
       __gen_e_acsl_assert_data_8.line = 17;
       __gen_e_acsl_assert_data_8.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_8);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_8);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
     }
     __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)PA,_Alignof(int));
@@ -248,7 +248,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
   }
   /*@ assert \offset(&a[3]) == 12; */ ;
-  long l = (long)4;
+  long l = 4L;
   __e_acsl_store_block((void *)(& l),8UL);
   __e_acsl_full_init((void *)(& l));
   char *pl = (char *)(& l);
@@ -381,7 +381,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
   }
   /*@ assert \offset(pi) == 4; */ ;
-  char *p = malloc((size_t)12);
+  char *p = malloc(12UL);
   __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
   {
@@ -485,7 +485,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_22);
   }
   /*@ assert \offset(p - 5) == 0; */ ;
-  long *q = malloc((unsigned long)30 * sizeof(long));
+  long *q = malloc(240UL);
   __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_full_init((void *)(& q));
   {

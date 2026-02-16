@@ -293,7 +293,7 @@ int main(int argc, char const **argv)
   __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
   __e_acsl_globals_init();
   char *empty_str = (char *)"";
-  char *heap_str = eacsl_test_strdup("the cat",(size_t)8);
+  char *heap_str = eacsl_test_strdup("the cat",8UL);
   char stack_str[8UL] = {'t', 'h', 'e', ' ', 'd', 'o', 'g', '\000'};
   __e_acsl_store_block((void *)(stack_str),8UL);
   __e_acsl_full_init((void *)(& stack_str));
@@ -303,7 +303,7 @@ int main(int argc, char const **argv)
     if (! pid) {
       size_t tmp_1;
       tmp_1 = __e_acsl_builtin_strlen((char const *)empty_str);
-      len = tmp_1 != (size_t)0;
+      len = tmp_1 != 0UL;
       if (len) __gen_e_acsl_abort();
       __gen_e_acsl_exit(0);
     }
@@ -321,7 +321,7 @@ int main(int argc, char const **argv)
     if (! pid_0) {
       size_t tmp_3;
       tmp_3 = __e_acsl_builtin_strlen((char const *)heap_str);
-      len = tmp_3 != (size_t)7;
+      len = tmp_3 != 7UL;
       if (len) __gen_e_acsl_abort();
       __gen_e_acsl_exit(0);
     }
@@ -339,7 +339,7 @@ int main(int argc, char const **argv)
     if (! pid_1) {
       size_t tmp_5;
       tmp_5 = __e_acsl_builtin_strlen((char const *)(stack_str));
-      len = tmp_5 != (size_t)7;
+      len = tmp_5 != 7UL;
       if (len) __gen_e_acsl_abort();
       __gen_e_acsl_exit(0);
     }
@@ -357,7 +357,7 @@ int main(int argc, char const **argv)
     if (! pid_2) {
       size_t tmp_7;
       tmp_7 = __e_acsl_builtin_strlen((char const *)const_str);
-      len = tmp_7 != (size_t)7;
+      len = tmp_7 != 7UL;
       if (len) __gen_e_acsl_abort();
       __gen_e_acsl_exit(0);
     }
@@ -370,15 +370,15 @@ int main(int argc, char const **argv)
       __e_acsl_delete_block((void *)(& process_status_2));
     }
   }
-  *(heap_str + 7) = (char)'a';
+  *(heap_str + 7) = (char)97;
   __e_acsl_initialize((void *)(& stack_str[7]),sizeof(char));
-  stack_str[7] = (char)'a';
+  stack_str[7] = (char)97;
   {
     pid_t pid_3 = __gen_e_acsl_fork();
     if (! pid_3) {
       size_t tmp_9;
       tmp_9 = __e_acsl_builtin_strlen((char const *)heap_str);
-      len = tmp_9 != (size_t)7;
+      len = tmp_9 != 7UL;
       if (len) __gen_e_acsl_abort();
       __gen_e_acsl_exit(0);
     }
@@ -396,7 +396,7 @@ int main(int argc, char const **argv)
     if (! pid_4) {
       size_t tmp_11;
       tmp_11 = __e_acsl_builtin_strlen((char const *)(stack_str));
-      len = tmp_11 != (size_t)7;
+      len = tmp_11 != 7UL;
       if (len) __gen_e_acsl_abort();
       __gen_e_acsl_exit(0);
     }
@@ -416,7 +416,7 @@ int main(int argc, char const **argv)
       size_t tmp_13;
       /*@ assert Eva: dangling_pointer: !\dangling(&heap_str); */
       tmp_13 = __e_acsl_builtin_strlen((char const *)heap_str);
-      len = tmp_13 != (size_t)7;
+      len = tmp_13 != 7UL;
       if (len) __gen_e_acsl_abort();
       __gen_e_acsl_exit(0);
     }

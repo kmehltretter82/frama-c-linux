@@ -196,6 +196,8 @@ let name_of_binop = function
   | MinusA -> "sub"
   | MinusPP | MinusPI | PlusPI -> assert false
 
+let make_binop = Cil.mkBinOp_exn ~constfold:true
+
 module Id_term =
   Datatype.Make_with_hashtbl
     (struct

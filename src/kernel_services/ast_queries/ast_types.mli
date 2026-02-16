@@ -275,6 +275,11 @@ val is_scalar : typ -> bool
 (** True if the argument is an object type (i.e. not a function type). *)
 val is_object : typ -> bool
 
+(** True if the argument is an object pointer type.
+    @since Frama-C+dev
+*)
+val is_object_ptr : typ -> bool
+
 (** True if the argument is a struct. *)
 val is_struct : typ -> bool
 

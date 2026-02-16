@@ -158,7 +158,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_m);
   }
   /*@ assert (\let u = m; u * u) > m; */ ;
-  char c = (char)'a';
+  char c = (char)97;
   {
     int __gen_e_acsl_u_9;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =

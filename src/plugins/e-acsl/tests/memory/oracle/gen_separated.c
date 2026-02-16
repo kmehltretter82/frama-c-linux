@@ -256,7 +256,7 @@ int main(void)
     __e_acsl_delete_block((void *)(& a));
   }
   {
-    double array[20] = {(double)0};
+    double array[20] = {0.};
     __e_acsl_store_block((void *)(array),160UL);
     __e_acsl_full_init((void *)(& array));
     {
@@ -1002,10 +1002,10 @@ int main(void)
     __e_acsl_delete_block((void *)(array));
   }
   {
-    int *a_0 = malloc(sizeof(int));
+    int *a_0 = malloc(4UL);
     __e_acsl_store_block((void *)(& a_0),8UL);
     __e_acsl_full_init((void *)(& a_0));
-    int *b_0 = malloc(sizeof(int));
+    int *b_0 = malloc(4UL);
     __e_acsl_store_block((void *)(& b_0),8UL);
     __e_acsl_full_init((void *)(& b_0));
     int *c_0 = a_0;
@@ -1239,7 +1239,7 @@ int main(void)
     __e_acsl_delete_block((void *)(& a_0));
   }
   {
-    double *array_0 = malloc(sizeof(double [20]));
+    double *array_0 = malloc(160UL);
     __e_acsl_store_block((void *)(& array_0),8UL);
     __e_acsl_full_init((void *)(& array_0));
     {
@@ -1991,7 +1991,7 @@ int main(void)
     __e_acsl_delete_block((void *)(& array_0));
   }
   {
-    double array_1[10][10][10] = {{{(double)0}}};
+    double array_1[10][10][10] = {{{0.}}};
     __e_acsl_store_block((void *)(array_1),8000UL);
     __e_acsl_full_init((void *)(& array_1));
     {

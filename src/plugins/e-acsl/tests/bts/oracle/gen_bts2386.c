@@ -66,8 +66,7 @@ void f(void const *s, int c, unsigned long n)
       __gen_e_acsl_assert_data_4.fct = "f";
       __gen_e_acsl_assert_data_4.line = 8;
       __gen_e_acsl_assert_data_4.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(unsigned char const) != 0UL,
-                      & __gen_e_acsl_assert_data_4);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
     __gen_e_acsl_aligned = __e_acsl_aligned((void *)s,
@@ -127,7 +126,7 @@ int main(void)
   char const *s = __fc_lit_string1;
   __e_acsl_store_block((void *)(& s),8UL);
   __e_acsl_full_init((void *)(& s));
-  f((void const *)s,'0',(unsigned long)11);
+  f((void const *)s,48,11UL);
   __retres = 0;
   __e_acsl_delete_block((void *)(& s));
   __e_acsl_globals_clean();

@@ -147,10 +147,10 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
     /*@ assert !\initialized(&buf_0[0 .. 3]); */ ;
-    __gen_e_acsl_snprintf_res = snprintf(buf_0,(size_t)2,"%d",10); /* snprintf_va_1 */
+    __gen_e_acsl_snprintf_res = snprintf(buf_0,2UL,"%d",10); /* snprintf_va_1 */
     if (__gen_e_acsl_snprintf_res >= 0) {
       unsigned long __gen_e_acsl_n;
-      if (2UL <= (size_t)__gen_e_acsl_snprintf_res) __gen_e_acsl_n = (size_t)2;
+      if (2UL <= (unsigned long)__gen_e_acsl_snprintf_res) __gen_e_acsl_n = 2UL;
       else __gen_e_acsl_n = __gen_e_acsl_snprintf_res + 1L;
       __e_acsl_initialize((void *)(buf_0),__gen_e_acsl_n);
     }
@@ -261,10 +261,10 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
     }
     /*@ assert !\initialized(&buf_1[0 .. 3]); */ ;
-    __gen_e_acsl_snprintf_res_2 = snprintf(buf_1,(size_t)4,"%d",10); /* snprintf_va_2 */
+    __gen_e_acsl_snprintf_res_2 = snprintf(buf_1,4UL,"%d",10); /* snprintf_va_2 */
     if (__gen_e_acsl_snprintf_res_2 >= 0) {
       unsigned long __gen_e_acsl_n_2;
-      if (4UL <= (size_t)__gen_e_acsl_snprintf_res_2) __gen_e_acsl_n_2 = (size_t)4;
+      if (4UL <= (unsigned long)__gen_e_acsl_snprintf_res_2) __gen_e_acsl_n_2 = 4UL;
       else __gen_e_acsl_n_2 = __gen_e_acsl_snprintf_res_2 + 1L;
       __e_acsl_initialize((void *)(buf_1),__gen_e_acsl_n_2);
     }

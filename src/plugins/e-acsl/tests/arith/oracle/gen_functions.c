@@ -305,7 +305,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
   }
   /*@ assert g(x) == x; */ ;
-  char c = (char)'c';
+  char c = (char)99;
   {
     char __gen_e_acsl_h_char_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
@@ -638,7 +638,7 @@ int f5(long j)
 int test_f5(void)
 {
   int __retres;
-  __gen_e_acsl_f5((long)1);
+  __gen_e_acsl_f5(1L);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_assert_data.blocking = 1;

@@ -55,7 +55,7 @@ int main(void)
     char buf_0[4];
     size_t tmp_0;
     __e_acsl_store_block((void *)(buf_0),4UL);
-    tmp_0 = __gen_e_acsl_fread((void *)(buf_0),(size_t)1,(size_t)4,f);
+    tmp_0 = __gen_e_acsl_fread((void *)(buf_0),1UL,4UL,f);
     int res = (int)tmp_0;
     __gen_e_acsl_fclose(f);
     if (res == 4) {
@@ -169,7 +169,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
       __gen_e_acsl_assert_data_3.fct = "fread";
       __gen_e_acsl_assert_data_3.line = 381;
       __gen_e_acsl_assert_data_3.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_3);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     }
     __gen_e_acsl_aligned = __e_acsl_aligned(ptr,_Alignof(char));
@@ -386,7 +386,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
       __gen_e_acsl_assert_data_10.fct = "fread";
       __gen_e_acsl_assert_data_10.line = 387;
       __gen_e_acsl_assert_data_10.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_10);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_10);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
     }
     __gen_e_acsl_aligned_2 = __e_acsl_aligned(__gen_e_acsl_at_2,

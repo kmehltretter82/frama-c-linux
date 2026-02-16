@@ -157,8 +157,8 @@ let pretty_C_constant suffix k fmt i =
        so we do what's done in limits.h, and print (-2147483467-1); *)
     (* in gcc this avoids a warning, but it might avoid a real
        problem on another compiler or a 64-bit architecture *)
-    Format.fprintf fmt "(-%a-1)"
-      Z.pretty (Z.pred max_strict_signed)
+    Format.fprintf fmt "(-%a%s-1%s)"
+      Z.pretty (Z.pred max_strict_signed) suffix suffix
   else
     Format.fprintf fmt "%a%s" Z.pretty i suffix
 
@@ -3461,6 +3461,7 @@ include Printer_builder.Make(struct class printer = cil_printer end)
 
 (* initializing Cil's forward references *)
 let () = Cil.pp_typ_ref := pp_typ
+let () = Cil.pp_binop_ref := pp_binop
 let () = Cil.pp_global_ref := pp_global
 let () = Cil.pp_exp_ref := pp_exp
 let () = Cil.pp_lval_ref := pp_lval

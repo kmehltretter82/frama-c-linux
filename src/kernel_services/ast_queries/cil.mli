@@ -772,6 +772,12 @@ val constFoldOffset: bool -> offset -> offset
     will also compute compiler-dependent expressions such as [sizeof]. *)
 val constFoldBinOp: loc:location -> bool -> binop -> exp -> exp -> typ -> exp
 
+(** Convert an expression [e] to a boolean expression [e != 0] if [e] is not
+    already a boolean.
+    @since Frama-C+dev
+*)
+val expression_to_bool: exp -> exp
+
 (** [true] if the two constant are equal.
     @since Nitrogen-20111001
 *)
@@ -818,21 +824,43 @@ val mkAddrOrStartOf: loc:location -> lval -> exp
     StartOf *)
 val mkMem: addr:exp -> off:offset -> lval
 
-(** makes a binary operation and performs const folding.  Inserts
-    casts between arithmetic types as needed, or between pointer
-    types, but do not attempt to cast pointer to int or
-    vice-versa. Use appropriate binop (PlusPI & friends) for that.
-*)
-val mkBinOp: loc:location -> binop -> exp -> exp -> exp
+(** Makes a binary operation and performs constant folding if [?constfold] is
+    [true] (defaults to [false]). Inserts casts as needed. Use appropriate binop
+    ([PlusPI] & friends).
 
-(** same as {!mkBinOp}, but performs a systematic cast (unless one of the
-    arguments is [0]) of pointers into [uintptr_t] during comparisons,
+    For pointer comparisons we do the following:
+    - If both types are equal, do dothing
+    - If both types are compatible, cast the second expression to the first type
+    - If both types are object pointers, cast to [void*]
+    - Else cast to [uintptr_t]
+
+    @before Frama-C+dev the function could raised [AbortFatal] instead of using
+    result type. It still can raise an exception via sub-function calls. The
+    parameter [?constfold] was not present and we always applied constant
+    folding.
+*)
+val mkBinOp: ?constfold:bool -> loc:location -> binop -> exp -> exp ->
+  (exp, string) result
+
+(** Same as {!mkBinOp} but handles [Error] by throwing an exception with the
+    given message and current location.
+    @raise Abortfatal if {!mkBinOp} fails
+    @since Frama-C+dev
+*)
+val mkBinOp_exn: ?constfold:bool -> loc:location -> binop -> exp -> exp -> exp
+
+(** Same as {!mkBinOp_exn}
+    @before Frama-C+dev Performed a systematic cast (unless one of the
+    arguments was [0]) of pointers into [uintptr_t] during comparisons,
     making such operation defined even if the pointers do not share
     the same base. This was the behavior of {!mkBinOp} prior to the
     introduction of this function.
     @since Chlorine-20180501
 *)
-val mkBinOp_safe_ptr_cmp: loc:location -> binop -> exp -> exp -> exp
+val mkBinOp_safe_ptr_cmp: loc:location -> binop -> exp ->
+  exp -> exp
+[@@deprecated "Use mkBinOp_exn instead, which is now safe to use."]
+[@@migrate { repl = Rel.mkBinOp_exn }]
 
 (** Equivalent to [mkMem] for terms. *)
 val mkTermMem: addr:term -> off:term_offset -> term_lval
@@ -2047,6 +2075,7 @@ val separate_if_succs: stmt -> stmt * stmt
 val switch_case_state_self: State.t
 
 val pp_typ_ref: (Format.formatter -> typ -> unit) ref
+val pp_binop_ref: (Format.formatter -> binop -> unit) ref
 val pp_global_ref: (Format.formatter -> global -> unit) ref
 val pp_exp_ref: (Format.formatter -> exp -> unit) ref
 val pp_lval_ref: (Format.formatter -> lval -> unit) ref

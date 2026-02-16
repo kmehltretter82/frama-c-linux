@@ -90,7 +90,7 @@ int z;
  */
 void i(void)
 {
-  expr_to_predicate((z && t) != 0);
+  expr_to_predicate(z && t);
   expr_to_predicate(! (z < 5));
   expr_to_predicate(t | 5);
   return;

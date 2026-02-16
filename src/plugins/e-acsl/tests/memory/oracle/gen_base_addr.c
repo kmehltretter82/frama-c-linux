@@ -85,7 +85,7 @@ int main(void)
       __gen_e_acsl_assert_data_4.fct = "main";
       __gen_e_acsl_assert_data_4.line = 14;
       __gen_e_acsl_assert_data_4.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_4);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     }
     __gen_e_acsl_aligned = __e_acsl_aligned((void *)PA,_Alignof(int));
@@ -141,7 +141,7 @@ int main(void)
       __gen_e_acsl_assert_data_7.fct = "main";
       __gen_e_acsl_assert_data_7.line = 15;
       __gen_e_acsl_assert_data_7.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_7);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_7);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
     }
     __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)PA,_Alignof(int));
@@ -197,7 +197,7 @@ int main(void)
       __gen_e_acsl_assert_data_10.fct = "main";
       __gen_e_acsl_assert_data_10.line = 17;
       __gen_e_acsl_assert_data_10.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_10);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_10);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
     }
     __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)PA,_Alignof(int));
@@ -253,7 +253,7 @@ int main(void)
       __gen_e_acsl_assert_data_13.fct = "main";
       __gen_e_acsl_assert_data_13.line = 18;
       __gen_e_acsl_assert_data_13.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_13);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_13);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
     }
     __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)PA,_Alignof(int));
@@ -410,7 +410,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
   }
   /*@ assert \base_addr(pa + 2) == \base_addr((int *)a); */ ;
-  long l = (long)4;
+  long l = 4L;
   __e_acsl_store_block((void *)(& l),8UL);
   __e_acsl_full_init((void *)(& l));
   char *pl = (char *)(& l);
@@ -512,7 +512,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_22);
   }
   /*@ assert \base_addr(pl) == \base_addr(&l); */ ;
-  char *p = malloc((size_t)12);
+  char *p = malloc(12UL);
   __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
   char *pd = p;
@@ -636,7 +636,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_27);
   }
   /*@ assert \base_addr(p - 5) == \base_addr(pd); */ ;
-  long *q = malloc((unsigned long)30 * sizeof(long));
+  long *q = malloc(240UL);
   __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_full_init((void *)(& q));
   long *qd = q;

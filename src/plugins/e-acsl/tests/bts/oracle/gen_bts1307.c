@@ -25,7 +25,7 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
   __e_acsl_store_block((void *)(& Mwmax),8UL);
   __e_acsl_store_block((void *)(& Mtmax_in),8UL);
   __e_acsl_initialize((void *)Mtmax_out,sizeof(float));
-  *Mtmax_out = *Mtmax_in + (5.0f - ((5.0f / 80.0f) * *Mwmax) * 0.4f);
+  *Mtmax_out = *Mtmax_in + (5.0f - (0.0625f * *Mwmax) * 0.4f);
   __e_acsl_delete_block((void *)(& Mtmax_out));
   __e_acsl_delete_block((void *)(& Mwmax));
   __e_acsl_delete_block((void *)(& Mtmax_in));
@@ -66,10 +66,10 @@ int main(void)
   float h;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_store_block((void *)(& h),4UL);
-  float f = (float)1.0;
+  float f = 1.f;
   __e_acsl_store_block((void *)(& f),4UL);
   __e_acsl_full_init((void *)(& f));
-  float g = (float)1.0;
+  float g = 1.f;
   __e_acsl_store_block((void *)(& g),4UL);
   __e_acsl_full_init((void *)(& g));
   __gen_e_acsl_foo(& f,& g,& h);

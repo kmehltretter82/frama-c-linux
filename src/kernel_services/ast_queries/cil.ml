@@ -47,6 +47,7 @@ let argsToList :
 
 (* A hack to allow forward reference of d_exp *)
 let pp_typ_ref = Extlib.mk_fun "Cil.pp_typ_ref"
+let pp_binop_ref = Extlib.mk_fun "Cil.pp_binop_ref"
 let pp_global_ref = Extlib.mk_fun "Cil.pp_global_ref"
 let pp_exp_ref = Extlib.mk_fun "Cil.pp_exp_ref"
 let pp_lval_ref = Extlib.mk_fun "Cil.pp_lval_ref"
@@ -3034,7 +3035,7 @@ exception SizeOfError of string * typ
 
 type sizeof_or_error =
   | Size of int
-  | Error of string * typ
+  | SizeError of string * typ
 
 module SizeOfOrError = Datatype.Make(struct
     include Datatype.Undefined
@@ -3043,12 +3044,12 @@ module SizeOfOrError = Datatype.Make(struct
     type t  = sizeof_or_error
     let reprs = [
       Size 0 ;
-      Error ("", Cil_const.voidType)
+      SizeError ("", Cil_const.voidType)
     ]
     let compare a b =
       match a, b with
       | Size a, Size b -> Int.compare a b
-      | Error (sa, ta), Error(sb, tb) ->
+      | SizeError (sa, ta), SizeError(sb, tb) ->
         let s = String.compare sa sb in
         if s = 0 then Cil_datatype.Typ.compare ta tb
         else s
@@ -3075,14 +3076,14 @@ module TypSize =
 let find_sizeof t f =
   try match TypSize.find t with
     | Size size -> size
-    | Error (msg, t') -> raise (SizeOfError(msg, t'))
+    | SizeError (msg, t') -> raise (SizeOfError(msg, t'))
   with Not_found ->
   try
     let t', size = f () in
     TypSize.add t' (Size size) ;
     size
   with SizeOfError(msg, t') as e ->
-    TypSize.add t' (Error (msg, t')) ;
+    TypSize.add t' (SizeError (msg, t')) ;
     raise e
 
 let selfTypSize = TypSize.self
@@ -4400,12 +4401,12 @@ class constFoldVisitorClass (machdep: bool) : cilVisitor = object
     (* Do it bottom up *)
     ChangeDoChildrenPost (e, constFold machdep)
 
-  (* Optimization: only visits function and variable definitions. *)
   method! vglob = function
-    | GFun _ | GVar _ -> DoChildren
+    | GFun _ | GVar _ | GVarDecl _ | GType _ | GCompTag _ | GCompTagDecl _
+    | GEnumTag _ | GEnumTagDecl _ ->
+      DoChildren
     | _ -> SkipChildren
 
-  method! vtype _ = SkipChildren
   method! vspec _ = SkipChildren
   method! vcode_annot _ = SkipChildren
 end
@@ -5666,13 +5667,13 @@ let rec castReduce fromsource force =
     | TFun _, TPtr { tnode = TFun _ }, Lval lv -> mkAddrOf ~loc lv
 
     | _, TInt IBool, _ when Ast_types.is_scalar oldt' ->
-      if is_boolean_result e then begin
+      let cmp = expression_to_bool e in
+      if Exp.equal e cmp then begin
         Kernel.debug ~dkey "Explicit cast to Boolean: %a" !pp_exp_ref e;
         res e
       end else begin
         Kernel.debug ~dkey
           "bool conversion by checking !=0: %a" !pp_exp_ref e;
-        let cmp = mkBinOp ~loc Ne e (integer ~loc 0) in
         let oldt = typeOf cmp in
         rec_default oldt newt cmp
       end
@@ -5705,20 +5706,17 @@ let rec castReduce fromsource force =
 and mkCastTGen ?(check=true) ?context ?(fromsource=false) ?(force=false)
     ~(oldt: typ) ~(newt: typ) e =
   let dkey = Kernel.dkey_typing_cast in
-  if
-    (if fromsource
-     then not (need_cast ~force oldt newt)
-     else not (need_cast ~force:false oldt newt))
-  then
-    begin
-      Kernel.debug ~dkey "no cast to perform";
-      let returned_type =
-        match newt.tnode with
-        | TNamed _ -> newt
-        | _ -> oldt
-      in
-      (returned_type, e)
-    end
+  let force_cast = fromsource || force in
+  let need_cast = need_cast ~force:force_cast oldt newt in
+  if not need_cast then begin
+    Kernel.debug ~dkey "no cast to perform";
+    let returned_type =
+      match newt.tnode with
+      | TNamed _ -> newt
+      | _ -> oldt
+    in
+    (returned_type, e)
+  end
   else
     let newt = if fromsource then newt else !typeForInsertedCast e oldt newt in
     let nullptr_cast = is_nullptr e in
@@ -5731,63 +5729,55 @@ and mkCastT ?(check=true) ?(force=false) ~(oldt: typ) ~(newt: typ) e =
 and mkCast ?(check=true) ?force ~(newt: typ) e =
   mkCastT ~check ?force ~oldt:(typeOf e) ~newt e
 
-(* TODO: unify this with doBinOp in Cabs2cil. *)
-and mkBinOp ~loc op e1 e2 =
+and mkBinOp ?(constfold=false) ~loc op e1 e2 =
   let open Ast_types in
   let t1 = typeOf e1 in
   let t2 = typeOf e2 in
-  let machdep = false in
-  let make_expr common_type res_type =
-    constFoldBinOp ~loc machdep op
-      (mkCastT ~oldt:t1 ~newt:common_type e1)
-      (mkCastT ~oldt:t2 ~newt:common_type e2)
-      res_type
+  let machdep = true in
+  let error msg = Format.kasprintf Result.error msg in
+  let constFoldBinOp bop e1 e2 t =
+    if constfold then
+      Ok (constFoldBinOp ~loc machdep bop e1 e2 t)
+    else
+      Ok (new_exp ~loc (BinOp(bop, e1, e2, t)))
   in
-  let doArithmetic () =
-    let tres = arithmeticConversion t1 t2 in
-    make_expr tres tres
+  let check_make_expr ?res ~check name =
+    if check t1 && check t2 then
+      let t = arithmeticConversion t1 t2 in
+      let tres = Option.value ~default:t res in
+      constFoldBinOp op
+        (mkCastT ~oldt:t1 ~newt:t e1)
+        (mkCastT ~oldt:t2 ~newt:t e2)
+        tres
+    else
+      error
+        "operator '%a' on %s type(s) '%a' and '%a'"
+        !pp_binop_ref op name !pp_typ_ref t1 !pp_typ_ref t2
   in
-  let doArithmeticComp () =
-    let tres = arithmeticConversion t1 t2 in
-    make_expr tres Cil_const.intType
+  let doArithmetic ?res () =
+    check_make_expr ?res ~check:Ast_types.is_arithmetic "non-arithmetic"
   in
   let doIntegralArithmetic () =
-    let tres = arithmeticConversion t1 t2 in
-    if is_integral tres then
-      make_expr tres tres
-    else
-      Kernel.fatal
-        ~current:true
-        "@[mkBinOp: unsupported non integral result type for integral \
-         arithmetic@ %a@]"
-        !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,Cil_const.intType)))
+    check_make_expr ~check:Ast_types.is_integral "non-integral"
   in
-  let compare_pointer op ?cast1 ?cast2 e1 e2 =
-    let do_cast e = function
-      | None -> e
-      | Some t' -> mkCast ~force:false ~newt:t' e
-    in
-    let e1, e2 =
-      if need_cast ~force:true (typeOf e1) (typeOf e2) then
-        do_cast e1 cast1, do_cast e2 cast2
-      else
-        e1, e2
-    in
-    constFoldBinOp ~loc machdep op e1 e2 Cil_const.intType
-  in
-  let check_scalar op e t =
-    if not (is_scalar t) then
-      Kernel.fatal ~current:true "operand of %s is not scalar: %a"
-        op !pp_exp_ref e
+  let compatible_pointed_types () =
+    let t1p = Ast_types.direct_pointed_type t1
+    and t2p = Ast_types.direct_pointed_type t2 in
+    areCompatibleTypes
+      (Ast_types.remove_qualifiers_deep t1p)
+      (Ast_types.remove_qualifiers_deep t2p)
   in
   match op with
-    (Mult|Div) -> doArithmetic ()
-  | (Mod|BAnd|BOr|BXor) -> doIntegralArithmetic ()
+  | Mult | Div -> doArithmetic ()
+  | Mod  | BAnd | BOr | BXor -> doIntegralArithmetic ()
   | LAnd | LOr ->
-    check_scalar "logical operator" e1 t1;
-    check_scalar "logical operator" e2 t2;
-    constFoldBinOp ~loc machdep op e1 e2 Cil_const.intType
-  | (Shiftlt|Shiftrt) -> (* ISO 6.5.7. Only integral promotions. The result
+    if Ast_types.is_scalar t1 && Ast_types.is_scalar t2 then
+      constFoldBinOp op (expression_to_bool e1) (expression_to_bool e2)
+        Cil_const.intType
+    else
+      error "operator '%a' on non-scalar type(s) '%a' and '%a'"
+        !pp_binop_ref op !pp_typ_ref t1 !pp_typ_ref t2
+  | Shiftlt | Shiftrt -> (* ISO 6.5.7. Only integral promotions. The result
                           * has the same type as the left hand side *)
     if Machine.msvcMode () then
       (* MSVC has a bug. We duplicate it here *)
@@ -5795,57 +5785,86 @@ and mkBinOp ~loc op e1 e2 =
     else
       let t1' = integralPromotion t1 in
       let t2' = integralPromotion t2 in
-      constFoldBinOp ~loc machdep op
-        (mkCastT ~oldt:t1 ~newt:t1' e1) (mkCastT ~oldt:t2 ~newt:t2' e2) t1'
-  | (PlusA|MinusA)
-    when is_arithmetic t1 && is_arithmetic t2 -> doArithmetic ()
-  | (PlusPI|MinusPI) when is_ptr t1 && is_integral t2 ->
-    constFoldBinOp ~loc machdep op e1 e2 t1
+      constFoldBinOp op
+        (mkCastT ~oldt:t1 ~newt:t1' e1)
+        (mkCastT ~oldt:t2 ~newt:t2' e2)
+        t1'
+  | PlusA | MinusA -> doArithmetic ()
+  | PlusPI when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
+    begin match e1.enode with
+      | StartOf lv ->
+        Ok { e1 with enode = AddrOf (addOffsetLval (Index (e2,NoOffset)) lv) }
+      | _ ->
+        constFoldBinOp op e1
+          (mkCastT ~oldt:t2 ~newt:(integralPromotion t2) e2) t1
+    end
+  | MinusPI when is_ptr t1 && is_integral t2 ->
+    constFoldBinOp op e1 (mkCastT ~oldt:t2 ~newt:(integralPromotion t2) e2) t1
   | MinusPP when is_ptr t1 && is_ptr t2 ->
-    (* NB: Same as cabs2cil. Check if this is really what the standard says*)
-    constFoldBinOp ~loc machdep op e1 (mkCastT ~oldt:t2 ~newt:t1 e2) Cil_const.intType
-  | (Eq|Ne|Lt|Le|Ge|Gt)
-    when is_arithmetic t1 && is_arithmetic t2 ->
-    doArithmeticComp ()
-  | (Eq|Ne) when is_ptr t1 && isZero e2 ->
-    compare_pointer ~cast2:t1 op e1 (zero ~loc)
-  | (Eq|Ne) when is_ptr t2 && isZero e1 ->
-    compare_pointer ~cast1:t2 op (zero ~loc) e2
-  | (Eq|Ne) when is_variadic_list t1 && isZero e2 ->
-    Kernel.debug ~level:3 "Comparison of va_list and zero";
-    compare_pointer ~cast2:t1 op e1 (zero ~loc)
-  | (Eq|Ne) when is_variadic_list t2 && isZero e1 ->
-    Kernel.debug ~level:3 "Comparison of zero and va_list";
-    compare_pointer ~cast1:t2 op (zero ~loc) e2
-  | (Le|Lt|Ge|Gt|Eq|Ne) when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
-    compare_pointer
-      ~cast1:(Machine.uintptr_type ())
-      ~cast2:(Machine.uintptr_type ())
-      op e1 e2
+    (* ISO C11 6.5.6§3 and 6.5.6§9 : Both types should be compatible and the
+       result is of type ptrdiff_t. *)
+    if compatible_pointed_types () then
+      constFoldBinOp op e1 (mkCastT ~oldt:t2 ~newt:t1 e2)
+        (Machine.ptrdiff_type ())
+    else
+      error "operator '%a' on incompatible pointer types '%a' and '%a'"
+        !pp_binop_ref op !pp_typ_ref t1 !pp_typ_ref t2
+  | Eq | Ne when (is_ptr t1 || is_variadic_list t1) && isZero e2 ->
+    constFoldBinOp op e1 (mkCast ~newt:t1 e2) Cil_const.intType
+  | Eq | Ne when (is_ptr t2 || is_variadic_list t2) && isZero e1 ->
+    constFoldBinOp op (mkCast ~newt:t2 e1) e2 Cil_const.intType
+  | Lt | Le | Ge | Gt
+    when Ast_types.is_fun_ptr t1 || Ast_types.is_fun_ptr t2 ->
+    (* ISO 6.5.8§2: both operands should be pointers to qualified or unqualified
+       versions of compatible object types. *)
+    error "operator '%a' on non-object (function) pointer type(s) '%a' and '%a'"
+      !pp_binop_ref op !pp_typ_ref t1 !pp_typ_ref t2
+  | Eq | Ne | Lt | Le | Ge | Gt
+    when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
+    (* We are more lenient than the ISO C here, if two pointers do not
+       point to compatible types, we cast them to a common type. *)
+    let e1, e2 =
+      if not (need_cast ~force:true t1 t2) then
+        e1, e2
+      else if compatible_pointed_types () then
+        e1, mkCastT ~oldt:t2 ~newt:t1 e2
+      else if Ast_types.is_object_ptr t1 && Ast_types.is_object_ptr t2 then
+        (* Only object types can safely be casted to void*. *)
+        mkCastT ~oldt:t1 ~newt:Cil_const.voidPtrType e1,
+        mkCastT ~oldt:t2 ~newt:Cil_const.voidPtrType e2
+      else
+        mkCastT ~oldt:t1 ~newt:(Machine.uintptr_type ()) e1,
+        mkCastT ~oldt:t2 ~newt:(Machine.uintptr_type ()) e2
+    in
+    constFoldBinOp op e1 e2 Cil_const.intType
+  | Eq | Ne | Lt | Le | Ge | Gt -> doArithmetic ~res:Cil_const.intType ()
   | _ ->
-    Kernel.fatal
-      ~current:true
-      "@[mkBinOp: unsupported operator for such operands@ \
-       %a@ (type of e1: %a,@ type of e2: %a)@]"
-      !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,Cil_const.intType)))
-      !pp_typ_ref t1
-      !pp_typ_ref t2
+    error "unsupported operator '%a' on expression of types '%a' and '%a'"
+      !pp_binop_ref op !pp_typ_ref t1 !pp_typ_ref t2
 
-let mkBinOp_safe_ptr_cmp ~loc op e1 e2 =
-  let e1, e2 =
-    match op with
-    | (Eq | Ne | Lt | Le | Ge | Gt) ->
-      let t1 = typeOf e1 in
-      let t2 = typeOf e2 in
-      if Ast_types.is_ptr t1 && Ast_types.is_ptr t2
-         && not (isZero e1) && not (isZero e2)
-      then begin
-        mkCast ~force:true ~newt:(Machine.uintptr_type ()) e1,
-        mkCast ~force:true ~newt:(Machine.uintptr_type ()) e2
-      end else e1, e2
-    | _ -> e1, e2
-  in
-  mkBinOp ~loc op e1 e2
+and mkBinOp_exn ?constfold ~loc op e1 e2 =
+  match mkBinOp ?constfold ~loc op e1 e2 with
+  | Ok e -> e
+  | Error msg ->
+    Kernel.fatal ~current:true "Cil.mkBinOp: typing expression '%a' failed: %s"
+      !pp_exp_ref (dummy_exp(BinOp(op, e1, e2, Cil_const.intType))) msg
+
+and expression_to_bool e =
+  if is_boolean_result e then e
+  else begin
+    let loc = e.eloc in
+    let zero =
+      match Ast_types.unroll_node (typeOf e) with
+      | TInt ik -> kinteger ~loc ik 0
+      | TEnum ei -> kinteger ~loc ei.ekind 0
+      | TFloat fk -> kfloat ~loc fk 0.0
+      | TPtr _ -> kinteger ~loc (Machine.uintptr_kind()) 0
+      | _ ->
+        Kernel.fatal "expression_to_bool: called on non-scalar expression '%a'"
+          !pp_exp_ref e
+    in
+    mkBinOp_exn ~loc Ne e zero
+  end
 
 type existsAction =
     ExistsTrue                          (* We have found it *)
@@ -6730,3 +6749,7 @@ end
 let typeDeepDropAllAttributes t =
   let vis = new dropAttributes () in
   visitCilType vis t
+
+(* Deprecated *)
+
+let mkBinOp_safe_ptr_cmp = mkBinOp_exn ~constfold:false

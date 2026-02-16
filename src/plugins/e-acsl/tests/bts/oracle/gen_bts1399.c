@@ -10,8 +10,8 @@
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 struct spongeStateStruct {
-   unsigned char __attribute__((__aligned__(32))) state[1600 / 8] ;
-   unsigned char __attribute__((__aligned__(32))) dataQueue[1536 / 8] ;
+   unsigned char __attribute__((__aligned__(32))) state[200] ;
+   unsigned char __attribute__((__aligned__(32))) dataQueue[192] ;
    unsigned int bitsInQueue ;
 } __attribute__((__aligned__(32)));
 typedef struct spongeStateStruct spongeState;
@@ -19,13 +19,13 @@ int main(void)
 {
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  spongeState *state = malloc(sizeof(spongeState));
+  spongeState *state = malloc(448UL);
   __e_acsl_store_block((void *)(& state),8UL);
   __e_acsl_full_init((void *)(& state));
   /*@ assert Eva: pointer_alignment: \aligned(state,alignof(spongeState)); */
   __e_acsl_initialize((void *)(& state->bitsInQueue),sizeof(unsigned int));
   /*@ assert Eva: pointer_alignment: \aligned(state,alignof(spongeState)); */
-  state->bitsInQueue = (unsigned int)16;
+  state->bitsInQueue = 16U;
   {
     int __gen_e_acsl_valid_read;
     int __gen_e_acsl_initialized;

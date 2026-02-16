@@ -11,7 +11,7 @@ int main(void)
 {
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  long x = (long)0;
+  long x = 0L;
   int y = 0;
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};

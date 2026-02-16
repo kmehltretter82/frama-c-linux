@@ -16,7 +16,7 @@ int main(void)
   __e_acsl_store_block((void *)(arr),16UL);
   __e_acsl_full_init((void *)(& arr));
   int arr2[4] = {1, 2, 3, 4};
-  if (! ((uintptr_t)(& arr) + sizeof(arr) == (uintptr_t)(& arr2))) {
+  if (! ((uintptr_t)(& arr) + 16UL == (uintptr_t)(& arr2))) {
     __retres = 0;
     goto return_label;
   }

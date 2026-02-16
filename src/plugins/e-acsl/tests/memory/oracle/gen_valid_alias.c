@@ -83,7 +83,7 @@ int main(void)
   }
   /*@ assert !\valid(a) && !\valid(b); */ ;
   __e_acsl_full_init((void *)(& a));
-  a = (int *)malloc(sizeof(int));
+  a = (int *)malloc(4UL);
   __e_acsl_initialize((void *)a,sizeof(int));
   *a = n;
   __e_acsl_full_init((void *)(& b));

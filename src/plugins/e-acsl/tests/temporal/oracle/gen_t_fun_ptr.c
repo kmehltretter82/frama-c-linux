@@ -39,7 +39,7 @@ int main(int argc, char const **argv)
   __e_acsl_temporal_reset_return();
   __e_acsl_temporal_save_nreferent_parameter((void *)(& p),1U);
   __e_acsl_temporal_save_nblock_parameter((void *)(& a),2U);
-  p = pfun((char)'a',p,& a,(int *)0,(int *)addr,2);
+  p = pfun((char)97,p,& a,(int *)0,(int *)addr,2);
   __e_acsl_temporal_pull_return((void *)(& p));
   {
     int __gen_e_acsl_initialized;

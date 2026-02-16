@@ -77,7 +77,7 @@ int *new_inversed(int len, int *v)
    */
   ;
   __e_acsl_full_init((void *)(& p));
-  p = (int *)malloc(sizeof(int) * (unsigned long)len);
+  p = (int *)malloc(4UL * (unsigned long)len);
   i = 0;
   while (i < len) {
     __e_acsl_initialize((void *)(p + i),sizeof(int));

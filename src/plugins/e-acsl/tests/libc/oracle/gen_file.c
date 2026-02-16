@@ -55,7 +55,7 @@ int main(void)
   FILE *f = __gen_e_acsl_fopen("/dev/urandom","r");
   __e_acsl_store_block((void *)(& f),8UL);
   __e_acsl_full_init((void *)(& f));
-  tmp_0 = __gen_e_acsl_fread((void *)(& buf[1]),sizeof(int),(size_t)4,f);
+  tmp_0 = __gen_e_acsl_fread((void *)(& buf[1]),4UL,4UL,f);
   int res = (int)tmp_0;
   {
     int __gen_e_acsl_initialized;
@@ -233,7 +233,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
   }
   /*@ assert !\initialized(&buf[5]); */ ;
-  __gen_e_acsl_fread((void *)(& buf2[1]),sizeof(int),(size_t)4,f);
+  __gen_e_acsl_fread((void *)(& buf2[1]),4UL,4UL,f);
   {
     int __gen_e_acsl_initialized_8;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
@@ -389,7 +389,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
       __gen_e_acsl_assert_data_3.fct = "fread";
       __gen_e_acsl_assert_data_3.line = 381;
       __gen_e_acsl_assert_data_3.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_3);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     }
     __gen_e_acsl_aligned = __e_acsl_aligned(ptr,_Alignof(char));
@@ -606,7 +606,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
       __gen_e_acsl_assert_data_10.fct = "fread";
       __gen_e_acsl_assert_data_10.line = 387;
       __gen_e_acsl_assert_data_10.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_10);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_10);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
     }
     __gen_e_acsl_aligned_2 = __e_acsl_aligned(__gen_e_acsl_at_2,

@@ -112,8 +112,7 @@ int main(int argc, char const **argv)
         __gen_e_acsl_assert_data_6.fct = "main";
         __gen_e_acsl_assert_data_6.line = 10;
         __gen_e_acsl_assert_data_6.name = "denominator not zero";
-        __e_acsl_assert(_Alignof(char const) != 0UL,
-                        & __gen_e_acsl_assert_data_6);
+        __e_acsl_assert(1,& __gen_e_acsl_assert_data_6);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
       }
       __gen_e_acsl_aligned = __e_acsl_aligned((void *)*argv,

@@ -214,7 +214,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"sig",0,sig);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "RTE";
-    __gen_e_acsl_assert_data.pred_txt = "sig < (int)(64 + 1)";
+    __gen_e_acsl_assert_data.pred_txt = "sig < 65";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/signal.h";
     __gen_e_acsl_assert_data.fct = "signal";
     __gen_e_acsl_assert_data.line = 139;
@@ -241,7 +241,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"sig",0,sig);
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "RTE";
-    __gen_e_acsl_assert_data_3.pred_txt = "sig < (int)(64 + 1)";
+    __gen_e_acsl_assert_data_3.pred_txt = "sig < 65";
     __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/signal.h";
     __gen_e_acsl_assert_data_3.fct = "signal";
     __gen_e_acsl_assert_data_3.line = 132;
@@ -300,7 +300,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"sig",0,sig);
     __gen_e_acsl_assert_data_7.blocking = 1;
     __gen_e_acsl_assert_data_7.kind = "RTE";
-    __gen_e_acsl_assert_data_7.pred_txt = "sig < (int)(64 + 1)";
+    __gen_e_acsl_assert_data_7.pred_txt = "sig < 65";
     __gen_e_acsl_assert_data_7.file = "FRAMAC_SHARE/libc/signal.h";
     __gen_e_acsl_assert_data_7.fct = "signal";
     __gen_e_acsl_assert_data_7.line = 137;
@@ -326,7 +326,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"sig",0,sig);
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "RTE";
-    __gen_e_acsl_assert_data_9.pred_txt = "sig < (int)(64 + 1)";
+    __gen_e_acsl_assert_data_9.pred_txt = "sig < 65";
     __gen_e_acsl_assert_data_9.file = "FRAMAC_SHARE/libc/signal.h";
     __gen_e_acsl_assert_data_9.fct = "signal";
     __gen_e_acsl_assert_data_9.line = 143;
@@ -401,7 +401,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
                                  "__gen_e_acsl_at_7",0,__gen_e_acsl_at_7);
     __gen_e_acsl_assert_data_15.blocking = 1;
     __gen_e_acsl_assert_data_15.kind = "RTE";
-    __gen_e_acsl_assert_data_15.pred_txt = "__gen_e_acsl_at_7 < (int)(64 + 1)";
+    __gen_e_acsl_assert_data_15.pred_txt = "__gen_e_acsl_at_7 < 65";
     __gen_e_acsl_assert_data_15.file = "FRAMAC_SHARE/libc/signal.h";
     __gen_e_acsl_assert_data_15.fct = "signal";
     __gen_e_acsl_assert_data_15.line = 131;
@@ -435,7 +435,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
                                    "__gen_e_acsl_at_5",0,__gen_e_acsl_at_5);
       __gen_e_acsl_assert_data_17.blocking = 1;
       __gen_e_acsl_assert_data_17.kind = "RTE";
-      __gen_e_acsl_assert_data_17.pred_txt = "__gen_e_acsl_at_5 < (int)(64 + 1)";
+      __gen_e_acsl_assert_data_17.pred_txt = "__gen_e_acsl_at_5 < 65";
       __gen_e_acsl_assert_data_17.file = "FRAMAC_SHARE/libc/signal.h";
       __gen_e_acsl_assert_data_17.fct = "signal";
       __gen_e_acsl_assert_data_17.line = 132;
@@ -486,7 +486,7 @@ void (*__gen_e_acsl_signal(int sig, void (*func)(int )))(int )
                                    "__gen_e_acsl_at_3",0,__gen_e_acsl_at_3);
       __gen_e_acsl_assert_data_20.blocking = 1;
       __gen_e_acsl_assert_data_20.kind = "RTE";
-      __gen_e_acsl_assert_data_20.pred_txt = "__gen_e_acsl_at_3 < (int)(64 + 1)";
+      __gen_e_acsl_assert_data_20.pred_txt = "__gen_e_acsl_at_3 < 65";
       __gen_e_acsl_assert_data_20.file = "FRAMAC_SHARE/libc/signal.h";
       __gen_e_acsl_assert_data_20.fct = "signal";
       __gen_e_acsl_assert_data_20.line = 134;

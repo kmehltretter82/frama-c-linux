@@ -65,10 +65,10 @@ let length_exp ~loc kf env ~name array =
              Smart_stmt.assigns
                ~loc
                ~result:(Cil.var v)
-               (Cil.mkBinOp
+               (Misc.make_binop
                   ~loc
                   Div
-                  (Cil.mkBinOp ~loc MinusA block_length_exp offset_exp)
+                  (Misc.make_binop ~loc MinusA block_length_exp offset_exp)
                   sizeof_exp)
            ])
     in
@@ -176,7 +176,7 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
   let env = !translate_rte_ref ~filter kf env array1_iter_e in
   let env = !translate_rte_ref ~filter kf env array2_iter_e in
   (* Create the condition *)
-  let cond = Cil.mkBinOp ~loc Ne array1_iter_e array2_iter_e in
+  let cond = Misc.make_binop ~loc Ne array1_iter_e array2_iter_e in
   (* Create the statement representing the body of the for loop *)
   let body =
     Smart_stmt.if_stmt
@@ -219,7 +219,7 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
       let len_orig, env =
         length_exp ~loc kf env ~name:(name ^ "_orig") array_orig
       in
-      let e = Cil.mkBinOp ~loc Le len len_orig in
+      let e = Misc.make_binop ~loc Le len len_orig in
       let p =
         Logic_const.prel
           ~loc
@@ -251,7 +251,7 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
   let stmt =
     Smart_stmt.if_stmt
       ~loc
-      ~cond:(Cil.mkBinOp ~loc Eq len1_exp len2_exp)
+      ~cond:(Misc.make_binop ~loc Eq len1_exp len2_exp)
       then_blk
       ~else_blk:(Cil.mkBlock
                    [ Smart_stmt.assigns

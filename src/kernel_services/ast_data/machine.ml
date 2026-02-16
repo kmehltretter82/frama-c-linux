@@ -20,8 +20,6 @@ type machine = {
       evaluate both of their operands. *)
   mutable machdep: mach;
   (* Machine.init will set this to the current machine description. *)
-  mutable lowerConstants: bool;
-  (* Do lower constants (default true) *)
   mutable insertImplicitCasts: bool;
   (* Do insert implicit casts (default true) *)
   mutable stringLiteralType: typ;
@@ -47,7 +45,6 @@ type machine = {
 let create_machine () = {
   useLogicalOperators = false;
   machdep = List.hd Machdep.reprs;
-  lowerConstants = false;
   insertImplicitCasts = true;
   stringLiteralType = Cil_const.charConstPtrType;
   upointType = Cil_const.voidType;
@@ -63,7 +60,6 @@ let create_machine () = {
 let copy_machine src dst =
   dst.useLogicalOperators <- src.useLogicalOperators;
   dst.machdep <- src.machdep;
-  dst.lowerConstants <- src.lowerConstants;
   dst.insertImplicitCasts <- src.insertImplicitCasts;
   dst.stringLiteralType <- src.stringLiteralType;
   dst.upointType <- src.upointType;
@@ -79,7 +75,7 @@ let the_machine = create_machine ()
 
 let use_logical_operators () = the_machine.useLogicalOperators
 let get_machdep () = the_machine.machdep
-let lower_constants () = the_machine.lowerConstants
+let lower_constants () = Kernel.Constfold.get ()
 let insert_implicit_casts () = the_machine.insertImplicitCasts
 let string_literal_type () = the_machine.stringLiteralType
 let uintptr_type () = the_machine.upointType

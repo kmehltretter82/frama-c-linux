@@ -1024,7 +1024,7 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     }
     /*@ assert \initialized(&src_0[0 .. 3]); */ ;
-    __gen_e_acsl_strncpy(dest_0,(char const *)(src_0),(size_t)1);
+    __gen_e_acsl_strncpy(dest_0,(char const *)(src_0),1UL);
     {
       int __gen_e_acsl_initialized_7;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
@@ -1159,7 +1159,7 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
     }
     /*@ assert \initialized(&src_1[0 .. 3]); */ ;
-    __gen_e_acsl_strncpy(dest_1,(char const *)(src_1),(size_t)3);
+    __gen_e_acsl_strncpy(dest_1,(char const *)(src_1),3UL);
     {
       int __gen_e_acsl_size_10;
       int __gen_e_acsl_if_10;
@@ -1499,7 +1499,7 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_20);
     }
     /*@ assert \initialized(&src_3[0 .. 2]); */ ;
-    __gen_e_acsl_strncat(dest_3,(char const *)(src_3),(size_t)1);
+    __gen_e_acsl_strncat(dest_3,(char const *)(src_3),1UL);
     {
       int __gen_e_acsl_size_18;
       int __gen_e_acsl_if_18;
@@ -1669,7 +1669,7 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_25);
     }
     /*@ assert \initialized(&src_4[0 .. 1]); */ ;
-    __gen_e_acsl_strncat(dest_4,(char const *)(src_4),(size_t)2);
+    __gen_e_acsl_strncat(dest_4,(char const *)(src_4),2UL);
     {
       int __gen_e_acsl_size_22;
       int __gen_e_acsl_if_22;

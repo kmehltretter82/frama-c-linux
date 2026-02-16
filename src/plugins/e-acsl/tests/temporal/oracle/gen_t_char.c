@@ -11,10 +11,10 @@ int main(int argc, char const **argv)
 {
   int __retres;
   __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
-  char a __attribute__((__aligned__(4))) = (char)'1';
+  char a __attribute__((__aligned__(4))) = (char)49;
   __e_acsl_store_block((void *)(& a),1UL);
   __e_acsl_full_init((void *)(& a));
-  char b __attribute__((__aligned__(4))) = (char)'2';
+  char b __attribute__((__aligned__(4))) = (char)50;
   __e_acsl_store_block((void *)(& b),1UL);
   __e_acsl_full_init((void *)(& b));
   char *p = & a;

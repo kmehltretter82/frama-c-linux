@@ -110,7 +110,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
           __gen_e_acsl_assert_data_3.fct = "memchr";
           __gen_e_acsl_assert_data_3.line = 8;
           __gen_e_acsl_assert_data_3.name = "denominator not zero";
-          __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_3);
+          __e_acsl_assert(1,& __gen_e_acsl_assert_data_3);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
         }
         __gen_e_acsl_aligned = __e_acsl_aligned((void *)buf,_Alignof(char));
@@ -161,7 +161,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
           __gen_e_acsl_assert_data_5.fct = "memchr";
           __gen_e_acsl_assert_data_5.line = 8;
           __gen_e_acsl_assert_data_5.name = "denominator not zero";
-          __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_5);
+          __e_acsl_assert(1,& __gen_e_acsl_assert_data_5);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
         }
         __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)((char *)buf + __gen_e_acsl_i),
@@ -196,7 +196,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
           __gen_e_acsl_assert_data_7.fct = "memchr";
           __gen_e_acsl_assert_data_7.line = 8;
           __gen_e_acsl_assert_data_7.name = "denominator not zero";
-          __e_acsl_assert(_Alignof(char) != 0UL,& __gen_e_acsl_assert_data_7);
+          __e_acsl_assert(1,& __gen_e_acsl_assert_data_7);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
         }
         __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)buf,_Alignof(char));
@@ -250,8 +250,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
           __gen_e_acsl_assert_data_10.fct = "memchr";
           __gen_e_acsl_assert_data_10.line = 11;
           __gen_e_acsl_assert_data_10.name = "denominator not zero";
-          __e_acsl_assert(_Alignof(char) != 0UL,
-                          & __gen_e_acsl_assert_data_10);
+          __e_acsl_assert(1,& __gen_e_acsl_assert_data_10);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
         }
         __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)buf,_Alignof(char));
@@ -303,8 +302,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
           __gen_e_acsl_assert_data_12.fct = "memchr";
           __gen_e_acsl_assert_data_12.line = 11;
           __gen_e_acsl_assert_data_12.name = "denominator not zero";
-          __e_acsl_assert(_Alignof(char) != 0UL,
-                          & __gen_e_acsl_assert_data_12);
+          __e_acsl_assert(1,& __gen_e_acsl_assert_data_12);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
         }
         __gen_e_acsl_aligned_5 = __e_acsl_aligned((void *)((char *)buf + __gen_e_acsl_k),
@@ -339,8 +337,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
           __gen_e_acsl_assert_data_14.fct = "memchr";
           __gen_e_acsl_assert_data_14.line = 11;
           __gen_e_acsl_assert_data_14.name = "denominator not zero";
-          __e_acsl_assert(_Alignof(char) != 0UL,
-                          & __gen_e_acsl_assert_data_14);
+          __e_acsl_assert(1,& __gen_e_acsl_assert_data_14);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
         }
         __gen_e_acsl_aligned_6 = __e_acsl_aligned((void *)buf,_Alignof(char));
@@ -400,8 +397,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
             __gen_e_acsl_assert_data_24.fct = "memchr";
             __gen_e_acsl_assert_data_24.line = 9;
             __gen_e_acsl_assert_data_24.name = "denominator not zero";
-            __e_acsl_assert(_Alignof(char) != 0UL,
-                            & __gen_e_acsl_assert_data_24);
+            __e_acsl_assert(1,& __gen_e_acsl_assert_data_24);
             __e_acsl_assert_clean(& __gen_e_acsl_assert_data_24);
           }
           __gen_e_acsl_aligned_10 = __e_acsl_aligned(__retres,_Alignof(char));
@@ -446,8 +442,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
             __gen_e_acsl_assert_data_18.fct = "memchr";
             __gen_e_acsl_assert_data_18.line = 9;
             __gen_e_acsl_assert_data_18.name = "denominator not zero";
-            __e_acsl_assert(_Alignof(char) != 0UL,
-                            & __gen_e_acsl_assert_data_18);
+            __e_acsl_assert(1,& __gen_e_acsl_assert_data_18);
             __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
           }
           __gen_e_acsl_aligned_7 = __e_acsl_aligned((void *)__gen_e_acsl_at_2,
@@ -503,8 +498,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
             __gen_e_acsl_assert_data_20.fct = "memchr";
             __gen_e_acsl_assert_data_20.line = 9;
             __gen_e_acsl_assert_data_20.name = "denominator not zero";
-            __e_acsl_assert(_Alignof(char) != 0UL,
-                            & __gen_e_acsl_assert_data_20);
+            __e_acsl_assert(1,& __gen_e_acsl_assert_data_20);
             __e_acsl_assert_clean(& __gen_e_acsl_assert_data_20);
           }
           __gen_e_acsl_aligned_8 = __e_acsl_aligned((void *)((char *)__gen_e_acsl_at_2 + __gen_e_acsl_j),
@@ -541,8 +535,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
             __gen_e_acsl_assert_data_22.fct = "memchr";
             __gen_e_acsl_assert_data_22.line = 9;
             __gen_e_acsl_assert_data_22.name = "denominator not zero";
-            __e_acsl_assert(_Alignof(char) != 0UL,
-                            & __gen_e_acsl_assert_data_22);
+            __e_acsl_assert(1,& __gen_e_acsl_assert_data_22);
             __e_acsl_assert_clean(& __gen_e_acsl_assert_data_22);
           }
           __gen_e_acsl_aligned_9 = __e_acsl_aligned((void *)__gen_e_acsl_at_2,
@@ -634,8 +627,8 @@ int main(void)
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
-  __gen_e_acsl_memchr((void const *)"toto",'o',(size_t)4);
-  __gen_e_acsl_memchr((void const *)"tata",'o',(size_t)4);
+  __gen_e_acsl_memchr((void const *)"toto",111,4UL);
+  __gen_e_acsl_memchr((void const *)"tata",111,4UL);
   __retres = 0;
   __e_acsl_globals_clean();
   __e_acsl_memory_clean();

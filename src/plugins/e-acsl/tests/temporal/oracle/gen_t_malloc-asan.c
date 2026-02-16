@@ -18,11 +18,11 @@ int main(void)
   __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_store_block((void *)(& p),8UL);
   int counter = 0;
-  size_t limit = (size_t)10000;
+  size_t limit = 10000UL;
   __e_acsl_full_init((void *)(& p));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
-  p = (int *)malloc((size_t)(1024 * 1024));
+  p = (int *)malloc(1048576UL);
   __e_acsl_temporal_store_nblock((void *)(& p),(void *)*(& p));
   __e_acsl_full_init((void *)(& q));
   __e_acsl_temporal_store_nreferent((void *)(& q),(void *)(& p));
@@ -35,7 +35,7 @@ int main(void)
     __e_acsl_full_init((void *)(& p));
     __e_acsl_temporal_reset_parameters();
     __e_acsl_temporal_reset_return();
-    p = (int *)malloc((size_t)(1024 * 1024));
+    p = (int *)malloc(1048576UL);
     __e_acsl_temporal_store_nblock((void *)(& p),(void *)*(& p));
     counter ++;
     /*@ assert Eva: dangling_pointer: !\dangling(&q); */

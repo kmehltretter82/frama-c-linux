@@ -458,7 +458,7 @@ int main_bhv_bhv(int c); */
     else aorai_intermediate_state_0_tmp = 0;
     bhv_aux = main_bhv_bhv(c);
     if (S0 == 1) 
-      if (bhv_aux) aorai_intermediate_state_tmp = 1;
+      if (bhv_aux != 0) aorai_intermediate_state_tmp = 1;
       else aorai_intermediate_state_tmp = 0;
     else aorai_intermediate_state_tmp = 0;
     Sf_tmp = 0;

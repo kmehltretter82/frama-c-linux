@@ -227,7 +227,7 @@ int __gen_e_acsl_CountInd_here(int *arr, __e_acsl_mpz_struct * len, int val,
         __gen_e_acsl_assert_data_4.fct = "CountInd_here";
         __gen_e_acsl_assert_data_4.line = 21;
         __gen_e_acsl_assert_data_4.name = "denominator not zero";
-        __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_4);
+        __e_acsl_assert(1,& __gen_e_acsl_assert_data_4);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
       }
       __gen_e_acsl_aligned = __e_acsl_aligned((void *)(arr + __gen_e_acsl_sub_2),
@@ -355,7 +355,7 @@ int __gen_e_acsl_CountInd_here(int *arr, __e_acsl_mpz_struct * len, int val,
           __gen_e_acsl_assert_data_7.fct = "CountInd_here";
           __gen_e_acsl_assert_data_7.line = 26;
           __gen_e_acsl_assert_data_7.name = "denominator not zero";
-          __e_acsl_assert(_Alignof(int) != 0UL,& __gen_e_acsl_assert_data_7);
+          __e_acsl_assert(1,& __gen_e_acsl_assert_data_7);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
         }
         __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)(arr + __gen_e_acsl_sub_7),

@@ -12,7 +12,7 @@ int main(void)
 {
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  uint8 x = (uint8)0;
+  uint8 x = (unsigned char)0;
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_uchar(& __gen_e_acsl_assert_data,"x",0,x);

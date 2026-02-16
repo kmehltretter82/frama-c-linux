@@ -50,13 +50,13 @@ struct TPM2B_DIGEST;
 typedef struct TPM2B_DIGEST TPM2B_DIGEST;
 struct TPM2B_DIGEST {
    UINT16 size ;
-   BYTE buffer[sizeof(TPMU_HA)] ;
+   BYTE buffer[64UL] ;
 };
 struct TPM2B_DATA;
 typedef struct TPM2B_DATA TPM2B_DATA;
 struct TPM2B_DATA {
    UINT16 size ;
-   BYTE buffer[sizeof(TPMU_HA)] ;
+   BYTE buffer[64UL] ;
 };
 typedef TPM2B_DIGEST TPM2B_NONCE;
 typedef TPM2B_DIGEST TPM2B_AUTH;
@@ -70,7 +70,7 @@ struct TPM2B_NAME;
 typedef struct TPM2B_NAME TPM2B_NAME;
 struct TPM2B_NAME {
    UINT16 size ;
-   BYTE name[sizeof(TPMU_NAME)] ;
+   BYTE name[68UL] ;
 };
 typedef TPM2_KEY_BITS TPMI_AES_KEY_BITS;
 typedef TPM2_KEY_BITS TPMI_SM4_KEY_BITS;
@@ -229,16 +229,16 @@ struct TPMT_ECC_SCHEME {
 union TPMU_ENCRYPTED_SECRET;
 typedef union TPMU_ENCRYPTED_SECRET TPMU_ENCRYPTED_SECRET;
 union TPMU_ENCRYPTED_SECRET {
-   BYTE ecc[sizeof(TPMS_ECC_POINT)] ;
+   BYTE ecc[260UL] ;
    BYTE rsa[512] ;
-   BYTE symmetric[sizeof(TPM2B_DIGEST)] ;
-   BYTE keyedHash[sizeof(TPM2B_DIGEST)] ;
+   BYTE symmetric[66UL] ;
+   BYTE keyedHash[66UL] ;
 };
 struct TPM2B_ENCRYPTED_SECRET;
 typedef struct TPM2B_ENCRYPTED_SECRET TPM2B_ENCRYPTED_SECRET;
 struct TPM2B_ENCRYPTED_SECRET {
    UINT16 size ;
-   BYTE secret[sizeof(TPMU_ENCRYPTED_SECRET)] ;
+   BYTE secret[512UL] ;
 };
 typedef TPM2_ALG_ID TPMI_ALG_PUBLIC;
 union TPMU_PUBLIC_ID;
@@ -336,7 +336,7 @@ struct __anonstruct_IESYS_SESSION_1 {
    IESYSC_PARAM_DECRYPT decrypt ;
    IESYSC_TYPE_POLICY_AUTH type_policy_session ;
    UINT16 sizeSessionValue ;
-   BYTE sessionValue[(unsigned long)2 * sizeof(TPMU_HA)] ;
+   BYTE sessionValue[128UL] ;
    UINT16 sizeHmacValue ;
 };
 typedef struct __anonstruct_IESYS_SESSION_1 IESYS_SESSION;

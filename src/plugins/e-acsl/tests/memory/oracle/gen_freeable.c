@@ -71,7 +71,7 @@ int main(void)
   }
   /*@ assert !\freeable((void *)0); */ ;
   __e_acsl_full_init((void *)(& p));
-  p = (int *)malloc((unsigned long)4 * sizeof(int));
+  p = (int *)malloc(16UL);
   {
     int __gen_e_acsl_freeable_3;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =

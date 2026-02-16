@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 {
   int __retres;
   __e_acsl_memory_init(& argc,& argv,8UL);
-  char *a = malloc((size_t)7);
+  char *a = malloc(7UL);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
@@ -32,7 +32,7 @@ int main(int argc, char **argv)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
   /*@ assert __e_acsl_heap_allocation_size == 7; */ ;
-  char *b = malloc((size_t)14);
+  char *b = malloc(14UL);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
@@ -87,7 +87,7 @@ int main(int argc, char **argv)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
   }
   /*@ assert __e_acsl_heap_allocation_size == 14; */ ;
-  b = (char *)realloc((void *)b,(size_t)9);
+  b = (char *)realloc((void *)b,9UL);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
@@ -105,7 +105,7 @@ int main(int argc, char **argv)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
   }
   /*@ assert __e_acsl_heap_allocation_size == 9; */ ;
-  b = (char *)realloc((void *)b,(size_t)18);
+  b = (char *)realloc((void *)b,18UL);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
@@ -123,7 +123,7 @@ int main(int argc, char **argv)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
   }
   /*@ assert __e_acsl_heap_allocation_size == 18; */ ;
-  b = (char *)realloc((void *)b,(size_t)0);
+  b = (char *)realloc((void *)b,0UL);
   b = (char *)0;
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
@@ -142,7 +142,7 @@ int main(int argc, char **argv)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
   }
   /*@ assert __e_acsl_heap_allocation_size == 0; */ ;
-  b = (char *)realloc((void *)b,(size_t)8);
+  b = (char *)realloc((void *)b,8UL);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
       {.values = (void *)0};
@@ -160,7 +160,7 @@ int main(int argc, char **argv)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
   }
   /*@ assert __e_acsl_heap_allocation_size == 8; */ ;
-  b = (char *)realloc((void *)0,(size_t)8);
+  b = (char *)realloc((void *)0,8UL);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
       {.values = (void *)0};

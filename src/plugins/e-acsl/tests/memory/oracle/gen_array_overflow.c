@@ -137,8 +137,7 @@ int main(void)
       __gen_e_acsl_assert_data_6.fct = "main";
       __gen_e_acsl_assert_data_6.line = 43;
       __gen_e_acsl_assert_data_6.name = "denominator not zero";
-      __e_acsl_assert(_Alignof(struct dat) != 0UL,
-                      & __gen_e_acsl_assert_data_6);
+      __e_acsl_assert(1,& __gen_e_acsl_assert_data_6);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     }
     __gen_e_acsl_aligned = __e_acsl_aligned((void *)d2.p[1],

@@ -283,7 +283,7 @@ void arrays(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
     __gen_e_acsl_ = __e_acsl_block_length((void *)(*((int (*)[])g)));
     __gen_e_acsl__2 = __e_acsl_offset((void *)(*((int (*)[])g)));
-    __gen_e_acsl_length2 = (__gen_e_acsl_ - __gen_e_acsl__2) / sizeof(int);
+    __gen_e_acsl_length2 = (__gen_e_acsl_ - __gen_e_acsl__2) / 4UL;
     if (3UL == __gen_e_acsl_length2) {
       unsigned long __gen_e_acsl_iter_5;
       __gen_e_acsl_iter_5 = 0;
@@ -422,7 +422,7 @@ void arrays(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
     __gen_e_acsl__3 = __e_acsl_block_length((void *)(*((int (*)[])f)));
     __gen_e_acsl__4 = __e_acsl_offset((void *)(*((int (*)[])f)));
-    __gen_e_acsl_length2_2 = (__gen_e_acsl__3 - __gen_e_acsl__4) / sizeof(int);
+    __gen_e_acsl_length2_2 = (__gen_e_acsl__3 - __gen_e_acsl__4) / 4UL;
     if (3UL == __gen_e_acsl_length2_2) {
       unsigned long __gen_e_acsl_iter_7;
       __gen_e_acsl_iter_7 = 0;

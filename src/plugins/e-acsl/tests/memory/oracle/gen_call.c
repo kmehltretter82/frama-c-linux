@@ -32,10 +32,10 @@ int main(void)
   int x = 0;
   __e_acsl_store_block((void *)(& x),4UL);
   __e_acsl_full_init((void *)(& x));
-  int *q = malloc(sizeof(int));
+  int *q = malloc(4UL);
   __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_full_init((void *)(& q));
-  int *r = malloc(sizeof(int));
+  int *r = malloc(4UL);
   __e_acsl_full_init((void *)(& p));
   p = __gen_e_acsl_f(& x,q);
   __e_acsl_full_init((void *)(& q));

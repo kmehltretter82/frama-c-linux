@@ -12,14 +12,14 @@ unsigned long long my_pow(unsigned int x, unsigned int n)
   unsigned long long __retres;
   int tmp;
   unsigned long long tmp_0;
-  if (n <= (unsigned int)1) {
-    __retres = (unsigned long long)1;
+  if (n <= 1U) {
+    __retres = 1ULL;
     goto return_label;
   }
-  tmp_0 = my_pow(x,n / (unsigned int)2);
+  tmp_0 = my_pow(x,n / 2U);
   tmp = (int)tmp_0;
   tmp *= tmp;
-  if (n % (unsigned int)2 == (unsigned int)0) {
+  if (n % 2U == 0U) {
     __retres = (unsigned long long)tmp;
     goto return_label;
   }
@@ -31,7 +31,7 @@ int main(void)
 {
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  unsigned long long x = my_pow((unsigned int)2,(unsigned int)63);
+  unsigned long long x = my_pow(2U,63U);
   {
     __e_acsl_mpz_t __gen_e_acsl_;
     __e_acsl_mpz_t __gen_e_acsl_x;

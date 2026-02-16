@@ -129,8 +129,7 @@ struct list *__gen_e_acsl_f(struct list *l)
           __gen_e_acsl_assert_data_3.fct = "f";
           __gen_e_acsl_assert_data_3.line = 17;
           __gen_e_acsl_assert_data_3.name = "denominator not zero";
-          __e_acsl_assert(_Alignof(struct list) != 0UL,
-                          & __gen_e_acsl_assert_data_3);
+          __e_acsl_assert(1,& __gen_e_acsl_assert_data_3);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
         }
         __gen_e_acsl_aligned = __e_acsl_aligned((void *)l->next,
