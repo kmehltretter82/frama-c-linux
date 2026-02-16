@@ -8,26 +8,6 @@
 
 open Cil_datatype
 
-(* {2 Termination.} *)
-
-let partition_terminating_instr stmt =
-  match Cvalue_results.get_stmt_state_by_callstack ~after:true stmt with
-  | `Bottom | `Top -> ([], [])
-  | `Value h ->
-    let terminating = ref [] in
-    let non_terminating = ref [] in
-    let add x xs = xs := x :: !xs in
-    Callstack.Hashtbl.iter (fun cs state ->
-        if Cvalue.Model.is_reachable state
-        then add cs terminating
-        else add cs non_terminating) h;
-    (!terminating, !non_terminating)
-
-let is_non_terminating_instr stmt =
-  match partition_terminating_instr stmt with
-  | [], _ -> true
-  | _, _ -> false
-
 (* {2 Global state.} *)
 
 (* Option_ref that calls [Parameters.change_correctness] when its state
