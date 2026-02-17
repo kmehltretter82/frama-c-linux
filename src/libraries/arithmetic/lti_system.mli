@@ -86,7 +86,7 @@ module Make (K : Field.S) : sig
       - [completion_target] specifies the relative completion of the permanent
         phase that must be achieved, i.e how much of the permanent box is
         proven to be a valid and reachable state of the system.
-        It is expressed in percentage between 0 and 100. *)
+        It is expressed as a ratio between 0 and 1. *)
   val behavior :
     ?timeout : float ->
     completion_target: float ->

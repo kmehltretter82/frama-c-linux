@@ -36,6 +36,6 @@ let shift =
 
 let () =
   let s = { state_matrix ; input_matrix ; input_space ; initial_state ; shift } in
-  let behavior = behavior ~completion_target:80.0 s in
+  let behavior = behavior ~completion_target:0.80 s in
   Format.printf "@[<v>Random 3D :@,%a@,@]" pretty_behavior behavior
 

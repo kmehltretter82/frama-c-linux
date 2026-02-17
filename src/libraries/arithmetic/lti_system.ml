@@ -111,39 +111,31 @@ module Make (K : Field.S) = struct
    *   limit radius, and the infinite remainder becomes smaller and smaller.
    * - The infinite remainder is approximated by the computation
    *   {m (I - |A^q|)^(-1) |A^q| (∑ |A^t B| |R|)}.
-   * - The function checks that the overapproximated remainder does not count
-   *   for more than a specified percentage of the limit box's radius. *)
-  let limit_behavior s ({ n ; _ } as knowledge) error_target iterations =
+   * - The radius of the returned overapproximated box is computed as the
+   *   finite sum inflated by a factor of {m 1 / completion_target} and is
+   *   considered a valid overapproximation if and only if using the remainder
+   *   overapproximation would actually be better. It is done that way to
+   *   avoid local minimums that are to precise to actually find an unrolling
+   *   stop point later on. *)
+  let limit_behavior s ({ n ; _ } as knowledge) completion_target iterations =
+    let inflation = K.(one / of_float completion_target) in
     let center_limit = compute_center_limit s knowledge in
-    let ( let<?> ) b f = if b then f () else None in
-    let compute_limit q { state_power ; perturbations } =
+    let head seq = Seq.uncons seq |> Option.map fst in
+    let limit q { state_power ; perturbations } =
       let () = Async.yield () in
-      let<?> () = K.(Matrix.norm_one state_power < one) in
-      let abs_power = Matrix.abs state_power in
-      let* center_limit = Lazy.force center_limit in
-      let* limit = Matrix.(inverse (id n - abs_power)) in
-      let underapprox = Box.make center_limit perturbations.radius in
-      let remainder = Matrix.(limit * abs_power * perturbations.radius) in
-      let overapprox = Box.(underapprox + make (Vector.zero n) remainder) in
-      let error = Matrix.(scale (K.of_int 100) remainder / overapprox.radius) in
-      let<?> () = K.(Vector.norm error < error_target) in
-      Some (q, overapprox)
-    in
-    (* The sequence of limit overapproximations converges to the actual one,
-     * but its not monotonous, and local minimums that are too precise to
-     * work with may be there. To avoid this, we look for the worst
-     * overapproximation in the first 10 candidates. *)
-    let limits = Seq.(mapi compute_limit iterations |> filter_map Fun.id) in
-    let limits = Seq.take 10 limits in
-    let worst acc (q, candidate) =
-      let () = Async.yield () in
-      match acc with
-      | None -> Some (q, candidate)
-      | Some (q', worst) ->
-        if Box.is_included worst candidate
-        then Some (q, candidate)
-        else Some (q', worst)
-    in Seq.fold_left worst None limits
+      if K.(Matrix.norm_one state_power < one) then
+        let underapprox = perturbations.radius in
+        let inflated = Matrix.scale inflation underapprox in
+        let abs_power = Matrix.abs state_power in
+        let* center_limit = Lazy.force center_limit in
+        let* limit_scale = Matrix.(inverse (id n - abs_power)) in
+        let remainder = Matrix.(limit_scale * abs_power * underapprox) in
+        let overapprox = Matrix.(underapprox + remainder) in
+        if Matrix.all_components_lower_than overapprox inflated
+        then Some (q, Box.make center_limit inflated)
+        else None
+      else None
+    in Seq.(mapi limit iterations |> filter_map Fun.id |> head)
 
   (* Searches for the first valid unrolling stop point for a given [limit]
    * found at the exponent [spectral]. A stop point [k] is valid if the
@@ -163,13 +155,13 @@ module Make (K : Field.S) = struct
     with Found stop -> Some (Seq.take stop iterations |> List.of_seq)
 
   (* Computation of the system's behavior. No termination guarantee. *)
-  let behavior_unbounded ~error_target (s : ('n, 'm) system) =
+  let behavior_unbounded completion (s : ('n, 'm) system) =
     let n = Vector.size s.initial_state in
     let radius = Matrix.(abs s.input_space.radius) in
     let center = Matrix.(s.input_matrix * s.input_space.center + s.shift) in
     let knowledge = { n ; radius ; center } in
     let iterations = compute_iterations s knowledge in
-    let* spectral, limit = limit_behavior s knowledge error_target iterations in
+    let* spectral, limit = limit_behavior s knowledge completion iterations in
     let remainder it = Matrix.(it.state_power * s.initial_state) in
     let abstraction it = Box.(point (remainder it) + it.perturbations) in
     let iterations = Seq.map abstraction iterations in
@@ -178,13 +170,14 @@ module Make (K : Field.S) = struct
 
   (* Behavior computation with timeout mecanism. *)
   let behavior ?(timeout = 1.0) ~completion_target =
-    let start = (Unix.times ()).tms_utime in
-    let elapsed_time () = (Unix.times ()).tms_utime -. start in
-    let cancel () = if elapsed_time () > timeout then Async.cancel () in
-    Async.with_progress cancel @@ fun system ->
-    let error_target = K.of_float (100.0 -. completion_target) in
-    try behavior_unbounded ~error_target system
-    with Async.Cancel -> None
+    if timeout > 0.0 && 0.0 < completion_target && completion_target < 1.0 then
+      let start = (Unix.times ()).tms_utime in
+      let elapsed_time () = (Unix.times ()).tms_utime -. start in
+      let cancel () = if elapsed_time () > timeout then Async.cancel () in
+      Async.with_progress cancel @@ fun system ->
+      try behavior_unbounded completion_target system
+      with Async.Cancel -> None
+    else fun _ -> None
 
   (* Pretty print a behavior. Used for test and debug purposes. *)
   let pretty_behavior fmt = function

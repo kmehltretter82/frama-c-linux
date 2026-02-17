@@ -32,6 +32,6 @@ let shift =
 
 let () =
   let s = { state_matrix ; input_matrix ; input_space ; initial_state ; shift } in
-  let behavior = behavior ~completion_target:99.0 s in
+  let behavior = behavior ~completion_target:0.99 s in
   Format.printf "@[<v>Simple :@,%a@,@]" pretty_behavior behavior
 
