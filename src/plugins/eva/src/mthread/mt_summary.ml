@@ -215,6 +215,24 @@ module AccessPropertyByZone = struct
 
   include Lmap_bitwise.Make_bitwise (Lattice)
 
+  (* Applies [f] on each (zone, access_kind, protection, locations) of [map]. *)
+  let iter f map =
+    let iter_zone f zone =
+      let apply base itvs () = f (Locations.Zone.inject base itvs) in
+      try Locations.Zone.fold_i apply zone ()
+      with Abstract_interp.Error_Top -> f Locations.Zone.top
+    in
+    let iter_access f accesses =
+      LocationsByAccessProperty.iter
+        (fun (kind, protection) locations -> f kind protection locations)
+        accesses
+    in
+    fold
+      (fun zones accesses () ->
+         let accesses = Eval.Top.non_top accesses in
+         iter_zone (fun zone -> iter_access (f zone) accesses) zones)
+      map ()
+
   (* Computes the map corresponding to a set of accesses of a memory zone. *)
   let compute_for_zone (acc : t) (zone, node_access_set) : t =
     Mt_cfg_types.SetNodeIdAccess.fold
@@ -278,26 +296,10 @@ module AccessTable =
 let compute_access_summary analysis =
   let accesses_by_zone = AccessPropertyByZone.compute analysis in
   AccessTable.clear ();
-  let add_zone_accesses zone accesses =
-    LocationsByAccessProperty.iter
-      (fun (kind, protection) locations ->
-         AccessTable.add (zone, kind, protection) locations)
-      accesses
-  in
-  AccessPropertyByZone.fold
-    (fun zones accesses () ->
-       let accesses = Eval.Top.non_top accesses in
-       try
-         Locations.Zone.fold_i
-           (fun base ivals () ->
-              let zone = Locations.Zone.inject base ivals in
-              add_zone_accesses zone accesses)
-           zones
-           ()
-       with Abstract_interp.Error_Top ->
-         add_zone_accesses Locations.Zone.top accesses)
-    accesses_by_zone
-    ();
+  AccessPropertyByZone.iter
+    (fun zone kind protection locs ->
+       AccessTable.replace (zone, kind, protection) locs)
+    accesses_by_zone;
   AccessTable.mark_as_computed ()
 
 
