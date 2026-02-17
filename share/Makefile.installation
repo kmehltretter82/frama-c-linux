@@ -75,5 +75,5 @@ endif
 ifdef PREFIX
 uninstall::
 	@echo "Uninstalling $(INSTALL_TARGET)"
-	dune uninstall --root . --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
+	dune uninstall ${WORKSPACE_OPT} --root . --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
 endif
