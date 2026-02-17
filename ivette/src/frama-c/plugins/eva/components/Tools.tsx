@@ -53,7 +53,7 @@ export default function EvaTools(
       <Hbox className='eva-tools-actions'>
         <IconButton
           icon="MEDIA.PLAY"
-          title="Commit changes and launch Eva analysis"
+          title="Apply changes and launch Eva analysis"
           size={iconSize}
           disabled={evaComputed === "computing"}
           onClick={compute}
@@ -81,7 +81,7 @@ export default function EvaTools(
           />
         <IconButton
           icon="PUSH"
-          title={"Commit changes"
+          title={"Apply changes"
             +
             (countErrors > 0 ?
             " : "+String(countErrors)+" error(s) in the form" : ""

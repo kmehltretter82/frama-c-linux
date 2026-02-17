@@ -114,7 +114,7 @@ function getActions<A>(
       />
       <Forms.CommitButton
         state={state}
-        title="Commit"
+        title="Apply"
         equal={equal}
       />
     </Forms.Actions>
