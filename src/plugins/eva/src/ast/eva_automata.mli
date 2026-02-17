@@ -103,7 +103,7 @@ val find_loop : automaton -> vertex -> loop option
 type 'a widening = Fixpoint | Widening of 'a
 
 (** Abstract domain for the dataflow analysis.
-    See [Interpreted_automata.Domain]. *)
+    See {!Interpreted_automata.Domain}. *)
 module type Domain =
 sig
   type t
@@ -112,13 +112,13 @@ sig
   val transfer : vertex * edge * vertex -> t -> t option
 end
 
-(** Forward Dataflow analysis. See [Interpreted_automata.ForwardAnalysis]. *)
+(** Forward Dataflow analysis. See {!Interpreted_automata.ForwardAnalysis}. *)
 module ForwardAnalysis (D : Domain):
 sig
   val fixpoint : automaton -> D.t -> D.t Vertex.Hashtbl.t
 end
 
-(** Backward Dataflow analysis. See [Interpreted_automata.BackwardAnalysis]. *)
+(** Backward Dataflow analysis. See {!Interpreted_automata.BackwardAnalysis}. *)
 module BackwardAnalysis (D : Domain):
 sig
   val fixpoint : automaton -> D.t -> D.t Vertex.Hashtbl.t

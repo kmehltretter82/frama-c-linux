@@ -239,9 +239,12 @@ sig
   val widen : t -> t -> t widening
 
   (** Transfer function for edges: [transfer (u,e,v) s] computes the state
-      after the transition [e.edge_transition] from the state [s] before,
-      between vertices [u] and [v]. Returns None if the end of the transition is
-      not reachable from the given state. *)
+      at vertex [v] after the transition [e.edge_transition] from the state [s]
+      at vertex [u]. For backward analyses, edges are thus reversed, i.e.
+      [(v,e,u)] is an edge of the graph.
+
+      This function can return None if the end of the transition is not
+      reachable from the given state. *)
   val transfer : vertex * vertex edge * vertex -> t -> t option
 end
 
