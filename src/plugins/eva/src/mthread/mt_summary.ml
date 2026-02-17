@@ -178,6 +178,31 @@ module LocationsByAccessProperty = struct
       with Not_found -> false
     in
     for_all is_included_binding l
+
+  let get_access_kind = function
+    | Read | ReadPos _ -> AccessRead
+    | Write _ | WritePos _ -> AccessWrite
+
+  (* Computes the map (property -> locations) corresponding to the cfg node
+     of a memory access. *)
+  let compute rw cfg_node : t =
+    let access_kind = get_access_kind rw in
+    let stmt_list = Mt_cfg_types.CfgNode.node_stmt cfg_node in
+    let locs = List.map Cil_datatype.Stmt.loc stmt_list |> LocSet.of_list in
+    let locked_mutexes = cfg_node.Mt_cfg_types.cfgn_context.locked_mutexes in
+    if MutexPresence.is_empty locked_mutexes then
+      singleton (access_kind, Unprotected) locs
+    else
+      let add_mutex mutex =
+        let protection =
+          if MutexPresence.find locked_mutexes mutex = Present
+          then Protected (Mutex.Set.singleton mutex)
+          else MaybeProtected (Mutex.Set.singleton mutex)
+        in
+        add (access_kind, protection) locs
+      in
+      let all_mutex = MutexPresence.all_present locked_mutexes in
+      MutexPresence.KeySet.fold add_mutex all_mutex empty
 end
 
 (** Map zone -> access property (kind+protection) -> set of locations. *)
@@ -189,51 +214,25 @@ module AccessPropertyByZone = struct
   end
 
   include Lmap_bitwise.Make_bitwise (Lattice)
+
+  (* Computes the map corresponding to a set of accesses of a memory zone. *)
+  let compute_for_zone (acc : t) (zone, node_access_set) : t =
+    Mt_cfg_types.SetNodeIdAccess.fold
+      (fun (rw, cfg_node, _) acc ->
+         let lba = LocationsByAccessProperty.compute rw cfg_node in
+         add_binding ~exact:false acc zone (`Value lba))
+      node_access_set
+      acc
+
+  (* Computes the map corresponding to all accesses from an analysis. *)
+  let compute analysis =
+    let accesses = analysis.Mt_thread.concurrent_accesses_by_nodes in
+    let r1 = List.fold_left compute_for_zone empty accesses in
+    match r1 with
+    | Top | Bottom ->
+      Mt_self.fatal "By construction, accesses_by_zone cannot be Top or Bottom"
+    | Map m -> m
 end
-
-let get_access_kind (rw, _, _) : AccessKind.t =
-  match rw with
-  | Read | ReadPos _ -> AccessRead
-  | Write _ | WritePos _ -> AccessWrite
-
-let get_access_locs (_, node, _) =
-  Mt_cfg_types.CfgNode.node_stmt node
-  |> List.map Cil_datatype.Stmt.loc
-  |> LocSet.of_list
-
-let get_locked_mutexes_for_access (_, node, _) =
-  node.Mt_cfg_types.cfgn_context.locked_mutexes
-
-let compute_node_access_summary (zone, node_access_set) =
-  let open Mt_cfg_types in
-  SetNodeIdAccess.fold
-    (fun node_id_access acc ->
-       let access_kind = get_access_kind node_id_access in
-       let locs = get_access_locs node_id_access in
-       let protection_kinds : Protection.t list =
-         let locked_mutexes = get_locked_mutexes_for_access node_id_access in
-         if MutexPresence.is_empty locked_mutexes then
-           [ Unprotected ]
-         else
-           let add_mutex mutex acc =
-             let set = Mutex.Set.singleton mutex in
-             if MutexPresence.find locked_mutexes mutex = Present
-             then Protected set :: acc
-             else MaybeProtected set :: acc
-           in
-           let all_mutex = MutexPresence.all_present locked_mutexes in
-           MutexPresence.KeySet.fold add_mutex all_mutex []
-       in
-       let lba =
-         List.fold_left
-           (fun acc protection ->
-              LocationsByAccessProperty.add (access_kind, protection) locs acc)
-           LocationsByAccessProperty.empty
-           protection_kinds
-       in
-       AccessPropertyByZone.add_binding ~exact:false acc zone (`Value lba))
-    node_access_set
-    AccessPropertyByZone.empty
 
 
 (* ----- Summary for all threads -------------------------------------------- *)
@@ -277,21 +276,7 @@ module AccessTable =
   State_builder.Hashtbl (Access.Hashtbl) (LocSet) (val info "AccessTable")
 
 let compute_access_summary analysis =
-  let accesses = analysis.Mt_thread.concurrent_accesses_by_nodes in
-  let r1 = List.map compute_node_access_summary accesses in
-  let accesses_by_zone =
-    List.fold_left
-      (fun r r' -> AccessPropertyByZone.join r r')
-      AccessPropertyByZone.empty
-      r1
-  in
-  let accesses_by_zone =
-    match accesses_by_zone with
-    | Top | Bottom ->
-      Mt_self.fatal
-        "By construction, accesses_by_zone cannot be Top or Bottom"
-    | Map m -> m
-  in
+  let accesses_by_zone = AccessPropertyByZone.compute analysis in
   AccessTable.clear ();
   let add_zone_accesses zone accesses =
     LocationsByAccessProperty.iter
