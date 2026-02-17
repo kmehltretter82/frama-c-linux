@@ -34,7 +34,6 @@
 [mt] one_var_multiple_threads.c:53: Lock lock2
 [mt] one_var_multiple_threads.c:56: Release lock2
 [mt] *** First value analysis for main thread done.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
@@ -76,7 +75,6 @@
   inject threads interferences at the start of f for thread jobs
 [mt] one_var_multiple_threads.c:21: Lock lock1
 [mt] one_var_multiple_threads.c:24: Release lock1
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data:
@@ -110,7 +108,6 @@
 [mt] one_var_multiple_threads.c:32: Release lock2
 [eva:alarm] one_var_multiple_threads.c:33: Warning: 
   assertion 'missing_return' got status invalid (stopping propagation).
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2.data:
@@ -155,7 +152,6 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [mt] Thread <main>, fun main
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
@@ -197,7 +193,6 @@
   inject threads interferences at this point
 [eva:interferences] one_var_multiple_threads.c:23: 
   inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data:
@@ -244,7 +239,6 @@
   inject threads interferences at this point
 [eva:interferences] one_var_multiple_threads.c:31: 
   inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2.data:
@@ -351,7 +345,6 @@
   inject threads interferences at this point
 [eva:interferences] one_var_multiple_threads.c:55: 
   inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
@@ -389,7 +382,6 @@
 [mt] * Computing value analysis for thread jobs
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data:
@@ -438,7 +430,6 @@
 [mt] * Computing value analysis for thread jobs
 [eva] Analyzing a complete application starting at g
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2.data:
@@ -536,7 +527,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
@@ -574,7 +564,6 @@
 [mt] * Computing value analysis for thread jobs
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data:
@@ -623,7 +612,6 @@
 [mt] * Computing value analysis for thread jobs
 [eva] Analyzing a complete application starting at g
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2.data:
@@ -729,7 +717,6 @@
   signed overflow. assert t + s2.data ≤ 2147483647;
 [eva:alarm] one_var_multiple_threads.c:55: Warning: 
   signed overflow. assert t + s2.data2 ≤ 2147483647;
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
@@ -771,7 +758,6 @@
   signed overflow. assert s1.data + 1 ≤ 2147483647;
 [eva:alarm] one_var_multiple_threads.c:23: Warning: 
   signed overflow. assert s1.data2 + 3 ≤ 2147483647;
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data:
@@ -826,7 +812,6 @@
   signed overflow. assert s2.data + 1 ≤ 2147483647;
 [eva:alarm] one_var_multiple_threads.c:31: Warning: 
   signed overflow. assert s2.data2 + 3 ≤ 2147483647;
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2.data:
@@ -933,7 +918,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data: read by <main> at one_var_multiple_threads.c:50 <- main
@@ -970,7 +954,6 @@
 [mt] * Computing value analysis for thread jobs
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1.data:

@@ -32,6 +32,22 @@ type existence =
 exception No_file
 exception File_exists
 
+let sanitize_filename s =
+  (* Invalid characters for different OSes taken from
+     <https://stackoverflow.com/a/31976060> *)
+  let is_invalid = function
+    (* Unix limitations *)
+    | '/' -> true
+    | c when Char.code c = 0 -> true
+    (* Additional MacOS limitations *)
+    | ':' -> true
+    (* Additional Windows limitations *)
+    | '<' | '>' | '"' | '\\' | '|' | '?' | '*' -> true
+    | c when Char.code c > 0 && Char.code c <= 31 -> true
+    | _ -> false
+  in
+  String.map (fun c -> if is_invalid c then '_' else c) s
+
 let normalize ?base s =
   if s = ""
   then ""
@@ -54,6 +70,12 @@ let of_string ?(existence=Indifferent) ?base s =
   check_existence ~existence p;
   p
 
+let of_format ?existence ?dir format =
+  let to_filepath s =
+    sanitize_filename s
+    |> of_string ?existence ?base:dir
+  in
+  Format.kasprintf to_filepath format
 
 (* -------------------------------------------------------------------------- *)
 (* --- Datatype                                                           --- *)
@@ -176,22 +198,6 @@ let pretty_rel fmt p =
 
 let is_relative ?(base=Hpath.(cwd |> to_string)) p =
   String.equal base p || String.starts_with ~prefix:(base ^ Filename.dir_sep) p
-
-let sanitize_filename s =
-  (* Invalid characters for different OSes taken from
-     <https://stackoverflow.com/a/31976060> *)
-  let is_invalid = function
-    (* Unix limitations *)
-    | '/' -> true
-    | c when Char.code c = 0 -> true
-    (* Additional MacOS limitations *)
-    | ':' -> true
-    (* Additional Windows limitations *)
-    | '<' | '>' | '"' | '\\' | '|' | '?' | '*' -> true
-    | c when Char.code c > 0 && Char.code c <= 31 -> true
-    | _ -> false
-  in
-  String.map (fun c -> if is_invalid c then '_' else c) s
 
 (* -------------------------------------------------------------------------- *)
 (* --- Symboling Names                                                    --- *)

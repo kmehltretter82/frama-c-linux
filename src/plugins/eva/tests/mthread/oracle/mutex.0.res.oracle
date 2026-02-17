@@ -20,7 +20,6 @@
 [mt] mutex.c:57: New thread: jobs4, fun f4, parent <main>, args {0}
 [mt] mutex.c:57: Start thread jobs4
 [mt] *** First value analysis for main thread done.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs1:
@@ -56,7 +55,6 @@
 [mt] mutex.c:24: Lock m2
 [mt] mutex.c:26: Release m2
 [mt] mutex.c:27: Release m1
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: write by jobs1 at mutex.c:25 <- f1
@@ -88,7 +86,6 @@
   inject threads interferences at the start of f2 for thread jobs2
 [mt] mutex.c:32: Lock m1
 [mt] mutex.c:35: Release m1
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: read by jobs2 at mutex.c:33 <- f2
@@ -114,7 +111,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f3 for thread jobs3
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs3 at mutex.c:40 <- f3
@@ -134,7 +130,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f4 for thread jobs4
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
@@ -172,7 +167,6 @@
 [mt] mutex.c:55: Thread jobs2, fun f2, parent <main>, args {0}
 [mt] mutex.c:56: Thread jobs3, fun f3, parent <main>, args {0}
 [mt] mutex.c:57: Thread jobs4, fun f4, parent <main>, args {0}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs1:
@@ -203,7 +197,6 @@
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
 [eva:interferences] mutex.c:25: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: write by jobs1 at mutex.c:25 <- f1
@@ -241,7 +234,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] mutex.c:33: inject threads interferences at this point
 [eva:interferences] mutex.c:34: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: read by jobs2 at mutex.c:33 <- f2
@@ -267,7 +259,6 @@
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
 [eva:interferences] mutex.c:40: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs3 at mutex.c:40 <- f3
@@ -292,7 +283,6 @@
 [mt] * Computing value analysis for thread jobs4
 [eva] Analyzing a complete application starting at f4
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
@@ -345,7 +335,6 @@
 [mt] mutex.c:55: New context for jobs2, fun f2, parent <main>, args {0}
 [mt] mutex.c:56: New context for jobs3, fun f3, parent <main>, args {0}
 [mt] mutex.c:57: New context for jobs4, fun f4, parent <main>, args {0}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs1:
@@ -374,7 +363,6 @@
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: write by jobs1 at mutex.c:25 <- f1
@@ -411,7 +399,6 @@
 [mt] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s1: read by jobs2 at mutex.c:33 <- f2
@@ -436,7 +423,6 @@
 [mt] * Computing value analysis for thread jobs3
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s2: write by jobs3 at mutex.c:40 <- f3
@@ -462,7 +448,6 @@
 [mt] * Computing value analysis for thread jobs4
 [eva] Analyzing a complete application starting at f4
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
@@ -505,7 +490,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs1:

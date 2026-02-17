@@ -26,7 +26,6 @@
   no \from part for clause 'assigns *p, r;'.
   Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
 [mt] *** First value analysis for main thread done.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   r: write by <main> at read_all.c:29 <- main
@@ -50,7 +49,6 @@
 [mt] read_all.c:19: User Error: 
   read of the whole memory. Ignoring to allow Mthread to continue, but the
   analysis will not be correct.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   r: write by jobs at read_all.c:19 <- f
@@ -89,7 +87,6 @@
 [mt] Thread <main>, fun main
 [mt] read_all.c:27: 
   Thread jobs, fun f, parent <main>, args [0..18446744073709551615]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   r: write by <main> at read_all.c:29 <- main
@@ -114,7 +111,6 @@
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user
 [eva:interferences] read_all.c:19: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   r: write by jobs at read_all.c:19 <- f
@@ -166,7 +162,6 @@
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
 [eva:interferences] read_all.c:29: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   r: write by <main> at read_all.c:29 <- main

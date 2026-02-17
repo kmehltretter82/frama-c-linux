@@ -29,7 +29,6 @@
 [mt] unhandled_calls.c:23: Thread th1, fun t, parent <main>, args {0}
 [mt] unhandled_calls.c:23: New context for th1, fun t, parent <main>, args {0}
 [mt] *** First value analysis for main thread done.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   th1:

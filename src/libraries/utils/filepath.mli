@@ -84,19 +84,40 @@ exception No_file
 exception File_exists
 (** Raised whenever some file exists and [existence] is [Must_not_exist]. *)
 
+(** [sanitize_filename name] returns the given filename with every
+    character not allowed as filename replaced with _. Note that this
+    function takes a file {i name} so path separators like / and \ are
+    replaced.
+
+    @since 32.0-Germanium *)
+val sanitize_filename: string -> string
+
 (** Returns an absolute path leading to the given file.
     The result is similar to [realpath --no-symlinks].
     Some special behaviors include:
-    - [normalize ""] (empty string) returns ""
+    - [of_string ""] (empty string) returns ""
       (realpath returns an error);
-    - [normalize] preserves multiple sequential '/' characters,
+    - [of_string] preserves multiple sequential '/' characters,
       unlike [realpath];
     - non-existing directories in [realpath] may lead to ENOTDIR errors,
-      but [normalize] may accept them.
+      but [of_string] may accept them.
 
     @before 21.0-Scandium no [existence] argument.
     @before 31.0-Gallium this function was [normalize] *)
 val of_string: ?existence:existence -> ?base:t -> string -> t
+
+(** [of_format ?existence ?dir format...] returns an absolute path where:
+    - The directory is given by [dir] (default to current working directory)
+    - The filename is built by the formatting argument. The result of the
+      formatting is sanitized with [sanitize_filename] before being used.
+
+    Cf. documentation of {!of_string} for an explanation of the [existence]
+    parameter and some notes on special behaviors.
+
+    @since Frama-C+dev *)
+val of_format:
+  ?existence:existence -> ?dir:t ->
+  ('a, Format.formatter, unit, t) format4 -> 'a
 
 (** [to_string p] returns [p] prettified, that is, a relative path-like string.
     The resulting string may contain symbolic dirs, thus it is not a path. *)
@@ -191,14 +212,6 @@ val chop_suffix: t -> string -> t
     @before 23.0-Vanadium argument types were string instead of t.
     @before 31.0-Gallium named argument was [base_name] *)
 val is_relative: ?base:t -> t -> bool
-
-(** [sanitize_filename name] returns the given filename with every
-    character not allowed as filename replaced with _. Note that this
-    function takes a file {i name} so path separators like / and \ are
-    replaced.
-
-    @since 32.0-Germanium *)
-val sanitize_filename: string -> string
 
 (* ************************************************************************* *)
 (** {2 Current working directory} *)

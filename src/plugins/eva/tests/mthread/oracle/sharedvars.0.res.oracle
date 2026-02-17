@@ -22,7 +22,6 @@
 [mt] sharedvars.c:118: New thread: jobs6, fun f6, parent <main>, args {0}
 [mt] sharedvars.c:118: Start thread jobs6
 [mt] *** First value analysis for main thread done.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u2:
@@ -66,7 +65,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f1 for thread jobs1
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u1:
@@ -89,7 +87,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread jobs2
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
@@ -110,7 +107,6 @@
   inject threads interferences at the start of f3 for thread jobs3
 [mt] sharedvars.c:62: New thread: jobs31, fun f31, parent jobs3, args {0}
 [mt] sharedvars.c:62: Start thread jobs31
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u3: write by jobs3 at sharedvars.c:61 <- f3
@@ -133,7 +129,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f4 for thread jobs4
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s4:
@@ -160,7 +155,6 @@
   inject threads interferences at the start of f5 for thread jobs5
 [mt] sharedvars.c:83: New thread: jobs51, fun f51, parent jobs5, args {0}
 [mt] sharedvars.c:83: Start thread jobs51
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s5: write by jobs5 at sharedvars.c:84 <- f5
@@ -183,7 +177,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f6 for thread jobs6
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s6:
@@ -226,7 +219,6 @@
 [mt] sharedvars.c:114: Thread jobs4, fun f4, parent <main>, args {0}
 [mt] sharedvars.c:117: Thread jobs5, fun f5, parent <main>, args {0}
 [mt] sharedvars.c:118: Thread jobs6, fun f6, parent <main>, args {0}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u2:
@@ -279,7 +271,6 @@
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u1:
@@ -300,7 +291,6 @@
 [mt] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
@@ -320,7 +310,6 @@
 [eva] Initial state supplied by user
 [mt] sharedvars.c:62: Thread jobs31, fun f31, parent jobs3, args {0}
 [mt] sharedvars.c:62: New context for jobs31, fun f31, parent jobs3, args {0}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u3: write by jobs3 at sharedvars.c:61 <- f3
@@ -346,7 +335,6 @@
 [eva:interferences] sharedvars.c:69: inject threads interferences at this point
 [eva:interferences] sharedvars.c:71: inject threads interferences at this point
 [eva:interferences] sharedvars.c:72: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s4:
@@ -383,7 +371,6 @@
 [eva] Initial state supplied by user
 [mt] sharedvars.c:83: Thread jobs51, fun f51, parent jobs5, args {0}
 [mt] sharedvars.c:83: New context for jobs51, fun f51, parent jobs5, args {0}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s5: write by jobs5 at sharedvars.c:84 <- f5
@@ -407,7 +394,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] sharedvars.c:90: inject threads interferences at this point
 [eva:interferences] sharedvars.c:91: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s6:
@@ -436,7 +422,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f31 for thread jobs31
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u3:
@@ -458,7 +443,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f51 for thread jobs51
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s5:
@@ -535,7 +519,6 @@
 [eva:interferences] sharedvars.c:115: inject threads interferences at this point
 [mt] sharedvars.c:117: New context for jobs5, fun f5, parent <main>, args {0}
 [mt] sharedvars.c:118: New context for jobs6, fun f6, parent <main>, args {0}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u2:
@@ -600,7 +583,6 @@
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u1:
@@ -622,7 +604,6 @@
 [mt] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
@@ -642,7 +623,6 @@
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
 [eva:interferences] sharedvars.c:61: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u3: write by jobs3 at sharedvars.c:61 <- f3
@@ -676,7 +656,6 @@
 [mt] * Computing value analysis for thread jobs4
 [eva] Analyzing a complete application starting at f4
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s4:
@@ -719,7 +698,6 @@
 [eva] Analyzing a complete application starting at f5
 [eva] Initial state supplied by user
 [eva:interferences] sharedvars.c:84: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s5: write by jobs5 at sharedvars.c:84 <- f5
@@ -753,7 +731,6 @@
 [mt] * Computing value analysis for thread jobs6
 [eva] Analyzing a complete application starting at f6
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s6:
@@ -788,7 +765,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] sharedvars.c:55: inject threads interferences at this point
 [eva:interferences] sharedvars.c:56: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u3:
@@ -823,7 +799,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] sharedvars.c:77: inject threads interferences at this point
 [eva:interferences] sharedvars.c:78: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s5:
@@ -914,7 +889,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] sharedvars.c:103: inject threads interferences at this point
 [mt] sharedvars.c:105: New context for jobs1, fun f1, parent <main>, args {0}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u2:
@@ -983,7 +957,6 @@
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u1:
@@ -1005,7 +978,6 @@
 [mt] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
@@ -1023,7 +995,6 @@
 [mt] * Computing value analysis for thread jobs3
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u3: write by jobs3 at sharedvars.c:61 <- f3
@@ -1059,7 +1030,6 @@
 [mt] * Computing value analysis for thread jobs4
 [eva] Analyzing a complete application starting at f4
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s4:
@@ -1103,7 +1073,6 @@
 [mt] * Computing value analysis for thread jobs5
 [eva] Analyzing a complete application starting at f5
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s5: write by jobs5 at sharedvars.c:84 <- f5
@@ -1139,7 +1108,6 @@
 [mt] * Computing value analysis for thread jobs6
 [eva] Analyzing a complete application starting at f6
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s6:
@@ -1173,7 +1141,6 @@
 [mt] * Computing value analysis for thread jobs31
 [eva] Analyzing a complete application starting at f31
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u3:
@@ -1208,7 +1175,6 @@
 [mt] * Computing value analysis for thread jobs51
 [eva] Analyzing a complete application starting at f51
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s5:
@@ -1289,7 +1255,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u2:
@@ -1358,7 +1323,6 @@
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u1:
@@ -1379,7 +1343,6 @@
 [mt] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
@@ -1396,7 +1359,6 @@
 [mt] * Computing value analysis for thread jobs3
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u3: write by jobs3 at sharedvars.c:61 <- f3
@@ -1432,7 +1394,6 @@
 [mt] * Computing value analysis for thread jobs4
 [eva] Analyzing a complete application starting at f4
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s4:
@@ -1476,7 +1437,6 @@
 [mt] * Computing value analysis for thread jobs5
 [eva] Analyzing a complete application starting at f5
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s5: write by jobs5 at sharedvars.c:84 <- f5
@@ -1510,7 +1470,6 @@
 [mt] * Computing value analysis for thread jobs6
 [eva] Analyzing a complete application starting at f6
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s6:
@@ -1543,7 +1502,6 @@
 [mt] * Computing value analysis for thread jobs31
 [eva] Analyzing a complete application starting at f31
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   u3:
@@ -1577,7 +1535,6 @@
 [mt] * Computing value analysis for thread jobs51
 [eva] Analyzing a complete application starting at f51
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   s5:

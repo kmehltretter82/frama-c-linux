@@ -20,7 +20,6 @@
 [mt] thread_arg.c:48: Release locks[0]
 [mt] thread_arg.c:48: Release locks[1]
 [mt] *** First value analysis for main thread done.
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0..1]:
@@ -52,7 +51,6 @@
 [mt] thread_arg.c:25: Lock locks[0]
 [eva] using specification for function Frama_C_interval
 [mt] thread_arg.c:27: Release locks[0]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -84,7 +82,6 @@
   inject threads interferences at the start of job for thread jobs[1]
 [mt] thread_arg.c:25: Lock locks[1]
 [mt] thread_arg.c:27: Release locks[1]
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -131,7 +128,6 @@
 [mt] Thread <main>, fun main
 [mt] thread_arg.c:37: Thread jobs[0], fun job, parent <main>, args {0}
 [mt] thread_arg.c:37: Thread jobs[1], fun job, parent <main>, args {1}
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0..1]:
@@ -160,7 +156,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
 [eva:interferences] thread_arg.c:26: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -202,7 +197,6 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -303,7 +297,6 @@
 [eva] Initial state supplied by user
 [mt] thread_arg.c:37: New context for jobs[1], fun job, parent <main>, args {1}
 [eva:interferences] thread_arg.c:45: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0..1]:
@@ -330,7 +323,6 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -375,7 +367,6 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -465,7 +456,6 @@
 [eva] Initial state supplied by user
 [eva:alarm] thread_arg.c:45: Warning: 
   signed overflow. assert sum + vars[i_2] ≤ 2147483647;
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0..1]:
@@ -492,7 +482,6 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -543,7 +532,6 @@
   signed overflow.
   assert vars[i] + tmp ≤ 2147483647;
   (tmp from Frama_C_interval(0, 10))
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -632,7 +620,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0..1]:
@@ -658,7 +645,6 @@
 [mt] * Computing value analysis for thread jobs[0]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -701,7 +687,6 @@
 [mt] * Computing value analysis for thread jobs[1]
 [eva] Analyzing a complete application starting at job
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   Frama_C_entropy_source:
@@ -786,7 +771,6 @@
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
-[mt] * Starting to save the state of the value analysis
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks[0..1]:
