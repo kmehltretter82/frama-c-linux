@@ -68,12 +68,13 @@ module List = List
 module Map = Map
 module Option = Option
 module Pretty = Pretty
+module Result = Result
 module Set = Set
 module String = String
-module Result = Result
 
 (** {2 Utils} *)
 
+module Ansi_escape = Ansi_escape
 module Async = Async
 module Bag = Bag
 module Binary_cache = Binary_cache
@@ -92,6 +93,7 @@ module Hptmap_sig = Hptmap_sig
 module Hptset = Hptset
 module Indexer = Indexer
 module Json = Json
+module Log = Log
 module Markdown = Markdown
 module Parray = Parray
 module Pretty_utils = Pretty_utils
@@ -103,4 +105,5 @@ module Sanitizer = Sanitizer
 module Task = Task
 module Unicode = Unicode
 module Utf8_logic = Utf8_logic
+module Vector = Vector
 module Wto = Wto
