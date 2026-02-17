@@ -930,8 +930,8 @@ let loc_lt = MemAddr.addr_lt
 let loc_leq = MemAddr.addr_le
 let loc_neq l1 l2 = p_not @@ loc_eq l1 l2
 
-let loc_diff _ l1 l2 =
-  let byte_size = Ctypes.sizeof_object (C_int (Ctypes.c_char ())) in
+let loc_diff obj l1 l2 =
+  let byte_size = Ctypes.sizeof_object obj in
   e_div (e_sub (MemAddr.offset l1) (MemAddr.offset l2)) (e_int byte_size)
 
 let pointer_cluster () =
