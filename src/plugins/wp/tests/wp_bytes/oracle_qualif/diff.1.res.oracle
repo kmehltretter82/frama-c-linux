@@ -4,15 +4,20 @@
 [wp] [Valid] Goal f_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal f_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] 2 goals scheduled
-[wp] [Unsuccess] bytes_f_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] Goal g_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal g_terminates (Cfg) (Trivial)
+[wp] 4 goals scheduled
+[wp] [Valid] bytes_f_ensures (Alt-Ergo) (Cached)
 [wp] [Valid] bytes_f_assigns (Qed)
-[wp] Proved goals:    3 / 4
-  Terminating:     1
-  Unreachable:     1
-  Qed:             1
-  Unsuccess:       1
+[wp] [Valid] bytes_g_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] bytes_g_assigns (Qed)
+[wp] Proved goals:    8 / 8
+  Terminating:     2
+  Unreachable:     2
+  Qed:             2
+  Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  f                         1        -        2      50.0%
+  f                         1        1        2       100%
+  g                         1        1        2       100%
 ------------------------------------------------------------
