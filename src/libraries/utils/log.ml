@@ -31,9 +31,6 @@ type event = {
   evt_message : Rich_text.t ;
 }
 
-let kernel_channel_name = "kernel"
-let kernel_label_name = "kernel"
-
 (* -------------------------------------------------------------------------- *)
 (* --- Exception Management                                               --- *)
 (* -------------------------------------------------------------------------- *)
@@ -1267,6 +1264,11 @@ struct
       label Format.(pp_print_list ~pp_sep:pp_print_cut print_one_elt) l
 
 end
+
+(* Deprecated *)
+
+let kernel_channel_name = "kernel"
+let kernel_label_name = "kernel"
 
 (* ------------------------------------------------------------------------- *)
 (* --- Tests                                                             --- *)

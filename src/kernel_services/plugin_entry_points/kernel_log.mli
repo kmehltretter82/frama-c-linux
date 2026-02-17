@@ -20,6 +20,12 @@ val kernel_debug_atleast_ref: (int -> bool) ref
 val kernel_verbose_atleast_ref: (int -> bool) ref
 [@@alert kernel_log "Use only in Cmdline and Plugin."]
 
+val kernel_channel_name: string
+(** the reserved channel name used by the Frama-C kernel. *)
+
+val kernel_label_name: string
+(** the reserved label name used by the Frama-C kernel. *)
+
 include Log.Messages
 
 (* ************************************************************************* *)

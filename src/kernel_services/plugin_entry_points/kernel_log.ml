@@ -9,10 +9,13 @@
 let kernel_debug_atleast_ref = Extlib.mk_fun "kernel_debug_atleast_ref"
 let kernel_verbose_atleast_ref = Extlib.mk_fun "kernel_debug_atleast_ref"
 
+let kernel_channel_name = "kernel"
+let kernel_label_name = "kernel"
+
 include Log.Register
     (struct
-      let channel = Log.kernel_channel_name
-      let label = Log.kernel_label_name
+      let channel = kernel_channel_name
+      let label = kernel_label_name
       let debug_atleast level = !kernel_debug_atleast_ref level
       let verbose_atleast level = !kernel_verbose_atleast_ref level
     end)

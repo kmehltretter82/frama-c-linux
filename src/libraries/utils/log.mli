@@ -463,10 +463,15 @@ val log_channel : channel -> ?kind:kind -> 'a pretty_printer
 val kernel_channel_name: string
 (** the reserved channel name used by the Frama-C kernel.
     @since Beryllium-20090601-beta1 *)
+[@@deprecated "Use Kernel_log.kernel_channel_name instead."]
+[@@migrate { repl = Kernel_log.kernel_channel_name } ]
+
 
 val kernel_label_name: string
 (** the reserved label name used by the Frama-C kernel.
     @since Beryllium-20090601-beta1 *)
+[@@deprecated "Use Kernel_log.kernel_label_name instead."]
+[@@migrate { repl = Kernel_log.kernel_label_name } ]
 
 val source : file:Filepath.t -> line:int -> Filepath.position
 (** @since Chlorine-20180501 *)

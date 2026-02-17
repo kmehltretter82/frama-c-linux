@@ -73,7 +73,7 @@ let last_project_created_by_copy = ref (fun () -> assert false)
 (* ************************************************************************* *)
 
 let long_plugin_name s =
-  if s = Log.kernel_label_name then "Frama-C" else "Plug-in " ^ s
+  if s = Kernel_log.kernel_label_name then "Frama-C" else "Plug-in " ^ s
 
 let get_backtrace () =
   (* Get the backtrace before potentially destroying it in the handler below *)
