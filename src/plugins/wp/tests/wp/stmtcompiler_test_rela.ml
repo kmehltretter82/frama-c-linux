@@ -31,7 +31,7 @@ let run () =
         VCS.pp_prover prv (VCS.pp_result_qualif prv res)
     in
     let server = ProverTask.server () in
-    Prover.spawn goal ~delayed:true ~result provers;
+    ProverTask.spawn goal ~delayed:true ~result provers;
     Task.launch server
   in
 

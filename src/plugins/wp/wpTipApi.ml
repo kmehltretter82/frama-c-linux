@@ -549,7 +549,7 @@ let runProvers ?mode ?timeout ?provers node =
              Wpo.set_result wpo prv VCS.no_result
            else if not @@ VCS.is_verdict r then
              Wpo.set_result wpo prv backup in
-         let process () = Prover.prove ~config ~mode ~result wpo prv in
+         let process () = ProverTask.prove ~config ~mode ~result wpo prv in
          let thread = Task.thread @@ Task.later process () in
          let status = VCS.computing (fun () -> Task.cancel thread) in
          Wpo.set_result wpo prv status ;

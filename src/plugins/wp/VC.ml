@@ -73,8 +73,8 @@ let generate_call ?model stmt =
 (* --- Prover Interface                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let prove = Prover.prove
-let spawn = Prover.spawn ~delayed:true
+let prove = ProverTask.prove
+let spawn = ProverTask.spawn ~delayed:true
 
 let server = ProverTask.server
 let command ?provers ?tip vcs =

@@ -145,7 +145,7 @@ struct
     | None -> ProofEngine.main env.tree
 
   let prove env wpo ?config prover =
-    Prover.prove wpo ?config ~mode:VCS.Batch
+    ProverTask.prove wpo ?config ~mode:VCS.Batch
       ~progress:env.progress prover
 
   let backtracking env =
@@ -532,7 +532,7 @@ let task
     ~start ~progress ~result ~success wpo =
   begin fun () ->
     Wp_parameters.debug ~dkey:dkey_pp_allgoals "%a" Wpo.pp_goal_flow wpo ;
-    Prover.simplify ~start ~result wpo >>= fun succeed ->
+    ProverTask.simplify ~start ~result wpo >>= fun succeed ->
     if succeed
     then
       ( success wpo (Some VCS.Qed) ; Task.return ())

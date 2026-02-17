@@ -560,7 +560,7 @@ let spawn_wp_proofs ~script goals =
                ~success:(do_wpo_success ~shell ~cache)
                goal
            else
-             Prover.spawn goal
+             ProverTask.spawn goal
                ~delayed:false
                ~start:do_wpo_start
                ~progress:do_progress
