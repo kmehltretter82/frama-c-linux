@@ -104,8 +104,8 @@ let tag_varinfo_as_lval_at eval_point =
 let with_updated_varinfo_printer eval_point f =
   let tag_vi = tag_varinfo_as_lval_at eval_point in
   let module Printer_class(X: Printer.PrinterClass) = struct
-    class printer = object
-      inherit X.printer as super
+    class printer () = object
+      inherit X.printer () as super
 
       method! varinfo fmt vi =
         Format.fprintf fmt "@{<%s>%a@}" (tag_vi vi) super#varinfo vi;

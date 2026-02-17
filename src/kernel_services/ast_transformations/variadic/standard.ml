@@ -13,7 +13,7 @@ module Typ = Extends.Typ
 let pp_prototype name fmt tparams =
   Format.fprintf fmt "%s(%a)"
     name
-    (Pretty_utils.pp_list ~sep:", " Printer.pp_typ) tparams
+    (Pretty_utils.pp_list ~sep:", " Cil_printer.pp_typ) tparams
 
 let pp_overload name fmt l =
   let prototypes = List.map fst l in
@@ -102,9 +102,9 @@ let does_fit exp typ =
 let pretty_typ fmt t =
   match Ast_types.unroll_node t with
   | TEnum ei ->
-    Format.fprintf fmt "%a (%a)" Printer.pp_typ t
-      Printer.pp_typ (Cil_const.mk_tint ei.ekind)
-  | _ -> Printer.pp_typ fmt t
+    Format.fprintf fmt "%a (%a)" Cil_printer.pp_typ t
+      Cil_printer.pp_typ (Cil_const.mk_tint ei.ekind)
+  | _ -> Cil_printer.pp_typ fmt t
 
 (* cast the i-th argument exp to paramtyp *)
 let cast_arg i paramtyp exp =
@@ -236,7 +236,7 @@ let fallback_fun_call ~builder ~callee env vf args =
   Kernel.result ~current:true ~dkey:Kernel.dkey_variadic
     "Fallback translation of call %s to a call to the specialized version %a. \
      Generating default assigns that may be inaccurate."
-    vf.vf_decl.vorig_name Build.pretty new_callee;
+    vf.vf_decl.vorig_name Cil_printer.pp_varinfo (Build.cil_varinfo new_callee);
   Build.(translated_call new_callee (List.map of_exp args))
 
 
@@ -437,7 +437,7 @@ let find_predicate_by_width typ narrow_name wide_name =
   | _ ->
     Kernel.warning ~current:true ~wkey:Kernel.wkey_typing
       "expected single/wide character pointer type, got %a (%a, unrolled %a)"
-      Printer.pp_typ typ
+      Cil_printer.pp_typ typ
       Cil_types_debug.pp_typ typ
       Cil_types_debug.pp_typ (Ast_types.unroll_deep typ);
     raise Not_found
@@ -582,7 +582,7 @@ let build_specialized_fun ~builder env vf format_fun tvparams =
     | Build.NotAFunction li ->
       Kernel.abort ~current:true
         "%a should be a logic function, not a predicate"
-        Printer.pp_logic_var li.l_var_info
+        Cil_printer.pp_logic_var li.l_var_info
   in
 
   begin match format_fun.f_buffer, format_fun.f_kind with
@@ -716,7 +716,7 @@ let infer_format_from_args vf format_fun args =
           Kernel.warning ~source ~wkey:Kernel.wkey_typing
             "Expecting pointer as parameter of scanf function. \
              Argument %a has type %a"
-            Printer.pp_exp arg Printer.pp_typ t;
+            Cil_printer.pp_exp arg Cil_printer.pp_typ t;
           raise (Translate_call_exn vf.vf_decl);
         end;
         Ast_types.direct_pointed_type t

@@ -92,11 +92,11 @@ module Make
 struct
 
   module type PrinterClass = sig
-    class printer : Printer_api.extensible_printer_type
+    class printer : unit -> Printer_api.extensible_printer_type
   end
 
   let printer_class_ref =
-    ref (module struct class printer = P.printer () end: PrinterClass)
+    ref (module P: PrinterClass)
 
   let printer_ref = ref None
 
@@ -116,7 +116,7 @@ struct
     match !printer_ref with
     | None ->
       let module Printer = (val !printer_class_ref: PrinterClass) in
-      let p = new Printer.printer in
+      let p = new Printer.printer () in
       printer_ref := Some p;
       p#reset ();
       p

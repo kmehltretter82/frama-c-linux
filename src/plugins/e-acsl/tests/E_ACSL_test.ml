@@ -14,8 +14,8 @@ let is_generated (g: Cil_datatype.Global.t) =
 
 module Printer_extension(X: Printer.PrinterClass) = struct
 
-  class printer = object
-    inherit X.printer as super
+  class printer () = object
+    inherit X.printer () as super
 
     method! global fmt g =
       let loc, _ = Cil_datatype.Global.loc g in

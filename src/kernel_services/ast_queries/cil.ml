@@ -60,6 +60,8 @@ let pp_identified_term_ref = Extlib.mk_fun "Cil.pp_identified_term_ref"
 let pp_location_ref = Extlib.mk_fun "Cil.pp_location_ref"
 let pp_from_ref = Extlib.mk_fun "Cil.pp_from_ref"
 let pp_behavior_ref = Extlib.mk_fun "Cil.pp_behavior_ref"
+let pp_block_ref = Extlib.mk_fun "Cil.pp_block_ref"
+let pp_varinfo_ref = Extlib.mk_fun "Cil.pp_varinfo_ref"
 
 let default_behavior_name = "default!"
 let is_default_behavior b =
@@ -677,7 +679,7 @@ let transient_block b =
     Kernel.warning
       ~wkey:wkey_transient
       "ignoring request to mark transient a block with local variables:@\n%a"
-      Cil_datatype.Block.pretty b
+      !pp_block_ref b
   end else
     b.battrs <- Ast_attributes.add (vis_tmp_attr,[]) b.battrs; b
 
@@ -2204,7 +2206,7 @@ and childrenFunction (vis : cilVisitor) (f : fundec) : fundec =
   if not (Cil_datatype.Varinfo.equal nv f.svar) then begin
     Kernel.fatal
       "Visiting the varinfo declared for function %a changes its id."
-      Cil_datatype.Varinfo.pretty nv
+      !pp_varinfo_ref nv
   end;
   f.svar <- nv; (* hit the function name *)
   (* visit the formals *)
@@ -4849,7 +4851,7 @@ let find_def_stmt b v =
     fold_local_init b action ();
     Kernel.fatal ~source:(fst v.vdecl)
       "inconsistent AST: local variable %a is supposed to be initialized, \
-       but no initialization statement found." Cil_datatype.Varinfo.pretty v
+       but no initialization statement found." !pp_varinfo_ref v
   with M.Found s -> s
 
 let has_extern_local_init b =
@@ -5242,7 +5244,7 @@ let combineTypesGen ?emitwith (combF : combineFunction)
         let msg =
           Format.asprintf
             "different integer types:@ '%a' and '%a'"
-            Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t in
+            !pp_typ_ref oldt !pp_typ_ref t in
         raise (Cannot_combine msg)
     in
     let combineIK oldk k =
@@ -5262,7 +5264,7 @@ let combineTypesGen ?emitwith (combF : combineFunction)
               ~wkey:Kernel.wkey_int_conversion
               ~current:true
               "Integer compatibility is machine-dependent: %a and %a\n"
-              Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t;
+              !pp_typ_ref oldt !pp_typ_ref t;
             result k oldk
           end
         else
@@ -5328,7 +5330,7 @@ let combineTypesGen ?emitwith (combF : combineFunction)
             ~current:true
             "Array type comparison succeeds only based on machine-dependent \
              constant evaluation: %a and %a\n"
-            Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t;
+            !pp_typ_ref oldt !pp_typ_ref t;
           oldsz
         end else
           raise (Cannot_combine "different array lengths")
@@ -5366,7 +5368,7 @@ let combineTypesGen ?emitwith (combF : combineFunction)
           let argslist = argslist @ ghostargslist in
           (* Go over the arguments and update the old ones with the
            * adjusted types *)
-          (* Format.printf "new type is %a@." Cil_datatype.Typ.pretty t; *)
+          (* Format.printf "new type is %a@." !pp_typ_ref t; *)
           let what =
             match what with
             | CombineFundef b -> CombineFunarg b
@@ -5426,7 +5428,7 @@ let combineTypesGen ?emitwith (combF : combineFunction)
     raise
       (Cannot_combine
          (Format.asprintf "different type constructors:@ %a and %a"
-            Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t))
+            !pp_typ_ref oldt !pp_typ_ref t))
 
 
 let default_combines = {
@@ -5527,7 +5529,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
           ~current:true
           "implicit conversion between incompatible function types:@ \
            %a@ and@ %a"
-          Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
+          !pp_typ_ref oldt !pp_typ_ref newt
 
     (* accept converting a ptr to function to/from a ptr to void, even though
        not really accepted by the standard.
@@ -5546,7 +5548,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
           ~current:true
           "conversion between incompatible from array type to pointer type:@ \
            %a@ and@ %a"
-          Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
+          !pp_typ_ref oldt !pp_typ_ref newt
 
     | TArray (t1, _), TArray (t2, _) ->
       if not (areCompatibleTypes ?context t1 t2)
@@ -5556,7 +5558,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
           ~current:true
           "conversion between incompatible array types :@ \
            %a@ and@ %a"
-          Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
+          !pp_typ_ref oldt !pp_typ_ref newt
 
     (* pointer to potential function type. Note that we do not
        use unroll_typeDeep above in order to avoid needless divergence with
@@ -5584,17 +5586,17 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
         Kernel.warning
           ~wkey:Kernel.wkey_incompatible_pointer_types
           ~current:true
-          "casting function to %a" Cil_datatype.Typ.pretty newt
+          "casting function to %a" !pp_typ_ref newt
     | TPtr t1, TPtr t2 when Ast_types.is_fun t2 && Ast_types.is_object t1 ->
       if not nullptr_cast then
         Kernel.warning
           ~wkey:Kernel.wkey_incompatible_pointer_types
           ~current:true
-          "casting function from %a" Cil_datatype.Typ.pretty oldt
+          "casting function from %a" !pp_typ_ref oldt
 
     | _, TPtr t1 when Ast_types.is_fun t1 ->
       error "cannot cast %a to function type"
-        Cil_datatype.Typ.pretty oldt
+        !pp_typ_ref oldt
 
     | _, _ when Ast_types.is_arithmetic oldt' && Ast_types.is_arithmetic newt' ->
       (* ISO 6.5.16.1.1#1 *) ()
@@ -5613,7 +5615,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
         match Ast_types.is_transparent_union oldt with
         | None ->
           error "cast from %a to %a"
-            Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
+            !pp_typ_ref oldt !pp_typ_ref newt
         | Some _ -> ()
       end
 
@@ -5621,15 +5623,15 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
 
     | (TInt _ | TPtr _), TBuiltin_va_list ->
       Kernel.debug ~dkey ~current:true
-        "Casting %a to __builtin_va_list" Cil_datatype.Typ.pretty oldt
+        "Casting %a to __builtin_va_list" !pp_typ_ref oldt
 
     | _, _ when fromsource && not (Ast_types.is_scalar newt') ->
       (* ISO 6.5.4.2 *)
-      error "cast over a non-scalar type %a" Cil_datatype.Typ.pretty newt
+      error "cast over a non-scalar type %a" !pp_typ_ref newt
 
     | _ ->
       error "cannot cast from %a to %a@\n"
-        Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
+        !pp_typ_ref oldt !pp_typ_ref newt
   in default_rec
 
 let rec castReduce fromsource force =
@@ -5683,7 +5685,7 @@ let rec castReduce fromsource force =
         match Ast_types.is_transparent_union oldt with
         | None ->
           error "cast from %a to %a"
-            Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
+            !pp_typ_ref oldt !pp_typ_ref newt
         | Some fstfield ->
           (* We do it now only if the expression is an lval *)
           let e' =
@@ -5693,7 +5695,7 @@ let rec castReduce fromsource force =
                 (Lval (addOffsetLval (Field (fstfield, NoOffset)) lv))
             | _ ->
               error "transparent union expression is not an lval: %a\n"
-                Cil_datatype.Exp.pretty e
+                !pp_exp_ref e
 
           in
           (* Continue casting *)
@@ -6176,7 +6178,7 @@ let is_mutable (lhost, offset) =
       aux can_mutate fi.ftype off
     | TArray (typ, _), Index(_, off) -> aux can_mutate typ off
     | _, Index _ ->
-      Kernel.fatal "Index on a non-array type '%a'" Cil_datatype.Typ.pretty typ'
+      Kernel.fatal "Index on a non-array type '%a'" !pp_typ_ref typ'
   in
   aux false (typeOfLhost lhost) offset
 

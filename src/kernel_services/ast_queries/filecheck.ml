@@ -39,6 +39,10 @@ module Base_checker = struct
       Kernel.fatal ~current:true ("[AST Integrity Check]@ %s@ " ^^ fmt) what
     in
     let abort_if cond = if cond then check_abort else Pretty_utils.nullprintf in
+    let pretty =
+      if is_normalized then (module Printer: Printer_api.S_pp)
+      else (module Cil_printer: Printer_api.S_pp)
+    in
     object(self)
       inherit Visitor.frama_c_inplace as plain
       val known_enuminfos = Enuminfo.Hashtbl.create 7
@@ -119,9 +123,11 @@ module Base_checker = struct
       method! vvdec v =
         Kernel.debug
           ~dkey:Kernel.dkey_check "Declaration of %s(%d)" v.vname v.vid;
-        if v.vname = "" then
+        if v.vname = "" then begin
+          let module Printer = (val pretty: Printer_api.S_pp) in
           check_abort "variable of id %d and type %a has an empty name"
-            v.vid Cil_datatype.Typ.pretty v.vtype;
+            v.vid Printer.pp_typ v.vtype
+        end;
         if Varinfo.Hashtbl.mem known_vars v then
           (let v' = Varinfo.Hashtbl.find known_vars v in
            if v != v' then (* we can see the declaration twice
@@ -138,17 +144,20 @@ module Base_checker = struct
             v.vname v.vid lv.lv_name lv.lv_id;
           (match lv.lv_type with
            | Ctype t ->
-             if not (Cil_datatype.TypNoUnroll.equal t v.vtype) then
+             if not (Cil_datatype.TypNoUnroll.equal t v.vtype) then begin
+               let module Printer = (val pretty: Printer_api.S_pp) in
                check_abort
                  "C variable %s and its associated variable do not have the \
                   same type:@\nC     type is %a@\nLogic type is %a"
-                 v.vname Cil_datatype.Typ.pretty v.vtype
-                 Cil_datatype.Typ.pretty t
+                 v.vname Printer.pp_typ v.vtype
+                 Printer.pp_typ t
+             end
            | lt ->
+             let module Printer = (val pretty: Printer_api.S_pp) in
              check_abort
                "Logic variable %s is associated to a C variable but has \
                 a purely logic type, %a@."
-               lv.lv_name Cil_datatype.Logic_type.pretty lt);
+               lv.lv_name Printer.pp_logic_type lt);
           Cil.DoChildren
         | Some lv ->
           (check_abort "C variable %s is not properly referenced by its \
@@ -744,13 +753,15 @@ module Base_checker = struct
                check_abort
                  "\\result found in a contract for function %a that returns void"
                  Kernel_function.pretty kf;
-             if not (Cil_datatype.TypNoUnroll.equal t t1) then
+             if not (Cil_datatype.TypNoUnroll.equal t t1) then begin
+               let module Printer = (val pretty: Printer_api.S_pp) in
                check_abort
                  "\\result of type %a found in a contract for function %a that \
                   returns %a"
-                 Cil_datatype.Typ.pretty t
+                 Printer.pp_typ t
                  Kernel_function.pretty kf
-                 Cil_datatype.Typ.pretty t1
+                 Printer.pp_typ t1
+             end
           );
           Cil.DoChildren
         | _ -> Cil.DoChildren

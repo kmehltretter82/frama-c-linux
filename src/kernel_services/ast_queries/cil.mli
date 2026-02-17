@@ -2088,6 +2088,8 @@ val pp_identified_term_ref: (Format.formatter -> identified_term -> unit) ref
 val pp_location_ref: (Format.formatter -> location -> unit) ref
 val pp_from_ref: (Format.formatter -> from -> unit) ref
 val pp_behavior_ref: (Format.formatter -> behavior -> unit) ref
+val pp_block_ref: (Format.formatter -> block -> unit) ref
+val pp_varinfo_ref: (Format.formatter -> varinfo -> unit) ref
 
 val set_extension_handler:
   visit:(plugin:string -> string -> cilVisitor -> acsl_extension_kind ->

@@ -74,6 +74,19 @@ class printer_with_annot () = object (self)
 
   inherit Cil_printer.extensible_printer () as super
 
+  initializer
+    if Kernel.(is_debug_key_enabled dkey_printer_too_early) then begin
+      try
+        ignore (Project.current());
+        if not (Ast.is_computed ()) then
+          Kernel.fatal
+            "Call to Printer while AST is not fully initialized, \
+             this can lead to unexpected crash. Use Cil_printer instead.@\n%s"
+            (Printexc.get_backtrace())
+      with Project.NoProject -> () (* weird case when using inline tests, disable
+                                      the check altogether. *)
+    end
+
   val mutable declared_globs = Cil_datatype.Varinfo.Set.empty
   val mutable print_spec = false
 
