@@ -24,7 +24,7 @@ let subset (A x) (A y) = (x lor y) = y
 let iter f w =
   List.iter
     (fun a -> if mem a w then f a)
-    [ `Nullable ; `Dynamic ; `Garbage ]
+    [ `Nullable ; `Dynamic ; `Garbage ; `Readonly ]
 
 let pp_attr fmt = function
   | `Nullable -> Format.pp_print_string fmt "nullable"

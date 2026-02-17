@@ -660,6 +660,8 @@ let rec consolidate marked n =
                iter_parent_path parent path n
              else path max_int
         ) ps ;
+      (* Warning about empty region shall be emitted here *)
+      if node.cpaths = 0 then node.cflags <- Attr.empty ;
     end
 
 (* -------------------------------------------------------------------------- *)

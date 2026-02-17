@@ -58,6 +58,7 @@ type context = node Domain.context
 type map
 
 val pp_node : Format.formatter -> node -> unit
+val pp_root : Format.formatter -> root -> unit
 val pp_region : Format.formatter -> region -> unit
 
 (** Initially unlocked. *)
