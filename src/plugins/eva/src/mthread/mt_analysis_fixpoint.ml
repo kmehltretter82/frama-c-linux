@@ -73,10 +73,8 @@ let record_end_of_thread_analysis analysis =
   Mt_self.feedback ~level:2 "* Cfg computed";
 ;;
 
-
 (* We compute a value analysis for the given thread *)
 let compute_thread analysis th =
-  let time = Sys.time () in
 
   Mt_self.feedback ~level:2 "* Computing value analysis for thread %a"
     Thread.pretty th.th_eva_thread;
@@ -90,12 +88,13 @@ let compute_thread analysis th =
   analysis.curr_events_stack <- [];
   Datatype.Int.Hashtbl.clear analysis.memexec_cache;
 
-  Analysis.compute_thread ~cvalue_state:th.th_init_state th.th_eva_thread;
+  let (), analysis_time = Eva_utils.measure_time
+    (Analysis.compute_thread ~cvalue_state:th.th_init_state) th.th_eva_thread in
 
   if Mt_options.ShowTime.get () then
     Mt_self.feedback ~level:2
       "* Value analysis computed for thread %a, %f sec"
-      ThreadState.pretty th (Sys.time () -. time);
+      ThreadState.pretty th analysis_time;
 
   (* We save all our results *)
   record_end_of_thread_analysis analysis;
