@@ -16,35 +16,30 @@ type mutex_summary = {
   taken : Mutex.Set.t;
   released : Mutex.Set.t;
 }
-[@@deriving eq, ord]
 
 type queue_summary = {
   created : Mqueue.Set.t;
   receivers : Mqueue.Set.t;
   senders : Mqueue.Set.t;
 }
-[@@deriving eq, ord]
 
 type shared_var_summary = {
   read : Locations.Zone.Set.t;
   written : Locations.Zone.Set.t;
 }
-[@@deriving eq, ord]
 
 type thread_summary = {
   locks : mutex_summary;
   mqueues : queue_summary;
   shared_vars : shared_var_summary;
 }
-[@@deriving eq, ord]
-
 
 (* ----- Datatypes for all above types. ----------------------------------- *)
 
 module MutexSummary = struct
   include Datatype.Serializable_undefined
 
-  type t = mutex_summary [@@deriving eq, ord]
+  type t = mutex_summary
 
   let empty = Mutex.Set.{ taken = empty; released = empty }
 
@@ -58,7 +53,7 @@ end
 module QueueSummary = struct
   include Datatype.Serializable_undefined
 
-  type t = queue_summary [@@deriving eq, ord]
+  type t = queue_summary
 
   let empty = Mqueue.Set.{ created = empty; receivers = empty; senders = empty }
 
@@ -72,7 +67,7 @@ end
 module SharedVarSummary = struct
   include Datatype.Serializable_undefined
 
-  type t = shared_var_summary [@@deriving eq, ord]
+  type t = shared_var_summary
 
   let empty = Locations.Zone.Set.{ read = empty; written = empty }
 
@@ -90,7 +85,7 @@ module SharedVarSummaryDatatype = Datatype.Make (SharedVarSummary)
 module ThreadSummary = struct
   include Datatype.Serializable_undefined
 
-  type t = thread_summary [@@deriving eq, ord]
+  type t = thread_summary
 
   let empty =
     { locks = MutexSummary.empty;
