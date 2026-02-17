@@ -377,8 +377,11 @@ module Results: sig
     (** No taint: the given memory zone cannot be modified by the attacker. *)
 
   (** Evaluates the taint of a given memory zone, according to the taint domain.
+      Only consider the taint of the given [name], if any. Otherwise,
+      a memory zone is tainted as soon as it is tainted for at least one taint.
       Returns an error if the taint domain was not enabled. *)
-  val is_tainted : Locations.Zone.t -> request -> (taint, error) Result.t
+  val is_tainted :
+    ?name:string -> Locations.Zone.t -> request -> (taint, error) Result.t
 
   (** Computes (an overapproximation of) the memory dependencies of an
       expression. *)

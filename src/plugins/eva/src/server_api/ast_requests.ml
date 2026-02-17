@@ -197,5 +197,5 @@ let () =
     ~keyType:Kernel_ast.Marker.jtype
     ~iter:Property_status.iter
     ~add_update_hook
-    ~add_reload_hook:Analysis_requests.register_computation_hook
+    ~add_reload_hook:Taint_requests.register_hook
     model

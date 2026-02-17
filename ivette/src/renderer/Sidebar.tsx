@@ -78,16 +78,24 @@ export function Panel(): JSX.Element {
     Dome.useStringSettings('ivette.sidebar.selected');
 
   const sidebars = State.useElements(SIDEBAR);
+  const sortedSidebars = React.useMemo(() => {
+      const newItems = [...sidebars].sort((a, b) => {
+        const e1 = a.rank ?? 0;
+        const e2 = b.rank ?? 0;
+        return e1 - e2;
+      });
+      return newItems;
+  }, [sidebars]);
 
   // Ensures there is one selected sidebar
   React.useEffect(() => {
-    if (sidebars.every((sb) => sb.id !== selected)) {
-      const first = sidebars[0];
+    if (sortedSidebars.every((sb) => sb.id !== selected)) {
+      const first = sortedSidebars[0];
       if (first) setSelected(first.id);
     }
-  }, [sidebars, selected, setSelected]);
+  }, [sortedSidebars, selected, setSelected]);
 
-  const items = sidebars.map((sb) => (
+  const items = sortedSidebars.map((sb) => (
     <Selector
       key={sb.id}
       selected={selected}
@@ -95,7 +103,7 @@ export function Panel(): JSX.Element {
       {...sb} />
   ));
 
-  const wrappers = sidebars.map((sb) => (
+  const wrappers = sortedSidebars.map((sb) => (
     <Wrapper
       key={sb.id}
       selected={selected}
@@ -106,7 +114,7 @@ export function Panel(): JSX.Element {
   // Hide sidebar if only one of them
   const selectorClasses = classes(
     'sidebar-items dome-color-frame',
-    sidebars.length <= 1 && 'dome-erased'
+    sortedSidebars.length <= 1 && 'dome-erased'
   );
 
   return (

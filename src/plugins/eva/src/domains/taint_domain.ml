@@ -248,10 +248,20 @@ end
 
 module LatticeMultiTaint = struct
 
+  module Info = struct
+    let name = "Eva.Taint_domain.TaintNames"
+    let dependencies = [ Self.state ]
+  end
+
+  (* Stores the set of taint names encountered during an analysis. *)
+  module TaintNamesRef = State_builder.Set_ref (Datatype.String.Set) (Info)
+
   (* Maps a taint name to its corresponding state. *)
   module TaintNamespace = struct
     include Datatype.String.Map
     include Datatype.String.Map.Make (LatticeSingleTaint)
+
+    let add name = TaintNamesRef.add name; add name
 
     let find_or_empty key map =
       try find key map
@@ -1182,17 +1192,20 @@ let () = Abstractions.Hooks.register interpret_taint_logic
 
 type taint = Direct | Indirect | Untainted
 
-let is_tainted state ?indirect zone =
+let is_tainted ?name state zone =
   let taint_state =
-    match state with
-    | `Top -> LatticeSingleTaint.top
-    | `Value state_map ->
-      LatticeMultiTaint.fold (fun _ state acc ->
-          LatticeSingleTaint.join state acc) state_map LatticeSingleTaint.empty
+    match state, name with
+    | `Top, _ -> LatticeSingleTaint.top
+    | `Value state_map, Some name ->
+      LatticeMultiTaint.find_or_empty name state_map
+    | `Value state_map, None ->
+      LatticeMultiTaint.fold (fun _name -> LatticeSingleTaint.join)
+        state_map LatticeSingleTaint.empty
   in
   let { locs_data; locs_control } = taint_state in
-  let intersects_any z = Zone.(intersects (join locs_data locs_control) z) in
-  let is_indirect () = Option.fold indirect ~none:false ~some:intersects_any in
   if Zone.intersects zone locs_data then Direct
-  else if Zone.intersects zone locs_control || is_indirect () then Indirect
+  else if Zone.intersects zone locs_control then Indirect
   else Untainted
+
+let taint_names () =
+  LatticeMultiTaint.TaintNamesRef.get () |> Datatype.String.Set.elements

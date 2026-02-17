@@ -19,6 +19,7 @@ import './DomainStates';
 import './EvaSidebar';
 import './Flamegraph';
 import './style.css';
+import './Taint';
 
 // --------------------------------------------------------------------------
 // --- help

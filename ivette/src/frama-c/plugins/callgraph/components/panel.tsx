@@ -100,7 +100,7 @@ function getElement(
 
   const allProperties = properties.map((elt) => {
     const evap = evaProperties.find((evaps) => evaps.key === elt.key);
-    return Object.assign(elt, evap);
+    return { ...elt, ...evap };
   });
 
   const error = allProperties
@@ -137,18 +137,14 @@ function getElement(
     (ps) => ps.taint === "direct_taint" || ps.taint === "indirect_taint"
   ).map(
     (ps) => {
-      let id = null;
-      let color = 'black';
-      switch (ps.taint) {
-        case 'not_tainted': id = 'DROP.EMPTY'; color = '#00B900'; break;
-        case 'direct_taint': id = 'DROP.FILLED'; color = '#882288'; break;
-        default:
-      }
-      return (id ? <Icon key={ps.key} id={id} fill={color} title={ps.key}
-        onClick={() => {
+      const taintIcon = renderTaint({ name: ps.taint });
+      return !taintIcon ? null : React.cloneElement(taintIcon, {
+        key: ps.key,
+        onClick: () => {
           const scope = properties.find((elt) => elt.key === ps.key)?.scope;
           if(scope) States.setCurrentLocation({ scope: scope, marker: ps.key });
-        }}/> : null);
+        }
+      });
     }
   );
 

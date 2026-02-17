@@ -39,7 +39,6 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import * as Locations from 'frama-c/kernel/Locations';
 import path from 'path';
 
-
 // --------------------------------------------------------------------------
 // --- Global Search Hints
 // --------------------------------------------------------------------------
