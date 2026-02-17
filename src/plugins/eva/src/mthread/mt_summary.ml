@@ -267,15 +267,16 @@ let compute_node_access_summary mutexes_by_zone (zone, node_access_set) =
 
 (* ----- Summary for all threads -------------------------------------------- *)
 
+let info name : (module State_builder.Info_with_size) =
+  (module struct
+    let name = "Eva.Mt_summary." ^ name
+    let size = 11
+    let dependencies = [ Self.state ]
+  end)
+
 module ThreadTable =
   State_builder.Hashtbl
-    (Thread.Hashtbl)
-    (ThreadSummaryDatatype)
-    (struct
-      let name = "Mt_summary.Summary"
-      let size = 7
-      let dependencies = [ Ast.self ]
-    end)
+    (Thread.Hashtbl) (ThreadSummaryDatatype) (val info "ThreadTable")
 
 let compute_threads_summary analysis =
   ThreadTable.clear ();
@@ -302,14 +303,7 @@ let access_protection (_, _, protection) = protection
 let access_id access = Format.asprintf "%a" Access.pretty access
 
 module AccessTable =
-  State_builder.Hashtbl
-    (Access.Hashtbl)
-    (LocSet)
-    (struct
-      let name = "Eva.Mthread.Mt_summary.AccessSummary"
-      let size = 11
-      let dependencies = [ Ast.self ]
-    end)
+  State_builder.Hashtbl (Access.Hashtbl) (LocSet) (val info "AccessTable")
 
 let compute_access_summary analysis =
   let accesses = analysis.concurrent_accesses_by_nodes in
