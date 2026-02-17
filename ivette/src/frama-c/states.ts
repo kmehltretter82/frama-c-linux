@@ -258,6 +258,15 @@ interface Handler<A> {
 
 enum SyncStatus { OffLine, Loading, Loaded }
 
+export type customSyncError = { name: string, error: string }
+export const syncErrorEvent = 'states:syncError' as const;
+
+declare global {
+  interface WindowEventMap {
+    [syncErrorEvent]: CustomEvent<customSyncError>;
+  }
+}
+
 class SyncState<A> extends GlobalState<A | undefined> {
   handler: Handler<A>;
   status = SyncStatus.OffLine;
@@ -311,7 +320,12 @@ class SyncState<A> extends GlobalState<A | undefined> {
         `Fail to update state '${this.handler.name}'.`,
         `${error}`,
       );
-      this.setValue(undefined);
+      const detail = {
+        name: this.handler.name,
+        error: "Fail to update state"
+      };
+      window.dispatchEvent(
+        new CustomEvent<customSyncError>(syncErrorEvent, { detail }));
     }
   }
 
@@ -367,11 +381,14 @@ export function useSyncValue<A>(value: Value<A>): A | undefined {
 export function useServerField<A>(
   state: State<A>,
   defaultValue: A,
+  syncError?: FieldError
 ): FieldState<A> {
   const [value, setState] = useSyncState(state);
-  const stateValue = value !== undefined ? value : defaultValue;
+  const stateValue = value ?? defaultValue;
   const [local, setLocal] = React.useState(stateValue);
-  const [error, setError] = React.useState<FieldError>(undefined);
+  const [error, setError] = React.useState<FieldError>(syncError);
+
+  React.useEffect(() => { setError(syncError); }, [syncError]);
 
   const update = React.useCallback((newValue: A, newError: FieldError) => {
     setLocal(newValue);

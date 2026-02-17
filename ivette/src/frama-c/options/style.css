@@ -36,5 +36,12 @@
 
   }
 
+  .dome-xForm-field {
+    flex-direction: row-reverse;
+
+    .dome-xForm-error { position: relative; }
+    &:has(.field-error-sync) .dome-xForm-error { display: none; }
+  }
+
   label.field-is-set { color: var(--primary-button-color) }
 }
