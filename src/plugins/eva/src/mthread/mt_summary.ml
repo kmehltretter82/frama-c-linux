@@ -38,13 +38,6 @@ type thread_summary = {
 }
 [@@deriving eq, ord]
 
-type protected_access = {
-  zone : Locations.Zone.t;
-  access_kind : AccessKind.t;
-  protection_kind : ProtectionKind.t;
-}
-[@@deriving eq, ord]
-
 
 (* ----- Datatypes for all above types. ----------------------------------- *)
 
@@ -115,73 +108,6 @@ end
 module ThreadSummaryDatatype = Datatype.Make (ThreadSummary)
 
 
-(** Map of zone to protected accesses. *)
-module ProtectedAccessesByZone = struct
-  module Lattice = struct
-    include Eval.Top.Make_Datatype (LocationsByAccess)
-    let top = `Top
-    let default = `Value LocationsByAccess.empty
-    let default_is_bottom = true
-    let join l r =
-      match l, r with
-      | `Top, _ | _, `Top -> `Top
-      | `Value l, `Value r -> `Value (LocationsByAccess.join l r)
-    let is_included l r =
-      match l, r with
-      | _, `Top -> true
-      | `Top, _ -> false
-      | `Value l, `Value r ->
-        LocationsByAccess.for_all
-          (fun key l ->
-             try
-               let r = LocationsByAccess.find key r in
-               AccessLocationSet.subset l r
-             with Not_found -> false)
-          l
-  end
-
-  include Lmap_bitwise.Make_bitwise (Lattice)
-end
-
-module ProtectedAccess = struct
-  include Datatype.Serializable_undefined
-
-  type t = protected_access [@@deriving eq, ord]
-
-  let name = "Eva.Mthread.Mt_summary.ProtectedAccessSummary"
-  let reprs =
-    List.fold_left
-      (fun acc zone ->
-         List.fold_left
-           (fun acc access_kind ->
-              List.fold_left
-                (fun acc protection_kind ->
-                   { zone; access_kind; protection_kind } :: acc)
-                acc
-                ProtectionKind.reprs)
-           acc
-           AccessKind.reprs)
-      []
-      Locations.Zone.reprs
-  let structural_descr =
-    Structural_descr.t_record [| Locations.Zone.packed_descr;
-                                 AccessKind.packed_descr;
-                                 ProtectionKind.packed_descr; |]
-  let hash { zone; access_kind; protection_kind } =
-    Hashtbl.hash
-      (Locations.Zone.hash zone,
-       AccessKind.hash access_kind,
-       ProtectionKind.hash protection_kind)
-  let pretty fmt { zone; access_kind; protection_kind } =
-    Format.fprintf fmt "%a>%a>%a"
-      Locations.Zone.pretty zone
-      AccessKind.pretty access_kind
-      ProtectionKind.pretty protection_kind
-end
-
-module ProtectedAccessDatatype = Datatype.Make_with_collections (ProtectedAccess)
-
-
 (* ----- Computation of the summary of one thread --------------------------- *)
 
 let add_lock_taken id th_summary =
@@ -237,6 +163,40 @@ let compute_thread_summary thread =
 
 (* ----- Computation of the summary of one access node set ------------------ *)
 
+module LocSet = Cil_datatype.Location.Set
+
+module AccessProperty = Datatype.Pair_with_collections (AccessKind) (Protection)
+
+(* Map binding access property (kind+protection) to a set of locations. *)
+module LocationsByAccessProperty = struct
+  include AccessProperty.Map
+  include Make (LocSet)
+
+  let hash map =
+    let hash_binding key set = AccessProperty.hash key, LocSet.hash set in
+    fold (fun key set acc -> Hashtbl.hash (acc, hash_binding key set)) map 0
+
+  let join = union (fun _key a b -> Some (LocSet.union a b))
+
+  let is_included l r =
+    let is_included_binding key elt =
+      try LocSet.subset elt (find key r)
+      with Not_found -> false
+    in
+    for_all is_included_binding l
+end
+
+(** Map zone -> access property (kind+protection) -> set of locations. *)
+module AccessPropertyByZone = struct
+  module Lattice = struct
+    include Lattice_bounds.Top.Bound_Lattice (LocationsByAccessProperty)
+    let default = `Value LocationsByAccessProperty.empty
+    let default_is_bottom = true
+  end
+
+  include Lmap_bitwise.Make_bitwise (Lattice)
+end
+
 let get_access_kind (rw, _, _) : AccessKind.t =
   match rw with
   | Read | ReadPos _ -> AccessRead
@@ -257,7 +217,7 @@ let get_mutexes_for_access mutexes (rw, _, _) =
 let get_access_locs (_, node, _) =
   Mt_cfg_types.CfgNode.node_stmt node
   |> List.map Cil_datatype.Stmt.loc
-  |> AccessLocationSet.of_list
+  |> LocSet.of_list
 
 let get_locked_mutexes_for_access (_, node, _) =
   node.Mt_cfg_types.cfgn_context.locked_mutexes
@@ -273,7 +233,7 @@ let compute_node_access_summary mutexes_by_zone (zone, node_access_set) =
        let access_kind = get_access_kind node_id_access in
        let protection_mutexes = get_mutexes_for_access mutexes node_id_access in
        let locs = get_access_locs node_id_access in
-       let protection_kinds : ProtectionKind.t list =
+       let protection_kinds : Protection.t list =
          let locked_mutexes = get_locked_mutexes_for_access node_id_access in
          if MutexPresence.is_empty locked_mutexes then
            [ Unprotected ]
@@ -281,7 +241,7 @@ let compute_node_access_summary mutexes_by_zone (zone, node_access_set) =
            MutexPresence.KeySet.fold
              (fun mutex acc ->
                 let presence = MutexPresence.find protection_mutexes mutex in
-                let protection : ProtectionKind.t =
+                let protection : Protection.t =
                   match presence with
                   | NotPresent ->
                     Mt_self.fatal
@@ -296,13 +256,13 @@ let compute_node_access_summary mutexes_by_zone (zone, node_access_set) =
        let lba =
          List.fold_left
            (fun acc protection ->
-              LocationsByAccess.add (access_kind, protection) locs acc)
-           LocationsByAccess.empty
+              LocationsByAccessProperty.add (access_kind, protection) locs acc)
+           LocationsByAccessProperty.empty
            protection_kinds
        in
-       ProtectedAccessesByZone.add_binding ~exact:false acc zone (`Value lba))
+       AccessPropertyByZone.add_binding ~exact:false acc zone (`Value lba))
     node_access_set
-    ProtectedAccessesByZone.empty
+    AccessPropertyByZone.empty
 
 
 (* ----- Summary for all threads -------------------------------------------- *)
@@ -331,10 +291,20 @@ let compute_threads_summary analysis =
 
 (* ----- Summary for all accesses ------------------------------------------- *)
 
+module Access =
+  Datatype.Triple_with_collections (Locations.Zone) (AccessKind) (Protection)
+
+type access = Access.t
+
+let access_zone (zone, _, _) = zone
+let access_kind (_, kind, _) = kind
+let access_protection (_, _, protection) = protection
+let access_id access = Format.asprintf "%a" Access.pretty access
+
 module AccessTable =
   State_builder.Hashtbl
-    (ProtectedAccessDatatype.Hashtbl)
-    (AccessLocationSet)
+    (Access.Hashtbl)
+    (LocSet)
     (struct
       let name = "Eva.Mthread.Mt_summary.AccessSummary"
       let size = 11
@@ -350,8 +320,8 @@ let compute_access_summary analysis =
   let r1 = List.map aux accesses in
   let accesses_by_zone =
     List.fold_left
-      (fun r r' -> ProtectedAccessesByZone.join r r')
-      ProtectedAccessesByZone.empty
+      (fun r r' -> AccessPropertyByZone.join r r')
+      AccessPropertyByZone.empty
       r1
   in
   let accesses_by_zone =
@@ -360,17 +330,15 @@ let compute_access_summary analysis =
       Mt_self.fatal
         "By construction, accesses_by_zone cannot be Top or Bottom"
     | Map m -> m
-
   in
   AccessTable.clear ();
   let add_zone_accesses zone accesses =
-    LocationsByAccess.iter
-      (fun (access_kind, protection_kind) locations ->
-         let access_key = { zone; access_kind; protection_kind } in
-         AccessTable.add access_key locations)
+    LocationsByAccessProperty.iter
+      (fun (kind, protection) locations ->
+         AccessTable.add (zone, kind, protection) locations)
       accesses
   in
-  ProtectedAccessesByZone.fold
+  AccessPropertyByZone.fold
     (fun zones accesses () ->
        let accesses = Eval.Top.non_top accesses in
        try
