@@ -23,7 +23,7 @@
     (post)dominated by all other (post)dominators of [s].
 
     A common ancestor (or child) of a list of statements is a (post)dominator
-    that (post)dominates all the statements
+    that (post)dominates all the statements.
 
     @since 30.0-Zinc
 *)

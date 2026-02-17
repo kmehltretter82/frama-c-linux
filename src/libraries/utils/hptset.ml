@@ -140,7 +140,7 @@ module Make
     in
     let i2 = inter s1 s2 in
     if not (i1 == i2) then
-      Cmdline.Kernel_log.error "%a@./@.%a@.->@.%a@./@.%a"
+      Kernel_log.error "%a@./@.%a@.->@.%a@./@.%a"
         pretty_debug s1 pretty_debug s2 pretty_debug i1 pretty_debug i2;
     i1
 

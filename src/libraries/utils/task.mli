@@ -12,7 +12,7 @@
 (** Prints debug information about tasks.
     @since 32.0-Germanium
 *)
-val dkey : Cmdline.Kernel_log.category
+val dkey : Kernel_log.category
 
 (* ************************************************************************* *)
 (** {2 Task} *)

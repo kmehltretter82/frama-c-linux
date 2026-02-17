@@ -174,7 +174,7 @@ module Shape(Key: Id_Datatype) = struct
   let compare =
     if Key.compare == Datatype.undefined
     then begin
-      Cmdline.Kernel_log.debug
+      Kernel_log.debug
         "%s shape, missing comparison function" (Type.name Key.ty);
       Datatype.undefined
     end
@@ -627,7 +627,7 @@ struct
   let compare =
     if V.compare == Datatype.undefined
     then begin
-      Cmdline.Kernel_log.debug
+      Kernel_log.debug
         "(%s, %s) ptmap, missing comparison function"
         (Type.name Key.ty) (Type.name V.ty);
       Datatype.undefined

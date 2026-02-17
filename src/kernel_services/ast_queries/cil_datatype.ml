@@ -2434,7 +2434,7 @@ module Global_annotation = struct
         let rec hash g = match g with
           | Dfun_or_pred (l,_) -> 2 * Logic_info.hash l
           | Dvolatile ([],_,_,_,(_source,_)) ->
-            Cmdline.Kernel_log.fatal
+            Kernel_log.fatal
               "Empty location list for volatile annotation@."
           | Dvolatile (t::_,_,_,_,_) -> 3 * Identified_term.hash t
           | Daxiomatic (_,[],_,_) -> 5
@@ -2816,7 +2816,7 @@ module Kf = struct
         let equal k1 k2 =
           if k1 != k2 then begin
             if id k1 = id k2 then begin
-              Cmdline.Kernel_log.fatal "Two kf for %a (%d) and %a (%d) (%d)@."
+              Kernel_log.fatal "Two kf for %a (%d) and %a (%d) (%d)@."
                 Varinfo.pretty (vi k1) (Extlib.address_of_value k1)
                 Varinfo.pretty (vi k2) (Extlib.address_of_value k2)
                 (id k1)

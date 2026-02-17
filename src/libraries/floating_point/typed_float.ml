@@ -481,4 +481,4 @@ let parse str =
 let parse_exn str =
   match parse str with
   | Ok parsed -> parsed
-  | Error msg -> Cmdline.Kernel_log.abort ~current:true "%s" msg
+  | Error msg -> Kernel_log.abort ~current:true "%s" msg

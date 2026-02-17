@@ -113,7 +113,7 @@ let ensure_round_nearest_even () =
   if Stdlib.(get_rounding_mode () <> Nearest_even) then
     let mode = string_of_rounding_mode (get_rounding_mode ()) in
     let () =
-      Cmdline.Kernel_log.failure
+      Kernel_log.failure
         "pretty: rounding mode (%s) <> FE_TONEAREST" mode
     in
     set_rounding_mode Nearest_even

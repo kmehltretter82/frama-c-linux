@@ -38,7 +38,7 @@ module Categories = struct
            new standard category at release N, then plug-ins which already
            create this category at release N-1 would be warned, but still work
            as before. *)
-        Cmdline.Kernel_log.warning "overriding category `%s' for type `%s'"
+        Kernel_log.warning "overriding category `%s' for type `%s'"
           c.name
           (Type.name c.ty)
       with

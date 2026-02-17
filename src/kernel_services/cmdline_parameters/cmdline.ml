@@ -43,18 +43,18 @@ module Debug_level = Make_level(struct let default = 0 end)
 module Verbose_level = Make_level(struct let default = 1 end)
 module Kernel_debug_level = Make_level(struct let default = 0 end)
 module Kernel_verbose_level = Make_level(struct let default = 1 end)
-let kernel_debug_atleast_ref = ref (fun n -> Kernel_debug_level.get () >= n)
-let kernel_verbose_atleast_ref = ref (fun n -> Kernel_verbose_level.get () >= n)
 
-module Kernel_log =
-  Log.Register
-    (struct
-      let channel = Log.kernel_channel_name
-      let label = Log.kernel_label_name
-      let debug_atleast level = !kernel_debug_atleast_ref level
-      let verbose_atleast level = !kernel_verbose_atleast_ref level
-    end)
-let dkey = Kernel_log.register_category "cmdline"
+let () =
+  Kernel_log.kernel_debug_atleast_ref :=
+    (fun n -> Kernel_debug_level.get () >= n)
+[@@alert "-kernel_log"]
+
+let () =
+  Kernel_log.kernel_verbose_atleast_ref :=
+    (fun n -> Kernel_verbose_level.get () >= n)
+[@@alert "-kernel_log"]
+
+let dkey = Kernel_log.dkey_cmdline
 
 let quiet_ref = ref false
 let deterministic = ref false
@@ -1279,3 +1279,14 @@ let explain_cmdline () =
        Format.fprintf fmt "[kernel] Explaining command-line options:@.");
   List.iter pp_option_help (List.rev option_names);
   raise Exit
+
+(* deprecated *)
+
+module Kernel_log = Kernel_log
+let kernel_debug_atleast_ref =
+  Kernel_log.kernel_debug_atleast_ref
+[@@alert "-kernel_log"]
+
+let kernel_verbose_atleast_ref =
+  Kernel_log.kernel_verbose_atleast_ref
+[@@alert "-kernel_log"]

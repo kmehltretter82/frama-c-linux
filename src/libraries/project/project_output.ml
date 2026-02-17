@@ -6,6 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Cmdline.Kernel_log
+include Kernel_log
 let dkey = register_category "project"
 let wkey = register_warn_category "project"

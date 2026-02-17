@@ -8,7 +8,7 @@
 
 let dkey =
   let help = "prints debug information about task executions" in
-  Cmdline.Kernel_log.register_category ~help "task"
+  Kernel_log.register_category ~help "task"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Error Messages                                                     --- *)
@@ -212,7 +212,7 @@ let set_time cmd t = match cmd.chrono with
 
 let start_command ~timeout ?time ?stdout ?stderr cmd args =
   begin
-    Cmdline.Kernel_log.debug ~dkey "execute task '@[<hov 4>%t'@]"
+    Kernel_log.debug ~dkey "execute task '@[<hov 4>%t'@]"
       (fun fmt ->
          Format.pp_print_string fmt cmd ;
          List.iter
@@ -244,7 +244,7 @@ let ping_command cmd coin =
         if cmd.timeout > 0.0 && time_now > cmd.time_stop then
           begin
             set_time cmd (time_now -. cmd.time_start) ;
-            Cmdline.Kernel_log.debug ~dkey "timeout '%s'" cmd.name ;
+            Kernel_log.debug ~dkey "timeout '%s'" cmd.name ;
             cmd.time_killed <- true ;
             kill () ;
           end ;
@@ -253,22 +253,22 @@ let ping_command cmd coin =
     | Command.Result (Unix.WEXITED s|Unix.WSIGNALED s|Unix.WSTOPPED s)
       when cmd.time_killed ->
       set_chrono cmd ;
-      Cmdline.Kernel_log.debug ~dkey "timeout '%s' [%d]" cmd.name s ;
+      Kernel_log.debug ~dkey "timeout '%s' [%d]" cmd.name s ;
       Return (Timeout cmd.timeout)
 
     | Command.Result (Unix.WEXITED s) ->
       set_chrono cmd ;
-      Cmdline.Kernel_log.debug ~dkey "exit '%s' [%d]" cmd.name s ;
+      Kernel_log.debug ~dkey "exit '%s' [%d]" cmd.name s ;
       Return (Result s)
 
     | Command.Result (Unix.WSIGNALED s|Unix.WSTOPPED s) ->
       set_chrono cmd ;
-      Cmdline.Kernel_log.debug ~dkey "signal '%s' [%d]" cmd.name s ;
+      Kernel_log.debug ~dkey "signal '%s' [%d]" cmd.name s ;
       Return Canceled
 
   with e ->
     set_chrono cmd ;
-    Cmdline.Kernel_log.debug ~dkey
+    Kernel_log.debug ~dkey
       "failure '%s' [%s]" cmd.name (Printexc.to_string e) ;
     Return (Failed e)
 

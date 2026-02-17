@@ -10,7 +10,7 @@
 (* --- Debugging                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Klog = Cmdline.Kernel_log
+module Klog = Kernel_log
 let dkey = Klog.register_category "dynlink"
 
 let error ~name ~message ~details =
