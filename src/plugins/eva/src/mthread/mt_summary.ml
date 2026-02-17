@@ -9,7 +9,6 @@
 (* Summary of an Mthread analysis, stored on disk for the Ivette component. *)
 
 open Mt_types
-open Mt_thread
 open Mt_shared_vars_types
 
 type mutex_summary = {
@@ -301,7 +300,7 @@ module AccessTable =
   State_builder.Hashtbl (Access.Hashtbl) (LocSet) (val info "AccessTable")
 
 let compute_access_summary analysis =
-  let accesses = analysis.concurrent_accesses_by_nodes in
+  let accesses = analysis.Mt_thread.concurrent_accesses_by_nodes in
   let mutexes_by_zone =
     Mt_mutexes.mutexes_protecting_zones' accesses
   in
