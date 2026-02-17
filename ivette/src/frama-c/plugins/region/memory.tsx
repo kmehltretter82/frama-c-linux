@@ -78,15 +78,15 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
     target.set(r.node, id);
     // --- Labels
     const L: Dot.Node = { id: '', shape: 'note', font: 'mono' };
-    r.labels.forEach(a => {
-      const lid = `L${a}`;
-      nodes.push({ ...L, id: lid, label: `${a}:` });
+    if (r.labels.length > 0) {
+      const lid = `L${r.node}`;
+      nodes.push({ ...L, id: lid, label: `${r.labels.join(',')}:` });
       index.set(lid, r.node);
       edges.push({
         source: lid, target: id, aligned: true,
         headAnchor: 's', head: 'none', color: 'grey'
       });
-    });
+    }
     // --- Roots
     const R: Dot.Node = { id: '', shape: 'cds', font: 'mono' };
     // --- Roots: Result

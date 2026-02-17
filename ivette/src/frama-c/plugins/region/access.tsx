@@ -81,7 +81,7 @@ function collect(r: Region.region | undefined): AccessKind[] {
       kind: 'Region',
       access: r.range,
       typeof: r.typeof,
-      source: '',
+      source: r.attrs.join(', '),
       marker: r.marker,
     }));
     r.inits.forEach(r => buffer.push({ kind: 'Init', ...r }));

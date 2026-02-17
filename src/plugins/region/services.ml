@@ -62,6 +62,7 @@ struct
     Jrecord [
       "range", Jstring ;
       "typeof", Jstring ;
+      "attrs", Jarray Jstring ;
       "marker", Kernel_ast.Marker.jtype ;
     ]
 
@@ -75,10 +76,19 @@ struct
       Printer.pp_term r.inf
       Printer.pp_term r.sup
 
+  let attributes (Memory.Root r) : Json.t =
+    let pool : Json.t list ref = ref [] in
+    Attr.iter
+      (fun a ->
+         pool := `String (Format.asprintf "%a" Attr.pp_attr a) :: !pool)
+      r.flags ;
+    `List (List.rev !pool)
+
   let to_json (Memory.Root r as root) =
     Json.of_fields [
       "range", Json.of_string (range root) ;
       "typeof", Json.of_string (typeof root) ;
+      "attrs", attributes root ;
       "marker", Kernel_ast.Marker.to_json (PIP r.ip) ;
     ]
   let of_json _ = failwith "Region.Cvar.of_json"
@@ -214,6 +224,14 @@ struct
         Attr.iter (Format.fprintf fmt " (%a)" Attr.pp_attr) m.flags ;
       end
 
+  let labels (r: Memory.region) =
+    List.filter
+      (fun l ->
+         List.for_all
+           (function Memory.Root r -> r.named <> l)
+           r.roots
+      ) r.labels
+
   let jtype = Data.declare ~package ~name:"region" @@
     Jrecord [
       "node", Node.jtype ;
@@ -240,7 +258,7 @@ struct
       "result", Json.of_bool m.cresult ;
       "cvars", Cvars.to_json m.cvars ;
       "roots", Roots.to_json m.roots ;
-      "labels", labels_to_json m.labels ;
+      "labels", labels_to_json @@ labels m ;
       "parents", NodeList.to_json m.parents ;
       "sizeof", Json.of_int @@ m.sizeof ;
       "ranges", Ranges.to_json @@ m.ranges ;
