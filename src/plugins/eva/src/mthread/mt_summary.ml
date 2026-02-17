@@ -196,18 +196,6 @@ let get_access_kind (rw, _, _) : AccessKind.t =
   | Read | ReadPos _ -> AccessRead
   | Write _ | WritePos _ -> AccessWrite
 
-let get_mutexes_for_access mutexes (rw, _, _) =
-  let open Mt_mutexes_types in
-  let mutexes =
-    match rw with
-    | Read | ReadPos _ -> mutexes.mutexes_for_read
-    | Write _ | WritePos _ -> mutexes.mutexes_for_write
-  in
-  match mutexes with
-  | Unaccessed ->
-    Mt_self.fatal "By construction, we are considering actual accesses"
-  | Mutexes m -> m
-
 let get_access_locs (_, node, _) =
   Mt_cfg_types.CfgNode.node_stmt node
   |> List.map Cil_datatype.Stmt.loc
@@ -216,36 +204,25 @@ let get_access_locs (_, node, _) =
 let get_locked_mutexes_for_access (_, node, _) =
   node.Mt_cfg_types.cfgn_context.locked_mutexes
 
-let compute_node_access_summary mutexes_by_zone (zone, node_access_set) =
-  let open Mt_mutexes_types in
+let compute_node_access_summary (zone, node_access_set) =
   let open Mt_cfg_types in
-  let mutexes = MutexesByZone.find mutexes_by_zone zone in
-  (* By construction, the zone is in the MutexesByZone *)
-  let mutexes = Eval.Bottom.non_bottom mutexes in
   SetNodeIdAccess.fold
     (fun node_id_access acc ->
        let access_kind = get_access_kind node_id_access in
-       let protection_mutexes = get_mutexes_for_access mutexes node_id_access in
        let locs = get_access_locs node_id_access in
        let protection_kinds : Protection.t list =
          let locked_mutexes = get_locked_mutexes_for_access node_id_access in
          if MutexPresence.is_empty locked_mutexes then
            [ Unprotected ]
          else
-           MutexPresence.KeySet.fold
-             (fun mutex acc ->
-                let presence = MutexPresence.find protection_mutexes mutex in
-                let protection : Protection.t =
-                  match presence with
-                  | NotPresent ->
-                    Mt_self.fatal
-                      "By construction, the mutexes from the access are present"
-                  | MaybePresent -> MaybeProtected (Mutex.Set.singleton mutex)
-                  | Present -> Protected (Mutex.Set.singleton mutex)
-                in
-                protection :: acc)
-             (MutexPresence.all_present locked_mutexes)
-             []
+           let add_mutex mutex acc =
+             let set = Mutex.Set.singleton mutex in
+             if MutexPresence.find locked_mutexes mutex = Present
+             then Protected set :: acc
+             else MaybeProtected set :: acc
+           in
+           let all_mutex = MutexPresence.all_present locked_mutexes in
+           MutexPresence.KeySet.fold add_mutex all_mutex []
        in
        let lba =
          List.fold_left
@@ -301,11 +278,7 @@ module AccessTable =
 
 let compute_access_summary analysis =
   let accesses = analysis.Mt_thread.concurrent_accesses_by_nodes in
-  let mutexes_by_zone =
-    Mt_mutexes.mutexes_protecting_zones' accesses
-  in
-  let aux = compute_node_access_summary mutexes_by_zone in
-  let r1 = List.map aux accesses in
+  let r1 = List.map compute_node_access_summary accesses in
   let accesses_by_zone =
     List.fold_left
       (fun r r' -> AccessPropertyByZone.join r r')
