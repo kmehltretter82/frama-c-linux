@@ -4516,7 +4516,7 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
       let loc = a.expr_loc in
       match a.expr_node with
       | Cabs.VARIABLE n ->
-          let n' = if check then check_attribute_name n else n in
+        let n' = if check then check_attribute_name n else n in
         ACons(n', [])
       | Cabs.CONSTANT (Cabs.CONST_STRING s) -> AStr s
       | Cabs.CONSTANT (Cabs.CONST_INT str) -> begin
@@ -5491,10 +5491,10 @@ and doExp local_env
               (new_exp ~loc (Lval lval)) (dropQualifiers vi.vtype)
           | EnvEnum item, _ ->
             let typ = Cil.typeOf item.eival in
-              finishExp []
-                (unspecified_chunk empty)
-                (new_exp ~loc (Const (CEnum item)))
-                typ
+            finishExp []
+              (unspecified_chunk empty)
+              (new_exp ~loc (Const (CEnum item)))
+              typ
           | _ -> raise Not_found
         with Not_found -> begin
             if isOldStyleVarArgName n then
@@ -7576,14 +7576,14 @@ and doBinOp loc (bop: binop) (e1: exp) (e2: exp) =
   let t1 = Cil.typeOf e1
   and t2 = Cil.typeOf e2 in
   let bop, e1, e2 =
-  match bop with
-  | PlusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
+    match bop with
+    | PlusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
       PlusPI, e1, e2
     | PlusA when Ast_types.is_ptr t2 && Ast_types.is_integral t1 ->
       PlusPI, e2, e1
-  | MinusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
+    | MinusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
       MinusPI, e1, e2
-  | MinusA when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
+    | MinusA when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
       MinusPP, e1, e2
     | _ -> bop, e1, e2
   in
