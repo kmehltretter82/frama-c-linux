@@ -399,6 +399,16 @@ val split_category : string -> string list
     @since 18.0-Argon *)
 val is_subcategory : string list -> string list -> bool
 
+(** @before Frama-C+dev Was in {!Cmdline} *)
+module type Level = sig
+  val value_if_set: int option ref
+  val get: unit -> int
+  val set: int -> unit
+end
+
+(** @since Frama-C+dev *)
+module Make_level(_ : sig val default : int end) : Level
+
 (** Each plugin has its own channel to output messages.
     This functor should not be directly applied by plug-in developer.
     They should apply {!Plugin.Register} instead.

@@ -635,7 +635,7 @@ struct
       set_range ~min:0 ~max:max_int;
       if is_kernel () then begin
         Kernel_log.kernel_verbose_atleast_ref := (fun n -> get () >= n);
-        match !Cmdline.Kernel_verbose_level.value_if_set with
+        match !Kernel_log.Verbose_level.value_if_set with
         | None -> ()
         | Some n -> set n
       end
@@ -668,7 +668,7 @@ struct
            else if old = 0 then Stdlib.incr positive_debug_ref);
       if is_kernel () then begin
         Kernel_log.kernel_debug_atleast_ref := (fun n -> get () >= n);
-        match !Cmdline.Kernel_debug_level.value_if_set with
+        match !Kernel_log.Debug_level.value_if_set with
         | None -> ()
         | Some n -> set n
       end

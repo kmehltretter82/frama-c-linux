@@ -762,6 +762,18 @@ let merge_status old_status new_status =
   | Winactive, _ -> Winactive
   | _ -> new_status
 
+module type Level = sig
+  val value_if_set: int option ref
+  val get: unit -> int
+  val set: int -> unit
+end
+
+module Make_level(X: sig val default: int end) = struct
+  let value_if_set = ref None
+  let get () = match !value_if_set with None -> X.default | Some x -> x
+  let set n = value_if_set := Some n
+end
+
 module type Messages =
 sig
 

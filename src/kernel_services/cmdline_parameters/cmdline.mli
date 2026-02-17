@@ -322,18 +322,21 @@ module type Level = sig
   val get: unit -> int
   val set: int -> unit
 end
+[@@deprecated "use Log.Level instead."]
 
-module Debug_level: Level
+module Debug_level: Log.Level
 (** @since Fluorine-20130401 *)
 
-module Verbose_level: Level
+module Verbose_level: Log.Level
 (** @since Fluorine-20130401 *)
 
-module Kernel_debug_level: Level
+module Kernel_debug_level: Log.Level
 (** @since Fluorine-20130401 *)
+[@@deprecated "Use Kernel_log.Debug_level instead."]
 
-module Kernel_verbose_level: Level
+module Kernel_verbose_level: Log.Level
 (** @since Fluorine-20130401 *)
+[@@deprecated "Use Kernel_log.Verbose_level instead."]
 
 val kernel_debug_atleast_ref: (int -> bool) ref
 (** @since Boron-20100401 *)

@@ -6,11 +6,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let kernel_debug_atleast_ref = Extlib.mk_fun "kernel_debug_atleast_ref"
-let kernel_verbose_atleast_ref = Extlib.mk_fun "kernel_debug_atleast_ref"
 
 let kernel_channel_name = "kernel"
 let kernel_label_name = "kernel"
+
+module Debug_level = Log.Make_level(struct let default = 0 end)
+module Verbose_level = Log.Make_level(struct let default = 1 end)
+
+let kernel_debug_atleast_ref   = ref (fun n -> Debug_level.get () >= n)
+let kernel_verbose_atleast_ref = ref (fun n -> Verbose_level.get () >= n)
 
 include Log.Register
     (struct

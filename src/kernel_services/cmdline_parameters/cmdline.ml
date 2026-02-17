@@ -27,32 +27,8 @@
 (** {2 Global declarations} *)
 (* ************************************************************************* *)
 
-module type Level = sig
-  val value_if_set: int option ref
-  val get: unit -> int
-  val set: int -> unit
-end
-
-module Make_level(X: sig val default: int end) = struct
-  let value_if_set = ref None
-  let get () = match !value_if_set with None -> X.default | Some x -> x
-  let set n = value_if_set := Some n
-end
-
-module Debug_level = Make_level(struct let default = 0 end)
-module Verbose_level = Make_level(struct let default = 1 end)
-module Kernel_debug_level = Make_level(struct let default = 0 end)
-module Kernel_verbose_level = Make_level(struct let default = 1 end)
-
-let () =
-  Kernel_log.kernel_debug_atleast_ref :=
-    (fun n -> Kernel_debug_level.get () >= n)
-[@@alert "-kernel_log"]
-
-let () =
-  Kernel_log.kernel_verbose_atleast_ref :=
-    (fun n -> Kernel_verbose_level.get () >= n)
-[@@alert "-kernel_log"]
+module Debug_level = Log.Make_level(struct let default = 0 end)
+module Verbose_level = Log.Make_level(struct let default = 1 end)
 
 let dkey = Kernel_log.dkey_cmdline
 
@@ -104,7 +80,7 @@ let request_crash_report =
 let protect = function
   | Sys.Break ->
     "User Interruption (Ctrl-C)"
-    ^ if Kernel_debug_level.get () > 0 then "\n" ^ get_backtrace () else ""
+    ^ if Kernel_log.Debug_level.get () > 0 then "\n" ^ get_backtrace () else ""
   | Sys_error s -> Printf.sprintf "System error: %s" s
   | Unix.Unix_error(err, a, b) ->
     let error = Printf.sprintf "System error: %s" (Unix.error_message err) in
@@ -165,7 +141,7 @@ let nop = ()
 let catch_at_toplevel = function
   | Log.AbortError _ -> true
   | Log.FeatureRequest _ -> true
-  | _ -> Kernel_debug_level.get () = 0
+  | _ -> Kernel_log.Debug_level.get () = 0
 
 let exit_code = function
   | Log.AbortError _ -> 1
@@ -495,8 +471,8 @@ let () =
             Debug_level.set 0);
         "-verbose", Int (fun n -> Verbose_level.set n);
         "-debug", Int (fun n -> Debug_level.set n);
-        "-kernel-verbose", Int (fun n -> Kernel_verbose_level.set n);
-        "-kernel-debug", Int (fun n -> Kernel_debug_level.set n);
+        "-kernel-verbose", Int (fun n -> Kernel_log.Verbose_level.set n);
+        "-kernel-debug", Int (fun n -> Kernel_log.Debug_level.set n);
         "-deterministic", Unit (fun () -> deterministic := true);
         "-tty", Unit (fun () -> set_tty true);
         "-no-tty", Unit (fun () -> set_tty false);
@@ -1281,6 +1257,12 @@ let explain_cmdline () =
   raise Exit
 
 (* deprecated *)
+
+module type Level = Log.Level
+
+module Kernel_debug_level = Kernel_log.Debug_level
+
+module Kernel_verbose_level = Kernel_log.Verbose_level
 
 module Kernel_log = Kernel_log
 let kernel_debug_atleast_ref =

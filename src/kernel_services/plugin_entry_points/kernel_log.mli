@@ -14,11 +14,15 @@
     @since Frama-C+dev
 *)
 
+module Debug_level: Log.Level
+
+module Verbose_level: Log.Level
+
 val kernel_debug_atleast_ref: (int -> bool) ref
-[@@alert kernel_log "Use only in Cmdline and Plugin."]
+[@@alert kernel_log "Use only in Plugin."]
 
 val kernel_verbose_atleast_ref: (int -> bool) ref
-[@@alert kernel_log "Use only in Cmdline and Plugin."]
+[@@alert kernel_log "Use only in Plugin."]
 
 val kernel_channel_name: string
 (** the reserved channel name used by the Frama-C kernel. *)
