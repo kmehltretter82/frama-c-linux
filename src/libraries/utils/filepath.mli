@@ -95,12 +95,12 @@ val sanitize_filename: string -> string
 (** Returns an absolute path leading to the given file.
     The result is similar to [realpath --no-symlinks].
     Some special behaviors include:
-    - [normalize ""] (empty string) returns ""
+    - [of_string ""] (empty string) returns ""
       (realpath returns an error);
-    - [normalize] preserves multiple sequential '/' characters,
+    - [of_string] preserves multiple sequential '/' characters,
       unlike [realpath];
     - non-existing directories in [realpath] may lead to ENOTDIR errors,
-      but [normalize] may accept them.
+      but [of_string] may accept them.
 
     @before 21.0-Scandium no [existence] argument.
     @before 31.0-Gallium this function was [normalize] *)
