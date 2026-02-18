@@ -170,9 +170,13 @@ SHELL        := $(shell which bash)
 %.parse: $$(if $$^,,.IMPOSSIBLE) $$(shell $(SHELL) $(DIR)cmd-dep.sh $$@/command $$(PARSE))
 	@$(call display_command,$(PARSE))
 	mkdir -p $@
+	# Beware: currently, we perform some extra operations
+	# (load/remove projects/save) that can affect benchmarking!
 	$(if $(AST_DIFF),\
 	  $(if $(wildcard $*.eva/framac.sav), \
-               mv $*.eva/framac.sav $@/framac.reparse,\
+               $(FRAMAC) $(FCFLAGS) -load $*.eva/framac.sav \
+               -remove-projects @all_but_current -save $@/framac.reparse; \
+               rm $*.eva/framac.sav,\
                $(if $(wildcard $@/framac.sav), \
                     mv $@/framac.sav $@/framac.reparse,true)),\
           true)
@@ -221,8 +225,6 @@ endef
 	      -eva-log w:$@/warnings.log \
 	      -eva-statistics-file $@/eva-stats.csv \
 	      -save $@/framac.sav \
-	      -then \
-	      -remove-projects @all_but_current -save $@/framac.sav \
 	      -then \
 	      -report-csv $@/alarms.csv -report-no-proven \
 	      -report-log w:$@/warnings.log \
