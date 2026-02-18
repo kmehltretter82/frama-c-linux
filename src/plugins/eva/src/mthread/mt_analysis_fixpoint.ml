@@ -387,10 +387,7 @@ let reach_fixpoint analysis =
   Mt_self.feedback "******* Starting to iterate";
   let limit = Mt_options.StopAfter.get () in
   analysis.iteration <- 0;
-  while
-    analysis.iteration = 0 ||
-    (analysis.iteration < limit && not (is_fixpoint_reached analysis))
-  do
+  while analysis.iteration < limit && not (is_fixpoint_reached analysis) do
     analysis.iteration <- analysis.iteration + 1;
     Mt_self.feedback "***** Iteration %d" analysis.iteration;
     one_iteration analysis;
