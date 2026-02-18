@@ -207,8 +207,8 @@ module LocationsByAccessProperty = struct
       let add_mutex mutex =
         let protection =
           if is_protected zone_mutexes rw mutex
-          then Protected (Mutex.Set.singleton mutex)
-          else MaybeProtected (Mutex.Set.singleton mutex)
+          then Protected mutex
+          else MaybeProtected mutex
         in
         add (access_kind, protection) locs
       in

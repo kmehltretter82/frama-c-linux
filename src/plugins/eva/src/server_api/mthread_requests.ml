@@ -176,8 +176,8 @@ let _shared_var_summary =
     ~get:(fun (access, _) ->
         match Mt_summary.access_protection access with
         | Unprotected -> []
-        | MaybeProtected mutexes | Protected mutexes ->
-          lockset_to_keyed_stringlist mutexes);
+        | MaybeProtected mutex | Protected mutex ->
+          [Mutex.id mutex, Mutex.label mutex]);
 
   States.column model ~name:"markers"
     ~descr:(Markdown.plain "")

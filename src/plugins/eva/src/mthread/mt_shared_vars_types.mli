@@ -46,11 +46,11 @@ type access_kind = AccessRead | AccessWrite
 
 module AccessKind : Datatype.S_with_collections with type t = access_kind
 
-(** Protection of an access: unprotected, maybe protected with associated
-    mutexes, or fully protected with associated mutexes. *)
+(** Protection of an access: unprotected, maybe protected by a mutex,
+    fully protected by a mutex. *)
 type protection =
   | Unprotected
-  | MaybeProtected of Mutex.Set.t
-  | Protected of Mutex.Set.t
+  | MaybeProtected of Mutex.t
+  | Protected of Mutex.t
 
 module Protection : Datatype.S_with_collections with type t = protection
