@@ -334,3 +334,13 @@ let should_compute_thread th =
    let only = Mt_options.OnlyThreads.get () in
    Datatype.String.Set.is_empty only || Datatype.String.Set.mem name only
   )
+
+let pretty_recompute_reasons fmt analysis =
+  let pretty_thread_reasons fmt th =
+    if not (SetRecomputeReason.is_empty th.th_to_recompute) then
+      Format.fprintf fmt "@[<hov 2>Thread %a:@ %a@]@ "
+        ThreadState.pretty_detailed th
+        SetRecomputeReason.pretty th.th_to_recompute
+  in
+  Format.fprintf fmt "@[<v>Remaining to do:@ %t@]"
+    (fun fmt -> iter_threads analysis (pretty_thread_reasons fmt))

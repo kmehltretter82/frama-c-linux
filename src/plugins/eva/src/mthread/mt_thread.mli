@@ -108,6 +108,7 @@ module ThreadState : sig
   val one_creates_other: t -> t -> [`Creates of t * t | `Unrelated]
 
   val recompute_because: t -> recompute_reason -> unit
+
 end
 
 
@@ -179,9 +180,10 @@ val pop_function_call: analysis_state -> unit
 
 val should_compute_thread: thread_state -> bool
 
+val pretty_recompute_reasons: analysis_state Pretty_utils.formatter
+
+
 module OrderedThreads : sig
-
-
   val family_tree: analysis_state -> thread list Thread.Hashtbl.t
   (** Create a table mapping each thread that creates a thread
       to the threads it creates *)

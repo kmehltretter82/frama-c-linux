@@ -400,13 +400,7 @@ let reach_fixpoint analysis =
          @[<hov 2>******* Analysis stopped after@ \
          %d iterations.@ Remaining@ to@ do:@]@ \
          %a@]" i
-        (fun fmt () -> iter_threads analysis
-            (fun th -> if not (SetRecomputeReason.is_empty th.th_to_recompute) then
-                Format.fprintf fmt "@[<hov 2>Thread %a:@ %a@]@ "
-                  ThreadState.pretty_detailed th
-                  SetRecomputeReason.pretty th.th_to_recompute
-            )
-        ) ()
+        pretty_recompute_reasons analysis
     else
       Mt_self.feedback "******* Analysis performed, %d iterations" i
   in
