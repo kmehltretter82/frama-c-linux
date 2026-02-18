@@ -22,8 +22,8 @@ val get_scope : t -> WpContext.scope
 val get_context : t -> WpContext.context
 val get_description : t -> string
 val get_property : t -> Property.t
-val get_result : t -> prover -> result
-val get_results : t -> (prover * result) list
+val get_result : t -> Prover.t -> result
+val get_results : t -> (Prover.t * result) list
 val get_sequent : t -> Conditions.sequent
 val get_formula: t -> Lang.F.pred
 val is_trivial : t -> bool
@@ -62,25 +62,28 @@ val generate_ip : ?model:string -> Property.t -> t Bag.t
 val generate_kf : ?model:string -> ?bhv:string list -> ?prop:string list ->
   Kernel_function.t -> t Bag.t
 val generate_call : ?model:string -> Cil_types.stmt -> t Bag.t
+val generate_all : ?model:string -> ?bhv:string list -> ?prop:string list ->
+  unit -> t Bag.t
+(** @since Frama-C+dev *)
 
 (** {2 Prover Interface} *)
 
 val prove : t ->
   ?config:config ->
-  ?mode:mode ->
+  ?mode:Prover.InteractiveMode.t ->
   ?start:(t -> unit) ->
   ?progress:(t -> string -> unit) ->
-  ?result:(t -> prover -> result -> unit) ->
-  prover -> bool Task.task
+  ?result:(t -> Prover.t -> result -> unit) ->
+  Prover.t -> bool Task.task
 (** Returns a ready-to-schedule task. *)
 
 val spawn : t ->
   ?config:config ->
   ?start:(t -> unit) ->
   ?progress:(t -> string -> unit) ->
-  ?result:(t -> prover -> result -> unit) ->
-  ?success:(t -> prover option -> unit) ->
-  (mode * prover) list -> unit
+  ?result:(t -> Prover.t -> result -> unit) ->
+  ?success:(t -> Prover.t option -> unit) ->
+  (Prover.InteractiveMode.t * Prover.t) list -> unit
 (** Same as [prove] but schedule the tasks into the global server returned
     by [server] function below.
 

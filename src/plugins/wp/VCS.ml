@@ -7,141 +7,6 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Prover Results                                                     --- *)
-(* -------------------------------------------------------------------------- *)
-
-let dkey_shell = Wp_parameters.register_category "shell"
-
-type prover =
-  | Why3 of Why3Provers.t (* Prover via WHY *)
-  | Qed           (* Qed Solver *)
-  | Tactical      (* Interactive Prover *)
-
-type mode =
-  | Batch (* Only check scripts *)
-  | Update (* Check and update scripts *)
-  | Edit  (* Edit then check scripts *)
-  | Fix   (* Try to check script, then edit script on non-success *)
-  | FixUpdate (* Update and fix *)
-
-let parse_prover = function
-  | "" | "none" -> None
-  | "qed" | "Qed" -> Some Qed
-  | "script" -> Some Tactical
-  | "tip" -> Some Tactical
-  | "why3" -> Some (Why3 { Why3.Whyconf.prover_name = "why3";
-                           Why3.Whyconf.prover_version = "";
-                           Why3.Whyconf.prover_altern = "generate only" })
-  | name ->
-    match Why3Provers.lookup name with
-    | Some p -> Some (Why3 p)
-    | None -> None
-
-let parse_mode m =
-  match String.lowercase_ascii m with
-  | "fix" -> Fix
-  | "edit" -> Edit
-  | "batch" -> Batch
-  | "update" -> Update
-  | "fixup" -> FixUpdate
-  | _ ->
-    Wp_parameters.error ~once:true
-      "Unrecognized mode %S (use 'batch' instead)" m ; Batch
-
-let name_of_prover = function
-  | Why3 s -> Why3Provers.ident_wp s
-  | Qed -> "qed"
-  | Tactical -> "script"
-
-let prover_of_name ?fallback = function
-  | "qed" -> Some Qed
-  | "script" -> Some Tactical
-  | name ->
-    match Why3Provers.lookup ?fallback name with
-    | None -> None
-    | Some prv -> Some (Why3 prv)
-
-let title_of_prover ?version = function
-  | Why3 s ->
-    let version = match version with Some v -> v | None ->
-      not (Wp_parameters.has_dkey dkey_shell)
-    in Why3Provers.title ~version s
-  | Qed -> "Qed"
-  | Tactical -> "Script"
-
-let title_of_mode = function
-  | Fix -> "Fix"
-  | Edit -> "Edit"
-  | Batch -> "Batch"
-  | Update -> "Update"
-  | FixUpdate -> "Fix Update"
-
-let sanitize_why3 s =
-  let buffer = Buffer.create 80 in
-  assert (s <> "ide");
-  Buffer.add_string buffer "Why3_" ;
-  String.iter
-    (fun c ->
-       let c = if
-         ('0' <= c && c <= '9') ||
-         ('a' <= c && c <= 'z') ||
-         ('A' <= c && c <= 'Z')
-         then c else '_'
-       in Buffer.add_char buffer c) s ;
-  Buffer.contents buffer
-
-let filename_for_prover = function
-  | Why3 s -> sanitize_why3 (Why3Provers.ident_wp s)
-  | Qed -> "Qed"
-  | Tactical -> "Tactical"
-
-let is_prover = function
-  | Qed | Why3 _ -> true
-  | Tactical -> false
-
-let is_extern = function
-  | Qed | Tactical -> false
-  | Why3 _ -> true
-
-let is_auto = function
-  | Qed -> true
-  | Tactical -> false
-  | Why3 p -> Why3Provers.is_auto p
-
-let eq_prover p q =
-  match p,q with
-  | Qed,Qed -> true
-  | Tactical,Tactical -> true
-  | Why3 p, Why3 q -> Why3Provers.compare p q = 0
-  | (Why3 _ | Qed | Tactical) , _ -> false
-
-let has_counter_examples = function
-  | Qed | Tactical -> false
-  | Why3 p -> Why3Provers.with_counter_examples p <> None
-
-let cmp_prover p q =
-  match p,q with
-  | Qed , Qed -> 0
-  | Qed , _ -> (-1)
-  | _ , Qed -> (+1)
-  | Why3 p , Why3 q -> Why3Provers.compare p q
-  | Why3 _ , _ -> (-1)
-  | _ , Why3 _ -> (+1)
-  | Tactical , Tactical -> 0
-
-let pp_prover fmt p = Format.pp_print_string fmt (title_of_prover p)
-let pp_mode fmt m = Format.pp_print_string fmt (title_of_mode m)
-
-let provers () =
-  List.map (fun p -> Why3 p) @@
-  List.filter Why3Provers.is_mainstream @@
-  Why3Provers.provers ()
-
-module P = struct type t = prover let compare = cmp_prover end
-module Pset = Set.Make(P)
-module Pmap = Map.Make(P)
-
-(* -------------------------------------------------------------------------- *)
 (* --- Config                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -325,7 +190,7 @@ let pp_perf_forced fmt r =
   end
 
 let pp_perf_shell fmt r =
-  if not (Wp_parameters.has_dkey dkey_shell) then
+  if not (Wp_parameters.has_dkey Prover.dkey_shell) then
     pp_perf_forced fmt r
 
 let name_of_verdict ?(computing=false) = function
@@ -355,13 +220,13 @@ let pp_result fmt r =
 
 let is_qualified prover result =
   match prover with
-  | Qed | Tactical -> true
+  | Prover.Qed | Tactical -> true
   | Why3 _ -> result.cached || result.prover_time <= Rformat.epsilon
 
 let pp_cache_miss fmt st updating prover result =
   if not updating
   && not (is_qualified prover result)
-  && Wp_parameters.has_dkey dkey_shell
+  && Wp_parameters.has_dkey Prover.dkey_shell
   then
     Format.fprintf fmt "%s%a (missing cache)" st pp_perf_forced result
   else
@@ -371,7 +236,7 @@ let pp_cache_miss fmt st updating prover result =
     Format.fprintf fmt "Unsuccess%a" pp_hasmodel result
 
 let pp_result_qualif ?(updating=true) prover result fmt =
-  if Wp_parameters.has_dkey dkey_shell then
+  if Wp_parameters.has_dkey Prover.dkey_shell then
     match result.verdict with
     | NoResult -> Format.pp_print_string fmt "No Result"
     | Computing _ -> Format.pp_print_string fmt "Computing"
@@ -429,4 +294,4 @@ let compare p q =
             Stdlib.compare p.solver_time q.solver_time
 
 let bestp pr1 pr2 = if compare (snd pr1) (snd pr2) <= 0 then pr1 else pr2
-let best = List.fold_left bestp (Qed,no_result)
+let best = List.fold_left bestp (Prover.Qed,no_result)

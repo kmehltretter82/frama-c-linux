@@ -23,17 +23,17 @@ val setSelection : ProofEngine.node -> Tactical.selection -> unit
 val lookup_printer: ProofEngine.node -> Ptip.pseq
 
 val runProvers :
-  ?mode:VCS.mode ->
+  ?mode:Prover.InteractiveMode.t ->
   ?timeout:int ->
-  ?provers:VCS.prover list ->
+  ?provers:Prover.t list ->
   ProofEngine.node -> unit
 
 val killProvers :
-  ?provers:VCS.prover list ->
+  ?provers:Prover.t list ->
   ProofEngine.node -> unit
 
 val clearProvers :
-  ?provers:VCS.prover list ->
+  ?provers:Prover.t list ->
   ProofEngine.node -> unit
 
 (* -------------------------------------------------------------------------- *)

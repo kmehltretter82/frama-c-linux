@@ -6,7 +6,58 @@
 (*                                                                        *)
 (**************************************************************************)
 
+type t =
+  | Why3 of Why3Provers.t (** Prover via WHY *)
+  | Qed                   (** Qed Solver *)
+  | Tactical              (** Interactive Prover *)
 
-(* -------------------------------------------------------------------------- *)
-(* --- Prover Implementation against Task API                             --- *)
-(* -------------------------------------------------------------------------- *)
+module Pset : Set.S with type elt = t
+module Pmap : Map.S with type key = t
+
+(** Mainstream installed provers *)
+val provers : unit -> t list
+
+val equal : t -> t -> bool
+val compare : t -> t -> int
+val pretty : Format.formatter -> t -> unit
+
+val name : t -> string
+val parse : string -> t option
+val title : ?version:bool -> t -> string
+
+val is_auto : t -> bool
+val is_tactical : t -> bool
+val is_extern : t -> bool
+val has_counter_examples : t -> bool
+
+val filename_for : t -> string
+val of_name : ?fallback:bool -> string -> t option
+
+module InteractiveMode : sig
+  type t =
+    | Batch  (** Only check scripts *)
+    | Update (** Check and update scripts *)
+    | Edit   (** Edit then check scripts *)
+    | Fix    (** Try check script, then edit script on non-success *)
+    | FixUpdate (** Update & Fix *)
+
+  val title : t -> string
+  val parse : string -> t
+  val pretty : Format.formatter -> t -> unit
+end
+
+module TipMode : sig
+  type t =
+    | Batch
+    | Update
+    | Dry
+    | Init
+
+  val get : unit -> t
+  val set : t -> unit
+
+  val is_scratch: unit -> bool
+  val is_saving: unit -> bool
+end
+
+val dkey_shell : Wp_parameters.category

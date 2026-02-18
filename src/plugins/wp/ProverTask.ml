@@ -35,7 +35,7 @@ let server ?procs () =
 let dispatch ?(config=VCS.default) mode prover wpo =
   begin
     match prover with
-    | VCS.Qed | Tactical -> Task.return VCS.no_result
+    | Prover.Qed | Tactical -> Task.return VCS.no_result
     | Why3 prover ->
       let smoke = Wpo.is_smoke_test wpo in
       let kf = match Wpo.get_scope wpo with
@@ -105,7 +105,7 @@ let update ?result wpo prover res =
 let simplify ?start ?result ?(commit=false) wpo =
   Server.Main.async
     (fun wpo ->
-       let r = Wpo.get_result wpo VCS.Qed in
+       let r = Wpo.get_result wpo Prover.Qed in
        VCS.( r.verdict == Valid ) ||
        begin
          started ?start wpo ;
@@ -114,13 +114,13 @@ let simplify ?start ?result ?(commit=false) wpo =
            let time = Wpo.qed_time wpo in
            let verdict = if ok then VCS.Valid else VCS.Unknown in
            let presult = VCS.result ~time verdict in
-           (update ?result wpo VCS.Qed presult ; ok)
+           (update ?result wpo Prover.Qed presult ; ok)
          else false
        end)
     wpo
 
-let run_prover wpo ?config ?(mode=VCS.Batch) ?progress ?result prover =
-  signal ?progress wpo (VCS.name_of_prover prover) ;
+let run_prover wpo ?config ?(mode=Prover.InteractiveMode.Batch) ?progress ?result prover =
+  signal ?progress wpo (Prover.name prover) ;
   dispatch ?config mode prover wpo >>>
   fun status ->
   let res = match status with
@@ -131,7 +131,7 @@ let run_prover wpo ?config ?(mode=VCS.Batch) ?progress ?result prover =
       let msg = Task.error exn in
       Wp_parameters.warning ~current:false
         "@[<hov 2>Goal %s:@ running prover %s failed (%s)@]"
-        (Wpo.get_label wpo) (VCS.name_of_prover prover) msg ;
+        (Wpo.get_label wpo) (Prover.name prover) msg ;
       VCS.failed msg
   in
   let res = { res with solver_time = Wpo.qed_time wpo } in
@@ -146,7 +146,7 @@ let prove wpo ?config ?mode ?start ?progress ?result prover =
 
 let spawn wpo ~delayed
     ?config ?start ?progress ?result ?success provers =
-  let provers = List.filter (fun (_,p) -> p <> VCS.Qed) provers in
+  let provers = List.filter (fun (_,p) -> p <> Prover.Qed) provers in
   if provers<>[] then
     let monitor = match success with
       | None -> None
@@ -155,9 +155,9 @@ let spawn wpo ~delayed
           begin function
             | None -> on_success wpo None
             | Some prover ->
-              let r = Wpo.get_result wpo VCS.Qed in
+              let r = Wpo.get_result wpo Prover.Qed in
               let prover =
-                if VCS.( r.verdict == Valid ) then VCS.Qed else prover in
+                if VCS.( r.verdict == Valid ) then Prover.Qed else prover in
               on_success wpo (Some prover)
           end in
     let process (mode,prover) =
@@ -177,10 +177,12 @@ let spawn wpo ~delayed
         match success with
         | None -> ()
         | Some on_success ->
-          on_success wpo (if ok then Some VCS.Qed else None) ;
+          on_success wpo (if ok then Some Prover.Qed else None) ;
       end ;
       Task.return ()
     in
     let thread = Task.thread process in
     let server = server () in
     Task.spawn server thread
+
+(* -------------------------------------------------------------------------- *)

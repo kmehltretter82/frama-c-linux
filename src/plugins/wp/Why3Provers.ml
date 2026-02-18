@@ -104,6 +104,7 @@ let title ?(version=true) p =
   if version then Pretty_utils.to_string Why3.Whyconf.print_prover p
   else p.Why3.Whyconf.prover_name
 let compare = Why3.Whyconf.Prover.compare
+let equal = Why3.Whyconf.Prover.equal
 let name p = p.Why3.Whyconf.prover_name
 let version p = p.Why3.Whyconf.prover_version
 let altern p = p.Why3.Whyconf.prover_altern

@@ -23,7 +23,7 @@ type pstats = {
 
 type stats = {
   best : VCS.verdict ;
-  provers : (VCS.prover * pstats) list ;
+  provers : (Prover.t * pstats) list ;
   tactics : int ;
   proved : int ;
   timeout : int ;
@@ -40,9 +40,9 @@ type stats = {
 
 module Plist = Qed.Listmap.Make
     (struct
-      type t = VCS.prover
-      let equal a b = a==b || (VCS.cmp_prover a b = 0)
-      let compare = VCS.cmp_prover
+      type t = Prover.t
+      let equal a b = a==b || (Prover.compare a b = 0)
+      let compare = Prover.compare
     end)
 
 let pzero = {
@@ -100,7 +100,7 @@ let empty = {
 }
 
 let cacheable p r =
-  p <> Qed && VCS.is_auto p && VCS.is_cacheable r
+  p <> Prover.Qed && Prover.is_auto p && VCS.is_cacheable r
 
 let add_cacheable n (p,r) = if cacheable p r then succ n else n
 let add_cached n (p,r) = if cacheable p r && r.cached then succ n else n
@@ -146,15 +146,17 @@ let tactical ~qed children =
   let valid = List.for_all (fun c -> c.best = Valid) children in
   let qed_only = children = [] in
   let best = if valid then Valid else Unknown in
-  let provers = [Qed,ptime qed qed_only] in
+  let provers = [Prover.Qed,ptime qed qed_only] in
   List.fold_left add { empty with best ; provers ; tactics = 1 } children
 
 let script stats =
   let cached = stats.cached = stats.cacheable in
   let solver = List.fold_left
-      (fun t (p,s) -> if p = Qed then t +. s.time else t) 0.0 stats.provers in
+      (fun t (p,s) ->
+         if p = Prover.Qed then t +. s.time else t) 0.0 stats.provers in
   let time = List.fold_left
-      (fun t (p,s) -> if p <> Qed then t +. s.time else t) 0.0 stats.provers in
+      (fun t (p,s) ->
+         if p <> Prover.Qed then t +. s.time else t) 0.0 stats.provers in
   VCS.result ~cached ~solver ~time stats.best
 
 (* -------------------------------------------------------------------------- *)
@@ -167,7 +169,7 @@ let complete s = s.proved = subgoals s
 let pp_pstats fmt p =
   if p.tnbr > 0.0 &&
      p.tmax > Rformat.epsilon &&
-     not (Wp_parameters.has_dkey VCS.dkey_shell)
+     not (Wp_parameters.has_dkey Prover.dkey_shell)
   then
     let mean = p.tval /. p.tnbr in
     let epsilon = 0.05 *. mean in
@@ -201,14 +203,13 @@ let pp_stats ~shell ~cache fmt s =
        let success = truncate pr.success in
        let print_proofs = success > 0 && total > 1 in
        let print_perfo =
-         not shell &&
          pr.time > Rformat.epsilon &&
-         (not updating && cachemiss > 0)
+         (not shell || (not updating && cachemiss > 0))
        in
-       if p != Qed || qed_only || print_perfo || print_proofs
+       if p != Prover.Qed || qed_only || print_perfo || print_proofs
        then
          begin
-           let title = VCS.title_of_prover ~version:false p in
+           let title = Prover.title ~version:false p in
            Format.fprintf fmt " (%s" title ;
            if print_proofs then
              Format.fprintf fmt " %d/%d" success total ;

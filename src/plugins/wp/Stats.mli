@@ -25,7 +25,7 @@ type pstats = {
     Remark: for each sub-goal, only the _best_ prover result is kept *)
 type stats = {
   best : VCS.verdict ; (** provers best verdict (not verdict of the goal) *)
-  provers : (VCS.prover * pstats) list ; (** meaningful provers *)
+  provers : (Prover.t * pstats) list ; (** meaningful provers *)
   tactics : int ; (** number of tactics *)
   proved : int ; (** number of proved sub-goals *)
   timeout : int ; (** number of timeouts and stepouts sub-goals *)
@@ -47,7 +47,7 @@ val pretty : Format.formatter -> stats -> unit
 val empty : stats
 val add : stats -> stats -> stats
 
-val results : smoke:bool -> (VCS.prover * VCS.result) list -> stats
+val results : smoke:bool -> (Prover.t * VCS.result) list -> stats
 val tactical : qed:float -> stats list -> stats
 val script : stats -> VCS.result
 

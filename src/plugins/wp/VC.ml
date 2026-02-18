@@ -69,6 +69,9 @@ let generate_kf ?model ?bhv ?prop kf =
 let generate_call ?model stmt =
   (generator model)#compute_call stmt
 
+let generate_all ?model ?bhv ?prop () =
+  (generator model)#compute_main ?bhv ?prop ()
+
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Interface                                                   --- *)
 (* -------------------------------------------------------------------------- *)

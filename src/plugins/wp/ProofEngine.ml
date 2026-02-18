@@ -260,7 +260,7 @@ let fully_proved n =
   try walk (fun _ -> raise HasPending) n ; true
   with HasPending -> false
 
-let is_prover (p,_) = VCS.is_prover p
+let is_prover (p,_) = not @@ Prover.is_tactical p
 
 let prover_stats ~smoke goal =
   Stats.results ~smoke @@
@@ -296,7 +296,7 @@ let validate tree =
     in
     try
       self_updating := true ;
-      Wpo.set_result tree.main VCS.Tactical result ;
+      Wpo.set_result tree.main Prover.Tactical result ;
       tree.dirty <- false ;
       self_updating := false ;
     with exn ->
@@ -591,7 +591,7 @@ let bound node =
   | Script s -> s
 
 let is_script_result ~margin (prv,res) =
-  VCS.is_extern prv && VCS.is_valid res &&
+  Prover.is_extern prv && VCS.is_valid res &&
   res.prover_time > margin
 
 let has_result tree =

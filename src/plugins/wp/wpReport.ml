@@ -163,7 +163,7 @@ let rankify_stats s js =
 
 type pstats = {
   main : stats ;
-  prover : (VCS.prover,stats) Hashtbl.t ;
+  prover : (Prover.t,stats) Hashtbl.t ;
 }
 
 let pstats () = {
@@ -176,7 +176,7 @@ let json_of_pstats p =
     begin
       Hashtbl.fold
         (fun p s w ->
-           (VCS.name_of_prover p , json_of_stats s) :: w)
+           (Prover.name p , json_of_stats s) :: w)
         p.prover [ "wp:main" , json_of_stats p.main ]
     end
 
@@ -185,7 +185,7 @@ let rankify_pstats p js =
     rankify_stats p.main (get_field js "wp:main") ;
     Hashtbl.iter
       (fun p s ->
-         rankify_stats s (get_field js @@ VCS.name_of_prover p) ;
+         rankify_stats s (get_field js @@ Prover.name p) ;
       ) p.prover ;
   end
 
@@ -211,9 +211,9 @@ let add_results ~status (plist:pstats list) (wpo:Wpo.t) =
            List.iter
              (fun fs -> add_stat re st tc (get_prover fs p))
              plist ;
-           if p <> VCS.Qed && ts > 0.0 then
+           if p <> Prover.Qed && ts > 0.0 then
              List.iter
-               (fun fs -> add_qedstat ts (get_prover fs VCS.Qed))
+               (fun fs -> add_qedstat ts (get_prover fs Prover.Qed))
                plist ;
          end ;
        res := best_result !res re ;
@@ -593,10 +593,10 @@ let stat ~config fmt s = function
 
 let pstats ~config fmt s cmd arg =
   match cmd with
-  | "wp" | "qed" -> stat ~config fmt (get_prover s VCS.Qed) arg
+  | "wp" | "qed" -> stat ~config fmt (get_prover s Prover.Qed) arg
   | cmd when is_stat_name cmd -> stat ~config fmt s.main cmd
   | prover ->
-    match (VCS.parse_prover prover) with
+    match (Prover.parse prover) with
     | None -> Wp_parameters.error ~once:true "Unknown prover name %s" prover
     | Some prover -> stat ~config fmt (get_prover s prover) arg
 

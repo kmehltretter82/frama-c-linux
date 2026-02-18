@@ -21,7 +21,7 @@ type 'a process =
   ?valid:bool ->
   ?failed:bool ->
   ?scratch:bool ->
-  ?provers:prover list ->
+  ?provers:Prover.t list ->
   ?depth:int ->
   ?width:int ->
   ?backtrack:int ->
@@ -29,8 +29,8 @@ type 'a process =
   ?strategies:bool ->
   ?start:(Wpo.t -> unit) ->
   ?progress:(Wpo.t -> string -> unit) ->
-  ?result:(Wpo.t -> prover -> result -> unit) ->
-  ?success:(Wpo.t -> prover option -> unit) ->
+  ?result:(Wpo.t -> Prover.t -> result -> unit) ->
+  ?success:(Wpo.t -> Prover.t option -> unit) ->
   Wpo.t -> 'a
 
 val prove : unit Task.task process
@@ -41,10 +41,10 @@ val search :
   ?width:int ->
   ?backtrack:int ->
   ?auto:Strategy.heuristic list ->
-  ?provers:prover list ->
+  ?provers:Prover.t list ->
   ?progress:(Wpo.t -> string -> unit) ->
-  ?result:(Wpo.t -> prover -> result -> unit) ->
-  ?success:(Wpo.t -> prover option -> unit) ->
+  ?result:(Wpo.t -> Prover.t -> result -> unit) ->
+  ?success:(Wpo.t -> Prover.t option -> unit) ->
   ProofEngine.tree ->
   ProofEngine.node ->
   unit
@@ -53,8 +53,8 @@ val explore :
   ?depth:int ->
   ?strategy:ProofStrategy.strategy ->
   ?progress:(Wpo.t -> string -> unit) ->
-  ?result:(Wpo.t -> prover -> result -> unit) ->
-  ?success:(Wpo.t -> prover option -> unit) ->
+  ?result:(Wpo.t -> Prover.t -> result -> unit) ->
+  ?success:(Wpo.t -> Prover.t option -> unit) ->
   ProofEngine.tree ->
   ProofEngine.node ->
   unit

@@ -15,23 +15,23 @@ val server : ?procs:int -> unit -> Task.server
 
 val simplify :
   ?start:(Wpo.t -> unit) ->
-  ?result:(Wpo.t -> VCS.prover -> VCS.result -> unit) ->
+  ?result:(Wpo.t -> Prover.t -> VCS.result -> unit) ->
   ?commit:bool ->
   Wpo.t -> bool Task.task
 
 val prove : Wpo.t ->
   ?config:VCS.config ->
-  ?mode:VCS.mode ->
+  ?mode:Prover.InteractiveMode.t ->
   ?start:(Wpo.t -> unit) ->
   ?progress:(Wpo.t -> string -> unit) ->
-  ?result:(Wpo.t -> VCS.prover -> VCS.result -> unit) ->
-  VCS.prover -> bool Task.task
+  ?result:(Wpo.t -> Prover.t -> VCS.result -> unit) ->
+  Prover.t -> bool Task.task
 
 val spawn : Wpo.t ->
   delayed:bool ->
   ?config:VCS.config ->
   ?start:(Wpo.t -> unit) ->
   ?progress:(Wpo.t -> string -> unit) ->
-  ?result:(Wpo.t -> VCS.prover -> VCS.result -> unit) ->
-  ?success:(Wpo.t -> VCS.prover option -> unit) ->
-  (VCS.mode * VCS.prover) list -> unit
+  ?result:(Wpo.t -> Prover.t -> VCS.result -> unit) ->
+  ?success:(Wpo.t -> Prover.t option -> unit) ->
+  (Prover.InteractiveMode.t * Prover.t) list -> unit

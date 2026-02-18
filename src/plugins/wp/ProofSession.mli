@@ -11,18 +11,6 @@ type script =
   | Script of Filepath.t
   | Deprecated of Filepath.t
 
-type mode =
-  | Batch
-  | Update
-  | Dry
-  | Init
-
-val get_mode : unit -> mode
-val set_mode : mode -> unit
-
-val scratch_mode : unit -> bool
-val saving_mode : unit -> bool
-
 val pp_file : Format.formatter -> Filepath.t -> unit
 val pp_script_for : Format.formatter -> Wpo.t -> unit
 

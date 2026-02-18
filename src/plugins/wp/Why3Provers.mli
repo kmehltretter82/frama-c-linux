@@ -21,6 +21,7 @@ val name : t -> string
 val version : t -> string
 val altern : t -> string
 val compare : t -> t -> int
+val equal : t -> t -> bool
 
 val lookup : ?fallback:bool -> string -> t option
 val provers : unit -> t list

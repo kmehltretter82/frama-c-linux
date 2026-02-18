@@ -245,7 +245,7 @@ let do_progress goal msg =
 
 let do_report_cache_usage mode =
   if !exercised > 0 &&
-     not (Wp_parameters.has_dkey VCS.dkey_shell)
+     not (Wp_parameters.has_dkey Prover.dkey_shell)
   then
     let hits = Cache.get_hits () in
     let miss = Cache.get_miss () in
@@ -283,7 +283,7 @@ let do_report_cache_usage mode =
 (* -------------------------------------------------------------------------- *)
 
 let pstats_to_json (p,r) : Json.t = `Assoc [
-    "prover", `String (VCS.name_of_prover p) ;
+    "prover", `String (Prover.name p) ;
     "time", `Float r.Stats.time ;
     "success", `Int (truncate r.Stats.success) ;
   ]
@@ -357,7 +357,7 @@ type stats = {
 }
 
 let do_wpo_result goal prover res =
-  if VCS.is_verdict res && prover = VCS.Qed then
+  if VCS.is_verdict res && prover = Prover.Qed then
     do_progress goal "Qed"
 
 let pp_hasmodel fmt goal =
@@ -370,7 +370,7 @@ let pp_hasmodel fmt goal =
     if model then Format.fprintf fmt " (Model)" else
       let ce_variant =
         List.exists
-          (fun (p,_) -> VCS.has_counter_examples p)
+          (fun (p,_) -> Prover.has_counter_examples p)
           results in
       if ce_variant then Format.fprintf fmt " (No Model)"
 
@@ -409,7 +409,7 @@ let do_wpo_success ~shell ~cache goal success =
     | None -> ()
     | Some prover ->
       Wp_parameters.feedback ~ontty:`Silent
-        "[Generated] Goal %s (%a)" (Wpo.get_gid goal) VCS.pp_prover prover
+        "[Generated] Goal %s (%a)" (Wpo.get_gid goal) Prover.pretty prover
   else
     let gui = Wp_parameters.is_interactive () in
     let smoke = Wpo.is_smoke_test goal in
@@ -451,7 +451,7 @@ let do_report_scheduled (stats : stats) =
             ) !session (unreachable + terminating) in
         let cache = Cache.get_mode () in
         if Cache.is_active cache then do_report_cache_usage cache ;
-        let shell = Wp_parameters.has_dkey VCS.dkey_shell in
+        let shell = Wp_parameters.has_dkey Prover.dkey_shell in
         let lines = ref [] in
         let none = fun _fmt -> () in
         let add_line title count pp =
@@ -461,7 +461,7 @@ let do_report_scheduled (stats : stats) =
         let proofs = stats.proofs in
         List.iter
           (fun (p,s) ->
-             let name = VCS.title_of_prover p in
+             let name = Prover.title p in
              let success = truncate s.Stats.success in
              if success > 0 || (not shell && p = Qed) then
                add_line name success (fun fmt ->
@@ -525,7 +525,7 @@ type script = {
   mutable width : int ;
   mutable backtrack : int ;
   mutable auto : Strategy.heuristic list ;
-  mutable provers : (VCS.mode * VCS.prover) list ;
+  mutable provers : (Prover.InteractiveMode.t * Prover.t) list ;
 }
 
 let spawn_wp_proofs ~script goals =
@@ -533,7 +533,7 @@ let spawn_wp_proofs ~script goals =
     begin
       let server = ProverTask.server () in
       ignore (Wp_parameters.Share.get_dir "."); (* To prevent further errors *)
-      let shell = Wp_parameters.has_dkey VCS.dkey_shell in
+      let shell = Wp_parameters.has_dkey Prover.dkey_shell in
       let cache = Cache.get_mode () in
       Bag.iter
         (fun goal ->
@@ -579,18 +579,18 @@ let get_prover_names () =
 let compute_provers ~mode ~script =
   script.provers <- List.fold_right
       begin fun pname prvs ->
-        match VCS.parse_prover pname with
+        match Prover.parse pname with
         | None ->
           if pname <> "" && pname <> "none" then
             Wp_parameters.error ~once:true
               "Prover '%s' not found." pname ;
           prvs
-        | Some VCS.Tactical ->
+        | Some Prover.Tactical ->
           script.proverscript <- true ;
           if pname = "tip" then script.strategies <- true ;
           prvs
         | Some prover ->
-          let pmode = if VCS.is_auto prover then VCS.Batch else mode in
+          let pmode = if Prover.is_auto prover then Prover.InteractiveMode.Batch else mode in
           (pmode , prover) :: prvs
       end (get_prover_names ()) []
 
@@ -609,8 +609,8 @@ let default_script_mode () = {
   provers = [] ;
   proverscript = false ;
   strategies = false ;
-  update = ProofSession.saving_mode () ;
-  scratch = ProofSession.scratch_mode () ;
+  update = Prover.TipMode.is_saving () ;
+  scratch = Prover.TipMode.is_scratch () ;
   stdout = Wp_parameters.ScriptOnStdout.get ();
   depth=0 ; width = 0 ; backtrack = 0 ; auto=[] ;
 }
@@ -646,14 +646,14 @@ type scripts =
 
 let do_compute_scripts ~smoke goal results : scripts =
   let autoproof (p,r) =
-    (p=VCS.Qed) || (VCS.is_auto p && VCS.is_valid r && VCS.autofit r) in
+    (p=Prover.Qed) || (Prover.is_auto p && VCS.is_valid r && VCS.autofit r) in
   if List.exists autoproof results then Useless
   else
     let scripts = ProofEngine.script (ProofEngine.proof ~main:goal) in
     if scripts = [] then Useless
     else
       let complete = function
-        | ProofScript.Prover(p,r) -> VCS.is_auto p && VCS.is_valid r
+        | ProofScript.Prover(p,r) -> Prover.is_auto p && VCS.is_valid r
         | ProofScript.Tactic(n,_,_) -> n=0
         | ProofScript.Error _ -> false in
       let winning = List.filter complete scripts in
@@ -674,7 +674,8 @@ let do_collect_session goals =
       let file = ProofSession.filename ~force:false goal in
       match do_compute_scripts ~smoke goal results with
       | Useless ->
-        let provers = List.filter (fun (p,_) -> VCS.is_prover p) results in
+        let provers =
+          List.filter (fun (p,_) -> not @@ Prover.is_tactical p) results in
         add proofs @@ Stats.results ~smoke provers ;
         if ProofSession.exists goal then
           removed := (goal, file) :: !removed
@@ -762,12 +763,12 @@ let do_wpo_display goal =
 
 let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
   let script = default_script_mode () in
-  let mode = VCS.parse_mode (Wp_parameters.Interactive.get ()) in
+  let mode = Prover.InteractiveMode.parse (Wp_parameters.Interactive.get ()) in
   compute_provers ~mode ~script ;
   compute_auto ~script ;
   ProofStrategy.typecheck () ;
   begin match provers with None -> () | Some prvs ->
-    script.provers <- List.map (fun dp -> VCS.Batch , VCS.Why3 dp) prvs
+    script.provers <- List.map (fun dp -> Prover.InteractiveMode.Batch , Prover.Why3 dp) prvs
   end ;
   begin match tip with None -> () | Some strategies ->
     script.proverscript <- true ;
@@ -795,7 +796,7 @@ let do_cache_cleanup () =
     Cache.cleanup_cache () ;
     let removed = Cache.get_removed () in
     if removed > 0 &&
-       not (Wp_parameters.has_dkey VCS.dkey_shell)
+       not (Wp_parameters.has_dkey Prover.dkey_shell)
     then
       Wp_parameters.result "[Cache] removed:%d" removed
   end
@@ -893,7 +894,7 @@ let pp_wp_parameters fmt =
 
 let () = Cmdline.run_after_setting_files
     (fun _ ->
-       if Wp_parameters.has_dkey VCS.dkey_shell then
+       if Wp_parameters.has_dkey Prover.dkey_shell then
          Log.print_on_output pp_wp_parameters)
 
 (* -------------------------------------------------------------------------- *)

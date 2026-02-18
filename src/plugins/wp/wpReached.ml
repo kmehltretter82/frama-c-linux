@@ -404,7 +404,7 @@ let set_unreachable pid =
          unless we know exactly what is going on. *)
       | p ->
         incr unreachable_proved ;
-        if Wp_parameters.has_dkey VCS.dkey_shell then
+        if Wp_parameters.has_dkey Prover.dkey_shell then
           Wp_parameters.feedback "[Valid] Goal %a (Cfg) (Unreachable)"
             WpPropId.pp_propid pid ;
         [p]

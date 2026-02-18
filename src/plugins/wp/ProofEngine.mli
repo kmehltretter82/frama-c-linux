@@ -38,7 +38,7 @@ val consolidate : Wpo.t -> unit
 val consolidated : Wpo.t -> Stats.stats
 
 (** Consolidated results (memoized). *)
-val results : Wpo.t -> (VCS.prover * VCS.result) list
+val results : Wpo.t -> (Prover.t * VCS.result) list
 
 (** Leaves are numbered from 0 to n-1 *)
 
