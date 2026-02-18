@@ -338,7 +338,6 @@ let is_fixpoint_reached analysis =
   threads analysis
   |> List.for_all (fun th -> SetRecomputeReason.is_empty th.th_to_recompute)
 
-
 (* Remove "white" nodes in the cfg, ie accesses to variables that
    are not concurrent at all. Done at the very end of the analysis
    because
@@ -386,22 +385,24 @@ let mark_shared_nodes_kind analysis =
 (* Auxiliary function iterating the analysis until the fixpoint is reached *)
 let reach_fixpoint analysis =
   Mt_self.feedback "******* Starting to iterate";
-  let rec aux i =
-    Mt_self.feedback "***** Iteration %d" i;
-    analysis.iteration <- i;
+  let limit = Mt_options.StopAfter.get () in
+  analysis.iteration <- 0;
+  while
+    analysis.iteration = 0 ||
+    (analysis.iteration < limit && not (is_fixpoint_reached analysis))
+  do
+    analysis.iteration <- analysis.iteration + 1;
+    Mt_self.feedback "***** Iteration %d" analysis.iteration;
     one_iteration analysis;
-    post_iteration analysis;
-    let continue = not (is_fixpoint_reached analysis) in
-    if continue && i < Mt_options.StopAfter.get () then aux (i+1)
-    else (* Stop iteration *)
-    if continue then
-      Mt_self.feedback
-        "@[<v 0>\
-         @[<hov 2>******* Analysis stopped after@ \
-         %d iterations.@ Remaining@ to@ do:@]@ \
-         %a@]" i
-        pretty_recompute_reasons analysis
-    else
-      Mt_self.feedback "******* Analysis performed, %d iterations" i
-  in
-  aux 1
+    post_iteration analysis
+  done;
+
+  if is_fixpoint_reached analysis then
+    Mt_self.feedback "******* Analysis performed, %d iterations"
+      analysis.iteration
+  else
+    Mt_self.feedback
+      "@[<v>******* Analysis stopped after %d iterations.\
+       @ Remaining to do: %a@]"
+      analysis.iteration
+      pretty_recompute_reasons analysis
