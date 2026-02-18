@@ -87,18 +87,36 @@ let pre_thread_analysis analysis th =
   Datatype.Int.Hashtbl.clear analysis.memexec_cache
 
 let thread_analysis analysis th =
-  pre_thread_analysis analysis th;
+  if SetRecomputeReason.is_empty th.th_to_recompute then
+    Mt_self.debug "No need to recompute thread %a" ThreadState.pretty th
+  else if not (Mt_thread.should_compute_thread th) then
+    Mt_self.feedback "*** Skipping thread %a as requested"
+      ThreadState.pretty th
+  else if not (Cvalue.Model.is_reachable th.th_init_state) then
+    Mt_self.feedback "@[<hov 2>*** Thread %a has been@ created but@ \
+                      not started. Skipping.@]"  ThreadState.pretty th
+  else begin
+    Mt_self.feedback
+      "@[<hov 2>*** Computing thread %a,@ iteration %d@ (%a)@]"
+      ThreadState.pretty th analysis.iteration
+      SetRecomputeReason.pretty th.th_to_recompute;
 
-  let (), analysis_time = Eva_utils.measure_time
-      (Analysis.compute_thread ~cvalue_state:th.th_init_state) th.th_eva_thread in
+    pre_thread_analysis analysis th;
 
-  if Mt_options.ShowTime.get () then
-    Mt_self.feedback ~level:2
-      "* Value analysis computed for thread %a, %f sec"
-      ThreadState.pretty th analysis_time;
+    let (), analysis_time = Eva_utils.measure_time
+        (Analysis.compute_thread ~cvalue_state:th.th_init_state) th.th_eva_thread in
 
-  (* We save all our results *)
-  post_thread_analysis analysis
+    if Mt_options.ShowTime.get () then
+      Mt_self.feedback ~level:2
+        "* Value analysis computed for thread %a, %f sec"
+        ThreadState.pretty th analysis_time;
+
+    (* We save all our results *)
+    post_thread_analysis analysis;
+
+    Mt_self.feedback "*** Thread %a computed" ThreadState.pretty th;
+  end;
+  th.th_to_recompute <- SetRecomputeReason.empty
 
 
 let recompute_shared_vars_changed analysis before =
@@ -265,35 +283,6 @@ let save_to_disk analysis =
       (Filepath.to_string_rel filepath);
   end
 
-(* Function that does one pass of value analysis on all the threads
-   that are marked as needed to be recomputed. Returns the values
-   written by each thread recomputed*)
-let one_iteration analysis =
-  iter_threads analysis
-    (fun th ->
-       if SetRecomputeReason.is_empty th.th_to_recompute then
-         Mt_self.debug "No need to recompute thread %a" ThreadState.pretty th
-       else if not (Mt_thread.should_compute_thread th) then
-         Mt_self.feedback "*** Skipping thread %a as requested"
-           ThreadState.pretty th
-       else if not (Cvalue.Model.is_reachable th.th_init_state) then
-         Mt_self.feedback "@[<hov 2>*** Thread %a has been@ created but@ \
-                           not started. Skipping.@]"  ThreadState.pretty th
-       else begin
-         Mt_self.feedback
-           "@[<hov 2>*** Computing thread %a,@ iteration %d@ (%a)@]"
-           ThreadState.pretty th analysis.iteration
-           SetRecomputeReason.pretty th.th_to_recompute;
-
-         thread_analysis analysis th;
-
-         Mt_self.feedback "*** Thread %a computed" ThreadState.pretty th;
-       end;
-       th.th_to_recompute <- SetRecomputeReason.empty);
-
-  Mt_self.feedback "***** Threads computed for iteration %d."
-    analysis.iteration
-
 let post_iteration analysis =
   (* We update the locked mutexes and started threads information of the
      cfg. This must obviously be done before shared variables are computed,
@@ -387,7 +376,9 @@ let reach_fixpoint analysis =
   while analysis.iteration < limit && not (is_fixpoint_reached analysis) do
     analysis.iteration <- analysis.iteration + 1;
     Mt_self.feedback "***** Iteration %d" analysis.iteration;
-    one_iteration analysis;
+    iter_threads analysis (thread_analysis analysis);
+    Mt_self.feedback "***** Threads computed for iteration %d."
+      analysis.iteration;
     post_iteration analysis
   done;
 
