@@ -182,16 +182,9 @@ let _shared_var_summary =
   States.column model ~name:"markers"
     ~descr:(Markdown.plain "List of statements where the access happens")
     ~data:(module Data.Jlist (Kernel_ast.Marker))
-    ~get:(fun (_, locations) ->
-        Cil_datatype.Location.Set.fold
-          (fun location acc ->
-             let pos = fst location in
-             let marker = Printer_tag.loc_to_localizable pos in
-             match marker with
-             | Some marker -> marker :: acc
-             | None -> acc)
-          locations
-          []);
+    ~get:(fun (_, stmts) ->
+        Cil_datatype.Stmt.Set.elements stmts
+        |> List.map Printer_tag.localizable_of_stmt);
 
   States.register_framac_array ~package
     ~name:"mtSharedVarsSummary"

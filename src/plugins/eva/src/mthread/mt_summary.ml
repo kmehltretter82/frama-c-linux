@@ -168,20 +168,20 @@ let is_protected (mutexes: Mt_mutexes_types.mutexes_by_access) rw mutex =
   | Unaccessed -> true (* Should not happen *)
   | Mutexes m -> MutexPresence.find m mutex = Present
 
-module LocSet = Cil_datatype.Location.Set
+module StmtSet = Cil_datatype.Stmt.Set
 
 module AccessProperty = Datatype.Pair_with_collections (AccessKind) (Protection)
 
 (* Map binding access property (kind+protection) to a set of locations. *)
 module LocationsByAccessProperty = struct
   include AccessProperty.Map
-  include Make (LocSet)
+  include Make (StmtSet)
 
-  let join = union (fun _key a b -> Some (LocSet.union a b))
+  let join = union (fun _key a b -> Some (StmtSet.union a b))
 
   let is_included l r =
     let is_included_binding key elt =
-      try LocSet.subset elt (find key r)
+      try StmtSet.subset elt (find key r)
       with Not_found -> false
     in
     for_all is_included_binding l
@@ -194,11 +194,10 @@ module LocationsByAccessProperty = struct
      of a memory access. *)
   let compute zone_mutexes rw cfg_node : t =
     let access_kind = get_access_kind rw in
-    let stmt_list = Mt_cfg_types.CfgNode.node_stmt cfg_node in
-    let locs = List.map Cil_datatype.Stmt.loc stmt_list |> LocSet.of_list in
+    let stmts = Mt_cfg_types.CfgNode.node_stmt cfg_node |> StmtSet.of_list in
     let locked_mutexes = cfg_node.Mt_cfg_types.cfgn_context.locked_mutexes in
     if MutexPresence.is_empty locked_mutexes then
-      singleton (access_kind, Unprotected) locs
+      singleton (access_kind, Unprotected) stmts
     else
       let add_mutex mutex =
         let protection =
@@ -206,7 +205,7 @@ module LocationsByAccessProperty = struct
           then Protected mutex
           else MaybeProtected mutex
         in
-        add (access_kind, protection) locs
+        add (access_kind, protection) stmts
       in
       let all_mutex = MutexPresence.all_present locked_mutexes in
       MutexPresence.KeySet.fold add_mutex all_mutex empty
@@ -304,7 +303,7 @@ let access_protection (_, _, protection) = protection
 let access_id access = Format.asprintf "%a" Access.pretty access
 
 module AccessTable =
-  State_builder.Hashtbl (Access.Hashtbl) (LocSet) (val info "AccessTable")
+  State_builder.Hashtbl (Access.Hashtbl) (StmtSet) (val info "AccessTable")
 
 let compute_access_summary analysis =
   let accesses_by_zone = AccessPropertyByZone.compute analysis in

@@ -64,4 +64,4 @@ val access_id: access -> string
 (** Table binding each access to the set of source code locations it occurs. *)
 module AccessTable : State_builder.Hashtbl
   with type key = access
-   and type data = Cil_datatype.Location.Set.t
+   and type data = Cil_datatype.Stmt.Set.t
