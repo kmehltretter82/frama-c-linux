@@ -236,17 +236,6 @@ let compute_thread ?cvalue_state thread =
     | Error | Self.Abort -> () (* do not re-raise *)
     | exn -> raise exn
 
-let mthread_pre_analysis () =
-  Self.clear_results ();
-  Ast.compute ();
-  pre_analysis ();
-  Engine.reset ()
-
-let mthread_post_analysis () =
-  post_analysis ();
-  Summary.print ();
-  Statistics.export_as_csv ()
-
 let mthread_thread_analysis analysis th =
   let open Mt_thread in
   if SetRecomputeReason.is_empty th.th_to_recompute then
@@ -320,9 +309,8 @@ let mthread_compute () =
   Mt_main.register_hooks analysis;
   Fun.protect ~finally:Mt_main.unregister_hooks @@ fun () ->
 
-  (* We analyse the main thread *)
-  let module Engine = (val Engine.current ()) in
-  Engine.Interferences.reset ();
+  let module E = (val Engine.current ()) in
+  E.Interferences.reset ();
   Thread.reset_state ();
   Mutex.reset_state ();
   Mqueue.reset_state ();
@@ -331,8 +319,12 @@ let mthread_compute () =
   (* Let Eva know about interrupt handlers. *)
   Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
 
+  (* We analyse the main thread *)
   Mt_self.feedback "*** Computing value analysis for main thread";
-  mthread_pre_analysis ();
+  Self.clear_results ();
+  Ast.compute ();
+  pre_analysis ();
+  Engine.reset ();
   compute_thread Thread.main;
   Mt_self.feedback "*** First value analysis for main thread done." ;
 
@@ -340,7 +332,9 @@ let mthread_compute () =
 
   (* We perform the analysis iterations *)
   mthread_fixpoint analysis;
-  mthread_post_analysis ();
+  post_analysis ();
+  Summary.print ();
+  Statistics.export_as_csv ();
   Mt_main.post_analysis analysis
 
 let mthread_compute_once, _self =
