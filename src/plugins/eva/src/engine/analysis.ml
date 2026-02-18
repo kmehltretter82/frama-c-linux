@@ -212,14 +212,14 @@ let abort () =
 
 (* Mthread entry point *)
 
-let compute_thread ?cvalue_state thread =
+let compute_thread (type t) (engine: t engine) ?cvalue_state thread =
+  let module Engine = (val engine) in
   let Thread.{ entry_point; arguments } = Thread.properties thread in
   let arguments =
     if Thread.is_main thread
     then None (* use generated main arguments *)
     else Some (List.map snd arguments)
   in
-  let module Engine = (val Engine.current ()) in
   try
     (* In multi thread analyses, Memexec cache must be invalidated *)
     Mem_exec.cleanup_results ();
@@ -235,7 +235,7 @@ let compute_thread ?cvalue_state thread =
     | Error | Self.Abort -> () (* do not re-raise *)
     | exn -> raise exn
 
-let mthread_thread_analysis analysis th =
+let mthread_thread_analysis engine analysis th =
   let open Mt_thread in
   if SetRecomputeReason.is_empty th.th_to_recompute then
     Mt_self.debug "No need to recompute thread %a" ThreadState.pretty th
@@ -254,7 +254,8 @@ let mthread_thread_analysis analysis th =
     Mt_analysis_fixpoint.pre_thread_analysis analysis th;
 
     let (), analysis_time = Eva_utils.measure_time
-        (compute_thread ~cvalue_state:th.th_init_state) th.th_eva_thread in
+        (compute_thread engine ~cvalue_state:th.th_init_state) th.th_eva_thread
+    in
 
     if Mt_options.ShowTime.get () then
       Mt_self.feedback ~level:2
@@ -269,7 +270,7 @@ let mthread_thread_analysis analysis th =
   th.th_to_recompute <- SetRecomputeReason.empty
 
 (* Auxiliary function iterating the analysis until the fixpoint is reached *)
-let mthread_fixpoint analysis =
+let mthread_fixpoint engine analysis =
   let open Mt_thread in
 
   Mt_self.feedback "******* Starting to iterate";
@@ -281,7 +282,7 @@ let mthread_fixpoint analysis =
   do
     analysis.iteration <- analysis.iteration + 1;
     Mt_self.feedback "***** Iteration %d" analysis.iteration;
-    iter_threads analysis (mthread_thread_analysis analysis);
+    iter_threads analysis (mthread_thread_analysis engine analysis);
     Mt_self.feedback "***** Threads computed for iteration %d."
       analysis.iteration;
     Mt_analysis_fixpoint.post_iteration analysis
@@ -308,8 +309,8 @@ let mthread_compute () =
   Mt_main.register_hooks analysis;
   Fun.protect ~finally:Mt_main.unregister_hooks @@ fun () ->
 
-  let module E = (val Engine.reset ()) in
-  E.Interferences.reset ();
+  let module Engine = (val Engine.reset ()) in
+  Engine.Interferences.reset ();
   Thread.reset_state ();
   Mutex.reset_state ();
   Mqueue.reset_state ();
@@ -324,13 +325,13 @@ let mthread_compute () =
   Ast.compute ();
   pre_analysis ();
 
-  compute_thread Thread.main;
+  compute_thread (module Engine) Thread.main;
   Mt_self.feedback "*** First value analysis for main thread done." ;
 
   Mt_analysis_fixpoint.post_thread_analysis analysis;
 
   (* We perform the analysis iterations *)
-  mthread_fixpoint analysis;
+  mthread_fixpoint (module Engine) analysis;
   post_analysis ();
   Summary.print ();
   Statistics.export_as_csv ();
