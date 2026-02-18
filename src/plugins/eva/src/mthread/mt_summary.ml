@@ -157,6 +157,17 @@ let compute_thread_summary thread =
 
 (* ----- Computation of the summary of one access node set ------------------ *)
 
+(* Does [mutex] protect all read/write accesses according to [mutexes]. *)
+let is_protected (mutexes: Mt_mutexes_types.mutexes_by_access) rw mutex =
+  let mutexes =
+    match rw with
+    | Read | ReadPos _ -> mutexes.mutexes_for_read
+    | Write _ | WritePos _ -> mutexes.mutexes_for_write
+  in
+  match mutexes with
+  | Unaccessed -> true (* Should not happen *)
+  | Mutexes m -> MutexPresence.find m mutex = Present
+
 module LocSet = Cil_datatype.Location.Set
 
 module AccessProperty = Datatype.Pair_with_collections (AccessKind) (Protection)
@@ -185,7 +196,7 @@ module LocationsByAccessProperty = struct
 
   (* Computes the map (property -> locations) corresponding to the cfg node
      of a memory access. *)
-  let compute rw cfg_node : t =
+  let compute zone_mutexes rw cfg_node : t =
     let access_kind = get_access_kind rw in
     let stmt_list = Mt_cfg_types.CfgNode.node_stmt cfg_node in
     let locs = List.map Cil_datatype.Stmt.loc stmt_list |> LocSet.of_list in
@@ -195,7 +206,7 @@ module LocationsByAccessProperty = struct
     else
       let add_mutex mutex =
         let protection =
-          if MutexPresence.find locked_mutexes mutex = Present
+          if is_protected zone_mutexes rw mutex
           then Protected (Mutex.Set.singleton mutex)
           else MaybeProtected (Mutex.Set.singleton mutex)
         in
@@ -234,10 +245,15 @@ module AccessPropertyByZone = struct
       map ()
 
   (* Computes the map corresponding to a set of accesses of a memory zone. *)
-  let compute_for_zone (acc : t) (zone, node_access_set) : t =
+  let compute_for_zone mutexes_by_zone (acc : t) (zone, node_access_set) : t =
+    (* [mutexes] contains the mutexes for all accesses to [zone], no only
+       the current one from [node_access_set]. *)
+    let mutexes = Mt_mutexes_types.MutexesByZone.find mutexes_by_zone zone in
+    (* By construction, the zone is in the MutexesByZone *)
+    let zone_mutexes = Eval.Bottom.non_bottom mutexes in
     Mt_cfg_types.SetNodeIdAccess.fold
-      (fun (rw, cfg_node, _) acc ->
-         let lba = LocationsByAccessProperty.compute rw cfg_node in
+      (fun (rw, node, _) acc ->
+         let lba = LocationsByAccessProperty.compute zone_mutexes rw node in
          add_binding ~exact:false acc zone (`Value lba))
       node_access_set
       acc
@@ -245,7 +261,8 @@ module AccessPropertyByZone = struct
   (* Computes the map corresponding to all accesses from an analysis. *)
   let compute analysis =
     let accesses = analysis.Mt_thread.concurrent_accesses_by_nodes in
-    let r1 = List.fold_left compute_for_zone empty accesses in
+    let mutexes_by_zone = Mt_mutexes.mutexes_protecting_zones' accesses in
+    let r1 = List.fold_left (compute_for_zone mutexes_by_zone) empty accesses in
     match r1 with
     | Top | Bottom ->
       Mt_self.fatal "By construction, accesses_by_zone cannot be Top or Bottom"
