@@ -251,7 +251,7 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
                in
                let callstack' = Callstack.push kf callsite callstack in
                let subtrace = Trace.subtrace_at_call subtrace call in
-               if Analysis.use_spec_instead_of_definition kf then
+               if Function_calls.use_spec_instead_of_definition kf then
                  let evts, access, stmts = all_events subtrace in
                  let node = CfgNode.new_node callstack'
                  and stmts = Cil_datatype.Stmt.Set.elements stmts in

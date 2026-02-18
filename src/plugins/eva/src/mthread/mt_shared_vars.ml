@@ -331,7 +331,7 @@ class do_it cp =
     method rw_fun kf =
       if not (self#already_visited kf) then (
         self#mark_visited kf;
-        match Analysis.use_spec_instead_of_definition kf, kf.fundec with
+        match Function_calls.use_spec_instead_of_definition kf, kf.fundec with
         | false, Definition (f,_) ->
           ignore (visitFramacFunction (self:>frama_c_visitor) f)
 

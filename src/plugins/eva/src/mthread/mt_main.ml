@@ -117,46 +117,6 @@ let post_analysis analysis =
 
   Mt_summary.compute analysis
 
-(* Perform an entire mthread execution on the current project *)
-let mthread_run () =
-  Mt_self.warning
-    "Mthread is an experimental plugin and is still in development.";
-
-  let analysis = pre_analysis () in
-
-  (* We register our callback function *)
-  register_hooks analysis;
-  Fun.protect ~finally:unregister_hooks @@ fun () ->
-
-  (* We analyse the main thread *)
-  let module Engine = (val Engine.current ()) in
-  Engine.Interferences.reset ();
-  Thread.reset_state ();
-  Mutex.reset_state ();
-  Mqueue.reset_state ();
-  Mt_summary.clear ();
-
-  (* Let Eva know about interrupt handlers. *)
-  Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
-
-  Mt_self.feedback "*** Computing value analysis for main thread";
-  Analysis.mthread_pre_analysis ();
-  Analysis.compute_thread Thread.main;
-  Mt_self.feedback "*** First value analysis for main thread done." ;
-
-  Mt_analysis_fixpoint.post_thread_analysis analysis;
-
-  (* We perform the analysis iterations *)
-  Mt_analysis_fixpoint.reach_fixpoint analysis;
-  Analysis.mthread_post_analysis ();
-  post_analysis analysis
-
-
-let compute_mthread_once, _self =
-  State_builder.apply_once "mthread_compute"
-    [ Ast.self (*; Kernel.MainFunction.self *) ]
-    (fun () -> mthread_run ())
-
 let () =
   (* Automatically add Mthread shared directory to the include path and add the
      threads lib to the parsed sources if either -mt-threads-lib or -mthread
@@ -178,9 +138,3 @@ let () =
          Mt_self.warning
            "ignoring option %s specified after parsing"
            Mt_options.ThreadsLib.option_name)
-
-let main () =
-  if Mt_options.Enabled.get () then (
-    compute_mthread_once ()
-  )
-let () = Boot.Main.extend main

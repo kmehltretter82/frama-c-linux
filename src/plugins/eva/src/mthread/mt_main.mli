@@ -6,4 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Runs Mthread analysis: nothing is exported. *)
+val register_hooks: Mt_thread.analysis_state -> unit
+val unregister_hooks: unit -> unit
+val pre_analysis: unit -> Mt_thread.analysis_state
+val post_analysis: Mt_thread.analysis_state -> unit

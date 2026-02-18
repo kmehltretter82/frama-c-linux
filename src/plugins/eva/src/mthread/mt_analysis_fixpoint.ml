@@ -86,37 +86,6 @@ let pre_thread_analysis analysis th =
   analysis.curr_events_stack <- [];
   Datatype.Int.Hashtbl.clear analysis.memexec_cache
 
-let thread_analysis analysis th =
-  if SetRecomputeReason.is_empty th.th_to_recompute then
-    Mt_self.debug "No need to recompute thread %a" ThreadState.pretty th
-  else if not (Mt_thread.should_compute_thread th) then
-    Mt_self.feedback "*** Skipping thread %a as requested"
-      ThreadState.pretty th
-  else if not (Cvalue.Model.is_reachable th.th_init_state) then
-    Mt_self.feedback "@[<hov 2>*** Thread %a has been@ created but@ \
-                      not started. Skipping.@]"  ThreadState.pretty th
-  else begin
-    Mt_self.feedback
-      "@[<hov 2>*** Computing thread %a,@ iteration %d@ (%a)@]"
-      ThreadState.pretty th analysis.iteration
-      SetRecomputeReason.pretty th.th_to_recompute;
-
-    pre_thread_analysis analysis th;
-
-    let (), analysis_time = Eva_utils.measure_time
-        (Analysis.compute_thread ~cvalue_state:th.th_init_state) th.th_eva_thread in
-
-    if Mt_options.ShowTime.get () then
-      Mt_self.feedback ~level:2
-        "* Value analysis computed for thread %a, %f sec"
-        ThreadState.pretty th analysis_time;
-
-    (* We save all our results *)
-    post_thread_analysis analysis;
-
-    Mt_self.feedback "*** Thread %a computed" ThreadState.pretty th;
-  end;
-  th.th_to_recompute <- SetRecomputeReason.empty
 
 
 let recompute_shared_vars_changed analysis before =
@@ -366,28 +335,3 @@ let mark_shared_nodes_kind analysis =
          let cfg = Mt_cfg.remove_superfluous_nodes ~keep th.th_cfg in
          th.th_cfg <- cfg;
       )
-
-
-(* Auxiliary function iterating the analysis until the fixpoint is reached *)
-let reach_fixpoint analysis =
-  Mt_self.feedback "******* Starting to iterate";
-  let limit = Mt_options.StopAfter.get () in
-  analysis.iteration <- 0;
-  while analysis.iteration < limit && not (is_fixpoint_reached analysis) do
-    analysis.iteration <- analysis.iteration + 1;
-    Mt_self.feedback "***** Iteration %d" analysis.iteration;
-    iter_threads analysis (thread_analysis analysis);
-    Mt_self.feedback "***** Threads computed for iteration %d."
-      analysis.iteration;
-    post_iteration analysis
-  done;
-
-  if is_fixpoint_reached analysis then
-    Mt_self.feedback "******* Analysis performed, %d iterations"
-      analysis.iteration
-  else
-    Mt_self.feedback
-      "@[<v>******* Analysis stopped after %d iterations.\
-       @ Remaining to do: %a@]"
-      analysis.iteration
-      pretty_recompute_reasons analysis
