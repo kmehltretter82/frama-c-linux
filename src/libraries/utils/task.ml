@@ -6,9 +6,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let dkey =
-  let help = "prints debug information about task executions" in
-  Kernel_log.register_category ~help "task"
+(* -------------------------------------------------------------------------- *)
+(* --- Debugging                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+let debug = ref false
+
+let set_debug b = debug := b
+
+let debug_msg msg =
+  if !debug then Format.printf msg
+  else Pretty_utils.nullprintf msg
 
 (* -------------------------------------------------------------------------- *)
 (* --- Error Messages                                                     --- *)
@@ -212,11 +220,10 @@ let set_time cmd t = match cmd.chrono with
 
 let start_command ~timeout ?time ?stdout ?stderr cmd args =
   begin
-    Kernel_log.debug ~dkey "execute task '@[<hov 4>%t'@]"
+    debug_msg "execute task '@[<hov 4>%t'@]"
       (fun fmt ->
-         Format.pp_print_string fmt cmd ;
-         List.iter
-           (fun c -> Format.fprintf fmt "@ %s" c) args) ;
+         Format.pp_print_string fmt cmd;
+         List.iter (fun c -> Format.fprintf fmt "@ %s" c) args);
     let timed = timeout > 0.0 || time <> None in
     let time_start = if timed then Unix.gettimeofday () else 0.0 in
     let time_stop = if timeout > 0.0 then time_start +. timeout else 0.0 in
@@ -244,7 +251,7 @@ let ping_command cmd coin =
         if cmd.timeout > 0.0 && time_now > cmd.time_stop then
           begin
             set_time cmd (time_now -. cmd.time_start) ;
-            Kernel_log.debug ~dkey "timeout '%s'" cmd.name ;
+            debug_msg "timeout '%s'" cmd.name ;
             cmd.time_killed <- true ;
             kill () ;
           end ;
@@ -253,23 +260,22 @@ let ping_command cmd coin =
     | Command.Result (Unix.WEXITED s|Unix.WSIGNALED s|Unix.WSTOPPED s)
       when cmd.time_killed ->
       set_chrono cmd ;
-      Kernel_log.debug ~dkey "timeout '%s' [%d]" cmd.name s ;
+      debug_msg "timeout '%s' [%d]" cmd.name s ;
       Return (Timeout cmd.timeout)
 
     | Command.Result (Unix.WEXITED s) ->
       set_chrono cmd ;
-      Kernel_log.debug ~dkey "exit '%s' [%d]" cmd.name s ;
+      debug_msg "exit '%s' [%d]" cmd.name s ;
       Return (Result s)
 
     | Command.Result (Unix.WSIGNALED s|Unix.WSTOPPED s) ->
       set_chrono cmd ;
-      Kernel_log.debug ~dkey "signal '%s' [%d]" cmd.name s ;
+      debug_msg "signal '%s' [%d]" cmd.name s ;
       Return Canceled
 
   with e ->
     set_chrono cmd ;
-    Kernel_log.debug ~dkey
-      "failure '%s' [%s]" cmd.name (Printexc.to_string e) ;
+    debug_msg "failure '%s' [%s]" cmd.name (Printexc.to_string e) ;
     Return (Failed e)
 
 let command ?(timeout=0.0) ?time ?stdout ?stderr cmd args = todo

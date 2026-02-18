@@ -24,6 +24,19 @@ include (P: Plugin.S_no_log)
 include Kernel_log
 
 (* ************************************************************************* *)
+(** {2 Fclib debug options} *)
+(* ************************************************************************* *)
+
+(* Link Kernel_log dkeys related to Fclib to the corresponding libraries
+   options *)
+
+let set_fclib_debug () =
+  let debug_task = is_debug_key_enabled dkey_task in
+  Task.set_debug debug_task
+
+let () = Cmdline.run_after_early_stage set_fclib_debug
+
+(* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
 (* ************************************************************************* *)
 

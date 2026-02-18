@@ -9,10 +9,10 @@
 (** High Level Interface to Command.
     @since Carbon-20101201 *)
 
-(** Prints debug information about tasks.
-    @since 32.0-Germanium
+(** If set to [true], prints debug informations about tasks.
+    @since Frama-C+dev
 *)
-val dkey : Kernel_log.category
+val set_debug: bool -> unit
 
 (* ************************************************************************* *)
 (** {2 Task} *)

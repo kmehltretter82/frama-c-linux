@@ -36,6 +36,12 @@ include Log.Messages
 (** {2 Message and warning categories} *)
 (* ************************************************************************* *)
 
+(** Fclib dkeys *)
+
+val dkey_task: category
+
+(* Kernel dkeys *)
+
 val dkey_acsl_extension: category
 
 val dkey_alpha: category

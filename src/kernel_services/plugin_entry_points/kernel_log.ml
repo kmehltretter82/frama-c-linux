@@ -24,6 +24,14 @@ include Log.Register
       let verbose_atleast level = !kernel_verbose_atleast_ref level
     end)
 
+(* Fclib dkeys set *)
+
+let dkey_task =
+  let help = "prints debug information about task executions" in
+  register_category ~help "task"
+
+(* Kernel dkeys *)
+
 let dkey_acsl_extension =
   register_category "acsl-extension"
     ~help:"print a message when registering a new ACSL extension"
