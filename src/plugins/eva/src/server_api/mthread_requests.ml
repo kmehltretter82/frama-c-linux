@@ -123,7 +123,7 @@ let _thread_summary =
         zoneset_to_stringlist th_summary.shared_vars.read);
 
   States.column model ~name:"sharedVarsWritten"
-    ~descr:(Markdown.plain "Shared varaibles written by thread")
+    ~descr:(Markdown.plain "Shared variables written by thread")
     ~data:(module Data.Jlist (Data.Jstring))
     ~get:(fun (_, (th_summary : Mt_summary.thread_summary)) ->
         zoneset_to_stringlist th_summary.shared_vars.written);
@@ -141,7 +141,7 @@ let _shared_var_summary =
   let model = States.model () in
 
   States.column model ~name:"bases"
-    ~descr:(Markdown.plain "")
+    ~descr:(Markdown.plain "Memory bases accessed")
     ~data:(module Data.Jstring)
     ~get:(fun (access, _) ->
         let zone = Mt_summary.access_zone access in
@@ -154,24 +154,24 @@ let _shared_var_summary =
           Format.asprintf "%t" Eval.Top.pretty_top);
 
   States.column model ~name:"zones"
-    ~descr:(Markdown.plain "")
+    ~descr:(Markdown.plain "Memory zone accessed")
     ~data:(module Data.Jstring)
     ~get:(fun (access, _) ->
         let zone = Mt_summary.access_zone access in
         Format.asprintf "%a" Locations.Zone.pretty zone);
 
   States.column model ~name:"accessKind"
-    ~descr:(Markdown.plain "")
+    ~descr:(Markdown.plain "Is the access a read or a write?")
     ~data:(module Jaccess_kind)
     ~get:(fun (access, _) -> Mt_summary.access_kind access);
 
   States.column model ~name:"protectionKind"
-    ~descr:(Markdown.plain "")
+    ~descr:(Markdown.plain "Kind of access protection")
     ~data:(module Jprotection)
     ~get:(fun (access, _) -> Mt_summary.access_protection access);
 
   States.column model ~name:"protectionMutexes"
-    ~descr:(Markdown.plain "")
+    ~descr:(Markdown.plain "Mutex protecting the access (if any)")
     ~data:(module Jlist_of_keyed_value)
     ~get:(fun (access, _) ->
         match Mt_summary.access_protection access with
@@ -180,7 +180,7 @@ let _shared_var_summary =
           [Mutex.id mutex, Mutex.label mutex]);
 
   States.column model ~name:"markers"
-    ~descr:(Markdown.plain "")
+    ~descr:(Markdown.plain "List of statements where the access happens")
     ~data:(module Data.Jlist (Kernel_ast.Marker))
     ~get:(fun (_, locations) ->
         Cil_datatype.Location.Set.fold
@@ -195,6 +195,6 @@ let _shared_var_summary =
 
   States.register_framac_array ~package
     ~name:"mtSharedVarsSummary"
-    ~descr:(Markdown.plain "Data for Mthread shared var summary")
+    ~descr:(Markdown.plain "Data for Mthread summary of shared memory accesses")
     ~key:Mt_summary.access_id
     model (module Mt_summary.AccessTable)
