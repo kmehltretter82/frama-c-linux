@@ -41,13 +41,13 @@ module AccessesByZone: sig
   val pretty_map: map Pretty_utils.formatter
 end
 
-(** Kind of protected access, read or write. *)
+(** Kind of access: read or write. *)
 type access_kind = AccessRead | AccessWrite
 
 module AccessKind : Datatype.S_with_collections with type t = access_kind
 
-(** Protection, unprotected, maybe protected with associated mutexes or
-    fully protected with associated mutexes. *)
+(** Protection of an access: unprotected, maybe protected with associated
+    mutexes, or fully protected with associated mutexes. *)
 type protection =
   | Unprotected
   | MaybeProtected of Mutex.Set.t
