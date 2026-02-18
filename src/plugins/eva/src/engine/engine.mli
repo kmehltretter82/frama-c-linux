@@ -17,7 +17,7 @@ module Make (Abstract: Abstractions.S) : Engine_sig.S_with_results
 val current : unit -> (module Engine_sig.S_with_results)
 
 (** Builds the current analysis engine according to the Eva parameters. *)
-val reset : unit -> unit
+val reset : unit -> (module Engine_sig.S_with_results)
 
 (** Registers a hook that will be called each time the current analyzer
     is changed. This happens when a new analysis is run with different

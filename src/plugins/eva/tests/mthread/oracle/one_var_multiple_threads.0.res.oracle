@@ -7,8 +7,8 @@
   Body of function g falls-through. Adding a return statement
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
-[mt] *** Computing value analysis for main thread
 [eva] Found concurrency builtins: enabling mthread domain
+[mt] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] one_var_multiple_threads.c:38: Initializing mutex lock1

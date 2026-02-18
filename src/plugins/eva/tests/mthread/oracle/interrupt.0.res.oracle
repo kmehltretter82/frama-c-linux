@@ -4,8 +4,8 @@
 [kernel] Parsing interrupt.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
-[mt] *** Computing value analysis for main thread
 [eva] Found concurrency builtins: enabling mthread domain
+[mt] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main_interrupt_one_shot
 [mt] New thread: <main>, fun main_interrupt_one_shot
 [mt] New thread: <interrupt_handler interrupt_oneshot>, fun interrupt_oneshot

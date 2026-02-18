@@ -5,8 +5,8 @@
 [kernel] Parsing interferences.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
-[mt] *** Computing value analysis for main thread
 [eva] Found concurrency builtins: enabling mthread domain
+[mt] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main_ptr_write
 [mt] New thread: <main>, fun main_ptr_write
 [eva:show] interferences.c:99: Frama_C_show_each_main_start: {0}, {0}

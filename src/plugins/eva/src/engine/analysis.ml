@@ -167,9 +167,8 @@ let compute_from ?cvalue_state ?arguments entry_point =
   Self.clear_results ();
   Ast.compute ();
   pre_analysis ();
-  Engine.reset ();
   (* The new analyzer can be accessed through hooks *)
-  let module Engine = (val Engine.current ()) in
+  let module Engine = (val Engine.reset ()) in
   let compute () =
     compute_from_entry_point (module Engine)
       ?cvalue_state ?arguments entry_point
@@ -309,7 +308,7 @@ let mthread_compute () =
   Mt_main.register_hooks analysis;
   Fun.protect ~finally:Mt_main.unregister_hooks @@ fun () ->
 
-  let module E = (val Engine.current ()) in
+  let module E = (val Engine.reset ()) in
   E.Interferences.reset ();
   Thread.reset_state ();
   Mutex.reset_state ();
@@ -324,7 +323,7 @@ let mthread_compute () =
   Self.clear_results ();
   Ast.compute ();
   pre_analysis ();
-  Engine.reset ();
+
   compute_thread Thread.main;
   Mt_self.feedback "*** First value analysis for main thread done." ;
 
