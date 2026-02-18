@@ -147,9 +147,12 @@ let _shared_var_summary =
         let zone = Mt_summary.access_zone access in
         let bases = Locations.Zone.get_bases zone in
         match bases with
-        | Set bases ->
+        | Set bases when Base.Hptset.cardinal bases = 1 ->
           let base = Base.Hptset.choose bases in
           Format.asprintf "%a" Base.pretty base
+        | Set bases ->
+          Self.fatal "By construction there should only be one base in %a"
+            Base.Hptset.pretty bases
         | Top ->
           Format.asprintf "%t" Eval.Top.pretty_top);
 
