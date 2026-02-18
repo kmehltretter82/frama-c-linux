@@ -271,29 +271,26 @@ let save_to_disk analysis =
 let one_iteration analysis =
   iter_threads analysis
     (fun th ->
-       if not (SetRecomputeReason.is_empty th.th_to_recompute) then (
-         if Mt_thread.should_compute_thread th then
-           if Cvalue.Model.is_reachable th.th_init_state then (
-             Mt_self.feedback
-               "@[<hov 2>*** Computing thread %a,@ iteration %d@ (%a)@]"
-               ThreadState.pretty th analysis.iteration
-               SetRecomputeReason.pretty th.th_to_recompute;
-
-             thread_analysis analysis th;
-
-             Mt_self.feedback "*** Thread %a computed" ThreadState.pretty th;
-           ) else (
-             Mt_self.feedback "@[<hov 2>*** Thread %a has been@ created but@ \
-                               not started. Skipping.@]"  ThreadState.pretty th
-           )
-         else (
-           Mt_self.feedback "*** Skipping thread %a as requested"
-             ThreadState.pretty th;
-         );
-         th.th_to_recompute <- SetRecomputeReason.empty;
-       ) else
+       if SetRecomputeReason.is_empty th.th_to_recompute then
          Mt_self.debug "No need to recompute thread %a" ThreadState.pretty th
-    );
+       else if not (Mt_thread.should_compute_thread th) then
+         Mt_self.feedback "*** Skipping thread %a as requested"
+           ThreadState.pretty th
+       else if not (Cvalue.Model.is_reachable th.th_init_state) then
+         Mt_self.feedback "@[<hov 2>*** Thread %a has been@ created but@ \
+                           not started. Skipping.@]"  ThreadState.pretty th
+       else begin
+         Mt_self.feedback
+           "@[<hov 2>*** Computing thread %a,@ iteration %d@ (%a)@]"
+           ThreadState.pretty th analysis.iteration
+           SetRecomputeReason.pretty th.th_to_recompute;
+
+         thread_analysis analysis th;
+
+         Mt_self.feedback "*** Thread %a computed" ThreadState.pretty th;
+       end;
+       th.th_to_recompute <- SetRecomputeReason.empty);
+
   Mt_self.feedback "***** Threads computed for iteration %d."
     analysis.iteration
 
