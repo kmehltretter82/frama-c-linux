@@ -157,7 +157,7 @@ let compute_thread_summary thread =
 
 (* ----- Computation of the summary of one access node set ------------------ *)
 
-(* Does [mutex] protect all read/write accesses according to [mutexes]. *)
+(* Does [mutex] protect all [rw] accesses according to [mutexes]. *)
 let is_protected (mutexes: Mt_mutexes_types.mutexes_by_access) rw mutex =
   let mutexes =
     match rw with
@@ -241,7 +241,7 @@ module AccessPropertyByZone = struct
 
   (* Computes the map corresponding to a set of accesses of a memory zone. *)
   let compute_for_zone mutexes_by_zone (acc : t) (zone, node_access_set) : t =
-    (* [mutexes] contains the mutexes for all accesses to [zone], no only
+    (* [mutexes] contains the mutexes for all accesses to [zone], not only
        the current one from [node_access_set]. *)
     let mutexes = Mt_mutexes_types.MutexesByZone.find mutexes_by_zone zone in
     (* By construction, the zone is in the MutexesByZone *)

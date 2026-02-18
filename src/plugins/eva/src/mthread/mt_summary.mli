@@ -47,6 +47,8 @@ module ThreadTable : State_builder.Hashtbl with type key = Thread.t
 
 (** Summary of accesses to shared memory. *)
 
+(** An access is a combination between a zone accessed, a kind of access (read,
+    write) and a protection status. *)
 type access
 
 (** Memory zone of an access. *)
@@ -61,7 +63,7 @@ val access_protection: access -> Mt_shared_vars_types.protection
 (** Unique id of an access. *)
 val access_id: access -> string
 
-(** Table binding each access to the set of source code locations it occurs. *)
+(** Table binding each access to the set of source code locations where it occurs. *)
 module AccessTable : State_builder.Hashtbl
   with type key = access
    and type data = Cil_datatype.Stmt.Set.t
