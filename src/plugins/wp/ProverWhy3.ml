@@ -1072,7 +1072,30 @@ class visitor (ctx:context) c =
             self#make_lemma cnv ~prefix:fname l
           in
           let ind_decl = (fid, List.map make_case dl) in
-          ctx.th <- Why3.Theory.add_ind_decl ctx.th Why3.Decl.Ind [ind_decl]
+          begin
+            try
+              ctx.th <- Why3.Theory.add_ind_decl ctx.th Why3.Decl.Ind [ind_decl] ;
+            with
+            | Why3.Decl.InvalidIndDecl _
+            | Why3.Decl.NonPositiveIndDecl _ ->
+              begin match d.d_lfun with
+                | Lang.ACSL li ->
+                  Wp_parameters.abort
+                    "After simplification inductive %s appear ill-formed \
+                     (hint: check cases premises)"
+                    li.l_var_info.lv_name
+                | Lang.CTOR ci ->
+                  Wp_parameters.fatal
+                    "Constructor (%s) in inductive compilation"
+                    ci.ctor_name
+                  [@ coverage off] (* should not happen *)
+                | extern ->
+                  Wp_parameters.fatal
+                    "Generated symbol %s is an ill-formed inductive"
+                    (Qed.Export.link_name @@ lfun_wname extern)
+                  [@ coverage off] (* should not happen *)
+              end
+          end
       end
 
   end
@@ -1551,7 +1574,12 @@ let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ?memlimit
       else
         automated ~config ~probes ~timeout ~steplimit ~memlimit
           wpo pconf drv prover task
-  with exn ->
+  with
+  | Log.AbortError _ ->
+    Task.failed "[User Error]"
+  | Log.AbortFatal _ ->
+    Task.failed "[Compilation Error]"
+  | exn ->
     if Wp_parameters.has_dkey dkey_compile then
       Wp_parameters.fatal "[Why3 Error] %a@\n%s"
         Why3.Exn_printer.exn_printer exn

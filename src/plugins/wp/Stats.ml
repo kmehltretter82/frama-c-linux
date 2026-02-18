@@ -201,8 +201,9 @@ let pp_stats ~shell ~cache fmt s =
        let success = truncate pr.success in
        let print_proofs = success > 0 && total > 1 in
        let print_perfo =
+         not shell &&
          pr.time > Rformat.epsilon &&
-         (not shell || (not updating && cachemiss > 0))
+         (not updating && cachemiss > 0)
        in
        if p != Qed || qed_only || print_perfo || print_proofs
        then
