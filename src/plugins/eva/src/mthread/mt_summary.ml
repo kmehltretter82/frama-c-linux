@@ -249,6 +249,8 @@ module AccessPropertyByZone = struct
     Mt_cfg_types.SetNodeIdAccess.fold
       (fun (rw, node, _) acc ->
          let lba = LocationsByAccessProperty.compute zone_mutexes rw node in
+         (* Use [exact:false] so that a weak update is performed, as we want
+            the join of maps from LocationsByAccessProperty for all accesses. *)
          add_binding ~exact:false acc zone (`Value lba))
       node_access_set
       acc
