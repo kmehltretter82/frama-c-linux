@@ -15,6 +15,7 @@
           (echo "  - Slicing:" %{lib-available:frama-c-slicing.core} "\n")
           (echo "  - Inout:" %{lib-available:frama-c-inout.core} "\n")
           (echo "  - Pdg:" %{lib-available:frama-c-pdg.core} "\n")
+          (echo "  - Server:" %{lib-available:frama-c-server.core} "\n")
   )
   )
 )
@@ -33,7 +34,9 @@
   (optional)
   (public_name frama-c-impact.core)
   (flags -open Frama_c_kernel :standard -w -9)
-  (libraries frama-c.kernel frama-c-pdg.core frama-c-slicing.core frama-c-callgraph.core frama-c-inout.core)
+  (libraries
+    frama-c.kernel frama-c-pdg.core frama-c-slicing.core
+    frama-c-callgraph.core frama-c-inout.core frama-c-server.core)
   (instrumentation (backend landmarks))
   (instrumentation (backend bisect_ppx))
 )

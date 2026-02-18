@@ -12,6 +12,7 @@
  (action (progn
           (echo "Callgraph:" %{lib-available:frama-c-callgraph.core} "\n")
           (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
+          (echo "  - Server:" %{lib-available:frama-c-server.core} "\n")
   )
   )
 )
@@ -30,7 +31,7 @@
   (optional)
   (public_name frama-c-callgraph.core)
   (flags -open Frama_c_kernel :standard -w -9)
-  (libraries frama-c.kernel frama-c-eva.core)
+  (libraries frama-c.kernel frama-c-eva.core frama-c-server.core)
   (instrumentation (backend landmarks))
   (instrumentation (backend bisect_ppx))
 )
