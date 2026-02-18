@@ -64,6 +64,8 @@ let generate_specs () =
   Parameters.UsePrototype.iter aux
 
 let pre_analysis () =
+  Self.clear_results ();
+  Ast.compute ();
   Self.configure_verbosity ();
   Parameters.configure_precision ();
   Signal.reset ();
@@ -79,8 +81,20 @@ let pre_analysis () =
   Eva_utils.DegenerationPoints.clear ();
   Cvalue_callbacks.apply_at_start_hooks ();
   Origin.clear ();
+
+  (* Engine can now be rebuilt *)
+  let module Engine = (val Engine.reset ()) in
+  Engine.Interferences.reset ();
+  Thread.reset_state ();
+  Mutex.reset_state ();
+  Mqueue.reset_state ();
+  Mt_summary.clear ();
+
   if not (Kernel.AuditCheck.is_empty ()) then
-    Eva_audit.check_configuration (Kernel.AuditCheck.get ())
+    Eva_audit.check_configuration (Kernel.AuditCheck.get ());
+
+  (module Engine : Engine_sig.S)
+
 
 (* ----- Post-analysis cleanup ---------------------------------------------- *)
 
@@ -164,11 +178,7 @@ let compute_from_entry_point  (type t) (engine: t engine)
 
 (* Builds the analyzer if needed, and run the analysis. *)
 let compute_from ?cvalue_state ?arguments entry_point =
-  Self.clear_results ();
-  Ast.compute ();
-  pre_analysis ();
-  (* The new analyzer can be accessed through hooks *)
-  let module Engine = (val Engine.reset ()) in
+  let module Engine = (val pre_analysis ()) in
   let compute () =
     compute_from_entry_point (module Engine)
       ?cvalue_state ?arguments entry_point
@@ -309,25 +319,15 @@ let mthread_compute () =
   Mt_main.register_hooks analysis;
   Fun.protect ~finally:Mt_main.unregister_hooks @@ fun () ->
 
-  let module Engine = (val Engine.reset ()) in
-  Engine.Interferences.reset ();
-  Thread.reset_state ();
-  Mutex.reset_state ();
-  Mqueue.reset_state ();
-  Mt_summary.clear ();
+  let module Engine = (val pre_analysis ()) in
 
   (* Let Eva know about interrupt handlers. *)
   Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
 
   (* We analyse the main thread *)
   Mt_self.feedback "*** Computing value analysis for main thread";
-  Self.clear_results ();
-  Ast.compute ();
-  pre_analysis ();
-
   compute_thread (module Engine) Thread.main;
   Mt_self.feedback "*** First value analysis for main thread done." ;
-
   Mt_analysis_fixpoint.post_thread_analysis analysis;
 
   (* We perform the analysis iterations *)
