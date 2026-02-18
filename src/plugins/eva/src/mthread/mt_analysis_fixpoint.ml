@@ -254,6 +254,16 @@ let store_written_value analysis lw =
   in
   iter_threads analysis aux
 
+let save_to_disk analysis =
+  if Mt_options.ToDisk.get () then begin
+    let filepath =
+      let prefix = Mt_options.ToDiskPrefix.get () in
+      Filepath.of_format "%siteration_%d.sav" prefix analysis.iteration
+    in
+    Project.save filepath;
+    Mt_self.feedback "* Saved iteration %d to file %S" analysis.iteration
+      (Filepath.to_string_rel filepath);
+  end
 
 (* Function that does one pass of value analysis on all the threads
    that are marked as needed to be recomputed. Returns the values
@@ -322,8 +332,11 @@ let post_iteration analysis =
   end;
   Mt_self.feedback "***** Shared variables computed";
 
-  fold_threads analysis false
-    (fun th v -> v || not (SetRecomputeReason.is_empty th.th_to_recompute))
+  save_to_disk analysis
+
+let is_fixpoint_reached analysis =
+  threads analysis
+  |> List.for_all (fun th -> SetRecomputeReason.is_empty th.th_to_recompute)
 
 
 (* Remove "white" nodes in the cfg, ie accesses to variables that
@@ -377,16 +390,8 @@ let reach_fixpoint analysis =
     Mt_self.feedback "***** Iteration %d" i;
     analysis.iteration <- i;
     one_iteration analysis;
-    let continue = post_iteration analysis in
-    if Mt_options.ToDisk.get () then begin
-      let filepath =
-        let prefix = Mt_options.ToDiskPrefix.get () in
-        Filepath.of_format "%siteration_%d.sav" prefix i
-      in
-      Project.save filepath;
-      Mt_self.feedback "* Saved iteration %d to file %S" i
-        (Filepath.to_string_rel filepath);
-    end;
+    post_iteration analysis;
+    let continue = not (is_fixpoint_reached analysis) in
     if continue && i < Mt_options.StopAfter.get () then aux (i+1)
     else (* Stop iteration *)
     if continue then
