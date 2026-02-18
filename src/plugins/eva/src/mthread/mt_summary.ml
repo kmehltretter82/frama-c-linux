@@ -177,10 +177,6 @@ module LocationsByAccessProperty = struct
   include AccessProperty.Map
   include Make (LocSet)
 
-  let hash map =
-    let hash_binding key set = AccessProperty.hash key, LocSet.hash set in
-    fold (fun key set acc -> Hashtbl.hash (acc, hash_binding key set)) map 0
-
   let join = union (fun _key a b -> Some (LocSet.union a b))
 
   let is_included l r =
