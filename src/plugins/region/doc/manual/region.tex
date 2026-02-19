@@ -2,11 +2,8 @@
 \usepackage{amsmath}
 \usepackage{longtable}
 \usepackage{pifont}
-\usepackage{tikz}
 
 \input{fc-macros}
-\input{region-libraries.tex}
-\input{"region-examples/libraries.tex"}
 
 \newcommand{\FCVERSION}{\input{VERSION}(\input{VERSION_CODENAME}\unskip)}
 \newcommand{\Region}{\textsf{Region}\xspace}
@@ -49,15 +46,13 @@ Project \textsf{CoMeMoV} (ANR-22-CE25-0018)%
 %% --------------------------------------------------------------------------
 %% -- Main Document
 %% --------------------------------------------------------------------------
-\input{region_intro}
-\input{region_plugin}
-\input{region_api}
-\input{region_logic}
+\input{region/intro}
+\input{region/plugin}
 
 %% --------------------------------------------------------------------------
 %% -- Bibliography
 %% --------------------------------------------------------------------------
-\bibliographystyle{alpha}
-\bibliography{region}
+%%\bibliographystyle{alpha}
+%%\bibliography{region}
 
 \end{document}

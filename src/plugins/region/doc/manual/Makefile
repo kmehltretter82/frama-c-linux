@@ -10,36 +10,30 @@
 # ---  Region User & Reference Manual                                    ---
 # --------------------------------------------------------------------------
 
-.PHONY: all clean install
+.PHONY: all pdf clean install
+
+all: pdf
 
 PLUGIN=region
 
-all: $(PLUGIN).pdf
-
 include ../MakeDoc
-
-IMAGES=
-
-TEX= \
-	region.tex \
-	region.bib
-
-EXAMPLES=
-
 
 clean::
 	@echo "Cleaning WP"
-	rm -f $(LOGS)
 	rm -f $(PLUGIN).pdf $(PLUGIN).cb $(PLUGIN).cb2 $(PLUGIN).log $(PLUGIN).out\
 		$(PLUGIN).aux $(PLUGIN).blg $(PLUGIN).bbl *~
 
-logs: $(LOGS)
-	rm -f $(LOGS) $(PLUGIN).pdf
+TEX_FILES=$(shell find . -name "*.tex")
 
-$(PLUGIN).pdf: $(FRAMAC_DOC) $(TEX) $(LOGS) $(IMAGES) $(EXAMPLES)
+pdf: $(TEX_FILES) $(FRAMAC_DOC) VERSION VERSION_CODENAME
 	latexmk -pdf $(PLUGIN)
 
-INSTALL_TO=$(FRAMAC_TRUNK)/doc/manuals/$(PLUGIN)-manual.pdf
+rebuild:
+	rm -f $(PLUGIN).pdf
+	latexmk -pdf $(PLUGIN)
+
+
+TARGET=$(FRAMAC_TRUNK)/doc/manuals/$(PLUGIN)-manual.pdf
 install:
-	rm -f $(INSTALL_TO)
-	cp $(PLUGIN).pdf $(INSTALL_TO)
+	rm -f $(TARGET)
+	cp $(PLUGIN).pdf $(TARGET)

@@ -9,10 +9,9 @@
 # --------------------------------------------------------------------------
 # ---  Resources                                                         ---
 # --------------------------------------------------------------------------
-FRAMAC_DOC= .make-class .make-icons VERSION VERSION_CODENAME
+FRAMAC_DOC= .make-class VERSION VERSION_CODENAME
 # --------------------------------------------------------------------------
 FRAMAC_CLASS=frama-c-book.cls fc-macros.tex logos anr-logo.png
-FRAMAC_BULLETS=never_tried.png unknown.png valid_under_hyp.png surely_valid.png
 # --------------------------------------------------------------------------
 FRAMAC_TRUNK?=../../../../..
 # --------------------------------------------------------------------------
@@ -22,13 +21,6 @@ RES_CLASS=$(addprefix $(FRAMAC_TRUNK)/doc/,$(FRAMAC_CLASS))
 	@echo "Import Frama-C Class"
 	@cp -rfv $(RES_CLASS) .
 	@touch .make-class
-
-RES_ICONS=$(addprefix $(FRAMAC_TRUNK)/share/theme/default/,$(FRAMAC_BULLETS))
-.make-icons: $(RES_ICONS)
-	@echo "Import Frama-C Icons"
-	@mkdir -p feedback
-	@cp -fv $(RES_ICONS) feedback/
-	@touch .make-icons
 
 VERSION: $(FRAMAC_TRUNK)/VERSION
 	@echo "Importing Frama-C Version"
@@ -43,4 +35,3 @@ VERSION_CODENAME: $(FRAMAC_TRUNK)/VERSION_CODENAME
 clean::
 	@echo "Cleaning resources"
 	@rm -f $(FRAMAC_DOC)
-	@rm -fr feedback
