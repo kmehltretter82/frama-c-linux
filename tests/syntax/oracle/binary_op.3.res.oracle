@@ -3,7 +3,7 @@
   operand of operator '+' with non-object (function) pointer type 'int (*)
   (void)'
   39    #ifdef ADD2
-  40    // Only GCC allows function pointers
+  40    // Only GCC allows function pointers here
   41    int x(void) { return x + 0; }
                              ^
   42    #endif

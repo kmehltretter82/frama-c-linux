@@ -7576,6 +7576,10 @@ and doBinOp loc (bop: binop) (e1: exp) (e2: exp) =
   let t1 = Cil.typeOf e1
   and t2 = Cil.typeOf e2 in
   let bop, e1, e2 =
+    (* Minimal typing to enforce Cil invariant on Plus and Minus operators :
+       pointers are handled using PlusPI, MinusPI and MinusPP. Except for
+       MinusPP, we do not check the second operand type and rely on Cil.mkBinOp
+       to throw the right error if any. *)
     match bop with
     | PlusA when Ast_types.is_ptr t1 -> PlusPI, e1, e2
     | PlusA when Ast_types.is_ptr t2 -> PlusPI, e2, e1

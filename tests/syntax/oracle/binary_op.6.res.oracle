@@ -1,10 +1,10 @@
 [kernel] Parsing binary_op.c (with preprocessing)
-[kernel] binary_op.c:61: User Error: 
+[kernel] binary_op.c:62: User Error: 
   operator '==' on types 'int *' and 'int', both should be either arithmetic or pointer types
-  59    #ifdef EQ2
-  60    // Both operands should be either pointers, arithmetics or pointer and zero
-  61    int y(void) { return ptr == 42; }
+  60    // Either both operands have pointer type or arithmetic type, or one is a
+  61    // pointer and the other zero
+  62    int y(void) { return ptr == 42; }
                              ^^^^^^^^^
-  62    #endif
-  63
+  63    #endif
+  64
 [kernel] Frama-C aborted: invalid user input.

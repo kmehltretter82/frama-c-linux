@@ -5831,7 +5831,7 @@ and mkBinOp ?(constfold=false) ~loc op e1 e2 =
     if c1 && c2 then Ok ()
     else error_any (not c1) (not c2) reason
   in
-  let check_not_funtion_ptr ~side_check =
+  let check_not_function_ptr ~side_check =
     (* Cf. GNU C 6.13.2: GCC allows arithmetic on function pointers. *)
     if Machine.gccMode () then Ok ()
     else side_check ~check:is_object_ptr "non-object (function) pointer"
@@ -5847,7 +5847,7 @@ and mkBinOp ?(constfold=false) ~loc op e1 e2 =
     else check_complete ()
   in
   let check_pointer_offset () =
-    let* () = check_not_funtion_ptr ~side_check:check_left in
+    let* () = check_not_function_ptr ~side_check:check_left in
     let* () = check_complete_pointed ~side_check:check_left in
     check_right ~check:is_integral "non-integral"
   in
@@ -5923,7 +5923,7 @@ and mkBinOp ?(constfold=false) ~loc op e1 e2 =
   | MinusPP ->
     (* ISO C11 6.5.6§3 and 6.5.6§9 : Both types should be pointers to complete
        and compatible object types and the result is of type ptrdiff_t. *)
-    let* () = check_not_funtion_ptr ~side_check:check_both in
+    let* () = check_not_function_ptr ~side_check:check_both in
     let* () = check_complete_pointed ~side_check:check_both in
     if compatible_pointed_types () then
       make_expr (Machine.ptrdiff_type ()) e1 (mkCastT ~oldt:t2 ~newt:t1 e2)

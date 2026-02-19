@@ -37,7 +37,7 @@ int x(void) { return ptr + ptr; }
 #endif
 
 #ifdef ADD2
-// Only GCC allows function pointers
+// Only GCC allows function pointers here
 int x(void) { return x + 0; }
 #endif
 
@@ -57,7 +57,8 @@ int y(void) { return ptr == 0; }
 #endif
 
 #ifdef EQ2
-// Both operands should be either pointers, arithmetics or pointer and zero
+// Either both operands have pointer type or arithmetic type, or one is a
+// pointer and the other zero
 int y(void) { return ptr == 42; }
 #endif
 
@@ -77,6 +78,6 @@ int y(void) { return y > y; }
 #endif
 
 #ifdef CMP4
-// Both operands should be either pointers or arithmetics
+// Both operands should have either pointer type or arithmetic type
 int y(void) { return ptr >= 0; }
 #endif
