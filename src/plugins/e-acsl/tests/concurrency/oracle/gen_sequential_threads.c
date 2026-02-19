@@ -9,6 +9,10 @@
 #include "time.h"
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
+struct __anonstruct_struct_t_1 {
+   int i ;
+};
+typedef struct __anonstruct_struct_t_1 struct_t;
 /*@ requires valid_thread: \valid(thread);
     requires valid_null_attr: attr == \null || \valid_read(attr);
     requires valid_routine: \valid_function(start_routine);
@@ -282,6 +286,7 @@ void *read_value(void *arg)
   return __retres;
 }
 
+struct_t const s = {.i = 0};
 /*@ requires valid_or_null_retval: retval == \null || \valid(retval);
     ensures
       success_or_error:
@@ -588,6 +593,9 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
+    __e_acsl_store_block((void *)(& s),4UL);
+    __e_acsl_full_init((void *)(& s));
+    __e_acsl_mark_readonly((void *)(& s.i));
     __e_acsl_store_block((void *)(values),80UL);
     __e_acsl_full_init((void *)(& values));
   }
@@ -596,6 +604,7 @@ void __e_acsl_globals_init(void)
 
 void __e_acsl_globals_clean(void)
 {
+  __e_acsl_delete_block((void *)(& s));
   __e_acsl_delete_block((void *)(values));
   return;
 }

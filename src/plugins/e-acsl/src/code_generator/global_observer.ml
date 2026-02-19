@@ -117,10 +117,22 @@ let mk_init_function () =
       (fun vi _ stmts ->
          if Misc.is_fc_or_compiler_builtin vi then stmts
          else begin
+           let loc = vi.vdecl in
+           let rec mark_readonly ty = match ty.tnode with
+             | TNamed {ttype} -> mark_readonly ttype
+             | TComp {cstruct = true; cfields = Some fields} ->
+               List.map
+                 (fun field ->
+                    let lval = Var vi, Field (field, NoOffset) in
+                    Smart_stmt.mark_readonly ~loc @@ Cil.mkAddrOf ~loc lval)
+
+                 fields
+             | _ -> [Smart_stmt.mark_readonly ~loc @@ Cil.evar ~loc vi]
+           in
            let stmts =
              if Ast_types.is_const vi.vtype then
                (* a const global can't be modified after initialization. *)
-               Smart_stmt.mark_readonly vi :: stmts
+               mark_readonly vi.vtype @ stmts
              else stmts
            in
            (* a global is both allocated and initialized *)

@@ -191,9 +191,8 @@ let delete_stmt ?(is_addr=false) vi =
   | _, TArray (_, Some _) | true, _ -> mk [ Cil.evar ~loc vi ]
   | _ -> mk [ Cil.mkAddrOfVi vi ]
 
-let mark_readonly vi =
-  let loc = vi.vdecl in
-  rtl_call ~loc "mark_readonly" [ Cil.evar ~loc vi ]
+let mark_readonly ~loc exp =
+  rtl_call ~loc "mark_readonly" [ exp ]
 
 let set_unsound_verdict ~loc =
   let sound_verdict_vi = Prepare_ast.sound_verdict () in
