@@ -263,4 +263,38 @@
 #  define LOGIN_NAME_MAX 8
 #endif
 
+// Note: these definitions are based on the _POSIX2_* above, which are the
+// minimum values mandated by POSIX, but not necessarily the values actually
+// used in Linux.
+#ifndef BC_BASE_MAX
+#define BC_BASE_MAX _POSIX2_BC_BASE_MAX
+#endif
+#ifndef BC_DIM_MAX
+#define BC_DIM_MAX _POSIX2_BC_DIM_MAX
+#endif
+#ifndef BC_SCALE_MAX
+#define BC_SCALE_MAX _POSIX2_BC_SCALE_MAX
+#endif
+#ifndef BC_STRING_MAX
+#define BC_STRING_MAX _POSIX2_BC_STRING_MAX
+#endif
+#ifndef CHARCLASS_NAME_MAX
+#define CHARCLASS_NAME_MAX _POSIX2_CHARCLASS_NAME_MAX
+#endif
+#ifndef COLL_WEIGHTS_MAX
+#define COLL_WEIGHTS_MAX _POSIX2_COLL_WEIGHTS_MAX
+#endif
+#ifndef EXPR_NEST_MAX
+#define EXPR_NEST_MAX _POSIX2_EXPR_NEST_MAX
+#endif
+#ifndef LINE_MAX
+#define LINE_MAX _POSIX2_LINE_MAX
+#endif
+#ifndef NGROUPS_MAX
+#define NGROUPS_MAX _POSIX_NGROUPS_MAX
+#endif
+#ifndef RE_DUP_MAX
+#define RE_DUP_MAX _POSIX_RE_DUP_MAX
+#endif
+
 #endif

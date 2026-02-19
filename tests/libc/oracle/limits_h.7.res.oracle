@@ -26,6 +26,16 @@
 [eva:progress] limits_h.c:38: assertion got status valid.
 [eva:progress] limits_h.c:39: assertion got status valid.
 [eva:progress] limits_h.c:40: assertion got status valid.
+[eva:progress] limits_h.c:51: assertion 'posix_compliance' got status valid.
+[eva:progress] limits_h.c:53: assertion 'posix_compliance' got status valid.
+[eva:progress] limits_h.c:55: assertion 'posix_compliance' got status valid.
+[eva:progress] limits_h.c:57: assertion 'posix_compliance' got status valid.
+[eva:progress] limits_h.c:59: assertion 'posix_compliance' got status valid.
+[eva:progress] limits_h.c:61: assertion 'posix_compliance' got status valid.
+[eva:progress] limits_h.c:63: assertion 'posix_compliance' got status valid.
+[eva:progress] limits_h.c:65: assertion 'posix_compliance' got status valid.
+[eva:progress] limits_h.c:67: assertion 'posix_compliance' got status valid.
+[eva:progress] limits_h.c:69: assertion 'posix_compliance' got status valid.
 [eva:progress] Recording results for main
 [eva:progress] Done for function main
 [scope:rm_asserts] removing 7 assertion(s)
@@ -36,3 +46,13 @@
   intptr_min ∈ {-9223372036854775808}
   uintptr_max ∈ {18446744073709551615}
   uintmax_max ∈ {18446744073709551615}
+  bc_base_max ∈ {99}
+  bc_dim_max ∈ {2048}
+  bs_scale_max ∈ {99}
+  bc_string_max ∈ {1000}
+  charclass_name_max ∈ {14}
+  coll_weights_max ∈ {2}
+  expr_nest_max ∈ {32}
+  line_max ∈ {2048}
+  ngroups_max ∈ {8}
+  re_dup_max ∈ {255}
