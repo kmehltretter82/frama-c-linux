@@ -1,5 +1,3 @@
-%rubber: watch region.bbl region.bib
-
 \documentclass{frama-c-book}
 \usepackage{amsmath}
 \usepackage{longtable}
@@ -14,17 +12,18 @@
 \newcommand{\Region}{\textsf{Region}\xspace}
 
 \title{Region Plug-in Manual}
-\author{Cécile Ruet-Cros}
+\author{Loïc Correnson, Cécile Ruet-Cros}
 \fcversion{\FCVERSION}
 
 \cclicence{by}
 \copyrightstarts{2025}
 
-%\anticopyCEA{} % To comments for public version.
 \begin{document}
 \sloppy
 \emergencystretch 3em
-
+%% --------------------------------------------------------------------------
+%% -- Cover Pages
+%% --------------------------------------------------------------------------
 \maketitle
 \tableofcontents
 
@@ -32,21 +31,29 @@
 \markright{}
 \addcontentsline{toc}{chapter}{Foreword}
 
-This is the user manual of the Region plug-in of \FramaC\footnote{\url{http://frama-c.com}}.
-The content of this document corresponds to the version \FCVERSION, released on \today, of
-\FramaC.
+This is the user manual of the Region plug-in of
+\FramaC\footnote{\url{http://frama-c.com}}. The content of this document
+corresponds to the \FramaC version \FCVERSION, released on \today.
 
 \section*{Acknowledgements}
-
 \medskip
+\acknowledgeANR{%
+\hbadness=20000
+the French National Agency for Research (ANR).\\%
+Project CoMeMoV (ANR-22-CE25-0018)%
+}
 
-\acknowledgeANR{the French ANR project CoMeMoV~(ANR-22-CE25-0018)}
-
+%% --------------------------------------------------------------------------
+%% -- Main Document
+%% --------------------------------------------------------------------------
 \input{region_intro.tex}
 \input{region_plugin.tex}
-%\input{region_api.tex}
-%\input{region_logic.tex}
+\input{region_api.tex}
+\input{region_logic.tex}
 
+%% --------------------------------------------------------------------------
+%% -- Bibliography
+%% --------------------------------------------------------------------------
 \bibliographystyle{alpha}
 \bibliography{region}
 
