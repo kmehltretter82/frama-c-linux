@@ -6,17 +6,25 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+import React from 'react';
+
 import * as Dome from 'dome';
-import * as Ivette from 'ivette';
 import * as Display from 'ivette/display';
 import { showHelp } from 'dome/help';
-import * as States from 'frama-c/states';
+import { FieldState, TextField, useState } from 'dome/layout/forms';
+import { Modal, showModal } from 'dome/dialogs';
+import { IconButton } from 'dome/controls/buttons';
+import { Button, ButtonGroup } from 'dome/frame/toolbars';
+import { Hbox } from 'dome/layout/boxes';
+import { Code } from 'dome/controls/labels';
+
 import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as ASTview from 'frama-c/kernel/ASTview';
 import * as Locations from 'frama-c/kernel/Locations';
 import { getWritesLval, getReadsLval } from 'frama-c/plugins/studia/api/studia';
 import './style.css';
+import * as States from 'frama-c/states';
 
 type access = 'Reads' | 'Writes';
 
@@ -78,56 +86,83 @@ export function buildMenu(
       ]);
       return;
     case 'STMT':
-      addSubMenu([
-        {
-          label: 'Select reads of…',
-          onClick: () => Ivette.focusSearchMode(studiaReadsMode.id)
-        },
-        {
-          label: 'Select writes to…',
-          onClick: () => Ivette.focusSearchMode(studiaWritesMode.id)
-        }
-      ]);
+      menu.push({ label: 'Studia', onClick: () => showModalStudia(attr) });
       return;
   }
 }
 
 ASTview.registerMarkerMenuExtender(buildMenu);
 
-const studiaReadsMode: Ivette.SearchProps = {
-  id: 'frama-c.plugins.studia.reads',
-  rank: -1,
-  label: 'Studia: reads',
-  title: 'Select all statements reading the given lvalue',
-  placeholder: 'lvalue (reads)',
-  icon: 'EDIT',
-  className: 'studia-search-mode',
-  onEnter: (p: string) => onEnter('Reads', p)
-};
+/* -------------------------------------------------------------------------- */
+/* --- Modal                                                              --- */
+/* -------------------------------------------------------------------------- */
 
-const studiaWritesMode: Ivette.SearchProps = {
-  id: 'frama-c.plugins.studia.writes',
-  rank: -1,
-  label: 'Studia: writes',
-  title: 'Select all statements writing the given lvalue',
-  placeholder: "lvalue (writes)",
-  icon: 'EDIT',
-  className: 'studia-search-mode',
-  onEnter: (p: string) => onEnter('Writes', p)
-};
-
-async function onEnter(akind: access, term: string): Promise<void> {
-  const stmt = States.getSelected();
+async function onEnter(stmt: States.Marker, akind: access, term: string
+): Promise<void> {
   const marker = await Server.send(Ast.parseLval, { stmt, term })
-    .catch(handleError);
+  .catch(handleError);
   if (marker) computeStudiaSelection(akind, marker, term);
 }
 
-Ivette.registerSearchMode(studiaReadsMode);
-Ivette.registerSearchMode(studiaWritesMode);
-States.GlobalHistory.on((s: States.History) => {
-  const marker = s.curr.marker;
-  const enabled = marker !== undefined;
-  Ivette.updateSearchMode({ id: studiaReadsMode.id, enabled });
-  Ivette.updateSearchMode({ id: studiaWritesMode.id, enabled });
-});
+interface ModalTextFielddProps {
+  attr: Ast.markerAttributesData;
+}
+
+function ModalStudiaSearch(props: ModalTextFielddProps)
+: React.JSX.Element {
+  const { attr } = props;
+  const state = useState('');
+  const [akind, setAkind] = React.useState<access>('Reads');
+
+  const onValidate = React.useCallback((p: string) =>
+    onEnter(attr.marker, akind, p)
+  , [akind, attr.marker]);
+
+  return <Modal
+      className='modal-studia'
+      label={`Studia: ${attr.sloc?.base}`}
+      actions={<IconButton icon='HELP' size={15}
+        onClick={() => showHelp('eva-studia')} />
+      }
+    >
+    <div>
+      <Hbox>
+        <ButtonGroup>
+          <Button
+            label='Reads of'
+            selected={akind === 'Reads'}
+            onClick={() => setAkind('Reads')}
+            />
+          <Button
+            label='Writes to'
+            selected={akind === 'Writes'}
+            onClick={() => setAkind('Writes')}
+            />
+        </ButtonGroup>
+        <Code>{attr.descr}</Code>
+      </Hbox>
+      <Hbox>
+        <TextField
+          label=''
+          state={state as FieldState<string | undefined>}
+          onKeyDown={(e) => {
+              if(e.key === "Enter")
+                onValidate(state.value);
+            }
+          }
+        />
+        <Button
+          label='Search'
+          onClick={() => onValidate(state.value)}
+        />
+      </Hbox>
+    </div>
+  </Modal>;
+}
+
+async function showModalStudia(
+  attr: Ast.markerAttributesData
+): Promise<void> {
+  showModal(<ModalStudiaSearch attr={attr} />);
+}
+/* -------------------------------------------------------------------------- */

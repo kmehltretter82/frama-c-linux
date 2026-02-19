@@ -81,3 +81,14 @@
     }
   }
 }
+
+.modal-studia {
+  .dome-xBoxes-hbox {
+    align-items: center;
+
+    &>label:first-child { display: none;}
+  }
+  .dome-xModal-body {
+    padding: 10px;
+  }
+}
