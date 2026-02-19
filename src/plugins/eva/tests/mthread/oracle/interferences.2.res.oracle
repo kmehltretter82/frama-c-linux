@@ -285,13 +285,13 @@
     Read by joblooped, Write by joboneshot: unprotected
     Read by <main>, Write by joboneshot: unprotected
 [mt] Statements needing manual synchronisation
-  interferences.c:119 (for shared_a)
-  interferences.c:118 (for shared_a)
-  interferences.c:135 (for shared_a; shared_b)
-  interferences.c:113 (for shared_b)
-  interferences.c:111 (for shared_b)
   interferences.c:110 (for shared_b)
+  interferences.c:111 (for shared_b)
+  interferences.c:113 (for shared_b)
+  interferences.c:118 (for shared_a)
+  interferences.c:119 (for shared_a)
   interferences.c:121 (for shared_a)
+  interferences.c:135 (for shared_a; shared_b)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
 [mt] *** Computing thread <main>, iteration 3 (shared vars values changed and
@@ -442,13 +442,13 @@
     Read by joblooped, Write by joboneshot: unprotected
     Read by <main>, Write by joboneshot: unprotected
 [mt] Statements needing manual synchronisation
-  interferences.c:119 (for shared_a)
-  interferences.c:118 (for shared_a)
-  interferences.c:135 (for shared_a; shared_b)
-  interferences.c:113 (for shared_b)
-  interferences.c:111 (for shared_b)
   interferences.c:110 (for shared_b)
+  interferences.c:111 (for shared_b)
+  interferences.c:113 (for shared_b)
+  interferences.c:118 (for shared_a)
+  interferences.c:119 (for shared_a)
   interferences.c:121 (for shared_a)
+  interferences.c:135 (for shared_a; shared_b)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 4
 [mt] *** Computing thread <main>, iteration 4 (shared vars values changed and
@@ -599,13 +599,13 @@
     Read by joblooped, Write by joboneshot: unprotected
     Read by <main>, Write by joboneshot: unprotected
 [mt] Statements needing manual synchronisation
-  interferences.c:119 (for shared_a)
-  interferences.c:118 (for shared_a)
-  interferences.c:135 (for shared_a; shared_b)
-  interferences.c:113 (for shared_b)
-  interferences.c:111 (for shared_b)
   interferences.c:110 (for shared_b)
+  interferences.c:111 (for shared_b)
+  interferences.c:113 (for shared_b)
+  interferences.c:118 (for shared_a)
+  interferences.c:119 (for shared_a)
   interferences.c:121 (for shared_a)
+  interferences.c:135 (for shared_a; shared_b)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 5
 [mt] *** Computing thread <main>, iteration 5 (shared vars values changed and
@@ -769,13 +769,13 @@
     Read by joblooped, Write by joboneshot: unprotected
     Read by <main>, Write by joboneshot: unprotected
 [mt] Statements needing manual synchronisation
-  interferences.c:119 (for shared_a)
-  interferences.c:118 (for shared_a)
-  interferences.c:135 (for shared_a; shared_b)
-  interferences.c:113 (for shared_b)
-  interferences.c:111 (for shared_b)
   interferences.c:110 (for shared_b)
+  interferences.c:111 (for shared_b)
+  interferences.c:113 (for shared_b)
+  interferences.c:118 (for shared_a)
+  interferences.c:119 (for shared_a)
   interferences.c:121 (for shared_a)
+  interferences.c:135 (for shared_a; shared_b)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 6
 [mt] *** Computing thread <main>, iteration 6 (interferences changed)
@@ -885,12 +885,12 @@
     Read by joblooped, Write by joboneshot: unprotected
     Read by <main>, Write by joboneshot: unprotected
 [mt] Statements needing manual synchronisation
-  interferences.c:119 (for shared_a)
-  interferences.c:118 (for shared_a)
-  interferences.c:135 (for shared_a; shared_b)
-  interferences.c:113 (for shared_b)
-  interferences.c:111 (for shared_b)
   interferences.c:110 (for shared_b)
+  interferences.c:111 (for shared_b)
+  interferences.c:113 (for shared_b)
+  interferences.c:118 (for shared_a)
+  interferences.c:119 (for shared_a)
   interferences.c:121 (for shared_a)
+  interferences.c:135 (for shared_a; shared_b)
 [mt] ***** Shared variables computed
 [mt] ******* Analysis performed, 6 iterations

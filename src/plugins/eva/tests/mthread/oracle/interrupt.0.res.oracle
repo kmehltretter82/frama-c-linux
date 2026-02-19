@@ -165,8 +165,8 @@
   interrupt_received:
     Read by <main>, Write by <interrupt_handler interrupt_oneshot>: unprotected
 [mt] Statements needing manual synchronisation
-  interrupt.c:19 (for interrupt_received)
   interrupt.c:18 (for interrupt_received)
+  interrupt.c:19 (for interrupt_received)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
 [mt] *** Computing thread <main>, iteration 3 (shared vars values changed and
@@ -263,10 +263,10 @@
   interrupt_received:
     Read by <main>, Write by <interrupt_handler interrupt_oneshot>: unprotected
 [mt] Statements needing manual synchronisation
-  interrupt.c:22 (for interrupt_received)
-  interrupt.c:20 (for interrupt_received)
-  interrupt.c:19 (for interrupt_received)
   interrupt.c:18 (for interrupt_received)
+  interrupt.c:19 (for interrupt_received)
+  interrupt.c:20 (for interrupt_received)
+  interrupt.c:22 (for interrupt_received)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 4
 [mt] *** Computing thread <main>, iteration 4 (shared vars values changed and
@@ -326,9 +326,9 @@
   interrupt_received:
     Read by <main>, Write by <interrupt_handler interrupt_oneshot>: unprotected
 [mt] Statements needing manual synchronisation
-  interrupt.c:22 (for interrupt_received)
-  interrupt.c:20 (for interrupt_received)
-  interrupt.c:19 (for interrupt_received)
   interrupt.c:18 (for interrupt_received)
+  interrupt.c:19 (for interrupt_received)
+  interrupt.c:20 (for interrupt_received)
+  interrupt.c:22 (for interrupt_received)
 [mt] ***** Shared variables computed
 [mt] ******* Analysis performed, 4 iterations

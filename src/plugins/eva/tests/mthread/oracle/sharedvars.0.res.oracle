@@ -503,8 +503,8 @@
     Read by jobs4, Write by jobs6: unprotected
   s4: Read by jobs4, Write by <main>: unprotected
 [mt] Statements needing manual synchronisation
-  sharedvars.c:71 (for s6)
   sharedvars.c:68 (for s4)
+  sharedvars.c:71 (for s6)
   sharedvars.c:90 (for s6)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
@@ -872,9 +872,9 @@
   s5: Read by jobs51, Write by jobs5: unprotected
   s4: Read by jobs4, Write by <main>: unprotected
 [mt] Statements needing manual synchronisation
-  sharedvars.c:77 (for s5)
-  sharedvars.c:71 (for s6)
   sharedvars.c:68 (for s4)
+  sharedvars.c:71 (for s6)
+  sharedvars.c:77 (for s5)
   sharedvars.c:90 (for s6)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 4
@@ -1237,9 +1237,9 @@
   s5: Read by jobs51, Write by jobs5: unprotected
   s4: Read by jobs4, Write by <main>: unprotected
 [mt] Statements needing manual synchronisation
-  sharedvars.c:77 (for s5)
-  sharedvars.c:71 (for s6)
   sharedvars.c:68 (for s4)
+  sharedvars.c:71 (for s6)
+  sharedvars.c:77 (for s5)
   sharedvars.c:90 (for s6)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 5
@@ -1592,9 +1592,9 @@
   s5: Read by jobs51, Write by jobs5: unprotected
   s4: Read by jobs4, Write by <main>: unprotected
 [mt] Statements needing manual synchronisation
-  sharedvars.c:77 (for s5)
-  sharedvars.c:71 (for s6)
   sharedvars.c:68 (for s4)
+  sharedvars.c:71 (for s6)
+  sharedvars.c:77 (for s5)
   sharedvars.c:90 (for s6)
 [mt] ***** Shared variables computed
 [mt] ******* Analysis performed, 5 iterations
