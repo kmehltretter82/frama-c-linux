@@ -37,9 +37,6 @@ class collect_visitor = object (self)
 
   method! vtype t = match t.tnode with
     | TNamed ti ->
-      (* we use the type name because direct typeinfo comparison
-       * doesn't wok. Anyway, CIL renames types if several type have the same
-       * name... *)
       if Typeinfo.Hashtbl.mem used_typeinfo ti then SkipChildren
       else begin
         debug "add used typedef %s@." ti.tname;
