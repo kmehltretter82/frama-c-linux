@@ -312,13 +312,13 @@
     Read by <main>, Write by jobptr2: unprotected
     Read by <main>, Write by jobptr1: unprotected
 [mt] Statements needing manual synchronisation
-  interferences.c:76 (for shared_a; shared_b)
-  interferences.c:75 (for shared_a; shared_b)
   interferences.c:94 (for shared_a; shared_b)
   interferences.c:88 (for shared_a; shared_b)
   interferences.c:87 (for shared_a; shared_b)
   interferences.c:82 (for shared_a; shared_b)
   interferences.c:106 (for shared_a; shared_b)
+  interferences.c:76 (for shared_a; shared_b)
+  interferences.c:75 (for shared_a; shared_b)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
 [mt] *** Computing thread <main>, iteration 3 (shared vars values changed and
@@ -501,13 +501,13 @@
     Read by <main>, Write by jobptr2: unprotected
     Read by <main>, Write by jobptr1: unprotected
 [mt] Statements needing manual synchronisation
-  interferences.c:76 (for shared_a; shared_b)
-  interferences.c:75 (for shared_a; shared_b)
   interferences.c:94 (for shared_a; shared_b)
   interferences.c:88 (for shared_a; shared_b)
   interferences.c:87 (for shared_a; shared_b)
   interferences.c:82 (for shared_a; shared_b)
   interferences.c:106 (for shared_a; shared_b)
+  interferences.c:76 (for shared_a; shared_b)
+  interferences.c:75 (for shared_a; shared_b)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 4
 [mt] *** Computing thread <main>, iteration 4 (shared vars values changed and
@@ -623,12 +623,12 @@
     Read by <main>, Write by jobptr2: unprotected
     Read by <main>, Write by jobptr1: unprotected
 [mt] Statements needing manual synchronisation
-  interferences.c:76 (for shared_a; shared_b)
-  interferences.c:75 (for shared_a; shared_b)
   interferences.c:94 (for shared_a; shared_b)
   interferences.c:88 (for shared_a; shared_b)
   interferences.c:87 (for shared_a; shared_b)
   interferences.c:82 (for shared_a; shared_b)
   interferences.c:106 (for shared_a; shared_b)
+  interferences.c:76 (for shared_a; shared_b)
+  interferences.c:75 (for shared_a; shared_b)
 [mt] ***** Shared variables computed
 [mt] ******* Analysis performed, 4 iterations

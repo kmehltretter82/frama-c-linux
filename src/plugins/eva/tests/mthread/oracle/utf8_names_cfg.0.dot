@@ -7,30 +7,30 @@ digraph G {
   center=1;
   v94 [URL="#", fillcolor="#00000000", shape=box, color="#00000055",
        label="Start: main", style="filled", ];
-  v85 [URL="code.html#sid513", fillcolor="#FFFFFFFF", shape=box,
+  v85 [URL="code.html#sid549", fillcolor="#FFFFFFFF", shape=box,
        color="#FF0000FF", label="Creating queue queue / \"𐍅\" (size 2)",
        style="filled", ];
-  v86 [URL="code.html#sid514", fillcolor="#FFFFFFFF", shape=box,
+  v86 [URL="code.html#sid550", fillcolor="#FFFFFFFF", shape=box,
        color="#FF0000FF", label="Create thread job / \"𐍅\" f1",
        style="filled", ];
-  v87 [URL="code.html#sid515", fillcolor="#FFFFFFFF", shape=box,
+  v87 [URL="code.html#sid551", fillcolor="#FFFFFFFF", shape=box,
        color="#FF0000FF", label="Start thread job / \"𐍅\" f1",
        style="filled", ];
-  v88 [URL="code.html#sid516", fillcolor="#FFFFFFFF", shape=box,
+  v88 [URL="code.html#sid552", fillcolor="#FFFFFFFF", shape=box,
        color="#FF0000FF", label="Create thread job / \"𐍅\" f2",
        style="filled", ];
-  v89 [URL="code.html#sid517", fillcolor="#FFFFFFFF", shape=box,
+  v89 [URL="code.html#sid553", fillcolor="#FFFFFFFF", shape=box,
        color="#FF0000FF", label="Start thread job / \"𐍅\" f2",
        style="filled", ];
-  v90 [URL="code.html#sid519", fillcolor="#FFFFFFFF", shape=box,
+  v90 [URL="code.html#sid555", fillcolor="#FFFFFFFF", shape=box,
        color="#000000FF", label="while(1)", style="filled", ];
-  v91 [URL="code.html#sid521", fillcolor="#CCCCFFFF", shape=box,
+  v91 [URL="code.html#sid557", fillcolor="#CCCCFFFF", shape=box,
        color="#000000FF", label="if (c == 0)\nreads c", style="filled", ];
-  v93 [URL="code.html#sid524", fillcolor="#FFFFFFFF", shape=box,
+  v93 [URL="code.html#sid560", fillcolor="#FFFFFFFF", shape=box,
        color="#FF0000FF",
        label="Receiving\nmessage\non queue / \"𐍅\",\nmax size 20,\nstored in &buf.",
        style="filled", ];
-  v92 [URL="code.html#sid652", fillcolor="#FFFFFFFF", shape=box,
+  v92 [URL="code.html#sid712", fillcolor="#FFFFFFFF", shape=box,
        color="#000000FF", label="exit", style="filled", ];
   v84 [URL="#", fillcolor="#FFFFFFFF", shape=plaintext, color="#000000FF",
        label="", style="invis", ];
@@ -56,25 +56,25 @@ digraph G {
   center=1;
   v104 [URL="#", fillcolor="#00000000", shape=box, color="#00000055",
         label="Start: f1", style="filled", ];
-  v96 [URL="code.html#sid494", fillcolor="#CCCCFFFF", shape=box,
+  v96 [URL="code.html#sid530", fillcolor="#CCCCFFFF", shape=box,
        color="#AAAAAAFF", label="Call a = g(& b);\nwrites a", style="filled", ];
-  v102 [URL="code.html#sid492", fillcolor="#CCCCFFFF", shape=box,
+  v102 [URL="code.html#sid528", fillcolor="#CCCCFFFF", shape=box,
         color="#000000FF",
         label="/*@ assert\n      Eva: pointer_downcast:\n        (unsigned long)(&\"\\\"\\360\\220\\215\\205\\\" /0\"[*from]) <= 2147483647;\n*/\n__retres = (int)(& \"\\\"\\360\\220\\215\\205\\\" /0\"[*from]);\nreads b",
         style="filled", ];
-  v103 [URL="code.html#sid646", fillcolor="#FFFFFFFF", shape=box,
+  v103 [URL="code.html#sid706", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v97 [URL="code.html#sid495", fillcolor="#FFFFFFFF", shape=box,
+  v97 [URL="code.html#sid531", fillcolor="#FFFFFFFF", shape=box,
        color="#FF0000FF", label="Lock mutex / \"𐍅\"", style="filled", ];
-  v98 [URL="code.html#sid496", fillcolor="#CCCCFFFF", shape=box,
+  v98 [URL="code.html#sid532", fillcolor="#CCCCFFFF", shape=box,
        color="#000000FF", label="c = 1;\nwrites c", style="filled", ];
-  v99 [URL="code.html#sid497", fillcolor="#FFFFFFFF", shape=box,
+  v99 [URL="code.html#sid533", fillcolor="#FFFFFFFF", shape=box,
        color="#FF0000FF", label="Release mutex / \"𐍅\"", style="filled", ];
-  v100 [URL="code.html#sid500", fillcolor="#FFFFFFFF", shape=box,
+  v100 [URL="code.html#sid536", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF",
         label="Sending\nmessage\non queue / \"𐍅\",\ncontent\n[0] IN {34}\n[1] IN {-16}\n[2] IN {-112}\n[3] IN {-115}\n[4] IN {-123}\n[5] IN {34}\n[6] IN {32}\n[7] IN {47}\n[8] IN {49}\n[9..19] IN {0}",
         style="filled", ];
-  v101 [URL="code.html#sid648", fillcolor="#FFFFFFFF", shape=box,
+  v101 [URL="code.html#sid708", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="exit", style="filled", ];
   v95 [URL="#", fillcolor="#FFFFFFFF", shape=plaintext, color="#000000FF",
        label="", style="invis", ];
@@ -99,25 +99,25 @@ digraph G {
   center=1;
   v83 [URL="#", fillcolor="#00000000", shape=box, color="#00000055",
        label="Start: f2", style="filled", ];
-  v75 [URL="code.html#sid503", fillcolor="#CCCCFFFF", shape=box,
+  v75 [URL="code.html#sid539", fillcolor="#CCCCFFFF", shape=box,
        color="#AAAAAAFF", label="Call b = g(& a);\nwrites b", style="filled", ];
-  v81 [URL="code.html#sid492", fillcolor="#CCCCFFFF", shape=box,
+  v81 [URL="code.html#sid528", fillcolor="#CCCCFFFF", shape=box,
        color="#000000FF",
        label="/*@ assert\n      Eva: pointer_downcast:\n        (unsigned long)(&\"\\\"\\360\\220\\215\\205\\\" /0\"[*from]) <= 2147483647;\n*/\n__retres = (int)(& \"\\\"\\360\\220\\215\\205\\\" /0\"[*from]);\nreads a",
        style="filled", ];
-  v82 [URL="code.html#sid646", fillcolor="#FFFFFFFF", shape=box,
+  v82 [URL="code.html#sid706", fillcolor="#FFFFFFFF", shape=box,
        color="#AAAAAAFF", label="return", style="filled", ];
-  v76 [URL="code.html#sid504", fillcolor="#FFFFFFFF", shape=box,
+  v76 [URL="code.html#sid540", fillcolor="#FFFFFFFF", shape=box,
        color="#FF0000FF", label="Lock mutex / \"𐍅\"", style="filled", ];
-  v77 [URL="code.html#sid505", fillcolor="#CCCCFFFF", shape=box,
+  v77 [URL="code.html#sid541", fillcolor="#CCCCFFFF", shape=box,
        color="#000000FF", label="c = 2;\nwrites c", style="filled", ];
-  v78 [URL="code.html#sid506", fillcolor="#FFFFFFFF", shape=box,
+  v78 [URL="code.html#sid542", fillcolor="#FFFFFFFF", shape=box,
        color="#FF0000FF", label="Release mutex / \"𐍅\"", style="filled", ];
-  v79 [URL="code.html#sid509", fillcolor="#FFFFFFFF", shape=box,
+  v79 [URL="code.html#sid545", fillcolor="#FFFFFFFF", shape=box,
        color="#FF0000FF",
        label="Sending\nmessage\non queue / \"𐍅\",\ncontent\n[0] IN {34}\n[1] IN {-16}\n[2] IN {-112}\n[3] IN {-115}\n[4] IN {-123}\n[5] IN {34}\n[6] IN {32}\n[7] IN {47}\n[8] IN {50}\n[9..19] IN {0}",
        style="filled", ];
-  v80 [URL="code.html#sid650", fillcolor="#FFFFFFFF", shape=box,
+  v80 [URL="code.html#sid710", fillcolor="#FFFFFFFF", shape=box,
        color="#000000FF", label="exit", style="filled", ];
   v74 [URL="#", fillcolor="#FFFFFFFF", shape=plaintext, color="#000000FF",
        label="", style="invis", ];
