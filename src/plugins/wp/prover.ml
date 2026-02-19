@@ -18,6 +18,9 @@ let provers () =
   List.filter Why3Provers.is_mainstream @@
   Why3Provers.provers ()
 
+let iter_provers f =
+  List.iter f @@ provers ()
+
 let equal p q =
   match p,q with
   | Qed,Qed -> true
@@ -35,10 +38,24 @@ let compare p q =
   | _ , Why3 _ -> (+1)
   | Tactical , Tactical -> 0
 
-let name = function
+let ident = function
   | Why3 s -> Why3Provers.ident_wp s
   | Qed -> "qed"
   | Tactical -> "script"
+
+let name = function
+  | Why3 s -> Why3Provers.name s
+  | Qed -> "Qed"
+  | Tactical -> "Script"
+
+let shortcut = function
+  | Why3 s -> String.lowercase_ascii @@ Why3Provers.name s
+  | Qed -> "qed"
+  | Tactical -> "script"
+
+let version = function
+  | Why3 p -> Why3Provers.version p
+  | _ -> System_config.Version.id_and_codename
 
 let parse = function
   | "" | "none" -> None

@@ -63,7 +63,7 @@ struct
   type t = Prover.t
   let jtype = D.declare ~package ~name:"prover"
       ~descr:(Md.plain "Prover Identifier") (Jkey "prover")
-  let to_json prv = `String (WP_Prover.name prv)
+  let to_json prv = `String (WP_Prover.ident prv)
   let of_json js =
     match Prover.parse @@ Json.string js with
     | Some prv -> prv
@@ -147,35 +147,20 @@ let _ =
 (* --- Available Provers                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-let get_name = function
-  | WP_Prover.Qed -> "Qed"
-  | Tactical -> "Script"
-  | Why3 p -> Why3Provers.name p
-
-let get_version = function
-  | WP_Prover.Qed | Tactical -> System_config.Version.id_and_codename
-  | Why3 p -> Why3Provers.version p
-
-let iter_provers fn =
-  List.iter
-    (fun p ->
-       if Why3Provers.is_mainstream p then fn (WP_Prover.Why3 p))
-  @@ Why3Provers.provers ()
-
 let _ : WP_Prover.t S.array =
   let model = S.model () in
   S.column ~name:"name" ~descr:(Md.plain "Prover Name")
-    ~data:(module D.Jalpha) ~get:get_name model ;
+    ~data:(module D.Jalpha) ~get:WP_Prover.name model ;
   S.column ~name:"version" ~descr:(Md.plain "Prover Version")
-    ~data:(module D.Jalpha) ~get:get_version model ;
+    ~data:(module D.Jalpha) ~get:WP_Prover.version model ;
   S.column ~name:"descr" ~descr:(Md.plain "Prover Full Name (description)")
     ~data:(module D.Jalpha) ~get:(WP_Prover.title ~version:true) model ;
   S.register_array ~package
     ~name:"ProverInfos" ~descr:(Md.plain "Available Provers")
-    ~key:WP_Prover.name
+    ~key:WP_Prover.ident
     ~keyName:"prover"
     ~keyType:Prover.jtype
-    ~iter:iter_provers model
+    ~iter:WP_Prover.iter_provers model
 
 (* -------------------------------------------------------------------------- *)
 (* --- Interactive provers                                                --- *)

@@ -120,7 +120,7 @@ let simplify ?start ?result ?(commit=false) wpo =
     wpo
 
 let run_prover wpo ?config ?(mode=Prover.InteractiveMode.Batch) ?progress ?result prover =
-  signal ?progress wpo (Prover.name prover) ;
+  signal ?progress wpo (Prover.ident prover) ;
   dispatch ?config mode prover wpo >>>
   fun status ->
   let res = match status with
@@ -131,7 +131,7 @@ let run_prover wpo ?config ?(mode=Prover.InteractiveMode.Batch) ?progress ?resul
       let msg = Task.error exn in
       Wp_parameters.warning ~current:false
         "@[<hov 2>Goal %s:@ running prover %s failed (%s)@]"
-        (Wpo.get_label wpo) (Prover.name prover) msg ;
+        (Wpo.get_label wpo) (Prover.ident prover) msg ;
       VCS.failed msg
   in
   let res = { res with solver_time = Wpo.qed_time wpo } in

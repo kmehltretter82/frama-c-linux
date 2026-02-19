@@ -176,7 +176,7 @@ let json_of_pstats p =
     begin
       Hashtbl.fold
         (fun p s w ->
-           (Prover.name p , json_of_stats s) :: w)
+           (Prover.ident p , json_of_stats s) :: w)
         p.prover [ "wp:main" , json_of_stats p.main ]
     end
 
@@ -185,7 +185,7 @@ let rankify_pstats p js =
     rankify_stats p.main (get_field js "wp:main") ;
     Hashtbl.iter
       (fun p s ->
-         rankify_stats s (get_field js @@ Prover.name p) ;
+         rankify_stats s (get_field js @@ Prover.ident p) ;
       ) p.prover ;
   end
 

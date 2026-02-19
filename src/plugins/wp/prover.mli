@@ -16,14 +16,28 @@ module Pmap : Map.S with type key = t
 
 (** Mainstream installed provers *)
 val provers : unit -> t list
+val iter_provers : (t -> unit) -> unit
 
 val equal : t -> t -> bool
 val compare : t -> t -> int
 val pretty : Format.formatter -> t -> unit
 
+val ident : t -> string
+(** Identifier of the Prover for WP, typically "CVC5:1.2.1" *)
+
 val name : t -> string
-val parse : string -> t option
+(** Name of the prover, typically CVC5 *)
+
+val shortcut : t -> string
+(** Shortcut name (typically lowercase name) *)
+
+val version : t -> string
+(** Frama-C version for TIP and Qed *)
+
 val title : ?version:bool -> t -> string
+
+
+val parse : string -> t option
 
 val is_auto : t -> bool
 val is_tactical : t -> bool

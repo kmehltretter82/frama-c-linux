@@ -6,11 +6,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val why3_version : string
+(* -------------------------------------------------------------------------- *)
+(** Why3 (and provers) configuration *)
+(* -------------------------------------------------------------------------- *)
 
+(** {2 Why3 configuration } *)
+
+val why3_version : string
 val config : unit -> Why3.Whyconf.config
 val configure : unit -> unit
 val set_procs : int -> unit
+
+(** {2 Prover information } *)
 
 type t = Why3.Whyconf.prover
 
@@ -19,13 +26,11 @@ val ident_wp : t -> string
 val title : ?version:bool -> t -> string
 val name : t -> string
 val version : t -> string
-val altern : t -> string
 val compare : t -> t -> int
 val equal : t -> t -> bool
 
 val lookup : ?fallback:bool -> string -> t option
 val provers : unit -> t list
-val provers_set : unit -> Why3.Whyconf.Sprover.t
 val is_auto : t -> bool
 val is_available : t -> bool
 val is_mainstream : t -> bool

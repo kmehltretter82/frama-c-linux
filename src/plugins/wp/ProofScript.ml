@@ -337,7 +337,7 @@ let verdict_of_json = function
 
 let json_of_result (p : Prover.t) (r : VCS.result) =
   let open VCS in
-  let name = "prover" , `String (Prover.name p) in
+  let name = "prover" , `String (Prover.ident p) in
   let verdict = "verdict" , json_of_verdict r.verdict in
   let time = if r.prover_time > 0.0 then [ "time" , `Float r.prover_time ] else [] in
   let steps = if r.prover_steps > 0 then [ "steps" , `Int r.prover_steps ] else [] in
