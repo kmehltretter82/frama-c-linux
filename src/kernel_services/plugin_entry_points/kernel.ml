@@ -2082,16 +2082,7 @@ module Remove_projects =
       let dependencies = []
     end)
 
-let _ =
-  Remove_projects.Category.enable_all
-    []
-    (object
-      method fold: 'a. (Project.t -> 'a -> 'a) -> 'a -> 'a =
-        fun f acc -> Project.fold_on_projects (fun acc p -> f p acc) acc
-      method mem _p = true (* impossible to build an unregistered project *)
-    end)
-
-let _ =
+let all_but_current =
   Remove_projects.Category.add
     "all_but_current"
     []
@@ -2103,6 +2094,8 @@ let _ =
           acc
       method mem p = not (Project.is_current p)
     end)
+
+let _ = Remove_projects.Category.enable_all_as all_but_current
 
 let () =
   Cmdline.run_after_configuring_stage
