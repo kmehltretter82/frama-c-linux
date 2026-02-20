@@ -292,8 +292,10 @@ class Builder {
         .print('";')
         .attr('tooltip', n.title ?? n.id);
     } else {
+      let label = n.label || n.id;
+      if (label && n.shape === 'cds') label += ' ';
       this
-        .attr('label', n.label || n.id)
+        .attr('label', label)
         .attr('shape', n.shape)
         .attr('tooltip', n.title || n.label || n.id);
     }
@@ -387,7 +389,7 @@ class Builder {
 let divId = 0;
 const newDivId = (): string => `dome_xDiagram_g${++divId}`;
 
-interface GraphvizProps extends DiagramProps { size: Size }
+interface GraphvizProps extends DiagramProps { size: Size, margin?: number }
 
 function GraphvizView(props: GraphvizProps): JSX.Element {
   // Colors

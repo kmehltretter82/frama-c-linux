@@ -133,10 +133,10 @@
     --status-invalid-under-hyp: linear-gradient(to right, var(--status-invalid) 49%, var(--status-unknown) 51%);
 
     /* node background colors */
-    --graph-bg-color-default: #fff;
-    --graph-bg-color-white: #fff;
-    --graph-bg-color-grey: #ccc;
-    --graph-bg-color-dark: #666;
+    --graph-bg-color-default: #ffffff;
+    --graph-bg-color-white: #ffffff;
+    --graph-bg-color-grey: #cccccc;
+    --graph-bg-color-dark: #666666;
     --graph-bg-color-primary: dodgerblue;
     --graph-bg-color-selected: deepskyblue;
     --graph-bg-color-green: lime;
@@ -146,10 +146,10 @@
     --graph-bg-color-blue: cyan;
     --graph-bg-color-pink: hotpink;
     /* cluster background colors */
-    --graph-sg-color-default: #eee;
-    --graph-sg-color-white: #eee;
-    --graph-sg-color-grey: #ccc;
-    --graph-sg-color-dark: #aaa;
+    --graph-sg-color-default: #eeeeee;
+    --graph-sg-color-white: #eeeeee;
+    --graph-sg-color-grey: #cccccc;
+    --graph-sg-color-dark: #aaaaaa;
     --graph-sg-color-primary: #4fc3f7;
     --graph-sg-color-selected: #90caf9;
     --graph-sg-color-green: #AED581;
