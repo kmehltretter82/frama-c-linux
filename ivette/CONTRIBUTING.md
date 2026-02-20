@@ -31,7 +31,16 @@ Additional targets and environment variables are listed by:
 $ make dome-help
 ```
 
-# Emacs Configuration
+# Editor Configuration
+
+`Ivette` development mainly relies on a modern web stack based on `TypeScript`,
+`React`, and related tooling. Suggested editors are those providing support for
+`TypeScript` language services, `JSX/TSX` editing, code navigation, linting
+integration, and automatic formatting.
+
+The following editor configurations are known to work well with the project.
+
+## Emacs
 
 `Emacs` mode configuration can be setup with `Typescript`, `Web-mode` and `Tide`
 packages. You can install them with `M-x package-install`:
@@ -57,7 +66,7 @@ M-x tide-documentation-at-point
 M-x tide-error-at-point
 ```
 
-# VS Code
+## VS Code
 
 `VS Code` has native support for `Typescript` (and `JavaScript`, of course), in
 terms of code navigation, syntax highlighting and formatting, compiler errors
@@ -67,13 +76,7 @@ Useful extensions:
 - `ESlint` provides support for lint errors and warnings
 - `ES7 React/Redux/GraphQL/React-Native snippets` provides boilerplate snippets
 
-# Sandboxing
-
-It is possible to add visual tests and playgrounds inside `src/sandbox`
-directory. Please read the associated
-[src/sandbox/README.md](src/sandbox/README.md) instructions.
-
-# Coding rules
+# Coding Rules
 
 Coding rules are mostly enforced by `Eslint`. It is mostly composed of all
 recommended rules for `Typescript` and `React`. A few of them are slightly
@@ -104,7 +107,7 @@ console.log('test'); // eslint-disable-line no-console
 console.log('test');
 ```
 
-## Safety rules
+## Safety Rules
 
 - [semi](https://eslint.org/docs/rules/semi)
   requires semicolon at the end of statements to avoid unexpected automatic
@@ -131,7 +134,7 @@ console.log('test');
   instead, with the obligation to verify the actual type at runtime or to use
   explicit unchecked conversions with `as`
 
-## Style rules
+## Style Rules
 
 - [max-len](https://eslint.org/docs/rules/max-len) enforces a maximum line
   length of 80 columns, not including comments
@@ -154,3 +157,9 @@ console.log('test');
 - [no-console](https://eslint.org/docs/rules/no-console) forbids the use of
   `console.*` to prevent remaining debug outputs in code releases. For error
   printing in the console, the use of `Dome.Debug` is encouraged
+
+# Sandboxing
+
+It is possible to add visual tests and playgrounds inside `src/sandbox`
+directory. Please read the associated
+[src/sandbox/README.md](src/sandbox/README.md) instructions.
