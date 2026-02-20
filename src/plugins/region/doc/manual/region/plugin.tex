@@ -18,20 +18,19 @@ is \emph{via} \textsf{Ivette} and its \textsf{Region Analysis} component:
 > ivette -region *.c
 \end{logs}
 
-The Region Analysis view shows the \emph{memory map} associated with the
-currently selected function. You can pin the current map if you want to consult
-other functions while keeping the current map visible. You can also download the
-current memory map in DOT/Graphviz\footnote{\url{https://graphviz.org}} format.
+The Region Analysis view (See Figure~\ref{region-view}) shows the \emph{memory
+map} associated with the currently selected function. You can pin the current
+map if you want to consult other functions while keeping the current map
+visible. You can also download the current memory map in
+DOT/Graphviz\footnote{\url{https://graphviz.org}} format.
 
-The currently selected l-value (eg. from the AST
-view) and the currently selected region (eg. after clicking in a region) are
-highlighted in blue. For the currently selected \emph{region}, the access list
-is reported with their respective types and source, which can be clicked to be
-localized inside the code.
-
+\begin{figure}[htbp]
 \begin{center}
 \fbox{\includegraphics[width=10cm]{images/ivette-region.png}}
 \end{center}
+\caption{Ivette View with the Region Analysis Component}
+\label{region-view}
+\end{figure}
 
 The User's Guide Section is structured as follows:
 \begin{itemize}
@@ -43,221 +42,204 @@ The User's Guide Section is structured as follows:
     options to generate the \emph{map side-conditions}.
 \end{itemize}
 
-
-\section{Navigating through the Region Map}
+\section{Walking through Region Maps}
 \label{region-navigation}
 
-For each function, the \FramaC/\Region plugin generates a single \emph{region
-map}. A region map is defined as a graph (acyclic when no pointer is involved)
-whose paths start with program variables represented as labels.
-\begin{table}[ht!]
+A \FramaC/\Region memory map consists of different kind of cells or
+\emph{regions}. Intuitively a \emph{region} is a delimited range of memory
+locations with consistent access.
+
+Regions can be split into \emph{subregions} to represent compound data
+structures such as structure and arrays. Typically, \C variables of atomic type
+will be represented as a single memory region and \C arrays by a collection of
+memory regions. However, pointer casts may also reshape objects into a different
+layout. For instance, a 64-bits integer variable might be represented as an
+\emph{array} of four 8-bits \emph{subregions}. Hence, in region maps there is no
+difference between \C atomic types and \C arrays since both kind of \C objects
+can be represented by: either a \emph{single} memory region; or an \emph{array}
+of subregions depending on the actual memory access done by the code.
+
+There is also a clear distinction between compound regions that are accessed
+like \emph{arrays} of subregions and those that are accessed by individual
+\emph{structure fields}. Notice that \emph{union fields} are not represented in
+memory maps, although union fields actually reshape their contents and hence the
+associated subregions.
+
+\paragraph{Variables.}
+The root regions of memory maps consists of the \C variables. Function returned
+value has also its own region, denoted by \verb+\result+ like in \acsl. Some
+regions can also be named with \emph{labels} from user's region annotations
+(Cf.~\ref{region-annotations}):
+\begin{quote}
+\begin{tabular}{rl}
+
+  \raisebox{-10pt}{\includegraphics[scale=0.6]{images/var.pdf}}
+  & \C variable containing a single \emph{subregion}\\
+
+  \raisebox{-10pt}{\includegraphics[scale=0.6]{images/array.pdf}}
+  & \C variable containing an array of \verb$N$ \emph{subregions}\\
+
+  \raisebox{-10pt}{\includegraphics[scale=0.6]{images/result.pdf}}
+  & Returned value of the current function\\
+
+  \raisebox{-10pt}{\includegraphics[scale=0.6]{images/label.pdf}}
+  & Region with label \verb+A+\\
+
+\end{tabular}
+\end{quote}
+
+\paragraph{Atomic Regions.} The \emph{atomic} regions in memory maps consist
+of aligned (arrays of) integer or float values. Inside an atomic region, all
+values are accessed through a consistent unique \C type. There are three kinds
+of access: read (R), written (W) and initialized (I):
+\begin{quote}
+\begin{tabular}{cl}
+
+  \raisebox{-10pt}{\includegraphics[scale=0.6]{images/nodeR.pdf}}
+  & Region with read-only access of type \verb+t+\\
+
+  \raisebox{-10pt}{\includegraphics[scale=0.6]{images/nodeW.pdf}}
+  & Region with write-only access of type \verb+t+\\
+
+  \raisebox{-10pt}{\includegraphics[scale=0.6]{images/nodeRW.pdf}}
+  & Region with read-write access of type \verb+t+\\
+
+  \raisebox{-10pt}{\includegraphics[scale=0.6]{images/nodeRWI.pdf}}
+  & Region with read-write access \emph{and} initialization\\
+
+\end{tabular}
+\end{quote}
+Atomic types are indicated with a single-letter for concision but their complete
+description (with size in bits) is accessible by hovering or clicking the
+region. One-letter types are listed in Figure~\ref{region-types}.
+
+\clearpage
+\paragraph{Pointer Regions.} When region values are pointers (\verb+*+), they
+shall all consistently points to a \emph{unique} target memory region. This is
+enforced during the construction of memory maps by merging and reshaping the
+different pointed regions when necessary. The pointed region of a region
+containing pointers is illustrated by a \emph{directed} edge in the memory map:
+\begin{quote}
+\begin{tabular}{cl}
+
+  \raisebox{-10pt}{\includegraphics[scale=0.6]{images/pointerR.pdf}}
+  & Pointer region with its (constant) points-to target region\\
+
+  \raisebox{-10pt}{\includegraphics[scale=0.6]{images/pointerRW.pdf}}
+  & Pointer region with its (written) points-to target region\\
+
+\end{tabular}
+\end{quote}
+
+\paragraph{Garbled Regions.} When regions with different types are merged, the
+resulting region is said to be \emph{garbled}. Its is labeled with (\verb+x+)
+one-letter type and its size is set to the greatest common divisor (in bits) of
+the size of all accessed types, and their pointed regions, if any, are also
+merged. Garbled regions are highlighted in red in memory regions:
+
+\begin{quote}
+\begin{tabular}{cl}
+
+  \raisebox{-10pt}{\includegraphics[scale=0.6]{images/garbled.pdf}}
+  & Garbled region, here with read-write access\\
+
+\end{tabular}
+\end{quote}
+
+\paragraph{Compound Regions.} Contrary to arrays, structure and unions have
+distinct memory layouts for each of their fields. Moreover, union fields are
+overlapped with each others and padding bits might be inserted between structure
+fields. Finally, not all fields of a given structure or union might be actually
+accessed by the code.
+
+When building memory maps, only \emph{structure} fields that are
+\emph{explicitly} accessed by the code are represented. Union fields are
+\emph{not} represented, although they reshape the layout of accessed values and
+makes the associated subregions to be merged, which might in turn produce
+garbled regions.
+
+By construction, structure fields leads to \emph{separated} subregions of the
+compound region, unless they are explicitly aliased by the code or user
+annotations (Cf.~\ref{region-annotations}). Hence, compound regions are
+graphically represented by tables with disjoint rows that represent separated
+subregions of each compound cell:
+\begin{quote}
+\begin{tabular}{cl}
+
+  \raisebox{-25pt}{\includegraphics[scale=0.6]{images/compound.pdf}} &
+  \parbox{10cm}{%
+  Compound region with two distinct subregions for fields %
+  \texttt{f} and \texttt{g} (other fields are not represented here)%
+  }
+
+\end{tabular}
+\end{quote}
+Like variables, compound \emph{array} fields are not explicitly represented,
+although each field might contain either one single memory cell or an array of
+\verb+N+ memory cells of some subregion. Padding bits and non-accessed fields
+are represented by the number of bits they spawn over:
+\begin{quote}
+\begin{tabular}{ll}
+
+  \raisebox{-8pt}{\includegraphics[scale=0.5]{images/fieldPAD.pdf}}
+  & \texttt{N} bits of padding or non-accessed fields (no associated subregion) \\
+
+  \raisebox{-8pt}{\includegraphics[scale=0.5]{images/fieldF.pdf}}
+  & Subregion for field \texttt{f} \\
+
+  \raisebox{-8pt}{\includegraphics[scale=0.5]{images/fieldFA.pdf}}
+  & Array subregion of \texttt{N} memory cells for field \texttt{f} \\
+
+\end{tabular}
+\end{quote}
+When consecutive fields are merged, the starting and final fields are indicated.
+In some weird situation with garbled regions, some rows might not be kept
+aligned with any structure fields, in which case they are represented by a
+range of offsets (in bits) inside the memory region:
+\begin{quote}
+\begin{tabular}{cl}
+
+  \raisebox{-8pt}{\includegraphics[scale=0.5]{images/fieldFG.pdf}}
+  & Subregion for all fields from \texttt{f} to \texttt{g} \\
+
+  \raisebox{-8pt}{\includegraphics[scale=0.5]{images/fieldRANGE.pdf}}
+  & Garbled subregion from
+    offset bits \texttt{P} (included) to \texttt{Q} (excluded) \\
+
+\end{tabular}
+\end{quote}
+\TODO{Not yet implemented} Clicking on a compound region displays a detailed list
+of all rows with their offset range and contained fields.
+
+\begin{figure}[htpb]
 \begin{center}
-\begin{tabular}{|m{2cm}|m{10cm}|}
-\hline
-    \centering Region label & Meaning
-\\
-\hline
-{\centering{\includegraphics[width=2cm]{"images/example-region-label.png"}}}
-&
-A region label (not a region) representing the program variable \texttt{s}.
-\\
-\hline
+\begin{tabular}[t]{cl}
+\multicolumn{2}{l}{\textbf{Arithmetic types} (\texttt{t})}\\\hline
+(\verb$b$) & \verb$_Bool$, \verb$unsigned char$ \rule{0pt}{15pt}\\
+(\verb$c$) & \verb$char$, \verb$signed char$ \\
+(\verb$i$) & \verb$int$ \\
+(\verb$u$) & \verb$unsigned int$ \\
+(\verb$s$) & \verb$unsigned? short$ \\
+(\verb$l$) & \verb$unsigned? long$ \\
+(\verb$w$) & \verb$unsigned? long long$ \\
+(\verb$f$) & \verb$float$ \\
+(\verb$d$) & \verb$double$, \verb+long double+\\
+\end{tabular}
+\quad\quad
+\begin{tabular}[t]{cl}
+\multicolumn{2}{l}{\textbf{Other types} (\texttt{t})}\\\hline
+(\verb$*$) & Pointers \rule{0pt}{15pt}\\
+(\verb$S$) & Structures \\
+(\verb$U$) & Unions \\
+(\verb$E$) & Enumerated \\
+(\verb$A$) & Arrays \\
+(\verb$F$) & Functions \\
+(\verb$x$) & Others \\
 \end{tabular}
 \end{center}
-\vspace{-15px}
-\caption{Example of a region label}
-\label{table-region-navigation-label}
-\vspace{-10px}
-\end{table}
-
-\subsection{Region definition}
-
-In any region map, each region is characterized by (at least) its size,
-its content, and the memory accesses.
-Memory access kinds are: read \texttt{R}, write \texttt{W}, shift
-\texttt{S}, and initialization \texttt{I}. Each access is paired with a C type
-that defines the size of all memory locations included in the region.
-
-\subsubsection{Arithmetic regions}
-
-Shown in Table \ref{table-region-navigation-primitive}, primitive regions
-are defined as region which only include accesses paired with primitive
-C types, which are represented as
-\texttt{i} for \texttt{int}, \texttt{s} for \texttt{short},
-\texttt{d} for \texttt{double}, \texttt{f} for \texttt{float},
- \texttt{b} for \texttt{bool}, and lastly \texttt{x} for multiple
- heterogeneous accesses.
-
-\begin{table}[ht!]
-\begin{center}
-\begin{tabular}{|m{4cm}|m{10cm}|}
-\hline
-    \centering Region & Meaning
-\\
-\hline
-    {\centering{\includegraphics[height=1.1cm]{"images/example-primitive-read.png"}}}
-&
-    Primitive region with read access(es) of \texttt{int}
-
-    (gray for only primitive read with a unique type).
-\\
-\hline
-    {\centering{\includegraphics[height=1.1cm]{"images/example-primitive-rw.png"}}}
-&
-    Primitive region with read \& write accesses of \texttt{int}.
-
-    (green for primitive read \& write with a unique type)
-\\
-\hline
-    {\centering{\includegraphics[height=1.1cm]{"images/example-primitive-write.png"}}}
-&
-    Primitive region with write access(es) of \texttt{int}.
-
-    (pink for only primitive write with a unique type)
-\\
-\hline
-    {\centering{\includegraphics[height=1.3cm]{"images/example-garbled-with-more-details.png"}}}
-&
-    Primitive region with heterogeneous accesses:
-
-    a 32-bits \texttt{int} and a 32-bits \texttt{float}.
-
-    (red for heterogeneous accesses)
-\\
-\hline
-\end{tabular}
-\end{center}
-\vspace{-15px}
-\caption{Example of primitive regions}
-\label{table-region-navigation-primitive}
-\vspace{-15px}
-\end{table}
-
-\pagebreak
-\subsubsection{Pointer regions}
-
-Shown in Table \ref{table-region-navigation-pointer},
-pointer regions are regions whose accesses are of C type pointer.
-Dereferencing one of the pointer region's pointers (accessing the pointed value)
-is interpreted as a pointer read access.
-The representation of pointer referencing is shown in the region arc examples
-in Table \ref{table-region-navigation-arcs}.
-
-\begin{table}[ht!]
-\begin{center}
-\begin{tabular}{|m{1.8cm}|m{10cm}|}
-\hline
-    \centering Region & Meaning
-\\
-\hline
-    {\centering{\includegraphics[height=1.1cm]{"images/example-pointer-read.png"}}}
-&
-    Pointer region with read access.
-
-    (yellow for only pointer read)
-\\
-\hline
-    {\centering{\includegraphics[height=1.1cm]{"images/example-pointer-rw.png"}}}
-&
-    Pointer region with read \& write accesses.
-
-    (orange for pointer read \& write)
-\\
-\hline
-    {\centering{\includegraphics[height=1.1cm]{"images/example-pointer-write.png"}}}
-&
-    Pointer region with write access.
-
-    NB: The addresses contained in this region are never read,
-    therefore, no arrow is pointing to another region from it.
-
-    (pink for only pointer write, same as primitive write)
-\\
-\hline
-\end{tabular}
-\end{center}
-\vspace{-15px}
-\caption{Example of pointer regions}
-\label{table-region-navigation-pointer}
-\vspace{-15px}
-\end{table}
-
-\subsubsection{Compound regions}
-
-Shown in Table \ref{table-region-navigation-compound},
-compound regions are accessed with a \texttt{struct} C type.
-The representation and the shape of the region depends on the accessed
-fields of the structure.
-
-\begin{table}[ht!]
-\begin{center}
-\begin{tabular}{|m{2cm}|m{10cm}|}
-\hline
-    \centering Region & Meaning
-\\
-\hline
-    {\centering{\includegraphics[width=2cm]{"images/example-compound-region.png"}}}
-&
-    Compound region with at least three fields named \texttt{x}, \texttt{z} and
-    \texttt{arr}, where the last one is an array of size \texttt{4}.
-
-    NB: Between the fields \texttt{x} and \texttt{z}, there may be any combination
-    of paddings and non accessed fields of total size 32 bits.
-
-    (no color on structures)
-\\
-\hline
-\end{tabular}
-\end{center}
-\vspace{-15px}
-\caption{Example of a compound region}
-\label{table-region-navigation-compound}
-\vspace{-15px}
-\end{table}
-
-
-\subsection{Region arcs in the region map}
-
-A region map is defined by its regions and the relations between them.
-Those relations are represented as arcs in the region map, as shown in
-Table \ref{table-region-navigation-arcs}.
-
-\begin{table}[ht!]
-\begin{center}
-\begin{tabular}{|m{5cm}|m{10cm}|}
-\hline
-\centering Region arc & Meaning
-\\
-\hline
-{\centering{\includegraphics[height=1.1cm]{"images/example-labeling.png"}}}
-&
-The colored primitive region is labelled by the variable named \texttt{\_retres}.
-\\\hline
-{\centering{\includegraphics[height=1.1cm]{"images/example-labeling-array.png"}}}
-&
-The colored primitive region is labelled by the variable named \texttt{y}, an array of size 2.
-\\
-\hline
-{\centering{\includegraphics[height=1cm]{"images/example-compound-field.png"}}}
-&
-The field \texttt{z} on the left is represented by the right colored region.
-\\
-\hline
-{\centering{\includegraphics[height=1.1cm]{"images/example-pointer.png"}}}
-&
-The right region is pointed by the left pointer region.
-
-It means that all the values in the left pointer region are addresses
-included in the right region addresses.
-\\
-\hline
-\end{tabular}
-\end{center}
-\vspace{-15px}
-\caption{Examples of region arcs}
-\label{table-region-navigation-arcs}
-\vspace{-15px}
-\end{table}
+\caption{Atomic Region Types}
+\label{region-types}
+\end{figure}
 
 \section{Adding Region Annotations}
 \label{region-annotations}

@@ -24,16 +24,19 @@ clean::
 		$(PLUGIN).aux $(PLUGIN).blg $(PLUGIN).bbl *~
 
 TEX_FILES=$(shell find . -name "*.tex")
+DOT_FILES=$(shell find . -name "*.dot")
+MAP_FILES=$(DOT_FILES:.dot=.pdf)
+.SUFFIXES: .dot .pdf
+.dot.pdf:
+	dot -Tpdf $< -o $@
 
-pdf: $(TEX_FILES) $(FRAMAC_DOC) VERSION VERSION_CODENAME
+pdf: $(TEX_FILES) $(FRAMAC_DOC) VERSION VERSION_CODENAME $(MAP_FILES)
 	latexmk -pdf $(PLUGIN)
 
-rebuild:
-	rm -f $(PLUGIN).pdf
-	latexmk -pdf $(PLUGIN)
-
+rebuild: clean pdf
 
 TARGET=$(FRAMAC_TRUNK)/doc/manuals/$(PLUGIN)-manual.pdf
 install:
 	rm -f $(TARGET)
+	rm -f $(MAP_FILES)
 	cp $(PLUGIN).pdf $(TARGET)

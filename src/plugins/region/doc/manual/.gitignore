@@ -13,3 +13,5 @@
 /frama-c-book.cls
 /cealistlogo.jpg
 /*.synctex.gz
+/images/*.pdf
+!/images/*.dot
