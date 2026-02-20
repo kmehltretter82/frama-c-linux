@@ -9,7 +9,8 @@
 (include_subdirs qualified)
 
 (library
- (name api)
+ (name server_api)
+ (optional)
  (public_name frama-c-eva.server_api)
  (flags -open Frama_c_kernel -open Eva__Private :standard)
  (libraries eva frama-c.kernel frama-c-server.core)
@@ -18,5 +19,6 @@
 
 (plugin
  (name eva.server_api)
+ (optional)
  (libraries frama-c-eva.server_api)
  (site (frama-c plugins)))
