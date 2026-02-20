@@ -11,15 +11,17 @@
  (deps (universe))
  (action
   (progn
-   (echo "EVA:" %{lib-available:frama-c-eva.core} "\n")
-   (echo " - ppx_deriving.eq:" %{lib-available:ppx_deriving.eq} "\n")
-   (echo " - ppx_deriving.ord:" %{lib-available:ppx_deriving.ord} "\n")
-   (echo " - ppx_z_literals:" %{lib-available:frama-c.ppx_z_literals} "\n")
-   (echo "Apron domains:" %{lib-available:frama-c-eva.apron.core} "\n")
-   (echo " - apron.octMPQ:" %{lib-available:apron.octMPQ} "\n")
-   (echo " - apron.boxMPQ:" %{lib-available:apron.boxMPQ} "\n")
-   (echo " - apron.polkaMPQ:" %{lib-available:apron.polkaMPQ} "\n")
-   (echo " - apron.apron:" %{lib-available:apron.apron} "\n"))))
+   (echo "Eva:" %{lib-available:frama-c-eva.core} "\n")
+   (echo "  - ppx_deriving.eq:" %{lib-available:ppx_deriving.eq} "\n")
+   (echo "  - ppx_deriving.ord:" %{lib-available:ppx_deriving.ord} "\n")
+   (echo "  - ppx_z_literals:" %{lib-available:frama-c.ppx_z_literals} "\n")
+   (echo "Eva Server API:" %{lib-available:frama-c-eva.server_api} "\n")
+   (echo "  - Server:" %{lib-available:frama-c-server.core} "\n")
+   (echo "Eva Apron domains:" %{lib-available:frama-c-eva.apron.core} "\n")
+   (echo "  - apron.octMPQ:" %{lib-available:apron.octMPQ} "\n")
+   (echo "  - apron.boxMPQ:" %{lib-available:apron.boxMPQ} "\n")
+   (echo "  - apron.polkaMPQ:" %{lib-available:apron.polkaMPQ} "\n")
+   (echo "  - apron.apron:" %{lib-available:apron.apron} "\n"))))
 
 ;; Deactivate warning 9 globally for Eva
 (env (_ (flags :standard -w -9)))
