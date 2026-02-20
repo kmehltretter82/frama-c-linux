@@ -17,25 +17,39 @@ let function_clean_name = Functions.RTL.mk_api_name "globals_clean"
 
    NOTE: here, varinfos as keys belong to the original project while values
    belong to the new one *)
-let tbl
-  : (offset (* compound initializers *) * init) list ref Varinfo.Hashtbl.t
-  = Varinfo.Hashtbl.create 7
+module GlobalVars = struct
+  let tbl
+    : (offset (* compound initializers *) * init) list ref Varinfo.Hashtbl.t
+    = Varinfo.Hashtbl.create 7
 
-let reset () = Varinfo.Hashtbl.reset tbl
+  let fold_sorted f =
+    let f' vi content acc =
+      let open Current_loc.Operators in
+      let<> UpdatedCurrentLoc = vi.vdecl in
+      f vi content acc in
+    Varinfo.Hashtbl.fold_sorted f' tbl
 
-let is_empty () = Varinfo.Hashtbl.length tbl = 0
+  let replace vi = Varinfo.Hashtbl.replace tbl vi
+  let find = Varinfo.Hashtbl.find tbl
+
+  let reset () = Varinfo.Hashtbl.reset tbl
+  let is_empty () = Varinfo.Hashtbl.length tbl = 0
+end
+
+let reset () = GlobalVars.reset ()
+let is_empty () = GlobalVars.is_empty ()
 
 (* Make a unique mapping for each global variable omitting initializers.
    Initializers (used to capture literal strings) are added through
    [add_initializer] below. *)
 let add vi =
   if Memory_tracking.must_monitor_vi vi then
-    Varinfo.Hashtbl.replace tbl vi (ref [])
+    GlobalVars.replace vi (ref [])
 
 let add_initializer vi offset init =
   if Memory_tracking.must_monitor_vi vi then
     try
-      let l = Varinfo.Hashtbl.find tbl vi in
+      let l = GlobalVars.find vi in
       l := (offset, init) :: !l
     with Not_found ->
       Options.fatal "variable %a is not monitored" Printer.pp_varinfo vi
@@ -84,7 +98,7 @@ let mk_init_function () =
   (* 2-stage observation of initializers: temporal analysis must be performed
      after generating observers of **all** globals *)
   let stmts =
-    Varinfo.Hashtbl.fold_sorted
+    GlobalVars.fold_sorted
       (fun vi l stmts ->
          List.fold_left
            (fun stmts (off,init) ->
@@ -95,12 +109,11 @@ let mk_init_function () =
            stmts
            !l
       )
-      tbl
       []
   in
   (* allocation and initialization of globals *)
   let stmts =
-    Varinfo.Hashtbl.fold_sorted
+    GlobalVars.fold_sorted
       (fun vi _ stmts ->
          if Misc.is_fc_or_compiler_builtin vi then stmts
          else begin
@@ -115,7 +128,6 @@ let mk_init_function () =
            :: Smart_stmt.initialize ~loc:Location.unknown (Cil.var vi)
            :: stmts
          end)
-      tbl
       stmts
   in
   (* create a new code block with generated statements *)
@@ -162,7 +174,7 @@ let mk_init_function () =
   vi, fundec
 
 let mk_clean_function () =
-  if Varinfo.Hashtbl.length tbl = 0 then
+  if GlobalVars.is_empty () then
     None
   else
     (* Create and register [__e_acsl_globals_clean] function with definition
@@ -171,11 +183,10 @@ let mk_clean_function () =
     (* Generate delete statements and add them to the function body *)
     let return = Cil.mkStmt ~valid_sid:true (Return (None, Location.unknown)) in
     let stmts =
-      Varinfo.Hashtbl.fold_sorted
+      GlobalVars.fold_sorted
         (fun vi _l acc ->
            if Misc.is_fc_or_compiler_builtin vi then acc
            else Smart_stmt.delete_stmt vi :: acc)
-        tbl
         [return]
     in
     fundec.sbody.bstmts <- stmts;
