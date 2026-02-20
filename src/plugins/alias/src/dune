@@ -28,6 +28,7 @@
 (env (release (flags -noassert)))
 
 ( library
+  (optional)
   (name Alias)
   (public_name frama-c-alias.core)
   (flags -open Frama_c_kernel :standard)
