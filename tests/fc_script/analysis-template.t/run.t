@@ -12,8 +12,8 @@ Create a GNUmakefile with -eva-stop-at-nth-alarm to test 'crashing'
   $ awk '/^FCFLAGS/ {print;print "  -no-autoload-plugins -load-module eva,inout,metrics,nonterm,report,scope\\";next};1' GNUmakefile.tmp1 > GNUmakefile.tmp2
   $ awk '/^EVAFLAGS/ {print;print "  -eva-stop-at-nth-alarm 0 \\";next};1' GNUmakefile.tmp2 > GNUmakefile.tmp3
   $ awk -v apostrophe="'" '/^CPPFLAGS/ {print;print "  -D" apostrophe "__P(args)=args" apostrophe " \\";next};1' GNUmakefile.tmp3 > GNUmakefile
-  $ make 2>&1 | grep "save partial results"
-  [eva] Clean up and save partial results.
+  $ make 2>&1 | grep "Clean up"
+  [eva] Clean up partial results.
   $ if [ -f main.eva/framac.sav.error ]; then
   > echo "OK! Partial save file exists"; fi
   OK! Partial save file exists

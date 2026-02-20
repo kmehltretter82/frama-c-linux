@@ -10,5 +10,5 @@
   s.[bits 0 to ..] ∈ {0} or UNINITIALIZED
 [eva] unknown_sizeof.i:24: User Error: 
   Function argument *((struct s *)((char *)(& s) + 1)) has unknown size. Aborting
-[eva] Clean up and save partial results.
+[eva] Clean up partial results.
 [kernel] Plug-in eva aborted: invalid user input.

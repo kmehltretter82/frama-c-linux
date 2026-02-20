@@ -24,6 +24,6 @@
 [eva:progress] clean_abort.i:37: assertion 'valid' got status valid.
 [eva:alarm] clean_abort.i:38: Warning: division by zero. assert x ≢ 0;
 [eva] User Error: Stopping at nth alarm
-[eva] Clean up and save partial results.
+[eva] Clean up partial results.
 [kernel] Plug-in eva aborted: invalid user input.
 [kernel] Warning: attempting to save on non-zero exit code: modifying filename into `clean_abort.sav.error'.
