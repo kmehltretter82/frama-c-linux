@@ -77,7 +77,8 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
     index.set(id, r.node);
     target.set(r.node, id);
     // --- Labels
-    const L: Dot.Node = { id: '', shape: 'note', font: 'mono' };
+    const L: Dot.Node =
+      { id: '', shape: 'note', font: 'mono', color: 'lightgrey' };
     if (r.labels.length > 0) {
       const lid = `L${r.node}`;
       nodes.push({ ...L, id: lid, label: `${r.labels.join(',')}:` });
