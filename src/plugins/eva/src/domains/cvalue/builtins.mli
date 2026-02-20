@@ -34,9 +34,9 @@ type result = Cvalue.Model.t * Locals_scoping.clobbered_set
     evaluated along with the builtin.
     [prepare_builtins] should have been called before using this function. *)
 val find_builtin_override:
-  Cil_types.kernel_function ->
-  (string * builtin * cacheable * Cil_types.funspec) option
+  Cil_types.kernel_function -> (string * builtin * Cil_types.funspec) option
 
 (* Applies a cvalue builtin for the given call, in the given cvalue state. *)
 val apply_builtin:
-  builtin -> call -> pre:Cvalue.Model.t -> post:Cvalue.Model.t -> result list
+  builtin -> call -> pre:Cvalue.Model.t -> post:Cvalue.Model.t ->
+  result list * cacheable

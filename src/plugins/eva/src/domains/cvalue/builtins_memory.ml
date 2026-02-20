@@ -12,8 +12,7 @@ open Cvalue
 open Abstract_interp
 open Locations
 
-let register_builtin name ?replace builtin =
-  Builtins.register_builtin name ?replace Cacheable builtin
+let register_builtin = Builtins.register_builtin
 
 let dkey = Self.register_category "imprecision" ~level:6
     ~help:"messages related to possible imprecision of builtins interpreting \
@@ -244,7 +243,8 @@ let frama_c_memcpy name state actuals =
       else
         None, Base.SetLattice.bottom
     in
-    Builtins.Full { c_values = [ return, state ]; c_clobbered; c_assigns }
+    let c_values = [ return, state ] in
+    Builtins.Full { c_values; c_clobbered; c_assigns; cacheable = Cacheable; }
   | _ -> raise (Builtins.Invalid_nb_of_args 3)
 
 let () =
@@ -559,7 +559,8 @@ let frama_c_memset state actuals =
       Builtins.Full
         { Builtins.c_values = [ Some dst_cvalue, state ];
           c_clobbered = Base.SetLattice.bottom;
-          c_assigns = Some (assigns, sure_output); }
+          c_assigns = Some (assigns, sure_output);
+          cacheable = Cacheable; }
     end
   | _ -> raise (Builtins.Invalid_nb_of_args 3)
 

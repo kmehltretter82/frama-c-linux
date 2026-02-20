@@ -47,7 +47,7 @@ let register_arity2 c_name fk f =
   let replace = c_name in
   let t = Cil_const.mk_tfloat fk in
   let typ () = t, [t; t] in
-  Builtins.register_builtin name ~replace ~typ Cacheable (arity2 fk f)
+  Builtins.register_builtin name ~replace ~typ (arity2 fk f)
 
 let () =
   let open Fval in
@@ -86,7 +86,7 @@ let register_arity1 c_name fk f =
   let replace = c_name in
   let t = Cil_const.mk_tfloat fk in
   let typ () = t, [t] in
-  Builtins.register_builtin name ~replace ~typ Cacheable (arity1 name fk f)
+  Builtins.register_builtin name ~replace ~typ (arity1 name fk f)
 
 let () =
   let open Fval in

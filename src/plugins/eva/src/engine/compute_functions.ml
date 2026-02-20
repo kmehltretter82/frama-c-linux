@@ -137,7 +137,7 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* Interprets a call to [kf] at callsite [kinstr] in the state [state]
      by using a cvalue builtin. *)
-  let compute_builtin (name, builtin, cacheable, spec) call state =
+  let compute_builtin (name, builtin, spec) call state =
     let kf_name = Kernel_function.get_name call.kf in
     Self.feedback ~current:true ~dkey:Self.dkey_progress
       "Call to builtin %s%s"
@@ -156,7 +156,7 @@ module Make (Engine: Engine_sig.S) = struct
       let cvalue_call = get_cvalue_call call in
       let post = Engine.Dom.get_cvalue_or_top final_state in
       let pre = Engine.Dom.get_cvalue_or_top state in
-      let cvalue_states =
+      let cvalue_states, cacheable =
         Builtins.apply_builtin builtin cvalue_call ~pre ~post
       in
       let insert result_id cvalue_state =
@@ -175,7 +175,7 @@ module Make (Engine: Engine_sig.S) = struct
     && Engine.Val.mem Main_values.CVal.key
     && Engine.Loc.mem Main_locations.PLoc.key
     then compute_builtin
-    else fun (_, _, _, spec) -> compute_using_spec_or_body (`Spec spec)
+    else fun (_, _, spec) -> compute_using_spec_or_body (`Spec spec)
 
   (* ----- Call computation ------------------------------------------------- *)
 

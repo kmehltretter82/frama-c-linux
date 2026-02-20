@@ -36,6 +36,7 @@ let wrap_builtin analysis builtin = fun state args ->
     { c_values = [res, state];
       c_clobbered = Base.SetLattice.bottom;
       c_assigns = None;
+      cacheable = NoCacheCallers;
     }
 
 let register_hooks analysis =
@@ -43,7 +44,7 @@ let register_hooks analysis =
   ref_hook_end_function := Mt_analysis_hooks.catch_functions_record analysis;
   let register (name, builtin) =
     wrap_builtin analysis builtin
-    |> Builtins.register_builtin name NoCacheCallers
+    |> Builtins.register_builtin name
   in
   List.iter register Mt_analysis_hooks.mthread_builtins
 
@@ -56,7 +57,7 @@ let register_no_hooks () =
         "Builtin %s requires -mthread parameter \
          for the analysis of concurrent programs." name
     in
-    Builtins.register_builtin name NoCacheCallers builtin
+    Builtins.register_builtin name builtin
   in
   List.iter register Mt_analysis_hooks.mthread_builtins
 
