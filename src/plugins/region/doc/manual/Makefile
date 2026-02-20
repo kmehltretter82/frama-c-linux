@@ -10,11 +10,10 @@
 # ---  Region User & Reference Manual                                    ---
 # --------------------------------------------------------------------------
 
-.PHONY: all pdf clean install
-
-all: pdf
-
+.PHONY: all clean install
 PLUGIN=region
+
+all: $(PLUGIN).pdf
 
 include ../MakeDoc
 
@@ -30,10 +29,10 @@ MAP_FILES=$(DOT_FILES:.dot=.pdf)
 .dot.pdf:
 	dot -Tpdf $< -o $@
 
-pdf: $(TEX_FILES) $(FRAMAC_DOC) VERSION VERSION_CODENAME $(MAP_FILES)
+$(PLUGIN).pdf: $(TEX_FILES) $(FRAMAC_DOC) VERSION VERSION_CODENAME $(MAP_FILES)
 	latexmk -pdf $(PLUGIN)
 
-rebuild: clean pdf
+rebuild: clean $(PLUGIN).pdf
 
 TARGET=$(FRAMAC_TRUNK)/doc/manuals/$(PLUGIN)-manual.pdf
 install:
