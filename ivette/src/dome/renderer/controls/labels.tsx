@@ -25,7 +25,7 @@ import './style.css';
 // --------------------------------------------------------------------------
 
 export type IconKind =
-  'default' | 'disabled' | 'warning' | 'positive' | 'negative';
+  'default' | 'disabled' | 'warning' | 'positive' | 'negative' | 'selected';
 
 /** Labels support forwarding refs to their inner [<label/>] element. */
 export interface LabelProps {

@@ -1054,7 +1054,14 @@ struct
             (Descr.str Key.datatype_descr) d
         let reprs r =
           [ Fc_list.fold_left (fun m k -> add k r m) empty Key.reprs ]
-        let hash = undefined
+        let hash hash_value =
+          if Key.hash == undefined || hash_value == undefined
+          then undefined
+          else fun map ->
+            let hash_binding key value = Key.hash key, hash_value value in
+            M.fold
+              (fun key set acc -> Fc_hashtbl.hash (acc, hash_binding key set))
+              map 0
         let pretty f_value =
           if Key.pretty == undefined || f_value == undefined
           then undefined

@@ -506,4 +506,109 @@ tr:first-of-type > .eva-table-callsite-box {
 .eva-status-computing {
   font-weight: bold;
 }
+
+
+/* -------------------------------------------------------------------------- */
+/* --- MThread                                                            --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-mthread {
+  height: 100%;
+
+  button:not(:disabled) { cursor: pointer;}
+
+  .eva-mthread-toolbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    &>div {
+      display: flex;
+      flex-direction: row;
+      margin: 0 10px;
+    }
+    .dome-xToolBar-inset { display: none }
+  }
+
+  .mthread-variable-filter {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+
+    .dome-xForm-field {
+      padding: 3px 5px;
+      border-radius: 5px;
+      background-color: var(--background-block-form);
+    }
+  }
+
+  .eva-mthread-elements {
+    overflow-y: auto;
+    max-height: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-bottom: 88px;
+
+    .mthread-element-mutex button.dome-selected {
+      background-color: var(--mthread-button-mutex);
+    }
+    .mthread-element-message button.dome-selected {
+      background-color: var(--mthread-button-message);
+    }
+    .mthread-element-variable button.dome-selected {
+      background-color: var(--mthread-button-variable);
+    }
+    .mthread-element-thread button.dome-selected {
+      background-color: var(--mthread-button-thread);
+    }
+
+    .mthread-element {
+      max-width: 400px;
+      background-color: var(--background-profound);
+      margin: 2px;
+      padding: 5px;
+      border-radius: 1em;
+      display: flex;
+      flex-direction: column;
+
+      .mthread-element-title {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        text-align: center;
+        align-items: center;
+        padding: 2px 2px;
+        font-weight: bold;
+        margin: 0 5px;
+        gap: 5px;
+      }
+
+      .mthread-element-content {
+        margin: 3px 0;
+        padding: 3px 0;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+
+        &.mthread-element-content-separator {
+          border-top: solid 1px rgba(120, 120, 120, .5);
+        }
+
+        &.mthread-element-content-row {
+          flex-direction: row;
+        }
+        &.mthread-element-content-column {
+          flex-direction: column;
+        }
+
+        button label {
+          cursor: pointer ;
+        }
+      }
+    }
+  }
+}
 /* -------------------------------------------------------------------------- */

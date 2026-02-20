@@ -18,6 +18,7 @@ import './Coverage';
 import './DomainStates';
 import './EvaSidebar';
 import './Flamegraph';
+import './MThread';
 import './style.css';
 import './Taint';
 
@@ -56,5 +57,15 @@ Ivette.registerView({
     'CD': 'fc.eva.values',
   }
 });
+
+Ivette.registerView({
+  id: 'fc.eva.mthread',
+  label: 'Eva MThread',
+  layout: {
+    'A': 'fc.kernel.astview',
+    'B': 'fc.kernel.locations',
+    'CD': 'fc.eva.mthread' }
+});
+
 
 // --------------------------------------------------------------------------

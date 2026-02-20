@@ -98,3 +98,49 @@ module AccessesByZone = struct
     | Map m -> pretty_map fmt m
 
 end
+
+type access_kind = AccessRead | AccessWrite [@@deriving eq, ord]
+
+module AccessKindPrototype = struct
+  include Datatype.Serializable_undefined
+  type t = access_kind [@@deriving eq, ord]
+  let name = "Eva.Mt_shared_vars_types.AccessKind"
+  let reprs = [AccessRead; AccessWrite]
+  let structural_descr = Structural_descr.t_sum [| |]
+  let hash = Hashtbl.hash
+  let pretty fmt = function
+    | AccessRead -> Format.fprintf fmt "read"
+    | AccessWrite -> Format.fprintf fmt "write"
+end
+
+module AccessKind = Datatype.Make_with_collections (AccessKindPrototype)
+
+type protection =
+  | Unprotected
+  | MaybeProtected of Mutex.t
+  | Protected of Mutex.t
+[@@deriving eq, ord]
+
+module ProtectionPrototype = struct
+  include Datatype.Serializable_undefined
+  type t = protection [@@deriving eq, ord]
+  let name = "Eva.Mt_shared_vars_types.Protection"
+  let reprs = [ Unprotected ]
+  let structural_descr =
+    let mutex_descr = [| Mutex.packed_descr |] in
+    Structural_descr.t_sum [| mutex_descr; mutex_descr |]
+
+  let hash = function
+    | Unprotected -> Hashtbl.hash 0
+    | MaybeProtected mutex -> Hashtbl.hash (1, Mutex.hash mutex)
+    | Protected mutex -> Hashtbl.hash (2, Mutex.hash mutex)
+
+  let pretty fmt = function
+    | Unprotected -> Format.fprintf fmt "unprotected"
+    | MaybeProtected mutex ->
+      Format.fprintf fmt "maybe protected with %a" Mutex.pretty mutex
+    | Protected mutex ->
+      Format.fprintf fmt "protected with %a" Mutex.pretty mutex
+end
+
+module Protection = Datatype.Make_with_collections (ProtectionPrototype)

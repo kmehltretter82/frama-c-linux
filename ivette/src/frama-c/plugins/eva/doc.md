@@ -219,3 +219,46 @@ A dropdown list selects the displayed domain, among domains enabled by the
 -eva-domains parameter.
 
 This component is experimental and intended to help debug Eva issues.
+
+## MThread {#eva-mthread}
+
+The MThread component is made up of 3 elements:
+
+* a title bar showing the status of eva and the help button,
+* a toolbar for changing the display mode between `thread` and `variable`,
+* a list of items to be displayed as cards
+
+### Threads
+
+The cards display 4 types of information for each thread displayed:
+
+* Errors: a thread contains an error if the mutexes taken do not match the mutexes released.
+* Mutex: list of mutexes.
+* Message: list of messages.
+* Variable: list of variables.
+
+Mutexes, messages and variables are displayed as buttons.
+When clicked, items of the same type are highlighted throughout the list.
+
+Filters are available in the toolbar.
+
+### Variables
+
+The `variable` type display highlights the protection of shared variables.
+
+Each card shows a title bar followed by the list of mutexes that
+protect the variable in read and write mode.
+
+The following elements are shown for each variable and each type of access:
+
+* [led-positive]: variable or access is protected
+* [led-warning]: variable or access is maybe protected
+* [led-negative]: variable or access is unprotected
+* [icon-multicheck]: the click will select all associated markers
+* [icon-table]: diplayed only for array. When clicked, only this table will be displayed,
+  followed by all its zones (the other filters still apply).
+
+Mutexes are displayed as buttons, when clicked, all associated markers are selected.
+
+Having all accesses protected does not mean that the variable is protected.
+At least one mutex must protect the variable for both reading and writing.
