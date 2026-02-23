@@ -232,12 +232,10 @@ let compute_thread (type t) (engine: t engine) ?cvalue_state thread =
   in
   (* In multi thread analyses, Memexec cache must be invalidated *)
   Mem_exec.cleanup_results ();
-  let final_state = compute_from_entry_point (module Engine)
-      ~thread ?cvalue_state ?arguments entry_point in
-  (* Display the final state of each thread main function *)
-  Engine.Dom.post_analysis final_state
+  compute_from_entry_point (module Engine)
+    ~thread ?cvalue_state ?arguments entry_point
 
-let mthread_thread_analysis engine analysis th =
+let mthread_thread_analysis engine analysis final_states th =
   let open Mt_thread in
   if SetRecomputeReason.is_empty th.th_to_recompute then
     Mt_self.debug "No need to recompute thread %a" ThreadState.pretty th
@@ -255,9 +253,12 @@ let mthread_thread_analysis engine analysis th =
 
     Mt_analysis_fixpoint.pre_thread_analysis analysis th;
 
-    let (), analysis_time = Eva_utils.measure_time
+    let final_state, analysis_time = Eva_utils.measure_time
         (compute_thread engine ~cvalue_state:th.th_init_state) th.th_eva_thread
     in
+
+    (* Store the thread analysis final state. *)
+    Thread.Hashtbl.replace final_states Thread.main final_state;
 
     if Mt_options.ShowTime.get () then
       Mt_self.feedback ~level:2
@@ -275,12 +276,17 @@ let mthread_thread_analysis engine analysis th =
 let mthread_fixpoint engine analysis =
   let open Mt_thread in
 
+  (* Store thread analyse final result of each thread in a Hashtbl. For now,
+     only the result of the main thread is used. *)
+  let final_states = Thread.Hashtbl.create 1 in
+
   (* Let Eva know about interrupt handlers. *)
   Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
 
   (* We analyse the main thread *)
   Mt_self.feedback "*** Computing value analysis for main thread";
-  compute_thread engine Thread.main;
+  let final_state = compute_thread engine Thread.main in
+  Thread.Hashtbl.replace final_states Thread.main final_state;
   Mt_self.feedback "*** First value analysis for main thread done." ;
   Mt_analysis_fixpoint.post_thread_analysis analysis;
 
@@ -294,7 +300,8 @@ let mthread_fixpoint engine analysis =
   do
     analysis.iteration <- analysis.iteration + 1;
     Mt_self.feedback "***** Iteration %d" analysis.iteration;
-    iter_threads analysis (mthread_thread_analysis engine analysis);
+    iter_threads analysis
+      (mthread_thread_analysis engine analysis final_states);
     Mt_self.feedback "***** Threads computed for iteration %d."
       analysis.iteration;
     Mt_analysis_fixpoint.post_iteration analysis
@@ -308,7 +315,10 @@ let mthread_fixpoint engine analysis =
       "@[<v>******* Analysis stopped after %d iterations.\
        @ Remaining to do: %a@]"
       analysis.iteration
-      pretty_recompute_reasons analysis
+      pretty_recompute_reasons analysis;
+
+  (* Return the main thread final state. *)
+  Thread.Hashtbl.find final_states Thread.main
 
 (* Perform an entire mthread execution on the current project *)
 let mthread_compute () =
@@ -328,9 +338,10 @@ let mthread_compute () =
   try
     Self.ComputationState.set Computing;
     let restore_signals = Signal.setup () in
-    Fun.protect ~finally:restore_signals compute;
+    let final_state = Fun.protect ~finally:restore_signals compute in
     Self.(ComputationState.set Computed);
     post_analysis ();
+    Engine.Dom.post_analysis final_state;
     Summary.print ();
     Statistics.export_as_csv ();
     Mt_main.post_analysis analysis
