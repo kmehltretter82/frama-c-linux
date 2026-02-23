@@ -58,13 +58,25 @@ let addrof ~loc lv =
   let lv = Logic_utils.lval_to_term_lval lv in
   Logic_const.term ~loc (TAddrOf lv) (Ctype ptr)
 
+let is_local v =
+  not (v.vglob || v.vformal)
+
+let is_initialized v =
+  v.vglob || v.vdefined ||
+  ((v.vformal || v.vtemp) &&
+   not (Ast_types.is_struct_or_union v.vtype))
+
+let is_const v =
+  (v.vformal || v.vglob || v.vdefined) &&
+  Ast_types.is_const v.vtype
+
 let cvar v =
-  if v.vformal then empty else
-  if v.vglob then
-    if Ast_types.is_const v.vtype then add `Readonly empty else empty
-  else
-    let temp = add `Dynamic empty in
-    if v.vdefined then temp else add `Garbage temp
+  let flags = ref empty in
+  let set f = flags := add f !flags in
+  if is_local v then set `Dynamic ;
+  if is_const v then set `Readonly ;
+  if not @@ is_initialized v then set `Garbage ;
+  !flags
 
 let null_or_valid ~loc ~from addr =
   if mem `Nullable from then
