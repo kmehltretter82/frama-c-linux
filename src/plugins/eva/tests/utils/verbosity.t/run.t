@@ -11,7 +11,6 @@ Verbose 1: summary but no message from "show" or "loop-unroll".
   [kernel] Expanding arguments from options.txt
   [kernel] Parsing file.i (no preprocessing)
   [eva] Analyzing a complete application starting at main
-  [eva] ====== VALUES COMPUTED ======
   [eva:summary] ====== ANALYSIS SUMMARY ======
     ----------------------------------------------------------------------------
     1 function analyzed (out of 1): 100% coverage.
@@ -32,7 +31,6 @@ Verbose 1 but disable "summary" and enable "show" and "loop-unroll".
   [eva:loop-unroll:partial] file.i:8: loop not completely unrolled
   [eva:loop-unroll:auto] file.i:11: Automatic loop unrolling.
   [eva:show] file.i:13: Frama_C_show_each: {9}
-  [eva] ====== VALUES COMPUTED ======
 
 Idem but with a different syntax.
   $ frama-c -commands-file options.txt -eva-verbose 1 -eva-msg-key=-summary,show -eva-warn-key="loop-unroll=feedback,loop-unroll:missing=ignore"
@@ -42,7 +40,6 @@ Idem but with a different syntax.
   [eva:loop-unroll:partial] file.i:8: loop not completely unrolled
   [eva:loop-unroll:auto] file.i:11: Automatic loop unrolling.
   [eva:show] file.i:13: Frama_C_show_each: {9}
-  [eva] ====== VALUES COMPUTED ======
 
 Verbose 4: "summary", "show", "partition" and "loop-unroll" are enabled by default.
   $ frama-c -commands-file options.txt -eva-verbose 4
@@ -53,7 +50,6 @@ Verbose 4: "summary", "show", "partition" and "loop-unroll" are enabled by defau
   [eva:partition] file.i:8: starting to merge loop iterations
   [eva:loop-unroll:auto] file.i:11: Automatic loop unrolling.
   [eva:show] file.i:13: Frama_C_show_each: {9}
-  [eva] ====== VALUES COMPUTED ======
   [eva:summary] ====== ANALYSIS SUMMARY ======
     ----------------------------------------------------------------------------
     1 function analyzed (out of 1): 100% coverage.
@@ -72,7 +68,6 @@ Verbose 4 but disable "summary", "show" and "loop-unroll".
   [kernel] Parsing file.i (no preprocessing)
   [eva] Analyzing a complete application starting at main
   [eva:partition] file.i:8: starting to merge loop iterations
-  [eva] ====== VALUES COMPUTED ======
 
 Idem but with a different syntax.
   $ frama-c -commands-file options.txt -eva-verbose 4 -eva-msg-key=-summary,-show -eva-warn-key="loop-unroll=ignore"
@@ -80,7 +75,6 @@ Idem but with a different syntax.
   [kernel] Parsing file.i (no preprocessing)
   [eva] Analyzing a complete application starting at main
   [eva:partition] file.i:8: starting to merge loop iterations
-  [eva] ====== VALUES COMPUTED ======
 
 Verbose 1 but warn on "loop-unroll".
   $ frama-c -commands-file options.txt -eva-verbose 1 -eva-msg-key=-summary,+show -eva-warn-key="loop-unroll=warning"
@@ -92,7 +86,6 @@ Verbose 1 but warn on "loop-unroll".
     for loop without unroll annotation
   [eva:loop-unroll:auto] file.i:11: Warning: Automatic loop unrolling.
   [eva:show] file.i:13: Frama_C_show_each: {9}
-  [eva] ====== VALUES COMPUTED ======
 
 Verbose 4 but warn on "loop-unroll".
   $ frama-c -commands-file options.txt -eva-verbose 4 -eva-msg-key=-summary,+show -eva-warn-key="loop-unroll=warning"
@@ -105,4 +98,3 @@ Verbose 4 but warn on "loop-unroll".
     for loop without unroll annotation
   [eva:loop-unroll:auto] file.i:11: Warning: Automatic loop unrolling.
   [eva:show] file.i:13: Frama_C_show_each: {9}
-  [eva] ====== VALUES COMPUTED ======

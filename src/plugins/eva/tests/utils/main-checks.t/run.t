@@ -14,7 +14,7 @@ Eva should not crash when a builtin is used for the main function.
 
 
 Mthread should not crash when a specification is used for the main function.
-  $ frama-c -no-autoload-plugins -load-module eva,inout,scope main_checks.i -mthread -eva-use-spec main
+  $ frama-c -no-autoload-plugins -load-module eva,inout,scope main_checks.i -eva -mthread -eva-use-spec main
   [mt] Preparing sources for Mthread with builtins only
   [kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
   [kernel] Parsing main_checks.i (no preprocessing)
@@ -26,7 +26,7 @@ Mthread should not crash when a specification is used for the main function.
   [3]
 
 Mthread should not crash when the main function has no body.
-  $ frama-c -no-autoload-plugins -load-module eva,inout,scope main_checks.i -mthread -main spec_only
+  $ frama-c -no-autoload-plugins -load-module eva,inout,scope main_checks.i -eva -mthread -main spec_only
   [mt] Preparing sources for Mthread with builtins only
   [kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
   [kernel] Parsing main_checks.i (no preprocessing)
@@ -38,7 +38,7 @@ Mthread should not crash when the main function has no body.
   [3]
 
 Mthread should not crash when a builtin is used for the main function.
-  $ frama-c -no-autoload-plugins -load-module eva,inout,scope main_checks.i -mthread -main strlen
+  $ frama-c -no-autoload-plugins -load-module eva,inout,scope main_checks.i -eva -mthread -main strlen
   [mt] Preparing sources for Mthread with builtins only
   [kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
   [kernel] Parsing main_checks.i (no preprocessing)

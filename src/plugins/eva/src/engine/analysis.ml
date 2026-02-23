@@ -198,28 +198,6 @@ let compute_from ?cvalue_state ?arguments entry_point =
     | Error | Self.Abort -> () (* do not re-raise  *)
     | exn -> raise exn
 
-let compute () =
-  (* Nothing to recompute when Eva has already been computed. This boolean
-      is automatically cleared when an option of Eva changes, because they
-      are registered as dependencies on [Self.state] in {!Parameters}.*)
-  if not (is_computed ()) then
-    let cvalue_state = Eva_results.get_initial_state ()
-    and arguments = Eva_results.get_main_args ()
-    and entry_point = fst @@ Globals.entry_point () in
-    compute_from ?cvalue_state ?arguments entry_point
-
-let compute =
-  let name = "Eva.Analysis.compute" in
-  fst (State_builder.apply_once name [ Self.state ] compute)
-
-let () = Parameters.ForceValues.set_output_dependencies [Self.state]
-
-let main () = if Parameters.ForceValues.get () then compute ()
-let () = Boot.Main.extend main
-
-let abort () =
-  Signal.abort ()
-
 (* Mthread entry point *)
 
 let compute_thread (type t) (engine: t engine) ?cvalue_state thread =
@@ -351,10 +329,27 @@ let mthread_compute () =
     | Error | Self.Abort -> () (* do not re-raise  *)
     | exn -> raise exn
 
-let mthread_compute_once, _self =
-  State_builder.apply_once "Eva.Analysis.mthread_compute"
-    [ Ast.self (*; Kernel.MainFunction.self *) ]
-    (fun () -> mthread_compute ())
+let compute () =
+  (* Nothing to recompute when Eva has already been computed. This boolean
+      is automatically cleared when an option of Eva changes, because they
+      are registered as dependencies on [Self.state] in {!Parameters}.*)
+  if not (is_computed ()) then
+    let cvalue_state = Eva_results.get_initial_state ()
+    and arguments = Eva_results.get_main_args ()
+    and entry_point = fst @@ Globals.entry_point () in
+    if Mt_options.Enabled.get () then
+      mthread_compute ()
+    else
+      compute_from ?cvalue_state ?arguments entry_point
 
-let mthread_main () = if Mt_options.Enabled.get () then mthread_compute_once ()
-let () = Boot.Main.extend mthread_main
+let compute =
+  let name = "Eva.Analysis.compute" in
+  fst (State_builder.apply_once name [ Self.state ] compute)
+
+let () = Parameters.ForceValues.set_output_dependencies [Self.state]
+
+let main () = if Parameters.ForceValues.get () then compute ()
+let () = Boot.Main.extend main
+
+let abort () =
+  Signal.abort ()

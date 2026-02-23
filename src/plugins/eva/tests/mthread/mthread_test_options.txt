@@ -1,5 +1,6 @@
 # Parameters of the mthread tests, shared by all test configurations.
 
+-eva
 -mthread
 -eva-slevel 15
 -mt-shared-values 2
