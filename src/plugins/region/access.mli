@@ -17,7 +17,7 @@ type acs =
   | Exp of stmt * exp
   | Ret of stmt * exp
   | Lval of stmt * lval
-  | Init of stmt * varinfo
+  | Init of stmt * lval * exp
   | Term of clause * term_lval
 
 val typeof : acs -> typ
