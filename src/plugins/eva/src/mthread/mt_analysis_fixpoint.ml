@@ -45,6 +45,10 @@ let mark_new_messages_received analysis =
 let post_thread_analysis analysis =
   let th = analysis.curr_thread in
 
+  (* (Temporary) hack to be able to retrieve temporary analysis results *)
+  let previous_computation_state = Self.ComputationState.get () in
+  Self.ComputationState.set Computed;
+
   mark_new_messages_received analysis;
 
   (* We compute the globals variables accessed by the thread *)
@@ -70,7 +74,10 @@ let post_thread_analysis analysis =
   Mt_self.feedback ~level:2 "* Computing cfg";
   th.th_cfg <- Mt_cfg.make_cfg th;
   th.th_read_written_cfg <- Mt_cfg.cfg_accesses th.th_eva_thread th.th_cfg;
-  Mt_self.feedback ~level:2 "* Cfg computed"
+  Mt_self.feedback ~level:2 "* Cfg computed";
+
+  (* (Temporary) hack to be able to retrieve temporary analysis results *)
+  Self.ComputationState.set previous_computation_state
 
 (* We compute a value analysis for the given thread *)
 let pre_thread_analysis analysis th =
