@@ -138,9 +138,7 @@ val shifts : node -> typ list
 val inits : node -> typ list
 val types : node -> typ list
 val typed : node -> typ option
-
-val bitsSizeOf : typ -> int
-
+val flags : node -> Attr.flags
 
 (**/**)
 val add_body : (map -> logic_info -> domain -> unit) ref

@@ -10,6 +10,16 @@ open Ranges
 open Cil_types
 module Domain = Cil_datatype.Compinfo.Set
 
+let bytesSizeOf ty =
+  try Cil.bytesSizeOf ty with
+  | Cil.SizeOfError (_, { tnode = TFun _ }) -> Machine.Sizeof.func ()
+  | Cil.SizeOfError (_, { tnode = TVoid  }) -> Machine.Sizeof.void ()
+
+let bitsSizeOf ty =
+  try Cil.bitsSizeOf ty with
+  | Cil.SizeOfError (_, { tnode = TFun _ }) -> Machine.Sizeof.func () * 8
+  | Cil.SizeOfError (_, { tnode = TVoid  }) -> Machine.Sizeof.void () * 8
+
 type field = fieldinfo range
 
 type domain = Domain.t (* support for associating offsets to field name *)

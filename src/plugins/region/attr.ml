@@ -53,11 +53,6 @@ let pretty fmt w =
 
 open Cil_types
 
-let addrof ~loc lv =
-  let ty = Cil.typeOfLval lv in
-  let lv = Logic_utils.lval_to_term_lval lv in
-  Logic_utils.mk_logic_AddrOf ~loc lv (Ctype ty)
-
 let is_local v =
   not (v.vglob || v.vformal)
 

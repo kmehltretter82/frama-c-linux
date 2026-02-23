@@ -39,9 +39,9 @@ val pretty : Format.formatter -> flags -> unit
 open Cil_types
 
 val cvar : varinfo -> flags
-
-val addrof : loc:location -> lval -> term
-(** Address of the (assignable) lval *)
+val is_local : varinfo -> bool
+val is_const : varinfo -> bool
+val is_initialized : varinfo -> bool
 
 val readable :
   loc:location -> ?label:logic_label ->
