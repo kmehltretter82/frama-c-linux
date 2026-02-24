@@ -1,4 +1,4 @@
-  $ frama-c-script make-machdep --compiler clang --cpp-arch-flags='--target=x86_64' | yq -Y 'del(.version)|del(.custom_defs)'
+  $ frama-c-script make-machdep --compiler clang --cpp-arch-flags='--target=x86_64' | yq -Y 'del(.version)|del(.custom_defs)|del(.posix_c_source)'
   alignof_aligned: 16
   alignof_double: 8
   alignof_float: 4
@@ -158,7 +158,6 @@
   mb_cur_max: ((size_t)16)
   nsig: (64 + 1)
   path_max: '4096'
-  posix_c_source: 200809L
   ptrdiff_t: long
   rand_max: '2147483647'
   sig_atomic_t: int
