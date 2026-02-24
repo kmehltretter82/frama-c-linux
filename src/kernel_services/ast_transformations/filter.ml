@@ -41,6 +41,7 @@ module type RemoveInfo = sig
   val fun_allocates_visible : fct -> identified_term -> bool
   val fun_assign_visible : fct -> from -> bool
   val fun_deps_visible : fct -> identified_term -> bool
+  val fun_extended_visible : fct -> acsl_extension -> bool
 
   val called_info : (proj * fct) -> stmt ->
     (kernel_function * fct) option
@@ -766,6 +767,11 @@ end = struct
            b.b_assigns <- Writes assigns
          with Info.EraseAssigns -> b.b_assigns <- WritesAny
       );
+
+      let extended_visible a = Info.fun_extended_visible finfo a in
+      let extended_visit a = visitCilExtended (self:>Cil.cilVisitor) a in
+      b.b_extended <- filter_list extended_visible extended_visit b.b_extended;
+
       SkipChildren (* see the warning on [SkipChildren] in [vspec] ! *)
 
     method! vspec spec =

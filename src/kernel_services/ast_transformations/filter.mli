@@ -72,15 +72,18 @@ module type RemoveInfo = sig
   val fun_frees_visible : fct -> identified_term -> bool
   val fun_allocates_visible : fct -> identified_term -> bool
 
-  val fun_assign_visible : fct -> from -> bool
   (** true if the assigned value (first component of the from) is visible
       @raise EraseAssigns to indicate that the corresponding assigns clause
       should be erased entirely (i.e. assigns everything. If it were to
       just return false to all elements, this would result in assigns \nothing
   *)
+  val fun_assign_visible : fct -> from -> bool
 
-  val fun_deps_visible : fct -> identified_term -> bool
   (** true if the corresponding functional dependency is visible. *)
+  val fun_deps_visible : fct -> identified_term -> bool
+
+  (** since @Frama-C+dev *)
+  val fun_extended_visible : fct -> acsl_extension -> bool
 
   (** [called_info] will be called only if the call statement is visible.
       If it returns [None], the source call will be visible,
