@@ -40,26 +40,31 @@ module BoolInfo = struct
     let key = PdgIndex.Key.decl_var_key var in
     key_visible "loc_var_visible" fm key
 
+  module M = struct exception Invisible end
+
+  let annot_visitor (fm, kf) = object
+    inherit Visitor.frama_c_inplace
+    method! vlogic_var_use v =
+      match v.lv_origin with
+      | None -> DoChildren
+      | Some v when v.vformal ->
+        let n_param = Kernel_function.get_formal_position v kf + 1 in
+        if not (param_visible (fm,kf) n_param)
+        then raise M.Invisible
+        else DoChildren
+      | Some v when not v.vglob ->
+        if not (loc_var_visible (fm, kf) v)
+        then raise M.Invisible
+        else DoChildren
+      | Some _ -> DoChildren
+  end
+
   let term_visible (fm,kf) t =
-    let module M = struct exception Invisible end in
-    let visitor = object
-      inherit Visitor.frama_c_inplace
-      method! vlogic_var_use v =
-        match v.lv_origin with
-        | None -> DoChildren
-        | Some v when v.vformal ->
-          let n_param = Kernel_function.get_formal_position v kf + 1 in
-          if not (param_visible (fm,kf) n_param)
-          then raise M.Invisible
-          else DoChildren
-        | Some v when not v.vglob ->
-          if not (loc_var_visible (fm, kf) v)
-          then raise M.Invisible
-          else DoChildren
-        | Some _ -> DoChildren
-    end
-    in
-    try ignore (Visitor.visitFramacTerm visitor t); true
+    try ignore (Visitor.visitFramacTerm (annot_visitor (fm,kf)) t); true
+    with M.Invisible -> false
+
+  let pred_visible (fm,kf) t =
+    try ignore (Visitor.visitFramacPredicate (annot_visitor (fm,kf)) t); true
     with M.Invisible -> false
 
   let body_visible _fm = true
@@ -104,12 +109,23 @@ module BoolInfo = struct
        to say assigns \nothing for all functions. *)
     term_visible fm_kf b.it_content
 
+  let rec fun_extended_visible_aux fm_kf ext =
+    match ext.ext_kind with
+    | Ext_id _ -> true
+    | Ext_terms t_list ->
+      List.for_all (term_visible fm_kf) t_list
+    | Ext_preds p_list ->
+      List.for_all (pred_visible fm_kf) p_list
+    | Ext_annot (_, ext_list) ->
+      List.for_all (fun_extended_visible_aux fm_kf) ext_list
+
+  let fun_extended_visible fm_kf ext = fun_extended_visible_aux fm_kf ext
+
   let fun_deps_visible fm_kf t = term_visible fm_kf t.it_content
 
   let res_call_visible (fm,_) call_stmt =
     let key = PdgIndex.Key.call_outret_key call_stmt in
     key_visible "res_call_visible" fm key
-
 
   let called_info (project, _fm) call_stmt =
     match call_stmt.skind with

@@ -175,7 +175,8 @@ module Visibility (SliceName : sig
      iff all C variables occurring in there are visible.
   *)
   let all_logic_var_visible, all_logic_var_visible_identified_term, all_logic_var_visible_term,
-      all_logic_var_visible_assigns, all_logic_var_visible_deps =
+      all_logic_var_visible_assigns, all_logic_var_visible_deps,
+      all_logic_var_visible_extended =
     let module Exn = struct exception Invisible end in
     let vis ff = object
       inherit Visitor.frama_c_inplace
@@ -217,6 +218,10 @@ module Visibility (SliceName : sig
        (fun ff d ->
           try
             ignore (Visitor.visitFramacTerm (vis ff) d.it_content); true
+          with Exn.Invisible -> false),
+       (fun ff a ->
+          try
+            ignore (Visitor.visitFramacExtended (vis ff) a); true
           with Exn.Invisible -> false)
 
   let annotation_visible ff_opt stmt annot =
@@ -357,6 +362,22 @@ module Visibility (SliceName : sig
       | Isrc _ -> true
       | Iproto -> true
       | Iff {slice = ff} -> all_logic_var_visible_assigns ff v
+    in SlicingParameters.debug ~level:2 "[SlicingTransform.Visibility.fun_assign_visible] -> %s"
+      (if visible then "yes" else "no");
+    visible
+
+  let fun_extended_visible ff_opt v =
+    let keep_annots = SlicingParameters.Mode.KeepAnnotations.get () in
+    SlicingParameters.debug ~level:2
+      "[SlicingTransform.Visibility.fun_assign_visible \
+       (with keep_annots = %B)] ?"
+      keep_annots;
+    if not keep_annots then raise EraseAssigns;
+    let visible =
+      match ff_opt with
+      | Isrc _ -> true
+      | Iproto -> true
+      | Iff {slice = ff} -> all_logic_var_visible_extended ff v
     in SlicingParameters.debug ~level:2 "[SlicingTransform.Visibility.fun_assign_visible] -> %s"
       (if visible then "yes" else "no");
     visible
