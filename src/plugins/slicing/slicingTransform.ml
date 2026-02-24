@@ -372,15 +372,16 @@ module Visibility (SliceName : sig
       "[SlicingTransform.Visibility.fun_assign_visible \
        (with keep_annots = %B)] ?"
       keep_annots;
-    if not keep_annots then raise EraseAssigns;
-    let visible =
-      match ff_opt with
-      | Isrc _ -> true
-      | Iproto -> true
-      | Iff {slice = ff} -> all_logic_var_visible_extended ff v
-    in SlicingParameters.debug ~level:2 "[SlicingTransform.Visibility.fun_assign_visible] -> %s"
-      (if visible then "yes" else "no");
-    visible
+    if keep_annots then begin
+      let visible =
+        match ff_opt with
+        | Isrc _ -> true
+        | Iproto -> true
+        | Iff {slice = ff} -> all_logic_var_visible_extended ff v
+      in SlicingParameters.debug ~level:2 "[SlicingTransform.Visibility.fun_assign_visible] -> %s"
+        (if visible then "yes" else "no");
+      visible
+    end else false
 
   let fun_deps_visible ff_opt v =
     let keep_annots = SlicingParameters.Mode.KeepAnnotations.get () in
