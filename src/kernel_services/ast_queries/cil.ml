@@ -5836,8 +5836,9 @@ and mkBinOp ?(constfold=false) ~loc op e1 e2 =
     else error_any (not c1) (not c2) reason
   in
   let check_not_function_ptr ~side_check =
-    (* Cf. GNU C 6.13.2: GCC allows arithmetic on function pointers. *)
-    if Machine.gccMode () then Ok ()
+    (* Cf. GNU C 6.13.2: GCC allows arithmetic on function pointers. Allow
+       pointers arithmetic on Machdeps which define sizeof_fun. *)
+    if Machine.Sizeof.func () > 0 then Ok ()
     else side_check ~check:is_object_ptr "non-object (function) pointer"
   in
   let check_complete_pointed ~side_check =
