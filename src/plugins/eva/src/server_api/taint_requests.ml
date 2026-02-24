@@ -146,10 +146,15 @@ module EvaTaints = struct
     let* after  = evaluate expr (Results.after  stmt) in
     Some (before, after)
 
-  let to_string = function
+  let to_string taint =
+    let name =
+      let current_name = CurrentTaint.get () in
+      if current_name = "" then "" else Format.sprintf " (%s)" current_name
+    in
+    match taint with
     | Untainted -> "untainted"
-    | Direct -> "direct taint"
-    | Indirect -> "indirect taint"
+    | Direct -> "direct taint" ^ name
+    | Indirect -> "indirect taint" ^ name
 
   let pp fmt = function
     | taint, Untainted -> Format.fprintf fmt "%s" (to_string taint)
@@ -179,7 +184,7 @@ module EvaTaints = struct
     let taint_computed = Taint_domain.Store.is_computed in
     let enable () = Analysis.is_computed () && taint_computed () in
     Server.Kernel_ast.Information.register
-      ~id:"eva.taint" ~label:"Taint" ~title: "Taint status according to Eva"
+      ~id:"eva.taint" ~label:"Taint" ~title:"Taint status according to Eva"
       ~descr:eva_taints_descr ~enable print_taint
 
   let () = register_hook Server.Kernel_ast.Information.update
