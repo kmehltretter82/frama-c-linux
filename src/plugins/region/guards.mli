@@ -48,4 +48,12 @@ val readable : env -> node -> addr -> unit
 val writable : env -> node -> addr -> unit
 
 val glval : env -> lval -> typ * node
+val geval : env -> exp -> unit
+val gaddr : env -> exp -> node
 val gexp : env -> exp -> node option
+val write : env -> lval -> unit
+val init : env -> init -> unit
+val instr : env -> instr -> unit
+val skind : env -> stmtkind -> unit
+
+val iter_stmt : map -> (guard -> valid:bool -> unit) -> stmt -> unit

@@ -172,7 +172,7 @@ and goffset env t r = function
   | NoOffset -> t,r
   | Field(fd,o) -> goffset env fd.ftype (Memory.field r fd) o
   | Index(k,o) ->
-    gval env k ;
+    geval env k ;
     let te = Ast_types.direct_element_type t in
     let r = Memory.index r te in
     begin
@@ -183,23 +183,62 @@ and goffset env t r = function
     goffset env te r o
 
 and gaddr env e = Option.get @@ gexp env e
-and gval env e = ignore @@ gexp env e
+and geval env e = ignore @@ gexp env e
 and gexp env e =
   match e.enode with
   | AddrOf lv | StartOf lv ->
     let _,r = glval env lv in Some r
   | Lval lv ->
     let _,r = glval env lv in
+    readable env r (LV lv) ;
     Memory.points_to r
   | CastE(_,e) -> gexp env e
   | BinOp((PlusPI|MinusPI),p,k,_) ->
     let r = gexp env p in
-    gval env k ; r
+    geval env k ; r
   | BinOp(_,a,b,_) ->
-    gval env a ;
-    gval env b ;
+    geval env a ;
+    geval env b ;
     None
-  | UnOp(_,e,_) -> gval env e ; None
+  | UnOp(_,e,_) -> geval env e ; None
   | Const _ | SizeOf _ | SizeOfE _ | AlignOf (_, _) | AlignOfE (_, _) -> None
+
+let write env lv =
+  let _,r = glval env lv in writable env r (LV lv)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Code Side Conditions                                               --- *)
+(* -------------------------------------------------------------------------- *)
+
+let rec init env = function
+  | SingleInit e -> geval env e
+  | CompoundInit(_,ofs) -> List.iter (fun (_,i) -> init env i) ofs
+
+let instr env = function
+  | Set(lv,e,_) ->
+    geval env e ; write env lv
+  | Call(r,f,es,_) ->
+    ignore (ghost env f) ;
+    List.iter (geval env) es ;
+    Option.iter (write env) r
+  | Local_init(_,AssignInit i,_) -> init env i
+  | Local_init(_,ConsInit(_,es,_),_) -> List.iter (geval env) es
+  | Asm _ | Skip _ | Code_annot _ -> ()
+
+let rec skind env = function
+  | Instr i -> instr env i
+  | Return(r,_) -> Option.iter (geval env) r
+  | If(e,_,_,_) | Switch(e,_,_,_)| Throw (Some(e,_),_) -> geval env e
+  | Goto _ | Break _ | Continue _ | Loop _ | Block _
+  | Throw(None,_) | TryCatch _ | TryFinally _ -> ()
+  | TryExcept(_,(ks,e),_,_) -> List.iter (instr env) ks ; geval env e
+  | UnspecifiedSequence us ->
+    let b = Cil.block_from_unspecified_sequence us in
+    List.iter (fun s -> skind env s.skind) b.bstmts
+
+let iter_stmt map f stmt =
+  let env = create ~stmt map in
+  skind env stmt.skind ;
+  iter f env
 
 (* -------------------------------------------------------------------------- *)
