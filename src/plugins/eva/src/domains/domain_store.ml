@@ -34,15 +34,12 @@ end
 
 module Make (Domain: InputDomain) = struct
 
-  let state_name = Domain.name ^ ".Store"
-
-  (* This module stores the resulting states of an Eva analysis. They depends on
-     the set of parameters with which the analysis has been run, and must be
-     cleared each time one of this parameter is changed. Thus, the tables of
-     this module have as dependencies Self.state, the internal state of Eva
-     (all parameters of Eva are added as codependencies of this state).  *)
-  let dependencies = [ Self.state ]
-  let size = 16
+  let info name : (module State_builder.Info_with_size) =
+    (module struct
+      let name = Format.asprintf "Eva.Domain_store.%s.%s" name Domain.name
+      let size = 17
+      let dependencies = [ Self.state ]
+    end)
 
   module type Ref = sig
     val get : unit -> bool
@@ -54,8 +51,8 @@ module Make (Domain: InputDomain) = struct
     State_builder.Ref
       (Datatype.Bool)
       (struct
-        let dependencies = dependencies
-        let name = state_name ^ ".Storage"
+        let dependencies = [ Self.state ]
+        let name = "Eva.Domain_store.Save." ^ Domain.name
         let default () = false
       end)
 
@@ -71,82 +68,54 @@ module Make (Domain: InputDomain) = struct
      [register_global_state] at the start of the analysis.
      If the domain is unmarshallable, its states cannot be saved on the
      disk, and this boolean should not be saved either. *)
-  module Storage =
+  module Save =
     (val (if Descr.is_unmarshable Domain.datatype_descr
           then (module Bool_Ref)
           else (module Bool_Ref_State)) : Ref)
 
   module Global_State =
-    State_builder.Option_ref (Domain)
-      (struct
-        let dependencies = dependencies
-        let name = state_name ^ ".Global_State"
-      end)
+    State_builder.Option_ref (Domain) (val info "Global_State")
 
-  module States_by_callstack =
-    Callstack.Hashtbl.Make (Domain)
+  (* Initial state by function. *)
+  module Initial_State =
+    Kernel_function.Make_Table (Domain) (val info "Initial_State")
 
-  module Table_By_Callstack =
-    Cil_state_builder.Stmt_hashtbl(States_by_callstack)
-      (struct
-        let name = state_name ^ ".Table_By_Callstack"
-        let size = size
-        let dependencies = dependencies
-      end)
-  module Table =
-    Cil_state_builder.Stmt_hashtbl (Domain)
-      (struct
-        let name = state_name ^ ".Table"
-        let size = size
-        let dependencies = [ Table_By_Callstack.self ]
-      end)
+  (* Consolidated state before each statement.*)
+  module Before_Stmt =
+    Cil_state_builder.Stmt_hashtbl (Domain) (val info "Before_Stmt")
 
-  module AfterTable_By_Callstack =
-    Cil_state_builder.Stmt_hashtbl (States_by_callstack)
-      (struct
-        let name = state_name ^ ".AfterTable_By_Callstack"
-        let size = size
-        let dependencies = dependencies
-      end)
-  module AfterTable =
-    Cil_state_builder.Stmt_hashtbl (Domain)
-      (struct
-        let name = state_name ^ ".AfterTable"
-        let size = size
-        let dependencies = [ AfterTable_By_Callstack.self ]
-      end)
+  (* Consolidated state after each statement.*)
+  module After_Stmt =
+    Cil_state_builder.Stmt_hashtbl (Domain) (val info "After_Stmt")
 
-  module Called_Functions_By_Callstack =
-    State_builder.Hashtbl
-      (Kernel_function.Hashtbl)
-      (States_by_callstack)
-      (struct
-        let name = state_name ^ ".Called_Functions_By_Callstack"
-        let size = 11
-        let dependencies = dependencies
-      end)
+  module States_by_callstack = Callstack.Hashtbl.Make (Domain)
 
-  module Called_Functions_Memo =
-    State_builder.Hashtbl
-      (Kernel_function.Hashtbl)
-      (Domain)
-      (struct
-        let name = state_name ^ ".Called_Functions_Memo"
-        let size = 11
-        let dependencies = [ Called_Functions_By_Callstack.self ]
-      end)
+  (* Initial state by callstack. *)
+  module Initial_State_By_Callstack =
+    Kernel_function.Make_Table
+      (States_by_callstack) (val info "Initial_State_By_Callstack")
+
+  (* State before statement, by callstack. *)
+  module Before_Stmt_By_Callstack =
+    Cil_state_builder.Stmt_hashtbl
+      (States_by_callstack) (val info "Before_Stmt_By_Callstack")
+
+  (* State after statement, by callstack. *)
+  module After_Stmt_By_Callstack =
+    Cil_state_builder.Stmt_hashtbl
+      (States_by_callstack) (val info "After_Stmt_By_Callstack")
 
 
   let set_global_state state =
     (* Check parameters -eva-results and -eva-no-results-domain. *)
     let eva_results = Parameters.ResultsAll.get () in
     let domain_results = not (Parameters.NoResultsDomains.mem Domain.name) in
-    let storage = eva_results && domain_results in
-    Storage.set storage;
-    if storage then Global_State.set state
+    let save = eva_results && domain_results in
+    Save.set save;
+    if save then Global_State.set state
 
   let get_global_state () =
-    if not (Storage.get ())
+    if not (Save.get ())
     then `Value Domain.top
     else match Global_State.get_option () with
       | None -> `Bottom
@@ -154,55 +123,55 @@ module Make (Domain: InputDomain) = struct
 
 
   let set_initial_state ?callstack kf state =
-    if Storage.get () then
+    if Save.get () then
       match callstack with
-      | None -> Called_Functions_Memo.replace kf state
+      | None -> Initial_State.replace kf state
       | Some callstack ->
         let create _kf = Callstack.Hashtbl.create 7 in
-        let by_callstack = Called_Functions_By_Callstack.memo create kf in
+        let by_callstack = Initial_State_By_Callstack.memo create kf in
         Callstack.Hashtbl.replace by_callstack callstack state
 
   let get_initial_state ?callstack kf =
-    if Storage.get ()
+    if Save.get ()
     then
       try
         match callstack with
-        | None -> `Value (Called_Functions_Memo.find kf)
+        | None -> `Value (Initial_State.find kf)
         | Some callstack ->
-          let cs_tbl = Called_Functions_By_Callstack.find kf in
+          let cs_tbl = Initial_State_By_Callstack.find kf in
           `Value (Callstack.Hashtbl.find cs_tbl callstack)
       with Not_found -> `Bottom
     else `Value Domain.top
 
   let set_stmt_state ?callstack ~after stmt state =
-    if Storage.get () then
+    if Save.get () then
       match callstack with
       | None ->
         if after
-        then AfterTable.add stmt state
-        else Table.add stmt state
+        then After_Stmt.replace stmt state
+        else Before_Stmt.replace stmt state
       | Some callstack ->
         let create _stmt = Callstack.Hashtbl.create 7 in
         let by_callstack =
           if after
-          then AfterTable_By_Callstack.memo create stmt
-          else Table_By_Callstack.memo create stmt
+          then After_Stmt_By_Callstack.memo create stmt
+          else Before_Stmt_By_Callstack.memo create stmt
         in
         Callstack.Hashtbl.replace by_callstack callstack state
 
   let get_stmt_state ?callstack ~after stmt =
-    if Storage.get () then
+    if Save.get () then
       try
         match callstack with
         | None ->
           if after
-          then `Value (AfterTable.find stmt)
-          else `Value (Table.find stmt)
+          then `Value (After_Stmt.find stmt)
+          else `Value (Before_Stmt.find stmt)
         | Some callstack ->
           let cs_tbl =
             if after
-            then AfterTable_By_Callstack.find stmt
-            else Table_By_Callstack.find stmt
+            then After_Stmt_By_Callstack.find stmt
+            else Before_Stmt_By_Callstack.find stmt
           in
           `Value (Callstack.Hashtbl.find cs_tbl callstack)
       with Not_found -> `Bottom
@@ -210,16 +179,18 @@ module Make (Domain: InputDomain) = struct
 
 
   let kf_callstacks kf =
-    if Storage.get () then
-      try `Value (Called_Functions_By_Callstack.find kf |> Callstack.Hashtbl.to_seq_keys)
+    if Save.get () then
+      try `Value (Initial_State_By_Callstack.find kf
+                  |> Callstack.Hashtbl.to_seq_keys)
       with Not_found -> `Value Seq.empty
     else `Top
 
   let stmt_callstacks stmt =
-    if Storage.get () then
-      try `Value (Table_By_Callstack.find stmt |> Callstack.Hashtbl.to_seq_keys)
+    if Save.get () then
+      try `Value (Before_Stmt_By_Callstack.find stmt
+                  |> Callstack.Hashtbl.to_seq_keys)
       with Not_found -> `Value Seq.empty
     else `Top
 
-  let is_enabled () = Storage.get ()
+  let is_enabled () = Save.get ()
 end
