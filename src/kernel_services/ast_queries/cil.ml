@@ -5952,8 +5952,10 @@ and mkBinOp ?(constfold=false) ~loc op e1 e2 =
 and mkBinOp_exn ?constfold ~loc op e1 e2 =
   match mkBinOp ?constfold ~loc op e1 e2 with
   | Ok e -> e
-  | Error (_, msg) ->
-    Kernel.fatal ~current:true "Cil.mkBinOp: typing expression '%a' failed: %s"
+  | Error (loc, msg) ->
+    let current = Option.is_none loc in
+    let source = Option.map fst loc in
+    Kernel.fatal ~current ?source "Cil.mkBinOp: typing expression '%a' failed: %s"
       !pp_exp_ref (dummy_exp(BinOp(op, e1, e2, Cil_const.intType))) msg
 
 and expression_to_bool e =
