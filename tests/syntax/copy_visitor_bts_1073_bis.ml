@@ -32,6 +32,7 @@ module Visi = struct
   let fun_frees_visible _ _ = true
   let fun_allocates_visible _ _ = true
   let fun_assign_visible _ _ = true
+  let fun_extended_visible _ _ = true
   let fun_deps_visible _ _ = true
   let called_info _ _ = None
   let res_call_visible _ _ = true

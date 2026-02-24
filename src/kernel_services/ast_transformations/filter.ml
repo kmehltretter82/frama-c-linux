@@ -40,8 +40,8 @@ module type RemoveInfo = sig
   val fun_frees_visible : fct -> identified_term -> bool
   val fun_allocates_visible : fct -> identified_term -> bool
   val fun_assign_visible : fct -> from -> bool
-  val fun_extended_visible : fct -> acsl_extension -> bool
   val fun_deps_visible : fct -> identified_term -> bool
+  val fun_extended_visible : fct -> acsl_extension -> bool
 
   val called_info : (proj * fct) -> stmt ->
     (kernel_function * fct) option

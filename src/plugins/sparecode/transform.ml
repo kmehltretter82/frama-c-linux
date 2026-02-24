@@ -63,8 +63,8 @@ module BoolInfo = struct
     try ignore (Visitor.visitFramacTerm (annot_visitor (fm,kf)) t); true
     with M.Invisible -> false
 
-  let pred_visible (fm,kf) t =
-    try ignore (Visitor.visitFramacPredicate (annot_visitor (fm,kf)) t); true
+  let extended_visible (fm,kf) t =
+    try ignore (Visitor.visitFramacExtended (annot_visitor (fm,kf)) t); true
     with M.Invisible -> false
 
   let body_visible _fm = true
@@ -109,17 +109,7 @@ module BoolInfo = struct
        to say assigns \nothing for all functions. *)
     term_visible fm_kf b.it_content
 
-  let rec fun_extended_visible_aux fm_kf ext =
-    match ext.ext_kind with
-    | Ext_id _ -> true
-    | Ext_terms t_list ->
-      List.for_all (term_visible fm_kf) t_list
-    | Ext_preds p_list ->
-      List.for_all (pred_visible fm_kf) p_list
-    | Ext_annot (_, ext_list) ->
-      List.for_all (fun_extended_visible_aux fm_kf) ext_list
-
-  let fun_extended_visible fm_kf ext = fun_extended_visible_aux fm_kf ext
+  let fun_extended_visible = extended_visible
 
   let fun_deps_visible fm_kf t = term_visible fm_kf t.it_content
 

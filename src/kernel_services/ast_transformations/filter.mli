@@ -78,7 +78,6 @@ module type RemoveInfo = sig
       should be erased entirely (i.e. assigns everything. If it were to
       just return false to all elements, this would result in assigns \nothing
   *)
-  val fun_extended_visible : fct -> acsl_extension -> bool
 
   val fun_deps_visible : fct -> identified_term -> bool
   (** true if the corresponding functional dependency is visible. *)
@@ -89,6 +88,9 @@ module type RemoveInfo = sig
       arguments are visible.
       The input [fct] parameter is the one of the caller function.
   *)
+
+  val fun_extended_visible : fct -> acsl_extension -> bool
+
   val called_info : proj * fct -> stmt ->
     (kernel_function * fct) option
 
