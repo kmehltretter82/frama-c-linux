@@ -41,38 +41,6 @@ module Make (Domain: InputDomain) = struct
       let dependencies = [ Self.state ]
     end)
 
-  module type Ref = sig
-    val get : unit -> bool
-    val set : bool -> unit
-  end
-
-  (* Boolean reference saved on the disk. *)
-  module Bool_Ref_State =
-    State_builder.Ref
-      (Datatype.Bool)
-      (struct
-        let dependencies = [ Self.state ]
-        let name = "Eva.Domain_store.Save." ^ Domain.name
-        let default () = false
-      end)
-
-  (* Boolean reference. Not saved on the disk. *)
-  module Bool_Ref = struct
-    let x = ref false
-    let set y = x := y
-    let get () = !x
-  end
-
-  (* A boolean reference indicating whether the states of the domain have been
-     saved. False by default, it becomes true when the engine calls
-     [register_global_state] at the start of the analysis.
-     If the domain is unmarshallable, its states cannot be saved on the
-     disk, and this boolean should not be saved either. *)
-  module Save =
-    (val (if Descr.is_unmarshable Domain.datatype_descr
-          then (module Bool_Ref)
-          else (module Bool_Ref_State)) : Ref)
-
   module Global_State =
     State_builder.Option_ref (Domain) (val info "Global_State")
 
@@ -110,20 +78,18 @@ module Make (Domain: InputDomain) = struct
     (* Check parameters -eva-results and -eva-no-results-domain. *)
     let eva_results = Parameters.ResultsAll.get () in
     let domain_results = not (Parameters.NoResultsDomains.mem Domain.name) in
-    let save = eva_results && domain_results in
-    Save.set save;
-    if save then Global_State.set state
+    if eva_results && domain_results then Global_State.set state
 
   let get_global_state () =
-    if not (Save.get ())
-    then `Value Domain.top
-    else match Global_State.get_option () with
-      | None -> `Bottom
-      | Some state -> `Value state
+    `Value (Global_State.get_option () |> Option.value ~default:Domain.top)
 
+  (* If Global_State is set, the analysis has started and domain states should
+     be registered according to analysis parameters. Otherwise, setters do not
+     register states and getters always return Domain.top.  *)
+  let is_enabled () = Global_State.get_option () |> Option.is_some
 
   let set_initial_state ?callstack kf state =
-    if Save.get () then
+    if is_enabled () then
       match callstack with
       | None -> Initial_State.replace kf state
       | Some callstack ->
@@ -132,7 +98,7 @@ module Make (Domain: InputDomain) = struct
         Callstack.Hashtbl.replace by_callstack callstack state
 
   let get_initial_state ?callstack kf =
-    if Save.get ()
+    if is_enabled ()
     then
       try
         match callstack with
@@ -144,7 +110,7 @@ module Make (Domain: InputDomain) = struct
     else `Value Domain.top
 
   let set_stmt_state ?callstack ~after stmt state =
-    if Save.get () then
+    if is_enabled () then
       match callstack with
       | None ->
         if after
@@ -160,7 +126,7 @@ module Make (Domain: InputDomain) = struct
         Callstack.Hashtbl.replace by_callstack callstack state
 
   let get_stmt_state ?callstack ~after stmt =
-    if Save.get () then
+    if is_enabled () then
       try
         match callstack with
         | None ->
@@ -179,18 +145,16 @@ module Make (Domain: InputDomain) = struct
 
 
   let kf_callstacks kf =
-    if Save.get () then
+    if is_enabled () then
       try `Value (Initial_State_By_Callstack.find kf
                   |> Callstack.Hashtbl.to_seq_keys)
       with Not_found -> `Value Seq.empty
     else `Top
 
   let stmt_callstacks stmt =
-    if Save.get () then
+    if is_enabled () then
       try `Value (Before_Stmt_By_Callstack.find stmt
                   |> Callstack.Hashtbl.to_seq_keys)
       with Not_found -> `Value Seq.empty
     else `Top
-
-  let is_enabled () = Save.get ()
 end
