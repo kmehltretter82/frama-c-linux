@@ -24,20 +24,28 @@ type guard =
   | Initialized of addr
   | Aligned of addr
 
+type condition = {
+  vars : quantifiers ;
+  hyps : predicate list ;
+  guard : guard ;
+}
+
 val pp_addr  : Format.formatter -> addr  -> unit
 val pp_value : Format.formatter -> value -> unit
 val pp_guard : Format.formatter -> guard -> unit
+val pp_condition : Format.formatter -> condition -> unit
 
 val of_value : value -> term
 val of_addr  : ?loc:location -> addr -> term
 val of_guard : ?loc:location -> ?names:string list -> guard -> predicate
+val of_condition : ?loc:location -> ?names:string list -> condition -> predicate
 
 val kind : addr -> Condition.lkind
 val typeof : addr -> typ (* of the pointed l-value *)
 
 type env
 val create : ?stmt:stmt -> map -> env
-val iter : (guard -> valid:bool -> unit) -> env -> unit
+val iter : (condition -> valid:bool -> unit) -> env -> unit
 
 val valid : env -> node -> addr -> unit
 val valid_read : env -> node -> addr -> unit
@@ -56,4 +64,4 @@ val init : env -> init -> unit
 val instr : env -> instr -> unit
 val skind : env -> stmtkind -> unit
 
-val iter_stmt : map -> (guard -> valid:bool -> unit) -> stmt -> unit
+val iter_stmt : map -> (condition -> valid:bool -> unit) -> stmt -> unit

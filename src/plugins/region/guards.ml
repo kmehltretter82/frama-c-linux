@@ -41,6 +41,13 @@ type guard =
   | Aligned of addr
 [@@ deriving ord]
 
+type condition = {
+  vars : (logic_var [@ compare Logic_var.compare]) list ;
+  hyps : (predicate [@ compare Predicate.compare]) list ;
+  guard : guard ;
+}
+[@@ deriving ord]
+
 let pp_guard fmt = function
   | Bounds(k,n) -> Format.fprintf fmt "0<= %a < %a" pp_value k Z.pretty n
   | Non_null a -> Format.fprintf fmt "!(%a)" pp_addr a
@@ -50,13 +57,23 @@ let pp_guard fmt = function
   | Initialized a -> Format.fprintf fmt "\\initialized(%a)" pp_addr a
   | Aligned a -> Format.fprintf fmt "\\aligned(%a)" pp_addr a
 
-module S =
-struct
-  type t = guard
-  let compare = compare_guard
-end
+let pp_condition fmt { vars ; hyps ; guard } =
+  begin
+    Format.fprintf fmt "@[<hov 2>" ;
+    List.iter
+      (fun x -> Format.fprintf fmt "\\forall %a %s;@ "
+          Printer.pp_logic_type x.lv_type x.lv_name)
+      vars ;
+    List.iter
+      (Format.fprintf fmt "%a ==>@ " Printer.pp_predicate) hyps ;
+    Format.fprintf fmt "%a@]" pp_guard guard ;
+  end
 
-module Guards = Map.Make(S)
+module Guards = Map.Make
+    (struct
+      type t = condition
+      let compare = compare_condition
+    end)
 
 let of_value = function
   | T t -> t
@@ -84,6 +101,13 @@ let of_guard ?loc ?names = function
   | Initialized p -> Condition.pinitialized ?loc ?names @@ of_addr ?loc p
   | Aligned p -> Condition.paligned ?loc ?names @@ of_addr ?loc p
 
+let of_condition ?loc ?(names=[]) { vars ; hyps ; guard } =
+  let p = of_guard ?loc guard in
+  let hs = Logic_const.pands hyps in
+  let hp = Logic_const.pimplies ?loc (hs,p) in
+  let fp = Logic_const.pforall ?loc (vars,hp) in
+  Logic_const.prepend_names ~names fp
+
 (* -------------------------------------------------------------------------- *)
 (* ---  Side Conditions Generator                                         --- *)
 (* -------------------------------------------------------------------------- *)
@@ -91,15 +115,32 @@ let of_guard ?loc ?names = function
 type env = {
   map: Memory.map ;
   kinstr: kinstr ;
+  qvars: logic_var Stack.t ;
+  qhyps: predicate Stack.t ;
   mutable guards: bool Guards.t ;
 }
 
 let create ?stmt map =
   let kinstr = match stmt with None -> Kglobal | Some stmt -> Kstmt stmt in
-  { map ; kinstr ; guards = Guards.empty }
+  {
+    map ; kinstr ;
+    qvars = Stack.create () ;
+    qhyps = Stack.create () ;
+    guards = Guards.empty ;
+  }
 
-let add env ?(valid=true) g = env.guards <- Guards.add g valid env.guards
 let iter f env = Guards.iter (fun g valid -> f g ~valid) env.guards
+
+let elements stk =
+  if Stack.is_empty stk then [] else
+    let w = ref [] in
+    Stack.iter (fun x -> w := x :: !w) stk ;
+    List.rev !w
+
+let add env ?(valid=true) guard =
+  let vars = elements env.qvars in
+  let hyps = elements env.qhyps in
+  env.guards <- Guards.add { vars ; hyps ; guard } valid env.guards
 
 let check env g n a = function
   | Condition.Default -> add env g
