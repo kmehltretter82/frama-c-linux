@@ -39,6 +39,9 @@ include Log.Messages
 (** Fclib dkeys *)
 
 val dkey_task: category
+(** @before Frama-C+dev Was in Task library *)
+
+val dkey_hptmap: category
 
 (* Kernel dkeys *)
 

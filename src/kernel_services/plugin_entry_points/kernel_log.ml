@@ -30,6 +30,10 @@ let dkey_task =
   let help = "prints debug information about task executions" in
   register_category ~help "task"
 
+let dkey_hptmap =
+  let help = "prints debug information about Hptmaps" in
+  register_category ~help "hptmap"
+
 (* Kernel dkeys *)
 
 let dkey_acsl_extension =

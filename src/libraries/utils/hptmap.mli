@@ -14,6 +14,11 @@
 (** Efficient maps from hash-consed trees to values, implemented as
     Patricia trees. *)
 
+(** If set to [true], prints debug informations about hptmap.
+    @since Frama-C+dev
+*)
+val set_debug: bool -> unit
+
 (** This implementation of big-endian Patricia trees follows Chris
     Okasaki's paper at the 1998 ML Workshop in Baltimore.  Maps are
     implemented on top of Patricia trees. A tree is big-endian if it

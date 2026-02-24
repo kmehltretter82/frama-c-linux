@@ -32,7 +32,9 @@ include Kernel_log
 
 let set_fclib_debug () =
   let debug_task = is_debug_key_enabled dkey_task in
-  Task.set_debug debug_task
+  Task.set_debug debug_task;
+  let debug_hptmap = is_debug_key_enabled dkey_hptmap in
+  Hptmap.set_debug debug_hptmap
 
 let () = Cmdline.run_after_early_stage set_fclib_debug
 
