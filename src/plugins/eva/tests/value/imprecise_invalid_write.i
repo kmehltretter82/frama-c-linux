@@ -1,3 +1,7 @@
+/* run.config*
+  STDOPT: +"-machdep gcc_x86_32"
+*/
+
 int x;
 
 int main1(int c)

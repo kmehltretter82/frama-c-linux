@@ -5475,6 +5475,65 @@ let areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
     ignore (compatibleTypes ?strictReturnTypes ?context t1 t2); true
   with Cannot_combine _ -> false
 
+(***************** Completeness ******)
+
+(* NB: these functions depend on isZero, hence can't be moved to Ast_types
+   without creating cyclic dependencies or ugly references.
+*)
+
+let rec has_flexible_array_member t =
+  let is_flexible_array t =
+    match Ast_types.unroll_skel t with
+    | TArray (_, None) -> true
+    | TArray (_, Some z) -> Machine.(msvcMode() || gccMode()) && isZero z
+    | _ -> false
+  in
+  match Ast_types.unroll_skel t with
+  | TComp { cfields = Some ((_::_) as l) } ->
+    let last = (List.last l).ftype in
+    is_flexible_array last ||
+    (Machine.(gccMode() || msvcMode()) && has_flexible_array_member last)
+  | _ -> false
+
+(* last_field is [true] if the given type is the type of the last field of
+   a struct (which could be a FAM, making the whole struct complete even if
+   the array type isn't. *)
+let rec isCompleteType ?(allowZeroSizeArrays=Machine.gccMode ())
+    ?(last_field=false) t =
+  match Ast_types.unroll_node t with
+  | TVoid -> false (* void is an incomplete type by definition (6.2.5§19) *)
+  | TArray(t, None) ->
+    last_field && is_complete_agg_member ~allowZeroSizeArrays ~last_field  t
+  | TArray(t, Some z) when isZero z ->
+    allowZeroSizeArrays &&
+    is_complete_agg_member ~allowZeroSizeArrays ~last_field t
+  | TArray(t, Some _) ->
+    is_complete_agg_member ~allowZeroSizeArrays ~last_field t
+  | TComp { cfields = None } -> false
+  | TComp { cstruct ; cfields = Some flds } -> (* Struct or union *)
+    complete_type_fields ~allowZeroSizeArrays cstruct flds
+  | TEnum {eitems = []} -> false
+  | TEnum _ -> true
+  | TInt _ | TFloat _ | TPtr _ | TBuiltin_va_list -> true
+  | TFun _ -> true (* only object types can be incomplete (6.2.5§1) *)
+  | TNamed _ -> assert false (* unroll should have removed it. *)
+
+and complete_type_fields ~allowZeroSizeArrays is_struct fields =
+  let rec aux is_first l =
+    let last_field = is_struct && not is_first in
+    match l with
+    | [] -> true
+    | [ f ] ->
+      is_complete_agg_member ~allowZeroSizeArrays ~last_field f.ftype
+    | f :: tl ->
+      is_complete_agg_member ~allowZeroSizeArrays f.ftype && aux false tl
+  in
+  aux true fields
+
+and is_complete_agg_member ~allowZeroSizeArrays ?last_field t =
+  isCompleteType ~allowZeroSizeArrays ?last_field t &&
+  (allowZeroSizeArrays || not (has_flexible_array_member t))
+
 (******************** CASTING *****)
 
 let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
@@ -5733,96 +5792,93 @@ and mkCast ?(check=true) ?force ~(newt: typ) e =
 
 and mkBinOp ?(constfold=false) ~loc op e1 e2 =
   let open Ast_types in
+  let open Result.Operators in
   let t1 = typeOf e1 in
   let t2 = typeOf e2 in
   let machdep = true in
-  let error msg = Format.kasprintf Result.error msg in
-  let constFoldBinOp bop e1 e2 t =
+  let promote_cast t e =
+    let t' = integralPromotion t in
+    t', mkCastT ~oldt:t ~newt:t' e
+  in
+  let make_expr t e1 e2 =
     if constfold then
-      Ok (constFoldBinOp ~loc machdep bop e1 e2 t)
+      Ok (constFoldBinOp ~loc machdep op e1 e2 t)
     else
-      Ok (new_exp ~loc (BinOp(bop, e1, e2, t)))
+      Ok (new_exp ~loc (BinOp(op, e1, e2, t)))
   in
-  let check_make_expr ?res ~check name =
-    if check t1 && check t2 then
-      let t = arithmeticConversion t1 t2 in
-      let tres = Option.value ~default:t res in
-      constFoldBinOp op
-        (mkCastT ~oldt:t1 ~newt:t e1)
-        (mkCastT ~oldt:t2 ~newt:t e2)
-        tres
-    else
-      error
-        "operator '%a' on %s type(s) '%a' and '%a'"
-        !pp_binop_ref op name !pp_typ_ref t1 !pp_typ_ref t2
+  (* Error handling *)
+  let error ?loc msg =
+    Format.kasprintf (fun str -> Result.error (loc,str)) msg
   in
-  let doArithmetic ?res () =
-    check_make_expr ?res ~check:Ast_types.is_arithmetic "non-arithmetic"
+  let error_one ~loc t reason =
+    error ~loc "operand of operator '%a' with %s type '%a'"
+      !pp_binop_ref op reason !pp_typ_ref t
   in
-  let doIntegralArithmetic () =
-    check_make_expr ~check:Ast_types.is_integral "non-integral"
+  let error_both reason =
+    error "operator '%a' on %s types '%a' and '%a'"
+      !pp_binop_ref op reason !pp_typ_ref t1 !pp_typ_ref t2
+  in
+  let error_any c1 c2 reason =
+    if c1 && c2 then error_both reason
+    else if c1 then error_one ~loc:e1.eloc t1 reason
+    else error_one ~loc:e2.eloc t2 reason
+  in
+  (* checks *)
+  let check_left ~check reason =
+    if check t1 then Ok () else error_one ~loc:e1.eloc t1 reason
+  in
+  let check_right ~check reason =
+    if check t2 then Ok () else error_one ~loc:e2.eloc t2 reason
+  in
+  let check_both ~check reason =
+    let c1 = check t1 and c2 = check t2 in
+    if c1 && c2 then Ok ()
+    else error_any (not c1) (not c2) reason
+  in
+  let check_not_function_ptr ~side_check =
+    (* Cf. GNU C 6.13.2: GCC allows arithmetic on function pointers. Allow
+       pointers arithmetic on Machdeps which define sizeof_fun. *)
+    if Machine.Sizeof.func () > 0 then Ok ()
+    else side_check ~check:is_object_ptr "non-object (function) pointer"
+  in
+  let check_complete_pointed ~side_check =
+    let is_complete t = isCompleteType (direct_pointed_type t) in
+    let check_complete () = side_check ~check:is_complete "incomplete pointer" in
+    (* Cf. 6.13.2: GCC allows arithmetic on void pointers. *)
+    if Machine.gccMode () then
+      match side_check ~check:is_void_ptr "non-void pointer" with
+      | Ok () -> Ok ()
+      | Error _ -> check_complete ()
+    else check_complete ()
+  in
+  let check_pointer_offset () =
+    let* () = check_not_function_ptr ~side_check:check_left in
+    let* () = check_complete_pointed ~side_check:check_left in
+    check_right ~check:is_integral "non-integral"
+  in
+  let arith_conv ~tres =
+    let t = arithmeticConversion t1 t2 in
+    let tres = Option.value ~default:t tres in
+    make_expr tres
+      (mkCastT ~oldt:t1 ~newt:t e1)
+      (mkCastT ~oldt:t2 ~newt:t e2)
+  in
+  let do_arithmetic ~tres =
+    let* () = check_both ~check:is_arithmetic "non-arithmetic" in
+    arith_conv ~tres
+  in
+  let do_integral_arithmetic () =
+    let* () = check_both ~check:is_integral "non-integral" in
+    arith_conv ~tres:None
   in
   let compatible_pointed_types () =
-    let t1p = Ast_types.direct_pointed_type t1
-    and t2p = Ast_types.direct_pointed_type t2 in
+    let t1p = direct_pointed_type t1
+    and t2p = direct_pointed_type t2 in
     areCompatibleTypes
-      (Ast_types.remove_qualifiers_deep t1p)
-      (Ast_types.remove_qualifiers_deep t2p)
+      (remove_qualifiers_deep t1p)
+      (remove_qualifiers_deep t2p)
   in
-  match op with
-  | Mult | Div -> doArithmetic ()
-  | Mod  | BAnd | BOr | BXor -> doIntegralArithmetic ()
-  | LAnd | LOr ->
-    if Ast_types.is_scalar t1 && Ast_types.is_scalar t2 then
-      constFoldBinOp op (expression_to_bool e1) (expression_to_bool e2)
-        Cil_const.intType
-    else
-      error "operator '%a' on non-scalar type(s) '%a' and '%a'"
-        !pp_binop_ref op !pp_typ_ref t1 !pp_typ_ref t2
-  | Shiftlt | Shiftrt -> (* ISO 6.5.7. Only integral promotions. The result
-                          * has the same type as the left hand side *)
-    if Machine.msvcMode () then
-      (* MSVC has a bug. We duplicate it here *)
-      doIntegralArithmetic ()
-    else
-      let t1' = integralPromotion t1 in
-      let t2' = integralPromotion t2 in
-      constFoldBinOp op
-        (mkCastT ~oldt:t1 ~newt:t1' e1)
-        (mkCastT ~oldt:t2 ~newt:t2' e2)
-        t1'
-  | PlusA | MinusA -> doArithmetic ()
-  | PlusPI when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
-    begin match e1.enode with
-      | StartOf lv ->
-        Ok { e1 with enode = AddrOf (addOffsetLval (Index (e2,NoOffset)) lv) }
-      | _ ->
-        constFoldBinOp op e1
-          (mkCastT ~oldt:t2 ~newt:(integralPromotion t2) e2) t1
-    end
-  | MinusPI when is_ptr t1 && is_integral t2 ->
-    constFoldBinOp op e1 (mkCastT ~oldt:t2 ~newt:(integralPromotion t2) e2) t1
-  | MinusPP when is_ptr t1 && is_ptr t2 ->
-    (* ISO C11 6.5.6§3 and 6.5.6§9 : Both types should be compatible and the
-       result is of type ptrdiff_t. *)
-    if compatible_pointed_types () then
-      constFoldBinOp op e1 (mkCastT ~oldt:t2 ~newt:t1 e2)
-        (Machine.ptrdiff_type ())
-    else
-      error "operator '%a' on incompatible pointer types '%a' and '%a'"
-        !pp_binop_ref op !pp_typ_ref t1 !pp_typ_ref t2
-  | Eq | Ne when (is_ptr t1 || is_variadic_list t1) && isZero e2 ->
-    constFoldBinOp op e1 (mkCast ~newt:t1 e2) Cil_const.intType
-  | Eq | Ne when (is_ptr t2 || is_variadic_list t2) && isZero e1 ->
-    constFoldBinOp op (mkCast ~newt:t2 e1) e2 Cil_const.intType
-  | Lt | Le | Ge | Gt
-    when Ast_types.is_fun_ptr t1 || Ast_types.is_fun_ptr t2 ->
-    (* ISO 6.5.8§2: both operands should be pointers to qualified or unqualified
-       versions of compatible object types. *)
-    error "operator '%a' on non-object (function) pointer type(s) '%a' and '%a'"
-      !pp_binop_ref op !pp_typ_ref t1 !pp_typ_ref t2
-  | Eq | Ne | Lt | Le | Ge | Gt
-    when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
+  let do_compare () =
     (* We are more lenient than the ISO C here, if two pointers do not
        point to compatible types, we cast them to a common type. *)
     let e1, e2 =
@@ -5830,7 +5886,7 @@ and mkBinOp ?(constfold=false) ~loc op e1 e2 =
         e1, e2
       else if compatible_pointed_types () then
         e1, mkCastT ~oldt:t2 ~newt:t1 e2
-      else if Ast_types.is_object_ptr t1 && Ast_types.is_object_ptr t2 then
+      else if is_object_ptr t1 && is_object_ptr t2 then
         (* Only object types can safely be casted to void*. *)
         mkCastT ~oldt:t1 ~newt:Cil_const.voidPtrType e1,
         mkCastT ~oldt:t2 ~newt:Cil_const.voidPtrType e2
@@ -5838,17 +5894,68 @@ and mkBinOp ?(constfold=false) ~loc op e1 e2 =
         mkCastT ~oldt:t1 ~newt:(Machine.uintptr_type ()) e1,
         mkCastT ~oldt:t2 ~newt:(Machine.uintptr_type ()) e2
     in
-    constFoldBinOp op e1 e2 Cil_const.intType
-  | Eq | Ne | Lt | Le | Ge | Gt -> doArithmetic ~res:Cil_const.intType ()
-  | _ ->
-    error "unsupported operator '%a' on expression of types '%a' and '%a'"
+    make_expr Cil_const.intType e1 e2
+  in
+  match op with
+  | Mult | Div -> do_arithmetic ~tres:None
+  | Mod  | BAnd | BOr | BXor -> do_integral_arithmetic ()
+  | LAnd | LOr ->
+    let* () = check_both ~check:is_scalar "non-scalar" in
+    make_expr Cil_const.intType
+      (expression_to_bool e1)
+      (expression_to_bool e2)
+  | Shiftlt | Shiftrt -> (* ISO 6.5.7. Only integral promotions. The result
+                          * has the same type as the left hand side *)
+    if Machine.msvcMode () then
+      (* MSVC has a bug. We duplicate it here *)
+      do_integral_arithmetic ()
+    else
+      let* () = check_both ~check:is_integral "non-integral" in
+      let t1', e1' = promote_cast t1 e1
+      and _  , e2' = promote_cast t2 e2 in
+      make_expr t1' e1' e2'
+  | PlusA | MinusA -> do_arithmetic ~tres:None
+  | PlusPI ->
+    let* () = check_pointer_offset () in
+    begin match e1.enode with
+      | StartOf lv ->
+        Ok { e1 with enode = AddrOf (addOffsetLval (Index (e2,NoOffset)) lv) }
+      | _ -> make_expr t1 e1 (snd @@ promote_cast t2 e2)
+    end
+  | MinusPI ->
+    let* () = check_pointer_offset () in
+    make_expr t1 e1 (snd @@ promote_cast t2 e2)
+  | MinusPP ->
+    (* ISO C11 6.5.6§3 and 6.5.6§9 : Both types should be pointers to complete
+       and compatible object types and the result is of type ptrdiff_t. *)
+    let* () = check_not_function_ptr ~side_check:check_both in
+    let* () = check_complete_pointed ~side_check:check_both in
+    if compatible_pointed_types () then
+      make_expr (Machine.ptrdiff_type ()) e1 (mkCastT ~oldt:t2 ~newt:t1 e2)
+    else error_both "incompatible"
+  | Eq | Ne when (is_ptr t1 || is_variadic_list t1) && isZero e2 ->
+    make_expr Cil_const.intType e1 (mkCast ~newt:t1 e2)
+  | Eq | Ne when (is_ptr t2 || is_variadic_list t2) && isZero e1 ->
+    make_expr Cil_const.intType (mkCast ~newt:t2 e1) e2
+  | Lt | Le | Ge | Gt when is_fun_ptr t1 || is_fun_ptr t2 ->
+    (* ISO 6.5.8§2: only pointers to object types are allowed. *)
+    error_any (is_fun_ptr t1) (is_fun_ptr t2) "non-object (function) pointer"
+  | Eq | Ne | Lt | Le | Ge | Gt when is_ptr t1 && is_ptr t2 ->
+    do_compare ()
+  | Eq | Ne | Lt | Le | Ge | Gt when is_arithmetic t1 && is_arithmetic t2 ->
+    arith_conv ~tres:(Some Cil_const.intType)
+  | Eq | Ne | Lt | Le | Ge | Gt ->
+    error "operator '%a' on types '%a' and '%a', both should be either \
+           arithmetic or pointer types"
       !pp_binop_ref op !pp_typ_ref t1 !pp_typ_ref t2
 
 and mkBinOp_exn ?constfold ~loc op e1 e2 =
   match mkBinOp ?constfold ~loc op e1 e2 with
   | Ok e -> e
-  | Error msg ->
-    Kernel.fatal ~current:true "Cil.mkBinOp: typing expression '%a' failed: %s"
+  | Error (loc, msg) ->
+    let current = Option.is_none loc in
+    let source = Option.map fst loc in
+    Kernel.fatal ~current ?source "Cil.mkBinOp: typing expression '%a' failed: %s"
       !pp_exp_ref (dummy_exp(BinOp(op, e1, e2, Cil_const.intType))) msg
 
 and expression_to_bool e =
@@ -6071,59 +6178,6 @@ let foldLeftCompound
       (fun acc (o, i) -> doinit o i (getTypeOffset o) acc) acc initl
 
   | _ -> Kernel.fatal ~current:true "Type of Compound is not array or struct or union"
-
-let rec has_flexible_array_member t =
-  let is_flexible_array t =
-    match Ast_types.unroll_skel t with
-    | TArray (_, None) -> true
-    | TArray (_, Some z) -> Machine.(msvcMode() || gccMode()) && isZero z
-    | _ -> false
-  in
-  match Ast_types.unroll_skel t with
-  | TComp { cfields = Some ((_::_) as l) } ->
-    let last = (List.last l).ftype in
-    is_flexible_array last ||
-    (Machine.(gccMode() || msvcMode()) && has_flexible_array_member last)
-  | _ -> false
-
-(* last_field is [true] if the given type is the type of the last field of
-   a struct (which could be a FAM, making the whole struct complete even if
-   the array type isn't. *)
-let rec isCompleteType ?(allowZeroSizeArrays=Machine.gccMode ())
-    ?(last_field=false) t =
-  match Ast_types.unroll_node t with
-  | TVoid -> false (* void is an incomplete type by definition (6.2.5§19) *)
-  | TArray(t, None) ->
-    last_field && is_complete_agg_member ~allowZeroSizeArrays ~last_field  t
-  | TArray(t, Some z) when isZero z ->
-    allowZeroSizeArrays &&
-    is_complete_agg_member ~allowZeroSizeArrays ~last_field t
-  | TArray(t, Some _) ->
-    is_complete_agg_member ~allowZeroSizeArrays ~last_field t
-  | TComp { cfields = None } -> false
-  | TComp { cstruct ; cfields = Some flds } -> (* Struct or union *)
-    complete_type_fields ~allowZeroSizeArrays cstruct flds
-  | TEnum {eitems = []} -> false
-  | TEnum _ -> true
-  | TInt _ | TFloat _ | TPtr _ | TBuiltin_va_list -> true
-  | TFun _ -> true (* only object types can be incomplete (6.2.5§1) *)
-  | TNamed _ -> assert false (* unroll should have removed it. *)
-
-and complete_type_fields ~allowZeroSizeArrays is_struct fields =
-  let rec aux is_first l =
-    let last_field = is_struct && not is_first in
-    match l with
-    | [] -> true
-    | [ f ] ->
-      is_complete_agg_member ~allowZeroSizeArrays ~last_field f.ftype
-    | f :: tl ->
-      is_complete_agg_member ~allowZeroSizeArrays f.ftype && aux false tl
-  in
-  aux true fields
-
-and is_complete_agg_member ~allowZeroSizeArrays ?last_field t =
-  isCompleteType ~allowZeroSizeArrays ?last_field t &&
-  (allowZeroSizeArrays || not (has_flexible_array_member t))
 
 let pointer_decay t =
   let t' = Ast_types.unroll t in

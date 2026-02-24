@@ -1,6 +1,6 @@
 /* run.config*
-   STDOPT: #"-main main -eva-msg-key pointer-comparison"
-   STDOPT: #"-eva-undefined-pointer-comparison-propagate-all -eva-msg-key pointer-comparison"
+   STDOPT: #"-main main -eva-msg-key pointer-comparison" +"-machdep gcc_x86_32"
+   STDOPT: #"-eva-undefined-pointer-comparison-propagate-all -eva-msg-key pointer-comparison" +"-machdep gcc_x86_32"
 */
 
 int *p,T[10]={0,1,2,3,4,5,6,7,8,9};

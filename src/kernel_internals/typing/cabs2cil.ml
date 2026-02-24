@@ -7576,20 +7576,20 @@ and doBinOp loc (bop: binop) (e1: exp) (e2: exp) =
   let t1 = Cil.typeOf e1
   and t2 = Cil.typeOf e2 in
   let bop, e1, e2 =
+    (* Minimal typing to enforce Cil invariant on Plus and Minus operators :
+       pointers are handled using PlusPI, MinusPI and MinusPP. Except for
+       MinusPP, we do not check the second operand type and rely on Cil.mkBinOp
+       to throw the right error if any. *)
     match bop with
-    | PlusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
-      PlusPI, e1, e2
-    | PlusA when Ast_types.is_ptr t2 && Ast_types.is_integral t1 ->
-      PlusPI, e2, e1
-    | MinusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
-      MinusPI, e1, e2
-    | MinusA when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
-      MinusPP, e1, e2
+    | PlusA when Ast_types.is_ptr t1 -> PlusPI, e1, e2
+    | PlusA when Ast_types.is_ptr t2 -> PlusPI, e2, e1
+    | MinusA when Ast_types.(is_ptr t1 && is_ptr t2) -> MinusPP, e1, e2
+    | MinusA when Ast_types.is_ptr t1 -> MinusPI, e1, e2
     | _ -> bop, e1, e2
   in
   match Cil.mkBinOp ~loc bop e1 e2 with
   | Ok e -> Cil.typeOf e, e
-  | Error msg -> Errorloc.abort_context "%s" msg
+  | Error (loc, msg) -> Errorloc.abort_context ?loc "%s" msg
 
 (* Constant fold a conditional. This is because we want to avoid having
  * conditionals in the initializers. So, we try very hard to avoid creating

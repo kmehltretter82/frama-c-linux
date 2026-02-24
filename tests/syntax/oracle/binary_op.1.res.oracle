@@ -1,10 +1,10 @@
 [kernel] Parsing binary_op.c (with preprocessing)
-[kernel] binary_op.c:17: User Error: 
-  operator '*' on non-arithmetic type(s) 'int' and 'int (*)(void)'
-  15    
-  16    #ifdef MULT
-  17    int w(void) { return 0 * w; }
-                             ^^^^^
-  18    #endif
-  19
+[kernel] binary_op.c:31: User Error: 
+  operand of operator '&' with non-integral type 'double'
+  29    #ifdef BITWISE
+  30    // BITWISE only works on integral types
+  31    int v(void) { return 0 & 0.0; }
+                                 ^^^
+  32    #endif
+  33
 [kernel] Frama-C aborted: invalid user input.
