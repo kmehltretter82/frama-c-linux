@@ -306,9 +306,9 @@ module Make
     Right.overwrite bases ~on:right_on ~by:right_by
 
   module Store = struct
-    let set_global_state b state =
-      Left.Store.set_global_state b (state >>-: fst);
-      Right.Store.set_global_state b (state >>-: snd)
+    let set_global_state (left, right) =
+      Left.Store.set_global_state left;
+      Right.Store.set_global_state right
     let set_initial_state ?callstack kf (left, right) =
       Left.Store.set_initial_state ?callstack kf left;
       Right.Store.set_initial_state ?callstack kf right

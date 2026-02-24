@@ -635,8 +635,8 @@ module Restrict
 
   module Store = struct
 
-    let set_global_state b state =
-      Domain.Store.set_global_state b (state >>-: get_state)
+    let set_global_state state =
+      Domain.Store.set_global_state (get_state state)
     let set_initial_state ?callstack kf s =
       Domain.Store.set_initial_state ?callstack kf (get_state s)
     let set_stmt_state ?callstack ~after stmt s =

@@ -431,7 +431,7 @@ module Make (Engine: Engine_Subset) = struct
     else `Bottom
 
   let print_initial_cvalue_state state =
-    let cvalue_state = Engine.Dom.get_cvalue_or_bottom state in
+    let cvalue_state = Engine.Dom.get_cvalue_or_top state in
     (* Do not show string literal nor variables from libc specifications. *)
     let print_base base =
       try
@@ -446,7 +446,7 @@ module Make (Engine: Engine_Subset) = struct
       "@[  %a@]" Cvalue.Model.pretty cvalue_state
 
   let initial_state_with_formals ?cvalue_state ?arguments ~lib_entry kf =
-    let init_state =
+    let+ init_state =
       match cvalue_state with
       | Some cvalue_state ->
         Self.feedback "Initial state supplied by user";
@@ -458,9 +458,8 @@ module Make (Engine: Engine_Subset) = struct
         Self.feedback ~dkey:Self.dkey_progress "Initial state computed";
         state
     in
-    let b = Parameters.ResultsAll.get () in
-    Domain.Store.register_global_state b init_state;
+    Domain.Store.register_global_state init_state;
     print_initial_cvalue_state init_state;
-    init_state >>-: add_main_formals ?arguments kf
+    add_main_formals ?arguments kf init_state
 
 end

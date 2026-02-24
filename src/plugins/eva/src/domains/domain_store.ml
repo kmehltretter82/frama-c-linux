@@ -18,7 +18,7 @@ end
 module type S = sig
   type t
 
-  val set_global_state: bool -> t or_bottom -> unit
+  val set_global_state: t -> unit
   val set_initial_state: ?callstack:Callstack.t -> kernel_function -> t -> unit
   val set_stmt_state: ?callstack:Callstack.t -> after:bool -> stmt -> t -> unit
 
@@ -137,12 +137,13 @@ module Make (Domain: InputDomain) = struct
       end)
 
 
-  let set_global_state storage state =
+  let set_global_state state =
+    (* Check parameters -eva-results and -eva-no-results-domain. *)
+    let eva_results = Parameters.ResultsAll.get () in
+    let domain_results = not (Parameters.NoResultsDomains.mem Domain.name) in
+    let storage = eva_results && domain_results in
     Storage.set storage;
-    if storage then
-      match state with
-      | `Bottom -> ()
-      | `Value state -> Global_State.set state
+    if storage then Global_State.set state
 
   let get_global_state () =
     if not (Storage.get ())

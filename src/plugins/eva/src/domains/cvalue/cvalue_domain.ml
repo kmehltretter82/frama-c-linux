@@ -388,8 +388,8 @@ module State = struct
   module Store = struct
     (* Do not register the Locals_scoping.clobbered_set part of the state. *)
 
-    let set_global_state b s =
-      Cvalue_results.set_global_state b (Bottom.map fst s)
+    let set_global_state (state, _clob) =
+      Cvalue_results.set_global_state state
     let set_initial_state ?callstack kf (state, _clob) =
       Cvalue_results.set_initial_state ?callstack kf state
     let set_stmt_state ?callstack ~after stmt (state, _clob) =

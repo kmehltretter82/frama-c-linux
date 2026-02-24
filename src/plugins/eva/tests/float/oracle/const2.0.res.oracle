@@ -8,8 +8,6 @@
   non-finite float value. assert \is_finite(1e40f);
 [eva] const2.i:6: Warning: evaluation of initializer '1e40f' failed
 [eva:progress] Initial state computed
-[eva:initial-state] Values of globals at initialization
-  NOT ACCESSIBLE
 [eva] User Error: Eva not started because globals initialization is not computable.
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:

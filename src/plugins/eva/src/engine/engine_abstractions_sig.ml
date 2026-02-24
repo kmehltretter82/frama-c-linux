@@ -33,7 +33,7 @@ module type Domain = sig
   (** Functions used during the analysis to register computed states.
       Built by [Engine.Make]. *)
   module Store : sig
-    val register_global_state: bool -> t Eval.or_bottom -> unit
+    val register_global_state: t -> unit
     val register_initial_state: Callstack.t -> kernel_function -> t -> unit
     val register_stmt_state: Callstack.t -> after:bool -> stmt -> t -> unit
   end

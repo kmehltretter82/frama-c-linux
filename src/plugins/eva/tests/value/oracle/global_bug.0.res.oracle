@@ -5,8 +5,6 @@
   invalid RHS operand for shift. assert 0 ≤ 63 < 32;
 [eva] global_bug.i:8: Warning: evaluation of initializer '99 << 63' failed
 [eva:progress] Initial state computed
-[eva:initial-state] Values of globals at initialization
-  NOT ACCESSIBLE
 [eva] User Error: Eva not started because globals initialization is not computable.
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:

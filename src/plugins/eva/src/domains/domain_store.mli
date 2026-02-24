@@ -23,10 +23,8 @@ module type S = sig
   type t
 
   (** Called once at the analysis beginning for the entry state of the main
-      function. The boolean indicates whether the states of this domain must be
-      saved during the analysis, according to options -eva-no-results. If it is
-      false, all set functions do nothing, and get functions return Top. *)
-  val set_global_state: bool -> t or_bottom -> unit
+      function. *)
+  val set_global_state: t -> unit
 
   val set_initial_state: ?callstack:Callstack.t -> kernel_function -> t -> unit
   val set_stmt_state: ?callstack:Callstack.t -> after:bool -> stmt -> t -> unit

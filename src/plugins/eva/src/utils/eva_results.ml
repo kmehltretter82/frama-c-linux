@@ -159,7 +159,7 @@ let set_results results =
   Parameters.change_correctness ();
   (* Those two functions may clear Self.state. Start by them *)
   (* Initial state *)
-  Cvalue_results.set_global_state true results.initial_state;
+  Lattice_bounds.Bottom.iter Cvalue_results.set_global_state results.initial_state;
   (* Initial args *)
   begin match results.initial_args with
     | None -> use_default_main_args ()
@@ -203,7 +203,5 @@ let set_results results =
     Property_status.emit Eva_utils.emitter ~hyps:[] ip st
   in
   Property.Hashtbl.iter aux_statuses results.statuses;
-  let b = Parameters.ResultsAll.get () in
-  Cvalue_domain.State.Store.set_global_state b
-    (`Value Cvalue_domain.State.top);
+  Cvalue_domain.State.Store.set_global_state Cvalue_domain.State.top;
   Self.ComputationState.set Computed
