@@ -5475,7 +5475,11 @@ let areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
     ignore (compatibleTypes ?strictReturnTypes ?context t1 t2); true
   with Cannot_combine _ -> false
 
-(***************** Completness ******)
+(***************** Completeness ******)
+
+(* NB: these functions depend on isZero, hence can't be moved to Ast_types
+   without creating cyclic dependencies or ugly references.
+*)
 
 let rec has_flexible_array_member t =
   let is_flexible_array t =
