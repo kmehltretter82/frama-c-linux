@@ -1,6 +1,6 @@
 Simple :
-Transition duration : 41 iterations
+Transition duration : 29 iterations
 State space invariant :
-* 0 : [0.571679290339 .. 2.42832070966]
-* 1 : [1.56657413086 .. 3.43342586914]
+* 0 : [0.565477141123 .. 2.43452285888]
+* 1 : [1.56587651862 .. 3.43412348138]
 

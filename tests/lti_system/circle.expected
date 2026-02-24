@@ -1,6 +1,6 @@
 Circle :
-Transition duration : 237 iterations
+Transition duration : 331 iterations
 State space invariant :
-* 0 : [-31.4731675688 .. 31.4731675688]
-* 1 : [-31.4731675688 .. 31.4731675688]
+* 0 : [-31.3852903425 .. 31.3852903425]
+* 1 : [-31.3852903425 .. 31.3852903425]
 
