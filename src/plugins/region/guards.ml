@@ -111,8 +111,8 @@ let check env g n a = function
     | `Non_null -> add env (Non_null a)
 
 let kind = function
-  | LV lv -> Condition.hkind (fst lv)
-  | TLV lv -> Condition.term_hkind (fst lv)
+  | LV lv -> Condition.lkind lv
+  | TLV lv -> Condition.term_lkind lv
 
 let typeof = function
   | LV lv -> Cil.typeOfLval lv
@@ -131,7 +131,7 @@ let valid_read env n a =
   Condition.rvalid ~readonly:true env.kinstr n (kind a)
 
 let valid_region env n a =
-  if not @@ Condition.valid_region (kind a) then add env (Valid_region(n,a))
+  if (kind a).unsafe then add env (Valid_region(n,a))
 
 let initialized env n a =
   check env (Valid_read a) n a @@ Condition.rinitialized n (kind a)

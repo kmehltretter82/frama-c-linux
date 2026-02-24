@@ -39,14 +39,17 @@ val is_valid_region : logic_info -> bool
 
 type lkind = {
   host : varinfo option ;
-  casted : bool ;
-  shifted : bool ;
+  unsafe : bool ; (* cast or pointer arithmetics or unbounded array-index *)
 }
 
-val lkind : exp -> lkind
+val kind : exp -> lkind
+val lkind : lval -> lkind
 val hkind : lhost -> lkind
-val term_lkind : term -> lkind
+val safe_offset : typ -> offset -> bool
+val term_kind : term -> lkind
 val term_hkind : term_lhost -> lkind
+val term_lkind : term_lval -> lkind
+val safe_term_offset : logic_type -> term_offset -> bool
 val default_kind : lkind
 
 type residual =
@@ -54,7 +57,6 @@ type residual =
   | Residual of { validregion : bool ; condition : condition }
 and condition = [ `True | `False | `Non_null ]
 
-val valid_region : lkind -> bool
 val rvalid : readonly:bool -> kinstr -> Memory.node -> lkind -> residual
 val rinitialized : Memory.node -> lkind -> residual
 val raligned : Memory.node -> lkind -> bits:int -> residual
