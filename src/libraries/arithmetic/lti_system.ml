@@ -108,15 +108,16 @@ module Make (K : Field.S) = struct
    * - The infinite sum is then divided in two: a finite sum of the {m q}
    *   first elements and the infinite remaining sum. Indeed, as {m q} grows,
    *   the finite sum becomes a better and better underapproximation of the
-   *   limit radius, and the infinite remainder becomes smaller and smaller.
+   *   limit radius, and the infinite remainder tends toward zero (but in a
+   *   potentially non monotonous way).
    * - The infinite remainder is approximated by the computation
    *   {m (I - |A^q|)^(-1) |A^q| (∑ |A^t B| |R|)}.
    * - The radius of the returned overapproximated box is computed as the
    *   finite sum inflated by a factor of {m 1 / completion_target} and is
    *   considered a valid overapproximation if and only if using the remainder
    *   overapproximation would actually be better. It is done that way to
-   *   avoid local minimums that are to precise to actually find an unrolling
-   *   stop point later on. *)
+   *   avoid local minimums coming from the non-monotony and that are to
+   *   precise to actually find an unrolling stop point later on. *)
   let limit_behavior s ({ n ; _ } as knowledge) completion_target iterations =
     let inflation = K.(one / of_float completion_target) in
     let center_limit = compute_center_limit s knowledge in
