@@ -35,8 +35,6 @@ val of_guard : ?loc:location -> ?names:string list -> guard -> predicate
 val kind : addr -> Condition.lkind
 val typeof : addr -> typ (* of the pointed l-value *)
 
-module Guards : Map.S with type key = guard
-
 type env
 val create : ?stmt:stmt -> map -> env
 val iter : (guard -> valid:bool -> unit) -> env -> unit

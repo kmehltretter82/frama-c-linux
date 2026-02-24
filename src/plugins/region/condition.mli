@@ -6,11 +6,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
-(* --- Side Condition Helpers                                             --- *)
-(* -------------------------------------------------------------------------- *)
-
 open Cil_types
+
+(* -------------------------------------------------------------------------- *)
+(** {2 Logic Helpers} *)
+(* -------------------------------------------------------------------------- *)
 
 val addrof : ?loc:location -> lval -> term
 val taddrof : ?loc:location -> term_lval -> term
@@ -37,6 +37,10 @@ val paligned :
 
 val is_valid_region : logic_info -> bool
 
+(* -------------------------------------------------------------------------- *)
+(** {2 Kind of L-Values and Pointers} *)
+(* -------------------------------------------------------------------------- *)
+
 type lkind = {
   host : varinfo option ;
   unsafe : bool ; (* cast or pointer arithmetics or unbounded array-index *)
@@ -52,6 +56,18 @@ val term_lkind : term_lval -> lkind
 val safe_term_offset : logic_type -> term_offset -> bool
 val default_kind : lkind
 
+(* -------------------------------------------------------------------------- *)
+(** {2 Residual Conditions} *)
+(* -------------------------------------------------------------------------- *)
+
+(** The residual conditions are computed by assuming that all inner
+    sub-expresisions or l-values are correct.
+
+    If a residual condition flag [validregion] is set, the original l-value
+    shall be checked to be a valid path in the memory map.
+    Otherwize, the residual condition is always applicable.
+*)
+
 type residual =
   | Default
   | Residual of { validregion : bool ; condition : condition }
@@ -60,3 +76,5 @@ and condition = [ `True | `False | `Non_null ]
 val rvalid : readonly:bool -> kinstr -> Memory.node -> lkind -> residual
 val rinitialized : Memory.node -> lkind -> residual
 val raligned : Memory.node -> lkind -> bits:int -> residual
+
+(* -------------------------------------------------------------------------- *)
