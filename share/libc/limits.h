@@ -290,6 +290,7 @@
 #ifndef LINE_MAX
 #define LINE_MAX _POSIX2_LINE_MAX
 #endif
+// Note: use of _POSIX_ and not _POSIX2_ below is not a typo, it's by design
 #ifndef NGROUPS_MAX
 #define NGROUPS_MAX _POSIX_NGROUPS_MAX
 #endif
