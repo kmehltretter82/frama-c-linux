@@ -6,17 +6,10 @@
 ;;                                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; automatic versioning from opam file
-(rule
- (targets version.ml)
- (deps frama-c-lint.opam)
- (action (system "grep ^version frama-c-lint.opam | sed -e 's/version:/let version=/' > version.ml"))
- )
-
 (executable
  (public_name frama-c-lint)
  (name lint)
- (modules lint version UTF8)
+ (modules lint UTF8)
  (preprocess (pps ppx_deriving_yojson))
  (libraries unix yojson ocp-indent.lexer ocp-indent.lib ocp-indent.dynlink)
 )
