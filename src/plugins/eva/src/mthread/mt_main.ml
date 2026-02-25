@@ -59,6 +59,9 @@ let unregister_hooks () =
 
 
 let checks () =
+  Mt_self.warning
+    "Mthread is an experimental plugin and is still in development.";
+
   Mt_lib.check_mthread_library ();
 
   if not (Mt_options.ConcatDotFilesTo.is_empty ()) &&
@@ -67,11 +70,7 @@ let checks () =
       Mt_options.ConcatDotFilesTo.option_name
       Mt_options.ExtractModels.option_name
 
-let pre_analysis () =
-  checks ();
-
-  Mt_self.feedback "******* Starting mthread";
-
+let make_analysis_state () =
   (* We create the record containing the state of the analysis (which must
      remain unique, as it is used to define the callback for the value
      analysis.)

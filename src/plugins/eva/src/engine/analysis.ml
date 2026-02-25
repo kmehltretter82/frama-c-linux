@@ -300,10 +300,11 @@ let mthread_fixpoint engine analysis =
 
 (* Perform an entire mthread execution on the current project *)
 let mthread_compute () =
-  Mt_self.warning
-    "Mthread is an experimental plugin and is still in development.";
+  Mt_main.checks ();
 
-  let analysis = Mt_main.pre_analysis () in
+  Mt_self.feedback "******* Starting mthread";
+
+  let analysis = Mt_main.make_analysis_state () in
 
   (* We register our callback function *)
   Mt_main.register_hooks analysis;
