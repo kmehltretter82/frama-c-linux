@@ -6,7 +6,7 @@ messages, such as '-- Configuring done (0.1s)'
   $ rm mopsa.db # remove CMake test files, e.g. CMakeFiles/CMakeScratch/TryCompile...
   $ mopsa-build make >make2.out 2>make2.err
   $ mopsa-db -json > mopsa-db.json
-  $ frama-c -mopsa-db mopsa-db.json
+  $ frama-c -no-autoload-plugins -mopsa-db mopsa-db.json
   [kernel] targets:
     [library   ] library/libpolarssl.a
     [executable] programs/aes/aescrypt2
@@ -43,7 +43,7 @@ messages, such as '-- Configuring done (0.1s)'
     [executable] programs/x509/cert_app
     [executable] programs/x509/crl_app
   $ cd ..
-  $ frama-c -mopsa-db build -mopsa-target library/libpolarssl.a
+  $ frama-c -no-autoload-plugins -mopsa-db build -mopsa-target library/libpolarssl.a
   [kernel] Parsing library/aes.c (with preprocessing)
   [kernel] Parsing library/arc4.c (with preprocessing)
   [kernel] Parsing library/asn1parse.c (with preprocessing)

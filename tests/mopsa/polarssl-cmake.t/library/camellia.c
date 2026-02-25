@@ -270,12 +270,10 @@ static const signed char transposes[2][20] =
     TK[2] = KC[(OFFSET) * 4 + 2];                           \
     TK[3] = KC[(OFFSET) * 4 + 3];                           \
                                                             \
-    /*@ loop unroll 4; */                                   \
     for ( i = 1; i <= 4; i++ )                              \
         if (shifts[(INDEX)][(OFFSET)][i -1])                \
             ROTL(TK + i * 4, TK, (15 * i) % 32);            \
                                                             \
-    /*@ loop unroll 20; */                                  \
     for ( i = 0; i < 20; i++ )                              \
         if (indexes[(INDEX)][(OFFSET)][i] != -1) {          \
         RK[indexes[(INDEX)][(OFFSET)][i]] = TK[ i ];        \
@@ -338,12 +336,10 @@ int camellia_setkey_enc( camellia_context *ctx, const unsigned char *key, unsign
         default : return( POLARSSL_ERR_CAMELLIA_INVALID_KEY_LENGTH );
     }
 
-    //@ loop unroll 32;
     for( i = 0; i < keysize / 8; ++i)
         t[i] = key[i];
 
     if (keysize == 192) {
-      //@ loop unroll 8;
         for (i = 0; i < 8; i++)
             t[24 + i] = ~t[16 + i];
     }
@@ -351,7 +347,6 @@ int camellia_setkey_enc( camellia_context *ctx, const unsigned char *key, unsign
     /*
      * Prepare SIGMA values
      */
-    //@ loop unroll 6;
     for (i = 0; i < 6; i++) {
         GET_ULONG_BE(SIGMA[i][0], SIGMA_CHARS[i], 0);
         GET_ULONG_BE(SIGMA[i][1], SIGMA_CHARS[i], 4);
@@ -364,19 +359,16 @@ int camellia_setkey_enc( camellia_context *ctx, const unsigned char *key, unsign
     memset(KC, 0, sizeof(KC));
 
     /* Store KL, KR */
-    //@ loop unroll 8;
     for (i = 0; i < 8; i++)
         GET_ULONG_BE(KC[i], t, i * 4);
 
     /* Generate KA */
-    //@ loop unroll 4;
     for( i = 0; i < 4; ++i)
         KC[8 + i] = KC[i] ^ KC[4 + i];
 
     camellia_feistel(KC + 8, SIGMA[0], KC + 10);
     camellia_feistel(KC + 10, SIGMA[1], KC + 8);
 
-    //@ loop unroll 4;
     for( i = 0; i < 4; ++i)
         KC[8 + i] ^= KC[i];
 
@@ -385,7 +377,6 @@ int camellia_setkey_enc( camellia_context *ctx, const unsigned char *key, unsign
 
     if (keysize > 128) {
         /* Generate KB */
-      //@ loop unroll 4;
         for( i = 0; i < 4; ++i)
             KC[12 + i] = KC[4 + i] ^ KC[8 + i];
 
@@ -414,7 +405,6 @@ int camellia_setkey_enc( camellia_context *ctx, const unsigned char *key, unsign
     }
 
     /* Do transpositions */
-    //@ loop unroll 20;
     for ( i = 0; i < 20; i++ ) {
         if (transposes[idx][i] != -1) {
             RK[32 + 12 * idx + i] = RK[transposes[idx][i]];
@@ -458,7 +448,6 @@ int camellia_setkey_dec( camellia_context *ctx, const unsigned char *key, unsign
     *RK++ = *SK++;
 
 
-    //@ loop unroll 30;
     for (i = 22 + 8 * idx, SK -= 6; i > 0; i--, SK -= 4)
     {
         *RK++ = *SK++;
