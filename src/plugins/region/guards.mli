@@ -13,7 +13,7 @@
 open Memory
 open Cil_types
 
-type addr = LV of lval | TLV of term_lval
+type addr = LV of lval | TLV of term_lval | ADDR of term
 type value = E of exp | T of term
 type guard =
   | Bounds of value * Z.t
@@ -55,13 +55,16 @@ val aligned : env -> node -> addr -> unit
 val readable : env -> node -> addr -> unit
 val writable : env -> node -> addr -> unit
 
-val glval : env -> lval -> typ * node
-val geval : env -> exp -> unit
-val gaddr : env -> exp -> node
-val gexp : env -> exp -> node option
+val lval : env -> lval -> typ * node
+val eval : env -> exp -> unit
+val addr : env -> exp -> node
+val exp : env -> exp -> node option
 val write : env -> lval -> unit
 val init : env -> init -> unit
 val instr : env -> instr -> unit
-val skind : env -> stmtkind -> unit
+val stmtkind : env -> stmtkind -> unit
+
+val term : env -> term -> domain
+val pred : env -> predicate -> unit
 
 val iter_stmt : map -> (condition -> valid:bool -> unit) -> stmt -> unit

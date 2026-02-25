@@ -14,13 +14,14 @@ open Cil_datatype
 (* -------------------------------------------------------------------------- *)
 
 type value =
-  | E of (exp [@ compare Exp.compare ])
-  | T of (term [@ compare Term.compare ])
+  | E of Exp.t
+  | T of Term.t
 [@@ deriving ord]
 
 type addr =
-  | LV of (lval [@ compare Lval.compare ])
-  | TLV of (term_lval [@ compare Term_lval.compare ])
+  | LV of Lval.t
+  | TLV of Term_lval.t
+  | ADDR of Term.t
 [@@ deriving ord]
 
 let pp_value fmt = function
@@ -30,6 +31,7 @@ let pp_value fmt = function
 let pp_addr fmt = function
   | LV lv -> Format.fprintf fmt "« %a »" Printer.pp_lval lv
   | TLV lv -> Printer.pp_term_lval fmt lv
+  | ADDR p -> Format.fprintf fmt "*(%a)" Printer.pp_term p
 
 type guard =
   | Bounds of value * Z.t
@@ -42,8 +44,8 @@ type guard =
 [@@ deriving ord]
 
 type condition = {
-  vars : (logic_var [@ compare Logic_var.compare]) list ;
-  hyps : (predicate [@ compare Predicate.compare]) list ;
+  vars : Logic_var.t list ;
+  hyps : Predicate.t list ;
   guard : guard ;
 }
 [@@ deriving ord]
@@ -82,6 +84,7 @@ let of_value = function
 let of_addr ?loc = function
   | LV lval -> Condition.addrof ?loc lval
   | TLV lval -> Condition.taddrof ?loc lval
+  | ADDR ptr -> ptr
 
 let of_guard ?loc ?names = function
   | Bounds(k,n) ->
@@ -114,33 +117,33 @@ let of_condition ?loc ?(names=[]) { vars ; hyps ; guard } =
 
 type env = {
   map: Memory.map ;
-  kinstr: kinstr ;
-  qvars: logic_var Stack.t ;
-  qhyps: predicate Stack.t ;
+  mutable here: kinstr ;
+  mutable vars: quantifiers ;
+  mutable rhyps: predicate list ; (* in reverse order, accumulated *)
+  mutable mhyps: predicate list ; (* in direct order, memoized *)
   mutable guards: bool Guards.t ;
 }
 
 let create ?stmt map =
-  let kinstr = match stmt with None -> Kglobal | Some stmt -> Kstmt stmt in
+  let here = match stmt with None -> Kglobal | Some stmt -> Kstmt stmt in
   {
-    map ; kinstr ;
-    qvars = Stack.create () ;
-    qhyps = Stack.create () ;
+    map ; here ;
+    vars = [] ;
+    rhyps = [] ;
+    mhyps = [] ;
     guards = Guards.empty ;
   }
 
 let iter f env = Guards.iter (fun g valid -> f g ~valid) env.guards
 
-let elements stk =
-  if Stack.is_empty stk then [] else
-    let w = ref [] in
-    Stack.iter (fun x -> w := x :: !w) stk ;
-    List.rev !w
-
 let add env ?(valid=true) guard =
-  let vars = elements env.qvars in
-  let hyps = elements env.qhyps in
-  env.guards <- Guards.add { vars ; hyps ; guard } valid env.guards
+  let vars = env.vars in
+  let hyps =
+    let rhs = env.rhyps in
+    if rhs = [] then [] else
+      let hs = env.mhyps in
+      if hs <> [] then hs else (env.mhyps <- rhs ; rhs)
+  in env.guards <- Guards.add { vars ; hyps ; guard } valid env.guards
 
 let check env g n a = function
   | Condition.Default -> add env g
@@ -154,10 +157,12 @@ let check env g n a = function
 let kind = function
   | LV lv -> Condition.lkind lv
   | TLV lv -> Condition.term_lkind lv
+  | ADDR p -> Condition.term_kind p
 
 let typeof = function
   | LV lv -> Cil.typeOfLval lv
   | TLV lv -> Logic_utils.logicCType @@ Cil.typeOfTermLval lv
+  | ADDR p -> Logic_typing.ctype_of_pointed p.term_type
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Valid Conditions                                                  --- *)
@@ -165,11 +170,11 @@ let typeof = function
 
 let valid env n a =
   check env (Valid a) n a @@
-  Condition.rvalid ~readonly:false env.kinstr n (kind a)
+  Condition.rvalid ~readonly:false env.here n (kind a)
 
 let valid_read env n a =
   check env (Valid_read a) n a @@
-  Condition.rvalid ~readonly:true env.kinstr n (kind a)
+  Condition.rvalid ~readonly:true env.here n (kind a)
 
 let valid_region env n a =
   if (kind a).unsafe then add env (Valid_region(n,a))
@@ -201,19 +206,19 @@ let writable env n a =
 (* ---  Lval/Exp Side Conditions                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rec glval env (h,o) =
-  let t,r = ghost env h in
-  goffset env t r o
+let rec lval env (h,o) =
+  let t,r = lhost env h in
+  offset env t r o
 
-and ghost env = function
+and lhost env = function
   | Var v -> v.vtype, Memory.cvar env.map v
-  | Mem e -> Cil.typeOf e, gaddr env e
+  | Mem e -> Ast_types.direct_pointed_type @@ Cil.typeOf e, addr env e
 
-and goffset env t r = function
+and offset env t r = function
   | NoOffset -> t,r
-  | Field(fd,o) -> goffset env fd.ftype (Memory.field r fd) o
+  | Field(fd,o) -> offset env fd.ftype (Memory.field r fd) o
   | Index(k,o) ->
-    geval env k ;
+    eval env k ;
     let te = Ast_types.direct_element_type t in
     let r = Memory.index r te in
     begin
@@ -221,65 +226,249 @@ and goffset env t r = function
         let n = Ast_info.direct_array_size t in
         add env (Bounds(E k,n))
     end ;
-    goffset env te r o
+    offset env te r o
 
-and gaddr env e = Option.get @@ gexp env e
-and geval env e = ignore @@ gexp env e
-and gexp env e =
+and addr env e = Option.get @@ exp env e
+and eval env e = ignore @@ exp env e
+and exp env e =
   match e.enode with
   | AddrOf lv | StartOf lv ->
-    let _,r = glval env lv in Some r
+    let _,r = lval env lv in Some r
   | Lval lv ->
-    let _,r = glval env lv in
+    let _,r = lval env lv in
     readable env r (LV lv) ;
     Memory.points_to r
-  | CastE(_,e) -> gexp env e
+  | CastE(t,_) when Ast_types.is_fun_or_ptr t ->
+    Options.not_yet_implemented ~source:(fst e.eloc) "Guards for pointer casts"
+  | CastE(_,e) -> exp env e
   | BinOp((PlusPI|MinusPI),p,k,_) ->
-    let r = gexp env p in
-    geval env k ; r
+    let r = exp env p in
+    eval env k ; r
   | BinOp(_,a,b,_) ->
-    geval env a ;
-    geval env b ;
+    eval env a ;
+    eval env b ;
     None
-  | UnOp(_,e,_) -> geval env e ; None
+  | UnOp(_,e,_) -> eval env e ; None
   | Const _ | SizeOf _ | SizeOfE _ | AlignOf (_, _) | AlignOfE (_, _) -> None
 
 let write env lv =
-  let _,r = glval env lv in writable env r (LV lv)
+  let _,r = lval env lv in writable env r (LV lv)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Code Side Conditions                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
 let rec init env = function
-  | SingleInit e -> geval env e
+  | SingleInit e -> eval env e
   | CompoundInit(_,ofs) -> List.iter (fun (_,i) -> init env i) ofs
 
 let instr env = function
   | Set(lv,e,_) ->
-    geval env e ; write env lv
+    (* TODO: FIXME: writen pointer need to be aligned + object_pointer *)
+    (* TODO: FIXME: writen function need to be valid_function  *)
+    eval env e ; write env lv
   | Call(r,f,es,_) ->
-    ignore (ghost env f) ;
-    List.iter (geval env) es ;
+    ignore (lhost env f) ;
+    List.iter (eval env) es ;
     Option.iter (write env) r
   | Local_init(_,AssignInit i,_) -> init env i
-  | Local_init(_,ConsInit(_,es,_),_) -> List.iter (geval env) es
+  | Local_init(_,ConsInit(_,es,_),_) -> List.iter (eval env) es
   | Asm _ | Skip _ | Code_annot _ -> ()
 
-let rec skind env = function
+let rec stmtkind env = function
   | Instr i -> instr env i
-  | Return(r,_) -> Option.iter (geval env) r
-  | If(e,_,_,_) | Switch(e,_,_,_)| Throw (Some(e,_),_) -> geval env e
+  | Return(r,_) -> Option.iter (eval env) r
+  | If(e,_,_,_) | Switch(e,_,_,_)| Throw (Some(e,_),_) -> eval env e
   | Goto _ | Break _ | Continue _ | Loop _ | Block _
   | Throw(None,_) | TryCatch _ | TryFinally _ -> ()
-  | TryExcept(_,(ks,e),_,_) -> List.iter (instr env) ks ; geval env e
+  | TryExcept(_,(ks,e),_,_) -> List.iter (instr env) ks ; eval env e
   | UnspecifiedSequence us ->
     let b = Cil.block_from_unspecified_sequence us in
-    List.iter (fun s -> skind env s.skind) b.bstmts
+    List.iter (fun s -> stmtkind env s.skind) b.bstmts
+
+(* -------------------------------------------------------------------------- *)
+(* --- Logic Labels                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+let locate env = function
+  | StmtLabel sr -> Kstmt !sr
+  | FormalLabel _ -> Kglobal
+  | BuiltinLabel Here -> env.here
+  | BuiltinLabel (Pre|Old|Post|Init) -> Kglobal
+  | BuiltinLabel (LoopEntry|LoopCurrent) ->
+    match env.here with
+    | Kglobal -> Kglobal
+    | Kstmt stmt ->
+      try
+        let kf = Kernel_function.find_englobing_kf stmt in
+        Kstmt (Kernel_function.find_enclosing_loop kf stmt)
+      with Not_found -> Kglobal
+
+let at env lbl job prm =
+  let here = env.here in
+  let r = env.here <- locate env lbl ; job prm in env.here <- here ; r
+
+let forall env xs job prm =
+  let vars = env.vars in
+  let r = env.vars <- vars @ xs ; job prm in env.vars <- vars ; r
+
+let assume env h job prm =
+  let rhs = env.rhyps in
+  let mhs = env.mhyps in
+  let r = env.rhyps <- h :: rhs ; env.mhyps <- [] ; job prm in
+  env.rhyps <- rhs ; env.mhyps <- mhs ; r
+
+(* -------------------------------------------------------------------------- *)
+(* --- Logic Annotations                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+type lvalue = LOC of Memory.node | VAL of Memory.domain
+
+let rec term_lval env (h,o) : lvalue =
+  match h with
+  | TVar { lv_origin = Some v } ->
+    term_coffset env v.vtype (Memory.cvar env.map v) o
+  | TResult tr ->
+    term_coffset env tr (Option.get @@ Memory.result env.map) o
+  | TMem p ->
+    let r = term_addr env p in
+    let t = Logic_typing.ctype_of_pointed p.term_type in
+    term_coffset env t r o
+  | TVar v ->
+    term_loffset env (Memory.lvar env.map v) o
+
+and term_loffset env d = function
+  | TNoOffset -> VAL d
+  | TField(fd,o) -> term_loffset env (Domain.get_field min d fd) o
+  | TIndex(k,o) -> term_eval env k ; term_loffset env (Domain.get_index min d) o
+  | TModel _-> Options.not_yet_implemented "Model fields"
+
+and term_coffset env t r = function
+  | TNoOffset -> LOC r
+  | TField(fd,o) -> term_coffset env fd.ftype (Memory.field r fd) o
+  | TIndex(k,o) ->
+    term_eval env k ;
+    let te = Ast_types.direct_element_type t in
+    let r = Memory.index r te in
+    begin
+      if Kernel.SafeArrays.get () then
+        let n = Ast_info.direct_array_size t in
+        add env (Bounds(T k,n))
+    end ;
+    term_coffset env te r o
+  | TModel _ -> Options.not_yet_implemented "Model fields"
+
+and term_eval env t = ignore @@ term env t
+and term_addr env t = Option.get @@ Domain.pointed min @@ term env t
+
+and term env t =
+  match t.term_node with
+  | TLval lv ->
+    begin
+      match term_lval env lv with
+      | VAL d -> d
+      | LOC r -> readable env r (TLV lv) ; Domain.scalar @@ Memory.points_to r
+    end
+  | TAddrOf lv | TStartOf lv ->
+    begin
+      match term_lval env lv with
+      | VAL _ -> assert false
+      | LOC r -> valid_region env r (TLV lv) ; Domain.ptr r
+    end
+  | TBinOp((PlusPI|MinusPI),p,k) ->
+    let r = term env p in
+    term_eval env k ; r
+  | TBinOp(_,a,b) -> term_eval env a ; term_eval env b ; Domain.pure
+  | Trange(a,b) ->
+    Option.iter (term_eval env) a ;
+    Option.iter (term_eval env) b ;
+    Domain.pure
+  | Tapp(f,_,ts) ->
+    List.iter (term_eval env) ts ; Memory.logic env.map f
+  | TCast(_,lt,_) when Ast_types.is_logic_fun_or_ptr lt ->
+    Options.not_yet_implemented ~source:(fst t.term_loc) "Guards for pointer casts"
+  | TCast(_,_,a) | TUnOp(_,a) -> term env a
+  | Tnull | Tempty_set
+  | TAlignOf _ | TAlignOfE _ | TSizeOf _ | TSizeOfE _
+  | Ttype _ | Ttypeof _
+  | TConst _ -> Domain.pure
+  | Tif(c,p,q) ->
+    term_eval env c ;
+    let loc = c.term_loc in
+    let pos = Logic_const.pif ~loc Logic_const.(c,ptrue,pfalse) in
+    let neg = Logic_const.pif ~loc Logic_const.(c,pfalse,ptrue) in
+    let dp = assume env pos (term env) p in
+    let dq = assume env neg (term env) q in
+    Domain.merge min dp dq
+  | Tat(a,l) -> at env l (term env) a
+  | Tcomprehension(t,xs,p) ->
+    forall env xs
+      (match p with
+       | None -> term env
+       | Some p -> assume env p (term env)
+      ) t
+  | Tunion ts | Tinter ts ->
+    List.fold_left
+      (fun w t -> Domain.merge min w @@ term env t)
+      Domain.pure ts
+  | Tbase_addr(_,t) | Toffset(_,t) | Tblock_length(_,t) ->
+    term_eval env t ; Domain.pure
+  | Tlambda(xs,t) -> forall env xs (term env) t
+  | _ -> assert false
+
+let rec pred env p =
+  match p.pred_content with
+  | Ptrue | Pfalse -> ()
+  | Pnot p | Plet(_,p) -> pred env p
+  | Pand(p,q) | Pimplies(p,q) -> pred env p ; assume env p (pred env) q
+  | Por(p,q) -> pred env p ; assume env (Logic_const.pnot p) (pred env) q
+  | Pxor(p,q) | Piff(p,q) -> pred env p ; pred env q
+  | Pif(c,p,q) ->
+    term_eval env c ;
+    let loc = c.term_loc in
+    let pos = Logic_const.pif ~loc Logic_const.(c,ptrue,pfalse) in
+    let neg = Logic_const.pif ~loc Logic_const.(c,pfalse,ptrue) in
+    assume env pos (pred env) p ;
+    assume env neg (pred env) q ;
+  | Pforall(xs,p) | Pexists(xs,p) -> forall env xs (pred env) p
+  | Prel(_,a,b) -> term_eval env a ; term_eval env b
+  | Pfresh(_,_,a,b) -> term_eval env a ; term_eval env b
+  | Pfreeable(_,p) | Pallocable(_,p)
+  | Pvalid_function p | Pobject_pointer(_,p)
+  | Pdangling(_,p)
+    -> term_eval env p
+  | Pvalid(l,p) ->
+    residual env (Condition.rvalid ~readonly:false (locate env l)) p
+  | Pvalid_read(l,p) ->
+    residual env (Condition.rvalid ~readonly:true (locate env l)) p
+  | Pinitialized(_,p) ->
+    residual env Condition.rinitialized p
+  | Paligned(p,s) ->
+    begin
+      match Ast_info.possible_value_of_integral_term s with
+      | Some n when Z.fits_int n ->
+        let bits = Z.to_int n * 8 in
+        residual env (Condition.raligned ~bits) p
+      | _ -> term_eval env p ; term_eval env s
+    end
+  | Papp(_,_,ts) | Pseparated ts -> List.iter (term_eval env) ts
+  | Pat(p,l) -> at env l (pred env) p
+
+and residual env f p =
+  let r = term_addr env p in
+  let kd = Condition.term_kind p in
+  match f r kd with
+  | Condition.Default -> ()
+  | Residual { validregion } ->
+    if validregion then valid_region env r (ADDR p)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Statement Annotations                                              --- *)
+(* -------------------------------------------------------------------------- *)
 
 let iter_stmt map f stmt =
   let env = create ~stmt map in
-  skind env stmt.skind ;
+  stmtkind env stmt.skind ;
   iter f env
 
 (* -------------------------------------------------------------------------- *)
