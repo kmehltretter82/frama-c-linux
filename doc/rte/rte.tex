@@ -1055,6 +1055,8 @@ Combined with the following Kernel options:
      the \framac{} user manual~\cite{userman}.}
 \item[{\tt -warn-unaligned-pointer} (boolean, defaults to true)] \ \smallskip \\
      Generate annotations for unaligned pointers.
+\item[{\tt -safe-arrays} (boolean, defaults to true, opposite option is {\tt -unsafe-arrays})] \ \smallskip \\
+     Generate annotations for index-out-of bounds of arrays inside structs.
 \end{description}
 
 Pretty-printing the output of \rte{} and relaunching the plug-in on the
