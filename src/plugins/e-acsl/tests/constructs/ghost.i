@@ -7,6 +7,10 @@
 
 // /*@ ghost int foo(int *x) { return *x + 1; } */
 
+/*@ ghost
+\ghost int* ghost_int_arr[] = {} ;
+*/
+
 int main(void) {
   /*@ ghost P = &G; */;
   /*@ assert \valid(P); @*/
@@ -23,4 +27,5 @@ int main(void) {
     G++ ;
     G++ ;
   }*/
+  //@ assert \let x = ghost_int_arr[0]; \true;
 }
