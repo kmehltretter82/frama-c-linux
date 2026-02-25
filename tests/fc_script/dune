@@ -28,7 +28,10 @@
   (deps
     (package frama-c-eva)
     (package frama-c-inout)
+    (package frama-c-metrics)
     (package frama-c-nonterm)
+    (package frama-c-report)
+    (package frama-c-scope)
   )
 )
 
