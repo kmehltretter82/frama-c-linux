@@ -8,8 +8,6 @@
 
 (** Signature of abstractions used in the Eva engine. *)
 
-open Cil_types
-
 (** Signature of the context abstractions used in the engine. *)
 module type Context = Abstract.Context.External
 
@@ -30,12 +28,10 @@ module type Domain = sig
   (** Direct access to the cvalue component of the abstract domain. *)
   include Cvalue_domain.Getters with type t := state
 
-  (** Functions used during the analysis to register computed states.
+  (** Function used during the analysis to register computed states.
       Built by [Engine.Make]. *)
   module Store : sig
-    val register_global_state: t -> unit
-    val register_initial_state: Callstack.t -> kernel_function -> t -> unit
-    val register_stmt_state: Callstack.t -> after:bool -> stmt -> t -> unit
+    val register_state: Callstack.t -> Domain_store.control_point -> t -> unit
   end
 end
 

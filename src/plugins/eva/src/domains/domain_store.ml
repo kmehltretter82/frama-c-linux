@@ -6,8 +6,36 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Eval
+
+type control_point =
+  | Initial
+  | Start of Kernel_function.t
+  | Before of Cil_datatype.Stmt.t
+  | After of Cil_datatype.Stmt.t
+[@@deriving eq, ord]
+
+module ControlPointPrototype = struct
+  include Datatype.Serializable_undefined
+  type t = control_point [@@deriving eq, ord]
+  let name = "Domain_store.ControlPoint"
+  let reprs = [ Initial ]
+
+  let hash = function
+    | Initial -> Hashtbl.hash 0
+    | Start kf -> Hashtbl.hash (1, Kernel_function.hash kf)
+    | Before stmt -> Hashtbl.hash (2, Cil_datatype.Stmt.hash stmt)
+    | After stmt -> Hashtbl.hash (3, Cil_datatype.Stmt.hash stmt)
+
+  let pretty fmt = function
+    | Initial -> Format.fprintf fmt "Initial"
+    | Start kf -> Format.fprintf fmt "Start of %a" Kernel_function.pretty kf
+    | Before stmt -> Format.fprintf fmt "Before %a" Printer.pp_stmt stmt
+    | After stmt -> Format.fprintf fmt "After %a" Printer.pp_stmt stmt
+end
+
+module ControlPoint = Datatype.Make_with_collections (ControlPointPrototype)
+
 
 module type InputDomain = sig
   include Datatype.S
@@ -17,18 +45,9 @@ end
 
 module type S = sig
   type t
-
-  val set_global_state: t -> unit
-  val set_initial_state: ?callstack:Callstack.t -> kernel_function -> t -> unit
-  val set_stmt_state: ?callstack:Callstack.t -> after:bool -> stmt -> t -> unit
-
-  val get_global_state: unit -> t or_bottom
-  val get_initial_state: ?callstack:Callstack.t -> kernel_function -> t or_bottom
-  val get_stmt_state: ?callstack:Callstack.t -> after:bool -> stmt -> t or_bottom
-
-  val kf_callstacks: kernel_function -> Callstack.t Seq.t or_top
-  val stmt_callstacks: stmt -> Callstack.t Seq.t or_top
-
+  val set_state: ?callstack:Callstack.t -> control_point -> t -> unit
+  val get_state: ?callstack:Callstack.t -> control_point -> t or_top_bottom
+  val callstacks: control_point -> Callstack.t list or_top
   val is_enabled: unit -> bool
 end
 
@@ -41,120 +60,56 @@ module Make (Domain: InputDomain) = struct
       let dependencies = [ Self.state ]
     end)
 
-  module Global_State =
-    State_builder.Option_ref (Domain) (val info "Global_State")
+  (* Are states of this domain saved? *)
+  module Save = State_builder.Option_ref (Datatype.Bool) (val info "Save")
 
-  (* Initial state by function. *)
-  module Initial_State =
-    Kernel_function.Make_Table (Domain) (val info "Initial_State")
+  (* If the domain is unmarshable, its states cannot be saved on the disk,
+     so this boolean should be false when reloading a session.*)
+  let () =
+    if Descr.is_unmarshable Domain.datatype_descr
+    then Save.howto_marshal (fun _ -> ()) (fun () -> ref None)
 
-  (* Consolidated state before each statement.*)
-  module Before_Stmt =
-    Cil_state_builder.Stmt_hashtbl (Domain) (val info "Before_Stmt")
-
-  (* Consolidated state after each statement.*)
-  module After_Stmt =
-    Cil_state_builder.Stmt_hashtbl (Domain) (val info "After_Stmt")
+  module Table =
+    State_builder.Hashtbl (ControlPoint.Hashtbl) (Domain) (val info "Table")
 
   module States_by_callstack = Callstack.Hashtbl.Make (Domain)
 
-  (* Initial state by callstack. *)
-  module Initial_State_By_Callstack =
-    Kernel_function.Make_Table
-      (States_by_callstack) (val info "Initial_State_By_Callstack")
+  module TableByCallstack =
+    State_builder.Hashtbl
+      (ControlPoint.Hashtbl) (States_by_callstack) (val info "TableByCallstack")
 
-  (* State before statement, by callstack. *)
-  module Before_Stmt_By_Callstack =
-    Cil_state_builder.Stmt_hashtbl
-      (States_by_callstack) (val info "Before_Stmt_By_Callstack")
+  let save () =
+    Parameters.(ResultsAll.get () && not (NoResultsDomains.mem Domain.name))
 
-  (* State after statement, by callstack. *)
-  module After_Stmt_By_Callstack =
-    Cil_state_builder.Stmt_hashtbl
-      (States_by_callstack) (val info "After_Stmt_By_Callstack")
-
-
-  let set_global_state state =
-    (* Check parameters -eva-results and -eva-no-results-domain. *)
-    let eva_results = Parameters.ResultsAll.get () in
-    let domain_results = not (Parameters.NoResultsDomains.mem Domain.name) in
-    if eva_results && domain_results then Global_State.set state
-
-  let get_global_state () =
-    `Value (Global_State.get_option () |> Option.value ~default:Domain.top)
-
-  (* If Global_State is set, the analysis has started and domain states should
-     be registered according to analysis parameters. Otherwise, setters do not
-     register states and getters always return Domain.top.  *)
-  let is_enabled () = Global_State.get_option () |> Option.is_some
-
-  let set_initial_state ?callstack kf state =
-    if is_enabled () then
+  let set_state ?callstack control_point state =
+    if Save.memo save then
       match callstack with
-      | None -> Initial_State.replace kf state
+      | None -> Table.replace control_point state
       | Some callstack ->
-        let create _kf = Callstack.Hashtbl.create 7 in
-        let by_callstack = Initial_State_By_Callstack.memo create kf in
+        let create _key = Callstack.Hashtbl.create 7 in
+        let by_callstack = TableByCallstack.memo create control_point in
         Callstack.Hashtbl.replace by_callstack callstack state
 
-  let get_initial_state ?callstack kf =
+  let is_enabled () = Save.get_option () |> Option.value ~default:false
+
+  let get_state ?callstack control_point =
     if is_enabled ()
     then
       try
         match callstack with
-        | None -> `Value (Initial_State.find kf)
+        | None -> `Value (Table.find control_point)
         | Some callstack ->
-          let cs_tbl = Initial_State_By_Callstack.find kf in
+          let cs_tbl = TableByCallstack.find control_point in
           `Value (Callstack.Hashtbl.find cs_tbl callstack)
       with Not_found -> `Bottom
-    else `Value Domain.top
-
-  let set_stmt_state ?callstack ~after stmt state =
-    if is_enabled () then
-      match callstack with
-      | None ->
-        if after
-        then After_Stmt.replace stmt state
-        else Before_Stmt.replace stmt state
-      | Some callstack ->
-        let create _stmt = Callstack.Hashtbl.create 7 in
-        let by_callstack =
-          if after
-          then After_Stmt_By_Callstack.memo create stmt
-          else Before_Stmt_By_Callstack.memo create stmt
-        in
-        Callstack.Hashtbl.replace by_callstack callstack state
-
-  let get_stmt_state ?callstack ~after stmt =
-    if is_enabled () then
-      try
-        match callstack with
-        | None ->
-          if after
-          then `Value (After_Stmt.find stmt)
-          else `Value (Before_Stmt.find stmt)
-        | Some callstack ->
-          let cs_tbl =
-            if after
-            then After_Stmt_By_Callstack.find stmt
-            else Before_Stmt_By_Callstack.find stmt
-          in
-          `Value (Callstack.Hashtbl.find cs_tbl callstack)
-      with Not_found -> `Bottom
-    else `Value Domain.top
-
-
-  let kf_callstacks kf =
-    if is_enabled () then
-      try `Value (Initial_State_By_Callstack.find kf
-                  |> Callstack.Hashtbl.to_seq_keys)
-      with Not_found -> `Value Seq.empty
     else `Top
 
-  let stmt_callstacks stmt =
+  let get_callstacks key =
+    TableByCallstack.find key |> Callstack.Hashtbl.to_seq_keys |> List.of_seq
+
+  let callstacks control_point =
     if is_enabled () then
-      try `Value (Before_Stmt_By_Callstack.find stmt
-                  |> Callstack.Hashtbl.to_seq_keys)
-      with Not_found -> `Value Seq.empty
+      try `Value (get_callstacks control_point)
+      with Not_found -> `Value []
     else `Top
 end

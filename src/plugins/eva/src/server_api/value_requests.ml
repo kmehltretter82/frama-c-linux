@@ -471,8 +471,7 @@ let filter_variables bases =
 (* -------------------------------------------------------------------------- *)
 
 module type EvaProxy = sig
-  val kf_callstacks : kernel_function -> Callstack.t list
-  val stmt_callstacks : stmt -> Callstack.t list
+  val callstacks : Domain_store.control_point -> Callstack.t list
   val evaluate : probe -> Callstack.t option -> evaluations
 end
 
@@ -489,33 +488,15 @@ module Proxy(A : Engine_sig.S_with_results) : EvaProxy = struct
     let default = fun _ -> Cvalue.V.top in
     Option.value ~default (A.Val.get Main_values.CVal.key)
 
-  let callstacks get_state_by_callstack elt =
-    match get_state_by_callstack elt with
-    | `Top | `Bottom -> []
-    | `Value states -> CSmap.fold (fun cs _ acc -> cs :: acc) states []
-
-  let kf_callstacks = callstacks A.get_initial_state_by_callstack
-  let stmt_callstacks = callstacks (A.get_stmt_state_by_callstack ~after:false)
-
-  let get_state get_consolidated get_by_callstack arg = function
-    | None -> get_consolidated arg
-    | Some cs ->
-      match get_by_callstack ?selection:(Some [cs]) arg with
-      | (`Top | `Bottom) as res -> res
-      | `Value cmap ->
-        try `Value (CSmap.find cmap cs)
-        with Not_found -> `Bottom
-
-  let get_stmt_state ~after =
-    get_state (A.get_stmt_state ~after) (A.get_stmt_state_by_callstack ~after)
-
-  let get_initial_state =
-    get_state A.get_initial_state A.get_initial_state_by_callstack
+  let callstacks control_point =
+    match A.callstacks control_point with
+    | `Top -> []
+    | `Value list -> list
 
   let domain_state callstack = function
-    | Initial -> A.get_global_state ()
-    | Pre kf -> get_initial_state kf callstack
-    | Stmt (_, stmt) -> get_stmt_state ~after:false stmt callstack
+    | Initial -> A.get_state Initial
+    | Pre kf -> A.get_state ?callstack (Start kf)
+    | Stmt (_, stmt) -> A.get_state ?callstack (Before stmt)
 
   (* --- Converts an evaluation [result] into an exported [value]. ---------- *)
 
@@ -614,7 +595,7 @@ module Proxy(A : Engine_sig.S_with_results) : EvaProxy = struct
       let else_state = (A.assume_cond ~pos state cond' false :> dstate) in
       Cond (eval then_state, eval else_state)
     | `Effect stmt ->
-      let after_state = get_stmt_state ~after:true stmt callstack in
+      let after_state = A.get_state ?callstack (After stmt) in
       After (eval after_state)
     | `None -> Nothing
 
@@ -673,8 +654,8 @@ let () =
       let gather_callstacks cset marker =
         let list =
           match probe marker with
-          | Some (_, Stmt (_, stmt)) -> A.stmt_callstacks stmt
-          | Some (_, Pre kf) -> A.kf_callstacks kf
+          | Some (_, Stmt (_, stmt)) -> A.callstacks (Before stmt)
+          | Some (_, Pre kf) -> A.callstacks (Start kf)
           | Some (_, Initial) | None -> []
         in
         List.fold_left (fun set elt -> CSet.add elt set) cset list

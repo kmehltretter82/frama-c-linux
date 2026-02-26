@@ -280,35 +280,20 @@ module type Results = sig
 
   (** {2 Access to abstract states inferred by the analysis} *)
 
-  (** Return the abstract state computed at the start of the analysis,
-      as entry point of the main function, after the initialization of global
-      variables and main arguments. *)
-  val get_global_state: unit -> state or_top_bottom
+  (** Returns the abstract state inferred at a control point:
+      - for the given [callstack] if provided;
+      - for any callstack otherwise, i.e. the join of states inferred for
+        each possible callstacks. *)
+  val get_state :
+    ?callstack:Callstack.t -> Domain_store.control_point -> state or_top_bottom
 
-  (** Return the abstract state inferred before or after a given statement.
-      This is the join of the states inferred for each callstack. *)
-  val get_stmt_state : after:bool -> stmt -> state or_top_bottom
+  (** Returns the abstract state inferred at a given control point for each
+      possible callstack analyzed. *)
+  val get_state_by_callstack:
+    Domain_store.control_point -> (Callstack.t * state) list or_top_bottom
 
-  (** Return the abstract state inferred before or after a given statement,
-      for each callstack in which the analysis has reached the statement.
-      The optional argument [selection] allows selecting only some callstacks:
-      it is more efficient to select fewer callstacks, if not all are needed. *)
-  val get_stmt_state_by_callstack:
-    ?selection:Callstack.t list ->
-    after:bool -> stmt -> state Callstack.Hashtbl.t or_top_bottom
-
-  (** Return the abstract state inferred at start of a given function.
-      This is the join of states inferred for each callstack. *)
-  val get_initial_state:
-    kernel_function -> state or_top_bottom
-
-  (** Return the abstract state inferred as entry point of the given function,
-      for each callstack in which the function has been analyzed.
-      The optional argument [selection] allows selecting only some callstacks:
-      it is more efficient to select fewer callstacks, if not all are needed. *)
-  val get_initial_state_by_callstack:
-    ?selection:Callstack.t list ->
-    kernel_function -> state Callstack.Hashtbl.t or_top_bottom
+  (** Returns all callstacks analyzed at a control point. *)
+  val callstacks: Domain_store.control_point -> Callstack.t list or_top
 
   (** {2 Shortcuts for the evaluation in an abstract state} *)
 

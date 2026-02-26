@@ -19,98 +19,68 @@ module Make_Domain (Abstract: Abstractions.S) = struct
   include Cvalue_domain.Getters (Abstract.Dom)
 
   (* Store used by the engine, built over Domain_store.S:
-     - [register_initial_state] and [register_stmt_state] join the previous
-       registered state (if any) for the given function/statement/callstack
-       with the new state.
+     - [register_state] joins the previous registered state (if any) at the
+       given control point with the new computed state.
      - during the analysis, states are registered by callstack. At the end,
        for each function/statement, consolidated states are computed as the join
        of states registered for each callstack.
-     - functions [get_*_state_by_callstack] use multiple calls to [get_*_state]
-       to return a hashtbl callstack -> state. *)
+     - [get_state_by_callstack] uses multiple calls to [get_state] to return
+       an associative list (callstack, state). *)
   module Store = struct
 
-    let register_global_state = Store.set_global_state
-    let get_global_state = Store.get_global_state
+    let register_state callstack control_point state =
+      match control_point with
+      | Domain_store.Initial ->
+        (* Only one possible initial state, which is also the consolidated state.
+           Register it, as it is used to evaluate ACSL \init label. *)
+        Store.set_state Initial state;
+        Store.set_state ~callstack Initial state
+      | _ ->
+        (* Only register [state] for the given callstack; the consolidated state
+           is computed afterward by [post_analysis]. *)
+        let set = Store.set_state ~callstack control_point in
+        match Store.get_state ~callstack control_point with
+        | `Value previous_state -> set (join previous_state state)
+        | `Bottom | `Top -> set state (* No state previously registered. *)
 
-    let register_initial_state callstack kf state =
-      let set = Store.set_initial_state ~callstack kf in
-      match Store.get_initial_state ~callstack kf with
-      | `Value previous_state -> set (join previous_state state)
-      | `Bottom -> set state
-
-    let compute_consolidated_initial_state kf =
-      match Store.kf_callstacks kf with
-      | `Top -> `Value top
-      | `Value callstacks ->
-        let get_state callstack = Store.get_initial_state ~callstack kf in
-        let aux acc callstack = Bottom.join join (get_state callstack) acc in
-        let+ joined_state = Seq.fold_left aux `Bottom callstacks in
-        Store.set_initial_state kf joined_state;
-        joined_state
-
-    let get_initial_state kf =
-      match Store.get_initial_state kf with
-      | `Value _ as s -> s
-      | `Bottom -> compute_consolidated_initial_state kf
-
-    let get_initial_state_by_callstack ?selection kf =
+    (* Computes and registers consolidated state as the join of states
+       registered for all possible callstacks at the given [control_point]. *)
+    let compute_consolidated_state control_point =
       let open Lattice_bounds.TopBottom.Operators in
-      let* callstacks =
-        match selection with
-        | Some list -> `Value (List.to_seq list)
-        | None -> Store.kf_callstacks kf
-      in
-      let tbl = Callstack.Hashtbl.create (Seq.length callstacks) in
-      let get_and_copy callstack =
-        let state = Store.get_initial_state ~callstack kf in
-        Bottom.iter (Callstack.Hashtbl.replace tbl callstack) state
-      in
-      Seq.iter get_and_copy callstacks;
-      if Callstack.Hashtbl.length tbl > 0 then `Value tbl else `Bottom
+      let* callstacks = Store.callstacks control_point in
+      let join a b = `Value (join a b) in
+      let get_state callstack = Store.get_state ~callstack control_point in
+      let aux acc callstack = TopBottom.join join (get_state callstack) acc in
+      let+ joined_state = List.fold_left aux `Bottom callstacks in
+      Store.set_state control_point joined_state;
+      joined_state
 
-    let register_stmt_state callstack ~after stmt state =
-      let set = Store.set_stmt_state ~callstack ~after stmt in
-      match Store.get_stmt_state ~callstack ~after stmt with
-      | `Value previous_state -> set (join previous_state state)
-      | `Bottom -> set state
+    (* Consolidated states are not registered during the analysis, so computes
+       it if no callstack. *)
+    let get_state ?callstack control_point =
+      match callstack, Store.get_state ?callstack control_point with
+      | None, `Bottom -> compute_consolidated_state control_point
+      | _, result -> result
 
-    let compute_consolidated_stmt_state ~after stmt =
-      match Store.stmt_callstacks stmt with
-      | `Top -> `Value top
-      | `Value callstacks ->
-        let get_state callstack = Store.get_stmt_state ~callstack ~after stmt in
-        let aux acc callstack = Bottom.join join (get_state callstack) acc in
-        let+ joined_state = Seq.fold_left aux `Bottom callstacks in
-        Store.set_stmt_state ~after stmt joined_state;
-        joined_state
-
-    let get_stmt_state ~after stmt =
-      match Store.get_stmt_state ~after stmt with
-      | `Value _ as s -> s
-      | `Bottom -> compute_consolidated_stmt_state ~after stmt
-
-    let get_stmt_state_by_callstack ?selection ~after stmt =
+    let get_state_by_callstack control_point =
       let open Lattice_bounds.TopBottom.Operators in
-      let* callstacks =
-        match selection with
-        | Some list -> `Value (List.to_seq list)
-        | None -> Store.stmt_callstacks stmt
+      let* callstacks = Store.callstacks control_point in
+      let get_state callstack =
+        match Store.get_state ~callstack control_point with
+        | `Bottom -> None
+        | `Top -> Some (callstack, Abstract.Dom.top)
+        | `Value state -> Some (callstack, state)
       in
-      let tbl = Callstack.Hashtbl.create (Seq.length callstacks) in
-      let get_and_copy callstack =
-        let state = Store.get_stmt_state ~callstack ~after stmt in
-        Bottom.iter (Callstack.Hashtbl.replace tbl callstack) state
-      in
-      Seq.iter get_and_copy callstacks;
-      if Callstack.Hashtbl.length tbl > 0 then `Value tbl else `Bottom
+      let list = List.filter_map get_state callstacks in
+      if list = [] then `Bottom else `Value list
 
     let compute_consolidated_states () =
       let compute_initial_state kf =
-        ignore (compute_consolidated_initial_state kf);
+        ignore (compute_consolidated_state (Start kf));
       in
       let compute_stmt_state stmt =
-        ignore (compute_consolidated_stmt_state ~after:false stmt);
-        ignore (compute_consolidated_stmt_state ~after:true stmt);
+        ignore (compute_consolidated_state (Before stmt));
+        ignore (compute_consolidated_state (After stmt));
       in
       let compute_kf_states kf =
         match Function_calls.analysis_status kf with
@@ -124,6 +94,7 @@ module Make_Domain (Abstract: Abstractions.S) = struct
       Globals.Functions.iter compute_kf_states
   end
 
+  (* Computes consolidated states at the end of the analysis. *)
   let post_analysis final_state =
     if Parameters.JoinResults.get () then Store.compute_consolidated_states ();
     post_analysis final_state
@@ -175,38 +146,31 @@ module Make (Abstract: Abstractions.S) = struct
     module Compute = Compute'
     module Interferences = Interference'
 
-    let find (type t) stmt f =
+
+    let find get (control_point: Domain_store.control_point) =
       if Self.is_computed ()
       then
-        let kf = Kernel_function.find_englobing_kf stmt in
-        match Function_calls.analysis_status kf with
-        | Unreachable | SpecUsed | Builtin _ -> `Bottom
-        | Analyzed NoResults -> `Top
-        | Analyzed (Complete | Partial) -> (f stmt :> t or_top_bottom)
+        match control_point with
+        | Initial -> get control_point
+        | Start kf ->
+          if Function_calls.is_called kf
+          then get control_point
+          else `Bottom
+        | Before stmt | After stmt ->
+          let kf = Kernel_function.find_englobing_kf stmt in
+          match Function_calls.analysis_status kf with
+          | Unreachable | SpecUsed | Builtin _ -> `Bottom
+          | Analyzed NoResults -> `Top
+          | Analyzed (Complete | Partial) -> get control_point
       else `Top
 
-    let get_stmt_state ~after stmt =
-      find stmt (Dom.Store.get_stmt_state ~after)
+    let get_state ?callstack =
+      find (Dom.Store.get_state ?callstack)
 
-    let get_stmt_state_by_callstack ?selection ~after stmt =
-      find stmt (Dom.Store.get_stmt_state_by_callstack ?selection ~after)
+    let get_state_by_callstack control_point =
+      find (Dom.Store.get_state_by_callstack) control_point
 
-    let get_global_state () =
-      (Dom.Store.get_global_state () :> Dom.t or_top_bottom)
-
-    let get_initial_state kf =
-      if Self.is_computed () then
-        if Function_calls.is_called kf
-        then (Dom.Store.get_initial_state kf :> Dom.t or_top_bottom)
-        else `Bottom
-      else `Top
-
-    let get_initial_state_by_callstack ?selection kf =
-      if Self.is_computed () then
-        if Function_calls.is_called kf
-        then Dom.Store.get_initial_state_by_callstack ?selection kf
-        else `Bottom
-      else `Top
+    let callstacks = Abstract.Dom.Store.callstacks
 
     let eval_expr state expr = Eval.evaluate state expr >>=: snd
 

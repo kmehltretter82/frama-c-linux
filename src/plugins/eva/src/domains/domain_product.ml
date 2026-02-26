@@ -306,39 +306,19 @@ module Make
     Right.overwrite bases ~on:right_on ~by:right_by
 
   module Store = struct
-    let set_global_state (left, right) =
-      Left.Store.set_global_state left;
-      Right.Store.set_global_state right
-    let set_initial_state ?callstack kf (left, right) =
-      Left.Store.set_initial_state ?callstack kf left;
-      Right.Store.set_initial_state ?callstack kf right
-    let set_stmt_state ?callstack ~after stmt (left, right) =
-      Left.Store.set_stmt_state ?callstack ~after stmt left;
-      Right.Store.set_stmt_state ?callstack ~after stmt right
+    let set_state ?callstack control_point (left, right) =
+      Left.Store.set_state ?callstack control_point left;
+      Right.Store.set_state ?callstack control_point right
 
-    let get_global_state () =
-      let+ left = Left.Store.get_global_state ()
-      and+ right = Right.Store.get_global_state () in
+    let get_state ?callstack control_point =
+      let open Lattice_bounds.TopBottom.Operators in
+      let+ left = Left.Store.get_state ?callstack control_point
+      and+ right = Right.Store.get_state ?callstack control_point in
       left, right
 
-    let get_initial_state ?callstack kf =
-      let+ left = Left.Store.get_initial_state ?callstack kf
-      and+ right = Right.Store.get_initial_state ?callstack kf in
-      left, right
-
-    let get_stmt_state ?callstack ~after stmt =
-      let+ left = Left.Store.get_stmt_state ?callstack ~after stmt
-      and+ right = Right.Store.get_stmt_state ?callstack ~after stmt in
-      left, right
-
-    let kf_callstacks kf =
-      match Left.Store.kf_callstacks kf with
-      | `Top -> Right.Store.kf_callstacks kf
-      | `Value _ as x -> x
-
-    let stmt_callstacks stmt =
-      match Left.Store.stmt_callstacks stmt with
-      | `Top -> Right.Store.stmt_callstacks stmt
+    let callstacks control_point =
+      match Left.Store.callstacks control_point with
+      | `Top -> Right.Store.callstacks control_point
       | `Value _ as x -> x
 
     let is_enabled () = Left.Store.is_enabled () && Right.Store.is_enabled ()

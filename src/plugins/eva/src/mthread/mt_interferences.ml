@@ -8,8 +8,8 @@
 
 let concurrent_writes thread shared_bases =
   let module Engine = (val Engine.current ()) in
-  let add_pos stmt (cs : Callstack.t) _state acc =
-    if cs.thread <> Thread.id thread
+  let add_pos stmt acc (cs, _state) =
+    if cs.Callstack.thread <> Thread.id thread
     then acc
     else
       let pos = Position.local stmt cs in
@@ -28,10 +28,9 @@ let concurrent_writes thread shared_bases =
       | _ -> false
     in
     if is_write_stmt
-    then match Engine.get_stmt_state_by_callstack ~after:true stmt with
+    then match Engine.get_state_by_callstack (After stmt) with
       | `Top | `Bottom -> acc (* TODO: handle Tops *)
-      | `Value table ->
-        Callstack.Hashtbl.fold (add_pos stmt) table acc
+      | `Value list -> List.fold_left (add_pos stmt) acc list
     else acc
   in
   let add_kf kf acc =

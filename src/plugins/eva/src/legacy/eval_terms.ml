@@ -200,8 +200,8 @@ let add_post = add_logic Logic_const.post_label
 let add_old = add_logic Logic_const.old_label
 (* Init is a bit special, it is constant and always added to the initial state*)
 let add_init states =
-  match Cvalue_results.get_global_state () with
-  | `Bottom -> states
+  match Cvalue_results.get_state Initial with
+  | `Bottom | `Top -> states
   | `Value state -> add_logic Logic_const.init_label state states
 
 let add_logic_var env lv cvalue =

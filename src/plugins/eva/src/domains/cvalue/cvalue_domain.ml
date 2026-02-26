@@ -385,36 +385,24 @@ module State = struct
   (*                                Storage                                   *)
   (* ------------------------------------------------------------------------ *)
 
+  (* Do not register the Locals_scoping.clobbered_set part of the state. *)
   module Store = struct
-    (* Do not register the Locals_scoping.clobbered_set part of the state. *)
+    let set_state ?callstack control_point (state, _clob) =
+      Cvalue_results.set_state ?callstack control_point state
 
-    let set_global_state (state, _clob) =
-      Cvalue_results.set_global_state state
-    let set_initial_state ?callstack kf (state, _clob) =
-      Cvalue_results.set_initial_state ?callstack kf state
-    let set_stmt_state ?callstack ~after stmt (state, _clob) =
-      Cvalue_results.set_stmt_state ?callstack ~after stmt state
-
-    let get_global_state () =
-      let+ state = Cvalue_results.get_global_state () in
+    let get_state ?callstack control_point =
+      let open Lattice_bounds.TopBottom.Operators in
+      let+ state = Cvalue_results.get_state ?callstack control_point in
       state, Locals_scoping.top ()
 
-    let get_initial_state ?callstack kf =
-      let+ state = Cvalue_results.get_initial_state ?callstack kf in
-      state, Locals_scoping.top ()
-
-    let get_stmt_state ?callstack ~after stmt =
-      let+ state = Cvalue_results.get_stmt_state ?callstack ~after stmt in
-      state, Locals_scoping.top ()
-
-    let kf_callstacks = Cvalue_results.kf_callstacks
-    let stmt_callstacks = Cvalue_results.stmt_callstacks
+    let callstacks = Cvalue_results.callstacks
     let is_enabled = Cvalue_results.is_enabled
   end
 
   let get_state_before stmt =
-    match Cvalue_results.get_stmt_state ~after:false stmt with
+    match Cvalue_results.get_state (Before stmt) with
     | `Bottom -> Cvalue.Model.bottom
+    | `Top -> Cvalue.Model.top
     | `Value v -> v
 
   let display_final_state kf =

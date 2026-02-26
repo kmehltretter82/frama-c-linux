@@ -634,26 +634,15 @@ module Restrict
   (* ----- Storage ---------------------------------------------------------- *)
 
   module Store = struct
+    let set_state ?callstack control_point s =
+      Domain.Store.set_state ?callstack control_point (get_state s)
 
-    let set_global_state state =
-      Domain.Store.set_global_state (get_state state)
-    let set_initial_state ?callstack kf s =
-      Domain.Store.set_initial_state ?callstack kf (get_state s)
-    let set_stmt_state ?callstack ~after stmt s =
-      Domain.Store.set_stmt_state ?callstack ~after stmt (get_state s)
+    let get_state ?callstack control_point =
+      let open Lattice_bounds.TopBottom.Operators in
+      let+ state = Domain.Store.get_state ?callstack control_point in
+      Some (state, Mode.all)
 
-    let inject s =
-      let+ state = s in Some (state, Mode.all)
-
-    let get_global_state () =
-      Domain.Store.get_global_state () |> inject
-    let get_initial_state ?callstack kf =
-      Domain.Store.get_initial_state ?callstack kf |> inject
-    let get_stmt_state ?callstack ~after stmt =
-      Domain.Store.get_stmt_state ?callstack ~after stmt |> inject
-
-    let kf_callstacks = Domain.Store.kf_callstacks
-    let stmt_callstacks = Domain.Store.stmt_callstacks
+    let callstacks = Domain.Store.callstacks
     let is_enabled = Domain.Store.is_enabled
   end
 end

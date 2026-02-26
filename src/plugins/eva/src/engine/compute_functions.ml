@@ -226,7 +226,7 @@ module Make (Engine: Engine_sig.S) = struct
       let thread_id = Thread.id thread in
       let callstack = Callstack.init ~thread:thread_id ~entry_point:kf in
       Callstack.with_callstack callstack @@ fun init_state ->
-      Engine.Dom.Store.register_initial_state callstack kf init_state;
+      Engine.Dom.Store.register_state callstack (Start kf) init_state;
       let init_state =
         (* Inject interferences in the initial state. The interferences are
            injected after registering the initial state as this is part of the

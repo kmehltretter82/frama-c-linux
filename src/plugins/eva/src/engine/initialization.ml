@@ -458,7 +458,9 @@ module Make (Engine: Engine_Subset) = struct
         Self.feedback ~dkey:Self.dkey_progress "Initial state computed";
         state
     in
-    Domain.Store.register_global_state init_state;
+    let thread = Thread.(id main) in
+    let callstack = Callstack.init ~thread ~entry_point:kf in
+    Domain.Store.register_state callstack Initial init_state;
     print_initial_cvalue_state init_state;
     add_main_formals ?arguments kf init_state
 
