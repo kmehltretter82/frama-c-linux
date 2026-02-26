@@ -88,6 +88,10 @@ endif
 
 # --- Utilities ---
 
+# Note: the 'Command: ...' line below is awfully complex due to the fact that
+# arguments with quotes (e.g. CPPFLAGS) need to be properly escaped to avoid
+# syntax errors in exotic cases, and we want to preserve quotes so the user
+# can simply copy-paste the line printed in the terminal during execution.
 ifeq ($(SILENT),yes)
 define display_command
 endef
@@ -96,7 +100,7 @@ define display_command
   @{
     echo '';
     [ -t 1 ] && tput setaf 4;
-    echo 'Command: $(strip $(1))';
+    echo 'Command: $(subst ','"'"',$(subst \,\\,$(strip $(1))))';
     [ -t 1 ] && tput sgr0;
     echo '';
   }
