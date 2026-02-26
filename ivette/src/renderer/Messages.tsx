@@ -19,12 +19,15 @@ import * as Arrays from 'dome/table/arrays';
 import { Table, Column, Renderer } from 'dome/table/views';
 import * as Compare from 'dome/data/compare';
 import { State, GlobalState, useGlobalState } from 'dome/data/states';
+import { alpha } from 'dome/data/compare';
 
 import { TitleBar } from 'ivette';
 import * as Display from 'ivette/display';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Kernel from 'frama-c/kernel/api/services';
+import * as Params from 'frama-c/kernel/api/parameters';
+import * as Server from 'frama-c/server';
 
 type Message = Kernel.messageData;
 type logkind = Kernel.logkind;
@@ -63,32 +66,9 @@ const kindFilter: KindFilter = {
   FAILURE: true,
 };
 
-/* The fields must be exactly the short names of Frama-C plugins used in
-   messages. They are all shown by default. */
-const pluginFilter: PluginFilter = {
-  'aorai': true,
-  'cg': true,
-  'dive': true,
-  'e-acsl': true,
-  'eva': true,
-  'from': true,
-  'impact': true,
-  'inout': true,
-  'metrics': true,
-  'nonterm': true,
-  'pdg': true,
-  'report': true,
-  'rte': true,
-  'scope': true,
-  'server': true,
-  'slicing': true,
-  'variadic': true,
-  'wp': true,
-};
-
 const emitterFilter = {
   kernel: true,
-  plugins: pluginFilter,
+  plugins: {},
   others: true,
 };
 
@@ -233,10 +213,8 @@ function MessageFilter(props: { filter: State<Filter> }): JSX.Element {
   const kernelState = Forms.useProperty(emitterState, 'kernel');
   const othersState = Forms.useProperty(emitterState, 'others');
   const pluginState = Forms.useProperty(emitterState, 'plugins');
-  const pluginCheckboxes =
-    Object.keys(pluginFilter).map((p) => (
-      <PluginCheckbox key={p} plugin={p} pluginState={pluginState} />
-    ));
+  const pluginCheckboxes = Object.keys(pluginState.value).map(
+    (p) => (<PluginCheckbox key={p} plugin={p} pluginState={pluginState} />));
 
   return (
     <Forms.PageForm className="message-search">
@@ -430,10 +408,30 @@ export function RenderMessages(): JSX.Element {
   }, [model, data]);
 
   const filterState = useGlobalState(globalFilterState);
-  const [filter] = filterState;
+  const [filter, setFilter] = filterState;
   const selectedDecl = States.useCurrentScope();
   const [selectedMsg, selectMsg] = React.useState<Message>();
   const [text, setText] = React.useState('');
+
+  /** List of plugins */
+  const [plugins, setPlugins] = React.useState<Params.plugin[]>([]);
+  React.useEffect(() => {
+    const fetchPlugins = async (): Promise<void> => {
+      const plugins = await Server.send(Params.getPlugins, {});
+      setPlugins(plugins.filter(v => v.name !== "kernel")
+        .sort((a, b) => alpha(a.name, b.name)));
+    };
+    if(Server.isRunning()) fetchPlugins();
+    else Server.onReady(fetchPlugins);
+  }, []);
+
+  React.useEffect(() => {
+    const newFilters = globalFilterState.getValue();
+    newFilters.emitter.plugins = Object.fromEntries(
+      plugins.map(p => [p.shortname, true])
+    );
+    setFilter(newFilters);
+  }, [plugins, setFilter]);
 
   React.useEffect(() => {
     if (selectedDecl !== selectedMsg?.decl)
