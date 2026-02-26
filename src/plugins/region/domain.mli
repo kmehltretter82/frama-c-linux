@@ -53,3 +53,4 @@ val of_typ : (unit -> 'a) -> typ -> 'a t
 type 'a sigma = 'a context ref
 val unify : ('a -> 'a -> 'a) -> 'a sigma -> 'a t -> 'a t -> unit
 val subst : 'a context -> 'a t -> 'a t
+val getvar : ?default:'a t -> 'a context -> string -> 'a t

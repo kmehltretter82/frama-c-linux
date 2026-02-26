@@ -131,7 +131,7 @@ type 'a context = 'a t M.t
 let empty = M.empty
 let make l : 'a context = List.fold_left (fun m (s,r) -> M.add s r m) empty l
 
-let get ?(default=pure) v ctxt =
+let getvar ?(default=pure) ctxt v =
   try M.find v ctxt with Not_found -> default
 
 let rec of_typ create ty : 'a t = match ty.tnode with
@@ -164,7 +164,7 @@ type 'a sigma = 'a context ref
 let rec unify (f:'a -> 'a -> 'a) (s:'a sigma) (d1:'a t) (d2:'a t) =
   match d1, d2 with
   | Pure, _ | _, Pure -> ()
-  | Dvar v, _ -> s := M.add v (merge f d2 @@ get v !s) !s
+  | Dvar v, _ -> s := M.add v (merge f d2 @@ getvar !s v) !s
   | Ptr r1, Ptr r2 -> ignore @@ f r1 r2
   | Array d1, Array d2 -> unify f s d1 d2
   | Record m1, Record m2 ->
@@ -191,9 +191,9 @@ let rec unify (f:'a -> 'a -> 'a) (s:'a sigma) (d1:'a t) (d2:'a t) =
       | Some r -> let d' = ptr r in List.iter (fun d -> unify f s d d') (dr::ds)
     end
 
-let rec subst ctxt d = match d with
-  | Pure | Ptr _ -> d
-  | Dvar v -> get ~default:d v ctxt
+let rec subst ctxt = function
+  | (Pure | Ptr _) as d -> d
+  | (Dvar v) as d -> getvar ~default:d ctxt v
   | Array a -> array @@ subst ctxt a
   | Record m -> record @@ Fmap.map (subst ctxt) m
   | Logic(t,ds) -> logic t @@ List.map (subst ctxt) ds

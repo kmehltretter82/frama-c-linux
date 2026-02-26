@@ -43,11 +43,12 @@ type guard =
   | Aligned of addr
 [@@ deriving ord]
 
-type condition = {
-  vars : Logic_var.t list ;
-  hyps : Predicate.t list ;
-  guard : guard ;
-}
+type condition =
+  | Forall of Logic_var.t list * condition
+  | Hyp of Predicate.t * condition
+  | Let of Logic_info.t * condition
+  | At of condition * Logic_label.t
+  | Guard of guard
 [@@ deriving ord]
 
 let pp_guard fmt = function
@@ -59,17 +60,26 @@ let pp_guard fmt = function
   | Initialized a -> Format.fprintf fmt "\\initialized(%a)" pp_addr a
   | Aligned a -> Format.fprintf fmt "\\aligned(%a)" pp_addr a
 
-let pp_condition fmt { vars ; hyps ; guard } =
-  begin
+let pp_body fmt = function
+  | LBterm t -> Printer.pp_term fmt t
+  | _ -> Format.pp_print_string fmt "…"
+
+let rec pp_condition fmt = function
+  | Forall(xs,p) ->
     Format.fprintf fmt "@[<hov 2>" ;
     List.iter
       (fun x -> Format.fprintf fmt "\\forall %a %s;@ "
           Printer.pp_logic_type x.lv_type x.lv_name)
-      vars ;
-    List.iter
-      (Format.fprintf fmt "%a ==>@ " Printer.pp_predicate) hyps ;
-    Format.fprintf fmt "%a@]" pp_guard guard ;
-  end
+      xs ;
+    Format.fprintf fmt "%a@]" pp_condition p ;
+  | Let(l,p) ->
+    Format.fprintf fmt "@[<hov 2>\\let %s = %a;@ %a@]"
+      l.l_var_info.lv_name pp_body l.l_body pp_condition p
+  | Hyp(h,q) ->
+    Format.fprintf fmt "@[<hov 2>%a ==>@ %a" Printer.pp_predicate h pp_condition q
+  | At(p,l) ->
+    Format.fprintf fmt "\\at(%a,%a)" pp_condition p Printer.pp_logic_label l
+  | Guard g -> pp_guard fmt g
 
 module Guards = Map.Make
     (struct
@@ -104,12 +114,14 @@ let of_guard ?loc ?names = function
   | Initialized p -> Condition.pinitialized ?loc ?names @@ of_addr ?loc p
   | Aligned p -> Condition.paligned ?loc ?names @@ of_addr ?loc p
 
-let of_condition ?loc ?(names=[]) { vars ; hyps ; guard } =
-  let p = of_guard ?loc guard in
-  let hs = Logic_const.pands hyps in
-  let hp = Logic_const.pimplies ?loc (hs,p) in
-  let fp = Logic_const.pforall ?loc (vars,hp) in
-  Logic_const.prepend_names ~names fp
+let of_condition ?loc ?(names=[]) p =
+  let rec generate = function
+    | Guard g -> of_guard ?loc g
+    | Forall(xs,p) -> Logic_const.pforall ?loc (xs,generate p)
+    | Let(l,p) -> Logic_const.plet ?loc l (generate p)
+    | Hyp(h,p) -> Logic_const.pimplies ?loc (h,generate p)
+    | At(p,l) -> Logic_const.pat ?loc (generate p,l)
+  in Logic_const.prepend_names ~names (generate p)
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Side Conditions Generator                                         --- *)
@@ -118,32 +130,25 @@ let of_condition ?loc ?(names=[]) { vars ; hyps ; guard } =
 type env = {
   map: Memory.map ;
   mutable here: kinstr ;
-  mutable vars: quantifiers ;
-  mutable rhyps: predicate list ; (* in reverse order, accumulated *)
-  mutable mhyps: predicate list ; (* in direct order, memoized *)
+  mutable context: (guard -> condition) ;
   mutable guards: bool Guards.t ;
 }
+
+let root g = Guard g
 
 let create ?stmt map =
   let here = match stmt with None -> Kglobal | Some stmt -> Kstmt stmt in
   {
     map ; here ;
-    vars = [] ;
-    rhyps = [] ;
-    mhyps = [] ;
+    context = root ;
     guards = Guards.empty ;
   }
 
 let iter f env = Guards.iter (fun g valid -> f g ~valid) env.guards
 
 let add env ?(valid=true) guard =
-  let vars = env.vars in
-  let hyps =
-    let rhs = env.rhyps in
-    if rhs = [] then [] else
-      let hs = env.mhyps in
-      if hs <> [] then hs else (env.mhyps <- rhs ; rhs)
-  in env.guards <- Guards.add { vars ; hyps ; guard } valid env.guards
+  let cond = env.context guard in
+  env.guards <- Guards.add cond valid env.guards
 
 let check env g n a = function
   | Condition.Default -> add env g
@@ -306,17 +311,25 @@ let locate env = function
 
 let at env lbl job prm =
   let here = env.here in
-  let r = env.here <- locate env lbl ; job prm in env.here <- here ; r
+  let context = env.context in
+  env.context <- (fun p -> At(context p,lbl)) ;
+  let r = job prm in env.here <- here ; env.context <- context ; r
 
 let forall env xs job prm =
-  let vars = env.vars in
-  let r = env.vars <- vars @ xs ; job prm in env.vars <- vars ; r
+  if xs = [] then job prm else
+    let context = env.context in
+    env.context <- (fun p -> Forall(xs,context p)) ;
+    let r = job prm in env.context <- context ; r
 
 let assume env h job prm =
-  let rhs = env.rhyps in
-  let mhs = env.mhyps in
-  let r = env.rhyps <- h :: rhs ; env.mhyps <- [] ; job prm in
-  env.rhyps <- rhs ; env.mhyps <- mhs ; r
+  let context = env.context in
+  env.context <- (fun p -> Hyp(h,context p)) ;
+  let r = job prm in env.context <- context ; r
+
+let plet env l job prm =
+  let context = env.context in
+  env.context <- (fun p -> Let(l,context p)) ;
+  let r = job prm in env.context <- context ; r
 
 (* -------------------------------------------------------------------------- *)
 (* --- Logic Annotations                                                  --- *)
@@ -383,8 +396,8 @@ and term env t =
     Option.iter (term_eval env) a ;
     Option.iter (term_eval env) b ;
     Domain.pure
-  | Tapp(f,_,ts) ->
-    List.iter (term_eval env) ts ; Memory.logic env.map f
+  | Tapp(f,_,ts) -> Logic.call env.map f @@ List.map (term env) ts
+  | TDataCons(c,ts) -> Logic.cons env.map c @@ List.map (term env) ts
   | TCast(_,lt,_) when Ast_types.is_logic_fun_or_ptr lt ->
     Options.not_yet_implemented ~source:(fst t.term_loc) "Guards for pointer casts"
   | TCast(_,_,a) | TUnOp(_,a) -> term env a
@@ -414,12 +427,24 @@ and term env t =
   | Tbase_addr(_,t) | Toffset(_,t) | Tblock_length(_,t) ->
     term_eval env t ; Domain.pure
   | Tlambda(xs,t) -> forall env xs (term env) t
-  | _ -> assert false
+  | Tlet( { l_profile = xs ; l_body = def } as d,t) ->
+    forall env xs (pbody env) def ; plet env d (term env) t
+  | TUpdate(r,o,v) ->
+    let dr = term env r in
+    ignore @@ term_loffset env dr o ;
+    term_eval env v ; dr
 
-let rec pred env p =
+and pbody env = function
+  | LBterm t -> term_eval env t
+  | LBpred p -> pred env p
+  | LBnone -> ()
+  | LBreads _ -> ()
+  | LBinductive cs -> List.iter (fun (_,_,_,p) -> pred env p) cs
+
+and pred env p =
   match p.pred_content with
   | Ptrue | Pfalse -> ()
-  | Pnot p | Plet(_,p) -> pred env p
+  | Pnot p -> pred env p
   | Pand(p,q) | Pimplies(p,q) -> pred env p ; assume env p (pred env) q
   | Por(p,q) -> pred env p ; assume env (Logic_const.pnot p) (pred env) q
   | Pxor(p,q) | Piff(p,q) -> pred env p ; pred env q
@@ -451,8 +476,11 @@ let rec pred env p =
         residual env (Condition.raligned ~bits) p
       | _ -> term_eval env p ; term_eval env s
     end
-  | Papp(_,_,ts) | Pseparated ts -> List.iter (term_eval env) ts
+  | Papp(f,_,ts) -> ignore @@ Logic.call env.map f @@ List.map (term env) ts
+  | Pseparated ts -> List.iter (term_eval env) ts
   | Pat(p,l) -> at env l (pred env) p
+  | Plet( { l_profile = xs ; l_body = def } as d,p) ->
+    forall env xs (pbody env) def ; plet env d (pred env) p
 
 and residual env f p =
   let r = term_addr env p in

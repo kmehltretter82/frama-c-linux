@@ -24,11 +24,12 @@ type guard =
   | Initialized of addr
   | Aligned of addr
 
-type condition = {
-  vars : quantifiers ;
-  hyps : predicate list ;
-  guard : guard ;
-}
+type condition =
+  | Forall of quantifiers * condition
+  | Hyp of predicate * condition
+  | Let of logic_info * condition
+  | At of condition * logic_label
+  | Guard of guard
 
 val pp_addr  : Format.formatter -> addr  -> unit
 val pp_value : Format.formatter -> value -> unit
