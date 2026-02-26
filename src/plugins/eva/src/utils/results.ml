@@ -204,9 +204,17 @@ struct
 
   let get_by_callstack (ctx : context) :
     (_, restricted_to_callstack) Response.t =
-    let open Response in
-    Engine.get_state_by_callstack ctx.control_point
-    |> by_callstack ctx
+    let list =
+      match ctx.selector with
+      | Some [ callstack ] ->
+        (* Optimization if only one callstack. *)
+        let open Lattice_bounds.TopBottom.Operators in
+        let+ state = Engine.get_state ~callstack ctx.control_point in
+        [ callstack, state ]
+      | _ ->
+        Engine.get_state_by_callstack ctx.control_point
+    in
+    Response.by_callstack ctx list
 
   let get (req : request) : (_, unrestricted_response) Response.t =
     let open Response in
