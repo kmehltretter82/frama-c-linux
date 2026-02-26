@@ -7,7 +7,7 @@
 [wp] 1 goal scheduled
 [wp] User Error: After simplification inductive P appear ill-formed (hint: check cases premises)
 [wp] Warning: Goal Property: running prover Alt-Ergo:2.5.4 failed ([User Error])
-[wp] [Failure] typed_foo_assert (Alt-Ergo) (Cache miss 1)
+[wp] [Failure] typed_foo_assert (Alt-Ergo) (No Cache)
 [wp] Proved goals:    2 / 3
   Terminating:     1
   Unreachable:     1

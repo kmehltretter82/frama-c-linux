@@ -127,6 +127,7 @@ val is_valid: result -> bool
 val is_trivial: result -> bool
 val is_not_valid: result -> bool
 val is_computing: result -> bool
+val is_cacheable: result -> bool
 val has_model: result -> bool
 
 val configure : result -> config
