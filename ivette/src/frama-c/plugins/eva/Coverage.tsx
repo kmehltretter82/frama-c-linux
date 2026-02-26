@@ -22,7 +22,7 @@ type stats = EvaStats.functionStatsData;
 // --- Coverage Table ---
 
 const ordering: Arrays.ByColumns<stats> = {
-  fct: Compare.byFields({ key: Compare.string }),
+  fct: Compare.byFields({ fctName: Compare.string }),
   alarms: Compare.byFields({
     alarmStatuses: Compare.lift(
       (x) => x.unknown + x.invalid,
