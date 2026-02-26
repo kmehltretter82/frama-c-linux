@@ -18,7 +18,9 @@ __PUSH_FC_STDLIB
 __BEGIN_DECLS
 
 typedef float float_t;
+typedef _Float32 _Float32_t;
 typedef double double_t;
+typedef _Float64 _Float64_t;
 
 #define MATH_ERRNO	1
 #define MATH_ERREXCEPT	2

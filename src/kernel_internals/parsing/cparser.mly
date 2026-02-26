@@ -314,7 +314,7 @@ let type_to_expr_for_builtin ~loc ~builtin specifier decl_type =
 
 %token EOF
 %token<Cabs.cabsloc> BOOL TRUE FALSE CHAR INT DOUBLE FLOAT VOID INT64
-%token<Cabs.cabsloc> ENUM STRUCT TYPEDEF UNION
+%token<Cabs.cabsloc> FLOAT32 FLOAT64 ENUM STRUCT TYPEDEF UNION
 %token<Cabs.cabsloc> SIGNED UNSIGNED LONG SHORT
 %token<Cabs.cabsloc> VOLATILE EXTERN STATIC CONST RESTRICT AUTO REGISTER
 %token<Cabs.cabsloc> THREAD THREAD_LOCAL
@@ -1218,6 +1218,8 @@ type_spec:   /* ISO 6.7.2 */
 | INT64    { Tint64, $1 }
 | FLOAT    { Tfloat, $1 }
 | DOUBLE   { Tdouble, $1 }
+| FLOAT32  { Tfloat32, $1 }
+| FLOAT64  { Tfloat64, $1 }
 | SIGNED   { Tsigned, $1 }
 | UNSIGNED { Tunsigned, $1 }
 | STRUCT                 id_or_typename

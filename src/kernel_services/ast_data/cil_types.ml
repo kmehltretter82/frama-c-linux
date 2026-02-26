@@ -98,6 +98,8 @@ type ikind =
 (** Various kinds of floating-point numbers*)
 type fkind =
   | FFloat      (** [float] *)
+  | FFloat32    (** [binary32] *)
+  | FFloat64    (** [binary64] *)
   | FDouble     (** [double] *)
   | FLongDouble (** [long double] *)
 [@@deriving eq]

@@ -14,8 +14,8 @@ let fkind_limits =
   let max_single = float_of_string "0x1.fffffep+127"
   and max_double = float_of_string "0x1.fffffffffffffp+1023" in
   function
-  | Cil_types.FFloat -> max_single
-  | FDouble | FLongDouble -> max_double
+  | Cil_types.FFloat | FFloat32 -> max_single
+  | FDouble | FFloat64 | FLongDouble -> max_double
 
 let ikind_limits ikind =
   let open Cil in

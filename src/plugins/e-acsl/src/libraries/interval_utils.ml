@@ -84,8 +84,8 @@ let join i1 i2 = match i1, i2 with
            let to_float n = Int64.to_float (Z.to_int64 n) in
            let mini, maxi = to_float min, to_float max in
            let minf, maxf = match k with
-             | FFloat -> Floating_point.finite_range_of Single
-             | FDouble -> Floating_point.finite_range_of Double
+             | FFloat  | FFloat32 -> Floating_point.finite_range_of Single
+             | FDouble | FFloat64 -> Floating_point.finite_range_of Double
              | FLongDouble -> raise Exit
            in
            if mini >= minf && maxi <= maxf then Float(k, None) else Rational
@@ -117,10 +117,10 @@ let meet i1 i2 = match i1, i2 with
   | Float(k, Some f), Float(k', None)
   | Float(k',None), Float(k, Some f) ->
     let f_in_k' = match k' with
-      | FFloat ->
+      | FFloat | FFloat32 ->
         let minf, maxf = Floating_point.finite_range_of Single in
         minf <= f && f <= maxf
-      | FDouble
+      | FDouble | FFloat64
       | FLongDouble ->
         true
     in if f_in_k' then Float(k, Some f) else Ival Ival.bottom
@@ -160,8 +160,8 @@ let meet i1 i2 = match i1, i2 with
            let to_float n = Int64.to_float (Z.to_int64 n) in
            let mini, maxi = to_float min, to_float max in
            let minf, maxf = match k with
-             | FFloat -> Floating_point.finite_range_of Single
-             | FDouble -> Floating_point.finite_range_of Double
+             | FFloat  | FFloat32 -> Floating_point.finite_range_of Single
+             | FDouble | FFloat64 -> Floating_point.finite_range_of Double
              | FLongDouble -> raise Exit
            in
            if mini <= minf && maxi >= maxf then Float(k, None) else Rational

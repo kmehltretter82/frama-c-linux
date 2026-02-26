@@ -154,8 +154,10 @@ and pp_ikind fmt = function
   | IULongLong -> Format.fprintf fmt "IULongLong"
 
 and pp_fkind fmt = function
-  | FFloat -> Format.fprintf fmt "FFloat"
-  | FDouble -> Format.fprintf fmt "FDouble"
+  | FFloat   -> Format.fprintf fmt "FFloat"
+  | FFloat32 -> Format.fprintf fmt "FFloat32"
+  | FFloat64 -> Format.fprintf fmt "FFloat64"
+  | FDouble  -> Format.fprintf fmt "FDouble"
   | FLongDouble -> Format.fprintf fmt "FLongDouble"
 
 and pp_attribute fmt (string,attrparam_list) =

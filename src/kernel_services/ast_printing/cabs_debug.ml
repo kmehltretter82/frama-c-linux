@@ -50,31 +50,33 @@ let pp_labels fmt lbls =
 
 
 let rec pp_typeSpecifier fmt = function
-  |     Tvoid -> fprintf fmt "Tvoid"
-  |     Tchar -> fprintf fmt "Tchar"
-  |     Tbool -> fprintf fmt "Tbool"
-  |     Tshort -> fprintf fmt "Tshort"
-  |     Tint -> fprintf fmt "Tint"
-  |     Tlong -> fprintf fmt "Tlong"
-  |     Tint64 -> fprintf fmt "Tint64"
-  |     Tfloat -> fprintf fmt "Tfloat"
-  |     Tdouble -> fprintf fmt "Tdouble"
-  |     Tsigned -> fprintf fmt "Tsigned"
-  |     Tunsigned -> fprintf fmt "Tunsigned"
-  |     Tnamed s -> fprintf fmt "%s" s
-  |     Tstruct (sname, None, alist) -> fprintf fmt "struct@ %s {} %a" sname pp_attrs alist
-  |     Tstruct (sname, Some fd_gp_list, alist) ->
+  | Tvoid  -> fprintf fmt "Tvoid"
+  | Tchar  -> fprintf fmt "Tchar"
+  | Tbool  -> fprintf fmt "Tbool"
+  | Tshort -> fprintf fmt "Tshort"
+  | Tint   -> fprintf fmt "Tint"
+  | Tlong  -> fprintf fmt "Tlong"
+  | Tint64 -> fprintf fmt "Tint64"
+  | Tfloat -> fprintf fmt "Tfloat"
+  | Tfloat32 -> fprintf fmt "Tfloat32"
+  | Tfloat64 -> fprintf fmt "Tfloat64"
+  | Tdouble  -> fprintf fmt "Tdouble"
+  | Tsigned  -> fprintf fmt "Tsigned"
+  | Tunsigned -> fprintf fmt "Tunsigned"
+  | Tnamed s  -> fprintf fmt "%s" s
+  | Tstruct (sname, None, alist) -> fprintf fmt "struct@ %s {} %a" sname pp_attrs alist
+  | Tstruct (sname, Some fd_gp_list, alist) ->
     fprintf fmt "struct@ %s {%a}@ attrs=(%a)" sname pp_field_groups fd_gp_list pp_attrs alist
-  |     Tunion (uname, None, alist) -> fprintf fmt "union@ %s {} %a" uname pp_attrs alist
+  | Tunion (uname, None, alist) -> fprintf fmt "union@ %s {} %a" uname pp_attrs alist
   | Tunion (uname, Some fd_gp_list, alist) ->
     fprintf fmt "union@ %s {%a}@ attrs=(%a)" uname pp_field_groups fd_gp_list pp_attrs alist
-  |     Tenum (ename, None, alist) -> fprintf fmt "enum@ %s {} %a" ename pp_attrs alist
-  |     Tenum (ename, Some e_item_list, alist) ->
+  | Tenum (ename, None, alist) -> fprintf fmt "enum@ %s {} %a" ename pp_attrs alist
+  | Tenum (ename, Some e_item_list, alist) ->
     fprintf fmt "enum@ %s {" ename;
     List.iter (fun e -> fprintf fmt ",@ %a" pp_enum_item e) e_item_list;
     fprintf fmt "}@ %a" pp_attrs alist;
-  |     TtypeofE exp -> fprintf fmt "typeOfE %a" pp_exp exp
-  |     TtypeofT (spec, d_type) -> fprintf fmt "typeOfT(%a,%a)" pp_spec spec pp_decl_type d_type
+  | TtypeofE exp -> fprintf fmt "typeOfE %a" pp_exp exp
+  | TtypeofT (spec, d_type) -> fprintf fmt "typeOfT(%a,%a)" pp_spec spec pp_decl_type d_type
 
 and pp_spec_elem  fmt = function
   |     SpecTypedef -> fprintf fmt "SpecTypedef"
@@ -93,16 +95,21 @@ and pp_spec fmt spec_elems =
   fprintf fmt "} @]"
 
 and pp_decl_type fmt = function
-  |     JUSTBASE -> fprintf fmt "@[<hov 2>JUSTBASE@]"
-  |     PARENTYPE (attrs1, decl_type, attrs2)
-    -> fprintf fmt "@[<hov 2>PARENTYPE(%a, %a, %a)@]" pp_attrs attrs1 pp_decl_type decl_type pp_attrs attrs2
-  |     ARRAY (decl_type, attrs, exp)
-    -> fprintf fmt "@[<hov 2>ARRAY[%a, %a, %a]@]" pp_decl_type decl_type pp_attrs attrs pp_exp exp
-  |     PTR (attrs, decl_type) -> fprintf fmt "@[<hov 2>PTR(%a, %a)@]" pp_attrs attrs pp_decl_type decl_type
-  |     PROTO (decl_type, single_names, single_ghost_names, b)
-    -> fprintf fmt "@[<hov 2>PROTO decl_type(%a), single_names(" pp_decl_type decl_type;
-    List.iter (fun sn -> fprintf fmt ",@ %a" pp_single_name sn) (single_names @ single_ghost_names) ;
-    fprintf fmt "),@ %b@]" b
+  | JUSTBASE -> fprintf fmt "@[<hov 2>JUSTBASE@]"
+  | PARENTYPE (attrs1, decl_type, attrs2) ->
+    fprintf fmt "@[<hov 2>PARENTYPE(%a, %a, %a)@]"
+      pp_attrs attrs1 pp_decl_type decl_type pp_attrs attrs2
+  | ARRAY (decl_type, attrs, exp) ->
+    fprintf fmt "@[<hov 2>ARRAY[%a, %a, %a]@]"
+      pp_decl_type decl_type pp_attrs attrs pp_exp exp
+  | PTR (attrs, decl_type) ->
+    fprintf fmt "@[<hov 2>PTR(%a, %a)@]" pp_attrs attrs pp_decl_type decl_type
+  | PROTO (decl_type, single_names, single_ghost_names, b) ->
+    let names = single_names @ single_ghost_names in
+    fprintf fmt "@[<hov 2>PROTO decl_type(%a), single_names(%a),@ %b@]"
+      pp_decl_type decl_type
+      (Pretty_utils.pp_list ~sep:",@ " pp_single_name) names
+      b
 
 and pp_name_group fmt (spec, names) =
   fprintf fmt "@[<hov 2>name_group@ spec(%a), names{" pp_spec spec;

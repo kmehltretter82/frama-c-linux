@@ -36,7 +36,8 @@ val get_rounding_mode : unit -> rounding
 (** Rounds the given float to a single precision float. *)
 val round_to_single_precision : float -> float
 
-(** Rounds the given float to a single precision float if [fkind = FFloat]. *)
+(** Rounds the given float to a single precision float if
+    [fkind = FFloat] or [fkind = FFloat32]. *)
 val round_if_single_precision : Cil_types.fkind -> float -> float
 
 
@@ -73,11 +74,24 @@ val is_nan : float -> bool
 val pretty_normal : use_hex:bool -> Format.formatter -> float -> unit
 val pretty : Format.formatter -> float -> unit
 
-(** True if the given string's last character corresponds to the given
-    format, i.e 'F' for single precision, 'D' for double precision and
-    'L' for extended precision. *)
+(** True if the given string's suffix corresponds to the given
+    format, i.e "F" for single precision (or "F32" for _Float32),
+    "D" (or "F64") for double precision (_Float64), and
+    "L" for extended precision.
+
+    @before Frama-C+dev "f32" and "f64" were not accepted.
+*)
 val has_suffix : Cil_types.fkind -> string -> bool
 
+(**
+   [extract_suffix s] tries to find a floating-point suffix
+   ("f", "F", "d", "l", "f32", etc) in [s] and returns
+   [(s_without_suffix, suffix, fkind)]. If [s] has no suffix,
+   returns [(s, "", Cil_types.FDouble)].
+
+   @since Frama-C+dev
+*)
+val extract_suffix : string -> (string * string * Cil_types.fkind)
 
 (** {2 Format based constants} *)
 

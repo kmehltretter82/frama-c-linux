@@ -641,7 +641,9 @@ let format_of_ikind = function
   | IULongLong -> Some `ll, `u
 
 let format_of_fkind k = function
-  | FFloat -> None, `f
+  | FFloat   -> None, `f
+  | FFloat32 -> None, `f32
+  | FFloat64 -> None, `f64
   | FDouble ->
     (match k with
      | Format_types.PrintfLike -> None, `f

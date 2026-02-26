@@ -443,8 +443,10 @@ let create_special_float_predicate ~loc e fkind predicate =
   let loc = best_loc ~loc e.eloc in
   let t = Logic_utils.expr_to_term e in
   let typ = match fkind with
-    | FFloat -> Cil_const.floatType
-    | FDouble -> Cil_const.doubleType
+    | FFloat   -> Cil_const.floatType
+    | FFloat32 -> Cil_const.float32Type
+    | FFloat64 -> Cil_const.float64Type
+    | FDouble  -> Cil_const.doubleType
     | FLongDouble -> Cil_const.longDoubleType
   in
   let t = Logic_utils.mk_cast ~loc typ t in

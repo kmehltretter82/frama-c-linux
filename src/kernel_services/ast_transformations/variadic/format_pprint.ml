@@ -57,6 +57,8 @@ let string_of_cs = function
   | `u -> "u"
   | `x -> "x"
   | `f -> "f"
+  | `f32 -> "f32"
+  | `f64 -> "f64"
   | `e -> "e"
   | `g -> "g"
   | `a -> "a"

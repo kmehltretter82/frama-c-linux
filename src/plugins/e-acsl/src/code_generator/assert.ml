@@ -122,6 +122,8 @@ let ikind_to_string = function
   | ILongLong -> "longlong"
   | IULongLong -> "ulonglong"
 
+let fkind_to_string fk = Format.asprintf "%a" Printer.pp_fkind fk
+
 let add_pending_register_data ~loc { data_ptr } name e =
   let ty = Cil.typeOf e in
   let fct, args =
@@ -133,9 +135,8 @@ let add_pending_register_data ~loc { data_ptr } name e =
       let ty = Ast_types.unroll ty in
       match ty.tnode with
       | TInt ikind -> ikind_to_string ikind, [ Cil.zero ~loc; e ]
-      | TFloat FFloat -> "float", [ e ]
-      | TFloat FDouble -> "double", [ e ]
       | TFloat FLongDouble -> "longdouble", [ e ]
+      | TFloat fk -> fkind_to_string fk, [ e ]
       | TPtr _ -> "ptr", [ e ]
       | TArray _ -> "array", [ e ]
       | TFun _ -> "fun", []

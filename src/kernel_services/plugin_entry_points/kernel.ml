@@ -175,7 +175,9 @@ let () = set_warn_status wkey_large_array Log.Werror
 
 let wkey_conditional_feature =
   register_warn_category "parser:conditional-feature"
-let () = set_warn_status wkey_conditional_feature Log.Wabort
+    ~default:Log.Wabort
+    ~help:"parsing feature only supported in specific modes: \
+           C11, a GCC-based machdep, etc"
 
 let wkey_drop_unused = register_warn_category "linker:drop-conflicting-unused"
 

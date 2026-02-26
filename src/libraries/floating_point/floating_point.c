@@ -78,7 +78,7 @@ value frama_c_get_round_mode(value _) {
 // must contain at least one value for each constructor of ['f format], and
 // those values have to be in the same order. For now, there is also a [Long]
 // value, which is not yet used, but will probably be in the future.
-typedef enum { Single, Double, Long } precision;
+typedef enum { Single, Float32, Float64, Double, Long } precision;
 
 // Convert the Frama-C format into a precision.
 precision decode_precision(value prec) { return (precision)Int_val(prec); }
@@ -99,7 +99,9 @@ value round_to_single(value num) { return caml_copy_double(to_float(num)); }
 value frama_c_change_format(value frama_c_prec, value num) {
   switch (decode_precision(frama_c_prec)) {
   case Single:
+  case Float32:
     return to_ocaml(to_float(num));
+  case Float64:
   case Double:
     return to_ocaml(to_double(num));
   case Long:
@@ -142,7 +144,9 @@ value float_is_negative(value v) {
 value frama_c_round(value frama_c_prec, value num) {
   switch (decode_precision(frama_c_prec)) {
   case Single:
+  case Float32:
     return to_ocaml(roundf(to_float(num)));
+  case Float64:
   case Double:
     return to_ocaml(round(to_double(num)));
   case Long:
@@ -156,7 +160,9 @@ value frama_c_round(value frama_c_prec, value num) {
 value frama_c_trunc(value frama_c_prec, value num) {
   switch (decode_precision(frama_c_prec)) {
   case Single:
+  case Float32:
     return to_ocaml(truncf(to_float(num)));
+  case Float64:
   case Double:
     return to_ocaml(trunc(to_double(num)));
   case Long:
@@ -170,7 +176,9 @@ value frama_c_trunc(value frama_c_prec, value num) {
 value frama_c_exp(value frama_c_prec, value num) {
   switch (decode_precision(frama_c_prec)) {
   case Single:
+  case Float32:
     return to_ocaml(expf(to_float(num)));
+  case Float64:
   case Double:
     return to_ocaml(exp(to_double(num)));
   case Long:
@@ -184,7 +192,9 @@ value frama_c_exp(value frama_c_prec, value num) {
 value frama_c_log(value frama_c_prec, value num) {
   switch (decode_precision(frama_c_prec)) {
   case Single:
+  case Float32:
     return to_ocaml(logf(to_float(num)));
+  case Float64:
   case Double:
     return to_ocaml(log(to_double(num)));
   case Long:
@@ -198,7 +208,9 @@ value frama_c_log(value frama_c_prec, value num) {
 value frama_c_log10(value frama_c_prec, value num) {
   switch (decode_precision(frama_c_prec)) {
   case Single:
+  case Float32:
     return to_ocaml(log10f(to_float(num)));
+  case Float64:
   case Double:
     return to_ocaml(log10(to_double(num)));
   case Long:
@@ -212,7 +224,9 @@ value frama_c_log10(value frama_c_prec, value num) {
 value frama_c_pow(value frama_c_prec, value num, value exp) {
   switch (decode_precision(frama_c_prec)) {
   case Single:
+  case Float32:
     return to_ocaml(powf(to_float(num), to_float(exp)));
+  case Float64:
   case Double:
     return to_ocaml(pow(to_double(num), to_double(exp)));
   case Long:
@@ -226,7 +240,9 @@ value frama_c_pow(value frama_c_prec, value num, value exp) {
 value frama_c_fmod(value frama_c_prec, value num, value mod) {
   switch (decode_precision(frama_c_prec)) {
   case Single:
+  case Float32:
     return to_ocaml(fmodf(to_float(num), to_float(mod)));
+  case Float64:
   case Double:
     return to_ocaml(fmod(to_double(num), to_double(mod)));
   case Long:
@@ -240,7 +256,9 @@ value frama_c_fmod(value frama_c_prec, value num, value mod) {
 value frama_c_cos(value frama_c_prec, value num) {
   switch (decode_precision(frama_c_prec)) {
   case Single:
+  case Float32:
     return to_ocaml(cosf(to_float(num)));
+  case Float64:
   case Double:
     return to_ocaml(cos(to_double(num)));
   case Long:
@@ -254,7 +272,9 @@ value frama_c_cos(value frama_c_prec, value num) {
 value frama_c_sin(value frama_c_prec, value num) {
   switch (decode_precision(frama_c_prec)) {
   case Single:
+  case Float32:
     return to_ocaml(sinf(to_float(num)));
+  case Float64:
   case Double:
     return to_ocaml(sin(to_double(num)));
   case Long:
@@ -268,7 +288,9 @@ value frama_c_sin(value frama_c_prec, value num) {
 value frama_c_tan(value frama_c_prec, value num) {
   switch (decode_precision(frama_c_prec)) {
   case Single:
+  case Float32:
     return to_ocaml(tanf(to_float(num)));
+  case Float64:
   case Double:
     return to_ocaml(tan(to_double(num)));
   case Long:
@@ -282,7 +304,9 @@ value frama_c_tan(value frama_c_prec, value num) {
 value frama_c_acos(value frama_c_prec, value num) {
   switch (decode_precision(frama_c_prec)) {
   case Single:
+  case Float32:
     return to_ocaml(acosf(to_float(num)));
+  case Float64:
   case Double:
     return to_ocaml(acos(to_double(num)));
   case Long:
@@ -296,7 +320,9 @@ value frama_c_acos(value frama_c_prec, value num) {
 value frama_c_asin(value frama_c_prec, value num) {
   switch (decode_precision(frama_c_prec)) {
   case Single:
+  case Float32:
     return to_ocaml(asinf(to_float(num)));
+  case Float64:
   case Double:
     return to_ocaml(asin(to_double(num)));
   case Long:
@@ -310,7 +336,9 @@ value frama_c_asin(value frama_c_prec, value num) {
 value frama_c_atan(value frama_c_prec, value num) {
   switch (decode_precision(frama_c_prec)) {
   case Single:
+  case Float32:
     return to_ocaml(atanf(to_float(num)));
+  case Float64:
   case Double:
     return to_ocaml(atan(to_double(num)));
   case Long:
@@ -324,7 +352,9 @@ value frama_c_atan(value frama_c_prec, value num) {
 value frama_c_atan2(value frama_c_prec, value l, value r) {
   switch (decode_precision(frama_c_prec)) {
   case Single:
+  case Float32:
     return to_ocaml(atan2f(to_float(l), to_float(r)));
+  case Float64:
   case Double:
     return to_ocaml(atan2(to_double(l), to_double(r)));
   case Long:

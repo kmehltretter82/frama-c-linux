@@ -72,9 +72,12 @@ module Make (Model : IEEE754.Modeling) = struct
 
   let simple = compute_error_hints_multipliers Single
   let double = compute_error_hints_multipliers Double
+  let float32 = compute_error_hints_multipliers Float32
+  let float64 = compute_error_hints_multipliers Float64
 
   let error_hints_multiplier : type f. f Typed_float.format -> Hints.t =
-    function Single -> simple | Double -> double
+    function Single  -> simple  | Double  -> double
+           | Float32 -> float32 | Float64 -> float64
 
 
 

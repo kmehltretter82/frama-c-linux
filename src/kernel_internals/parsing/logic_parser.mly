@@ -278,7 +278,7 @@
 %token <string> STRING_CONSTANT
 %token <string> WSTRING_CONSTANT
 %token LPAR RPAR IF ELSE COLON COLON2 COLONCOLON DOT DOTDOT DOTDOTDOT
-%token INT INTEGER REAL BOOLEAN BOOL FLOAT LT GT LE GE EQ NE COMMA ARROW EQUAL
+%token INT INTEGER REAL BOOLEAN BOOL FLOAT FLOAT32 FLOAT64 LT GT LE GE EQ NE COMMA ARROW EQUAL
 %token FORALL EXISTS IFF IMPLIES AND OR NOT SEPARATED
 %token TRUE FALSE OLD AS AT RESULT
 %token BLOCK_LENGTH BASE_ADDR OFFSET VALID VALID_READ VALID_INDEX VALID_RANGE
@@ -899,6 +899,8 @@ type_spec(tname):
 | UNSIGNED LONG LONG INT { LTint IULongLong }  /** [unsigned long long]
                                 (or [unsigned _int64] on Microsoft Visual C) */
 | FLOAT             { LTfloat FFloat }
+| FLOAT32           { LTfloat FFloat32 }
+| FLOAT64           { LTfloat FFloat64 }
 | DOUBLE            { LTfloat FDouble }
 | LONG DOUBLE       { LTfloat FLongDouble }
 | STRUCT id = identifier_or_typename_full { LTstruct id }
@@ -1926,6 +1928,8 @@ c_keyword:
 | ENUM     { "enum" }
 | ELSE     { "else" }
 | FLOAT    { "float" }
+| FLOAT32  { "_Float32" }
+| FLOAT64  { "_Float64" }
 | IF       { "if" }
 | INT      { "int" }
 | LONG     { "long" }

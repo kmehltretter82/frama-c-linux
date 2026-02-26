@@ -183,6 +183,14 @@ val doubleType: typ
     @since 30.0-Zinc *)
 val longDoubleType: typ
 
+(** _Float32
+    @since Frama-C+dev *)
+val float32Type : typ
+
+(** _Float64
+    @since Frama-C+dev *)
+val float64Type : typ
+
 (** set the vid to a fresh number. *)
 val set_vid: varinfo -> unit
 

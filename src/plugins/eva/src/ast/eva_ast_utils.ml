@@ -295,6 +295,10 @@ and const_fold_unop (op : unop) (e : exp) (t : typ) : exp =
     if Z.(equal i zero) then Build.one else Build.zero
   (* Float operations *)
   | Neg, `Float f, `Float fkind ->
+    let f = match fkind with
+      | FFloat  | FFloat32 -> Floating_point.round_to_single_precision f
+      | FDouble | FFloat64 | FLongDouble -> f
+    in
     mk_exp (Const (CReal (-.f, fkind, None)))
   (* No possible folding *)
   | _ -> default ()

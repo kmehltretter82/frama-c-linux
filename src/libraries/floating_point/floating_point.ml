@@ -27,8 +27,8 @@ external get_rounding_mode : unit -> rounding = "frama_c_get_round_mode" [@@noal
 external round_to_single_precision : float -> float = "round_to_single"
 
 let round_if_single_precision = function
-  | Cil_types.FFloat -> round_to_single_precision
-  | FDouble | FLongDouble -> Fun.id
+  | Cil_types.FFloat | FFloat32 -> round_to_single_precision
+  | FDouble | FFloat64 | FLongDouble -> Fun.id
 
 
 type truncated_to_integer =
@@ -133,15 +133,43 @@ let pretty fmt f =
 
 
 let suffix_of_fkind = function
-  | Cil_types.FFloat -> 'F'
-  | Cil_types.FDouble -> 'D'
-  | Cil_types.FLongDouble -> 'L'
+  | Cil_types.FFloat   -> "F"
+  | Cil_types.FFloat32 -> "F32"
+  | Cil_types.FFloat64 -> "F64"
+  | Cil_types.FDouble  -> "D"
+  | Cil_types.FLongDouble -> "L"
 
 let has_suffix fkind literal =
-  let ln = String.length literal in
   let suffix = suffix_of_fkind fkind in
-  ln > 0 && Char.uppercase_ascii literal.[ln - 1] = suffix
+  let literal_upper = String.uppercase_ascii literal in
+  String.ends_with ~suffix literal_upper
 
+let extract_single_letter_sufix s len =
+  let last = String.sub s (len - 1) 1 in
+  match last with
+  | "f" | "F" -> (String.sub s 0 (len - 1), last, Cil_types.FFloat)
+  (* Note: 'd' is accepted as a GCC extension, but also always
+     accepted in ACSL *)
+  | "d" | "D" -> (String.sub s 0 (len - 1), last, Cil_types.FDouble)
+  | "l" | "L" -> (String.sub s 0 (len - 1), last, Cil_types.FLongDouble)
+  | "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "." ->
+    (s, "", Cil_types.FDouble)
+  | _ ->
+    Cmdline.Kernel_log.abort "extract_single_letter_suffix: unexpected '%s'"
+      last
+
+let extract_suffix s =
+  let len = String.length s in
+  if len = 0 then (s, "", Cil_types.FDouble)
+  else if len <= 3 then
+    extract_single_letter_sufix s len
+  else
+    (* look for a 3-letter suffix, then for a 1-letter suffix *)
+    let last3 = String.sub s (len - 3) 3 in
+    match last3 with
+    | "f32" | "F32" -> (String.sub s 0 (len - 3), last3, Cil_types.FFloat32)
+    | "f64" | "F64" -> (String.sub s 0 (len - 3), last3, Cil_types.FFloat64)
+    | _             -> extract_single_letter_sufix s len
 
 type format = Single | Double
 

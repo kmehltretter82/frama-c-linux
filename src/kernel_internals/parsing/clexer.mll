@@ -130,7 +130,9 @@ let init_lexicon () =
   valid "_Bool" (fun loc -> BOOL loc) ;
   valid "int" (fun loc -> INT loc) ;
   valid "float" (fun loc -> FLOAT loc) ;
+  valid "_Float32" (fun loc -> FLOAT32 loc) ;
   valid "double" (fun loc -> DOUBLE loc) ;
+  valid "_Float64" (fun loc -> FLOAT64 loc) ;
   valid "void" (fun loc -> VOID loc) ;
   valid "enum" (fun loc -> ENUM loc) ;
   valid "struct" (fun loc -> STRUCT loc) ;
@@ -453,7 +455,7 @@ let hexfloat =
     hexprefix hexfraction binexponent
   | hexprefix hexdigit+   binexponent
 
-let floatsuffix = ['f' 'F' 'l' 'L']
+let floatsuffix = ['f' 'F' 'l' 'L' 'd' 'D'] | "f32" | "F32" | "f64" | "F64"
 let floatnum = (decfloat | hexfloat) floatsuffix?
 
 let ident = (letter|'_')(letter|decdigit|'_'|'$')*
@@ -567,7 +569,22 @@ rule initial = parse
     CST_WSTRING(content, Cil_datatype.Location.of_lexing_loc (start,last))
     }
 
-  | floatnum  { CST_FLOAT (Lexing.lexeme lexbuf, currentLoc ()) }
+  | floatnum
+    {
+    let loc = currentLoc () in
+    let content = Lexing.lexeme lexbuf in
+    let len = String.length content in
+    let last = content.[len - 1] in
+    if (last = 'd' || last = 'D') && not (Machine.gccMode ()) then begin
+       Kernel.warning ~wkey:Kernel.wkey_conditional_feature
+          ~source:(fst loc) ~once:true
+          "'d' suffix in a floating literal (%s) is a GCC extension, \
+           use a GCC-based machdep to enable it" content;
+       (* drop the suffix *)
+       CST_FLOAT (String.sub content 0 (len - 1), loc)
+    end else
+       CST_FLOAT (content, loc)
+    }
 
   (* GCC Extension for binary numbers *)
   | binarynum { CST_INT (Lexing.lexeme lexbuf, currentLoc ()) }

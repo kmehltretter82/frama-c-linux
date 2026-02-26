@@ -178,6 +178,8 @@ and print_type_spec fmt = function
   | Tlong -> fprintf fmt "long"
   | Tint64 -> fprintf fmt  "__int64"
   | Tfloat -> fprintf fmt  "float"
+  | Tfloat32 -> fprintf fmt "_Float32"
+  | Tfloat64 -> fprintf fmt "_Float64"
   | Tdouble -> fprintf fmt "double "
   | Tsigned -> fprintf fmt "signed"
   | Tunsigned -> fprintf fmt "unsigned"

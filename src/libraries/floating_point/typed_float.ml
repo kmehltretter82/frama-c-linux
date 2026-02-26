@@ -10,18 +10,24 @@ open Floating_point
 
 
 
-type single = Format_Single
-type double = Format_Double
-type long   = Format_Long
+type single  = Format_Single
+type float32 = Format_Float32
+type float64 = Format_Float64
+type double  = Format_Double
+type long    = Format_Long
 
 type 'f format =
-  | Single : single format
-  | Double : double format
+  | Single  : single format
+  | Float32 : float32 format
+  | Float64 : float64 format
+  | Double  : double format
 
 type ('f, 'k) parsed_format =
-  | Single_supported : (single, single) parsed_format
-  | Double_supported : (double, double) parsed_format
-  | Long_unsupported : (long  , double) parsed_format
+  | Single_supported  : (single,   single) parsed_format
+  | Float32_supported : (float32, float32) parsed_format
+  | Float64_supported : (float64, float64) parsed_format
+  | Double_supported  : (double,   double) parsed_format
+  | Long_unsupported  : (long  ,   double) parsed_format
 
 type 'f t =
   | Float : float * 'f format -> 'f t
@@ -51,29 +57,29 @@ type resulting_format =
   | Format : ('f, 'k) parsed_format * 'k format -> resulting_format
 
 let fkind_of_format : type f. f format -> Cil_types.fkind = function
-  | Single -> Cil_types.FFloat
-  | Double -> Cil_types.FDouble
+  | Single  -> Cil_types.FFloat
+  | Float32 -> Cil_types.FFloat32
+  | Float64 -> Cil_types.FFloat64
+  | Double  -> Cil_types.FDouble
 
 let pretty_format : type f. f format Pretty_utils.formatter = fun fmt format ->
   match format with
-  | Single -> Format.fprintf fmt "Binary32"
-  | Double -> Format.fprintf fmt "Binary64"
+  | (Single|Float32) -> Format.fprintf fmt "Binary32"
+  | (Double|Float64) -> Format.fprintf fmt "Binary64"
 
 let parsed_fkind : type k f. (k, f) parsed_format -> Cil_types.fkind = function
-  | Single_supported -> Cil_types.FFloat
-  | Double_supported -> Cil_types.FDouble
-  | Long_unsupported -> Cil_types.FLongDouble
+  | Single_supported  -> Cil_types.FFloat
+  | Float32_supported -> Cil_types.FFloat32
+  | Float64_supported -> Cil_types.FFloat64
+  | Double_supported  -> Cil_types.FDouble
+  | Long_unsupported  -> Cil_types.FLongDouble
 
-let format_of_string = function
-  | "L" | "l" -> Format (Long_unsupported, Double)
-  | "F" | "f" -> Format (Single_supported, Single)
-  | _         -> Format (Double_supported, Double)
-
-let format_of_char = function
-  | 'L' | 'l' -> Format (Long_unsupported, Double), true
-  | 'D' | 'd' -> Format (Double_supported, Double), true
-  | 'F' | 'f' -> Format (Single_supported, Single), true
-  | _         -> Format (Double_supported, Double), false
+let format_of_suffix = function
+  | "L"   | "l"   -> Format (Long_unsupported, Double)
+  | "F"   | "f"   -> Format (Single_supported, Single)
+  | "F32" | "f32" -> Format (Float32_supported, Float32)
+  | "F64" | "f64" -> Format (Float64_supported, Float64)
+  | _             -> Format (Double_supported, Double)
 
 
 
@@ -83,27 +89,33 @@ type ('l, 'r) same_format =
 
 let same_format (type l r) (l : l format) (r : r format) : (l, r) same_format =
   match l, r with
-  | Single, Single -> Yes Single
-  | Double, Double -> Yes Double
-  | _, _ -> No
+  | Single,  Single  -> Yes Single
+  | Float32, Float32 -> Yes Float32
+  | Float64, Float64 -> Yes Float64
+  | Double,  Double  -> Yes Double
+  | _, _             -> No
 
-let format_order (type l r) (l : l format) (r : r format) : int =
-  match l, r with
-  | Single, Single ->  0
-  | Single, _      -> -1
-  | _     , Single ->  1
-  | Double, Double ->  0
+let id (type l) : l format -> int = function
+  | Single -> 0
+  | Double -> 1
+  | Float32 -> 2
+  | Float64 -> 3
+
+let compare l r = Datatype.Int.compare (id l) (id r)
 
 
-
-let single f = Float (change_format Single f, Single)
-let double f = Float (f, Double)
+let single  f = Float (change_format Single f, Single)
+let float32 f = Float (change_format Float32 f, Float32)
+let float64 f = Float (change_format Float64 f, Float64)
+let double  f = Float (f, Double)
 
 let represents : type f. float:float -> in_format:f format -> f t =
   fun ~float ~in_format ->
   match in_format with
-  | Single -> single float
-  | Double -> double float
+  | Single  -> single  float
+  | Float32 -> float32 float
+  | Float64 -> float64 float
+  | Double  -> double  float
 
 let to_float (Float (n, _)) = n
 let format   (Float (_, f)) = f
@@ -115,11 +127,13 @@ let is_nan (Float (f, _)) = Floating_point.is_nan f
 
 
 let sig_size : type f. f format -> int =
-  function Single -> 24 | Double -> 53
+  function (Single | Float32) -> 24 | (Float64 | Double) -> 53
 
 let convert_float (type f) f : f format -> f t = function
-  | Single -> single (f Floating_point.Single)
-  | Double -> double (f Floating_point.Double)
+  | Single  -> single  (f Floating_point.Single)
+  | Float32 -> float32 (f Floating_point.Single)
+  | Float64 -> float64 (f Floating_point.Double)
+  | Double  -> double  (f Floating_point.Double)
 
 let largest_finite_float_of ~format =
   convert_float Floating_point.largest_finite_float_of format
@@ -134,8 +148,8 @@ let unit_in_the_last_place_of ~format =
   convert_float Floating_point.unit_in_the_last_place_of format
 
 let convert_int (type f) f : f format -> int = function
-  | Single -> f Floating_point.Single
-  | Double -> f Floating_point.Double
+  | Single | Float32  -> f Floating_point.Single
+  | Float64 | Double  -> f Floating_point.Double
 
 let minimal_exponent_of ~format =
   convert_int Floating_point.minimal_exponent_of format
@@ -196,8 +210,10 @@ let fmod base m = binary fmod base m
 
 let change_format : type a f. a t -> f format -> f t = fun number format ->
   match number, format with
-  | Float (n, _), Single -> single n
-  | Float (n, _), Double -> double n
+  | Float (n, _), Single  -> single n
+  | Float (n, _), Float32 -> float32 n
+  | Float (n, _), Float64 -> float64 n
+  | Float (n, _), Double  -> double n
 
 let finite_range_of : type f. format:f format -> f t * f t = fun ~format ->
   let upper = largest_finite_float_of ~format in neg upper, upper
@@ -205,8 +221,8 @@ let finite_range_of : type f. format:f format -> f t * f t = fun ~format ->
 
 
 let bits_encoding : type f. f t -> Z.t = function
-  | Float (x, Single) -> Z.of_int32 (Int32.bits_of_float x)
-  | Float (x, Double) -> Z.of_int64 (Int64.bits_of_float x)
+  | Float (x, (Single|Float32)) -> Z.of_int32 (Int32.bits_of_float x)
+  | Float (x, (Float64|Double)) -> Z.of_int64 (Int64.bits_of_float x)
 
 
 
@@ -400,9 +416,11 @@ let parse_hexadecimal (type f) ~(format : f format) s =
 
 let pretty_resulting_format fmt (Format (supported, format)) =
   match supported, format with
-  | Single_supported, Single -> Format.fprintf fmt "single precision"
-  | Double_supported, Double -> Format.fprintf fmt "double precision"
-  | Long_unsupported, Double -> Format.fprintf fmt "long double precision"
+  | Single_supported,  Single
+  | Float32_supported, Float32 -> Format.fprintf fmt "single precision"
+  | Float64_supported, Float64
+  | Double_supported, Double  -> Format.fprintf fmt "double precision"
+  | Long_unsupported, Double  -> Format.fprintf fmt "long double precision"
 
 let cannot_be_parsed string format =
   let msg =
@@ -420,54 +438,45 @@ module Regexp = struct
   let dot  = "[.]"
   let num  = "\\([0-9]*\\)"
   let exp  = "[eE]\\([+-]?[0-9]+\\)"
-  let fmt  = "\\([FfDdLl]?\\)"
 end
 
-let num_dot_frac_exp = Str.regexp Regexp.(sign ^ num ^ dot ^ num ^ exp ^ fmt)
-let num_dot_frac     = Str.regexp Regexp.(sign ^ num ^ dot ^ num ^ fmt)
-let num_exp          = Str.regexp Regexp.(sign ^ num ^ exp ^ fmt)
+let num_dot_frac_exp = Str.regexp Regexp.(sign ^ num ^ dot ^ num ^ exp)
+let num_dot_frac     = Str.regexp Regexp.(sign ^ num ^ dot ^ num)
+let num_exp          = Str.regexp Regexp.(sign ^ num ^ exp)
 
 let parse str =
-  let length = Stdlib.(String.length str - 1) in
-  if Stdlib.(length < 0) then
-    empty_string ()
-  else if is_hexadecimal str then
-    let resulting_format, suffix = format_of_char str.[length] in
-    let Format (supported, format) = resulting_format in
-    let str = if suffix then String.sub str 0 length else str in
-    match parse_hexadecimal ~format str with
-    | None -> cannot_be_parsed str resulting_format
-    | Some result -> Ok (Parsed (supported, result))
-  else if Str.string_match num_dot_frac_exp str 0 then
-    let sign       = Str.matched_group 1 str in
-    let integral   = Str.matched_group 2 str in
-    let fractional = Str.matched_group 3 str in
-    let exponent   = Str.matched_group 4 str in
-    let format     = Str.matched_group 5 str in
-    let Format (supported, format) = format_of_string format in
-    let normalizing = normalize integral fractional exponent format in
-    Ok (Parsed (supported, apply_sign sign normalizing))
-  else if Str.string_match num_dot_frac str 0 then
-    let sign       = Str.matched_group 1 str in
-    let integral   = Str.matched_group 2 str in
-    let fractional = Str.matched_group 3 str in
-    let exponent   = "0" in
-    let format     = Str.matched_group 4 str in
-    let Format (supported, format) = format_of_string format in
-    let normalizing = normalize integral fractional exponent format in
-    Ok (Parsed (supported, apply_sign sign normalizing))
-  else if Str.string_match num_exp str 0 then
-    let sign          = Str.matched_group 1 str in
-    let integral      = Str.matched_group 2 str in
-    let fractional    = "" in
-    let exponent      = Str.matched_group 3 str in
-    let format     = Str.matched_group 4 str in
-    let Format (supported, format) = format_of_string format in
-    let normalizing = normalize integral fractional exponent format in
-    Ok (Parsed (supported, apply_sign sign normalizing))
+  let (str, suffix, _fkind) = Floating_point.extract_suffix str in
+  if String.length str == 0 then empty_string ()
   else
-    let format = format_of_string (String.make 1 str.[length]) in
-    cannot_be_parsed str format
+    let Format (supported, format) = format_of_suffix suffix in
+    let resulting_format = Format (supported, format) in
+    if is_hexadecimal str then
+      match parse_hexadecimal ~format str with
+      | None -> cannot_be_parsed str resulting_format
+      | Some result -> Ok (Parsed (supported, result))
+    else if Str.string_match num_dot_frac_exp str 0 then
+      let sign       = Str.matched_group 1 str in
+      let integral   = Str.matched_group 2 str in
+      let fractional = Str.matched_group 3 str in
+      let exponent   = Str.matched_group 4 str in
+      let normalizing = normalize integral fractional exponent format in
+      Ok (Parsed (supported, apply_sign sign normalizing))
+    else if Str.string_match num_dot_frac str 0 then
+      let sign       = Str.matched_group 1 str in
+      let integral   = Str.matched_group 2 str in
+      let fractional = Str.matched_group 3 str in
+      let exponent   = "0" in
+      let normalizing = normalize integral fractional exponent format in
+      Ok (Parsed (supported, apply_sign sign normalizing))
+    else if Str.string_match num_exp str 0 then
+      let sign          = Str.matched_group 1 str in
+      let integral      = Str.matched_group 2 str in
+      let fractional    = "" in
+      let exponent      = Str.matched_group 3 str in
+      let normalizing = normalize integral fractional exponent format in
+      Ok (Parsed (supported, apply_sign sign normalizing))
+    else
+      cannot_be_parsed str resulting_format
 
 let parse_exn str =
   match parse str with

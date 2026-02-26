@@ -284,6 +284,8 @@ let get_type_tag t =
     | TInt ILongLong -> "ll"
     | TInt IULongLong -> "ull"
     | TFloat FFloat -> "f"
+    | TFloat FFloat32 -> "f32"
+    | TFloat FFloat64 -> "f64"
     | TFloat FDouble -> "d"
     | TFloat FLongDouble -> "ld"
     | TPtr t -> "p" ^ aux t

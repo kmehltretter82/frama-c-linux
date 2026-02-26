@@ -78,7 +78,7 @@ module Make (Model : Modeling) = struct
     | Repr l, Repr r ->
       let conclude_they_are_equal = 0 in
       let ( let= ) c f = if c = 0 then f `Eq else c in
-      let= `Eq = Typed_float.format_order l.format r.format in
+      let= `Eq = Typed_float.compare l.format r.format in
       let= `Eq = Exact.compare    l.exact    r.exact    in
       let= `Eq = Absolute.compare l.absolute r.absolute in
       let= `Eq = Relative.compare l.relative r.relative in
@@ -128,6 +128,8 @@ module Make (Model : Modeling) = struct
 
   let format_of_fkind = function
     | Cil_types.FFloat      -> Format Single
+    | Cil_types.FFloat32    -> Format Float32
+    | Cil_types.FFloat64    -> Format Float64
     | Cil_types.FDouble     -> Format Double
     | Cil_types.FLongDouble ->
       Kernel.warning ~wkey:Kernel.wkey_long_double
@@ -629,9 +631,10 @@ module Make (Model : Modeling) = struct
       let Format dest = format_of_fkind destination in
       let default = Repr { r with format = dest } in
       match r.format, dest with
-      | Single, (Single | Double) -> `Value default
-      | Double, Double -> `Value default
-      | Double, Single ->
+      | (Single | Float32), (Single | Float32 | Double | Float64) ->
+        `Value default
+      | (Double | Float64), (Double | Float64) -> `Value default
+      | (Double | Float64), (Single | Float32) ->
         match is_an_exact_constant_in_format ~format:Single r with
         | None -> `Value (perform_imprecise_cast ~dest r |> resolve context)
         | Some r -> `Value (represents ~exact:r ~in_format:Single)

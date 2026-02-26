@@ -246,10 +246,7 @@ let report_alarm ~pos annot msg =
     "@[%s.@ @[<hov 2>%a@]@]"
     msg pr_annot annot
 
-let string_fkind = function
-  | Cil_types.FFloat -> "float"
-  | Cil_types.FDouble -> "double"
-  | Cil_types.FLongDouble -> "long double"
+let string_fkind fk = Format.asprintf "%a" Printer.pp_fkind fk
 
 (** Emitting alarms *)
 

@@ -3111,8 +3111,8 @@ let unsignedVersionOf (ik:ikind): ikind =
   | _ -> ik
 
 let frank = function
-  | FFloat -> 1
-  | FDouble -> 2
+  | FFloat  | FFloat32 -> 1
+  | FDouble | FFloat64 -> 2
   | FLongDouble -> 3
 
 
@@ -3198,9 +3198,9 @@ let rec bytesAlignOf ~standard_or_gcc t =
     | TInt (ILongLong|IULongLong) ->
       Alignof.longlong ()
     | TEnum ei ->  bytesAlignOf ~standard_or_gcc (Cil_const.mk_tint ei.ekind)
-    | TFloat FFloat ->
+    | TFloat (FFloat|FFloat32) ->
       Alignof.float ()
-    | TFloat FDouble ->
+    | TFloat (FDouble|FFloat64) ->
       Alignof.double ()
     | TFloat FLongDouble ->
       Alignof.longdouble ()
@@ -4931,10 +4931,10 @@ let arithmeticConversion t1 t2 = (* c.f. ISO 6.3.1.8 *)
   match Ast_types.unroll_skel t1, Ast_types.unroll_skel t2 with
   | TFloat FLongDouble, _ -> checkToFloat t2; t1
   | _, TFloat FLongDouble -> checkToFloat t1; t2
-  | TFloat FDouble, _ -> checkToFloat t2; t1
-  | _, TFloat FDouble -> checkToFloat t1; t2
-  | TFloat FFloat, _ -> checkToFloat t2; t1
-  | _, TFloat FFloat -> checkToFloat t1; t2
+  | TFloat (FFloat64|FDouble), _ -> checkToFloat t2; t1
+  | _, TFloat (FFloat64|FDouble) -> checkToFloat t1; t2
+  | TFloat (FFloat|FFloat32), _ -> checkToFloat t2; t1
+  | _, TFloat (FFloat|FFloat32) -> checkToFloat t1; t2
   | _, _ -> begin
       let t1' = integralPromotion t1 in
       let t2' = integralPromotion t2 in

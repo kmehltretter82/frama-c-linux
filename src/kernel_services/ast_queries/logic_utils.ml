@@ -324,8 +324,8 @@ let constant_to_lconstant c = match c with
   | CReal (f,_,Some s) -> LReal (real_of_float s f)
   | CReal (f,fkind,None) ->
     let s = match fkind with
-      | FFloat -> Format.sprintf "%.8ef" f
-      | FDouble | FLongDouble -> Format.sprintf "%.16ed" f
+      | FFloat  | FFloat32 -> Format.sprintf "%.8ef" f
+      | FDouble | FFloat64 | FLongDouble -> Format.sprintf "%.16ed" f
     in
     LReal (real_of_float s f)
 
@@ -348,13 +348,16 @@ let lconstant_to_constant c = match c with
   | LReal r -> CReal (r.r_nearest,FDouble,Some r.r_literal)
   | LEnum e -> CEnum e
 
+let float_exact_suffixes = ["F"; "D"; "F32"; "F64"]
+let string_has_suffix suffixes s =
+  let supper = String.uppercase_ascii s in
+  List.exists (fun suffix -> String.ends_with ~suffix supper) suffixes
+
 let parse_float ?loc literal =
-  (* If the string has suffix 'F' or 'D', then it represents a single or double
-     constant and the nearest parsed float is exact. Otherwise, use the upper
-     and lower float computed by [parse]. *)
-  let len = String.length literal in
-  let last = Char.uppercase_ascii literal.[len-1] in
-  let is_nearest_exact = last = 'F' || last = 'D' in
+  (* If the string has suffix 'F', 'D', 'F32' or 'F64', then it represents a
+     single or double constant and the nearest parsed float is exact.
+     Otherwise, use the upper and lower float computed by [parse]. *)
+  let is_nearest_exact = string_has_suffix float_exact_suffixes literal in
   let Parsed (format, p) = Typed_float.parse_exn literal in
   let nearest = Typed_float.(to_float p.nearest) in
   let fkind = Typed_float.parsed_fkind format in
@@ -479,8 +482,10 @@ let is_boolean_binop op =
 
 let float_builtin prefix fkind =
   let name = match fkind with
-    | FFloat -> Printf.sprintf "\\%s_float" prefix
-    | FDouble -> Printf.sprintf "\\%s_double" prefix
+    | FFloat   -> Printf.sprintf "\\%s_float" prefix
+    | FFloat32 -> Printf.sprintf "\\%s_float32" prefix
+    | FFloat64 -> Printf.sprintf "\\%s_float64" prefix
+    | FDouble  -> Printf.sprintf "\\%s_double" prefix
     | FLongDouble ->
       Kernel.not_yet_implemented ~current:true "Builtins for long double type"
   in match Logic_env.find_all_logic_functions name with
@@ -1362,7 +1367,8 @@ and is_same_pl_type t1 t2 =
   | LTfloat k1, LTfloat k2 ->
     (match k1,k2 with
      | FFloat, FFloat | FDouble, FDouble | FLongDouble, FLongDouble -> true
-     | (FFloat | FDouble | FLongDouble),_ -> false)
+     | FFloat32, FFloat32 | FFloat64, FFloat64 -> true
+     | (FFloat | FDouble | FLongDouble | FFloat32 | FFloat64), _ -> false)
   | LTarray (t1,c1), LTarray(t2,c2) ->
     is_same_pl_type t1 t2 && is_same_pl_array_size c1 c2
   | LTpointer t1, LTpointer t2 -> is_same_pl_type t1 t2

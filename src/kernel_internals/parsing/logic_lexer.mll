@@ -161,6 +161,8 @@
         "frees", (fun _ -> FREES);
         "function", ext_acsl_kw EXT_SPEC_FUNCTION "function";
         "float", (fun _ -> FLOAT);
+        "_Float32", (fun _ -> FLOAT32);
+        "_Float64", (fun _ -> FLOAT64);
         "for", (fun _ -> FOR);
         "global", (fun _ -> GLOBAL);
         "if", (fun _ -> IF);
@@ -365,7 +367,7 @@ let rL = ['a'-'z' 'A'-'Z' '_']
 let rH = ['a'-'f' 'A'-'F' '0'-'9']
 let rE = ['E''e']['+''-']? rD+
 let rP = ['P''p']['+''-']? rD+
-let rFS	= ('f'|'F'|'l'|'L'|'d'|'D')
+let rFS	= ('f'|'F'|'l'|'L'|'d'|'D'|"f32"|"F32"|"f64"|"F64")
 let rIS = ('u'|'U'|'l'|'L')*
 let rOP = [
   '=' '<' '>' '~'
