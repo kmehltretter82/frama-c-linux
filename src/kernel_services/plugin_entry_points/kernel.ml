@@ -30,13 +30,13 @@ include Kernel_log
 (* Link Kernel_log dkeys related to Fclib to the corresponding libraries
    options *)
 
-let set_fclib_debug () =
+let set_fclib_debug _ _ =
   let debug_task = is_debug_key_enabled dkey_task in
   Task.set_debug debug_task;
   let debug_hptmap = is_debug_key_enabled dkey_hptmap in
   Hptmap.set_debug debug_hptmap
 
-let () = Cmdline.run_after_early_stage set_fclib_debug
+let () = Message_category.add_update_hook set_fclib_debug
 
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
