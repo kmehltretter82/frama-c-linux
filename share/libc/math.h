@@ -11,16 +11,16 @@
 #define __FC_MATH_H
 #include "features.h"
 __PUSH_FC_STDLIB
-
 #include "__fc_string_axiomatic.h"
 #include "errno.h"
-
 __BEGIN_DECLS
 
 typedef float float_t;
-typedef _Float32 _Float32_t;
 typedef double double_t;
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+typedef _Float32 _Float32_t;
 typedef _Float64 _Float64_t;
+#endif
 
 #define MATH_ERRNO	1
 #define MATH_ERREXCEPT	2
