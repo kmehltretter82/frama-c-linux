@@ -6,3 +6,9 @@
     (package frama-c-scope)
   )
 )
+
+; Test using eva.apron
+(cram
+  (applies_to help-messages)
+  (enabled_if %{lib-available:frama-c-eva.apron.core})
+)
