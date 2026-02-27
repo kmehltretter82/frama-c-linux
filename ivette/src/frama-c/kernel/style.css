@@ -238,7 +238,7 @@
 /* -------------------------------------------------------------------------- */
 
 .message-search {
-    padding: 4px 4px 4px 14px;
+    padding: 4px 4px 4px 4px;
 }
 
 .message-search .dome-xForm-section {
@@ -253,7 +253,7 @@
 .message-search .dome-xForm-field {
     margin: 0px 4px;
     display: inline-block;
-    min-width: 80px;
+    min-width: 110px;
 }
 
 .message-search .message-emitter-category {
