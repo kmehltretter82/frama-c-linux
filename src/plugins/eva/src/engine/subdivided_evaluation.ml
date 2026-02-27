@@ -240,9 +240,9 @@ let subdivide size cvalue =
    length (the number of lvalues on which the subdivision is done). We ensure
    this invariant through length indexed lists, by using GADT. *)
 module Hypotheses = struct
-  type zero
-  type 'a succ = S
-  let _ = S
+  type zero = private [ `Zero ]
+  type 'a succ = private | (* Polymorphic variant does not type here. *)
+
   type ('a, 'length) llist =
     | Nil: ('a, zero) llist
     | Cons: 'a * ('a, 'b) llist -> ('a, 'b succ) llist
