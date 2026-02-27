@@ -28,6 +28,7 @@ import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as ASTview from 'frama-c/kernel/ASTview';
 import * as Values from 'frama-c/plugins/eva/api/values';
+import * as Callstack from 'frama-c/plugins/eva/api/callstack';
 import { current as currentProject } from 'frama-c/kernel/api/project';
 import { MarkerText, Modifier, selectMarker, textToString }
   from 'frama-c/richtext';
@@ -97,19 +98,25 @@ function TableCell(props: TableCellProps): JSX.Element {
 
 /* Callstacks are declared by the server. We add the `Summary` construction to
  * cleanly represent the summary of all the callstacks. */
-type callstack = 'Summary' | Values.callstack
+type callstack = 'Summary' | Callstack.callstack
+
+type callsite = Callstack.callsite
 
 /* `getCallstacks` request */
 function useCallstacks(): Request<Ast.marker[], callstack[]> {
-  return React.useCallback((m) => Server.send(Values.getCallstacks, m), []);
+  return React.useCallback((m) =>
+     Server.send(Callstack.getMarkersCallstacks, m), []
+  );
 }
 
 /* `getCallstackInfo` request */
-function useCallsites(): Request<callstack, Values.callsite[]> {
+function useCallsites(): Request<callstack, callsite[]> {
   return React.useCallback(
-    (c: callstack): Promise<Values.callsite[]> => {
-      if (c !== 'Summary') return Server.send(Values.getCallstackInfo, c);
-      else return Promise.resolve([]);
+    (c: callstack): Promise<callsite[]> => {
+      if (c !== 'Summary')
+        return Server.send(Callstack.getCallstackInfo, c).then((c) => c.stack);
+      else
+        return Promise.resolve([]);
     }, []);
 }
 
@@ -222,7 +229,7 @@ function AlarmsInfos(probe?: Probe): Request<callstack, JSX.Element> {
 /* -------------------------------------------------------------------------- */
 
 interface StackInfosProps {
-  callsites: Values.callsite[];
+  callsites: callsite[];
   isSelected: boolean;
   close: () => void;
 }
@@ -232,7 +239,7 @@ async function StackInfos(props: StackInfosProps): Promise<JSX.Element> {
   const selectedClass = isSelected ? 'eva-focused' : '';
   const className = classes('eva-callsite', selectedClass);
   if (callsites.length <= 1) return <></>;
-  const makeCallsite = ({ caller, stmt }: Values.callsite): JSX.Element => {
+  const makeCallsite = ({ caller, stmt }: callsite): JSX.Element => {
     if (!caller || !stmt) return <></>;
     const { name } = States.getDeclaration(caller);
     const key = `${caller}@${stmt}`;
@@ -509,11 +516,11 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
 interface CallsiteCellProps {
   callstack: callstack | 'None' | 'Header';
   index?: number;
-  getCallsites: Request<callstack, Values.callsite[]>;
+  getCallsites: Request<callstack, callsite[]>;
   selectedClass?: string;
 }
 
-function makeStackTitle(calls: Values.callsite[]): string {
+function makeStackTitle(calls: callsite[]): string {
   const cs = calls.slice(1);
   if (cs.length > 0)
     return `Callstack: ${cs.map((c) => c.callee).join(' \u2190 ')}`;
@@ -567,7 +574,7 @@ interface ScopeProps {
   removeProbe: (probe: Probe) => void;
   folded: boolean;
   setFolded: (folded: boolean) => void;
-  getCallsites: Request<callstack, Values.callsite[]>;
+  getCallsites: Request<callstack, callsite[]>;
   byCallstacks: boolean;
   getCallstacks: Request<Ast.marker[], callstack[]>;
   setByCallstacks: (byCallstack: boolean) => void;
@@ -1059,7 +1066,7 @@ function EvaTable(): JSX.Element {
    * asynchronous process. */
   const stackInfosPromise = React.useMemo(async () => {
     const callsites = await getCallsites(cs);
-    const p = (c: Values.callsite): boolean =>
+    const p = (c: callsite): boolean =>
       c.stmt !== undefined && c.stmt === marker;
     const isSelected = callsites.find(p) !== undefined;
     const close = (): void => setCS('Summary');

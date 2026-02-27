@@ -6,4 +6,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Requests registered to the Frama-C server; nothing is exported. *)
+include module type of Eva__Results
