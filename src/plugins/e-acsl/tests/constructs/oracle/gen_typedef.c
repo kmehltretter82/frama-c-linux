@@ -27,7 +27,8 @@ int main(void)
   }
   /*@ assert x == 0; */ ;
   __int128 i = (__int128)((int)x + 1);
-  unsigned __int128 u2 = (unsigned __int128)(i + (__int128)2);
+  unsigned __int128 u2 = (unsigned __int128)(i + 2LL);
+  unsigned __int128 u3 = u2 + 18446744073709551615ULL;
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;
