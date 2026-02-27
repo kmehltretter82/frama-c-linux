@@ -426,11 +426,18 @@ export function RenderMessages(): JSX.Element {
   }, []);
 
   React.useEffect(() => {
-    const newFilters = globalFilterState.getValue();
-    newFilters.emitter.plugins = Object.fromEntries(
-      plugins.map(p => [p.shortname, true])
-    );
-    setFilter(newFilters);
+    const current = globalFilterState.getValue();
+    const newP = Object.fromEntries(plugins.map(p => [p.shortname, true]));
+
+    const updated = {
+      ...current,
+      emitter: {
+        ...current.emitter,
+        plugins: newP
+      }
+    };
+
+    setFilter(updated);
   }, [plugins, setFilter]);
 
   React.useEffect(() => {
