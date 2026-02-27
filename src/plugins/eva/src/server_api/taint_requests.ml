@@ -157,12 +157,7 @@ module EvaTaints = struct
     | Indirect -> "indirect taint" ^ name
 
   let pp fmt = function
-    | taint, Untainted -> Format.fprintf fmt "%s" (to_string taint)
-    | data, indirect ->
-      let sep = match data with Untainted -> "but" | _ -> "and" in
-      Format.fprintf fmt
-        "%s to the value, %s %s to values used to compute lvalues addresses"
-        (to_string data) sep (to_string indirect)
+    (data, _indirect) -> Format.fprintf fmt "%s" (to_string data)
 
   let print_taint fmt marker =
     match of_marker marker with
