@@ -33,7 +33,7 @@ import { menuItem, setting } from './Globals';
 
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as EvaAst from 'frama-c/plugins/eva/api/ast';
-import { taintStatusTags } from 'frama-c/plugins/eva/api/taint';
+import { taintStatus, taintStatusTags } from 'frama-c/plugins/eva/api/taint';
 import * as Properties from 'frama-c/kernel/api/properties';
 import * as States from 'frama-c/states';
 
@@ -275,15 +275,21 @@ function filterEva(p: Property): boolean {
   if ('priority' in p && p.priority === false && filter('eva.priority_only'))
     return false;
   if ('taint' in p) {
-    switch (p.taint) {
-      case 'not_tainted':
-      case 'not_applicable':
+    const taint = p.taint as taintStatus;
+    switch (taint) {
+      case taintStatus.not_tainted:
+      case taintStatus.not_applicable:
         return !filter('eva.data_tainted_only') &&
           !filter('eva.ctrl_tainted_only');
-      case 'direct_taint':
+      case taintStatus.direct_taint:
         return !(filter('eva.ctrl_tainted_only'));
-      case 'indirect_taint':
+      case taintStatus.indirect_taint:
         return !(filter('eva.data_tainted_only'));
+      case taintStatus.not_computed:
+      case taintStatus.error:
+        break;
+      default:
+        throw taint satisfies never;
     }
   }
   return true;
@@ -419,13 +425,22 @@ export const renderTaint: Renderer<States.Tag> =
   (taint: States.Tag): JSX.Element | null => {
     let id = null;
     let color = 'black';
-    switch (taint.name) {
-      case 'not_tainted': id = 'DROP.EMPTY'; color = '#00B900'; break;
-      case 'direct_taint': id = 'DROP.FILLED'; color = '#882288'; break;
-      case 'indirect_taint': id = 'DROP.FILLED'; color = '#73BBBB'; break;
-      case 'error': id = 'HELP'; break;
-      case 'not_applicable': id = 'MINUS'; break;
+    const status = taint.name as taintStatus;
+    switch (status) {
+      case taintStatus.not_tainted:
+        id = 'DROP.EMPTY'; color = '#00B900'; break;
+      case taintStatus.direct_taint:
+        id = 'DROP.FILLED'; color = '#882288'; break;
+      case taintStatus.indirect_taint:
+        id = 'DROP.FILLED'; color = '#73BBBB'; break;
+      case taintStatus.error:
+        id = 'HELP'; break;
+      case taintStatus.not_applicable:
+        id = 'MINUS'; break;
+      case taintStatus.not_computed:
+        break;
       default:
+        throw status satisfies never;
     }
     return (id ? <Icon id={id} fill={color} title={taint.descr} /> : null);
   };
