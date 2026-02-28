@@ -74,7 +74,7 @@ const DEFAULTS: { [key: string]: IFilterContent } = {
   'source.alarms': newFilter(true, "Alarms"),
   'source.libc': newFilter(true, "Libc specifications"),
   'source.others': newFilter(true, "Others"),
-   /** status */
+  /** status */
   'status.valid': newFilter(true, "Valid"),
   'status.valid_hyp': newFilter(true, "Valid under hyp."),
   'status.unknown': newFilter(true, "Unknown"),
@@ -156,13 +156,13 @@ function useFilterStr(path: string): Form.FieldState<string> {
     (newValue: string, newError: Form.FieldError) => {
       setValue(newValue);
       setError(newError);
-      if(Form.isValid(newError)) Reload.emit();
+      if (Form.isValid(newError)) Reload.emit();
     }, [setValue],
   );
   return { value, error, onChanged };
 }
 
-function resetFilters(prefix: string, b?: boolean) : void {
+function resetFilters(prefix: string, b?: boolean): void {
   for (const key in DEFAULTS) {
     if (key.startsWith(prefix)) {
       const target = b ?? DEFAULTS[key].value;
@@ -322,11 +322,11 @@ export interface IFilterState {
 
 function getContextMenu(
   type: TFilterType,
-  filters: {[key: string]: setting}
-):Dome.PopupMenuItem[] {
-  const typeStr = type+".";
+  filters: { [key: string]: setting }
+): Dome.PopupMenuItem[] {
+  const typeStr = type + ".";
   return Object.entries(DEFAULTS)
-    .filter(([k, ]) => k.startsWith(typeStr))
+    .filter(([k,]) => k.startsWith(typeStr))
     .map(([k, elt]) => menuItem({
       label: elt.label,
       state: filters[k.replace(typeStr, "")]
@@ -334,13 +334,13 @@ function getContextMenu(
 }
 
 export function useStatusFilter(): IFilterState {
-  const filters: {[key: string]: setting} = {};
+  const filters: { [key: string]: setting } = {};
 
   filters['valid'] = useFilter('status.valid');
   filters['valid_hyp'] = useFilter('status.valid_hyp');
   filters['unknown'] = useFilter('status.unknown');
   filters['invalid'] = useFilter('status.invalid');
-  filters['invalid_hyp' ]= useFilter('status.invalid_hyp');
+  filters['invalid_hyp'] = useFilter('status.invalid_hyp');
   filters['considered_valid'] = useFilter('status.considered_valid');
   filters['untried'] = useFilter('status.untried');
   filters['dead'] = useFilter('status.dead');
@@ -354,7 +354,7 @@ export function useStatusFilter(): IFilterState {
 }
 
 export function useKindPropertiesFilter(): IFilterState {
-  const filters: {[key: string]: setting} = {};
+  const filters: { [key: string]: setting } = {};
 
   filters['assert'] = useFilter('kind.assert');
   filters['invariant'] = useFilter('kind.invariant');
@@ -379,7 +379,7 @@ export function useKindPropertiesFilter(): IFilterState {
 }
 
 export function useEvaPropertiesFilter(): IFilterState {
-  const filters: {[key: string]: setting} = {};
+  const filters: { [key: string]: setting } = {};
 
   filters['priority_only'] = useFilter('eva.priority_only');
   filters['data_tainted_only'] = useFilter('eva.data_tainted_only');
@@ -626,16 +626,16 @@ function CheckField(props: CheckFieldProps): JSX.Element {
 function PropertyFilter(): JSX.Element {
   const namesState = useFilterStr("names");
   const checkerNames = (names: string | undefined): Form.FieldError => {
-    if( names === undefined || names === "" || names.length > 1) return true;
+    if (names === undefined || names === "" || names.length > 1) return true;
     return "At least 2 characters";
   };
 
   const getCheckBox = (type: TFilterType): JSX.Element => {
     return <> {
       Object.entries(DEFAULTS)
-        .filter(([key, ]) => key.startsWith(type+"."))
+        .filter(([key,]) => key.startsWith(type + "."))
         .map(([key, elt]) =>
-          <CheckField key={key} label={elt.label} path={key} title={elt.title}/>
+          <CheckField key={key} label={elt.label} path={key} title={elt.title} />
         )
     }</>;
   };
@@ -649,7 +649,7 @@ function PropertyFilter(): JSX.Element {
         className="properties-section-names"
         infos={Form.isValid(namesState.error) && namesState.value.length >= 2 ? "Active" : ""}
         summary={!Form.isValid(namesState.error) ?
-          <Icon id='WARNING' kind="warning" title={`Errors in section`}/> : undefined }
+          <Icon id='WARNING' kind="warning" title={`Errors in section`} /> : undefined}
       >
         <Form.TextField
           label={""}
@@ -660,11 +660,11 @@ function PropertyFilter(): JSX.Element {
         />
       </Section>
 
-      <FilterSection label="Source" prefix="source"> { getCheckBox("source") } </FilterSection>
-      <FilterSection label="Status" prefix="status" unfold> { getCheckBox("status") } </FilterSection>
-      <FilterSection label="Property kind" prefix="kind"> { getCheckBox("kind") } </FilterSection>
-      <FilterSection label="Alarms kind" prefix="alarms"> { getCheckBox("alarms") } </FilterSection>
-      <FilterSection label="Eva"> { getCheckBox("eva") } </FilterSection>
+      <FilterSection label="Source" prefix="source"> {getCheckBox("source")} </FilterSection>
+      <FilterSection label="Status" prefix="status" unfold> {getCheckBox("status")} </FilterSection>
+      <FilterSection label="Property kind" prefix="kind"> {getCheckBox("kind")} </FilterSection>
+      <FilterSection label="Alarms kind" prefix="alarms"> {getCheckBox("alarms")} </FilterSection>
+      <FilterSection label="Eva"> {getCheckBox("eva")} </FilterSection>
     </Scroll>
   );
 }

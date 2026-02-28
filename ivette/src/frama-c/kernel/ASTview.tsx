@@ -496,7 +496,7 @@ export function getMarkerMenuItems(
   const items: Dome.PopupMenuItem[] = [];
   const { kind, name, labelKind, definition } = attributes;
   if (kind === 'DFUN') {
-    if(callers) {
+    if (callers) {
       const groupedCallers = Lodash.groupBy(callers, ({ call }) => call);
       const markers = callers.map(({ stmt }) => stmt);
       const descr = `Calls to ${name}`;
