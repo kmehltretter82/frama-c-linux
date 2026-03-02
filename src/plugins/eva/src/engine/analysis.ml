@@ -230,20 +230,12 @@ let compute_thread (type t) (engine: t engine) ?cvalue_state thread =
     then None (* use generated main arguments *)
     else Some (List.map snd arguments)
   in
-  try
-    (* In multi thread analyses, Memexec cache must be invalidated *)
-    Mem_exec.cleanup_results ();
-    Self.ComputationState.set Computing;
-    let final_state = compute_from_entry_point (module Engine)
-        ~thread ?cvalue_state ?arguments entry_point in
-    Self.ComputationState.set Computed;
-    (* Display the final state of each thread main function *)
-    Engine.Dom.post_analysis final_state
-  with exn ->
-    Self.(ComputationState.set Aborted);
-    match exn with
-    | Error | Self.Abort -> () (* do not re-raise *)
-    | exn -> raise exn
+  (* In multi thread analyses, Memexec cache must be invalidated *)
+  Mem_exec.cleanup_results ();
+  let final_state = compute_from_entry_point (module Engine)
+      ~thread ?cvalue_state ?arguments entry_point in
+  (* Display the final state of each thread main function *)
+  Engine.Dom.post_analysis final_state
 
 let mthread_thread_analysis engine analysis th =
   let open Mt_thread in
@@ -283,6 +275,16 @@ let mthread_thread_analysis engine analysis th =
 let mthread_fixpoint engine analysis =
   let open Mt_thread in
 
+  (* Let Eva know about interrupt handlers. *)
+  Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
+
+  (* We analyse the main thread *)
+  Mt_self.feedback "*** Computing value analysis for main thread";
+  compute_thread engine Thread.main;
+  Mt_self.feedback "*** First value analysis for main thread done." ;
+  Mt_analysis_fixpoint.post_thread_analysis analysis;
+
+  (* We perform the analysis iterations *)
   Mt_self.feedback "******* Starting to iterate";
   let limit = Mt_options.StopAfter.get () in
   analysis.iteration <- 0;
@@ -320,22 +322,23 @@ let mthread_compute () =
   Fun.protect ~finally:Mt_main.unregister_hooks @@ fun () ->
 
   let module Engine = (val pre_analysis ()) in
-
-  (* Let Eva know about interrupt handlers. *)
-  Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
-
-  (* We analyse the main thread *)
-  Mt_self.feedback "*** Computing value analysis for main thread";
-  compute_thread (module Engine) Thread.main;
-  Mt_self.feedback "*** First value analysis for main thread done." ;
-  Mt_analysis_fixpoint.post_thread_analysis analysis;
-
-  (* We perform the analysis iterations *)
-  mthread_fixpoint (module Engine) analysis;
-  post_analysis ();
-  Summary.print ();
-  Statistics.export_as_csv ();
-  Mt_main.post_analysis analysis
+  let compute () =
+    mthread_fixpoint (module Engine) analysis
+  in
+  try
+    Self.ComputationState.set Computing;
+    let restore_signals = Signal.setup () in
+    Fun.protect ~finally:restore_signals compute;
+    Self.(ComputationState.set Computed);
+    post_analysis ();
+    Summary.print ();
+    Statistics.export_as_csv ();
+    Mt_main.post_analysis analysis
+  with exn ->
+    Self.(ComputationState.set Aborted);
+    match exn with
+    | Error | Self.Abort -> () (* do not re-raise  *)
+    | exn -> raise exn
 
 let mthread_compute_once, _self =
   State_builder.apply_once "Eva.Analysis.mthread_compute"
