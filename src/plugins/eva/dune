@@ -13,20 +13,6 @@
   (modules gen_api)
   (libraries str)))
 
-(rule
- (targets Eva.ml Eva.mli)
- (mode (promote (only Eva.mli)))
- (deps
-  gen_api/Eva.header
-  src/engine/analysis.mli src/types/callstack.mli src/types/deps.mli
-  src/utils/results.mli src/parameters.mli
-  src/utils/eva_perf.mli src/utils/statistics.mli src/utils/export.mli
-  src/utils/eva_annotations.mli src/eval.mli src/types/assigns.mli src/ast/eva_ast.mli
-  src/domains/cvalue/builtins.mli
-  src/utils/cvalue_callbacks.mli src/legacy/logic_inout.mli src/utils/eva_results.mli
-  src/utils/unit_tests.mli)
- (action (run ./gen_api/gen_api.exe %{deps})))
-
 (install
  (package frama-c-eva)
  (section (site (frama-c share)))
