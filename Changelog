@@ -18,6 +18,12 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2026-03-02] Move `Cmdline.Kernel_log` to its own `Kernel_log`
+              module. `Cmdline.Kernel_log` and related symbols are now
+              deprecated. All Kernel's wkey/dkey have been moved to `Kernel_log`
+              as well and are now imported in `Kernel`. `Kernel_log` should
+              only be used to avoid dependency cycles with `Plugin` or `Cmdline`
+              modules, in other cases, use `Kernel` directly.
 -   Kernel    [2026-02-16] Updated 'frama-c-script configure' to better match
               the target configuration w.r.t. Frama-C's libc.
 -   Kernel    [2026-02-11] Natively support bool keywords for C23
