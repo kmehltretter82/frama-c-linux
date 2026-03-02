@@ -321,7 +321,7 @@ module Make
       | `Top -> Right.Store.callstacks control_point
       | `Value _ as x -> x
 
-    let is_enabled () = Left.Store.is_enabled () && Right.Store.is_enabled ()
+    let is_computed () = Left.Store.is_computed () && Right.Store.is_computed ()
   end
 
   let post_analysis = function

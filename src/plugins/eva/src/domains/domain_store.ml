@@ -48,7 +48,7 @@ module type S = sig
   val set_state: ?callstack:Callstack.t -> control_point -> t -> unit
   val get_state: ?callstack:Callstack.t -> control_point -> t or_top_bottom
   val callstacks: control_point -> Callstack.t list or_top
-  val is_enabled: unit -> bool
+  val is_computed: unit -> bool
 end
 
 module Make (Domain: InputDomain) = struct
@@ -91,10 +91,10 @@ module Make (Domain: InputDomain) = struct
         let by_callstack = TableByCallstack.memo create control_point in
         Callstack.Hashtbl.replace by_callstack callstack state
 
-  let is_enabled () = Save.get_option () |> Option.value ~default:false
+  let is_computed () = Save.get_option () |> Option.value ~default:false
 
   let get_state ?callstack control_point =
-    if is_enabled ()
+    if is_computed ()
     then
       try
         match callstack with
@@ -109,7 +109,7 @@ module Make (Domain: InputDomain) = struct
     TableByCallstack.find key |> Callstack.Hashtbl.to_seq_keys |> List.of_seq
 
   let callstacks control_point =
-    if is_enabled () then
+    if is_computed () then
       try `Value (get_callstacks control_point)
       with Not_found -> `Value []
     else `Top

@@ -643,6 +643,6 @@ module Restrict
       Some (state, Mode.all)
 
     let callstacks = Domain.Store.callstacks
-    let is_enabled = Domain.Store.is_enabled
+    let is_computed = Domain.Store.is_computed
   end
 end

@@ -396,7 +396,7 @@ module State = struct
       state, Locals_scoping.top ()
 
     let callstacks = Cvalue_results.callstacks
-    let is_enabled = Cvalue_results.is_enabled
+    let is_computed = Cvalue_results.is_computed
   end
 
   let get_state_before stmt =

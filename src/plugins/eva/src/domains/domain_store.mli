@@ -46,7 +46,7 @@ module type S = sig
   val callstacks: control_point -> Callstack.t list or_top
 
   (** Are states of this domain saved? *)
-  val is_enabled: unit -> bool
+  val is_computed: unit -> bool
 end
 
 module Make (Domain : InputDomain) : S with type t := Domain.t
