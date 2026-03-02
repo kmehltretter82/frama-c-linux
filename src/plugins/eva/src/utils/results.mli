@@ -180,6 +180,14 @@ type taint =
 val is_tainted :
   ?name:string -> Locations.Zone.t -> request -> (taint, error) Result.t
 
+type taint_names_by_kind =
+  { direct_taint_names: Datatype.String.Set.t;
+    indirect_taint_names: Datatype.String.Set.t;
+  }
+
+val taint_names_by_kind:
+  Locations.Zone.t -> request -> (taint_names_by_kind, error) Result.t
+
 (** Computes (an overapproximation of) the memory dependencies of an
     expression. *)
 val expr_dependencies : Cil_types.exp -> request -> Deps.t

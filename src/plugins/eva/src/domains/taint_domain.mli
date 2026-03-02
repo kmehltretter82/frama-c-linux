@@ -23,3 +23,10 @@ val is_tainted: ?name:string -> state -> Locations.Zone.t -> taint
 
 (** Returns the list of taint names encountered by the taint analysis. *)
 val taint_names: unit -> string list
+
+type taint_names_by_kind =
+  { direct_taint_names: Datatype.String.Set.t;
+    indirect_taint_names: Datatype.String.Set.t;
+  }
+
+val taint_names_by_kind: state -> Locations.Zone.t -> taint_names_by_kind

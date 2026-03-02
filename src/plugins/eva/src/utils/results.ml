@@ -715,6 +715,16 @@ let is_tainted ?name zone request =
   let state = M.get_state request Taint_domain.key Taint_domain.join in
   Result.map (fun state -> Taint_domain.is_tainted ?name state zone) state
 
+type taint_names_by_kind = Taint_domain.taint_names_by_kind =
+  { direct_taint_names: Datatype.String.Set.t;
+    indirect_taint_names: Datatype.String.Set.t;
+  }
+
+let taint_names_by_kind zone request =
+  let module M = Make () in
+  let state = M.get_state request Taint_domain.key Taint_domain.join in
+  Result.map (fun state -> Taint_domain.taint_names_by_kind state zone) state
+
 (* Reachability *)
 
 let is_empty rq =

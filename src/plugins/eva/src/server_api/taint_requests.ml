@@ -50,6 +50,19 @@ let is_tainted zone request =
   let name = if current_name = "" then None else Some current_name in
   Results.is_tainted ?name zone request
 
+let taint_names_by_kind zone request =
+  let open Option.Operators in
+  let* names = Results.taint_names_by_kind zone request |> Result.to_option in
+  let current_name = CurrentTaint.get () in
+  if current_name = ""
+  then Some names
+  else
+    let current_name = Datatype.String.Set.of_list [ current_name ] in
+    let restrict = Datatype.String.Set.inter current_name in
+    let direct_taint_names = restrict names.direct_taint_names in
+    let indirect_taint_names = restrict names.indirect_taint_names in
+    Some { direct_taint_names; indirect_taint_names }
+
 let register_hook f =
   Analysis_requests.register_computation_hook f;
   CurrentTaint.add_hook_on_change (fun _ -> f ())
@@ -126,10 +139,10 @@ module EvaTaints = struct
 
   let evaluate expr request =
     let open Option.Operators in
-    let Deps.{ data ; indirect } = Results.expr_dependencies expr request in
-    let* data = is_tainted data request |> Result.to_option in
-    let* indirect = is_tainted indirect request |> Result.to_option in
-    Some (data, indirect)
+    let Deps.{ data } = Results.expr_dependencies expr request in
+    let* taint = is_tainted data request |> Result.to_option in
+    let* names = taint_names_by_kind data request in
+    Some (taint, names)
 
   let expr_of_marker = let open Printer_tag in function
       | PLval (_, Kstmt stmt, lval) -> Some (expr_of_lval lval, stmt)
@@ -146,18 +159,23 @@ module EvaTaints = struct
     let* after  = evaluate expr (Results.after  stmt) in
     Some (before, after)
 
-  let to_string taint =
-    let name =
-      let current_name = CurrentTaint.get () in
-      if current_name = "" then "" else Format.sprintf " (%s)" current_name
-    in
+  let to_string taint Results.{ direct_taint_names; indirect_taint_names } =
     match taint with
-    | Untainted -> "untainted"
-    | Direct -> "direct taint" ^ name
-    | Indirect -> "indirect taint" ^ name
+    | Untainted ->
+      "untainted"
+    | Indirect ->
+      Format.asprintf "indirect taint @[<h>%a@]"
+        Datatype.String.Set.pretty indirect_taint_names
+    | Direct when Datatype.String.Set.is_empty indirect_taint_names ->
+      Format.asprintf "direct taint @[<h>%a@]"
+        Datatype.String.Set.pretty direct_taint_names
+    | Direct ->
+      Format.asprintf "direct taint @[<h>%a@], indirect taint @[<h>%a@]"
+        Datatype.String.Set.pretty direct_taint_names
+        Datatype.String.Set.pretty indirect_taint_names
 
-  let pp fmt = function
-    (data, _indirect) -> Format.fprintf fmt "%s" (to_string data)
+  let pp fmt = fun (taint, taint_names) ->
+    Format.fprintf fmt "%s" (to_string taint taint_names)
 
   let print_taint fmt marker =
     match of_marker marker with
