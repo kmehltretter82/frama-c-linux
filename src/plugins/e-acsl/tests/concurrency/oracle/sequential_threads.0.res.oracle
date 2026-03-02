@@ -18,11 +18,11 @@
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:354: Warning: 
   function __gen_e_acsl_pthread_create: postcondition 'initialization,success_or_error' got status unknown.
-[eva:alarm] sequential_threads.c:29: Warning: 
+[eva:alarm] sequential_threads.c:35: Warning: 
   accessing uninitialized left-value. assert \initialized(&t);
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:401: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:350: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] sequential_threads.c:33: Warning: 
+[eva:alarm] sequential_threads.c:39: Warning: 
   accessing uninitialized left-value. assert \initialized(&t);

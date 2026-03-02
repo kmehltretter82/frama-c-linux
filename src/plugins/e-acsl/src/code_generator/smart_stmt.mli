@@ -91,9 +91,9 @@ val initialize: loc:location -> lval -> stmt
 (** Same as [store_stmt] for [__e_acsl_initialize] that observes the
     initialization of the given left-value. *)
 
-val mark_readonly: varinfo -> stmt
+val mark_readonly : loc:location -> exp -> stmt
 (** Same as [store_stmt] for [__e_acsl_markreadonly] that observes the
-    read-onlyness of the given varinfo. *)
+    read-onlyness of the given expression. *)
 
 val set_unsound_verdict : loc:location -> stmt
 (** @return a statement that indicates to the user that from here on all

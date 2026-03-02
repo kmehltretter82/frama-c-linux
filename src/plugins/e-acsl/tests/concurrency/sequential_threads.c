@@ -19,6 +19,12 @@ void *read_value(void *arg) {
   return NULL;
 }
 
+// https://git.frama-c.com/frama-c/frama-c/-/issues/1700
+typedef struct {
+  int i;
+} struct_t;
+struct_t const s = {.i = 0};
+
 int main() {
   pthread_t t;
   int args[SIZE];

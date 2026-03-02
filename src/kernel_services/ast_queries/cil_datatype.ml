@@ -210,6 +210,7 @@ end
 
 module Location = struct
   let unknown = Position.unknown, Position.unknown
+  let is_unknown loc = loc = unknown
   let dummy = unknown
   let pretty_ref = ref (fun _ _ -> assert false)
   include Make_with_collections

@@ -118,7 +118,7 @@ let setCurrentFile n =
 let pp_context_from_file ?(ctx=2) fmt ((start_pos, pos) as loc) =
   let open Filesystem.Operators in
   (* We cannot give any context on unknown locations *)
-  if loc == Cil_datatype.Location.unknown then ()
+  if Cil_datatype.Location.is_unknown loc then ()
   else
     let start_pos =
       if Filepath.equal start_pos.Filepath.pos_path pos.Filepath.pos_path
