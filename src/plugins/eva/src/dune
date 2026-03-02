@@ -67,7 +67,7 @@
 
 (rule
  (targets Eva.ml Eva.mli)
- (mode (promote (only Eva.mli) (into ..)))
+ (mode (promote (only Eva.mli)))
  (deps
   ../gen_api/Eva.header
   engine/analysis.mli types/callstack.mli types/deps.mli
