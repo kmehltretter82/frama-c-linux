@@ -6,6 +6,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+type 'state engine = (module Engine_sig.S with type Dom.state = 'state)
+
 (* ----- Pre-analysis checks ------------------------------------------------ *)
 
 (* Clear Eva's various caches. Some operations of Eva depend on parameters,
@@ -98,7 +100,7 @@ let pre_analysis () =
 
 (* ----- Post-analysis cleanup ---------------------------------------------- *)
 
-let post_analysis () =
+let post_analysis (type t) (engine: t engine) final_state =
   (* Garbled mix must be dumped here -- at least before the call to
      mark_green_and_red -- because fresh ones are created when re-evaluating
      all the alarms, and we get an unpleasant "ghost effect". *)
@@ -118,7 +120,12 @@ let post_analysis () =
   if Parameters.RmAssert.get () then Eva_dynamic.Scope.rm_asserts ();
   (* The above functions may have changed the status of alarms. *)
   Summary.FunctionStats.recompute_all ();
-  Red_statuses.report ()
+  Red_statuses.report ();
+  (* Print results *)
+  let module Engine = (val engine) in
+  Engine.Dom.post_analysis final_state;
+  Summary.print ();
+  Statistics.export_as_csv ()
 
 
 (* ----- Analysis status ---------------------------------------------------- *)
@@ -154,8 +161,6 @@ let save_results kf =
   with Kernel_function.No_Definition -> false
 
 (* ----- Running the analysis ------------------------------------------------ *)
-
-type 'state engine = (module Engine_sig.S with type Dom.state = 'state)
 
 exception Error
 
@@ -317,10 +322,7 @@ let compute_from ?cvalue_state ?arguments entry_point =
           ?cvalue_state ?arguments entry_point
     in
     Self.(ComputationState.set Computed);
-    post_analysis ();
-    Engine.Dom.post_analysis final_state;
-    Summary.print ();
-    Statistics.export_as_csv ();
+    post_analysis (module Engine) final_state;
     if mt_enabled then
       Mt_main.post_analysis analysis
   with exn ->
