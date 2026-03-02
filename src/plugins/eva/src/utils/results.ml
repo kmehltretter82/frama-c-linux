@@ -80,8 +80,8 @@ let in_cvalue_state cvalue = Cvalue cvalue
 
 (* Manipulating request results *)
 
-type restricted_to_callstack
-type unrestricted_response
+type restricted_to_callstack = private [ `Restricted ]
+type unrestricted_response = private [ `Unrestricted ]
 
 module Response =
 struct
@@ -184,8 +184,8 @@ end
 
 (* Extracting states and values *)
 
-type value
-type address
+type value = private [ `Value ]
+type address = private [ `Address ]
 
 module Make () =
 struct
