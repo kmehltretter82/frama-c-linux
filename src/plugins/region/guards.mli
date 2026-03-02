@@ -13,13 +13,14 @@
 open Memory
 open Cil_types
 
-type addr = LV of lval | TLV of term_lval | ADDR of term
+type addr = LV of lval | TLV of term_lval | ADDR of exp | TADDR of term
 type value = E of exp | T of term
 type guard =
   | Bounds of value * Z.t
   | Non_null of addr
   | Valid of addr
   | Valid_read of addr
+  | Valid_object of addr
   | Valid_region of node * addr
   | Initialized of addr
   | Aligned of addr

@@ -27,6 +27,10 @@ val pvalid_region :
   ?loc:location -> ?names:string list -> ?label:logic_label ->
   term -> predicate
 
+val pvalid_object :
+  ?loc:location -> ?names:string list -> ?label:logic_label ->
+  term -> predicate
+
 val pinitialized :
   ?loc:location -> ?names:string list -> ?label:logic_label ->
   term -> predicate
@@ -74,6 +78,7 @@ type residual =
 and condition = [ `True | `False | `Non_null ]
 
 val rvalid : readonly:bool -> kinstr -> Memory.node -> lkind -> residual
+val rvalid_object : kinstr -> Memory.node -> lkind -> residual
 val rinitialized : Memory.node -> lkind -> residual
 val raligned : Memory.node -> lkind -> bits:int -> residual
 

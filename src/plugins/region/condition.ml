@@ -24,6 +24,11 @@ let pvalid ?loc ?names ?(label=Logic_const.here_label) addr =
 let pvalid_read ?loc ?names ?(label=Logic_const.here_label) addr =
   Logic_const.pvalid_read ?loc ?names (label,addr)
 
+let pvalid_object ?loc ?names ?(label=Logic_const.here_label) addr =
+  if Ast_types.is_logic_fun_ptr addr.term_type
+  then Logic_const.pvalid_function ?loc ?names addr
+  else Logic_const.pobject_pointer ?loc ?names (label, addr)
+
 let pinitialized ?loc ?names ?(label=Logic_const.here_label) addr =
   Logic_const.pinitialized ?loc ?names (label,addr)
 
@@ -161,10 +166,21 @@ let rvalid ~readonly kinstr node kd =
       then `False
       else allocated kinstr v
     | _ ->
-      let flags = Memory.flags node in
       condition ~validregion:true @@
+      let flags = Memory.flags node in
       if not readonly && Attr.mem `Readonly flags then `False
       else
+      if Attr.mem `Dynamic flags then `Default else
+      if Attr.mem `Nullable flags then `Non_null else `True
+
+let rvalid_object kinstr node kd =
+  if kd.unsafe then Default
+  else
+    match kd.host with
+    | Some v -> condition @@ allocated kinstr v
+    | _ ->
+      condition ~validregion:true @@
+      let flags = Memory.flags node in
       if Attr.mem `Dynamic flags then `Default else
       if Attr.mem `Nullable flags then `Non_null else `True
 

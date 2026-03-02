@@ -21,7 +21,8 @@ type value =
 type addr =
   | LV of Lval.t
   | TLV of Term_lval.t
-  | ADDR of Term.t
+  | ADDR of Exp.t
+  | TADDR of Term.t
 [@@ deriving ord]
 
 let pp_value fmt = function
@@ -29,15 +30,17 @@ let pp_value fmt = function
   | T t -> Printer.pp_term fmt t
 
 let pp_addr fmt = function
-  | LV lv -> Format.fprintf fmt "« %a »" Printer.pp_lval lv
-  | TLV lv -> Printer.pp_term_lval fmt lv
-  | ADDR p -> Format.fprintf fmt "*(%a)" Printer.pp_term p
+  | LV lv -> Format.fprintf fmt "« &(%a) »" Printer.pp_lval lv
+  | ADDR p -> Format.fprintf fmt "« %a »" Printer.pp_exp p
+  | TLV lv -> Format.fprintf fmt "&(%a)" Printer.pp_term_lval lv
+  | TADDR p -> Format.fprintf fmt "%a" Printer.pp_term p
 
 type guard =
   | Bounds of value * Z.t
   | Non_null of addr
   | Valid of addr
   | Valid_read of addr
+  | Valid_object of addr
   | Valid_region of (Memory.node [@ compare fun _ _ -> 0]) * addr
   | Initialized of addr
   | Aligned of addr
@@ -55,6 +58,7 @@ let pp_guard fmt = function
   | Bounds(k,n) -> Format.fprintf fmt "0<= %a < %a" pp_value k Z.pretty n
   | Non_null a -> Format.fprintf fmt "!(%a)" pp_addr a
   | Valid a -> Format.fprintf fmt "\\valid(%a)" pp_addr a
+  | Valid_object a -> Format.fprintf fmt "\\valid_object(%a)" pp_addr a
   | Valid_read a -> Format.fprintf fmt "\\valid_read(%a)" pp_addr a
   | Valid_region(_,a) -> Format.fprintf fmt "\\valid_region(%a)" pp_addr a
   | Initialized a -> Format.fprintf fmt "\\initialized(%a)" pp_addr a
@@ -94,7 +98,8 @@ let of_value = function
 let of_addr ?loc = function
   | LV lval -> Condition.addrof ?loc lval
   | TLV lval -> Condition.taddrof ?loc lval
-  | ADDR ptr -> ptr
+  | ADDR ptr -> Logic_utils.expr_to_term ~coerce:true ptr
+  | TADDR ptr -> ptr
 
 let of_guard ?loc ?names = function
   | Bounds(k,n) ->
@@ -110,6 +115,7 @@ let of_guard ?loc ?names = function
     Logic_const.prel ?loc ?names (Rneq,addr,null)
   | Valid p -> Condition.pvalid ?loc ?names @@ of_addr ?loc p
   | Valid_read p -> Condition.pvalid_read ?loc ?names @@ of_addr ?loc p
+  | Valid_object p -> Condition.pvalid_object ?loc ?names @@ of_addr ?loc p
   | Valid_region(_,p) -> Condition.pvalid_region ?loc ?names @@ of_addr ?loc p
   | Initialized p -> Condition.pinitialized ?loc ?names @@ of_addr ?loc p
   | Aligned p -> Condition.paligned ?loc ?names @@ of_addr ?loc p
@@ -161,13 +167,15 @@ let check env g n a = function
 
 let kind = function
   | LV lv -> Condition.lkind lv
+  | ADDR p -> Condition.kind p
   | TLV lv -> Condition.term_lkind lv
-  | ADDR p -> Condition.term_kind p
+  | TADDR p -> Condition.term_kind p
 
 let typeof = function
   | LV lv -> Cil.typeOfLval lv
   | TLV lv -> Logic_utils.logicCType @@ Cil.typeOfTermLval lv
-  | ADDR p -> Logic_typing.ctype_of_pointed p.term_type
+  | ADDR p -> Ast_types.pointed_type @@ Cil.typeOf p
+  | TADDR p -> Logic_typing.ctype_of_pointed p.term_type
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Valid Conditions                                                  --- *)
@@ -180,6 +188,10 @@ let valid env n a =
 let valid_read env n a =
   check env (Valid_read a) n a @@
   Condition.rvalid ~readonly:true env.here n (kind a)
+
+let valid_object env n a =
+  check env (Valid_read a) n a @@
+  Condition.rvalid_object env.here n (kind a)
 
 let valid_region env n a =
   if (kind a).unsafe then add env (Valid_region(n,a))
@@ -205,6 +217,13 @@ let writable env n a =
     valid_region env n a ;
     valid env n a ;
     aligned env n a ;
+  end
+
+let assignable_pointed env a n =
+  let is_fun = Ast_types.is_fun_ptr @@ typeof a in
+  begin
+    if not is_fun then aligned env n a ;
+    valid_object env n a
   end
 
 (* -------------------------------------------------------------------------- *)
@@ -234,7 +253,11 @@ and offset env t r = function
     offset env te r o
 
 and addr env e = Option.get @@ exp env e
-and eval env e = ignore @@ exp env e
+and eval env e =
+  match exp env e with
+  | None -> ()
+  | Some r -> assignable_pointed env (ADDR e) r
+
 and exp env e =
   match e.enode with
   | AddrOf lv | StartOf lv ->
@@ -249,15 +272,13 @@ and exp env e =
   | BinOp((PlusPI|MinusPI),p,k,_) ->
     let r = exp env p in
     eval env k ; r
-  | BinOp(_,a,b,_) ->
-    eval env a ;
-    eval env b ;
-    None
+  | BinOp(_,a,b,_) -> eval env a ; eval env b ; None
   | UnOp(_,e,_) -> eval env e ; None
   | Const _ | SizeOf _ | SizeOfE _ | AlignOf (_, _) | AlignOfE (_, _) -> None
 
 let write env lv =
-  let _,r = lval env lv in writable env r (LV lv)
+  let _,r = lval env lv in
+  writable env r (LV lv)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Code Side Conditions                                               --- *)
@@ -269,9 +290,8 @@ let rec init env = function
 
 let instr env = function
   | Set(lv,e,_) ->
-    (* TODO: FIXME: writen pointer need to be aligned + object_pointer *)
-    (* TODO: FIXME: writen function need to be valid_function  *)
-    eval env e ; write env lv
+    eval env e ;
+    write env lv ;
   | Call(r,f,es,_) ->
     ignore (lhost env f) ;
     List.iter (eval env) es ;
@@ -488,7 +508,7 @@ and residual env f p =
   match f r kd with
   | Condition.Default -> ()
   | Residual { validregion } ->
-    if validregion then valid_region env r (ADDR p)
+    if validregion then valid_region env r (TADDR p)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Statement Annotations                                              --- *)
