@@ -176,33 +176,21 @@ let compute_from_entry_point  (type t) (engine: t engine)
   | `Value initial_state ->
     Engine.Compute.compute_main_call ~thread entry_point initial_state
 
-(* Builds the analyzer if needed, and run the analysis. *)
-let compute_from ?cvalue_state ?arguments entry_point =
-  let module Engine = (val pre_analysis ()) in
-  let compute () =
-    compute_from_entry_point (module Engine)
-      ?cvalue_state ?arguments entry_point
-  in
-  try
-    Self.ComputationState.set Computing;
-    let restore_signals = Signal.setup () in
-    let final_state = Fun.protect ~finally:restore_signals compute in
-    Self.(ComputationState.set Computed);
-    post_analysis ();
-    Engine.Dom.post_analysis final_state;
-    Summary.print ();
-    Statistics.export_as_csv ();
-  with exn ->
-    Self.(ComputationState.set Aborted);
-    match exn with
-    | Error | Self.Abort -> () (* do not re-raise  *)
-    | exn -> raise exn
-
 (* Mthread entry point *)
+
+let check_thread_analysis thread kf =
+  match Function_calls.analysis_target kf Kglobal with
+  | `Body _ -> ()
+  | `Builtin _ | `Spec _ ->
+    Mt_self.not_yet_implemented
+      "Using an ACSL specification or a builtin to interpret entry point %a \
+       of thread %a is not supported."
+      Kernel_function.pretty kf Thread.pretty thread
 
 let compute_thread (type t) (engine: t engine) ?cvalue_state thread =
   let module Engine = (val engine) in
   let Thread.{ entry_point; arguments } = Thread.properties thread in
+  check_thread_analysis thread entry_point;
   let arguments =
     if Thread.is_main thread
     then None (* use generated main arguments *)
@@ -299,31 +287,42 @@ let mthread_fixpoint engine analysis =
   Thread.Hashtbl.find final_states Thread.main
 
 (* Perform an entire mthread execution on the current project *)
-let mthread_compute () =
-  Mt_main.checks ();
+let compute_from ?cvalue_state ?arguments entry_point =
+  let mt_enabled = Mt_options.Enabled.get () in
 
-  Mt_self.feedback "******* Starting mthread";
-
+  (* Build the mthread analysis state even when mthread is disabled *)
   let analysis = Mt_main.make_analysis_state () in
 
-  (* We register our callback function *)
-  Mt_main.register_hooks analysis;
+  if mt_enabled then begin
+    Mt_main.checks ();
+    Mt_self.feedback "******* Starting mthread";
+    Mt_main.register_hooks analysis;
+  end;
   Fun.protect ~finally:Mt_main.unregister_hooks @@ fun () ->
 
+  (* Prepare the analysis and build the engine. *)
   let module Engine = (val pre_analysis ()) in
-  let compute () =
-    mthread_fixpoint (module Engine) analysis
-  in
+
+  (* Setup signals *)
+  let restore_signals = Signal.setup () in
+  Fun.protect ~finally:restore_signals @@ fun () ->
+
   try
     Self.ComputationState.set Computing;
-    let restore_signals = Signal.setup () in
-    let final_state = Fun.protect ~finally:restore_signals compute in
+    (* Run the analysis. *)
+    let final_state =
+      if mt_enabled
+      then mthread_fixpoint (module Engine) analysis
+      else compute_from_entry_point (module Engine)
+          ?cvalue_state ?arguments entry_point
+    in
     Self.(ComputationState.set Computed);
     post_analysis ();
     Engine.Dom.post_analysis final_state;
     Summary.print ();
     Statistics.export_as_csv ();
-    Mt_main.post_analysis analysis
+    if mt_enabled then
+      Mt_main.post_analysis analysis
   with exn ->
     Self.(ComputationState.set Aborted);
     match exn with
@@ -338,10 +337,7 @@ let compute () =
     let cvalue_state = Eva_results.get_initial_state ()
     and arguments = Eva_results.get_main_args ()
     and entry_point = fst @@ Globals.entry_point () in
-    if Mt_options.Enabled.get () then
-      mthread_compute ()
-    else
-      compute_from ?cvalue_state ?arguments entry_point
+    compute_from ?cvalue_state ?arguments entry_point
 
 let compute =
   let name = "Eva.Analysis.compute" in

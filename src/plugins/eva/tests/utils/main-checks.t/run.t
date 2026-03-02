@@ -20,6 +20,7 @@ Mthread should not crash when a specification is used for the main function.
   [kernel] Parsing main_checks.i (no preprocessing)
   [mt] Warning: Mthread is an experimental plugin and is still in development.
   [mt] ******* Starting mthread
+  [mt] *** Computing value analysis for main thread
   [kernel] Plug-in mt aborted: unimplemented feature.
     You may send a feature request at https://git.frama-c.com/pub/frama-c/issues with:
     '[Plug-in mt] Using an ACSL specification or a builtin to interpret entry point main of thread <main> is not supported.'.
@@ -32,6 +33,7 @@ Mthread should not crash when the main function has no body.
   [kernel] Parsing main_checks.i (no preprocessing)
   [mt] Warning: Mthread is an experimental plugin and is still in development.
   [mt] ******* Starting mthread
+  [mt] *** Computing value analysis for main thread
   [kernel] Plug-in mt aborted: unimplemented feature.
     You may send a feature request at https://git.frama-c.com/pub/frama-c/issues with:
     '[Plug-in mt] Using an ACSL specification or a builtin to interpret entry point spec_only of thread <main> is not supported.'.
@@ -44,6 +46,9 @@ Mthread should not crash when a builtin is used for the main function.
   [kernel] Parsing main_checks.i (no preprocessing)
   [mt] Warning: Mthread is an experimental plugin and is still in development.
   [mt] ******* Starting mthread
+  [mt] *** Computing value analysis for main thread
+  [eva:builtins:missing-spec] main_checks.i:8: Warning: 
+    No Frama-C libc specification found for function strlen, for which a builtin is used; its soundness relies on the specification provided by the user.
   [kernel] Plug-in mt aborted: unimplemented feature.
     You may send a feature request at https://git.frama-c.com/pub/frama-c/issues with:
     '[Plug-in mt] Using an ACSL specification or a builtin to interpret entry point strlen of thread <main> is not supported.'.
