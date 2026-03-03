@@ -19,12 +19,15 @@ import * as Arrays from 'dome/table/arrays';
 import { Table, Column, Renderer } from 'dome/table/views';
 import * as Compare from 'dome/data/compare';
 import { State, GlobalState, useGlobalState } from 'dome/data/states';
+import { Section } from 'dome/frame/sidebars';
 
 import { TitleBar } from 'ivette';
 import * as Display from 'ivette/display';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Kernel from 'frama-c/kernel/api/services';
+import * as Params from 'frama-c/kernel/api/parameters';
+import * as Server from 'frama-c/server';
 
 type Message = Kernel.messageData;
 type logkind = Kernel.logkind;
@@ -63,32 +66,9 @@ const kindFilter: KindFilter = {
   FAILURE: true,
 };
 
-/* The fields must be exactly the short names of Frama-C plugins used in
-   messages. They are all shown by default. */
-const pluginFilter: PluginFilter = {
-  'aorai': true,
-  'cg': true,
-  'dive': true,
-  'e-acsl': true,
-  'eva': true,
-  'from': true,
-  'impact': true,
-  'inout': true,
-  'metrics': true,
-  'nonterm': true,
-  'pdg': true,
-  'report': true,
-  'rte': true,
-  'scope': true,
-  'server': true,
-  'slicing': true,
-  'variadic': true,
-  'wp': true,
-};
-
 const emitterFilter = {
   kernel: true,
-  plugins: pluginFilter,
+  plugins: {},
   others: true,
 };
 
@@ -188,18 +168,9 @@ function filterMessage(
 // --- Filters panel and ratio
 // --------------------------------------------------------------------------
 
-function Section(p: Forms.SectionProps): JSX.Element {
-  const settings = `fc.kernel.messages.filter.${p.label}`;
-  return (
-    <Forms.Section label={p.label} unfold settings={settings}>
-      {p.children}
-    </Forms.Section>
-  );
-}
-
 function Checkbox(p: Forms.CheckboxFieldProps): JSX.Element {
   const lbl = p.label.charAt(0).toUpperCase() + p.label.slice(1).toLowerCase();
-  return <Forms.CheckboxField label={lbl} state={p.state} />;
+  return <Forms.CheckboxField label={lbl} title={p.title} state={p.state} />;
 }
 
 function MessageKindCheckbox(props: {
@@ -213,14 +184,20 @@ function MessageKindCheckbox(props: {
 
 function PluginCheckbox(props: {
   plugin: string,
+  title: string,
   pluginState: Forms.FieldState<PluginFilter>,
 }): JSX.Element {
   const state = Forms.useProperty(props.pluginState, props.plugin);
-  return <Checkbox label={props.plugin} state={state} />;
+  return <Checkbox title={props.title} label={props.plugin} state={state} />;
 }
 
-function MessageFilter(props: { filter: State<Filter> }): JSX.Element {
-  const state = Forms.useValid(props.filter);
+
+function MessageFilter(props: {
+  filter: State<Filter>,
+  plugins: Params.plugin[]
+}): JSX.Element {
+  const { filter, plugins } = props;
+  const state = Forms.useValid(filter);
   const search = Forms.useProperty(state, 'search');
   const categoryState = Forms.useProperty(search, 'category');
   const messageState = Forms.useProperty(search, 'message');
@@ -233,19 +210,46 @@ function MessageFilter(props: { filter: State<Filter> }): JSX.Element {
   const kernelState = Forms.useProperty(emitterState, 'kernel');
   const othersState = Forms.useProperty(emitterState, 'others');
   const pluginState = Forms.useProperty(emitterState, 'plugins');
-  const pluginCheckboxes =
-    Object.keys(pluginFilter).map((p) => (
-      <PluginCheckbox key={p} plugin={p} pluginState={pluginState} />
-    ));
+  const emitterStateReset = React.useCallback(
+    (val: boolean) => emitterState.onChanged({
+        kernel: val,
+        plugins: Object.fromEntries(plugins.map(p => [p.shortname, val])),
+        others: val,
+      }, false, true)
+  , [emitterState, plugins]);
+  const onContextMenu = React.useCallback(() => {
+    const items: Dome.PopupMenuItem[] = [
+      {
+        label: 'Select all',
+        onClick: () => emitterStateReset(true),
+      },
+      {
+        label: 'Deselect all',
+        onClick: () => emitterStateReset(false)
+      },
+    ];
+    Dome.popupMenu(items);
+  }, [emitterStateReset]);
+  const pluginStateReady = Object.keys(pluginState.value).length > 0;
+  const pluginCheckboxes = pluginStateReady && plugins.map((p) =>
+    <PluginCheckbox key={p.shortname}
+      title={p.name}
+      plugin={p.shortname}
+      pluginState={pluginState}
+    />
+  );
 
   return (
-    <Forms.PageForm className="message-search">
+    <div className="message-search">
       <Forms.CheckboxField
         label="Current function"
         title="Only show messages emitted at the current function"
         state={Forms.useProperty(state, 'currentDecl')}
       />
-      <Section label="Search">
+      <Section label="Search"
+        defaultUnfold={true}
+        settings="message-filter-search"
+      >
         <Forms.TextField
           label="Category"
           state={categoryState}
@@ -262,10 +266,22 @@ function MessageFilter(props: { filter: State<Filter> }): JSX.Element {
             + 'Use "text" for an exact case-sensitive search.'}
         />
       </Section>
-      <Section label="Kind">
+      <Section label="Kind"
+        defaultUnfold={true}
+        settings="message-filter-kind"
+      >
         {kindCheckboxes}
       </Section>
-      <Section label="Emitter">
+      <Section
+        label="Emitter"
+        defaultUnfold={true}
+        settings="message-filter-emitter"
+        rightButtonProps={{
+          icon: 'TUNINGS',
+          title: `Configure filters`,
+          onClick: () => onContextMenu(),
+        }}
+      >
         <div className="message-emitter-category">
           <Forms.CheckboxField label='Kernel' state={kernelState} />
         </div>
@@ -276,7 +292,7 @@ function MessageFilter(props: { filter: State<Filter> }): JSX.Element {
           <Forms.CheckboxField label='Others' state={othersState} />
         </div>
       </Section>
-    </Forms.PageForm>
+    </div>
   );
 }
 
@@ -430,10 +446,37 @@ export function RenderMessages(): JSX.Element {
   }, [model, data]);
 
   const filterState = useGlobalState(globalFilterState);
-  const [filter] = filterState;
+  const [filter, setFilter] = filterState;
   const selectedDecl = States.useCurrentScope();
   const [selectedMsg, selectMsg] = React.useState<Message>();
   const [text, setText] = React.useState('');
+
+  /** List of plugins */
+  const [plugins, setPlugins] = React.useState<Params.plugin[]>([]);
+  React.useEffect(() => {
+    const fetchPlugins = async (): Promise<void> => {
+      const plugins = await Server.send(Params.getPlugins, {});
+      setPlugins(plugins.filter(v => v.name !== "kernel")
+        .sort((a, b) => Compare.alpha(a.name, b.name)));
+    };
+    if(Server.isRunning()) fetchPlugins();
+    else Server.onReady(fetchPlugins);
+  }, []);
+
+  React.useEffect(() => {
+    const current = globalFilterState.getValue();
+    const newP = Object.fromEntries(plugins.map(p => [p.shortname, true]));
+
+    const updated = {
+      ...current,
+      emitter: {
+        ...current.emitter,
+        plugins: newP
+      }
+    };
+
+    setFilter(updated);
+  }, [plugins, setFilter]);
 
   React.useEffect(() => {
     if (selectedDecl !== selectedMsg?.decl)
@@ -504,7 +547,7 @@ export function RenderMessages(): JSX.Element {
           {MessagePanel}
         </BSplit>
         <Scroll>
-          <MessageFilter filter={filterState} />
+          <MessageFilter filter={filterState} plugins={plugins}/>
         </Scroll>
       </RSplit>
     </>
