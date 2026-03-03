@@ -371,7 +371,7 @@ module TransferSingleTaint = struct
      - its memory location (as a zone);
      - its indirect dependencies, i.e. the memory zone its location depends on;
      - whether its location is a singleton. *)
-  let compute_lval_zones to_loc lval =
+  let lval_deps to_loc lval =
     match (lval : Eva_ast.lval).node with
     | Var vi, NoOffset ->
       (* Special case for direct access to variable: do not use [to_loc] here,
@@ -380,15 +380,11 @@ module TransferSingleTaint = struct
       zone, Zone.bottom, true
     | _ ->
       let ploc = to_loc lval in
-      let singleton = Precise_locs.cardinal_zero_or_one ploc in
-      let lv_zone =
-        let loc = Precise_locs.imprecise_location ploc in
-        Locations.enumerate_valid_bits Write loc
+      let is_singleton = Precise_locs.cardinal_zero_or_one ploc in
+      let Deps.{ data; indirect } =
+        Eva_ast.PreciseDepsOf.deps_of_lval to_loc Write lval
       in
-      let lv_indirect_zone =
-        Eva_ast.PreciseDepsOf.indirect_zone_of_lval to_loc lval
-      in
-      lv_zone, lv_indirect_zone, singleton
+      data, indirect, is_singleton
 
   let bottom_loc =
     Precise_locs.make_precise_loc Precise_locs.bottom_location_bits
@@ -415,7 +411,7 @@ module TransferSingleTaint = struct
 
   (* Propagates data- and control-taints for an assignment [lval = exp]. *)
   let assign_aux ~namespace ~pos lval exp v to_loc state =
-    let lv_zone, lv_indirect_zone, singleton = compute_lval_zones to_loc lval in
+    let lv_data, lv_indirect, is_singleton = lval_deps to_loc lval in
     let exp_deps =
       let to_loc =
         if ignore_singletons () then
@@ -437,16 +433,16 @@ module TransferSingleTaint = struct
     let ctrl_tainted =
       is_in_tainted_scope state
       || Zone.intersects state.locs_control (Deps.to_zone exp_deps)
-      || LatticeSingleTaint.intersects state lv_indirect_zone
+      || LatticeSingleTaint.intersects state lv_indirect
       || LatticeSingleTaint.intersects state exp_deps.indirect
     in
     if is_private_namespace namespace
-    then warn_assign_interference ~pos ~data_tainted ~ctrl_tainted lv_zone;
+    then warn_assign_interference ~pos ~data_tainted ~ctrl_tainted lv_data;
     let update tainted locs =
       if tainted
-      then Zone.join locs lv_zone
-      else if singleton
-      then Zone.diff locs lv_zone
+      then Zone.join locs lv_data
+      else if is_singleton
+      then Zone.diff locs lv_data
       else locs
     in
     { state with locs_data = update data_tainted state.locs_data;
