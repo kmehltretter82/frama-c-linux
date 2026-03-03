@@ -485,7 +485,7 @@ let lift_aborter (aborter : ('a,'b) Log.pretty_aborter)
     and append = append_callstack ?stacktrace ?append ~callstack in
     aborter ?current:None ~source ~append
   | None ->
-    let callstack = Callstack.get_current () in
+    let callstack = Current_callstack.get () in
     let append = append_callstack ?stacktrace ?append ~callstack in
     aborter ?current ?source ~append
 

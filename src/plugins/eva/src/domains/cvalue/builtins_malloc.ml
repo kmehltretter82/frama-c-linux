@@ -60,7 +60,7 @@ let () = Ast.add_monotonic_state Dynamic_Alloc_Bases.self
 (* -------------------------- Auxiliary functions  -------------------------- *)
 
 let current_call_site () =
-  match Callstack.top_callsite (Callstack.get_current_exn ()) with
+  match Callstack.top_callsite (Current_callstack.get_exn ()) with
   | Kglobal -> Cil_datatype.Stmt.dummy
   | Kstmt stmt -> stmt
 
@@ -70,7 +70,7 @@ let current_call_site () =
      these call site correspond to a different use of a malloc function,
      so it is interesting to keep their bases separated. *)
 let call_stack_no_wrappers () =
-  let cs = Callstack.get_current_exn () in
+  let cs = Current_callstack.get_exn () in
   let wrappers = Parameters.AllocFunctions.get () in
   let rec bottom_filter = function
     | [] | [_] as stack -> stack
@@ -375,7 +375,7 @@ let string_of_region = function
 
 (* Only called when the 'weakest base' needs to be allocated. *)
 let create_weakest_base region =
-  let stack = { (Callstack.get_current_exn ()) with stack = [] } in
+  let stack = { (Current_callstack.get_exn ()) with stack = [] } in
   let type_base = Cil_const.(mk_tarray charType None) in
   let var = create_new_var stack "alloc" type_base Weak in
   Self.warning ~wkey:wkey_imprecise_alloc ~current:true ~once:true
