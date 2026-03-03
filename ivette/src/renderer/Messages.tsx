@@ -210,24 +210,26 @@ function MessageFilter(props: {
   const kernelState = Forms.useProperty(emitterState, 'kernel');
   const othersState = Forms.useProperty(emitterState, 'others');
   const pluginState = Forms.useProperty(emitterState, 'plugins');
-  const pluginStateReset = React.useCallback((val: boolean) => {
-    pluginState.onChanged(
-      Object.fromEntries(plugins.map(p => [p.shortname, val])), false, true
-    );
-  }, [pluginState, plugins]);
+  const emitterStateReset = React.useCallback(
+    (val: boolean) => emitterState.onChanged({
+        kernel: val,
+        plugins: Object.fromEntries(plugins.map(p => [p.shortname, val])),
+        others: val,
+      }, false, true)
+  , [emitterState, plugins]);
   const onContextMenu = React.useCallback(() => {
     const items: Dome.PopupMenuItem[] = [
       {
         label: 'Select all',
-        onClick: () => pluginStateReset(true),
+        onClick: () => emitterStateReset(true),
       },
       {
         label: 'Deselect all',
-        onClick: () => pluginStateReset(false),
+        onClick: () => emitterStateReset(false)
       },
     ];
     Dome.popupMenu(items);
-  }, [pluginStateReset]);
+  }, [emitterStateReset]);
   const pluginStateReady = Object.keys(pluginState.value).length > 0;
   const pluginCheckboxes = pluginStateReady && plugins.map((p) =>
     <PluginCheckbox key={p.shortname}
