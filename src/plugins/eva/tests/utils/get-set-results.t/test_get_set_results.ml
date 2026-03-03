@@ -45,7 +45,8 @@ let print_results name results =
 let test () =
   let precise_results = analyze "precise" in
   let imprecise_results = analyze "imprecise" in
-  Eva.Self.clear_results ();
+  let selection = State_selection.with_dependencies Eva.Analysis.self in
+  Project.clear ~selection ();
   print_results "precise" precise_results;
   print_results "imprecise" imprecise_results
 
