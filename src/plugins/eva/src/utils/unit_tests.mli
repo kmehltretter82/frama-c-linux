@@ -6,11 +6,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-[@@@ api_start]
-
 (** Currently tested by this module:
     - semantics of sign values. *)
 
 (** Runs some programmatic tests on Eva. *)
 val run: unit -> unit
-[@@@ api_end]

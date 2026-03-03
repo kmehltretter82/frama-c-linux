@@ -6,10 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Note: widen hints annotations are still registered in !{widen_hints_ext.ml}. *)
-
-[@@@ api_start]
-
 (** Register special annotations to locally guide the Eva analysis:
 
     - slevel annotations: "slevel default", "slevel merge" and "slevel i"
@@ -17,6 +13,8 @@
     - value partitioning annotations: "split term" and "merge term"
     - subdivision annotations: "subdivide i"
 *)
+
+(* Note: widen hints annotations are still registered in !{widen_hints_ext.ml}. *)
 
 (** Annotations tweaking the behavior of the -eva-slevel parameter. *)
 type slevel_annotation =
@@ -74,7 +72,6 @@ val add_array_segmentation : emitter:Emitter.t ->
   Cil_types.stmt -> array_segmentation -> unit
 val add_domain_scope : emitter:Emitter.t ->
   Cil_types.stmt -> domain_scope -> unit
-[@@@ api_end]
 
 val read_array_segmentation : Cil_types.acsl_extension -> array_segmentation
 val read_domain_scope : Cil_types.acsl_extension -> domain_scope

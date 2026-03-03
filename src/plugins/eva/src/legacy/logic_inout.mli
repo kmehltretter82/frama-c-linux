@@ -6,8 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-[@@@ api_start]
-
 (** Functions used by the Inout and From plugins to interpret predicate
     and assigns clauses. This API may change according to these plugins
     development. *)
@@ -65,5 +63,3 @@ val verify_assigns:
     - a formal or local of [kf] and the corresponding argument is [true]. *)
 val accept_base:
   formals:bool -> locals:bool -> Kernel_function.t -> Base.t -> bool
-
-[@@@ api_end]

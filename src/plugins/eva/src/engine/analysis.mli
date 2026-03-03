@@ -6,11 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val abort : unit -> unit
-(** Cleanly abort the analysis at the next safe point: partial results will be
-    saved and Frama-C is not killed. *)
-
-[@@@ api_start]
 val compute : unit -> unit
 (** Computes the Eva analysis, if not already computed, using the entry point
     of the current project. You may set it with {!Globals.set_entry_point}.
@@ -21,6 +16,10 @@ val is_computed : unit -> bool
 (** Return [true] iff the Eva analysis has been done.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
+
+val abort : unit -> unit
+(** Cleanly abort the analysis at the next safe point: partial results will be
+    saved and Frama-C is not killed. *)
 
 val self : State.t
 (** Internal state of Eva analysis from projects viewpoint. *)
@@ -83,7 +82,6 @@ val use_spec_instead_of_definition: Cil_types.kernel_function -> bool
     for the given function. Please use {!Eva.Results.are_available} instead
     to known whether results are available for a given function. *)
 val save_results: Cil_types.kernel_function -> bool
-[@@@ api_end]
 
 (** {2 Mthread entry point}
 

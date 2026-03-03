@@ -6,9 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-[@@@ api_start]
-
-(** Eva Syntax Tree. *)
+(** Eva Abstract Syntax Tree. *)
 
 include module type of Eva_ast_types
 include module type of Eva_ast_typing
@@ -18,5 +16,3 @@ include module type of Eva_ast_builder
 include module type of Eva_ast_deps
 include module type of Eva_ast_utils
 include module type of Eva_ast_visitor
-
-[@@@ api_end]

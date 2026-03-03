@@ -6,8 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-[@@@ api_start]
-
 (** Eva's result API is a new interface to access the results of an analysis,
     once it is completed. It may slightly change in the future.
 
@@ -325,5 +323,3 @@ val callsites : Cil_types.kernel_function ->
     Raises [Stdlib.Invalid_argument] if the statement is not a [Call]
     instruction or a [Local_init] with [ConsInit] initializer. *)
 val callee : Cil_types.stmt -> Kernel_function.t list
-
-[@@@ api_end]
