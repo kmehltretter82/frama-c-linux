@@ -56,6 +56,53 @@ module Eva_annotations = Eva_annotations
 module Builtins = (Builtins : Builtins_sig.API)
 
 
+(** {2 Registration of new abstractions} *)
+
+(** Various types used in abstract domain signature. *)
+module Eval = Eval
+
+(** Signature of abstract domains, inferring properties about the program
+    during the analysis. *)
+module Abstract_domain = Abstract_domain
+
+(** Signature of abstract numerical values, representing the set of possible
+    values of an expression or lvalue. Used to exchange information between
+    abstract domains. *)
+module Abstract_value = Abstract_value
+
+(** Signature of abstract memory locations, representing the set of possible
+    memory locations pointed to by an lvalue. *)
+module Abstract_location = Abstract_location
+
+(** Signature of abstract state, which can be used to transfer information from
+    states of abstract domains to abstract values. *)
+module Abstract_context = Abstract_context
+
+(** Empty context. *)
+module Unit_context = Unit_context
+
+(** Automatic builders to complete abstract domains from different
+    simplified interfaces. *)
+module Domain_builder = Domain_builder
+
+(** Simplified interfaces for abstract domains. Complete abstract domains can be
+    built from these interfaces through the functors in {!Domain_builder}. *)
+module Simpler_domains = Simpler_domains
+
+(** Build a domain upon a value abstraction with a very simple memory model
+    for scalar non-volatile variables. *)
+module Simple_memory = Simple_memory
+
+(** Register new abstract domains. *)
+module Domain = Abstractions.Domain
+
+(** Common value abstractions shared by many abstract domains. *)
+module Main_values = Main_values
+
+(** Common location abstractions shared by many abstract domains. *)
+module Main_locations = Main_locations
+
+
 (** {2 Internal API}
 
     These modules are for internal use only.
