@@ -8,13 +8,15 @@
 
 open Eva_ast_types
 
+type access = Locations.access
+
 module type DepsOf = sig
   type location
   val zone_of_exp : (lval -> location) -> exp -> Locations.Zone.t
-  val zone_of_lval : (lval -> location) -> lval -> Locations.Zone.t
+  val zone_of_lval : (lval -> location) -> access -> lval -> Locations.Zone.t
   val indirect_zone_of_lval : (lval -> location) -> lval -> Locations.Zone.t
   val deps_of_exp : (lval -> location) -> exp -> Deps.t
-  val deps_of_lval : (lval -> location) -> lval -> Deps.t
+  val deps_of_lval : (lval -> location) -> access -> lval -> Deps.t
 end
 
 module type DepsOfInput = sig
@@ -29,7 +31,7 @@ module MakeDepsOf (Loc : DepsOfInput) : DepsOf with type location =
   let rec deps_of_exp find_loc exp =
     let rec process exp = match exp.node with
       | Lval lval ->
-        deps_of_lval find_loc lval
+        deps_of_lval find_loc Locations.Read lval
       | UnOp (_, e, _) | CastE (_, e) ->
         process e
       | BinOp (_, e1, e2, _) ->
@@ -41,17 +43,19 @@ module MakeDepsOf (Loc : DepsOfInput) : DepsOf with type location =
     in
     process exp
 
-  and zone_of_exp find_loc exp = Deps.to_zone (deps_of_exp find_loc exp)
+  and zone_of_exp find_loc exp =
+    Deps.to_zone (deps_of_exp find_loc exp)
 
-  and deps_of_lval find_loc lval =
+  and deps_of_lval find_loc access lval =
     let ploc = find_loc lval in
     (* dereference of an lvalue: first, its address must be computed,
        then its contents themselves are read *)
     let indirect = indirect_zone_of_lval find_loc lval in
-    let data = Loc.enumerate_valid_bits Read ploc in
+    let data = Loc.enumerate_valid_bits access ploc in
     { Deps.data ; indirect }
 
-  and zone_of_lval find_loc lval = Deps.to_zone (deps_of_lval find_loc lval)
+  and zone_of_lval find_loc access lval =
+    Deps.to_zone (deps_of_lval find_loc access lval)
 
   (* Computations of the inputs of a lvalue : union of the "host" part and
      the offset. *)

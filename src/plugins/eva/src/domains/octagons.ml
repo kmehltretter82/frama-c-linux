@@ -147,7 +147,7 @@ module Variable : Variable = struct
       { data = Locations.Zone.bottom ; indirect = Locations.Zone.bottom }
     | Lval lval ->
       Eva_ast.PreciseDepsOf.deps_of_lval
-        eval_loc (Option.get (HCE.to_lval lval))
+        eval_loc Read (Option.get (HCE.to_lval lval))
 end
 
 module VarSet = Hptset.Make (Variable) (Hptmap_Info)

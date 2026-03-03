@@ -719,7 +719,8 @@ let expr_deps expr request =
 
 let lval_deps lval request =
   let lval_to_loc lv = eval_address' lv request |> as_precise_loc in
-  Eva_ast.PreciseDepsOf.zone_of_lval lval_to_loc (Eva_ast.translate_lval lval)
+  Eva_ast.PreciseDepsOf.zone_of_lval lval_to_loc Read
+    (Eva_ast.translate_lval lval)
 
 let address_deps lval request =
   let lval_to_loc lv = eval_address' lv request |> as_precise_loc in
