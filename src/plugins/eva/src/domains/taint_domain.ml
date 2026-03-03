@@ -416,7 +416,7 @@ module TransferSingleTaint = struct
   (* Propagates data- and control-taints for an assignment [lval = exp]. *)
   let assign_aux ~namespace ~pos lval exp v to_loc state =
     let lv_zone, lv_indirect_zone, singleton = compute_lval_zones to_loc lval in
-    let exp_zone =
+    let exp_deps =
       let to_loc =
         if ignore_singletons () then
           (* Do not data-taint [lval] in case it contains a singleton value. *)
@@ -426,17 +426,19 @@ module TransferSingleTaint = struct
              [exp] depends on is data-tainted. *)
           to_loc
       in
-      Eva_ast.PreciseDepsOf.zone_of_exp to_loc exp
+      Eva_ast.PreciseDepsOf.deps_of_exp to_loc exp
     in
-    let data_tainted = Zone.intersects state.locs_data exp_zone in
+    let data_tainted = Zone.intersects state.locs_data exp_deps.data in
     (* [lval] becomes control-tainted if:
        - the assignment is in a tainted scope;
        - the value of [exp] is control-tainted;
-       - the assigned location depends on tainted values. *)
+       - the [lval] location depends on tainted values;
+       - the [exp] location depends on tainted values. *)
     let ctrl_tainted =
       is_in_tainted_scope state
-      || Zone.intersects state.locs_control exp_zone
+      || Zone.intersects state.locs_control (Deps.to_zone exp_deps)
       || LatticeSingleTaint.intersects state lv_indirect_zone
+      || LatticeSingleTaint.intersects state exp_deps.indirect
     in
     if is_private_namespace namespace
     then warn_assign_interference ~pos ~data_tainted ~ctrl_tainted lv_zone;

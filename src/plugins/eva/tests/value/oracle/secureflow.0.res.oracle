@@ -106,8 +106,8 @@
 [eva:progress] secureflow.c:127: check got status valid.
 [eva:progress] secureflow.c:128: check got status valid.
 [eva:progress] secureflow.c:129: check got status valid.
-[eva:secure-flow:direct] secureflow.c:130: Warning: 
-  direct non-interference violation on {z}
+[eva:secure-flow:indirect] secureflow.c:130: Warning: 
+  indirect non-interference violation on {z}
 [eva:alarm] secureflow.c:131: Warning: check got status unknown.
 [eva:progress] secureflow.c:132: check got status valid.
 [eva:progress] secureflow.c:133: check got status valid.
