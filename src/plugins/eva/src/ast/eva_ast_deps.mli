@@ -10,6 +10,8 @@
 
 open Eva_ast_types
 
+type access = Locations.access
+
 (** Dependencies of expressions and lvalues based on type [location]. *)
 module type DepsOf = sig
   type location
@@ -18,9 +20,10 @@ module type DepsOf = sig
   (** Given a function computing the location of lvalues, computes the memory
       zone on which the value of an expression depends. *)
 
-  val zone_of_lval : (lval -> location) -> lval -> Locations.Zone.t
+  val zone_of_lval : (lval -> location) -> access -> lval -> Locations.Zone.t
   (** Given a function computing the location of lvalues, computes the memory
-      zone on which the value of an lvalue depends. *)
+      zone on which the value of an lvalue depends. If [access = Write], this
+      function only considers the writable bits of the lvalue. *)
 
   val indirect_zone_of_lval : (lval -> location) -> lval -> Locations.Zone.t
   (** Given a function computing the location of lvalues, computes the memory
@@ -31,9 +34,10 @@ module type DepsOf = sig
   (** Given a function computing the location of lvalues, computes the memory
       dependencies of an expression. *)
 
-  val deps_of_lval : (lval -> location) -> lval -> Deps.t
+  val deps_of_lval : (lval -> location) -> access -> lval -> Deps.t
   (** Given a function computing the location of lvalues, computes the memory
-      dependencies of an lvalue. *)
+      dependencies of an lvalue. If [access = Write], the direct dependencies
+      will only contain the writable bits of the lvalue. *)
 end
 
 (** Input for [MakeDepsOf] functor. *)
