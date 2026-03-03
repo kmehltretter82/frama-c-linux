@@ -131,6 +131,8 @@ val dkey_print_builtins: category
 
 val dkey_print_logic_coercions: category
 
+val dkey_print_c_types: category
+
 val dkey_print_logic_types: category
 
 val dkey_print_imported_modules: category

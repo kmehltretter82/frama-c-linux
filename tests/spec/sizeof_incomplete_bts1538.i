@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"-kernel-msg-key printer:logic-types"
+STDOPT: +"-kernel-msg-key printer:types:logic"
 */
 int t[];
 

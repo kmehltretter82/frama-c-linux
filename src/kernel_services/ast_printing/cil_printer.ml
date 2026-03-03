@@ -777,44 +777,49 @@ class cil_printer () = object (self)
       | `Standard -> "_Alignof"
       | `GCC -> "__alignof__"
     in
-    match e.enode with
-    | Const(c) -> self#constant fmt c
-    | Lval(l) -> self#lval fmt l
+    let debug = Kernel.is_debug_key_enabled Kernel.dkey_print_c_types in
+    if debug then fprintf fmt "/*(type:%a */" (self#typ None) (Cil.typeOf e);
+    let () =
+      match e.enode with
+      | Const(c) -> self#constant fmt c
+      | Lval(l) -> self#lval fmt l
 
-    | UnOp(u,e1,_) ->
-      (match u, e1 with
-       | Neg, {enode = Const (CInt64 (v, _, _))}
-         when Z.geq v Z.zero ->
-         fprintf fmt "-%a" (self#exp_prec level) e1
-       | _ ->
-         fprintf fmt "%a %a" self#unop u (self#exp_prec level) e1)
+      | UnOp(u,e1,_) ->
+        (match u, e1 with
+         | Neg, {enode = Const (CInt64 (v, _, _))}
+           when Z.geq v Z.zero ->
+           fprintf fmt "-%a" (self#exp_prec level) e1
+         | _ ->
+           fprintf fmt "%a %a" self#unop u (self#exp_prec level) e1)
 
-    | BinOp(b,e1,e2,_) ->
-      fprintf fmt "@[%a %a %a@]"
-        (self#exp_prec level) e1
-        self#binop b
-        (self#exp_prec level) e2
+      | BinOp(b,e1,e2,_) ->
+        fprintf fmt "@[%a %a %a@]"
+          (self#exp_prec level) e1
+          self#binop b
+          (self#exp_prec level) e2
 
-    | CastE(t,e) ->
-      fprintf fmt "(%a)%a" (self#typ None) t (self#exp_prec level) e
-    | SizeOf t ->
-      fprintf fmt "%a(%a)"
-        self#pp_keyword "sizeof" (self#typ None) t
-    | SizeOfE e ->
-      fprintf fmt "%a(%a)"
-        self#pp_keyword "sizeof" self#exp_non_decay e
-    | AlignOf (t, i) ->
-      fprintf fmt "%a(%a)" (self#pp_keyword) (alignof_kw i) (self#typ None) t
-    | AlignOfE (e, i) ->
-      fprintf fmt "%a(%a)" (self#pp_keyword) (alignof_kw i) self#exp_non_decay e
-    | AddrOf ((Var v, NoOffset))
-      when Datatype.String.Hashtbl.mem rename_builtins v.vname ->
-      self#varinfo fmt v
-    | AddrOf lv -> fprintf fmt "& %a" (self#lval_prec Precedence.addrOfLevel) lv
-    | StartOf(lv) ->
-      if state.print_cil_as_is || non_decay then
-        fprintf fmt "&(%a[0])" self#lval lv
-      else self#lval fmt lv
+      | CastE(t,e) ->
+        fprintf fmt "(%a)%a" (self#typ None) t (self#exp_prec level) e
+      | SizeOf t ->
+        fprintf fmt "%a(%a)"
+          self#pp_keyword "sizeof" (self#typ None) t
+      | SizeOfE e ->
+        fprintf fmt "%a(%a)"
+          self#pp_keyword "sizeof" self#exp_non_decay e
+      | AlignOf (t, i) ->
+        fprintf fmt "%a(%a)" (self#pp_keyword) (alignof_kw i) (self#typ None) t
+      | AlignOfE (e, i) ->
+        fprintf fmt "%a(%a)" (self#pp_keyword) (alignof_kw i) self#exp_non_decay e
+      | AddrOf ((Var v, NoOffset))
+        when Datatype.String.Hashtbl.mem rename_builtins v.vname ->
+        self#varinfo fmt v
+      | AddrOf lv -> fprintf fmt "& %a" (self#lval_prec Precedence.addrOfLevel) lv
+      | StartOf(lv) ->
+        if state.print_cil_as_is || non_decay then
+          fprintf fmt "&(%a[0])" self#lval lv
+        else self#lval fmt lv
+    in
+    if debug then fprintf fmt "/*)*/"
 
   method private exp_non_decay fmt e = parent_non_decay <- true; self#exp fmt e
 
@@ -2052,18 +2057,18 @@ class cil_printer () = object (self)
       in
       let name' =
         fun fmt ->
-        let attr = t.tattr <> [] in
-        fprintf fmt "*%a%a%a"
-          printAttributes t.tattr
-          palignas attr
-          pname (attr || alignas <> None)
+          let attr = t.tattr <> [] in
+          fprintf fmt "*%a%a%a"
+            printAttributes t.tattr
+            palignas attr
+            pname (attr || alignas <> None)
       in
       let name'' =
         fun fmt ->
-        (* Put the parenthesis *)
-        match paren with
-        | Some p -> fprintf fmt "%t%t)" p name'
-        | None -> fprintf fmt "%t" name'
+          (* Put the parenthesis *)
+          match paren with
+          | Some p -> fprintf fmt "%t%t)" p name'
+          | None -> fprintf fmt "%t" name'
       in
       self#typ (Some name'') fmt bt'
 
