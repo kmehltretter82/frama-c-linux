@@ -79,6 +79,14 @@ type number_ty =
   | Real
   | Nan
 
+let pp_number_ty fmt = function
+  | C_integer ikind -> Format.fprintf fmt "C_integer %a" Printer.pp_ikind ikind
+  | C_float fkind -> Format.fprintf fmt "C_float %a" Printer.pp_fkind fkind
+  | Gmpz -> Format.pp_print_string fmt "Gmpz"
+  | Rational -> Format.pp_print_string fmt "Rational"
+  | Real -> Format.pp_print_string fmt "Real"
+  | Nan -> Format.pp_print_string fmt "Nan"
+
 (** Type of a string that represents a number.
     Used when a string is required to encode a constant number because it is not
     representable in any C type  *)
