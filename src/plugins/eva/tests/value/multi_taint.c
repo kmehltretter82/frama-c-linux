@@ -18,6 +18,13 @@ void taint_simplify_singletons(int taint_var) {
   x = 4 - y;
   /*@ check !\tainted(auto:x); */
   /*@ check !\tainted(test:x); */
+
+  int i = 1;
+  //@ \eva::taint i;
+  int t[2] = {0};
+  int z = t[i];
+  /*@ check !\tainted(t[0]); */
+  /*@ check !\tainted(z); */ // due to -eva-no-taint-singletons
 }
 
 void multi_taint_test(int* taint_var) {
