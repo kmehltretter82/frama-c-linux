@@ -12,11 +12,12 @@ import * as Dome from 'dome';
 import * as Display from 'ivette/display';
 import { showHelp } from 'dome/help';
 import { FieldState, TextField, useState } from 'dome/layout/forms';
-import { Modal, showModal } from 'dome/dialogs';
+import { closeModal, Modal, showModal } from 'dome/dialogs';
 import { IconButton } from 'dome/controls/buttons';
 import { Button, ButtonGroup } from 'dome/frame/toolbars';
 import { Hbox } from 'dome/layout/boxes';
 import { Code } from 'dome/controls/labels';
+import { Icon } from 'dome/controls/icons';
 
 import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
@@ -24,7 +25,6 @@ import * as ASTview from 'frama-c/kernel/ASTview';
 import * as Locations from 'frama-c/kernel/Locations';
 import { getWritesLval, getReadsLval } from 'frama-c/plugins/studia/api/studia';
 import './style.css';
-import * as States from 'frama-c/states';
 
 type access = 'Reads' | 'Writes';
 
@@ -36,9 +36,14 @@ async function computeStudiaSelection(
   kind: access,
   marker: Ast.marker,
   descr: string,
+  onError?: (err: string) => void,
+  onSuccess?: () => void
 ): Promise<void> {
   const request = kind === 'Reads' ? getReadsLval : getWritesLval;
-  const data = await Server.send(request, marker).catch(handleError);
+  const data = await Server.send(request, marker).catch((err: string) => {
+    handleError(err);
+    if(onError) onError(err);
+  });
   const markers = data?.direct ?? [];
   if (markers.length > 0) {
     const label = (kind === 'Reads' ? 'Reads of ' : 'Writes to ') + `${descr}`;
@@ -54,6 +59,7 @@ async function computeStudiaSelection(
       plugin: 'Studia', label, markers: []
     });
   }
+  if(onSuccess) onSuccess();
 }
 
 /** Builds the Studia entries in the contextual menu about a given marker.  */
@@ -97,13 +103,6 @@ ASTview.registerMarkerMenuExtender(buildMenu);
 /* --- Modal                                                              --- */
 /* -------------------------------------------------------------------------- */
 
-async function onEnter(stmt: States.Marker, akind: access, term: string
-): Promise<void> {
-  const marker = await Server.send(Ast.parseLval, { stmt, term })
-  .catch(handleError);
-  if (marker) computeStudiaSelection(akind, marker, term);
-}
-
 interface ModalTextFielddProps {
   attr: Ast.markerAttributesData;
 }
@@ -113,10 +112,18 @@ function ModalStudiaSearch(props: ModalTextFielddProps)
   const { attr } = props;
   const state = useState('');
   const [akind, setAkind] = React.useState<access>('Reads');
+  const [error, setError] = React.useState<string | undefined>();
 
-  const onValidate = React.useCallback((p: string) =>
-    onEnter(attr.marker, akind, p)
-  , [akind, attr.marker]);
+  const onValidate = React.useCallback(async (p: string) => {
+    const marker = await Server.send(
+      Ast.parseLval, { stmt: attr.marker, term: p }
+    ).catch((err: string) => {
+        handleError(err);
+        setError(err);
+      });
+    if (marker)
+      computeStudiaSelection(akind, marker, p, setError, () => closeModal());
+  }, [akind, attr.marker, setError]);
 
   return <Modal
       className='modal-studia'
@@ -144,6 +151,7 @@ function ModalStudiaSearch(props: ModalTextFielddProps)
       <Hbox>
         <TextField
           label=''
+          autoFocus={true}
           state={state as FieldState<string | undefined>}
           onKeyDown={(e) => {
               if(e.key === "Enter")
@@ -154,8 +162,14 @@ function ModalStudiaSearch(props: ModalTextFielddProps)
         <Button
           label='Search'
           onClick={() => onValidate(state.value)}
-        />
+          />
       </Hbox>
+      { error &&
+        <Hbox>
+          <Icon id='WARNING' kind='warning' />
+          <span>Studia Failure: {error}</span>
+        </Hbox>
+      }
     </div>
   </Modal>;
 }
