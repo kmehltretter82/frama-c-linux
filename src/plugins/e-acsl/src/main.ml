@@ -35,6 +35,7 @@ let generate_code =
             (* preparation of the AST does not concern the E-ACSL RTL:
                do it first *)
             Prepare_ast.prepare ();
+            Analyses.check_integrity ();
             Memory_tracking.SpecialPointers.initialize ();
             Rtl.link rtl_prj;
             (* the E-ACSL type system ensures the soundness of the generated
@@ -57,6 +58,7 @@ let generate_code =
                  Gmp_types.init ();
                  Analyses.preprocess ();
                  Injector.inject ()) ;
+            Analyses.check_integrity ();
             (* remove the RTE's results computed from E-ACSL: they are partial
                and associated with the wrong kernel function (the one of the old
                project). *)

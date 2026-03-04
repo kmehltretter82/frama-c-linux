@@ -6,5 +6,7 @@
 [e-acsl] Warning: Negative verdicts of linked_ll might be unsound
 [e-acsl] iFM_esys.c:528: Warning: 
   E-ACSL construct `constructor' is not yet supported. Ignoring annotation.
+[e-acsl] Warning: shared term (fallthrough: (\list<RSRC_NODE_T *> )0) in AST
+[e-acsl] Warning: shared term 0 in AST
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] iFM_esys.c:528: Warning: assertion got status unknown.

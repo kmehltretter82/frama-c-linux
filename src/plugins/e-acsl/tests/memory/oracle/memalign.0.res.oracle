@@ -47,6 +47,8 @@
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:538: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
+[e-acsl] Warning: shared term \old(alignment) in AST
+[e-acsl] Warning: shared term alignment in AST
 [e-acsl] translation done in project "e-acsl".
 [eva] FRAMAC_SHARE/libc/stdlib.h:1005: Warning: 
   ignoring unsupported allocates clause

@@ -9,6 +9,8 @@
 [e-acsl:analysis:inductive] 
   extracting function from power2 with mode: incomplete in 3
 [e-acsl] Warning: Negative verdicts of power2 might be unsound
+[e-acsl] Warning: shared term x in AST
+[e-acsl] Warning: shared term 1 in AST
 [e-acsl] translation done in project "e-acsl".
 [eva] power.c:9: Warning: 
   Using specification of function __gen_e_acsl_power_fun3

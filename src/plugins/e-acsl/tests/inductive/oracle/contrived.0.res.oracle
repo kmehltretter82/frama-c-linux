@@ -35,6 +35,7 @@
 [e-acsl:analysis:inductive] 
   extracting function from bind_twice with mode: incomplete in 3
 [e-acsl] Warning: Negative verdicts of bind_twice might be unsound
+[e-acsl] Warning: shared term 0 in AST
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] contrived.c:60: Warning: assertion got status unknown.
 [eva:alarm] contrived.c:61: Warning: assertion got status unknown.

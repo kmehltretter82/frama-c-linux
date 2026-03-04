@@ -3,6 +3,7 @@
   extracting predicate from CountInd using mode: complete
 [e-acsl] count.c:35: Warning: 
   no assigns clause generated for function CountInd because pointers as arguments is not yet supported
+[e-acsl] Warning: shared term 1 in AST
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] count.c:21: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

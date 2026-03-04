@@ -1,4 +1,5 @@
 [e-acsl] beginning translation.
+[e-acsl] Warning: shared term 2 in AST
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] longlong.i:19: Warning: 
   function __gmpz_import: precondition got status unknown.

@@ -1,4 +1,14 @@
 [e-acsl] beginning translation.
+[e-acsl] Warning: shared term b in AST
+[e-acsl] Warning: shared term 0 in AST
+[e-acsl] Warning: shared term a in AST
+[e-acsl] Warning: shared term 1 in AST
+[e-acsl] Warning: shared term 18446744073709551615ULL + 1 in AST
+[e-acsl] Warning: shared term 18446744073709551615ULL in AST
+[e-acsl] Warning: shared term 65 in AST
+[e-acsl] Warning: shared term 1u in AST
+[e-acsl] Warning: shared term 18446744073709551615ULL + 1u in AST
+[e-acsl] Warning: shared term 65u in AST
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] bitwise.c:42: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

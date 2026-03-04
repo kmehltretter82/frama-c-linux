@@ -1,4 +1,10 @@
 [e-acsl] beginning translation.
+[e-acsl] Warning: shared term 3 in AST
+[e-acsl] Warning: shared term 2 in AST
+[e-acsl] Warning: shared term -2 in AST
+[e-acsl] Warning: shared term y in AST
+[e-acsl] Warning: shared term y - 123456789123456789 in AST
+[e-acsl] Warning: shared term 123456789123456789 in AST
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] arith.i:10: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
