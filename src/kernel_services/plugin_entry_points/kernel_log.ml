@@ -46,6 +46,10 @@ let dkey_alpha =
 let dkey_alpha_undo =
   register_category ~help:"undoing alpha conversion (parsing)" "alpha:undo"
 
+let dkey_approximation =
+  register_category "approximation" ~default:true
+    ~help:"messages emitted when imprecise approximations are performed"
+
 let dkey_asm_contracts =
   register_category ~help:"inline assembly contracts" "asm:contracts"
 
@@ -62,6 +66,11 @@ let dkey_builtins =
 
 let dkey_check = register_category "check"
 
+let dkey_cil_builder =
+  register_category
+    ~help:"displays information about cil_builder internal state"
+    "cil-builder"
+
 let dkey_cmdline = register_category "cmdline"
 
 let dkey_constfold = register_category "constfold"
@@ -75,6 +84,8 @@ let dkey_dataflow_scc = register_category "dataflow:scc"
 let dkey_dominators = register_category "dominators"
 
 let dkey_dyncalls = register_category "dyncalls"
+
+let dkey_dynlink = register_category "dynlink"
 
 let dkey_emitter = register_category "emitter"
 let dkey_emitter_clear = register_category "emitter:clear"
@@ -90,6 +101,8 @@ let dkey_file_transform = register_category "file:transformation"
 let dkey_file_source = register_category "file:source"
 
 let dkey_filter = register_category "filter"
+
+let dkey_inline = register_category "inline"
 
 let dkey_globals = register_category "globals"
 
@@ -116,6 +129,8 @@ let dkey_mopsa_db_verbose =
   register_category "mopsa-db:verbose"
     ~help:"highly verbose messages related to mopsa-db options"
 
+let dkey_pretty_source = register_category "pretty-source"
+
 let dkey_print_bitfields = register_category "printer:bitfields"
 
 let dkey_print_builtins = register_category "printer:builtins"
@@ -140,6 +155,8 @@ let dkey_printer_too_early =
   register_category "printer:too-early"
     ~help:"raise fatal error when Printer is used in early parsing stages, \
            where Cil_printer would be more adequate"
+
+let dkey_project = register_category "project"
 
 let dkey_prop_status = register_category "prop-status"
 
@@ -166,6 +183,8 @@ let dkey_ulevel = register_category "ulevel"
 let dkey_visitor = register_category "visitor"
 
 let dkey_variadic = register_category "variadic"
+
+(* Kernel wkeys *)
 
 let wkey_annot_error = register_warn_category "annot-error"
 let () = set_warn_status wkey_annot_error Log.Wabort
@@ -312,3 +331,10 @@ let wkey_variadic_format_nonliteral =
   register_warn_category "typing:variadic:format:nonliteral"
     ~help:("warns about scanf/printf with non-literal strings; " ^
            "similar to GCC's [-Wformat-nonliteral]")
+
+let wkey_transient = register_warn_category "transient-block"
+let () = set_warn_status wkey_transient Log.Winactive
+
+let wkey_inline = register_warn_category "inline"
+
+let wkey_project = register_warn_category "project"

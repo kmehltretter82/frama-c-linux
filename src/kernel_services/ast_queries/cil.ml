@@ -662,9 +662,6 @@ let assertEmptyQueue vis =
 
 let vis_tmp_attr = "FRAMAC_VIS_TMP_ATTR"
 
-let wkey_transient = Kernel.register_warn_category "transient-block"
-let () = Kernel.set_warn_status wkey_transient Log.Winactive
-
 let transient_block b =
   if b.blocals <> [] then begin
     if List.exists
@@ -677,7 +674,7 @@ let transient_block b =
       Kernel.fatal
         "Attempting to mark as transient a block that declares local variables";
     Kernel.warning
-      ~wkey:wkey_transient
+      ~wkey:Kernel.wkey_transient
       "ignoring request to mark transient a block with local variables:@\n%a"
       !pp_block_ref b
   end else

@@ -9,10 +9,6 @@
 open Cil_types
 module Kernel_file = File
 
-let dkey = Kernel.register_category "inline"
-
-let wkey = Kernel.register_warn_category "inline"
-
 let () = Parameter_customize.set_group Kernel.normalisation
 module InlineCalls =
   Kernel.Kernel_function_set(struct
@@ -195,7 +191,7 @@ let inliner functions_to_inline = object (self)
        not (self#recursive_call_limit callee)
     then begin
       if Ast_types.is_variadic f.vtype then begin
-        Kernel.warning ~wkey ~current:true ~once:true
+        Kernel.warning ~wkey:Kernel.wkey_inline ~current:true ~once:true
           "Ignoring inlining option for variadic function %a"
           Printer.pp_varinfo f;
         Cil.DoChildren
@@ -311,7 +307,7 @@ let inliner functions_to_inline = object (self)
        | Var vi ->
          self#inline stmt None return vi args
        | _ ->
-         Kernel.warning ~wkey ~current:true ~once:true
+         Kernel.warning ~wkey:Kernel.wkey_inline ~current:true ~once:true
            "Ignoring call via function pointer";
          Cil.DoChildren)
     | Instr(Local_init(v, ConsInit (f, args, kind), _)) ->
@@ -391,7 +387,7 @@ let inline_calls ast =
     Ast.mark_as_changed ();
     Cfg.clearFileCFG ~clear_id:false ast;
     Cfg.computeFileCFG ast;
-    Kernel.feedback ~dkey "inlining done"
+    Kernel.feedback ~dkey:Kernel.dkey_inline "inlining done"
   end
 
 let inline_transform =

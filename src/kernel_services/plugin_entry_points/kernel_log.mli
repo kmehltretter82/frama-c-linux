@@ -51,6 +51,8 @@ val dkey_alpha: category
 
 val dkey_alpha_undo: category
 
+val dkey_approximation: category
+
 val dkey_asm_contracts: category
 
 val dkey_ast: category
@@ -61,6 +63,8 @@ val dkey_attrs: category
 val dkey_builtins: category
 
 val dkey_check: category
+
+val dkey_cil_builder: category
 
 val dkey_cmdline: category
 
@@ -82,6 +86,8 @@ val dkey_dominators: category
 
 val dkey_dyncalls: category
 
+val dkey_dynlink: category
+
 val dkey_emitter: category
 
 val dkey_emitter_clear: category
@@ -99,6 +105,8 @@ val dkey_file_source: category
 
 val dkey_filter: category
 
+val dkey_inline: category
+
 val dkey_globals: category
 
 val dkey_kf_blocks: category
@@ -112,6 +120,8 @@ val dkey_loops: category
 val dkey_pp: category
 
 val dkey_pp_logic: category
+
+val dkey_pretty_source: category
 
 val dkey_print_attrs: category
 
@@ -144,6 +154,8 @@ val dkey_prop_status_merge: category
 val dkey_prop_status_graph: category
 
 val dkey_prop_status_reg: category
+
+val dkey_project: category
 
 val dkey_rmtmps: category
 
@@ -292,3 +304,7 @@ val wkey_libc_framac: warn_category
 val wkey_prototype: warn_category
 val wkey_typing: warn_category
 val wkey_variadic_format_nonliteral: warn_category
+
+val wkey_transient: warn_category
+val wkey_inline: warn_category
+val wkey_project: warn_category

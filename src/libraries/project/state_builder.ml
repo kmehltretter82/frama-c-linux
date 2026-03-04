@@ -6,8 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Project_output
-
 (* ************************************************************************* *)
 (** {3 Signatures} *)
 (* ************************************************************************* *)
@@ -122,7 +120,7 @@ struct
   let internal_name = ref ""
 
   let debug ~level op_name p =
-    debug ~dkey ~level "%s %S (project %s)"
+    Kernel_log.debug ~dkey:Kernel_log.dkey_project ~level "%s %S (project %s)"
       op_name
       !internal_name
       (Project.get_debug_name p)
@@ -151,7 +149,7 @@ struct
         let v = find p in
         v.state <- Local_state.get ()
       with Not_found ->
-        fatal
+        Kernel_log.fatal
           "state %S not associated with project %S; program will fail"
           name
           (Project.get_debug_name p)
@@ -217,8 +215,9 @@ struct
     debug ~level:4 ("copying to " ^ Project.get_debug_name dst) src;
     let v = find src in
     if Datatype.copy == FCDatatype.undefined then
-      abort "cannot copy project: unimplemented `copy' function in datatype \
-             `%s' for state `%s'" Datatype.datatype_name !internal_name;
+      Kernel_log.abort
+        "cannot copy project: unimplemented `copy' function in datatype \
+         `%s' for state `%s'" Datatype.datatype_name !internal_name;
     change ~force:false dst { v with state = Datatype.copy v.state }
 
   (* ******* TOUCH THE FOLLOWING AT YOUR OWN RISK: DANGEROUS CODE ******** *)
@@ -260,7 +259,7 @@ struct
              Do not call Local_state.create to don't break sharing *)
           try (find p).state, false
           with Not_found ->
-            fatal "unknown project '%s' in state '%s'"
+            Kernel_log.fatal "unknown project '%s' in state '%s'"
               (Project.get_debug_name p)
               !internal_name
       in

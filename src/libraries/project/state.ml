@@ -137,12 +137,12 @@ let delete s =
 let add s =
   let uname = s.unique_name in
   assert
-    (Project_output.verify
+    (Kernel_log.verify
        (not (Datatype.String.Hashtbl.mem states uname))
        "state %S already exists."
        uname);
   assert
-    (Project_output.verify (uname <> "")
+    (Kernel_log.verify (uname <> "")
        "state should have a non-empty name");
   Datatype.String.Hashtbl.add states uname s
 

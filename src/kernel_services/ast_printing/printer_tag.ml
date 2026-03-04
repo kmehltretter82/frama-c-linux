@@ -519,7 +519,7 @@ let localizable_of_declaration = function
 (* --- Find localizable at a Filepath.position                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let dkey = Kernel.register_category "pretty-source"
+let dkey = Kernel.dkey_pretty_source
 
 module LineToLocalizable =
   Datatype.Hashtbl(Datatype.Int.Hashtbl)(Datatype.Int)

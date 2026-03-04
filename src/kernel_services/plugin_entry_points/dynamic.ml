@@ -10,11 +10,8 @@
 (* --- Debugging                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Klog = Kernel_log
-let dkey = Klog.register_category "dynlink"
-
 let error ~name ~message ~details =
-  Klog.error "cannot load plug-in '%s': %s%t" name message
+  Kernel_log.error "cannot load plug-in '%s': %s%t" name message
     (fun fmt ->
        if details <> "" then
          Format.fprintf fmt "@\nDetails: %s" details)
@@ -56,7 +53,8 @@ let dynlib_error name = function
       ~details:(Printexc.get_backtrace ())
 
 let dynlib_module name file =
-  Klog.feedback ~dkey "Loading module '%s' from '%s'." name file ;
+  Kernel_log.feedback ~dkey:Kernel_log.dkey_dynlink
+    "Loading module '%s' from '%s'." name file ;
   try
     dynlib_init () ;
     Dynlink.loadfile file ;
@@ -112,14 +110,14 @@ let load_plugin m =
   (* Ok, this is ugly, but Dune Site does not give any way to catch this ...
      Note that we abort with a user error.
   *)
-  with e -> Klog.abort "Failed to load plug-in %S@.Exception: %s" m
+  with e -> Kernel_log.abort "Failed to load plug-in %S@.Exception: %s" m
               (Printexc.to_string e)
 
 let load_module m =
   let base,ext = split_ext m in
   match ext with
   | ".ml" ->
-    Klog.error "Script loading has been removed; see section \"Loading Single OCaml Files as Plug-ins\" in the Frama-C user manual for an alternative."
+    Kernel_log.error "Script loading has been removed; see section \"Loading Single OCaml Files as Plug-ins\" in the Frama-C user manual for an alternative."
   | _ ->
     begin
       (* load object or compile script or find package *)
@@ -147,7 +145,7 @@ let dynamic_values = Tbl.create 97
 let comments_fordoc = Hashtbl.create 97
 
 let register ?(comment="") ~plugin name ty f =
-  Klog.debug ~level:5 "registering dynamic function %s" name;
+  Kernel_log.debug ~level:5 "registering dynamic function %s" name;
   let key = plugin ^ "." ^ name in
   Tbl.add dynamic_values key ty f;
   if comment <> "" then Hashtbl.add comments_fordoc key comment ;

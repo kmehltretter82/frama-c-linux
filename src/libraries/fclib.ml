@@ -47,7 +47,6 @@ module State_monad = State_monad
 (** {2 Project} *)
 
 module Project = Project
-module Project_output = Project_output
 module Project_skeleton = Project_skeleton
 module State = State
 module State_builder = State_builder
