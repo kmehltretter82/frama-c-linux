@@ -6,9 +6,6 @@
 [e-acsl] functions.c:111: Warning: 
   E-ACSL construct `function application' is not yet supported.
   Ignoring annotation.
-[e-acsl] Warning: shared term 99 in AST
-[e-acsl] Warning: shared term 1 in AST
-[e-acsl] Warning: shared term 0 in AST
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] functions.c:91: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

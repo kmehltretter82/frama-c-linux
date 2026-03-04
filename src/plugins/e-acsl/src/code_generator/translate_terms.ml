@@ -382,7 +382,7 @@ and denominator_zero_guard ~loc ~ctx ~adata ~kf ~env ~name ?root denom =
       zero_exp
       root
   in
-  let p = Logic_const.prel ~loc (Rneq, denom, zero) in
+  let p = Logic_const.prel ~loc (Rneq, Misc.Id_term.deep_copy denom, zero) in
   let cond, env =
     Assert.runtime_check_with_msg
       ~adata:adata2
@@ -606,15 +606,15 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       (* Coerce e2 to mp_bitcnt_t *)
       let coerce_guard_cond, env =
         let max_bitcnt =
-          Cil.max_unsigned_number (Cil.bitsSizeOf (Gmp_types.bitcnt_t ()))
+          Cil.lconstant ~loc @@
+          Cil.max_unsigned_number @@ Cil.bitsSizeOf @@ Gmp_types.bitcnt_t ()
         in
-        let max_bitcnt_term = Cil.lconstant ~loc max_bitcnt in
         let pred =
           Logic_const.pand
             ~loc
             ~names:[bop_name ^ "_rhs_fits_in_mp_bitcnt_t"]
-            (Logic_const.prel ~loc (Rle, zero, t2),
-             Logic_const.prel ~loc (Rle, t2, max_bitcnt_term))
+            (Logic_const.prel ~loc (Rle, zero, Misc.Id_term.deep_copy t2),
+             Logic_const.prel ~loc (Rle, Misc.Id_term.deep_copy t2, max_bitcnt))
         in
         Typing.preprocess_predicate ~logic_env:(Env.Logic_env.get env) pred;
         let cond, env =
@@ -694,7 +694,10 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
               t
           in
           let e1_guard_cond, env =
-            let pred = Logic_const.prel ~loc (Rge, t1, zero) in
+            let pred =
+              Logic_const.prel ~loc
+                (Rge, Misc.Id_term.deep_copy t1, Misc.Id_term.deep_copy zero)
+            in
             Typing.preprocess_predicate ~logic_env:(Env.Logic_env.get env) pred;
             let cond, env =
               Assert.runtime_check
