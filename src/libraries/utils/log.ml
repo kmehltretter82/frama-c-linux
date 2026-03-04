@@ -529,9 +529,6 @@ let finally_unit _ = ()
 let finally_raise e _ = raise e
 let finally_false _ = false
 
-let cmdline_error_occurred = Extlib.mk_fun "Log.cmdline_error_occurred"
-let cmdline_at_error_exit = Extlib.mk_fun "Log.at_error_exit"
-
 type deferred_exn =
   | DNo_exn
   | DWarn_as_error of event
@@ -1281,6 +1278,9 @@ end
 
 let kernel_channel_name = "kernel"
 let kernel_label_name = "kernel"
+
+let cmdline_error_occurred = Extlib.mk_fun "Log.cmdline_error_occurred"
+let cmdline_at_error_exit = Extlib.mk_fun "Log.at_error_exit"
 
 (* ------------------------------------------------------------------------- *)
 (* --- Tests                                                             --- *)

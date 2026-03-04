@@ -128,11 +128,9 @@ let run_normal_exit_hook = NormalExit.apply
 
 module ErrorExit = Hook.Build(struct type t = exn end)
 let at_error_exit = ErrorExit.extend
-let () = Log.cmdline_at_error_exit := at_error_exit
 let run_error_exit_hook = ErrorExit.apply
 let error_occurred_ref = ref None
 let error_occurred exn = error_occurred_ref := Some exn
-let () = Log.cmdline_error_occurred := error_occurred
 
 type exit = unit
 exception Exit
@@ -1272,3 +1270,6 @@ let kernel_debug_atleast_ref =
 let kernel_verbose_atleast_ref =
   Kernel_log.kernel_verbose_atleast_ref
 [@@alert "-kernel_log"]
+
+let () = Log.cmdline_at_error_exit := at_error_exit [@@alert "-deprecated"]
+let () = Log.cmdline_error_occurred := error_occurred  [@@alert "-deprecated"]

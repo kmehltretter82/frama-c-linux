@@ -543,8 +543,10 @@ val check_not_yet: (event -> bool) ref
 *)
 
 val cmdline_error_occurred: (exn -> unit) ref
+[@@deprecated "Use Cmdline.error_occurred directly instead"]
 
 val cmdline_at_error_exit: ((exn -> unit) -> unit) ref
+[@@deprecated "Use Cmdline.at_error_exit directly instead"]
 
 val treat_deferred_error: unit -> unit
 (** call this function when it is a good time to raise an exception following
