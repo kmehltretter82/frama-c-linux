@@ -6,6 +6,12 @@
 [e-acsl] functions.c:111: Warning: 
   E-ACSL construct `function application' is not yet supported.
   Ignoring annotation.
+[e-acsl] functions.c:123: Warning: 
+  E-ACSL construct `predicate with labels' is not yet supported.
+  Ignoring annotation.
+[e-acsl] functions.c:124: Warning: 
+  E-ACSL construct `logic functions with labels' is not yet supported.
+  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] functions.c:91: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
@@ -21,6 +27,8 @@
 [eva:alarm] functions.c:119: Warning: assertion got status unknown.
 [eva:alarm] functions.c:121: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:123: Warning: assertion got status unknown.
+[eva:alarm] functions.c:124: Warning: assertion got status unknown.
 [eva:alarm] functions.c:129: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] functions.c:132: Warning: assertion got status unknown.
