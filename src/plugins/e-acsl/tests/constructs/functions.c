@@ -1,6 +1,6 @@
 /* run.config
-   COMMENT: logic functions without labels
-   STDOPT: +"-eva-slevel 100"
+   COMMENT: (recursive) logic functions and predicates without labels
+   STDOPT: +"-eva-slevel 100 -eva-unroll-recursive-calls 100"
 */
 
 /*@ predicate p1(int x, int y) = x + y > 0; */
@@ -54,6 +54,36 @@ int glob = 5;
 int z = 8;
 /*@ logic integer f3 (integer y) = z+y; */
 
+/*@ predicate even (integer n) =
+      n == 0 ? \true :
+      n > 0 ? ! even (n - 1) :
+      ! even (n + 1);
+*/
+
+/*@ predicate even_and_not_negative (integer n) =
+      n == 0 ? \true :
+      n > 0 ? ! even (n - 1) :
+      \false;
+*/
+
+/*@ logic integer rf1(integer n) =
+    n <= 0 ? 0 : rf1(n - 1) + n; */
+
+/*@ logic integer rf2(integer n) =
+    n < 0 ? 1 : rf2(n - 1)*rf2(n - 2)/rf2(n - 3); */
+
+/*@ logic integer g(integer n) = 0; */
+/*@ logic integer rf3(integer n) =
+    n > 0 ? g(n)*rf3(n - 1) - 5 : g(n + 1); */
+
+/*@ logic integer rf4(integer n) =
+    n < 100 ? rf4(n + 1) :
+    n < 0x7fffffffffffffffL ? 0x7fffffffffffffffL :
+    6; */
+
+/*@ logic integer rf5(integer n) =
+  n >= 0 ? 0 : rf5(n + 1) + n; */
+
 int main(void) {
   int x = 1, y = 2;
   /*@ assert p1(x, y); */;
@@ -98,6 +128,23 @@ int main(void) {
   /*@ assert signum(3.0) > 0; */
   /*@ assert signum(0.0-3.0) < 0; */
   /*@ assert signum(0.0) ≡ 0; */
+
+  /*@ assert even(10); @*/;
+  /*@ assert even(-6); @*/;
+  /*@ assert even_and_not_negative(10); */;
+  /*@ assert rf1(0) == 0; */;
+  /*@ assert rf1(1) == 1; */;
+  /*@ assert rf1(10) == 55; */;
+
+  /*@ assert rf2(7) == 1; */;
+
+  /*@ assert rf3(6) == -5; */;
+
+  /*@ assert rf4(9) > 0; */;
+
+  /*@ assert rf5(0) == 0; */
+
+  /*@ assert (\let n = (0 == 0) ? 0x7fffffffffffffffL : -1; rf5(n) == 0);*/
 }
 
 // Function with different return types depending on the call site
