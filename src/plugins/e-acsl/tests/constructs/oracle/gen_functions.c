@@ -104,9 +104,9 @@ void __gen_e_acsl_over(__e_acsl_mpq_t *__retres_arg, double a, double b);
 /*@ logic integer \signum(real x) = x > 0. ? 1 : (x < 0. ? -1 : 0);
 
 */
-int __gen_e_acsl_\signum_3(__e_acsl_mpq_t x);
+int __gen_e_acsl_signum_3(__e_acsl_mpq_t x);
 
-int __gen_e_acsl_\signum(double x);
+int __gen_e_acsl_signum(double x);
 
 int z = 8;
 /*@ logic integer f3{L}(integer y) = \at(z + y,L);
@@ -554,19 +554,19 @@ int main(void)
   }
   /*@ assert f3(5) == 13; */ ;
   {
-    int __gen_e_acsl_\signum_2;
+    int __gen_e_acsl_signum_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_19 =
       {.values = (void *)0};
-    __gen_e_acsl_\signum_2 = __gen_e_acsl_\signum(3.);
+    __gen_e_acsl_signum_2 = __gen_e_acsl_signum(3.);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,
-                                 "\\signum(3.0)",0,__gen_e_acsl_\signum_2);
+                                 "\\signum(3.0)",0,__gen_e_acsl_signum_2);
     __gen_e_acsl_assert_data_19.blocking = 1;
     __gen_e_acsl_assert_data_19.kind = "Assertion";
     __gen_e_acsl_assert_data_19.pred_txt = "\\signum(3.0) > 0";
     __gen_e_acsl_assert_data_19.file = "functions.c";
     __gen_e_acsl_assert_data_19.fct = "main";
     __gen_e_acsl_assert_data_19.line = 128;
-    __e_acsl_assert(__gen_e_acsl_\signum_2 > 0,& __gen_e_acsl_assert_data_19);
+    __e_acsl_assert(__gen_e_acsl_signum_2 > 0,& __gen_e_acsl_assert_data_19);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_19);
   }
   /*@ assert \signum(3.0) > 0; */ ;
@@ -574,7 +574,7 @@ int main(void)
     __e_acsl_mpq_t __gen_e_acsl__10;
     __e_acsl_mpq_t __gen_e_acsl__11;
     __e_acsl_mpq_t __gen_e_acsl_sub;
-    int __gen_e_acsl_\signum_4;
+    int __gen_e_acsl_signum_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_20 =
       {.values = (void *)0};
     __gmpq_init(__gen_e_acsl__10);
@@ -585,17 +585,17 @@ int main(void)
     __gmpq_sub(__gen_e_acsl_sub,
                (__e_acsl_mpq_struct const *)(__gen_e_acsl__10),
                (__e_acsl_mpq_struct const *)(__gen_e_acsl__11));
-    __gen_e_acsl_\signum_4 = __gen_e_acsl_\signum_3(__gen_e_acsl_sub);
+    __gen_e_acsl_signum_4 = __gen_e_acsl_signum_3(__gen_e_acsl_sub);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,
                                  "\\signum(0.0 - 3.0)",0,
-                                 __gen_e_acsl_\signum_4);
+                                 __gen_e_acsl_signum_4);
     __gen_e_acsl_assert_data_20.blocking = 1;
     __gen_e_acsl_assert_data_20.kind = "Assertion";
     __gen_e_acsl_assert_data_20.pred_txt = "\\signum(0.0 - 3.0) < 0";
     __gen_e_acsl_assert_data_20.file = "functions.c";
     __gen_e_acsl_assert_data_20.fct = "main";
     __gen_e_acsl_assert_data_20.line = 129;
-    __e_acsl_assert(__gen_e_acsl_\signum_4 < 0,& __gen_e_acsl_assert_data_20);
+    __e_acsl_assert(__gen_e_acsl_signum_4 < 0,& __gen_e_acsl_assert_data_20);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_20);
     __gmpq_clear(__gen_e_acsl__10);
     __gmpq_clear(__gen_e_acsl__11);
@@ -603,20 +603,19 @@ int main(void)
   }
   /*@ assert \signum(0.0 - 3.0) < 0; */ ;
   {
-    int __gen_e_acsl_\signum_6;
+    int __gen_e_acsl_signum_6;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_21 =
       {.values = (void *)0};
-    __gen_e_acsl_\signum_6 = __gen_e_acsl_\signum(0.);
+    __gen_e_acsl_signum_6 = __gen_e_acsl_signum(0.);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_21,
-                                 "\\signum(0.0)",0,__gen_e_acsl_\signum_6);
+                                 "\\signum(0.0)",0,__gen_e_acsl_signum_6);
     __gen_e_acsl_assert_data_21.blocking = 1;
     __gen_e_acsl_assert_data_21.kind = "Assertion";
     __gen_e_acsl_assert_data_21.pred_txt = "\\signum(0.0) == 0";
     __gen_e_acsl_assert_data_21.file = "functions.c";
     __gen_e_acsl_assert_data_21.fct = "main";
     __gen_e_acsl_assert_data_21.line = 130;
-    __e_acsl_assert(__gen_e_acsl_\signum_6 == 0,
-                    & __gen_e_acsl_assert_data_21);
+    __e_acsl_assert(__gen_e_acsl_signum_6 == 0,& __gen_e_acsl_assert_data_21);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_21);
   }
   /*@ assert \signum(0.0) == 0; */ ;
@@ -1235,7 +1234,7 @@ void __gen_e_acsl_over(__e_acsl_mpq_t *__retres_arg, double a, double b)
 
 /*@ assigns \result;
     assigns \result \from x; */
-int __gen_e_acsl_\signum(double x)
+int __gen_e_acsl_signum(double x)
 {
   int __gen_e_acsl_if_2;
   if (x > 0.) __gen_e_acsl_if_2 = 1;
@@ -1249,7 +1248,7 @@ int __gen_e_acsl_\signum(double x)
 
 /*@ assigns \result;
     assigns \result \from *((__e_acsl_mpq_struct *)x); */
-int __gen_e_acsl_\signum_3(__e_acsl_mpq_t x)
+int __gen_e_acsl_signum_3(__e_acsl_mpq_t x)
 {
   __e_acsl_mpq_t __gen_e_acsl__12;
   int __gen_e_acsl_gt_3;

@@ -14,7 +14,7 @@ type scope =
   | Block
 
 val get: scope:scope -> string -> string
-(** @return a fresh variable name for the given scope wrt the given name. *)
+(** @return a fresh, sanitized version of the given name for a given scope. *)
 
 val clear_locals: unit -> unit
 (** Reset the generator for variables that are local to a block or a
