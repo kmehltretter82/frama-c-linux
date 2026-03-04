@@ -53,14 +53,10 @@ let setup () =
 
 (** {2 Signal catching} *)
 
-let is_interactive () = Server.Main.is_active ()
-let is_saved () = not (Kernel.SaveState.is_empty ())
-
 let protect_only_once = ref true
 
 let protect f ~cleanup =
   protect_only_once := true;
-  let catch () = is_interactive () || is_saved () in
   let cleanup () =
     try cleanup ()
     with e ->
@@ -69,9 +65,7 @@ let protect f ~cleanup =
   in
   try f ();
   with
-  | Log.(AbortError _ | AbortFatal _ | FeatureRequest _) as e when catch () ->
+  | Self.Abort | Log.(AbortError _ | AbortFatal _ | FeatureRequest _) as e ->
     cleanup (); raise e
-  | Sys.Break as e when catch () && !protect_only_once ->
-    cleanup (); raise e
-  | Self.Abort as e ->
+  | Sys.Break as e when !protect_only_once ->
     cleanup (); raise e

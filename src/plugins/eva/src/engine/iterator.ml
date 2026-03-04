@@ -697,7 +697,7 @@ module Make (Engine : Engine_Subset) = struct
       results, !Dataflow.cacheable
     in
     let cleanup () =
-      Self.feedback ~once:true "Clean up and save partial results.";
+      Self.feedback ~once:true ~level:3 "Clean up partial results.";
       Dataflow.mark_degeneration ();
       Dataflow.merge_results ~save_results
     in

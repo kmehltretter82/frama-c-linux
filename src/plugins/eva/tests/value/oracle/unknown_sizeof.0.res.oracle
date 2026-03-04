@@ -10,4 +10,5 @@
   s.[bits 0 to ..] ∈ {0} or UNINITIALIZED
 [eva] unknown_sizeof.i:19: User Error: 
   function g returns a value of unknown size. Aborting
+[eva] Clean up partial results.
 [kernel] Plug-in eva aborted: invalid user input.

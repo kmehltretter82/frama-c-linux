@@ -23,4 +23,5 @@
 [eva:watchpoint] watch.c:18: (void *)(& c) [--..--]
 [eva:watchpoint] watch.c:19: (void *)(& c) [--..--]
 [eva] User Error: Watchpoint builtin: countdown to zero
+[eva] Clean up partial results.
 [kernel] Plug-in eva aborted: invalid user input.

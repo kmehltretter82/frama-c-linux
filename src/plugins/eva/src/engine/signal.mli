@@ -36,6 +36,6 @@ val setup: unit -> (unit -> unit)
 (** {2 Signal catching} *)
 
 (** [protect f ~cleanup] runs [f]. On a user interruption or a Frama-C error,
-    if option -save is set, applies [cleanup]. This is used to clean up and
-    save partial results when the analysis is aborted. *)
+    applies [cleanup]. This is used to clean up and save partial results when
+    the analysis is aborted. *)
 val protect: (unit -> 'a) -> cleanup:(unit -> unit) -> 'a
