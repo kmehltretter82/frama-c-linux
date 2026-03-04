@@ -340,6 +340,28 @@ tr:first-of-type > .eva-table-callsite-box {
 .eva-status-icon.eva-not_computed { fill: var(--eva-alarms-false); }
 
 /* -------------------------------------------------------------------------- */
+/* --- Taint Sidebar                                                      --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-taint-row {
+  display: flex;
+  align-items: center;
+}
+
+.eva-taint-list .eva-taint-row > .dome-xCheckbox {
+  flex: 1 1 auto;
+}
+
+.eva-taint-marker {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--warning);
+  flex: 0 0 auto;
+  margin-right: 8px;
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- Flamegraph                                                         --- */
 /* -------------------------------------------------------------------------- */
 
