@@ -47,8 +47,8 @@ include struct (* auxiliary functions *)
     method !vterm = function
       | {term_node = TLval (TVar v, TNoOffset); term_loc} ->
         (try
-           let t = Logic_var.Map.find v substs in
-           Cil.ChangeTo {t with term_loc} (* copy *)
+           let t = Misc.Id_term.deep_copy @@ Logic_var.Map.find v substs in
+           Cil.ChangeTo {t with term_loc}
          with Not_found -> Cil.DoChildren)
       | _ -> Cil.DoChildren
   end
