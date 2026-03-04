@@ -71,7 +71,11 @@ val make_binop: loc:location -> binop -> exp -> exp -> exp
 val finite_min_and_max: Ival.t -> Z.t * Z.t
 (** [finite_min_and_max i] takes the finite ival [i] and returns its bounds. *)
 
-module Id_term: Datatype.S_with_hashtbl with type t = term
+module Id_term : sig
+  include Datatype.S_with_hashtbl with type t = term
+
+  val deep_copy : t -> t
+end
 (** Datatype for terms that relies on physical equality.
     Note that of its collections only [Hashtbl] can be used.
     Using [Map] and [Set] raises a fatal error as they require a comparison
