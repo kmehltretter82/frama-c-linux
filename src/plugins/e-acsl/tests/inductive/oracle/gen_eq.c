@@ -31,16 +31,16 @@ inductive eqC(integer x, integer y) {
                 eqC(a, b) ==> eqC(b, c) ==> eqC(a, c);
   }
  */
-/*@ predicate eqC(integer x, integer y) = eqC_fun2(x) == y;
- */
-int __gen_e_acsl_eqC(int x, int y);
-
 /*@
 logic integer eqC_fun2(integer x) =
   x == 1 ? 2 : (x == 2 ? 3 : (\let b = eqC_fun2(x); \let c = eqC_fun2(b); c));
+ */
+int __gen_e_acsl_eqC_fun2(unsigned int x);
+
+/*@ predicate eqC(integer x, integer y) = eqC_fun2(x) == y;
 
 */
-int __gen_e_acsl_eqC_fun2(unsigned int x);
+int __gen_e_acsl_eqC(int x, int y);
 
 int main(void)
 {

@@ -22,19 +22,6 @@ inductive sum{L}
   }
  */
 /*@
-predicate __gen_e_acsl_sum_here
-  (int *arr, integer low, integer high, integer len, integer res) =
-  __gen_e_acsl_sum_fun5_here(arr, low, high, len) == res;
-
-*/
-int __gen_e_acsl_sum_here(int *arr, int low, int high, int len, int res);
-
-/*@
-predicate sum{L}
-  (int *arr, integer low, integer high, integer len, integer res) =
-  sum_fun5(arr, low, high, len) == res;
- */
-/*@
 logic integer __gen_e_acsl_sum_fun5_here
 (int *arr, integer low, integer high, integer len) =
   low > high ? 0 :
@@ -57,6 +44,19 @@ logic integer sum_fun5{L}(int *arr, integer low, integer high, integer len) =
               : 0,
             L),
       L);
+ */
+/*@
+predicate __gen_e_acsl_sum_here
+  (int *arr, integer low, integer high, integer len, integer res) =
+  __gen_e_acsl_sum_fun5_here(arr, low, high, len) == res;
+
+*/
+int __gen_e_acsl_sum_here(int *arr, int low, int high, int len, int res);
+
+/*@
+predicate sum{L}
+  (int *arr, integer low, integer high, integer len, integer res) =
+  sum_fun5(arr, low, high, len) == res;
 
 */
 int main(void)

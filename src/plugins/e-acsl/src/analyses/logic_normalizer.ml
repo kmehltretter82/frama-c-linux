@@ -84,7 +84,7 @@ let pp_logic_info fmt li =
     from which they stem. *)
 module Logic_infos : sig
   val origin_of_lv : logic_var -> logic_var
-  val generated_of : logic_info -> logic_info list
+  val generated_of : logic_info -> Logic_info.Set.t
 end = struct
   let original_of_lv lv =
     let li = {l_var_info = lv;
@@ -105,10 +105,11 @@ end = struct
     | Some origin -> origin_of_lv origin.l_var_info
 
   let generated_of li =
-    List.filter (fun li' -> not @@ Logic_info.equal li li') @@
-    Option.to_list (Inductive_extractions.derived_opt li) @
-    Option.to_list (Here_specialized.derived_opt li) @
-    Auxiliary_functions.M.tails li
+    Logic_info.Set.remove li @@
+    Logic_info.Set.of_list (
+      Option.to_list (Inductive_extractions.derived_opt li) @
+      Option.to_list (Here_specialized.derived_opt li) @
+      Auxiliary_functions.M.tails li)
 end
 
 (** E-ACSL currently is not in general capable of translating predicates and

@@ -54,10 +54,6 @@ inductive conds(integer a, integer b, integer c) {
             conds(x - 1, y, z) ==> conds(x, y - 1, 1) ==> conds(x, y, x - 1);
   }
  */
-/*@ predicate conds(integer a, integer b, integer c) = conds_fun3(a, b) == c;
- */
-int __gen_e_acsl_conds(int a, int b, int c);
-
 /*@
 logic integer conds_fun3(integer a, integer b) =
   a <= 0 || b <= 0 ? 1 :
@@ -70,6 +66,10 @@ void __gen_e_acsl_conds_fun3_2(__e_acsl_mpz_t *__retres_arg,
 
 int __gen_e_acsl_conds_fun3(__e_acsl_mpz_struct * a, __e_acsl_mpz_struct * b);
 
+/*@ predicate conds(integer a, integer b, integer c) = conds_fun3(a, b) == c;
+ */
+int __gen_e_acsl_conds(int a, int b, int c);
+
 /*@
 inductive fibo(integer i, integer x) {
   case zero: fibo(0, 0);
@@ -79,39 +79,19 @@ inductive fibo(integer i, integer x) {
                 fibo(n - 1, f1) ==> fibo(n - 2, f2) ==> fibo(n, f1 + f2);
   }
  */
+/*@
+logic integer fibo_fun2(integer i) =
+  i == 0 ? 0 :
+    (i == 1 ? 1 :
+       (i > 1 ?
+          (\let f1 = fibo_fun2(i - 1); \let f2 = fibo_fun2(i - 2); f1 + f2) :
+          0));
+ */
+void __gen_e_acsl_fibo_fun2(__e_acsl_mpz_t *__retres_arg, int i);
+
 /*@ predicate fibo(integer i, integer x) = fibo_fun2(i) == x;
  */
 int __gen_e_acsl_fibo(int i, int x);
-
-/*@
-logic integer fibo_fun2(integer i) =
-  i == 0 ? 0 :
-    (i == 1 ? 1 :
-       (i > 1 ?
-          (\let f1 = fibo_fun2(i - 1); \let f2 = fibo_fun2(i - 2); f1 + f2) :
-          0));
- */
-void __gen_e_acsl_fibo_fun2(__e_acsl_mpz_t *__retres_arg, int i);
-
-/*@
-logic integer fibo_fun2(integer i) =
-  i == 0 ? 0 :
-    (i == 1 ? 1 :
-       (i > 1 ?
-          (\let f1 = fibo_fun2(i - 1); \let f2 = fibo_fun2(i - 2); f1 + f2) :
-          0));
- */
-void __gen_e_acsl_fibo_fun2(__e_acsl_mpz_t *__retres_arg, int i);
-
-/*@
-logic integer fibo_fun2(integer i) =
-  i == 0 ? 0 :
-    (i == 1 ? 1 :
-       (i > 1 ?
-          (\let f1 = fibo_fun2(i - 1); \let f2 = fibo_fun2(i - 2); f1 + f2) :
-          0));
- */
-void __gen_e_acsl_fibo_fun2(__e_acsl_mpz_t *__retres_arg, int i);
 
 /*@
 inductive use_var_bind_and_subst(integer x, integer y) {
@@ -147,12 +127,6 @@ inductive bind_twice(integer a, integer b, integer c) {
   }
  */
 /*@
-predicate bind_twice(integer a, integer b, integer c) =
-  bind_twice_fun3(a, b) == c;
- */
-int __gen_e_acsl_bind_twice(int a, int b, int c);
-
-/*@
 logic integer bind_twice_fun3(integer a, integer b) =
   a <= 0 || b <= 0 ? 1 :
     (\let z = bind_twice_fun3(0, b); bind_twice_fun3(a, 0) == z ? a - 1 : 0);
@@ -161,6 +135,13 @@ logic integer bind_twice_fun3(integer a, integer b) =
 long __gen_e_acsl_bind_twice_fun3_2(int a, int b);
 
 int __gen_e_acsl_bind_twice_fun3(int a, int b);
+
+/*@
+predicate bind_twice(integer a, integer b, integer c) =
+  bind_twice_fun3(a, b) == c;
+
+*/
+int __gen_e_acsl_bind_twice(int a, int b, int c);
 
 int main(void)
 {
