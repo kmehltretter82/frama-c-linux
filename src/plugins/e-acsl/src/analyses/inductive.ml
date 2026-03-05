@@ -444,23 +444,7 @@ module type Out_language = sig
   val mk_concl : mode:mode -> term list -> t
 end
 
-(* Here we store terms that we use as a fallthrough result of logic functions
-   we generate. When an inductive or axiomatic definition is incomplete, then
-   it will return such a fallthrough value. In the translation to CIL this term
-   will become a failing assertion. *)
-module Fallthrough_terms : sig
-  val mem : term -> bool
-  val add : term -> unit
-  val clear : unit -> unit
-end = struct
-  open Misc.Id_term.Hashtbl
-  let tbl = create 9
-  let mem = mem tbl
-  let add t = add tbl t ()
-  let clear () = clear tbl
-end
-
-let is_fallthrough_term = Fallthrough_terms.mem
+let is_fallthrough_term t = List.mem "fallthrough" t.term_name
 
 module Derived_functions = struct
   open Logic_info.Hashtbl
@@ -664,8 +648,7 @@ end = struct
 
       let mk_false ?loc lty =
         let t = mk_false ?loc lty in
-        Fallthrough_terms.add t;
-        t
+        {t with term_name = "fallthrough" :: t.term_name}
 
       let mk_concl ~mode args =
         match Mode.out_arg ~mode args with
@@ -734,7 +717,6 @@ let extract_predicate = PredicateExtractor.extract
 let predicate_is_unsound_if_false = Unsound_if_false.mem
 
 let clear () =
-  Fallthrough_terms.clear ();
   Extractions.clear ();
   Derived_functions.clear ();
   InductiveDef.clear ();

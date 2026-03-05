@@ -396,8 +396,8 @@ logic \list<RSRC_NODE_T *>  __gen_e_acsl_linked_ll_fun3_here
     (Pseparated((void *)bl, (void *)el) && Pvalid((void *)bl) ?
        (\let tail = __gen_e_acsl_linked_ll_fun3_here(bl->next, el);
         __gen_e_acsl_ptr_sep_from_list_here(bl, tail) ? \Cons(bl, tail) :
-          (\list<RSRC_NODE_T *> )0)
-       : (\list<RSRC_NODE_T *> )0);
+          (fallthrough: (\list<RSRC_NODE_T *> )0))
+       : (fallthrough: (\list<RSRC_NODE_T *> )0));
  */
 /*@
 logic \list<RSRC_NODE_T *>  linked_ll_fun3{L}
@@ -406,8 +406,8 @@ logic \list<RSRC_NODE_T *>  linked_ll_fun3{L}
     (Pseparated((void *)bl, (void *)el) && Pvalid((void *)bl) ?
        (\let tail = __gen_e_acsl_linked_ll_fun3_here(bl->next, el);
         ptr_sep_from_list(bl, tail) ? \Cons(bl, tail) :
-          (\list<RSRC_NODE_T *> )0)
-       : (\list<RSRC_NODE_T *> )0);
+          (fallthrough: (\list<RSRC_NODE_T *> )0))
+       : (fallthrough: (\list<RSRC_NODE_T *> )0));
  */
 /*@
 predicate __gen_e_acsl_linked_ll_here

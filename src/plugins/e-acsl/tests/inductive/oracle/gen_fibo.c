@@ -22,7 +22,7 @@ logic integer fibo_fun2(integer i) =
     (i == 1 ? 1 :
        (i > 1 ?
           (\let f1 = fibo_fun2(i - 1); \let f2 = fibo_fun2(i - 2); f1 + f2) :
-          0));
+          (fallthrough: 0)));
  */
 void __gen_e_acsl_fibo_fun2(__e_acsl_mpz_t *__retres_arg, int i);
 
@@ -45,8 +45,9 @@ logic integer fibo2_fun2(integer i) =
     (i == 1 ? 1 :
        (i - 1 > 0 ?
           (\let f1 = fibo2_fun2(i - 1);
-           \let f2 = fibo2_fun2((i - 1) - 1); i == (i - 1) + 1 ? f1 + f2 : 0)
-          : 0));
+           \let f2 = fibo2_fun2((i - 1) - 1);
+           i == (i - 1) + 1 ? f1 + f2 : (fallthrough: 0))
+          : (fallthrough: 0)));
 
 */
 void __gen_e_acsl_fibo2_fun2(__e_acsl_mpz_t *__retres_arg,

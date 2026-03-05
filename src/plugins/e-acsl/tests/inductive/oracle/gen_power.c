@@ -36,7 +36,8 @@ inductive power2(integer x, integer y, integer p) {
 /*@
 logic integer power2_fun3(integer x, integer y) =
   y == 0 ? 1 :
-    (\let q = power2_fun3(x * 1, y - 1); x == (x * 1) / 1 ? q * (x * 1) : 0);
+    (\let q = power2_fun3(x * 1, y - 1);
+     x == (x * 1) / 1 ? q * (x * 1) : (fallthrough: 0));
 
 */
 void __gen_e_acsl_power2_fun3(__e_acsl_mpz_t *__retres_arg, int x,
