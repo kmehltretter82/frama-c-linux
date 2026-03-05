@@ -358,7 +358,9 @@ let parse_float ?loc literal =
      single or double constant and the nearest parsed float is exact.
      Otherwise, use the upper and lower float computed by [parse]. *)
   let is_nearest_exact = string_has_suffix float_exact_suffixes literal in
-  let Parsed (format, p) = Typed_float.parse_exn literal in
+  let res = Typed_float.parse literal in
+  let error s = Errorloc.abort_context "%s" s in
+  let Parsed (format, p) = Result.value_or_else ~error res in
   let nearest = Typed_float.(to_float p.nearest) in
   let fkind = Typed_float.parsed_fkind format in
   let creal =

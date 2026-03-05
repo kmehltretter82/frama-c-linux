@@ -27,34 +27,10 @@
 (** {2 Global declarations} *)
 (* ************************************************************************* *)
 
-module type Level = sig
-  val value_if_set: int option ref
-  val get: unit -> int
-  val set: int -> unit
-end
+module Debug_level = Log.Make_level(struct let default = 0 end)
+module Verbose_level = Log.Make_level(struct let default = 1 end)
 
-module Make_level(X: sig val default: int end) = struct
-  let value_if_set = ref None
-  let get () = match !value_if_set with None -> X.default | Some x -> x
-  let set n = value_if_set := Some n
-end
-
-module Debug_level = Make_level(struct let default = 0 end)
-module Verbose_level = Make_level(struct let default = 1 end)
-module Kernel_debug_level = Make_level(struct let default = 0 end)
-module Kernel_verbose_level = Make_level(struct let default = 1 end)
-let kernel_debug_atleast_ref = ref (fun n -> Kernel_debug_level.get () >= n)
-let kernel_verbose_atleast_ref = ref (fun n -> Kernel_verbose_level.get () >= n)
-
-module Kernel_log =
-  Log.Register
-    (struct
-      let channel = Log.kernel_channel_name
-      let label = Log.kernel_label_name
-      let debug_atleast level = !kernel_debug_atleast_ref level
-      let verbose_atleast level = !kernel_verbose_atleast_ref level
-    end)
-let dkey = Kernel_log.register_category "cmdline"
+let dkey = Kernel_log.dkey_cmdline
 
 let quiet_ref = ref false
 let deterministic = ref false
@@ -73,7 +49,7 @@ let last_project_created_by_copy = ref (fun () -> assert false)
 (* ************************************************************************* *)
 
 let long_plugin_name s =
-  if s = Log.kernel_label_name then "Frama-C" else "Plug-in " ^ s
+  if s = Kernel_log.kernel_label_name then "Frama-C" else "Plug-in " ^ s
 
 let get_backtrace () =
   (* Get the backtrace before potentially destroying it in the handler below *)
@@ -104,7 +80,7 @@ let request_crash_report =
 let protect = function
   | Sys.Break ->
     "User Interruption (Ctrl-C)"
-    ^ if Kernel_debug_level.get () > 0 then "\n" ^ get_backtrace () else ""
+    ^ if Kernel_log.Debug_level.get () > 0 then "\n" ^ get_backtrace () else ""
   | Sys_error s -> Printf.sprintf "System error: %s" s
   | Unix.Unix_error(err, a, b) ->
     let error = Printf.sprintf "System error: %s" (Unix.error_message err) in
@@ -152,11 +128,9 @@ let run_normal_exit_hook = NormalExit.apply
 
 module ErrorExit = Hook.Build(struct type t = exn end)
 let at_error_exit = ErrorExit.extend
-let () = Log.cmdline_at_error_exit := at_error_exit
 let run_error_exit_hook = ErrorExit.apply
 let error_occurred_ref = ref None
 let error_occurred exn = error_occurred_ref := Some exn
-let () = Log.cmdline_error_occurred := error_occurred
 
 type exit = unit
 exception Exit
@@ -165,7 +139,7 @@ let nop = ()
 let catch_at_toplevel = function
   | Log.AbortError _ -> true
   | Log.FeatureRequest _ -> true
-  | _ -> Kernel_debug_level.get () = 0
+  | _ -> Kernel_log.Debug_level.get () = 0
 
 let exit_code = function
   | Log.AbortError _ -> 1
@@ -495,8 +469,8 @@ let () =
             Debug_level.set 0);
         "-verbose", Int (fun n -> Verbose_level.set n);
         "-debug", Int (fun n -> Debug_level.set n);
-        "-kernel-verbose", Int (fun n -> Kernel_verbose_level.set n);
-        "-kernel-debug", Int (fun n -> Kernel_debug_level.set n);
+        "-kernel-verbose", Int (fun n -> Kernel_log.Verbose_level.set n);
+        "-kernel-debug", Int (fun n -> Kernel_log.Debug_level.set n);
         "-deterministic", Unit (fun () -> deterministic := true);
         "-tty", Unit (fun () -> set_tty true);
         "-no-tty", Unit (fun () -> set_tty false);
@@ -1279,3 +1253,23 @@ let explain_cmdline () =
        Format.fprintf fmt "[kernel] Explaining command-line options:@.");
   List.iter pp_option_help (List.rev option_names);
   raise Exit
+
+(* deprecated *)
+
+module type Level = Log.Level
+
+module Kernel_debug_level = Kernel_log.Debug_level
+
+module Kernel_verbose_level = Kernel_log.Verbose_level
+
+module Kernel_log = Kernel_log
+let kernel_debug_atleast_ref =
+  Kernel_log.kernel_debug_atleast_ref
+[@@alert "-kernel_log"]
+
+let kernel_verbose_atleast_ref =
+  Kernel_log.kernel_verbose_atleast_ref
+[@@alert "-kernel_log"]
+
+let () = Log.cmdline_at_error_exit := at_error_exit [@@alert "-deprecated"]
+let () = Log.cmdline_error_occurred := error_occurred  [@@alert "-deprecated"]

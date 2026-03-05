@@ -29,6 +29,10 @@ let get ?(exn=Invalid_argument "option is None") = function
   | None -> raise exn
   | Some x -> x
 
+let value_or_else ~none = function
+  | None -> none ()
+  | Some v -> v
+
 let hash hash v = match v with
   | None -> 31179
   | Some v -> hash v

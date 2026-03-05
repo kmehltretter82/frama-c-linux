@@ -133,17 +133,6 @@ module Make
       ~idempotent:true
       ~decide:(fun _ () () -> Some ())
 
-  (* Test that implementation of function inter in Hptmap is correct *)
-  let _test_inter s1 s2 =
-    let i1 =
-      fold (fun x acc -> if mem x s1 then add x acc else acc) s2 empty
-    in
-    let i2 = inter s1 s2 in
-    if not (i1 == i2) then
-      Cmdline.Kernel_log.error "%a@./@.%a@.->@.%a@./@.%a"
-        pretty_debug s1 pretty_debug s2 pretty_debug i1 pretty_debug i2;
-    i1
-
   let union =
     let name = Format.sprintf "Hptset(%s).union" X.datatype_name in
     join ~cache:(Hptmap_sig.PersistentCache name) ~decide:(fun _ () () -> ())
@@ -218,3 +207,16 @@ module Make
     replace_key ~decide
 
 end
+
+(* Test that implementation of function inter in Hptmap is correct *)
+let%test _ =
+  let module IdInt = struct include Datatype.Int let id = Fun.id end in
+  let module Info = struct let initial_values = [[]] let dependencies = [] end in
+  let module HSet = Make (IdInt) (Info) in
+  let open HSet in
+  let l = List.init 10 Fun.id in
+  let s1 = List.fold_left (fun set i -> add i set) empty l in
+  let s2 = List.fold_left (fun set i -> add (i+5) set) empty l in
+  let i1 = fold (fun x acc -> if mem x s1 then add x acc else acc) s2 empty in
+  let i2 = inter s1 s2 in
+  i1 == i2

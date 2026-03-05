@@ -64,9 +64,11 @@ let canceled = ref false
 let cancel () = canceled := true
 
 let warn_error exn =
-  Cmdline.Kernel_log.failure
-    "Unexpected Async.daemon exception:@\n%s"
-    (Printexc.to_string exn)
+  let msg =
+    Format.asprintf "Unexpected Async.daemon exception:@\n%s"
+      (Printexc.to_string exn)
+  in
+  failwith msg
 
 let fire ~warn_on_delayed ~forced ~time d =
   if forced || time > d.next_at then
@@ -76,7 +78,7 @@ let fire ~warn_on_delayed ~forced ~time d =
         d.trigger () ;
       with
       | Cancel -> canceled := true
-      | exn -> warn_error exn ; raise exn
+      | exn -> warn_error exn
     end ;
   match d.on_delayed with
   | None -> ()

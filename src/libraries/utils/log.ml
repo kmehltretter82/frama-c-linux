@@ -31,9 +31,6 @@ type event = {
   evt_message : Rich_text.t ;
 }
 
-let kernel_channel_name = "kernel"
-let kernel_label_name = "kernel"
-
 (* -------------------------------------------------------------------------- *)
 (* --- Exception Management                                               --- *)
 (* -------------------------------------------------------------------------- *)
@@ -532,9 +529,6 @@ let finally_unit _ = ()
 let finally_raise e _ = raise e
 let finally_false _ = false
 
-let cmdline_error_occurred = Extlib.mk_fun "Log.cmdline_error_occurred"
-let cmdline_at_error_exit = Extlib.mk_fun "Log.at_error_exit"
-
 type deferred_exn =
   | DNo_exn
   | DWarn_as_error of event
@@ -764,6 +758,18 @@ let merge_status old_status new_status =
   | Winactive, Wonce -> Wonce
   | Winactive, _ -> Winactive
   | _ -> new_status
+
+module type Level = sig
+  val value_if_set: int option ref
+  val get: unit -> int
+  val set: int -> unit
+end
+
+module Make_level(X: sig val default: int end) = struct
+  let value_if_set = ref None
+  let get () = match !value_if_set with None -> X.default | Some x -> x
+  let set n = value_if_set := Some n
+end
 
 module type Messages =
 sig
@@ -1267,6 +1273,14 @@ struct
       label Format.(pp_print_list ~pp_sep:pp_print_cut print_one_elt) l
 
 end
+
+(* Deprecated *)
+
+let kernel_channel_name = "kernel"
+let kernel_label_name = "kernel"
+
+let cmdline_error_occurred = Extlib.mk_fun "Log.cmdline_error_occurred"
+let cmdline_at_error_exit = Extlib.mk_fun "Log.at_error_exit"
 
 (* ------------------------------------------------------------------------- *)
 (* --- Tests                                                             --- *)

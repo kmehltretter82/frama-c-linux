@@ -68,8 +68,9 @@ val is_nan : float -> bool
 (** {2 Pretty printers}
 
     The function [pretty_normal] implements a custom printer. The function
-    [pretty] relies on kernel's options to decide between using the OCaml
-    printer or the [pretty_normal] one. *)
+    [pretty] relies on internal state {!float_display} to decide between using
+    the OCaml printer or the [pretty_normal] one. This mode can be changed
+    using {!set_float_display}. *)
 
 val pretty_normal : use_hex:bool -> Format.formatter -> float -> unit
 val pretty : Format.formatter -> float -> unit
@@ -83,15 +84,15 @@ val pretty : Format.formatter -> float -> unit
 *)
 val has_suffix : Cil_types.fkind -> string -> bool
 
-(**
-   [extract_suffix s] tries to find a floating-point suffix
-   ("f", "F", "d", "l", "f32", etc) in [s] and returns
-   [(s_without_suffix, suffix, fkind)]. If [s] has no suffix,
-   returns [(s, "", Cil_types.FDouble)].
+(** [extract_suffix s] tries to find a floating-point suffix
+    ("f", "F", "d", "l", "f32", etc) in [s] and returns
+    [Some (s_without_suffix, suffix, fkind)]. If [s] has no suffix,
+    returns [Some (s, "", Cil_types.FDouble)]. If the suffix is unknown, returns
+    [None].
 
-   @since Frama-C+dev
+    @since Frama-C+dev
 *)
-val extract_suffix : string -> (string * string * Cil_types.fkind)
+val extract_suffix : string -> (string * string * Cil_types.fkind) option
 
 (** {2 Format based constants} *)
 

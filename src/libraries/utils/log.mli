@@ -399,6 +399,16 @@ val split_category : string -> string list
     @since 18.0-Argon *)
 val is_subcategory : string list -> string list -> bool
 
+(** @before Frama-C+dev Was in {!Cmdline} *)
+module type Level = sig
+  val value_if_set: int option ref
+  val get: unit -> int
+  val set: int -> unit
+end
+
+(** @since Frama-C+dev *)
+module Make_level(_ : sig val default : int end) : Level
+
 (** Each plugin has its own channel to output messages.
     This functor should not be directly applied by plug-in developer.
     They should apply {!Plugin.Register} instead.
@@ -463,10 +473,15 @@ val log_channel : channel -> ?kind:kind -> 'a pretty_printer
 val kernel_channel_name: string
 (** the reserved channel name used by the Frama-C kernel.
     @since Beryllium-20090601-beta1 *)
+[@@deprecated "Use Kernel_log.kernel_channel_name instead."]
+[@@migrate { repl = Kernel_log.kernel_channel_name } ]
+
 
 val kernel_label_name: string
 (** the reserved label name used by the Frama-C kernel.
     @since Beryllium-20090601-beta1 *)
+[@@deprecated "Use Kernel_log.kernel_label_name instead."]
+[@@migrate { repl = Kernel_log.kernel_label_name } ]
 
 val source : file:Filepath.t -> line:int -> Filepath.position
 (** @since Chlorine-20180501 *)
@@ -528,8 +543,10 @@ val check_not_yet: (event -> bool) ref
 *)
 
 val cmdline_error_occurred: (exn -> unit) ref
+[@@deprecated "Use Cmdline.error_occurred directly instead"]
 
 val cmdline_at_error_exit: ((exn -> unit) -> unit) ref
+[@@deprecated "Use Cmdline.at_error_exit directly instead"]
 
 val treat_deferred_error: unit -> unit
 (** call this function when it is a good time to raise an exception following

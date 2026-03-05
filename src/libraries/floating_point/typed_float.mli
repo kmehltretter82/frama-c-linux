@@ -98,8 +98,9 @@ val change_format : _ t -> 'f format -> 'f t
 (** {2 Pretty printers}
 
     The function [pretty_normal] implements a custom printer. The function
-    [pretty] relies on kernel's options to decide between using the OCaml
-    printer or the [pretty_normal] one. *)
+    [pretty] relies on internal state {!Floating_point.float_display} to decide
+    between using the OCaml printer or the [pretty_normal] one. This mode can be
+    changed using {!Floating_point.set_float_display}. *)
 
 val pretty_normal : use_hex:bool -> Format.formatter -> 'f t -> unit
 val pretty : Format.formatter -> 'f t -> unit
@@ -143,8 +144,11 @@ type parsed_result =
 val parse : string -> (parsed_result, string) result
 
 (** Calls {!parse} and evaluates the result type.
-    @raise Log.AbortError if the parsing fails. *)
+    @raise Failure if the parsing fails.
+    @before Frama-C+dev emitted a {!Kernel.failure} instead
+*)
 val parse_exn : string -> parsed_result
+[@@deprecated "Use parse function instead and handle the error if any."]
 
 (** Returns the floating-point kind parsed by [parse]. *)
 val parsed_fkind : ('k, 'f) parsed_format -> Cil_types.fkind

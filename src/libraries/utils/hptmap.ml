@@ -11,8 +11,13 @@
 (*                                                                         *)
 (***************************************************************************)
 
-(* Set to true to see which caches are created *)
-let debug_cache = false
+let debug = ref false
+
+let set_debug b = debug := b
+
+let debug_msg msg =
+  if !debug then Format.printf msg
+  else Pretty_utils.nullprintf msg
 
 type prefix = int * int
 
@@ -174,8 +179,7 @@ module Shape(Key: Id_Datatype) = struct
   let compare =
     if Key.compare == Datatype.undefined
     then begin
-      Cmdline.Kernel_log.debug
-        "%s shape, missing comparison function" (Type.name Key.ty);
+      debug_msg "%s shape, missing comparison function" (Type.name Key.ty);
       Datatype.undefined
     end
     else compare_v
@@ -362,8 +366,7 @@ module Shape(Key: Id_Datatype) = struct
     | Hptmap_sig.NoCache -> (fun f x -> f x)
     | Hptmap_sig.TemporaryCache cache_name
     | Hptmap_sig.PersistentCache cache_name ->
-      if debug_cache
-      then Format.eprintf "Hptmap CACHE %s : %s@." name cache_name;
+      debug_msg "Hptmap CACHE %s : %s@." name cache_name;
       let module Arg = Cacheable (struct type nonrec v = v end) in
       let module R = struct
         type t = result
@@ -385,8 +388,7 @@ module Shape(Key: Id_Datatype) = struct
     | Hptmap_sig.NoCache -> (fun f x y -> f x y)
     | Hptmap_sig.TemporaryCache cache_name
     | Hptmap_sig.PersistentCache cache_name ->
-      if debug_cache
-      then Format.eprintf "Hptmap CACHE %s: %s@." name cache_name;
+      debug_msg "Hptmap CACHE %s: %s@." name cache_name;
       let module Arg1 = Cacheable (struct type v = v1 end) in
       let module Arg2 = Cacheable (struct type v = v2 end) in
       let module R = struct
@@ -627,8 +629,7 @@ struct
   let compare =
     if V.compare == Datatype.undefined
     then begin
-      Cmdline.Kernel_log.debug
-        "(%s, %s) ptmap, missing comparison function"
+      debug_msg "(%s, %s) ptmap, missing comparison function"
         (Type.name Key.ty) (Type.name V.ty);
       Datatype.undefined
     end
@@ -996,7 +997,7 @@ struct
         wrap_Branch p m tree0' tree1'
 
   let cached_map ~cache ~temporary ~f =
-    let _name, cache = cache in
+    let name, cache = cache in
     let table = Hashtbl.create cache in
     if not temporary then
       register_clear_cache (fun () -> Hashtbl.clear table);
@@ -1010,7 +1011,7 @@ struct
         | Branch(p, m, s0, s1, _) ->
           try
             let result = Hashtbl.find table t in
-            (* Format.printf "find %s %d@." name !counter; *)
+            debug_msg "find in %s %d@." name !counter;
             result
           with Not_found ->
             let result0 = traverse s0 in
@@ -1019,11 +1020,11 @@ struct
             incr counter;
             if !counter >= cache
             then begin
-              (* Format.printf "Clearing %s fold table@." name;*)
+              debug_msg "Clearing %s fold table@." name;
               Hashtbl.clear table;
               counter := 0;
             end;
-            (* Format.printf "add  %s %d@." name !counter; *)
+            debug_msg "add  %s %d@." name !counter;
             Hashtbl.add table t result;
             result
       in
@@ -1339,18 +1340,19 @@ struct
 
 
   let pretty_prefix (p,m) fmt tree =
-    let prettykv fmt k v =
+    let prettykv fmt (k, v) =
       Format.fprintf fmt "[@[%a@] -> @[%a@]@]@ " Key.pretty k V.pretty v
     in
     let rec pretty_prefix_aux tree =
       match tree with
         Empty -> ()
       | Leaf (k,v,_) ->
-        if match_prefix (Key.id k) p m then prettykv fmt k v
+        if match_prefix (Key.id k) p m then prettykv fmt (k, v)
       | Branch(p1,m1,l,r,_) ->
         if m1 <= m
         then begin
-          if match_prefix p1 p m then iter (prettykv fmt) tree;
+          if match_prefix p1 p m then
+            iter (fun k v -> prettykv fmt (k, v)) tree;
         end
         else if p land m1 = 0
         then pretty_prefix_aux l
@@ -1367,22 +1369,22 @@ struct
     assert (t1 != t2);
     let all_comp = compositional_bool t1 && compositional_bool t2 in
     match t1, t2 with
-      Leaf (k1, _v1, _), Leaf (k2, _v2, _) ->
+    | Leaf (k1, _v1, _), Leaf (k2, _v2, _) ->
       if Key.equal k1 k2 && all_comp
       then begin
-        (* Format.printf "PREF leaves:@.";
-           prettykv Format.std_formatter k1 _v1;
-           prettykv Format.std_formatter k1 _v2;  *)
+        let prefix = Key.id k1, -1 in
+        debug_msg "PREF leaves:@\n%a@\n%a@."
+          (pretty_prefix prefix) t1 (pretty_prefix prefix) t2;
         raise (Found_prefix((Key.id k1, -1), t1, t2))
       end
     | Branch (p1, m1, l1, r1, _), Branch (p2, m2, l2, r2, _) ->
       if (p1 = p2) && (m1 = m2)
       then begin
         if all_comp then begin
-          (* Format.printf "PREF subtree:@.";
-             pretty Format.std_formatter t1;
-             pretty Format.std_formatter t2;  *)
-          raise (Found_prefix((p1 ,m1), t1, t2));
+          let prefix = p1 ,m1 in
+          debug_msg "PREF subtree:@\n%a@\n%a@."
+            (pretty_prefix prefix) t1 (pretty_prefix prefix) t2;
+          raise (Found_prefix(prefix, t1, t2));
         end;
         let go_left = l1 != l2 in
         if go_left

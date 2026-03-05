@@ -199,7 +199,7 @@ struct
   let verbose_level = Extlib.mk_fun "verbose_level"
   let debug_level = Extlib.mk_fun "debug_level"
 
-  (* unused by the kernel: it uses Cmdline.Kernel_log instead;
+  (* unused by the kernel: it uses Kernel_log instead;
      see module [L] below *)
   module Plugin_log = Log.Register
       (struct
@@ -249,7 +249,7 @@ struct
 
   module L =
     (val if is_kernel ()
-      then (module Auto_log(Cmdline.Kernel_log))
+      then (module Auto_log(Kernel_log))
       else (module Auto_log(Plugin_log))
       : Log_skeleton)
 
@@ -634,12 +634,14 @@ struct
       (* line order below matters *)
       set_range ~min:0 ~max:max_int;
       if is_kernel () then begin
-        Cmdline.kernel_verbose_atleast_ref := (fun n -> get () >= n);
-        match !Cmdline.Kernel_verbose_level.value_if_set with
+        Kernel_log.kernel_verbose_atleast_ref := (fun n -> get () >= n);
+        match !Kernel_log.Verbose_level.value_if_set with
         | None -> ()
         | Some n -> set n
       end
+    [@@alert "-kernel_log"]
   end
+
 
   let debug_optname = output_mode ~group:grp_debug "Debug" "debug"
   module Debug = struct
@@ -665,11 +667,12 @@ struct
            if n = 0 then decr positive_debug_ref
            else if old = 0 then Stdlib.incr positive_debug_ref);
       if is_kernel () then begin
-        Cmdline.kernel_debug_atleast_ref := (fun n -> get () >= n);
-        match !Cmdline.Kernel_debug_level.value_if_set with
+        Kernel_log.kernel_debug_atleast_ref := (fun n -> get () >= n);
+        match !Kernel_log.Debug_level.value_if_set with
         | None -> ()
         | Some n -> set n
       end
+    [@@alert "-kernel_log"]
   end
 
   type action = Print_help | Change_category of (bool * string) list

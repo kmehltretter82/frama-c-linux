@@ -316,33 +316,42 @@ val replace_option_help:
 
     They should not be used directly by a standard plug-in developer. *)
 
-module Kernel_log: Log.Messages
-(** @since Neon-20140301 *)
-
 (** @since Fluorine-20130401 *)
 module type Level = sig
   val value_if_set: int option ref
   val get: unit -> int
   val set: int -> unit
 end
+[@@deprecated "use Log.Level instead."]
 
-module Debug_level: Level
+module Debug_level: Log.Level
 (** @since Fluorine-20130401 *)
 
-module Verbose_level: Level
+module Verbose_level: Log.Level
 (** @since Fluorine-20130401 *)
 
-module Kernel_debug_level: Level
+module Kernel_debug_level: Log.Level
 (** @since Fluorine-20130401 *)
+[@@deprecated "Use Kernel_log.Debug_level instead."]
 
-module Kernel_verbose_level: Level
+module Kernel_verbose_level: Log.Level
 (** @since Fluorine-20130401 *)
+[@@deprecated "Use Kernel_log.Verbose_level instead."]
 
 val kernel_debug_atleast_ref: (int -> bool) ref
 (** @since Boron-20100401 *)
+[@@deprecated "Use Kernel_log.kernel_debug_atleast_ref instead." ]
+[@@migrate { repl = Kernel_log.kernel_debug_atleast_ref }]
 
 val kernel_verbose_atleast_ref: (int -> bool) ref
 (** @since Boron-20100401 *)
+[@@deprecated "Use Kernel_log.kernel_verbose_atleast_ref instead." ]
+[@@migrate { repl = Kernel_log.kernel_verbose_atleast_ref }]
+
+module Kernel_log: Log.Messages
+[@@deprecated "Use Kernel_log module instead." ]
+[@@migrate { repl = Kernel_log }]
+(** @since Neon-20140301 *)
 
 val quiet: bool
 (** Must not be used for something else that initializing values

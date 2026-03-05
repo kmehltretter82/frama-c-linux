@@ -22,3 +22,6 @@ module Operators = struct
   let ( and* ) l r = zip l r
   let ( and+ ) l r = zip l r
 end
+
+let value_or_else ~error res =
+  fold ~ok:Fun.id ~error res

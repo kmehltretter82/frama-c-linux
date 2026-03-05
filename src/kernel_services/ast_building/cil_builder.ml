@@ -1037,8 +1037,6 @@ end
 
 (* --- Stateful builder --- *)
 
-let dkey = Kernel.register_category "cil-builder"
-
 module Stateful () =
 struct
   include Exp
@@ -1179,10 +1177,10 @@ struct
       | s :: _ -> s.ghost
     in
     stack := { state  with ghost = parent_ghost || state.ghost } :: !stack;
-    Kernel.debug ~dkey "push onto %t" pretty_stack
+    Kernel.debug ~dkey:Kernel.dkey_cil_builder "push onto %t" pretty_stack
 
   let pop () =
-    Kernel.debug ~dkey "pop from %t" pretty_stack;
+    Kernel.debug ~dkey:Kernel.dkey_cil_builder "pop from %t" pretty_stack;
     match !stack with
     | [] -> error "not in an opened context"
     | hd :: tail ->

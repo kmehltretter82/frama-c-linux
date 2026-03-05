@@ -243,11 +243,11 @@ let compute_events () =
     match event.evt_kind, event.evt_plugin with
     | Warning, "eva" when event.evt_category <> Some "alarm" ->
       incr_warn eva
-    | Warning, name when name = Log.kernel_label_name ->
+    | Warning, name when name = Kernel_log.kernel_label_name ->
       incr_warn kernel
     | Error, "eva" when event.evt_category <> Some "alarm" ->
       incr_err eva
-    | Error, name when name = Log.kernel_label_name ->
+    | Error, name when name = Kernel_log.kernel_label_name ->
       incr_warn kernel
     | _ -> ()
   in
