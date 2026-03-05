@@ -195,7 +195,7 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
       false (* is a formal? *)
       ~referenced:true
       (Varname.get ~scope (Functions.RTL.mk_gen_name name))
-      ty
+      (Misc.unghost_type ty)
   in
   v.vreferenced <- true;
   let lscope = match scope with

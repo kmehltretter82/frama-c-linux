@@ -145,7 +145,7 @@ int main(void)
     G ++;
   }
   {
-    int \ghost *__gen_e_acsl_x;
+    int *__gen_e_acsl_x;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
     /*@ assert Eva: mem_access: \valid_read((int **)ghost_int_arr); */
