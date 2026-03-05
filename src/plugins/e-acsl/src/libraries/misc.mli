@@ -86,3 +86,6 @@ val extract_uncoerced_lval: exp -> exp option
 
 val labels_are_all_here : logic_label list -> bool
 (** @return [true] if all labels are the builtin label Here (or list is empty). *)
+
+val unghost_type : typ -> typ
+(** remove all occurrences (also deep onces) of the "ghost" attribute. *)

@@ -222,3 +222,5 @@ let extract_uncoerced_lval e =
 let labels_are_all_here =
   let is_here l = l = BuiltinLabel Here in
   fun labels -> List.for_all is_here labels
+
+let unghost_type = Ast_types.remove_attributes_deep ["ghost"]

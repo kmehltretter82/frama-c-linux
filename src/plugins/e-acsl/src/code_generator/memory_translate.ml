@@ -276,7 +276,7 @@ let term_to_ptr_and_size ~adata ~loc kf env t =
         let e, adata, env = Translate_terms.to_exp ~adata kf env t in
         (e, adata), env)
   in
-  let ty = Ast_types.remove_attributes_deep ["ghost"] @@ Misc.cty t.term_type in
+  let ty = Misc.unghost_type @@ Misc.cty t.term_type in
   let sizeof = Smart_exp.ptr_sizeof ~loc ty in
   let adata =
     Assert.register
