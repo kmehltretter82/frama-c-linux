@@ -45,11 +45,11 @@ include struct (* auxiliary functions *)
       | Some _ | None -> Cil.DoChildren
 
     method !vterm = function
-      | {term_node = TLval (TVar v, TNoOffset); term_loc} ->
+      | {term_node = TLval (TVar v, TNoOffset)} ->
         (try
            let t = Misc.Id_term.deep_copy @@ Logic_var.Map.find v substs in
-           Cil.ChangeTo {t with term_loc}
-         with Not_found -> Cil.DoChildren)
+           Cil.ChangeTo t
+         with Not_found -> DoChildren)
       | _ -> Cil.DoChildren
   end
 
@@ -442,6 +442,7 @@ end
 module type Out_language = sig
   include Build_pred_or_term.S
   val mk_concl : mode:mode -> term list -> t
+  val deep_copy : t -> t (* in order to not introduce sharing *)
 end
 
 let is_fallthrough_term t = List.mem "fallthrough" t.term_name
@@ -622,7 +623,7 @@ end = functor (Out : Out_language) -> struct
       let fallthrough = Out.mk_false ?loc l_type in
       List.fold_right extract_ctor (InductiveDef.ctors li) fallthrough
     in
-    li.l_body <- Out.mk_logic_body body;
+    li.l_body <- Out.mk_logic_body (Out.deep_copy body);
     li.l_var_info <- freshen_up_logic_var li.l_var_info;
     let () = match res with
       | Some res -> (* incomplete mode: change lv_type into function type *)
@@ -654,6 +655,12 @@ end = struct
         match Mode.out_arg ~mode args with
         | Some t -> t
         | None -> assert false (* necessarily in incomplete mode *)
+
+      (* since incomplete extraction involves potentially term duplication (the
+         phenomenon that leads to term-size explosion) we need to unshare. We
+         deep-copy the entire extracted logic function body, since sharing may
+         also occur between two extractions in two different modes. *)
+      let deep_copy = Misc.Id_term.deep_copy
     end)
 
   let extract_with_mode ~mode:m li =
@@ -678,6 +685,7 @@ end
   module Extractor = Make_extractor (struct
       include Build_pred_or_term.Predicate
       let mk_concl ~mode:_ _ = mk_true None
+      let deep_copy p = p (* no term duplication occurs in complete extraction *)
     end)
 
   let extract_with_mode ~mode:{Modus.mode} li =
