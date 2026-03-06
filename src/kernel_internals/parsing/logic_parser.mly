@@ -744,7 +744,8 @@ abs_param_list:
 since its name can be omitted
 */
 abs_param:
-| logic_type { $1 }
+| type_spec(identifier_or_typename) abs_spec_option { $2 $1 }
+| parameter { fst $1 }
 ;
 
 ne_parameters:
