@@ -140,7 +140,15 @@ int f1(int a)
           {
              /* __blockattribute__(__fc_inlined__("g1")) */
             int a_5_11 = 1;
-            if (nondet) g1(4);
+            if (nondet) {
+              int __inline_tmp_13;
+              {
+                 /* __blockattribute__(__fc_inlined__("g1")) */
+                int a_15 = 4;
+                if (nondet) g1(4);
+                __inline_tmp_13 = a_15;
+              }
+            }
             __inline_tmp_10 = a_5_11;
           }
         }
@@ -241,7 +249,15 @@ int main(void)
             {
                /* __blockattribute__(__fc_inlined__("g1")) */
               int a_5_11 = 1;
-              if (nondet) g1(4);
+              if (nondet) {
+                int __inline_tmp_13;
+                {
+                   /* __blockattribute__(__fc_inlined__("g1")) */
+                  int a_15 = 4;
+                  if (nondet) g1(4);
+                  __inline_tmp_13 = a_15;
+                }
+              }
               __inline_tmp_10 = a_5_11;
             }
           }
