@@ -146,7 +146,7 @@ end = struct
 
       method! vlogic_var_use lv =
         match Logic_var.Map.find_opt lv formal_substitutions with
-        | None -> DoChildren
+        | None -> Cil.DoChildren
         | Some lv' -> ChangeTo lv'
 
       method !vpredicate p =
@@ -154,26 +154,26 @@ end = struct
         | Papp (li, labels, args) when
             Logic_info.equal li li_old && List.for_all is_obsolete_label labels ->
           let p = {p with pred_content = Papp (li_new, [], args)} in
-          ChangeDoChildrenPost (p, fun x -> x)
-        | _ -> DoChildren
+          Cil.ChangeDoChildrenPost (p, fun x -> x)
+        | _ -> Cil.DoChildren
 
       method !vterm t =
         match t.term_node with
         | Tat (body, label) when is_obsolete_label label ->
-          ChangeDoChildrenPost (body, fun x -> x)
+          Cil.ChangeDoChildrenPost (body, fun x -> x)
         | Tapp (li, labels, args) when
             Logic_info.equal li li_old && List.for_all is_obsolete_label labels ->
           let t = {t with term_node = Tapp (li_new, [], args)} in
-          ChangeDoChildrenPost (t, fun x -> x)
-        | _ -> DoChildren
+          Cil.ChangeDoChildrenPost (t, fun x -> x)
+        | _ -> Cil.DoChildren
 
       method !vlogic_info_use l =
         if Logic_info.equal l li_old
-        then ChangeTo li_new
-        else DoChildren
+        then Cil.ChangeTo li_new
+        else Cil.DoChildren
 
       method !vlogic_label l =
-        if is_obsolete_label l then ChangeTo here else DoChildren
+        if is_obsolete_label l then Cil.ChangeTo here else Cil.DoChildren
     end
 
   let specialize li =
@@ -217,8 +217,8 @@ end = struct
         (* The Cil visitor does not descend into [logic_info] definitions. *)
         let li = Visitor.visitFramacLogicInfo self li in
         let p = {p with pred_content = Papp(li, [], args)} in
-        ChangeDoChildrenPost (p, fun x -> x)
-      | _ -> DoChildren
+        Cil.ChangeDoChildrenPost (p, fun x -> x)
+      | _ -> Cil.DoChildren
 
     method !vterm t =
       match t.term_node with
@@ -230,8 +230,8 @@ end = struct
         (* The Cil visitor does not descend into [logic_info] definitions. *)
         let li = Visitor.visitFramacLogicInfo self li in
         let t = Logic_const.term ~loc:t.term_loc (Tapp (li, [], args)) t.term_type in
-        ChangeDoChildrenPost (t, fun x -> x)
-      | _ -> DoChildren
+        Cil.ChangeDoChildrenPost (t, fun x -> x)
+      | _ -> Cil.DoChildren
   end
 
   let preprocess_pred p =

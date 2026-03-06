@@ -41,8 +41,8 @@ DISABLED_PLUGINS?=
 
 all::
 ifeq (${FRAMAC_DEVELOPER},yes)
-	dune build --no-print-directory --root ${FRAMAC_LINTCK_SRC}
-	dune build --no-print-directory --root ${FRAMAC_HDRCK_SRC}
+	dune build ${WORKSPACE_OPT} --no-print-directory --root ${FRAMAC_LINTCK_SRC}
+	dune build ${WORKSPACE_OPT} --no-print-directory --root ${FRAMAC_HDRCK_SRC}
 endif
 ifneq ($(DISABLED_PLUGINS),)
 	dune clean
@@ -99,13 +99,13 @@ ifeq (${FRAMAC_DEVELOPER},yes)
 
 install::
 	@echo "Installing frama-c-hdrck and frama-c-lint"
-	dune install --root ${FRAMAC_HDRCK_SRC} --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
-	dune install --root ${FRAMAC_LINTCK_SRC} --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
+	dune install ${WORKSPACE_OPT} --root ${FRAMAC_HDRCK_SRC} --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
+	dune install ${WORKSPACE_OPT} --root ${FRAMAC_LINTCK_SRC} --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
 
 uninstall::
 	@echo "Uninstalling frama-c-hdrck and frama-c-lint"
-	dune uninstall --root ${FRAMAC_HDRCK_SRC} --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
-	dune uninstall --root ${FRAMAC_LINTCK_SRC} --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
+	dune uninstall ${WORKSPACE_OPT} --root ${FRAMAC_HDRCK_SRC} --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
+	dune uninstall ${WORKSPACE_OPT} --root ${FRAMAC_LINTCK_SRC} --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
 
 endif
 
