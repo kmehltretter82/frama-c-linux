@@ -8,12 +8,15 @@
 
 open Cil_types
 
-module InlineCalls: Parameter_sig.Kernel_function_set
 (** Behavior of option "-inline-calls" *)
+module InlineCalls: Parameter_sig.Kernel_function_set
 
-module RemoveInlined: Parameter_sig.Kernel_function_set
 (** Behavior of option "-remove-inlined" *)
+module RemoveInlined: Parameter_sig.Kernel_function_set
 
+(** Inline function calls and potentially remove inlined functions
+    according to the values of options {!InlineCalls} and {!RemoveInlined}.
+*)
 val inline_calls : file -> unit
 
 (** [inline_term ~inline term] inlines in [term] the application of predicates
