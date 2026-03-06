@@ -214,15 +214,17 @@ module Fc_version = struct
   let get () =
     let out_VERSION = head1 "VERSION" in
     let re_version =
-      Str.regexp {|\([1-9][0-9]\)\.\([0-9]\)\(.*\)|}
+      Str.regexp {|\([1-9][0-9]\)\(\.\([0-9]\)\|~dev\)\(.*\)|}
     in
-    let major, minor, ext =
-      if Str.string_match re_version out_VERSION 0 then
-        Str.matched_group 1 out_VERSION,
-        Str.matched_group 2 out_VERSION,
-        try Str.matched_group 3 out_VERSION with Not_found -> ""
+    if not (Str.string_match re_version out_VERSION 0) then
+      C.die "Invalid VERSION contents.";
+    let major = Str.matched_group 1 out_VERSION in
+    let rest = Str.matched_group 2 out_VERSION in
+    let minor, ext =
+      if rest.[0] = '~' then "0", "~~dev"
       else
-        C.die "Invalid VERSION contents."
+        Str.matched_group 3 out_VERSION,
+        try Str.matched_group 4 out_VERSION with Not_found -> ""
     in
     let name = head1 "VERSION_CODENAME" in
     { major; minor; ext; name }

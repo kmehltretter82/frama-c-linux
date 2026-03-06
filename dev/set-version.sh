@@ -39,7 +39,10 @@ CURRENT_SUFFIX=$(echo "$CURRENT"| $SED -e s/[0-9]*.[0-9]*\\\(.*\\\)/\\1/)
 CURRENT_CODENAME=$(grep "$CURRENT_MAJOR " ./doc/periodic-elements.txt | cut -d " " -f2)
 
 if [[ $NEXT == "dev" ]]; then
-  echo "Set VERSION to $CURRENT_MAJOR.$CURRENT_MINOR+dev"
+  DEV_VERSION=$(($CURRENT_MAJOR+1))
+  DEV_CODENAME=$(grep "$DEV_VERSION " ./doc/periodic-elements.txt | cut -d " " -f2)
+  echo "Set VERSION to $DEV_VERSION~dev"
+  echo "Set CODENAME to $DEV_CODENAME"
   echo "Continue? [y/N] "
   read CHOICE
   case "${CHOICE}" in
@@ -47,11 +50,13 @@ if [[ $NEXT == "dev" ]]; then
   *) exit 1 ;;
   esac
 
-  echo "$CURRENT_MAJOR.$CURRENT_MINOR+dev" >VERSION
-  $SED -i "s/^version: .*/version: \"$CURRENT_MAJOR.$CURRENT_MINOR+dev\"/g" opam
+  echo "$DEV_VERSION~dev" > VERSION
+  echo "$DEV_CODENAME" > VERSION_CODENAME
+  $SED -i "s/^version: .*/version: \"$DEV_VERSION~dev\"/g" opam
+  # NB: we don't generate manuals for dev branch, so documentation will refer to the last stable
   $SED -i "s/^\(doc:.*$CURRENT_MAJOR.$CURRENT_MINOR\)$(tr '~' '-' <<< $CURRENT_SUFFIX)\(-$CURRENT_CODENAME.*\)\(.*\)/\1\2/" opam
-  $SED -i "s/^version: .*/version: \"$CURRENT_MAJOR.$CURRENT_MINOR+dev\"/g" tools/lint/frama-c-lint.opam
-  $SED -i "s/^version: .*/version: \"$CURRENT_MAJOR.$CURRENT_MINOR+dev\"/g" tools/hdrck/frama-c-hdrck.opam
+  $SED -i "s/^version: .*/version: \"$DEV_VERSION~dev\"/g" tools/lint/frama-c-lint.opam
+  $SED -i "s/^version: .*/version: \"$DEV_VERSION~dev\"/g" tools/hdrck/frama-c-hdrck.opam
 else
   NEXT_MAJOR=$(echo "$NEXT" | $SED -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
   NEXT_MINOR=$(echo "$NEXT" | $SED -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)

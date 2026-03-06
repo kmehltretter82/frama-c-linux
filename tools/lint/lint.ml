@@ -435,10 +435,6 @@ let check ~count ~verbose ~update file params =
 
 let exec_name = Sys.argv.(0)
 
-let version () =
-  Format.printf "%s version %s@." (Filename.basename exec_name) Version.version;
-  exit 0
-
 let update = ref false
 let verbose = ref false
 let config_file = ref ""
@@ -450,7 +446,6 @@ let argspec = [
   "-s", Arg.Set strict, " Considers warnings as errors for the exit value" ;
   "-c", Arg.String (fun s -> config_file := s), "<json-config-file> Reads the JSON configuration file (allows to overload the default configuration)" ;
   "-e", Arg.Set extract_config, " Prints default JSON configuration" ;
-  "--version", Arg.Unit version, " Prints tool version" ;
 ]
 let sort argspec =
   List.sort (fun (name1, _, _) (name2, _, _) -> String.compare name1 name2)
