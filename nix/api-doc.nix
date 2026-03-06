@@ -19,10 +19,15 @@ stdenv.mkDerivation rec {
   ];
 
   buildPhase = ''
+    dune build -j1 --error-reporting=twice @doc-json
+    cp -r _build/default/_doc/_html frama-c-api-json
+    rm -rf _build/default/_doc/_html
     dune build -j1 --error-reporting=twice @doc
     cp -r _build/default/_doc/_html frama-c-api
+
     echo ".dummy" > excluded
     tar czf frama-c-api.tar.gz -X excluded --owner=0 --group=0 --numeric-owner --sort=name --mtime="$(date --iso-8601 --date "today 00:00:00") 00:00Z" frama-c-api
+    tar czf frama-c-api-json.tar.gz -X excluded --owner=0 --group=0 --numeric-owner --sort=name --mtime="$(date --iso-8601 --date "today 00:00:00") 00:00Z" frama-c-api-json
 
     make server-doc NO_BUILD_FRAMAC=yes
     cp -r doc/server frama-c-server-api
@@ -32,6 +37,7 @@ stdenv.mkDerivation rec {
   installPhase = ''
     mkdir -p $out
     cp frama-c-api.tar.gz $out
+    cp frama-c-api-json.tar.gz $out
     cp frama-c-server-api.tar.gz $out
   '';
 }

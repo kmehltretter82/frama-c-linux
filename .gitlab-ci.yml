@@ -359,28 +359,38 @@ ivette-plugins:
 
 # API documentation
 
-api-doc:
+.build_template: &api_build_template
   stage: distrib
   variables:
     OUT: "api"
   script:
     - ./nix/build-proxy.sh api-doc
+
+.build_template: &api_artifacts_template
   artifacts:
     paths:
       - api/frama-c-api.tar.gz
-      - api/frama-c-server-api.tar.gz
-    expire_in: 7 days
-
-api-json-doc:
-  stage: distrib
-  variables:
-    OUT: "api"
-  script:
-    - ./nix/build-proxy.sh api-json-doc
-  artifacts:
-    paths:
       - api/frama-c-api-json.tar.gz
-    expire_in: 7 days
+      - api/frama-c-server-api.tar.gz
+    expire_in: 7 days # Note: the LAST artifact of the ref is always kept
+
+api:
+  <<: *api_build_template
+
+api-artifacts:
+  <<: *api_build_template
+  <<: *api_artifacts_template
+  <<: *manual_when_not_special_pipeline
+
+api-nightly:
+  <<: *api_build_template
+  <<: *api_artifacts_template
+  <<: *when_publish
+
+api-for-release:
+  <<: *api_build_template
+  <<: *api_artifacts_template
+  <<: *when_release
 
 # Build distribution tarball
 
@@ -528,7 +538,7 @@ release-content:
   script:
     - ./nix/shell-checkers.sh "./dev/build-release.sh"
   needs:
-    - api-doc
+    - api-for-release
     - build-distrib-tarball
     - build-ivette-linux-packages-release
     - build-ivette-macos-packages-release
