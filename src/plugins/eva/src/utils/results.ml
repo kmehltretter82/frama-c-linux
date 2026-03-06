@@ -16,14 +16,8 @@ let are_available kf =
 
 type 'a by_callstack = (Callstack.t * 'a) list
 
-type control_point =
-  | Initial
-  | Start of Cil_types.kernel_function
-  | Before of Cil_types.stmt
-  | After of Cil_types.stmt
-
 type context = {
-  control_point : control_point;
+  control_point : Domain_store.control_point;
   selector : Callstack.t list option;
   filter: (Callstack.t -> bool) list;
 }
@@ -109,26 +103,18 @@ struct
     | `Top -> Consolidated top
     | `Value state -> Consolidated state
 
-  let singleton cs =
-    function
-    | `Bottom -> Bottom
-    | `Top -> Top
-    | `Value state -> ByCallstack [cs,state]
-
   let by_callstack : context ->
-    [< `Bottom | `Top | `Value of 'a Callstack.Hashtbl.t ] ->
+    [< `Bottom | `Top | `Value of (Callstack.t * 'a) list ] ->
     ('a, restricted_to_callstack) t =
     fun req -> function
       | `Top -> Top
       | `Bottom -> Bottom
       | `Value table ->
-        let add cs state acc =
-          if List.for_all (fun filter -> filter cs) req.filter
-          then (cs, state) :: acc
-          else acc
+        let keep (cs, _state) =
+          List.for_all (fun filter -> filter cs) req.filter
+          && Option.fold ~none:true ~some:(List.mem cs) req.selector
         in
-        let list = Callstack.Hashtbl.fold add table [] in
-        ByCallstack list
+        ByCallstack (List.filter keep table)
 
   (* Accessors *)
 
@@ -218,22 +204,17 @@ struct
 
   let get_by_callstack (ctx : context) :
     (_, restricted_to_callstack) Response.t =
-    let open Response in
-    let selection = ctx.selector in
-    match ctx.control_point with
-    | Before stmt ->
-      Engine.get_stmt_state_by_callstack ?selection ~after:false stmt
-      |> by_callstack ctx
-    | After stmt ->
-      Engine.get_stmt_state_by_callstack ?selection ~after:true stmt
-      |> by_callstack ctx
-    | Initial ->
-      let thread = Thread.(id main)
-      and entry_point = fst (Globals.entry_point ()) in
-      let cs = Callstack.init ~thread ~entry_point in
-      Engine.get_global_state () |> singleton cs
-    | Start kf ->
-      Engine.get_initial_state_by_callstack ?selection kf |> by_callstack ctx
+    let list =
+      match ctx.selector with
+      | Some [ callstack ] ->
+        (* Optimization if only one callstack. *)
+        let open Lattice_bounds.TopBottom.Operators in
+        let+ state = Engine.get_state ~callstack ctx.control_point in
+        [ callstack, state ]
+      | _ ->
+        Engine.get_state_by_callstack ctx.control_point
+    in
+    Response.by_callstack ctx list
 
   let get (req : request) : (_, unrestricted_response) Response.t =
     let open Response in
@@ -243,13 +224,7 @@ struct
       if req.filter <> [] || Option.is_some req.selector then
         Response.coercion @@ get_by_callstack req
       else
-        let state =
-          match req.control_point with
-          | Before stmt -> Engine.get_stmt_state ~after:false stmt
-          | After stmt -> Engine.get_stmt_state ~after:true stmt
-          | Start kf -> Engine.get_initial_state kf
-          | Initial -> Engine.get_global_state ()
-        in
+        let state = Engine.get_state req.control_point in
         consolidated ~top:Engine.Dom.top state
 
   let convert : 'a or_top_bottom -> 'a result = function

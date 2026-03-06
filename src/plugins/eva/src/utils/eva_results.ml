@@ -63,12 +63,11 @@ type stmt_by_callstack = Cvalue.Model.t Callstack.Hashtbl.t
 module AlarmsStmt =
   Datatype.Pair_with_collections (Alarms) (Stmt)
 
+module ControlPoint = Domain_store.ControlPoint
+
 type results = {
-  before_states: stmt_by_callstack Stmt.Hashtbl.t;
-  after_states: stmt_by_callstack Stmt.Hashtbl.t;
-  kf_initial_states: stmt_by_callstack Kernel_function.Hashtbl.t;
+  states: stmt_by_callstack ControlPoint.Hashtbl.t;
   kf_callers: Function_calls.t;
-  initial_state: Cvalue.Model.t Lattice_bounds.or_bottom;
   initial_args: Cvalue.V.t list option;
   alarms: Property_status.emitted_status AlarmsStmt.Hashtbl.t;
   statuses: Property_status.emitted_status Property.Hashtbl.t
@@ -79,31 +78,36 @@ type results = {
 let get_results () =
   let vue = Emitter.get Eva_utils.emitter in
   let module CS = Callstack in
-  let before_states = Stmt.Hashtbl.create 128 in
-  let after_states = Stmt.Hashtbl.create 128 in
-  let kf_initial_states = Kernel_function.Hashtbl.create 128 in
-  let copy_states stmt =
-    let copy h ~after stmt =
-      match Cvalue_results.get_stmt_state_by_callstack ~after stmt with
-      | `Top | `Bottom -> ()
-      | `Value states -> Stmt.Hashtbl.add h stmt (CS.Hashtbl.copy states)
-    in
-    copy before_states ~after:false stmt;
-    copy after_states ~after:true stmt;
+  let states = ControlPoint.Hashtbl.create 128 in
+  let copy_states control_point =
+    match Cvalue_results.callstacks control_point with
+    | `Top -> ()
+    | `Value callstacks ->
+      let copy_callstack by_cs control_point callstack =
+        match Cvalue_results.get_state ~callstack control_point with
+        | `Bottom | `Top -> ()
+        | `Value state -> CS.Hashtbl.replace by_cs callstack state
+      in
+      let copy h control_point =
+        let by_cs = CS.Hashtbl.create (List.length callstacks) in
+        List.iter (copy_callstack by_cs control_point) callstacks;
+        ControlPoint.Hashtbl.replace h control_point by_cs
+      in
+      copy states control_point;
+  in
+  let copy_stmt stmt =
+    copy_states (Before stmt); copy_states (After stmt)
   in
   let copy_kf kf =
-    match Cvalue_results.get_initial_state_by_callstack kf with
-    | `Top | `Bottom -> ()
-    | `Value hstack ->
-      Kernel_function.Hashtbl.add kf_initial_states kf (CS.Hashtbl.copy hstack);
-      try
-        let fundec = Kernel_function.get_definition kf in
-        List.iter copy_states fundec.sallstmts
-      with Kernel_function.No_Definition -> ()
+    copy_states (Start kf);
+    try
+      let fundec = Kernel_function.get_definition kf in
+      List.iter copy_stmt fundec.sallstmts
+    with Kernel_function.No_Definition -> ()
   in
   Globals.Functions.iter copy_kf;
+  copy_states Initial;
   let kf_callers = Function_calls.get_results () in
-  let initial_state = Cvalue_results.get_global_state () in
   let initial_args = get_main_args () in
   let aux_statuses f_status ip =
     let aux_any_status e status =
@@ -135,41 +139,29 @@ let get_results () =
     | _ -> add ()
   in
   Property_status.iter aux_ip;
-  { before_states; after_states; kf_initial_states; kf_callers;
-    initial_state; initial_args; alarms; statuses; }
+  { states; kf_callers; initial_args; alarms; statuses; }
 
 let set_results results =
   let selection = State_selection.with_dependencies Self.state in
   Project.clear ~selection ();
   Parameters.change_correctness ();
   (* Those two functions may clear Self.state. Start by them *)
-  (* Initial state *)
-  Cvalue_results.register_global_state true results.initial_state;
   (* Initial args *)
   begin match results.initial_args with
     | None -> use_default_main_args ()
     | Some l -> set_main_args l
   end;
-  (* Pre- and post-states *)
-  let register_states register (tbl: stmt_by_callstack Stmt.Hashtbl.t) =
-    let copy stmt (h:stmt_by_callstack) =
+  (* States at each control point. *)
+  let register_states (tbl: stmt_by_callstack ControlPoint.Hashtbl.t) =
+    let copy control_point (h:stmt_by_callstack) =
       let aux_callstack callstack state =
-        register callstack stmt state;
+        Cvalue_results.set_state ~callstack control_point state;
       in
       Callstack.Hashtbl.iter aux_callstack h
     in
-    Stmt.Hashtbl.iter copy tbl
+    ControlPoint.Hashtbl.iter copy tbl
   in
-  register_states Cvalue_results.register_state_before_stmt results.before_states;
-  register_states Cvalue_results.register_state_after_stmt results.after_states;
-  (* Kf initial state *)
-  let aux_initial_state kf h =
-    let aux_callstack callstack state =
-      Cvalue_results.register_initial_state callstack kf state
-    in
-    Callstack.Hashtbl.iter aux_callstack h
-  in
-  Kernel_function.Hashtbl.iter aux_initial_state results.kf_initial_states;
+  register_states results.states;
   Function_calls.set_results results.kf_callers;
   (* Alarms *)
   let aux_alarms (alarm, stmt) st =
@@ -188,8 +180,4 @@ let set_results results =
     Property_status.emit Eva_utils.emitter ~hyps:[] ip st
   in
   Property.Hashtbl.iter aux_statuses results.statuses;
-  let b = Parameters.ResultsAll.get () in
-  Cvalue_domain.State.Store.register_global_state b
-    (`Value Cvalue_domain.State.top);
-  Self.ComputationState.set Computed;
-  Cvalue_results.mark_as_computed ()
+  Self.ComputationState.set Computed

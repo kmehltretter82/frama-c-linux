@@ -6,47 +6,46 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Eval
+
+type control_point =
+  | Initial
+  | Start of Cil_types.kernel_function
+  | Before of Cil_types.stmt
+  | After of Cil_types.stmt
+
+module ControlPoint : Datatype.S_with_collections with type t = control_point
 
 module type InputDomain = sig
   include Datatype.S
 
-  (* The domain name, shown in some logs and in the GUI. *)
+  (** The domain name, used to enable it via -eva-domains. *)
   val name: string
 
+  (** The state representing all possible concrete states. *)
   val top: t
-  val join: t -> t -> t
 end
 
 (** Automatic storage of the states computed during the analysis. *)
 module type S = sig
   type t
 
-  (** Called once at the analysis beginning for the entry state of the main
-      function. The boolean indicates whether the states of this domain must be
-      saved during the analysis, according to options -eva-no-results. If it is
-      false, register functions do nothing, and get functions return Top. *)
-  val register_global_state: bool -> t or_bottom -> unit
+  (** Registers the state computed at a control point:
+      - for the given [callstack] if provided;
+      - for any callstack otherwise. *)
+  val set_state: ?callstack:Callstack.t -> control_point -> t -> unit
 
-  val register_initial_state: Callstack.t -> kernel_function -> t -> unit
-  val register_state_before_stmt: Callstack.t -> stmt -> t -> unit
-  val register_state_after_stmt: Callstack.t -> stmt -> t -> unit
+  (** Returns:
+      - [`Top] if no analysis has started or if states are not stored.
+      - or the state set by the last call to [set_state] with the same arguments.
+      - or [`Bottom] if no such call has been made. *)
+  val get_state: ?callstack:Callstack.t -> control_point -> t or_top_bottom
 
-  (** Allows accessing the states inferred by an Eva analysis after it has
-      been computed with the domain enabled. *)
-  val get_global_state: unit -> t or_bottom
-  val get_initial_state: kernel_function -> t or_bottom
-  val get_initial_state_by_callstack:
-    ?selection:Callstack.t list ->
-    kernel_function -> t Callstack.Hashtbl.t or_top_bottom
+  (** Returns all callstacks from previous calls to [set_state] for the
+      given control point. *)
+  val callstacks: control_point -> Callstack.t list or_top
 
-  val get_stmt_state: after:bool -> stmt -> t or_bottom
-  val get_stmt_state_by_callstack:
-    ?selection:Callstack.t list ->
-    after:bool -> stmt -> t Callstack.Hashtbl.t or_top_bottom
-
-  val mark_as_computed: unit -> unit
+  (** Are states of this domain saved? *)
   val is_computed: unit -> bool
 end
 

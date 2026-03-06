@@ -616,18 +616,6 @@ module Domain = struct
     | State (module S) -> (module S.Location)
 
   type 'a identity = 'a -> 'a
-  type ('c, 'v, 'l) name = string -> ('c, 'v, 'l) structured_domain identity
-
-  (* Change [Domain.register_global_state] to take -eva-no-results-domain into
-     account, according to the domain name. Need to be applied after the domain
-     has been built, in case of a domain functor. *)
-  let use_no_results : type c v l. (c, v, l) name = fun name (module D) ->
-    let register = D.Store.register_global_state in
-    let results () = not (Parameters.NoResultsDomains.mem name) in
-    let f storage state = register (storage && results ()) state in
-    let module S = struct include D.Store let register_global_state = f end in
-    (module struct include D module Store = S end)
-
 
   (* Adding a registered domain into a structured one consists of performing a
      lifting of the registered one if needed before performing the product,
@@ -694,8 +682,6 @@ module Domain = struct
           (module Domain_lift.Make (D)
                (val ctx_converter) (val val_converter) (val loc_converter))
     in
-    (* Take -eva-no-results-domain into account for this domain. *)
-    let lifted = use_no_results info.name lifted in
     (* Restricts the domain according to [mode]. *)
     let restricted : (c, v, l) structured_domain =
       match mode with

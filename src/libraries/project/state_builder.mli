@@ -143,7 +143,7 @@ end
 
 (** Build a reference on an option. *)
 module Option_ref(Data:Datatype.S)(_: Info) :
-  Option_ref with type data = Data.t
+  Option_ref with type data = Data.t and type Datatype.t = Data.t option ref
 
 (** Output signature of [ListRef].
     @since Boron-20100401 *)

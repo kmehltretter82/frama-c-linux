@@ -413,7 +413,6 @@ module Make (Man : Input) = struct
         include D
         let name = Man.name
         let top = top
-        let join = join
       end)
 
   let make_eval state =

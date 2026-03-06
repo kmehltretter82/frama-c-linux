@@ -280,7 +280,7 @@ module Make (Engine: Engine_Subset) = struct
     | `Value state ->
       let pos = Position.of_local pos in
       let state = Interferences.inject_after_change ~pos access state in
-      Domain.Store.register_initial_state call.callstack call.kf state;
+      Domain.Store.register_state call.callstack (Start call.kf) state;
       Engine.Compute.compute_call call recursion state
     | `Bottom ->
       { states = []; cacheable = Cacheable; kind = `Bottom }

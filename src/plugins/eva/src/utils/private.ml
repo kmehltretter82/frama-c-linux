@@ -24,6 +24,7 @@ module Cvalue_domain = Cvalue_domain
 module Cvalue_results = Cvalue_results
 module Deps = Deps
 module Domain_builder = Domain_builder
+module Domain_store = Domain_store
 module Engine = Engine
 module Engine_sig = Engine_sig
 module Eva_ast = Eva_ast

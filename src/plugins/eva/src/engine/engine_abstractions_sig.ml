@@ -27,6 +27,12 @@ module type Domain = sig
 
   (** Direct access to the cvalue component of the abstract domain. *)
   include Cvalue_domain.Getters with type t := state
+
+  (** Function used during the analysis to register computed states.
+      Built by [Engine.Make]. *)
+  module Store : sig
+    val register_state: Callstack.t -> Domain_store.control_point -> t -> unit
+  end
 end
 
 

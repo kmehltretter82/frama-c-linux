@@ -179,13 +179,11 @@ let compute_from ?cvalue_state ?arguments entry_point =
     let restore_signals = Signal.setup () in
     let final_state = Fun.protect ~finally:restore_signals compute in
     Self.(ComputationState.set Computed);
-    Engine.Dom.Store.mark_as_computed ();
     post_analysis ();
     Engine.Dom.post_analysis final_state;
     Summary.print ();
     Statistics.export_as_csv ();
   with exn ->
-    Engine.Dom.Store.mark_as_computed ();
     Self.(ComputationState.set Aborted);
     match exn with
     | Error | Self.Abort -> () (* do not re-raise  *)
@@ -229,12 +227,10 @@ let compute_thread ?cvalue_state thread =
     Self.ComputationState.set Computing;
     let final_state = compute_from_entry_point (module Engine)
         ~thread ?cvalue_state ?arguments entry_point in
-    Engine.Dom.Store.mark_as_computed ();
     Self.ComputationState.set Computed;
     (* Display the final state of each thread main function *)
     Engine.Dom.post_analysis final_state
   with exn ->
-    Engine.Dom.Store.mark_as_computed ();
     Self.(ComputationState.set Aborted);
     match exn with
     | Error | Self.Abort -> () (* do not re-raise *)

@@ -634,43 +634,15 @@ module Restrict
   (* ----- Storage ---------------------------------------------------------- *)
 
   module Store = struct
+    let set_state ?callstack control_point s =
+      Domain.Store.set_state ?callstack control_point (get_state s)
 
-    let register_global_state b state =
-      let state = state >>-: get_state in
-      Domain.Store.register_global_state b state
+    let get_state ?callstack control_point =
+      let open Lattice_bounds.TopBottom.Operators in
+      let+ state = Domain.Store.get_state ?callstack control_point in
+      Some (state, Mode.all)
 
-    let lift_register f state = f (get_state state)
-
-    let register_initial_state callstack kf =
-      lift_register (Domain.Store.register_initial_state callstack kf)
-    let register_state_before_stmt callstack stmt =
-      lift_register (Domain.Store.register_state_before_stmt callstack stmt)
-    let register_state_after_stmt callstack stmt =
-      lift_register (Domain.Store.register_state_after_stmt callstack stmt)
-
-    let inject state = Some (state, Mode.all)
-
-    let get_global_state () = Domain.Store.get_global_state () >>-: inject
-    let get_initial_state kf = Domain.Store.get_initial_state kf >>-: inject
-    let get_stmt_state ~after stmt =
-      Domain.Store.get_stmt_state ~after stmt >>-: inject
-
-    let inject_table = function
-      | `Top -> `Top
-      | `Bottom -> `Bottom
-      | `Value t ->
-        let module Hashtbl = Callstack.Hashtbl in
-        let table = Hashtbl.create (Hashtbl.length t) in
-        Hashtbl.iter (fun key s -> Hashtbl.add table key (inject s)) t;
-        `Value table
-
-    let get_initial_state_by_callstack ?selection kf =
-      inject_table (Domain.Store.get_initial_state_by_callstack ?selection kf)
-    let get_stmt_state_by_callstack ?selection ~after stmt =
-      inject_table
-        (Domain.Store.get_stmt_state_by_callstack ?selection ~after stmt)
-
-    let mark_as_computed = Domain.Store.mark_as_computed
+    let callstacks = Domain.Store.callstacks
     let is_computed = Domain.Store.is_computed
   end
 end

@@ -652,8 +652,9 @@ module Make_Dataflow
     let merged_pre_cvalues = lazy (lift_to_cvalues merged_pre_states)
     and merged_post_cvalues = lazy (lift_to_cvalues merged_post_states) in
     if save_results then begin
-      let register_pre = Domain.Store.register_state_before_stmt callstack
-      and register_post = Domain.Store.register_state_after_stmt callstack in
+      let register = Domain.Store.register_state callstack in
+      let register_pre stmt = register (Before stmt)
+      and register_post stmt = register (After stmt) in
       StmtTable.iter register_pre (Lazy.force merged_pre_states);
       StmtTable.iter register_post (Lazy.force merged_post_states);
     end;

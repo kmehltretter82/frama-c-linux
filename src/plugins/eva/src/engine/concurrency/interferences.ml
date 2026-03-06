@@ -219,25 +219,9 @@ struct
       ThreadTable.find_default ~default current.interferences_by_pos thread
     in
     let new_interferences_by_pos =
-      let add (stmt, cs as pos) acc_map =
+      let add (stmt, callstack as pos) acc_map =
         let source = Pos.pos pos in
-        let open TopBottom.Operators in
-        let state =
-          let* state_table =
-            Engine.get_stmt_state_by_callstack ~selection:[cs] ~after:true stmt
-          in
-          let+ state =
-            try
-              `Value (Callstack.Hashtbl.find state_table cs)
-            with Not_found ->
-              Self.warning ~once:false ~source
-                "cannot find %a at %a"
-                Callstack.pretty cs
-                Printer.pp_location (Cil_datatype.Stmt.loc stmt);
-              `Bottom
-          in
-          state
-        in
+        let state = Engine.get_state ~callstack (After stmt) in
         match state with
         | `Bottom -> acc_map (* no interference to add *)
         | `Top | `Value _ as state ->
