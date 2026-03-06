@@ -157,7 +157,24 @@ let rec remove_attributes_deep (anl: string list) t =
     if t != t'
     then Cil_const.mk_tarray ~tattr:(Ast_attributes.drop_list anl t.tattr) t' l
     else reshare ()
-  | TFun  _ -> reshare ()
+  | TFun(rt,args,va) ->
+    let rt' = remove_attributes_deep anl rt in
+    let process_arg_file args =
+      let changed, args' =
+        List.fold_left
+          (fun (changed, l) (x,t,a) ->
+             let t' = remove_attributes_deep anl t in
+             (changed || t != t', (x,t',a)::l))
+          (false, []) args
+      in
+      changed, Some args'
+    in
+    let changed, args' = Option.fold ~none:(false,None) ~some:process_arg_file args in
+    let args' = if changed then args' else args in
+    if rt' != rt || args' != args then
+      Cil_const.mk_tfun ~tattr:(Ast_attributes.drop_list anl t.tattr) rt' args' va
+    else
+      reshare ()
   | TComp _ -> reshare ()
   | TBuiltin_va_list -> reshare ()
   | TNamed ti ->
