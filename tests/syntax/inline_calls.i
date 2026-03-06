@@ -50,6 +50,7 @@ int g1(int a) {
 
 int main() {
   int local_init = i();
+  int const const_local = i();
   int t = rec(local_init);
   f1(2);
   return h();

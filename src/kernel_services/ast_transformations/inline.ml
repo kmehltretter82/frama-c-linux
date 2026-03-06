@@ -215,7 +215,7 @@ let inliner functions_to_inline = object (self)
                 true, Some (Cil.var v), args
               end
             | Some Plain_func, Some lv ->
-              let t = Cil.typeOfLval lv in
+              let t = Ast_types.remove_attributes ["const"] (Cil.typeOfLval lv) in
               let scope = Stack.top block_stack in
               let v =
                 Cil.makeLocalVar
@@ -318,7 +318,7 @@ let inliner functions_to_inline = object (self)
     Cil.DoChildrenPost
       (fun f ->
          let kf = Globals.Functions.get f.svar in
-         already_visited <- Cil_datatype.Kf.Set.add kf functions_to_inline; f)
+         already_visited <- Cil_datatype.Kf.Set.add kf already_visited; f)
 
   method! vexpr _ = Cil.SkipChildren
   method! vlval _ = Cil.SkipChildren
