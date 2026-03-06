@@ -84,12 +84,13 @@ int g1(int a)
 
 int main(void)
 {
-  int tmp_1;
+  int tmp_2;
   int local_init = i();
+  int const const_local = i();
   int t = rec(local_init);
   f1(2);
-  tmp_1 = h();
-  return tmp_1;
+  tmp_2 = h();
+  return tmp_2;
 }
 
 int with_static(void);
