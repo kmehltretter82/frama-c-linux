@@ -21,11 +21,11 @@ fi
 path=$1
 
 if [ -z ${DUNE_WS+x} ]; then
-  WORKSPACE_OPT=
+  FRAMA_C="../bin/frama-c"
 else
-  WORKSPACE_OPT="--workspace ../dev/dune-workspace.${DUNE_WS} --context ${DUNE_WS}"
+  FRAMA_C="dune exec --workspace ../dev/dune-workspace.${DUNE_WS} --context ${DUNE_WS} -- frama-c"
 fi
 
 find $path/frama-c -path "*/api/*" -name "*.ts" -exec rm -f {} \;
-dune exec ${WORKSPACE_OPT} -- frama-c -server-tsc $path
+$FRAMA_C -server-tsc $path
 find $path/frama-c -path "*/api/*" -name "*.ts" -exec chmod a-w {} \;
