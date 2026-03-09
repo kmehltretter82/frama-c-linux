@@ -16,6 +16,10 @@
   ))
 )
 
+(subdir
+   result/mixed_includes
+   (copy_files ../../mixed_includes/*))
+
 ; Generic dependencies for all tests
 (cram
   (deps (package frama-c))
