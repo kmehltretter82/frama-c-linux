@@ -73,13 +73,13 @@ struct
 
   let proto rt args is_va =
     let rt = match rt with
-      | ((Single | Record _), Ctype t) -> t
+      | (Single | Record _), Ctype t -> t
       | _, Ctype ({ tnode = TArray _}) -> error "function cannot return an array"
       | _ -> raise NotACType
     in
     let treat_arg (name, t, attrs) =
       match t with
-      | ((Single | Record _), Ctype t) -> (name, t, attrs)
+      | (Single | Record _), Ctype t -> (name, t, attrs)
       | _, Ctype ({ tnode = TArray(elt,_) } as t ) ->
         (name, { t with tnode = TPtr elt }, attrs)
       | _ -> raise NotACType
