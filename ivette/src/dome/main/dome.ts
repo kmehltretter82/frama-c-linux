@@ -460,13 +460,23 @@ function createBrowserWindow(
     process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true';
 
   // Load Finished
-  theWindow.on('ready-to-show', () => {
+  const showWindow = () : void => {
     console.log('[Dome] Window ready');
     if (DEVEL || LOCAL)
       process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'false';
     if (DEVEL && devtools) webContents.openDevTools();
     theWindow.show();
-  });
+  };
+
+  // `ready-to-show` event doesn't always fire on wayland; use `did-finish-load`
+  // event on the web content instead, as it is similar enough.
+  // Cf https://github.com/electron/electron/issues/48859
+  if (process.platform === 'linux'
+      && app.commandLine.getSwitchValue('ozone-platform') === 'wayland') {
+    theWindow.webContents.once('did-finish-load', showWindow);
+  } else {
+    theWindow.once('ready-to-show', showWindow);
+  }
 
   // Focus Management
   theWindow.on('focus', () => webContents.send('dome.ipc.focus', true));
