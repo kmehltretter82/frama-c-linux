@@ -15,6 +15,30 @@ let package =
 module Results = Eva__Results
 
 
+let rec is_prefix_stack st1 st2 =
+  match st1, st2 with
+  | [], _ | _, [] -> true
+  | (kf1, stmt1) :: st1, (kf2, stmt2) :: st2 ->
+    Kernel_function.equal kf1 kf2
+    && Cil_datatype.Stmt.equal stmt1 stmt2
+    && is_prefix_stack st1 st2
+
+(* Returns true if one callstack is prefix of the other. *)
+let is_prefix cs1 cs2 =
+  let open Callstack in
+  cs1.thread = cs2.thread
+  && Kernel_function.equal cs1.entry_point cs2.entry_point
+  && is_prefix_stack (List.rev cs1.stack) (List.rev cs2.stack)
+
+let is_compatible callstacks cs =
+  List.exists (fun cs' -> is_prefix cs cs') callstacks
+
+let compatible_filter () =
+  match Update.CurrentCallstacks.get () with
+  | [] -> None
+  | callstacks -> Some (is_compatible callstacks)
+
+
 let compare_call (kf1, stmt1) (kf2, stmt2) =
   let c = Int.compare stmt1.Cil_types.sid stmt2.Cil_types.sid in
   if c <> 0 then c else Kernel_function.compare kf1 kf2
@@ -173,7 +197,10 @@ let markers_callstacks markers =
     marker_callstacks marker |> Callstack.Set.of_list |> Callstack.Set.union acc
   in
   let callstack_set = List.fold_left aux Callstack.Set.empty markers in
-  Callstack.Set.elements callstack_set
+  let callstack_list = Callstack.Set.elements callstack_set in
+  match compatible_filter () with
+  | None -> callstack_list
+  | Some filter -> List.filter filter callstack_list
 
 let () =
   register_list_request
