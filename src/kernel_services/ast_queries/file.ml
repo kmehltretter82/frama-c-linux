@@ -459,11 +459,13 @@ let c_standard_option cmdl =
     | C11 -> [ "-std=c11" ]
     | C17 -> [ "-std=c17" ]
     | C23 -> [ "-std=c2x" ] (* still supported most of the time, unlike c23 *)
+    | C2y -> [ "-std=c2y" ]
   else if exe = "cl" (* MSVC *)
   then match Kernel.CStd.get () with
     | C11 -> [ "/std:c11" ]
     | C17 -> [ "/std:c17" ]
     | C23 -> [ "/std:c23" ] (* not supported, we hope they will use this name *)
+    | C2y -> [ "/std:c2y" ] (* not supported, we hope they will use this name *)
   else []
 
 let censored_macros cpp_args =

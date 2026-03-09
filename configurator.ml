@@ -140,6 +140,14 @@ int main(){}
       (C_preprocessor.preprocess configurator preprocessor options code).exit_code = 0
   end
 
+  module C2y = struct
+    let code = {|int main(){}|}
+
+    let check configurator preprocessor =
+      let options = ["-std=c2y"] in
+      (C_preprocessor.preprocess configurator preprocessor options code).exit_code = 0
+  end
+
   type t =
     { preprocessor : C_preprocessor.t
     ; default_args : string list
@@ -147,6 +155,7 @@ int main(){}
     ; keep_comments : bool
     ; supported_archs_opts : string list
     ; has_c2x : bool
+    ; has_c2y : bool
     }
 
   let get configurator =
@@ -157,12 +166,14 @@ int main(){}
     let supported_archs_opts =
       Archs.supported_archs configurator preprocessor [ "16" ; "32" ; "64" ] in
     let has_c2x = C2x.check configurator preprocessor in
+    let has_c2y = C2y.check configurator preprocessor in
     { preprocessor
     ; default_args
     ; is_gnu_like
     ; keep_comments
     ; supported_archs_opts
     ; has_c2x
+    ; has_c2y
     }
 
   let pp_flags fmt =
@@ -330,7 +341,10 @@ let configure configurator =
     close_out gcc;
     let c2x = open_out "has-c2x-option" in
     Printf.fprintf c2x "%B" cpp.has_c2x;
-    close_out c2x
+    close_out c2x;
+    let c2y = open_out "has-c2y-option" in
+    Printf.fprintf c2y "%B" cpp.has_c2y;
+    close_out c2y
 
 let () =
   C.main ~name:"frama_c_config" configure

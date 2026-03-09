@@ -1065,7 +1065,7 @@ module Orig_name =
     let help = "prints a message each time a variable is renamed"
   end)
 
-type iso_c = C11 | C17 | C23
+type iso_c = C11 | C17 | C23 | C2y
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
@@ -1078,7 +1078,7 @@ module CStd =
       let help =
         "Configures the ISO standard to use. Note that your preprocessor must \
          support it, else it will lead to preprocessing failure."
-      let values = [ C11, "c11" ; C17, "c17" ; C23, "c23" ]
+      let values = [ C11, "c11" ; C17, "c17" ; C23, "c23"  ; C2y, "c2y"]
     end)
 
 type attr_info =

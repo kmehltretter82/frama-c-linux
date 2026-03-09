@@ -92,8 +92,8 @@ let compiler (name, is_machdep) key builder =
 let gcc key builder = compiler ("GCC", Machine.gccMode ()) key builder
 let msvc key builder = compiler ("MSVC", Machine.msvcMode ()) key builder
 
-let c23 key builder =
-  if Kernel.CStd.get() = Kernel.C23
+let c23_or_later key builder =
+  if compare (Kernel.CStd.get()) Kernel.C23 >= 0
   then add key builder
 
 let filename_keyword () =
@@ -124,9 +124,9 @@ let init_lexicon () =
   (* WW: see /usr/include/sys/cdefs.h for why __signed and __volatile
    * are accepted GCC-isms *)
   valid "char" (fun loc -> CHAR loc) ;
-  c23   "bool" (fun loc -> BOOL loc) ;
-  c23   "true" (fun loc -> TRUE loc) ;
-  c23   "false" (fun loc -> FALSE loc) ;
+  c23_or_later "bool" (fun loc -> BOOL loc) ;
+  c23_or_later "true" (fun loc -> TRUE loc) ;
+  c23_or_later "false" (fun loc -> FALSE loc) ;
   valid "_Bool" (fun loc -> BOOL loc) ;
   valid "int" (fun loc -> INT loc) ;
   valid "float" (fun loc -> FLOAT loc) ;
@@ -150,9 +150,9 @@ let init_lexicon () =
   valid "for" (fun loc -> FOR loc) ;
   valid "if" (fun loc -> IF loc) ;
   valid "else" (fun _ -> ELSE) ;
-  c23 "alignas" (fun loc -> ALIGNAS loc) ;
+  c23_or_later "alignas" (fun loc -> ALIGNAS loc) ;
   valid "_Alignas" (fun loc -> ALIGNAS loc) ;
-  c23 "alignof" (fun loc -> ALIGNOF loc) ;
+  c23_or_later "alignof" (fun loc -> ALIGNOF loc) ;
   valid "_Alignof" (fun loc -> ALIGNOF loc) ;
   valid "_Generic" (fun loc -> GENERIC loc) ;
   (*** Implementation specific keywords ***)
