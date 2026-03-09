@@ -52,8 +52,8 @@ sig
     Cil_types.compinfo -> (Cil_types.fieldinfo -> 'a -> 'v) -> ('v, 'a) typ
 
   val proto:
-    ('v, 'v) typ ->
-    (string * ('v, 'v) typ * Cil_types.attributes) list -> bool -> ('v, 'v) typ
+    ('vr, 'sr) typ ->
+    (string * ('va, 'sa) typ * Cil_types.attributes) list -> bool -> ('vr, 'vr) typ
 
   (* Attributes *)
   val attribute : ('v,'s) typ -> string -> Cil_types.attrparam list

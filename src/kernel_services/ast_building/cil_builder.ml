@@ -19,6 +19,7 @@ let error format =
 module Type =
 struct
   exception NotACType
+  open Cil_types
 
   type ('value,'shape) morphology =
     | Single : ('value,'value) morphology
@@ -27,7 +28,6 @@ struct
 
   and ('value,'shape) typ = ('value,'shape) morphology * Cil_types.logic_type
 
-  open Cil_types
   open Cil_const
 
   (* Logic types *)
@@ -71,17 +71,21 @@ struct
   let structure compinfo f =
     Record f, Ctype (mk_tcomp compinfo)
 
-  let proto rt args is_va =
+  let proto:
+    type vr sr va sa.
+    ((vr, sr) typ) -> (string * (va, sa) typ * attributes) list -> bool -> (vr, vr) typ
+    =
+    fun rt args is_va ->
     let rt = match rt with
-      | (Single | Record _), Ctype t -> t
       | _, Ctype ({ tnode = TArray _}) -> error "function cannot return an array"
+      | _, Ctype t -> t
       | _ -> raise NotACType
     in
-    let treat_arg (name, t, attrs) =
+    let treat_arg (name, (t: (va,sa) typ), attrs) =
       match t with
-      | (Single | Record _), Ctype t -> (name, t, attrs)
       | _, Ctype ({ tnode = TArray(elt,_) } as t ) ->
         (name, { t with tnode = TPtr elt }, attrs)
+      | _, Ctype t -> (name, t, attrs)
       | _ -> raise NotACType
     in
     let args = List.map treat_arg args in
