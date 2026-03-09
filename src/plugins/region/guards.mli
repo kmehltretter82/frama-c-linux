@@ -69,4 +69,12 @@ val stmtkind : env -> stmtkind -> unit
 val term : env -> term -> domain
 val pred : env -> predicate -> unit
 
+class visit : env -> Visitor.frama_c_inplace
+
 val iter_stmt : map -> (condition -> valid:bool -> unit) -> stmt -> unit
+
+val annotate :
+  ?kf:kernel_function ->
+  ?emitter:Emitter.t ->
+  ?valid:bool -> ?hyps:Property.t list ->
+  stmt -> condition -> unit

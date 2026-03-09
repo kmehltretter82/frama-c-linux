@@ -511,12 +511,65 @@ and residual env f p =
     if validregion then valid_region env r (TADDR p)
 
 (* -------------------------------------------------------------------------- *)
+(* --- ACSL Annotations                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+class visit env =
+  object
+    inherit Visitor.frama_c_inplace
+    method !vexpr e = eval env e ; SkipChildren
+    method !vlval lv = ignore @@ lval env lv ; SkipChildren
+    method !vterm t = term_eval env t ; SkipChildren
+    method !vpredicate p = pred env p ; SkipChildren
+    method !vterm_lval lv = ignore @@ term_lval env lv ; SkipChildren
+  end
+
+(* -------------------------------------------------------------------------- *)
 (* --- Statement Annotations                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
 let iter_stmt map f stmt =
   let env = create ~stmt map in
+  if Options.Logic.get () then
+    begin
+      let visitor = new visit env in
+      Annotations.iter_code_annot
+        (fun _emitter ca ->
+           ignore @@ Visitor.visitFramacCodeAnnotation visitor ca) stmt ;
+    end ;
   stmtkind env stmt.skind ;
   iter f env
+
+(* -------------------------------------------------------------------------- *)
+(* --- Generate Annotations                                               --- *)
+(* -------------------------------------------------------------------------- *)
+
+let self =
+  let em = ref None in
+  fun () ->
+    match !em with
+    | Some e -> e
+    | None ->
+      let e = Emitter.create "Region Side-Conditions"
+          Emitter.[ Code_annot ; Property_status ]
+          ~correctness:[]
+          ~tuning:[] in
+      em := Some e ; e
+
+let annotate ?kf ?emitter ?valid ?(hyps=[]) stmt condition =
+  let loc = Cil_datatype.Stmt.loc stmt in
+  let kind = if Options.Assert.get () then Cil_types.Assert else Check in
+  let e = match emitter with Some e -> e | None -> self () in
+  let a = of_condition ~loc ~names:["Region"] condition in
+  let a = Logic_const.toplevel_predicate ~kind a in
+  let ca = Logic_const.new_code_annotation (AAssert ([],a)) in
+  Annotations.add_code_annot e ?kf stmt ca ;
+  match valid with
+  | None -> ()
+  | Some ok ->
+    let kf = Kernel_function.find_englobing_kf stmt in
+    let ips = Property.ip_of_code_annot kf stmt ca in
+    let status = if ok then Property_status.True else False_if_reachable in
+    List.iter (fun ip -> Property_status.emit e ~hyps ip status) ips
 
 (* -------------------------------------------------------------------------- *)
