@@ -2,7 +2,6 @@
 # HEADER_SPEC: .ignore #
 ########################
 
-/gen_api/Eva.header header_spec=.ignore
 /Changelog_non_free header_spec=.ignore
 /src/legacy/TOREMOVE header_spec=.ignore
 /src/mthread/trie.ml header_spec=JCF_LGPL

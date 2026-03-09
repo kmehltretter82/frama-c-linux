@@ -6,8 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-[@@@ api_start]
-
 open Cil_types
 
 (* -------------------------------------------------------------------------- *)
@@ -45,7 +43,5 @@ val generator : unit -> Visitor.frama_c_inplace
    {!emitter}. This will also remove their associated status.
 *)
 val cleaner : unit -> Visitor.frama_c_inplace
-
-[@@@ api_end]
 
 (* -------------------------------------------------------------------------- *)

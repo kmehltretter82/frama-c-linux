@@ -184,7 +184,7 @@ module Make (Engine: Engine_sig.S) = struct
   let with_callstack callstack job x =
     Eva_perf.start callstack;
     let finally () = Eva_perf.stop callstack in
-    Callstack.with_callstack ~finally callstack job x
+    Current_callstack.with_callstack ~finally callstack job x
 
   (* Interprets a [call] in the state [state], using a builtin, specification or
      the body of the called function according to [target]. *)
@@ -225,7 +225,7 @@ module Make (Engine: Engine_sig.S) = struct
     let compute_call_and_join =
       let thread_id = Thread.id thread in
       let callstack = Callstack.init ~thread:thread_id ~entry_point:kf in
-      Callstack.with_callstack callstack @@ fun init_state ->
+      Current_callstack.with_callstack callstack @@ fun init_state ->
       Engine.Dom.Store.register_state callstack (Start kf) init_state;
       let init_state =
         (* Inject interferences in the initial state. The interferences are

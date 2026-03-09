@@ -6,8 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-[@@@ api_start]
-
 (** Memory dependencies of an expression. *)
 type t = {
   data: Locations.Zone.t;
@@ -45,4 +43,3 @@ val map : (Locations.Zone.t -> Locations.Zone.t) -> t -> t
 val is_included : t -> t -> bool
 val join : t -> t -> t
 val narrow : t -> t -> t
-[@@@ api_end]

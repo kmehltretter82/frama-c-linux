@@ -8,8 +8,6 @@
 
 (** Datastructures and common operations for the results of the From plugin. *)
 
-[@@@ api_start]
-
 module DepsOrUnassigned : sig
 
   type t =
@@ -59,8 +57,6 @@ include Datatype.S with type t := t
 
 val top : t
 val join : t -> t -> t
-
-[@@@ api_end]
 
 (** Extract the left part of a from result, ie. the zones that are written *)
 val outputs : t -> Locations.Zone.t

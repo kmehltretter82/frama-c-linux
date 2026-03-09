@@ -166,8 +166,6 @@ val register_domain: name:string -> descr:string -> priority:int -> unit
 
 module Annot: Parameter_sig.Kernel_function_set
 
-[@@@ api_start]
-
 (** Configuration of the analysis. *)
 
 (** Returns the list (name, descr) of currently enabled abstract domains. *)
@@ -181,4 +179,3 @@ val use_builtin: Cil_types.kernel_function -> string -> unit
 (** [use_global_value_partitioning vi] instructs the analysis to use
     value partitioning on the global variable [vi]. *)
 val use_global_value_partitioning: Cil_types.varinfo -> unit
-[@@@ api_end]

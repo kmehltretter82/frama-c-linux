@@ -261,8 +261,6 @@ type recursion = {
   (** Same withdrawal as the previous field, for bases. *)
 }
 
-[@@@ api_start]
-
 (** Can the results of a function call be cached with memexec? *)
 type cacheable =
   | Cacheable      (** Functions whose result can be safely cached. *)
@@ -271,4 +269,3 @@ type cacheable =
                        functions printing something during the analysis. *)
   | NoCacheCallers (** Functions for which neither the call, neither the
                        callers, can be cached. *)
-[@@@ api_end]

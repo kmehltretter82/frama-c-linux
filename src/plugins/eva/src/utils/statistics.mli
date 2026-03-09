@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-[@@@ api_start]
 (** This module keeps track of statistics collected by Eva during an
     analysis. *)
 
@@ -103,7 +102,6 @@ val add : ('k, 'ty) t -> 'k -> 'ty -> unit
 (** Set the stat to the maximum between the current value and the given
     value. *)
 val grow : ('k, 'ty) t -> 'k -> 'ty -> unit
-[@@@ api_end]
 
 (** Reset all statistics to zero. *)
 val reset_all: unit -> unit

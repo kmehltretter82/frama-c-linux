@@ -6,8 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-[@@@ api_start]
-
 (** A call is identified by the function called and the call statement *)
 type call = Cil_types.kernel_function * Cil_types.stmt
 
@@ -76,26 +74,9 @@ val to_stmt_list : t -> Cil_types.stmt list
 (** Gives the list of call from the bottom to the top of the callstack
     (i.e. reverse order of the call stack). *)
 val to_call_list : t -> (Cil_types.kernel_function * Cil_types.kinstr) list
-[@@@ api_end]
 
 (** {2 Iteration} *)
 
 (** [iter f cs] calls [f] on [cs] and all the callstacks obtained by successful
     calls to {!pop} until the result of the call is [None]. *)
 val iter : (t -> unit) -> t -> unit
-
-(** {2 Callstack tracking} *)
-
-(** Returns the current callstack or None if it has not been initialized. *)
-val get_current : unit -> t option
-
-(** Returns the current callstack; fails if it has not been initialized.
-    This should only be called during the analysis of a function. *)
-val get_current_exn : unit -> t
-
-(** [with_callstack ~finally cs job] creates a wrapper around [job] such that
-    the wrapped executions happen in environment where the current callstack
-    returned by {!get_current} is set to [cs]. When [job] returns or raises an
-    exception, [finally] is called and then the current callstack is restored to
-    its previous value. *)
-val with_callstack : ?finally:(unit -> unit) -> t -> ('a -> 'b) -> 'a -> 'b
