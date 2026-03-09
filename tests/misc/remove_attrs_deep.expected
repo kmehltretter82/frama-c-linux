@@ -20,5 +20,5 @@ int const * const *(int const (*x)[])
 int **(int (*x)[])
 
 int const *(int const *x, int const * const *y)
-int *(int **y, int *x)
+int *(int *x, int **y)
 

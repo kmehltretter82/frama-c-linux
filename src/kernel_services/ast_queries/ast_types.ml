@@ -159,18 +159,14 @@ let rec remove_attributes_deep (anl: string list) t =
     else reshare ()
   | TFun(rt,args,va) ->
     let rt' = remove_attributes_deep anl rt in
-    let process_arg_file args =
-      let changed, args' =
-        List.fold_left
-          (fun (changed, l) (x,t,a) ->
-             let t' = remove_attributes_deep anl t in
-             (changed || t != t', (x,t',a)::l))
-          (false, []) args
-      in
-      changed, Some args'
+    let args' =
+      Option.map_no_copy
+        (List.map_no_copy
+           (fun (x,t,a as orig) ->
+              let t' = remove_attributes_deep anl t in
+              if t == t' then orig else (x,t',a)))
+        args
     in
-    let changed, args' = Option.fold ~none:(false,None) ~some:process_arg_file args in
-    let args' = if changed then args' else args in
     if rt' != rt || args' != args then
       Cil_const.mk_tfun ~tattr:(Ast_attributes.drop_list anl t.tattr) rt' args' va
     else
