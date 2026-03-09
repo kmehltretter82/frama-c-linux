@@ -47,7 +47,7 @@ val typeof : addr -> typ (* of the pointed l-value *)
 
 type env
 val create : ?stmt:stmt -> map -> env
-val iter : (condition -> valid:bool -> unit) -> env -> unit
+val iter : (condition -> invalid:bool -> unit) -> env -> unit
 
 val valid : env -> node -> addr -> unit
 val valid_read : env -> node -> addr -> unit
@@ -71,10 +71,15 @@ val pred : env -> predicate -> unit
 
 class visit : env -> Visitor.frama_c_inplace
 
-val iter_stmt : map -> (condition -> valid:bool -> unit) -> stmt -> unit
+val iter_stmt : map -> (condition -> invalid:bool -> unit) -> stmt -> unit
 
-val annotate :
+val add_annotation :
   ?kf:kernel_function ->
   ?emitter:Emitter.t ->
-  ?valid:bool -> ?hyps:Property.t list ->
+  ?status:Property_status.emitted_status ->
+  ?hyps:Property.t list ->
   stmt -> condition -> unit
+
+val is_annotated : kernel_function -> bool
+val set_annotated : kernel_function -> unit
+val annotate : kernel_function -> unit

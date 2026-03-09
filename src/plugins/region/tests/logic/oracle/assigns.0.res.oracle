@@ -1,5 +1,4 @@
 [kernel] Parsing assigns.i (no preprocessing)
-[region] Analyzing regions
 [region] Function byref:
   R0001: -R-- p (int **) 64b (*R0002) (singleton) ;
   R0002: ---- 0b ;

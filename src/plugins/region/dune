@@ -12,6 +12,7 @@
  (action
   (progn
    (echo "Region:" %{lib-available:frama-c-region.core} "\n")
+   (echo "  - RteGen:" %{lib-available:frama-c-rtegen.core} "\n")
    (echo "  - Server:" %{lib-available:frama-c-server.core} "\n")
    (echo "  - UnionFind:" %{lib-available:unionFind} "\n")
    (echo "  - ppx_deriving.ord:" %{lib-available:ppx_deriving.ord} "\n"))))
@@ -33,7 +34,7 @@
  (name Region)
  (public_name frama-c-region.core)
  (flags -open Frama_c_kernel :standard -w -9)
- (libraries frama-c.kernel frama-c-server.core unionFind)
+ (libraries frama-c.kernel frama-c-rtegen.core frama-c-server.core unionFind)
  (preprocess (pps ppx_deriving.ord))
  (instrumentation (backend landmarks))
  (instrumentation (backend bisect_ppx)))

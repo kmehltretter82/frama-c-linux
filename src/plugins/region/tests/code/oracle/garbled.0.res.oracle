@@ -1,5 +1,4 @@
 [kernel] Parsing garbled.i (no preprocessing)
-[region] Analyzing regions
 [region] Function job:
   R0001: -R-- p (int *) 64b (*R0002) (singleton) ;
   R0002: -R-- (int) (float) 32b ;

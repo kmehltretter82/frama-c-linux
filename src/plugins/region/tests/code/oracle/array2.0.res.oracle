@@ -1,5 +1,4 @@
 [kernel] Parsing array2.i (no preprocessing)
-[region] Analyzing regions
 [region] Function job:
   R0001: -R-- n (int) 32b (singleton) ;
   R0002: -R-- p (int *) 64b (*R0003) (singleton) ;

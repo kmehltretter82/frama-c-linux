@@ -150,7 +150,7 @@ let create ?stmt map =
     guards = Guards.empty ;
   }
 
-let iter f env = Guards.iter (fun g valid -> f g ~valid) env.guards
+let iter f env = Guards.iter (fun g valid -> f g ~invalid:(not valid)) env.guards
 
 let add env ?(valid=true) guard =
   let cond = env.context guard in
@@ -556,7 +556,7 @@ let self =
           ~tuning:[] in
       em := Some e ; e
 
-let annotate ?kf ?emitter ?valid ?(hyps=[]) stmt condition =
+let add_annotation ?kf ?emitter ?status ?(hyps=[]) stmt condition =
   let loc = Cil_datatype.Stmt.loc stmt in
   let kind = if Options.Assert.get () then Cil_types.Assert else Check in
   let e = match emitter with Some e -> e | None -> self () in
@@ -564,12 +564,49 @@ let annotate ?kf ?emitter ?valid ?(hyps=[]) stmt condition =
   let a = Logic_const.toplevel_predicate ~kind a in
   let ca = Logic_const.new_code_annotation (AAssert ([],a)) in
   Annotations.add_code_annot e ?kf stmt ca ;
-  match valid with
+  match status with
   | None -> ()
-  | Some ok ->
+  | Some st ->
     let kf = Kernel_function.find_englobing_kf stmt in
     let ips = Property.ip_of_code_annot kf stmt ca in
-    let status = if ok then Property_status.True else False_if_reachable in
-    List.iter (fun ip -> Property_status.emit e ~hyps ip status) ips
+    List.iter (fun ip -> Property_status.emit e ~hyps ip st) ips
+
+(* -------------------------------------------------------------------------- *)
+(* ---  Function Annotation                                               --- *)
+(* -------------------------------------------------------------------------- *)
+
+let is_annotated kf =
+  not (Options.Force.get ())
+  && RteGen.Generator.Mem_access.is_computed kf
+  && RteGen.Generator.Pointer_alignment.is_computed kf
+  && RteGen.Generator.Pointer_value.is_computed kf
+
+let set_annotated kf =
+  if not (Options.Force.get ()) then
+    begin
+      RteGen.Generator.Mem_access.set kf true ;
+      RteGen.Generator.Pointer_alignment.set kf true ;
+      RteGen.Generator.Pointer_value.set kf true ;
+    end
+
+let annotate kf =
+  if Kernel_function.has_definition kf && not @@ is_annotated kf then
+    begin
+      let map = Analysis.get kf in
+      Options.feedback "annotating function %a" Kernel_function.pretty kf ;
+      let fd = Kernel_function.get_definition kf in
+      List.iter
+        (fun stmt ->
+           iter_stmt map
+             (fun condition ~invalid ->
+                let status =
+                  if invalid then
+                    Some Property_status.False_if_reachable
+                  else None
+                in add_annotation ~kf ?status stmt condition
+             ) stmt
+        ) fd.sallstmts ;
+      set_annotated kf ;
+    end
 
 (* -------------------------------------------------------------------------- *)

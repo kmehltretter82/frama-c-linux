@@ -1,5 +1,4 @@
 [kernel] Parsing fb_SORT.i (no preprocessing)
-[region] Analyzing regions
 [region] Function job:
   R0001: -R-- fb (FB *) 64b (*R0002) (singleton) ;
   R0002: ---- 704b

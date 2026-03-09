@@ -1,5 +1,4 @@
 [kernel] Parsing swap.i (no preprocessing)
-[region] Analyzing regions
 [region] Function swap_aliased:
   R0001: -R-- a (int *) 64b (*R0002) (singleton) ;
   R0002: -RW- R: (int) 32b R: a[0..0] R: b[0..0] ;

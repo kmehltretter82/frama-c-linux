@@ -1,5 +1,4 @@
 [kernel] Parsing mat.c (with preprocessing)
-[region] Analyzing regions
 [region] Function BornatArrayStyle:
   R0001: ---A X[12] 128b { .re: R0002; #64b; } ;
   R0002: -R-- (double) 64b ;

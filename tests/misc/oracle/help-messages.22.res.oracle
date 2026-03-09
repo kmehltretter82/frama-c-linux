@@ -13,7 +13,15 @@ Options taking a string as argument should preferably be written
 
 ***** LIST OF AVAILABLE OPTIONS:
 
--region             Enable Region Analysis (opposite option is -no-region)
+-region             Analyze Regions for all functions (opposite option is
+                    -no-region)
+-region-assert      Generate ACSL 'assert' annotations instead of checks
+                    (opposite option is -region-check)
+-region-check       Generate ACSL 'check' annotations (set by default)
+-region-logic       Also generate guards for logical statements (opposite
+                    option is -region-no-logic)
+-region-rte         Generate RTE based on regions (opposite option is
+                    -region-no-rte)
 
 *** DEBUG
 

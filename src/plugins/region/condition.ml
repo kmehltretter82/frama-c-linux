@@ -43,22 +43,19 @@ let paligned ?loc ?names addr =
 
 let l_valid_region = "\\validregion"
 let is_valid_region lf = lf.l_var_info.lv_name = l_valid_region
-let valid_region_builtin = ref false
+
+let () = Logic_builtin.register {
+    bl_name = l_valid_region;
+    bl_labels = [FormalLabel "A"] ;
+    bl_params = [] ;
+    bl_type = None ;
+    bl_profile = [
+      "ptr", Ctype Cil_const.voidConstPtrType ;
+      "size", Linteger ;
+    ];
+  }
+
 let pvalid_region ?loc ?names ?(label=Logic_const.here_label) addr =
-  if not (!valid_region_builtin) then
-    begin
-      valid_region_builtin := true ;
-      Logic_builtin.register {
-        bl_name = l_valid_region;
-        bl_labels = [FormalLabel "A"] ;
-        bl_params = [] ;
-        bl_type = None ;
-        bl_profile = [
-          "ptr", Ctype Cil_const.voidConstPtrType ;
-          "size", Linteger ;
-        ];
-      } ;
-    end ;
   let f = List.hd @@ Logic_env.find_all_logic_functions "\\validregion" in
   let te = Logic_typing.ctype_of_pointed addr.term_type in
   let size = Logic_const.tinteger ?loc @@ Fields.bytesSizeOf te in

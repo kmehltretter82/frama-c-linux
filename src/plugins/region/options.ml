@@ -17,10 +17,16 @@ include Plugin.Register
       let shortname = "region"
     end)
 
-module Enabled = False
+module Analyze = Action
     (struct
       let option_name = "-region"
-      let help = "Enable Region Analysis"
+      let help = "Analyze Regions for all functions"
+    end)
+
+module Annotate = Action
+    (struct
+      let option_name = "-region-rte"
+      let help = "Generate RTE based on regions"
     end)
 
 module Logic = False
@@ -29,16 +35,17 @@ module Logic = False
       let help = "Also generate guards for logical statements"
     end)
 
+let () = Parameter_customize.is_invisible ()
+module Force = False
+    (struct
+      let option_name = "-region-force"
+      let help = "Force generation of annotations (debug only)"
+    end)
+
 let () = Parameter_customize.set_negative_option_name "-region-check"
 let () = Parameter_customize.set_negative_option_help "Generate ACSL 'check' annotations"
 module Assert = False
     (struct
       let option_name = "-region-assert"
       let help = "Generate ACSL 'assert' annotations instead of checks"
-    end)
-
-module Rte = False
-    (struct
-      let option_name = "-region-rte"
-      let help = "Generate ACSL annotations for all functions"
     end)
