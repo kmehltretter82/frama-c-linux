@@ -31,7 +31,7 @@ let tptr_ptr = Cil_builder.Type.(ptr (const tptr))
 
 let tfun = Cil_builder.Type.proto tptr_ptr ["x",tptr_arr,[]] false
 
-let tfun2 = Cil_builder.Type.proto tptr ["x", tptr,[]; "y", tptr_ptr,[]] false
+let tfun2 = Cil_builder.Type.proto tptr [("x", tptr, []); ("y", tptr_ptr, [])] false
 
 let () =
   List.iter test
