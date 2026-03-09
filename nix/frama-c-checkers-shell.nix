@@ -11,6 +11,7 @@
 , headache
 , jq
 , ocp-indent
+, typos
 } :
 stdenv.mkDerivation rec {
   name = "frama-c-checkers-shell";
@@ -26,5 +27,6 @@ stdenv.mkDerivation rec {
     headache
     jq
     ocp-indent
+    typos
   ];
 }
