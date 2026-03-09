@@ -24,6 +24,25 @@ __BEGIN_DECLS
       \forall integer i; 0 <= i < n ==> !\dangling((char *)s + i);
 */
 
+#if __STDC_VERSION__ > 202311L
+/* In C2y (post-C23), pointers are no longer required to be valid when dealing
+   with a 0-byte function call:
+   "Where an argument declared as size_t n specifies the length of the array
+   for a function, n can have the value zero on a call to that function.
+   Unless explicitly stated otherwise (...), pointer arguments on such a call
+   may be null pointers.
+   Therefore, we are more permissive in our conditions related to
+   valid_or_empty and valid_read_or_empty.
+*/
+/*@
+  predicate valid_or_empty{L}(void *s, size_t n) =
+    (\object_pointer((char*)s) || s == \null) && \valid(((char*)s)+(0..n-1));
+
+  predicate valid_read_or_empty{L}(void *s, size_t n) =
+    (\object_pointer((char*)s) || s == \null) &&
+    \valid_read(((char*)s)+(0..n-1));
+*/
+#else
 /*@
   predicate valid_or_empty{L}(void *s, size_t n) =
     \object_pointer((char*)s) && \valid(((char*)s)+(0..n-1));
@@ -31,6 +50,7 @@ __BEGIN_DECLS
   predicate valid_read_or_empty{L}(void *s, size_t n) =
     \object_pointer((char*)s) && \valid_read(((char*)s)+(0..n-1));
 */
+#endif
 
 /*@ requires valid_s1: valid_read_or_empty(s1, n);
   @ requires valid_s2: valid_read_or_empty(s2, n);
