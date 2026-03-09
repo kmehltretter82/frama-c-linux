@@ -392,7 +392,7 @@ class Dive {
     }
 
     // Edges must be updated after vertices since their sources and destination
-    // must have been created beforhand
+    // must have been created beforehand
     for (const d of data) {
       if ('dkind' in d.element) // Dependency
         this.updateEdgeData(d.element);

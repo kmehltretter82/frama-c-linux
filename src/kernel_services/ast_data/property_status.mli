@@ -163,7 +163,7 @@ module Consolidation: sig
     | Unknown of pending
     (** The verification of this property is not finished: the property itself
         remains to verify and it may also remain other pending properties.
-        NB: the pendings contains the property itself. *)
+        NB: pending contains the property itself. *)
 
     | Invalid of Emitter.Usable_emitter.Set.t
     (** The verification of this property is fully done. All its hypotheses have

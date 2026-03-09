@@ -142,7 +142,7 @@ let tests_markdown_report_deps_available configurator =
     [check_jsonschema; jq]
 
 let tests_server_deps_available configurator =
-  (* No dependancy for now *)
+  (* No dependencies for now *)
   test_aux "tests-server-deps-available" configurator
     [ ]
 

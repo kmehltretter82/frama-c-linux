@@ -2521,7 +2521,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                 oldvi.vname
                 Cil_printer.pp_exp (Option.get oldvi.valignas)
                 Cil_printer.pp_location oldloc
-            | _ -> ((* Compatile alignas *))
+            | _ -> ((* Compatible alignas *))
           end
         | Some oldloc ->
           match oldvi.valignas with

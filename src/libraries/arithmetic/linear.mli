@@ -80,7 +80,7 @@ module Space (Field : Field.S) : sig
     (** The call [zero n m] returns the 0 matrix in 𝕂ⁿˣᵐ. *)
     val zero : 'n succ nat -> 'm succ nat -> ('n succ, 'm succ) matrix
 
-    (** Build a matrix from a 2 dimensionnal array of strings. Strings are
+    (** Build a matrix from a 2 dimensional array of strings. Strings are
         used here to ensure that no rounding is performed prior of the
         ones that may be introduced by the underlying field.
         Raise out of bounds exceptions if the array is not well formed. *)

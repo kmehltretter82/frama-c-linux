@@ -26,7 +26,7 @@ import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
 
 // -----------------------------------------------------------------------------
-//  Utilitary types and functions
+//  Utility types and functions
 // -----------------------------------------------------------------------------
 
 interface Position { line: number, column: number }

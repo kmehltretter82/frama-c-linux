@@ -139,7 +139,7 @@ let has_suffix fkind literal =
   let literal_upper = String.uppercase_ascii literal in
   String.ends_with ~suffix literal_upper
 
-let extract_single_letter_sufix s len =
+let extract_single_letter_suffix s len =
   let last = String.sub s (len - 1) 1 in
   match last with
   | "f" | "F" -> Some (String.sub s 0 (len - 1), last, Cil_types.FFloat)
@@ -155,14 +155,14 @@ let extract_suffix s =
   let len = String.length s in
   if len = 0 then Some (s, "", Cil_types.FDouble)
   else if len <= 3 then
-    extract_single_letter_sufix s len
+    extract_single_letter_suffix s len
   else
     (* look for a 3-letter suffix, then for a 1-letter suffix *)
     let last3 = String.sub s (len - 3) 3 in
     match last3 with
     | "f32" | "F32" -> Some (String.sub s 0 (len - 3), last3, Cil_types.FFloat32)
     | "f64" | "F64" -> Some (String.sub s 0 (len - 3), last3, Cil_types.FFloat64)
-    | _             -> extract_single_letter_sufix s len
+    | _             -> extract_single_letter_suffix s len
 
 type format = Single | Double
 

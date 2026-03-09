@@ -1710,7 +1710,7 @@ postfix_attr:
 | postfix_attr LBRACKET attr RBRACKET { make_expr $sloc (INDEX ($1, $3)) }
 ;
 
-/*(* Since in attributes we use both IDENT and NAMED_TYPE as indentifiers,
+/*(* Since in attributes we use both IDENT and NAMED_TYPE as identifiers,
  * that leads to conflicts for SIZEOF and ALIGNOF. In those cases we require
  * that their arguments be expressions, not attributes *)*/
 unary_attr:

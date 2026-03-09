@@ -14,7 +14,7 @@
 (** Efficient maps from hash-consed trees to values, implemented as
     Patricia trees. *)
 
-(** If set to [true], prints debug informations about hptmap.
+(** If set to [true], prints debug information about hptmaps.
     @since Frama-C+dev
 *)
 val set_debug: bool -> unit

@@ -3152,7 +3152,7 @@ o* Makefile   [2012-02-09] 'make doc' did not work when GUI disabled
 -* Value      [2012-02-07] Allocate a finite space for malloc builtins; fixes
               some bugs when a pointer refers to a non-yet allocated space.
 -* Journal    [2012-02-07] Fixed bug #!1080: better generated journal
-              in case of missing internal data preventing it of being runable.
+              in case of missing internal data preventing it of being runnable.
 o* Makefile   [2012-02-07] Fixed bug #1082 about wrong link in
               generated code documentation.
 -  Scope      [2012-02-04] Improve precision of Defs computation (wish #1079).

@@ -1135,7 +1135,7 @@ module RegisterAttributes =
          separated by colons, for example 'attr1:name:print:ignore,\
          attr2:default'. The possible setting values are:\n\
          - 'default': to register an attribute with default settings. If the \
-         attribute is already registred, we use its registered settings \
+         attribute is already registered, we use its registered settings \
          instead.\n\
          - 'name', 'type', 'funtype', 'stmt' or 'unknown': class of the \
          attribute that specifies on which AST node the attribute should be \

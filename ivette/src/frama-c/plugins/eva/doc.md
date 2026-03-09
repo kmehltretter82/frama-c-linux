@@ -255,7 +255,7 @@ The following elements are shown for each variable and each type of access:
 * [led-warning]: variable or access is maybe protected
 * [led-negative]: variable or access is unprotected
 * [icon-multicheck]: the click will select all associated markers
-* [icon-table]: diplayed only for array. When clicked, only this table will be displayed,
+* [icon-table]: displayed only for arrays. When clicked, only this table will be displayed,
   followed by all its zones (the other filters still apply).
 
 Mutexes are displayed as buttons, when clicked, all associated markers are selected.

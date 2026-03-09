@@ -373,7 +373,7 @@ Options taking a string as argument should preferably be written
                     'attr1:name:print:ignore,attr2:default'. The possible
                     setting values are:
                     - 'default': to register an attribute with default
-                    settings. If the attribute is already registred, we use
+                    settings. If the attribute is already registered, we use
                     its registered settings instead.
                     - 'name', 'type', 'funtype', 'stmt' or 'unknown': class
                     of the attribute that specifies on which AST node the

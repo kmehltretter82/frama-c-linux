@@ -228,7 +228,7 @@ module Make_based_on_map_with_product (M : Based_on_map_with_product) :
 
 (** {3 Monadic iterators signature}
 
-    Handling the interaction beween monads and iterable data structures
+    Handling the interaction between monads and iterable data structures
     like lists can be difficult. On the other hand, all iterators
     concerning a monad over an iterable have the same signature, thus
     we provide a generic signature for all three standard iterators.

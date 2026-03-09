@@ -427,7 +427,7 @@ let ereal fval = inject_no_deps Cil_const.doubleType (Cvalue.V.inject_float fval
 let efloat fval = inject_no_deps Cil_const.floatType (Cvalue.V.inject_float fval)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Utilitary functions on the Cil AST                                 --- *)
+(* --- Utility functions on the Cil AST                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
 let is_rel_binop = function

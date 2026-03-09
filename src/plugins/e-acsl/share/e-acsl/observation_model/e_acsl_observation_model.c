@@ -19,7 +19,7 @@
 
 /**
  * Check if the memory location represented by `ptr1..ptr1+size1` is separated
- * with the memory locatin represented by `ptr2..ptr2+size2`.
+ * with the memory location represented by `ptr2..ptr2+size2`.
  *
  * \return A non-zero value if the two memory locations are separated, zero
  * otherwise.

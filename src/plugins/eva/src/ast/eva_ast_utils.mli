@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Utilitary functions on the Eva AST of lvalues and expressions. *)
+(** Utility functions on the Eva AST of lvalues and expressions. *)
 
 open Eva_ast_types
 

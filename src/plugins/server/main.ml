@@ -142,7 +142,7 @@ let pp_response pp fmt (r : _ response) =
 let pp_running pp fmt = function
   | Idle -> Format.pp_print_string fmt "Idle"
   | CmdLine -> Format.pp_print_string fmt "CmdLine"
-  | ExecRequest { id } -> Format.fprintf fmt "ExectRequest [%a]" pp id
+  | ExecRequest { id } -> Format.fprintf fmt "ExecRequest [%a]" pp id
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request Handling                                                   --- *)

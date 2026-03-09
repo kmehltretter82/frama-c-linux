@@ -512,7 +512,7 @@ struct
      removing those that are not really concurrent (using
      [concurrent_accesses_sets] above) *)
   let concurrent_accesses_two_threads th1 th2 =
-    Mt_self.debug ~level:2 "Concurrent accessses in threads %a and %a"
+    Mt_self.debug ~level:2 "Concurrent accesses in threads %a and %a"
       ThreadState.pretty th1 ThreadState.pretty th2;
     let consider = consider_vars_accesses th1 th2 in
     (* not a global cache: we have a dependency on [Thread.one_creates_other],

@@ -188,8 +188,8 @@ The importation semantics is given by the following rules:
     The ACSL loop annotations refer to the loop statement itself,  whereas
     ACSL code annotations and statement contracts refer to the loop body.
   \item \verb|at loop stmt <i>| as previous, but denotes always the loop stmt
-    (notice that this statement never includes the inializer part of \verb|for|
-    loops),
+    (notice that this statement never includes the initializer part of
+    \verb|for| loops),
   \item \verb|at loop body <i>| as previous, but denotes always the loop stmt
     (notice that this statement never includes the increment part of \verb|for|
     loops),
@@ -199,11 +199,11 @@ The importation semantics is given by the following rules:
   \item \verb|at indirect_call <i>| denotes the indirect call (via function pointer) of number \verb|i|,
     inside the current function, counting from the top of the definition
     of the function and starting from $1$.
-    To refers all indirect calls from the current function, do not give a value \verb|i|.
+    To refer to all indirect calls from the current function, do not give a value \verb|i|.
   \item \verb|at call <fun_name> <i>| denotes the direct call to the function \verb|fun_name| of number \verb|i|,
     inside the current function, counting from the top of the definition
     of the function and starting from $1$.
-    To refers all direct calls to  \verb|fun_name| from the current function, do not give a value \verb|i|.
+    To refer to all direct calls to  \verb|fun_name| from the current function, do not give a value \verb|i|.
   \item \verb|at call <i>| denotes the direct call of number \verb|i|,
     inside the current function, counting from the top of the definition
     of the function and starting from $1$.

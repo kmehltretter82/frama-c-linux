@@ -27,7 +27,7 @@ import { TitleBar } from 'ivette';
 import * as Preferences from 'ivette/prefs';
 
 // -----------------------------------------------------------------------------
-//  Utilitary types and functions
+//  Utility types and functions
 // -----------------------------------------------------------------------------
 
 // An alias type for functions and locations.

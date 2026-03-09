@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Utilitary functions on the {!Eva.Froms.Memory.t} type. *)
+(** Utility functions on the {!Eva.Froms.Memory.t} type. *)
 
 type t = Eva.Assigns.Memory.t
 

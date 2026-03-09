@@ -425,7 +425,7 @@ let () =
   let get_indent = R.param_opt printSequent ~name:"indent"
       ~descr:(Md.plain "Number of indentation spaces") (module D.Jint) in
   let get_margin = R.param_opt printSequent ~name:"margin"
-      ~descr:(Md.plain "Maximial text width") (module D.Jint) in
+      ~descr:(Md.plain "Maximal text width") (module D.Jint) in
   let get_iformat = R.param_opt printSequent ~name:"iformat"
       ~descr:(Md.plain "Integer constants format") iformat in
   let get_rformat = R.param_opt printSequent ~name:"rformat"

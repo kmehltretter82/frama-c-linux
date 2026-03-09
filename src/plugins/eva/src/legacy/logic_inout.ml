@@ -301,7 +301,7 @@ let verify_assigns kf ~pre froms =
   check_fct_assigns kf ab ~pre_state:pre froms
 
 (* -------------------------------------------------------------------------- *)
-(* --- Utilitary function for Inout and From plugins                      --- *)
+(* --- Utility function for Inout and From plugins                      --- *)
 (* -------------------------------------------------------------------------- *)
 
 let compute_all_callers kf =

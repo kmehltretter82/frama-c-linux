@@ -19,6 +19,7 @@ typs = "typs"
 [default.extend-words]
 ABD = "ABD" # text that does not match regex "ABC"
 ABL = "ABL" # 'L' suffix for a hexadecimal constant finishing in 'AB'
+aloc = "aloc" # variable name, related to locations
 Aspec = "Aspec" # constructor (A spec)
 Cose = "Cose" # as in CoSE layout, in cytoscape
 Cristal = "Cristal" # old INRIA research team
@@ -42,12 +43,16 @@ WRONLY = "WRONLY" # O_WRONLY (write-only)
 Wonce = "Wonce" # Warn-once constructor
 atend = "atend" # "at end", present in PS files
 ba = "ba"
+bimap = "bimap" # data structure used in E-ACSL
 bitcase = "bitcase"
 breal = "breal"
 caf = "caf" # code annotation filter
 clen = "clen" # variable name (c len)
+cmo = "cmo" # OCaml compiler extension
 configl = "configl" # print_configl, l for "list"
+controllen = "controllen" # part of msg_controllen, field in libc's socket.h
 cose = "cose" # as in CoSE layout, in cytoscape
+cpy = "cpy" # variable name
 datas = "datas" # has too many occurrences to be fixed
 divde = "divde" # from __builtin_divde, for doubleword extended division
 elemt = "elemt" # variable name
@@ -63,6 +68,7 @@ inouts = "inouts"
 ist = "ist" # LaTeX-related extension
 iterm = "iterm"
 iy = "iy" # short variable name
+iz = "iz" # variable name
 lene = "lene" # variable name (l ene)
 lok = "lok" # variable name (l ok)
 marger = "marger" # something that "creates a margin" in OCaml Format?
@@ -76,6 +82,7 @@ ot = "ot" # short variable name
 padds = "padds" # paddings
 parm = "parm" # abbr. of parameter
 parms = "parms" # abbr. of parameters
+pathc = "pathc" # field name in libc's glob.h
 permut = "permut"
 projet = "projet" # appears in "projet Cristal", Inria header in several files
 ptd = "ptd" # part of identifier (pointed)
@@ -84,8 +91,11 @@ raison = "raison" # in "raison d'être", a posh phrase
 rela = "rela" # function name
 sav = "sav" # 3-letter extension for save files
 scatch = "scatch" # variable name
+scond = "scond" # variable name in WP
+secur = "secur" # part of macro names in libc's netinet/ip.h
 seh = "seh" # variable name
 selt = "selt" # variable name (stack element)
+servent = "servent" # struct name in libc's netdb.h
 siz = "siz" # variable name (for 'size')
 strat = "strat" # in file name
 tabl = "tabl" # variable name
@@ -108,6 +118,7 @@ uiu = "uiu" # variable name
 undet = "undet" # variable name for a non-deterministic value
 unio = "unio" # variable name for a union
 varity = "varity" # related to variadic arguments
+zerod = "zerod" # variable name (zero with type double)
 
 [files]
 extend-exclude = [
@@ -152,6 +163,7 @@ extend-exclude = [
 "src/plugins/eva/tests/idct/idct.c",
 "src/plugins/eva/tests/idct/idct.c",
 "src/plugins/eva/tests/idct/ieee_1180_1990.c",
+"src/plugins/eva/tests/value/builtins_split.c",
 "src/plugins/eva/tests/value/CruiseControl.c",
 "src/plugins/eva/tests/value/CruiseControl.h",
 "src/plugins/eva/tests/value/shift.i",

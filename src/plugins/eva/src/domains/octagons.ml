@@ -434,7 +434,7 @@ module Rewriting = struct
     let make_octagons_from_binop kind e1 op e2 ival =
       (* equivalent octagonal forms ±(X±Y-v) for [e1 op e2]. *)
       let rewritings = rewrite_binop evaluate env e1 op e2 in
-      (* create the final octagon, knowning that [e1 op e2] ∈ [ival]. *)
+      (* create the final octagon, knowing that [e1 op e2] ∈ [ival]. *)
       let make_octagon (sign, octagon) =
         let ival = if sign then ival else Arith.neg ival in
         let value = Arith.add kind ival octagon.value in
