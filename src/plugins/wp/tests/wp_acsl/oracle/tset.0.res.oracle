@@ -5,6 +5,13 @@
   Global
 ------------------------------------------------------------
 
+Goal Lemma 'INTER_EMPTY':
+Assume Lemmas: 'INTER_RANGE' 'INTER_EQ' 'UNION_DESCR' 'UNION_RANGE'
+  'UNION_LIFT' 'UNION_EQ'
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Lemma 'INTER_EQ':
 Assume Lemmas: 'UNION_DESCR' 'UNION_RANGE' 'UNION_LIFT' 'UNION_EQ'
 Let a = singleton(y).

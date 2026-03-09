@@ -27,4 +27,7 @@
   lemma INTER_RANGE:
   \forall integer k,n ; 0 <= k <= n ==>
   \inter( (0..(k+1)) , k, ((k-1)..n) ) == (k..k) ;
+
+  lemma INTER_EMPTY:
+  \inter() == \empty;
  */
