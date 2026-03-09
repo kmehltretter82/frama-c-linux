@@ -1,6 +1,6 @@
 let check ty =
   let vis = object
-    inherit Cil.nopCilVisitor
+    inherit Cil.copyCilVisitor
     method! vattr (a,_) =
       if a = "const" then begin
         let error =
@@ -8,10 +8,11 @@ let check ty =
             Cil_printer.pp_typ ty
         in
         failwith error
-      end else Cil.SkipChildren
+      end else Cil.DoChildren
   end
   in
-  ignore (Cil.visitCilType vis ty)
+  let ty' = Cil.visitCilType vis ty in
+  Format.printf "@[<v>%a@;%a@;@;@]" Cil_printer.pp_typ ty Cil_printer.pp_typ ty'
 
 let test ty = check (Ast_types.remove_qualifiers_deep ty)
 

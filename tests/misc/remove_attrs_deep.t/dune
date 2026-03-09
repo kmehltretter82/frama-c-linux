@@ -1,6 +1,0 @@
-(executable
- (public_name remove-attrs-deep)
- (name remove_attrs_deep)
- (flags -open Frama_c_kernel :standard)
- (libraries frama-c.kernel)
-)

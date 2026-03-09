@@ -1,4 +1,0 @@
-(lang dune 3.13)
-(using dune_site 0.1)
-(name remove-attrs-deep)
-(package (name remove-attrs-deep))

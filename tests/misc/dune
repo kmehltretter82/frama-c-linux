@@ -68,7 +68,7 @@
 )
 
 (tests
- (names coherent_compare_hash_types string_literal)
+ (names coherent_compare_hash_types remove_attrs_deep string_literal)
  (deps (package frama-c))
  (libraries frama-c.init frama-c.kernel)
  (flags :standard -open Frama_c_kernel))
