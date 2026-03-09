@@ -825,8 +825,8 @@ struct
       then Lset [] else Vset []
     | v::vs ->
       let s = List.fold_left Vset.inter v vs in
-      let t = Lang.tau_of_ltype t in
-      Vset [Vset.Set(t,s)]
+      let te = Logic_utils.type_of_set_elem t in
+      Vset [Vset.Set(Lang.tau_of_ltype te,s)]
 
   (* -------------------------------------------------------------------------- *)
   (* --- Sloc to Rloc                                                       --- *)
