@@ -17,7 +17,12 @@ module H = Datatype.String.Hashtbl
 let tbl = H.create 7
 let globals = H.create 7
 
-let get ~scope s =
+let sanitize =
+  let trimmed_chars = Str.regexp "\\" in
+  fun n -> Str.global_replace trimmed_chars "" n
+
+let get ~scope name =
+  let s = sanitize name in
   let _, u =
     Extlib.make_unique_name
       (fun s -> H.mem tbl s || H.mem globals s)
