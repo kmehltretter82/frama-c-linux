@@ -137,7 +137,13 @@ let dkey_print_builtins = register_category "printer:builtins"
 
 let dkey_print_logic_coercions = register_category "printer:logic-coercions"
 
-let dkey_print_logic_types = register_category "printer:logic-types"
+let dkey_print_logic_types =
+  register_category "printer:types:logic"
+    ~help:"annotate each logic term with its type"
+
+let dkey_print_c_types =
+  register_category "printer:types:c"
+    ~help:"annotate each Cil expression with its type"
 
 let dkey_print_imported_modules = register_category "printer:imported-modules"
 
