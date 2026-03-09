@@ -29,6 +29,7 @@
   (flags -noassert)))
 
 (library
+ (optional)
  (name Region)
  (public_name frama-c-region.core)
  (flags -open Frama_c_kernel :standard -w -9)
