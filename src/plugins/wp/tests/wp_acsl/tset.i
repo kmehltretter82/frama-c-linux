@@ -20,4 +20,11 @@
   \forall integer n;
   { n-x | integer x; \subset(x,(0..n)) } == (0..n) ;
 
+  lemma INTER_EQ:
+  \forall integer x,y ;
+  (\inter(x,x) == \inter(y,y)) <==> (x==y) ;
+
+  lemma INTER_RANGE:
+  \forall integer k,n ; 0 <= k <= n ==>
+  \inter( (0..(k+1)) , k, ((k-1)..n) ) == (k..k) ;
  */
