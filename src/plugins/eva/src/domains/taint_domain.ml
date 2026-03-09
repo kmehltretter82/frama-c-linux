@@ -427,13 +427,14 @@ module TransferSingleTaint = struct
     let data_tainted = Zone.intersects state.locs_data exp_deps.data in
     (* [lval] becomes control-tainted if:
        - the assignment is in a tainted scope;
-       - the value of [exp] is control-tainted;
        - the [lval] location depends on tainted values;
-       - the [exp] location depends on tainted values. *)
+       - the value of [exp] is control-tainted;
+       - the address of a location read to compute the value of [exp] depends on
+         tainted values. *)
     let ctrl_tainted =
       is_in_tainted_scope state
-      || Zone.intersects state.locs_control (Deps.to_zone exp_deps)
       || LatticeSingleTaint.intersects state lv_indirect
+      || Zone.intersects state.locs_control exp_deps.data
       || LatticeSingleTaint.intersects state exp_deps.indirect
     in
     if is_private_namespace namespace
