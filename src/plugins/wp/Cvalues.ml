@@ -821,12 +821,12 @@ struct
   let inter t vs =
     match List.map (fun v -> Vset.concretize (vset v)) vs with
     | [] ->
-      if Logic_utils.is_pointer_type t
+      if Logic_utils.is_pointer_type @@ Logic_utils.type_of_set_elem t
       then Lset [] else Vset []
     | v::vs ->
       let s = List.fold_left Vset.inter v vs in
-      let t = Lang.tau_of_ltype t in
-      Vset [Vset.Set(t,s)]
+      let te = Logic_utils.type_of_set_elem t in
+      Vset [Vset.Set(Lang.tau_of_ltype te,s)]
 
   (* -------------------------------------------------------------------------- *)
   (* --- Sloc to Rloc                                                       --- *)

@@ -73,7 +73,16 @@ Prove: !mem(0, L_Set3).
 
 ------------------------------------------------------------
 
-Goal Check Lemma 'test':
+Goal Check Lemma 'test_inter':
+Let a_1 = inter(a, inter(b, c)).
+Let a_2 = inter(a, c).
+Assume { Have: (b = a) \/ (c = b). }
+Prove: (forall i : Z. (mem(i, a_1) -> mem(i, a_2))) /\
+    (forall i : Z. (mem(i, a_2) -> mem(i, a_1))).
+
+------------------------------------------------------------
+
+Goal Check Lemma 'test_union':
 Assume { Have: (b = a) \/ (c = b). Have: mem(i, b). }
 Prove: mem(i, a) \/ mem(i, c).
 
