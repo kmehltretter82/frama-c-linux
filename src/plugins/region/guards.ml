@@ -590,7 +590,7 @@ let set_annotated kf =
     end
 
 let annotate kf =
-  if Kernel_function.has_definition kf && not @@ is_annotated kf then
+  if Kernel_function.has_definition kf && not (is_annotated kf) then
     begin
       let map = Analysis.get kf in
       Options.feedback "annotating function %a" Kernel_function.pretty kf ;

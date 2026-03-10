@@ -1,0 +1,2 @@
+PLUGIN: region
+OPT: -region-rte -region-force -rte -then -print
