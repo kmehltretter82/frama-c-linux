@@ -29,9 +29,9 @@ let tarr_ptr = Cil_builder.Type.array tptr
 
 let tptr_ptr = Cil_builder.Type.(ptr (const tptr))
 
-let tfun = Cil_builder.Type.proto tptr_ptr ["x",tptr_arr,[]] false
+let tfun = Cil_builder.Type.(proto tptr_ptr ArgList.["x",tptr_arr,[]])
 
-let tfun2 = Cil_builder.Type.proto tptr [("x", tptr, []); ("y", tptr_ptr, [])] false
+let tfun2 = Cil_builder.Type.(proto tptr ArgList.[("x", tptr, []); ("y", tptr_ptr, [])])
 
 let () =
   List.iter test
