@@ -54,17 +54,16 @@ let pretty fmt w =
 open Cil_types
 
 let addrof ~loc lv =
-  let ptr = Cil_const.mk_tptr @@ Cil.typeOfLval lv in
+  let ty = Cil.typeOfLval lv in
   let lv = Logic_utils.lval_to_term_lval lv in
-  Logic_const.term ~loc (TAddrOf lv) (Ctype ptr)
+  Logic_utils.mk_logic_AddrOf ~loc lv (Ctype ty)
 
 let is_local v =
   not (v.vglob || v.vformal)
 
 let is_initialized v =
   v.vglob || v.vdefined ||
-  ((v.vformal || v.vtemp) &&
-   not (Ast_types.is_struct_or_union v.vtype))
+  ((v.vformal || v.vtemp) && not (Ast_types.is_struct_or_union v.vtype))
 
 let is_const v =
   (v.vformal || v.vglob || v.vdefined) &&
