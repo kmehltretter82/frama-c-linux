@@ -164,6 +164,28 @@ prepare-wp-cache:
       - ./nix/wp-cache.nix
 
 ################################################################################
+### LINT
+
+.build_template: &lint_template
+  script:
+    - ./nix/shell-checkers.sh "make -f share/Makefile.linting check-lint LINTCK_EXTRA=-s"
+    - ./nix/shell-checkers.sh "typos --config=dev/_typos.toml"
+
+.build_template: &headers_template
+  script:
+    - ./nix/shell-checkers.sh "make -f share/Makefile.headers check-headers"
+
+check-lint:
+  stage: build
+  allow_failure: true
+  <<: *lint_template
+
+check-headers:
+  stage: build
+  allow_failure: true
+  <<: *headers_template
+
+################################################################################
 ### BUILD
 
 frama-c:
@@ -425,18 +447,15 @@ coverage:
 
 # Check files header
 
-header-check:
+assert-headers:
   stage: distrib
-  script:
-    - ./nix/shell-checkers.sh "make -f share/Makefile.headers check-headers"
+  <<: *headers_template
 
 # Lint files
 
-lint:
+assert-lint:
   stage: distrib
-  script:
-    - ./nix/shell-checkers.sh "make -f share/Makefile.linting check-lint LINTCK_EXTRA=-s"
-    - ./nix/shell-checkers.sh "typos --config=dev/_typos.toml"
+  <<: *lint_template
 
 # Manuals
 
