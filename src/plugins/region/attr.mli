@@ -40,21 +40,21 @@ open Cil_types
 
 val cvar : varinfo -> flags
 
-(** Address of the (assignable) lval *)
 val addrof : loc:location -> lval -> term
+(** Address of the (assignable) lval *)
 
-(** Whether the address is readable wrt. [~from] attributes *)
 val readable :
   loc:location -> ?label:logic_label ->
   from:flags -> term -> predicate
+(** Whether the address is readable wrt. [~from] attributes *)
 
-(** Whether the address is writable wrt. [~from] attributes *)
 val writable :
   loc:location -> ?label:logic_label ->
   from:flags -> term -> predicate
+(** Whether the address is writable wrt. [~from] attributes *)
 
-(** Whether the address satisfying [~from] attributes
-    satisfies [~target] attributes. *)
 val requires :
   loc:location -> ?label:logic_label ->
   ?readonly:bool -> from:flags -> target:flags -> term -> predicate
+(** Whether the address satisfying [~from] attributes
+    satisfies [~target] attributes. *)
