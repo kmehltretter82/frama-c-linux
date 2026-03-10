@@ -41,7 +41,6 @@ int main(void)
   s1.u.c = (char)'a';
   s2.u = s1.u;
   __retres = 0;
-  /*@ assert rte: initialization: \initialized(&__retres); */
   return __retres;
 }
 

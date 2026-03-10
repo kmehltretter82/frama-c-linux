@@ -1140,6 +1140,9 @@ and stmtkind =
 
   | Return of exp option * location
   (** The return statement. This is a leaf in the CFG.
+      After {!Oneret} normalization, the optional expression should be either
+      [None] or [Some ({ enode = Lval (Var vi, NoOffset); _ })].
+
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | Goto of stmt ref * location

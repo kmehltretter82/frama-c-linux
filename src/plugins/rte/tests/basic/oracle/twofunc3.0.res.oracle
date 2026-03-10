@@ -17,9 +17,7 @@ int f(int x, int y)
     goto return_label;
   }
   __retres = 1;
-  return_label:
-  /*@ assert rte: initialization: \initialized(&__retres); */
-  return __retres;
+  return_label: return __retres;
 }
 
 int main(void)
@@ -64,9 +62,7 @@ int main(void)
       goto return_label;
     }
   __retres = 0;
-  return_label:
-  /*@ assert rte: initialization: \initialized(&__retres); */
-  return __retres;
+  return_label: return __retres;
 }
 
 
@@ -83,8 +79,6 @@ int main(void)
                 }
 [kernel] assert rte: signed_overflow: -2147483648 ≤ x + y;
 [kernel] assert rte: signed_overflow: x + y ≤ 2147483647;
-[kernel] For Statement return_label: return __retres;
-[kernel] assert rte: initialization: \initialized(&__retres);
 [kernel] Rte-generated annotations for function main
 [kernel] For Statement if (! (i < 20)) break;
 [kernel] assert rte: initialization: \initialized(&i);
@@ -121,5 +115,3 @@ int main(void)
 [kernel] For Statement tmp_0 = f(x,y);
 [kernel] assert rte: initialization: \initialized(&x);
 [kernel] assert rte: initialization: \initialized(&y);
-[kernel] For Statement return_label: return __retres;
-[kernel] assert rte: initialization: \initialized(&__retres);
