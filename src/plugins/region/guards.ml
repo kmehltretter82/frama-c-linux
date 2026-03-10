@@ -170,14 +170,11 @@ let add env ?(invalid=false) name guard =
   } in
   env.guards <- Gmap.add cond status env.guards
 
-let check env name g n a = function
-  | Condition.Default -> add env name g
-  | Residual { validregion ; condition } ->
-    if validregion then add env name (Valid_region(n,a)) ;
-    match condition with
-    | `True -> ()
-    | `False -> add env ~invalid:true name g
-    | `Non_null -> add env name (Non_null a)
+let check env name g a = function
+  | `True -> ()
+  | `False -> add env ~invalid:true name g
+  | `Non_null -> add env name (Non_null a)
+  | `Default -> add env name g
 
 let kind = function
   | LV lv -> Condition.lkind lv
@@ -197,27 +194,27 @@ let typeof = function
 
 let valid env n a =
   if not @@ RteGen.Generator.Mem_access.is_computed env.kf then
-    check env "mem_access" (Valid a) n a @@
+    check env "mem_access" (Valid a) a @@
     Condition.rvalid ~readonly:false env.here n (kind a)
 
 let valid_read env n a =
   if not @@ RteGen.Generator.Mem_access.is_computed env.kf then
     let residual = Condition.rvalid ~readonly:true env.here n (kind a) in
-    check env "mem_access" (Valid_read a) n a residual
+    check env "mem_access" (Valid_read a) a residual
 
 let valid_object env n a =
   if not @@ RteGen.Generator.Pointer_value.is_computed env.kf then
-    check env "pointer_value" (Valid_object a) n a @@
+    check env "pointer_value" (Valid_object a) a @@
     Condition.rvalid_object env.here n (kind a)
 
 let initialized env n a =
   if not @@ RteGen.Generator.Initialized.is_computed env.kf then
-    check env "initialized" (Initialized a) n a @@ Condition.rinitialized n (kind a)
+    check env "initialized" (Initialized a) a @@ Condition.rinitialized n (kind a)
 
 let aligned env n a =
   if not @@ RteGen.Generator.Pointer_alignment.is_computed env.kf then
     let bits = Fields.bitsSizeOf @@ typeof a in
-    check env "aligned" (Aligned a) n a @@ Condition.raligned n (kind a) ~bits
+    check env "aligned" (Aligned a) a @@ Condition.raligned n (kind a) ~bits
 
 let valid_region env n a =
   if (kind a).unsafe then add env "path" (Valid_region(n,a))
@@ -525,9 +522,8 @@ and residual env f p =
   let r = term_addr env p in
   let kd = Condition.term_kind p in
   match f r kd with
-  | Condition.Default -> ()
-  | Residual { validregion } ->
-    if validregion then valid_region env r (TADDR p)
+  | `Default -> ()
+  | _ -> valid_region env r (TADDR p)
 
 (* -------------------------------------------------------------------------- *)
 (* --- ACSL Annotations                                                   --- *)

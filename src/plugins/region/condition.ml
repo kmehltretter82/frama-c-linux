@@ -133,25 +133,13 @@ and safe_term_offset t = function
 (* --- Side Condition Generators                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-type residual =
-  | Default
-  | Residual of { validregion : bool ; condition : condition }
-and condition = [ `True | `False | `Non_null ]
+type residual = [ `Default | `True | `False | `Non_null ]
 
-let pp_condition fmt = function
+let pp_residual fmt = function
+  | `Default -> Format.pp_print_string fmt "default"
   | `True -> Format.pp_print_string fmt "true"
   | `False -> Format.pp_print_string fmt "false"
   | `Non_null -> Format.pp_print_string fmt "non-null"
-
-let pp_residual fmt = function
-  | Default -> Format.pp_print_string fmt "default"
-  | Residual { validregion ; condition } ->
-    if validregion then Format.pp_print_string fmt "residual && " ;
-    pp_condition fmt condition
-
-let condition ?(validregion=false) = function
-  | `Default -> Default
-  | #condition as condition -> Residual { validregion ; condition }
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Valid / ValidRead                                                 --- *)
@@ -170,16 +158,14 @@ let allocated kinstr v =
     | Kstmt stmt -> if in_scope v stmt then `True else `False
 
 let rvalid ~readonly kinstr node kd =
-  if kd.unsafe then Default
+  if kd.unsafe then `Default
   else
     match kd.host with
     | Some v ->
-      condition @@
       if not readonly && Attr.is_const v
       then `False
       else allocated kinstr v
     | _ ->
-      condition ~validregion:true @@
       let flags = Memory.flags node in
       if not readonly && Attr.mem `Readonly flags then `False
       else
@@ -187,12 +173,11 @@ let rvalid ~readonly kinstr node kd =
       if Attr.mem `Nullable flags then `Non_null else `True
 
 let rvalid_object kinstr node kd =
-  if kd.unsafe then Default
+  if kd.unsafe then `Default
   else
     match kd.host with
-    | Some v -> condition @@ allocated kinstr v
+    | Some v -> allocated kinstr v
     | _ ->
-      condition ~validregion:true @@
       let flags = Memory.flags node in
       if Attr.mem `Dynamic flags then `Default else
       if Attr.mem `Nullable flags then `Non_null else `True
@@ -203,24 +188,20 @@ let rvalid_object kinstr node kd =
 
 let rinitialized node kd =
   match kd.host with
-  | Some v -> condition @@ if Attr.is_initialized v then `True else `Default
+  | Some v -> if Attr.is_initialized v then `True else `Default
   | None ->
-    condition ~validregion:true @@
     let flags = Memory.flags node in
     if Attr.mem `Garbage flags || Attr.mem `Dynamic flags
-    then `Default
-    else if Attr.mem `Nullable flags then `Non_null else `True
+    then `Default else `True
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Aligned                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
 let raligned node kd ~bits =
-  if kd.unsafe then Default else
+  if kd.unsafe then `Default else
     match kd.host with
-    | Some _ -> Residual { validregion = false ; condition = `True }
-    | None ->
-      condition ~validregion:true @@
-      if Memory.size node mod bits = 0 then `True else `Default
+    | Some _ -> `True
+    | None -> if Memory.size node mod bits = 0 then `True else `Default
 
 (* -------------------------------------------------------------------------- *)

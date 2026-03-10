@@ -5,4 +5,5 @@
   OPT: -region-no-force -region-annotate -then -rte -then -print
 */
 
+/*@ region *p, \nullable; */
 int access(int *p) { return *p; }

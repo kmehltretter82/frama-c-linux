@@ -65,17 +65,9 @@ val default_kind : lkind
 (* -------------------------------------------------------------------------- *)
 
 (** The residual conditions are computed by assuming that all inner
-    sub-expresisions or l-values are correct.
+    sub-expresisions or l-values are correct. *)
 
-    If a residual condition flag [validregion] is set, the original l-value
-    shall be checked to be a valid path in the memory map.
-    Otherwize, the residual condition is always applicable.
-*)
-
-type residual =
-  | Default
-  | Residual of { validregion : bool ; condition : condition }
-and condition = [ `True | `False | `Non_null ]
+type residual = [ `Default | `True | `False | `Non_null ]
 
 val rvalid : readonly:bool -> kinstr -> Memory.node -> lkind -> residual
 val rvalid_object : kinstr -> Memory.node -> lkind -> residual
@@ -85,7 +77,6 @@ val raligned : Memory.node -> lkind -> bits:int -> residual
 (* -------------------------------------------------------------------------- *)
 
 val pp_kind : Format.formatter -> lkind -> unit
-val pp_condition : Format.formatter -> condition -> unit
 val pp_residual : Format.formatter -> residual -> unit
 
 (* -------------------------------------------------------------------------- *)
