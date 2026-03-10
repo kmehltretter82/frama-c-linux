@@ -85,11 +85,14 @@ let rec pp_condition fmt = function
     Format.fprintf fmt "\\at(%a,%a)" pp_condition p Printer.pp_logic_label l
   | Guard g -> pp_guard fmt g
 
-module Guards = Map.Make
+module Names = Datatype.String.Set
+module Gmap = Map.Make
     (struct
       type t = condition
       let compare = compare_condition
     end)
+
+type status = { invalid : bool ; names : Names.t }
 
 let of_value = function
   | T t -> t
@@ -134,36 +137,47 @@ let of_condition ?loc ?(names=[]) p =
 (* -------------------------------------------------------------------------- *)
 
 type env = {
+  kf: kernel_function;
   map: Memory.map ;
   mutable here: kinstr ;
   mutable context: (guard -> condition) ;
-  mutable guards: bool Guards.t ;
+  mutable guards: status Gmap.t ;
 }
 
-let root g = Guard g
-
-let create ?stmt map =
+let create kf ?stmt map =
   let here = match stmt with None -> Kglobal | Some stmt -> Kstmt stmt in
   {
-    map ; here ;
-    context = root ;
-    guards = Guards.empty ;
+    kf ; map ; here ;
+    context = (fun g -> Guard g) ;
+    guards = Gmap.empty ;
   }
 
-let iter f env = Guards.iter (fun g valid -> f g ~invalid:(not valid)) env.guards
+let iter f env =
+  Gmap.iter
+    (fun condition { names ; invalid } ->
+       let names = Names.elements names in
+       f ~names ~invalid condition
+    ) env.guards
 
-let add env ?(valid=true) guard =
+let add env ?(invalid=false) name guard =
   let cond = env.context guard in
-  env.guards <- Guards.add cond valid env.guards
+  let status =
+    try Gmap.find cond env.guards
+    with Not_found -> { invalid = false ; names = Names.empty } in
+  let status = {
+    invalid = invalid || status.invalid ;
+    names = Names.add name status.names ;
+  } in
+  env.guards <- Gmap.add cond status env.guards
 
-let check env g n a = function
-  | Condition.Default -> add env g
+let check env name g n a = function
+  | Condition.Default -> add env name g
   | Residual { validregion ; condition } ->
-    if validregion then add env (Valid_region(n,a)) ;
+    if validregion then add env name (Valid_region(n,a)) ;
     match condition with
     | `True -> ()
-    | `False -> add env ~valid:false g
-    | `Non_null -> add env (Non_null a)
+    | `False -> add env ~invalid:true name g
+    | `Non_null -> add env name (Non_null a)
 
 let kind = function
   | LV lv -> Condition.lkind lv
@@ -182,26 +196,31 @@ let typeof = function
 (* -------------------------------------------------------------------------- *)
 
 let valid env n a =
-  check env (Valid a) n a @@
-  Condition.rvalid ~readonly:false env.here n (kind a)
+  if not @@ RteGen.Generator.Mem_access.is_computed env.kf then
+    check env "mem_access" (Valid a) n a @@
+    Condition.rvalid ~readonly:false env.here n (kind a)
 
 let valid_read env n a =
-  check env (Valid_read a) n a @@
-  Condition.rvalid ~readonly:true env.here n (kind a)
+  if not @@ RteGen.Generator.Mem_access.is_computed env.kf then
+    let residual = Condition.rvalid ~readonly:true env.here n (kind a) in
+    check env "mem_access" (Valid_read a) n a residual
 
 let valid_object env n a =
-  check env (Valid_read a) n a @@
-  Condition.rvalid_object env.here n (kind a)
+  if not @@ RteGen.Generator.Pointer_value.is_computed env.kf then
+    check env "pointer_value" (Valid_object a) n a @@
+    Condition.rvalid_object env.here n (kind a)
 
 let valid_region env n a =
-  if (kind a).unsafe then add env (Valid_region(n,a))
+  if (kind a).unsafe then add env "path" (Valid_region(n,a))
 
 let initialized env n a =
-  check env (Valid_read a) n a @@ Condition.rinitialized n (kind a)
+  if not @@ RteGen.Generator.Initialized.is_computed env.kf then
+    check env "initialized" (Initialized a) n a @@ Condition.rinitialized n (kind a)
 
 let aligned env n a =
-  let bits = Fields.bitsSizeOf @@ typeof a in
-  check env (Valid_read a) n a @@ Condition.raligned n (kind a) ~bits
+  if not @@ RteGen.Generator.Pointer_alignment.is_computed env.kf then
+    let bits = Fields.bitsSizeOf @@ typeof a in
+    check env "aligned" (Aligned a) n a @@ Condition.raligned n (kind a) ~bits
 
 let readable env n a =
   begin
@@ -248,7 +267,7 @@ and offset env t r = function
     begin
       if Kernel.SafeArrays.get () then
         let n = Ast_info.direct_array_size t in
-        add env (Bounds(E k,n))
+        add env "path" (Bounds(E k,n))
     end ;
     offset env te r o
 
@@ -386,7 +405,7 @@ and term_coffset env t r = function
     begin
       if Kernel.SafeArrays.get () then
         let n = Ast_info.direct_array_size t in
-        add env (Bounds(T k,n))
+        add env "path" (Bounds(T k,n))
     end ;
     term_coffset env te r o
   | TModel _ -> Options.not_yet_implemented "Model fields"
@@ -528,8 +547,8 @@ class visit env =
 (* --- Statement Annotations                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-let iter_stmt map f stmt =
-  let env = create ~stmt map in
+let guards kf map f stmt =
+  let env = create kf ~stmt map in
   if Options.Logic.get () then
     begin
       let visitor = new visit env in
@@ -556,11 +575,11 @@ let self =
           ~tuning:[] in
       em := Some e ; e
 
-let add_annotation ?kf ?emitter ?status ?(hyps=[]) stmt condition =
+let add_annotation ?kf ?emitter ?names ?status ?(hyps=[]) stmt condition =
   let loc = Cil_datatype.Stmt.loc stmt in
   let kind = if Options.Assert.get () then Cil_types.Assert else Check in
   let e = match emitter with Some e -> e | None -> self () in
-  let a = of_condition ~loc ~names:["Region"] condition in
+  let a = of_condition ~loc ?names condition in
   let a = Logic_const.toplevel_predicate ~kind a in
   let ca = Logic_const.new_code_annotation (AAssert ([],a)) in
   Annotations.add_code_annot e ?kf stmt ca ;
@@ -597,13 +616,14 @@ let annotate kf =
       let fd = Kernel_function.get_definition kf in
       List.iter
         (fun stmt ->
-           iter_stmt map
-             (fun condition ~invalid ->
+           guards kf map
+             (fun ~names ~invalid condition ->
+                let names = "region"::names in
                 let status =
                   if invalid then
                     Some Property_status.False_if_reachable
                   else None
-                in add_annotation ~kf ?status stmt condition
+                in add_annotation ~kf ~names ?status stmt condition
              ) stmt
         ) fd.sallstmts ;
       set_annotated kf ;

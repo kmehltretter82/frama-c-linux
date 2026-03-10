@@ -6,9 +6,9 @@ int access(int *p)
 {
   int __retres;
   /*@ assert rte: mem_access: \valid_read(p); */
-  /*@ check Region: \validregion(p, 4); */
+  /*@ check region: aligned: initialized: \validregion(p, 4); */
   __retres = *p;
-  /*@ check Region: \valid_read(&__retres); */
+  /*@ check region: initialized: \initialized(&__retres); */
   return __retres;
 }
 

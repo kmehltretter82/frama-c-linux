@@ -83,3 +83,9 @@ val rinitialized : Memory.node -> lkind -> residual
 val raligned : Memory.node -> lkind -> bits:int -> residual
 
 (* -------------------------------------------------------------------------- *)
+
+val pp_kind : Format.formatter -> lkind -> unit
+val pp_condition : Format.formatter -> condition -> unit
+val pp_residual : Format.formatter -> residual -> unit
+
+(* -------------------------------------------------------------------------- *)

@@ -46,8 +46,8 @@ val kind : addr -> Condition.lkind
 val typeof : addr -> typ (* of the pointed l-value *)
 
 type env
-val create : ?stmt:stmt -> map -> env
-val iter : (condition -> invalid:bool -> unit) -> env -> unit
+val create : kernel_function -> ?stmt:stmt -> map -> env
+val iter : (names:string list -> invalid:bool -> condition -> unit) -> env -> unit
 
 val valid : env -> node -> addr -> unit
 val valid_read : env -> node -> addr -> unit
@@ -71,11 +71,14 @@ val pred : env -> predicate -> unit
 
 class visit : env -> Visitor.frama_c_inplace
 
-val iter_stmt : map -> (condition -> invalid:bool -> unit) -> stmt -> unit
+val guards : kernel_function -> map ->
+  (names:string list -> invalid:bool -> condition -> unit) ->
+  stmt -> unit
 
 val add_annotation :
   ?kf:kernel_function ->
   ?emitter:Emitter.t ->
+  ?names:string list ->
   ?status:Property_status.emitted_status ->
   ?hyps:Property.t list ->
   stmt -> condition -> unit

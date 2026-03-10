@@ -70,13 +70,18 @@ type lkind = {
   unsafe : bool ;
 }
 
+let pp_kind fmt kd =
+  Format.pp_print_string fmt (if kd.unsafe then "unsafe" else "safe") ;
+  match kd.host with
+  | None -> Format.pp_print_string fmt "(*)"
+  | Some v -> Format.fprintf fmt "(%s)" v.vname
+
 let default_kind = { host = None ; unsafe = false }
 
 let rec kind e =
   match e.enode with
   | AddrOf lv | StartOf lv -> lkind lv
-  | BinOp((PlusPI|MinusPI),p,_,_) | CastE(_,p) ->
-    { (kind p) with unsafe = true }
+  | BinOp((PlusPI|MinusPI),p,_,_) | CastE(_,p) -> { (kind p) with unsafe = true }
   | _ -> default_kind
 
 and lkind (h,o) =
@@ -132,6 +137,17 @@ type residual =
   | Default
   | Residual of { validregion : bool ; condition : condition }
 and condition = [ `True | `False | `Non_null ]
+
+let pp_condition fmt = function
+  | `True -> Format.pp_print_string fmt "true"
+  | `False -> Format.pp_print_string fmt "false"
+  | `Non_null -> Format.pp_print_string fmt "non-null"
+
+let pp_residual fmt = function
+  | Default -> Format.pp_print_string fmt "default"
+  | Residual { validregion ; condition } ->
+    if validregion then Format.pp_print_string fmt "residual && " ;
+    pp_condition fmt condition
 
 let condition ?(validregion=false) = function
   | `Default -> Default

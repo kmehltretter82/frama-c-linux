@@ -5,10 +5,10 @@
 int access(int *p)
 {
   int __retres;
-  /*@ check Region: \validregion(p, 4); */
+  /*@ check region: aligned: initialized: mem_access: \validregion(p, 4); */
   /*@ assert rte: mem_access: \valid_read(p); */
   __retres = *p;
-  /*@ check Region: \valid_read(&__retres); */
+  /*@ check region: initialized: \initialized(&__retres); */
   return __retres;
 }
 
