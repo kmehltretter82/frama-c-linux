@@ -68,6 +68,7 @@ let pvalid_region ?loc ?names ?(label=Logic_const.here_label) addr =
 type lkind = {
   host : varinfo option ;
   unsafe : bool ;
+  aligned : bool ;
 }
 
 let pp_kind fmt kd =
@@ -76,7 +77,7 @@ let pp_kind fmt kd =
   | None -> Format.pp_print_string fmt "(*)"
   | Some v -> Format.fprintf fmt "(%s)" v.vname
 
-let default_kind = { host = None ; unsafe = false }
+let default_kind = { host = None ; unsafe = false ; aligned = true }
 
 let rec kind e =
   match e.enode with
@@ -105,8 +106,8 @@ and safe_offset t = function
 let rec term_kind t =
   match t.term_node with
   | TAddrOf lv | TStartOf lv -> term_lkind lv
-  | TBinOp((PlusPI|MinusPI),p,_) | TCast(_,_,p) ->
-    { (term_kind p) with unsafe = true }
+  | TBinOp((PlusPI|MinusPI),p,_) -> { (term_kind p) with unsafe = true }
+  | TCast(_,_,p) -> { (term_kind p) with unsafe = true ; aligned = false }
   | _ -> default_kind
 
 and term_lkind (h,o) =
@@ -169,7 +170,7 @@ let rvalid ~readonly kinstr node kd =
       let flags = Memory.flags node in
       if not readonly && Attr.mem `Readonly flags then `False
       else
-      if Attr.mem `Dynamic flags then `Default else
+      if Attr.mem `Allocated flags then `Default else
       if Attr.mem `Nullable flags then `Non_null else `True
 
 let rvalid_object kinstr node kd =
@@ -179,7 +180,7 @@ let rvalid_object kinstr node kd =
     | Some v -> allocated kinstr v
     | _ ->
       let flags = Memory.flags node in
-      if Attr.mem `Dynamic flags then `Default else
+      if Attr.mem `Allocated flags then `Default else
       if Attr.mem `Nullable flags then `Non_null else `True
 
 (* -------------------------------------------------------------------------- *)
@@ -191,17 +192,16 @@ let rinitialized node kd =
   | Some v -> if Attr.is_initialized v then `True else `Default
   | None ->
     let flags = Memory.flags node in
-    if Attr.mem `Garbage flags || Attr.mem `Dynamic flags
+    if Attr.mem `Garbage flags || Attr.mem `Allocated flags
     then `Default else `True
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Aligned                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let raligned node kd ~bits =
-  if kd.unsafe then `Default else
-    match kd.host with
-    | Some _ -> `True
-    | None -> if Memory.size node mod bits = 0 then `True else `Default
+let raligned node ~bits ?(default=true) kd =
+  if (default && kd.aligned) || (Memory.size node mod bits = 0)
+  then `True
+  else `Default
 
 (* -------------------------------------------------------------------------- *)

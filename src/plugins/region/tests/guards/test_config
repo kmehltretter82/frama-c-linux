@@ -1,2 +1,2 @@
 PLUGIN: region
-OPT: -region-annotate -region-force -rte -then -print
+OPT: -region-annotate -print

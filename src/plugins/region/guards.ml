@@ -509,7 +509,7 @@ and pred env p =
       match Ast_info.possible_value_of_integral_term s with
       | Some n when Z.fits_int n ->
         let bits = Z.to_int n * 8 in
-        residual env (Condition.raligned ~bits) p
+        residual env (Condition.raligned ~default:false ~bits) p
       | _ -> term_eval env p ; term_eval env s
     end
   | Papp(f,_,ts) -> ignore @@ Logic.call env.map f @@ List.map (term env) ts

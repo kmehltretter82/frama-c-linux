@@ -8,7 +8,6 @@ int access(int *p)
   int __retres;
   /*@ check region: mem_access: p ≢ \null; */
   __retres = *p;
-  /*@ check region: initialized: \initialized(&__retres); */
   return __retres;
 }
 

@@ -5,25 +5,25 @@
   R0003: -R-- i (int) 32b (singleton) ;
   R0004: -R-- j (int) 32b (singleton) ;
   R0005: -R-- k (int) 32b (singleton) ;
-  R0006: IR-- c (struct Complex *) 64b (*R0001) (singleton) (dynamic) ;
-  R0007: I--- p (double) 64b (singleton) (dynamic) ;
+  R0006: IR-- c (struct Complex *) 64b (*R0001) (singleton) (allocated) ;
+  R0007: I--- p (double) 64b (singleton) (allocated) ;
 [region] Function BornatFieldStyle:
   R0001: ---- X[12] 128b { .re: R0002; #64b; } ;
   R0002: -R-- (double) 64b ;
   R0003: -R-- i (int) 32b (singleton) ;
   R0004: -R-- j (int) 32b (singleton) ;
-  R0005: IR-- c (struct Complex *) 64b (*R0001) (singleton) (dynamic) ;
-  R0006: I--- p (double) 64b (singleton) (dynamic) ;
+  R0005: IR-- c (struct Complex *) 64b (*R0001) (singleton) (allocated) ;
+  R0006: I--- p (double) 64b (singleton) (allocated) ;
 [region] Function CompCertStyle:
   R0001: ---- X[12] 128b { .re: R0002; .im: R0002; } ;
   R0002: ---A A: 64b ;
   R0003: -R-- i (int) 32b (singleton) ;
   R0004: -R-- j (int) 32b (singleton) ;
   R0005: -R-- k (int) 32b (singleton) ;
-  R0006: I--- p (double *) 64b (*R0002) (singleton) (dynamic) ;
+  R0006: I--- p (double *) 64b (*R0002) (singleton) (allocated) ;
 [region] Function KrobbersStyle:
   R0001: ---- X[12] 128b { .re: R0002; #64b; } ;
   R0002: -R-- (double) 64b ;
   R0003: -R-- i (int) 32b (singleton) ;
   R0004: -R-- j (int) 32b (singleton) ;
-  R0005: I--- p (double) 64b (singleton) (dynamic) ;
+  R0005: I--- p (double) 64b (singleton) (allocated) ;

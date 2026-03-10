@@ -6,12 +6,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type attr = [ `Nullable | `Dynamic | `Garbage | `Readonly ]
+type attr = [ `Nullable | `Allocated | `Garbage | `Readonly ]
 type flags = A of int [@@ unboxed]
 
 let flag = function
   | `Nullable -> 0b0001
-  | `Dynamic  -> 0b0010
+  | `Allocated  -> 0b0010
   | `Garbage  -> 0b0100
   | `Readonly -> 0b1000
 
@@ -24,11 +24,11 @@ let subset (A x) (A y) = (x lor y) = y
 let iter f w =
   List.iter
     (fun a -> if mem a w then f a)
-    [ `Nullable ; `Dynamic ; `Garbage ; `Readonly ]
+    [ `Nullable ; `Allocated ; `Garbage ; `Readonly ]
 
 let pp_attr fmt = function
   | `Nullable -> Format.pp_print_string fmt "nullable"
-  | `Dynamic  -> Format.pp_print_string fmt "dynamic"
+  | `Allocated  -> Format.pp_print_string fmt "allocated"
   | `Garbage  -> Format.pp_print_string fmt "garbage"
   | `Readonly -> Format.pp_print_string fmt "readonly"
 
@@ -67,7 +67,7 @@ let is_const v =
 let cvar v =
   let flags = ref empty in
   let set f = flags := add f !flags in
-  if is_local v then set `Dynamic ;
+  if is_local v then set `Allocated ;
   if is_const v then set `Readonly ;
   if not @@ is_initialized v then set `Garbage ;
   !flags
@@ -80,7 +80,7 @@ let null_or_valid ~loc ~from addr =
     Logic_const.ptrue
 
 let readable ~loc ?(label=Logic_const.here_label) ~from addr =
-  if mem `Dynamic from then
+  if mem `Allocated from then
     Logic_const.pvalid_read ~loc (label, addr)
   else
     null_or_valid ~loc ~from addr
@@ -89,7 +89,7 @@ let writable ~loc ?(label=Logic_const.here_label) ~from addr =
   if mem `Readonly from then
     Logic_const.pfalse
   else
-  if mem `Dynamic from then
+  if mem `Allocated from then
     Logic_const.pvalid ~loc (label, addr)
   else
     null_or_valid ~loc ~from addr
@@ -106,7 +106,7 @@ let requires ~loc ?(label=Logic_const.here_label) ?(readonly=false) ~from ~targe
     else
       Logic_const.pinitialized ~loc (label,addr) in
   let allocated =
-    if mem `Dynamic target then
+    if mem `Allocated target then
       Logic_const.pimplies ~loc (valid,init)
     else
       Logic_const.pand ~loc (valid,init) in

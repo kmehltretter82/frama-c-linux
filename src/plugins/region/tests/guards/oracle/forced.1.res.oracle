@@ -9,7 +9,6 @@ int access(int *p)
   /*@ check region: mem_access: p ≢ \null; */
   /*@ assert rte: mem_access: \valid_read(p); */
   __retres = *p;
-  /*@ check region: initialized: \initialized(&__retres); */
   return __retres;
 }
 

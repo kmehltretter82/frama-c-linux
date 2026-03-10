@@ -48,6 +48,7 @@ val is_valid_region : logic_info -> bool
 type lkind = {
   host : varinfo option ;
   unsafe : bool ; (* cast or pointer arithmetics or unbounded array-index *)
+  aligned : bool ; (* no cast *)
 }
 
 val kind : exp -> lkind
@@ -72,7 +73,7 @@ type residual = [ `Default | `True | `False | `Non_null ]
 val rvalid : readonly:bool -> kinstr -> Memory.node -> lkind -> residual
 val rvalid_object : kinstr -> Memory.node -> lkind -> residual
 val rinitialized : Memory.node -> lkind -> residual
-val raligned : Memory.node -> lkind -> bits:int -> residual
+val raligned : Memory.node -> bits:int -> ?default:bool -> lkind -> residual
 
 (* -------------------------------------------------------------------------- *)
 
