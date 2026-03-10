@@ -46,7 +46,6 @@ int main(void)
   s2.u = s1.u;
   union empty e1 = e;
   __retres = 0;
-  /*@ assert rte: initialization: \initialized(&__retres); */
   return __retres;
 }
 
