@@ -25,8 +25,16 @@ module Analyze = Action
 
 module Annotate = Action
     (struct
-      let option_name = "-region-rte"
-      let help = "Generate RTE based on regions"
+      let option_name = "-region-annotate"
+      let help = "Generate Region and RTE checks"
+    end)
+
+let () = Parameter_customize.set_negative_option_name "-region-check"
+let () = Parameter_customize.set_negative_option_help "Generate ACSL 'check' annotations"
+module Assert = False
+    (struct
+      let option_name = "-region-assert"
+      let help = "Generate ACSL 'assert' annotations instead of checks"
     end)
 
 module Logic = False
@@ -40,12 +48,4 @@ module Force = False
     (struct
       let option_name = "-region-force"
       let help = "Force generation of annotations (debug only)"
-    end)
-
-let () = Parameter_customize.set_negative_option_name "-region-check"
-let () = Parameter_customize.set_negative_option_help "Generate ACSL 'check' annotations"
-module Assert = False
-    (struct
-      let option_name = "-region-assert"
-      let help = "Generate ACSL 'assert' annotations instead of checks"
     end)

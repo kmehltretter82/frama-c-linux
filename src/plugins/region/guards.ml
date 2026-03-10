@@ -210,9 +210,6 @@ let valid_object env n a =
     check env "pointer_value" (Valid_object a) n a @@
     Condition.rvalid_object env.here n (kind a)
 
-let valid_region env n a =
-  if (kind a).unsafe then add env "path" (Valid_region(n,a))
-
 let initialized env n a =
   if not @@ RteGen.Generator.Initialized.is_computed env.kf then
     check env "initialized" (Initialized a) n a @@ Condition.rinitialized n (kind a)
@@ -221,6 +218,9 @@ let aligned env n a =
   if not @@ RteGen.Generator.Pointer_alignment.is_computed env.kf then
     let bits = Fields.bitsSizeOf @@ typeof a in
     check env "aligned" (Aligned a) n a @@ Condition.raligned n (kind a) ~bits
+
+let valid_region env n a =
+  if (kind a).unsafe then add env "path" (Valid_region(n,a))
 
 let readable env n a =
   begin
@@ -594,39 +594,46 @@ let add_annotation ?kf ?emitter ?names ?status ?(hyps=[]) stmt condition =
 (* ---  Function Annotation                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let is_annotated kf =
-  not (Options.Force.get ())
-  && RteGen.Generator.Mem_access.is_computed kf
-  && RteGen.Generator.Pointer_alignment.is_computed kf
-  && RteGen.Generator.Pointer_value.is_computed kf
+module ValidRegion =
+  State_builder.Hashtbl(Kernel_function.Hashtbl)(Datatype.Unit)
+    (struct
+      let name = "Region.Guards.ValidRegion"
+      let dependencies = [Ast.self]
+      let size = 0
+    end)
+
+let is_annotated kf = ValidRegion.mem kf
 
 let set_annotated kf =
-  if not (Options.Force.get ()) then
-    begin
-      RteGen.Generator.Mem_access.set kf true ;
-      RteGen.Generator.Pointer_alignment.set kf true ;
-      RteGen.Generator.Pointer_value.set kf true ;
-    end
+  begin
+    ValidRegion.add kf () ;
+    RteGen.Generator.Mem_access.set kf true ;
+    RteGen.Generator.Pointer_alignment.set kf true ;
+    RteGen.Generator.Pointer_value.set kf true ;
+  end
 
-let annotate kf =
-  if Kernel_function.has_definition kf && not (is_annotated kf) then
-    begin
-      let map = Analysis.get kf in
-      Options.feedback "annotating function %a" Kernel_function.pretty kf ;
-      let fd = Kernel_function.get_definition kf in
-      List.iter
-        (fun stmt ->
-           guards kf map
-             (fun ~names ~invalid condition ->
-                let names = "region"::names in
-                let status =
-                  if invalid then
-                    Some Property_status.False_if_reachable
-                  else None
-                in add_annotation ~kf ~names ?status stmt condition
-             ) stmt
-        ) fd.sallstmts ;
-      set_annotated kf ;
+let annotate =
+  ValidRegion.memo
+    begin fun kf ->
+      if Kernel_function.has_definition kf then
+        begin
+          let map = Analysis.get kf in
+          Options.feedback "annotating function %a" Kernel_function.pretty kf ;
+          let fd = Kernel_function.get_definition kf in
+          List.iter
+            (fun stmt ->
+               guards kf map
+                 (fun ~names ~invalid condition ->
+                    let names = "region"::names in
+                    let status =
+                      if invalid then
+                        Some Property_status.False_if_reachable
+                      else None
+                    in add_annotation ~kf ~names ?status stmt condition
+                 ) stmt
+            ) fd.sallstmts ;
+          if not @@ Options.Force.get () then set_annotated kf ;
+        end
     end
 
 (* -------------------------------------------------------------------------- *)
