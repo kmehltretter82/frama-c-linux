@@ -8,6 +8,8 @@
 
 (** General module for E-ACSL analyses *)
 
+val check_integrity : unit -> unit
+
 val preprocess: unit -> unit
 (** Analyses to run before starting the translation *)
 

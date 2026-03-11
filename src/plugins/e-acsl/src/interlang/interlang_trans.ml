@@ -238,8 +238,11 @@ and compile_div_mod ~origin {ity; binop; op1; op2} =
               (Some origin)
           )
       in
-      let pname = ["denominator not zero"] in
-      let p = Logic_const.prel ~loc ~names:pname (Rneq, t2, zero) in
+      let p =
+        let pname = ["denominator not zero"] in
+        let denominator = Misc.Id_term.deep_copy t2 in
+        Logic_const.prel ~loc ~names:pname (Rneq, denominator, zero)
+      in
       let* cond =
         M.modifying_env @@ fun env ->
         Assert.runtime_check

@@ -16,39 +16,19 @@ inductive fibo(integer i, integer x) {
                 fibo(n - 1, f1) ==> fibo(n - 2, f2) ==> fibo(n, f1 + f2);
   }
  */
+/*@
+logic integer fibo_fun2(integer i) =
+  i == 0 ? 0 :
+    (i == 1 ? 1 :
+       (i > 1 ?
+          (\let f1 = fibo_fun2(i - 1); \let f2 = fibo_fun2(i - 2); f1 + f2) :
+          (fallthrough: 0)));
+ */
+void __gen_e_acsl_fibo_fun2(__e_acsl_mpz_t *__retres_arg, int i);
+
 /*@ predicate fibo(integer i, integer x) = fibo_fun2(i) == x;
  */
 int __gen_e_acsl_fibo(int i, int x);
-
-/*@
-logic integer fibo_fun2(integer i) =
-  i == 0 ? 0 :
-    (i == 1 ? 1 :
-       (i > 1 ?
-          (\let f1 = fibo_fun2(i - 1); \let f2 = fibo_fun2(i - 2); f1 + f2) :
-          0));
- */
-void __gen_e_acsl_fibo_fun2(__e_acsl_mpz_t *__retres_arg, int i);
-
-/*@
-logic integer fibo_fun2(integer i) =
-  i == 0 ? 0 :
-    (i == 1 ? 1 :
-       (i > 1 ?
-          (\let f1 = fibo_fun2(i - 1); \let f2 = fibo_fun2(i - 2); f1 + f2) :
-          0));
- */
-void __gen_e_acsl_fibo_fun2(__e_acsl_mpz_t *__retres_arg, int i);
-
-/*@
-logic integer fibo_fun2(integer i) =
-  i == 0 ? 0 :
-    (i == 1 ? 1 :
-       (i > 1 ?
-          (\let f1 = fibo_fun2(i - 1); \let f2 = fibo_fun2(i - 2); f1 + f2) :
-          0));
- */
-void __gen_e_acsl_fibo_fun2(__e_acsl_mpz_t *__retres_arg, int i);
 
 /*@
 inductive fibo2(integer i, integer x) {
@@ -59,22 +39,23 @@ inductive fibo2(integer i, integer x) {
                 fibo2(n, f1) ==> fibo2(n - 1, f2) ==> fibo2(n + 1, f1 + f2);
   }
  */
-/*@ predicate fibo2(integer i, integer x) = fibo2_fun2(i) == x;
- */
-int __gen_e_acsl_fibo2(int i, int x);
-
 /*@
 logic integer fibo2_fun2(integer i) =
   i == 0 ? 0 :
     (i == 1 ? 1 :
        (i - 1 > 0 ?
           (\let f1 = fibo2_fun2(i - 1);
-           \let f2 = fibo2_fun2((i - 1) - 1); i == (i - 1) + 1 ? f1 + f2 : 0)
-          : 0));
+           \let f2 = fibo2_fun2((i - 1) - 1);
+           i == (i - 1) + 1 ? f1 + f2 : (fallthrough: 0))
+          : (fallthrough: 0)));
 
 */
 void __gen_e_acsl_fibo2_fun2(__e_acsl_mpz_t *__retres_arg,
                              __e_acsl_mpz_struct * i);
+
+/*@ predicate fibo2(integer i, integer x) = fibo2_fun2(i) == x;
+ */
+int __gen_e_acsl_fibo2(int i, int x);
 
 /*@
 inductive is_fibo(integer x) {

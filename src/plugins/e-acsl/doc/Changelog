@@ -25,6 +25,8 @@
 Plugin E-ACSL <next-release>
 ###############################################################################
 
+-* E-ACSL       [2026-03-05] Fix violations of physical term uniqueness. The
+                             -check flag now enables a uniqueness verification.
 -* E-ACSL       [2026-02-03] fix typing error occurring on global structs when
                              concurrency is enabled
 -* E-ACSL       [2026-05-03] fix backslashes occurring in generated identifiers

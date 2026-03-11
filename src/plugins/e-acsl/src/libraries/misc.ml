@@ -198,17 +198,28 @@ let name_of_binop = function
 
 let make_binop = Cil.mkBinOp_exn ~constfold:true
 
-module Id_term =
-  Datatype.Make_with_hashtbl
-    (struct
-      include Cil_datatype.Term
-      let name = "E_ACSL.Id_term"
-      let compare = Datatype.undefined
-      let equal (t1:term) t2 = t1 == t2
-      let structural_descr = Structural_descr.t_abstract
-      let rehash = Datatype.identity
-      let mem_project = Datatype.never_any_project
-    end)
+module Id_term = struct
+  include Datatype.Make_with_hashtbl
+      (struct
+        include Cil_datatype.Term
+        let name = "E_ACSL.Id_term"
+        let compare = Datatype.undefined
+        let equal (t1:term) t2 = t1 == t2
+        let structural_descr = Structural_descr.t_abstract
+        let rehash = Datatype.identity
+        let mem_project = Datatype.never_any_project
+      end)
+
+  let deep_copy =
+    let copier = object
+      inherit Visitor.frama_c_inplace
+      method! vterm _ = Cil.DoChildrenPost (fun t -> {t with term_loc = t.term_loc})
+      method! vlogic_type _ =
+        (* optimisation: we copy terms and logic types do not contain terms *)
+        Cil.SkipChildren
+    end in
+    fun t -> Visitor.visitFramacTerm copier t
+end
 
 let extract_uncoerced_lval e =
   let rec aux e =

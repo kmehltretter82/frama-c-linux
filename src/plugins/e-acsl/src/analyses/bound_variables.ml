@@ -707,7 +707,7 @@ end
       let visit_logic_info =
         Visitor.visitFramacLogicInfo (self :> Visitor.frama_c_visitor)
       in
-      ignore @@ List.map visit_logic_info derived;
+      ignore @@ Logic_info.Set.map visit_logic_info derived;
       Cil.DoChildren
 
   end

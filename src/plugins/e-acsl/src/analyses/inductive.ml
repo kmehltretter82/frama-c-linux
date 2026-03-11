@@ -45,11 +45,11 @@ include struct (* auxiliary functions *)
       | Some _ | None -> Cil.DoChildren
 
     method !vterm = function
-      | {term_node = TLval (TVar v, TNoOffset); term_loc} ->
+      | {term_node = TLval (TVar v, TNoOffset)} ->
         (try
-           let t = Logic_var.Map.find v substs in
-           Cil.ChangeTo {t with term_loc} (* copy *)
-         with Not_found -> Cil.DoChildren)
+           let t = Misc.Id_term.deep_copy @@ Logic_var.Map.find v substs in
+           Cil.ChangeTo t
+         with Not_found -> DoChildren)
       | _ -> Cil.DoChildren
   end
 
@@ -442,25 +442,10 @@ end
 module type Out_language = sig
   include Build_pred_or_term.S
   val mk_concl : mode:mode -> term list -> t
+  val deep_copy : t -> t (* in order to not introduce sharing *)
 end
 
-(* Here we store terms that we use as a fallthrough result of logic functions
-   we generate. When an inductive or axiomatic definition is incomplete, then
-   it will return such a fallthrough value. In the translation to CIL this term
-   will become a failing assertion. *)
-module Fallthrough_terms : sig
-  val mem : term -> bool
-  val add : term -> unit
-  val clear : unit -> unit
-end = struct
-  open Misc.Id_term.Hashtbl
-  let tbl = create 9
-  let mem = mem tbl
-  let add t = add tbl t ()
-  let clear () = clear tbl
-end
-
-let is_fallthrough_term = Fallthrough_terms.mem
+let is_fallthrough_term t = List.mem "fallthrough" t.term_name
 
 module Derived_functions = struct
   open Logic_info.Hashtbl
@@ -638,7 +623,7 @@ end = functor (Out : Out_language) -> struct
       let fallthrough = Out.mk_false ?loc l_type in
       List.fold_right extract_ctor (InductiveDef.ctors li) fallthrough
     in
-    li.l_body <- Out.mk_logic_body body;
+    li.l_body <- Out.mk_logic_body (Out.deep_copy body);
     li.l_var_info <- freshen_up_logic_var li.l_var_info;
     let () = match res with
       | Some res -> (* incomplete mode: change lv_type into function type *)
@@ -664,13 +649,18 @@ end = struct
 
       let mk_false ?loc lty =
         let t = mk_false ?loc lty in
-        Fallthrough_terms.add t;
-        t
+        {t with term_name = "fallthrough" :: t.term_name}
 
       let mk_concl ~mode args =
         match Mode.out_arg ~mode args with
         | Some t -> t
         | None -> assert false (* necessarily in incomplete mode *)
+
+      (* since incomplete extraction involves potentially term duplication (the
+         phenomenon that leads to term-size explosion) we need to unshare. We
+         deep-copy the entire extracted logic function body, since sharing may
+         also occur between two extractions in two different modes. *)
+      let deep_copy = Misc.Id_term.deep_copy
     end)
 
   let extract_with_mode ~mode:m li =
@@ -695,6 +685,7 @@ end
   module Extractor = Make_extractor (struct
       include Build_pred_or_term.Predicate
       let mk_concl ~mode:_ _ = mk_true None
+      let deep_copy p = p (* no term duplication occurs in complete extraction *)
     end)
 
   let extract_with_mode ~mode:{Modus.mode} li =
@@ -734,7 +725,6 @@ let extract_predicate = PredicateExtractor.extract
 let predicate_is_unsound_if_false = Unsound_if_false.mem
 
 let clear () =
-  Fallthrough_terms.clear ();
   Extractions.clear ();
   Derived_functions.clear ();
   InductiveDef.clear ();

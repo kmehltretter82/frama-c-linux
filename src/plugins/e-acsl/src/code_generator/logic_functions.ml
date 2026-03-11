@@ -357,14 +357,19 @@ end
 let reset () = Gen_functions.clear ()
 
 let add_generated_functions_to_file file =
+  let added = (* to avoid adding the same function multiple times *)
+    Logic_info.Hashtbl.create 7
+  in
   let rec decls_of_li ?(generated = false) ?(loc = Location.unknown) li =
     let dependencies =
       List.concat_map (decls_of_li ~generated:true ~loc)
-        (Logic_normalizer.Logic_infos.generated_of li)
+        (Logic_info.Set.elements @@ Logic_normalizer.Logic_infos.generated_of li)
     in
     let add_generated_annot =
-      if generated
-      then fun decls -> GAnnot(Dfun_or_pred(li, loc), loc) :: decls
+      if generated && not (Logic_info.Hashtbl.mem added li)
+      then fun decls ->
+        let () = Logic_info.Hashtbl.add added li () in
+        GAnnot(Dfun_or_pred(li, loc), loc) :: decls
       else fun decls -> decls
     in
     let kfs = Gen_functions.kernel_functions_of_logic_info li in

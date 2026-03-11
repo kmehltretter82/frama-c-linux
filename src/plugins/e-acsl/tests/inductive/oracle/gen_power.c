@@ -14,10 +14,6 @@ inductive power(integer x, integer y, integer p) {
                    power(a, b - 1, q) ==> power(a, b, q * a);
   }
  */
-/*@ predicate power(integer x, integer y, integer p) = power_fun3(x, y) == p;
- */
-int __gen_e_acsl_power(int x, int y, int p);
-
 /*@
 logic integer power_fun3(integer x, integer y) =
   y == 0 ? 1 : (\let q = power_fun3(x, y - 1); q * x);
@@ -25,6 +21,10 @@ logic integer power_fun3(integer x, integer y) =
 */
 void __gen_e_acsl_power_fun3(__e_acsl_mpz_t *__retres_arg, int x,
                              __e_acsl_mpz_struct * y);
+
+/*@ predicate power(integer x, integer y, integer p) = power_fun3(x, y) == p;
+ */
+int __gen_e_acsl_power(int x, int y, int p);
 
 /*@
 inductive power2(integer x, integer y, integer p) {
@@ -34,18 +34,20 @@ inductive power2(integer x, integer y, integer p) {
   }
  */
 /*@
-predicate power2(integer x, integer y, integer p) = power2_fun3(x, y) == p;
- */
-int __gen_e_acsl_power2(int x, int y, int p);
-
-/*@
 logic integer power2_fun3(integer x, integer y) =
   y == 0 ? 1 :
-    (\let q = power2_fun3(x * 1, y - 1); x == (x * 1) / 1 ? q * (x * 1) : 0);
+    (\let q = power2_fun3(x * 1, y - 1);
+     x == (x * 1) / 1 ? q * (x * 1) : (fallthrough: 0));
 
 */
 void __gen_e_acsl_power2_fun3(__e_acsl_mpz_t *__retres_arg, int x,
                               __e_acsl_mpz_struct * y);
+
+/*@
+predicate power2(integer x, integer y, integer p) = power2_fun3(x, y) == p;
+
+*/
+int __gen_e_acsl_power2(int x, int y, int p);
 
 int main(void)
 {

@@ -16,6 +16,7 @@
 *)
 
 open Cil_types
+open Cil_datatype
 
 val preprocess : file -> unit
 (** Preprocess all the predicates of the ast and store the results *)
@@ -33,7 +34,7 @@ val preprocess_predicate : predicate -> unit
       predicates into recursively defined ones
       This module provides functions to inquire about their status. *)
 module Logic_infos : sig
-  val generated_of : logic_info -> logic_info list
+  val generated_of : logic_info -> Logic_info.Set.t
   (** auxiliary [logic_info]s generated from the given [logic_info]. *)
 
   val origin_of_lv : logic_var -> logic_var
