@@ -19,7 +19,7 @@ __BEGIN_DECLS
 #include "../__fc_define_off_t.h"
 #include "../__fc_define_size_t.h"
 #include "../__fc_define_ssize_t.h"
-#include "../errno.h"
+#include <errno.h>
 
 /*@
   //missing: requires in_fd opened for reading

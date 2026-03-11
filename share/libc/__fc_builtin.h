@@ -12,8 +12,8 @@
 __PUSH_FC_STDLIB
 #include "__fc_alloc_axiomatic.h"
 #include "__fc_define_wint_t.h"
-#include "stddef.h"
-#include "stdint.h"
+#include <stddef.h>
+#include <stdint.h>
 
 __BEGIN_DECLS
 

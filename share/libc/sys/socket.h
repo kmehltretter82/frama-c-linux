@@ -13,7 +13,7 @@ __PUSH_FC_STDLIB
 __BEGIN_DECLS
 #include "__fc_machdep.h"
 
-#include "../errno.h"
+#include <errno.h>
 
 // Note: most constants used here are based on Linux, independently of the
 // chosen machdep. If using other OSs (e.g. MacOS), consider redefining them.
@@ -36,7 +36,7 @@ struct sockaddr_storage {
   char __sa_data[_SS_MAXSIZE - sizeof(sa_family_t)]; /* non-POSIX */
 };
 
-#include "./uio.h"
+#include <sys/uio.h>
 
 struct cmsghdr {
   socklen_t  cmsg_len;

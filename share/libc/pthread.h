@@ -13,7 +13,7 @@
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
 
-#include "errno.h"
+#include <errno.h>
 #include "__fc_string_axiomatic.h"
 // The values for the constants below are based on an x86 Linux,
 // declared in the order given by POSIX.1-2008.
@@ -116,7 +116,7 @@ enum __fc_pthread_mutex_pshared
 // Include pthread-related types
 #include "__fc_define_pthread_types.h"
 #include "__fc_define_size_t.h"
-#include "sched.h"
+#include <sched.h>
 
 /*@
   assigns \result \from indirect:prepare, indirect:parent, indirect:child;
@@ -731,7 +731,7 @@ int pthread_getname_np(pthread_t thread, char* name, size_t len);
 // From POSIX: "Inclusion of the <pthread.h> header shall make symbols defined
 //              in the headers <sched.h> and <time.h> visible."
 //              (sched.h has already been included)
-#include "time.h"
+#include <time.h>
 
 __END_DECLS
 __POP_FC_STDLIB

@@ -15,9 +15,9 @@
 #include "features.h"
 __PUSH_FC_STDLIB
 
-#include "errno.h"
-#include "stdlib.h"
-#include "string.h"
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
 
 __BEGIN_DECLS
 

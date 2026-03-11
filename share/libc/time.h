@@ -17,8 +17,8 @@ __PUSH_FC_STDLIB
 #include "__fc_define_timer_t.h"
 #include "__fc_define_timespec.h"
 #include "__fc_string_axiomatic.h"
-#include "errno.h"
-#include "signal.h"
+#include <errno.h>
+#include <signal.h>
 
 /*
  * Names of the interval timers, and structure

@@ -12,7 +12,7 @@
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_string_axiomatic.h"
-#include "errno.h"
+#include <errno.h>
 __BEGIN_DECLS
 
 typedef float float_t;
@@ -52,7 +52,7 @@ typedef _Float64 _Float64_t;
 #define FP_ILOGB0 __FC_INT_MIN
 #define FP_ILOGBNAN __FC_INT_MIN
 
-#include "float.h" // for DBL_MIN and FLT_MIN
+#include <float.h> // for DBL_MIN and FLT_MIN
 
 /*@
   assigns \result \from x;

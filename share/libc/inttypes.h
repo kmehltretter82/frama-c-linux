@@ -12,8 +12,8 @@
 __PUSH_FC_STDLIB
 /* ISO C: 7.8 */
 #include "__fc_machdep.h"
-#include "stdint.h"
-#include "errno.h"
+#include <stdint.h>
+#include <errno.h>
 
 /* ISO C: 7.8.1 */
 

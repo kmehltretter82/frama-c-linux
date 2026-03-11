@@ -16,7 +16,7 @@
 __PUSH_FC_STDLIB
 
 #include "__fc_string_axiomatic.h"
-#include "stdarg.h"
+#include <stdarg.h>
 
 __BEGIN_DECLS
 

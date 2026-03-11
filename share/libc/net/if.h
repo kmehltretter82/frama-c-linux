@@ -12,8 +12,8 @@
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
 
-#include "errno.h"
-#include "sys/socket.h"
+#include <errno.h>
+#include <sys/socket.h>
 
 struct if_nameindex {unsigned if_index; char *if_name;};
 #define IF_NAMESIZE 16

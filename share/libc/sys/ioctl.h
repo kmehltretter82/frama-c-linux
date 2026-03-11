@@ -13,7 +13,7 @@
 // compatibility reasons.
 
 // For the ioctl() prototype
-#include "../stropts.h"
+#include <stropts.h>
 
 struct winsize
 {

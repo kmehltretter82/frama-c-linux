@@ -11,7 +11,7 @@
 #include "features.h"
 __PUSH_FC_STDLIB
 
-#include "errno.h"
+#include <errno.h>
 
 #include "__fc_define_ino_t.h"
 #include "__fc_define_off_t.h"

@@ -16,7 +16,7 @@ __PUSH_FC_STDLIB
 // be defined in "limits.h" according to POSIX. For instance, in Linux,
 // PATH_MAX is defined in the non-POSIX file linux/limits.h.
 
-#include "../limits.h"
+#include <limits.h>
 
 #define MAX(x,y) ((x)>=(y)?(x):(y))
 #define MIN(x,y) ((x)<=(y)?(x):(y))

@@ -12,7 +12,7 @@
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
 
-#include "__fc_machdep.h"
+
 #include "../__fc_define_id_t.h"
 #include "../__fc_define_pid_t.h"
 #include "../__fc_define_size_t.h"
@@ -38,7 +38,7 @@ typedef unsigned char u_char;
 
 // Some glibc versions include major/minor/makedev here, but recently
 // they are in 'sysmacros.h'
-#include "sysmacros.h"
+#include <sys/sysmacros.h>
 
 #define __u_char_defined 1
 #endif

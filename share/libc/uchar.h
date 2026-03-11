@@ -14,7 +14,7 @@
 __PUSH_FC_STDLIB
 #include "__fc_define_mbstate_t.h"
 #include "__fc_define_size_t.h"
-#include "errno.h"
+#include <errno.h>
 
 __BEGIN_DECLS
 

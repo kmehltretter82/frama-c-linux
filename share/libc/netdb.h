@@ -11,9 +11,9 @@
 #include "features.h"
 __PUSH_FC_STDLIB
 
-#include "netinet/in.h"
-#include "sys/socket.h"
-#include "inttypes.h"
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <inttypes.h>
 #include "__fc_builtin.h"
 #include "__fc_string_axiomatic.h"
 

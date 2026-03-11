@@ -8,7 +8,7 @@
 
 #ifndef __FC_SYS_STAT_H
 #define __FC_SYS_STAT_H
-#include "features.h"
+#include "../features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
 
@@ -17,7 +17,7 @@ __BEGIN_DECLS
 #include "../__fc_string_axiomatic.h"
 #include "../__fc_define_fds.h"
 #include "../__fc_define_timespec.h"
-#include "../errno.h"
+#include <errno.h>
 
 /*@
   // missing: assigns 'filesystem' \frompath, path[0..], mode;

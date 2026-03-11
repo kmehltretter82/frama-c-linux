@@ -23,8 +23,8 @@ __PUSH_FC_STDLIB
 #include "__fc_define_useconds_t.h"
 #include "__fc_define_intptr_t.h"
 #include "__fc_define_fds.h"
-#include "fcntl.h"
-#include "limits.h"
+#include <fcntl.h>
+#include <limits.h>
 
 #ifndef _POSIX_C_SOURCE
 #error "unistd.h should only be included with a POSIX machdep"

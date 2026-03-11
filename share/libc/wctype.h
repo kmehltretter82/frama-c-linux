@@ -14,7 +14,7 @@
 __PUSH_FC_STDLIB
 #include "__fc_define_locale_t.h"
 #include "__fc_define_weof.h"
-#include "wchar.h"
+#include <wchar.h>
 __BEGIN_DECLS
 
 typedef const int32_t *wctrans_t;

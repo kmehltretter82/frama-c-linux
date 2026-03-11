@@ -8,7 +8,7 @@
 
 #ifndef __FC_SYS_RANDOM_H
 #define __FC_SYS_RANDOM_H
-#include "features.h"
+#include "../features.h"
 #include "../__fc_define_size_t.h"
 #include "../__fc_define_ssize_t.h"
 __PUSH_FC_STDLIB

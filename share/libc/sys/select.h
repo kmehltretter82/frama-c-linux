@@ -8,7 +8,7 @@
 
 #ifndef __FC_SYS_SELECT_H
 #define __FC_SYS_SELECT_H
-#include "features.h"
+#include "../features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
 

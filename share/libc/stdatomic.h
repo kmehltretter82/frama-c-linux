@@ -10,8 +10,8 @@
 #define __FC_STDATOMIC_H
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "wchar.h"
-#include "stddef.h"
+#include <wchar.h>
+#include <stddef.h>
 
 __BEGIN_DECLS
 
