@@ -189,6 +189,7 @@ let example_msg =
      LIBRARY: <pkg.lib>... @[<v 0># Adds a dependency and sets macro @@PTEST_LIBRARY@@ defining the '-load-library' option used in the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
      MODULE: <module>... @[<v 0># Adds a dependency and adds the corresponding '-load-module' option to the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
      LIBS: <module>...   @[<v 0># Like 'MODULE' directive, but for modules that can be shared between several test files.@]@  \
+     ENV: <name> <value> @[<v 0># Defines environnement variable @@<name>@@ with value <value>.@]@  \
      EXIT: <number>      @[<v 0># Defines the exit code required for the following sub-test commands.@]@  \
      FILTER: <cmd>       @[<v 0># Performs a transformation on the test result files before comparing with oracles.@ \
      # The oracle will be compared from the standard output of the command: cat <test-output-file> | <cmd> .@ \
@@ -629,6 +630,7 @@ type cmd = {
   toplevel: string;
   opts: string;
   macros: Macros.t;
+  env_var: (string * string) list;
   exit_code: string option;
   logs: string list;
   bins: string list;
@@ -649,6 +651,7 @@ type config =
     dc_library : string list option; (** additional libraries to load *)
     dc_module : string list option; (** module to load *)
     dc_macros: Macros.t; (** existing macros. *)
+    dc_env_var : (string * string) list; (** env *)
     dc_default_toplevel   : string;
     (** full path of the default toplevel. *)
     dc_filter     : string option; (** optional filter to apply to
@@ -703,13 +706,16 @@ end = struct
       ] in
     let ptest_macros = Macros.add_list ptest_vars Macros.empty in
     let subst = Macros.expand_list ~file ptest_macros in
-    let dc_enabled_if = Macros.expand_enabled_if  ~file ptest_macros config.dc_enabled_if
+    let dc_enabled_if = Macros.expand_enabled_if  ~file ptest_macros config.dc_enabled_if in
+    let dc_env_var =
+      List.map (fun (k, v) -> k, Macros.expand ~file ptest_macros v) config.dc_env_var
     in
     ptest_name,
     { config with
       dc_enabled_if;
       dc_execnow = List.rev config.dc_execnow;
       dc_deps = Option.map subst config.dc_deps ;
+      dc_env_var = dc_env_var;
       dc_plugin = Option.map subst config.dc_plugin;
       dc_module = Option.map subst config.dc_module;
       dc_libs = Option.map subst config.dc_libs;
@@ -725,6 +731,7 @@ end = struct
         opts="";
         exit_code=None;
         macros=config.dc_macros;
+        env_var=[];
         logs=[];
         bins=[];
         deps={ load_plugin=None;
@@ -740,6 +747,7 @@ end = struct
   let default_config () =
     { dc_test_regexp = test_file_regexp;
       dc_macros = Macros.default_macros ();
+      dc_env_var = [];
       dc_execnow = [];
       dc_libs = None;
       dc_deps = None;
@@ -878,6 +886,22 @@ end = struct
       dc_enabled_if = Some s;
       dc_macros = Macros.add_list ["PTEST_ENABLED_IF", s] current.dc_macros }
 
+  let config_env ~drop:_ ~file ~dir s current =
+    let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
+    if Str.string_match regex s 0 then begin
+      let name = Str.matched_group 1 s in
+      let value =
+        try Macros.expand ~file current.dc_macros (Str.matched_group 3 s)
+        with Not_found -> (* empty text *) "\"\""
+      in
+      if !verbosity >= 4 then
+        Format.printf "%%   - New ENV variable %s with value %s@." name value;
+      { current with dc_env_var = current.dc_env_var @ [name, value] }
+    end else begin
+      Format.eprintf "%a: cannot understand ENV definition: %s@." (SubDir.pp_file ~dir) file s;
+      current
+    end
+
   let config_libs ~drop:_ ~file ~dir:_ s current =
     let s = Macros.expand ~file current.dc_macros s in
     let l = List.map (fun s -> Filename.remove_extension_opt [ ".cmxs" ; ".cma" ; ".ml" ] s) (split_list s) in
@@ -965,7 +989,8 @@ end = struct
              logs = current.dc_default_log;
              bins = current.dc_default_bin;
              timeout = current.dc_timeout;
-             deps = deps_of_config current
+             deps = deps_of_config current;
+             env_var = current.dc_env_var;
            }
          in
          { current with
@@ -989,7 +1014,8 @@ end = struct
                   logs= command.logs @ current.dc_default_log;
                   bins= command.bins @ current.dc_default_bin;
                   timeout= current.dc_timeout;
-                  deps = deps_of_config ~deps:command.deps current
+                  deps = deps_of_config ~deps:command.deps current;
+                  env_var = command.env_var @ current.dc_env_var;
                 })
              (if !default_parsing_env.current_default_cmds = [] then
                 default_commands current
@@ -1034,6 +1060,7 @@ end = struct
          config_exec ~once:false ~file ~drop s acc);
 
       "MACRO", config_macro;
+      "ENV", config_env;
       "LIBS", config_libs;
       "DEPS", config_deps;
       "ENABLED_IF", config_enabled_if;
@@ -1179,6 +1206,7 @@ end
 
 type toplevel_command =
   { macros: Macros.t;
+    env_var: (string*string) list;
     log_files: string list;
     bin_files: string list;
     test_name : string ;
@@ -1459,6 +1487,15 @@ let get_exit_code ~file = function
 let pp_accepted_exit_code fmt cmd =
   Format.fprintf fmt "with-accepted-exit-codes %d" cmd.exit_code
 
+let pp_setenv fmt (var, value) =
+  Format.fprintf fmt "(setenv %s %s " var value
+
+let pp_env fmt l =
+  List.iter (Format.fprintf fmt "%a" pp_setenv) l
+
+let pp_close_env fmt l =
+  List.iter (fun _ -> Format.fprintf fmt ")") l
+
 let command_string ~env ~result_fmt ~oracle_fmt command =
   let log_prefix = log_prefix ~env command in
   let reslog = log_prefix ^ ".res.log" in
@@ -1517,7 +1554,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
        (targets %S %S %a %a)\n  \
        (deps %S %S %S %a %a)\n  \
        %a\n\
-       (action (run %s %S %S %a))\n\
+       (action %a(run %s %S %S %a))%a\n\
        )@."
       (* rule: *)
       wtest.info
@@ -1537,10 +1574,13 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       (* enabled_if: *)
       pp_enabled_if command.deps
       (* action: *)
+      pp_env command.env_var
       !wrapper_cmd
       wrapper_basename
       wtest.cmd
-      pp_list (if command.filter = None then [] else [wtest.sedout ; wtest.sederr]);
+      pp_list (if command.filter = None then [] else [wtest.sedout ; wtest.sederr])
+      pp_close_env command.env_var
+    ;
 
     let wtest =
       { wtest with
@@ -1560,7 +1600,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
        (targets %S %S %a %a)\n  \
        (deps   %a)\n  \
        %a\n\
-       (action (with-stderr-to %S (with-stdout-to %S (%a (system %S)))))\n\
+       (action %a(with-stderr-to %S (with-stdout-to %S (%a (system %S)))))%a\n\
        )@."
       (* rule: *)
       wtest.info
@@ -1576,10 +1616,12 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       (* enabled_if: *)
       pp_enabled_if command.deps
       (* action: *)
+      pp_env command.env_var
       cmderrlog
       cmdreslog
       pp_accepted_exit_code command
       command_string
+      pp_close_env command.env_var
   end;
   let filter_rule txt fin fout cmd =
     if cmd <> "" then
@@ -1624,7 +1666,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
      (alias %S)\n  \
      (deps  %a (universe))\n  \
      %a\n\
-     (action (%a (system %S)))\n\
+     (action %a(%a (system %S)))%a\n\
      )@."
     (* rule: *)
     command.nth command.file
@@ -1635,8 +1677,10 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (* enabled_if: *)
     pp_enabled_if command.deps
     (* action: *)
+    pp_env command.env_var
     pp_accepted_exit_code command
     command_string
+    pp_close_env command.env_var
   ;
   Format.fprintf result_fmt
     "(rule ; SHOW TEST COMMAND #%d OF TEST FILE %S\n  \
@@ -1744,7 +1788,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
     let test_name,config,ptest_vars = Test_config.ptest_vars ~env directory ~file config  in
     let make_cmd =
       let i = ref 0 in
-      fun { toplevel; opts=options; macros; exit_code; logs; bins; timeout; deps } ->
+      fun { toplevel; opts=options; macros; exit_code; logs; bins; timeout; deps; env_var} ->
         let nth = !i in
         incr i ;
         let macros = ptest_vars ~nth macros in
@@ -1762,11 +1806,12 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             exit_code = get_exit_code ~file exit_code;
             execnow=false;
             deps;
+            env_var;
           }
     in
     let make_execnow_cmd =
       let e = ref 0 in
-      fun execnow->
+      fun execnow ->
         let nth = !e in
         incr e ;
         let macros = ptest_vars ~nth Macros.empty in
@@ -1786,6 +1831,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             filter = None; (* no FILTER applied to EXECNOW LOG *)
             execnow = true;
             deps = deps;
+            env_var = config.dc_env_var;
           }
         in
         let cmd_string = basic_command_string cmd in
@@ -1813,7 +1859,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
              (deps %a %a)\n  \
              (targets %a %a)\n  \
              %a\n\
-             (action (run %s %%{dep:%s} %S))\n\
+             (action %a(run %s %%{dep:%s} %S))%a\n\
              )@."
             (* rule: *)
             wtest.info
@@ -1828,9 +1874,11 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             (* enabled_if: *)
             pp_enabled_if cmd.deps
             (* action: *)
+            pp_env cmd.env_var
             !wrapper_cmd
             wrapper_basename
-            wtest.cmd;
+            wtest.cmd
+            pp_close_env cmd.env_var;
           let wtest =
             { wtest with
               cmd = show_cmd wtest.cmd ;
@@ -1847,7 +1895,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
              (deps (package frama-c)%a)\n  \
              (targets %a %a)\n  \
              %a\n\
-             (action (%a (system %S)))\n\
+             (action %a(%a (system %S)))%a\n\
              )@."
             (* rule: *)
             wtest.info
@@ -1861,8 +1909,10 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             (* enabled_if: *)
             pp_enabled_if cmd.deps
             (* action: *)
+            pp_env cmd.env_var
             pp_accepted_exit_code cmd
             wtest.cmd
+            pp_close_env cmd.env_var
         end;
         let oracle_subdir = SubDir.oracle_subdir ~env cmd.directory in
         List.iter (oracle_target oracle_fmt oracle_subdir) wtest.log ;
