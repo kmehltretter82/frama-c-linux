@@ -1,4 +1,4 @@
-//@ region P: *p, Q: *q ;
+//@ region P: p[0..n-1], Q: q[0..n-1] ;
 int job( int n, int * p , int * q )
 {
   int s = 0 ;

@@ -19,6 +19,13 @@ module Fmap = Logic_info.Map
 (* --- Region Maps                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
+type root = Root of {
+    ip : Property.t ;
+    named : string ;
+    typ : typ ; ptr : term ; inf : term ; sup : term ;
+    flags : Attr.flags ;
+  }
+
 type 'a nlayout =
   | Blob of int
   | Cell of int * 'a option
@@ -30,6 +37,7 @@ and 'a nchunk = {
   cpointed: 'a list ;
   cresult: bool ;
   ccvars: Vset.t ;
+  croots: root Bag.t ;
   clabels: Lset.t ;
   creads: Access.Set.t ;
   cwrites: Access.Set.t ;
@@ -37,6 +45,9 @@ and 'a nchunk = {
   cinits: Access.Set.t ;
   clayout: 'a nlayout ;
   mutable cid : int ;
+  mutable cpaths : int ;
+  mutable cdepth : int ;
+  mutable cflags : Attr.flags ;
 }
 
 (* All offsets in bits *)
@@ -53,12 +64,13 @@ type chunk = node nchunk
 type layout = node nlayout
 type rg = node Ranges.range
 
-type domain = node Ldomain.t
-type context = node Ldomain.context
+type domain = node Domain.t
+type context = node Domain.context
 
 type map = {
   store: UF.store ;
   mutable labels: node Lmap.t ;
+  mutable roots: (root * node) list ;
   mutable cvars: node Vmap.t ;
   mutable lvars: domain LVmap.t ;
   mutable logics: domain Fmap.t ;
@@ -95,6 +107,7 @@ let ctypes (m : chunk) : typ list =
 
 let create () = {
   store = UF.create () ;
+  roots = [] ;
   cvars = Vmap.empty ;
   labels = Lmap.empty ;
   lvars = LVmap.empty ;
@@ -107,6 +120,7 @@ let empty = {
   cparents = [] ;
   cpointed = [] ;
   cresult = false ;
+  croots = Bag.empty ;
   ccvars = Vset.empty ;
   clabels = Lset.empty ;
   creads = Access.Set.empty ;
@@ -114,6 +128,9 @@ let empty = {
   cshifts = Access.Set.empty ;
   cinits = Access.Set.empty ;
   clayout = Blob 0 ;
+  cdepth = 0 ;
+  cpaths = 0 ;
+  cflags = Attr.empty ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -151,11 +168,27 @@ let pp_layout fmt =
       ) rg ;
     Format.fprintf fmt "@ }@]"
 
+let pp_root fmt (Root r) =
+  begin
+    Format.fprintf fmt "@[<hov 2>%a%a[%a..%a]"
+      Spec.pp_named r.named
+      Printer.pp_term r.ptr
+      Printer.pp_term r.inf
+      Printer.pp_term r.sup ;
+    Attr.iter (Format.fprintf fmt ",@ %a" Attr.pp_attr) r.flags ;
+    Format.fprintf fmt "@]" ;
+  end
+
 let pp_chunk name fmt (m: chunk) =
   begin
-    let acs r s = if Access.Set.is_empty s then '-' else r in
-    Format.fprintf fmt "@[<hov 2>%s: %c%c%c%c" name
-      (acs 'I' m.cinits) (acs 'R' m.creads) (acs 'W' m.cwrites) (acs 'A' m.cshifts) ;
+    Format.fprintf fmt "@[<hov 2>%s: " name ;
+    let pp_acs fmt r s =
+      Format.pp_print_char fmt @@
+      if not @@ Access.Set.is_empty s then r else '-' in
+    pp_acs fmt 'I' m.cinits ;
+    pp_acs fmt 'R' m.creads ;
+    pp_acs fmt 'W' m.cwrites ;
+    pp_acs fmt 'A' m.cshifts ;
     List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) (ctypes m) ;
     Lset.iter (Format.fprintf fmt "@ %s:") m.clabels ;
     Vset.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.ccvars ;
@@ -165,8 +198,9 @@ let pp_chunk name fmt (m: chunk) =
         Access.Set.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.creads ;
         Access.Set.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.cwrites ;
         Access.Set.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.cshifts ;
+        List.iter (Format.fprintf fmt "@ P:%a" pp_node) m.cparents ;
       end ;
-    List.iter (Format.fprintf fmt "@ P:%a" pp_node) m.cparents ;
+    Bag.iter (Format.fprintf fmt "@ %a" pp_root) m.croots ;
     Format.fprintf fmt "@ %a ;@]" pp_layout m.clayout ;
   end
 
@@ -202,7 +236,8 @@ let new_chunk store ?parent ?(size=0) ?(value=false) ?ptr ?pointed ?(result=fals
   in
   let cparents = match parent with None -> [] | Some root -> [root] in
   let cpointed = match pointed with None -> [] | Some ptr -> [ptr] in
-  UF.fresh store { empty with cresult ; clayout ; cpointed ; cparents }
+  UF.fresh store
+    { empty with cresult ; clayout ; cpointed ; cparents }
 
 let fresh (m: map) = new_chunk m.store ()
 
@@ -222,15 +257,21 @@ let add_cvar (m: map) v =
 let add_lvar (m: map) lv =
   try LVmap.find lv m.lvars with Not_found ->
     assert (lv.lv_origin = None);
-    let d = Ldomain.of_ltype (new_chunk m.store) lv.lv_type in
+    let d = Domain.of_ltype (new_chunk m.store) lv.lv_type in
     m.lvars <- LVmap.add lv d m.lvars ; d
+
+let add_root (m: map) (node : node) (root : root) =
+  begin
+    m.roots <- (root,node) :: m.roots ;
+    update node (fun d -> { d with croots = Bag.add root d.croots }) ;
+  end
 
 let add_body = ref (fun _ _ _ -> assert false)
 
 let add_logic (m: map) f =
   try Fmap.find f m.logics with Not_found ->
-    let get_type t = Ldomain.of_ltype (new_chunk m.store) t in
-    let d = Option.fold ~none:Ldomain.pure ~some:get_type f.l_type in
+    let get_type t = Domain.of_ltype (new_chunk m.store) t in
+    let d = Option.fold ~none:Domain.pure ~some:get_type f.l_type in
     m.logics <- Fmap.add f d m.logics ;
     !add_body m f d ; d
 
@@ -240,11 +281,11 @@ let add_result (m: map) =
     m.result <- Some r ; r
 
 let domain_of_typ (m:map) (typ:typ) =
-  Ldomain.of_typ (new_chunk m.store) typ
+  Domain.of_typ (new_chunk m.store) typ
 
 let domain_of_ltyp (m:map) ?(ctxt) (lt:logic_type) =
-  let d : domain = Ldomain.of_ltype (new_chunk m.store) lt in
-  Option.fold ~none:d ~some:(fun (c:context) -> Ldomain.subst c d) ctxt
+  let d : domain = Domain.of_ltype (new_chunk m.store) lt in
+  Option.fold ~none:d ~some:(fun (c:context) -> Domain.subst c d) ctxt
 
 (* -------------------------------------------------------------------------- *)
 (* --- Iterator                                                           --- *)
@@ -258,22 +299,14 @@ let rec walk (f: node -> bool) n =
     | Compound(_,_,rg) -> Ranges.iter (walk f) rg
 
 let witer (m:map) (f: node -> bool) =
-  Vmap.iter   (fun _x n -> walk f n) m.cvars ;
-  LVmap.iter  (fun _ -> Ldomain.iter (walk f)) m.lvars ;
-  Fmap.iter (fun _ -> Ldomain.iter (walk f)) m.logics ;
-  Option.iter (walk f) m.result
+  begin
+    Vmap.iter (fun _x n -> walk f n) m.cvars ;
+    LVmap.iter (fun _ -> Domain.iter (walk f)) m.lvars ;
+    Fmap.iter (fun _ -> Domain.iter (walk f)) m.logics ;
+    Option.iter (walk f) m.result ;
+  end
 
-let once (f : node -> unit) : node -> bool =
-  let h = ref Z.zero in
-  fun n ->
-    let uid = (UF.get n).cid in
-    Z.testbit !h uid ||
-    begin
-      h := Z.( !h lor (one lsl uid) ) ;
-      f n ; false
-    end
-
-let iter m f = witer m (once f)
+let iter m f = witer m (UF.once f)
 let size (r: node) = sizeof (UF.get r).clayout
 let parents (r: node) = UF.find_all (UF.get r).cparents
 let cvars (r: node) = Vset.elements (UF.get r).ccvars
@@ -378,13 +411,14 @@ let merge_chunk s (q:queue) (root:node)
     cpointed = UF.find_all2 a.cpointed b.cpointed ;
     clabels = Lset.union a.clabels b.clabels ;
     cresult = a.cresult || b.cresult ;
+    croots = Bag.concat a.croots b.croots ;
     ccvars = Vset.union a.ccvars b.ccvars ;
     creads = Access.Set.union a.creads b.creads ;
     cwrites = Access.Set.union a.cwrites b.cwrites ;
     cshifts = Access.Set.union a.cshifts b.cshifts ;
     cinits = Access.Set.union a.cinits b.cinits ;
     clayout = merge_layout s q root a.clayout b.clayout ;
-    cid = UF.noid ;
+    cid = UF.noid ; cdepth = 0 ; cpaths = 0 ; cflags = Attr.empty ;
   }
 
 let do_merge (q: queue) (a: node) (b: node): unit =
@@ -414,10 +448,10 @@ let merge (a: node) (b: node) : unit = merge_all [a;b]
 (* --- Merging Domains                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-let pure : domain = Ldomain.pure
+let pure : domain = Domain.pure
 let dmerge a b = merge a b ; min a b
-let merge_domain = Ldomain.merge dmerge
-let merge_points_to = Ldomain.pointed dmerge
+let merge_domain = Domain.merge dmerge
+let merge_points_to = Domain.pointed dmerge
 
 (* -------------------------------------------------------------------------- *)
 (* --- Offset                                                             --- *)
@@ -436,6 +470,24 @@ let add_field (r:node) (fd:fieldinfo) : node =
       let clayout = Compound(size,fields,ranges) in
       let nc = UF.fresh store { empty with clayout } in
       merge r nc ; data
+
+let add_field_range (r:node) (f:fieldinfo) (g:fieldinfo) : node =
+  let cf = f.fcomp in
+  let cg = g.fcomp in
+  if not (cf.cstruct && Compinfo.equal cf cg) then
+    raise (Invalid_argument "Region.Memory.add_field_range") ;
+  let store = UF.store r in
+  let size = bitsSizeOf (Cil_const.mk_tcomp cf) in
+  let a, p = Cil.fieldBitsOffset f in
+  let b, q = Cil.fieldBitsOffset g in
+  let offset = min a b in
+  let length = max (a+p) (b+q) - offset in
+  let data = new_chunk store ~parent:r () in
+  let ranges = Ranges.singleton { offset ; length ; data } in
+  let fields = Fields.(union (singleton f) (singleton g)) in
+  let clayout = Compound(size,fields,ranges) in
+  let nc = UF.fresh store { empty with clayout } in
+  merge r nc ; data
 
 let add_index (r:node) (ty:typ) : node =
   let size = bitsSizeOf ty in
@@ -566,26 +618,76 @@ and exp (m: map) (e: exp) : node option =
 let result (m: map) = m.result
 
 (* -------------------------------------------------------------------------- *)
+(* ---  Consolidation                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+let iter_parent_path parent f r =
+  match parent.clayout with
+  | Blob _ | Cell _ -> assert false
+  | Compound(_,_,R rgs) ->
+    List.iter
+      (fun (rg : node Ranges.range) ->
+         if equal r rg.data then f rg.length
+      ) rgs
+
+let rec consolidate marked n =
+  if not @@ UF.test_and_mark marked n then
+    let node = UF.get n in
+    let ps = UF.find_all node.cparents in
+    begin
+      node.cflags <- Attr.bottom ;
+      let flags fs = node.cflags <- Attr.merge node.cflags fs in
+      let size = sizeof node.clayout in
+      let path s = node.cpaths <- node.cpaths + (if s = size then 1 else 2) in
+      Vset.iter
+        (fun v ->
+           path @@ bitsSizeOf v.vtype ;
+           flags @@ Attr.cvar v
+        ) node.ccvars ;
+      Bag.iter
+        (function Root r ->
+           path (if Term.equal r.inf r.sup then size else max_int) ;
+           flags r.flags
+        ) node.croots ;
+      List.iter
+        (fun p ->
+           consolidate marked p ;
+           let parent = UF.get p in
+           node.cdepth <- max node.cdepth (succ parent.cdepth) ;
+           flags parent.cflags ;
+           if node.cpaths <= 1 then
+             if parent.cpaths = 1 then
+               iter_parent_path parent path n
+             else path max_int
+        ) ps ;
+      (* Warning about empty region shall be emitted here *)
+      if node.cpaths = 0 then node.cflags <- Attr.empty ;
+    end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Included & Separated                                               --- *)
+(* -------------------------------------------------------------------------- *)
 
 let included source target : bool =
   let exception Reached in
   try
-    let q = Queue.create () in (* only marked nodes *)
-    let push r =
-      let r = UF.find r in
-      if equal target r then raise Reached else Queue.push r q
-    in
-    push source ;
-    let visited = Hashtbl.create 0 in
+    let queue = Queue.create () in (* only marked nodes *)
+    let visit = Hashtbl.create 0 in
+    let depth = (UF.get target).cdepth in
+    let push src =
+      let src = UF.find src in
+      if equal target src then raise Reached else
+        let d = (UF.get src).cdepth in
+        if d <= depth then Queue.push src queue
+    in push source ;
     while true do
-      let node = Queue.pop q in
-      if equal target node then raise Exit else
-        let id = id node in
-        if not @@ Hashtbl.mem visited id then
-          begin
-            Hashtbl.add visited id () ;
-            List.iter push (parents node) ;
-          end
+      let node = Queue.pop queue in
+      let id = id node in
+      if not @@ Hashtbl.mem visit id then
+        begin
+          Hashtbl.add visit id () ;
+          List.iter push (parents node) ;
+        end
     done ;
     assert false
   with
@@ -595,28 +697,8 @@ let included source target : bool =
 let separated r1 r2 =
   not (included r1 r2) && not (included r2 r1)
 
-let single_path r0 r s =
-  match (UF.get r0).clayout with
-  | Blob _ -> true
-  | Cell(s0,_) -> s = s0
-  | Compound(_,_,R rgs) ->
-    List.for_all
-      (fun (rg : node Ranges.range) ->
-         not (equal r rg.data) || rg.length = s
-      ) rgs
-
-let rec singleton r =
-  let node = UF.get r in
-  (* normalized parents *)
-  match UF.find_all node.cparents with
-  | [] -> Vset.cardinal node.ccvars = 1
-  | [r0] ->
-    Vset.is_empty node.ccvars &&
-    single_path r0 r (sizeof node.clayout) &&
-    (* r != r0 && (* This test may be useful to prevent infinity loops. *) *)
-    singleton r0
-  | _ -> false
-
+(* -------------------------------------------------------------------------- *)
+(* --- Consolidated Accessors                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
 let reads (r:node) =
@@ -654,8 +736,11 @@ let typed (r:node) =
     in
     Access.Set.iter check node.creads ;
     Access.Set.iter check node.cwrites ;
+    Access.Set.iter check node.cinits ;
     !types
   with Exit -> None
+
+let singleton n = (UF.get n).cpaths = 1
 
 (* -------------------------------------------------------------------------- *)
 (* --- High-Level API                                                     --- *)
@@ -680,10 +765,12 @@ type region = {
   parents: node list ;
   cresult: bool ;
   cvars: cvar list ;
+  roots: root list ;
   labels: string list ;
   types: typ list ;
   typed : typ option ;
   fields: Fields.domain ;
+  flags : Attr.flags ;
   reads: Access.acs list ;
   writes: Access.acs list ;
   inits: Access.acs list ;
@@ -734,16 +821,21 @@ let pp_cvar fmt (Cvar r) =
 
 let pp_region fmt (m: region) =
   begin
-    let acs r s = if s = [] then '-' else r in
-    Format.fprintf fmt "@[<hov 2>%a: %c%c%c%c"
-      pp_node m.node (acs 'I' m.inits)
-      (acs 'R' m.reads) (acs 'W' m.writes) (acs 'A' m.shifts) ;
+    let pp_acs fmt r s =
+      Format.pp_print_char fmt @@
+      if s <> [] then r else '-' in
+    Format.fprintf fmt "@[<hov 2>%a: " pp_node m.node ;
+    pp_acs fmt 'I' m.inits ;
+    pp_acs fmt 'R' m.reads ;
+    pp_acs fmt 'W' m.writes ;
+    pp_acs fmt 'A' m.shifts ;
     List.iter (Format.fprintf fmt "@ %s:") m.labels ;
     if m.cresult then Format.fprintf fmt "@ \\result" ;
     List.iter (Format.fprintf fmt "@ %a" pp_cvar) m.cvars ;
     List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) m.types ;
     Format.fprintf fmt "@ %db" m.sizeof ;
     Option.iter (Format.fprintf fmt "@ (*%a)" pp_node) m.pointed ;
+    List.iter (Format.fprintf fmt "@ %a" pp_root) m.roots ;
     if m.ranges <> [] then
       begin
         Format.fprintf fmt "@ @[<hv 0>@[<hv 2>{" ;
@@ -759,6 +851,8 @@ let pp_region fmt (m: region) =
         List.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.writes ;
         List.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.shifts ;
       end ;
+    if m.singleton then Format.fprintf fmt "@ (singleton)" ;
+    Attr.iter (Format.fprintf fmt "@ (%a)" Attr.pp_attr) m.flags ;
     Format.fprintf fmt " ;@]" ;
   end
 
@@ -790,12 +884,14 @@ let make_region (n: node) (r: chunk) : region =
   let typed = typed n in
   let sizeof = sizeof r.clayout in
   let fields = cfields r.clayout in
-  let singleton = singleton n in
+  let singleton = r.cpaths = 1 in
+  let flags = r.cflags in
   {
     node = n ;
     parents = UF.find_all r.cparents ;
     cresult = r.cresult ;
     cvars = List.map (make_cvar sizeof) @@ Vset.elements r.ccvars ;
+    roots = Bag.elements r.croots ;
     labels = Lset.elements r.clabels ;
     reads = Access.Set.elements r.creads ;
     writes = Access.Set.elements r.cwrites ;
@@ -803,7 +899,7 @@ let make_region (n: node) (r: chunk) : region =
     inits = Access.Set.elements r.cinits ;
     ranges = List.map (make_range fields) (cranges r.clayout) ;
     pointed = Option.map UF.find (cpointed r.clayout) ;
-    types ; typed ; singleton ; sizeof ; fields ;
+    types ; typed ; singleton ; sizeof ; fields ; flags
   }
 
 let region n = make_region n (UF.get n)
@@ -813,6 +909,11 @@ let regions map =
   iter map (fun r -> pool := region r :: !pool) ;
   List.rev !pool
 
-let lock m = witer m UF.lock
+let lock m =
+  begin
+    witer m UF.lock ;
+    let marks = UF.marks () in
+    iter m (consolidate marks) ;
+  end
 
 (* -------------------------------------------------------------------------- *)

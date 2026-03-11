@@ -33,14 +33,17 @@ type acs =
   | Exp of Stmt.t * exp
   | Ret of Stmt.t * exp
   | Lval of Stmt.t * lval
-  | Init of Stmt.t * varinfo
+  | Init of Stmt.t * lval * exp
   | Term of clause * term_lval
 
 let compare a b =
   match a, b with
-  | Init(sa,xa), Init(sb,xb) ->
+  | Init(sa,la,va), Init(sb,lb,vb) ->
     let cmp = Stmt.compare sa sb in
-    if cmp <> 0 then cmp else Varinfo.compare xa xb
+    if cmp <> 0 then cmp else
+      let cmp = Lval.compare la lb in
+      if cmp <> 0 then cmp else
+        Exp.compare va vb
   | Init _ , _ -> (-1)
   | _ , Init _ -> (+1)
 
@@ -84,8 +87,8 @@ let pp_clause fmt = function
       (Property.Names.get_prop_name_id prop)
 
 let pretty fmt = function
-  | Init(s,x) ->
-    Format.fprintf fmt "%a@%a" Varinfo.pretty x pp_label s
+  | Init(s,l,v) ->
+    Format.fprintf fmt "(%a=%a)@%a" Lval.pretty l Exp.pretty v pp_label s
   | Lval(s,l) ->
     Format.fprintf fmt "%a@%a" Lval.pretty l pp_label s
   | Exp(s,e) ->
@@ -96,10 +99,11 @@ let pretty fmt = function
     Format.fprintf fmt "(%a)@%a" Term_lval.pretty l pp_clause c
 
 let pp_access fmt = function
-  | Init(_,x) -> Printer.pp_vdecl fmt x
   | Exp(_,e) -> Printer.pp_exp fmt e
   | Ret(_,e) -> Format.fprintf fmt "return %a" Printer.pp_exp e
   | Lval(_,l) -> Printer.pp_lval fmt l
+  | Init(_,l,v) ->
+    Format.fprintf fmt "init %a=%a" Printer.pp_lval l Printer.pp_exp v
   | Term(Prop _,t) -> Printer.pp_term_lval fmt t
   | Term(Body fn,t) ->
     Format.fprintf fmt "%a { %a }" Logic_info.pretty fn Printer.pp_term_lval t
@@ -112,7 +116,8 @@ let pp_line fmt stmt =
   Format.fprintf fmt "s%d, line %d" stmt.sid (fst loc).pos_lnum
 
 let pp_source fmt = function
-  | Init(stmt,_) | Ret(stmt,_) | Exp(stmt,_) | Lval(stmt,_) -> pp_line fmt stmt
+  | Init(stmt,_,_) | Ret(stmt,_) | Exp(stmt,_) | Lval(stmt,_) ->
+    pp_line fmt stmt
   | Term(Prop ip,_) -> Description.pp_local fmt ip
   | Term(Body fn,_) ->
     if fn.l_type = None then
@@ -131,8 +136,7 @@ let location = function
   | Prop ip | Call(_,_,ip) -> Property.location ip
 
 let typeof = function
-  | Init(_,x) -> x.vtype
-  | Lval(_,lv) -> Cil.typeOfLval lv
+  | Init(_,lv,_) | Lval(_,lv) -> Cil.typeOfLval lv
   | Exp(_,e) | Ret(_,e) -> Cil.typeOf e
   | Term(_,lv) ->
     Logic_const.plain_or_set ctype_of @@ Cil.typeOfTermLval lv
@@ -141,7 +145,8 @@ open Printer_tag
 
 let marker = function
   | Exp(stmt,e) | Ret(stmt,e) -> PExp(None,Kstmt stmt,e)
-  | Init (stmt,vi) -> PVDecl(None,Kstmt stmt,vi)
+  | Init (stmt,(Var vi,_),_) -> PVDecl(None,Kstmt stmt,vi)
+  | Init (stmt,(Mem e,_),_) -> PExp(None,Kstmt stmt,e)
   | Lval(stmt,_) | Term (Call (stmt, _, _), _) ->
     PStmtStart(Kernel_function.find_englobing_kf stmt, stmt)
   | Term (Body fn, _) -> PGlobal(GAnnot(Dfun_or_pred(fn,Location.dummy),Location.dummy))
@@ -149,4 +154,5 @@ let marker = function
 
 let rank = function
   | Term (Body _, _) | Term(Prop _, _) -> 0
-  | Exp(s,_) | Ret(s,_) | Init(s,_) | Lval(s,_) | Term(Call(s,_,_),_) -> s.sid
+  | Exp(s,_) | Ret(s,_) | Init(s,_,_) | Lval(s,_) | Term(Call(s,_,_),_)
+    -> s.sid

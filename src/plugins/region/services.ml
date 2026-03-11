@@ -39,10 +39,11 @@ struct
     ]
 
   let title (Memory.Cvar r) =
-    Format.asprintf "%a (%db) (%d cells)"
+    Format.asprintf "%a (%db)%t"
       Typ.pretty r.cvar.vtype
       (Memory.bitsSizeOf r.cvar.vtype)
-      r.cells
+      (fun fmt ->
+         if r.cells > 1 then Format.fprintf fmt " (%d cells)" r.cells)
 
   let to_json (Memory.Cvar r as cvar) =
     Json.of_fields [
@@ -54,6 +55,44 @@ struct
   let of_json _ = failwith "Region.Cvar.of_json"
 end
 
+module Root : Data.S with type t = Memory.root =
+struct
+  type t = Memory.root
+  let jtype = Data.declare ~package ~name:"root" @@
+    Jrecord [
+      "range", Jstring ;
+      "typeof", Jstring ;
+      "attrs", Jarray Jstring ;
+      "marker", Kernel_ast.Marker.jtype ;
+    ]
+
+  let typeof (Memory.Root r) =
+    Format.asprintf "%a[..]" Printer.pp_typ r.typ
+
+  let range (Memory.Root r) =
+    Format.asprintf "%a%a[%a..%a]"
+      Spec.pp_named r.named
+      Printer.pp_term r.ptr
+      Printer.pp_term r.inf
+      Printer.pp_term r.sup
+
+  let attributes (Memory.Root r) : Json.t =
+    let pool : Json.t list ref = ref [] in
+    Attr.iter
+      (fun a ->
+         pool := `String (Format.asprintf "%a" Attr.pp_attr a) :: !pool)
+      r.flags ;
+    `List (List.rev !pool)
+
+  let to_json (Memory.Root r as root) =
+    Json.of_fields [
+      "range", Json.of_string (range root) ;
+      "typeof", Json.of_string (typeof root) ;
+      "attrs", attributes root ;
+      "marker", Kernel_ast.Marker.to_json (PIP r.ip) ;
+    ]
+  let of_json _ = failwith "Region.Cvar.of_json"
+end
 
 module Range : Data.S with type t = Memory.range =
 struct
@@ -103,6 +142,7 @@ struct
 end
 
 module Cvars = Data.Jlist(Cvar)
+module Roots = Data.Jlist(Root)
 module Ranges = Data.Jlist(Range)
 module ACS = Data.Jlist(ACCESS)
 
@@ -172,7 +212,7 @@ struct
     Format.asprintf "%t (%db)%t"
       begin fun fmt ->
         match m.types with
-        | [] -> Format.pp_print_string fmt "Compound (empty)"
+        | [] -> Format.pp_print_string fmt "(no access)"
         | [ty] -> pp_typ_layout m.sizeof fmt ty ;
         | ty::ts ->
           pp_typ_layout 0 fmt ty ;
@@ -180,14 +220,24 @@ struct
       end
       m.sizeof
       begin fun fmt ->
-        if m.singleton then Format.pp_print_string fmt " (singleton)"
+        if m.types <> [] && m.singleton then Format.pp_print_string fmt " (singleton)" ;
+        Attr.iter (Format.fprintf fmt " (%a)" Attr.pp_attr) m.flags ;
       end
+
+  let labels (r: Memory.region) =
+    List.filter
+      (fun l ->
+         List.for_all
+           (function Memory.Root r -> r.named <> l)
+           r.roots
+      ) r.labels
 
   let jtype = Data.declare ~package ~name:"region" @@
     Jrecord [
       "node", Node.jtype ;
       "result", Jboolean ;
       "cvars", Cvars.jtype ;
+      "roots", Roots.jtype ;
       "labels", Jarray Jalpha ;
       "parents", NodeList.jtype ;
       "sizeof", Jnumber ;
@@ -207,7 +257,8 @@ struct
       "node", Node.to_json m.node ;
       "result", Json.of_bool m.cresult ;
       "cvars", Cvars.to_json m.cvars ;
-      "labels", labels_to_json m.labels ;
+      "roots", Roots.to_json m.roots ;
+      "labels", labels_to_json @@ labels m ;
       "parents", NodeList.to_json m.parents ;
       "sizeof", Json.of_int @@ m.sizeof ;
       "ranges", Ranges.to_json @@ m.ranges ;

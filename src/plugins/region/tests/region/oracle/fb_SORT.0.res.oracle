@@ -1,45 +1,35 @@
 [kernel] Parsing fb_SORT.i (no preprocessing)
 [region] Analyzing regions
 [region] Function job:
-  R0001: -R-- fb (FB *) 64b (*R0002) ;
+  R0001: -R-- fb (FB *) 64b (*R0002) (singleton) ;
   R0002: ---- 704b
     {
       .prm: R0003;
-      .inp1: R0006;
-      #128b;
-      .out1: R000a;
-      .out2: R000e;
-      .out3: R0011;
-      .idx1: R0014;
-      #128b;
-      .sum: R0018;
+      (inp1-inp3): R0006[3];
+      (out1-out3): R000a[3];
+      (idx1-idx3): R000e[3];
+      .sum: R0012;
     } ;
   R0003: -R-- (struct N *) 64b (*R0004) ;
   R0004: ---- 128b { .v: R0005; #64b; } ;
   R0005: -R-- (double) 64b ;
-  R0006: -R-A (struct N *) 64b (*R0007) ;
+  R0006: -R-A INP: (struct N *) 64b (*R0007) ;
   R0007: ---- 128b { .v: R0008; .s: R0009; #32b; } ;
   R0008: -R-- (double) 64b ;
   R0009: -R-- (int) 32b ;
-  R000a: -R-A (struct N *) 64b (*R000b) ;
+  R000a: -R-A OUT: (struct N *) 64b (*R000b) ;
   R000b: ---- 128b { .v: R000c; .s: R000d; #32b; } ;
   R000c: -RW- (double) 64b ;
   R000d: --W- (int) 32b ;
-  R000e: -R-- (struct N *) 64b (*R000f) ;
-  R000f: ---- 128b { .v: R0010; #64b; } ;
-  R0010: -R-- (double) 64b ;
-  R0011: -R-- (struct N *) 64b (*R0012) ;
-  R0012: ---- 128b { .v: R0013; #64b; } ;
-  R0013: -R-- (double) 64b ;
-  R0014: -R-A (struct L *) 64b (*R0015) ;
-  R0015: ---- 64b { .v: R0016; .s: R0017; } ;
-  R0016: --W- (int) 32b ;
-  R0017: --W- (int) 32b ;
-  R0018: -R-- (struct N *) 64b (*R0019) ;
-  R0019: ---- 128b { .v: R001a; .s: R001b; #32b; } ;
-  R001a: --W- (double) 64b ;
-  R001b: --W- (int) 32b ;
-  R001c: IR-- inp (SN *) 64b (*R0006) ;
-  R001d: IR-- out (SN *) 64b (*R000a) ;
-  R001e: IR-- idx (SL *) 64b (*R0014) ;
-  R001f: IRW- i (int) 32b ;
+  R000e: -R-A IDX: (struct L *) 64b (*R000f) ;
+  R000f: ---- 64b { .v: R0010; .s: R0011; } ;
+  R0010: --W- (int) 32b ;
+  R0011: --W- (int) 32b ;
+  R0012: -R-- (struct N *) 64b (*R0013) ;
+  R0013: ---- 128b { .v: R0014; .s: R0015; #32b; } ;
+  R0014: --W- (double) 64b ;
+  R0015: --W- (int) 32b ;
+  R0016: IR-- inp (SN *) 64b (*R0006) (singleton) (dynamic) ;
+  R0017: IR-- out (SN *) 64b (*R000a) (singleton) (dynamic) ;
+  R0018: IR-- idx (SL *) 64b (*R000e) (singleton) (dynamic) ;
+  R0019: IRW- i (int) 32b (singleton) (dynamic) ;

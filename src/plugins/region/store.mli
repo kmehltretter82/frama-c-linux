@@ -64,4 +64,15 @@ sig
       For non-locked nodes, 'HHHH' is the raw rref of the node, for
       locked nodes, 'hhhh' is the unique identifier of the node. *)
 
+  type marks
+  val marks : unit -> marks
+  val marked : marks -> node -> bool
+
+  (** Returns [true] if the node is already marked and finally mark it. *)
+  val test_and_mark : marks -> node -> bool
+
+  (** Returns [true] if the node is already marked and finally mark it.
+      The callback is only invoked when the node was {i not} marked. *)
+  val once : (node -> unit) -> node -> bool
+
 end

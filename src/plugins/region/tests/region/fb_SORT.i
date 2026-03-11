@@ -15,6 +15,11 @@ typedef struct Block {
   SN sum ;
 } FB ;
 
+/*@
+  region INP: (fb->inp1 .. fb->inp3) ;
+  region OUT: (fb->out1 .. fb->out3) ;
+  region IDX: (fb->idx3 .. fb->idx1) ; // min-max
+  */
 void job(FB *fb)
 {
   SN *inp = &(fb->inp1) ;

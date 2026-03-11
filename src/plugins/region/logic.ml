@@ -11,41 +11,7 @@ open Cil_datatype
 
 open Spec
 open Memory
-open Ldomain
-
-(* -------------------------------------------------------------------------- *)
-(* ---  Process ACSL region annotations                                   --- *)
-(* -------------------------------------------------------------------------- *)
-
-let rec add_path (m:map) (p:path): node =
-  match p.step with
-  | Var x -> add_cvar m x
-  | Field(lv,fd) -> Memory.add_field (add_path m lv) fd
-  | Index(lv,_) -> Memory.add_index (add_path m lv) lv.typ
-  | Star e | Cast(_,e) -> add_pointer m e
-  | Shift _ | AddrOf _ ->
-    Options.error ~source:(fst p.loc)
-      "Unexpected expression (l-value expected)" ;
-    Memory.fresh m
-and add_pointer (m:map) (p:path): Memory.node =
-  match add_exp m p with
-  | None -> Memory.fresh m
-  | Some r -> r
-
-and add_exp (m:map) (p:path): Memory.node option =
-  match p.step with
-  | (Var _ | Field _ | Index _ | Star _ | Cast _) ->
-    let r = add_path m p in
-    add_value r p.typ
-  | AddrOf p -> Some (add_path m p)
-  | Shift p -> add_exp m p
-
-let add_region (m: map) (r : Spec.region) =
-  let rs = List.map (add_path m) r.rpath in
-  merge_all @@
-  match r.rname with
-  | None -> rs
-  | Some a -> add_label m a :: rs
+open Domain
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Process ACSL logic terms & predicates                             --- *)
@@ -63,7 +29,7 @@ let fresh env () = Memory.fresh env.map
 let merge a b = Memory.merge a b ; min a b
 
 let pointer (d:domain) : node =
-  match Ldomain.pointed merge d with
+  match Domain.pointed merge d with
   | Some p -> p
   | None -> Options.fatal "Not a pointer value"
 
@@ -92,14 +58,14 @@ let rec load env lv (ty,r) : domain =
       let ofs = TField (fd,TNoOffset) in
       let lvf = Logic_const.addTermOffsetLval ofs lv in
       merge_domain d
-      @@ Ldomain.field fd
+      @@ Domain.field fd
       @@ load env lvf
       @@ (fd.ftype, Memory.add_field r fd)
     in List.fold_left add_field pure @@ Option.value ~default:[] cfields
   | _ ->
     let acs = Access.Term (env.context, lv) in
     Memory.add_read r acs ;
-    Ldomain.scalar @@ Memory.add_value r ty
+    Domain.scalar @@ Memory.add_value r ty
 
 let rterm = ref (fun _ _ -> assert false)
 
@@ -119,10 +85,10 @@ let rec term_offset ~loc (env:env) (d:domain) = function
   | TModel _ ->
     Options.not_yet_implemented ~source:(fst loc) "Unsupported model fields"
   | TField (f,offset) ->
-    term_offset ~loc env (Ldomain.get_field merge d f) offset
+    term_offset ~loc env (Domain.get_field merge d f) offset
   | TIndex(k,offset) ->
     ignore @@ !rterm env k ;
-    term_offset ~loc env (Ldomain.get_index merge d) offset
+    term_offset ~loc env (Domain.get_index merge d) offset
 
 let add_term_lval ~loc (env:env) (lv : term_lval) : domain =
   let lhost, loffset = lv in
@@ -169,16 +135,16 @@ let add_addr_lval ~loc (env:env) (lv : term_lval) : typ * node =
 let rec add_loffset ~loc (env:env) loffest d =
   match loffest with
   | TNoOffset -> d
-  | TField(fd,offset) -> Ldomain.field fd @@ add_loffset ~loc env offset d
+  | TField(fd,offset) -> Domain.field fd @@ add_loffset ~loc env offset d
   | TModel _ ->
     Options.not_yet_implemented ~source:(fst loc) "Unsupported model fields"
-  | TIndex(_,offset) -> Ldomain.array @@ add_loffset ~loc env offset d
+  | TIndex(_,offset) -> Domain.array @@ add_loffset ~loc env offset d
 
 let call (env:env) (l:logic_info) (ds:domain list) : domain =
-  let sigma = ref Ldomain.empty in
-  let unify = Ldomain.unify merge sigma in
+  let sigma = ref Domain.empty in
+  let unify = Domain.unify merge sigma in
   List.iter2 (fun x -> unify (Memory.add_lvar env.map x)) l.l_profile ds ;
-  Ldomain.subst !sigma @@ Memory.add_logic env.map l
+  Domain.subst !sigma @@ Memory.add_logic env.map l
 
 let iadd_logic_var m v = ignore @@ add_lvar m v
 
@@ -212,15 +178,15 @@ let rec add_term (env:env) (t:term) : domain =
     add_term env t
   | Tapp(f,_,ts) -> call env f @@ List.map (add_term env) ts
   | Tlambda(q,t) ->
-    Ldomain.arrow (List.map (Memory.add_lvar env.map) q) @@ add_term env t
+    Domain.arrow (List.map (Memory.add_lvar env.map) q) @@ add_term env t
   | Tlet({ l_body ; l_var_info=v },b) ->
     begin match l_body with
       | LBterm a ->
         let dv = add_lvar env.map v in
         let da = add_term env a in
-        let sigma = ref Ldomain.empty in
-        Ldomain.unify merge sigma da dv ;
-        Ldomain.subst !sigma @@ add_term env b
+        let sigma = ref Domain.empty in
+        Domain.unify merge sigma da dv ;
+        Domain.subst !sigma @@ add_term env b
       | LBpred p ->
         iadd_logic_var env.map v ;
         add_predicate env p ;
@@ -232,7 +198,7 @@ let rec add_term (env:env) (t:term) : domain =
   | TDataCons(c,ts) ->
     let ds = List.map (add_term env) ts in
     let args = List.map (of_ltype (fresh env)) c.ctor_params in
-    let sigma = ref Ldomain.empty in
+    let sigma = ref Domain.empty in
     List.iter2 (unify merge sigma) ds args ;
     begin match c.ctor_type.lt_def with
       | Some (LTsyn lt) -> of_ltype (fresh env) lt
@@ -266,7 +232,7 @@ and add_predicate (env:env) (p:predicate) = match p.pred_content with
     let dv = add_lvar env.map v in
     let dt = add_term env t in
     let sigma = ref empty in
-    Ldomain.unify merge sigma dt dv ;
+    Domain.unify merge sigma dt dv ;
     add_predicate env p2
   | Plet({ l_var_info = v ; l_body = LBpred p1 ; },p2) ->
     iadd_logic_var env.map v ;
@@ -280,6 +246,29 @@ and add_predicate (env:env) (p:predicate) = match p.pred_content with
   | Papp(f,_,ts) -> ignore @@ call env f @@ List.map (add_term env) ts
 
 let () = rterm := add_term
+
+(* -------------------------------------------------------------------------- *)
+(* ---  Process ACSL region annotations                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+let add_path (env: env) Spec.{ named ; flags } = function
+  | Spec.Alias(loc,lv) ->
+    snd @@ add_addr_lval ~loc env lv
+  | Spec.Field(loc,lv,f,g) ->
+    let r = snd @@ add_addr_lval ~loc env lv in
+    Memory.add_field_range r f g
+  | Spec.Range(_,ptr,typ,inf,sup) ->
+    iadd_term env inf ; iadd_term env sup ;
+    let rp = pointer @@ add_term env ptr in
+    let re = Memory.add_index rp typ in
+    let ip = match env.context with Prop ip -> ip | _ -> assert false in
+    let root = Root { ip ; named ; ptr ; typ ; inf ; sup ; flags } in
+    Memory.add_root env.map re root ; re
+
+let add_region (env: env) (r : Spec.region) =
+  let rs = List.map (add_path env r) r.paths in
+  merge_all @@
+  if r.named = "" then rs else add_label env.map r.named :: rs
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Process ACSL logic                                                --- *)

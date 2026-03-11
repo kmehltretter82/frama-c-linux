@@ -1,0 +1,6 @@
+[kernel] Parsing init.c (with preprocessing)
+[region] Analyzing regions
+[region] Function job:
+  R0001: ---- a s[4] 64b { .f: R0002; .g: R0003; } (dynamic) (garbage) ;
+  R0002: I--- (int) 32b (dynamic) (garbage) ;
+  R0003: I--- (int) 32b (dynamic) (garbage) ;

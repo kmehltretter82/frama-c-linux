@@ -10,6 +10,13 @@ open Cil_types
 
 type node
 
+type root = Root of {
+    ip : Property.t ;
+    named : string ;
+    typ : typ ; ptr : term ; inf : term ; sup : term ;
+    flags : Attr.flags ;
+  }
+
 type cvar = Cvar of {
     cvar : varinfo ;
     label : string ;
@@ -29,10 +36,12 @@ type region = {
   parents: node list ;
   cresult: bool ;
   cvars: cvar list ;
+  roots: root list ;
   labels: string list ;
   types: typ list ;
   typed : typ option ;
   fields: Fields.domain ;
+  flags : Attr.flags ;
   reads: Access.acs list ;
   writes: Access.acs list ;
   inits: Access.acs list ;
@@ -43,12 +52,13 @@ type region = {
   pointed: node option ;
 }
 
-type domain = node Ldomain.t
-type context = node Ldomain.context
+type domain = node Domain.t
+type context = node Domain.context
 
 type map
 
 val pp_node : Format.formatter -> node -> unit
+val pp_root : Format.formatter -> root -> unit
 val pp_region : Format.formatter -> region -> unit
 
 (** Initially unlocked. *)
@@ -81,7 +91,9 @@ val add_lvar : map -> Cil_types.logic_var -> domain
 val add_logic : map -> Cil_types.logic_info -> domain
 val add_result : map -> node
 val add_label : map -> string -> node
+val add_root : map -> node -> root -> unit
 val add_field : node -> fieldinfo -> node
+val add_field_range : node -> fieldinfo -> fieldinfo -> node
 val add_index : node -> typ -> node
 val add_points_to : node -> node -> unit
 val add_value : node -> typ -> node option

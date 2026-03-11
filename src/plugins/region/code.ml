@@ -82,7 +82,7 @@ let is_comp lv =
 (* --- Initializers                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rec add_init (m:map) (s:stmt) (acs:Access.acs) (lv:lval) (iv:init) =
+let rec add_init (m:map) (s:stmt) (lv:lval) (iv:init) =
   match iv with
 
   | SingleInit { enode = Lval le } when is_comp le ->
@@ -92,16 +92,18 @@ let rec add_init (m:map) (s:stmt) (acs:Access.acs) (lv:lval) (iv:init) =
 
   | SingleInit e ->
     let r = add_lval m s lv in
-    Memory.add_init r acs @@ Cil.typeOfLval lv ;
+    let tv = Cil.typeOfLval lv in
+    let tr = if Ast_types.is_array tv then Ast_types.element_type tv else tv in
+    let acs = Access.Init(s,lv,e) in
+    Memory.add_init r acs tr ;
     Option.iter (Memory.add_points_to r) (add_exp m s e)
 
   | CompoundInit(_,fvs) ->
     List.iter
       (fun (ofs,iv) ->
          let lv = Cil.addOffsetLval ofs lv in
-         add_init m s acs lv iv
+         add_init m s lv iv
       ) fvs
-
 
 (* -------------------------------------------------------------------------- *)
 (* --- Instructions                                                       --- *)
@@ -139,7 +141,7 @@ let add_kf_call m s r kf vs =
   in Annot.add_spec ~map:m ~called:s ~kf ~formals ~result:r spec
 
 let add_call m s r fct es =
-  let vs = List.map (fun e -> Ldomain.scalar @@ add_exp m s e) es in
+  let vs = List.map (fun e -> Domain.scalar @@ add_exp m s e) es in
   match Kernel_function.get_called fct with
   | Some kf -> add_kf_call m s r kf vs
   | None ->
@@ -161,8 +163,7 @@ let add_instr ~map ~stmt = function
     add_write ~map ~stmt ~acs:(Lval(stmt,lv)) r e ;
 
   | Local_init(x,AssignInit iv,_) ->
-    let acs = Access.Init(stmt,x) in
-    add_init map stmt acs (Var x,NoOffset) iv
+    add_init map stmt (Var x,NoOffset) iv
 
   | Local_init(x,ConsInit (vf,args,kind), loc) ->
     let r = add_cvar map x in

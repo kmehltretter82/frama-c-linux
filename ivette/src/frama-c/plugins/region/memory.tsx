@@ -28,7 +28,7 @@ function makeRecord(
   const cells: Dot.Cell[] = [];
   let offset = 0;
   ranges.forEach((rg, i) => {
-    const port = `r${i}`;
+    const port = `P${i}`;
     const target = `n${rg.data}`;
     edges.push({
       source, sourcePort: port, target,
@@ -78,15 +78,15 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
     target.set(r.node, id);
     // --- Labels
     const L: Dot.Node = { id: '', shape: 'note', font: 'mono' };
-    r.labels.forEach(a => {
-      const lid = `L${a}`;
-      nodes.push({ ...L, id: lid, label: `${a}:` });
+    if (r.labels.length > 0) {
+      const lid = `L${r.node}`;
+      nodes.push({ ...L, id: lid, label: `${r.labels.join(',')}:` });
       index.set(lid, r.node);
       edges.push({
         source: lid, target: id, aligned: true,
         headAnchor: 's', head: 'none', color: 'grey'
       });
-    });
+    }
     // --- Roots
     const R: Dot.Node = { id: '', shape: 'cds', font: 'mono' };
     // --- Roots: Result
@@ -106,6 +106,17 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
       index.set(xid, r.node);
       edges.push({
         source: xid, target: id,
+        headAnchor: "e", head: 'none', color: 'grey'
+      });
+    });
+    // --- Roots: Array Ranges
+    const A: Dot.Node = { ...R, color: 'blue' };
+    r.roots.forEach((a, k) => {
+      const aid = `A${r.node}#${k}`;
+      nodes.push({ ...A, id: aid, label: a.range, title: a.typeof });
+      index.set(aid, r.node);
+      edges.push({
+        source: aid, target: id,
         headAnchor: "e", head: 'none', color: 'grey'
       });
     });

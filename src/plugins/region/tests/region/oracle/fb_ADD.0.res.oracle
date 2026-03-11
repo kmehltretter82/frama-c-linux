@@ -1,7 +1,7 @@
 [kernel] Parsing fb_ADD.i (no preprocessing)
 [region] Analyzing regions
 [region] Function job:
-  R0001: -R-- fb (FB *) 64b (*R0002) ;
+  R0001: -R-- fb (FB *) 64b (*R0002) (singleton) ;
   R0002: ---- 704b { #256b; .out1: R0003; .out2: R0007; #320b; } ;
   R0003: -R-- (struct N *) 64b (*R0004) ;
   R0004: ---- 128b { .v: R0005; .s: R0006; #32b; } ;
