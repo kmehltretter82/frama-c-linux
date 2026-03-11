@@ -1,4 +1,5 @@
 /* run.config
+   ENABLED_IF: %{bin-available:gcc}
    DEPS: ./mixed_includes/limits.h
    OPT: -cpp-command="gcc -E -C -Imixed_includes" -print
 */
