@@ -8,76 +8,79 @@
   tainted ∈ {0}
 [eva:progress] 
   computing for function taints <- main.
-  Called from taint.c:212.
+  Called from taint.c:225.
 [eva:progress] 
   computing for function Frama_C_interval <- taints <- main.
-  Called from taint.c:207.
+  Called from taint.c:220.
 [eva] using specification for function Frama_C_interval
-[eva:progress] taint.c:207: 
+[eva:progress] taint.c:220: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva:progress] Done for function Frama_C_interval
 [eva:progress] Recording results for taints
 [eva:progress] Done for function taints
 [eva:progress] 
   computing for function taint_basic <- main.
-  Called from taint.c:213.
-[eva:alarm] taint.c:33: Warning: accessing out of bounds index. assert t < 2;
-[eva:show] taint.c:35: 
+  Called from taint.c:226.
+[eva:alarm] taint.c:36: Warning: accessing out of bounds index. assert t < 2;
+[eva:progress] taint.c:44: check got status valid.
+[eva:progress] taint.c:45: check got status valid.
+[eva:alarm] taint.c:46: Warning: check got status unknown.
+[eva:show] taint.c:48: 
   Frama_C_dump_each:
   # taint:
   default:
-    Locations (data): tainted; t; u; x
-    Locations (control): w; buf[0..1]
+    Locations (data): tainted; t; u; x; i
+    Locations (control): w; y; buf[0..1]; z
   ==END OF DUMP==
 [eva:progress] Recording results for taint_basic
 [eva:progress] Done for function taint_basic
 [eva:progress] 
   computing for function taint_assume_1 <- main.
-  Called from taint.c:216.
-[eva:loop-unroll:auto] taint.c:49: Automatic loop unrolling.
-[eva:show] taint.c:50: 
+  Called from taint.c:229.
+[eva:loop-unroll:auto] taint.c:62: Automatic loop unrolling.
+[eva:show] taint.c:63: 
   Frama_C_dump_each:
   # taint:
   default:
     Locations (data): \nothing
     Locations (control): \nothing
   ==END OF DUMP==
-[eva:show] taint.c:53: 
+[eva:show] taint.c:66: 
   Frama_C_dump_each:
   # taint:
   default:
     Locations (data): \nothing
     Locations (control): \nothing
   ==END OF DUMP==
-[eva:show] taint.c:50: 
+[eva:show] taint.c:63: 
   Frama_C_dump_each:
   # taint:
   default:
     Locations (data): x
     Locations (control): \nothing
   ==END OF DUMP==
-[eva:show] taint.c:53: 
+[eva:show] taint.c:66: 
   Frama_C_dump_each:
   # taint:
   default:
     Locations (data): x
     Locations (control): y
   ==END OF DUMP==
-[eva:show] taint.c:50: 
-  Frama_C_dump_each:
-  # taint:
-  default:
-    Locations (data): x
-    Locations (control): x; y
-  ==END OF DUMP==
-[eva:show] taint.c:53: 
-  Frama_C_dump_each:
-  # taint:
-  default:
-    Locations (data): x
-    Locations (control): x; y
-  ==END OF DUMP==
 [eva:show] taint.c:63: 
+  Frama_C_dump_each:
+  # taint:
+  default:
+    Locations (data): x
+    Locations (control): x; y
+  ==END OF DUMP==
+[eva:show] taint.c:66: 
+  Frama_C_dump_each:
+  # taint:
+  default:
+    Locations (data): x
+    Locations (control): x; y
+  ==END OF DUMP==
+[eva:show] taint.c:76: 
   Frama_C_dump_each:
   # taint:
   default:
@@ -88,8 +91,8 @@
 [eva:progress] Done for function taint_assume_1
 [eva:progress] 
   computing for function taint_assume_2 <- main.
-  Called from taint.c:217.
-[eva:show] taint.c:79: 
+  Called from taint.c:230.
+[eva:show] taint.c:92: 
   Frama_C_dump_each:
   # taint:
   default:
@@ -100,8 +103,8 @@
 [eva:progress] Done for function taint_assume_2
 [eva:progress] 
   computing for function taint_undet_locs <- main.
-  Called from taint.c:219.
-[eva:show] taint.c:91: 
+  Called from taint.c:232.
+[eva:show] taint.c:104: 
   Frama_C_dump_each:
   # taint:
   default:
@@ -110,20 +113,20 @@
   ==END OF DUMP==
 [eva:progress] Recording results for taint_undet_locs
 [eva:progress] Done for function taint_undet_locs
-[eva:progress] taint.c:222: Reusing old results for call to taints
+[eva:progress] taint.c:235: Reusing old results for call to taints
 [eva:progress] 
   computing for function taint_spec_assigns <- main.
-  Called from taint.c:223.
+  Called from taint.c:236.
 [eva] using specification for function taint_spec_assigns
 [eva:progress] Done for function taint_spec_assigns
-[eva:show] taint.c:225: 
+[eva:show] taint.c:238: 
   Frama_C_domain_show_each:
   l : # taint: default
   true
 [eva:progress] 
   computing for function taint_goto_1 <- main.
-  Called from taint.c:228.
-[eva:show] taint.c:110: 
+  Called from taint.c:241.
+[eva:show] taint.c:123: 
   Frama_C_dump_each:
   # taint:
   default:
@@ -134,8 +137,8 @@
 [eva:progress] Done for function taint_goto_1
 [eva:progress] 
   computing for function taint_goto_2 <- main.
-  Called from taint.c:229.
-[eva:show] taint.c:130: 
+  Called from taint.c:242.
+[eva:show] taint.c:143: 
   Frama_C_dump_each:
   # taint:
   default:
@@ -144,23 +147,24 @@
   ==END OF DUMP==
 [eva:progress] Recording results for taint_goto_2
 [eva:progress] Done for function taint_goto_2
-[eva:progress] taint.c:231: Reusing old results for call to taints
+[eva:progress] taint.c:244: Reusing old results for call to taints
 [eva:progress] 
   computing for function taint_call <- main.
-  Called from taint.c:232.
+  Called from taint.c:245.
 [eva:progress] 
   computing for function taint_basic <- taint_call <- main.
-  Called from taint.c:138.
-[eva:show] taint.c:35: 
+  Called from taint.c:151.
+[eva:alarm] taint.c:44: Warning: check got status unknown.
+[eva:show] taint.c:48: 
   Frama_C_dump_each:
   # taint:
   default:
-    Locations (data): tainted; t; u; x; t
-    Locations (control): t; u; w; x; y; buf[0..1]
+    Locations (data): tainted; t; u; x; i; t
+    Locations (control): t; u; w; x; y; buf[0..1]; i; tt[0]; z
   ==END OF DUMP==
 [eva:progress] Recording results for taint_basic
 [eva:progress] Done for function taint_basic
-[eva:show] taint.c:141: 
+[eva:show] taint.c:154: 
   Frama_C_domain_show_each:
   x : # taint: default
   false
@@ -168,21 +172,21 @@
 [eva:progress] Done for function taint_call
 [eva:progress] 
   computing for function taints <- main.
-  Called from taint.c:234.
+  Called from taint.c:247.
 [eva:progress] 
   computing for function Frama_C_interval <- taints <- main.
-  Called from taint.c:207.
+  Called from taint.c:220.
 [eva:progress] Done for function Frama_C_interval
 [eva:progress] Recording results for taints
 [eva:progress] Done for function taints
 [eva:progress] 
   computing for function taint_infinite_while <- main.
-  Called from taint.c:235.
-[eva:loop-unroll:auto] taint.c:157: Automatic loop unrolling.
-[eva:loop-unroll:partial] taint.c:157: loop not completely unrolled
-[eva:partition] taint.c:157: starting to merge loop iterations
-[eva:alarm] taint.c:157: Warning: signed overflow. assert i + 1 ≤ 2147483647;
-[eva:show] taint.c:165: 
+  Called from taint.c:248.
+[eva:loop-unroll:auto] taint.c:170: Automatic loop unrolling.
+[eva:loop-unroll:partial] taint.c:170: loop not completely unrolled
+[eva:partition] taint.c:170: starting to merge loop iterations
+[eva:alarm] taint.c:170: Warning: signed overflow. assert i + 1 ≤ 2147483647;
+[eva:show] taint.c:178: 
   Frama_C_dump_each:
   # taint:
   default:
@@ -191,33 +195,33 @@
   ==END OF DUMP==
 [eva:progress] Recording results for taint_infinite_while
 [eva:progress] Done for function taint_infinite_while
-[eva:progress] taint.c:237: Reusing old results for call to taints
+[eva:progress] taint.c:250: Reusing old results for call to taints
 [eva:progress] 
   computing for function tainted_predicate <- main.
-  Called from taint.c:238.
+  Called from taint.c:251.
 [eva:progress] 
   computing for function Frama_C_interval <- tainted_predicate <- main.
-  Called from taint.c:170.
-[eva:progress] taint.c:170: 
+  Called from taint.c:183.
+[eva:progress] taint.c:183: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva:progress] Done for function Frama_C_interval
-[eva:alarm] taint.c:176: Warning: check 'true' got status unknown.
-[eva:alarm] taint.c:177: Warning: check 'false' got status unknown.
-[eva:alarm] taint.c:178: Warning: check 'false' got status invalid.
-[eva:progress] taint.c:179: check 'true' got status valid.
-[eva:alarm] taint.c:180: Warning: assertion 'unknown' got status unknown.
-[eva:progress] taint.c:181: check 'true' got status valid.
-[eva:alarm] taint.c:182: Warning: check got status unknown.
-[eva:alarm] taint.c:183: Warning: check 'false' got status invalid.
-[eva:progress] taint.c:191: assertion 'true' got status valid.
-[eva:progress] taint.c:192: assertion 'true' got status valid.
+[eva:alarm] taint.c:189: Warning: check 'true' got status unknown.
+[eva:alarm] taint.c:190: Warning: check 'false' got status unknown.
+[eva:alarm] taint.c:191: Warning: check 'false' got status invalid.
+[eva:progress] taint.c:192: check 'true' got status valid.
+[eva:alarm] taint.c:193: Warning: assertion 'unknown' got status unknown.
+[eva:progress] taint.c:194: check 'true' got status valid.
 [eva:alarm] taint.c:195: Warning: check got status unknown.
-[eva:alarm] taint.c:196: Warning: check got status unknown.
-[eva:progress] taint.c:197: check 'true' got status valid.
-[eva:progress] taint.c:198: check 'true' got status valid.
-[eva:alarm] taint.c:200: Warning: check 'false' got status unknown.
-[eva:alarm] taint.c:201: Warning: assertion 'unknown' got status unknown.
-[eva:progress] taint.c:202: check 'true' got status valid.
+[eva:alarm] taint.c:196: Warning: check 'false' got status invalid.
+[eva:progress] taint.c:204: assertion 'true' got status valid.
+[eva:progress] taint.c:205: assertion 'true' got status valid.
+[eva:alarm] taint.c:208: Warning: check got status unknown.
+[eva:alarm] taint.c:209: Warning: check got status unknown.
+[eva:progress] taint.c:210: check 'true' got status valid.
+[eva:progress] taint.c:211: check 'true' got status valid.
+[eva:alarm] taint.c:213: Warning: check 'false' got status unknown.
+[eva:alarm] taint.c:214: Warning: assertion 'unknown' got status unknown.
+[eva:progress] taint.c:215: check 'true' got status valid.
 [eva:progress] Recording results for tainted_predicate
 [eva:progress] Done for function tainted_predicate
 [eva:progress] Recording results for main
@@ -235,9 +239,12 @@
   u ∈ [0..10]
   w ∈ {1; 2}
   x ∈ [1..11]
-  y ∈ {0}
+  y ∈ {1; 2}
   buf[0] ∈ {0; 2}
      [1] ∈ {1; 2}
+  i ∈ {1}
+  tt[0..1] ∈ {0}
+  z ∈ {0}
 [eva:final-states] Values at end of function taint_call:
   x ∈ {0}
 [eva:final-states] Values at end of function taint_goto_1:
@@ -344,7 +351,7 @@
 [inout] Inputs for function taint_assume_2:
     \nothing
 [inout] Out (internal) for function taint_basic:
-    u; w; x; y; buf[0..1]
+    u; w; x; y; buf[0..1]; i; tt[0..1]; z
 [inout] Inputs for function taint_basic:
     undet
 [inout] Out (internal) for function taint_call:

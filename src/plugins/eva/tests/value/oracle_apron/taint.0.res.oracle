@@ -1,41 +1,41 @@
 2d1
 < [eva:experimental] Warning: The taint domain is experimental.
-113c112,120
-< [eva:progress] taint.c:222: Reusing old results for call to taints
+116c115,123
+< [eva:progress] taint.c:235: Reusing old results for call to taints
 ---
 > [eva:progress] 
 >   computing for function taints <- main.
->   Called from taint.c:222.
+>   Called from taint.c:235.
 > [eva:progress] 
 >   computing for function Frama_C_interval <- taints <- main.
->   Called from taint.c:207.
+>   Called from taint.c:220.
 > [eva:progress] Done for function Frama_C_interval
 > [eva:progress] Recording results for taints
 > [eva:progress] Done for function taints
-147c154,162
-< [eva:progress] taint.c:231: Reusing old results for call to taints
+150c157,165
+< [eva:progress] taint.c:244: Reusing old results for call to taints
 ---
 > [eva:progress] 
 >   computing for function taints <- main.
->   Called from taint.c:231.
+>   Called from taint.c:244.
 > [eva:progress] 
 >   computing for function Frama_C_interval <- taints <- main.
->   Called from taint.c:207.
+>   Called from taint.c:220.
 > [eva:progress] Done for function Frama_C_interval
 > [eva:progress] Recording results for taints
 > [eva:progress] Done for function taints
-181,182d195
-< [eva:loop-unroll:auto] taint.c:157: Automatic loop unrolling.
-< [eva:loop-unroll:partial] taint.c:157: loop not completely unrolled
-194c207,215
-< [eva:progress] taint.c:237: Reusing old results for call to taints
+185,186d199
+< [eva:loop-unroll:auto] taint.c:170: Automatic loop unrolling.
+< [eva:loop-unroll:partial] taint.c:170: loop not completely unrolled
+198c211,219
+< [eva:progress] taint.c:250: Reusing old results for call to taints
 ---
 > [eva:progress] 
 >   computing for function taints <- main.
->   Called from taint.c:237.
+>   Called from taint.c:250.
 > [eva:progress] 
 >   computing for function Frama_C_interval <- taints <- main.
->   Called from taint.c:207.
+>   Called from taint.c:220.
 > [eva:progress] Done for function Frama_C_interval
 > [eva:progress] Recording results for taints
 > [eva:progress] Done for function taints
