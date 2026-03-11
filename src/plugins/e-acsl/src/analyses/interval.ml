@@ -568,7 +568,12 @@ let rec infer ~force ~logic_env t =
   Memo.memo
     ~force_infer:force
     (Logic_env.get_profile logic_env)
-    compute
+    (fun t ->
+       let res = compute t in
+       (* inferring interval for each guards associated to [t] *)
+       Rte_analysis.iter_on_guards t (infer_predicate ~logic_env:logic_env);
+       res
+    )
     t
 
 and initiate_fixpoint ~logic_env li args_ival args =

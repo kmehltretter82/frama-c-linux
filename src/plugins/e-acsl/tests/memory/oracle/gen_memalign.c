@@ -587,6 +587,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
 void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
 {
   __e_acsl_contract_t *__gen_e_acsl_contract;
+  size_t __gen_e_acsl_at_3;
   size_t __gen_e_acsl_at_2;
   int __gen_e_acsl_at;
   void *__retres;
@@ -598,6 +599,7 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
     __e_acsl_store_block((void *)(& alignment),8UL);
     __gen_e_acsl_at = errno;
     __gen_e_acsl_at_2 = alignment;
+    __gen_e_acsl_at_3 = alignment;
     __gen_e_acsl_contract = __e_acsl_contract_init(3UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_is_valid_alignment_2 = __gen_e_acsl_is_valid_alignment

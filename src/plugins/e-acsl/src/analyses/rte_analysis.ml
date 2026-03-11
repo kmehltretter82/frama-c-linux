@@ -25,6 +25,11 @@ struct
       | Some preds -> Terms.replace tbl t (pred :: preds)
       | None -> Terms.add tbl t [pred]
 
+  let apply ~default t f =
+    match Terms.find_opt tbl t with
+    | Some preds -> f preds
+    | _ -> default
+
   let clear () = Terms.clear tbl
 
   let pretty fmt () =
@@ -42,6 +47,10 @@ end
 module Undefined_behaviours =
 struct
 
+  let preprocess_guard guard =
+    Logic_normalizer.preprocess_predicate guard;
+    Bound_variables.preprocess_predicate guard
+
   (** [div_by_zero ~loc divider] creates the predicate that checks if [divider]
       is not equal to [Z.zero]. The guard does not contain directly [divider]
       but a copy of it. *)
@@ -55,6 +64,7 @@ struct
         divider_cpy
         (Logic_const.tint Z.zero)
     in
+    preprocess_guard pred;
     pred
 
 end
@@ -103,5 +113,7 @@ let preprocess ast =
   ignore @@ rte_visitor#visit_file ast;
   Options.feedback ~dkey:dkey "Result of the RTE analysis.%!";
   Options.feedback ~dkey:dkey "%a%!" Guards.pretty ()
+
+let iter_on_guards t f = Guards.apply ~default:() t (List.iter f)
 
 let clear () = Guards.clear ()

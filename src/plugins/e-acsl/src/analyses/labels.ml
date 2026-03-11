@@ -314,6 +314,9 @@ end = struct
 
   (** Term traversal *)
   let rec do_term ?error env t =
+    (* preprocess labels for RTE guards of [t] *)
+    Rte_analysis.iter_on_guards t
+      (fun p -> ignore @@ do_predicate ?error env p);
     let t = Logic_normalizer.get_term t in
     match t.term_node with
     | Tat (t', l) ->
