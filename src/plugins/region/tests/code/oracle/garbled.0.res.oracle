@@ -5,5 +5,5 @@
   R0002: -R-- (int) (float) 32b ;
   R0003: -R-- q (int *) 64b (*R0004) (singleton) ;
   R0004: -R-- (int) 32b ;
-  R0005: -RW- __retres (float) 32b (singleton) (dynamic) (garbage) ;
+  R0005: -RW- __retres (float) 32b (singleton) (dynamic) ;
   R0006: --W- \result (float) 32b ;
