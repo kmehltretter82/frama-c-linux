@@ -225,6 +225,9 @@ let example_msg =
      @@PTEST_ENABLED_IF@@      # Current value of ENABLED_IF directive.@  \
      @@PTEST_MODULE@@          # Current list of modules defined by the MODULE directive.@  \
      @@PTEST_PLUGIN@@          # Current list of plugins set by the PLUGIN directive.@  \
+     @@PTEST_SHARE_DIR@@       # Path to the share directory of the related plugin.@  \
+     @@FRAMAC_SHARE@@          # Shortcut defined as follows: %s@  \
+     @@DEV_NULL@@              # Set to 'NUL' for Windows platforms and to '/dev/null' otherwise.@  \
      @]@ \
      @[<v 1>\
      Other macros can only be used in test commands (CMD and EXECNOW directives):@  \
@@ -233,9 +236,6 @@ let example_msg =
      @@frama-c-exe@@    # Shortcut defined as follows: %s@  \
      @@frama-c@@        # Shortcut defined as follows: %s@  \
      @@frama-c-cmd@@    # Shortcut defined as follows: %s@  \
-     @@FRAMAC_SHARE@@   # Shortcut defined as follows: %s@  \
-     @@PTEST_SHARE_DIR@@   # Path to the share directory of the related plugin.@  \
-     @@DEV_NULL@@       # Set to 'NUL' for Windows platforms and to '/dev/null' otherwise.@  \
      @]@ \
      @[<v 1>\
      Default directive values:@  \
@@ -265,10 +265,10 @@ let example_msg =
      @]@ \
      @]"
     !macro_default_options
+    !macro_frama_c_share
     !macro_frama_c_exe
     !macro_frama_c
     !macro_frama_c_cmd
-    !macro_frama_c_share
     test_file_regexp
     !default_toplevel
 
