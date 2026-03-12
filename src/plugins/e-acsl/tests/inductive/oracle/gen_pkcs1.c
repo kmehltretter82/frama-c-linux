@@ -1060,16 +1060,17 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
         }
         else __gen_e_acsl_and_14 = 0;
         if (__gen_e_acsl_and_14) {
-          __e_acsl_mpz_t __gen_e_acsl_exp;
+          __e_acsl_mpz_t __gen_e_acsl_plus_g_tlv_spec_tlv_link_const_0;
           int __gen_e_acsl_valid_tlv_here_9;
-          __gmpz_init_set_ui(__gen_e_acsl_exp,
+          __gmpz_init_set_ui(__gen_e_acsl_plus_g_tlv_spec_tlv_link_const_0,
                              (unsigned long)*(g_tlv_spec[__gen_e_acsl_tlv_link] + 0));
           __gen_e_acsl_valid_tlv_here_9 = __gen_e_acsl_valid_tlv_here
           ((start + prev_pars) + 2,__gen_e_acsl_nest_prev_pars,
            (unsigned int)*(start + (prev_pars + 1)),
-           (__e_acsl_mpz_struct *)__gen_e_acsl_exp,__gen_e_acsl_tlv_link,1);
+           (__e_acsl_mpz_struct *)__gen_e_acsl_plus_g_tlv_spec_tlv_link_const_0,
+           __gen_e_acsl_tlv_link,1);
           __gen_e_acsl_and_15 = __gen_e_acsl_valid_tlv_here_9;
-          __gmpz_clear(__gen_e_acsl_exp);
+          __gmpz_clear(__gen_e_acsl_plus_g_tlv_spec_tlv_link_const_0);
         }
         else __gen_e_acsl_and_15 = 0;
         if (__gen_e_acsl_and_15) __gen_e_acsl_and_16 = with_children == 1;
@@ -1440,17 +1441,17 @@ int __gen_e_acsl_prim_gh_set_here(u1 *start, int prev_pars,
         }
         else __gen_e_acsl_and_30 = 0;
         if (__gen_e_acsl_and_30) {
-          __e_acsl_mpz_t __gen_e_acsl_exp_2;
+          __e_acsl_mpz_t __gen_e_acsl_plus_g_tlv_spec_tlv_link_const_0_2;
           int __gen_e_acsl_prim_gh_set_here_9;
-          __gmpz_init_set_ui(__gen_e_acsl_exp_2,
+          __gmpz_init_set_ui(__gen_e_acsl_plus_g_tlv_spec_tlv_link_const_0_2,
                              (unsigned long)*(g_tlv_spec[__gen_e_acsl_tlv_link_2] + 0));
           __gen_e_acsl_prim_gh_set_here_9 = __gen_e_acsl_prim_gh_set_here
           ((start + prev_pars) + 2,__gen_e_acsl_nest_prev_pars_2,
            (unsigned int)*(start + (prev_pars + 1)),
-           (__e_acsl_mpz_struct *)__gen_e_acsl_exp_2,__gen_e_acsl_tlv_link_2,
-           1);
+           (__e_acsl_mpz_struct *)__gen_e_acsl_plus_g_tlv_spec_tlv_link_const_0_2,
+           __gen_e_acsl_tlv_link_2,1);
           __gen_e_acsl_and_31 = __gen_e_acsl_prim_gh_set_here_9;
-          __gmpz_clear(__gen_e_acsl_exp_2);
+          __gmpz_clear(__gen_e_acsl_plus_g_tlv_spec_tlv_link_const_0_2);
         }
         else __gen_e_acsl_and_31 = 0;
         if (__gen_e_acsl_and_31) __gen_e_acsl_and_32 = with_children == 1;
