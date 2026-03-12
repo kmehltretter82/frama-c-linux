@@ -19,15 +19,18 @@ let error format =
 module Type =
 struct
   exception NotACType
+  open Cil_types
+
+  type empty = |
 
   type ('value,'shape) morphology =
+    | Uninitializable : (empty,empty) morphology
     | Single : ('value,'value) morphology
     | Listed : ('value,'shape) typ -> ('value,'shape list) morphology
     | Record : (Cil_types.fieldinfo -> 'a -> 'value) -> ('value,'a) morphology
 
   and ('value,'shape) typ = ('value,'shape) morphology * Cil_types.logic_type
 
-  open Cil_types
   open Cil_const
 
   (* Logic types *)
@@ -70,6 +73,36 @@ struct
 
   let structure compinfo f =
     Record f, Ctype (mk_tcomp compinfo)
+
+  module ArgList = struct
+    type t =
+      | [] : t
+      | Variadic : t
+      | (::) : (string * ('v,'s) typ * attributes) * t -> t
+  end
+
+  let proto (rt : ('vr, 'sr) typ) (args : ArgList.t) : (empty, empty) typ =
+    let rt = match rt with
+      | _, Ctype ({ tnode = TArray _}) ->
+        error "function cannot return an array"
+      | _, Ctype t -> t
+      | _ -> raise NotACType
+    in
+    let rec fold_args (args : ArgList.t) acc =
+      match args with
+      | [] -> List.rev acc, false
+      | Variadic -> List.rev acc, true
+      | (name, t, attrs) :: tail ->
+        match t with
+        | _, Ctype ({ tnode = TArray(elt,_) } as t ) ->
+          fold_args tail ((name, { t with tnode = TPtr elt }, attrs) :: acc)
+        | _, Ctype t ->
+          fold_args tail ((name, t, attrs) :: acc)
+        | _ ->
+          raise NotACType
+    in
+    let args, is_va = fold_args args [] in
+    Uninitializable, Ctype (mk_tfun rt (Some args) is_va)
 
   (* Attributes *)
 

@@ -20,6 +20,7 @@ module Type :
 sig
   exception NotACType
 
+  type empty
   type ('value,'shape) typ
 
   (* Logic types *)
@@ -50,6 +51,15 @@ sig
   val array : ?size:int -> ('v,'s) typ -> ('v,'s list) typ
   val structure :
     Cil_types.compinfo -> (Cil_types.fieldinfo -> 'a -> 'v) -> ('v, 'a) typ
+
+  module ArgList : sig
+    type t =
+      | [] : t
+      | Variadic : t
+      | (::) : (string * ('v,'s) typ * Cil_types.attributes) * t -> t
+  end
+
+  val proto: ('vr, 'sr) typ -> ArgList.t -> (empty, empty) typ
 
   (* Attributes *)
   val attribute : ('v,'s) typ -> string -> Cil_types.attrparam list
