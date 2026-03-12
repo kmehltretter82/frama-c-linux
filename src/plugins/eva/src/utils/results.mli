@@ -92,6 +92,22 @@ val after : Cil_types.stmt -> request
 (** Just before a statement or at the start of the analysis. *)
 val before_kinstr : Cil_types.kinstr -> request
 
+(** Just before the given position:
+    - local position: just before the statement of the position, filtered by
+      the position's callstack;
+    - global init: at the start of the analysis, but after the initialization
+      of globals;
+    - root call: at the start of the position's function. *)
+val before_pos : Position.t -> request
+
+(** Just after the given position:
+    - local position: just after the statement of the position, filtered by the
+      position's callstack;
+    - global init: at the end of the analysis, after the main function has
+      returned;
+    - root call: at the end of the position's function. *)
+val after_pos : Position.t -> request
+
 (** Evaluation in a given cvalue state. Callstacks selection are silently
     ignored on such requests. For internal use, could be modified or removed
     in a future version. *)
@@ -308,6 +324,9 @@ val is_called : Cil_types.kernel_function -> bool
 
 (** Returns true if the statement has been reached by the analysis. *)
 val is_reachable : Cil_types.stmt -> bool
+
+(** Returns true if the position has been reached by the analysis. *)
+val is_reachable_pos : Position.t -> bool
 
 (** Returns true if the statement has been reached by the analysis, or if
     the main function has been analyzed for [Kglobal]. *)
