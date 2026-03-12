@@ -568,6 +568,11 @@ module Macros = struct
   let expand ~file (macros:t) s =
     snd (does_expand ~file macros s)
 
+  (* Same as expand but make sure the string is never empty by adding quotes if needed. *)
+  let expand_not_empty ~file (macros:t) s =
+    let v = snd (does_expand ~file macros s) in
+    if v = "" then "\"\"" else v
+
   (* Removes the expansions to an empty string from the list (for DEPS,PLUGIN,MODULE,BIN,LOG *)
   let expand_list ~file (macros:t) ls =
     List.filter_map (fun s ->
@@ -580,7 +585,7 @@ module Macros = struct
         if s = "" then "true" else s) enabled_if
 
   let expand_env ~file macros env =
-    List.map (fun (k, v) -> k, expand ~file macros v) env
+    List.map (fun (k, v) -> k, expand_not_empty ~file macros v) env
 
   let add_list l map =
     List.fold_left (fun acc (k,v) -> StringMap.add k v acc) map l
@@ -936,8 +941,7 @@ end = struct
       current
     | Some (name, value) ->
       (* Make quotes explicit in dune file if the string is empty. *)
-      let value = Macros.expand ~file current.dc_macros value in
-      let value = if value = "" then "\"\"" else value in
+      let value = Macros.expand_not_empty ~file current.dc_macros value in
       debug ~level:4 "%%   - New ENV variable %s with value %s@." name value;
       let dc_env_var =
         (* If the environnement variable is already set, we replace its value. *)
