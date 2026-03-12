@@ -19,6 +19,10 @@ let ignored_suites = ref []
 let config_filter = ref None
 let default_config = "DEFAULT"
 
+let debug ~level msg =
+  if !verbosity >= level then Format.printf msg
+  else Format.ifprintf Format.std_formatter msg
+
 (* Set to an empty string to use no wrapper *)
 let wrapper_cmd = ref "frama-c-wtests -brief"
 
@@ -385,7 +389,7 @@ end = struct
              | None -> incr nb_ignores
             );
             ignored_suites := (ptests_config ^ ":" ^ value)::!ignored_suites;
-            if !verbosity >=2 then Format.eprintf "%s: %s=%s@." ptests_config key value
+            if !verbosity >= 2 then Format.eprintf "%s: %s=%s@." ptests_config key value
           | _ ->  Format.eprintf "%s: (DEPRECATED): %s=%s@." ptests_config key value;
       in
       if Sys.file_exists ptests_config then begin
@@ -519,8 +523,8 @@ module Macros = struct
       let has_ptest_opt = ref false in
       let has_ptest_options = ref false in
       let has_frama_c_exe = ref false in
-      if !verbosity >= 4 then Format.printf "%% %s: Expand: %s@." file s;
-      if !verbosity >= 5 then Format.printf "%a" pp_macros macros;
+      debug ~level:2 "%% %s: Expand: %s@." file s;
+      debug ~level:5 "%a" pp_macros macros;
       let nb_loops = ref 0 in
       let rec aux s =
         if !nb_loops > 100 then
@@ -538,11 +542,10 @@ module Macros = struct
                  | "PTEST_OPTIONS" -> has_ptest_options := true
                  | "frama-c-exe" -> has_frama_c_exe := true
                  | _ -> ());
-                if !verbosity >= 5 then Format.printf "%% %s:     - macro is %s\n%!" file macro;
+                debug ~level:5 "%% %s:     - macro is %s\n%!" file macro;
                 try
                   let replacement = StringMap.find macro macros in
-                  if !verbosity >= 4 then
-                    Format.printf "%% %s:     - replacement for %s is %s\n%!" file macro replacement;
+                  debug ~level:4 "%% %s:     - replacement for %s is %s\n%!" file macro replacement;
                   aux replacement
                 with Not_found -> s
               end
@@ -556,7 +559,7 @@ module Macros = struct
           Format.eprintf "%s: uncaught exception %s\n%!" file (Printexc.to_string e);
           raise e
       in
-      if !verbosity >= 4 then Format.printf "%% %s: Expansion result: %s@." file r;
+      debug ~level:4 "%% %s: Expansion result: %s@." file r;
       { has_ptest_file= !has_ptest_file;
         has_ptest_opt= !has_ptest_opt;
         has_frama_c_exe= !has_frama_c_exe;
@@ -937,8 +940,7 @@ end = struct
       Format.eprintf "%a: cannot understand MACRO definition: %s@." (SubDir.pp_file ~dir) file s;
       current
     | Some (name, def) ->
-      if !verbosity >= 4 then
-        Format.printf "%%   - New macro %s with definition %s@." name def;
+      debug ~level:4 "%%   - New macro %s with definition %s@." name def;
       { current with dc_macros = Macros.add_expand ~file name def current.dc_macros }
 
   let config_env ~drop:_ ~file ~dir s current =
@@ -949,8 +951,7 @@ end = struct
     | Some (name, value) ->
       (* Make quotes explicit in dune file if the string is empty. *)
       let value = if value = "" then "\"\"" else value in
-      if !verbosity >= 4 then
-        Format.printf "%%   - New ENV variable %s with value %s@." name value;
+      debug ~level:4 "%%   - New ENV variable %s with value %s@." name value;
       let dc_env_var =
         (* If the environnement variable is already set, we replace its value. *)
         let old, others = List.partition (fun (name', _) -> name = name') current.dc_env_var in
@@ -958,8 +959,7 @@ end = struct
         | _ :: _ :: _ -> assert false (* should not happen *)
         | [] -> others @ [(name, value)]
         | [ _, value' ] ->
-          if !verbosity >= 4 then
-            Format.printf "%%   - Replacing ENV variable %s=%s with value %s@." name value' value;
+          debug ~level:4 "%%   - Replacing previously set ENV variable %s=%s with value %s@." name value' value;
           others @ [(name, value)]
       in
       { current with dc_env_var }
@@ -1143,7 +1143,7 @@ end = struct
     let general_config_file = SubDir.make_file dir (config_name ~env filename) in
     if Sys.file_exists general_config_file
     then begin
-      if !verbosity >=2 then Format.printf "%% Parsing global config file=%s@." general_config_file;
+      debug ~level:2 "%% Parsing global config file=%s@." general_config_file;
       let scan_buffer = Scanf.Scanning.from_file general_config_file in
       scan_directives ~drop:false
         (SubDir.create ~env ~with_subdir:false Filename.current_dir_name)
@@ -1152,7 +1152,7 @@ end = struct
         default_config
     end
     else begin
-      if !verbosity >=2 then Format.printf "%% There is no global config file=%s@." general_config_file;
+      debug ~level:2 "%% There is no global config file=%s@." general_config_file;
       default_config
     end
 
@@ -1185,8 +1185,7 @@ end = struct
              match List.find_opt is_current_config configs with
              | Some name ->
                (* Found options for current config! *)
-               if !verbosity >= 2 then Format.printf "%% Parsing %s of file=%s@."
-                   name f ;
+               debug ~level:2 "%% Parsing %s of file=%s@." name f ;
                scan_directives ~drop:false dir ~file:f scan_buffer default
              | None -> begin
                  (* config name does not match: eat config and continue.
@@ -1206,7 +1205,7 @@ end = struct
           options
         with End_of_file | Scanf.Scan_failure _ ->
           Scanf.Scanning.close_in scan_buffer;
-          if !verbosity >= 2 then Format.printf "%% No run.config directives in file=%s@." f ;
+          debug ~level:2 "%% No run.config directives in file=%s@." f ;
           default
       in
       if config.dc_commands = [] && config.dc_framac
@@ -1454,7 +1453,7 @@ let default_wtest = match wtest_of_yojson (Yojson.Safe.from_string "{}") with
 
 let print_json_wrapper ~file wtest =
   (* Prints the JSON file for the wrapper *)
-  if !verbosity >= 2 then Format.printf "%% Generates %S wrapper file...@." file;
+  debug ~level:2 "%% Generates %S wrapper file...@." file;
   let wrapper_cout = open_out file in
   let wrapper_fmt = Format.formatter_of_out_channel wrapper_cout  in
   Format.fprintf wrapper_fmt "%a@." (pp_wtest ~compacted:false) wtest;
@@ -2110,19 +2109,19 @@ let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
        let suite = Filename.concat env.dir suite in
        let directory = SubDir.create ~with_subdir:true ~env suite in
        let result_dune_file = SubDir.make_file (SubDir.result_subdir ~env directory) "dune" in
-       if !verbosity >= 2 then Format.printf "%% Generates %S file for test suite %s%s and dune-alias=@@%s ...@."
-           result_dune_file suite (if env.config = "" then "" else (", config=" ^ env.config)) env.dune_alias;
+       debug ~level:2 "%% Generates %S file for test suite %s%s and dune-alias=@@%s ...@."
+         result_dune_file suite (if env.config = "" then "" else (", config=" ^ env.config)) env.dune_alias;
        let dir_config =
          let config = SubDir.make_file directory (config_name ~env Test_config.filename) in
          if Sys.file_exists config
          then begin
            let scan_buffer = Scanf.Scanning.from_file config in
-           if !verbosity >= 2 then Format.printf "%% Parsing suite config file=%s@." config ;
+           debug ~level:2 "%% Parsing suite config file=%s@." config ;
            Test_config.scan_directives ~drop:false directory ~file:config
              scan_buffer default_config
          end
          else begin
-           if !verbosity >= 2 then Format.printf "%% There is no suite config file=%s@." config ;
+           debug ~level:2 "%% There is no suite config file=%s@." config ;
            default_config
          end
        in
@@ -2144,13 +2143,13 @@ let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
        let dir_files =
          List.filter (fun n -> String.get n 0 <> '.') dir_files
        in
-       if !verbosity >= 3 then Format.printf "%% - Look at %d entries of the directory...@." (List.length dir_files);
+       debug ~level:3 "%% - Look at %d entries of the directory...@." (List.length dir_files);
        List.iter
          (fun file ->
             assert (Filename.is_relative file);
             if test_pattern dir_config file
             then begin
-              if !verbosity >= 2 then Format.printf "%% - Process test file %s ...@." file;
+              debug ~level:2 "%% - Process test file %s ...@." file;
               has_test := process_file ~env ~result_fmt ~oracle_fmt file directory dir_config ~modules ~enabled_if || !has_test;
             end;
          ) dir_files;
@@ -2190,7 +2189,7 @@ let () =
   List.iter (fun dir ->
       Format.printf "Test directory: %s@." dir;
       let suites = Ptests_config.parse ~dir in
-      if !verbosity >= 1 then Format.printf "%% Nb config= %d@." (StringMap.cardinal suites);
+      debug ~level:1 "%% Nb config= %d@." (StringMap.cardinal suites);
       let nb = !nb_dune_files in
       StringMap.iter (fun config_mode suites ->
           match !config_filter with
@@ -2200,14 +2199,14 @@ let () =
               (match config_mode with "" -> default_config | s -> s) nbi;
             nb_ignores := !nb_ignores + nbi
           | _ ->
-            if !verbosity >= 1 then Format.printf "%% - %s_SUITES -> nb suites= %d@."
-                (match config_mode with "" -> default_config | s -> s) (StringMap.cardinal suites);
+            debug ~level:1 "%% - %s_SUITES -> nb suites= %d@."
+              (match config_mode with "" -> default_config | s -> s) (StringMap.cardinal suites);
             let env = { config = config_mode ; dir ; dune_alias = "" ; absolute_cwd} in
             let directory = SubDir.create ~with_subdir:false ~env dir in
             let config = Test_config.current_config ~env directory in
             process ~env config suites) suites ;
       let nbi = !nb_ignores in
-      if !verbosity >= 1 then Format.printf "%% Nb dune files= %d@." (!nb_dune_files-nb);
+      debug ~level:1 "%% Nb dune files= %d@." (!nb_dune_files-nb);
       if (!nb_ignores-nbi) <> 0 then Format.printf "- %d ignored suite(s)@." (!nb_ignores-nbi);
     ) suites ;
   Format.printf "Total number of generated dune files: %d@." !nb_dune_files;
