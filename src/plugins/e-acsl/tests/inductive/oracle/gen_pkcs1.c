@@ -607,15 +607,15 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
-                                     "alignof(uint const \\ghost)",0,
-                                     _Alignof(uint const \ghost));
+                                     "alignof(uint const)",0,
+                                     _Alignof(uint const));
       __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_3,
                                   & __gen_e_acsl_assert_data_4);
-      /*@ assert E_ACSL: alignof(uint const \ghost) != 0; */
+      /*@ assert E_ACSL: alignof(uint const) != 0; */
       {
         __gen_e_acsl_assert_data_4.blocking = 1;
         __gen_e_acsl_assert_data_4.kind = "RTE";
-        __gen_e_acsl_assert_data_4.pred_txt = "alignof(uint const \\ghost) != 0";
+        __gen_e_acsl_assert_data_4.pred_txt = "alignof(uint const) != 0";
         __gen_e_acsl_assert_data_4.file = "pkcs1.c";
         __gen_e_acsl_assert_data_4.fct = "valid_tlv_here";
         __gen_e_acsl_assert_data_4.line = 108;
@@ -624,7 +624,7 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
       }
       __gen_e_acsl_aligned = __e_acsl_aligned((void *)(__gen_e_acsl_tlv_cur + __gen_e_acsl_add_2),
-                                              _Alignof(uint const \ghost));
+                                              _Alignof(uint const));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,
                                    "__gen_e_acsl_tlv_cur",
                                    (void *)__gen_e_acsl_tlv_cur);
@@ -633,7 +633,7 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
                                     __gen_e_acsl_add_2);
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "RTE";
-      __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(__gen_e_acsl_tlv_cur + __gen_e_acsl_add_2,alignof(uint const \\ghost))";
+      __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(__gen_e_acsl_tlv_cur + __gen_e_acsl_add_2,alignof(uint const))";
       __gen_e_acsl_assert_data_3.file = "pkcs1.c";
       __gen_e_acsl_assert_data_3.fct = "valid_tlv_here";
       __gen_e_acsl_assert_data_3.line = 108;
@@ -873,15 +873,15 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
           {.values = (void *)0};
         __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_13,
-                                       "alignof(uint const \\ghost)",0,
-                                       _Alignof(uint const \ghost));
+                                       "alignof(uint const)",0,
+                                       _Alignof(uint const));
         __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_12,
                                     & __gen_e_acsl_assert_data_13);
-        /*@ assert E_ACSL: alignof(uint const \ghost) != 0; */
+        /*@ assert E_ACSL: alignof(uint const) != 0; */
         {
           __gen_e_acsl_assert_data_13.blocking = 1;
           __gen_e_acsl_assert_data_13.kind = "RTE";
-          __gen_e_acsl_assert_data_13.pred_txt = "alignof(uint const \\ghost) != 0";
+          __gen_e_acsl_assert_data_13.pred_txt = "alignof(uint const) != 0";
           __gen_e_acsl_assert_data_13.file = "pkcs1.c";
           __gen_e_acsl_assert_data_13.fct = "valid_tlv_here";
           __gen_e_acsl_assert_data_13.line = 119;
@@ -890,7 +890,7 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
         }
         __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)(__gen_e_acsl_tlv_cur_2 + __gen_e_acsl_add_5),
-                                                  _Alignof(uint const \ghost));
+                                                  _Alignof(uint const));
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_12,
                                      "__gen_e_acsl_tlv_cur_2",
                                      (void *)__gen_e_acsl_tlv_cur_2);
@@ -899,7 +899,7 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
                                       __gen_e_acsl_add_5);
         __gen_e_acsl_assert_data_12.blocking = 1;
         __gen_e_acsl_assert_data_12.kind = "RTE";
-        __gen_e_acsl_assert_data_12.pred_txt = "\\aligned(__gen_e_acsl_tlv_cur_2 + __gen_e_acsl_add_5,alignof(uint const \\ghost))";
+        __gen_e_acsl_assert_data_12.pred_txt = "\\aligned(__gen_e_acsl_tlv_cur_2 + __gen_e_acsl_add_5,alignof(uint const))";
         __gen_e_acsl_assert_data_12.file = "pkcs1.c";
         __gen_e_acsl_assert_data_12.fct = "valid_tlv_here";
         __gen_e_acsl_assert_data_12.line = 119;
@@ -1016,15 +1016,15 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
           __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
             {.values = (void *)0};
           __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_16,
-                                         "alignof(uint const \\ghost)",0,
-                                         _Alignof(uint const \ghost));
+                                         "alignof(uint const)",0,
+                                         _Alignof(uint const));
           __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_15,
                                       & __gen_e_acsl_assert_data_16);
-          /*@ assert E_ACSL: alignof(uint const \ghost) != 0; */
+          /*@ assert E_ACSL: alignof(uint const) != 0; */
           {
             __gen_e_acsl_assert_data_16.blocking = 1;
             __gen_e_acsl_assert_data_16.kind = "RTE";
-            __gen_e_acsl_assert_data_16.pred_txt = "alignof(uint const \\ghost) != 0";
+            __gen_e_acsl_assert_data_16.pred_txt = "alignof(uint const) != 0";
             __gen_e_acsl_assert_data_16.file = "pkcs1.c";
             __gen_e_acsl_assert_data_16.fct = "valid_tlv_here";
             __gen_e_acsl_assert_data_16.line = 134;
@@ -1033,7 +1033,7 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
             __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
           }
           __gen_e_acsl_aligned_5 = __e_acsl_aligned((void *)(__gen_e_acsl_tlv_cur_3 + __gen_e_acsl_add_9),
-                                                    _Alignof(uint const \ghost));
+                                                    _Alignof(uint const));
           __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_15,
                                        "__gen_e_acsl_tlv_cur_3",
                                        (void *)__gen_e_acsl_tlv_cur_3);
@@ -1042,7 +1042,7 @@ int __gen_e_acsl_valid_tlv_here(u1 *start, int prev_pars,
                                         __gen_e_acsl_add_9);
           __gen_e_acsl_assert_data_15.blocking = 1;
           __gen_e_acsl_assert_data_15.kind = "RTE";
-          __gen_e_acsl_assert_data_15.pred_txt = "\\aligned(__gen_e_acsl_tlv_cur_3 + __gen_e_acsl_add_9,alignof(uint const \\ghost))";
+          __gen_e_acsl_assert_data_15.pred_txt = "\\aligned(__gen_e_acsl_tlv_cur_3 + __gen_e_acsl_add_9,alignof(uint const))";
           __gen_e_acsl_assert_data_15.file = "pkcs1.c";
           __gen_e_acsl_assert_data_15.fct = "valid_tlv_here";
           __gen_e_acsl_assert_data_15.line = 134;
@@ -1397,15 +1397,15 @@ int __gen_e_acsl_prim_gh_set_here(u1 *start, int prev_pars,
           __e_acsl_assert_data_t __gen_e_acsl_assert_data_31 =
             {.values = (void *)0};
           __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_31,
-                                         "alignof(uint const \\ghost)",0,
-                                         _Alignof(uint const \ghost));
+                                         "alignof(uint const)",0,
+                                         _Alignof(uint const));
           __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_30,
                                       & __gen_e_acsl_assert_data_31);
-          /*@ assert E_ACSL: alignof(uint const \ghost) != 0; */
+          /*@ assert E_ACSL: alignof(uint const) != 0; */
           {
             __gen_e_acsl_assert_data_31.blocking = 1;
             __gen_e_acsl_assert_data_31.kind = "RTE";
-            __gen_e_acsl_assert_data_31.pred_txt = "alignof(uint const \\ghost) != 0";
+            __gen_e_acsl_assert_data_31.pred_txt = "alignof(uint const) != 0";
             __gen_e_acsl_assert_data_31.file = "pkcs1.c";
             __gen_e_acsl_assert_data_31.fct = "prim_gh_set_here";
             __gen_e_acsl_assert_data_31.line = 191;
@@ -1414,7 +1414,7 @@ int __gen_e_acsl_prim_gh_set_here(u1 *start, int prev_pars,
             __e_acsl_assert_clean(& __gen_e_acsl_assert_data_31);
           }
           __gen_e_acsl_aligned_10 = __e_acsl_aligned((void *)(__gen_e_acsl_tlv_cur_7 + __gen_e_acsl_add_16),
-                                                     _Alignof(uint const \ghost));
+                                                     _Alignof(uint const));
           __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_30,
                                        "__gen_e_acsl_tlv_cur_7",
                                        (void *)__gen_e_acsl_tlv_cur_7);
@@ -1423,7 +1423,7 @@ int __gen_e_acsl_prim_gh_set_here(u1 *start, int prev_pars,
                                         __gen_e_acsl_add_16);
           __gen_e_acsl_assert_data_30.blocking = 1;
           __gen_e_acsl_assert_data_30.kind = "RTE";
-          __gen_e_acsl_assert_data_30.pred_txt = "\\aligned(__gen_e_acsl_tlv_cur_7 + __gen_e_acsl_add_16,alignof(uint const \\ghost))";
+          __gen_e_acsl_assert_data_30.pred_txt = "\\aligned(__gen_e_acsl_tlv_cur_7 + __gen_e_acsl_add_16,alignof(uint const))";
           __gen_e_acsl_assert_data_30.file = "pkcs1.c";
           __gen_e_acsl_assert_data_30.fct = "prim_gh_set_here";
           __gen_e_acsl_assert_data_30.line = 191;
@@ -1532,15 +1532,15 @@ int __gen_e_acsl_prim_tlv_stored_here(u1 *start,
   __e_acsl_assert_data_t __gen_e_acsl_assert_data_22 = {.values = (void *)0};
   __e_acsl_assert_data_t __gen_e_acsl_assert_data_23 = {.values = (void *)0};
   __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_23,
-                                 "alignof(uint const \\ghost)",0,
-                                 _Alignof(uint const \ghost));
+                                 "alignof(uint const)",0,
+                                 _Alignof(uint const));
   __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_22,
                               & __gen_e_acsl_assert_data_23);
-  /*@ assert E_ACSL: alignof(uint const \ghost) != 0; */
+  /*@ assert E_ACSL: alignof(uint const) != 0; */
   {
     __gen_e_acsl_assert_data_23.blocking = 1;
     __gen_e_acsl_assert_data_23.kind = "RTE";
-    __gen_e_acsl_assert_data_23.pred_txt = "alignof(uint const \\ghost) != 0";
+    __gen_e_acsl_assert_data_23.pred_txt = "alignof(uint const) != 0";
     __gen_e_acsl_assert_data_23.file = "pkcs1.c";
     __gen_e_acsl_assert_data_23.fct = "prim_tlv_stored_here";
     __gen_e_acsl_assert_data_23.line = 146;
@@ -1549,7 +1549,7 @@ int __gen_e_acsl_prim_tlv_stored_here(u1 *start,
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_23);
   }
   __gen_e_acsl_aligned_7 = __e_acsl_aligned((void *)(__gen_e_acsl_tlv_cur_6 + __gen_e_acsl_add_12),
-                                            _Alignof(uint const \ghost));
+                                            _Alignof(uint const));
   __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_22,
                                "__gen_e_acsl_tlv_cur_6",
                                (void *)__gen_e_acsl_tlv_cur_6);
@@ -1557,7 +1557,7 @@ int __gen_e_acsl_prim_tlv_stored_here(u1 *start,
                                 "__gen_e_acsl_add_12",0,__gen_e_acsl_add_12);
   __gen_e_acsl_assert_data_22.blocking = 1;
   __gen_e_acsl_assert_data_22.kind = "RTE";
-  __gen_e_acsl_assert_data_22.pred_txt = "\\aligned(__gen_e_acsl_tlv_cur_6 + __gen_e_acsl_add_12,alignof(uint const \\ghost))";
+  __gen_e_acsl_assert_data_22.pred_txt = "\\aligned(__gen_e_acsl_tlv_cur_6 + __gen_e_acsl_add_12,alignof(uint const))";
   __gen_e_acsl_assert_data_22.file = "pkcs1.c";
   __gen_e_acsl_assert_data_22.fct = "prim_tlv_stored_here";
   __gen_e_acsl_assert_data_22.line = 146;

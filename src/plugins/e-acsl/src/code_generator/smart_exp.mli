@@ -12,6 +12,12 @@ open Cil_types
 (* Helper functions to build expressions *)
 (* ********************************************************************** *)
 
+val new_exp : loc:location -> exp_node -> exp
+(** Like {!Cil.new_exp}: creates an expression with a fresh id; but it also
+    removes any \ghost attributes from types occurring from the result. Ghost
+    attributes should never appear in the generated code, so this function is
+    to be preferred over {!Cil.new_exp} in any code generation context. *)
+
 val lval: loc:location -> lval -> exp
 (** Construct an lval expression from an lval. *)
 
