@@ -16,3 +16,16 @@ module Generator = Generator
 module Visit = Visit
 
 let compute = Register.compute
+
+(** Options  *)
+module Options = struct
+
+  module DoShift = Options.DoShift
+  module DoDivMod = Options.DoDivMod
+  module DoFloatToInt = Options.DoFloatToInt
+  module DoInitialized = Options.DoInitialized
+  module DoMemAccess = Options.DoMemAccess
+  module DoPointerCall = Options.DoPointerCall
+  module Trivial = Options.Trivial
+
+end

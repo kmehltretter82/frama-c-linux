@@ -61,6 +61,8 @@ let preprocess () =
   Logic_normalizer.preprocess ast;
   analyses_feedback "normalizing quantifiers";
   Bound_variables.preprocess ast;
+  analyses_feedback "inferring RTEs";
+  Rte_analysis.preprocess ast;
   analyses_feedback "inferring interval of annotations";
   Interval.infer_program ast;
   check_integrity ();
@@ -75,6 +77,7 @@ let reset () =
   Literal_strings.reset ();
   Bound_variables.clear_guards ();
   Logic_normalizer.clear ();
+  Rte_analysis.clear ();
   Inductive.clear ();
   Interval.clear ();
   Typing.clear ();
