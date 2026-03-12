@@ -1,30 +1,32 @@
 [e-acsl] beginning translation.
+[e-acsl] valid.c:54: Warning: 
+  no assigns clause generated for function P because pointers as arguments is not yet supported
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] valid.c:31: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] valid.c:33: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] valid.c:33: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] valid.c:35: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] valid.c:35: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] valid.c:37: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] valid.c:37: Warning: 
+[eva:alarm] valid.c:38: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] valid.c:40: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] valid.c:40: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] valid.c:40: Warning: 
+[eva:alarm] valid.c:42: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] valid.c:41: Warning: 
+[eva:alarm] valid.c:42: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] valid.c:41: Warning: 
+[eva:alarm] valid.c:44: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] valid.c:41: Warning: 
+[eva:alarm] valid.c:44: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] valid.c:43: Warning: 
+[eva:alarm] valid.c:47: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] valid.c:47: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] valid.c:47: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] valid.c:48: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] valid.c:48: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] valid.c:48: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] valid.c:50: Warning: 
   accessing left-value that contains escaping addresses. assert !\dangling(&a);

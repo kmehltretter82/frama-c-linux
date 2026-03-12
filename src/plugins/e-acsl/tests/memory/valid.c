@@ -1,5 +1,10 @@
 /* run.config
-   COMMENT: \valid
+   COMMENT: The \valid built-in predicate.
+*/
+
+/* run.config_dev
+   COMMENT: Print the data and filter the addresses of the output so that the test is deterministic.
+   MACRO: ROOT_EACSL_EXEC_FILTER sed -e s/0x[0-9a-f]*$/0x000000/g
 */
 
 #include "stdlib.h"
@@ -24,6 +29,8 @@ void g(void) {
   //@ assert \valid(*p);
 }
 
+//@ predicate P(int *i) = \valid(i);
+
 int main(void) {
   int *a, *b, **c, ***d, n = 0;
   /*@ assert ! \valid(a) && ! \valid(b) && ! \valid(X); */
@@ -43,5 +50,7 @@ int main(void) {
   /*@ assert ! \valid(a) && \valid(b) && \valid(X); */
   /*@ assert \valid(&Z); */
   g();
+  int i = 3;
+  //@ check P(&i);
   return 0;
 }
