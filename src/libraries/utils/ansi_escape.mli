@@ -44,11 +44,13 @@ val is_supported : unit -> bool
 
 (** Enable the style output on the given formatter. No support test is
     performed.
+    @param fallback is set to [true], unhandled styles are delegated
+    to the underlying formatter. Default is [false].
     @return a reset function that can be called to reset styles. *)
-val enable_on : Format.formatter -> (unit -> unit)
+val enable_on : ?fallback:bool -> Format.formatter -> (unit -> unit)
 
 (** Output colors. The associated string semantic tag is documented for each
-    constructor. Note that there exists variants prefixed with "fg" and "bg"
+    constructor. Note that there exists variants prefixed with "fg:" and "bg:"
     for each colors, for foreground and background. When no prefix is used,
     it means the foreground color. *)
 type color =
@@ -71,9 +73,22 @@ type style =
   | Underline           (** ["underline"] *)
   | Blink               (** ["blink"] *)
   | Strike              (** ["strike"] *)
-  | Foreground of color (** ["fgxxxx"] where ["xxxx"] is the color tag *)
-  | Background of color (** ["bgxxxx"] where ["xxxx"] is the color tag *)
+  | Foreground of color (** ["fg:xxxx"] where ["xxxx"] is the color tag *)
+  | Background of color (** ["bg:xxxx"] where ["xxxx"] is the color tag *)
+
+(** Associates a style to format tag ["@{<tag>"]. *)
+val add_style : string -> style -> unit
+
+(** Find the style associated to format tag ["@{<tag>"], if any.
+    @raises Not_found *)
+val find_style : string -> style
+
+(** Remove a style. Previous style definition is restored, if any. *)
+val remove_style : string -> unit
+
+(** Reset styles to predefined ones.
+    Removes {i all} the previously added styles. *)
+val reset_styles : unit -> unit
 
 (** Extension of semantic tags for style information *)
 type Format.stag += Style_tag of style
-
