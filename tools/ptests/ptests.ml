@@ -1029,7 +1029,7 @@ end = struct
                   bins= command.bins @ current.dc_default_bin;
                   timeout= current.dc_timeout;
                   deps = deps_of_config ~deps:command.deps current;
-                  env_var = command.env_var @ current.dc_env_var;
+                  env_var = current.dc_env_var;
                 })
              (if !default_parsing_env.current_default_cmds = [] then
                 default_commands current
