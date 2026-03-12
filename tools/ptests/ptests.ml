@@ -926,13 +926,12 @@ end = struct
 
   let parse_split_space s =
     let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
-    if Str.string_match regex s 0 then begin
-      let name = Str.matched_group 1 s in
+    match str_string_match1 regex s 0 with
+    | None -> None
+    | Some name ->
       let value =
         try Str.matched_group 3 s with Not_found -> (* empty text *) ""
       in Some (name, value)
-    end
-    else None
 
   let config_macro ~drop:_ ~file ~dir s current =
     match parse_split_space s with
@@ -950,6 +949,7 @@ end = struct
       current
     | Some (name, value) ->
       (* Make quotes explicit in dune file if the string is empty. *)
+      let value = Macros.expand ~file current.dc_macros value in
       let value = if value = "" then "\"\"" else value in
       debug ~level:4 "%%   - New ENV variable %s with value %s@." name value;
       let dc_env_var =
