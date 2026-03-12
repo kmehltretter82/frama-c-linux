@@ -18,7 +18,7 @@
 
   lemma UNION_DESCR:
   \forall integer n;
-  { n-x | integer x; \subset(x,(0..n)) } == (0..n) ;
+  { n-x | integer x; x \in (0..n) } == (0..n) ;
 
   lemma INTER_EQ:
   \forall integer x,y ;
