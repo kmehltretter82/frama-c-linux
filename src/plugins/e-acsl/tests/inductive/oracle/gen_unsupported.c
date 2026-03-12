@@ -89,6 +89,7 @@ int main(void)
   __e_acsl_store_block((void *)(& ptr),8UL);
   __e_acsl_full_init((void *)(& ptr));
   /*@ assert is_max(ptr, 1, 1); */ ;
+  /*@ assert fibo(7, 13); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& ptr));
   __e_acsl_globals_clean();

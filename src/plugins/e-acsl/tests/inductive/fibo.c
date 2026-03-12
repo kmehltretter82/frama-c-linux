@@ -44,6 +44,7 @@
 int main() {
   /*@ assert fibo(7, 13); @*/
   /*@ assert fibo2(7, 13); @*/
+  /*@ assert is_fibo(13); @*/
 
   /*@ assert lucas(0, 2); @*/
   /*@ assert lucas(1, 1); @*/

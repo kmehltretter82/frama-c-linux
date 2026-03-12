@@ -18,6 +18,11 @@
 [e-acsl:analysis:inductive] 
   extracting function from fibo with mode: incomplete in 2
 [e-acsl] Warning: Negative verdicts of lucas might be unsound
+[e-acsl] fibo.c:47: Warning: 
+  E-ACSL construct
+  `inductive definitions outside of subset described in the reference manual'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] fibo.c:45: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
@@ -35,9 +40,7 @@
 [eva:alarm] fibo.c:46: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] fibo.c:46: Warning: assertion got status unknown.
-[eva:alarm] fibo.c:48: Warning: assertion got status unknown.
-[eva:alarm] fibo.c:49: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] fibo.c:47: Warning: assertion got status unknown.
 [eva:alarm] fibo.c:49: Warning: assertion got status unknown.
 [eva:alarm] fibo.c:50: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
@@ -48,12 +51,15 @@
 [eva:alarm] fibo.c:52: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] fibo.c:52: Warning: assertion got status unknown.
-[eva:alarm] fibo.c:54: Warning: 
+[eva:alarm] fibo.c:53: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] fibo.c:54: Warning: assertion got status unknown.
+[eva:alarm] fibo.c:53: Warning: assertion got status unknown.
 [eva:alarm] fibo.c:55: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] fibo.c:55: Warning: assertion got status unknown.
 [eva:alarm] fibo.c:56: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] fibo.c:56: Warning: assertion got status unknown.
+[eva:alarm] fibo.c:57: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] fibo.c:57: Warning: assertion got status unknown.

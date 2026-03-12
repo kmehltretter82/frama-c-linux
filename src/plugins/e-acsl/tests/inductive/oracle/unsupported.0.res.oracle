@@ -31,8 +31,14 @@
   `inductive definitions outside of subset described in the reference manual'
   is not yet supported.
   Ignoring annotation.
+[e-acsl] unsupported.c:61: Warning: 
+  E-ACSL construct
+  `inductive definitions outside of subset described in the reference manual'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] unsupported.c:54: Warning: assertion got status unknown.
 [eva:alarm] unsupported.c:55: Warning: assertion got status unknown.
 [eva:alarm] unsupported.c:56: Warning: assertion got status unknown.
 [eva:alarm] unsupported.c:59: Warning: assertion got status unknown.
+[eva:alarm] unsupported.c:61: Warning: assertion got status unknown.
