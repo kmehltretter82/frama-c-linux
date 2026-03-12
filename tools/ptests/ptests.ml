@@ -624,6 +624,7 @@ type execnow =
     ex_bin: string list; (** bin files *)
     ex_timeout: string;
     ex_deps: deps;
+    ex_env_var: (string * string) list;
     ex_exit_code: string option
   }
 
@@ -767,7 +768,7 @@ end = struct
       dc_timeout = "";
     }
 
-  let scan_execnow ~file ~once ex_exit_code ex_timeout ex_deps (s:string) =
+  let scan_execnow ~file ~once ex_exit_code ex_timeout ex_deps ex_env_var (s:string) =
     if once=false then
       Format.eprintf "%s: using EXEC directive (DEPRECATED): %s@."
         file s;
@@ -800,6 +801,7 @@ end = struct
           ex_log = [];
           ex_bin = [];
           ex_deps;
+          ex_env_var;
           ex_timeout;
           ex_exit_code;
         }
@@ -853,7 +855,7 @@ end = struct
     { current with
       dc_execnow =
         scan_execnow ~file ~once
-          current.dc_exit_code current.dc_timeout (deps_of_config current)
+          current.dc_exit_code current.dc_timeout (deps_of_config current) current.dc_env_var
           s :: current.dc_execnow
     }
 
@@ -1820,7 +1822,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
         let macros = Macros.add_defaults ~defaults:config.dc_macros macros in
         let cmd =
           let deps = deps_command ~file macros execnow.ex_deps in
-          let env_var = Macros.expand_env ~file macros config.dc_env_var in
+          let env_var = Macros.expand_env ~file macros execnow.ex_env_var in
           update_modules ~file ~modules deps;
           update_enabled_if ~enabled_if deps;
           { test_name; file; directory; nth;
