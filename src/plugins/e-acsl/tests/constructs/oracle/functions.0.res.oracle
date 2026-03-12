@@ -28,6 +28,8 @@
 [eva:alarm] functions.c:96: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] functions.c:111: Warning: assertion got status unknown.
+[eva:alarm] functions.c:37: Warning: 
+  assertion 'E_ACSL,division by zero' got status unknown.
 [eva:alarm] functions.c:117: Warning: 
   non-finite double value. assert \is_finite(__gen_e_acsl__8);
 [eva:alarm] functions.c:117: Warning: 
@@ -37,6 +39,8 @@
 [eva:alarm] functions.c:118: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] functions.c:119: Warning: assertion got status unknown.
+[eva:alarm] functions.c:47: Warning: 
+  assertion 'E_ACSL,division by zero' got status unknown.
 [eva:alarm] functions.c:121: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] functions.c:123: Warning: assertion got status unknown.
@@ -53,6 +57,8 @@
 [eva:alarm] functions.c:137: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] functions.c:137: Warning: assertion got status unknown.
+[eva:alarm] functions.c:73: Warning: 
+  assertion 'E_ACSL,division by zero' got status unknown.
 [eva:alarm] functions.c:139: Warning: assertion got status unknown.
 [eva:alarm] functions.c:141: Warning: assertion got status unknown.
 [eva:alarm] functions.c:143: Warning: assertion got status unknown.

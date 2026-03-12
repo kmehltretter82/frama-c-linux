@@ -290,6 +290,7 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
             Translate_terms.denominator_zero_guard ~loc ~ctx ~adata ~kf ~env ~name:"aligned" align
           in
           let env = Env.add_stmt env align_rte in
+
           (align_e, adata), env
         )
     in
@@ -441,6 +442,31 @@ let do_it kf env p =
     Env.add_stmt env stmt
   | Admit -> env
 
+let rte_guards_to_exp_il t =
+  Rte_analysis.fold_guards_il ~default:(M.return []) t @@ fun p guards ->
+  let* e : IL.rte = M.map (Interlang.Exp.to_rte p) @@ to_exp_il ~rte:true p in
+  let* guards = guards in
+  M.return (e :: guards)
+
+let rte_guards_to_exp_old ~loc ~kf t env =
+  Rte_analysis.fold_guards_old ~default:env t @@ fun p env ->
+  Assert.push_pending_register_data ();
+  let adata, env = Assert.empty ~loc kf env in
+  let cil, adata, env = to_exp ~adata ~rte:true kf env p in
+  let stmt, env = Assert.runtime_check
+      ~adata
+      ~pred_kind:Assert
+      RTE
+      kf
+      env
+      cil
+      p
+  in
+  let env = Assert.do_pending_register_data env in
+  let env = Env.add_stmt env stmt in
+  Env.add_assert kf stmt p;
+  env
+
 let predicate_to_exp_without_rte ~adata kf env p =
   (* forget optional argument ?rte and ?name*)
   to_exp ~adata kf env p
@@ -455,7 +481,12 @@ let () =
   Loops.predicate_to_exp_ref := predicate_to_exp_without_rte;
   Quantif.predicate_to_exp_ref := predicate_to_exp_without_rte;
   Memory_translate.predicate_to_exp_ref := predicate_to_exp_without_rte;
-  Logic_functions.predicate_to_exp_ref := predicate_to_exp_without_rte
+  Logic_functions.predicate_to_exp_ref := predicate_to_exp_without_rte;
+  Translate_terms.Translate_predicates.rte_guards_to_exp_old_ref :=
+    rte_guards_to_exp_old;
+  Translate_terms.Translate_predicates.rte_guards_to_exp_il_ref :=
+    rte_guards_to_exp_il
+
 
 exception No_simple_translation of predicate
 

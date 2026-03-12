@@ -48,7 +48,7 @@ end
 
 type varinfo = Varinfo.t
 
-type exp = {enode : exp_node; origin : term option}
+type exp = {enode : exp_node; rtes : rte list; origin : term option}
 (** [origin] is required to calculate casts. Note that [origin] is [None] when
     it stems from a predicate as predicates never require casts. *)
 
@@ -70,6 +70,8 @@ and offset =
   | Field of fieldinfo * offset
   | Index of exp * offset
 
+and rte = {rnode : exp_node; rorigin: predicate}
+
 module Pretty : sig
   val pp_varinfo : Format.formatter -> varinfo -> unit
   val pp_binop : Format.formatter -> binop -> unit
@@ -78,13 +80,19 @@ module Pretty : sig
   val pp_offset : Format.formatter -> offset -> unit
   val pp_exp : Format.formatter -> exp -> unit
   val pp_exp_node : Format.formatter -> exp_node -> unit
+  val pp_rtes : Format.formatter -> rte list -> unit
 end
 
 module Exp : sig
-  val of_exp_node : ?origin:term -> exp_node -> exp
+  val of_exp_node : ?origin:term -> ?rtes:rte list -> exp_node -> exp
   val of_lval : ?origin:term -> lval -> exp
   val of_integer : origin:term -> Z.t -> exp
   val of_sizeof : origin:term -> typ -> exp
+
+  val to_rte : predicate -> exp -> rte
+  val attach_rtes : rte list -> exp -> exp
+  (** Attach a list of RTE guards to an expression. The original list is
+      overwritten. *)
 
   (** Transforms a Cil binary operator to an {!Interlang} binary operator.
       Not all Cil operators are supported (yet). *)

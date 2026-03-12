@@ -28,9 +28,13 @@ module Conf = struct
      the recorded assertion data (of type Assert.t). *)
   type state = {env : Env.t; adata : Assert.t}
 
-  type out = unit (* The Writer variable of M. *)
-  let merge_out () () = ()
-  let empty_out () = ()
+  (** The out variable of {!M} contains a list of RTE guards which is enriched
+      with new elements during the translation from Interlang to Cil. Using
+      [bind], [update] and [flush], the list can be initialized, merged with
+      another one and finally retrieved and cleared. *)
+  type out = rte list (* The Writer variable of M. *)
+  let merge_out l1 l2 = l2 @ l1
+  let empty_out () = []
 end
 
 (** The intermediate language translation monad. It is used for translating
@@ -61,6 +65,8 @@ module M = struct
     return e
 end
 
+module ListM = List.Make_monadic_iterators (M)
+
 open M.Operators
 
 let compile_binop = function
@@ -81,20 +87,30 @@ let assert_register_term ~loc ?force e t =
   M.modify_adata @@ fun a ->
   Assert.register_term ~loc ?force t e a
 
-let rec compile ({origin} as exp) =
-  let* e, cast_info = compile_context_insensitive exp in
-  match cast_info, origin with
-  (* The type of [cast_info] specifies what we cast from. *)
-  (* The type of the original term [origin] determines what we cast to. *)
-  | Some (strnum, name), Some t ->
-    let* logic_env = M.get_logic_env in
-    let cast = Typing.get_cast ~logic_env t in
-    let name = if name = "" then None else Some name in
-    let* {kf} = M.read in
-    M.modifying_env (fun env ->
-        Typed_number.add_cast ~loc:t.term_loc ?name env kf cast strnum (Some t) e)
-  | Some _, None (* [origin] is [None] when it stems from predicates. *)
-  | None, _ -> M.return e (* no cast required *)
+let rec compile ?(flush_rtes=false) ({origin} as exp: Interlang.exp) =
+  let add_cast (e, cast_info) =
+    match cast_info, origin with
+    (* The type of [cast_info] specifies what we cast from. *)
+    (* The type of the original term [origin] determines what we cast to. *)
+    | Some (strnum, name), Some t ->
+      let* logic_env = M.get_logic_env in
+      let cast = Typing.get_cast ~logic_env t in
+      let name = if name = "" then None else Some name in
+      let* {kf} = M.read in
+      M.modifying_env (fun env ->
+          Typed_number.add_cast ~loc:t.term_loc
+            ?name
+            env
+            kf
+            cast
+            strnum
+            (Some t)
+            e)
+    | Some _, None (* [origin] is [None] when it stems from predicates. *)
+    | None, _ -> M.return e (* no cast required *)
+  in
+  let cil = M.update exp.rtes (compile_context_insensitive exp >>- add_cast) in
+  if flush_rtes then compile_rte_guards cil else cil
 
 and compile_context_insensitive {Interlang.enode; origin} =
   let* {kf; loc} = M.read in
@@ -152,8 +168,8 @@ and compile_context_insensitive {Interlang.enode; origin} =
     M.return (e, Some (strnum, ""))
   | BinOp {ity; binop = Lt | Gt | Le | Ge | Eq | Ne as binop; op1; op2} ->
     let binop = compile_binop binop in
-    let* e1 = compile op1 in
-    let* e2 = compile op2 in
+    let* e1 = compile ~flush_rtes:true op1 in
+    let* e2 = compile ~flush_rtes:true op2 in
     let name = Misc.name_of_binop binop in
     let* e = M.modifying_env @@ fun env ->
       Translate_utils.comparison_to_exp ~loc kf env ity binop e1 e2 ~name origin
@@ -223,7 +239,13 @@ and compile_div_mod ~origin {ity; binop; op1; op2} =
       let zero = Logic_const.tinteger 0 in
       Typing.preprocess_term ~use_gmp_opt:true ~ctx ~logic_env zero;
       let* guard =
-        let* zero = compile {enode = Integer Z.zero; origin = Some zero} in
+        let* zero = compile
+            {
+              enode = Integer Z.zero;
+              rtes = [];
+              origin = Some zero
+            }
+        in
         let name = Misc.name_of_binop binop ^ "_guard" in
         M.modifying_env (fun env ->
             Translate_utils.comparison_to_exp
@@ -263,6 +285,7 @@ and compile_div_mod ~origin {ity; binop; op1; op2} =
         let name = Gmp.Z.name_arith_bop binop in
         let instr = Smart_stmt.rtl_call ~loc ~prefix:"" name [ e; e1; e2 ] in
         [ cond; instr ]
+
       in
       let name = Misc.name_of_binop binop in
       M.modifying_env (fun env -> Gmp.Z.new_var ~loc ~name env kf None mk_stmts)
@@ -312,9 +335,38 @@ and compile_lval (host, offset) =
   let* offset = compile_offset offset in
   M.return ((host, offset), name)
 
+and compile_rte_guards cil =
+  let* ({loc; kf}) = M.read in
+  let compile_rte_guard rte =
+    let* orig_state = M.get in
+    let* () = M.modify @@ fun { env } ->
+      Assert.push_pending_register_data ();
+      let adata, env = Assert.empty ~loc kf env in
+      Conf.{adata; env}
+    in
+    let* cil = compile @@ Interlang.Exp.of_exp_node rte.rnode in
+    M.modify @@ fun {adata;env} ->
+    let stmt, env =
+      Assert.runtime_check
+        ~adata
+        ~pred_kind:Assert
+        RTE
+        kf
+        env
+        cil
+        rte.rorigin
+    in
+    let env = Assert.do_pending_register_data env in
+    let env = Env.add_stmt env stmt in
+    Env.add_assert kf stmt rte.rorigin;
+    {orig_state with env}
+  in
+  let* (cil,rtes) = M.flush cil in
+  let* () = ListM.iter compile_rte_guard rtes in
+  M.return cil
 
 let generate_and_compile ~loc ~adata ~env ~kf m source =
-  let interlang, (), _ =
+  let interlang, _, _ =
     let env = Interlang_gen.{kf; loc; env; rte = true;
                              vars = Cil_datatype.Term.Map.empty} in
     let state = Cil_datatype.Term.Map.empty (* local variables *) in
@@ -322,9 +374,9 @@ let generate_and_compile ~loc ~adata ~env ~kf m source =
   in
   Options.debug ~dkey ~level:3
     "@[interlang:@ @[%a@]@]" Interlang.Pretty.pp_exp interlang;
-  let cil, (), {env; adata} =
-    M.run ~env:{Conf.kf; loc; adata_register = true} ~state:{Conf.env; adata} @@
-    compile interlang
+  let cil, _, Conf.{env; adata} =
+    M.run ~env:{Conf.kf; loc; adata_register = true} ~state:Conf.{env; adata} @@
+    compile ~flush_rtes:true interlang
   in
   Options.debug ~dkey ~level:4
     "@[Cil output:@ @[%a@]@]" Printer.pp_exp cil;

@@ -30,11 +30,14 @@ module type S = sig
 
   (* Writer *)
   val write : out -> unit t
+  val update : out -> 'a t -> 'a t
+  val flush : 'a t -> ('a * out) t
 
   (* State *)
   val get : state t
   val set : state -> unit t
   val modify : (state -> state) -> unit t
+
 end
 
 module Make (C : Conf)
@@ -64,6 +67,12 @@ module Make (C : Conf)
 
   (* writer *)
   let write out = fun _env state -> (), out, state
+  let update out m = fun env state ->
+    let x, out', state = m env state in
+    x, C.merge_out out out', state
+  let flush m = fun env state ->
+    let x, out, state = m env state in
+    (x, out), C.empty_out (), state
 
   (* state *)
   let get = fun _env state -> state, C.empty_out (), state

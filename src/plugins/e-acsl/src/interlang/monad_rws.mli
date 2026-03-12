@@ -89,6 +89,12 @@ module type S = sig
 
   val write : out -> unit t (** send a value to the Writer side-channel *)
 
+  val update : out -> 'a t -> 'a t
+  (** merge a value to the Writer side-channel *)
+
+  val flush : 'a t -> ('a * out) t
+  (** clear the [out] value and pair it up with the ['a] value *)
+
   (** {1 State monad} *)
 
   val get : state t (** obtain the current value of the State variable *)
@@ -97,6 +103,7 @@ module type S = sig
 
   val modify : (state -> state) -> unit t
   (** modify the current value of the State variable by applying a function *)
+
 end
 
 (** create an RWS monad from specification [C] *)

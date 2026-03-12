@@ -6,6 +6,10 @@
   signed overflow. assert -2147483648 <= 1 + __gen_e_acsl__3;
 [eva:alarm] rte.i:40: Warning: 
   signed overflow. assert 1 + __gen_e_acsl__3 <= 2147483647;
+[eva:alarm] rte.i:40: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] rte.i:13: Warning: 
+  assertion 'E_ACSL,division by zero' got status unknown.
 [eva:alarm] rte.i:45: Warning: 
   non-finite double value. assert \is_finite(__gen_e_acsl__5);
 [eva:alarm] rte.i:45: Warning: 
@@ -20,5 +24,9 @@
                                                             var % l == var got status unknown.
 [eva:alarm] rte.i:25: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] rte.i:17: Warning: 
+  assertion 'E_ACSL,division by zero' got status unknown.
+[eva:alarm] rte.i:27: Warning: 
+  assertion 'E_ACSL,division by zero' got status unknown.
 [eva:alarm] rte.i:51: Warning: 
   accessing uninitialized left-value. assert \initialized(&x);

@@ -71,3 +71,16 @@ val translate_rte_exp_ref:
    Env.t ->
    exp ->
    Env.t) ref
+
+module Translate_predicates : sig
+  val rte_guards_to_exp_old_ref:
+    ( loc:location ->
+      kf:kernel_function ->
+      term ->
+      Env.t ->
+      Env.t
+    ) ref
+
+  val rte_guards_to_exp_il_ref:
+    (term ->  Interlang.rte list Interlang_gen.M.t) ref
+end
