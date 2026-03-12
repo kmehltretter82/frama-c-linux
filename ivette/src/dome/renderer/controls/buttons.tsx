@@ -21,7 +21,6 @@ import { Vbox } from 'dome/layout/boxes';
 import { Icon } from './icons';
 import './style.css';
 import * as ToolBar from 'dome/frame/toolbars';
-import { LocalFilter } from 'frama-c/kernel/Globals';
 
 interface EVENT {
   stopPropagation: () => void;
@@ -505,6 +504,54 @@ export function SelectMenu(props: SelectProps): JSX.Element {
   );
 }
 
+export interface SelectButtonProps {
+  /** label for the ‘all’ button,
+    * if not defined, the button does not appear
+   */
+  labelAll?: string;
+  /** Currently selected value. */
+  value?: string;
+  /** onSelected */
+  onSelected: (a: string) => void;
+  /** Defaults to `false`. */
+  disabled?: boolean;
+  /** Default selected value. */
+  className?: string;
+  /** Additional style for the `< dov /> ` container of Raiods */
+  style?: React.CSSProperties;
+  /** Shall be standard `<option/>` and `<optgroup/>` elements. */
+  children: React.ReactElement<typeof ToolBar.Button>[];
+}
+
+
+export function SelectButton(props: SelectButtonProps)
+: React.JSX.Element | null {
+  const { labelAll, value, disabled = false, onSelected } = props;
+
+  const className = classes(
+    'dome-xMenu-Item',
+    'dome-xMenu-Item-Button',
+    props.disabled && 'dome-xMenu-Item-disabled',
+    props.className && props.className
+  );
+
+  return <div className={className}>
+    <ToolBar.ButtonGroup disabled={disabled}>
+      <>{ labelAll &&
+          <ToolBar.Button
+            label={labelAll}
+            selected={value === "all"}
+            onClick={() => onSelected('all')}
+            />
+      }</>
+      <>
+        { props.children }
+      </>
+    </ToolBar.ButtonGroup>
+  </div>;
+}
+
+
 // --------------------------------------------------------------------------
 // --- Multiselect
 // --------------------------------------------------------------------------
@@ -544,56 +591,6 @@ export function MultiselectItem({ item }: {item: MultiselectItemProps})
       <Icon id='CHECK' size={14} visible={item.checked}/>
       <div>{item.label}</div>
     </div>;
-}
-
-export type PosNegBothButtonSetter =
-  (id: string, type: 'both' | 'pos' | 'neg') => void
-
-export interface PosNegBothButtonProps {
-  filter: LocalFilter,
-  replace?: string,
-  set: PosNegBothButtonSetter
-}
-
-export function PosNegBothButton(props: PosNegBothButtonProps)
-: React.JSX.Element | null {
-  const { filter, set, replace } = props;
-
-  const className = classes(
-    'dome-xMenu-Item',
-    'dome-xMenu-Item-Button',
-    !filter.enabled && 'dome-xMenu-Item-disabled'
-  );
-
-  const posLabel = filter.positive_label.replace(replace ?? "", "")
-    .replace(/\s*\([^)]*\)/g, '');
-  const negLabel = filter.negative_label.replace(replace ?? "", "")
-    .replace(/\s*\([^)]*\)/g, '');
-
-  return <div className={className}>
-    <ToolBar.Button
-      label="Both"
-      selected={filter.showNegative && filter.showPositive}
-      enabled={filter.enabled}
-      onClick={() => set(filter.id, 'both')}
-    />
-    <ToolBar.ButtonGroup enabled={filter.enabled}>
-      <ToolBar.Button
-        label={posLabel}
-        title={filter.positive_label}
-        selected={filter.showPositive && !filter.showNegative}
-        enabled={filter.enabled}
-        onClick={() => set(filter.id, 'pos')}
-        />
-      <ToolBar.Button
-        label={negLabel}
-        title={filter.negative_label}
-        selected={filter.showNegative && !filter.showPositive}
-        enabled={filter.enabled}
-        onClick={() => set(filter.id, 'neg')}
-      />
-    </ToolBar.ButtonGroup>
-  </div>;
 }
 
 export function Multiselect(

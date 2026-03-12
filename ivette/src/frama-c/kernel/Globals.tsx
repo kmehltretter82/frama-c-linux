@@ -20,7 +20,7 @@ import { Section, Item, SidebarTitle, makeBadge } from 'dome/frame/sidebars';
 import {
   Button, IconButton, ItemProps,
   Multiselect, MultiselectItem, MultiselectItemProps,
-  PosNegBothButton, PosNegBothButtonSetter,
+  SelectButton,
 } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 import * as Toolbar from 'dome/frame/toolbars';
@@ -245,59 +245,59 @@ function FctItem(props: FctItemProps): JSX.Element {
 // --- Generic filter
 // --------------------------------------------------------------------------
 
-export interface LocalFilter extends Ast.filter {
-  showPositive: boolean,
-  showNegative: boolean
-}
+export interface LocalFilter extends Ast.filter { value: string }
 
 function isVisible(
   value: { filters: [string, boolean][] },
   localFilters: LocalFilter[]
 ): boolean {
   return localFilters.every(f => {
-      const { id, showPositive, showNegative } = f;
-      const current = value.filters.find(([k, ]) => k === id)?.[1];
-      return current === undefined ? true // default true
-            : (showPositive && current) || (showNegative && !current);
+      const current = value.filters.find(([k, ]) => k === f.id);
+      /**
+       * If f.value is ‘all’ or if the filter does not exist in
+       * the current value: returns true.
+       * Otherwise, the returned value depends on the match between
+       * the current value and the selected filter.
+       */
+      return current === undefined || f.value ==="all" ? true : (
+        (f.value === f.positive_label && current[1])
+        || (f.value === f.negative_label && !current[1])
+      );
     });
 }
 
-type FilterKind = 'functions' | 'variables'
+function sanitizeLabel(label: string, kind: string): string {
+  return label.replace(kind, "").replace(/\s*\([^)]*\)/g, '');
+}
 
+type FilterKind = 'functions' | 'variables'
 /**
  * This hook returns the list of Boolean filters to display and
  * a function to modify the value of a filter.
  */
 function useFilterLocal(filters: Ast.filter[], kind: FilterKind)
-: [LocalFilter[], setFilterValue: PosNegBothButtonSetter] {
+: [LocalFilter[], setFilterValue: (id: string, value: string) => void] {
   const name = `ivette.${kind}.filters`;
-  const decode = Json.jDict(Json.jBoolean);
+  const decode = Json.jDict(Json.jString);
   const [savedFilters, setSavedFilters] = useWindowSettings(name, decode, {});
 
   const setFilterValue = React.useCallback(
-    (id: string, type: 'both' |'pos' | 'neg'): void => {
+    (id: string, value: string): void => {
       const newObj = structuredClone(savedFilters);
-      switch(type) {
-        case 'both':
-          newObj[`${id}.pos`] = true;
-          newObj[`${id}.neg`] = true;
-          break;
-        case 'pos':
-          newObj[`${id}.pos`] = true;
-          newObj[`${id}.neg`] = false;
-          break;
-        case 'neg':
-          newObj[`${id}.pos`] = false;
-          newObj[`${id}.neg`] = true;
-          break;
-      }
+      newObj[id] = value;
       setSavedFilters(newObj);
   }, [savedFilters, setSavedFilters]);
 
+  function getValue(f: Ast.filter): string {
+    if(f.positive_default && f.negative_default) return 'all';
+    else if(f.positive_default) return f.positive_label;
+    else if(f.negative_default) return f.negative_label;
+    else return 'all';
+  }
+
   const localFilters = filters.map(f => {
-    const showPositive = savedFilters[`${f.id}.pos`] ?? f.positive_default;
-    const showNegative = savedFilters[`${f.id}.neg`] ?? f.negative_default;
-    return { ...f, showPositive, showNegative };
+    const value = savedFilters[`${f.id}`] ?? getValue(f);
+    return { ...f, value };
   });
 
   return [localFilters, setFilterValue];
@@ -346,11 +346,31 @@ export function useFunctionFilter(): FunctionFilterRet {
   ]);
 
   const itemsComp = localFilters.map(
-    (e, i) => <PosNegBothButton
+    (e, i) => <SelectButton
       key={i}
-      filter={e}
-      set={setLocalFilters}
-      replace='functions' />
+      labelAll='All'
+      value={e.value}
+      onSelected={(a: string) => setLocalFilters(e.id, a)}
+      className='global-filters'
+    >
+      <Toolbar.Button
+        key={e.positive_label}
+        label={sanitizeLabel(e.positive_label, 'functions')}
+        title={e.positive_label}
+        selected={e.value === e.positive_label}
+        onClick={() => setLocalFilters(e.id, e.positive_label)}
+        disabled= {false}
+      />
+      <Toolbar.Button
+        key={e.negative_label}
+        label={sanitizeLabel(e.negative_label, 'functions')}
+        title={e.negative_label}
+        selected={e.value === e.negative_label}
+        onClick={() => setLocalFilters(e.id, e.negative_label)}
+        disabled= {false}
+      />
+
+    </SelectButton>
   );
 
   itemsComp.push(<Toolbar.Button
@@ -448,8 +468,31 @@ export function useVariableFilter(): VariablesFilterRet {
   }, [localFilters]);
 
   const itemsComp = localFilters.map(
-    (e, i) => <PosNegBothButton key={i} filter={e} set={setLocalFilters}
-     replace='variables'/>);
+    (e, i) => <SelectButton
+      key={i}
+      labelAll='All'
+      value={e.value}
+      onSelected={(a: string) => setLocalFilters(e.id, a)}
+      className='global-filters'
+    >
+      <Toolbar.Button
+        key={e.positive_label}
+        label={sanitizeLabel(e.positive_label, 'variables')}
+        title={e.positive_label}
+        selected={e.value === e.positive_label}
+        onClick={() => setLocalFilters(e.id, e.positive_label)}
+        disabled= {false}
+      />
+      <Toolbar.Button
+        key={e.negative_label}
+        label={sanitizeLabel(e.negative_label, 'variables')}
+        title={e.negative_label}
+        selected={e.value === e.negative_label}
+        onClick={() => setLocalFilters(e.id, e.negative_label)}
+        disabled= {false}
+      />
+    </SelectButton>
+  );
   const contextVarFilter =  <Multiselect title='Show variables'>
       { itemsComp }
     </Multiselect>;

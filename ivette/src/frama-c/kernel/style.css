@@ -156,7 +156,13 @@
 }
 
 .globals-section {
-  padding-right: 3px;
+    padding-right: 3px;
+}
+
+.global-filters {
+    .dome-xToolBar-buttongroup button:not(:first-child) {
+        border-left: solid 1px var(--border);
+    }
 }
 
 /* -------------------------------------------------------------------------- */
