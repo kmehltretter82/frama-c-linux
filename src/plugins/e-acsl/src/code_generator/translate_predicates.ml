@@ -285,12 +285,9 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
   | Paligned (ptr, align) ->
     let (align_e, adata), env =
       Env.with_params_and_result ~rte:false ~env (fun env ->
-          let ctx = C_integer (Machine.sizeof_kind ()) in
-          let align_e, align_rte, adata, env =
-            Translate_terms.denominator_zero_guard ~loc ~ctx ~adata ~kf ~env ~name:"aligned" align
+          let align_e, adata, env =
+            Translate_terms.to_exp ~adata kf env align
           in
-          let env = Env.add_stmt env align_rte in
-
           (align_e, adata), env
         )
     in

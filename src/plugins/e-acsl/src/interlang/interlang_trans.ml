@@ -219,73 +219,12 @@ and compile_div_mod ~origin {ity; binop; op1; op2} =
   let* e =
     match ity with
     | Gmpz ->
-      let* {adata} = M.get in
-      let () = Assert.push_pending_register_data () in
-      let* adata2 = M.modifying_env (Assert.empty ~loc kf) in
-      let* () = M.modify (fun state -> {state with adata = adata2}) in
       let* e2 = compile op2 in
-      let* {adata = adata2} = M.get in
-      (* TODO: preventing division by zero should not be required anymore.
-         RTE should do this automatically. *)
-      let* logic_env = M.get_logic_env in
-      let origin, t2 = match origin with
-        | Some ({term_node = TBinOp ((Div | Mod), _, t2)} as o) -> o, t2
-        | _ -> Options.fatal "expected division or modulo operator as origin"
-      in
-      let ctx = Typing.get_number_ty ~logic_env origin in
-      (* [TODO] can now do better since the type system got some info about
-         possible values of [t2] *)
-      (* guarding divisions and modulos *)
-      let zero = Logic_const.tinteger 0 in
-      Typing.preprocess_term ~use_gmp_opt:true ~ctx ~logic_env zero;
-      let* guard =
-        let* zero = compile
-            {
-              enode = Integer Z.zero;
-              rtes = [];
-              origin = Some zero
-            }
-        in
-        let name = Misc.name_of_binop binop ^ "_guard" in
-        M.modifying_env (fun env ->
-            Translate_utils.comparison_to_exp
-              ~loc
-              kf
-              env
-              Typing.gmpz
-              ~name
-              Ne
-              e2
-              zero
-              (Some origin)
-          )
-      in
-      let p =
-        let pname = ["denominator not zero"] in
-        let denominator = Misc.Id_term.deep_copy t2 in
-        Logic_const.prel ~loc ~names:pname (Rneq, denominator, zero)
-      in
-      let* cond =
-        M.modifying_env @@ fun env ->
-        Assert.runtime_check
-          ~adata:adata2
-          ~pred_kind:Assert
-          RTE
-          kf
-          env
-          guard
-          p
-      in
-      let* () = M.modifying_env (fun env -> (), Assert.do_pending_register_data env) in
-      let* adata = M.modifying_env (fun env -> Assert.merge_right ~loc env adata2 adata) in
-      let* () = M.modify (fun state -> {state with adata}) in
-      Env.add_assert kf cond p;
       let mk_stmts _v e =
         assert (Gmp_types.Z.is_t ty);
         let name = Gmp.Z.name_arith_bop binop in
         let instr = Smart_stmt.rtl_call ~loc ~prefix:"" name [ e; e1; e2 ] in
-        [ cond; instr ]
-
+        [ instr ]
       in
       let name = Misc.name_of_binop binop in
       M.modifying_env (fun env -> Gmp.Z.new_var ~loc ~name env kf None mk_stmts)

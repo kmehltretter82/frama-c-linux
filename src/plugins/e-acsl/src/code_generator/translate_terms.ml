@@ -369,53 +369,6 @@ and context_insensitive_term_to_exp_il ?inplace t =
     Interlang.Exp.binop ~origin:t (Interlang_gen.of_binop binop) ity e1 e2
   | _ -> M.not_covered Printer.pp_term t
 
-and denominator_zero_guard ~loc ~ctx ~adata ~kf ~env ~name ?root denom =
-  (* Creating a second assertion context that will hold the data
-     contributing to the guard of the denominator. The context will be
-     merged to [adata] afterward so that the calling assertion context holds
-     all data. *)
-  let logic_env = Env.Logic_env.get env in
-  let () = Assert.push_pending_register_data () in
-  let adata2, env = Assert.empty ~loc kf env in
-  let e, adata2, env = to_exp ~adata:adata2 kf env denom in
-  (* TODO: preventing division by zero should not be required anymore.
-     RTE should do this automatically. *)
-  (* [TODO] can now do better since the type system got some info about
-     possible values of [denom] *)
-  (* guarding divisions and modulos *)
-  let zero = Logic_const.tinteger 0 in
-  Typing.preprocess_term ~use_gmp_opt:true ~ctx ~logic_env zero;
-  let guard, env =
-    let zero_exp, _, env = to_exp ~adata:Assert.no_data kf env zero in
-    Translate_utils.comparison_to_exp
-      ~loc
-      kf
-      env
-      ctx
-      ~name:(name ^ "_guard")
-      Ne
-      e
-      zero_exp
-      root
-  in
-  let p = Logic_const.prel ~loc (Rneq, Misc.Id_term.deep_copy denom, zero) in
-  let cond, env =
-    Assert.runtime_check_with_msg
-      ~adata:adata2
-      ~loc
-      ~name:"denominator not zero"
-      (Format.asprintf "%a@?" Printer.pp_predicate p)
-      ~pred_kind:Assert
-      RTE
-      kf
-      env
-      guard
-  in
-  let env = Assert.do_pending_register_data env in
-  let adata, env = Assert.merge_right ~loc env adata2 adata in
-  Env.add_assert kf cond p;
-  e, cond, adata, env
-
 and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
   let t = Logic_normalizer.get_term t in
   let loc = t.term_loc in
@@ -524,17 +477,12 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let e1, adata, env = to_exp ~adata kf env t1 in
     let t2_to_exp adata env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
-      let ctx = Typing.get_number_ty ~logic_env t in
-      let e2, cond, adata, env =
-        denominator_zero_guard
-          ~loc ~ctx ~adata ~kf ~env
-          ~name:(Misc.name_of_binop bop) ~root:t t2
-      in
+      let e2, adata, env = t2_to_exp adata env in
       let mk_stmts _v e =
         assert (Gmp_types.Z.is_t ty);
         let name = Gmp.Z.name_arith_bop bop in
         let instr = Smart_stmt.rtl_call ~loc ~prefix:"" name [ e; e1; e2 ] in
-        [ cond; instr ]
+        [ instr ]
       in
       let name = Misc.name_of_binop bop in
       let e, env = Gmp.Z.new_var ~loc ~name env kf (Some t) mk_stmts in

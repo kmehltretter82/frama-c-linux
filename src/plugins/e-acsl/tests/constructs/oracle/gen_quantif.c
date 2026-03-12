@@ -1333,26 +1333,10 @@ int __gen_e_acsl_implicitly_labelled_here(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_38);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_39 =
         {.values = (void *)0};
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_40 =
-        {.values = (void *)0};
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_40,
-                                     "alignof(int)",0,_Alignof(int));
-      __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_39,
-                                  & __gen_e_acsl_assert_data_40);
-      /*@ assert E_ACSL: alignof(int) != 0; */
-      {
-        __gen_e_acsl_assert_data_40.blocking = 1;
-        __gen_e_acsl_assert_data_40.kind = "RTE";
-        __gen_e_acsl_assert_data_40.pred_txt = "alignof(int) != 0";
-        __gen_e_acsl_assert_data_40.file = "quantif.i";
-        __gen_e_acsl_assert_data_40.fct = "implicitly_labelled_here";
-        __gen_e_acsl_assert_data_40.line = 18;
-        __gen_e_acsl_assert_data_40.name = "denominator not zero";
-        __e_acsl_assert(1,& __gen_e_acsl_assert_data_40);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_40);
-      }
       __gen_e_acsl_aligned = __e_acsl_aligned((void *)a[(int)__gen_e_acsl_i_15],
                                               _Alignof(int));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_39,
+                                     "alignof(int)",0,_Alignof(int));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_39,
                                    "a[(int)__gen_e_acsl_i_15]",
                                    (void *)a[(int)__gen_e_acsl_i_15]);

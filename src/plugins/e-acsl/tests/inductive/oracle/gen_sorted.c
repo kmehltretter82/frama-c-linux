@@ -109,23 +109,23 @@ int main(void)
   /*@ assert sorted_decr(&next); */ ;
   {
     int __gen_e_acsl_sorted_decr_here_6;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
       {.values = (void *)0};
     __gen_e_acsl_sorted_decr_here_6 = __gen_e_acsl_sorted_decr_here(& root);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_15,"&root",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,"&root",
                                  (void *)(& root));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
                                  "sorted_decr(&root)",0,
                                  __gen_e_acsl_sorted_decr_here_6);
-    __gen_e_acsl_assert_data_15.blocking = 1;
-    __gen_e_acsl_assert_data_15.kind = "Assertion";
-    __gen_e_acsl_assert_data_15.pred_txt = "!sorted_decr(&root)";
-    __gen_e_acsl_assert_data_15.file = "sorted.c";
-    __gen_e_acsl_assert_data_15.fct = "main";
-    __gen_e_acsl_assert_data_15.line = 36;
+    __gen_e_acsl_assert_data_11.blocking = 1;
+    __gen_e_acsl_assert_data_11.kind = "Assertion";
+    __gen_e_acsl_assert_data_11.pred_txt = "!sorted_decr(&root)";
+    __gen_e_acsl_assert_data_11.file = "sorted.c";
+    __gen_e_acsl_assert_data_11.fct = "main";
+    __gen_e_acsl_assert_data_11.line = 36;
     __e_acsl_assert(! __gen_e_acsl_sorted_decr_here_6,
-                    & __gen_e_acsl_assert_data_15);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
+                    & __gen_e_acsl_assert_data_11);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
   }
   /*@ assert !sorted_decr(&root); */ ;
   __retres = 0;
@@ -169,27 +169,11 @@ int __gen_e_acsl_sorted_decr_here(list *node)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
         {.values = (void *)0};
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
-        {.values = (void *)0};
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
-                                     "alignof(struct list)",0,
-                                     _Alignof(struct list));
-      __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_3,
-                                  & __gen_e_acsl_assert_data_4);
-      /*@ assert E_ACSL: alignof(struct list) != 0; */
-      {
-        __gen_e_acsl_assert_data_4.blocking = 1;
-        __gen_e_acsl_assert_data_4.kind = "RTE";
-        __gen_e_acsl_assert_data_4.pred_txt = "alignof(struct list) != 0";
-        __gen_e_acsl_assert_data_4.file = "sorted.c";
-        __gen_e_acsl_assert_data_4.fct = "sorted_decr_here";
-        __gen_e_acsl_assert_data_4.line = 20;
-        __gen_e_acsl_assert_data_4.name = "denominator not zero";
-        __e_acsl_assert(1,& __gen_e_acsl_assert_data_4);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
-      }
       __gen_e_acsl_aligned = __e_acsl_aligned((void *)node->next,
                                               _Alignof(struct list));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                     "alignof(struct list)",0,
+                                     _Alignof(struct list));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"node->next",
                                    (void *)node->next);
       __gen_e_acsl_assert_data_3.blocking = 1;
@@ -225,52 +209,73 @@ int __gen_e_acsl_sorted_decr_here(list *node)
         int __gen_e_acsl_valid_read_4;
         int __gen_e_acsl_aligned_4;
         int __gen_e_acsl_valid_read_5;
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
           {.values = (void *)0};
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
           {.values = (void *)0};
         __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(& node->next),
                                                         sizeof(struct list *),
                                                         (void *)(& node->next),
                                                         (void *)0);
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,
                                      "&node->next",(void *)(& node->next));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
                                        "sizeof(struct list *)",0,
                                        sizeof(struct list *));
+        __gen_e_acsl_assert_data_5.blocking = 1;
+        __gen_e_acsl_assert_data_5.kind = "RTE";
+        __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(&node->next)";
+        __gen_e_acsl_assert_data_5.file = "sorted.c";
+        __gen_e_acsl_assert_data_5.fct = "sorted_decr_here";
+        __gen_e_acsl_assert_data_5.line = 25;
+        __gen_e_acsl_assert_data_5.name = "mem_access";
+        __e_acsl_assert(__gen_e_acsl_valid_read_2,
+                        & __gen_e_acsl_assert_data_5);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+          {.values = (void *)0};
+        __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)node->next,
+                                                  _Alignof(struct list));
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
+                                       "alignof(struct list)",0,
+                                       _Alignof(struct list));
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
+                                     "node->next",(void *)node->next);
         __gen_e_acsl_assert_data_6.blocking = 1;
         __gen_e_acsl_assert_data_6.kind = "RTE";
-        __gen_e_acsl_assert_data_6.pred_txt = "\\valid_read(&node->next)";
+        __gen_e_acsl_assert_data_6.pred_txt = "\\aligned(node->next,alignof(struct list))";
         __gen_e_acsl_assert_data_6.file = "sorted.c";
         __gen_e_acsl_assert_data_6.fct = "sorted_decr_here";
         __gen_e_acsl_assert_data_6.line = 25;
-        __gen_e_acsl_assert_data_6.name = "mem_access";
-        __e_acsl_assert(__gen_e_acsl_valid_read_2,
-                        & __gen_e_acsl_assert_data_6);
+        __gen_e_acsl_assert_data_6.name = "pointer_alignment";
+        __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_6);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+        __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)(& (node->next)->hd),
+                                                        sizeof(int),
+                                                        (void *)(& (node->next)->hd),
+                                                        (void *)0);
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
+                                     "&(node->next)->hd",
+                                     (void *)(& (node->next)->hd));
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
+                                       "sizeof(int)",0,sizeof(int));
+        __gen_e_acsl_assert_data_4.blocking = 1;
+        __gen_e_acsl_assert_data_4.kind = "RTE";
+        __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(&(node->next)->hd)";
+        __gen_e_acsl_assert_data_4.file = "sorted.c";
+        __gen_e_acsl_assert_data_4.fct = "sorted_decr_here";
+        __gen_e_acsl_assert_data_4.line = 25;
+        __gen_e_acsl_assert_data_4.name = "mem_access";
+        __e_acsl_assert(__gen_e_acsl_valid_read_3,
+                        & __gen_e_acsl_assert_data_4);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
           {.values = (void *)0};
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
-          {.values = (void *)0};
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
+        __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)node->next,
+                                                  _Alignof(struct list));
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
                                        "alignof(struct list)",0,
                                        _Alignof(struct list));
-        __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_7,
-                                    & __gen_e_acsl_assert_data_8);
-        /*@ assert E_ACSL: alignof(struct list) != 0; */
-        {
-          __gen_e_acsl_assert_data_8.blocking = 1;
-          __gen_e_acsl_assert_data_8.kind = "RTE";
-          __gen_e_acsl_assert_data_8.pred_txt = "alignof(struct list) != 0";
-          __gen_e_acsl_assert_data_8.file = "sorted.c";
-          __gen_e_acsl_assert_data_8.fct = "sorted_decr_here";
-          __gen_e_acsl_assert_data_8.line = 25;
-          __gen_e_acsl_assert_data_8.name = "denominator not zero";
-          __e_acsl_assert(1,& __gen_e_acsl_assert_data_8);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
-        }
-        __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)node->next,
-                                                  _Alignof(struct list));
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,
                                      "node->next",(void *)node->next);
         __gen_e_acsl_assert_data_7.blocking = 1;
@@ -280,50 +285,36 @@ int __gen_e_acsl_sorted_decr_here(list *node)
         __gen_e_acsl_assert_data_7.fct = "sorted_decr_here";
         __gen_e_acsl_assert_data_7.line = 25;
         __gen_e_acsl_assert_data_7.name = "pointer_alignment";
-        __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_7);
+        __e_acsl_assert(__gen_e_acsl_aligned_3,& __gen_e_acsl_assert_data_7);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
-        __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)(& (node->next)->hd),
-                                                        sizeof(int),
-                                                        (void *)(& (node->next)->hd),
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+          {.values = (void *)0};
+        __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(& node->next),
+                                                        sizeof(struct list *),
+                                                        (void *)(& node->next),
                                                         (void *)0);
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,
-                                     "&(node->next)->hd",
-                                     (void *)(& (node->next)->hd));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
-                                       "sizeof(int)",0,sizeof(int));
-        __gen_e_acsl_assert_data_5.blocking = 1;
-        __gen_e_acsl_assert_data_5.kind = "RTE";
-        __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(&(node->next)->hd)";
-        __gen_e_acsl_assert_data_5.file = "sorted.c";
-        __gen_e_acsl_assert_data_5.fct = "sorted_decr_here";
-        __gen_e_acsl_assert_data_5.line = 25;
-        __gen_e_acsl_assert_data_5.name = "mem_access";
-        __e_acsl_assert(__gen_e_acsl_valid_read_3,
-                        & __gen_e_acsl_assert_data_5);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
+                                     "&node->next",(void *)(& node->next));
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
+                                       "sizeof(struct list *)",0,
+                                       sizeof(struct list *));
+        __gen_e_acsl_assert_data_8.blocking = 1;
+        __gen_e_acsl_assert_data_8.kind = "RTE";
+        __gen_e_acsl_assert_data_8.pred_txt = "\\valid_read(&node->next)";
+        __gen_e_acsl_assert_data_8.file = "sorted.c";
+        __gen_e_acsl_assert_data_8.fct = "sorted_decr_here";
+        __gen_e_acsl_assert_data_8.line = 25;
+        __gen_e_acsl_assert_data_8.name = "mem_access";
+        __e_acsl_assert(__gen_e_acsl_valid_read_4,
+                        & __gen_e_acsl_assert_data_8);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
           {.values = (void *)0};
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
-          {.values = (void *)0};
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_10,
+        __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)node->next,
+                                                  _Alignof(struct list));
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_9,
                                        "alignof(struct list)",0,
                                        _Alignof(struct list));
-        __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_9,
-                                    & __gen_e_acsl_assert_data_10);
-        /*@ assert E_ACSL: alignof(struct list) != 0; */
-        {
-          __gen_e_acsl_assert_data_10.blocking = 1;
-          __gen_e_acsl_assert_data_10.kind = "RTE";
-          __gen_e_acsl_assert_data_10.pred_txt = "alignof(struct list) != 0";
-          __gen_e_acsl_assert_data_10.file = "sorted.c";
-          __gen_e_acsl_assert_data_10.fct = "sorted_decr_here";
-          __gen_e_acsl_assert_data_10.line = 25;
-          __gen_e_acsl_assert_data_10.name = "denominator not zero";
-          __e_acsl_assert(1,& __gen_e_acsl_assert_data_10);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
-        }
-        __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)node->next,
-                                                  _Alignof(struct list));
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,
                                      "node->next",(void *)node->next);
         __gen_e_acsl_assert_data_9.blocking = 1;
@@ -333,83 +324,28 @@ int __gen_e_acsl_sorted_decr_here(list *node)
         __gen_e_acsl_assert_data_9.fct = "sorted_decr_here";
         __gen_e_acsl_assert_data_9.line = 25;
         __gen_e_acsl_assert_data_9.name = "pointer_alignment";
-        __e_acsl_assert(__gen_e_acsl_aligned_3,& __gen_e_acsl_assert_data_9);
+        __e_acsl_assert(__gen_e_acsl_aligned_4,& __gen_e_acsl_assert_data_9);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
-          {.values = (void *)0};
-        __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(& node->next),
-                                                        sizeof(struct list *),
-                                                        (void *)(& node->next),
-                                                        (void *)0);
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,
-                                     "&node->next",(void *)(& node->next));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_11,
-                                       "sizeof(struct list *)",0,
-                                       sizeof(struct list *));
-        __gen_e_acsl_assert_data_11.blocking = 1;
-        __gen_e_acsl_assert_data_11.kind = "RTE";
-        __gen_e_acsl_assert_data_11.pred_txt = "\\valid_read(&node->next)";
-        __gen_e_acsl_assert_data_11.file = "sorted.c";
-        __gen_e_acsl_assert_data_11.fct = "sorted_decr_here";
-        __gen_e_acsl_assert_data_11.line = 25;
-        __gen_e_acsl_assert_data_11.name = "mem_access";
-        __e_acsl_assert(__gen_e_acsl_valid_read_4,
-                        & __gen_e_acsl_assert_data_11);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
-          {.values = (void *)0};
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
-          {.values = (void *)0};
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_13,
-                                       "alignof(struct list)",0,
-                                       _Alignof(struct list));
-        __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_12,
-                                    & __gen_e_acsl_assert_data_13);
-        /*@ assert E_ACSL: alignof(struct list) != 0; */
-        {
-          __gen_e_acsl_assert_data_13.blocking = 1;
-          __gen_e_acsl_assert_data_13.kind = "RTE";
-          __gen_e_acsl_assert_data_13.pred_txt = "alignof(struct list) != 0";
-          __gen_e_acsl_assert_data_13.file = "sorted.c";
-          __gen_e_acsl_assert_data_13.fct = "sorted_decr_here";
-          __gen_e_acsl_assert_data_13.line = 25;
-          __gen_e_acsl_assert_data_13.name = "denominator not zero";
-          __e_acsl_assert(1,& __gen_e_acsl_assert_data_13);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
-        }
-        __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)node->next,
-                                                  _Alignof(struct list));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_12,
-                                     "node->next",(void *)node->next);
-        __gen_e_acsl_assert_data_12.blocking = 1;
-        __gen_e_acsl_assert_data_12.kind = "RTE";
-        __gen_e_acsl_assert_data_12.pred_txt = "\\aligned(node->next,alignof(struct list))";
-        __gen_e_acsl_assert_data_12.file = "sorted.c";
-        __gen_e_acsl_assert_data_12.fct = "sorted_decr_here";
-        __gen_e_acsl_assert_data_12.line = 25;
-        __gen_e_acsl_assert_data_12.name = "pointer_alignment";
-        __e_acsl_assert(__gen_e_acsl_aligned_4,& __gen_e_acsl_assert_data_12);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
           {.values = (void *)0};
         __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)(& node->hd),
                                                         sizeof(int),
                                                         (void *)(& node->hd),
                                                         (void *)0);
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_14,
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,
                                      "&node->hd",(void *)(& node->hd));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_14,
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_10,
                                        "sizeof(int)",0,sizeof(int));
-        __gen_e_acsl_assert_data_14.blocking = 1;
-        __gen_e_acsl_assert_data_14.kind = "RTE";
-        __gen_e_acsl_assert_data_14.pred_txt = "\\valid_read(&node->hd)";
-        __gen_e_acsl_assert_data_14.file = "sorted.c";
-        __gen_e_acsl_assert_data_14.fct = "sorted_decr_here";
-        __gen_e_acsl_assert_data_14.line = 25;
-        __gen_e_acsl_assert_data_14.name = "mem_access";
+        __gen_e_acsl_assert_data_10.blocking = 1;
+        __gen_e_acsl_assert_data_10.kind = "RTE";
+        __gen_e_acsl_assert_data_10.pred_txt = "\\valid_read(&node->hd)";
+        __gen_e_acsl_assert_data_10.file = "sorted.c";
+        __gen_e_acsl_assert_data_10.fct = "sorted_decr_here";
+        __gen_e_acsl_assert_data_10.line = 25;
+        __gen_e_acsl_assert_data_10.name = "mem_access";
         __e_acsl_assert(__gen_e_acsl_valid_read_5,
-                        & __gen_e_acsl_assert_data_14);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
+                        & __gen_e_acsl_assert_data_10);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
         __gen_e_acsl_and_3 = node->hd >= (node->next)->hd;
       }
       else __gen_e_acsl_and_3 = 0;

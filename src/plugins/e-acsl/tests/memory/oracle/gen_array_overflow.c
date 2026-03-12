@@ -120,27 +120,11 @@ int main(void)
       {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
-      {.values = (void *)0};
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
-                                   "alignof(struct dat)",0,
-                                   _Alignof(struct dat));
-    __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_5,
-                                & __gen_e_acsl_assert_data_6);
-    /*@ assert E_ACSL: alignof(struct dat) != 0; */
-    {
-      __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
-      __gen_e_acsl_assert_data_6.pred_txt = "alignof(struct dat) != 0";
-      __gen_e_acsl_assert_data_6.file = "array_overflow.c";
-      __gen_e_acsl_assert_data_6.fct = "main";
-      __gen_e_acsl_assert_data_6.line = 43;
-      __gen_e_acsl_assert_data_6.name = "denominator not zero";
-      __e_acsl_assert(1,& __gen_e_acsl_assert_data_6);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
-    }
     __gen_e_acsl_aligned = __e_acsl_aligned((void *)d2.p[1],
                                             _Alignof(struct dat));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+                                   "alignof(struct dat)",0,
+                                   _Alignof(struct dat));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"d2.p[1]",
                                  (void *)d2.p[1]);
     __gen_e_acsl_assert_data_5.blocking = 1;
