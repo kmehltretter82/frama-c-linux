@@ -189,7 +189,6 @@ let example_msg =
      LIBRARY: <pkg.lib>... @[<v 0># Adds a dependency and sets macro @@PTEST_LIBRARY@@ defining the '-load-library' option used in the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
      MODULE: <module>... @[<v 0># Adds a dependency and adds the corresponding '-load-module' option to the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
      LIBS: <module>...   @[<v 0># Like 'MODULE' directive, but for modules that can be shared between several test files.@]@  \
-     ENV: <name> <value> @[<v 0># Defines environnement variable @@<name>@@ with value <value>.@]@  \
      EXIT: <number>      @[<v 0># Defines the exit code required for the following sub-test commands.@]@  \
      FILTER: <cmd>       @[<v 0># Performs a transformation on the test result files before comparing with oracles.@ \
      # The oracle will be compared from the standard output of the command: cat <test-output-file> | <cmd> .@ \
@@ -202,6 +201,7 @@ let example_msg =
      TIMEOUT: <delay>    @[<v 0># Set a timeout for all sub-tests.@]@  \
      NOFRAMAC:           @[<v 0># Drops previous sub-test definitions and considers that there is no defined default sub-test.@]@  \
      MACRO: <name> <def> @[<v 0># Defines macro @@<name>@@ as <def>.@]@  \
+     ENV: <name> <value> @[<v 0># Defines environnement variable <name> with value <value>.@]@  \
      @]@ \
      @[<v 1>\
      Some predefined macros can be used in test directives:@  \
@@ -576,6 +576,9 @@ module Macros = struct
         let s = String.trim (expand ~file macros s) in
         if s = "" then "true" else s) enabled_if
 
+  let expand_env ~file macros env =
+    List.map (fun (k, v) -> k, expand ~file macros v) env
+
   let add_list l map =
     List.fold_left (fun acc (k,v) -> StringMap.add k v acc) map l
 
@@ -707,9 +710,7 @@ end = struct
     let ptest_macros = Macros.add_list ptest_vars Macros.empty in
     let subst = Macros.expand_list ~file ptest_macros in
     let dc_enabled_if = Macros.expand_enabled_if  ~file ptest_macros config.dc_enabled_if in
-    let dc_env_var =
-      List.map (fun (k, v) -> k, Macros.expand ~file ptest_macros v) config.dc_env_var
-    in
+    let dc_env_var = Macros.expand_env ~file ptest_macros config.dc_env_var in
     ptest_name,
     { config with
       dc_enabled_if;
@@ -1795,6 +1796,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
         let macros = Macros.add_defaults ~defaults:config.dc_macros macros in
         let log_files = Macros.expand_list ~file macros logs in
         let bin_files = Macros.expand_list ~file macros bins in
+        let env_var = Macros.expand_env ~file macros env_var in
         let deps = deps_command ~file macros deps in
         update_modules ~file ~modules deps;
         update_enabled_if ~enabled_if deps;
@@ -1818,6 +1820,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
         let macros = Macros.add_defaults ~defaults:config.dc_macros macros in
         let cmd =
           let deps = deps_command ~file macros execnow.ex_deps in
+          let env_var = Macros.expand_env ~file macros config.dc_env_var in
           update_modules ~file ~modules deps;
           update_enabled_if ~enabled_if deps;
           { test_name; file; directory; nth;
@@ -1831,7 +1834,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             filter = None; (* no FILTER applied to EXECNOW LOG *)
             execnow = true;
             deps = deps;
-            env_var = config.dc_env_var;
+            env_var;
           }
         in
         let cmd_string = basic_command_string cmd in
