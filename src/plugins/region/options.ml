@@ -42,10 +42,3 @@ module Logic = False
       let option_name = "-region-logic"
       let help = "Also generate guards for logical statements"
     end)
-
-let () = Parameter_customize.is_invisible ()
-module Force = False
-    (struct
-      let option_name = "-region-force"
-      let help = "Force generation of annotations (debug only)"
-    end)

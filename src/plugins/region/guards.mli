@@ -12,6 +12,7 @@
 
 open Memory
 open Cil_types
+open Condition
 
 type addr = LV of lval | TLV of term_lval | ADDR of exp | TADDR of term
 type value = E of exp | T of term
@@ -42,34 +43,8 @@ val of_addr  : ?loc:location -> addr -> term
 val of_guard : ?loc:location -> ?names:string list -> guard -> predicate
 val of_condition : ?loc:location -> ?names:string list -> condition -> predicate
 
-val kind : addr -> Condition.lkind
-val typeof : addr -> typ (* of the pointed l-value *)
-
-type env
-val create : kernel_function -> ?stmt:stmt -> map -> env
-val iter : (names:string list -> invalid:bool -> condition -> unit) -> env -> unit
-
-val valid : env -> node -> addr -> unit
-val valid_read : env -> node -> addr -> unit
-val valid_region : env -> node -> addr -> unit
-val initialized : env -> node -> addr -> unit
-val aligned : env -> node -> addr -> unit
-val readable : env -> node -> addr -> unit
-val writable : env -> node -> addr -> unit
-
-val lval : env -> lval -> typ * node
-val eval : env -> exp -> unit
-val addr : env -> exp -> node
-val exp : env -> exp -> node option
-val write : env -> lval -> unit
-val init : env -> init -> unit
-val instr : env -> instr -> unit
-val stmtkind : env -> stmtkind -> unit
-
-val term : env -> term -> domain
-val pred : env -> predicate -> unit
-
-class visit : env -> Visitor.frama_c_inplace
+val kind : addr -> lkind
+val pointed : addr -> typ
 
 val guards : kernel_function -> map ->
   (names:string list -> invalid:bool -> condition -> unit) ->

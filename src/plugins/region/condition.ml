@@ -18,6 +18,11 @@ let taddrof ?loc tlv =
 
 let addrof ?loc lv = taddrof ?loc @@ Logic_utils.lval_to_term_lval lv
 
+let pnull ?loc ?names ~eq addr =
+  let null = Logic_const.term ?loc Tnull addr.term_type in
+  let rel = if eq then Req else Rneq in
+  Logic_const.prel ?loc ?names (rel,addr,null)
+
 let pvalid ?loc ?names ?(label=Logic_const.here_label) addr =
   Logic_const.pvalid ?loc ?names (label,addr)
 
@@ -25,9 +30,11 @@ let pvalid_read ?loc ?names ?(label=Logic_const.here_label) addr =
   Logic_const.pvalid_read ?loc ?names (label,addr)
 
 let pvalid_object ?loc ?names ?(label=Logic_const.here_label) addr =
-  if Ast_types.is_logic_fun_ptr addr.term_type
-  then Logic_const.pvalid_function ?loc ?names addr
-  else Logic_const.pobject_pointer ?loc ?names (label, addr)
+  Logic_const.por ?loc ?names
+    ( pnull ?loc ?names ~eq:true addr ,
+      if Ast_types.is_logic_fun_ptr addr.term_type
+      then Logic_const.pvalid_function ?loc ?names addr
+      else Logic_const.pobject_pointer ?loc ?names (label, addr) )
 
 let pinitialized ?loc ?names ?(label=Logic_const.here_label) addr =
   Logic_const.pinitialized ?loc ?names (label,addr)
@@ -41,7 +48,7 @@ let paligned ?loc ?names addr =
 (* --- Valid Region Built-in                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-let l_valid_region = "\\validregion"
+let l_valid_region = "\\valid_region"
 let is_valid_region lf = lf.l_var_info.lv_name = l_valid_region
 
 let () = Logic_builtin.register {
@@ -56,7 +63,7 @@ let () = Logic_builtin.register {
   }
 
 let pvalid_region ?loc ?names ?(label=Logic_const.here_label) addr =
-  let f = List.hd @@ Logic_env.find_all_logic_functions "\\validregion" in
+  let f = List.hd @@ Logic_env.find_all_logic_functions l_valid_region in
   let te = Logic_typing.ctype_of_pointed addr.term_type in
   let size = Logic_const.tinteger ?loc @@ Fields.bytesSizeOf te in
   Logic_const.papp ?loc ?names (f,[label],[addr;size])
@@ -67,68 +74,79 @@ let pvalid_region ?loc ?names ?(label=Logic_const.here_label) addr =
 
 type lkind = {
   host : varinfo option ;
-  unsafe : bool ;
+  indexed : bool ;
   aligned : bool ;
 }
 
 let pp_kind fmt kd =
-  Format.pp_print_string fmt (if kd.unsafe then "unsafe" else "safe") ;
-  match kd.host with
-  | None -> Format.pp_print_string fmt "(*)"
-  | Some v -> Format.fprintf fmt "(%s)" v.vname
+  begin
+    match kd.host with
+    | None -> Format.pp_print_string fmt "(*"
+    | Some v -> Format.fprintf fmt "(%s" v.vname
+  end ;
+  if not kd.indexed then Format.pp_print_string fmt ",misindexed" ;
+  if not kd.aligned then Format.pp_print_string fmt ",misaligned" ;
+  Format.pp_print_string fmt ")"
 
-let default_kind = { host = None ; unsafe = false ; aligned = true }
+let safe = { host = None ; indexed = true ; aligned = true }
+let unsafe = { host = None ; indexed = false ; aligned = false }
 
 let rec kind e =
   match e.enode with
+  | Lval _ -> safe
   | AddrOf lv | StartOf lv -> lkind lv
-  | BinOp((PlusPI|MinusPI),p,_,_) | CastE(_,p) -> { (kind p) with unsafe = true }
-  | _ -> default_kind
+  | BinOp((PlusPI|MinusPI),p,_,_) -> { (kind p) with indexed = false }
+  | CastE(ty,p) when Ast_types.is_ptr ty -> { (kind p) with aligned = false }
+  | _ -> unsafe
 
 and lkind (h,o) =
   let kd = hkind h in
-  if kd.unsafe || safe_offset (Cil.typeOfLhost h) o then kd
-  else { kd with unsafe = true }
+  if kd.indexed && safe_array_offset (Cil.typeOfLhost h) o then kd
+  else { kd with indexed = false }
 
 and hkind = function
-  | Var v -> { default_kind with host = Some v }
+  | Var v -> { safe with host = Some v }
   | Mem e -> kind e
 
-and safe_offset t = function
+and safe_array_offset t = function
   | NoOffset -> true
-  | Field(fd,o) -> safe_offset fd.ftype o
+  | Field(fd,o) -> safe_array_offset fd.ftype o
   | Index(_,o) ->
     Kernel.SafeArrays.get () &&
     let n = Ast_info.direct_array_size t in
     not (Z.is_zero n) &&
-    safe_offset (Ast_types.direct_element_type t) o
+    safe_array_offset (Ast_types.direct_element_type t) o
 
 let rec term_kind t =
   match t.term_node with
+  | TLval _ -> safe
   | TAddrOf lv | TStartOf lv -> term_lkind lv
-  | TBinOp((PlusPI|MinusPI),p,_) -> { (term_kind p) with unsafe = true }
-  | TCast(_,_,p) -> { (term_kind p) with unsafe = true ; aligned = false }
-  | _ -> default_kind
+  | TBinOp((PlusPI|MinusPI),p,_) ->
+    { (term_kind p) with indexed = false }
+  | TCast(_,Ctype ty,p) when Ast_types.is_ptr ty ->
+    { (term_kind p) with aligned = true }
+  | _ -> unsafe
 
 and term_lkind (h,o) =
   let kd = term_hkind h in
-  if kd.unsafe || safe_term_offset (Cil.typeOfTermLval (h,TNoOffset)) o then kd
-  else { kd with unsafe = true }
+  if kd.indexed && safe_array_toffset (Cil.typeOfTermLval (h,TNoOffset)) o
+  then kd
+  else { kd with indexed = false }
 
 and term_hkind = function
-  | TVar { lv_origin = (Some _ as host) } -> { default_kind with host }
+  | TVar { lv_origin = (Some _ as host) } -> { safe with host }
   | TMem e -> term_kind e
-  | _ -> default_kind
+  | _ -> safe
 
-and safe_term_offset t = function
+and safe_array_toffset t = function
   | TNoOffset -> true
-  | TField(fd,o) -> safe_term_offset (Ctype fd.ftype) o
-  | TModel(fm,o) -> safe_term_offset fm.mi_field_type o
+  | TField(fd,o) -> safe_array_toffset (Ctype fd.ftype) o
+  | TModel(fm,o) -> safe_array_toffset fm.mi_field_type o
   | TIndex(_,o) ->
     Kernel.SafeArrays.get () &&
     let n = Ast_info.direct_array_size @@ Logic_utils.logicCType t in
     not (Z.is_zero n) &&
-    safe_term_offset (Logic_utils.type_of_array_elem t) o
+    safe_array_toffset (Logic_utils.type_of_array_elem t) o
 
 (* -------------------------------------------------------------------------- *)
 (* --- Side Condition Generators                                          --- *)
@@ -142,8 +160,11 @@ let pp_residual fmt = function
   | `False -> Format.pp_print_string fmt "false"
   | `Non_null -> Format.pp_print_string fmt "non-null"
 
+let rpath kd =
+  if kd.indexed && kd.aligned then `True else `Default
+
 (* -------------------------------------------------------------------------- *)
-(* ---  Valid / ValidRead                                                 --- *)
+(* ---  Validity                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
 let in_scope v stmt =
@@ -152,48 +173,37 @@ let in_scope v stmt =
        List.exists (Varinfo.equal v) b.blocals
     ) @@ Kernel_function.find_all_enclosing_blocks stmt
 
-let allocated kinstr v =
+let rallocated kinstr v =
   if v.vglob || v.vformal then `True else
     match kinstr with
     | Kglobal -> `Default
     | Kstmt stmt -> if in_scope v stmt then `True else `False
 
-let rvalid ~readonly kinstr node kd =
-  if kd.unsafe then `Default
+(* Note: rvalid also applies to object_pointer because of safe arrays *)
+
+let rvalid ?(writing=false) kinstr _node kd =
+  if not kd.aligned then `Default
   else
     match kd.host with
     | Some v ->
-      if not readonly && Attr.is_const v
-      then `False
-      else allocated kinstr v
-    | _ ->
-      let flags = Memory.flags node in
-      if not readonly && Attr.mem `Readonly flags then `False
-      else
-      if Attr.mem `Allocated flags then `Default else
-      if Attr.mem `Nullable flags then `Non_null else `True
-
-let rvalid_object kinstr node kd =
-  if kd.unsafe then `Default
-  else
-    match kd.host with
-    | Some v -> allocated kinstr v
-    | _ ->
-      let flags = Memory.flags node in
-      if Attr.mem `Allocated flags then `Default else
-      if Attr.mem `Nullable flags then `Non_null else `True
+      if writing && Attr.is_const v then `False else
+      if kd.indexed then rallocated kinstr v else `Default
+    | None -> `Default
+(* let flags = Memory.flags node in
+   if writing && Attr.mem `Readonly flags then `False else
+   if not kd.indexed || Attr.mem `Allocated flags then `Default else
+   if Attr.mem `Nullable flags then `Non_null else `True *)
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Initialized                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rinitialized node kd =
+let rinitialized _node kd =
   match kd.host with
   | Some v -> if Attr.is_initialized v then `True else `Default
-  | None ->
-    let flags = Memory.flags node in
-    if Attr.mem `Garbage flags || Attr.mem `Allocated flags
-    then `Default else `True
+  | None -> `Default
+(* let flags = Memory.flags node in
+   if Attr.mem `Garbage flags then `Default else `True *)
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Aligned                                                           --- *)

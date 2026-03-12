@@ -10,10 +10,10 @@ type attr = [ `Nullable | `Allocated | `Garbage | `Readonly ]
 type flags = A of int [@@ unboxed]
 
 let flag = function
-  | `Nullable -> 0b0001
-  | `Allocated  -> 0b0010
-  | `Garbage  -> 0b0100
-  | `Readonly -> 0b1000
+  | `Nullable  -> 0b0001
+  | `Allocated -> 0b0010
+  | `Garbage   -> 0b0100
+  | `Readonly  -> 0b1000
 
 let empty = A 0
 let add a (A w) = A (flag a lor w)
@@ -27,10 +27,10 @@ let iter f w =
     [ `Nullable ; `Allocated ; `Garbage ; `Readonly ]
 
 let pp_attr fmt = function
-  | `Nullable -> Format.pp_print_string fmt "nullable"
-  | `Allocated  -> Format.pp_print_string fmt "allocated"
-  | `Garbage  -> Format.pp_print_string fmt "garbage"
-  | `Readonly -> Format.pp_print_string fmt "readonly"
+  | `Nullable  -> Format.pp_print_string fmt "nullable"
+  | `Allocated -> Format.pp_print_string fmt "allocated"
+  | `Garbage   -> Format.pp_print_string fmt "garbage"
+  | `Readonly  -> Format.pp_print_string fmt "readonly"
 
 let reversed = flag `Readonly
 (* flags that shall be merged with land instead of lor *)

@@ -15,6 +15,10 @@ open Cil_types
 val addrof : ?loc:location -> lval -> term
 val taddrof : ?loc:location -> term_lval -> term
 
+val pnull :
+  ?loc:location -> ?names:string list -> eq:bool ->
+  term -> predicate
+
 val pvalid :
   ?loc:location -> ?names:string list -> ?label:logic_label ->
   term -> predicate
@@ -45,21 +49,19 @@ val is_valid_region : logic_info -> bool
 (** {2 Kind of L-Values and Pointers} *)
 (* -------------------------------------------------------------------------- *)
 
-type lkind = {
-  host : varinfo option ;
-  unsafe : bool ; (* cast or pointer arithmetics or unbounded array-index *)
-  aligned : bool ; (* no cast *)
-}
+type lkind
+
+val safe : lkind
+val unsafe : lkind
 
 val kind : exp -> lkind
 val lkind : lval -> lkind
 val hkind : lhost -> lkind
-val safe_offset : typ -> offset -> bool
 val term_kind : term -> lkind
 val term_hkind : term_lhost -> lkind
 val term_lkind : term_lval -> lkind
-val safe_term_offset : logic_type -> term_offset -> bool
-val default_kind : lkind
+val safe_array_offset : typ -> offset -> bool
+val safe_array_toffset : logic_type -> term_offset -> bool
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Residual Conditions} *)
@@ -70,10 +72,11 @@ val default_kind : lkind
 
 type residual = [ `Default | `True | `False | `Non_null ]
 
-val rvalid : readonly:bool -> kinstr -> Memory.node -> lkind -> residual
-val rvalid_object : kinstr -> Memory.node -> lkind -> residual
+val rpath : lkind -> residual
+val rvalid : ?writing:bool -> kinstr -> Memory.node -> lkind -> residual
 val rinitialized : Memory.node -> lkind -> residual
 val raligned : Memory.node -> bits:int -> ?default:bool -> lkind -> residual
+val rallocated : kinstr -> varinfo -> residual
 
 (* -------------------------------------------------------------------------- *)
 

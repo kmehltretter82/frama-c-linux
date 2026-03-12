@@ -160,10 +160,10 @@ let flush env =
 
 let rec parse_region (env:env) p =
   match p.lexpr_node with
-  | PLvar "\\nullable" -> env.eflags <- Attr.add `Nullable env.eflags
-  | PLvar "\\allocated"  -> env.eflags <- Attr.add `Allocated  env.eflags
-  | PLvar "\\garbage"  -> env.eflags <- Attr.add `Garbage  env.eflags
-  | PLvar "\\readonly" -> env.eflags <- Attr.add `Readonly env.eflags
+  | PLvar "\\nullable"  -> env.eflags <- Attr.add `Nullable  env.eflags
+  | PLvar "\\allocated" -> env.eflags <- Attr.add `Allocated env.eflags
+  | PLvar "\\garbage"   -> env.eflags <- Attr.add `Garbage   env.eflags
+  | PLvar "\\readonly"  -> env.eflags <- Attr.add `Readonly  env.eflags
   | PLnamed( name , p ) ->
     flush env ;
     env.enamed <- name ;

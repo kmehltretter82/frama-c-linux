@@ -15,4 +15,3 @@ module Analyze : Bool
 module Annotate : Bool
 module Assert : Bool
 module Logic : Bool
-module Force : Bool

@@ -112,10 +112,7 @@ let of_guard ?loc ?names = function
     let inf = Logic_const.pred ?loc (Prel(Rle,z,k)) in
     let sup = Logic_const.pred ?loc (Prel(Rlt,k,n)) in
     Logic_const.pand ?loc ?names (inf,sup)
-  | Non_null p ->
-    let addr = of_addr ?loc p in
-    let null = Logic_const.term ?loc Tnull addr.term_type in
-    Logic_const.prel ?loc ?names (Rneq,addr,null)
+  | Non_null p -> Condition.pnull ?loc ?names ~eq:false @@ of_addr ?loc p
   | Valid p -> Condition.pvalid ?loc ?names @@ of_addr ?loc p
   | Valid_read p -> Condition.pvalid_read ?loc ?names @@ of_addr ?loc p
   | Valid_object p -> Condition.pvalid_object ?loc ?names @@ of_addr ?loc p
@@ -182,7 +179,7 @@ let kind = function
   | TLV lv -> Condition.term_lkind lv
   | TADDR p -> Condition.term_kind p
 
-let typeof = function
+let pointed = function
   | LV lv -> Cil.typeOfLval lv
   | TLV lv -> Logic_utils.logicCType @@ Cil.typeOfTermLval lv
   | ADDR p -> Ast_types.pointed_type @@ Cil.typeOf p
@@ -192,40 +189,51 @@ let typeof = function
 (* ---  Valid Conditions                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-let valid env n a =
+let kindof a = function None -> kind a | Some kd -> kd
+
+let valid env n ?kd a =
   if not @@ RteGen.Generator.Mem_access.is_computed env.kf then
     check env "mem_access" (Valid a) a @@
-    Condition.rvalid ~readonly:false env.here n (kind a)
+    Condition.rvalid ~writing:true env.here n (kindof a kd)
 
-let valid_read env n a =
+let valid_read env n ?kd a =
   if not @@ RteGen.Generator.Mem_access.is_computed env.kf then
-    let residual = Condition.rvalid ~readonly:true env.here n (kind a) in
+    let residual = Condition.rvalid env.here n (kindof a kd) in
     check env "mem_access" (Valid_read a) a residual
 
-let valid_object env n a =
-  if not @@ RteGen.Generator.Pointer_value.is_computed env.kf then
+let valid_object env n ?kd a =
+  if
+    Kernel.InvalidPointer.get () &&
+    not @@ RteGen.Generator.Pointer_value.is_computed env.kf
+  then
     check env "pointer_value" (Valid_object a) a @@
-    Condition.rvalid_object env.here n (kind a)
+    Condition.rvalid env.here n (kindof a kd)
 
-let initialized env n a =
+let initialized env n ?kd a =
   if not @@ RteGen.Generator.Initialized.is_computed env.kf then
-    check env "initialized" (Initialized a) a @@ Condition.rinitialized n (kind a)
+    check env "initialized" (Initialized a) a @@
+    Condition.rinitialized n (kindof a kd)
 
-let aligned env n a =
-  if not @@ RteGen.Generator.Pointer_alignment.is_computed env.kf then
-    let bits = Fields.bitsSizeOf @@ typeof a in
-    check env "aligned" (Aligned a) a @@ Condition.raligned n (kind a) ~bits
+let aligned env n ?kd a =
+  if
+    Kernel.UnalignedPointer.get () &&
+    not @@ RteGen.Generator.Pointer_alignment.is_computed env.kf
+  then
+    let bits = Fields.bitsSizeOf @@ pointed a in
+    check env "aligned" (Aligned a) a @@
+    Condition.raligned n (kindof a kd) ~bits
 
-let valid_region env n a =
-  if (kind a).unsafe then add env "path" (Valid_region(n,a))
+let valid_region env n ?kd a =
+  check env "path" (Valid_region(n,a)) a @@ Condition.rpath (kindof a kd)
 
 let readable env n a =
   begin
-    valid_region env n a ;
-    valid_read env n a ;
-    aligned env n a ;
-    if not (Ast_types.is_struct_or_union @@ typeof a) then
-      initialized env n a ;
+    let kd = kind a in
+    valid_region env n ~kd a ;
+    valid_read env n ~kd a ;
+    aligned env n ~kd a ;
+    if not (Ast_types.is_struct_or_union @@ pointed a) then
+      initialized env n ~kd a ;
   end
 
 let writable env n a =
@@ -233,13 +241,6 @@ let writable env n a =
     valid_region env n a ;
     valid env n a ;
     aligned env n a ;
-  end
-
-let assignable_pointed env a n =
-  let is_fun = Ast_types.is_fun_ptr @@ typeof a in
-  begin
-    if not is_fun then aligned env n a ;
-    valid_object env n a
   end
 
 (* -------------------------------------------------------------------------- *)
@@ -264,15 +265,12 @@ and offset env t r = function
     begin
       if Kernel.SafeArrays.get () then
         let n = Ast_info.direct_array_size t in
-        add env "path" (Bounds(E k,n))
+        add env "safe_array" (Bounds(E k,n))
     end ;
     offset env te r o
 
 and addr env e = Option.get @@ exp env e
-and eval env e =
-  match exp env e with
-  | None -> ()
-  | Some r -> assignable_pointed env (ADDR e) r
+and eval env e = ignore @@ exp env e
 
 and exp env e =
   match e.enode with
@@ -288,8 +286,9 @@ and exp env e =
   | BinOp((PlusPI|MinusPI),p,k,_) ->
     let r = exp env p in
     eval env k ; r
-  | BinOp(_,a,b,_) -> eval env a ; eval env b ; None
-  | UnOp(_,e,_) -> eval env e ; None
+  | BinOp(_,a,b,_) ->
+    eval env a ; eval env b ; None
+  | UnOp((Neg|BNot|LNot),e, _) -> eval env e ; None
   | Const _ | SizeOf _ | SizeOfE _ | AlignOf (_, _) | AlignOfE (_, _) -> None
 
 let write env lv =
@@ -306,7 +305,11 @@ let rec init env = function
 
 let instr env = function
   | Set(lv,e,_) ->
-    eval env e ;
+    begin
+      match exp env e with
+      | None -> ()
+      | Some rp -> valid_object env rp (ADDR e)
+    end ;
     write env lv ;
   | Call(r,f,es,_) ->
     ignore (lhost env f) ;
@@ -499,9 +502,9 @@ and pred env p =
   | Pdangling(_,p)
     -> term_eval env p
   | Pvalid(l,p) ->
-    residual env (Condition.rvalid ~readonly:false (locate env l)) p
+    residual env (Condition.rvalid ~writing:true (locate env l)) p
   | Pvalid_read(l,p) ->
-    residual env (Condition.rvalid ~readonly:true (locate env l)) p
+    residual env (Condition.rvalid ~writing:false (locate env l)) p
   | Pinitialized(_,p) ->
     residual env Condition.rinitialized p
   | Paligned(p,s) ->
@@ -604,8 +607,11 @@ let set_annotated kf =
   begin
     ValidRegion.add kf () ;
     RteGen.Generator.Mem_access.set kf true ;
-    RteGen.Generator.Pointer_alignment.set kf true ;
-    RteGen.Generator.Pointer_value.set kf true ;
+    RteGen.Generator.Initialized.set kf true ;
+    (if Kernel.InvalidPointer.get() then
+       RteGen.Generator.Pointer_value.set kf true) ;
+    (if Kernel.UnalignedPointer.get () then
+       RteGen.Generator.Pointer_alignment.set kf true) ;
   end
 
 let annotate =
@@ -628,7 +634,7 @@ let annotate =
                     in add_annotation ~kf ~names ?status stmt condition
                  ) stmt
             ) fd.sallstmts ;
-          if not @@ Options.Force.get () then set_annotated kf ;
+          set_annotated kf ;
         end
     end
 
