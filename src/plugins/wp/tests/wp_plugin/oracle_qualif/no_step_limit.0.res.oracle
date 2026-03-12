@@ -6,3 +6,7 @@
 [wp] [Unsuccess] typed_lemma_truc (no-steps) (Cache miss 1)
 [wp] Proved goals:    0 / 1
   Unsuccess:       1
+------------------------------------------------------------
+ Axiomatics                WP     Alt-Ergo  Total   Success
+  Lemma                     -        -        1       0.0%
+------------------------------------------------------------
