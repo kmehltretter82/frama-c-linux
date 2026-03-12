@@ -889,22 +889,6 @@ end = struct
       dc_enabled_if = Some s;
       dc_macros = Macros.add_list ["PTEST_ENABLED_IF", s] current.dc_macros }
 
-  let config_env ~drop:_ ~file ~dir s current =
-    let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
-    if Str.string_match regex s 0 then begin
-      let name = Str.matched_group 1 s in
-      let value =
-        try Macros.expand ~file current.dc_macros (Str.matched_group 3 s)
-        with Not_found -> (* empty text *) "\"\""
-      in
-      if !verbosity >= 4 then
-        Format.printf "%%   - New ENV variable %s with value %s@." name value;
-      { current with dc_env_var = current.dc_env_var @ [name, value] }
-    end else begin
-      Format.eprintf "%a: cannot understand ENV definition: %s@." (SubDir.pp_file ~dir) file s;
-      current
-    end
-
   let config_libs ~drop:_ ~file ~dir:_ s current =
     let s = Macros.expand ~file current.dc_macros s in
     let l = List.map (fun s -> Filename.remove_extension_opt [ ".cmxs" ; ".cma" ; ".ml" ] s) (split_list s) in
@@ -937,21 +921,48 @@ end = struct
       dc_module = Some l;
       dc_macros = Macros.add_list [macro_name, s] current.dc_macros }
 
-  let config_macro ~drop:_ ~file ~dir s current =
-    (* note: the expansion is only done into the definition *)
+  let parse_split_space s =
     let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
     if Str.string_match regex s 0 then begin
       let name = Str.matched_group 1 s in
-      let def =
+      let value =
         try Str.matched_group 3 s with Not_found -> (* empty text *) ""
-      in
+      in Some (name, value)
+    end
+    else None
+
+  let config_macro ~drop:_ ~file ~dir s current =
+    match parse_split_space s with
+    | None ->
+      Format.eprintf "%a: cannot understand MACRO definition: %s@." (SubDir.pp_file ~dir) file s;
+      current
+    | Some (name, def) ->
       if !verbosity >= 4 then
         Format.printf "%%   - New macro %s with definition %s@." name def;
       { current with dc_macros = Macros.add_expand ~file name def current.dc_macros }
-    end else begin
-      Format.eprintf "%a: cannot understand MACRO definition: %s@." (SubDir.pp_file ~dir) file s;
+
+  let config_env ~drop:_ ~file ~dir s current =
+    match parse_split_space s with
+    | None ->
+      Format.eprintf "%a: cannot understand ENV definition: %s@." (SubDir.pp_file ~dir) file s;
       current
-    end
+    | Some (name, value) ->
+      (* Make quotes explicit in dune file if the string is empty. *)
+      let value = if value = "" then "\"\"" else value in
+      if !verbosity >= 4 then
+        Format.printf "%%   - New ENV variable %s with value %s@." name value;
+      let dc_env_var =
+        (* If the environnement variable is already set, we replace its value. *)
+        let old, others = List.partition (fun (name', _) -> name = name') current.dc_env_var in
+        match old with
+        | _ :: _ :: _ -> assert false (* should not happen *)
+        | [] -> others @ [(name, value)]
+        | [ _, value' ] ->
+          if !verbosity >= 4 then
+            Format.printf "%%   - Replacing ENV variable %s=%s with value %s@." name value' value;
+          others @ [(name, value)]
+      in
+      { current with dc_env_var }
 
   type parsing_env = {
     current_default_log: string list;
