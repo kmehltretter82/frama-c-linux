@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Types, monads and utilitary functions for lattices in which the bottom
+(** Types, monads and utility functions for lattices in which the bottom
     and/or the top are managed separately from other values. *)
 
 type 'a or_bottom = [ `Value of 'a | `Bottom ]

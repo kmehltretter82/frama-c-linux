@@ -14,7 +14,7 @@
  * - μ is an infinite sequence of inputs ;
  * - C is the center of the inputs box ;
  * - R is the radius of the inputs box ;
- * - Everytime a radius is mentionned, it is always supposed all positive ;
+ * - Everytime a radius is mentioned, it is always supposed all positive ;
  * - |.| is the componentwise absolute value on matrices and vectors. *)
 
 module Make (K : Field.S) = struct
@@ -40,7 +40,7 @@ module Make (K : Field.S) = struct
     ; initial_state : 'n vector
     }
 
-  (* Knowledge on LTI systems shared accross the module's functions:
+  (* Knowledge on LTI systems shared across the module's functions:
    * - [n] is the system's order ;
    * - [center] corresponds to the constant part added at each iteration
    *   and is computed as {m B C + S} ;
@@ -66,7 +66,7 @@ module Make (K : Field.S) = struct
   (** Behavior computation **)
 
   (* Computes the limit center. The computation is lazy for two reasons:
-   * - The result is valid iif {m ρ(A) < 1}, which will eventually be
+   * - The result is valid iff {m ρ(A) < 1}, which will eventually be
    *   proven through the limit computation.
    * - Proving {m ρ(A) < 1} comes down to finding a {m q ∈ ℕ} such
    *   as {m ||A^q||₁ < 1}. The limit center can then be computed
@@ -74,7 +74,7 @@ module Make (K : Field.S) = struct
    *   and {m q - 1}. But, this computation's result is the same for
    *   all {m q} once the necessary condition is proven, so we only
    *   need to compute it as {m (I - A)^(-1) (B C + S)}.
-   * Relying on lazyness is then a simple way to wait for a proof of
+   * Relying on laziness is then a simple way to wait for a proof of
    * the necessary condition {m ρ(A) < 1} and then compute the
    * limit center only once. *)
   let compute_center_limit system knowledge = Lazy.from_fun @@ fun () ->
@@ -103,7 +103,7 @@ module Make (K : Field.S) = struct
    * of the limit as {m k} tends toward infinity of {m ∑ A^t B μ_(k - 1 - t)},
    * with {m t} between {m 0} and {m k - 1}.
    * The computation is done as follows:
-   * - To prove that {m ρ(A) < 1}, the fonction searches for a spectral
+   * - To prove that {m ρ(A) < 1}, the function searches for a spectral
    *   exponent, i.e a {m q ∈ ℕ} such as {m ||A^q||₁ < 1}.
    * - The infinite sum is then divided in two: a finite sum of the {m q}
    *   first elements and the infinite remaining sum. Indeed, as {m q} grows,
@@ -169,7 +169,7 @@ module Make (K : Field.S) = struct
     let+ transition = search_unrolling_stop spectral limit iterations in
     { transition ; permanent = limit }
 
-  (* Behavior computation with timeout mecanism. *)
+  (* Behavior computation with timeout mechanism. *)
   let behavior ?(timeout = 1.0) ~completion_target =
     if timeout > 0.0 && 0.0 < completion_target && completion_target < 1.0 then
       let start = (Unix.times ()).tms_utime in

@@ -866,9 +866,9 @@ common issues that may arise during verification.
 In addition to annotations, \aorai generates an implementation for the transition
 functions, so that it is possible to use the Eva plug-in of Frama-C on the
 instrumented code. However, there's no guarantee that Eva will be able to
-perform an analyzis that stays precise enough to verify that the automaton
+perform an analysis that stays precise enough to verify that the automaton
 always ends in an accepting state. Aoraï will set up automatically a certain number
-of parameters in Eva to help make the analyzis more precise, but,
+of parameters in Eva to help make the analysis more precise, but,
 in the case of deterministic automata it is also possible
 to use option \texttt{-aorai-instrumentation-history n} to have the instrumentation
 retain the \texttt{n} previous states of the automaton (in addition to the

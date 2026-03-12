@@ -510,7 +510,7 @@ function QSplitEngine(props: QSplitEngineProps): JSX.Element {
    ```
 
    The horizontal and vertical split bars can be dragged to adjust the ratios.
-   The central node can also be dragged to adust both ratios.
+   The central node can also be dragged to adjust both ratios.
 
    Any adjacent quarters collapse when they contain either the same component
    or one component and `undefined`. The split bars are erased accordingly.

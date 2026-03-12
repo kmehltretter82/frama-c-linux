@@ -834,7 +834,7 @@ val mkMem: addr:exp -> off:offset -> lval
     - If both types are object pointers, cast to [void*]
     - Else cast to [uintptr_t]
 
-    The [Result.Error] contains an optionnal [location] to target a specific
+    The [Result.Error] contains an optional [location] to target a specific
     operand and an error message.
 
     @before Frama-C+dev the function could raise [AbortFatal] instead of using

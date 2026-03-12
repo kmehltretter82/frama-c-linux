@@ -791,7 +791,7 @@ and pragma = parse
 
 
 and str = parse
-  (* no nul terminiation in CST_STRING '"' *)
+  (* no nul termination in CST_STRING '"' *)
   | '"'         { [] }
   | hex_escape  { lex_hex_escape str lexbuf }
   | oct_escape  { lex_oct_escape str lexbuf }

@@ -26,7 +26,7 @@ module Make (K : Field.S) : sig
       center [center], i.e a point in the vector space. *)
   val point : 'n succ vector -> 'n succ t
 
-  (** The call [zero n] returns the point zero in a [n] dimensionnal
+  (** The call [zero n] returns the point zero in a [n] dimensional
       vector space. *)
   val zero : 'n succ nat -> 'n succ t
 

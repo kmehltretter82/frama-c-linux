@@ -79,7 +79,7 @@ module Make (K : Field.S) : sig
   type 'n behavior = { transition : 'n box list ; permanent : 'n box }
 
   (** Behavior computation. See module-level documentation for a general
-      overview and a link to the underlying theory. The optionnal parameters
+      overview and a link to the underlying theory. The optional parameters
       are as follows:
       - [timeout] specifies the maximum analysis duration. It is expressed
         in seconds, and its default value is one second.

@@ -9,7 +9,7 @@
 (** High Level Interface to Command.
     @since Carbon-20101201 *)
 
-(** If set to [true], prints debug informations about tasks.
+(** If set to [true], prints debug information about tasks.
     @since Frama-C+dev
 *)
 val set_debug: bool -> unit

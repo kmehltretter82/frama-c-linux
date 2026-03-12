@@ -40,7 +40,7 @@ void simple_loops () {
   }
   Frama_C_show_each_imprecise(res);
   res = 0;
-  /* The annnotation has priority over the automatic loop unrolling:
+  /* The annotation has priority over the automatic loop unrolling:
      this loop should always be unrolled. */
   /*@ loop unroll 100; */
   for (int i = 0; i < 100; i++) {

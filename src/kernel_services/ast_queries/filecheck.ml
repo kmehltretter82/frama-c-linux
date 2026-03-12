@@ -392,7 +392,7 @@ module Base_checker = struct
             match Stack.top_opt switch_cases with
             | None ->
               check_abort
-                "@[<v 2>The label %a is outside of a switch statment@]"
+                "@[<v 2>The label %a is outside of a switch statement@]"
                 Printer.pp_label label
             | Some cases when not @@ Stmt.Hashtbl.mem cases s ->
               check_abort

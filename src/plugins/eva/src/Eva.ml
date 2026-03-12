@@ -36,7 +36,7 @@ module Eva_ast = Eva_ast
 (** Types of callstack. *)
 module Callstack = Callstack
 
-(** Types for the memory dependencies of an expresson or lvalue. *)
+(** Types for the memory dependencies of an expression or lvalue. *)
 module Deps = Deps
 
 

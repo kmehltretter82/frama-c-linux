@@ -9,7 +9,7 @@
 (** This modules creates Kernel Logs manually instead of using the one created
     via the {!Plugin} modules. It is required for {!Cmdline} which cannot depend
     on {!Plugin}. It also includes all Kernel debug and warning keys. Unless
-    you cannot depend on Frama-C's kernel, always prefere using {!Kernel}
+    you cannot depend on Frama-C's kernel, always prefer using {!Kernel}
     instead of {!Kernel_log}.
     @since Frama-C+dev
 *)
