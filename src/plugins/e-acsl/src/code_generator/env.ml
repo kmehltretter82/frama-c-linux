@@ -195,7 +195,7 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
       false (* is a formal? *)
       ~referenced:true
       (Varname.get ~scope (Functions.RTL.mk_gen_name name))
-      ty
+      (Misc.unghost_type ty)
   in
   v.vreferenced <- true;
   let lscope = match scope with
@@ -627,9 +627,10 @@ let with_params ?rte ?kinstr ~env f =
 
 (* debugging purpose *)
 let pretty fmt env =
-  let local_env, _ = top env in
-  Format.fprintf fmt "local new_stmts %t"
-    (fun fmt ->
-       List.iter
-         (fun s -> Printer.pp_stmt fmt s)
-         local_env.block_info.new_stmts)
+  let {block_info = bi}, _ = top env in
+  let indented pp fmt x = Format.fprintf fmt "@[<v 2>%a@]" pp x in
+  Format.fprintf fmt "local environment:@,@[%a@]@,@[%a@]@,@[%a@]@,@[%a@]"
+    (indented @@ Pretty_utils.pp_list ~pre:"vars: " ~sep:" " Varinfo.pretty) bi.new_block_vars
+    (indented @@ Pretty_utils.pp_list ~pre:"pre_stmts:@," ~sep:"@," Stmt.pretty) bi.pre_stmts
+    (indented @@ Pretty_utils.pp_list ~pre:"stmts:@," ~sep:"@," Stmt.pretty) bi.new_stmts
+    (indented @@ Pretty_utils.pp_list ~pre:"post_stmts:@," ~sep:"@," Stmt.pretty) bi.post_stmts

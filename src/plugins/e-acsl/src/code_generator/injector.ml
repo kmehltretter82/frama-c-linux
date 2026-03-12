@@ -614,7 +614,7 @@ let inject_in_fundec main fundec =
   (* convert ghost variables *)
   vi.vghost <- false;
   let unghost_local vi =
-    Cil.update_var_type vi (Ast_types.remove_attributes_deep ["ghost"] vi.vtype);
+    Cil.update_var_type vi (Misc.unghost_type vi.vtype);
     vi.vghost <- false
   in
   List.iter unghost_local fundec.slocals;
@@ -652,7 +652,7 @@ let unghost_vi vi =
   (* do not convert extern ghost variables, because they can't be linked,
      see bts #1392 *)
   if vi.vstorage <> Extern then vi.vghost <- false;
-  Cil.update_var_type vi (Ast_types.remove_attributes_deep ["ghost"] vi.vtype);
+  Cil.update_var_type vi (Misc.unghost_type vi.vtype);
   match Ast_types.unroll vi.vtype with
   | { tnode = TFun (res, Some l, va); tattr } ->
     (* unghostify function's parameters *)

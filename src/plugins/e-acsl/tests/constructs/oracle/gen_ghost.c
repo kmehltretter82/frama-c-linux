@@ -9,6 +9,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 int G = 0;
 int *P;
+int *ghost_int_arr[0] = {};
 void __e_acsl_globals_init(void)
 {
   static char __e_acsl_already_run = 0;
@@ -54,7 +55,7 @@ int main(void)
       __gen_e_acsl_assert_data_3.pred_txt = "alignof(int) != 0";
       __gen_e_acsl_assert_data_3.file = "ghost.i";
       __gen_e_acsl_assert_data_3.fct = "main";
-      __gen_e_acsl_assert_data_3.line = 12;
+      __gen_e_acsl_assert_data_3.line = 16;
       __gen_e_acsl_assert_data_3.name = "denominator not zero";
       __e_acsl_assert(1,& __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
@@ -66,7 +67,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(P,alignof(int))";
     __gen_e_acsl_assert_data_2.file = "ghost.i";
     __gen_e_acsl_assert_data_2.fct = "main";
-    __gen_e_acsl_assert_data_2.line = 12;
+    __gen_e_acsl_assert_data_2.line = 16;
     __gen_e_acsl_assert_data_2.name = "pointer_alignment";
     __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -82,7 +83,7 @@ int main(void)
     __gen_e_acsl_assert_data.pred_txt = "\\valid(P)";
     __gen_e_acsl_assert_data.file = "ghost.i";
     __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 12;
+    __gen_e_acsl_assert_data.line = 16;
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
@@ -121,7 +122,7 @@ int main(void)
     __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(q)";
     __gen_e_acsl_assert_data_5.file = "ghost.i";
     __gen_e_acsl_assert_data_5.fct = "main";
-    __gen_e_acsl_assert_data_5.line = 15;
+    __gen_e_acsl_assert_data_5.line = 19;
     __gen_e_acsl_assert_data_5.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
@@ -132,7 +133,7 @@ int main(void)
     __gen_e_acsl_assert_data_4.pred_txt = "*q == G";
     __gen_e_acsl_assert_data_4.file = "ghost.i";
     __gen_e_acsl_assert_data_4.fct = "main";
-    __gen_e_acsl_assert_data_4.line = 15;
+    __gen_e_acsl_assert_data_4.line = 19;
     __e_acsl_assert(*q == G,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
   }
@@ -143,6 +144,24 @@ int main(void)
     G ++;
     G ++;
   }
+  {
+    int *__gen_e_acsl_x;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+      {.values = (void *)0};
+    /*@ assert Eva: mem_access: \valid_read((int **)ghost_int_arr); */
+    __gen_e_acsl_x = ghost_int_arr[0];
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
+                                 "ghost_int_arr[0]",(void *)ghost_int_arr[0]);
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "Assertion";
+    __gen_e_acsl_assert_data_6.pred_txt = "\\let x = ghost_int_arr[0]; \\true";
+    __gen_e_acsl_assert_data_6.file = "ghost.i";
+    __gen_e_acsl_assert_data_6.fct = "main";
+    __gen_e_acsl_assert_data_6.line = 30;
+    __e_acsl_assert(1,& __gen_e_acsl_assert_data_6);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+  }
+  /*@ assert \let x = ghost_int_arr[0]; \true; */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& q));
   __e_acsl_globals_clean();
