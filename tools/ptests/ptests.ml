@@ -687,14 +687,14 @@ module Test_config: sig
 
   (* updates the configuration directives that do not depend of the test number and
      returns a getter of the PTEST_xxx variables including the one depending on the test number *)
-  val ptest_vars: env:env_t -> SubDir.t -> file:string -> config -> string * config * (nth:int -> Macros.t -> Macros.t)
+  val ptest_vars: env:env_t -> file:string -> string * (nth:int -> Macros.t -> Macros.t)
 
   (** Split a string on spaces, tabs and commas, except if they are escaped with
       '\'. *)
   val split_list: string -> string list
 end = struct
 
-  let ptest_vars ~env _directory ~file config =
+  let ptest_vars ~env ~file =
     let ptest_config = config_name ~env "" in
     let ptest_file = Filename.sanitize file in
     let ptest_name = Filename.remove_extension file in
@@ -711,20 +711,7 @@ end = struct
         "PTEST_FILE", ptest_file;
         "PTEST_NAME", ptest_name;
       ] in
-    let ptest_macros = Macros.add_list ptest_vars Macros.empty in
-    let subst = Macros.expand_list ~file ptest_macros in
-    let dc_enabled_if = Macros.expand_enabled_if  ~file ptest_macros config.dc_enabled_if in
-    let dc_env_var = Macros.expand_env ~file ptest_macros config.dc_env_var in
     ptest_name,
-    { config with
-      dc_enabled_if;
-      dc_execnow = List.rev config.dc_execnow;
-      dc_deps = Option.map subst config.dc_deps ;
-      dc_env_var = dc_env_var;
-      dc_plugin = Option.map subst config.dc_plugin;
-      dc_module = Option.map subst config.dc_module;
-      dc_libs = Option.map subst config.dc_libs;
-    },
     fun ~nth macros ->
       Macros.add_list (("PTEST_NUMBER", string_of_int nth)::ptest_vars) macros
 
@@ -1798,7 +1785,7 @@ let update_modules ~file ~modules deps =
 let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~enabled_if =
   let config = Test_config.scan_test_file ~env directory ~file config in
   if not config.dc_dont_run then
-    let test_name,config,ptest_vars = Test_config.ptest_vars ~env directory ~file config  in
+    let test_name, ptest_vars = Test_config.ptest_vars ~env ~file in
     let make_cmd =
       let i = ref 0 in
       fun { toplevel; opts=options; macros; exit_code; logs; bins; timeout; deps; env_var} ->
@@ -1997,6 +1984,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             pp_enabled_if cmd.deps
         end
     in
+    let config = { config with dc_execnow = List.rev config.dc_execnow } in
     if config.dc_commands <> [] || config.dc_execnow <> [] then begin
       let pp_list_alias fmt l = List.iter (Format.fprintf fmt "(alias %S)") l in
       Format.fprintf result_fmt
@@ -2017,7 +2005,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
     end ;
     List.iter make_cmd config.dc_commands;
     List.iter make_execnow_cmd config.dc_execnow;
-    (config.dc_commands <> [] || config.dc_execnow <> [])
+    true
   else
     false
 
