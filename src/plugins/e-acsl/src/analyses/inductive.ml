@@ -696,7 +696,7 @@ end
   module Extractor = Make_extractor (struct
       include Build_pred_or_term.Predicate
       let mk_concl ~mode:_ _ = mk_true None
-      let deep_copy p = p (* no term duplication occurs in complete extraction *)
+      let deep_copy p = Misc.Id_term.deep_copy_predicate p
     end)
 
   let extract_with_mode ~mode:{Modus.mode} li =

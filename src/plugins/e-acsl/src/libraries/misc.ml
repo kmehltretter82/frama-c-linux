@@ -210,15 +210,16 @@ module Id_term = struct
         let mem_project = Datatype.never_any_project
       end)
 
-  let deep_copy =
-    let copier = object
-      inherit Visitor.frama_c_inplace
-      method! vterm _ = Cil.DoChildrenPost (fun t -> {t with term_loc = t.term_loc})
-      method! vlogic_type _ =
-        (* optimisation: we copy terms and logic types do not contain terms *)
-        Cil.SkipChildren
-    end in
-    fun t -> Visitor.visitFramacTerm copier t
+  let term_copier = object
+    inherit Visitor.frama_c_inplace
+    method! vterm _ = Cil.DoChildrenPost (fun t -> {t with term_loc = t.term_loc})
+    method! vlogic_type _ =
+      (* optimisation: we copy terms and logic types do not contain terms *)
+      Cil.SkipChildren
+  end
+
+  let deep_copy t = Visitor.visitFramacTerm term_copier t
+  let deep_copy_predicate p = Visitor.visitFramacPredicate term_copier p
 end
 
 let extract_uncoerced_lval e =

@@ -47,7 +47,7 @@ let check_integrity () =
       method! vterm t =
         let () =
           if Terms.mem visited_terms t
-          then Options.warning ~once:true "shared term %a in AST" Printer.pp_term t
+          then Options.fatal "shared term %a in AST" Printer.pp_term t
           else Terms.add visited_terms t ()
         in
         Cil.DoChildren

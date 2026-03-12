@@ -75,6 +75,14 @@ module Id_term : sig
   include Datatype.S_with_hashtbl with type t = term
 
   val deep_copy : t -> t
+  (** @return a copy of the given term with all sub-terms being copied as well.
+      If a term already in the AST is added another time somewhere else in the
+      AST, it has to be unshared in this way, so as to preserve the invariant:
+      two term nodes in the AST may not be physically identical.
+  *)
+
+  val deep_copy_predicate : predicate -> predicate
+  (** @return a predicate with all sub-terms occurring within being unshared. *)
 end
 (** Datatype for terms that relies on physical equality.
     Note that of its collections only [Hashtbl] can be used.

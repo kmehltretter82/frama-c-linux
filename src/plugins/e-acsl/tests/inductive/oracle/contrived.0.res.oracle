@@ -29,10 +29,6 @@
 [e-acsl] Warning: Negative verdicts of bind_twice might be unsound
 [e-acsl:analysis:inductive] 
   extracting predicate from subst_let using mode: complete
-[e-acsl] Warning: shared term x in AST
-[e-acsl] Warning: shared term 4 in AST
-[e-acsl] Warning: shared term y in AST
-[e-acsl] Warning: shared term 2 in AST
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] contrived.c:68: Warning: assertion got status unknown.
 [eva:alarm] contrived.c:69: Warning: assertion got status unknown.
