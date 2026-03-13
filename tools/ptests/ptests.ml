@@ -916,17 +916,21 @@ end = struct
       dc_module = Some l;
       dc_macros = Macros.add_list [macro_name, s] current.dc_macros }
 
-  let parse_split_space s =
-    let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
+  let macro_name_regex = "[-_0-9a-zA-Z]+"
+  let env_name_regex = "[_0-9a-zA-Z]+"
+
+  let parse_split_space name_regex s =
+    let regex_str = Format.sprintf "[ \t]*\\(%s\\)\\([ \t]+.*\\)?$" name_regex in
+    let regex = Str.regexp regex_str in
     match str_string_match1 regex s 0 with
     | None -> None
     | Some name ->
       let value =
-        try Str.matched_group 3 s with Not_found -> (* empty text *) ""
+        try Str.matched_group 2 s |> String.trim with Not_found -> (* empty text *) ""
       in Some (name, value)
 
   let config_macro ~drop:_ ~file ~dir s current =
-    match parse_split_space s with
+    match parse_split_space macro_name_regex s with
     | None ->
       Format.eprintf "%a: cannot understand MACRO definition: %s@." (SubDir.pp_file ~dir) file s;
       current
@@ -935,7 +939,7 @@ end = struct
       { current with dc_macros = Macros.add_expand ~file name def current.dc_macros }
 
   let config_env ~drop:_ ~file ~dir s current =
-    match parse_split_space s with
+    match parse_split_space env_name_regex s with
     | None ->
       Format.eprintf "%a: cannot understand ENV definition: %s@." (SubDir.pp_file ~dir) file s;
       current
