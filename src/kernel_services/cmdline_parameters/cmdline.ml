@@ -962,31 +962,24 @@ type project_functions = {
 }
 
 let project_functions =
-  let current () =
-    Extlib.mk_labeled_fun "Cmdline.project_functions.current"
-  in
-  let on_from_pid _ _ =
-    Extlib.mk_labeled_fun "Cmdline.project_functions.on_from_pid"
-  in
-  let pid_to_name _ =
-    Extlib.mk_labeled_fun "Cmdline.project_functions.pid_to_name"
-  in
-  let name_to_pid _ =
-    Extlib.mk_labeled_fun "Cmdline.project_functions.name_to_pid"
+  let current = Project.get_current_pid in
+  let on_from_pid pid f = Project.on_from_pid pid f () in
+  let pid_to_name = Project.pid_to_name in
+  let name_to_pid name =
+    let none () = Kernel_log.abort "no project named `%s'" name in
+    Option.value_or_else ~none (Project.name_to_pid name)
   in
   ref { current; on_from_pid; pid_to_name; name_to_pid }
 
 let play_in_toplevel nb_used play options =
-  let prj_funs = !project_functions in
   (* [aux then_opts] handles the following "-then" options *)
   let rec aux current = function
     | None -> ()
     | Some(options, then_argument) ->
       let play_on options p =
         p,
-        prj_funs.on_from_pid
-          p
-          (fun () -> play_in_toplevel_one_shot nb_used play options)
+        Project.on_from_pid
+          p (fun () -> play_in_toplevel_one_shot nb_used play options) ()
       in
       let last_current, then_opts = match then_argument with
         | Default -> current, play_in_toplevel_one_shot nb_used play options
@@ -998,10 +991,11 @@ let play_in_toplevel nb_used play options =
           (match !last_project_created_by_copy () with
            | None -> Kernel_log.abort "no known last created project."
            | Some p ->
-             let current = prj_funs.pid_to_name current in
+             let current = Project.pid_to_name current in
              play_on (("-remove-projects=-@all,+" ^ current) :: options) p)
         | Name p_name ->
-          let pid = prj_funs.name_to_pid p_name in
+          let none () = Kernel_log.abort "no project named `%s'" p_name in
+          let pid = Option.value_or_else ~none (Project.name_to_pid p_name) in
           play_on options pid
       in
       aux last_current then_opts
@@ -1009,7 +1003,7 @@ let play_in_toplevel nb_used play options =
   (* play the first shot before the first "-then" *)
   let then_opts = play_in_toplevel_one_shot nb_used play options in
   (* play the "-then" options *)
-  let current = prj_funs.current () in
+  let current = Project.get_current_pid () in
   aux current then_opts
 
 let parse_and_boot ~get_toplevel ~play_analysis =
