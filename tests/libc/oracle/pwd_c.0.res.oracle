@@ -102,7 +102,7 @@
   function strcpy: precondition 'room_string' got status valid.
 [eva:progress] FRAMAC_SHARE/libc/pwd.c:80: 
   function strcpy: precondition 'separation' got status valid.
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:420: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:440: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva:progress] Done for function strcpy
 [eva:progress] FRAMAC_SHARE/libc/pwd.c:81: Call to builtin strlen

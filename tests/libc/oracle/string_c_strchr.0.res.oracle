@@ -13,7 +13,7 @@
   Called from string_c_strchr.c:62.
 [eva:progress] string_c_strchr.c:62: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva:progress] FRAMAC_SHARE/libc/string.h:201: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:221: 
   function strchr, behavior not_found: postcondition 'result_null' got status valid.
 [eva:progress] Recording results for strchr
 [eva:progress] Done for function strchr
@@ -66,17 +66,17 @@
   Called from string_c_strchr.c:70.
 [eva:progress] string_c_strchr.c:70: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva:progress] FRAMAC_SHARE/libc/string.h:193: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:213: 
   function strchr, behavior found: postcondition 'result_valid_string' got status valid.
-[eva:progress] FRAMAC_SHARE/libc/string.h:194: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:214: 
   function strchr, behavior found: postcondition 'result_char' got status valid.
-[eva:progress] FRAMAC_SHARE/libc/string.h:195: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:215: 
   function strchr, behavior found: postcondition 'result_same_base' got status valid.
-[eva:progress] FRAMAC_SHARE/libc/string.h:196: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:216: 
   function strchr, behavior found: postcondition 'result_in_length' got status valid.
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:198: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:218: 
   cannot evaluate ACSL term, unsupported logic var p
-[eva:alarm] FRAMAC_SHARE/libc/string.h:198: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:218: Warning: 
   function strchr, behavior found: postcondition 'result_first_occurrence' got status unknown.
 [eva:progress] Recording results for strchr
 [eva:progress] Done for function strchr

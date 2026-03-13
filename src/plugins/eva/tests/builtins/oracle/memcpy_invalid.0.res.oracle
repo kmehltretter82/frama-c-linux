@@ -19,7 +19,7 @@
   function memcpy: precondition 'valid_src' got status unknown.
 [eva:progress] memcpy_invalid.c:17: 
   function memcpy: precondition 'separation' got status valid.
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:114: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:134: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva:progress] Recording results for test
 [from] Computing for function test

@@ -17,7 +17,7 @@
 [eva:progress] sys_select.c:16: Call to builtin memset
 [eva:progress] sys_select.c:16: 
   function memset: precondition 'valid_s' got status valid.
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:147: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:167: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva:progress] 
   computing for function htonl <- main.
@@ -65,7 +65,7 @@
   function memcpy: precondition 'valid_src' got status valid.
 [eva:progress] sys_select.c:30: 
   function memcpy: precondition 'separation' got status valid.
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:114: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:134: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva:progress] 
   computing for function select <- main.

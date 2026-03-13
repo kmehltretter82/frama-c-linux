@@ -128,7 +128,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     __gen_e_acsl_assert_data_2.pred_txt = "\\valid(dest + (0 .. n - 1))";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_2.fct = "strncpy";
-    __gen_e_acsl_assert_data_2.line = 427;
+    __gen_e_acsl_assert_data_2.line = 447;
     __gen_e_acsl_assert_data_2.name = "room_nstring";
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -158,7 +158,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(dest + (0 .. n - 1))";
     __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_4.fct = "strncpy";
-    __gen_e_acsl_assert_data_4.line = 429;
+    __gen_e_acsl_assert_data_4.line = 449;
     __gen_e_acsl_assert_data_4.name = "separated_guard";
     __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
@@ -186,7 +186,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(src + (0 .. n - 1))";
     __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_5.fct = "strncpy";
-    __gen_e_acsl_assert_data_5.line = 429;
+    __gen_e_acsl_assert_data_5.line = 449;
     __gen_e_acsl_assert_data_5.name = "separated_guard";
     __e_acsl_assert(__gen_e_acsl_valid_read_3,& __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
@@ -227,7 +227,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     __gen_e_acsl_assert_data_3.pred_txt = "\\separated(dest + (0 .. n - 1), src + (0 .. n - 1))";
     __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_3.fct = "strncpy";
-    __gen_e_acsl_assert_data_3.line = 429;
+    __gen_e_acsl_assert_data_3.line = 449;
     __gen_e_acsl_assert_data_3.name = "separation";
     __e_acsl_assert(__gen_e_acsl_separated,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
@@ -259,7 +259,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     __gen_e_acsl_assert_data_6.pred_txt = "\\result == \\old(dest)";
     __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_6.fct = "strncpy";
-    __gen_e_acsl_assert_data_6.line = 432;
+    __gen_e_acsl_assert_data_6.line = 452;
     __gen_e_acsl_assert_data_6.name = "result_ptr";
     __e_acsl_assert(__retres == __gen_e_acsl_at_5,
                     & __gen_e_acsl_assert_data_6);
@@ -304,7 +304,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     __gen_e_acsl_assert_data_7.pred_txt = "\\initialized(\\old(dest) + (0 .. \\old(n) - 1))";
     __gen_e_acsl_assert_data_7.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_7.fct = "strncpy";
-    __gen_e_acsl_assert_data_7.line = 433;
+    __gen_e_acsl_assert_data_7.line = 453;
     __gen_e_acsl_assert_data_7.name = "initialization";
     __e_acsl_assert(__gen_e_acsl_initialized_2,& __gen_e_acsl_assert_data_7);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
