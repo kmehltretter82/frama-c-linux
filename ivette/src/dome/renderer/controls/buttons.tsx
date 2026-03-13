@@ -382,9 +382,9 @@ export interface RadioGroupProps<A> {
   value?: A;
   /** Callback to selected values. */
   onChange?: (newValue: A) => void;
-  /** Default selected value. */
+  /** Additional CSS class. */
   className?: string;
-  /** Additional style for the `< dov /> ` container of Raiods */
+  /** Additional style for the `<div/>` container. */
   style?: React.CSSProperties;
   /** [[Radio]] Buttons. */
   children?: React.ReactNode;
@@ -457,9 +457,9 @@ export interface SelectProps {
   focus?: boolean;
   /** Callback to selected values. */
   onChange?: (newValue?: string) => void;
-  /** Default selected value. */
+  /** Additional CSS class. */
   className?: string;
-  /** Additional style for the `< dov /> ` container of Raiods */
+  /** Additional style for the `<div/>` container. */
   style?: React.CSSProperties;
   /** Shall be standard `<option/>` and `<optgroup/>` elements. */
   children?: React.ReactNode;
@@ -504,29 +504,32 @@ export function SelectMenu(props: SelectProps): JSX.Element {
   );
 }
 
-/** Keep the Props buttons to simplify,
-  * but omit some elements managed by the group. */
-export type SelectButtonElement = Omit<ToolBar.ButtonProps<string>,
-  'onClick' | 'selected' | 'selection' | 'children'>
-   & { id: string }
+/** ButtonProps without properties managed by `SelectButton`,
+    plus an unique id for each element. */
+export type SelectButtonElement =
+  Omit<ToolBar.ButtonProps<string>,
+    'onClick' | 'selected' | 'selection' | 'children'>
+  & { id: string }
 
 export interface SelectButtonProps {
-  /** list of buttons */
+  /** List of buttons. */
   buttonList: SelectButtonElement[];
-  /** Button selected on the group */
+  /** Button selected in the group. */
   selected: string;
-  /** Set button selected */
+  /** Called when the selected button changes. */
   onSelection: (a: string) => void;
-  /** Vertical separation, default true */
+  /** Vertical separation, default to true. */
   verticalSep?: boolean;
   /** Defaults to `false`. */
   disabled?: boolean;
-  /** Default selected value. */
+  /** Additional CSS class. */
   className?: string;
-  /** Additional style for the `< dov /> ` container of Raiods */
+  /** Additional style for the `<div/> ` container. */
   style?: React.CSSProperties;
 }
 
+/** Selection from a group of buttons.
+    Only one button from the group can be selected at a time. */
 export function SelectButton(props: SelectButtonProps)
 : React.JSX.Element | null {
   const { buttonList, selected, onSelection,
@@ -637,9 +640,9 @@ export interface SpinnerProps {
   vstep?: number;
   /** Callback to selected values. */
   onChange?: (newValue: number) => void;
-  /** Default selected value. */
+  /** Additional CSS class. */
   className?: string;
-  /** Additional style for the `< dov /> ` container of Raiods */
+  /** Additional style for the `<div/> ` container. */
   style?: React.CSSProperties;
 }
 
@@ -694,9 +697,9 @@ export interface FieldProps {
   onChange?: (newValue: string) => void;
   /** Callback on every modification. */
   onEdited?: (tmpValue: string) => void;
-  /** Default selected value. */
+  /** Additional CSS class. */
   className?: string;
-  /** Additional style for the `< dov /> ` container of Raiods */
+  /** Additional style for the `<div/> ` container. */
   style?: React.CSSProperties;
 }
 
