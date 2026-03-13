@@ -793,8 +793,12 @@ module type Hashconsing_tbl =
   functor (_: Info_with_size) ->
     Weak_hashtbl with type data = Data.t
 
+let deterministic =
+  Option.fold ~none:false ~some:(( = ) "yes")
+    (Sys.getenv_opt "FC_DETERMINISTIC")
+
 module Hashconsing_tbl =
-  (val if Cmdline.deterministic
+  (val if deterministic
     then (module Hashconsing_tbl_not_weak: Hashconsing_tbl)
     else (module Hashconsing_tbl_weak: Hashconsing_tbl))
 

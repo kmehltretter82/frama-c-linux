@@ -33,7 +33,6 @@ module Verbose_level = Log.Make_level(struct let default = 1 end)
 let dkey = Kernel_log.dkey_cmdline
 
 let quiet_ref = ref false
-let deterministic = ref false
 let tty = ref Unix.(isatty stdout && Ansi_escape.is_supported ())
 let permissive = ref false
 let compress_saved_session = ref true
@@ -459,6 +458,11 @@ let configure_ocaml_gc n =
     if space_overhead <> gc_control.space_overhead then
       Gc.set { gc_control with space_overhead }
 
+let deprecated_deterministic () =
+  Kernel_log.warning
+    "'-deterministic' is deprecated and does nothing, use environment \
+     variable 'FC_DETERMINISTIC=yes' instead."
+
 let () =
   let first_parsing_stage () =
     parse
@@ -471,7 +475,7 @@ let () =
         "-debug", Int (fun n -> Debug_level.set n);
         "-kernel-verbose", Int (fun n -> Kernel_log.Verbose_level.set n);
         "-kernel-debug", Int (fun n -> Kernel_log.Debug_level.set n);
-        "-deterministic", Unit (fun () -> deterministic := true);
+        "-deterministic", Unit (fun () -> deprecated_deterministic ());
         "-tty", Unit (fun () -> set_tty true);
         "-no-tty", Unit (fun () -> set_tty false);
         "-permissive", Unit (fun () -> permissive := true);
@@ -495,7 +499,10 @@ let () =
     ~on_error:run_error_exit_hook
 
 let quiet = !quiet_ref
-let deterministic = !deterministic
+let deterministic =
+  Option.fold ~none:false ~some:(( = ) "yes")
+    (Sys.getenv_opt "FC_DETERMINISTIC")
+
 let tty = !tty
 let permissive = !permissive
 let compress_saved_session = !compress_saved_session
