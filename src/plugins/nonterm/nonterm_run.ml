@@ -19,12 +19,11 @@ module Self = Plugin.Register
     end)
 
 module Enabled =
-  Self.WithOutput
+  Self.False
     (struct
       let option_name = "-nonterm"
       let help = "when on (off by default), \
                   warns about non-terminating functions/loops"
-      let output_by_default = false
     end)
 
 let () = Parameter_customize.argument_may_be_fundecl ()
