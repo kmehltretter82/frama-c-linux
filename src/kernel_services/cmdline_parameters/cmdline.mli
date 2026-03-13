@@ -383,6 +383,8 @@ val compress_saved_session: bool
 [@@migrate { repl = Project.compress_saved_session } ]
 
 val last_project_created_by_copy: (unit -> int option) ref
+[@@deprecated "Use Project.last_project_created_by_copy instead."]
+[@@migrate { repl = Project.last_project_created_by_copy } ]
 
 type project_functions = {
   current: unit -> int;

@@ -241,11 +241,8 @@ let current () = Q.top projects
 let is_current p = equal p (current ())
 
 let last_created_by_copy_ref: t option ref = ref None
-let () =
-  Cmdline.last_project_created_by_copy :=
-    (fun () -> match !last_created_by_copy_ref with
-       | None -> None
-       | Some p -> Some p.pid)
+let last_project_created_by_copy  () =
+  Option.map (fun p -> p.pid) !last_created_by_copy_ref
 
 let iter_on_projects f = Q.iter f projects
 let fold_on_projects f acc = Q.fold f acc projects

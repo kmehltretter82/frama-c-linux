@@ -68,6 +68,9 @@ val current: unit -> t
 val is_current: t -> bool
 (** Check whether the given project is the current one or not. *)
 
+val last_project_created_by_copy: unit -> int option
+(** @since Frama-C+dev *)
+
 val iter_on_projects: (t -> unit) -> unit
 (** iteration on project starting with the current one. *)
 

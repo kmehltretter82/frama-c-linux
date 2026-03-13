@@ -40,8 +40,6 @@ let set_tty isatty =
   tty := isatty;
   Log.reset_stdout ~isatty  ()
 
-let last_project_created_by_copy = ref (fun () -> assert false)
-
 (* ************************************************************************* *)
 (** {2 Handling errors} *)
 (* ************************************************************************* *)
@@ -982,11 +980,11 @@ let play_in_toplevel nb_used play options =
       let last_current, then_opts = match then_argument with
         | Default -> current, play_in_toplevel_one_shot nb_used play options
         | Last ->
-          (match !last_project_created_by_copy () with
+          (match Project.last_project_created_by_copy () with
            | None -> Kernel_log.abort "no known last created project."
            | Some p -> play_on options p)
         | Replace ->
-          (match !last_project_created_by_copy () with
+          (match Project.last_project_created_by_copy () with
            | None -> Kernel_log.abort "no known last created project."
            | Some p ->
              let current = Project.pid_to_name current in
@@ -1274,3 +1272,5 @@ let () = Log.cmdline_at_error_exit := at_error_exit [@@alert "-deprecated"]
 let () = Log.cmdline_error_occurred := error_occurred  [@@alert "-deprecated"]
 
 let compress_saved_session = !Project.compress_saved_session
+
+let last_project_created_by_copy = ref Project.last_project_created_by_copy
