@@ -17,11 +17,7 @@ import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
 import { alpha } from 'dome/data/compare';
 import { Section, Item, SidebarTitle, makeBadge } from 'dome/frame/sidebars';
-import {
-  Button, IconButton, ItemProps,
-  Multiselect, MultiselectItem, MultiselectItemProps,
-  SelectButton, SelectButtonElement,
-} from 'dome/controls/buttons';
+import * as Buttons from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 import * as Toolbar from 'dome/frame/toolbars';
 import { Hbox } from 'dome/layout/boxes';
@@ -87,7 +83,7 @@ interface MenuItemProps {
   enabled?: boolean
 }
 
-export function menuItem(props: MenuItemProps): ItemProps {
+export function menuItem(props: MenuItemProps): Buttons.ItemProps {
   const { label, state, title, enabled = true } = props;
   const [b, flip] = state;
   return {
@@ -154,7 +150,7 @@ function List(props: ListProps): JSX.Element {
   let contents;
 
   if (count <= 0 && total > 0) {
-    const button = <Button {...filterButtonProps}
+    const button = <Buttons.Button {...filterButtonProps}
       label={`${Name}s filters`} />;
     contents =
       <div className='dome-xSideBarSection-content'>
@@ -303,14 +299,15 @@ function useFiltersFlipSettings(label: string, type: string, b: boolean)
   return Dome.useFlipSettings(`ivette.${type}.${label}`, b);
 }
 
-function getSelectElement(descr: string, kind: string): SelectButtonElement {
+function getSelectElement(descr: string, kind: string)
+: Buttons.SelectButtonElement {
   const label = descr.replace(kind, "").replace(/\s*\([^)]*\)/g, '');
   const title = `Show only ${descr}`;
   return { id: descr, label, title };
 }
 
 function getFilterButtonProps(f: LocalFilter, kind: string)
-: SelectButtonElement[] {
+: Buttons.SelectButtonElement[] {
   const allTitle = `Show both ${f.positive_label} and ${f.negative_label}`;
   return [
     { id: 'all', label: 'All', title: allTitle },
@@ -357,7 +354,7 @@ export function useFunctionFilter(): FunctionFilterRet {
   ]);
 
   const itemsComp = localFilters.map(e =>
-    <SelectButton
+    <Buttons.SelectButton
       key={e.id}
       buttonList={getFilterButtonProps(e, 'functions')}
       selected={e.value}
@@ -374,8 +371,8 @@ export function useFunctionFilter(): FunctionFilterRet {
       disabled= {!multipleSelectionActive} />
   );
 
-  const contextFctFilter = <Multiselect title="Show functions">
-    { itemsComp }</Multiselect>;
+  const contextFctFilter = <Buttons.Multiselect title="Show functions">
+    { itemsComp }</Buttons.Multiselect>;
 
   return { contextFctFilter, multipleSelection, showFunction, isSelected };
 }
@@ -460,16 +457,16 @@ export function useVariableFilter(): VariablesFilterRet {
   }, [localFilters]);
 
   const itemsComp = localFilters.map(e =>
-    <SelectButton
+    <Buttons.SelectButton
       key={e.id}
       buttonList={getFilterButtonProps(e, 'variables')}
       selected={e.value}
       onSelection={(a: string) => setLocalFilters(e.id, a)}
     />
   );
-  const contextVarFilter =  <Multiselect title='Show variables'>
+  const contextVarFilter =  <Buttons.Multiselect title='Show variables'>
       { itemsComp }
-    </Multiselect>;
+    </Buttons.Multiselect>;
 
   return { contextVarFilter, showVariable };
 }
@@ -685,7 +682,7 @@ export function useAnnotFilter(): AnnotFilterRet {
     linvariants, lmodel, lvolatile, lextensions
   ]);
 
-  const contextMenuItems: MultiselectItemProps[] = [
+  const contextMenuItems: Buttons.MultiselectItemProps[] = [
     menuItem({ label: 'Show Logic Types',
                state: ltypesState }),
     menuItem({ label: 'Show Predicates and Logic Functions',
@@ -707,8 +704,9 @@ export function useAnnotFilter(): AnnotFilterRet {
   ];
 
   const itemsComp = contextMenuItems.map(
-    (e, i) => <MultiselectItem key={i} item={e} />);
-  const contextAnnotFilter = <Multiselect>{ itemsComp }</Multiselect>;
+    (e, i) => <Buttons.MultiselectItem key={i} item={e} />);
+  const contextAnnotFilter =
+    <Buttons.Multiselect>{itemsComp}</Buttons.Multiselect>;
 
   return {
     contextAnnotFilter,
@@ -1047,7 +1045,7 @@ export function Files(props: FilesProps): JSX.Element {
             }
             { showFcts ? <Node key='fctsFiltered' id='fctsFiltered'
               label={'Functions'} title={'Functions'}  actions={<>
-                  <Dropdown control={ <IconButton icon='FILTER' /> }
+                  <Dropdown control={ <Buttons.IconButton icon='FILTER' /> }
                   >{contextFctFilter}</Dropdown>
                   {makeBadge(fctsFiltered.length)}
                 </>}
@@ -1057,7 +1055,7 @@ export function Files(props: FilesProps): JSX.Element {
             { showVars ? <Node key='varsFiltered' id='varsFiltered'
               label={'Variables'} title={'Variables'}
               actions={<>
-                  <Dropdown control={ <IconButton icon='FILTER' /> }
+                  <Dropdown control={ <Buttons.IconButton icon='FILTER' /> }
                   >{contextVarFilter}</Dropdown>
                   {makeBadge(varsFiltered.length)}
                 </>}
@@ -1067,7 +1065,7 @@ export function Files(props: FilesProps): JSX.Element {
             { showAnnot ? <Node key='annotsFiltered' id='annotsFiltered'
               label={'Annotations'} title={'Annotations'}
               actions={<>
-                  <Dropdown control={ <IconButton icon='FILTER' /> }
+                  <Dropdown control={ <Buttons.IconButton icon='FILTER' /> }
                   >{contextAnnotFilter}</Dropdown>
                   {makeBadge(annotsFiltered.length)}
                 </>}
@@ -1134,7 +1132,7 @@ function SidebarFilesTools(props: SidebarFilesToolProps): React.JSX.Element {
           label=''
           placeholder='Search'
           state={searchByNameState}
-          actions={<IconButton
+          actions={<Buttons.IconButton
             icon='TRASH'
             onClick={() =>
               searchByNameState.onChanged(undefined, undefined, false)}
