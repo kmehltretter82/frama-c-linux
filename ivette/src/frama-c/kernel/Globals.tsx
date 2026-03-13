@@ -266,10 +266,6 @@ function isVisible(
     });
 }
 
-function sanitizeLabel(label: string, kind: string): string {
-  return label.replace(kind, "").replace(/\s*\([^)]*\)/g, '');
-}
-
 type FilterKind = 'functions' | 'variables'
 /**
  * This hook returns the list of Boolean filters to display and
@@ -308,12 +304,19 @@ function useFiltersFlipSettings(label: string, type: string, b: boolean)
   return Dome.useFlipSettings(`ivette.${type}.${label}`, b);
 }
 
+function getSelectElement(descr: string, kind: string): SelectButtonElement {
+  const label = descr.replace(kind, "").replace(/\s*\([^)]*\)/g, '');
+  const title = `Show only ${descr}`;
+  return { id: descr, label, title };
+}
+
 function getFilterButtonProps(f: LocalFilter, kind: string)
 : SelectButtonElement[] {
+  const allTitle = `Show both ${f.positive_label} and ${f.negative_label}`;
   return [
-    { id: 'all', label: 'All' },
-    { id: f.positive_label, label: sanitizeLabel(f.positive_label, kind) },
-    { id: f.negative_label, label: sanitizeLabel(f.negative_label, kind) },
+    { id: 'all', label: 'All', title: allTitle },
+    getSelectElement(f.positive_label, kind),
+    getSelectElement(f.negative_label, kind)
   ];
 }
 
