@@ -245,7 +245,7 @@ function FctItem(props: FctItemProps): JSX.Element {
 // --- Generic filter
 // --------------------------------------------------------------------------
 
-export interface LocalFilter extends Ast.filter { value: string }
+interface LocalFilter extends Ast.filter { value: string }
 
 function isVisible(
   value: { filters: [string, boolean][] },
@@ -259,10 +259,9 @@ function isVisible(
        * Otherwise, the returned value depends on the match between
        * the current value and the selected filter.
        */
-      return current === undefined || f.value ==="all" ? true : (
-        (f.value === f.positive_label && current[1])
-        || (f.value === f.negative_label && !current[1])
-      );
+      return current === undefined || f.value ==="all"
+        || (f.value === f.positive_label && current[1])
+        || (f.value === f.negative_label && !current[1]);
     });
 }
 
@@ -362,8 +361,7 @@ export function useFunctionFilter(): FunctionFilterRet {
       key={e.id}
       buttonList={getFilterButtonProps(e, 'functions')}
       selected={e.value}
-      verticalSep={true}
-      setSelected={(a: string) => setLocalFilters(e.id, a)}
+      onSelection={(a: string) => setLocalFilters(e.id, a)}
     />
   );
 
@@ -466,8 +464,7 @@ export function useVariableFilter(): VariablesFilterRet {
       key={e.id}
       buttonList={getFilterButtonProps(e, 'variables')}
       selected={e.value}
-      verticalSep={true}
-      setSelected={(a: string) => setLocalFilters(e.id, a)}
+      onSelection={(a: string) => setLocalFilters(e.id, a)}
     />
   );
   const contextVarFilter =  <Multiselect title='Show variables'>

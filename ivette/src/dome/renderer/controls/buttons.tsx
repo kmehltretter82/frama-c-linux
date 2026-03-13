@@ -505,8 +505,7 @@ export function SelectMenu(props: SelectProps): JSX.Element {
 }
 
 /** Keep the Props buttons to simplify,
-  * but omit some elements managed by the group.
-  * label become */
+  * but omit some elements managed by the group. */
 export type SelectButtonElement = Omit<ToolBar.ButtonProps<string>,
   'onClick' | 'selected' | 'selection' | 'children'>
    & { id: string }
@@ -517,8 +516,8 @@ export interface SelectButtonProps {
   /** Button selected on the group */
   selected: string;
   /** Set button selected */
-  setSelected: (a: string) => void;
-  /** Vertical separation, default false */
+  onSelection: (a: string) => void;
+  /** Vertical separation, default true */
   verticalSep?: boolean;
   /** Defaults to `false`. */
   disabled?: boolean;
@@ -530,26 +529,25 @@ export interface SelectButtonProps {
 
 export function SelectButton(props: SelectButtonProps)
 : React.JSX.Element | null {
-  const { buttonList, selected, setSelected,
-    disabled = false, verticalSep = false } = props;
+  const { buttonList, selected, onSelection,
+    disabled = false, verticalSep = true } = props;
 
   const className = classes(
     'dome-xMenu-Item',
     'dome-xMenu-Item-Button',
     disabled && 'dome-xMenu-Item-disabled',
-    verticalSep && 'dome-xMenu-Item-separation',
     props.className
   );
 
   if(buttonList.length < 2) return null;
   return (
     <div className={className}>
-      <ToolBar.ButtonGroup disabled={disabled}>
+      <ToolBar.ButtonGroup disabled={disabled} verticalSep={verticalSep}>
         {buttonList.map(b =>
           <ToolBar.Button {...b}
             key={b.id}
             selected={b.id === selected}
-            onClick={() => setSelected(b.id)}
+            onClick={() => onSelection(b.id)}
           />
         )}
       </ToolBar.ButtonGroup>

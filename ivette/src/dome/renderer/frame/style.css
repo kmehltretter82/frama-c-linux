@@ -451,6 +451,10 @@
   border-bottom-right-radius: 4px;
 }
 
+.dome-xToolBar-buttongroup-separation > .dome-xToolBar-control:not(:first-child){
+  border-left: solid 1px var(--border-discrete);
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- Styling ToolBar Search Field                                       --- */
 /* -------------------------------------------------------------------------- */
