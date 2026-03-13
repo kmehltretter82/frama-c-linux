@@ -1,2 +1,2 @@
 PLUGIN: @EVA_PLUGINS@ pdg
-OPT: @EVA_OPTIONS@ -pdg-print -pdg-verbose 2
+OPT: @EVA_OPTIONS@ -pdg-verbose 2

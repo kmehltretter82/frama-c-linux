@@ -16,12 +16,10 @@ include Plugin.Register
 let output = add_group "Output"
 
 module BuildAll =
-  WithOutput
+  False
     (struct
       let option_name = "-pdg"
-      let help =
-        "build the dependence graph of each function"
-      let output_by_default = false
+      let help = "build the dependence graph of each function"
     end)
 
 module BuildFct =
@@ -36,7 +34,7 @@ let () = Parameter_customize.set_group output
 module PrintBw =
   False(struct
     let option_name = "-codpds"
-    let help = "force option -pdg-print to show the co-dependencies rather than the dependencies"
+    let help = "show co-dependencies rather than dependencies"
   end)
 
 let () = Parameter_customize.set_group output

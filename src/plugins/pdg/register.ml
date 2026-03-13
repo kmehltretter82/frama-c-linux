@@ -17,11 +17,6 @@ let () =
          ~onto:Pdg_tbl.self
          [ From.self ])
 
-let deps =
-  [Pdg_tbl.self; Pdg_parameters.BuildAll.self; Pdg_parameters.BuildFct.self]
-
-let () = Pdg_parameters.BuildAll.set_output_dependencies deps
-
 let compute_for_kf kf =
   let all = Pdg_parameters.BuildAll.get () in
   (all && Eva.Results.is_called kf) ||
@@ -45,9 +40,6 @@ let compute () =
   if Pdg_parameters.BuildAll.get () then
     Pdg_parameters.feedback "====== PDG GRAPH COMPUTED ======"
 
-let compute_once, _ =
-  State_builder.apply_once "Pdg.Register.compute_once" deps compute
-
 let output () =
   let bw  = Pdg_parameters.PrintBw.get () in
   let do_kf_pdg kf =
@@ -61,16 +53,19 @@ let output () =
   in
   Callgraph.Uses.iter_in_rev_order do_kf_pdg
 
-let something_to_do () =
-  Pdg_parameters.BuildAll.get ()
+let compute_and_output () = compute (); output ()
+
+let run () =
+  if Pdg_parameters.BuildAll.get ()
   || not (Kernel_function.Set.is_empty (Pdg_parameters.BuildFct.get ()))
+  then compute_and_output ()
 
-let main () =
-  if something_to_do () then
-    (compute_once ();
-     Pdg_parameters.BuildAll.output output)
+let deps =
+  [Pdg_tbl.self; Pdg_parameters.BuildAll.self; Pdg_parameters.BuildFct.self]
 
-let () = Boot.Main.extend main
+let run_once, _ = State_builder.apply_once "Pdg.Register.main" deps run
+
+let () = Boot.Main.extend run_once
 
 (* {2 Overview}
 

@@ -1,8 +1,8 @@
 /* run.config
    STDOPT: +"-slice-return main -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
 COMMENT:
-   STDOPT: +"-main bts906b -fct-pdg bts906b -pdg-print -pdg-verbose 2"
-   STDOPT: +"-main bts906c -fct-pdg bts906c -pdg-print -pdg-verbose 2"
+   STDOPT: +"-main bts906b -fct-pdg bts906b -pdg-verbose 2"
+   STDOPT: +"-main bts906c -fct-pdg bts906c -pdg-verbose 2"
 COMMENT: The two PDG tests above test interesting case where the slicing may
 COMMENT: slice away a goto because of an incorrect analyze of some dead code,
 COMMENT: which make the slicer think that the destination of the goto is the
@@ -32,7 +32,7 @@ B: ;
 }
 
 int G2;
-void f2(void) { 
+void f2(void) {
   while (1) {
     G2 = 3;
     if (G2) break;
@@ -43,7 +43,7 @@ int bts181 (int c) {
   int x = 0, y = 0;
   if (c) {
     x = 1;
-    if (x>0) 
+    if (x>0)
       y = 3;
     }
   return y;
@@ -52,7 +52,7 @@ int bts181b (int c) {
   int x = 0, y = 0;
   if (c) {
     x = 1;
-    if (x>0) 
+    if (x>0)
       y = 3;
     else
       y = 4;
@@ -89,7 +89,7 @@ int bts879 (int c) {
   int g = 0;
   int p = c ? 0 : 10;
 
-  if (p  || (g && G1) ) { 
+  if (p  || (g && G1) ) {
     return 1;
   }
   return 0;
@@ -101,9 +101,9 @@ int bts879b (int c) {
   int g = 0;
   int p = c ? 0 : 10;
 
-  if (p || (g && G1) ) 
+  if (p || (g && G1) )
     return 1;
-  
+
   return 0;
 }
 
@@ -210,7 +210,7 @@ int bts963 (void) {
 L: i = 0;
    while (i < 10) {
      x++;
-     if (x < 3) goto L; 
+     if (x < 3) goto L;
      else return x;
    }
    return x;
@@ -222,7 +222,7 @@ int bts963b (void) {
 L: i = 0;
    while (i < 10) {
      x++;
-     if (x < 3) goto L; 
+     if (x < 3) goto L;
      else return x;
      i++;
    }
@@ -248,4 +248,3 @@ int main (int n) {
   x += bts963b ();
   return x;
 }
-

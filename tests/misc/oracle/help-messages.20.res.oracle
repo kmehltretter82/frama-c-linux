@@ -29,9 +29,8 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT
 
--codpds             force option -pdg-print to show the co-dependencies
-                    rather than the dependencies (opposite option is
-                    -no-codpds)
+-codpds             show co-dependencies rather than dependencies (opposite
+                    option is -no-codpds)
 -pdg-dot <basename>  put the PDG of function <f> in basename.f.dot
                     (preferably use -pdg-dot="basename")
 
@@ -50,8 +49,6 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -pdg-msg-key help to get a list of
                     available categories, and * to enable all categories
                     (preferably use -pdg-msg-key="k1[,...,kn]")
--pdg-print          print results for option -pdg (opposite option is
-                    -pdg-no-print)
 -pdg-verbose <n>    level of verbosity for plug-in Pdg (default to 1)
 -pdg-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category <k1>
                     to <s1>,...,<kn> to <sn>. Use -pdg-warn-key help to get a
