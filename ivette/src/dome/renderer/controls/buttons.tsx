@@ -504,51 +504,57 @@ export function SelectMenu(props: SelectProps): JSX.Element {
   );
 }
 
+/** Keep the Props buttons to simplify,
+  * but omit some elements managed by the group.
+  * label become */
+export type SelectButtonElement = Omit<ToolBar.ButtonProps<string>,
+  'onClick' | 'selected' | 'selection' | 'children'>
+   & { id: string }
+
 export interface SelectButtonProps {
-  /** label for the ‘all’ button,
-    * if not defined, the button does not appear
-   */
-  labelAll?: string;
-  /** Currently selected value. */
-  value?: string;
-  /** onSelected */
-  onSelected: (a: string) => void;
+  /** list of buttons */
+  buttonList: SelectButtonElement[];
+  /** Button selected on the group */
+  selected: string;
+  /** Set button selected */
+  setSelected: (a: string) => void;
+  /** Vertical separation, default false */
+  verticalSep?: boolean;
   /** Defaults to `false`. */
   disabled?: boolean;
   /** Default selected value. */
   className?: string;
   /** Additional style for the `< dov /> ` container of Raiods */
   style?: React.CSSProperties;
-  /** Shall be standard `<option/>` and `<optgroup/>` elements. */
-  children: React.ReactElement<typeof ToolBar.Button>[];
 }
-
 
 export function SelectButton(props: SelectButtonProps)
 : React.JSX.Element | null {
-  const { labelAll, value, disabled = false, onSelected } = props;
+  const { buttonList, selected, setSelected,
+    disabled = false, verticalSep = false } = props;
 
   const className = classes(
     'dome-xMenu-Item',
     'dome-xMenu-Item-Button',
-    props.disabled && 'dome-xMenu-Item-disabled',
-    props.className && props.className
+    disabled && 'dome-xMenu-Item-disabled',
+    verticalSep && 'dome-xMenu-Item-separation',
+    props.className
   );
 
-  return <div className={className}>
-    <ToolBar.ButtonGroup disabled={disabled}>
-      <>{ labelAll &&
-          <ToolBar.Button
-            label={labelAll}
-            selected={value === "all"}
-            onClick={() => onSelected('all')}
-            />
-      }</>
-      <>
-        { props.children }
-      </>
-    </ToolBar.ButtonGroup>
-  </div>;
+  if(buttonList.length < 2) return null;
+  return (
+    <div className={className}>
+      <ToolBar.ButtonGroup disabled={disabled}>
+        {buttonList.map(b =>
+          <ToolBar.Button {...b}
+            key={b.id}
+            selected={b.id === selected}
+            onClick={() => setSelected(b.id)}
+          />
+        )}
+      </ToolBar.ButtonGroup>
+    </div>
+  );
 }
 
 

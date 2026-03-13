@@ -301,7 +301,11 @@ export interface SelectionProps<A> {
 // --------------------------------------------------------------------------
 
 export interface ButtonGroupProps<A> extends SelectionProps<A> {
+  /** add vertical separation between button */
+  separation?: boolean;
+  /** Additional class. */
   className?: string;
+  /** Additional style. */
   style?: React.CSSProperties;
 }
 

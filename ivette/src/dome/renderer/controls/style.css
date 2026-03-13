@@ -465,6 +465,10 @@ meter::-webkit-meter-even-less-good-value  {
   }
 
   .dome-xMenu-Item-Button { gap: 10px; }
+
+  .dome-xToolBar-buttongroup button:not(:first-child) {
+      border-left: solid 1px var(--border-discrete);
+  }
 }
 
 .dome-xMenu-Item-disabled {

@@ -20,7 +20,7 @@ import { Section, Item, SidebarTitle, makeBadge } from 'dome/frame/sidebars';
 import {
   Button, IconButton, ItemProps,
   Multiselect, MultiselectItem, MultiselectItemProps,
-  SelectButton,
+  SelectButton, SelectButtonElement,
 } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 import * as Toolbar from 'dome/frame/toolbars';
@@ -308,6 +308,15 @@ function useFiltersFlipSettings(label: string, type: string, b: boolean)
   return Dome.useFlipSettings(`ivette.${type}.${label}`, b);
 }
 
+function getFilterButtonProps(f: LocalFilter, kind: string)
+: SelectButtonElement[] {
+  return [
+    { id: 'all', label: 'All' },
+    { id: f.positive_label, label: sanitizeLabel(f.positive_label, kind) },
+    { id: f.negative_label, label: sanitizeLabel(f.negative_label, kind) },
+  ];
+}
+
 // --------------------------------------------------------------------------
 // --- Functions Section
 // --------------------------------------------------------------------------
@@ -345,32 +354,14 @@ export function useFunctionFilter(): FunctionFilterRet {
   }, [localFilters, selected, isSelected, multipleSelectionActive
   ]);
 
-  const itemsComp = localFilters.map(
-    (e, i) => <SelectButton
-      key={i}
-      labelAll='All'
-      value={e.value}
-      onSelected={(a: string) => setLocalFilters(e.id, a)}
-      className='global-filters'
-    >
-      <Toolbar.Button
-        key={e.positive_label}
-        label={sanitizeLabel(e.positive_label, 'functions')}
-        title={e.positive_label}
-        selected={e.value === e.positive_label}
-        onClick={() => setLocalFilters(e.id, e.positive_label)}
-        disabled= {false}
-      />
-      <Toolbar.Button
-        key={e.negative_label}
-        label={sanitizeLabel(e.negative_label, 'functions')}
-        title={e.negative_label}
-        selected={e.value === e.negative_label}
-        onClick={() => setLocalFilters(e.id, e.negative_label)}
-        disabled= {false}
-      />
-
-    </SelectButton>
+  const itemsComp = localFilters.map(e =>
+    <SelectButton
+      key={e.id}
+      buttonList={getFilterButtonProps(e, 'functions')}
+      selected={e.value}
+      verticalSep={true}
+      setSelected={(a: string) => setLocalFilters(e.id, a)}
+    />
   );
 
   itemsComp.push(<Toolbar.Button
@@ -467,31 +458,14 @@ export function useVariableFilter(): VariablesFilterRet {
     };
   }, [localFilters]);
 
-  const itemsComp = localFilters.map(
-    (e, i) => <SelectButton
-      key={i}
-      labelAll='All'
-      value={e.value}
-      onSelected={(a: string) => setLocalFilters(e.id, a)}
-      className='global-filters'
-    >
-      <Toolbar.Button
-        key={e.positive_label}
-        label={sanitizeLabel(e.positive_label, 'variables')}
-        title={e.positive_label}
-        selected={e.value === e.positive_label}
-        onClick={() => setLocalFilters(e.id, e.positive_label)}
-        disabled= {false}
-      />
-      <Toolbar.Button
-        key={e.negative_label}
-        label={sanitizeLabel(e.negative_label, 'variables')}
-        title={e.negative_label}
-        selected={e.value === e.negative_label}
-        onClick={() => setLocalFilters(e.id, e.negative_label)}
-        disabled= {false}
-      />
-    </SelectButton>
+  const itemsComp = localFilters.map(e =>
+    <SelectButton
+      key={e.id}
+      buttonList={getFilterButtonProps(e, 'variables')}
+      selected={e.value}
+      verticalSep={true}
+      setSelected={(a: string) => setLocalFilters(e.id, a)}
+    />
   );
   const contextVarFilter =  <Multiselect title='Show variables'>
       { itemsComp }
