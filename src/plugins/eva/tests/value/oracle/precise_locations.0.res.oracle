@@ -366,6 +366,28 @@
     t{{[0..48]; [49].f1[0..4]}; [49].f2}; i; j; q; r; __retres
 [inout] Inputs for function main:
     t{[0..48]; [49].f1[0..4]}; i; j; q; r
+[inout] Out (internal) for function ct:
+    __retres
+[inout] Inputs for function ct:
+    \nothing
+[inout] InOut (internal) for function ct:
+  Operational inputs:
+    \nothing
+  Operational inputs on termination:
+    \nothing
+  Sure outputs:
+    __retres
+[inout] Out (internal) for function main:
+    t{{[0..48]; [49].f1[0..4]}; [49].f2}; i; j; q; r; __retres
+[inout] Inputs for function main:
+    t{[0..48]; [49].f1[0..4]}; i; j; q; r
+[inout] InOut (internal) for function main:
+  Operational inputs:
+    t{[0..48]; [49].f1[0..4]}; q; r
+  Operational inputs on termination:
+    t{[0..48]; [49].f1[0..4]}; q; r
+  Sure outputs:
+    i; j; __retres
 [report] Computing properties status...
 
 --------------------------------------------------------------------------------

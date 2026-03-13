@@ -232,6 +232,20 @@
 [eva:progress] Done for function f_slice_1
 [eva:progress] Recording results for main
 [eva:progress] Done for function main
+[inout] InOut (internal) for function f_slice_1:
+  Operational inputs:
+    \nothing
+  Operational inputs on termination:
+    \nothing
+  Sure outputs:
+    Y
+[inout] InOut (internal) for function main:
+  Operational inputs:
+    \nothing
+  Operational inputs on termination:
+    \nothing
+  Sure outputs:
+    Y
 [pdg] computing for function input
 [from] Computing for function input
 [from] Done for function input

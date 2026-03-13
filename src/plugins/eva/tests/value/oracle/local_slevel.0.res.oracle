@@ -535,3 +535,15 @@ void main(void)
   i ∈ {100}
 [eva:final-states] Values at end of function main:
   t[0..99] ∈ [-1073741823..2147483647]
+[inout] Out (internal) for function main1:
+    v; r; i
+[inout] Inputs for function main1:
+    \nothing
+[inout] Out (internal) for function main2:
+    t[0..99]; i; n
+[inout] Inputs for function main2:
+    vol
+[inout] Out (internal) for function main:
+    t[0..99]
+[inout] Inputs for function main:
+    vol
