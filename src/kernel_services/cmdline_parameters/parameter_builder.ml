@@ -84,7 +84,6 @@ module Make
          val abort: ('a,'b) Log.pretty_aborter
          val warning: 'a Log.pretty_printer
        end
-       val messages_group: Cmdline.Group.t
      end) =
 struct
 
@@ -1807,56 +1806,6 @@ struct
         (struct include X let dependencies = [] end)
 
     let () = extend_ast_dependencies S.self
-
-  end
-
-  (** Options that directly cause an output. *)
-  module WithOutput
-      (X: sig include Parameter_sig.Input val output_by_default: bool end) =
-  struct
-
-    (* Requested command-line option *)
-    include False(X)
-
-    (* Command-line option for output. *)
-    let () = Parameter_customize.set_group P.messages_group
-    module Output =
-      Bool(struct
-        let default = X.output_by_default
-        let option_name = X.option_name ^ "-print"
-        let help = "print results for option " ^ X.option_name
-      end)
-
-    (* Boolean that indicates whether the results have never been output
-       in the current mode. As usual, change in dependencies automatically
-       reset the value *)
-    module ShouldOutput =
-      State_builder.True_ref(struct
-        let dependencies = [] (* To be filled by the user when calling the
-                                 output function *)
-        let name = X.option_name ^ "ShouldOutput"
-      end)
-
-    (* Output has been requested by the user. Set the "output should be
-       printed" boolean to true *)
-    let () = Output.add_set_hook (fun _ v -> if v then ShouldOutput.set true)
-
-    let set_output_dependencies deps =
-      State_dependency_graph.add_codependencies ~onto:ShouldOutput.self deps
-
-    let output f =
-      (* Output only if our two booleans are at true *)
-      if Output.get () && ShouldOutput.get () then begin
-        (* One output will occur, do not output anything next time (unless
-           dependencies change, or the user requests it on the command-line) *)
-        ShouldOutput.set false;
-        f ();
-        if ShouldOutput.get () then ShouldOutput.set false
-      end
-
-    let add_aliases ?visible ?deprecated list =
-      add_aliases ?visible ?deprecated list;
-      Output.add_aliases (List.map (fun alias -> alias ^ "-print") list)
 
   end
 

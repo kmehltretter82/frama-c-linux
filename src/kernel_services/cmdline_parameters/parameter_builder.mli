@@ -20,7 +20,6 @@ module Make
          val abort: ('a,'b) Log.pretty_aborter
          val warning: 'a Log.pretty_printer
        end
-       val messages_group: Cmdline.Group.t
      end):
   Parameter_sig.Builder
 

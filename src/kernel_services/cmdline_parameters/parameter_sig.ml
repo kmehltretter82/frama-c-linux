@@ -260,20 +260,6 @@ end
 (** {3 Custom signatures} *)
 (* ************************************************************************** *)
 
-(** Signature for a boolean parameter that causes something to be output. *)
-module type With_output = sig
-  include Bool
-
-  val set_output_dependencies: State.t list -> unit
-  (** Set the dependencies for the output of the option. Two successive
-      calls to [output] below will cause only one output, unless some
-      of the supplied dependencies have changed between the two calls. *)
-
-  val output: (unit -> unit) -> unit
-  (** To be used by the plugin to output the results of the option
-      in a controlled way. See [set_output_dependencies] details. *)
-end
-
 (** signature for normalized pathnames. *)
 module type Filepath = sig
   include S with type t = Filepath.t
@@ -563,10 +549,6 @@ module type Builder = sig
 
   (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   module True(_: Input) : Bool
-
-  module WithOutput
-      (_: sig include Input val output_by_default: bool end):
-    With_output
 
   (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   module Int(_: sig include Input_with_arg val default: int end): Int
