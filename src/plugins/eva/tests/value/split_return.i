@@ -1,14 +1,15 @@
 /* run.config*
+ ENV: FC_DETERMINISTIC yes
  PLUGIN: @PTEST_PLUGIN@ report
-   STDOPT: +"-deterministic -eva-no-memexec -eva-slevel-function init:3,main1:3,f2:4,main2:4,f4:3,main5:3,uninit:2,main9:2 -eva-split-return-function f2:0,f3:-2:-4,f4:4,f5:-2,NON_EXISTING:4,uninit:0,escaping:0 -eva-warn-copy-indeterminate=-uninit,-escaping,-main9 -permissive -then -report"
-   STDOPT: +"-deterministic -eva-no-memexec -eva-slevel 6 -eva-split-return auto -eva-split-return-function f7:0:3 -eva-warn-copy-indeterminate=-uninit,-escaping,-main9 -then -report"
+   STDOPT: +"-eva-no-memexec -eva-slevel-function init:3,main1:3,f2:4,main2:4,f4:3,main5:3,uninit:2,main9:2 -eva-split-return-function f2:0,f3:-2:-4,f4:4,f5:-2,NON_EXISTING:4,uninit:0,escaping:0 -eva-warn-copy-indeterminate=-uninit,-escaping,-main9 -permissive -then -report"
+   STDOPT: +"-eva-no-memexec -eva-slevel 6 -eva-split-return auto -eva-split-return-function f7:0:3 -eva-warn-copy-indeterminate=-uninit,-escaping,-main9 -then -report"
  PLUGIN: @EVA_PLUGINS@
  EXIT:1
    COMMENT: below command must fail, as -permissive is not set
-   STDOPT: +"-deterministic -eva-no-memexec -eva-slevel-function NON_EXISTING:4 -eva-warn-copy-indeterminate=-uninit,-escaping,-main9"
+   STDOPT: +"-eva-no-memexec -eva-slevel-function NON_EXISTING:4 -eva-warn-copy-indeterminate=-uninit,-escaping,-main9"
  EXIT:0
-   STDOPT: +"-deterministic -eva-no-memexec -eva-slevel 6 -eva-split-return full -eva-warn-copy-indeterminate=-uninit,-escaping,-main9"
-   STDOPT: +"-deterministic -eva-no-memexec -eva-slevel 6 -eva-split-return full -eva-split-return-function f7:0:3 -eva-split-return-function f2:full -eva-warn-copy-indeterminate=-uninit,-escaping,-main9 -then -eva-split-return-function f2:auto"
+   STDOPT: +"-eva-no-memexec -eva-slevel 6 -eva-split-return full -eva-warn-copy-indeterminate=-uninit,-escaping,-main9"
+   STDOPT: +"-eva-no-memexec -eva-slevel 6 -eva-split-return full -eva-split-return-function f7:0:3 -eva-split-return-function f2:full -eva-warn-copy-indeterminate=-uninit,-escaping,-main9 -then -eva-split-return-function f2:auto"
  */
 
 

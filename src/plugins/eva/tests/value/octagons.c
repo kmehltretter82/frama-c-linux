@@ -1,5 +1,6 @@
 /* run.config*
-   STDOPT: +"-deterministic -eva-domains octagon -eva-octagon-through-calls -eva-msg-key=d-octagon,-d-cvalue"
+   ENV: FC_DETERMINISTIC yes
+   STDOPT: +"-eva-domains octagon -eva-octagon-through-calls -eva-msg-key=d-octagon,-d-cvalue"
 */
 
 #include "__fc_builtin.h"

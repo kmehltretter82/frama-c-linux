@@ -8,11 +8,11 @@
   nondet ∈ [--..--]
 [eva:progress] 
   computing for function init <- main.
-  Called from octagons-pointers-simple.c:38.
-[eva:partition] octagons-pointers-simple.c:18: starting to merge loop iterations
+  Called from octagons-pointers-simple.c:39.
+[eva:partition] octagons-pointers-simple.c:19: starting to merge loop iterations
 [eva:progress] Recording results for init
 [eva:progress] Done for function init
-[eva:show] octagons-pointers-simple.c:46: 
+[eva:show] octagons-pointers-simple.c:47: 
   Frama_C_dump_each:
   # octagon:
   {[ buffer - cmd ∈ {-3}
@@ -21,10 +21,10 @@
   ==END OF DUMP==
 [eva:progress] 
   computing for function cmdRead <- main.
-  Called from octagons-pointers-simple.c:47.
+  Called from octagons-pointers-simple.c:48.
 [eva:progress] Recording results for cmdRead
 [eva:progress] Done for function cmdRead
-[eva:show] octagons-pointers-simple.c:46: 
+[eva:show] octagons-pointers-simple.c:47: 
   Frama_C_dump_each:
   # octagon:
   {[ buffer - cmd ∈ [-436..-6]
@@ -35,10 +35,10 @@
   ==END OF DUMP==
 [eva:progress] 
   computing for function cmdRead <- main.
-  Called from octagons-pointers-simple.c:47.
+  Called from octagons-pointers-simple.c:48.
 [eva:progress] Recording results for cmdRead
 [eva:progress] Done for function cmdRead
-[eva:loop-unroll:partial] octagons-pointers-simple.c:43: 
+[eva:loop-unroll:partial] octagons-pointers-simple.c:44: 
   loop not completely unrolled
 [eva:progress] Recording results for main
 [eva:progress] Done for function main

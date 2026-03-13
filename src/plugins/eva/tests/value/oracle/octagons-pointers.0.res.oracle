@@ -8,11 +8,11 @@
   nondet ∈ [--..--]
 [eva:progress] 
   computing for function init <- main.
-  Called from octagons-pointers.c:39.
-[eva:partition] octagons-pointers.c:18: starting to merge loop iterations
+  Called from octagons-pointers.c:40.
+[eva:partition] octagons-pointers.c:19: starting to merge loop iterations
 [eva:progress] Recording results for init
 [eva:progress] Done for function init
-[eva:show] octagons-pointers.c:46: 
+[eva:show] octagons-pointers.c:47: 
   Frama_C_dump_each:
   # octagon:
   {[ buffer - cmd ∈ {-3}
@@ -20,8 +20,8 @@
   ==END OF DUMP==
 [eva:progress] 
   computing for function cmdRead <- main.
-  Called from octagons-pointers.c:47.
-[eva:show] octagons-pointers.c:31: 
+  Called from octagons-pointers.c:48.
+[eva:show] octagons-pointers.c:32: 
   Frama_C_dump_each:
   # octagon:
   {[ buffer - cmd ∈ {-3}
@@ -31,7 +31,7 @@
   ==END OF DUMP==
 [eva:progress] Recording results for cmdRead
 [eva:progress] Done for function cmdRead
-[eva:show] octagons-pointers.c:46: 
+[eva:show] octagons-pointers.c:47: 
   Frama_C_dump_each:
   # octagon:
   {[ buffer - cmd ∈ [-436..-6]
@@ -40,8 +40,8 @@
   ==END OF DUMP==
 [eva:progress] 
   computing for function cmdRead <- main.
-  Called from octagons-pointers.c:47.
-[eva:show] octagons-pointers.c:31: 
+  Called from octagons-pointers.c:48.
+[eva:show] octagons-pointers.c:32: 
   Frama_C_dump_each:
   # octagon:
   {[ buffer - cmd ∈ [-436..-6]
@@ -75,15 +75,15 @@
      elt3 - cmd ∈ [-421..436]
       ]}
   ==END OF DUMP==
-[eva:alarm] octagons-pointers.c:33: Warning: 
-  out of bounds read. assert \valid_read(elt1);
 [eva:alarm] octagons-pointers.c:34: Warning: 
-  out of bounds read. assert \valid_read(elt2);
+  out of bounds read. assert \valid_read(elt1);
 [eva:alarm] octagons-pointers.c:35: Warning: 
+  out of bounds read. assert \valid_read(elt2);
+[eva:alarm] octagons-pointers.c:36: Warning: 
   out of bounds read. assert \valid_read(elt3);
 [eva:progress] Recording results for cmdRead
 [eva:progress] Done for function cmdRead
-[eva:loop-unroll:partial] octagons-pointers.c:43: loop not completely unrolled
+[eva:loop-unroll:partial] octagons-pointers.c:44: loop not completely unrolled
 [eva:progress] Recording results for main
 [eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
