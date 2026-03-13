@@ -19,7 +19,7 @@ Open Source Release <next-release>
 ###############################################################################
 
 o   Ptests    [2026-03-13] Add a new directive ENV to ptests. It is now
-              possible to define environnement variables for OPT, STDOPT and
+              possible to define environment variables for OPT, STDOPT and
               EXECNOW directives via `ENV: <variable-name> <value>`, see
               the developer manual for more information.
 o!  Kernel    [2026-03-06] dev branch following version N.x has now (N+1)~dev

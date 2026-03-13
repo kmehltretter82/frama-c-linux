@@ -205,7 +205,7 @@ let example_msg =
      TIMEOUT: <delay>    @[<v 0># Set a timeout for all sub-tests.@]@  \
      NOFRAMAC:           @[<v 0># Drops previous sub-test definitions and considers that there is no defined default sub-test.@]@  \
      MACRO: <name> <def> @[<v 0># Defines macro @@<name>@@ as <def>.@]@  \
-     ENV: <name> <value> @[<v 0># Defines environnement variable <name> with value <value>.@]@  \
+     ENV: <name> <value> @[<v 0># Defines environment variable <name> with value <value>.@]@  \
      @]@ \
      @[<v 1>\
      Some predefined macros can be used in test directives:@  \
@@ -948,7 +948,7 @@ end = struct
       let value = Macros.expand_not_empty ~file current.dc_macros value in
       debug ~level:4 "%%   - New ENV variable %s with value %s@." name value;
       let dc_env_var =
-        (* If the environnement variable is already set, we replace its value. *)
+        (* If the environment variable is already set, we replace its value. *)
         let old, others = List.partition (fun (name', _) -> name = name') current.dc_env_var in
         match old with
         | _ :: _ :: _ -> assert false (* should not happen *)
