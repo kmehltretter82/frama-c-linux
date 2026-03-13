@@ -23,7 +23,7 @@ Options taking a string as argument should preferably be written
 -metrics-cover <f1,..,fn>  compute an overapproximation of the functions
                     reachable from f1,..,fn. (preferably use
                     -metrics-cover="f1,..,fn")
--metrics-eva-cover  estimate Eva coverage w.r.t. to reachable syntactic
+-metrics-eva-cover  estimate Eva coverage w.r.t. reachable syntactic
                     definitions (opposite option is -metrics-no-eva-cover)
 -metrics-value-cover  alias for option -metrics-eva-cover
 -metrics-libc       show functions from Frama-C standard C library in the
@@ -51,12 +51,6 @@ Options taking a string as argument should preferably be written
 
 *** OUTPUT MESSAGES
 
--metrics-by-function-print  print results for option -metrics-by-function
-                    (set by default, opposite option is
-                    -metrics-no-by-function-print)
--metrics-eva-cover-print  print results for option -metrics-eva-cover (set by
-                    default, opposite option is -metrics-no-eva-cover-print)
--metrics-value-cover-print  alias for option -metrics-eva-cover-print
 -metrics-log <K_1:file_1,...>  copy log messages from Metrics to a file. <K>
                     is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
@@ -70,8 +64,6 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -metrics-msg-key help to get a list of
                     available categories, and * to enable all categories
                     (preferably use -metrics-msg-key="k1[,...,kn]")
--metrics-print      print results for option -metrics (set by default,
-                    opposite option is -metrics-no-print)
 -metrics-verbose <n>  level of verbosity for plug-in Metrics (default to 1)
 -metrics-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category
                     <k1> to <s1>,...,<kn> to <sn>. Use -metrics-warn-key help

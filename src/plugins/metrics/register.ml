@@ -7,14 +7,9 @@
 (**************************************************************************)
 
 open Metrics_parameters
-;;
 
-let () = Enabled.set_output_dependencies
-    [ Ast.self; AstType.self; OutputFile.self; SyntacticallyReachable.self;
-      Libc.self ]
-;;
-
-let syntactic ?(libc=Metrics_parameters.Libc.get ()) () =
+let syntactic () =
+  let libc = Libc.get () in
   begin
     match AstType.get () with
     | "cil" -> Metrics_cilast.compute_on_cilast ~libc
@@ -30,7 +25,13 @@ let syntactic ?(libc=Metrics_parameters.Libc.get ()) () =
        Metrics_parameters.result "%a"
          cov_printer#pp_reached_from_function kf)
 
-let () = ValueCoverage.set_output_dependencies [Eva.Analysis.self; Libc.self]
+let syntactic_deps =
+  [ Ast.self; AstType.self; OutputFile.self; SyntacticallyReachable.self;
+    Libc.self ]
+
+let syntactic_once, _ =
+  State_builder.apply_once "Metrics.syntactic" syntactic_deps syntactic
+
 
 let dkey_eva_coverage =
   Metrics_parameters.register_category "eva:coverage" ~default:true
@@ -44,9 +45,10 @@ let dkey_eva_reached_stmts =
   Metrics_parameters.register_category "eva:reached-stmts" ~default:true
     ~help:"print messages about statements reached by Eva"
 
-let value ~libc () =
+let eva () =
   Eva.Analysis.compute ();
   if Eva.Analysis.is_computed () then begin
+    let libc = Libc.get () in
     let cov_metrics = Metrics_coverage.compute ~libc in
     let cov_printer = new Metrics_coverage.semantic_printer ~libc cov_metrics in
     Metrics_parameters.result ~dkey:dkey_eva_coverage
@@ -56,12 +58,13 @@ let value ~libc () =
     Metrics_parameters.result ~dkey:dkey_eva_reached_stmts
       "%t" cov_printer#pp_stmts_reached_by_function;
   end
-;;
+
+let eva_deps = [Eva.Analysis.self; Libc.self]
+let eva_once, _ = State_builder.apply_once "Metrics.value" eva_deps eva
 
 let main () =
-  let libc = Libc.get () in
-  if Enabled.get () then Enabled.output (syntactic ~libc);
-  if ValueCoverage.get () then ValueCoverage.output (value ~libc);
+  if Enabled.get () then syntactic_once ();
+  if ValueCoverage.get () then eva_once ();
   if LocalsSize.is_set () then begin
     Ast.compute ();
     Metrics_parameters.result "function\tlocals_size_no_temps\t\

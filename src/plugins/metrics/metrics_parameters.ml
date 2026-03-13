@@ -14,19 +14,17 @@ include Plugin.Register
     end)
 
 module Enabled =
-  WithOutput
+  False
     (struct
       let option_name = "-metrics"
       let help = "activate metrics computation"
-      let output_by_default = true
     end)
 
 module ByFunction =
-  WithOutput
+  False
     (struct
       let option_name = "-metrics-by-function"
       let help = "also compute metrics on a per-function basis"
-      let output_by_default = true
     end)
 
 module OutputFile =
@@ -42,13 +40,11 @@ module OutputFile =
     end)
 
 module ValueCoverage =
-  WithOutput (
-  struct
-    let option_name = "-metrics-eva-cover"
-    let help = "estimate Eva coverage w.r.t. \
-                to reachable syntactic definitions"
-    let output_by_default = true
-  end)
+  False
+    (struct
+      let option_name = "-metrics-eva-cover"
+      let help = "estimate Eva coverage w.r.t. reachable syntactic definitions"
+    end)
 let () = ValueCoverage.add_aliases [ "-metrics-value-cover" ]
 
 module AstType =
