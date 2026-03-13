@@ -31,6 +31,16 @@ type project = Project_skeleton.t =
 (** Type of a project. *)
 
 (* ************************************************************************* *)
+(** {2 Options} *)
+(* ************************************************************************* *)
+
+val compress_saved_session: bool ref
+(** This is used to decide if projects should be compressed when saved with
+    {!save} and {!save_all} without the [?compress] parameter. Defaults to
+    [true].
+    @since Frama-C+dev *)
+
+(* ************************************************************************* *)
 (** {2 Operations on all projects} *)
 (* ************************************************************************* *)
 
@@ -229,7 +239,8 @@ exception IOError of string
 val save:
   ?compress:bool -> ?selection:State_selection.t -> ?project:t ->
   Filepath.t -> unit
-(** Save a given project in a file. Default project is [current ()].
+(** Save a given project in a file. Default project is [current ()]. [?compress]
+    defaults to {!compress_saved_session}.
     @raise IOError if the project cannot be saved.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
@@ -249,7 +260,8 @@ val load: ?selection:State_selection.t -> ?name:string -> Filepath.t -> t
 
 val save_all:
   ?compress:bool -> ?selection:State_selection.t -> Filepath.t -> unit
-(** Save all the projects in a file.
+(** Save all the projects in a file. [?compress] defaults to
+    {!compress_saved_session}.
     @raise IOError a project cannot be saved. *)
 
 val load_all: ?selection:State_selection.t -> Filepath.t -> unit

@@ -379,6 +379,8 @@ val compress_saved_session: bool
 (** Indicates whether the saved sessions should be compressed or not.
 
     @since 31.0-Gallium *)
+[@@deprecated "Use Project.compress_saved_session instead."]
+[@@migrate { repl = Project.compress_saved_session } ]
 
 val last_project_created_by_copy: (unit -> int option) ref
 

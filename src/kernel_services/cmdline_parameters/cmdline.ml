@@ -35,7 +35,6 @@ let dkey = Kernel_log.dkey_cmdline
 let quiet_ref = ref false
 let tty = ref Unix.(isatty stdout && Ansi_escape.is_supported ())
 let permissive = ref false
-let compress_saved_session = ref true
 
 let set_tty isatty =
   tty := isatty;
@@ -481,9 +480,9 @@ let () =
         "-permissive", Unit (fun () -> permissive := true);
         "-memory-footprint", Int configure_ocaml_gc;
         "-compress-saved-session", Unit (fun () ->
-            compress_saved_session := true);
+            Project.compress_saved_session := true);
         "-no-compress-saved-session", Unit (fun () ->
-            compress_saved_session := false)
+            Project.compress_saved_session := false)
       ]
       false
       all_options
@@ -505,7 +504,6 @@ let deterministic =
 
 let tty = !tty
 let permissive = !permissive
-let compress_saved_session = !compress_saved_session
 
 (* ************************************************************************* *)
 (** {2 Plugin} *)
@@ -1274,3 +1272,5 @@ let kernel_verbose_atleast_ref =
 
 let () = Log.cmdline_at_error_exit := at_error_exit [@@alert "-deprecated"]
 let () = Log.cmdline_error_occurred := error_occurred  [@@alert "-deprecated"]
+
+let compress_saved_session = !Project.compress_saved_session

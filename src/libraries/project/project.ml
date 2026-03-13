@@ -7,6 +7,12 @@
 (**************************************************************************)
 
 (* ************************************************************************** *)
+(** {2 Project options} *)
+(* ************************************************************************** *)
+
+let compress_saved_session = ref true
+
+(* ************************************************************************** *)
 (** {2 Project skeleton} *)
 (* ************************************************************************** *)
 
@@ -469,10 +475,8 @@ let temp_file ~prefix ~suffix =
   with Sys_error s ->
     Kernel_log.abort "cannot create temporary file: %s" s
 
-let save_projects ?compress selection projects (filename : Filepath.t) =
-  let compress =
-    Option.value ~default:Cmdline.compress_saved_session compress
-  in
+let save_projects ?(compress = !compress_saved_session) selection projects
+    (filename : Filepath.t) =
   let open Filesystem.Operators in
   let$ cout = Filesystem.Compressed.with_open_out_exn ~compress filename in
   Channel.output_value cout System_config.Version.id;
