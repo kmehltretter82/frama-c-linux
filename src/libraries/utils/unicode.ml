@@ -100,3 +100,6 @@ let pp_rfloor = pretty "⌋" ")"
 
 let pp_ceil pp fmt elt = Format.fprintf fmt "%t%a%t" pp_lceil pp elt pp_rceil
 let pp_floor pp fmt elt = Format.fprintf fmt "%t%a%t" pp_lfloor pp elt pp_rfloor
+
+let pp_string fmt s =
+  Format.pp_print_as fmt (String.utf8_length s) s

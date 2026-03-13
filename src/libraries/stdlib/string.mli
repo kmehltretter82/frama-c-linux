@@ -24,6 +24,9 @@ val remove_prefix: ?strict:bool -> string -> string -> string option
     of [s] and [Some s'] iff [s=s'^suffix]. *)
 val remove_suffix: ?strict:bool -> string -> string -> string option
 
+(** Same as {!String.escaped} but counts utf8 characters instead of bytes. *)
+val utf8_length: string -> int
+
 (** Same as {!String.escaped} but for utf8 encoded strings. Unicode non ASCII
     characters are preserved unescaped. *)
 val utf8_escaped: string -> string

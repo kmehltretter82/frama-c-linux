@@ -25,7 +25,7 @@ module Name = struct
     let reprs = [Integer Z.zero]
 
     let pretty fmt = function
-      | String s -> Format.pp_print_string fmt s
+      | String s -> Unicode.pp_string fmt s
       | Integer i -> Z.pretty fmt i
       | Pointer (v, o) ->
         let last_offset = Cil.lastOffset o in

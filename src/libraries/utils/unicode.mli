@@ -81,3 +81,7 @@ val pp_ellipsis : printer (** … *)
 
 val pp_floor : 'a Pretty_utils.formatter -> 'a Pretty_utils.formatter (** ⌊elt⌋ *)
 val pp_ceil : 'a Pretty_utils.formatter -> 'a Pretty_utils.formatter (** ⌈elt⌉ *)
+
+(* Complete strings *)
+
+val pp_string : Format.formatter -> string -> unit
