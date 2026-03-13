@@ -19,6 +19,10 @@ let ignored_suites = ref []
 let config_filter = ref None
 let default_config = "DEFAULT"
 
+let debug ~level msg =
+  if !verbosity >= level then Format.printf msg
+  else Format.ifprintf Format.std_formatter msg
+
 (* Set to an empty string to use no wrapper *)
 let wrapper_cmd = ref "frama-c-wtests -brief"
 
@@ -201,6 +205,7 @@ let example_msg =
      TIMEOUT: <delay>    @[<v 0># Set a timeout for all sub-tests.@]@  \
      NOFRAMAC:           @[<v 0># Drops previous sub-test definitions and considers that there is no defined default sub-test.@]@  \
      MACRO: <name> <def> @[<v 0># Defines macro @@<name>@@ as <def>.@]@  \
+     ENV: <name> <value> @[<v 0># Defines environnement variable <name> with value <value>.@]@  \
      @]@ \
      @[<v 1>\
      Some predefined macros can be used in test directives:@  \
@@ -220,6 +225,9 @@ let example_msg =
      @@PTEST_ENABLED_IF@@      # Current value of ENABLED_IF directive.@  \
      @@PTEST_MODULE@@          # Current list of modules defined by the MODULE directive.@  \
      @@PTEST_PLUGIN@@          # Current list of plugins set by the PLUGIN directive.@  \
+     @@PTEST_SHARE_DIR@@       # Path to the share directory of the related plugin.@  \
+     @@FRAMAC_SHARE@@          # Shortcut defined as follows: %s@  \
+     @@DEV_NULL@@              # Set to 'NUL' for Windows platforms and to '/dev/null' otherwise.@  \
      @]@ \
      @[<v 1>\
      Other macros can only be used in test commands (CMD and EXECNOW directives):@  \
@@ -228,9 +236,6 @@ let example_msg =
      @@frama-c-exe@@    # Shortcut defined as follows: %s@  \
      @@frama-c@@        # Shortcut defined as follows: %s@  \
      @@frama-c-cmd@@    # Shortcut defined as follows: %s@  \
-     @@FRAMAC_SHARE@@   # Shortcut defined as follows: %s@  \
-     @@PTEST_SHARE_DIR@@   # Path to the share directory of the related plugin.@  \
-     @@DEV_NULL@@       # Set to 'NUL' for Windows platforms and to '/dev/null' otherwise.@  \
      @]@ \
      @[<v 1>\
      Default directive values:@  \
@@ -260,10 +265,10 @@ let example_msg =
      @]@ \
      @]"
     !macro_default_options
+    !macro_frama_c_share
     !macro_frama_c_exe
     !macro_frama_c
     !macro_frama_c_cmd
-    !macro_frama_c_share
     test_file_regexp
     !default_toplevel
 
@@ -384,7 +389,7 @@ end = struct
              | None -> incr nb_ignores
             );
             ignored_suites := (ptests_config ^ ":" ^ value)::!ignored_suites;
-            if !verbosity >=2 then Format.eprintf "%s: %s=%s@." ptests_config key value
+            if !verbosity >= 2 then Format.eprintf "%s: %s=%s@." ptests_config key value
           | _ ->  Format.eprintf "%s: (DEPRECATED): %s=%s@." ptests_config key value;
       in
       if Sys.file_exists ptests_config then begin
@@ -518,8 +523,8 @@ module Macros = struct
       let has_ptest_opt = ref false in
       let has_ptest_options = ref false in
       let has_frama_c_exe = ref false in
-      if !verbosity >= 4 then Format.printf "%% %s: Expand: %s@." file s;
-      if !verbosity >= 5 then Format.printf "%a" pp_macros macros;
+      debug ~level:2 "%% %s: Expand: %s@." file s;
+      debug ~level:5 "%a" pp_macros macros;
       let nb_loops = ref 0 in
       let rec aux s =
         if !nb_loops > 100 then
@@ -537,11 +542,10 @@ module Macros = struct
                  | "PTEST_OPTIONS" -> has_ptest_options := true
                  | "frama-c-exe" -> has_frama_c_exe := true
                  | _ -> ());
-                if !verbosity >= 5 then Format.printf "%% %s:     - macro is %s\n%!" file macro;
+                debug ~level:5 "%% %s:     - macro is %s\n%!" file macro;
                 try
                   let replacement = StringMap.find macro macros in
-                  if !verbosity >= 4 then
-                    Format.printf "%% %s:     - replacement for %s is %s\n%!" file macro replacement;
+                  debug ~level:4 "%% %s:     - replacement for %s is %s\n%!" file macro replacement;
                   aux replacement
                 with Not_found -> s
               end
@@ -555,7 +559,7 @@ module Macros = struct
           Format.eprintf "%s: uncaught exception %s\n%!" file (Printexc.to_string e);
           raise e
       in
-      if !verbosity >= 4 then Format.printf "%% %s: Expansion result: %s@." file r;
+      debug ~level:4 "%% %s: Expansion result: %s@." file r;
       { has_ptest_file= !has_ptest_file;
         has_ptest_opt= !has_ptest_opt;
         has_frama_c_exe= !has_frama_c_exe;
@@ -563,6 +567,11 @@ module Macros = struct
 
   let expand ~file (macros:t) s =
     snd (does_expand ~file macros s)
+
+  (* Same as expand but make sure the string is never empty by adding quotes if needed. *)
+  let expand_not_empty ~file (macros:t) s =
+    let v = snd (does_expand ~file macros s) in
+    if v = "" then "\"\"" else v
 
   (* Removes the expansions to an empty string from the list (for DEPS,PLUGIN,MODULE,BIN,LOG *)
   let expand_list ~file (macros:t) ls =
@@ -574,6 +583,9 @@ module Macros = struct
     Option.map (fun s ->
         let s = String.trim (expand ~file macros s) in
         if s = "" then "true" else s) enabled_if
+
+  let expand_env ~file macros env =
+    List.map (fun (k, v) -> k, expand_not_empty ~file macros v) env
 
   let add_list l map =
     List.fold_left (fun acc (k,v) -> StringMap.add k v acc) map l
@@ -620,6 +632,7 @@ type execnow =
     ex_bin: string list; (** bin files *)
     ex_timeout: string;
     ex_deps: deps;
+    ex_env_var: (string * string) list;
     ex_exit_code: string option
   }
 
@@ -629,6 +642,7 @@ type cmd = {
   toplevel: string;
   opts: string;
   macros: Macros.t;
+  env_var: (string * string) list;
   exit_code: string option;
   logs: string list;
   bins: string list;
@@ -649,6 +663,7 @@ type config =
     dc_library : string list option; (** additional libraries to load *)
     dc_module : string list option; (** module to load *)
     dc_macros: Macros.t; (** existing macros. *)
+    dc_env_var : (string * string) list; (** env *)
     dc_default_toplevel   : string;
     (** full path of the default toplevel. *)
     dc_filter     : string option; (** optional filter to apply to
@@ -677,14 +692,14 @@ module Test_config: sig
 
   (* updates the configuration directives that do not depend of the test number and
      returns a getter of the PTEST_xxx variables including the one depending on the test number *)
-  val ptest_vars: env:env_t -> SubDir.t -> file:string -> config -> string * config * (nth:int -> Macros.t -> Macros.t)
+  val ptest_vars: env:env_t -> file:string -> string * (nth:int -> Macros.t -> Macros.t)
 
   (** Split a string on spaces, tabs and commas, except if they are escaped with
       '\'. *)
   val split_list: string -> string list
 end = struct
 
-  let ptest_vars ~env _directory ~file config =
+  let ptest_vars ~env ~file =
     let ptest_config = config_name ~env "" in
     let ptest_file = Filename.sanitize file in
     let ptest_name = Filename.remove_extension file in
@@ -701,19 +716,7 @@ end = struct
         "PTEST_FILE", ptest_file;
         "PTEST_NAME", ptest_name;
       ] in
-    let ptest_macros = Macros.add_list ptest_vars Macros.empty in
-    let subst = Macros.expand_list ~file ptest_macros in
-    let dc_enabled_if = Macros.expand_enabled_if  ~file ptest_macros config.dc_enabled_if
-    in
     ptest_name,
-    { config with
-      dc_enabled_if;
-      dc_execnow = List.rev config.dc_execnow;
-      dc_deps = Option.map subst config.dc_deps ;
-      dc_plugin = Option.map subst config.dc_plugin;
-      dc_module = Option.map subst config.dc_module;
-      dc_libs = Option.map subst config.dc_libs;
-    },
     fun ~nth macros ->
       Macros.add_list (("PTEST_NUMBER", string_of_int nth)::ptest_vars) macros
 
@@ -725,6 +728,7 @@ end = struct
         opts="";
         exit_code=None;
         macros=config.dc_macros;
+        env_var=[];
         logs=[];
         bins=[];
         deps={ load_plugin=None;
@@ -740,6 +744,7 @@ end = struct
   let default_config () =
     { dc_test_regexp = test_file_regexp;
       dc_macros = Macros.default_macros ();
+      dc_env_var = [];
       dc_execnow = [];
       dc_libs = None;
       dc_deps = None;
@@ -758,7 +763,7 @@ end = struct
       dc_timeout = "";
     }
 
-  let scan_execnow ~file ~once ex_exit_code ex_timeout ex_deps (s:string) =
+  let scan_execnow ~file ~once ex_exit_code ex_timeout ex_deps ex_env_var (s:string) =
     if once=false then
       Format.eprintf "%s: using EXEC directive (DEPRECATED): %s@."
         file s;
@@ -791,6 +796,7 @@ end = struct
           ex_log = [];
           ex_bin = [];
           ex_deps;
+          ex_env_var;
           ex_timeout;
           ex_exit_code;
         }
@@ -844,7 +850,7 @@ end = struct
     { current with
       dc_execnow =
         scan_execnow ~file ~once
-          current.dc_exit_code current.dc_timeout (deps_of_config current)
+          current.dc_exit_code current.dc_timeout (deps_of_config current) current.dc_env_var
           s :: current.dc_execnow
     }
 
@@ -910,21 +916,48 @@ end = struct
       dc_module = Some l;
       dc_macros = Macros.add_list [macro_name, s] current.dc_macros }
 
+  let macro_name_regex = "[-_0-9a-zA-Z]+"
+  let env_name_regex = "[_0-9a-zA-Z]+"
+
+  let parse_split_space name_regex s =
+    let regex_str = Format.sprintf "[ \t]*\\(%s\\)\\([ \t]+.*\\)?$" name_regex in
+    let regex = Str.regexp regex_str in
+    match str_string_match1 regex s 0 with
+    | None -> None
+    | Some name ->
+      let value =
+        try Str.matched_group 2 s |> String.trim with Not_found -> (* empty text *) ""
+      in Some (name, value)
+
   let config_macro ~drop:_ ~file ~dir s current =
-    (* note: the expansion is only done into the definition *)
-    let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
-    if Str.string_match regex s 0 then begin
-      let name = Str.matched_group 1 s in
-      let def =
-        try Str.matched_group 3 s with Not_found -> (* empty text *) ""
-      in
-      if !verbosity >= 4 then
-        Format.printf "%%   - New macro %s with definition %s@." name def;
-      { current with dc_macros = Macros.add_expand ~file name def current.dc_macros }
-    end else begin
+    match parse_split_space macro_name_regex s with
+    | None ->
       Format.eprintf "%a: cannot understand MACRO definition: %s@." (SubDir.pp_file ~dir) file s;
       current
-    end
+    | Some (name, def) ->
+      debug ~level:4 "%%   - New macro %s with definition %s@." name def;
+      { current with dc_macros = Macros.add_expand ~file name def current.dc_macros }
+
+  let config_env ~drop:_ ~file ~dir s current =
+    match parse_split_space env_name_regex s with
+    | None ->
+      Format.eprintf "%a: cannot understand ENV definition: %s@." (SubDir.pp_file ~dir) file s;
+      current
+    | Some (name, value) ->
+      (* Make quotes explicit in dune file if the string is empty. *)
+      let value = Macros.expand_not_empty ~file current.dc_macros value in
+      debug ~level:4 "%%   - New ENV variable %s with value %s@." name value;
+      let dc_env_var =
+        (* If the environnement variable is already set, we replace its value. *)
+        let old, others = List.partition (fun (name', _) -> name = name') current.dc_env_var in
+        match old with
+        | _ :: _ :: _ -> assert false (* should not happen *)
+        | [] -> others @ [(name, value)]
+        | [ _, value' ] ->
+          debug ~level:4 "%%   - Replacing previously set ENV variable %s=%s with value %s@." name value' value;
+          others @ [(name, value)]
+      in
+      { current with dc_env_var }
 
   type parsing_env = {
     current_default_log: string list;
@@ -965,7 +998,8 @@ end = struct
              logs = current.dc_default_log;
              bins = current.dc_default_bin;
              timeout = current.dc_timeout;
-             deps = deps_of_config current
+             deps = deps_of_config current;
+             env_var = current.dc_env_var;
            }
          in
          { current with
@@ -989,7 +1023,8 @@ end = struct
                   logs= command.logs @ current.dc_default_log;
                   bins= command.bins @ current.dc_default_bin;
                   timeout= current.dc_timeout;
-                  deps = deps_of_config ~deps:command.deps current
+                  deps = deps_of_config ~deps:command.deps current;
+                  env_var = current.dc_env_var;
                 })
              (if !default_parsing_env.current_default_cmds = [] then
                 default_commands current
@@ -1034,6 +1069,7 @@ end = struct
          config_exec ~once:false ~file ~drop s acc);
 
       "MACRO", config_macro;
+      "ENV", config_env;
       "LIBS", config_libs;
       "DEPS", config_deps;
       "ENABLED_IF", config_enabled_if;
@@ -1102,7 +1138,7 @@ end = struct
     let general_config_file = SubDir.make_file dir (config_name ~env filename) in
     if Sys.file_exists general_config_file
     then begin
-      if !verbosity >=2 then Format.printf "%% Parsing global config file=%s@." general_config_file;
+      debug ~level:2 "%% Parsing global config file=%s@." general_config_file;
       let scan_buffer = Scanf.Scanning.from_file general_config_file in
       scan_directives ~drop:false
         (SubDir.create ~env ~with_subdir:false Filename.current_dir_name)
@@ -1111,7 +1147,7 @@ end = struct
         default_config
     end
     else begin
-      if !verbosity >=2 then Format.printf "%% There is no global config file=%s@." general_config_file;
+      debug ~level:2 "%% There is no global config file=%s@." general_config_file;
       default_config
     end
 
@@ -1144,8 +1180,7 @@ end = struct
              match List.find_opt is_current_config configs with
              | Some name ->
                (* Found options for current config! *)
-               if !verbosity >= 2 then Format.printf "%% Parsing %s of file=%s@."
-                   name f ;
+               debug ~level:2 "%% Parsing %s of file=%s@." name f ;
                scan_directives ~drop:false dir ~file:f scan_buffer default
              | None -> begin
                  (* config name does not match: eat config and continue.
@@ -1165,7 +1200,7 @@ end = struct
           options
         with End_of_file | Scanf.Scan_failure _ ->
           Scanf.Scanning.close_in scan_buffer;
-          if !verbosity >= 2 then Format.printf "%% No run.config directives in file=%s@." f ;
+          debug ~level:2 "%% No run.config directives in file=%s@." f ;
           default
       in
       if config.dc_commands = [] && config.dc_framac
@@ -1179,6 +1214,7 @@ end
 
 type toplevel_command =
   { macros: Macros.t;
+    env_var: (string*string) list;
     log_files: string list;
     bin_files: string list;
     test_name : string ;
@@ -1412,7 +1448,7 @@ let default_wtest = match wtest_of_yojson (Yojson.Safe.from_string "{}") with
 
 let print_json_wrapper ~file wtest =
   (* Prints the JSON file for the wrapper *)
-  if !verbosity >= 2 then Format.printf "%% Generates %S wrapper file...@." file;
+  debug ~level:2 "%% Generates %S wrapper file...@." file;
   let wrapper_cout = open_out file in
   let wrapper_fmt = Format.formatter_of_out_channel wrapper_cout  in
   Format.fprintf wrapper_fmt "%a@." (pp_wtest ~compacted:false) wtest;
@@ -1458,6 +1494,15 @@ let get_exit_code ~file = function
 
 let pp_accepted_exit_code fmt cmd =
   Format.fprintf fmt "with-accepted-exit-codes %d" cmd.exit_code
+
+let pp_setenv fmt (var, value) =
+  Format.fprintf fmt "(setenv %s %s " var value
+
+let pp_env fmt l =
+  List.iter (Format.fprintf fmt "%a" pp_setenv) l
+
+let pp_close_env fmt l =
+  List.iter (fun _ -> Format.fprintf fmt ")") l
 
 let command_string ~env ~result_fmt ~oracle_fmt command =
   let log_prefix = log_prefix ~env command in
@@ -1517,7 +1562,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
        (targets %S %S %a %a)\n  \
        (deps %S %S %S %a %a)\n  \
        %a\n\
-       (action (run %s %S %S %a))\n\
+       (action %a(run %s %S %S %a))%a\n\
        )@."
       (* rule: *)
       wtest.info
@@ -1537,10 +1582,13 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       (* enabled_if: *)
       pp_enabled_if command.deps
       (* action: *)
+      pp_env command.env_var
       !wrapper_cmd
       wrapper_basename
       wtest.cmd
-      pp_list (if command.filter = None then [] else [wtest.sedout ; wtest.sederr]);
+      pp_list (if command.filter = None then [] else [wtest.sedout ; wtest.sederr])
+      pp_close_env command.env_var
+    ;
 
     let wtest =
       { wtest with
@@ -1560,7 +1608,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
        (targets %S %S %a %a)\n  \
        (deps   %a)\n  \
        %a\n\
-       (action (with-stderr-to %S (with-stdout-to %S (%a (system %S)))))\n\
+       (action %a(with-stderr-to %S (with-stdout-to %S (%a (system %S)))))%a\n\
        )@."
       (* rule: *)
       wtest.info
@@ -1576,10 +1624,12 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       (* enabled_if: *)
       pp_enabled_if command.deps
       (* action: *)
+      pp_env command.env_var
       cmderrlog
       cmdreslog
       pp_accepted_exit_code command
       command_string
+      pp_close_env command.env_var
   end;
   let filter_rule txt fin fout cmd =
     if cmd <> "" then
@@ -1624,7 +1674,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
      (alias %S)\n  \
      (deps  %a (universe))\n  \
      %a\n\
-     (action (%a (system %S)))\n\
+     (action %a(%a (system %S)))%a\n\
      )@."
     (* rule: *)
     command.nth command.file
@@ -1635,8 +1685,10 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (* enabled_if: *)
     pp_enabled_if command.deps
     (* action: *)
+    pp_env command.env_var
     pp_accepted_exit_code command
     command_string
+    pp_close_env command.env_var
   ;
   Format.fprintf result_fmt
     "(rule ; SHOW TEST COMMAND #%d OF TEST FILE %S\n  \
@@ -1741,16 +1793,17 @@ let update_modules ~file ~modules deps =
 let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~enabled_if =
   let config = Test_config.scan_test_file ~env directory ~file config in
   if not config.dc_dont_run then
-    let test_name,config,ptest_vars = Test_config.ptest_vars ~env directory ~file config  in
+    let test_name, ptest_vars = Test_config.ptest_vars ~env ~file in
     let make_cmd =
       let i = ref 0 in
-      fun { toplevel; opts=options; macros; exit_code; logs; bins; timeout; deps } ->
+      fun { toplevel; opts=options; macros; exit_code; logs; bins; timeout; deps; env_var} ->
         let nth = !i in
         incr i ;
         let macros = ptest_vars ~nth macros in
         let macros = Macros.add_defaults ~defaults:config.dc_macros macros in
         let log_files = Macros.expand_list ~file macros logs in
         let bin_files = Macros.expand_list ~file macros bins in
+        let env_var = Macros.expand_env ~file macros env_var in
         let deps = deps_command ~file macros deps in
         update_modules ~file ~modules deps;
         update_enabled_if ~enabled_if deps;
@@ -1762,17 +1815,19 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             exit_code = get_exit_code ~file exit_code;
             execnow=false;
             deps;
+            env_var;
           }
     in
     let make_execnow_cmd =
       let e = ref 0 in
-      fun execnow->
+      fun execnow ->
         let nth = !e in
         incr e ;
         let macros = ptest_vars ~nth Macros.empty in
         let macros = Macros.add_defaults ~defaults:config.dc_macros macros in
         let cmd =
           let deps = deps_command ~file macros execnow.ex_deps in
+          let env_var = Macros.expand_env ~file macros execnow.ex_env_var in
           update_modules ~file ~modules deps;
           update_enabled_if ~enabled_if deps;
           { test_name; file; directory; nth;
@@ -1786,6 +1841,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             filter = None; (* no FILTER applied to EXECNOW LOG *)
             execnow = true;
             deps = deps;
+            env_var;
           }
         in
         let cmd_string = basic_command_string cmd in
@@ -1813,7 +1869,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
              (deps %a %a)\n  \
              (targets %a %a)\n  \
              %a\n\
-             (action (run %s %%{dep:%s} %S))\n\
+             (action %a(run %s %%{dep:%s} %S))%a\n\
              )@."
             (* rule: *)
             wtest.info
@@ -1828,9 +1884,11 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             (* enabled_if: *)
             pp_enabled_if cmd.deps
             (* action: *)
+            pp_env cmd.env_var
             !wrapper_cmd
             wrapper_basename
-            wtest.cmd;
+            wtest.cmd
+            pp_close_env cmd.env_var;
           let wtest =
             { wtest with
               cmd = show_cmd wtest.cmd ;
@@ -1847,7 +1905,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
              (deps (package frama-c)%a)\n  \
              (targets %a %a)\n  \
              %a\n\
-             (action (%a (system %S)))\n\
+             (action %a(%a (system %S)))%a\n\
              )@."
             (* rule: *)
             wtest.info
@@ -1861,8 +1919,10 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             (* enabled_if: *)
             pp_enabled_if cmd.deps
             (* action: *)
+            pp_env cmd.env_var
             pp_accepted_exit_code cmd
             wtest.cmd
+            pp_close_env cmd.env_var
         end;
         let oracle_subdir = SubDir.oracle_subdir ~env cmd.directory in
         List.iter (oracle_target oracle_fmt oracle_subdir) wtest.log ;
@@ -1932,6 +1992,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             pp_enabled_if cmd.deps
         end
     in
+    let config = { config with dc_execnow = List.rev config.dc_execnow } in
     if config.dc_commands <> [] || config.dc_execnow <> [] then begin
       let pp_list_alias fmt l = List.iter (Format.fprintf fmt "(alias %S)") l in
       Format.fprintf result_fmt
@@ -1952,7 +2013,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
     end ;
     List.iter make_cmd config.dc_commands;
     List.iter make_execnow_cmd config.dc_execnow;
-    (config.dc_commands <> [] || config.dc_execnow <> [])
+    true
   else
     false
 
@@ -2044,19 +2105,19 @@ let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
        let suite = Filename.concat env.dir suite in
        let directory = SubDir.create ~with_subdir:true ~env suite in
        let result_dune_file = SubDir.make_file (SubDir.result_subdir ~env directory) "dune" in
-       if !verbosity >= 2 then Format.printf "%% Generates %S file for test suite %s%s and dune-alias=@@%s ...@."
-           result_dune_file suite (if env.config = "" then "" else (", config=" ^ env.config)) env.dune_alias;
+       debug ~level:2 "%% Generates %S file for test suite %s%s and dune-alias=@@%s ...@."
+         result_dune_file suite (if env.config = "" then "" else (", config=" ^ env.config)) env.dune_alias;
        let dir_config =
          let config = SubDir.make_file directory (config_name ~env Test_config.filename) in
          if Sys.file_exists config
          then begin
            let scan_buffer = Scanf.Scanning.from_file config in
-           if !verbosity >= 2 then Format.printf "%% Parsing suite config file=%s@." config ;
+           debug ~level:2 "%% Parsing suite config file=%s@." config ;
            Test_config.scan_directives ~drop:false directory ~file:config
              scan_buffer default_config
          end
          else begin
-           if !verbosity >= 2 then Format.printf "%% There is no suite config file=%s@." config ;
+           debug ~level:2 "%% There is no suite config file=%s@." config ;
            default_config
          end
        in
@@ -2078,13 +2139,13 @@ let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
        let dir_files =
          List.filter (fun n -> String.get n 0 <> '.') dir_files
        in
-       if !verbosity >= 3 then Format.printf "%% - Look at %d entries of the directory...@." (List.length dir_files);
+       debug ~level:3 "%% - Look at %d entries of the directory...@." (List.length dir_files);
        List.iter
          (fun file ->
             assert (Filename.is_relative file);
             if test_pattern dir_config file
             then begin
-              if !verbosity >= 2 then Format.printf "%% - Process test file %s ...@." file;
+              debug ~level:2 "%% - Process test file %s ...@." file;
               has_test := process_file ~env ~result_fmt ~oracle_fmt file directory dir_config ~modules ~enabled_if || !has_test;
             end;
          ) dir_files;
@@ -2124,7 +2185,7 @@ let () =
   List.iter (fun dir ->
       Format.printf "Test directory: %s@." dir;
       let suites = Ptests_config.parse ~dir in
-      if !verbosity >= 1 then Format.printf "%% Nb config= %d@." (StringMap.cardinal suites);
+      debug ~level:1 "%% Nb config= %d@." (StringMap.cardinal suites);
       let nb = !nb_dune_files in
       StringMap.iter (fun config_mode suites ->
           match !config_filter with
@@ -2134,14 +2195,14 @@ let () =
               (match config_mode with "" -> default_config | s -> s) nbi;
             nb_ignores := !nb_ignores + nbi
           | _ ->
-            if !verbosity >= 1 then Format.printf "%% - %s_SUITES -> nb suites= %d@."
-                (match config_mode with "" -> default_config | s -> s) (StringMap.cardinal suites);
+            debug ~level:1 "%% - %s_SUITES -> nb suites= %d@."
+              (match config_mode with "" -> default_config | s -> s) (StringMap.cardinal suites);
             let env = { config = config_mode ; dir ; dune_alias = "" ; absolute_cwd} in
             let directory = SubDir.create ~with_subdir:false ~env dir in
             let config = Test_config.current_config ~env directory in
             process ~env config suites) suites ;
       let nbi = !nb_ignores in
-      if !verbosity >= 1 then Format.printf "%% Nb dune files= %d@." (!nb_dune_files-nb);
+      debug ~level:1 "%% Nb dune files= %d@." (!nb_dune_files-nb);
       if (!nb_ignores-nbi) <> 0 then Format.printf "- %d ignored suite(s)@." (!nb_ignores-nbi);
     ) suites ;
   Format.printf "Total number of generated dune files: %d@." !nb_dune_files;

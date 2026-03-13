@@ -607,6 +607,12 @@ The syntax for \texttt{EXECNOW} related to that need is different
 & \textit{None}
 \\
 \hline
+\texttt{ENV}\nscodeidxdef{Test!Directive}{ENV}
+& Export an environnement variable for \texttt{OPT}, \texttt{STDOPT} or
+\texttt{EXECNOW} directives.
+& \textit{None}
+\\
+\hline
 \texttt{MODULE}\nscodeidxdef{Test!Directive}{MODULE}
 & Register a dynamic module to be built and loaded with each subsequent test.
 & \textit{None}
@@ -735,6 +741,20 @@ In the following, we detail some aspects of several directives.
   \texttt{STDOPT} or \texttt{EXECNOW} directive at this configuration level
   or in any level below it will be replaced by \texttt{content}. Existing
   predefined macros are listed in section~\ref{sec:ptests-macros}.
+\item The \texttt{ENV}\nscodeidx{Test!Directive}{ENV} directive
+  has the following syntax:
+  \begin{code}
+    ENV: variable-name value
+  \end{code}
+  where \texttt{variable-name} is any valid environnement variable name, and
+  \texttt{value} extends until the end of the line. Each encountered
+  \texttt{ENV} directive will export the variable which will be visible in the
+  context of \texttt{OPT}, \texttt{STDOPT} or \texttt{EXECNOW} directives. A
+  variable can be un-set via \texttt{ENV: variable-name} or \texttt{ENV:
+  variable-name ""}. Declaration order matters, and an \texttt{ENV} directive
+  can be used to override a previous one on the same variable. Macros can be
+  used as values for this directive and they will be expanded before exporting
+  the environment variable.
 \item The \texttt{MODULE}\nscodeidx{Test!Directive}{MODULE}
  directive takes as argument the name of a \texttt{.cmxs}
   module. It will then add a directive to compile this file with the
@@ -824,7 +844,7 @@ Refer to \texttt{frama-c-ptests --help} to have the full list.
 \hline
 Name & Expansion \\
 \hline
-\verb|frama-c| & path to \framac executable \\
+\verb|frama-c-exe| & path to \framac executable \\
 \hline
 \verb|PTEST_CONFIG| & either the empty string or \verb|_| followed by the
 name of the current alternative configuration

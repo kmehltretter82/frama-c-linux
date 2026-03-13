@@ -1,7 +1,9 @@
 /* run.config*
    FILTER: sed -e 's/[0-9.]\{1,\}\([%s]\)/?\1/g'
    STDOPT: +"-eva-show-perf"
-   EXECNOW: BIN flamegraph.txt BIN flamegraph.err { PTESTS_TESTING=1 %{bin:frama-c} @PTEST_FILE@ -eva -eva-flamegraph flamegraph.txt && NOGUI=1 %{bin:frama-c-script} flamegraph flamegraph.txt; } 1> /dev/null 2> flamegraph.err
+   ENV: PTESTS_TESTING 1
+   ENV: NOGUI 1
+   EXECNOW: BIN flamegraph.txt BIN flamegraph.err { %{bin:frama-c} @PTEST_FILE@ -eva -eva-flamegraph flamegraph.txt && %{bin:frama-c-script} flamegraph flamegraph.txt; } 1> @DEV_NULL@ 2> flamegraph.err
 */
 
 /* This example is kept minimal to ensure the stability of the output
