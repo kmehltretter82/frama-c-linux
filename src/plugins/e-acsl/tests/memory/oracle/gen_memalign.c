@@ -450,6 +450,8 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
   {
     int __gen_e_acsl_valid;
     int __gen_e_acsl_is_posix_alignment_2;
+    __e_acsl_store_block((void *)(& size),8UL);
+    __e_acsl_store_block((void *)(& alignment),8UL);
     __e_acsl_store_block((void *)(& memptr),8UL);
     __gen_e_acsl_contract = __e_acsl_contract_init(3UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
@@ -537,6 +539,8 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     }
     __e_acsl_contract_clean(__gen_e_acsl_contract);
+    __e_acsl_delete_block((void *)(& size));
+    __e_acsl_delete_block((void *)(& alignment));
     __e_acsl_delete_block((void *)(& memptr));
     return __retres;
   }
@@ -590,6 +594,8 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
   {
     int __gen_e_acsl_is_valid_alignment_2;
     int __gen_e_acsl_is_valid_alignment_4;
+    __e_acsl_store_block((void *)(& size),8UL);
+    __e_acsl_store_block((void *)(& alignment),8UL);
     __gen_e_acsl_at = errno;
     __gen_e_acsl_at_2 = alignment;
     __gen_e_acsl_contract = __e_acsl_contract_init(3UL);
@@ -764,6 +770,8 @@ void *__gen_e_acsl_aligned_alloc(size_t alignment, size_t size)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
     }
     __e_acsl_contract_clean(__gen_e_acsl_contract);
+    __e_acsl_delete_block((void *)(& size));
+    __e_acsl_delete_block((void *)(& alignment));
     __e_acsl_delete_block((void *)(& __retres));
     return __retres;
   }

@@ -1,4 +1,7 @@
 [e-acsl] beginning translation.
+[e-acsl] quantif.i:100: Warning: 
+  E-ACSL construct `function application' is not yet supported.
+  Ignoring annotation.
 [e-acsl] quantif.i:97: Warning: 
   invalid E-ACSL construct
   `invalid guard 10 > i in quantification

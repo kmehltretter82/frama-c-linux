@@ -2,11 +2,6 @@
    COMMENT: The \valid built-in predicate.
 */
 
-/* run.config_dev
-   COMMENT: Print the data and filter the addresses of the output so that the test is deterministic.
-   MACRO: ROOT_EACSL_EXEC_FILTER sed -e s/0x[0-9a-f]*$/0x000000/g
-*/
-
 #include "stdlib.h"
 
 int *X, Z;

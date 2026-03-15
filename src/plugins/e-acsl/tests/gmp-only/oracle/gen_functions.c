@@ -89,7 +89,11 @@ int main(void)
   mystruct m;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int x = 1;
+  __e_acsl_store_block((void *)(& x),4UL);
+  __e_acsl_full_init((void *)(& x));
   int y = 2;
+  __e_acsl_store_block((void *)(& y),4UL);
+  __e_acsl_full_init((void *)(& y));
   {
     __e_acsl_mpz_t __gen_e_acsl_y;
     __e_acsl_mpz_t __gen_e_acsl_x;
@@ -473,6 +477,8 @@ int main(void)
   }
   /*@ assert 0.499999 < f2(d) < 0.500001; */ ;
   __retres = 0;
+  __e_acsl_delete_block((void *)(& y));
+  __e_acsl_delete_block((void *)(& x));
   __e_acsl_memory_clean();
   return __retres;
 }
@@ -483,6 +489,7 @@ void __gen_e_acsl_k(int x)
   {
     __e_acsl_mpz_t __gen_e_acsl_x;
     int __gen_e_acsl_k_pred_2;
+    __e_acsl_store_block((void *)(& x),4UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gmpz_init_set_si(__gen_e_acsl_x,(long)x);
     __gen_e_acsl_k_pred_2 = __gen_e_acsl_k_pred((__e_acsl_mpz_struct *)__gen_e_acsl_x);
@@ -500,6 +507,7 @@ void __gen_e_acsl_k(int x)
     __gmpz_clear(__gen_e_acsl_x);
   }
   k(x);
+  __e_acsl_delete_block((void *)(& x));
   return;
 }
 

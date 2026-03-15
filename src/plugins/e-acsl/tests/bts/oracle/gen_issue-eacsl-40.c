@@ -43,68 +43,8 @@ FILE *__gen_e_acsl_fopen(char const * restrict filename,
 size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
                           FILE * restrict stream);
 
-int main(void)
-{
-  int __retres;
-  char buf[4];
-  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  FILE *f = __gen_e_acsl_fopen("/dev/urandom","r");
-  __e_acsl_store_block((void *)(& f),8UL);
-  __e_acsl_full_init((void *)(& f));
-  if (f) {
-    char buf_0[4];
-    size_t tmp_0;
-    __e_acsl_store_block((void *)(buf_0),4UL);
-    tmp_0 = __gen_e_acsl_fread((void *)(buf_0),1UL,4UL,f);
-    int res = (int)tmp_0;
-    __gen_e_acsl_fclose(f);
-    if (res == 4) {
-      {
-        int __gen_e_acsl_initialized;
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data =
-          {.values = (void *)0};
-        __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& buf_0[3]),
-                                                        sizeof(char));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&buf_0[3]",
-                                     (void *)(& buf_0[3]));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
-                                       "sizeof(char)",0,sizeof(char));
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                     "\\initialized(&buf_0[3])",0,
-                                     __gen_e_acsl_initialized);
-        __gen_e_acsl_assert_data.blocking = 1;
-        __gen_e_acsl_assert_data.kind = "Assertion";
-        __gen_e_acsl_assert_data.pred_txt = "\\initialized(&buf_0[3])";
-        __gen_e_acsl_assert_data.file = "issue-eacsl-40.c";
-        __gen_e_acsl_assert_data.fct = "main";
-        __gen_e_acsl_assert_data.line = 31;
-        __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
-      }
-      /*@ assert \initialized(&buf_0[3]); */ ;
-      __e_acsl_initialize((void *)(buf_0),sizeof(char));
-      buf_0[0] = buf_0[3];
-    }
-    else {
-      __retres = 2;
-      __e_acsl_delete_block((void *)(buf_0));
-      goto return_label;
-    }
-    __e_acsl_delete_block((void *)(buf_0));
-  }
-  else {
-    __retres = 1;
-    goto return_label;
-  }
-  __retres = 0;
-  return_label:
-  {
-    __e_acsl_delete_block((void *)(& f));
-    __e_acsl_memory_clean();
-    return __retres;
-  }
-}
-
+char const __fc_lit_string1[2UL] = "r";
+char const __fc_lit_string2[13UL] = "/dev/urandom";
 /*@ requires valid_ptr_block: \valid((char *)ptr + (0 .. nmemb * size - 1));
     requires valid_stream: \valid(stream);
     ensures size_read: \result <= \old(nmemb);
@@ -521,7 +461,11 @@ FILE *__gen_e_acsl_fopen(char const * restrict filename,
 {
   FILE *__retres;
   __e_acsl_store_block((void *)(& __retres),8UL);
+  __e_acsl_store_block((void *)(& mode),8UL);
+  __e_acsl_store_block((void *)(& filename),8UL);
   __retres = fopen(filename,mode);
+  __e_acsl_delete_block((void *)(& mode));
+  __e_acsl_delete_block((void *)(& filename));
   __e_acsl_delete_block((void *)(& __retres));
   return __retres;
 }
@@ -579,6 +523,92 @@ int __gen_e_acsl_fclose(FILE *stream)
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __e_acsl_delete_block((void *)(& stream));
+    return __retres;
+  }
+}
+
+void __e_acsl_globals_init(void)
+{
+  static char __e_acsl_already_run = 0;
+  if (! __e_acsl_already_run) {
+    __e_acsl_already_run = 1;
+    __e_acsl_store_block((void *)(__fc_lit_string2),13UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string2));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string2));
+    __e_acsl_store_block((void *)(__fc_lit_string1),2UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string1));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string1));
+  }
+  return;
+}
+
+void __e_acsl_globals_clean(void)
+{
+  __e_acsl_delete_block((void *)(__fc_lit_string2));
+  __e_acsl_delete_block((void *)(__fc_lit_string1));
+  return;
+}
+
+int main(void)
+{
+  int __retres;
+  char buf[4];
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_globals_init();
+  FILE *f = __gen_e_acsl_fopen(__fc_lit_string2,__fc_lit_string1);
+  __e_acsl_store_block((void *)(& f),8UL);
+  __e_acsl_full_init((void *)(& f));
+  if (f) {
+    char buf_0[4];
+    size_t tmp_0;
+    __e_acsl_store_block((void *)(buf_0),4UL);
+    tmp_0 = __gen_e_acsl_fread((void *)(buf_0),1UL,4UL,f);
+    int res = (int)tmp_0;
+    __gen_e_acsl_fclose(f);
+    if (res == 4) {
+      {
+        int __gen_e_acsl_initialized;
+        __e_acsl_assert_data_t __gen_e_acsl_assert_data =
+          {.values = (void *)0};
+        __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& buf_0[3]),
+                                                        sizeof(char));
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&buf_0[3]",
+                                     (void *)(& buf_0[3]));
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
+                                       "sizeof(char)",0,sizeof(char));
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+                                     "\\initialized(&buf_0[3])",0,
+                                     __gen_e_acsl_initialized);
+        __gen_e_acsl_assert_data.blocking = 1;
+        __gen_e_acsl_assert_data.kind = "Assertion";
+        __gen_e_acsl_assert_data.pred_txt = "\\initialized(&buf_0[3])";
+        __gen_e_acsl_assert_data.file = "issue-eacsl-40.c";
+        __gen_e_acsl_assert_data.fct = "main";
+        __gen_e_acsl_assert_data.line = 31;
+        __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
+        __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+      }
+      /*@ assert \initialized(&buf_0[3]); */ ;
+      __e_acsl_initialize((void *)(buf_0),sizeof(char));
+      buf_0[0] = buf_0[3];
+    }
+    else {
+      __retres = 2;
+      __e_acsl_delete_block((void *)(buf_0));
+      goto return_label;
+    }
+    __e_acsl_delete_block((void *)(buf_0));
+  }
+  else {
+    __retres = 1;
+    goto return_label;
+  }
+  __retres = 0;
+  return_label:
+  {
+    __e_acsl_delete_block((void *)(& f));
+    __e_acsl_globals_clean();
+    __e_acsl_memory_clean();
     return __retres;
   }
 }

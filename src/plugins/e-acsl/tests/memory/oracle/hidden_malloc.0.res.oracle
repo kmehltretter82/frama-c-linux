@@ -4,6 +4,8 @@
   if there are memory-related annotations.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:1089: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1089: Warning: 
+  E-ACSL construct `set union' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:1091: Warning: 
   no assigns clause generated for function valid_read_string because pointers as arguments is not yet supported
 [e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:282: Warning: 

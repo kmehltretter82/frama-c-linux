@@ -159,7 +159,11 @@ int main(void)
   mystruct m;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int x = 1;
+  __e_acsl_store_block((void *)(& x),4UL);
+  __e_acsl_full_init((void *)(& x));
   int y = 2;
+  __e_acsl_store_block((void *)(& y),4UL);
+  __e_acsl_full_init((void *)(& y));
   {
     int __gen_e_acsl_p1_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
@@ -794,6 +798,8 @@ int main(void)
   }
   /*@ assert \let n = 0 == 0 ? 0x7fffffffffffffffL : -1; rf5(n) == 0; */ ;
   __retres = 0;
+  __e_acsl_delete_block((void *)(& y));
+  __e_acsl_delete_block((void *)(& x));
   __e_acsl_memory_clean();
   return __retres;
 }
@@ -956,6 +962,7 @@ void __gen_e_acsl_k(int x)
 {
   {
     int __gen_e_acsl_k_pred_2;
+    __e_acsl_store_block((void *)(& x),4UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_k_pred_2 = __gen_e_acsl_k_pred(x);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"x",0,x);
@@ -971,6 +978,7 @@ void __gen_e_acsl_k(int x)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
   k(x);
+  __e_acsl_delete_block((void *)(& x));
   return;
 }
 
