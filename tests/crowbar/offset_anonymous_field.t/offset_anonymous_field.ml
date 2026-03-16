@@ -191,8 +191,7 @@ let test { designator; offsets; structs } =
        with Log.AbortFatal _ ->
          let filename = generate_failure_file "anonymous" offset structs in
          Crowbar.fail
-           ("fieldsToInit failed on the test given in file " ^ filename ^
-            ", for field " ^ field))
+           ("fieldsToInit failed on field " ^ field ^ ", file saved in " ^ filename))
 let f () =
   Crowbar.add_test ~name:"designator and anonymous fields"
     [ gen_type 20 ] test

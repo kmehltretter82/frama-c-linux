@@ -129,13 +129,13 @@ let test (types, kind) =
     let filename = generate_failure_file kind is_const types in
     Crowbar.fail
       ("typeOffset should have marked a field as const. \
-        See example in file '" ^ filename ^ "'.")
+        File saved in '" ^ filename ^ "'.")
   end
   else if not is_const && has_const then begin
     let filename = generate_failure_file kind is_const types in
     Crowbar.fail
       ("typeOffset declared const a field that should have been mutable. \
-        See example in file '" ^ filename ^ "'.")
+        File saved in '" ^ filename ^ "'.")
   end
   else true
 

@@ -143,17 +143,16 @@ let test (allowZeroSizeArrays, typ, types, kind) =
     if not (Cil.isCompleteType ~allowZeroSizeArrays typ) then begin
       let filename = generate_failure_file true (typ, types) in
       Crowbar.fail
-        ("isCompleteType declared as incomplete a complete type. \
-          See example in file '" ^ filename ^ "'.")
+        ("isCompleteType found incomplete a complete type. \
+          File saved in '" ^ filename ^ "'.")
     end;
     true
   | Incomplete | FAM_array ->
     if Cil.isCompleteType typ then begin
       let filename = generate_failure_file false (typ, types) in
       Crowbar.fail
-        ("isCompleteType declared as complete an incomplete type. \
-          See example in file '" ^ filename ^
-         "', which should trigger an error.")
+        ("isCompleteType found complete an incomplete type. \
+          File saved in '" ^ filename ^ "', which should trigger an error.")
     end;
     true
 
