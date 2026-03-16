@@ -1,7 +1,7 @@
 (test
  (name constfold)
  (libraries
-  frama-c.init.cmdline
+  frama-c.init
   frama-c.kernel
   frama-c-inout.core
   frama-c-eva.core
