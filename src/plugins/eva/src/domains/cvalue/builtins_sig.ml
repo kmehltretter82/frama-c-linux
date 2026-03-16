@@ -66,11 +66,9 @@ module type API = sig
   val register_builtin:
     string -> ?replace:string -> ?typ:builtin_type -> builtin -> unit
 
-  (** [unregister_builtin name] unregister a builtin previously registered with
-      {!register_builtin_name} with name [name]. If [replace] was provided,
-      the replaced function must also be unregistered with another call. If the
-      no builtin with this name was previously registered, this function should
-      have no effect. *)
+  (** [unregister_builtin name] unregisters a builtin previously registered
+      with {!register_builtin name}. If there is no builtin with this name,
+      this function has no effect. *)
   val unregister_builtin: string -> unit
 
   (** Has a builtin been registered with the given name? *)
