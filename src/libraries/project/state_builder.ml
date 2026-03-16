@@ -794,7 +794,7 @@ module type Hashconsing_tbl =
     Weak_hashtbl with type data = Data.t
 
 let deterministic =
-  Option.fold ~none:false ~some:(( = ) "yes")
+  Option.fold ~none:false ~some:String.means_yes
     (Sys.getenv_opt "FC_DETERMINISTIC")
 
 module Hashconsing_tbl =
