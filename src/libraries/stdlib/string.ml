@@ -98,3 +98,13 @@ let means_yes s =
   match lowercase_ascii s with
   | "yes" | "true" | "1" -> true
   | _ -> false
+
+
+(* --- Inline test --- *)
+
+let%test "utf8_length" =
+  let pangram = (* Spanish pangram *)
+    "El veloz murciélago hindú comía feliz cardillo y kiwi. La cigüeña tocaba \
+     el saxofón detrás del palenque de paja."
+  in
+  utf8_length pangram = 112
