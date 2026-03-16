@@ -177,16 +177,21 @@ type taint =
     Only consider the taint of the given [name], if any. Otherwise,
     a memory zone is tainted as soon as it is tainted for at least one taint.
     Returns an error if the taint domain was not enabled. *)
-val is_tainted :
-  ?name:string -> Locations.Zone.t -> request -> (taint, error) Result.t
+val is_tainted : ?name:string -> Locations.Zone.t -> request -> taint result
 
+(** Sets of taint names classified by kind of dependency. *)
 type taint_names_by_kind =
   { direct_taint_names: Datatype.String.Set.t;
+    (** Taint names for which the given zone has a direct data dependency. *)
     indirect_taint_names: Datatype.String.Set.t;
+    (** Taint names for which the given zone has an indirect (control)
+        dependency. *)
   }
 
-val taint_names_by_kind:
-  Locations.Zone.t -> request -> (taint_names_by_kind, error) Result.t
+(** Returns the sets of taint names whose tainted locations intersect the given
+    memory zone, classified by kind of dependency (direct or indirect). *)
+val taint_names_by_kind :
+  Locations.Zone.t -> request -> taint_names_by_kind result
 
 (** Computes (an overapproximation of) the memory dependencies of an
     expression. *)

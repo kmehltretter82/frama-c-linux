@@ -723,7 +723,10 @@ type taint_names_by_kind = Taint_domain.taint_names_by_kind =
 let taint_names_by_kind zone request =
   let module M = Make () in
   let state = M.get_state request Taint_domain.key Taint_domain.join in
-  Result.map (fun state -> Taint_domain.taint_names_by_kind state zone) state
+  Result.bind state (fun state ->
+      match Taint_domain.taint_names_by_kind state zone with
+      | `Top -> Error Top
+      | `Value v -> Ok v)
 
 (* Reachability *)
 
