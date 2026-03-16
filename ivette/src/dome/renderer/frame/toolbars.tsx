@@ -301,7 +301,11 @@ export interface SelectionProps<A> {
 // --------------------------------------------------------------------------
 
 export interface ButtonGroupProps<A> extends SelectionProps<A> {
+  /** add vertical separation between button */
+  verticalSep?: boolean;
+  /** Additional class. */
   className?: string;
+  /** Additional style. */
   style?: React.CSSProperties;
 }
 
@@ -312,14 +316,18 @@ export interface ButtonGroupProps<A> extends SelectionProps<A> {
    as appropriate defaults.
  */
 export function ButtonGroup<A>(props: ButtonGroupProps<A>): JSX.Element {
-  const { children, value, onChange, enabled, disabled } = props;
+  const { children, value, onChange, enabled, disabled,
+    verticalSep = false } = props;
   const baseProps: ButtonProps<A> = {
     enabled,
     disabled,
     selection: value,
     onClick: onChange,
   };
-  const className = classes('dome-xToolBar-buttongroup', props.className);
+  const className = classes(
+    'dome-xToolBar-buttongroup',
+    verticalSep && 'dome-xToolBar-buttongroup-separation',
+    props.className);
   return (
     <div className={className} style={props.style}>
       {React.Children.map(children, (elt) => React.cloneElement(

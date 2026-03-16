@@ -17,10 +17,7 @@ import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
 import { alpha } from 'dome/data/compare';
 import { Section, Item, SidebarTitle, makeBadge } from 'dome/frame/sidebars';
-import {
-  Button, IconButton, ItemProps,
-  Multiselect, MultiselectItem, MultiselectItemProps
-} from 'dome/controls/buttons';
+import * as Buttons from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 import * as Toolbar from 'dome/frame/toolbars';
 import { Hbox } from 'dome/layout/boxes';
@@ -86,7 +83,7 @@ interface MenuItemProps {
   enabled?: boolean
 }
 
-export function menuItem(props: MenuItemProps): ItemProps {
+export function menuItem(props: MenuItemProps): Buttons.ItemProps {
   const { label, state, title, enabled = true } = props;
   const [b, flip] = state;
   return {
@@ -153,7 +150,7 @@ function List(props: ListProps): JSX.Element {
   let contents;
 
   if (count <= 0 && total > 0) {
-    const button = <Button {...filterButtonProps}
+    const button = <Buttons.Button {...filterButtonProps}
       label={`${Name}s filters`} />;
     contents =
       <div className='dome-xSideBarSection-content'>
@@ -244,73 +241,54 @@ function FctItem(props: FctItemProps): JSX.Element {
 // --- Generic filter
 // --------------------------------------------------------------------------
 
-export interface LocalFilter extends Ast.filter {
-  showPositive: boolean,
-  showNegative: boolean
-}
+interface LocalFilter extends Ast.filter { value: string }
 
 function isVisible(
   value: { filters: [string, boolean][] },
   localFilters: LocalFilter[]
 ): boolean {
   return localFilters.every(f => {
-      const { id, showPositive, showNegative } = f;
-      const current = value.filters.find(([k, ]) => k === id)?.[1];
-      return current === undefined ? true // default true
-            : (showPositive && current) || (showNegative && !current);
+      const current = value.filters.find(([k, ]) => k === f.id);
+      /**
+       * If f.value is ‘all’ or if the filter does not exist in
+       * the current value: returns true.
+       * Otherwise, the returned value depends on the match between
+       * the current value and the selected filter.
+       */
+      return current === undefined || f.value ==="all"
+        || (f.value === f.positive_label && current[1])
+        || (f.value === f.negative_label && !current[1]);
     });
 }
 
-function getContextMenu(
-  localFilters: LocalFilter[],
-  set: (id: string, type: "pos" | "neg", newValue: boolean) => void
-): MultiselectItemProps[] {
-  const newMenu: MultiselectItemProps[] = [];
-  localFilters.forEach(filter => {
-      newMenu.push({
-        label: "Show " + filter.positive_label,
-        enabled: filter.enabled,
-        title: filter.positive_label || '',
-        checked: filter.showPositive,
-        onClick: () => set(filter.id, 'pos', !filter.showPositive),
-      });
-      newMenu.push({
-        label: "Show " + filter.negative_label,
-        enabled: filter.enabled,
-        title: filter.negative_label || '',
-        checked: filter.showNegative,
-        onClick: () => set(filter.id, 'neg', !filter.showNegative),
-      });
-      newMenu.push("separator");
-  });
-  return newMenu;
-}
-
 type FilterKind = 'functions' | 'variables'
-
 /**
  * This hook returns the list of Boolean filters to display and
  * a function to modify the value of a filter.
  */
-function useFilterLocal(filters: Ast.filter[], kind: FilterKind): [
-  LocalFilter[],
-  setFilterValue: (id: string, type: "pos" | "neg", newValue: boolean) => void
-] {
+function useFilterLocal(filters: Ast.filter[], kind: FilterKind)
+: [LocalFilter[], setFilterValue: (id: string, value: string) => void] {
   const name = `ivette.${kind}.filters`;
-  const decode = Json.jDict(Json.jBoolean);
+  const decode = Json.jDict(Json.jString);
   const [savedFilters, setSavedFilters] = useWindowSettings(name, decode, {});
 
   const setFilterValue = React.useCallback(
-    (id: string, type: 'pos' | 'neg', newValue: boolean): void => {
+    (id: string, value: string): void => {
       const newObj = structuredClone(savedFilters);
-      newObj[`${id}.${type}`] = newValue;
+      newObj[id] = value;
       setSavedFilters(newObj);
   }, [savedFilters, setSavedFilters]);
 
+  function getValue(f: Ast.filter): string {
+    if(f.positive_default && f.negative_default) return 'all';
+    else if(f.positive_default) return f.positive_label;
+    else if(f.negative_default) return f.negative_label;
+    else return 'all';
+  }
+
   const localFilters = filters.map(f => {
-    const showPositive = savedFilters[`${f.id}.pos`] ?? f.positive_default;
-    const showNegative = savedFilters[`${f.id}.neg`] ?? f.negative_default;
-    return { ...f, showPositive, showNegative };
+    const value = savedFilters[`${f.id}`] ?? getValue(f);
+    return { ...f, value };
   });
 
   return [localFilters, setFilterValue];
@@ -319,6 +297,23 @@ function useFilterLocal(filters: Ast.filter[], kind: FilterKind): [
 function useFiltersFlipSettings(label: string, type: string, b: boolean)
 : setting {
   return Dome.useFlipSettings(`ivette.${type}.${label}`, b);
+}
+
+function getSelectElement(descr: string, kind: string)
+: Buttons.SelectButtonElement {
+  const label = descr.replace(kind, "").replace(/\s*\([^)]*\)/g, '');
+  const title = `Show only ${descr}`;
+  return { id: descr, label, title };
+}
+
+function getFilterButtonProps(f: LocalFilter, kind: string)
+: Buttons.SelectButtonElement[] {
+  const allTitle = `Show both ${f.positive_label} and ${f.negative_label}`;
+  return [
+    { id: 'all', label: 'All', title: allTitle },
+    getSelectElement(f.positive_label, kind),
+    getSelectElement(f.negative_label, kind)
+  ];
 }
 
 // --------------------------------------------------------------------------
@@ -358,21 +353,26 @@ export function useFunctionFilter(): FunctionFilterRet {
   }, [localFilters, selected, isSelected, multipleSelectionActive
   ]);
 
-  const contextFctMenuItems: MultiselectItemProps[] = React.useMemo(() => {
-    const dyn = getContextMenu(localFilters, setLocalFilters);
-    dyn.push(
-      menuItem({
-        label: 'Selected only',
-        state: selectedState,
-        title: 'Show only the functions selected in the Locations panel',
-        enabled: multipleSelectionActive })
-    );
-    return dyn;
-  }, [localFilters, setLocalFilters, selectedState, multipleSelectionActive]);
+  const itemsComp = localFilters.map(e =>
+    <Buttons.SelectButton
+      key={e.id}
+      buttonList={getFilterButtonProps(e, 'functions')}
+      selected={e.value}
+      onSelection={(a: string) => setLocalFilters(e.id, a)}
+    />
+  );
 
-  const itemsComp = contextFctMenuItems.map(
-    (e, i) => <MultiselectItem key={i} item={e} />);
-  const contextFctFilter = <Multiselect>{ itemsComp }</Multiselect>;
+  itemsComp.push(<Toolbar.Button
+      key='selectedOnly'
+      label= 'Selected only'
+      selected={selectedState[0] }
+      onClick={selectedState[1]}
+      title= 'Show only the functions selected in the Locations panel'
+      disabled= {!multipleSelectionActive} />
+  );
+
+  const contextFctFilter = <Buttons.Multiselect title="Show functions">
+    { itemsComp }</Buttons.Multiselect>;
 
   return { contextFctFilter, multipleSelection, showFunction, isSelected };
 }
@@ -456,13 +456,17 @@ export function useVariableFilter(): VariablesFilterRet {
     };
   }, [localFilters]);
 
-  const contextVarMenuItems: MultiselectItemProps[] = React.useMemo(() => {
-    return getContextMenu(localFilters, setLocalFilters);
-  }, [localFilters, setLocalFilters]);
-
-  const itemsComp = contextVarMenuItems.map(
-    (e, i) => <MultiselectItem key={i} item={e} />);
-  const contextVarFilter =  <Multiselect>{ itemsComp }</Multiselect>;
+  const itemsComp = localFilters.map(e =>
+    <Buttons.SelectButton
+      key={e.id}
+      buttonList={getFilterButtonProps(e, 'variables')}
+      selected={e.value}
+      onSelection={(a: string) => setLocalFilters(e.id, a)}
+    />
+  );
+  const contextVarFilter =  <Buttons.Multiselect title='Show variables'>
+      { itemsComp }
+    </Buttons.Multiselect>;
 
   return { contextVarFilter, showVariable };
 }
@@ -678,7 +682,7 @@ export function useAnnotFilter(): AnnotFilterRet {
     linvariants, lmodel, lvolatile, lextensions
   ]);
 
-  const contextMenuItems: MultiselectItemProps[] = [
+  const contextMenuItems: Buttons.MultiselectItemProps[] = [
     menuItem({ label: 'Show Logic Types',
                state: ltypesState }),
     menuItem({ label: 'Show Predicates and Logic Functions',
@@ -700,8 +704,9 @@ export function useAnnotFilter(): AnnotFilterRet {
   ];
 
   const itemsComp = contextMenuItems.map(
-    (e, i) => <MultiselectItem key={i} item={e} />);
-  const contextAnnotFilter = <Multiselect>{ itemsComp }</Multiselect>;
+    (e, i) => <Buttons.MultiselectItem key={i} item={e} />);
+  const contextAnnotFilter =
+    <Buttons.Multiselect>{itemsComp}</Buttons.Multiselect>;
 
   return {
     contextAnnotFilter,
@@ -1040,7 +1045,7 @@ export function Files(props: FilesProps): JSX.Element {
             }
             { showFcts ? <Node key='fctsFiltered' id='fctsFiltered'
               label={'Functions'} title={'Functions'}  actions={<>
-                  <Dropdown control={ <IconButton icon='FILTER' /> }
+                  <Dropdown control={ <Buttons.IconButton icon='FILTER' /> }
                   >{contextFctFilter}</Dropdown>
                   {makeBadge(fctsFiltered.length)}
                 </>}
@@ -1050,7 +1055,7 @@ export function Files(props: FilesProps): JSX.Element {
             { showVars ? <Node key='varsFiltered' id='varsFiltered'
               label={'Variables'} title={'Variables'}
               actions={<>
-                  <Dropdown control={ <IconButton icon='FILTER' /> }
+                  <Dropdown control={ <Buttons.IconButton icon='FILTER' /> }
                   >{contextVarFilter}</Dropdown>
                   {makeBadge(varsFiltered.length)}
                 </>}
@@ -1060,7 +1065,7 @@ export function Files(props: FilesProps): JSX.Element {
             { showAnnot ? <Node key='annotsFiltered' id='annotsFiltered'
               label={'Annotations'} title={'Annotations'}
               actions={<>
-                  <Dropdown control={ <IconButton icon='FILTER' /> }
+                  <Dropdown control={ <Buttons.IconButton icon='FILTER' /> }
                   >{contextAnnotFilter}</Dropdown>
                   {makeBadge(annotsFiltered.length)}
                 </>}
@@ -1127,7 +1132,7 @@ function SidebarFilesTools(props: SidebarFilesToolProps): React.JSX.Element {
           label=''
           placeholder='Search'
           state={searchByNameState}
-          actions={<IconButton
+          actions={<Buttons.IconButton
             icon='TRASH'
             onClick={() =>
               searchByNameState.onChanged(undefined, undefined, false)}

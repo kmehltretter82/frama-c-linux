@@ -20,6 +20,7 @@ import { classes } from 'dome/misc/utils';
 import { Vbox } from 'dome/layout/boxes';
 import { Icon } from './icons';
 import './style.css';
+import * as ToolBar from 'dome/frame/toolbars';
 
 interface EVENT {
   stopPropagation: () => void;
@@ -381,9 +382,9 @@ export interface RadioGroupProps<A> {
   value?: A;
   /** Callback to selected values. */
   onChange?: (newValue: A) => void;
-  /** Default selected value. */
+  /** Additional CSS class. */
   className?: string;
-  /** Additional style for the `< dov /> ` container of Raiods */
+  /** Additional style for the `<div/>` container. */
   style?: React.CSSProperties;
   /** [[Radio]] Buttons. */
   children?: React.ReactNode;
@@ -456,9 +457,9 @@ export interface SelectProps {
   focus?: boolean;
   /** Callback to selected values. */
   onChange?: (newValue?: string) => void;
-  /** Default selected value. */
+  /** Additional CSS class. */
   className?: string;
-  /** Additional style for the `< dov /> ` container of Raiods */
+  /** Additional style for the `<div/>` container. */
   style?: React.CSSProperties;
   /** Shall be standard `<option/>` and `<optgroup/>` elements. */
   children?: React.ReactNode;
@@ -503,6 +504,61 @@ export function SelectMenu(props: SelectProps): JSX.Element {
   );
 }
 
+/** ButtonProps without properties managed by `SelectButton`,
+    plus an unique id for each element. */
+export type SelectButtonElement =
+  Omit<ToolBar.ButtonProps<string>,
+    'onClick' | 'selected' | 'selection' | 'children'>
+  & { id: string }
+
+export interface SelectButtonProps {
+  /** List of buttons. */
+  buttonList: SelectButtonElement[];
+  /** Button selected in the group. */
+  selected: string;
+  /** Called when the selected button changes. */
+  onSelection: (a: string) => void;
+  /** Vertical separation, default to true. */
+  verticalSep?: boolean;
+  /** Defaults to `false`. */
+  disabled?: boolean;
+  /** Additional CSS class. */
+  className?: string;
+  /** Additional style for the `<div/> ` container. */
+  style?: React.CSSProperties;
+}
+
+/** Selection from a group of buttons.
+    Only one button from the group can be selected at a time. */
+export function SelectButton(props: SelectButtonProps)
+: React.JSX.Element | null {
+  const { buttonList, selected, onSelection,
+    disabled = false, verticalSep = true } = props;
+
+  const className = classes(
+    'dome-xMenu-Item',
+    'dome-xMenu-Item-Button',
+    disabled && 'dome-xMenu-Item-disabled',
+    props.className
+  );
+
+  if(buttonList.length < 2) return null;
+  return (
+    <div className={className}>
+      <ToolBar.ButtonGroup disabled={disabled} verticalSep={verticalSep}>
+        {buttonList.map(b =>
+          <ToolBar.Button {...b}
+            key={b.id}
+            selected={b.id === selected}
+            onClick={() => onSelection(b.id)}
+          />
+        )}
+      </ToolBar.ButtonGroup>
+    </div>
+  );
+}
+
+
 // --------------------------------------------------------------------------
 // --- Multiselect
 // --------------------------------------------------------------------------
@@ -544,8 +600,20 @@ export function MultiselectItem({ item }: {item: MultiselectItemProps})
     </div>;
 }
 
-export function Multiselect({ children }: {children: React.ReactNode})
-: React.JSX.Element { return <Vbox>{ children }</Vbox>; }
+export function Multiselect(
+  { title, children }: {title?: string, children: React.ReactNode}
+): React.JSX.Element {
+  return (
+    <Vbox>
+      { title &&
+        <Vbox className='dome-xMenu-Item-title dome-xMenu-Item-separator'>
+          {title}
+        </Vbox>
+      }
+      { children }
+    </Vbox>
+  );
+}
 
 // --------------------------------------------------------------------------
 // --- Spinner
@@ -572,9 +640,9 @@ export interface SpinnerProps {
   vstep?: number;
   /** Callback to selected values. */
   onChange?: (newValue: number) => void;
-  /** Default selected value. */
+  /** Additional CSS class. */
   className?: string;
-  /** Additional style for the `< dov /> ` container of Raiods */
+  /** Additional style for the `<div/> ` container. */
   style?: React.CSSProperties;
 }
 
@@ -629,9 +697,9 @@ export interface FieldProps {
   onChange?: (newValue: string) => void;
   /** Callback on every modification. */
   onEdited?: (tmpValue: string) => void;
-  /** Default selected value. */
+  /** Additional CSS class. */
   className?: string;
-  /** Additional style for the `< dov /> ` container of Raiods */
+  /** Additional style for the `<div/> ` container. */
   style?: React.CSSProperties;
 }
 
