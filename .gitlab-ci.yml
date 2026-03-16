@@ -61,6 +61,18 @@ variables:
     refs:
       - schedules
 
+.build_template: &when_weekly
+  only:
+    variables:
+      - $WEEKLY == "yes"
+  <<: *when_schedules
+
+.build_template: &when_nightly
+  only:
+    variables:
+      - $NIGHTLY == "yes"
+  <<: *when_schedules
+
 .build_template: &when_publish
   only:
     variables:
@@ -273,12 +285,12 @@ crowbar-tests:
   allow_failure: true
   <<: *manual_when_not_special_pipeline
 
-crowbar-tests-nightly:
+crowbar-tests-weekly:
   stage: tests
   script:
     - ./nix/build-proxy.sh crowbar-tests
   allow_failure: true
-  <<: *when_schedules
+  <<: *when_weekly
 
 crowbar-tests-release:
   stage: tests
@@ -658,7 +670,7 @@ opam-pin-manual:
 
 opam-pin-nightly:
   <<: *opam_pin_template
-  <<: *when_schedules
+  <<: *when_nightly
 
 opam-pin-release:
   <<: *opam_pin_template
@@ -700,7 +712,7 @@ opam-pin-minimal:
 
 opam-pin-minimal-nightly:
   <<: *opam_pin_minimal_template
-  <<: *when_schedules
+  <<: *when_nightly
 
 opam-pin-minimal-release:
   <<: *opam_pin_minimal_template
@@ -722,9 +734,9 @@ src-distrib-tests:
   <<: *src_distrib_tests_template
   <<: *manual_when_not_special_pipeline
 
-src-distrib-tests-scheduled:
+src-distrib-tests-nightly:
   <<: *src_distrib_tests_template
-  <<: *when_schedules
+  <<: *when_nightly
 
 src-distrib-tests-release:
   <<: *src_distrib_tests_template
