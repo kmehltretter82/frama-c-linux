@@ -426,13 +426,16 @@ module rec Transfer
       | Tbase_addr(_, t) | Toffset(_, t) | Tblock_length(_, t) | Tlet(_, t) ->
         state_ref := register_term kf !state_ref t;
         Cil.DoChildren
+      | Tapp (_, _, tlist) ->
+        state_ref := List.fold_left (register_term kf) !state_ref tlist;
+        Cil.DoChildren
       | TConst _ | TSizeOf _ | TAlignOf _  | Tnull | Ttype _
       | Tempty_set ->
         (* no left-value inside inside: skip for efficiency *)
         Cil.SkipChildren
       | TUnOp _ | TBinOp _ | Ttypeof _ | TSizeOfE _
       | TLval _ | TAlignOfE _ | TCast _ | TAddrOf _
-      | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _ | Tif _ | Tat _
+      | TStartOf _ | Tlambda _ | TDataCons _ | Tif _ | Tat _
       | TUpdate _ | Tunion _ | Tinter _
       | Tcomprehension _ | Trange _  ->
         (* potential sub-term inside *)

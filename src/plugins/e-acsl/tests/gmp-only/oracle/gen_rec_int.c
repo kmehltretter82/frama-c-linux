@@ -18,6 +18,8 @@ int main(void)
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int i = 1;
+  __e_acsl_store_block((void *)(& i),4UL);
+  __e_acsl_full_init((void *)(& i));
   {
     __e_acsl_mpz_t __gen_e_acsl_i;
     __e_acsl_mpz_t __gen_e_acsl_identity_4;
@@ -48,6 +50,7 @@ int main(void)
   }
   /*@ assert identity(i) == i; */ ;
   __retres = 0;
+  __e_acsl_delete_block((void *)(& i));
   __e_acsl_memory_clean();
   return __retres;
 }

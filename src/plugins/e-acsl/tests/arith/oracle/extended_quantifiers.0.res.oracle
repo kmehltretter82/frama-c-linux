@@ -1,4 +1,30 @@
 [e-acsl] beginning translation.
+[e-acsl] extended_quantifiers.c:31: Warning: 
+  E-ACSL construct `lambda function' is not yet supported. Ignoring annotation.
+[e-acsl] extended_quantifiers.c:30: Warning: 
+  E-ACSL construct `lambda function' is not yet supported. Ignoring annotation.
+[e-acsl] extended_quantifiers.c:29: Warning: 
+  E-ACSL construct `lambda function' is not yet supported. Ignoring annotation.
+[e-acsl] extended_quantifiers.c:28: Warning: 
+  E-ACSL construct `lambda function' is not yet supported. Ignoring annotation.
+[e-acsl] extended_quantifiers.c:24: Warning: 
+  E-ACSL construct `lambda function' is not yet supported. Ignoring annotation.
+[e-acsl] extended_quantifiers.c:23: Warning: 
+  E-ACSL construct `lambda function' is not yet supported. Ignoring annotation.
+[e-acsl] extended_quantifiers.c:21: Warning: 
+  E-ACSL construct `lambda function' is not yet supported. Ignoring annotation.
+[e-acsl] extended_quantifiers.c:19: Warning: 
+  E-ACSL construct `lambda function' is not yet supported. Ignoring annotation.
+[e-acsl] extended_quantifiers.c:18: Warning: 
+  E-ACSL construct `lambda function' is not yet supported. Ignoring annotation.
+[e-acsl] extended_quantifiers.c:17: Warning: 
+  E-ACSL construct `lambda function' is not yet supported. Ignoring annotation.
+[e-acsl] extended_quantifiers.c:16: Warning: 
+  E-ACSL construct `lambda function' is not yet supported. Ignoring annotation.
+[e-acsl] extended_quantifiers.c:15: Warning: 
+  E-ACSL construct `lambda function' is not yet supported. Ignoring annotation.
+[e-acsl] extended_quantifiers.c:14: Warning: 
+  E-ACSL construct `lambda function' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] extended_quantifiers.c:14: Warning: 
   signed overflow. assert 2 * __gen_e_acsl_k <= 2147483647;

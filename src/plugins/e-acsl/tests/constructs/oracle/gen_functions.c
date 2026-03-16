@@ -347,6 +347,8 @@ int main(void)
   }
   /*@ assert g(x) == x; */ ;
   char c = (char)99;
+  __e_acsl_store_block((void *)(& c),1UL);
+  __e_acsl_full_init((void *)(& c));
   {
     char __gen_e_acsl_h_char_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
@@ -368,6 +370,8 @@ int main(void)
   }
   /*@ assert h_char(c) == c; */ ;
   short s = (short)1;
+  __e_acsl_store_block((void *)(& s),2UL);
+  __e_acsl_full_init((void *)(& s));
   {
     short __gen_e_acsl_h_short_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
@@ -434,6 +438,8 @@ int main(void)
   /*@ assert t2(t1(m)) == 17; */ ;
   __gen_e_acsl_k(9);
   double d = 2.0;
+  __e_acsl_store_block((void *)(& d),8UL);
+  __e_acsl_full_init((void *)(& d));
   {
     double __gen_e_acsl_f2_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
@@ -798,6 +804,9 @@ int main(void)
   }
   /*@ assert \let n = 0 == 0 ? 0x7fffffffffffffffL : -1; rf5(n) == 0; */ ;
   __retres = 0;
+  __e_acsl_delete_block((void *)(& d));
+  __e_acsl_delete_block((void *)(& s));
+  __e_acsl_delete_block((void *)(& c));
   __e_acsl_delete_block((void *)(& y));
   __e_acsl_delete_block((void *)(& x));
   __e_acsl_memory_clean();

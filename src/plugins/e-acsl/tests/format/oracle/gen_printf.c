@@ -114,6 +114,7 @@ void apply_specifier(char *format, int spec)
   int n;
   char *tmp_1;
   __e_acsl_store_block((void *)(& tmp_1),8UL);
+  __e_acsl_store_block((void *)(& spec),4UL);
   __e_acsl_store_block((void *)(& format),8UL);
   void *p = (void *)0;
   __e_acsl_full_init((void *)(& tmp_1));
@@ -148,6 +149,7 @@ void apply_specifier(char *format, int spec)
     }
     __e_acsl_delete_block((void *)(& tmp_0));
   }
+  __e_acsl_delete_block((void *)(& spec));
   __e_acsl_delete_block((void *)(& format));
   __e_acsl_delete_block((void *)(& tmp_1));
   return;
@@ -217,6 +219,8 @@ void test_specifier_application(char const *allowed, char const *fmt,
         char *tmp_2;
         __e_acsl_store_block((void *)(& tmp_2),8UL);
         int c = (int)*(valid_specifiers + i_0);
+        __e_acsl_store_block((void *)(& c),4UL);
+        __e_acsl_full_init((void *)(& c));
         __e_acsl_initialize((void *)(format + (len - 1)),sizeof(char));
         *(format + (len - 1)) = (char)c;
         __e_acsl_full_init((void *)(& tmp_2));
@@ -258,6 +262,7 @@ void test_specifier_application(char const *allowed, char const *fmt,
           }
         }
         __e_acsl_delete_block((void *)(& tmp_2));
+        __e_acsl_delete_block((void *)(& c));
       }
       i_0 ++;
     }
@@ -412,6 +417,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
   char const *__gen_e_acsl_at;
   char *__retres;
   __e_acsl_store_block((void *)(& __retres),8UL);
+  __e_acsl_store_block((void *)(& c),4UL);
   __e_acsl_store_block((void *)(& s),8UL);
   __gen_e_acsl_at = s;
   __gen_e_acsl_at_2 = s;
@@ -515,6 +521,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
     }
     __e_acsl_contract_clean(__gen_e_acsl_contract);
+    __e_acsl_delete_block((void *)(& c));
     __e_acsl_delete_block((void *)(& s));
     __e_acsl_delete_block((void *)(& __retres));
     return __retres;

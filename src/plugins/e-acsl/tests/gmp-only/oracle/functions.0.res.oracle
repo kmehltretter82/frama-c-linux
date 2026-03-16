@@ -1,4 +1,7 @@
 [e-acsl] beginning translation.
+[e-acsl] functions.c:67: Warning: 
+  E-ACSL construct `function application' is not yet supported.
+  Ignoring annotation.
 [e-acsl] functions.c:50: Warning: 
   E-ACSL construct `function application' is not yet supported.
   Ignoring annotation.

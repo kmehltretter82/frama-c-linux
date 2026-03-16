@@ -14,7 +14,9 @@ int __gen_e_acsl_f(int i);
 
 int f(int i)
 {
+  __e_acsl_store_block((void *)(& i),4UL);
   int j = i + 1;
+  __e_acsl_delete_block((void *)(& i));
   return j;
 }
 
@@ -40,6 +42,7 @@ int __gen_e_acsl_f(int i)
 {
   int __gen_e_acsl_at;
   int __retres;
+  __e_acsl_store_block((void *)(& i),4UL);
   __gen_e_acsl_at = i;
   __retres = f(i);
   {
@@ -61,6 +64,7 @@ int __gen_e_acsl_f(int i)
     __e_acsl_assert(__retres == __gen_e_acsl_incr_app,
                     & __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+    __e_acsl_delete_block((void *)(& i));
     return __retres;
   }
 }

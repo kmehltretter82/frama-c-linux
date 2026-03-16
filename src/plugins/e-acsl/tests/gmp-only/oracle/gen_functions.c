@@ -334,6 +334,8 @@ int main(void)
   }
   /*@ assert g(x) == x; */ ;
   char c = (char)99;
+  __e_acsl_store_block((void *)(& c),1UL);
+  __e_acsl_full_init((void *)(& c));
   {
     __e_acsl_mpz_t __gen_e_acsl_c;
     __e_acsl_mpz_t __gen_e_acsl_h_char_2;
@@ -362,6 +364,8 @@ int main(void)
   }
   /*@ assert h_char(c) == c; */ ;
   short s = (short)1;
+  __e_acsl_store_block((void *)(& s),2UL);
+  __e_acsl_full_init((void *)(& s));
   {
     __e_acsl_mpz_t __gen_e_acsl_s;
     __e_acsl_mpz_t __gen_e_acsl_h_short_2;
@@ -422,6 +426,8 @@ int main(void)
   /*@ assert t2(t1(m)) == 17; */ ;
   __gen_e_acsl_k(9);
   double d = 2.0;
+  __e_acsl_store_block((void *)(& d),8UL);
+  __e_acsl_full_init((void *)(& d));
   {
     __e_acsl_mpq_t __gen_e_acsl__13;
     __e_acsl_mpq_t __gen_e_acsl_d;
@@ -477,6 +483,9 @@ int main(void)
   }
   /*@ assert 0.499999 < f2(d) < 0.500001; */ ;
   __retres = 0;
+  __e_acsl_delete_block((void *)(& d));
+  __e_acsl_delete_block((void *)(& s));
+  __e_acsl_delete_block((void *)(& c));
   __e_acsl_delete_block((void *)(& y));
   __e_acsl_delete_block((void *)(& x));
   __e_acsl_memory_clean();

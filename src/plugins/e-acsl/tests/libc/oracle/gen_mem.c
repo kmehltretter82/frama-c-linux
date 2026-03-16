@@ -407,6 +407,7 @@ void *__gen_e_acsl_memset(void *s, int c, size_t n)
   {
     int __gen_e_acsl_valid_or_empty_here_2;
     __e_acsl_store_block((void *)(& n),8UL);
+    __e_acsl_store_block((void *)(& c),4UL);
     __e_acsl_store_block((void *)(& s),8UL);
     __gen_e_acsl_at = s;
     __gen_e_acsl_at_2 = n;
@@ -450,6 +451,7 @@ void *__gen_e_acsl_memset(void *s, int c, size_t n)
     __e_acsl_assert(__retres == __gen_e_acsl_at,& __gen_e_acsl_assert_data_7);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
     __e_acsl_delete_block((void *)(& n));
+    __e_acsl_delete_block((void *)(& c));
     __e_acsl_delete_block((void *)(& s));
     return __retres;
   }
