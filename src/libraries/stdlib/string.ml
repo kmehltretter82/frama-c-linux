@@ -83,3 +83,8 @@ let percent_encode s =
         Buffer.add_string buf percent_code)
     s;
   Buffer.contents buf
+
+let means_yes s =
+  match lowercase_ascii s with
+  | "yes" | "true" | "1" -> true
+  | _ -> false

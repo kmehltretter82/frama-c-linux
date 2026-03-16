@@ -33,16 +33,12 @@ module Verbose_level = Log.Make_level(struct let default = 1 end)
 let dkey = Kernel_log.dkey_cmdline
 
 let quiet_ref = ref false
-let deterministic = ref false
 let tty = ref Unix.(isatty stdout && Ansi_escape.is_supported ())
 let permissive = ref false
-let compress_saved_session = ref true
 
 let set_tty isatty =
   tty := isatty;
   Log.reset_stdout ~isatty  ()
-
-let last_project_created_by_copy = ref (fun () -> assert false)
 
 (* ************************************************************************* *)
 (** {2 Handling errors} *)
@@ -459,6 +455,11 @@ let configure_ocaml_gc n =
     if space_overhead <> gc_control.space_overhead then
       Gc.set { gc_control with space_overhead }
 
+let deprecated_deterministic () =
+  Kernel_log.warning
+    "'-deterministic' is deprecated and does nothing, use environment \
+     variable 'FC_DETERMINISTIC=yes' instead."
+
 let () =
   let first_parsing_stage () =
     parse
@@ -471,15 +472,15 @@ let () =
         "-debug", Int (fun n -> Debug_level.set n);
         "-kernel-verbose", Int (fun n -> Kernel_log.Verbose_level.set n);
         "-kernel-debug", Int (fun n -> Kernel_log.Debug_level.set n);
-        "-deterministic", Unit (fun () -> deterministic := true);
+        "-deterministic", Unit (fun () -> deprecated_deterministic ());
         "-tty", Unit (fun () -> set_tty true);
         "-no-tty", Unit (fun () -> set_tty false);
         "-permissive", Unit (fun () -> permissive := true);
         "-memory-footprint", Int configure_ocaml_gc;
         "-compress-saved-session", Unit (fun () ->
-            compress_saved_session := true);
+            Project.compress_saved_session := true);
         "-no-compress-saved-session", Unit (fun () ->
-            compress_saved_session := false)
+            Project.compress_saved_session := false)
       ]
       false
       all_options
@@ -495,10 +496,12 @@ let () =
     ~on_error:run_error_exit_hook
 
 let quiet = !quiet_ref
-let deterministic = !deterministic
+let deterministic =
+  Option.fold ~none:false ~some:(( = ) "yes")
+    (Sys.getenv_opt "FC_DETERMINISTIC")
+
 let tty = !tty
 let permissive = !permissive
-let compress_saved_session = !compress_saved_session
 
 (* ************************************************************************* *)
 (** {2 Plugin} *)
@@ -955,46 +958,40 @@ type project_functions = {
 }
 
 let project_functions =
-  let current () =
-    Extlib.mk_labeled_fun "Cmdline.project_functions.current"
-  in
-  let on_from_pid _ _ =
-    Extlib.mk_labeled_fun "Cmdline.project_functions.on_from_pid"
-  in
-  let pid_to_name _ =
-    Extlib.mk_labeled_fun "Cmdline.project_functions.pid_to_name"
-  in
-  let name_to_pid _ =
-    Extlib.mk_labeled_fun "Cmdline.project_functions.name_to_pid"
+  let current = Project.get_current_pid in
+  let on_from_pid pid f = Project.on_from_pid pid f () in
+  let pid_to_name = Project.pid_to_name in
+  let name_to_pid name =
+    let none () = Kernel_log.abort "no project named `%s'" name in
+    Option.value_or_else ~none (Project.name_to_pid name)
   in
   ref { current; on_from_pid; pid_to_name; name_to_pid }
 
 let play_in_toplevel nb_used play options =
-  let prj_funs = !project_functions in
   (* [aux then_opts] handles the following "-then" options *)
   let rec aux current = function
     | None -> ()
     | Some(options, then_argument) ->
       let play_on options p =
         p,
-        prj_funs.on_from_pid
-          p
-          (fun () -> play_in_toplevel_one_shot nb_used play options)
+        Project.on_from_pid
+          p (fun () -> play_in_toplevel_one_shot nb_used play options) ()
       in
       let last_current, then_opts = match then_argument with
         | Default -> current, play_in_toplevel_one_shot nb_used play options
         | Last ->
-          (match !last_project_created_by_copy () with
+          (match Project.last_project_created_by_copy () with
            | None -> Kernel_log.abort "no known last created project."
            | Some p -> play_on options p)
         | Replace ->
-          (match !last_project_created_by_copy () with
+          (match Project.last_project_created_by_copy () with
            | None -> Kernel_log.abort "no known last created project."
            | Some p ->
-             let current = prj_funs.pid_to_name current in
+             let current = Project.pid_to_name current in
              play_on (("-remove-projects=-@all,+" ^ current) :: options) p)
         | Name p_name ->
-          let pid = prj_funs.name_to_pid p_name in
+          let none () = Kernel_log.abort "no project named `%s'" p_name in
+          let pid = Option.value_or_else ~none (Project.name_to_pid p_name) in
           play_on options pid
       in
       aux last_current then_opts
@@ -1002,7 +999,7 @@ let play_in_toplevel nb_used play options =
   (* play the first shot before the first "-then" *)
   let then_opts = play_in_toplevel_one_shot nb_used play options in
   (* play the "-then" options *)
-  let current = prj_funs.current () in
+  let current = Project.get_current_pid () in
   aux current then_opts
 
 let parse_and_boot ~get_toplevel ~play_analysis =
@@ -1273,3 +1270,7 @@ let kernel_verbose_atleast_ref =
 
 let () = Log.cmdline_at_error_exit := at_error_exit [@@alert "-deprecated"]
 let () = Log.cmdline_error_occurred := error_occurred  [@@alert "-deprecated"]
+
+let compress_saved_session = !Project.compress_saved_session
+
+let last_project_created_by_copy = ref Project.last_project_created_by_copy

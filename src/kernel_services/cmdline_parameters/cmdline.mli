@@ -379,8 +379,12 @@ val compress_saved_session: bool
 (** Indicates whether the saved sessions should be compressed or not.
 
     @since 31.0-Gallium *)
+[@@deprecated "Use Project.compress_saved_session instead."]
+[@@migrate { repl = Project.compress_saved_session } ]
 
 val last_project_created_by_copy: (unit -> int option) ref
+[@@deprecated "Use Project.last_project_created_by_copy instead."]
+[@@migrate { repl = Project.last_project_created_by_copy } ]
 
 type project_functions = {
   current: unit -> int;
@@ -388,7 +392,9 @@ type project_functions = {
   pid_to_name: int -> string;
   name_to_pid: string -> int;
 }
+
 val project_functions : project_functions ref
+[@@deprecated "Use Project functions instead. 'current' was renamed 'get_current_pid'."]
 
 val load_all_plugins: (unit -> unit) ref
 

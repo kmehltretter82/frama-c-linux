@@ -31,6 +31,16 @@ type project = Project_skeleton.t =
 (** Type of a project. *)
 
 (* ************************************************************************* *)
+(** {2 Options} *)
+(* ************************************************************************* *)
+
+val compress_saved_session: bool ref
+(** This is used to decide if projects should be compressed when saved with
+    {!save} and {!save_all} without the [?compress] parameter. Defaults to
+    [true].
+    @since Frama-C+dev *)
+
+(* ************************************************************************* *)
 (** {2 Operations on all projects} *)
 (* ************************************************************************* *)
 
@@ -57,6 +67,9 @@ val current: unit -> t
 
 val is_current: t -> bool
 (** Check whether the given project is the current one or not. *)
+
+val last_project_created_by_copy: unit -> int option
+(** @since Frama-C+dev *)
 
 val iter_on_projects: (t -> unit) -> unit
 (** iteration on project starting with the current one. *)
@@ -100,6 +113,21 @@ val get_debug_name: t -> string
 (** @return a project name appended with its id.
     @since 32.0-Germanium *)
 
+val get_current_pid: unit -> int
+(** The current project {!pid}.
+    @raise NoProject if there is no project.
+    @since Frama-C+dev *)
+
+val pid_to_name: int -> string
+(** Return a project name based from its {!pid}.
+    @raise Unknown_project if no project has this unique pid.
+    @since Frama-C+dev *)
+
+val name_to_pid: string -> int option
+(** Return the project {!pid} based on its name. If several projects are found
+    with the same name, the most recent one will be picked (emits a warning).
+    @since Frama-C+dev *)
+
 val set_name: t -> string -> unit
 (** Set the name of the given project.
     @since Boron-20100401 *)
@@ -113,7 +141,7 @@ exception Unknown_project
 
 val from_pid: int -> t
 (** Return a project based on {!pid}.
-    @raise Unknown_project if no project has this unique name.
+    @raise Unknown_project if no project has this unique pid.
     @since 32.0-Germanium *)
 
 val set_current: ?on:bool -> ?selection:State_selection.t -> t -> unit
@@ -137,6 +165,11 @@ val on: ?selection:State_selection.t -> t -> ('a -> 'b) -> 'a -> 'b
     restores the current project. You should use this function if you use a
     project different of [current ()].
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+
+val on_from_pid: ?selection:State_selection.t -> int -> ('a -> 'b) -> 'a -> 'b
+(** Same than {!on} but find the project using its {!pid}.
+    @raise Log.AbortError if no project with this [pid] is found
+    @since Frama-C+dev *)
 
 val set_keep_current: bool -> unit
 (** [set_keep_current b] keeps the current project forever (even after the end
@@ -209,7 +242,8 @@ exception IOError of string
 val save:
   ?compress:bool -> ?selection:State_selection.t -> ?project:t ->
   Filepath.t -> unit
-(** Save a given project in a file. Default project is [current ()].
+(** Save a given project in a file. Default project is [current ()]. [?compress]
+    defaults to {!compress_saved_session}.
     @raise IOError if the project cannot be saved.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
@@ -229,7 +263,8 @@ val load: ?selection:State_selection.t -> ?name:string -> Filepath.t -> t
 
 val save_all:
   ?compress:bool -> ?selection:State_selection.t -> Filepath.t -> unit
-(** Save all the projects in a file.
+(** Save all the projects in a file. [?compress] defaults to
+    {!compress_saved_session}.
     @raise IOError a project cannot be saved. *)
 
 val load_all: ?selection:State_selection.t -> Filepath.t -> unit

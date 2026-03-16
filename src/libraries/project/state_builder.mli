@@ -297,8 +297,10 @@ module Hashconsing_tbl_weak: Hashconsing_tbl
     @since Aluminium-20160501  *)
 module Hashconsing_tbl_not_weak: Hashconsing_tbl
 
-(** Weak or non-weak hashconsing tables, depending on variable
-    {!Cmdline.deterministic}.
+(** Weak or non-weak hashconsing tables, depending on environment variable
+    [FC_DETERMINISTIC] (set to [yes] to enable this).
+    @before Frama-C+dev used {!Cmdline.deterministic} instead of
+    [FC_DETERMINISTIC].
     @since Aluminium-20160501  *)
 module Hashconsing_tbl: Hashconsing_tbl
 

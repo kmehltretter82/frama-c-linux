@@ -43,3 +43,8 @@ val html_escape: string -> string
     Cf. {{:https://datatracker.ietf.org/doc/html/rfc3986#section-2.3}} for the
     list of unreserved characters. *)
 val percent_encode: string -> string
+
+(** Return [true] if the string is ["yes"], ["true"] or ["1"] (ignore case).
+    @since Frama-C+dev
+*)
+val means_yes: string -> bool

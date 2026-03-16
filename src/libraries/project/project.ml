@@ -7,6 +7,12 @@
 (**************************************************************************)
 
 (* ************************************************************************** *)
+(** {2 Project options} *)
+(* ************************************************************************** *)
+
+let compress_saved_session = ref true
+
+(* ************************************************************************** *)
 (** {2 Project skeleton} *)
 (* ************************************************************************** *)
 
@@ -235,11 +241,8 @@ let current () = Q.top projects
 let is_current p = equal p (current ())
 
 let last_created_by_copy_ref: t option ref = ref None
-let () =
-  Cmdline.last_project_created_by_copy :=
-    (fun () -> match !last_created_by_copy_ref with
-       | None -> None
-       | Some p -> Some p.pid)
+let last_project_created_by_copy  () =
+  Option.map (fun p -> p.pid) !last_created_by_copy_ref
 
 let iter_on_projects f = Q.iter f projects
 let fold_on_projects f acc = Q.fold f acc projects
@@ -287,6 +290,23 @@ let create name =
 let get_pid p = p.pid
 let get_name p = p.name
 let get_debug_name = get_project_debug_name
+
+let get_current_pid () = current () |> get_pid
+
+let pid_to_name pid = from_pid pid |> get_name
+
+let name_to_pid p_name =
+  let project =
+    match find_all p_name with
+    | [ p ] -> Some p
+    | _ :: _ as projects ->
+      Kernel_log.warning ~wkey
+        "multiple projects named `%s', choosing most recently created"
+        p_name;
+      Some (pick_most_recently_created projects)
+    | [] -> None
+  in
+  Option.map get_pid project
 
 exception NoProject = Q.Empty
 
@@ -356,6 +376,10 @@ let on ?selection p f x =
     in
     if Kernel_log.debug_atleast 1 then go ()
     else begin try go () with e -> set_to_old old_current; raise e end
+
+let on_from_pid ?selection pid f x =
+  try on ?selection (from_pid pid) f x
+  with Unknown_project -> Kernel_log.abort "no project with id `%d'." pid
 
 (* [set_current] must never be called internally. *)
 module Hide_set_current = struct let set_current () = assert false end
@@ -448,11 +472,10 @@ let temp_file ~prefix ~suffix =
   with Sys_error s ->
     Kernel_log.abort "cannot create temporary file: %s" s
 
-let save_projects ?compress selection projects (filename : Filepath.t) =
-  let compress =
-    Option.value ~default:Cmdline.compress_saved_session compress
-  in
+let save_projects ?compress selection projects
+    (filename : Filepath.t) =
   let open Filesystem.Operators in
+  let compress = Option.value ~default:!compress_saved_session compress in
   let$ cout = Filesystem.Compressed.with_open_out_exn ~compress filename in
   Channel.output_value cout System_config.Version.id;
   Channel.output_value cout magic;
@@ -714,37 +737,6 @@ module Undo = struct
     filename := temp_file ~prefix:short_filename ~suffix:".sav"
 
 end
-
-
-(* ************************************************************************** *)
-(** {2 Special Cmdline functions} *)
-(* ************************************************************************** *)
-
-let () =
-  let project_functions : Cmdline.project_functions =
-    let current () = current () |> get_pid in
-    let on_from_pid pid f =
-      try on (from_pid pid) f ()
-      with Unknown_project -> Kernel_log.abort "no project with id `%d'." pid
-    in
-    let pid_to_name pid = from_pid pid |> get_name in
-    let name_to_pid p_name =
-      let project =
-        match find_all p_name with
-        | [ p ] -> p
-        | _ :: _ as projects ->
-          Kernel_log.warning
-            "multiple projects named `%s', choosing most recently created"
-            p_name;
-          pick_most_recently_created projects
-        | [] -> Kernel_log.abort "no project named `%s'" p_name
-      in
-      get_pid project
-    in
-    { current; on_from_pid; pid_to_name; name_to_pid }
-  in
-  Cmdline.project_functions := project_functions
-
 
 (* Exporting Datatype for an easy external use *)
 module Datatype = D

@@ -1928,18 +1928,6 @@ module CacheSize =
 let () = CacheSize.set_range ~min:1 ~max:10
 let () = CacheSize.add_update_hook (fun _ i -> Binary_cache.set_cache_size i)
 
-let () = Parameter_customize.set_group grp_debug
-let () = Parameter_customize.set_negative_option_name ""
-let () = Parameter_customize.set_cmdline_stage Cmdline.Early
-module Deterministic =
-  Bool
-    (struct
-      let module_name = "Deterministic"
-      let default = not Cmdline.deterministic
-      let option_name = "-deterministic"
-      let help = ""
-    end)
-
 (* ************************************************************************* *)
 (** {2 Other options} *)
 (* ************************************************************************* *)
