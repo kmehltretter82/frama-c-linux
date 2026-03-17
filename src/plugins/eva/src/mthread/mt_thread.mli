@@ -109,6 +109,7 @@ module ThreadState : sig
 
   val recompute_because: t -> recompute_reason -> unit
 
+  val needs_recomputation: t -> bool
 end
 
 
@@ -182,6 +183,7 @@ val should_compute_thread: thread_state -> bool
 
 val pretty_recompute_reasons: analysis_state Pretty_utils.formatter
 
+val needs_recomputation: analysis_state -> bool
 
 module OrderedThreads : sig
   val family_tree: analysis_state -> thread list Thread.Hashtbl.t

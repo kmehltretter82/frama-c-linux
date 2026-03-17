@@ -296,10 +296,6 @@ let post_iteration analysis =
 
   save_to_disk analysis
 
-let is_fixpoint_reached analysis =
-  threads analysis
-  |> List.for_all (fun th -> SetRecomputeReason.is_empty th.th_to_recompute)
-
 (* Remove "white" nodes in the cfg, ie accesses to variables that
    are not concurrent at all. Done at the very end of the analysis
    because

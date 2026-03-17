@@ -264,7 +264,7 @@ let mthread_fixpoint engine analysis =
   analysis.iteration <- 0;
   while
     analysis.iteration < limit &&
-    not (Mt_analysis_fixpoint.is_fixpoint_reached analysis)
+    Mt_thread.needs_recomputation analysis
   do
     analysis.iteration <- analysis.iteration + 1;
     Mt_self.feedback "***** Iteration %d" analysis.iteration;
@@ -275,7 +275,7 @@ let mthread_fixpoint engine analysis =
     Mt_analysis_fixpoint.post_iteration analysis
   done;
 
-  if Mt_analysis_fixpoint.is_fixpoint_reached analysis then
+  if not (Mt_thread.needs_recomputation analysis) then
     Mt_self.feedback "******* Analysis performed, %d iterations"
       analysis.iteration
   else

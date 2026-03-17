@@ -125,6 +125,9 @@ module ThreadState = struct
        is split by the value analysis *)
     then
       th.th_to_recompute <- SetRecomputeReason.add r th.th_to_recompute
+
+  let needs_recomputation th =
+    not (SetRecomputeReason.is_empty th.th_to_recompute)
 end
 
 
@@ -344,3 +347,7 @@ let pretty_recompute_reasons fmt analysis =
   in
   Format.fprintf fmt "@[<v>Remaining to do:@ %t@]"
     (fun fmt -> iter_threads analysis (pretty_thread_reasons fmt))
+
+let needs_recomputation analysis =
+  threads analysis
+  |> List.exists ThreadState.needs_recomputation

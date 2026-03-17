@@ -11,4 +11,3 @@ val pre_thread_analysis :
 val post_thread_analysis : Mt_thread.analysis_state -> unit
 val post_iteration : Mt_thread.analysis_state -> unit
 val mark_shared_nodes_kind : Mt_thread.analysis_state -> unit
-val is_fixpoint_reached : Mt_thread.analysis_state -> bool
