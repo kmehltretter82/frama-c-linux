@@ -57,12 +57,9 @@ let test l first last =
     true
 
 let mk_arg =
-  Crowbar.map [ Crowbar.option (Crowbar.range 20) ]
-    (fun opt_x -> match opt_x with
-       | None -> None
-       | Some x -> Some (x - 10))
+  Crowbar.map [ Crowbar.option (Crowbar.range 20) ] (Option.map (fun x -> x - 10))
 
-let gen_list = Crowbar.list (Crowbar.range 10000)
+let gen_list = Crowbar.list (Crowbar.range 100)
 
 let f () =
   Crowbar.add_test ~name:"List.slice"
