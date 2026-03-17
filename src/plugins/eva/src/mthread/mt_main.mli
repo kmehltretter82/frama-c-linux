@@ -8,6 +8,6 @@
 
 val register_hooks: Mt_thread.analysis_state -> unit
 val unregister_hooks: unit -> unit
-val checks: unit -> unit
+val pre_analysis: unit -> unit
 val make_analysis_state: unit -> Mt_thread.analysis_state
 val post_analysis: Mt_thread.analysis_state -> unit

@@ -58,7 +58,7 @@ let unregister_hooks () =
   List.iter unregister Mt_analysis_hooks.mthread_builtins
 
 
-let checks () =
+let pre_analysis () =
   Mt_self.warning
     "Mthread is an experimental plugin and is still in development.";
 
