@@ -1,7 +1,7 @@
 # Crowbar tests
 
 This folder regroup some tests using the OCaml library Crowbar.
-To run these tests the environnement variable `CROWBAR` must be defined :
+To run these tests the environment variable `CROWBAR` must be defined :
 
 ```bash
 CROWBAR= dune test tests/crowbar
