@@ -228,7 +228,7 @@ let mthread_thread_analysis engine analysis final_states th =
     in
 
     (* Store the thread analysis final state. *)
-    Thread.Hashtbl.replace final_states Thread.main final_state;
+    Thread.Hashtbl.replace final_states th.th_eva_thread final_state;
 
     if Mt_options.ShowTime.get () then
       Mt_self.feedback ~level:2
