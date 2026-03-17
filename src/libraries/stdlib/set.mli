@@ -35,7 +35,7 @@ module type S = sig
     (Format.formatter -> elt -> unit) ->
     Format.formatter -> t -> unit
 
-  (** Pretty prints the list as a user readable text.
+  (** Pretty prints the set as a user readable text.
       @param format defaults to "%t"
       @param item defaults to "%a"
       @param sep defaults to ",@ "

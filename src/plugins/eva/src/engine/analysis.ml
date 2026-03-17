@@ -193,7 +193,6 @@ let check_thread_analysis thread kf =
       Kernel_function.pretty kf Thread.pretty thread
 
 let compute_thread (type t) (engine: t engine) ?cvalue_state thread =
-  let module Engine = (val engine) in
   let Thread.{ entry_point; arguments } = Thread.properties thread in
   check_thread_analysis thread entry_point;
   let arguments =
@@ -203,7 +202,7 @@ let compute_thread (type t) (engine: t engine) ?cvalue_state thread =
   in
   (* In multi thread analyses, Memexec cache must be invalidated *)
   Mem_exec.cleanup_results ();
-  compute_from_entry_point (module Engine)
+  compute_from_entry_point engine
     ~thread ?cvalue_state ?arguments entry_point
 
 let mthread_thread_analysis engine analysis final_states th =
@@ -245,8 +244,6 @@ let mthread_thread_analysis engine analysis final_states th =
 
 (* Auxiliary function iterating the analysis until the fixpoint is reached *)
 let mthread_fixpoint engine analysis =
-  let open Mt_thread in
-
   (* Store thread analyse final result of each thread in a Hashtbl. For now,
      only the result of the main thread is used. *)
   let final_states = Thread.Hashtbl.create 1 in
@@ -271,7 +268,7 @@ let mthread_fixpoint engine analysis =
   do
     analysis.iteration <- analysis.iteration + 1;
     Mt_self.feedback "***** Iteration %d" analysis.iteration;
-    iter_threads analysis
+    Mt_thread.iter_threads analysis
       (mthread_thread_analysis engine analysis final_states);
     Mt_self.feedback "***** Threads computed for iteration %d."
       analysis.iteration;
@@ -283,10 +280,9 @@ let mthread_fixpoint engine analysis =
       analysis.iteration
   else
     Mt_self.feedback
-      "@[<v>******* Analysis stopped after %d iterations.\
-       @ Remaining to do: %a@]"
+      "@[<v>******* Analysis stopped after %d iterations.@ %a@]"
       analysis.iteration
-      pretty_recompute_reasons analysis;
+      Mt_thread.pretty_recompute_reasons analysis;
 
   (* Return the main thread final state. *)
   Thread.Hashtbl.find final_states Thread.main
