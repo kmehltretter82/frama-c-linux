@@ -180,7 +180,7 @@ and print_type_spec fmt = function
   | Tfloat -> fprintf fmt  "float"
   | Tfloat32 -> fprintf fmt "_Float32"
   | Tfloat64 -> fprintf fmt "_Float64"
-  | Tdouble -> fprintf fmt "double "
+  | Tdouble -> fprintf fmt "double"
   | Tsigned -> fprintf fmt "signed"
   | Tunsigned -> fprintf fmt "unsigned"
   | Tnamed s -> fprintf fmt "%s" s
