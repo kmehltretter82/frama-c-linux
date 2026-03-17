@@ -1018,6 +1018,9 @@ let () = ArrayPrecisionLevel.add_update_hook
 (* --- Messages                                                          --- *)
 (* ------------------------------------------------------------------------- *)
 
+(* Export verbose option generated when creating the Eva plugin. *)
+module Verbose = Self.Verbose
+
 let () = Parameter_customize.set_group messages
 module ValShowPerf =
   False
