@@ -25,13 +25,14 @@
 Plugin E-ACSL <next-release>
 ###############################################################################
 
--* E-ACSL       [2026-03-05] Fix violations of physical term uniqueness. The
-                             -check flag now enables a uniqueness verification.
--* E-ACSL       [2026-02-03] fix typing error occurring on global structs when
-                             concurrency is enabled
--* E-ACSL       [2026-05-03] fix backslashes occurring in generated identifiers
--* E-ACSL       [2025-12-07] fix unsound-marking of inductive funs/predicates
--* E-ACSL       [2025-11-08] Fix some bugs in the inductive extraction.
+-* E-ACSL     [2026-03-16] Fix E-ACSL API: no longer expose all of the modules.
+-* E-ACSL     [2026-03-05] Fix violations of physical term uniqueness. The
+                           -check flag now enables a uniqueness verification.
+-* E-ACSL     [2026-02-03] fix typing error occurring on global structs when
+                           concurrency is enabled
+-* E-ACSL     [2026-05-03] fix backslashes occurring in generated identifiers
+-* E-ACSL     [2025-12-07] fix unsound-marking of inductive funs/predicates
+-* E-ACSL     [2025-11-08] Fix some bugs in the inductive extraction.
 -* E-ACSL     [2026-03-05] fix occurrence of \ghost attribute in generated code
 -* E-ACSL     [2026-02-03] fix typing error occurring on global structs when
                            concurrency is enabled
