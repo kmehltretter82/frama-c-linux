@@ -297,6 +297,7 @@ let fc_internal_attributes =
   ; frama_c_init_obj
   ; frama_c_mutable
   ; fc_stdlib_generated
+  ; fc_literal
   ; fc_local_static
   ; frama_c_destructor
   ; frama_c_inlined
