@@ -1,5 +1,5 @@
   $ dune build --cache=disabled --root . @install
-This test should not timeout, dune error "Rule produced directory" is "normal"
+If this test times out (code 124), try to increase the value below
   $ timeout 10.0 dune runtest --cache=disabled --root .
   Running Crowbar tests on mutable
   mutable typeOffset: PASS
@@ -9,4 +9,5 @@ This test should not timeout, dune error "Rule produced directory" is "normal"
 
   $ dune build --cache=disabled --root . _build/default/mutable_mutable_fail.cmxs
 
+This produces an output when the test generated an error
   $ ./failed_test.sh
