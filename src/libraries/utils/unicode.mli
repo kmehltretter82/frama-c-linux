@@ -84,4 +84,7 @@ val pp_ceil : 'a Pretty_utils.formatter -> 'a Pretty_utils.formatter (** âŒˆeltâ
 
 (* Complete strings *)
 
+(** [pp_string fmt s] pretty prints a string [s] as {!Format.pp_print_string},
+    but each unicode character is counted as one character for Format line
+    splitting policies. This avoids differences with OCaml < 5.4. *)
 val pp_string : Format.formatter -> string -> unit
