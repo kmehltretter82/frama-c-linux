@@ -1,5 +1,7 @@
 open Cabs
 
+[@@@warning "-32-27"]
+
 let loc = Cil_datatype.Location.unknown
 
 let gen_int_type =
@@ -70,7 +72,7 @@ let gen_constant =
     map [ float ]
       (fun f ->
          let up = 4.0 in
-         let f = if f < 0.0 then 0. else f in
+         let f = if f < 0.0 || Float.is_nan f then 0. else f in
          let f = if f > up then up else f in
          mk_exp (CONSTANT (CONST_FLOAT (string_of_float f))))
   ]
@@ -111,17 +113,18 @@ let gen_binary t op e1 e2 =
 let gen_question c et ef =
   mk_exp (QUESTION (c,et,ef))
 
-let gen_expr =
-  let open Crowbar in
-  fix
-    (fun gen_expr ->
-       choose [
-         gen_constant;
-         map [ gen_int_type; gen_unary_op; gen_expr] gen_unary;
-         map [ gen_int_type; gen_binary_op; gen_expr; gen_expr ] gen_binary;
-         map [ gen_expr; gen_expr; gen_expr ] gen_question;
-         map [ gen_type; gen_expr ] gen_cast;
-       ])
+let rec gen_expr_l n =
+  if n <= 0 then lazy gen_constant
+  else lazy (
+    let open Crowbar in
+    choose [
+      gen_constant;
+      map [ gen_int_type; gen_unary_op; gen_expr (n-1)] gen_unary;
+      map [ gen_int_type; gen_binary_op; gen_expr (n-1); gen_expr (n-1) ] gen_binary;
+      map [ gen_expr (n-1); gen_expr (n-1); gen_expr (n-1)] gen_question;
+      map [ gen_type; gen_expr (n-1) ] gen_cast;
+    ])
+and gen_expr n = Crowbar.unlazy (gen_expr_l n)
 
 let gen_cabs typ expr =
   let expr = protected_cast typ expr in
@@ -183,20 +186,21 @@ let run typ expr =
   Kernel.SignedDowncast.off ();
   Kernel.UnsignedOverflow.off ();
   Kernel.UnsignedDowncast.off ();
-  Kernel.add_debug_keys Kernel.dkey_constfold;
+  Kernel.UnsignedOverflow.off ();
+  Kernel.set_warn_status Kernel.wkey_decimal_float Log.Winactive;
+  Eva.Parameters.Verbose.set 0;
   (* otherwise, we must load scope in addition to eva. *)
   Dynamic.Parameter.Bool.off "-eva-remove-redundant-alarms" ();
   Errorloc.clear_errors ();
-  Format.printf "Cabs is@\n%a@." Cprint.printFile cabs;
   let cil =
     try Cabs2cil.convFile cabs
     with exn ->
-      Crowbar.failf "Failed to typecheck cabs: %s@\n%a@."
+      Crowbar.failf "@[<v2>Failed to typecheck cabs: %s@\n%a@]@."
         (Printexc.to_string exn)
         Cprint.printFile cabs
   in
   if Errorloc.had_errors () then begin
-    Crowbar.failf "Failed to typecheck cabs (had errors)@\n%a@."
+    Crowbar.failf "@[<v2>Failed to typecheck cabs (had errors)@\n%a@]@."
       Cprint.printFile cabs
   end;
   File.init_cil();
@@ -211,15 +215,15 @@ let run typ expr =
   let itv =
     try Cvalue.V.project_ival v1
     with exn ->
-      Crowbar.failf "Eva analysis did not reduce to a constant: %s@\n%t@."
+      Crowbar.failf "@[<v2>Eva analysis did not reduce to a constant: %s@\n%t@]@."
         (Printexc.to_string exn)
         (fun fmt -> File.pretty_ast ~fmt ())
   in
   if not (Ival.is_one itv) then begin
-    Crowbar.failf "const fold did not reduce to identical value:@\n%t@."
+    Crowbar.failf "@[<v2>Const fold did not reduce to identical value:@\n%t@]@."
       (fun fmt -> File.pretty_ast ~fmt ())
   end
 
-let f () = Crowbar.add_test ~name:"constfold" [gen_type; gen_expr] run
+let f () = Crowbar.add_test ~name:"constfold" [gen_type; gen_expr 2] run
 
 let () = Crowbar_utils.run "constfold" f

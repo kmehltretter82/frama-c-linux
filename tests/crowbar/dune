@@ -15,7 +15,6 @@
 
 (cram
   (applies_to constfold)
-  (enabled_if false) ; Turn off this test for now because of CI issues
   (deps
     (package frama-c-eva)
     (package frama-c-inout))
