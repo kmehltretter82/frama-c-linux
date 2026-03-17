@@ -162,36 +162,35 @@ let generate_failure_file name offset types  =
 
 let test { designator; offsets; structs } =
   match structs with
-  | [] -> Crowbar.bad_test ()
+  | [] -> ()
   | comp :: _ ->
     (match designator with
-     | None -> Crowbar.bad_test ()
+     | None -> ()
      | Some field ->
-       let offset, expected =
-         match Datatype.String.Map.find_opt field offsets with
-         | None | Some [] -> Crowbar.bad_test ()
-         | Some (hd :: _ as l) -> hd, l
-       in
-       try
-         let result = Cabs2cil.fieldsToInit comp designator in
-         if List.length result <> List.length expected ||
-            not (List.for_all2 Cil_datatype.Offset.equal result expected)
-         then begin
+       match Datatype.String.Map.find_opt field offsets with
+       | None | Some [] -> ()
+       | Some (offset :: _ as expected) ->
+         try
+           let result = Cabs2cil.fieldsToInit comp designator in
+           if List.length result <> List.length expected ||
+              not (List.for_all2 Cil_datatype.Offset.equal result expected)
+           then begin
+             let filename = generate_failure_file "anonymous" offset structs in
+             let pp_sep fmt () = Format.pp_print_string fmt " " in
+             Crowbar.fail
+               (Format.asprintf
+                  "fieldsToInit didn't find appropriate offset for %s in %s.\n\
+                   expected offsets were %a\n\
+                   returned offsets are  %a"
+                  field filename
+                  (Format.pp_print_list ~pp_sep Cil_printer.pp_offset) expected
+                  (Format.pp_print_list ~pp_sep Cil_printer.pp_offset) result)
+           end
+         with Log.AbortFatal _ ->
            let filename = generate_failure_file "anonymous" offset structs in
-           let pp_sep fmt () = Format.pp_print_string fmt " " in
            Crowbar.fail
-             (Format.asprintf
-                "fieldsToInit didn't find appropriate offset for %s in %s.\n\
-                 expected offsets were %a\n\
-                 returned offsets are  %a"
-                field filename
-                (Format.pp_print_list ~pp_sep Cil_printer.pp_offset) expected
-                (Format.pp_print_list ~pp_sep Cil_printer.pp_offset) result)
-         end
-       with Log.AbortFatal _ ->
-         let filename = generate_failure_file "anonymous" offset structs in
-         Crowbar.fail
-           ("fieldsToInit failed on field " ^ field ^ ", file saved in " ^ filename))
+             ("fieldsToInit failed on field " ^ field ^ ", file saved in " ^ filename))
+
 let f () =
   Crowbar.add_test ~name:"designator and anonymous fields"
     [ gen_type 20 ] test
