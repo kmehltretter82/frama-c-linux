@@ -205,7 +205,7 @@ let compute_thread (type t) (engine: t engine) ?cvalue_state thread =
   compute_from_entry_point engine
     ~thread ?cvalue_state ?arguments entry_point
 
-let mthread_thread_analysis engine analysis final_states th =
+let thread_analysis engine analysis final_states th =
   let open Mt_thread in
   if SetRecomputeReason.is_empty th.th_to_recompute then
     Mt_self.debug "No need to recompute thread %a" ThreadState.pretty th
@@ -269,7 +269,7 @@ let mthread_fixpoint engine analysis =
     analysis.iteration <- analysis.iteration + 1;
     Mt_self.feedback "***** Iteration %d" analysis.iteration;
     Mt_thread.iter_threads analysis
-      (mthread_thread_analysis engine analysis final_states);
+      (thread_analysis engine analysis final_states);
     Mt_self.feedback "***** Threads computed for iteration %d."
       analysis.iteration;
     Mt_analysis_fixpoint.post_iteration analysis
