@@ -73,7 +73,10 @@ class frama_c_copy: Project.t -> frama_c_visitor
     visitor creates the new values. (Technically, the method
     [fill_global_tables] is called inside this project.)
     See {!File.init_project_from_visitor} and [create_project_from_visitor]
-    for possible uses. *)
+    for possible uses.
+    {b NB:} If no recursive child of the given entry is modified during the
+    visit, then the visitor returns the exact (physically identical) entry. For
+    instance, copying a term returns the exact same term. *)
 
 class frama_c_refresh: Project.t -> frama_c_visitor
 (** Similar to {!frama_c_copy}, but ids will be refreshed in the copy.
