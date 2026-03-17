@@ -336,13 +336,13 @@ extern int getchar(void);
 // Number of characters that will read by gets()
 /*@
   axiomatic GetsLength {
-    logic size_t gets_length{L} reads *__fc_stdin;
+    logic size_t gets_length{L}(FILE *f) reads *f;
   }
 */
 
 /*@
-  requires room_s: \valid(s+(0..gets_length));
-  assigns s[0..gets_length] \from *__fc_stdin ;
+  requires room_s: \valid(s+(0..gets_length(__fc_stdin)));
+  assigns s[0..gets_length(__fc_stdin)] \from *__fc_stdin ;
   assigns \result \from s, *__fc_stdin;
   assigns *__fc_stdin \from *__fc_stdin;
   ensures result_null_or_same: \result == s || \result == \null;
@@ -614,17 +614,17 @@ extern int dprintf(int fd, const char *restrict format, ...);
 
 /*@
   requires valid_command: valid_read_string(command);
-  requires valid_type: valid_read_string(type);
-  assigns \result \from indirect:*command, indirect:*type,
+  requires valid_mode: valid_read_string(mode);
+  assigns \result \from indirect:*command, indirect:*mode,
     &__fc_fopen;
-  assigns __fc_fopen[0..] \from indirect:*command, indirect:*type,
+  assigns __fc_fopen[0..] \from indirect:*command, indirect:*mode,
     __fc_fopen[0..];
   ensures result_error_or_valid_open_pipe:
     \result == \null ||
     (\subset(\result,&__fc_fopen[0 .. __FC_FOPEN_MAX-1]) &&
      is_open_pipe(\result));
 */
-extern FILE *popen(const char *command, const char *type);
+extern FILE *popen(const char *command, const char *mode);
 
 /*@
   requires valid_stream: \valid(stream);
