@@ -367,4 +367,20 @@ void main(void)
   return;
 }
 
+__int128 i128 = (__int128)1;
+__uint128_t u128 = (__uint128_t)(-1);
+void int128_ops(void)
+{
+  __uint128_t tmp;
+  if (u128 > (__uint128_t)i128) tmp = u128 - (__uint128_t)1;
+  else tmp = (__uint128_t)(i128 + (__int128)1);
+  unsigned __int128 u128a = tmp;
+  u128a += (u128a * (unsigned __int128)2) / u128;
+  u128a >>= 1;
+  u128a %= u128 + (__uint128_t)1234567890ULL;
+  u128a -= (unsigned __int128)((__int128)1234567890ULL + i128);
+  i128 = (__int128)(-1) + i128;
+  return;
+}
+
 

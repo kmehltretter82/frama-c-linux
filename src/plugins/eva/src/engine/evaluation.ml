@@ -152,6 +152,7 @@ let signed_ikind = function
   | IShort | IUShort        -> IShort
   | ILong | IULong          -> ILong
   | ILongLong | IULongLong  -> ILongLong
+  | IInt128 | IUInt128      -> IInt128
 
 let rec signed_counterpart typ =
   let typ = Ast_types.unroll typ in

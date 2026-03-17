@@ -48,6 +48,8 @@ struct
   let read_uint32 m a = e_fun f_read_uint32 [ m ; a ]
   let f_read_uint64 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_uint64"
   let read_uint64 m a = e_fun f_read_uint64 [ m ; a ]
+  let f_read_uint128 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_uint128"
+  let read_uint128 m a = e_fun f_read_uint128 [ m ; a ]
   let f_read_sint8 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_sint8"
   let read_sint8 m a = e_fun f_read_sint8 [ m ; a ]
   let f_read_sint16 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_sint16"
@@ -56,6 +58,8 @@ struct
   let read_sint32 m a = e_fun f_read_sint32 [ m ; a ]
   let f_read_sint64 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_sint64"
   let read_sint64 m a = e_fun f_read_sint64 [ m ; a ]
+  let f_read_sint128 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_sint128"
+  let read_sint128 m a = e_fun f_read_sint128 [ m ; a ]
   let f_write_uint8 = Lang.extern_f ~result:t_memory ~library "write_uint8"
   let write_uint8 m a v = e_fun f_write_uint8 [ m ; a ; v ]
   let f_write_uint16 = Lang.extern_f ~result:t_memory ~library "write_uint16"
@@ -64,6 +68,8 @@ struct
   let write_uint32 m a v = e_fun f_write_uint32 [ m ; a ; v ]
   let f_write_uint64 = Lang.extern_f ~result:t_memory ~library "write_uint64"
   let write_uint64 m a v = e_fun f_write_uint64 [ m ; a ; v ]
+  let f_write_uint128 = Lang.extern_f ~result:t_memory ~library "write_uint128"
+  let write_uint128 m a v = e_fun f_write_uint128 [ m ; a ; v ]
   let f_write_sint8 = Lang.extern_f ~result:t_memory ~library "write_sint8"
   let write_sint8 m a v = e_fun f_write_sint8 [ m ; a ; v ]
   let f_write_sint16 = Lang.extern_f ~result:t_memory ~library "write_sint16"
@@ -72,6 +78,8 @@ struct
   let write_sint32 m a v = e_fun f_write_sint32 [ m ; a ; v ]
   let f_write_sint64 = Lang.extern_f ~result:t_memory ~library "write_sint64"
   let write_sint64 m a v = e_fun f_write_sint64 [ m ; a ; v ]
+  let f_write_sint128 = Lang.extern_f ~result:t_memory ~library "write_sint128"
+  let write_sint128 m a v = e_fun f_write_sint128 [ m ; a ; v ]
 
   (* init *)
   let f_read_init8 = Lang.extern_f ~result:Qed.Logic.Bool ~library "read_init8"
@@ -82,6 +90,8 @@ struct
   let read_init32 m a = e_fun f_read_init32 [ m ; a ]
   let f_read_init64 = Lang.extern_f ~result:Qed.Logic.Bool ~library "read_init64"
   let read_init64 m a = e_fun f_read_init64 [ m ; a ]
+  let f_read_init128 = Lang.extern_f ~result:Qed.Logic.Bool ~library "read_init128"
+  let read_init128 m a = e_fun f_read_init128 [ m ; a ]
   let f_write_init8 = Lang.extern_f ~result:t_init ~library "write_init8"
   let write_init8 m a v = e_fun f_write_init8 [ m ; a ; v ]
   let f_write_init16 = Lang.extern_f ~result:t_init ~library "write_init16"
@@ -90,6 +100,8 @@ struct
   let write_init32 m a v = e_fun f_write_init32 [ m ; a ; v ]
   let f_write_init64 = Lang.extern_f ~result:t_init ~library "write_init64"
   let write_init64 m a v = e_fun f_write_init64 [ m ; a ; v ]
+  let f_write_init128 = Lang.extern_f ~result:t_init ~library "write_init128"
+  let write_init128 m a v = e_fun f_write_init128 [ m ; a ; v ]
 end
 
 (* Model *)
@@ -512,6 +524,8 @@ let load_int_raw memory kind addr =
     | SInt32 -> WBytes.read_sint32
     | UInt64 -> WBytes.read_uint64
     | SInt64 -> WBytes.read_sint64
+    | UInt128 -> WBytes.read_uint128
+    | SInt128 -> WBytes.read_sint128
   in
   read memory addr
 
@@ -533,6 +547,7 @@ let load_init_raw memory size loc =
   | 2 -> WBytes.read_init16 memory loc
   | 4 -> WBytes.read_init32 memory loc
   | 8 -> WBytes.read_init64 memory loc
+  | 16 -> WBytes.read_init128 memory loc
   | _ -> assert false
 
 let load_init_atom sigma obj loc =
@@ -551,6 +566,8 @@ let store_int sigma kind addr v =
     | SInt32 -> WBytes.write_sint32
     | UInt64 -> WBytes.write_uint64
     | SInt64 -> WBytes.write_sint64
+    | UInt128 -> WBytes.write_uint128
+    | SInt128 -> WBytes.write_sint128
   in
   m_mem, write (Sigma.value sigma m_mem) addr v
 
@@ -566,6 +583,7 @@ let store_init_raw m size loc v =
     | 2 -> WBytes.write_init16
     | 4 -> WBytes.write_init32
     | 8 -> WBytes.write_init64
+    | 16 -> WBytes.write_init128
     | _ -> assert false
   in
   write m loc v

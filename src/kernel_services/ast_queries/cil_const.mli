@@ -127,6 +127,14 @@ val ulongType: typ
     @since 30.0-Zinc *)
 val ulongLongType: typ
 
+(** __int128 (GCC extension)
+    @since Frama-C+dev *)
+val int128Type: typ
+
+(** unsigned __int128 (GCC extension)
+    @since Frama-C+dev *)
+val uint128Type: typ
+
 (** char
     @since 30.0-Zinc *)
 val charType: typ

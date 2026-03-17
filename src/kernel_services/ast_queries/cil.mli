@@ -213,6 +213,13 @@ val int32_t: unit -> typ
 *)
 val int64_t: unit -> typ
 
+(** Any signed integer type of size 128 bits.
+    It is equivalent to the (non-ISO C) GCC __int128 type.
+    Must only be called if such type exists in the current architecture.
+    @since Frama-C+dev
+*)
+val int128_t: unit -> typ
+
 (** Any unsigned integer type of size 16 bits.
     It is equivalent to the ISO C uint16_t type but without using the
     corresponding header.
@@ -236,6 +243,13 @@ val uint32_t: unit -> typ
     @since Nitrogen-20111001
 *)
 val uint64_t: unit -> typ
+
+(** Any unsigned integer type of size 128 bits.
+    It is equivalent to the (non-ISO C) GCC unsigned __int128 type.
+    Must only be called if such type exists in the current architecture.
+    @since Frama-C+dev
+*)
+val uint128_t: unit -> typ
 
 (** @return true if and only if the given type is a signed integer type. *)
 val isSignedInteger: typ -> bool

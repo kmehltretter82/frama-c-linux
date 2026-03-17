@@ -24,6 +24,16 @@ __PUSH_FC_STDLIB
 
 __BEGIN_DECLS
 
+#if !defined(__int128_t) && defined(__GNUC__)
+typedef __int128 __int128_t;
+#define __int128_t __int128_t
+#endif
+
+#if !defined(__uint128_t) && defined(__GNUC__)
+typedef unsigned __int128 __uint128_t;
+#define __uint128_t __uint128_t
+#endif
+
 /*@
   requires valid_res: \valid(res);
   assigns \result, *res \from a, b;

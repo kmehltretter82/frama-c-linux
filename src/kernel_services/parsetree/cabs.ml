@@ -30,6 +30,7 @@ type typeSpecifier = (* Merge all specifiers into one type *)
   | Tint
   | Tlong
   | Tint64
+  | Tint128 (* gcc extension *)
   | Tfloat
   | Tfloat32
   | Tfloat64

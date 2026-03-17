@@ -4,7 +4,7 @@
    STDOPT: #"-cpp-extra-args=-DIMAGINARY"
    STDOPT: #"-cpp-extra-args=-DDECIMAL"
    STDOPT: #"-cpp-extra-args=-DINT128"
-   STDOPT: #"-cpp-extra-args=-DUINT128"
+
 */
 
 int main(void) {
@@ -23,10 +23,6 @@ int main(void) {
 
 #ifdef INT128
   __int128 i128 = -1; // Not C11, but GNU extension
-#endif
-
-#ifdef UINT128
-  __uint128_t ui128 = 9; // Not C11, but GNU extension
 #endif
 
   return 0;

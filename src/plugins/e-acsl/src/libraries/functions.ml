@@ -113,6 +113,7 @@ module Libc = struct
       | IULong -> "L" (* [unsigned long] *)
       | ILongLong -> "r" (* [long long] *)
       | IULongLong -> "R" (* [unsigned long long] *)
+      | IInt128 | IUInt128 -> Error.not_yet "functions.ml: 128-bit integers"
       (* _Bool, char and short (either signed or unsigned are promoted to
          int) *)
       | IBool | IChar | ISChar | IUChar | IShort | IUShort -> "d"

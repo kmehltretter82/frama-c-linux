@@ -177,6 +177,7 @@ and print_type_spec fmt = function
   | Tint -> fprintf fmt "int"
   | Tlong -> fprintf fmt "long"
   | Tint64 -> fprintf fmt  "__int64"
+  | Tint128 -> fprintf fmt  "__int128"
   | Tfloat -> fprintf fmt  "float"
   | Tfloat32 -> fprintf fmt "_Float32"
   | Tfloat64 -> fprintf fmt "_Float64"

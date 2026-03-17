@@ -626,8 +626,8 @@ class cil_printer () = object (self)
         | IUInt -> "U"
         | ILong -> "L"
         | IULong -> "UL"
-        | ILongLong -> if Machine.msvcMode () then "L" else "LL"
-        | IULongLong -> if Machine.msvcMode () then "UL" else "ULL"
+        | ILongLong | IInt128 -> if Machine.msvcMode () then "L" else "LL"
+        | IULongLong | IUInt128 -> if Machine.msvcMode () then "UL" else "ULL"
         | IInt | IBool | IShort | IUShort | IChar | ISChar | IUChar -> ""
       in
       let prefix =
@@ -1966,6 +1966,8 @@ class cil_printer () = object (self)
          if Machine.msvcMode ()
          then "unsigned __int64"
          else "unsigned long long"
+       | IInt128 -> "__int128"
+       | IUInt128 -> "unsigned __int128"
       )
 
   method compkind fmt ci =

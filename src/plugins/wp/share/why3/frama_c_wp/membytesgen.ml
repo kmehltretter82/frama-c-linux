@@ -22,9 +22,11 @@ let pp_use fmt (m, alias) =
 let pp_use_list fmt l =
   fprintf fmt "%a" (pp_print_list ~pp_sep:pp_print_cut pp_use) l
 
-let all_sizes = [ 8 ; 16 ; 32 ; 64 ]
-let all_types = [ (false, 8) ; (false, 16) ; (false, 32) ; (false, 64)
-                ; (true , 8) ; (true , 16) ; (true , 32) ; (true , 64) ]
+let all_sizes = [ 8 ; 16 ; 32 ; 64 ; 128 ]
+let all_types = [ (false, 8) ; (false, 16) ; (false, 32) ; (false, 64) ;
+                  (false, 128)
+                ; (true , 8) ; (true , 16) ; (true , 32) ; (true , 64) ;
+                  (true, 128) ]
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Value Encode/Decode                                               --- *)

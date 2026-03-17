@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: #"-machdep gcc_x86_64 -cpp-extra-args='-include __fc_gcc_builtins.h'"
+   STDOPT: +"-machdep gcc_x86_64"
 */
 
 #include <limits.h>

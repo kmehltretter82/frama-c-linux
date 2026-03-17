@@ -313,7 +313,8 @@ let type_to_expr_for_builtin ~loc ~builtin specifier decl_type =
 %token <int64 list * Cabs.cabsloc> CST_WSTRING
 
 %token EOF
-%token<Cabs.cabsloc> BOOL TRUE FALSE CHAR INT DOUBLE FLOAT VOID INT64
+%token<Cabs.cabsloc> BOOL TRUE FALSE CHAR INT DOUBLE FLOAT VOID
+%token<Cabs.cabsloc> INT64 INT128
 %token<Cabs.cabsloc> FLOAT32 FLOAT64 ENUM STRUCT TYPEDEF UNION
 %token<Cabs.cabsloc> SIGNED UNSIGNED LONG SHORT
 %token<Cabs.cabsloc> VOLATILE EXTERN STATIC CONST RESTRICT AUTO REGISTER
@@ -1216,6 +1217,7 @@ type_spec:   /* ISO 6.7.2 */
 | INT      { Tint, $1 }
 | LONG     { Tlong, $1 }
 | INT64    { Tint64, $1 }
+| INT128   { Tint128, $1 }
 | FLOAT    { Tfloat, $1 }
 | DOUBLE   { Tdouble, $1 }
 | FLOAT32  { Tfloat32, $1 }

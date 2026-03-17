@@ -152,6 +152,8 @@ and pp_ikind fmt = function
   | IULong -> Format.fprintf fmt "IULong"
   | ILongLong -> Format.fprintf fmt "ILongLong"
   | IULongLong -> Format.fprintf fmt "IULongLong"
+  | IInt128 -> Format.fprintf fmt "IInt128"
+  | IUInt128 -> Format.fprintf fmt "IUInt128"
 
 and pp_fkind fmt = function
   | FFloat   -> Format.fprintf fmt "FFloat"
