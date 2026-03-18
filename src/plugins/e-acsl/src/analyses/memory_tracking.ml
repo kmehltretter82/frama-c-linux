@@ -83,20 +83,22 @@ let must_never_monitor vi =
    left-values must be tracked by the memory model library *)
 (* ********************************************************************** *)
 
+module Varinfos = Varinfo.Hptset
+
 module Env: sig
   val has_heap_allocations: unit -> bool
   val check_heap_allocations: kernel_function -> unit
-  val default_varinfos: Varinfo.Hptset.t option -> Varinfo.Hptset.t
+  val default_varinfos: Varinfos.t option -> Varinfos.t
   val apply: (kernel_function -> 'a) -> kernel_function -> 'a
   val clear: unit -> unit
-  val add: kernel_function -> Varinfo.Hptset.t option Stmt.Hashtbl.t -> unit
-  val add_init: kernel_function -> Varinfo.Hptset.t option -> unit
-  val mem_init: kernel_function -> Varinfo.Hptset.t option -> bool
-  val find: kernel_function -> Varinfo.Hptset.t option Stmt.Hashtbl.t
+  val add: kernel_function -> Varinfos.t option Stmt.Hashtbl.t -> unit
+  val add_init: kernel_function -> Varinfos.t option -> unit
+  val mem_init: kernel_function -> Varinfos.t option -> bool
+  val find: kernel_function -> Varinfos.t option Stmt.Hashtbl.t
   module StartData:
-    Dataflow.StmtStartData with type data = Varinfo.Hptset.t option
+    Dataflow.StmtStartData with type data = Varinfos.t option
   val is_consolidated: unit -> bool
-  val consolidate: Varinfo.Hptset.t -> unit
+  val consolidate: Varinfos.t -> unit
   val consolidated_mem: varinfo -> bool
   val is_empty: unit -> bool
 end = struct
@@ -109,7 +111,7 @@ end = struct
       !heap_allocation_ref || not (Kernel_function.is_definition kf)
 
   let current_kf = ref None
-  let default_varinfos = function None -> Varinfo.Hptset.empty | Some s -> s
+  let default_varinfos = function None -> Varinfos.empty | Some s -> s
 
   let apply f kf =
     let old = !current_kf in
@@ -122,7 +124,7 @@ end = struct
   let add = Kernel_function.Hashtbl.add tbl
   let find = Kernel_function.Hashtbl.find tbl
 
-  module S = Set.Make(Datatype.Option(Varinfo.Hptset))
+  module S = Set.Make(Datatype.Option(Varinfos))
 
   let tbl_init = Kernel_function.Hashtbl.create 7
   let add_init kf init =
@@ -141,7 +143,7 @@ end = struct
       false
 
   module StartData = struct
-    type data = Varinfo.Hptset.t option
+    type data = Varinfos.t option
     let apply f =
       try
         let kf = Option.value ~default:Cil_datatype.Kf.dummy !current_kf in
@@ -161,16 +163,16 @@ end = struct
   (* TODO: instead of this costly consolidation, why do not take the state of
      the entry point of the function? *)
 
-  let consolidated_set = ref Varinfo.Hptset.empty
+  let consolidated_set = ref Varinfos.empty
   let is_consolidated_ref = ref false
 
   let consolidate set =
-    let set = Varinfo.Hptset.union set !consolidated_set in
+    let set = Varinfos.union set !consolidated_set in
     consolidated_set := set
 
   let consolidated_mem v =
     is_consolidated_ref := true;
-    Varinfo.Hptset.mem v !consolidated_set
+    Varinfos.mem v !consolidated_set
 
   let is_consolidated () = !is_consolidated_ref
 
@@ -181,7 +183,7 @@ end = struct
            Stmt.Hashtbl.iter
              (fun _ set -> match set with
                 | None -> ()
-                | Some s -> if not (Varinfo.Hptset.is_empty s) then raise Exit)
+                | Some s -> if not (Varinfos.is_empty s) then raise Exit)
              h)
         tbl;
       true
@@ -190,7 +192,7 @@ end = struct
 
   let clear () =
     Kernel_function.Hashtbl.clear tbl;
-    consolidated_set := Varinfo.Hptset.empty;
+    consolidated_set := Varinfos.empty;
     is_consolidated_ref := false;
     heap_allocation_ref := false
 
@@ -202,20 +204,20 @@ let reset () =
   Env.clear ()
 
 module rec Transfer
-  : Dataflow.BackwardsTransfer with type t = Varinfo.Hptset.t option
+  : Dataflow.BackwardsTransfer with type t = Varinfos.t option
 = struct
 
   let name = "E_ACSL.Pre_analysis"
 
   let debug = false
 
-  type t = Varinfo.Hptset.t option
+  type t = Varinfos.t option
 
   module StmtStartData = Env.StartData
 
   let pretty fmt state = match state with
     | None -> Format.fprintf fmt "None"
-    | Some s -> Format.fprintf fmt "%a" Varinfo.Hptset.pretty s
+    | Some s -> Format.fprintf fmt "%a" Varinfos.pretty s
 
   (** The data at function exit. Used for statements with no successors.
       This is usually bottom, since we'll also use doStmt on Return
@@ -230,17 +232,17 @@ module rec Transfer
     | _, _, None -> assert false
     | _, None, Some _ -> Some state (* [old] already included in [state] *)
     | Return _, Some old, Some new_ ->
-      Some (Some (Varinfo.Hptset.union old new_))
+      Some (Some (Varinfos.union old new_))
     | _, Some old, Some new_ ->
-      if Varinfo.Hptset.equal old new_ then
+      if Varinfos.equal old new_ then
         None
       else
-        Some (Some (Varinfo.Hptset.union old new_))
+        Some (Some (Varinfos.union old new_))
 
   (** Take the data from two successors and combine it *)
   let combineSuccessors s1 s2 =
     Some
-      (Varinfo.Hptset.union (Env.default_varinfos s1) (Env.default_varinfos s2))
+      (Varinfos.union (Env.default_varinfos s1) (Env.default_varinfos s2))
 
   let is_ptr_or_array ty =
     Ast_types.is_ptr ty || Ast_types.is_array ty
@@ -279,7 +281,7 @@ module rec Transfer
 
   let extend_to_expr always state lhost e =
     let add_vi state vi =
-      if is_ptr_or_array_exp e && (always || Varinfo.Hptset.mem vi state)
+      if is_ptr_or_array_exp e && (always || Varinfos.mem vi state)
       then begin
         match base_addr e with
         | None -> state
@@ -293,7 +295,7 @@ module rec Transfer
             (* String literals can't be monitored. In case we have one,
                drop the attribute. *)
             Demote_string_literal.demote vi_e;
-            Varinfo.Hptset.add vi_e state
+            Varinfos.add vi_e state
           end
       end else
         state
@@ -336,7 +338,7 @@ module rec Transfer
         Printer.pp_varinfo vi
         Kernel_function.pretty kf;
       Demote_string_literal.demote vi;
-      Varinfo.Hptset.add vi varinfos
+      Varinfos.add vi varinfos
     in
     match thost with
     | TVar { lv_origin = None } -> varinfos
@@ -578,8 +580,8 @@ module rec Transfer
               (fun acc p a -> match base_addr a with
                  | None -> acc
                  | Some vi ->
-                   if Varinfo.Hptset.mem vi state
-                   then Varinfo.Hptset.add p acc
+                   if Varinfos.mem vi state
+                   then Varinfos.add p acc
                    else acc)
               state
               params
@@ -591,8 +593,8 @@ module rec Transfer
               match base_addr_node (Lval lv) with
               | None -> init
               | Some vi ->
-                if Varinfo.Hptset.mem vi state
-                then Varinfo.Hptset.add (Misc.result_vi kf) init
+                if Varinfos.mem vi state
+                then Varinfos.add (Misc.result_vi kf) init
                 else init
           in
           let state = Compute.get ~init kf in
@@ -602,7 +604,7 @@ module rec Transfer
             (fun acc p a -> match base_addr a with
                | None -> acc
                | Some vi ->
-                 if Varinfo.Hptset.mem p state then Varinfo.Hptset.add vi acc
+                 if Varinfos.mem p state then Varinfos.add vi acc
                  else acc)
             state
             params
@@ -624,7 +626,7 @@ module rec Transfer
              match base_addr arg with
              | Some vi when Ast_info.is_string_literal vi ->
                Demote_string_literal.demote vi;
-               Varinfo.Hptset.add vi state
+               Varinfos.add vi state
              | _ -> state
           )
           state args
@@ -636,13 +638,13 @@ module rec Transfer
       | Some (lhost, _), true ->
         (* add the result if \result must be kept after calling the kf *)
         let vi = Misc.result_vi kf in
-        if  Varinfo.Hptset.mem vi state then
+        if  Varinfos.mem vi state then
           match lhost with
-          | Var vi -> Varinfo.Hptset.add vi state
+          | Var vi -> Varinfos.add vi state
           | Mem e ->
             match base_addr e with
             | None -> state
-            | Some vi -> Varinfo.Hptset.add vi state
+            | Some vi -> Varinfos.add vi state
         else
           state
     in
@@ -678,7 +680,7 @@ module rec Transfer
               (List.fold_left
                  (fun acc e -> match base_addr e with
                     | None -> acc
-                    | Some vi -> Varinfo.Hptset.add vi acc)
+                    | Some vi -> Varinfos.add vi acc)
                  state
                  l)))
     | Asm _ -> Error.not_yet "asm"
@@ -691,7 +693,7 @@ module rec Transfer
 end
 
 and Compute: sig
-  val get: ?init:Varinfo.Hptset.t -> kernel_function -> Varinfo.Hptset.t
+  val get: ?init:Varinfos.t -> kernel_function -> Varinfos.t
 end = struct
 
   module D = Dataflow.Backwards(Transfer)
@@ -730,7 +732,7 @@ end = struct
                    Stmt.Hashtbl.replace
                      tbl
                      s
-                     (Some (Varinfo.Hptset.union set old)))
+                     (Some (Varinfos.union set old)))
                 returns)
            init_set
        else begin
@@ -751,7 +753,7 @@ end = struct
 
   let get ?init kf =
     if Rtl.Symbols.mem_kf kf then
-      Varinfo.Hptset.empty
+      Varinfos.empty
     else
       try
         let stmt = Kernel_function.find_first_stmt kf in
@@ -772,7 +774,7 @@ end = struct
           Options.fatal "[pre_analysis] stmt never analyzed: %a"
             Printer.pp_stmt stmt
       with Kernel_function.No_Statement ->
-        Varinfo.Hptset.empty
+        Varinfos.empty
 
 end
 
@@ -832,7 +834,7 @@ let must_monitor_vi ?kf ?stmt vi =
         let tbl = Env.find kf in
         try
       let set = Stmt.Hashtbl.find tbl stmt in
-      Varinfo.Hptset.mem vi (Env.default_varinfos set)
+      Varinfos.mem vi (Env.default_varinfos set)
         with Not_found ->
       (* new statement *)
       consolidated_must_monitor_vi vi
