@@ -532,6 +532,8 @@ let check_file (env, file) =
   end
   else success_remove file
 
+let () = Log.set_echo false
+
 let f () =
   Crowbar.add_test ~name:"ghost cfg" [gen_file]
     (fun res -> Crowbar.check (check_file res))

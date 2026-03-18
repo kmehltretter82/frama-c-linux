@@ -1,6 +1,6 @@
   $ dune build --cache=disabled --root . @install
-If this test times out (code 124), try to increase the value below
-  $ timeout 10.0 dune runtest --cache=disabled --root .
+
+  $ dune runtest --cache=disabled --root .
   Running Crowbar tests on offset_anonymous_field
   designator and anonymous fields: PASS
   
