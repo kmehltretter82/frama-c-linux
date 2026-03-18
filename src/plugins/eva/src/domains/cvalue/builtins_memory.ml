@@ -52,7 +52,7 @@ let deps_nth_arg n =
    are valid. Reduce them accordingly. *)
 let reduce_to_valid_loc dst size access =
   let min_size = Ival.min_int size in
-  let size = Option.fold ~none:Z_or_top.zero ~some:Z_or_top.inject min_size in
+  let size = `Value (Option.value ~default:Z.zero min_size) in
   let dst_loc = Locations.make_loc dst size in
   let valid_dst_loc = Locations.valid_part ~bitfield:false access dst_loc in
   valid_dst_loc.Locations.loc

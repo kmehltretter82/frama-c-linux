@@ -50,13 +50,13 @@ let warn_if_void typ =
 (* [sizeof ty] is the size of [ty] in bits; it may return [`Top]. *)
 let sizeof typ =
   warn_if_void typ;
-  try Z_or_top.inject (Z.of_int (bitsSizeOf typ))
+  try Z_or_top.of_int (bitsSizeOf typ)
   with SizeOfError _ -> Z_or_top.top
 
 (* [osizeof ty] is the size of [ty] in bytes; it may return [`Top]. *)
 let osizeof typ =
   warn_if_void typ;
-  try Z_or_top.inject (Z.of_int (warn_if_zero typ (bitsSizeOf typ) / 8))
+  try Z_or_top.of_int (warn_if_zero typ (bitsSizeOf typ) / 8)
   with SizeOfError _ -> Z_or_top.top
 
 exception Neither_Int_Nor_Enum_Nor_Pointer
@@ -91,7 +91,7 @@ let sizeof_lval lv =
       | Field (f,NoOffset) ->
         (match f.fbitfield with
          | None -> sizeof typ
-         | Some i -> Z_or_top.inject (Z.of_int i))
+         | Some i -> Z_or_top.of_int i)
       | Field (_,f) | Index(_,f) -> get_size f
     in get_size (snd lv)
 

@@ -16,6 +16,8 @@ val minus_one: t
 val top: t
 val neg: t -> t
 
+val of_int: int -> t
+
 val is_zero: t -> bool
 val is_top: t -> bool
 

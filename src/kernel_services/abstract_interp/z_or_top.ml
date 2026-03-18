@@ -13,6 +13,8 @@ let one = `Value Z.one
 let zero = `Value Z.zero
 let top = `Top
 
+let of_int i = `Value (Z.of_int i)
+
 let is_zero x = equal x zero
 let is_top = Lattice_bounds.Top.is_top
 

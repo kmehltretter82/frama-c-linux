@@ -764,7 +764,7 @@ struct
   let load state v obj =
     let bsize = 8 * Ctypes.sizeof_object obj in
     let bits = Locations.loc_bytes_to_loc_bits v in
-    let int_base = bsize |> Z.of_int |> Z_or_top.inject in
+    let int_base = bsize |> Z_or_top.of_int in
     let vloc = Locations.make_loc bits int_base in
     Cvalue.Model.find state vloc
 

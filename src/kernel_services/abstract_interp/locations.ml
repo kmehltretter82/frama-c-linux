@@ -529,10 +529,7 @@ let filter_base f loc =
   { loc with loc = Location_Bits.filter_base f loc.loc }
 
 let int_base_size_of_varinfo v =
-  try
-    let s = bitsSizeOf v.vtype in
-    let s = Z.of_int s in
-    Z_or_top.inject s
+  try bitsSizeOf v.vtype |> Z_or_top.of_int
   with Cil.SizeOfError (msg, _) ->
     Abstract_interp.feedback_approximation
       "imprecise size for variable %a (%s)" Printer.pp_varinfo v msg;
@@ -548,7 +545,7 @@ let loc_of_base v =
 let loc_of_typoffset b typ offset =
   try
     let offs, size = Cil.bitsOffset typ offset in
-    let size = Z_or_top.inject (Z.of_int size) in
+    let size = Z_or_top.of_int size in
     make_loc (Location_Bits.inject b (Ival.of_int offs)) size
   with SizeOfError _ as _e ->
     make_loc (Location_Bits.inject b Ival.top) Z_or_top.top
