@@ -5,8 +5,8 @@
 [kernel] Parsing interferences.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
-[mt] *** Computing value analysis for main thread
 [eva] Found concurrency builtins: enabling mthread domain
+[mt] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main_thread_loop
 [mt] New thread: <main>, fun main_thread_loop
 [eva:show] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
@@ -142,8 +142,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread joboneshot, iteration 2
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread joboneshot, iteration 2 (potential shared vars changed
+    and interferences changed)
 [mt] * Computing value analysis for thread joboneshot
 [eva] Analyzing a complete application starting at fjoboneshot
 [eva] Initial state supplied by user
@@ -182,8 +182,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread joboneshot computed
-[mt] *** Computing thread joblooped, iteration 2
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread joblooped, iteration 2 (potential shared vars changed
+    and interferences changed)
 [mt] * Computing value analysis for thread joblooped
 [eva] Analyzing a complete application starting at fjoblooped
 [eva] Initial state supplied by user
@@ -293,8 +293,8 @@
   interferences.c:110 (for shared_b)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
-[mt] *** Computing thread <main>, iteration 3
-    (shared vars values changed, interferences changed)
+[mt] *** Computing thread <main>, iteration 3 (shared vars values changed and
+    interferences changed)
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
@@ -318,8 +318,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread joboneshot, iteration 3
-    (shared vars values changed, interferences changed)
+[mt] *** Computing thread joboneshot, iteration 3 (shared vars values changed and
+    interferences changed)
 [mt] * Computing value analysis for thread joboneshot
 [eva] Analyzing a complete application starting at fjoboneshot
 [eva] Initial state supplied by user
@@ -354,9 +354,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread joboneshot computed
-[mt] *** Computing thread joblooped, iteration 3
-    (shared vars values changed, thread initial memory state changed,
-     interferences changed)
+[mt] *** Computing thread joblooped, iteration 3 (shared vars values changed,
+    thread initial memory state changed and interferences changed)
 [mt] * Computing value analysis for thread joblooped
 [eva] Analyzing a complete application starting at fjoblooped
 [eva] Initial state supplied by user
@@ -451,8 +450,8 @@
   interferences.c:110 (for shared_b)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 4
-[mt] *** Computing thread <main>, iteration 4
-    (shared vars values changed, interferences changed)
+[mt] *** Computing thread <main>, iteration 4 (shared vars values changed and
+    interferences changed)
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
@@ -474,8 +473,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread joboneshot, iteration 4
-    (shared vars values changed, interferences changed)
+[mt] *** Computing thread joboneshot, iteration 4 (shared vars values changed and
+    interferences changed)
 [mt] * Computing value analysis for thread joboneshot
 [eva] Analyzing a complete application starting at fjoboneshot
 [eva] Initial state supplied by user
@@ -512,8 +511,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread joboneshot computed
-[mt] *** Computing thread joblooped, iteration 4
-    (thread initial memory state changed, interferences changed)
+[mt] *** Computing thread joblooped, iteration 4 (thread initial memory state
+    changed and interferences changed)
 [mt] * Computing value analysis for thread joblooped
 [eva] Analyzing a complete application starting at fjoblooped
 [eva] Initial state supplied by user
@@ -608,8 +607,8 @@
   interferences.c:110 (for shared_b)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 5
-[mt] *** Computing thread <main>, iteration 5
-    (shared vars values changed, interferences changed)
+[mt] *** Computing thread <main>, iteration 5 (shared vars values changed and
+    interferences changed)
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main_thread_loop
 [eva] Initial state supplied by user
@@ -633,8 +632,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread joboneshot, iteration 5
-    (shared vars values changed, interferences changed)
+[mt] *** Computing thread joboneshot, iteration 5 (shared vars values changed and
+    interferences changed)
 [mt] * Computing value analysis for thread joboneshot
 [eva] Analyzing a complete application starting at fjoboneshot
 [eva] Initial state supplied by user
@@ -671,8 +670,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread joboneshot computed
-[mt] *** Computing thread joblooped, iteration 5
-    (thread initial memory state changed, interferences changed)
+[mt] *** Computing thread joblooped, iteration 5 (thread initial memory state
+    changed and interferences changed)
 [mt] * Computing value analysis for thread joblooped
 [eva] Analyzing a complete application starting at fjoblooped
 [eva] Initial state supplied by user

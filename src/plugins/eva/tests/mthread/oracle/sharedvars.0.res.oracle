@@ -5,8 +5,8 @@
 [kernel] Parsing sharedvars.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
-[mt] *** Computing value analysis for main thread
 [eva] Found concurrency builtins: enabling mthread domain
+[mt] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] sharedvars.c:105: New thread: jobs1, fun f1, parent <main>, args {0}
@@ -266,8 +266,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread jobs1, iteration 2
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread jobs1, iteration 2 (potential shared vars changed and
+    interferences changed)
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
@@ -303,8 +303,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
-[mt] *** Computing thread jobs3, iteration 2
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread jobs3, iteration 2 (potential shared vars changed and
+    interferences changed)
 [mt] * Computing value analysis for thread jobs3
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
@@ -326,8 +326,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
-[mt] *** Computing thread jobs4, iteration 2
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread jobs4, iteration 2 (potential shared vars changed and
+    interferences changed)
 [mt] * Computing value analysis for thread jobs4
 [eva] Analyzing a complete application starting at f4
 [eva] Initial state supplied by user
@@ -364,8 +364,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
-[mt] *** Computing thread jobs5, iteration 2
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread jobs5, iteration 2 (potential shared vars changed and
+    interferences changed)
 [mt] * Computing value analysis for thread jobs5
 [eva] Analyzing a complete application starting at f5
 [eva] Initial state supplied by user
@@ -387,8 +387,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs5 computed
-[mt] *** Computing thread jobs6, iteration 2
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread jobs6, iteration 2 (potential shared vars changed and
+    interferences changed)
 [mt] * Computing value analysis for thread jobs6
 [eva] Analyzing a complete application starting at f6
 [eva] Initial state supplied by user
@@ -507,8 +507,8 @@
   sharedvars.c:68 (for s4)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
-[mt] *** Computing thread <main>, iteration 3
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread <main>, iteration 3 (potential shared vars changed and
+    interferences changed)
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user
@@ -578,8 +578,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread jobs1, iteration 3
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread jobs1, iteration 3 (potential shared vars changed and
+    interferences changed)
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
@@ -599,8 +599,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
-[mt] *** Computing thread jobs2, iteration 3
-    (thread initial memory state changed, interferences changed)
+[mt] *** Computing thread jobs2, iteration 3 (thread initial memory state changed
+    and interferences changed)
 [mt] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
@@ -616,9 +616,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
-[mt] *** Computing thread jobs3, iteration 3
-    (potential shared vars changed, thread initial memory state changed,
-     interferences changed)
+[mt] *** Computing thread jobs3, iteration 3 (potential shared vars changed,
+    thread initial memory state changed and interferences changed)
 [mt] * Computing value analysis for thread jobs3
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
@@ -650,9 +649,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
-[mt] *** Computing thread jobs4, iteration 3
-    (shared vars values changed, thread initial memory state changed,
-     interferences changed)
+[mt] *** Computing thread jobs4, iteration 3 (shared vars values changed, thread
+    initial memory state changed and interferences changed)
 [mt] * Computing value analysis for thread jobs4
 [eva] Analyzing a complete application starting at f4
 [eva] Initial state supplied by user
@@ -691,9 +689,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
-[mt] *** Computing thread jobs5, iteration 3
-    (potential shared vars changed, thread initial memory state changed,
-     interferences changed)
+[mt] *** Computing thread jobs5, iteration 3 (potential shared vars changed,
+    thread initial memory state changed and interferences changed)
 [mt] * Computing value analysis for thread jobs5
 [eva] Analyzing a complete application starting at f5
 [eva] Initial state supplied by user
@@ -725,9 +722,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs5 computed
-[mt] *** Computing thread jobs6, iteration 3
-    (shared vars values changed, thread initial memory state changed,
-     interferences changed)
+[mt] *** Computing thread jobs6, iteration 3 (shared vars values changed, thread
+    initial memory state changed and interferences changed)
 [mt] * Computing value analysis for thread jobs6
 [eva] Analyzing a complete application starting at f6
 [eva] Initial state supplied by user
@@ -757,9 +753,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs6 computed
-[mt] *** Computing thread jobs31, iteration 3
-    (potential shared vars changed, thread initial memory state changed,
-     interferences changed)
+[mt] *** Computing thread jobs31, iteration 3 (potential shared vars changed,
+    thread initial memory state changed and interferences changed)
 [mt] * Computing value analysis for thread jobs31
 [eva] Analyzing a complete application starting at f31
 [eva] Initial state supplied by user
@@ -791,9 +786,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs31 computed
-[mt] *** Computing thread jobs51, iteration 3
-    (potential shared vars changed, thread initial memory state changed,
-     interferences changed)
+[mt] *** Computing thread jobs51, iteration 3 (potential shared vars changed,
+    thread initial memory state changed and interferences changed)
 [mt] * Computing value analysis for thread jobs51
 [eva] Analyzing a complete application starting at f51
 [eva] Initial state supplied by user
@@ -952,8 +946,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread jobs1, iteration 4
-    (thread initial memory state changed, interferences changed)
+[mt] *** Computing thread jobs1, iteration 4 (thread initial memory state changed
+    and interferences changed)
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
@@ -973,8 +967,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
-[mt] *** Computing thread jobs2, iteration 4
-    (thread initial memory state changed, interferences changed)
+[mt] *** Computing thread jobs2, iteration 4 (thread initial memory state changed
+    and interferences changed)
 [mt] * Computing value analysis for thread jobs2
 [eva] Analyzing a complete application starting at f2
 [eva] Initial state supplied by user
@@ -990,8 +984,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
-[mt] *** Computing thread jobs3, iteration 4
-    (thread initial memory state changed, interferences changed)
+[mt] *** Computing thread jobs3, iteration 4 (thread initial memory state changed
+    and interferences changed)
 [mt] * Computing value analysis for thread jobs3
 [eva] Analyzing a complete application starting at f3
 [eva] Initial state supplied by user
@@ -1024,9 +1018,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
-[mt] *** Computing thread jobs4, iteration 4
-    (shared vars values changed, thread initial memory state changed,
-     interferences changed)
+[mt] *** Computing thread jobs4, iteration 4 (shared vars values changed, thread
+    initial memory state changed and interferences changed)
 [mt] * Computing value analysis for thread jobs4
 [eva] Analyzing a complete application starting at f4
 [eva] Initial state supplied by user
@@ -1068,8 +1061,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
-[mt] *** Computing thread jobs5, iteration 4
-    (thread initial memory state changed, interferences changed)
+[mt] *** Computing thread jobs5, iteration 4 (thread initial memory state changed
+    and interferences changed)
 [mt] * Computing value analysis for thread jobs5
 [eva] Analyzing a complete application starting at f5
 [eva] Initial state supplied by user
@@ -1102,9 +1095,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs5 computed
-[mt] *** Computing thread jobs6, iteration 4
-    (shared vars values changed, thread initial memory state changed,
-     interferences changed)
+[mt] *** Computing thread jobs6, iteration 4 (shared vars values changed, thread
+    initial memory state changed and interferences changed)
 [mt] * Computing value analysis for thread jobs6
 [eva] Analyzing a complete application starting at f6
 [eva] Initial state supplied by user
@@ -1136,8 +1128,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs6 computed
-[mt] *** Computing thread jobs31, iteration 4
-    (thread initial memory state changed, interferences changed)
+[mt] *** Computing thread jobs31, iteration 4 (thread initial memory state changed
+    and interferences changed)
 [mt] * Computing value analysis for thread jobs31
 [eva] Analyzing a complete application starting at f31
 [eva] Initial state supplied by user
@@ -1169,9 +1161,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs31 computed
-[mt] *** Computing thread jobs51, iteration 4
-    (shared vars values changed, thread initial memory state changed,
-     interferences changed)
+[mt] *** Computing thread jobs51, iteration 4 (shared vars values changed, thread
+    initial memory state changed and interferences changed)
 [mt] * Computing value analysis for thread jobs51
 [eva] Analyzing a complete application starting at f51
 [eva] Initial state supplied by user
@@ -1318,8 +1309,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread jobs1, iteration 5
-    (thread initial memory state changed, interferences changed)
+[mt] *** Computing thread jobs1, iteration 5 (thread initial memory state changed
+    and interferences changed)
 [mt] * Computing value analysis for thread jobs1
 [eva] Analyzing a complete application starting at f1
 [eva] Initial state supplied by user
@@ -1388,9 +1379,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
-[mt] *** Computing thread jobs4, iteration 5
-    (shared vars values changed, thread initial memory state changed,
-     interferences changed)
+[mt] *** Computing thread jobs4, iteration 5 (shared vars values changed, thread
+    initial memory state changed and interferences changed)
 [mt] * Computing value analysis for thread jobs4
 [eva] Analyzing a complete application starting at f4
 [eva] Initial state supplied by user
@@ -1432,8 +1422,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
-[mt] *** Computing thread jobs5, iteration 5
-    (thread initial memory state changed, interferences changed)
+[mt] *** Computing thread jobs5, iteration 5 (thread initial memory state changed
+    and interferences changed)
 [mt] * Computing value analysis for thread jobs5
 [eva] Analyzing a complete application starting at f5
 [eva] Initial state supplied by user
@@ -1530,8 +1520,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs31 computed
-[mt] *** Computing thread jobs51, iteration 5
-    (shared vars values changed, interferences changed)
+[mt] *** Computing thread jobs51, iteration 5 (shared vars values changed and
+    interferences changed)
 [mt] * Computing value analysis for thread jobs51
 [eva] Analyzing a complete application starting at f51
 [eva] Initial state supplied by user

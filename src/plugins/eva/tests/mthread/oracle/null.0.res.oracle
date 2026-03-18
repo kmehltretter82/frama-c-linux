@@ -5,8 +5,8 @@
 [kernel] Parsing null.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
-[mt] *** Computing value analysis for main thread
 [eva] Found concurrency builtins: enabling mthread domain
+[mt] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] null.c:24: New thread: tjob0, fun job0, parent <main>, args {0}
@@ -86,8 +86,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread tjob0, iteration 2
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread tjob0, iteration 2 (potential shared vars changed and
+    interferences changed)
 [mt] * Computing value analysis for thread tjob0
 [eva] Analyzing a complete application starting at job0
 [eva] Initial state supplied by user
@@ -135,8 +135,8 @@
   NULL[100..200]: Read by <main>, Write by tjob0: unprotected
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
-[mt] *** Computing thread <main>, iteration 3
-    (shared vars values changed, interferences changed)
+[mt] *** Computing thread <main>, iteration 3 (shared vars values changed and
+    interferences changed)
 [mt] * Computing value analysis for thread <main>
 [eva] Analyzing a complete application starting at main
 [eva] Initial state supplied by user

@@ -5,8 +5,8 @@
 [kernel] Parsing read_all.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
-[mt] *** Computing value analysis for main thread
 [eva] Found concurrency builtins: enabling mthread domain
+[mt] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [kernel:annot:missing-spec] read_all.c:25: Warning: 
@@ -105,8 +105,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread jobs, iteration 2
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread jobs, iteration 2 (potential shared vars changed and
+    interferences changed)
 [mt] * Computing value analysis for thread jobs
 [eva] Analyzing a complete application starting at f
 [eva] Initial state supplied by user

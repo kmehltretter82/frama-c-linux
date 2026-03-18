@@ -4,11 +4,11 @@
 < [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
 305d302
 < [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1}
-461d457
+460d456
 < [eva:show] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1; 2}
-619,620d614
+618,619d613
 < [eva:show] interferences.c:135: 
 <   Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
-786,787d779
+785,786d778
 < [eva:show] interferences.c:135: 
 <   Frama_C_show_each_main_end: {0; 1}, [0..2147483647]

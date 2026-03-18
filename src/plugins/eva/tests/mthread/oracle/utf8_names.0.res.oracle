@@ -80,8 +80,8 @@
 [mt] Detailed shared zones protections
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 2
-[mt] *** Computing thread <main>, iteration 2
-    (new message received, potential shared vars changed)
+[mt] *** Computing thread <main>, iteration 2 (new message received and potential
+    shared vars changed)
 [mt] Thread <main>, fun main
 [mt] Thread job / "𐍅" f1, fun f1, parent <main>, args {0}
 [mt] Thread job / "𐍅" f2, fun f2, parent <main>, args {0}
@@ -116,8 +116,8 @@
     interferences by location:
     interferences by mutexes:
 [mt] *** Thread <main> computed
-[mt] *** Computing thread job / "𐍅" f1, iteration 2
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread job / "𐍅" f1, iteration 2 (potential shared vars changed
+    and interferences changed)
 [eva:interferences] utf8_names.c:23: inject threads interferences at this point
 [eva:interferences] utf8_names.c:27: inject threads interferences at this point
 [eva:interferences] utf8_names.c:29: inject threads interferences at this point
@@ -158,8 +158,8 @@
         b ∈ {0}
         c ∈ {1}
 [mt] *** Thread job / "𐍅" f1 computed
-[mt] *** Computing thread job / "𐍅" f2, iteration 2
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread job / "𐍅" f2, iteration 2 (potential shared vars changed
+    and interferences changed)
 [eva:interferences] utf8_names.c:37: inject threads interferences at this point
 [eva:interferences] utf8_names.c:39: inject threads interferences at this point
 [eva:interferences] 
@@ -264,8 +264,8 @@
   utf8_names.c:59 (for c)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
-[mt] *** Computing thread <main>, iteration 3
-    (shared vars values changed, interferences changed)
+[mt] *** Computing thread <main>, iteration 3 (shared vars values changed and
+    interferences changed)
 [mt] New context for job / "𐍅" f2, fun f2, parent <main>, args {0}
 [eva:interferences] utf8_names.c:59: inject threads interferences at this point
 [eva:interferences] 
@@ -275,8 +275,8 @@
     interferences by location:
     interferences by mutexes:
 [mt] *** Thread <main> computed
-[mt] *** Computing thread job / "𐍅" f1, iteration 3
-    (shared vars values changed, interferences changed)
+[mt] *** Computing thread job / "𐍅" f1, iteration 3 (shared vars values changed
+    and interferences changed)
 [eva:interferences] 
   Interferences from thread job / "𐍅" f1
     concurrent writes:
@@ -322,9 +322,8 @@
           (origin: Arithmetic {utf8_names.c:23}) }}
         c ∈ {1}
 [mt] *** Thread job / "𐍅" f1 computed
-[mt] *** Computing thread job / "𐍅" f2, iteration 3
-    (shared vars values changed, thread initial memory state changed,
-     interferences changed)
+[mt] *** Computing thread job / "𐍅" f2, iteration 3 (shared vars values changed,
+    thread initial memory state changed and interferences changed)
 [eva:interferences] 
   Interferences from thread job / "𐍅" f2
     concurrent writes:

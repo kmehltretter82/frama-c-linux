@@ -62,3 +62,7 @@ val height_lval: lval -> int
 val skip_specifications: kernel_function -> bool
 (** Should we skip the specifications of this function, according to
     [-eva-skip-stdlib-specs] *)
+
+(** [measure_time f arg] measures the execution time (user time) of [f arg] and
+    returns both the result of [f arg] and the elapsed time in seconds. *)
+val measure_time : ('a -> 'b) -> 'a -> 'b * float

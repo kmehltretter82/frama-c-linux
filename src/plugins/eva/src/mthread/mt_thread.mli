@@ -27,10 +27,13 @@ type recompute_reason =
 module RecomputeReason: sig
   type t = recompute_reason
   val compare: t -> t -> int
-  val pretty: t Pretty_utils.formatter
+  val pretty: t Pretty.aformatter
 end
 
-module SetRecomputeReason: Set.S with type elt = recompute_reason
+module SetRecomputeReason: sig
+  include Set.S with type elt = recompute_reason
+  val pretty: t Pretty.aformatter
+end
 
 type priority =
   | PDefault (** No priority specified, but it is possible to specify one *)
@@ -105,6 +108,8 @@ module ThreadState : sig
   val one_creates_other: t -> t -> [`Creates of t * t | `Unrelated]
 
   val recompute_because: t -> recompute_reason -> unit
+
+  val needs_recomputation: t -> bool
 end
 
 
@@ -176,9 +181,11 @@ val pop_function_call: analysis_state -> unit
 
 val should_compute_thread: thread_state -> bool
 
+val pretty_recompute_reasons: analysis_state Pretty_utils.formatter
+
+val needs_recomputation: analysis_state -> bool
+
 module OrderedThreads : sig
-
-
   val family_tree: analysis_state -> thread list Thread.Hashtbl.t
   (** Create a table mapping each thread that creates a thread
       to the threads it creates *)

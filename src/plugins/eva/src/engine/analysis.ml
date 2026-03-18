@@ -6,6 +6,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+type 'state engine = (module Engine_sig.S with type Dom.state = 'state)
+
 (* ----- Pre-analysis checks ------------------------------------------------ *)
 
 (* Clear Eva's various caches. Some operations of Eva depend on parameters,
@@ -64,6 +66,8 @@ let generate_specs () =
   Parameters.UsePrototype.iter aux
 
 let pre_analysis () =
+  Self.clear_results ();
+  Ast.compute ();
   Self.configure_verbosity ();
   Parameters.configure_precision ();
   Signal.reset ();
@@ -79,12 +83,24 @@ let pre_analysis () =
   Eva_utils.DegenerationPoints.clear ();
   Cvalue_callbacks.apply_at_start_hooks ();
   Origin.clear ();
+
+  (* Engine can now be rebuilt *)
+  let module Engine = (val Engine.reset ()) in
+  Engine.Interferences.reset ();
+  Thread.reset_state ();
+  Mutex.reset_state ();
+  Mqueue.reset_state ();
+  Mt_summary.clear ();
+
   if not (Kernel.AuditCheck.is_empty ()) then
-    Eva_audit.check_configuration (Kernel.AuditCheck.get ())
+    Eva_audit.check_configuration (Kernel.AuditCheck.get ());
+
+  (module Engine : Engine_sig.S)
+
 
 (* ----- Post-analysis cleanup ---------------------------------------------- *)
 
-let post_analysis () =
+let post_analysis (type t) (engine: t engine) final_state =
   (* Garbled mix must be dumped here -- at least before the call to
      mark_green_and_red -- because fresh ones are created when re-evaluating
      all the alarms, and we get an unpleasant "ghost effect". *)
@@ -104,7 +120,12 @@ let post_analysis () =
   if Parameters.RmAssert.get () then Eva_dynamic.Scope.rm_asserts ();
   (* The above functions may have changed the status of alarms. *)
   Summary.FunctionStats.recompute_all ();
-  Red_statuses.report ()
+  Red_statuses.report ();
+  (* Print results *)
+  let module Engine = (val engine) in
+  Engine.Dom.post_analysis final_state;
+  Summary.print ();
+  Statistics.export_as_csv ()
 
 
 (* ----- Analysis status ---------------------------------------------------- *)
@@ -141,8 +162,6 @@ let save_results kf =
 
 (* ----- Running the analysis ------------------------------------------------ *)
 
-type 'state engine = (module Engine_sig.S with type Dom.state = 'state)
-
 exception Error
 
 let compute_from_entry_point  (type t) (engine: t engine)
@@ -162,27 +181,146 @@ let compute_from_entry_point  (type t) (engine: t engine)
   | `Value initial_state ->
     Engine.Compute.compute_main_call ~thread entry_point initial_state
 
-(* Builds the analyzer if needed, and run the analysis. *)
-let compute_from ?cvalue_state ?arguments entry_point =
-  Self.clear_results ();
-  Ast.compute ();
-  pre_analysis ();
-  Engine.reset ();
-  (* The new analyzer can be accessed through hooks *)
-  let module Engine = (val Engine.current ()) in
-  let compute () =
-    compute_from_entry_point (module Engine)
-      ?cvalue_state ?arguments entry_point
+(* Mthread entry point *)
+
+let check_thread_analysis thread kf =
+  match Function_calls.analysis_target kf Kglobal with
+  | `Body _ -> ()
+  | `Builtin _ | `Spec _ ->
+    Mt_self.not_yet_implemented
+      "Using an ACSL specification or a builtin to interpret entry point %a \
+       of thread %a is not supported."
+      Kernel_function.pretty kf Thread.pretty thread
+
+let compute_thread (type t) (engine: t engine) ?cvalue_state thread =
+  let Thread.{ entry_point; arguments } = Thread.properties thread in
+  check_thread_analysis thread entry_point;
+  let arguments =
+    if Thread.is_main thread
+    then None (* use generated main arguments *)
+    else Some (List.map snd arguments)
   in
+  (* In multi thread analyses, Memexec cache must be invalidated *)
+  Mem_exec.cleanup_results ();
+  compute_from_entry_point engine
+    ~thread ?cvalue_state ?arguments entry_point
+
+let thread_analysis engine analysis final_states th =
+  let open Mt_thread in
+  if SetRecomputeReason.is_empty th.th_to_recompute then
+    Mt_self.debug "No need to recompute thread %a" ThreadState.pretty th
+  else if not (Mt_thread.should_compute_thread th) then
+    Mt_self.feedback "*** Skipping thread %a as requested"
+      ThreadState.pretty th
+  else if not (Cvalue.Model.is_reachable th.th_init_state) then
+    Mt_self.feedback "@[<hov 2>*** Thread %a has been@ created but@ \
+                      not started. Skipping.@]"  ThreadState.pretty th
+  else begin
+    Mt_self.feedback
+      "@[<hov 2>*** Computing thread %a,@ iteration %d@ (%a)@]"
+      ThreadState.pretty th analysis.iteration
+      SetRecomputeReason.pretty th.th_to_recompute;
+
+    Mt_analysis_fixpoint.pre_thread_analysis analysis th;
+
+    let final_state, analysis_time = Eva_utils.measure_time
+        (compute_thread engine ~cvalue_state:th.th_init_state) th.th_eva_thread
+    in
+
+    (* Store the thread analysis final state. *)
+    Thread.Hashtbl.replace final_states th.th_eva_thread final_state;
+
+    if Mt_options.ShowTime.get () then
+      Mt_self.feedback ~level:2
+        "* Value analysis computed for thread %a, %f sec"
+        ThreadState.pretty th analysis_time;
+
+    (* We save all our results *)
+    Mt_analysis_fixpoint.post_thread_analysis analysis;
+
+    Mt_self.feedback "*** Thread %a computed" ThreadState.pretty th;
+  end;
+  th.th_to_recompute <- SetRecomputeReason.empty
+
+(* Auxiliary function iterating the analysis until the fixpoint is reached *)
+let mthread_fixpoint engine analysis =
+  (* Store thread analyse final result of each thread in a Hashtbl. For now,
+     only the result of the main thread is used. *)
+  let final_states = Thread.Hashtbl.create 1 in
+
+  (* Let Eva know about interrupt handlers. *)
+  Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
+
+  (* We analyse the main thread *)
+  Mt_self.feedback "*** Computing value analysis for main thread";
+  let final_state = compute_thread engine Thread.main in
+  Thread.Hashtbl.replace final_states Thread.main final_state;
+  Mt_self.feedback "*** First value analysis for main thread done." ;
+  Mt_analysis_fixpoint.post_thread_analysis analysis;
+
+  (* We perform the analysis iterations *)
+  Mt_self.feedback "******* Starting to iterate";
+  let limit = Mt_options.StopAfter.get () in
+  analysis.iteration <- 0;
+  while
+    analysis.iteration < limit &&
+    Mt_thread.needs_recomputation analysis
+  do
+    analysis.iteration <- analysis.iteration + 1;
+    Mt_self.feedback "***** Iteration %d" analysis.iteration;
+    Mt_thread.iter_threads analysis
+      (thread_analysis engine analysis final_states);
+    Mt_self.feedback "***** Threads computed for iteration %d."
+      analysis.iteration;
+    Mt_analysis_fixpoint.post_iteration analysis
+  done;
+
+  if not (Mt_thread.needs_recomputation analysis) then
+    Mt_self.feedback "******* Analysis performed, %d iterations"
+      analysis.iteration
+  else
+    Mt_self.feedback
+      "@[<v>******* Analysis stopped after %d iterations.@ %a@]"
+      analysis.iteration
+      Mt_thread.pretty_recompute_reasons analysis;
+
+  (* Return the main thread final state. *)
+  Thread.Hashtbl.find final_states Thread.main
+
+(* Perform an entire mthread execution on the current project *)
+let compute_from ?cvalue_state ?arguments entry_point =
+  let mt_enabled = Mt_options.Enabled.get () in
+
+  (* Build the mthread analysis state even when mthread is disabled *)
+  let analysis = Mt_main.make_analysis_state () in
+
+  if mt_enabled then begin
+    Mt_main.pre_analysis ();
+    Mt_self.feedback "******* Starting mthread";
+    Mt_main.register_hooks analysis;
+  end;
+  Fun.protect ~finally:Mt_main.unregister_hooks @@ fun () ->
+
+  (* Prepare the analysis and build the engine. *)
+  let module Engine = (val pre_analysis ()) in
+
+  (* Setup signals *)
+  let restore_signals = Signal.setup () in
+  Fun.protect ~finally:restore_signals @@ fun () ->
+
   try
     Self.ComputationState.set Computing;
-    let restore_signals = Signal.setup () in
-    let final_state = Fun.protect ~finally:restore_signals compute in
+    (* Run the analysis. *)
+    let final_state =
+      if mt_enabled
+      then mthread_fixpoint (module Engine) analysis
+      else compute_from_entry_point (module Engine)
+          ?cvalue_state ?arguments entry_point
+    in
     Self.(ComputationState.set Computed);
-    post_analysis ();
-    Engine.Dom.post_analysis final_state;
-    Summary.print ();
-    Statistics.export_as_csv ();
+    post_analysis (module Engine) final_state;
+    if mt_enabled then
+      Mt_main.post_analysis analysis
   with exn ->
     Self.(ComputationState.set Aborted);
     match exn with
@@ -210,39 +348,3 @@ let () = Boot.Main.extend main
 
 let abort () =
   Signal.abort ()
-
-(* Mthread entry point *)
-
-let compute_thread ?cvalue_state thread =
-  let Thread.{ entry_point; arguments } = Thread.properties thread in
-  let arguments =
-    if Thread.is_main thread
-    then None (* use generated main arguments *)
-    else Some (List.map snd arguments)
-  in
-  let module Engine = (val Engine.current ()) in
-  try
-    (* In multi thread analyses, Memexec cache must be invalidated *)
-    Mem_exec.cleanup_results ();
-    Self.ComputationState.set Computing;
-    let final_state = compute_from_entry_point (module Engine)
-        ~thread ?cvalue_state ?arguments entry_point in
-    Self.ComputationState.set Computed;
-    (* Display the final state of each thread main function *)
-    Engine.Dom.post_analysis final_state
-  with exn ->
-    Self.(ComputationState.set Aborted);
-    match exn with
-    | Error | Self.Abort -> () (* do not re-raise *)
-    | exn -> raise exn
-
-let mthread_pre_analysis () =
-  Self.clear_results ();
-  Ast.compute ();
-  pre_analysis ();
-  Engine.reset ()
-
-let mthread_post_analysis () =
-  post_analysis ();
-  Summary.print ();
-  Statistics.export_as_csv ();

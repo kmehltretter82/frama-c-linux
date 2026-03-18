@@ -221,27 +221,29 @@ let set_current config (engine: (module S)) =
   Engine_Hook.apply (module (val engine): S);
   ref_engine := (config, engine)
 
-(* Builds the Engine module corresponding to a given configuration,
-   and sets it as the current engine. *)
+(* Builds the Engine module corresponding to a given configuration *)
 let make config =
-  let engine =
-    if Abstractions.Config.(equal config default) then (module Default : S)
-    else
-      let module Abstract = (val Abstractions.make config) in
-      let module Engine = Make (Abstract) in
-      (module Engine)
-  in
-  set_current config engine
+  if Abstractions.Config.(equal config default) then (module Default : S)
+  else
+    let module Abstract = (val Abstractions.make config) in
+    let module Engine = Make (Abstract) in
+    (module Engine)
 
-(* Builds the engine reference according to the parameters of Eva. *)
+(* Builds the engine reference according to the parameters of Eva if
+   necessary and sets it as the current engine. *)
 let reset () =
   let config = Abstractions.Config.configure () in
   (* If the configuration has not changed, do not reset the engine but uses
      the reference instead. *)
-  if not (Abstractions.Config.equal config (fst !ref_engine))
-  then make config
+  if Abstractions.Config.equal config (fst !ref_engine)
+  then snd !ref_engine
+  else
+    let engine = make config in
+    set_current config engine;
+    engine
 
 (* Resets the Engine reference when the current project is changed. *)
 let () =
+  let reset () = ignore @@ reset () in
   Project.register_after_set_current_hook ~user_only:true (fun _ -> reset ());
   Project.register_after_global_load_hook reset

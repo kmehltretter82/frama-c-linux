@@ -159,6 +159,9 @@ val change_correctness: unit -> unit
 (** Registers available cvalue builtins for the -eva-builtin option. *)
 val register_builtin: string -> unit
 
+(** Unregister a cvalue builtin. *)
+val unregister_builtin: string -> unit
+
 (** Registers available domain names for the -eva-domains option. *)
 val register_domain: name:string -> descr:string -> priority:int -> unit
 

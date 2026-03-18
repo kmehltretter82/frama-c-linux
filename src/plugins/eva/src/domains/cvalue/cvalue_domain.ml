@@ -414,10 +414,12 @@ module State = struct
     with Kernel_function.No_Statement -> ()
 
   let display_results () =
-    Self.result "====== VALUES COMPUTED ======";
     if Plugin.is_present "inout"
     && Self.is_debug_key_enabled Self.dkey_final_states
-    then Eva_dynamic.Callgraph.iter_in_rev_order display_final_state;
+    then (
+      Self.result "====== VALUES COMPUTED ======";
+      Eva_dynamic.Callgraph.iter_in_rev_order display_final_state
+    );
     Self.result "%t" Eva_perf.display
 
   let post_analysis _state =

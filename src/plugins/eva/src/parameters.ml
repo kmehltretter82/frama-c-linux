@@ -873,6 +873,8 @@ let () = ILevel.set_range ~min:2 ~max:max_int
 
 let builtins = ref Datatype.String.Set.empty
 let register_builtin name = builtins := Datatype.String.Set.add name !builtins
+let unregister_builtin name =
+  builtins := Datatype.String.Set.remove name !builtins
 let mem_builtin name = Datatype.String.Set.mem name !builtins
 
 let () = Parameter_customize.set_group precision_tuning

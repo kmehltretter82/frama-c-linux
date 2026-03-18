@@ -5,8 +5,8 @@
 [kernel] Parsing nice_offsets.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
-[mt] *** Computing value analysis for main thread
 [eva] Found concurrency builtins: enabling mthread domain
+[mt] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] nice_offsets.c:19: Initializing mutex t[0].a1
@@ -26,16 +26,4 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
-[mt] ***** Iteration 1
-[mt] ***** Threads computed for iteration 1.
-[mt] * Computing live threads and locked mutexes
-[mt] * threads and mutexes computed
-[mt] ***** Computing shared variables
-[mt] Imprecise locations to watch: \nothing
-[mt] Possible read/write data races:
-  none
-[mt] Shared memory: \nothing
-[mt] Mutexes for concurrent accesses:
-[mt] Detailed shared zones protections
-[mt] ***** Shared variables computed
-[mt] ******* Analysis performed, 1 iterations
+[mt] ******* Analysis performed, 0 iterations

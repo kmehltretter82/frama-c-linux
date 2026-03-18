@@ -42,6 +42,16 @@ let trim_underscores s =
     sub s st (fin - st + 1)
   end
 
+let utf8_length s =
+  let rec aux i count =
+    if i >= length s then count
+    else
+      let uchar = get_utf_8_uchar s i in
+      let len = Uchar.utf_decode_length uchar in
+      aux (i + len) (count + 1)
+  in
+  aux 0 0
+
 let utf8_escaped s =
   let escape_char c =
     if c = '"' then "\\\"" else Char.escaped c
@@ -88,3 +98,13 @@ let means_yes s =
   match lowercase_ascii s with
   | "yes" | "true" | "1" -> true
   | _ -> false
+
+
+(* --- Inline test --- *)
+
+let%test "utf8_length" =
+  let pangram = (* Spanish pangram *)
+    "El veloz murciélago hindú comía feliz cardillo y kiwi. La cigüeña tocaba \
+     el saxofón detrás del palenque de paja."
+  in
+  utf8_length pangram = 112

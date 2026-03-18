@@ -42,8 +42,12 @@ let mark_new_messages_received analysis =
       );
 ;;
 
-let record_end_of_thread_analysis analysis =
+let post_thread_analysis analysis =
   let th = analysis.curr_thread in
+
+  (* (Temporary) hack to be able to retrieve temporary analysis results *)
+  let previous_computation_state = Self.ComputationState.get () in
+  Self.ComputationState.set Computed;
 
   mark_new_messages_received analysis;
 
@@ -71,13 +75,12 @@ let record_end_of_thread_analysis analysis =
   th.th_cfg <- Mt_cfg.make_cfg th;
   th.th_read_written_cfg <- Mt_cfg.cfg_accesses th.th_eva_thread th.th_cfg;
   Mt_self.feedback ~level:2 "* Cfg computed";
-;;
 
+  (* (Temporary) hack to be able to retrieve temporary analysis results *)
+  Self.ComputationState.set previous_computation_state
 
 (* We compute a value analysis for the given thread *)
-let compute_thread analysis th =
-  let time = Sys.time () in
-
+let pre_thread_analysis analysis th =
   Mt_self.feedback ~level:2 "* Computing value analysis for thread %a"
     Thread.pretty th.th_eva_thread;
   Mt_self.debug "@[<hov>Arguments@ %a@]"
@@ -88,18 +91,9 @@ let compute_thread analysis th =
   (* We set the values that depend on the thread analysed *)
   analysis.curr_thread <- th;
   analysis.curr_events_stack <- [];
-  Datatype.Int.Hashtbl.clear analysis.memexec_cache;
+  Datatype.Int.Hashtbl.clear analysis.memexec_cache
 
-  Analysis.compute_thread ~cvalue_state:th.th_init_state th.th_eva_thread;
 
-  if Mt_options.ShowTime.get () then
-    Mt_self.feedback ~level:2
-      "* Value analysis computed for thread %a, %f sec"
-      ThreadState.pretty th (Sys.time () -. time);
-
-  (* We save all our results *)
-  record_end_of_thread_analysis analysis;
-;;
 
 let recompute_shared_vars_changed analysis before =
   iter_threads analysis
@@ -110,7 +104,6 @@ let recompute_shared_vars_changed analysis before =
              th.th_read_written ()
        with Exit -> ThreadState.recompute_because th PotentialSharedVarsChanged
     )
-;;
 
 (** Recompute all the threads that are not [th], and that read a value
     that has changed between [before] and [now] *)
@@ -255,41 +248,18 @@ let store_written_value analysis lw =
   in
   iter_threads analysis aux
 
+let save_to_disk analysis =
+  if Mt_options.ToDisk.get () then begin
+    let filepath =
+      let prefix = Mt_options.ToDiskPrefix.get () in
+      Filepath.of_format "%siteration_%d.sav" prefix analysis.iteration
+    in
+    Project.save filepath;
+    Mt_self.feedback "* Saved iteration %d to file %S" analysis.iteration
+      (Filepath.to_string_rel filepath);
+  end
 
-(* Function that does one pass of value analysis on all the threads
-   that are marked as needed to be recomputed. Returns the values
-   written by each thread recomputed*)
-let one_iteration analysis =
-  iter_threads analysis
-    (fun th ->
-       if not (SetRecomputeReason.is_empty th.th_to_recompute) then (
-         if Mt_thread.should_compute_thread th then
-           if Cvalue.Model.is_reachable th.th_init_state then (
-             Mt_self.feedback
-               "@[<hov 2>*** Computing thread %a,@ iteration %d@ (%a)@]"
-               ThreadState.pretty th analysis.iteration
-               (Pretty_utils.pp_iter ~sep:",@ "
-                  SetRecomputeReason.iter RecomputeReason.pretty)
-               th.th_to_recompute;
-
-             compute_thread analysis th;
-
-             Mt_self.feedback "*** Thread %a computed" ThreadState.pretty th;
-           ) else (
-             Mt_self.feedback "@[<hov 2>*** Thread %a has been@ created but@ \
-                               not started. Skipping.@]"  ThreadState.pretty th
-           )
-         else (
-           Mt_self.feedback "*** Skipping thread %a as requested"
-             ThreadState.pretty th;
-         );
-         th.th_to_recompute <- SetRecomputeReason.empty;
-       ) else
-         Mt_self.debug "No need to recompute thread %a" ThreadState.pretty th
-    );
-  Mt_self.feedback "***** Threads computed for iteration %d."
-    analysis.iteration;
-
+let post_iteration analysis =
   (* We update the locked mutexes and started threads information of the
      cfg. This must obviously be done before shared variables are computed,
      but it supposes the thread creation structure is completely known.
@@ -324,10 +294,7 @@ let one_iteration analysis =
   end;
   Mt_self.feedback "***** Shared variables computed";
 
-  fold_threads analysis false
-    (fun th v -> v || not (SetRecomputeReason.is_empty th.th_to_recompute))
-;;
-
+  save_to_disk analysis
 
 (* Remove "white" nodes in the cfg, ie accesses to variables that
    are not concurrent at all. Done at the very end of the analysis
@@ -370,44 +337,4 @@ let mark_shared_nodes_kind analysis =
          in
          let cfg = Mt_cfg.remove_superfluous_nodes ~keep th.th_cfg in
          th.th_cfg <- cfg;
-      );
-;;
-
-
-(* Auxiliary function iterating the analysis until the fixpoint is reached *)
-let reach_fixpoint analysis =
-  Mt_self.feedback "******* Starting to iterate";
-  let rec aux i =
-    Mt_self.feedback "***** Iteration %d" i;
-    analysis.iteration <- i;
-    let continue = one_iteration analysis in
-    if Mt_options.ToDisk.get () then begin
-      let filepath =
-        let prefix = Mt_options.ToDiskPrefix.get () in
-        Filepath.of_format "%siteration_%d.sav" prefix i
-      in
-      Project.save filepath;
-      Mt_self.feedback "* Saved iteration %d to file %S" i
-        (Filepath.to_string_rel filepath);
-    end;
-    if continue && i < Mt_options.StopAfter.get () then aux (i+1)
-    else (* Stop iteration *)
-    if continue then
-      Mt_self.feedback
-        "@[<v 0>\
-         @[<hov 2>******* Analysis stopped after@ \
-         %d iterations.@ Remaining@ to@ do:@]@ \
-         %a@]" i
-        (fun fmt () -> iter_threads analysis
-            (fun th -> if not (SetRecomputeReason.is_empty th.th_to_recompute) then
-                Format.fprintf fmt "@[<hov 2>Thread %a:@ %a@]@ "
-                  ThreadState.pretty_detailed th
-                  (Pretty_utils.pp_iter ~sep:",@ " ~pre:"" ~suf:""
-                     SetRecomputeReason.iter RecomputeReason.pretty)
-                  th.th_to_recompute
-            )
-        ) ()
-    else
-      Mt_self.feedback "******* Analysis performed, %d iterations" i
-  in
-  aux 1
+      )

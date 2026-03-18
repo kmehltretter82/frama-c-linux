@@ -11,10 +11,10 @@ open Mt_types
 open Mt_shared_vars_types
 open Mt_cfg_types
 
-(* -------------------------------------------------------------------------- *)
-(* --- Threads                                                            --- *)
-(* -------------------------------------------------------------------------- *)
 
+(* -------------------------------------------------------------------------- *)
+(* --- Thread reasons to recompute                                        --- *)
+(* -------------------------------------------------------------------------- *)
 
 type recompute_reason =
   | FirstIteration
@@ -24,45 +24,34 @@ type recompute_reason =
   | InitialArgsChanged
   | InitialEnvChanged
   | InterferencesChanged
-;;
-
+[@@deriving ord]
 
 module RecomputeReason = struct
-
   type t = recompute_reason
+  [@@deriving ord]
 
-  (* Used for comparison. *)
-  let rank = function
-    | FirstIteration -> 0
-    | NewMsgReceived -> 1
-    | PotentialSharedVarsChanged -> 2
-    | SharedVarsValuesChanged -> 3
-    | InitialArgsChanged -> 4
-    | InitialEnvChanged -> 5
-    | InterferencesChanged -> 6
+  let to_string = function
+    | FirstIteration -> "first iteration"
+    | NewMsgReceived -> "new message received"
+    | SharedVarsValuesChanged -> "shared vars values changed"
+    | PotentialSharedVarsChanged -> "potential shared vars changed"
+    | InitialArgsChanged -> "thread initial arguments changed"
+    | InitialEnvChanged -> "thread initial memory state changed"
+    | InterferencesChanged -> "interferences changed"
 
-  let compare r1 r2 = rank r1 - rank r2
+  let pretty fmt r =
+    Format.pp_print_text fmt (to_string r)
+end
 
-  let pretty fmt = function
-    | FirstIteration -> Format.fprintf fmt "first@ iteration"
-    | NewMsgReceived -> Format.fprintf fmt "new@ message@ received"
-    | SharedVarsValuesChanged ->
-      Format.fprintf fmt "shared@ vars@ values@ changed"
-    | PotentialSharedVarsChanged ->
-      Format.fprintf fmt "potential@ shared@ vars@ changed"
-    | InitialArgsChanged -> Format.fprintf fmt
-                              "thread@ initial@ arguments@ changed"
-    | InitialEnvChanged -> Format.fprintf fmt
-                             "thread@ initial@ memory@ state@ changed"
-    | InterferencesChanged -> Format.fprintf fmt "interferences@ changed"
-
+module SetRecomputeReason = struct
+  include Set.Make (RecomputeReason)
+  let pretty fmt set = pretty_text RecomputeReason.pretty fmt set
 end
 
 
-module SetRecomputeReason = Set.Make(struct
-    type t = recompute_reason
-    let compare = RecomputeReason.compare
-  end)
+(* -------------------------------------------------------------------------- *)
+(* --- Threads                                                            --- *)
+(* -------------------------------------------------------------------------- *)
 
 type priority = PDefault | PUnknown | PPriority of int
 
@@ -136,6 +125,9 @@ module ThreadState = struct
        is split by the value analysis *)
     then
       th.th_to_recompute <- SetRecomputeReason.add r th.th_to_recompute
+
+  let needs_recomputation th =
+    not (SetRecomputeReason.is_empty th.th_to_recompute)
 end
 
 
@@ -345,3 +337,17 @@ let should_compute_thread th =
    let only = Mt_options.OnlyThreads.get () in
    Datatype.String.Set.is_empty only || Datatype.String.Set.mem name only
   )
+
+let pretty_recompute_reasons fmt analysis =
+  let pretty_thread_reasons fmt th =
+    if not (SetRecomputeReason.is_empty th.th_to_recompute) then
+      Format.fprintf fmt "@[<hov 2>Thread %a:@ %a@]@ "
+        ThreadState.pretty_detailed th
+        SetRecomputeReason.pretty th.th_to_recompute
+  in
+  Format.fprintf fmt "@[<v>Remaining to do:@ %t@]"
+    (fun fmt -> iter_threads analysis (pretty_thread_reasons fmt))
+
+let needs_recomputation analysis =
+  threads analysis
+  |> List.exists ThreadState.needs_recomputation

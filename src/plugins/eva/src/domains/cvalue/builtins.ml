@@ -48,6 +48,10 @@ let register_builtin name ?replace ?typ cacheable f =
   | None -> ()
   | Some fname -> Hashtbl.replace table fname builtin
 
+let unregister_builtin name =
+  Parameters.unregister_builtin name;
+  Hashtbl.remove table name
+
 let is_builtin name =
   try
     let bname, _, _, _ = Hashtbl.find table name in

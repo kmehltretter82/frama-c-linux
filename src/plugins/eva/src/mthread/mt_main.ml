@@ -24,56 +24,41 @@ let () = Cvalue_callbacks.register_call_hook
 let () = Cvalue_callbacks.register_call_results_hook
     (fun args -> !ref_hook_end_function args)
 
+(* Conversion from the simplified type of an mthread function into one suitable
+   as a hook *)
+let wrap_builtin analysis builtin = fun state args ->
+  let state, res =
+    try builtin analysis state args
+    with Mt_analysis_hooks.Hook_failure res ->
+      state, Some (Mt_memory.int_to_value res)
+  in
+  Builtins.Full
+    { c_values = [res, state];
+      c_clobbered = Base.SetLattice.bottom;
+      c_assigns = None;
+    }
 
-let hook_builtins =
-  lazy (
-    (* a generic function that does nothing *)
-    let nop st _args = st, None in
+let register_hooks analysis =
+  ref_hook_call_function :=
+    Mt_analysis_hooks.catch_functions_calls analysis;
+  ref_hook_end_function :=
+    Mt_analysis_hooks.catch_functions_record analysis;
+  let register (name, builtin) =
+    wrap_builtin analysis builtin
+    |> Builtins.register_builtin name NoCacheCallers
+  in
+  List.iter register Mt_analysis_hooks.mthread_builtins
 
-    (* We create a reference for each of our builtin functions *)
-    let lref = List.map (fun e -> (ref nop, e)) Mt_analysis_hooks.mthread_builtins in
+let unregister_hooks () =
+  ref_hook_call_function := no_hook;
+  ref_hook_end_function := no_hook;
+  let unregister (name, _builtin) =
+    Builtins.unregister_builtin name
+  in
+  List.iter unregister Mt_analysis_hooks.mthread_builtins
 
-    (* We register one hook by function, that simply dereferences the
-       corresponding reference (up to some interface conversion) *)
-    List.iter (fun (r, (s, _)) ->
-        (* Conversion from the simplified type of an mthread function
-           into one suitable as a hook *)
-        Builtins.register_builtin s NoCacheCallers
-          (fun st args ->
-             let st, res =
-               try !r st args
-               with Mt_analysis_hooks.Hook_failure res ->
-                 st, Some (Mt_memory.int_to_value res)
-             in
-             Builtins.Full
-               { c_values = [res, st];
-                 c_clobbered = Base.SetLattice.bottom;
-                 c_assigns = None;
-               }
-          )) lref;
 
-    (* And finally, we return a function that sets all the references either
-       to nop, or to the suitable hook function *)
-    (function
-      | None -> (* Disable the hook *)
-        List.iter (fun (r, _) -> r := nop) lref;
-        ref_hook_call_function := no_hook;
-        ref_hook_end_function := no_hook;
-
-      | Some analysis ->
-        List.iter (fun (r, (_s, f)) -> r:= f analysis) lref;
-        ref_hook_call_function :=
-          Mt_analysis_hooks.catch_functions_calls analysis;
-        ref_hook_end_function :=
-          Mt_analysis_hooks.catch_functions_record analysis;
-    )
-  )
-
-let ref_analysis = ref None
-
-(* Perform an entire mthread execution, based on the ast and options of the
-   given project *)
-let mthread_run project =
+let pre_analysis () =
   Mt_self.warning
     "Mthread is an experimental plugin and is still in development.";
 
@@ -83,33 +68,16 @@ let mthread_run project =
      not (Mt_options.ExtractModels.mem "html") then
     Mt_self.error "Option %S needs option \"%s html\" to work."
       Mt_options.ConcatDotFilesTo.option_name
-      Mt_options.ExtractModels.option_name;
+      Mt_options.ExtractModels.option_name
 
-  let old_project = Project.current () in
-  Project.set_current project;
-  let hook_builtins = Lazy.force hook_builtins in
-
-  Mt_self.feedback "******* Starting mthread";
-
-  (* We force the computation of the AST before this stage, so that it does not
-     get recomputed in some other projects later *)
-  Ast.compute ();
-
-  (* Make sure that Mthread won't restart in one of the other projects
-     or once the fixpoint is reached. *)
-  Mt_options.Enabled.set false;
-
+let make_analysis_state () =
   (* We create the record containing the state of the analysis (which must
      remain unique, as it is used to define the callback for the value
      analysis.)
 
      For the current thread field, we use a dummy main thread, that will get
      overwritten once the real one is determined *)
-  let f_main =
-    try fst (Globals.entry_point ())
-    with Globals.No_such_entry_point s ->
-      Mt_self.abort "%s Mthread cannot run" s
-  in
+  let f_main = fst @@ Globals.entry_point () in
   let dummy_main_thread =
     Mt_analysis_hooks.main_thread f_main Cvalue.Model.empty_map in
   let analysis = {
@@ -127,67 +95,26 @@ let mthread_run project =
     concurrent_accesses_by_nodes = [];
   } in
 
-  (* We register our callback function *)
-  hook_builtins (Some analysis);
+  analysis
 
-  ref_analysis := Some analysis;
+let post_analysis analysis =
+  (* In the cfgs, mark whether the accesses are concurrent or not,
+      and remove superfluous node *)
+  Mt_analysis_fixpoint.mark_shared_nodes_kind analysis;
 
-  (* Cleanup function, called at the end or in case of failure or success. *)
-  let cleanup () =
-    Mt_summary.compute analysis;
-    hook_builtins None;
-    Project.set_current old_project;
-  in
+  (* Printing results to files *)
+  Mt_options.ExtractModels.iter
+    (fun s ->
+       Mt_self.feedback "******* Outputting model for %s" s;
+       (match s with
+        | "html" -> Mt_outputs.Html.output_threads analysis;
+        | _ -> Mt_self.error "Unknown model %s specified" s;
+       );
+       Mt_self.feedback "******* %s output done."
+         (String.capitalize_ascii s);
+    );
 
-  try
-    (* We analyse the main thread *)
-    let module Engine = (val Engine.current ()) in
-    Engine.Interferences.reset ();
-    Self.clear_results ();
-    Thread.reset_state ();
-    Mutex.reset_state ();
-    Mqueue.reset_state ();
-    Mt_summary.clear ();
-
-    (* Let Eva know about interrupt handlers. *)
-    Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
-
-    Mt_self.feedback "*** Computing value analysis for main thread";
-    Analysis.mthread_pre_analysis ();
-    Analysis.compute_thread Thread.main;
-    Mt_self.feedback "*** First value analysis for main thread done." ;
-
-    Mt_analysis_fixpoint.record_end_of_thread_analysis analysis;
-
-    (* We perform the analysis iterations *)
-    Mt_analysis_fixpoint.reach_fixpoint analysis;
-    Analysis.mthread_post_analysis ();
-
-    (* In the cfgs, mark whether the accesses are concurrent or not,
-       and remove superfluous node *)
-    Mt_analysis_fixpoint.mark_shared_nodes_kind analysis;
-
-    (* Printing results to files *)
-    Mt_options.ExtractModels.iter
-      (fun s ->
-         Mt_self.feedback "******* Outputting model for %s" s;
-         (match s with
-          | "html" -> Mt_outputs.Html.output_threads analysis;
-          | _ -> Mt_self.error "Unknown model %s specified" s;
-         );
-         Mt_self.feedback "******* %s output done."
-           (String.capitalize_ascii s);
-      );
-
-    cleanup ();
-
-  with e -> cleanup (); raise e
-
-
-let compute_mthread_once, _self =
-  State_builder.apply_once "mthread_compute"
-    [ Ast.self (*; Kernel.MainFunction.self *) ]
-    (fun () -> mthread_run (Project.current ()))
+  Mt_summary.compute analysis
 
 let () =
   (* Automatically add Mthread shared directory to the include path and add the
@@ -210,9 +137,3 @@ let () =
          Mt_self.warning
            "ignoring option %s specified after parsing"
            Mt_options.ThreadsLib.option_name)
-
-let main () =
-  if Mt_options.Enabled.get () then (
-    compute_mthread_once ()
-  )
-let () = Boot.Main.extend main

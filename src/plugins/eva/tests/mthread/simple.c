@@ -1,5 +1,6 @@
 /* run.config*
    ENABLED_IF: %{bin-available:dot}
+   STDOPT: +"-mt-stop-after 1"
    LOG: @LOG_MT_DOT_FILES_FILENAME@
    STDOPT: +"-mt-full-cfg @LOG_MT_DOT_FILES_OPTS@"
 */
@@ -8,7 +9,6 @@
 #include <pthread.h>
 
 int a, b, c, d, e, v;
-
 pthread_t job1, job2;
 pthread_mutex_t  lock;
 

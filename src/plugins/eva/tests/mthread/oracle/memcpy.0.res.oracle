@@ -5,8 +5,8 @@
 [kernel] Parsing memcpy.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
-[mt] *** Computing value analysis for main thread
 [eva] Found concurrency builtins: enabling mthread domain
+[mt] *** Computing value analysis for main thread
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] memcpy.c:39: New thread: tjob0, fun job0, parent <main>, args {0}
@@ -228,8 +228,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob0 computed
-[mt] *** Computing thread tjob1, iteration 2
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread tjob1, iteration 2 (potential shared vars changed and
+    interferences changed)
 [mt] * Computing value analysis for thread tjob1
 [eva] Analyzing a complete application starting at job1
 [eva] Initial state supplied by user
@@ -248,8 +248,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob1 computed
-[mt] *** Computing thread tjob2, iteration 2
-    (potential shared vars changed, interferences changed)
+[mt] *** Computing thread tjob2, iteration 2 (potential shared vars changed and
+    interferences changed)
 [mt] * Computing value analysis for thread tjob2
 [eva] Analyzing a complete application starting at job2
 [eva] Initial state supplied by user
