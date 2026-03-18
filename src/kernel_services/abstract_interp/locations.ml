@@ -525,7 +525,7 @@ let is_valid access {loc; size} =
 let filter_base f loc =
   { loc with loc = Location_Bits.filter_base f loc.loc }
 
-let int_base_size_of_varinfo v =
+let size_of_varinfo v =
   try bitsSizeOf v.vtype |> Z_or_top.of_int
   with Cil.SizeOfError (msg, _) ->
     Abstract_interp.feedback_approximation
@@ -534,7 +534,7 @@ let int_base_size_of_varinfo v =
 
 let loc_of_varinfo v =
   let base = Base.of_varinfo v in
-  make_loc (Location_Bits.inject base Ival.zero) (int_base_size_of_varinfo v)
+  make_loc (Location_Bits.inject base Ival.zero) (size_of_varinfo v)
 
 let loc_of_base v =
   make_loc (Location_Bits.inject v Ival.zero) (Base.bits_sizeof v)
