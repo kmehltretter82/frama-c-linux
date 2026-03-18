@@ -83,7 +83,19 @@ let must_never_monitor vi =
    left-values must be tracked by the memory model library *)
 (* ********************************************************************** *)
 
-module Varinfos = Varinfo.Hptset
+module Varinfos = struct
+  include Varinfo.Hptset
+
+  let add vi state =
+    if must_never_monitor vi then state
+    else begin
+      Options.debug ~level:4 ~dkey "monitoring %a" Printer.pp_varinfo vi;
+      (* String literals can't be monitored. In case we have one,
+         drop the attribute. *)
+      Demote_string_literal.demote vi;
+      add vi state
+    end
+end
 
 module Env: sig
   val has_heap_allocations: unit -> bool
@@ -282,23 +294,10 @@ module rec Transfer
   let extend_to_expr always state lhost e =
     let add_vi state vi =
       if is_ptr_or_array_exp e && (always || Varinfos.mem vi state)
-      then begin
-        match base_addr e with
+      then match base_addr e with
         | None -> state
-        | Some vi_e ->
-          if must_never_monitor vi then state
-          else begin
-            Options.feedback ~level:4 ~dkey
-              "monitoring %a from %a."
-              Printer.pp_varinfo vi_e
-              Printer.pp_lval (lhost, NoOffset);
-            (* String literals can't be monitored. In case we have one,
-               drop the attribute. *)
-            Demote_string_literal.demote vi_e;
-            Varinfos.add vi_e state
-          end
-      end else
-        state
+        | Some vi_e -> Varinfos.add vi_e state
+      else state
     in
     match lhost with
     | Var vi -> add_vi state vi
@@ -333,17 +332,10 @@ module rec Transfer
     extend_to_expr always state lhost e
 
   let rec register_term_lval kf varinfos (thost, _) =
-    let add_vi kf vi =
-      Options.feedback ~level:4 ~dkey "monitoring %a from annotation of %a."
-        Printer.pp_varinfo vi
-        Kernel_function.pretty kf;
-      Demote_string_literal.demote vi;
-      Varinfos.add vi varinfos
-    in
     match thost with
     | TVar { lv_origin = None } -> varinfos
-    | TVar { lv_origin = Some vi } -> add_vi kf vi
-    | TResult _ -> add_vi kf (Misc.result_vi kf)
+    | TVar { lv_origin = Some vi } -> Varinfos.add vi varinfos
+    | TResult _ -> Varinfos.add (Misc.result_vi kf) varinfos
     | TMem t -> register_term kf varinfos t
 
   and register_term kf varinfos term = match term.term_node with
@@ -699,14 +691,13 @@ end = struct
   module D = Dataflow.Backwards(Transfer)
 
   let compute init_set kf =
-    Options.feedback ~dkey ~level:2 "entering in function %a."
+    Options.debug ~dkey ~level:2 "entering in function %a."
       Kernel_function.pretty kf;
     assert (not (Rtl.Symbols.mem_kf kf));
     let tbl, is_init =
       try Env.find kf, true
       with Not_found -> Stmt.Hashtbl.create 17, false
     in
-    (*    Options.feedback "ANALYSING %a" Kernel_function.pretty kf;*)
     if not is_init then Env.add kf tbl;
     (try
        let fundec = Kernel_function.get_definition kf in
@@ -747,8 +738,7 @@ end = struct
        D.compute stmts
      with Kernel_function.No_Definition | Kernel_function.No_Statement ->
        ());
-    Options.feedback ~dkey ~level:2 "function %a done."
-      Kernel_function.pretty kf;
+    Options.debug ~dkey ~level:2 "function %a done." Kernel_function.pretty kf;
     tbl
 
   let get ?init kf =
@@ -757,7 +747,6 @@ end = struct
     else
       try
         let stmt = Kernel_function.find_first_stmt kf in
-        (*      Options.feedback "GETTING %a" Kernel_function.pretty kf;*)
         let tbl =
           if Env.mem_init kf init then
             try Env.find kf with Not_found -> assert false
