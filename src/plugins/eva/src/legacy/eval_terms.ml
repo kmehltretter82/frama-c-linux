@@ -1745,7 +1745,7 @@ and eval_toffset ~alarm_mode env typ toffset =
         try Cvalue.V.project_ival_bottom idxs.eover
         with Cvalue.V.Not_based_on_null -> Ival.top
       in
-      let offset = Ival.scale_int_base size_e offset in
+      let offset = Ival.scale_or_top size_e offset in
       Ival.add_int offset offsrem.eover
     in
     let eunder =
@@ -1755,8 +1755,8 @@ and eval_toffset ~alarm_mode env typ toffset =
       in
       let offset = match size_e with
         | `Top -> Ival.bottom
-        (* Note: scale_int_base would overapproximate when given a
-           Float.  Should never happen. *)
+        (* [Ival.scale] would overapproximate when given a Float.
+           Should never happen. *)
         | `Value f ->
           assert (Ival.is_int offset);
           Ival.scale f offset

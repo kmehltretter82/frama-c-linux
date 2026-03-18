@@ -759,7 +759,7 @@ include (
     end):
     Datatype.S_with_collections with type t := t)
 
-let scale_int_base factor v = match factor with
+let scale_or_top factor v = match factor with
   | `Top -> top
   | `Value f -> scale f v
 

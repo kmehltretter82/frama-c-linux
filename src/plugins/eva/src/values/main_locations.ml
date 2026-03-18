@@ -77,7 +77,7 @@ module PLoc = struct
         let index_i = Cvalue.V.project_ival index in
         let size = Bit_utils.sizeof typ_pointed in
         (* Index offsets expressed in terms of the array elements size *)
-        let index_i = Ival.scale_int_base size index_i in
+        let index_i = Ival.scale_or_top size index_i in
         (* Combine the two offsets *)
         Precise (Precise_locs.shift_offset index_i offset)
       with Cvalue.V.Not_based_on_null ->
@@ -212,7 +212,7 @@ module PLoc = struct
             else Ival.scale_div ~pos:true size new_index
         in
         (* new_remaining = offset - index * size *)
-        let index_i = Ival.scale_int_base size index_ival in
+        let index_i = Ival.scale_or_top size index_ival in
         let new_rem = Ival.sub_int off_ival index_i in
         if Ival.is_bottom new_index || Ival.is_bottom new_rem
         then `Bottom
