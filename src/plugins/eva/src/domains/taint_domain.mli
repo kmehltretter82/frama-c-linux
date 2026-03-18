@@ -23,3 +23,17 @@ val is_tainted: ?name:string -> state -> Locations.Zone.t -> taint
 
 (** Returns the list of taint names encountered by the taint analysis. *)
 val taint_names: unit -> string list
+
+(** Sets of taint names classified by kind of dependency. *)
+type taint_names_by_kind =
+  { direct_taint_names: Datatype.String.Set.t;
+    (** Taint names for which the given zone has a direct data dependency. *)
+    indirect_taint_names: Datatype.String.Set.t;
+    (** Taint names for which the given zone has an indirect (control)
+        dependency. *)
+  }
+
+(** Returns the sets of taint names whose tainted locations intersect the given
+    memory zone, classified by kind of dependency (direct or indirect). *)
+val taint_names_by_kind:
+  state -> Locations.Zone.t -> taint_names_by_kind Lattice_bounds.or_top

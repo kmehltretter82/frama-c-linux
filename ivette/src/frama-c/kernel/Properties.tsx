@@ -33,7 +33,7 @@ import { menuItem, setting } from './Globals';
 
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as EvaAst from 'frama-c/plugins/eva/api/ast';
-import { taintStatusTags } from 'frama-c/plugins/eva/api/taint';
+import { taintStatus, taintStatusTags } from 'frama-c/plugins/eva/api/taint';
 import * as Properties from 'frama-c/kernel/api/properties';
 import * as States from 'frama-c/states';
 
@@ -74,7 +74,7 @@ const DEFAULTS: { [key: string]: IFilterContent } = {
   'source.alarms': newFilter(true, "Alarms"),
   'source.libc': newFilter(true, "Libc specifications"),
   'source.others': newFilter(true, "Others"),
-   /** status */
+  /** status */
   'status.valid': newFilter(true, "Valid"),
   'status.valid_hyp': newFilter(true, "Valid under hyp."),
   'status.unknown': newFilter(true, "Unknown"),
@@ -156,13 +156,13 @@ function useFilterStr(path: string): Form.FieldState<string> {
     (newValue: string, newError: Form.FieldError) => {
       setValue(newValue);
       setError(newError);
-      if(Form.isValid(newError)) Reload.emit();
+      if (Form.isValid(newError)) Reload.emit();
     }, [setValue],
   );
   return { value, error, onChanged };
 }
 
-function resetFilters(prefix: string, b?: boolean) : void {
+function resetFilters(prefix: string, b?: boolean): void {
   for (const key in DEFAULTS) {
     if (key.startsWith(prefix)) {
       const target = b ?? DEFAULTS[key].value;
@@ -275,15 +275,21 @@ function filterEva(p: Property): boolean {
   if ('priority' in p && p.priority === false && filter('eva.priority_only'))
     return false;
   if ('taint' in p) {
-    switch (p.taint) {
-      case 'not_tainted':
-      case 'not_applicable':
+    const taint = p.taint as taintStatus;
+    switch (taint) {
+      case taintStatus.not_tainted:
+      case taintStatus.not_applicable:
         return !filter('eva.data_tainted_only') &&
           !filter('eva.ctrl_tainted_only');
-      case 'direct_taint':
+      case taintStatus.direct_taint:
         return !(filter('eva.ctrl_tainted_only'));
-      case 'indirect_taint':
+      case taintStatus.indirect_taint:
         return !(filter('eva.data_tainted_only'));
+      case taintStatus.not_computed:
+      case taintStatus.error:
+        break;
+      default:
+        throw taint satisfies never;
     }
   }
   return true;
@@ -316,11 +322,11 @@ export interface IFilterState {
 
 function getContextMenu(
   type: TFilterType,
-  filters: {[key: string]: setting}
-):Dome.PopupMenuItem[] {
-  const typeStr = type+".";
+  filters: { [key: string]: setting }
+): Dome.PopupMenuItem[] {
+  const typeStr = type + ".";
   return Object.entries(DEFAULTS)
-    .filter(([k, ]) => k.startsWith(typeStr))
+    .filter(([k,]) => k.startsWith(typeStr))
     .map(([k, elt]) => menuItem({
       label: elt.label,
       state: filters[k.replace(typeStr, "")]
@@ -328,13 +334,13 @@ function getContextMenu(
 }
 
 export function useStatusFilter(): IFilterState {
-  const filters: {[key: string]: setting} = {};
+  const filters: { [key: string]: setting } = {};
 
   filters['valid'] = useFilter('status.valid');
   filters['valid_hyp'] = useFilter('status.valid_hyp');
   filters['unknown'] = useFilter('status.unknown');
   filters['invalid'] = useFilter('status.invalid');
-  filters['invalid_hyp' ]= useFilter('status.invalid_hyp');
+  filters['invalid_hyp'] = useFilter('status.invalid_hyp');
   filters['considered_valid'] = useFilter('status.considered_valid');
   filters['untried'] = useFilter('status.untried');
   filters['dead'] = useFilter('status.dead');
@@ -348,7 +354,7 @@ export function useStatusFilter(): IFilterState {
 }
 
 export function useKindPropertiesFilter(): IFilterState {
-  const filters: {[key: string]: setting} = {};
+  const filters: { [key: string]: setting } = {};
 
   filters['assert'] = useFilter('kind.assert');
   filters['invariant'] = useFilter('kind.invariant');
@@ -373,7 +379,7 @@ export function useKindPropertiesFilter(): IFilterState {
 }
 
 export function useEvaPropertiesFilter(): IFilterState {
-  const filters: {[key: string]: setting} = {};
+  const filters: { [key: string]: setting } = {};
 
   filters['priority_only'] = useFilter('eva.priority_only');
   filters['data_tainted_only'] = useFilter('eva.data_tainted_only');
@@ -419,13 +425,22 @@ export const renderTaint: Renderer<States.Tag> =
   (taint: States.Tag): JSX.Element | null => {
     let id = null;
     let color = 'black';
-    switch (taint.name) {
-      case 'not_tainted': id = 'DROP.EMPTY'; color = '#00B900'; break;
-      case 'direct_taint': id = 'DROP.FILLED'; color = '#882288'; break;
-      case 'indirect_taint': id = 'DROP.FILLED'; color = '#73BBBB'; break;
-      case 'error': id = 'HELP'; break;
-      case 'not_applicable': id = 'MINUS'; break;
+    const status = taint.name as taintStatus;
+    switch (status) {
+      case taintStatus.not_tainted:
+        id = 'DROP.EMPTY'; color = '#00B900'; break;
+      case taintStatus.direct_taint:
+        id = 'DROP.FILLED'; color = '#882288'; break;
+      case taintStatus.indirect_taint:
+        id = 'DROP.FILLED'; color = '#73BBBB'; break;
+      case taintStatus.error:
+        id = 'HELP'; break;
+      case taintStatus.not_applicable:
+        id = 'MINUS'; break;
+      case taintStatus.not_computed:
+        break;
       default:
+        throw status satisfies never;
     }
     return (id ? <Icon id={id} fill={color} title={taint.descr} /> : null);
   };
@@ -611,16 +626,16 @@ function CheckField(props: CheckFieldProps): JSX.Element {
 function PropertyFilter(): JSX.Element {
   const namesState = useFilterStr("names");
   const checkerNames = (names: string | undefined): Form.FieldError => {
-    if( names === undefined || names === "" || names.length > 1) return true;
+    if (names === undefined || names === "" || names.length > 1) return true;
     return "At least 2 characters";
   };
 
   const getCheckBox = (type: TFilterType): JSX.Element => {
     return <> {
       Object.entries(DEFAULTS)
-        .filter(([key, ]) => key.startsWith(type+"."))
+        .filter(([key,]) => key.startsWith(type + "."))
         .map(([key, elt]) =>
-          <CheckField key={key} label={elt.label} path={key} title={elt.title}/>
+          <CheckField key={key} label={elt.label} path={key} title={elt.title} />
         )
     }</>;
   };
@@ -634,7 +649,7 @@ function PropertyFilter(): JSX.Element {
         className="properties-section-names"
         infos={Form.isValid(namesState.error) && namesState.value.length >= 2 ? "Active" : ""}
         summary={!Form.isValid(namesState.error) ?
-          <Icon id='WARNING' kind="warning" title={`Errors in section`}/> : undefined }
+          <Icon id='WARNING' kind="warning" title={`Errors in section`} /> : undefined}
       >
         <Form.TextField
           label={""}
@@ -645,11 +660,11 @@ function PropertyFilter(): JSX.Element {
         />
       </Section>
 
-      <FilterSection label="Source" prefix="source"> { getCheckBox("source") } </FilterSection>
-      <FilterSection label="Status" prefix="status" unfold> { getCheckBox("status") } </FilterSection>
-      <FilterSection label="Property kind" prefix="kind"> { getCheckBox("kind") } </FilterSection>
-      <FilterSection label="Alarms kind" prefix="alarms"> { getCheckBox("alarms") } </FilterSection>
-      <FilterSection label="Eva"> { getCheckBox("eva") } </FilterSection>
+      <FilterSection label="Source" prefix="source"> {getCheckBox("source")} </FilterSection>
+      <FilterSection label="Status" prefix="status" unfold> {getCheckBox("status")} </FilterSection>
+      <FilterSection label="Property kind" prefix="kind"> {getCheckBox("kind")} </FilterSection>
+      <FilterSection label="Alarms kind" prefix="alarms"> {getCheckBox("alarms")} </FilterSection>
+      <FilterSection label="Eva"> {getCheckBox("eva")} </FilterSection>
     </Scroll>
   );
 }

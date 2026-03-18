@@ -1208,3 +1208,26 @@ let is_tainted ?name state zone =
 
 let taint_names () =
   LatticeMultiTaint.TaintNamesRef.get () |> Datatype.String.Set.elements
+
+type taint_names_by_kind =
+  { direct_taint_names: Datatype.String.Set.t;
+    indirect_taint_names: Datatype.String.Set.t;
+  }
+
+let taint_names_by_kind state zone =
+  let open Lattice_bounds.Top.Operators in
+  let+ state_map = state in
+  let add_name locs name names =
+    if Zone.intersects zone locs
+    then Datatype.String.Set.add name names
+    else names
+  in
+  let empty = Datatype.String.Set.empty, Datatype.String.Set.empty in
+  let direct_taint_names, indirect_taint_names =
+    LatticeMultiTaint.fold (fun name taint_state (direct, indirect) ->
+        let direct = add_name taint_state.locs_data name direct in
+        let indirect = add_name taint_state.locs_control name indirect in
+        direct, indirect)
+      state_map empty
+  in
+  { direct_taint_names; indirect_taint_names }

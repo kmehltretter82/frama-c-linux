@@ -496,7 +496,7 @@ export function getMarkerMenuItems(
   const items: Dome.PopupMenuItem[] = [];
   const { kind, name, labelKind, definition } = attributes;
   if (kind === 'DFUN') {
-    if(callers) {
+    if (callers) {
       const groupedCallers = Lodash.groupBy(callers, ({ call }) => call);
       const markers = callers.map(({ stmt }) => stmt);
       const descr = `Calls to ${name}`;
@@ -572,16 +572,22 @@ const TaintedLvalues = Editor.createField<Taints[] | undefined>(undefined);
 
 function textOfTaint(taint: EvaTaint.taintStatus): string {
   switch (taint) {
-    case 'not_computed': return 'The taint has not been computed';
-    case 'error': return 'There was an error during the taint computation';
-    case 'not_applicable': return 'No taint for this lvalue';
-    case 'direct_taint': return 'This lvalue can be affected by an attacker';
-    case 'indirect_taint':
-      return 'This lvalue depends on path conditions that can \
-      be affected by an attacker';
-    case 'not_tainted': return 'This lvalue is safe';
+    case EvaTaint.taintStatus.not_computed:
+      return 'The taint has not been computed';
+    case EvaTaint.taintStatus.error:
+      return 'There was an error during the taint computation';
+    case EvaTaint.taintStatus.not_applicable:
+      return 'No taint for this lvalue';
+    case EvaTaint.taintStatus.direct_taint:
+      return 'This lvalue can be affected by an attacker';
+    case EvaTaint.taintStatus.indirect_taint:
+      return 'This lvalue depends on path conditions that can be affected by \
+        an attacker';
+    case EvaTaint.taintStatus.not_tainted:
+      return 'This lvalue is safe';
+    default:
+      throw taint satisfies never;
   }
-  return '';
 }
 
 const TaintedLvaluesDecorator = createTaintedLvaluesDecorator();
