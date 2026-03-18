@@ -840,7 +840,7 @@ let eval_logic_charchr builtin env s c ldeps_s ldeps_c =
 let eval_logic_memchr_off builtin env s c n =
   let minus_one = Cvalue.V.inject_int Z.minus_one in
   let positive = Cvalue.V.inject_ival Ival.positive_integers in
-  let pred_n = Cvalue.V.add_untyped ~factor:Z_or_top.one n.eover minus_one in
+  let pred_n = Cvalue.V.add_untyped ~factor:Z.one n.eover minus_one in
   let n_pos = Cvalue.V.narrow positive pred_n in
   let eover =
     if Cvalue.V.is_bottom n_pos then minus_one else
@@ -1377,10 +1377,10 @@ and eval_binop ~alarm_mode env op t1 t2 =
       | PlusPI -> begin
           match Bit_utils.osizeof_pointed te1 with
           | `Top -> fun _ _ -> V.bottom
-          | `Value _ as size -> add_untyped_op size
+          | `Value size -> add_untyped_op size
         end
-      | PlusA -> add_untyped_op (Z_or_top.one)
-      | MinusA -> add_untyped_op (Z_or_top.minus_one)
+      | PlusA -> add_untyped_op (Z.one)
+      | MinusA -> add_untyped_op (Z.minus_one)
       | _ -> fun _ _ -> under_from_over eover
     in
     let eunder = eunder_op r1.eunder r2.eunder in

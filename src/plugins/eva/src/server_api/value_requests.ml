@@ -418,7 +418,7 @@ let extract_single_var vi state =
 let reduce_loc_and_eval state loc =
   if Cvalue.Model.is_top state then Top
   else if not (Cvalue.Model.is_reachable state) then Bottom
-  else if Z_or_top.(equal loc.Locations.size zero) then Empty
+  else if Z_or_top.is_zero loc.Locations.size then Empty
   else
     let loc' = Locations.(valid_part Read loc) in
     if Locations.is_bottom_loc loc' then InvalidLoc

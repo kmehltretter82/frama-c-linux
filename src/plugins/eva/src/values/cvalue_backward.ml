@@ -57,13 +57,13 @@ let backward_relation typ ~positive op =
 (* res == v1 +/- v2 *)
 let backward_add_int typ ~res_value ~v1 ~v2 pos =
   (* v1 == res -/+ v2 *)
-  let v1' =
-    V.add_untyped ~factor:Z_or_top.(if pos then minus_one else one) res_value v2
+  let factor = if pos then Z.minus_one else Z.one in
+  let v1' = V.add_untyped ~factor res_value v2 in
   (* +/- v2 == res - v1 *)
-  and v2' =
+  let v2' =
     if pos
-    then V.add_untyped ~factor:Z_or_top.minus_one res_value v1
-    else V.add_untyped ~factor:Z_or_top.minus_one v1 res_value
+    then V.add_untyped ~factor:Z.minus_one res_value v1
+    else V.add_untyped ~factor:Z.minus_one v1 res_value
   in
   (* TODO: no need for reinterpret if no overflow. *)
   Some (Cvalue_forward.reinterpret typ v1',
@@ -89,7 +89,6 @@ let backward_add_float fk ~res_value ~v1 ~v2 (pos: [`Add|`Sub]) =
    As address part cannot interfere, new integer parts are computed pointwise,
    and new addresses are computed from the integer part of the other side. *)
 let unsafe_backward_add_ptr size ~res_value ~v1 ~v2 pos =
-  let scale = Z_or_top.project size in
   let i1 = V.find Base.null v1 in
   (* Compute the reduced value for v2 = (+/- (res - v1)) / size. *)
   let i2' =
@@ -97,15 +96,15 @@ let unsafe_backward_add_ptr size ~res_value ~v1 ~v2 pos =
     then V.sub_untyped_pointwise res_value v1
     else V.sub_untyped_pointwise v1 res_value
   in
-  let i2' = Ival.scale_div ~pos:false scale i2' in
+  let i2' = Ival.scale_div ~pos:false size i2' in
   let p2' =
     (* If the operation is v1 + v2, the offset v2 may be a precise pointer.
        Otherwise, we would be multiplying an address by a constant, which makes
        no sense for pointer arithmetics. *)
-    if (Z_or_top.equal size Z_or_top.one && pos)
-    || (Z_or_top.equal size Z_or_top.minus_one && not pos)
+    if (Z.equal size Z.one && pos)
+    || (Z.equal size Z.minus_one && not pos)
     then
-      let factor = Z_or_top.minus_one in
+      let factor = Z.minus_one in
       if pos
       then V.add_untyped ~factor res_value (Cvalue.V.inject_ival i1)
       else V.add_untyped ~factor (Cvalue.V.inject_ival i1) res_value
@@ -119,9 +118,9 @@ let unsafe_backward_add_ptr size ~res_value ~v1 ~v2 pos =
   let v2 = Cvalue.V.narrow v2 v2' in
   (* Compute the reduced value for v1 = res +/- size * v2. *)
   let i2 = V.find Base.null v2 in
-  let factor = if pos then size else Z_or_top.neg size in
+  let factor = if pos then size else Z.neg size in
   let i1' = V.sub_untyped_pointwise ~factor res_value v2 in
-  let factor = if pos then Z_or_top.neg size else size in
+  let factor = if pos then Z.neg size else size in
   let p1' = V.add_untyped ~factor res_value (Cvalue.V.inject_ival i2) in
   let v1 = V.add Base.null i1' p1' in
   v1, v2
@@ -148,10 +147,10 @@ let backward_add_ptr typ ~res_value ~v1 ~v2 pos =
   let default = if !reduced then Some (v1, v2) else None in
   (* If the result is imprecise, or the size is zero or top, no more reduction
      is possible. *)
-  let size = Bit_utils.osizeof_pointed typ in
-  if Z_or_top.is_zero size || Z_or_top.is_top size || V.is_imprecise res_value
-  then default
-  else
+  match Bit_utils.osizeof_pointed typ with
+  | `Top -> default
+  | `Value size when Z.is_zero size || V.is_imprecise res_value -> default
+  | `Value size ->
     match v1, v2 with
     | V.Map _, V.Map _ ->
       Some (unsafe_backward_add_ptr size ~res_value ~v1 ~v2 pos)
@@ -253,12 +252,12 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
   | MinusA, TFloat fk -> backward_add_float (Fval.kind fk) ~res_value ~v1 ~v2 `Sub
 
   | PlusPI, TPtr _ -> backward_add_ptr typ ~res_value ~v1 ~v2 true
-  | MinusPI, TPtr _ ->            backward_add_ptr typ ~res_value ~v1 ~v2 false
+  | MinusPI, TPtr _ -> backward_add_ptr typ ~res_value ~v1 ~v2 false
 
   | MinusPP, TInt _ ->
-    let factor = Bit_utils.osizeof_pointed typ_e1 in
-    let v1 = V.add_untyped ~factor v2 res_value
-    and v2 = V.add_untyped ~factor:(Z_or_top.neg factor) v1 res_value in
+    let forward_binop = Cvalue_forward.forward_binop_int ~typ:typ_e1 in
+    let v1 = forward_binop v2 PlusPI res_value
+    and v2 = forward_binop v1 MinusPI res_value in
     Some (v1, v2)
 
   (* comparison operators *)
@@ -287,7 +286,7 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
     (* the following equality only holds when v1 does not change sign, which
        is why we split its range: v1 == (v1 / v2) * v2 + res *)
     let v1' v1 res =
-      V.add_untyped ~factor:Z_or_top.one res (V.mul (V.div v1 v2) v2)
+      V.add_untyped ~factor:Z.one res (V.mul (V.div v1 v2) v2)
     in
     let ge = Abstract_interp.Comp.Ge and le = Abstract_interp.Comp.Le in
     let v1_pos =  V.backward_comp_int_left ge v1 V.singleton_zero in
@@ -305,7 +304,7 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
       else
         (* v2 = (v1 - res) / (v1 / v2) *)
         V.div
-          (V.add_untyped ~factor:Z_or_top.minus_one v1 res_value)
+          (V.add_untyped ~factor:Z.minus_one v1 res_value)
           (V.div  v1 v2)
     in
     Some (v1', v2')

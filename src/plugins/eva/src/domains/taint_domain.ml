@@ -387,8 +387,8 @@ module TransferSingleTaint = struct
       data, indirect, is_singleton
 
   let bottom_loc =
-    Precise_locs.make_precise_loc Precise_locs.bottom_location_bits
-      ~size:Z_or_top.zero
+    let size = Z_or_top.of_int 0 in
+    Precise_locs.make_precise_loc Precise_locs.bottom_location_bits ~size
 
   let dont_taint_singleton valuation to_loc =
     fun lval ->

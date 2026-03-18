@@ -112,18 +112,15 @@ module Location_Bytes = struct
     if Ival.is_bottom offset then bottom
     else map (Ival.add_int_under offset) l
 
-  let sub_pointwise_map ?factor m1 m2 =
-    let factor = match factor with
-      | None -> Z_or_top.minus_one
-      | Some f -> Z_or_top.neg f
-    in
+  let sub_pointwise_map ?(factor=Z.one) m1 m2 =
+    let factor = Z.neg factor in
     (* Subtract pointwise for all the bases that are present in both m1
        and m2. *)
     M.fold2_join_heterogeneous
       ~cache:Hptmap_sig.NoCache
       ~empty_left:(fun _ -> Ival.bottom)
       ~empty_right:(fun _ -> Ival.bottom)
-      ~both:(fun _b i1 i2 -> Ival.add_int i1 (Ival.scale_int_base factor i2))
+      ~both:(fun _b i1 i2 -> Ival.add_int i1 (Ival.scale factor i2))
       ~join:Ival.join
       ~empty:Ival.bottom
       m1 m2

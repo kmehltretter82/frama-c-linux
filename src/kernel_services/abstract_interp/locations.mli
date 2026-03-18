@@ -83,7 +83,7 @@ module Location_Bytes : sig
   val shift_under : Ival.t -> t -> t
   (** Over- and under-approximation of shifting the value by the given Ival. *)
 
-  val sub_pointwise: ?factor:Z_or_top.t -> t -> t -> Ival.t
+  val sub_pointwise: ?factor:Z.t -> t -> t -> Ival.t
   (** Subtracts the offsets of two locations [loc1] and [loc2].
       Returns the pointwise subtraction of their offsets
       [off1 - factor * off2]. [factor] defaults to [1]. *)

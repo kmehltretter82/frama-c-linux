@@ -408,7 +408,7 @@ module G = struct
     let empty_right left = left in
     let both b v i =
       let p = Cvalue.V.inject_ival (Bounds.to_ival (Bounds.mul nb i)) in
-      let v' = Cvalue.V.add_untyped ~factor:Z_or_top.one v p in
+      let v' = Cvalue.V.add_untyped ~factor:Z.one v p in
       MV.singleton b v'
     in
     let join = MV.merge_disjoint in
@@ -837,7 +837,7 @@ module G = struct
       with Not_found -> raise Untranslatable
 
     let add (ct1, l1: t) (ct2, l2: t) : t =
-      let ct = Cvalue.V.add_untyped ~factor:Z_or_top.one ct1 ct2 in
+      let ct = Cvalue.V.add_untyped ~factor:Z.one ct1 ct2 in
       let l = map2 Bounds.add l1 l2 in
       sanitize_v ct;
       ct, l
@@ -888,7 +888,7 @@ module G = struct
         Bounds.add shift_b (aux q qg)
     in
     let shift = Cvalue.V.inject_ival (Bounds.to_ival (aux l lg)) in
-    Cvalue.V.add_untyped ctg ~factor:Z_or_top.one shift
+    Cvalue.V.add_untyped ctg ~factor:Z.one shift
 
   (* Assuming [b] has value [v], backward-propagate this information to
      the number of iterations in [t]. Reduce [None] if no reduction

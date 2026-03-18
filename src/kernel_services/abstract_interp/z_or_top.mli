@@ -10,12 +10,7 @@
 
 include Datatype.S with type t = Z.t Lattice_bounds.or_top
 
-val zero: t
-val one: t
-val minus_one: t
 val top: t
-val neg: t -> t
-
 val of_int: int -> t
 
 val is_zero: t -> bool
