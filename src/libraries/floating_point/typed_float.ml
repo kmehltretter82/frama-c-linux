@@ -56,23 +56,23 @@ external fmod  : 'f format -> float -> float -> float = "frama_c_fmod"
 type resulting_format =
   | Format : ('f, 'k) parsed_format * 'k format -> resulting_format
 
-let fkind_of_format : type f. f format -> Cil_types.fkind = function
-  | Single  -> Cil_types.FFloat
-  | Float32 -> Cil_types.FFloat32
-  | Float64 -> Cil_types.FFloat64
-  | Double  -> Cil_types.FDouble
+let fkind_of_format : type f. f format -> fkind = function
+  | Single  -> FFloat
+  | Float32 -> FFloat32
+  | Float64 -> FFloat64
+  | Double  -> FDouble
 
 let pretty_format : type f. f format Pretty_utils.formatter = fun fmt format ->
   match format with
   | (Single|Float32) -> Format.fprintf fmt "Binary32"
   | (Double|Float64) -> Format.fprintf fmt "Binary64"
 
-let parsed_fkind : type k f. (k, f) parsed_format -> Cil_types.fkind = function
-  | Single_supported  -> Cil_types.FFloat
-  | Float32_supported -> Cil_types.FFloat32
-  | Float64_supported -> Cil_types.FFloat64
-  | Double_supported  -> Cil_types.FDouble
-  | Long_unsupported  -> Cil_types.FLongDouble
+let parsed_fkind : type k f. (k, f) parsed_format -> fkind = function
+  | Single_supported  -> FFloat
+  | Float32_supported -> FFloat32
+  | Float64_supported -> FFloat64
+  | Double_supported  -> FDouble
+  | Long_unsupported  -> FLongDouble
 
 let format_of_suffix = function
   | "L"   | "l"   -> Format (Long_unsupported, Double)

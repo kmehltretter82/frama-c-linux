@@ -6,6 +6,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** {2 Float kinds}
+    @since Frama-C+dev
+*)
+type fkind =
+  | FFloat      (** [float] *)
+  | FFloat32    (** [binary32] *)
+  | FFloat64    (** [binary64] *)
+  | FDouble     (** [double] *)
+  | FLongDouble (** [long double] *)
+
 (** {2 pretty modes} *)
 
 (** Determine how floats will be printed.
@@ -38,7 +48,7 @@ val round_to_single_precision : float -> float
 
 (** Rounds the given float to a single precision float if
     [fkind = FFloat] or [fkind = FFloat32]. *)
-val round_if_single_precision : Cil_types.fkind -> float -> float
+val round_if_single_precision : fkind -> float -> float
 
 
 (** {2 Floating-point operations} *)
@@ -82,17 +92,17 @@ val pretty : Format.formatter -> float -> unit
 
     @before Frama-C+dev "f32" and "f64" were not accepted.
 *)
-val has_suffix : Cil_types.fkind -> string -> bool
+val has_suffix : fkind -> string -> bool
 
 (** [extract_suffix s] tries to find a floating-point suffix
     ("f", "F", "d", "l", "f32", etc) in [s] and returns
     [Some (s_without_suffix, suffix, fkind)]. If [s] has no suffix,
-    returns [Some (s, "", Cil_types.FDouble)]. If the suffix is unknown, returns
+    returns [Some (s, "", FDouble)]. If the suffix is unknown, returns
     [None].
 
     @since Frama-C+dev
 *)
-val extract_suffix : string -> (string * string * Cil_types.fkind) option
+val extract_suffix : string -> (string * string * fkind) option
 
 (** {2 Format based constants} *)
 

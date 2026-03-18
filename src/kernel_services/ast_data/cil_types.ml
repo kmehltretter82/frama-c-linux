@@ -97,8 +97,13 @@ type ikind =
   | IUInt128    (** [unsigned __int128] (GCC extension) *)
 [@@deriving eq]
 
-(** Various kinds of floating-point numbers*)
-type fkind =
+(** Various kinds of floating-point numbers. Constructors are re-exported here
+    so that we only need to open {!Cil_types} to access them, without the
+    need to open {!Floating_point}.
+
+    @before Frama-C+dev These constructors were not defined in {!Floating_point}
+*)
+type fkind = Floating_point.fkind =
   | FFloat      (** [float] *)
   | FFloat32    (** [binary32] *)
   | FFloat64    (** [binary64] *)

@@ -40,7 +40,7 @@ type 'f format =
   | Double : double format (** 64-bits double precision IEEE-754 format. *)
 
 (** Returns the [fkind] corresponding to the given format. *)
-val fkind_of_format : 'f format -> Cil_types.fkind
+val fkind_of_format : 'f format -> Floating_point.fkind
 
 (** Pretty printer for floating point formats. *)
 val pretty_format : 'f format Pretty_utils.formatter
@@ -151,7 +151,7 @@ val parse_exn : string -> parsed_result
 [@@deprecated "Use parse function instead and handle the error if any."]
 
 (** Returns the floating-point kind parsed by [parse]. *)
-val parsed_fkind : ('k, 'f) parsed_format -> Cil_types.fkind
+val parsed_fkind : ('k, 'f) parsed_format -> Floating_point.fkind
 
 
 
