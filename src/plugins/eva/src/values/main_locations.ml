@@ -38,7 +38,7 @@ module PLoc = struct
     let ploc_bits = Precise_locs.inject_location_bits loc.Locations.loc in
     Precise_locs.make_precise_loc ploc_bits ~size:loc.Locations.size
 
-  let top = make (Locations.make_loc Locations.Location_Bits.top Z_or_top.Top)
+  let top = make (Locations.make_loc Locations.Location_Bits.top `Top)
 
   let assume_no_overlap ~partial l1 l2 =
     let loc1 = Precise_locs.imprecise_location l1
@@ -205,8 +205,8 @@ module PLoc = struct
            Beware of zero size. *)
         let new_index = Ival.sub_int off_ival rem_ival in
         let new_index = match size with
-          | Z_or_top.Top -> Ival.top
-          | Z_or_top.Value size ->
+          | `Top -> Ival.top
+          | `Value size ->
             if Z.is_zero size
             then Ival.top
             else Ival.scale_div ~pos:true size new_index

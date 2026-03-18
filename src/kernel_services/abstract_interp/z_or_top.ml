@@ -6,61 +6,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Abstract_interp
+include Lattice_bounds.Top.Make_Datatype (Z)
 
-type i = Top | Value of Z.t
+let minus_one = `Value Z.minus_one
+let one = `Value Z.one
+let zero = `Value Z.zero
+let top = `Top
 
-let equal i1 i2 = match i1, i2 with
-  | Top, Top -> true
-  | Value i1, Value i2 -> Z.equal i1 i2
-  | Top, Value _ | Value _, Top -> false
-
-let compare i1 i2 = match i1, i2 with
-  | Top, Top -> 0
-  | Value i1, Value i2 -> Z.compare i1 i2
-  | Top, Value _ -> -1
-  | Value _, Top -> 1
-
-let hash = function
-  | Top -> 37
-  | Value i -> Z.hash i
-
-let pretty fmt = function
-  | Top -> Format.fprintf fmt "Top"
-  | Value i -> Format.fprintf fmt "<%a>" Z.pretty i
-
-include Datatype.Make
-    (struct
-      type t = i (*= Top | Value of Z.t *)
-      let name = "Z_or_top.t"
-      let structural_descr =
-        Structural_descr.t_sum [| [| Z.packed_descr |] |]
-      let reprs = Top :: List.map (fun v -> Value v) Z.reprs
-      let equal = equal
-      let compare = compare
-      let hash = hash
-      let rehash = Datatype.identity
-      let copy = Fun.id
-      let pretty = pretty
-      let mem_project = Datatype.never_any_project
-    end)
-
-let minus_one = Value Z.minus_one
-let one = Value Z.one
-let zero = Value Z.zero
 let is_zero x = equal x zero
-let top = Top
-let is_top v = (v = Top)
-let neg x =
-  match x with
-  | Value v -> Value (Z.neg v)
-  | Top -> x
-let inject i = Value i
+let is_top = Lattice_bounds.Top.is_top
+
+let neg = Lattice_bounds.Top.map Z.neg
+
+let inject i = `Value i
 
 let project = function
-  | Top -> raise Error_Top
-  | Value i -> i
+  | `Top -> raise Abstract_interp.Error_Top
+  | `Value i -> i
 
 let cardinal_zero_or_one = function
-  | Top -> false
-  | Value _ -> true
+  | `Top -> false
+  | `Value _ -> true

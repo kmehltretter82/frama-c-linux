@@ -954,8 +954,8 @@ module G = struct
            Cil_datatype.Typ.equal typ vi.vtype &&
            Ival.is_zero o &&
            (match loc.Locations.size with
-            | Z_or_top.Value size -> Z.equal size (Z.succ max)
-            | Z_or_top.Top -> false)
+            | `Value size -> Z.equal size (Z.succ max)
+            | `Top -> false)
         then b
         else raise Untranslatable
       | _ -> raise Untranslatable

@@ -202,10 +202,10 @@ let validity_from_size size =
 
 let validity_from_known_size size =
   match size with
-  | Z_or_top.Value size ->
+  | `Value size ->
     (* all start to be valid at offset 0 *)
     validity_from_size size
-  | Z_or_top.Top ->
+  | `Top ->
     Unknown (Z.zero, None, Bit_utils.max_bit_address ())
 
 let validity b =
@@ -381,9 +381,8 @@ let validity_from_type v =
   else
     let max_valid = Bit_utils.sizeof_vid v in
     match max_valid with
-    | Z_or_top.Top ->
-      Unknown (Z.zero, None, Bit_utils.max_bit_address ())
-    | Z_or_top.Value size -> validity_from_size size
+    | `Top -> Unknown (Z.zero, None, Bit_utils.max_bit_address ())
+    | `Value size -> validity_from_size size
 
 type range_validity =
   | Invalid_range

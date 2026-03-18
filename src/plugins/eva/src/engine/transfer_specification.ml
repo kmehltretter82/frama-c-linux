@@ -341,8 +341,8 @@ module Make (Engine: Engine_Subset) = struct
       let precise_loc = Option.map get_ploc location in
       let loc = Option.map Precise_locs.imprecise_location precise_loc in
       match loc with
-      | None | Some Locations.{ size = Top } -> ()
-      | Some Locations.{ loc; size = Value size } ->
+      | None | Some Locations.{ size = `Top } -> ()
+      | Some Locations.{ loc; size = `Value size } ->
         let offsm = Cvalue.Model.copy_offsetmap loc size cvalue_state in
         let warn v =
           match Cvalue.V_Or_Uninitialized.get_v v with

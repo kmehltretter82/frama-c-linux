@@ -113,8 +113,8 @@ module D : Abstract_domain.Leaf
           kill loc state
         else
           match loc.Locations.size with
-          | Z_or_top.Top -> assert false
-          | Z_or_top.Value size ->
+          | `Top -> assert false
+          | `Value size ->
             Memory.paste_offsetmap
               ~from:o ~dst_loc:loc.Locations.loc ~size ~exact:true state
     in

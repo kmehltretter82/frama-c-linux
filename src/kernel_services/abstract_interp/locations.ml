@@ -410,8 +410,8 @@ module Zone = struct
   let of_bases bases =
     let f base _ =
       match Base.bits_sizeof base with
-      | Top -> Int_Intervals.top
-      | Value size -> Int_Intervals.inject_bounds Z.zero size
+      | `Top -> Int_Intervals.top
+      | `Value size -> Int_Intervals.inject_bounds Z.zero size
     in
     Map (M.from_shape f bases)
 
@@ -453,8 +453,8 @@ type location =
 type access = Read | Write | Object_pointer | Any_pointer
 
 let project_size = function
-  | Z_or_top.Value size -> size
-  | Z_or_top.Top -> Z.zero
+  | `Value size -> size
+  | `Top -> Z.zero
 
 (* Conversion into Base.access. A location valid for an access of unknown size
    must be at least valid for an empty access, so accesses of unknown sizes are
@@ -478,8 +478,8 @@ let valid_cardinal_zero_or_one ~for_writing {loc=loc;size=size} =
   try
     match loc, size with
     | Location_Bits.Top _, _ -> false
-    | _, Z_or_top.Top -> false
-    | Location_Bits.Map m, Z_or_top.Value size ->
+    | _, `Top -> false
+    | Location_Bits.Map m, `Value size ->
       Location_Bits.M.iter
         (fun base offsets ->
            if Base.is_weak base then raise Found_two;
@@ -593,8 +593,7 @@ let pretty_english ~prefix fmt { loc = m ; size = size } =
   | Location_Bits.Map off ->
     let print_binding fmt (k, v) =
       ( match Ival.is_zero v, Base.validity k, size with
-          true, Base.Known (_,s1), Z_or_top.Value s2 when
-            Z.equal (Z.succ s1) s2 ->
+        | true, Base.Known (_,s1), `Value s2 when Z.equal (Z.succ s1) s2 ->
           Format.fprintf fmt "@[<h>%a@]" Base.pretty k
         | _ ->
           Format.fprintf fmt "@[<h>%a with offsets %a@]"
@@ -637,8 +636,8 @@ let enumerate_valid_bits access loc =
 
 let enumerate_valid_bits_under access loc =
   match loc.size with
-  | Z_or_top.Top -> Zone.bottom
-  | Z_or_top.Value _ ->
+  | `Top -> Zone.bottom
+  | `Value _ ->
     match loc.loc with
     | Location_Bits.Top _ -> Zone.bottom
     | Location_Bits.Map _ ->
@@ -684,7 +683,7 @@ let enumerate_bits loc =
 
 let enumerate_bits_under loc =
   match loc.loc, loc.size with
-  | Location_Bits.Top _, _ | _, Z_or_top.Top -> Zone.bottom
+  | Location_Bits.Top _, _ | _, `Top -> Zone.bottom
   | _ -> enumerate_bits_under_over interval_from_ival_under loc
 
 

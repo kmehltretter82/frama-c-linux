@@ -270,7 +270,7 @@ let frama_c_memset_imprecise state dst_expr dst v size =
       let state =
         Cvalue.Model.paste_offsetmap ~from ~size ~exact ~dst_loc:dst state
       in
-      let loc = make_loc dst (Z_or_top.Value size_min) in
+      let loc = make_loc dst (`Value size_min) in
       let written_zone = enumerate_valid_bits Locations.Write loc in
       state, written_zone
     else state, Zone.bottom
@@ -505,7 +505,7 @@ let frama_c_memset_precise state dst_expr dst v (exp_size, size) =
       Cvalue.Model.paste_offsetmap
         ~from:offsm ~dst_loc:dst ~size ~exact:true state
     in
-    let dst_location = Locations.make_loc dst (Z_or_top.Value size) in
+    let dst_location = Locations.make_loc dst (`Value size) in
     let dst_zone = Locations.(enumerate_valid_bits Write dst_location) in
     state, dst_zone, dst_zone
   with

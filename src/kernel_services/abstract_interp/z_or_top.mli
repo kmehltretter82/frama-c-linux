@@ -6,11 +6,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Big integers with an additional top element. *)
+(** Z integers with an additional top element. *)
 
-type i = Top | Value of Z.t
-
-include Datatype.S with type t = i
+include Datatype.S with type t = Z.t Lattice_bounds.or_top
 
 val zero: t
 val one: t

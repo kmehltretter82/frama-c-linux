@@ -556,7 +556,7 @@ let pass_logic_cast exn typ trm =
     let szexpr = Bit_utils.sizeof typeoftrm in
     let styp, sexpr =
       match sztyp, szexpr with
-      | Z_or_top.Value styp, Z_or_top.Value sexpr -> styp, sexpr
+      | `Value styp, `Value sexpr -> styp, sexpr
       | _ -> raise exn
     in
     let sityp = Bit_utils.is_signed_int_enum_pointer typ in
@@ -1376,8 +1376,8 @@ and eval_binop ~alarm_mode env op t1 t2 =
     let eunder_op = match op with
       | PlusPI -> begin
           match Bit_utils.osizeof_pointed te1 with
-          | Z_or_top.Top -> fun _ _ -> V.bottom
-          | Z_or_top.Value _ as size -> add_untyped_op size
+          | `Top -> fun _ _ -> V.bottom
+          | `Value _ as size -> add_untyped_op size
         end
       | PlusA -> add_untyped_op (Z_or_top.one)
       | MinusA -> add_untyped_op (Z_or_top.minus_one)
@@ -1754,10 +1754,10 @@ and eval_toffset ~alarm_mode env typ toffset =
         with Cvalue.V.Not_based_on_null -> Ival.bottom
       in
       let offset = match size_e with
-        | Z_or_top.Top -> Ival.bottom
+        | `Top -> Ival.bottom
         (* Note: scale_int_base would overapproximate when given a
            Float.  Should never happen. *)
-        | Z_or_top.Value f ->
+        | `Value f ->
           assert (Ival.is_int offset);
           Ival.scale f offset
       in

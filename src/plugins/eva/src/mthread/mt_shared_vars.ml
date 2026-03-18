@@ -655,12 +655,12 @@ module Precise = struct
 
   let extract_shared_value node op loc state =
     match loc.size with
-    | Z_or_top.Top ->
+    | `Top ->
       Mt_self.warning ?source:(CfgNode.node_first_loc node)
         "Ignoring imprecise %a at %a"
         Mt_types.RW.pretty op Locations.pretty loc;
       []
-    | Z_or_top.Value size ->
+    | `Value size ->
       Location_Bits.fold_topset_ok
         (fun base offs acc ->
            let validity = Base.validity base in

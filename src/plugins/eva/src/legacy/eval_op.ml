@@ -32,8 +32,8 @@ let offsetmap_of_loc location state =
 let v_uninit_of_offsetmap ~typ offsm =
   let size = Eval_typ.sizeof_lval_typ typ in
   match size with
-  | Z_or_top.Top -> V_Offsetmap.find_imprecise_everywhere offsm
-  | Z_or_top.Value size ->
+  | `Top -> V_Offsetmap.find_imprecise_everywhere offsm
+  | `Value size ->
     let validity = Base.validity_from_size size in
     let offsets = Ival.zero in
     V_Offsetmap.find ~validity ~conflate_bottom:false ~offsets ~size offsm
@@ -150,7 +150,7 @@ let make_loc_contiguous loc =
     else
       let min, max, _rem, modu = Ival.min_max_r_mod offset in
       match min, max, loc.Locations.size with
-      | Some min, Some max, Z_or_top.Value size when Z.equal modu size ->
+      | Some min, Some max, `Value size when Z.equal modu size ->
         let size' = Z.add (Z.sub max min) modu in
         let i = Ival.inject_singleton min in
         let loc_bits = Locations.Location_Bits.inject base i in
@@ -160,8 +160,8 @@ let make_loc_contiguous loc =
 
 let apply_on_all_locs f loc state =
   match loc.Locations.size with
-  | Z_or_top.Top -> state
-  | Z_or_top.Value _ as size ->
+  | `Top -> state
+  | `Value _ as size ->
     let loc = Locations.valid_part Locations.Read loc in
     let plevel = Parameters.ArrayPrecisionLevel.get () in
     let ilevel = Int_set.get_small_cardinal () in
@@ -235,8 +235,8 @@ exception CannotComputeUnder
 
 let find_lmap_under state location =
   match location.Locations.size with
-  | Z_or_top.Top -> raise CannotComputeUnder
-  | Z_or_top.Value size ->
+  | `Top -> raise CannotComputeUnder
+  | `Value size ->
     match location.Locations.loc with
     | Locations.Location_Bits.Top _ -> raise CannotComputeUnder
     | Locations.Location_Bits.Map map ->

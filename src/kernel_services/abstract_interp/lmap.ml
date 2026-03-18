@@ -139,10 +139,10 @@ struct
         | `Value offm ->
           let offm' =
             match size with
-            | Z_or_top.Top ->
+            | `Top ->
               let orig = Origin.current Origin.Misalign_write in
               Offsetmap.update_imprecise_everywhere ~validity orig v offm
-            | Z_or_top.Value size ->
+            | `Value size ->
               assert (Z.geq size Z.zero);
               Offsetmap.update ?origin ~validity ~exact ~offsets ~size v offm
           in
@@ -181,10 +181,10 @@ struct
         Base.SetLattice.O.fold handle_imprecise_base s `Bottom
       | Location_Bits.Map loc_map -> begin
           match size with
-          | Z_or_top.Top ->
+          | `Top ->
             let aux base _ acc = handle_imprecise_base base acc in
             Location_Bits.M.fold aux loc_map `Bottom
-          | Z_or_top.Value size ->
+          | `Value size ->
             let aux_base base offsets acc_v =
               let validity = Base.validity base in
               match find_or_default base mem with
