@@ -95,7 +95,7 @@ let location_with_size_aux p sbytes =
 
 let location_with_size p sbytes =
   let locb, size = location_with_size_aux p sbytes in
-  Locations.make_loc locb (Int_Base.inject size)
+  Locations.make_loc locb (Z_or_top.inject size)
 
 let location_of_pointer (p : Types.pointer) =
   Location_Bytes.inject

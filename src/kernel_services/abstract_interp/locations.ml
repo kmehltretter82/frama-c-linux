@@ -114,8 +114,8 @@ module Location_Bytes = struct
 
   let sub_pointwise_map ?factor m1 m2 =
     let factor = match factor with
-      | None -> Int_Base.minus_one
-      | Some f -> Int_Base.neg f
+      | None -> Z_or_top.minus_one
+      | Some f -> Z_or_top.neg f
     in
     (* Subtract pointwise for all the bases that are present in both m1
        and m2. *)
@@ -448,13 +448,13 @@ end
 
 type location =
   { loc : Location_Bits.t;
-    size : Int_Base.t }
+    size : Z_or_top.t }
 
 type access = Read | Write | Object_pointer | Any_pointer
 
 let project_size = function
-  | Int_Base.Value size -> size
-  | Int_Base.Top -> Z.zero
+  | Z_or_top.Value size -> size
+  | Z_or_top.Top -> Z.zero
 
 (* Conversion into Base.access. A location valid for an access of unknown size
    must be at least valid for an empty access, so accesses of unknown sizes are
@@ -478,8 +478,8 @@ let valid_cardinal_zero_or_one ~for_writing {loc=loc;size=size} =
   try
     match loc, size with
     | Location_Bits.Top _, _ -> false
-    | _, Int_Base.Top -> false
-    | Location_Bits.Map m, Int_Base.Value size ->
+    | _, Z_or_top.Top -> false
+    | Location_Bits.Map m, Z_or_top.Value size ->
       Location_Bits.M.iter
         (fun base offsets ->
            if Base.is_weak base then raise Found_two;
@@ -517,7 +517,7 @@ let loc_size { size = size } = size
 let make_loc loc_bits size = { loc = loc_bits; size = size }
 
 let is_valid access {loc; size} =
-  not (Int_Base.is_top size) &&
+  not (Z_or_top.is_top size) &&
   let access = base_access ~size access in
   let is_valid_offset = Base.is_valid_offset access in
   match loc with
@@ -532,11 +532,11 @@ let int_base_size_of_varinfo v =
   try
     let s = bitsSizeOf v.vtype in
     let s = Z.of_int s in
-    Int_Base.inject s
+    Z_or_top.inject s
   with Cil.SizeOfError (msg, _) ->
     Abstract_interp.feedback_approximation
       "imprecise size for variable %a (%s)" Printer.pp_varinfo v msg;
-    Int_Base.top
+    Z_or_top.top
 
 let loc_of_varinfo v =
   let base = Base.of_varinfo v in
@@ -548,35 +548,35 @@ let loc_of_base v =
 let loc_of_typoffset b typ offset =
   try
     let offs, size = Cil.bitsOffset typ offset in
-    let size = Int_Base.inject (Z.of_int size) in
+    let size = Z_or_top.inject (Z.of_int size) in
     make_loc (Location_Bits.inject b (Ival.of_int offs)) size
   with SizeOfError _ as _e ->
-    make_loc (Location_Bits.inject b Ival.top) Int_Base.top
+    make_loc (Location_Bits.inject b Ival.top) Z_or_top.top
 
-let loc_top = make_loc Location_Bits.top Int_Base.top
-let loc_bottom = make_loc Location_Bits.bottom Int_Base.top
+let loc_top = make_loc Location_Bits.top Z_or_top.top
+let loc_bottom = make_loc Location_Bits.bottom Z_or_top.top
 let is_bottom_loc l = Location_Bits.(equal l.loc bottom)
 
 let cardinal_zero_or_one { loc = loc ; size = size } =
   Location_Bits.cardinal_zero_or_one loc &&
-  Int_Base.cardinal_zero_or_one size
+  Z_or_top.cardinal_zero_or_one size
 
 let loc_equal { loc = loc1 ; size = size1 } { loc = loc2 ; size = size2 } =
-  Int_Base.equal size1 size2 &&
+  Z_or_top.equal size1 size2 &&
   Location_Bits.equal loc1 loc2
 
 let loc_hash { loc = loc; size = size } =
-  Int_Base.hash size + 317 * Location_Bits.hash loc
+  Z_or_top.hash size + 317 * Location_Bits.hash loc
 
 let loc_compare { loc = loc1 ; size = size1 } { loc = loc2 ; size = size2 } =
-  let c1 = Int_Base.compare size1 size2 in
+  let c1 = Z_or_top.compare size1 size2 in
   if c1 <> 0 then c1
   else Location_Bits.compare loc1 loc2
 
 let pretty fmt { loc = loc ; size = size } =
   Format.fprintf fmt "%a (size:%a)"
     Location_Bits.pretty loc
-    Int_Base.pretty size
+    Z_or_top.pretty size
 let pretty_loc = pretty
 
 let pretty_english ~prefix fmt { loc = m ; size = size } =
@@ -593,7 +593,7 @@ let pretty_english ~prefix fmt { loc = m ; size = size } =
   | Location_Bits.Map off ->
     let print_binding fmt (k, v) =
       ( match Ival.is_zero v, Base.validity k, size with
-          true, Base.Known (_,s1), Int_Base.Value s2 when
+          true, Base.Known (_,s1), Z_or_top.Value s2 when
             Z.equal (Z.succ s1) s2 ->
           Format.fprintf fmt "@[<h>%a@]" Base.pretty k
         | _ ->
@@ -637,8 +637,8 @@ let enumerate_valid_bits access loc =
 
 let enumerate_valid_bits_under access loc =
   match loc.size with
-  | Int_Base.Top -> Zone.bottom
-  | Int_Base.Value _ ->
+  | Z_or_top.Top -> Zone.bottom
+  | Z_or_top.Value _ ->
     match loc.loc with
     | Location_Bits.Top _ -> Zone.bottom
     | Location_Bits.Map _ ->
@@ -684,7 +684,7 @@ let enumerate_bits loc =
 
 let enumerate_bits_under loc =
   match loc.loc, loc.size with
-  | Location_Bits.Top _, _ | _, Int_Base.Top -> Zone.bottom
+  | Location_Bits.Top _, _ | _, Z_or_top.Top -> Zone.bottom
   | _ -> enumerate_bits_under_over interval_from_ival_under loc
 
 
@@ -696,7 +696,7 @@ let invalid_part l = l (* TODO (but rarely useful) *)
 
 let overlaps ~partial l1 l2 =
   try
-    let size = Z.max (Int_Base.project l1.size) (Int_Base.project l2.size) in
+    let size = Z.max (Z_or_top.project l1.size) (Z_or_top.project l2.size) in
     Location_Bits.overlaps ~partial ~size l1.loc l2.loc
   with Abstract_interp.Error_Top -> true
 
@@ -707,14 +707,14 @@ module Location =
       type t = location
       let structural_descr =
         Structural_descr.t_record
-          [| Location_Bits.packed_descr; Int_Base.packed_descr |]
+          [| Location_Bits.packed_descr; Z_or_top.packed_descr |]
       let reprs =
         List.fold_left
           (fun acc l ->
              List.fold_left
                (fun acc n -> { loc = l; size = n } :: acc)
                acc
-               Int_Base.reprs)
+               Z_or_top.reprs)
           []
           Location_Bits.reprs
       let name = "Locations.Location"

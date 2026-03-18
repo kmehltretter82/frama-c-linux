@@ -418,13 +418,13 @@ let extract_single_var vi state =
 let reduce_loc_and_eval state loc =
   if Cvalue.Model.is_top state then Top
   else if not (Cvalue.Model.is_reachable state) then Bottom
-  else if Int_Base.(equal loc.Locations.size zero) then Empty
+  else if Z_or_top.(equal loc.Locations.size zero) then Empty
   else
     let loc' = Locations.(valid_part Read loc) in
     if Locations.is_bottom_loc loc' then InvalidLoc
     else
       try
-        let size = Int_Base.project loc'.Locations.size in
+        let size = Z_or_top.project loc'.Locations.size in
         match Cvalue.Model.copy_offsetmap loc'.Locations.loc size state with
         | `Bottom -> InvalidLoc
         | `Value offsm -> Offsetmap offsm

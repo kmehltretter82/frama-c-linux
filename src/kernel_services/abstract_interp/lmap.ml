@@ -139,10 +139,10 @@ struct
         | `Value offm ->
           let offm' =
             match size with
-            | Int_Base.Top ->
+            | Z_or_top.Top ->
               let orig = Origin.current Origin.Misalign_write in
               Offsetmap.update_imprecise_everywhere ~validity orig v offm
-            | Int_Base.Value size ->
+            | Z_or_top.Value size ->
               assert (Z.geq size Z.zero);
               Offsetmap.update ?origin ~validity ~exact ~offsets ~size v offm
           in
@@ -181,10 +181,10 @@ struct
         Base.SetLattice.O.fold handle_imprecise_base s `Bottom
       | Location_Bits.Map loc_map -> begin
           match size with
-          | Int_Base.Top ->
+          | Z_or_top.Top ->
             let aux base _ acc = handle_imprecise_base base acc in
             Location_Bits.M.fold aux loc_map `Bottom
-          | Int_Base.Value size ->
+          | Z_or_top.Value size ->
             let aux_base base offsets acc_v =
               let validity = Base.validity base in
               match find_or_default base mem with
@@ -448,7 +448,7 @@ struct
         r
 
     let paste_offsetmap ~from ~dst_loc ~size ~exact m =
-      let loc_dst = make_loc dst_loc (Int_Base.inject size) in
+      let loc_dst = make_loc dst_loc (Z_or_top.inject size) in
       assert (Z.leq Z.zero size);
       let exact = exact && cardinal_zero_or_one loc_dst in
       (* TODO: do we want to alter exact here? *)

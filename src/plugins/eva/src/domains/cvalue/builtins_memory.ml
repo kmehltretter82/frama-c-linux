@@ -52,7 +52,7 @@ let deps_nth_arg n =
    are valid. Reduce them accordingly. *)
 let reduce_to_valid_loc dst size access =
   let min_size = Ival.min_int size in
-  let size = Option.fold ~none:Int_Base.zero ~some:Int_Base.inject min_size in
+  let size = Option.fold ~none:Z_or_top.zero ~some:Z_or_top.inject min_size in
   let dst_loc = Locations.make_loc dst size in
   let valid_dst_loc = Locations.valid_part ~bitfield:false access dst_loc in
   valid_dst_loc.Locations.loc
@@ -85,7 +85,7 @@ let add_deps_loc ~exact ~src_loc ~dst_loc deps_table =
 (* Adds a sure \from dependency of size [size] from [src] to [dst].
    Also returns the written zone if it is a singleton. *)
 let add_sure_deps ~size ~src ~dst (deps_table, sure_output) =
-  let size = Int_Base.inject size in
+  let size = Z_or_top.inject size in
   let src_loc = Locations.make_loc src size in
   let dst_loc = Locations.make_loc dst size in
   let exact = Location_Bits.cardinal_zero_or_one dst in
@@ -173,7 +173,7 @@ let char_location loc ?(min_size=Z.zero) max_size =
       ~rem:Z.zero ~modu:size_char
   in
   let loc = Location_Bits.shift shift loc in
-  make_loc loc (Int_Base.inject size_char)
+  make_loc loc (Z_or_top.inject size_char)
 
 let compute_memcpy ~name ~dst_expr ~dst ~src ~size state =
   let size_min, size_max = min_max_size size in
@@ -270,7 +270,7 @@ let frama_c_memset_imprecise state dst_expr dst v size =
       let state =
         Cvalue.Model.paste_offsetmap ~from ~size ~exact ~dst_loc:dst state
       in
-      let loc = make_loc dst (Int_Base.Value size_min) in
+      let loc = make_loc dst (Z_or_top.Value size_min) in
       let written_zone = enumerate_valid_bits Locations.Write loc in
       state, written_zone
     else state, Zone.bottom
@@ -310,7 +310,7 @@ let frama_c_memset_imprecise state dst_expr dst v size =
             Cvalue.Model.paste_offsetmap
               ~from ~dst_loc ~size:sure ~exact:true state
           in
-          let sure_loc = make_loc dst_loc (Int_Base.inject sure) in
+          let sure_loc = make_loc dst_loc (Z_or_top.inject sure) in
           let sure_zone = enumerate_valid_bits Locations.Write sure_loc in
           state, sure_zone
         else
@@ -377,7 +377,7 @@ let memset_typ_offsm_int full_typ i =
         match Ast_types.unroll_node styp with
         | TInt _ | TEnum _ | TPtr _ ->
           let size = Eval_typ.sizeof_lval_typ styp (* handles bitfields *) in
-          let size = Int_Base.project size in
+          let size = Z_or_top.project size in
           let v = V_Or_Uninitialized.get_v (find size) in
           let signed = Bit_utils.is_signed_int_enum_pointer styp in
           let v = Cvalue.V.cast_int_to_int ~size ~signed v in
@@ -505,7 +505,7 @@ let frama_c_memset_precise state dst_expr dst v (exp_size, size) =
       Cvalue.Model.paste_offsetmap
         ~from:offsm ~dst_loc:dst ~size ~exact:true state
     in
-    let dst_location = Locations.make_loc dst (Int_Base.Value size) in
+    let dst_location = Locations.make_loc dst (Z_or_top.Value size) in
     let dst_zone = Locations.(enumerate_valid_bits Write dst_location) in
     state, dst_zone, dst_zone
   with

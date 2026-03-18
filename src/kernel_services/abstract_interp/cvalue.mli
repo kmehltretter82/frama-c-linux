@@ -96,7 +96,7 @@ module V : sig
   val cast_int_to_float_inverse :
     single_precision:bool -> t -> t option
 
-  val add_untyped : factor:Int_Base.t -> t -> t -> t
+  val add_untyped : factor:Z_or_top.t -> t -> t -> t
   (** [add_untyped ~factor e1 e2] computes [e1+factor*e2] using C semantic
       for +, i.e. [ptr+v] is [add_untyped ~factor:sizeof( *ptr ) ptr v]. (Thus,
       [factor] is in bytes.) This function handles simultaneously PlusA, MinusA,
@@ -104,11 +104,11 @@ module V : sig
       This is more precise than having multiple functions, as computations such
       as [(int)&t[1] - (int)&t[2]] would not be treated precisely otherwise. *)
 
-  val add_untyped_under : factor:Int_Base.t -> t -> t -> t
+  val add_untyped_under : factor:Z_or_top.t -> t -> t -> t
   (** Under-approximating variant of {!add_untyped}. Takes two
       under-approximation, and returns an under-approximation.*)
 
-  val sub_untyped_pointwise: ?factor:Int_Base.t -> t -> t -> Ival.t
+  val sub_untyped_pointwise: ?factor:Z_or_top.t -> t -> t -> Ival.t
   (** See {!Locations.sub_pointwise}. In this module, [factor] is expressed in
       bytes. *)
 

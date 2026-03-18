@@ -51,7 +51,7 @@ let add_watch make_watch state actuals =
         raise Builtins.Outside_builtin_possibilities
     in
     let loc_bits = Locations.loc_bytes_to_loc_bits dst in
-    let loc = Locations.make_loc loc_bits (Int_Base.inject size) in
+    let loc = Locations.make_loc loc_bits (Z_or_top.inject size) in
     let target_w = make_watch target_value in
     let current = !watch_table in
     if

@@ -32,7 +32,7 @@ let pretty fmt = function
 include Datatype.Make
     (struct
       type t = i (*= Top | Value of Z.t *)
-      let name = "Int_Base.t"
+      let name = "Z_or_top.t"
       let structural_descr =
         Structural_descr.t_sum [| [| Z.packed_descr |] |]
       let reprs = Top :: List.map (fun v -> Value v) Z.reprs

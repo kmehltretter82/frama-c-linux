@@ -113,8 +113,8 @@ module D : Abstract_domain.Leaf
           kill loc state
         else
           match loc.Locations.size with
-          | Int_Base.Top -> assert false
-          | Int_Base.Value size ->
+          | Z_or_top.Top -> assert false
+          | Z_or_top.Value size ->
             Memory.paste_offsetmap
               ~from:o ~dst_loc:loc.Locations.loc ~size ~exact:true state
     in
@@ -155,7 +155,7 @@ module D : Abstract_domain.Leaf
 
   (* Basic 'find' on a location *)
   let find_loc state loc =
-    let size = Int_Base.project loc.Locations.size in
+    let size = Z_or_top.project loc.Locations.size in
     let o = Memory.copy_offsetmap loc.Locations.loc size state in
     o >>-: fun o ->
     if Default_offsetmap.is_top o ||

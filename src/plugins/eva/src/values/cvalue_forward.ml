@@ -377,7 +377,7 @@ let rewrap_integer range value =
 let forward_minus_pp ~typ ev1 ev2 =
   let conv minus_offs =
     try
-      let size = Int_Base.project (Bit_utils.osizeof_pointed typ) in
+      let size = Z_or_top.project (Bit_utils.osizeof_pointed typ) in
       if Z.is_one size
       then minus_offs
       else Ival.scale_div ~pos:true size minus_offs
@@ -385,7 +385,7 @@ let forward_minus_pp ~typ ev1 ev2 =
   in
   if not (Parameters.WarnPointerSubtraction.get ()) then
     (* Generate garbled mix if the two pointers disagree on their base *)
-    let minus_val = V.add_untyped ~factor:Int_Base.minus_one ev1 ev2 in
+    let minus_val = V.add_untyped ~factor:Z_or_top.minus_one ev1 ev2 in
     try
       V.inject_ival (conv (Cvalue.V.project_ival minus_val))
     with Cvalue.V.Not_based_on_null ->
@@ -404,10 +404,10 @@ let forward_binop_int ~typ ev1 op ev2 =
   match op with
   | Eva_ast.PlusPI  -> V.add_untyped ~factor:(Bit_utils.osizeof_pointed typ) ev1 ev2
   | MinusPI ->
-    let int_base = Int_Base.neg (Bit_utils.osizeof_pointed typ) in
+    let int_base = Z_or_top.neg (Bit_utils.osizeof_pointed typ) in
     V.add_untyped ~factor:int_base ev1 ev2
-  | PlusA   -> V.add_untyped ~factor:(Int_Base.one) ev1 ev2
-  | MinusA  -> V.add_untyped ~factor:Int_Base.minus_one ev1 ev2
+  | PlusA   -> V.add_untyped ~factor:(Z_or_top.one) ev1 ev2
+  | MinusA  -> V.add_untyped ~factor:Z_or_top.minus_one ev1 ev2
   | MinusPP -> forward_minus_pp ~typ ev1 ev2
   | Mod     -> V.c_rem ev1 ev2
   | Div     -> V.div ev1 ev2

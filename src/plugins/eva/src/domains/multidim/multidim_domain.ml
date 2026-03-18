@@ -735,7 +735,7 @@ struct
           DomainLattice.overwrite ~oracle state dst src
 
   let assign ~pos:_ { lval=dst } src assigned_value valuation state =
-    if Int_Base.is_zero (Bit_utils.sizeof dst.typ)
+    if Z_or_top.is_zero (Bit_utils.sizeof dst.typ)
     then `Value state
     else
       let+ state = assume_valuation valuation state in

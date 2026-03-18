@@ -92,8 +92,8 @@ module Queries = struct
   let extract_aggregate_lval state lval ploc =
     let loc = Precise_locs.imprecise_location ploc in
     match loc.Locations.size with
-    | Int_Base.Top -> `Value (Cvalue.V.top, None), Alarmset.all
-    | Int_Base.Value size ->
+    | Z_or_top.Top -> `Value (Cvalue.V.top, None), Alarmset.all
+    | Z_or_top.Value size ->
       let offsm = Cvalue.Model.copy_offsetmap loc.Locations.loc size state in
       match offsm with
       | `Bottom -> `Bottom, Alarmset.none

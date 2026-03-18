@@ -493,7 +493,7 @@ module V = struct
      [(int)&t[1] - (int)&t[2]] would not be treated precisely otherwise. *)
   let add_untyped ~origin ~factor e1 e2 =
     try
-      if Int_Base.equal factor (Int_Base.minus_one)
+      if Z_or_top.equal factor (Z_or_top.minus_one)
       then
         (* Either e1 and e2 have the same base, and it's a subtraction
            of pointers, or e2 is really an integer *)
@@ -502,7 +502,7 @@ module V = struct
         if Base.compare b1 b2 <> 0 then raise Not_found;
         inject_ival (Ival.sub_int o1 o2)
       else begin
-        if not (Int_Base.equal factor (Int_Base.one)) then
+        if not (Z_or_top.equal factor (Z_or_top.one)) then
           raise Not_found (* cannot multiply a pointer *);
         try
           Location_Bytes.shift (project_ival_bottom e2) e1
@@ -524,7 +524,7 @@ module V = struct
   (* Under-approximating variant of add_untyped. Takes two
      under-approximation, and returns an under-approximation.*)
   let add_untyped_under ~factor e1 e2 =
-    if Int_Base.equal factor (Int_Base.minus_one)
+    if Z_or_top.equal factor (Z_or_top.minus_one)
     then
       (* Note: we could do a "link" for each pair of matching bases in
          e1 and e2, so this is an underapproximation in the most
@@ -535,7 +535,7 @@ module V = struct
         if Base.compare b1 b2 <> 0 then bottom
         else inject_ival (Ival.sub_int_under o1 o2)
       with Not_found -> bottom
-    else if Int_Base.equal factor Int_Base.one
+    else if Z_or_top.equal factor Z_or_top.one
     then
       try Location_Bytes.shift_under (project_ival_bottom e2) e1
       with Not_based_on_null -> bottom
@@ -634,7 +634,7 @@ module V = struct
       then bottom
       else topify origin (join acc value)
     else
-      add_untyped ~origin ~factor:Int_Base.one value acc
+      add_untyped ~origin ~factor:Z_or_top.one value acc
 
   (* neutral value for foo_endian_merge_bits *)
   let merge_neutral_element = singleton_zero

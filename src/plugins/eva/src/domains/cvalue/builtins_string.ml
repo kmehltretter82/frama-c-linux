@@ -324,7 +324,7 @@ let search_char kind ~length state str =
    indicating whether the pointer was completely valid or not. *)
 let reduce_by_validity ~size cvalue =
   let loc_bits = Locations.loc_bytes_to_loc_bits cvalue in
-  let loc = Locations.make_loc loc_bits (Int_Base.inject size) in
+  let loc = Locations.make_loc loc_bits (Z_or_top.inject size) in
   if Locations.(is_valid Read loc)
   then
     let is_aligned _base ival =

@@ -43,24 +43,24 @@ let warn_if_zero ty r =
   r
 
 (** [sizeof ty] is the size of [ty] in bits. This function may return
-    [Int_Base.top]. *)
+    [Z_or_top.top]. *)
 let sizeof ty =
   (match ty.tnode with
    | TVoid -> Kernel.warning ~current:true ~once:true "using size of 'void'"
    | _ -> ()) ;
-  try Int_Base.inject (Z.of_int (bitsSizeOf ty))
+  try Z_or_top.inject (Z.of_int (bitsSizeOf ty))
   with SizeOfError _ ->
-    Int_Base.top
+    Z_or_top.top
 
 (** [osizeof ty] is the size of [ty] in bytes. This function may return
-    [Int_Base.top]. *)
+    [Z_or_top.top]. *)
 let osizeof ty =
   (match ty.tnode with
    | TVoid -> Kernel.warning ~once:true ~current:true "using size of 'void'"
    | _ -> ()) ;
   try
-    Int_Base.inject (Z.of_int (warn_if_zero ty (bitsSizeOf ty) / 8))
-  with SizeOfError _ -> Int_Base.top
+    Z_or_top.inject (Z.of_int (warn_if_zero ty (bitsSizeOf ty) / 8))
+  with SizeOfError _ -> Z_or_top.top
 
 exception Neither_Int_Nor_Enum_Nor_Pointer
 
@@ -94,7 +94,7 @@ let sizeof_lval lv =
       | Field (f,NoOffset) ->
         (match f.fbitfield with
          | None -> sizeof typ
-         | Some i -> Int_Base.inject (Z.of_int i))
+         | Some i -> Z_or_top.inject (Z.of_int i))
       | Field (_,f) | Index(_,f) -> get_size f
     in get_size (snd lv)
 
@@ -120,7 +120,7 @@ let osizeof_pointed typ =
   | _ ->
     assert false (*
         Format.printf "TYPE IS: %a\n" Printer.pp_typ typ;
-        Int_Base.top*)
+        Z_or_top.top*)
 
 (** Returns the size of the type pointed by a pointer type of the [lval] in
     bits. Never call it on a non pointer type [lval]. *)

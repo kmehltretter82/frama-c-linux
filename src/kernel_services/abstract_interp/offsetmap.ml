@@ -2726,8 +2726,8 @@ module Int_Intervals = struct
      intervals *)
   let from_ival_size ival size =
     match size with
-    | Int_Base.Top -> top
-    | Int_Base.Value size -> from_ival_size_over_cached ival size
+    | Z_or_top.Top -> top
+    | Z_or_top.Value size -> from_ival_size_over_cached ival size
 
   (* Under-approximation of the conversion of an ival+size to a set of
      intervals. Basically, we see if we are going to over-approximate (in which
@@ -2735,8 +2735,8 @@ module Int_Intervals = struct
      which is by definition exact in this case, and has a cache *)
   let from_ival_size_under ival size =
     match size with
-    | Int_Base.Top -> Bottom (* imprecise *)
-    | Int_Base.Value size ->
+    | Z_or_top.Top -> Bottom (* imprecise *)
+    | Z_or_top.Value size ->
       if Ival.is_small_set ival
       then from_ival_size_over_cached ival size (* precise *)
       else
@@ -2826,9 +2826,9 @@ module Make_bitwise(V: sig
 
   let add_binding_ival ~validity ~exact offsets ~size v m =
     match size with
-    | Int_Base.Value size ->
+    | Z_or_top.Value size ->
       update ~validity ~exact ~offsets ~size v m
-    | Int_Base.Top ->
+    | Z_or_top.Top ->
       update_imprecise_everywhere ~validity Origin.(current Misalign_write) v m
 
   let fold_itv ?direction ~entire f itv m acc =

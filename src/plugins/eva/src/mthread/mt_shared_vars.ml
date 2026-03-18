@@ -291,7 +291,7 @@ class do_it cp =
         (* Compute the zones written by the assigns *)
         (match assigns with
          | WritesAny ->
-           let top = Locations.make_loc Location_Bits.top Int_Base.top in
+           let top = Locations.make_loc Location_Bits.top Z_or_top.top in
            self#add_access (Write top) Zone.top;
 
          | Writes assigns' ->
@@ -447,12 +447,12 @@ struct
         List.iter aux_itv l;
         H.fold
           (fun size loc acc ->
-             let loc = Locations.make_loc loc (Int_Base.inject size) in
+             let loc = Locations.make_loc loc (Z_or_top.inject size) in
              f loc v acc
           ) by_size acc
       with Abstract_interp.Error_Top ->
         let locb = Location_Bits.inject b Ival.zero in
-        let size = Int_Base.top (* TODO : use validity *) in
+        let size = Z_or_top.top (* TODO : use validity *) in
         let loc = Locations.make_loc locb size in
         f loc v acc
     in
@@ -655,12 +655,12 @@ module Precise = struct
 
   let extract_shared_value node op loc state =
     match loc.size with
-    | Int_Base.Top ->
+    | Z_or_top.Top ->
       Mt_self.warning ?source:(CfgNode.node_first_loc node)
         "Ignoring imprecise %a at %a"
         Mt_types.RW.pretty op Locations.pretty loc;
       []
-    | Int_Base.Value size ->
+    | Z_or_top.Value size ->
       Location_Bits.fold_topset_ok
         (fun base offs acc ->
            let validity = Base.validity base in

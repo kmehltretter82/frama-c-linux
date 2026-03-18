@@ -278,7 +278,7 @@ val backward_comp_float_left_false : Comp.t -> Fval.kind -> t -> t -> t
 
 val forward_comp_int: Comp.t -> t -> t -> Comp.result
 
-val scale_int_base : Int_Base.t -> t -> t
+val scale_int_base : Z_or_top.t -> t -> t
 
 
 val of_int : int -> t

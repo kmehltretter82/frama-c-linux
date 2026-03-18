@@ -556,7 +556,7 @@ let pass_logic_cast exn typ trm =
     let szexpr = Bit_utils.sizeof typeoftrm in
     let styp, sexpr =
       match sztyp, szexpr with
-      | Int_Base.Value styp, Int_Base.Value sexpr -> styp, sexpr
+      | Z_or_top.Value styp, Z_or_top.Value sexpr -> styp, sexpr
       | _ -> raise exn
     in
     let sityp = Bit_utils.is_signed_int_enum_pointer typ in
@@ -840,7 +840,7 @@ let eval_logic_charchr builtin env s c ldeps_s ldeps_c =
 let eval_logic_memchr_off builtin env s c n =
   let minus_one = Cvalue.V.inject_int Z.minus_one in
   let positive = Cvalue.V.inject_ival Ival.positive_integers in
-  let pred_n = Cvalue.V.add_untyped ~factor:Int_Base.one n.eover minus_one in
+  let pred_n = Cvalue.V.add_untyped ~factor:Z_or_top.one n.eover minus_one in
   let n_pos = Cvalue.V.narrow positive pred_n in
   let eover =
     if Cvalue.V.is_bottom n_pos then minus_one else
@@ -1376,11 +1376,11 @@ and eval_binop ~alarm_mode env op t1 t2 =
     let eunder_op = match op with
       | PlusPI -> begin
           match Bit_utils.osizeof_pointed te1 with
-          | Int_Base.Top -> fun _ _ -> V.bottom
-          | Int_Base.Value _ as size -> add_untyped_op size
+          | Z_or_top.Top -> fun _ _ -> V.bottom
+          | Z_or_top.Value _ as size -> add_untyped_op size
         end
-      | PlusA -> add_untyped_op (Int_Base.one)
-      | MinusA -> add_untyped_op (Int_Base.minus_one)
+      | PlusA -> add_untyped_op (Z_or_top.one)
+      | MinusA -> add_untyped_op (Z_or_top.minus_one)
       | _ -> fun _ _ -> under_from_over eover
     in
     let eunder = eunder_op r1.eunder r2.eunder in
@@ -1754,10 +1754,10 @@ and eval_toffset ~alarm_mode env typ toffset =
         with Cvalue.V.Not_based_on_null -> Ival.bottom
       in
       let offset = match size_e with
-        | Int_Base.Top -> Ival.bottom
+        | Z_or_top.Top -> Ival.bottom
         (* Note: scale_int_base would overapproximate when given a
            Float.  Should never happen. *)
-        | Int_Base.Value f ->
+        | Z_or_top.Value f ->
           assert (Ival.is_int offset);
           Ival.scale f offset
       in

@@ -163,7 +163,7 @@ class propagate project fnames ~cast_intro = object(self)
                     then Bit_utils.osizeof_pointed vi.vtype
                     else Bit_utils.osizeof vi.vtype
                   in
-                  array, Int_Base.project size
+                  array, Z_or_top.project size
                 in
                 let div,rem = Z.ediv_rem offset sizeof_pointed in
                 array,div,rem

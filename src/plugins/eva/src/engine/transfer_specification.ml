@@ -169,7 +169,7 @@ let precise_loc_of_assign env kind term =
       | Free | Allocate ->
         let result = Eval_terms.eval_term ~alarm_mode env term in
         let loc_bits = Locations.loc_bytes_to_loc_bits result.eover in
-        Locations.make_loc loc_bits Int_Base.top
+        Locations.make_loc loc_bits Z_or_top.top
     in
     if kind <> From then reduce_to_valid_location kind term loc else Some loc
   with Eval_terms.LogicEvalError e ->
