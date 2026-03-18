@@ -154,7 +154,7 @@ let make_loc_contiguous loc =
         let size' = Z.add (Z.sub max min) modu in
         let i = Ival.inject_singleton min in
         let loc_bits = Locations.Location_Bits.inject base i in
-        Locations.make_loc loc_bits (Z_or_top.inject size')
+        Locations.make_loc loc_bits (`Value size')
       | _ -> loc
   with Not_found -> loc
 

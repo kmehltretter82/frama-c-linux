@@ -85,9 +85,8 @@ let add_deps_loc ~exact ~src_loc ~dst_loc deps_table =
 (* Adds a sure \from dependency of size [size] from [src] to [dst].
    Also returns the written zone if it is a singleton. *)
 let add_sure_deps ~size ~src ~dst (deps_table, sure_output) =
-  let size = Z_or_top.inject size in
-  let src_loc = Locations.make_loc src size in
-  let dst_loc = Locations.make_loc dst size in
+  let src_loc = Locations.make_loc src (`Value size) in
+  let dst_loc = Locations.make_loc dst (`Value size) in
   let exact = Location_Bits.cardinal_zero_or_one dst in
   let deps_table = add_deps_loc ~exact ~src_loc ~dst_loc deps_table in
   let dst_zone = Locations.(enumerate_valid_bits Write dst_loc) in
@@ -173,7 +172,7 @@ let char_location loc ?(min_size=Z.zero) max_size =
       ~rem:Z.zero ~modu:size_char
   in
   let loc = Location_Bits.shift shift loc in
-  make_loc loc (Z_or_top.inject size_char)
+  make_loc loc (`Value size_char)
 
 let compute_memcpy ~name ~dst_expr ~dst ~src ~size state =
   let size_min, size_max = min_max_size size in
@@ -310,7 +309,7 @@ let frama_c_memset_imprecise state dst_expr dst v size =
             Cvalue.Model.paste_offsetmap
               ~from ~dst_loc ~size:sure ~exact:true state
           in
-          let sure_loc = make_loc dst_loc (Z_or_top.inject sure) in
+          let sure_loc = make_loc dst_loc (`Value sure) in
           let sure_zone = enumerate_valid_bits Locations.Write sure_loc in
           state, sure_zone
         else

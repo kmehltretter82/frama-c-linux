@@ -447,7 +447,7 @@ struct
         List.iter aux_itv l;
         H.fold
           (fun size loc acc ->
-             let loc = Locations.make_loc loc (Z_or_top.inject size) in
+             let loc = Locations.make_loc loc (`Value size) in
              f loc v acc
           ) by_size acc
       with Abstract_interp.Error_Top ->

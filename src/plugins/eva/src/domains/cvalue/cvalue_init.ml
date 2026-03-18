@@ -22,7 +22,7 @@ let make_well hidden_base state loc =
   let well_loc =
     Locations.make_loc
       (Location_Bits.inject hidden_base Ival.zero)
-      (Z_or_top.inject size)
+      (`Value size)
   in
   let state = add_initialized state well_loc well in
   add_initialized state loc well

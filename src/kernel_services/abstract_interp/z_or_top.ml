@@ -20,8 +20,6 @@ let is_top = Lattice_bounds.Top.is_top
 
 let neg = Lattice_bounds.Top.map Z.neg
 
-let inject i = `Value i
-
 let project = function
   | `Top -> raise Abstract_interp.Error_Top
   | `Value i -> i
