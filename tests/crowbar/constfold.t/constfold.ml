@@ -173,12 +173,6 @@ let gen_cabs typ expr =
 
 let () = Project.set_current (Project.create "my_project")
 
-let () =
-  Cmdline.(
-    parse_and_boot
-      ~get_toplevel:(fun () f -> f ())
-      ~play_analysis:(fun _ -> ()))
-
 let run typ expr =
   Project.clear ();
   let cabs = gen_cabs typ expr in
