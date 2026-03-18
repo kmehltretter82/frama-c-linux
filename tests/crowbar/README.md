@@ -1,6 +1,6 @@
 # Crowbar tests
 
-This folder regroup some tests using the OCaml library Crowbar.
+This folder groups some tests using the OCaml library Crowbar.
 To run these tests the environment variable `CROWBAR` must be defined :
 
 ```bash
