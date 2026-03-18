@@ -555,8 +555,7 @@ let loc_bottom = make_loc Location_Bits.bottom Z_or_top.top
 let is_bottom_loc l = Location_Bits.(equal l.loc bottom)
 
 let cardinal_zero_or_one { loc = loc ; size = size } =
-  Location_Bits.cardinal_zero_or_one loc &&
-  Z_or_top.cardinal_zero_or_one size
+  Location_Bits.cardinal_zero_or_one loc && not (Z_or_top.is_top size)
 
 let loc_equal { loc = loc1 ; size = size1 } { loc = loc2 ; size = size2 } =
   Z_or_top.equal size1 size2 &&

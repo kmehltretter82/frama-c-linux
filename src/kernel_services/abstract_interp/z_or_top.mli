@@ -24,5 +24,3 @@ val is_top: t -> bool
 val inject: Z.t -> t
 val project: t -> Z.t
 (** @raise Error_Top if the argument is {!Top}. *)
-
-val cardinal_zero_or_one: t -> bool

@@ -25,7 +25,3 @@ let inject i = `Value i
 let project = function
   | `Top -> raise Abstract_interp.Error_Top
   | `Value i -> i
-
-let cardinal_zero_or_one = function
-  | `Top -> false
-  | `Value _ -> true
