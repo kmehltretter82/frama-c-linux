@@ -472,10 +472,9 @@ let temp_file ~prefix ~suffix =
   with Sys_error s ->
     Kernel_log.abort "cannot create temporary file: %s" s
 
-let save_projects ?compress selection projects
+let save_projects ?(compress = !compress_saved_session) selection projects
     (filename : Filepath.t) =
   let open Filesystem.Operators in
-  let compress = Option.value ~default:!compress_saved_session compress in
   let$ cout = Filesystem.Compressed.with_open_out_exn ~compress filename in
   Channel.output_value cout System_config.Version.id;
   Channel.output_value cout magic;

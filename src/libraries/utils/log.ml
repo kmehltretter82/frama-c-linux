@@ -759,6 +759,57 @@ let merge_status old_status new_status =
   | Winactive, _ -> Winactive
   | _ -> new_status
 
+type category_action = Category_help | Change_category of (bool * string) list
+let parse_category s =
+  let categories = String.split_on_char ',' s in
+  if List.mem "help" categories then Category_help
+  else
+    let parse_single s =
+      match String.get s 0 with
+      | '-' -> false, String.sub s 1 (String.length s - 1)
+      | '+' -> true, String.sub s 1 (String.length s - 1)
+      | _ -> true, s
+    in
+    let non_empty_category s =
+      if s <> "" then Some (parse_single s) else None
+    in
+    Change_category (List.filter_map non_empty_category categories)
+
+type warning_action =
+  | Warning_help
+  | Set_status of (string * warn_status) list
+  | Parsing_error of string
+
+let warn_status_of_string = function
+  | "inactive" | "ignore" -> Winactive
+  | "feedback-once" -> Wfeedback_once
+  | "feedback" -> Wfeedback
+  | "warning-once" | "warn-once" | "once" -> Wonce
+  | "warning" | "warn" | "active" -> Wactive
+  | "error-once" | "err-once" -> Werror_once
+  | "error" | "err" -> Werror
+  | "abort" -> Wabort
+  | s -> invalid_arg (Format.sprintf "Unknown warning category status `%s'" s)
+
+let parse_warning s =
+  let directives = String.split_on_char ',' s in
+  if List.mem "help" directives then Warning_help
+  else
+    let parse_single s =
+      match String.split_on_char '=' s with
+      | [] -> assert false (* split_on_char should return at least an element
+                              even if it is the empty string *)
+      | [ c ] -> (c, Wactive)
+      | [ c; status ] -> (c, warn_status_of_string status)
+      | _ -> invalid_arg (Format.sprintf "Ill-formed warn key directive `%s'" s)
+    in
+    try
+      let non_empty_warning s =
+        if s <> "" then Some (parse_single s) else None
+      in
+      Set_status (List.filter_map non_empty_warning directives)
+    with Invalid_argument msg -> Parsing_error msg
+
 module type Level = sig
   val value_if_set: int option ref
   val get: unit -> int
