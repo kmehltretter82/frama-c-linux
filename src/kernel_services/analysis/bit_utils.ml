@@ -42,24 +42,21 @@ let warn_if_zero ty r =
       Printer.pp_typ ty;
   r
 
-(** [sizeof ty] is the size of [ty] in bits. This function may return
-    [Z_or_top.top]. *)
-let sizeof ty =
-  (match ty.tnode with
-   | TVoid -> Kernel.warning ~current:true ~once:true "using size of 'void'"
-   | _ -> ()) ;
-  try Z_or_top.inject (Z.of_int (bitsSizeOf ty))
-  with SizeOfError _ ->
-    Z_or_top.top
+let warn_if_void typ =
+  match typ.tnode with
+  | TVoid -> Kernel.warning ~current:true ~once:true "using size of 'void'"
+  | _ -> ()
 
-(** [osizeof ty] is the size of [ty] in bytes. This function may return
-    [Z_or_top.top]. *)
-let osizeof ty =
-  (match ty.tnode with
-   | TVoid -> Kernel.warning ~once:true ~current:true "using size of 'void'"
-   | _ -> ()) ;
-  try
-    Z_or_top.inject (Z.of_int (warn_if_zero ty (bitsSizeOf ty) / 8))
+(* [sizeof ty] is the size of [ty] in bits; it may return [`Top]. *)
+let sizeof typ =
+  warn_if_void typ;
+  try Z_or_top.inject (Z.of_int (bitsSizeOf typ))
+  with SizeOfError _ -> Z_or_top.top
+
+(* [osizeof ty] is the size of [ty] in bytes; it may return [`Top]. *)
+let osizeof typ =
+  warn_if_void typ;
+  try Z_or_top.inject (Z.of_int (warn_if_zero typ (bitsSizeOf typ) / 8))
   with SizeOfError _ -> Z_or_top.top
 
 exception Neither_Int_Nor_Enum_Nor_Pointer

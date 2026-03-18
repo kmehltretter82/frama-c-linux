@@ -17,12 +17,10 @@ val sizeofpointer: unit -> int
 (** [sizeof(char* )] in bits *)
 
 val sizeof: typ -> Z_or_top.t
-(** [sizeof ty] is the size of [ty] in bits. This function may return
-    [Z_or_top.top]. *)
+(** [sizeof typ] is the size of [typ] in bits; it may return [`Top]. *)
 
 val osizeof: typ -> Z_or_top.t
-(** [osizeof ty] is the size of [ty] in bytes. This function may return
-    [Z_or_top.top]. *)
+(** [osizeof typ] is the size of [typ] in bytes; it may return [`Top]. *)
 
 exception Neither_Int_Nor_Enum_Nor_Pointer
 
