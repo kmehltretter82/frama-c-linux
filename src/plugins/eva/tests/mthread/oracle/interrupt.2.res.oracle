@@ -31,6 +31,7 @@
     interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
+[mt] *** Thread <main> computed
 [mt] ******* Starting to iterate
 [mt] ***** Iteration 1
 [mt] *** Computing thread <main>, iteration 1 (thread initial memory state

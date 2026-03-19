@@ -237,8 +237,6 @@ let thread_analysis engine analysis final_states th =
 
     (* We save all our results *)
     Mt_analysis_fixpoint.post_thread_analysis analysis;
-
-    Mt_self.feedback "*** Thread %a computed" ThreadState.pretty th;
   end;
   th.th_to_recompute <- SetRecomputeReason.empty
 

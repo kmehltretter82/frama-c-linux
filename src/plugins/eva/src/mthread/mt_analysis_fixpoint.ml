@@ -76,6 +76,8 @@ let post_thread_analysis analysis =
   th.th_read_written_cfg <- Mt_cfg.cfg_accesses th.th_eva_thread th.th_cfg;
   Mt_self.feedback ~level:2 "* Cfg computed";
 
+  Mt_self.feedback "*** Thread %a computed" ThreadState.pretty th;
+
   (* (Temporary) hack to be able to retrieve temporary analysis results *)
   Self.ComputationState.set previous_computation_state
 
