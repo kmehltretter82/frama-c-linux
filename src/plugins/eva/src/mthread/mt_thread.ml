@@ -126,8 +126,23 @@ module ThreadState = struct
     then
       th.th_to_recompute <- SetRecomputeReason.add r th.th_to_recompute
 
-  let needs_recomputation th =
-    not (SetRecomputeReason.is_empty th.th_to_recompute)
+  type recompute_status = NoNeed | NotStarted | Recompute
+
+  let get_recompute_status th =
+    if SetRecomputeReason.is_empty th.th_to_recompute then NoNeed
+    else if not (Cvalue.Model.is_reachable th.th_init_state) then NotStarted
+    else Recompute
+
+  let recompute_feedback = function
+    | NoNeed -> Mt_self.debug "No need to recompute thread %a"
+    | NotStarted ->
+      Mt_self.feedback "*** Thread %a has been created but not started. Skipping."
+    | Recompute -> fun _ _ -> ()
+
+  let needs_recomputation ?(feedback=false) th =
+    let status = get_recompute_status th in
+    if feedback then recompute_feedback status pretty th;
+    status = Recompute
 end
 
 

@@ -206,13 +206,7 @@ let compute_thread (type t) (engine: t engine) ?cvalue_state thread =
     ~thread ?cvalue_state ?arguments entry_point
 
 let thread_analysis engine analysis final_states th =
-  let open Mt_thread in
-  if SetRecomputeReason.is_empty th.th_to_recompute then
-    Mt_self.debug "No need to recompute thread %a" ThreadState.pretty th
-  else if not (Cvalue.Model.is_reachable th.th_init_state) then
-    Mt_self.feedback "@[<hov 2>*** Thread %a has been@ created but@ \
-                      not started. Skipping.@]"  ThreadState.pretty th
-  else begin
+  if Mt_thread.ThreadState.needs_recomputation ~feedback:true th then begin
     Mt_analysis_fixpoint.pre_thread_analysis analysis th;
 
     let final_state, analysis_time = Eva_utils.measure_time
@@ -225,12 +219,12 @@ let thread_analysis engine analysis final_states th =
     if Mt_options.ShowTime.get () then
       Mt_self.feedback ~level:2
         "* Value analysis computed for thread %a, %f sec"
-        ThreadState.pretty th analysis_time;
+        Mt_thread.ThreadState.pretty th analysis_time;
 
     (* We save all our results *)
     Mt_analysis_fixpoint.post_thread_analysis analysis;
   end;
-  th.th_to_recompute <- SetRecomputeReason.empty
+  th.th_to_recompute <- Mt_thread.SetRecomputeReason.empty
 
 (* Auxiliary function iterating the analysis until the fixpoint is reached *)
 let mthread_fixpoint engine analysis =
