@@ -79,9 +79,10 @@ module Operators : sig
   (** Conversion from [int] using {!of_int}. *)
   val ( ~$ ) : int -> t
 
-  (** Power {!pow_exn}. For coherence, we're using our own {!pow_exn} function,
+  (** Power {!pow}. For coherence, we're using our own {!pow} function,
       which has a limit. If you want to customize this limit, use the function
       instead of this operator, or set it via {!set_pow_exponent_limit}.
+      @raise Overflow See {!pow}
   *)
   val ( ** ) : t -> int -> t
 end
@@ -136,8 +137,7 @@ val set_pow_exponent_limit: int -> unit
     the exponent is too big. See {!set_pow_exponent_limit} for default value.
     @raises Overflow if the argument is greater than [?limit]
     @before Frama-C+dev [?limit] argument was not present and all values were
-    accepted
-*)
+    accepted, potentially leading to memory exhaustion. *)
 val pow : ?limit:int -> t -> int -> t
 
 (** Computes [2^n]. [?limit] can be used to raise an {!Overflow} if the exponent
