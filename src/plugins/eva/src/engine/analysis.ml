@@ -278,10 +278,7 @@ let compute_from ?cvalue_state ?arguments entry_point =
   (* Build the mthread analysis state even when mthread is disabled *)
   let analysis = Mt_main.make_analysis_state () in
 
-  if mt_enabled then begin
-    Mt_main.pre_analysis ();
-    Mt_main.register_hooks analysis;
-  end;
+  if mt_enabled then Mt_main.pre_analysis analysis;
   Fun.protect ~finally:Mt_main.unregister_hooks @@ fun () ->
 
   (* Prepare the analysis and build the engine. *)

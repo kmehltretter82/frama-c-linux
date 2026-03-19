@@ -58,7 +58,7 @@ let unregister_hooks () =
   List.iter unregister Mt_analysis_hooks.mthread_builtins
 
 
-let pre_analysis () =
+let pre_analysis analysis =
   Mt_self.warning
     "Mthread is an experimental plugin and is still in development.";
 
@@ -70,7 +70,8 @@ let pre_analysis () =
       Mt_options.ConcatDotFilesTo.option_name
       Mt_options.ExtractModels.option_name;
 
-  Mt_self.feedback "******* Starting mthread"
+  Mt_self.feedback "******* Starting mthread";
+  register_hooks analysis
 
 let make_analysis_state () =
   (* We create the record containing the state of the analysis (which must
