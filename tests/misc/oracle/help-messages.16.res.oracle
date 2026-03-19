@@ -62,8 +62,6 @@ Options taking a string as argument should preferably be written
 -mt-skip-threads <th1,...,thn>  do not execute the specified threads
                     (preferably use -mt-skip-threads="th1,...,thn")
 -mt-stop-after <i>  Only perform at most i iterations
--mt-time            Show time taken by thread computation (opposite option is
-                    -mt-no-time)
 
 *** EXTRACTION OF MODELS
 

@@ -208,19 +208,10 @@ let compute_thread (type t) (engine: t engine) ?cvalue_state thread =
 let thread_analysis engine analysis final_states th =
   if Mt_thread.ThreadState.needs_recomputation ~feedback:true th then begin
     Mt_analysis_fixpoint.pre_thread_analysis analysis th;
-
-    let final_state, analysis_time = Eva_utils.measure_time
-        (compute_thread engine ~cvalue_state:th.th_init_state) th.th_eva_thread
-    in
-
+    let cvalue_state = th.th_init_state in
+    let final_state = compute_thread engine ~cvalue_state th.th_eva_thread in
     (* Store the thread analysis final state. *)
     Thread.Hashtbl.replace final_states th.th_eva_thread final_state;
-
-    if Mt_options.ShowTime.get () then
-      Mt_self.feedback ~level:2
-        "* Value analysis computed for thread %a, %f sec"
-        Mt_thread.ThreadState.pretty th analysis_time;
-
     (* We save all our results *)
     Mt_analysis_fixpoint.post_thread_analysis analysis;
   end;
