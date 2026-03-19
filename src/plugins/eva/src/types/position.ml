@@ -156,3 +156,25 @@ let of_kinstr kinstr callstack =
 
 let of_local lpos =
   Local lpos
+
+let set_stmt stmt pos =
+  match pos with
+  | GlobalInit _ -> None
+  | RootCall { thread; entry_point } ->
+    let cs = Callstack.init ~thread ~entry_point in
+    Some (local stmt cs)
+  | Local (_, cs) ->
+    Some (local stmt cs)
+
+let push_kf kf pos =
+  match pos with
+  | GlobalInit _ | RootCall _ ->
+    None
+  | Local (stmt, cs) ->
+    try
+      let cs = Callstack.push kf stmt cs in
+      let stmt = Kernel_function.find_first_stmt kf in
+      Some (local stmt cs)
+    with Kernel_function.No_Statement ->
+      None
+
