@@ -83,6 +83,11 @@ let post_thread_analysis analysis =
 
 (* We compute a value analysis for the given thread *)
 let pre_thread_analysis analysis th =
+  Mt_self.feedback
+    "@[<hov 2>*** Computing thread %a,@ iteration %d@ (%a)@]"
+    ThreadState.pretty th analysis.iteration
+    SetRecomputeReason.pretty th.th_to_recompute;
+
   Mt_self.feedback ~level:2 "* Computing value analysis for thread %a"
     Thread.pretty th.th_eva_thread;
   Mt_self.debug "@[<hov>Arguments@ %a@]"

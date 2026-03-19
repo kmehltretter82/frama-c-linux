@@ -216,11 +216,6 @@ let thread_analysis engine analysis final_states th =
     Mt_self.feedback "@[<hov 2>*** Thread %a has been@ created but@ \
                       not started. Skipping.@]"  ThreadState.pretty th
   else begin
-    Mt_self.feedback
-      "@[<hov 2>*** Computing thread %a,@ iteration %d@ (%a)@]"
-      ThreadState.pretty th analysis.iteration
-      SetRecomputeReason.pretty th.th_to_recompute;
-
     Mt_analysis_fixpoint.pre_thread_analysis analysis th;
 
     let final_state, analysis_time = Eva_utils.measure_time
