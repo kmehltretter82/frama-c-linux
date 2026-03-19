@@ -613,7 +613,7 @@ struct
           then F.p_true
           else C.has_ltype v.lv_type (e_var x)
         in
-        let e = C.env_let env v (Vexp (e_var x)) in
+        let e = C.env_let env v (Cvalues.plain v.lv_type (e_var x)) in
         acc (x::xs) e (h::hs) vs in
     acc [] env [] qs
 
@@ -687,7 +687,7 @@ struct
       let c = val_of_term env cond in
       let a = val_of_term env a in
       let b = val_of_term env b in
-      Vexp (e_if c a b)
+      Cvalues.plain t.term_type (e_if c a b)
 
     | Tat( t , label ) ->
       let clabel = Clabels.of_logic label in

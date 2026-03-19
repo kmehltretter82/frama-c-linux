@@ -329,7 +329,7 @@ struct
     let lvars = List.fold_left
         (fun lvars lv ->
            let x = fresh_lvar ~basename:lv.lv_name lv.lv_type in
-           let v = Vexp(e_var x) in
+           let v = Cvalues.plain lv.lv_type (e_var x) in
            Logic_var.Map.add lv v lvars)
         Logic_var.Map.empty lvars in
     { lhere = here ; current = here ; vars = lvars }
