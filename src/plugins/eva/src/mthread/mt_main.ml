@@ -98,6 +98,15 @@ let make_analysis_state () =
   analysis
 
 let post_analysis analysis =
+  if not (Mt_thread.needs_recomputation analysis) then
+    Mt_self.feedback "******* Analysis performed, %d iterations"
+      analysis.iteration
+  else
+    Mt_self.feedback
+      "@[<v>******* Analysis stopped after %d iterations.@ %a@]"
+      analysis.iteration
+      Mt_thread.pretty_recompute_reasons analysis;
+
   (* In the cfgs, mark whether the accesses are concurrent or not,
       and remove superfluous node *)
   Mt_analysis_fixpoint.mark_shared_nodes_kind analysis;

@@ -268,15 +268,6 @@ let mthread_fixpoint engine analysis =
     Mt_analysis_fixpoint.post_iteration analysis
   done;
 
-  if not (Mt_thread.needs_recomputation analysis) then
-    Mt_self.feedback "******* Analysis performed, %d iterations"
-      analysis.iteration
-  else
-    Mt_self.feedback
-      "@[<v>******* Analysis stopped after %d iterations.@ %a@]"
-      analysis.iteration
-      Mt_thread.pretty_recompute_reasons analysis;
-
   (* Return the main thread final state. *)
   Thread.Hashtbl.find final_states Thread.main
 
