@@ -68,22 +68,35 @@ module Capital = struct
   let pp_theta = pretty "Θ" "\\Theta"
 end
 
-(* Superscript *)
-let super_digits = [| "⁰"; "¹"; "²"; "³"; "⁴"; "⁵"; "⁶"; "⁷"; "⁸"; "⁹" |]
+(* Superscript/subscript *)
+let super_digits = [| "⁰"; "¹"; "²"; "³"; "⁴"; "⁵"; "⁶"; "⁷"; "⁸"; "⁹"; "⁻" |]
+let sub_digits = [| "₀"; "₁"; "₂"; "₃"; "₄"; "₅"; "₆"; "₇"; "₈"; "₉"; "₋" |]
 
-let pp_super_char fmt c =
-  let s = match c with
-    | '0' .. '9' -> super_digits.(int_of_char c - int_of_char '0')
-    | '-' -> "⁻"
-    | _ -> invalid_arg (Format.asprintf "no superscript version of '%c'" c)
+let pp_digit_char digits fmt c =
+  let s =
+    match c with
+    | '0' .. '9' -> digits.(int_of_char c - int_of_char '0')
+    | '-' -> digits.(10)
+    | _ ->
+      invalid_arg (Format.asprintf "no version of '%c' in %a"
+                     c (Array.pretty Format.pp_print_string) digits)
   in
   Format.pp_print_as fmt 1 s
+
+let pp_super_char = pp_digit_char super_digits
+let pp_sub_char = pp_digit_char sub_digits
 
 let pp_super_int fmt value =
   if !use_utf8_unicode then
     Int.to_string value |> String.iter (pp_super_char fmt)
   else
     Format.fprintf fmt "^%d" value
+
+let pp_sub_int fmt value =
+  if !use_utf8_unicode then
+    Int.to_string value |> String.iter (pp_sub_char fmt)
+  else
+    Format.fprintf fmt "_%d" value
 
 (* Other symbols. *)
 
