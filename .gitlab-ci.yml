@@ -56,22 +56,19 @@ variables:
     variables:
       - $RELEASE == "yes"
 
-.build_template: &when_schedules
-  only:
-    refs:
-      - schedules
-
 .build_template: &when_weekly
   only:
     variables:
       - $WEEKLY == "yes"
-  <<: *when_schedules
+    refs:
+      - schedules
 
 .build_template: &when_nightly
   only:
     variables:
       - $NIGHTLY == "yes"
-  <<: *when_schedules
+    refs:
+      - schedules
 
 .build_template: &when_publish
   only:
@@ -564,9 +561,8 @@ internal-nightly:
   <<: *internal_template
   # The Opam target may affect this job
   timeout: 2h
-  only:
-    - schedules
-
+  <<: *when_nightly
+  
 # Linux ARM & MacOS
 
 .build_template: &additional_arch_template
