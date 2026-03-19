@@ -71,7 +71,10 @@ let pre_analysis analysis =
       Mt_options.ExtractModels.option_name;
 
   Mt_self.feedback "******* Starting mthread";
-  register_hooks analysis
+  register_hooks analysis;
+
+  (* Let Eva know about interrupt handlers. *)
+  Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ())
 
 let make_analysis_state () =
   (* We create the record containing the state of the analysis (which must

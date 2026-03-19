@@ -241,9 +241,6 @@ let mthread_fixpoint engine analysis =
      only the result of the main thread is used. *)
   let final_states = Thread.Hashtbl.create 1 in
 
-  (* Let Eva know about interrupt handlers. *)
-  Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
-
   (* We analyse the main thread *)
   Mt_self.feedback "*** Computing value analysis for main thread";
   let final_state = compute_thread engine Thread.main in
