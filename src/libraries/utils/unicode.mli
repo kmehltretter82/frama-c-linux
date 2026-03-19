@@ -55,6 +55,7 @@ val pp_real : printer (** ℝ *)
 
 (* Greek letters. *)
 
+val pp_alpha : printer (** α *)
 val pp_pi : printer (** π *)
 val pp_lambda : printer (** λ *)
 val pp_mu : printer (** µ *)

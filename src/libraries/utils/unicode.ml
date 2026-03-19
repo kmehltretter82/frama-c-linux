@@ -58,6 +58,7 @@ let pp_real =    pretty Utf8_logic.real "real"
 
 (* Greek letters. *)
 
+let pp_alpha = pretty "α" "\\alpha"
 let pp_pi = pretty Utf8_logic.pi "\\pi"
 let pp_lambda = pretty "λ" "\\lambda"
 let pp_mu = pretty "µ" "\\mu"
