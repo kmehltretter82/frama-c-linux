@@ -4703,10 +4703,8 @@ program and potentially influence its execution.
 The initial taint must be specified by the user with \acsl{} annotations
 \lstinline|//@  taint <lvalues>;| on a statement, or a clause
 \lstinline|taints <lvalues>;| in a function contract.
-
 These directives are hypotheses of the taint analysis, and thus have no logical
-status. The specified set of lvalues becomes tainted just after the code
-annotation, or at the return of the function with the \texttt{taints} clause.
+status.
 
 \begin{listing-nonumber}
   int r = write(buf, n);
@@ -4721,8 +4719,10 @@ annotation, or at the return of the function with the \texttt{taints} clause.
       int write(char *buf, int n);
 \end{listing-nonumber}
 
-The taint is then propagated during the \Eva{} analysis, which computes an
-over-approximation of the set of tainted locations at each program point.
+The specified set of lvalues becomes tainted just after the code annotation, or
+at the return of the function with the \texttt{taints} clause. The taint is then
+propagated during the \Eva{} analysis, which computes an over-approximation of
+the set of tainted locations at each program point.
 
 The \acsl{} predicate \lstinline|\tainted| can be used to verify that some
 values are \emph{not} tainted.
@@ -4749,14 +4749,80 @@ not tainted anymore.
   void sanitize(int *p);
 \end{listing-nonumber}
 
-Taint analysis accounts for both data and control dependencies: a value may
-become tainted either directly, through assignments that use tainted data, or
-indirectly, through control flow and computations that depends on tainted
-values. To reflect this distinction, the predicates
-\lstinline|\tainted_directly| and \lstinline|\tainted_indirectly| refine the
-general \lstinline|\tainted| predicate: \lstinline|\tainted_directly| (resp.
-\lstinline|\tainted_indirectly|) can be used to verify that a value is
-\emph{not} directly (resp. indirectly) tainted.
+\subsubsection{Direct and indirect taints}
+Taint analysis distinguishes between direct and indirect taints. Accordingly, a
+location may be \emph{directly}, \emph{indirectly}, or both directly and
+indirectly tainted.
+
+Direct taints account for \emph{data dependencies} among program locations: a
+first location is said to be \emph{data-dependent} on a second location if the
+value of the former is computed from the value of the latter.
+In practice, direct taints are introduced by means of \acsl{} annotations
+\lstinline|//@taint <lvalues>;| or clauses \lstinline|taints <lvalues>;|. They
+are propagated through assignments \lstinline|lvalue = expr| whenever
+a location occurring in \lstinline|expr| is directly tainted or data-dependent
+on another location.
+
+Indirect taints account for \emph{control dependencies} among program locations:
+a first location is said to be \emph{control-dependent} on a second location if
+the value of the former may depend on a control-flow decision or an address
+computation based on the value of the latter. In practice, they are introduced
+and propagated through assignments of the form \lstinline|lvalue = expr|
+whenever one of the following applies:
+\begin{enumerate}
+  \item \lstinline|lvalue = expr| occurs in the scope of a conditional
+  statement, possibly through function calls, whose controlling expression is
+  tainted;
+  \item the value of a location occurring in \lstinline|expr| depends on the
+  value of an indirectly tainted location;
+  \item the address computation of \lstinline|lvalue| depends on the value of
+  a tainted location;
+  \item the address computation of a location read to compute the value of
+  \lstinline|expr| depends on the value of a tainted location.
+\end{enumerate}
+
+To illustrate this distinction, let us consider the following example:
+\begin{listing-nonumber}
+void fun(int t) {
+  //@ taint t;                // 't' becomes directly tainted.
+
+  int x, y, z, w = 0;
+
+  x = t + 1;                  // 'x' becomes directly tainted via 't'.
+
+  // CASE 1.: 'z' and 'w' become indirectly tainted as their value depend on the
+  // value of the controlling expression 'x', which is tainted.
+  // Moreover, 'z' becomes also directly tainted as it may take the value of
+  // 't' in the else-branch. 
+  if (x) {
+    z = 1;
+    w = 0;
+  }
+  else {
+    z = t;                    // 'z' becomes directly tainted via 't'.
+    w = 1;
+  }
+
+  // CASE 2.: 'y' becomes indirectly tainted via 'w'.
+  y = w;
+
+  int buf[2] = {0};
+
+  // CASE 3.: 'buf[w]' becomes indirectly tainted as the address 'buf + w'
+  // depends on the value of the tainted location 'w'.
+  buf[w] = buf[1] + 1;
+
+  // CASE 4.: 'buf[0]' becomes indirectly tainted as the address 'buf + w'
+  // depends on the value of the tainted location 'w'.
+  buf[0] = buf[w] - 1;
+}
+\end{listing-nonumber}
+
+To reflect this distinction, the predicates \lstinline|\tainted_directly| and
+\lstinline|\tainted_indirectly| refine the general \lstinline|\tainted|
+predicate: \lstinline|\tainted_directly| (resp. \lstinline|\tainted_indirectly|)
+can be used to verify that a value is \emph{not} directly (resp. indirectly)
+tainted.
 
 \begin{listing-nonumber}
   void fun(int a, int b, int t) {
