@@ -179,8 +179,6 @@ val push_function_call: analysis_state -> unit
 val pop_function_call: analysis_state -> unit
 
 
-val should_compute_thread: thread_state -> bool
-
 val pretty_recompute_reasons: analysis_state Pretty_utils.formatter
 
 val needs_recomputation: analysis_state -> bool

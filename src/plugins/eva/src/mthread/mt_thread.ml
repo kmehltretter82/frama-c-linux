@@ -183,6 +183,14 @@ type analysis_state = {
    compute the field [precise_concurrent_accesses] *);
 }
 
+let skips_thread th =
+  let name = ThreadState.label th in
+  Mt_options.SkipThreads.mem name
+  || not Mt_options.OnlyThreads.(is_empty () || mem name)
+
+let should_compute_thread th =
+  Thread.is_main th.th_eva_thread || not (skips_thread th)
+
 (* Iterators on threads. We presave the current list of threads so that
    the iterators do not accidentally capture new added threads. (This is not
    important for correctness, but is slightly cleaner.). Threads are sorted,
@@ -190,9 +198,8 @@ type analysis_state = {
 let threads analysis =
   (* the main thread always has the least id and will always be in front of the
      list *)
-  Thread.Hashtbl.fold_sorted
-    (fun _ th l -> th :: l)
-    analysis.all_threads []
+  Thread.Hashtbl.fold_sorted (fun _ th l -> th :: l) analysis.all_threads []
+  |> List.filter should_compute_thread
   |> List.rev
 
 let thread_state analysis th =
@@ -328,15 +335,6 @@ module OrderedThreads = struct
     in do_thread_id_list acc [Thread.main]
   ;;
 end
-
-
-let should_compute_thread th =
-  (Thread.is_main th.th_eva_thread) ||
-  (let name = ThreadState.label th in
-   (not (Datatype.String.Set.mem name (Mt_options.SkipThreads.get ()))) &&
-   let only = Mt_options.OnlyThreads.get () in
-   Datatype.String.Set.is_empty only || Datatype.String.Set.mem name only
-  )
 
 let pretty_recompute_reasons fmt analysis =
   let pretty_thread_reasons fmt th =

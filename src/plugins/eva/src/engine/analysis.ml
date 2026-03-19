@@ -209,9 +209,6 @@ let thread_analysis engine analysis final_states th =
   let open Mt_thread in
   if SetRecomputeReason.is_empty th.th_to_recompute then
     Mt_self.debug "No need to recompute thread %a" ThreadState.pretty th
-  else if not (Mt_thread.should_compute_thread th) then
-    Mt_self.feedback "*** Skipping thread %a as requested"
-      ThreadState.pretty th
   else if not (Cvalue.Model.is_reachable th.th_init_state) then
     Mt_self.feedback "@[<hov 2>*** Thread %a has been@ created but@ \
                       not started. Skipping.@]"  ThreadState.pretty th
