@@ -1,21 +1,22 @@
 open Cabs
-open Crowbar
 
-let loc = Cabshelper.cabslu
+[@@@warning "-32-27"]
+
+let loc = Cil_datatype.Location.unknown
 
 let gen_int_type =
-  choose [
-    const Tint;
-    const Tlong;
-    const Tunsigned;
-  ]
+  Crowbar.(choose [
+      const Tint;
+      const Tlong;
+      const Tunsigned;
+    ])
 
 let gen_type =
-  choose [
-    gen_int_type;
-    const Tfloat;
-    const Tdouble;
-  ]
+  Crowbar.(choose [
+      gen_int_type;
+      const Tfloat;
+      const Tdouble;
+    ])
 
 let mk_exp expr_node = { expr_loc = loc; expr_node }
 
@@ -23,13 +24,13 @@ let needs_int_unary = function
   | NOT | BNOT -> true
   | _ -> false
 
-let gen_unary =
-  choose [
-    const NOT;
-    const BNOT;
-    const MINUS;
-    const PLUS;
-  ]
+let gen_unary_op =
+  Crowbar.(choose [
+      const NOT;
+      const BNOT;
+      const MINUS;
+      const PLUS;
+    ])
 
 (* NB: we don't generate shifts and division/modulo operands to avoid
    undefined operations. Overflows alarms are deactivated as well. *)
@@ -38,7 +39,8 @@ let needs_int_binary = function
   | AND | OR | BAND | BOR | XOR -> true
   | _ -> false
 
-let gen_binary =
+let gen_binary_op =
+  let open Crowbar in
   choose [
     const AND;
     const OR;
@@ -56,18 +58,21 @@ let gen_binary =
     const GE;
   ]
 
+
+
 (* int32 generator as the default machdep is 32 bit.
    Moreover, we only generate positive integers here, as negative ones are
    supposed to be given by unary -
 *)
 let gen_constant =
+  let open Crowbar in
   choose [
     map [ range 4 ]
       (fun i -> mk_exp (CONSTANT (CONST_INT (string_of_int i))));
     map [ float ]
       (fun f ->
          let up = 4.0 in
-         let f = if f < 0.0 then 0. else f in
+         let f = if f < 0.0 || Float.is_nan f then 0. else f in
          let f = if f > up then up else f in
          mk_exp (CONSTANT (CONST_FLOAT (string_of_float f))))
   ]
@@ -89,34 +94,37 @@ let protected_cast t e =
       mk_exp(QUESTION(mk_exp(BINARY(LE,e,max)),e,maxr)),
       minr))
 
-let force_int typ e =
-  let e = protected_cast typ e in
-  mk_exp (CAST (([SpecType typ],JUSTBASE), SINGLE_INIT e))
+let gen_cast t e =
+  let e = protected_cast t e in
+  mk_exp (CAST (([SpecType t],JUSTBASE), SINGLE_INIT e))
 
-let gen_expr =
-  fix
-    (fun gen_expr ->
-       choose [
-         gen_constant;
-         map [ gen_int_type; gen_unary; gen_expr]
-           (fun t u e ->
-              let e = if needs_int_unary u then force_int t e else e in
-              mk_exp (UNARY(u,e)));
-         map [ gen_int_type; gen_binary; gen_expr; gen_expr ]
-           (fun t b e1 e2 ->
-              let e1,e2 =
-                if needs_int_binary b then
-                  force_int t e1, force_int t e2
-                else e1,e2
-              in
-              mk_exp (BINARY (b,e1,e2)));
-         map [ gen_expr; gen_expr; gen_expr ]
-           (fun c et ef -> mk_exp (QUESTION (c,et,ef)));
-         map [ gen_type; gen_expr ]
-           (fun t e ->
-              let e = protected_cast t e in
-              mk_exp (CAST (([SpecType t],JUSTBASE), SINGLE_INIT e)));
-       ])
+let gen_unary t op e =
+  let e = if needs_int_unary op then gen_cast t e else e in
+  mk_exp (UNARY (op,e))
+
+let gen_binary t op e1 e2 =
+  let e1,e2 =
+    if needs_int_binary op then
+      gen_cast t e1, gen_cast t e2
+    else e1,e2
+  in
+  mk_exp (BINARY (op,e1,e2))
+
+let gen_question c et ef =
+  mk_exp (QUESTION (c,et,ef))
+
+let rec gen_expr_l n =
+  if n <= 0 then lazy gen_constant
+  else lazy (
+    let open Crowbar in
+    choose [
+      gen_constant;
+      map [ gen_int_type; gen_unary_op; gen_expr (n-1)] gen_unary;
+      map [ gen_int_type; gen_binary_op; gen_expr (n-1); gen_expr (n-1) ] gen_binary;
+      map [ gen_expr (n-1); gen_expr (n-1); gen_expr (n-1)] gen_question;
+      map [ gen_type; gen_expr (n-1) ] gen_cast;
+    ])
+and gen_expr n = Crowbar.unlazy (gen_expr_l n)
 
 let gen_cabs typ expr =
   let expr = protected_cast typ expr in
@@ -163,62 +171,53 @@ let gen_cabs typ expr =
        },
        loc,loc)])
 
-let () = Kernel.AutoLoadPlugins.off()
-
 let () = Project.set_current (Project.create "my_project")
-
-let () = Dynamic.set_module_load_path [ "lib/plugins" ]
-
-let () = Dynamic.load_module "frama-c-eva"
-
-let () =
-  Cmdline.(
-    parse_and_boot
-      ~get_toplevel:(fun () f -> f ())
-      ~play_analysis:(fun _ -> ()))
 
 let run typ expr =
   Project.clear ();
-  let loc = Cil_datatype.Location.unknown in
   let cabs = gen_cabs typ expr in
   Kernel.SignedOverflow.off ();
   Kernel.SignedDowncast.off ();
   Kernel.UnsignedOverflow.off ();
   Kernel.UnsignedDowncast.off ();
-  Kernel.add_debug_keys Kernel.dkey_constfold;
+  Kernel.UnsignedOverflow.off ();
+  Kernel.set_warn_status Kernel.wkey_decimal_float Log.Winactive;
+  Eva.Parameters.Verbose.set 0;
   (* otherwise, we must load scope in addition to eva. *)
   Dynamic.Parameter.Bool.off "-eva-remove-redundant-alarms" ();
   Errorloc.clear_errors ();
-  Format.printf "Cabs is@\n%a@." Cprint.printFile cabs;
   let cil =
     try Cabs2cil.convFile cabs
     with exn ->
-      failf "Failed to typecheck cabs: %s@\n%a@."
+      Crowbar.failf "@[<v2>Failed to typecheck cabs: %s@\n%a@]@."
         (Printexc.to_string exn)
         Cprint.printFile cabs
   in
   if Errorloc.had_errors () then begin
-    failf "Failed to typecheck cabs (had errors)@\n%a@."
+    Crowbar.failf "@[<v2>Failed to typecheck cabs (had errors)@\n%a@]@."
       Cprint.printFile cabs
   end;
+  File.init_cil();
   File.prepare_cil_file cil;
   Kernel.MainFunction.set "f";
   Eva.Analysis.compute ();
   let kf = Globals.Functions.find_by_name "f" in
-  let r = Globals.Vars.find_from_astinfo "result" Cil_types.VGlobal in
+  let r = Globals.Vars.find_from_astinfo "result" Cil_types.Global in
   let ret = Kernel_function.find_return kf in
   let expr = Cil.evar ~loc r in
   let v1 = Eva.Results.(before ret |> eval_exp expr |> as_cvalue) in
   let itv =
     try Cvalue.V.project_ival v1
     with exn ->
-      failf "Eva analysis did not reduce to a constant: %s@\n%t@."
+      Crowbar.failf "@[<v2>Eva analysis did not reduce to a constant: %s@\n%t@]@."
         (Printexc.to_string exn)
         (fun fmt -> File.pretty_ast ~fmt ())
   in
   if not (Ival.is_one itv) then begin
-    failf "const fold did not reduce to identical value:@\n%t@."
+    Crowbar.failf "@[<v2>Const fold did not reduce to identical value:@\n%t@]@."
       (fun fmt -> File.pretty_ast ~fmt ())
   end
 
-let () = add_test ~name:"constfold" [gen_type; gen_expr] run
+let f () = Crowbar.add_test ~name:"constfold" [gen_type; gen_expr 2] run
+
+let () = Crowbar_utils.run "constfold" f

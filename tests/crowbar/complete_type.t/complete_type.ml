@@ -1,5 +1,4 @@
 open Cil_types
-open Crowbar
 
 let loc = Cil_datatype.Location.unknown
 
@@ -23,12 +22,11 @@ let type_name =
 type kind = Complete | FAM_array | FAM_struct | Incomplete
 
 (* pointers are always complete. *)
-let mk_ptr_type (is_gcc,typ, types,_) =
-  (is_gcc,TPtr (typ,[]), types, Complete)
+let mk_ptr_type (is_gcc, typ, types, _) =
+  (is_gcc, Cil_const.mk_tptr typ, types, Complete)
 
 let gen_length =
-  choose
-    [ const None; const (Some 0); const (Some 1); ]
+  Crowbar.(choose [ const None; const (Some 0); const (Some 1); ])
 
 let mk_array_type (is_gcc, typ, types, kind) length =
   let kind =
@@ -44,19 +42,19 @@ let mk_array_type (is_gcc, typ, types, kind) length =
   let length =
     Option.map (Cil.kinteger ~loc (Machine.sizeof_kind ())) length
   in
-  (is_gcc, TArray (typ, length, []), types, kind)
+  (is_gcc, Cil_const.mk_tarray typ length, types, kind)
 
 let mk_named_type (is_gcc, ttype, types, kind) =
   let tname = type_name () in
   let typedef = { torig_name = tname; tname; ttype; treferenced = true } in
-  (is_gcc, TNamed(typedef,[]), GType(typedef, loc) :: types, kind)
+  (is_gcc, Cil_const.mk_tnamed typedef, GType(typedef, loc) :: types, kind)
 
 let mk_comp_type
     cstruct nb_fields (is_gcc, typ1, types1, kind1) (_, typ2, types2, kind2) =
   let mk_field ftype =
-    let fname = field_name () in (fname, ftype, None, [], loc)
+    let fname = field_name () in (fname, ftype, None, None, [], loc)
   in
-  let mk_fields compinfo =
+  let mk_fields _ =
     match nb_fields with
     | 0 -> None
     | 1 -> Some [ mk_field typ1 ]
@@ -89,7 +87,7 @@ let mk_comp_type
     if nb_fields = 0 then GCompTagDecl (compinfo, loc)
     else GCompTag (compinfo,loc)
   in
-  (is_gcc, TComp (compinfo, []), glob :: types, kind)
+  (is_gcc, Cil_const.mk_tcomp compinfo, glob :: types, kind)
 
 let mk_enum_type is_def is_gcc =
   let ename = type_name () in
@@ -107,15 +105,15 @@ let mk_enum_type is_def is_gcc =
     if is_def then GEnumTag(eihost,loc) else GEnumTagDecl(eihost,loc)
   in
   let kind =  if is_def then Complete else Incomplete in
-  (is_gcc, TEnum (eihost, []), [ glob ], kind)
+  (is_gcc, Cil_const.mk_tenum eihost, [ glob ], kind)
 
 let gen_type =
   let open Crowbar in
   fix
     (fun gen_type ->
        choose
-         [ map [bool] (fun is_gcc -> (is_gcc, TVoid [], [], Incomplete));
-           map [bool] (fun is_gcc -> (is_gcc, TInt (IInt, []), [], Complete));
+         [ map [bool] (fun is_gcc -> (is_gcc, Cil_const.voidType, [], Incomplete));
+           map [bool] (fun is_gcc -> (is_gcc, Cil_const.intType , [], Complete));
            map [ gen_type ] mk_ptr_type;
            map [ gen_type; gen_length ] mk_array_type;
            map [ gen_type ] mk_named_type;
@@ -125,32 +123,19 @@ let gen_type =
 
 let generate_failure_file is_complete =
   let count = ref 0 in
-  let kind = if is_complete then "complete" else "incomplete" in
+  let name = if is_complete then "complete" else "incomplete" in
   fun (typ, types) ->
     incr count;
-    let name = "test_case_" ^ kind ^ "_" ^ string_of_int !count ^ ".i" in
-    let dirname = Filename.dirname Sys.executable_name in
-    let name = Filepath.of_string (dirname ^ "/" ^ name) in
-    let out = open_out (Filepath.to_string_abs name) in
-    let fmt = Format.formatter_of_out_channel out in
+    let file = Crowbar_utils.generate_cil_file name in
     let fundec = Cil.emptyFunction "f" in
     let s =
       Cil.mkPureExpr ~valid_sid:true ~fundec (Cil.new_exp ~loc (SizeOf typ))
     in
     let b = Cil.mkBlock [ s ] in
     fundec.sbody <- b;
-    let file =
-      { fileName = name;
-        globals =
-          List.rev types @ [ GFun (fundec, loc) ];
-        globinit = None;
-        globinitcalled = true
-      }
-    in
-    Kernel.add_debug_keys Kernel.dkey_print_attrs;
-    Format.fprintf fmt "%a@." Cil_printer.pp_file file;
-    close_out out;
-    Filepath.to_pretty_string name
+    let file = { file with globals = List.rev types @ [ GFun (fundec, loc) ] } in
+    Crowbar_utils.generate_file file;
+    Filepath.to_string_abs file.fileName
 
 let test (allowZeroSizeArrays, typ, types, kind) =
   match kind with
@@ -158,20 +143,21 @@ let test (allowZeroSizeArrays, typ, types, kind) =
     if not (Cil.isCompleteType ~allowZeroSizeArrays typ) then begin
       let filename = generate_failure_file true (typ, types) in
       Crowbar.fail
-        ("isCompleteType declared as incomplete a complete type. \
-          See example in file '" ^ filename ^ "'.")
+        ("isCompleteType found incomplete a complete type. \
+          File saved in '" ^ filename ^ "'.")
     end;
     true
   | Incomplete | FAM_array ->
     if Cil.isCompleteType typ then begin
       let filename = generate_failure_file false (typ, types) in
       Crowbar.fail
-        ("isCompleteType declared as complete an incomplete type. \
-          See example in file '" ^ filename ^
-         "', which should trigger an error.")
+        ("isCompleteType found complete an incomplete type. \
+          File saved in '" ^ filename ^ "', which should trigger an error.")
     end;
     true
 
-let () =
-  Crowbar.add_test ~name:"mutable typeOffset"
-    [ gen_type ] @@ (fun x -> Crowbar.check (test x))
+let f () =
+  Crowbar.add_test ~name:"complete type"
+    [ gen_type ] (fun x -> Crowbar.check (test x))
+
+let () = Crowbar_utils.run "complete_type" f

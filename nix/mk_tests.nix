@@ -48,6 +48,7 @@
 , tests-command
 , has-wp-proofs ? false
 , cover ? true
+, additional-build-inputs ? []
 } :
 
 stdenvNoCC.mkDerivation {
@@ -73,8 +74,9 @@ stdenvNoCC.mkDerivation {
     unixtools.getopt
     which
     yq
-  ] ++
-  (if has-wp-proofs then [ alt-ergo cvc4 ] else []);
+  ]
+  ++ (if has-wp-proofs then [ alt-ergo cvc4 ] else [])
+  ++ additional-build-inputs;
 
   postPatch = ''
     patchShebangs .
