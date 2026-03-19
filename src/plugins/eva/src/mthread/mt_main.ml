@@ -68,7 +68,9 @@ let pre_analysis () =
      not (Mt_options.ExtractModels.mem "html") then
     Mt_self.error "Option %S needs option \"%s html\" to work."
       Mt_options.ConcatDotFilesTo.option_name
-      Mt_options.ExtractModels.option_name
+      Mt_options.ExtractModels.option_name;
+
+  Mt_self.feedback "******* Starting mthread"
 
 let make_analysis_state () =
   (* We create the record containing the state of the analysis (which must

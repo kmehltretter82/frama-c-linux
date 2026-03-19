@@ -280,7 +280,6 @@ let compute_from ?cvalue_state ?arguments entry_point =
 
   if mt_enabled then begin
     Mt_main.pre_analysis ();
-    Mt_self.feedback "******* Starting mthread";
     Mt_main.register_hooks analysis;
   end;
   Fun.protect ~finally:Mt_main.unregister_hooks @@ fun () ->
