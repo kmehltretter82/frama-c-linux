@@ -5,8 +5,8 @@
 
 /*@ predicate p1(int x, int y) = x + y > 0; */
 /*@ predicate p2(integer x, integer y) = x + y > 0; */
-
-/*@ logic integer f1(integer x, integer y) = x + y; */
+int zero = 0;
+/*@ logic integer f1(integer x, integer y) = x + y + zero; */
 
 // E-ACSL integer typing:
 // types less than int are considered as int
