@@ -26,8 +26,15 @@ external get_rounding_mode : unit -> rounding = "frama_c_get_round_mode" [@@noal
 
 external round_to_single_precision : float -> float = "round_to_single"
 
+type fkind =
+  | FFloat
+  | FFloat32
+  | FFloat64
+  | FDouble
+  | FLongDouble
+
 let round_if_single_precision = function
-  | Cil_types.FFloat | FFloat32 -> round_to_single_precision
+  | FFloat | FFloat32 -> round_to_single_precision
   | FDouble | FFloat64 | FLongDouble -> Fun.id
 
 
@@ -128,11 +135,11 @@ let pretty fmt f =
   pretty_rounding_mode (fun () -> pretty fmt f)
 
 let suffix_of_fkind = function
-  | Cil_types.FFloat   -> "F"
-  | Cil_types.FFloat32 -> "F32"
-  | Cil_types.FFloat64 -> "F64"
-  | Cil_types.FDouble  -> "D"
-  | Cil_types.FLongDouble -> "L"
+  | FFloat   -> "F"
+  | FFloat32 -> "F32"
+  | FFloat64 -> "F64"
+  | FDouble  -> "D"
+  | FLongDouble -> "L"
 
 let has_suffix fkind literal =
   let suffix = suffix_of_fkind fkind in
@@ -142,26 +149,26 @@ let has_suffix fkind literal =
 let extract_single_letter_suffix s len =
   let last = String.sub s (len - 1) 1 in
   match last with
-  | "f" | "F" -> Some (String.sub s 0 (len - 1), last, Cil_types.FFloat)
+  | "f" | "F" -> Some (String.sub s 0 (len - 1), last, FFloat)
   (* Note: 'd' is accepted as a GCC extension, but also always
      accepted in ACSL *)
-  | "d" | "D" -> Some (String.sub s 0 (len - 1), last, Cil_types.FDouble)
-  | "l" | "L" -> Some (String.sub s 0 (len - 1), last, Cil_types.FLongDouble)
+  | "d" | "D" -> Some (String.sub s 0 (len - 1), last, FDouble)
+  | "l" | "L" -> Some (String.sub s 0 (len - 1), last, FLongDouble)
   | "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "." ->
-    Some (s, "", Cil_types.FDouble)
+    Some (s, "", FDouble)
   | _ -> None
 
 let extract_suffix s =
   let len = String.length s in
-  if len = 0 then Some (s, "", Cil_types.FDouble)
+  if len = 0 then Some (s, "", FDouble)
   else if len <= 3 then
     extract_single_letter_suffix s len
   else
     (* look for a 3-letter suffix, then for a 1-letter suffix *)
     let last3 = String.sub s (len - 3) 3 in
     match last3 with
-    | "f32" | "F32" -> Some (String.sub s 0 (len - 3), last3, Cil_types.FFloat32)
-    | "f64" | "F64" -> Some (String.sub s 0 (len - 3), last3, Cil_types.FFloat64)
+    | "f32" | "F32" -> Some (String.sub s 0 (len - 3), last3, FFloat32)
+    | "f64" | "F64" -> Some (String.sub s 0 (len - 3), last3, FFloat64)
     | _             -> extract_single_letter_suffix s len
 
 type format = Single | Double
