@@ -20,6 +20,18 @@
   \forall integer n;
   { n-x | integer x; x \in (0..n) } == (0..n) ;
 
+  lemma UNION_DESCR_LIFT_LEFT:
+  \forall integer n;
+  { n-x | integer x; \subset(x, (0..n)) } == (0..n) ;
+
+  lemma UNION_DESCR_LIFT_RIGHT:
+  \forall integer n;
+  { x | integer x; \subset({x}, n) } == { n } ;
+
+  lemma UNION_DESCR_LIFT_BOTH:
+  \forall integer n;
+  { x | integer x; \subset(x, n) } == { n } ;
+
   lemma INTER_EQ:
   \forall integer x,y ;
   (\inter(x,x) == \inter(y,y)) <==> (x==y) ;
