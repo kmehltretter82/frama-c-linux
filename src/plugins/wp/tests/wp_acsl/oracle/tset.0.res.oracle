@@ -6,14 +6,16 @@
 ------------------------------------------------------------
 
 Goal Lemma 'INTER_EMPTY':
-Assume Lemmas: 'INTER_RANGE' 'INTER_EQ' 'UNION_DESCR' 'UNION_RANGE'
-  'UNION_LIFT' 'UNION_EQ'
+Assume Lemmas: 'INTER_RANGE' 'INTER_EQ' 'UNION_DESCR_LIFT_BOTH'
+  'UNION_DESCR_LIFT_RIGHT' 'UNION_DESCR_LIFT_LEFT' 'UNION_DESCR'
+  'UNION_RANGE' 'UNION_LIFT' 'UNION_EQ'
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Lemma 'INTER_EQ':
-Assume Lemmas: 'UNION_DESCR' 'UNION_RANGE' 'UNION_LIFT' 'UNION_EQ'
+Assume Lemmas: 'UNION_DESCR_LIFT_BOTH' 'UNION_DESCR_LIFT_RIGHT'
+  'UNION_DESCR_LIFT_LEFT' 'UNION_DESCR' 'UNION_RANGE' 'UNION_LIFT' 'UNION_EQ'
 Let a = singleton(y).
 Let a_1 = inter(a, a).
 Let a_2 = singleton(x).
@@ -24,7 +26,8 @@ Prove: ((forall i : Z. (mem(i, a_1) -> mem(i, a_3))) /\
 ------------------------------------------------------------
 
 Goal Lemma 'INTER_RANGE':
-Assume Lemmas: 'INTER_EQ' 'UNION_DESCR' 'UNION_RANGE' 'UNION_LIFT' 'UNION_EQ'
+Assume Lemmas: 'INTER_EQ' 'UNION_DESCR_LIFT_BOTH' 'UNION_DESCR_LIFT_RIGHT'
+  'UNION_DESCR_LIFT_LEFT' 'UNION_DESCR' 'UNION_RANGE' 'UNION_LIFT' 'UNION_EQ'
 Let a = inter(inter(range(0, 1 + k), singleton(k)), range(k - 1, n)).
 Assume { Have: 0 <= k. Have: k <= n. }
 Prove: mem(k, a) /\ (forall i : Z. (mem(i, a) -> (i = k))).
@@ -33,6 +36,26 @@ Prove: mem(k, a) /\ (forall i : Z. (mem(i, a) -> (i = k))).
 
 Goal Lemma 'UNION_DESCR':
 Assume Lemmas: 'UNION_RANGE' 'UNION_LIFT' 'UNION_EQ'
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Lemma 'UNION_DESCR_LIFT_BOTH':
+Assume Lemmas: 'UNION_DESCR_LIFT_RIGHT' 'UNION_DESCR_LIFT_LEFT' 'UNION_DESCR'
+  'UNION_RANGE' 'UNION_LIFT' 'UNION_EQ'
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Lemma 'UNION_DESCR_LIFT_LEFT':
+Assume Lemmas: 'UNION_DESCR' 'UNION_RANGE' 'UNION_LIFT' 'UNION_EQ'
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Lemma 'UNION_DESCR_LIFT_RIGHT':
+Assume Lemmas: 'UNION_DESCR_LIFT_LEFT' 'UNION_DESCR' 'UNION_RANGE'
+  'UNION_LIFT' 'UNION_EQ'
 Prove: true.
 
 ------------------------------------------------------------

@@ -34,3 +34,7 @@
   @   (a == b || b == c) ==>
   @   (\inter(a,\inter(b,c)) == \inter(a,c));
   @*/
+
+/*@
+  check lemma quantify: (\forall set<integer> s; 0 \in s) ==> \false;
+*/
