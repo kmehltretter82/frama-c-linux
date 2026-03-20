@@ -22,7 +22,7 @@ int default_arr(int *p, int k, int n)
 {
   int __retres;
   /*@ check region: mem_access: \valid_read(p + k); */
-  /*@ check region: path: \valid_region(p + k, 4); */
+  /*@ check region: boundaries: \valid_region(p + k, 4); */
   /*@ check region: initialized: \initialized(p + k); */
   __retres = *(p + k);
   return __retres;
@@ -33,7 +33,7 @@ int default_comp(struct S p, int k)
 {
   int __retres;
   /*@ check region: mem_access: \valid_read(&p.f[k]); */
-  /*@ check region: path: \valid_region(&p.f[k], 4); */
+  /*@ check region: boundaries: \valid_region(&p.f[k], 4); */
   /*@ check region: initialized: \initialized(&p.f[k]); */
   __retres = p.f[k];
   return __retres;
@@ -44,7 +44,7 @@ int default_pcomp(struct S *p, int k)
 {
   int __retres;
   /*@ check region: mem_access: \valid_read(&p->f[k]); */
-  /*@ check region: path: \valid_region(&p->f[k], 4); */
+  /*@ check region: boundaries: \valid_region(&p->f[k], 4); */
   /*@ check region: initialized: \initialized(&p->f[k]); */
   __retres = p->f[k];
   return __retres;

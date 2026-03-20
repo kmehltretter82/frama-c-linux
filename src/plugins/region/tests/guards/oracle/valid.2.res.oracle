@@ -22,7 +22,7 @@ int default_arr(int *p, int k, int n)
 {
   int __retres;
   /*@ check region: mem_access: \valid_read(p + k); */
-  /*@ check region: path: \valid_region(p + k, 4); */
+  /*@ check region: boundaries: \valid_region(p + k, 4); */
   /*@ check region: initialized: \initialized(p + k); */
   __retres = *(p + k);
   return __retres;
