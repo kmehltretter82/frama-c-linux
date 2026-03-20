@@ -17,6 +17,7 @@ import { useStyle, useColorTheme } from 'dome/themes';
 export enum EColor {
   DEFAULT = "default",
   WHITE = 'white',
+  LIGHTGREY = 'lightgrey',
   GREY = 'grey',
   DARK = 'dark',
   PRIMARY = 'primary',

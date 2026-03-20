@@ -96,6 +96,7 @@ all: \
 	manuals/mthread-manual$(FC_SUFFIX).pdf \
 	manuals/volatile-manual$(FC_SUFFIX).pdf \
 	manuals/wp-manual$(FC_SUFFIX).pdf \
+	manuals/region-manual$(FC_SUFFIX).pdf \
 
 manuals/%:
 	mkdir --parent manuals
@@ -122,6 +123,7 @@ manuals/metrics-manual$(FC_SUFFIX).pdf: metrics/metrics.pdf
 manuals/mthread-manual$(FC_SUFFIX).pdf: eva/mthread.pdf
 manuals/volatile-manual$(FC_SUFFIX).pdf: ../src/plugins/volatile/doc/manual/volatile.pdf
 manuals/wp-manual$(FC_SUFFIX).pdf: ../src/plugins/wp/doc/manual/wp.pdf
+manuals/region-manual$(FC_SUFFIX).pdf: ../src/plugins/region/doc/manual/region.pdf
 
 
 ###################

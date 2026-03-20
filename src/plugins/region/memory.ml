@@ -847,6 +847,7 @@ let pp_region fmt (m: region) =
       end ;
     if Options.debug_atleast 1 then
       begin
+        List.iter (Format.fprintf fmt "@ I:%a" Access.pretty) m.inits ;
         List.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.reads ;
         List.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.writes ;
         List.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.shifts ;

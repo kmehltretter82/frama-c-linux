@@ -134,9 +134,10 @@
 
     /* node background colors */
     --graph-bg-color-default: #4c596b;
-    --graph-bg-color-white: #fff;
-    --graph-bg-color-grey: #ccc;
-    --graph-bg-color-dark: #666;
+    --graph-bg-color-white: #ffffff;
+    --graph-bg-color-lightgrey: #dddddd;
+    --graph-bg-color-grey: #cccccc;
+    --graph-bg-color-dark: #666666;
     --graph-bg-color-primary: dodgerblue;
     --graph-bg-color-selected: deepskyblue;
     --graph-bg-color-green: lime;
@@ -147,9 +148,10 @@
     --graph-bg-color-pink: hotpink;
     /* cluster background colors */
     --graph-sg-color-default: #4c596b;
-    --graph-sg-color-white: #ccc;
-    --graph-sg-color-grey: #bbb;
-    --graph-sg-color-dark: #aaa;
+    --graph-sg-color-white: #dddddd;
+    --graph-bg-color-lightgrey: #cccccc;
+    --graph-sg-color-grey: #bbbbbb;
+    --graph-sg-color-dark: #aaaaaa;
     --graph-sg-color-primary: #4fc3f7;
     --graph-sg-color-selected: #4c596b;
     --graph-sg-color-green: #AED581;
@@ -161,6 +163,7 @@
     /** foreground colors */
     --graph-fg-color-default: white;
     --graph-fg-color-white: black;
+    --graph-fg-color-lightgrey: black;
     --graph-fg-color-grey: black;
     --graph-fg-color-dark: white;
     --graph-fg-color-primary: white;
@@ -172,9 +175,10 @@
     --graph-fg-color-blue: black;
     --graph-fg-color-pink: white;
     /** edge colors */
-    --graph-ed-color-default: #FFFFFF; /* white */
-    --graph-ed-color-white: #FFFFFF; /* white */
-    --graph-ed-color-grey: #DDDDDD;
+    --graph-ed-color-default: white; /* white */
+    --graph-ed-color-white: white; /* white */
+    --graph-ed-color-lightgrey: #bbbbbb;
+    --graph-ed-color-grey: #aaaaaa;
     --graph-ed-color-dark: #000000; /* black */
     --graph-ed-color-primary: #1E90FF; /* dodgerblue */
     --graph-ed-color-selected: #00BFFF; /* deepskyblue */

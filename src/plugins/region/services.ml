@@ -170,7 +170,6 @@ struct
 
   let typ_to_char (ty: Cil_types.typ) =
     match ty.tnode with
-    | TVoid -> 'b'
     | TPtr _ -> 'p'
     | TInt ik -> ikind_to_char ik
     | TFloat fk -> fkind_to_char fk
@@ -179,7 +178,7 @@ struct
     | TNamed _ -> 'T'
     | TEnum _ -> 'E'
     | TFun _ -> 'F'
-    | TBuiltin_va_list -> 'x'
+    | TVoid | TBuiltin_va_list -> 'x'
 
   let typs_to_char (typs : Cil_types.typ list) =
     match typs with
