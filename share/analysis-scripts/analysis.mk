@@ -169,7 +169,8 @@ SHELL        := $(shell which bash)
                  $(PARSEFLAGS) \
                  $(FCFLAGS) \
                  $(if $(value MACHDEP),-machdep $(MACHDEP),) \
-                 -cpp-extra-args="$(CPPFLAGS)" $(SOURCES) \
+                 -cpp-extra-args="$(CPPFLAGS)" \
+                 $(if $(findstring -mopsa-db,$(PARSEFLAGS)),,$(SOURCES)) \
 
 %.parse: $$(if $$^,,.IMPOSSIBLE) $$(shell $(SHELL) $(DIR)cmd-dep.sh $$@/command $$(PARSE))
 	@$(call display_command,$(PARSE))
