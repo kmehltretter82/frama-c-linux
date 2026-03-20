@@ -6,3 +6,4 @@
   R0004: -R-- (int) 32b ;
   R0005: -RW- __retres (float) 32b (singleton) (allocated) ;
   R0006: --W- \result (float) 32b ;
+[region] annotating function job

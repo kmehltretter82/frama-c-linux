@@ -11,7 +11,6 @@
 open Parameter_sig
 include Log.Messages
 
-module Analyze : Bool
-module Annotate : Bool
+module Enabled : Bool
 module Assert : Bool
 module Logic : Bool

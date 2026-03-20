@@ -2,3 +2,4 @@
 [region] Function f:
   R0001: -R-- p (union U *) 64b (*R0002) (singleton) ;
   R0002: -RW- (int) (short) 16b ;
+[region] annotating function f

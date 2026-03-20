@@ -8,3 +8,4 @@
   R0006: IRW- s (int) 32b (singleton) (allocated) ;
   R0007: IRW- k (int) 32b (singleton) (allocated) ;
   R0008: --W- \result (int) 32b ;
+[region] annotating function job

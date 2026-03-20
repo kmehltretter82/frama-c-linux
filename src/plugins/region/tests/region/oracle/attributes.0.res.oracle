@@ -10,6 +10,7 @@
   R0006: IRW- k (int) 32b (singleton) (allocated) ;
   R0007: -RW- __retres (int) 32b (singleton) (allocated) ;
   R0008: --W- \result (int) 32b ;
+[region] annotating function job_disjoint
 [region] Function job_merged:
   R0001: -R-- n (int) 32b (singleton) ;
   R0002: -R-- p (int *) 64b (*R0003) (singleton) ;
@@ -19,3 +20,4 @@
   R0005: IRW- k (int) 32b (singleton) (allocated) ;
   R0006: -RW- __retres (int) 32b (singleton) (allocated) ;
   R0007: --W- \result (int) 32b ;
+[region] annotating function job_merged

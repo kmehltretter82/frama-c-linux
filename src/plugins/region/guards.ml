@@ -281,8 +281,10 @@ and exp env e =
     let _,r = lval env lv in
     readable env r (LV lv) ;
     Memory.points_to r
-  | CastE(t,_) when Ast_types.is_fun_or_ptr t ->
-    Options.not_yet_implemented ~source:(fst e.eloc) "Guards for pointer casts"
+  | CastE(t,e) when
+      Ast_types.is_fun_or_ptr t &&
+      not (Ast_types.is_fun_or_ptr @@ Cil.typeOf e) ->
+    Options.not_yet_implemented ~source:(fst e.eloc) "Integral to pointer casts"
   | CastE(_,e) -> exp env e
   | BinOp((PlusPI|MinusPI),p,k,_) ->
     let r = exp env p in
@@ -304,6 +306,10 @@ let rec init env = function
   | SingleInit e -> eval env e
   | CompoundInit(_,ofs) -> List.iter (fun (_,i) -> init env i) ofs
 
+let called env = function
+  | Var _vf -> ()
+  | Mem e -> eval env e
+
 let instr env = function
   | Set(lv,e,_) ->
     begin
@@ -313,7 +319,7 @@ let instr env = function
     end ;
     write env lv ;
   | Call(r,f,es,_) ->
-    ignore (lhost env f) ;
+    called env f ;
     List.iter (eval env) es ;
     Option.iter (write env) r
   | Local_init(_,AssignInit i,_) -> init env i
@@ -426,8 +432,11 @@ and term env t =
     Domain.pure
   | Tapp(f,_,ts) -> Logic.call env.map f @@ List.map (term env) ts
   | TDataCons(c,ts) -> Logic.cons env.map c @@ List.map (term env) ts
-  | TCast(_,lt,_) when Ast_types.is_logic_fun_or_ptr lt ->
-    Options.not_yet_implemented ~source:(fst t.term_loc) "Guards for pointer casts"
+  | TCast(_,Ctype pt,e) when
+      Ast_types.is_fun_or_ptr pt &&
+      not (Ast_types.is_logic_fun_or_ptr e.term_type) ->
+    Options.not_yet_implemented
+      ~source:(fst t.term_loc) "Integral to pointer casts"
   | TCast(_,_,a) | TUnOp(_,a) -> term env a
   | Tnull | Tempty_set
   | TAlignOf _ | TAlignOfE _ | TSizeOf _ | TSizeOfE _

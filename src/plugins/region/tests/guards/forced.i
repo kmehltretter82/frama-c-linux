@@ -1,7 +1,7 @@
 /* run.config
-  OPT: -rte -then -region-annotate -then -print
-  OPT: -warn-invalid-pointer -warn-unaligned-pointer -rte-initialized @all -rte -then -region-annotate -then -print
-  OPT: -warn-invalid-pointer -warn-unaligned-pointer -rte-initialized @all -region-annotate -then -rte -then -print
+  OPT: -rte -then -region -then -print
+  OPT: -warn-invalid-pointer -warn-unaligned-pointer -rte-initialized @all -rte -then -region -then -print
+  OPT: -warn-invalid-pointer -warn-unaligned-pointer -rte-initialized @all -region -then -rte -then -print
 */
 
 /*@ region *p, \allocated; */

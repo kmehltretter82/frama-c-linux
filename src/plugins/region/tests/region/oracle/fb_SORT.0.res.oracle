@@ -32,3 +32,4 @@
   R0017: IR-- out (SN *) 64b (*R000a) (singleton) (allocated) ;
   R0018: IR-- idx (SL *) 64b (*R000e) (singleton) (allocated) ;
   R0019: IRW- i (int) 32b (singleton) (allocated) ;
+[region] annotating function job

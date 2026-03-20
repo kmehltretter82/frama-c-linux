@@ -17,16 +17,10 @@ include Plugin.Register
       let shortname = "region"
     end)
 
-module Analyze = Action
+module Enabled = Action
     (struct
       let option_name = "-region"
-      let help = "Analyze Regions for all functions"
-    end)
-
-module Annotate = Action
-    (struct
-      let option_name = "-region-annotate"
-      let help = "Generate Region and RTE checks"
+      let help = "Annotate all functions wrt regions"
     end)
 
 let () = Parameter_customize.set_negative_option_name "-region-check"
@@ -40,5 +34,5 @@ module Assert = False
 module Logic = False
     (struct
       let option_name = "-region-logic"
-      let help = "Also generate guards for logical statements"
+      let help = "Also generate guards for logic"
     end)

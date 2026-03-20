@@ -5,3 +5,4 @@
     (garbage) ;
   R0003: --W- (int) 32b (singleton) (allocated) (garbage) ;
   R0004: --W- (int) 32b (allocated) (garbage) ;
+[region] annotating function f

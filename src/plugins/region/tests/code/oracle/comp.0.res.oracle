@@ -6,3 +6,4 @@
   R0003: --W- (int *) 64b (*R0004) (singleton) (allocated) (garbage) ;
   R0004: IR-- a (int) 32b (singleton) (allocated) ;
   R0005: --W- (short) 16b (allocated) (garbage) ;
+[region] annotating function f

@@ -10,3 +10,4 @@
   R0008: ---- 128b { .v: R0009; .s: R000a; #32b; } ;
   R0009: -R-- (double) 64b ;
   R000a: -R-- (int) 32b ;
+[region] annotating function job

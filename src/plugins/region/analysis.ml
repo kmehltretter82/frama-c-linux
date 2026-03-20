@@ -31,6 +31,9 @@ module STATE = State_builder.Hashtbl(Kernel_function.Hashtbl)(DOMAIN)
 (* ---  Memoized Access                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
+let dump = Options.register_category "dump"
+    ~help:"Dump regions for each analyzed function"
+
 let find = STATE.find
 
 let get kf =
@@ -39,6 +42,17 @@ let get kf =
       "Function %a%t" Kernel_function.pretty kf Unicode.pp_ellipsis ;
     let domain = Code.domain kf in
     STATE.add kf domain ;
+    if Options.is_debug_key_enabled dump then
+      Options.result "@[<v 2>Function %a:%t@]@."
+        Kernel_function.pretty kf
+        begin fun fmt ->
+          List.iter
+            begin fun r ->
+              Format.pp_print_newline fmt () ;
+              Memory.pp_region fmt r ;
+            end @@
+          Memory.regions domain ;
+        end ;
     domain
 
 let compute kf = ignore @@ get kf

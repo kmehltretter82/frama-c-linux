@@ -3,3 +3,4 @@
   R0001: ---- a s[4] 64b { .f: R0002; .g: R0003; } (allocated) (garbage) ;
   R0002: I--- (int) 32b (allocated) (garbage) ;
   R0003: I--- (int) 32b (allocated) (garbage) ;
+[region] annotating function job
