@@ -21,7 +21,16 @@ let to_int32_opt = wrap to_int32
 (* Basic functions and utils *)
 (* ------------------------- *)
 
-let two_power_of_int ?(limit = 1024) k =
+let pow_exponent_limit = ref 99999
+
+let set_pow_exponent_limit x = pow_exponent_limit := x
+
+let pow ?(limit = !pow_exponent_limit) b e =
+  if e > limit && gt (abs b) one
+  then raise Overflow
+  else pow b e
+
+let two_power_of_int ?(limit = !pow_exponent_limit) k =
   if k > limit then
     raise Overflow
   else
@@ -191,7 +200,7 @@ module Operators = struct
   let ( lsl ) = ( lsl )
   let ( asr ) = ( asr )
   let ( ~$ ) = ( ~$ )
-  let ( ** ) = ( ** )
+  let ( ** ) b e = pow b e
 end
 
 (* We also want relational operators at top level. *)

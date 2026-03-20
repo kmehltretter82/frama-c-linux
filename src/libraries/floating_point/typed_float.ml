@@ -422,11 +422,11 @@ let pretty_resulting_format fmt (Format (supported, format)) =
   | Double_supported, Double  -> Format.fprintf fmt "double precision"
   | Long_unsupported, Double  -> Format.fprintf fmt "long double precision"
 
-let cannot_be_parsed string format =
-  let msg =
-    Format.asprintf
-      "The string %s cannot be parsed as a %a floating-point constant"
+let cannot_be_parsed ?reason string format =
+  let msg = Format.asprintf
+      "The string %s cannot be parsed as a %a floating-point constant%a"
       string pretty_resulting_format format
+      (Pretty_utils.pp_opt ~pre:" " Format.pp_print_string) reason
   in
   Error msg
 
@@ -456,37 +456,47 @@ let parse str =
   match Floating_point.extract_suffix str with
   | None -> unknown_suffix str
   | Some (str, suffix, _fkind) ->
-    if String.length str == 0 then empty_string ()
-    else
-      let Format (supported, format) = format_of_suffix suffix in
+    let Format (supported, format) = format_of_suffix suffix in
+    let unparsable_error ?reason () =
       let resulting_format = Format (supported, format) in
-      if is_hexadecimal str then
-        match parse_hexadecimal ~format str with
-        | None -> cannot_be_parsed str resulting_format
-        | Some result -> Ok (Parsed (supported, result))
-      else if Str.string_match num_dot_frac_exp str 0 then
-        let sign       = Str.matched_group 1 str in
-        let integral   = Str.matched_group 2 str in
-        let fractional = Str.matched_group 3 str in
-        let exponent   = Str.matched_group 4 str in
-        let normalizing = normalize integral fractional exponent format in
-        Ok (Parsed (supported, apply_sign sign normalizing))
-      else if Str.string_match num_dot_frac str 0 then
-        let sign       = Str.matched_group 1 str in
-        let integral   = Str.matched_group 2 str in
-        let fractional = Str.matched_group 3 str in
-        let exponent   = "0" in
-        let normalizing = normalize integral fractional exponent format in
-        Ok (Parsed (supported, apply_sign sign normalizing))
-      else if Str.string_match num_exp str 0 then
-        let sign          = Str.matched_group 1 str in
-        let integral      = Str.matched_group 2 str in
-        let fractional    = "" in
-        let exponent      = Str.matched_group 3 str in
-        let normalizing = normalize integral fractional exponent format in
-        Ok (Parsed (supported, apply_sign sign normalizing))
-      else
-        cannot_be_parsed str resulting_format
+      cannot_be_parsed ?reason str resulting_format
+    in
+    if String.length str == 0 then empty_string ()
+    else try
+        if is_hexadecimal str then
+          match parse_hexadecimal ~format str with
+          | None -> unparsable_error ()
+          | Some result -> Ok (Parsed (supported, result))
+        else if Str.string_match num_dot_frac_exp str 0 then
+          let sign       = Str.matched_group 1 str in
+          let integral   = Str.matched_group 2 str in
+          let fractional = Str.matched_group 3 str in
+          let exponent   = Str.matched_group 4 str in
+          let normalizing = normalize integral fractional exponent format in
+          Ok (Parsed (supported, apply_sign sign normalizing))
+        else if Str.string_match num_dot_frac str 0 then
+          let sign       = Str.matched_group 1 str in
+          let integral   = Str.matched_group 2 str in
+          let fractional = Str.matched_group 3 str in
+          let exponent   = "0" in
+          let normalizing = normalize integral fractional exponent format in
+          Ok (Parsed (supported, apply_sign sign normalizing))
+        else if Str.string_match num_exp str 0 then
+          let sign          = Str.matched_group 1 str in
+          let integral      = Str.matched_group 2 str in
+          let fractional    = "" in
+          let exponent      = Str.matched_group 3 str in
+          let normalizing = normalize integral fractional exponent format in
+          Ok (Parsed (supported, apply_sign sign normalizing))
+        else
+          unparsable_error ()
+      with Z.Overflow ->
+        let reason =
+          Format.asprintf
+            "because of an oversized exponent@;\
+             Use flag -pow-limit to raise the upper limit of accepted exponents."
+        in
+        unparsable_error ~reason ()
 
 let parse_exn str =
   Result.value_or_else ~error:failwith (parse str)

@@ -18,6 +18,10 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-*  Kernel    [2026-03-19] Gracefully exit when parsing float with an oversized
+              exponent instead of exhausting all system memory.
+-   Kernel    [2026-03-19] New flag -pow-limit for setting the greatest
+              supported supported exponent in integer exponentiation.
 o   Ptests    [2026-03-13] Add a new directive ENV to ptests. It is now
               possible to define environment variables for OPT, STDOPT and
               EXECNOW directives via `ENV: <variable-name> <value>`, see
