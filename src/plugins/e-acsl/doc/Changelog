@@ -25,10 +25,15 @@
 Plugin E-ACSL <next-release>
 ###############################################################################
 
+-* E-ACSL     [2026-03-18] Fix const assignments occurring in generated code.
 -* E-ACSL     [2026-03-18] Fix monitoring memory properties of arguments of
                            user-defined predicates
 -* E-ACSL     [2026-03-18] Fix monitoring memory properties of string literals.
 -* E-ACSL     [2026-03-16] Fix E-ACSL API: no longer expose all of the modules.
+-  E-ACSL     [2026-03-16] fix const assignments appearing in generated code
+-  E-ACSL     [2026-03-16] fix occurrences of \ghost in types of generated code
+-  E-ACSL     [2026-01-18] Improvements around inductive predicate extraction,
+                           amongst others simple algebraic inversions
 -* E-ACSL     [2026-03-16] Fix memory tracking for user-defined predicates
 -* E-ACSL     [2026-03-05] Fix violations of physical term uniqueness. The
                            -check flag now enables a uniqueness verification.

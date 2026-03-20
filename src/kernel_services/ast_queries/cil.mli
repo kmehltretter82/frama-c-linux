@@ -2055,6 +2055,10 @@ val extract_free_logicvars_from_term : term -> Logic_var.Set.t
 val extract_free_logicvars_from_predicate :
   predicate -> Logic_var.Set.t
 
+(** extract from a [predicate] the [logic_info] elements that are applied
+    (using [Tapp] or [Papp]). *)
+val extract_applied_logic_infos_from_predicate : predicate -> Logic_info.Set.t
+
 (** extract [logic_label] elements from a [code_annotation] *)
 val extract_labels_from_annot:
   code_annotation -> Logic_label.Set.t

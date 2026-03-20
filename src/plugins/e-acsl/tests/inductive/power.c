@@ -1,4 +1,5 @@
 /* run.config
+   COMMENT: based on src/plugins/wp/tests/wp_plugin/tutorial.i
    STDOPT: +"-eva-unroll-recursive-calls 5"
 */
 

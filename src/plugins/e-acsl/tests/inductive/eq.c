@@ -20,7 +20,7 @@
     }
 */
 
-// unsound because of overlap
+// translatable, but unsound because of overlap
 /*@
     inductive eqC(ℤ x, ℤ y) {
       case eq12: eqC(1,2);
@@ -31,7 +31,7 @@
 
 int main() {
   /*@ assert eqA(1,2); */ // untranslatable
-  /*@ assert eqC(1,2); */ // untranslatable
+  /*@ assert eqB(1,2); */ // untranslatable
   /*@ assert eqC(1,3); */ // fails due to overlap
   return 0;
 }

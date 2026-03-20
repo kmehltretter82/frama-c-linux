@@ -56,6 +56,23 @@
   }
 */
 
+// let-bound variable are not to be substituted
+/*@
+  inductive subst_let(ℤ x, ℤ y) {
+    case c: ∀ ℤ x; 0 < x ==> \let two = 2; x < two ==> subst_let(x, two);
+    case d: subst_let(4, 2);
+  }
+*/
+
+// Hypothesis gathering is interrupted by binding hypothesis.
+// Leads to a duplication of constructor d.
+/*@
+  inductive dupl(ℤ a, ℤ b) {
+    case c: ∀ ℤ x, y; x < 0 ⇒ dupl(1-x, y) ⇒ y < 9 ⇒ dupl(x, y+y);
+    case d: ∀ ℤ x, y; x >= 0 ⇒ dupl(x, 1/x);
+  }
+*/
+
 int main() {
   //@ assert use_multimode(0,0);
   //@ assert simple_complex_argument(0, 1);
@@ -64,5 +81,7 @@ int main() {
   //@ assert use_var_bind_and_subst(0,0);
   //@ assert use_var_use_bind_and_subst(0,0);
   //@ assert bind_twice(2, 3, 1);
+  //@ assert subst_let(1,2);
+  //@ assert dupl(-1, 1/2 + 1/2);
   return 0;
 }

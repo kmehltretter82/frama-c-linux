@@ -1,4 +1,5 @@
 /* run.config
+   COMMENT: based on example from ACSL specification
    STDOPT: +"-eva-unroll-recursive-calls 5"
 */
 

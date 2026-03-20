@@ -62,8 +62,6 @@ include struct (* auxiliary functions *)
       Vars.union (Vars.of_list qs) qs', p'
     | p -> Vars.empty, p
 
-  let without_foralls p = snd @@ extract_foralls p
-
   let var_of_term t = match t.term_node with
     | TLval (TVar v, TNoOffset) -> Some v
     | _ -> None
@@ -75,6 +73,8 @@ include struct (* auxiliary functions *)
 
   let free_vars = Cil.extract_free_logicvars_from_term
   let free_vars_pred = Cil.extract_free_logicvars_from_predicate
+  let applied_logic_infos_pred = Cil.extract_applied_logic_infos_from_predicate
+
   let loc_of_inductive = function
     | {l_body = LBinductive ((_, _, _, p) :: _)} -> Some p.pred_loc
     | _ -> None
@@ -107,7 +107,7 @@ module Mode : sig
   val in_out_args : mode:t -> 'a list -> 'a list * 'a option
   val out_arg : mode:t -> 'a list -> 'a option
   val incomplete_in_out_args : mode:int -> 'a list -> 'a list * 'a
-  val select_mode : usable_vars:Vars.t -> li:logic_info -> term list -> t list -> t
+  val preferred : li:logic_info -> t list -> t
   val all_modes : li:logic_info -> t list
 end = struct
   type t = mode
@@ -167,15 +167,6 @@ end = struct
       else []
     in
     Complete :: incomplete_modes
-
-  let select_mode ~usable_vars ~li args modes =
-    let check_mode mode =
-      let in_args, _ = in_out_args ~mode args in
-      let fvs = Vars.unions @@ List.map free_vars in_args in
-      Vars.subset fvs usable_vars
-    in
-    let usable_modes = List.filter check_mode modes in
-    preferred ~li usable_modes
 end
 
 module Substs = struct
@@ -273,9 +264,9 @@ end = struct
     predicate : predicate (* generalized Horn clauses *)
   }
 
-  let mk_var_subst (arg, formal) =
+  let mk_var_subst quantifiers (arg, formal) =
     let rec solve lhs rhs = match lhs.term_node with
-      | TLval (TVar v, TNoOffset) -> Some (v, rhs)
+      | TLval (TVar v, TNoOffset) when Vars.mem v quantifiers -> Some (v, rhs)
       | TBinOp (PlusA, t1, t2) when Vars.is_empty (free_vars t2) ->
         solve t1 {t2 with term_node = TBinOp (MinusA, rhs, t2)}
       | TBinOp (PlusA, t1, t2) when Vars.is_empty (free_vars t1) ->
@@ -357,7 +348,7 @@ end = struct
       | Papp (li, _, args) when is_rec_occurrence li -> (* conclusion *)
         let substs =
           let pairs, _ = Mode.in_out_args ~mode (List.combine args li.l_profile) in
-          Substs.of_list @@ List.filter_map mk_var_subst pairs
+          Substs.of_list @@ List.filter_map (mk_var_subst quantifiers) pairs
         in
         let fv = add_fv fv args in
         let unbound_quantified_vars =
@@ -494,6 +485,9 @@ end = functor (Out : Out_language) -> struct
     let new_formals, res = Mode.in_out_args ~mode new_profile in
     let is_unsound_if_false = ref false in
     let extract_ctor ({Constructor.predicate = p} as ctor) next_ctor =
+      let quantifiers, p = extract_foralls p in
+      let free_vars t = Vars.inter quantifiers @@ free_vars t in
+      let free_vars_pred p = Vars.inter quantifiers @@ free_vars_pred p in
       let li_rec = li in
       let is_rec_occurrence li' = Logic_var.equal li'.l_var_info li_rec.l_var_info in
       let flush_conds ~conds case_true =
@@ -539,6 +533,20 @@ end = functor (Out : Out_language) -> struct
         | Plet (li, p) ->
           let c = recurse ~uv:(Vars.add li.l_var_info uv) ~conds:[] p in
           flush_conds ~conds (Out.mk_let ~loc:p.pred_loc li c)
+        | Pimplies (pl, pr) when (* simple hypothesis *)
+            Vars.subset (free_vars_pred pl) uv &&
+            not (Logic_info.Set.mem li @@ applied_logic_infos_pred pl) ->
+          let extractor = object
+            inherit Visitor.frama_c_inplace
+
+            method !vpredicate p = match p.pred_content with
+              | Papp (li, labels, args) when is_inductive li ->
+                let li' = PredicateExtractor.extract li in
+                ChangeTo {p with pred_content = Papp (li', labels, args)}
+              | _ -> DoChildren
+          end in
+          let pl' = Visitor.visitFramacPredicate extractor pl in
+          recurse ~conds:(pl' :: conds) pr
         | Pimplies ({pred_content = Papp (li, labels, args)} as pl, pr)
           when is_inductive li ->
           let in_out_args', li' =
@@ -550,7 +558,12 @@ end = functor (Out : Out_language) -> struct
                     (fun m -> m.Modus.mode)
                     (InductiveDef.analyze_modes li)
                 in
-                Mode.select_mode ~usable_vars:uv ~li args available_modes
+                let check_mode mode =
+                  let in_args, _ = Mode.in_out_args ~mode args in
+                  let fvs = Vars.unions @@ List.map free_vars in_args in
+                  Vars.subset fvs uv
+                in
+                Mode.preferred ~li @@ List.filter check_mode available_modes
               in
               Mode.in_out_args ~mode:mode' args,
               match mode' with
@@ -583,17 +596,15 @@ end = functor (Out : Out_language) -> struct
                 let pl = {pl with pred_content = Papp (li', labels, args)} in
                 recurse ~conds:(pl :: conds) pr
           end
-        | Pimplies (pl, pr) -> (* simple hypothesis *)
-          recurse ~conds:(pl :: conds) pr
         | Pat (p', labels) -> Out.mk_at labels @@ recurse p'
-        | _ -> (* should have been caught in mk_ctor *)
+        | _ -> (* should have been caught by the mode analysis *)
           Options.fatal "unexpected predicate in extraction:@ %a"
             Printer.pp_predicate p
       in
       Options.debug ~dkey ~level:3
         "@[<2>extracting data from constructor %s using modus %a:@ @[%a@]@]"
         ctor.name Mode.pretty mode Constructor.pretty ctor;
-      compile ~uv:(Vars.of_list new_formals) ~conds:[] @@ without_foralls p
+      compile ~uv:(Vars.of_list new_formals) ~conds:[] p
     in
     let modus = List.find
         (fun m -> m.Modus.mode = mode)
@@ -685,7 +696,7 @@ end
   module Extractor = Make_extractor (struct
       include Build_pred_or_term.Predicate
       let mk_concl ~mode:_ _ = mk_true None
-      let deep_copy p = p (* no term duplication occurs in complete extraction *)
+      let deep_copy p = Misc.Id_term.deep_copy_predicate p
     end)
 
   let extract_with_mode ~mode:{Modus.mode} li =

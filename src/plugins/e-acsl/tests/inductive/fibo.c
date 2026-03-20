@@ -34,16 +34,18 @@
 */
 
 // translatable in complete mode using foreign predicate fibo in incomplete mode 1
+int one = 1;
 /*@
   inductive lucas(ℤ i, ℤ x) {
       case zero: lucas(0, 2);
-      case more: \forall ℤ n, f1, f2; fibo(n-1, f1) ==> fibo(n+1, f2) ==> lucas(n, f1+f2);
+      case more: \forall ℤ n, f1, f2; fibo(n-one, f1) ==> fibo(n+1, f2) ==> lucas(n, f1+f2);
   }
 */
 
 int main() {
   /*@ assert fibo(7, 13); @*/
   /*@ assert fibo2(7, 13); @*/
+  /*@ assert is_fibo(13); @*/
 
   /*@ assert lucas(0, 2); @*/
   /*@ assert lucas(1, 1); @*/

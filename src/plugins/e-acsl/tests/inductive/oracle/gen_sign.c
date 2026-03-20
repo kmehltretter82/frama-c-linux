@@ -43,7 +43,7 @@ int main(void)
     __gen_e_acsl_assert_data.pred_txt = "signum(2., POS)";
     __gen_e_acsl_assert_data.file = "sign.c";
     __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 24;
+    __gen_e_acsl_assert_data.line = 25;
     __e_acsl_assert(__gen_e_acsl_signum_2,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
@@ -60,7 +60,7 @@ int main(void)
     __gen_e_acsl_assert_data_2.pred_txt = "signum(0., ZERO)";
     __gen_e_acsl_assert_data_2.file = "sign.c";
     __gen_e_acsl_assert_data_2.fct = "main";
-    __gen_e_acsl_assert_data_2.line = 25;
+    __gen_e_acsl_assert_data_2.line = 26;
     __e_acsl_assert(__gen_e_acsl_signum_4,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
@@ -88,7 +88,7 @@ int main(void)
     __gen_e_acsl_assert_data_3.pred_txt = "!signum(0. - 2., ZERO)";
     __gen_e_acsl_assert_data_3.file = "sign.c";
     __gen_e_acsl_assert_data_3.fct = "main";
-    __gen_e_acsl_assert_data_3.line = 26;
+    __gen_e_acsl_assert_data_3.line = 27;
     __e_acsl_assert(! __gen_e_acsl_signum_6,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __gmpq_clear(__gen_e_acsl_);

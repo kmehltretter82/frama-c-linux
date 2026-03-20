@@ -1,4 +1,5 @@
 /* run.config
+   COMMENT: from Why3 stdlib
    STDOPT: +"-eva-unroll-recursive-calls 5"
 */
 enum sign_t { POS, ZERO, NEG };

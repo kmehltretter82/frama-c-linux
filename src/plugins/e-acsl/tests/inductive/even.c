@@ -1,6 +1,6 @@
-
 /* run.config
-   COMMENT:
+   COMMENT: based on WP tutorial by Allan Blanchard:
+   COMMENT: Introduction to C program proof with Frama-C and its WP plugin
    STDOPT: +"-eva-unroll-recursive-calls 5"
 */
 

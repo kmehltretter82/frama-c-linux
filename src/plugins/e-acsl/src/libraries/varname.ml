@@ -84,8 +84,8 @@ let suffix suf =
 let point = Str.regexp_string "\\."
 let trailing_point = Str.regexp_string "\\.$"
 
-let rec of_exp ?default exp = match exp.enode with
-  | Lval (Var {vorig_name}, NoOffset) -> vorig_name
+let rec of_exp exp = match exp.enode with
+  | Lval (lhost, offset) -> of_lhost lhost ^ of_offset offset
   | Const (CInt64 (i, _, _)) -> "const_" ^ suffix (Z.to_string i)
   | Const (CReal (float, _, txt)) ->
     let suf = Option.value ~default:(Float.to_string float) txt in
@@ -96,10 +96,17 @@ let rec of_exp ?default exp = match exp.enode with
   | Const (CChr c) -> "char" ^ suffix (Z.to_string @@ Cil.charConstToInt c)
   | BinOp (op, x, y, _) -> of_binop op ^ "_" ^ of_exp x ^ "_" ^ of_exp y
   | UnOp (op, x, _) -> of_unop op ^ "_" ^ of_exp x
+  | CastE (_, exp) -> of_exp exp
   | e ->
-    match default with
-    | None ->
-      Options.debug "Varname.of_exp: supply default or extend this function \
-                     to handle enodes like: %a" Cil_types_debug.pp_exp_node e;
-      "exp"
-    | Some default -> default
+    Options.debug "Varname.of_exp: supply default or extend this function \
+                   to handle enodes like: %a" Cil_types_debug.pp_exp_node e;
+    "exp"
+
+and of_lhost = function
+  | Var {vorig_name} -> vorig_name
+  | Mem exp -> of_exp exp
+
+and of_offset = function
+  | NoOffset -> ""
+  | Field (fieldinfo, offset) -> "_" ^ fieldinfo.forig_name ^ of_offset offset
+  | Index (exp, offset) -> "_" ^ of_exp exp ^ of_offset offset

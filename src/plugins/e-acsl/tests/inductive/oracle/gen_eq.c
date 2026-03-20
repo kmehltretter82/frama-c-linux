@@ -47,39 +47,22 @@ int main(void)
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   /*@ assert eqA(1, 2); */ ;
+  /*@ assert eqB(1, 2); */ ;
   {
     int __gen_e_acsl_eqC_2;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __gen_e_acsl_eqC_2 = __gen_e_acsl_eqC(1,2);
-    if (! __gen_e_acsl_eqC_2) __e_acsl_sound_verdict = 0;
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"eqC(1, 2)",0,
-                                 __gen_e_acsl_eqC_2);
-    __gen_e_acsl_assert_data_2.blocking = 1;
-    __gen_e_acsl_assert_data_2.kind = "Assertion";
-    __gen_e_acsl_assert_data_2.pred_txt = "eqC(1, 2)";
-    __gen_e_acsl_assert_data_2.file = "eq.c";
-    __gen_e_acsl_assert_data_2.fct = "main";
-    __gen_e_acsl_assert_data_2.line = 34;
-    __e_acsl_assert(__gen_e_acsl_eqC_2,& __gen_e_acsl_assert_data_2);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-  }
-  /*@ assert eqC(1, 2); */ ;
-  {
-    int __gen_e_acsl_eqC_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __gen_e_acsl_eqC_4 = __gen_e_acsl_eqC(1,3);
-    if (! __gen_e_acsl_eqC_4) __e_acsl_sound_verdict = 0;
+    __gen_e_acsl_eqC_2 = __gen_e_acsl_eqC(1,3);
+    if (! __gen_e_acsl_eqC_2) __e_acsl_sound_verdict = 0;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"eqC(1, 3)",0,
-                                 __gen_e_acsl_eqC_4);
+                                 __gen_e_acsl_eqC_2);
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
     __gen_e_acsl_assert_data_3.pred_txt = "eqC(1, 3)";
     __gen_e_acsl_assert_data_3.file = "eq.c";
     __gen_e_acsl_assert_data_3.fct = "main";
     __gen_e_acsl_assert_data_3.line = 35;
-    __e_acsl_assert(__gen_e_acsl_eqC_4,& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert(__gen_e_acsl_eqC_2,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
   }
   /*@ assert eqC(1, 3); */ ;

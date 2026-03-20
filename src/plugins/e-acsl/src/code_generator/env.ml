@@ -211,7 +211,9 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
   let new_stmts = acc_list_rev local_block.new_stmts stmts in
   let new_block_vars = match scope with
     | Varname.Global | Varname.Function -> local_block.new_block_vars
-    | Varname.Block -> v :: local_block.new_block_vars
+    | Varname.Block ->
+      v.vtype <- Ast_types.remove_qualifiers v.vtype;
+      v :: local_block.new_block_vars
   in
   let new_block =
     { new_block_vars = new_block_vars;

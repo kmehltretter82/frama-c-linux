@@ -1,6 +1,5 @@
 /* run.config
    COMMENT: generated from tests/axiomatic_function/sum.c
-   COMMENT: E-ACSL construct `logic functions with labels' is not yet supported.
    STDOPT: +"-eva-unroll-recursive-calls 9"
 */
 /* run.config_dev

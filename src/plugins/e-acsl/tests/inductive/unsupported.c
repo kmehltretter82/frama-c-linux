@@ -58,5 +58,7 @@ int main() {
   int *ptr = (int *)&t;
   /*@ assert is_max(ptr, 1, 1); */
 
+  //@ assert fibo(7, 13);
+
   return 0;
 }

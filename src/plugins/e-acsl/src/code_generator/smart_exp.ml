@@ -8,8 +8,16 @@
 
 open Cil_types
 
+let new_exp ~loc exp_node =
+  let exp = Cil.new_exp ~loc exp_node in
+  let visitor = object
+    inherit Visitor.frama_c_inplace
+    method !vtype _ = Cil.DoChildrenPost Misc.unghost_type
+  end in
+  Visitor.visitFramacExpr visitor exp
+
 let lval ~loc lv =
-  Cil.new_exp ~loc (Lval lv)
+  new_exp ~loc (Lval lv)
 
 let deref ~loc lv = lval ~loc (Mem lv, NoOffset)
 
@@ -27,7 +35,7 @@ let subscript ~loc array idx =
 
 let ptr_sizeof ~loc typ =
   match Ast_types.unroll_node typ with
-  | TPtr t' -> Cil.new_exp ~loc (SizeOf t')
+  | TPtr t' -> new_exp ~loc (SizeOf t')
   | _ -> assert false
 
 let lnot ~loc e =
@@ -44,7 +52,7 @@ let lnot ~loc e =
          with the [LNot] operator. *)
       match e.enode with
       | UnOp (LNot, e, _) -> e
-      | _ -> Cil.new_exp ~loc (UnOp (LNot, e, Cil_const.intType))
+      | _ -> new_exp ~loc (UnOp (LNot, e, Cil_const.intType))
     end
   | Some i when Z.is_zero i ->
     (* The expression is an integer equal to zero, directly return one. *)
