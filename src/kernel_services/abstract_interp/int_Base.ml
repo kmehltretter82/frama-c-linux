@@ -6,17 +6,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Z integers with an additional top element.
+type i = Z_or_top.t
 
-    @before Frama-C+dev was named [Int_Base]. *)
+include Z_or_top
 
-include Datatype.S with type t = Z.t Lattice_bounds.or_top
-
-val top: t
-val of_int: int -> t
-
-val is_zero: t -> bool
-val is_top: t -> bool
-
-val project: t -> Z.t
-(** @raise Error_Top if the argument is {!Top}. *)
+let zero = `Value Z.zero
+let one = `Value Z.one
+let minus_one = `Value Z.minus_one
+let neg = Lattice_bounds.Top.map Z.neg
+let inject z = `Value z
+let cardinal_zero_or_one z = not (is_top z)
