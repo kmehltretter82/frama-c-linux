@@ -18,6 +18,8 @@ void __gen_e_acsl_f(int s);
 
 void f(int s)
 {
+  __e_acsl_store_block((void *)(& s),4UL);
+  __e_acsl_delete_block((void *)(& s));
   return;
 }
 
@@ -82,8 +84,10 @@ int __gen_e_acsl_h(int const t)
 void __gen_e_acsl_f(int s)
 {
   int __gen_e_acsl_at;
+  __e_acsl_store_block((void *)(& s),4UL);
   __gen_e_acsl_at = s;
   f(s);
+  __e_acsl_delete_block((void *)(& s));
   return;
 }
 

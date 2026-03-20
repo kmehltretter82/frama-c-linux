@@ -120,8 +120,11 @@ char *__gen_e_acsl_strncat(char * restrict dest, char const * restrict src,
 char const __fc_lit_string1[2UL] = "b";
 char const __fc_lit_string2[3UL] = "ab";
 char const __fc_lit_string3[2UL] = "b";
+char const __fc_lit_string4[2UL] = "a";
 char const __fc_lit_string5[2UL] = "b";
+char const __fc_lit_string6[2UL] = "a";
 char const __fc_lit_string7[3UL] = "bc";
+char const __fc_lit_string8[2UL] = "a";
 char const __fc_lit_string9[2UL] = "b";
 /*@ requires valid_nstring_src: valid_read_nstring(src, n);
     requires valid_string_dest: valid_string(dest);
@@ -177,6 +180,7 @@ char *__gen_e_acsl_strncat(char * restrict dest, char const * restrict src,
   char *__gen_e_acsl_at_2;
   char *__gen_e_acsl_at;
   char *__retres;
+  __e_acsl_store_block((void *)(& n),8UL);
   __e_acsl_store_block((void *)(& src),8UL);
   __e_acsl_store_block((void *)(& dest),8UL);
   __gen_e_acsl_at = dest;
@@ -256,6 +260,7 @@ char *__gen_e_acsl_strncat(char * restrict dest, char const * restrict src,
                     & __gen_e_acsl_assert_data_9);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
     __e_acsl_contract_clean(__gen_e_acsl_contract);
+    __e_acsl_delete_block((void *)(& n));
     __e_acsl_delete_block((void *)(& src));
     __e_acsl_delete_block((void *)(& dest));
     return __retres;
@@ -431,6 +436,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     unsigned long __gen_e_acsl_add_6;
     unsigned long __gen_e_acsl_if_5;
     int __gen_e_acsl_separated;
+    __e_acsl_store_block((void *)(& n),8UL);
     __e_acsl_store_block((void *)(& src),8UL);
     __e_acsl_store_block((void *)(& dest),8UL);
     __gen_e_acsl_at = src;
@@ -656,6 +662,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_7);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
     __e_acsl_contract_clean(__gen_e_acsl_contract);
+    __e_acsl_delete_block((void *)(& n));
     __e_acsl_delete_block((void *)(& src));
     __e_acsl_delete_block((void *)(& dest));
     __gmpz_clear(__gen_e_acsl__2);
@@ -762,21 +769,21 @@ void __e_acsl_globals_init(void)
     __e_acsl_store_block((void *)(__fc_lit_string9),2UL);
     __e_acsl_full_init((void *)(& __fc_lit_string9));
     __e_acsl_mark_readonly((void *)(__fc_lit_string9));
-    __e_acsl_store_block((void *)"a",2UL);
-    __e_acsl_full_init((void *)(& "a"));
-    __e_acsl_mark_readonly((void *)"a");
+    __e_acsl_store_block((void *)(__fc_lit_string8),2UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string8));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string8));
     __e_acsl_store_block((void *)(__fc_lit_string7),3UL);
     __e_acsl_full_init((void *)(& __fc_lit_string7));
     __e_acsl_mark_readonly((void *)(__fc_lit_string7));
-    __e_acsl_store_block((void *)"a",2UL);
-    __e_acsl_full_init((void *)(& "a"));
-    __e_acsl_mark_readonly((void *)"a");
+    __e_acsl_store_block((void *)(__fc_lit_string6),2UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string6));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string6));
     __e_acsl_store_block((void *)(__fc_lit_string5),2UL);
     __e_acsl_full_init((void *)(& __fc_lit_string5));
     __e_acsl_mark_readonly((void *)(__fc_lit_string5));
-    __e_acsl_store_block((void *)"a",2UL);
-    __e_acsl_full_init((void *)(& "a"));
-    __e_acsl_mark_readonly((void *)"a");
+    __e_acsl_store_block((void *)(__fc_lit_string4),2UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string4));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string4));
     __e_acsl_store_block((void *)(__fc_lit_string3),2UL);
     __e_acsl_full_init((void *)(& __fc_lit_string3));
     __e_acsl_mark_readonly((void *)(__fc_lit_string3));
@@ -793,11 +800,11 @@ void __e_acsl_globals_init(void)
 void __e_acsl_globals_clean(void)
 {
   __e_acsl_delete_block((void *)(__fc_lit_string9));
-  __e_acsl_delete_block((void *)"a");
+  __e_acsl_delete_block((void *)(__fc_lit_string8));
   __e_acsl_delete_block((void *)(__fc_lit_string7));
-  __e_acsl_delete_block((void *)"a");
+  __e_acsl_delete_block((void *)(__fc_lit_string6));
   __e_acsl_delete_block((void *)(__fc_lit_string5));
-  __e_acsl_delete_block((void *)"a");
+  __e_acsl_delete_block((void *)(__fc_lit_string4));
   __e_acsl_delete_block((void *)(__fc_lit_string3));
   __e_acsl_delete_block((void *)(__fc_lit_string2));
   __e_acsl_delete_block((void *)(__fc_lit_string1));
@@ -1223,7 +1230,7 @@ int main(void)
   {
     char dest_2[4];
     __e_acsl_store_block((void *)(dest_2),4UL);
-    __gen_e_acsl_strcpy(dest_2,"a");
+    __gen_e_acsl_strcpy(dest_2,__fc_lit_string4);
     char src_2[2UL] = {'b', '\000'};
     __e_acsl_store_block((void *)(src_2),2UL);
     __e_acsl_full_init((void *)(& src_2));
@@ -1393,7 +1400,7 @@ int main(void)
   {
     char dest_3[4];
     __e_acsl_store_block((void *)(dest_3),4UL);
-    __gen_e_acsl_strcpy(dest_3,"a");
+    __gen_e_acsl_strcpy(dest_3,__fc_lit_string6);
     char src_3[3UL] = {'b', 'c', '\000'};
     __e_acsl_store_block((void *)(src_3),3UL);
     __e_acsl_full_init((void *)(& src_3));
@@ -1563,7 +1570,7 @@ int main(void)
   {
     char dest_4[4];
     __e_acsl_store_block((void *)(dest_4),4UL);
-    __gen_e_acsl_strcpy(dest_4,"a");
+    __gen_e_acsl_strcpy(dest_4,__fc_lit_string8);
     char src_4[2UL] = {'b', '\000'};
     __e_acsl_store_block((void *)(src_4),2UL);
     __e_acsl_full_init((void *)(& src_4));

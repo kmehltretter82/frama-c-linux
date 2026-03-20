@@ -3,7 +3,13 @@
 [kernel:CERT:MSC:37] functions.c:173: Warning: 
   Body of function test_f5 falls-through. Adding a return statement
 [e-acsl] beginning translation.
+[e-acsl] functions.c:112: Warning: 
+  E-ACSL construct `function application' is not yet supported.
+  Ignoring annotation.
 [e-acsl] functions.c:111: Warning: 
+  E-ACSL construct `function application' is not yet supported.
+  Ignoring annotation.
+[e-acsl] functions.c:94: Warning: 
   E-ACSL construct `function application' is not yet supported.
   Ignoring annotation.
 [e-acsl] functions.c:123: Warning: 

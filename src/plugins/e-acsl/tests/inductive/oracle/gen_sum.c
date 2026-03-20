@@ -64,7 +64,11 @@ int main(void)
   int __retres;
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int a[4] = {1, 2, 3, 4};
+  __e_acsl_store_block((void *)(a),16UL);
+  __e_acsl_full_init((void *)(& a));
   int *ptr = a;
+  __e_acsl_store_block((void *)(& ptr),8UL);
+  __e_acsl_full_init((void *)(& ptr));
   {
     int __gen_e_acsl_sum_here_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
@@ -107,6 +111,8 @@ int main(void)
   }
   /*@ assert !sum(ptr, 1, 2, 4, 4); */ ;
   __retres = 0;
+  __e_acsl_delete_block((void *)(& ptr));
+  __e_acsl_delete_block((void *)(a));
   __e_acsl_memory_clean();
   return __retres;
 }

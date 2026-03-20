@@ -106,29 +106,33 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src);
 
 char const __fc_lit_string6[18UL] = "diouxfFeEgGaAcspn";
 char const *valid_specifiers = __fc_lit_string6;
+char const __fc_lit_string8[4UL] = "dic";
+char const __fc_lit_string9[5UL] = "uoxX";
+char const __fc_lit_string10[9UL] = "fFeEgGaA";
 void apply_specifier(char *format, int spec)
 {
   int n;
   char *tmp_1;
   __e_acsl_store_block((void *)(& tmp_1),8UL);
+  __e_acsl_store_block((void *)(& spec),4UL);
   __e_acsl_store_block((void *)(& format),8UL);
   void *p = (void *)0;
   __e_acsl_full_init((void *)(& tmp_1));
-  tmp_1 = __gen_e_acsl_strchr("fFeEgGaA",spec);
+  tmp_1 = __gen_e_acsl_strchr(__fc_lit_string10,spec);
   if (tmp_1 != (char *)0) __e_acsl_builtin_printf("e",(char const *)format,
                                                   1.0);
   else {
     char *tmp_0;
     __e_acsl_store_block((void *)(& tmp_0),8UL);
     __e_acsl_full_init((void *)(& tmp_0));
-    tmp_0 = __gen_e_acsl_strchr("uoxX",spec);
+    tmp_0 = __gen_e_acsl_strchr(__fc_lit_string9,spec);
     if (tmp_0 != (char *)0) __e_acsl_builtin_printf("D",(char const *)format,
                                                     1U);
     else {
       char *tmp;
       __e_acsl_store_block((void *)(& tmp),8UL);
       __e_acsl_full_init((void *)(& tmp));
-      tmp = __gen_e_acsl_strchr("dic",spec);
+      tmp = __gen_e_acsl_strchr(__fc_lit_string8,spec);
       if (tmp != (char *)0) __e_acsl_builtin_printf("d",(char const *)format,
                                                     97);
       else 
@@ -145,6 +149,7 @@ void apply_specifier(char *format, int spec)
     }
     __e_acsl_delete_block((void *)(& tmp_0));
   }
+  __e_acsl_delete_block((void *)(& spec));
   __e_acsl_delete_block((void *)(& format));
   __e_acsl_delete_block((void *)(& tmp_1));
   return;
@@ -214,6 +219,8 @@ void test_specifier_application(char const *allowed, char const *fmt,
         char *tmp_2;
         __e_acsl_store_block((void *)(& tmp_2),8UL);
         int c = (int)*(valid_specifiers + i_0);
+        __e_acsl_store_block((void *)(& c),4UL);
+        __e_acsl_full_init((void *)(& c));
         __e_acsl_initialize((void *)(format + (len - 1)),sizeof(char));
         *(format + (len - 1)) = (char)c;
         __e_acsl_full_init((void *)(& tmp_2));
@@ -255,6 +262,7 @@ void test_specifier_application(char const *allowed, char const *fmt,
           }
         }
         __e_acsl_delete_block((void *)(& tmp_2));
+        __e_acsl_delete_block((void *)(& c));
       }
       i_0 ++;
     }
@@ -269,6 +277,26 @@ void test_specifier_application(char const *allowed, char const *fmt,
 
 char const __fc_lit_string12[13UL] = "Hello world!";
 char const __fc_lit_string21[7UL] = "fmt:%s";
+char const __fc_lit_string34[5UL] = "%.3X";
+char const __fc_lit_string35[16UL] = "diouxXaAeEfFgGs";
+char const __fc_lit_string37[4UL] = "%#X";
+char const __fc_lit_string38[12UL] = "oxXaAeEfFgG";
+char const __fc_lit_string40[4UL] = "%0X";
+char const __fc_lit_string41[15UL] = "diouxXaAeEfFgG";
+char const __fc_lit_string49[5UL] = "%hhX";
+char const __fc_lit_string50[8UL] = "diouxXn";
+char const __fc_lit_string66[4UL] = "%hX";
+char const __fc_lit_string67[8UL] = "diouxXn";
+char const __fc_lit_string83[4UL] = "%lX";
+char const __fc_lit_string84[18UL] = "diouxXncsaAeEfFgG";
+char const __fc_lit_string132[4UL] = "%jX";
+char const __fc_lit_string133[8UL] = "diouxXn";
+char const __fc_lit_string149[4UL] = "%zX";
+char const __fc_lit_string150[8UL] = "diouxXn";
+char const __fc_lit_string166[4UL] = "%tX";
+char const __fc_lit_string167[8UL] = "diouxXn";
+char const __fc_lit_string183[4UL] = "%LX";
+char const __fc_lit_string184[9UL] = "aAeEfFgG";
 char const __fc_lit_string521[4UL] = "cat";
 /*@ requires valid_string_src: valid_read_string(src);
     requires room_string: \valid(dest + (0 .. strlen(src)));
@@ -389,6 +417,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
   char const *__gen_e_acsl_at;
   char *__retres;
   __e_acsl_store_block((void *)(& __retres),8UL);
+  __e_acsl_store_block((void *)(& c),4UL);
   __e_acsl_store_block((void *)(& s),8UL);
   __gen_e_acsl_at = s;
   __gen_e_acsl_at_2 = s;
@@ -492,6 +521,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
     }
     __e_acsl_contract_clean(__gen_e_acsl_contract);
+    __e_acsl_delete_block((void *)(& c));
     __e_acsl_delete_block((void *)(& s));
     __e_acsl_delete_block((void *)(& __retres));
     return __retres;
@@ -732,81 +762,81 @@ void __e_acsl_globals_init(void)
     __e_acsl_store_block((void *)(__fc_lit_string521),4UL);
     __e_acsl_full_init((void *)(& __fc_lit_string521));
     __e_acsl_mark_readonly((void *)(__fc_lit_string521));
-    __e_acsl_store_block((void *)"aAeEfFgG",9UL);
-    __e_acsl_full_init((void *)(& "aAeEfFgG"));
-    __e_acsl_mark_readonly((void *)"aAeEfFgG");
-    __e_acsl_store_block((void *)"%LX",4UL);
-    __e_acsl_full_init((void *)(& "%LX"));
-    __e_acsl_mark_readonly((void *)"%LX");
-    __e_acsl_store_block((void *)"diouxXn",8UL);
-    __e_acsl_full_init((void *)(& "diouxXn"));
-    __e_acsl_mark_readonly((void *)"diouxXn");
-    __e_acsl_store_block((void *)"%tX",4UL);
-    __e_acsl_full_init((void *)(& "%tX"));
-    __e_acsl_mark_readonly((void *)"%tX");
-    __e_acsl_store_block((void *)"diouxXn",8UL);
-    __e_acsl_full_init((void *)(& "diouxXn"));
-    __e_acsl_mark_readonly((void *)"diouxXn");
-    __e_acsl_store_block((void *)"%zX",4UL);
-    __e_acsl_full_init((void *)(& "%zX"));
-    __e_acsl_mark_readonly((void *)"%zX");
-    __e_acsl_store_block((void *)"diouxXn",8UL);
-    __e_acsl_full_init((void *)(& "diouxXn"));
-    __e_acsl_mark_readonly((void *)"diouxXn");
-    __e_acsl_store_block((void *)"%jX",4UL);
-    __e_acsl_full_init((void *)(& "%jX"));
-    __e_acsl_mark_readonly((void *)"%jX");
-    __e_acsl_store_block((void *)"diouxXncsaAeEfFgG",18UL);
-    __e_acsl_full_init((void *)(& "diouxXncsaAeEfFgG"));
-    __e_acsl_mark_readonly((void *)"diouxXncsaAeEfFgG");
-    __e_acsl_store_block((void *)"%lX",4UL);
-    __e_acsl_full_init((void *)(& "%lX"));
-    __e_acsl_mark_readonly((void *)"%lX");
-    __e_acsl_store_block((void *)"diouxXn",8UL);
-    __e_acsl_full_init((void *)(& "diouxXn"));
-    __e_acsl_mark_readonly((void *)"diouxXn");
-    __e_acsl_store_block((void *)"%hX",4UL);
-    __e_acsl_full_init((void *)(& "%hX"));
-    __e_acsl_mark_readonly((void *)"%hX");
-    __e_acsl_store_block((void *)"diouxXn",8UL);
-    __e_acsl_full_init((void *)(& "diouxXn"));
-    __e_acsl_mark_readonly((void *)"diouxXn");
-    __e_acsl_store_block((void *)"%hhX",5UL);
-    __e_acsl_full_init((void *)(& "%hhX"));
-    __e_acsl_mark_readonly((void *)"%hhX");
-    __e_acsl_store_block((void *)"diouxXaAeEfFgG",15UL);
-    __e_acsl_full_init((void *)(& "diouxXaAeEfFgG"));
-    __e_acsl_mark_readonly((void *)"diouxXaAeEfFgG");
-    __e_acsl_store_block((void *)"%0X",4UL);
-    __e_acsl_full_init((void *)(& "%0X"));
-    __e_acsl_mark_readonly((void *)"%0X");
-    __e_acsl_store_block((void *)"oxXaAeEfFgG",12UL);
-    __e_acsl_full_init((void *)(& "oxXaAeEfFgG"));
-    __e_acsl_mark_readonly((void *)"oxXaAeEfFgG");
-    __e_acsl_store_block((void *)"%#X",4UL);
-    __e_acsl_full_init((void *)(& "%#X"));
-    __e_acsl_mark_readonly((void *)"%#X");
-    __e_acsl_store_block((void *)"diouxXaAeEfFgGs",16UL);
-    __e_acsl_full_init((void *)(& "diouxXaAeEfFgGs"));
-    __e_acsl_mark_readonly((void *)"diouxXaAeEfFgGs");
-    __e_acsl_store_block((void *)"%.3X",5UL);
-    __e_acsl_full_init((void *)(& "%.3X"));
-    __e_acsl_mark_readonly((void *)"%.3X");
+    __e_acsl_store_block((void *)(__fc_lit_string184),9UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string184));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string184));
+    __e_acsl_store_block((void *)(__fc_lit_string183),4UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string183));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string183));
+    __e_acsl_store_block((void *)(__fc_lit_string167),8UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string167));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string167));
+    __e_acsl_store_block((void *)(__fc_lit_string166),4UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string166));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string166));
+    __e_acsl_store_block((void *)(__fc_lit_string150),8UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string150));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string150));
+    __e_acsl_store_block((void *)(__fc_lit_string149),4UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string149));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string149));
+    __e_acsl_store_block((void *)(__fc_lit_string133),8UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string133));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string133));
+    __e_acsl_store_block((void *)(__fc_lit_string132),4UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string132));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string132));
+    __e_acsl_store_block((void *)(__fc_lit_string84),18UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string84));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string84));
+    __e_acsl_store_block((void *)(__fc_lit_string83),4UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string83));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string83));
+    __e_acsl_store_block((void *)(__fc_lit_string67),8UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string67));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string67));
+    __e_acsl_store_block((void *)(__fc_lit_string66),4UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string66));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string66));
+    __e_acsl_store_block((void *)(__fc_lit_string50),8UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string50));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string50));
+    __e_acsl_store_block((void *)(__fc_lit_string49),5UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string49));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string49));
+    __e_acsl_store_block((void *)(__fc_lit_string41),15UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string41));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string41));
+    __e_acsl_store_block((void *)(__fc_lit_string40),4UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string40));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string40));
+    __e_acsl_store_block((void *)(__fc_lit_string38),12UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string38));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string38));
+    __e_acsl_store_block((void *)(__fc_lit_string37),4UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string37));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string37));
+    __e_acsl_store_block((void *)(__fc_lit_string35),16UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string35));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string35));
+    __e_acsl_store_block((void *)(__fc_lit_string34),5UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string34));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string34));
     __e_acsl_store_block((void *)(__fc_lit_string21),7UL);
     __e_acsl_full_init((void *)(& __fc_lit_string21));
     __e_acsl_mark_readonly((void *)(__fc_lit_string21));
     __e_acsl_store_block((void *)(__fc_lit_string12),13UL);
     __e_acsl_full_init((void *)(& __fc_lit_string12));
     __e_acsl_mark_readonly((void *)(__fc_lit_string12));
-    __e_acsl_store_block((void *)"fFeEgGaA",9UL);
-    __e_acsl_full_init((void *)(& "fFeEgGaA"));
-    __e_acsl_mark_readonly((void *)"fFeEgGaA");
-    __e_acsl_store_block((void *)"uoxX",5UL);
-    __e_acsl_full_init((void *)(& "uoxX"));
-    __e_acsl_mark_readonly((void *)"uoxX");
-    __e_acsl_store_block((void *)"dic",4UL);
-    __e_acsl_full_init((void *)(& "dic"));
-    __e_acsl_mark_readonly((void *)"dic");
+    __e_acsl_store_block((void *)(__fc_lit_string10),9UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string10));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string10));
+    __e_acsl_store_block((void *)(__fc_lit_string9),5UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string9));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string9));
+    __e_acsl_store_block((void *)(__fc_lit_string8),4UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string8));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string8));
     __e_acsl_store_block((void *)(__fc_lit_string6),18UL);
     __e_acsl_full_init((void *)(& __fc_lit_string6));
     __e_acsl_mark_readonly((void *)(__fc_lit_string6));
@@ -819,31 +849,31 @@ void __e_acsl_globals_init(void)
 void __e_acsl_globals_clean(void)
 {
   __e_acsl_delete_block((void *)(__fc_lit_string521));
-  __e_acsl_delete_block((void *)"aAeEfFgG");
-  __e_acsl_delete_block((void *)"%LX");
-  __e_acsl_delete_block((void *)"diouxXn");
-  __e_acsl_delete_block((void *)"%tX");
-  __e_acsl_delete_block((void *)"diouxXn");
-  __e_acsl_delete_block((void *)"%zX");
-  __e_acsl_delete_block((void *)"diouxXn");
-  __e_acsl_delete_block((void *)"%jX");
-  __e_acsl_delete_block((void *)"diouxXncsaAeEfFgG");
-  __e_acsl_delete_block((void *)"%lX");
-  __e_acsl_delete_block((void *)"diouxXn");
-  __e_acsl_delete_block((void *)"%hX");
-  __e_acsl_delete_block((void *)"diouxXn");
-  __e_acsl_delete_block((void *)"%hhX");
-  __e_acsl_delete_block((void *)"diouxXaAeEfFgG");
-  __e_acsl_delete_block((void *)"%0X");
-  __e_acsl_delete_block((void *)"oxXaAeEfFgG");
-  __e_acsl_delete_block((void *)"%#X");
-  __e_acsl_delete_block((void *)"diouxXaAeEfFgGs");
-  __e_acsl_delete_block((void *)"%.3X");
+  __e_acsl_delete_block((void *)(__fc_lit_string184));
+  __e_acsl_delete_block((void *)(__fc_lit_string183));
+  __e_acsl_delete_block((void *)(__fc_lit_string167));
+  __e_acsl_delete_block((void *)(__fc_lit_string166));
+  __e_acsl_delete_block((void *)(__fc_lit_string150));
+  __e_acsl_delete_block((void *)(__fc_lit_string149));
+  __e_acsl_delete_block((void *)(__fc_lit_string133));
+  __e_acsl_delete_block((void *)(__fc_lit_string132));
+  __e_acsl_delete_block((void *)(__fc_lit_string84));
+  __e_acsl_delete_block((void *)(__fc_lit_string83));
+  __e_acsl_delete_block((void *)(__fc_lit_string67));
+  __e_acsl_delete_block((void *)(__fc_lit_string66));
+  __e_acsl_delete_block((void *)(__fc_lit_string50));
+  __e_acsl_delete_block((void *)(__fc_lit_string49));
+  __e_acsl_delete_block((void *)(__fc_lit_string41));
+  __e_acsl_delete_block((void *)(__fc_lit_string40));
+  __e_acsl_delete_block((void *)(__fc_lit_string38));
+  __e_acsl_delete_block((void *)(__fc_lit_string37));
+  __e_acsl_delete_block((void *)(__fc_lit_string35));
+  __e_acsl_delete_block((void *)(__fc_lit_string34));
   __e_acsl_delete_block((void *)(__fc_lit_string21));
   __e_acsl_delete_block((void *)(__fc_lit_string12));
-  __e_acsl_delete_block((void *)"fFeEgGaA");
-  __e_acsl_delete_block((void *)"uoxX");
-  __e_acsl_delete_block((void *)"dic");
+  __e_acsl_delete_block((void *)(__fc_lit_string10));
+  __e_acsl_delete_block((void *)(__fc_lit_string9));
+  __e_acsl_delete_block((void *)(__fc_lit_string8));
   __e_acsl_delete_block((void *)(__fc_lit_string6));
   __e_acsl_delete_block((void *)(& valid_specifiers));
   return;
@@ -1045,10 +1075,12 @@ int main(int argc, char const **argv)
       __e_acsl_delete_block((void *)(& process_status_8));
     }
   }
-  test_specifier_application("diouxXaAeEfFgGs","%.3X",0,
+  test_specifier_application(__fc_lit_string35,__fc_lit_string34,0,
                              (char *)"printf.c:219");
-  test_specifier_application("oxXaAeEfFgG","%#X",0,(char *)"printf.c:225");
-  test_specifier_application("diouxXaAeEfFgG","%0X",0,(char *)"printf.c:228");
+  test_specifier_application(__fc_lit_string38,__fc_lit_string37,0,
+                             (char *)"printf.c:225");
+  test_specifier_application(__fc_lit_string41,__fc_lit_string40,0,
+                             (char *)"printf.c:228");
   {
     pid_t pid_9 = __gen_e_acsl_fork();
     if (! pid_9) {
@@ -1094,7 +1126,8 @@ int main(int argc, char const **argv)
       __e_acsl_delete_block((void *)(& process_status_11));
     }
   }
-  test_specifier_application("diouxXn","%hhX",1,(char *)"printf.c:242");
+  test_specifier_application(__fc_lit_string50,__fc_lit_string49,1,
+                             (char *)"printf.c:242");
   {
     pid_t pid_12 = __gen_e_acsl_fork();
     if (! pid_12) {
@@ -1200,7 +1233,8 @@ int main(int argc, char const **argv)
       __e_acsl_delete_block((void *)(& process_status_18));
     }
   }
-  test_specifier_application("diouxXn","%hX",1,(char *)"printf.c:252");
+  test_specifier_application(__fc_lit_string67,__fc_lit_string66,1,
+                             (char *)"printf.c:252");
   {
     pid_t pid_19 = __gen_e_acsl_fork();
     if (! pid_19) {
@@ -1306,7 +1340,7 @@ int main(int argc, char const **argv)
       __e_acsl_delete_block((void *)(& process_status_25));
     }
   }
-  test_specifier_application("diouxXncsaAeEfFgG","%lX",1,
+  test_specifier_application(__fc_lit_string84,__fc_lit_string83,1,
                              (char *)"printf.c:262");
   {
     pid_t pid_26 = __gen_e_acsl_fork();
@@ -1653,7 +1687,8 @@ int main(int argc, char const **argv)
       __e_acsl_delete_block((void *)(& process_status_48));
     }
   }
-  test_specifier_application("diouxXn","%jX",1,(char *)"printf.c:295");
+  test_specifier_application(__fc_lit_string133,__fc_lit_string132,1,
+                             (char *)"printf.c:295");
   {
     pid_t pid_49 = __gen_e_acsl_fork();
     if (! pid_49) {
@@ -1759,7 +1794,8 @@ int main(int argc, char const **argv)
       __e_acsl_delete_block((void *)(& process_status_55));
     }
   }
-  test_specifier_application("diouxXn","%zX",1,(char *)"printf.c:305");
+  test_specifier_application(__fc_lit_string150,__fc_lit_string149,1,
+                             (char *)"printf.c:305");
   {
     pid_t pid_56 = __gen_e_acsl_fork();
     if (! pid_56) {
@@ -1865,7 +1901,8 @@ int main(int argc, char const **argv)
       __e_acsl_delete_block((void *)(& process_status_62));
     }
   }
-  test_specifier_application("diouxXn","%tX",1,(char *)"printf.c:325");
+  test_specifier_application(__fc_lit_string167,__fc_lit_string166,1,
+                             (char *)"printf.c:325");
   {
     pid_t pid_63 = __gen_e_acsl_fork();
     if (! pid_63) {
@@ -1971,7 +2008,8 @@ int main(int argc, char const **argv)
       __e_acsl_delete_block((void *)(& process_status_69));
     }
   }
-  test_specifier_application("aAeEfFgG","%LX",1,(char *)"printf.c:342");
+  test_specifier_application(__fc_lit_string184,__fc_lit_string183,1,
+                             (char *)"printf.c:342");
   {
     pid_t pid_70 = __gen_e_acsl_fork();
     if (! pid_70) {

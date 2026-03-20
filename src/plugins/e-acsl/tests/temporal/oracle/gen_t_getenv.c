@@ -19,10 +19,61 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
  */
 char *__gen_e_acsl_getenv(char const *name);
 
+char const __fc_lit_string1[5UL] = "HOME";
+char const __fc_lit_string2[5UL] = "PATH";
+/*@ requires valid_name: valid_read_string(name);
+    ensures
+      null_or_valid_result:
+        \result == \null || (\valid(\result) && valid_read_string(\result));
+    assigns \result;
+    assigns \result
+      \from __fc_env[0 ..], (indirect: name),
+            (indirect: *(name + (0 .. strlen{Old}(name))));
+ */
+char *__gen_e_acsl_getenv(char const *name)
+{
+  char *__retres;
+  __e_acsl_store_block((void *)(& __retres),8UL);
+  __e_acsl_store_block((void *)(& name),8UL);
+  __e_acsl_temporal_pull_parameter((void *)(& name),0U,8UL);
+  __e_acsl_temporal_reset_parameters();
+  __e_acsl_temporal_reset_return();
+  __e_acsl_temporal_save_nreferent_parameter((void *)(& name),0U);
+  __retres = getenv(name);
+  __e_acsl_temporal_store_nblock((void *)(& __retres),(void *)*(& __retres));
+  __e_acsl_temporal_save_return((void *)(& __retres));
+  __e_acsl_delete_block((void *)(& name));
+  __e_acsl_delete_block((void *)(& __retres));
+  return __retres;
+}
+
+void __e_acsl_globals_init(void)
+{
+  static char __e_acsl_already_run = 0;
+  if (! __e_acsl_already_run) {
+    __e_acsl_already_run = 1;
+    __e_acsl_store_block((void *)(__fc_lit_string2),5UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string2));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string2));
+    __e_acsl_store_block((void *)(__fc_lit_string1),5UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string1));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string1));
+  }
+  return;
+}
+
+void __e_acsl_globals_clean(void)
+{
+  __e_acsl_delete_block((void *)(__fc_lit_string2));
+  __e_acsl_delete_block((void *)(__fc_lit_string1));
+  return;
+}
+
 int main(int argc, char const **argv)
 {
   int __retres;
   __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
+  __e_acsl_globals_init();
   char *g1 = (char *)0;
   __e_acsl_temporal_store_nblock((void *)(& g1),(void *)0);
   __e_acsl_store_block((void *)(& g1),8UL);
@@ -30,11 +81,13 @@ int main(int argc, char const **argv)
   __e_acsl_full_init((void *)(& g1));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
-  g1 = __gen_e_acsl_getenv("HOME");
+  __e_acsl_temporal_save_nblock_parameter((void *)(__fc_lit_string1),0U);
+  g1 = __gen_e_acsl_getenv(__fc_lit_string1);
   __e_acsl_temporal_pull_return((void *)(& g1));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
-  char *g2 = __gen_e_acsl_getenv("PATH");
+  __e_acsl_temporal_save_nblock_parameter((void *)(__fc_lit_string2),0U);
+  char *g2 = __gen_e_acsl_getenv(__fc_lit_string2);
   __e_acsl_temporal_pull_return((void *)(& g2));
   __e_acsl_store_block((void *)(& g2),8UL);
   __e_acsl_full_init((void *)(& g2));
@@ -127,29 +180,8 @@ int main(int argc, char const **argv)
   __retres = 0;
   __e_acsl_delete_block((void *)(& g2));
   __e_acsl_delete_block((void *)(& g1));
+  __e_acsl_globals_clean();
   __e_acsl_memory_clean();
-  return __retres;
-}
-
-/*@ requires valid_name: valid_read_string(name);
-    ensures
-      null_or_valid_result:
-        \result == \null || (\valid(\result) && valid_read_string(\result));
-    assigns \result;
-    assigns \result
-      \from __fc_env[0 ..], (indirect: name),
-            (indirect: *(name + (0 .. strlen{Old}(name))));
- */
-char *__gen_e_acsl_getenv(char const *name)
-{
-  char *__retres;
-  __e_acsl_store_block((void *)(& __retres),8UL);
-  __e_acsl_temporal_reset_parameters();
-  __e_acsl_temporal_reset_return();
-  __retres = getenv(name);
-  __e_acsl_temporal_store_nblock((void *)(& __retres),(void *)*(& __retres));
-  __e_acsl_temporal_save_return((void *)(& __retres));
-  __e_acsl_delete_block((void *)(& __retres));
   return __retres;
 }
 

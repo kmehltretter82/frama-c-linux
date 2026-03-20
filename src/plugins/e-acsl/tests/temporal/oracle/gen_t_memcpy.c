@@ -58,6 +58,8 @@ int main(void)
   __e_acsl_store_block((void *)(& b),4UL);
   __e_acsl_full_init((void *)(& b));
   int size = 16;
+  __e_acsl_store_block((void *)(& size),4UL);
+  __e_acsl_full_init((void *)(& size));
   __e_acsl_initialize((void *)(src),sizeof(int *));
   __e_acsl_temporal_store_nblock((void *)(src),(void *)(& a));
   src[0] = & a;
@@ -1225,6 +1227,7 @@ int main(void)
   __e_acsl_delete_block((void *)(& tmp_1));
   __e_acsl_delete_block((void *)(& q));
   __e_acsl_delete_block((void *)(& p));
+  __e_acsl_delete_block((void *)(& size));
   __e_acsl_delete_block((void *)(dest));
   __e_acsl_delete_block((void *)(src));
   __e_acsl_delete_block((void *)(& b));
@@ -1249,6 +1252,8 @@ void *__gen_e_acsl_memset(void *s, int c, size_t n)
   void *__retres;
   {
     int __gen_e_acsl_valid_or_empty_here_2;
+    __e_acsl_store_block((void *)(& n),8UL);
+    __e_acsl_store_block((void *)(& c),4UL);
     __e_acsl_store_block((void *)(& s),8UL);
     __e_acsl_temporal_pull_parameter((void *)(& s),0U,8UL);
     __gen_e_acsl_at = s;
@@ -1296,6 +1301,8 @@ void *__gen_e_acsl_memset(void *s, int c, size_t n)
     __gen_e_acsl_assert_data_7.name = "result_ptr";
     __e_acsl_assert(__retres == __gen_e_acsl_at,& __gen_e_acsl_assert_data_7);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+    __e_acsl_delete_block((void *)(& n));
+    __e_acsl_delete_block((void *)(& c));
     __e_acsl_delete_block((void *)(& s));
     return __retres;
   }
@@ -1347,6 +1354,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
     unsigned long __gen_e_acsl_add_7;
     unsigned long __gen_e_acsl_if_5;
     int __gen_e_acsl_separated;
+    __e_acsl_store_block((void *)(& n),8UL);
     __e_acsl_store_block((void *)(& src),8UL);
     __e_acsl_store_block((void *)(& dest),8UL);
     __e_acsl_temporal_pull_parameter((void *)(& dest),0U,8UL);
@@ -1652,6 +1660,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
     __e_acsl_assert(__retres == __gen_e_acsl_at,
                     & __gen_e_acsl_assert_data_19);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_19);
+    __e_acsl_delete_block((void *)(& n));
     __e_acsl_delete_block((void *)(& src));
     __e_acsl_delete_block((void *)(& dest));
     return __retres;

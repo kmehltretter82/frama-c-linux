@@ -1,5 +1,5 @@
 /* run.config
-   COMMENT: \valid
+   COMMENT: The \valid built-in predicate.
 */
 
 #include "stdlib.h"
@@ -24,6 +24,8 @@ void g(void) {
   //@ assert \valid(*p);
 }
 
+//@ predicate P(int *i) = \valid(i);
+
 int main(void) {
   int *a, *b, **c, ***d, n = 0;
   /*@ assert ! \valid(a) && ! \valid(b) && ! \valid(X); */
@@ -43,5 +45,7 @@ int main(void) {
   /*@ assert ! \valid(a) && \valid(b) && \valid(X); */
   /*@ assert \valid(&Z); */
   g();
+  int i = 3;
+  //@ check P(&i);
   return 0;
 }

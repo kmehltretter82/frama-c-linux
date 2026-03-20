@@ -16,18 +16,8 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 int __gen_e_acsl_atoi(char const *nptr);
 
 int a;
-char *n = (char *)"134";
-int main(int argc, char **argv)
-{
-  int __retres;
-  __e_acsl_memory_init(& argc,& argv,8UL);
-  argc = __gen_e_acsl_atoi((char const *)n);
-  a = argc;
-  __retres = 0;
-  __e_acsl_memory_clean();
-  return __retres;
-}
-
+char const __fc_lit_string1[4UL] = "134";
+char *n = (char *)(__fc_lit_string1);
 /*@ requires valid_nptr: valid_read_string(nptr);
     assigns \result;
     assigns \result
@@ -36,7 +26,43 @@ int main(int argc, char **argv)
 int __gen_e_acsl_atoi(char const *nptr)
 {
   int __retres;
+  __e_acsl_store_block((void *)(& nptr),8UL);
   __retres = atoi(nptr);
+  __e_acsl_delete_block((void *)(& nptr));
+  return __retres;
+}
+
+void __e_acsl_globals_init(void)
+{
+  static char __e_acsl_already_run = 0;
+  if (! __e_acsl_already_run) {
+    __e_acsl_already_run = 1;
+    __e_acsl_store_block((void *)(__fc_lit_string1),4UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string1));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string1));
+    __e_acsl_store_block((void *)(& n),8UL);
+    __e_acsl_full_init((void *)(& n));
+  }
+  return;
+}
+
+void __e_acsl_globals_clean(void)
+{
+  __e_acsl_delete_block((void *)(__fc_lit_string1));
+  __e_acsl_delete_block((void *)(& n));
+  return;
+}
+
+int main(int argc, char **argv)
+{
+  int __retres;
+  __e_acsl_memory_init(& argc,& argv,8UL);
+  __e_acsl_globals_init();
+  argc = __gen_e_acsl_atoi((char const *)n);
+  a = argc;
+  __retres = 0;
+  __e_acsl_globals_clean();
+  __e_acsl_memory_clean();
   return __retres;
 }
 

@@ -43,288 +43,8 @@ FILE *__gen_e_acsl_fopen(char const * restrict filename,
 size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
                           FILE * restrict stream);
 
-int main(void)
-{
-  int __retres;
-  int buf[6];
-  size_t tmp_0;
-  int buf2[6];
-  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  __e_acsl_store_block((void *)(buf2),24UL);
-  __e_acsl_store_block((void *)(buf),24UL);
-  FILE *f = __gen_e_acsl_fopen("/dev/urandom","r");
-  __e_acsl_store_block((void *)(& f),8UL);
-  __e_acsl_full_init((void *)(& f));
-  tmp_0 = __gen_e_acsl_fread((void *)(& buf[1]),4UL,4UL,f);
-  int res = (int)tmp_0;
-  {
-    int __gen_e_acsl_initialized;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(buf),
-                                                    sizeof(int));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"(int *)buf",
-                                 (void *)(buf));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(int)",
-                                   0,sizeof(int));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "\\initialized((int *)buf)",0,
-                                 __gen_e_acsl_initialized);
-    __gen_e_acsl_assert_data.blocking = 1;
-    __gen_e_acsl_assert_data.kind = "Assertion";
-    __gen_e_acsl_assert_data.pred_txt = "!\\initialized((int *)buf)";
-    __gen_e_acsl_assert_data.file = "file.c";
-    __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 13;
-    __e_acsl_assert(! __gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
-  }
-  /*@ assert !\initialized((int *)buf); */ ;
-  if (res == 0) {
-    {
-      int __gen_e_acsl_initialized_2;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& buf[1]),
-                                                        sizeof(int));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&buf[1]",
-                                   (void *)(& buf[1]));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                     "sizeof(int)",0,sizeof(int));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                   "\\initialized(&buf[1])",0,
-                                   __gen_e_acsl_initialized_2);
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "Assertion";
-      __gen_e_acsl_assert_data_2.pred_txt = "!\\initialized(&buf[1])";
-      __gen_e_acsl_assert_data_2.file = "file.c";
-      __gen_e_acsl_assert_data_2.fct = "main";
-      __gen_e_acsl_assert_data_2.line = 15;
-      __e_acsl_assert(! __gen_e_acsl_initialized_2,
-                      & __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    }
-    /*@ assert !\initialized(&buf[1]); */ ;
-  }
-  if (res >= 1) {
-    {
-      int __gen_e_acsl_initialized_3;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(& buf[1]),
-                                                        sizeof(int));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&buf[1]",
-                                   (void *)(& buf[1]));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
-                                     "sizeof(int)",0,sizeof(int));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
-                                   "\\initialized(&buf[1])",0,
-                                   __gen_e_acsl_initialized_3);
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "Assertion";
-      __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(&buf[1])";
-      __gen_e_acsl_assert_data_3.file = "file.c";
-      __gen_e_acsl_assert_data_3.fct = "main";
-      __gen_e_acsl_assert_data_3.line = 18;
-      __e_acsl_assert(__gen_e_acsl_initialized_3,
-                      & __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-    }
-    /*@ assert \initialized(&buf[1]); */ ;
-  }
-  if (res >= 2) {
-    {
-      int __gen_e_acsl_initialized_4;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_4 = __e_acsl_initialized((void *)(& buf[2]),
-                                                        sizeof(int));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"&buf[2]",
-                                   (void *)(& buf[2]));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
-                                     "sizeof(int)",0,sizeof(int));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                   "\\initialized(&buf[2])",0,
-                                   __gen_e_acsl_initialized_4);
-      __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "Assertion";
-      __gen_e_acsl_assert_data_4.pred_txt = "\\initialized(&buf[2])";
-      __gen_e_acsl_assert_data_4.file = "file.c";
-      __gen_e_acsl_assert_data_4.fct = "main";
-      __gen_e_acsl_assert_data_4.line = 21;
-      __e_acsl_assert(__gen_e_acsl_initialized_4,
-                      & __gen_e_acsl_assert_data_4);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
-    }
-    /*@ assert \initialized(&buf[2]); */ ;
-  }
-  if (res >= 3) {
-    {
-      int __gen_e_acsl_initialized_5;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_5 = __e_acsl_initialized((void *)(& buf[3]),
-                                                        sizeof(int));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"&buf[3]",
-                                   (void *)(& buf[3]));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
-                                     "sizeof(int)",0,sizeof(int));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
-                                   "\\initialized(&buf[3])",0,
-                                   __gen_e_acsl_initialized_5);
-      __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "Assertion";
-      __gen_e_acsl_assert_data_5.pred_txt = "\\initialized(&buf[3])";
-      __gen_e_acsl_assert_data_5.file = "file.c";
-      __gen_e_acsl_assert_data_5.fct = "main";
-      __gen_e_acsl_assert_data_5.line = 24;
-      __e_acsl_assert(__gen_e_acsl_initialized_5,
-                      & __gen_e_acsl_assert_data_5);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
-    }
-    /*@ assert \initialized(&buf[3]); */ ;
-  }
-  if (res >= 4) {
-    {
-      int __gen_e_acsl_initialized_6;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_6 = __e_acsl_initialized((void *)(& buf[4]),
-                                                        sizeof(int));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"&buf[4]",
-                                   (void *)(& buf[4]));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
-                                     "sizeof(int)",0,sizeof(int));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
-                                   "\\initialized(&buf[4])",0,
-                                   __gen_e_acsl_initialized_6);
-      __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "Assertion";
-      __gen_e_acsl_assert_data_6.pred_txt = "\\initialized(&buf[4])";
-      __gen_e_acsl_assert_data_6.file = "file.c";
-      __gen_e_acsl_assert_data_6.fct = "main";
-      __gen_e_acsl_assert_data_6.line = 27;
-      __e_acsl_assert(__gen_e_acsl_initialized_6,
-                      & __gen_e_acsl_assert_data_6);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
-    }
-    /*@ assert \initialized(&buf[4]); */ ;
-  }
-  {
-    int __gen_e_acsl_initialized_7;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized_7 = __e_acsl_initialized((void *)(& buf[5]),
-                                                      sizeof(int));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"&buf[5]",
-                                 (void *)(& buf[5]));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
-                                   "sizeof(int)",0,sizeof(int));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
-                                 "\\initialized(&buf[5])",0,
-                                 __gen_e_acsl_initialized_7);
-    __gen_e_acsl_assert_data_7.blocking = 1;
-    __gen_e_acsl_assert_data_7.kind = "Assertion";
-    __gen_e_acsl_assert_data_7.pred_txt = "!\\initialized(&buf[5])";
-    __gen_e_acsl_assert_data_7.file = "file.c";
-    __gen_e_acsl_assert_data_7.fct = "main";
-    __gen_e_acsl_assert_data_7.line = 29;
-    __e_acsl_assert(! __gen_e_acsl_initialized_7,
-                    & __gen_e_acsl_assert_data_7);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
-  }
-  /*@ assert !\initialized(&buf[5]); */ ;
-  __gen_e_acsl_fread((void *)(& buf2[1]),4UL,4UL,f);
-  {
-    int __gen_e_acsl_initialized_8;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized_8 = __e_acsl_initialized((void *)(buf2),
-                                                      sizeof(int));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"(int *)buf2",
-                                 (void *)(buf2));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
-                                   "sizeof(int)",0,sizeof(int));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
-                                 "\\initialized((int *)buf2)",0,
-                                 __gen_e_acsl_initialized_8);
-    __gen_e_acsl_assert_data_8.blocking = 1;
-    __gen_e_acsl_assert_data_8.kind = "Assertion";
-    __gen_e_acsl_assert_data_8.pred_txt = "!\\initialized((int *)buf2)";
-    __gen_e_acsl_assert_data_8.file = "file.c";
-    __gen_e_acsl_assert_data_8.fct = "main";
-    __gen_e_acsl_assert_data_8.line = 36;
-    __e_acsl_assert(! __gen_e_acsl_initialized_8,
-                    & __gen_e_acsl_assert_data_8);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
-  }
-  /*@ assert !\initialized((int *)buf2); */ ;
-  {
-    int __gen_e_acsl_size;
-    int __gen_e_acsl_if;
-    int __gen_e_acsl_initialized_9;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
-      {.values = (void *)0};
-    __gen_e_acsl_size = 4 * 4;
-    if (__gen_e_acsl_size <= 0) __gen_e_acsl_if = 0;
-    else __gen_e_acsl_if = __gen_e_acsl_size;
-    __gen_e_acsl_initialized_9 = __e_acsl_initialized((void *)((char *)(buf2) + 4),
-                                                      (size_t)__gen_e_acsl_if);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"(int *)buf2",
-                                 (void *)(buf2));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
-                                 "sizeof(int) * 1",0,4);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"sizeof(int)",
-                                 0,4);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"size",0,
-                                 __gen_e_acsl_size);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"size",0,
-                                 __gen_e_acsl_size);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
-                                 "\\initialized(&buf2[1 .. 4])",0,
-                                 __gen_e_acsl_initialized_9);
-    __gen_e_acsl_assert_data_9.blocking = 1;
-    __gen_e_acsl_assert_data_9.kind = "Assertion";
-    __gen_e_acsl_assert_data_9.pred_txt = "\\initialized(&buf2[1 .. 4])";
-    __gen_e_acsl_assert_data_9.file = "file.c";
-    __gen_e_acsl_assert_data_9.fct = "main";
-    __gen_e_acsl_assert_data_9.line = 37;
-    __e_acsl_assert(__gen_e_acsl_initialized_9,& __gen_e_acsl_assert_data_9);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
-  }
-  /*@ assert \initialized(&buf2[1 .. 4]); */ ;
-  {
-    int __gen_e_acsl_initialized_10;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized_10 = __e_acsl_initialized((void *)(& buf2[5]),
-                                                       sizeof(int));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,"&buf2[5]",
-                                 (void *)(& buf2[5]));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_10,
-                                   "sizeof(int)",0,sizeof(int));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,
-                                 "\\initialized(&buf2[5])",0,
-                                 __gen_e_acsl_initialized_10);
-    __gen_e_acsl_assert_data_10.blocking = 1;
-    __gen_e_acsl_assert_data_10.kind = "Assertion";
-    __gen_e_acsl_assert_data_10.pred_txt = "!\\initialized(&buf2[5])";
-    __gen_e_acsl_assert_data_10.file = "file.c";
-    __gen_e_acsl_assert_data_10.fct = "main";
-    __gen_e_acsl_assert_data_10.line = 38;
-    __e_acsl_assert(! __gen_e_acsl_initialized_10,
-                    & __gen_e_acsl_assert_data_10);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
-  }
-  /*@ assert !\initialized(&buf2[5]); */ ;
-  __gen_e_acsl_fclose(f);
-  __retres = 0;
-  __e_acsl_delete_block((void *)(buf2));
-  __e_acsl_delete_block((void *)(& f));
-  __e_acsl_delete_block((void *)(buf));
-  __e_acsl_memory_clean();
-  return __retres;
-}
-
+char const __fc_lit_string1[2UL] = "r";
+char const __fc_lit_string2[13UL] = "/dev/urandom";
 /*@ requires valid_ptr_block: \valid((char *)ptr + (0 .. nmemb * size - 1));
     requires valid_stream: \valid(stream);
     ensures size_read: \result <= \old(nmemb);
@@ -741,7 +461,11 @@ FILE *__gen_e_acsl_fopen(char const * restrict filename,
 {
   FILE *__retres;
   __e_acsl_store_block((void *)(& __retres),8UL);
+  __e_acsl_store_block((void *)(& mode),8UL);
+  __e_acsl_store_block((void *)(& filename),8UL);
   __retres = fopen(filename,mode);
+  __e_acsl_delete_block((void *)(& mode));
+  __e_acsl_delete_block((void *)(& filename));
   __e_acsl_delete_block((void *)(& __retres));
   return __retres;
 }
@@ -801,6 +525,312 @@ int __gen_e_acsl_fclose(FILE *stream)
     __e_acsl_delete_block((void *)(& stream));
     return __retres;
   }
+}
+
+void __e_acsl_globals_init(void)
+{
+  static char __e_acsl_already_run = 0;
+  if (! __e_acsl_already_run) {
+    __e_acsl_already_run = 1;
+    __e_acsl_store_block((void *)(__fc_lit_string2),13UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string2));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string2));
+    __e_acsl_store_block((void *)(__fc_lit_string1),2UL);
+    __e_acsl_full_init((void *)(& __fc_lit_string1));
+    __e_acsl_mark_readonly((void *)(__fc_lit_string1));
+  }
+  return;
+}
+
+void __e_acsl_globals_clean(void)
+{
+  __e_acsl_delete_block((void *)(__fc_lit_string2));
+  __e_acsl_delete_block((void *)(__fc_lit_string1));
+  return;
+}
+
+int main(void)
+{
+  int __retres;
+  int buf[6];
+  size_t tmp_0;
+  int buf2[6];
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_globals_init();
+  __e_acsl_store_block((void *)(buf2),24UL);
+  __e_acsl_store_block((void *)(buf),24UL);
+  FILE *f = __gen_e_acsl_fopen(__fc_lit_string2,__fc_lit_string1);
+  __e_acsl_store_block((void *)(& f),8UL);
+  __e_acsl_full_init((void *)(& f));
+  tmp_0 = __gen_e_acsl_fread((void *)(& buf[1]),4UL,4UL,f);
+  int res = (int)tmp_0;
+  {
+    int __gen_e_acsl_initialized;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(buf),
+                                                    sizeof(int));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"(int *)buf",
+                                 (void *)(buf));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(int)",
+                                   0,sizeof(int));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+                                 "\\initialized((int *)buf)",0,
+                                 __gen_e_acsl_initialized);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "!\\initialized((int *)buf)";
+    __gen_e_acsl_assert_data.file = "file.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 13;
+    __e_acsl_assert(! __gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+  }
+  /*@ assert !\initialized((int *)buf); */ ;
+  if (res == 0) {
+    {
+      int __gen_e_acsl_initialized_2;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+        {.values = (void *)0};
+      __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& buf[1]),
+                                                        sizeof(int));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&buf[1]",
+                                   (void *)(& buf[1]));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                     "sizeof(int)",0,sizeof(int));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                   "\\initialized(&buf[1])",0,
+                                   __gen_e_acsl_initialized_2);
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "Assertion";
+      __gen_e_acsl_assert_data_2.pred_txt = "!\\initialized(&buf[1])";
+      __gen_e_acsl_assert_data_2.file = "file.c";
+      __gen_e_acsl_assert_data_2.fct = "main";
+      __gen_e_acsl_assert_data_2.line = 15;
+      __e_acsl_assert(! __gen_e_acsl_initialized_2,
+                      & __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    }
+    /*@ assert !\initialized(&buf[1]); */ ;
+  }
+  if (res >= 1) {
+    {
+      int __gen_e_acsl_initialized_3;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+        {.values = (void *)0};
+      __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(& buf[1]),
+                                                        sizeof(int));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&buf[1]",
+                                   (void *)(& buf[1]));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                     "sizeof(int)",0,sizeof(int));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+                                   "\\initialized(&buf[1])",0,
+                                   __gen_e_acsl_initialized_3);
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "Assertion";
+      __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(&buf[1])";
+      __gen_e_acsl_assert_data_3.file = "file.c";
+      __gen_e_acsl_assert_data_3.fct = "main";
+      __gen_e_acsl_assert_data_3.line = 18;
+      __e_acsl_assert(__gen_e_acsl_initialized_3,
+                      & __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    }
+    /*@ assert \initialized(&buf[1]); */ ;
+  }
+  if (res >= 2) {
+    {
+      int __gen_e_acsl_initialized_4;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+        {.values = (void *)0};
+      __gen_e_acsl_initialized_4 = __e_acsl_initialized((void *)(& buf[2]),
+                                                        sizeof(int));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"&buf[2]",
+                                   (void *)(& buf[2]));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
+                                     "sizeof(int)",0,sizeof(int));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+                                   "\\initialized(&buf[2])",0,
+                                   __gen_e_acsl_initialized_4);
+      __gen_e_acsl_assert_data_4.blocking = 1;
+      __gen_e_acsl_assert_data_4.kind = "Assertion";
+      __gen_e_acsl_assert_data_4.pred_txt = "\\initialized(&buf[2])";
+      __gen_e_acsl_assert_data_4.file = "file.c";
+      __gen_e_acsl_assert_data_4.fct = "main";
+      __gen_e_acsl_assert_data_4.line = 21;
+      __e_acsl_assert(__gen_e_acsl_initialized_4,
+                      & __gen_e_acsl_assert_data_4);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    }
+    /*@ assert \initialized(&buf[2]); */ ;
+  }
+  if (res >= 3) {
+    {
+      int __gen_e_acsl_initialized_5;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+        {.values = (void *)0};
+      __gen_e_acsl_initialized_5 = __e_acsl_initialized((void *)(& buf[3]),
+                                                        sizeof(int));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"&buf[3]",
+                                   (void *)(& buf[3]));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+                                     "sizeof(int)",0,sizeof(int));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
+                                   "\\initialized(&buf[3])",0,
+                                   __gen_e_acsl_initialized_5);
+      __gen_e_acsl_assert_data_5.blocking = 1;
+      __gen_e_acsl_assert_data_5.kind = "Assertion";
+      __gen_e_acsl_assert_data_5.pred_txt = "\\initialized(&buf[3])";
+      __gen_e_acsl_assert_data_5.file = "file.c";
+      __gen_e_acsl_assert_data_5.fct = "main";
+      __gen_e_acsl_assert_data_5.line = 24;
+      __e_acsl_assert(__gen_e_acsl_initialized_5,
+                      & __gen_e_acsl_assert_data_5);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+    }
+    /*@ assert \initialized(&buf[3]); */ ;
+  }
+  if (res >= 4) {
+    {
+      int __gen_e_acsl_initialized_6;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+        {.values = (void *)0};
+      __gen_e_acsl_initialized_6 = __e_acsl_initialized((void *)(& buf[4]),
+                                                        sizeof(int));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"&buf[4]",
+                                   (void *)(& buf[4]));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
+                                     "sizeof(int)",0,sizeof(int));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+                                   "\\initialized(&buf[4])",0,
+                                   __gen_e_acsl_initialized_6);
+      __gen_e_acsl_assert_data_6.blocking = 1;
+      __gen_e_acsl_assert_data_6.kind = "Assertion";
+      __gen_e_acsl_assert_data_6.pred_txt = "\\initialized(&buf[4])";
+      __gen_e_acsl_assert_data_6.file = "file.c";
+      __gen_e_acsl_assert_data_6.fct = "main";
+      __gen_e_acsl_assert_data_6.line = 27;
+      __e_acsl_assert(__gen_e_acsl_initialized_6,
+                      & __gen_e_acsl_assert_data_6);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+    }
+    /*@ assert \initialized(&buf[4]); */ ;
+  }
+  {
+    int __gen_e_acsl_initialized_7;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+      {.values = (void *)0};
+    __gen_e_acsl_initialized_7 = __e_acsl_initialized((void *)(& buf[5]),
+                                                      sizeof(int));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"&buf[5]",
+                                 (void *)(& buf[5]));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
+                                   "sizeof(int)",0,sizeof(int));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
+                                 "\\initialized(&buf[5])",0,
+                                 __gen_e_acsl_initialized_7);
+    __gen_e_acsl_assert_data_7.blocking = 1;
+    __gen_e_acsl_assert_data_7.kind = "Assertion";
+    __gen_e_acsl_assert_data_7.pred_txt = "!\\initialized(&buf[5])";
+    __gen_e_acsl_assert_data_7.file = "file.c";
+    __gen_e_acsl_assert_data_7.fct = "main";
+    __gen_e_acsl_assert_data_7.line = 29;
+    __e_acsl_assert(! __gen_e_acsl_initialized_7,
+                    & __gen_e_acsl_assert_data_7);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+  }
+  /*@ assert !\initialized(&buf[5]); */ ;
+  __gen_e_acsl_fread((void *)(& buf2[1]),4UL,4UL,f);
+  {
+    int __gen_e_acsl_initialized_8;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
+      {.values = (void *)0};
+    __gen_e_acsl_initialized_8 = __e_acsl_initialized((void *)(buf2),
+                                                      sizeof(int));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"(int *)buf2",
+                                 (void *)(buf2));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
+                                   "sizeof(int)",0,sizeof(int));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
+                                 "\\initialized((int *)buf2)",0,
+                                 __gen_e_acsl_initialized_8);
+    __gen_e_acsl_assert_data_8.blocking = 1;
+    __gen_e_acsl_assert_data_8.kind = "Assertion";
+    __gen_e_acsl_assert_data_8.pred_txt = "!\\initialized((int *)buf2)";
+    __gen_e_acsl_assert_data_8.file = "file.c";
+    __gen_e_acsl_assert_data_8.fct = "main";
+    __gen_e_acsl_assert_data_8.line = 36;
+    __e_acsl_assert(! __gen_e_acsl_initialized_8,
+                    & __gen_e_acsl_assert_data_8);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
+  }
+  /*@ assert !\initialized((int *)buf2); */ ;
+  {
+    int __gen_e_acsl_size;
+    int __gen_e_acsl_if;
+    int __gen_e_acsl_initialized_9;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
+      {.values = (void *)0};
+    __gen_e_acsl_size = 4 * 4;
+    if (__gen_e_acsl_size <= 0) __gen_e_acsl_if = 0;
+    else __gen_e_acsl_if = __gen_e_acsl_size;
+    __gen_e_acsl_initialized_9 = __e_acsl_initialized((void *)((char *)(buf2) + 4),
+                                                      (size_t)__gen_e_acsl_if);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"(int *)buf2",
+                                 (void *)(buf2));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
+                                 "sizeof(int) * 1",0,4);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"sizeof(int)",
+                                 0,4);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"size",0,
+                                 __gen_e_acsl_size);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"size",0,
+                                 __gen_e_acsl_size);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
+                                 "\\initialized(&buf2[1 .. 4])",0,
+                                 __gen_e_acsl_initialized_9);
+    __gen_e_acsl_assert_data_9.blocking = 1;
+    __gen_e_acsl_assert_data_9.kind = "Assertion";
+    __gen_e_acsl_assert_data_9.pred_txt = "\\initialized(&buf2[1 .. 4])";
+    __gen_e_acsl_assert_data_9.file = "file.c";
+    __gen_e_acsl_assert_data_9.fct = "main";
+    __gen_e_acsl_assert_data_9.line = 37;
+    __e_acsl_assert(__gen_e_acsl_initialized_9,& __gen_e_acsl_assert_data_9);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
+  }
+  /*@ assert \initialized(&buf2[1 .. 4]); */ ;
+  {
+    int __gen_e_acsl_initialized_10;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
+      {.values = (void *)0};
+    __gen_e_acsl_initialized_10 = __e_acsl_initialized((void *)(& buf2[5]),
+                                                       sizeof(int));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,"&buf2[5]",
+                                 (void *)(& buf2[5]));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_10,
+                                   "sizeof(int)",0,sizeof(int));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,
+                                 "\\initialized(&buf2[5])",0,
+                                 __gen_e_acsl_initialized_10);
+    __gen_e_acsl_assert_data_10.blocking = 1;
+    __gen_e_acsl_assert_data_10.kind = "Assertion";
+    __gen_e_acsl_assert_data_10.pred_txt = "!\\initialized(&buf2[5])";
+    __gen_e_acsl_assert_data_10.file = "file.c";
+    __gen_e_acsl_assert_data_10.fct = "main";
+    __gen_e_acsl_assert_data_10.line = 38;
+    __e_acsl_assert(! __gen_e_acsl_initialized_10,
+                    & __gen_e_acsl_assert_data_10);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
+  }
+  /*@ assert !\initialized(&buf2[5]); */ ;
+  __gen_e_acsl_fclose(f);
+  __retres = 0;
+  __e_acsl_delete_block((void *)(buf2));
+  __e_acsl_delete_block((void *)(& f));
+  __e_acsl_delete_block((void *)(buf));
+  __e_acsl_globals_clean();
+  __e_acsl_memory_clean();
+  return __retres;
 }
 
 
