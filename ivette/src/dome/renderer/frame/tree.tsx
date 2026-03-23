@@ -158,14 +158,12 @@ export function Node(props: NodeProps): JSX.Element {
       heightSticky: context.heightSticky+height
     }}>
       <div>
-        <div ref={ref} className={className} style={style}
+        <div ref={ref} className={className} style={style} title={title}
           onClick={() => context.onClick ? context.onClick(id) : flipUnfold() }
         >
-            <div>
+            <div >
               { foldIconPosition === 'left' && foldIcon }
-              <Label icon={icon} title={title}
-                label={label}
-              ></Label>
+              <Label icon={icon} label={label} ></Label>
             </div>
             <Actions>
               { actions && actions }

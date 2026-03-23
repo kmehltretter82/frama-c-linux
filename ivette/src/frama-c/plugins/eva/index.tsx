@@ -20,7 +20,6 @@ import './EvaSidebar';
 import './Flamegraph';
 import './Mthread';
 import './style.css';
-import './Taint';
 
 // --------------------------------------------------------------------------
 // --- help

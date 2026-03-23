@@ -16,6 +16,11 @@ import * as Params from 'frama-c/kernel/api/parameters';
 import * as EvaDef from 'frama-c/plugins/eva/EvaDefinitions';
 import { EvaFormOptions } from 'frama-c/plugins/eva/components/Form';
 import EvaTools from './components/Tools';
+import { useStringSettings } from 'dome';
+import * as Toolbar from 'dome/frame/toolbars';
+import { SidebarTitle } from 'dome/frame/sidebars';
+import { TaintsSelection } from './Taint';
+import { CallstackSelection } from './Callstack';
 
 const startComputing = new GlobalState<number>(0);
 
@@ -258,9 +263,53 @@ export function EvaSideBar(): JSX.Element {
 }
 
 Ivette.registerSidebar({
-  id: 'frama-c.plugins.eva_sidebar',
+  id: 'frama-c.plugins.eva.sidebar.form',
   label: 'EVA',
   icon: 'APPLE',
   title: 'Eva',
-  children: <EvaSideBar />,
+  children: <EvaSideBarForm />,
+});
+
+export function EvaSideBarSelection(): React.JSX.Element {
+  const scrollableArea = React.useRef<HTMLDivElement>(null);
+
+  // Selection
+  const [selected, setSelected] = useStringSettings(
+    'eva.sidebar.selected', 'callstacks');
+
+  return (<>
+    <SidebarTitle label='Selection' >
+      <Toolbar.ButtonGroup>
+        <Toolbar.Button
+          key='taints'
+          label='Taints'
+          title='Show taints selection'
+          selected={selected === 'taints'}
+          onClick={() => setSelected('taints')}
+        /><Toolbar.Button
+          key='callstacks'
+          label='Callstacks'
+          title='Show callstacks selection'
+          selected={selected === 'callstacks'}
+          onClick={() => setSelected('callstacks')}
+        />
+      </Toolbar.ButtonGroup>
+    </SidebarTitle>
+    <div ref={scrollableArea} className="globals-scrollable-area">
+      <div style={selected === "taints" ? {} : { display: 'none' }}>
+        <TaintsSelection />
+      </div>
+      <div style={selected === "callstacks" ? {} : { display: 'none' }}>
+        <CallstackSelection />
+      </div>
+    </div>
+  </>);
+}
+
+Ivette.registerSidebar({
+  id: 'fc.plugins.eva.sidebar.selection',
+  label: 'Selection',
+  icon: 'APPLEMORE',
+  title: 'Eva selection',
+  children: <EvaSideBarSelection />
 });
