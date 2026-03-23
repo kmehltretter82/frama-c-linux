@@ -148,19 +148,16 @@ let loc_of_global_annotation = function
 let global_of_declaration decl =
   let global_type namespace name =
     try Globals.Types.global namespace name
-    with Not_found -> Kernel.fatal "Unknown type %a" pp_declaration decl
+    with Not_found -> Kernel.fatal "Unknown %a" pp_declaration decl
   in
   match decl with
   | SGlobal vi -> Ast.def_or_last_decl vi
   | SFunction kf -> Kernel_function.get_global kf
-  | SType ti -> global_type Logic_typing.Typedef ti.torig_name
+  | SType ti -> global_type Logic_typing.Typedef ti.tname
   | SComp ci ->
     let namespace = if ci.cstruct then Logic_typing.Struct else Union in
-    let name = if ci.corig_name <> "" then ci.corig_name else ci.cname in
-    global_type namespace name
-  | SEnum ei ->
-    let name = if ei.eorig_name <> "" then ei.eorig_name else ei.ename in
-    global_type Logic_typing.Enum name
+    global_type namespace ci.cname
+  | SEnum ei -> global_type Logic_typing.Enum ei.ename
   | SGAnnot ga -> GAnnot (ga, loc_of_global_annotation ga)
 
 let pp_global_annotation_decl fmt = function
