@@ -21,6 +21,7 @@ __PUSH_FC_STDLIB
 #include "__fc_define_mode_t.h"
 #include "__fc_define_nlink_t.h"
 #include "__fc_define_off_t.h"
+#include "__fc_define_timespec.h"
 
 #define __statfs_word unsigned int
 
@@ -50,9 +51,12 @@ struct stat {
   gid_t     st_gid;
   dev_t     st_rdev;
   off_t     st_size;
-  time_t    st_atime;
-  time_t    st_mtime;
-  time_t    st_ctime;
+  struct timespec    st_atim;
+#define st_atime st_atim.tv_sec
+  struct timespec    st_mtim;
+#define st_mtime st_mtim.tv_sec
+  struct timespec    st_ctim;
+#define st_ctime st_ctim.tv_sec
   blksize_t st_blksize;
   blkcnt_t  st_blocks;
 };
