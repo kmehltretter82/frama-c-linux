@@ -337,8 +337,17 @@ let spawn_thread analysis eva_thread stack func state params parent =
     result analysis "@[<hov>New thread: %a@]" ThreadState.pretty_detailed th;
     th
 
+let check_thread_analysis thread kf =
+  match Function_calls.analysis_target kf Kglobal with
+  | `Body _ -> ()
+  | `Builtin _ | `Spec _ ->
+    Mt_self.not_yet_implemented
+      "Using an ACSL specification or a builtin to interpret entry point %a \
+       of thread %a is not supported."
+      Kernel_function.pretty kf Thread.pretty thread
 
 let standalone_thread th kf initial_state =
+  check_thread_analysis th kf;
   let formals = Kernel_function.get_formals kf in
   let eval_arg vi =
     Results.(in_cvalue_state initial_state |> eval_var vi |> as_cvalue)

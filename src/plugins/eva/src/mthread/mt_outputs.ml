@@ -726,7 +726,7 @@ module Html = struct
   ;;
 
   let output_threads analysis =
-    let th_list = List.filter should_compute_thread (threads analysis) in
+    let th_list = threads analysis in
     let page_table, add_page, find_page =
       let module PageTable = Thread.Hashtbl in
       let page_table =

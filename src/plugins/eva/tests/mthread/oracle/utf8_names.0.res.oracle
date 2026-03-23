@@ -23,6 +23,7 @@
     shared bases: {}
     interferences by location:
     interferences by mutexes:
+[mt] *** Thread <main> computed
 [mt] ******* Starting to iterate
 [mt] ***** Iteration 1
 [mt] *** Computing thread job / "𐍅" f1, iteration 1 (first iteration)

@@ -65,7 +65,11 @@ let protect f ~cleanup =
   in
   try f ();
   with
-  | Self.Abort | Log.(AbortError _ | AbortFatal _ | FeatureRequest _) as e ->
-    cleanup (); raise e
-  | Sys.Break as e when !protect_only_once ->
-    cleanup (); raise e
+  | Self.Abort | Log.(AbortError _ | AbortFatal _ | FeatureRequest _) as exn ->
+    let backtrace = Printexc.get_raw_backtrace () in
+    cleanup ();
+    Printexc.raise_with_backtrace exn backtrace
+  | Sys.Break as exn when !protect_only_once ->
+    let backtrace = Printexc.get_raw_backtrace () in
+    cleanup ();
+    Printexc.raise_with_backtrace exn backtrace

@@ -43,9 +43,6 @@ module ModerateWarnings: Parameter_sig.Bool
 (** behavior of option -mt-print-callstacks. *)
 module PrintCallstacks: Parameter_sig.Bool
 
-(** behavior of option -mt-time. *)
-module ShowTime: Parameter_sig.Bool
-
 (** behavior of option -mt-skip-threads. *)
 module SkipThreads: Parameter_sig.String_set
 

@@ -109,7 +109,10 @@ module ThreadState : sig
 
   val recompute_because: t -> recompute_reason -> unit
 
-  val needs_recomputation: t -> bool
+  (** Does a thread need to be recomputed? If not and if [feedback] is true,
+      prints a debug or feedback message explaining why the thread should not
+      be recomputed. *)
+  val needs_recomputation: ?feedback:bool -> t -> bool
 end
 
 
@@ -178,8 +181,6 @@ val register_multiple_events:
 val push_function_call: analysis_state -> unit
 val pop_function_call: analysis_state -> unit
 
-
-val should_compute_thread: thread_state -> bool
 
 val pretty_recompute_reasons: analysis_state Pretty_utils.formatter
 

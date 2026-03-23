@@ -126,8 +126,23 @@ module ThreadState = struct
     then
       th.th_to_recompute <- SetRecomputeReason.add r th.th_to_recompute
 
-  let needs_recomputation th =
-    not (SetRecomputeReason.is_empty th.th_to_recompute)
+  type recompute_status = NoNeed | NotStarted | Recompute
+
+  let get_recompute_status th =
+    if SetRecomputeReason.is_empty th.th_to_recompute then NoNeed
+    else if not (Cvalue.Model.is_reachable th.th_init_state) then NotStarted
+    else Recompute
+
+  let recompute_feedback = function
+    | NoNeed -> Mt_self.debug "No need to recompute thread %a"
+    | NotStarted ->
+      Mt_self.feedback "*** Thread %a has been created but not started. Skipping."
+    | Recompute -> fun _ _ -> ()
+
+  let needs_recomputation ?(feedback=false) th =
+    let status = get_recompute_status th in
+    if feedback then recompute_feedback status pretty th;
+    status = Recompute
 end
 
 
@@ -183,6 +198,14 @@ type analysis_state = {
    compute the field [precise_concurrent_accesses] *);
 }
 
+let is_thread_name_enabled name =
+  not (Mt_options.SkipThreads.mem name)
+  && Mt_options.OnlyThreads.(is_empty () || mem name)
+
+let is_thread_enabled th =
+  Thread.is_main th.th_eva_thread
+  || is_thread_name_enabled (ThreadState.label th)
+
 (* Iterators on threads. We presave the current list of threads so that
    the iterators do not accidentally capture new added threads. (This is not
    important for correctness, but is slightly cleaner.). Threads are sorted,
@@ -190,9 +213,8 @@ type analysis_state = {
 let threads analysis =
   (* the main thread always has the least id and will always be in front of the
      list *)
-  Thread.Hashtbl.fold_sorted
-    (fun _ th l -> th :: l)
-    analysis.all_threads []
+  Thread.Hashtbl.fold_sorted (fun _ th l -> th :: l) analysis.all_threads []
+  |> List.filter is_thread_enabled
   |> List.rev
 
 let thread_state analysis th =
@@ -328,15 +350,6 @@ module OrderedThreads = struct
     in do_thread_id_list acc [Thread.main]
   ;;
 end
-
-
-let should_compute_thread th =
-  (Thread.is_main th.th_eva_thread) ||
-  (let name = ThreadState.label th in
-   (not (Datatype.String.Set.mem name (Mt_options.SkipThreads.get ()))) &&
-   let only = Mt_options.OnlyThreads.get () in
-   Datatype.String.Set.is_empty only || Datatype.String.Set.mem name only
-  )
 
 let pretty_recompute_reasons fmt analysis =
   let pretty_thread_reasons fmt th =

@@ -130,14 +130,6 @@ module PrintCallstacks  =
   end)
 
 let () = Parameter_customize.set_group grp_debug
-module ShowTime =
-  False (struct
-    let option_name = "-mt-time"
-    let help = "Show time taken by thread computation"
-  end)
-;;
-
-let () = Parameter_customize.set_group grp_debug
 module SkipThreads =
   String_set
     (struct
@@ -228,4 +220,3 @@ module ShowReturnEdges =
     let help = "Show link between a call an a return instruction as a dotted line"
   end)
 ;;
-

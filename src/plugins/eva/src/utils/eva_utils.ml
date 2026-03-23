@@ -142,14 +142,3 @@ let skip_specifications kf =
   Parameters.SkipLibcSpecs.get () &&
   Kernel_function.is_definition kf &&
   Cil.is_in_libc (Kernel_function.get_vi kf).vattr
-
-
-let measure_time f arg =
-  if Cmdline.deterministic
-  then f arg, 0.0
-  else
-    let t1 = Unix.times () in
-    let r = f arg in
-    let t2 = Unix.times () in
-    let d = t2.tms_utime -. t1.tms_utime in
-    r, d

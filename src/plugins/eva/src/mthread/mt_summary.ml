@@ -282,8 +282,7 @@ module ThreadTable =
 
 let compute_threads_summary analysis =
   ThreadTable.clear ();
-  let all_threads = Mt_thread.threads analysis in
-  let threads = List.filter Mt_thread.should_compute_thread all_threads in
+  let threads = Mt_thread.threads analysis in
   List.iter
     (fun thread ->
        let thread_summary = compute_thread_summary thread in

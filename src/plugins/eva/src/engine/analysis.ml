@@ -183,18 +183,8 @@ let compute_from_entry_point  (type t) (engine: t engine)
 
 (* Mthread entry point *)
 
-let check_thread_analysis thread kf =
-  match Function_calls.analysis_target kf Kglobal with
-  | `Body _ -> ()
-  | `Builtin _ | `Spec _ ->
-    Mt_self.not_yet_implemented
-      "Using an ACSL specification or a builtin to interpret entry point %a \
-       of thread %a is not supported."
-      Kernel_function.pretty kf Thread.pretty thread
-
 let compute_thread (type t) (engine: t engine) ?cvalue_state thread =
   let Thread.{ entry_point; arguments } = Thread.properties thread in
-  check_thread_analysis thread entry_point;
   let arguments =
     if Thread.is_main thread
     then None (* use generated main arguments *)
@@ -206,50 +196,22 @@ let compute_thread (type t) (engine: t engine) ?cvalue_state thread =
     ~thread ?cvalue_state ?arguments entry_point
 
 let thread_analysis engine analysis final_states th =
-  let open Mt_thread in
-  if SetRecomputeReason.is_empty th.th_to_recompute then
-    Mt_self.debug "No need to recompute thread %a" ThreadState.pretty th
-  else if not (Mt_thread.should_compute_thread th) then
-    Mt_self.feedback "*** Skipping thread %a as requested"
-      ThreadState.pretty th
-  else if not (Cvalue.Model.is_reachable th.th_init_state) then
-    Mt_self.feedback "@[<hov 2>*** Thread %a has been@ created but@ \
-                      not started. Skipping.@]"  ThreadState.pretty th
-  else begin
-    Mt_self.feedback
-      "@[<hov 2>*** Computing thread %a,@ iteration %d@ (%a)@]"
-      ThreadState.pretty th analysis.iteration
-      SetRecomputeReason.pretty th.th_to_recompute;
-
+  if Mt_thread.ThreadState.needs_recomputation ~feedback:true th then begin
     Mt_analysis_fixpoint.pre_thread_analysis analysis th;
-
-    let final_state, analysis_time = Eva_utils.measure_time
-        (compute_thread engine ~cvalue_state:th.th_init_state) th.th_eva_thread
-    in
-
+    let cvalue_state = th.th_init_state in
+    let final_state = compute_thread engine ~cvalue_state th.th_eva_thread in
     (* Store the thread analysis final state. *)
     Thread.Hashtbl.replace final_states th.th_eva_thread final_state;
-
-    if Mt_options.ShowTime.get () then
-      Mt_self.feedback ~level:2
-        "* Value analysis computed for thread %a, %f sec"
-        ThreadState.pretty th analysis_time;
-
     (* We save all our results *)
     Mt_analysis_fixpoint.post_thread_analysis analysis;
-
-    Mt_self.feedback "*** Thread %a computed" ThreadState.pretty th;
   end;
-  th.th_to_recompute <- SetRecomputeReason.empty
+  th.th_to_recompute <- Mt_thread.SetRecomputeReason.empty
 
 (* Auxiliary function iterating the analysis until the fixpoint is reached *)
 let mthread_fixpoint engine analysis =
   (* Store thread analyse final result of each thread in a Hashtbl. For now,
      only the result of the main thread is used. *)
   let final_states = Thread.Hashtbl.create 1 in
-
-  (* Let Eva know about interrupt handlers. *)
-  Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
 
   (* We analyse the main thread *)
   Mt_self.feedback "*** Computing value analysis for main thread";
@@ -275,57 +237,37 @@ let mthread_fixpoint engine analysis =
     Mt_analysis_fixpoint.post_iteration analysis
   done;
 
-  if not (Mt_thread.needs_recomputation analysis) then
-    Mt_self.feedback "******* Analysis performed, %d iterations"
-      analysis.iteration
-  else
-    Mt_self.feedback
-      "@[<v>******* Analysis stopped after %d iterations.@ %a@]"
-      analysis.iteration
-      Mt_thread.pretty_recompute_reasons analysis;
-
   (* Return the main thread final state. *)
   Thread.Hashtbl.find final_states Thread.main
 
 (* Perform an entire mthread execution on the current project *)
 let compute_from ?cvalue_state ?arguments entry_point =
-  let mt_enabled = Mt_options.Enabled.get () in
-
-  (* Build the mthread analysis state even when mthread is disabled *)
-  let analysis = Mt_main.make_analysis_state () in
-
-  if mt_enabled then begin
-    Mt_main.pre_analysis ();
-    Mt_self.feedback "******* Starting mthread";
-    Mt_main.register_hooks analysis;
-  end;
-  Fun.protect ~finally:Mt_main.unregister_hooks @@ fun () ->
-
-  (* Prepare the analysis and build the engine. *)
-  let module Engine = (val pre_analysis ()) in
-
   (* Setup signals *)
   let restore_signals = Signal.setup () in
   Fun.protect ~finally:restore_signals @@ fun () ->
-
+  (* Mthread pre-analysis: returns an analysis state if requested. *)
+  let mt_analysis = Mt_main.pre_analysis () in
+  (* Prepare the analysis and build the engine. *)
+  let module Engine = (val pre_analysis ()) in
   try
     Self.ComputationState.set Computing;
     (* Run the analysis. *)
     let final_state =
-      if mt_enabled
-      then mthread_fixpoint (module Engine) analysis
-      else compute_from_entry_point (module Engine)
+      match mt_analysis with
+      | Some analysis -> mthread_fixpoint (module Engine) analysis
+      | None ->
+        compute_from_entry_point (module Engine)
           ?cvalue_state ?arguments entry_point
     in
     Self.(ComputationState.set Computed);
     post_analysis (module Engine) final_state;
-    if mt_enabled then
-      Mt_main.post_analysis analysis
+    Option.iter Mt_main.post_analysis mt_analysis
   with exn ->
+    let backtrace = Printexc.get_raw_backtrace () in
     Self.(ComputationState.set Aborted);
     match exn with
     | Error | Self.Abort -> () (* do not re-raise  *)
-    | exn -> raise exn
+    | exn -> Printexc.raise_with_backtrace exn backtrace
 
 let compute () =
   (* Nothing to recompute when Eva has already been computed. This boolean
