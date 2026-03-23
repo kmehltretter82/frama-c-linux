@@ -635,7 +635,7 @@ function createTaintTooltip(): Editor.Extension {
 
 // Server request handler returning the given function's text.
 function useAST(decl: Ast.decl | undefined): text {
-  return States.useRequestValue(Ast.printDeclaration, decl || undefined);
+  return States.useRequestStable(Ast.printDeclaration, decl || undefined);
 }
 
 // Server request handler returning the given function's callers.
@@ -650,12 +650,12 @@ function useCallees(marker: Marker): Ast.decl[] {
 
 // Server request handler returning the tainted lvalues.
 function useTaints(decl: Decl): EvaTaint.LvalueTaints[] {
-  return States.useRequestValue(EvaTaint.taintedLvalues, decl || undefined);
+  return States.useRequestStable(EvaTaint.taintedLvalues, decl || undefined);
 }
 
 // Server request handler returning the given function's dead code information.
 function useDead(decl: Decl): EvaAst.deadCode {
-  return States.useRequestValue(EvaAst.getDeadCode, decl || undefined)
+  return States.useRequestStable(EvaAst.getDeadCode, decl || undefined)
     ?? emptyDeadCode;
 }
 

@@ -339,7 +339,7 @@ export function useFunctionFilter(): FunctionFilterRet {
     };
   }, [multipleSelection]);
 
-  const filters = States.useRequestValue(Ast.getFunctionsFilters, null);
+  const filters = States.useRequestStable(Ast.getFunctionsFilters, null);
   const [localFilters, setLocalFilters] = useFilterLocal(filters, 'functions');
   const selectedState = useFiltersFlipSettings('selected', 'functions', false);
   const [selected, ] = selectedState;
@@ -444,7 +444,7 @@ interface VariablesFilterRet {
 }
 
 export function useVariableFilter(): VariablesFilterRet {
-  const filters = States.useRequestValue(Ast.getVariablesFilters, null);
+  const filters = States.useRequestStable(Ast.getVariablesFilters, null);
   const [localFilters, setLocalFilters] = useFilterLocal(filters, 'variables');
 
   const showVariable = React.useMemo(() => {
