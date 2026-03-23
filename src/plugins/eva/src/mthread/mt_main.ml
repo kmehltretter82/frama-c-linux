@@ -60,6 +60,10 @@ let register_no_hooks () =
   in
   List.iter register Mt_analysis_hooks.mthread_builtins
 
+(** Registers Mthread builtins so that they appear in the builtins list,
+    even if Mthread has not been enabled yet. *)
+let () = register_no_hooks ()
+
 
 let check_options () =
   if not (Mt_options.ConcatDotFilesTo.is_empty ()) &&
