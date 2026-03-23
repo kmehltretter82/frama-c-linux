@@ -252,34 +252,26 @@ let mthread_fixpoint engine analysis =
 
 (* Perform an entire mthread execution on the current project *)
 let compute_from ?cvalue_state ?arguments entry_point =
-  let mt_enabled = Mt_options.Enabled.get () in
-
-  (* Build the mthread analysis state even when mthread is disabled *)
-  let analysis = Mt_main.make_analysis_state () in
-
-  if mt_enabled then Mt_main.pre_analysis analysis;
-  Fun.protect ~finally:Mt_main.unregister_hooks @@ fun () ->
-
-  (* Prepare the analysis and build the engine. *)
-  let module Engine = (val pre_analysis ()) in
-
   (* Setup signals *)
   let restore_signals = Signal.setup () in
   Fun.protect ~finally:restore_signals @@ fun () ->
-
+  (* Mthread pre-analysis: returns an analysis state if requested. *)
+  let mt_analysis = Mt_main.pre_analysis () in
+  (* Prepare the analysis and build the engine. *)
+  let module Engine = (val pre_analysis ()) in
   try
     Self.ComputationState.set Computing;
     (* Run the analysis. *)
     let final_state =
-      if mt_enabled
-      then mthread_fixpoint (module Engine) analysis
-      else compute_from_entry_point (module Engine)
+      match mt_analysis with
+      | Some analysis -> mthread_fixpoint (module Engine) analysis
+      | None ->
+        compute_from_entry_point (module Engine)
           ?cvalue_state ?arguments entry_point
     in
     Self.(ComputationState.set Computed);
     post_analysis (module Engine) final_state;
-    if mt_enabled then
-      Mt_main.post_analysis analysis
+    Option.iter Mt_main.post_analysis mt_analysis
   with exn ->
     Self.(ComputationState.set Aborted);
     match exn with

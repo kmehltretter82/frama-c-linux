@@ -39,42 +39,34 @@ let wrap_builtin analysis builtin = fun state args ->
     }
 
 let register_hooks analysis =
-  ref_hook_call_function :=
-    Mt_analysis_hooks.catch_functions_calls analysis;
-  ref_hook_end_function :=
-    Mt_analysis_hooks.catch_functions_record analysis;
+  ref_hook_call_function := Mt_analysis_hooks.catch_functions_calls analysis;
+  ref_hook_end_function := Mt_analysis_hooks.catch_functions_record analysis;
   let register (name, builtin) =
     wrap_builtin analysis builtin
     |> Builtins.register_builtin name NoCacheCallers
   in
   List.iter register Mt_analysis_hooks.mthread_builtins
 
-let unregister_hooks () =
+let register_no_hooks () =
   ref_hook_call_function := no_hook;
   ref_hook_end_function := no_hook;
-  let unregister (name, _builtin) =
-    Builtins.unregister_builtin name
+  let register (name, _builtin) =
+    let builtin _state _args =
+      Mt_self.abort
+        "Builtin %s requires -mthread parameter \
+         for the analysis of concurrent programs." name
+    in
+    Builtins.register_builtin name NoCacheCallers builtin
   in
-  List.iter unregister Mt_analysis_hooks.mthread_builtins
+  List.iter register Mt_analysis_hooks.mthread_builtins
 
 
-let pre_analysis analysis =
-  Mt_self.warning
-    "Mthread is an experimental plugin and is still in development.";
-
-  Mt_lib.check_mthread_library ();
-
+let check_options () =
   if not (Mt_options.ConcatDotFilesTo.is_empty ()) &&
      not (Mt_options.ExtractModels.mem "html") then
     Mt_self.error "Option %S needs option \"%s html\" to work."
       Mt_options.ConcatDotFilesTo.option_name
-      Mt_options.ExtractModels.option_name;
-
-  Mt_self.feedback "******* Starting mthread";
-  register_hooks analysis;
-
-  (* Let Eva know about interrupt handlers. *)
-  Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ())
+      Mt_options.ExtractModels.option_name
 
 let make_analysis_state () =
   (* We create the record containing the state of the analysis (which must
@@ -86,7 +78,7 @@ let make_analysis_state () =
   let f_main = fst @@ Globals.entry_point () in
   let dummy_main_thread =
     Mt_analysis_hooks.main_thread f_main Cvalue.Model.empty_map in
-  let analysis = {
+  {
     all_threads = Thread.Hashtbl.create 17;
     all_mutexes = Mutex.Set.empty;
     all_queues = Mqueue.Set.empty;
@@ -99,9 +91,26 @@ let make_analysis_state () =
     concurrent_accesses = Locations.Zone.bottom;
     precise_concurrent_accesses = Locations.Zone.bottom;
     concurrent_accesses_by_nodes = [];
-  } in
+  }
 
-  analysis
+let pre_analysis () =
+  if Mt_options.Enabled.get ()
+  then begin
+    Mt_self.warning
+      "Mthread is an experimental plugin and is still in development.";
+    Mt_lib.check_mthread_library ();
+    check_options ();
+    let analysis = make_analysis_state () in
+    register_hooks analysis;
+    (* Let Eva know about interrupt handlers. *)
+    Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
+    Mt_self.feedback "******* Starting mthread";
+    Some analysis
+  end else begin
+    register_no_hooks ();
+    None
+  end
+
 
 let post_analysis analysis =
   if not (Mt_thread.needs_recomputation analysis) then
