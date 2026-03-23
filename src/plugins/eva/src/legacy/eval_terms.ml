@@ -1755,9 +1755,9 @@ and eval_toffset ~alarm_mode env typ toffset =
       in
       let offset = match size_e with
         | `Top -> Ival.bottom
-        (* [Ival.scale] would overapproximate when given a Float.
-           Should never happen. *)
         | `Value f ->
+          (* [Ival.scale] is exact (and so can be used for under-approximation),
+             except on floating-point values, which should never happen. *)
           assert (Ival.is_int offset);
           Ival.scale f offset
       in
