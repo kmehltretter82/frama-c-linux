@@ -263,10 +263,11 @@ let compute_from ?cvalue_state ?arguments entry_point =
     post_analysis (module Engine) final_state;
     Option.iter Mt_main.post_analysis mt_analysis
   with exn ->
+    let backtrace = Printexc.get_raw_backtrace () in
     Self.(ComputationState.set Aborted);
     match exn with
     | Error | Self.Abort -> () (* do not re-raise  *)
-    | exn -> raise exn
+    | exn -> Printexc.raise_with_backtrace exn backtrace
 
 let compute () =
   (* Nothing to recompute when Eva has already been computed. This boolean
