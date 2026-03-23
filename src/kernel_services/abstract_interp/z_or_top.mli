@@ -18,5 +18,6 @@ val of_int: int -> t
 val is_zero: t -> bool
 val is_top: t -> bool
 
+val inject: Z.t -> t
 val project: t -> Z.t
 (** @raise Error_Top if the argument is {!Top}. *)
