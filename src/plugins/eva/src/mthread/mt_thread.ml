@@ -198,13 +198,13 @@ type analysis_state = {
    compute the field [precise_concurrent_accesses] *);
 }
 
-let skips_thread th =
-  let name = ThreadState.label th in
-  Mt_options.SkipThreads.mem name
-  || not Mt_options.OnlyThreads.(is_empty () || mem name)
+let is_thread_name_enabled name =
+  not (Mt_options.SkipThreads.mem name)
+  && Mt_options.OnlyThreads.(is_empty () || mem name)
 
-let should_compute_thread th =
-  Thread.is_main th.th_eva_thread || not (skips_thread th)
+let is_thread_enabled th =
+  Thread.is_main th.th_eva_thread
+  || is_thread_name_enabled (ThreadState.label th)
 
 (* Iterators on threads. We presave the current list of threads so that
    the iterators do not accidentally capture new added threads. (This is not
@@ -214,7 +214,7 @@ let threads analysis =
   (* the main thread always has the least id and will always be in front of the
      list *)
   Thread.Hashtbl.fold_sorted (fun _ th l -> th :: l) analysis.all_threads []
-  |> List.filter should_compute_thread
+  |> List.filter is_thread_enabled
   |> List.rev
 
 let thread_state analysis th =
