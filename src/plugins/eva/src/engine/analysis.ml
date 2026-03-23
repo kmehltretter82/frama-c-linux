@@ -183,18 +183,8 @@ let compute_from_entry_point  (type t) (engine: t engine)
 
 (* Mthread entry point *)
 
-let check_thread_analysis thread kf =
-  match Function_calls.analysis_target kf Kglobal with
-  | `Body _ -> ()
-  | `Builtin _ | `Spec _ ->
-    Mt_self.not_yet_implemented
-      "Using an ACSL specification or a builtin to interpret entry point %a \
-       of thread %a is not supported."
-      Kernel_function.pretty kf Thread.pretty thread
-
 let compute_thread (type t) (engine: t engine) ?cvalue_state thread =
   let Thread.{ entry_point; arguments } = Thread.properties thread in
-  check_thread_analysis thread entry_point;
   let arguments =
     if Thread.is_main thread
     then None (* use generated main arguments *)
