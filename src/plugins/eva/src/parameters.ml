@@ -989,7 +989,7 @@ module RmAssert =
 let () = add_precision_dep RmAssert.parameter
 
 let () = Parameter_customize.set_group precision_tuning
-module MemExecAll =
+module Memexec =
   True
     (struct
       let option_name = "-eva-memexec"
@@ -1353,7 +1353,7 @@ let deprecated_aliases : ((module Parameter_sig.S) * string) list =
   ; (module UseSpec), "-val-use-spec"
   ; (module SkipLibcSpecs), "-val-skip-stdlib-specs"
   ; (module RmAssert), "-remove-redundant-alarms"
-  ; (module MemExecAll), "-memexec-all"
+  ; (module Memexec), "-memexec-all"
   ; (module ArrayPrecisionLevel), "-plevel"
   ; (module ValShowProgress), "-val-show-progress"
   ; (module ValShowPerf), "-val-show-perf"

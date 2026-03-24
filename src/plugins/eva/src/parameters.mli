@@ -125,7 +125,7 @@ module PrintCallstacks: Parameter_sig.Bool
 module ReportRedStatuses: Parameter_sig.Filepath
 module StatisticsFile: Parameter_sig.Filepath
 
-module MemExecAll: Parameter_sig.Bool
+module Memexec: Parameter_sig.Bool
 
 
 module InterpreterMode: Parameter_sig.Bool

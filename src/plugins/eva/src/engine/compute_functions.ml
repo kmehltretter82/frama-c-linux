@@ -195,7 +195,7 @@ module Make (Engine: Engine_sig.S) = struct
     | `Spec _ as spec -> compute_using_spec_or_body spec call state
     | `Body _ as def ->
       let compute = compute_using_spec_or_body def in
-      if Parameters.MemExecAll.get ()
+      if Parameters.Memexec.get ()
       then compute_and_cache_call compute call state
       else compute call state
 
