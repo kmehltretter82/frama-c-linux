@@ -6,13 +6,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type i = Z_or_top.t
+include Lattice_bounds.Top.Make_Datatype (Z)
 
-include Z_or_top
+let top = `Top
+let of_int i = `Value (Z.of_int i)
 
-let zero = `Value Z.zero
-let one = `Value Z.one
-let minus_one = `Value Z.minus_one
-let neg = Lattice_bounds.Top.map Z.neg
-let inject z = `Value z
-let cardinal_zero_or_one z = not (is_top z)
+let is_zero = equal (`Value Z.zero)
+let is_top = Lattice_bounds.Top.is_top
+
+let inject i = `Value i
+let project = function
+  | `Top -> raise Abstract_interp.Error_Top
+  | `Value i -> i

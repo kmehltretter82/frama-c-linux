@@ -124,7 +124,7 @@ let copy_one_loc state left_lv right_lv =
   and right_lval, right_loc = right_lv in
   (* top size is tested before this function is called, in which case
      the imprecise copy mode is used. *)
-  let size = Int_Base.project right_loc.Locations.size in
+  let size = Z_or_top.project right_loc.Locations.size in
   let right_loc = right_loc.Locations.loc in
   let offsetmap = Cvalue.Model.copy_offsetmap right_loc size state in
   let make_volatile =
@@ -158,7 +158,7 @@ let copy_right_lval state left_lv right_lv copied_value =
      This cannot be done by copies, but require a conversion *)
   let right_size = Main_locations.PLoc.size right_lv.lloc
   and left_size = Main_locations.PLoc.size loc in
-  if not (Int_Base.equal left_size right_size) || Int_Base.is_top right_size
+  if not (Z_or_top.equal left_size right_size) || Z_or_top.is_top right_size
   then
     fun loc -> write_abstract_value state (lval, loc) copied_value
   else

@@ -21,7 +21,7 @@ let offsetmap_of_loc location state =
   let aux (loc: Locations.location) offsm_res =
     (* If the size is unknown, returns the complete offsetmap. *)
     let size =
-      try Int_Base.project loc.size
+      try Z_or_top.project loc.size
       with Abstract_interp.Error_Top -> Bit_utils.max_bit_size ()
     in
     let copy = Cvalue.Model.copy_offsetmap loc.loc size state in
@@ -32,8 +32,8 @@ let offsetmap_of_loc location state =
 let v_uninit_of_offsetmap ~typ offsm =
   let size = Eval_typ.sizeof_lval_typ typ in
   match size with
-  | Int_Base.Top -> V_Offsetmap.find_imprecise_everywhere offsm
-  | Int_Base.Value size ->
+  | `Top -> V_Offsetmap.find_imprecise_everywhere offsm
+  | `Value size ->
     let validity = Base.validity_from_size size in
     let offsets = Ival.zero in
     V_Offsetmap.find ~validity ~conflate_bottom:false ~offsets ~size offsm
@@ -73,7 +73,7 @@ let reduce_by_initialized_defined f loc state =
       Locations.Location_Bits.find_lonely_key loc.Locations.loc
     in
     if Base.is_weak base then raise Unchanged;
-    let size = Int_Base.project loc.Locations.size in
+    let size = Z_or_top.project loc.Locations.size in
     let ll = Ival.project_int offset in
     let lh = Z.pred (Z.add ll size) in
     let offsm = match Model.find_base_or_default base state with
@@ -111,7 +111,7 @@ let reduce_by_initialized_defined f loc state =
   with
   | Reduce_to_bottom -> Model.bottom
   | Unchanged -> state
-  | Abstract_interp.Error_Top (* from Int_Base.project *)
+  | Abstract_interp.Error_Top (* from Z_or_top.project *)
   | Not_found (* from find_lonely_key *)
   | Ival.Not_Singleton_Int (* from Ival.project_int *) ->
     state
@@ -150,18 +150,18 @@ let make_loc_contiguous loc =
     else
       let min, max, _rem, modu = Ival.min_max_r_mod offset in
       match min, max, loc.Locations.size with
-      | Some min, Some max, Int_Base.Value size when Z.equal modu size ->
+      | Some min, Some max, `Value size when Z.equal modu size ->
         let size' = Z.add (Z.sub max min) modu in
         let i = Ival.inject_singleton min in
         let loc_bits = Locations.Location_Bits.inject base i in
-        Locations.make_loc loc_bits (Int_Base.inject size')
+        Locations.make_loc loc_bits (`Value size')
       | _ -> loc
   with Not_found -> loc
 
 let apply_on_all_locs f loc state =
   match loc.Locations.size with
-  | Int_Base.Top -> state
-  | Int_Base.Value _ as size ->
+  | `Top -> state
+  | `Value _ as size ->
     let loc = Locations.valid_part Locations.Read loc in
     let plevel = Parameters.ArrayPrecisionLevel.get () in
     let ilevel = Int_set.get_small_cardinal () in
@@ -235,8 +235,8 @@ exception CannotComputeUnder
 
 let find_lmap_under state location =
   match location.Locations.size with
-  | Int_Base.Top -> raise CannotComputeUnder
-  | Int_Base.Value size ->
+  | `Top -> raise CannotComputeUnder
+  | `Value size ->
     match location.Locations.loc with
     | Locations.Location_Bits.Top _ -> raise CannotComputeUnder
     | Locations.Location_Bits.Map map ->

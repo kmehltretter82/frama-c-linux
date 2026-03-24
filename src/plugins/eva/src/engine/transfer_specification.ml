@@ -169,7 +169,7 @@ let precise_loc_of_assign env kind term =
       | Free | Allocate ->
         let result = Eval_terms.eval_term ~alarm_mode env term in
         let loc_bits = Locations.loc_bytes_to_loc_bits result.eover in
-        Locations.make_loc loc_bits Int_Base.top
+        Locations.make_loc loc_bits Z_or_top.top
     in
     if kind <> From then reduce_to_valid_location kind term loc else Some loc
   with Eval_terms.LogicEvalError e ->
@@ -341,8 +341,8 @@ module Make (Engine: Engine_Subset) = struct
       let precise_loc = Option.map get_ploc location in
       let loc = Option.map Precise_locs.imprecise_location precise_loc in
       match loc with
-      | None | Some Locations.{ size = Top } -> ()
-      | Some Locations.{ loc; size = Value size } ->
+      | None | Some Locations.{ size = `Top } -> ()
+      | Some Locations.{ loc; size = `Value size } ->
         let offsm = Cvalue.Model.copy_offsetmap loc size cvalue_state in
         let warn v =
           match Cvalue.V_Or_Uninitialized.get_v v with

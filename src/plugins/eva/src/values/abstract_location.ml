@@ -31,7 +31,7 @@ module type S = sig
   val pretty_offset : Format.formatter -> offset -> unit
 
   val to_value : location -> value or_bottom
-  val size : location -> Int_Base.t
+  val size : location -> Z_or_top.t
 
   (** Given an access type and a location, return the zone corresponding to the
       valid bits of the location. *)

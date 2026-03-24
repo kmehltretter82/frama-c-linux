@@ -156,7 +156,7 @@ val max_valid_absolute_address: unit -> Z.t
 val typeof : t -> Cil_types.typ option
 
 (** Size in bits of the base. *)
-val bits_sizeof : t -> Int_Base.t
+val bits_sizeof : t -> Z_or_top.t
 
 (** Minimum alignment (in bytes) of the base: the address of a variable
     represented by base [b] is known to be a multiple of [alignof b]. Returns 1

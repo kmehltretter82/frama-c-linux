@@ -10,7 +10,7 @@ open Cil_types
 
 (** Functions related to type conversions *)
 
-val sizeof_lval_typ: typ -> Int_Base.t
+val sizeof_lval_typ: typ -> Z_or_top.t
 (** Size of the type of a lval, taking into account that the lval might have
     been a bitfield. *)
 

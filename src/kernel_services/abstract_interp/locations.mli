@@ -83,7 +83,7 @@ module Location_Bytes : sig
   val shift_under : Ival.t -> t -> t
   (** Over- and under-approximation of shifting the value by the given Ival. *)
 
-  val sub_pointwise: ?factor:Int_Base.t -> t -> t -> Ival.t
+  val sub_pointwise: ?factor:Z.t -> t -> t -> Ival.t
   (** Subtracts the offsets of two locations [loc1] and [loc2].
       Returns the pointwise subtraction of their offsets
       [off1 - factor * off2]. [factor] defaults to [1]. *)
@@ -304,7 +304,7 @@ end
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 type location = private {
   loc : Location_Bits.t;
-  size : Int_Base.t;
+  size : Z_or_top.t;
 }
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
@@ -314,17 +314,17 @@ val loc_top : location
 val loc_bottom : location
 val is_bottom_loc: location -> bool
 
-val make_loc : Location_Bits.t -> Int_Base.t -> location
+val make_loc : Location_Bits.t -> Z_or_top.t -> location
 
 val loc_equal : location -> location -> bool
-val loc_size : location -> Int_Base.t
+val loc_size : location -> Z_or_top.t
 
 (** Kind of memory access. *)
 type access = Read | Write | Object_pointer | Any_pointer
 
 (** Conversion into a base access, with the size information.
     Accesses of unknown sizes are converted into empty accesses.  *)
-val base_access: size:Int_Base.t -> access -> Base.access
+val base_access: size:Z_or_top.t -> access -> Base.access
 
 val is_valid : access -> location -> bool
 (** Is the given location entirely valid, without any access or as a destination

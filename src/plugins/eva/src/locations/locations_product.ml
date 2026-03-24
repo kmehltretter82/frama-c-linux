@@ -36,9 +36,9 @@ module Make
   (* TODO: don't know what to do, used max by default *)
   let size (l, r) =
     match Left.size l, Right.size r with
-    | Int_Base.Top, size
-    | size, Int_Base.Top -> size
-    | Int_Base.Value lsize as size, Int_Base.Value rsize ->
+    | `Top, size
+    | size, `Top -> size
+    | `Value lsize as size, `Value rsize ->
       if Z.equal lsize rsize then size else
         Self.fatal
           "Location product: inconsistent size of the same location \

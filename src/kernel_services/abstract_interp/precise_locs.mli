@@ -57,10 +57,10 @@ type precise_location
 
 val equal_loc: precise_location -> precise_location -> bool
 
-val loc_size: precise_location -> Int_Base.t
+val loc_size: precise_location -> Z_or_top.t
 
 val make_precise_loc :
-  precise_location_bits -> size:Int_Base.t -> precise_location
+  precise_location_bits -> size:Z_or_top.t -> precise_location
 
 val imprecise_location : precise_location -> Locations.location
 

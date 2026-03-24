@@ -759,9 +759,9 @@ include (
     end):
     Datatype.S_with_collections with type t := t)
 
-let scale_int_base factor v = match factor with
-  | Int_Base.Top -> top
-  | Int_Base.Value f -> scale f v
+let scale_or_top factor v = match factor with
+  | `Top -> top
+  | `Value f -> scale f v
 
 let cast_float_to_int_non_nan ~signed ~size (min, max) =
   let all = create_all_values ~size ~signed in

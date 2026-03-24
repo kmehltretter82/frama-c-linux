@@ -27,7 +27,7 @@
 [eva:progress] Done for function setup1
 [eva:progress] builtins_split.c:22: Call to builtin Frama_C_builtin_split
 [eva] builtins_split.c:22: 
-  Location *p is not a singleton ({{ x -> {0}; y -> {0} }} (size:<32>)). Cannot split.
+  Location *p is not a singleton ({{ x -> {0}; y -> {0} }} (size:32)). Cannot split.
 [eva:show] builtins_split.c:23: Frama_C_show_each_split: {{ &x ; &y }}
 [eva:progress] builtins_split.c:25: 
   Call to builtin Frama_C_builtin_split_pointer

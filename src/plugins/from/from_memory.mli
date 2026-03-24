@@ -40,14 +40,14 @@ val default_return: return
 val top_return: return
 
 (** Completely imprecise return of the given size *)
-val top_return_size: Int_Base.t -> return
+val top_return_size: Z_or_top.t -> return
 
 (** Add some dependencies to [\result], between bits [start] and
     [start+size-1], to the [Deps.t] value; default value for [start] is 0.
     If [m] is specified, the dependencies are added to it. Otherwise,
     {!default_return} is used. *)
 val add_to_return:
-  ?start:int -> size:Int_Base.t -> ?m:return -> Eva.Deps.t -> return
+  ?start:int -> size:Z_or_top.t -> ?m:return -> Eva.Deps.t -> return
 
 val collapse_return: return -> Eva.Deps.t
 

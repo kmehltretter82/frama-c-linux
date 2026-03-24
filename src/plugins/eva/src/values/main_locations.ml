@@ -38,7 +38,7 @@ module PLoc = struct
     let ploc_bits = Precise_locs.inject_location_bits loc.Locations.loc in
     Precise_locs.make_precise_loc ploc_bits ~size:loc.Locations.size
 
-  let top = make (Locations.make_loc Locations.Location_Bits.top Int_Base.Top)
+  let top = make (Locations.make_loc Locations.Location_Bits.top `Top)
 
   let assume_no_overlap ~partial l1 l2 =
     let loc1 = Precise_locs.imprecise_location l1
@@ -77,7 +77,7 @@ module PLoc = struct
         let index_i = Cvalue.V.project_ival index in
         let size = Bit_utils.sizeof typ_pointed in
         (* Index offsets expressed in terms of the array elements size *)
-        let index_i = Ival.scale_int_base size index_i in
+        let index_i = Ival.scale_or_top size index_i in
         (* Combine the two offsets *)
         Precise (Precise_locs.shift_offset index_i offset)
       with Cvalue.V.Not_based_on_null ->
@@ -205,14 +205,14 @@ module PLoc = struct
            Beware of zero size. *)
         let new_index = Ival.sub_int off_ival rem_ival in
         let new_index = match size with
-          | Int_Base.Top -> Ival.top
-          | Int_Base.Value size ->
+          | `Top -> Ival.top
+          | `Value size ->
             if Z.is_zero size
             then Ival.top
             else Ival.scale_div ~pos:true size new_index
         in
         (* new_remaining = offset - index * size *)
-        let index_i = Ival.scale_int_base size index_ival in
+        let index_i = Ival.scale_or_top size index_ival in
         let new_rem = Ival.sub_int off_ival index_i in
         if Ival.is_bottom new_index || Ival.is_bottom new_rem
         then `Bottom

@@ -20,13 +20,13 @@ module type S = sig
   val inject_bounds: Z.t -> Z.t -> t
   val inject_itv: itv -> t
   val inject: itv list -> t
-  val from_ival_size: Ival.t -> Int_Base.t -> t
+  val from_ival_size: Ival.t -> Z_or_top.t -> t
   (** Conversion from an ival, which represents the beginning of
-      each interval. The size if taken from the [Int_Base.t] argument.
+      each interval. The size if taken from the [Z_or_top.t] argument.
       If the result contains more than [-plevel] arguments, it is
       automatically over-approximated. *)
 
-  val from_ival_size_under: Ival.t -> Int_Base.t -> t
+  val from_ival_size_under: Ival.t -> Z_or_top.t -> t
   (** Same as [from_ival_size], except that the result is an under-approximation
       if the ival points to too many locations *)
 

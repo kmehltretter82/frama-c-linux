@@ -18,7 +18,7 @@ let sizeof_lval_typ typlv =
   match Ast_types.unroll typlv with
   | { tnode = (TInt _ | TEnum _); tattr } as t ->
     (match Ast_attributes.(find_params bitfield_attribute_name tattr) with
-     | [AInt i] -> Int_Base.Value i
+     | [AInt i] -> `Value i
      | _ -> Bit_utils.sizeof t)
   | t -> Bit_utils.sizeof t
 

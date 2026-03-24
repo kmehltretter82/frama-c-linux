@@ -196,7 +196,7 @@ module Make (Engine: Engine_Subset) = struct
   let are_compatible loc right_loc =
     let size1 = Location.size loc
     and size2 = Location.size right_loc in
-    Int_Base.equal size1 size2 && not (Int_Base.is_top size1)
+    Z_or_top.equal size1 size2 && not (Z_or_top.is_top size1)
 
   (* Assignment. *)
   let assign_lv_or_ret ~pos ~is_ret state lval expr =
@@ -438,7 +438,7 @@ module Make (Engine: Engine_Subset) = struct
     | Lval lv ->
       lvaluate_and_check ~for_writing:false ~subdivnb ~valuation state lv
       >>= fun (valuation, loc) ->
-      if Int_Base.is_top (Location.size loc)
+      if Z_or_top.is_top (Location.size loc)
       then
         Self.abort ~current:true
           "Function argument %a has unknown size. Aborting"

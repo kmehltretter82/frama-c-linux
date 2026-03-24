@@ -400,7 +400,7 @@ struct
         if Precise_locs.equal_loc ploc1 ploc2 then ploc1 else
           let loc1 = Precise_locs.imprecise_location ploc1
           and loc2 = Precise_locs.imprecise_location ploc2 in
-          assert (Int_Base.equal loc1.size loc2.size);
+          assert (Z_or_top.equal loc1.size loc2.size);
           let size = loc1.size in
           let loc_bit = Locations.Location_Bits.join loc1.loc loc2.loc in
           let ploc_bit = Precise_locs.inject_location_bits loc_bit in
@@ -419,7 +419,7 @@ struct
         let open Locations in
         let size = loc1.size
         and loc = Location_Bits.join loc1.loc loc2.loc in
-        assert (Int_Base.equal loc2.size size);
+        assert (Z_or_top.equal loc2.size size);
         make_loc loc size
       and extract loc =
         loc >>-: get >>-: Precise_locs.imprecise_location

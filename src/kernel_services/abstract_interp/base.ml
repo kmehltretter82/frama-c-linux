@@ -138,7 +138,7 @@ let typeof v =
 
 let bits_sizeof v =
   match v with
-  | Null -> Int_Base.top
+  | Null -> Z_or_top.top
   | Var (v,_) | Allocated (v,_,_) ->
     Bit_utils.sizeof_vid v
   | CLogic_Var (_, ty, _) -> Bit_utils.sizeof ty
@@ -202,10 +202,10 @@ let validity_from_size size =
 
 let validity_from_known_size size =
   match size with
-  | Int_Base.Value size ->
+  | `Value size ->
     (* all start to be valid at offset 0 *)
     validity_from_size size
-  | Int_Base.Top ->
+  | `Top ->
     Unknown (Z.zero, None, Bit_utils.max_bit_address ())
 
 let validity b =
@@ -381,9 +381,8 @@ let validity_from_type v =
   else
     let max_valid = Bit_utils.sizeof_vid v in
     match max_valid with
-    | Int_Base.Top ->
-      Unknown (Z.zero, None, Bit_utils.max_bit_address ())
-    | Int_Base.Value size -> validity_from_size size
+    | `Top -> Unknown (Z.zero, None, Bit_utils.max_bit_address ())
+    | `Value size -> validity_from_size size
 
 type range_validity =
   | Invalid_range

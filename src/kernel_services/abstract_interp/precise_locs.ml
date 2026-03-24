@@ -223,11 +223,11 @@ let imprecise_location_bits = function
 
 type precise_location = {
   loc: precise_location_bits;
-  size: Int_Base.t
+  size: Z_or_top.t
 }
 
 let equal_loc pl1 pl2 =
-  equal_loc_bits pl1.loc pl2.loc && Int_Base.equal pl1.size pl2.size
+  equal_loc_bits pl1.loc pl2.loc && Z_or_top.equal pl1.size pl2.size
 
 let imprecise_location pl =
   make_loc (imprecise_location_bits pl.loc) pl.size
@@ -238,13 +238,13 @@ let loc_size loc = loc.size
 
 let loc_bottom = {
   loc = PLBottom;
-  size = Int_Base.top;
+  size = Z_or_top.top;
 }
 let is_bottom_loc pl = pl.loc = PLBottom
 
 let loc_top = {
   loc = PLLoc Location_Bits.top;
-  size = Int_Base.top;
+  size = Z_or_top.top;
 }
 let is_top_loc pl = equal_loc loc_top pl
 
@@ -315,7 +315,7 @@ let enumerate_valid_bits access loc =
 
 
 let cardinal_zero_or_one pl =
-  not (Int_Base.is_top pl.size) && cardinal_zero_or_one_location_bits pl.loc
+  not (Z_or_top.is_top pl.size) && cardinal_zero_or_one_location_bits pl.loc
 
 let valid_cardinal_zero_or_one ~for_writing pl =
   match pl.loc with
@@ -340,7 +340,7 @@ let valid_cardinal_zero_or_one ~for_writing pl =
 
 let pretty_loc fmt loc =
   Format.fprintf fmt "%a (size:%a)"
-    pretty_loc_bits loc.loc Int_Base.pretty loc.size
+    pretty_loc_bits loc.loc Z_or_top.pretty loc.size
 
 
 let rec reduce_offset_by_range range offset = match offset with

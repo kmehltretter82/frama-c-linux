@@ -58,7 +58,7 @@ module type S = sig
 
   val add_binding_ival :
     validity:Base.validity ->
-    exact:bool -> Ival.t -> size:Int_Base.t -> v -> t -> t Lattice_bounds.or_bottom
+    exact:bool -> Ival.t -> size:Z_or_top.t -> v -> t -> t Lattice_bounds.or_bottom
 
 
   (** {2 Creating an offsetmap} *)

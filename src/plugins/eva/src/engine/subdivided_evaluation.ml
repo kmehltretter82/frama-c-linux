@@ -482,7 +482,7 @@ module Make
      on the size of each lvalue, computed from their type.  *)
   let make_split (lvals: 'l sub_lvals) : 'l split =
     let compute_size info =
-      Int_Base.project (Eval_typ.sizeof_lval_typ info.lval.typ)
+      Z_or_top.project (Eval_typ.sizeof_lval_typ info.lval.typ)
     in
     let sizes = Hypotheses.map compute_size lvals in
     Hypotheses.split sizes
