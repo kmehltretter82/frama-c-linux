@@ -1023,7 +1023,7 @@ let () = ArrayPrecisionLevel.add_update_hook
 module Verbose = Self.Verbose
 
 let () = Parameter_customize.set_group messages
-module ValShowPerf =
+module ShowPerf =
   False
     (struct
       let option_name = "-eva-show-perf"
@@ -1356,7 +1356,7 @@ let deprecated_aliases : ((module Parameter_sig.S) * string) list =
   ; (module Memexec), "-memexec-all"
   ; (module ArrayPrecisionLevel), "-plevel"
   ; (module ValShowProgress), "-val-show-progress"
-  ; (module ValShowPerf), "-val-show-perf"
+  ; (module ShowPerf), "-val-show-perf"
   ; (module ValPerfFlamegraphs), "-val-flamegraph"
   ; (module ShowSlevel), "-val-show-slevel"
   ; (module PrintCallstacks), "-val-print-callstacks"

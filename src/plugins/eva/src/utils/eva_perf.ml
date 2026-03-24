@@ -300,7 +300,7 @@ let stop callstack =
     Statistics.(set analysis_duration () d)
   end;
   (* Print perfs *)
-  if Parameters.ValShowPerf.get ()
+  if Parameters.ShowPerf.get ()
   && (duration !last_time_displayed current_time) > display_interval
   then begin
     last_time_displayed := current_time;
@@ -308,7 +308,7 @@ let stop callstack =
   end
 
 let display fmt =
-  if Parameters.ValShowPerf.get ()
+  if Parameters.ShowPerf.get ()
   then show_perf (Sys.time ()) fmt
 
 let reset () =
