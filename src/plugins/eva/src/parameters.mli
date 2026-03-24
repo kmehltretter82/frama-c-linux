@@ -62,7 +62,7 @@ module WideningPeriod: Parameter_sig.Int
 
 module RecursiveUnroll: Parameter_sig.Int
 
-module SemanticUnrollingLevel: Parameter_sig.Int
+module SLevel: Parameter_sig.Int
 module SlevelFunction:
   Parameter_sig.Map with type key = Cil_types.kernel_function
                      and type value = int

@@ -21,7 +21,7 @@ let export_emitter = create_emitter "Eva_export" [ Emitter.Code_annot ]
 
 let get_slevel kf =
   try Parameters.SlevelFunction.find kf
-  with Not_found -> Parameters.SemanticUnrollingLevel.get ()
+  with Not_found -> Parameters.SLevel.get ()
 
 let get_subdivision_option stmt =
   try

@@ -129,7 +129,7 @@ module ForKf = Kernel_function.Make_Table
       let size = 17
       let dependencies =
         [ Ast.self;
-          Parameters.SemanticUnrollingLevel.self;
+          Parameters.SLevel.self;
           Parameters.SlevelFunction.self; ]
       let name = "Value.Local_slevel.ForKf"
     end)

@@ -662,7 +662,7 @@ let () = add_precision_dep RecursiveUnroll.parameter
 (* --- Partitioning --- *)
 
 let () = Parameter_customize.set_group precision_tuning
-module SemanticUnrollingLevel =
+module SLevel =
   Zero
     (struct
       let option_name = "-eva-slevel"
@@ -672,8 +672,8 @@ module SemanticUnrollingLevel =
          The larger n, the more precise and expensive the analysis \
          (defaults to 0)"
     end)
-let () = SemanticUnrollingLevel.set_range ~min:0 ~max:max_int
-let () = add_precision_dep SemanticUnrollingLevel.parameter
+let () = SLevel.set_range ~min:0 ~max:max_int
+let () = add_precision_dep SLevel.parameter
 
 let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
@@ -1323,7 +1323,7 @@ let () =
   ForcePrintSummary.add_set_hook hook
 
 let deprecated_aliases : ((module Parameter_sig.S) * string) list =
-  [ (module SemanticUnrollingLevel), "-slevel"
+  [ (module SLevel), "-slevel"
   ; (module SlevelFunction), "-slevel-function"
   ; (module NoResultsFunction), "-no-results-function"
   ; (module ResultsAll), "-results"
@@ -1449,7 +1449,7 @@ let () =
   bind (module AutoLoopUnroll) (get auto_unroll);
   bind (module WideningDelay) (fun n -> 1 + n / 2);
   bind (module HistoryPartitioning) (fun n -> (n - 1) / 5);
-  bind (module SemanticUnrollingLevel) (get slevel_power);
+  bind (module SLevel) (get slevel_power);
   bind (module ILevel) (get ilevel_power);
   bind (module ArrayPrecisionLevel) (get plevel_power);
   bind (module LinearLevel) (fun n -> n * 20);
