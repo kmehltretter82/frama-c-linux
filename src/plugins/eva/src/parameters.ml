@@ -1032,7 +1032,7 @@ module ShowPerf =
     end)
 
 let () = Parameter_customize.set_group messages
-module ValPerfFlamegraphs =
+module Flamegraph =
   Filepath
     (struct
       let option_name = "-eva-flamegraph"
@@ -1357,7 +1357,7 @@ let deprecated_aliases : ((module Parameter_sig.S) * string) list =
   ; (module ArrayPrecisionLevel), "-plevel"
   ; (module ValShowProgress), "-val-show-progress"
   ; (module ShowPerf), "-val-show-perf"
-  ; (module ValPerfFlamegraphs), "-val-flamegraph"
+  ; (module Flamegraph), "-val-flamegraph"
   ; (module ShowSlevel), "-val-show-slevel"
   ; (module PrintCallstacks), "-val-print-callstacks"
   ; (module InterpreterMode), "-val-interpreter-mode"

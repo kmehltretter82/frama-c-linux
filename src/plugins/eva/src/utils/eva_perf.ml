@@ -27,9 +27,9 @@ let flamegraph_output = ref None
 
 (* Sets the reference above according to -eva-flamegraph. *)
 let initialize_flamegraph () =
-  if not (Parameters.ValPerfFlamegraphs.is_empty ()) then
+  if not (Parameters.Flamegraph.is_empty ()) then
     try
-      let file = Parameters.ValPerfFlamegraphs.get () in
+      let file = Parameters.Flamegraph.get () in
       let out_channel = open_out (Filepath.to_string_abs file) in
       let formatter = Format.formatter_of_out_channel out_channel in
       flamegraph_output := Some formatter;

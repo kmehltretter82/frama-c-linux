@@ -119,7 +119,7 @@ module SplitReturn: Parameter_sig.Custom with type t = Split_strategy.t
 
 module Verbose: Parameter_sig.Int
 module ShowPerf: Parameter_sig.Bool
-module ValPerfFlamegraphs: Parameter_sig.Filepath
+module Flamegraph: Parameter_sig.Filepath
 module ShowSlevel: Parameter_sig.Int
 module PrintCallstacks: Parameter_sig.Bool
 module ReportRedStatuses: Parameter_sig.Filepath
