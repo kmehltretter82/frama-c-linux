@@ -39,4 +39,4 @@ let frama_C_assert state actuals =
     Builtins.States [ state ]
   | _ -> raise (Builtins.Invalid_nb_of_args 1)
 
-let () = Builtins.register_builtin "Frama_C_assert" NoCache frama_C_assert
+let () = Builtins.register_builtin "Frama_C_assert" frama_C_assert

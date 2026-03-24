@@ -10,9 +10,6 @@ open Eva_ast
 open Abstract_interp
 open Cvalue
 
-let register_builtin name builtin =
-  Builtins.register_builtin name Cacheable builtin
-
 (** Enumeration *)
 
 (** Cardinal of an abstract value (-1 if not enumerable). Beware this builtin
@@ -26,7 +23,7 @@ let frama_c_cardinal _state = function
     Builtins.Result [nb]
   | _ -> Kernel.abort ~current:true "Incorrect argument for Frama_C_cardinal"
 
-let () = register_builtin "Frama_C_abstract_cardinal" frama_c_cardinal
+let () = Builtins.register_builtin "Frama_C_abstract_cardinal" frama_c_cardinal
 
 (** Minimum or maximum of an integer abstract value, Top_int otherwise.
     Also not monotonic. *)
@@ -43,8 +40,8 @@ let frama_c_min_max f _state = function
   | _ -> Kernel.abort ~current:true "Incorrect argument for Frama_C_min/max"
 
 let () =
-  register_builtin "Frama_C_abstract_min" (frama_c_min_max fst);
-  register_builtin "Frama_C_abstract_max" (frama_c_min_max snd)
+  Builtins.register_builtin "Frama_C_abstract_min" (frama_c_min_max fst);
+  Builtins.register_builtin "Frama_C_abstract_max" (frama_c_min_max snd)
 
 (** Splitting values *)
 
@@ -178,6 +175,6 @@ let aux_split f state = function
     Builtins.States [state]
 
 let () =
-  register_builtin "Frama_C_builtin_split" (aux_split split_v);
-  register_builtin "Frama_C_builtin_split_pointer" (aux_split split_pointer);
-  register_builtin "Frama_C_builtin_split_all" (aux_split split_all)
+  Builtins.register_builtin "Frama_C_builtin_split" (aux_split split_v);
+  Builtins.register_builtin "Frama_C_builtin_split_pointer" (aux_split split_pointer);
+  Builtins.register_builtin "Frama_C_builtin_split_all" (aux_split split_all)

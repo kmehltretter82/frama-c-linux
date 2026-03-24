@@ -76,7 +76,7 @@ let () =
     (fun () -> (show_aorai_state,Cil_const.voidType,[],true))
 
 let () =
-  Eva.Builtins.register_builtin show_aorai_state Cacheable builtin_show_aorai_state;
+  Eva.Builtins.register_builtin show_aorai_state builtin_show_aorai_state;
   Cil_builtins.add_special_builtin show_aorai_state
 
 let add_slevel_annotation vi kind =

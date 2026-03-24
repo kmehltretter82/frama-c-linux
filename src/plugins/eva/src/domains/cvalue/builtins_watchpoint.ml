@@ -76,10 +76,10 @@ let make_watch_cardinal target_value =
     raise Builtins.Outside_builtin_possibilities
 
 let () =
-  Builtins.register_builtin "Frama_C_watch_value" Cacheable
+  Builtins.register_builtin "Frama_C_watch_value"
     (add_watch make_watch_value)
 let () =
-  Builtins.register_builtin "Frama_C_watch_cardinal" Cacheable
+  Builtins.register_builtin "Frama_C_watch_cardinal"
     (add_watch make_watch_cardinal)
 
 let watch_hook _callstack stmt states =

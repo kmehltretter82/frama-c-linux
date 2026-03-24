@@ -31,19 +31,24 @@ module type API = sig
         - the assigns of the function, i.e. the dependencies of the result
           and of each zone written to.
         - and its sure outputs, i.e. an under-approximation of written zones. *)
+    cacheable: cacheable;
+    (** Can this result of the function call be cached with memexec? *)
   }
 
   (** The result of a builtin can be given in different forms. *)
   type call_result =
     | States of Cvalue.Model.t list
     (** A disjunctive list of post-states at the end of the C function.
-        Can only be used if the C function does not write the address of local
-        variables, does not read other locations than the call arguments, and
-        does not write other locations than the result. *)
+        Can only be used if these results can be cached and reused for other
+        calls with the same entry state, and if the C function:
+        - does not write the address of any local variables;
+        - does not read other memory locations than the call arguments;
+        - does not write other locations than the result. *)
     | Result of Cvalue.V.t list
     (** A disjunctive list of resulting values. The specification is used to
         compute the post-state, in which the result is replaced by the values
-        computed by the builtin. *)
+        computed by the builtin. Can only be used in the same condition than
+        [States] above. *)
     | Full of full_result
     (** See [full_result] type. *)
 
@@ -52,15 +57,14 @@ module type API = sig
       - the list of arguments of the function call. *)
   type builtin = Cvalue.Model.t -> (Eva_ast.exp * Cvalue.V.t) list -> call_result
 
-  (** [register_builtin name ?replace ?typ cacheable f] registers the function [f]
+  (** [register_builtin name ?replace ?typ f] registers the function [f]
       as a builtin to be used instead of the C function of name [name].
       If [replace] is provided, the builtin is also used instead of the C function
       of name [replace], unless option -eva-builtin-auto is disabled.
       If [typ] is provided, consistency between the expected [typ] and the type of
-      the C function is checked before using the builtin.
-      The results of the builtin are cached according to [cacheable]. *)
+      the C function is checked before using the builtin. *)
   val register_builtin:
-    string -> ?replace:string -> ?typ:builtin_type -> cacheable -> builtin -> unit
+    string -> ?replace:string -> ?typ:builtin_type -> builtin -> unit
 
   (** [unregister_builtin name] unregister a builtin previously registered with
       {!register_builtin_name} with name [name]. If [replace] was provided,

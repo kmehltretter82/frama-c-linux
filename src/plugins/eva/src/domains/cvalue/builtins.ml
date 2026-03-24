@@ -16,6 +16,7 @@ type full_result = {
   c_values: (Cvalue.V.t option * Cvalue.Model.t) list;
   c_clobbered: Base.SetLattice.t;
   c_assigns: (Assigns.t * Locations.Zone.t) option;
+  cacheable: cacheable;
 }
 
 type call_result =
@@ -40,9 +41,9 @@ end
 (** Set of functions overridden by a builtin. *)
 module BuiltinsOverride = State_builder.Set_ref (Kernel_function.Set) (Info)
 
-let register_builtin name ?replace ?typ cacheable f =
+let register_builtin name ?replace ?typ f =
   Parameters.register_builtin name;
-  let builtin = (name, f, cacheable, typ) in
+  let builtin = (name, f, typ) in
   Hashtbl.replace table name builtin;
   match replace with
   | None -> ()
@@ -54,14 +55,14 @@ let unregister_builtin name =
 
 let is_builtin name =
   try
-    let bname, _, _, _ = Hashtbl.find table name in
+    let bname, _, _ = Hashtbl.find table name in
     name = bname
   with Not_found -> false
 
 let builtin_names_and_replacements () =
   let stand_alone, replacements =
     Hashtbl.fold
-      (fun name (builtin_name, _, _, _) (acc1, acc2) ->
+      (fun name (builtin_name, _, _) (acc1, acc2) ->
          if name = builtin_name
          then name :: acc1, acc2
          else acc1, (name, builtin_name) :: acc2)
@@ -175,7 +176,7 @@ let inconsistent_builtin_typ kf = function
       || List.exists2 (fun (_, t, _) u -> need_cast t u) args expected_args
     | _ -> assert false
 
-let prepare_builtin kf (name, builtin, cacheable, expected_typ) =
+let prepare_builtin kf (name, builtin, expected_typ) =
   let source = fst (Kernel_function.get_location kf) in
   if inconsistent_builtin_typ kf expected_typ
   then warn_incompatible_type ~source name kf
@@ -186,7 +187,7 @@ let prepare_builtin kf (name, builtin, cacheable, expected_typ) =
     | NoAssigns -> warn_no_assigns ~source kf
     | Spec spec ->
       BuiltinsOverride.add kf;
-      Hashtbl.replace builtins_table kf (name, builtin, cacheable, spec)
+      Hashtbl.replace builtins_table kf (name, builtin, spec)
 
 let prepare_builtins () =
   BuiltinsOverride.clear ();
@@ -194,12 +195,12 @@ let prepare_builtins () =
   let autobuiltins = Parameters.BuiltinsAuto.get () in
   (* Links kernel functions to the registered builtins. *)
   Hashtbl.iter
-    (fun name (bname, f, cacheable, typ) ->
+    (fun name (bname, f, typ) ->
        if autobuiltins || name = bname
        then
          try
            let kf = Globals.Functions.find_by_name name in
-           prepare_builtin kf (name, f, cacheable, typ)
+           prepare_builtin kf (name, f, typ)
          with Not_found -> ())
     table;
   (* Overrides builtins attribution according to the -eva-builtin option. *)
@@ -209,7 +210,7 @@ let prepare_builtins () =
 
 (* Emits warning if builtin [name] overrides function definition [kf], or if
    the Frama-C specification of [kf] is missing. *)
-let check_builtin kf (name, _, _, _) =
+let check_builtin kf (name, _, _) =
   let source = fst (Kernel_function.get_location kf) in
   if not (Kernel_function.is_in_libc kf || is_frama_c_builtin kf)
   then warn_user_specification ~source kf;
@@ -289,14 +290,14 @@ let apply_builtin (builtin:builtin) call ~pre ~post =
   try
     let call_result = builtin pre arguments in
     let states = process_result call post call_result in
-    let froms =
+    let froms, cacheable =
       match call_result with
-      | Full result -> result.c_assigns
-      | States _ | Result _ -> None
+      | Full result -> result.c_assigns, result.cacheable
+      | States _ | Result _ -> None, Cacheable
     in
     let result = `Builtin (List.map fst states, froms) in
     Cvalue_callbacks.apply_call_results_hooks call.callstack call.kf pre result;
-    states
+    states, cacheable
   with
   | Invalid_nb_of_args n ->
     Self.abort ~current:true

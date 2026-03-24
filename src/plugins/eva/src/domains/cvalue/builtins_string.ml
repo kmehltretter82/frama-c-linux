@@ -396,7 +396,7 @@ let register_builtin c_name ~search ~stop_at_0 ~typ ~length ?limit =
   let name = "Frama_C_" ^ c_name in
   let f = do_search ~search ~stop_at_0 ~typ ~length ?limit in
   let builtin = apply_builtin name f in
-  Builtins.register_builtin name ~replace:c_name Cacheable builtin;
+  Builtins.register_builtin name ~replace:c_name builtin;
   f
 
 type str_builtin_sig =

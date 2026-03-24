@@ -62,7 +62,7 @@ let nb_callsites () =
     0
 
 type analysis_target =
-  [ `Builtin of string * Builtins.builtin * cacheable * funspec
+  [ `Builtin of string * Builtins.builtin * funspec
   | `Spec of Cil_types.funspec
   | `Body of Cil_types.fundec * bool ]
 
@@ -107,7 +107,7 @@ let merge_status s1 s2 =
 let register_status kf kind =
   let status =
     match kind with
-    | `Builtin (name, _, _, _) -> Builtin name
+    | `Builtin (name, _, _) -> Builtin name
     | `Spec _ -> SpecUsed
     | `Body (_, results) -> Analyzed (if results then Complete else NoResults)
   in
@@ -140,8 +140,8 @@ let get_funspec callsite kf =
 
 let analysis_target ?(recursion_depth = -1) kf callsite =
   match Builtins.find_builtin_override kf with
-  | Some (name, builtin, cache, spec) ->
-    `Builtin (name, builtin, cache, spec)
+  | Some (name, builtin, spec) ->
+    `Builtin (name, builtin, spec)
   | None ->
     if recursion_depth >= Parameters.RecursiveUnroll.get ()
     then begin

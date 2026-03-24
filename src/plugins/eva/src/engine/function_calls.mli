@@ -17,7 +17,7 @@ val save_results: fundec -> bool
     - the function body. The boolean indicates whether the resulting states
       must be recorded at each statement of this function. *)
 type analysis_target =
-  [ `Builtin of string * Builtins.builtin * Eval.cacheable * funspec
+  [ `Builtin of string * Builtins.builtin * funspec
   | `Spec of Cil_types.funspec
   | `Body of Cil_types.fundec * bool ]
 
