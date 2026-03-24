@@ -10,7 +10,7 @@ open Cil_types
 open Eval
 
 let save_results f =
-  Parameters.ResultsAll.get () && not (Parameters.NoResultsFunctions.mem f)
+  Parameters.ResultsAll.get () && not (Parameters.NoResultsFunction.mem f)
 
 let info name : (module State_builder.Info_with_size) =
   (module struct

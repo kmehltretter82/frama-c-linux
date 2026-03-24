@@ -387,7 +387,7 @@ let () = add_precision_dep MultidimFastImprecise.parameter
 (* -------------------------------------------------------------------------- *)
 
 let () = Parameter_customize.set_group performance
-module NoResultsFunctions =
+module NoResultsFunction =
   Fundec_set
     (struct
       let option_name = "-eva-no-results-function"
@@ -395,7 +395,7 @@ module NoResultsFunctions =
       let help = "Do not record the values obtained for the statements of \
                   function f"
     end)
-let () = add_dep NoResultsFunctions.parameter
+let () = add_dep NoResultsFunction.parameter
 
 let () = Parameter_customize.set_group performance
 module ResultsAll =
@@ -1325,7 +1325,7 @@ let () =
 let deprecated_aliases : ((module Parameter_sig.S) * string) list =
   [ (module SemanticUnrollingLevel), "-slevel"
   ; (module SlevelFunction), "-slevel-function"
-  ; (module NoResultsFunctions), "-no-results-function"
+  ; (module NoResultsFunction), "-no-results-function"
   ; (module ResultsAll), "-results"
   ; (module JoinResults), "-val-join-results"
   ; (module AllRoundingModesConstants), "-all-rounding-modes-constants"
