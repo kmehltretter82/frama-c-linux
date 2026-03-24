@@ -132,11 +132,11 @@ let print_calldeps () =
 
 let output_deps () =
   Functionwise.compute_all ();
-  print_deps ()
+  if From_parameters.verbose_atleast 1 then print_deps ()
 
 let output_calldeps () =
   Callwise.compute_all_calldeps ();
-  print_calldeps ()
+  if From_parameters.verbose_atleast 1 then print_calldeps ()
 
 let output_deps_once =
   let name = "From.output_deps" in
