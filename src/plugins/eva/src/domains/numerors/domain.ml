@@ -17,7 +17,7 @@ type interaction_modes =
 
 (* Retrieving the interaction mode from parameters. *)
 let get_interaction_mode () =
-  match Parameters.Numerors_Mode.get () with
+  match Parameters.NumerorsInteraction.get () with
   | "relative" -> Only_Reduce_Relative_Using_Absolute
   | "absolute" -> Only_Reduce_Absolute_Using_Relative
   | "both" -> Complete_Reduced_Product

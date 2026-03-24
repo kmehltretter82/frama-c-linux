@@ -297,7 +297,7 @@ module SecureFlow =
 let () = add_correctness_dep SecureFlow.parameter
 
 let () = Parameter_customize.set_group domains
-module Numerors_Mode =
+module NumerorsInteraction =
   String
     (struct
       let option_name = "-eva-numerors-interaction"
@@ -311,8 +311,8 @@ module Numerors_Mode =
       let arg_name = "relative|absolute|none|both"
     end)
 let () =
-  Numerors_Mode.set_possible_values ["relative"; "absolute"; "none"; "both"]
-let () = add_precision_dep Numerors_Mode.parameter
+  NumerorsInteraction.set_possible_values ["relative"; "absolute"; "none"; "both"]
+let () = add_precision_dep NumerorsInteraction.parameter
 
 let () = Parameter_customize.set_group domains
 module TracesUnrollLoop =
