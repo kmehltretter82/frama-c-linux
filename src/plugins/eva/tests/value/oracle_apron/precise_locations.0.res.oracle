@@ -62,7 +62,7 @@
 >   Called from precise_locations.i:39.
 > [eva:progress] Recording results for ct
 > [eva:progress] Done for function ct
-536,545c576,625
+558,567c598,647
 < [eva:progress] precise_locations.i:39: Reusing old results for call to ct
 < [eva:progress] precise_locations.i:39: Reusing old results for call to ct
 < [eva:progress] precise_locations.i:39: Reusing old results for call to ct

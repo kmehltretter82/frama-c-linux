@@ -49,8 +49,6 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -nonterm-msg-key help to get a list of
                     available categories, and * to enable all categories
                     (preferably use -nonterm-msg-key="k1[,...,kn]")
--nonterm-print      print results for option -nonterm (opposite option is
-                    -nonterm-no-print)
 -nonterm-verbose <n>  level of verbosity for plug-in Nonterm (default to 1)
 -nonterm-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category
                     <k1> to <s1>,...,<kn> to <sn>. Use -nonterm-warn-key help

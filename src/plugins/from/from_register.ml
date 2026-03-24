@@ -129,19 +129,25 @@ let print_calldeps () =
          d);
   From_parameters.feedback "====== END OF CALLWISE DEPENDENCIES ======"
 
+
+let output_deps () =
+  Functionwise.compute_all ();
+  if From_parameters.verbose_atleast 1 then print_deps ()
+
+let output_calldeps () =
+  Callwise.compute_all_calldeps ();
+  if From_parameters.verbose_atleast 1 then print_calldeps ()
+
+let output_deps_once =
+  let name = "From.output_deps" in
+  State_builder.apply_once name [ Functionwise.self ] output_deps |> fst
+
+let output_calldeps_once =
+  let name = "From.output_calldeps" in
+  State_builder.apply_once name [ Callwise.self ] output_calldeps |> fst
+
 let main () =
-  let not_quiet = From_parameters.verbose_atleast 1 in
-  if From_parameters.ForceDeps.get () then
-    From_parameters.ForceDeps.output
-      (fun () ->
-         Functionwise.compute_all ();
-         print_deps ();
-      );
-  if From_parameters.ForceCallDeps.get () then
-    From_parameters.ForceCallDeps.output
-      (fun () ->
-         Callwise.compute_all_calldeps ();
-         if not_quiet then print_calldeps ();
-      )
+  if From_parameters.ForceDeps.get () then output_deps_once ();
+  if From_parameters.ForceCallDeps.get () then output_calldeps_once ()
 
 let () = Boot.Main.extend main

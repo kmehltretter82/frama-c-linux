@@ -8,13 +8,13 @@
 
 include Plugin.S
 
-module Enabled: Parameter_sig.With_output
+module Enabled: Parameter_sig.Bool
 (** Activate metrics *)
 
 module ByFunction: Parameter_sig.Bool
 (** Activate metrics by function *)
 
-module ValueCoverage: Parameter_sig.With_output
+module ValueCoverage: Parameter_sig.Bool
 (** Give an estimation about value analysis code penetration.
     Only works on CIL AST. *)
 

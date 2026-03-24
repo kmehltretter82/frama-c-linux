@@ -8,7 +8,7 @@
 
 include Plugin.S
 
-module BuildAll: Parameter_sig.With_output
+module BuildAll: Parameter_sig.Bool
 
 module BuildFct: Parameter_sig.Kernel_function_set
 

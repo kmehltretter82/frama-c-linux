@@ -289,7 +289,6 @@ struct
       (struct
         let shortname = P.shortname
         module L = L
-        let messages_group = messages
         let parameters = plugin.p_parameters
       end)
 

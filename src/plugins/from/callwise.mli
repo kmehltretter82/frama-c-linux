@@ -13,3 +13,4 @@
 val compute_all_calldeps : unit -> unit
 val iter : (Cil_types.kinstr -> Eva.Assigns.t -> unit) -> unit
 val find : Cil_types.kinstr -> Eva.Assigns.t
+val self : State.t

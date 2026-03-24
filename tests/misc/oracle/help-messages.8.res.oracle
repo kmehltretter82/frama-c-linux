@@ -14,7 +14,7 @@ Options taking a string as argument should preferably be written
 
 ***** LIST OF AVAILABLE OPTIONS:
 
--eva                Compute values (opposite option is -no-eva)
+-eva                Run the Eva analysis. (opposite option is -no-eva)
 -val                alias for option -eva
 -eva-precision <n>  Meta-option that automatically sets up some Eva
                     parameters for a quick configuration of an analysis, from
@@ -161,9 +161,6 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -eva-msg-key help to get a list of
                     available categories, and * to enable all categories
                     (preferably use -eva-msg-key="k1[,...,kn]")
--eva-print          print results for option -eva (set by default, opposite
-                    option is -eva-no-print)
--val-print          alias for option -eva-print
 -eva-print-callstacks  When printing a message, also show the current call
                     stack (opposite option is -eva-no-print-callstacks)
 -eva-report-red-statuses <filename>  Output the list of "red properties" in a

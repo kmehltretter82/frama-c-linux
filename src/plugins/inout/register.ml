@@ -6,61 +6,39 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* This code duplicates more or less Option_signature.With_output. Since Inout prints
-   the results of all its options interleaved, it is difficult to proceed
-   otherwise *)
-module ShouldOutput =
-  State_builder.True_ref
-    (struct
-      let dependencies = [Eva.Analysis.self] (* To be completed if some computations
-                                                use some other results than Eva *)
-      let name = "Inout.Register.ShouldOutput"
-    end)
-let () = Inout_parameters.Output.add_set_hook
-    (fun _ v -> if v then ShouldOutput.set true)
+(* Bind parameters to printing functions to be applied on each function. *)
+let param_pretty =
+  let open Inout_parameters in
+  [ ForceOut.(self, get), Outputs.pretty_internal;
+    ForceExternalOut.(self, get), Outputs.pretty_external;
+    ForceInput.(self, get), Inputs.pretty_external;
+    ForceDeref.(self, get), Derefs.pretty_external;
+    ForceInout.(self, get), Operational_inputs.pretty_operational_inputs_internal;
+    ForceInoutExternalWithFormals.(self, get),
+    Operational_inputs.pretty_operational_inputs_external_with_formals;
+    ForceInputWithFormals.(self, get), Inputs.pretty_with_formals;
+  ]
 
-
-let main () =
-  let forceout = Inout_parameters.ForceOut.get () in
-  let forceexternalout = Inout_parameters.ForceExternalOut.get () in
-  let forceinput = Inout_parameters.ForceInput.get () in
-  let forceinout = Inout_parameters.ForceInout.get () in
-  let forceinoutwithformals =
-    Inout_parameters.ForceInoutExternalWithFormals.get ()
-  in
-  let forcederef = Inout_parameters.ForceDeref.get () in
-  let forceinputwithformals = Inout_parameters.ForceInputWithFormals.get () in
-  if (forceout || forceexternalout || forceinput || forceinputwithformals
-      || forcederef || forceinout || forceinoutwithformals) &&
-     Inout_parameters.Output.get () && ShouldOutput.get ()
+let run () =
+  (* Only keep printing function for which the parameter is enabled. *)
+  let aux ((_self, get), pretty) = if get () then Some pretty else None in
+  let pretty_list = List.filter_map aux param_pretty in
+  if pretty_list <> [] && Inout_parameters.Output.get ()
   then begin
-    ShouldOutput.set false;
     Eva.Analysis.compute ();
     Callgraph.Uses.iter_in_rev_order
       (fun kf ->
          if Kernel_function.is_definition kf && Eva.Results.is_called kf
          then begin
-           if forceout
-           then Inout_parameters.result "%a" Outputs.pretty_internal kf ;
-           if forceexternalout
-           then Inout_parameters.result "%a" Outputs.pretty_external kf ;
-           if forceinput
-           then Inout_parameters.result "%a" Inputs.pretty_external kf;
-           if forcederef then begin
-             Derefs.compute_external kf;
-             Inout_parameters.result "%a" Derefs.pretty_external kf;
-           end;
-           if forceinout then
-             Inout_parameters.result "%a"
-               Operational_inputs.pretty_operational_inputs_internal kf;
-           if forceinoutwithformals then
-             Inout_parameters.result "%a"
-               Operational_inputs.pretty_operational_inputs_external_with_formals kf;
-           if forceinputwithformals
-           then
-             Inout_parameters.result "%a"
-               Inputs.pretty_with_formals kf ;
+           if Inout_parameters.ForceDeref.get ()
+           then Derefs.compute_external kf;
+           List.iter (fun pp -> Inout_parameters.result "%a" pp kf) pretty_list
          end)
   end
 
-let () = Boot.Main.extend main
+let param_deps = List.map (fun ((self, _), _) -> self) param_pretty
+let deps = Eva.Analysis.self :: param_deps
+
+let run_once, _ = State_builder.apply_once "Inout.main" deps run
+
+let () = Boot.Main.extend run_once

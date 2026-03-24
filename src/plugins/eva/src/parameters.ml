@@ -50,11 +50,10 @@ let add_precision_dep p =
 let () = List.iter add_correctness_dep kernel_parameters_correctness
 
 module ForceValues =
-  WithOutput
+  False
     (struct
       let option_name = "-eva"
-      let help = "Compute values"
-      let output_by_default = true
+      let help = "Run the Eva analysis."
     end)
 let () = ForceValues.add_aliases ~deprecated:true ["-val"]
 
