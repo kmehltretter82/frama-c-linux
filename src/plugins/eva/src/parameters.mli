@@ -95,7 +95,7 @@ module WarnPointerComparison: Parameter_sig.S
 module ReduceOnLogicAlarms: Parameter_sig.Bool
 module InitializedLocals: Parameter_sig.Bool
 
-module UsePrototype: Parameter_sig.Kernel_function_set
+module UseSpec: Parameter_sig.Kernel_function_set
 
 module SkipLibcSpecs: Parameter_sig.Bool
 

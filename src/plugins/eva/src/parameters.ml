@@ -957,7 +957,7 @@ let () = add_precision_dep SubdivideNonLinearFunction.parameter
 
 let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
-module UsePrototype =
+module UseSpec =
   Kernel_function_set
     (struct
       let option_name = "-eva-use-spec"
@@ -965,7 +965,7 @@ module UsePrototype =
       let help = "Use the ACSL specification of the functions instead of \
                   their definitions"
     end)
-let () = add_correctness_dep UsePrototype.parameter
+let () = add_correctness_dep UseSpec.parameter
 
 let () = Parameter_customize.set_group precision_tuning
 module SkipLibcSpecs =
@@ -1350,7 +1350,7 @@ let deprecated_aliases : ((module Parameter_sig.S) * string) list =
   ; (module BuiltinsAuto), "-val-builtins-auto"
   ; (module BuiltinsList), "-val-builtins-list"
   ; (module SubdivideNonLinear), "-val-subdivide-non-linear"
-  ; (module UsePrototype), "-val-use-spec"
+  ; (module UseSpec), "-val-use-spec"
   ; (module SkipLibcSpecs), "-val-skip-stdlib-specs"
   ; (module RmAssert), "-remove-redundant-alarms"
   ; (module MemExecAll), "-memexec-all"

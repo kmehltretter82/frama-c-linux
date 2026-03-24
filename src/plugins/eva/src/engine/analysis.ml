@@ -59,11 +59,11 @@ let generate_specs () =
       Self.warning ~wkey:Self.wkey_missing_assigns
         "@[No assigns specified for function '%a' for which option %s is set. \
          Generating potentially incorrect assigns.@]"
-        Kernel_function.pretty kf Parameters.UsePrototype.option_name;
+        Kernel_function.pretty kf Parameters.UseSpec.option_name;
       Populate_spec.populate_funspec ~do_body:true kf [`Assigns];
     end
   in
-  Parameters.UsePrototype.iter aux
+  Parameters.UseSpec.iter aux
 
 let pre_analysis () =
   Self.clear_results ();
