@@ -378,6 +378,8 @@ module Make (Engine: Engine_Subset) = struct
   let initialize_global_variable ~lib_entry vi init state =
     let open Current_loc.Operators in
     let<> UpdatedCurrentLoc = vi.vdecl in
+    Async.yield ();
+    Signal.check ();
     let pos = Position.global_init vi in
     let state = Domain.enter_scope Abstract_domain.Global [vi] state in
     if vi.vsource then
