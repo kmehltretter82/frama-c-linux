@@ -49,13 +49,13 @@ let add_precision_dep p =
 
 let () = List.iter add_correctness_dep kernel_parameters_correctness
 
-module ForceValues =
+module Eva =
   False
     (struct
       let option_name = "-eva"
       let help = "Run the Eva analysis."
     end)
-let () = ForceValues.add_aliases ~deprecated:true ["-val"]
+let () = Eva.add_aliases ~deprecated:true ["-val"]
 
 let domains = add_group "Abstract Domains"
 let precision_tuning = add_group "Precision vs. time"

@@ -421,7 +421,7 @@ module State = struct
     if Plugin.is_present "inout"
     && Self.is_debug_key_enabled Self.dkey_final_states
     && Self.verbose_atleast 1
-    && Parameters.ForceValues.get ()
+    && Parameters.Eva.get ()
     then display_results ();
     Self.result "%t" Eva_perf.display
 
