@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Eva       [2026-03-24] Improve performance on dynamic allocation
+              with option `-eva-alloc-builtin imprecise`.
 o!  Kernel    [2026-03-24] Rename module `Int_Base` into `Z_or_top`. Change
               its type to `Z.t Lattice_bounds.or_top`.
 -*  Kernel    [2026-03-19] Gracefully exit when parsing float with an oversized
