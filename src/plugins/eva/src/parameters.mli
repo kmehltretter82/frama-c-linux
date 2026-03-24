@@ -101,8 +101,8 @@ module SkipLibcSpecs: Parameter_sig.Bool
 
 module RmAssert: Parameter_sig.Bool
 
-module LinearLevel: Parameter_sig.Int
-module LinearLevelFunction:
+module SubdivideNonLinear: Parameter_sig.Int
+module SubdivideNonLinearFunction:
   Parameter_sig.Map with type key = Cil_types.kernel_function
                      and type value = int
 

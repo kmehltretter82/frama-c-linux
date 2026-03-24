@@ -26,8 +26,8 @@ let get_slevel kf =
 let get_subdivision_option stmt =
   try
     let kf = Kernel_function.find_englobing_kf stmt in
-    Parameters.LinearLevelFunction.find kf
-  with Not_found -> Parameters.LinearLevel.get ()
+    Parameters.SubdivideNonLinearFunction.find kf
+  with Not_found -> Parameters.SubdivideNonLinear.get ()
 
 let get_subdivision stmt =
   match Eva_annotations.get_subdivision_annot stmt with

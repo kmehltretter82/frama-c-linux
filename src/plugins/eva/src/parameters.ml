@@ -929,7 +929,7 @@ module BuiltinsList =
     end)
 
 let () = Parameter_customize.set_group precision_tuning
-module LinearLevel =
+module SubdivideNonLinear =
   Zero
     (struct
       let option_name = "-eva-subdivide-non-linear"
@@ -939,11 +939,11 @@ module LinearLevel =
          appears multiple times, by splitting its value at most n times. \
          Defaults to 0."
     end)
-let () = LinearLevel.set_range ~min:0 ~max:max_int
-let () = add_precision_dep LinearLevel.parameter
+let () = SubdivideNonLinear.set_range ~min:0 ~max:max_int
+let () = add_precision_dep SubdivideNonLinear.parameter
 
 let () = Parameter_customize.set_group precision_tuning
-module LinearLevelFunction =
+module SubdivideNonLinearFunction =
   Kernel_function_map
     (Value_int)
     (struct
@@ -953,7 +953,7 @@ module LinearLevelFunction =
                   when analyzing the function <f>."
       let default = Kernel_function.Map.empty
     end)
-let () = add_precision_dep LinearLevelFunction.parameter
+let () = add_precision_dep SubdivideNonLinearFunction.parameter
 
 let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
@@ -1349,7 +1349,7 @@ let deprecated_aliases : ((module Parameter_sig.S) * string) list =
   ; (module BuiltinsOverrides), "-val-builtin"
   ; (module BuiltinsAuto), "-val-builtins-auto"
   ; (module BuiltinsList), "-val-builtins-list"
-  ; (module LinearLevel), "-val-subdivide-non-linear"
+  ; (module SubdivideNonLinear), "-val-subdivide-non-linear"
   ; (module UsePrototype), "-val-use-spec"
   ; (module SkipLibcSpecs), "-val-skip-stdlib-specs"
   ; (module RmAssert), "-remove-redundant-alarms"
@@ -1452,7 +1452,7 @@ let () =
   bind (module SLevel) (get slevel_power);
   bind (module ILevel) (get ilevel_power);
   bind (module ArrayPrecisionLevel) (get plevel_power);
-  bind (module LinearLevel) (fun n -> n * 20);
+  bind (module SubdivideNonLinear) (fun n -> n * 20);
   bind (module RmAssert) (fun n -> n > 0);
   bind (module Domains) (fun n -> Datatype.String.Set.of_list (domains n));
   bind (module SplitReturn) (fun n -> if n > 3 then SplitAuto else NoSplit);
