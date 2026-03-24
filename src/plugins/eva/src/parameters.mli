@@ -43,7 +43,7 @@ module AutomaticContextMaxWidth: Parameter_sig.Int
 
 module AllRoundingModesConstants: Parameter_sig.Bool
 
-module NoResultsDomains: Parameter_sig.String_set
+module NoResultsDomain: Parameter_sig.String_set
 module NoResultsFunction: Parameter_sig.Fundec_set
 module ResultsAll: Parameter_sig.Bool
 

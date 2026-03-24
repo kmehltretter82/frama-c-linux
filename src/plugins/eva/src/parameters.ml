@@ -110,14 +110,14 @@ let create_domain_option name =
        if _new then Domains.add name else remove_domain name)
 
 let () = Parameter_customize.set_group performance
-module NoResultsDomains =
+module NoResultsDomain =
   String_set
     (struct
       let option_name = "-eva-no-results-domain"
       let arg_name = "domains"
       let help = "Do not record the states of some domains during the analysis."
     end)
-let () = add_dep NoResultsDomains.parameter
+let () = add_dep NoResultsDomain.parameter
 
 (* List ((name, descr), priority) of available domains. *)
 let domains_ref : ((string * string) * int) list ref = ref []
@@ -176,7 +176,7 @@ let () =
     Datatype.String.Set.iter (check_domain option_name) domains
   in
   Domains.add_set_hook (hook Domains.name);
-  NoResultsDomains.add_set_hook (hook NoResultsDomains.name)
+  NoResultsDomain.add_set_hook (hook NoResultsDomain.name)
 
 let () = Parameter_customize.set_group domains
 module DomainsFunction =

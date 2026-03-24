@@ -80,7 +80,7 @@ module Make (Domain: InputDomain) = struct
       (ControlPoint.Hashtbl) (States_by_callstack) (val info "TableByCallstack")
 
   let save () =
-    Parameters.(ResultsAll.get () && not (NoResultsDomains.mem Domain.name))
+    Parameters.(ResultsAll.get () && not (NoResultsDomain.mem Domain.name))
 
   let set_state ?callstack control_point state =
     if Save.memo save then
