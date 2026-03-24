@@ -476,6 +476,7 @@ let raise_errors = function
 
 let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
   let fname = li.l_var_info.lv_name in
+  let targs = List.map Logic_normalizer.get_term targs in
   (* build the varinfo (as an expression) which stores the result of the
      function call. *)
   if Builtins.mem li.l_var_info.lv_name then
