@@ -2828,10 +2828,10 @@ let setReturnType (f:fundec) (t:typ) =
 
 let no_op_coerce typ t =
   match typ with
-  | Lreal -> Ast_types.is_logic_arithmetic t.term_type
-  | Linteger -> Ast_types.is_logic_integral t.term_type
-  | Ltype _ when Logic_const.is_boolean_type typ ->
-    Ast_types.is_logic_pure_boolean t.term_type
+  | Lreal -> Ast_types.Acsl.is_logic_arithmetic t.term_type
+  | Linteger -> Ast_types.Acsl.is_logic_integral t.term_type
+  | Ltype _ when Ast_types.Acsl.is_boolean typ ->
+    Ast_types.Acsl.is_logic_pure_boolean t.term_type
   | Ltype ({lt_name="set"},_) -> true
   | _ -> false
 
@@ -2936,7 +2936,7 @@ let rec typeOfTermLval = function
         | Lboolean | Linteger | Lreal ->
           Kernel.fatal ~current:true "typeOfTermLval: Mem on a logic type"
         | Ltype (s,_) as ty when is_unrollable_ltdef s ->
-          type_of_pointed (unroll_ltdef ty)
+          type_of_pointed (Ast_types.Acsl.unroll_ltdef ty)
         | Ltype (s,_) ->
           Kernel.fatal ~current:true
             "typeOfTermLval: Mem on a non-C type (%s)" s.lt_name
@@ -2947,7 +2947,7 @@ let rec typeOfTermLval = function
           Kernel.fatal ~current:true
             "typeOfTermLval: Mem on a function type"
       in
-      Logic_const.transform_element type_of_pointed addr.term_type
+      Ast_types.Acsl.transform_element type_of_pointed addr.term_type
     end
 
 and typeTermOffset basetyp =
@@ -2961,7 +2961,7 @@ and typeTermOffset basetyp =
         Kernel.fatal ~current:true
           "typeTermOffset: Attribute on a logic type"
       | Ltype (s,_) as ty when is_unrollable_ltdef s ->
-        putAttributes (unroll_ltdef ty)
+        putAttributes (Ast_types.Acsl.unroll_ltdef ty)
       | Ltype (s,_) ->
         Kernel.fatal ~current:true
           "typeTermOffset: Attribute on a non-C type (%s)" s.lt_name
@@ -2972,7 +2972,7 @@ and typeTermOffset basetyp =
         Kernel.fatal ~current:true
           "typeTermOffset: Attribute on a function type"
     in
-    Logic_const.transform_element putAttributes t
+    Ast_types.Acsl.transform_element putAttributes t
   in
   function
   | TNoOffset -> basetyp
@@ -2991,14 +2991,14 @@ and typeTermOffset basetyp =
         | Lboolean | Linteger | Lreal ->
           Kernel.fatal ~current:true "typeTermOffset: Index on a logic type"
         | Ltype (s,_) as ty when is_unrollable_ltdef s ->
-          elt_type (unroll_ltdef ty)
+          elt_type (Ast_types.Acsl.unroll_ltdef ty)
         | Ltype (s,_) ->
           Kernel.fatal ~current:true "typeTermOffset: Index on a non-C type (%s)" s.lt_name
         | Lvar s -> Kernel.fatal ~current:true "typeTermOffset: Index on a non-C type ('%s)" s
         | Larrow _ -> Kernel.fatal ~current:true "typeTermOffset: Index on a function type"
       in
-      Logic_const.set_conversion
-        (Logic_const.transform_element elt_type basetyp) e.term_type
+      Ast_types.Acsl.set_conversion
+        (Ast_types.Acsl.transform_element elt_type basetyp) e.term_type
     end
   | TModel (m,o) -> typeTermOffset m.mi_field_type o
   | TField (fi, o) ->
@@ -3013,12 +3013,12 @@ and typeTermOffset basetyp =
       | Lboolean | Linteger | Lreal ->
         Kernel.fatal ~current:true "typeTermOffset: Field on a logic type"
       | Ltype (s,_) as ty when is_unrollable_ltdef s ->
-        elt_type (unroll_ltdef ty)
+        elt_type (Ast_types.Acsl.unroll_ltdef ty)
       | Ltype (s,_) ->
         Kernel.fatal ~current:true "typeTermOffset: Field on a non-C type (%s)" s.lt_name
       | Lvar s ->  Kernel.fatal ~current:true "typeTermOffset: Field on a non-C type ('%s)" s
       | Larrow _ -> Kernel.fatal ~current:true "typeTermOffset: Field on a function type"
-    in Logic_const.transform_element elt_type basetyp
+    in Ast_types.Acsl.transform_element elt_type basetyp
 
 (**** Check for const attribute ****)
 
@@ -3030,7 +3030,7 @@ let isGlobalInitConst vi =
 
 let isVolatileLval lv = Ast_types.is_volatile (typeOfLval lv)
 let isVolatileTermLval lv =
-  Logic_const.plain_or_set Ast_types.is_logic_volatile (typeOfTermLval lv)
+  Ast_types.Acsl.plain_or_set Ast_types.Acsl.is_logic_volatile (typeOfTermLval lv)
 
 (**** MACHINE DEPENDENT PART ****)
 
@@ -3663,7 +3663,7 @@ and bitsOffset (baset: typ) (off: offset) : int * int =
           | Some i -> Z.to_int i
           | None -> raise (SizeOfError ("Index is not constant", baset))
         in
-        let bt = Ast_types.direct_element_type baset in
+        let bt = Ast_types.direct_array_element baset in
         let bitsbt = bitsSizeOf bt in
         loopOff bt bitsbt (start + ei * bitsbt) off
       end

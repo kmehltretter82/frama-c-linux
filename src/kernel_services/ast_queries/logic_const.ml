@@ -135,6 +135,7 @@ let rec instantiate subst = function
        no need to recursively substitute in the resulting type. *)
     (try List.assoc v subst with Not_found -> ty)
   | Ctype _ | Linteger | Lreal | Lboolean as ty -> ty
+(* let instantiate = Ast_types.Acsl.instantiate *)
 
 let is_unrollable_ltdef = function
   | {lt_def=Some (LTsyn _)} -> true
@@ -489,4 +490,3 @@ let pseparated ?loc ?names seps =
 
 let paligned ?loc ?names (p, n) =
   pred ?loc ?names (Paligned(p, n))
-

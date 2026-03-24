@@ -42,7 +42,7 @@ and offset env s t r = function
   | Field(fd,o) -> offset env s fd.ftype (Memory.field r fd) o
   | Index(k,o) ->
     eval env k ;
-    let te = Ast_types.direct_element_type t in
+    let te = Ast_types.direct_array_element t in
     let r = Memory.index r te in
     let s =
       if Kernel.SafeArrays.get () then

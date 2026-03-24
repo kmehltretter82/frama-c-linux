@@ -98,7 +98,7 @@ let tdivide ?loc t1 t2 =
   term ?loc (TBinOp(Div, t1, t2)) t1.term_type
 
 let ttype_of_pointed t =
-  match Ast_types.unroll_logic t with
+  match Ast_types.Acsl.unroll_logic t with
   | Ctype { tnode = TPtr t | TArray (t, _) } -> Ctype t
   | _ -> Options.fatal "ttype_of_pointed on a non pointer type"
 
@@ -128,7 +128,7 @@ let taccess ?loc ptr offset =
     | TLval(lval) -> lval
     | _ -> Options.fatal "unexpected non-lvalue on call to taccess"
   in
-  match Ast_types.unroll_logic ptr.term_type with
+  match Ast_types.Acsl.unroll_logic ptr.term_type with
   | Ctype { tnode = TPtr _ } ->
     let address = tplus ?loc ptr offset in
     let lval = TLval(TMem(address), TNoOffset) in
@@ -207,7 +207,7 @@ and pall_elems_eq ?loc depth t1 t2 len =
   let eq = peq_unfold ?loc (depth+1) t1_acc t2_acc in
   pforall ?loc ([ind], (pimplies ?loc (bounds, eq)))
 and peq_unfold ?loc depth t1 t2 =
-  match Ast_types.unroll_logic t1.term_type with
+  match Ast_types.Acsl.unroll_logic t1.term_type with
   | Ctype { tnode = TArray (_, Some len) } ->
     let len = Logic_utils.expr_to_term ~coerce:true len in
     pall_elems_eq ?loc depth t1 t2 len
@@ -223,7 +223,7 @@ and pall_elems_pred ?loc depth t1 len pred =
   let eq = punfold_pred ?loc depth t1_acc pred in
   pforall ?loc ([ind], (pimplies ?loc (bounds, eq)))
 and punfold_pred ?loc ?(dyn_len = None) depth t1 pred =
-  match Ast_types.unroll_logic t1.term_type with
+  match Ast_types.Acsl.unroll_logic t1.term_type with
   | Ctype { tnode = TArray (_, opt_len) } ->
     let len =
       match opt_len, dyn_len with

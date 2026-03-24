@@ -215,7 +215,7 @@ let of_id m = UF.of_id m.store
 
 module Node =
 struct
-  type t = node
+    type t = node
   let hash = id
   let equal a b = (id a = id b)
   let compare a b = Int.compare (id a) (id b)
@@ -594,9 +594,9 @@ let footprint (r: node) : node list =
       if not (Nhash.mem visited n) then
         begin
           Nhash.add visited n () ;
-          match (UF.get n).clayout with
-          | Compound (_, _, range) -> Ranges.iter visit range
-          | Blob _ | Cell (_,_) -> leaves := n :: !leaves
+      match (UF.get n).clayout with
+      | Compound (_, _, range) -> Ranges.iter visit range
+      | Blob _ | Cell (_,_) -> leaves := n :: !leaves
         end
     in visit r ; !leaves
   with Not_found -> []

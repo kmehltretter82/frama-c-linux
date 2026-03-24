@@ -305,7 +305,7 @@ let cdomain obj =
   if is_constrained_obj obj then Some(TYPE.is_obj obj) else None
 
 let ldomain ltype =
-  match Ast_types.unroll_logic ~unroll_typedef:false ltype with
+  match Ast_types.Acsl.unroll_logic ~unroll_typedef:false ltype with
   | Ctype typ -> cdomain (Ctypes.object_of typ)
   | Ltype _ | Lvar _ | Lboolean | Linteger | Lreal | Larrow _ -> None
 
@@ -486,8 +486,8 @@ let map_logic f = function
   | Lset ls -> Lset (List.map (map_sloc f) ls)
 
 let plain lt e =
-  if Logic_utils.is_set_type lt then
-    let te = Logic_utils.type_of_set_elem lt in
+  if Ast_types.Acsl.is_set_type lt then
+    let te = Ast_types.Acsl.set_element lt in
     Vset [Vset.Set(tau_of_ltype te,e)]
   else
     Vexp e
@@ -554,7 +554,7 @@ let is_false p = e_if (e_prop p) e_zero e_one
 
 let startof ~shift loc typ =
   if Ast_types.is_array typ then
-    let t_elt = Ast_types.direct_element_type typ in
+    let t_elt = Ast_types.direct_array_element typ in
     shift loc (Ctypes.object_of t_elt) e_zero
   else loc
 
@@ -816,16 +816,16 @@ struct
         | Vset s -> a.vset <- List.rev_append s a.vset
         | Lset s -> a.sloc <- List.rev_append s a.sloc
       ) vs ;
-    flush (Logic_utils.is_pointer_type t) a
+    flush (Ast_types.Acsl.is_pointer t) a
 
   let inter t vs =
     match List.map (fun v -> Vset.concretize (vset v)) vs with
     | [] ->
-      if Logic_utils.is_pointer_type @@ Logic_utils.type_of_set_elem t
+      if Ast_types.Acsl.is_pointer @@ Ast_types.Acsl.set_element t
       then Lset [] else Vset []
     | v::vs ->
       let s = List.fold_left Vset.inter v vs in
-      let te = Logic_utils.type_of_set_elem t in
+      let te = Ast_types.Acsl.set_element t in
       Vset [Vset.Set(Lang.tau_of_ltype te,s)]
 
   (* -------------------------------------------------------------------------- *)

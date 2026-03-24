@@ -67,10 +67,10 @@ let get_lvalue = function
   | _ -> None
 
 let rec ghost_term_type t =
-  match (Ast_types.unroll_logic t) with
+  match (Ast_types.Acsl.unroll_logic t) with
   | Ctype t -> Ast_types.is_ghost t
-  | t when Logic_const.is_set_type t ->
-    ghost_term_type (Logic_const.type_of_element t)
+  | t when Ast_types.Acsl.is_set t ->
+    ghost_term_type (Ast_types.Acsl.set_element t)
   | _ -> false
 
 class visitor = object(self)

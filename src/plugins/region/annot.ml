@@ -78,9 +78,9 @@ let rec store env lv ty tgt deps =
       ) @@ Option.value ~default:[] cfields
 
 let is_ctype lt ty =
-  Logic_const.plain_or_set
+  Ast_types.Acsl.plain_or_set
     (fun lt ->
-       match Ast_types.unroll_logic lt with
+       match Ast_types.Acsl.unroll_logic lt with
        | Ctype tr -> Cil_datatype.Typ.equal ty tr
        | _ -> false
     ) lt

@@ -68,7 +68,7 @@ let from_prototype_vi vi =
         TIndex (range, offs), typ
       | _ ->
         TNoOffset,
-        (if set then make_set_type (Ctype typ) else (Ctype typ))
+        (if set then Ast_types.Acsl.make_set (Ctype typ) else (Ctype typ))
     in
     (* make_set_type (Ctype typ_pointed) *)
 
@@ -87,7 +87,7 @@ let from_prototype_vi vi =
     in
     let offset_arrays, typ_with_offset = mk_offset true typ_pointed in
     let t_range =
-      Logic_const.term ~loc t_range_node (if set then make_set_type (Ctype typ) else Ctype typ)
+      Logic_const.term ~loc t_range_node (if set then Ast_types.Acsl.make_set (Ctype typ) else Ctype typ)
     in
     let t = Logic_const.new_identified_term
         (term ~loc (TLval (TMem t_range, offset_arrays)) typ_with_offset)

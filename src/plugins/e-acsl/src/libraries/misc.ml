@@ -119,9 +119,9 @@ let term_of_li li =  match li.l_body with
     Options.fatal "li.l_body does not match LBterm(t) in Misc.term_of_li"
 
 let is_set_of_ptr_or_array lty =
-  if Logic_const.is_set_type lty then
-    let lty = Logic_const.type_of_element lty in
-    Logic_utils.isLogicPointerType lty || Logic_utils.isLogicArrayType lty
+  if Ast_types.Acsl.is_set lty then
+    let lty = Ast_types.Acsl.set_element lty in
+    Ast_types.Acsl.is_logic_pointer lty || Ast_types.Acsl.is_logic_array lty
   else
     false
 
@@ -152,8 +152,8 @@ let is_bitfield_pointers lty =
     | Ltype _ | Lvar _ | Lboolean | Linteger | Lreal | Larrow _ ->
       false
   in
-  if Logic_const.is_set_type lty then
-    is_bitfield_pointer (Logic_const.type_of_element lty)
+  if Ast_types.Acsl.is_set lty then
+    is_bitfield_pointer (Ast_types.Acsl.set_element lty)
   else
     is_bitfield_pointer lty
 

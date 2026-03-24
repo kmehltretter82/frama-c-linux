@@ -4450,7 +4450,7 @@ and makeVarInfoCabs
         ~wkey:Kernel.wkey_ghost_already_ghost ~once:true ~current:true
         "'%s' is already ghost" n;
     if Ast_types.is_array vtype then
-      let elem_t = Ast_types.direct_element_type vtype in
+      let elem_t = Ast_types.direct_array_element vtype in
       if Ast_attributes.contains "ghost" (Ast_types.get_attributes elem_t) then
         Kernel.warning
           ~wkey:Kernel.wkey_ghost_already_ghost ~once:true ~current:true

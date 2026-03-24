@@ -55,7 +55,7 @@ let rec add_addr_offset ~loc (env:env) (ty:typ) (r:node) = function
     add_addr_offset ~loc env f.ftype (Memory.add_field r f) offset
   | TIndex(k,offset) ->
     ignore @@ !rterm env k ;
-    let te = Ast_types.direct_element_type ty in
+    let te = Ast_types.direct_array_element ty in
     add_addr_offset ~loc env te (Memory.add_index r ty) offset
 
 let rec add_term_offset ~loc (env:env) (d:domain) = function
@@ -73,7 +73,7 @@ let dispatch_term_lval ~loc ?(garbage=false) (env:env) (lv : term_lval) =
   match lhost with
   | TMem e ->
     let rh = pointed (!rterm env e) in
-    let te = Logic_typing.ctype_of_pointed e.term_type in
+    let te = Ast_types.Acsl.ctype_of_pointed e.term_type in
     Either.Left (add_addr_offset ~loc env te rh loffset)
   | TResult ty ->
     begin match env.result with
@@ -82,9 +82,9 @@ let dispatch_term_lval ~loc ?(garbage=false) (env:env) (lv : term_lval) =
     end
   | TVar v ->
     let left x =
-      let garbage =
-        garbage && x.vformal && Ast_types.is_struct_or_union x.vtype in
-      let r = Memory.add_cvar ~garbage env.map x in
+        let garbage =
+          garbage && x.vformal && Ast_types.is_struct_or_union x.vtype in
+        let r = Memory.add_cvar ~garbage env.map x in
       add_addr_offset ~loc  env x.vtype r loffset in
     let right d = add_term_offset ~loc env d loffset in
     Either.map ~left ~right @@ lvar env v

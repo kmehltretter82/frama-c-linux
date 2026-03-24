@@ -36,7 +36,7 @@ and add_loffset (m:map) (s:stmt) (r:node) (ty:typ)= function
   | Field(fd,ofs) ->
     add_loffset m s (add_field r fd) fd.ftype ofs
   | Index(e,ofs) ->
-    let elt = Ast_types.direct_element_type ty in
+    let elt = Ast_types.direct_array_element ty in
     ignore @@ add_exp m s e ;
     add_loffset m s (add_index r elt) elt ofs
 
@@ -93,7 +93,7 @@ let rec add_init (m:map) (s:stmt) (lv:lval) (iv:init) =
   | SingleInit e ->
     let r = add_lval m s lv in
     let tv = Cil.typeOfLval lv in
-    let tr = if Ast_types.is_array tv then Ast_types.element_type tv else tv in
+    let tr = if Ast_types.is_array tv then Ast_types.array_element tv else tv in
     let acs = Access.Init(s,lv,e) in
     Memory.add_init r acs tr ;
     Option.iter (Memory.add_points_to r) (add_exp m s e)

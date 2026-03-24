@@ -1530,7 +1530,7 @@ let find_pebble_origin lab actions =
     | Pebble_init (_,_,count) :: _ ->
       Logic_const.term
         (TLval (TVar count, TNoOffset))
-        (Logic_const.make_set_type count.lv_type)
+        (Ast_types.Acsl.make_set count.lv_type)
     | Pebble_move (_,_,set,_) :: _-> Data_for_aorai.pebble_set_at set lab
     | _ :: tl -> aux tl
   in aux actions

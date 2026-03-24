@@ -44,7 +44,7 @@ let pset_len_bytes_to_value ?loc ptr value bytes_len =
 
 let pset_len_bytes_to_zero ?loc ptr bytes_len =
   let eq_value ?loc t =
-    let value = match Ast_types.unroll_logic t.term_type with
+    let value = match Ast_types.Acsl.unroll_logic t.term_type with
       | Ctype { tnode = TPtr _ } -> term Tnull t.term_type
       | Ctype { tnode = TFloat _ } -> treal ?loc 0.
       | Ctype { tnode = (TInt _ | TEnum _) } -> tinteger ?loc 0
@@ -63,7 +63,7 @@ let pset_len_bytes_all_bits_to_one ?loc ptr bytes_len =
   in
   let find_nan_for_type t = List.find (of_type t) nans in
   let all_bits_to_one ?loc t =
-    match Ast_types.unroll_logic t.term_type with
+    match Ast_types.Acsl.unroll_logic t.term_type with
     | Ctype { tnode = TFloat _ } ->
       papp ?loc ((find_nan_for_type t.term_type), [], [t])
     | Ctype { tnode = TPtr _ } ->
@@ -95,7 +95,7 @@ let generate_requires loc ptr value len =
       [ { (pcorrect_len_bytes ~loc ptr.term_type len)
           with pred_name = ["aligned_end"] } ]
     | Some value ->
-      let low, up = match Ast_types.unroll_logic value.term_type with
+      let low, up = match Ast_types.Acsl.unroll_logic value.term_type with
         | Ctype { tnode = TInt ((IChar|ISChar|IUChar) as kind) } ->
           let bits = bitsSizeOfInt kind in
           let plus_one = Z.(add one) in

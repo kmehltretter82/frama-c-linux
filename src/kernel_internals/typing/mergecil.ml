@@ -1513,7 +1513,7 @@ let matchModelField
     let oldfidx = oldlnode.nfidx in
     let mf = lnode.ndata in
     let fidx = oldlnode.nfidx in
-    if Logic_utils.is_same_type oldmf.mi_field_type mf.mi_field_type then
+    if Ast_types.Acsl.is_same oldmf.mi_field_type mf.mi_field_type then
       begin
         if oldfidx < fidx then
           lnode.nrep <- oldlnode.nrep

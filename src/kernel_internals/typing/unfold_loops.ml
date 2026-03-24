@@ -23,7 +23,7 @@ let empty_info =
 
 let update_info global_find_init emitter info spec =
   match spec with
-  | {term_type=typ}  when Logic_utils.is_integral_type typ ->
+  | {term_type=typ}  when Ast_types.Acsl.is_integral_type typ ->
     if Option.is_some info.unroll_number && not info.ignore_unroll then begin
       Kernel.warning ~once:true ~current:true
         "ignoring unfolding directive (directive already defined)";

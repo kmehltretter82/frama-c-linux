@@ -33,7 +33,7 @@ let () = Logic_builtin.register {
 
 let pvalid_region ?loc ?names ?(label=Logic_const.here_label) addr =
   let f = List.hd @@ Logic_env.find_all_logic_functions lvalid_region in
-  let te = Logic_typing.ctype_of_pointed addr.term_type in
+  let te = Ast_types.Acsl.ctype_of_pointed addr.term_type in
   let size = Logic_const.term ?loc (TSizeOf te) Linteger in
   Logic_const.papp ?loc ?names (f,[label],[addr;size])
 

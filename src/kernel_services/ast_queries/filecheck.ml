@@ -838,7 +838,7 @@ module Base_checker = struct
                     check_abort "Trying to use predicate %a as a term"
                       Printer.pp_logic_var lvi
                   | Some rt ->
-                    let ft = Logic_const.make_arrow_type li.l_profile rt in
+                    let ft = Ast_types.Acsl.make_arrow li.l_profile rt in
                     if
                       not
                         (Logic_utils.is_instance_of li.l_tparams t.term_type ft)
@@ -906,7 +906,7 @@ module Base_checker = struct
           self#check_logic_label l; Cil.DoChildren
         | TBinOp (bop, lterm, _) ->
           begin
-            match bop, Logic_utils.isLogicPointerType lterm.term_type with
+            match bop, Ast_types.Acsl.is_logic_pointer lterm.term_type with
             | (PlusA | MinusA), true ->
               check_abort "PlusA/MinusA operator with pointer argument @[(%a)@]"
                 Printer.pp_logic_type lterm.term_type

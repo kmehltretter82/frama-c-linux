@@ -271,7 +271,7 @@ let bind_logic_vars env lvs =
     let bind_logic_var ival =
       state, LogicVarEnv.add lv (Cvalue.V.inject_ival ival) logic_vars
     in
-    match Ast_types.unroll_logic lv.lv_type with
+    match Ast_types.Acsl.unroll_logic lv.lv_type with
     | Linteger -> bind_logic_var Ival.top
     | Lreal -> bind_logic_var top_float
     | Ctype ctyp when Ast_types.is_integral ctyp ->
@@ -287,7 +287,7 @@ let bind_logic_vars env lvs =
   overwrite_current_state { env with logic_vars } state
 
 let add_logic_var env lvar value =
-  match Ast_types.unroll_logic lvar.lv_type with
+  match Ast_types.Acsl.unroll_logic lvar.lv_type with
   | Linteger | Lreal ->
     let logic_vars = LogicVarEnv.add lvar value env.logic_vars in
     { env with logic_vars }
@@ -300,7 +300,7 @@ let add_logic_var env lvar value =
   | _ -> unsupported_lvar lvar
 
 let find_logic_var env lvar =
-  match Ast_types.unroll_logic lvar.lv_type with
+  match Ast_types.Acsl.unroll_logic lvar.lv_type with
   | Linteger | Lreal -> LogicVarEnv.find lvar env.logic_vars
   | Ctype _ ->
     let base = Base.of_c_logic_var lvar in
@@ -337,7 +337,7 @@ let split_logic_vars env lvars =
 
 let unbind_logic_vars env lvs =
   let unbind_one (state, logic_vars) lv =
-    match Ast_types.unroll_logic lv.lv_type with
+    match Ast_types.Acsl.unroll_logic lv.lv_type with
     | Linteger | Lreal -> state, LogicVarEnv.remove lv logic_vars
     | Ctype _ ->
       let base = Base.of_c_logic_var lv in
@@ -490,7 +490,7 @@ let rec isLogicNonCompositeType t =
   | Lvar _ | Larrow _ -> false
   | Ltype (info, _) ->
     info.lt_name = "sign" ||
-    (try isLogicNonCompositeType (Logic_const.type_of_element t)
+    (try isLogicNonCompositeType (Ast_types.Acsl.set_element t)
      with Failure _ -> false)
   | Lboolean | Linteger | Lreal -> true
   | Ctype t -> Ast_types.is_scalar t
@@ -506,9 +506,9 @@ let rec infer_type = function
   | Linteger -> Cil_const.intType
   | Lreal -> Cil_const.doubleType
   | Ltype _ | Larrow _ as t ->
-    if Logic_const.is_plain_type t then
+    if Ast_types.Acsl.is_plain t then
       unsupported (Pretty_utils.to_string Cil_datatype.Logic_type.pretty t)
-    else Logic_const.plain_or_set infer_type t
+    else Ast_types.Acsl.plain_or_set infer_type t
 
 (* Best effort for comparing the types currently understood by Value: ignore
    differences in integer and floating-point sizes, that are meaningless
@@ -554,12 +554,12 @@ let comes_from_fc_stdlib lvar =
     Cil.is_in_libc vi.vattr
 
 let is_noop_cast ~src_typ ~dst_typ =
-  let src_typ = Logic_const.plain_or_set
+  let src_typ = Ast_types.Acsl.plain_or_set
       (fun lt ->
-         match Ast_types.unroll_logic lt with
+         match Ast_types.Acsl.unroll_logic lt with
          | Ctype typ -> Eval_typ.classify_as_scalar typ
          | _ -> None
-      ) (Ast_types.unroll_logic src_typ)
+      ) (Ast_types.Acsl.unroll_logic src_typ)
   in
   let open Eval_typ in
   match src_typ, Eval_typ.classify_as_scalar dst_typ with
@@ -573,7 +573,7 @@ let is_noop_cast ~src_typ ~dst_typ =
 (* If casting [trm] to [typ] has no effect in terms of the values contained
    in [trm], do nothing. Otherwise, raise [exn]. Adapted from [pass_cast] *)
 let pass_logic_cast exn typ trm =
-  match Ast_types.(unroll_logic typ, unroll_logic trm.term_type) with
+  match Ast_types.Acsl.(unroll_logic typ, unroll_logic trm.term_type) with
   | Linteger, Ctype { tnode = (TInt _ | TEnum _) } -> () (* Always inclusion *)
   | Ctype ({ tnode = (TInt _ | TEnum _) } as typ),
     Ctype ({ tnode = (TInt _ | TEnum _) } as typeoftrm) ->
@@ -1062,7 +1062,7 @@ let rec eval_term ~alarm_mode env t =
 
   | TStartOf tlval ->
     let r = eval_tlval ~alarm_mode env tlval in
-    { etype = Cil_const.mk_tptr (Ast_types.direct_element_type r.etype);
+    { etype = Cil_const.mk_tptr (Ast_types.direct_array_element r.etype);
       ldeps = r.ldeps;
       eunder = Addresses.Bits.to_bytes_under r.eunder;
       eover = Addresses.Bits.to_bytes r.eover;
@@ -1201,13 +1201,13 @@ let rec eval_term ~alarm_mode env t =
     (* we must handle coercion from singleton to set, for which there is
        nothing to do, AND coercion from an integer type to a floating-point
        type, that require a conversion. *)
-    (match Logic_const.plain_or_set Fun.id ltyp with
-     | Linteger when Logic_utils.is_integral_type t.term_type
-                  || Logic_const.is_boolean_type t.term_type -> r
+    (match Ast_types.Acsl.plain_or_set Fun.id ltyp with
+     | Linteger when Ast_types.Acsl.is_integral_type t.term_type
+                  || Ast_types.Acsl.is_boolean t.term_type -> r
      | Ctype typ when Ast_types.is_integral_or_pointer typ -> r
      | Lreal ->
        let eover =
-         if Logic_utils.is_integral_type t.term_type
+         if Ast_types.Acsl.is_integral_type t.term_type
          then V.cast_int_to_float Fval.Real r.eover
          else V.cast_float_to_float Fval.Real r.eover
        in
@@ -1216,10 +1216,10 @@ let rec eval_term ~alarm_mode env t =
          eover; eunder = under_from_over eover;
          empty = r.empty }
      | ltyp ->
-       if Logic_const.is_boolean_type ltyp
-       && Logic_utils.is_integral_type t.term_type
+       if Ast_types.Acsl.is_boolean ltyp
+       && Ast_types.Acsl.is_integral_type t.term_type
        then cast_to_bool r
-       else if Logic_utils.is_same_type ltyp t.term_type then
+       else if Ast_types.Acsl.is_same ltyp t.term_type then
          (* coercion from singleton to set *)
          r
        else
@@ -1716,7 +1716,7 @@ and eval_tlhost ~alarm_mode env lv =
   match lv with
   | TVar lvar ->
     let base, typ =
-      match lvar.lv_origin, Ast_types.unroll_logic lvar.lv_type with
+      match lvar.lv_origin, Ast_types.Acsl.unroll_logic lvar.lv_type with
       | Some v, _ -> Base.of_varinfo v, v.vtype
       | None, Ctype typ -> Base.of_c_logic_var lvar, typ
       | _ -> unsupported_lvar lvar
@@ -2512,7 +2512,7 @@ and eval_predicate env pred =
         | Pobject_pointer _ -> Object_pointer
         | _ -> assert false
       in
-      let typ_pointed = Logic_typing.ctype_of_pointed tsets.term_type in
+      let typ_pointed = Ast_types.Acsl.ctype_of_pointed tsets.term_type in
       (* Check if we are trying to write in a const l-value *)
       if kind = Write && Eva_utils.is_const_write_invalid typ_pointed
       then False

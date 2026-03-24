@@ -495,10 +495,21 @@ let direct_element_type t =
   | TArray (elem_t, _) -> elem_t
   | _ -> Kernel.fatal "Not an array type %a" Cil_datatype.Typ.pretty t
 
+let direct_array_element t =
+  match unroll_node t with
+  | TArray (elem_t, _) -> elem_t
+  | _ -> Kernel.fatal "Not an array type %a" Cil_datatype.Typ.pretty t
+
 let rec element_type t =
-  let t' = direct_element_type t in
+  let t' = direct_array_element t in
   match unroll_node t' with
   | TArray _ -> element_type t'
+  | _ -> t'
+
+let rec array_element t =
+  let t' = direct_array_element t in
+  match unroll_node t' with
+  | TArray _ -> array_element t'
   | _ -> t'
 
 let array_elem_type_and_size t =
@@ -514,8 +525,414 @@ let direct_pointed_type t =
 let pointed_type t =
   let t' = direct_pointed_type t in
   match unroll_node t' with
-  | TArray _ -> element_type t'
+  | TArray _ -> array_element t'
   | _ -> t'
+
+
+(* ********************* *)
+(* Logic Type utilities. *)
+(* ********************* *)
+
+module Acsl = struct
+
+  let rec instantiate subst = function
+    | Ltype(ty,prms) -> Ltype(ty, List.map (instantiate subst) prms)
+    | Larrow(args,rt) ->
+      Larrow(List.map (instantiate subst) args, instantiate subst rt)
+    | Lvar v as ty ->
+      (* This is an application of type parameters:
+         no need to recursively substitute in the resulting type. *)
+      (try List.assoc v subst with Not_found -> ty)
+    | Ctype _ | Linteger | Lreal | Lboolean as ty -> ty
+
+  let rec unroll_ltdef = function
+    | Ltype ({lt_def=Some (LTsyn ty);lt_params},prms) ->
+      let subst =
+        try
+          List.combine lt_params prms
+        with Invalid_argument _ ->
+          Kernel.fatal "Logic type used with wrong number of parameters"
+      in
+      unroll_ltdef (instantiate subst ty)
+    | Ltype ({lt_def= None},_)
+    | Ltype ({lt_def= Some (LTsum _)},_)
+    | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ | Ctype _ as ty  -> ty
+
+  let rec unroll_logic ?(unroll_typedef=true) = function
+    | Ltype (tdef,_) as ty when Logic_const.is_unrollable_ltdef tdef ->
+      unroll_logic ~unroll_typedef (unroll_ltdef ty)
+    | Ctype ty when unroll_typedef -> Ctype (unroll ty)
+    | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ | Ctype _ | Ltype _ as ty ->
+      ty
+
+  let rec is_logic_ctype f = function
+    | Ltype (tdef,_) as ty when Logic_const.is_unrollable_ltdef tdef ->
+      is_logic_ctype f (unroll_ltdef ty)
+    | Ltype _ | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ -> false
+    | Ctype cty  -> f cty
+
+  let rec is_list = function
+    | Ltype ({lt_name = "\\list"},[_]) -> true
+    | Ltype (tdef,_) as ty when Logic_const.is_unrollable_ltdef tdef ->
+      is_list (unroll_ltdef ty)
+    | _ -> false
+
+  (** build the type list of [ty]. *)
+  let make_list ty =
+    Ltype(Logic_env.find_logic_type "\\list",[ty])
+
+  (** returns the type of elements of a list type.
+      @raise Failure if the input type is not a list type. *)
+  let rec list_element ty = match ty with
+    | Ltype ({lt_name = "\\list"},[t]) -> t
+    | Ltype (tdef,_) as ty when Logic_const.is_unrollable_ltdef tdef ->
+      list_element (unroll_ltdef ty)
+    | _ -> failwith "not a list type"
+
+  let rec is_set = function
+    | Ltype ({lt_name = "set"},[_]) -> true
+    | Ltype (tdef,_) as ty when Logic_const.is_unrollable_ltdef tdef ->
+      is_set (unroll_ltdef ty)
+    | _ -> false
+
+  (** converts a type into the corresponding set type if needed. *)
+  let make_set ty =
+    if is_set ty then ty
+    else Ltype(Logic_env.find_logic_type "set",[ty])
+
+  (** [set_conversion ty1 ty2] returns a set type as soon as [ty1] and/or [ty2]
+      is a set. Elements have type [ty1], or the type of the elements of [ty1] if
+      it is itself a set-type ({i.e.} we do not build set of sets that way).*)
+  let set_conversion ty1 ty2 =
+    if is_set ty2 then make_set ty1 else ty1
+
+  (** returns the type of elements of a set type.
+      @raise Failure if the input type is not a set type. *)
+  let rec set_element ty = match ty with
+    | Ltype ({lt_name = "set"},[t]) -> t
+    | Ltype (tdef,_) as ty when Logic_const.is_unrollable_ltdef tdef ->
+      set_element (unroll_ltdef ty)
+    | _ -> failwith "not a set type"
+
+  (** [plain_or_set f t] applies [f] to [t] or to the type of elements of [t]
+      if it is a set type *)
+  let plain_or_set f = function
+    | Ltype ({lt_name = "set"},[t]) -> f t
+    | Ltype (tdef,_) as t when Logic_const.is_unrollable_ltdef tdef -> begin
+        match unroll_ltdef t with
+        | Ltype ({lt_name = "set"},[t]) -> f t
+        | _ -> f t
+      end
+    | t -> f t
+
+  let transform_element f t = set_conversion (plain_or_set f t) t
+
+  let is_plain ty = not (is_set ty)
+
+  let make_arrow args rt =
+    match args with
+    | [] -> rt
+    | _ -> Larrow(List.map (fun x -> x.lv_type) args, rt)
+
+  let rec is_boolean = function
+    | Lboolean -> true
+    | Ltype (tdef,_) as ty when Logic_const.is_unrollable_ltdef tdef ->
+      is_boolean (unroll_ltdef ty)
+    | _ -> false
+
+  (* Utils function for is_logic_* functions. *)
+  let unroll_logic_aux is_logic lti t =
+    Logic_const.is_unrollable_ltdef lti && is_logic (unroll_ltdef t)
+
+  let rec is_logic_volatile t =
+    match t with
+    | Ctype typ -> is_volatile typ
+    | Lboolean | Linteger | Lreal | Lvar _ | Larrow _ -> false
+    | Ltype (lti,_) -> unroll_logic_aux is_logic_volatile lti t
+
+  let rec is_logic_typetag t =
+    match t with
+    | Ltype ({lt_name = "typetag"}, []) -> true
+    | Ltype (lti, _) -> unroll_logic_aux is_logic_typetag lti t
+    | _ -> false
+
+  let rec is_logic_boolean t =
+    match t with
+    | Ctype t -> is_integral t
+    | Lboolean | Linteger -> true
+    | Ltype (lti, _) -> unroll_logic_aux is_logic_boolean lti t
+    | Lreal | Lvar _ | Larrow _ -> false
+
+  let rec is_logic_pure_boolean t =
+    match t with
+    | Ctype t -> is_bool t
+    | Lboolean -> true
+    | Ltype (lti, _) -> unroll_logic_aux is_logic_pure_boolean lti t
+    | _ -> false
+
+  let rec is_logic_integral t =
+    match t with
+    | Ctype t -> is_integral t
+    | Lboolean -> false
+    | Linteger -> true
+    | Lreal -> false
+    | Ltype (lti, _) -> unroll_logic_aux is_logic_integral lti t
+    | Lvar _ | Larrow _ -> false
+
+  let is_logic_float t =
+    match t with
+    | Ctype t -> is_float t
+    | Lboolean -> false
+    | Linteger -> false
+    | Lreal -> false
+    | Lvar _ | Ltype _ | Larrow _ -> false
+
+  let rec is_logic_real t =
+    match t with
+    | Ctype _ -> false
+    | Lboolean -> false
+    | Linteger -> false
+    | Lreal -> true
+    | Ltype (lti, _) -> unroll_logic_aux is_logic_real lti t
+    | Lvar _ | Larrow _ -> false
+
+  let rec is_logic_real_or_float t =
+    match t with
+    | Ctype t -> is_float t
+    | Lboolean -> false
+    | Linteger -> false
+    | Lreal -> true
+    | Ltype (lti, _) -> unroll_logic_aux is_logic_real_or_float lti t
+    | Lvar _ | Larrow _ -> false
+
+  let rec is_logic_arithmetic t =
+    match t with
+    | Ctype t -> is_arithmetic t
+    | Linteger | Lreal -> true
+    | Ltype (lti, _) -> unroll_logic_aux is_logic_arithmetic lti t
+    | Lboolean | Lvar _ | Larrow _ -> false
+
+  let is_logic_ptr t =
+    is_logic_ctype is_ptr t
+
+  let is_logic_fun t =
+    is_logic_ctype is_ptr t
+
+  let is_logic_fun_ptr t =
+    is_logic_ctype is_ptr t
+
+  let is_logic_fun_or_ptr t =
+    is_logic_ctype is_ptr t
+
+  let is_plain_arithmetic t = is_logic_arithmetic t
+
+  let is_plain_integral t = is_logic_integral t
+
+  let is_plain_fun_ptr t = is_logic_fun_ptr t
+
+  let is_plain_array t =
+    match unroll_logic t with
+    | Ctype ct -> is_array ct
+    | _ -> false
+
+  let is_plain_pointer t =
+    match unroll_logic t with
+    | Ctype ct -> is_ptr ct
+    | _ -> false
+
+  let is_arithmetic_type = plain_or_set is_plain_arithmetic
+
+  let is_integral_type = plain_or_set is_plain_integral
+
+  let is_fun_ptr = plain_or_set is_plain_fun_ptr
+
+  let is_array_type = plain_or_set is_plain_array
+
+  let is_pointer = plain_or_set is_plain_pointer
+
+  let is_list_type t =
+    is_list (unroll_logic t)
+
+  let is_set_type t =
+    is_set (unroll_logic t)
+
+  (*
+  let pointed =
+    transform_element
+      (fun t ->
+         match unroll_logic t with
+           Ctype ty when is_ptr ty ->
+           Ctype (direct_pointed_type ty)
+         | _ ->
+           Kernel.fatal ~current:true "type %a is not a pointer type"
+             !Cil.pp_logic_type_ref t)
+  *)
+
+  let is_logic f t = plain_or_set (is_logic_ctype f) t
+
+  (** true if the type is a C array (or a set of)*)
+  let is_logic_array = is_logic is_array
+
+  let is_logic_char = is_logic is_char
+
+  let is_logic_any_char = is_logic is_any_char
+
+  let is_logic_void = is_logic is_void
+
+  let is_logic_pointer = is_logic is_ptr
+
+  let is_logic_void_pointer = is_logic is_void_ptr
+
+  let logic_ctype t =
+    let rec logic_ctype = function
+      | Ctype t -> t
+      | Ltype (tdef,_) as ty when Logic_const.is_unrollable_ltdef tdef ->
+        logic_ctype (unroll_ltdef ty)
+      | Lvar _ -> Cil_const.intType
+      | _ -> failwith "not a C type"
+    in plain_or_set logic_ctype t
+
+  (*
+  let plain_array_to_ptr ty =
+    let open Current_loc.Operators in
+    match unroll_logic ty with
+    | Ctype({ tnode = TArray(ty,lo); tattr } as tarr) ->
+      let length_attr =
+        match lo with
+        | None -> []
+        | Some e ->
+          let<> UpdatedCurrentLoc = e.eloc in
+          try
+            let len = Cil.bitsSizeOf tarr in
+            let len =
+              if Cil.bitsSizeOf ty == 0 then 0
+              else try len / (Cil.bitsSizeOf ty)
+                with Cil.SizeOfError _ ->
+                  Kernel.fatal
+                    "Inconsistent information: I know the length of \
+                     array type %a, but not of its elements."
+                    !Cil.pp_typ_ref tarr
+            in
+            (* Normally, overflow is checked in bitsSizeOf itself *)
+            let la = AInt (Z.of_int len) in
+            [ ("arraylen",[la]) ]
+          with Cil.SizeOfError _ ->
+            Kernel.warning ~current:true
+              "Cannot represent length of array as an attribute";
+            []
+      in
+      let tattr = Ast_attributes.add_list length_attr tattr in
+      Ctype (Cil_const.mk_tptr ~tattr ty)
+    | ty -> ty
+
+  let array_to_ptr = plain_or_set plain_array_to_ptr
+  *)
+
+  let remove_qualifiers =
+    let plain typ =
+      match unroll_logic typ with
+      | Ctype t ->
+        let t' = remove_qualifiers t in
+        if Cil_datatype.Typ.equal t t' then typ else Ctype t'
+      | _ -> typ
+    in
+    transform_element plain
+
+  (*let mk_coerce ltyp t =
+    Logic_const.term ~loc:t.term_loc (TCast (true, ltyp, t)) ltyp
+
+  let rec numeric_coerce ltyp t =
+    let oldt = unroll_logic t.term_type in
+    match t.term_node with
+    | TCast (true, lt,e) when Cil.no_op_coerce lt e ->
+      (* coercion hidden by the printer, but still present *)
+      numeric_coerce ltyp e
+    | TConst(LEnum _) | TConst(Integer _) when ltyp = Linteger
+      -> { t with term_type = Linteger }
+    | TConst(LReal _ ) when ltyp = Lreal ->
+      { t with term_type = Lreal }
+    | TCast (false, Ctype ty,e) ->
+      begin match ltyp, unroll_node ty, e.term_node with
+        | Linteger, TInt ik, TConst(Integer(v,_))
+          when Cil.fitsInInt ik v -> { e with term_type = Linteger }
+        | Lreal, TFloat fk, TConst(LReal r)
+          when Cil.isExactFloat fk r -> { e with term_type = Lreal }
+        | Linteger, TInt ik, TConst(LEnum { eival }) ->
+          ( match Cil.constFoldToInt eival with
+            | Some i when Cil.fitsInInt ik i -> { e with term_type = Linteger }
+            | _ -> mk_coerce ltyp t )
+        | _ -> mk_coerce ltyp t
+      end
+    | Trange(a,b) ->
+      let ra = numeric_bound ltyp a in
+      let rb = numeric_bound ltyp b in
+      { t with term_node = Trange(ra,rb) ;
+               term_type = make_set ltyp }
+    | Tunion ts ->
+      { t with term_node = Tunion (List.map (numeric_coerce ltyp) ts) ;
+               term_type = make_set ltyp }
+    | Tinter ts ->
+      { t with term_node = Tinter (List.map (numeric_coerce ltyp) ts) ;
+               term_type = make_set ltyp }
+    | Tcomprehension(t,qs,cond) ->
+      { t with term_node = Tcomprehension (numeric_coerce ltyp t,qs,cond) ;
+               term_type = make_set ltyp }
+    | _ ->
+      if Cil_datatype.Logic_type.equal oldt ltyp then t
+      else mk_coerce ltyp t
+
+  and numeric_bound ltyp = function
+    | None -> None
+    | Some a -> Some (numeric_coerce ltyp a)*)
+
+  let is_same t1 t2 = Cil_datatype.Logic_type_ByName.equal t1 t2
+
+  let rec ctype_of_pointed t =
+    match unroll_logic t with
+      Ctype ty when is_ptr ty -> direct_pointed_type ty
+    | Ltype ({lt_name = "set"},[t]) -> ctype_of_pointed t
+    | _ ->
+      Kernel.fatal ~current:true "type %a is not a pointer type"
+        (* Cil_printer.pp_logic_type t *)
+        Cil_datatype.Logic_type.pretty t
+
+  let rec ctype_of_array_elem t =
+    match unroll_logic t with
+    | Ctype ty when is_array ty -> direct_array_element ty
+    | Ltype ({lt_name = "set"},[t]) -> ctype_of_array_elem t
+    | _ ->
+      Kernel.fatal ~current:true "type %a is not a pointer type"
+        (*Cil_printer.pp_logic_type t*)
+        Cil_datatype.Logic_type.pretty t
+
+  let rec arithmetic_conversion ty1 ty2 =
+    match unroll_logic ty1, unroll_logic ty2 with
+    | Ctype ty1, Ctype ty2 ->
+      if is_integral ty1 && is_integral ty2
+      then Linteger
+      else Lreal
+    | (Linteger, Ctype t | Ctype t, Linteger) when is_integral t ->
+      Linteger
+    | (Linteger, Ctype t | Ctype t , Linteger)
+      when is_arithmetic t-> Lreal
+    | (Lreal, Ctype ty | Ctype ty, Lreal)
+      when is_arithmetic ty -> Lreal
+    | Linteger, Linteger -> Linteger
+    | (Lreal | Linteger) , (Lreal | Linteger) -> Lreal
+    | Ltype ({lt_name="set"} as lt,[t1]),
+      Ltype ({lt_name="set"},[t2]) ->
+      Ltype(lt,[arithmetic_conversion t1 t2])
+    | Ltype ({lt_name="set"} as lt,[t1]), t2 ->
+      Ltype(lt, [arithmetic_conversion t1 t2])
+    | t1, Ltype({lt_name = "set"} as lt, [t2]) ->
+      Ltype(lt, [arithmetic_conversion t1 t2])
+    | _ ->
+      Kernel.fatal
+        ~current:true
+        "arithmetic conversion between non arithmetic types %a and %a"
+        (*Cil_printer.pp_logic_type ty1 Cil_printer.pp_logic_type ty2*)
+        Cil_datatype.Logic_type.pretty ty1 Cil_datatype.Logic_type.pretty ty2
+end
 
 (* ******************** *)
 (* Logic Type checkers. *)
@@ -523,7 +940,7 @@ let pointed_type t =
 
 let rec unroll_logic ?(unroll_typedef=true) = function
   | Ltype (tdef,_) as ty when Logic_const.is_unrollable_ltdef tdef ->
-    unroll_logic ~unroll_typedef (Logic_const.unroll_ltdef ty)
+    unroll_logic ~unroll_typedef (Acsl.unroll_ltdef ty)
   | Ctype ty when unroll_typedef -> Ctype (unroll ty)
   | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ | Ctype _ | Ltype _ as ty ->
     ty
@@ -531,33 +948,35 @@ let rec unroll_logic ?(unroll_typedef=true) = function
 let () = Cil_datatype.punrollLogicType := unroll_logic
 
 (* Utils function for is_logic_* functions. *)
+(*
 let unroll_logic_aux is_logic lti t =
-  Logic_const.is_unrollable_ltdef lti && is_logic (Logic_const.unroll_ltdef t)
+  Logic_const.is_unrollable_ltdef lti && is_logic (Acsl.unroll_ltdef t)
+*)
 
 let rec is_logic_volatile t =
   match t with
   | Ctype typ -> is_volatile typ
   | Lboolean | Linteger | Lreal | Lvar _ | Larrow _ -> false
-  | Ltype (lti,_) -> unroll_logic_aux is_logic_volatile lti t
+  | Ltype (lti,_) -> Acsl.unroll_logic_aux is_logic_volatile lti t
 
 let rec is_logic_typetag t =
   match t with
   | Ltype ({lt_name = "typetag"}, []) -> true
-  | Ltype (lti, _) -> unroll_logic_aux is_logic_typetag lti t
+  | Ltype (lti, _) -> Acsl.unroll_logic_aux is_logic_typetag lti t
   | _ -> false
 
 let rec is_logic_boolean t =
   match t with
   | Ctype t -> is_integral t
   | Lboolean | Linteger -> true
-  | Ltype (lti, _) -> unroll_logic_aux is_logic_boolean lti t
+  | Ltype (lti, _) -> Acsl.unroll_logic_aux is_logic_boolean lti t
   | Lreal | Lvar _ | Larrow _ -> false
 
 let rec is_logic_pure_boolean t =
   match t with
   | Ctype t -> is_bool t
   | Lboolean -> true
-  | Ltype (lti, _) -> unroll_logic_aux is_logic_pure_boolean lti t
+  | Ltype (lti, _) -> Acsl.unroll_logic_aux is_logic_pure_boolean lti t
   | _ -> false
 
 let rec is_logic_integral t =
@@ -566,7 +985,7 @@ let rec is_logic_integral t =
   | Lboolean -> false
   | Linteger -> true
   | Lreal -> false
-  | Ltype (lti, _) -> unroll_logic_aux is_logic_integral lti t
+  | Ltype (lti, _) -> Acsl.unroll_logic_aux is_logic_integral lti t
   | Lvar _ | Larrow _ -> false
 
 let is_logic_float t =
@@ -583,7 +1002,7 @@ let rec is_logic_real t =
   | Lboolean -> false
   | Linteger -> false
   | Lreal -> true
-  | Ltype (lti, _) -> unroll_logic_aux is_logic_real lti t
+  | Ltype (lti, _) -> Acsl.unroll_logic_aux is_logic_real lti t
   | Lvar _ | Larrow _ -> false
 
 let rec is_logic_real_or_float t =
@@ -592,24 +1011,24 @@ let rec is_logic_real_or_float t =
   | Lboolean -> false
   | Linteger -> false
   | Lreal -> true
-  | Ltype (lti, _) -> unroll_logic_aux is_logic_real_or_float lti t
+  | Ltype (lti, _) -> Acsl.unroll_logic_aux is_logic_real_or_float lti t
   | Lvar _ | Larrow _ -> false
 
 let rec is_logic_arithmetic t =
   match t with
   | Ctype t -> is_arithmetic t
   | Linteger | Lreal -> true
-  | Ltype (lti, _) -> unroll_logic_aux is_logic_arithmetic lti t
+  | Ltype (lti, _) -> Acsl.unroll_logic_aux is_logic_arithmetic lti t
   | Lboolean | Lvar _ | Larrow _ -> false
 
 let is_logic_ptr t =
-  Logic_const.isLogicCType is_ptr t
+  Acsl.is_logic_ctype is_ptr t
 
 let is_logic_fun t =
-  Logic_const.isLogicCType is_fun t
+  Acsl.is_logic_ctype is_ptr t
 
 let is_logic_fun_ptr t =
-  Logic_const.isLogicCType is_fun_ptr t
+  Acsl.is_logic_ctype is_ptr t
 
 let is_logic_fun_or_ptr t =
-  Logic_const.isLogicCType is_fun_or_ptr t
+  Acsl.is_logic_ctype is_ptr t
