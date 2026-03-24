@@ -60,7 +60,7 @@ let eva () =
   end
 
 let eva_deps = [Eva.Analysis.self; Libc.self]
-let eva_once, _ = State_builder.apply_once "Metrics.value" eva_deps eva
+let eva_once, _ = State_builder.apply_once "Metrics.eva" eva_deps eva
 
 let main () =
   if Enabled.get () then syntactic_once ();
