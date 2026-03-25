@@ -56,20 +56,20 @@ typedef _Float64 _Float64_t;
 
 /*@
   assigns \result \from x;
-  behavior nan:
+  behavior nan_argument:
     assumes is_nan: \is_NaN(x);
     ensures fp_nan: \result == FP_NAN;
-  behavior inf:
+  behavior infinite_argument:
     assumes is_infinite: !\is_NaN(x) && !\is_finite(x);
     ensures fp_infinite: \result == FP_INFINITE;
-  behavior zero:
+  behavior zero_argument:
     assumes is_a_zero: x == 0.0; // also includes -0.0
     ensures fp_zero: \result == FP_ZERO;
-  behavior subnormal:
+  behavior subnormal_argument:
     assumes is_finite: \is_finite(x);
     assumes is_subnormal: (x > 0.0 && x < FLT_MIN) || (x < 0.0 && x > -FLT_MIN);
     ensures fp_subnormal: \result == FP_SUBNORMAL;
-  behavior normal:
+  behavior normal_argument:
     assumes is_finite: \is_finite(x);
     assumes not_subnormal: (x <= -FLT_MIN || x >= FLT_MIN);
     ensures fp_normal: \result == FP_NORMAL;
@@ -80,20 +80,20 @@ __FC_EXTERN_FOR_MACRO(fpclassify) int __fc_fpclassifyf(float x);
 
 /*@
   assigns \result \from x;
-  behavior nan:
+  behavior nan_argument:
     assumes is_nan: \is_NaN(x);
     ensures fp_nan: \result == FP_NAN;
-  behavior inf:
+  behavior infinite_argument:
     assumes is_infinite: !\is_NaN(x) && !\is_finite(x);
     ensures fp_infinite: \result == FP_INFINITE;
-  behavior zero:
+  behavior zero_argument:
     assumes is_a_zero: x == 0.0; // also includes -0.0
     ensures fp_zero: \result == FP_ZERO;
-  behavior subnormal:
+  behavior subnormal_argument:
     assumes is_finite: \is_finite(x);
     assumes is_subnormal: (x > 0.0 && x < DBL_MIN) || (x < 0.0 && x > -DBL_MIN);
     ensures fp_subnormal: \result == FP_SUBNORMAL;
-  behavior normal:
+  behavior normal_argument:
     assumes is_finite: \is_finite(x);
     assumes not_subnormal: (x <= -DBL_MIN || x >= DBL_MIN);
     ensures fp_normal: \result == FP_NORMAL;
@@ -104,20 +104,20 @@ __FC_EXTERN_FOR_MACRO(fpclassify) int __fc_fpclassify(double x);
 
 /*@
   assigns \result \from x;
-  behavior nan:
+  behavior nan_argument:
     assumes is_nan: \is_NaN(x);
     ensures fp_nan: \result == FP_NAN;
-  behavior inf:
+  behavior infinite_argument:
     assumes is_infinite: !\is_NaN(x) && !\is_finite(x);
     ensures fp_infinite: \result == FP_INFINITE;
-  behavior zero:
+  behavior zero_argument:
     assumes is_a_zero: x == 0.0; // also includes -0.0
     ensures fp_zero: \result == FP_ZERO;
-  behavior subnormal:
+  behavior subnormal_argument:
     assumes is_finite: \is_finite(x);
     assumes is_subnormal: (x > 0.0 && x < LDBL_MIN) || (x < 0.0 && x > -LDBL_MIN);
     ensures fp_subnormal: \result == FP_SUBNORMAL;
-  behavior normal:
+  behavior normal_argument:
     assumes is_finite: \is_finite(x);
     assumes not_subnormal: (x <= -LDBL_MIN || x >= LDBL_MIN);
     ensures fp_normal: \result == FP_NORMAL;
@@ -145,13 +145,13 @@ __FC_EXTERN_FOR_MACRO(fpclassify) int __fc_fpclassifyl(long double x);
 
 /*@
   assigns \result \from x;
-  behavior plus_inf:
+  behavior pos_infinity_argument:
     assumes is_plus_infinity: \is_plus_infinity(x);
     ensures res_one: \result == 1;
-  behavior neg_inf:
+  behavior neg_infinity_argument:
     assumes is_minus_infinity: \is_minus_infinity(x);
     ensures res_minus_one: \result == -1;
-  behavior rest:
+  behavior finite_argument:
     assumes not_infinity: !\is_infinite (x);
     ensures res_zero: \result == 0;
   complete behaviors;
@@ -161,13 +161,13 @@ __FC_EXTERN_FOR_MACRO(isinf) int __fc_isinff(float x);
 
 /*@
   assigns \result \from x;
-  behavior plus_inf:
+  behavior pos_infinity_argument:
     assumes is_plus_infinity: \is_plus_infinity(x);
     ensures res_one: \result == 1;
-  behavior neg_inf:
+  behavior neg_infinity_argument:
     assumes is_minus_infinity: \is_minus_infinity(x);
     ensures res_minus_one: \result == -1;
-  behavior rest:
+  behavior finite_argument:
     assumes not_infinity: !\is_infinite (x);
     ensures res_zero: \result == 0;
   complete behaviors;
@@ -177,13 +177,13 @@ __FC_EXTERN_FOR_MACRO(isinf) int __fc_isinf(double x);
 
 /*@
   assigns \result \from x;
-  behavior plus_inf:
+  behavior pos_infinity_argument:
     assumes is_plus_infinity: \is_plus_infinity(x);
     ensures res_one: \result == 1;
-  behavior neg_inf:
+  behavior neg_infinity_argument:
     assumes is_minus_infinity: \is_minus_infinity(x);
     ensures res_minus_one: \result == -1;
-  behavior rest:
+  behavior finite_argument:
     assumes not_infinity: !\is_infinite (x);
     ensures res_zero: \result == 0;
   complete behaviors;
@@ -222,7 +222,7 @@ __FC_EXTERN_FOR_MACRO(signbit) int __fc_signbitl(long double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes in_domain: \is_finite(x) && \abs(x) <= 1;
     assigns \result \from x;
     ensures positive_result: \is_finite(\result) && \result >= 0;
@@ -231,7 +231,7 @@ __FC_EXTERN_FOR_MACRO(signbit) int __fc_signbitl(long double x);
     assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -243,7 +243,7 @@ extern double acos(double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes in_domain: \is_finite(x) && \abs(x) <= 1;
     assigns \result \from x;
     ensures positive_result: \is_finite(\result) && \result >= 0;
@@ -252,7 +252,7 @@ extern double acos(double x);
     assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -264,7 +264,7 @@ extern float acosf(float x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes in_domain: \is_finite(x) && \abs(x) <= 1;
     assigns \result \from x;
     ensures positive_result: \is_finite(\result) && \result >= 0;
@@ -273,7 +273,7 @@ extern float acosf(float x);
     assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -294,7 +294,7 @@ extern long double acosl(long double x);
     assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -306,7 +306,7 @@ extern double asin(double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes in_domain: \is_finite(x) && \abs(x) <= 1;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
@@ -315,7 +315,7 @@ extern double asin(double x);
     assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -327,7 +327,7 @@ extern float asinf(float x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes in_domain: \is_finite(x) && \abs(x) <= 1;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
@@ -336,7 +336,7 @@ extern float asinf(float x);
     assumes out_of_domain: \is_infinite(x) || (\is_finite(x) && \abs(x) > 1);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -348,11 +348,11 @@ extern long double asinl(long double x);
 
 /*@
   assigns \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes number_arg: !\is_NaN(x);
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1.571 <= \result <= 1.571;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -362,11 +362,11 @@ extern float atanf(float x);
 
 /*@
   assigns \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes number_arg: !\is_NaN(x);
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1.571 <= \result <= 1.571;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -376,11 +376,11 @@ extern double atan(double x);
 
 /*@
   assigns \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes number_arg: !\is_NaN(x);
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1.571 <= \result <= 1.571;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -390,10 +390,10 @@ extern long double atanl(long double x);
 
 /*@
   assigns \result \from x, y;
-  behavior normal:
+  behavior normal_argument:
     assumes number_args: !\is_NaN(x) && !\is_NaN(y);
     ensures finite_result: \is_finite(\result);
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x) || \is_NaN(y);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -403,10 +403,10 @@ extern double atan2(double y, double x);
 
 /*@
   assigns \result \from x, y;
-  behavior normal:
+  behavior normal_argument:
     assumes number_args: !\is_NaN(x) && !\is_NaN(y);
     ensures finite_result: \is_finite(\result);
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x) || \is_NaN(y);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -416,10 +416,10 @@ extern float atan2f(float y, float x);
 
 /*@
   assigns \result \from x, y;
-  behavior normal:
+  behavior normal_argument:
     assumes number_args: !\is_NaN(x) && !\is_NaN(y);
     ensures finite_result: \is_finite(\result);
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x) || \is_NaN(y);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -429,17 +429,17 @@ extern long double atan2l(long double y, long double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. <= \result <= 1.;
     ensures no_error: errno == \old(errno);
-  behavior infinity:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -451,17 +451,17 @@ extern double cos(double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. <= \result <= 1.;
     ensures no_error: errno == \old(errno);
-  behavior infinity:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -473,17 +473,17 @@ extern float cosf(float x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. <= \result <= 1.;
     ensures no_error: errno == \old(errno);
-  behavior infinity:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -495,17 +495,17 @@ extern long double cosl(long double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. <= \result <= 1.;
     ensures no_error: errno == \old(errno);
-  behavior infinity:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -517,17 +517,17 @@ extern double sin(double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. <= \result <= 1.;
     ensures no_error: errno == \old(errno);
-  behavior infinity:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -539,17 +539,17 @@ extern float sinf(float x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures result_domain: -1. <= \result <= 1.;
     ensures no_error: errno == \old(errno);
-  behavior infinity:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -569,20 +569,20 @@ extern long double sinl(long double x);
  */
 /*@
   assigns errno, \result \from x;
-  behavior zero:
+  behavior zero_argument:
     assumes zero_arg: \is_finite(x) && x == 0.;
     assigns \result \from x;
     ensures zero_res: \is_finite(\result) && \result == x;
     ensures no_error: errno == \old(errno);
-  behavior finite_non_zero:
+  behavior finite_non_zero_argument:
     assumes finite_arg: \is_finite(x) && x != 0.;
     ensures finite_result: \is_finite(\result);
     ensures maybe_error: errno == \old(errno) || errno == ERANGE;
-  behavior infinity:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -594,20 +594,20 @@ extern double tan(double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior zero:
+  behavior zero_argument:
     assumes zero_arg: \is_finite(x) && x == 0.;
     assigns \result \from x;
     ensures zero_res: \is_finite(\result) && \result == x;
     ensures no_error: errno == \old(errno);
-  behavior finite_non_zero:
+  behavior finite_non_zero_argument:
     assumes finite_arg: \is_finite(x) && x != 0.;
     ensures finite_result: \is_finite(\result);
     ensures maybe_error: errno == \old(errno) || errno == ERANGE;
-  behavior infinity:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -625,12 +625,12 @@ extern long double tanl(long double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes in_domain: \is_finite(x) && x >= 1;
     assigns \result \from x;
     ensures positive_result: \is_finite(\result) && \result >= 0;
     ensures no_error: errno == \old(errno);
-  behavior infinite:
+  behavior infinite_argument:
     assumes is_plus_infinity: \is_plus_infinity(x);
     assigns \result \from x;
     ensures result_plus_infinity: \is_plus_infinity(\result);
@@ -639,7 +639,7 @@ extern long double tanl(long double x);
     assumes out_of_domain: \is_minus_infinity(x) || (\is_finite(x) && x < 1);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -651,12 +651,12 @@ extern double acosh(double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes in_domain: \is_finite(x) && x >= 1;
     assigns \result \from x;
     ensures positive_result: \is_finite(\result) && \result >= 0;
     ensures no_error: errno == \old(errno);
-  behavior infinite:
+  behavior infinite_argument:
     assumes is_plus_infinity: \is_plus_infinity(x);
     assigns \result \from x;
     ensures result_plus_infinity: \is_plus_infinity(\result);
@@ -665,7 +665,7 @@ extern double acosh(double x);
     assumes out_of_domain: \is_minus_infinity(x) || (\is_finite(x) && x < 1);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -677,12 +677,12 @@ extern float acoshf(float x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes in_domain: \is_finite(x) && x >= 1;
     assigns \result \from x;
     ensures positive_result: \is_finite(\result) && \result >= 0;
     ensures no_error: errno == \old(errno);
-  behavior infinite:
+  behavior infinite_argument:
     assumes is_plus_infinity: \is_plus_infinity(x);
     assigns \result \from x;
     ensures result_plus_infinity: \is_plus_infinity(\result);
@@ -691,7 +691,7 @@ extern float acoshf(float x);
     assumes out_of_domain: \is_minus_infinity(x) || (\is_finite(x) && x < 1);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -778,32 +778,32 @@ extern long double tanhl(long double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assumes domain_arg: x >= -0x1.74910d52d3051p9 && x <= 0x1.62e42fefa39efp+9;
     assigns \result \from x;
     ensures res_finite: \is_finite(\result);
     ensures positive_result: \result > 0.;
     ensures no_error: errno == \old(errno);
-  behavior overflow:
+  behavior overflow_argument:
     assumes overflow_arg: \is_finite(x) && x > 0x1.62e42fefa39efp+9;
     ensures infinite_res: \is_plus_infinity(\result);
     ensures errno_set: errno == ERANGE;
-  behavior plus_infinity:
+  behavior pos_infinity_argument:
     assumes plus_infinity_arg: \is_plus_infinity(x);
     assigns \result \from x;
     ensures infinity_result: \is_plus_infinity(\result);
     ensures no_error: errno == \old(errno);
-  behavior underflow:
+  behavior underflow_argument:
     assumes underflow_arg: \is_finite(x) && x < -0x1.74910d52d3051p9;
     ensures zero_res: \result == 0.;
     ensures errno_set: errno == ERANGE;
-  behavior minus_infinity:
+  behavior neg_infinity_argument:
     assumes plus_infinity_arg: \is_minus_infinity(x);
     assigns \result \from x;
     ensures zero_result: \is_finite(\result) && \result == 0.;
     ensures no_error: errno == \old(errno);
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -815,32 +815,32 @@ extern double exp(double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assumes domain_arg: x >= -0x1.9fe368p6 && x <= 0x1.62e42ep+6;
     assigns \result \from x;
     ensures res_finite: \is_finite(\result);
     ensures positive_result: \result > 0.;
     ensures no_error: errno == \old(errno);
-  behavior overflow:
+  behavior overflow_argument:
     assumes overflow_arg: \is_finite(x) && x > 0x1.62e42ep+6;
     ensures infinite_res: \is_plus_infinity(\result);
     ensures errno_set: errno == ERANGE;
-  behavior plus_infinity:
+  behavior pos_infinity_argument:
     assumes plus_infinity_arg: \is_plus_infinity(x);
     assigns \result \from x;
     ensures infinity_result: \is_plus_infinity(\result);
     ensures no_error: errno == \old(errno);
-  behavior underflow:
+  behavior underflow_argument:
     assumes underflow_arg: \is_finite(x) && x < -0x1.9fe368p6;
     ensures zero_res: \result == 0.;
     ensures errno_set: errno == ERANGE;
-  behavior minus_infinity:
+  behavior neg_infinity_argument:
     assumes plus_infinity_arg: \is_minus_infinity(x);
     assigns \result \from x;
     ensures zero_result: \is_finite(\result) && \result == 0.;
     ensures no_error: errno == \old(errno);
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -888,23 +888,23 @@ extern long double expm1l(long double x);
 /*@
   requires valid_exp: \valid(exp);
   assigns \result, *exp \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assumes arg_nonzero: x != 0.0;
     ensures finite_result: \is_finite(\result);
     ensures bounded_result: 0.5 <= \result < 1.0;
     ensures initialization:exp: \initialized(exp);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_plus_infinity(x) || \is_minus_infinity(x);
     ensures infinite_result: \is_infinite(\result);
     ensures result_same_infinite: \result == x;
-  behavior zero:
+  behavior zero_argument:
     assumes zero_arg: \is_finite(x) && x == 0.;
     ensures finite_result: \is_finite(\result);
     ensures zero_result: \result == 0.0;
     ensures initialization:exp: \initialized(exp);
     ensures zero_exp: *exp == 0;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -915,23 +915,23 @@ extern double frexp(double x, int *exp);
 /*@
   requires valid_exp: \valid(exp);
   assigns \result, *exp \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assumes arg_nonzero: x != 0.0;
     ensures finite_result: \is_finite(\result);
     ensures bounded_result: 0.5 <= \result < 1.0;
     ensures initialization:exp: \initialized(exp);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_plus_infinity(x) || \is_minus_infinity(x);
     ensures infinite_result: \is_infinite(\result);
     ensures result_same_infinite: \result == x;
-  behavior zero:
+  behavior zero_argument:
     assumes zero_arg: \is_finite(x) && x == 0.;
     ensures finite_result: \is_finite(\result);
     ensures zero_result: \result == x;
     ensures initialization:exp: \initialized(exp);
     ensures zero_exp: *exp == 0;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -942,23 +942,23 @@ extern float frexpf(float x, int *exp);
 /*@
   requires valid_exp: \valid(exp);
   assigns \result, *exp \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assumes arg_nonzero: x != 0.0;
     ensures finite_result: \is_finite(\result);
     ensures bounded_result: 0.5 <= \result < 1.0;
     ensures initialization:exp: \initialized(exp);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_plus_infinity(x) || \is_minus_infinity(x);
     ensures infinite_result: \is_infinite(\result);
     ensures result_same_infinite: \result == x;
-  behavior zero:
+  behavior zero_argument:
     assumes zero_arg: \is_finite(x) && x == 0.;
     ensures finite_result: \is_finite(\result);
     ensures zero_result: \result == x;
     ensures initialization:exp: \initialized(exp);
     ensures zero_exp: *exp == 0;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -983,7 +983,7 @@ extern int ilogbl(long double x);
 
 /*@
   assigns errno, \result \from x, exp;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_logic_res: \is_finite((double)(x * pow(2.0d, (double)exp)));
     ensures finite_result: \is_finite(\result);
     ensures errno: errno == ERANGE || errno == \old(errno); //ERANGE if underflow
@@ -992,7 +992,7 @@ extern int ilogbl(long double x);
     assumes infinite_logic_res: !\is_finite((double)(x * pow(2.0d, (double)exp)));
     ensures infinite_result: \is_infinite(\result);
     ensures errno: errno == ERANGE || errno == \old(errno);
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -1003,7 +1003,7 @@ extern double ldexp(double x, int exp);
 
 /*@
   assigns errno, \result \from x, exp;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_logic_res: \is_finite((float)(x * pow(2.0f, (float)exp)));
     ensures finite_result: \is_finite(\result);
     ensures errno: errno == ERANGE || errno == \old(errno); //ERANGE if underflow
@@ -1012,7 +1012,7 @@ extern double ldexp(double x, int exp);
     assumes infinite_logic_res: !\is_finite((float)(x * pow(2.0f, (float)exp)));
     ensures infinite_result: \is_infinite(\result);
     ensures errno: errno == ERANGE || errno == \old(errno);
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -1028,26 +1028,26 @@ extern long double ldexpl(long double x, int exp);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures no_error: errno == \old(errno);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_plus_infinity(x);
     assigns \result \from x;
     ensures infinite_result: \is_plus_infinity(\result);
     ensures no_error: errno == \old(errno);
-  behavior zero:
+  behavior zero_argument:
     assumes zero_arg: \is_finite(x) && x == 0.;
     ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VAL
     ensures errno_set: errno == ERANGE;
-  behavior negative:
+  behavior negative_argument:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -1059,26 +1059,26 @@ extern double log(double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures no_error: errno == \old(errno);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_plus_infinity(x);
     assigns \result \from x;
     ensures infinite_result: \is_plus_infinity(\result);
     ensures no_error: errno == \old(errno);
-  behavior zero:
+  behavior zero_argument:
     assumes zero_arg: \is_finite(x) && x == 0.;
     ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VALF
     ensures errno_set: errno == ERANGE;
-  behavior negative:
+  behavior negative_argument:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -1090,26 +1090,26 @@ extern float logf(float x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures no_error: errno == \old(errno);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_plus_infinity(x);
     assigns \result \from x;
     ensures infinite_result: \is_plus_infinity(\result);
     ensures no_error: errno == \old(errno);
-  behavior zero:
+  behavior zero_argument:
     assumes zero_arg: \is_finite(x) && x == 0.;
     ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VALL
     ensures errno_set: errno == ERANGE;
-  behavior negative:
+  behavior negative_argument:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -1121,26 +1121,26 @@ extern long double logl(long double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures no_error: errno == \old(errno);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_plus_infinity(x);
     assigns \result \from x;
     ensures infinite_result: \is_plus_infinity(\result);
     ensures no_error: errno == \old(errno);
-  behavior zero:
+  behavior zero_argument:
     assumes zero_arg: \is_finite(x) && x == 0.;
     ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VAL
     ensures errno_set: errno == ERANGE;
-  behavior negative:
+  behavior negative_argument:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -1152,26 +1152,26 @@ extern double log10(double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures no_error: errno == \old(errno);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_plus_infinity(x);
     assigns \result \from x;
     ensures infinite_result: \is_plus_infinity(\result);
     ensures no_error: errno == \old(errno);
-  behavior zero:
+  behavior zero_argument:
     assumes zero_arg: \is_finite(x) && x == 0.;
     ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VALF
     ensures errno_set: errno == ERANGE;
-  behavior negative:
+  behavior negative_argument:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -1183,26 +1183,26 @@ extern float log10f(float x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures no_error: errno == \old(errno);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_plus_infinity(x);
     assigns \result \from x;
     ensures infinite_result: \is_plus_infinity(\result);
     ensures no_error: errno == \old(errno);
-  behavior zero:
+  behavior zero_argument:
     assumes zero_arg: \is_finite(x) && x == 0.;
     ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VALL
     ensures errno_set: errno == ERANGE;
-  behavior negative:
+  behavior negative_argument:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -1229,26 +1229,26 @@ extern long double log1pl(long double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures no_error: errno == \old(errno);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_plus_infinity(x);
     assigns \result \from x;
     ensures infinite_result: \is_plus_infinity(\result);
     ensures no_error: errno == \old(errno);
-  behavior zero:
+  behavior zero_argument:
     assumes zero_arg: \is_finite(x) && x == 0.;
     ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VAL
     ensures errno_set: errno == ERANGE;
-  behavior negative:
+  behavior negative_argument:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -1260,26 +1260,26 @@ extern double log2(double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures no_error: errno == \old(errno);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_plus_infinity(x);
     assigns \result \from x;
     ensures infinite_result: \is_plus_infinity(\result);
     ensures no_error: errno == \old(errno);
-  behavior zero:
+  behavior zero_argument:
     assumes zero_arg: \is_finite(x) && x == 0.;
     ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VALF
     ensures errno_set: errno == ERANGE;
-  behavior negative:
+  behavior negative_argument:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -1291,26 +1291,26 @@ extern float log2f(float x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assumes arg_positive: x > 0;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures no_error: errno == \old(errno);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_plus_infinity(x);
     assigns \result \from x;
     ensures infinite_result: \is_plus_infinity(\result);
     ensures no_error: errno == \old(errno);
-  behavior zero:
+  behavior zero_argument:
     assumes zero_arg: \is_finite(x) && x == 0.;
     ensures infinite_result: \is_minus_infinity(\result); // -HUGE_VALL
     ensures errno_set: errno == ERANGE;
-  behavior negative:
+  behavior negative_argument:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -1397,15 +1397,15 @@ extern long double cbrtl(long double x);
 
 /*@
   assigns \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     ensures res_finite: \is_finite(\result);
     ensures positive_result: \result >= 0.;
     ensures equal_magnitude_result: \result == x || \result == -x;
-  behavior infinity:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures infinite_result: \is_plus_infinity(\result);
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -1415,15 +1415,15 @@ extern double fabs(double x);
 
 /*@
   assigns \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     ensures res_finite: \is_finite(\result);
     ensures positive_result: \result >= 0.;
     ensures equal_magnitude_result: \result == x || \result == -x;
-  behavior infinity:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures infinite_result: \is_plus_infinity(\result);
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -1433,15 +1433,15 @@ extern float fabsf(float x);
 
 /*@
   assigns \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     ensures res_finite: \is_finite(\result);
     ensures positive_result: \result >= 0.;
     ensures equal_magnitude_result: \result == x || \result == -x;
-  behavior infinity:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures infinite_result: \is_plus_infinity(\result);
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -1466,11 +1466,11 @@ extern long double hypotl(long double x, long double y);
 
 /*@
   assigns errno, \result \from x, y;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_logic_res: \is_finite(pow(x, y));
     ensures finite_result: \is_finite(\result);
     ensures errno: errno == ERANGE || errno == \old(errno);
-  behavior overflow:
+  behavior overflow_argument:
     assumes infinite_logic_res: !\is_finite(pow(x, y));
     ensures infinite_result: !\is_finite(\result);
     ensures errno: errno == ERANGE || errno == EDOM || errno == \old(errno);
@@ -1481,11 +1481,11 @@ extern double pow(double x, double y);
 
 /*@
   assigns errno, \result \from x, y;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_logic_res: \is_finite(pow(x, y));
     ensures finite_result: \is_finite(\result);
     ensures errno: errno == ERANGE || errno == \old(errno);
-  behavior overflow:
+  behavior overflow_argument:
     assumes infinite_logic_res: !\is_finite(pow(x, y));
     ensures infinite_result: !\is_finite(\result);
     ensures errno: errno == ERANGE || errno == EDOM || errno == \old(errno);
@@ -1501,7 +1501,7 @@ extern long double powl(long double x, long double y);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assumes arg_positive: x >= -0.;
     assigns \result \from x;
@@ -1509,16 +1509,16 @@ extern long double powl(long double x, long double y);
     ensures positive_result: \result >= -0.;
     ensures result_value: \result == sqrt(x);
     ensures no_error: errno == \old(errno);
-  behavior negative:
+  behavior negative_argument:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior infinity:
+  behavior infinite_argument:
     assumes infinite_arg: \is_plus_infinity(x);
     assigns \result \from x;
     ensures infinite_result: \is_plus_infinity(\result);
     ensures no_error: errno == \old(errno);
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -1530,7 +1530,7 @@ extern double sqrt(double x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assumes arg_positive: x >= -0.;
     assigns \result \from x;
@@ -1538,16 +1538,16 @@ extern double sqrt(double x);
     ensures positive_result: \result >= -0.;
     ensures result_value: \result == sqrt(x);
     ensures no_error: errno == \old(errno);
-  behavior negative:
+  behavior negative_argument:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior infinity:
+  behavior infinite_argument:
     assumes infinite_arg: \is_plus_infinity(x);
     assigns \result \from x;
     ensures infinite_result: \is_plus_infinity(\result);
     ensures no_error: errno == \old(errno);
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -1559,23 +1559,23 @@ extern float sqrtf(float x);
 
 /*@
   assigns errno, \result \from x;
-  behavior normal:
+  behavior normal_argument:
     assumes finite_arg: \is_finite(x);
     assumes arg_positive: x >= -0.;
     assigns \result \from x;
     ensures finite_result: \is_finite(\result);
     ensures positive_result: \result >= -0.;
     ensures no_error: errno == \old(errno);
-  behavior negative:
+  behavior negative_argument:
     assumes negative_arg: \is_minus_infinity(x) || (\is_finite(x) && x < -0.);
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior infinity:
+  behavior infinite_argument:
     assumes infinite_arg: \is_plus_infinity(x);
     assigns \result \from x;
     ensures infinite_result: \is_plus_infinity(\result);
     ensures no_error: errno == \old(errno);
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     assigns \result \from x;
     ensures nan_result: \is_NaN(\result);
@@ -1648,14 +1648,14 @@ extern long double tgammal(long double x);
 
 /*@
   assigns \result \from x;
-  behavior finite:
+  behavior finite_argument:
     assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures infinite_result: \is_infinite(\result);
     ensures equal_result: \result == x;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -1665,14 +1665,14 @@ extern double ceil(double x);
 
 /*@
   assigns \result \from x;
-  behavior finite:
+  behavior finite_argument:
     assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures infinite_result: \is_infinite(\result);
     ensures equal_result: \result == x;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -1682,14 +1682,14 @@ extern float ceilf(float x);
 
 /*@
   assigns \result \from x;
-  behavior finite:
+  behavior finite_argument:
     assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures infinite_result: \is_infinite(\result);
     ensures equal_result: \result == x;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -1699,14 +1699,14 @@ extern long double ceill(long double x);
 
 /*@
   assigns \result \from x;
-  behavior finite:
+  behavior finite_argument:
     assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures infinite_result: \is_infinite(\result);
     ensures equal_result: \result == x;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -1716,14 +1716,14 @@ extern double floor(double x);
 
 /*@
   assigns \result \from x;
-  behavior finite:
+  behavior finite_argument:
     assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures infinite_result: \is_infinite(\result);
     ensures equal_result: \result == x;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -1733,14 +1733,14 @@ extern float floorf(float x);
 
 /*@
   assigns \result \from x;
-  behavior finite:
+  behavior finite_argument:
     assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures infinite_result: \is_infinite(\result);
     ensures equal_result: \result == x;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -1810,14 +1810,14 @@ extern long long int llrintl(long double x);
 
 /*@
   assigns \result \from x;
-  behavior finite:
+  behavior finite_argument:
     assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures infinite_result: \is_infinite(\result);
     ensures equal_result: \result == x;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -1827,14 +1827,14 @@ extern double round(double x);
 
 /*@
   assigns \result \from x;
-  behavior finite:
+  behavior finite_argument:
     assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures infinite_result: \is_infinite(\result);
     ensures equal_result: \result == x;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -1844,14 +1844,14 @@ extern float roundf(float x);
 
 /*@
   assigns \result \from x;
-  behavior finite:
+  behavior finite_argument:
     assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures infinite_result: \is_infinite(\result);
     ensures equal_result: \result == x;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -1891,14 +1891,14 @@ extern long long int llroundl(long double x);
 
 /*@
   assigns \result \from x;
-  behavior finite:
+  behavior finite_argument:
     assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures infinite_result: \is_infinite(\result);
     ensures equal_result: \result == x;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -1908,14 +1908,14 @@ extern double trunc(double x);
 
 /*@
   assigns \result \from x;
-  behavior finite:
+  behavior finite_argument:
     assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures infinite_result: \is_infinite(\result);
     ensures equal_result: \result == x;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -1925,14 +1925,14 @@ extern float truncf(float x);
 
 /*@
   assigns \result \from x;
-  behavior finite:
+  behavior finite_argument:
     assumes finite_arg: \is_finite(x);
     ensures finite_result: \is_finite(\result);
-  behavior infinite:
+  behavior infinite_argument:
     assumes infinite_arg: \is_infinite(x);
     ensures infinite_result: \is_infinite(\result);
     ensures equal_result: \result == x;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_arg: \is_NaN(x);
     ensures nan_result: \is_NaN(\result);
   complete behaviors;
@@ -1942,7 +1942,7 @@ extern long double truncl(long double x);
 
 /*@
   assigns errno, \result \from x, y;
-  behavior normal:
+  behavior normal_argument:
     assumes in_domain: !\is_NaN(x) && !\is_NaN(y) && y != 0.;
     assigns \result \from x, y;
     ensures finite_result: \is_finite(\result);
@@ -1951,7 +1951,7 @@ extern long double truncl(long double x);
     assumes out_of_domain: \is_infinite(x) || y == 0.;
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_args: \is_NaN(x) || \is_NaN(y);
     assigns \result \from x, y;
     ensures nan_result: \is_NaN(\result);
@@ -1963,7 +1963,7 @@ extern double fmod(double x, double y);
 
 /*@
   assigns errno, \result \from x, y;
-  behavior normal:
+  behavior normal_argument:
     assumes in_domain: !\is_NaN(x) && !\is_NaN(y) && y != 0.;
     assigns \result \from x, y;
     ensures finite_result: \is_finite(\result);
@@ -1972,7 +1972,7 @@ extern double fmod(double x, double y);
     assumes out_of_domain: \is_infinite(x) || y == 0.;
     ensures nan_result: \is_NaN(\result);
     ensures errno_set: errno == EDOM;
-  behavior nan:
+  behavior nan_argument:
     assumes nan_args: \is_NaN(x) || \is_NaN(y);
     assigns \result \from x, y;
     ensures nan_result: \is_NaN(\result);
@@ -2153,10 +2153,10 @@ extern long double fmal(long double x, long double y, long double z);
 
 /*@
   assigns \result \from f;
-  behavior finite:
+  behavior finite_argument:
     assumes isfinite_f: \is_finite(f);
     ensures nonzero_result: \result > 0 || \result < 0;
-  behavior nonfinite:
+  behavior infinite_argument:
     assumes nonfinite_f: !\is_finite(f);
     ensures zero_result: \result == 0;
   complete behaviors;
@@ -2166,10 +2166,10 @@ extern int __finitef(float f);
 
 /*@
   assigns \result \from d;
-  behavior finite:
+  behavior finite_argument:
     assumes isfinite_d: \is_finite(d);
     ensures nonzero_result: \result > 0 || \result < 0;
-  behavior nonfinite:
+  behavior infinite_argument:
     assumes nonfinite_d: !\is_finite(d);
     ensures zero_result: \result == 0;
   complete behaviors;
@@ -2179,10 +2179,10 @@ extern int __finite(double d);
 
 /*@
   assigns \result \from x;
-  behavior finite:
+  behavior finite_argument:
     assumes isfinite: \is_finite(x);
     ensures nonzero_result: \result > 0 || \result < 0;
-  behavior nonfinite:
+  behavior infinite_argument:
     assumes nonfinite: !\is_finite(x);
     ensures zero_result: \result == 0;
   complete behaviors;

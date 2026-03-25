@@ -1125,46 +1125,46 @@
   Called from math_builtins.c:754.
 [eva:progress] math_builtins.c:516: Call to builtin Frama_C_exp for function exp
 [eva:progress] math_builtins.c:516: 
-  function exp: precondition 'not_overflow' got status valid.
+  function exp: precondition 'not_overflow_argument' got status valid.
 [eva:progress] math_builtins.c:516: 
-  function exp: precondition 'not_plus_infinity' got status valid.
+  function exp: precondition 'not_pos_infinity_argument' got status valid.
 [eva:progress] math_builtins.c:516: 
-  function exp: precondition 'not_nan' got status valid.
+  function exp: precondition 'not_nan_argument' got status valid.
 [eva:progress] math_builtins.c:517: Call to builtin Frama_C_exp for function exp
 [eva:progress] math_builtins.c:517: 
-  function exp: precondition 'not_overflow' got status valid.
+  function exp: precondition 'not_overflow_argument' got status valid.
 [eva:progress] math_builtins.c:517: 
-  function exp: precondition 'not_plus_infinity' got status valid.
+  function exp: precondition 'not_pos_infinity_argument' got status valid.
 [eva:progress] math_builtins.c:517: 
-  function exp: precondition 'not_nan' got status valid.
+  function exp: precondition 'not_nan_argument' got status valid.
 [eva:progress] math_builtins.c:518: Call to builtin Frama_C_exp for function exp
 [eva:progress] math_builtins.c:518: 
-  function exp: precondition 'not_overflow' got status valid.
+  function exp: precondition 'not_overflow_argument' got status valid.
 [eva:progress] math_builtins.c:518: 
-  function exp: precondition 'not_plus_infinity' got status valid.
+  function exp: precondition 'not_pos_infinity_argument' got status valid.
 [eva:progress] math_builtins.c:518: 
-  function exp: precondition 'not_nan' got status valid.
+  function exp: precondition 'not_nan_argument' got status valid.
 [eva:progress] math_builtins.c:519: Call to builtin Frama_C_exp for function exp
 [eva:progress] math_builtins.c:519: 
-  function exp: precondition 'not_overflow' got status valid.
+  function exp: precondition 'not_overflow_argument' got status valid.
 [eva:progress] math_builtins.c:519: 
-  function exp: precondition 'not_plus_infinity' got status valid.
+  function exp: precondition 'not_pos_infinity_argument' got status valid.
 [eva:progress] math_builtins.c:519: 
-  function exp: precondition 'not_nan' got status valid.
+  function exp: precondition 'not_nan_argument' got status valid.
 [eva:progress] math_builtins.c:520: Call to builtin Frama_C_exp for function exp
 [eva:progress] math_builtins.c:520: 
-  function exp: precondition 'not_overflow' got status valid.
+  function exp: precondition 'not_overflow_argument' got status valid.
 [eva:progress] math_builtins.c:520: 
-  function exp: precondition 'not_plus_infinity' got status valid.
+  function exp: precondition 'not_pos_infinity_argument' got status valid.
 [eva:progress] math_builtins.c:520: 
-  function exp: precondition 'not_nan' got status valid.
+  function exp: precondition 'not_nan_argument' got status valid.
 [eva:progress] math_builtins.c:521: Call to builtin Frama_C_exp for function exp
 [eva:alarm] math_builtins.c:521: Warning: 
-  function exp: precondition 'not_overflow' got status invalid.
+  function exp: precondition 'not_overflow_argument' got status invalid.
 [eva:progress] math_builtins.c:521: 
-  function exp: no state left, precondition 'not_plus_infinity' got status valid.
+  function exp: no state left, precondition 'not_pos_infinity_argument' got status valid.
 [eva:progress] math_builtins.c:521: 
-  function exp: no state left, precondition 'not_nan' got status valid.
+  function exp: no state left, precondition 'not_nan_argument' got status valid.
 [eva:progress] Recording results for test_exp_det
 [eva:progress] Done for function test_exp_det
 [eva:progress] 
@@ -1656,43 +1656,43 @@
 [eva:progress] math_builtins.c:525: 
   Call to builtin Frama_C_expf for function expf
 [eva:progress] math_builtins.c:525: 
-  function expf: precondition 'not_overflow' got status valid.
+  function expf: precondition 'not_overflow_argument' got status valid.
 [eva:progress] math_builtins.c:525: 
-  function expf: precondition 'not_plus_infinity' got status valid.
+  function expf: precondition 'not_pos_infinity_argument' got status valid.
 [eva:progress] math_builtins.c:525: 
-  function expf: precondition 'not_nan' got status valid.
+  function expf: precondition 'not_nan_argument' got status valid.
 [eva:progress] math_builtins.c:526: 
   Call to builtin Frama_C_expf for function expf
 [eva:progress] math_builtins.c:526: 
-  function expf: precondition 'not_overflow' got status valid.
+  function expf: precondition 'not_overflow_argument' got status valid.
 [eva:progress] math_builtins.c:526: 
-  function expf: precondition 'not_plus_infinity' got status valid.
+  function expf: precondition 'not_pos_infinity_argument' got status valid.
 [eva:progress] math_builtins.c:526: 
-  function expf: precondition 'not_nan' got status valid.
+  function expf: precondition 'not_nan_argument' got status valid.
 [eva:progress] math_builtins.c:527: 
   Call to builtin Frama_C_expf for function expf
 [eva:progress] math_builtins.c:527: 
-  function expf: precondition 'not_overflow' got status valid.
+  function expf: precondition 'not_overflow_argument' got status valid.
 [eva:progress] math_builtins.c:527: 
-  function expf: precondition 'not_plus_infinity' got status valid.
+  function expf: precondition 'not_pos_infinity_argument' got status valid.
 [eva:progress] math_builtins.c:527: 
-  function expf: precondition 'not_nan' got status valid.
+  function expf: precondition 'not_nan_argument' got status valid.
 [eva:progress] math_builtins.c:528: 
   Call to builtin Frama_C_expf for function expf
 [eva:progress] math_builtins.c:528: 
-  function expf: precondition 'not_overflow' got status valid.
+  function expf: precondition 'not_overflow_argument' got status valid.
 [eva:progress] math_builtins.c:528: 
-  function expf: precondition 'not_plus_infinity' got status valid.
+  function expf: precondition 'not_pos_infinity_argument' got status valid.
 [eva:progress] math_builtins.c:528: 
-  function expf: precondition 'not_nan' got status valid.
+  function expf: precondition 'not_nan_argument' got status valid.
 [eva:progress] math_builtins.c:529: 
   Call to builtin Frama_C_expf for function expf
 [eva:progress] math_builtins.c:529: 
-  function expf: precondition 'not_overflow' got status valid.
+  function expf: precondition 'not_overflow_argument' got status valid.
 [eva:progress] math_builtins.c:529: 
-  function expf: precondition 'not_plus_infinity' got status valid.
+  function expf: precondition 'not_pos_infinity_argument' got status valid.
 [eva:progress] math_builtins.c:529: 
-  function expf: precondition 'not_nan' got status valid.
+  function expf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Recording results for test_expf_det
 [eva:progress] Done for function test_expf_det
 [eva:progress] 

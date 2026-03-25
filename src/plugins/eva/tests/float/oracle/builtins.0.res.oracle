@@ -97,40 +97,40 @@
   function log10: precondition 'arg_positive' got status invalid.
 [eva:progress] builtins.c:85: Call to builtin exp
 [eva:progress] builtins.c:85: 
-  function exp: precondition 'not_overflow' got status valid.
+  function exp: precondition 'not_overflow_argument' got status valid.
 [eva:progress] builtins.c:85: 
-  function exp: precondition 'not_plus_infinity' got status valid.
+  function exp: precondition 'not_pos_infinity_argument' got status valid.
 [eva:progress] builtins.c:85: 
-  function exp: precondition 'not_nan' got status valid.
+  function exp: precondition 'not_nan_argument' got status valid.
 [eva:progress] builtins.c:88: Call to builtin exp
 [eva:progress] builtins.c:88: 
-  function exp: precondition 'not_overflow' got status valid.
+  function exp: precondition 'not_overflow_argument' got status valid.
 [eva:progress] builtins.c:88: 
-  function exp: precondition 'not_plus_infinity' got status valid.
+  function exp: precondition 'not_pos_infinity_argument' got status valid.
 [eva:progress] builtins.c:88: 
-  function exp: precondition 'not_nan' got status valid.
+  function exp: precondition 'not_nan_argument' got status valid.
 [eva:progress] builtins.c:91: Call to builtin exp
 [eva:progress] builtins.c:91: 
-  function exp: precondition 'not_overflow' got status valid.
+  function exp: precondition 'not_overflow_argument' got status valid.
 [eva:progress] builtins.c:91: 
-  function exp: precondition 'not_plus_infinity' got status valid.
+  function exp: precondition 'not_pos_infinity_argument' got status valid.
 [eva:progress] builtins.c:91: 
-  function exp: precondition 'not_nan' got status valid.
+  function exp: precondition 'not_nan_argument' got status valid.
 [eva:alarm] builtins.c:94: Warning: assertion got status unknown.
 [eva:progress] builtins.c:95: Call to builtin exp
 [eva:alarm] builtins.c:95: Warning: 
-  function exp: precondition 'not_overflow' got status unknown.
+  function exp: precondition 'not_overflow_argument' got status unknown.
 [eva:progress] builtins.c:95: 
-  function exp: precondition 'not_plus_infinity' got status valid.
+  function exp: precondition 'not_pos_infinity_argument' got status valid.
 [eva:progress] builtins.c:95: 
-  function exp: precondition 'not_nan' got status valid.
+  function exp: precondition 'not_nan_argument' got status valid.
 [eva:progress] builtins.c:98: Call to builtin exp
 [eva:alarm] builtins.c:98: Warning: 
-  function exp: precondition 'not_overflow' got status invalid.
+  function exp: precondition 'not_overflow_argument' got status invalid.
 [eva:progress] builtins.c:98: 
-  function exp: no state left, precondition 'not_plus_infinity' got status valid.
+  function exp: no state left, precondition 'not_pos_infinity_argument' got status valid.
 [eva:progress] builtins.c:98: 
-  function exp: no state left, precondition 'not_nan' got status valid.
+  function exp: no state left, precondition 'not_nan_argument' got status valid.
 [eva:progress] builtins.c:102: Call to builtin log
 [eva:progress] builtins.c:102: 
   function log: precondition 'finite_arg' got status valid.
@@ -139,11 +139,11 @@
 [eva:progress] builtins.c:103: assertion got status valid.
 [eva:progress] builtins.c:104: Call to builtin exp
 [eva:progress] builtins.c:104: 
-  function exp: precondition 'not_overflow' got status valid.
+  function exp: precondition 'not_overflow_argument' got status valid.
 [eva:progress] builtins.c:104: 
-  function exp: precondition 'not_plus_infinity' got status valid.
+  function exp: precondition 'not_pos_infinity_argument' got status valid.
 [eva:progress] builtins.c:104: 
-  function exp: precondition 'not_nan' got status valid.
+  function exp: precondition 'not_nan_argument' got status valid.
 [eva:alarm] builtins.c:107: Warning: 
   pointer downcast. assert (unsigned int)(&d) ≤ 2147483647;
 [eva:alarm] builtins.c:107: Warning: 

@@ -318,65 +318,65 @@
   Called from math_h.c:88.
 [eva] using specification for function tan
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_infinity' got status valid.
+  function tan: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_nan' got status valid.
+  function tan: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tan
 [eva:progress] 
   computing for function tan <- main.
   Called from math_h.c:88.
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_infinity' got status valid.
+  function tan: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_nan' got status valid.
+  function tan: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tan
 [eva:progress] 
   computing for function tan <- main.
   Called from math_h.c:88.
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_infinity' got status valid.
+  function tan: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_nan' got status valid.
+  function tan: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tan
 [eva:progress] 
   computing for function tan <- main.
   Called from math_h.c:88.
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_infinity' got status valid.
+  function tan: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_nan' got status valid.
+  function tan: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tan
 [eva:progress] 
   computing for function tan <- main.
   Called from math_h.c:88.
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_infinity' got status valid.
+  function tan: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_nan' got status valid.
+  function tan: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tan
 [eva:progress] 
   computing for function tan <- main.
   Called from math_h.c:88.
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_infinity' got status valid.
+  function tan: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_nan' got status valid.
+  function tan: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tan
 [eva:progress] 
   computing for function tan <- main.
   Called from math_h.c:88.
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_infinity' got status valid.
+  function tan: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_nan' got status valid.
+  function tan: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tan
 [eva:progress] 
   computing for function tan <- main.
   Called from math_h.c:88.
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_infinity' got status valid.
+  function tan: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_nan' got status valid.
+  function tan: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tan
 [eva:alarm] math_h.c:88: Warning: 
   non-finite double value. assert \is_finite(top);
@@ -384,74 +384,74 @@
   computing for function tan <- main.
   Called from math_h.c:88.
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_infinity' got status valid.
+  function tan: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tan: precondition 'not_nan' got status valid.
+  function tan: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tan
 [eva:progress] 
   computing for function tanf <- main.
   Called from math_h.c:88.
 [eva] using specification for function tanf
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_infinity' got status valid.
+  function tanf: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_nan' got status valid.
+  function tanf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tanf
 [eva:progress] 
   computing for function tanf <- main.
   Called from math_h.c:88.
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_infinity' got status valid.
+  function tanf: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_nan' got status valid.
+  function tanf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tanf
 [eva:progress] 
   computing for function tanf <- main.
   Called from math_h.c:88.
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_infinity' got status valid.
+  function tanf: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_nan' got status valid.
+  function tanf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tanf
 [eva:progress] 
   computing for function tanf <- main.
   Called from math_h.c:88.
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_infinity' got status valid.
+  function tanf: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_nan' got status valid.
+  function tanf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tanf
 [eva:progress] 
   computing for function tanf <- main.
   Called from math_h.c:88.
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_infinity' got status valid.
+  function tanf: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_nan' got status valid.
+  function tanf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tanf
 [eva:progress] 
   computing for function tanf <- main.
   Called from math_h.c:88.
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_infinity' got status valid.
+  function tanf: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_nan' got status valid.
+  function tanf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tanf
 [eva:progress] 
   computing for function tanf <- main.
   Called from math_h.c:88.
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_infinity' got status valid.
+  function tanf: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_nan' got status valid.
+  function tanf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tanf
 [eva:progress] 
   computing for function tanf <- main.
   Called from math_h.c:88.
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_infinity' got status valid.
+  function tanf: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_nan' got status valid.
+  function tanf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tanf
 [eva:alarm] math_h.c:88: Warning: 
   non-finite float value. assert \is_finite(f_top);
@@ -459,9 +459,9 @@
   computing for function tanf <- main.
   Called from math_h.c:88.
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_infinity' got status valid.
+  function tanf: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:88: 
-  function tanf: precondition 'not_nan' got status valid.
+  function tanf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function tanf
 [eva:progress] 
   computing for function tanl <- main.
@@ -509,9 +509,9 @@
 [eva:progress] math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_infinite' got status valid.
+  function frexp: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_nan' got status valid.
+  function frexp: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexp
 [eva:progress] 
   computing for function frexp <- main.
@@ -519,23 +519,9 @@
 [eva:progress] math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_infinite' got status valid.
+  function frexp: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_nan' got status valid.
-[eva:progress] Done for function frexp
-[eva:progress] 
-  computing for function frexp <- main.
-  Called from math_h.c:90.
-[eva:progress] Done for function frexp
-[eva:progress] 
-  computing for function frexp <- main.
-  Called from math_h.c:90.
-[eva:progress] math_h.c:90: 
-  function frexp: precondition 'valid_exp' got status valid.
-[eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_infinite' got status valid.
-[eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_nan' got status valid.
+  function frexp: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexp
 [eva:progress] 
   computing for function frexp <- main.
@@ -547,9 +533,9 @@
 [eva:progress] math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_infinite' got status valid.
+  function frexp: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_nan' got status valid.
+  function frexp: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexp
 [eva:progress] 
   computing for function frexp <- main.
@@ -561,9 +547,23 @@
 [eva:progress] math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_infinite' got status valid.
+  function frexp: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_nan' got status valid.
+  function frexp: precondition 'not_nan_argument' got status valid.
+[eva:progress] Done for function frexp
+[eva:progress] 
+  computing for function frexp <- main.
+  Called from math_h.c:90.
+[eva:progress] Done for function frexp
+[eva:progress] 
+  computing for function frexp <- main.
+  Called from math_h.c:90.
+[eva:progress] math_h.c:90: 
+  function frexp: precondition 'valid_exp' got status valid.
+[eva:progress] math_h.c:90: 
+  function frexp: precondition 'not_infinite_argument' got status valid.
+[eva:progress] math_h.c:90: 
+  function frexp: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexp
 [eva:progress] 
   computing for function frexp <- main.
@@ -579,9 +579,9 @@
 [eva:progress] math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_infinite' got status valid.
+  function frexp: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_nan' got status valid.
+  function frexp: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexp
 [eva:progress] 
   computing for function frexp <- main.
@@ -589,9 +589,9 @@
 [eva:progress] math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_infinite' got status valid.
+  function frexp: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_nan' got status valid.
+  function frexp: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexp
 [eva:progress] 
   computing for function frexp <- main.
@@ -603,9 +603,9 @@
 [eva:progress] math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_infinite' got status valid.
+  function frexp: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_nan' got status valid.
+  function frexp: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexp
 [eva:progress] 
   computing for function frexp <- main.
@@ -619,9 +619,9 @@
 [eva:progress] math_h.c:90: 
   function frexp: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_infinite' got status valid.
+  function frexp: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:90: 
-  function frexp: precondition 'not_nan' got status valid.
+  function frexp: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexp
 [eva:progress] 
   computing for function frexp <- main.
@@ -634,9 +634,9 @@
 [eva:progress] math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_infinite' got status valid.
+  function frexpf: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_nan' got status valid.
+  function frexpf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexpf
 [eva:progress] 
   computing for function frexpf <- main.
@@ -644,23 +644,9 @@
 [eva:progress] math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_infinite' got status valid.
+  function frexpf: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_nan' got status valid.
-[eva:progress] Done for function frexpf
-[eva:progress] 
-  computing for function frexpf <- main.
-  Called from math_h.c:91.
-[eva:progress] Done for function frexpf
-[eva:progress] 
-  computing for function frexpf <- main.
-  Called from math_h.c:91.
-[eva:progress] math_h.c:91: 
-  function frexpf: precondition 'valid_exp' got status valid.
-[eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_infinite' got status valid.
-[eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_nan' got status valid.
+  function frexpf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexpf
 [eva:progress] 
   computing for function frexpf <- main.
@@ -672,9 +658,9 @@
 [eva:progress] math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_infinite' got status valid.
+  function frexpf: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_nan' got status valid.
+  function frexpf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexpf
 [eva:progress] 
   computing for function frexpf <- main.
@@ -686,9 +672,23 @@
 [eva:progress] math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_infinite' got status valid.
+  function frexpf: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_nan' got status valid.
+  function frexpf: precondition 'not_nan_argument' got status valid.
+[eva:progress] Done for function frexpf
+[eva:progress] 
+  computing for function frexpf <- main.
+  Called from math_h.c:91.
+[eva:progress] Done for function frexpf
+[eva:progress] 
+  computing for function frexpf <- main.
+  Called from math_h.c:91.
+[eva:progress] math_h.c:91: 
+  function frexpf: precondition 'valid_exp' got status valid.
+[eva:progress] math_h.c:91: 
+  function frexpf: precondition 'not_infinite_argument' got status valid.
+[eva:progress] math_h.c:91: 
+  function frexpf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexpf
 [eva:progress] 
   computing for function frexpf <- main.
@@ -704,9 +704,9 @@
 [eva:progress] math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_infinite' got status valid.
+  function frexpf: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_nan' got status valid.
+  function frexpf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexpf
 [eva:progress] 
   computing for function frexpf <- main.
@@ -714,9 +714,9 @@
 [eva:progress] math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_infinite' got status valid.
+  function frexpf: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_nan' got status valid.
+  function frexpf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexpf
 [eva:progress] 
   computing for function frexpf <- main.
@@ -728,9 +728,9 @@
 [eva:progress] math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_infinite' got status valid.
+  function frexpf: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_nan' got status valid.
+  function frexpf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexpf
 [eva:progress] 
   computing for function frexpf <- main.
@@ -744,9 +744,9 @@
 [eva:progress] math_h.c:91: 
   function frexpf: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_infinite' got status valid.
+  function frexpf: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:91: 
-  function frexpf: precondition 'not_nan' got status valid.
+  function frexpf: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexpf
 [eva:progress] 
   computing for function frexpf <- main.
@@ -759,9 +759,9 @@
 [eva:progress] math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:92: 
-  function frexpl: precondition 'not_infinite' got status valid.
+  function frexpl: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:92: 
-  function frexpl: precondition 'not_nan' got status valid.
+  function frexpl: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexpl
 [eva:progress] 
   computing for function frexpl <- main.
@@ -769,23 +769,9 @@
 [eva:progress] math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:92: 
-  function frexpl: precondition 'not_infinite' got status valid.
+  function frexpl: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:92: 
-  function frexpl: precondition 'not_nan' got status valid.
-[eva:progress] Done for function frexpl
-[eva:progress] 
-  computing for function frexpl <- main.
-  Called from math_h.c:92.
-[eva:progress] Done for function frexpl
-[eva:progress] 
-  computing for function frexpl <- main.
-  Called from math_h.c:92.
-[eva:progress] math_h.c:92: 
-  function frexpl: precondition 'valid_exp' got status valid.
-[eva:progress] math_h.c:92: 
-  function frexpl: precondition 'not_infinite' got status valid.
-[eva:progress] math_h.c:92: 
-  function frexpl: precondition 'not_nan' got status valid.
+  function frexpl: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexpl
 [eva:progress] 
   computing for function frexpl <- main.
@@ -797,9 +783,9 @@
 [eva:progress] math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:92: 
-  function frexpl: precondition 'not_infinite' got status valid.
+  function frexpl: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:92: 
-  function frexpl: precondition 'not_nan' got status valid.
+  function frexpl: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexpl
 [eva:progress] 
   computing for function frexpl <- main.
@@ -811,9 +797,23 @@
 [eva:progress] math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:92: 
-  function frexpl: precondition 'not_infinite' got status valid.
+  function frexpl: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:92: 
-  function frexpl: precondition 'not_nan' got status valid.
+  function frexpl: precondition 'not_nan_argument' got status valid.
+[eva:progress] Done for function frexpl
+[eva:progress] 
+  computing for function frexpl <- main.
+  Called from math_h.c:92.
+[eva:progress] Done for function frexpl
+[eva:progress] 
+  computing for function frexpl <- main.
+  Called from math_h.c:92.
+[eva:progress] math_h.c:92: 
+  function frexpl: precondition 'valid_exp' got status valid.
+[eva:progress] math_h.c:92: 
+  function frexpl: precondition 'not_infinite_argument' got status valid.
+[eva:progress] math_h.c:92: 
+  function frexpl: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexpl
 [eva:progress] 
   computing for function frexpl <- main.
@@ -829,9 +829,9 @@
 [eva:progress] math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:92: 
-  function frexpl: precondition 'not_infinite' got status valid.
+  function frexpl: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:92: 
-  function frexpl: precondition 'not_nan' got status valid.
+  function frexpl: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexpl
 [eva:progress] 
   computing for function frexpl <- main.
@@ -839,9 +839,9 @@
 [eva:progress] math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:92: 
-  function frexpl: precondition 'not_infinite' got status valid.
+  function frexpl: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:92: 
-  function frexpl: precondition 'not_nan' got status valid.
+  function frexpl: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexpl
 [eva:progress] 
   computing for function frexpl <- main.
@@ -853,9 +853,9 @@
 [eva:progress] math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva:progress] math_h.c:92: 
-  function frexpl: precondition 'not_infinite' got status valid.
+  function frexpl: precondition 'not_infinite_argument' got status valid.
 [eva:progress] math_h.c:92: 
-  function frexpl: precondition 'not_nan' got status valid.
+  function frexpl: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexpl
 [eva:progress] 
   computing for function frexpl <- main.
@@ -869,9 +869,9 @@
 [eva:progress] math_h.c:92: 
   function frexpl: precondition 'valid_exp' got status valid.
 [eva:alarm] math_h.c:92: Warning: 
-  function frexpl: precondition 'not_infinite' got status unknown.
+  function frexpl: precondition 'not_infinite_argument' got status unknown.
 [eva:progress] math_h.c:92: 
-  function frexpl: precondition 'not_nan' got status valid.
+  function frexpl: precondition 'not_nan_argument' got status valid.
 [eva:progress] Done for function frexpl
 [eva:progress] 
   computing for function frexpl <- main.
