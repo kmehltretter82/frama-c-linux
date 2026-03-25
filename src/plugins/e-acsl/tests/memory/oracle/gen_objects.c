@@ -189,7 +189,7 @@ void pointer(void)
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                      "sizeof(int)",0,sizeof(int));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                   "\\object_pointer(p)",0,
+                                   "P0: \\object_pointer(p)",0,
                                    __gen_e_acsl_object_pointer_2);
       __gen_e_acsl_and = __gen_e_acsl_object_pointer_2;
     }

@@ -430,7 +430,8 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                    "sizeof(pthread_t)",0,sizeof(pthread_t));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "\\valid(thread)",0,__gen_e_acsl_valid);
+                                 "valid_thread: \\valid(thread)",0,
+                                 __gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(thread)";
