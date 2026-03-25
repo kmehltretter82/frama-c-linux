@@ -117,6 +117,8 @@ export function EvaFlamegraph(props: EvaFlamegraphProps): JSX.Element {
       });
 
     container.datum(data).call(chart);
+    // Remove tooltips
+    container.selectAll("title").remove();
     attachEvents(container);
   }, [data, width, height, useScope]);
 
