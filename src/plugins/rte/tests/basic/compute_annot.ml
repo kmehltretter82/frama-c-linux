@@ -28,7 +28,7 @@ let main () =
   print_status ();
 
   Kernel.log "removing rte-div alarms" ;
-  let emitter = Dynamic.get ~plugin:"RteGen" "emitter" Emitter.ty in
+  let emitter = RteGen.Generator.emitter in
   let filter = function
     | Alarms.Division_by_zero _ -> true
     | _ -> false

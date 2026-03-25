@@ -49,6 +49,3 @@ end
 
 (** Same result as having [-rte] on the command line *)
 val compute : unit -> unit
-
-module Api : module type of Api
-[@@ deprecated "Use Visit, Flags and Generator modules"]
