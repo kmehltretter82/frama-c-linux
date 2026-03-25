@@ -97,7 +97,6 @@ module Parray = Parray
 module Pretty_utils = Pretty_utils
 module Qstack = Qstack
 module Rangemap = Rangemap
-module Rgmap = Rgmap
 module Rich_text = Rich_text
 module Sanitizer = Sanitizer
 module Task = Task
