@@ -107,8 +107,6 @@ let pp_pair
     pp_a pp_b fmt (a, b) =
   Format.fprintf fmt "%(%)%a%(%)%a%(%)" pre pp_a a sep pp_b b suf
 
-let escape_underscores = Str.global_replace (Str.regexp_string "_") "__"
-
 let pp_escaped pp fmt e =
   let s = Format.asprintf "%a" pp e in
   Format.fprintf fmt "%s" (String.escaped s)

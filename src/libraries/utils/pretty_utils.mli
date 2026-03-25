@@ -41,10 +41,6 @@ val to_string: ?margin:int -> (Format.formatter -> 'a -> unit) -> 'a -> string
     maximal width of the box before a line-break is inserted.
     See {!Format.set_margin} *)
 
-(** {2 separators} *)
-
-val escape_underscores : string -> string
-
 (* ********************************************************************** *)
 (** {2 pretty printers for standard types} *)
 (* ********************************************************************** *)
