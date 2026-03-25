@@ -714,29 +714,5 @@ let create_by_copy
     Filesystem.remove_file filename;
     raise e
 
-(* ************************************************************************** *)
-(** {2 Undoing} *)
-(* ************************************************************************** *)
-
-module Undo = struct
-
-  let short_filename = "frama_c_undo_restore"
-  let filename = ref Filepath.empty
-
-  let clear_breakpoint () = Filesystem.remove_file !filename
-
-  let restore () =
-    try
-      clear_breakpoint ()
-    with IOError s ->
-      Kernel_log.feedback ~dkey "cannot restore the last breakpoint: %S" s;
-      clear_breakpoint ()
-
-  let breakpoint () =
-    clear_breakpoint ();
-    filename := temp_file ~prefix:short_filename ~suffix:".sav"
-
-end
-
 (* Exporting Datatype for an easy external use *)
 module Datatype = D
