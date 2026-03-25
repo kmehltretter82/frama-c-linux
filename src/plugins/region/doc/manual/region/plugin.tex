@@ -244,8 +244,216 @@ of all rows with their offset range and contained fields.
 
 \section{Adding Region Annotations}
 \label{region-annotations}
-\TODO{To be completed}
 
+By default, the \textsf{Region} plug-in guess on optimistic aliasing contexts
+and assumes that pointers have all desirable good properties to avoid any
+unexpected, unspecified or undefined behaviors. The optimistic guess covers the
+following desirable properties:
+\begin{itemize}
+\item pointer variables only have either a null value, or an aligned
+  address that fits within some object boundaries, up to the address immediately
+  after (also called off-by-one of array elements);
+\item formal parameters with pointer type initially point to valid, separated
+  and properly initialized objects of the specified type;
+\item pointed objects are considered to be writable unless their type have an
+  explicit \verb+const+ attribute;
+\end{itemize}
+Would such an optimistic guess be incompatible with some code, the user shall
+provide additional annotations for the \textsf{Region} plug-in to be more
+pessimistic and to consider more problematic cases to be properly handled and
+analyzed.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \begin{tabular}{|ccl@{\hspace{1cm}}l|}
+    % LTeX: enabled=false
+    \hline
+    \rule{0pt}{2em}
+    \textit{clause} & ::= & \ldots & \\
+    & $\mid$ & \texttt{region} \textit{region}, \ldots , \textit{region} ;
+    & Regions specification\\
+
+    \rule{0pt}{2em}
+    \textit{region} & ::= &
+    [Name:] \emph{object}, \ldots, \textit{object} [, \textit{flags} ]
+    & Region objects and properties \\
+
+    \rule{0pt}{2em}
+    \textit{object} & ::= && \\
+    &$\mid$& \textit{path} & Aliased paths \\
+    &$\mid$& \textit{path}$\,.\,$\textit{field} ..
+             \textit{path}$\,.\,$\textit{field} & Aliased fields \\
+
+    &$\mid$& \textit{term} [ \textit{term} .. \textit{term} ]
+           & Pointed objects \\
+
+    \rule{0pt}{2em}
+    \textit{path} & ::= && \\
+    &$\mid$& \textit{var} & Variable \\
+    &$\mid$& \textit{path}$\,.\,$\textit{field} & Structure or union field \\
+    &$\mid$& \textit{path} [ .. ] & Array elements \\
+    &$\mid$& \texttt{*}\textit{path} & Pointed value \\
+    &$\mid$& \textit{path} \texttt{->} \textit{field} & Pointed field \\
+    &$\mid$& (\texttt{*}\textit{type}) \textit{path} & Pointer cast \\
+
+
+    \rule{0pt}{2em}
+    \textit{flags} & ::= & \textit{flag}, \ldots , \textit{flag} & \\
+    \textit{flag} & ::= && \\
+    &$\mid$& \verb+\nullable+ & \\
+    &$\mid$& \verb+\allocated+ & \\
+    &$\mid$& \verb+\garbage+ & \\
+    &$\mid$& \verb+\readonly+ & \\
+
+    &&& \\
+    \hline
+  % LTeX: enabled=true
+  \end{tabular}
+  \end{center}
+  \caption{Syntax of Region Annotations}
+  \label{fig:region-annotations}
+\end{figure}
+
+Region annotations are extended \textsf{ACSL} clauses, introduced by
+\verb+region+ keyword (or \verb+\\region::region+) that follow the syntactic
+definitions of Figure~\ref{fig:region-annotations}. They can be used in function
+contracts, but within the default behavior only, or inside code-annotations.
+
+Each region annotation introduces one or several regions specifications. Region
+can be anonymous or identified with a \emph{name}. When more than one region is
+specified, the subsequent ones shall be named. Regions, with or without names,
+consists of \emph{paths} and \emph{objects}. Paths are limited forms of
+\textsf{ACSL} terms denoting classes of l-values that might be aliased with
+each others. Objects are used to declare the available arrays through pointer
+arguments from the function calling contexts, together with their properties.
+They can only be declared in function contracts.
+
+We now describe region specifications, paths and objects in more details.
+
+\paragraph{Region Names.} Inside a given function code or function
+specification:
+\begin{itemize}
+  \item all regions with the same name are merged into the same region;
+  \item two regions with different names may be merged if they share aliased path;
+  \item two objects declared within regions with different names shall be
+  separated from each other, even if they finally belong to the same (merged)
+  region.
+\end{itemize}
+
+\paragraph{Aliasing Paths.}
+Aliasing paths are regular \textsf{ACSL} term l-values, with the following
+restrictions:
+\begin{itemize}
+\item no arithmetic conversion, only pointer casts are accepted;
+\item array access shall have an unspecified range of indices;
+\item pointer access are considered like undefined array access.
+\end{itemize}
+Should paths \verb+p+ and \verb+q+ are aliased with each other and belong the
+same region $R$, then access paths \verb+*p+ and \verb+*q+ denote the
+\emph{same} region $R'$ and region $R$ \emph{points-to} region $R'$.
+
+\paragraph{Aliased Fields.}
+Aliased fields specifications, for instance \verb+a.f..a.g+, must share the same
+base aliasing path. Given any compound object accessible through path \verb+a+,
+the entire space occupied between fields \verb+f+ and \verb+g+ will be merged
+into the same region. Both fields are included together will all the other
+fields in between, whatever their respective types. Fields \verb+f+ and \verb+g+
+might be declared in any order, hence \verb+a.g..a.f+ is an equivalent
+specification.
+
+\paragraph{Objects.}
+They shall be only specified in function contracts. An object \verb+a[p..q]+
+consists of a term \verb+a+ of pointer type, and two integer terms \verb+p+ and
+\verb+q+. The three terms \verb+a+, \verb+p+ and \verb+q+ are meant to be
+evaluated in the pre-state of the function, just like pre-conditions.
+
+An object specification \verb+p[a..b]+ denotes a \emph{potentially} existing
+array of elements \verb$*(p+k)$ with index \verb+k+ ranging from \verb+p+ to
+\verb+q+, both included.
+
+Anonymous objects might overlap with each others unless they are declared in
+different region clauses.
+
+On the contrary, any two objects declared in regions with \emph{different} names
+shall be \emph{separated} from each others. Sometimes, two objects with
+different names will be later merged into the same region because of further
+aliasing path specifications. However, provided they are introduced by region
+with \emph{distinct} names, they shall be \emph{separated} at the function entry
+point. Otherwise, objects declared within regions with the same name might
+overlap with each others.
+
+\paragraph{Object Properties.}
+By default, any declared object \verb+p[a..b]+ is assumed to be valid and
+properly initialized. Flags can be used in region specifications to downgrade
+those hypotheses to more permissive situations. The available flags for an
+object specification \verb+a[p..q]+ are:
+\begin{itemize}
+  \item \verb+\nullable+ allows \verb+a+ to be \verb+\null+;
+  \item \verb+\allocated+ allows range \verb$a+(p..q)$ to be valid partially
+  valid or not valid at all;
+  \item \verb+\garbage+ allows element \verb+a[k]+ to be partially initialized
+  or not initialized at all;
+  \item \verb+\readonly+ requires \verb+a[p..q]+ to have read-only access only.
+\end{itemize}
+Flags can be combined with each other and apply to all objects that appears in
+the same (named or anonymous) region clause. If a region clause introduces
+several region groups, flags only applies to objects of the same subgroup,
+whatever their names. A warning is emitted when flags have no object to apply on.
+
+\paragraph{Formals with Compound Type.}
+\TODO{Not yet implemented}
+In case a formal parameter of a function has a compound (structure or union)
+type, its value will be required be fully initialized, although this is not
+explicitly required by the C standard. To downgrade this assumption, the region
+property \verb+\gargabe+ shall be put on the considered formal parameter.
+
+\paragraph{Values of Pointer Type.}
+In case a variable or an l-value has a pointer type, its value is assumed to be
+aligned with the expected pointed type. This hypothesis can be leveraged by
+using the kernel command-line option \verb+-no-warn-unaligned-pointer+.
+
+\noindent Additionally, provided the kernel command-line option
+\verb+-warn-invalid-pointer+ has been set, a variable with pointer type shall
+only be assigned the \verb+\null+ value or a pointer to a valid object
+(including the final edge of the object, as formally specified by
+\verb+\valid_object+ in \textsf{ACSL}).
+
+\pagebreak
 \section{Generating Side Conditions}
 \label{region-commands}
-\TODO{To be completed}
+
+Region specifications are taken as \emph{additional requirements} to other
+\textsf{ACSL} clauses of a function. As such, they are not necessarily verified
+or preserved by any execution of the function and for any calling context.
+Hence, region specifications necessarily induce some \emph{side conditions} to
+be verified to be correct. The \textsf{Region} plug-in provides two ways for
+generating side-conditions: a programmatic \textsf{API} for other
+\textsf{Frama-C} plug-ins to verify these side conditions on their own, and a
+command-line option to generate regular \textsf{ACSL} clauses that enforce
+side-conditions to be verified.
+
+This behavior is similar to what provides the \textsf{RteGen} plug-in
+(\verb+-rte+). Actually, the side-conditions generated by \textsf{Region}
+generally subsume necessary side-conditions to prove the absence of some
+categories of \emph{Runtime Errors}, so that \verb+-region+ shall be used
+\emph{before} \textsf{RteGen} to obtain more precise annotations.
+
+The following command line options can be used to tune the generated side
+conditions of \textsf{Region} plug-in:
+
+\begin{description}
+\item[\texttt{-(no)-region}] generate side-conditions by inserting additional
+  \textsf{ACSL} clauses in the code (not by default).
+\item[\texttt{-region-(check|assert)}] generate side-conditions by using respectively
+  \verb+check+ (the default) or \verb+assert+ clauses.
+\item[\texttt{-(no)-region-logic}] generate side-conditions for \textsf{ACSL}
+  terms and predicates throughout the specifications (not by default).
+\item[\texttt{-(safe|unsafe)-arrays}] generate strict array bounds
+  side-conditions whenever possible (safe, by default) or not (unsafe).
+\item[\texttt{-(no)-warn-unaligned-pointer}] generate side-conditions when
+  accessing memory through misaligned pointers, or when assigning a non-aligned
+  pointer value to a pointer variable or l-value (set by default).
+\item[\texttt{-(no)-warn-invalid-pointer}] generate side-conditions when invalid
+  pointers are assigned to pointer variables or l-values (\emph{not} set by
+  default).
+\end{description}
