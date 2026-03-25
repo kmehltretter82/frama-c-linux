@@ -36,13 +36,14 @@ async function computeStudiaSelection(
   kind: access,
   marker: Ast.marker,
   descr: string,
+  // Replaces the handleError function
   onError?: (err: string) => void,
-  onSuccess?: () => void
+  onSuccess?: (markers: Ast.marker[]) => void
 ): Promise<void> {
   const request = kind === 'Reads' ? getReadsLval : getWritesLval;
   const data = await Server.send(request, marker).catch((err: string) => {
-    handleError(err);
     if(onError) onError(err);
+    else handleError(err);
   });
   const markers = data?.direct ?? [];
   if (markers.length > 0) {
@@ -59,7 +60,7 @@ async function computeStudiaSelection(
       plugin: 'Studia', label, markers: []
     });
   }
-  if(onSuccess) onSuccess();
+  if(onSuccess) onSuccess(markers);
 }
 
 /** Builds the Studia entries in the contextual menu about a given marker.  */
@@ -114,16 +115,21 @@ function ModalStudiaSearch(props: ModalTextFielddProps)
   const [akind, setAkind] = React.useState<access>('Reads');
   const [error, setError] = React.useState<string | undefined>();
 
+  const onSuccess = React.useCallback(
+    (m: Ast.marker[], kind: access, descr: string) => {
+      if(m.length > 0) closeModal();
+      else setError(`No ${kind.toLowerCase()} to ${descr}`);
+    }, [setError]);
+
   const onValidate = React.useCallback(async (p: string) => {
     const marker = await Server.send(
       Ast.parseLval, { stmt: attr.marker, term: p }
-    ).catch((err: string) => {
-        handleError(err);
-        setError(err);
-      });
-    if (marker)
-      computeStudiaSelection(akind, marker, p, setError, () => closeModal());
-  }, [akind, attr.marker, setError]);
+    ).catch((err: string) => setError(err));
+    if (marker) {
+      computeStudiaSelection(akind, marker, p, setError,
+        (m: Ast.marker[]) => onSuccess(m, akind, p));
+      }
+  }, [akind, attr.marker, setError, onSuccess]);
 
   return <Modal
       className='modal-studia'
@@ -167,7 +173,7 @@ function ModalStudiaSearch(props: ModalTextFielddProps)
       { error &&
         <Hbox>
           <Icon id='WARNING' kind='warning' />
-          <span>Studia Failure: {error}</span>
+          <span>{error}</span>
         </Hbox>
       }
     </div>
