@@ -527,7 +527,7 @@ let () = add_correctness_dep InitializedLocals.parameter
 (* ------------------------------------------------------------------------- *)
 
 let () = Parameter_customize.set_group initial_context
-module AutomaticContextMaxDepth =
+module ContextDepth =
   Int
     (struct
       let option_name = "-eva-context-depth"
@@ -536,11 +536,11 @@ module AutomaticContextMaxDepth =
       let help = "Use <n> as the depth of the default context for Eva. \
                   (defaults to 2)"
     end)
-let () = AutomaticContextMaxDepth.set_range ~min:0 ~max:max_int
-let () = add_correctness_dep AutomaticContextMaxDepth.parameter
+let () = ContextDepth.set_range ~min:0 ~max:max_int
+let () = add_correctness_dep ContextDepth.parameter
 
 let () = Parameter_customize.set_group initial_context
-module AutomaticContextMaxWidth =
+module ContextWidth =
   Int
     (struct
       let option_name = "-eva-context-width"
@@ -549,18 +549,18 @@ module AutomaticContextMaxWidth =
       let help = "Use <n> as the width of the default context for Eva. \
                   (defaults to 2)"
     end)
-let () = AutomaticContextMaxWidth.set_range ~min:1 ~max:max_int
-let () = add_correctness_dep AutomaticContextMaxWidth.parameter
+let () = ContextWidth.set_range ~min:1 ~max:max_int
+let () = add_correctness_dep ContextWidth.parameter
 
 let () = Parameter_customize.set_group initial_context
-module AllocatedContextValid =
+module ContextValidPointers =
   False
     (struct
       let option_name = "-eva-context-valid-pointers"
       let help = "Only allocate valid pointers until context-depth, \
                   and then use NULL (defaults to false)"
     end)
-let () = add_correctness_dep AllocatedContextValid.parameter
+let () = add_correctness_dep ContextValidPointers.parameter
 
 let () = Parameter_customize.set_group initial_context
 module InitializationPaddingGlobals =
@@ -1337,9 +1337,9 @@ let deprecated_aliases : ((module Parameter_sig.S) * string) list =
   ; (module WarnCopyIndeterminate), "-val-warn-copy-indeterminate"
   ; (module ReduceOnLogicAlarms), "-val-reduce-on-logic-alarms"
   ; (module InitializedLocals), "-val-initialized-locals"
-  ; (module AutomaticContextMaxDepth), "-context-depth"
-  ; (module AutomaticContextMaxWidth), "-context-width"
-  ; (module AllocatedContextValid), "-context-valid-pointers"
+  ; (module ContextDepth), "-context-depth"
+  ; (module ContextWidth), "-context-width"
+  ; (module ContextValidPointers), "-context-valid-pointers"
   ; (module InitializationPaddingGlobals), "-val-initialization-padding-globals"
   ; (module WideningDelay), "-wlevel"
   ; (module SlevelMergeAfterLoop), "-val-slevel-merge-after-loop"

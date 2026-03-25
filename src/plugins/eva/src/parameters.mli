@@ -95,9 +95,9 @@ module Memexec: Parameter_sig.Bool
 
 (** {2 Initial context of the analysis} *)
 
-module AutomaticContextMaxDepth: Parameter_sig.Int
-module AutomaticContextMaxWidth: Parameter_sig.Int
-module AllocatedContextValid: Parameter_sig.Bool
+module ContextDepth: Parameter_sig.Int
+module ContextWidth: Parameter_sig.Int
+module ContextValidPointers: Parameter_sig.Bool
 
 module InitializationPaddingGlobals: Parameter_sig.S
   with type t = [ `Initialized | `Uninitialized | `MaybeInitialized ]

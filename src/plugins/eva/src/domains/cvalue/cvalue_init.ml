@@ -59,7 +59,7 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
     in
     match validity with
     | Base.Known (a,b)
-      when not (Parameters.AllocatedContextValid.get ()) ->
+      when not (Parameters.ContextValidPointers.get ()) ->
       (* Weaken validity, because the created variables are not supposed
          to be valid *)
       (match valid with
@@ -115,11 +115,11 @@ let initialize_var_using_type varinfo state =
     | TFun _ -> state
 
     | TPtr typ'
-      when depth <= Parameters.AutomaticContextMaxDepth.get () ->
+      when depth <= Parameters.ContextDepth.get () ->
       let attr = Ast_types.get_attributes typ in
       let libc = Cil.is_in_libc varinfo.vattr in
       let context_max_width =
-        Parameters.AutomaticContextMaxWidth.get ()
+        Parameters.ContextWidth.get ()
       in begin
         match Ast_types.is_void typ', Ast_types.is_fun typ' with
         | false, false -> (* non-void, non-function *)
@@ -158,7 +158,7 @@ let initialize_var_using_type varinfo state =
           in
           let value = Cvalue.V.inject hidden_base (Ival.zero) in
           let value =
-            if Parameters.AllocatedContextValid.get ()
+            if Parameters.ContextValidPointers.get ()
             then value
             else Cvalue.V.join Cvalue.V.singleton_zero value
           in
@@ -186,7 +186,7 @@ let initialize_var_using_type varinfo state =
           let state = ref state in
           let typ = Ast_types.unroll typ in
           let max_precise_size =
-            Parameters.AutomaticContextMaxWidth.get ()
+            Parameters.ContextWidth.get ()
           in
           let locs = ref [] in
           for i = 0 to min psize (pred max_precise_size) do
@@ -213,7 +213,7 @@ let initialize_var_using_type varinfo state =
               match offsm with `Bottom -> assert false | `Value m -> m
             in
             let last_loc, locs = match !locs with
-              | [] -> assert false (* AutomaticContextMaxWidth is at least 1*)
+              | [] -> assert false (* ContextWidth is at least 1*)
               | l :: ll -> l, ll
             in
             let last_offsm = offsm_of_loc last_loc.loc in
@@ -308,7 +308,7 @@ let initialize_var_using_type varinfo state =
       (* Union of arithmetic types *)
       bind_entire_loc Cvalue.V.top_int
 
-    | TPtr _ when Parameters.AllocatedContextValid.get () ->
+    | TPtr _ when Parameters.ContextValidPointers.get () ->
       (* deep pointers map to NULL in this case *)
       bind_entire_loc Cvalue.V.singleton_zero
 
