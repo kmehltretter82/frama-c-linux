@@ -375,17 +375,6 @@ let run th = !on_idle (fun () -> (progress th))
 
 type pool = thread list ref
 
-let pool () = ref []
-
-let add p t =
-  let ps = List.filter is_running !p in
-  p := if is_running t then t :: ps else ps
-
-let iter f p = p := List.filter (fun t -> f t ; is_running t) !p
-
-let flush p = p := List.filter is_running !p
-let size p = flush p ; List.length !p
-
 (* -------------------------------------------------------------------------- *)
 (* --- Task Server                                                        --- *)
 (* -------------------------------------------------------------------------- *)
@@ -436,9 +425,8 @@ let cancel_all server =
     List.iter cancel server.running ;
   end
 
-let spawn server ?pool ?(stage=0) thread =
+let spawn server ?(stage=0) thread =
   begin
-    (match pool with None -> () | Some pool -> add pool thread) ;
     Queue.push thread server.queue.(stage) ;      (* queue(i) ++ *)
     server.scheduled <- succ server.scheduled ; (* scheduled ++ *)
     server.waiting <- false ;

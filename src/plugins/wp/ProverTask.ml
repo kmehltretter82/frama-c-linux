@@ -288,7 +288,7 @@ let schedule task =
   Task.spawn server (Task.thread task)
 
 let silent _ = ()
-let spawn ?(monitor=silent) ?pool ~all ~smoke
+let spawn ?(monitor=silent) ~all ~smoke
     (jobs : ('a * bool Task.task) list) =
   if jobs <> [] then
     begin
@@ -321,5 +321,5 @@ let spawn ?(monitor=silent) ?pool ~all ~smoke
       step := List.length jobs ;
       monitored := List.map pack jobs ;
       let server = server () in
-      List.iter (Task.spawn server ?pool) !monitored ;
+      List.iter (Task.spawn server) !monitored ;
     end
