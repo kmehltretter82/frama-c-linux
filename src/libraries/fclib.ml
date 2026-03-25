@@ -90,7 +90,6 @@ module Hpath = Hpath
 module Hptmap = Hptmap
 module Hptmap_sig = Hptmap_sig
 module Hptset = Hptset
-module Indexer = Indexer
 module Json = Json
 module Log = Log
 module Markdown = Markdown
