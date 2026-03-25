@@ -12,7 +12,7 @@ foo X = {0, 1, 2, 3};
  */
 /*@ lemma vaddrof{L}: \valid(&X);
  */
-/*@ lemma vaddrof2{L}: \valid((int *)X);
+/*@ lemma vaddrof2{L}: \valid(&(X[0]));
  */
 /*@ requires p1(x); */
 int f1(int x[4])
@@ -38,14 +38,14 @@ int g1(void)
 int a[10];
 void ftest(void)
 {
-  /*@ assert p((int *)a) ≡ \true; */ ;
+  /*@ assert p(&(a[0])) ≡ \true; */ ;
   return;
 }
 
-/*@ lemma array_not_null{L}: (int *)a ≢ \null;
+/*@ lemma array_not_null{L}: &(a[0]) ≢ \null;
  */
 int const ca[1] = {0};
-/*@ lemma const_array_init{L}: \initialized((int const *)ca);
+/*@ lemma const_array_init{L}: \initialized(&(ca[0]));
 
 */
 

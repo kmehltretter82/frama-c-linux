@@ -44,7 +44,7 @@ axiomatic A {
 void f(Point *q);
 
 Point tab[3];
-/*@ ensures Q((Point *)tab);
+/*@ ensures Q(&(tab[0]));
     ensures P(tab); */
 void h(void)
 {

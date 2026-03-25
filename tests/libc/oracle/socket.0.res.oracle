@@ -99,7 +99,7 @@
 [eva:progress] Done for function readv
 [eva:alarm] socket.c:72: Warning: 
   accessing uninitialized left-value.
-  assert \initialized((char *)rcv_buffer_scattered1);
+  assert \initialized(&(rcv_buffer_scattered1[0]));
 [eva:progress] 
   computing for function printf_va_2 <- test_readv <- main.
   Called from socket.c:75.
@@ -131,7 +131,7 @@
 [eva:progress] Done for function recvmsg
 [eva:alarm] socket.c:92: Warning: 
   accessing uninitialized left-value.
-  assert \initialized((char *)rcv_buffer_scattered1);
+  assert \initialized(&(rcv_buffer_scattered1[0]));
 [eva:progress] 
   computing for function printf_va_3 <- test_recvmsg <- main.
   Called from socket.c:95.
