@@ -972,16 +972,17 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
 
     method! vglob_aux = function
       | GFun (decl, _) ->
-        let f = decl.svar.vname in
+        let dkey = dkey_transformation_visit in
+        let f = Globals.Functions.get decl.svar in
         let fs = Options.Process.get () in
-        if Datatype.String.Set.is_empty fs || Datatype.String.Set.mem f fs
+        if Kf.Set.is_empty fs || Kf.Set.mem f fs
         then begin
-          Options.debug ~level:2 ~dkey:dkey_transformation_visit "Visit DO fun %s@." f;
+          Options.debug ~level:2 ~dkey "Visit DO fun %s@." decl.svar.vname;
           ScopingBlock.reset ();
           Cil.DoChildren
         end
         else begin
-          Options.debug ~level:2 ~dkey:dkey_transformation_visit "Visit COPY fun %s@." f;
+          Options.debug ~level:2 ~dkey "Visit COPY fun %s@." decl.svar.vname;
           Cil.JustCopy
         end
       | _ ->

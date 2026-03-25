@@ -94,8 +94,9 @@ module Enabled =
       ^"\") where volatile accesses are simulated by function calls"
   end)
 
+let () = Parameter_customize.argument_may_be_fundecl ()
 module Process =
-  String_set (struct
+  Kernel_function_set (struct
     let option_name = "-volatile-fct"
     let arg_name = "f,..."
     let help = "Only process the given function(s)"

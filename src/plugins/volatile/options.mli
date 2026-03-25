@@ -38,7 +38,7 @@ end
 (** {1 Options} *)
 
 module Enabled : Parameter_sig.Bool
-module Process : Parameter_sig.String_set
+module Process : Parameter_sig.Kernel_function_set
 module CallPtr : Parameter_sig.String_list
 module Binding : Parameter_sig.String_list
 module BindingAuto : Parameter_sig.Bool
