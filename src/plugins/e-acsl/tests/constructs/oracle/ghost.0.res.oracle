@@ -6,4 +6,4 @@
 [eva:alarm] ghost.i:16: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] ghost.i:30: Warning: 
-  out of bounds read. assert \valid_read((int **)ghost_int_arr);
+  out of bounds read. assert \valid_read(&(ghost_int_arr[0]));

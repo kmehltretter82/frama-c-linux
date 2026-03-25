@@ -150,9 +150,7 @@ int __gen_e_acsl_gcd(int a, int b, int r)
 }
 
 /*@ assigns \result;
-    assigns \result
-      \from *((__e_acsl_mpz_struct *)a), *((__e_acsl_mpz_struct *)b), r;
- */
+    assigns \result \from *(&(a[0])), *(&(b[0])), r; */
 int __gen_e_acsl_gcd2(__e_acsl_mpz_struct * a, __e_acsl_mpz_struct * b, int r)
 {
   int __gen_e_acsl_eq;

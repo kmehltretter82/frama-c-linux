@@ -129,7 +129,7 @@
 [eva:progress] memcpy.c:89: 
   function memcpy: precondition 'separation' got status valid.
 [eva:alarm] memcpy.c:91: Warning: 
-  pointer downcast. assert (unsigned int)((struct t1 *)t) ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&(t[0])) ≤ 2147483647;
 [eva:garbled-mix:write] memcpy.c:91: 
   Assigning imprecise value to src
   because of arithmetic operation on addresses.
@@ -156,7 +156,7 @@
 [eva:progress] memcpy.c:93: 
   function memcpy: precondition 'separation' got status valid.
 [eva:alarm] memcpy.c:94: Warning: 
-  pointer downcast. assert (unsigned int)((struct t1 *)t) ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&(t[0])) ≤ 2147483647;
 [eva:alarm] memcpy.c:95: Warning: 
   pointer downcast. assert (unsigned int)(&v5) ≤ 2147483647;
 [eva:garbled-mix:write] memcpy.c:95: 
@@ -198,7 +198,7 @@
 [eva:imprecision] memcpy.c:109: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:alarm] memcpy.c:113: Warning: 
-  unaligned pointer creation. assert \aligned((char *)ptop1,alignof(int));
+  unaligned pointer creation. assert \aligned(&(ptop1[0]),alignof(int));
 [eva:alarm] memcpy.c:115: Warning: 
   unaligned pointer creation. assert \aligned(pptop,alignof(int));
 [eva:partition] memcpy.c:114: starting to merge loop iterations

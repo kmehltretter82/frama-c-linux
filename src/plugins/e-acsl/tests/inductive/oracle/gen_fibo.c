@@ -462,7 +462,7 @@ int __gen_e_acsl_fibo(int i, int x)
 }
 
 /*@ assigns (*__retres_arg)[0];
-    assigns (*__retres_arg)[0] \from *((__e_acsl_mpz_struct *)i);
+    assigns (*__retres_arg)[0] \from *(&(i[0]));
  */
 void __gen_e_acsl_fibo2_fun2(__e_acsl_mpz_t *__retres_arg,
                              __e_acsl_mpz_struct * i)

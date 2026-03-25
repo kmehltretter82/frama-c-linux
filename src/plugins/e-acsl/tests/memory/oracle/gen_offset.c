@@ -40,21 +40,20 @@ int main(void)
     unsigned long __gen_e_acsl_offset;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_offset = __e_acsl_offset((void *)(A));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"(int *)A",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&(A[0])",
                                  (void *)(A));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
-                                   "\\offset((int *)A)",0,
-                                   __gen_e_acsl_offset);
+                                   "\\offset(&(A[0]))",0,__gen_e_acsl_offset);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
-    __gen_e_acsl_assert_data.pred_txt = "\\offset((int *)A) == 0";
+    __gen_e_acsl_assert_data.pred_txt = "\\offset(&(A[0])) == 0";
     __gen_e_acsl_assert_data.file = "offset.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 13;
     __e_acsl_assert(__gen_e_acsl_offset == 0UL,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
-  /*@ assert \offset((int *)A) == 0; */ ;
+  /*@ assert \offset(&(A[0])) == 0; */ ;
   {
     unsigned long __gen_e_acsl_offset_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
@@ -191,14 +190,14 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
       {.values = (void *)0};
     __gen_e_acsl_offset_5 = __e_acsl_offset((void *)(a));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"(int *)a",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"&(a[0])",
                                  (void *)(a));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_9,
-                                   "\\offset((int *)a)",0,
+                                   "\\offset(&(a[0]))",0,
                                    __gen_e_acsl_offset_5);
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "Assertion";
-    __gen_e_acsl_assert_data_9.pred_txt = "\\offset((int *)a) == 0";
+    __gen_e_acsl_assert_data_9.pred_txt = "\\offset(&(a[0])) == 0";
     __gen_e_acsl_assert_data_9.file = "offset.c";
     __gen_e_acsl_assert_data_9.fct = "main";
     __gen_e_acsl_assert_data_9.line = 21;
@@ -206,7 +205,7 @@ int main(void)
                     & __gen_e_acsl_assert_data_9);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
   }
-  /*@ assert \offset((int *)a) == 0; */ ;
+  /*@ assert \offset(&(a[0])) == 0; */ ;
   {
     unsigned long __gen_e_acsl_offset_6;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =

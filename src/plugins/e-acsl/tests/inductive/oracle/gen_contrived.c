@@ -442,9 +442,7 @@ int __gen_e_acsl_simple_complex_argument(int i, int x)
 }
 
 /*@ assigns \result;
-    assigns \result
-      \from *((__e_acsl_mpz_struct *)a), *((__e_acsl_mpz_struct *)b);
- */
+    assigns \result \from *(&(a[0])), *(&(b[0])); */
 int __gen_e_acsl_conds_fun3(__e_acsl_mpz_struct * a, __e_acsl_mpz_struct * b)
 {
   __e_acsl_mpz_t __gen_e_acsl_;
@@ -543,8 +541,7 @@ int __gen_e_acsl_conds_fun3(__e_acsl_mpz_struct * a, __e_acsl_mpz_struct * b)
 }
 
 /*@ assigns (*__retres_arg)[0];
-    assigns (*__retres_arg)[0]
-      \from *((__e_acsl_mpz_struct *)a), *((__e_acsl_mpz_struct *)b);
+    assigns (*__retres_arg)[0] \from *(&(a[0])), *(&(b[0]));
  */
 void __gen_e_acsl_conds_fun3_2(__e_acsl_mpz_t *__retres_arg,
                                __e_acsl_mpz_struct * a,

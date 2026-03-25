@@ -286,7 +286,7 @@
   computing for function escaping <- main.
   Called from strnlen2.c:522.
 [eva:alarm] strnlen2.c:196: Warning: 
-  unaligned pointer creation. assert \aligned((char *)s,alignof(int));
+  unaligned pointer creation. assert \aligned(&(s[0]),alignof(int));
 [eva:alarm] strnlen2.c:196: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:locals-escaping] strnlen2.c:196: Warning: 

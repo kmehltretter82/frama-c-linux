@@ -67,23 +67,23 @@ int main(void)
     int __gen_e_acsl_initialized;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(a),sizeof(char));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"(char *)a",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&(a[0])",
                                  (void *)(a));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(char)",
                                    0,sizeof(char));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "\\initialized((char *)a)",0,
+                                 "\\initialized(&(a[0]))",0,
                                  __gen_e_acsl_initialized);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
-    __gen_e_acsl_assert_data.pred_txt = "\\initialized((char *)a)";
+    __gen_e_acsl_assert_data.pred_txt = "\\initialized(&(a[0]))";
     __gen_e_acsl_assert_data.file = "mem.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 10;
     __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
-  /*@ assert \initialized((char *)a); */ ;
+  /*@ assert \initialized(&(a[0])); */ ;
   {
     int __gen_e_acsl_initialized_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
@@ -139,16 +139,16 @@ int main(void)
       {.values = (void *)0};
     __gen_e_acsl_initialized_4 = __e_acsl_initialized((void *)(b),
                                                       sizeof(int));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"(int *)b",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"&(b[0])",
                                  (void *)(b));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                    "sizeof(int)",0,sizeof(int));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                 "\\initialized((int *)b)",0,
+                                 "\\initialized(&(b[0]))",0,
                                  __gen_e_acsl_initialized_4);
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
-    __gen_e_acsl_assert_data_4.pred_txt = "!\\initialized((int *)b)";
+    __gen_e_acsl_assert_data_4.pred_txt = "!\\initialized(&(b[0]))";
     __gen_e_acsl_assert_data_4.file = "mem.c";
     __gen_e_acsl_assert_data_4.fct = "main";
     __gen_e_acsl_assert_data_4.line = 16;
@@ -156,7 +156,7 @@ int main(void)
                     & __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
   }
-  /*@ assert !\initialized((int *)b); */ ;
+  /*@ assert !\initialized(&(b[0])); */ ;
   {
     int __gen_e_acsl_initialized_5;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
@@ -193,7 +193,7 @@ int main(void)
     __gen_e_acsl_initialized_6 = __e_acsl_initialized((void *)((char *)(b) + 
                                                                4 * 2),
                                                       (size_t)__gen_e_acsl_if);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"(int *)b",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"&(b[0])",
                                  (void *)(b));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"sizeof(int)",
                                  0,4);
@@ -247,16 +247,16 @@ int main(void)
       {.values = (void *)0};
     __gen_e_acsl_initialized_8 = __e_acsl_initialized((void *)(c),
                                                       sizeof(char));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"(char *)c",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"&(c[0])",
                                  (void *)(c));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
                                    "sizeof(char)",0,sizeof(char));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
-                                 "\\initialized((char *)c)",0,
+                                 "\\initialized(&(c[0]))",0,
                                  __gen_e_acsl_initialized_8);
     __gen_e_acsl_assert_data_8.blocking = 1;
     __gen_e_acsl_assert_data_8.kind = "Assertion";
-    __gen_e_acsl_assert_data_8.pred_txt = "!\\initialized((char *)c)";
+    __gen_e_acsl_assert_data_8.pred_txt = "!\\initialized(&(c[0]))";
     __gen_e_acsl_assert_data_8.file = "mem.c";
     __gen_e_acsl_assert_data_8.fct = "main";
     __gen_e_acsl_assert_data_8.line = 23;
@@ -264,7 +264,7 @@ int main(void)
                     & __gen_e_acsl_assert_data_8);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
   }
-  /*@ assert !\initialized((char *)c); */ ;
+  /*@ assert !\initialized(&(c[0])); */ ;
   {
     int __gen_e_acsl_size_2;
     int __gen_e_acsl_if_2;
@@ -276,7 +276,7 @@ int main(void)
     else __gen_e_acsl_if_2 = __gen_e_acsl_size_2;
     __gen_e_acsl_initialized_9 = __e_acsl_initialized((void *)(c + 1),
                                                       (size_t)__gen_e_acsl_if_2);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"(char *)c",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"&(c[0])",
                                  (void *)(c));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
                                  "sizeof(char) * 1",0,1);
@@ -335,7 +335,7 @@ int main(void)
     else __gen_e_acsl_if_3 = __gen_e_acsl_size_3;
     __gen_e_acsl_initialized_11 = __e_acsl_initialized((void *)(c + 0),
                                                        (size_t)__gen_e_acsl_if_3);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,"(char *)c",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,"&(c[0])",
                                  (void *)(c));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
                                  "sizeof(char)",0,1);

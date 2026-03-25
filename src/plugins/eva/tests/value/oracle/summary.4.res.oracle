@@ -30,7 +30,7 @@
 [eva:alarm] summary.i:32: Warning: 
   assertion 'rte,pointer_alignment' got status unknown.
 [eva:alarm] summary.i:32: Warning: 
-  unaligned pointer creation. assert \aligned((char *)c,alignof(int));
+  unaligned pointer creation. assert \aligned(&(c[0]),alignof(int));
 [eva:alarm] summary.i:33: Warning: 
   assertion 'rte,division_by_zero' got status unknown.
 [eva:alarm] summary.i:33: Warning: division by zero. assert undet ≢ 0;

@@ -40,15 +40,15 @@ int main(void)
     unsigned long __gen_e_acsl_block_length;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_block_length = __e_acsl_block_length((void *)(A));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"(int *)A",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&(A[0])",
                                  (void *)(A));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
-                                   "\\block_length((int *)A)",0,
+                                   "\\block_length(&(A[0]))",0,
                                    __gen_e_acsl_block_length);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"sizeof(A)",0,16);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
-    __gen_e_acsl_assert_data.pred_txt = "\\block_length((int *)A) == sizeof(A)";
+    __gen_e_acsl_assert_data.pred_txt = "\\block_length(&(A[0])) == sizeof(A)";
     __gen_e_acsl_assert_data.file = "block_length.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 13;
@@ -56,7 +56,7 @@ int main(void)
                     & __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
-  /*@ assert \block_length((int *)A) == sizeof(A); */ ;
+  /*@ assert \block_length(&(A[0])) == sizeof(A); */ ;
   {
     unsigned long __gen_e_acsl_block_length_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
@@ -209,16 +209,16 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
       {.values = (void *)0};
     __gen_e_acsl_block_length_6 = __e_acsl_block_length((void *)(a));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"(int *)a",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"&(a[0])",
                                  (void *)(a));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_9,
-                                   "\\block_length((int *)a)",0,
+                                   "\\block_length(&(a[0]))",0,
                                    __gen_e_acsl_block_length_6);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"sizeof(a)",0,
                                  16);
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "Assertion";
-    __gen_e_acsl_assert_data_9.pred_txt = "\\block_length((int *)a) == sizeof(a)";
+    __gen_e_acsl_assert_data_9.pred_txt = "\\block_length(&(a[0])) == sizeof(a)";
     __gen_e_acsl_assert_data_9.file = "block_length.c";
     __gen_e_acsl_assert_data_9.fct = "main";
     __gen_e_acsl_assert_data_9.line = 22;
@@ -226,7 +226,7 @@ int main(void)
                     & __gen_e_acsl_assert_data_9);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
   }
-  /*@ assert \block_length((int *)a) == sizeof(a); */ ;
+  /*@ assert \block_length(&(a[0])) == sizeof(a); */ ;
   {
     unsigned long __gen_e_acsl_block_length_7;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =

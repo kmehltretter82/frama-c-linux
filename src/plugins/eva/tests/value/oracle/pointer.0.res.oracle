@@ -33,10 +33,10 @@
 [eva:progress] Done for function k
 [eva:alarm] pointer.i:40: Warning: 
   pointer comparison.
-  assert \pointer_comparable((void *)((int *)T - 1), (void *)((int *)T));
+  assert \pointer_comparable((void *)(&(T[0]) - 1), (void *)(&(T[0])));
 [eva:alarm] pointer.i:41: Warning: 
   pointer comparison.
-  assert \pointer_comparable((void *)((int *)T), (void *)(&T[12]));
+  assert \pointer_comparable((void *)(&(T[0])), (void *)(&T[12]));
 [eva:progress] Recording results for main
 [eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======

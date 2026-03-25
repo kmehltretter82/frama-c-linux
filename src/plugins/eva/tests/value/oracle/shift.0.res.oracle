@@ -38,25 +38,23 @@
 [eva:show] shift.i:48: 
   Frama_C_show_each: {{ "ua:%u\nub:%u\n" }}, {1401}, {1073741074}
 [eva:alarm] shift.i:52: Warning: 
-  unsigned overflow. assert 0 ≤ (unsigned long)((char *)t) << 8;
+  unsigned overflow. assert 0 ≤ (unsigned long)(&(t[0])) << 8;
 [eva:alarm] shift.i:52: Warning: 
-  unsigned overflow. assert (unsigned long)((char *)t) << 8 ≤ 4294967295;
+  unsigned overflow. assert (unsigned long)(&(t[0])) << 8 ≤ 4294967295;
 [eva:garbled-mix:write] shift.i:52: 
   Assigning imprecise value to r because of arithmetic operation on addresses.
 [eva:alarm] shift.i:53: Warning: 
-  pointer downcast. assert (unsigned int)((char *)t) ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&(t[0])) ≤ 2147483647;
 [eva:alarm] shift.i:53: Warning: 
-  invalid LHS operand for left shift. assert 0 ≤ (long)((char *)t);
+  invalid LHS operand for left shift. assert 0 ≤ (long)(&(t[0]));
 [eva:alarm] shift.i:53: Warning: 
-  signed overflow. assert -2147483648 ≤ (long)((char *)t) << 8;
+  signed overflow. assert -2147483648 ≤ (long)(&(t[0])) << 8;
 [eva:alarm] shift.i:53: Warning: 
-  signed overflow. assert (long)((char *)t) << 8 ≤ 2147483647;
+  signed overflow. assert (long)(&(t[0])) << 8 ≤ 2147483647;
 [eva:alarm] shift.i:53: Warning: 
-  signed overflow.
-  assert -2147483648 ≤ (long)r + (long)((long)((char *)t) << 8);
+  signed overflow. assert -2147483648 ≤ (long)r + (long)((long)(&(t[0])) << 8);
 [eva:alarm] shift.i:53: Warning: 
-  signed overflow.
-  assert (long)r + (long)((long)((char *)t) << 8) ≤ 2147483647;
+  signed overflow. assert (long)r + (long)((long)(&(t[0])) << 8) ≤ 2147483647;
 [eva:alarm] shift.i:58: Warning: 
   unsigned overflow. assert 2U << 31 ≤ 4294967295;
 [eva:progress] Recording results for main

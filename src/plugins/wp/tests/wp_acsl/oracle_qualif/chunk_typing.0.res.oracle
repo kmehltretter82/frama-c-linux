@@ -57,14 +57,14 @@
   Memory model hypotheses for function 'function':
   /*@
      behavior wp_typed:
-       requires \separated(i16 + (..), (char const *)x + (..));
-       requires \separated(i32 + (..), (char const *)x + (..));
-       requires \separated(i64 + (..), (char const *)x + (..));
-       requires \separated(i8 + (..), (char const *)x + (..));
-       requires \separated(u16 + (..), (char const *)x + (..));
-       requires \separated(u32 + (..), (char const *)x + (..));
-       requires \separated(u64 + (..), (char const *)x + (..));
-       requires \separated(u8 + (..), (char const *)x + (..));
+       requires \separated(i16 + (..), &(x[0]) + (..));
+       requires \separated(i32 + (..), &(x[0]) + (..));
+       requires \separated(i64 + (..), &(x[0]) + (..));
+       requires \separated(i8 + (..), &(x[0]) + (..));
+       requires \separated(u16 + (..), &(x[0]) + (..));
+       requires \separated(u32 + (..), &(x[0]) + (..));
+       requires \separated(u64 + (..), &(x[0]) + (..));
+       requires \separated(u8 + (..), &(x[0]) + (..));
      */
   void function(signed char i8[10], unsigned char u8[10], short i16[10],
                 unsigned short u16[10], int i32[10], unsigned int u32[10],

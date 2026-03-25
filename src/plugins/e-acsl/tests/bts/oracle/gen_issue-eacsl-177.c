@@ -78,7 +78,7 @@ int main(void)
 }
 
 /*@ assigns (*__retres_arg)[0];
-    assigns (*__retres_arg)[0] \from *((__e_acsl_mpz_struct *)n);
+    assigns (*__retres_arg)[0] \from *(&(n[0]));
  */
 void __gen_e_acsl_f(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * n)
 {

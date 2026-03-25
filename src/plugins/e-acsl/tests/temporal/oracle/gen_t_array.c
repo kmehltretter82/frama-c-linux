@@ -30,12 +30,12 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(src),
                                                     sizeof(int *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"(int **)src",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&(src[0])",
                                  (void *)(src));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                    "sizeof(int *)",0,sizeof(int *));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "\\initialized((int **)src)",0,
+                                 "\\initialized(&(src[0]))",0,
                                  __gen_e_acsl_initialized);
     if (__gen_e_acsl_initialized) {
       int __gen_e_acsl_aligned;

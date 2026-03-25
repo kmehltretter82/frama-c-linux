@@ -76,7 +76,7 @@
   Memory model hypotheses for function 'load_5':
   /*@
      behavior wp_typed_ref:
-       requires \separated(hp + (..), (int *)reg_load + (..));
+       requires \separated(hp + (..), &(reg_load[0]) + (..));
      */
   void load_5(int *hp);
 [wp] reference_array.i:31: Warning: 
@@ -84,14 +84,14 @@
   /*@
      behavior wp_typed_ref:
        requires
-         \separated(gp + (..), (int *)reg_load + (..), (int *)reg_add + (..));
+         \separated(gp + (..), &(reg_load[0]) + (..), &(reg_add[0]) + (..));
      */
   void add_5(int *gp);
 [wp] reference_array.i:45: Warning: 
   Memory model hypotheses for function 'load_1_5':
   /*@
      behavior wp_typed_ref:
-       requires \separated(lp + (..), (int *)reg_load + (..));
+       requires \separated(lp + (..), &(reg_load[0]) + (..));
      */
   void load_1_5(int (*lp)[5]);
 [wp] reference_array.i:52: Warning: 
@@ -99,6 +99,6 @@
   /*@
      behavior wp_typed_ref:
        requires
-         \separated(ap + (..), (int *)reg_load + (..), (int *)reg_add + (..));
+         \separated(ap + (..), &(reg_load[0]) + (..), &(reg_add[0]) + (..));
      */
   void add_1_5(int (*ap)[5]);

@@ -82,9 +82,7 @@ int main(void)
 }
 
 /*@ assigns \result;
-    assigns \result
-      \from n, *((__e_acsl_mpz_struct *)m), *((__e_acsl_mpz_struct *)r);
- */
+    assigns \result \from n, *(&(m[0])), *(&(r[0])); */
 int __gen_e_acsl_add(int n, __e_acsl_mpz_struct * m, __e_acsl_mpz_struct * r)
 {
   __e_acsl_mpz_t __gen_e_acsl__3;

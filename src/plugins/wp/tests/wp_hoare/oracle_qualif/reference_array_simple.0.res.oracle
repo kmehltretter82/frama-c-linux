@@ -32,5 +32,5 @@
 [wp] reference_array_simple.i:40: Warning: 
   Memory model hypotheses for function 'call_f3':
   /*@ behavior wp_typed_ref:
-        ensures \separated(\result, (int **)tp + (..)); */
+        ensures \separated(\result, &(tp[0]) + (..)); */
   int *call_f3(void);

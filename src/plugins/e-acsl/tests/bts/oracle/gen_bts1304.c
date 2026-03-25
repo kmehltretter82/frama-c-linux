@@ -43,8 +43,7 @@ int main(void)
   i = 0;
   while ((unsigned long)i < 4UL) {
     /*@ assert
-          Eva: pointer_alignment:
-            \aligned((unsigned char *)buf,alignof(unsigned int));
+          Eva: pointer_alignment: \aligned(&(buf[0]),alignof(unsigned int));
     */
     read_sensor_4((unsigned int *)(buf) + i);
     i ++;
@@ -76,11 +75,11 @@ int main(void)
     }
     __gen_e_acsl_aligned = __e_acsl_aligned((void *)(buf),
                                             _Alignof(union msg));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
-                                 "(unsigned char *)buf",(void *)(buf));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&(buf[0])",
+                                 (void *)(buf));
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "RTE";
-    __gen_e_acsl_assert_data_2.pred_txt = "\\aligned((unsigned char *)buf,alignof(union msg))";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\aligned(&(buf[0]),alignof(union msg))";
     __gen_e_acsl_assert_data_2.file = "bts1304.i";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 32;
@@ -89,23 +88,23 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(buf),
                                                     sizeof(union msg));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,
-                                 "(unsigned char *)buf",(void *)(buf));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&(buf[0])",
+                                 (void *)(buf));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                    "sizeof(union msg)",0,sizeof(union msg));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "\\initialized((union msg *)((unsigned char *)buf))",
-                                 0,__gen_e_acsl_initialized);
+                                 "\\initialized((union msg *)(&(buf[0])))",0,
+                                 __gen_e_acsl_initialized);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
-    __gen_e_acsl_assert_data.pred_txt = "\\initialized((union msg *)((unsigned char *)buf))";
+    __gen_e_acsl_assert_data.pred_txt = "\\initialized((union msg *)(&(buf[0])))";
     __gen_e_acsl_assert_data.file = "bts1304.i";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 32;
     __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
-  /*@ assert \initialized((union msg *)((unsigned char *)buf)); */ ;
+  /*@ assert \initialized((union msg *)(&(buf[0]))); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(buf));
   __e_acsl_memory_clean();

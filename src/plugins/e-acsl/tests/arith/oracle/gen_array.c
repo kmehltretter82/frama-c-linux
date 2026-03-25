@@ -167,34 +167,34 @@ void arrays(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
       {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"e",(void *)e);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"(int *)a",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"&(a[0])",
                                  (void *)(a));
     __gen_e_acsl_assert_data_7.blocking = 1;
     __gen_e_acsl_assert_data_7.kind = "Assertion";
-    __gen_e_acsl_assert_data_7.pred_txt = "e == (int *)a";
+    __gen_e_acsl_assert_data_7.pred_txt = "e == &(a[0])";
     __gen_e_acsl_assert_data_7.file = "array.i";
     __gen_e_acsl_assert_data_7.fct = "arrays";
     __gen_e_acsl_assert_data_7.line = 36;
     __e_acsl_assert(e == a,& __gen_e_acsl_assert_data_7);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
   }
-  /*@ assert e == (int *)a; */ ;
+  /*@ assert e == &(a[0]); */ ;
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
       {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"e",(void *)e);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"(int *)c",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"&(c[0])",
                                  (void *)(c));
     __gen_e_acsl_assert_data_8.blocking = 1;
     __gen_e_acsl_assert_data_8.kind = "Assertion";
-    __gen_e_acsl_assert_data_8.pred_txt = "e != (int *)c";
+    __gen_e_acsl_assert_data_8.pred_txt = "e != &(c[0])";
     __gen_e_acsl_assert_data_8.file = "array.i";
     __gen_e_acsl_assert_data_8.fct = "arrays";
     __gen_e_acsl_assert_data_8.line = 37;
     __e_acsl_assert(e != c,& __gen_e_acsl_assert_data_8);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
   }
-  /*@ assert e != (int *)c; */ ;
+  /*@ assert e != &(c[0]); */ ;
   {
     int __gen_e_acsl_eq_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
@@ -267,13 +267,13 @@ void arrays(void)
                                                     (void *)(*((int (*)[])g)),
                                                     (void *)0);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_12,
-                                 "(int *)*((int (*)[])g)",
+                                 "&(*((int (*)[])g)[0])",
                                  (void *)(*((int (*)[])g)));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_12,
                                    "sizeof(int)",0,sizeof(int));
     __gen_e_acsl_assert_data_12.blocking = 1;
     __gen_e_acsl_assert_data_12.kind = "RTE";
-    __gen_e_acsl_assert_data_12.pred_txt = "\\valid_read((int *)*((int (*)[])g))";
+    __gen_e_acsl_assert_data_12.pred_txt = "\\valid_read(&(*((int (*)[])g)[0]))";
     __gen_e_acsl_assert_data_12.file = "array.i";
     __gen_e_acsl_assert_data_12.fct = "arrays";
     __gen_e_acsl_assert_data_12.line = 41;
@@ -406,13 +406,13 @@ void arrays(void)
                                                     (void *)(*((int (*)[])f)),
                                                     (void *)0);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_17,
-                                 "(int *)*((int (*)[])f)",
+                                 "&(*((int (*)[])f)[0])",
                                  (void *)(*((int (*)[])f)));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_17,
                                    "sizeof(int)",0,sizeof(int));
     __gen_e_acsl_assert_data_17.blocking = 1;
     __gen_e_acsl_assert_data_17.kind = "RTE";
-    __gen_e_acsl_assert_data_17.pred_txt = "\\valid_read((int *)*((int (*)[])f))";
+    __gen_e_acsl_assert_data_17.pred_txt = "\\valid_read(&(*((int (*)[])f)[0]))";
     __gen_e_acsl_assert_data_17.file = "array.i";
     __gen_e_acsl_assert_data_17.fct = "arrays";
     __gen_e_acsl_assert_data_17.line = 43;

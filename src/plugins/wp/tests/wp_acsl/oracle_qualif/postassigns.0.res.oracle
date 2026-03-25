@@ -61,8 +61,8 @@
   Memory model hypotheses for function 'job2':
   /*@
      behavior wp_typed:
-       requires \separated(p + (..), (int *)A + (..), &N);
-       ensures \separated(p + A[0 .. \at(N,Post) - 1], (int *)A + (..), &N);
+       requires \separated(p + (..), &(A[0]) + (..), &N);
+       ensures \separated(p + A[0 .. \at(N,Post) - 1], &(A[0]) + (..), &N);
      */
   void job2(int *p);
 [wp] postassigns.c:35: Warning: 

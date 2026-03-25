@@ -127,7 +127,7 @@ int __gen_e_acsl_signum(double x, int r)
 }
 
 /*@ assigns \result;
-    assigns \result \from *((__e_acsl_mpq_struct *)x), r; */
+    assigns \result \from *(&(x[0])), r; */
 int __gen_e_acsl_signum_5(__e_acsl_mpq_t x, int r)
 {
   __e_acsl_mpq_t __gen_e_acsl__3;

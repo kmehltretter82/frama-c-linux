@@ -129,7 +129,7 @@ int main(void)
 }
 
 /*@ assigns (*__retres_arg)[0];
-    assigns (*__retres_arg)[0] \from x, *((__e_acsl_mpz_struct *)y);
+    assigns (*__retres_arg)[0] \from x, *(&(y[0]));
  */
 void __gen_e_acsl_power_fun3(__e_acsl_mpz_t *__retres_arg, int x,
                              __e_acsl_mpz_struct * y)
@@ -205,7 +205,7 @@ int __gen_e_acsl_power(int x, int y, int p)
 }
 
 /*@ assigns (*__retres_arg)[0];
-    assigns (*__retres_arg)[0] \from x, *((__e_acsl_mpz_struct *)y);
+    assigns (*__retres_arg)[0] \from x, *(&(y[0]));
  */
 void __gen_e_acsl_power2_fun3(__e_acsl_mpz_t *__retres_arg, int x,
                               __e_acsl_mpz_struct * y)

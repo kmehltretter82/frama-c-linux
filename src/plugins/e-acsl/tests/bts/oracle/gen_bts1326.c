@@ -85,13 +85,13 @@ void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
                                                   (void *)(*__gen_e_acsl_at),
                                                   (void *)0);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
-                                 "(int *)*__gen_e_acsl_at",
+                                 "&(*__gen_e_acsl_at[0])",
                                  (void *)(*__gen_e_acsl_at));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                    "sizeof(int)",0,sizeof(int));
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "RTE";
-    __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read((int *)*__gen_e_acsl_at)";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(&(*__gen_e_acsl_at[0]))";
     __gen_e_acsl_assert_data_2.file = "bts1326.i";
     __gen_e_acsl_assert_data_2.fct = "atp_NORMAL_computeAverageAccel";
     __gen_e_acsl_assert_data_2.line = 8;
