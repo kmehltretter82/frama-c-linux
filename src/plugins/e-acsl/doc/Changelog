@@ -27,6 +27,8 @@ Plugin E-ACSL <next-release>
 
 -* E-ACSL     [2026-03-24] Fix generation of logic functions containing
                            occurrences of global variables
+-* E-ACSL     [2026-03-24] Fix crash because of labels pre-analysis not having
+                           been performed.
 -* E-ACSL     [2026-03-18] Fix const assignments occurring in generated code.
 -* E-ACSL     [2026-03-18] Fix monitoring memory properties of arguments of
                            user-defined predicates

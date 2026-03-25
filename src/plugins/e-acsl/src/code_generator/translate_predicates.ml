@@ -166,23 +166,19 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
       )
   | Pxor _ -> Env.not_yet env "xor"
   | Pimplies(p1, p2) ->
-    (* (p1 ==> p2) <==> !p1 || p2 *)
-    to_exp
-      ~adata
-      ~name:"implies"
-      kf
-      env
-      (Logic_const.por ~loc ((Logic_const.pnot ~loc p1), p2))
+    let rewritten = (* (p1 ==> p2) <==> !p1 || p2 *)
+      Logic_const.por ~loc ((Logic_const.pnot ~loc p1), p2)
+    in
+    Typing.preprocess_predicate ~logic_env rewritten;
+    to_exp ~adata ~name:"implies" kf env rewritten
   | Piff(p1, p2) ->
-    (* (p1 <==> p2) <==> (p1 ==> p2 && p2 ==> p1) *)
-    to_exp
-      ~adata
-      ~name:"equiv"
-      kf
-      env
-      (Logic_const.pand ~loc
-         (Logic_const.pimplies ~loc (p1, p2),
-          Logic_const.pimplies ~loc (p2, p1)))
+    let rewritten = (* (p1 <==> p2) <==> (p1 ==> p2 && p2 ==> p1) *)
+      Logic_const.pand ~loc
+        (Logic_const.pimplies ~loc (p1, p2),
+         Logic_const.pimplies ~loc (p2, p1))
+    in
+    Typing.preprocess_predicate ~logic_env rewritten;
+    to_exp ~adata ~name:"equiv" kf env rewritten
   | Pnot p ->
     let e, adata, env = to_exp ~adata kf env p in
     Smart_exp.lnot ~loc e, adata, env
