@@ -116,7 +116,7 @@ let dkey_annot =
     ~help:"message about function annotations"
 
 let () =
-  if not @@ Eva_analysis.is_available
+  if not Eva_analysis.is_available
   then Parameter_customize.is_invisible ()
 
 module UseEvaResults =
@@ -129,7 +129,7 @@ module UseEvaResults =
     end)
 
 let use_eva_results () =
-  if UseEvaResults.get () && not @@ Eva_analysis.is_available then
+  if UseEvaResults.get () && not Eva_analysis.is_available then
     warning ~once:true
       "-rte-use-eva-results is set while Eva is not available, ignoring" ;
   UseEvaResults.get ()
