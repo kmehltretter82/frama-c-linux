@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Fun.Operators
-open Cil
 open Cil_types
 
 (* ************************************************************************* *)
@@ -16,10 +15,10 @@ open Cil_types
 
 (** Class type for a Db-aware visitor. *)
 class type frama_c_visitor = object
-  inherit cilVisitor
+  inherit Cil.cilVisitor
   method frama_c_plain_copy: frama_c_visitor
-  method vstmt_aux: Cil_types.stmt -> Cil_types.stmt visitAction
-  method vglob_aux: Cil_types.global -> Cil_types.global list visitAction
+  method vstmt_aux: Cil_types.stmt -> Cil_types.stmt Cil.visitAction
+  method vglob_aux: Cil_types.global -> Cil_types.global list Cil.visitAction
   method current_kf: kernel_function option
   (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
@@ -35,7 +34,7 @@ end
 class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c_visitor =
 
   object(self)
-    inherit internal_genericCilVisitor fundec behavior queue
+    inherit Cil.internal_genericCilVisitor fundec behavior queue
 
     method frama_c_plain_copy =
       new internal_generic_frama_c_visitor fundec queue current_kf behavior
@@ -68,7 +67,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
         let add, remove =
           List.fold_left
             (fun (add, remove) (e, x) ->
-               let y = visitCilCodeAnnotation (vis:>cilVisitor) x in
+               let y = Cil.visitCilCodeAnnotation (vis:>Cil.cilVisitor) x in
                (* Given x, we compute whether it must be removed from the
                   destination project, and whether we should add its copy y,
                   again in the destination project. *)
@@ -132,7 +131,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
       in
       let plain_post = post_action (fun x -> x) in
       match res with
-      | SkipChildren -> res
+      | Cil.SkipChildren -> res
       | JustCopy -> JustCopyPost copy
       | JustCopyPost f -> JustCopyPost (f $ copy)
       | DoChildren -> DoChildrenPost plain_post
@@ -142,7 +141,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
         ChangeDoChildrenPost (stmt, post_action f)
 
     method vstmt_aux _ = DoChildren
-    method vglob_aux _ = DoChildren
+    method vglob_aux _ = Cil.DoChildren
 
     method private vbehavior_annot ?e b =
       let kf = Option.get self#current_kf in
@@ -834,22 +833,22 @@ class frama_c_refresh prj =
 class frama_c_inplace =
   generic_frama_c_visitor (Visitor_behavior.inplace())
 
-let visitFramacFileCopy vis f = visitCilFileCopy (vis:>cilVisitor) f
+let visitFramacFileCopy vis f = Cil.visitCilFileCopy (vis:>Cil.cilVisitor) f
 
-let visitFramacFile vis f = visitCilFile (vis:>cilVisitor) f
+let visitFramacFile vis f = Cil.visitCilFile (vis:>Cil.cilVisitor) f
 
 let visitFramacFileSameGlobals vis f =
-  visitCilFileSameGlobals (vis:>cilVisitor) f
+  Cil.visitCilFileSameGlobals (vis:>Cil.cilVisitor) f
 
 let visitFramacGlobal vis g =
-  let g' = visitCilGlobal (vis:>cilVisitor) g in
+  let g' = Cil.visitCilGlobal (vis:>Cil.cilVisitor) g in
   vis#fill_global_tables; g'
 
 let visitFramacFunction vis f =
   let orig_var = Visitor_behavior.Get_orig.varinfo vis#behavior f.svar in
   let old_current_kf = vis#current_kf in
   vis#set_current_kf (Globals.Functions.get orig_var);
-  let f' = visitCilFunction (vis:>cilVisitor) f in
+  let f' = Cil.visitCilFunction (vis:>Cil.cilVisitor) f in
   vis#reset_current_kf ();
   Option.iter vis#set_current_kf old_current_kf;
   vis#fill_global_tables; f'
@@ -872,149 +871,149 @@ let visitFramacKf vis kf =
     Project.on prj Globals.Functions.get vi'
 
 let visitFramacExpr vis e =
-  let e' = visitCilExpr (vis:>cilVisitor) e in
+  let e' = Cil.visitCilExpr (vis:>Cil.cilVisitor) e in
   vis#fill_global_tables; e'
 
 let visitFramacLval vis l =
-  let l' = visitCilLval (vis:>cilVisitor) l in
+  let l' = Cil.visitCilLval (vis:>Cil.cilVisitor) l in
   vis#fill_global_tables; l'
 
 let visitFramacLhost vis h =
-  let h' = visitCilLhost (vis:>cilVisitor) h in
+  let h' = Cil.visitCilLhost (vis:>Cil.cilVisitor) h in
   vis#fill_global_tables; h'
 
 let visitFramacOffset vis o =
-  let o' = visitCilOffset (vis:>cilVisitor) o in
+  let o' = Cil.visitCilOffset (vis:>Cil.cilVisitor) o in
   vis#fill_global_tables; o'
 
 let visitFramacInitOffset vis o =
-  let o' = visitCilInitOffset (vis:>cilVisitor) o in
+  let o' = Cil.visitCilInitOffset (vis:>Cil.cilVisitor) o in
   vis#fill_global_tables; o'
 
 let visitFramacInstr vis i =
-  let i' = visitCilInstr (vis:>cilVisitor) i in
+  let i' = Cil.visitCilInstr (vis:>Cil.cilVisitor) i in
   vis#fill_global_tables; i'
 
 let visitFramacStmt vis s =
-  let s' = visitCilStmt (vis:>cilVisitor) s in
+  let s' = Cil.visitCilStmt (vis:>Cil.cilVisitor) s in
   vis#fill_global_tables; s'
 
 let visitFramacBlock vis b =
-  let b' = visitCilBlock (vis:>cilVisitor) b in
+  let b' = Cil.visitCilBlock (vis:>Cil.cilVisitor) b in
   vis#fill_global_tables; b'
 
 let visitFramacType vis t =
-  let t' = visitCilType (vis:>cilVisitor) t in
+  let t' = Cil.visitCilType (vis:>Cil.cilVisitor) t in
   vis#fill_global_tables; t'
 
 let visitFramacVarDecl vis v =
-  let v' = visitCilVarDecl (vis:>cilVisitor) v in
+  let v' = Cil.visitCilVarDecl (vis:>Cil.cilVisitor) v in
   vis#fill_global_tables; v'
 
 let visitFramacLogicVarDecl vis v =
-  let v' = visitCilLogicVarDecl (vis:>cilVisitor) v in
+  let v' = Cil.visitCilLogicVarDecl (vis:>Cil.cilVisitor) v in
   vis#fill_global_tables; v'
 
 let visitFramacInit vis v o i =
-  let i' = visitCilInit (vis:>cilVisitor) v o i in
+  let i' = Cil.visitCilInit (vis:>Cil.cilVisitor) v o i in
   vis#fill_global_tables; i'
 
 let visitFramacStr_literal vis v lit =
-  let lit' = visitCilStr_literal (vis:>cilVisitor) v lit in
+  let lit' = Cil.visitCilStr_literal (vis:>Cil.cilVisitor) v lit in
   vis#fill_global_tables; lit'
 
 let visitFramacInit_or_str vis v i =
-  let i' = visitCilInit_or_str (vis:>cilVisitor) v i in
+  let i' = Cil.visitCilInit_or_str (vis:>Cil.cilVisitor) v i in
   vis#fill_global_tables; i'
 
 let visitFramacAttributes vis a =
-  let a' = visitCilAttributes (vis:>cilVisitor) a in
+  let a' = Cil.visitCilAttributes (vis:>Cil.cilVisitor) a in
   vis#fill_global_tables; a'
 
 let visitFramacAnnotation vis a =
-  let a' = visitCilAnnotation (vis:>cilVisitor) a in
+  let a' = Cil.visitCilAnnotation (vis:>Cil.cilVisitor) a in
   vis#fill_global_tables; a'
 
 let visitFramacCodeAnnotation vis c =
-  let c' = visitCilCodeAnnotation (vis:>cilVisitor) c in
+  let c' = Cil.visitCilCodeAnnotation (vis:>Cil.cilVisitor) c in
   vis#fill_global_tables; c'
 
 let visitFramacAssigns vis a =
-  let a' = visitCilAssigns (vis:>cilVisitor) a in
+  let a' = Cil.visitCilAssigns (vis:>Cil.cilVisitor) a in
   vis#fill_global_tables; a'
 
 let visitFramacAllocation vis a =
-  let a' = visitCilAllocation (vis:>cilVisitor) a in
+  let a' = Cil.visitCilAllocation (vis:>Cil.cilVisitor) a in
   vis#fill_global_tables; a'
 
 let visitFramacFrom vis a =
-  let a' = visitCilFrom (vis:>cilVisitor) a in
+  let a' = Cil.visitCilFrom (vis:>Cil.cilVisitor) a in
   vis#fill_global_tables; a'
 
 let visitFramacDeps vis a =
-  let a' = visitCilDeps (vis:>cilVisitor) a in
+  let a' = Cil.visitCilDeps (vis:>Cil.cilVisitor) a in
   vis#fill_global_tables; a'
 
 let visitFramacFunspec vis f =
-  let f' = visitCilFunspec (vis:>cilVisitor) f in
+  let f' = Cil.visitCilFunspec (vis:>Cil.cilVisitor) f in
   vis#fill_global_tables; f'
 
 let visitFramacLogicType vis l =
-  let l' = visitCilLogicType (vis:>cilVisitor) l in
+  let l' = Cil.visitCilLogicType (vis:>Cil.cilVisitor) l in
   vis#fill_global_tables; l'
 
 let visitFramacPredicateNode vis p =
-  let p' = visitCilPredicateNode (vis:>cilVisitor) p in
+  let p' = Cil.visitCilPredicateNode (vis:>Cil.cilVisitor) p in
   vis#fill_global_tables; p'
 
 let visitFramacPredicate vis p =
-  let p' = visitCilPredicate (vis:>cilVisitor) p in
+  let p' = Cil.visitCilPredicate (vis:>Cil.cilVisitor) p in
   vis#fill_global_tables; p'
 
 let visitFramacIdPredicate vis p =
-  let p' = visitCilIdPredicate (vis:>cilVisitor) p in
+  let p' = Cil.visitCilIdPredicate (vis:>Cil.cilVisitor) p in
   vis#fill_global_tables; p'
 
 let visitFramacPredicates vis p =
-  let p' = visitCilPredicates (vis:>cilVisitor) p in
+  let p' = Cil.visitCilPredicates (vis:>Cil.cilVisitor) p in
   vis#fill_global_tables; p'
 
 let visitFramacIdTerm  vis t =
-  let t' = visitCilIdTerm (vis:>cilVisitor) t in
+  let t' = Cil.visitCilIdTerm (vis:>Cil.cilVisitor) t in
   vis#fill_global_tables; t'
 
 let visitFramacTerm  vis t =
-  let t' = visitCilTerm (vis:>cilVisitor) t in
+  let t' = Cil.visitCilTerm (vis:>Cil.cilVisitor) t in
   vis#fill_global_tables; t'
 
 let visitFramacTermOffset vis t =
-  let t' = visitCilTermOffset (vis:>cilVisitor) t in
+  let t' = Cil.visitCilTermOffset (vis:>Cil.cilVisitor) t in
   vis#fill_global_tables; t'
 
 let visitFramacTermLhost vis t =
-  let t' = visitCilTermLhost (vis:>cilVisitor) t in
+  let t' = Cil.visitCilTermLhost (vis:>Cil.cilVisitor) t in
   vis#fill_global_tables; t'
 
 let visitFramacTermLval vis t =
-  let t' = visitCilTermLval (vis:>cilVisitor) t in
+  let t' = Cil.visitCilTermLval (vis:>Cil.cilVisitor) t in
   vis#fill_global_tables; t'
 
 let visitFramacLogicInfo vis l =
-  let l' = visitCilLogicInfo (vis:>cilVisitor) l in
+  let l' = Cil.visitCilLogicInfo (vis:>Cil.cilVisitor) l in
   vis#fill_global_tables; l'
 
 let visitFramacBehavior vis b =
-  let b' = visitCilBehavior (vis:>cilVisitor) b in
+  let b' = Cil.visitCilBehavior (vis:>Cil.cilVisitor) b in
   vis#fill_global_tables; b'
 
 let visitFramacBehaviors vis b =
-  let b' = visitCilBehaviors (vis:>cilVisitor) b in
+  let b' = Cil.visitCilBehaviors (vis:>Cil.cilVisitor) b in
   vis#fill_global_tables; b'
 
 let visitFramacModelInfo vis m =
-  let m' = visitCilModelInfo (vis:>cilVisitor) m in
+  let m' = Cil.visitCilModelInfo (vis:>Cil.cilVisitor) m in
   vis#fill_global_tables; m'
 
 let visitFramacExtended vis e =
-  let e'= visitCilExtended (vis:>cilVisitor) e in
+  let e'= Cil.visitCilExtended (vis:>Cil.cilVisitor) e in
   vis#fill_global_tables; e'

@@ -8,7 +8,6 @@
 
 open Cil_types
 open Cil_datatype
-open Cil
 open Visitor
 open Options
 

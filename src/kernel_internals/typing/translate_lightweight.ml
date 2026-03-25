@@ -8,7 +8,6 @@
 (******************************************************************************)
 
 open Cil_types
-open Cil
 
 let mkterm tnode ty loc =
   { term_node = tnode;
@@ -16,7 +15,7 @@ let mkterm tnode ty loc =
     term_type = ty;
     term_name = [] }
 
-let term_of_var v= Ast_info.variable_term v.vdecl (cvar_to_lvar v)
+let term_of_var v= Ast_info.variable_term v.vdecl (Cil.cvar_to_lvar v)
 
 exception No_recovery
 
@@ -116,7 +115,7 @@ class annotateFunFromDeclspec =
     let requires = List.fold_left (annotate_var params) [] params in
     if requires <> [] then
       (* add [requires] to [b_requires] of default behavior *)
-      let return_ty = getReturnType v.vtype in
+      let return_ty = Cil.getReturnType v.vtype in
       let loc = v.vdecl in
       Annotations.add_requires Emitter.end_user kf requires;
       (* modify 'ensures' clauses *)

@@ -1,5 +1,4 @@
 open Logic_const
-open Cil
 open Cil_types
 
 module P =
@@ -71,7 +70,7 @@ let main () =
     (* The initial AST *)
     print ();
     let file = Ast.get () in
-    ignore (Cil.visitCilFileSameGlobals (new foo:>cilVisitor) file);
+    ignore (Cil.visitCilFileSameGlobals (new foo:>Cil.cilVisitor) file);
     (* The AST with all asserts *)
     print ();
     Kernel.SafeArrays.set false;

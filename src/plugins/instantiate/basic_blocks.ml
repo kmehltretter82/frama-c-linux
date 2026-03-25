@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil
 open Cil_types
 open Logic_const
 
@@ -74,7 +73,7 @@ let size_var ?(name_ext="") t value = {
 
 (** Features related to terms *)
 
-let cvar_to_tvar vi = tvar (cvar_to_lvar vi)
+let cvar_to_tvar vi = tvar (Cil.cvar_to_lvar vi)
 
 let tminus ?loc t1 t2 =
   let minus, typ = match t1.term_type, t2.term_type with

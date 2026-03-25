@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil
 
 (* ************************************************************************** *)
 (** {2 Expressions} *)
@@ -87,7 +86,7 @@ let term_lvals_of_term t =
   ignore
     (Cil.visitCilTerm
        (object
-         inherit nopCilVisitor
+         inherit Cil.nopCilVisitor
          method! vterm_lval lv =
            l := lv :: !l;
            DoChildren
@@ -134,7 +133,7 @@ let get_named_bhv bhv_list name =
 let get_named_bhv_assumes spec bhv_names =
   let bhvs = match bhv_names with
     | [] -> (* no names ==> all named behaviors *)
-      List.filter (fun b -> not (is_default_behavior b)) spec.spec_behavior
+      List.filter (fun b -> not (Cil.is_default_behavior b)) spec.spec_behavior
     | _ ->
       let rec get l =
         match l with
@@ -310,7 +309,7 @@ let get_sid s = match s with
 
 let mkassign lv e loc = Set(lv,e,loc)
 
-let mkassign_statement lv e loc = mkStmt (Instr(mkassign lv e loc))
+let mkassign_statement lv e loc = Cil.mkStmt (Instr(mkassign lv e loc))
 
 let is_block_local v b = List.exists (fun vv -> v.vid = vv.vid) b.blocals
 
@@ -336,7 +335,7 @@ module Function = struct
     (not v.vglob) && ((is_formal v fundec) || (is_local v fundec))
 
   let is_formal_of_prototype v vi =
-    let formals = try getFormalsDecl vi with Not_found -> [] in
+    let formals = try Cil.getFormalsDecl vi with Not_found -> [] in
     List.exists (fun x -> x.vid = v.vid) formals
 
   let is_definition = function

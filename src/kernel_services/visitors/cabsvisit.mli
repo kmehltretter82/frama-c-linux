@@ -16,8 +16,6 @@
 (* cabsvisit.mli *)
 (* interface for cabsvisit.ml *)
 
-open Cil
-
 type nameKind =
     NVar                                (** Variable or function prototype
                                             name *)
@@ -29,19 +27,19 @@ type nameKind =
 (* All visit methods are called in preorder! (but you can use
    ChangeDoChildrenPost to change the order) *)
 class type cabsVisitor = object
-  method vexpr: Cabs.expression -> Cabs.expression visitAction   (* expressions *)
-  method vinitexpr: Cabs.init_expression -> Cabs.init_expression visitAction
-  method vstmt: Cabs.statement -> Cabs.statement list visitAction
-  method vblock: Cabs.block -> Cabs.block visitAction
+  method vexpr: Cabs.expression -> Cabs.expression Cil.visitAction   (* expressions *)
+  method vinitexpr: Cabs.init_expression -> Cabs.init_expression Cil.visitAction
+  method vstmt: Cabs.statement -> Cabs.statement list Cil.visitAction
+  method vblock: Cabs.block -> Cabs.block Cil.visitAction
   method vvar: string -> string                  (* use of a variable names *)
-  method vdef: Cabs.definition -> Cabs.definition list visitAction
-  method vtypespec: Cabs.typeSpecifier -> Cabs.typeSpecifier visitAction
-  method vdecltype: Cabs.decl_type -> Cabs.decl_type visitAction
+  method vdef: Cabs.definition -> Cabs.definition list Cil.visitAction
+  method vtypespec: Cabs.typeSpecifier -> Cabs.typeSpecifier Cil.visitAction
+  method vdecltype: Cabs.decl_type -> Cabs.decl_type Cil.visitAction
 
   (* For each declaration we call vname *)
-  method vname: nameKind -> Cabs.specifier -> Cabs.name -> Cabs.name visitAction
-  method vspec: Cabs.specifier -> Cabs.specifier visitAction     (* specifier *)
-  method vattr: Cabs.attribute -> Cabs.attribute list visitAction
+  method vname: nameKind -> Cabs.specifier -> Cabs.name -> Cabs.name Cil.visitAction
+  method vspec: Cabs.specifier -> Cabs.specifier Cil.visitAction     (* specifier *)
+  method vattr: Cabs.attribute -> Cabs.attribute list Cil.visitAction
 
 
   method vEnterScope: unit -> unit

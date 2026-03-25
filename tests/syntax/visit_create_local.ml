@@ -1,5 +1,4 @@
 open Cil_types
-open Cil
 
 class cF = object(self) inherit Visitor.frama_c_inplace
 
@@ -7,9 +6,9 @@ class cF = object(self) inherit Visitor.frama_c_inplace
     let fd = (Option.get self#current_func) in
     match s.skind with
     | Instr (Set (lv,e,loc)) ->
-      let vi = makeLocalVar fd "varbidon" (typeOf e) in
-      let sk = Instr (Set (var vi,new_exp ~loc (Lval lv),loc)) in
-      let s0 = mkStmt ~valid_sid:true sk in
+      let vi = Cil.makeLocalVar fd "varbidon" (Cil.typeOf e) in
+      let sk = Instr (Set (Cil.var vi,Cil.new_exp ~loc (Lval lv),loc)) in
+      let s0 = Cil.mkStmt ~valid_sid:true sk in
       ChangeTo (Cil.mkStmtCfgBlock [s0; s])
     | _ -> SkipChildren
 end

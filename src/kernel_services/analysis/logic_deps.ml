@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil
 open Cil_types
 open Cil_datatype
 
@@ -162,12 +161,12 @@ let extract_locals logicvars =
 (** Term utility:
     Extract C local variables occurring into a [term]. *)
 let extract_locals_from_term term =
-  extract_locals (extract_free_logicvars_from_term term)
+  extract_locals (Cil.extract_free_logicvars_from_term term)
 
 (** Predicate utility:
     Extract C local variables occurring into a [term]. *)
 let extract_locals_from_pred pred =
-  extract_locals (extract_free_logicvars_from_predicate pred)
+  extract_locals (Cil.extract_free_logicvars_from_predicate pred)
 
 type abs_label = | AbsLabel_here
                  | AbsLabel_pre
@@ -238,18 +237,18 @@ let populate_zone ctx visit cil_node current_zones =
       | _ -> raise (NYI
                       "[logic_interp] clause related to a function contract")
 
-    method private change_label: 'a.abs_label -> 'a -> 'a visitAction =
+    method private change_label: 'a.abs_label -> 'a -> 'a Cil.visitAction =
       fun label x ->
       let old_label = current_label in
       current_label <- label;
       ChangeDoChildrenPost
         (x,fun x -> current_label <- old_label; x)
 
-    method private change_label_to_here: 'a.'a -> 'a visitAction =
+    method private change_label_to_here: 'a.'a -> 'a Cil.visitAction =
       fun x ->
       self#change_label AbsLabel_here x
 
-    method private change_label_to_old: 'a.'a -> 'a visitAction =
+    method private change_label_to_old: 'a.'a -> 'a Cil.visitAction =
       fun x ->
       match ctx.site, ctx.before with
       (* function contract *)
@@ -273,7 +272,7 @@ let populate_zone ctx visit cil_node current_zones =
         (* refers to the pre-state of the function contract. *)
         self#change_label AbsLabel_pre x
 
-    method private change_label_to_post: 'a.'a -> 'a visitAction =
+    method private change_label_to_post: 'a.'a -> 'a Cil.visitAction =
       fun x ->
       (* allowed when [before_opt=None] for function/statement contracts *)
       match ctx.site, ctx.before with
@@ -296,7 +295,7 @@ let populate_zone ctx visit cil_node current_zones =
         failwith "The use of the label Post is forbidden inside code \
                   annotations."
 
-    method private change_label_to_pre: 'a.'a -> 'a visitAction =
+    method private change_label_to_pre: 'a.'a -> 'a Cil.visitAction =
       fun x ->
       match ctx.site with
       (* function contract *)
@@ -309,10 +308,10 @@ let populate_zone ctx visit cil_node current_zones =
         (* refers to the pre-state of the function contract. *)
         self#change_label AbsLabel_pre x
 
-    method private change_label_aux: 'a. _ -> 'a -> 'a visitAction =
+    method private change_label_aux: 'a. _ -> 'a -> 'a Cil.visitAction =
       fun lbl x -> self#change_label lbl x
 
-    method private change_label_to_stmt: 'a.stmt -> 'a -> 'a visitAction =
+    method private change_label_to_stmt: 'a.stmt -> 'a -> 'a Cil.visitAction =
       fun stmt x ->
       match ctx.site with
       (* function contract *)
@@ -432,7 +431,7 @@ let add_results_from_term ctx results t =
     results with
     zones;
     locals = Varinfo.Set.union (extract_locals_from_term t) results.locals;
-    labels = Logic_label.Set.union (extract_labels_from_term t) results.labels
+    labels = Logic_label.Set.union (Cil.extract_labels_from_term t) results.labels
   }
 
 let add_results_from_pred ctx results p =
@@ -441,7 +440,7 @@ let add_results_from_pred ctx results p =
     results with
     zones;
     locals = Varinfo.Set.union (extract_locals_from_pred p) results.locals;
-    labels = Logic_label.Set.union (extract_labels_from_pred p) results.labels
+    labels = Logic_label.Set.union (Cil.extract_labels_from_pred p) results.labels
   }
 
 (** Entry point to get the list of [ki] * [Locations.Zone.t]
@@ -544,7 +543,7 @@ let get_zone_from_annot a (ki,kf) loop_body_opt results =
             (fun results pred -> {
                  results with
                  locals = Varinfo.Set.union (extract_locals_from_pred pred) results.locals;
-                 labels = Logic_label.Set.union (extract_labels_from_pred pred) results.labels
+                 labels = Logic_label.Set.union (Cil.extract_labels_from_pred pred) results.labels
                })
             results preds
         | Ext_terms terms ->
@@ -553,7 +552,7 @@ let get_zone_from_annot a (ki,kf) loop_body_opt results =
             (fun results term -> {
                  results with
                  locals = Varinfo.Set.union (extract_locals_from_term term) results.locals;
-                 labels = Logic_label.Set.union (extract_labels_from_term term) results.labels
+                 labels = Logic_label.Set.union (Cil.extract_labels_from_term term) results.labels
                })
             results terms
         | _ -> raise (NYI "[logic_interp] extension")

@@ -12,7 +12,6 @@ open Automaton_ast
 open Fun.Operators
 open Logic_const
 open Cil_types
-open Cil
 (**************************************************************************)
 
 let dkey = Aorai_option.register_category "action"
@@ -247,10 +246,10 @@ class visit_adding_code_for_synchronisation =
                 Kernel_function.pretty kf
           in
           let call =
-            mkStmtOneInstr
+            Cil.mkStmtOneInstr
               ~ghost:true (Call (None, Var aux_vi, args, loc))
           in
-          let new_return = mkStmt ~valid_sid:true stmt.skind in
+          let new_return = Cil.mkStmt ~valid_sid:true stmt.skind in
           let new_stmts = [call; new_return] in
           stmt.skind<-Block(Cil.mkBlock(new_stmts))
         end;
@@ -995,12 +994,12 @@ class visit_adding_pre_post_from_buch treatloops =
         end;
 
         (*    2) The associated init variable is set to 1 before the loop *)
-        let new_loop = mkStmt ~valid_sid:true stmt.skind in
+        let new_loop = Cil.mkStmt ~valid_sid:true stmt.skind in
         let stmt_varset =
           Cil.mkStmtOneInstr ~ghost:true ~valid_sid:true
             (Set((Var(vi_init),NoOffset), Cil.one ~loc, loc))
         in
-        let block = mkBlock [stmt_varset;new_loop] in
+        let block = Cil.mkBlock [stmt_varset;new_loop] in
         stmt.skind<-Block(block);
 
         (* Overcome WP limitation wrt LoopEntry. See bug 1353 *)

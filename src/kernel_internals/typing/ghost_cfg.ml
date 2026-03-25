@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil
 open Cil_types
 open Visitor_behavior
 
@@ -27,7 +26,7 @@ let has_annot stmt =
 
 let noGhostFD prj fd =
   let visitor = object (self)
-    inherit genericCilVisitor (refresh prj)
+    inherit Cil.genericCilVisitor (refresh prj)
 
     method private original = Get_orig.stmt self#behavior
 
@@ -61,7 +60,7 @@ let noGhostFD prj fd =
 
     method getBehavior () = self#behavior
   end in
-  (visitCilFunction (visitor :> cilVisitor) fd), (visitor#getBehavior ())
+  (Cil.visitCilFunction (visitor :> Cil.cilVisitor) fd), (visitor#getBehavior ())
 
 type follower =
   (* For a stmt, an "Infinite" follower means that following skip instructions

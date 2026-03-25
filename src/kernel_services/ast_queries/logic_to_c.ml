@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil
 open Cil_types
 
 exception No_conversion
@@ -34,7 +33,7 @@ let create_const_list loc kind low high =
   let rec aux acc i =
     if Z.lt i low then acc
     else
-      aux (new_exp ~loc (Const (CInt64 (i,kind,None)))::acc) (Z.pred i)
+      aux (Cil.new_exp ~loc (Const (CInt64 (i,kind,None)))::acc) (Z.pred i)
   in aux [] high
 
 let range low high =
@@ -77,33 +76,33 @@ and loc_offset_to_offset ?result = function
 and loc_to_exp ?result {term_node = lnode ; term_type = ltype; term_loc = loc} =
   match lnode with
   | TLval lv ->
-    List.map (fun x -> new_exp ~loc (Lval x)) (loc_lval_to_lval ?result lv)
+    List.map (fun x -> Cil.new_exp ~loc (Lval x)) (loc_lval_to_lval ?result lv)
   | TAddrOf lv ->
-    List.map (fun x -> new_exp ~loc (AddrOf x)) (loc_lval_to_lval ?result lv)
+    List.map (fun x -> Cil.new_exp ~loc (AddrOf x)) (loc_lval_to_lval ?result lv)
   | TStartOf lv ->
-    List.map (fun x -> new_exp ~loc (StartOf x)) (loc_lval_to_lval ?result lv)
+    List.map (fun x -> Cil.new_exp ~loc (StartOf x)) (loc_lval_to_lval ?result lv)
   | TSizeOfE lexp ->
-    List.map (fun x -> new_exp ~loc (SizeOfE x)) (loc_to_exp ?result lexp)
+    List.map (fun x -> Cil.new_exp ~loc (SizeOfE x)) (loc_to_exp ?result lexp)
   | TAlignOfE lexp ->
-    List.map (fun x -> new_exp ~loc (AlignOfE(x, `Standard))) (loc_to_exp ?result lexp)
+    List.map (fun x -> Cil.new_exp ~loc (AlignOfE(x, `Standard))) (loc_to_exp ?result lexp)
   | TUnOp (unop, lexp) ->
     List.map
-      (fun x -> new_exp ~loc (UnOp (unop, x, logic_type_to_typ ltype)))
+      (fun x -> Cil.new_exp ~loc (UnOp (unop, x, logic_type_to_typ ltype)))
       (loc_to_exp ?result lexp)
   | TBinOp (binop, lexp1, lexp2) ->
     List.product_map
-      (fun x y -> new_exp ~loc (BinOp (binop, x,y, logic_type_to_typ ltype)))
+      (fun x y -> Cil.new_exp ~loc (BinOp (binop, x,y, logic_type_to_typ ltype)))
       (loc_to_exp ?result lexp1)
       (loc_to_exp ?result lexp2)
   | TConst constant ->
     (* TODO: Very likely to fail on large integer and incorrect on reals not
        representable as floats *)
-    [new_exp ~loc (Const (Logic_utils.lconstant_to_constant constant))]
+    [Cil.new_exp ~loc (Const (Logic_utils.lconstant_to_constant constant))]
   | TCast (false, Ctype typ, lexp) ->
     List.map
-      (fun x -> new_exp ~loc (CastE (typ, x))) (loc_to_exp ?result lexp)
-  | TAlignOf typ -> [new_exp ~loc (AlignOf (typ, `Standard))]
-  | TSizeOf typ -> [new_exp ~loc (SizeOf typ)]
+      (fun x -> Cil.new_exp ~loc (CastE (typ, x))) (loc_to_exp ?result lexp)
+  | TAlignOf typ -> [Cil.new_exp ~loc (AlignOf (typ, `Standard))]
+  | TSizeOf typ -> [Cil.new_exp ~loc (SizeOf typ)]
   | Trange (Some low, Some high) ->
     let low = singleton (loc_to_exp ?result) low in
     let high = singleton (loc_to_exp ?result) high in
@@ -117,7 +116,7 @@ and loc_to_exp ?result {term_node = lnode ; term_type = ltype; term_loc = loc} =
     loc_to_exp ?result t
   | TCast (true, Lreal, t) when Logic_utils.is_integral_type t.term_type ->
     List.map
-      (fun x -> new_exp ~loc (CastE (logic_type_to_typ Lreal, x)))
+      (fun x -> Cil.new_exp ~loc (CastE (logic_type_to_typ Lreal, x)))
       (loc_to_exp ?result t)
   | TCast (true, Lreal, t) when Logic_utils.is_arithmetic_type t.term_type ->
     loc_to_exp ?result t

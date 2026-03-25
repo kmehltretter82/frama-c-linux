@@ -11,7 +11,6 @@
 
 open Cil_types
 open Cil_datatype
-open Cil
 
 let replace_by_zero exp =
   match Ast_types.unroll_node (Cil.typeOf exp) with
@@ -22,8 +21,8 @@ let replace_by_zero exp =
   | _ ->
     Cil.SkipChildren
 
-class constGlobSubstVisitorClass : cilVisitor = object
-  inherit nopCilVisitor
+class constGlobSubstVisitorClass : Cil.cilVisitor = object
+  inherit Cil.nopCilVisitor
 
   val vi_to_init_opt = Varinfo.Hashtbl.create 7
 
@@ -71,21 +70,21 @@ class constGlobSubstVisitorClass : cilVisitor = object
              i.e. the implicit initializer for such globals. *)
           replace_by_zero e
         | Some init ->
-          let offset = constFoldOffset true offset in
+          let offset = Cil.constFoldOffset true offset in
           let rec find_replace current_offset current_init current_newexp =
             match current_init with
             | SingleInit si ->
               if Cil_datatype.OffsetStructEq.equal offset current_offset
-              then ChangeTo (new_exp ~loc si.enode)
+              then Cil.ChangeTo (Cil.new_exp ~loc si.enode)
               else current_newexp
             | CompoundInit (ct, initl) ->
               (* We are dealing with an array: recursively [find_replace] among
                  its initializers. *)
-              foldLeftCompound
+              Cil.foldLeftCompound
                 ~implicit:true
                 ~doinit:(fun coffset cinit _ acc ->
                     find_replace
-                      (addOffset coffset current_offset)
+                      (Cil.addOffset coffset current_offset)
                       cinit
                       acc)
                 ~ct

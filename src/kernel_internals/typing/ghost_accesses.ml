@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil
 open Cil_types
 
 module Error = struct
@@ -41,13 +40,13 @@ module Error = struct
       "Cannot cast return of '%a' from '%a' to '%a'"
       Cil_printer.pp_lhost f
       Cil_printer.pp_typ ret_type
-      Cil_printer.pp_typ (typeOfLval lv)
+      Cil_printer.pp_typ (Cil.typeOfLval lv)
 
   let bad_cast ?source ?once ?current exp t =
     error ?source ?once ?current
       "Invalid cast of '%a' from '%a' to '%a'"
       Cil_printer.pp_exp exp
-      Cil_printer.pp_typ (typeOf exp)
+      Cil_printer.pp_typ (Cil.typeOf exp)
       Cil_printer.pp_typ t
 
   let non_ghost_function_call_in_ghost ?source ?once ?current () =
@@ -117,9 +116,9 @@ class visitor = object(self)
       then begin
         let spec =
           try Annotations.funspec kf
-          with _ -> empty_funspec ()
+          with _ -> Cil.empty_funspec ()
         in
-        if is_empty_funspec spec then self#bad_ghost_function kf
+        if Cil.is_empty_funspec spec then self#bad_ghost_function kf
       end ;
       Cil.DoChildrenPost post
     (* Optimization: only visits ghost globals or globals that may contain
@@ -138,7 +137,7 @@ class visitor = object(self)
     && not (Ast_types.is_wellformed_ghost v.vtype) then
       Error.invalid_ghost_type_for_varinfo ~once:true ~current ~source v ;
     if Ast_types.(is_fun (unroll v.vtype)) then begin
-      let ftype = getReturnType (Ast_types.unroll v.vtype) in
+      let ftype = Cil.getReturnType (Ast_types.unroll v.vtype) in
       match ftype.tnode with
       | TPtr t when not (Ast_types.is_wellformed_ghost t) ->
         Error.invalid_ghost_type_for_return ~once:true ~current ~source ()
@@ -152,11 +151,11 @@ class visitor = object(self)
       Cil.DoChildren
     else begin
       let error_if_incompatible lv ret_type f =
-        if self#ghost_incompatible (typeOfLval lv) ret_type then
+        if self#ghost_incompatible (Cil.typeOfLval lv) ret_type then
           Error.bad_cast_on_return ~current:true f ret_type lv
       in
       let error_if_not_writable lv =
-        if not (Ast_types.is_ghost (typeOfLval lv)) then
+        if not (Ast_types.is_ghost (Cil.typeOfLval lv)) then
           Error.assigns_non_ghost_lvalue ~current:true lv
       in
       let failed = match i with
@@ -184,10 +183,10 @@ class visitor = object(self)
                 let vi =
                   Kernel_function.(get_vi @@ Option.get @@ get_called f) in
                 if not (Ast_info.is_frama_c_builtin vi) then
-                  error_if_incompatible lv (getReturnType (typeOfLhost f)) f
+                  error_if_incompatible lv (Cil.getReturnType (Cil.typeOfLhost f)) f
               | Local_init(_, ConsInit(fct, _, _), _) ->
                 if not (Ast_info.is_frama_c_builtin fct) then
-                  error_if_incompatible lv (getReturnType fct.vtype) (Var fct)
+                  error_if_incompatible lv (Cil.getReturnType fct.vtype) (Var fct)
               | _ -> ()
             end
           (* Note that we do not check "assigns" for a ghost function call since
@@ -206,7 +205,7 @@ class visitor = object(self)
 
   method! vexpr = function
     | { enode = CastE (t, exp) }
-      when self#ghost_incompatible t (typeOf exp) ->
+      when self#ghost_incompatible t (Cil.typeOf exp) ->
       Error.bad_cast ~current:true exp t ;
       DoChildren
     | _ -> DoChildren

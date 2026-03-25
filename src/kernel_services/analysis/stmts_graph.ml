@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil
 open Cil_datatype
 
 (* This is a reimplementation of ocamlgraph Path.Check. Instead of using
@@ -162,7 +161,7 @@ end
 module GPrint = Graph.Graphviz.Dot(TP)
 
 class stmt_graph_builder = object
-  inherit nopCilVisitor
+  inherit Cil.nopCilVisitor
   val graph = SG.create ()
   method result = graph
   method! vstmt s =
@@ -174,7 +173,7 @@ end
 
 let compute_stmtgraph_func func =
   let o = new stmt_graph_builder in
-  ignore (visitCilFunction (o:>cilVisitor) func);
+  ignore (Cil.visitCilFunction (o:>Cil.cilVisitor) func);
   if Kernel.debug_atleast 1 then
     begin
       Kernel.debug

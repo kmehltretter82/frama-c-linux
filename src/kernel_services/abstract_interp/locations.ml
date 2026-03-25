@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil
 open Abstract_interp
 
 module Hptmap_Info = struct
@@ -526,7 +525,7 @@ let filter_base f loc =
   { loc with loc = Location_Bits.filter_base f loc.loc }
 
 let size_of_varinfo v =
-  try bitsSizeOf v.vtype |> Z_or_top.of_int
+  try Cil.bitsSizeOf v.vtype |> Z_or_top.of_int
   with Cil.SizeOfError (msg, _) ->
     Abstract_interp.feedback_approximation
       "imprecise size for variable %a (%s)" Printer.pp_varinfo v msg;
@@ -544,7 +543,7 @@ let loc_of_typoffset b typ offset =
     let offs, size = Cil.bitsOffset typ offset in
     let size = Z_or_top.of_int size in
     make_loc (Location_Bits.inject b (Ival.of_int offs)) size
-  with SizeOfError _ as _e ->
+  with Cil.SizeOfError _ as _e ->
     make_loc (Location_Bits.inject b Ival.top) Z_or_top.top
 
 let loc_top = make_loc Location_Bits.top Z_or_top.top

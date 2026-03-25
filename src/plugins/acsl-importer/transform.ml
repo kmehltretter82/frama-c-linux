@@ -9,9 +9,6 @@
 (** Transformation module. *)
 
 open Cil_types
-open Cil
-
-open Cabs
 
 (*-----------------------------------------------------------------------*)
 (* Transformation on Cabs unrolling loop conditions, identifying loop
@@ -44,12 +41,12 @@ end = struct
     not (List.exists (fun (attr,args) ->
         ((attr = Paste.hidden_attr) &&
          List.exists (function
-             | { expr_node = CONSTANT (CONST_STRING attr) } ->
+             | { Cabs.expr_node = CONSTANT (CONST_STRING attr) } ->
                processed_attr = attr
-             | _ -> false) args)) block.battrs)
+             | _ -> false) args)) block.Cabs.battrs)
 
   let is_stmt_markup processed_attr = function
-    | { stmt_node=BLOCK(block,_,_)} ->
+    | { Cabs.stmt_node=BLOCK(block,_,_)} ->
       is_block_markup processed_attr block
     | _ -> true
 
@@ -68,11 +65,11 @@ let has_only_unroll_loop li =
 
 module S = struct
 
-  let stmt stmt_node ~sref = { sref with stmt_node }
+  let stmt stmt_node ~sref = { sref with Cabs.stmt_node }
   let nop ~loc= stmt (NOP (None,loc))
 
   let block_node ?(loc2=Cabshelper.cabslu) ~loc bstmts battrs  =
-    BLOCK ({ bstmts ; blabels = [] ; battrs }, loc, loc2)
+    Cabs.BLOCK ({ bstmts ; blabels = [] ; battrs }, loc, loc2)
   let block ?loc2 ~loc bstmts battrs = stmt (block_node ?loc2 ~loc bstmts battrs)
 
   (* transform "{ ... L1: /*@annot*/ S1; ... }"
@@ -84,14 +81,14 @@ module S = struct
                                   | CODE_SPEC _ -> true
                                   | _ -> false) in
     let mk_label s = function
-      | LABEL(l,_,loc) -> LABEL(l,s,loc)
+      | Cabs.LABEL(l,_,loc) -> Cabs.LABEL(l,s,loc)
       | CASERANGE(e1,e2,_,loc) -> CASERANGE(e1,e2,s,loc)
       | CASE(e,_,loc) ->  CASE(e,s,loc)
       | DEFAULT(_,loc) -> DEFAULT(s,loc)
       | _ -> assert false
     in
     let rec get prev = function
-      | ({ stmt_node=LABEL(_,s,loc) } as sref)::ls
+      | ({ Cabs.stmt_node=LABEL(_,s,loc) } as sref)::ls
       | ({ stmt_node=DEFAULT(s,loc) } as sref)::ls
       | ({ stmt_node=CASE(_,s,loc) } as sref)::ls
       | ({ stmt_node=CASERANGE(_,_,s,loc) } as sref)::ls
@@ -99,17 +96,17 @@ module S = struct
       | s::ls -> get (s::prev) ls
       | [] -> prev
     and extract prev vref fs = function
-      | s::ls when is_annot s.stmt_node -> extract prev vref (s::fs) ls
+      | s::ls when is_annot s.Cabs.stmt_node -> extract prev vref (s::fs) ls
       | s::ls -> next prev vref (s::fs) ls
       | []    -> next prev vref fs []
     and next prev (sref,loc) fs ls =
       let bstmts = (List.rev fs) in
       let blk = block ~loc bstmts [] ~sref in
-      let slabel = stmt (mk_label blk sref.stmt_node) ~sref in
+      let slabel = stmt (mk_label blk sref.Cabs.stmt_node) ~sref in
       get (slabel::prev) ls
     in
     let rec find = function
-      | ({ stmt_node=LABEL(_,s,loc) } as sref)::ls
+      | ({ Cabs.stmt_node=LABEL(_,s,loc) } as sref)::ls
       | ({ stmt_node=DEFAULT(s,loc) } as sref)::ls
       | ({ stmt_node=CASE(_,s,loc) } as sref)::ls
       | ({ stmt_node=CASERANGE(_,_,s,loc) } as sref)::ls
@@ -176,7 +173,7 @@ let transform_cabs cabs =
             }
           in
           li@[ Logic_ptree.(AExtended([],true,ext)) ]
-        in match s.stmt_node with
+        in match s.Cabs.stmt_node with
         | WHILE(li,cond,body,loc) ->
           let li = unroll_pragma_insertion_process "while" li in
           { s with stmt_node=WHILE(li,cond,body,loc) }
@@ -203,7 +200,7 @@ let transform_cabs cabs =
     (* Returns a transformed loop where a fresh attribute is added to
        each loop body. An attribute is also added when the loop
        condition is unrolled. *)
-    method unroll_loop_process ~sref = match sref.stmt_node with
+    method unroll_loop_process ~sref = match sref.Cabs.stmt_node with
       | WHILE(li,cond,body,loc) ->
         let battrs, is_unrollable = self#fresh_loop_body_attr li in
         let body = S.block ~loc [body] battrs ~sref in
@@ -215,7 +212,7 @@ let transform_cabs cabs =
           in Options.debug ~level:2 ~dkey
             "Unrolling loop condition of loop #%d of function %S."
             loop_cpt fct_name;
-          IF(cond,dowhile,nop,loc)
+          Cabs.IF(cond,dowhile,nop,loc)
         else WHILE(li,cond, body,loc)
       | DOWHILE(li,cond,body,loc) ->
         (* Transforms the "do Sb while (c);" into
@@ -230,15 +227,15 @@ let transform_cabs cabs =
           (* Transforms the "for (s;c;e) Sb;" into
              "{ s; if (c) do {/* body attribs */ Sb; e; } while (c); }" *)
           let body = match inc with
-            | { expr_node = NOTHING } -> mk_body []
+            | { Cabs.expr_node = NOTHING } -> mk_body []
             | _ -> mk_body [ S.stmt (COMPUTATION (inc,loc)) ~sref ]
           in
-          let dowhile_node = DOWHILE(li,cond,body,loc) in
+          let dowhile_node = Cabs.DOWHILE(li,cond,body,loc) in
           let ifdowhile_node = match cond with
             | { expr_node = NOTHING } ->
               (* ISO C11 : 6.8.5.3.2 *)
               let cond = {cond with expr_node = Cabs.(CONSTANT (CONST_INT "1"))} in
-              DOWHILE(li,cond,body,loc)
+              Cabs.DOWHILE(li,cond,body,loc)
             | _ -> let nop = S.nop ~loc ~sref in
               IF(cond,(S.stmt dowhile_node ~sref),nop,loc)
           in Options.debug ~level:2 ~dkey
@@ -246,7 +243,7 @@ let transform_cabs cabs =
             loop_cpt fct_name;
           let init = match init with
             | FC_EXP { expr_node = NOTHING } -> None
-            | FC_EXP init  -> Some (COMPUTATION (init,loc))
+            | FC_EXP init  -> Some (Cabs.COMPUTATION (init,loc))
             | FC_DECL decl -> Some (DEFINITION decl)
           in match init with
           | None -> ifdowhile_node
@@ -282,7 +279,7 @@ let transform_cabs cabs =
         ChangeDoChildrenPost ( {block with bstmts }, fun x -> x)
 
     method! vstmt sref =
-      let change f = ChangeDoChildrenPost ([f ~sref], fun x -> x) in
+      let change f = Cil.ChangeDoChildrenPost ([f ~sref], fun x -> x) in
       let loop_process ~sref =
         loop_cpt <- loop_cpt + 1;
         let sref = self#unroll_pragma_insertion_process sref in

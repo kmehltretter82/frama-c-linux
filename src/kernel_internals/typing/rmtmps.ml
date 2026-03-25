@@ -17,7 +17,6 @@ let dkey = Kernel.dkey_rmtmps
 
 open Fun.Operators
 open Cil_types
-open Cil
 
 (* Reachability of used data is stored in a table mapping [info] to [bool].
    Note that due to mutability, we need to use our own Hashtbl module which
@@ -151,7 +150,7 @@ let categorizePragmas ast =
     | _ ->
       ()
   in
-  iterGlobals ast considerPragma;
+  Cil.iterGlobals ast considerPragma;
   keepers
 
 
@@ -295,7 +294,7 @@ class markReachableVisitor
     (currentFunc: Cil_types.fundec option ref)
     (reachable_tbl: bool InfoHashtbl.t)
   = object (self)
-    inherit nopCilVisitor
+    inherit Cil.nopCilVisitor
 
     method! vglob = function
       | GType (typeinfo, _) ->
@@ -376,7 +375,7 @@ class markReachableVisitor
             begin
               Kernel.debug ~dkey "descending: global %s (%d)" name v.vid;
               let descend global =
-                ignore (visitCilGlobal (self :> cilVisitor) global)
+                ignore (Cil.visitCilGlobal (self :> Cil.cilVisitor) global)
               in
               let globals = Hashtbl.find_all globalMap name in
               List.iter descend globals
@@ -391,7 +390,7 @@ class markReachableVisitor
           InfoHashtbl.replace reachable_tbl (Enum e) true;
           self#visitAttrs e.eattr;
           (* Must visit the value attributed to the enum constants *)
-          ignore (visitCilEnumInfo (self:>cilVisitor) e);
+          ignore (Cil.visitCilEnumInfo (self:>Cil.cilVisitor) e);
         end
       else
         Kernel.debug ~dkey "not marking transitive use: enum %s" e.ename;
@@ -407,7 +406,7 @@ class markReachableVisitor
       | _ -> DoChildren
 
     method private visitAttrs attrs =
-      ignore (visitCilAttributes (self :> cilVisitor) attrs)
+      ignore (Cil.visitCilAttributes (self :> Cil.cilVisitor) attrs)
 
     method! vtype typ =
       (match typ.tnode with
@@ -448,7 +447,7 @@ class markReachableVisitor
        | TPtr ty -> ignore (self#vtype ty); self#visitAttrs typ.tattr
        | TArray (ty, sz) ->
          ignore (self#vtype ty); self#visitAttrs typ.tattr;
-         Option.iter (ignore $ (visitCilExpr (self:>cilVisitor))) sz
+         Option.iter (ignore $ (Cil.visitCilExpr (self:>Cil.cilVisitor))) sz
        | TFun (ty, args, _) ->
          ignore (self#vtype ty);
          Option.iter (List.iter (fun (_,ty,_) -> ignore (self#vtype ty))) args;
@@ -480,7 +479,7 @@ class markReachableVisitor
               begin
                 Kernel.debug ~dkey "descending: global %s (%d)" name v.vid;
                 let descend global =
-                  ignore (visitCilGlobal (self :> cilVisitor) global)
+                  ignore (Cil.visitCilGlobal (self :> Cil.cilVisitor) global)
                 in
                 let globals = Hashtbl.find_all globalMap name in
                 List.iter descend globals
@@ -504,7 +503,7 @@ let markReachable isRoot ast reachable_tbl =
     | _ ->
       ()
   in
-  iterGlobals ast considerGlobal;
+  Cil.iterGlobals ast considerGlobal;
 
   let currentFunc = ref None in
 
@@ -517,13 +516,13 @@ let markReachable isRoot ast reachable_tbl =
         (match global with
            GFun(fd, _) -> currentFunc := Some fd
          | _ -> currentFunc := None);
-        ignore (visitCilGlobal visitor global)
+        ignore (Cil.visitCilGlobal visitor global)
       end
     else
       (*      trace (dprintf "skipping non-root global: %a\n" d_shortglobal global)*)
       ()
   in
-  iterGlobals ast visitIfRoot
+  Cil.iterGlobals ast visitIfRoot
 
 (**********************************************************************
  *
@@ -547,7 +546,7 @@ let global_type_and_name = function
   | GAnnot _ -> "<annot>"
 
 class markReferencedVisitor = object (self)
-  inherit nopCilVisitor
+  inherit Cil.nopCilVisitor
 
   val dkey = Kernel.dkey_referenced
 
@@ -631,7 +630,7 @@ end
 let markReferenced ast =
   Kernel.debug ~dkey "starting markReferenced (AST has %d globals)"
     (List.length ast.globals);
-  visitCilFileSameGlobals (new markReferencedVisitor) ast;
+  Cil.visitCilFileSameGlobals (new markReferencedVisitor) ast;
   Kernel.debug ~dkey "finished markReferenced"
 
 (**********************************************************************
@@ -709,7 +708,7 @@ class markUsedLabels is_removable (labelMap: (string, unit) Hashtbl.t) =
     | StmtLabel dest -> keep_label dest
   in
   object
-    inherit nopCilVisitor
+    inherit Cil.nopCilVisitor
 
     method! vstmt (s: stmt) =
       match s.skind with
@@ -742,7 +741,7 @@ class markUsedLabels is_removable (labelMap: (string, unit) Hashtbl.t) =
   end
 
 class removeUnusedLabels is_removable (labelMap: (string, unit) Hashtbl.t) = object
-  inherit nopCilVisitor
+  inherit Cil.nopCilVisitor
 
   method! vstmt (s: stmt) =
     let (ln, lab), lrest = labelsToKeep is_removable s.labels in
@@ -777,10 +776,10 @@ let remove_unused_labels ?(is_removable=label_removable) func =
    * marking the used labels *)
   let usedLabels:(string, unit) Hashtbl.t = Hashtbl.create 13 in
   ignore
-    (visitCilBlock (new markUsedLabels is_removable usedLabels) func.sbody);
+    (Cil.visitCilBlock (new markUsedLabels is_removable usedLabels) func.sbody);
   (* And now we scan again and we remove them *)
   ignore
-    (visitCilBlock (new removeUnusedLabels is_removable usedLabels) func.sbody)
+    (Cil.visitCilBlock (new removeUnusedLabels is_removable usedLabels) func.sbody)
 
 let removeUnmarked isRoot ast reachable_tbl =
   let filterGlobal global =
@@ -830,7 +829,7 @@ let removeUnmarked isRoot ast reachable_tbl =
       ((is_reachable reachable_tbl (Var func.svar))
        || Ast_attributes.contains "FC_BUILTIN" func.svar.vattr
        || isRoot global) &&
-      (ignore (visitCilBlock remove_blocals func.sbody);
+      (ignore (Cil.visitCilBlock remove_blocals func.sbody);
        remove_unused_labels func;
        true)
 

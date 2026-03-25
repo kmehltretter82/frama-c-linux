@@ -9,7 +9,6 @@
 (** Syntactic loop unfolding. *)
 
 open Cil_types
-open Cil
 open Visitor
 
 let dkey = Kernel.dkey_ulevel
@@ -125,7 +124,7 @@ let refresh_vars old_var new_var =
 let update_gotos sid_tbl block =
   let goto_updater =
     object
-      inherit nopCilVisitor
+      inherit Cil.nopCilVisitor
       method! vstmt s = match s.skind with
         | Goto(sref,_loc) ->
           (try (* A deep copy has already be done. Just modifies the reference in place. *)
@@ -142,7 +141,7 @@ let update_gotos sid_tbl block =
       method! vlval _ = Cil.SkipChildren (* via stmt such as Set, Call, Asm, ... *)
       method! vattr _ = Cil.SkipChildren (* via Asm stmt *)
     end
-  in visitCilBlock (goto_updater:>cilVisitor) block
+  in Cil.visitCilBlock (goto_updater:>Cil.cilVisitor) block
 
 let is_referenced stmt l =
   let module Found = struct exception Found end in
@@ -189,7 +188,7 @@ let copy_annotations kf assoc labelled_stmt_tbl (break_continue_must_change, stm
            with Not_found -> SkipChildren) ;
         | BuiltinLabel _ | FormalLabel _ -> SkipChildren
     end
-    in visitCilCodeAnnotation (visitor:>cilVisitor) (Logic_const.refresh_code_annotation a)
+    in Cil.visitCilCodeAnnotation (visitor:>Cil.cilVisitor) (Logic_const.refresh_code_annotation a)
   in
   let filter_annotation a = (* Special cases for some "breaks" and "continues" clauses. *)
     (* Note: it would be preferable to do that job in the visitor of 'fresh_annotation'... *)
@@ -494,7 +493,7 @@ let copy_block kf switch_label_action break_continue_must_change bl =
     in
     fundec.slocals <- fundec.slocals @ new_locals;
     assoc:=(List.combine bl.blocals new_locals) @ !assoc;
-    let new_block = mkBlock (List.rev new_stmts) in
+    let new_block = Cil.mkBlock (List.rev new_stmts) in
     refresh_vars bl.blocals new_locals new_block;
     new_block.blocals <- new_locals;
     new_block,labelled_stmt_tbl,calls_tbl
@@ -611,14 +610,14 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
           let<> UpdatedCurrentLoc = loc in
           let break_lbl_stmt =
             let break_label = fresh_label () in
-            let break_lbl_stmt = mkEmptyStmt () in
+            let break_lbl_stmt = Cil.mkEmptyStmt () in
             break_lbl_stmt.labels <- [break_label];
             break_lbl_stmt.sid <- Cil_const.new_raw_sid ();
             break_lbl_stmt
           in
           let mk_continue () =
             let continue_label = fresh_label () in
-            let continue_lbl_stmt = mkEmptyStmt () in
+            let continue_lbl_stmt = Cil.mkEmptyStmt () in
             continue_lbl_stmt.labels <- [continue_label] ;
             continue_lbl_stmt.sid <- Cil_const.new_raw_sid ();
             continue_lbl_stmt
@@ -641,7 +640,7 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
             (match new_block.blocals with
                [] -> new_stmts:= new_block.bstmts @ !new_stmts;
              | _ -> (* keep the block in order to preserve locals decl *)
-               new_stmts:= mkStmt (Block new_block) :: !new_stmts);
+               new_stmts:= Cil.mkStmt (Block new_block) :: !new_stmts);
           done;
           let new_stmt = match !new_stmts with
             | [ s ] -> s
@@ -649,8 +648,8 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
               List.iter (update_loop_entry (Option.get self#current_kf) !current_continue) l;
               let l = if is_referenced !current_continue l then !current_continue :: l else l in
               let new_stmts = l @ [break_lbl_stmt] in
-              let new_block = mkBlock new_stmts in
-              let snew = mkStmt (Block new_block) in
+              let new_block = Cil.mkBlock new_stmts in
+              let snew = Cil.mkStmt (Block new_block) in
               (* Move the labels in front of the original loop at the top of the
                  new code *)
               Cil_datatype.Stmt.Hashtbl.add moved_labels sloop snew;

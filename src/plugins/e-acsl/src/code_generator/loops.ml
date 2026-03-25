@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil
 open Cil_types
 open Analyses_types
 
@@ -297,7 +296,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     in
     (* loop counter corresponding to the quantified variable *)
     let var_x, x, env = Env.Logic_binding.add ~ty env kf logic_x in
-    let lv_x = var var_x in
+    let lv_x = Cil.var var_x in
     let env = match ctx with
       | C_integer _ -> env
       | Gmpz -> Env.add_stmt env (Gmp.init ~loc x)
@@ -343,8 +342,8 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
         (Smart_stmt.if_stmt
            ~loc:guard_exp.eloc
            ~cond:guard_exp
-           (mkBlock [ mkEmptyStmt ~loc () ])
-           ~else_blk:(mkBlock [ break_stmt ]))
+           (Cil.mkBlock [ Cil.mkEmptyStmt ~loc () ])
+           ~else_blk:(Cil.mkBlock [ break_stmt ]))
         ~global_clear:false
         Env.Middle
     in
@@ -391,11 +390,11 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
         guard_for_small_type :: guard :: body @ [ next ], env
     in
     let start = block_to_stmt init_blk in
-    let stmt = mkStmt
+    let stmt = Cil.mkStmt
         ~valid_sid:true
         (Loop(
             [],
-            mkBlock stmts,
+            Cil.mkBlock stmts,
             loc,
             None,
             Some break_stmt))

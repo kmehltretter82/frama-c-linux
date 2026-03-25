@@ -1,5 +1,4 @@
 open Cil_types
-open Cil
 
 let run () =
   let vis =

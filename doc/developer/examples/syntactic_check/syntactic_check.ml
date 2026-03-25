@@ -1,5 +1,4 @@
 open Cil_types
-open Cil
 
 module M = Plugin.Register
 

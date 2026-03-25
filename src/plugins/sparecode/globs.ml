@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil
 
 module Varinfo = Cil_datatype.Varinfo
 module Typeinfo = Cil_datatype.Typeinfo
@@ -41,7 +40,7 @@ class collect_visitor = object (self)
       else begin
         debug "add used typedef %s@." ti.tname;
         Typeinfo.Hashtbl.add used_typeinfo ti ();
-        ignore (visitCilType (self:>Cil.cilVisitor) ti.ttype);
+        ignore (Cil.visitCilType (self:>Cil.cilVisitor) ti.ttype);
         DoChildren
       end
     | TEnum ei ->
@@ -56,7 +55,7 @@ class collect_visitor = object (self)
         debug "add used comp %s@." ci.cname;
         Compinfo.Hashtbl.add used_compinfo ci ();
         List.iter
-          (fun f -> ignore (visitCilType (self:>Cil.cilVisitor) f.ftype))
+          (fun f -> ignore (Cil.visitCilType (self:>Cil.cilVisitor) f.ftype))
           (Option.value ~default:[] ci.cfields);
         DoChildren
       end
@@ -66,10 +65,10 @@ class collect_visitor = object (self)
     if v.vglob && not (Varinfo.Hashtbl.mem used_variables v) then begin
       debug "add used var %s@." v.vname;
       Varinfo.Hashtbl.add used_variables v ();
-      ignore (visitCilType (self:>Cil.cilVisitor) v.vtype);
+      ignore (Cil.visitCilType (self:>Cil.cilVisitor) v.vtype);
       try
         let init = Varinfo.Hashtbl.find var_init v in
-        ignore (visitCilInit_or_str (self:>Cil.cilVisitor) v init)
+        ignore (Cil.visitCilInit_or_str (self:>Cil.cilVisitor) v init)
       with Not_found -> ()
     end;
     DoChildren
@@ -89,7 +88,7 @@ class collect_visitor = object (self)
             Varinfo.Hashtbl.add var_init v init;
             if Varinfo.Hashtbl.mem used_variables v then
               (* already used before its initialization (see bug #758) *)
-              ignore (visitCilInit_or_str (self:>Cil.cilVisitor) v init)
+              ignore (Cil.visitCilInit_or_str (self:>Cil.cilVisitor) v init)
           end
       in Cil.SkipChildren
     | GFunDecl _ -> DoChildren

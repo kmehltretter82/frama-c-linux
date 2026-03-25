@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil
 open Cil_types
 module FC_file = File (* overwritten by Cil_datatype *)
 open Cil_datatype
@@ -436,7 +435,7 @@ end = struct
       if Info.annotation_visible (self#get_finfo ()) stmt v
       then begin
         self#add_stmt_keep stmt;
-        ChangeDoChildrenPost (v,Logic_const.refresh_code_annotation)
+        Cil.ChangeDoChildrenPost (v,Logic_const.refresh_code_annotation)
       end else begin
         debug "\t-> ignoring annotation: %a@."
           Printer.pp_code_annotation v;
@@ -570,7 +569,7 @@ end = struct
         s
       in
       s.skind <- mk_stmt_skip s;
-      ChangeDoChildrenPost(s, do_after)
+      Cil.ChangeDoChildrenPost(s, do_after)
 
 
     (* We always keep global variables. However there are two cases where
@@ -638,7 +637,7 @@ end = struct
                 match s'.skind with
                 | UnspecifiedSequence l ->
                   let res =
-                    List.filter (fun (s,_,_,_,_) -> not (is_skip s.skind)) l
+                    List.filter (fun (s,_,_,_,_) -> not (Cil.is_skip s.skind)) l
                   in
                   let res =
                     List.map
@@ -706,17 +705,17 @@ end = struct
       keep_stmts <- Stmt.Set.empty;
       Varinfo.Hashtbl.clear local_visible;
       Varinfo.Hashtbl.add spec_table f.svar
-        (visitCilFunspec (self:>Cil.cilVisitor)
+        (Cil.visitCilFunspec (self:>Cil.cilVisitor)
            (Annotations.funspec (Option.get self#current_kf)));
       SkipChildren
 
     method private visit_pred p =
       Logic_const.new_predicate
-        (visitCilPredicate (self:>Cil.cilVisitor)
+        (Cil.visitCilPredicate (self:>Cil.cilVisitor)
            (Logic_const.pred_of_id_pred p))
 
     method private visit_identified_term t =
-      let t' = visitCilTerm (self:>Cil.cilVisitor) t.it_content in
+      let t' = Cil.visitCilTerm (self:>Cil.cilVisitor) t.it_content in
       Logic_const.new_identified_term t'
 
     method! vfrom (b,f) =
@@ -758,7 +757,7 @@ end = struct
       );
 
       let from_visible a = Info.fun_assign_visible finfo a in
-      let from_visit a = visitCilFrom (self:>Cil.cilVisitor) a in
+      let from_visit a = Cil.visitCilFrom (self:>Cil.cilVisitor) a in
       (match b.b_assigns with
          WritesAny -> ()
        | Writes l ->
@@ -769,7 +768,7 @@ end = struct
       );
 
       let extended_visible a = Info.fun_extended_visible finfo a in
-      let extended_visit a = visitCilExtended (self:>Cil.cilVisitor) a in
+      let extended_visit a = Cil.visitCilExtended (self:>Cil.cilVisitor) a in
       b.b_extended <- filter_list extended_visible extended_visit b.b_extended;
 
       SkipChildren (* see the warning on [SkipChildren] in [vspec] ! *)
@@ -785,7 +784,7 @@ end = struct
       let new_variant = match spec.spec_variant with
         | None -> None
         | Some (t,n) -> if Info.fun_variant_visible finfo t
-          then Some (visitCilTerm (self:>Cil.cilVisitor) t, n)
+          then Some (Cil.visitCilTerm (self:>Cil.cilVisitor) t, n)
           else None
       in
       spec.spec_variant <- new_variant ;
@@ -826,7 +825,7 @@ end = struct
              let old_formals = filter_params finfo old_formals in
              let args = filter_params finfo args in
              let mytype = Cil_const.mk_tfun ~tattr  rt (Some args) va in
-             let new_formals = List.map makeFormalsVarDecl args in
+             let new_formals = List.map Cil.makeFormalsVarDecl args in
              self#add_formals_bindings new_var new_formals;
              Cil.update_var_type new_var mytype;
              List.iter2
