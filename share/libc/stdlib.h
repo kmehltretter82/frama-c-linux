@@ -797,7 +797,7 @@ extern int putenv(char *string);
     allocates \nothing;
     assigns \result \from indirect:name[0 .. strlen(name)];
     assigns __fc_errno \from indirect:name[0 .. strlen(name)];
-    ensures error: \result == -1;
+    ensures result_error: \result == -1;
     ensures errno_set: __fc_errno == EINVAL;
   behavior out_of_memory:
     assumes not_enough_memory: !is_allocable(strlen(name) + strlen(value) + 2);
@@ -805,9 +805,9 @@ extern int putenv(char *string);
     assigns \result, __fc_errno \from indirect:name[0 .. strlen(name)],
                                       indirect:value[0 .. strlen(value)],
                                       indirect:overwrite;
-    ensures error: \result == -1;
+    ensures result_error: \result == -1;
     ensures errno_set: __fc_errno == ENOMEM;
-  behavior ok:
+  behavior valid_name:
     assumes name_not_empty: strlen(name) > 0;
     assumes name_has_no_equals_sign: !strchr(name, '=');
     assumes enough_memory: is_allocable(strlen(name) + strlen(value) + 2);
@@ -819,7 +819,7 @@ extern int putenv(char *string);
                                      value[0 .. strlen(value)],
                                      indirect:__fc_env[0..],
                                      indirect:overwrite;
-    ensures ok: \result == 0;
+    ensures result_zero: \result == 0;
 */
 extern int setenv(const char *name, const char *value, int overwrite);
 
