@@ -102,13 +102,15 @@ module Process =
     let help = "Only process the given function(s)"
   end)
 
+let () = Parameter_customize.argument_may_be_fundecl ()
 module CallPtr =
-  String_list (struct
+  Kernel_function_set (struct
     let option_name = "-volatile-call-pointer"
     let arg_name = "f,..."
     let help = "stub call to pointer functions to the provided functions \
                 (indexed by type)"
   end)
+let () = Parameter_customize.argument_must_be_fundecl ()
 
 module Base =
   False (struct

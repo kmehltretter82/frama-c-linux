@@ -1,8 +1,8 @@
 [kernel] Parsing binding_basetype.i (no preprocessing)
 [volatile] Running volatile plugin...
 [volatile] Processing volatile clauses...
-[volatile] Register binding function 'Rd_int' for 'read' accesses to type 'int volatile'
 [volatile] Register binding function 'Rd_unsigned_int' for 'read' accesses to type 'unsigned int volatile'
+[volatile] Register binding function 'Rd_int' for 'read' accesses to type 'int volatile'
 [volatile:transformed-access:lvalue-volatile] binding_basetype.i:17: 
   unsigned_enum function: Introducing a call to 'Rd_unsigned_int' for read access to volatile left-value: x
 [volatile:binding] Looking for function c2fc2_Rd_unsigned_int

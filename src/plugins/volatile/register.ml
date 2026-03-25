@@ -432,15 +432,11 @@ end
 module INDEX = Map.Make (SIG)
 
 let build_call_index () =
-  List.fold_left (fun idx f ->
-      let kf =
-        try Globals.Functions.find_by_name f
-        with Not_found ->
-          Options.abort "Unknown function -volatile-call-pointer '%s'" f
-      in
+  Kf.Set.fold (fun kf idx ->
       let vf = Kernel_function.get_vi kf in
       match SIG.stub vf with
       | None ->
+        let f = Kernel_function.get_name kf in
         Options.abort "Function '%s' can not be used as call-pointer stub" f
       | Some s ->
         match INDEX.find_opt s idx with
@@ -450,8 +446,8 @@ let build_call_index () =
             vf0.vorig_name vf.vorig_name
         | None -> INDEX.add s vf idx
     )
-    INDEX.empty
     (Options.CallPtr.get ())
+    INDEX.empty
 
 (* -------------------------------------------------------------------------- *)
 (* --- Pointer Calls                                                      --- *)
