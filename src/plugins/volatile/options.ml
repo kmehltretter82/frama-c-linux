@@ -117,12 +117,14 @@ module Base =
                 related to -volatile-binding option"
   end)
 
+let () = Parameter_customize.argument_may_be_fundecl ()
 module Binding =
-  String_list (struct
+  Kernel_function_set (struct
     let option_name = "-volatile-binding"
     let arg_name = "f,..."
     let help = "allows binding of volatile accesses to functions <f,...>"
   end)
+let () = Parameter_customize.argument_must_be_fundecl ()
 
 module BindingAuto =
   False (struct

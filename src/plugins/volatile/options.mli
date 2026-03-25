@@ -40,7 +40,7 @@ end
 module Enabled : Parameter_sig.Bool
 module Process : Parameter_sig.Kernel_function_set
 module CallPtr : Parameter_sig.String_list
-module Binding : Parameter_sig.String_list
+module Binding : Parameter_sig.Kernel_function_set
 module BindingAuto : Parameter_sig.Bool
 module BindingCall : Parameter_sig.Bool
 module Base : Parameter_sig.Bool

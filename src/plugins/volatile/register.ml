@@ -325,42 +325,36 @@ module B_MAP = struct
       None
 
   let build_binding_map () =
-    List.fold_left (fun ((map_rd, map_wr) as maps) f ->
-        try
-          let kf = Globals.Functions.find_by_name f in
-          let vf = Kernel_function.get_vi kf in
-          match checks_prototype_kind vf with
+    Kf.Set.fold (fun kf ((map_rd, map_wr) as maps) ->
+        let vf = Kernel_function.get_vi kf in
+        match checks_prototype_kind vf with
+        | None -> maps
+        | Some (is_wr_access, volatile_object) ->
+          let map = if is_wr_access then map_wr else map_rd in
+          let map =
+            match T_MAP.find_opt volatile_object map with
+            | None -> Some (T_MAP.add volatile_object vf map)
+            | Some vf0 ->
+              Options.warning ~once:true ~wkey:wkey_invalid_binding_function
+                "Functions -volatile-binding '%s' and '%s' %s"
+                vf0.vorig_name vf.vorig_name
+                (if Options.Base.get ()
+                 then "apply to the same base type"
+                 else "has same signature");
+              None
+          in
+          match map with
           | None -> maps
-          | Some (is_wr_access, volatile_object) ->
-            let map = if is_wr_access then map_wr else map_rd in
-            let map =
-              match T_MAP.find_opt volatile_object map with
-              | None -> Some (T_MAP.add volatile_object vf map)
-              | Some vf0 ->
-                Options.warning ~once:true ~wkey:wkey_invalid_binding_function
-                  "Functions -volatile-binding '%s' and '%s' %s"
-                  vf0.vorig_name vf.vorig_name
-                  (if Options.Base.get ()
-                   then "apply to the same base type"
-                   else "has same signature");
-                None
-            in
-            match map with
-            | None -> maps
-            | Some map ->
-              Options.feedback
-                "Register binding function '%s' for '%s' accesses to type '%a'"
-                vf.vorig_name
-                (if is_wr_access then "write" else "read")
-                Typ.pretty (T_MAP.basetype volatile_object);
-              if is_wr_access then (map_rd, map) else (map, map_wr)
-        with Not_found ->
-          Options.warning ~once:true ~wkey:wkey_invalid_binding_function
-            "Unknown function related to -volatile-binding '%s'" f;
-          maps
+          | Some map ->
+            Options.feedback
+              "Register binding function '%s' for '%s' accesses to type '%a'"
+              vf.vorig_name
+              (if is_wr_access then "write" else "read")
+              Typ.pretty (T_MAP.basetype volatile_object);
+            if is_wr_access then (map_rd, map) else (map, map_wr)
       )
-      (T_MAP.empty, T_MAP.empty)
       (Options.Binding.get ())
+      (T_MAP.empty, T_MAP.empty)
 
   let find_binding ~is_wr_access map typ =
     T_MAP.find_opt typ (if is_wr_access then snd map else fst map)
