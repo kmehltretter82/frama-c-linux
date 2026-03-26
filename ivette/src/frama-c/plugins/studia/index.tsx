@@ -28,22 +28,14 @@ import './style.css';
 
 type access = 'Reads' | 'Writes';
 
-function handleError(err: string): void {
-  Display.showWarning({ label: 'Studia Failure', title: `Error (${err})` });
-}
-
 async function computeStudiaSelection(
   kind: access,
   marker: Ast.marker,
   descr: string,
-  // Replaces the handleError function
-  onError?: (err: string) => void
+  onError: (err: string) => void
 ): Promise<void> {
   const request = kind === 'Reads' ? getReadsLval : getWritesLval;
-  const data = await Server.send(request, marker).catch((err: string) => {
-    if(onError) onError(err);
-    else handleError(err);
-  });
+  const data = await Server.send(request, marker).catch(onError);
   const markers = data?.direct ?? [];
   if (markers.length > 0) {
     const label = (kind === 'Reads' ? 'Reads of ' : 'Writes to ') + `${descr}`;
@@ -59,6 +51,10 @@ async function computeStudiaSelection(
       plugin: 'Studia', label, markers: []
     });
   }
+}
+
+function handleError(err: string): void {
+  Display.showWarning({ label: 'Studia Failure', title: `Error (${err})` });
 }
 
 /** Builds the Studia entries in the contextual menu about a given marker.  */
@@ -82,11 +78,13 @@ export function buildMenu(
       addSubMenu([
         {
           label: `Select reads`,
-          onClick: () => computeStudiaSelection('Reads', marker, attr.descr)
+          onClick: () =>
+            computeStudiaSelection('Reads', marker, attr.descr, handleError)
         },
         {
           label: `Select writes`,
-          onClick: () => computeStudiaSelection('Writes', marker, attr.descr)
+          onClick: () =>
+            computeStudiaSelection('Writes', marker, attr.descr, handleError)
         }
       ]);
       return;
