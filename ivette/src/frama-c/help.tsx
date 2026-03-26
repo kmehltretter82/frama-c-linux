@@ -133,9 +133,10 @@ interface AboutProps {
 }
 
 function AboutModal(props: AboutProps): JSX.Element {
+  const scrollableArea = React.useRef<HTMLDivElement>(null);
   return (
     <Modal className='modal-framac-infos' label='About Frama-C'>
-      <>
+      <div ref={scrollableArea} className="globals-scrollable-area">
         <FramaCLogo />
         <Hbox className='modal-framac-about'>
           <pre>version: {props.version}</pre>
@@ -158,7 +159,7 @@ function AboutModal(props: AboutProps): JSX.Element {
           <pre>{copyright}</pre>
           <pre>{license}</pre>
         </Hbox>
-      </>
+      </div>
     </Modal>
   );
 }
@@ -171,9 +172,10 @@ export async function showAboutModal(): Promise<void> {
 }
 
 function CreditsModal(): JSX.Element {
+  const scrollableArea = React.useRef<HTMLDivElement>(null);
   return (
     <Modal className='modal-framac-infos' label='Credits'>
-      <>
+      <div ref={scrollableArea} className="globals-scrollable-area">
         <FramaCLogo />
         <Hbox>
           <pre style={{ fontSize: '1.2em', textAlign: "center" }}
@@ -182,7 +184,7 @@ function CreditsModal(): JSX.Element {
         <div className='modal-framac-credits'>
           {authors.map((author, i) => <div key={i} >{author}</div>)}
         </div>
-      </>
+      </div>
     </Modal>
   );
 }
