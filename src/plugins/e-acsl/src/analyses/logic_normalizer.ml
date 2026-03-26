@@ -271,15 +271,8 @@ let preprocess_pred ~loc p =
             ~loc
             (llabel, Logic_utils.mk_logic_AddrOf ~loc tlv lty)
         in
-        (* need to store a copy, to avoid p to appear in its own preprocessed
-           form (otherwise it loops) *)
-        let p_copy =
-          match p.pred_content with
-          | Pvalid_read _ -> Logic_const.pvalid_read ~loc (llabel, t)
-          | Pvalid _ -> Logic_const.pvalid ~loc (llabel, t)
-          | Pobject_pointer _ -> Logic_const.pobject_pointer ~loc (llabel, t)
-          | _ -> assert false
-        in
+        (* copy p, since p appearing in its preprocessed form may induce loops *)
+        let p_copy = {p with pred_content = p.pred_content} in
         Some (Logic_const.pand ~loc (init, p_copy))
       | _ -> None
     end

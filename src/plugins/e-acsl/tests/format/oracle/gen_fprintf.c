@@ -438,7 +438,8 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                      "sizeof(int)",0,sizeof(int));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                   "\\valid(stat_loc)",0,__gen_e_acsl_valid);
+                                   "stat_loc_non_null: valid_stat_loc: \\valid(stat_loc)",
+                                   0,__gen_e_acsl_valid);
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Precondition";
       __gen_e_acsl_assert_data.pred_txt = "\\valid(stat_loc)";
@@ -556,7 +557,8 @@ int __gen_e_acsl_fclose(FILE *stream)
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(FILE)",
                                    0,sizeof(FILE));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "\\valid(stream)",0,__gen_e_acsl_valid);
+                                 "valid_stream: \\valid(stream)",0,
+                                 __gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(stream)";

@@ -106,7 +106,8 @@ time_t __gen_e_acsl_time(time_t *timer)
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                      "sizeof(time_t)",0,sizeof(time_t));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                   "\\valid(timer)",0,__gen_e_acsl_valid);
+                                   "not_null: valid_timer: \\valid(timer)",0,
+                                   __gen_e_acsl_valid);
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Precondition";
       __gen_e_acsl_assert_data.pred_txt = "\\valid(timer)";

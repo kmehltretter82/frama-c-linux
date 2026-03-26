@@ -57,6 +57,7 @@ let relation_to_binop = function
   | Rneq -> Ne
 
 let predicate_content_to_exp_il p =
+  let p = Logic_normalizer.get_pred p in
   match p.pred_content with
   | Ptrue -> M.return @@ IL.Exp.of_exp_node True
   | Pfalse -> M.return @@ IL.Exp.of_exp_node False
@@ -82,6 +83,7 @@ let predicate_content_to_exp_il p =
    regardless of its label. Otherwise [Translate_ats] is used to retrieve the
    translation. *)
 let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf p =
+  let p = Logic_normalizer.get_pred p in
   let logic_env = Env.Logic_env.get env in
   let open Current_loc.Operators in
   let<> UpdatedCurrentLoc = loc in
@@ -166,23 +168,19 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
       )
   | Pxor _ -> Env.not_yet env "xor"
   | Pimplies(p1, p2) ->
-    (* (p1 ==> p2) <==> !p1 || p2 *)
-    to_exp
-      ~adata
-      ~name:"implies"
-      kf
-      env
-      (Logic_const.por ~loc ((Logic_const.pnot ~loc p1), p2))
+    let rewritten = (* (p1 ==> p2) <==> !p1 || p2 *)
+      Logic_const.por ~loc ((Logic_const.pnot ~loc p1), p2)
+    in
+    Typing.preprocess_predicate ~logic_env rewritten;
+    to_exp ~adata ~name:"implies" kf env rewritten
   | Piff(p1, p2) ->
-    (* (p1 <==> p2) <==> (p1 ==> p2 && p2 ==> p1) *)
-    to_exp
-      ~adata
-      ~name:"equiv"
-      kf
-      env
-      (Logic_const.pand ~loc
-         (Logic_const.pimplies ~loc (p1, p2),
-          Logic_const.pimplies ~loc (p2, p1)))
+    let rewritten = (* (p1 <==> p2) <==> (p1 ==> p2 && p2 ==> p1) *)
+      Logic_const.pand ~loc
+        (Logic_const.pimplies ~loc (p1, p2),
+         Logic_const.pimplies ~loc (p2, p1))
+    in
+    Typing.preprocess_predicate ~logic_env rewritten;
+    to_exp ~adata ~name:"equiv" kf env rewritten
   | Pnot p ->
     let e, adata, env = to_exp ~adata kf env p in
     Smart_exp.lnot ~loc e, adata, env
@@ -399,13 +397,12 @@ and to_exp ~adata ?inplace ?name kf ?rte env p =
   let loc = p.pred_loc in
   let<> UpdatedCurrentLoc = loc in
   Assert.push_pending_register_data();
-  let p = Logic_normalizer.get_pred p in
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in
   let e, adata, env =
     Interlang_trans.try_il_compiler ~loc ~adata ~env ~kf
       (to_exp_il ~rte)
       (to_exp_old ~rte ?name ?inplace)
-      (Logic_normalizer.get_pred p)
+      p
   in
   let env = Assert.do_pending_register_data env in
   e, adata, env

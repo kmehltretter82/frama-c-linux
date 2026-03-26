@@ -461,7 +461,8 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                    "sizeof(void *)",0,sizeof(void *));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "\\valid(memptr)",0,__gen_e_acsl_valid);
+                                 "valid_memptr: \\valid(memptr)",0,
+                                 __gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
     __gen_e_acsl_assert_data.pred_txt = "\\valid(memptr)";

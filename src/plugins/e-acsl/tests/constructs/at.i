@@ -4,12 +4,15 @@
 
 int A = 0;
 
+/*@ predicate P{L} = \at(A ≡ 0,L); */
+
 /*@
   requires \at(A,Here) == 0;
   requires \at(A,Pre) == 0;
   ensures \at(A,Pre) == \at(A,Old) == 0;
   ensures \at(A,Post) == 4; */
 void f(void) {
+  //@ assert !P ==> P;
   A = 1;
 F:
   A = 2;
