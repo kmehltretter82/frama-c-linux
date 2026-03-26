@@ -20,7 +20,7 @@ import { Button, Inset } from 'dome/frame/toolbars';
 import { Cell, Code, Label } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Filler, Hpack, Hfill, Vpack, Vfill, Hbox } from 'dome/layout/boxes';
-import { Modal, showModal } from 'dome/dialogs';
+import { Modal, showModal, closeModal } from 'dome/dialogs';
 import { FieldState, TextField, useState } from 'dome/layout/forms';
 
 import * as States from 'frama-c/states';
@@ -1111,17 +1111,14 @@ function ModalEvaluate(props: ModalTextFieldProps): React.JSX.Element {
   const { attr } = props;
   const state = useState('');
   const value = state.value;
+  const [error, setError] = React.useState<string | undefined>();
   const [fcts] = useGlobalState(ScopesManagerState);
   const [tac, setTic] = useGlobalState(ticValue);
 
   const onValidate = React.useCallback((pattern: string): void => {
     const data = { stmt: attr.marker, term: pattern };
-    const handleError = (err: string): void => {
-      const label = 'Evaluation Error';
-      const title = `${pattern} could not be evaluated: ${err}.`;
-      Display.showWarning({ label, title });
-    };
     const addProbe = (target: Ast.marker): void => {
+      closeModal();
       const scope = States.getMarker(attr.marker).scope;
       if (scope) {
         fcts.pin(scope, target);
@@ -1130,7 +1127,7 @@ function ModalEvaluate(props: ModalTextFieldProps): React.JSX.Element {
         Display.alertComponent('fc.eva.values');
       }
     };
-    Server.send(Ast.parseExpr, data).then(addProbe).catch(handleError);
+    Server.send(Ast.parseExpr, data).then(addProbe).catch(setError);
   }, [attr, fcts, tac, setTic]);
 
   return (
@@ -1143,6 +1140,8 @@ function ModalEvaluate(props: ModalTextFieldProps): React.JSX.Element {
         <Hbox>
           <TextField
             label=''
+            latency={0}
+            autoFocus={true}
             state={state as FieldState<string | undefined>}
             onKeyDown={(e) => { if (e.key === "Enter") onValidate(value); }}
           />
@@ -1151,6 +1150,11 @@ function ModalEvaluate(props: ModalTextFieldProps): React.JSX.Element {
             onClick={() => onValidate(value)}
           />
         </Hbox>
+        { error &&
+          <Hbox>
+            <Icon id='WARNING' kind='warning' />
+            <span>{error}</span>
+          </Hbox> }
       </div>
     </Modal>);
 }
