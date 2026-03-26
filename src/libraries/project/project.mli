@@ -313,13 +313,3 @@ val get_current_selection: unit -> State_selection.t
 val compare: t -> t -> int
 val equal: t -> t -> bool
 val hash: t -> int
-
-(* ************************************************************************* *)
-(** {2 Undoing} *)
-(* ************************************************************************* *)
-
-module Undo: sig
-  val breakpoint: unit -> unit
-  val restore: unit -> unit
-  val clear_breakpoint: unit -> unit
-end

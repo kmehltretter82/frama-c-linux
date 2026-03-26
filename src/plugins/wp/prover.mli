@@ -33,5 +33,4 @@ val spawn : Wpo.t ->
   ?progress:(Wpo.t -> string -> unit) ->
   ?result:(Wpo.t -> prover -> result -> unit) ->
   ?success:(Wpo.t -> prover option -> unit) ->
-  ?pool:Task.pool ->
   (mode * prover) list -> unit

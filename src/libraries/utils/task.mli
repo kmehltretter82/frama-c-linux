@@ -188,16 +188,6 @@ val run : thread -> unit
 
 type pool
 
-val pool : unit -> pool
-
-val add : pool -> thread -> unit (** Auto-flush *)
-
-val iter : (thread -> unit) -> pool -> unit (** Auto-flush *)
-
-val flush : pool -> unit (** Clean all terminated tasks *)
-
-val size : pool -> int (** Auto-flush. Number of living tasks *)
-
 (* ************************************************************************* *)
 (** {2 Task Server} *)
 (* ************************************************************************* *)
@@ -213,7 +203,7 @@ val server :
     Stage 0 tasks are issued first. Default is 1.
     @param procs maximum number of running tasks. Default is 4. *)
 
-val spawn : server -> ?pool:pool -> ?stage:int -> thread -> unit
+val spawn : server -> ?stage:int -> thread -> unit
 (** Schedules a task on the server.
     The task is not immediately started. *)
 

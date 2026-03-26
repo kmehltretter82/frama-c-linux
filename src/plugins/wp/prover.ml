@@ -91,7 +91,7 @@ let prove wpo ?config ?mode ?start ?progress ?result prover =
   else (run_prover wpo ?config ?mode ?progress ?result prover)
 
 let spawn wpo ~delayed
-    ?config ?start ?progress ?result ?success ?pool provers =
+    ?config ?start ?progress ?result ?success provers =
   let provers = List.filter (fun (_,p) -> p <> Qed) provers in
   if provers<>[] then
     let monitor = match success with
@@ -110,7 +110,7 @@ let spawn wpo ~delayed
       prove wpo ?config ~mode ?start ?progress ?result prover in
     let all = Wp_parameters.RunAllProvers.get() in
     let smoke = Wpo.is_smoke_test wpo in
-    ProverTask.spawn ?monitor ?pool ~all ~smoke
+    ProverTask.spawn ?monitor ~all ~smoke
       (List.map
          (fun mp ->
             let prover = snd mp in
@@ -129,6 +129,6 @@ let spawn wpo ~delayed
     in
     let thread = Task.thread process in
     let server = ProverTask.server () in
-    Task.spawn server ?pool thread
+    Task.spawn server thread
 
 (* -------------------------------------------------------------------------- *)

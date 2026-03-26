@@ -80,7 +80,6 @@ val spawn : t ->
   ?progress:(t -> string -> unit) ->
   ?result:(t -> prover -> result -> unit) ->
   ?success:(t -> prover option -> unit) ->
-  ?pool:Task.pool ->
   (mode * prover) list -> unit
 (** Same as [prove] but schedule the tasks into the global server returned
     by [server] function below.
