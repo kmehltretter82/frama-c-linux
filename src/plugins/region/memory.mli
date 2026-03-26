@@ -141,5 +141,6 @@ val typed : node -> typ option
 val flags : node -> Attr.flags
 
 (**/**)
-val add_body : (map -> logic_info -> domain -> unit) ref
+val body : (map -> logic_info -> domain -> unit) ref
+[@@alert internal]
 (**/***)

@@ -288,6 +288,6 @@ let add_body map (l:logic_info) (d:domain) =
   | LBinductive l ->
     List.iter (fun (_,_,_,t) -> add_predicate env t) l
 
-let () = Memory.add_body := add_body
+let () = Memory.body[@alert "-internal"] := add_body
 
 (* -------------------------------------------------------------------------- *)

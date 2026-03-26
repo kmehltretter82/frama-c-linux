@@ -261,14 +261,14 @@ let add_root (m: map) (node : node) (root : root) =
     update node (fun d -> { d with croots = Bag.add root d.croots }) ;
   end
 
-let add_body = ref (fun _ _ _ -> assert false)
+let body = ref (fun _ _ _ -> assert false)
 
 let add_logic (m: map) f =
   try Fmap.find f m.logics with Not_found ->
     let get_type t = Domain.of_ltype (new_chunk m.store) t in
     let d = Option.fold ~none:Domain.pure ~some:get_type f.l_type in
     m.logics <- Fmap.add f d m.logics ;
-    !add_body m f d ; d
+    !body m f d ; d
 
 let add_result (m: map) =
   match m.result with Some r -> r | None ->
