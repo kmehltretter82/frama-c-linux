@@ -157,6 +157,7 @@ function ModalStudiaSearch(props: ModalTextFielddProps)
       <Hbox>
         <TextField
           label=''
+          latency={0}
           autoFocus={true}
           state={state as FieldState<string | undefined>}
           onKeyDown={(e) => {
