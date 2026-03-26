@@ -22,3 +22,9 @@ int job_merged( int n, int * p , int * q )
   for (int k=0; k<n; k++) p[k] = q[k];
   return 1;
 }
+
+/*@ region x, \garbage ; */
+void formal_garbage_ok(struct S { int f; } x);
+
+/*@ region x, \garbage ; */
+void formal_garbage_ko(int x);

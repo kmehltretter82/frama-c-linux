@@ -38,10 +38,10 @@ val pretty : Format.formatter -> flags -> unit
 
 open Cil_types
 
-val cvar : varinfo -> flags
+val cvar : garbage:bool -> varinfo -> flags
 val is_local : varinfo -> bool
 val is_const : varinfo -> bool
-val is_initialized : varinfo -> bool
+val is_initialized : garbage:bool -> varinfo -> bool
 
 val readable :
   loc:location -> ?label:logic_label ->

@@ -198,9 +198,11 @@ let rvalid ?(writing=false) kinstr _node kd =
 (* ---  Initialized                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rinitialized _node kd =
+let rinitialized map _node kd =
   match kd.host with
-  | Some v -> if Attr.is_initialized v then `True else `Default
+  | Some v ->
+    let garbage = Memory.garbage map v in
+    if Attr.is_initialized ~garbage v then `True else `Default
   | None -> `Default
 (* let flags = Memory.flags node in
    if Attr.mem `Garbage flags then `Default else `True *)

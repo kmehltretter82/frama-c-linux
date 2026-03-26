@@ -20,9 +20,10 @@ type env = {
 val call : map -> logic_info -> domain list -> domain
 val cons : map -> logic_ctor_info -> domain list -> domain
 
-val add_addr_lval : loc:location -> env -> term_lval -> typ * node
+val add_addr_lval : loc:location -> env -> ?garbage:bool -> term_lval -> typ * node
 val add_term_lval : loc:location -> env -> term_lval -> domain
-val add_term      : env -> term      -> domain
+
+val add_term : env -> term -> domain
 val add_predicate : env -> predicate -> unit
 val add_path : env -> Spec.region -> Spec.path -> node
 val add_region : env -> Spec.region -> unit

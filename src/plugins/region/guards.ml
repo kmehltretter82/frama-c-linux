@@ -212,7 +212,7 @@ let valid_object env n ?kd a =
 let initialized env n ?kd a =
   if not @@ RteGen.Generator.Initialized.is_computed env.kf then
     check env "initialized" (Initialized a) a @@
-    Condition.rinitialized n (kindof a kd)
+    Condition.rinitialized env.map n (kindof a kd)
 
 let aligned env n ?kd a =
   if

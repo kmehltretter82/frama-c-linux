@@ -72,6 +72,7 @@ type map = {
   mutable labels: node Lmap.t ;
   mutable roots: (root * node) list ;
   mutable cvars: node Vmap.t ;
+  mutable gvars: Vset.t ;
   mutable lvars: domain LVmap.t ;
   mutable logics: domain Fmap.t ;
   mutable result: node option ;
@@ -103,6 +104,7 @@ let ctypes (m : chunk) : typ list =
 let create () = {
   store = UF.create () ;
   roots = [] ;
+  gvars = Vset.empty ;
   cvars = Vmap.empty ;
   labels = Lmap.empty ;
   lvars = LVmap.empty ;
@@ -242,7 +244,8 @@ let add_label (m: map) a =
     update n (fun d -> { d with clabels = Lset.singleton a }) ;
     m.labels <- Lmap.add a n m.labels ; n
 
-let add_cvar (m: map) v =
+let add_cvar (m: map) ?(garbage=false) v =
+  (if garbage then m.gvars <- Vset.add v m.gvars) ;
   try Vmap.find v m.cvars with Not_found ->
     let size = Fields.bitsSizeOf v.vtype in
     let n = new_chunk m.store ~size () in
@@ -548,6 +551,7 @@ let pointed_by (r : node) = UF.find_all (UF.get r).cpointed
 let cvar (m: map) (v: varinfo) : node = UF.find @@ Vmap.find v m.cvars
 let lvar (m: map) (v: logic_var) = LVmap.find v m.lvars
 let logic (m: map) (l: logic_info) = Fmap.find l m.logics
+let garbage (m: map) (v : varinfo) = Vset.mem v m.gvars
 
 let rec move (r: node) (p: int) (s: int) =
   match (UF.get r).clayout with
@@ -625,7 +629,7 @@ let iter_parent_path parent f r =
          if equal r rg.data then f rg.length
       ) rgs
 
-let rec consolidate marked n =
+let rec consolidate gvars marked n =
   if not @@ UF.test_and_mark marked n then
     let node = UF.get n in
     let ps = UF.find_all node.cparents in
@@ -637,7 +641,7 @@ let rec consolidate marked n =
       Vset.iter
         (fun v ->
            path @@ Fields.bitsSizeOf v.vtype ;
-           flags @@ Attr.cvar v
+           flags @@ Attr.cvar ~garbage:(Vset.mem v gvars) v
         ) node.ccvars ;
       Bag.iter
         (function Root r ->
@@ -646,7 +650,7 @@ let rec consolidate marked n =
         ) node.croots ;
       List.iter
         (fun p ->
-           consolidate marked p ;
+           consolidate gvars marked p ;
            let parent = UF.get p in
            node.cdepth <- max node.cdepth (succ parent.cdepth) ;
            flags parent.cflags ;
@@ -910,7 +914,7 @@ let lock m =
   begin
     witer m UF.lock ;
     let marks = UF.marks () in
-    iter m (consolidate marks) ;
+    iter m (consolidate m.gvars marks) ;
   end
 
 (* -------------------------------------------------------------------------- *)

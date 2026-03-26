@@ -1,4 +1,5 @@
-[kernel] Parsing attributes.c (with preprocessing)
+[kernel] Parsing attributes.i (no preprocessing)
+[region] attributes.i:29: Warning: garbage has no object to apply on
 [region] Function job_disjoint:
   R0001: -R-- n (int) 32b (singleton) ;
   R0002: -R-- p (int *) 64b (*R0003) (singleton) ;

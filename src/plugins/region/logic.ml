@@ -109,7 +109,7 @@ let add_term_lval ~loc (env:env) (lv : term_lval) : domain =
         load env lv @@ addr_offset ~loc  env x.vtype r loffset
     end
 
-let add_addr_lval ~loc (env:env) (lv : term_lval) : typ * node =
+let add_addr_lval ~loc (env:env) ?(garbage=false) (lv : term_lval) : typ * node =
   let lhost, loffset = lv in
   match lhost with
   | TMem e ->
@@ -126,7 +126,9 @@ let add_addr_lval ~loc (env:env) (lv : term_lval) : typ * node =
       | VAL _ ->
         Options.fatal "address of logic value (%a)" Printer.pp_term_lval lv ;
       | VAR x ->
-        let r = Memory.add_cvar env.map x in
+        let garbage =
+          garbage && x.vformal && Ast_types.is_struct_or_union x.vtype in
+        let r = Memory.add_cvar ~garbage env.map x in
         addr_offset ~loc env x.vtype r loffset
     end
 
@@ -251,7 +253,8 @@ let () = rterm := add_term
 
 let add_path (env: env) Spec.{ named ; flags } = function
   | Spec.Alias(loc,lv) ->
-    snd @@ add_addr_lval ~loc env lv
+    let garbage = Attr.mem `Garbage flags in
+    snd @@ add_addr_lval ~loc ~garbage env lv
   | Spec.Field(loc,lv,f,g) ->
     let r = snd @@ add_addr_lval ~loc env lv in
     Memory.add_field_range r f g

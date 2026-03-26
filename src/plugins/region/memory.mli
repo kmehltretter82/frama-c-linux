@@ -86,7 +86,7 @@ val regions : map -> region list
 val iter : map -> (node -> unit) -> unit
 
 val fresh : map -> node
-val add_cvar : map -> Cil_types.varinfo -> node
+val add_cvar : map -> ?garbage:bool -> Cil_types.varinfo -> node
 val add_lvar : map -> Cil_types.logic_var -> domain
 val add_logic : map -> Cil_types.logic_info -> domain
 val add_result : map -> node
@@ -121,6 +121,7 @@ val index : node -> typ -> node
 val lval : map -> lval -> node
 val exp : map -> exp -> node option
 val result : map -> node option
+val garbage : map -> varinfo -> bool
 
 val ranges : node -> range list
 val points_to : node -> node option

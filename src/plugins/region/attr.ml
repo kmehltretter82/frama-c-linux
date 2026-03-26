@@ -56,20 +56,21 @@ open Cil_types
 let is_local v =
   not (v.vglob || v.vformal)
 
-let is_initialized v =
+let is_initialized ~garbage v =
   v.vglob || v.vdefined ||
-  ((v.vformal || v.vtemp) && not (Ast_types.is_struct_or_union v.vtype))
+  (v.vformal && not garbage) ||
+  (v.vtemp && not @@ Ast_types.is_struct_or_union v.vtype)
 
 let is_const v =
   (v.vformal || v.vglob || v.vdefined) &&
   Ast_types.is_const v.vtype
 
-let cvar v =
+let cvar ~garbage v =
   let flags = ref empty in
   let set f = flags := add f !flags in
   if is_local v then set `Allocated ;
   if is_const v then set `Readonly ;
-  if not @@ is_initialized v then set `Garbage ;
+  if not @@ is_initialized ~garbage v then set `Garbage ;
   !flags
 
 let null_or_valid ~loc ~from addr =
