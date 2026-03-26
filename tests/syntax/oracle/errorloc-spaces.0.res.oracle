@@ -4,6 +4,6 @@
   8     	/* The spaces and tabulations in the next line are not guaranteed to be
   9     	   kept by the preprocessor. This may lead to wrong column counting. */
   10    	int 	    x = t[xy];
-                   ^^
+        	    	          ^^
   11    }
 [kernel] Frama-C aborted: invalid user input.

@@ -20,7 +20,8 @@
   [list-functions] List written to: list-functions2.json
 
   $ cat list-functions2.json
-  [ { "extf": { "declarations": [ "list-functions2.h:1" ] } },
+  [ { "extf": { "declarations": [ "list-functions2.h:1",
+                                  "list-functions2.h:1" ] } },
     { "f": { "definitions": [ { "location": "find-fun2.c:6", "statements": 1 } ] } },
     { "false_positive": { "declarations": [ "find-fun2.c:21" ] } },
     { "g": { "definitions": [ { "location": "find-fun2.c:10", "statements": 3 } ] } },

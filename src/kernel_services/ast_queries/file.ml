@@ -385,7 +385,7 @@ let pretty_machdep ?fmt ?machdep () =
 
 let safe_remove_file (f : Filepath.t) =
   if not (Kernel.KeepTempFiles.get ()) then
-    Filesystem.remove_file f
+    Temp_files.cleanup_at_exit f
 
 let cpp_name cmd =
   let cmd = List.hd (String.split_on_char ' ' cmd) in

@@ -2,10 +2,13 @@
 [kernel] c23-bool-kws.c:32: 
   syntax error:
   Location: line 32, between columns 6 and 7, before or at token: b1
+          bool b1 = false ;
+              ^
+  in code pre-processed from the original source
   30    
   31    int main(void){
   32      BOOL b1 = FALSE ;
-              ^
+        ^^^^^^^^^^^^^^^^^^^
   33      BOOL b2 = TRUE ;
   34    }
 [kernel] Frama-C aborted: invalid user input.
