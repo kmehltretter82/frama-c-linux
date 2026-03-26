@@ -1,5 +1,7 @@
 /* run.config
    STDOPT: +"-machdep gcc_x86_64"
+   EXIT: 1
+   STDOPT: +"-machdep gcc_x86_64 -std=c23"
 */
 
 int normal(int n);

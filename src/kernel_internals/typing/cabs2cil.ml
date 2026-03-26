@@ -4422,16 +4422,22 @@ and makeVarInfoCabs
          Hence, at this point only formals can have a VLA type *)
       bt (Cabs.PARENTYPE(attrs, ndt, a))
   in
-  begin
+  let vtype =
     match vtype.tnode with
-    | TFun (_, None, _) ->
-      Kernel.warning ~current:true ~once:true ~wkey:Kernel.wkey_no_proto
-        "Function %s is declared without prototype.@ \
-         Its formals will be inferred from actual arguments at first call.@ \
-         Declare it as %s(void) if the function does not take any parameters."
-        n n
-    | _ -> ()
-  end;
+    | TFun (t, None, b) ->
+      if Kernel.CStd.get () >= Kernel.C23 then
+        mk_tfun ~tattr:vtype.tattr t (Some []) b
+      else
+        begin
+          Kernel.warning ~current:true ~once:true ~wkey:Kernel.wkey_no_proto
+            "Function %s is declared without prototype.@ \
+             Its formals will be inferred from actual arguments at first call.@ \
+             Declare it as %s(void) if the function does not take any parameters."
+            n n;
+          vtype
+        end
+    | _ -> vtype
+  in
   if Ast_attributes.contains "thread" nattr then begin
     let wkey = Kernel.wkey_inconsistent_specifier in
     let source = fst ldecl in
