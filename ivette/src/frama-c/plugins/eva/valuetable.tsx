@@ -1102,14 +1102,15 @@ function EvaTable(): JSX.Element {
 /* -------------------------------------------------------------------------- */
 /* --- Evaluation Modal                                                   --- */
 /* -------------------------------------------------------------------------- */
-interface ModalTextFielddProps {
+
+interface ModalTextFieldProps {
   attr: Ast.markerAttributesData;
 }
 
-function ModalEvaluate(props: ModalTextFielddProps)
-: React.JSX.Element {
+function ModalEvaluate(props: ModalTextFieldProps): React.JSX.Element {
   const { attr } = props;
   const state = useState('');
+  const value = state.value;
   const [fcts] = useGlobalState(ScopesManagerState);
   const [tac, setTic] = useGlobalState(ticValue);
 
@@ -1132,44 +1133,34 @@ function ModalEvaluate(props: ModalTextFielddProps)
     Server.send(Ast.parseExpr, data).then(addProbe).catch(handleError);
   }, [attr, fcts, tac, setTic]);
 
-  return <Modal
-      className='modal-evaluate'
-      label={`Eva: evaluate`}
-    >
-    <div>
-      <Hbox>
-        <Label>Evaluate from </Label>
-        <Code>{attr.descr}</Code>
-      </Hbox>
-      <Hbox>
+  return (
+    <Modal className='modal-evaluate' label={'Eva: evaluate'}>
+      <div>
+        <Hbox>
+          <Label>Evaluate from </Label>
+          <Code>{attr.descr}</Code>
+        </Hbox>
+        <Hbox>
           <TextField
             label=''
             state={state as FieldState<string | undefined>}
-            onKeyDown={(e) => {
-              if(e.key === "Enter")
-                  onValidate(state.value);
-              }
-            }
-            />
+            onKeyDown={(e) => { if (e.key === "Enter") onValidate(value); }}
+          />
           <Button
             label='Evaluate'
-            onClick={() => onValidate(state.value)}
-            />
-      </Hbox>
-    </div>
-  </Modal>;
+            onClick={() => onValidate(value)}
+          />
+        </Hbox>
+      </div>
+    </Modal>);
 }
 
-async function showModalEvaluate(
-  attr: Ast.markerAttributesData
-): Promise<void> {
-  showModal(<ModalEvaluate attr={attr} />);
+async function showEvaluate(attr: Ast.markerAttributesData): Promise<void> {
+  showModal(<ModalEvaluate attr={attr}/>);
 }
 
-/** Builds the 'evaluate' entries in the contextual menu about a given
- * marker.
- */
-export  function buildMenu(
+/* Builds the 'evaluate' entries in the contextual menu about a given marker. */
+export function buildMenu(
   menu: Dome.PopupMenuItem[],
   attr: Ast.markerAttributesData,
 ): void {
@@ -1177,7 +1168,7 @@ export  function buildMenu(
     menu.push({
       label: 'Evaluate',
       enabled: true,
-      onClick: () => showModalEvaluate(attr)
+      onClick: () => showEvaluate(attr)
     });
   }
 }

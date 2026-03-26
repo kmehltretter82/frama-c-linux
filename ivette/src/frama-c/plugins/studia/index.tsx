@@ -104,12 +104,11 @@ ASTview.registerMarkerMenuExtender(buildMenu);
 /* --- Modal                                                              --- */
 /* -------------------------------------------------------------------------- */
 
-interface ModalTextFielddProps {
+interface ModalTextFieldProps {
   attr: Ast.markerAttributesData;
 }
 
-function ModalStudiaSearch(props: ModalTextFielddProps)
-: React.JSX.Element {
+function ModalStudiaSearch(props: ModalTextFieldProps) : React.JSX.Element {
   const { attr } = props;
   const state = useState('');
   const [akind, setAkind] = React.useState<access>('Reads');
@@ -122,22 +121,25 @@ function ModalStudiaSearch(props: ModalTextFielddProps)
     }, [setError]);
 
   const onValidate = React.useCallback(async (p: string) => {
-    const marker = await Server.send(
-      Ast.parseLval, { stmt: attr.marker, term: p }
-    ).catch((err: string) => setError(err));
+    const data = { stmt: attr.marker, term: p };
+    const marker = await Server.send(Ast.parseLval, data).catch(setError);
     if (marker) {
       computeStudiaSelection(akind, marker, p, setError,
         (m: Ast.marker[]) => onSuccess(m, akind, p));
       }
   }, [akind, attr.marker, setError, onSuccess]);
 
+  const helpButton =
+    <IconButton
+      icon='HELP' size={15}
+      onClick={() => showHelp('eva-studia')}
+    />;
+
   return <Modal
-      className='modal-studia'
-      label={`Studia: ${attr.sloc?.base}`}
-      actions={<IconButton icon='HELP' size={15}
-        onClick={() => showHelp('eva-studia')} />
-      }
-    >
+    className='modal-studia'
+    label={`Studia: ${attr.sloc?.base}`}
+    actions={helpButton}
+  >
     <div>
       <Hbox>
         <ButtonGroup>
@@ -145,12 +147,12 @@ function ModalStudiaSearch(props: ModalTextFielddProps)
             label='Reads of'
             selected={akind === 'Reads'}
             onClick={() => setAkind('Reads')}
-            />
+          />
           <Button
             label='Writes to'
             selected={akind === 'Writes'}
             onClick={() => setAkind('Writes')}
-            />
+          />
         </ButtonGroup>
         <Code>{attr.descr}</Code>
       </Hbox>
@@ -160,30 +162,24 @@ function ModalStudiaSearch(props: ModalTextFielddProps)
           latency={0}
           autoFocus={true}
           state={state as FieldState<string | undefined>}
-          onKeyDown={(e) => {
-              if(e.key === "Enter")
-                onValidate(state.value);
-            }
-          }
+          onKeyDown={(e) => { if (e.key === "Enter") onValidate(state.value); }}
         />
         <Button
           label='Search'
           onClick={() => onValidate(state.value)}
-          />
+        />
       </Hbox>
       { error &&
         <Hbox>
           <Icon id='WARNING' kind='warning' />
           <span>{error}</span>
-        </Hbox>
-      }
+        </Hbox> }
     </div>
   </Modal>;
 }
 
-async function showModalStudia(
-  attr: Ast.markerAttributesData
-): Promise<void> {
+async function showModalStudia(attr: Ast.markerAttributesData): Promise<void> {
   showModal(<ModalStudiaSearch attr={attr} />);
 }
+
 /* -------------------------------------------------------------------------- */
