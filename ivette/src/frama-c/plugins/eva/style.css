@@ -472,23 +472,41 @@ tr:first-of-type > .eva-table-callsite-box {
 /* -------------------------------------------------------------------------- */
 .eva-status {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
   align-items: center;
-  margin:10%;
-
-  span {
-    font-size: 16px;
-    text-align: center;
-  }
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 
   button {
     margin: auto;
   }
 
-  .eva-status-icon,
-  .eva-status-icon svg{
-    fill: var(--background-softer);
+  .eva-status-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+
+    .eva-status-message {
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .eva-status-timer {
+      color: var(--text-discrete);
+    }
+
+    .eva-status-timer-hide {
+      display: none;
+    }
+
+    .eva-status-icon,
+    .eva-status-icon svg{
+      fill: var(--background-softer);
+    }
   }
 }
 
