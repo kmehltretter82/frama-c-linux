@@ -2156,7 +2156,7 @@ extern long double fmal(long double x, long double y, long double z);
   behavior finite_argument:
     assumes isfinite_f: \is_finite(f);
     ensures nonzero_result: \result > 0 || \result < 0;
-  behavior infinite_argument:
+  behavior nonfinite_argument:
     assumes nonfinite_f: !\is_finite(f);
     ensures zero_result: \result == 0;
   complete behaviors;
@@ -2169,7 +2169,7 @@ extern int __finitef(float f);
   behavior finite_argument:
     assumes isfinite_d: \is_finite(d);
     ensures nonzero_result: \result > 0 || \result < 0;
-  behavior infinite_argument:
+  behavior nonfinite_argument:
     assumes nonfinite_d: !\is_finite(d);
     ensures zero_result: \result == 0;
   complete behaviors;
@@ -2182,7 +2182,7 @@ extern int __finite(double d);
   behavior finite_argument:
     assumes isfinite: \is_finite(x);
     ensures nonzero_result: \result > 0 || \result < 0;
-  behavior infinite_argument:
+  behavior nonfinite_argument:
     assumes nonfinite: !\is_finite(x);
     ensures zero_result: \result == 0;
   complete behaviors;
