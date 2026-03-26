@@ -1123,7 +1123,7 @@ function ModalEvaluate(props: ModalTextFieldProps): React.JSX.Element {
       if (scope) {
         fcts.pin(scope, target);
         setTic(tac + 1);
-        Display.showMessage('New Probe');
+        Display.showMessage(`New expression ${pattern} in Values table`);
         Display.alertComponent('fc.eva.values');
       }
     };
@@ -1131,12 +1131,9 @@ function ModalEvaluate(props: ModalTextFieldProps): React.JSX.Element {
   }, [attr, fcts, tac, setTic]);
 
   return (
-    <Modal className='modal-evaluate' label={'Eva: evaluate'}>
+    <Modal className='modal-evaluate' label={'Eva: evaluate expression'}>
       <div>
-        <Hbox>
-          <Label>Evaluate from </Label>
-          <Code>{attr.descr}</Code>
-        </Hbox>
+        <Label>Compute the possible values of: </Label>
         <Hbox>
           <TextField
             label=''
@@ -1170,7 +1167,7 @@ export function buildMenu(
 ): void {
   if(evaComputationValue === 'computed' && attr.kind === 'STMT') {
     menu.push({
-      label: 'Evaluate',
+      label: 'Evaluate…',
       enabled: true,
       onClick: () => showEvaluate(attr)
     });
