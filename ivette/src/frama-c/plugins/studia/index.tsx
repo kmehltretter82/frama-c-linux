@@ -12,11 +12,11 @@ import * as Dome from 'dome';
 import * as Display from 'ivette/display';
 import { showHelp } from 'dome/help';
 import { FieldState, TextField, useState } from 'dome/layout/forms';
+import { Label } from 'dome/controls/labels';
 import { closeModal, Modal, showModal } from 'dome/dialogs';
 import { IconButton } from 'dome/controls/buttons';
 import { Button, ButtonGroup } from 'dome/frame/toolbars';
 import { Hbox } from 'dome/layout/boxes';
-import { Code } from 'dome/controls/labels';
 import { Icon } from 'dome/controls/icons';
 
 import * as Server from 'frama-c/server';
@@ -93,7 +93,7 @@ export function buildMenu(
       ]);
       return;
     case 'STMT':
-      menu.push({ label: 'Studia', onClick: () => showModalStudia(attr) });
+      menu.push({ label: 'Studia…', onClick: () => showModalStudia(attr) });
       return;
   }
 }
@@ -132,15 +132,21 @@ function ModalStudiaSearch(props: ModalTextFieldProps) : React.JSX.Element {
   const helpButton =
     <IconButton
       icon='HELP' size={15}
+      title='Open Studia documentation'
       onClick={() => showHelp('eva-studia')}
     />;
 
+  const readOrWrite = (akind === 'Reads') ? "read" : "write";
+
   return <Modal
     className='modal-studia'
-    label={`Studia: ${attr.sloc?.base}`}
+    label={'Studia'}
     actions={helpButton}
   >
     <div>
+      <Label>
+        Find all statements that may {readOrWrite} the given lvalue:
+      </Label>
       <Hbox>
         <ButtonGroup>
           <Button
@@ -154,9 +160,6 @@ function ModalStudiaSearch(props: ModalTextFieldProps) : React.JSX.Element {
             onClick={() => setAkind('Writes')}
           />
         </ButtonGroup>
-        <Code>{attr.descr}</Code>
-      </Hbox>
-      <Hbox>
         <TextField
           label=''
           latency={0}
