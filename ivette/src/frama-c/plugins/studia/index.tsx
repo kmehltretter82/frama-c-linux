@@ -37,8 +37,7 @@ async function computeStudiaSelection(
   marker: Ast.marker,
   descr: string,
   // Replaces the handleError function
-  onError?: (err: string) => void,
-  onSuccess?: (markers: Ast.marker[]) => void
+  onError?: (err: string) => void
 ): Promise<void> {
   const request = kind === 'Reads' ? getReadsLval : getWritesLval;
   const data = await Server.send(request, marker).catch((err: string) => {
@@ -60,7 +59,6 @@ async function computeStudiaSelection(
       plugin: 'Studia', label, markers: []
     });
   }
-  if(onSuccess) onSuccess(markers);
 }
 
 /** Builds the Studia entries in the contextual menu about a given marker.  */
@@ -114,20 +112,14 @@ function ModalStudiaSearch(props: ModalTextFieldProps) : React.JSX.Element {
   const [akind, setAkind] = React.useState<access>('Reads');
   const [error, setError] = React.useState<string | undefined>();
 
-  const onSuccess = React.useCallback(
-    (m: Ast.marker[], kind: access, descr: string) => {
-      if(m.length > 0) closeModal();
-      else setError(`No ${kind.toLowerCase()} to ${descr}`);
-    }, [setError]);
-
   const onValidate = React.useCallback(async (p: string) => {
     const data = { stmt: attr.marker, term: p };
     const marker = await Server.send(Ast.parseLval, data).catch(setError);
     if (marker) {
-      computeStudiaSelection(akind, marker, p, setError,
-        (m: Ast.marker[]) => onSuccess(m, akind, p));
-      }
-  }, [akind, attr.marker, setError, onSuccess]);
+      closeModal();
+      computeStudiaSelection(akind, marker, p, setError);
+    }
+  }, [akind, attr.marker, setError]);
 
   const helpButton =
     <IconButton
