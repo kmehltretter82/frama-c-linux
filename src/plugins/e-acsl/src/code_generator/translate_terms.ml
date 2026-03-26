@@ -401,6 +401,7 @@ and denominator_zero_guard ~loc ~ctx ~adata ~kf ~env ~name ?root denom =
   e, cond, adata, env
 
 and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
+  let t = Logic_normalizer.get_term t in
   let loc = t.term_loc in
   let open Current_loc.Operators in
   let<> UpdatedCurrentLoc = loc in
