@@ -7,15 +7,20 @@
 /* ************************************************************************ */
 
 import React from 'react';
-import { IconButton } from 'dome/controls/buttons';
-import * as Ivette from 'ivette';
-import * as States from 'frama-c/states';
-import * as EvaStats from 'frama-c/plugins/eva/api/stats';
-import { FlameGraph } from 'react-flame-graph';
 import AutoSizer, { Size } from 'react-virtualized-auto-sizer';
-import { EvaReady, EvaStatus } from './components/AnalysisStatus';
+import flamegraph from "d3-flame-graph";
+import { select, Selection } from 'd3-selection';
+
+import { IconButton } from 'dome/controls/buttons';
 import { Inset } from 'dome/frame/toolbars';
 import { useFlipSettings } from 'dome';
+
+import * as Ivette from 'ivette';
+
+import * as States from 'frama-c/states';
+import * as EvaStats from 'frama-c/plugins/eva/api/stats';
+
+import { EvaReady, EvaStatus } from './components/AnalysisStatus';
 
 // --- Flamegraph Table ---
 interface Flamegraph {
@@ -27,7 +32,7 @@ interface Flamegraph {
 
 const addNodeToFlamegraph = (
   flamegraph: Flamegraph,
-  cs: string[],
+  indexCs: number,
   row: EvaStats.flamegraphData,
 ): void => {
   /* Accumulate times for all nodes crossed. We do not rely on [row.totalTime]
@@ -36,26 +41,20 @@ const addNodeToFlamegraph = (
      each callstack from the selfTime of all available callstacks. */
   flamegraph.value += row.selfTime;
   // updating last node
-  if(cs.length === 0) {
+  if(indexCs === row.stackNames.length) {
     flamegraph.info = row;
   } else {
     // Search/create next node
-    let nextNode = flamegraph.children.find((elt) => elt.name === cs[0]);
+    let nextNode = flamegraph.children.find(
+      (elt) => elt.name === row.stackNames[indexCs]);
     if (!nextNode) {
-      nextNode = { name: cs[0], value: 0, children: [] };
+      nextNode = { name: row.stackNames[indexCs], value: 0, children: [] };
       flamegraph.children.unshift(nextNode);
     }
-    cs.shift();
     // Treatment of the next node
-    addNodeToFlamegraph(nextNode, cs, row);
+    addNodeToFlamegraph(nextNode, indexCs+1, row);
   }
 };
-
-interface EvaFlamegraphProps {
-  useScope: boolean;
-  flameGraph: Flamegraph;
-  size: Size
-}
 
 /* Round f to at most [decimal] decimals. */
 function round(f: number, decimal: number): number {
@@ -77,36 +76,62 @@ function nodeInfoText(flameGraph:Flamegraph, node:Flamegraph): string {
   return infos;
 }
 
-function EvaFlamegraph(props: EvaFlamegraphProps): JSX.Element {
-  const { useScope, flameGraph, size } = props;
+// --- Flamegraph Component ---
+export type FlameNode = { data: Flamegraph; };
+
+type Container = Selection<HTMLDivElement, FlameNode, null, undefined>;
+
+interface EvaFlamegraphProps {
+  useScope: boolean;
+  data: Flamegraph;
+  size: Size
+}
+
+export function EvaFlamegraph(props: EvaFlamegraphProps): JSX.Element {
+  const { useScope, data, size } = props;
   const { width, height } = size;
   const [ nodeInfos, setNodeInfos ] = React.useState("");
+  const ref = React.useRef<HTMLDivElement | null>(null);
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  const changeScope = (node:any): void => {
-    if (useScope) States.setCurrentScope(node.source.info.kfDecl);
-  };
+  React.useEffect(() => {
+    if (!ref.current) return;
 
-  return (
-    <>
-      <FlameGraph
-        data={flameGraph}
-        height={height}
-        width={width}
-        onChange={changeScope}
-        onMouseOver={(_e:Event, node:Flamegraph) => {
-          setNodeInfos(nodeInfoText(flameGraph, node));
-        }}
-        onMouseOut={() => { setNodeInfos(""); }}
-      />
-      {
-        nodeInfos &&
-        <div className='flame-details'>
-          {nodeInfos}
-        </div>
-      }
-    </>
-  );
+    const container: Container = select(ref.current);
+
+    function attachEvents(container: Container): void {
+      container
+        .selectAll<SVGRectElement, FlameNode>(".frame")
+        .on("mouseover", (_e: Event, node: FlameNode) => {
+          setNodeInfos(nodeInfoText(data, node.data));
+        })
+        .on("mouseout", () => setNodeInfos(""));
+    }
+
+    const chart = flamegraph()
+      .width(width)
+      .cellHeight(20)
+      .inverted(true)
+      .onClick((node: FlameNode) => {
+        if (useScope) States.setCurrentScope(node.data.info?.kfDecl);
+        attachEvents(container);
+      });
+
+    container.datum(data).call(chart);
+    // Remove tooltips
+    container.selectAll("title").remove();
+    attachEvents(container);
+  }, [data, width, height, useScope]);
+
+
+  return <>
+    <div ref={ref} />
+    {
+      nodeInfos &&
+      <div className='flame-details'>
+        {nodeInfos}
+      </div>
+    }
+  </>;
 }
 
 // --- Flamegraph Component ---
@@ -119,11 +144,7 @@ export function FlamegraphComponent(): JSX.Element {
     if(model.length === 0 ) return null;
     const mainName = model[0].stackNames[0];
     const flame: Flamegraph = { name: mainName, value: 0, children: [] };
-    model.forEach(row => {
-      const cs = row.stackNames;
-      cs.shift();
-      addNodeToFlamegraph(flame, cs, row);
-    });
+    model.forEach(row => addNodeToFlamegraph(flame, 1, row));
     return flame;
   }, [model]);
 
@@ -148,7 +169,7 @@ export function FlamegraphComponent(): JSX.Element {
             {(size: Size) => (
               <EvaFlamegraph
                 useScope={useScope}
-                flameGraph={flameGraph}
+                data={flameGraph}
                 size={size}
               />
             )}

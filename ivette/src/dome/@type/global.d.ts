@@ -17,7 +17,7 @@ declare module '*.png' {
   export default value;
 }
 
-declare module 'react-flame-graph';
+declare module 'd3-flame-graph';
 declare module 'react-pivottable/PivotTableUI';
 declare module 'react-pivottable/PivotTable';
 declare module 'react-pivottable/Utilities';
