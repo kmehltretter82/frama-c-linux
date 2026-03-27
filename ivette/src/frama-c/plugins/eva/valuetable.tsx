@@ -28,6 +28,7 @@ import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as ASTview from 'frama-c/kernel/ASTview';
 import * as Values from 'frama-c/plugins/eva/api/values';
+import * as Signals from 'frama-c/plugins/eva/api/signals';
 import * as Callstack from 'frama-c/plugins/eva/api/callstack';
 import { current as currentProject } from 'frama-c/kernel/api/project';
 import { MarkerText, Modifier, selectMarker, textToString }
@@ -1079,7 +1080,8 @@ function EvaTable(): JSX.Element {
     fcts.clear();
     setTic(tac + 1);
   };
-  Server.useSignal(Values.changed, clear);
+  Server.useSignal(Signals.computationState, clear);
+  Server.useSignal(Signals.currentCallstacks, () => setTic(tac+1));
 
   /* Builds the component */
   return (

@@ -189,12 +189,6 @@ type evaluations = {
   next: evaluation next;
 }
 
-let signal = Request.signal ~package ~name:"changed"
-    ~descr:(Md.plain "Emitted when EVA results has changed")
-
-let () = Analysis.register_computation_hook ~on:Computed
-    (fun _ -> Request.emit signal)
-
 (* -------------------------------------------------------------------------- *)
 (* --- Marker Utilities                                                   --- *)
 (* -------------------------------------------------------------------------- *)
@@ -504,7 +498,7 @@ let proxy =
     (module Proxy (val a) : EvaProxy)
   in
   let current = ref (make @@ Engine.current ()) in
-  let hook a = current := make a ; Request.emit signal in
+  let hook a = current := make a in
   Engine.register_hook hook ;
   fun () -> !current
 
@@ -622,6 +616,7 @@ let () =
   Request.register_sig ~package getValues
     ~kind:`GET ~name:"getValues"
     ~descr:(Md.plain "Abstract values for the given marker")
+    ~signals:Update.signals
     begin fun rq () ->
       let module A : EvaProxy = (val proxy ()) in
       let marker = get_tgt rq and callstack = get_cs rq in
