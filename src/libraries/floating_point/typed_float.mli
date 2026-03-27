@@ -56,6 +56,9 @@ val same_format : 'l format -> 'r format -> ('l, 'r) same_format
 (** Compare formats. *)
 val compare_format : 'l format -> 'r format -> int
 
+(** Hash of a format. *)
+val hash_format : 'f format -> int
+
 
 
 (** {2 Typed floating point numbers} *)
@@ -92,6 +95,16 @@ val is_nan : 'f t -> bool
 (** Cast a typed floating point number to a new given format.
     Rounding operations are performed when needed. *)
 val change_format : _ t -> 'f format -> 'f t
+
+(** [equal f1 f2] returns true if [f1] and [f2] have the same format and are
+    equal, false otherwise. *)
+val equal : 'l t -> 'r t -> bool
+
+(** Total order on two typed floats with possibly different formats. *)
+val compare : 'l t -> 'r t -> int
+
+(** Hash of a typed float. *)
+val hash : 'f t -> int
 
 
 
