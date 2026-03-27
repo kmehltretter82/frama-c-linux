@@ -111,6 +111,7 @@ export function EvaFlamegraph(props: EvaFlamegraphProps): JSX.Element {
       .width(width)
       .cellHeight(20)
       .inverted(true)
+      .transitionDuration(350)
       .onClick((node: FlameNode) => {
         if (useScope) States.setCurrentScope(node.data.info?.kfDecl);
         attachEvents(container);
