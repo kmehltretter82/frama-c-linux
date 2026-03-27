@@ -55,6 +55,7 @@ val pp_real : printer (** ℝ *)
 
 (* Greek letters. *)
 
+val pp_alpha : printer (** α *)
 val pp_pi : printer (** π *)
 val pp_lambda : printer (** λ *)
 val pp_mu : printer (** µ *)
@@ -64,9 +65,10 @@ module Capital : sig
   val pp_theta : printer (** Θ *)
 end
 
-(* Superscript *)
+(* Superscript/subscript *)
 
 val pp_super_int : Format.formatter -> int -> unit
+val pp_sub_int : Format.formatter -> int -> unit
 
 (* Other symbols. *)
 
