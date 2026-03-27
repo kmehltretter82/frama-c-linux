@@ -20,12 +20,11 @@ type parseinfo = {
   lexbuf : Lexing.lexbuf;
   menhir_pos: (Lexing.position * Lexing.position) MenhirLib.ErrorReports.buffer;
   mutable current_working_directory : Filepath.t option;
+  mutable current_origin : Filepos.t option;
+  origins : Filepos.t Datatype.Int.Hashtbl.t;
 }
 
 let current = ref None
-
-(* Used to temporarily store current line before knowing the current file *)
-let currentLine = ref None
 
 let startParsing fname lexer =
   (* We only support one open file at a time *)
@@ -37,45 +36,44 @@ let startParsing fname lexer =
       fname (Lexing.lexeme_start_p lexbuf).Lexing.pos_fname
   | None ->
     let scan_references = Kernel.EagerLoadSources.get () in
-    let filepath = Filepath.of_string fname in
-    match Parse_env.open_source ~scan_references filepath with
+    let path = Filepath.of_string fname in
+    match Parse_env.open_source ~scan_references path with
     | Error msg -> Kernel.fatal "%s" msg
     | Ok in_str ->
       let lexbuf = Lexing.from_string in_str in
       let menhir_pos, lexer = MenhirLib.ErrorReports.wrap lexer in
-      let i = { lexbuf; menhir_pos; current_working_directory = None } in
       (* Initialize lexer buffer. *)
       lexbuf.Lexing.lex_curr_p <-
-        { Lexing.pos_fname = Filepath.to_string_abs filepath;
+        { Lexing.pos_fname = Filepath.to_string_abs path;
           Lexing.pos_lnum  = 1;
           Lexing.pos_bol   = 0;
           Lexing.pos_cnum  = 0
         };
-      current := Some i;
+      current := Some
+          { lexbuf;
+            menhir_pos;
+            current_working_directory = None;
+            current_origin = None;
+            origins = Datatype.Int.Hashtbl.create 100;
+          };
       lexbuf, lexer
 
 let finishParsing () =
   match !current with
-  | None -> Kernel.fatal "Errorloc.finishParsing called while lexbuf is empty"
+  | None -> Kernel.fatal "Parsing called while lexbuf is empty"
   | Some _ -> current := None
+
+let update_origins current =
+  let line = current.lexbuf.lex_curr_p.pos_lnum in
+  let add_origin = Datatype.Int.Hashtbl.replace current.origins line in
+  Option.iter add_origin current.current_origin
 
 (* Call this function to announce a new line *)
 let newline () =
   let current = Option.get !current in
-  if !currentLine <> None then begin
-    (* line directive without file name; update line number *)
-    let pos = current.lexbuf.Lexing.lex_curr_p in
-    current.lexbuf.Lexing.lex_curr_p <-
-      { pos with
-        Lexing.pos_lnum = Option.get !currentLine;
-        Lexing.pos_bol = pos.Lexing.pos_cnum;
-      };
-    currentLine := None
-  end;
-  Lexing.new_line current.lexbuf
-
-let setCurrentLine (i: int) =
-  currentLine := Some i
+  Lexing.new_line current.lexbuf;
+  current.current_origin <- Option.map Filepos.incr_line current.current_origin;
+  update_origins current
 
 let setCurrentWorkingDirectory fp =
   let current = Option.get !current in
@@ -92,24 +90,52 @@ let is_special_file n =
      but it can't hurt to check. *)
   len = 0 || n.[0] = '<' && n.[len-1] = '>'
 
-let setCurrentFile n =
+let setCurrentLine ?(filename: string option) (line: int) =
   let current = Option.get !current in
-  let base = current.current_working_directory in
-  let norm = Filepath.of_string ?base n in
-  if not (is_special_file n) && not (Filesystem.exists norm)
-  then begin
-    currentLine := None;
-    Kernel.warning ~wkey:Kernel.wkey_line_directive ~once:true
-      "ignoring non-existing file '%a', referenced in a line directive"
-      Filepath.pretty norm
-  end else begin
-    let pos = current.lexbuf.Lexing.lex_curr_p in
-    current.lexbuf.Lexing.lex_curr_p <- {
-      pos with Lexing.pos_fname = Filepath.to_string_abs norm;
-               Lexing.pos_lnum = (Option.get !currentLine);
-               Lexing.pos_bol = pos.Lexing.pos_cnum;
-    }
-  end
+  match filename with
+  | Some filename ->
+    let base = current.current_working_directory in
+    let path = Filepath.of_string ?base filename in
+    if not (is_special_file filename) && not (Filesystem.exists path) then
+      (* do not change line number if directive refers to non-existing file *)
+      Kernel.warning ~wkey:Kernel.wkey_line_directive ~once:true
+        "ignoring non-existing file '%a', referenced in a line directive"
+        Filepath.pretty path
+    else
+      let new_origin = match current.current_origin with
+        | Some origin -> Filepos.update_line ~path ~line origin
+        | None -> Filepos.make ~path ~line ()
+      in
+      current.current_origin <- Some new_origin;
+      update_origins current
+  | None ->
+    match current.current_origin with
+    | None ->
+      (* Some test use #line directive to reduce changes in non-regression
+         tests. We update the current line to support this behavior, but the
+         position is likely meaningless. *)
+      current.lexbuf.lex_curr_p <-
+        { current.lexbuf.lex_curr_p with
+          pos_lnum = line;
+          pos_bol = current.lexbuf.lex_curr_p.pos_cnum;
+        };
+    | Some origin ->
+      let new_origin = Filepos.update_line ~line origin in
+      current.current_origin <- Some new_origin;
+      update_origins current
+
+let convert_pos pos =
+  let open Option.Operators in
+  let origin =
+    let* current = !current in
+    let line = pos.Lexing.pos_lnum in
+    let+ origin = Datatype.Int.Hashtbl.find_opt current.origins line in
+    Filepos.Preprocessed origin
+  in
+  Filepos.of_lexing_pos ?origin pos
+
+let convert_loc (pos_start, pos_end) =
+  convert_pos pos_start, convert_pos pos_end
 
 (* Prints the line(s) between start_pos and pos,
    plus up to [ctx] lines before and after (if they exist),
@@ -236,8 +262,7 @@ let parse_error ?loc msg =
     | Some loc -> loc
     | None ->
       if Stack.is_empty all_pos then
-        Fileloc.of_lexing_loc
-          (current.lexbuf.Lexing.lex_start_p, current.lexbuf.Lexing.lex_curr_p)
+        convert_loc (current.lexbuf.lex_start_p, current.lexbuf.lex_curr_p)
       else
         let _,start_pos = Stack.pop all_pos in
         let last_pos =
@@ -246,7 +271,7 @@ let parse_error ?loc msg =
           else
             fst (Stack.pop all_pos)
         in
-        Fileloc.of_lexing_loc (start_pos, last_pos)
+        convert_loc (start_pos, last_pos)
   in
   let pretty_token fmt token =
     (* prints more detailed information around the erroneous token;
@@ -271,9 +296,10 @@ let parse_error ?loc msg =
 
 (* More parsing support functions: line, file, char count *)
 let currentLoc () =
-  let i = Option.get !current in
-  Fileloc.of_lexing_loc
-    (Lexing.lexeme_start_p i.lexbuf, Lexing.lexeme_end_p i.lexbuf)
+  let current = Option.get !current in
+  let start_pos = Lexing.lexeme_start_p current.lexbuf
+  and end_pos = Lexing.lexeme_end_p current.lexbuf in
+  convert_loc (start_pos, end_pos)
 
 
 (** Handling of errors during parsing *)

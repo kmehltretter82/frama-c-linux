@@ -86,8 +86,8 @@ val is_known : t -> bool
 
 (** {2 Conversion from/to Lexing.position } *)
 
-(** Convert a [Lexing.position] to a [Filepos.t] *)
-val of_lexing_pos : Lexing.position -> t
+(** Convert a [Lexing.position] to a [Filepos.t]. *)
+val of_lexing_pos : ?origin:origin -> Lexing.position -> t
 
 (** Convert a [Filepos.t] to a [Lexing.position] *)
 val to_lexing_pos : t -> Lexing.position

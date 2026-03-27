@@ -97,14 +97,34 @@ include Datatype.Make_with_collections (struct
 include Prototype
 
 
-(** {2 Conversion from/to Lexing.position } *)
+(** {2 Origins } *)
 
-let of_lexing_pos (pos : Lexing.position) : t =
-  { path = Filepath.of_string pos.pos_fname;
+(** [origin_pos pos] gets the first direct origin position of [pos] if it
+    exists. *)
+let origin_pos (pos : t) : t option =
+  match pos.origin with
+  | Unknown | Original | Generated _ -> None
+  | Preprocessed pos | Included pos -> Some pos
+
+(** [origin_find path pos] recursively (deeply) finds an origin of [pos] that
+    matches the given path. *)
+let rec origin_find (path : Filepath.t) (pos : t) : t option  =
+  let open Option.Operators in
+  if Filepath.equal path pos.path
+  then Some pos
+  else
+    let* pos' = origin_pos pos in
+    origin_find path pos'
+
+
+(** {2 Construction and conversion } *)
+
+let of_lexing_pos ?(origin=Original) (pos : Lexing.position) : t =
+  { origin;
+    path = Filepath.of_string pos.pos_fname;
     line = pos.pos_lnum;
     column = pos.pos_cnum - pos.pos_bol;
     offset = pos.pos_cnum;
-    origin = Original
   }
 
 let to_lexing_pos (pos : t) : Lexing.position =
@@ -119,7 +139,14 @@ let to_lexing_pos (pos : t) : Lexing.position =
 
 let update_line ?path ~line pos =
   let path = Option.value ~default:pos.path path in
-  { pos with path; line }
+  let origin =
+    (* Find the path in the origin to see if we leave an included file or if we
+       are including a new one*)
+    match origin_find path pos with
+    | None -> Included pos
+    | Some pos -> pos.origin
+  in
+  make ~origin ~path ~line ()
 
 let incr_line pos =
   { pos with line = pos.line + 1 }

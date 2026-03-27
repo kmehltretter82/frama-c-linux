@@ -16,10 +16,10 @@
   open Logic_utils
 
   let loc (start_pos, end_pos) =
-    Fileloc.of_lexing_loc (start_pos, end_pos)
+    Errorloc.convert_loc (start_pos, end_pos)
 
   let pos pos =
-    Filepos.of_lexing_pos pos
+    Errorloc.convert_pos pos
 
   let loc_info lexpr_loc x = { lexpr_node = x; lexpr_loc }
   let loc_start x = fst x.lexpr_loc
