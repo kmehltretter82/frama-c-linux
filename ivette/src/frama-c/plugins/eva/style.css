@@ -504,10 +504,8 @@ tr:first-of-type > .eva-table-callsite-box {
   height: 100%;
   width: 100%;
   overflow: hidden;
+  padding: 5px;
 
-  button {
-    margin: auto;
-  }
 
   .eva-status-content {
     width: 100%;
@@ -521,6 +519,7 @@ tr:first-of-type > .eva-table-callsite-box {
     .eva-status-message {
       font-size: 16px;
       text-align: center;
+      margin-bottom: 10px;
     }
 
     .eva-status-timer {
@@ -533,7 +532,12 @@ tr:first-of-type > .eva-table-callsite-box {
 
     .eva-status-icon,
     .eva-status-icon svg{
+      bottom: 0;
       fill: var(--background-softer);
+    }
+
+    button {
+      align-self: center;
     }
   }
 }
@@ -548,11 +552,6 @@ tr:first-of-type > .eva-table-callsite-box {
 .labview-titlebar .dome-xIcon.eva-status-icon {
   cursor: default;
 }
-
-.eva-status-computing {
-  font-weight: bold;
-}
-
 
 /* -------------------------------------------------------------------------- */
 /* --- MThread                                                            --- */

@@ -12,10 +12,13 @@ import { Icon } from 'dome/controls/icons';
 import { GlobalState, useGlobalState } from 'dome/data/states';
 import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
+import { Button } from 'dome/controls/buttons';
+import { closeModal, Modal, showModal } from 'dome/dialogs';
 
 import * as Eva from 'frama-c/plugins/eva/api/analysis';
 import { evaBasicStatus } from 'frama-c/plugins/eva/EvaDefinitions';
 import { useSyncValue } from 'frama-c/states';
+import * as Server from 'frama-c/server';
 
 interface EvaReadyProps {
   children: React.ReactNode;
@@ -44,6 +47,16 @@ export function StatusIcon(props: StatusIconProp):JSX.Element {
       size={size}
     />
   );
+}
+
+function EvaLaunchButton(): JSX.Element | null {
+  return <Button
+      icon="MEDIA.PLAY"
+      label="Launch analysis"
+      title="Click to launch Eva analysis with
+        actual parameters or launch from Eva sidebar."
+      onClick={() => Server.send(Eva.compute, null)}
+    />;
 }
 
 export function EvaStatus(props: EvaStatusProp): JSX.Element | null {
@@ -85,17 +98,9 @@ function Timer({ start }: {start: number}): React.JSX.Element {
   return <Label className={className}>{timeToString(time)}</Label>;
 }
 
-const startComputing = new GlobalState<number>(0);
-
-export function EvaReady(props: EvaReadyProps): JSX.Element {
-  const { showChildrenForComputingStatus = false, children } = props;
-  const [start, setStart] = useGlobalState(startComputing);
+function useTimer(): React.JSX.Element | null {
   const status = useSyncValue(Eva.computationState);
-  const infosStatus = evaBasicStatus[status || "undefined"];
-  const showChildren = Boolean(
-    status === "aborted" || status === "computed" ||
-    (showChildrenForComputingStatus && status === "computing")
-  );
+  const [start, setStart] = useGlobalState(startComputing);
 
   React.useEffect(() => {
     // If start ≠ 0, this means the counter has already started.
@@ -104,14 +109,85 @@ export function EvaReady(props: EvaReadyProps): JSX.Element {
     else if(status !== "computing") setStart(0);
   }, [status, start, setStart]);
 
+  return start !== 0 ? <Timer start={start}/> : null;
+}
+
+const startComputing = new GlobalState<number>(0);
+
+export function EvaReady(props: EvaReadyProps): JSX.Element {
+  const { showChildrenForComputingStatus = false, children } = props;
+  const timer = useTimer();
+  const status = useSyncValue(Eva.computationState);
+  const infosStatus = evaBasicStatus[status || "undefined"];
+  const showChildren = Boolean(
+    status === "aborted" || status === "computed" ||
+    (showChildrenForComputingStatus && status === "computing")
+  );
+
   if(showChildren) return <>{children}</>;
   else return (
     <div className={"eva-status eva-status-"+status}>
       <div className='eva-status-content'>
         <div className="eva-status-message">{infosStatus.message}</div>
+        { status !== 'computing' && <EvaLaunchButton /> }
         <StatusIcon size={50} status={status} />
-        { status === "computing" && start !== 0 && <Timer start={start}/>}
+        { timer }
       </div>
     </div>
   );
+}
+/* -------------------------------------------------------------------------- */
+/* --- Modal                                                              --- */
+/* -------------------------------------------------------------------------- */
+
+function EvaModal({ callback }: { callback: () => void })
+: React.JSX.Element {
+  const status = useSyncValue(Eva.computationState);
+  const timer = useTimer();
+
+  /**
+   * The callback function is only called if the Eva modal window is still
+   * open at the end of the analysis.
+   * Closing the modal window is equivalent to abandoning the action.
+  */
+  React.useEffect(() => {
+    if(status === 'computed') {
+      callback();
+      closeModal();
+    }
+  }, [status, callback]);
+
+  return (
+    <Modal className='modal-eva' label={`Eva: Analysis not completed`} >
+      <div className={"eva-status eva-status-"+status}>
+        <div className='eva-status-content'>
+          <div className='eva-status-message'>
+            The requested action requires an Eva analysis.
+          </div>
+          <div className='eva-status-message'>
+            If you run the analysis here, once it is complete,
+            the action will be executed and the modal window will be closed.
+          </div>
+          <div className='eva-status-message'>
+            If the modal window is closed during the analysis,
+            the action will be abandoned.
+          </div>
+          <EvaLaunchButton />
+          <StatusIcon size={50} status={status} />
+          { timer }
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+function showEvaModal(callback: () => void): void {
+  showModal(<EvaModal callback={callback} />);
+}
+
+export async function evaNeeded(callback: () => void): Promise<void> {
+  const status = await Server.send(Eva.getComputationState, []);
+  if(status !== "computed")
+    showEvaModal(callback);
+  else callback();
 }

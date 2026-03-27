@@ -88,6 +88,8 @@
 .modal-studia {
   .dome-xBoxes-hbox {
     align-items: center;
+    padding: 5px;
+    max-width:100%;
 
     &:last-child>label:first-child { display: none;}
   }
