@@ -1236,7 +1236,7 @@ module Make
     let remaining_fuel = root_fuel () in
     (* By default, use the number of subdivision defined by the global option
        -eva-subdivide-non-linear. *)
-    let default () =  Parameters.LinearLevel.get () in
+    let default () =  Parameters.SubdivideNonLinear.get () in
     let subdivision = match subdivnb with None -> default () | Some n -> n in
     { state; context; root; subdivision; subdivided; remaining_fuel; oracle }
 

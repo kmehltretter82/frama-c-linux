@@ -21,13 +21,13 @@ let export_emitter = create_emitter "Eva_export" [ Emitter.Code_annot ]
 
 let get_slevel kf =
   try Parameters.SlevelFunction.find kf
-  with Not_found -> Parameters.SemanticUnrollingLevel.get ()
+  with Not_found -> Parameters.SLevel.get ()
 
 let get_subdivision_option stmt =
   try
     let kf = Kernel_function.find_englobing_kf stmt in
-    Parameters.LinearLevelFunction.find kf
-  with Not_found -> Parameters.LinearLevel.get ()
+    Parameters.SubdivideNonLinearFunction.find kf
+  with Not_found -> Parameters.SubdivideNonLinear.get ()
 
 let get_subdivision stmt =
   match Eva_annotations.get_subdivision_annot stmt with

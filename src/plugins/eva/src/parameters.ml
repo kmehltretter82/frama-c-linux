@@ -49,13 +49,13 @@ let add_precision_dep p =
 
 let () = List.iter add_correctness_dep kernel_parameters_correctness
 
-module ForceValues =
+module Eva =
   False
     (struct
       let option_name = "-eva"
       let help = "Run the Eva analysis."
     end)
-let () = ForceValues.add_aliases ~deprecated:true ["-val"]
+let () = Eva.add_aliases ~deprecated:true ["-val"]
 
 let domains = add_group "Abstract Domains"
 let precision_tuning = add_group "Precision vs. time"
@@ -110,14 +110,14 @@ let create_domain_option name =
        if _new then Domains.add name else remove_domain name)
 
 let () = Parameter_customize.set_group performance
-module NoResultsDomains =
+module NoResultsDomain =
   String_set
     (struct
       let option_name = "-eva-no-results-domain"
       let arg_name = "domains"
       let help = "Do not record the states of some domains during the analysis."
     end)
-let () = add_dep NoResultsDomains.parameter
+let () = add_dep NoResultsDomain.parameter
 
 (* List ((name, descr), priority) of available domains. *)
 let domains_ref : ((string * string) * int) list ref = ref []
@@ -176,7 +176,7 @@ let () =
     Datatype.String.Set.iter (check_domain option_name) domains
   in
   Domains.add_set_hook (hook Domains.name);
-  NoResultsDomains.add_set_hook (hook NoResultsDomains.name)
+  NoResultsDomain.add_set_hook (hook NoResultsDomain.name)
 
 let () = Parameter_customize.set_group domains
 module DomainsFunction =
@@ -297,7 +297,7 @@ module SecureFlow =
 let () = add_correctness_dep SecureFlow.parameter
 
 let () = Parameter_customize.set_group domains
-module Numerors_Mode =
+module NumerorsInteraction =
   String
     (struct
       let option_name = "-eva-numerors-interaction"
@@ -311,8 +311,8 @@ module Numerors_Mode =
       let arg_name = "relative|absolute|none|both"
     end)
 let () =
-  Numerors_Mode.set_possible_values ["relative"; "absolute"; "none"; "both"]
-let () = add_precision_dep Numerors_Mode.parameter
+  NumerorsInteraction.set_possible_values ["relative"; "absolute"; "none"; "both"]
+let () = add_precision_dep NumerorsInteraction.parameter
 
 let () = Parameter_customize.set_group domains
 module TracesUnrollLoop =
@@ -387,7 +387,7 @@ let () = add_precision_dep MultidimFastImprecise.parameter
 (* -------------------------------------------------------------------------- *)
 
 let () = Parameter_customize.set_group performance
-module NoResultsFunctions =
+module NoResultsFunction =
   Fundec_set
     (struct
       let option_name = "-eva-no-results-function"
@@ -395,7 +395,7 @@ module NoResultsFunctions =
       let help = "Do not record the values obtained for the statements of \
                   function f"
     end)
-let () = add_dep NoResultsFunctions.parameter
+let () = add_dep NoResultsFunction.parameter
 
 let () = Parameter_customize.set_group performance
 module ResultsAll =
@@ -527,7 +527,7 @@ let () = add_correctness_dep InitializedLocals.parameter
 (* ------------------------------------------------------------------------- *)
 
 let () = Parameter_customize.set_group initial_context
-module AutomaticContextMaxDepth =
+module ContextDepth =
   Int
     (struct
       let option_name = "-eva-context-depth"
@@ -536,11 +536,11 @@ module AutomaticContextMaxDepth =
       let help = "Use <n> as the depth of the default context for Eva. \
                   (defaults to 2)"
     end)
-let () = AutomaticContextMaxDepth.set_range ~min:0 ~max:max_int
-let () = add_correctness_dep AutomaticContextMaxDepth.parameter
+let () = ContextDepth.set_range ~min:0 ~max:max_int
+let () = add_correctness_dep ContextDepth.parameter
 
 let () = Parameter_customize.set_group initial_context
-module AutomaticContextMaxWidth =
+module ContextWidth =
   Int
     (struct
       let option_name = "-eva-context-width"
@@ -549,18 +549,18 @@ module AutomaticContextMaxWidth =
       let help = "Use <n> as the width of the default context for Eva. \
                   (defaults to 2)"
     end)
-let () = AutomaticContextMaxWidth.set_range ~min:1 ~max:max_int
-let () = add_correctness_dep AutomaticContextMaxWidth.parameter
+let () = ContextWidth.set_range ~min:1 ~max:max_int
+let () = add_correctness_dep ContextWidth.parameter
 
 let () = Parameter_customize.set_group initial_context
-module AllocatedContextValid =
+module ContextValidPointers =
   False
     (struct
       let option_name = "-eva-context-valid-pointers"
       let help = "Only allocate valid pointers until context-depth, \
                   and then use NULL (defaults to false)"
     end)
-let () = add_correctness_dep AllocatedContextValid.parameter
+let () = add_correctness_dep ContextValidPointers.parameter
 
 let () = Parameter_customize.set_group initial_context
 module InitializationPaddingGlobals =
@@ -662,7 +662,7 @@ let () = add_precision_dep RecursiveUnroll.parameter
 (* --- Partitioning --- *)
 
 let () = Parameter_customize.set_group precision_tuning
-module SemanticUnrollingLevel =
+module SLevel =
   Zero
     (struct
       let option_name = "-eva-slevel"
@@ -672,8 +672,8 @@ module SemanticUnrollingLevel =
          The larger n, the more precise and expensive the analysis \
          (defaults to 0)"
     end)
-let () = SemanticUnrollingLevel.set_range ~min:0 ~max:max_int
-let () = add_precision_dep SemanticUnrollingLevel.parameter
+let () = SLevel.set_range ~min:0 ~max:max_int
+let () = add_precision_dep SLevel.parameter
 
 let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
@@ -929,7 +929,7 @@ module BuiltinsList =
     end)
 
 let () = Parameter_customize.set_group precision_tuning
-module LinearLevel =
+module SubdivideNonLinear =
   Zero
     (struct
       let option_name = "-eva-subdivide-non-linear"
@@ -939,11 +939,11 @@ module LinearLevel =
          appears multiple times, by splitting its value at most n times. \
          Defaults to 0."
     end)
-let () = LinearLevel.set_range ~min:0 ~max:max_int
-let () = add_precision_dep LinearLevel.parameter
+let () = SubdivideNonLinear.set_range ~min:0 ~max:max_int
+let () = add_precision_dep SubdivideNonLinear.parameter
 
 let () = Parameter_customize.set_group precision_tuning
-module LinearLevelFunction =
+module SubdivideNonLinearFunction =
   Kernel_function_map
     (Value_int)
     (struct
@@ -953,11 +953,11 @@ module LinearLevelFunction =
                   when analyzing the function <f>."
       let default = Kernel_function.Map.empty
     end)
-let () = add_precision_dep LinearLevelFunction.parameter
+let () = add_precision_dep SubdivideNonLinearFunction.parameter
 
 let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.argument_may_be_fundecl ()
-module UsePrototype =
+module UseSpec =
   Kernel_function_set
     (struct
       let option_name = "-eva-use-spec"
@@ -965,7 +965,7 @@ module UsePrototype =
       let help = "Use the ACSL specification of the functions instead of \
                   their definitions"
     end)
-let () = add_correctness_dep UsePrototype.parameter
+let () = add_correctness_dep UseSpec.parameter
 
 let () = Parameter_customize.set_group precision_tuning
 module SkipLibcSpecs =
@@ -989,7 +989,7 @@ module RmAssert =
 let () = add_precision_dep RmAssert.parameter
 
 let () = Parameter_customize.set_group precision_tuning
-module MemExecAll =
+module Memexec =
   True
     (struct
       let option_name = "-eva-memexec"
@@ -1023,7 +1023,7 @@ let () = ArrayPrecisionLevel.add_update_hook
 module Verbose = Self.Verbose
 
 let () = Parameter_customize.set_group messages
-module ValShowPerf =
+module ShowPerf =
   False
     (struct
       let option_name = "-eva-show-perf"
@@ -1032,7 +1032,7 @@ module ValShowPerf =
     end)
 
 let () = Parameter_customize.set_group messages
-module ValPerfFlamegraphs =
+module Flamegraph =
   Filepath
     (struct
       let option_name = "-eva-flamegraph"
@@ -1323,9 +1323,9 @@ let () =
   ForcePrintSummary.add_set_hook hook
 
 let deprecated_aliases : ((module Parameter_sig.S) * string) list =
-  [ (module SemanticUnrollingLevel), "-slevel"
+  [ (module SLevel), "-slevel"
   ; (module SlevelFunction), "-slevel-function"
-  ; (module NoResultsFunctions), "-no-results-function"
+  ; (module NoResultsFunction), "-no-results-function"
   ; (module ResultsAll), "-results"
   ; (module JoinResults), "-val-join-results"
   ; (module AllRoundingModesConstants), "-all-rounding-modes-constants"
@@ -1337,9 +1337,9 @@ let deprecated_aliases : ((module Parameter_sig.S) * string) list =
   ; (module WarnCopyIndeterminate), "-val-warn-copy-indeterminate"
   ; (module ReduceOnLogicAlarms), "-val-reduce-on-logic-alarms"
   ; (module InitializedLocals), "-val-initialized-locals"
-  ; (module AutomaticContextMaxDepth), "-context-depth"
-  ; (module AutomaticContextMaxWidth), "-context-width"
-  ; (module AllocatedContextValid), "-context-valid-pointers"
+  ; (module ContextDepth), "-context-depth"
+  ; (module ContextWidth), "-context-width"
+  ; (module ContextValidPointers), "-context-valid-pointers"
   ; (module InitializationPaddingGlobals), "-val-initialization-padding-globals"
   ; (module WideningDelay), "-wlevel"
   ; (module SlevelMergeAfterLoop), "-val-slevel-merge-after-loop"
@@ -1349,15 +1349,15 @@ let deprecated_aliases : ((module Parameter_sig.S) * string) list =
   ; (module BuiltinsOverrides), "-val-builtin"
   ; (module BuiltinsAuto), "-val-builtins-auto"
   ; (module BuiltinsList), "-val-builtins-list"
-  ; (module LinearLevel), "-val-subdivide-non-linear"
-  ; (module UsePrototype), "-val-use-spec"
+  ; (module SubdivideNonLinear), "-val-subdivide-non-linear"
+  ; (module UseSpec), "-val-use-spec"
   ; (module SkipLibcSpecs), "-val-skip-stdlib-specs"
   ; (module RmAssert), "-remove-redundant-alarms"
-  ; (module MemExecAll), "-memexec-all"
+  ; (module Memexec), "-memexec-all"
   ; (module ArrayPrecisionLevel), "-plevel"
   ; (module ValShowProgress), "-val-show-progress"
-  ; (module ValShowPerf), "-val-show-perf"
-  ; (module ValPerfFlamegraphs), "-val-flamegraph"
+  ; (module ShowPerf), "-val-show-perf"
+  ; (module Flamegraph), "-val-flamegraph"
   ; (module ShowSlevel), "-val-show-slevel"
   ; (module PrintCallstacks), "-val-print-callstacks"
   ; (module InterpreterMode), "-val-interpreter-mode"
@@ -1449,10 +1449,10 @@ let () =
   bind (module AutoLoopUnroll) (get auto_unroll);
   bind (module WideningDelay) (fun n -> 1 + n / 2);
   bind (module HistoryPartitioning) (fun n -> (n - 1) / 5);
-  bind (module SemanticUnrollingLevel) (get slevel_power);
+  bind (module SLevel) (get slevel_power);
   bind (module ILevel) (get ilevel_power);
   bind (module ArrayPrecisionLevel) (get plevel_power);
-  bind (module LinearLevel) (fun n -> n * 20);
+  bind (module SubdivideNonLinear) (fun n -> n * 20);
   bind (module RmAssert) (fun n -> n > 0);
   bind (module Domains) (fun n -> Datatype.String.Set.of_list (domains n));
   bind (module SplitReturn) (fun n -> if n > 3 then SplitAuto else NoSplit);

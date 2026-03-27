@@ -49,7 +49,7 @@ let is_determinate kf =
 let subdivide_stmt = Eva_utils.get_subdivision
 
 let subdivide_pos ~pos = match Position.stmt pos with
-  | None -> Parameters.LinearLevel.get ()
+  | None -> Parameters.SubdivideNonLinear.get ()
   | Some stmt -> subdivide_stmt stmt
 
 (* Used to disambiguate files for Frama_C_dump_each_file directives. *)
