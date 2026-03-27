@@ -17,6 +17,8 @@ import { EvaStatus } from 'frama-c/plugins/eva/components/AnalysisStatus';
 import { SidebarTitle } from 'dome/frame/sidebars';
 import { HelpButton } from 'dome/help';
 
+export let evaComputationValue:
+  Eva.computationStateType | undefined = undefined;
 
 export interface EvaToolsProps {
   remote: Forms.BufferController;
@@ -29,6 +31,9 @@ export default function EvaTools(
   const { remote, iconSize } = props;
 
   const evaComputed = States.useSyncValue(Eva.computationState);
+
+  React.useEffect(() => { evaComputationValue = evaComputed; }, [evaComputed]);
+
   const countErrors = remote.getErrors();
   remote.resetNotified();
 

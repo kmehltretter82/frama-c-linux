@@ -8,26 +8,31 @@
 
 import React from 'react';
 import _ from 'lodash';
-import * as Dome from 'dome';
-import * as System from 'dome/system';
-import { GlobalState, useGlobalState } from 'dome/data/states';
+
 import * as Ivette from 'ivette';
 import * as Display from 'ivette/display';
+
+import * as Dome from 'dome';
+import { GlobalState, useGlobalState } from 'dome/data/states';
+import { classes } from 'dome/misc/utils';
+import { Icon } from 'dome/controls/icons';
+import { Button, Inset } from 'dome/frame/toolbars';
+import { Cell, Code, Label } from 'dome/controls/labels';
+import { IconButton } from 'dome/controls/buttons';
+import { Filler, Hpack, Hfill, Vpack, Vfill, Hbox } from 'dome/layout/boxes';
+import { Modal, showModal, closeModal } from 'dome/dialogs';
+import { FieldState, TextField, useState } from 'dome/layout/forms';
+
 import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
-import * as Eva from 'frama-c/plugins/eva/api/analysis';
+import * as ASTview from 'frama-c/kernel/ASTview';
 import * as Values from 'frama-c/plugins/eva/api/values';
-import { EvaReady, EvaStatus } from './components/AnalysisStatus';
 import { current as currentProject } from 'frama-c/kernel/api/project';
-
-import { classes } from 'dome/misc/utils';
-import { Icon } from 'dome/controls/icons';
-import { Inset } from 'dome/frame/toolbars';
-import { Cell, Code } from 'dome/controls/labels';
-import { IconButton } from 'dome/controls/buttons';
 import { MarkerText, Modifier, selectMarker } from 'frama-c/richtext';
-import { Filler, Hpack, Hfill, Vpack, Vfill } from 'dome/layout/boxes';
+
+import { EvaReady, EvaStatus } from './components/AnalysisStatus';
+import { evaComputationValue } from './components/Tools';
 
 /* -------------------------------------------------------------------------- */
 /* --- Miscellaneous definitions                                          --- */
@@ -875,78 +880,6 @@ class ScopesManager {
 }
 
 /* -------------------------------------------------------------------------- */
-
-
-
-/* -------------------------------------------------------------------------- */
-/* --- Evaluation Mode Handling                                           --- */
-/* -------------------------------------------------------------------------- */
-
-interface EvaluationModeProps {
-  computationState: Eva.computationStateType | undefined;
-  marker: Ast.marker | undefined;
-  setLocPin: (scope: Ast.decl, loc: Ast.marker, pin: boolean) => void;
-}
-
-const evalShortcut = System.platform === 'macos' ? 'Cmd+E' : 'Ctrl+E';
-const evalMode: Ivette.SearchProps = {
-  id: 'frama-c.eva.evalMode',
-  label: 'Evaluation',
-  title: `Evaluate an ACSL expression (shortcut: ${evalShortcut})`,
-  icon: 'TERMINAL',
-  className: 'eva-evaluation-mode',
-  enabled: false,
-};
-
-Dome.addMenuItem({
-  menu: 'Edit',
-  id: evalMode.id,
-  label: 'Evaluate',
-  key: 'Cmd+E',
-  enabled: false,
-  onClick: () => Ivette.focusSearchMode(evalMode.id),
-});
-
-Ivette.registerSearchMode(evalMode);
-
-function useEvaluationMode(props: EvaluationModeProps): void {
-  const { computationState, marker, setLocPin } = props;
-  const enabled = computationState === 'computed' && marker !== undefined;
-  React.useEffect(() => {
-    if (enabled) {
-      const onEnter = (pattern: string): void => {
-        const data = { stmt: marker, term: pattern };
-        const handleError = (err: string): void => {
-          const label = 'Evaluation Error';
-          const title = `${pattern} could not be evaluated: ${err}.`;
-          Display.showWarning({ label, title });
-        };
-        const addProbe = (target: Ast.marker): void => {
-          const scope = States.getMarker(marker).scope;
-          if (scope) {
-            setLocPin(scope, target, true);
-            Display.showMessage('New Probe');
-            Display.alertComponent('fc.eva.values');
-          }
-        };
-        Server.send(Ast.parseExpr, data).then(addProbe).catch(handleError);
-      };
-      Ivette.updateSearchMode({ id: evalMode.id, enabled: true, onEnter });
-    } else {
-      Ivette.updateSearchMode({ id: evalMode.id, enabled: false });
-    }
-  }, [enabled, marker, setLocPin]);
-  React.useEffect(
-    () => Dome.setMenuItem({ id: evalMode.id, enabled })
-    , [enabled]
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-
-
-
-/* -------------------------------------------------------------------------- */
 /* --- Eva Table Complete Component                                       --- */
 /* -------------------------------------------------------------------------- */
 
@@ -954,7 +887,7 @@ function useEvaluationMode(props: EvaluationModeProps): void {
 export const CallstackState = new GlobalState<callstack>('Summary');
 const ScopesManagerState = new GlobalState(new ScopesManager());
 const FocusState = new GlobalState<Probe | undefined>(undefined);
-
+const ticValue = new GlobalState<number>(0);
 
 export function clearGlobalState(): void {
   CallstackState.setValue('Summary');
@@ -983,7 +916,9 @@ function EvaTable(): JSX.Element {
    * value (here tac) explicitly. We need to force the update as modifications
    * of the Scope Manager internal data does NOT trigger the component
    * update. */
+  const [globalTac, ] = useGlobalState(ticValue);
   const [tac, setTic] = React.useState(0);
+  React.useEffect(() => setTic(t => t+1), [globalTac]);
 
   /* Event use to communicate when a location is selected. Used to scroll
    * related column into view if needed */
@@ -1131,10 +1066,6 @@ function EvaTable(): JSX.Element {
   }, [cs, setCS, getCallsites, marker]);
   const { result: stackInfos } = Dome.usePromise(stackInfosPromise);
 
-  /* Handle Evaluation mode */
-  const computationState = States.useSyncValue(Eva.computationState);
-  useEvaluationMode({ computationState, marker, setLocPin });
-
   /* Clear the table when Eva values change. */
   const clear = (): void => {
     fcts.clear();
@@ -1167,6 +1098,83 @@ function EvaTable(): JSX.Element {
   );
 
 }
+
+/* -------------------------------------------------------------------------- */
+/* --- Evaluation Modal                                                   --- */
+/* -------------------------------------------------------------------------- */
+
+interface ModalTextFieldProps {
+  attr: Ast.markerAttributesData;
+}
+
+function ModalEvaluate(props: ModalTextFieldProps): React.JSX.Element {
+  const { attr } = props;
+  const state = useState('');
+  const value = state.value;
+  const [error, setError] = React.useState<string | undefined>();
+  const [fcts] = useGlobalState(ScopesManagerState);
+  const [tac, setTic] = useGlobalState(ticValue);
+
+  const onValidate = React.useCallback((pattern: string): void => {
+    const data = { stmt: attr.marker, term: pattern };
+    const addProbe = (target: Ast.marker): void => {
+      closeModal();
+      const scope = States.getMarker(attr.marker).scope;
+      if (scope) {
+        fcts.pin(scope, target);
+        setTic(tac + 1);
+        Display.showMessage(`New expression ${pattern} in Values table`);
+        Display.alertComponent('fc.eva.values');
+      }
+    };
+    Server.send(Ast.parseExpr, data).then(addProbe).catch(setError);
+  }, [attr, fcts, tac, setTic]);
+
+  return (
+    <Modal className='modal-evaluate' label={'Eva: evaluate expression'}>
+      <div>
+        <Label>Compute the possible values of: </Label>
+        <Hbox>
+          <TextField
+            label=''
+            latency={0}
+            autoFocus={true}
+            state={state as FieldState<string | undefined>}
+            onKeyDown={(e) => { if (e.key === "Enter") onValidate(value); }}
+          />
+          <Button
+            label='Evaluate'
+            onClick={() => onValidate(value)}
+          />
+        </Hbox>
+        { error &&
+          <Hbox>
+            <Icon id='WARNING' kind='warning' />
+            <span>{error}</span>
+          </Hbox> }
+      </div>
+    </Modal>);
+}
+
+async function showEvaluate(attr: Ast.markerAttributesData): Promise<void> {
+  showModal(<ModalEvaluate attr={attr}/>);
+}
+
+/* Builds the 'evaluate' entries in the contextual menu about a given marker. */
+export function buildMenu(
+  menu: Dome.PopupMenuItem[],
+  attr: Ast.markerAttributesData,
+): void {
+  if(evaComputationValue === 'computed' && attr.kind === 'STMT') {
+    menu.push({
+      label: 'Evaluate…',
+      enabled: true,
+      onClick: () => showEvaluate(attr)
+    });
+  }
+}
+
+ASTview.registerMarkerMenuExtender(buildMenu);
 
 /* Registers the component in Ivette */
 Ivette.registerComponent({

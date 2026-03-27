@@ -81,3 +81,15 @@
     }
   }
 }
+
+.modal-evaluate,
+.modal-studia {
+  .dome-xBoxes-hbox {
+    align-items: center;
+
+    &:last-child>label:first-child { display: none;}
+  }
+  .dome-xModal-body {
+    padding: 10px;
+  }
+}
