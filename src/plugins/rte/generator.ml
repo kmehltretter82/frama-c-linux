@@ -27,7 +27,7 @@ module Make
        val name:string
        val parameter: Typed_parameter.t
        val additional_parameters: Typed_parameter.t list
-       val active: kernel_function -> bool
+       val kernel_active: unit -> bool
      end)
 =
 struct
@@ -49,20 +49,18 @@ struct
     (* Nothing to do for functions without body. *)
     let default kf = not (Kernel_function.is_definition kf) in
     fun kf ->
-      begin
-        (* TODO: Ok, this is far from perfect. Since the kernel does not
-           centralize alarms management, one might ask RTE whether alarms
-           have been emitted even if RTE itself has not been started. In
-           this case, if RTE is configured to use Eva results, it checks
-            whether Eva emitted this alarms and when it has, it update the
-           internal of RTE accordingly.
-        *)
-        if M.active kf
-        && Options.use_eva_results ()
-        && Eva_analysis.is_computed kf
-        then H.replace kf true
-      end ;
-      H.memo default kf
+      (* TODO: Ok, this is far from perfect. Since the kernel does not
+         centralize alarms management, one might ask RTE whether alarms
+         have been emitted even if RTE itself has not been started. In
+         this case, if RTE is configured to use Eva results, it checks
+         whether Eva emitted these alarms.
+      *)
+      if M.kernel_active ()
+      && Options.use_eva_results ()
+      && Eva_analysis.is_computed kf
+      then true
+      else H.memo default kf
+
   let set = H.replace
   let self = H.self
   let accessor = M.name, set, is_computed
@@ -79,7 +77,7 @@ module Initialized =
       let name = "initialized"
       let parameter = Options.DoInitialized.parameter
       let additional_parameters = [ ]
-      let active kf = Options.DoInitialized.mem kf
+      let kernel_active () = true
     end)
 
 module Mem_access =
@@ -88,7 +86,7 @@ module Mem_access =
       let name = "mem_access"
       let parameter = Options.DoMemAccess.parameter
       let additional_parameters = [ Kernel.SafeArrays.parameter ]
-      let active _ = Options.DoMemAccess.get ()
+      let kernel_active () = true
     end)
 
 module Pointer_alignment =
@@ -97,7 +95,7 @@ module Pointer_alignment =
       let name = "pointer_alignment"
       let parameter = Kernel.UnalignedPointer.parameter
       let additional_parameters = []
-      let active _ = Kernel.UnalignedPointer.get ()
+      let kernel_active () = Kernel.UnalignedPointer.get ()
     end)
 
 module Pointer_value =
@@ -106,7 +104,7 @@ module Pointer_value =
       let name = "pointer_value"
       let parameter = Kernel.InvalidPointer.parameter
       let additional_parameters = []
-      let active _ = Kernel.InvalidPointer.get ()
+      let kernel_active () = Kernel.InvalidPointer.get ()
     end)
 
 module Pointer_call =
@@ -115,7 +113,7 @@ module Pointer_call =
       let name = "pointer_call"
       let parameter = Options.DoPointerCall.parameter
       let additional_parameters = []
-      let active _ = Options.DoPointerCall.get()
+      let kernel_active () = true
     end)
 
 module Div_mod =
@@ -124,7 +122,7 @@ module Div_mod =
       let name = "division_by_zero"
       let parameter = Options.DoDivMod.parameter
       let additional_parameters = []
-      let active _ = Options.DoDivMod.get()
+      let kernel_active () = true
     end)
 
 module Shift =
@@ -133,7 +131,7 @@ module Shift =
       let name = "shift_value_out_of_bounds"
       let parameter = Options.DoShift.parameter
       let additional_parameters = []
-      let active _ = Options.DoShift.get()
+      let kernel_active () = true
     end)
 
 module Left_shift_negative =
@@ -142,7 +140,7 @@ module Left_shift_negative =
       let name = "left_shift_negative"
       let parameter = Kernel.LeftShiftNegative.parameter
       let additional_parameters = []
-      let active _ = Kernel.LeftShiftNegative.get()
+      let kernel_active () = Kernel.LeftShiftNegative.get()
     end)
 
 module Right_shift_negative =
@@ -151,7 +149,7 @@ module Right_shift_negative =
       let name = "right_shift_negative"
       let parameter = Kernel.RightShiftNegative.parameter
       let additional_parameters = []
-      let active _ = Kernel.RightShiftNegative.get()
+      let kernel_active () = Kernel.RightShiftNegative.get()
     end)
 
 module Signed_overflow =
@@ -160,7 +158,7 @@ module Signed_overflow =
       let name = "signed_overflow"
       let parameter = Kernel.SignedOverflow.parameter
       let additional_parameters = []
-      let active _ = Kernel.SignedOverflow.get()
+      let kernel_active () = Kernel.SignedOverflow.get()
     end)
 
 module Signed_downcast =
@@ -169,7 +167,7 @@ module Signed_downcast =
       let name = "downcast"
       let parameter = Kernel.SignedDowncast.parameter
       let additional_parameters = []
-      let active _ = Kernel.SignedDowncast.get()
+      let kernel_active () = Kernel.SignedDowncast.get()
     end)
 
 module Unsigned_overflow =
@@ -178,7 +176,7 @@ module Unsigned_overflow =
       let name = "unsigned_overflow"
       let parameter = Kernel.UnsignedOverflow.parameter
       let additional_parameters = []
-      let active _ = Kernel.UnsignedOverflow.get()
+      let kernel_active () = Kernel.UnsignedOverflow.get()
     end)
 
 module Unsigned_downcast =
@@ -187,7 +185,7 @@ module Unsigned_downcast =
       let name = "unsigned_downcast"
       let parameter = Kernel.UnsignedDowncast.parameter
       let additional_parameters = []
-      let active _ = Kernel.UnsignedDowncast.get()
+      let kernel_active () = Kernel.UnsignedDowncast.get()
     end)
 
 module Pointer_downcast =
@@ -196,7 +194,7 @@ module Pointer_downcast =
       let name = "pointer_downcast"
       let parameter = Kernel.PointerDowncast.parameter
       let additional_parameters = []
-      let active _ = Kernel.PointerDowncast.get()
+      let kernel_active () = Kernel.PointerDowncast.get()
     end)
 
 module Float_to_int =
@@ -205,7 +203,7 @@ module Float_to_int =
       let name = "float_to_int"
       let parameter = Options.DoFloatToInt.parameter
       let additional_parameters = []
-      let active _ = Options.DoFloatToInt.get()
+      let kernel_active () = true
     end)
 
 
@@ -215,7 +213,7 @@ module Finite_float =
       let name = "finite_float"
       let parameter = Kernel.SpecialFloat.parameter
       let additional_parameters = []
-      let active _ = Kernel.SpecialFloat.get() <> "none"
+      let kernel_active () = Kernel.SpecialFloat.get() <> "none"
     end)
 
 module Bool_value =
@@ -224,7 +222,7 @@ module Bool_value =
       let name = "bool_value"
       let parameter = Kernel.InvalidBool.parameter
       let additional_parameters = []
-      let active _ = Kernel.InvalidBool.get()
+      let kernel_active () = Kernel.InvalidBool.get()
     end)
 
 (** DO NOT CALL Make AFTER THIS POINT *)
