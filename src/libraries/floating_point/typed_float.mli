@@ -54,7 +54,7 @@ type ('l, 'r) same_format =
 val same_format : 'l format -> 'r format -> ('l, 'r) same_format
 
 (** Compare formats. *)
-val compare : 'l format -> 'r format -> int
+val compare_format : 'l format -> 'r format -> int
 
 
 

@@ -78,7 +78,7 @@ module Make (Model : Modeling) = struct
     | Repr l, Repr r ->
       let conclude_they_are_equal = 0 in
       let ( let= ) c f = if c = 0 then f `Eq else c in
-      let= `Eq = Typed_float.compare l.format r.format in
+      let= `Eq = Typed_float.compare_format l.format r.format in
       let= `Eq = Exact.compare    l.exact    r.exact    in
       let= `Eq = Absolute.compare l.absolute r.absolute in
       let= `Eq = Relative.compare l.relative r.relative in

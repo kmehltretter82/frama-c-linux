@@ -101,7 +101,7 @@ let id (type l) : l format -> int = function
   | Float32 -> 2
   | Float64 -> 3
 
-let compare l r = Datatype.Int.compare (id l) (id r)
+let compare_format l r = Datatype.Int.compare (id l) (id r)
 
 
 let single  f = Float (change_format Single f, Single)
