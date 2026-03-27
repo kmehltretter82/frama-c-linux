@@ -367,8 +367,9 @@ let debug_tactic env ctxt loc (tac: ProofStrategy.tactic) node =
 
     in apply_all Pattern.empty tac.lookup
 
-let debug_alternative env ctxt strategy node alt =
+let debug_alternative ctxt strategy node alt =
   let mk_result diags = Some (result ~loc:alt.ProofStrategy.loc diags) in
+  let env = Pattern.env ~raise:true () in
   try
     match alt with
     | ProofStrategy.{ value = Default } ->
@@ -408,7 +409,6 @@ exception Empty
 
 let debug strategy ?node () =
   let ctxt = ProofStrategy.context () in
-  let env = Pattern.env ~raise:true () in
 
   let parse string =
     match parse_string string with
@@ -427,7 +427,7 @@ let debug strategy ?node () =
     [ failed @@ Printf.sprintf "Failure (%s)" (Printexc.to_string exn) ]
   | strategy, alternatives ->
     List.filter_map
-      (debug_alternative env ctxt strategy node) alternatives
+      (debug_alternative ctxt strategy node) alternatives
 
 let () =
   let signature = Request.signature ~output:(module Alternatives) () in

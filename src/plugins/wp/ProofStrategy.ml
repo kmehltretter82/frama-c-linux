@@ -418,11 +418,13 @@ let typecheck_alternative_node env = function
   | Provers(pvs,_) -> List.iter (typecheck_prover env) pvs
   | Tactic t -> typecheck_tactic env t
 
-let typecheck_alternative env a = typecheck_alternative_node env a.value
+let typecheck_alternative a =
+  let env = Pattern.env () in
+  typecheck_alternative_node env a.value
 
-let typecheck ?(env=Pattern.env ()) () =
+let typecheck () =
   Hashtbl.iter
-    (fun _ s -> List.iter (typecheck_alternative env) s.alternatives) strategies
+    (fun _ s -> List.iter typecheck_alternative s.alternatives) strategies
 
 (* -------------------------------------------------------------------------- *)
 (* --- Strategy Hints                                                     --- *)
