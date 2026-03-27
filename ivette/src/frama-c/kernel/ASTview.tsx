@@ -504,9 +504,8 @@ export function getMarkerMenuItems(
         const n = group.length;
         const { call }: EvaAst.CallSite = group[0];
         const { name: fct } = States.getDeclaration(call);
-        const caller = `caller ${fct}`;
-        const nsites = n > 1 ? `s (${n} call sites)` : '';
-        const label = `Go to ${caller}${nsites}`;
+        const nsites = n > 1 ? ` (${n} call sites)` : '';
+        const label = `Go to caller ${fct}${nsites}`;
         const index = callers.findIndex(({ call: f }) => f === call);
         const onClick = (): void => Locations.setSelection({
           label: descr, markers, index, plugin: 'Callers',
