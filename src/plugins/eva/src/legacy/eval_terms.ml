@@ -1225,9 +1225,9 @@ let rec eval_term ~alarm_mode env t =
               Printer.pp_logic_type t.term_type Printer.pp_logic_type ltyp)
     )
 
-  | Tif (tcond, ttrue, tfalse) ->
+  | Tif (pcond, ttrue, tfalse) ->
     eval_tif eval_term Cvalue.V.join Cvalue.V.meet ~alarm_mode env
-      tcond ttrue tfalse
+      pcond ttrue tfalse
 
   | TSizeOf _ | TSizeOfE _ | TAlignOf _ | TAlignOfE _ ->
     let e = Cil.constFoldTerm t in
@@ -1415,12 +1415,9 @@ and eval_binop ~alarm_mode env op t1 t2 =
       eunder; eover; empty = r1.empty || r2.empty; }
 
 and eval_tif : 'a. (alarm_mode:_ -> _ -> _ -> 'a eval_result) -> ('a -> 'a -> 'a) -> ('a -> 'a -> 'a) -> alarm_mode:_ -> _ -> _ -> _ -> _ -> 'a eval_result =
-  fun eval join meet ~alarm_mode env tcond ttrue tfalse ->
-  let r = eval_term ~alarm_mode env tcond in
-  let ctrue =  Cvalue.V.contains_non_zero r.eover
-  and cfalse =  Cvalue.V.contains_zero r.eover in
-  match ctrue, cfalse with
-  | true, true ->
+  fun eval join meet ~alarm_mode env pcond ttrue tfalse ->
+  match eval_predicate env pcond with
+  | Unknown ->
     let vtrue = eval ~alarm_mode env ttrue in
     let vfalse = eval ~alarm_mode env tfalse in
     if not (same_etype vtrue.etype vfalse.etype) then
@@ -1433,9 +1430,8 @@ and eval_tif : 'a. (alarm_mode:_ -> _ -> _ -> 'a eval_result) -> ('a -> 'a -> 'a
     { etype = vtrue.etype;
       ldeps = join_logic_deps vtrue.ldeps vfalse.ldeps;
       eunder; eover; empty = vtrue.empty || vfalse.empty; }
-  | true, false  -> eval ~alarm_mode env ttrue
-  | false, true  -> eval ~alarm_mode env tfalse
-  | false, false -> assert false (* a logic alarm would have been raised*)
+  | True -> eval ~alarm_mode env ttrue
+  | False -> eval ~alarm_mode env tfalse
 
 (* if you add something here, update known_logic_funs above also *)
 and eval_known_logic_function ~alarm_mode env li labels args =
@@ -1850,9 +1846,9 @@ and eval_term_as_lval ~alarm_mode env t =
     (* Logic coerce on locations (that are pointers) can only introduce
        sets, that do not change the abstract value. *)
     eval_term_as_lval ~alarm_mode env t
-  | Tif (tcond, ttrue, tfalse) ->
+  | Tif (pcond, ttrue, tfalse) ->
     eval_tif eval_term_as_lval Addresses.Bits.join Addresses.Bits.meet ~alarm_mode env
-      tcond ttrue tfalse
+      pcond ttrue tfalse
   | Tcomprehension (term, quantifiers, predicate) ->
     let env = bind_comprehension_quantifiers env quantifiers predicate in
     let r = eval_term_as_lval ~alarm_mode env term in
@@ -2421,25 +2417,16 @@ and reduce_by_predicate ~alarm_mode env positive p =
           | None -> env
           | Some p' -> reduce_by_predicate_content env positive p'.pred_content
       end
-    | _,Pif (tcond, ptrue, pfalse) ->
+    | _,Pif (pcond, ptrue, pfalse) ->
       begin
         let reduce = reduce_by_predicate ~alarm_mode in
-        let r = eval_term ~alarm_mode env tcond in
-        let ctrue = Cvalue.V.contains_non_zero r.eover in
-        let cfalse = Cvalue.V.contains_zero r.eover in
-        match ctrue, cfalse with
-        | true, true ->
-          let reduce_by_rel =
-            reduce_by_relation ~alarm_mode env positive tcond
-          in
-          let env_true = reduce_by_rel Cil_types.Rneq (Cil.lzero ()) in
-          let env_false = reduce_by_rel Cil_types.Req (Cil.lzero ()) in
-          let env_true =  reduce env_true positive ptrue in
-          let env_false = reduce env_false positive pfalse in
+        match eval_predicate env pcond with
+        | Unknown ->
+          let env_true = reduce env positive ptrue in
+          let env_false = reduce env positive pfalse in
           join_env env_true env_false
-        | true, false -> reduce env positive ptrue
-        | false, true -> reduce env positive pfalse
-        | false, false -> assert false (* a logic alarm would have been raised*)
+        | True -> reduce env positive ptrue
+        | False -> reduce env positive pfalse
       end
     | true, Pexists (_, _) | false, Pforall (_, _)
     | _,Pallocable (_,_) | _,Pfreeable (_,_) | _,Pfresh (_,_,_,_)
@@ -2713,20 +2700,15 @@ and eval_predicate env pred =
           | Some p' -> do_eval env p'
       end
 
-    | Pif (tcond, ptrue, pfalse) ->
+    | Pif (pcond, ptrue, pfalse) ->
       begin
-        let r = eval_term ~alarm_mode env tcond in
-        let ctrue =  Cvalue.V.contains_non_zero r.eover
-        and cfalse =  Cvalue.V.contains_zero r.eover in
-        match ctrue, cfalse with
-        | true, true ->
-          let reduce_by_rel = reduce_by_relation ~alarm_mode env true tcond in
-          let env_true = reduce_by_rel Cil_types.Rneq (Cil.lzero ()) in
-          let env_false = reduce_by_rel Cil_types.Req (Cil.lzero ()) in
+        match eval_predicate env pcond with
+        | Unknown ->
+          let env_true = reduce_by_predicate ~alarm_mode env true pcond in
+          let env_false = reduce_by_predicate ~alarm_mode env false pcond in
           join_predicate_status (do_eval env_true ptrue) (do_eval env_false pfalse)
-        | true, false -> do_eval env ptrue
-        | false, true -> do_eval env pfalse
-        | false, false -> assert false (* a logic alarm would have been raised*)
+        | True -> do_eval env ptrue
+        | False -> do_eval env pfalse
       end
     | Pfreeable (BuiltinLabel Here, t) ->
       let r = eval_term ~alarm_mode env t in
@@ -2857,7 +2839,7 @@ and predicate_deps env pred =
       join_logic_deps (term_deps t1) (term_deps t2)
 
     | Pif (c, p1, p2) ->
-      join_logic_deps (term_deps c)
+      join_logic_deps (do_eval env c)
         (join_logic_deps (do_eval env p1) (do_eval env p2))
 
     | Pat (p, lbl) ->

@@ -142,7 +142,7 @@ let rec add_assigns_from env ~iscalled ~from tgt =
       ~source:(fst tgt.term_loc)
       "Unsupported \\let-assigns"
   | Tif (c,tt,te) ->
-    iadd_term env c ;
+    add_predicate env c ;
     add_assigns_from env ~iscalled ~from tt ;
     add_assigns_from env ~iscalled ~from te ;
   | TConst _ | TSizeOf _ | TSizeOfE _ | TAlignOf _ | TAlignOfE _

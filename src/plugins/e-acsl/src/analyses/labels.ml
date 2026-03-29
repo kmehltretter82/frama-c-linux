@@ -340,10 +340,10 @@ end = struct
     | TBinOp (_, t1, t2) ->
       let error = do_term ?error env t1 in
       do_term ?error env t2
-    | Tif (t1, t2, t3) ->
+    | Tif (c, t1, t2) ->
+      let error = do_predicate ?error env c in
       let error = do_term ?error env t1 in
-      let error = do_term ?error env t2 in
-      do_term ?error env t3
+      do_term ?error env t2
     | Tapp (_, [], targs) ->
       do_list do_term ?error env targs
     | Tapp (_, labels, targs) ->
@@ -463,8 +463,8 @@ end = struct
     | Piff (p1, p2) ->
       let error = do_predicate ?error env p1 in
       do_predicate ?error env p2
-    | Pif (t, p1, p2) ->
-      let error = do_term ?error env t in
+    | Pif (c, p1, p2) ->
+      let error = do_predicate ?error env c in
       let error = do_predicate ?error env p1 in
       do_predicate ?error env p2
     | Prel (_, t1, t2) ->

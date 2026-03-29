@@ -163,7 +163,7 @@ let rec add_term (env:env) (t:term) : domain =
   | TAddrOf lval | TStartOf lval ->
     ptr @@ snd @@ add_addr_lval ~loc:t.term_loc env lval
   | Tif (b,ct,cf) ->
-    iadd_term env b ;
+    add_predicate env b ;
     let dt = add_term env ct in
     let df = add_term env cf in
     merge_domain dt df
@@ -220,7 +220,7 @@ and add_predicate (env:env) (p:predicate) = match p.pred_content with
     add_predicate env p2 ;
   | Pnot p | Pat(p,_) -> add_predicate env p
   | Pif(c,pt,pf) ->
-    iadd_term env c ;
+    add_predicate env c ;
     add_predicate env pt ;
     add_predicate env pf ;
   | Pobject_pointer(_,t) | Pvalid(_,t) | Pvalid_read(_,t) | Paligned(t, _)

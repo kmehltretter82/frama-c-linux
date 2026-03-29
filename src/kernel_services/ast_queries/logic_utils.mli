@@ -213,8 +213,7 @@ val expr_to_term : ?coerce:bool -> exp -> term
 
     Remark: when the original expression is a comparison, it is evaluated as
     an [int] or an [integer] depending on the [~coerce] flag.
-    To obtain a boolean or predicate, use [expr_to_boolean] or
-    [expr_to_predicate] instead.
+    To obtain a predicate, use [expr_to_predicate] instead.
 
     @before 21.0-Scandium was unsound in many cases.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>

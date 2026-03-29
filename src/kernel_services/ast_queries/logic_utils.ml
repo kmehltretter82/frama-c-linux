@@ -530,8 +530,8 @@ let rec expr_to_term ?(coerce=false) e =
     | StartOf lv -> TStartOf (lval_to_term_lval lv) , ctyp
     | AddrOf lv -> TAddrOf (lval_to_term_lval lv) , ctyp
     | BinOp (op, _, _, _) when is_boolean_binop op ->
-      let tc = expr_to_boolean e in
-      Tif( tc , Cil.lone ~loc () , Cil.lzero ~loc () ),
+      let p = expr_to_predicate e in
+      Tif (p, Cil.lone ~loc (), Cil.lzero ~loc ()),
       Linteger
     | BinOp (op, a, b, _) ->
       begin match get_float_binop op typ with
@@ -545,8 +545,8 @@ let rec expr_to_term ?(coerce=false) e =
           TBinOp(op,va,vb) , coerce_type typ
       end
     | UnOp (LNot, c, _) ->
-      let tc = expr_to_boolean c in
-      Tif( tc , Cil.lzero ~loc () , Cil.lone ~loc () ),
+      let p = expr_to_predicate c in
+      Tif (p, Cil.lzero ~loc (), Cil.lone ~loc ()),
       Linteger
     | UnOp(op, a, _) ->
       begin match get_float_unop op typ with
@@ -1017,7 +1017,7 @@ let rec is_same_term t1 t2 =
       labels1 labels2
     && List.for_all2 is_same_term args1 args2
   | Tif(c1,t1,e1), Tif(c2,t2,e2) ->
-    is_same_term c1 c2 && is_same_term t1 t2 && is_same_term e1 e2
+    is_same_predicate c1 c2 && is_same_term t1 t2 && is_same_term e1 e2
   | Tbase_addr (l1,t1), Tbase_addr (l2,t2)
   | Tblock_length (l1,t1), Tblock_length (l2,t2)
   | Toffset (l1,t1), Toffset (l2,t2)
@@ -1116,7 +1116,7 @@ and is_same_predicate_node p1 p2 =
   | Pnot p1, Pnot p2 ->
     is_same_predicate p1 p2
   | Pif (c1,t1,e1), Pif(c2,t2,e2) ->
-    is_same_term c1 c2 && is_same_predicate t1 t2 &&
+    is_same_predicate c1 c2 && is_same_predicate t1 t2 &&
     is_same_predicate e1 e2
   | Plet (d1,p1), Plet(d2,p2) ->
     is_same_logic_info d1 d2 && is_same_predicate p1 p2
@@ -1562,10 +1562,10 @@ let rec hash_term (acc,depth,tot) t =
       let hash = acc + 266 + Hashtbl.hash ctor.ctor_name in
       let hash_one_term (acc,tot) t = hash_term (acc,depth-1,tot) t in
       List.fold_left hash_one_term (hash,tot-1) args
-    | Tif(t1,t2,t3) ->
-      let hash1,tot1 = hash_term (acc+285,depth-1,tot) t1 in
-      let hash2,tot2 = hash_term (hash1,depth-1,tot1) t2 in
-      hash_term (hash2,depth-1,tot2) t3
+    | Tif(c,t1,t2) ->
+      let hash1,tot1 = hash_predicate (acc+285,depth-1,tot) c in
+      let hash2,tot2 = hash_term (hash1,depth-1,tot1) t1 in
+      hash_term (hash2,depth-1,tot2) t2
     | Tat(t,l) ->
       let hash = acc + 304 + hash_label l in
       hash_term (hash,depth-1,tot-2) t
@@ -1693,7 +1693,7 @@ and hash_predicate (acc,depth,tot) p =
       hash_predicate (acc, depth - 1, tot) p2
     | Pnot p -> hash_predicate (acc + 97, depth - 1, tot - 1) p
     | Pif (t,p1,p2) ->
-      let (acc, tot) = hash_term (acc + 103, depth - 1, tot - 1) t in
+      let (acc, tot) = hash_predicate (acc + 103, depth - 1, tot - 1) t in
       let (acc, tot) = hash_predicate (acc + 113, depth - 1, tot) p1 in
       hash_predicate (acc + 127, depth - 1, tot) p2
     | Plet (li, p) ->
@@ -1798,7 +1798,7 @@ let rec compare_term t1 t2 =
   | Tapp _, _ -> 1
   | _, Tapp _ -> -1
   | Tif(c1,t1,e1), Tif(c2,t2,e2) ->
-    let res = compare_term c1 c2 in
+    let res = compare_predicate c1 c2 in
     if res = 0 then
       let res = compare_term t1 t2 in
       if res = 0 then compare_term e1 e2 else res
@@ -1982,7 +1982,7 @@ and compare_predicate_node p1 p2 =
   | Pnot _, _ -> 1
   | _, Pnot _ -> -1
   | Pif (c1,t1,e1), Pif(c2,t2,e2) ->
-    let res = compare_term c1 c2 in
+    let res = compare_predicate c1 c2 in
     if res = 0 then
       let res = compare_predicate t1 t2 in
       if res = 0 then compare_predicate e1 e2 else res
@@ -2463,10 +2463,6 @@ let rec constFoldTermToInt ?(machdep=true) (e: term) : Z.t option =
   | TCast (false, Ctype typ, e) -> constFoldCastToInt ~machdep typ e
   | TCast (true, Linteger, e) -> constFoldTermToInt ~machdep e
   | Toffset (_, t) -> if machdep then constFoldToffset t else None
-  | Tif (c, e1, e2) ->
-    let open Option.Operators in
-    let* i = constFoldTermToInt ~machdep c in
-    constFoldTermToInt ~machdep (if Z.is_zero i then e2 else e1)
   | Tnull -> Some Z.zero
   | Tapp (li, _, [{term_node = (Tunion args |
                                 TCast (true, _, {term_node = Tunion args}))}])
@@ -2476,9 +2472,17 @@ let rec constFoldTermToInt ?(machdep=true) (e: term) : Z.t option =
                                 TCast (true, _, {term_node = Tunion args}))}])
     when is_min_function li ->
     constFoldMinMax ~machdep Z.min args
+  | Tif ({pred_content = Prel (rel, op1, op2)}, t1, t2) ->
+    let open Option.Operators in
+    let* int1 = constFoldTermToInt ~machdep op1 in
+    let* int2 = constFoldTermToInt ~machdep op2 in
+    let cmp = match rel with
+        Rlt -> (<) | Rgt -> (>) | Rle -> (<=) | Rge -> (>=) | Req -> (=) | Rneq -> (<>)
+    in
+    constFoldTermToInt ~machdep (if cmp int1 int2 then t1 else t2)
 
   | TLval _ | TAddrOf _ | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _
-  | Tat _ | Tbase_addr _ | Tblock_length _
+  | Tif _ | Tat _ | Tbase_addr _ | Tblock_length _
   | TUpdate _ | Ttypeof _ | Ttype _ | Tempty_set | Tunion _ | Tinter _
   | Tcomprehension _ | Trange _ | Tlet _
   | TCast _ ->

@@ -29,6 +29,25 @@ val do_it:
     If [pred_to_print] is set, then the runtime check will use this predicate as
     message. *)
 
+val to_exp :
+  adata:Assert.t ->
+  ?inplace:bool ->
+  ?name:string ->
+  kernel_function ->
+  ?rte:bool ->
+  Env.t ->
+  predicate ->
+  exp * Assert.t * Env.t
+(** [to_exp ~adata ?inplace ?name kf ?rte env p] translates an ACSL predicate into a C expression.
+    - [adata]: assertion context
+    - [inplace]: if the root predicate has a label, indicates if it should be
+      immediately translated or if [Translate_ats] should be used to retrieve the translation
+    - [name]: name to use for generated variables
+    - [kf]: the enclosing function.
+    - [rte]: if true, generate and translate RTE before translating the predicate
+    - [env]: the current environment
+    - [p]: the predicate to translate *)
+
 exception No_simple_translation of predicate
 (** Exception raised if [untyped_to_exp] would generate new statements in the
     environment *)

@@ -184,9 +184,9 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
   | Pnot p ->
     let e, adata, env = to_exp ~adata kf env p in
     Smart_exp.lnot ~loc e, adata, env
-  | Pif(t, p2, p3) ->
+  | Pif(c, p2, p3) ->
     Extlib.flatten @@ Env.with_params_and_result ~rte:true ~env (fun env ->
-        let e1, adata, env1 = Translate_terms.to_exp ~adata kf env t in
+        let e1, adata, env1 = to_exp ~adata kf env c in
         let e2, adata, env2 =
           to_exp ~adata kf (Env.push env1) p2 in
         let res2 = e2, env2 in

@@ -422,7 +422,7 @@ and term (env:ctx) (t:term) : model = match t.term_node with
   (* Operators *)
   | Tat(t,_) -> term env t
   | Tunion ts | Tinter ts | TDataCons(_,ts) -> m_fcup (term env) ts
-  | Tif(e,a,b) -> m_fcup (term env) [e;a;b]
+  | Tif(c,a,b) -> m_vcup (m_fcup (term env) [a;b]) (pred env c)
   | Trange(a,b) -> m_fcup (termopt env) [a;b]
   | Toffset(_,t) | Tbase_addr(_,t) -> mterm env t
   | Tnull | Tempty_set -> nothing
@@ -492,7 +492,7 @@ and pred (env:ctx) p : value = match p.pred_content with
   (* Binary *)
   | Pand(p1,p2) | Por(p1,p2) | Pxor(p1,p2) | Piff(p1,p2)
   | Pimplies(p1,p2) -> E.fcup (pred env) [p1; p2]
-  | Pif (t,p1,p2) -> E.cup ((vterm env) t) (E.fcup (pred env) [p1; p2])
+  | Pif (c,p1,p2) -> E.cup ((pred env) c) (E.fcup (pred env) [p1; p2])
   | Prel(_,t1,t2) -> E.fcup (vterm env) [t1; t2]
 
   (* Binders *)

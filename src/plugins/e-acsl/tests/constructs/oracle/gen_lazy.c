@@ -307,8 +307,8 @@ int main(void)
     int __gen_e_acsl_if_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
       {.values = (void *)0};
-    if (x != 0) __gen_e_acsl_if_4 = x; else __gen_e_acsl_if_4 = y;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"x",0,x);
+    if (x != 0) __gen_e_acsl_if_4 = x; else __gen_e_acsl_if_4 = y;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"x",0,x);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"y",0,y);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"x",0,x);

@@ -1391,7 +1391,7 @@ struct
       | Trange (None, Some t) | Trange(Some t, None) -> needs_at t
       | Trange (Some t1, Some t2) -> needs_at t1 || needs_at t2
       | Tlet(_,t) -> needs_at t
-      | Tif(t1,t2,t3) -> needs_at t1 || needs_at t2 || needs_at t3
+      | Tif(c,t1,t2) -> needs_at_pred c || needs_at t1 || needs_at t2
     and needs_at_offset = function
       | TNoOffset -> false
       | TIndex (t,o) -> needs_at t || needs_at_offset o
@@ -1404,7 +1404,7 @@ struct
       | Pand(p1,p2) | Por(p1,p2) | Pxor(p1,p2)
       | Pimplies(p1,p2) | Piff(p1,p2) -> needs_at_pred p1 || needs_at_pred p2
       | Pnot p | Plet (_,p) | Pforall(_,p) | Pexists(_,p) -> needs_at_pred p
-      | Pif(t,p1,p2) -> needs_at t || needs_at_pred p1 || needs_at_pred p2
+      | Pif(c,p1,p2) -> needs_at_pred c || needs_at_pred p1 || needs_at_pred p2
       | Pvalid (_,t) | Pvalid_read (_,t)
       | Pobject_pointer (_,t) | Pvalid_function t
       | Pinitialized (_,t) | Pdangling (_, t)
@@ -3031,8 +3031,8 @@ struct
       let t = lift_set (mk_shift loc env t'2 tres) t'1 in
       t.term_node, t.term_type
 
-    | PLif (t1, t2, t3) ->
-      let t1 = type_bool_term ctxt (drop_qualifiers env) t1 in
+    | PLif (cond, t2, t3) ->
+      let p = ctxt.type_predicate ctxt (drop_qualifiers env) cond in
       let t2 = term env t2 in
       let t3 = term env t3 in
       let env,ty,ty2,ty3 =
@@ -3046,7 +3046,7 @@ struct
       let _,t3 = implicit_conversion
           ~overloaded:false loc t3 t3.term_type ty3
       in
-      Tif (t1, mk_cast t2 ty, mk_cast t3 ty), ty
+      Tif (p, mk_cast t2 ty, mk_cast t3 ty), ty
 
     | PLold t ->
       let lab = find_old_label loc env in
@@ -3548,21 +3548,9 @@ struct
               term_type = t ; term_name = []}
         | None -> papp ~loc (info, label_assoc, tl)
       end
-    | PLif (t, p1, p2) ->
-      begin try
-          let t = type_bool_term { ctxt with silent = true } env t in
-          pif ~loc (t, predicate env p1, predicate env p2)
-        with Backtrack ->
-          (* p1 ? p2 : p3 is syntactic sugar
-                    for (p1 ==> p2) && (!p1 ==> p3) *)
-          predicate env {lexpr_node =
-                           (PLand ({lexpr_node = (PLimplies (t, p1)); lexpr_loc = loc},
-                                   {lexpr_node =
-                                      (PLimplies ({lexpr_node = PLnot t; lexpr_loc = loc},
-                                                  p2));
-                                    lexpr_loc = loc}));
-                         lexpr_loc = loc}
-      end
+    | PLif (p0, p1, p2) ->
+      let c = predicate env p0 in
+      pif ~loc (c, predicate env p1, predicate env p2)
     | PLforall (q, p) ->
       let q, env' = add_quantifiers ctxt loc ~kind:LVQuant q env in
       pforall ~loc (q, predicate env' p)
@@ -4291,14 +4279,14 @@ struct
     | Tlambda(_,t) -> find_occurrences_term v ~polarity ~pos_use ~neg_use t
     | TDataCons(_,args) ->
       List.fold_left aux_list unchanged args
-    | Tif(t1,t2,t3) ->
+    | Tif(cond,t1,t2) ->
       let (pos_use,neg_use) =
-        find_occurrences_term v ~polarity ~pos_use ~neg_use t1
+        find_occurrences_pred v ~polarity ~pos_use ~neg_use cond
       in
       let (pos_use, neg_use) =
-        find_occurrences_term v ~polarity ~pos_use ~neg_use t2
+        find_occurrences_term v ~polarity ~pos_use ~neg_use t1
       in
-      find_occurrences_term v ~polarity ~pos_use ~neg_use t3
+      find_occurrences_term v ~polarity ~pos_use ~neg_use t2
     | Tat(t,_) | Tbase_addr(_,t) | Toffset(_,t) | Tblock_length(_,t) ->
       find_occurrences_term v ~polarity ~pos_use ~neg_use t
     | Tnull -> unchanged
@@ -4366,9 +4354,9 @@ struct
     | Pnot p ->
       let polarity = invert_polarity polarity in
       find_occurrences_pred v ~polarity ~pos_use ~neg_use p
-    | Pif (t,p1,p2) ->
+    | Pif (c,p1,p2) ->
       let (pos_use, neg_use) =
-        find_occurrences_term v ~polarity ~pos_use ~neg_use t
+        find_occurrences_pred v ~polarity ~pos_use ~neg_use c
       in
       let (pos_use, neg_use) =
         find_occurrences_pred v ~polarity ~pos_use ~neg_use p1
@@ -4449,10 +4437,10 @@ struct
     | Tlambda(_,t) -> check_horn_clause_term ~polarity ~pos_use ~neg_use t
     | TDataCons(_,args) ->
       List.iter (check_horn_clause_term ~polarity ~pos_use ~neg_use) args
-    | Tif(t1,t2,t3) ->
+    | Tif(c,t1,t2) ->
+      check_horn_clause_pred ~polarity ~pos_use ~neg_use c;
       check_horn_clause_term ~polarity ~pos_use ~neg_use t1;
-      check_horn_clause_term ~polarity ~pos_use ~neg_use t2;
-      check_horn_clause_term ~polarity ~pos_use ~neg_use t3
+      check_horn_clause_term ~polarity ~pos_use ~neg_use t2
     | Tat(t,_)
     | Tbase_addr(_,t)
     | Toffset(_,t)
@@ -4507,8 +4495,8 @@ struct
     | Pnot p ->
       let polarity = invert_polarity polarity in
       check_horn_clause_pred ~polarity ~pos_use ~neg_use p
-    | Pif (t,p1,p2) ->
-      check_horn_clause_term ~polarity ~pos_use ~neg_use t;
+    | Pif (c,p1,p2) ->
+      check_horn_clause_pred ~polarity ~pos_use ~neg_use c;
       check_horn_clause_pred ~polarity ~pos_use ~neg_use p1;
       check_horn_clause_pred ~polarity ~pos_use ~neg_use p2
     | Plet (li,p') ->
@@ -4568,9 +4556,8 @@ struct
     | Pimplies(p1,p2) ->
       check_horn_clause_pred ~polarity:`Pos ~pos_use ~neg_use p1;
       check_horn_clause_main ~pos_use ~neg_use p2
-    | Pif(t,p1,p2) ->
-      let polarity = `Pos in
-      check_horn_clause_term ~polarity ~pos_use ~neg_use t;
+    | Pif(c,p1,p2) ->
+      check_horn_clause_main ~pos_use ~neg_use c;
       check_horn_clause_main ~pos_use ~neg_use p1;
       check_horn_clause_main ~pos_use ~neg_use p2
     | Plet(li, p) ->

@@ -238,7 +238,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
     let size_term_if =
       Logic_const.term
         ~loc
-        (Tif (Logic_const.term ~loc (TBinOp (Le, size_term_lv, tzero)) Linteger,
+        (Tif (Logic_const.prel ~loc (Rle, size_term_lv, tzero),
               tzero,
               size_term_lv))
         Linteger

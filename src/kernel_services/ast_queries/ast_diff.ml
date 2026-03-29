@@ -484,8 +484,8 @@ and is_same_predicate_node p p' env =
   | Piff(p1,p2), Piff(p1',p2') ->
     is_same_predicate p1 p1' env && is_same_predicate p2 p2' env
   | Pnot p, Pnot p' -> is_same_predicate p p' env
-  | Pif(t,p1,p2), Pif(t',p1',p2') ->
-    is_same_term t t' env &&
+  | Pif(c,p1,p2), Pif(c',p1',p2') ->
+    is_same_predicate c c' env &&
     is_same_predicate p1 p1' env &&
     is_same_predicate p2 p2' env
   | Plet(v,p), Plet(v',p') ->
@@ -565,7 +565,7 @@ and is_same_term_node t t' env =
     is_matching_logic_ctor c c' env &&
     is_same_list is_same_term args args' env
   | Tif(c,t1,t2), Tif(c',t1',t2') ->
-    is_same_term c c' env &&
+    is_same_predicate c c' env &&
     is_same_term t1 t1' env &&
     is_same_term t2 t2' env
   | Tat(t,l), Tat(t',l') ->

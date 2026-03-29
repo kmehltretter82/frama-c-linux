@@ -8,36 +8,6 @@
 
 open Cil_types
 
-let relation_to_binop = function
-  | Rlt -> Lt
-  | Rgt -> Gt
-  | Rle -> Le
-  | Rge -> Ge
-  | Req -> Eq
-  | Rneq -> Ne
-
-let mk_bool_term ~loc node =
-  Logic_const.term ~loc node (Ctype Cil_const.boolType)
-
-let rec term_of_pred p =
-  let loc = p.pred_loc in
-  match p.pred_content with
-  | Prel (rel, tl, tr) ->
-    let op = relation_to_binop rel in
-    mk_bool_term ~loc (TBinOp (op, tl, tr))
-  | Pand (pl, pr) ->
-    let tl = term_of_pred pl in
-    let tr = term_of_pred pr in
-    mk_bool_term ~loc (TBinOp (LAnd, tl, tr))
-  | Por (pl, pr) ->
-    let tl = term_of_pred pl in
-    let tr = term_of_pred pr in
-    mk_bool_term ~loc (TBinOp (LOr, tl, tr))
-  | Papp (({ l_body = LBpred _; _ } as li), labels, args) ->
-    mk_bool_term ~loc (Tapp (li, labels, args))
-  | _ ->
-    Options.fatal ~source:(fst loc) "Cannot convert predicate '%a' to term" Printer.pp_predicate p
-
 module type S = sig
   type t
 
@@ -76,8 +46,7 @@ module Predicate : S with type t = predicate = struct
     (* cond ? t : \false  ≡  cond && t *)
     | _, Pfalse -> Logic_const.pand ?loc (p_cond, t_true)
     | _ ->
-      let cond = term_of_pred p_cond in
-      Logic_const.pif (cond, t_true, t_false)
+      Logic_const.pif (p_cond, t_true, t_false)
 
   let mk_at labels p = {p with pred_content = Pat (p, labels)}
 
@@ -106,8 +75,7 @@ module Term : S with type t = term = struct
   let mk_let ?loc li t = Logic_const.term ?loc (Tlet (li, t)) t.term_type
 
   let mk_if ?loc p_cond t_true t_false =
-    let t_cond = term_of_pred p_cond in
-    Logic_const.term ?loc (Tif (t_cond, t_true, t_false)) t_true.term_type
+    Logic_const.term ?loc (Tif (p_cond, t_true, t_false)) t_true.term_type
 
   let mk_at labels p = {p with term_node = Tat (p, labels)}
 

@@ -408,12 +408,12 @@ let pimplies ?(loc=Cil_datatype.Location.unknown) ?(names=[]) (p1,p2) =
   in
   prepend_names ~names p
 
-let pif ?loc ?(names=[]) (t,p2,p3) =
+let pif ?loc ?(names=[]) (c,p2,p3) =
   let p =
     match (p2.pred_content, p3.pred_content) with
     | Ptrue, Ptrue  -> ptrue
     | Pfalse, Pfalse -> pfalse
-    | _,_ -> unnamed ?loc (Pif (t,p2,p3))
+    | _,_ -> unnamed ?loc (Pif (c,p2,p3))
   in
   prepend_names ~names p
 

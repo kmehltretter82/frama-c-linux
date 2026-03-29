@@ -1460,7 +1460,7 @@ and term_node =
   | Tlambda of quantifiers * term (** lambda abstraction. *)
   | TDataCons of logic_ctor_info * term list
   (** constructor of logic sum-type. *)
-  | Tif of term * term * term
+  | Tif of predicate * term * term
   (** conditional operator*)
   | Tat of term * logic_label
   (** term refers to a particular program point. *)
@@ -1631,7 +1631,7 @@ and predicate_node =
   (** [p1 <==> p2] equivalence. *)
   | Pnot of predicate
   (** [!p] negation. *)
-  | Pif of term * predicate * predicate
+  | Pif of predicate * predicate * predicate
   (** [c ? p1 : p2] conditional *)
   | Plet of logic_info * predicate
   (** [\let x = <value> ; p] definition of a local variable *)
