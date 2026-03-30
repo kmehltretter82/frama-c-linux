@@ -215,11 +215,11 @@ extern int     tcflush(int fd, int queue_selector);
     assigns \result, *termios_p \from indirect:fd,
                                        indirect:Frama_C_entropy_source;
     assigns Frama_C_entropy_source \from Frama_C_entropy_source;
-    behavior ok:
+    behavior ok_behavior:
       assumes nondet: Frama_C_entropy_source == 0; // arbitrary condition
       ensures initialization:termios_p: \initialized(termios_p);
       ensures result_ok: \result == 0;
-    behavior error:
+    behavior error_behavior:
       assumes nondet: Frama_C_entropy_source != 0; // arbitrary condition
       ensures result_error: \result == -1;
     disjoint behaviors;

@@ -208,12 +208,12 @@ extern int clock_getres(clockid_t clock_id, struct timespec *res);
 #else
     // simulates a system without monotonic clock
     assigns \result\from clk_id;
-    ensures error: \result == EINVAL;
+    ensures result_error: \result == EINVAL;
 #endif
   behavior bad_clock_id:
     assumes bad_id: clk_id != CLOCK_REALTIME && clk_id != CLOCK_MONOTONIC;
     assigns \result \from clk_id;
-    ensures error: \result == EINVAL;
+    ensures result_error: \result == EINVAL;
 
   complete behaviors;
   disjoint behaviors;
