@@ -6684,7 +6684,9 @@ and doExp local_env
           )
       in
       let (argTypes, ghostArgTypes) =
-        List.partition (fun d -> not (Cil.isGhostFormalVarDecl d) || ghost) argTypesList
+        List.partition (fun d ->
+            not (Cil.isGhostFormalVarDecl d) || ghost
+          ) argTypesList
       in
       let args = if ghost then args @ ghost_args else args in
 
@@ -6735,183 +6737,174 @@ and doExp local_env
         | _ -> ""
       in
       (* Try to intercept some builtins *)
-      (match !pf with
-       | Var fv -> begin
-           match fv.vname with
-           | "__builtin_va_arg" ->
-             begin
-               match !pargs with
-               | marker :: ({enode = SizeOf resTyp} as size) :: _ -> begin
-                   (* Make a variable of the desired type *)
-                   let is_real, destlv, r, destlvtyp =
-                     match !pwhat with
-                     | ASet (is_real,lv, r, lvt) -> is_real, lv, r, lvt
-                     | _ ->
-                       let v = newTempVar ~ghost loc "vararg" true resTyp in
-                       locals := v::!locals;
-                       false, Cil.var v, [], resTyp
-                   in
-                   pwhat := (ASet (is_real, destlv, r, destlvtyp));
-                   pargs := [marker; size;
-                             Cil.new_exp ~loc
-                               (CastE(voidPtrType,
-                                      Cil.new_exp ~loc (AddrOf destlv)))];
-                   pis__builtin_va_arg := true;
-                 end
-               | _ ->
-                 Kernel.warning ~current:true "Invalid call to %s\n" fv.vname;
-             end
-
-           | "__builtin_va_start"
-           | "__builtin_c23_va_start" ->
-             let variad = match (!currentFunctionFDEC).svar.vtype.tnode with
-               | TFun (_, _, t) -> t
-               | _ -> assert false
-             in
-             let name =
-               (!currentFunctionFDEC).svar.vname
-             in
-             begin
-               match !pargs with
-               | marker :: last :: [] -> begin
-                   let isOk =
-                     match (dropCasts last).enode with
-                     | Lval (Var lastv, NoOffset) ->
-                       lastv.vname = getNameLastNonGhostFormal ()
-                     | _ -> false
-                   in
-                   if not isOk && variad then
-                     Kernel.error ~current:true
-                       "The last argument in call to %s \
-                        should be the last formal argument of %s"
-                       fv.vname name;
-
-                   if not isOk && not variad then
-                     Kernel.error ~current:true
-                       "Invalid call to %s \
-                        in non-variadic function %s"
-                       fv.vname
-                       name;
-
-                   (* Check that "lastv" is indeed the last variable in the
-                    * prototype and then drop it *)
-                   pargs := [ marker ]
-                 end
-               | _ ->
-                 Kernel.warning ~current:true "Invalid call to %s\n" name;
-
-                 (* We have to turn uses of __builtin_varargs_start into uses
-                  * of __builtin_stdarg_start (because we have dropped the
-                  * __builtin_va_alist argument from this function) *)
-             end
-
-           | "__builtin_stdarg_start" ->
-             let name =
-               (!currentFunctionFDEC).svar.vname
-             in
-             begin
-               match !pargs with
-               | marker :: last :: [] -> begin
-                   let isOk =
-                     match (dropCasts last).enode with
-                     | Lval (Var lastv, NoOffset) ->
-                       lastv.vname = getNameLastNonGhostFormal ()
-                     | _ -> false
-                   in
-                   if not isOk then
-                     Kernel.warning ~current:true
-                       "The last argument in call to __builtin_stdarg_start \
-                        should be the last formal argument of %s" name;
-
-                   (* Check that "lastv" is indeed the last variable in the
-                    * prototype and then drop it *)
-                   pargs := [ marker ]
-                 end
-               | _ ->
-                 Kernel.warning ~current:true "Invalid call to %s\n" name;
-
-                 (* We have to turn uses of __builtin_varargs_start into uses
-                  * of __builtin_stdarg_start (because we have dropped the
-                  * __builtin_va_alist argument from this function) *)
-             end
-
-           | "__builtin_varargs_start" ->
-             begin
-               (* Lookup the prototype for the replacement *)
-               let v, _  =
-                 (* builtin is not ghost *)
-                 try lookupGlobalVar false "__builtin_stdarg_start"
-                 with Not_found ->
-                   Errorloc.abort_context
-                     "Cannot find __builtin_stdarg_start to replace %s"
-                     fv.vname
-               in
-               pf := Var v
-             end
-           |  "__builtin_next_arg" ->
-             begin
-               match !pargs with
-               | last :: [] -> begin
-                   let isOk =
-                     match (dropCasts last).enode with
-                     | Lval (Var lastv, NoOffset) ->
-                       lastv.vname = getNameLastNonGhostFormal ()
-                     | _ -> false
-                   in
-                   if not isOk then
-                     Kernel.warning ~current:true
-                       "The argument in call to %s should be \
-                        the last formal argument\n" fv.vname;
-
-                   pargs := [ ]
-                 end
-               | _ ->
-                 Kernel.warning ~current:true "Invalid call to %s\n" fv.vname;
-             end
-           | "__builtin_va_arg_pack" ->
-             begin
-               (match !pargs with
-                | [ ] -> begin
-                    piscall := false;
-                    let e' = Cil.new_exp ~loc:e.expr_loc (Lval (!pf,NoOffset)) in
-                    pres := Cil.new_exp ~loc:e.expr_loc (SizeOfE e');
-                    prestype := (Machine.sizeof_type ())
+      begin
+        match !pf with
+        | Var fv -> begin
+            match fv.vname with
+            | "__builtin_va_arg" ->
+              begin
+                match !pargs with
+                | marker :: ({enode = SizeOf resTyp} as size) :: _ -> begin
+                    (* Make a variable of the desired type *)
+                    let is_real, destlv, r, destlvtyp =
+                      match !pwhat with
+                      | ASet (is_real,lv, r, lvt) -> is_real, lv, r, lvt
+                      | _ ->
+                        let v = newTempVar ~ghost loc "vararg" true resTyp in
+                        locals := v::!locals;
+                        false, Cil.var v, [], resTyp
+                    in
+                    pwhat := ASet (is_real, destlv, r, destlvtyp);
+                    pargs := [marker; size;
+                              Cil.new_exp ~loc
+                                (CastE(voidPtrType,
+                                       Cil.new_exp ~loc (AddrOf destlv)))];
+                    pis__builtin_va_arg := true;
                   end
                 | _ ->
+                  Kernel.warning ~current:true "Invalid call to %s\n" fv.vname
+              end
+
+            | "__builtin_va_start"
+            | "__builtin_c23_va_start" ->
+              let variad = match (!currentFunctionFDEC).svar.vtype.tnode with
+                | TFun (_, _, t) -> t
+                | _ -> assert false
+              in
+              let name = (!currentFunctionFDEC).svar.vname in
+              begin
+                match !pargs with
+                | marker :: last :: [] ->
+                  let isOk =
+                    match (dropCasts last).enode with
+                    | Lval (Var lastv, NoOffset) ->
+                      lastv.vname = getNameLastNonGhostFormal ()
+                    | _ -> false
+                  in
+                  if not isOk && variad then
+                    Kernel.error ~current:true
+                      "The last argument in call to %s \
+                       should be the last formal argument of %s"
+                      fv.vname name;
+
+                  if not isOk && not variad then
+                    Kernel.error ~current:true
+                      "Invalid call to %s \
+                       in non-variadic function %s"
+                      fv.vname
+                      name;
+
+                  (* Check that "lastv" is indeed the last variable in the
+                   * prototype and then drop it *)
+                  pargs := [ marker ]
+                | _ ->
+                  Kernel.warning ~current:true "Invalid call to %s\n" name
+
+                (* We have to turn uses of __builtin_varargs_start into uses
+                 * of __builtin_stdarg_start (because we have dropped the
+                 * __builtin_va_alist argument from this function) *)
+              end
+
+            | "__builtin_stdarg_start" ->
+              let name = (!currentFunctionFDEC).svar.vname in
+              begin
+                match !pargs with
+                | marker :: last :: [] ->
+                  let isOk =
+                    match (dropCasts last).enode with
+                    | Lval (Var lastv, NoOffset) ->
+                      lastv.vname = getNameLastNonGhostFormal ()
+                    | _ -> false
+                  in
+                  if not isOk then
+                    Kernel.warning ~current:true
+                      "The last argument in call to __builtin_stdarg_start \
+                       should be the last formal argument of %s" name;
+
+                  (* Check that "lastv" is indeed the last variable in the
+                   * prototype and then drop it *)
+                  pargs := [ marker ]
+                | _ ->
+                  Kernel.warning ~current:true "Invalid call to %s\n" name
+
+                (* We have to turn uses of __builtin_varargs_start into uses
+                 * of __builtin_stdarg_start (because we have dropped the
+                 * __builtin_va_alist argument from this function) *)
+              end
+
+            | "__builtin_varargs_start" ->
+              (* Lookup the prototype for the replacement *)
+              let v, _  =
+                (* builtin is not ghost *)
+                try lookupGlobalVar false "__builtin_stdarg_start"
+                with Not_found ->
+                  Errorloc.abort_context
+                    "Cannot find __builtin_stdarg_start to replace %s"
+                    fv.vname
+              in
+              pf := Var v
+            |  "__builtin_next_arg" ->
+              begin
+                match !pargs with
+                | last :: [] ->
+                  let isOk =
+                    match (dropCasts last).enode with
+                    | Lval (Var lastv, NoOffset) ->
+                      lastv.vname = getNameLastNonGhostFormal ()
+                    | _ -> false
+                  in
+                  if not isOk then
+                    Kernel.warning ~current:true
+                      "The argument in call to %s should be \
+                       the last formal argument\n" fv.vname;
+
+                  pargs := [ ]
+                | _ ->
+                  Kernel.warning ~current:true "Invalid call to %s\n" fv.vname
+              end
+            | "__builtin_va_arg_pack" ->
+              begin
+                match !pargs with
+                | [ ] ->
+                  piscall := false;
+                  let e' = Cil.new_exp ~loc:e.expr_loc (Lval (!pf,NoOffset)) in
+                  pres := Cil.new_exp ~loc:e.expr_loc (SizeOfE e');
+                  prestype := (Machine.sizeof_type ())
+                | _ ->
                   Kernel.warning ~current:true
-                    "Invalid call to builtin_va_arg_pack");
-             end
-           | "__builtin_constant_p" ->
-             begin
-               (* Before emptying the chunk, we remove the corresponding
-                  generated labels from the tables. Otherwise, they will
-                  be dangling when we iterate over the tables to fix
-                  forward gotos, leading to errors. *)
-               let remove_label s =
-                 let vis = object
-                   inherit Cil.nopCilVisitor
-                   method! vstmt { labels } =
-                     List.iter
-                       (function
-                         | Label (l, _, _) ->
-                           H.remove labelStmt l;
-                           H.remove backPatchGotos l
-                         | _ -> ())
-                       labels;
-                     DoChildren
-                 end
-                 in
-                 ignore (Cil.visitCilStmt vis s)
-               in
-               List.iter
-                 (fun (stmt, _, _, _, _) ->
-                    remove_label stmt
-                 ) !prechunk.stmts;
-               clean_up_chunk_locals !prechunk;
-               (* Drop the side-effects *)
-               prechunk := empty;
-               (* Constant-fold the argument and see if it is a constant *)
-               (match !pargs with
+                    "Invalid call to builtin_va_arg_pack"
+              end
+            | "__builtin_constant_p" ->
+              (* Before emptying the chunk, we remove the corresponding
+                 generated labels from the tables. Otherwise, they will
+                 be dangling when we iterate over the tables to fix
+                 forward gotos, leading to errors. *)
+              let remove_label s =
+                let vis = object
+                  inherit Cil.nopCilVisitor
+                  method! vstmt { labels } =
+                    List.iter
+                      (function
+                        | Label (l, _, _) ->
+                          H.remove labelStmt l;
+                          H.remove backPatchGotos l
+                        | _ -> ())
+                      labels;
+                    DoChildren
+                end
+                in
+                ignore (Cil.visitCilStmt vis s)
+              in
+              List.iter
+                (fun (stmt, _, _, _, _) ->
+                   remove_label stmt
+                ) !prechunk.stmts;
+              clean_up_chunk_locals !prechunk;
+              (* Drop the side-effects *)
+              prechunk := empty;
+              (* Constant-fold the argument and see if it is a constant *)
+              begin
+                match !pargs with
                 | [ arg ] -> begin
                     match (Cil.constFold true arg).enode with
                     | Const _ -> piscall := false;
@@ -6924,123 +6917,121 @@ and doExp local_env
                   end
                 | _ ->
                   Kernel.warning ~current:true
-                    "Invalid call to builtin_constant_p")
-             end
-           | "__builtin_offsetof" ->
-             begin
-               match !pargs with
-               | [{ enode = CastE (_, {enode = AddrOf (host, offset)}) } as e] ->
-                 begin
-                   piscall := false;
-                   prestype := Machine.sizeof_type ();
-                   let typ = Cil.typeOfLhost host in
-                   try
-                     let start, _width = Cil.bitsOffset typ offset in
-                     if start mod 8 <> 0 then
-                       Kernel.error ~current:true "Using offset of bitfield";
-                     let kind = Machine.sizeof_kind () in
-                     pres := Cil.kinteger ~loc:e.eloc kind (start / 8);
-                   with Cil.SizeOfError (s, _) ->
-                     pres := e;
-                     Kernel.error ~once:true ~current:true
-                       "Unable to compute offset %a in type %a: %s"
-                       Cil_printer.pp_offset offset
-                       Cil_printer.pp_typ typ
-                       s;
-                 end
-               | _ ->
-                 Errorloc.abort_context "Invalid call to builtin_offsetof"
-             end
-           | "__builtin_types_compatible_p" ->
-             begin
-               (* Constant-fold the argument and see if it is a constant *)
-               (match !pargs with
-                | [ {enode = SizeOf t1}; {enode = SizeOf t2}] -> begin
-                    (* Drop the side-effects *)
-                    prechunk := empty;
+                    "Invalid call to builtin_constant_p"
+              end
+            | "__builtin_offsetof" ->
+              begin
+                match !pargs with
+                | [{ enode = CastE (_, {enode = AddrOf (host, offset)}) } as e] ->
+                  begin
                     piscall := false;
-                    let compatible =
-                      try ignore(Cil.combineTypes CombineOther t1 t2); true
-                      with Cil.Cannot_combine _ -> false
-                    in if compatible then
-                      pres := Cil.integer ~loc 1
-                    else
-                      pres := Cil.integer ~loc 0;
-                    prestype := intType
+                    prestype := Machine.sizeof_type ();
+                    let typ = Cil.typeOfLhost host in
+                    try
+                      let start, _width = Cil.bitsOffset typ offset in
+                      if start mod 8 <> 0 then
+                        Kernel.error ~current:true "Using offset of bitfield";
+                      let kind = Machine.sizeof_kind () in
+                      pres := Cil.kinteger ~loc:e.eloc kind (start / 8);
+                    with Cil.SizeOfError (s, _) ->
+                      pres := e;
+                      Kernel.error ~once:true ~current:true
+                        "Unable to compute offset %a in type %a: %s"
+                        Cil_printer.pp_offset offset
+                        Cil_printer.pp_typ typ
+                        s;
                   end
+                | _ ->
+                  Errorloc.abort_context "Invalid call to builtin_offsetof"
+              end
+            | "__builtin_types_compatible_p" ->
+              begin
+                (* Constant-fold the argument and see if it is a constant *)
+                match !pargs with
+                | [ {enode = SizeOf t1}; {enode = SizeOf t2}] ->
+                  (* Drop the side-effects *)
+                  prechunk := empty;
+                  piscall := false;
+                  let compatible =
+                    try ignore(Cil.combineTypes CombineOther t1 t2); true
+                    with Cil.Cannot_combine _ -> false
+                  in if compatible then
+                    pres := Cil.integer ~loc 1
+                  else
+                    pres := Cil.integer ~loc 0;
+                  prestype := intType
                 | _ ->
                   Kernel.warning
                     ~once:true
                     ~current:true
-                    "Invalid call to builtin_types_compatible_p");
-             end
-           | "__builtin_expect" ->
-             begin
-               match !pargs with
-               | [ arg;_ ] ->
-                 (* Keep all side-effects, including those stemming
-                    from the second argument. This is quite strange but
-                    compliant with GCC's behavior. *)
-                 piscall := false;
-                 pres := arg
+                    "Invalid call to builtin_types_compatible_p"
+              end
+            | "__builtin_expect" ->
+              begin
+                match !pargs with
+                | [ arg;_ ] ->
+                  (* Keep all side-effects, including those stemming
+                     from the second argument. This is quite strange but
+                     compliant with GCC's behavior. *)
+                  piscall := false;
+                  pres := arg
+                | _ ->
+                  Kernel.warning ~once:true ~current:true
+                    "Invalid call to builtin_expect"
+              end
+
+            | "__fc_infinity" ->
+              piscall := false;
+              let cst = CReal (infinity, FFloat, Some "INFINITY") in
+              pres := Cil.new_exp ~loc (Const cst);
+              prestype := floatType
+            | "__fc_nan" ->
+              piscall := false;
+              let cst = CReal (nan, FFloat, Some "NAN") in
+              pres := Cil.new_exp ~loc (Const cst);
+              prestype := floatType
+
+            (* TODO: Only keep the side effects of the 1st or 2nd argument
+               | "__builtin_choose_expr" ->
+               begin match !pargs with
+               | [ arg; e1; e2 ] ->
+                 begin
+                   let constfolded = constFold true arg in
+                   match constfolded.enode with
+                   | Const _ ->
+                     piscall := false;
+                     if isZero constfolded then begin
+                     (* Keep only 3rd arg side effects *)
+                       (*TODO: prechunk := sf @@@ (List.nth sargsl 2);*)
+                       pres := e2;
+                       prestype := typeOf e2
+                     end else begin
+                     (* Keep only 2nd arg side effects *)
+                       (*TODO prechunk := sf @@@ (List.nth sargsl 1);*)
+                       pres := e1;
+                       prestype := typeOf e1
+                     end
+                   | _ -> Kernel.warning ~once:true ~current:true
+                     "builtin_choose_expr expects a constant first argument"
+                 end
                | _ ->
-                 Kernel.warning ~once:true ~current:true
-                   "Invalid call to builtin_expect"
-             end
-
-           | "__fc_infinity" -> begin
-               piscall := false;
-               let cst = CReal (infinity, FFloat, Some "INFINITY") in
-               pres := Cil.new_exp ~loc (Const cst);
-               prestype := floatType;
-             end
-           | "__fc_nan" -> begin
-               piscall := false;
-               let cst = CReal (nan, FFloat, Some "NAN") in
-               pres := Cil.new_exp ~loc (Const cst);
-               prestype := floatType;
-             end
-
-           (* TODO: Only keep the side effects of the 1st or 2nd argument
-              | "__builtin_choose_expr" ->
-              begin match !pargs with
-              | [ arg; e1; e2 ] ->
+               Kernel.warning ~once:true ~current:true
+                 "Invalid call to builtin_choose_expr: 3 arguments are \
+                  expected but %d are provided."
+                 (List.length !pargs)
+               end*)
+            | _ ->
+              if asconst = CConst then
+                (* last special case: we cannot allow a function call
+                   at this point.*)
                 begin
-                  let constfolded = constFold true arg in
-                  match constfolded.enode with
-                  | Const _ ->
-                    piscall := false;
-                    if isZero constfolded then begin
-                    (* Keep only 3rd arg side effects *)
-                      (*TODO: prechunk := sf @@@ (List.nth sargsl 2);*)
-                      pres := e2;
-                      prestype := typeOf e2
-                    end else begin
-                    (* Keep only 2nd arg side effects *)
-                      (*TODO prechunk := sf @@@ (List.nth sargsl 1);*)
-                      pres := e1;
-                      prestype := typeOf e1
-                    end
-                  | _ -> Kernel.warning ~once:true ~current:true
-                    "builtin_choose_expr expects a constant first argument"
+                  piscall := false;
+                  Errorloc.abort_context
+                    "Call to %a in constant." Cil_printer.pp_varinfo fv;
                 end
-              | _ ->
-              Kernel.warning ~once:true ~current:true
-                "Invalid call to builtin_choose_expr: 3 arguments are \
-                 expected but %d are provided."
-                (List.length !pargs)
-              end*)
-           | _ ->
-             if asconst = CConst then
-               (* last special case: we cannot allow a function call
-                  at this point.*)
-               begin
-                 piscall := false;
-                 Errorloc.abort_context
-                   "Call to %a in constant." Cil_printer.pp_varinfo fv;
-               end
-         end
-       | _ -> ());
+          end
+        | _ -> ()
+      end;
 
       (* Now we must finish the call *)
       if !piscall then begin
