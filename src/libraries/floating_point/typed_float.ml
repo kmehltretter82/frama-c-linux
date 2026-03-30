@@ -185,9 +185,9 @@ let ( >= )  : type f. f t -> f t -> bool =
   fun l r -> to_float l >= to_float r
 
 let equal (type l r) (l : l t) (r : r t) =
-  let l_format = format l in
-  let r_format = format r in
-  match same_format l_format r_format with
+  let l_fmt = format l in
+  let r_fmt = format r in
+  match same_format l_fmt r_fmt with
   | Yes _ -> l = r
   | No -> false
 
@@ -195,10 +195,8 @@ let compare (type l r) (l : l t) (r : r t) =
   let l_fmt = format l in
   let r_fmt = format r in
   match same_format l_fmt r_fmt with
-  | Yes _ ->
-    Float.compare (to_float l) (to_float r)
-  | No ->
-    compare_format l_fmt r_fmt
+  | Yes _ -> Float.compare (to_float l) (to_float r)
+  | No -> compare_format l_fmt r_fmt
 
 let hash (type f) (f : f t) =
   Hashtbl.hash (hash_format (format f), Float.hash (to_float f))
