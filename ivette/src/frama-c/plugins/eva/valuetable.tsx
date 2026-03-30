@@ -36,6 +36,7 @@ import { MarkerText, Modifier, selectMarker, textToString }
 
 import { EvaReady, EvaStatus } from './components/AnalysisStatus';
 import { evaComputationValue } from './components/Tools';
+import { useSelectedCS } from './Callstack';
 
 /* -------------------------------------------------------------------------- */
 /* --- Miscellaneous definitions                                          --- */
@@ -191,12 +192,32 @@ function Stmt(props: StmtProps): JSX.Element | null {
   const { descr, scope } = States.useMarker(stmt);
   const { sloc } = States.useMarker(marker);
   const { name: fct } = States.useDeclaration(scope);
+  const getCS = useCallstacks();
+  const [cs, setCS] = React.useState<Callstack.callstack | undefined>();
+  const [currCS, ] = States.useSyncState(Callstack.currentCallstacks);
+  const isSelected = cs && currCS?.includes(cs);
+  const { setSelected } = useSelectedCS();
+  // get callstack
+  React.useEffect(() => {
+    if(!marker) return;
+    getCS([marker]).then(e => {
+      if(e.length === 1 && e[0] !== "Summary") setCS(e[0]); });
+    }, [marker, setCS, getCS]);
+
   if (!marker || !fct) return null;
   // Location sloc should always be defined for statements.
   const label = short ? `@L${sloc?.line}` : `@${sloc?.base}:${sloc?.line}`;
   const title = stmt ? descr : "Start of function " + fct;
   const className = 'dome-text-cell eva-stmt';
-  return <span className={className} title={title}>{label}</span>;
+  return <>
+    <span className={className} title={title}>{label}</span>
+    <IconButton
+      icon='FILTER'
+      title={isSelected ? 'Callstack is selected' : 'Filter the callstack'}
+      kind={isSelected ? 'selected' : 'default'}
+      onClick={() => cs && setSelected(cs)}
+    />
+  </>;
 }
 
 /* -------------------------------------------------------------------------- */

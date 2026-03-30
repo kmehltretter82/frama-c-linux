@@ -80,15 +80,15 @@ function delMessage(): void {
 
 interface CSTreeProps {
   tree: TreeMap,
-  onClick: (id: string) => void
+  onClick: (id: EvaCS.callstack) => void
 }
 
 function CSTree({ tree, onClick } : CSTreeProps): React.ReactNode {
   const [currentCS, ] = States.useSyncState(EvaCS.currentCallstacks);
 
-  function getActions(id: string)
+  function getActions(id: EvaCS.callstack)
   : React.JSX.Element | null {
-    const isSelected = currentCS?.includes(parseInt(id, 10) as EvaCS.callstack);
+    const isSelected = currentCS?.includes(id);
     return (<>
       <IconButton
         icon='FILTER'
@@ -107,7 +107,7 @@ function CSTree({ tree, onClick } : CSTreeProps): React.ReactNode {
     return (
       <Tree.Node key={key} id={key} label={label}
         title={title}
-        actions={getActions(callstack.callstack.toString())}
+        actions={getActions(callstack.callstack)}
       >
         { subTree.size > 0 ?
           <CSTree tree={subTree} onClick={onClick} />
@@ -207,17 +207,10 @@ async function getInfosCallstacks(
   callback(infos);
 }
 
-// ----------------------------------------------------------------------------
-// --- Component CallstackSelection
-// ----------------------------------------------------------------------------
-
-export function CallstackSelection(): React.JSX.Element {
-  const [ unfoldAll, setUnfoldAll ] = React.useState<boolean|undefined>(true);
-
+export function useCallstacks(): InfosCS[] {
   const status = Server.useStatus();
   const evaComputed = States.useSyncValue(EvaAnalysis.computationState);
 
-  const [currCS, setCurrCS] = States.useSyncState(EvaCS.currentCallstacks);
   const [callstacks, setCallstacks] = React.useState<EvaCS.callstack[]>([]);
   const [CSInfos, setCallstacksInfos] = React.useState<InfosCS[]>([]);
 
@@ -231,32 +224,46 @@ export function CallstackSelection(): React.JSX.Element {
     getInfosCallstacks(callstacks, setCallstacksInfos);
   }, [callstacks]);
 
+  return CSInfos;
+}
+
+interface UseSelectedCS {
+  selected: EvaCS.callstack[] | undefined,
+  setSelected: (id: EvaCS.callstack) => void,
+  reset: () => void
+}
+
+export function useSelectedCS(): UseSelectedCS {
+  const [selected, _setSelected] = States.useSyncState(EvaCS.currentCallstacks);
+  const reset = React.useCallback(() => { _setSelected([]); }, [_setSelected]);
+
+  const setSelected  = React.useCallback((id: EvaCS.callstack): void => {
+    if(!selected || selected.length === 0) _setSelected([id]);
+    else if(selected.includes(id)) _setSelected(selected.filter(e => e !== id));
+    else _setSelected([...selected, id]);
+  }, [selected, _setSelected]);
+
+  /** update warning when selected change */
+  React.useEffect(() => {
+    if (selected && selected.length > 0) addMessage(selected.length, reset);
+    else delMessage();
+  }, [selected, reset]);
+
+  return { selected, setSelected, reset };
+}
+
+// ----------------------------------------------------------------------------
+// --- Component CallstackSelection
+// ----------------------------------------------------------------------------
+
+export function CallstackSelection(): React.JSX.Element {
+  const [ unfoldAll, setUnfoldAll ] = React.useState<boolean|undefined>(true);
+  const { selected, setSelected, reset } = useSelectedCS();
+  const CSInfos = useCallstacks();
   /** Nodes */
   const nodes = React.useMemo(() => getNodes(CSInfos), [CSInfos]);
   /** Tree */
   const tree = React.useMemo(() => getTree(nodes), [nodes]);
-
-  /** Selected callstacks */
-  const [selected, setSelected] = React.useState(new Set(currCS));
-  const onClick = (id: string): void => {
-    const intId = parseInt(id, 10) as EvaCS.callstack;
-    selected.has(intId) ? selected.delete(intId): selected.add(intId);
-    setSelected(new Set(selected));
-  };
-
-  /** Update callstacks selected */
-  React.useEffect(() => { setCurrCS([...selected]); }, [selected, setCurrCS]);
-
-  /** update warning when currentCS is not empty */
-  React.useEffect(() => {
-    if (currCS && currCS.length > 0)
-      addMessage(currCS.length, () => {
-        setCurrCS([]);
-        setSelected(new Set([]));
-      });
-    else
-      delMessage();
-  }, [currCS, setCurrCS]);
 
   return (
     <EvaReady>
@@ -279,8 +286,8 @@ export function CallstackSelection(): React.JSX.Element {
         </div>
         <Button
           label='Select All'
-          disabled={selected.size === 0}
-          onClick={() => setSelected(new Set())}
+          disabled={!selected || selected.length === 0}
+          onClick={reset}
           />
       </div>
       <Tree.Tree
@@ -298,7 +305,7 @@ export function CallstackSelection(): React.JSX.Element {
           }
         }}
       >
-        <CSTree tree={tree} onClick={onClick}></CSTree>
+        <CSTree tree={tree} onClick={setSelected}></CSTree>
       </Tree.Tree>
     </EvaReady>
   );
