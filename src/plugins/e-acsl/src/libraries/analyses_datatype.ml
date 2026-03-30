@@ -394,7 +394,7 @@ module Logic_env
            the profile, we add the refined interval in the other bindings,
            which are checked first when finding the interval *)
         Logic_var.Map.add x (!ival_meet_ref i ival) env.let_quantif_bind
-      | None -> Options.abort "updating a variable not in environment"
+      | None -> env.let_quantif_bind
     in
     {env with let_quantif_bind = new_lq_bind}
 
