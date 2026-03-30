@@ -70,7 +70,7 @@ val safe_array_toffset : logic_type -> term_offset -> bool
 (** The residual conditions are computed by assuming that all inner
     sub-expresisions or l-values are correct. *)
 
-type residual = [ `Default | `True | `False | `Non_null ]
+type residual = [ `Default | `True | `False ]
 
 val rpath : lkind -> residual
 val rvalid : ?writing:bool -> kinstr -> Memory.node -> lkind -> residual

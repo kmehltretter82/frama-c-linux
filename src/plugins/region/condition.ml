@@ -152,13 +152,12 @@ and safe_array_toffset t = function
 (* --- Side Condition Generators                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-type residual = [ `Default | `True | `False | `Non_null ]
+type residual = [ `Default | `True | `False ]
 
 let pp_residual fmt = function
   | `Default -> Format.pp_print_string fmt "default"
   | `True -> Format.pp_print_string fmt "true"
   | `False -> Format.pp_print_string fmt "false"
-  | `Non_null -> Format.pp_print_string fmt "non-null"
 
 let rpath kd =
   if kd.indexed && kd.aligned then `True else `Default
