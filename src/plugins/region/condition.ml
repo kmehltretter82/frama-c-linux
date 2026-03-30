@@ -181,18 +181,16 @@ let rallocated kinstr v =
 
 (* Note: rvalid also applies to object_pointer because of safe arrays *)
 
-let rvalid ?(writing=false) kinstr _node kd =
+let rvalid ?(writing=false) kinstr node kd =
   if not kd.aligned then `Default
   else
     match kd.host with
     | Some v ->
       if writing && Attr.is_const v then `False else
       if kd.indexed then rallocated kinstr v else `Default
-    | None -> `Default
-(* let flags = Memory.flags node in
-   if writing && Attr.mem `Readonly flags then `False else
-   if not kd.indexed || Attr.mem `Allocated flags then `Default else
-   if Attr.mem `Nullable flags then `Non_null else `True *)
+    | None ->
+      let flags = Memory.flags node in
+      if writing && Attr.mem `Readonly flags then `False else `Default
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Initialized                                                       --- *)

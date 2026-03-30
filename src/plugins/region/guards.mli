@@ -54,7 +54,7 @@ val add_annotation :
   ?kf:kernel_function ->
   ?emitter:Emitter.t ->
   ?names:string list ->
-  ?status:Property_status.emitted_status ->
+  ?invalid:bool ->
   ?hyps:Property.t list ->
   stmt -> condition -> unit
 

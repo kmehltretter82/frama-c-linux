@@ -161,10 +161,8 @@ let add env ?(invalid=false) name guard =
   let status =
     try Gmap.find cond env.guards
     with Not_found -> { invalid = false ; names = Names.empty } in
-  let status = {
-    invalid = invalid || status.invalid ;
-    names = Names.add name status.names ;
-  } in
+  let names = Names.add name status.names in
+  let status = { invalid = invalid || status.invalid ; names } in
   env.guards <- Gmap.add cond status env.guards
 
 let check env name g a = function
@@ -552,20 +550,29 @@ let self =
           ~tuning:[] in
       em := Some e ; e
 
-let add_annotation ?kf ?emitter ?names ?status ?(hyps=[]) stmt condition =
+let add_annotation ?kf ?emitter ?(names=[]) ?(invalid=false) ?(hyps=[]) stmt condition =
   let loc = Cil_datatype.Stmt.loc stmt in
   let kind = if Options.Assert.get () then Cil_types.Assert else Check in
+  let enames = if invalid then "invalid"::names else names in
+  let enames = if emitter = None then "region"::enames else enames in
   let e = match emitter with Some e -> e | None -> self () in
-  let a = of_condition ~loc ?names condition in
+  let a = of_condition ~loc ~names:enames condition in
   let a = Logic_const.toplevel_predicate ~kind a in
   let ca = Logic_const.new_code_annotation (AAssert ([],a)) in
   Annotations.add_code_annot e ?kf stmt ca ;
-  match status with
-  | None -> ()
-  | Some st ->
+  if invalid then
     let kf = Kernel_function.find_englobing_kf stmt in
     let ips = Property.ip_of_code_annot kf stmt ca in
-    List.iter (fun ip -> Property_status.emit e ~hyps ip st) ips
+    let status = Property_status.False_if_reachable in
+    List.iter (fun ip -> Property_status.emit e ~hyps ip status) ips ;
+    match names with
+    | [] ->
+      Options.warning ~source:(fst loc) "Invalid side-condition"
+    | [e] ->
+      Options.warning ~source:(fst loc) "Invalid side-condition (%s)" e
+    | es ->
+      Options.warning ~source:(fst loc) "Invalid side-conditions (%s)"
+        (String.concat ", " es)
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Function Annotation                                               --- *)
@@ -604,12 +611,7 @@ let annotate =
             (fun stmt ->
                guards kf map
                  (fun ~names ~invalid condition ->
-                    let names = "region"::names in
-                    let status =
-                      if invalid then
-                        Some Property_status.False_if_reachable
-                      else None
-                    in add_annotation ~kf ~names ?status stmt condition
+                    add_annotation ~kf ~names ~invalid stmt condition
                  ) stmt
             ) fd.sallstmts ;
           set_annotated kf ;
