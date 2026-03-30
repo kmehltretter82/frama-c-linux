@@ -633,9 +633,11 @@ struct
       set_range ~min:0 ~max:max_int;
       if is_kernel () then begin
         Kernel_log.kernel_verbose_atleast_ref := (fun n -> get () >= n);
-        match !Kernel_log.Verbose_level.value_if_set with
-        | None -> ()
-        | Some n -> set n
+        begin match !Kernel_log.Verbose_level.value_if_set with
+          | None -> ()
+          | Some n -> set n
+        end;
+        add_set_hook (fun _ n -> Kernel_log.Verbose_level.set n);
       end
     [@@alert "-kernel_log"]
   end
@@ -665,9 +667,11 @@ struct
       set_range ~min:0 ~max:max_int;
       if is_kernel () then begin
         Kernel_log.kernel_debug_atleast_ref := (fun n -> get () >= n);
-        match !Kernel_log.Debug_level.value_if_set with
-        | None -> ()
-        | Some n -> set n
+        begin match !Kernel_log.Debug_level.value_if_set with
+          | None -> ()
+          | Some n -> set n
+        end;
+        add_set_hook (fun _ n -> Kernel_log.Debug_level.set n)
       end
     [@@alert "-kernel_log"]
   end
