@@ -158,13 +158,18 @@ let of_local lpos =
   Local lpos
 
 let set_stmt stmt pos =
+  let is_in_kf stmt kf =
+    Kernel_function.equal
+      (Kernel_function.find_englobing_kf stmt)
+      kf
+  in
   match pos with
-  | GlobalInit _ -> None
-  | RootCall { thread; entry_point } ->
+  | RootCall { thread; entry_point } when is_in_kf stmt entry_point ->
     let cs = Callstack.init ~thread ~entry_point in
     Some (local stmt cs)
-  | Local (_, cs) ->
+  | Local (_, cs) when is_in_kf stmt (Callstack.top_kf cs) ->
     Some (local stmt cs)
+  | GlobalInit _ | RootCall _ | Local _ -> None
 
 let push_kf kf pos =
   match pos with
