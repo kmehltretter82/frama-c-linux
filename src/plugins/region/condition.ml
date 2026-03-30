@@ -196,14 +196,13 @@ let rvalid ?(writing=false) kinstr node kd =
 (* ---  Initialized                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rinitialized map _node kd =
+let rinitialized node kd =
   match kd.host with
-  | Some v ->
-    let garbage = Memory.garbage map v in
-    if Attr.is_initialized ~garbage v then `True else `Default
+  | Some _ ->
+    let flags = Memory.flags node in
+    let garbage = Attr.mem `Garbage flags in
+    if not garbage then `True else `Default
   | None -> `Default
-(* let flags = Memory.flags node in
-   if Attr.mem `Garbage flags then `Default else `True *)
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Aligned                                                           --- *)

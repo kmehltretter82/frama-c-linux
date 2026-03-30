@@ -74,7 +74,7 @@ type residual = [ `Default | `True | `False | `Non_null ]
 
 val rpath : lkind -> residual
 val rvalid : ?writing:bool -> kinstr -> Memory.node -> lkind -> residual
-val rinitialized : Memory.map -> Memory.node -> lkind -> residual
+val rinitialized : Memory.node -> lkind -> residual
 val raligned : Memory.node -> bits:int -> ?default:bool -> lkind -> residual
 val rallocated : kinstr -> varinfo -> residual
 
