@@ -424,11 +424,7 @@ let () =
   | Some n -> GeneralDebug.set n
 let () =
   (* Add the hook after setting it from Cmdline to avoid setting it twice. *)
-  GeneralDebug.add_set_hook
-    (fun old n ->
-       if n = 0 then decr Plugin.positive_debug_ref
-       else if old = 0 then incr Plugin.positive_debug_ref;
-       Cmdline.Debug_level.set n)
+  GeneralDebug.add_set_hook (fun _ n -> Cmdline.Debug_level.set n)
 
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.set_negative_option_name ""

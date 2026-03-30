@@ -10,7 +10,6 @@ module CamlString = String
 
 let empty_string = ""
 
-let positive_debug_ref = ref 0
 let session_is_set_ref = Extlib.mk_fun "session_is_set_ref"
 let session_ref = Extlib.mk_fun "session_ref"
 let cache_is_set_ref = Extlib.mk_fun "cache_is_set_ref"
@@ -659,10 +658,6 @@ struct
       debug_level := get;
       (* line order below matters *)
       set_range ~min:0 ~max:max_int;
-      add_set_hook
-        (fun old n ->
-           if n = 0 then decr positive_debug_ref
-           else if old = 0 then Stdlib.incr positive_debug_ref);
       if is_kernel () then begin
         Kernel_log.kernel_debug_atleast_ref := (fun n -> get () >= n);
         match !Kernel_log.Debug_level.value_if_set with
