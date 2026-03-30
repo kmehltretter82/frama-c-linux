@@ -1,7 +1,7 @@
-\chapter{Region User's Guide}
-\label{region-plugin}
+\chapter{User's Guide}
+\label{toc:userguide}
 
-The \FramaC/\Region computes a single \emph{memory map} for every
+The \FramaC/\textsf{Region} computes a single \emph{memory map} for every
 \textsf{C}-function in the source. The computation of memory maps is performed
 on-demand through the \FramaC GUI or through the \textsf{API} or once and for
 all functions by using the \verb$-region$ command-line option.
@@ -11,14 +11,14 @@ difficult to read by normal users. It consists of a text-based dump of all
 regions for all functions with their attributes and properties.
 
 Region maps are visual and interactive data that deserve a graphical user
-interface to be exploited. Hence, the recommended way of using \FramaC/\Region
+interface to be exploited. Hence, the recommended way of using \FramaC/\textsf{Region}
 is \emph{via} the \FramaC GUI and its \textsf{Region Analysis} component:
 
 \begin{logs}
 > frama-c-gui -region *.c
 \end{logs}
 
-The Region Analysis view (See Figure~\ref{region-view}) shows the \emph{memory
+The Region Analysis view (See Figure~\ref{fig:ivette}) shows the \emph{memory
 map} associated with the currently selected function. You can pin the current
 map if you want to consult other functions while keeping the current map
 visible. You can also download the current memory map in
@@ -29,23 +29,23 @@ DOT/Graphviz\footnote{\url{https://graphviz.org}} format.
 \fbox{\includegraphics[width=10cm]{images/ivette-region.png}}
 \end{center}
 \caption{Ivette View with the Region Analysis Component}
-\label{region-view}
+\label{fig:ivette}
 \end{figure}
 
 The User's Guide Section is structured as follows:
 \begin{itemize}
-  \item Section~\ref{region-navigation} explains how to read and navigate
+  \item Section~\ref{toc:navigation} explains how to read and navigate
     through the different regions of memory maps.
-  \item Section~\ref{region-annotations} explains how to write \acsl
+  \item Section~\ref{toc:annotations} explains how to write \acsl
     \emph{region annotations} in order to refine the memory maps.
-  \item Section~\ref{region-commands} explains how to use the command-line
+  \item Section~\ref{toc:commandline} explains how to use the command-line
     options to generate the \emph{map side-conditions}.
 \end{itemize}
 
 \section{Walking through Region Maps}
-\label{region-navigation}
+\label{toc:navigation}
 
-A \FramaC/\Region memory map consists of different kinds of cells or
+A \FramaC/\textsf{Region} memory map consists of different kinds of cells or
 \emph{regions}. Intuitively a \emph{region} is a delimited range of memory
 locations with consistent access.
 
@@ -69,7 +69,7 @@ associated subregions.
 The root regions of memory maps consists of the \C variables. Function returned
 value has also its own region, denoted by \verb+\result+ like in \acsl. Some
 regions can also be named with \emph{labels} from user's region annotations
-(Cf.~\ref{region-annotations}):
+(Cf.~\ref{toc:annotations}):
 \begin{quote}
 \begin{tabular}{rl}
 
@@ -111,7 +111,7 @@ of access: read (R), written (W) and initialized (I):
 \end{quote}
 Atomic types are indicated with a single-letter for concision but their complete
 description (with size in bits) is accessible by hovering or clicking the
-region. One-letter types are listed in Figure~\ref{region-types}.
+region. One-letter types are listed in Figure~\ref{fig:types}.
 
 \clearpage
 \paragraph{Pointer Regions.} When region values are pointers (\verb+*+), they
@@ -161,7 +161,7 @@ garbled regions.
 
 By construction, structure fields lead to \emph{separated} subregions of the
 compound region, unless they are explicitly aliased by the code or user
-annotations (Cf.~\ref{region-annotations}). Hence, compound regions are
+annotations (Cf.~\ref{toc:annotations}). Hence, compound regions are
 graphically represented by tables with disjoint rows that represent separated
 subregions of each compound cell:
 \begin{quote}
@@ -239,11 +239,11 @@ of all rows with their offset range and contained fields.
 \end{tabular}
 \end{center}
 \caption{Atomic Region Types}
-\label{region-types}
+\label{fig:types}
 \end{figure}
 
 \section{Adding Region Annotations}
-\label{region-annotations}
+\label{toc:annotations}
 
 By default, the \textsf{Region} plug-in guess on optimistic aliasing contexts
 and assumes that pointers have all desirable good properties to avoid any
@@ -311,12 +311,13 @@ analyzed.
   \end{tabular}
   \end{center}
   \caption{Syntax of Region Annotations}
-  \label{fig:region-annotations}
+  \label{fig:annotations}
 \end{figure}
 
+\index{region@\verb+region+}
 Region annotations are extended \textsf{ACSL} clauses, introduced by
 \verb+region+ keyword (or \verb+\\region::region+) that follow the syntactic
-definitions of Figure~\ref{fig:region-annotations}. They can be used in function
+definitions of Figure~\ref{fig:annotations}. They can be used in function
 contracts, but within the default behavior only, or inside code-annotations.
 
 Each region annotation introduces one or several regions specifications. Region
@@ -387,6 +388,10 @@ By default, any declared object \verb+p[a..b]+ is assumed to be valid and
 properly initialized. Flags can be used in region specifications to downgrade
 those hypotheses to more permissive situations. The available flags for an
 object specification \verb+a[p..q]+ are:
+\index{nullable@\verb+\nullable+}
+\index{allocated@\verb+\allocated+}
+\index{garbage@\verb+\garbage+}
+\index{readonly@\verb+\readonly+}
 \begin{itemize}
   \item \verb+\nullable+ allows \verb+a+ to be \verb+\null+;
   \item \verb+\allocated+ allows range \verb$a+(p..q)$ to be valid partially
@@ -419,7 +424,7 @@ only be assigned the \verb+\null+ value or a pointer to a valid object
 
 \pagebreak
 \section{Generating Side Conditions}
-\label{region-commands}
+\label{toc:commandline}
 
 Region specifications are taken as \emph{additional requirements} to other
 \textsf{ACSL} clauses of a function. As such, they are not necessarily verified
