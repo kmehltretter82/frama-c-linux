@@ -200,11 +200,10 @@ async function getInfosCallstacks(
   callstacks: EvaCS.callstack[],
   callback: (a: InfosCS[]) => void
 ): Promise<void> {
-  const infos = [];
-  for(const cs of callstacks) {
+  const infos = await Promise.all(callstacks.map(async (cs) => {
     const info = await Server.send(EvaCS.getCallstackInfo, cs);
-    infos.push({ ...info, callstack: cs });
-  }
+    return { ...info, callstack: cs };
+  }));
   callback(infos);
 }
 
