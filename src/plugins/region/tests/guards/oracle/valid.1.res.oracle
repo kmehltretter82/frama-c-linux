@@ -24,7 +24,7 @@ int arr(int *p, int k, int n)
 {
   int __retres;
   /*@ check region: mem_access: \valid_read(p + k); */
-  /*@ check region: boundaries: \valid_region(p + k, 4); */
+  /*@ check region: path: \valid_region(p + k, sizeof(int)); */
   /*@ check region: initialized: \initialized(p + k); */
   __retres = *(p + k);
   return __retres;
@@ -35,7 +35,7 @@ int comp(struct S p, int k)
 {
   int __retres;
   /*@ check region: mem_access: \valid_read(&p.f[k]); */
-  /*@ check region: boundaries: \valid_region(&p.f[k], 4); */
+  /*@ check region: path: \valid_region(&p.f[k], sizeof(int)); */
   __retres = p.f[k];
   return __retres;
 }
@@ -45,7 +45,7 @@ int pcomp(struct S *p, int k)
 {
   int __retres;
   /*@ check region: mem_access: \valid_read(&p->f[k]); */
-  /*@ check region: boundaries: \valid_region(&p->f[k], 4); */
+  /*@ check region: path: \valid_region(&p->f[k], sizeof(int)); */
   /*@ check region: initialized: \initialized(&p->f[k]); */
   __retres = p->f[k];
   return __retres;
@@ -56,9 +56,9 @@ int cast(char *p, int k, int n)
 {
   int __retres;
   /*@ check region: mem_access: \valid_read((int *)(p + k)); */
-  /*@ check region: boundaries: \valid_region((int *)(p + k), 4); */
+  /*@ check region: path: \valid_region((int *)(p + k), sizeof(int)); */
   /*@ check region: initialized: \initialized((int *)(p + k)); */
-  /*@ check region: aligned: \aligned((int *)(p + k),4); */
+  /*@ check region: aligned: \aligned((int *)(p + k),sizeof(int)); */
   __retres = *((int *)(p + k));
   return __retres;
 }
@@ -68,7 +68,7 @@ int nocast(char *p, int k, int n)
 {
   int __retres;
   /*@ check region: mem_access: \valid_read((int *)p + k); */
-  /*@ check region: boundaries: \valid_region((int *)p + k, 4); */
+  /*@ check region: path: \valid_region((int *)p + k, sizeof(int)); */
   /*@ check region: initialized: \initialized((int *)p + k); */
   __retres = *((int *)p + k);
   return __retres;

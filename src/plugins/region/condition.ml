@@ -41,7 +41,7 @@ let pinitialized ?loc ?names ?(label=Logic_const.here_label) addr =
 
 let paligned ?loc ?names addr =
   let te = Logic_typing.ctype_of_pointed addr.term_type in
-  let size = Logic_const.tinteger ?loc @@ Fields.bytesSizeOf te in
+  let size = Logic_const.term ?loc (TSizeOf te) Linteger in
   Logic_const.paligned ?loc ?names (addr,size)
 
 (* -------------------------------------------------------------------------- *)
@@ -65,7 +65,7 @@ let () = Logic_builtin.register {
 let pvalid_region ?loc ?names ?(label=Logic_const.here_label) addr =
   let f = List.hd @@ Logic_env.find_all_logic_functions l_valid_region in
   let te = Logic_typing.ctype_of_pointed addr.term_type in
-  let size = Logic_const.tinteger ?loc @@ Fields.bytesSizeOf te in
+  let size = Logic_const.term ?loc (TSizeOf te) Linteger in
   Logic_const.papp ?loc ?names (f,[label],[addr;size])
 
 (* -------------------------------------------------------------------------- *)
@@ -177,8 +177,6 @@ let rallocated kinstr v =
     match kinstr with
     | Kglobal -> `Default
     | Kstmt stmt -> if in_scope v stmt then `True else `False
-
-(* Note: rvalid also applies to object_pointer because of safe arrays *)
 
 let rvalid ?(writing=false) kinstr node kd =
   if not kd.aligned then `Default

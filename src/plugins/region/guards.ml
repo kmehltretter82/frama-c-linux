@@ -196,8 +196,8 @@ let valid env n ?kd a =
 
 let valid_read env n ?kd a =
   if not @@ RteGen.Generator.Mem_access.is_computed env.kf then
-    let residual = Condition.rvalid env.here n (kindof a kd) in
-    check env "mem_access" (Valid_read a) a residual
+    check env "mem_access" (Valid_read a) a @@
+    Condition.rvalid env.here n (kindof a kd)
 
 let valid_object env n ?kd a =
   if
@@ -222,7 +222,7 @@ let aligned env n ?kd a =
     Condition.raligned n (kindof a kd) ~bits
 
 let valid_region env n ?kd a =
-  check env "boundaries" (Valid_region(n,a)) a @@ Condition.rpath (kindof a kd)
+  check env "path" (Valid_region(n,a)) a @@ Condition.rpath (kindof a kd)
 
 let readable env n a =
   begin
@@ -263,7 +263,7 @@ and offset env t r = function
     begin
       if Kernel.SafeArrays.get () then
         let n = Ast_info.direct_array_size t in
-        add env "safe_array" (Bounds(E k,n))
+        add env "bounds" (Bounds(E k,n))
     end ;
     offset env te r o
 
