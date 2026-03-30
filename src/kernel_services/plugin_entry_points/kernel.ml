@@ -397,12 +397,13 @@ module GeneralVerbose =
       let module_name = "GeneralVerbose"
     end)
 let () =
-  (* line order below matters *)
   GeneralVerbose.set_range ~min:0 ~max:max_int;
-  GeneralVerbose.add_set_hook (fun _ n -> Cmdline.Verbose_level.set n);
   match !Cmdline.Verbose_level.value_if_set with
   | None -> ()
   | Some n -> GeneralVerbose.set n
+let () =
+  (* Add the hook after setting it from Cmdline to avoid setting it twice. *)
+  GeneralVerbose.add_set_hook (fun _ n -> Cmdline.Verbose_level.set n)
 
 let () = Parameter_customize.set_group grp_debug
 let () = Parameter_customize.do_not_projectify ()
@@ -417,16 +418,17 @@ module GeneralDebug =
       let module_name = "GeneralDebug"
     end)
 let () =
-  (* line order below matters *)
   GeneralDebug.set_range ~min:0 ~max:max_int;
+  match !Cmdline.Debug_level.value_if_set with
+  | None -> ()
+  | Some n -> GeneralDebug.set n
+let () =
+  (* Add the hook after setting it from Cmdline to avoid setting it twice. *)
   GeneralDebug.add_set_hook
     (fun old n ->
        if n = 0 then decr Plugin.positive_debug_ref
        else if old = 0 then incr Plugin.positive_debug_ref;
-       Cmdline.Debug_level.set n);
-  match !Cmdline.Debug_level.value_if_set with
-  | None -> ()
-  | Some n -> GeneralDebug.set n
+       Cmdline.Debug_level.set n)
 
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.set_negative_option_name ""
