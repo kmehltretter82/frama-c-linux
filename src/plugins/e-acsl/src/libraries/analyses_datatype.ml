@@ -398,6 +398,10 @@ module Logic_env
     in
     {env with let_quantif_bind = new_lq_bind}
 
+  let pretty fmt {profile; let_quantif_bind} =
+    Format.fprintf fmt "@[profile: %a@]@[<v 2>let_quantif_bind: %a@]"
+      Profile.pretty profile
+      Profile.pretty let_quantif_bind
 end
 
 (* Imperative environment to perform fixpoint algorithm for recursive

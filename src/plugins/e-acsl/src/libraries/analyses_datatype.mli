@@ -48,7 +48,7 @@ module Profile: sig
   val is_empty: t -> bool
   val empty: t
   val is_included: t -> t -> bool
-
+  val pretty: Format.formatter -> t -> unit
 end
 
 (** term with a profile: a term inside a logic function or predicate may
@@ -91,6 +91,8 @@ module Logic_env : sig
   (** refine the interval of a logic variable: replace an interval with a more
       precise one *)
   val refine : t -> logic_var -> ival -> t
+
+  val pretty: Format.formatter -> t -> unit
 end
 
 
