@@ -661,8 +661,6 @@ struct
       set_range ~min:0 ~max:max_int;
       add_set_hook
         (fun old n ->
-           (* the level of verbose is at least the level of debug *)
-           if n > Verbose.get () then Verbose.set n;
            if n = 0 then decr positive_debug_ref
            else if old = 0 then Stdlib.incr positive_debug_ref);
       if is_kernel () then begin
