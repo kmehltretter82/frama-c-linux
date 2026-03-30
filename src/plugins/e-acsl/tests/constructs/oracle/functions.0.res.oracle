@@ -12,6 +12,8 @@
 [e-acsl] functions.c:94: Warning: 
   E-ACSL construct `function application' is not yet supported.
   Ignoring annotation.
+[e-acsl] functions.c:118: Warning: 
+  no assigns clause generated for function f6 because pointers as arguments is not yet supported
 [e-acsl] functions.c:123: Warning: 
   E-ACSL construct `predicate with labels' is not yet supported.
   Ignoring annotation.
@@ -29,6 +31,10 @@
 [eva:alarm] functions.c:117: Warning: 
   non-finite double value. assert \is_finite(__gen_e_acsl__8);
 [eva:alarm] functions.c:117: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:118: Warning: 
+  non-finite double value. assert \is_finite(__gen_e_acsl__11);
+[eva:alarm] functions.c:118: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] functions.c:119: Warning: assertion got status unknown.
 [eva:alarm] functions.c:121: Warning: 

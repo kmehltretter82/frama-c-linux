@@ -35,7 +35,7 @@ int glob = 5;
 /*@ predicate never_called(int x) = x == x; */
 
 /*@ logic double f2(double x) = (double)(1/x); */ /* handle in MR !226 */
-
+//@ logic double f6(double* x) = (double)(1 / *x); // E-ACSL issue !236
 // To test not_yet:
 /*@ predicate p_labelled{L}(integer x) = x > 0; */
 /*@ logic integer f_labelled{L}(integer x) = x; */
@@ -115,7 +115,7 @@ int main(void) {
 
   double d = 2.0;
   /*@ assert f2(d) > 0; */;
-
+  //@ assert f6(&d) > 0;
   /*@ assert f_sum (100) == 100; */;
 
   /*@ assert over(1., 2.) == 0.5; */;
