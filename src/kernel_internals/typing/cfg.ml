@@ -207,8 +207,9 @@ and cfgStmt env (s: stmt) next break cont =
     cfgBlock env blk2 next break cont
 
   | UnspecifiedSequence seq ->
-    addBlockSucc (Cil.block_from_unspecified_sequence seq);
-    cfgBlock env (Cil.block_from_unspecified_sequence seq) next break cont
+    let b = Cil.block_from_unspecified_sequence seq in
+    addBlockSucc b;
+    cfgBlock env b next break cont
   | Block b ->
     addBlockSucc b;
     cfgBlock env b next break cont
