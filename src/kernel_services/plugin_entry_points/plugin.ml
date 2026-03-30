@@ -653,7 +653,12 @@ struct
            else "level of debug for plug-in " ^ P.name)
           ^ " (default to " ^ string_of_int default ^ ")"
       end)
-    let get () = if is_set () then get () else Cmdline.Debug_level.get ()
+
+    let get () =
+      if is_set () || Option.is_none !Cmdline.Debug_level.value_if_set
+      then get ()
+      else Cmdline.Debug_level.get ()
+
     let () =
       debug_level := get;
       (* line order below matters *)
