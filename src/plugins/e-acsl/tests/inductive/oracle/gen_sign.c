@@ -7,9 +7,9 @@
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 enum sign_t {
-    POS = 0,
-    ZERO = 1,
-    NEG = 2
+    POS = 0U,
+    ZERO = 1U,
+    NEG = 2U
 };
 /*@
 inductive signum(real x, enum sign_t r) {
@@ -34,7 +34,7 @@ int main(void)
   {
     int __gen_e_acsl_signum_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __gen_e_acsl_signum_2 = __gen_e_acsl_signum(2.,POS);
+    __gen_e_acsl_signum_2 = __gen_e_acsl_signum(2.,(int)POS);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "signum(2., POS)",0,__gen_e_acsl_signum_2);
     __gen_e_acsl_assert_data.blocking = 1;
@@ -51,7 +51,7 @@ int main(void)
     int __gen_e_acsl_signum_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __gen_e_acsl_signum_4 = __gen_e_acsl_signum(0.,ZERO);
+    __gen_e_acsl_signum_4 = __gen_e_acsl_signum(0.,(int)ZERO);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "signum(0., ZERO)",0,__gen_e_acsl_signum_4);
     __gen_e_acsl_assert_data_2.blocking = 1;
@@ -78,7 +78,7 @@ int main(void)
     __gmpq_init(__gen_e_acsl_sub);
     __gmpq_sub(__gen_e_acsl_sub,(__e_acsl_mpq_struct const *)(__gen_e_acsl_),
                (__e_acsl_mpq_struct const *)(__gen_e_acsl__2));
-    __gen_e_acsl_signum_6 = __gen_e_acsl_signum_5(__gen_e_acsl_sub,ZERO);
+    __gen_e_acsl_signum_6 = __gen_e_acsl_signum_5(__gen_e_acsl_sub,(int)ZERO);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                  "signum(0. - 2., ZERO)",0,
                                  __gen_e_acsl_signum_6);

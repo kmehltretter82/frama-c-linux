@@ -15,9 +15,9 @@ struct Flex {
    int f[] ;
 };
 enum E {
-    A = 0,
-    B = 1,
-    C = 2
+    A = 0U,
+    B = 1U,
+    C = 2U
 };
 struct incomplete;
 /*@ requires correct_size: 0 ≤ size - 8 ∧ 0 ≡ (size - 8) % 4;
@@ -326,9 +326,9 @@ struct Flex {
    int f[] ;
 };
 enum E {
-    A = 0,
-    B = 1,
-    C = 2
+    A = 0U,
+    B = 1U,
+    C = 2U
 };
 struct incomplete;
 /*@ requires correct_size: 0 ≤ size - 8 ∧ 0 ≡ (size - 8) % 4;

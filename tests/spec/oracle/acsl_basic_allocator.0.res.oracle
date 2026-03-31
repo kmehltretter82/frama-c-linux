@@ -4,8 +4,8 @@
 #include "stddef.h"
 #include "stdlib.h"
 enum _bool {
-    false = 0,
-    true = 1
+    false = (unsigned int)0,
+    true = (unsigned int)1
 };
 typedef enum _bool bool;
 struct _memory_block {

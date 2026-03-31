@@ -14,20 +14,20 @@ union U {
    float b ;
 };
 enum EBool {
-    EBOOL_MIN = (_Bool)0,
-    EBOOL_MAX = (_Bool)1
+    EBOOL_MIN = 0U,
+    EBOOL_MAX = 1U
 };
 enum EChar {
-    ECHAR_MIN = (char)(-127-1),
-    ECHAR_MAX = (char)127
+    ECHAR_MIN = -128,
+    ECHAR_MAX = 127
 };
 enum ESChar {
-    ESCHAR_MIN = (signed char)(-127-1),
-    ESCHAR_MAX = (signed char)127
+    ESCHAR_MIN = -128,
+    ESCHAR_MAX = 127
 };
 enum EUChar {
-    EUCHAR_MIN = (unsigned char)0,
-    EUCHAR_MAX = (unsigned char)255
+    EUCHAR_MIN = 0U,
+    EUCHAR_MAX = 255U
 };
 enum EInt {
     EINT_MIN = (-2147483647-1),
@@ -38,12 +38,12 @@ enum EUInt {
     EUINT_MAX = 4294967295U
 };
 enum EShort {
-    ESHORT_MIN = (short)(-32767-1),
-    ESHORT_MAX = (short)32767
+    ESHORT_MIN = -32768,
+    ESHORT_MAX = 32767
 };
 enum EUShort {
-    EUSHORT_MIN = (unsigned short)0,
-    EUSHORT_MAX = (unsigned short)65535
+    EUSHORT_MIN = 0U,
+    EUSHORT_MAX = 65535U
 };
 enum ELong {
     ELONG_MIN = (-9223372036854775807L-1L),
@@ -54,12 +54,12 @@ enum EULong {
     EULONG_MAX = 18446744073709551615UL
 };
 enum ELLong {
-    ELLONG_MIN = (-9223372036854775807LL-1LL),
-    ELLONG_MAX = 9223372036854775807LL
+    ELLONG_MIN = (-9223372036854775807L-1L),
+    ELLONG_MAX = 9223372036854775807L
 };
 enum EULLong {
-    EULLONG_MIN = 0ULL,
-    EULLONG_MAX = 18446744073709551615ULL
+    EULLONG_MIN = 0UL,
+    EULLONG_MAX = 18446744073709551615UL
 };
 void f(void)
 {
@@ -768,7 +768,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_32);
   }
   /*@ assert \let x = enum_ulong; \true; */ ;
-  enum ELLong enum_llong = 9223372036854775807LL;
+  enum ELLong enum_llong = 9223372036854775807L;
   __e_acsl_store_block((void *)(& enum_llong),8UL);
   __e_acsl_full_init((void *)(& enum_llong));
   {
@@ -788,7 +788,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_33);
   }
   /*@ assert \let x = enum_llong; \true; */ ;
-  enum EULLong enum_ullong = 18446744073709551615ULL;
+  enum EULLong enum_ullong = 18446744073709551615UL;
   __e_acsl_store_block((void *)(& enum_ullong),8UL);
   __e_acsl_full_init((void *)(& enum_ullong));
   {

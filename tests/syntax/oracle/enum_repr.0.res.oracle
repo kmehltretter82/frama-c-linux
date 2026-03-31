@@ -1,12 +1,12 @@
 [kernel] Parsing enum_repr.i (no preprocessing)
-[kernel] enum_repr.i:40: Inserted implicit cast from unsigned int to bu2
-[kernel] enum_repr.i:41: Inserted implicit cast from long long to bu3
-[kernel] enum_repr.i:43: Inserted implicit cast from unsigned int to bs2
-[kernel] enum_repr.i:44: Inserted implicit cast from long long to bs3
-[kernel] enum_repr.i:45: Inserted implicit cast from signed char to bc1
-[kernel] enum_repr.i:46: Inserted implicit cast from unsigned char to bc2
-[kernel] enum_repr.i:47: Inserted implicit cast from signed char to bd1
-[kernel] enum_repr.i:48: Inserted implicit cast from unsigned char to bd2
+[kernel] enum_repr.i:25: Inserted implicit cast from unsigned int to int
+[kernel] enum_repr.i:26: Inserted implicit cast from long long to int
+[kernel] enum_repr.i:28: Inserted implicit cast from unsigned int to int
+[kernel] enum_repr.i:29: Inserted implicit cast from long long to int
+[kernel] enum_repr.i:31: Inserted implicit cast from signed char to int
+[kernel] enum_repr.i:32: Inserted implicit cast from unsigned char to int
+[kernel] enum_repr.i:33: Inserted implicit cast from signed char to int
+[kernel] enum_repr.i:34: Inserted implicit cast from unsigned char to int
 [kernel] enum_repr.i:66: Inserted implicit cast from foo to bla
 [kernel] enum_repr.i:67: Inserted implicit cast from bla to foo
 [kernel] enum_repr.i:68: Inserted implicit cast from unsigned int to foo
@@ -36,11 +36,11 @@ enum __anonenum_bu1_3 {
 };
 typedef enum __anonenum_bu1_3 bu1;
 enum __anonenum_bu2_4 {
-    Bu2 = 0xFFFFFFFF
+    Bu2 = (int)0xFFFFFFFF
 };
 typedef enum __anonenum_bu2_4 bu2;
 enum __anonenum_bu3_5 {
-    Bu3 = 0x1FFFFFFFF
+    Bu3 = (int)0x1FFFFFFFF
 };
 typedef enum __anonenum_bu3_5 bu3;
 enum __anonenum_bs1_6 {
@@ -49,30 +49,30 @@ enum __anonenum_bs1_6 {
 };
 typedef enum __anonenum_bs1_6 bs1;
 enum __anonenum_bs2_7 {
-    Bs2 = 0xFFFFFFFF,
+    Bs2 = (int)0xFFFFFFFF,
     Ms2 = -1
 };
 typedef enum __anonenum_bs2_7 bs2;
 enum __anonenum_bs3_8 {
-    Bs3 = 0x1FFFFFFFF,
+    Bs3 = (int)0x1FFFFFFFF,
     Ms3 = -1
 };
 typedef enum __anonenum_bs3_8 bs3;
 enum __anonenum_bc1_9 {
-    Bc1 = (signed char)'c'
+    Bc1 = (int)((signed char)'c')
 };
 typedef enum __anonenum_bc1_9 bc1;
 enum __anonenum_bc2_10 {
-    Bc2 = (unsigned char)'c'
+    Bc2 = (int)((unsigned char)'c')
 };
 typedef enum __anonenum_bc2_10 bc2;
 enum __anonenum_bd1_11 {
-    Bd1 = (signed char)'c',
+    Bd1 = (int)((signed char)'c'),
     Md1 = -1
 };
 typedef enum __anonenum_bd1_11 bd1;
 enum __anonenum_bd2_12 {
-    Bd2 = (unsigned char)'c',
+    Bd2 = (int)((unsigned char)'c'),
     Md2 = -1
 };
 typedef enum __anonenum_bd2_12 bd2;
@@ -84,14 +84,14 @@ int main(void)
   bar y = B;
   bu1 u1 = Bu1;
   bu2 u2 = Bu2;
-  bu3 u3 = (bu3)Bu3;
+  bu3 u3 = Bu3;
   bs1 s1 = Bs1;
   bs2 s2 = Bs2;
-  bs3 s3 = (bs3)Bs3;
-  bc1 c1 = (bc1)Bc1;
-  bc2 c2 = (bc2)Bc2;
-  bd1 d1 = (bd1)Bd1;
-  bd2 d2 = (bd2)Bd2;
+  bs3 s3 = Bs3;
+  bc1 c1 = Bc1;
+  bc2 c2 = Bc2;
+  bd1 d1 = Bd1;
+  bd2 d2 = Bd2;
   if (x == A) 
     if (y == B) {
       __retres = 0;
