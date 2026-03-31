@@ -453,7 +453,7 @@ and term env t =
     forall env xs
       (match p with
        | None -> term env
-       | Some p -> assume env p (term env)
+       | Some p -> pred env p ; assume env p (term env)
       ) t
   | Tunion ts | Tinter ts ->
     List.fold_left
