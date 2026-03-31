@@ -4369,6 +4369,20 @@ let rec doSpecList loc ghost
           | s -> Kernel.fatal ~current:true "Unknown enum representation '%s'" s
         in
         enum.ekind <- ekind;
+        (* Now that we found the enum's type, retype every item to this type. *)
+        let newt = mk_tint enum.ekind in
+        let zero = Cil.kinteger ~loc:(Current_loc.get()) enum.ekind 0 in
+        let retype i cabsitem cilitem =
+          match cabsitem with
+          | (_, { expr_node = Cabs.NOTHING}, _) ->
+            cilitem.eival <- i;
+            increm i 1
+          | (_, cabsexp, _) ->
+            let newival = mkCast ~newt (getIntConstExp ghost cabsexp) in
+            cilitem.eival <- newival;
+            increm newival 1
+        in
+        ignore (List.fold_left2 retype zero eil enum.eitems);
       end;
       (* Record the enum name in the environment *)
       addLocalToEnv ghost (kindPlusName "enum" n') (EnvTyp res);
