@@ -44,7 +44,7 @@ val debug_table: context -> (string, pattern) Hashtbl.t
 
 val parse_alternatives: context -> Logic_ptree.lexpr list -> alternative loc list
 
-val typecheck : ?env:env -> unit -> unit
+val typecheck : unit -> unit
 
 val typecheck_strategy : env -> string loc -> unit
 val typecheck_prover : env -> string loc -> unit

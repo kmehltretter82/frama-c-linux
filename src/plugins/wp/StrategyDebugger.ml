@@ -273,6 +273,10 @@ let field ~label ?(title="") (printer : Ptip.pseq) pvalue =
   let target = printer#selection_to_target pvalue in
   { label ; title ; value ; debug ; target }
 
+type parameter =
+  | Selection of Tactical.selection
+  | String of string
+
 let extract_matchings debug_table printer ?select ?(params=[]) sigma =
   let selection =
     (* Extracting selection *)
@@ -282,10 +286,13 @@ let extract_matchings debug_table printer ?select ?(params=[]) sigma =
   let params =
     (* Extracting parameters *)
     List.map
-      (fun (name,pvalue) ->
-         let label = Format.asprintf "Parameter %S" name in
-         field ~label printer pvalue
-      ) params
+      begin fun (a, param) ->
+        let label = Format.asprintf "Parameter %S" a in
+        match param with
+        | Selection sel -> field ~label printer sel
+        | String s ->
+          { label ; title = "" ; value = s ; debug = s ; target = Term, None }
+      end params
   in
   let matched = ref [] in
   Pattern.iter_sigma
@@ -304,14 +311,27 @@ let extract_matchings debug_table printer ?select ?(params=[]) sigma =
   let by_name f g = String.compare f.label g.label in
   selection @ params @ List.sort by_name !matched
 
+let parameter (t : Tactical.tactical) (a: string ProofStrategy.loc) =
+  try List.find (fun p -> Tactical.pident p = a.value) t#params
+  with Not_found ->
+    Pretty_utils.ksfprintf
+      (fun e -> raise (Pattern.TypeError(a.loc, e)))
+      "Parameter '%s' not found" a.value
+
+let configure_parameter env tactic sigma (a,v) =
+  a.ProofStrategy.value,
+  match parameter tactic a with
+  | Checkbox _ | Spinner _ | Composer _ ->
+    ProofStrategy.configure env tactic sigma (a, v) ;
+    Selection(Pattern.select sigma v)
+  | Selector _ | Search _ ->
+    ProofStrategy.configure env tactic sigma (a, v) ;
+    String(Pattern.string v)
+
 let configure env sigma tactical params =
-  let fold_parameter (diags, sels) (a, v) =
-    let sels = (a.ProofStrategy.value, Pattern.select sigma v) :: sels in
-    let diags =
-      try ProofStrategy.configure env tactical sigma (a, v) ; diags
-      with Pattern.TypeError(loc, message) -> error ~loc ~message :: diags
-    in
-    diags, sels
+  let fold_parameter (sels, diags) (a, v) =
+    try (configure_parameter env tactical sigma (a, v) :: sels), diags
+    with Pattern.TypeError(loc, message) -> sels, (error ~loc ~message :: diags)
   in
   List.fold_left fold_parameter ([], []) params
 
@@ -348,7 +368,7 @@ let debug_tactic env ctxt loc (tac: ProofStrategy.tactic) node =
         let goal = if tac.lookup = [] then Some (snd sequent) else None in
         let tactical = ProofStrategy.tactical tac.tactic in
         let select = ProofStrategy.select sigma ?goal tac.select in
-        let diags, params = configure env sigma tactical tac.params in
+        let params, diags = configure env sigma tactical tac.params in
         let fields = extract_matchings dtable printer ~select ~params sigma in
         if diags <> [] then
           result ~loc ~fields diags
@@ -367,8 +387,9 @@ let debug_tactic env ctxt loc (tac: ProofStrategy.tactic) node =
 
     in apply_all Pattern.empty tac.lookup
 
-let debug_alternative env ctxt strategy node alt =
+let debug_alternative ctxt strategy node alt =
   let mk_result diags = Some (result ~loc:alt.ProofStrategy.loc diags) in
+  let env = Pattern.env ~raise:true () in
   try
     match alt with
     | ProofStrategy.{ value = Default } ->
@@ -408,7 +429,6 @@ exception Empty
 
 let debug strategy ?node () =
   let ctxt = ProofStrategy.context () in
-  let env = Pattern.env ~raise:true () in
 
   let parse string =
     match parse_string string with
@@ -419,15 +439,15 @@ let debug strategy ?node () =
     | ps ->
       "", ProofStrategy.parse_alternatives ctxt ps
   in
-  match parse strategy with
-  | exception Empty -> []
-  | exception ParseError (loc, message)
-  | exception Pattern.TypeError (loc, message) -> [ failed ~loc message ]
-  | exception exn ->
+  try match parse strategy with
+    | exception Empty -> []
+    | exception ParseError (loc, message)
+    | exception Pattern.TypeError (loc, message) ->
+      [ failed ~loc message ]
+    | strategy, alternatives ->
+      List.filter_map (debug_alternative ctxt strategy node) alternatives
+  with exn ->
     [ failed @@ Printf.sprintf "Failure (%s)" (Printexc.to_string exn) ]
-  | strategy, alternatives ->
-    List.filter_map
-      (debug_alternative env ctxt strategy node) alternatives
 
 let () =
   let signature = Request.signature ~output:(module Alternatives) () in

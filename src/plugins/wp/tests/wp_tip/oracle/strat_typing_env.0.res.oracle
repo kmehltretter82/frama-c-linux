@@ -1,0 +1,15 @@
+# frama-c -wp [...]
+[kernel] Parsing strat_typing_env.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] [Valid] Goal foo_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal foo_terminates (Cfg) (Trivial)
+[wp] Warning: Missing RTE guards
+------------------------------------------------------------
+  Function foo
+------------------------------------------------------------
+
+Goal Assertion 'P' (file strat_typing_env.i, line 18):
+Assume { Type: is_sint32(a) /\ is_sint32(b). (* Then *) Have: b != a. }
+Prove: (a % b) = 0.
+
+------------------------------------------------------------
