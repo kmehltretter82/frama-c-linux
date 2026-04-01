@@ -8,17 +8,17 @@ int t1[10];
 int t2[10];
 /*@ logic int * a1{L}= \at(&t1[0],L);
  */
-/*@ logic int * a2{L}= \at((int *)t1,L);
+/*@ logic int * a2{L}= \at(&(t1[0]),L);
  */
-/*@ logic int * a3{L}= \at((int *)t1,L);
+/*@ logic int * a3{L}= \at(&(t1[0]),L);
  */
-/*@ logic int * a5{L}= \at((int *)t1,L);
+/*@ logic int * a5{L}= \at(&(t1[0]),L);
  */
 /*@ logic int * b1{L}= \at(\let x = &t1[0]; x,L);
  */
-/*@ logic int * b2{L}= \at(\let x = (int *)t1; x,L);
+/*@ logic int * b2{L}= \at(\let x = &(t1[0]); x,L);
  */
-/*@ logic int * b3{L}= \at(\let x = (int *)t1; x,L);
+/*@ logic int * b3{L}= \at(\let x = &(t1[0]); x,L);
  */
 int main(void)
 {

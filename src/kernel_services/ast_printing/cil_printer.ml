@@ -2578,10 +2578,7 @@ class cil_printer () = object (self)
     | TAddrOf lv ->
       fprintf fmt "&%a" (self#term_lval_prec Precedence.addrOfLevel) lv
     | TStartOf lv ->
-      let typ = Logic_utils.array_to_ptr (Cil.typeOfTermLval lv) in
-      fprintf fmt "(%a)%a"
-        (self#logic_type None) typ
-        (self#term_lval_prec current_level) lv
+      fprintf fmt "&(%a[0])" self#term_lval lv
     (* A few built-ins for lists have special syntax. Use it when we're not
        in print-as-is mode. *)
     | Tapp ({ l_var_info },[],[e1; e2])

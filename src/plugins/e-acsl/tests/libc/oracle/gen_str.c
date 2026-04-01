@@ -832,7 +832,7 @@ int main(void)
       else __gen_e_acsl_if = __gen_e_acsl_size;
       __gen_e_acsl_initialized = __e_acsl_initialized((void *)(dest + 0),
                                                       (size_t)__gen_e_acsl_if);
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"(char *)dest",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&(dest[0])",
                                    (void *)(dest));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"sizeof(char)",
                                    0,1);
@@ -864,8 +864,8 @@ int main(void)
       else __gen_e_acsl_if_2 = __gen_e_acsl_size_2;
       __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(src + 0),
                                                         (size_t)__gen_e_acsl_if_2);
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
-                                   "(char *)src",(void *)(src));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&(src[0])",
+                                   (void *)(src));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"size",0,
@@ -898,8 +898,8 @@ int main(void)
       else __gen_e_acsl_if_3 = __gen_e_acsl_size_3;
       __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(dest + 0),
                                                         (size_t)__gen_e_acsl_if_3);
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,
-                                   "(char *)dest",(void *)(dest));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&(dest[0])",
+                                   (void *)(dest));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"size",0,
@@ -931,8 +931,8 @@ int main(void)
       else __gen_e_acsl_if_4 = __gen_e_acsl_size_4;
       __gen_e_acsl_initialized_4 = __e_acsl_initialized((void *)(dest + 1 * 2),
                                                         (size_t)__gen_e_acsl_if_4);
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
-                                   "(char *)dest",(void *)(dest));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"&(dest[0])",
+                                   (void *)(dest));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
@@ -976,7 +976,7 @@ int main(void)
       __gen_e_acsl_initialized_5 = __e_acsl_initialized((void *)(dest_0 + 0),
                                                         (size_t)__gen_e_acsl_if_5);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,
-                                   "(char *)dest_0",(void *)(dest_0));
+                                   "&(dest_0[0])",(void *)(dest_0));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"size",0,
@@ -1009,7 +1009,7 @@ int main(void)
       __gen_e_acsl_initialized_6 = __e_acsl_initialized((void *)(src_0 + 0),
                                                         (size_t)__gen_e_acsl_if_6);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
-                                   "(char *)src_0",(void *)(src_0));
+                                   "&(src_0[0])",(void *)(src_0));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"size",0,
@@ -1038,15 +1038,15 @@ int main(void)
       __gen_e_acsl_initialized_7 = __e_acsl_initialized((void *)(dest_0),
                                                         sizeof(char));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,
-                                   "(char *)dest_0",(void *)(dest_0));
+                                   "&(dest_0[0])",(void *)(dest_0));
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
                                      "sizeof(char)",0,sizeof(char));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
-                                   "\\initialized((char *)dest_0)",0,
+                                   "\\initialized(&(dest_0[0]))",0,
                                    __gen_e_acsl_initialized_7);
       __gen_e_acsl_assert_data_7.blocking = 1;
       __gen_e_acsl_assert_data_7.kind = "Assertion";
-      __gen_e_acsl_assert_data_7.pred_txt = "\\initialized((char *)dest_0)";
+      __gen_e_acsl_assert_data_7.pred_txt = "\\initialized(&(dest_0[0]))";
       __gen_e_acsl_assert_data_7.file = "str.c";
       __gen_e_acsl_assert_data_7.fct = "main";
       __gen_e_acsl_assert_data_7.line = 26;
@@ -1054,7 +1054,7 @@ int main(void)
                       & __gen_e_acsl_assert_data_7);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
     }
-    /*@ assert \initialized((char *)dest_0); */ ;
+    /*@ assert \initialized(&(dest_0[0])); */ ;
     {
       int __gen_e_acsl_size_7;
       int __gen_e_acsl_if_7;
@@ -1067,7 +1067,7 @@ int main(void)
       __gen_e_acsl_initialized_8 = __e_acsl_initialized((void *)(dest_0 + 1),
                                                         (size_t)__gen_e_acsl_if_7);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
-                                   "(char *)dest_0",(void *)(dest_0));
+                                   "&(dest_0[0])",(void *)(dest_0));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
                                    "sizeof(char) * 1",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
@@ -1111,7 +1111,7 @@ int main(void)
       __gen_e_acsl_initialized_9 = __e_acsl_initialized((void *)(dest_1 + 0),
                                                         (size_t)__gen_e_acsl_if_8);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,
-                                   "(char *)dest_1",(void *)(dest_1));
+                                   "&(dest_1[0])",(void *)(dest_1));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"size",0,
@@ -1144,7 +1144,7 @@ int main(void)
       __gen_e_acsl_initialized_10 = __e_acsl_initialized((void *)(src_1 + 0),
                                                          (size_t)__gen_e_acsl_if_9);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,
-                                   "(char *)src_1",(void *)(src_1));
+                                   "&(src_1[0])",(void *)(src_1));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,"size",0,
@@ -1178,7 +1178,7 @@ int main(void)
       __gen_e_acsl_initialized_11 = __e_acsl_initialized((void *)(dest_1 + 0),
                                                          (size_t)__gen_e_acsl_if_10);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,
-                                   "(char *)dest_1",(void *)(dest_1));
+                                   "&(dest_1[0])",(void *)(dest_1));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,"size",0,
@@ -1245,7 +1245,7 @@ int main(void)
       __gen_e_acsl_initialized_13 = __e_acsl_initialized((void *)(dest_2 + 0),
                                                          (size_t)__gen_e_acsl_if_11);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_13,
-                                   "(char *)dest_2",(void *)(dest_2));
+                                   "&(dest_2[0])",(void *)(dest_2));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,"size",0,
@@ -1279,7 +1279,7 @@ int main(void)
                                                                   1 * 2),
                                                          (size_t)__gen_e_acsl_if_12);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_14,
-                                   "(char *)dest_2",(void *)(dest_2));
+                                   "&(dest_2[0])",(void *)(dest_2));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,
@@ -1314,7 +1314,7 @@ int main(void)
       __gen_e_acsl_initialized_15 = __e_acsl_initialized((void *)(src_2 + 0),
                                                          (size_t)__gen_e_acsl_if_13);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_15,
-                                   "(char *)src_2",(void *)(src_2));
+                                   "&(src_2[0])",(void *)(src_2));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"size",0,
@@ -1348,7 +1348,7 @@ int main(void)
       __gen_e_acsl_initialized_16 = __e_acsl_initialized((void *)(dest_2 + 0),
                                                          (size_t)__gen_e_acsl_if_14);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_16,
-                                   "(char *)dest_2",(void *)(dest_2));
+                                   "&(dest_2[0])",(void *)(dest_2));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,"size",0,
@@ -1415,7 +1415,7 @@ int main(void)
       __gen_e_acsl_initialized_18 = __e_acsl_initialized((void *)(dest_3 + 0),
                                                          (size_t)__gen_e_acsl_if_15);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_18,
-                                   "(char *)dest_3",(void *)(dest_3));
+                                   "&(dest_3[0])",(void *)(dest_3));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,"size",0,
@@ -1449,7 +1449,7 @@ int main(void)
                                                                   1 * 2),
                                                          (size_t)__gen_e_acsl_if_16);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_19,
-                                   "(char *)dest_3",(void *)(dest_3));
+                                   "&(dest_3[0])",(void *)(dest_3));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,
@@ -1484,7 +1484,7 @@ int main(void)
       __gen_e_acsl_initialized_20 = __e_acsl_initialized((void *)(src_3 + 0),
                                                          (size_t)__gen_e_acsl_if_17);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_20,
-                                   "(char *)src_3",(void *)(src_3));
+                                   "&(src_3[0])",(void *)(src_3));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,"size",0,
@@ -1518,7 +1518,7 @@ int main(void)
       __gen_e_acsl_initialized_21 = __e_acsl_initialized((void *)(dest_3 + 0),
                                                          (size_t)__gen_e_acsl_if_18);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_21,
-                                   "(char *)dest_3",(void *)(dest_3));
+                                   "&(dest_3[0])",(void *)(dest_3));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_21,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_21,"size",0,
@@ -1585,7 +1585,7 @@ int main(void)
       __gen_e_acsl_initialized_23 = __e_acsl_initialized((void *)(dest_4 + 0),
                                                          (size_t)__gen_e_acsl_if_19);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_23,
-                                   "(char *)dest_4",(void *)(dest_4));
+                                   "&(dest_4[0])",(void *)(dest_4));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_23,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_23,"size",0,
@@ -1619,7 +1619,7 @@ int main(void)
                                                                   1 * 2),
                                                          (size_t)__gen_e_acsl_if_20);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_24,
-                                   "(char *)dest_4",(void *)(dest_4));
+                                   "&(dest_4[0])",(void *)(dest_4));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,
@@ -1654,7 +1654,7 @@ int main(void)
       __gen_e_acsl_initialized_25 = __e_acsl_initialized((void *)(src_4 + 0),
                                                          (size_t)__gen_e_acsl_if_21);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_25,
-                                   "(char *)src_4",(void *)(src_4));
+                                   "&(src_4[0])",(void *)(src_4));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_25,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_25,"size",0,
@@ -1688,7 +1688,7 @@ int main(void)
       __gen_e_acsl_initialized_26 = __e_acsl_initialized((void *)(dest_4 + 0),
                                                          (size_t)__gen_e_acsl_if_22);
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_26,
-                                   "(char *)dest_4",(void *)(dest_4));
+                                   "&(dest_4[0])",(void *)(dest_4));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_26,
                                    "sizeof(char)",0,1);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_26,"size",0,

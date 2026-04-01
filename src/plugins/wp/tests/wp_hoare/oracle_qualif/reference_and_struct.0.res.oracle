@@ -85,13 +85,13 @@
   Memory model hypotheses for function 'call_reset_5_tps':
   /*@
      behavior wp_typed_ref:
-       requires \separated(tps[9] + (0 .. 4), (struct T **)tps + (..));
+       requires \separated(tps[9] + (0 .. 4), &(tps[0]) + (..));
      */
   void call_reset_5_tps(void);
 [wp] reference_and_struct.i:88: Warning: 
   Memory model hypotheses for function 'load_5':
   /*@
      behavior wp_typed_ref:
-       requires \separated(hp + (..), (int *)reg_load + (..));
+       requires \separated(hp + (..), &(reg_load[0]) + (..));
      */
   void load_5(int *hp);

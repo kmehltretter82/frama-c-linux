@@ -1,8 +1,7 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] bts1304.i:31: Warning: 
-  unaligned pointer creation.
-  assert \aligned((unsigned char *)buf,alignof(unsigned int));
+  unaligned pointer creation. assert \aligned(&(buf[0]),alignof(unsigned int));
 [eva:alarm] bts1304.i:24: Warning: 
   unaligned pointer creation. assert \aligned(m,alignof(unsigned int));
 [eva:alarm] bts1304.i:24: Warning: 

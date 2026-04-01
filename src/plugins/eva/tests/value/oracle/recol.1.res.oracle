@@ -16,16 +16,16 @@
   col_ones ∈ {0}
   col_123 ∈ {0}
 [eva:alarm] recol.c:25: Warning: 
-  unaligned pointer creation. assert \aligned((char *)ones,alignof(int));
+  unaligned pointer creation. assert \aligned(&(ones[0]),alignof(int));
 [eva:alarm] recol.c:26: Warning: 
-  unaligned pointer creation. assert \aligned((char *)one23,alignof(int));
+  unaligned pointer creation. assert \aligned(&(one23[0]),alignof(int));
 [eva:alarm] recol.c:35: Warning: 
   unaligned pointer creation. assert \aligned(p,alignof(short));
 [eva:alarm] recol.c:40: Warning: 
   unaligned pointer creation. assert \aligned(p,alignof(int));
 [eva:signed-overflow] recol.c:30: Warning: 2's complement assumed for overflow
 [eva:alarm] recol.c:45: Warning: 
-  unaligned pointer creation. assert \aligned((char *)s,alignof(int));
+  unaligned pointer creation. assert \aligned(&(s[0]),alignof(int));
 [eva:alarm] recol.c:45: Warning: 
   unaligned pointer creation. assert \aligned(p_int,alignof(int));
 [eva:alarm] recol.c:45: Warning: 

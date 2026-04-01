@@ -227,7 +227,7 @@ int *g_alias;
     assigns *g_alias;
     
     behavior wp_typed:
-      requires \separated(g_alias, (int *)global + (..), &g_alias);
+      requires \separated(g_alias, &(global[0]) + (..), &g_alias);
  */
 void global_alias(void)
 {
@@ -258,7 +258,7 @@ void global_no_alias(void)
     assigns *f_alias;
     
     behavior wp_typed:
-      requires \separated(f_alias, (int *)global + (..));
+      requires \separated(f_alias, &(global[0]) + (..));
  */
 void formal_alias(int *f_alias)
 {
@@ -287,8 +287,8 @@ void formal_no_alias(int *f_alias)
     assigns (*alias_array)[0 .. 1];
     
     behavior wp_typed:
-      requires \separated((int *)global + (..), &(*alias_array)[0 .. 1]);
-      requires \separated(alias_array + (..), (int *)global + (..));
+      requires \separated(&(global[0]) + (..), &(*alias_array)[0 .. 1]);
+      requires \separated(alias_array + (..), &(global[0]) + (..));
  */
 void formal_alias_array(int (*alias_array)[2])
 {
@@ -305,8 +305,8 @@ void formal_alias_array(int (*alias_array)[2])
     assigns x->x;
     
     behavior wp_typed:
-      requires \separated((int *)global + (..), &x->x);
-      requires \separated(x, (int *)global + (..));
+      requires \separated(&(global[0]) + (..), &x->x);
+      requires \separated(x, &(global[0]) + (..));
  */
 void field_alias(struct X *x)
 {
@@ -322,8 +322,8 @@ void field_alias(struct X *x)
     assigns (x + (0 .. 3))->x;
     
     behavior wp_typed:
-      requires \separated((int *)global + (..), &(x + (0 .. 3))->x);
-      requires \separated(x + (..), (int *)global + (..));
+      requires \separated(&(global[0]) + (..), &(x + (0 .. 3))->x);
+      requires \separated(x + (..), &(global[0]) + (..));
  */
 void field_range_alias(struct X *x)
 {
@@ -339,9 +339,8 @@ void field_range_alias(struct X *x)
     assigns {*g_alias, *f_alias};
     
     behavior wp_typed:
-      requires
-        \separated((int *)global + (..), &g_alias, {g_alias, f_alias});
-      requires \separated(f_alias, (int *)global + (..), &g_alias);
+      requires \separated(&(global[0]) + (..), &g_alias, {g_alias, f_alias});
+      requires \separated(f_alias, &(global[0]) + (..), &g_alias);
  */
 void set_alias(int *f_alias)
 {
@@ -359,7 +358,7 @@ void set_alias(int *f_alias)
     behavior wp_typed:
       requires
         \separated(
-          (int *)global + (..), &g_alias,
+          &(global[0]) + (..), &g_alias,
           {alias | int *alias; alias ≡ \at(g_alias,Pre)}
           );
  */
@@ -377,9 +376,8 @@ void comprehension_alias(void)
     assigns {*g_alias, *f_alias};
     
     behavior wp_typed:
-      requires
-        \separated((int *)global + (..), &g_alias, {g_alias, f_alias});
-      requires \separated(f_alias, (int *)global + (..), &g_alias);
+      requires \separated(&(global[0]) + (..), &g_alias, {g_alias, f_alias});
+      requires \separated(f_alias, &(global[0]) + (..), &g_alias);
  */
 void union_alias(int *f_alias)
 {

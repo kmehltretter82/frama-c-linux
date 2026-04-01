@@ -197,15 +197,15 @@ Prove: ((48 - (16 * i)) / 16) < ((64 - (16 * i)) / 16).
 [wp] funvar_inv.i:26: Warning: 
   Memory model hypotheses for function 'f':
   /*@ behavior wp_hoare:
-        ensures \separated(\result, (int *)G + (..)); */
+        ensures \separated(\result, &(G[0]) + (..)); */
   int *f(void);
 [wp] funvar_inv.i:42: Warning: 
   Memory model hypotheses for function 'f2':
   /*@ behavior wp_hoare:
-        ensures \separated(\result, (int *)G + (..)); */
+        ensures \separated(\result, &(G[0]) + (..)); */
   int *f2(void);
 [wp] funvar_inv.i:59: Warning: 
   Memory model hypotheses for function 'g':
   /*@ behavior wp_hoare:
-        ensures \separated(\result, (int *)G + (..)); */
+        ensures \separated(\result, &(G[0]) + (..)); */
   int *g(void);

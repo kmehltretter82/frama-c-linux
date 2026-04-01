@@ -65,7 +65,7 @@
   invalid pointer comparison: invalid pointer(s)
 [eva:alarm] cmp_ptr.i:30: Warning: 
   pointer comparison.
-  assert \pointer_comparable((void *)((int *)T - 1), (void *)0);
+  assert \pointer_comparable((void *)(&(T[0]) - 1), (void *)0);
 [eva:pointer-comparison] cmp_ptr.i:32: 
   invalid pointer comparison: invalid pointer(s)
 [eva:alarm] cmp_ptr.i:32: Warning: 

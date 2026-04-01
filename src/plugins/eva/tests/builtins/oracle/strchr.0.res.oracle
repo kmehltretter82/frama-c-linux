@@ -343,7 +343,7 @@
   computing for function strchr_escaping <- main.
   Called from strchr.c:558.
 [eva:alarm] strchr.c:258: Warning: 
-  unaligned pointer creation. assert \aligned((char *)s,alignof(int));
+  unaligned pointer creation. assert \aligned(&(s[0]),alignof(int));
 [eva:alarm] strchr.c:258: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:locals-escaping] strchr.c:258: Warning: 

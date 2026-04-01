@@ -45,13 +45,13 @@ int main(void)
     __gen_e_acsl_base_addr = __e_acsl_base_addr((void *)(A));
     __gen_e_acsl_base_addr_2 = __e_acsl_base_addr((void *)(& A));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,
-                                 "\\base_addr((int *)A)",
+                                 "\\base_addr(&(A[0]))",
                                  __gen_e_acsl_base_addr);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,
                                  "\\base_addr(&A)",__gen_e_acsl_base_addr_2);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
-    __gen_e_acsl_assert_data.pred_txt = "\\base_addr((int *)A) == \\base_addr(&A)";
+    __gen_e_acsl_assert_data.pred_txt = "\\base_addr(&(A[0])) == \\base_addr(&A)";
     __gen_e_acsl_assert_data.file = "base_addr.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 13;
@@ -59,7 +59,7 @@ int main(void)
                     & __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
-  /*@ assert \base_addr((int *)A) == \base_addr(&A); */ ;
+  /*@ assert \base_addr(&(A[0])) == \base_addr(&A); */ ;
   {
     void *__gen_e_acsl_base_addr_3;
     int __gen_e_acsl_aligned;
@@ -101,13 +101,13 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __gen_e_acsl_base_addr_4 = __e_acsl_base_addr((void *)PA);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
-                                 "\\base_addr((int *)A)",
+                                 "\\base_addr(&(A[0]))",
                                  __gen_e_acsl_base_addr_3);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
                                  "\\base_addr(PA)",__gen_e_acsl_base_addr_4);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
-    __gen_e_acsl_assert_data_2.pred_txt = "\\base_addr((int *)A) == \\base_addr(PA)";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\base_addr(&(A[0])) == \\base_addr(PA)";
     __gen_e_acsl_assert_data_2.file = "base_addr.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 14;
@@ -115,7 +115,7 @@ int main(void)
                     & __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
-  /*@ assert \base_addr((int *)A) == \base_addr(PA); */ ;
+  /*@ assert \base_addr(&(A[0])) == \base_addr(PA); */ ;
   {
     void *__gen_e_acsl_base_addr_5;
     int __gen_e_acsl_aligned_2;
@@ -216,11 +216,11 @@ int main(void)
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
                                  "\\base_addr(PA)",__gen_e_acsl_base_addr_7);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
-                                 "\\base_addr((int *)A)",
+                                 "\\base_addr(&(A[0]))",
                                  __gen_e_acsl_base_addr_8);
     __gen_e_acsl_assert_data_8.blocking = 1;
     __gen_e_acsl_assert_data_8.kind = "Assertion";
-    __gen_e_acsl_assert_data_8.pred_txt = "\\base_addr(PA) == \\base_addr((int *)A)";
+    __gen_e_acsl_assert_data_8.pred_txt = "\\base_addr(PA) == \\base_addr(&(A[0]))";
     __gen_e_acsl_assert_data_8.file = "base_addr.c";
     __gen_e_acsl_assert_data_8.fct = "main";
     __gen_e_acsl_assert_data_8.line = 17;
@@ -228,7 +228,7 @@ int main(void)
                     & __gen_e_acsl_assert_data_8);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
   }
-  /*@ assert \base_addr(PA) == \base_addr((int *)A); */ ;
+  /*@ assert \base_addr(PA) == \base_addr(&(A[0])); */ ;
   {
     int __gen_e_acsl_aligned_4;
     void *__gen_e_acsl_base_addr_9;
@@ -299,13 +299,13 @@ int main(void)
     __gen_e_acsl_base_addr_11 = __e_acsl_base_addr((void *)(a));
     __gen_e_acsl_base_addr_12 = __e_acsl_base_addr((void *)(& a));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_14,
-                                 "\\base_addr((int *)a)",
+                                 "\\base_addr(&(a[0]))",
                                  __gen_e_acsl_base_addr_11);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_14,
                                  "\\base_addr(&a)",__gen_e_acsl_base_addr_12);
     __gen_e_acsl_assert_data_14.blocking = 1;
     __gen_e_acsl_assert_data_14.kind = "Assertion";
-    __gen_e_acsl_assert_data_14.pred_txt = "\\base_addr((int *)a) == \\base_addr(&a)";
+    __gen_e_acsl_assert_data_14.pred_txt = "\\base_addr(&(a[0])) == \\base_addr(&a)";
     __gen_e_acsl_assert_data_14.file = "base_addr.c";
     __gen_e_acsl_assert_data_14.fct = "main";
     __gen_e_acsl_assert_data_14.line = 25;
@@ -313,7 +313,7 @@ int main(void)
                     & __gen_e_acsl_assert_data_14);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
   }
-  /*@ assert \base_addr((int *)a) == \base_addr(&a); */ ;
+  /*@ assert \base_addr(&(a[0])) == \base_addr(&a); */ ;
   {
     void *__gen_e_acsl_base_addr_13;
     void *__gen_e_acsl_base_addr_14;
@@ -322,13 +322,13 @@ int main(void)
     __gen_e_acsl_base_addr_13 = __e_acsl_base_addr((void *)(a));
     __gen_e_acsl_base_addr_14 = __e_acsl_base_addr((void *)pa);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_15,
-                                 "\\base_addr((int *)a)",
+                                 "\\base_addr(&(a[0]))",
                                  __gen_e_acsl_base_addr_13);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_15,
                                  "\\base_addr(pa)",__gen_e_acsl_base_addr_14);
     __gen_e_acsl_assert_data_15.blocking = 1;
     __gen_e_acsl_assert_data_15.kind = "Assertion";
-    __gen_e_acsl_assert_data_15.pred_txt = "\\base_addr((int *)a) == \\base_addr(pa)";
+    __gen_e_acsl_assert_data_15.pred_txt = "\\base_addr(&(a[0])) == \\base_addr(pa)";
     __gen_e_acsl_assert_data_15.file = "base_addr.c";
     __gen_e_acsl_assert_data_15.fct = "main";
     __gen_e_acsl_assert_data_15.line = 26;
@@ -336,7 +336,7 @@ int main(void)
                     & __gen_e_acsl_assert_data_15);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
   }
-  /*@ assert \base_addr((int *)a) == \base_addr(pa); */ ;
+  /*@ assert \base_addr(&(a[0])) == \base_addr(pa); */ ;
   {
     void *__gen_e_acsl_base_addr_15;
     void *__gen_e_acsl_base_addr_16;
@@ -372,11 +372,11 @@ int main(void)
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_17,
                                  "\\base_addr(pa)",__gen_e_acsl_base_addr_17);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_17,
-                                 "\\base_addr((int *)a)",
+                                 "\\base_addr(&(a[0]))",
                                  __gen_e_acsl_base_addr_18);
     __gen_e_acsl_assert_data_17.blocking = 1;
     __gen_e_acsl_assert_data_17.kind = "Assertion";
-    __gen_e_acsl_assert_data_17.pred_txt = "\\base_addr(pa) == \\base_addr((int *)a)";
+    __gen_e_acsl_assert_data_17.pred_txt = "\\base_addr(pa) == \\base_addr(&(a[0]))";
     __gen_e_acsl_assert_data_17.file = "base_addr.c";
     __gen_e_acsl_assert_data_17.fct = "main";
     __gen_e_acsl_assert_data_17.line = 29;
@@ -384,7 +384,7 @@ int main(void)
                     & __gen_e_acsl_assert_data_17);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
   }
-  /*@ assert \base_addr(pa) == \base_addr((int *)a); */ ;
+  /*@ assert \base_addr(pa) == \base_addr(&(a[0])); */ ;
   {
     void *__gen_e_acsl_base_addr_19;
     void *__gen_e_acsl_base_addr_20;
@@ -396,11 +396,11 @@ int main(void)
                                  "\\base_addr(pa + 2)",
                                  __gen_e_acsl_base_addr_19);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_18,
-                                 "\\base_addr((int *)a)",
+                                 "\\base_addr(&(a[0]))",
                                  __gen_e_acsl_base_addr_20);
     __gen_e_acsl_assert_data_18.blocking = 1;
     __gen_e_acsl_assert_data_18.kind = "Assertion";
-    __gen_e_acsl_assert_data_18.pred_txt = "\\base_addr(pa + 2) == \\base_addr((int *)a)";
+    __gen_e_acsl_assert_data_18.pred_txt = "\\base_addr(pa + 2) == \\base_addr(&(a[0]))";
     __gen_e_acsl_assert_data_18.file = "base_addr.c";
     __gen_e_acsl_assert_data_18.fct = "main";
     __gen_e_acsl_assert_data_18.line = 30;
@@ -408,7 +408,7 @@ int main(void)
                     & __gen_e_acsl_assert_data_18);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
   }
-  /*@ assert \base_addr(pa + 2) == \base_addr((int *)a); */ ;
+  /*@ assert \base_addr(pa + 2) == \base_addr(&(a[0])); */ ;
   long l = 4L;
   __e_acsl_store_block((void *)(& l),8UL);
   __e_acsl_full_init((void *)(& l));

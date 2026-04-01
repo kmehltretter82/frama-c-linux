@@ -105,16 +105,16 @@ int main(void)
                                                               (__e_acsl_mpz_struct *)__gen_e_acsl__11,
                                                               (__e_acsl_mpz_struct *)__gen_e_acsl__10,
                                                               (struct list *)0);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,
-                                 "(struct list **)cArr",(void *)(cArr));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"&(cArr[0])",
+                                 (void *)(cArr));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"&root",
                                  (void *)(& root));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
-                                 "linked_n(&root, (struct list **)cArr, 0, 2, (struct list *)0)",
+                                 "linked_n(&root, &(cArr[0]), 0, 2, (struct list *)0)",
                                  0,__gen_e_acsl_linked_n_here_6);
     __gen_e_acsl_assert_data_7.blocking = 1;
     __gen_e_acsl_assert_data_7.kind = "Assertion";
-    __gen_e_acsl_assert_data_7.pred_txt = "linked_n(&root, (struct list **)cArr, 0, 2, (struct list *)0)";
+    __gen_e_acsl_assert_data_7.pred_txt = "linked_n(&root, &(cArr[0]), 0, 2, (struct list *)0)";
     __gen_e_acsl_assert_data_7.file = "ghosts_for_lists.c";
     __gen_e_acsl_assert_data_7.fct = "main";
     __gen_e_acsl_assert_data_7.line = 44;
@@ -124,9 +124,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl__10);
     __gmpz_clear(__gen_e_acsl__11);
   }
-  /*@ assert linked_n(&root, (struct list **)cArr, 0, 2, (struct list *)0);
-   */
-  ;
+  /*@ assert linked_n(&root, &(cArr[0]), 0, 2, (struct list *)0); */ ;
   struct list *cArr2[2] = {& leaf, & root};
   __e_acsl_store_block((void *)(cArr2),16UL);
   __e_acsl_full_init((void *)(& cArr2));
@@ -142,16 +140,16 @@ int main(void)
                                                               (__e_acsl_mpz_struct *)__gen_e_acsl__13,
                                                               (__e_acsl_mpz_struct *)__gen_e_acsl__12,
                                                               (struct list *)0);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
-                                 "(struct list **)cArr2",(void *)(cArr2));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"&(cArr2[0])",
+                                 (void *)(cArr2));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"&root",
                                  (void *)(& root));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
-                                 "linked_n(&root, (struct list **)cArr2, 0, 2, (struct list *)0)",
+                                 "linked_n(&root, &(cArr2[0]), 0, 2, (struct list *)0)",
                                  0,__gen_e_acsl_linked_n_here_8);
     __gen_e_acsl_assert_data_8.blocking = 1;
     __gen_e_acsl_assert_data_8.kind = "Assertion";
-    __gen_e_acsl_assert_data_8.pred_txt = "!linked_n(&root, (struct list **)cArr2, 0, 2, (struct list *)0)";
+    __gen_e_acsl_assert_data_8.pred_txt = "!linked_n(&root, &(cArr2[0]), 0, 2, (struct list *)0)";
     __gen_e_acsl_assert_data_8.file = "ghosts_for_lists.c";
     __gen_e_acsl_assert_data_8.fct = "main";
     __gen_e_acsl_assert_data_8.line = 46;
@@ -161,9 +159,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl__12);
     __gmpz_clear(__gen_e_acsl__13);
   }
-  /*@ assert !linked_n(&root, (struct list **)cArr2, 0, 2, (struct list *)0);
-   */
-  ;
+  /*@ assert !linked_n(&root, &(cArr2[0]), 0, 2, (struct list *)0); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(cArr2));
   __e_acsl_delete_block((void *)(cArr));

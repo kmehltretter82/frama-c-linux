@@ -407,7 +407,7 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva:progress] Done for function Frama_C_interval
 [eva:alarm] wcslen.c:355: Warning: 
-  out of bounds write. assert \valid((char *)((wchar_t *)b) + i);
+  out of bounds write. assert \valid((char *)(&(b[0])) + i);
 [eva:alarm] wcslen.c:356: Warning: assertion got status unknown.
 [eva:progress] wcslen.c:357: Call to builtin wcslen
 [eva:alarm] wcslen.c:357: Warning: 

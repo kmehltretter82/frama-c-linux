@@ -118,30 +118,23 @@ void startof_to_ptr(void)
   int8_t *pc3 = (int8_t *)(i);
   int8_t *pc4 = i8;
   if (nondet) {
-    /*@ assert
-          rte: pointer_alignment: \aligned((int8_t *)c,alignof(int32_t));
-    */
+    /*@ assert rte: pointer_alignment: \aligned(&(c[0]),alignof(int32_t)); */
     int32_t *pi1 = (int32_t *)(c);
   }
   int32_t *pi2 = (int32_t *)(c4);
   int32_t *pi3 = i;
   int32_t *pi4 = (int32_t *)(i8);
   if (nondet) {
-    /*@ assert
-          rte: pointer_alignment: \aligned((int8_t *)c,alignof(int64_t));
-    */
+    /*@ assert rte: pointer_alignment: \aligned(&(c[0]),alignof(int64_t)); */
     int64_t *pl1 = (int64_t *)(c);
   }
   if (nondet) {
-    /*@ assert
-          rte: pointer_alignment: \aligned((int8_t *)c4,alignof(int64_t));
+    /*@ assert rte: pointer_alignment: \aligned(&(c4[0]),alignof(int64_t));
     */
     int64_t *pl2 = (int64_t *)(c4);
   }
   if (nondet) {
-    /*@ assert
-          rte: pointer_alignment: \aligned((int32_t *)i,alignof(int64_t));
-    */
+    /*@ assert rte: pointer_alignment: \aligned(&(i[0]),alignof(int64_t)); */
     int64_t *pl3 = (int64_t *)(i);
   }
   int64_t *pl4 = (int64_t *)(i8);

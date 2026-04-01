@@ -133,7 +133,7 @@ int main(void)
 }
 
 /*@ assigns \result;
-    assigns \result \from *((__e_acsl_mpz_struct *)x); */
+    assigns \result \from *(&(x[0])); */
 int __gen_e_acsl_even_here(__e_acsl_mpz_struct * x)
 {
   __e_acsl_mpz_t __gen_e_acsl_zero;

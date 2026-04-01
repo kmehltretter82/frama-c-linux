@@ -8,8 +8,7 @@
 [eva] Analyzing a complete application starting at main
 [eva:progress] Computing initial state
 [eva:alarm] imprecise_invalid_write.i:17: Warning: 
-  unaligned pointer creation.
-  assert \aligned((char const *)"abc",alignof(int));
+  unaligned pointer creation. assert \aligned(&("abc"[0]),alignof(int));
 [eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   x ∈ {0}

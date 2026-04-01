@@ -132,21 +132,21 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
     __gen_e_acsl_freeable_6 = __e_acsl_freeable((void *)(array));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
-                                 "(char *)array",(void *)(array));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"&(array[0])",
+                                 (void *)(array));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
-                                 "\\freeable((char *)array)",0,
+                                 "\\freeable(&(array[0]))",0,
                                  __gen_e_acsl_freeable_6);
     __gen_e_acsl_assert_data_6.blocking = 1;
     __gen_e_acsl_assert_data_6.kind = "Assertion";
-    __gen_e_acsl_assert_data_6.pred_txt = "!\\freeable((char *)array)";
+    __gen_e_acsl_assert_data_6.pred_txt = "!\\freeable(&(array[0]))";
     __gen_e_acsl_assert_data_6.file = "freeable.c";
     __gen_e_acsl_assert_data_6.fct = "main";
     __gen_e_acsl_assert_data_6.line = 23;
     __e_acsl_assert(! __gen_e_acsl_freeable_6,& __gen_e_acsl_assert_data_6);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
   }
-  /*@ assert !\freeable((char *)array); */ ;
+  /*@ assert !\freeable(&(array[0])); */ ;
   {
     int __gen_e_acsl_freeable_7;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =

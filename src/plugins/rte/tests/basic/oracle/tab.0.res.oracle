@@ -8,7 +8,7 @@ typedef double typetab[2];
 double g4(typetab *t)
 {
   double y;
-  /*@ assert rte: mem_access: \valid_read((double *)*t); */
+  /*@ assert rte: mem_access: \valid_read(&(*t[0])); */
   /*@ assert rte: mem_access: \valid_read(&(*t)[1]); */
   y = (*t)[0] + (*t)[1];
   return y;

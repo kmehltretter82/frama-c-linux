@@ -77,12 +77,12 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(src),
                                                     sizeof(int *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"(int **)src",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&(src[0])",
                                  (void *)(src));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                    "sizeof(int *)",0,sizeof(int *));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "\\initialized((int **)src)",0,
+                                 "\\initialized(&(src[0]))",0,
                                  __gen_e_acsl_initialized);
     if (__gen_e_acsl_initialized) {
       int __gen_e_acsl_aligned;
@@ -223,12 +223,12 @@ int main(void)
       {.values = (void *)0};
     __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(dest),
                                                       sizeof(int *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"(int **)dest",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"&(dest[0])",
                                  (void *)(dest));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
                                    "sizeof(int *)",0,sizeof(int *));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
-                                 "\\initialized((int **)dest)",0,
+                                 "\\initialized(&(dest[0]))",0,
                                  __gen_e_acsl_initialized_3);
     if (__gen_e_acsl_initialized_3) {
       int __gen_e_acsl_aligned_3;
@@ -370,12 +370,12 @@ int main(void)
       {.values = (void *)0};
     __gen_e_acsl_initialized_5 = __e_acsl_initialized((void *)(dest),
                                                       sizeof(int *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_13,
-                                 "(int **)dest",(void *)(dest));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_13,"&(dest[0])",
+                                 (void *)(dest));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_13,
                                    "sizeof(int *)",0,sizeof(int *));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,
-                                 "\\initialized((int **)dest)",0,
+                                 "\\initialized(&(dest[0]))",0,
                                  __gen_e_acsl_initialized_5);
     if (__gen_e_acsl_initialized_5) {
       int __gen_e_acsl_aligned_5;

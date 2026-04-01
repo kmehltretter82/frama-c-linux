@@ -147,7 +147,7 @@ int main(void)
     int *__gen_e_acsl_x;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
-    /*@ assert Eva: mem_access: \valid_read((int **)ghost_int_arr); */
+    /*@ assert Eva: mem_access: \valid_read(&(ghost_int_arr[0])); */
     __gen_e_acsl_x = ghost_int_arr[0];
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
                                  "ghost_int_arr[0]",(void *)ghost_int_arr[0]);

@@ -20,7 +20,7 @@
   Memory model hypotheses for function 'Write':
   /*@
      behavior wp_typed:
-       requires \separated(p + (..), (char *)A + (..));
-       requires \separated(p + (0 ..), (char *)A + (..));
+       requires \separated(p + (..), &(A[0]) + (..));
+       requires \separated(p + (0 ..), &(A[0]) + (..));
      */
   extern void Write(char *p, int n);

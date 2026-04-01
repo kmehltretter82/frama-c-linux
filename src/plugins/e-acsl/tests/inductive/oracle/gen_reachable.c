@@ -200,7 +200,7 @@ int main(void)
   int arr[3] = {1, 2, 3};
   __e_acsl_store_block((void *)(arr),12UL);
   __e_acsl_full_init((void *)(& arr));
-  /*@ assert same_elements((int *)arr, (int *)arr, 0, 1); */ ;
+  /*@ assert same_elements(&(arr[0]), &(arr[0]), 0, 1); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(arr));
   __e_acsl_globals_clean();

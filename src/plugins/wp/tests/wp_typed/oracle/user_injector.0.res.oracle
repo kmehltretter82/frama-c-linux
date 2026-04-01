@@ -134,7 +134,7 @@ Prove: true.
      behavior wp_typed:
        requires
          \separated(
-           error, (int *)service_id + (..), (int *)service_result + (..), &seq,
+           error, &(service_id[0]) + (..), &(service_result[0]) + (..), &seq,
            &service_cpt
            );
      */

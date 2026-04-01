@@ -15,7 +15,7 @@ void f(void)
   t[0] = 10;
   t[1] = 20;
   /*@ assert P(t); */ ;
-  /*@ assert Q((int *)t); */ ;
+  /*@ assert Q(&(t[0])); */ ;
   return;
 }
 

@@ -76,7 +76,7 @@ int main(void)
     __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(t + 0),
                                           (size_t)__gen_e_acsl_if_2,
                                           (void *)(t),(void *)0);
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"(char *)t",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&(t[0])",
                                  (void *)(t));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"sizeof(char)",
                                  0,1);

@@ -15,7 +15,7 @@
 [eva:alarm] summary.i:31: Warning: 
   accessing out of bounds index. assert undet < 10;
 [eva:alarm] summary.i:32: Warning: 
-  unaligned pointer creation. assert \aligned((char *)c,alignof(int));
+  unaligned pointer creation. assert \aligned(&(c[0]),alignof(int));
 [eva:alarm] summary.i:33: Warning: division by zero. assert undet ≢ 0;
 [eva:alarm] summary.i:34: Warning: 
   signed overflow. assert -2147483648 ≤ undet + undet;

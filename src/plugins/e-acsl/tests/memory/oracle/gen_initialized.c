@@ -411,16 +411,16 @@ int main(void)
       {.values = (void *)0};
     __gen_e_acsl_initialized_11 = __e_acsl_initialized((void *)(d),
                                                        sizeof(long));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_19,"(long *)d",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_19,"&(d[0])",
                                  (void *)(d));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_19,
                                    "sizeof(long)",0,sizeof(long));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,
-                                 "\\initialized((long *)d)",0,
+                                 "\\initialized(&(d[0]))",0,
                                  __gen_e_acsl_initialized_11);
     __gen_e_acsl_assert_data_19.blocking = 1;
     __gen_e_acsl_assert_data_19.kind = "Assertion";
-    __gen_e_acsl_assert_data_19.pred_txt = "!\\initialized((long *)d)";
+    __gen_e_acsl_assert_data_19.pred_txt = "!\\initialized(&(d[0]))";
     __gen_e_acsl_assert_data_19.file = "initialized.c";
     __gen_e_acsl_assert_data_19.fct = "main";
     __gen_e_acsl_assert_data_19.line = 43;
@@ -428,7 +428,7 @@ int main(void)
                     & __gen_e_acsl_assert_data_19);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_19);
   }
-  /*@ assert !\initialized((long *)d); */ ;
+  /*@ assert !\initialized(&(d[0])); */ ;
   {
     int __gen_e_acsl_initialized_12;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_20 =
@@ -531,16 +531,16 @@ int main(void)
       {.values = (void *)0};
     __gen_e_acsl_initialized_16 = __e_acsl_initialized((void *)(d),
                                                        sizeof(long));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_24,"(long *)d",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_24,"&(d[0])",
                                  (void *)(d));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_24,
                                    "sizeof(long)",0,sizeof(long));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,
-                                 "\\initialized((long *)d)",0,
+                                 "\\initialized(&(d[0]))",0,
                                  __gen_e_acsl_initialized_16);
     __gen_e_acsl_assert_data_24.blocking = 1;
     __gen_e_acsl_assert_data_24.kind = "Assertion";
-    __gen_e_acsl_assert_data_24.pred_txt = "\\initialized((long *)d)";
+    __gen_e_acsl_assert_data_24.pred_txt = "\\initialized(&(d[0]))";
     __gen_e_acsl_assert_data_24.file = "initialized.c";
     __gen_e_acsl_assert_data_24.fct = "main";
     __gen_e_acsl_assert_data_24.line = 50;
@@ -548,7 +548,7 @@ int main(void)
                     & __gen_e_acsl_assert_data_24);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_24);
   }
-  /*@ assert \initialized((long *)d); */ ;
+  /*@ assert \initialized(&(d[0])); */ ;
   {
     int __gen_e_acsl_initialized_17;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_25 =
@@ -651,16 +651,16 @@ int main(void)
       {.values = (void *)0};
     __gen_e_acsl_initialized_21 = __e_acsl_initialized((void *)(d),
                                                        sizeof(long));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_29,"(long *)d",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_29,"&(d[0])",
                                  (void *)(d));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_29,
                                    "sizeof(long)",0,sizeof(long));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_29,
-                                 "\\initialized((long *)d)",0,
+                                 "\\initialized(&(d[0]))",0,
                                  __gen_e_acsl_initialized_21);
     __gen_e_acsl_assert_data_29.blocking = 1;
     __gen_e_acsl_assert_data_29.kind = "Assertion";
-    __gen_e_acsl_assert_data_29.pred_txt = "\\initialized((long *)d)";
+    __gen_e_acsl_assert_data_29.pred_txt = "\\initialized(&(d[0]))";
     __gen_e_acsl_assert_data_29.file = "initialized.c";
     __gen_e_acsl_assert_data_29.fct = "main";
     __gen_e_acsl_assert_data_29.line = 57;
@@ -668,7 +668,7 @@ int main(void)
                     & __gen_e_acsl_assert_data_29);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_29);
   }
-  /*@ assert \initialized((long *)d); */ ;
+  /*@ assert \initialized(&(d[0])); */ ;
   {
     int __gen_e_acsl_initialized_22;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_30 =

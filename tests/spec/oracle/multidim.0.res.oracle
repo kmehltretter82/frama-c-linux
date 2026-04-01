@@ -12,7 +12,7 @@ int (*pt)[3][4] = ttt;
       
     }
  */
-/*@ requires Q((TT *)ttt); */
+/*@ requires Q(&(ttt[0])); */
 void f(void)
 {
   return;

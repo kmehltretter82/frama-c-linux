@@ -56,11 +56,11 @@
   computing for function origin_arithmetic_1 <- main.
   Called from origin.i:94.
 [eva:alarm] origin.i:14: Warning: 
-  pointer downcast. assert (unsigned int)((int *)ta1) ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&(ta1[0])) ≤ 2147483647;
 [eva:alarm] origin.i:14: Warning: 
-  signed overflow. assert -2147483648 ≤ -((int)((int *)ta1));
+  signed overflow. assert -2147483648 ≤ -((int)(&(ta1[0])));
 [eva:alarm] origin.i:14: Warning: 
-  signed overflow. assert -((int)((int *)ta1)) ≤ 2147483647;
+  signed overflow. assert -((int)(&(ta1[0]))) ≤ 2147483647;
 [eva:garbled-mix:write] origin.i:14: 
   Assigning imprecise value to pa1
   because of arithmetic operation on addresses.
@@ -71,20 +71,20 @@
   computing for function origin_arithmetic_2 <- main.
   Called from origin.i:95.
 [eva:alarm] origin.i:19: Warning: 
-  pointer downcast. assert (unsigned int)((int *)ta2) ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&(ta2[0])) ≤ 2147483647;
 [eva:alarm] origin.i:19: Warning: 
-  signed overflow. assert -2147483648 ≤ -((int)((int *)ta2));
+  signed overflow. assert -2147483648 ≤ -((int)(&(ta2[0])));
 [eva:alarm] origin.i:19: Warning: 
-  signed overflow. assert -((int)((int *)ta2)) ≤ 2147483647;
+  signed overflow. assert -((int)(&(ta2[0]))) ≤ 2147483647;
 [eva:garbled-mix:write] origin.i:19: 
   Assigning imprecise value to pa2
   because of arithmetic operation on addresses.
 [eva:alarm] origin.i:20: Warning: 
-  pointer downcast. assert (unsigned int)((int *)tta2) ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&(tta2[0])) ≤ 2147483647;
 [eva:alarm] origin.i:20: Warning: 
-  signed overflow. assert -2147483648 ≤ -((int)((int *)tta2));
+  signed overflow. assert -2147483648 ≤ -((int)(&(tta2[0])));
 [eva:alarm] origin.i:20: Warning: 
-  signed overflow. assert -((int)((int *)tta2)) ≤ 2147483647;
+  signed overflow. assert -((int)(&(tta2[0]))) ≤ 2147483647;
 [eva:garbled-mix:write] origin.i:20: 
   Assigning imprecise value to qa2
   because of arithmetic operation on addresses.
@@ -97,11 +97,11 @@
   computing for function origin_arithmetic_3 <- main.
   Called from origin.i:96.
 [eva:alarm] origin.i:25: Warning: 
-  pointer downcast. assert (unsigned int)((int *)ta3) ≤ 2147483647;
+  pointer downcast. assert (unsigned int)(&(ta3[0])) ≤ 2147483647;
 [eva:alarm] origin.i:25: Warning: 
-  signed overflow. assert -2147483648 ≤ -((int)((int *)ta3));
+  signed overflow. assert -2147483648 ≤ -((int)(&(ta3[0])));
 [eva:alarm] origin.i:25: Warning: 
-  signed overflow. assert -((int)((int *)ta3)) ≤ 2147483647;
+  signed overflow. assert -((int)(&(ta3[0]))) ≤ 2147483647;
 [eva:garbled-mix:write] origin.i:25: 
   Assigning imprecise value to pa3
   because of arithmetic operation on addresses.
