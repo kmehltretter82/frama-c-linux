@@ -4305,7 +4305,7 @@ let rec doSpecList loc ghost
         end
       in
       (* as each name,value pair is determined, this is called *)
-      let rec processName kname (i: exp) loc rest = begin
+      let processName kname (i: exp) loc =
         (* add the name to the environment, but with a faked 'typ' field;
          * we don't know the full type yet (since that includes all of the
          * tag values), but we won't need them in here  *)
@@ -4313,23 +4313,23 @@ let rec doSpecList loc ghost
         (* add this tag to the list so that it ends up in the real
          * environment when we're finished  *)
         let newname, _  = newAlphaName ghost true "" kname in
-        let item = { eiorig_name = kname;
-                     einame = newname;
-                     eival = i;
-                     eiloc = loc;
-                     eihost = enum }
-        in
+        let item = {
+          eiorig_name = kname;
+          einame = newname;
+          eival = i;
+          eiloc = loc;
+          eihost = enum
+        } in
         addLocalToEnv ghost kname (EnvEnum item);
-        (kname, item) :: loop (Cil.increm i 1) rest
-      end
+        Cil.increm i 1, item
+      in
 
-      and loop i = function
-          [] -> []
-        | (kname, { expr_node = Cabs.NOTHING}, cloc) :: rest ->
+      let loop i item =
+        match item with
+        | (kname, { expr_node = Cabs.NOTHING}, cloc) ->
           (* use the passed-in 'i' as the value, since none specified *)
-          processName kname i (convLoc cloc) rest
-
-        | (kname, e, cloc) :: rest ->
+          processName kname i (convLoc cloc)
+        | (kname, e, cloc) ->
           (* constant-eval 'e' to determine tag value *)
           let e' = getIntConstExp ghost e in
           begin match Cil.constFoldToInt e' with
@@ -4339,13 +4339,12 @@ let rec doSpecList loc ghost
                 Cil_printer.pp_exp e'
             | Some i -> ignore (updateEnum i)
           end;
-          processName kname e' (convLoc cloc) rest
+          processName kname e' (convLoc cloc)
       in
 
       (*TODO: find a better loc*)
-      let fields = loop (Cil.zero ~loc:(Current_loc.get())) eil in
-      (* Now set the right set of items *)
-      enum.eitems <- List.map (fun (_, x) -> x) fields;
+      let init = Cil.zero ~loc:(Current_loc.get()) in
+      enum.eitems <- snd (List.fold_left_map loop init eil);
       (* Pick the enum's kind - see discussion above *)
       begin
         let unsigned = Z.geq !smallest Z.zero in
@@ -4376,11 +4375,11 @@ let rec doSpecList loc ghost
           match cabsitem with
           | (_, { expr_node = Cabs.NOTHING}, _) ->
             cilitem.eival <- i;
-            increm i 1
+            Cil.increm i 1
           | (_, cabsexp, _) ->
-            let newival = mkCast ~newt (getIntConstExp ghost cabsexp) in
+            let newival = Cil.mkCast ~newt (getIntConstExp ghost cabsexp) in
             cilitem.eival <- newival;
-            increm newival 1
+            Cil.increm newival 1
         in
         ignore (List.fold_left2 retype zero eil enum.eitems);
       end;
