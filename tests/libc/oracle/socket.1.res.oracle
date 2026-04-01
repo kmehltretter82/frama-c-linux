@@ -158,7 +158,7 @@
 [eva] using specification for function memset
 [eva:progress] socket.c:103: 
   function memset: precondition 'valid_s' got status valid.
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:147: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:167: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva:progress] Done for function memset
 [eva:progress] 

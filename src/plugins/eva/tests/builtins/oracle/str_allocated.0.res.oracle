@@ -25,9 +25,9 @@
   function memchr: precondition 'initialization' got status unknown.
 [eva:alarm] str_allocated.c:14: Warning: 
   function memchr: precondition 'danglingness' got status unknown.
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:58: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:78: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memchr
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:66: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:86: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memchr
 [eva:progress] Recording results for memchr_bug
 [eva:progress] Done for function memchr_bug

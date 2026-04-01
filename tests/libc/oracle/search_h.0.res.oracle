@@ -37,7 +37,7 @@
   function strcpy: precondition 'room_string' got status unknown.
 [eva:progress] search_h.c:42: 
   function strcpy: precondition 'separation' got status valid.
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:420: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:440: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva:progress] Done for function strcpy
 [eva:alarm] search_h.c:43: Warning: 

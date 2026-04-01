@@ -386,7 +386,7 @@ Options taking a string as argument should preferably be written
                     Note: using the same setting category several times for
                     the same attribute is undefined. (preferably use
                     -register-attributes="k1:v1:v2,k2:v3,...")
--std <c11|c17|c23>  Configures the ISO standard to use. Note that your
+-std <c11|c17|c23|c2y>  Configures the ISO standard to use. Note that your
                     preprocessor must support it, else it will lead to
                     preprocessing failure.
 

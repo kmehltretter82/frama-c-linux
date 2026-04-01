@@ -124,8 +124,9 @@ let tests_syntax_deps_available configurator =
   let genuine_gcc = dep "gcc-is-genuine" in
   let python = dep "python-3.10-available" in
   let has_c2x_option = dep "has-c2x-option" in
+  let has_c2y_option = dep "has-c2y-option" in
   test_aux "tests-syntax-deps-available" configurator
-    [clang; gcc; genuine_gcc; python; has_c2x_option]
+    [clang; gcc; genuine_gcc; python; has_c2x_option; has_c2y_option]
 
 (** {3 Plug-ins tests}  *)
 

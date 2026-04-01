@@ -13,11 +13,11 @@
   function strcpy: precondition 'room_string' got status valid.
 [eva:progress] string_c_generic.c:56: 
   function strcpy: precondition 'separation' got status valid.
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:420: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:440: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
-[eva:alarm] FRAMAC_SHARE/libc/string.h:420: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:440: Warning: 
   function strcpy: postcondition 'equal_contents' got status unknown.
-[eva:progress] FRAMAC_SHARE/libc/string.h:421: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:441: 
   function strcpy: postcondition 'result_ptr' got status valid.
 [eva:progress] Recording results for strcpy
 [eva:progress] Done for function strcpy
@@ -28,9 +28,9 @@
   function strcmp: precondition 'valid_string_s1' got status valid.
 [eva:progress] string_c_generic.c:57: 
   function strcmp: precondition 'valid_string_s2' got status valid.
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:170: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:190: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
-[eva:alarm] FRAMAC_SHARE/libc/string.h:170: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:190: Warning: 
   function strcmp: postcondition 'acsl_c_equiv' got status unknown.
 [eva:progress] Recording results for strcmp
 [eva:progress] Done for function strcmp
@@ -159,11 +159,11 @@
   Called from string_c_generic.c:72.
 [eva:progress] string_c_generic.c:72: 
   function memset: precondition 'valid_s' got status valid.
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:147: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:167: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
-[eva:alarm] FRAMAC_SHARE/libc/string.h:147: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:167: Warning: 
   function memset: postcondition 'acsl_c_equiv' got status unknown.
-[eva:progress] FRAMAC_SHARE/libc/string.h:148: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:168: 
   function memset: postcondition 'result_ptr' got status valid.
 [eva:progress] Recording results for memset
 [eva:progress] Done for function memset
@@ -178,13 +178,13 @@
   function strncpy: precondition 'separation' got status valid.
 [eva:partition] FRAMAC_SHARE/libc/string.c:235: 
   starting to merge loop iterations
-[eva:progress] FRAMAC_SHARE/libc/string.h:432: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:452: 
   function strncpy: postcondition 'result_ptr' got status valid.
-[eva:progress] FRAMAC_SHARE/libc/string.h:433: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:453: 
   function strncpy: postcondition 'initialization' got status valid.
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:436: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:456: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
-[eva:alarm] FRAMAC_SHARE/libc/string.h:436: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:456: Warning: 
   function strncpy, behavior complete: postcondition 'equal_after_copy' got status unknown.
 [eva:progress] Recording results for strncpy
 [eva:progress] Done for function strncpy
@@ -203,9 +203,9 @@
   function memcmp: precondition 'danglingness,s1' got status valid.
 [eva:progress] string_c_generic.c:74: 
   function memcmp: precondition 'danglingness,s2' got status valid.
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:43: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:63: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[eva:alarm] FRAMAC_SHARE/libc/string.h:43: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:63: Warning: 
   function memcmp: postcondition 'logic_spec' got status unknown.
 [eva:progress] Recording results for memcmp
 [eva:progress] Done for function memcmp
@@ -218,9 +218,9 @@
   function strncpy: precondition 'room_nstring' got status valid.
 [eva:progress] string_c_generic.c:78: 
   function strncpy: precondition 'separation' got status valid.
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:439: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:459: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[eva:alarm] FRAMAC_SHARE/libc/string.h:439: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:459: Warning: 
   function strncpy, behavior partial: postcondition 'equal_prefix' got status unknown.
 [eva:progress] Recording results for strncpy
 [eva:progress] Done for function strncpy
@@ -233,9 +233,9 @@
   function strncmp: precondition 'valid_string_s2' got status valid.
 [eva:partition] FRAMAC_SHARE/libc/string.c:140: 
   starting to merge loop iterations
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:177: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:197: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strncmp
-[eva:alarm] FRAMAC_SHARE/libc/string.h:177: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:197: Warning: 
   function strncmp: postcondition 'acsl_c_equiv' got status unknown.
 [eva:progress] Recording results for strncmp
 [eva:progress] Done for function strncmp
@@ -275,13 +275,13 @@
   Called from FRAMAC_SHARE/libc/string.c:198.
 [eva:progress] FRAMAC_SHARE/libc/string.c:198: 
   function strlen: precondition 'valid_string_s' got status valid.
-[eva:progress] FRAMAC_SHARE/libc/string.h:156: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:176: 
   function strlen: postcondition 'acsl_c_equiv' got status valid.
 [eva:progress] Recording results for strlen
 [eva:progress] Done for function strlen
-[eva:progress] FRAMAC_SHARE/libc/string.h:499: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:519: 
   function strncat: postcondition 'result_ptr' got status valid.
-[eva:progress] FRAMAC_SHARE/libc/string.h:513: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:533: 
   function strncat, behavior partial: postcondition 'sum_of_bounded_lengths' got status valid.
 [eva:progress] Recording results for strncat
 [eva:progress] Done for function strncat
@@ -310,17 +310,17 @@
   Called from string_c_generic.c:91.
 [eva:progress] string_c_generic.c:91: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva:progress] FRAMAC_SHARE/libc/string.h:193: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:213: 
   function strchr, behavior found: postcondition 'result_valid_string' got status valid.
-[eva:progress] FRAMAC_SHARE/libc/string.h:194: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:214: 
   function strchr, behavior found: postcondition 'result_char' got status valid.
-[eva:progress] FRAMAC_SHARE/libc/string.h:195: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:215: 
   function strchr, behavior found: postcondition 'result_same_base' got status valid.
-[eva:progress] FRAMAC_SHARE/libc/string.h:196: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:216: 
   function strchr, behavior found: postcondition 'result_in_length' got status valid.
-[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:198: 
+[eva:acsl:unsupported] FRAMAC_SHARE/libc/string.h:218: 
   cannot evaluate ACSL term, unsupported logic var p
-[eva:alarm] FRAMAC_SHARE/libc/string.h:198: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:218: Warning: 
   function strchr, behavior found: postcondition 'result_first_occurrence' got status unknown.
 [eva:progress] Recording results for strchr
 [eva:progress] Done for function strchr
@@ -329,7 +329,7 @@
   Called from string_c_generic.c:92.
 [eva:progress] string_c_generic.c:92: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva:progress] FRAMAC_SHARE/libc/string.h:201: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:221: 
   function strchr, behavior not_found: postcondition 'result_null' got status valid.
 [eva:progress] Recording results for strchr
 [eva:progress] Done for function strchr
@@ -345,7 +345,7 @@
   function strlen: precondition 'valid_string_s' got status valid.
 [eva:progress] Recording results for strlen
 [eva:progress] Done for function strlen
-[eva:progress] FRAMAC_SHARE/libc/string.h:219: 
+[eva:progress] FRAMAC_SHARE/libc/string.h:239: 
   function strrchr: postcondition 'result_null_or_same_base' got status valid.
 [eva:progress] Recording results for strrchr
 [eva:progress] Done for function strrchr
