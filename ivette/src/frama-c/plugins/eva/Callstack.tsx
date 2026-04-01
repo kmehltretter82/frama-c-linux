@@ -10,9 +10,11 @@ import React from 'react';
 
 import * as Dome from 'dome';
 import * as Tree from 'dome/frame/tree';
-import { addPinnedMessage, Button, delPinnedMessage, PinnedMessage
+import { addPinnedMessage, delPinnedMessage, PinnedMessage
 } from 'dome/frame/toolbars';
 import { IconButton } from 'dome/controls/buttons';
+import { RState } from 'dome/data/states';
+import { makeBadge } from 'dome/frame/sidebars';
 
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
@@ -78,6 +80,24 @@ function delMessage(): void {
 // --- Component Nodes
 // ----------------------------------------------------------------------------
 
+function getActions(
+  id: EvaCS.callstack,
+  onClick: (id: EvaCS.callstack) => void,
+  currentCS?: EvaCS.callstack[]
+): React.JSX.Element | null {
+  const isSelected = currentCS?.includes(id);
+  return (<>
+    <IconButton
+      icon='FILTER'
+      title={isSelected ? 'Callstack is selected' : 'Filter the callstack'}
+      kind={isSelected ? 'selected' : 'default'}
+      style={isSelected ? {} : { fillOpacity: '0.2' } }
+      onClick={() => onClick(id)}
+    />
+  </>
+  );
+}
+
 interface CSTreeProps {
   tree: TreeMap,
   onClick: (id: EvaCS.callstack) => void
@@ -86,28 +106,12 @@ interface CSTreeProps {
 function CSTree({ tree, onClick } : CSTreeProps): React.ReactNode {
   const [currentCS, ] = States.useSyncState(EvaCS.currentCallstacks);
 
-  function getActions(id: EvaCS.callstack)
-  : React.JSX.Element | null {
-    const isSelected = currentCS?.includes(id);
-    return (<>
-      <IconButton
-        icon='FILTER'
-        title={isSelected ? 'Callstack is selected' : 'Filter the callstack'}
-        kind={isSelected ? 'selected' : 'default'}
-        style={isSelected ? {} : { fillOpacity: '0.2' } }
-        onClick={() => onClick(id)}
-      />
-    </>
-    );
-  }
-
   return [...tree].map(([, { key, label, callstack, subTree }]) => {
     const loc = States.getMarker(callstack.stack[0]?.stmt).sloc;
     const title = loc ? loc.base+': '+loc.line : '';
     return (
-      <Tree.Node key={key} id={key} label={label}
-        title={title}
-        actions={getActions(callstack.callstack)}
+      <Tree.Node key={key} id={key} label={label} title={title}
+        actions={getActions(callstack.callstack, onClick, currentCS)}
       >
         { subTree.size > 0 ?
           <CSTree tree={subTree} onClick={onClick} />
@@ -116,6 +120,54 @@ function CSTree({ tree, onClick } : CSTreeProps): React.ReactNode {
       </Tree.Node>
     );
   });
+}
+
+interface CSNodesProps {
+  nodes: NodesMap,
+  onClick: (id: EvaCS.callstack) => void
+}
+
+function CSNodes({ nodes, onClick } : CSNodesProps): React.ReactNode {
+  const [currentCS, ] = States.useSyncState(EvaCS.currentCallstacks);
+
+  return [...nodes].map(([, { key, label, callstack }]) => {
+    const loc = States.getMarker(callstack.stack[0]?.stmt).sloc;
+    const title = loc ? loc.base+': '+loc.line : '';
+    return (
+      <Tree.Node key={key} id={key} label={label} title={title}
+        actions={getActions(callstack.callstack, onClick, currentCS)}
+      />
+    );
+  });
+}
+
+interface ContainerCSTreeProps {
+  unfoldAllState?: RState<boolean|undefined>,
+  nodes: NodesMap,
+  children: React.JSX.Element
+}
+
+function ContainerCSTree(props: ContainerCSTreeProps): React.JSX.Element {
+  const { unfoldAllState, nodes, children } = props;
+  const [ unfoldAll, setUnfoldAll ] = unfoldAllState || [true, () => {}];
+
+  return (
+    <Tree.Tree
+      unfoldAll={unfoldAll}
+      setUnfoldAll={setUnfoldAll}
+      onClick={(id: string) => {
+        const node = nodes.get(id);
+        if(node) {
+          if(node?.callstack.stack.length > 0) {
+            const stmt = node.callstack.stack[0].stmt;
+            const marker = States.getMarker(stmt).marker;
+            States.setSelected(marker);
+          }
+          else States.setCurrentScope(node.decl);
+        }
+      }}
+    >{ children }</Tree.Tree>
+  );
 }
 
 // ----------------------------------------------------------------------------
@@ -131,10 +183,14 @@ function getNode(key: string, cs: InfosCS): CSNode {
 }
 
 /** Return the Tree */
-function getNodes(callstacks: InfosCS[]): NodesMap {
+function getNodes(
+  callstacks: InfosCS[],
+  filter?: (val: EvaCS.callstack) => boolean
+): NodesMap {
   const nodes: NodesMap = new Map();
 
   callstacks.forEach(cs => {
+    if(filter && !filter(cs.callstack)) return;
     const key = cs.stack.length === 0
       ? cs.entryPoint
       : cs.stack[0].rank.toString();
@@ -170,7 +226,6 @@ function getTree(nodes: NodesMap): TreeMap {
     else error(key);
   }
   const nodeInTree: string[] = [];
-
 
   nodes.forEach(node => {
     if(nodeInTree.includes(node.key)) return;
@@ -257,56 +312,76 @@ export function useSelectedCS(): UseSelectedCS {
 // ----------------------------------------------------------------------------
 
 export function CallstackSelection(): React.JSX.Element {
-  const [ unfoldAll, setUnfoldAll ] = React.useState<boolean|undefined>(true);
+  const unfoldAllState = React.useState<boolean|undefined>(true);
+  const [ unfoldAll, setUnfoldAll ] = unfoldAllState;
+  const [ unfoldCS, setUnfoldCS ] = React.useState<boolean|undefined>(true);
   const { selected, setSelected, reset } = useSelectedCS();
   const CSInfos = useCallstacks();
+
+  const filter = React.useCallback(
+    (v: EvaCS.callstack) => selected?.includes(v) ?? true, [selected]);
+
   /** Nodes */
   const nodes = React.useMemo(() => getNodes(CSInfos), [CSInfos]);
   /** Tree */
   const tree = React.useMemo(() => getTree(nodes), [nodes]);
+  /** Selected nodes */
+  const nodesSelected = React.useMemo(() =>
+    getNodes(CSInfos, filter), [CSInfos, filter]);
 
   return (
     <EvaReady>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div className='dome-xTree-actions'>
-          <IconButton
-            size={16}
-            icon={ "CHEVRON.CONTRACT" }
-            title="Fold all"
-            disabled={unfoldAll === false}
-            onClick={() => setUnfoldAll(false)}
-          />
-          <IconButton
-            size={16}
-            icon={ "CHEVRON.EXPAND" }
-            title="Unfold all"
-            disabled={unfoldAll}
-            onClick={() => setUnfoldAll(true)}
-          />
-        </div>
-        <Button
-          label='Select All'
-          disabled={!selected || selected.length === 0}
-          onClick={reset}
-          />
-      </div>
-      <Tree.Tree
-        unfoldAll={unfoldAll}
-        setUnfoldAll={setUnfoldAll}
-        onClick={(id: string) => {
-          const node = nodes.get(id);
-          if(node) {
-            if(node?.callstack.stack.length > 0) {
-              const stmt = node.callstack.stack[0].stmt;
-              const marker = States.getMarker(stmt).marker;
-              States.setSelected(marker);
-            }
-            else States.setCurrentScope(node.decl);
-          }
-        }}
-      >
-        <CSTree tree={tree} onClick={setSelected}></CSTree>
+
+      <Tree.Tree sticky={true}>
+        <Tree.Node id='selectedOnly' label='Selected'
+          title='Show selected callstacks only'
+          actions={makeBadge(nodesSelected.size)}
+        >
+          <ContainerCSTree nodes={nodes}>
+            <CSNodes nodes={nodesSelected} onClick={setSelected}></CSNodes>
+          </ContainerCSTree>
+        </Tree.Node>
       </Tree.Tree>
+
+      <Tree.Tree sticky={true} unfoldAll={unfoldCS} setUnfoldAll={setUnfoldCS}>
+        <Tree.Node id='allCS' label='Callstacks'
+          title='Show all callstacks'
+          actions={<div className='dome-xTree-actions'>
+            <IconButton
+              size={16}
+              icon={ "CHEVRON.CONTRACT" }
+              title="Fold all"
+              disabled={unfoldAll === false}
+              onClick={() => {
+                setUnfoldAll(false);
+                setUnfoldCS(false);
+              }}
+            />
+            <IconButton
+              size={16}
+              icon={ "CHEVRON.EXPAND" }
+              title="Unfold all"
+              disabled={unfoldAll}
+              onClick={() => {
+                setUnfoldAll(true);
+                setUnfoldCS(true);
+              }}
+            />
+            <IconButton
+              icon='FILTER'
+              title='Select all callstacks'
+              disabled={!selected || selected.length === 0}
+              onClick={reset}
+              />
+            {makeBadge(nodes.size)}
+          </div>}
+        >
+          <ContainerCSTree unfoldAllState={unfoldAllState} nodes={nodes} >
+            <CSTree tree={tree} onClick={setSelected}></CSTree>
+          </ContainerCSTree>
+        </Tree.Node>
+      </Tree.Tree>
+
     </EvaReady>
   );
 
