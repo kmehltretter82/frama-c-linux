@@ -276,7 +276,7 @@ module MakeGraph (Vertex : Vertex) (Edge : Edge) = struct
         let s = if s = "" then " " else s in (* graph viewers don't like empty labels *)
         `HtmlLabel s
       in
-      Pretty_utils.ksfprintf string_to_label fmt
+      Format.kasprintf string_to_label fmt
     in
     (* Build vertex attributes and subgraphs from wto if present *)
     let open Graph.Graphviz.DotAttributes in

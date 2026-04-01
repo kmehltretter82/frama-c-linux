@@ -36,7 +36,7 @@ let failure ?json msg =
     in
     raise(InputError(msg))
   in
-  Pretty_utils.ksfprintf add_json msg
+  Format.kasprintf add_json msg
 
 let failure_from_type_error msg json =
   failure ~json "%s" msg

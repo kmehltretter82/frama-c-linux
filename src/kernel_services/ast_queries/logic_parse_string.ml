@@ -92,7 +92,7 @@ let default_typer kf kinstr =
                   Printer.pp_typ ty))
 
         let error loc msg =
-          Pretty_utils.ksfprintf (fun e -> raise (Error (loc, e))) msg
+          Format.kasprintf (fun e -> raise (Error (loc, e))) msg
 
         let on_error f rollback x =
           try f x with Error (loc,msg) as exn -> rollback (loc,msg); raise exn

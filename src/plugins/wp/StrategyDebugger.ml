@@ -314,7 +314,7 @@ let extract_matchings debug_table printer ?select ?(params=[]) sigma =
 let parameter (t : Tactical.tactical) (a: string ProofStrategy.loc) =
   try List.find (fun p -> Tactical.pident p = a.value) t#params
   with Not_found ->
-    Pretty_utils.ksfprintf
+    Format.kasprintf
       (fun e -> raise (Pattern.TypeError(a.loc, e)))
       "Parameter '%s' not found" a.value
 

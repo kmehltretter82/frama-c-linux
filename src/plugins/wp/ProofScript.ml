@@ -440,9 +440,9 @@ class console ~pool ~title =
     method interactive = false
     method get_title = the_title
     method set_title : 'a. 'a formatter =
-      fun msg -> Pretty_utils.ksfprintf (fun s -> the_title <- s) msg
+      fun msg -> Format.kasprintf (fun s -> the_title <- s) msg
     method set_descr : 'a. 'a formatter =
-      fun msg -> Pretty_utils.ksfprintf (fun s -> ignore s) msg
+      fun msg -> Format.kasprintf (fun s -> ignore s) msg
 
     method update_field :
       'a. ?enabled:bool -> ?title:string -> ?tooltip:string ->
@@ -463,7 +463,7 @@ class console ~pool ~title =
     method set_error
       : 'a. 'a formatter
       = fun msg ->
-        Pretty_utils.ksfprintf
+        Format.kasprintf
           (fun msg ->
              errors <- Some msg ;
              Wp_parameters.warning "[%s] %s" title msg)

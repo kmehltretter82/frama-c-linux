@@ -101,7 +101,7 @@ exception TypeError of Cil_types.location * string
 
 let error ctxt loc msg =
   match ctxt.typing with
-  | None -> Pretty_utils.ksfprintf (fun e -> raise (TypeError(loc, e))) msg
+  | None -> Format.kasprintf (fun e -> raise (TypeError(loc, e))) msg
   | Some tc -> tc.error loc msg
 
 let pint ctxt ~loc a =
@@ -802,7 +802,7 @@ let env ?(raise=false) () = {
 
 let typecheck_error env loc msg =
   if env.raise
-  then Pretty_utils.ksfprintf (fun e -> raise (TypeError(loc, e))) msg
+  then Format.kasprintf (fun e -> raise (TypeError(loc, e))) msg
   else Wp_parameters.error ~source:(fst loc) msg
 
 let tc_merge env ~loc ~expected va =

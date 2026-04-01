@@ -29,13 +29,6 @@ val with_null : (unit -> 'b) -> ('a,Format.formatter,unit,'b) format4 -> 'a
 (** {2 pretty-printing to a string} *)
 (* ********************************************************************** *)
 
-val ksfprintf:
-  (string -> 'b) -> ('a, Format.formatter, unit, 'b) format4 -> 'a
-(** similar to Format.kfprintf, but the continuation is given the result
-    string instead of a formatter.
-    @since Magnesium-20151001
-*)
-
 val to_string: ?margin:int -> (Format.formatter -> 'a -> unit) -> 'a -> string
 (** pretty-prints the supplied value into a string. [margin] is the
     maximal width of the box before a line-break is inserted.
