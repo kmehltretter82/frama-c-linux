@@ -362,10 +362,6 @@ struct RSRC_NODE_T {
    struct RSRC_NODE_T *next ;
 };
 typedef struct RSRC_NODE_T RSRC_NODE_T;
-/*@ predicate Pseparated(void *ptr1, void *ptr2) = \true;
- */
-/*@ predicate Pvalid(void *ptr) = \true;
- */
 /*@
 predicate ptr_sep_from_list{L}(RSRC_NODE_T *e, \list<RSRC_NODE_T *>  ll) =
   \true;
@@ -381,8 +377,8 @@ inductive linked_ll{L}
   case linked_ll_nil{L}: \forall RSRC_NODE_T *el; linked_ll(el, el, [| |]);
   case linked_ll_cons{L}: \forall RSRC_NODE_T *bl, RSRC_NODE_T *el,
                                   \list<RSRC_NODE_T *>  tail;
-                            Pseparated((void *)bl, (void *)el) ==>
-                            Pvalid((void *)bl) ==>
+                            \separated(bl, el) ==>
+                            \valid(bl) ==>
                             linked_ll(bl->next, el, tail) ==>
                             ptr_sep_from_list(bl, tail) ==>
                             linked_ll(bl, el, \Cons(bl, tail));
@@ -392,7 +388,7 @@ inductive linked_ll{L}
 logic \list<RSRC_NODE_T *>  __gen_e_acsl_linked_ll_fun3_here
 (RSRC_NODE_T *bl, RSRC_NODE_T *el) =
   el == bl ? [| |] :
-    (Pseparated((void *)bl, (void *)el) && Pvalid((void *)bl) ?
+    (\separated(bl, el) && \valid(bl) ?
        (\let tail = __gen_e_acsl_linked_ll_fun3_here(bl->next, el);
         __gen_e_acsl_ptr_sep_from_list_here(bl, tail) ? \Cons(bl, tail) :
           (fallthrough: (\list<RSRC_NODE_T *> )0))
@@ -402,7 +398,7 @@ logic \list<RSRC_NODE_T *>  __gen_e_acsl_linked_ll_fun3_here
 logic \list<RSRC_NODE_T *>  linked_ll_fun3{L}
 (RSRC_NODE_T *bl, RSRC_NODE_T *el) =
   el == bl ? [| |] :
-    (Pseparated((void *)bl, (void *)el) && Pvalid((void *)bl) ?
+    (\separated(bl, el) && \valid(bl) ?
        (\let tail = __gen_e_acsl_linked_ll_fun3_here(bl->next, el);
         ptr_sep_from_list(bl, tail) ? \Cons(bl, tail) :
           (fallthrough: (\list<RSRC_NODE_T *> )0))
