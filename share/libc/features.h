@@ -148,5 +148,11 @@
 #define __STDC_NO_COMPLEX__ 1
 #endif
 
+#if defined(__cplusplus)
+#define __FC_BOOL bool
+#else
+#define __FC_BOOL _Bool
+#endif
+
 /* end __FC_FEATURES_H */
 #endif
