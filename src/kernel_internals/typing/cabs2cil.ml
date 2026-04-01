@@ -4314,8 +4314,11 @@ let rec doSpecList loc ghost
 
       (*TODO: find a better loc*)
       let init = Cil.zero ~loc:(Current_loc.get()) in
+      (* All item expressions will be retyped with the right type in a second
+         typing phase once we found this enum kind (see below). *)
       enum.eitems <- snd (List.fold_left_map loop init eil);
-      (* Pick the enum's kind - see discussion above *)
+
+      (* Pick the enum's kind. *)
       begin
         (* Life is fun here. ANSI says: enum constants are ints,
            and there's an implementation-dependent underlying integer
