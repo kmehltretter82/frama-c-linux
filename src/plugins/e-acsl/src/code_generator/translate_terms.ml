@@ -19,9 +19,8 @@ end
 module M = Interlang_gen.M
 open Interlang_gen.M.Operators
 
-(**************************************************************************)
+
 (********************** Forward references ********************************)
-(**************************************************************************)
 
 let translate_rte_exp_ref
   : (?filter:(code_annotation -> bool) ->
@@ -34,6 +33,21 @@ let translate_rte_exp_ref
       Extlib.mk_labeled_fun "translate_rte_exp_ref")
 
 module Translate_predicates = struct
+  let to_exp_ref :
+    (adata:Assert.t ->
+     ?inplace:bool ->
+     ?name:string ->
+     kernel_function ->
+     ?rte:bool ->
+     Env.t ->
+     predicate ->
+     exp * Assert.t * Env.t) ref
+    = ref @@ fun ~adata:_ ?inplace:_ ?name:_ _kf ?rte:_ _env _p ->
+    Extlib.mk_labeled_fun "Translate_terms.Translate_predicates.to_exp_ref"
+
+  let to_exp ~adata ?inplace ?name kf ?rte env p =
+    !to_exp_ref ~adata ?inplace ?name kf ?rte env p
+
   let rte_guards_to_exp_old_ref
     : (loc:location ->
        kf:kernel_function ->

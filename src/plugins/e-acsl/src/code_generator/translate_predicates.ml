@@ -482,8 +482,8 @@ let () =
   Translate_terms.Translate_predicates.rte_guards_to_exp_old_ref :=
     rte_guards_to_exp_old;
   Translate_terms.Translate_predicates.rte_guards_to_exp_il_ref :=
-    rte_guards_to_exp_il
-
+    rte_guards_to_exp_il;
+  Translate_terms.Translate_predicates.to_exp_ref := to_exp
 
 exception No_simple_translation of predicate
 

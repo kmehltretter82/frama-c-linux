@@ -50,6 +50,17 @@ val translate_rte_exp_ref:
    Env.t) ref
 
 module Translate_predicates : sig
+  val to_exp_ref :
+    (adata:Assert.t ->
+     ?inplace:bool ->
+     ?name:string ->
+     kernel_function ->
+     ?rte:bool ->
+     Env.t ->
+     predicate ->
+     exp * Assert.t * Env.t)
+      ref
+
   val rte_guards_to_exp_old_ref:
     ( loc:location ->
       kf:kernel_function ->
