@@ -371,6 +371,15 @@ class annot_visitor kf flags on_alarm = object (self)
 
 end
 
+let visit_with_stmt visit kf flags on_alarm stmt element =
+  if not (Options.use_eva_results () && Eva_analysis.is_computed kf)
+  then
+    let visitor = object (self)
+      inherit annot_visitor kf flags on_alarm
+      initializer self#push_stmt stmt
+    end in
+    ignore (visit (visitor :> Cil.cilVisitor) element)
+
 (** {2 Iterate over Alarms on Cil elements} *)
 
 type on_alarm = kernel_function -> stmt -> invalid:bool -> Alarms.alarm -> unit
@@ -378,11 +387,7 @@ type on_alarm = kernel_function -> stmt -> invalid:bool -> Alarms.alarm -> unit
 let filter = function None -> Flags.default () | Some flags -> flags
 
 let iter_alarms visit ?flags (on_alarm:on_alarm) kf stmt element =
-  let visitor = object (self)
-    inherit annot_visitor kf (filter flags) (on_alarm kf)
-    initializer self#push_stmt stmt
-  end in
-  ignore (visit (visitor :> Cil.cilVisitor) element)
+  visit_with_stmt visit kf (filter flags) (on_alarm kf) stmt element
 
 type 'a iterator =
   ?flags:Flags.t -> on_alarm ->
@@ -414,20 +419,22 @@ let collector () =
   in pool , on_alarm
 
 let get_annotations_kf ?flags kf =
-  match kf.fundec with
-  | Declaration _ -> []
-  | Definition(f, _) ->
-    let pool,on_alarm = collector () in
-    let visitor = new annot_visitor kf (filter flags) on_alarm in
-    ignore (Visitor.visitFramacFunction visitor f) ; !pool
-
-let collect from flags kf stmt elt =
+  let visit_function kf flags on_alarm =
+    if not (Options.use_eva_results () && Eva_analysis.is_computed kf)
+    then match kf.fundec with
+      | Declaration _ -> ()
+      | Definition(f, _) ->
+        let visitor = new annot_visitor kf flags on_alarm in
+        ignore (Visitor.visitFramacFunction visitor f)
+  in
   let pool,on_alarm = collector () in
-  let visitor = object (self)
-    inherit annot_visitor kf (filter flags) on_alarm
-    initializer self#push_stmt stmt
-  end in
-  ignore (from (visitor :> Cil.cilVisitor) elt); !pool
+  visit_function kf (filter flags) on_alarm ;
+  !pool
+
+let collect visit flags kf stmt elt =
+  let pool,on_alarm = collector () in
+  visit_with_stmt visit kf (filter flags) on_alarm stmt elt;
+  !pool
 
 let get_annotations_stmt ?flags kf stmt =
   collect Cil.visitCilStmt flags kf stmt stmt
@@ -444,54 +451,57 @@ let get_annotations_lval ?flags kf stmt lv =
 let annotate ?flags kf =
   let flags = filter flags in
   Options.debug "annotating function %a" Kernel_function.pretty kf;
-  match kf.fundec with
-  | Declaration _ -> ()
-  | Definition(f, _) ->
-    (* This reference contains all the RTE statuses that should be positioned
-       once this function has been annotated. *)
-    let to_update = ref [] in
-    (* Check whether there is something to compute + lists all the statuses
-       that will be ultimately updated *)
-    let comp (_name, set, is_computed) should_compute =
-      if should_compute && not (is_computed kf) then begin
-        to_update := (fun () -> set kf true) :: !to_update;
-        true
-      end
-      else false
-    in
-    (* Strict version of ||, because [comp] has side-effects *)
-    let (|||) a b = a || b in
-    let open Generator in
-    let open Flags in
-    if comp Initialized.accessor
-        (not @@ Kernel_function.Set.is_empty flags.initialized) |||
-       comp Mem_access.accessor flags.mem_access |||
-       comp Pointer_value.accessor flags.pointer_value |||
-       comp Pointer_call.accessor flags.pointer_call |||
-       comp Div_mod.accessor flags.div_mod |||
-       comp Shift.accessor flags.shift |||
-       comp Left_shift_negative.accessor flags.left_shift_negative |||
-       comp Right_shift_negative.accessor flags.right_shift_negative |||
-       comp Signed_overflow.accessor flags.signed_overflow |||
-       comp Signed_downcast.accessor flags.signed_downcast |||
-       comp Unsigned_overflow.accessor flags.unsigned_overflow |||
-       comp Unsigned_downcast.accessor flags.unsigned_downcast |||
-       comp Pointer_downcast.accessor flags.pointer_downcast |||
-       comp Float_to_int.accessor flags.float_to_int |||
-       comp Finite_float.accessor flags.finite_float |||
-       comp Bool_value.accessor flags.bool_value
-    then begin
-      Options.feedback ~dkey:Options.dkey_annot
-        "annotating function %a" Kernel_function.pretty kf;
-      let warn = Options.Warn.get () in
-      let on_alarm stmt ~invalid alarm =
-        let ca, _ = register Generator.emitter kf stmt ~invalid alarm in
-        if warn && invalid then
-          Options.warning ~current:true ~once:true "@[guaranteed RTE:@ %a@]"
-            Printer.pp_code_annotation ca
-      in
-      let vis = new annot_visitor kf flags on_alarm in
-      let nkf = Visitor.visitFramacFunction vis f in
-      assert(nkf == f);
-      List.iter (fun f -> f ()) !to_update;
+  (* This reference contains all the RTE statuses that should be positioned
+     once this function has been annotated. *)
+  let to_update = ref [] in
+  (* Check whether there is something to compute + lists all the statuses
+     that will be ultimately updated *)
+  let comp (_name, set, is_computed) should_compute =
+    if should_compute && not (is_computed kf) then begin
+      to_update := (fun () -> set kf true) :: !to_update;
+      true
     end
+    else false
+  in
+  (* Strict version of ||, because [comp] has side-effects *)
+  let (|||) a b = a || b in
+  let open Generator in
+  let open Flags in
+  if comp Initialized.accessor
+      (not @@ Kernel_function.Set.is_empty flags.initialized) |||
+     comp Mem_access.accessor flags.mem_access |||
+     comp Pointer_value.accessor flags.pointer_value |||
+     comp Pointer_call.accessor flags.pointer_call |||
+     comp Div_mod.accessor flags.div_mod |||
+     comp Shift.accessor flags.shift |||
+     comp Left_shift_negative.accessor flags.left_shift_negative |||
+     comp Right_shift_negative.accessor flags.right_shift_negative |||
+     comp Signed_overflow.accessor flags.signed_overflow |||
+     comp Signed_downcast.accessor flags.signed_downcast |||
+     comp Unsigned_overflow.accessor flags.unsigned_overflow |||
+     comp Unsigned_downcast.accessor flags.unsigned_downcast |||
+     comp Pointer_downcast.accessor flags.pointer_downcast |||
+     comp Float_to_int.accessor flags.float_to_int |||
+     comp Finite_float.accessor flags.finite_float |||
+     comp Bool_value.accessor flags.bool_value
+  then begin
+    let visit_function kf flags on_alarm =
+      if not (Options.use_eva_results () && Eva_analysis.is_computed kf)
+      then match kf.fundec with
+        | Declaration _ -> ()
+        | Definition(f, _) ->
+          Options.feedback ~dkey:Options.dkey_annot
+            "annotating function %a" Kernel_function.pretty kf;
+          let visitor = new annot_visitor kf flags on_alarm in
+          ignore (Visitor.visitFramacFunction visitor f)
+    in
+    let warn = Options.Warn.get () in
+    let on_alarm stmt ~invalid alarm =
+      let ca, _ = register Generator.emitter kf stmt ~invalid alarm in
+      if warn && invalid then
+        Options.warning ~current:true ~once:true "@[guaranteed RTE:@ %a@]"
+          Printer.pp_code_annotation ca
+    in
+    ignore @@ visit_function kf flags on_alarm ;
+    List.iter (fun f -> f ()) !to_update;
+  end

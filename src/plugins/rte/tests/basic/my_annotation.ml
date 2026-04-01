@@ -28,7 +28,7 @@ let main () =
 
   Kernel.log "Removing some rte annotations" ;
   let _, set_signed, _ = RteGen.Generator.Signed_overflow.accessor in
-  let emitter = Dynamic.get ~plugin:"RteGen" "emitter" Emitter.ty in
+  let emitter = RteGen.Generator.emitter in
   let filter = function
     | Alarms.Overflow _ -> true
     | _ -> false

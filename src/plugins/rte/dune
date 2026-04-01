@@ -28,9 +28,11 @@
   (name RteGen)
   (optional)
   (public_name frama-c-rtegen.core)
-  (private_modules api options generator rte visit register)
   (flags -open Frama_c_kernel :standard -w -9)
-  (libraries frama-c.kernel)
+  (libraries frama-c.kernel
+   (select eva_analysis.ml from
+    (frama-c-eva.core -> eva_analysis.enabled.ml)
+    (                 -> eva_analysis.disabled.ml)))
   (instrumentation (backend landmarks))
   (instrumentation (backend bisect_ppx))
 )

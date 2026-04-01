@@ -114,3 +114,22 @@ module FunctionSelection =
 let dkey_annot =
   register_category "annot" ~default:true
     ~help:"message about function annotations"
+
+let () =
+  if not Eva_analysis.is_available
+  then Parameter_customize.is_invisible ()
+
+module UseEvaResults =
+  Bool
+    (struct
+      let option_name  = "-rte-use-eva-results"
+      let default = Eva_analysis.is_available
+      let help =
+        "When enabled, do not emit annotations on functions analyzed by Eva"
+    end)
+
+let use_eva_results () =
+  if UseEvaResults.get () && not Eva_analysis.is_available then
+    warning ~once:true
+      "-rte-use-eva-results is set while Eva is not available, ignoring" ;
+  UseEvaResults.get ()

@@ -16,6 +16,3 @@ module Generator = Generator
 module Visit = Visit
 
 let compute = Register.compute
-
-(** Replaces old Db API *)
-module Api = Api

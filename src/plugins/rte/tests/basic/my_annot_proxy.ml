@@ -27,7 +27,7 @@ let main () =
   print () ;
   print_status ();
 
-  let emitter = Dynamic.get ~plugin:"RteGen" "emitter" Emitter.ty in
+  let emitter = RteGen.Generator.emitter in
   let filter = function
     | Alarms.Overflow _ | Alarms.Division_by_zero _ -> true
     | _ -> false

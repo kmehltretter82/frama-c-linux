@@ -6,10 +6,7 @@ let print () =
   Kernel.log "================================"
 
 let get_rte_annotations =
-  Dynamic.get ~plugin:"RteGen" "get_rte_annotations"
-    (Datatype.func
-       Cil_datatype.Stmt.ty
-       (let module L = Datatype.List(Cil_datatype.Code_annotation) in L.ty))
+  RteGen.Generator.get_registered_annotations
 
 let fetch_stmts_visitor () = object
   inherit nopCilVisitor

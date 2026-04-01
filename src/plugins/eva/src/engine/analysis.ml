@@ -114,7 +114,6 @@ let post_analysis (type t) (engine: t engine) final_state =
   (* Try to refine the 'Unknown' statuses that have been emitted during
      this analysis. *)
   Eval_annots.mark_green_and_red ();
-  Eva_dynamic.RteGen.mark_generated_rte ();
   Mem_exec.cleanup_results ();
   (* Remove redundant alarms *)
   if Parameters.RmAssert.get () then Eva_dynamic.Scope.rm_asserts ();
