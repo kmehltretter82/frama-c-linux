@@ -266,8 +266,13 @@ end
 *)
 module LogicalOperators: Parameter_sig.Bool
 
-(** Behavior of option "-enums" *)
-module Enums: Parameter_sig.String
+
+type enum = Default | Int | Short
+
+(** Behavior of option "-enums"
+    @before Frama-C+dev Was of type string
+*)
+module Enums: Parameter_sig.S with type t = enum
 
 module CppCommand: Parameter_sig.String
 (** Behavior of option "-cpp-command" *)

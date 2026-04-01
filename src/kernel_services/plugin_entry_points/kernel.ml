@@ -1290,27 +1290,34 @@ module LogicalOperators =
          conditional statements when possible."
     end)
 
+type enum = Default | Int | Short
+
 let () = Parameter_customize.set_group normalisation
 let () = Parameter_customize.do_not_reset_on_copy ()
 module Enums =
-  P.String
+  P.Enum
     (struct
+      type t = enum
+      let default = Default
       let option_name = "-enums"
-      let arg_name = "repr"
-      let default = "gcc-enums"
       let help =
-        "use <repr> to decide how enumerated types should be represented. \
-         -enums help gives the list of available representations (default: "
-        ^ default ^ ")"
+        "decide how enumerated types should be represented:\n\
+         - 'default' (default): chose between gcc or msvc depending on the \
+         machdep\n\
+         - 'int': treat everything as int (including enumerated types \
+         with packed attribute)\n\
+         - 'gcc-enums': use an unsigned integer type when no tag has a \
+         negative value, and choose the smallest rank possible starting \
+         from int (default gcc's behavior)\n\
+         - 'gcc-short-enums': same behavior than 'gcc-enums' but starting from \
+         char instead (gcc's -fshortenums option)\n\
+         - 'msvc': same behavior than 'int'"
+      let values = [
+        Default, "default"; Default, "gcc-enums";
+        Int, "int"; Int, "msvc";
+        Short, "gcc-short-enums"
+      ]
     end)
-let enum_reprs = ["gcc-enums"; "gcc-short-enums"; "int";]
-let () = Enums.set_possible_values ("help"::enum_reprs)
-let () =
-  Enums.add_set_hook
-    (fun _ o -> if o = "help" then
-        feedback "Possible enums representation are: %a"
-          (Pretty_utils.pp_list ~sep:", " Format.pp_print_string)
-          enum_reprs)
 
 let () = Parameter_customize.set_group normalisation
 module SimplifyCfg =

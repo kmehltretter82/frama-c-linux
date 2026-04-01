@@ -122,10 +122,18 @@ Options taking a string as argument should preferably be written
                     default, opposite option is -no-collapse-call-cast)
 -constfold          fold all constant expressions in the code before analysis
                     (opposite option is -no-constfold)
--enums <repr>       use <repr> to decide how enumerated types should be
-                    represented. -enums help gives the list of available
-                    representations (default: gcc-enums) (preferably use
-                    -enums="repr")
+-enums <default|gcc-enums|int|msvc|gcc-short-enums>  decide how enumerated
+                    types should be represented:
+                    - 'default' (default): chose between gcc or msvc
+                    depending on the machdep
+                    - 'int': treat everything as int (including enumerated
+                    types with packed attribute)
+                    - 'gcc-enums': use an unsigned integer type when no tag
+                    has a negative value, and choose the smallest rank
+                    possible starting from int (default gcc's behavior)
+                    - 'gcc-short-enums': same behavior than 'gcc-enums' but
+                    starting from char instead (gcc's -fshortenums option)
+                    - 'msvc': same behavior than 'int'
 -generated-spec-custom <c1:m1,c2:m2,...>  Fine-tune missing specification
                     generation by manually selecting modes for each clause.
                     Can be one of: frama-c, acsl, safe, skip or the name of a

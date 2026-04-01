@@ -293,21 +293,19 @@ the expression \texttt{1+2} is replaced by \texttt{3}.
 \item \texttt{\optiondef{-}{enums} <repr name>} specifies which representation
 should be used for a given enumerated type. Namely, the C standard allows the use
 of any integral type in which all the corresponding tags can be represented.
-Default is \texttt{gcc-enums}. A list of supported
-options can be obtained by typing:
-\begin{frama-c-commands}
-\$ frama-c -enums help
-\end{frama-c-commands}
+Default is \texttt{default}.
 This includes:
 \begin{itemize}
+\item \texttt{default}: chose between \texttt{gcc} or \texttt{msvc} depending on
+the machdep (see \texttt{-machdep}).
 \item \texttt{int}: treat everything as \texttt{int} (including enumerated types
 with \texttt{packed} attribute).
 \item \texttt{gcc-enums}: use an unsigned integer type when no tag has a
 negative value, and choose the smallest rank possible starting from \texttt{int}
 (default \gcc's behavior)
-\item \texttt{gcc-short-enums}: use an unsigned integer type when no tag has
-a negative value, and choose the smallest rank possible starting from
-\texttt{char} (\gcc's \texttt{-fshortenums} option)
+\item \texttt{gcc-short-enums}: same behavior than \texttt{gcc-enums} but
+starting from \texttt{char} instead (\gcc's \texttt{-fshortenums} option)
+\item \texttt{msvc}: same behavior than \texttt{int}
 \end{itemize}
 
 \item \optiondef{-}{initialized-padding-locals} forces to initialize padding

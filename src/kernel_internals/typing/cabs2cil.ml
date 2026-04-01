@@ -4343,14 +4343,15 @@ let rec doSpecList loc ghost
         in
         let ekind =
           match Kernel.Enums.get () with
-          | "" | "help" | "gcc-enums" ->
+          | Int -> IInt
+          | Default when Machine.msvcMode () -> IInt
+          | Short -> real_kind
+          | Default ->
+            (* This is GCC mode, but use it as a default behavior for anything. *)
             if Ast_attributes.contains "packed" enum.eattr ||
                Cil.bytesSizeOfInt real_kind >= Cil.bytesSizeOfInt IInt
             then real_kind
             else if unsigned then IUInt else IInt
-          | "int" -> IInt
-          | "gcc-short-enums" -> real_kind
-          | s -> Kernel.fatal ~current:true "Unknown enum representation '%s'" s
         in
         enum.ekind <- ekind;
         (* Now that we found the enum's type, retype every item to this type. *)
