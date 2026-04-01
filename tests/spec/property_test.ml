@@ -1,4 +1,3 @@
-open Cil
 open Cil_types
 
 let emitter =

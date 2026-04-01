@@ -1,7 +1,6 @@
 open Cabsvisit
 open Cabshelper
 open Cil_types
-open Cil
 open Cabs
 
 class visit = object

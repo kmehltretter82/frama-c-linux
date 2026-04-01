@@ -14,7 +14,6 @@
 (***************************************************************************)
 
 open Cil_types
-open Cil
 open Logic_const
 
 let adjust_assigns_clause loc var code_annot =
@@ -130,7 +129,7 @@ let encapsulate_local_vars f =
     in
     let stack_block, ret_stmt =
       try
-        ignore (visitCilBlock vis f.sbody);
+        ignore (Cil.visitCilBlock vis f.sbody);
         Kernel.fatal "No return statement found inside %a"
           Cil_printer.pp_varinfo f.svar
       with Found res -> res
@@ -192,7 +191,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
       | None ->
         let ghost = f.svar.vghost in
         (* don't collide *)
-        let rv = makeLocalVar ~loc ~ghost ~temp:true f "__retres" retTyp in
+        let rv = Cil.makeLocalVar ~loc ~ghost ~temp:true f "__retres" retTyp in
         retVar := Some rv;
         rv
       | Some rv ->
@@ -206,10 +205,10 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
       method! vterm_lhost = function
         | TResult _ ->
           let v = getRetVar Cil_datatype.Location.unknown in
-          ChangeTo (TVar (cvar_to_lvar v))
+          ChangeTo (TVar (Cil.cvar_to_lvar v))
         | TMem _ | TVar _ -> DoChildren
     end
-    in visitCilPredicate vis p
+    in Cil.visitCilPredicate vis p
   in
   let assert_of_returns ca =
     match ca.annot_content with
@@ -261,10 +260,10 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
         (* Must create a statement *)
         let rv =
           if hasRet then
-            Some (new_exp ~loc (Lval(Var (getRetVar loc), NoOffset)))
+            Some (Cil.new_exp ~loc (Lval(Var (getRetVar loc), NoOffset)))
           else None
         in
-        mkStmt (Return (rv, loc))
+        Cil.mkStmt (Return (rv, loc))
       in retStmt := sr;
       sr
     end else
@@ -365,7 +364,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
            the statement contract(s) will apply.
         *)
         let sgref = ref (getRetStmt ()) in
-        let sg = mkStmt ~ghost:s.ghost (Goto (sgref, loc)) in
+        let sg = Cil.mkStmt ~ghost:s.ghost (Goto (sgref, loc)) in
         haveGoto := true;
         let b_stmts =
           match !returns_assert with
@@ -373,7 +372,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
           | p ->
             let p = Logic_const.toplevel_predicate p in
             let a = Logic_const.new_code_annotation (AAssert ([],p)) in
-            let sta = mkStmt (Instr (Code_annot (a,loc))) in
+            let sta = Cil.mkStmt (Instr (Code_annot (a,loc))) in
             if callback<>None then
               ( let gclause = sta , a in
                 Stack.iter
@@ -384,7 +383,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
                   ) returns_stack ) ;
             [ s; sta; sg ]
         in
-        let s = mkStmt (Block (mkBlock b_stmts)) in
+        let s = Cil.mkStmt (Block (Cil.mkBlock b_stmts)) in
         popn popstack;
         scanStmts (s :: acc) mainbody 0 rests
       end

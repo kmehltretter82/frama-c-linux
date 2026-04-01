@@ -17,7 +17,6 @@
 (* sfg: this stuff was stolen from optim.ml - the code to print the cfg as
    a dot graph is mine *)
 
-open Cil
 open Cil_types
 open Cil_datatype
 
@@ -25,7 +24,7 @@ open Cil_datatype
 let nodeList : stmt list ref = ref []
 
 class caseLabeledStmtFinder slr = object
-  inherit nopCilVisitor
+  inherit Cil.nopCilVisitor
 
   method! vstmt s =
     if List.exists (fun l ->
@@ -44,7 +43,7 @@ end
 let findCaseLabeledStmts (b : block) : stmt list =
   let slr = ref [] in
   let vis = new caseLabeledStmtFinder slr in
-  ignore(visitCilBlock vis b);
+  ignore(Cil.visitCilBlock vis b);
   !slr
 
 (* we might need to add a Skip statement at the end of a block in order
@@ -208,8 +207,9 @@ and cfgStmt env (s: stmt) next break cont =
     cfgBlock env blk2 next break cont
 
   | UnspecifiedSequence seq ->
-    addBlockSucc (block_from_unspecified_sequence seq);
-    cfgBlock env (block_from_unspecified_sequence seq) next break cont
+    let b = Cil.block_from_unspecified_sequence seq in
+    addBlockSucc b;
+    cfgBlock env b next break cont
   | Block b ->
     addBlockSucc b;
     cfgBlock env b next break cont
@@ -269,7 +269,7 @@ and cfgStmt env (s: stmt) next break cont =
 
 let forallStmts todo (fd : fundec) =
   let vis = object
-    inherit nopCilVisitor
+    inherit Cil.nopCilVisitor
     method! vstmt stmt = ignore (todo stmt); DoChildren
     method! vinst _ = Cil.SkipChildren
     method! vexpr _ = Cil.SkipChildren
@@ -280,7 +280,7 @@ let forallStmts todo (fd : fundec) =
     method! vattr _ = Cil.SkipChildren
   end
   in
-  ignore (visitCilFunction vis fd)
+  ignore (Cil.visitCilFunction vis fd)
 
 
 let clearCFGinfo ?(clear_id=true) (fd : fundec) =
@@ -292,7 +292,7 @@ let clearCFGinfo ?(clear_id=true) (fd : fundec) =
   forallStmts clear fd
 
 let clearFileCFG ?(clear_id=true) (f : file) =
-  iterGlobals f (fun g ->
+  Cil.iterGlobals f (fun g ->
       match g with
       | GFun(fd,_) -> clearCFGinfo ~clear_id fd
       | _ -> ())
@@ -301,7 +301,7 @@ let clear_sid_info_ref = Extlib.mk_fun "Cfg.clear_sid_info_ref"
 
 let computeFileCFG (f : file) =
   !clear_sid_info_ref ();
-  iterGlobals f (fun g -> match g with GFun(fd,_) -> cfgFun fd | _ -> ())
+  Cil.iterGlobals f (fun g -> match g with GFun(fd,_) -> cfgFun fd | _ -> ())
 
 
 (* This alphaTable is used to prevent collision of label names when
@@ -410,7 +410,7 @@ let xform_switch_block ?(keepSwitch=false) b =
                 Label _ -> lab
               | Case(e,l) ->
                 let suffix =
-                  match isInteger e with
+                  match Cil.isInteger e with
                   | Some value ->
                     if Z.lt value Z.zero then
                       "neg_" ^ Z.to_string (Z.neg value)
@@ -456,7 +456,7 @@ let xform_switch_block ?(keepSwitch=false) b =
              let a =
                Logic_const.new_code_annotation (AAssert ([], p))
              in
-             let assertion = mkStmt (Instr(Code_annot(a,l))) in
+             let assertion = Cil.mkStmt (Instr(Code_annot(a,l))) in
              popn popstack;
              assertion:: s ::
              xform_switch_stmt
@@ -478,7 +478,7 @@ let xform_switch_block ?(keepSwitch=false) b =
            | p ->
              let p = Logic_const.toplevel_predicate p in
              let a = Logic_const.new_code_annotation (AAssert ([], p)) in
-             let assertion = mkStmt (Instr(Code_annot(a,l))) in
+             let assertion = Cil.mkStmt (Instr(Code_annot(a,l))) in
              popn popstack;
              assertion :: s ::
              xform_switch_stmt
@@ -495,7 +495,7 @@ let xform_switch_block ?(keepSwitch=false) b =
           let loc = snd_l, snd_l in
           if keepSwitch then begin
             let label_index = label_index + 1 in
-            let break_stmt = mkStmt (Instr (Skip loc)) in
+            let break_stmt = Cil.mkStmt (Instr (Skip loc)) in
             break_stmt.labels <-
               [Label
                  (freshLabel
@@ -534,7 +534,7 @@ let xform_switch_block ?(keepSwitch=false) b =
              *
             *)
             let label_index = label_index + 1 in
-            let break_stmt = mkStmt (Instr (Skip loc)) in
+            let break_stmt = Cil.mkStmt (Instr (Skip loc)) in
             break_stmt.labels <-
               [Label(freshLabel
                        (Printf.sprintf
@@ -566,15 +566,15 @@ let xform_switch_block ?(keepSwitch=false) b =
                         Const (CInt64 (z,_,_))
                         when Z.is_zero z
                         ->
-                        new_exp ~loc:ce.eloc (UnOp(LNot,e,Cil_const.intType))
+                        Cil.new_exp ~loc:ce.eloc (UnOp(LNot,e,Cil_const.intType))
                       | _ ->
-                        new_exp ~loc:ce.eloc (BinOp(Eq,e,ce,Cil_const.intType))
+                        Cil.new_exp ~loc:ce.eloc (BinOp(Eq,e,ce,Cil_const.intType))
                     in
                     (* end replacement *)
                     let then_block =
-                      mkBlock [ mkStmt (Goto(ref stmt_hd,cl)) ] in
+                      Cil.mkBlock [ Cil.mkStmt (Goto(ref stmt_hd,cl)) ] in
                     let else_block =
-                      mkBlock [ mkStmt (handle_labels lab_tl) ] in
+                      Cil.mkBlock [ Cil.mkStmt (handle_labels lab_tl) ] in
                     If(pred,then_block,else_block,cl)
                   | Default(dl) :: lab_tl ->
                     (* ww: before this was 'if (1) goto label',
@@ -583,14 +583,14 @@ let xform_switch_block ?(keepSwitch=false) b =
                               handling for if(1) into thinking
                               that there are two paths here.
                               The simpler 'goto label' is what we want. *)
-                    Block(mkBlock [ mkStmt (Goto(ref stmt_hd,dl)) ;
-                                    mkStmt (handle_labels lab_tl) ])
+                    Block(Cil.mkBlock [ Cil.mkStmt (Goto(ref stmt_hd,dl)) ;
+                                        Cil.mkStmt (handle_labels lab_tl) ])
                   | Label(_,_,_) :: lab_tl -> handle_labels lab_tl
                 in
                 handle_labels stmt_hd.labels
             in
             let sl = List.sort compare_choices sl in
-            let ifblock = mkStmt (handle_choices sl) in
+            let ifblock = Cil.mkStmt (handle_choices sl) in
             Stack.push (Stack.create()) breaks_stack;
             let switch_block =
               xform_switch_block
@@ -613,13 +613,13 @@ let xform_switch_block ?(keepSwitch=false) b =
         | Loop(a,b,(fst_l, snd_l as l),_,_) ->
           let label_index = label_index + 1 in
           let loc_break = snd_l, snd_l in
-          let break_stmt = mkStmt (Instr (Skip loc_break)) in
+          let break_stmt = Cil.mkStmt (Instr (Skip loc_break)) in
           break_stmt.labels <-
             [Label(freshLabel
                      (Printf.sprintf
                         "while_%d_break" label_index),l,false)] ;
           let cont_loc = fst_l, fst_l in
-          let cont_stmt = mkStmt (Instr (Skip cont_loc)) in
+          let cont_stmt = Cil.mkStmt (Instr (Skip cont_loc)) in
           b.bstmts <- cont_stmt :: b.bstmts ;
           let my_break_dest () = ref break_stmt in
           let use_continue = ref false in
@@ -703,8 +703,8 @@ let xform_switch_block ?(keepSwitch=false) b =
 (* Enter all the labels in a function into an alpha renaming table to
    prevent duplicate labels when transforming loops and switch
    statements. *)
-class registerLabelsVisitor : cilVisitor = object
-  inherit nopCilVisitor
+class registerLabelsVisitor : Cil.cilVisitor = object
+  inherit Cil.nopCilVisitor
   method! vstmt { labels = labels } = begin
     List.iter
       (function
@@ -731,6 +731,6 @@ let prepareCFG ?(keepSwitch=false) (fd : fundec) : unit =
   (* Labels are local to a function, so start with a clean slate by
      clearing labelAlphaTable. Then register all labels. *)
   Hashtbl.clear labelAlphaTable;
-  ignore (visitCilFunction (new registerLabelsVisitor) fd);
+  ignore (Cil.visitCilFunction (new registerLabelsVisitor) fd);
   let b = xform_switch_block ~keepSwitch fd.sbody in
   fd.sbody <- b

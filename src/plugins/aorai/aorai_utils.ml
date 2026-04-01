@@ -8,7 +8,6 @@
 (*                                                                            *)
 (******************************************************************************)
 
-open Cil
 open Logic_const
 open Logic_utils
 open Data_for_aorai
@@ -301,7 +300,7 @@ let make_binop = Cil.mkBinOp_exn ~constfold:true
 
 (** Returns an int constant expression which represents the given int value. *)
 let mk_int_exp value =
-  new_exp ~loc:Cil_datatype.Location.unknown
+  Cil.new_exp ~loc:Cil_datatype.Location.unknown
     (Const(CInt64(Z.of_int value,IInt,Some(string_of_int value))))
 
 (** This function rewrites a cross condition into an ACSL expression.
@@ -385,7 +384,7 @@ let rec term_to_exp t res =
   | TConst (Integer (value,repr)) -> Cil.kinteger64 ~loc ?repr value
   | TConst (LStr _str) -> Aorai_option.not_yet_implemented "term_to_exp str"
   | TConst (LWStr _l) -> Aorai_option.not_yet_implemented "term_to_exp wstr"
-  | TConst (LChr c) -> new_exp ~loc (Const (CChr c))
+  | TConst (LChr c) -> Cil.new_exp ~loc (Const (CChr c))
   | TConst (LReal l_real) ->
     let res = Typed_float.parse l_real.r_literal in
     let error s = Errorloc.abort_context "%s" s in
@@ -397,30 +396,30 @@ let rec term_to_exp t res =
       else (* fallback to double, r_nearest being in that format anyways *)
         (CReal (l_real.r_nearest, FDouble, None))
     in
-    new_exp ~loc (Const cst)
-  | TConst (LEnum e) -> new_exp ~loc (Const (CEnum e))
-  | TLval tlval -> new_exp ~loc (Lval (tlval_to_lval tlval res))
-  | TSizeOf ty -> new_exp ~loc (SizeOf ty)
-  | TSizeOfE t -> new_exp ~loc (SizeOfE(term_to_exp t res))
-  | TAlignOf ty -> new_exp ~loc (AlignOf (ty, `Standard))
-  | TAlignOfE t -> new_exp ~loc (AlignOfE (term_to_exp t res, `Standard))
+    Cil.new_exp ~loc (Const cst)
+  | TConst (LEnum e) -> Cil.new_exp ~loc (Const (CEnum e))
+  | TLval tlval -> Cil.new_exp ~loc (Lval (tlval_to_lval tlval res))
+  | TSizeOf ty -> Cil.new_exp ~loc (SizeOf ty)
+  | TSizeOfE t -> Cil.new_exp ~loc (SizeOfE(term_to_exp t res))
+  | TAlignOf ty -> Cil.new_exp ~loc (AlignOf (ty, `Standard))
+  | TAlignOfE t -> Cil.new_exp ~loc (AlignOfE (term_to_exp t res, `Standard))
   | TUnOp (unop, t) ->
-    new_exp ~loc (UnOp (unop, term_to_exp t res, Cil_const.intType))
+    Cil.new_exp ~loc (UnOp (unop, term_to_exp t res, Cil_const.intType))
   | TBinOp (binop, t1, t2)->
-    new_exp ~loc
+    Cil.new_exp ~loc
       (BinOp(binop, term_to_exp t1 res, term_to_exp t2 res, Cil_const.intType))
   | TCast (false, Ctype ty, {term_node = TConst(LReal lreal)})
     when Ast_types.is_float ty ->
     (match Ast_types.unroll_node ty with
      | TFloat fk ->
-       new_exp ~loc
+       Cil.new_exp ~loc
          (Const (CReal (lreal.r_nearest,fk,Some lreal.r_literal)))
      | _ ->
        Aorai_option.fatal
          "A floating-point type was expected, got %a." Printer.pp_typ ty)
-  | TCast (false, Ctype ty, t) -> new_exp ~loc (CastE (ty, term_to_exp t res))
-  | TAddrOf tlval -> new_exp ~loc (AddrOf (tlval_to_lval tlval res))
-  | TStartOf tlval -> new_exp ~loc (StartOf (tlval_to_lval tlval res))
+  | TCast (false, Ctype ty, t) -> Cil.new_exp ~loc (CastE (ty, term_to_exp t res))
+  | TAddrOf tlval -> Cil.new_exp ~loc (AddrOf (tlval_to_lval tlval res))
+  | TStartOf tlval -> Cil.new_exp ~loc (StartOf (tlval_to_lval tlval res))
   | TCast (true, _,t) -> term_to_exp t res
   | _ ->
     Aorai_option.fatal
@@ -444,7 +443,7 @@ and tlval_to_lval (tlhost, toffset) res =
       end
     in
     (Var v_info, t_to_loffset toffset)
-  |TMem t -> mkMem ~addr:(term_to_exp t res) ~off:(t_to_loffset toffset)
+  |TMem t -> Cil.mkMem ~addr:(term_to_exp t res) ~off:(t_to_loffset toffset)
   |TResult _ ->
     (match res with
      | Some res -> Var res, t_to_loffset toffset
@@ -500,7 +499,7 @@ let get_bhv_aux_fct kf bhv =
       [Normal,
        Logic_const.(
          new_predicate
-           (prel (Req, tlogic_coerce (tresult ret_typ) Linteger,lone())))]
+           (prel (Req, tlogic_coerce (tresult ret_typ) Linteger,Cil.lone())))]
     in
     let bhv_in =
       Cil.mk_behavior ~name:bhv.b_name ~assumes ~assigns ~post_cond ()
@@ -516,7 +515,7 @@ let get_bhv_aux_fct kf bhv =
         Logic_const.(
           new_predicate
             (prel
-               (Req, tlogic_coerce (tresult ret_typ) Linteger, lzero())))]
+               (Req, tlogic_coerce (tresult ret_typ) Linteger, Cil.lzero())))]
     in
     let bhv_out = Cil.mk_behavior ~name ~assumes ~assigns ~post_cond () in
     Globals.Functions.replace_by_declaration (Cil.empty_funspec()) vi loc;
@@ -771,7 +770,7 @@ let int2enumstate nums =
   let enum = find_enum nums in
   Logic_const.term (TConst (LEnum enum)) (Ctype (Cil_const.mk_tenum enum.eihost))
 
-let int2enumstate_exp loc nums = new_exp ~loc (Const (CEnum (find_enum nums)))
+let int2enumstate_exp loc nums = Cil.new_exp ~loc (Const (CEnum (find_enum nums)))
 
 (** Given an lval term 'host' and an integer value 'off', it returns a lval term host[off]. *)
 let mk_offsetted_array_states_as_enum host off =
@@ -818,11 +817,11 @@ let is_state_pred state =
        Logic_const.tvar (Data_for_aorai.get_state_logic_var state))
 
 let is_state_non_det_stmt (_,copy) loc =
-  mkStmtOneInstr ~ghost:true (Set (Cil.var copy, Cil.one ~loc, loc))
+  Cil.mkStmtOneInstr ~ghost:true (Set (Cil.var copy, Cil.one ~loc, loc))
 
 let is_state_det_stmt state loc =
   let var = Data_for_aorai.get_varinfo curState in
-  mkStmtOneInstr
+  Cil.mkStmtOneInstr
     ~ghost:true (Set (Cil.var var, int2enumstate_exp loc state.nums, loc))
 
 
@@ -853,7 +852,7 @@ let is_out_of_state_stmt (_,copy) loc =
     Aorai_option.fatal
       "Deterministic automaton sync functions can't have out-of-state stmt. \
        Maybe this should use `is_out_of_state_exp' instead."
-  else mkStmtOneInstr ~ghost:true (Set(Cil.var copy , mk_int_exp 0 , loc ))
+  else Cil.mkStmtOneInstr ~ghost:true (Set(Cil.var copy , mk_int_exp 0 , loc ))
 
 let is_out_of_state_exp state loc =
 
@@ -861,7 +860,7 @@ let is_out_of_state_exp state loc =
   then
     make_binop ~loc Ne
       (int2enumstate_exp loc state.nums)
-      (evar ~loc (Data_for_aorai.get_varinfo curState))
+      (Cil.evar ~loc (Data_for_aorai.get_varinfo curState))
   else
     make_binop ~loc Eq
       (Cil.evar (Data_for_aorai.get_state_var state))
@@ -937,7 +936,7 @@ let mk_decl_loops_init () =
   Cil.visitCilFile (visitor :> Cil.cilVisitor) !file
 
 let change_vars subst subst_res kf label pred =
-  let add_label t = ChangeDoChildrenPost(t,fun t -> tat(t,label)) in
+  let add_label t = Cil.ChangeDoChildrenPost(t,fun t -> tat(t,label)) in
   let visitor =
     object
       inherit Visitor.frama_c_copy (Project.current())
@@ -1953,7 +1952,7 @@ let mk_behavior ~loc auto kf e status state =
       (Normal, Logic_const.new_predicate (is_out_of_state_pred state))
       ::post_cond
     in
-    WritesAny,[mk_behavior ~name ~post_cond ()]
+    WritesAny,[Cil.mk_behavior ~name ~post_cond ()]
   end
 
 let auto_func_behaviors loc f st state =
@@ -2072,15 +2071,15 @@ let mk_goto loc b =
   match b.bstmts with
   | [] -> Cil.mkBlock []
   | [ { skind = Instr i } ] ->
-    let s = mkStmtOneInstr ~ghost i in
+    let s = Cil.mkStmtOneInstr ~ghost i in
     Cil.mkBlock [s]
   | [ { skind = Goto (s,_) }] ->
-    let s' = mkStmt ~ghost (Goto (ref !s,loc)) in
+    let s' = Cil.mkStmt ~ghost (Goto (ref !s,loc)) in
     Cil.mkBlock [s']
   | s::_ ->
     s.labels <-
       (Label(Data_for_aorai.get_fresh "__aorai_label",loc,false)):: s.labels;
-    let s' = mkStmt ~ghost (Goto (ref s,loc)) in
+    let s' = Cil.mkStmt ~ghost (Goto (ref s,loc)) in
     Cil.mkBlock [s']
 
 let normalize_condition loc cond block1 block2 =
@@ -2119,8 +2118,8 @@ let mk_deterministic_stmt
       List.fold_left
         (fun acc (cond, stmt_act) ->
            [mkIfStmt loc cond
-              (mkBlock (is_state_det_stmt state loc :: stmt_act))
-              (mkBlock acc)])
+              (Cil.mkBlock (is_state_det_stmt state loc :: stmt_act))
+              (Cil.mkBlock acc)])
         trans_stmts
         (List.rev stmt_from_action)
     in
@@ -2151,11 +2150,11 @@ let mk_non_deterministic_stmt
           (fun acc (cond, stmt_act) ->
              if stmt_act = [] then acc
              else
-               (mkIfStmt loc cond (mkBlock stmt_act) (mkBlock []))::acc)
+               (mkIfStmt loc cond (Cil.mkBlock stmt_act) (Cil.mkBlock []))::acc)
           []
           (List.rev stmt_from_action)
       in
-      mkIfStmt loc cond (mkBlock [then_stmt]) (mkBlock else_stmt) :: actions
+      mkIfStmt loc cond (Cil.mkBlock [then_stmt]) (Cil.mkBlock else_stmt) :: actions
     in
     new_funcs, new_vars, aux_stmts @ trans_stmts
   end else

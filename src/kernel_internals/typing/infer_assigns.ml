@@ -6,20 +6,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil
 open Cil_types
 open Logic_const
 
 let from_prototype_vi vi =
   let formals =
     try
-      let formals = getFormalsDecl vi in
+      let formals = Cil.getFormalsDecl vi in
       (* Do ignore anonymous names *)
       List.filter (fun vi -> vi.vname <> "") formals
     with Not_found -> []
     (* this may happen for function pointer used as formal parameters.*)
   in
-  let rtyp, _, _, _ = splitFunctionTypeVI vi in
+  let rtyp, _, _, _ = Cil.splitFunctionTypeVI vi in
   let pointer_args,basic_args =
     List.partition (fun vi -> Ast_types.is_ptr vi.vtype) formals in
   (* Remove args of type pointer to pointer *)
@@ -33,7 +32,7 @@ let from_prototype_vi vi =
     List.map
       (fun vi ->
          let loc = vi.vdecl in
-         let t = tvar (cvar_to_lvar vi) in
+         let t = tvar (Cil.cvar_to_lvar vi) in
          let typ = vi.vtype in
          if Ast_types.is_void_ptr typ then
            let const = Ast_types.(has_attribute "const" (direct_pointed_type typ)) in
@@ -63,7 +62,7 @@ let from_prototype_vi vi =
         let range = match size with
           | None -> make_range None
           | Some size ->
-            make_range (constFoldToInt size)
+            make_range (Cil.constFoldToInt size)
         in
         let offs, typ = mk_offset true typ_elem in
         TIndex (range, offs), typ
@@ -114,7 +113,7 @@ let from_prototype_vi vi =
         (fun v ->
            v.vghost,
            (Logic_const.new_identified_term
-              { term_node = TLval (TVar (cvar_to_lvar v),TNoOffset);
+              { term_node = TLval (TVar (Cil.cvar_to_lvar v),TNoOffset);
                 term_type = Ctype v.vtype;
                 term_name = [];
                 term_loc = v.vdecl })

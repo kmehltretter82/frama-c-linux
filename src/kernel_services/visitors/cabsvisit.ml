@@ -19,8 +19,6 @@
 open Cabs
 open Cabshelper
 
-open Cil
-
 type nameKind =
     NVar                                (* Variable or function prototype
                                            name *)
@@ -31,20 +29,20 @@ type nameKind =
 (* All visit methods are called in preorder! (but you can use
  * ChangeDoChildrenPost to change the order) *)
 class type cabsVisitor = object
-  method vexpr: expression -> expression visitAction   (* expressions *)
-  method vinitexpr: init_expression -> init_expression visitAction
-  method vstmt: statement -> statement list visitAction
-  method vblock: block -> block visitAction
+  method vexpr: expression -> expression Cil.visitAction   (* expressions *)
+  method vinitexpr: init_expression -> init_expression Cil.visitAction
+  method vstmt: statement -> statement list Cil.visitAction
+  method vblock: block -> block Cil.visitAction
   method vvar: string -> string                  (* use of a variable
                                                         * names *)
-  method vdef: definition -> definition list visitAction
-  method vtypespec: typeSpecifier -> typeSpecifier visitAction
-  method vdecltype: decl_type -> decl_type visitAction
+  method vdef: definition -> definition list Cil.visitAction
+  method vtypespec: typeSpecifier -> typeSpecifier Cil.visitAction
+  method vdecltype: decl_type -> decl_type Cil.visitAction
 
   (* For each declaration we call vname *)
-  method vname: nameKind -> specifier -> name -> name visitAction
-  method vspec: specifier -> specifier visitAction     (* specifier *)
-  method vattr: attribute -> attribute list visitAction
+  method vname: nameKind -> specifier -> name -> name Cil.visitAction
+  method vspec: specifier -> specifier Cil.visitAction     (* specifier *)
+  method vattr: attribute -> attribute list Cil.visitAction
 
   method vEnterScope: unit -> unit
   method vExitScope: unit -> unit
@@ -52,17 +50,17 @@ end
 
 (* a default visitor which does nothing to the tree *)
 class nopCabsVisitor : cabsVisitor = object
-  method vexpr (_e:expression) = DoChildren
-  method vinitexpr (_e:init_expression) = DoChildren
-  method vstmt (_s: statement) = DoChildren
-  method vblock (_b: block) = DoChildren
+  method vexpr (_e:expression) = Cil.DoChildren
+  method vinitexpr (_e:init_expression) = Cil.DoChildren
+  method vstmt (_s: statement) = Cil.DoChildren
+  method vblock (_b: block) = Cil.DoChildren
   method vvar (s: string) = s
-  method vdef (_d: definition) = DoChildren
-  method vtypespec (_ts: typeSpecifier) = DoChildren
-  method vdecltype (_dt: decl_type) = DoChildren
-  method vname _k (_s:specifier) (_n: name) = DoChildren
-  method vspec (_s:specifier) = DoChildren
-  method vattr (_a: attribute) = DoChildren
+  method vdef (_d: definition) = Cil.DoChildren
+  method vtypespec (_ts: typeSpecifier) = Cil.DoChildren
+  method vdecltype (_dt: decl_type) = Cil.DoChildren
+  method vname _k (_s:specifier) (_n: name) = Cil.DoChildren
+  method vspec (_s:specifier) = Cil.DoChildren
+  method vattr (_a: attribute) = Cil.DoChildren
 
   method vEnterScope () = ()
   method vExitScope () = ()

@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil
 open Visitor
 
 type cpp_opt_kind = Gnu | Not_gnu | Unknown
@@ -740,7 +739,7 @@ let isRoot g =
     || keepFuncs = "all_debug"
     || (keepFuncs = "all" && not (Cil_builtins.Builtin_functions.mem v.vname))
     || (keepFuncs = "user-specified" &&
-        (not (is_empty_funspec spec) && not (Cil.global_is_in_libc g)))
+        (not (Cil.is_empty_funspec spec) && not (Cil.global_is_in_libc g)))
   | GType _ | GCompTag _ | GCompTagDecl _ | GEnumTag _ | GEnumTagDecl _ ->
     keepTypes
   | _ -> false
@@ -822,8 +821,8 @@ let add_annotation kf st a =
 let synchronize_source_annot has_new_stmt kf =
   match kf.fundec with
   | Definition (fd,_) ->
-    let (visitor:cilVisitor) = object
-      inherit nopCilVisitor as super
+    let (visitor:Cil.cilVisitor) = object
+      inherit Cil.nopCilVisitor as super
       val block_with_user_annots = ref None
       val user_annots_for_next_stmt = ref []
       method! vstmt st =
@@ -866,7 +865,7 @@ let synchronize_source_annot has_new_stmt kf =
               in
               block_with_user_annots:=None;
               user_annots_for_next_stmt:=[];
-              ChangeDoChildrenPost(st,post_action)
+              Cil.ChangeDoChildrenPost(st,post_action)
             end
             else begin
               Kernel.warning ~current:true ~once:true
@@ -896,7 +895,7 @@ let synchronize_source_annot has_new_stmt kf =
             block_with_user_annots := father;
             user_annots_for_next_stmt := [st, annot] ;
           end;
-          ChangeTo (Cil.mkStmtOneInstr (Skip Cil_datatype.Location.unknown))
+          Cil.ChangeTo (Cil.mkStmtOneInstr (Skip Cil_datatype.Location.unknown))
         in
         assert (!block_with_user_annots = None
                 || !user_annots_for_next_stmt <> []);
@@ -929,7 +928,7 @@ let synchronize_source_annot has_new_stmt kf =
           synchronize_previous_user_annots () ;
     end
     in
-    ignore (visitCilFunction visitor fd)
+    ignore (Cil.visitCilFunction visitor fd)
   | Declaration _ -> ()
 
 let register_global = function
@@ -1009,7 +1008,7 @@ let cleanup file =
       match st.skind with
       | Block b ->
         (* queue is flushed afterwards*)
-        let b' = Cil.visitCilBlock (self:>cilVisitor) b in
+        let b' = Cil.visitCilBlock (self:>Cil.cilVisitor) b in
         (match b'.bstmts, b'.blocals, b'.bstatics with
          | [], [], [] -> changed <- true; st.skind <- (Instr (Skip loc))
          | _ -> if b != b' then st.skind <- Block b');

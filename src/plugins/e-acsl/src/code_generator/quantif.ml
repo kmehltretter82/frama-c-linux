@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil
 open Analyses_types
 
 (** Forward reference for [Translate_predicates.to_exp]. *)
@@ -75,8 +74,8 @@ let convert kf env loc ~is_forall quantif =
       (* create different "initial value", "found value" and guard expression
          for the predicate depending on the type of quantification *)
       let init_val, found_val, mk_guard =
-        let z = zero ~loc in
-        let o = one ~loc in
+        let z = Cil.zero ~loc in
+        let o = Cil.one ~loc in
         if is_forall then o, z, fun x -> x
         else z, o, fun e -> Smart_exp.lnot ~loc:e.eloc e
       in
@@ -104,7 +103,7 @@ let convert kf env loc ~is_forall quantif =
           None
           Cil_const.intType
           (fun v _ ->
-             let lv = var v in
+             let lv = Cil.var v in
              [ Smart_stmt.assigns ~loc ~result:lv init_val ])
       in
       let end_loop_ref = ref Cil_datatype.Stmt.dummy in
@@ -114,13 +113,13 @@ let convert kf env loc ~is_forall quantif =
            to evaluation of the goal *)
         let predicate_to_exp = !predicate_to_exp_ref ~adata:Assert.no_data in
         let test, _, env = predicate_to_exp kf (Env.push env) goal in
-        let then_blk = mkBlock [ mkEmptyStmt ~loc () ] in
+        let then_blk = Cil.mkBlock [ Cil.mkEmptyStmt ~loc () ] in
         let else_blk =
           (* use a 'goto', not a simple 'break' in order to handle 'forall' with
              multiple binders (leading to imbricated loops) *)
-          mkBlock
-            [ Smart_stmt.assigns ~loc ~result:(var var_res) found_val;
-              mkStmt ~valid_sid:true (Goto(end_loop_ref, loc)) ]
+          Cil.mkBlock
+            [ Smart_stmt.assigns ~loc ~result:(Cil.var var_res) found_val;
+              Cil.mkStmt ~valid_sid:true (Goto(end_loop_ref, loc)) ]
         in
         let blk, env =
           Env.pop_and_get
@@ -136,10 +135,10 @@ let convert kf env loc ~is_forall quantif =
         Loops.mk_nested_loops ~loc mk_innermost_block kf env lvs_guards
       in
       let env =
-        Env.add_stmt env (Smart_stmt.block_stmt (mkBlock stmts))
+        Env.add_stmt env (Smart_stmt.block_stmt (Cil.mkBlock stmts))
       in
       (* where to jump to go out of the loop *)
-      let end_loop = mkEmptyStmt ~loc () in
+      let end_loop = Cil.mkEmptyStmt ~loc () in
       let label_name = "e_acsl_end_loop" ^ string_of_int (Label_ids.next ()) in
       let label = Label(label_name, loc, false) in
       end_loop.labels <- label :: end_loop.labels;

@@ -1,23 +1,22 @@
 open Cil_datatype
-open Cil
 
 let loc = Location.unknown
 
 let null () =
-  let e = zero ~loc in
-  mkCast ~force:true ~newt:Cil_const.voidPtrType e
+  let e = Cil.zero ~loc in
+  Cil.mkCast ~force:true ~newt:Cil_const.voidPtrType e
 
 let inull () =
-  let e = zero ~loc in
-  mkCast ~force:true ~newt:Cil_const.intPtrType e
+  let e = Cil.zero ~loc in
+  Cil.mkCast ~force:true ~newt:Cil_const.intPtrType e
 
 let cone () =
-  let e = one ~loc in
-  mkCast ~force:true ~newt:Cil_const.charPtrType e
+  let e = Cil.one ~loc in
+  Cil.mkCast ~force:true ~newt:Cil_const.charPtrType e
 
 let ione () =
-  let e = one ~loc in
-  mkCast ~force:true ~newt:Cil_const.intPtrType e
+  let e = Cil.one ~loc in
+  Cil.mkCast ~force:true ~newt:Cil_const.intPtrType e
 
 let test =
   let n = ref 0 in

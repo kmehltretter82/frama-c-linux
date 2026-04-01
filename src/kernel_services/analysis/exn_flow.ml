@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil
 open Cil_types
 
 (* all exceptions that can be raised somewhere in the AST.
@@ -522,7 +521,7 @@ class erase_exn =
         let rtyp = Kernel_function.get_return_type kf in
         if ret.labels = [] then
           ret.labels <- [Label("__ret_label",Cil_datatype.Stmt.loc ret,false)];
-        let goto = mkStmt (Goto (ref ret,loc)) in
+        let goto = Cil.mkStmt (Goto (ref ret,loc)) in
         match ret.skind with
         | Return (None,_) -> [goto]
         (* rt is void: do not need to create a dummy return value *)
@@ -535,14 +534,14 @@ class erase_exn =
           Kernel.fatal "find_return did not give a Return statement"
       end else begin
         let stmt = Stack.top catch_all_label in
-        [mkStmt (Goto (ref stmt, loc))]
+        [Cil.mkStmt (Goto (ref stmt, loc))]
       end
 
     method private jumps_to_handler loc t =
       let t = purify t in
       try
         let stmt = Cil_datatype.Typ.Hashtbl.find exn_labels t in
-        [mkStmt (Goto (ref stmt, loc))]
+        [Cil.mkStmt (Goto (ref stmt, loc))]
       with
       | Not_found -> self#jumps_to_default_handler loc
 
@@ -719,7 +718,7 @@ class erase_exn =
 
     method! vstmt_aux s =
       let generate_jumps instr exns loc =
-        if Cil_datatype.Typ.Set.is_empty exns then SkipChildren
+        if Cil_datatype.Typ.Set.is_empty exns then Cil.SkipChildren
         else begin
           self#modify_current ();
           let make_jump t (stmts, uncaught) =
@@ -773,7 +772,7 @@ class erase_exn =
         let s2 = self#set_exn_kind loc t in
         let s3 = self#set_exn_value loc t e in
         let rv = self#jumps_to_handler loc t in
-        let b = mkBlock (s1 :: s2 :: s3 :: rv) in
+        let b = Cil.mkBlock (s1 :: s2 :: s3 :: rv) in
         s.skind <- Block b;
         SkipChildren
       | Throw (None,loc) ->
@@ -781,7 +780,7 @@ class erase_exn =
         let s1 = self#set_uncaught_flag loc true in
         let t = purify (Option.get exn_var).vtype in
         let rv = self#jumps_to_handler loc t in
-        let b = mkBlock (s1 :: rv) in
+        let b = Cil.mkBlock (s1 :: rv) in
         s.skind <- Block b;
         SkipChildren
       | TryCatch (t,_,_) when not can_throw ->

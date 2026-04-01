@@ -1,5 +1,4 @@
 open Cil_types
-open Cil
 
 class pathcrawlerVisitor prj =
   object(self)

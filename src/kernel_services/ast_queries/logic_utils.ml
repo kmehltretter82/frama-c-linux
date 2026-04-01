@@ -7,7 +7,6 @@
 (*                                                                            *)
 (******************************************************************************)
 
-open Cil
 open Logic_const
 open Cil_types
 
@@ -262,7 +261,7 @@ let mk_logic_AddrOf ?(loc=Cil_datatype.Location.unknown) lval typ =
   in
   match lval with
   | TMem e, TNoOffset -> Logic_const.term ~loc e.term_node e.term_type
-  | b, TIndex(z, TNoOffset) when isLogicZero z ->
+  | b, TIndex(z, TNoOffset) when Cil.isLogicZero z ->
     Logic_const.term ~loc (TStartOf (b, TNoOffset)) (lift_set typ)
   | _ ->
     Logic_const.term ~loc (TAddrOf lval) (lift_set typ)
@@ -700,7 +699,7 @@ and expr_to_ipredicate e =
 let array_with_range arr size =
   let loc = arr.eloc in
   let arr = Cil.stripCasts arr in
-  let typ_arr = typeOf arr in
+  let typ_arr = Cil.typeOf arr in
   let no_cast =
     Ast_types.(is_any_char_ptr typ_arr || is_any_char_array typ_arr)
   in
@@ -2445,7 +2444,7 @@ let rec constFoldTermToInt ?(machdep=true) (e: term) : Z.t option =
   match e.term_node with
   | TBinOp(bop, e1, e2) -> constFoldBinOpToInt ~machdep bop e1 e2
   | TUnOp(unop, e) -> constFoldUnOpToInt ~machdep unop e
-  | TConst(LChr c) -> Some (charConstToInt c)
+  | TConst(LChr c) -> Some (Cil.charConstToInt c)
   | TConst(LEnum {eival = v}) -> Cil.constFoldToInt ~machdep v
   | TConst (Boolean b) -> Some (if b then Z.one else Z.zero)
   | TConst (Integer (i, _)) -> Some i
@@ -2500,8 +2499,8 @@ and constFoldCastToInt ~machdep typ e =
 
 and constFoldSizeOfToInt ~machdep typ =
   if machdep then
-    try Some (Z.of_int (bytesSizeOf typ))
-    with SizeOfError _ -> None
+    try Some (Z.of_int (Cil.bytesSizeOf typ))
+    with Cil.SizeOfError _ -> None
   else None
 
 and constFoldUnOpToInt ~machdep unop e =
@@ -2574,7 +2573,7 @@ and bitsLogicOffset ltyp off : Z.t * Z.t =
     | TIndex(e, off) -> begin
         let ei = match constFoldTermToInt e with
           | Some i -> i
-          | None -> raise (SizeOfError ("Index is not constant", typ))
+          | None -> raise (Cil.SizeOfError ("Index is not constant", typ))
         in
         let typ_e = Ast_types.direct_element_type typ in
         let size_e = Z.of_int (Cil.bitsSizeOf typ_e) in
@@ -2592,11 +2591,11 @@ and bitsLogicOffset ltyp off : Z.t * Z.t =
       else
         (* All union fields start at offset 0 *)
         loopOff f.ftype (Z.of_int (Cil.bitsSizeOf f.ftype)) start off
-    | TModel _ -> raise (SizeOfError ("bitsLogicOffset on model field", typ))
+    | TModel _ -> raise (Cil.SizeOfError ("bitsLogicOffset on model field", typ))
   in
   match Ast_types.unroll_logic ltyp with
   | Ctype typ -> loopOff typ Z.zero Z.zero off
-  | _ -> raise (SizeOfError ("bitsLogicOffset on logic type", Cil_const.voidPtrType))
+  | _ -> raise (Cil.SizeOfError ("bitsLogicOffset on logic type", Cil_const.voidPtrType))
 
 (* Handle \min(\union(args)) or \max(\union(args)), depending on [f] *)
 and constFoldMinMax ~machdep f args =

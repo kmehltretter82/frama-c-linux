@@ -11,13 +11,12 @@
 (** Some utilities *)
 
 open Cil_types
-open Cil
 
 (** [sizeof(char)] in bits *)
-let sizeofchar () = Z.of_int (bitsSizeOf Cil_const.charType)
+let sizeofchar () = Z.of_int (Cil.bitsSizeOf Cil_const.charType)
 
 (** [sizeof(char* )] in bits *)
-let sizeofpointer () =  bitsSizeOf (Machine.uintptr_type ())
+let sizeofpointer () =  Cil.bitsSizeOf (Machine.uintptr_type ())
 
 (** 2^(8 * sizeof( void * )) *)
 let max_byte_size () =
@@ -50,14 +49,14 @@ let warn_if_void typ =
 (* [sizeof ty] is the size of [ty] in bits; it may return [`Top]. *)
 let sizeof typ =
   warn_if_void typ;
-  try Z_or_top.of_int (bitsSizeOf typ)
-  with SizeOfError _ -> Z_or_top.top
+  try Z_or_top.of_int (Cil.bitsSizeOf typ)
+  with Cil.SizeOfError _ -> Z_or_top.top
 
 (* [osizeof ty] is the size of [ty] in bytes; it may return [`Top]. *)
 let osizeof typ =
   warn_if_void typ;
-  try Z_or_top.of_int (warn_if_zero typ (bitsSizeOf typ) / 8)
-  with SizeOfError _ -> Z_or_top.top
+  try Z_or_top.of_int (warn_if_zero typ (Cil.bitsSizeOf typ) / 8)
+  with Cil.SizeOfError _ -> Z_or_top.top
 
 exception Neither_Int_Nor_Enum_Nor_Pointer
 
@@ -204,7 +203,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
     let size =
       match bfinfo with
       | Other -> begin
-          try Z.of_int (bitsSizeOf typ)
+          try Z.of_int (Cil.bitsSizeOf typ)
           with Cil.SizeOfError _ -> Z.zero
         end
       | Bitfield i -> Z.of_int64 i
@@ -224,8 +223,8 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
     )
 
   | TComp compinfo ->
-    let size = Z.of_int (try bitsSizeOf typ
-                         with SizeOfError _ -> 0)
+    let size = Z.of_int (try Cil.bitsSizeOf typ
+                         with Cil.SizeOfError _ -> 0)
     in
     if (not env.use_align) && Z.compare req_size size = 0
     then
@@ -235,7 +234,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
       try
         let full_fields_to_print = List.fold_left
             (fun acc field ->
-               let start_o,width_o = fieldBitsOffset field in
+               let start_o,width_o = Cil.fieldBitsOffset field in
                let start_o,width_o =
                  Z.of_int start_o, Z.of_int width_o
                in
@@ -275,7 +274,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
             List.fold_left
               (fun ((s,last_field_offset) as acc) field ->
                  let current_offset = Field (field,NoOffset) in
-                 let start_o,width_o = bitsOffset typ current_offset in
+                 let start_o,width_o = Cil.bitsOffset typ current_offset in
                  let start_o,width_o =
                    Z.of_int start_o, Z.of_int width_o
                  in
@@ -328,7 +327,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
 
   | TArray (typ, _) ->
     let size =
-      try Z.of_int (bitsSizeOf typ)
+      try Z.of_int (Cil.bitsSizeOf typ)
       with Cil.SizeOfError _ -> Z.zero
     in
     if Z.is_zero size then

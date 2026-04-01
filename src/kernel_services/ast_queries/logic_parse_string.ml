@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil
 open Cil_types
 open Cil_datatype
 
@@ -43,7 +42,7 @@ let find_var kf kinstr ?label var =
     with Not_found ->
       Globals.Vars.find_from_astinfo var Global
   in
-  cvar_to_lvar vi
+  Cil.cvar_to_lvar vi
 
 (** Create a logic typer, the interpretation being done for the given
     kernel_function and stmt (the stmt is used check that loop invariants

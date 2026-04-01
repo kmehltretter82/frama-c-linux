@@ -8,7 +8,6 @@
 
 (** Pasting module. *)
 
-open Cil
 open Cil_types
 
 (*-----------------------------------------------------------------------*)
@@ -58,7 +57,7 @@ struct
   let iter_from_func f kf =
     let definition = Kernel_function.get_definition kf
     and visitor = object
-      inherit nopCilVisitor as super
+      inherit Cil.nopCilVisitor as super
       method! vstmt stmt = f stmt; super#vstmt stmt
       (* speed up: skip non interesting subtrees *)
       method! vvdec _ = SkipChildren (* via visitCilFunction *)
@@ -70,7 +69,7 @@ struct
       method! vattr _ = SkipChildren (* via Asm stmt *)
     end
     in
-    ignore (visitCilFunction (visitor:>cilVisitor) definition)
+    ignore (Cil.visitCilFunction (visitor:>Cil.cilVisitor) definition)
 
   exception FoundStmt of stmt
 
@@ -657,7 +656,7 @@ end = struct
         with Not_found ->
           Options.fatal "No AST registered in ACSL importer plug-in"
       in
-      iterGlobals
+      Cil.iterGlobals
         ast
         (fun glob ->
            match Symbol.encode glob with
@@ -834,7 +833,7 @@ end = struct
     let vi = (* look at file first *)
       find_varinfo ~file x
     in
-    cvar_to_lvar vi
+    Cil.cvar_to_lvar vi
 
   (** Find [Kernel_function] related to a global annotation. *)
   let find_kf ~file x =
@@ -852,7 +851,7 @@ end = struct
       with Not_found ->
         find_varinfo ~file x
     in
-    cvar_to_lvar vi
+    Cil.cvar_to_lvar vi
 
 
   (** Find variables related to a code annotation. *)
@@ -874,7 +873,7 @@ end = struct
       | Some vi -> vi
       | None -> find_varinfo ~file var
     in
-    cvar_to_lvar vi
+    Cil.cvar_to_lvar vi
 end
 
 (*-----------------------------------------------------------------------*)
@@ -1348,8 +1347,8 @@ let add_post kf id _loc post =
     inherit Visitor.frama_c_inplace
     val mutable status = None
     method! vterm_lhost term_lhost =
-      let change_to lvar = ChangeDoChildrenPost (TVar lvar, fun x -> x) in
-      let continue () = JustCopy in
+      let change_to lvar = Cil.ChangeDoChildrenPost (TVar lvar, fun x -> x) in
+      let continue () = Cil.JustCopy in
       match status, term_lhost with
       | None, TVar{lv_name = "\\exit_status"} ->
         (* meet first "\exit_status" ... *)
@@ -1390,7 +1389,7 @@ let add_post kf id _loc post =
         exits. *)
     method make_post_cond pred =
       (* look at "\result" and "\exit_status" and transform one of these *)
-      let new_pred = visitCilPredicate (self :> Cil.cilVisitor) pred in
+      let new_pred = Cil.visitCilPredicate (self :> Cil.cilVisitor) pred in
       let make_clause pred kind name =
         let nameid = if id = "" then name else (id ^ "_" ^ name) in
         kind,
@@ -1406,7 +1405,7 @@ let add_post kf id _loc post =
           | Some lvar -> (* a second transformation is needed ... *)
             status <- Some (kind, lvar, None) ;
             (* so, performs that second transformation *)
-            quantif lvar (visitCilPredicate (self :> Cil.cilVisitor) pred)
+            quantif lvar (Cil.visitCilPredicate (self :> Cil.cilVisitor) pred)
         in
         make_clause other_pred kind
       in
@@ -1452,7 +1451,7 @@ let add_post kf id _loc post =
       (Ctype (Kernel_function.get_return_type kf))
   in
   let add_formal env vi =
-    Logic_typing.add_var vi.vorig_name (cvar_to_lvar vi) env
+    Logic_typing.add_var vi.vorig_name (Cil.cvar_to_lvar vi) env
   in
   let env = List.fold_left add_formal env (Kernel_function.get_formals kf) in
   try
@@ -1483,8 +1482,8 @@ let ensures_and_exits_typer ~typing_context ~loc ps =
         val mutable status = None
 
         method! vterm_lhost term_lhost =
-          let change_to lvar = ChangeDoChildrenPost (TVar lvar, fun x -> x)
-          and continue () = JustCopy
+          let change_to lvar = Cil.ChangeDoChildrenPost (TVar lvar, fun x -> x)
+          and continue () = Cil.JustCopy
           in match status, term_lhost with
           | None, TVar{lv_name = "\\exit_status"} ->
             (* meet first "\exit_status" ... *)
@@ -1527,7 +1526,7 @@ let ensures_and_exits_typer ~typing_context ~loc ps =
             exits. *)
         method make_post_cond pred =
           (* look at "\result" and "\exit_status" and transform one of these *)
-          let new_pred = visitCilPredicate (self :> Cil.cilVisitor) pred
+          let new_pred = Cil.visitCilPredicate (self :> Cil.cilVisitor) pred
           and make_clause pred name =
             let pred_name = name :: pred.pred_name in {pred with pred_name}
           and quantif lvar pred =
@@ -1541,7 +1540,7 @@ let ensures_and_exits_typer ~typing_context ~loc ps =
                 status <- Some (kind, lvar, None) ;
                 (* so, performs that second transformation *)
                 quantif lvar
-                  (visitCilPredicate (self :> Cil.cilVisitor) pred)
+                  (Cil.visitCilPredicate (self :> Cil.cilVisitor) pred)
             in
             make_clause other_pred
           in

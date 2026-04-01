@@ -1,4 +1,3 @@
-open Cil
 open Cil_types
 
 let print () =
@@ -9,7 +8,7 @@ let get_rte_annotations =
   RteGen.Generator.get_registered_annotations
 
 let fetch_stmts_visitor () = object
-  inherit nopCilVisitor
+  inherit Cil.nopCilVisitor
   val mutable stmts : stmt list = []
   method fetch_stmts () = List.rev stmts
   method! vstmt stmt = stmts <- stmt :: stmts ; DoChildren
@@ -19,7 +18,7 @@ let get_stmts kf =
   match kf.fundec with
   | Definition (f,_) ->
     let vis = fetch_stmts_visitor () in
-    let _ = visitCilFunction (vis :> cilVisitor) f in
+    let _ = Cil.visitCilFunction (vis :> Cil.cilVisitor) f in
     vis#fetch_stmts ()
   | _ -> []
 

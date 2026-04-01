@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil
 
 (** A framework for data flow analysis for CIL code.  Before using
     this framework, you must initialize the Control-flow Graph for your
@@ -402,7 +401,7 @@ module Forwards(T : ForwardsTransfer) = struct
               (* This helps when switch is used on boolean expressions. *)
               | Const (CInt64 (z,_,_))
                 when Z.is_zero z ->
-                new_exp ~loc:exp_sw.eloc (UnOp(LNot,exp_sw,Cil_const.intType))
+                Cil.new_exp ~loc:exp_sw.eloc (UnOp(LNot,exp_sw,Cil_const.intType))
               | _ ->
                 Cil.new_exp ~loc:exp_case.eloc
                   (BinOp (Eq, exp_sw, exp_case, Cil_const.intType))
@@ -660,7 +659,7 @@ end
     fall through the end of a void function).  Useful when you need an
     initial set of statements for BackwardsDataFlow.compute. *)
 let sinkFinder sink_stmts all_stmts = object
-  inherit nopCilVisitor
+  inherit Cil.nopCilVisitor
 
   method! vstmt s =
     all_stmts := s ::(!all_stmts);
@@ -675,5 +674,5 @@ end
 let find_stmts (fdec:fundec) : (stmt list * stmt list) =
   let sink_stmts = ref []
   and all_stmts = ref [] in
-  ignore(visitCilFunction (sinkFinder sink_stmts all_stmts) fdec);
+  ignore(Cil.visitCilFunction (sinkFinder sink_stmts all_stmts) fdec);
   !all_stmts, !sink_stmts

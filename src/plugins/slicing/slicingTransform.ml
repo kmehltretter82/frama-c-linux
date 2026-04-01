@@ -10,7 +10,6 @@
 
 (**/**)
 open Cil_types
-open Cil
 
 open Pdg_types
 

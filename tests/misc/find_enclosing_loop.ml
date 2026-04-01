@@ -1,4 +1,3 @@
-open Cil
 open Cil_types
 
 class check =
@@ -9,7 +8,7 @@ class check =
       let res =
         match s.skind with
         | Loop _ -> Stack.push s current_loop;
-          ChangeDoChildrenPost
+          Cil.ChangeDoChildrenPost
             (s,
              fun s -> ignore (Stack.pop current_loop); s)
         | _ -> DoChildren

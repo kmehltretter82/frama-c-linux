@@ -21,7 +21,6 @@
 
 open Fun.Operators
 open Cil_types
-open Cil
 module H = Hashtbl
 
 open Logic_utils
@@ -522,7 +521,7 @@ module ModelMerging =
 
 
 let compare_int e1 e2 =
-  match (constFold true e1), (constFold true e2) with
+  match (Cil.constFold true e1), (Cil.constFold true e2) with
   | {enode = Const(CInt64(i, _, _))}, {enode = Const(CInt64(i', _, _))} ->
     Z.compare i i'
   | e1,e2 -> Cil_datatype.Exp.compare e1 e2
@@ -538,7 +537,7 @@ let have_same_enum_items oldei ei =
        if old_item.einame <> item.einame then
          raise (Failure
                   "different names for enumeration items");
-       if not (same_int64 old_item.eival item.eival) then
+       if not (Cil.same_int64 old_item.eival item.eival) then
          raise (Failure "different values for enumeration items"))
     oldei.eitems ei.eitems
 
@@ -655,7 +654,7 @@ let formals_renaming = Cil_datatype.Varinfo.Hashtbl.create 59;;
 
 (* add 'g' to the merged file *)
 let mergePushGlobal (g: global) : unit =
-  pushGlobal g ~types:theFileTypes ~variables:theFile
+  Cil.pushGlobal g ~types:theFileTypes ~variables:theFile
 
 let mergePushGlobals gl = List.iter mergePushGlobal gl
 
@@ -1025,7 +1024,7 @@ let matchEnumInfoGen (oldei: enuminfo) (ei: enuminfo) : unit =
       let newrep, _ = EnumMerging.union oldeinode einode in
       (* We get here if the enumerations match *)
       newrep.ndata.eattr <- Ast_attributes.add_list oldei.eattr ei.eattr
-    with (Cannot_combine msg | Failure msg) ->
+    with (Cil.Cannot_combine msg | Failure msg) ->
       let pp_items = Pretty_utils.pp_list ~pre:"{" ~suf:"}" ~sep:",@ "
           (fun fmt item ->
              Format.fprintf fmt "%s=%a" item.eiorig_name
@@ -1043,7 +1042,7 @@ let matchEnumInfoGen (oldei: enuminfo) (ei: enuminfo) : unit =
         ignore(EnumMerging.union einode intEnumInfoNode)
 
 
-let matchCompInfoGen (combineF : combineFunction)
+let matchCompInfoGen (combineF : Cil.combineFunction)
     (oldci: compinfo) (ci: compinfo) : unit =
   let cstruct = oldci.cstruct in
   if cstruct <> ci.cstruct then
@@ -1123,7 +1122,7 @@ let matchCompInfoGen (combineF : combineFunction)
                     (* Change the type in the representative *)
                     oldf.ftype <- newtype)
                  oldfields fields
-             with (Cannot_combine reason | Failure reason) ->
+             with (Cil.Cannot_combine reason | Failure reason) ->
                (* Our assumption was wrong. Forget the isomorphism *)
                undo ();
                let fields_old =
@@ -1136,8 +1135,8 @@ let matchCompInfoGen (combineF : combineFunction)
                    Cil_printer.pp_global
                    (GCompTag(ci, Cil_datatype.Location.unknown))
                in
-               let fullname_old = compFullName oldci in
-               let fullname = compFullName ci in
+               let fullname_old = Cil.compFullName oldci in
+               let fullname = Cil.compFullName ci in
                let msg =
                  match fullname_old = fullname,
                        fields_old = fields (* Could also use a special comparison *)
@@ -1171,7 +1170,7 @@ let matchCompInfoGen (combineF : combineFunction)
 
 
 (* Match two typeinfos and throw a Failure if they do not match *)
-let matchTypeInfoGen (combineF : combineFunction)
+let matchTypeInfoGen (combineF : Cil.combineFunction)
     (oldti: typeinfo) (ti: typeinfo) : unit =
   if oldti.tname = "" || ti.tname = "" then
     Kernel.fatal "matchTypeInfo for anonymous type";
@@ -1190,7 +1189,7 @@ let matchTypeInfoGen (combineF : combineFunction)
            ignore (combineF.typ_combine combineF
                      ~strictInteger:false ~strictReturnTypes:true
                      CombineOther oldti.ttype ti.ttype);
-         with (Cannot_combine reason | Failure reason) ->
+         with (Cil.Cannot_combine reason | Failure reason) ->
            let msg =
              let oldname = oldti.tname in
              let name = ti.tname in
@@ -1211,7 +1210,7 @@ let matchTypeInfoGen (combineF : combineFunction)
 let conflict_detected = ref false
 
 let combines = {
-  typ_combine = (fun combF ~strictInteger ~strictReturnTypes what t1 t2 ->
+  Cil.typ_combine = (fun combF ~strictInteger ~strictReturnTypes what t1 t2 ->
       let find_names_file = H.find fileNames in
       let oldfidx = Fidx.get_oldfidx () in
       let fidx = Fidx.get_fidx () in
@@ -1234,7 +1233,7 @@ let combines = {
               "%s" pre_msg
           end
       in
-      combineTypesGen
+      Cil.combineTypesGen
         ~emitwith combF ~strictInteger ~strictReturnTypes what t1 t2);
   enum_combine = (fun _ oldei ei ->
       matchEnumInfoGen oldei ei;
@@ -1257,7 +1256,7 @@ let matchCompInfo = setFidCall (matchCompInfoGen combines)
 let matchTypeInfo = setFidCall (matchTypeInfoGen combines)
 
 let combineTypes what =
-  setFidCall (combines.typ_combine combines
+  setFidCall (combines.Cil.typ_combine combines
                 ~strictInteger:false ~strictReturnTypes:true what)
 
 (* Match two compinfos and throw a Failure if they do not match *)
@@ -1357,7 +1356,7 @@ let has_static_ref_predicate pred_info =
 
 let has_static_ref_logic_function lf_info =
   try
-    ignore (visitCilLogicInfo static_var_visitor lf_info); false
+    ignore (Cil.visitCilLogicInfo static_var_visitor lf_info); false
   with Exit -> true
 
 let matchLogicInfo oldfidx oldpi fidx pi =
@@ -1595,7 +1594,7 @@ let oneFilePass1 (f:file) : unit =
           combineTypes CombineOther
             oldvinode.nfidx oldvi.vtype
             !currentFidx vi.vtype, fst (union oldvinode vinode);
-        with (Cannot_combine reason | Failure reason) -> begin
+        with (Cil.Cannot_combine reason | Failure reason) -> begin
             (* If one of the variable is currently unused, we can ignore it.
                If both are unused and only one is defined, we keep this one.
                Otherwise, we keep the old variable by default. *)
@@ -1705,9 +1704,9 @@ let oneFilePass1 (f:file) : unit =
     | GFun (fdec, l) ->
       incr currentDeclIdx;
       (* Save the names of the formal arguments *)
-      let _, args, _, _ = splitFunctionTypeVI fdec.svar in
+      let _, args, _, _ = Cil.splitFunctionTypeVI fdec.svar in
       H.add formalNames (!currentFidx, fdec.svar.vname)
-        (List.map (fun (n,_,_) -> n) (argsToList args));
+        (List.map (fun (n,_,_) -> n) (Cil.argsToList args));
       (* Force inline functions to be static. *)
       (* GN: This turns out to be wrong. inline functions are external,
         * unless specified to be static. *)
@@ -1845,7 +1844,7 @@ class renameVisitorClass =
       let li = logic_info_of_logic_var lv in
       (match LogicMerging.findReplacement true lfEq !currentFidx li
        with
-       | None -> DoChildren
+       | None -> Cil.DoChildren
        | Some (li,_) ->
          let lv' = li.l_var_info in
          if lv == lv' then DoChildren (* Replacement already done... *)
@@ -1876,7 +1875,7 @@ class renameVisitorClass =
       if enum == intEnumInfo then begin
         (* Two different enums have been merged into an int type.
            Switch to an integer constant. *)
-        match (constFold true ei.eival).enode with
+        match (Cil.constFold true ei.eival).enode with
         | Const c -> Some c
         | _ ->
           Kernel.fatal ~current:true "non constant value for an enum item"
@@ -1885,17 +1884,17 @@ class renameVisitorClass =
         let n = List.find_index (fun e -> e.einame = ei.einame)
             ei.eihost.eitems in
         let ei' = List.nth enum.eitems (Option.get ~exn:Not_found n) in
-        assert (same_int64 ei.eival ei'.eival);
+        assert (Cil.same_int64 ei.eival ei'.eival);
         Some (CEnum ei')
       end
   in
   object (self)
-    inherit nopCilVisitor
+    inherit Cil.nopCilVisitor
 
     method! vvdec (_vi: varinfo) = DoChildren
 
     (* This is a variable use. See if we must change it *)
-    method! vvrbl (vi: varinfo) : varinfo visitAction =
+    method! vvrbl (vi: varinfo) : varinfo Cil.visitAction =
       if not vi.vglob then DoChildren
       else begin
         match PlainMerging.findReplacement true vEq !currentFidx vi.vname with
@@ -2003,7 +2002,7 @@ class renameVisitorClass =
             Kernel.debug ~dkey:Kernel.dkey_linker
               "Renaming use of %s(%d) to %s(%d)"
               ci.cname !currentFidx ci'.cname oldfidx;
-            let tattr = visitCilAttributes (self :> cilVisitor) t.tattr in
+            let tattr = Cil.visitCilAttributes (self :> Cil.cilVisitor) t.tattr in
             ChangeTo (Cil_const.mk_tcomp ~tattr ci')
         end
       | TComp ci ->
@@ -2014,7 +2013,7 @@ class renameVisitorClass =
           match EnumMerging.findReplacement true eEq !currentFidx ei with
             None -> DoChildren
           | Some (ei', _) ->
-            let tattr = visitCilAttributes (self :> cilVisitor) t.tattr in
+            let tattr = Cil.visitCilAttributes (self :> Cil.cilVisitor) t.tattr in
             if ei' == intEnumInfo then
               (* This is actually our friend intEnumInfo *)
               ChangeTo (Cil_const.mk_tint ~tattr IInt)
@@ -2026,7 +2025,7 @@ class renameVisitorClass =
           match PlainMerging.findReplacement true tEq !currentFidx ti.tname with
             None -> DoChildren
           | Some (ti', _) ->
-            let tattr = visitCilAttributes (self :> cilVisitor) t.tattr in
+            let tattr = Cil.visitCilAttributes (self :> Cil.cilVisitor) t.tattr in
             ChangeTo (Cil_const.mk_tnamed ~tattr ti')
         end
 
@@ -2044,7 +2043,7 @@ class renameVisitorClass =
            by an integer type. *)
         let post_action e = match e.enode with
           | CastE(typ,exp) when
-              Cil_datatype.TypByName.equal (typeOf exp) typ ->
+              Cil_datatype.TypByName.equal (Cil.typeOf exp) typ ->
             exp
           | _ -> e
         in
@@ -2057,7 +2056,7 @@ class renameVisitorClass =
         (match find_enumitem_replacement ei with
            None -> DoChildren
          | Some c ->
-           let t = visitCilLogicType (self:>cilVisitor) e.term_type in
+           let t = Cil.visitCilLogicType (self:>Cil.cilVisitor) e.term_type in
            ChangeTo
              { e with
                term_node = TConst (Logic_utils.constant_to_lconstant c);
@@ -2077,7 +2076,7 @@ class renameVisitorClass =
             (* First, find out the index of the original field *)
             let rec indexOf (i: int) = function
               | [] -> Kernel.fatal "Cannot find field %s in %s"
-                        f.fname (compFullName f.fcomp)
+                        f.fname (Cil.compFullName f.fcomp)
               | f' :: _ when f' == f -> i
               | _ :: rest -> indexOf (i + 1) rest
             in
@@ -2085,8 +2084,8 @@ class renameVisitorClass =
             let ci'_fields = Option.value ~default:[] ci'.cfields in
             if List.length ci'_fields <= idx then
               Kernel.fatal "Too few fields in replacement %s for %s"
-                (compFullName ci')
-                (compFullName f.fcomp);
+                (Cil.compFullName ci')
+                (Cil.compFullName f.fcomp);
             Some (List.nth ci'_fields idx)
           end
       end
@@ -2139,7 +2138,7 @@ let renameVisitor = new renameVisitorClass
  * and it also renames forward declarations of the inlines to be removed. *)
 
 class renameInlineVisitorClass = object(self)
-  inherit nopCilVisitor
+  inherit Cil.nopCilVisitor
 
   val mutable visited = Cil_datatype.Varinfo.Set.empty
 
@@ -2147,7 +2146,7 @@ class renameInlineVisitorClass = object(self)
     visited <- Cil_datatype.Varinfo.Set.add vi visited
 
   (* This is a variable use. See if we must change it *)
-  method! vvrbl (vi: varinfo) : varinfo visitAction =
+  method! vvrbl (vi: varinfo) : varinfo Cil.visitAction =
     if not vi.vglob || Cil_datatype.Varinfo.Set.mem vi visited then DoChildren
     else begin
       match PlainMerging.findReplacement true vEq !currentFidx vi.vname with
@@ -2192,7 +2191,7 @@ let checkContext ~toplevel = function
   | InModule -> errorContext "module" toplevel
 
 let pushGlobal ?toplevel = function
-  | Toplevel g -> mergePushGlobals (visitCilGlobal renameVisitor g)
+  | Toplevel g -> mergePushGlobals (Cil.visitCilGlobal renameVisitor g)
   | InAxiomatic -> Option.iter (errorContext "axiomatic") toplevel
   | InModule -> Option.iter (errorContext "module") toplevel
 
@@ -2251,7 +2250,7 @@ let rec logic_annot_pass2 context a =
           true mfEq !currentFidx (mf.mi_name,mf.mi_base_type)
       with
       | None ->
-        let mf' = visitCilModelInfo renameVisitor mf in
+        let mf' = Cil.visitCilModelInfo renameVisitor mf in
         if mf' != mf then begin
           let my_node =
             ModelMerging.find_eq_table
@@ -2294,7 +2293,7 @@ let rec logic_annot_pass2 context a =
       | _ ->
         let annot = Dvolatile(l,rd,wr,attr,loc) in
         mergePushGlobals
-          (visitCilGlobal renameVisitor (GAnnot (annot,loc)))
+          (Cil.visitCilGlobal renameVisitor (GAnnot (annot,loc)))
     in
     (* check whether some volatile location clashes with a previous
        annotation. Warnings about that have been generated during pass 1
@@ -2626,13 +2625,13 @@ let oneFilePass2 (f: file) =
       if vi == vi' && not (H.mem emittedVarDecls vi'.vname) then begin
         H.add emittedVarDecls vi'.vname true; (* Remember that we emitted
                                                * it  *)
-        mergePushGlobals (visitCilGlobal renameVisitor g)
+        mergePushGlobals (Cil.visitCilGlobal renameVisitor g)
       end
 
     | GFunDecl (spec,vi, l) as g ->
       incr currentDeclIdx;
       let vi' = processVarinfo vi l in
-      let spec' = visitCilFunspec renameVisitor spec in
+      let spec' = Cil.visitCilFunspec renameVisitor spec in
       if vi != vi' then begin
         (* if vi is supposed to be ignored, do nothing. *)
         if not (is_ignored_vi vi) then begin
@@ -2647,7 +2646,7 @@ let oneFilePass2 (f: file) =
       end else begin
         H.add emittedVarDecls vi'.vname true; (* Remember that we emitted
                                                * it  *)
-        mergePushGlobals (visitCilGlobal renameVisitor g)
+        mergePushGlobals (Cil.visitCilGlobal renameVisitor g)
       end
 
     | GVar (vi, init, l) ->
@@ -2686,7 +2685,7 @@ let oneFilePass2 (f: file) =
 
         if emitIt then
           mergePushGlobals
-            (visitCilGlobal renameVisitor (GVar(vi', init, l)))
+            (Cil.visitCilGlobal renameVisitor (GVar(vi', init, l)))
       end
 
     | GFun (fdec, l) as g ->
@@ -2708,14 +2707,14 @@ let oneFilePass2 (f: file) =
         in
         (* Go in there and rename everything as needed *)
         let fdec' =
-          match visitCilGlobal renameVisitor g with
+          match Cil.visitCilGlobal renameVisitor g with
           | [ GFun(fdec', _) ] -> fdec'
           | _ ->
             Kernel.fatal "renameVisitor for GFun returned something else"
         in
         let g' = GFun(fdec', l) in
         (* Now restore the parameter names *)
-        let _, args, _, _ = splitFunctionTypeVI fdec'.svar in
+        let _, args, _, _ = Cil.splitFunctionTypeVI fdec'.svar in
         let oldnames, foundthem =
           try H.find formalNames (!currentFidx, origname), true
           with Not_found -> begin
@@ -2727,7 +2726,7 @@ let oneFilePass2 (f: file) =
           with Not_found -> None
         in
         if foundthem then begin
-          let _argl = argsToList args in
+          let _argl = Cil.argsToList args in
           if List.length oldnames <> List.length fdec.sformals then
             Kernel.fatal ~current:true
               "After merging the function has different arguments";
@@ -2735,7 +2734,7 @@ let oneFilePass2 (f: file) =
             (fun oldn a -> if oldn <> "" then a.vname <- oldn)
             oldnames fdec.sformals;
           (* Reflect them in the type *)
-          setFormals fdec fdec.sformals
+          Cil.setFormals fdec fdec.sformals
         end;
         (* See if we can remove this inline function *)
         if fdec'.svar.vinline && mergeInlinesWithAlphaConvert() then begin
@@ -2769,7 +2768,7 @@ let oneFilePass2 (f: file) =
             (* Rename the formals *)
             List.iter renameOne fdec'.sformals;
             (* Reflect in the type *)
-            setFormals fdec' fdec'.sformals;
+            Cil.setFormals fdec' fdec'.sformals;
             (* Now do the locals *)
             List.iter renameOne fdec'.slocals;
             (* Now print it *)
@@ -2932,7 +2931,7 @@ let oneFilePass2 (f: file) =
             (* Now we should visit the fields as well *)
             H.add emittedCompDecls ci.cname true; (* Remember that we
                                                    * emitted it  *)
-            mergePushGlobals (visitCilGlobal renameVisitor g)
+            mergePushGlobals (Cil.visitCilGlobal renameVisitor g)
           | Some (_oldci, _oldfidx) -> begin
               (* We are not the representative. Drop this declaration
                * because we'll not be using it. *)
@@ -2968,7 +2967,7 @@ let oneFilePass2 (f: file) =
                  in
                  item.einame <- newname)
               ei.eitems;
-            mergePushGlobals (visitCilGlobal renameVisitor g);
+            mergePushGlobals (Cil.visitCilGlobal renameVisitor g);
           | Some (_ei', _) -> (* Drop this since we are reusing it from
                                * before *)
             ()
@@ -3011,7 +3010,7 @@ let oneFilePass2 (f: file) =
             in
             ti.tname <- newname;
             ti.treferenced <- true;
-            mergePushGlobals (visitCilGlobal renameVisitor g);
+            mergePushGlobals (Cil.visitCilGlobal renameVisitor g);
           | Some (_ti', _) ->(* Drop this since we are reusing it from
                               * before *)
             ()
@@ -3020,7 +3019,7 @@ let oneFilePass2 (f: file) =
     | GAnnot (a, _) as g ->
       incr currentDeclIdx;
       global_annot_pass2 g a
-    | g -> mergePushGlobals (visitCilGlobal renameVisitor g)
+    | g -> mergePushGlobals (Cil.visitCilGlobal renameVisitor g)
   in
   (* Now do the real PASS 2 *)
   List.iter processOneGlobal f.globals;
@@ -3066,7 +3065,7 @@ let oneFilePass2 (f: file) =
     (* Now reprocess them *)
     theFile := savedTheFile;
     List.iter (fun g ->
-        theFile := (visitCilGlobal renameInlinesVisitor g) @ !theFile)
+        theFile := (Cil.visitCilGlobal renameInlinesVisitor g) @ !theFile)
       !theseGlobals;
     (* Now check if we have inlines that we could not remove
        H.iter (fun name _ ->
@@ -3092,7 +3091,7 @@ let global_merge_spec g =
   let rename v spec =
     try
       let alpha = Cil_datatype.Varinfo.Hashtbl.find formals_renaming v in
-      ignore (visitCilFunspec alpha spec)
+      ignore (Cil.visitCilFunspec alpha spec)
     with Not_found -> ()
   in
   let<> UpdatedCurrentLoc = Cil_datatype.Global.loc g in
@@ -3165,7 +3164,7 @@ let find_decls g =
         SkipChildren
     end
   in
-  ignore (visitCilGlobal visit g); !c_res, !res
+  ignore (Cil.visitCilGlobal visit g); !c_res, !res
 
 let used_vars g =
   let res = ref Cil_datatype.Logic_var.Set.empty in
@@ -3187,7 +3186,7 @@ let used_vars g =
         SkipChildren
     end
   in
-  ignore (visitCilGlobal visit g); !res
+  ignore (Cil.visitCilGlobal visit g); !res
 
 let print_missing fmt to_declare =
   let print_one_binding fmt s =
@@ -3330,7 +3329,7 @@ let merge (files: file list) (newname: string) : file =
   init ~all:false (); (* Make the GC happy BUT KEEP some tables *)
   (* We have made many renaming changes and sometimes we have just guessed a
    * name wrong. Make sure now that the local names are unique. *)
-  uniqueVarNames res;
+  Cil.uniqueVarNames res;
   Kernel.debug ~dkey:Kernel.dkey_linker
     "AST after alpha renaming@\n%a" Cil_printer.pp_file res;
   if Errorloc.had_errors () then

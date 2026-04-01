@@ -1,5 +1,4 @@
 open Cil_types
-open Cil
 
 let find_comment () =
   let kf = Globals.Functions.find_by_name "f" in

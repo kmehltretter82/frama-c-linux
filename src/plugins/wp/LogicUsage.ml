@@ -10,7 +10,6 @@
 (* --- Dependencies of Logic Definitions                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-open Cil
 open Cil_types
 open Cil_datatype
 open Clabels

@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil
 open Cil_datatype
 open Locations
 
@@ -40,7 +39,7 @@ let compute_using_prototype_for_state state kf assigns =
         Kernel_function.pretty kf;
       From_memory.(top_return, top)
     | Writes assigns ->
-      let (rt_typ,_,_,_) = splitFunctionTypeVI varinfo in
+      let (rt_typ,_,_,_) = Cil.splitFunctionTypeVI varinfo in
       let input_zone out ins =
         (* Technically out is unused, but there is a signature problem *)
         Eva.Logic_inout.assigns_inputs_to_zone state (Writes [out, ins])
@@ -89,13 +88,13 @@ let compute_using_prototype_for_state state kf assigns =
           let coffs = Logic_to_c.loc_to_offset out.it_content in
           List.fold_left
             (fun acc coff ->
-               let (base,width) = bitsOffset rt_typ coff in
+               let (base,width) = Cil.bitsOffset rt_typ coff in
                let size = Z_or_top.of_int width in
                From_memory.add_to_return
                  ~start:base ~size ~m:acc inputs_deps
             )
             acc coffs
-        with Logic_to_c.No_conversion | SizeOfError _ ->
+        with Logic_to_c.No_conversion | Cil.SizeOfError _ ->
           From_parameters.result  ~once:true ~current:true
             "Unable to extract a proper offset. \
              Using FROM for the whole \\result";
@@ -448,7 +447,7 @@ struct
     let transfer_guard s e d =
       let request = To_Use.stmt_request s in
       let interpreted_e = Eva.Results.(eval_exp e request |> as_cvalue) in
-      let t1 = Ast_types.unroll (typeOf e) in
+      let t1 = Ast_types.unroll (Cil.typeOf e) in
       let do_then, do_else =
         if Ast_types.is_integral t1 || Ast_types.is_ptr t1
         then Cvalue.V.contains_non_zero interpreted_e,

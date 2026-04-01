@@ -8,7 +8,6 @@
 (******************************************************************************)
 
 open Cil_types
-open Cil
 open Logic_ptree
 open Logic_const
 open Logic_utils
@@ -641,7 +640,7 @@ let location_to_char_ptr t =
     else
       let loc = t.term_loc in
       let sizeof = term ~loc (TSizeOf (logicCType ptd_type)) Linteger in
-      let range = trange ~loc (Some (lzero ~loc ()), Some sizeof) in
+      let range = trange ~loc (Some (Cil.lzero ~loc ()), Some sizeof) in
       let converted_type = set_conversion (Ctype Cil_const.charPtrType) t.term_type
       in
       let cast = term ~loc (TCast(false, Ctype Cil_const.charPtrType, t)) converted_type in
@@ -655,7 +654,7 @@ let rec c_mk_cast ?(force=false) e oldt newt =
     if force then Logic_utils.mk_cast ~loc ~force newt e else e
   end else begin
     (* Watch out for constants *)
-    if Ast_types.is_ptr newt && isLogicNull e && not (isLogicZero e) then
+    if Ast_types.is_ptr newt && Cil.isLogicNull e && not (Cil.isLogicZero e) then
       (* \null can have any pointer type, see ACSL manual. *)
       (if force then
          Logic_const.term ~loc (TCast (false, Ctype newt, e)) (Ctype newt)
@@ -728,7 +727,7 @@ let rec mk_cast_conf integral_cast
       c_mk_cast ~force e oldt newt
     | t1, Lboolean when Logic_utils.is_integral_type t1 ->
       let e = mk_cast e Linteger in
-      Logic_const.term ~loc (TBinOp(Ne,e,lzero ~loc())) Lboolean
+      Logic_const.term ~loc (TBinOp(Ne,e,Cil.lzero ~loc())) Lboolean
     | Lboolean, Linteger when explicit ->
       logic_coerce Linteger e
     | Lboolean, (Linteger|Lreal) ->
@@ -753,7 +752,7 @@ let rec mk_cast_conf integral_cast
       let e = mk_cast e ty2 in
       logic_coerce (make_set_type e.term_type) e
     | Lboolean, Lboolean | Linteger, Linteger | Lreal, Lreal -> e
-    | Linteger, Ctype t when isLogicPointerType newt && isLogicNull e ->
+    | Linteger, Ctype t when isLogicPointerType newt && Cil.isLogicNull e ->
       c_mk_cast ~force e Cil_const.intType t
     | Linteger, (Ctype newt) | Lreal, (Ctype newt) when explicit ->
       Logic_utils.mk_cast ~loc newt e
@@ -1168,7 +1167,7 @@ struct
 
   let fresh_type = new fresh_type_var
 
-  let fresh typ = visitCilLogicType (fresh_type :> cilVisitor) typ
+  let fresh typ = Cil.visitCilLogicType (fresh_type :> Cil.cilVisitor) typ
 
   let fresh_type_var name = fresh (Lvar name)
 
@@ -1498,7 +1497,7 @@ struct
     in
     Ast_types.(is_array ctyp1 && is_array ctyp2 && same_array_elt ())
     || Ast_types.(is_ptr ctyp1 && is_ptr ctyp2 &&
-                  (compatible_pointed() || isLogicNull term))
+                  (compatible_pointed() || Cil.isLogicNull term))
 
   let c_cast_to ot nt e =
     if is_same_c_type ot nt then (ot, e)
@@ -1533,10 +1532,10 @@ struct
       if is_same_c_type ty1 ty2
       then ot, oterm
       else if Ast_types.(is_integral ty1 && is_integral ty2) then begin
-        let sz1 = bitsSizeOf ty1 in
-        let sz2 = bitsSizeOf ty2 in
+        let sz1 = Cil.bitsSizeOf ty1 in
+        let sz2 = Cil.bitsSizeOf ty2 in
         if (sz1 < sz2
-            || (sz1 = sz2 && (isSignedInteger ty1 = isSignedInteger ty2))
+            || (sz1 = sz2 && (Cil.isSignedInteger ty1 = Cil.isSignedInteger ty2))
             || is_enum_cst oterm nt)
         then begin let t, e = c_cast_to ty1 ty2 oterm in Ctype t,e end
         else if overloaded then raise Not_applicable
@@ -1588,7 +1587,7 @@ struct
     | Ctype ty, Lreal when Ast_types.is_arithmetic ty -> Lreal, oterm
     | Linteger, Lreal -> Lreal, oterm
     (* Integer 0 is also a valid pointer. *)
-    | Linteger, Ctype ty when Ast_types.is_ptr ty && isLogicNull oterm ->
+    | Linteger, Ctype ty when Ast_types.is_ptr ty && Cil.isLogicNull oterm ->
       nt, { oterm with
             term_node = TCast(false, Ctype ty,oterm);
             term_type = nt }
@@ -1673,10 +1672,10 @@ struct
       Ltype(set, [st])
     | Lvar s1, Lvar s2 when s1 = s2 -> ot
     | Linteger, Ctype nt when Ast_types.is_integral nt -> Linteger
-    | Linteger, Ctype nt when Ast_types.is_ptr nt && isLogicNull t ->
+    | Linteger, Ctype nt when Ast_types.is_ptr nt && Cil.isLogicNull t ->
       Ctype nt
     | Ctype ot, Linteger when Ast_types.is_integral ot -> Linteger
-    | Ctype ot, Linteger when Ast_types.is_ptr ot && isLogicNull t ->
+    | Ctype ot, Linteger when Ast_types.is_ptr ot && Cil.isLogicNull t ->
       Ctype ot
     | Lboolean, Lboolean -> Lboolean
     | Linteger, Linteger -> Linteger
@@ -1831,7 +1830,7 @@ struct
   let convertible_non_null (ty1,t as t1) (ty2,_ as t2) =
     match (Ast_types.unroll_logic ty1, Ast_types.unroll_logic ty2) with
     | Ctype ty1, Ctype ty2 when
-        Ast_types.is_ptr ty1 && Ast_types.is_ptr ty2 && isLogicNull t ->
+        Ast_types.is_ptr ty1 && Ast_types.is_ptr ty2 && Cil.isLogicNull t ->
       Ast_types.is_void_ptr ty2
     | _ -> convertible t1 t2
 
@@ -1946,7 +1945,7 @@ struct
       | Ctype ty1, Ctype ty2 ->
         if Ast_types.is_integral ty1 && Ast_types.is_integral ty2 then
           if is_same_type lty1 lty2 then lty1
-          else if (isSignedInteger ty1) <> (isSignedInteger ty2) then
+          else if (Cil.isSignedInteger ty1) <> (Cil.isSignedInteger ty2) then
             (* in ACSL, the comparison between 0xFFFFFFFF seen as int and
                unsigned int is not true: we really have to operate at
                the integer level.
@@ -2142,7 +2141,7 @@ struct
 
   (* rename v1 into v2 in t *)
   let rename_variable t v1 v2 =
-    visitCilTerm (new rename_variable v1 v2) t
+    Cil.visitCilTerm (new rename_variable v1 v2) t
 
   let find_lv_logic_info v env =
     try Lenv.find_logic_info v.lv_name env
@@ -3269,7 +3268,7 @@ struct
       | _ when Ast_types.is_logic_arithmetic ty1
             && Ast_types.is_logic_arithmetic ty2 ->
         conditional_conversion t1 t2
-      | Eq | Neq when isLogicPointer t1 && isLogicNull t2 ->
+      | Eq | Neq when isLogicPointer t1 && Cil.isLogicNull t2 ->
         let t1 = mk_logic_pointer_or_StartOf t1 in
         let t2 =
           (* in case of a set, we perform two conversions: first from
@@ -3279,7 +3278,7 @@ struct
           else t2
         in
         f loc op t1 (mk_cast t2 t1.term_type)
-      | Eq | Neq when isLogicPointer t2 && isLogicNull t1 ->
+      | Eq | Neq when isLogicPointer t2 && Cil.isLogicNull t1 ->
         let t2 = mk_logic_pointer_or_StartOf t2 in
         let t1 =
           if is_set_type t2.term_type then
@@ -3534,7 +3533,7 @@ struct
     | PLiff (p1, p2) -> piff ~loc (predicate env p1, predicate env p2)
     | PLnot p ->
       (match (predicate env p) with
-       | {pred_content = Prel (Cil_types.Rneq, t, z)} when isLogicZero z ->
+       | {pred_content = Prel (Cil_types.Rneq, t, z)} when Cil.isLogicZero z ->
          prel ~loc (Cil_types.Req, t, Cil.lzero ~loc ())
        | p -> pnot ~loc p)
     | PLapp (p, labels, tl) ->

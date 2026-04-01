@@ -8,7 +8,6 @@
 
 open Cil_types
 open Cil_datatype
-open Cil
 
 (* ************************************************************************* *)
 (** {2 Global variables} *)
@@ -237,11 +236,11 @@ module Functions = struct
 
   let fundec_of_decl spec v l =
     let args =
-      try Some (getFormalsDecl v)
+      try Some (Cil.getFormalsDecl v)
       with Not_found ->
       try
-        setFormalsDecl v v.vtype;
-        Some (getFormalsDecl v)
+        Cil.setFormalsDecl v v.vtype;
+        Some (Cil.getFormalsDecl v)
       with Not_found ->
         None (* function with 0 arg. See setFormalsDecl code for details *)
     in Declaration(spec, v, args, l)
@@ -336,7 +335,7 @@ module Functions = struct
       (*Kernel.feedback "adding empty fun for %a"
         Cil_datatype.Varinfo.pretty vi; *)
       if Cil_builtins.is_special_builtin v.vname then
-        add_declaration (empty_funspec ()) v v.vdecl
+        add_declaration (Cil.empty_funspec ()) v v.vdecl
       else
         raise Not_found
     in
@@ -552,7 +551,7 @@ module FileIndex = struct
 
   let compute, self =
     let compute () =
-      iterGlobals
+      Cil.iterGlobals
         (Ast.get ())
         (fun glob ->
            let f = (fst (Global.loc glob)).Filepath.pos_path in

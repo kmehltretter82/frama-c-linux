@@ -9,7 +9,6 @@
 (******************************************************************************)
 
 open Logic_ptree
-open Cil
 open Cil_types
 open Automaton_ast
 open Logic_simplification
