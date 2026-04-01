@@ -200,7 +200,11 @@ struct
        (* unprojectified early options can be set even before creating the
           initial project. Do nothing for these ones: consistency will be
           automatically ensured when creating the initial project. *)
-       assert (not projectify));
+       assert (
+         Kernel_log.verify (not projectify)
+           "projectified option %s cannot be set before creating the initial \
+            project" X.option_name
+       ));
     Internal_state.set x;
     Set_hook.apply (old, x)
 
