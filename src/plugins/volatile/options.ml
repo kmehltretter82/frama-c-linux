@@ -94,20 +94,23 @@ module Enabled =
       ^"\") where volatile accesses are simulated by function calls"
   end)
 
+let () = Parameter_customize.argument_may_be_fundecl ()
 module Process =
-  String_set (struct
+  Kernel_function_set (struct
     let option_name = "-volatile-fct"
     let arg_name = "f,..."
     let help = "Only process the given function(s)"
   end)
 
+let () = Parameter_customize.argument_may_be_fundecl ()
 module CallPtr =
-  String_list (struct
+  Kernel_function_set (struct
     let option_name = "-volatile-call-pointer"
     let arg_name = "f,..."
     let help = "stub call to pointer functions to the provided functions \
                 (indexed by type)"
   end)
+let () = Parameter_customize.argument_must_be_fundecl ()
 
 module Base =
   False (struct
@@ -116,12 +119,14 @@ module Base =
                 related to -volatile-binding option"
   end)
 
+let () = Parameter_customize.argument_may_be_fundecl ()
 module Binding =
-  String_list (struct
+  Kernel_function_set (struct
     let option_name = "-volatile-binding"
     let arg_name = "f,..."
     let help = "allows binding of volatile accesses to functions <f,...>"
   end)
+let () = Parameter_customize.argument_must_be_fundecl ()
 
 module BindingAuto =
   False (struct
