@@ -6,6 +6,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* ************************************************************************** *)
+(** {2 Debug} *)
+(* ************************************************************************** *)
+
+let debug = ref false
+
+let set_debug b = debug := b
+
 (* ************************************************************************* *)
 (** {3 Signatures} *)
 (* ************************************************************************* *)
@@ -119,11 +127,11 @@ struct
 
   let internal_name = ref ""
 
-  let debug ~level op_name p =
-    Kernel_log.debug ~dkey:Kernel_log.dkey_project ~level "%s %S (project %s)"
-      op_name
-      !internal_name
-      (Project.get_debug_name p)
+  let debug op_name p =
+    if !debug then
+      Format.printf "[State_builder] %s %S (project %s)" op_name !internal_name
+        (Project.get_debug_name p)
+    else Pretty_utils.nullprintf "%s" op_name
 
   module Datatype = D
   module Tbl = Hashtbl.Make(Project)
@@ -149,17 +157,20 @@ struct
         let v = find p in
         v.state <- Local_state.get ()
       with Not_found ->
-        Kernel_log.fatal
-          "state %S not associated with project %S; program will fail"
-          name
-          (Project.get_debug_name p)
+        let msg =
+          Format.sprintf
+            "state %S not associated with project %S; program will fail"
+            name
+            (Project.get_debug_name p)
+        in
+        failwith msg
 
   module Update_hook = Hook.Build(Datatype)
   let add_hook_on_update = Update_hook.extend
 
   let update_with ~force p s =
     if Project.is_current p || force then begin
-      debug ~level:8 "updating" p;
+      debug "updating" p;
       Update_hook.apply s;
       Local_state.set s
     end
@@ -188,7 +199,7 @@ struct
           first := false;
           Local_state.get ()
         end else begin
-          debug ~level:4 "creating" p;
+          debug "creating" p;
           let s = Local_state.create () in
           update_with ~force:false p s;
           s
@@ -198,7 +209,7 @@ struct
       add p s
 
   let clear p =
-    debug ~level:4 "clearing" p;
+    debug "clearing" p;
     let v = find p in
     Local_state.clear v.state;
     v.computed <- false;
@@ -208,16 +219,20 @@ struct
     assert (not (f p));
     let has_cleared = Local_state.clear_some_projects f (find p).state in
     if has_cleared then
-      debug ~level:4 "erasing dangling project pointers" p;
+      debug "erasing dangling project pointers" p;
     has_cleared
 
   let copy src dst =
-    debug ~level:4 ("copying to " ^ Project.get_debug_name dst) src;
+    debug ("copying to " ^ Project.get_debug_name dst) src;
     let v = find src in
-    if Datatype.copy == FCDatatype.undefined then
-      Kernel_log.abort
-        "cannot copy project: unimplemented `copy' function in datatype \
-         `%s' for state `%s'" Datatype.datatype_name !internal_name;
+    if Datatype.copy == FCDatatype.undefined then begin
+      let msg =
+        Format.sprintf
+          "cannot copy project: unimplemented `copy' function in datatype \
+           `%s' for state `%s'" Datatype.datatype_name !internal_name
+      in
+      failwith msg
+    end;
     change ~force:false dst { v with state = Datatype.copy v.state }
 
   (* ******* TOUCH THE FOLLOWING AT YOUR OWN RISK: DANGEROUS CODE ******** *)
@@ -237,7 +252,7 @@ struct
     let v = find p in
     let obj =
       if !must_save then begin
-        debug ~level:4 "serializing" p;
+        debug "serializing" p;
         !marshal v.state
       end else
         Obj.repr ()
@@ -251,7 +266,7 @@ struct
     if Type.digest Datatype.ty = new_s.State.on_disk_digest then begin
       let s, computed =
         if !must_save && new_s.State.on_disk_saved then begin
-          debug ~level:4 "unserializing" p;
+          debug "unserializing" p;
           !unmarshal new_s.State.on_disk_value, new_s.State.on_disk_computed
         end else
           (* invariant: the found state is equal to the default one since it
@@ -259,9 +274,12 @@ struct
              Do not call Local_state.create to don't break sharing *)
           try (find p).state, false
           with Not_found ->
-            Kernel_log.fatal "unknown project '%s' in state '%s'"
-              (Project.get_debug_name p)
-              !internal_name
+            let msg =
+              Format.sprintf "unknown project '%s' in state '%s'"
+                (Project.get_debug_name p)
+                !internal_name
+            in
+            failwith msg
       in
       change ~force:true p { state = s; computed = computed };
     end else begin

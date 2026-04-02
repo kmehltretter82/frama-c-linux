@@ -7,19 +7,71 @@
 (**************************************************************************)
 
 (* ************************************************************************** *)
-(** {2 Project options} *)
+(** {2 Warning, debug and feedback} *)
 (* ************************************************************************** *)
 
+let debug = ref false
+let feedback = ref false
+let default_source = "[Project]"
+
+let source = ref default_source
+
+let set_debug b = debug := b
+let set_feedback b = feedback := b
+let set_source s = source := s
+
+let warning_level = ref 2
+
+let set_warn_level l = warning_level := l
+
+let print should_print msg =
+  if should_print then Format.printf ("%s " ^^ msg ^^ "@.") !source
+  else Pretty_utils.nullprintf msg
+
+let print_debug msg = print !debug msg
+let print_feedback msg = print !feedback msg
+let print_warning msg =
+  match !warning_level with
+  | x when x <= 0 -> ()
+  | 1 -> Format.printf "%s %s@." default_source msg
+  | 2 -> Format.printf "%s Warning: %s@." default_source msg
+  | _ -> failwith (default_source ^ " " ^ msg)
+
+let guarded_feedback selection fmt_msg =
+  if !feedback then begin
+    if State_selection.is_full selection then
+      Format.printf fmt_msg
+    else
+      let n = State_selection.cardinal selection in
+      if n = 0 then
+        Pretty_utils.nullprintf fmt_msg
+      else
+        let states =
+          if n > 1 then Format.sprintf " (for %d states)" n
+          else Format.sprintf " (for 1 state)"
+        in
+        let f s = Format.printf "%s%s@." s states in
+        Format.kasprintf f fmt_msg
+  end
+  else
+    Pretty_utils.nullprintf fmt_msg
+
+(* ************************************************************************* *)
+(** {2 Options} *)
+(* ************************************************************************* *)
+
 let compress_saved_session = ref true
+
+(* Keep [p] as the current project when calling {!on p}. *)
+let keep_current: bool ref = ref false
+
+let set_keep_current b = keep_current := b
 
 (* ************************************************************************** *)
 (** {2 Project skeleton} *)
 (* ************************************************************************** *)
 
 open Project_skeleton
-
-let dkey = Kernel_log.dkey_project
-let wkey = Kernel_log.wkey_project
 
 (* re-exporting record fields *)
 type project = t = private
@@ -94,7 +146,7 @@ module States_operations = struct
       (fun s -> (private_ops s).update)
 
   let clear ?(selection=State_selection.full) p =
-    Kernel_log.debug ~dkey "clearing following selection:@.  @[%a@]@.%a"
+    print_debug "clearing following selection:@.  @[%a@]@.%a"
       State_selection.pretty_witness selection State_selection.pretty selection;
     let clear s = (private_ops s).clear in
     if State_selection.is_full selection then
@@ -120,9 +172,12 @@ module States_operations = struct
         State_selection.empty
     in
     if not (State_selection.is_empty states_to_clear) then begin
-      Kernel_log.warning "clearing dangling project pointers in project %S" p.name;
-      Kernel_log.debug ~dkey ~once:true ~append:(fun fmt -> Format.fprintf fmt "@]")
-        "@[the involved states are:%t"
+      let msg =
+        Format.sprintf "clearing dangling project pointers in project %S"
+          p.name
+      in
+      print_warning msg;
+      print_debug "@[the involved states are:%t@]"
         (fun fmt ->
            iter_on_selection
              ~selection:states_to_clear
@@ -143,11 +198,12 @@ module States_operations = struct
   let unserialize ?selection dst loaded_states =
     let pp_err fmt n msg_sing msg_plural =
       if n > 0 then begin
-        Kernel_log.warning ~once:true ~wkey
-          fmt
-          n
-          (if n = 1 then "" else "s")
-          (if n = 1 then msg_sing else msg_plural)
+        let msg =
+          Format.sprintf fmt n
+            (if n = 1 then "" else "s")
+            (if n = 1 then msg_sing else msg_plural)
+        in
+        print_warning msg
       end
     in
     let tbl = Hashtbl.create 97 in
@@ -165,8 +221,8 @@ module States_operations = struct
               Hashtbl.remove tbl n
             with
             | Not_found ->
-              Kernel_log.fatal "unexpected 'Not_found' when unserializing; \
-                                possibly an issue with a hook"
+              failwith "unexpected 'Not_found' when unserializing; \
+                        possibly an issue with a hook"
             | State.Incompatible_datatype _ ->
               (* datatype of [s] on disk is incompatible with the one in RAM: as
                  [dst] is a new project, [s] is already equal to its default
@@ -192,11 +248,10 @@ module States_operations = struct
       nb_ignored
       "It is invalid in"
       "They are invalid in";
-    if Kernel_log.debug_atleast 1 then
-      Hashtbl.iter
-        (fun k s -> if s.on_disk_saved then
-            Kernel_log.debug ~dkey "ignoring state %s" k)
-        tbl;
+    if !debug then
+      Hashtbl.iter (fun k s ->
+          if s.on_disk_saved then print_debug "ignoring state %s" k
+        ) tbl;
     (* after loading, reset dependencies of incompatible states *)
     let to_be_cleared =
       State.Hashtbl.fold
@@ -217,20 +272,6 @@ module States_operations = struct
     end
 
 end
-
-let guarded_feedback selection fmt_msg =
-  if State_selection.is_full selection then
-    Kernel_log.feedback ~dkey fmt_msg
-  else
-    let n = State_selection.cardinal selection in
-    if n = 0 then
-      Pretty_utils.nullprintf fmt_msg
-    else
-      let states fmt =
-        if n > 1 then Format.fprintf fmt " (for %d states)" n
-        else Format.fprintf fmt " (for 1 state)"
-      in
-      Kernel_log.feedback ~dkey ~append:states fmt_msg
 
 module Q = Qstack.Make(struct type t = project let equal = equal end)
 
@@ -270,7 +311,7 @@ module Set_Name_Hook = Hook.Build(struct type t = project * string end)
 let register_after_set_name_hook = Set_Name_Hook.extend
 
 let set_name p s =
-  Kernel_log.feedback ~dkey "renaming project %S to %S" p.name s;
+  print_feedback "renaming project %S to %S" p.name s;
   let old_name = p.name in
   Setter.set_name p s;
   Set_Name_Hook.apply (p, old_name);
@@ -279,9 +320,9 @@ module Create_Hook = Hook.Build(struct type t = project end)
 let register_create_hook = Create_Hook.extend
 
 let create name =
-  Kernel_log.feedback ~dkey "creating project %S" name;
+  print_feedback "creating project %S" name;
   let p = Setter.make name in
-  Kernel_log.feedback ~dkey "its unique name is %S" (get_project_debug_name p);
+  print_feedback "its unique name is %S" (get_project_debug_name p);
   Q.add_at_end p projects;
   States_operations.create p;
   Create_Hook.apply p;
@@ -300,7 +341,7 @@ let name_to_pid p_name =
     match find_all p_name with
     | [ p ] -> Some p
     | _ :: _ as projects ->
-      Kernel_log.warning ~wkey
+      print_debug
         "multiple projects named `%s', choosing most recently created"
         p_name;
       Some (pick_most_recently_created projects)
@@ -341,11 +382,6 @@ let set_current ?(on=false) ?(selection=State_selection.full) p =
 let set_current_as_last_created () =
   Option.iter (fun p -> set_current p) !last_created_by_copy_ref
 
-(** Indicates if we should keep [p] as the current project when calling {!on p}. *)
-let keep_current: bool ref = ref false
-
-let set_keep_current b = keep_current := b
-
 let on ?selection p f x =
   let old_current = current () in
   if old_current == p then f x
@@ -361,25 +397,21 @@ let on ?selection p f x =
           (* the old current project has been remove: replace it by the previous
              one, if any *)
           if Q.length projects < 2 then
-            Kernel_log.warning
-              "cannot restore project '%s'. Keep '%s' as default project."
-              old_current.name
-              (current ()).name
+            let msg =
+              Format.sprintf
+                "cannot restore project '%s'. Keep '%s' as default project."
+                old_current.name (current ()).name
+            in
+            print_warning msg
           else
             set_to_old (Q.nth 1 projects)
     in
-    let go () =
-      set p;
-      let r = f x in
-      set_to_old old_current;
-      r
-    in
-    if Kernel_log.debug_atleast 1 then go ()
-    else begin try go () with e -> set_to_old old_current; raise e end
+    let go () = set p; f x in
+    let finally () = set_to_old old_current in
+    Fun.protect ~finally go
 
 let on_from_pid ?selection pid f x =
-  try on ?selection (from_pid pid) f x
-  with Unknown_project -> Kernel_log.abort "no project with id `%d'." pid
+  on ?selection (from_pid pid) f x
 
 (* [set_current] must never be called internally. *)
 module Hide_set_current = struct let set_current () = assert false end
@@ -393,7 +425,7 @@ module Before_remove = Hook.Build(struct type t = project end)
 let register_before_remove_hook = Before_remove.extend
 
 let remove ?(project=current()) () =
-  Kernel_log.feedback ~dkey "removing project %S" project.name;
+  print_feedback "removing project %S" project.name;
   if Q.length projects = 1 then raise (Cannot_remove project.name);
   Before_remove.apply project;
   States_operations.remove project;
@@ -414,7 +446,7 @@ let remove ?(project=current()) () =
   Q.iter (States_operations.clear_some_projects (equal project)) projects
 
 let remove_all () =
-  Kernel_log.feedback ~dkey "removing all existing projects";
+  print_feedback "removing all existing projects";
   try
     iter_on_projects Before_remove.apply;
     States_operations.clean ();
@@ -470,7 +502,7 @@ let temp_file ~prefix ~suffix =
     Extlib.safe_at_exit (fun () -> Filesystem.remove_file file);
     file
   with Sys_error s ->
-    Kernel_log.abort "cannot create temporary file: %s" s
+    failwith (Format.sprintf "cannot create temporary file: %s" s)
 
 let save_projects ?(compress = !compress_saved_session) selection projects
     (filename : Filepath.t) =
@@ -646,8 +678,11 @@ let load_projects ~project_under_copy selection ?name (filename : Filepath.t) =
     | Failure s ->
       raise (IOError s)
     | End_of_file ->
-      Kernel_log.abort "unexpected end of file while loading '%a'"
-        Filepath.pretty filename
+      let msg =
+        Format.asprintf "unexpected end of file while loading '%a'"
+          Filepath.pretty filename
+      in
+      raise (IOError msg)
   in
   last_created_by_copy_ref := last_created;
   Descr.finalize loaded_states selection;

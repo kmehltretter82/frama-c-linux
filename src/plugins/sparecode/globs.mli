@@ -6,4 +6,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val rm_unused_decl: string -> Project_skeleton.t
+val rm_unused_decl: string -> Project.t

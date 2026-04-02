@@ -30,11 +30,27 @@ include Kernel_log
 (* Link Kernel_log dkeys related to Fclib to the corresponding libraries
    options *)
 
+let is_enabled_debug ?(level=1) key =
+  is_debug_key_enabled key && debug_atleast level
+let is_enabled_verbose ?(level=1) key =
+  is_debug_key_enabled key && verbose_atleast level
+
+let should_warn_error wkey =
+  match get_warn_status wkey with
+  | Wfeedback | Wfeedback_once when verbose_atleast 1 -> 1
+  | Wfeedback | Wfeedback_once | Winactive -> 0
+  | Wactive | Wonce -> 2
+  | Werror | Werror_once | Wabort -> 3
+
 let set_fclib_debug _ _ =
-  let debug_task = is_debug_key_enabled dkey_task in
-  Task.set_debug debug_task;
-  let debug_hptmap = is_debug_key_enabled dkey_hptmap in
-  Hptmap.set_debug debug_hptmap
+  Task.set_debug (is_enabled_debug dkey_task);
+  Hptmap.set_debug (is_enabled_debug dkey_hptmap);
+  let source = Format.asprintf "[%s:%a]" "kernel" pp_category dkey_project in
+  Project.set_source source;
+  Project.set_debug (is_enabled_debug dkey_project);
+  Project.set_feedback (is_enabled_verbose dkey_project);
+  Project.set_warn_level (should_warn_error wkey_project);
+  State_builder.set_debug (is_enabled_debug ~level:4 dkey_project)
 
 let () = Message_category.add_update_hook set_fclib_debug
 

@@ -959,7 +959,11 @@ type project_functions = {
 
 let project_functions =
   let current = Project.get_current_pid in
-  let on_from_pid pid f = Project.on_from_pid pid f () in
+  let on_from_pid pid f =
+    try Project.on_from_pid pid f ()
+    with Project.Unknown_project ->
+      Kernel_log.abort "no project with id `%d'." pid
+  in
   let pid_to_name = Project.pid_to_name in
   let name_to_pid name =
     let none () = Kernel_log.abort "no project named `%s'" name in
