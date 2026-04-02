@@ -328,7 +328,7 @@ struct
     | `Value { state = `Top; _ } -> Dom.top
     | `Value { state = `Value interferences_state; access; _ } ->
       let written_shared_bases =
-        let written_bases = Locations.Zone.get_bases access.write in
+        let written_bases = Memory_zone.get_bases access.write in
         Base.SetLattice.(inject current.shared_bases
                          |> inter written_bases
                          |> project)
@@ -356,8 +356,8 @@ struct
   let inject_after_change ~pos access state =
     let need_injection () =
       let access = Inout_access.keep_globals_only access in
-      let zone = Locations.Zone.join access.read access.write in
-      match Locations.Zone.get_bases zone with
+      let zone = Memory_zone.join access.read access.write in
+      match Memory_zone.get_bases zone with
       | Top ->
         (* Shared memory is Top, always inject *)
         Self.warning ~current:true ~once:true

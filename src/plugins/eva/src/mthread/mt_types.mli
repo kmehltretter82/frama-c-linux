@@ -55,7 +55,7 @@ type event =
       - [ptr]: loc to which the message must be written
       - [size]: max size to read
   *)
-  | VarAccess of rw * Locations.Zone.t (** Access to some shared variables *)
+  | VarAccess of rw * Memory_zone.t (** Access to some shared variables *)
   | Dummy of string * value list
 
 

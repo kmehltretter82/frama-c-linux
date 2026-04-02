@@ -50,7 +50,7 @@ type arg_nodes = Node.t list
 type pdg_build = {
   fct : kernel_function;
   mutable other_inputs :
-    (PdgTypes.Node.t * Dpd.td * Locations.Zone.t) list;
+    (PdgTypes.Node.t * Dpd.td * Memory_zone.t) list;
   graph : G.t;
   states : Pdg_state.states;
   index : PdgTypes.Pdg.fi;
@@ -101,7 +101,7 @@ let decl_var pdg var =
 
 let get_var_base zone =
   try
-    let base, _ = Locations.Zone.find_lonely_key zone in
+    let base, _ = Memory_zone.find_lonely_key zone in
     match base with
     | Base.Var (var,_) -> Some var
     | _ -> None
@@ -303,7 +303,7 @@ let process_call_output pdg state_before_call state stmt out default from_out fc
   let exact = (not default) in
   debug "call-%d Out : %a From %a (%sexact)@."
     stmt.sid
-    Locations.Zone.pretty out Locations.Zone.pretty from_out
+    Memory_zone.pretty out Memory_zone.pretty from_out
     (if exact then "" else "not ");
   let key = Key.call_output_key stmt out in
   let new_node = create_call_output_node pdg state_before_call stmt
@@ -480,16 +480,16 @@ let process_other_inputs pdg =
       let key = Key.implicit_in_key z_or_top in
       let nz = add_elem pdg key in
       debug "add_implicit_input : %a@."
-        Locations.Zone.pretty z_or_top ;
+        Memory_zone.pretty z_or_top ;
       let state = Pdg_state.add_init_state_input state z_or_top nz in
       add_z_dpd pdg n dpd_kind None nz;
       state, [(z_or_top, nz)]
     | (zone, nz)::tl_zones ->
       match z_or_top, zone with
-      | (Locations.Zone.Top (_,_), Locations.Zone.Top (_,_)) ->
+      | (Memory_zone.Top (_,_), Memory_zone.Top (_,_)) ->
         add_z_dpd  pdg n dpd_kind None nz;
         (state, zones)
-      | (z, _) when (Locations.Zone.equal zone z) ->
+      | (z, _) when (Memory_zone.equal zone z) ->
         add_z_dpd  pdg n dpd_kind None nz;
         (* don't add z : already in *)
         (state, zones)
@@ -504,16 +504,16 @@ let process_other_inputs pdg =
       | None -> true
     in if do_add then
       let acc = match z with
-        | Locations.Zone.Top (_,_) ->  add n dpd_kind acc z
+        | Memory_zone.Top (_,_) ->  add n dpd_kind acc z
         | _ ->
           let aux b intervs acc =
-            let z = Locations.Zone.inject b intervs in
+            let z = Memory_zone.inject b intervs in
             add n dpd_kind acc z
           in
-          Locations.Zone.fold_i aux z acc
+          Memory_zone.fold_i aux z acc
       in acc
     else begin
-      debug2 "might use uninitialized : %a" Locations.Zone.pretty z;
+      debug2 "might use uninitialized : %a" Memory_zone.pretty z;
       acc
     end
   in
@@ -562,7 +562,7 @@ let finalize_pdg pdg from_opt =
            match from_table with
            | Top ->
              process_out
-               Locations.Zone.top Eva.Assigns.DepsOrUnassigned.top state
+               Memory_zone.top Eva.Assigns.DepsOrUnassigned.top state
            | Map m ->
              Eva.Assigns.Memory.fold_fuse_same process_out m state
            | Bottom -> assert false (* checked above *)
@@ -655,7 +655,7 @@ let call_outputs  pdg state_before_call state_with_inputs stmt
       match memory_deps with
       | Top ->
         process_out
-          Locations.Zone.top Eva.Assigns.DepsOrUnassigned.top state_before_call
+          Memory_zone.top Eva.Assigns.DepsOrUnassigned.top state_before_call
       | Bottom -> assert false (* checked above *)
       | Map m ->
         Eva.Assigns.Memory.fold_fuse_same process_out m state_before_call

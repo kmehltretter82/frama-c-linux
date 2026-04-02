@@ -53,7 +53,7 @@ let effects_of_call stmt zlval effects  =
   let aux_kf (direct, indirect) kf =
     let inout = Inout.get_precise_inout ~stmt kf in
     let out = inout.Inout_type.over_outputs in
-    if Zone.intersects out zlval then
+    if Memory_zone.intersects out zlval then
       if Eva.Analysis.use_spec_instead_of_definition kf then
         (true, indirect) (* Direct effect: there is no body for this function. *)
       else
@@ -76,12 +76,12 @@ class find_write_insts zlval = object (self)
         (* Direct effect through the writing of [lvopt], or indirect inside
            the call. *)
         let z = Inout.stmt_outputs stmt in
-        if Zone.intersects z zlval then
+        if Memory_zone.intersects z zlval then
           let direct = match lvopt with
             | None -> false
             | Some lv ->
               Eva.Results.(before stmt |> eval_address lv |> as_zone_result) |>
-              Result.fold ~ok:(Zone.intersects zlval) ~error:(fun _ -> false)
+              Result.fold ~ok:(Memory_zone.intersects zlval) ~error:(fun _ -> false)
           in
           let direct, indirect = effects_of_call stmt zlval (direct, false) in
           if direct then
@@ -93,7 +93,7 @@ class find_write_insts zlval = object (self)
       | Set _ | Local_init(_, AssignInit _, _) ->
         (* Effect only through the written l-value *)
         let z = Inout.stmt_outputs stmt in
-        if Zone.intersects z zlval then begin
+        if Memory_zone.intersects z zlval then begin
           res <- Assign stmt :: res
         end
       | Call (lvopt, f, args, loc) -> aux_call lvopt f args loc
@@ -111,7 +111,7 @@ let inst_writes z =
   let aux_kf_fundec kf =
     let all_out = Inout.get_precise_inout kf in
     let zout = all_out.Inout_type.over_outputs in
-    if Zone.intersects zout z then begin
+    if Memory_zone.intersects zout z then begin
       let fundec = Kernel_function.get_definition kf in
       ignore
         (Visitor.visitFramacFunction (vis :> Visitor.frama_c_visitor) fundec;)
@@ -136,4 +136,4 @@ let base_inits base acc =
   | _ -> acc (* Local init will be found by [inst_writes] *)
 
 let compute z =
-  inst_writes z @ Zone.fold_bases base_inits z []
+  inst_writes z @ Memory_zone.fold_bases base_inits z []

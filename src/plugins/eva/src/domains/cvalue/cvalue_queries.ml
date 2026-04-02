@@ -123,11 +123,11 @@ module Queries = struct
       Cvalue_forward.reinterpret lval.typ v
     in
     let process_ival base ival (acc_loc, acc_val as acc) =
-      let loc_bits = Locations.Location_Bits.inject base ival in
+      let loc_bits = Addresses.Bits.inject base ival in
       let single_loc = Locations.make_loc loc_bits size in
       let v = eval_one_loc single_loc in
       if Cvalue.V.intersects v value
-      then Locations.Location_Bits.join loc_bits acc_loc, Cvalue.V.join v acc_val
+      then Addresses.Bits.join loc_bits acc_loc, Cvalue.V.join v acc_val
       else acc
     in
     let fold_ival base ival acc =
@@ -138,13 +138,13 @@ module Queries = struct
     let fold_location loc acc =
       try
         let loc = loc.Locations.loc in
-        Locations.Location_Bits.fold_i fold_ival loc acc
+        Addresses.Bits.fold_i fold_ival loc acc
       with
         Abstract_interp.Error_Top -> loc.Locations.loc, value
     in
-    let acc = Locations.Location_Bits.bottom, Cvalue.V.bottom in
+    let acc = Addresses.Bits.bottom, Cvalue.V.bottom in
     let loc_bits, value = fold_location loc acc in
-    if Locations.Location_Bits.is_bottom loc_bits
+    if Addresses.Bits.is_bottom loc_bits
     then `Bottom
     else
       let loc = Precise_locs.inject_location_bits loc_bits in

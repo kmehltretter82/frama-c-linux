@@ -120,7 +120,7 @@ and project = {
       When applied, they are translated into [fct_criterion]
 *)
 and appli_criterion =
-  | CaGlobalData of Locations.Zone.t
+  | CaGlobalData of Memory_zone.t
   (** select all that is necessary to compute the given location. *)
   | CaCall of fct_info
   (** select all that is necessary to call the given function.
@@ -138,7 +138,7 @@ and fct_base_criterion = pdg_mark PdgMarks.select
 
 (** Used to identify a location (zone) at a given program point.
       * The boolean tell if the point is before (true) or after the statement *)
-and loc_point = Cil_types.stmt * Locations.Zone.t * bool
+and loc_point = Cil_types.stmt * Memory_zone.t * bool
 
 (** [node_or_dpds] tells how we want to select nodes,
     or some of their dependencies (see {!fct_user_crit}). *)

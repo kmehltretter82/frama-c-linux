@@ -41,14 +41,14 @@ type precise_location_bits
 val pretty_loc_bits : Format.formatter -> precise_location_bits -> unit
 val bottom_location_bits : precise_location_bits
 
-val inject_location_bits : Locations.Location_Bits.t -> precise_location_bits
+val inject_location_bits : Addresses.Bits.t -> precise_location_bits
 val combine_base_precise_offset :
   Base.t -> precise_offset -> precise_location_bits
 val combine_loc_precise_offset :
-  Locations.Location_Bits.t -> precise_offset -> precise_location_bits
+  Addresses.Bits.t -> precise_offset -> precise_location_bits
 
 val imprecise_location_bits :
-  precise_location_bits -> Locations.Location_Bits.t
+  precise_location_bits -> Addresses.Bits.t
 
 
 (** {2 Precise locations} *)
@@ -76,7 +76,7 @@ val fold:
   (Locations.location -> 'a -> 'a) -> precise_location -> 'a -> 'a
 
 val enumerate_valid_bits:
-  Locations.access -> precise_location -> Locations.Zone.t
+  Locations.access -> precise_location -> Memory_zone.t
 
 val valid_cardinal_zero_or_one: for_writing:bool -> precise_location -> bool
 (** Is the restriction of the given location to its valid part precise enough

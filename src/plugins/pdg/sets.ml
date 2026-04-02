@@ -14,7 +14,7 @@ open Pdg_types
 open PdgIndex
 
 type nodes_and_undef =
-  (PdgTypes.Node.t * Locations.Zone.t option) list * Locations.Zone.t option
+  (PdgTypes.Node.t * Memory_zone.t option) list * Memory_zone.t option
 
 let get_init_state pdg =
   try Pdg_state.get_init_state (PdgTypes.Pdg.get_states pdg)
@@ -98,7 +98,7 @@ let find_loc_nodes pdg state loc =
       let state = get_init_state pdg in
       let init_nodes, init_undef = Pdg_state.get_loc_nodes state undef in
       let init_nodes = match loc with
-        | Locations.Zone.Top(_,_) ->
+        | Memory_zone.Top(_,_) ->
           begin
             try (find_top_input_node pdg, None)::init_nodes
             with Not_found -> init_nodes
@@ -121,7 +121,7 @@ let find_location_nodes_at_stmt pdg stmt ~before loc =
       let acc_loc = match acc_loc, undef with
         | _, None -> acc_loc
         | None, _ -> undef
-        | Some acc_loc, Some undef -> Some (Locations.Zone.join acc_loc undef)
+        | Some acc_loc, Some undef -> Some (Memory_zone.join acc_loc undef)
       in (acc_nodes, acc_loc)
     in List.fold_left add ([], None) stmts
   in

@@ -21,7 +21,7 @@ let make_well hidden_base state loc =
   in
   let well_loc =
     Locations.make_loc
-      (Location_Bits.inject hidden_base Ival.zero)
+      (Addresses.Bits.inject hidden_base Ival.zero)
       (`Value size)
   in
   let state = add_initialized state well_loc well in
@@ -241,7 +241,7 @@ let initialize_var_using_type varinfo state =
               let total_size = Z.mul size_elt (Z.of_int ncells) in
               let offsm_repeat = Cvalue.V_Offsetmap.create
                   ~size_v:modu ~size:total_size v in
-              let loc = Location_Bits.shift
+              let loc = Addresses.Bits.shift
                   (Ival.inject_singleton size_elt) last_loc.loc;
               in
               (* paste [size - max_precise_size] elements, starting from
@@ -259,7 +259,7 @@ let initialize_var_using_type varinfo state =
                    take some time" size;
               let loc = ref last_loc.loc in
               for _i = max_precise_size to psize do
-                loc := Location_Bits.shift
+                loc := Addresses.Bits.shift
                     (Ival.inject_singleton size_elt) !loc;
                 state :=
                   Cvalue.Model.paste_offsetmap

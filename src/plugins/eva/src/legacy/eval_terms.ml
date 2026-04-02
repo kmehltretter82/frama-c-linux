@@ -365,27 +365,27 @@ type exact_location =
 (* Raised when a term cannot be evaluated as an exact location.*)
 exception Not_an_exact_loc
 
-type logic_deps = Zone.t Logic_label.Map.t
+type logic_deps = Memory_zone.t Logic_label.Map.t
 
 let deps_at lbl (ld:logic_deps) =
   try Logic_label.Map.find lbl ld
-  with Not_found -> Zone.bottom
+  with Not_found -> Memory_zone.bottom
 
 let add_deps lbl ldeps deps =
   let prev_deps = deps_at lbl ldeps in
-  let deps = Zone.join prev_deps deps in
+  let deps = Memory_zone.join prev_deps deps in
   let ldeps : logic_deps = Logic_label.Map.add lbl deps ldeps in
   ldeps
 
 let join_logic_deps (ld1:logic_deps) (ld2: logic_deps) : logic_deps =
   let aux _ d1 d2 = match d1, d2 with
     | None as d, None | (Some _ as d), None | None, (Some _ as d) -> d
-    | Some d1, Some d2 -> Some (Zone.join d1 d2)
+    | Some d1, Some d2 -> Some (Memory_zone.join d1 d2)
   in
   Logic_label.Map.merge aux ld1 ld2
 
 let empty_logic_deps =
-  Logic_label.Map.add lbl_here Zone.bottom Logic_label.Map.empty
+  Logic_label.Map.add lbl_here Memory_zone.bottom Logic_label.Map.empty
 
 (* Type holding the result of an evaluation. Currently, 'a is either
    [Cvalue.V.t] for [eval_term], and [Location_Bits.t] for [eval_tlval_as_loc],
@@ -431,9 +431,9 @@ let under_from_over eover =
   else Cvalue.V.bottom
 
 let under_loc_from_over eover =
-  if Locations.Location_Bits.cardinal_zero_or_one eover
+  if Addresses.Bits.cardinal_zero_or_one eover
   then eover
-  else Locations.Location_Bits.bottom
+  else Addresses.Bits.bottom
 
 (* Injects [cvalue] as an eval_result of type [typ] with no dependencies. *)
 let inject_no_deps typ cvalue =
@@ -956,7 +956,7 @@ let forall_in_under_location state loc test =
     Int_Intervals.fold (inspect_itv base) intervals acc
   in
   let zone = Locations.enumerate_bits loc in
-  try Zone.fold_i inspect_base zone Unknown
+  try Memory_zone.fold_i inspect_base zone Unknown
   with EFalse -> False
      | Abstract_interp.Error_Top -> Unknown
 
@@ -983,7 +983,7 @@ let eval_initialized state r =
     | V_Or_Uninitialized.C_init_noesc _ -> True
     | V_Or_Uninitialized.C_uninit_esc _ -> Unknown
     | V_Or_Uninitialized.C_uninit_noesc v ->
-      if Location_Bytes.is_bottom v then False else Unknown
+      if Addresses.Bytes.is_bottom v then False else Unknown
   in
   eval_forall_predicate state r test
 
@@ -992,7 +992,7 @@ let eval_initialized state r =
 let eval_dangling state r =
   let test = function
     | V_Or_Uninitialized.C_init_esc v ->
-      if Location_Bytes.is_bottom v then True else Unknown
+      if Addresses.Bytes.is_bottom v then True else Unknown
     | V_Or_Uninitialized.C_uninit_esc _ -> Unknown
     | V_Or_Uninitialized.C_init_noesc _
     | V_Or_Uninitialized.C_uninit_noesc _ -> False
@@ -1270,7 +1270,7 @@ let rec eval_term ~alarm_mode env t =
     let r = eval_term ~alarm_mode env t in
     let add_offset _ offs acc = Ival.join offs acc in
     let offs =
-      try Location_Bytes.fold_topset_ok add_offset r.eover Ival.bottom
+      try Addresses.Bytes.fold_topset_ok add_offset r.eover Ival.bottom
       with Abstract_interp.Error_Top -> Ival.top
     in
     let eover = Cvalue.V.inject_ival offs in
@@ -1284,7 +1284,7 @@ let rec eval_term ~alarm_mode env t =
     let r = eval_term ~alarm_mode env t in
     let add_base b acc = V.join acc (V.inject b Ival.zero) in
     let eover =
-      try Location_Bytes.fold_bases add_base r.eover V.bottom
+      try Addresses.Bytes.fold_bases add_base r.eover V.bottom
       with Abstract_interp.Error_Top -> r.eover
     in
     { etype = Cil_const.charPtrType;
@@ -1320,7 +1320,7 @@ let rec eval_term ~alarm_mode env t =
       Ival.join acc bl
     in
     let bl =
-      try Location_Bytes.fold_bases add_block_length r.eover Ival.bottom
+      try Addresses.Bytes.fold_bases add_block_length r.eover Ival.bottom
       with Abstract_interp.Error_Top -> Ival.top
     in
     let eover = V.inject_ival bl in
@@ -1722,7 +1722,7 @@ and eval_tlhost ~alarm_mode env lv =
       | None, Ctype typ -> Base.of_c_logic_var lvar, typ
       | _ -> unsupported_lvar lvar
     in
-    let loc = Location_Bits.inject base Ival.zero in
+    let loc = Addresses.Bits.inject base Ival.zero in
     { etype = typ;
       ldeps = empty_logic_deps;
       eover = loc;
@@ -1731,7 +1731,7 @@ and eval_tlhost ~alarm_mode env lv =
   | TResult typ ->
     (match env.result with
      | Some v ->
-       let loc = Location_Bits.inject (Base.of_varinfo v) Ival.zero in
+       let loc = Addresses.Bits.inject (Base.of_varinfo v) Ival.zero in
        { etype = typ;
          ldeps = empty_logic_deps;
          eunder = loc; eover = loc;
@@ -1815,8 +1815,8 @@ and eval_tlval ~alarm_mode env (thost, toffs) =
   let roffset = eval_toffset ~alarm_mode env rhost.etype toffs in
   { etype = roffset.etype;
     ldeps = join_logic_deps rhost.ldeps roffset.ldeps;
-    eunder = Location_Bits.shift_under roffset.eunder rhost.eunder;
-    eover = Location_Bits.shift roffset.eover rhost.eover;
+    eunder = Addresses.Bits.shift_under roffset.eunder rhost.eunder;
+    eover = Addresses.Bits.shift roffset.eover rhost.eover;
     empty = rhost.empty || roffset.empty;
   }
 
@@ -1828,11 +1828,11 @@ and eval_term_as_lval ~alarm_mode env t =
     let eunder, eover, deps, empty = List.fold_left
         (fun (accunder, accover, accdeps, accempty) t ->
            let r = eval_term_as_lval ~alarm_mode env t in
-           Location_Bits.link accunder r.eunder,
-           Location_Bits.join accover r.eover,
+           Addresses.Bits.link accunder r.eunder,
+           Addresses.Bits.join accover r.eover,
            join_logic_deps accdeps r.ldeps,
            accempty || r.empty
-        ) (Location_Bits.top, Location_Bits.bottom, empty_logic_deps, false) l
+        ) (Addresses.Bits.top, Addresses.Bits.bottom, empty_logic_deps, false) l
     in
     { etype = infer_type t.term_type;
       ldeps = deps;
@@ -1840,8 +1840,8 @@ and eval_term_as_lval ~alarm_mode env t =
   | Tempty_set ->
     { etype = infer_type t.term_type;
       ldeps = empty_logic_deps;
-      eunder = Location_Bits.bottom;
-      eover = Location_Bits.bottom;
+      eunder = Addresses.Bits.bottom;
+      eover = Addresses.Bits.bottom;
       empty = true }
   | Tat (t, lab) ->
     ignore (env_state env lab);
@@ -1851,7 +1851,7 @@ and eval_term_as_lval ~alarm_mode env t =
        sets, that do not change the abstract value. *)
     eval_term_as_lval ~alarm_mode env t
   | Tif (tcond, ttrue, tfalse) ->
-    eval_tif eval_term_as_lval Location_Bits.join Location_Bits.meet ~alarm_mode env
+    eval_tif eval_term_as_lval Addresses.Bits.join Addresses.Bits.meet ~alarm_mode env
       tcond ttrue tfalse
   | Tcomprehension (term, quantifiers, predicate) ->
     let env = bind_comprehension_quantifiers env quantifiers predicate in
@@ -1960,7 +1960,7 @@ and reduce_by_valid env positive access (tset: term) =
      example if offset is a field access. *)
   let aux lv env (offs_typ, offs) =
     try
-      if not (Location_Bits.cardinal_zero_or_one lv.eover) ||
+      if not (Addresses.Bits.cardinal_zero_or_one lv.eover) ||
          not (Ival.cardinal_zero_or_one offs)
       then raise DoNotReduce;
       let state = env_current_state env in
@@ -1969,7 +1969,7 @@ and reduce_by_valid env positive access (tset: term) =
       let alarm_mode = alarm_reduce_mode () in
       let p_orig = find_or_alarm ~alarm_mode state lvloc in
       let pb = Locations.loc_bytes_to_loc_bits p_orig in
-      let shifted_p = Location_Bits.shift offs pb in
+      let shifted_p = Addresses.Bits.shift offs pb in
       let lshifted_p = make_loc shifted_p (Eval_typ.sizeof_lval_typ offs_typ) in
       let valid = (* reduce the shifted pointer to the wanted part *)
         if positive
@@ -1977,12 +1977,12 @@ and reduce_by_valid env positive access (tset: term) =
         else Locations.invalid_part lshifted_p
       in
       let valid = valid.loc in
-      if Location_Bits.equal shifted_p valid
+      if Addresses.Bits.equal shifted_p valid
       then env
       else
         (* Shift back *)
         let shift = Ival.neg_int offs in
-        let pb = Location_Bits.shift shift valid in
+        let pb = Addresses.Bits.shift shift valid in
         let p = Locations.loc_bits_to_loc_bytes pb in
         (* Store the result *)
         let state = Model.reduce_previous_binding state lvloc p in
@@ -2363,7 +2363,7 @@ and reduce_by_predicate ~alarm_mode env positive p =
              locations: at least one of them is non initialized/dangling, but
              which one? Reduction would only be possible in the rare case where
              only one of the locations might be non initialized/dangling. *)
-          if not (positive || Location_Bits.cardinal_zero_or_one rlocb.eover)
+          if not (positive || Addresses.Bits.cardinal_zero_or_one rlocb.eover)
           then env
           else
             let size = Eval_typ.sizeof_lval_typ rlocb.etype in
@@ -2686,9 +2686,9 @@ and eval_predicate env pred =
          (* Are those two lists of locations separated? *)
          let do_two (z1, zu1) l2 =
            let combine (z2, zu2) =
-             if Zone.intersects z1 z2 then begin
+             if Memory_zone.intersects z1 z2 then begin
                unknown := true;
-               if Zone.intersects zu1 zu2 then raise Exit;
+               if Memory_zone.intersects zu1 zu2 then raise Exit;
              end
            in
            List.iter combine l2

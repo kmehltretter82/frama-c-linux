@@ -39,4 +39,4 @@ val var_hints : Cil_types.stmt -> Base.Set.t -> t
     {!Cvalue.Model.widen}. *)
 val hints_from_keys :
   Cil_types.stmt -> t ->
-  Base.Set.t * (Base.t -> Locations.Location_Bytes.widen_hint)
+  Base.Set.t * (Base.t -> Addresses.Bytes.widen_hint)

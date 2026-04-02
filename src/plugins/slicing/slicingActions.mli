@@ -33,7 +33,7 @@ val build_node_and_dpds_selection :
 
 val translate_crit_to_select :
   Pdg.Api.t -> ?to_select:select ->
-  ((PdgTypes.Node.t * Locations.Zone.t option) list * n_or_d_marks) list
+  ((PdgTypes.Node.t * Memory_zone.t option) list * n_or_d_marks) list
   -> select
 
 val mk_fct_crit : fct_info -> fct_crit -> criterion

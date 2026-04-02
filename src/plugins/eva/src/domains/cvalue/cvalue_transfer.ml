@@ -23,7 +23,7 @@ let unbottomize = function
 
 let warn_imprecise_value ?prefix lval value =
   match value with
-  | Locations.Location_Bytes.Top (bases, origin) ->
+  | Addresses.Bytes.Top (bases, origin) ->
     if Origin.register_write bases origin then
       let prefix = Option.fold ~none:"A" ~some:(fun s -> s ^ ": a") prefix in
       Self.warning ~wkey:Self.wkey_garbled_mix_write ~once:true ~current:true
@@ -34,7 +34,7 @@ let warn_imprecise_value ?prefix lval value =
 
 let warn_imprecise_location ?prefix loc =
   match loc.Locations.loc with
-  | Locations.Location_Bits.Top (Base.SetLattice.Top, orig) ->
+  | Addresses.Bits.Top (Base.SetLattice.Top, orig) ->
     let prefix = Option.fold ~none:"" ~some:(fun s -> s ^ ": ") prefix in
     Self.fatal ~current:true
       "@[%swriting at a completely unknown address@ because of %s.@]@\nAborting."

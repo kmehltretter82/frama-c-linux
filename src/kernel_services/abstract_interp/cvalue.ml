@@ -47,7 +47,7 @@ end
 
 module V = struct
 
-  include Location_Bytes
+  include Addresses.Bytes
 
   exception Not_based_on_null
 
@@ -91,7 +91,7 @@ module V = struct
         let bits_offset = Ival.scale (Bit_utils.sizeofchar()) offset in
         not Base.(is_valid_offset Any_pointer base bits_offset)
     in
-    Location_Bytes.exists offset_contains_zero loc
+    Addresses.Bytes.exists offset_contains_zero loc
 
   let contains_non_zero v =
     not ((equal v bottom) || (is_zero v))
@@ -497,18 +497,18 @@ module V = struct
       then
         (* Either e1 and e2 have the same base, and it's a subtraction
            of pointers, or e2 is really an integer *)
-        let b1, o1 = Location_Bytes.find_lonely_key e1 in
-        let b2, o2 = Location_Bytes.find_lonely_key e2 in
+        let b1, o1 = Addresses.Bytes.find_lonely_key e1 in
+        let b2, o2 = Addresses.Bytes.find_lonely_key e2 in
         if Base.compare b1 b2 <> 0 then raise Not_found;
         inject_ival (Ival.sub_int o1 o2)
       else begin
         if not Z.(equal factor one) then
           raise Not_found (* cannot multiply a pointer *);
         try
-          Location_Bytes.shift (project_ival_bottom e2) e1
+          Addresses.Bytes.shift (project_ival_bottom e2) e1
         with Not_based_on_null  ->
         try (* On the off chance that someone writes [i+(int)&p]... *)
-          Location_Bytes.shift (project_ival_bottom e1) e2
+          Addresses.Bytes.shift (project_ival_bottom e1) e2
         with Not_based_on_null ->
           topify origin (join e1 e2)
       end
@@ -517,7 +517,7 @@ module V = struct
        addition is to convert e2 to an integer *)
     try
       let right = Ival.scale factor (project_ival_bottom e2)
-      in Location_Bytes.shift right e1
+      in Addresses.Bytes.shift right e1
     with Not_based_on_null  -> (* from [project_ival] *)
       topify origin (join e1 e2)
 
@@ -530,19 +530,19 @@ module V = struct
          e1 and e2, so this is an underapproximation in the most
          common case. *)
       try
-        let b1, o1 = Location_Bytes.find_lonely_key e1 in
-        let b2, o2 = Location_Bytes.find_lonely_key e2 in
+        let b1, o1 = Addresses.Bytes.find_lonely_key e1 in
+        let b2, o2 = Addresses.Bytes.find_lonely_key e2 in
         if Base.compare b1 b2 <> 0 then bottom
         else inject_ival (Ival.sub_int_under o1 o2)
       with Not_found -> bottom
     else if Z.(equal factor one)
     then
-      try Location_Bytes.shift_under (project_ival_bottom e2) e1
+      try Addresses.Bytes.shift_under (project_ival_bottom e2) e1
       with Not_based_on_null -> bottom
     else
       try
         let right = Ival.scale factor (project_ival_bottom e2) in
-        Location_Bytes.shift_under right e1
+        Addresses.Bytes.shift_under right e1
       with Not_based_on_null -> bottom
   ;;
 

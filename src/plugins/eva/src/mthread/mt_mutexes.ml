@@ -72,11 +72,11 @@ let pretty_protection_per_thread fmt (th_read, th_write, protection) =
     pretty_protection protection
 
 type zone_protection =
-  (Locations.Zone.t * (Thread.t * Thread.t * protection) list) list
+  (Memory_zone.t * (Thread.t * Thread.t * protection) list) list
 
 let pretty_zone_protection fmt (z, l) =
   Format.fprintf fmt "@[<hv 2>@[%a@]:@ %a@]"
-    Locations.Zone.pretty z
+    Memory_zone.pretty z
     (Pretty_utils.pp_list ~pre:"" ~suf:"" pretty_protection_per_thread) l
 
 let check_protection analysis (l: Mt_shared_vars.Precise.list_accesses) : zone_protection =
@@ -147,9 +147,9 @@ let ill_protected (accesses: Mt_shared_vars.Precise.list_accesses) (protections:
             let aux stmt =
               let prev =
                 try Cil_datatype.Stmt.Hashtbl.find res stmt
-                with Not_found -> Locations.Zone.bottom
+                with Not_found -> Memory_zone.bottom
               in
-              let z = Locations.Zone.join prev z in
+              let z = Memory_zone.join prev z in
               Cil_datatype.Stmt.Hashtbl.replace res stmt z
             in
             List.iter aux stmts

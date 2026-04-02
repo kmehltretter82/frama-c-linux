@@ -78,7 +78,7 @@ let register_modified_zones lmap stmt =
   let register lmap zone = InitSid.add_zone lmap zone stmt in
   let aux_out out kf =
     let inout= Inout.get_precise_inout ~stmt kf in
-    Locations.Zone.join out inout.Inout_type.over_outputs
+    Memory_zone.join out inout.Inout_type.over_outputs
   in
   match stmt.skind with
   | Instr (Set (lval, _, _)) ->
@@ -91,7 +91,7 @@ let register_modified_zones lmap stmt =
      | AssignInit _ -> lmap_init
      | ConsInit(f,_,_) ->
        let kf = Globals.Functions.get f in
-       let out = aux_out Locations.Zone.bottom kf in
+       let out = aux_out Memory_zone.bottom kf in
        register lmap_init out)
   | Instr (Call (dst,funclv,_args,_)) ->
     begin
@@ -105,7 +105,7 @@ let register_modified_zones lmap stmt =
         Eva.Results.(before stmt |> eval_callee funclv |> default [])
       in
       let out =
-        List.fold_left aux_out Locations.Zone.bottom kfs
+        List.fold_left aux_out Memory_zone.bottom kfs
       in
       register lmap out
     end
@@ -312,8 +312,8 @@ let find_scope allstmts modif_stmts modif_edge s kf =
 
 (* Computes the memory zones that points to a base in [escaping] in a state. *)
 let gather_escaping_zones escaping = function
-  | Cvalue.Model.Top -> Locations.Zone.top
-  | Cvalue.Model.Bottom -> Locations.Zone.bottom
+  | Cvalue.Model.Top -> Memory_zone.top
+  | Cvalue.Model.Bottom -> Memory_zone.bottom
   | Cvalue.Model.Map m ->
     let aux base offsm zone =
       let test b = Base.Hptset.mem b escaping in
@@ -321,13 +321,13 @@ let gather_escaping_zones escaping = function
         let v = Cvalue.V_Or_Uninitialized.get_v v in
         if Cvalue.V.contains_addresses_of_locals test v
         then
-          let z = Locations.Zone.inject base (Int_Intervals.inject_itv itv) in
-          Locations.Zone.join acc z
+          let z = Memory_zone.inject base (Int_Intervals.inject_itv itv) in
+          Memory_zone.join acc z
         else acc
       in
       Cvalue.V_Offsetmap.fold gather offsm zone
     in
-    Cvalue.Model.fold aux m Locations.Zone.bottom
+    Cvalue.Model.fold aux m Memory_zone.bottom
 
 (* compute the memory zones that are changed into ESCAPING ADDRESS
    when taking the cfg edge s1->s2 *)
@@ -340,7 +340,7 @@ let compute_escaping_zones s1 s2 =
   in
   let bases = List.fold_left filter Base.Hptset.empty locals in
   if Base.Hptset.is_empty bases
-  then Locations.Zone.bottom
+  then Memory_zone.bottom
   else
     let cvalue_state = Eva.Results.(before s1 |> get_cvalue_model) in
     gather_escaping_zones bases cvalue_state
@@ -353,7 +353,7 @@ module PairStmts =
 (* Hashtbl from pairs of stmts to zone. Used as maps from Cfg edges to the
    memory zones that are 'modified' by thescope change. *)
 module HashPairStmtsZone =
-  PairStmts.Hashtbl.Make(Locations.Zone)
+  PairStmts.Hashtbl.Make(Memory_zone)
 type modified_by_edge = HashPairStmtsZone.t
 
 (* compute the {!modified_by_edge} hashtbl for the fundec [fdec] *)
@@ -384,7 +384,7 @@ let modified_by_edge_kf =
 (* Does the Cfg edge [s1->s2] has an effect on [z]? *)
 let is_modified_by_edge kf z s1 s2 =
   let modifs_edge = modified_by_edge_kf kf in
-  Locations.Zone.intersects z (PairStmts.Hashtbl.find modifs_edge (s1, s2))
+  Memory_zone.intersects z (PairStmts.Hashtbl.find modifs_edge (s1, s2))
 
 (** Try to find the statement set where [data] has the same value than
  * before [stmt].
@@ -403,7 +403,7 @@ let get_data_scope_at_stmt kf stmt lval =
      modified by = %a@\n\
      f = %a@\nfb = %a@\nb = %a@]"
     (* stmt at *)
-    Locations.Zone.pretty zone stmt.sid
+    Memory_zone.pretty zone stmt.sid
     (* modified by *)
     (Pretty_utils.pp_iter
        StmtSetLattice.iter ~sep:",@ " Cil_datatype.Stmt.pretty_sid)
@@ -422,10 +422,10 @@ let get_annot_zone kf stmt annot =
     let before = info.Logic_deps.before in
     let zone = info.Logic_deps.zone in
     R.debug ~level:2 "[forward_prop_scope] need %a %s stmt %d@."
-      Locations.Zone.pretty zone
+      Memory_zone.pretty zone
       (if before then "before" else "after") s.sid;
     if before && stmt.sid = s.sid then
-      Locations.Zone.join zone z
+      Memory_zone.join zone z
     else (* TODO *)
       raise ToDo
   in
@@ -433,8 +433,8 @@ let get_annot_zone kf stmt annot =
   match info with
   | None -> raise ToDo
   | Some info ->
-    let zone = List.fold_left add_zone Locations.Zone.bottom info in
-    R.debug "[get_annot_zone] need %a" Locations.Zone.pretty zone ;
+    let zone = List.fold_left add_zone Memory_zone.bottom info in
+    R.debug "[get_annot_zone] need %a" Memory_zone.pretty zone ;
     zone
 
 

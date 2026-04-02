@@ -12,7 +12,7 @@ open Cil_types
 open Pdg_types
 
 type nodes_and_undef =
-  (PdgTypes.Node.t * Locations.Zone.t option) list * Locations.Zone.t option
+  (PdgTypes.Node.t * Memory_zone.t option) list * Memory_zone.t option
 
 (** {2 PDG nodes for some elements} *)
 
@@ -20,11 +20,11 @@ val find_stmt_node: PdgTypes.Pdg.t -> stmt -> PdgTypes.Node.t
 val find_simple_stmt_nodes: PdgTypes.Pdg.t -> stmt -> PdgTypes.Node.t list
 val find_stmt_and_blocks_nodes: PdgTypes.Pdg.t -> stmt -> PdgTypes.Node.t list
 val find_location_nodes_at_stmt:
-  PdgTypes.Pdg.t -> stmt -> before:bool -> Locations.Zone.t -> nodes_and_undef
+  PdgTypes.Pdg.t -> stmt -> before:bool -> Memory_zone.t -> nodes_and_undef
 val find_location_nodes_at_end:
-  PdgTypes.Pdg.t -> Locations.Zone.t -> nodes_and_undef
+  PdgTypes.Pdg.t -> Memory_zone.t -> nodes_and_undef
 val find_location_nodes_at_begin:
-  PdgTypes.Pdg.t -> Locations.Zone.t -> nodes_and_undef
+  PdgTypes.Pdg.t -> Memory_zone.t -> nodes_and_undef
 val find_label_node: PdgTypes.Pdg.t -> stmt -> label -> PdgTypes.Node.t
 val find_decl_var_node: PdgTypes.Pdg.t -> varinfo -> PdgTypes.Node.t
 val find_input_node: PdgTypes.Pdg.t -> int -> PdgTypes.Node.t

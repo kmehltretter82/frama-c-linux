@@ -88,17 +88,17 @@ let filter_public_zone =
     | None -> false
     | Some typ -> Ast_types.has_qualifier public_taint_namespace typ
   in
-  Zone.filter_base base_is_public
+  Memory_zone.filter_base base_is_public
 
 let warn_assign_interference ~pos ~data_tainted ~ctrl_tainted zone =
   if secure_flow_analysis () && (data_tainted || ctrl_tainted) then
     let zone = filter_public_zone zone in
-    if not (Zone.is_bottom zone) then
+    if not (Memory_zone.is_bottom zone) then
       let source = fst (Position.loc pos) in
       let warn wkey kind zone =
         Self.warning ~wkey ~source ~once:true
           "@[<hv 2>%s non-interference violation on@ @[<hov>{%a}@]"
-          kind Zone.pretty zone
+          kind Memory_zone.pretty zone
       in
       if data_tainted then warn wkey_secure_flow_direct "direct" zone;
       if ctrl_tainted then warn wkey_secure_flow_indirect "indirect" zone
@@ -108,7 +108,7 @@ let warn_assume_interference ~pos zone =
     let source = fst (Position.loc pos) in
     Self.warning ~wkey:wkey_secure_flow_assume ~source ~once:true
       "@[<hv 2>non-interference violation on condition involving@ @[<hov>{%a}@]"
-      Zone.pretty zone
+      Memory_zone.pretty zone
 
 (* -------------------------------------------------------------------------- *)
 (*                          Lattice for one taint                             *)
@@ -117,10 +117,10 @@ let warn_assume_interference ~pos zone =
 type taint_state = {
   (* Over-approximation of the memory locations that are tainted due to a data
      dependency. *)
-  locs_data: Zone.t;
+  locs_data: Memory_zone.t;
   (* Over-approximation of the memory locations that are tainted due to a
      control dependency. *)
-  locs_control: Zone.t;
+  locs_control: Memory_zone.t;
   (* Set of assume statements over a tainted expression. This set is needed to
      implement control-dependency: all left-values appearing in statements whose
      evaluation depends on at least one of the assume expressions is to be
@@ -137,8 +137,8 @@ module LatticeSingleTaint = struct
     Format.fprintf fmt
       "@[<v>@[<hv 2>Locations (data):@ @[<hov>%a@]@]@,\
        @[<hv 2>Locations (control):@ @[<hov>%a@]@]@]"
-      Zone.pretty t.locs_data
-      Zone.pretty t.locs_control
+      Memory_zone.pretty t.locs_data
+      Memory_zone.pretty t.locs_control
 
   let pp_state fmt t =
     Format.fprintf fmt
@@ -146,8 +146,8 @@ module LatticeSingleTaint = struct
        @[<hv 2>Locations (control):@ @[<hov>%a@]@]@,\
        @[<hv 2>Assume statements:@ @[<hov>%a@]@]@,\
        @[<hv 2>Tainted call:@ @[<hov>%b@]@]@]"
-      Zone.pretty t.locs_data
-      Zone.pretty t.locs_control
+      Memory_zone.pretty t.locs_data
+      Memory_zone.pretty t.locs_control
       Stmt.Set.pretty t.assume_stmts
       t.tainted_call
 
@@ -160,20 +160,20 @@ module LatticeSingleTaint = struct
       let name = "single-taint"
 
       let reprs =
-        [ { locs_data = List.hd Zone.reprs;
-            locs_control = List.hd Zone.reprs;
+        [ { locs_data = List.hd Memory_zone.reprs;
+            locs_control = List.hd Memory_zone.reprs;
             assume_stmts = Stmt.Set.empty;
             tainted_call = false; } ]
 
       let structural_descr =
         Structural_descr.t_record
-          [| Zone.packed_descr; Zone.packed_descr;
+          [| Memory_zone.packed_descr; Memory_zone.packed_descr;
              Stmt.Set.packed_descr; Datatype.Bool.packed_descr |]
 
       let compare t1 t2 =
         let (<?>) c (cmp,x,y) = if c = 0 then cmp x y else c in
-        Zone.compare t1.locs_data t2.locs_data
-        <?> (Zone.compare, t1.locs_control, t2.locs_control)
+        Memory_zone.compare t1.locs_data t2.locs_data
+        <?> (Memory_zone.compare, t1.locs_control, t2.locs_control)
         <?> (Stmt.Set.compare, t1.assume_stmts, t2.assume_stmts)
         <?> (Datatype.Bool.compare, t1.tainted_call, t2.tainted_call)
 
@@ -186,8 +186,8 @@ module LatticeSingleTaint = struct
 
       let hash t =
         Hashtbl.hash
-          (Zone.hash t.locs_data,
-           Zone.hash t.locs_control,
+          (Memory_zone.hash t.locs_data,
+           Memory_zone.hash t.locs_control,
            Stmt.Set.hash t.assume_stmts,
            t.tainted_call)
 
@@ -197,24 +197,24 @@ module LatticeSingleTaint = struct
 
   (* Initial state at the start of the computation: nothing is tainted yet. *)
   let empty = {
-    locs_data = Zone.bottom;
-    locs_control = Zone.bottom;
+    locs_data = Memory_zone.bottom;
+    locs_control = Memory_zone.bottom;
     assume_stmts = Stmt.Set.empty;
     tainted_call = false;
   }
 
   (* Top state: everything is tainted. *)
   let top = {
-    locs_data = Zone.top;
-    locs_control = Zone.top;
+    locs_data = Memory_zone.top;
+    locs_control = Memory_zone.top;
     assume_stmts = Stmt.Set.empty;
     tainted_call = false;
   }
 
   (* Join: keep pointwise over-approximation. *)
   let join t1 t2 =
-    { locs_data = Zone.join t1.locs_data t2.locs_data;
-      locs_control = Zone.join t1.locs_control t2.locs_control;
+    { locs_data = Memory_zone.join t1.locs_data t2.locs_data;
+      locs_control = Memory_zone.join t1.locs_control t2.locs_control;
       assume_stmts = Stmt.Set.union t1.assume_stmts t2.assume_stmts;
       tainted_call = t1.tainted_call || t2.tainted_call; }
 
@@ -224,21 +224,21 @@ module LatticeSingleTaint = struct
 
   let narrow t1 t2 =
     `Value {
-      locs_data = Zone.narrow t1.locs_data t2.locs_data;
-      locs_control = Zone.narrow t1.locs_control t2.locs_control;
+      locs_data = Memory_zone.narrow t1.locs_data t2.locs_data;
+      locs_control = Memory_zone.narrow t1.locs_control t2.locs_control;
       assume_stmts = Stmt.Set.inter t1.assume_stmts t2.assume_stmts;
       tainted_call = t1.tainted_call && t2.tainted_call;
     }
 
   (* Inclusion testing: pointwise, on locs only. *)
   let is_included t1 t2 =
-    Zone.is_included t1.locs_data t2.locs_data &&
-    Zone.is_included t1.locs_control t2.locs_control
+    Memory_zone.is_included t1.locs_data t2.locs_data &&
+    Memory_zone.is_included t1.locs_control t2.locs_control
 
   (* Intersection testing: pointwise, on locs only. *)
   let intersects t e =
-    Zone.intersects t.locs_data e ||
-    Zone.intersects t.locs_control e
+    Memory_zone.intersects t.locs_data e ||
+    Memory_zone.intersects t.locs_control e
 
 end
 
@@ -377,7 +377,7 @@ module TransferSingleTaint = struct
       (* Special case for direct access to variable: do not use [to_loc] here,
          as it will fail for the formal parameters of calls. *)
       let zone = Locations.zone_of_varinfo vi in
-      zone, Zone.bottom, true
+      zone, Memory_zone.bottom, true
     | _ ->
       let ploc = to_loc lval in
       let is_singleton = Precise_locs.cardinal_zero_or_one ploc in
@@ -424,7 +424,7 @@ module TransferSingleTaint = struct
       in
       Eva_ast.PreciseDepsOf.deps_of_exp to_loc exp
     in
-    let data_tainted = Zone.intersects state.locs_data exp_deps.data in
+    let data_tainted = Memory_zone.intersects state.locs_data exp_deps.data in
     (* [lval] becomes control-tainted if:
        - the assignment is in a tainted scope;
        - the [lval] location depends on tainted values;
@@ -434,16 +434,16 @@ module TransferSingleTaint = struct
     let ctrl_tainted =
       is_in_tainted_scope state
       || LatticeSingleTaint.intersects state lv_indirect
-      || Zone.intersects state.locs_control exp_deps.data
+      || Memory_zone.intersects state.locs_control exp_deps.data
       || LatticeSingleTaint.intersects state exp_deps.indirect
     in
     if is_private_namespace namespace
     then warn_assign_interference ~pos ~data_tainted ~ctrl_tainted lv_data;
     let update tainted locs =
       if tainted
-      then Zone.join locs lv_data
+      then Memory_zone.join locs lv_data
       else if is_singleton
-      then Zone.diff locs lv_data
+      then Memory_zone.diff locs lv_data
       else locs
     in
     { state with locs_data = update data_tainted state.locs_data;
@@ -506,7 +506,7 @@ module TransferSingleTaint = struct
 
   let arg_to_zone arg =
     match Eval.(value_assigned arg.avalue) with
-    | `Bottom -> Locations.Zone.bottom (* should not happen *)
+    | `Bottom -> Memory_zone.bottom (* should not happen *)
     | `Value value ->
       let loc_bits = Locations.loc_bytes_to_loc_bits value in
       let size = Bit_utils.sizeof_pointed arg.formal.vtype in
@@ -540,7 +540,7 @@ module TransferSingleTaint = struct
     | Some vi ->
       let loc = Locations.loc_of_varinfo vi in
       Locations.enumerate_valid_bits Write loc
-    | _ -> Zone.bottom
+    | _ -> Memory_zone.bottom
 
   let finalize_call ~pos:_ _call _recursion ~pre ~post =
     (* Recover assume statements from the [pre] abstract state: we assume the
@@ -564,7 +564,7 @@ module TransferSingleTaint = struct
               let n = get_formats_number s in
               let vars_to_taint = get_n_first zones n in
               let locs_data =
-                List.fold_left Zone.join state.locs_data vars_to_taint
+                List.fold_left Memory_zone.join state.locs_data vars_to_taint
               in
               { state with locs_data }
             | Wstr _ -> state
@@ -577,14 +577,14 @@ module TransferSingleTaint = struct
           try
             let to_taint = find_tainted_argument call.arguments in
             let zone = arg_to_zone to_taint in
-            { state with locs_data = Zone.join state.locs_data zone }
+            { state with locs_data = Memory_zone.join state.locs_data zone }
           with
           | Not_found -> state
         end
       else if is_auto_taint_res call.kf then
         begin
           let zone = zone_of_return call.return in
-          { state with locs_data = Zone.join state.locs_data zone }
+          { state with locs_data = Memory_zone.join state.locs_data zone }
         end
       else
         state
@@ -726,7 +726,7 @@ module Domain = struct
       if exists_tainted_from pre_state deps
       then
         let loc_zone = Precise_locs.enumerate_valid_bits Write location in
-        { state with locs_data = Zone.join state.locs_data loc_zone }
+        { state with locs_data = Memory_zone.join state.locs_data loc_zone }
       else
         state
 
@@ -753,16 +753,16 @@ module Domain = struct
       | [] -> state
       | private_vars ->
         let var_zones = List.map Locations.zone_of_varinfo private_vars in
-        let private_zone = List.fold_left Zone.join Zone.bottom var_zones in
+        let private_zone = List.fold_left Memory_zone.join Memory_zone.bottom var_zones in
         let open Lattice_bounds.Top.Operators in
         let+ state_map = state in
         let taint_state = LatticeMultiTaint.find_or_empty namespace state_map in
-        let locs_data = Zone.join taint_state.locs_data private_zone in
+        let locs_data = Memory_zone.join taint_state.locs_data private_zone in
         let taint_state = { taint_state with locs_data } in
         LatticeMultiTaint.add namespace taint_state state_map
 
   let remove_bases_per_taint bases state =
-    let remove = Zone.filter_base (fun b -> not (Base.Hptset.mem b bases)) in
+    let remove = Memory_zone.filter_base (fun b -> not (Base.Hptset.mem b bases)) in
     { state with locs_data = remove state.locs_data;
                  locs_control = remove state.locs_control; }
 
@@ -789,7 +789,7 @@ module Domain = struct
     let open Lattice_bounds.Top.Operators in
     let+ state_map = state in
     let filter_state bases state =
-      let filter_base = Zone.filter_base (fun b -> Base.Hptset.mem b bases) in
+      let filter_base = Memory_zone.filter_base (fun b -> Base.Hptset.mem b bases) in
       { state with locs_data = filter_base state.locs_data;
                    locs_control = filter_base state.locs_control;
                    assume_stmts = Stmt.Set.empty; }
@@ -994,7 +994,7 @@ module TaintLogic = struct
     try
       let result = Eval_terms.eval_term ~alarm_mode cvalue_env term in
       match Logic_label.Map.bindings result.ldeps with
-      | [ BuiltinLabel Here, zone ] -> Some (Zone.bottom, zone)
+      | [ BuiltinLabel Here, zone ] -> Some (Memory_zone.bottom, zone)
       | _ -> None
     with Eval_terms.LogicEvalError _ -> None
 
@@ -1007,7 +1007,7 @@ module TaintLogic = struct
     match eval_term_zone cvalue_env taint_predicate.arg with
     | None -> state
     | Some (under, _over) ->
-      let zone_op = if taint_predicate.positive then Zone.join else Zone.diff in
+      let zone_op = if taint_predicate.positive then Memory_zone.join else Memory_zone.diff in
       let reduce state =
         match taint_predicate.name with
         | "\\tainted" ->
@@ -1047,7 +1047,7 @@ module TaintLogic = struct
     match eval_term_zone cvalue_env term with
     | None -> Alarmset.Unknown
     | Some (_under, over) ->
-      if Zone.intersects over zone
+      if Memory_zone.intersects over zone
       then Alarmset.Unknown
       else Alarmset.False
 
@@ -1059,13 +1059,13 @@ module TaintLogic = struct
         match predicate.name with
         | "\\tainted_directly" -> state.locs_data
         | "\\tainted_indirectly" -> state.locs_control
-        | "\\tainted" | _ -> Zone.join state.locs_data state.locs_control
+        | "\\tainted" | _ -> Memory_zone.join state.locs_data state.locs_control
       in
       let add_zone acc namespace =
         let state = LatticeMultiTaint.find_or_empty namespace state_map in
-        Zone.join acc (get_zone state)
+        Memory_zone.join acc (get_zone state)
       in
-      let zone = List.fold_left add_zone Zone.bottom predicate.namespaces in
+      let zone = List.fold_left add_zone Memory_zone.bottom predicate.namespaces in
       let truth = evaluate_taint_term cvalue_env zone predicate.arg in
       if predicate.positive then truth else Abstract_interp.inv_truth truth
 
@@ -1105,7 +1105,7 @@ module TaintLogic = struct
           Printer.pp_term term;
         state_map
       | Some (under, over) ->
-        if not (Zone.equal under over)
+        if not (Memory_zone.equal under over)
         then
           Self.warning ~wkey ~current:true ~once:true
             "Cannot precisely evaluate term %a in taint annotation; \
@@ -1114,7 +1114,7 @@ module TaintLogic = struct
         let taint_names = term_taint_namespaces term in
         let add_taint state name =
           let taint = LatticeMultiTaint.find_or_empty name state in
-          let locs_data = Zone.join taint.locs_data over in
+          let locs_data = Memory_zone.join taint.locs_data over in
           LatticeMultiTaint.add name { taint with locs_data } state
         in
         List.fold_left add_taint state_map taint_names
@@ -1206,8 +1206,8 @@ let is_tainted ?(names=[]) state zone =
         LatticeSingleTaint.empty names
   in
   let { locs_data; locs_control } = taint_state in
-  if Zone.intersects zone locs_data then Direct
-  else if Zone.intersects zone locs_control then Indirect
+  if Memory_zone.intersects zone locs_data then Direct
+  else if Memory_zone.intersects zone locs_control then Indirect
   else Untainted
 
 let taint_names () =
@@ -1222,7 +1222,7 @@ let taint_names_by_kind state zone =
   let open Lattice_bounds.Top.Operators in
   let+ state_map = state in
   let add_name locs name names =
-    if Zone.intersects zone locs
+    if Memory_zone.intersects zone locs
     then Datatype.String.Set.add name names
     else names
   in

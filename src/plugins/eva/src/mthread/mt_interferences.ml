@@ -17,7 +17,7 @@ let concurrent_writes thread shared_bases =
          given statement? (can be done directly by Inout_access). *)
       let filter = Inout_access.keep_globals_only in
       let accesses = Inout_access.at ~filter pos in
-      let written_bases = Locations.Zone.get_bases accesses.write in
+      let written_bases = Memory_zone.get_bases accesses.write in
       if Base.SetLattice.(intersects (inject shared_bases) written_bases)
       then Position.Local.Set.add (stmt, cs) acc
       else acc
@@ -43,7 +43,7 @@ let concurrent_writes thread shared_bases =
 
 let shared_bases analysis_state =
   let shared_zones = analysis_state.Mt_thread.concurrent_accesses in
-  match Locations.Zone.get_bases shared_zones with
+  match Memory_zone.get_bases shared_zones with
   | Top -> assert false
   | Set zones ->  zones
 

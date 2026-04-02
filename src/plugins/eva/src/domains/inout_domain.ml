@@ -10,15 +10,15 @@ open Locations
 
 type inout = {
   (* over-approximation of the memory locations written by the function *)
-  over_outputs: Zone.t;
+  over_outputs: Memory_zone.t;
   (* over-approximation of the memory locations read by the function *)
-  over_inputs: Zone.t;
+  over_inputs: Memory_zone.t;
   (* under-approximation of the memory locations written by the function *)
-  under_outputs: Zone.t;
+  under_outputs: Memory_zone.t;
   (* over-approximation of the memory locations parts read by the function
      that are parts of its inputs (i.e. that the function has not written
      previously) *)
-  operational_inputs: Zone.t;
+  operational_inputs: Memory_zone.t;
 }
 
 
@@ -36,30 +36,30 @@ module LatticeInout = struct
       let name = "Eva.Inout_domain.LatticeInout"
 
       let reprs = [ {
-          over_outputs = List.hd Zone.reprs;
-          over_inputs = List.hd Zone.reprs;
-          under_outputs = List.hd Zone.reprs;
-          operational_inputs = List.hd Zone.reprs;
+          over_outputs = List.hd Memory_zone.reprs;
+          over_inputs = List.hd Memory_zone.reprs;
+          under_outputs = List.hd Memory_zone.reprs;
+          operational_inputs = List.hd Memory_zone.reprs;
         } ]
 
       let structural_descr =
         Structural_descr.t_record [|
-          Zone.packed_descr;
-          Zone.packed_descr;
-          Zone.packed_descr;
-          Zone.packed_descr;
+          Memory_zone.packed_descr;
+          Memory_zone.packed_descr;
+          Memory_zone.packed_descr;
+          Memory_zone.packed_descr;
         |]
 
       let compare m1 m2 =
-        let c = Zone.compare m1.over_outputs m2.over_outputs in
+        let c = Memory_zone.compare m1.over_outputs m2.over_outputs in
         if c <> 0 then c
         else
-          let c = Zone.compare m1.over_inputs m2.over_inputs in
+          let c = Memory_zone.compare m1.over_inputs m2.over_inputs in
           if c <> 0 then c
           else
-            let c = Zone.compare m1.under_outputs m2.under_outputs in
+            let c = Memory_zone.compare m1.under_outputs m2.under_outputs in
             if c <> 0 then c
-            else Zone.compare m1.operational_inputs m2.operational_inputs
+            else Memory_zone.compare m1.operational_inputs m2.operational_inputs
 
       let equal = Datatype.from_compare
 
@@ -69,16 +69,16 @@ module LatticeInout = struct
            @[<v 2>Over inputs:@ @[<hov>%a@]@]@.\
            @[<v 2>Sure outputs:@ @[<hov>%a@]@]@.\
            @[<v 2>Operational inputs:@ @[<hov>%a@]@]"
-          Zone.pretty c.over_outputs
-          Zone.pretty c.over_inputs
-          Zone.pretty c.under_outputs
-          Zone.pretty c.operational_inputs
+          Memory_zone.pretty c.over_outputs
+          Memory_zone.pretty c.over_inputs
+          Memory_zone.pretty c.under_outputs
+          Memory_zone.pretty c.operational_inputs
 
       let hash m =
-        Hashtbl.hash (Zone.hash m.over_outputs,
-                      Zone.hash m.over_inputs,
-                      Zone.hash m.under_outputs,
-                      Zone.hash m.operational_inputs)
+        Hashtbl.hash (Memory_zone.hash m.over_outputs,
+                      Memory_zone.hash m.over_inputs,
+                      Memory_zone.hash m.under_outputs,
+                      Memory_zone.hash m.operational_inputs)
 
       let copy c = c
 
@@ -87,26 +87,26 @@ module LatticeInout = struct
   (* Initial abstract at the beginning of the computation: nothing written
      or read so far. *)
   let empty = {
-    over_outputs = Zone.bottom;
-    over_inputs = Zone.bottom;
-    under_outputs = Zone.bottom;
-    operational_inputs = Zone.bottom;
+    over_outputs = Memory_zone.bottom;
+    over_inputs = Memory_zone.bottom;
+    under_outputs = Memory_zone.bottom;
+    operational_inputs = Memory_zone.bottom;
   }
 
   (* Top state: everything read or written, nothing written in a sure way *)
   let top = {
-    over_outputs = Zone.top;
-    over_inputs = Zone.top;
-    under_outputs = Zone.bottom;
-    operational_inputs = Zone.top;
+    over_outputs = Memory_zone.top;
+    over_inputs = Memory_zone.top;
+    under_outputs = Memory_zone.bottom;
+    operational_inputs = Memory_zone.top;
   }
 
   (* Join: over-approximation are joined, under-approximation are met. *)
   let join c1 c2 = {
-    over_outputs = Zone.join c1.over_outputs c2.over_outputs;
-    over_inputs = Zone.join c1.over_inputs c2.over_inputs;
-    under_outputs = Zone.meet c1.under_outputs c2.under_outputs;
-    operational_inputs = Zone.join c1.operational_inputs c2.operational_inputs;
+    over_outputs = Memory_zone.join c1.over_outputs c2.over_outputs;
+    over_inputs = Memory_zone.join c1.over_inputs c2.over_inputs;
+    under_outputs = Memory_zone.meet c1.under_outputs c2.under_outputs;
+    operational_inputs = Memory_zone.join c1.operational_inputs c2.operational_inputs;
   }
 
   (* The memory locations are finite, so the ascending chain property is
@@ -115,19 +115,19 @@ module LatticeInout = struct
 
   let narrow c1 c2 =
     `Value
-      { over_outputs = Zone.narrow c1.over_outputs c2.over_outputs;
-        over_inputs = Zone.narrow c1.over_inputs c2.over_inputs;
-        under_outputs = Zone.link c1.under_outputs c2.under_outputs;
+      { over_outputs = Memory_zone.narrow c1.over_outputs c2.over_outputs;
+        over_inputs = Memory_zone.narrow c1.over_inputs c2.over_inputs;
+        under_outputs = Memory_zone.link c1.under_outputs c2.under_outputs;
         operational_inputs =
-          Zone.narrow c1.operational_inputs c2.operational_inputs; }
+          Memory_zone.narrow c1.operational_inputs c2.operational_inputs; }
 
   (* Inclusion testing: pointwise for over-approximations, counter-pointwise
      for under-approximations *)
   let is_included c1 c2 =
-    Zone.is_included c1.over_outputs c2.over_outputs &&
-    Zone.is_included c1.over_inputs c2.over_inputs &&
-    Zone.is_included c2.under_outputs c1.under_outputs &&
-    Zone.is_included c1.operational_inputs c2.operational_inputs
+    Memory_zone.is_included c1.over_outputs c2.over_outputs &&
+    Memory_zone.is_included c1.over_inputs c2.over_inputs &&
+    Memory_zone.is_included c2.under_outputs c1.under_outputs &&
+    Memory_zone.is_included c1.operational_inputs c2.operational_inputs
 
 end
 
@@ -139,12 +139,12 @@ module Transfer = struct
      the memory locations that have been written in a sure way in [c1],
      then perform the join. *)
   let catenate c1 c2 =
-    { over_outputs = Zone.join c1.over_outputs c2.over_outputs;
-      over_inputs = Zone.join c1.over_inputs c2.over_inputs;
-      under_outputs = Zone.link c1.under_outputs c2.under_outputs;
+    { over_outputs = Memory_zone.join c1.over_outputs c2.over_outputs;
+      over_inputs = Memory_zone.join c1.over_inputs c2.over_inputs;
+      under_outputs = Memory_zone.link c1.under_outputs c2.under_outputs;
       operational_inputs =
-        Zone.join c1.operational_inputs
-          (Zone.diff c2.operational_inputs c1.under_outputs);
+        Memory_zone.join c1.operational_inputs
+          (Memory_zone.diff c2.operational_inputs c1.under_outputs);
     }
 
   (* Effects of a conditional [if (e)]. [to_z] converts the lvalues present
@@ -153,9 +153,9 @@ module Transfer = struct
   let effects_assume to_z e =
     let inputs = Eva_ast.PreciseDepsOf.zone_of_exp to_z e in
     {
-      over_outputs = Zone.bottom;
+      over_outputs = Memory_zone.bottom;
       over_inputs = inputs;
-      under_outputs = Zone.bottom;
+      under_outputs = Memory_zone.bottom;
       operational_inputs = inputs;
     }
 
@@ -166,7 +166,7 @@ module Transfer = struct
     let inputs_lv =
       Eva_ast.PreciseDepsOf.indirect_zone_of_lval to_z lv.Eval.lval
     in
-    let inputs = Zone.join inputs_e inputs_lv in
+    let inputs = Memory_zone.join inputs_e inputs_lv in
     let outputs =
       Precise_locs.enumerate_valid_bits Locations.Write lv.Eval.lloc
     in
@@ -174,7 +174,7 @@ module Transfer = struct
     {
       over_outputs = outputs;
       over_inputs = inputs;
-      under_outputs = if exact_outputs then outputs else Zone.bottom;
+      under_outputs = if exact_outputs then outputs else Memory_zone.bottom;
       operational_inputs = inputs;
     }
 
@@ -186,7 +186,7 @@ module Transfer = struct
         (fun acc v -> Base.Set.add (Base.of_varinfo v) acc)
         Base.Set.empty vars
     in
-    let rm = Zone.filter_base (fun b -> not (Base.Set.mem b bases)) in {
+    let rm = Memory_zone.filter_base (fun b -> not (Base.Set.mem b bases)) in {
       over_outputs = rm state.over_outputs;
       over_inputs = rm state.over_inputs;
       under_outputs = rm state.under_outputs;
@@ -255,8 +255,8 @@ module Domain = struct
   let extract_lval ~oracle:_ _context _state _lv _locs = top_query
 
   let overwrite bases ~on:state ~by:_ =
-    let zone = Zone.of_bases bases in
-    { state with over_outputs = Zone.join state.over_outputs zone; }
+    let zone = Memory_zone.of_bases bases in
+    { state with over_outputs = Memory_zone.join state.over_outputs zone; }
 end
 
 include Domain

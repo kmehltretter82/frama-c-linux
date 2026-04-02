@@ -13,14 +13,14 @@ open Pdg_types
 open PdgTypes
 (** Types data_state and Node.t come from this module *)
 
-val make : PdgTypes.LocInfo.t -> Locations.Zone.t -> data_state
+val make : PdgTypes.LocInfo.t -> Memory_zone.t -> data_state
 val empty : data_state
 val bottom: data_state
 
 val add_loc_node :
-  data_state -> exact:bool -> Locations.Zone.t -> Node.t -> data_state
+  data_state -> exact:bool -> Memory_zone.t -> Node.t -> data_state
 val add_init_state_input :
-  data_state -> Locations.Zone.t -> Node.t -> data_state
+  data_state -> Memory_zone.t -> Node.t -> data_state
 
 
 (** Kind of 'join' of the two states
@@ -32,7 +32,8 @@ val test_and_merge :
 
 (** @raise Cannot_fold if the state is Top *)
 val get_loc_nodes :
-  data_state -> Locations.Zone.t -> (Node.t * Locations.Zone.t option) list * Locations.Zone.t option
+  data_state -> Memory_zone.t ->
+  (Node.t * Memory_zone.t option) list * Memory_zone.t option
 
 val pretty : Format.formatter -> data_state -> unit
 

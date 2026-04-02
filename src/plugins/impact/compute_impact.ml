@@ -32,7 +32,7 @@ let kfmns_find_default key m =
 type todo = {
   kf: kernel_function (* kernel_function in which the node can be found *);
   pdg: PdgTypes.Pdg.t (* pdg of this kernel_function *);
-  zone: Locations.Zone.t (* fragment of the node that is impacted *);
+  zone: Memory_zone.t (* fragment of the node that is impacted *);
   init: bool (* is this node in the worklist only because it is part of the
                 nodes initially selected as source? The initial nodes are not
                 in the final result, but must be present in intermediate
@@ -86,7 +86,7 @@ type worklist = {
                                          been found. The impact on upward calls to those callees
                                          will have to be computed again. *);
 
-  skip: Locations.Zone.t (** Locations for which the impact is
+  skip: Memory_zone.t (** Locations for which the impact is
                              dismissed. Nodes that involve only those zones
                              are skipped. Constant after initialization *);
 
@@ -159,14 +159,14 @@ let node_to_skip skip n =
   | Key.SigKey (Signature.Out (Signature.OutLoc z))
   | Key.SigCallKey (_, Signature.In (Signature.InImpl z))
   | Key.SigCallKey (_, Signature.Out (Signature.OutLoc z)) ->
-    Locations.Zone.equal Locations.Zone.bottom
-      (Locations.Zone.diff z skip)
+    Memory_zone.equal Memory_zone.bottom
+      (Memory_zone.diff z skip)
   | _ -> false
 
 (** Auxiliary function, used to refuse some nodes that should not go in
     the results *)
 let filter wl (n, z) =
-  not (Locations.Zone.is_bottom z) &&
+  not (Memory_zone.is_bottom z) &&
   match Pdg.Api.node_key n with
   | Key.SigKey (Signature.In Signature.InCtrl) -> false
   (* do not consider node [InCtrl]. YYY: find when this may happen *)
@@ -207,7 +207,7 @@ let add_to_do_aux ~init wl kf pdg (pn, zone as n) =
       let cur = NM.find pn wl.todo in
       (* Node is already in the todo list. Check init field and zone *)
       if (cur.init = true && init = false) ||
-         (not (Locations.Zone.is_included zone cur.zone))
+         (not (Memory_zone.is_included zone cur.zone))
       then begin
         (* overwrite the existing binding in the todo list *)
         Options.debug ~level:2 "todo list node %t is now init=false" pp;
@@ -272,11 +272,11 @@ let intraprocedural_one_node wl (node, z as nsrc) kf pdg =
        (* Filter edge according to the subzone of the node that is impacted *)
        let follow = match zopt with
          | None -> true
-         | Some z' -> Locations.Zone.intersects z z'
+         | Some z' -> Memory_zone.intersects z z'
        in
        if follow then begin
          (* YYY: is it possible to compute a refinement on this zone? *)
-         let ndst = (n, Locations.Zone.top) in
+         let ndst = (n, Memory_zone.top) in
          add_to_reason wl ~nsrc ~ndst (Intraprocedural dpd);
          add_to_do wl kf pdg ndst;
        end
@@ -331,11 +331,11 @@ let downward_one_call_node wl (pnode, _ as node) caller_kf pdg =
              (match key with
               | Signature.In (Signature.InNum n) ->
                 (try [Pdg.Api.find_input_node called_pdg n,
-                      Locations.Zone.top]
+                      Memory_zone.top]
                  with Not_found -> [])
               | Signature.In Signature.InCtrl ->
                 (try [Pdg.Api.find_entry_point_node called_pdg,
-                      Locations.Zone.top]
+                      Memory_zone.top]
                  with Not_found -> [])
               | Signature.In (Signature.InImpl _) -> assert false
               | Signature.Out _ -> []
@@ -369,8 +369,8 @@ let downward_one_call_node wl (pnode, _ as node) caller_kf pdg =
 
 (* TODO: document *)
 let zone_restrict set_src_impact =
-  let aux (_, z) acc = Locations.Zone.join z acc in
-  NS.fold aux set_src_impact Locations.Zone.bottom
+  let aux (_, z) acc = Memory_zone.join z acc in
+  NS.fold aux set_src_impact Memory_zone.bottom
 
 
 (** Propagate impact for one call registered in [downward_calls].  If the set
@@ -488,7 +488,7 @@ let upward_in_callers wl =
 (* -------------------------------------------------------------------------- *)
 
 (** Compute the initial state of the worklist. *)
-let initial_worklist ?(skip=Locations.Zone.bottom) ?(reason=false) nodes kf =
+let initial_worklist ?(skip=Memory_zone.bottom) ?(reason=false) nodes kf =
   let initial =
     KFM.add kf
       (List.fold_left (fun s n -> NS.add' n s) NS.empty nodes)
@@ -621,7 +621,7 @@ let impact ?skip ?reason nodes kf =
 (* -------------------------------------------------------------------------- *)
 
 (** Impact of a list of PDG nodes coming from the same function *)
-let nodes_impacted_by_nodes ?(skip=Locations.Zone.bottom) ?(restrict=Locations.Zone.top) ?(reason=false) kf nodes =
+let nodes_impacted_by_nodes ?(skip=Memory_zone.bottom) ?(restrict=Memory_zone.top) ?(reason=false) kf nodes =
   let nodes = List.map (fun n -> n, restrict) nodes in
   let r, unimpacted, initial, reason_graph = impact ~skip ~reason nodes kf in
   let pp_kf fmt (kf, ns) =
@@ -641,7 +641,7 @@ let nodes_impacted_by_nodes ?(skip=Locations.Zone.bottom) ?(restrict=Locations.Z
   r, unimpacted, reason_full
 
 (** Impact of a list stmts coming from the same function *)
-let nodes_impacted_by_stmts ?(skip=Locations.Zone.bottom) ?(restrict=Locations.Zone.top) ?(reason=false) kf stmts =
+let nodes_impacted_by_stmts ?(skip=Memory_zone.bottom) ?(restrict=Memory_zone.top) ?(reason=false) kf stmts =
   let nodes = List.map (initial_nodes ~skip kf) stmts in
   let nodes = List.concat nodes in
   Options.debug
@@ -669,12 +669,12 @@ let nodes_to_stmts ns =
 
 
 (** Impact of a list of statements as a set of statements *)
-let stmts_impacted ?(skip=Locations.Zone.bottom) ~reason kf stmts =
+let stmts_impacted ?(skip=Memory_zone.bottom) ~reason kf stmts =
   let r, _, _ = nodes_impacted_by_stmts ~skip ~reason kf stmts in
   nodes_to_stmts (result_to_nodes r)
 
 (** Impact of a list of PDG nodes as a set of nodes *)
-let nodes_impacted ?(skip=Locations.Zone.bottom) ~reason kf nodes =
+let nodes_impacted ?(skip=Memory_zone.bottom) ~reason kf nodes =
   let r, _, _ = nodes_impacted_by_nodes ~skip ~reason kf nodes in
   result_to_nodes r
 
@@ -685,10 +685,10 @@ let impact_in_kf (res: result) kf = kfmns_find_default kf res
 (** Computation of the [skip] field from a list of variables *)
 let skip_bases vars =
   let aux acc v =
-    let z = Locations.Zone.inject v Int_Intervals.top in
-    Locations.Zone.join z acc
+    let z = Memory_zone.inject v Int_Intervals.top in
+    Memory_zone.join z acc
   in
-  List.fold_left aux Locations.Zone.bottom vars
+  List.fold_left aux Memory_zone.bottom vars
 
 (** Computation of the [skip] field from the [-impact-skip] option *)
 let skip () =

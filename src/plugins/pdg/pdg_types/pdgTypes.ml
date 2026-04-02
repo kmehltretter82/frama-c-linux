@@ -20,7 +20,7 @@ module Node : sig
   (*val equivalent : t -> PdgIndex.Key.t -> bool*)
   val pretty_list : Format.formatter -> t list -> unit
   val pretty_with_part :
-    Format.formatter -> (t * Locations.Zone.t option) -> unit
+    Format.formatter -> (t * Memory_zone.t option) -> unit
   val pretty_node: Format.formatter -> t -> unit
   val make: PdgIndex.Key.t -> t
 end
@@ -77,7 +77,7 @@ end
     Format.fprintf fmt "%a" pretty n;
     match z_part with None -> ()
                     | Some z -> Format.fprintf fmt "(restrict to @[<h 1>%a@])"
-                                  Locations.Zone.pretty z
+                                  Memory_zone.pretty z
 
   let pretty_node fmt n =
     Format.fprintf fmt "@[<hov 2>{n%d}:@ %a@]" (id n)
@@ -205,16 +205,16 @@ module DpdZone : sig
   include Datatype.S
 
   val is_dpd : Dpd.td -> t -> bool
-  val make : Dpd.td -> Locations.Zone.t option -> t
-  val add : t -> Dpd.td -> Locations.Zone.t option -> t
-  val kind_and_zone : t -> Dpd.t * Locations.Zone.t option
-  val dpd_zone : t -> Locations.Zone.t option
+  val make : Dpd.td -> Memory_zone.t option -> t
+  val add : t -> Dpd.td -> Memory_zone.t option -> t
+  val kind_and_zone : t -> Dpd.t * Memory_zone.t option
+  val dpd_zone : t -> Memory_zone.t option
 
   val pretty : Format.formatter -> t -> unit
 end = struct
 
-  include Datatype.Pair(Dpd)(Datatype.Option(Locations.Zone))
-  (* None == Locations.Zone.Top *)
+  include Datatype.Pair(Dpd)(Datatype.Option(Memory_zone))
+  (* None == Memory_zone.Top *)
 
   let dpd_kind dpd = fst dpd
   let dpd_zone dpd = snd dpd
@@ -231,9 +231,9 @@ end = struct
       | Some zz1, Some zz2  ->
         (* we are losing some precision here because for instance :
          * (zz1, addr) + (zz2, data) = (zz1 U zz2, data+addr) *)
-        let zz = Locations.Zone.join zz1 zz2 in
+        let zz = Memory_zone.join zz1 zz2 in
         match zz with
-        | Locations.Zone.Top(_p, _o) -> None
+        | Memory_zone.Top(_p, _o) -> None
         | _ -> (* To share values as much as possible *)
           if (zz == zz1)      then z1
           else if (zz == zz2) then z
@@ -244,7 +244,7 @@ end = struct
     Dpd.pretty fmt (dpd_kind dpd);
     match (dpd_zone dpd) with None -> ()
                             | Some z ->
-                              Format.fprintf fmt "@[<h 1>(%a)@]" Locations.Zone.pretty z
+                              Format.fprintf fmt "@[<h 1>(%a)@]" Memory_zone.pretty z
 end
 
 (** The graph itself. *)
@@ -395,7 +395,7 @@ end
     Managed in src/pdg/state.ml
 *)
 type data_state =
-  { loc_info : LocInfo.t ; under_outputs : Locations.Zone.t }
+  { loc_info : LocInfo.t ; under_outputs : Memory_zone.t }
 
 module Data_state =
   Datatype.Make
@@ -409,13 +409,13 @@ module Data_state =
              List.fold_left
                (fun acc z -> { loc_info = l; under_outputs = z } :: acc)
                acc
-               Locations.Zone.reprs)
+               Memory_zone.reprs)
           []
           LocInfo.reprs
       let rehash = Datatype.identity
       let structural_descr =
         Structural_descr.t_record
-          [| LocInfo.packed_descr; Locations.Zone.packed_descr |]
+          [| LocInfo.packed_descr; Memory_zone.packed_descr |]
       let mem_project = Datatype.never_any_project
     end)
 
@@ -505,7 +505,7 @@ module Pdg = struct
     let do_it acc (_k, n) = f acc n in
     PdgIndex.Signature.fold do_it acc call_pdg
 
-  type dpd_info = (Node.t * Locations.Zone.t option)
+  type dpd_info = (Node.t * Memory_zone.t option)
 
   (** gives the list of nodes that depend to the given node, with a given
       kind of dependency if [dpd_type] is not [None]. The dependency kind is
@@ -693,7 +693,7 @@ module Pdg = struct
         | None -> attrib
         | Some z ->
           let txt =
-            Format.asprintf "@[<h 1>%a@]" Locations.Zone.pretty z in
+            Format.asprintf "@[<h 1>%a@]" Memory_zone.pretty z in
           (`Label (String.escaped txt)) :: attrib
       in
       let attrib =

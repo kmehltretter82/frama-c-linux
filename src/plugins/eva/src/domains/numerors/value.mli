@@ -20,6 +20,6 @@ module Make (Model : IEEE754.Modeling) : sig
   include Abstract_value.Leaf with type context = Model.Context.t
   val track_variable : Cil_types.varinfo -> bool
   val of_scalars : Cil_types.fkind -> Model.scalar -> Model.scalar -> t
-  val widen : Locations.Location_Bytes.widen_hint -> t -> t -> t
+  val widen : Addresses.Bytes.widen_hint -> t -> t -> t
   val builtins : (string * (context, t) builtin) list
 end

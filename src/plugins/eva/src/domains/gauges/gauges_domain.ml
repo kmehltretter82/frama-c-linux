@@ -947,7 +947,7 @@ module G = struct
     try
       let locb = loc.Locations.loc in
       (* Single pointer *)
-      let b, o = Locations.Location_Bits.find_lonely_binding locb in
+      let b, o = Addresses.Bits.find_lonely_binding locb in
       match b with
       | Base.Var (vi, Base.Known (_, max)) -> (* "standard" varinfos only *)
         if tracked_variable vi &&
@@ -1086,7 +1086,7 @@ module G = struct
       store_gauge b g state
     with Untranslatable ->
     try
-      Locations.Location_Bits.fold_topset_ok
+      Addresses.Bits.fold_topset_ok
         (fun b _ state -> kill_base b state) loc.Locations.loc state
     with Abstract_interp.Error_Top -> top state
 
@@ -1130,7 +1130,7 @@ module D : Abstract_domain.Leaf
       try Base.to_varinfo b :: acc
       with Base.Not_a_C_variable (* NULL *) -> acc
     in
-    let vars = Locations.Location_Bits.fold_topset_ok aux_base loc [] in
+    let vars = Addresses.Bits.fold_topset_ok aux_base loc [] in
     remove_variables vars state
 
   let assume_exp valuation e r state =

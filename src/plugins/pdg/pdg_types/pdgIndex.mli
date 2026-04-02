@@ -44,13 +44,13 @@ module Signature : sig
     private
     | InCtrl (** input control point *)
     | InNum of int (** parameters numbered from 1 *)
-    | InImpl of Locations.Zone.t (** key for implicit inputs.
+    | InImpl of Memory_zone.t (** key for implicit inputs.
                                      Used in function signatures only *)
 
   type out_key =
     private
     | OutRet (** key for the output corresponding to the [return] *)
-    | OutLoc of Locations.Zone.t (** key for output locations.
+    | OutLoc of Memory_zone.t (** key for output locations.
                                      used in call signatures only  *)
 
   (** a key represents either an input or an output of a function. *)
@@ -59,7 +59,7 @@ module Signature : sig
   val empty : 'a t
   (** build a new, empty signature *)
 
-  val mk_undef_in_key : Locations.Zone.t -> in_key
+  val mk_undef_in_key : Memory_zone.t -> in_key
 
   val cmp_in_key : in_key -> in_key -> int
   val cmp_out_key : out_key -> out_key -> int
@@ -76,9 +76,9 @@ module Signature : sig
   val fold : ('a -> key * 'b -> 'a) -> 'a -> 'b t -> 'a
   val fold_num_inputs : ('a -> int * 'b -> 'a) -> 'a -> 'b t -> 'a
   val fold_impl_inputs :
-    ('a -> Locations.Zone.t * 'b -> 'a) -> 'a -> 'b t -> 'a
-  val fold_matching_impl_inputs : Locations.Zone.t ->
-    ('a -> Locations.Zone.t * 'b -> 'a) -> 'a -> 'b t -> 'a
+    ('a -> Memory_zone.t * 'b -> 'a) -> 'a -> 'b t -> 'a
+  val fold_matching_impl_inputs : Memory_zone.t ->
+    ('a -> Memory_zone.t * 'b -> 'a) -> 'a -> 'b t -> 'a
   val fold_all_inputs : ('a -> in_key * 'b -> 'a) -> 'a -> 'b t -> 'a
   val fold_all_outputs : ('a -> out_key * 'b -> 'a) -> 'a -> 'b t -> 'a
 
@@ -108,12 +108,12 @@ module Key : sig
   include Datatype.S with type t = key
 
   val param_key : int -> t
-  val implicit_in_key : Locations.Zone.t -> t
+  val implicit_in_key : Memory_zone.t -> t
   val entry_point : t
   val top_input : t
   val output_key : t
 
-  val out_from_key : Locations.Zone.t -> t
+  val out_from_key : Memory_zone.t -> t
 
   val decl_var_key : Cil_types.varinfo -> t
   val label_key : Cil_types.stmt -> Cil_types.label -> t
@@ -121,7 +121,7 @@ module Key : sig
 
   val call_key : Cil_types.stmt -> t
   val call_input_key : Cil_types.stmt -> int -> t
-  val call_output_key : Cil_types.stmt -> Locations.Zone.t -> t
+  val call_output_key : Cil_types.stmt -> Memory_zone.t -> t
   val call_outret_key : Cil_types.stmt -> t
   val call_ctrl_key : Cil_types.stmt -> t
   val call_topin_key : Cil_types.stmt -> t

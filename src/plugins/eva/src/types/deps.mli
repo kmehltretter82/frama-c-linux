@@ -8,9 +8,9 @@
 
 (** Memory dependencies of an expression. *)
 type t = {
-  data: Locations.Zone.t;
+  data: Memory_zone.t;
   (** Memory zone directly required to evaluate the given expression. *)
-  indirect: Locations.Zone.t;
+  indirect: Memory_zone.t;
   (** Memory zone read to compute data addresses. *)
 }
 
@@ -22,21 +22,21 @@ val pretty_precise: Format.formatter -> t -> unit
 
 val top : t
 val bottom : t
-val data : Locations.Zone.t -> t
-val indirect : Locations.Zone.t -> t
+val data : Memory_zone.t -> t
+val indirect : Memory_zone.t -> t
 
 (* Conversion *)
 
-val to_zone : t -> Locations.Zone.t
+val to_zone : t -> Memory_zone.t
 
 (* Mutators *)
 
-val add_data : t -> Locations.Zone.t -> t
-val add_indirect : t -> Locations.Zone.t -> t
+val add_data : t -> Memory_zone.t -> t
+val add_indirect : t -> Memory_zone.t -> t
 
 (* Map *)
 
-val map : (Locations.Zone.t -> Locations.Zone.t) -> t -> t
+val map : (Memory_zone.t -> Memory_zone.t) -> t -> t
 
 (* Lattice operators *)
 

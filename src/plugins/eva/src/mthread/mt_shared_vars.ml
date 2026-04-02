@@ -54,7 +54,7 @@ let keep_base b =
 (* We are only interested in globals, and remove locals, formals, and special
    frama-c variables on the fly *)
 let remove_uninteresting_variables_zone z =
-  Zone.filter_base keep_base z
+  Memory_zone.filter_base keep_base z
 let remove_uninteresting_variables_loc loc =
   Locations.filter_base keep_base loc
 
@@ -80,18 +80,18 @@ let filter_inout_access =
   in
   Inout_access.mk_filter ~filter_base
 
-let read_written_by_thread ?(watch_only=Locations.Zone.top) sm th =
+let read_written_by_thread ?(watch_only=Memory_zone.top) sm th =
   let open Current_loc.Operators in
 
   let add stmt op zone acc =
-    if Locations.Zone.is_bottom zone then
+    if Memory_zone.is_bottom zone then
       (* Do nothing *) acc
-    else if Locations.Zone.is_top zone then
+    else if Memory_zone.is_top zone then
       let () = error_io_whole_memory op in
       acc
     else
       let zone = remove_uninteresting_variables_zone zone in
-      let zone = Locations.Zone.narrow zone watch_only in
+      let zone = Memory_zone.narrow zone watch_only in
       let state = AccessesByZone.Map acc in
       let v = SetStmtIdAccess.inject_singleton (op, stmt, th) in
       match AccessesByZone.add_binding state ~exact:false zone v with
@@ -128,7 +128,7 @@ type collect_params = {
   thread: thread;
   mode: mode;
   iter_requests: stmt -> (Results.request -> unit) -> unit;
-  watch_only: Locations.Zone.t;
+  watch_only: Memory_zone.t;
 }
 
 (* Visitor that collects all reads and assignments done by the functions.
@@ -157,11 +157,11 @@ class do_it cp =
 
 
     method private add_access op z =
-      if not (Locations.Zone.equal Locations.Zone.top z) then (
+      if not (Memory_zone.equal Memory_zone.top z) then (
         let stmt = self#cur_stmt in
         if cp.stmt_multithread stmt then
           let interesting = remove_uninteresting_variables_zone z in
-          let concurrent = Locations.Zone.narrow interesting cp.watch_only in
+          let concurrent = Memory_zone.narrow interesting cp.watch_only in
           let state = AccessesByZone.Map result in
           let v =
             SetStmtIdAccess.inject_singleton (op, stmt, cp.thread)
@@ -205,7 +205,7 @@ class do_it cp =
            let deps = Results.(address_deps lv request) in
            self#add_access Read deps;
            let loc = Results.(eval_address lv request |> as_location) in
-           if Location_Bits.(equal loc.loc top) then
+           if Addresses.Bits.(equal loc.loc top) then
              Mt_self.warning ~current:true ~once:true
                "Problem with %a: its writing location is completely unknown."
                Printer.pp_lval lv;
@@ -291,8 +291,8 @@ class do_it cp =
         (* Compute the zones written by the assigns *)
         (match assigns with
          | WritesAny ->
-           let top = Locations.make_loc Location_Bits.top Z_or_top.top in
-           self#add_access (Write top) Zone.top;
+           let top = Locations.make_loc Addresses.Bits.top Z_or_top.top in
+           self#add_access (Write top) Memory_zone.top;
 
          | Writes assigns' ->
            let aux l =
@@ -349,7 +349,7 @@ let aux_visitor sm th sa watch_only =
   } in
   new do_it cp
 
-let read_written_by_function sm th sa ?(watch_only=Locations.Zone.top) kf ki =
+let read_written_by_function sm th sa ?(watch_only=Memory_zone.top) kf ki =
   let comp = aux_visitor sm th sa watch_only in
   (* We position the current statement for calls to leaf functions *)
   (match ki with
@@ -387,13 +387,13 @@ sig
   module Set: Lattice_type.Lattice_Set with type O.elt = Access.t
   module ZoneMap: Lmap_bitwise.Location_map_bitwise with type v = Set.t
 
-  type list_accesses = (Locations.Zone.t * Set.t) list
+  type list_accesses = (Memory_zone.t * Set.t) list
 
   val pretty_concurrent_accesses :
     ?f:Access.t Pretty_utils.formatter ->
     unit -> Format.formatter -> list_accesses -> unit
 
-  val all_zones_accessed : list_accesses -> Locations.Zone.t
+  val all_zones_accessed : list_accesses -> Memory_zone.t
 
   val concurrent_accesses_all_threads :
     Mt_thread.ThreadState.t list ->
@@ -436,11 +436,11 @@ struct
         let l = Int_Intervals.project_set itvs in
         let by_size = H.create 4 in
         let aux_itv (ib, ie) =
-          let loc = Location_Bits.inject b (Ival.inject_singleton ib) in
+          let loc = Addresses.Bits.inject b (Ival.inject_singleton ib) in
           let size = Z.succ (Z.sub ie ib) in
           try
             let prev = H.find by_size size in
-            let loc = Location_Bits.join prev loc in
+            let loc = Addresses.Bits.join prev loc in
             H.replace by_size size loc
           with Not_found -> H.add by_size size loc
         in
@@ -451,7 +451,7 @@ struct
              f loc v acc
           ) by_size acc
       with Abstract_interp.Error_Top ->
-        let locb = Location_Bits.inject b Ival.zero in
+        let locb = Addresses.Bits.inject b Ival.zero in
         let size = Z_or_top.top (* TODO : use validity *) in
         let loc = Locations.make_loc locb size in
         f loc v acc
@@ -547,7 +547,7 @@ struct
       ~cache ~symmetric ~idempotent ~empty_neutral decide_fast X.Set.join
 
   type list_accesses =
-    (Locations.Zone.t * X.Set.t) list
+    (Memory_zone.t * X.Set.t) list
 
   (* Compute all the concurrent accesses to all the variables. For each
      thread, we consider its possible concurrent accesses with all
@@ -602,13 +602,13 @@ struct
       Format.fprintf fmt "@[<v 1>%a@]"
         (Pretty_utils.pp_list ~sep:"@ "
            (fun fmt (z, s) -> Format.fprintf fmt "@[<v 0>%a:@ @[<hov>%a@]@]"
-               Locations.Zone.pretty z (X.Set.pretty_aux f) s
+               Memory_zone.pretty z (X.Set.pretty_aux f) s
            ))
         l
 
   let all_zones_accessed (l: list_accesses) =
-    let aux acc (z, _) = Locations.Zone.join z acc in
-    List.fold_left aux Locations.Zone.bottom l
+    let aux acc (z, _) = Memory_zone.join z acc in
+    List.fold_left aux Memory_zone.bottom l
 
 end
 
@@ -661,7 +661,7 @@ module Precise = struct
         Mt_types.RW.pretty op Locations.pretty loc;
       []
     | `Value size ->
-      Location_Bits.fold_topset_ok
+      Addresses.Bits.fold_topset_ok
         (fun base offs acc ->
            let validity = Base.validity base in
            if Base.Validity.equal Base.Invalid validity then
@@ -770,8 +770,8 @@ module Precise = struct
     let update_zones n =
       let filtered = SetZoneAccess.filter
           (fun (_, z) ->
-             not (Locations.Zone.equal Locations.Zone.bottom
-                    (Locations.Zone.narrow all_zones z)))
+             not (Memory_zone.equal Memory_zone.bottom
+                    (Memory_zone.narrow all_zones z)))
           n.cfgn_var_access.concur_accesses
       in
       let kind =

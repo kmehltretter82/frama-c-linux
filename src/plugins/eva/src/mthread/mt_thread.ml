@@ -184,16 +184,16 @@ type analysis_state = {
    by another, because of a slightly too restricted signature in the
    value analysis. *);
 
-  mutable concurrent_accesses: Locations.Zone.t
+  mutable concurrent_accesses: Memory_zone.t
 (* Shared variables that have been detected in the analysis so far
    in a global manner *);
 
-  mutable precise_concurrent_accesses: Locations.Zone.t
+  mutable precise_concurrent_accesses: Memory_zone.t
 (* Shared variables that have been detected in the analysis so far,
    through the various cfgs. Subset of the previous field *);
 
   mutable concurrent_accesses_by_nodes:
-    (Locations.Zone.t * SetNodeIdAccess.t) list
+    (Memory_zone.t * SetNodeIdAccess.t) list
 (* List of concurrent accesses that have been found. Used to
    compute the field [precise_concurrent_accesses] *);
 }

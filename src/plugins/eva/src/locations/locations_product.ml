@@ -47,7 +47,7 @@ module Make
           Right.pretty_loc r Z.pretty rsize
 
   let enumerate_valid_bits access (l, r) =
-    Locations.Zone.narrow
+    Memory_zone.narrow
       (Left.enumerate_valid_bits access l)
       (Right.enumerate_valid_bits access r)
 

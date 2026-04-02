@@ -38,7 +38,7 @@ let main _ =
   let _data_nodes = g_nodes @ data_nodes in
   let undef = match undef with None -> assert false | Some z -> z in
   Format.printf "Warning : cannot select %a in this function...@\n"
-    Locations.Zone.pretty undef;
+    Memory_zone.pretty undef;
   Format.printf "%a@." (Pdg.Api.pretty ~bw:false) pdg;
   Pdg.Api.extract pdg "dyn_dpds_1.dot"
 

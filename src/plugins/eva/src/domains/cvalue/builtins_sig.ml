@@ -26,7 +26,7 @@ module type API = sig
     c_clobbered: Base.SetLattice.t;
     (** An over-approximation of the bases in which addresses of local variables
         might have been written *)
-    c_assigns: (Assigns.t * Locations.Zone.t) option;
+    c_assigns: (Assigns.t * Memory_zone.t) option;
     (** If not None:
         - the assigns of the function, i.e. the dependencies of the result
           and of each zone written to.

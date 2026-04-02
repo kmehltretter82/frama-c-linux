@@ -38,7 +38,7 @@ module PLoc = struct
     let ploc_bits = Precise_locs.inject_location_bits loc.Locations.loc in
     Precise_locs.make_precise_loc ploc_bits ~size:loc.Locations.size
 
-  let top = make (Locations.make_loc Locations.Location_Bits.top `Top)
+  let top = make (Locations.make_loc Addresses.Bits.top `Top)
 
   let assume_no_overlap ~partial l1 l2 =
     let loc1 = Precise_locs.imprecise_location l1
@@ -97,7 +97,7 @@ module PLoc = struct
     else `Value loc
 
   let join_loc value loc =
-    let loc = Locations.(Location_Bits.join loc (loc_bytes_to_loc_bits value)) in
+    let loc = Locations.(Addresses.Bits.join loc (loc_bytes_to_loc_bits value)) in
     Precise_locs.inject_location_bits loc
 
   let forward_variable typ_offset host offset =
@@ -107,7 +107,7 @@ module PLoc = struct
       let loc_pr = Precise_locs.combine_base_precise_offset base offset in
       make_precise_loc loc_pr typ_offset
     | Imprecise value ->
-      let loc_b = Locations.Location_Bits.inject base Ival.zero in
+      let loc_b = Addresses.Bits.inject base Ival.zero in
       let loc_pr = join_loc value loc_b in
       make_precise_loc loc_pr typ_offset
 
@@ -146,7 +146,7 @@ module PLoc = struct
   let backward_variable varinfo location =
     let loc = Precise_locs.imprecise_location location in
     let base = Base.of_varinfo varinfo in
-    let ival = Locations.(Location_Bits.find base loc.loc) in
+    let ival = Locations.(Addresses.Bits.find base loc.loc) in
     if Ival.is_bottom ival
     then `Bottom
     else `Value (Precise (Precise_locs.inject_ival ival))
@@ -166,11 +166,11 @@ module PLoc = struct
          As the offset does not contain addresses, we can make the pointwise
          subtraction between the two locations. *)
       let value_bits = Locations.loc_bytes_to_loc_bits mem in
-      let new_off = Locations.Location_Bits.sub_pointwise loc value_bits in
+      let new_off = Addresses.Bits.sub_pointwise loc value_bits in
       let new_off = Ival.narrow new_off off_ival in
       let new_off = Precise_locs.inject_ival new_off in
       (* new_mem = (location - offset) * 8 *)
-      let new_mem = Locations.Location_Bits.shift (Ival.neg_int off_ival) loc in
+      let new_mem = Addresses.Bits.shift (Ival.neg_int off_ival) loc in
       let new_mem = Locations.loc_bits_to_loc_bytes new_mem in
       if Cvalue.V.is_bottom new_mem || Precise_locs.is_bottom_offset new_off
       then `Bottom

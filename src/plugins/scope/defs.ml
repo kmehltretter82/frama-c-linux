@@ -35,7 +35,7 @@ let _pp_list_node_underout prefix fmt =
        | None -> PdgTypes.Node.pretty fmt n
        | Some undef ->
          Format.fprintf fmt "%a {underout %a}"
-           PdgTypes.Node.pretty n Locations.Zone.pretty undef)
+           PdgTypes.Node.pretty n Memory_zone.pretty undef)
     fmt
 
 let _pp_set prefix fmt =
@@ -57,7 +57,7 @@ let rec add_callee_nodes z acc nodes =
                  | PdgIndex.Signature.OutLoc out ->
                    (* [out] might be an over-approximation of the location
                       we are searching for. We refine the search if needed. *)
-                   let z = Locations.Zone.narrow out z in
+                   let z = Memory_zone.narrow out z in
                    fst (Pdg.Api.find_location_nodes_at_end callee_pdg z)
                  | PdgIndex.Signature.OutRet -> (* probably never occurs *)
                    fst (Pdg.Api.find_output_nodes callee_pdg out_key)
@@ -80,7 +80,7 @@ let rec add_caller_nodes z kf acc (undef, nodes) =
   let join_undef u u' = match u, u' with
     | _, None -> u
     | None, Some _ -> u'
-    | Some z, Some z' -> Some (Locations.Zone.join z z')
+    | Some z, Some z' -> Some (Memory_zone.join z z')
   in
   let add_one_call_nodes pdg (acc_undef, acc) stmt =
     let acc_undef, acc = match undef with
@@ -104,7 +104,7 @@ let rec add_caller_nodes z kf acc (undef, nodes) =
             let n = Pdg.Api.find_call_input_node pdg stmt n_param in
             acc_undef, NSet.add n acc
           | PdgIndex.Signature.InImpl z' ->
-            let z = Locations.Zone.narrow z z' in
+            let z = Memory_zone.narrow z z' in
             let nodes, undef'= Pdg.Api.find_location_nodes_at_stmt
                 pdg stmt ~before:true z
             in
@@ -124,7 +124,7 @@ let rec add_caller_nodes z kf acc (undef, nodes) =
 
 let compute_aux kf stmt zone =
   debug1 "[Defs.compute] for %a at sid:%d in '%a'@."
-    Locations.Zone.pretty zone stmt.sid Kernel_function.pretty kf;
+    Memory_zone.pretty zone stmt.sid Kernel_function.pretty kf;
   try
     let pdg = Pdg.Api.get kf in
     let nodes, undef =

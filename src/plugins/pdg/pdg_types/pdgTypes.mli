@@ -60,7 +60,7 @@ module Node : sig
   (*val equivalent : t -> PdgIndex.Key.t -> bool*)
   val pretty_list : Format.formatter -> t list -> unit
   val pretty_with_part :
-    Format.formatter -> (t * Locations.Zone.t option) -> unit
+    Format.formatter -> (t * Memory_zone.t option) -> unit
   val pretty_node: Format.formatter -> t -> unit
 end
 
@@ -85,7 +85,7 @@ module G : sig
 
   val add_elem : t -> PdgIndex.Key.t -> Node.t
   val add_dpd :
-    t -> Node.t -> Dpd.td -> Locations.Zone.t option -> Node.t -> unit
+    t -> Node.t -> Dpd.td -> Memory_zone.t option -> Node.t -> unit
 end
 
 module NodeSetLattice : sig
@@ -100,7 +100,7 @@ module LocInfo :
     and provides a mapping between a location and some nodes in the PDG
     that are used to compute the location value at that point. *)
 type data_state =
-  { loc_info : LocInfo.t ; under_outputs : Locations.Zone.t }
+  { loc_info : LocInfo.t ; under_outputs : Memory_zone.t }
 
 module Pdg : sig
 
@@ -134,7 +134,7 @@ module Pdg : sig
 
   (** a dependency to another node. The dependency can be restricted to a zone.
       (None means no restriction ie. total dependency) *)
-  type dpd_info = (Node.t * Locations.Zone.t option)
+  type dpd_info = (Node.t * Memory_zone.t option)
 
   val get_all_direct_dpds : t -> Node.t -> dpd_info list
   val get_x_direct_dpds : Dpd.td -> t -> Node.t -> dpd_info list
@@ -143,11 +143,11 @@ module Pdg : sig
   val get_x_direct_codpds : Dpd.td -> t -> Node.t -> dpd_info list
 
   val fold_direct_dpds : t ->
-    ('a -> Dpd.t * Locations.Zone.t option -> Node.t -> 'a) ->
+    ('a -> Dpd.t * Memory_zone.t option -> Node.t -> 'a) ->
     'a -> Node.t -> 'a
 
   val fold_direct_codpds : t ->
-    ('a -> Dpd.t * Locations.Zone.t option -> Node.t -> 'a) ->
+    ('a -> Dpd.t * Memory_zone.t option -> Node.t -> 'a) ->
     'a -> Node.t -> 'a
 
   val pretty_bw : ?bw:bool -> Format.formatter -> t -> unit

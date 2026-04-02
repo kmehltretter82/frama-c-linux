@@ -41,7 +41,7 @@ val remove_node_deps : t -> node -> unit
 
 val update_node_values : t -> node ->
   typ:Cil_types.typ ->
-  cvalue:Locations.Location_Bytes.t -> taint:Eva.Results.taint option -> unit
+  cvalue:Addresses.Bytes.t -> taint:Eva.Results.taint option -> unit
 val set_node_writes : t -> node -> origin list -> unit
 
 val set_update_hook : t -> (element -> unit) -> unit

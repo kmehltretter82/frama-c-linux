@@ -14,11 +14,11 @@
 open PdgIndex
 
 type select_elem =
-  | SelNode of PdgTypes.Node.t * Locations.Zone.t option
+  | SelNode of PdgTypes.Node.t * Memory_zone.t option
   (** zone is [Some z] only for nodes that
    * represent call output in case we want to
    * select less than the whole OutCall *)
-  | SelIn of Locations.Zone.t
+  | SelIn of Memory_zone.t
 
 type 'tm select = (select_elem * 'tm) list
 
@@ -44,7 +44,7 @@ let add_undef_in_to_select select undef m =
   match undef with
   | None -> select
   | Some loc ->
-    if (Locations.Zone.equal Locations.Zone.bottom loc) then select
+    if (Memory_zone.equal Memory_zone.bottom loc) then select
     else add_to_select select (mk_select_undef_zone loc) m
 
 (** Type of the module that the user has to provide to describe the marks.  *)
@@ -171,7 +171,7 @@ module F_Fct (M : Mark)
         let cmp =
           match key, k with
           | Signature.OutLoc z, Signature.OutLoc zone ->
-            if Locations.Zone.equal z zone then 0 else 1
+            if Memory_zone.equal z zone then 0 else 1
           | _ -> Signature.cmp_out_key key k
         in
         if cmp = 0 then (key, M.merge m mark)::tl
@@ -212,7 +212,7 @@ module F_Fct (M : Mark)
         | Some z ->
           match node_key with
           | Key.SigCallKey (call, Signature.Out (Signature.OutLoc out_z)) ->
-            let z = Locations.Zone.narrow z out_z in
+            let z = Memory_zone.narrow z out_z in
             Key.call_output_key (Key.call_from_id call) z
           | _ -> node_key
       in

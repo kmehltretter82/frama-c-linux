@@ -156,38 +156,38 @@ let shift_offset shift po =
 
 type precise_location_bits =
   | PLBottom
-  | PLLoc of Location_Bits.t
+  | PLLoc of Addresses.Bits.t
   | PLVarOffset of Base.t * precise_offset
-  | PLLocOffset of Location_Bits.t * precise_offset
+  | PLLocOffset of Addresses.Bits.t * precise_offset
 
 let pretty_loc_bits fmt = function
   | PLBottom -> Format.fprintf fmt "[Bot]"
-  | PLLoc loc -> Format.fprintf fmt "[%a]" Location_Bits.pretty loc
+  | PLLoc loc -> Format.fprintf fmt "[%a]" Addresses.Bits.pretty loc
   | PLVarOffset (b, po) ->
     Format.fprintf fmt "[%a+%a]" Base.pretty b pretty_offset po
   | PLLocOffset (loc, po) ->
-    Format.fprintf fmt "[%a+%a]" Location_Bits.pretty loc pretty_offset po
+    Format.fprintf fmt "[%a+%a]" Addresses.Bits.pretty loc pretty_offset po
 
 let equal_loc_bits l1 l2 = match l1, l2 with
   | PLBottom, PLBottom -> true
-  | PLLoc l1, PLLoc l2 -> Location_Bits.equal l1 l2
+  | PLLoc l1, PLLoc l2 -> Addresses.Bits.equal l1 l2
   | PLVarOffset (b1, o1), PLVarOffset (b2, o2) ->
     Base.equal b1 b2 && equal_offset o1 o2
   | PLLocOffset (l1, o1), PLLocOffset (l2, o2) ->
-    Location_Bits.equal l1 l2 && equal_offset o1 o2
+    Addresses.Bits.equal l1 l2 && equal_offset o1 o2
   | _, _ -> false
 
 let bottom_location_bits = PLBottom
 
 let cardinal_zero_or_one_location_bits = function
   | PLBottom -> true
-  | PLLoc loc -> Location_Bits.cardinal_zero_or_one loc
+  | PLLoc loc -> Addresses.Bits.cardinal_zero_or_one loc
   | PLVarOffset (_, po) -> cardinal_zero_or_one_offset po
   | PLLocOffset (loc, po) ->
-    Location_Bits.cardinal_zero_or_one loc && cardinal_zero_or_one_offset po
+    Addresses.Bits.cardinal_zero_or_one loc && cardinal_zero_or_one_offset po
 
 let inject_location_bits loc =
-  if Location_Bits.is_bottom loc then PLBottom else PLLoc loc
+  if Addresses.Bits.is_bottom loc then PLBottom else PLLoc loc
 
 let combine_base_precise_offset base po =
   match po with
@@ -196,7 +196,7 @@ let combine_base_precise_offset base po =
 
 let combine_loc_precise_offset loc po =
   try
-    let base, ival = Location_Bits.find_lonely_key loc in
+    let base, ival = Addresses.Bits.find_lonely_key loc in
     begin match shift_offset ival po with
       | POBottom -> PLBottom
       | po -> PLVarOffset (base, po)
@@ -205,21 +205,21 @@ let combine_loc_precise_offset loc po =
   match po with
   | POBottom      -> PLBottom
   | POZero        -> PLLoc loc
-  | POImprecise i -> PLLoc (Location_Bits.shift i loc)
-  | POSingleton i -> PLLoc (Location_Bits.shift (Ival.inject_singleton i) loc)
-  | POPrecise (i, _c) when Location_Bits.cardinal_zero_or_one loc ->
-    PLLoc (Location_Bits.shift i loc)
+  | POImprecise i -> PLLoc (Addresses.Bits.shift i loc)
+  | POSingleton i -> PLLoc (Addresses.Bits.shift (Ival.inject_singleton i) loc)
+  | POPrecise (i, _c) when Addresses.Bits.cardinal_zero_or_one loc ->
+    PLLoc (Addresses.Bits.shift i loc)
   | POPrecise (_, c) | POShift (_, _, c) ->
-    match Location_Bits.cardinal loc with
+    match Addresses.Bits.cardinal loc with
     | Some card when small_cardinal (Z.mul card c) -> PLLocOffset (loc, po)
-    | _ -> PLLoc (Location_Bits.shift (imprecise_offset po) loc)
+    | _ -> PLLoc (Addresses.Bits.shift (imprecise_offset po) loc)
 
 
 let imprecise_location_bits = function
-  | PLBottom -> Location_Bits.bottom
+  | PLBottom -> Addresses.Bits.bottom
   | PLLoc l -> l
-  | PLVarOffset (b, po) -> Location_Bits.inject b (imprecise_offset po)
-  | PLLocOffset (loc, po) -> Location_Bits.shift (imprecise_offset po) loc
+  | PLVarOffset (b, po) -> Addresses.Bits.inject b (imprecise_offset po)
+  | PLLocOffset (loc, po) -> Addresses.Bits.shift (imprecise_offset po) loc
 
 type precise_location = {
   loc: precise_location_bits;
@@ -243,7 +243,7 @@ let loc_bottom = {
 let is_bottom_loc pl = pl.loc = PLBottom
 
 let loc_top = {
-  loc = PLLoc Location_Bits.top;
+  loc = PLLoc Addresses.Bits.top;
   size = Z_or_top.top;
 }
 let is_top_loc pl = equal_loc loc_top pl
@@ -252,7 +252,7 @@ let replace_base substitution po =
   match po.loc with
   | PLBottom -> po
   | PLLoc loc ->
-    let modified, loc = Location_Bits.replace_base substitution loc in
+    let modified, loc = Addresses.Bits.replace_base substitution loc in
     if modified then { po with loc = PLLoc loc } else po
   | PLVarOffset (base, offset) ->
     begin
@@ -262,7 +262,7 @@ let replace_base substitution po =
       with Not_found -> po
     end
   | PLLocOffset (loc, offset) ->
-    let modified, loc = Location_Bits.replace_base substitution loc in
+    let modified, loc = Addresses.Bits.replace_base substitution loc in
     if modified
     then { po with loc = PLLocOffset (loc, offset) }
     else po
@@ -289,7 +289,7 @@ let fold f pl acc =
   | PLLoc l -> f (make_loc l pl.size) acc
   | PLVarOffset (b, po) ->
     let aux_po ival acc =
-      let loc_b = Location_Bits.inject b ival in
+      let loc_b = Addresses.Bits.inject b ival in
       let loc = make_loc loc_b pl.size in
       f loc acc
     in
@@ -299,19 +299,19 @@ let fold f pl acc =
       let aux_loc b ival_loc acc =
         let aux_ival_loc i acc =
           let ival = Ival.add_singleton_int i ival_po in
-          let loc_b = Location_Bits.inject b ival in
+          let loc_b = Addresses.Bits.inject b ival in
           let loc = make_loc loc_b pl.size in
           f loc acc
         in
         Ival.fold_int aux_ival_loc ival_loc acc
       in
-      Location_Bits.fold_i aux_loc loc acc
+      Addresses.Bits.fold_i aux_loc loc acc
     in
     fold_offset aux_po po acc
 
 let enumerate_valid_bits access loc =
-  let aux loc z = Zone.join z (enumerate_valid_bits access loc) in
-  fold aux loc Zone.bottom
+  let aux loc z = Memory_zone.join z (enumerate_valid_bits access loc) in
+  fold aux loc Memory_zone.bottom
 
 
 let cardinal_zero_or_one pl =

@@ -15,16 +15,16 @@ let debug2 fmt = R.debug ~level:2 fmt
 open Cil_datatype
 open Cil_types
 
-type t_zones = Locations.Zone.t Stmt.Hashtbl.t
+type t_zones = Memory_zone.t Stmt.Hashtbl.t
 
 module Data = struct
-  type t = Locations.Zone.t
-  let bottom = Locations.Zone.bottom
-  let equal = Locations.Zone.equal
-  let intersects = Locations.Zone.valid_intersects
-  let merge = Locations.Zone.join (* over-approx *)
-  let diff = Locations.Zone.diff (* over-approx *)
-  let pretty fmt z = Format.fprintf fmt "@[<h 1>%a@]" Locations.Zone.pretty z
+  type t = Memory_zone.t
+  let bottom = Memory_zone.bottom
+  let equal = Memory_zone.equal
+  let intersects = Memory_zone.valid_intersects
+  let merge = Memory_zone.join (* over-approx *)
+  let diff = Memory_zone.diff (* over-approx *)
+  let pretty fmt z = Format.fprintf fmt "@[<h 1>%a@]" Memory_zone.pretty z
 
   let exp_zone stmt exp = Eva.Results.(before stmt |> expr_deps exp)
 end
@@ -101,7 +101,7 @@ let process_froms data_after froms =
     | Bottom -> to_prop, used, new_data
     | Top ->
       let v = Eva.Assigns.DepsOrUnassigned.top in
-      process_out_call Locations.Zone.top v (to_prop, used, new_data)
+      process_out_call Memory_zone.top v (to_prop, used, new_data)
     | Map m ->
       Eva.Assigns.Memory.fold process_out_call m (to_prop, used, new_data)
   in let data = Data.merge to_prop new_data in

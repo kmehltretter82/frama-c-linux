@@ -28,7 +28,7 @@ let filter_generated_and_locals kf =
 (* Prints the final state [values] of function [kf] with outputs [outs]. *)
 let print_final_state kf values =
   let outs = Eva_dynamic.Inout.kf_outputs kf in
-  let outs = Locations.Zone.filter_base (filter_generated_and_locals kf) outs in
+  let outs = Memory_zone.filter_base (filter_generated_and_locals kf) outs in
   (* NB: there's no need to filter the variables representing string literals
      here, since by definition they won't appear as _output_ of any function. *)
   let print_filtered_state fmt =
@@ -42,7 +42,7 @@ let print_final_state kf values =
                               (including unchanged variables)@\n";
           values
         | Top (Set set, _) -> Cvalue.Model.filter_by_shape set values
-        | Map m -> Cvalue.Model.filter_by_shape (Locations.Zone.shape m) values
+        | Map m -> Cvalue.Model.filter_by_shape (Memory_zone.shape m) values
       in
       Format.fprintf fmt "@[  %a@]" Cvalue.Model.pretty values
   in

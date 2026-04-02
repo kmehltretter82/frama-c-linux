@@ -19,7 +19,7 @@ module Types = struct
 
   type state = Cvalue.Model.t
   type value = Cvalue.V.t
-  type zone = Zone.t
+  type zone = Memory_zone.t
   type slice = Cvalue.V_Offsetmap.t
 
   type functions_states = state Cil_datatype.Stmt.Hashtbl.t
@@ -98,7 +98,7 @@ let location_with_size p sbytes =
   Locations.make_loc locb (`Value size)
 
 let location_of_pointer (p : Types.pointer) =
-  Location_Bytes.inject
+  Addresses.Bytes.inject
     (Base.of_varinfo (fst p) ) (Ival.of_int (snd p))
 
 
@@ -118,7 +118,7 @@ let read_slice ~p ~sbytes state =
 
 let write_int_pointer p i state =
   let sbytes = Machine.Sizeof.int ()
-  and value = Location_Bytes.inject Base.null (Ival.of_int i) in
+  and value = Addresses.Bytes.inject Base.null (Ival.of_int i) in
   let pointer = location_of_pointer p in
   let p = location_with_size pointer sbytes in
   Mt_self.debug ~level:3 "# Write %a at %a, size %d bytes"
@@ -127,15 +127,15 @@ let write_int_pointer p i state =
 
 let replace_value_at_int_pointer p ~before ~after state =
   let sbytes = Machine.Sizeof.int () in
-  let value_after = Location_Bytes.inject Base.null (Ival.of_int after) in
-  let value_before = Location_Bytes.inject Base.null (Ival.of_int before) in
+  let value_after = Addresses.Bytes.inject Base.null (Ival.of_int after) in
+  let value_before = Addresses.Bytes.inject Base.null (Ival.of_int before) in
   let pointer = location_of_pointer p in
   let p = location_with_size pointer sbytes in
   let cur = Cvalue.Model.find ~conflate_bottom:true state p in
-  if Location_Bytes.equal cur value_before then
+  if Addresses.Bytes.equal cur value_before then
     Cvalue.Model.add_binding ~exact:true state p value_after
   else
-  if Location_Bytes.is_included value_before cur then
+  if Addresses.Bytes.is_included value_before cur then
     let v = Cvalue.V.(join (diff_if_one cur value_before) value_after) in
     Cvalue.Model.add_binding ~exact:true state p v
   else
@@ -163,14 +163,14 @@ let extract_definition name kf =
   else error "Missing definition for function %s" name
 
 let extract_fun value =
-  match fst (Location_Bytes.find_lonely_key value) with
+  match fst (Addresses.Bytes.find_lonely_key value) with
   | Base.Var (vi, _) when Globals.Functions.mem vi ->
     extract_definition vi.vname (Globals.Functions.get vi)
   | _ | exception Not_found ->
     error "Expected pointer to function, received %a" Cvalue.V.pretty value
 
 let extract_pointer value =
-  match Location_Bytes.find_lonely_key value with
+  match Addresses.Bytes.find_lonely_key value with
   | Base.Var (v, _), i
   | Base.Allocated (v, _, _), i ->
     begin
@@ -219,7 +219,7 @@ let extract_int_list ~cardinal value =
     error "Overflow integer value: %a" Cvalue.V.pretty value
 
 let extract_constant_string value =
-  match Location_Bytes.fold_i (fun b i l -> (b,i) :: l) value [] with
+  match Addresses.Bytes.fold_i (fun b i l -> (b,i) :: l) value [] with
   | [Base.Var (vi, _), i] when Ival.is_zero i && Ast_info.is_string_literal vi ->
     let l = Globals.Vars.get_string_literal vi in
     (match l with

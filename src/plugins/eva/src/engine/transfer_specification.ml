@@ -129,7 +129,7 @@ let warn_on_missing_result_assigns kinstr kf spec =
       Kernel_function.pretty kf
 
 let reduce_to_valid_location kind term loc =
-  if Locations.(Location_Bits.(equal top loc.loc)) then
+  if Locations.(Addresses.Bits.(equal top loc.loc)) then
     begin
       Self.error ~once:true ~current:true
         "@[Cannot handle@ %a,@ location is too imprecise@ (%a).@ \

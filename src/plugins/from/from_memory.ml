@@ -36,9 +36,9 @@ module DepsOrUnassigned = struct
   let pretty fmt fd =
     match fd with
     | Unassigned -> Format.pp_print_string fmt "(SELF)"
-    | AssignedFrom d -> Zone.pretty fmt (Deps.to_zone d)
+    | AssignedFrom d -> Memory_zone.pretty fmt (Deps.to_zone d)
     | MaybeAssignedFrom d ->
-      Format.fprintf fmt "%a (and SELF)" Zone.pretty (Deps.to_zone d)
+      Format.fprintf fmt "%a (and SELF)" Memory_zone.pretty (Deps.to_zone d)
 
   let pretty_precise fmt = function
     | Unassigned -> Format.pp_print_string fmt "UNASSIGNED"
@@ -102,7 +102,7 @@ let substitute_data_deps =
   let empty = Deps.bottom in
   let cache = Hptmap_sig.PersistentCache "From_memory.substitute_data" in
   let f_map =
-    Zone.fold2_join_heterogeneous
+    Memory_zone.fold2_join_heterogeneous
       ~cache ~empty_left ~empty_right ~both ~join ~empty
   in
   fun call_site_froms z ->
@@ -120,26 +120,26 @@ let substitute_indirect_deps =
   (* Nothing left to substitute, z is directly an indirect dependency *)
   let empty_right z = z in
   (* Zone to substitute is empty *)
-  let empty_left _ = Zone.bottom in
+  let empty_left _ = Memory_zone.bottom in
   let both b itvs offsm =
     (* Both the found data and indirect dependencies are computed for indirect
        dependencies: merge to a single zone *)
     Deps.to_zone (find_precise_loffset offsm b itvs)
   in
-  let join = Zone.join in
-  let empty = Zone.bottom in
+  let join = Memory_zone.join in
+  let empty = Memory_zone.bottom in
   let cache = Hptmap_sig.PersistentCache "From_memory.substitute_indirect" in
   let f_map =
-    Zone.fold2_join_heterogeneous
+    Memory_zone.fold2_join_heterogeneous
       ~cache ~empty_left ~empty_right ~both ~join ~empty
   in
   fun call_site_froms z ->
     match call_site_froms with
-    | Bottom -> Zone.bottom
-    | Top -> Zone.top
+    | Bottom -> Memory_zone.bottom
+    | Top -> Memory_zone.top
     | Map m ->
       try f_map z (shape m)
-      with Abstract_interp.Error_Top -> Zone.top
+      with Abstract_interp.Error_Top -> Memory_zone.top
 
 let substitute call_site_froms deps =
   let open Deps in
@@ -149,7 +149,7 @@ let substitute call_site_froms deps =
   let dirdeps = substitute_data_deps call_site_froms data in
   let inddeps = substitute_indirect_deps call_site_froms indirect in
   let dir = dirdeps.data in
-  let ind = Zone.(join dirdeps.indirect inddeps) in
+  let ind = Memory_zone.(join dirdeps.indirect inddeps) in
   { data = dir; indirect = ind }
 
 

@@ -13,7 +13,7 @@ type widen_hint = Z.Set.t * Datatype.Float.Set.t
 
 module type Value = sig
   include Abstract_value.Leaf
-  val widen : Locations.Location_Bytes.widen_hint -> t -> t -> t
+  val widen : Addresses.Bytes.widen_hint -> t -> t -> t
   val track_variable: Cil_types.varinfo -> bool
   val builtins: (string * t builtin) list
 end
@@ -118,7 +118,7 @@ module Make_Memory (Info: sig val name: string end) (Value: Value) = struct
     let {loc; size} = Precise_locs.imprecise_location loc in
     (* exact means that the location is precise and that we can perform
        a strong update. *)
-    let exact = Location_Bits.cardinal_zero_or_one loc in
+    let exact = Addresses.Bits.cardinal_zero_or_one loc in
     let aux_base b o state =
       match covers_base b o size typ with
       | Precise ->
@@ -133,7 +133,7 @@ module Make_Memory (Info: sig val name: string end) (Value: Value) = struct
         else add b v state
       | Imprecise -> remove b state
     in
-    try Location_Bits.fold_topset_ok aux_base loc state
+    try Addresses.Bits.fold_topset_ok aux_base loc state
     with Abstract_interp.Error_Top -> empty
 
   let remove_variables vars state =
@@ -142,7 +142,7 @@ module Make_Memory (Info: sig val name: string end) (Value: Value) = struct
 
   let remove loc state =
     let loc = Precise_locs.imprecise_location loc in
-    Locations.(Location_Bits.fold_bases remove loc.loc state)
+    Locations.(Addresses.Bits.fold_bases remove loc.loc state)
 
   let find loc typ state =
     let open Locations in
@@ -155,7 +155,7 @@ module Make_Memory (Info: sig val name: string end) (Value: Value) = struct
       | Imprecise -> `Value Value.top
     in
     try
-      match Location_Bits.fold_topset_ok aux_base loc `Bottom with
+      match Addresses.Bits.fold_topset_ok aux_base loc `Bottom with
       | `Bottom -> Value.top (* does not happen if the location is not empty *)
       | `Value v -> v
     with Abstract_interp.Error_Top -> Value.top

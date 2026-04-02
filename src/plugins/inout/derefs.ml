@@ -11,15 +11,15 @@ open Locations
 
 
 class virtual do_it_ = object(self)
-  inherit [Zone.t] Cumulative_analysis.cumulative_visitor
-  val mutable derefs = Zone.bottom
+  inherit [Memory_zone.t] Cumulative_analysis.cumulative_visitor
+  val mutable derefs = Memory_zone.bottom
 
-  method bottom = Zone.bottom
+  method bottom = Memory_zone.bottom
 
   method result = derefs
 
   method join new_ =
-    derefs <- Zone.join new_ derefs;
+    derefs <- Memory_zone.join new_ derefs;
 
   method! vlval (base,_ as lv) =
     begin match base with
@@ -35,9 +35,9 @@ class virtual do_it_ = object(self)
     DoChildren
 
   method compute_funspec (_: kernel_function) =
-    Zone.bottom
+    Memory_zone.bottom
 
-  method clean_kf_result (_ : kernel_function) (r: Locations.Zone.t) = r
+  method clean_kf_result (_ : kernel_function) (r: Memory_zone.t) = r
 
 end
 
@@ -45,8 +45,8 @@ module Analysis = Cumulative_analysis.Make(
   struct
     let analysis_name ="derefs"
 
-    type t = Locations.Zone.t
-    module T = Locations.Zone
+    type t = Memory_zone.t
+    module T = Memory_zone
 
     class virtual do_it = do_it_
   end)
@@ -54,12 +54,12 @@ module Analysis = Cumulative_analysis.Make(
 let get_internal = Analysis.kernel_function
 
 let externalize _return fundec x =
-  Zone.filter_base
+  Memory_zone.filter_base
     (fun v -> not (Base.is_formal_or_local v fundec))
     x
 
 module Externals =
-  Kernel_function.Make_Table(Locations.Zone)
+  Kernel_function.Make_Table(Memory_zone)
     (struct
       let name = "Inout.Derefs.Externals"
       let dependencies = [ Analysis.Memo.self ]
@@ -80,16 +80,16 @@ let get_external =
            assert false
        else
          (* assume there is no deref for leaf functions *)
-         Zone.bottom)
+         Memory_zone.bottom)
 
 let compute_external kf = ignore (get_external kf)
 
 let _pretty_internal fmt kf =
   Format.fprintf fmt "@[Derefs (internal) for function %a:@\n@[<hov 2>  %a@]@]@\n"
     Kernel_function.pretty kf
-    Zone.pretty (get_internal kf)
+    Memory_zone.pretty (get_internal kf)
 
 let pretty_external fmt kf =
   Format.fprintf fmt "@[Derefs for function %a:@\n@[<hov 2>  %a@]@]@\n"
     Kernel_function.pretty kf
-    Zone.pretty (get_external kf)
+    Memory_zone.pretty (get_external kf)

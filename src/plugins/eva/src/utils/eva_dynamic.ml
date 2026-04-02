@@ -19,8 +19,8 @@ module Inout = struct
     get ~plugin "register_call_hook" typ ~fallback f
 
   let kf_outputs kf =
-    let fallback _ = Locations.Zone.top in
-    let typ arg = Datatype.func arg Locations.Zone.ty in
+    let fallback _ = Memory_zone.top in
+    let typ arg = Datatype.func arg Memory_zone.ty in
     get ~plugin "kf_outputs" (typ Kernel_function.ty) ~fallback kf
 end
 

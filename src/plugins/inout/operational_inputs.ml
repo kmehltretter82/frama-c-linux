@@ -15,23 +15,23 @@ open Locations
 *)
 
 type t = Inout_type.t = {
-  over_inputs: Locations.Zone.t;
-  over_inputs_if_termination: Locations.Zone.t;
-  over_logic_inputs: Locations.Zone.t;
+  over_inputs: Memory_zone.t;
+  over_inputs_if_termination: Memory_zone.t;
+  over_logic_inputs: Memory_zone.t;
   (* [over_logic_inputs] is used internally by Eva to make memexec consider also
      the logic inputs of the function. Computed in [transfer_annotations]. *)
-  under_outputs_if_termination: Locations.Zone.t;
-  over_outputs: Locations.Zone.t;
-  over_outputs_if_termination: Locations.Zone.t;
+  under_outputs_if_termination: Memory_zone.t;
+  over_outputs: Memory_zone.t;
+  over_outputs_if_termination: Memory_zone.t;
 }
 
 let top = {
-  over_inputs = Zone.top;
-  over_inputs_if_termination = Zone.top;
-  over_logic_inputs = Zone.top;
-  under_outputs_if_termination = Zone.bottom;
-  over_outputs = Zone.top;
-  over_outputs_if_termination = Zone.top;
+  over_inputs = Memory_zone.top;
+  over_inputs_if_termination = Memory_zone.top;
+  over_logic_inputs = Memory_zone.top;
+  under_outputs_if_termination = Memory_zone.bottom;
+  over_outputs = Memory_zone.top;
+  over_outputs_if_termination = Memory_zone.top;
 }
 
 (* [_if_termination] fields of the type above, which are the one propagated by
@@ -39,39 +39,39 @@ let top = {
    ones, as they come from branches that are by construction not propagated
    until the end by the dataflow. *)
 type compute_t = {
-  over_inputs_d : Zone.t ;
-  under_outputs_d : Zone.t;
-  over_outputs_d: Zone.t;
+  over_inputs_d : Memory_zone.t ;
+  under_outputs_d : Memory_zone.t;
+  over_outputs_d: Memory_zone.t;
 }
 
 (* Initial value for the computation *)
 let empty = {
-  over_inputs_d = Zone.bottom;
-  under_outputs_d = Zone.bottom;
-  over_outputs_d = Zone.bottom;
+  over_inputs_d = Memory_zone.bottom;
+  under_outputs_d = Memory_zone.bottom;
+  over_outputs_d = Memory_zone.bottom;
 }
 
 let bottom = {
-  over_inputs_d = Zone.bottom;
-  under_outputs_d = Zone.top;
-  over_outputs_d = Zone.bottom;
+  over_inputs_d = Memory_zone.bottom;
+  under_outputs_d = Memory_zone.top;
+  over_outputs_d = Memory_zone.bottom;
 }
 
 let equal ct1 ct2 =
-  Zone.equal ct1.over_inputs_d ct2.over_inputs_d &&
-  Zone.equal ct1.under_outputs_d ct2.under_outputs_d &&
-  Zone.equal ct1.over_outputs_d ct2.over_outputs_d
+  Memory_zone.equal ct1.over_inputs_d ct2.over_inputs_d &&
+  Memory_zone.equal ct1.under_outputs_d ct2.under_outputs_d &&
+  Memory_zone.equal ct1.over_outputs_d ct2.over_outputs_d
 
 let join c1 c2 = {
-  over_inputs_d = Zone.join c1.over_inputs_d c2.over_inputs_d;
-  under_outputs_d = Zone.meet c1.under_outputs_d c2.under_outputs_d;
-  over_outputs_d = Zone.join c1.over_outputs_d c2.over_outputs_d;
+  over_inputs_d = Memory_zone.join c1.over_inputs_d c2.over_inputs_d;
+  under_outputs_d = Memory_zone.meet c1.under_outputs_d c2.under_outputs_d;
+  over_outputs_d = Memory_zone.join c1.over_outputs_d c2.over_outputs_d;
 }
 
 let is_included c1 c2 =
-  Zone.is_included c1.over_inputs_d c2.over_inputs_d &&
-  Zone.is_included c2.under_outputs_d c1.under_outputs_d &&
-  Zone.is_included c1.over_outputs_d c2.over_outputs_d
+  Memory_zone.is_included c1.over_inputs_d c2.over_inputs_d &&
+  Memory_zone.is_included c2.under_outputs_d c1.under_outputs_d &&
+  Memory_zone.is_included c1.over_outputs_d c2.over_outputs_d
 
 let join_and_is_included smaller larger =
   let join = join smaller larger in
@@ -79,7 +79,7 @@ let join_and_is_included smaller larger =
 ;;
 
 let externalize_zone ~with_formals kf =
-  Zone.filter_base
+  Memory_zone.filter_base
     (Eva.Logic_inout.accept_base ~formals:with_formals ~locals:false kf)
 
 (* This code evaluates an assigns, computing in particular a sound approximation
@@ -99,7 +99,7 @@ let eval_assigns kf state assigns =
     (* Return a list of independent output zones, plus a zone indicating
        that the zone has been overwritten in a sure way *)
     let clean_deps =
-      Locations.Zone.filter_base
+      Memory_zone.filter_base
         (function
           | Base.Var (v, _) | Base.Allocated (v, _, _) ->
             not (Kernel_function.is_formal v kf)
@@ -108,7 +108,7 @@ let eval_assigns kf state assigns =
     let out_term = out.it_content in
     let outputs_under, outputs_over, deps =
       if Logic_const.(is_result out_term || is_exit_status out_term)
-      then (Zone.bottom, Zone.bottom, Zone.bottom)
+      then (Memory_zone.bottom, Memory_zone.bottom, Memory_zone.bottom)
       else
         let output =
           Eva.Logic_inout.tlval_to_zones Assigns state Write out_term
@@ -118,24 +118,24 @@ let eval_assigns kf state assigns =
         | None ->
           Inout_parameters.warning ~current:true ~once:true
             "failed to interpret assigns clause '%a'" Printer.pp_term out_term;
-          (Zone.bottom, Zone.top, Zone.top)
+          (Memory_zone.bottom, Memory_zone.top, Memory_zone.top)
     in
     (* Compute all inputs as a zone *)
     let inputs =
       match froms with
-      | FromAny -> Zone.top
+      | FromAny -> Memory_zone.top
       | From l ->
         let aux acc { it_content = from } =
           let inputs = Eva.Logic_inout.tlval_to_zones Assigns state Read from in
           match inputs with
           | Some inputs ->
-            let acc = Zone.join (clean_deps inputs.deps) acc in
-            Zone.join inputs.over acc
+            let acc = Memory_zone.join (clean_deps inputs.deps) acc in
+            Memory_zone.join inputs.over acc
           | _ ->
             Inout_parameters.warning ~current:true ~once:true
               "failed to interpret inputs in assigns clause '%a'"
               Printer.pp_from asgn;
-            Zone.top
+            Memory_zone.top
         in
         List.fold_left aux deps l
     in
@@ -147,12 +147,12 @@ let eval_assigns kf state assigns =
        the usual direction. It works here because diff on non-top zones is
        an exact operation. *)
     let sure_out =
-      Zone.(if equal top inputs then bottom else diff outputs_under inputs)
+      Memory_zone.(if equal top inputs then bottom else diff outputs_under inputs)
     in
     {
-      under_outputs_d = Zone.link acc.under_outputs_d sure_out;
-      over_inputs_d = Zone.join acc.over_inputs_d inputs;
-      over_outputs_d = Zone.join acc.over_outputs_d outputs_over;
+      under_outputs_d = Memory_zone.link acc.under_outputs_d sure_out;
+      over_inputs_d = Memory_zone.join acc.over_inputs_d inputs;
+      over_outputs_d = Memory_zone.join acc.over_outputs_d outputs_over;
     }
   in
   match assigns with
@@ -162,7 +162,7 @@ let eval_assigns kf state assigns =
       Kernel_function.pretty kf;
     top
   | Writes l  ->
-    let init = { bottom with under_outputs_d = Zone.bottom } in
+    let init = { bottom with under_outputs_d = Memory_zone.bottom } in
     let r = List.fold_left treat_one_zone init l in {
       over_inputs = r.over_inputs_d;
       over_logic_inputs = r.over_inputs_d;
@@ -223,35 +223,35 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
      terminating function, or (3) branches that fail, will not appear in the
      final state. Hence, we two use auxiliary variables into which we add
      all partial results. *)
-  let non_terminating_inputs = ref Zone.bottom
-  let non_terminating_outputs = ref Zone.bottom
-  let non_terminating_logic_inputs = ref Zone.bottom
+  let non_terminating_inputs = ref Memory_zone.bottom
+  let non_terminating_outputs = ref Memory_zone.bottom
+  let non_terminating_logic_inputs = ref Memory_zone.bottom
 
   let store_non_terminating_inputs inputs =
-    non_terminating_inputs := Zone.join !non_terminating_inputs inputs;
+    non_terminating_inputs := Memory_zone.join !non_terminating_inputs inputs;
   ;;
 
   let store_non_terminating_logic_inputs logic_inputs =
     non_terminating_logic_inputs :=
-      Zone.join !non_terminating_logic_inputs logic_inputs
+      Memory_zone.join !non_terminating_logic_inputs logic_inputs
 
   let store_non_terminating_outputs outputs =
-    non_terminating_outputs := Zone.join !non_terminating_outputs outputs;
+    non_terminating_outputs := Memory_zone.join !non_terminating_outputs outputs;
   ;;
 
   (* Store the 'non-termination' information of a function subcall into
      the current call. [under_outputs] are the current call sure outputs. *)
   let store_non_terminating_subcall under_outputs subcall =
-    store_non_terminating_inputs (Zone.diff subcall.over_inputs under_outputs);
+    store_non_terminating_inputs (Memory_zone.diff subcall.over_inputs under_outputs);
     store_non_terminating_outputs subcall.over_outputs;
   ;;
 
   let catenate c1 c2 =
-    let inputs = Zone.diff c2.over_inputs_d c1.under_outputs_d in
+    let inputs = Memory_zone.diff c2.over_inputs_d c1.under_outputs_d in
     store_non_terminating_inputs inputs;
-    { over_inputs_d = Zone.join c1.over_inputs_d inputs;
-      under_outputs_d = Zone.link c1.under_outputs_d c2.under_outputs_d;
-      over_outputs_d = Zone.join  c1.over_outputs_d c2.over_outputs_d;
+    { over_inputs_d = Memory_zone.join c1.over_inputs_d inputs;
+      under_outputs_d = Memory_zone.link c1.under_outputs_d c2.under_outputs_d;
+      over_outputs_d = Memory_zone.join  c1.over_outputs_d c2.over_outputs_d;
     }
 
   type t = compute_t
@@ -260,8 +260,8 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
     Format.fprintf fmt
       "@[Over-approximated operational inputs: %a@]@\n\
        @[Under-approximated operational outputs: %a@]"
-      Zone.pretty x.over_inputs_d
-      Zone.pretty x.under_outputs_d
+      Memory_zone.pretty x.over_inputs_d
+      Memory_zone.pretty x.under_outputs_d
 
   let bottom = bottom
   let join_and_is_included = join_and_is_included
@@ -272,9 +272,9 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
   let transfer_exp s exp data =
     let request = X.stmt_request s in
     let inputs = Eva.Results.expr_deps exp request in
-    let new_inputs = Zone.diff inputs data.under_outputs_d in
+    let new_inputs = Memory_zone.diff inputs data.under_outputs_d in
     store_non_terminating_inputs new_inputs;
-    {data with over_inputs_d = Zone.join data.over_inputs_d new_inputs}
+    {data with over_inputs_d = Memory_zone.join data.over_inputs_d new_inputs}
 
   (* Initialized const variables should be included as outputs of the function,
      so [for_writing] must be false for local initializations. It should be
@@ -285,32 +285,32 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
     let exact = Eva.Results.is_singleton lv_address in
     store_non_terminating_outputs new_outs;
     let lv_deps = Eva.Results.address_deps lv request in
-    let deps = Zone.join lv_deps deps in
-    let new_inputs = Zone.diff deps data.under_outputs_d in
+    let deps = Memory_zone.join lv_deps deps in
+    let new_inputs = Memory_zone.diff deps data.under_outputs_d in
     store_non_terminating_inputs new_inputs;
     let new_sure_outs =
       if exact then
         (* There is only one modified zone. So, this is an exact output.
            Add it into the under-approximated outputs. *)
-        Zone.link data.under_outputs_d new_outs
+        Memory_zone.link data.under_outputs_d new_outs
       else data.under_outputs_d
     in
     { under_outputs_d = new_sure_outs;
-      over_inputs_d = Zone.join data.over_inputs_d new_inputs;
-      over_outputs_d = Zone.join data.over_outputs_d new_outs }
+      over_inputs_d = Memory_zone.join data.over_inputs_d new_inputs;
+      over_outputs_d = Memory_zone.join data.over_outputs_d new_outs }
 
   let transfer_call ~for_writing s dest f args _loc data =
     let request = X.stmt_request s in
     (* Join the inputs of [args] and of the function expression. *)
     let f_inputs = Eva.Results.lval_deps (f,NoOffset) request in
-    let eval_deps acc e = Zone.join acc (Eva.Results.expr_deps e request) in
+    let eval_deps acc e = Memory_zone.join acc (Eva.Results.expr_deps e request) in
     let f_args_inputs = List.fold_left eval_deps f_inputs args in
     let data =
       catenate
         data
         { over_inputs_d = f_args_inputs ;
-          under_outputs_d = Zone.bottom;
-          over_outputs_d = Zone.bottom; }
+          under_outputs_d = Memory_zone.bottom;
+          over_outputs_d = Memory_zone.bottom; }
     in
     let called = Eva.Results.(eval_callee f request |> default []) in
     let for_functions =
@@ -332,7 +332,7 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
       (* Treatment for the possible assignment of the call result *)
       (match dest with
        | None -> result
-       | Some lv -> add_out ~for_writing request lv Zone.bottom result)
+       | Some lv -> add_out ~for_writing request lv Memory_zone.bottom result)
     in result
 
   (* Propagate all zones in predicates for the given statement, only in the case
@@ -385,7 +385,7 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
                zone of the array as outputs. It is exactly the written zone for
                arrays of scalar elements. Nothing is read by zero-initializers,
                so the inputs are empty. *)
-            add_out ~for_writing:false request lv Zone.bottom acc
+            add_out ~for_writing:false request lv Memory_zone.bottom acc
       in
       aux (Cil.var v) i data
     | Call (lvaloption,funclv,argl,loc) ->
@@ -457,10 +457,10 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
       under_outputs_if_termination = res_if_termination.under_outputs_d ;
       over_outputs_if_termination = res_if_termination.over_outputs_d;
       over_inputs =
-        Zone.join !non_terminating_inputs res_if_termination.over_inputs_d;
+        Memory_zone.join !non_terminating_inputs res_if_termination.over_inputs_d;
       over_logic_inputs = !non_terminating_logic_inputs;
       over_outputs =
-        Zone.join !non_terminating_outputs res_if_termination.over_outputs_d;
+        Memory_zone.join !non_terminating_outputs res_if_termination.over_outputs_d;
     }
 
 end
@@ -507,8 +507,8 @@ let extract_inout_from_froms kf assigns =
   let in_return = Eva.Deps.to_zone deps_return in
   let in_, out_ =
     match deps_table with
-    | Top -> Zone.top, Zone.top
-    | Bottom -> Zone.bottom, Zone.bottom
+    | Top -> Memory_zone.top, Memory_zone.top
+    | Bottom -> Memory_zone.bottom, Memory_zone.bottom
     | Map m ->
       let aux_from out in_ (acc_in,acc_out as acc) =
         (* Skip zones fully unassigned, they are not really port of the
@@ -516,12 +516,12 @@ let extract_inout_from_froms kf assigns =
         match (in_ : Eva.Assigns.DepsOrUnassigned.t) with
         | Unassigned -> acc
         | AssignedFrom in_ | MaybeAssignedFrom in_ ->
-          Zone.join acc_in (Eva.Deps.to_zone in_),
-          Zone.join acc_out out
+          Memory_zone.join acc_in (Eva.Deps.to_zone in_),
+          Memory_zone.join acc_out out
       in
-      Eva.Assigns.Memory.fold aux_from m (Zone.bottom, Zone.bottom)
+      Eva.Assigns.Memory.fold aux_from m (Memory_zone.bottom, Memory_zone.bottom)
   in
-  let in_ = Zone.join in_return in_ in
+  let in_ = Memory_zone.join in_return in_ in
   let externalize = externalize_zone ~with_formals:false kf in
   externalize in_, externalize out_
 
@@ -631,7 +631,7 @@ module Callwise = struct
                 let vi_kf = Kernel_function.get_vi kf in
                 (fun b -> not (Base.is_formal_of_prototype b vi_kf))
             in
-            Inout_type.map (Zone.filter_base filter) with_internals
+            Inout_type.map (Memory_zone.filter_base filter) with_internals
           with Not_found -> Inout_type.bottom
       end) in
     let module [@warning "-60"] Compute =
@@ -661,7 +661,7 @@ module Callwise = struct
         {
           over_inputs_if_termination = in_;
           over_inputs = in_;
-          over_logic_inputs = Zone.bottom;
+          over_logic_inputs = Memory_zone.bottom;
           over_outputs_if_termination = out_ ;
           over_outputs = out_;
           under_outputs_if_termination = sure_out;
@@ -805,11 +805,11 @@ let pretty_operational_inputs_external_with_formals fmt kf =
 let pretty fmt x =
   Format.fprintf fmt "@[<v>";
   Format.fprintf fmt "@[<v 2>Operational inputs:@ @[<hov>%a@]@]@ "
-    Locations.Zone.pretty (x.Inout_type.over_inputs);
+    Memory_zone.pretty (x.Inout_type.over_inputs);
   Format.fprintf fmt "@[<v 2>Operational inputs on termination:@ @[<hov>%a@]@]@ "
-    Locations.Zone.pretty (x.Inout_type.over_inputs_if_termination);
+    Memory_zone.pretty (x.Inout_type.over_inputs_if_termination);
   Format.fprintf fmt "@[<v 2>Sure outputs:@ @[<hov>%a@]@]"
-    Locations.Zone.pretty (x.Inout_type.under_outputs_if_termination);
+    Memory_zone.pretty (x.Inout_type.under_outputs_if_termination);
   Format.fprintf fmt "@]"
 
 let get_internal_precise = get_internal_aux

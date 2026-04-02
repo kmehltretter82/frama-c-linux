@@ -60,7 +60,7 @@ module CfgConcur: sig
   val default: t
 
   val combine: t -> t -> t
-  val add_access: rw * Locations.Zone.t -> t -> t
+  val add_access: rw * Memory_zone.t -> t -> t
 
   (** See {!CfgNode.must_be_in_cfg} below *)
   val must_be_in_cfg: keep:var_access_kind -> t -> bool

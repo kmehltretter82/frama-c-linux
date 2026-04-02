@@ -10,7 +10,7 @@ open Pdg_types
 open PdgIndex
 open Locations
 
-type node = PdgTypes.Node.t * Zone.t
+type node = PdgTypes.Node.t * Memory_zone.t
 
 module Hptmap_Info = struct
   let initial_values = []
@@ -18,11 +18,11 @@ module Hptmap_Info = struct
 end
 
 module NS = struct
-  include Hptmap.Make (PdgTypes.Node) (Locations.Zone) (Hptmap_Info)
+  include Hptmap.Make (PdgTypes.Node) (Memory_zone) (Hptmap_Info)
 
   let intersects =
     let name = "Impact.Pdg_aux.NS.intersects" in
-    let z_intersects _ z1 z2 = Locations.Zone.intersects z1 z2 in
+    let z_intersects _ z1 z2 = Memory_zone.intersects z1 z2 in
     let map_intersects =
       symmetric_binary_predicate
         (Hptmap_sig.PersistentCache name)
@@ -35,38 +35,38 @@ module NS = struct
 
   let inter =
     let decide _ z1 z2 =
-      let inter = Locations.Zone.narrow z1 z2 in
-      if Locations.Zone.is_bottom inter then None
+      let inter = Memory_zone.narrow z1 z2 in
+      if Memory_zone.is_bottom inter then None
       else Some inter
     in
     inter ~cache:(Hptmap_sig.PersistentCache "Pdg_aux.NS.inter")
       ~symmetric:true ~idempotent:true ~decide
 
   let union =
-    let decide _k z1 z2 = Zone.join z1 z2 in
+    let decide _k z1 z2 = Memory_zone.join z1 z2 in
     join ~cache:(Hptmap_sig.PersistentCache "Pdg_aux.NS.union") ~decide
       ~symmetric:true ~idempotent:true
 
   let find_default n m =
     try find n m
-    with Not_found -> Zone.bottom
+    with Not_found -> Memory_zone.bottom
 
   (* We reimplement the following functions to get a Set semantics *)
   let add' (n, z) m =
     let z' = find_default n m in
-    let z'' = Zone.join z z' in
-    if Zone.equal z z'
+    let z'' = Memory_zone.join z z' in
+    if Memory_zone.equal z z'
     then m
     else add n z'' m
 
   let mem' (n, z) m =
     let z' = find_default n m in
-    Zone.is_included z z'
+    Memory_zone.is_included z z'
 
   let remove' (n, z) m =
     let z' = find_default n m in
-    let z'' = Zone.diff z' z in (* TODO: z is not an under-approximation *)
-    if Zone.equal z Zone.top || Zone.is_bottom z'' then
+    let z'' = Memory_zone.diff z' z in (* TODO: z is not an under-approximation *)
+    if Memory_zone.equal z Memory_zone.top || Memory_zone.is_bottom z'' then
       remove n m
     else
       add n z'' m
@@ -96,19 +96,19 @@ end
 type call_interface = (PdgTypes.Node.t * NS.t) list
 
 let pretty_node fmt (n, z) =
-  if Locations.Zone.equal z Locations.Zone.top then
+  if Memory_zone.equal z Memory_zone.top then
     PdgTypes.Node.pretty_node fmt n
   else
     let open PdgIndex.Signature in
     let default () =
       Format.fprintf fmt "%a/%a"
-        PdgTypes.Node.pretty_node n Locations.Zone.pretty z
+        PdgTypes.Node.pretty_node n Memory_zone.pretty z
     in
     let narrow_by_z = function
       | Out OutRet | In (InCtrl | InNum _) -> default ()
       | In (InImpl z')
       | Out (OutLoc z') ->
-        if Locations.Zone.equal z z' then
+        if Memory_zone.equal z z' then
           PdgTypes.Node.pretty_node fmt n
         else
           default ()
@@ -119,7 +119,7 @@ let pretty_node fmt (n, z) =
     | _ -> default ()
 
 
-let node_list_to_set ?(z=Zone.top) =
+let node_list_to_set ?(z=Memory_zone.top) =
   List.fold_left
     (fun set (n, zopt) ->
        match zopt, z with
@@ -132,7 +132,7 @@ let node_list_to_set ?(z=Zone.top) =
     [pdg_caller] that define the pdg input [input] above the call statement [s].
     If [input] is an implicit input, its value is refined according to [z]. *)
 (*   Copied from pdg/sets.ml, as it is currently not exported *)
-let find_call_input_nodes pdg_caller call_stmt ?(z=Locations.Zone.top) in_key =
+let find_call_input_nodes pdg_caller call_stmt ?(z=Memory_zone.top) in_key =
   match in_key with
   | PdgIndex.Signature.InCtrl
   | PdgIndex.Signature.InNum _ ->
@@ -141,7 +141,7 @@ let find_call_input_nodes pdg_caller call_stmt ?(z=Locations.Zone.top) in_key =
     let node = PdgIndex.Signature.find_in_info call_sgn in_key in
     [ node, None ]
   | PdgIndex.Signature.InImpl zone ->
-    let zone' = Locations.Zone.narrow zone z in
+    let zone' = Memory_zone.narrow zone z in
     (* skip undef zone: any result different from None is due to calldeps or
        some imprecision. *)
     let nodes, _undef =
@@ -164,7 +164,7 @@ let all_call_input_nodes ~caller:pdg_caller ~callee:(kf_callee, pdg_callee) call
     match in_key with
     | Signature.InCtrl | Signature.InNum _ -> default ()
     | Signature.InImpl z ->
-      if Locations.Zone.intersects z real_inputs
+      if Memory_zone.intersects z real_inputs
       then default ~z:real_inputs ()
       else acc
   in

@@ -13,7 +13,7 @@ open Mt_types
 
 (** Sets of zone accesses (used in cfg nodes) *)
 module SetZoneAccess: sig
-  include Datatype.Set with type elt = rw * Locations.Zone.t
+  include Datatype.Set with type elt = rw * Memory_zone.t
 
   val pretty_sep: sep:Pretty_utils.sformat -> Format.formatter -> t -> unit
 end

@@ -94,7 +94,7 @@ class occurrence = object (self)
     begin
       let z = Eva.Results.(before_kinstr ki |> eval_address lv |> as_zone) in
       try
-        Locations.Zone.fold_topset_ok
+        Memory_zone.fold_topset_ok
           (fun b _ () ->
              match b with
              | Base.Var (vi, _) | Base.Allocated (vi, _, _) ->

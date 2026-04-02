@@ -517,7 +517,7 @@ module Make (Man : Input) = struct
 
   let kill_location loc state =
     let aux_ploc loc state =
-      let bases = Locations.Location_Bits.get_bases loc.Locations.loc in
+      let bases = Addresses.Bits.get_bases loc.Locations.loc in
       match bases with
       | Base.SetLattice.Set set -> kill_bases set state
       | Base.SetLattice.Top  -> make_top (Abstract1.env state)

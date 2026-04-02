@@ -83,11 +83,11 @@ let () = Request.register ~package
 
 let compute_lval_deps request lval =
   let zone = Results.lval_deps lval request in
-  Locations.Zone.get_bases zone
+  Memory_zone.get_bases zone
 
 let compute_expr_deps request expr =
   let zone = Results.expr_deps expr request in
-  Locations.Zone.get_bases zone
+  Memory_zone.get_bases zone
 
 let compute_instr_deps request = function
   | Set (lval, expr, _) ->

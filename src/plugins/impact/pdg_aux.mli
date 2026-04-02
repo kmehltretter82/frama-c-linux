@@ -17,7 +17,7 @@ open Pdg_types
 
 (** Refinement of a PDG node: we add an indication of which zone is really
     impacted *)
-type node = PdgTypes.Node.t * Zone.t
+type node = PdgTypes.Node.t * Memory_zone.t
 
 val pretty_node: node Pretty_utils.formatter
 

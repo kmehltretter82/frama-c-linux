@@ -24,22 +24,22 @@ module DepsOrUnassigned : sig
   val top : t
   val equal : t -> t -> bool
   val may_be_unassigned : t -> bool
-  val to_zone : t -> Locations.Zone.t
+  val to_zone : t -> Memory_zone.t
 end
 
 module Memory : sig
   include Lmap_bitwise.Location_map_bitwise with type v = DepsOrUnassigned.t
 
-  val find : t -> Locations.Zone.t -> Locations.Zone.t
+  val find : t -> Memory_zone.t -> Memory_zone.t
   (** Imprecise version of find, in which data and indirect dependencies are
       not distinguished *)
 
-  val find_precise : t -> Locations.Zone.t -> Deps.t
+  val find_precise : t -> Memory_zone.t -> Deps.t
   (** Precise version of find *)
 
   val find_precise_loffset : LOffset.t -> Base.t -> Int_Intervals.t -> Deps.t
 
-  val add_binding : exact:bool -> t -> Locations.Zone.t -> Deps.t -> t
+  val add_binding : exact:bool -> t -> Memory_zone.t -> Deps.t -> t
   val add_binding_loc : exact:bool -> t -> Locations.location -> Deps.t -> t
   val add_binding_precise_loc :
     exact:bool -> Locations.access -> t ->
@@ -59,4 +59,4 @@ val top : t
 val join : t -> t -> t
 
 (** Extract the left part of a from result, ie. the zones that are written *)
-val outputs : t -> Locations.Zone.t
+val outputs : t -> Memory_zone.t

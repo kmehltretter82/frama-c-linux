@@ -15,7 +15,7 @@ val compute : kernel_function -> unit
 val compute_all : unit -> unit
 
 val get : Cil_types.kernel_function -> Eva.Assigns.t
-val access : Locations.Zone.t -> Eva.Assigns.Memory.t -> Locations.Zone.t
+val access : Memory_zone.t -> Eva.Assigns.Memory.t -> Memory_zone.t
 
 val self : State.t
 

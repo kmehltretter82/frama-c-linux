@@ -45,7 +45,7 @@ val basic_add_select :
   Kernel_function.t ->
   SlicingTypes.sl_select ->
   PdgTypes.Node.t list ->
-  ?undef:Locations.Zone.t option * SlicingTypes.sl_mark ->
+  ?undef:Memory_zone.t option * SlicingTypes.sl_mark ->
   SlicingActions.n_or_d_marks ->
   SlicingTypes.sl_select
 
@@ -59,8 +59,8 @@ val select_pdg_nodes :
 val mk_select :
   Pdg.Api.t ->
   SlicingActions.select ->
-  (PdgTypes.Node.t * Locations.Zone.t option) list ->
-  Locations.Zone.t option ->
+  (PdgTypes.Node.t * Memory_zone.t option) list ->
+  Memory_zone.t option ->
   SlicingTypes.sl_mark -> SlicingInternals.fct_user_crit
 
 val select_stmt_zone :
@@ -68,7 +68,7 @@ val select_stmt_zone :
   ?select:SlicingTypes.sl_select ->
   Cil_types.stmt ->
   before:bool ->
-  Locations.Zone.t ->
+  Memory_zone.t ->
   SlicingTypes.sl_mark ->
   SlicingTypes.sl_select
 
@@ -79,28 +79,28 @@ val select_in_out_zone :
   use_undef:bool ->
   Kernel_function.t ->
   SlicingTypes.sl_select ->
-  Locations.Zone.t ->
+  Memory_zone.t ->
   SlicingTypes.sl_mark ->
   SlicingTypes.sl_select
 
 val select_zone_at_end :
   Kernel_function.t ->
   ?select:SlicingTypes.sl_select ->
-  Locations.Zone.t ->
+  Memory_zone.t ->
   SlicingTypes.sl_mark ->
   SlicingTypes.sl_select
 
 val select_modified_output_zone :
   Kernel_function.t ->
   ?select:SlicingTypes.sl_select ->
-  Locations.Zone.t ->
+  Memory_zone.t ->
   SlicingTypes.sl_mark ->
   SlicingTypes.sl_select
 
 val select_zone_at_entry :
   Kernel_function.t ->
   ?select:SlicingTypes.sl_select ->
-  Locations.Zone.t ->
+  Memory_zone.t ->
   SlicingTypes.sl_mark ->
   SlicingTypes.sl_select
 

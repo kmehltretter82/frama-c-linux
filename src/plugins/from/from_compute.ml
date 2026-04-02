@@ -71,8 +71,8 @@ let compute_using_prototype_for_state state kf assigns =
              the usual direction. It works here because diff on non-top
                    zones is an exact operation. *)
           let sure_out_zone =
-            Zone.(if equal top input_zone then bottom
-                  else diff output.under input_zone)
+            Memory_zone.(
+              if equal top input_zone then bottom else diff output.under input_zone)
           in
           let acc = Eva.Assigns.Memory.add_binding ~exact:true
               acc sure_out_zone input_deps in
@@ -132,10 +132,10 @@ module ZoneStmtMap = struct
     let dependencies = [ Ast.self ]
   end
 
-  include Hptmap.Make (Stmt_Id) (Zone) (Hptmap_Info)
+  include Hptmap.Make (Stmt_Id) (Memory_zone) (Hptmap_Info)
 
   let join =
-    let decide _k z1 z2 = Zone.join z1 z2 in
+    let decide _k z1 z2 = Memory_zone.join z1 z2 in
     join ~cache:(Hptmap_sig.PersistentCache "From_compute.ZoneStmtMap.join")
       ~symmetric:true ~idempotent:true ~decide
 end
@@ -149,7 +149,7 @@ struct
           The statement information is used to remove the dependencies that
           are no longer useful, when we reach a statement that post-dominates
           the statement that gave rise to the dependency. *)
-      additional_deps : Zone.t;
+      additional_deps : Memory_zone.t;
       (** Union of the sets in {!additional_deps_table} *)
       deps_table : Eva.Assigns.Memory.t
       (** dependency table *)
@@ -160,7 +160,7 @@ struct
 
   (** Recreate the [additional_deps] field from [additional_deps_table] *)
   let rebuild_additional_deps map =
-    ZoneStmtMap.fold (fun _ z accz -> Zone.join z accz) map Zone.bottom
+    ZoneStmtMap.fold (fun _ z accz -> Memory_zone.join z accz) map Memory_zone.bottom
 
 
   (** given a [Function_Froms.Deps.t], apply [f] on both components and merge
@@ -171,7 +171,7 @@ struct
     let open Eva.Deps in
     let ind = f deps.indirect in
     let data = f deps.data in
-    let ind = Zone.join data.indirect (to_zone ind) in
+    let ind = Memory_zone.join data.indirect (to_zone ind) in
     let data = data.data in
     { data = data; indirect = ind }
 
@@ -220,12 +220,12 @@ struct
 
   let empty_from =
     { additional_deps_table = ZoneStmtMap.empty;
-      additional_deps = Zone.bottom;
+      additional_deps = Memory_zone.bottom;
       deps_table = Eva.Assigns.Memory.empty }
 
   let bottom_from =
     { additional_deps_table = ZoneStmtMap.empty;
-      additional_deps = Zone.bottom;
+      additional_deps = Memory_zone.bottom;
       deps_table = Eva.Assigns.Memory.bottom }
 
   module Computer = struct
@@ -245,7 +245,7 @@ struct
         ZoneStmtMap.pretty v.additional_deps_table;
       Format.fprintf fmt
         "Additional Variable Map Set : %a@\n"
-        Zone.pretty
+        Memory_zone.pretty
         v.additional_deps
 
     let pretty fmt (v: t) =
@@ -258,7 +258,7 @@ struct
        additional_deps_table =
          ZoneStmtMap.add s additional state.additional_deps_table;
        additional_deps =
-         Zone.join additional state.additional_deps }
+         Memory_zone.join additional state.additional_deps }
 
 
     let join_and_is_included new_ old =
@@ -270,7 +270,7 @@ struct
         if ZoneStmtMap.equal m mold then
           mold, zold, true
         else
-          let new_z = Zone.join old.additional_deps new_.additional_deps in
+          let new_z = Memory_zone.join old.additional_deps new_.additional_deps in
           m, new_z, false
       in
       let map =
@@ -298,7 +298,7 @@ struct
         lval_to_precise_loc_with_deps stmt ~for_writing:(not init) lv
       in
       let deps_of_deps = Eva.Assigns.Memory.find state.deps_table deps in
-      let all_indirect = Zone.join state.additional_deps deps_of_deps in
+      let all_indirect = Memory_zone.join state.additional_deps deps_of_deps in
       let deps = Eva.Deps.add_indirect deps_right all_indirect in
       let access = if init then Read else Write in
       { state with deps_table =
@@ -313,7 +313,7 @@ struct
       (* dependencies for the evaluation of [f] *)
       let f_deps = Eva.Assigns.Memory.find state.deps_table f_deps in
       let additional_deps =
-        Zone.join
+        Memory_zone.join
           state.additional_deps
           f_deps
       in

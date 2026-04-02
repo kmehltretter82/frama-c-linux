@@ -294,7 +294,7 @@ module SigMarks = struct
          | PdgIndex.Signature.InCtrl | PdgIndex.Signature.InNum _ ->
            (k, m) :: acc
          | PdgIndex.Signature.InImpl z' ->
-           if Locations.Zone.intersects z z' then (k, m) :: acc else acc
+           if Memory_zone.intersects z z' then (k, m) :: acc else acc
       ) [] sgn
 
   exception Visible
@@ -333,23 +333,23 @@ module SigMarks = struct
   let get_input_loc_under_mark cm loc =
     if debug then
       Format.printf "get_input_loc_under_mark of %a"
-        Locations.Zone.pretty loc;
-    assert (not (Locations.Zone.equal Locations.Zone.bottom loc));
+        Memory_zone.pretty loc;
+    assert (not (Memory_zone.equal Memory_zone.bottom loc));
     let do_in (marked_inputs, marks) (in_loc, m) =
       if is_bottom_mark m then (marked_inputs, [])
-      else if Locations.Zone.intersects in_loc loc
+      else if Memory_zone.intersects in_loc loc
       then
-        let marked_inputs = Locations.Zone.link marked_inputs in_loc in
+        let marked_inputs = Memory_zone.link marked_inputs in_loc in
         let marks = m::marks in
         (marked_inputs, marks)
       else
         (marked_inputs, marks)
     in
-    let marked_inputs = Locations.Zone.bottom in
+    let marked_inputs = Memory_zone.bottom in
     let marked_inputs, marks =
       Signature.fold_impl_inputs do_in (marked_inputs, []) cm in
     let m =
-      if Locations.Zone.is_included loc marked_inputs
+      if Memory_zone.is_included loc marked_inputs
       then MarkPair.inter_all marks
       else bottom_mark
     in
@@ -367,8 +367,8 @@ module SigMarks = struct
       else match out_key with
         | PdgIndex.Signature.OutRet -> true, out_zone
         | PdgIndex.Signature.OutLoc z ->
-          out0, Locations.Zone.join out_zone z
-    in Signature.fold_all_outputs add  (false, Locations.Zone.bottom) call_marks
+          out0, Memory_zone.join out_zone z
+    in Signature.fold_all_outputs add  (false, Memory_zone.bottom) call_marks
 
 
 end

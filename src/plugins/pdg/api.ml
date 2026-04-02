@@ -13,7 +13,7 @@ open Pdg_types
 type t = PdgTypes.Pdg.t
 
 type t_nodes_and_undef =
-  ((PdgTypes.Node.t * Locations.Zone.t option) list * Locations.Zone.t option)
+  ((PdgTypes.Node.t * Memory_zone.t option) list * Memory_zone.t option)
 
 exception Top = PdgTypes.Pdg.Top
 exception Bottom = PdgTypes.Pdg.Bottom

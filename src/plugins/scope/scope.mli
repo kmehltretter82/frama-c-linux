@@ -15,14 +15,14 @@ open Cil_datatype
 module Defs : sig
   val get_defs :
     Kernel_function.t -> stmt -> lval ->
-    (Stmt.Hptset.t * Locations.Zone.t option) option
+    (Stmt.Hptset.t * Memory_zone.t option) option
   (** @return the set of statements that define [lval] before [stmt] in [kf].
       Also returns the zone that is possibly not defined.
       Can return [None] when the information is not available (Pdg missing). *)
 
   val get_defs_with_type :
     Kernel_function.t -> stmt -> lval ->
-    ((bool * bool) Stmt.Map.t * Locations.Zone.t option) option
+    ((bool * bool) Stmt.Map.t * Memory_zone.t option) option
   (** @return a map from the statements that define [lval] before [stmt] in
           [kf]. The first boolean indicates the possibility of a direct
           modification at this statement, ie. [lval = ...] or [lval = f()].
@@ -33,8 +33,8 @@ module Defs : sig
   *)
 
   val compute_with_def_type_zone:
-    Cil_types.kernel_function -> Cil_types.stmt -> Locations.Zone.t ->
-    ((bool * bool) Cil_datatype.Stmt.Map.t * Locations.Zone.t option) option
+    Cil_types.kernel_function -> Cil_types.stmt -> Memory_zone.t ->
+    ((bool * bool) Cil_datatype.Stmt.Map.t * Memory_zone.t option) option
     (** internal use *)
 end
 
@@ -70,9 +70,9 @@ end
 (** {3 Zones} *)
 
 module Zones : sig
-  type t_zones = Locations.Zone.t Stmt.Hashtbl.t
+  type t_zones = Memory_zone.t Stmt.Hashtbl.t
   val build_zones :
     kernel_function -> stmt -> lval -> Stmt.Hptset.t * t_zones
   val pretty_zones : Format.formatter -> t_zones -> unit
-  val get_zones : t_zones ->  Cil_types.stmt -> Locations.Zone.t
+  val get_zones : t_zones ->  Cil_types.stmt -> Memory_zone.t
 end

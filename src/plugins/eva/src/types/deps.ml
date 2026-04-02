@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Zone = Locations.Zone
+module Zone = Memory_zone
 
 type deps = {
   data: Zone.t;
@@ -32,7 +32,7 @@ let pretty_precise fmt {data; indirect} =
       Zone.pretty data
 
 (* Conversion to zone, used by default pretty printing *)
-let to_zone d = Locations.Zone.join d.data d.indirect
+let to_zone d = Memory_zone.join d.data d.indirect
 
 
 (* Datatype *)
@@ -59,8 +59,8 @@ include Prototype
 (* Constructors *)
 
 let bottom = {
-  data = Locations.Zone.bottom;
-  indirect = Locations.Zone.bottom;
+  data = Memory_zone.bottom;
+  indirect = Memory_zone.bottom;
 }
 
 let top = {

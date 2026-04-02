@@ -24,6 +24,6 @@ type t =
 
 val compare: t -> t -> int
 
-val compute: Locations.Zone.t -> t list
+val compute: Memory_zone.t -> t list
 (** [compute z] finds all the statements that modifies [z], and for each
     statement, indicates whether the modification is direct or indirect. *)

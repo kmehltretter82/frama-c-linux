@@ -423,7 +423,7 @@ struct
           and loc2 = Precise_locs.imprecise_location ploc2 in
           assert (Z_or_top.equal loc1.size loc2.size);
           let size = loc1.size in
-          let loc_bit = Locations.Location_Bits.join loc1.loc loc2.loc in
+          let loc_bit = Addresses.Bits.join loc1.loc loc2.loc in
           let ploc_bit = Precise_locs.inject_location_bits loc_bit in
           Precise_locs.make_precise_loc ploc_bit ~size
       and extract loc =
@@ -439,7 +439,7 @@ struct
       let join loc1 loc2 =
         let open Locations in
         let size = loc1.size
-        and loc = Location_Bits.join loc1.loc loc2.loc in
+        and loc = Addresses.Bits.join loc1.loc loc2.loc in
         assert (Z_or_top.equal loc2.size size);
         make_loc loc size
       and extract loc =
@@ -453,7 +453,7 @@ struct
       Result.error DisabledDomain
     | Some get ->
       let response_loc, access = extract_loc res in
-      let join = Locations.Zone.join
+      let join = Memory_zone.join
       and extract loc =
         loc >>-: get >>-:
         Precise_locs.enumerate_valid_bits access
@@ -681,8 +681,8 @@ let as_zone_result (Address lvaluation) =
 let as_zone address =
   match as_zone_result address with
   | Ok zone -> zone
-  | Error Bottom -> Locations.Zone.bottom
-  | Error (Top | DisabledDomain) -> Locations.Zone.top
+  | Error Bottom -> Memory_zone.bottom
+  | Error (Top | DisabledDomain) -> Memory_zone.top
 
 (* Evaluation properties *)
 

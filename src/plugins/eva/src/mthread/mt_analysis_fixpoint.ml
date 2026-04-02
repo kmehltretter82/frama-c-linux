@@ -107,7 +107,7 @@ let recompute_shared_vars_changed analysis before =
     (fun th ->
        try AccessesByZone.fold
              (fun z _ () ->
-                if not (Locations.Zone.is_included z before) then raise Exit)
+                if not (Memory_zone.is_included z before) then raise Exit)
              th.th_read_written ()
        with Exit -> ThreadState.recompute_because th PotentialSharedVarsChanged
     )
@@ -119,8 +119,8 @@ let recompute_shared_vars_values_changed analysis th before now =
     (* b is present in [now] but not in [before], or has changed: add the
        entire base to the changed_zone *)
     let default () =
-      let zb = Locations.Zone.inject b Int_Intervals.top in
-      Locations.Zone.join z zb
+      let zb = Memory_zone.inject b Int_Intervals.top in
+      Memory_zone.join z zb
     in
     try
       match Cvalue.Model.find_base b before with
@@ -135,7 +135,7 @@ let recompute_shared_vars_values_changed analysis th before now =
   | Cvalue.Model.Map now ->
     (* Over-approximation of the zones changed from [before] to [now] *)
     let z_changed =
-      Cvalue.Model.fold changed_zone now Locations.Zone.bottom
+      Cvalue.Model.fold changed_zone now Memory_zone.bottom
     in
     iter_threads analysis
       (fun th' ->
@@ -143,7 +143,7 @@ let recompute_shared_vars_values_changed analysis th before now =
            try
              AccessesByZone.fold
                (fun z accesses () ->
-                  if Locations.Zone.intersects z_changed z &&
+                  if Memory_zone.intersects z_changed z &&
                      (* YYY: recompute also threads that only write the variable?*)
                      (SetStmtIdAccess.exists
                         (fun (op, _, _) -> RW.is_read op)
@@ -169,16 +169,16 @@ let compute_shared_vars analysis =
       (Mt_shared_vars.Global.pretty_concurrent_accesses ()) accesses;
     let all_zones = Mt_shared_vars.Global.all_zones_accessed accesses in
     Mt_self.result ~level:3 "@[<hov 2>Imprecise locations to watch: %a@]"
-      Locations.Zone.pretty all_zones;
+      Memory_zone.pretty all_zones;
 
     (* Detect changes *)
-    if not (Locations.Zone.equal all_zones analysis.concurrent_accesses)
+    if not (Memory_zone.equal all_zones analysis.concurrent_accesses)
     then (
       let before = analysis.concurrent_accesses in
       Mt_self.feedback ~level:2 "@[<v>Concurrent imprecise accesses have \
                                  changed: before@ @[<hov 2>  %a@]@ vs.@ @[<hov 2>  %a@]"
-        Locations.Zone.pretty before Locations.Zone.pretty all_zones;
-      let after = Locations.Zone.join before all_zones in
+        Memory_zone.pretty before Memory_zone.pretty all_zones;
+      let after = Memory_zone.join before all_zones in
       analysis.concurrent_accesses <- after;
       recompute_shared_vars_changed analysis before;
     )
@@ -204,10 +204,10 @@ let compute_shared_vars analysis =
     end;
     let all_zones = Mt_shared_vars.Precise.all_zones_accessed (ww_accesses @ rw_accesses) in
     Mt_self.result ~level:2 "@[<hov 2>Shared memory:@ %a@]"
-      Locations.Zone.pretty all_zones;
+      Memory_zone.pretty all_zones;
 
     (* Detect changes *)
-    if not (Locations.Zone.equal all_zones analysis.precise_concurrent_accesses)
+    if not (Memory_zone.equal all_zones analysis.precise_concurrent_accesses)
     then (
       let before = analysis.precise_concurrent_accesses in
       Mt_self.feedback ~level:2
@@ -215,7 +215,7 @@ let compute_shared_vars analysis =
          @[<hov 2>  %a@]@ \
          vs.@ \
          @[<hov 2>  %a@]@]"
-        Locations.Zone.pretty before Locations.Zone.pretty all_zones;
+        Memory_zone.pretty before Memory_zone.pretty all_zones;
       (* let after = Locations.Zone.join before all_zones in *)
       analysis.precise_concurrent_accesses <- all_zones;
       (* No need to recompute for the moment, this field is not used by
@@ -293,7 +293,7 @@ let post_iteration analysis =
       let pp fmt (stmt, z) =
         Format.fprintf fmt "@[%a (for %a)@]"
           Cil_datatype.Location.pretty (Cil_datatype.Stmt.loc stmt)
-          Locations.Zone.pretty z
+          Memory_zone.pretty z
       in
       Mt_self.result "Statements needing manual synchronisation@.%a"
         (Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@ " ~suf:"@]" pp) need_sync

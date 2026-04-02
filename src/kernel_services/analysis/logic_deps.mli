@@ -8,7 +8,7 @@
 
 open Cil_types
 
-val compute_term_deps: (stmt -> term -> Locations.Zone.t option) ref
+val compute_term_deps: (stmt -> term -> Memory_zone.t option) ref
 
 (** Is an ACSL extension a directive for the slicing plug-in? *)
 val is_slice_directive: acsl_extension -> bool
@@ -27,7 +27,7 @@ val mk_ctx_stmt_annot: kernel_function -> stmt -> ctx
 (** To build an interpretation context relative to statement
     annotations. *)
 
-type t = {before:bool ; ki:stmt ; zone:Locations.Zone.t}
+type t = {before:bool ; ki:stmt ; zone:Memory_zone.t}
 type zone_info = (t list) option
 (** list of zones at some program points.
     None means that the computation has failed. *)

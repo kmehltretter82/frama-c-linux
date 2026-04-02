@@ -17,8 +17,8 @@ open Pdg_types
     Can be None if we don't know how to compute them.
 *)
 type data_info =
-  ((PdgTypes.Node.t * Locations.Zone.t option) list
-   * Locations.Zone.t option) option
+  ((PdgTypes.Node.t * Memory_zone.t option) list
+   * Memory_zone.t option) option
 
 (** [ctrl_info] correspond to control dependencies nodes *)
 type ctrl_info = PdgTypes.Node.t list

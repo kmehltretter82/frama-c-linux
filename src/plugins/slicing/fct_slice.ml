@@ -231,7 +231,7 @@ module FctMarks : sig
     SlicingTypes.sl_mark PdgMarks.select
 
   val get_all_input_marks : t -> to_prop
-  val get_matching_input_marks : t -> Locations.Zone.t -> to_prop
+  val get_matching_input_marks : t -> Memory_zone.t -> to_prop
 
   (** add the given mark to the node, and propagate to its dependencies *)
   val mark_and_propagate     : t -> ?to_prop:to_prop ->
@@ -415,7 +415,7 @@ end = struct
         match s with
         | PdgMarks.SelNode (_, None) -> true
         | PdgMarks.SelIn z' | PdgMarks.SelNode (_,Some z') ->
-          Locations.Zone.intersects z z'
+          Memory_zone.intersects z z'
       in
       if add_mark then
         let new_m = SlicingMarks.missing_input_mark ~call:old_m ~called:m in

@@ -7,28 +7,28 @@
 (**************************************************************************)
 
 type t = {
-  over_inputs: Locations.Zone.t;
-  over_inputs_if_termination: Locations.Zone.t;
-  over_logic_inputs: Locations.Zone.t;
-  under_outputs_if_termination: Locations.Zone.t;
-  over_outputs: Locations.Zone.t;
-  over_outputs_if_termination: Locations.Zone.t;
+  over_inputs: Memory_zone.t;
+  over_inputs_if_termination: Memory_zone.t;
+  over_logic_inputs: Memory_zone.t;
+  under_outputs_if_termination: Memory_zone.t;
+  over_outputs: Memory_zone.t;
+  over_outputs_if_termination: Memory_zone.t;
 }
 
 let pretty_operational_inputs_aux fmt x =
   Format.fprintf fmt "@[<v 2>Operational inputs:@ @[<hov>%a@]@]@ "
-    Locations.Zone.pretty (x.over_inputs);
+    Memory_zone.pretty (x.over_inputs);
   Format.fprintf fmt "@[<v 2>Operational inputs on termination:@ @[<hov>%a@]@]@ "
-    Locations.Zone.pretty (x.over_inputs_if_termination);
+    Memory_zone.pretty (x.over_inputs_if_termination);
   Format.fprintf fmt "@[<v 2>Sure outputs:@ @[<hov>%a@]@]@ "
-    Locations.Zone.pretty (x.under_outputs_if_termination);
+    Memory_zone.pretty (x.under_outputs_if_termination);
 ;;
 
 let pretty_outputs_aux fmt x =
   Format.fprintf fmt "@[<v 2>Over outputs:@ @[<hov>%a@]@]@ "
-    Locations.Zone.pretty (x.over_outputs);
+    Memory_zone.pretty (x.over_outputs);
   Format.fprintf fmt "@[<v 2>Over outputs on termination:@ @[<hov>%a@]@]@ "
-    Locations.Zone.pretty (x.over_outputs_if_termination);
+    Memory_zone.pretty (x.over_outputs_if_termination);
 ;;
 
 let wrap_vbox f fmt x =
@@ -54,7 +54,7 @@ include
          Format.fprintf fmt "@]"
 
        let structural_descr =
-         let z = Locations.Zone.packed_descr in
+         let z = Memory_zone.packed_descr in
          Structural_descr.t_record [| z; z; z; z; z; z |]
        let reprs =
          List.map
@@ -65,7 +65,7 @@ include
                 over_logic_inputs = z;
                 over_outputs = z;
                 over_outputs_if_termination = z;
-              }) Locations.Zone.reprs
+              }) Memory_zone.reprs
        let name = "Full.tt"
        let hash
            { over_inputs_if_termination = a;
@@ -75,12 +75,12 @@ include
              over_outputs_if_termination = e;
              over_logic_inputs = f;
            } =
-         Zone.hash a +
-         17 * Zone.hash b +
-         587 * Zone.hash c +
-         1077 * Zone.hash d +
-         13119 * Zone.hash e +
-         15823 * Zone.hash f
+         Memory_zone.hash a +
+         17 * Memory_zone.hash b +
+         587 * Memory_zone.hash c +
+         1077 * Memory_zone.hash d +
+         13119 * Memory_zone.hash e +
+         15823 * Memory_zone.hash f
        let equal
            { over_inputs_if_termination = a;
              under_outputs_if_termination = b;
@@ -96,12 +96,12 @@ include
              over_outputs_if_termination = e';
              over_logic_inputs = f';
            } =
-         Zone.equal a a'
-         && Zone.equal b b'
-         && Zone.equal c c'
-         && Zone.equal d d'
-         && Zone.equal e e'
-         && Zone.equal f f'
+         Memory_zone.equal a a'
+         && Memory_zone.equal b b'
+         && Memory_zone.equal c c'
+         && Memory_zone.equal d d'
+         && Memory_zone.equal e e'
+         && Memory_zone.equal f f'
        let mem_project = Datatype.never_any_project
      end)
    : Datatype.S with type t := t)
@@ -116,22 +116,22 @@ let map f v = {
 }
 
 let bottom = {
-  over_inputs = Zone.bottom;
-  over_inputs_if_termination = Zone.bottom;
-  over_logic_inputs = Zone.bottom;
-  under_outputs_if_termination = Zone.top;
-  over_outputs = Zone.bottom;
-  over_outputs_if_termination = Zone.bottom;
+  over_inputs = Memory_zone.bottom;
+  over_inputs_if_termination = Memory_zone.bottom;
+  over_logic_inputs = Memory_zone.bottom;
+  under_outputs_if_termination = Memory_zone.top;
+  over_outputs = Memory_zone.bottom;
+  over_outputs_if_termination = Memory_zone.bottom;
 }
 
 let join c1 c2 = {
-  over_inputs = Zone.join c1.over_inputs c2.over_inputs;
+  over_inputs = Memory_zone.join c1.over_inputs c2.over_inputs;
   over_inputs_if_termination =
-    Zone.join c1.over_inputs_if_termination c2.over_inputs_if_termination;
-  over_logic_inputs = Zone.join c1.over_logic_inputs c2.over_logic_inputs;
-  over_outputs = Zone.join c1.over_outputs c2.over_outputs;
+    Memory_zone.join c1.over_inputs_if_termination c2.over_inputs_if_termination;
+  over_logic_inputs = Memory_zone.join c1.over_logic_inputs c2.over_logic_inputs;
+  over_outputs = Memory_zone.join c1.over_outputs c2.over_outputs;
   over_outputs_if_termination =
-    Zone.join c1.over_outputs_if_termination c2.over_outputs_if_termination;
+    Memory_zone.join c1.over_outputs_if_termination c2.over_outputs_if_termination;
   under_outputs_if_termination =
-    Zone.meet c1.under_outputs_if_termination c2.under_outputs_if_termination;
+    Memory_zone.meet c1.under_outputs_if_termination c2.under_outputs_if_termination;
 }

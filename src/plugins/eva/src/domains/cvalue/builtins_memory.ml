@@ -86,11 +86,11 @@ let add_deps_loc ~exact ~src_loc ~dst_loc deps_table =
 let add_sure_deps ~size ~src ~dst (deps_table, sure_output) =
   let src_loc = Locations.make_loc src (`Value size) in
   let dst_loc = Locations.make_loc dst (`Value size) in
-  let exact = Location_Bits.cardinal_zero_or_one dst in
+  let exact = Addresses.Bits.cardinal_zero_or_one dst in
   let deps_table = add_deps_loc ~exact ~src_loc ~dst_loc deps_table in
   let dst_zone = Locations.(enumerate_valid_bits Write dst_loc) in
-  let sure_zone = if exact then dst_zone else Zone.bottom in
-  deps_table, Zone.join sure_zone sure_output
+  let sure_zone = if exact then dst_zone else Memory_zone.bottom in
+  deps_table, Memory_zone.join sure_zone sure_output
 
 (* Copy the offsetmap of size [size] from [src] to [dst] in [state]. *)
 let copy_offsetmap ~name ~exact ~size ~src ~dst ~dst_expr state =
@@ -114,8 +114,8 @@ let min_max_size size =
 let shift ~factor:i src dst size =
   let new_size = Z.sub size i in
   let ival = Ival.inject_singleton i in
-  let new_src = Location_Bits.shift ival src in
-  let new_dst = Location_Bits.shift ival dst in
+  let new_src = Addresses.Bits.shift ival src in
+  let new_dst = Addresses.Bits.shift ival dst in
   new_src, new_dst, new_size
 
 (* Performs the remaining copy from [src] to [dst] for all other possible [size],
@@ -170,13 +170,13 @@ let char_location loc ?(min_size=Z.zero) max_size =
     Ival.inject_interval ~min:(Some min_size) ~max:(Some max)
       ~rem:Z.zero ~modu:size_char
   in
-  let loc = Location_Bits.shift shift loc in
+  let loc = Addresses.Bits.shift shift loc in
   make_loc loc (`Value size_char)
 
 let compute_memcpy ~name ~dst_expr ~dst ~src ~size state =
   let size_min, size_max = min_max_size size in
   (* Empty \from dependencies and sure output *)
-  let empty_deps = Assigns.Memory.empty, Zone.bottom in
+  let empty_deps = Assigns.Memory.empty, Memory_zone.bottom in
   (* First step: copy the bits we are sure to copy, i.e. for the minimum size
      [size_min] if it is not zero. *)
   let state, (deps_table, written_zone) =
@@ -258,7 +258,7 @@ let () =
 (*  Implementation of [memset] that accepts imprecise arguments. *)
 let frama_c_memset_imprecise state dst_expr dst v size =
   let size_min, size_max = min_max_size size in
-  let exact = Location_Bits.cardinal_zero_or_one dst in
+  let exact = Addresses.Bits.cardinal_zero_or_one dst in
   (* Write [v] everywhere that is written, between [dst] and [dst+size_min]. *)
   let state, min_zone =
     if Z.gt size_min Z.zero then
@@ -272,7 +272,7 @@ let frama_c_memset_imprecise state dst_expr dst v size =
       let loc = make_loc dst (`Value size_min) in
       let written_zone = enumerate_valid_bits Locations.Write loc in
       state, written_zone
-    else state, Zone.bottom
+    else state, Memory_zone.bottom
   in
   (* Write [v] everywhere that might be written, ie between
      [dst+size_min] and [dst+size_max-1]. *)
@@ -283,9 +283,9 @@ let frama_c_memset_imprecise state dst_expr dst v size =
       let state = Cvalue.Model.add_binding ~exact:false state loc v in
       let written_zone = enumerate_valid_bits Locations.Write loc in
       state, written_zone
-    else state, Zone.bottom
+    else state, Memory_zone.bottom
   in
-  let over_zone = Zone.join min_zone extra_zone in
+  let over_zone = Memory_zone.join min_zone extra_zone in
   if exact
   then state, min_zone, over_zone
   else
@@ -293,14 +293,14 @@ let frama_c_memset_imprecise state dst_expr dst v size =
        one base, and within it, size_min+leftmost_loc > rightmost_loc *)
     let state, sure_zone =
       try
-        let base, offset = Location_Bits.find_lonely_key dst in
+        let base, offset = Addresses.Bits.find_lonely_key dst in
         let minb, maxb = match Ival.min_and_max offset with
           | Some minb, Some maxb -> minb, maxb
           | _ -> raise Not_found
         in
         let sure = Z.sub (Z.add minb size_min) maxb in
         if Z.gt sure Z.zero then
-          let dst_loc = Location_Bits.inject base (Ival.inject_singleton maxb) in
+          let dst_loc = Addresses.Bits.inject base (Ival.inject_singleton maxb) in
           let vuninit = V_Or_Uninitialized.initialized v in
           let size_v = Bit_utils.sizeofchar () in
           let from = V_Offsetmap.create ~size:sure vuninit ~size_v in
@@ -313,8 +313,8 @@ let frama_c_memset_imprecise state dst_expr dst v size =
           let sure_zone = enumerate_valid_bits Locations.Write sure_loc in
           state, sure_zone
         else
-          state, Zone.bottom
-      with Not_found -> state, Zone.bottom (* from find_lonely_key + explicit raise *)
+          state, Memory_zone.bottom
+      with Not_found -> state, Memory_zone.bottom (* from find_lonely_key + explicit raise *)
     in
     state, sure_zone, over_zone
 
@@ -474,7 +474,7 @@ let frama_c_memset_precise state dst_expr dst v (exp_size, size) =
        fallback *)
     let size = Ival.project_int size in
     (* Extract the location, check that it is precise. *)
-    if Location_Bits.(is_bottom dst || not (cardinal_zero_or_one dst)) then
+    if Addresses.Bits.(is_bottom dst || not (cardinal_zero_or_one dst)) then
       raise (ImpreciseMemset NotSingletonLoc);
     if not (Z.gt size Z.zero) then
       raise (ImpreciseMemset NegativeOrNullSize);
@@ -492,7 +492,7 @@ let frama_c_memset_precise state dst_expr dst v (exp_size, size) =
       | None ->
         (* No such luck. Use the base and the offset of [dst] to resynthesize
            a type *)
-        let base_dst, offset_dst = Location_Bits.find_lonely_binding dst in
+        let base_dst, offset_dst = Addresses.Bits.find_lonely_binding dst in
         let offset = Ival.project_int offset_dst in
         let vi_dst = Base.to_varinfo base_dst in
         let mo = Bit_utils.MatchSize size in
@@ -579,7 +579,7 @@ let frama_C_is_base_aligned _state = function
       match Ival.project_small_set (Cvalue.V.project_ival y) with
       | Some si ->
         let aligned =
-          Location_Bytes.for_all
+          Addresses.Bytes.for_all
             (fun b _o -> List.for_all (is_aligned_by b) si)
             x
         in
@@ -598,7 +598,7 @@ let frama_c_offset _state = function
     let result =
       try
         let acc = Ival.bottom in
-        let offsets = Location_Bytes.fold_i (fun _b -> Ival.join) x acc in
+        let offsets = Addresses.Bytes.fold_i (fun _b -> Ival.join) x acc in
         Cvalue.V.inject_ival offsets
       with Abstract_interp.Error_Top ->
         Self.error ~current:true

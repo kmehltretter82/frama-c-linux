@@ -44,12 +44,12 @@ module type Location_map_bitwise = sig
 
   val pretty_debug: t Pretty_utils.formatter
 
-  val add_binding : exact:bool -> t -> Zone.t -> v -> t
+  val add_binding : exact:bool -> t -> Memory_zone.t -> v -> t
   val add_binding_loc: exact:bool -> t -> location -> v -> t
   val add_base: Base.t -> LOffset.t -> t -> t
   val remove_base: Base.t -> t -> t
 
-  val find : t -> Zone.t -> v Lattice_bounds.or_bottom
+  val find : t -> Memory_zone.t -> v Lattice_bounds.or_bottom
 
   val filter_base : (Base.t -> bool) -> t -> t
 
@@ -61,14 +61,14 @@ module type Location_map_bitwise = sig
   (** The following fold_* functions, as well as {!map2} take arguments
       of type [map] to force their user to handle the cases Top and Bottom
       explicitly. *)
-  val fold: (Zone.t -> v -> 'a -> 'a) -> map -> 'a -> 'a
+  val fold: (Memory_zone.t -> v -> 'a -> 'a) -> map -> 'a -> 'a
   (** [fold f m] folds a function [f] on the bindings in [m]. Contiguous
       bits with the same value are merged into a single zone. Different bases
       are presented in different zones. *)
 
   val fold_base : (Base.t -> LOffset.t -> 'a -> 'a) -> map -> 'a -> 'a
 
-  val fold_fuse_same : (Zone.t -> v -> 'a -> 'a) -> map -> 'a -> 'a
+  val fold_fuse_same : (Memory_zone.t -> v -> 'a -> 'a) -> map -> 'a -> 'a
   (** Same behavior as [fold], except if two non-contiguous ranges [r1] and
       [r2] of a given base are mapped to the same value.
       [fold] will call its argument [f] on each range successively
@@ -79,10 +79,10 @@ module type Location_map_bitwise = sig
   val fold_join_zone:
     both:(Int_Intervals.t -> LOffset.t -> 'a) ->
     conv:(Base.t -> 'a -> 'b) ->
-    empty_map:(Locations.Zone.t -> 'b) ->
+    empty_map:(Memory_zone.t -> 'b) ->
     join:('b -> 'b -> 'b) ->
     empty:'b ->
-    Locations.Zone.t -> map -> 'b
+    Memory_zone.t -> map -> 'b
   (** [fold_join_zone ~both ~conv ~empty_map ~join ~empty z m] folds over the
       intervals present in [z]. When a base [b] is present in both [z] and [m],
       and bound respectively to [itvs] and [mb], [both itvs mb] is called.

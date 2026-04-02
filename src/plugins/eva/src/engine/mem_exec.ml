@@ -24,9 +24,9 @@ exception TooImprecise
 
 (* Extract all the bases from a zone *)
 let bases = function
-  | Locations.Zone.Top (Base.SetLattice.Top, _) -> raise TooImprecise
-  | Locations.Zone.Top (Base.SetLattice.Set s, _) -> s
-  | Locations.Zone.Map m -> Base.Hptset.from_map (Locations.Zone.shape m)
+  | Memory_zone.Top (Base.SetLattice.Top, _) -> raise TooImprecise
+  | Memory_zone.Top (Base.SetLattice.Set s, _) -> s
+  | Memory_zone.Map m -> Base.Hptset.from_map (Memory_zone.shape m)
 
 
 let counter = ref 0
@@ -102,8 +102,8 @@ module Make
     in
     fun bases z ->
       match z with
-      | Locations.Zone.Map m -> f bases (Locations.Zone.shape m)
-      | Locations.Zone.Top _ -> bases (* Never happens anyway *)
+      | Memory_zone.Map m -> f bases (Memory_zone.shape m)
+      | Memory_zone.Top _ -> bases (* Never happens anyway *)
 
   (* Extends the input [bases] of a function [kf] by adding all bases related to
      these inputs in state [state]. We perform a fixpoint over [Domain.relate]

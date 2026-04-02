@@ -19,7 +19,7 @@ type taint = | Direct | Indirect | Untainted
 (** Is a memory zone tainted according to a given state?
     Only consider the taints of the given [names], if any. Otherwise,
     a memory zone is tainted as soon as it is tainted for at least one taint. *)
-val is_tainted: ?names:string list -> state -> Locations.Zone.t -> taint
+val is_tainted: ?names:string list -> state -> Memory_zone.t -> taint
 
 (** Returns the list of taint names encountered by the taint analysis. *)
 val taint_names: unit -> string list
@@ -36,4 +36,4 @@ type taint_names_by_kind =
 (** Returns the sets of taint names whose tainted locations intersect the given
     memory zone, classified by kind of dependency (direct or indirect). *)
 val taint_names_by_kind:
-  state -> Locations.Zone.t -> taint_names_by_kind Lattice_bounds.or_top
+  state -> Memory_zone.t -> taint_names_by_kind Lattice_bounds.or_top

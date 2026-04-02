@@ -18,7 +18,7 @@ module type API = sig
       - the assigns of the function, i.e. the dependencies of the result
         and the dependencies of each zone written to;
       - and its sure outputs, i.e. an under-approximation of written zones. *)
-  type call_assigns = (Assigns.t * Locations.Zone.t) option
+  type call_assigns = (Assigns.t * Memory_zone.t) option
 
   type analysis_kind =
     [ `Builtin (** A cvalue builtin is used to interpret the function. *)

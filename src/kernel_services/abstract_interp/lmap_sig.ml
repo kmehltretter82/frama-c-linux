@@ -84,7 +84,7 @@ module type S = sig
       is no Top value in the type {!v}. *)
 
   val copy_offsetmap :
-    Location_Bits.t -> Z.t -> t -> offsetmap or_bottom
+    Addresses.Bits.t -> Z.t -> t -> offsetmap or_bottom
   (** [copy_offsetmap alarms loc size m] returns the superposition of the
       ranges of [size] bits starting at [loc] within [m]. [size] must be
       strictly greater than zero. Return [None] if all pointed addresses are
@@ -122,7 +122,7 @@ module type S = sig
       may be valid are written. *)
   val paste_offsetmap :
     from:offsetmap ->
-    dst_loc:Location_Bits.t ->
+    dst_loc:Addresses.Bits.t ->
     size:Z.t ->
     exact:bool ->
     t -> t

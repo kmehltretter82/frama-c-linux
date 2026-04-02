@@ -264,7 +264,7 @@ let search_base kind ~offset base state =
 
 (* Returns a map binding a result for each base of [str]. *)
 let search_by_base kind str state =
-  Locations.Location_Bits.fold_i
+  Addresses.Bits.fold_i
     (fun base offset acc ->
        let t = search_base kind ~offset base state in
        Base.Map.add base t acc)
@@ -292,8 +292,8 @@ let return_length kind ~zero basemap =
 let return_pointer ~zero basemap =
   let loc_bits =
     Base.Map.fold
-      (fun base t acc -> Locations.Location_Bits.add base t.offset acc)
-      basemap Locations.Location_Bits.bottom
+      (fun base t acc -> Addresses.Bits.add base t.offset acc)
+      basemap Addresses.Bits.bottom
   in
   let cvalue = Locations.loc_bits_to_loc_bytes loc_bits in
   if zero || Base.Map.exists (fun _base t -> t.null) basemap
@@ -330,7 +330,7 @@ let reduce_by_validity ~size cvalue =
     let is_aligned _base ival =
       Ival.is_zero (Ival.scale_rem ~pos:true size ival)
     in
-    let valid = Locations.Location_Bits.for_all is_aligned loc_bits in
+    let valid = Addresses.Bits.for_all is_aligned loc_bits in
     loc.Locations.loc, valid
   else
     let valid_loc = Locations.(valid_part Read ~bitfield:true loc) in

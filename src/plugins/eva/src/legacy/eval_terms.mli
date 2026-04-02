@@ -57,7 +57,7 @@ val env_only_here: Model.t -> eval_env
 val env_current_state: eval_env -> Model.t
 
 (** Dependencies needed to evaluate a term or a predicate *)
-type logic_deps = Locations.Zone.t Cil_datatype.Logic_label.Map.t
+type logic_deps = Memory_zone.t Cil_datatype.Logic_label.Map.t
 
 (** Three modes to handle the alarms when evaluating a logical term. *)
 type alarm_mode =
@@ -69,7 +69,7 @@ type alarm_mode =
 (** Return a pair of (under-approximating, over-approximating) zones. *)
 val eval_tlval_as_zone_under_over:
   alarm_mode:alarm_mode ->
-  Locations.access -> eval_env -> term -> Zone.t * Zone.t
+  Locations.access -> eval_env -> term -> Memory_zone.t * Memory_zone.t
 
 (* ML: Should not be exported. *)
 type 'a eval_result = {
@@ -91,7 +91,7 @@ val eval_tlval_as_location :
 
 val eval_tlval_as_zone :
   alarm_mode:alarm_mode ->
-  Locations.access -> eval_env -> term -> Zone.t
+  Locations.access -> eval_env -> term -> Memory_zone.t
 
 val eval_predicate :
   eval_env -> predicate -> predicate_status

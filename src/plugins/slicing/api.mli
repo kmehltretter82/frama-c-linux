@@ -202,7 +202,7 @@ module Select : sig
   val select_stmt_zone :
     set ->
     Mark.t ->
-    Locations.Zone.t ->
+    Memory_zone.t ->
     before:bool ->
     Cil_types.stmt -> Cil_types.kernel_function -> set
 
@@ -269,7 +269,7 @@ module Select : sig
 
   (** To select an output zone related to a function. *)
   val select_func_zone :
-    set -> Mark.t -> Locations.Zone.t -> Cil_types.kernel_function -> set
+    set -> Mark.t -> Memory_zone.t -> Cil_types.kernel_function -> set
 
   (** To select the function result (returned value). *)
   val select_func_return : set -> spare:bool -> Cil_types.kernel_function -> set
@@ -345,7 +345,7 @@ module Select : sig
   val select_stmt_zone_internal :
     Cil_types.kernel_function ->
     ?select:t ->
-    Cil_types.stmt -> before:bool -> Locations.Zone.t -> Mark.t -> t
+    Cil_types.stmt -> before:bool -> Memory_zone.t -> Mark.t -> t
 
   (** Internally used to select a zone value at the beginning of a function.
       For a defined function, it is similar to [select_stmt_zone_internal]
@@ -353,7 +353,7 @@ module Select : sig
       functions.
       @raise SlicingTypes.NoPdg when the Pdg cannot be computed. *)
   val select_zone_at_entry_point_internal :
-    Cil_types.kernel_function -> ?select:t -> Locations.Zone.t -> Mark.t -> t
+    Cil_types.kernel_function -> ?select:t -> Memory_zone.t -> Mark.t -> t
 
   (** Internally used to select a zone value at the end of a function.
       For a defined function, it is similar to [select_stmt_zone_internal]
@@ -361,7 +361,7 @@ module Select : sig
       functions.
       @raise SlicingTypes.NoPdg when the Pdg cannot be computed. *)
   val select_zone_at_end_internal :
-    Cil_types.kernel_function -> ?select:t -> Locations.Zone.t -> Mark.t -> t
+    Cil_types.kernel_function -> ?select:t -> Memory_zone.t -> Mark.t -> t
 
   (** Internally used to select the statements that modify the
       given zone considered as in output.
@@ -369,7 +369,7 @@ module Select : sig
       The 'undef' zone is not propagated...
       @raise SlicingTypes.NoPdg when the Pdg cannot be computed. *)
   val select_modified_output_zone_internal :
-    Cil_types.kernel_function -> ?select:t -> Locations.Zone.t -> Mark.t -> t
+    Cil_types.kernel_function -> ?select:t -> Memory_zone.t -> Mark.t -> t
 
   (** Internally used to select a statement reachability :
       Only propagate a ctrl_mark on the statement control dependencies.
