@@ -163,7 +163,6 @@ let eval_assigns_from pre_state it =
     entire clause is [assigns asgn \from from]. The inferred dependencies
     are [found_froms], while [asgn] evaluates to [assigns_zone]. *)
 let check_from pre_state asgn assigns_zone from found_assigns =
-  let open Locations in
   let found_deps =
     if Logic_utils.is_result asgn.it_content then
       found_assigns.Assigns.return
@@ -219,7 +218,6 @@ let conv_status = function
 
 
 let check_fct_assigns kf ab ~pre_state found_froms =
-  let open Locations in
   let open Alarmset in
   let behaviors = Annotations.behaviors kf in
   (* Under-approximation of the union. *)

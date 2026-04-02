@@ -51,7 +51,7 @@ module Make (Engine : Engine_abstractions_sig.S) = struct
   let compute_zones to_loc (lval : Eva_ast.lval) =
     match lval.node with
     | Var vi, NoOffset ->
-      Locations.(zone_of_varinfo vi, Memory_zone.bottom)
+      Locations.zone_of_varinfo vi, Memory_zone.bottom
     | _ ->
       let loc = to_loc lval in
       let lv_zone = Location.enumerate_valid_bits Write loc in

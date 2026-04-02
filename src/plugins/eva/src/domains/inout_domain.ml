@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Locations
 
 type inout = {
   (* over-approximation of the memory locations written by the function *)

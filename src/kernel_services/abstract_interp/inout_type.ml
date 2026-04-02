@@ -39,7 +39,6 @@ let wrap_vbox f fmt x =
 let pretty_operational_inputs = wrap_vbox pretty_operational_inputs_aux
 let pretty_outputs = wrap_vbox pretty_outputs_aux
 
-open Locations
 
 include
   (Datatype.Make

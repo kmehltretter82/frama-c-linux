@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Locations
 open Visitor
 
 class virtual do_it_ = object(self)

@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Locations
 module Deps = Eva.Deps
 
 module DepsOrUnassigned = struct

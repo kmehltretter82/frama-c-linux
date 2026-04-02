@@ -8,7 +8,6 @@
 
 open Cil_types
 open Visitor
-open Locations
 
 class virtual do_it_ = object(self)
   inherit [Memory_zone.t] Cumulative_analysis.cumulative_visitor as super

@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Locations
 
 (* Must be used inlined, as Machine.theMachine is mutable
    let pointer_size_bytes = Machine.sizeof_ptr ()

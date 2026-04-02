@@ -8,7 +8,6 @@
 
 open Cil_types
 open Abstract_interp
-open Locations
 open Cvalue
 open Lattice_bounds
 

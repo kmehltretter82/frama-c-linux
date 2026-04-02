@@ -12,7 +12,6 @@
     *after* the stmt the user has chosen. *)
 
 open Cil_types
-open Locations
 
 type t =
   | Assign of Cil_types.stmt

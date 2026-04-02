@@ -403,7 +403,6 @@ struct
       (equalities, deps, modified_zone: t)
 
   let assign ~pos:_ left_value right_expr value valuation state =
-    let open Locations in
     let left_loc = Precise_locs.imprecise_location left_value.lloc in
     let direct_left_zone = Locations.(enumerate_valid_bits Write left_loc) in
     let state = kill Hcexprs.Modified direct_left_zone state in

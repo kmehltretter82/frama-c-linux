@@ -89,7 +89,6 @@ let possible_pointer access location =
 (* Are [ev1] and [ev2] safely comparable, or does their comparison involves
    invalid pointers, or is undefined (typically pointers in different bases). *)
 let are_comparable_reason kind ev1 ev2 =
-  let open Locations in
   (* If both of the operands have arithmetic type, the comparison is valid. *)
   if Addresses.Bytes.is_included ev1 Addresses.Bytes.top_int
   && Addresses.Bytes.is_included ev2 Addresses.Bytes.top_int

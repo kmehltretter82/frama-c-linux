@@ -8,7 +8,6 @@
 
 open Eval
 open Eva_ast
-open Locations
 
 module K = Hcexprs
 module V = Cvalue.V (* TODO: functorize (with locations too ?) *)

@@ -10,7 +10,6 @@
     only operational reads are found.) *)
 
 open Cil_types
-open Locations
 
 type t =
   | Direct of Cil_types.stmt

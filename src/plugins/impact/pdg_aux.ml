@@ -8,7 +8,6 @@
 
 open Pdg_types
 open PdgIndex
-open Locations
 
 type node = PdgTypes.Node.t * Memory_zone.t
 

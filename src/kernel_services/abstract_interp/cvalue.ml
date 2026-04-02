@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Abstract_interp
-open Locations
 open Cil_types
 
 module CardinalEstimate = struct
