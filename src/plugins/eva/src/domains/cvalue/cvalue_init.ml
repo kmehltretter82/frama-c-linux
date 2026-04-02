@@ -270,9 +270,9 @@ let initialize_var_using_type varinfo state =
           !state
         with
         | Cil.LenOfArray cause ->
-          Self.result ~once:true ~current:true
-            "problem with array size (%a), assuming 0"
-            Cil.pp_incorrect_array_length cause;
+          Self.warning ~wkey:Self.wkey_unknown_size ~once:true ~current:true
+            "problem with array size (%a) for variable %a, assuming 0"
+            Cil.pp_incorrect_array_length cause Printer.pp_varinfo varinfo;
           (* This is either a flexible array member (for which Cil
              implicitly returns a size of 0, so we are doing the proper
              thing), or an incomplete array (which is forbidden)  *)
