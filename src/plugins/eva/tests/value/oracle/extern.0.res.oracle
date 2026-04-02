@@ -7,8 +7,8 @@
 [eva:unknown-size] extern.i:7: Warning: 
   during initialization of variable 'T4', size of type 'int const []' cannot be
   computed (Size of array without number of elements.)
-[eva] extern.i:16: 
-  problem with array size (not a compile-time constant), assuming 0
+[eva:unknown-size] extern.i:16: Warning: 
+  problem with array size (not a compile-time constant) for variable s, assuming 0
 [eva:progress] Initial state computed
 [eva:initial-state] Values of globals at initialization
   T1 ∈ [--..--]
