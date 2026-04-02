@@ -4,7 +4,6 @@
   $ frama-c -check -no-autoload-plugins -load-module eva,inout,scope -machdep gcc_x86_64 -cpp-extra-args="-DALIGN=1024" c2y.c -std=c2y -eva -eva-verbose 1
   [kernel] Parsing c2y.c (with preprocessing)
   [eva] Analyzing a complete application starting at main
-  [eva] ====== VALUES COMPUTED ======
   [eva:summary] ====== ANALYSIS SUMMARY ======
     ----------------------------------------------------------------------------
     1 function analyzed (out of 1): 100% coverage.
