@@ -309,7 +309,7 @@ let dump_assume : Format.formatter -> P.t -> unit =
     Format.fprintf fmt "  }@."
 
 
-let escape fmt = Pretty_utils.ksfprintf (fun s -> String.escaped s) fmt
+let escape fmt = Format.kasprintf (fun s -> String.escaped s) fmt
 
 let output_dot : type a b. out_channel -> ?checks:_ -> (a,b) env -> unit =
   fun cout ?(checks=Bag.empty) env ->

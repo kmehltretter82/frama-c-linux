@@ -76,7 +76,7 @@ let invalid = props "invalid" R.InvalidStatus.get
 exception WrongFormat of string
 
 let failwith msg =
-  Pretty_utils.ksfprintf (fun s -> raise (WrongFormat s)) msg
+  Format.kasprintf (fun s -> raise (WrongFormat s)) msg
 
 let default = `NONE , {
     r_id = "unclassified" ;

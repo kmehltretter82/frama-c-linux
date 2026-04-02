@@ -283,7 +283,7 @@ let parse_error ?loc msg =
     else
       Format.fprintf fmt ", before or at token: %s" token
   in
-  Pretty_utils.ksfprintf (fun str ->
+  Format.kasprintf (fun str ->
       Kernel.feedback ~source:(fst loc) "%s:@." str
         ~append:(fun fmt ->
             Format.fprintf fmt "%a%a\n"

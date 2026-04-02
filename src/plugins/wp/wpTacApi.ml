@@ -326,13 +326,13 @@ class configurator (tactic : Tactical.tactical) =
     method get_error = error
 
     method set_title : 'a. 'a Tactical.formatter =
-      fun msg -> Pretty_utils.ksfprintf (fun m -> title <- m) msg
+      fun msg -> Format.kasprintf (fun m -> title <- m) msg
 
     method set_descr : 'a. 'a Tactical.formatter =
-      fun msg -> Pretty_utils.ksfprintf (fun m -> descr <- m) msg
+      fun msg -> Format.kasprintf (fun m -> descr <- m) msg
 
     method set_error : 'a. 'a Tactical.formatter =
-      fun msg -> Pretty_utils.ksfprintf (fun m -> error <- Some m) msg
+      fun msg -> Format.kasprintf (fun m -> error <- Some m) msg
 
     method update_field :
       'a. ?enabled:bool -> ?title:string -> ?tooltip:string ->

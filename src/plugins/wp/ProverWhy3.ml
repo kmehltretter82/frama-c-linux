@@ -31,7 +31,7 @@ let option_qual =
     "why3" "qualifier"
 
 let why3_failure msg =
-  Pretty_utils.ksfprintf failwith msg
+  Format.kasprintf failwith msg
 
 type why3_conf = {
   env : Why3.Env.env ;

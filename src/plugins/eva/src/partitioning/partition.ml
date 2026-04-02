@@ -462,7 +462,7 @@ struct
       Self.warning ~source ~once:true "%s" message;
       raise Operation_failed
     in
-    Pretty_utils.ksfprintf warn_and_raise message
+    Format.kasprintf warn_and_raise message
 
   let evaluate_exp_to_ival ~source state exp =
     (* Evaluate the expression *)

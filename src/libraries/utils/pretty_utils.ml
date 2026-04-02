@@ -10,11 +10,6 @@ let null = Format.make_formatter (fun _ _ _ -> ()) (fun _ -> ())
 let with_null k msg = Format.kfprintf (fun _ -> k ()) null msg
 let nullprintf msg = Format.ifprintf null msg
 
-let ksfprintf f fmt =
-  let b = Buffer.create 20 in
-  let return fmt = Format.pp_print_flush fmt (); f (Buffer.contents b) in
-  Format.kfprintf return (Format.formatter_of_buffer b) fmt
-
 let to_string ?margin pp x =
   let b = Buffer.create 20 in
   let f = Format.formatter_of_buffer b in

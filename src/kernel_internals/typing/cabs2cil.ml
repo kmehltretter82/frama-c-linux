@@ -3524,7 +3524,7 @@ struct
      escape Cabs2cil. Hence, each call to a function of module [Ltyping] below
      must catch it. *)
   let error loc msg =
-    Pretty_utils.ksfprintf (fun e -> raise (LogicTypeError (loc,e))) msg
+    Format.kasprintf (fun e -> raise (LogicTypeError (loc,e))) msg
 
   let on_error f rollback x =
     try f x with

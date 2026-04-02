@@ -307,7 +307,7 @@ let failed ?pos msg = {
 
 let cached r = if is_verdict r then { r with cached=true } else r
 
-let kfailed ?pos msg = Pretty_utils.ksfprintf (failed ?pos) msg
+let kfailed ?pos msg = Format.kasprintf (failed ?pos) msg
 
 let pp_perf_forced fmt r =
   begin
