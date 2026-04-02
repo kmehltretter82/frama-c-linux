@@ -1601,10 +1601,27 @@ module Make
 
   let to_domain_valuation valuation =
     let find = Valuation.find valuation in
-    let fold f acc = Valuation.fold f valuation acc in
     let find_loc = Valuation.find_loc valuation in
     let find_loc_def = Valuation.find_loc_def valuation in
-    Abstract_domain.{ find ; fold ; find_loc ; find_loc_def }
+    let is_volatile term =
+      let compute find node get_volatile_status =
+        match find node with
+        | `Top -> true
+        | `Value r -> get_volatile_status r
+      in
+      match term with
+      | `Lval lval | `Expr { node = Lval lval} ->
+        compute find_loc lval (fun r -> r.volatile_lval || r.volatile_loc)
+      | `Expr expr ->
+        compute find expr (fun r -> r.volatile_expr)
+    in
+    let fold f acc =
+      let f expr record acc =
+        if record.volatile_expr then acc else f expr record acc
+      in
+      Valuation.fold f valuation acc
+    in
+    Abstract_domain.{ find ; fold ; find_loc ; find_loc_def; is_volatile; }
 
   let evaluate ?(valuation=Cache.empty) ?(reduction=true) ?subdivnb state expr =
     let eval, alarms = subdivided_forward_eval valuation ?subdivnb state expr in

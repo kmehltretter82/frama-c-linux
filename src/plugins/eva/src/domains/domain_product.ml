@@ -127,9 +127,7 @@ module Make
         (fun expr record acc -> f expr (lift_record side record) acc)
         acc
     in
-    let find_loc = valuation.find_loc in
-    let find_loc_def = valuation.find_loc_def in
-    Abstract_domain.{ find; fold; find_loc; find_loc_def }
+    Abstract_domain.{ valuation with find; fold; }
 
   let left_val = lift_valuation (fun o -> o.left)
   let right_val = lift_valuation (fun o -> o.right)
