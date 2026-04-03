@@ -391,6 +391,7 @@ struct
        indeterminate_copy value
     then state
     else
+      let right_expr = Eva_ast.const_fold right_expr in
       let (equalities, deps, modified_zone: t) = state in
       let lterm = HCE.of_lval left_lval in
       let lterm_lvals = Hcexprs.empty_lvalues in
@@ -406,7 +407,6 @@ struct
     let left_loc = Precise_locs.imprecise_location left_value.lloc in
     let direct_left_zone = Locations.(enumerate_valid_bits Write left_loc) in
     let state = kill Hcexprs.Modified direct_left_zone state in
-    let right_expr = Eva_ast.const_fold right_expr in
     try
       let indirect_left_zone =
         Eva_ast.PreciseDepsOf.indirect_zone_of_lval
@@ -457,25 +457,23 @@ struct
     | false, BinOp (Ne, e1, e2, _) ->
       begin
         if not (is_safe_equality valuation e1 e2)
+        || Eva_ast.exp_contains_volatile e1
+        || Eva_ast.exp_contains_volatile e2
+        || not (Ast_types.is_scalar e1.typ)
+        || (expr_is_cardinal_zero_or_one_loc valuation e1 &&
+            expr_cardinal_zero_or_one valuation e2)
+        || (expr_is_cardinal_zero_or_one_loc valuation e2 &&
+            expr_cardinal_zero_or_one valuation e1)
         then `Value state
         else
           let e1 = Eva_ast.const_fold e1
           and e2 = Eva_ast.const_fold e2 in
-          if Eva_ast.exp_contains_volatile e1
-          || Eva_ast.exp_contains_volatile e2
-          || not (Ast_types.is_scalar e1.typ)
-          || (expr_is_cardinal_zero_or_one_loc valuation e1 &&
-              expr_cardinal_zero_or_one valuation e2)
-          || (expr_is_cardinal_zero_or_one_loc valuation e2 &&
-              expr_cardinal_zero_or_one valuation e1)
-          then `Value state
-          else
-            try
-              let a1, a1_lvals, deps = register e1 valuation deps in
-              let a2, a2_lvals, deps = register e2 valuation deps in
-              let eqs = Equality.Set.unite (a1, a1_lvals) (a2, a2_lvals) eqs in
-              `Value (eqs, deps, modified_zone)
-            with Top_location -> `Value state
+          try
+            let a1, a1_lvals, deps = register e1 valuation deps in
+            let a2, a2_lvals, deps = register e2 valuation deps in
+            let eqs = Equality.Set.unite (a1, a1_lvals) (a2, a2_lvals) eqs in
+            `Value (eqs, deps, modified_zone)
+          with Top_location -> `Value state
       end
     | _ -> `Value state
 
