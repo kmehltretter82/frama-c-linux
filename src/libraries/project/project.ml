@@ -38,7 +38,7 @@ let print_aux ?(post=Fun.id) should_print kind msg =
   else Pretty_utils.nullprintf msg
 
 let print_warning msg =
-  let should_print = !warning_level >= 0 in
+  let should_print = !warning_level > 0 in
   let kind =
     match !warning_level with
     | x when x <= 0 -> Log.Result (* will not be printed anyway *)
