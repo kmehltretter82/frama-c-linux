@@ -192,32 +192,12 @@ function Stmt(props: StmtProps): JSX.Element | null {
   const { descr, scope } = States.useMarker(stmt);
   const { sloc } = States.useMarker(marker);
   const { name: fct } = States.useDeclaration(scope);
-  const getCS = useCallstacks();
-  const [cs, setCS] = React.useState<Callstack.callstack | undefined>();
-  const [currCS, ] = States.useSyncState(Callstack.currentCallstacks);
-  const isSelected = cs && currCS?.includes(cs);
-  const { setSelected } = useSelectedCS();
-  // get callstack
-  React.useEffect(() => {
-    if(!marker) return;
-    getCS([marker]).then(e => {
-      if(e.length === 1 && e[0] !== "Summary") setCS(e[0]); });
-    }, [marker, setCS, getCS]);
-
   if (!marker || !fct) return null;
   // Location sloc should always be defined for statements.
   const label = short ? `@L${sloc?.line}` : `@${sloc?.base}:${sloc?.line}`;
   const title = stmt ? descr : "Start of function " + fct;
   const className = 'dome-text-cell eva-stmt';
-  return <>
-    <span className={className} title={title}>{label}</span>
-    <IconButton
-      icon='FILTER'
-      title={isSelected ? 'Callstack is selected' : 'Filter the callstack'}
-      kind={isSelected ? 'selected' : 'default'}
-      onClick={() => cs && setSelected(cs)}
-    />
-  </>;
+  return <span className={className} title={title}>{label}</span>;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -455,11 +435,12 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
 interface ProbeValuesProps {
   probe: Probe;
   pinProbe: (loc: Ast.marker, pin: boolean) => void;
+  setSelectedCallstack: (c: Callstack.callstack) => void;
   isSelectedCallstack: (c: callstack) => boolean;
 }
 
 function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
-  const { probe, pinProbe, isSelectedCallstack } = props;
+  const { probe, pinProbe, setSelectedCallstack, isSelectedCallstack } = props;
 
   const onSelected = (marker: Ast.marker, modifier: Modifier): void => {
     /* Pin the current probe so that its column is not removed
@@ -469,13 +450,23 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
   };
 
   // Building common parts
-  const onContextMenu = (evaluation?: Values.evaluation) => (): void => {
+  const onContextMenu = (
+    callstack: callstack,
+    evaluation?: Values.evaluation
+  ) => (): void => {
     const { value = '', pointedVars = [] } = evaluation ?? {};
     const items: Dome.PopupMenuItem[] = [];
     const copy = (): void => {
       if (value) navigator.clipboard.writeText(textToString(value));
     };
     if (value !== '') items.push({ label: 'Copy to clipboard', onClick: copy });
+    if(callstack !== 'Summary') {
+      items.push('separator');
+      items.push({
+        label: 'Add/Remove this callstack from the selection',
+        onClick: () => setSelectedCallstack(callstack) }
+      );
+    }
     if (items.length > 0 && pointedVars.length > 0) items.push('separator');
     pointedVars.forEach((lval) => {
       const [text, lvalMarker] = lval;
@@ -503,7 +494,8 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
       const warning =
         <Icon className={alarmClass} size={10} title={title} id="WARNING" />;
       return (
-        <td className={c} colSpan={colSpan} onContextMenu={onContextMenu(e)}>
+        <td className={c} colSpan={colSpan}
+          onContextMenu={onContextMenu(callstack, e)} >
           <TableCell right={warning} align={align}>
             <MarkerText onSelected={onSelected} text={value} />
           </TableCell>
@@ -600,6 +592,7 @@ interface ScopeProps {
   byCallstacks: boolean;
   getCallstacks: Request<Ast.marker[], callstack[]>;
   setByCallstacks: (byCallstack: boolean) => void;
+  setSelectedCallstack: (c: Callstack.callstack) => void;
   selectCallstack: (callstack: callstack) => void;
   isSelectedCallstack: (c: callstack) => boolean;
   locEvt: Dome.Event<Ast.marker>;
@@ -611,7 +604,7 @@ const PageSize = 99;
 
 async function ScopeSection(props: ScopeProps): Promise<JSX.Element> {
   const {
-    scope, folded, isSelectedCallstack, locEvt,
+    scope, folded, setSelectedCallstack, isSelectedCallstack, locEvt,
     byCallstacks, getCallsites,
     getCallstacks: getCS, pinProbe,
     setFolded, setByCallstacks, close,
@@ -659,7 +652,7 @@ async function ScopeSection(props: ScopeProps): Promise<JSX.Element> {
   const descrs = data.map((d) => ProbeDescr(d)).flat();
 
   /* Computes the summary values */
-  const miscs = { pinProbe, isSelectedCallstack };
+  const miscs = { pinProbe, isSelectedCallstack, setSelectedCallstack };
   const builders = data.map((d: Data) => ProbeValues({ ...d, ...miscs }));
   const summary = await Promise.all(builders.map((b) => b('Summary')));
   const summaryKind = allCallstacks.length === 0 ? 'None' : 'Summary';
@@ -958,6 +951,7 @@ function EvaTable(): JSX.Element {
   const getProbe = useProbe();
   const getCallsites = useCallsites();
   const getCallstacks = useCallstacks();
+  const { setSelected } = useSelectedCS();
 
   /* Updates the scope manager when the showCallstacks state changes. */
   React.useEffect(() => {
@@ -1064,6 +1058,7 @@ function EvaTable(): JSX.Element {
         byCallstacks,
         getCallstacks,
         setByCallstacks: setByCS,
+        setSelectedCallstack: setSelected,
         selectCallstack: (c: callstack) => { setCS(c); setTic(tac + 1); },
         isSelectedCallstack,
         locEvt,
@@ -1074,7 +1069,7 @@ function EvaTable(): JSX.Element {
     return Promise.all(elts);
   }, [
     cs, setCS, fcts, focus, setFocus, tac,
-    getCallsites, setLocPin, csFct,
+    getCallsites, setLocPin, csFct, setSelected,
     getCallstacks, getProbe, remove, locEvt
   ]);
   const { result: functions } = Dome.usePromise(functionsPromise);
