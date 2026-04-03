@@ -78,14 +78,15 @@ struct
     let id = WpPropId.get_propid pid in
     file ~id ~model ~prover ~ext:"err" ()
 
-  let file_goal ~pid ~model ~prover =
-    let ext = match prover with
-      | Qed -> "qed"
-      | Why3 _ -> "why"
-      | Tactical -> "tac"
-    in
+  let file_goal  ~pid ~model driver prover =
+    let basefile = Why3.Driver.get_filename driver
+        ~input_file:"f" ~theory_name:"t" ~goal_name:"g" in
+    let ext = Filename.extension basefile in
+    let ext = if ext = "" then ".why" else ext in
+    let ext = String.sub ext 1 (String.length ext - 1) in
     let id = WpPropId.get_propid pid in
-    file ~id ~model ~prover ~ext ()
+    file ~id ~model ~prover:(Why3 prover) ~ext ()
+
 end
 
 module GOAL =

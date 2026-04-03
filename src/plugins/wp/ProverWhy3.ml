@@ -1346,15 +1346,22 @@ let output_task wpo drv ?(script : Filepath.t option) prover task =
   let file = Wpo.DISK.file_goal
       ~pid:wpo.Wpo.po_pid
       ~model:wpo.Wpo.po_model
-      ~prover:(VCS.Why3 prover) in
+      drv prover in
   let open Filesystem.Operators in
   let$ fmt = Filesystem.with_formatter_exn file in
-  Format.fprintf fmt "(* WP Task for Prover %s *)@\n"
-    (Why3Provers.ident_why3 prover) ;
+  let pp_header fmt msg data =
+    match Filepath.extension file with
+    | ".mlw" | ".why" | ".v" ->
+      Format.fprintf fmt "(* %s %s *)@\n" msg data
+    | ".smt2" | ".psmt2" ->
+      Format.fprintf fmt "; %s %s@\n" msg data
+    | _ -> ()
+  in
+  pp_header fmt "WP Task for Prover" @@ Why3Provers.ident_why3 prover ;
   let old = Option.map
       (fun fscript ->
          let hash = Filesystem.digest fscript in
-         Format.fprintf fmt "(* WP Script %s *)@\n" hash ;
+         pp_header fmt "WP Script" hash ;
          open_in (Filepath.to_string_abs fscript)
       ) script in
   let _ = Why3.Driver.print_task_prepared ?old drv fmt task in
@@ -1363,13 +1370,8 @@ let output_task wpo drv ?(script : Filepath.t option) prover task =
 
 let digest_task wpo drv ?(script : Filepath.t option) prover task =
   output_task wpo drv ?script prover task;
-  let file = Wpo.DISK.file_goal
-      ~pid:wpo.Wpo.po_pid
-      ~model:wpo.Wpo.po_model
-      ~prover:(VCS.Why3 prover) in
-  begin
-    Filesystem.digest file
-  end
+  Filesystem.digest @@
+  Wpo.DISK.file_goal ~pid:wpo.Wpo.po_pid ~model:wpo.Wpo.po_model drv prover
 
 let run_batch pconf driver ~config
     ?(script : Filepath.t option)
