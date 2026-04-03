@@ -12,45 +12,61 @@
 
 let debug = ref false
 let feedback = ref false
-let default_source = "[Project]"
-
-let source = ref default_source
+let source = ref "nosource"
+let warning_level = ref 2
 
 let set_debug b = debug := b
 let set_feedback b = feedback := b
 let set_source s = source := s
-
-let warning_level = ref 2
-
 let set_warn_level l = warning_level := l
 
-let print should_print msg =
-  if should_print then Format.printf ("%s " ^^ msg ^^ "@.") !source
+let pretty kind fmt msg =
+  let evt = {
+    Log.evt_kind = kind;
+    evt_plugin = !source;
+    evt_category = Some "project";
+    evt_source = None;
+    evt_message = Rich_text.of_string msg;
+  } in
+  Format.fprintf fmt "%a" (Log.Event.pretty ?truncate:None) evt
+
+let print_aux ?(post=Fun.id) should_print kind msg =
+  if should_print then
+    Format.kasprintf (fun str ->
+        Format.printf "%a" (pretty kind) str; post ()
+      ) msg
   else Pretty_utils.nullprintf msg
 
-let print_debug msg = print !debug msg
-let print_feedback msg = print !feedback msg
 let print_warning msg =
-  match !warning_level with
-  | x when x <= 0 -> ()
-  | 1 -> Format.printf "%s %s@." default_source msg
-  | 2 -> Format.printf "%s Warning: %s@." default_source msg
-  | _ -> failwith (default_source ^ " " ^ msg)
+  let should_print = !warning_level >= 0 in
+  let kind =
+    match !warning_level with
+    | x when x <= 0 -> Log.Result (* will not be printed anyway *)
+    | 1 -> Feedback
+    | 2 -> Warning
+    | _ -> Failure
+  in
+  let post () =
+    if !warning_level >= 3 then failwith "An error occurred in project library"
+  in
+  print_aux ~post should_print kind msg
+
+let print_debug msg = print_aux !debug Debug msg
+let print_feedback msg = print_aux !feedback Feedback msg
 
 let guarded_feedback selection fmt_msg =
   if !feedback then begin
     if State_selection.is_full selection then
-      Format.printf fmt_msg
+      print_feedback fmt_msg
     else
       let n = State_selection.cardinal selection in
-      if n = 0 then
-        Pretty_utils.nullprintf fmt_msg
+      if n = 0 then Pretty_utils.nullprintf fmt_msg
       else
         let states =
           if n > 1 then Format.sprintf " (for %d states)" n
           else Format.sprintf " (for 1 state)"
         in
-        let f s = Format.printf "%s%s@." s states in
+        let f s = print_feedback "%s%s" s states in
         Format.kasprintf f fmt_msg
   end
   else
@@ -172,11 +188,7 @@ module States_operations = struct
         State_selection.empty
     in
     if not (State_selection.is_empty states_to_clear) then begin
-      let msg =
-        Format.sprintf "clearing dangling project pointers in project %S"
-          p.name
-      in
-      print_warning msg;
+      print_warning "clearing dangling project pointers in project %S" p.name;
       print_debug "@[the involved states are:%t@]"
         (fun fmt ->
            iter_on_selection
@@ -198,12 +210,9 @@ module States_operations = struct
   let unserialize ?selection dst loaded_states =
     let pp_err fmt n msg_sing msg_plural =
       if n > 0 then begin
-        let msg =
-          Format.sprintf fmt n
-            (if n = 1 then "" else "s")
-            (if n = 1 then msg_sing else msg_plural)
-        in
-        print_warning msg
+        print_warning fmt n
+          (if n = 1 then "" else "s")
+          (if n = 1 then msg_sing else msg_plural)
       end
     in
     let tbl = Hashtbl.create 97 in
@@ -243,8 +252,7 @@ module States_operations = struct
       Hashtbl.fold (fun _ s n -> if s.on_disk_saved then succ n else n) tbl 0
     in
     pp_err
-      "%d state%s in saved file ignored. \
-       %s this Frama-C configuration."
+      "%d state%s in saved file ignored. %s this Frama-C configuration."
       nb_ignored
       "It is invalid in"
       "They are invalid in";
@@ -397,12 +405,9 @@ let on ?selection p f x =
           (* the old current project has been remove: replace it by the previous
              one, if any *)
           if Q.length projects < 2 then
-            let msg =
-              Format.sprintf
-                "cannot restore project '%s'. Keep '%s' as default project."
-                old_current.name (current ()).name
-            in
-            print_warning msg
+            print_warning
+              "cannot restore project '%s'. Keep '%s' as default project."
+              old_current.name (current ()).name
           else
             set_to_old (Q.nth 1 projects)
     in

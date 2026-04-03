@@ -44,7 +44,7 @@ val set_debug: bool -> unit
 *)
 val set_feedback: bool -> unit
 
-(** Set the "source" of printed messages. Defaults to ["[Project]"]
+(** Set the "source" of printed messages. Defaults to ["nosource"]
     @since Frama-C+dev
 *)
 val set_source: string -> unit
