@@ -70,7 +70,7 @@ let generate_call ?model stmt =
   (generator model)#compute_call stmt
 
 let generate_all ?model ?bhv ?prop () =
-  (generator model)#compute_main ?bhv ?prop ()
+  (generator model)#compute_main ~fct:Fct_all ?bhv ?prop ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Interface                                                   --- *)
