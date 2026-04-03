@@ -136,14 +136,10 @@ let delete s =
 
 let add s =
   let uname = s.unique_name in
-  assert
-    (Kernel_log.verify
-       (not (Datatype.String.Hashtbl.mem states uname))
-       "state %S already exists."
-       uname);
-  assert
-    (Kernel_log.verify (uname <> "")
-       "state should have a non-empty name");
+  if uname = "" then
+    failwith "state should have a non-empty name";
+  if Datatype.String.Hashtbl.mem states uname then
+    failwith (Format.sprintf "state %S already exists." uname);
   Datatype.String.Hashtbl.add states uname s
 
 let unique_name_from_name name =

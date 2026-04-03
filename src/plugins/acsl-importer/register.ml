@@ -146,7 +146,7 @@ let import =
 
 (** Import from the cmdline process. *)
 let import_from_cmdline ast =
-  Options.feedback ~level:2 "Importing..." ;
+  Options.debug ~level:2 "Importing..." ;
   import [] [] ast;
   Options.set_importation_off ()
 

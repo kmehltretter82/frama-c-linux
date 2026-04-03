@@ -34,11 +34,41 @@ type project = Project_skeleton.t =
 (** {2 Options} *)
 (* ************************************************************************* *)
 
+(** If set to [true], prints debug information about projects.
+    @since Frama-C+dev
+*)
+val set_debug: bool -> unit
+
+(** If set to [true], prints feedbacks about projects.
+    @since Frama-C+dev
+*)
+val set_feedback: bool -> unit
+
+(** Set the "source" of printed messages. Defaults to ["nosource"]
+    @since Frama-C+dev
+*)
+val set_source: string -> unit
+
+(** Decide how warnings should be handled:
+    - <= 0 -> ignored
+    - 1 -> feedbacks
+    - 2 -> warnings (default)
+    - >= 3 -> errors ([Failure])
+
+    @since Frama-C+dev
+*)
+val set_warn_level: int -> unit
+
 val compress_saved_session: bool ref
 (** This is used to decide if projects should be compressed when saved with
     {!save} and {!save_all} without the [?compress] parameter. Defaults to
     [true].
     @since Frama-C+dev *)
+
+val set_keep_current: bool -> unit
+(** [set_keep_current b] keeps the current project forever (even after the end
+    of the current {!on}) iff [b] is [true].
+    @since Aluminium-20160501 *)
 
 (* ************************************************************************* *)
 (** {2 Operations on all projects} *)
@@ -125,7 +155,7 @@ val pid_to_name: int -> string
 
 val name_to_pid: string -> int option
 (** Return the project {!pid} based on its name. If several projects are found
-    with the same name, the most recent one will be picked (emits a warning).
+    with the same name, the most recent one will be picked.
     @since Frama-C+dev *)
 
 val set_name: t -> string -> unit
@@ -168,13 +198,8 @@ val on: ?selection:State_selection.t -> t -> ('a -> 'b) -> 'a -> 'b
 
 val on_from_pid: ?selection:State_selection.t -> int -> ('a -> 'b) -> 'a -> 'b
 (** Same than {!on} but find the project using its {!pid}.
-    @raise Log.AbortError if no project with this [pid] is found
+    @raise Unknown_project if no project with this [pid] is found
     @since Frama-C+dev *)
-
-val set_keep_current: bool -> unit
-(** [set_keep_current b] keeps the current project forever (even after the end
-    of the current {!on}) iff [b] is [true].
-    @since Aluminium-20160501 *)
 
 (**/**)
 val set_current_as_last_created: unit -> unit
@@ -197,6 +222,8 @@ val create_by_copy:
     applied when loading a project are applied (see {!load}).
     If [last], then remember that the returned project is the last created
     one.
+    @raise Failure If for some reasons we cannot create a temporary file in
+    '/tmp' (lack of disk space, permissions, etc).
 *)
 
 val create_by_copy_hook: (t -> t -> unit) -> unit

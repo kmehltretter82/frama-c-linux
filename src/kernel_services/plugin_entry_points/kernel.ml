@@ -30,13 +30,30 @@ include Kernel_log
 (* Link Kernel_log dkeys related to Fclib to the corresponding libraries
    options *)
 
+let is_enabled_debug ?(level=1) key =
+  is_debug_key_enabled key && debug_atleast level
+let is_enabled_verbose ?(level=1) key =
+  is_debug_key_enabled key && verbose_atleast level
+
+let should_warn_error wkey =
+  match get_warn_status wkey with
+  | Wfeedback | Wfeedback_once when verbose_atleast 1 -> 1
+  | Wfeedback | Wfeedback_once | Winactive -> 0
+  | Wactive | Wonce -> 2
+  | Werror | Werror_once | Wabort -> 3
+
 let set_fclib_debug _ _ =
-  let debug_task = is_debug_key_enabled dkey_task in
-  Task.set_debug debug_task;
-  let debug_hptmap = is_debug_key_enabled dkey_hptmap in
-  Hptmap.set_debug debug_hptmap
+  Task.set_debug (is_enabled_debug dkey_task);
+  Hptmap.set_debug (is_enabled_debug dkey_hptmap);
+  Project.set_debug (is_enabled_debug dkey_project);
+  Project.set_feedback (is_enabled_verbose dkey_project);
+  State_builder.set_debug (is_enabled_debug ~level:4 dkey_project)
+
+let set_fclib_warn _ _ =
+  Project.set_warn_level (should_warn_error wkey_project)
 
 let () = Message_category.add_update_hook set_fclib_debug
+let () = Warn_category.add_update_hook set_fclib_warn
 
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
@@ -397,12 +414,13 @@ module GeneralVerbose =
       let module_name = "GeneralVerbose"
     end)
 let () =
-  (* line order below matters *)
   GeneralVerbose.set_range ~min:0 ~max:max_int;
-  GeneralVerbose.add_set_hook (fun _ n -> Cmdline.Verbose_level.set n);
   match !Cmdline.Verbose_level.value_if_set with
   | None -> ()
   | Some n -> GeneralVerbose.set n
+let () =
+  (* Add the hook after setting it from Cmdline to avoid setting it twice. *)
+  GeneralVerbose.add_set_hook (fun _ n -> Cmdline.Verbose_level.set n)
 
 let () = Parameter_customize.set_group grp_debug
 let () = Parameter_customize.do_not_projectify ()
@@ -417,16 +435,13 @@ module GeneralDebug =
       let module_name = "GeneralDebug"
     end)
 let () =
-  (* line order below matters *)
   GeneralDebug.set_range ~min:0 ~max:max_int;
-  GeneralDebug.add_set_hook
-    (fun old n ->
-       if n = 0 then decr Plugin.positive_debug_ref
-       else if old = 0 then incr Plugin.positive_debug_ref;
-       Cmdline.Debug_level.set n);
   match !Cmdline.Debug_level.value_if_set with
   | None -> ()
   | Some n -> GeneralDebug.set n
+let () =
+  (* Add the hook after setting it from Cmdline to avoid setting it twice. *)
+  GeneralDebug.add_set_hook (fun _ n -> Cmdline.Debug_level.set n)
 
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.set_negative_option_name ""

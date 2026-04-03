@@ -187,9 +187,6 @@ val fold_on_plugins: (plugin -> 'a -> 'a) -> 'a -> 'a
 (** {2 Internal kernel stuff} *)
 (* ************************************************************************* *)
 
-val positive_debug_ref: int ref
-(** @since Boron-20100401 *)
-
 val session_is_set_ref: (unit -> bool) ref
 val session_ref: (unit -> Filepath.t) ref
 

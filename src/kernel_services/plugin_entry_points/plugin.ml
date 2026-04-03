@@ -10,7 +10,6 @@ module CamlString = String
 
 let empty_string = ""
 
-let positive_debug_ref = ref 0
 let session_is_set_ref = Extlib.mk_fun "session_is_set_ref"
 let session_ref = Extlib.mk_fun "session_ref"
 let cache_is_set_ref = Extlib.mk_fun "cache_is_set_ref"
@@ -634,9 +633,11 @@ struct
       set_range ~min:0 ~max:max_int;
       if is_kernel () then begin
         Kernel_log.kernel_verbose_atleast_ref := (fun n -> get () >= n);
-        match !Kernel_log.Verbose_level.value_if_set with
-        | None -> ()
-        | Some n -> set n
+        begin match !Kernel_log.Verbose_level.value_if_set with
+          | None -> ()
+          | Some n -> set n
+        end;
+        add_set_hook (fun _ n -> Kernel_log.Verbose_level.set n);
       end
     [@@alert "-kernel_log"]
   end
@@ -654,80 +655,26 @@ struct
            else "level of debug for plug-in " ^ P.name)
           ^ " (default to " ^ string_of_int default ^ ")"
       end)
-    let get () = if is_set () then get () else Cmdline.Debug_level.get ()
+
+    let get () =
+      if is_set () || Option.is_none !Cmdline.Debug_level.value_if_set
+      then get ()
+      else Cmdline.Debug_level.get ()
+
     let () =
       debug_level := get;
       (* line order below matters *)
       set_range ~min:0 ~max:max_int;
-      add_set_hook
-        (fun old n ->
-           (* the level of verbose is at least the level of debug *)
-           if n > Verbose.get () then Verbose.set n;
-           if n = 0 then decr positive_debug_ref
-           else if old = 0 then Stdlib.incr positive_debug_ref);
       if is_kernel () then begin
         Kernel_log.kernel_debug_atleast_ref := (fun n -> get () >= n);
-        match !Kernel_log.Debug_level.value_if_set with
-        | None -> ()
-        | Some n -> set n
+        begin match !Kernel_log.Debug_level.value_if_set with
+          | None -> ()
+          | Some n -> set n
+        end;
+        add_set_hook (fun _ n -> Kernel_log.Debug_level.set n)
       end
     [@@alert "-kernel_log"]
   end
-
-  type action = Print_help | Change_category of (bool * string) list
-
-  let warn_status_of_string = function
-    | "inactive" | "ignore" -> Log.Winactive
-    | "feedback-once" -> Log.Wfeedback_once
-    | "feedback" -> Log.Wfeedback
-    | "warning-once" | "warn-once" | "once" -> Log.Wonce
-    | "warning" | "warn" | "active" -> Log.Wactive
-    | "error-once" | "err-once" -> Log.Werror_once
-    | "error" | "err" -> Log.Werror
-    | "abort" -> Log.Wabort
-    | s -> L.abort "Unknown warning category status `%s'" s
-
-  let parse_warn_directives is_kernel _old_s s =
-    let set_status c s =
-      if is_kernel && not (L.is_registered_category c) then
-        Cmdline.run_after_extended_stage (fun () -> L.set_warn_status c s)
-      else
-        L.set_warn_status c s
-    in
-    let directives = CamlString.split_on_char ',' s in
-    if List.mem "help" directives then begin
-      match directives with
-      | [ "help" ] ->
-        Cmdline.run_after_exiting_stage
-          (fun () -> L.pp_all_warn_categories_status (); raise Cmdline.Exit)
-      | _ -> L.abort "mixing help with warning categories in `%s'" s
-    end else begin
-      let parse_single s =
-        match CamlString.split_on_char '=' s with
-        | [] -> assert false (* split_on_char should return at least an element
-                                even if it is the empty string *)
-        | [ c ] -> set_status c Log.Wactive
-        | [ c; status ] -> set_status c (warn_status_of_string status)
-        | _ -> L.abort "Ill-formed warn key directive `%s'" s
-      in
-      let non_empty s = s <> "" in
-      List.iter parse_single (List.filter non_empty directives)
-    end
-
-  let parse_category s =
-    let categories = CamlString.split_on_char ',' s in
-    if List.mem "help" categories then Print_help
-    else begin
-      let parse_single s =
-        match CamlString.get s 0 with
-        | '-' -> false, CamlString.sub s 1 (CamlString.length s - 1)
-        | '+' -> true, CamlString.sub s 1 (CamlString.length s - 1)
-        | _ -> true, s
-      in
-      let non_empty_category s =
-        if s <> "" then Some (parse_single s) else None in
-      Change_category (List.filter_map non_empty_category categories)
-    end
 
   let debug_category_optname = output_mode "Msg_key" "msg-key"
   module Message_category =
@@ -741,29 +688,30 @@ struct
            all categories"
     end)
 
+  let parse_category is_kernel _old_s s =
+    match Log.parse_category s with
+    | Category_help ->
+      Cmdline.run_after_exiting_stage
+        (fun () -> L.pp_all_categories (); raise Cmdline.Exit)
+    | Change_category l ->
+      let add_or_del flag c () =
+        if flag then L.add_or_warn c else L.del_or_warn c
+      in
+      let action (to_add, c) =
+        (* Allow loaded modules to add categories to the kernel:
+           Only categories that exist will be considered in the early
+           stage where -kernel-msg-key is running. Of course, if
+           none of the loaded modules register the given category,
+           a warning will still be emitted. *)
+        if is_kernel && not (L.is_registered_category c) then begin
+          Cmdline.run_after_extended_stage (add_or_del to_add c)
+        end else add_or_del to_add c ()
+      in
+      List.iter action l
+
   let () =
     let is_kernel = is_kernel () in
-    Message_category.add_set_hook
-      (fun _ s ->
-         match parse_category s with
-         | Print_help ->
-           Cmdline.run_after_exiting_stage
-             (fun () -> L.pp_all_categories (); raise Cmdline.Exit)
-         | Change_category l ->
-           let add_or_del flag c () =
-             if flag then L.add_or_warn c else L.del_or_warn c
-           in
-           let action (to_add, c) =
-             (* Allow loaded modules to add categories to the kernel:
-                Only categories that exist will be considered in the early
-                stage where -kernel-msg-key is running. Of course, if
-                none of the loaded modules register the given category,
-                a warning will still be emitted. *)
-             if is_kernel && not (L.is_registered_category c) then begin
-               Cmdline.run_after_extended_stage (add_or_del to_add c)
-             end else add_or_del to_add c ()
-           in
-           List.iter action l)
+    Message_category.add_set_hook (parse_category is_kernel)
 
   let warn_category_optname = output_mode "Warn_key" "warn-key"
   module Warn_category =
@@ -778,6 +726,21 @@ struct
            error, abort, feedback-once, warning-once, error-once. \
            Defaults to warning."
     end)
+
+  let parse_warn_directives is_kernel _old_s s =
+    let set_status (warning, status) =
+      if is_kernel && not (L.is_registered_category warning) then
+        Cmdline.run_after_extended_stage
+          (fun () -> L.set_warn_status warning status)
+      else
+        L.set_warn_status warning status
+    in
+    match Log.parse_warning s with
+    | Parsing_error msg -> L.abort "%s" msg
+    | Warning_help ->
+      Cmdline.run_after_exiting_stage
+        (fun () -> L.pp_all_warn_categories_status (); raise Cmdline.Exit)
+    | Set_status l -> List.iter set_status l
 
   let () =
     let is_kernel = is_kernel () in

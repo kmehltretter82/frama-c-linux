@@ -32,8 +32,10 @@ MAIN (compressed: false)
 [pdg] done for function f
 [sparecode] remove unused global declarations...
 [sparecode] result in new project 'default without sparecode'.
-[kernel] Warning: clearing dangling project pointers in project "default"
-[kernel] Warning: clearing dangling project pointers in project "default"
+[kernel:project] Warning: 
+  clearing dangling project pointers in project "default"
+[kernel:project] Warning: 
+  clearing dangling project pointers in project "default"
 [sparecode] remove unused code...
 [sparecode] remove unused global declarations...
 [sparecode] result in new project 'default without sparecode'.
@@ -41,8 +43,10 @@ MAIN (compressed: true)
 [sparecode] remove unused code...
 [sparecode] remove unused global declarations...
 [sparecode] result in new project 'default without sparecode'.
-[kernel] Warning: clearing dangling project pointers in project "default"
-[kernel] Warning: clearing dangling project pointers in project "default"
+[kernel:project] Warning: 
+  clearing dangling project pointers in project "default"
+[kernel:project] Warning: 
+  clearing dangling project pointers in project "default"
 [sparecode] remove unused code...
 [sparecode] remove unused global declarations...
 [sparecode] result in new project 'default without sparecode'.
