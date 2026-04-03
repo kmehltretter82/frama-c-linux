@@ -86,11 +86,9 @@ why3.import += "real.Square";
 why3.import += "frama_c_wp.cmath.Square";
 
 library exponential: qed
-why3.import += "real.ExpLog" ;
 why3.import += "frama_c_wp.cmath.ExpLog" ;
 
 library power: exponential sqrt
-why3.import += "real.PowerReal" ;
 
 library truncate: qed
 why3.import += "real.Truncate" ;
