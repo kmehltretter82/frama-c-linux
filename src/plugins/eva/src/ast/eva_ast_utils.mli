@@ -35,13 +35,6 @@ val height_lval : lval -> int
 
 (** Specialized visitors *)
 
-(** [exp_contains_volatile e] (resp. [lval_contains_volatile lv] is true
-    whenever one l-value contained inside the expression [e] (resp. the lvalue
-    [lv]) has volatile qualifier. Relational analyses should not learn
-    anything on such values. *)
-val exp_contains_volatile : exp -> bool
-val lval_contains_volatile : lval -> bool
-
 (** Returns the set of variables that syntactically appear in an expression or
     lvalue. *)
 val vars_in_exp : exp -> Cil_datatype.Varinfo.Set.t
