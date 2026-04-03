@@ -148,7 +148,7 @@ module PTable = Hashtbl.Make
 
 type proving_config = {
   provers: bool PTable.t ;
-  (* mutable *) strategies: bool ;
+  mutable strategies: bool ;
 }
 
 let config = ref None
@@ -207,21 +207,89 @@ let provers ?(filter=fun _ -> true) () =
     ~cmp:compare
     (fun p _ l -> if filter p then p :: l else l) (get ()).provers []
 
-let use_scripts () = PTable.find (get ()).provers Tactical
 let enabled p = PTable.find (get()).provers p
 
-let use_strategies () = (get ()).strategies
-
-let update_hooks = ref []
-let add_update_hook f = update_hooks := f :: !update_hooks
+let prover_hooks = ref []
+let add_prover_update_hook f = prover_hooks := f :: !prover_hooks
 
 let set_prover p ~state =
   PTable.replace (get()).provers p state ;
-  List.iter (fun f -> f p) !update_hooks
+  List.iter (fun f -> f p) !prover_hooks
+
+let use_scripts () = PTable.find (get ()).provers Tactical
+let use_strategies () = (get ()).strategies
+
+let scripts_hooks = ref []
+let add_scripts_update_hook f = scripts_hooks := f :: !scripts_hooks
+
+let set_use_scripts value =
+  let config = get() in
+  PTable.replace config.provers Tactical value ;
+  if not value then config.strategies <- false ;
+  List.iter (fun f -> f ()) !scripts_hooks
+
+let set_use_strategies value =
+  let config = get () in
+  config.strategies <- value ;
+  if value then set_use_scripts true ;
+  List.iter (fun f -> f ()) !scripts_hooks
 
 (* -------------------------------------------------------------------------- *)
 (* --- Interactive provers configuration                                  --- *)
 (* -------------------------------------------------------------------------- *)
+
+module ModeCache(Mode: sig
+    module Parameter : Parameter_sig.String
+    type t
+    val parse: string -> t
+    val name: string
+    val default: unit -> t
+  end)
+=
+struct
+  open Mode
+  let option = Parameter.name
+  let variable = "FRAMAC_WP_" ^ (String.uppercase_ascii name)
+  let cache_name = "Wp.Prover." ^ (String.capitalize_ascii name) ^ ".Cache"
+
+  include WpContext.StaticGenerator(Datatype.Unit)
+      (struct
+        type key = unit
+        type data = t
+        let name = cache_name
+        let compile () =
+          let parse ~origin ~fallback s =
+            try parse s
+            with Not_found ->
+              Wp_parameters.warning ~current:false
+                "Unknown %s mode %S (use %s instead)" origin s fallback ;
+              raise Not_found
+          in
+          try
+            if Parameter.is_set ()
+            then parse ~origin:option ~fallback:variable @@ Parameter.get ()
+            else raise Not_found
+          with Not_found ->
+          try
+            let param = Sys.getenv variable in
+            if param = "" then raise Not_found
+            else parse ~origin:variable ~fallback:option param
+          with Not_found ->
+            default ()
+      end)
+
+  let hooks = ref []
+  let add_hook_on_update f = hooks := f :: !hooks
+  let clear_then_hooks () = clear () ; List.iter (fun h -> h ()) !hooks
+
+  let () =
+    Parameter.add_update_hook
+      (fun _ _ -> clear_then_hooks ())
+
+  let parse = Mode.parse
+  let get () = get ()
+  let set m = set () m
+end
 
 module InteractiveMode = struct
   type t =
@@ -245,14 +313,17 @@ module InteractiveMode = struct
     | "batch" -> Batch
     | "update" -> Update
     | "fixup" -> FixUpdate
-    | _ ->
-      Wp_parameters.error ~once:true
-        "Unrecognized mode %S (use 'batch' instead)" m ; Batch
+    | _ -> raise Not_found
 
   let pretty fmt m = Format.pp_print_string fmt (title m)
 
-  let get () = parse @@ Wp_parameters.Interactive.get ()
-  let set m = Wp_parameters.Interactive.set (String.lowercase_ascii @@ title m)
+  include ModeCache(struct
+      module Parameter = Wp_parameters.Interactive
+      type nonrec t = t
+      let parse = parse
+      let name = "interactive"
+      let default () = Batch
+    end)
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -266,49 +337,36 @@ module TipMode = struct
     | Dry
     | Init
 
-  let parse ~origin ~fallback = function
+  let parse = function
     | "batch" -> Batch
     | "update" -> Update
     | "dry" -> Dry
     | "init" -> Init
-    | "" -> raise Not_found
-    | m ->
-      Wp_parameters.warning ~current:false
-        "Unknown %s mode %S (use %s instead)" origin m fallback ;
-      raise Not_found
+    | _ -> raise Not_found
 
-  module MODE = WpContext.StaticGenerator(Datatype.Unit)
-      (struct
-        type key = unit
-        type data = t
-        let name = "Wp.Script.mode"
-        let compile () =
-          try
-            if not (Wp_parameters.CacheEnv.get()) then
-              raise Not_found ;
-            let origin = "FRAMAC_WP_SCRIPT" in
-            parse ~origin ~fallback:"-wp-script" (Sys.getenv origin)
-          with Not_found ->
-          try
-            let mode = Wp_parameters.ScriptMode.get() in
-            parse ~origin:"-wp-script" ~fallback:"batch" mode
-          with Not_found ->
-            let provers = Wp_parameters.Provers.get () in
-            if List.mem "tip" provers then Update else
-            if List.mem "script" provers then Batch else
-              Dry
-      end)
+  include ModeCache(struct
+      module Parameter = Wp_parameters.ScriptMode
+      type nonrec t = t
+      let parse = parse
+      let name = "script"
+      let default () =
+        let provers = Wp_parameters.Provers.get () in
+        if List.mem "tip" provers then Update else
+        if List.mem "script" provers then Batch else
+          Dry
+    end)
 
-  let get = MODE.get
-  let set m = MODE.set () m
+  let () =
+    Wp_parameters.Provers.add_update_hook
+      (fun _ _ -> clear_then_hooks ())
 
   let is_scratch () =
-    match MODE.get () with
+    match get () with
     | Batch | Update -> false
     | Dry | Init -> true
 
   let is_saving () =
-    match MODE.get () with
+    match get () with
     | Update | Init -> true
     | Batch | Dry -> false
 

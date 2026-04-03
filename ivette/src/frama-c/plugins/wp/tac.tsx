@@ -502,9 +502,9 @@ export function ConfigureInteractiveProver(sel: ProverSelection): JSX.Element {
   const kill =
     (): void => sendProver(TIP.killProvers, node, prover);
   const batch =
-    (): void => sendProverInteractive(node, prover, WP.InteractiveMode.batch);
+    (): void => sendProverInteractive(node, prover, WP.InteractiveMode.Batch);
   const edit =
-    (): void => sendProverInteractive(node, prover, WP.InteractiveMode.edit);
+    (): void => sendProverInteractive(node, prover, WP.InteractiveMode.Edit);
 
   const onClear = (): void => sendProver(TIP.clearProvers, node, prover);
   const onClose = (): void => setSelected(undefined);

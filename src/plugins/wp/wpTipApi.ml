@@ -535,8 +535,7 @@ let runProvers ?mode ?timeout ?provers node =
     | None -> Wp_parameters.Timeout.get () in
   let mode = match mode with
     | Some mode -> mode
-    | None -> Prover.InteractiveMode.parse @@ Wp_parameters.Interactive.get () in
-  Kernel.feedback "Run prover with mode %a" Prover.InteractiveMode.pretty mode ;
+    | None -> Prover.InteractiveMode.get () in
   let config =
     let cfg = VCS.current () in
     { cfg with timeout = Some (float timeout) } in

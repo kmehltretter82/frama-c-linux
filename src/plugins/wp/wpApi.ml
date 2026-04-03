@@ -120,7 +120,7 @@ let _ : WP_Prover.t S.array =
     ~keyName:"prover"
     ~keyType:Prover.jtype
     ~iter:(fun f -> List.iter f @@ WP_Prover.provers ())
-    ~add_update_hook:WP_Prover.add_update_hook
+    ~add_update_hook:WP_Prover.add_prover_update_hook
     ~add_reload_hook:WP_Prover.add_reload_hook
     model
 
@@ -170,13 +170,13 @@ struct
 
   let dictionary : WP_Prover.InteractiveMode.t dictionary = dictionary ()
 
-  let tag name descr value = tag ~name ~descr:(Md.plain descr) ~value dictionary
+  let tag name value = tag ~name ~descr:(Md.plain name) ~value dictionary
 
-  let batch  = tag "batch"  "Batch"     WP_Prover.InteractiveMode.Batch
-  let update = tag "update" "Update"    WP_Prover.InteractiveMode.Update
-  let edit   = tag "edit"   "Edit"      WP_Prover.InteractiveMode.Edit
-  let fix    = tag "fix"    "Fix"       WP_Prover.InteractiveMode.Fix
-  let fixup  = tag "fixup"  "FixUpdate" WP_Prover.InteractiveMode.FixUpdate
+  let batch  = tag "Batch"     WP_Prover.InteractiveMode.Batch
+  let update = tag "Update"    WP_Prover.InteractiveMode.Update
+  let edit   = tag "Edit"      WP_Prover.InteractiveMode.Edit
+  let fix    = tag "Fix"       WP_Prover.InteractiveMode.Fix
+  let fixup  = tag "FixUpdate" WP_Prover.InteractiveMode.FixUpdate
 
   let lookup = function
     | WP_Prover.InteractiveMode.Batch -> batch
@@ -195,6 +195,80 @@ struct
         ~name:"InteractiveMode"
         dictionary)
 end
+
+let _ =
+  S.register_state ~package
+    ~name:"interactiveMode"
+    ~descr:(Md.plain "Current interactive mode")
+    ~data:(module InteractiveMode)
+    ~get:WP_Prover.InteractiveMode.get
+    ~set:WP_Prover.InteractiveMode.set
+    ~add_hook:WP_Prover.InteractiveMode.add_hook_on_update
+    ()
+
+(* -------------------------------------------------------------------------- *)
+(* --- Proof Strategies                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+module TipMode =
+struct
+  include D.Enum
+
+  let dictionary : WP_Prover.TipMode.t dictionary = dictionary ()
+
+  let tag name value = tag ~name ~descr:(Md.plain name) ~value dictionary
+
+  let batch  = tag "Batch"  WP_Prover.TipMode.Batch
+  let update = tag "Update" WP_Prover.TipMode.Update
+  let dry    = tag "Dry"    WP_Prover.TipMode.Dry
+  let init   = tag "Init"   WP_Prover.TipMode.Init
+
+  let lookup = function
+    | WP_Prover.TipMode.Batch -> batch
+    | Update -> update
+    | Dry -> dry
+    | Init -> init
+
+  let () =
+    set_lookup dictionary lookup
+
+  include
+    (val publish
+        ~package
+        ~descr:(Md.plain "TIP mode")
+        ~name:"TipMode"
+        dictionary)
+end
+
+let _ =
+  S.register_state ~package
+    ~name:"tipMode"
+    ~descr:(Md.plain "Current Strategy Mode")
+    ~data:(module TipMode)
+    ~get:WP_Prover.TipMode.get
+    ~set:WP_Prover.TipMode.set
+    ~add_hook:WP_Prover.TipMode.add_hook_on_update
+    ()
+
+let _ =
+  S.register_state ~package
+    ~name:"scripts"
+    ~descr:(Md.plain "Whether scripts are enabled")
+    ~data:(module D.Jbool)
+    ~get:WP_Prover.use_scripts
+    ~set:WP_Prover.set_use_scripts
+    ~add_hook:WP_Prover.add_scripts_update_hook
+    ()
+
+let _ =
+  S.register_state ~package
+    ~name:"strategies"
+    ~descr:(Md.plain "Whether strategies are enabled")
+    ~data:(module D.Jbool)
+    ~get:WP_Prover.use_strategies
+    ~set:WP_Prover.set_use_strategies
+    ~add_hook:WP_Prover.add_scripts_update_hook
+    ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Counter Examples                                                   --- *)

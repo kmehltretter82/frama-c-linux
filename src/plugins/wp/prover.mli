@@ -62,15 +62,22 @@ val provers : ?filter :(t -> bool) -> unit -> t list
     @since Frama-C+dev
 *)
 
+val add_reload_hook : (unit -> unit) -> unit
+
 val enabled : t -> bool
+val set_prover : t -> state:bool -> unit
+val add_prover_update_hook : (t -> unit) -> unit
 
 val use_scripts : unit -> bool
 val use_strategies : unit -> bool
 
-val set_prover : t -> state:bool -> unit
+val set_use_scripts : bool -> unit
+(** Note: if false, also disables strategies *)
 
-val add_update_hook : (t -> unit) -> unit
-val add_reload_hook : (unit -> unit) -> unit
+val set_use_strategies : bool -> unit
+(** Note: if true, also enables scripts *)
+
+val add_scripts_update_hook : (unit -> unit) -> unit
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Interactive provers configuration} *)
@@ -90,6 +97,8 @@ module InteractiveMode : sig
 
   val get : unit -> t
   val set : t -> unit
+
+  val add_hook_on_update : (unit -> unit) -> unit
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -108,6 +117,8 @@ module TipMode : sig
 
   val get : unit -> t
   val set : t -> unit
+
+  val add_hook_on_update : (unit -> unit) -> unit
 end
 
 val dkey_shell : Wp_parameters.category

@@ -9,7 +9,12 @@
 import React from 'react';
 import { Icon } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
-import { Checkbox, IconButton, Spinner } from 'dome/controls/buttons';
+import {
+  Checkbox,
+  IconButton,
+  SelectMenu,
+  Spinner
+} from 'dome/controls/buttons';
 import { SidebarTitle } from 'dome/frame/sidebars';
 import { Hbox, Vbox } from 'dome/layout/boxes';
 import * as Server from 'frama-c/server';
@@ -50,7 +55,7 @@ function Prover(props: ProverConfig): JSX.Element {
   const { prover, up, name } = props;
   const [checked, setChecked] = React.useState(up);
 
-  const onClick = () : void => {
+  const onClick = (): void => {
     setChecked(!checked);
     Server.send(WP.setProverState, [prover, !checked]);
   };
@@ -64,6 +69,56 @@ function Prover(props: ProverConfig): JSX.Element {
   );
 }
 
+function InteractiveSelector(): JSX.Element {
+  const [inter, setInter] = States.useSyncState(WP.interactiveMode);
+  const onChange = (value: string | undefined): void => {
+    const mode =
+      value
+        ? WP.InteractiveMode[value as keyof typeof WP.InteractiveMode]
+        : undefined;
+    if (mode)
+      setInter(mode);
+  };
+  const options =
+    (Object.keys(WP.InteractiveMode) as Array<keyof typeof WP.InteractiveMode>)
+      .map((value) =>
+        <option key={value} value={value}>{value}</option>
+      );
+  return (
+    <Label label='Interactive Mode'>
+      <SelectMenu
+        value={inter}
+        onChange={onChange}
+      >{options}</SelectMenu>
+    </Label>
+  );
+}
+
+function TipSelector(): JSX.Element {
+  const [tipMode, setTipMode] = States.useSyncState(WP.tipMode);
+  const onChange = (value: string | undefined): void => {
+    const mode =
+      value
+        ? WP.TipMode[value as keyof typeof WP.TipMode]
+        : undefined;
+    if (mode)
+      setTipMode(mode);
+  };
+  const options =
+    (Object.keys(WP.TipMode) as Array<keyof typeof WP.TipMode>)
+      .map((value) =>
+        <option key={value} value={value}>{value}</option>
+      );
+  return (
+    <Label label='TIP Mode'>
+      <SelectMenu
+        value={tipMode}
+        onChange={onChange}
+      >{options}</SelectMenu>
+    </Label>
+  );
+}
+
 export function SideBar(): JSX.Element {
   const [rte, setRte] = States.useSyncState(Params.wpRte);
   const [timeout, setTimeout] = States.useSyncState(Params.wpTimeout);
@@ -72,8 +127,11 @@ export function SideBar(): JSX.Element {
   const provers = States.useSyncValue(WP.provers) ?? [];
   const proversInfo = States.useSyncArrayGetter(WP.ProverInfos);
 
-  const auto = provers.filter((p) => proversInfo(p)?.auto);
-  const inter = provers.filter((p) => !proversInfo(p)?.auto);
+  const autoPrvs = provers.filter((p) => proversInfo(p)?.auto);
+  const interPrvs = provers.filter((p) => !proversInfo(p)?.auto);
+
+  const [scripts, setScripts] = States.useSyncState(WP.scripts);
+  const [strategies, setStrategies] = States.useSyncState(WP.strategies);
 
   return (
     <>
@@ -109,7 +167,7 @@ export function SideBar(): JSX.Element {
         </Vbox>
         <Label label='Automatic Provers' />
         {
-          auto.map((p) =>
+          autoPrvs.map((p) =>
             <Prover
               key={p}
               prover={p}
@@ -119,8 +177,9 @@ export function SideBar(): JSX.Element {
           )
         }
         <Label label='Interactive Provers' />
+        <InteractiveSelector />
         {
-          inter.map((p) =>
+          interPrvs.map((p) =>
             <Prover
               key={p}
               prover={p}
@@ -129,6 +188,18 @@ export function SideBar(): JSX.Element {
             />
           )
         }
+        <Label label='Proof Strategies' />
+        <TipSelector />
+        <Checkbox
+          label='Use scripts'
+          onChange={setScripts}
+          value={scripts}
+        />
+        <Checkbox
+          label='Use strategies'
+          onChange={setStrategies}
+          value={strategies}
+        />
       </Vbox>
     </>
   );
