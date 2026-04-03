@@ -1089,10 +1089,10 @@ let rec eval_term ~alarm_mode env t =
     let typ = lval.etype in
     let size = Eval_typ.sizeof_lval_typ typ in
     let state = env_current_state env in
-    let eover_loc = Locations.make (lval.eover) size in
+    let eover_loc = Locations.make lval.eover size in
     let eover = find_or_alarm ~alarm_mode state eover_loc in
     let eover =
-      if Ast_types.has_qualifier "volatile" typ
+      if Locations.is_volatile eover_loc
       then Cvalue_forward.make_volatile eover
       else eover
     in
@@ -1873,11 +1873,11 @@ and eval_term_as_exact_locs ~alarm_mode env t =
   | TLval tlval ->
     let loc = eval_tlval ~alarm_mode env tlval in
     let typ = loc.etype in
-    (* eval_term_as_exact_loc is only used for reducing values, and we must
+    let loc = Locations.make loc.eunder (Eval_typ.sizeof_lval_typ typ) in
+    (* eval_term_as_exact_locs is only used for reducing values, and we must
        NOT reduce volatile locations. *)
-    if Ast_types.has_qualifier "volatile" typ then raise Not_an_exact_loc;
-    let loc = Locations.make loc.eunder (Eval_typ.sizeof_lval_typ typ)in
-    if Locations.is_bottom loc then raise Not_an_exact_loc;
+    if Locations.(is_bottom loc || is_volatile loc)
+    then raise Not_an_exact_loc;
     Location (typ, loc)
 
   | TCast (true, Lreal, t) -> begin
