@@ -216,9 +216,8 @@ module Make (Engine: Engine_Subset) = struct
   let initialize_var_not_lib_entry ~pos ~local vi init state =
     ignore (warn_unknown_size vi);
     let source = fst vi.vdecl in
-    let typ = vi.vtype in
     let lval = Eva_ast.Build.var vi in
-    let volatile_everywhere = Ast_types.has_qualifier "volatile" typ in
+    let volatile_everywhere = Ast_types.has_qualifier "volatile" vi.vtype in
     let state =
       if volatile_everywhere && padding_initialization ~local = `Initialized
       then initialize_top_volatile lval state
@@ -231,7 +230,7 @@ module Make (Engine: Engine_Subset) = struct
            must be different from zero somewhere. This is a not-so minor
            optimization. *)
         if padding_initialization ~local = `Initialized &&
-           not (Ast_types.is_volatile typ)
+           not (Ast_types.is_volatile vi.vtype)
         then state
         else initialize_var_zero_or_volatile ~pos vi state
     in
