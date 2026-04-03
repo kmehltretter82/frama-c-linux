@@ -12,6 +12,7 @@
 , menhir
 , ocplib-simplex
 , ppx_blob
+, ppx_deriving
 , psmt2-frontend
 , seq
 , stdlib-shims
@@ -42,6 +43,7 @@ let alt-ergo-lib = buildDunePackage rec {
     fmt
     ocplib-simplex
     ppx_blob
+    ppx_deriving
     seq
     stdlib-shims
     zarith
