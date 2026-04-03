@@ -17,6 +17,9 @@ to get a more verbose output for Make.
   [eva:recursion] make-wrapper.c:17: 
     detected recursive call
     of function large_name_to_force_line_break_in_stack_msg.
+    stack: large_name_to_force_line_break_in_stack_msg :: make-wrapper.c:21 <-
+           rec :: make-wrapper.c:26 <-
+           main
   [eva:assigns:missing] make-wrapper.c:17: User Error: 
     Recursive call to large_name_to_force_line_break_in_stack_msg without assigns clause.
     Generating probably incomplete assigns to interpret the call.
@@ -40,8 +43,7 @@ to get a more verbose output for Make.
   *** recommendation #1 ***
   
   1. Found recursive call at:
-    stack: large_name_to_force_line_break_in_stack_msg :: make-wrapper.c:17 <-
-           large_name_to_force_line_break_in_stack_msg :: make-wrapper.c:21 <-
+    stack: large_name_to_force_line_break_in_stack_msg :: make-wrapper.c:21 <-
            rec :: make-wrapper.c:26 <-
            main
   
