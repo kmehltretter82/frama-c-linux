@@ -30,6 +30,8 @@
 module Debug_level = Log.Make_level(struct let default = 0 end)
 module Verbose_level = Log.Make_level(struct let default = 1 end)
 
+let () = Project.set_source "kernel"
+
 let dkey = Kernel_log.dkey_cmdline
 
 let quiet_ref = ref false

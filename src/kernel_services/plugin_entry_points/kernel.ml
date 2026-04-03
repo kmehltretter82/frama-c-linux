@@ -45,14 +45,15 @@ let should_warn_error wkey =
 let set_fclib_debug _ _ =
   Task.set_debug (is_enabled_debug dkey_task);
   Hptmap.set_debug (is_enabled_debug dkey_hptmap);
-  let source = Format.asprintf "[%s:%a]" "kernel" pp_category dkey_project in
-  Project.set_source source;
   Project.set_debug (is_enabled_debug dkey_project);
   Project.set_feedback (is_enabled_verbose dkey_project);
-  Project.set_warn_level (should_warn_error wkey_project);
   State_builder.set_debug (is_enabled_debug ~level:4 dkey_project)
 
+let set_fclib_warn _ _ =
+  Project.set_warn_level (should_warn_error wkey_project)
+
 let () = Message_category.add_update_hook set_fclib_debug
+let () = Warn_category.add_update_hook set_fclib_warn
 
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
