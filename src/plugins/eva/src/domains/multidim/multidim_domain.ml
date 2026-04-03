@@ -164,11 +164,7 @@ struct
     let (host,offset) = lval.node in
     let oracle' = convert_oracle oracle in
     let base_typ = Eva_ast.type_of_lhost host in
-    let offset =
-      if Eva_ast.lval_contains_volatile lval then
-        `Top
-      else
-        Offset.of_eva_offset oracle' base_typ offset in
+    let offset = Offset.of_eva_offset oracle' base_typ offset in
     match host with
     | Var vi ->
       `Value (Map.singleton (Base.of_varinfo vi) offset)
