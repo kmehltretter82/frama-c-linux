@@ -13,6 +13,6 @@ compiling Frama-C 32.0.
 - ppx_inline_test.v0.16.1
 - unionFind.20220122
 - why3.1.8.2 (for wp)
-- alt-ergo.2.5.4 (for wp, optional)
+- alt-ergo.2.6.2 (for wp, optional)
 - yojson.2.2.2
 - zarith.1.14
