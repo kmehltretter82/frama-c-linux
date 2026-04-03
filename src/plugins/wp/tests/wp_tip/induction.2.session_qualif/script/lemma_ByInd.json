@@ -2,9 +2,9 @@
     "params": { "base": { "select": "kint", "val": "0" } },
     "select": { "select": "inside-goal", "occur": 0, "target": "y_0",
                 "pattern": "$y" },
-    "children": { "Base": [ { "prover": "Alt-Ergo:2.5.4",
+    "children": { "Base": [ { "prover": "Alt-Ergo:2.6.2",
                               "verdict": "timeout", "time": 1. } ],
-                  "Induction (sup)": [ { "prover": "Alt-Ergo:2.5.4",
+                  "Induction (sup)": [ { "prover": "Alt-Ergo:2.6.2",
                                          "verdict": "timeout", "time": 1. } ],
-                  "Induction (inf)": [ { "prover": "Alt-Ergo:2.5.4",
+                  "Induction (inf)": [ { "prover": "Alt-Ergo:2.6.2",
                                          "verdict": "timeout", "time": 1. } ] } } ]
