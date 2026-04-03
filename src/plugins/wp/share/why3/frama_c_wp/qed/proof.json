@@ -1,19 +1,19 @@
 {
-  "profile": [ { "prover": "alt-ergo@2.5.4", "size": 16, "time": 0.183 } ],
+  "profile": [],
   "proofs": {
     "Qed": {
-      "c_euclidian": { "prover": "alt-ergo@2.5.4", "time": 0.021 },
+      "c_euclidian": { "prover": "alt-ergo", "time": 0.011 },
       "cdiv_closed_remainder": {
         "tactic": "split_vc",
         "children": [
-          { "prover": "alt-ergo@2.5.4", "time": 0.023 },
+          { "prover": "alt-ergo", "time": 0.012 },
           null,
-          { "prover": "alt-ergo@2.5.4", "time": 0.036 }
+          { "prover": "alt-ergo", "time": 0.017 }
         ]
       },
       "cdiv_inv": null,
-      "cdiv_neutral": { "prover": "alt-ergo@2.5.4", "time": 0.02 },
-      "cmod_remainder": { "prover": "alt-ergo@2.5.4", "time": 0.027 }
+      "cdiv_neutral": { "prover": "alt-ergo", "time": 0.01 },
+      "cmod_remainder": { "prover": "alt-ergo", "time": 0.016 }
     }
   }
 }
