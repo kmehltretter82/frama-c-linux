@@ -1091,7 +1091,11 @@ let rec eval_term ~alarm_mode env t =
     let state = env_current_state env in
     let eover_loc = Locations.make (lval.eover) size in
     let eover = find_or_alarm ~alarm_mode state eover_loc in
-    let eover = Cvalue_forward.make_volatile ~typ eover in
+    let eover =
+      if Ast_types.has_qualifier "volatile" typ
+      then Cvalue_forward.make_volatile eover
+      else eover
+    in
     let eover = Cvalue_forward.reinterpret typ eover in
     (* Skip dependencies if state is dead *)
     let deps =
