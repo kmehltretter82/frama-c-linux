@@ -313,6 +313,10 @@ let wkey_alarm =
     ~help:"warnings for each possible undefined behavior detected \
            by the analysis"
 
+let wkey_volatile =
+  register_warn_category "volatile"
+    ~help:"a non-volatile lvalue may point to a volatile memory location"
+
 let wkey_locals_escaping =
   register_warn_category "locals-escaping"
     ~help:"a pointer p points to an out of scope local variable \

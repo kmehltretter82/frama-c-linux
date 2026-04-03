@@ -90,6 +90,10 @@
   signed overflow. assert -2147483648 ≤ m - l;
 [eva:alarm] volatile.c:59: Warning: 
   signed overflow. assert m - l ≤ 2147483647;
+[eva:volatile] volatile.c:69: Warning: 
+  Lvalue *pv, whose type has no 'volatile' qualifier, may point to a volatile memory location
+[eva:volatile] volatile.c:70: Warning: 
+  Lvalue *pv, whose type has no 'volatile' qualifier, may point to a volatile memory location
 [eva:progress] Recording results for main1
 [eva:progress] Done for function main1
 [eva:progress] 

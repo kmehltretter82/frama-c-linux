@@ -846,6 +846,8 @@ module Make
       (* The oracle which can be used by abstract domains to get a value for
          some expressions. *)
       oracle: recursive_environment -> exp -> Value.t evaluated;
+      (* Was the current evaluation requested by use of the oracle? *)
+      oracle_evaluation: bool;
     }
 
   (* Builds the query to the domain from the environment. *)
@@ -1027,6 +1029,16 @@ module Make
       let res =
         let+ loc, red, volatile_lval = res in
         let volatile_loc = Loc.is_volatile loc in
+        (* This warning should be a proper alarm. Do not emit the warning
+           on evaluations from the oracle or from calls to the Eva API. *)
+        if volatile_loc && not (Ast_types.is_volatile lval.typ) && reduction
+           && not env.oracle_evaluation
+           && Self.ComputationState.get () = Computing
+        then
+          Self.warning ~wkey:Self.wkey_volatile ~once:true ~current:true
+            "Lvalue %a, whose type has no 'volatile' qualifier, \
+             may point to a volatile memory location"
+            Eva_ast.pp_lval lval;
         let fuel = env.remaining_fuel in
         let record = { loc; volatile_loc; volatile_lval; loc_alarms = alarms }
         and report = { fuel = Finite fuel; reduction = red }
@@ -1189,7 +1201,7 @@ module Make
     if remaining_fuel > 0 then
       fun expr ->
         let valuation = !cache in
-        let env = { env with remaining_fuel } in
+        let env = { env with remaining_fuel; oracle_evaluation = true; } in
         let subdivnb = env.subdivision in
         let evaluate = Subdivided_Evaluation.evaluate env valuation in
         let eval, alarms = evaluate ~subdivnb expr in
@@ -1231,7 +1243,9 @@ module Make
        -eva-subdivide-non-linear. *)
     let default () =  Parameters.SubdivideNonLinear.get () in
     let subdivision = match subdivnb with None -> default () | Some n -> n in
-    { state; context; root; subdivision; subdivided; remaining_fuel; oracle }
+    let oracle_evaluation = false in
+    { state; context; root; subdivision; subdivided; remaining_fuel;
+      oracle; oracle_evaluation; }
 
   (* Environment for a fast forward evaluation with minimal precision:
      no subdivisions, no calls to the oracle, and the expression is not
@@ -1240,7 +1254,9 @@ module Make
     let+ context = get_context state in
     let remaining_fuel = no_fuel and root = false in
     let subdivision = 0 and subdivided = false in
-    { state; context; root; subdivision; subdivided; remaining_fuel; oracle }
+    let oracle_evaluation = true in
+    { state; context; root; subdivision; subdivided; remaining_fuel;
+      oracle; oracle_evaluation; }
 
   let subdivided_forward_eval valuation ?subdivnb state expr =
     let open Evaluated.Operators in

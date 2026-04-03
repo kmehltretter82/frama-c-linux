@@ -19,6 +19,8 @@
   The specification of function __res_state
   has generated a garbled mix of addresses for assigns clause \result.
 [eva:progress] Done for function __res_state
+[eva:volatile] resolv_h.c:16: Warning: 
+  Lvalue tmp_0->options, whose type has no 'volatile' qualifier, may point to a volatile memory location
 [eva:alarm] resolv_h.c:16: Warning: 
   unaligned pointer creation.
   assert \aligned(tmp_0,alignof(struct __res_state));
