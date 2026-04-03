@@ -9,7 +9,7 @@
 import React from 'react';
 import { Icon } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
-import { IconButton, Spinner } from 'dome/controls/buttons';
+import { Checkbox, IconButton, Spinner } from 'dome/controls/buttons';
 import { SidebarTitle } from 'dome/frame/sidebars';
 import { Hbox, Vbox } from 'dome/layout/boxes';
 import * as Server from 'frama-c/server';
@@ -65,7 +65,7 @@ function Prover(props: ProverConfig): JSX.Element {
 }
 
 export function SideBar(): JSX.Element {
-  /* const rte = Params.wpRte; */
+  const [rte, setRte] = States.useSyncState(Params.wpRte);
   const [timeout, setTimeout] = States.useSyncState(Params.wpTimeout);
   const [processes, setProcesses] = States.useSyncState(Params.wpPar);
 
@@ -81,6 +81,11 @@ export function SideBar(): JSX.Element {
         <Tools />
       </SidebarTitle>
       <Vbox>
+        <Checkbox
+          label='Generate RTE guards'
+          onChange={setRte}
+          value={rte}
+        />
         <Label label='Provers Configuration' />
         <Vbox>
           <Label label='Timeout' icon='TUNINGS' >
