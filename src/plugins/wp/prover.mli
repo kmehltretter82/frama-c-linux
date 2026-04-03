@@ -6,17 +6,21 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* -------------------------------------------------------------------------- *)
+(** Provers configuration and information *)
+(* -------------------------------------------------------------------------- *)
+
+(* -------------------------------------------------------------------------- *)
+(** {2 Prover} *)
+(* -------------------------------------------------------------------------- *)
+
 type t =
-  | Why3 of Why3Provers.t (** Prover via WHY *)
+  | Why3 of Why3Provers.t (** Prover via Why3 *)
   | Qed                   (** Qed Solver *)
   | Tactical              (** Interactive Prover *)
 
 module Pset : Set.S with type elt = t
 module Pmap : Map.S with type key = t
-
-(** Mainstream installed provers *)
-val provers : unit -> t list
-val iter_provers : (t -> unit) -> unit
 
 val equal : t -> t -> bool
 val compare : t -> t -> int
@@ -36,7 +40,6 @@ val version : t -> string
 
 val title : ?version:bool -> t -> string
 
-
 val parse : string -> t option
 
 val is_auto : t -> bool
@@ -46,6 +49,32 @@ val has_counter_examples : t -> bool
 
 val filename_for : t -> string
 val of_name : ?fallback:bool -> string -> t option
+
+(* -------------------------------------------------------------------------- *)
+(** {2 Prover list} *)
+(* -------------------------------------------------------------------------- *)
+
+val provers : ?filter :(t -> bool) -> unit -> t list
+(** Returns *all* provers such that satisfy [filter] (which defaults to keep
+    everything). E.g. if you need only enabled solvers, it should be called with
+    the [enabled] function.
+
+    @since Frama-C+dev
+*)
+
+val enabled : t -> bool
+
+val use_scripts : unit -> bool
+val use_strategies : unit -> bool
+
+val set_prover : t -> state:bool -> unit
+
+val add_update_hook : (t -> unit) -> unit
+val add_reload_hook : (unit -> unit) -> unit
+
+(* -------------------------------------------------------------------------- *)
+(** {2 Interactive provers configuration} *)
+(* -------------------------------------------------------------------------- *)
 
 module InteractiveMode : sig
   type t =
@@ -58,7 +87,14 @@ module InteractiveMode : sig
   val title : t -> string
   val parse : string -> t
   val pretty : Format.formatter -> t -> unit
+
+  val get : unit -> t
+  val set : t -> unit
 end
+
+(* -------------------------------------------------------------------------- *)
+(** {2 TIP configuration} *)
+(* -------------------------------------------------------------------------- *)
 
 module TipMode : sig
   type t =
@@ -67,11 +103,11 @@ module TipMode : sig
     | Dry
     | Init
 
-  val get : unit -> t
-  val set : t -> unit
-
   val is_scratch: unit -> bool
   val is_saving: unit -> bool
+
+  val get : unit -> t
+  val set : t -> unit
 end
 
 val dkey_shell : Wp_parameters.category

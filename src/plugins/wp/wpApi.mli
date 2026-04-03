@@ -22,6 +22,5 @@ module InteractiveMode : Server.Data.S with type t = WP_Prover.InteractiveMode.t
 
 val goals : Wpo.t Server.States.array
 val getProvers : unit -> Prover.t list
-val setProvers : Prover.t list -> unit
 
 (* -------------------------------------------------------------------------- *)

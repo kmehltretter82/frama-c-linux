@@ -105,7 +105,9 @@ let title ?(version=true) p =
   else p.Why3.Whyconf.prover_name
 let compare = Why3.Whyconf.Prover.compare
 let equal = Why3.Whyconf.Prover.equal
+let hash = Why3.Whyconf.Prover.hash
 let name p = p.Why3.Whyconf.prover_name
+
 let version p = p.Why3.Whyconf.prover_version
 let is_mainstream p = p.Why3.Whyconf.prover_version <> "" && p.Why3.Whyconf.prover_altern = ""
 let is_auto (p : t) =

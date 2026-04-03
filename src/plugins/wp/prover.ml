@@ -8,18 +8,14 @@
 
 let dkey_shell = Wp_parameters.register_category "shell"
 
+(* -------------------------------------------------------------------------- *)
+(* --- Prover                                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
 type t =
   | Why3 of Why3Provers.t
   | Qed
   | Tactical
-
-let provers () =
-  List.map (fun p -> Why3 p) @@
-  List.filter Why3Provers.is_mainstream @@
-  Why3Provers.provers ()
-
-let iter_provers f =
-  List.iter f @@ provers ()
 
 let equal p q =
   match p,q with
@@ -37,6 +33,11 @@ let compare p q =
   | Why3 _ , _ -> (-1)
   | _ , Why3 _ -> (+1)
   | Tactical , Tactical -> 0
+
+let hash = function
+  | Qed -> 0
+  | Tactical -> 1
+  | Why3 p -> Why3Provers.hash p
 
 let ident = function
   | Why3 s -> Why3Provers.ident_wp s
@@ -129,6 +130,99 @@ module P = struct type nonrec t = t let compare = compare end
 module Pset = Set.Make(P)
 module Pmap = Map.Make(P)
 
+(* -------------------------------------------------------------------------- *)
+(* --- Prover list                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+let available_why3_provers () =
+  List.map (fun p -> Why3 p) @@
+  List.filter Why3Provers.is_mainstream @@
+  Why3Provers.provers ()
+
+module PTable = Hashtbl.Make
+    (struct
+      type nonrec t = t
+      let equal = equal
+      let hash = hash
+    end)
+
+type proving_config = {
+  provers: bool PTable.t ;
+  (* mutable *) strategies: bool ;
+}
+
+let config = ref None
+let reload_hooks = ref []
+let add_reload_hook f = reload_hooks := f :: !reload_hooks
+
+let parse_and_set () =
+  let provers = PTable.create 9 in
+  List.iter
+    (fun p -> PTable.add provers p false)
+    (Qed :: Tactical :: available_why3_provers ());
+  let has_none = ref false in
+  let has_strat = ref false in
+  let parse = function
+    | "none" | "" -> has_none := true ;
+    | "Qed" | "qed" -> PTable.replace provers Qed true
+    | "tip" -> PTable.replace provers Tactical true ; has_strat := true
+    | "script" -> PTable.replace provers Tactical true
+    | name ->
+      match parse name with
+      | None -> Wp_parameters.error "Unknown prover %s" name
+      | Some p -> PTable.replace provers p true
+  in
+  List.iter parse @@ Wp_parameters.Provers.get () ;
+  if not (PTable.fold (fun _ v acc -> v || acc) provers false) && not !has_none
+  then begin
+    (* 1. take Alt-Ergo *)
+    match Why3Provers.lookup "Alt-Ergo" with
+    | Some p -> PTable.replace provers (Why3 p) true
+    | None ->
+      (* 2. take any automatic solver  *)
+      match List.filter is_auto @@ available_why3_provers () with
+      | p :: _  -> PTable.replace provers p true
+      | [] ->
+        (* 3. take any external solver *)
+        match available_why3_provers () with
+        | p :: _ -> PTable.replace provers p true
+        (* 4. take Qed *)
+        | [] -> PTable.replace provers Qed true
+  end ;
+  config := Some { provers ; strategies = !has_strat } ;
+  List.iter (fun f -> f ()) !reload_hooks
+
+let () =
+  Wp_parameters.Provers.add_update_hook (fun _ _ -> parse_and_set ())
+
+let get () =
+  begin match !config with
+    | None -> parse_and_set ()
+    | _ -> ()
+  end ;
+  Option.get !config
+
+let provers ?(filter=fun _ -> true) () =
+  List.rev @@ PTable.fold_sorted
+    ~cmp:compare
+    (fun p _ l -> if filter p then p :: l else l) (get ()).provers []
+
+let use_scripts () = PTable.find (get ()).provers Tactical
+let enabled p = PTable.find (get()).provers p
+
+let use_strategies () = (get ()).strategies
+
+let update_hooks = ref []
+let add_update_hook f = update_hooks := f :: !update_hooks
+
+let set_prover p ~state =
+  PTable.replace (get()).provers p state ;
+  List.iter (fun f -> f p) !update_hooks
+
+(* -------------------------------------------------------------------------- *)
+(* --- Interactive provers configuration                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
 module InteractiveMode = struct
   type t =
     | Batch
@@ -156,7 +250,14 @@ module InteractiveMode = struct
         "Unrecognized mode %S (use 'batch' instead)" m ; Batch
 
   let pretty fmt m = Format.pp_print_string fmt (title m)
+
+  let get () = parse @@ Wp_parameters.Interactive.get ()
+  let set m = Wp_parameters.Interactive.set (String.lowercase_ascii @@ title m)
 end
+
+(* -------------------------------------------------------------------------- *)
+(* --- TIP configuration                                                  --- *)
+(* -------------------------------------------------------------------------- *)
 
 module TipMode = struct
   type t =

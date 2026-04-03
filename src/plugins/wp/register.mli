@@ -9,4 +9,8 @@
 val cmdline_run: unit -> unit
 
 val do_wp_proofs:
-  ?provers:Why3.Whyconf.prover list -> ?tip:bool -> Wpo.t Bag.t -> unit
+  ?provers:Why3.Whyconf.prover list ->
+  ?interactive_mode:Prover.InteractiveMode.t ->
+  ?scripts:bool ->
+  ?strategies:bool ->
+  Wpo.t Bag.t -> unit

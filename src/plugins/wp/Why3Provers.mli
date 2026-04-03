@@ -28,6 +28,7 @@ val name : t -> string
 val version : t -> string
 val compare : t -> t -> int
 val equal : t -> t -> bool
+val hash : t -> int
 
 val lookup : ?fallback:bool -> string -> t option
 val provers : unit -> t list

@@ -55,7 +55,7 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
-(* --- VCS Provers                                                        --- *)
+(* --- Provers                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
 module Prover =
@@ -73,47 +73,56 @@ end
 module Provers = D.Jlist(Prover)
 
 let signal = ref None
-let provers = ref None
-
-let parse cmdline =
-  let cmdline = match cmdline with
-    | [] -> [ "Alt-Ergo" ]
-    | provers -> provers
-  in
-  let parse s =
-    match WP_Prover.parse s with
-    | None -> None
-    | Some (Qed | Tactical) -> None
-    | Some prv as result -> if WP_Prover.is_auto prv then result else None in
-  List.filter_map parse cmdline
 
 let getProvers () =
-  match !provers with
-  | Some prvs -> prvs
-  | None ->
-    let selection = parse @@ Wp_parameters.Provers.get () in
-    provers := Some selection ; selection
-
-let updProvers prv =
-  provers := Some prv
-
-let setProvers prv =
-  updProvers prv ;
-  Option.iter (fun s -> R.emit s)
-    !signal
+  List.filter WP_Prover.is_extern @@ WP_Prover.provers ()
 
 let () =
-  Wp_parameters.Provers.add_update_hook
-    (fun _ provers -> setProvers @@ parse provers)
+  R.register ~package
+    ~name:"setProverState"
+    ~descr:(Md.plain "Select/unselect prover")
+    ~kind:`SET
+    ~input:(module D.Jpair(Prover)(D.Jbool))
+    ~output:(module D.Junit)
+    begin fun (p, v) ->
+      WP_Prover.set_prover p ~state:v ;
+      Option.iter R.emit !signal
+    end
 
-let () =
+let _ =
   let s =
-    S.register_state ~package ~name:"provers"
-      ~descr:(Md.plain "Selected Provers")
-      ~data:(module Provers)
-      ~get:getProvers
-      ~set:updProvers ()
-  in signal := Some s
+    S.register_value
+      ~package ~name:"provers"
+      ~descr:(Md.plain "Get all available provers")
+      ~output:(module Provers)
+      ~get:(fun () -> getProvers())
+      ()
+  in
+  signal := Some s
+
+let _ : WP_Prover.t S.array =
+  let model = S.model () in
+  S.column ~name:"name" ~descr:(Md.plain "Prover Name")
+    ~data:(module D.Jalpha) ~get:WP_Prover.name model ;
+  S.column ~name:"version" ~descr:(Md.plain "Prover Version")
+    ~data:(module D.Jalpha) ~get:WP_Prover.version model ;
+  S.column ~name:"descr" ~descr:(Md.plain "Prover Full Name (description)")
+    ~data:(module D.Jalpha) ~get:(WP_Prover.title ~version:true) model ;
+  S.column model ~name:"extern" ~descr:(Md.plain "Why3 or internal")
+    ~data:(module D.Jbool) ~get:WP_Prover.is_extern ;
+  S.column model ~name:"auto" ~descr:(Md.plain "Automatic solver")
+    ~data:(module D.Jbool) ~get:WP_Prover.is_auto ;
+  S.column model ~name:"active" ~descr:(Md.plain "Whether it is enabled")
+    ~data:(module D.Jbool) ~get:WP_Prover.enabled ;
+  S.register_array ~package
+    ~name:"ProverInfos" ~descr:(Md.plain "Available Provers")
+    ~key:WP_Prover.ident
+    ~keyName:"prover"
+    ~keyType:Prover.jtype
+    ~iter:(fun f -> List.iter f @@ WP_Prover.provers ())
+    ~add_update_hook:WP_Prover.add_update_hook
+    ~add_reload_hook:WP_Prover.add_reload_hook
+    model
 
 (* -------------------------------------------------------------------------- *)
 (* --- Server Processes                                                   --- *)
@@ -142,25 +151,6 @@ let _ =
     ~get:Wp_parameters.Timeout.get
     ~set:Wp_parameters.Timeout.set
     ~add_hook:Wp_parameters.Timeout.add_hook_on_update ()
-
-(* -------------------------------------------------------------------------- *)
-(* --- Available Provers                                                  --- *)
-(* -------------------------------------------------------------------------- *)
-
-let _ : WP_Prover.t S.array =
-  let model = S.model () in
-  S.column ~name:"name" ~descr:(Md.plain "Prover Name")
-    ~data:(module D.Jalpha) ~get:WP_Prover.name model ;
-  S.column ~name:"version" ~descr:(Md.plain "Prover Version")
-    ~data:(module D.Jalpha) ~get:WP_Prover.version model ;
-  S.column ~name:"descr" ~descr:(Md.plain "Prover Full Name (description)")
-    ~data:(module D.Jalpha) ~get:(WP_Prover.title ~version:true) model ;
-  S.register_array ~package
-    ~name:"ProverInfos" ~descr:(Md.plain "Available Provers")
-    ~key:WP_Prover.ident
-    ~keyName:"prover"
-    ~keyType:Prover.jtype
-    ~iter:WP_Prover.iter_provers model
 
 (* -------------------------------------------------------------------------- *)
 (* --- Interactive provers                                                --- *)

@@ -511,22 +511,75 @@ let do_list_scheduled_result stats =
     clear_scheduled () ;
   end
 
+let dump_strategies =
+  let once = ref true in
+  fun () ->
+    if !once then
+      ( once := false ;
+        Wp_parameters.result "Registered strategies for -wp-auto:%t"
+          (fun fmt ->
+             Strategy.iter (fun h ->
+                 Format.fprintf fmt "@\n  '%s': %s" h#id h#title
+               )))
+
 (* ------------------------------------------------------------------------ *)
 (* ---  Proving                                                         --- *)
 (* ------------------------------------------------------------------------ *)
 
 type script = {
-  mutable proverscript : bool ;
-  mutable strategies : bool ;
+  proverscript : bool ;
+  strategies : bool ;
   scratch : bool ;
   update : bool ;
   stdout : bool ;
-  mutable depth : int ;
-  mutable width : int ;
-  mutable backtrack : int ;
-  mutable auto : Strategy.heuristic list ;
-  mutable provers : (Prover.InteractiveMode.t * Prover.t) list ;
+  depth : int ;
+  width : int ;
+  backtrack : int ;
+  auto : Strategy.heuristic list ;
+  provers : (Prover.InteractiveMode.t * Prover.t) list ;
 }
+
+let script ?provers ?interactive_mode ?scripts ?strategies () =
+  let open Option in
+  let width = Wp_parameters.AutoWidth.get () in
+  let depth = Wp_parameters.AutoDepth.get () in
+  let backtrack = max 0 (Wp_parameters.BackTrack.get ()) in
+
+  let filter_auto id =
+    if id = "?" then (dump_strategies () ; None)
+    else
+      try Some (Strategy.lookup ~id)
+      with Not_found ->
+        Wp_parameters.error "Strategy -wp-auto '%s' unknown (ignored)." id ;
+        None
+  in
+  let auto = List.filter_map filter_auto @@ Wp_parameters.Auto.get() in
+  let auto = if auto <> [] && (width <= 0 || depth <= 0)
+    then begin
+      Wp_parameters.feedback
+        "Auto-search deactivated because of 0-depth or 0-width"  ;
+      []
+    end else auto
+  in
+  let mode = interactive_mode <? Prover.InteractiveMode.get () in
+  let prover_mode p =
+    if Prover.is_auto p
+    then Prover.InteractiveMode.Batch, p
+    else mode, p
+  in
+  let provers = match provers with
+    | None -> List.map prover_mode @@ Prover.provers ~filter:Prover.enabled ()
+    | Some provers -> List.map (fun p -> prover_mode (Why3 p)) provers
+  in
+  {
+    proverscript = scripts <? (Prover.use_scripts () || auto <> []) ;
+    strategies = strategies <? Prover.use_strategies () ;
+    scratch = Prover.TipMode.is_scratch () ;
+    update = Prover.TipMode.is_saving () ;
+    stdout = Wp_parameters.ScriptOnStdout.get () ;
+    depth ; width ; backtrack ; auto ;
+    provers ;
+  }
 
 let spawn_wp_proofs ~script goals =
   if script.proverscript || script.provers<>[] then
@@ -570,74 +623,6 @@ let spawn_wp_proofs ~script goals =
         ) goals ;
       Task.on_server_wait server do_wpo_wait ;
       Task.launch server
-    end
-
-let get_prover_names () =
-  match Wp_parameters.Provers.get () with
-  | [] -> [ "Alt-Ergo" ] | pnames -> pnames
-
-let compute_provers ~mode ~script =
-  script.provers <- List.fold_right
-      begin fun pname prvs ->
-        match Prover.parse pname with
-        | None ->
-          if pname <> "" && pname <> "none" then
-            Wp_parameters.error ~once:true
-              "Prover '%s' not found." pname ;
-          prvs
-        | Some Prover.Tactical ->
-          script.proverscript <- true ;
-          if pname = "tip" then script.strategies <- true ;
-          prvs
-        | Some prover ->
-          let pmode = if Prover.is_auto prover then Prover.InteractiveMode.Batch else mode in
-          (pmode , prover) :: prvs
-      end (get_prover_names ()) []
-
-let dump_strategies =
-  let once = ref true in
-  fun () ->
-    if !once then
-      ( once := false ;
-        Wp_parameters.result "Registered strategies for -wp-auto:%t"
-          (fun fmt ->
-             Strategy.iter (fun h ->
-                 Format.fprintf fmt "@\n  '%s': %s" h#id h#title
-               )))
-
-let default_script_mode () = {
-  provers = [] ;
-  proverscript = false ;
-  strategies = false ;
-  update = Prover.TipMode.is_saving () ;
-  scratch = Prover.TipMode.is_scratch () ;
-  stdout = Wp_parameters.ScriptOnStdout.get ();
-  depth=0 ; width = 0 ; backtrack = 0 ; auto=[] ;
-}
-
-let compute_auto ~script =
-  script.auto <- [] ;
-  script.width <- Wp_parameters.AutoWidth.get () ;
-  script.depth <- Wp_parameters.AutoDepth.get () ;
-  script.backtrack <- max 0 (Wp_parameters.BackTrack.get ()) ;
-  let auto = Wp_parameters.Auto.get () in
-  if script.depth <= 0 || script.width <= 0 then
-    ( if auto <> [] then
-        Wp_parameters.feedback
-          "Auto-search deactivated because of 0-depth or 0-width" )
-  else
-    begin
-      List.iter
-        (fun id ->
-           if id = "?" then dump_strategies ()
-           else
-             try script.auto <- Strategy.lookup ~id :: script.auto
-             with Not_found ->
-               Wp_parameters.error ~current:false
-                 "Strategy -wp-auto '%s' unknown (ignored)." id
-        ) auto ;
-      script.auto <- List.rev script.auto ;
-      if script.auto <> [] then script.proverscript <- true ;
     end
 
 type scripts =
@@ -761,19 +746,9 @@ let do_wpo_display goal =
   let result = if Wpo.is_trivial goal then "trivial" else "not tried" in
   Wp_parameters.feedback "Goal %s : %s" (Wpo.get_gid goal) result
 
-let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
-  let script = default_script_mode () in
-  let mode = Prover.InteractiveMode.parse (Wp_parameters.Interactive.get ()) in
-  compute_provers ~mode ~script ;
-  compute_auto ~script ;
+let do_wp_proofs ?provers ?interactive_mode ?scripts ?strategies (goals : Wpo.t Bag.t) =
+  let script = script ?provers ?interactive_mode ?scripts ?strategies () in
   ProofStrategy.typecheck () ;
-  begin match provers with None -> () | Some prvs ->
-    script.provers <- List.map (fun dp -> Prover.InteractiveMode.Batch , Prover.Why3 dp) prvs
-  end ;
-  begin match tip with None -> () | Some strategies ->
-    script.proverscript <- true ;
-    script.strategies <- strategies ;
-  end ;
   let spawned = script.proverscript || script.provers <> [] in
   begin
     if spawned then do_list_scheduled goals ;
@@ -905,7 +880,7 @@ let () = Cmdline.run_after_configuring_stage Why3Provers.configure
 
 let do_prover_detect () =
   if Wp_parameters.ListProvers.get () && not @@ Wp_parameters.is_interactive () then
-    let provers = Prover.provers () in
+    let provers = Prover.provers ~filter:Prover.is_extern () in
     if provers = [] then
       Wp_parameters.result "No Why3 provers detected."
     else

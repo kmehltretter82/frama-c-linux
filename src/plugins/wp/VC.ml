@@ -78,9 +78,7 @@ let generate_all ?model ?bhv ?prop () =
 
 let prove = ProverTask.prove
 let spawn = ProverTask.spawn ~delayed:true
-
 let server = ProverTask.server
-let command ?provers ?tip vcs =
-  Register.do_wp_proofs ?provers ?tip vcs
+let command = Register.do_wp_proofs
 
 (* -------------------------------------------------------------------------- *)

@@ -24,6 +24,7 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import * as ASTview from 'frama-c/kernel/ASTview';
 import { GoalTable } from './goals';
 import { TIPView } from './tip';
+import { SideBar } from './sidebar';
 import * as TIP from './tip';
 import * as WP from 'frama-c/plugins/wp/api';
 import doc from './doc.md?raw';
@@ -223,6 +224,18 @@ function ServerActivity(): JSX.Element {
 Ivette.registerStatusbar({
   id: 'fc.wp.server',
   children: <ServerActivity />,
+});
+
+/* -------------------------------------------------------------------------- */
+/* --- WP SideBar                                                         --- */
+/* -------------------------------------------------------------------------- */
+
+Ivette.registerSidebar({
+  id: 'frama-c.plugins.wp-sidebar',
+  label: 'WP',
+  icon: 'TARGET',
+  title: 'WP',
+  children: <SideBar />
 });
 
 /* -------------------------------------------------------------------------- */

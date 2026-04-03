@@ -157,24 +157,26 @@ export interface ProverSelection {
 export function Provers(props: ProverSelection): JSX.Element {
   const { node, selected, setSelected } = props;
   const { results=[] } = States.useRequestStable(TIP.getNodeInfos, node);
-  const [ provers=[], setProvers ] = States.useSyncState(WP.provers);
-  const setItems = (prvs: string[]): void => setProvers(prvs.map(WP.jProver));
-  const children = [...provers].sort().map((prover) => {
-    const res = results.find(([p]) => p === prover);
-    const result = res ? res[1] : WP.resultDefault;
-    return (
-      <Dnd.Item id={prover} key={prover}>
-        <ProverItem
-          node={node}
-          prover={prover}
-          result={result}
-          selected={selected}
-          setSelected={setSelected} />
-      </Dnd.Item>
-    );
-  });
+  const provers = States.useSyncValue(WP.provers) ?? [];
+  const proversInfo = States.useSyncArrayGetter(WP.ProverInfos);
+  const children = [...provers]
+    .filter((p) => proversInfo(p)?.active)
+    .map((prover) => {
+      const res = results.find(([p]) => p === prover);
+      const result = res ? res[1] : WP.resultDefault;
+      return (
+        <Dnd.Item id={prover} key={prover}>
+          <ProverItem
+            node={node}
+            prover={prover}
+            result={result}
+            selected={selected}
+            setSelected={setSelected} />
+        </Dnd.Item>
+      );
+    });
   const isInactive = (p: WP.prover): boolean => (
-    p !== 'qed' && p !== 'script' && !provers.some(q => p === q)
+    p !== 'qed' && p !== 'script' && !proversInfo(p)?.active
   );
   const inactive =
     results
@@ -194,7 +196,7 @@ export function Provers(props: ProverSelection): JSX.Element {
   return (
     <>
       <Vbox>
-        <Dnd.List items={provers} setItems={setItems}>
+        <Dnd.List items={provers}>
           {node ? children : null}
         </Dnd.List>
       </Vbox>
