@@ -31,7 +31,10 @@ __FC_EXTERN int __fc_tz;
   requires valid_path: valid_read_string(path);
   requires valid_times_or_null: \valid_read(times+(0..1)) || times == \null;
   requires initialized_times_or_null:initialization:
-    \initialized(times+(0..1)) || times == \null;
+    (\initialized(&times[0].tv_sec) &&
+     \initialized(&times[0].tv_usec) &&
+     \initialized(&times[1].tv_sec) &&
+     \initialized(&times[1].tv_usec)) || times == \null;
   assigns \result \from indirect:path[0..strlen(path)],
     indirect:times, indirect:times[0..1];
 */
