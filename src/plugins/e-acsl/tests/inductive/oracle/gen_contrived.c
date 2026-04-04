@@ -476,8 +476,7 @@ int __gen_e_acsl_conds_fun3(__e_acsl_mpz_struct * a, __e_acsl_mpz_struct * b)
     __e_acsl_mpz_t __gen_e_acsl_sub;
     __e_acsl_mpz_t __gen_e_acsl_conds_fun3_7;
     __e_acsl_mpz_t __gen_e_acsl_sub_5;
-    __e_acsl_mpz_t __gen_e_acsl_conds_fun3_9;
-    int __gen_e_acsl_eq_2;
+    int __gen_e_acsl_conds_fun3_9;
     __e_acsl_mpz_t __gen_e_acsl_if_5;
     __gmpz_init_set_si(__gen_e_acsl__4,1L);
     __gmpz_init(__gen_e_acsl_sub);
@@ -490,11 +489,9 @@ int __gen_e_acsl_conds_fun3(__e_acsl_mpz_struct * a, __e_acsl_mpz_struct * b)
     __gmpz_init(__gen_e_acsl_sub_5);
     __gmpz_sub(__gen_e_acsl_sub_5,(__e_acsl_mpz_struct const *)(b),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
-    __gen_e_acsl_conds_fun3_2(& __gen_e_acsl_conds_fun3_9,a,
-                              (__e_acsl_mpz_struct *)__gen_e_acsl_sub_5);
-    __gen_e_acsl_eq_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_conds_fun3_9),
-                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
-    if (__gen_e_acsl_eq_2 == 0) {
+    __gen_e_acsl_conds_fun3_9 = __gen_e_acsl_conds_fun3(a,
+                                                        (__e_acsl_mpz_struct *)__gen_e_acsl_sub_5);
+    if (__gen_e_acsl_conds_fun3_9 == 1) {
       __e_acsl_mpz_t __gen_e_acsl__12;
       __e_acsl_mpz_t __gen_e_acsl_sub_6;
       __gmpz_init_set_si(__gen_e_acsl__12,1L);
@@ -531,7 +528,6 @@ int __gen_e_acsl_conds_fun3(__e_acsl_mpz_struct * a, __e_acsl_mpz_struct * b)
     __gmpz_clear(__gen_e_acsl_sub);
     __gmpz_clear(__gen_e_acsl_conds_fun3_7);
     __gmpz_clear(__gen_e_acsl_sub_5);
-    __gmpz_clear(__gen_e_acsl_conds_fun3_9);
     __gmpz_clear(__gen_e_acsl_if_5);
   }
   __gen_e_acsl__14 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_if_6));
@@ -578,8 +574,7 @@ void __gen_e_acsl_conds_fun3_2(__e_acsl_mpz_t *__retres_arg,
     __e_acsl_mpz_t __gen_e_acsl_sub_2;
     __e_acsl_mpz_t __gen_e_acsl_conds_fun3_4;
     __e_acsl_mpz_t __gen_e_acsl_sub_3;
-    __e_acsl_mpz_t __gen_e_acsl_conds_fun3_6;
-    int __gen_e_acsl_eq;
+    int __gen_e_acsl_conds_fun3_6;
     __e_acsl_mpz_t __gen_e_acsl_if_3;
     __gmpz_init_set_si(__gen_e_acsl__8,1L);
     __gmpz_init(__gen_e_acsl_sub_2);
@@ -592,11 +587,9 @@ void __gen_e_acsl_conds_fun3_2(__e_acsl_mpz_t *__retres_arg,
     __gmpz_init(__gen_e_acsl_sub_3);
     __gmpz_sub(__gen_e_acsl_sub_3,(__e_acsl_mpz_struct const *)(b),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
-    __gen_e_acsl_conds_fun3_2(& __gen_e_acsl_conds_fun3_6,a,
-                              (__e_acsl_mpz_struct *)__gen_e_acsl_sub_3);
-    __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_conds_fun3_6),
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
-    if (__gen_e_acsl_eq == 0) {
+    __gen_e_acsl_conds_fun3_6 = __gen_e_acsl_conds_fun3(a,
+                                                        (__e_acsl_mpz_struct *)__gen_e_acsl_sub_3);
+    if (__gen_e_acsl_conds_fun3_6 == 1) {
       __e_acsl_mpz_t __gen_e_acsl__9;
       __e_acsl_mpz_t __gen_e_acsl_sub_4;
       __gmpz_init_set_si(__gen_e_acsl__9,1L);
@@ -633,7 +626,6 @@ void __gen_e_acsl_conds_fun3_2(__e_acsl_mpz_t *__retres_arg,
     __gmpz_clear(__gen_e_acsl_sub_2);
     __gmpz_clear(__gen_e_acsl_conds_fun3_4);
     __gmpz_clear(__gen_e_acsl_sub_3);
-    __gmpz_clear(__gen_e_acsl_conds_fun3_6);
     __gmpz_clear(__gen_e_acsl_if_3);
   }
   __gen_e_acsl__11 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_if_4));
@@ -745,12 +737,12 @@ int __gen_e_acsl_fibo(int i, int x)
 {
   __e_acsl_mpz_t __gen_e_acsl_fibo_fun2_6;
   __e_acsl_mpz_t __gen_e_acsl_x;
-  int __gen_e_acsl_eq_3;
+  int __gen_e_acsl_eq;
   __gen_e_acsl_fibo_fun2(& __gen_e_acsl_fibo_fun2_6,i);
   __gmpz_init_set_si(__gen_e_acsl_x,(long)x);
-  __gen_e_acsl_eq_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_fibo_fun2_6),
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_x));
-  int __retres = __gen_e_acsl_eq_3 == 0;
+  __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_fibo_fun2_6),
+                               (__e_acsl_mpz_struct const *)(__gen_e_acsl_x));
+  int __retres = __gen_e_acsl_eq == 0;
   __gmpz_clear(__gen_e_acsl_fibo_fun2_6);
   __gmpz_clear(__gen_e_acsl_x);
   return __retres;
@@ -798,13 +790,13 @@ int __gen_e_acsl_bind_twice_fun3(int a, int b)
   else {
     long __gen_e_acsl_z_3;
     long __gen_e_acsl_bind_twice_fun3_7;
-    long __gen_e_acsl_bind_twice_fun3_9;
+    int __gen_e_acsl_bind_twice_fun3_9;
     long __gen_e_acsl_if_12;
     __gen_e_acsl_bind_twice_fun3_7 = __gen_e_acsl_bind_twice_fun3_2(0,b);
     __gen_e_acsl_z_3 = __gen_e_acsl_bind_twice_fun3_7;
-    __gen_e_acsl_bind_twice_fun3_9 = __gen_e_acsl_bind_twice_fun3_2(a,0);
-    if (__gen_e_acsl_bind_twice_fun3_9 == __gen_e_acsl_z_3) __gen_e_acsl_if_12 = 
-                                                            a - 1L;
+    __gen_e_acsl_bind_twice_fun3_9 = __gen_e_acsl_bind_twice_fun3(a,0);
+    if ((long)__gen_e_acsl_bind_twice_fun3_9 == __gen_e_acsl_z_3) __gen_e_acsl_if_12 = 
+                                                                  a - 1L;
     else {
       {
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
@@ -836,13 +828,13 @@ long __gen_e_acsl_bind_twice_fun3_2(int a, int b)
   else {
     long __gen_e_acsl_z_4;
     long __gen_e_acsl_bind_twice_fun3_4;
-    long __gen_e_acsl_bind_twice_fun3_6;
+    int __gen_e_acsl_bind_twice_fun3_6;
     long __gen_e_acsl_if_10;
     __gen_e_acsl_bind_twice_fun3_4 = __gen_e_acsl_bind_twice_fun3_2(0,b);
     __gen_e_acsl_z_4 = __gen_e_acsl_bind_twice_fun3_4;
-    __gen_e_acsl_bind_twice_fun3_6 = __gen_e_acsl_bind_twice_fun3_2(a,0);
-    if (__gen_e_acsl_bind_twice_fun3_6 == __gen_e_acsl_z_4) __gen_e_acsl_if_10 = 
-                                                            a - 1L;
+    __gen_e_acsl_bind_twice_fun3_6 = __gen_e_acsl_bind_twice_fun3(a,0);
+    if ((long)__gen_e_acsl_bind_twice_fun3_6 == __gen_e_acsl_z_4) __gen_e_acsl_if_10 = 
+                                                                  a - 1L;
     else {
       {
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
