@@ -244,19 +244,6 @@ val expr_to_ipredicate: exp -> identified_predicate
     @before 21.0-Scandium was unsound in many cases.
 *)
 
-val expr_to_boolean: exp -> term
-(** Returns a boolean term semantically equivalent to the condition
-    of the original C-expression.
-
-    This is different from [expr_to_term e |> scalar_term_to_predicate]
-    since C-relations are translated into logic ones.
-
-    @raise Fatal error if the expression is not a comparison and cannot be
-           compared to zero.
-    @since Sulfur-20171101
-    @before 21.0-Scandium was unsound in many cases.
-*)
-
 val is_zero_comparable: term -> bool
 (** [true] if the given term has a type for which a comparison to 0 exists
     (i.e. scalar C types, logic integers and reals).

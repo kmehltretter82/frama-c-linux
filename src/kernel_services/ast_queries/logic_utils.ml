@@ -599,50 +599,6 @@ and offset_to_term_offset = function
   | Index (e,off) ->
     TIndex (expr_to_term ~coerce:true e,offset_to_term_offset off)
 
-and expr_to_boolean e =
-  let open Cil_types in
-  let tbool n = Logic_const.term n Lboolean in
-  let tnot t = tbool @@ TUnOp(LNot, t) in
-  let tcompare op a b =
-    let va = expr_to_term ~coerce:true a in
-    let vb = expr_to_term ~coerce:true b in
-    tbool @@ TBinOp(op,va,vb)
-  in
-  match e.enode with
-  | UnOp(LNot, a,_) -> tnot (expr_to_boolean a)
-  | BinOp((LAnd|LOr) as op,a,b,_) ->
-    let va = expr_to_boolean a in
-    let vb = expr_to_boolean b in
-    tbool @@ TBinOp(op,va,vb)
-  | BinOp(Eq, a, b, _) ->
-    begin
-      match get_bool_kind a , get_bool_kind b with
-      | `True , `Bool -> expr_to_boolean b
-      | `Bool , `True -> expr_to_boolean a
-      | `False , `Bool -> tnot @@ expr_to_boolean b
-      | `Bool , `False -> tnot @@ expr_to_boolean a
-      | _ -> tcompare Eq a b
-    end
-  | BinOp(Ne, a, b, _) ->
-    begin
-      match get_bool_kind a , get_bool_kind b with
-      | `False , `Bool -> expr_to_boolean b
-      | `Bool , `False -> expr_to_boolean a
-      | `True , `Bool -> tnot @@ expr_to_boolean b
-      | `Bool , `True -> tnot @@ expr_to_boolean a
-      | _ -> tcompare Ne a b
-    end
-  | BinOp((Lt | Gt | Le | Ge) as op, a, b, _) ->
-    tcompare op a b
-  | _ ->
-    let t = expr_to_term ~coerce:true e in
-    if is_zero_comparable t then
-      scalar_term_to_boolean t
-    else
-      Kernel.fatal
-        "Cannot convert into predicate the C expression %a"
-        !Cil.pp_exp_ref e
-
 and expr_to_predicate e =
   let open Cil_types in
   let unnamed = Logic_const.unnamed ~loc:e.eloc in
