@@ -1,11 +1,11 @@
-Files ../oracle/hello_test.res.oracle and hello_test.res.log differ
+Files ../oracle/hello_test.0.res.oracle and hello_test.0.res.log differ
 % dune build @"tests/hello/result/hello_test.0.exec.wtests": diff failure on diff:
- (cd _build/default/tests/hello/result && diff --new-file "hello_test.res.log" "../oracle/hello_test.res.oracle")
-File "tests/hello/oracle/hello_test.res.oracle", line 1, characters 0-0:
-diff --git a/_build/default/tests/hello/oracle/hello_test.res.oracle b/_build/default/tests/hello/result/hello_test.res.log
-index 5f6ab2389a..cf2e5c010c 100644
---- a/_build/default/tests/hello/oracle/hello_test.res.oracle
-+++ b/_build/default/tests/hello/result/hello_test.res.log
+ (cd _build/default/tests/hello/result && diff --new-file "hello_test.0.res.log" "../oracle/hello_test.0.res.oracle")
+File "tests/hello/oracle/hello_test.0.res.oracle", line 1, characters 0-0:
+diff --git 1/_build/default/tests/hello/oracle/hello_test.0.res.oracle 2/_build/default/tests/hello/result/hello_test.0.res.log
+index 5f6ab23..cf2e5c0 100644
+--- 1/_build/default/tests/hello/oracle/hello_test.0.res.oracle
++++ 2/_build/default/tests/hello/result/hello_test.0.res.log
 @@ -1,2 +1,2 @@
  [kernel] Parsing hello_test.c (with preprocessing)
 -[hello] Hello, world!
