@@ -35,7 +35,7 @@ module PLoc = struct
     Precise_locs.enumerate_valid_bits access loc
 
   let make loc =
-    let paddr_bits = Precise_locs.inject_location_bits loc.Locations.addr in
+    let paddr_bits = Precise_locs.inject_addr_bits loc.Locations.addr in
     Precise_locs.make_precise_loc paddr_bits ~size:loc.Locations.size
 
   let top = make (Locations.make_loc Addresses.Bits.top `Top)
@@ -96,9 +96,9 @@ module PLoc = struct
     then `Bottom
     else `Value loc
 
-  let join_loc value loc =
-    let loc = Addresses.Bits.join loc (Addresses.Bits.of_bytes value) in
-    Precise_locs.inject_location_bits loc
+  let join_addr value addr =
+    let addr = Addresses.Bits.join addr (Addresses.Bits.of_bytes value) in
+    Precise_locs.inject_addr_bits addr
 
   let forward_variable typ_offset host offset =
     let base = Base.of_varinfo host in
@@ -107,19 +107,19 @@ module PLoc = struct
       let loc_pr = Precise_locs.combine_base_precise_offset base offset in
       make_precise_loc loc_pr typ_offset
     | Imprecise value ->
-      let loc_b = Addresses.Bits.inject base Ival.zero in
-      let loc_pr = join_loc value loc_b in
-      make_precise_loc loc_pr typ_offset
+      let addr_b = Addresses.Bits.inject base Ival.zero in
+      let addr_pr = join_addr value addr_b in
+      make_precise_loc addr_pr typ_offset
 
-  let forward_pointer typ_offset loc_lv offset =
-    let loc_bits = Addresses.Bits.of_bytes loc_lv in
+  let forward_pointer typ_offset addr_lv offset =
+    let addr_bits = Addresses.Bits.of_bytes addr_lv in
     match offset with
     | Precise offset ->
-      let loc_pr = Precise_locs.combine_loc_precise_offset loc_bits offset in
+      let loc_pr = Precise_locs.combine_addr_precise_offset addr_bits offset in
       make_precise_loc loc_pr typ_offset
     | Imprecise value ->
-      let loc_pr = join_loc value loc_bits in
-      make_precise_loc loc_pr typ_offset
+      let addr_pr = join_addr value addr_bits in
+      make_precise_loc addr_pr typ_offset
 
   let eval_varinfo varinfo = make (Locations.loc_of_varinfo varinfo)
 

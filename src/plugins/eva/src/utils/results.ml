@@ -424,7 +424,7 @@ struct
           assert (Z_or_top.equal loc1.size loc2.size);
           let size = loc1.size in
           let addr_bit = Addresses.Bits.join loc1.addr loc2.addr in
-          let paddr_bit = Precise_locs.inject_location_bits addr_bit in
+          let paddr_bit = Precise_locs.inject_addr_bits addr_bit in
           Precise_locs.make_precise_loc paddr_bit ~size
       and extract loc =
         loc >>-: get

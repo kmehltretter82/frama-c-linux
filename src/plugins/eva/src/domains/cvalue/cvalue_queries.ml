@@ -143,12 +143,12 @@ module Queries = struct
         Abstract_interp.Error_Top -> loc.Locations.addr, value
     in
     let acc = Addresses.Bits.bottom, Cvalue.V.bottom in
-    let loc_bits, value = fold_location loc acc in
-    if Addresses.Bits.is_bottom loc_bits
+    let addr_bits, value = fold_location loc acc in
+    if Addresses.Bits.is_bottom addr_bits
     then `Bottom
     else
-      let loc = Precise_locs.inject_location_bits loc_bits in
-      `Value (Precise_locs.make_precise_loc loc ~size, value)
+      let addr = Precise_locs.inject_addr_bits addr_bits in
+      `Value (Precise_locs.make_precise_loc addr ~size, value)
 
   let reduce_further _state _expr _value = []
   let build_context _ = `Value ()
