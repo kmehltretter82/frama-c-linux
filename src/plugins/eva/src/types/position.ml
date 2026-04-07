@@ -163,13 +163,13 @@ let set_stmt stmt pos =
       (Kernel_function.find_englobing_kf stmt)
       kf
   in
-  match pos with
-  | RootCall { thread; entry_point } when is_in_kf stmt entry_point ->
-    let cs = Callstack.init ~thread ~entry_point in
+  let open Option.Operators in
+  let* kf = kf pos
+  and* cs = callstack pos in
+  if is_in_kf stmt kf then
     Some (local stmt cs)
-  | Local (_, cs) when is_in_kf stmt (Callstack.top_kf cs) ->
-    Some (local stmt cs)
-  | GlobalInit _ | RootCall _ | Local _ -> None
+  else
+    None
 
 let push_kf kf pos =
   match pos with
