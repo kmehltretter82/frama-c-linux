@@ -15,6 +15,7 @@
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_id_t.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_ino_t.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_intptr_t.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/libc/__fc_define_ioctl.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_iovec.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_key_t.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_locale_t.h (with preprocessing)

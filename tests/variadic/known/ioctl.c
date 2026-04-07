@@ -1,4 +1,4 @@
-#include <stropts.h>
+#include <sys/ioctl.h>
 
 struct st {
   int a;
