@@ -54,7 +54,7 @@ let reduce_to_valid_loc dst size access =
   let size = `Value (Option.value ~default:Z.zero min_size) in
   let dst_loc = Locations.make_loc dst size in
   let valid_dst_loc = Locations.valid_part ~bitfield:false access dst_loc in
-  valid_dst_loc.Locations.loc
+  valid_dst_loc.Locations.addr
 
 (* -------------------------------------------------------------------------- *)
 (*                             Memcpy & Memmove                               *)

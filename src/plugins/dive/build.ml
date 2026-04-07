@@ -186,7 +186,7 @@ let enumerate_cells ~is_folded_base gstmt lval =
     | Null -> Seq.return AbsoluteMemory
   in
   try
-    Addresses.Bits.to_seq_i location.loc |> Seq.flat_map map_base
+    Addresses.Bits.to_seq_i location.addr |> Seq.flat_map map_base
   with Abstract_interp.Error_Top ->
   match gstmt with
   | Local (stmt,_) -> Seq.return (Unknown (lval, stmt))

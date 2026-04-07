@@ -129,7 +129,7 @@ struct
 
     exception Result_is_top
 
-    let add_binding ~exact mem {loc; size} v =
+    let add_binding ~exact mem {addr; size} v =
       let had_non_bottom = ref false in
       let result = ref mem in
       let aux origin b offsets =
@@ -152,7 +152,7 @@ struct
             had_non_bottom := true;
             if offm != offm' then result := add b offm' !result
       in
-      match loc with
+      match addr with
       | Addresses.Bits.Top (Base.SetLattice.Top, orig) ->
         Abstract_interp.feedback_approximation
           "writing at a completely unknown address @[%a@]"
@@ -166,7 +166,7 @@ struct
         !had_non_bottom, !result
 
     (* may raise Error_Top in the case Top Top. Make sure to annotate callers *)
-    let find ?(conflate_bottom=true) mem {loc ; size} =
+    let find ?(conflate_bottom=true) mem {addr ; size} =
       let open Bottom.Operators in
       let handle_imprecise_base base acc =
         let v =
@@ -175,7 +175,7 @@ struct
         in
         Bottom.join V.join v acc
       in
-      match loc with
+      match addr with
       | Addresses.Bits.Top (Base.SetLattice.Top, _) -> `Value (vtop ())
       | Addresses.Bits.Top (Base.SetLattice.Set s, _) ->
         Base.SetLattice.O.fold handle_imprecise_base s `Bottom

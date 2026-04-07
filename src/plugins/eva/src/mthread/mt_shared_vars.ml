@@ -205,7 +205,7 @@ class do_it cp =
            let deps = Results.(address_deps lv request) in
            self#add_access Read deps;
            let loc = Results.(eval_address lv request |> as_location) in
-           if Addresses.Bits.(equal loc.loc top) then
+           if Addresses.Bits.(equal loc.addr top) then
              Mt_self.warning ~current:true ~once:true
                "Problem with %a: its writing location is completely unknown."
                Printer.pp_lval lv;
@@ -679,7 +679,7 @@ module Precise = struct
              | `Bottom -> acc
              | `Value offsm -> (base, offsm)::acc
         )
-        loc.loc
+        loc.addr
         []
 
   let pp_stack fmt node =

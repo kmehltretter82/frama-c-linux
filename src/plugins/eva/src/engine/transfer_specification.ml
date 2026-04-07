@@ -129,7 +129,7 @@ let warn_on_missing_result_assigns kinstr kf spec =
       Kernel_function.pretty kf
 
 let reduce_to_valid_location kind term loc =
-  if Locations.(Addresses.Bits.(equal top loc.loc)) then
+  if Locations.(Addresses.Bits.(equal top loc.addr)) then
     begin
       Self.error ~once:true ~current:true
         "@[Cannot handle@ %a,@ location is too imprecise@ (%a).@ \
@@ -342,8 +342,8 @@ module Make (Engine: Engine_Subset) = struct
       let loc = Option.map Precise_locs.imprecise_location precise_loc in
       match loc with
       | None | Some Locations.{ size = `Top } -> ()
-      | Some Locations.{ loc; size = `Value size } ->
-        let offsm = Cvalue.Model.copy_offsetmap loc size cvalue_state in
+      | Some Locations.{ addr; size = `Value size } ->
+        let offsm = Cvalue.Model.copy_offsetmap addr size cvalue_state in
         let warn v =
           match Cvalue.V_Or_Uninitialized.get_v v with
           | Top (bases, origin) ->

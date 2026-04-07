@@ -94,7 +94,7 @@ module Queries = struct
     match loc.Locations.size with
     | `Top -> `Value (Cvalue.V.top, None), Alarmset.all
     | `Value size ->
-      let offsm = Cvalue.Model.copy_offsetmap loc.Locations.loc size state in
+      let offsm = Cvalue.Model.copy_offsetmap loc.Locations.addr size state in
       match offsm with
       | `Bottom -> `Bottom, Alarmset.none
       | `Value offsm ->
@@ -123,11 +123,11 @@ module Queries = struct
       Cvalue_forward.reinterpret lval.typ v
     in
     let process_ival base ival (acc_loc, acc_val as acc) =
-      let loc_bits = Addresses.Bits.inject base ival in
-      let single_loc = Locations.make_loc loc_bits size in
+      let addr_bits = Addresses.Bits.inject base ival in
+      let single_loc = Locations.make_loc addr_bits size in
       let v = eval_one_loc single_loc in
       if Cvalue.V.intersects v value
-      then Addresses.Bits.join loc_bits acc_loc, Cvalue.V.join v acc_val
+      then Addresses.Bits.join addr_bits acc_loc, Cvalue.V.join v acc_val
       else acc
     in
     let fold_ival base ival acc =
@@ -137,10 +137,10 @@ module Queries = struct
     in
     let fold_location loc acc =
       try
-        let loc = loc.Locations.loc in
-        Addresses.Bits.fold_i fold_ival loc acc
+        let addr = loc.Locations.addr in
+        Addresses.Bits.fold_i fold_ival addr acc
       with
-        Abstract_interp.Error_Top -> loc.Locations.loc, value
+        Abstract_interp.Error_Top -> loc.Locations.addr, value
     in
     let acc = Addresses.Bits.bottom, Cvalue.V.bottom in
     let loc_bits, value = fold_location loc acc in

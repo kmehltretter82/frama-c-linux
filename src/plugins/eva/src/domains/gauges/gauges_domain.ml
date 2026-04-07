@@ -945,9 +945,9 @@ module G = struct
      variable fits [typ] *)
   let loc_to_base loc typ =
     try
-      let locb = loc.Locations.loc in
+      let addrb = loc.Locations.addr in
       (* Single pointer *)
-      let b, o = Addresses.Bits.find_lonely_binding locb in
+      let b, o = Addresses.Bits.find_lonely_binding addrb in
       match b with
       | Base.Var (vi, Base.Known (_, max)) -> (* "standard" varinfos only *)
         if tracked_variable vi &&
@@ -1087,7 +1087,7 @@ module G = struct
     with Untranslatable ->
     try
       Addresses.Bits.fold_topset_ok
-        (fun b _ state -> kill_base b state) loc.Locations.loc state
+        (fun b _ state -> kill_base b state) loc.Locations.addr state
     with Abstract_interp.Error_Top -> top state
 
 end
@@ -1125,12 +1125,12 @@ module D : Abstract_domain.Leaf
 
   let kill loc state =
     let loc = Precise_locs.imprecise_location loc in
-    let loc = loc.Locations.loc in
+    let addr = loc.Locations.addr in
     let aux_base b _ acc =
       try Base.to_varinfo b :: acc
       with Base.Not_a_C_variable (* NULL *) -> acc
     in
-    let vars = Addresses.Bits.fold_topset_ok aux_base loc [] in
+    let vars = Addresses.Bits.fold_topset_ok aux_base addr [] in
     remove_variables vars state
 
   let assume_exp valuation e r state =

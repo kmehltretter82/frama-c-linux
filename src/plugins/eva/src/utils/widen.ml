@@ -428,7 +428,7 @@ let dynamic_bases_of_lval states e offset =
       let location = Cvalue_queries.lval_to_loc state lv in
       Addresses.Bits.fold_bases
         (fun base acc'' -> Base.Hptset.add base acc'')
-        location.Locations.loc acc'
+        location.Locations.addr acc'
     ) Base.Hptset.empty states
 
 (* Find syntactically the dynamic hints on [stmt]. *)

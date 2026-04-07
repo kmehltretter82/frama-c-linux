@@ -423,9 +423,9 @@ struct
           and loc2 = Precise_locs.imprecise_location ploc2 in
           assert (Z_or_top.equal loc1.size loc2.size);
           let size = loc1.size in
-          let loc_bit = Addresses.Bits.join loc1.loc loc2.loc in
-          let ploc_bit = Precise_locs.inject_location_bits loc_bit in
-          Precise_locs.make_precise_loc ploc_bit ~size
+          let addr_bit = Addresses.Bits.join loc1.addr loc2.addr in
+          let paddr_bit = Precise_locs.inject_location_bits addr_bit in
+          Precise_locs.make_precise_loc paddr_bit ~size
       and extract loc =
         loc >>-: get
       in
@@ -439,7 +439,7 @@ struct
       let join loc1 loc2 =
         let open Locations in
         let size = loc1.size
-        and loc = Addresses.Bits.join loc1.loc loc2.loc in
+        and loc = Addresses.Bits.join loc1.addr loc2.addr in
         assert (Z_or_top.equal loc2.size size);
         make_loc loc size
       and extract loc =

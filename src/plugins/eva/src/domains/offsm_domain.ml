@@ -116,7 +116,7 @@ module D : Abstract_domain.Leaf
           | `Top -> assert false
           | `Value size ->
             Memory.paste_offsetmap
-              ~from:o ~dst_loc:loc.Locations.loc ~size ~exact:true state
+              ~from:o ~dst_loc:loc.Locations.addr ~size ~exact:true state
     in
     match state' with
     | Memory.Bottom -> `Bottom
@@ -156,7 +156,7 @@ module D : Abstract_domain.Leaf
   (* Basic 'find' on a location *)
   let find_loc state loc =
     let size = Z_or_top.project loc.Locations.size in
-    let o = Memory.copy_offsetmap loc.Locations.loc size state in
+    let o = Memory.copy_offsetmap loc.Locations.addr size state in
     o >>-: fun o ->
     if Default_offsetmap.is_top o ||
        (not store_redundant && V_Offsetmap.is_single_interval o)

@@ -33,7 +33,7 @@ let warn_imprecise_value ?prefix lval value =
   | _ -> ()
 
 let warn_imprecise_location ?prefix loc =
-  match loc.Locations.loc with
+  match loc.Locations.addr with
   | Addresses.Bits.Top (Base.SetLattice.Top, orig) ->
     let prefix = Option.fold ~none:"" ~some:(fun s -> s ^ ": ") prefix in
     Self.fatal ~current:true
@@ -125,8 +125,8 @@ let copy_one_loc state left_lv right_lv =
   (* top size is tested before this function is called, in which case
      the imprecise copy mode is used. *)
   let size = Z_or_top.project right_loc.Locations.size in
-  let right_loc = right_loc.Locations.loc in
-  let offsetmap = Cvalue.Model.copy_offsetmap right_loc size state in
+  let right_addr = right_loc.Locations.addr in
+  let offsetmap = Cvalue.Model.copy_offsetmap right_addr size state in
   let make_volatile =
     Ast_types.has_qualifier "volatile" left_lval.typ ||
     Ast_types.has_qualifier "volatile" right_lval.typ
@@ -147,7 +147,7 @@ let copy_one_loc state left_lv right_lv =
     warn_imprecise_offsm_write left_lval offsetmap;
     `Value
       (Cvalue.Model.paste_offsetmap ~exact:true
-         ~from:offsetmap ~dst_loc:left_loc.Locations.loc ~size state)
+         ~from:offsetmap ~dst_loc:left_loc.Locations.addr ~size state)
 
 let make_determinate value =
   { v = `Value value; initialized = true; escaping = false }

@@ -271,10 +271,11 @@ struct
     let size = loc.size in
     let add ~validity = LOffset.add_binding_ival ~validity ~exact ~size in
     let aux_base_offset = add_base_offset add v in
-    match loc.loc, m with
+    match loc.addr, m with
     | Addresses.Bits.Top (Base.SetLattice.Top, _), _ | _, Top -> Top
     | _, Bottom -> Bottom
-    | _, Map m -> Map (Addresses.Bits.fold_topset_ok aux_base_offset loc.loc m)
+    | _, Map m ->
+      Map (Addresses.Bits.fold_topset_ok aux_base_offset loc.addr m)
 
   let add_base b offsm = function
     | Bottom | Top as m -> m

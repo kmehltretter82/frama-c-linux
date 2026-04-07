@@ -1976,7 +1976,7 @@ and reduce_by_valid env positive access (tset: term) =
         then Locations.valid_part access lshifted_p
         else Locations.invalid_part lshifted_p
       in
-      let valid = valid.loc in
+      let valid = valid.addr in
       if Addresses.Bits.equal shifted_p valid
       then env
       else

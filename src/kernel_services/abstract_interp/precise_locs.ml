@@ -368,9 +368,9 @@ let reduce_offset_by_validity ~bitfield access size base offset =
 let reduce_by_valid_part access ~bitfield precise_loc size =
   match precise_loc with
   | PLBottom -> precise_loc
-  | PLLoc loc ->
-    let loc = Locations.make_loc loc size in
-    PLLoc Locations.((valid_part access ~bitfield loc).Locations.loc)
+  | PLLoc addr ->
+    let loc = Locations.make_loc addr size in
+    PLLoc Locations.((valid_part access ~bitfield loc).Locations.addr)
   | PLVarOffset (base, offset) ->
     begin
       match reduce_offset_by_validity ~bitfield access size base offset with

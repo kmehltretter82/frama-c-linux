@@ -24,7 +24,7 @@ let offsetmap_of_loc location state =
       try Z_or_top.project loc.size
       with Abstract_interp.Error_Top -> Bit_utils.max_bit_size ()
     in
-    let copy = Cvalue.Model.copy_offsetmap loc.loc size state in
+    let copy = Cvalue.Model.copy_offsetmap loc.addr size state in
     Bottom.join Cvalue.V_Offsetmap.join copy offsm_res
   in
   Precise_locs.fold aux location `Bottom
@@ -70,7 +70,7 @@ exception Reduce_to_bottom
 let reduce_by_initialized_defined f loc state =
   try
     let base, offset =
-      Addresses.Bits.find_lonely_key loc.Locations.loc
+      Addresses.Bits.find_lonely_key loc.Locations.addr
     in
     if Base.is_weak base then raise Unchanged;
     let size = Z_or_top.project loc.Locations.size in
@@ -143,7 +143,7 @@ let reduce_by_valid_loc ~positive access loc typ state =
 let make_loc_contiguous loc =
   try
     let base, offset =
-      Addresses.Bits.find_lonely_key loc.Locations.loc
+      Addresses.Bits.find_lonely_key loc.Locations.addr
     in
     if Ival.is_small_set offset
     then loc
@@ -174,7 +174,7 @@ let apply_on_all_locs f loc state =
       then Ival.fold_enum (fun i acc -> apply_f base i acc) ival state
       else state
     in
-    try Addresses.Bits.fold_i aux loc.loc state
+    try Addresses.Bits.fold_i aux loc.addr state
     with Abstract_interp.Error_Top -> state
 
 (* Display [o] as a single value, when this is more readable and more precise
@@ -237,7 +237,7 @@ let find_lmap_under state location =
   match location.Locations.size with
   | `Top -> raise CannotComputeUnder
   | `Value size ->
-    match location.Locations.loc with
+    match location.Locations.addr with
     | Addresses.Bits.Top _ -> raise CannotComputeUnder
     | Addresses.Bits.Map map ->
       let process base offset acc =

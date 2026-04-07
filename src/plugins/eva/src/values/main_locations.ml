@@ -35,8 +35,8 @@ module PLoc = struct
     Precise_locs.enumerate_valid_bits access loc
 
   let make loc =
-    let ploc_bits = Precise_locs.inject_location_bits loc.Locations.loc in
-    Precise_locs.make_precise_loc ploc_bits ~size:loc.Locations.size
+    let paddr_bits = Precise_locs.inject_location_bits loc.Locations.addr in
+    Precise_locs.make_precise_loc paddr_bits ~size:loc.Locations.size
 
   let top = make (Locations.make_loc Addresses.Bits.top `Top)
 
@@ -146,7 +146,7 @@ module PLoc = struct
   let backward_variable varinfo location =
     let loc = Precise_locs.imprecise_location location in
     let base = Base.of_varinfo varinfo in
-    let ival = Locations.(Addresses.Bits.find base loc.loc) in
+    let ival = Locations.(Addresses.Bits.find base loc.addr) in
     if Ival.is_bottom ival
     then `Bottom
     else `Value (Precise (Precise_locs.inject_ival ival))
@@ -161,16 +161,16 @@ module PLoc = struct
          mem * 8 + offset == location *)
       let off_ival = Precise_locs.imprecise_offset offset in
       let loc = Precise_locs.imprecise_location location in
-      let loc = loc.Locations.loc in
+      let addr = loc.Locations.addr in
       (* new_off = location - (mem * 8)
          As the offset does not contain addresses, we can make the pointwise
          subtraction between the two locations. *)
       let value_bits = Addresses.Bits.of_bytes mem in
-      let new_off = Addresses.Bits.sub_pointwise loc value_bits in
+      let new_off = Addresses.Bits.sub_pointwise addr value_bits in
       let new_off = Ival.narrow new_off off_ival in
       let new_off = Precise_locs.inject_ival new_off in
       (* new_mem = (location - offset) * 8 *)
-      let new_mem = Addresses.Bits.shift (Ival.neg_int off_ival) loc in
+      let new_mem = Addresses.Bits.shift (Ival.neg_int off_ival) addr in
       let new_mem = Addresses.Bits.to_bytes new_mem in
       if Cvalue.V.is_bottom new_mem || Precise_locs.is_bottom_offset new_off
       then `Bottom

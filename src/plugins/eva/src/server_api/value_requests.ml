@@ -425,7 +425,7 @@ let reduce_loc_and_eval state loc =
     else
       try
         let size = Z_or_top.project loc'.Locations.size in
-        match Cvalue.Model.copy_offsetmap loc'.Locations.loc size state with
+        match Cvalue.Model.copy_offsetmap loc'.Locations.addr size state with
         | `Bottom -> InvalidLoc
         | `Value offsm -> Offsetmap offsm
       with Abstract_interp.Error_Top -> Top

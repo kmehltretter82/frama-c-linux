@@ -223,7 +223,7 @@ struct
       let typ = Option.value ~default:Cil_const.voidType (Base.typeof base) in
       Map.add base (`Value (Offset.NoOffset typ)) map
     in
-    Addresses.Bits.(fold_bases add_base loc'.loc empty)
+    Addresses.Bits.(fold_bases add_base loc'.addr empty)
 end
 
 
