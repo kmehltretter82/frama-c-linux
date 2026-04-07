@@ -91,8 +91,14 @@ val pretty_english : prefix:bool -> Format.formatter -> location -> unit
    under-approximating counterpart. *)
 val loc_to_loc_without_size : location -> Addresses.Bytes.t
 val loc_bytes_to_loc_bits : Addresses.Bytes.t -> Addresses.Bits.t
+[@@deprecated "Use Addresses.Bits.of_bytes instead"]
+[@@migrate { repl = Addresses.Bits.of_bytes }]
 val loc_bits_to_loc_bytes : Addresses.Bits.t -> Addresses.Bytes.t
+[@@deprecated "Use Addresses.Bits.to_bytes instead"]
+[@@migrate { repl = Addresses.Bits.to_bytes }]
 val loc_bits_to_loc_bytes_under : Addresses.Bits.t -> Addresses.Bytes.t
+[@@deprecated "Use Addresses.Bits.to_bytes_under instead"]
+[@@migrate { repl = Addresses.Bits.to_bytes_under }]
 
 val enumerate_bits : location -> Memory_zone.t
 val enumerate_bits_under : location -> Memory_zone.t
