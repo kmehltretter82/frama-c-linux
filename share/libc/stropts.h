@@ -13,6 +13,7 @@ __PUSH_FC_STDLIB
 __BEGIN_DECLS
 
 #include "__fc_define_uid_and_gid.h"
+#include "__fc_define_ioctl.h"
 #include "__fc_machdep.h"
 
 typedef __INT32_T t_scalar_t;
@@ -174,22 +175,6 @@ extern int getmsg(int fildes, struct strbuf *restrict ctlptr,
 extern int getpmsg(int fildes, struct strbuf *restrict ctlptr,
                    struct strbuf *restrict dataptr, int *restrict bandp,
                    int *restrict flagsp);
-
-// Variadic function: specifications are given below, at each specialized form
-extern int ioctl(int, int, ...);
-
-// for Variadic
-/*@ assigns \result \from indirect:fd, indirect:request; */
-extern int    __va_ioctl_void(int fd, int request);
-
-/*@ assigns \result \from indirect:fd, indirect:request, indirect:arg; */
-extern int    __va_ioctl_int(int fd, int request, int arg);
-
-/*@ assigns \result \from indirect:fd, indirect:request,
-      indirect:((char*)argp)[0..];
-    assigns ((char*)argp)[0..] \from
-      indirect:fd, indirect:request, ((char*)argp)[0..]; */
-extern int    __va_ioctl_ptr(int fd, int request, void* argp);
 
 /*@
   assigns \result \from indirect:fildes; //missing: \from 'STREAMS-based file'

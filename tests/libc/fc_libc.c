@@ -63,6 +63,7 @@
 #include "__fc_define_id_t.h"
 #include "__fc_define_ino_t.h"
 #include "__fc_define_intptr_t.h"
+#include "__fc_define_ioctl.h"
 #include "__fc_define_iovec.h"
 #include "__fc_define_key_t.h"
 #include "__fc_define_locale_t.h"

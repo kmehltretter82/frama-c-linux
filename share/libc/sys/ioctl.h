@@ -12,8 +12,10 @@
 // This file is neither in the C standard nor POSIX; it is here for
 // compatibility reasons.
 
-// For the ioctl() prototype
-#include <stropts.h>
+#include "features.h"
+__PUSH_FC_STDLIB
+__BEGIN_DECLS
+#include "../__fc_define_ioctl.h"
 
 struct winsize
 {
@@ -193,5 +195,8 @@ struct winsize
 #define TIOCPKT_IOCTL 64
 
 #define TIOCSER_TEMT 0x01
+
+__END_DECLS
+__POP_FC_STDLIB
 
 #endif
