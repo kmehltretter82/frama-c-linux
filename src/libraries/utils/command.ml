@@ -133,8 +133,8 @@ let command_generic ~async ?stdout ?stderr cmd args =
 let async ?stdout ?stderr cmd args =
   command_generic ~async:true ?stdout ?stderr cmd args
 
-let spawn ?(timeout=0) ?stdout ?stderr cmd args =
-  if System_config.is_gui () || timeout > 0 then
+let spawn ~async ?(timeout=0) ?stdout ?stderr cmd args =
+  if async || timeout > 0 then
     let f = command_generic ~async:true ?stdout ?stderr cmd args in
     let res = ref(Unix.WEXITED 99) in
     let ftimeout = float_of_int timeout in
@@ -172,7 +172,7 @@ struct
     | Png -> "png"
     | Svg -> "svg"
 
-  let spawn ?timeout ?layout ~format ~output input =
+  let spawn ~async ?timeout ?layout ~format ~output input =
     let layout_args = match layout with
       | Some s -> ["-K" ; s]
       | None -> []
@@ -182,5 +182,5 @@ struct
                  "-o" ; Filepath.to_string_abs output ;
                  Filepath.to_string_abs input ]
     in
-    spawn ?timeout "dot" args
+    spawn ~async ?timeout "dot" args
 end

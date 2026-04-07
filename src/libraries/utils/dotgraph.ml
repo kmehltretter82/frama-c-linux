@@ -120,7 +120,7 @@ let close dot =
 
 type target = Command.Dot.format = Jpeg | Pdf | Png | Svg
 
-let layout ?(force=false) ?(target=Pdf) ?(engine="dot") ?output dot =
+let layout ~async ?(force=false) ?(target=Pdf) ?(engine="dot") ?output dot =
   begin
     if dot.out <> None then raise (Invalid_argument "DotGraph: not closed") ;
     let input = Filepath.of_string dot.file in
@@ -130,7 +130,7 @@ let layout ?(force=false) ?(target=Pdf) ?(engine="dot") ?output dot =
         Printf.sprintf "%s.%s" (basename dot.file) file_ext
     in
     let output = Filepath.of_string output_filename in
-    let status = Command.Dot.(spawn ~layout:engine ~format:target ~output input)
+    let status = Command.Dot.(spawn ~async ~layout:engine ~format:target ~output input)
     in
     match status with
     | Unix.WEXITED 0 -> output_filename

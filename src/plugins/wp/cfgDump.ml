@@ -44,7 +44,8 @@ let flush () =
       close_out fout ;
       let input = Filepath.of_string (file ^ ".dot")
       and output = Filepath.of_string (file ^ ".pdf") in
-      ignore @@ Command.Dot.(spawn ~format:Pdf ~output input)
+      let async = System_config.is_gui () in
+      ignore @@ Command.Dot.(spawn ~async ~format:Pdf ~output input)
   end
 
 (* -------------------------------------------------------------------------- *)

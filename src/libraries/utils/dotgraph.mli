@@ -89,6 +89,7 @@ val is_dot_installed : unit -> bool
 type target = Jpeg | Pdf | Png | Svg
 
 val layout :
+  async:bool ->
   ?force:bool ->
   ?target:target ->
   ?engine:string ->
