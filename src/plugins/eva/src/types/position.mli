@@ -93,3 +93,17 @@ val stmt : t -> Cil_types.stmt option
 val callstack : t -> Callstack.t option
 (** [callstack p] returns the callstack of a local position or [None] if it is a
     global position. *)
+
+(** {2 Setters} *)
+
+val set_stmt : Cil_types.stmt -> t -> t option
+(** [set_stmt stmt p] changes the statement of a local or root call position [p]
+    to [stmt] and returns the updated position, or returns [None] if it is a
+    global position. *)
+
+val push_kf : Cil_types.kernel_function -> t -> t option
+(** [push_kf kf p], if [p] is a local position, returns an updated local
+    position where the given [kf] has been pushed on the callstack and the
+    statement points to the first statement of the given [kf]. The function
+    returns [None] if [p] is a global position. *)
+

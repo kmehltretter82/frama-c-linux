@@ -33,6 +33,9 @@ module Statistics = Statistics
 (** AST used by Eva. *)
 module Eva_ast = Eva_ast
 
+(** Position in the analysis *)
+module Position = Position
+
 (** Types of callstack. *)
 module Callstack = Callstack
 

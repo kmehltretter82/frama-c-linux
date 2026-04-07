@@ -71,6 +71,27 @@ let filter_callstack f =
 
 let in_cvalue_state cvalue = Cvalue cvalue
 
+let before_pos pos =
+  match pos with
+  | Position.RootCall { thread; entry_point } ->
+    at_start_of entry_point
+    |> in_callstack (Callstack.init ~thread ~entry_point)
+  | Position.GlobalInit _ ->
+    at_start
+  | Position.Local local ->
+    before (Position.Local.stmt local)
+    |> in_callstack (Position.Local.callstack local)
+
+let after_pos pos =
+  match pos with
+  | Position.RootCall { thread; entry_point } ->
+    at_end_of entry_point
+    |> in_callstack (Callstack.init ~thread ~entry_point)
+  | Position.GlobalInit _ ->
+    at_end ()
+  | Position.Local local ->
+    after (Position.Local.stmt local)
+    |> in_callstack (Position.Local.callstack local)
 
 (* Manipulating request results *)
 
@@ -746,6 +767,10 @@ let is_bottom : type a. a evaluation -> bool =
 let is_reachable stmt =
   let module M = Make () in
   M.is_reachable (before stmt)
+
+let is_reachable_pos pos =
+  let module M = Make () in
+  M.is_reachable (before_pos pos)
 
 let is_reachable_kinstr kinstr =
   let module M = Make () in
