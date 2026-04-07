@@ -26,7 +26,7 @@ module Zone = Memory_zone
 (** A {!Addresses.Bits.t} and a size in bits.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 type location = private {
-  loc : Addresses.Bits.t;
+  addr : Addresses.Bits.t;
   size : Z_or_top.t;
 }
 
