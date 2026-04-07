@@ -102,7 +102,8 @@ val set_stmt : Cil_types.stmt -> t -> t option
     global position. *)
 
 val push_kf : Cil_types.kernel_function -> t -> t option
-(** [push_kf kf p] pushes the given [kf] on the callstack of the local position
-    [p] and returns the updated position, or returns [None] if it is a global
-    position. *)
+(** [push_kf kf p], if [p] is a local position, returns an updated local
+    position where the given [kf] has been pushed on the callstack and the
+    statement points to the first statement of the given [kf]. The function
+    returns [None] if [p] is a global position. *)
 
