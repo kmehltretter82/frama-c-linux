@@ -7,6 +7,8 @@
 /* ************************************************************************ */
 
 import React from 'react';
+import * as Utils from 'dome/misc/utils';
+import * as Forms from 'dome/layout/forms';
 import { Icon } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import {
@@ -16,12 +18,41 @@ import {
   Spinner
 } from 'dome/controls/buttons';
 import { SidebarTitle } from 'dome/frame/sidebars';
-import { Hbox, Vbox } from 'dome/layout/boxes';
+import { DivProps, Hbox, Vbox } from 'dome/layout/boxes';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as Params from 'frama-c/kernel/api/parameters';
 import * as WP from 'frama-c/plugins/wp/api';
 import * as TIP from './tip';
+
+function Section(p: Forms.SectionProps): JSX.Element {
+  return (
+    <Forms.Section
+      label={p.label}
+      unfold
+    >
+      {p.children}
+    </Forms.Section>
+  );
+}
+
+interface PanelProps extends DivProps {
+  title?: string;
+}
+
+function PanelBlock(props: PanelProps) : JSX.Element {
+  const { children, title, ...others } = props;
+  return (
+    <Vbox className={Utils.classes('wp-panel-block')} {...others}>
+      <Label
+        label={title}
+        className={Utils.classes('wp-panel-block-title')}
+        display={!!title}
+      />
+      {children}
+    </Vbox>
+  );
+}
 
 function Tools(): JSX.Element {
   const { running } = TIP.useServerActivity();
@@ -61,10 +92,16 @@ function Prover(props: ProverConfig): JSX.Element {
   };
   const icon = checked ? 'SWITCH.ON' : 'SWITCH.OFF';
   const iconKind = checked ? 'positive' : 'default';
+  const className = Utils.classes('wp-panel-prover-label');
   return (
     <Hbox key={prover}>
-      <Icon id={icon} kind={iconKind} onClick={onClick} />
-      <Label label={name} title={name} />
+      <Icon
+        id={icon}
+        kind={iconKind}
+        onClick={onClick}
+        size={16}
+      />
+      <Label label={name} title={name} className={className} />
     </Hbox>
   );
 }
@@ -85,7 +122,7 @@ function InteractiveSelector(): JSX.Element {
         <option key={value} value={value}>{value}</option>
       );
   return (
-    <Label label='Interactive Mode'>
+    <Label label='Mode'>
       <SelectMenu
         value={inter}
         onChange={onChange}
@@ -110,7 +147,7 @@ function TipSelector(): JSX.Element {
         <option key={value} value={value}>{value}</option>
       );
   return (
-    <Label label='TIP Mode'>
+    <Label label='Mode'>
       <SelectMenu
         value={tipMode}
         onChange={onChange}
@@ -138,69 +175,79 @@ export function SideBar(): JSX.Element {
       <SidebarTitle label='Weakest Precondition'>
         <Tools />
       </SidebarTitle>
-      <Vbox>
-        <Checkbox
-          label='Generate RTE guards'
-          onChange={setRte}
-          value={rte}
-        />
-        <Label label='Provers Configuration' />
-        <Vbox>
-          <Label label='Timeout' icon='TUNINGS' >
-            <Spinner
-              className="wp-config-field wp-config-spinner"
-              value={timeout}
-              vmin={0}
-              vstep={1}
-              onChange={setTimeout}
+      <Forms.SidebarForm>
+        <Section
+          label='Properties Selection'
+        >
+          <Checkbox
+            label='Generate RTE guards'
+            onChange={setRte}
+            value={rte}
+          />
+        </Section>
+        <Section
+          label='Provers Configuration'
+        >
+          <PanelBlock title='General configuration'>
+            <Label label='Timeout' icon='CLOCK' >
+              <Spinner
+                className="wp-config-field wp-config-spinner"
+                value={timeout}
+                vmin={0}
+                vstep={1}
+                onChange={setTimeout}
+              />
+            </Label>
+            <Label label='Processes' icon='SETTINGS'>
+              <Spinner
+                className="wp-config-field wp-config-spinner"
+                value={processes}
+                vmin={0}
+                vstep={1}
+                onChange={setProcesses}
+              />
+            </Label>
+          </PanelBlock>
+          <PanelBlock title='Automatic Provers'>
+            {
+              autoPrvs.map((p) =>
+                <Prover
+                  key={p}
+                  prover={p}
+                  up={proversInfo(p)?.active ?? false}
+                  name={proversInfo(p)?.name ?? ''}
+                />
+              )
+            }
+          </PanelBlock>
+          <PanelBlock title='Interactive Provers'>
+            <InteractiveSelector />
+            {
+              interPrvs.map((p) =>
+                <Prover
+                  key={p}
+                  prover={p}
+                  up={proversInfo(p)?.active ?? false}
+                  name={proversInfo(p)?.name ?? ''}
+                />
+              )
+            }
+          </PanelBlock>
+          <PanelBlock title='Proof Strategies'>
+            <TipSelector />
+            <Checkbox
+              label='Use scripts'
+              onChange={setScripts}
+              value={scripts}
             />
-          </Label>
-          <Label label='Processes' icon='SETTINGS'>
-            <Spinner
-              className="wp-config-field wp-config-spinner"
-              value={processes}
-              vmin={0}
-              vstep={1}
-              onChange={setProcesses}
+            <Checkbox
+              label='Use strategies'
+              onChange={setStrategies}
+              value={strategies}
             />
-          </Label>
-        </Vbox>
-        <Label label='Automatic Provers' />
-        {
-          autoPrvs.map((p) =>
-            <Prover
-              key={p}
-              prover={p}
-              up={proversInfo(p)?.active ?? false}
-              name={proversInfo(p)?.name ?? ''}
-            />
-          )
-        }
-        <Label label='Interactive Provers' />
-        <InteractiveSelector />
-        {
-          interPrvs.map((p) =>
-            <Prover
-              key={p}
-              prover={p}
-              up={proversInfo(p)?.active ?? false}
-              name={proversInfo(p)?.name ?? ''}
-            />
-          )
-        }
-        <Label label='Proof Strategies' />
-        <TipSelector />
-        <Checkbox
-          label='Use scripts'
-          onChange={setScripts}
-          value={scripts}
-        />
-        <Checkbox
-          label='Use strategies'
-          onChange={setStrategies}
-          value={strategies}
-        />
-      </Vbox>
+          </PanelBlock>
+        </Section>
+      </Forms.SidebarForm>
     </>
   );
 }
