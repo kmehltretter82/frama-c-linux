@@ -748,6 +748,10 @@
     visibility: hidden;
   }
 
+  .dome-xTree-node-container:not(:has(.dome-xTree-node-visible)) {
+    display: none;
+  }
+
   .dome-xTree-node {
     display: flex;
     flex-direction: row;

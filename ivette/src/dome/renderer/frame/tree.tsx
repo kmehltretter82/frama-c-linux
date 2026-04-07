@@ -95,12 +95,13 @@ export interface NodeProps {
   icon?: string;
   label?: string;
   title?: string;
+  visible?: boolean; /* default to true */
   actions?: React.ReactNode;
   children?: React.ReactNode;
 }
 
 export function Node(props: NodeProps): JSX.Element {
-  const { id, icon, label, title, actions, children } = props;
+  const { id, icon, label, title, visible = true, actions, children } = props;
 
   const context = React.useContext(CONTEXT);
   const countChildren = React.Children.count(children);
@@ -125,6 +126,7 @@ export function Node(props: NodeProps): JSX.Element {
 
   const className = classes(
     'dome-xTree-node',
+    visible && 'dome-xTree-node-visible',
     hasSubTree ? "dome-xTree-has-subtree" : "",
     unfold ? 'dome-xTree-show-children' : 'dome-xTree-hide-children',
     context.selected === id && 'dome-xTree-selected'
@@ -157,7 +159,7 @@ export function Node(props: NodeProps): JSX.Element {
       depth: context.depth+1,
       heightSticky: context.heightSticky+height
     }}>
-      <div>
+      <div className='dome-xTree-node-container'>
         <div ref={ref} className={className} style={style} title={title}
           onClick={() => context.onClick ? context.onClick(id) : flipUnfold() }
         >
