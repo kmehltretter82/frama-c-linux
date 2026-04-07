@@ -573,16 +573,16 @@ run the tests:
 
 \begin{frama-c-commands}[breaklines=true]
 \$ dune build @ptests
-Files ../oracle/hello_test.res.oracle and hello_test.res.log differ
+Files ../oracle/hello_test.0.res.oracle and hello_test.0.res.log differ
 % dune build @"tests/hello/result/hello_test.0.exec.wtests": diff failure on diff:
-(cd _build/default/tests/hello/result && diff --new-file "hello_test.res.log"
-"../oracle/hello_test.res.oracle")
-File "tests/hello/oracle/hello_test.res.oracle", line 1, characters 0-0:
-diff --git a/_build/default/tests/hello/oracle/hello_test.res.oracle
-            b/_build/default/tests/hello/result/hello_test.res.log
+(cd _build/default/tests/hello/result && diff --new-file "hello_test.0.res.log"
+"../oracle/hello_test.0.res.oracle")
+File "tests/hello/oracle/hello_test.0.res.oracle", line 1, characters 0-0:
+diff --git 1/_build/default/tests/hello/oracle/hello_test.0.res.oracle
+            2/_build/default/tests/hello/result/hello_test.0.res.log
 index e69de29..5f6ab23 100644
---- a/_build/default/tests/hello/oracle/hello_test.res.oracle
-+++ b/_build/default/tests/hello/result/hello_test.res.log
+--- 1/_build/default/tests/hello/oracle/hello_test.0.res.oracle
++++ 2/_build/default/tests/hello/result/hello_test.0.res.log
 @@ -0,0 +1,2 @@
 +[kernel] Parsing hello_test.c (with preprocessing)
 +[hello] Hello, world!
@@ -596,14 +596,14 @@ can be summarized as:
   \verb|_build/default|, which is (approximately) a copy of the plug-in
   file tree;
 \item Dune compared two files, none of which existed before running the test:
-  \verb|result/hello_test.res.log| and \verb|oracle/hello_test.res.oracle|;
+  \verb|result/hello_test.0.res.log| and \verb|oracle/hello_test.0.res.oracle|;
 \item The last lines (which should be colored, if your terminal supports colors)
   show the textual difference between the expected and actual outputs.
 \end{itemize}
 
-The first file, \verb|result/hello_test.res.log|, is the {\em actual} output of
+The first file, \verb|result/hello_test.0.res.log|, is the {\em actual} output of
 the execution of the test command.
-The second file, \verb|oracle/hello_test.res.oracle|, is the {\em expected}
+The second file, \verb|oracle/hello_test.0.res.oracle|, is the {\em expected}
 output of the test.
 
 The result file is re-generated each time the test is run.
@@ -666,14 +666,14 @@ Running these commands:
 \$ dune build @install
 <...>
 \$ dune build @ptests
-Files ../oracle/hello_test.res.oracle and hello_test.res.log are different
+Files ../oracle/hello_test.0.res.oracle and hello_test.0.res.log are different
 % dune build @"tests/hello/result/hello_test.0.exec.wtests": diff failure on diff:
- (cd _build/default/tests/hello/result && diff --new-file "hello_test.res.log" "../oracle/hello_test.res.oracle")
-File "tests/hello/oracle/hello_test.res.oracle", line 1, characters 0-0:
-diff --git a/_build/default/tests/hello/oracle/hello_test.res.oracle b/_build/default/tests/hello/result/hello_test.res.log
+ (cd _build/default/tests/hello/result && diff --new-file "hello_test.0.res.log" "../oracle/hello_test.0.res.oracle")
+File "tests/hello/oracle/hello_test.0.res.oracle", line 1, characters 0-0:
+diff --git 1/_build/default/tests/hello/oracle/hello_test.0.res.oracle 2/_build/default/tests/hello/result/hello_test.0.res.log
 index 5f6ab2389a..cf2e5c010c 100644
---- a/_build/default/tests/hello/oracle/hello_test.res.oracle
-+++ b/_build/default/tests/hello/result/hello_test.res.log
+--- 1/_build/default/tests/hello/oracle/hello_test.0.res.oracle
++++ 2/_build/default/tests/hello/result/hello_test.0.res.log
 @@ -1,2 +1,2 @@
  [kernel] Parsing hello_test.c (with preprocessing)
 -[hello] Hello, world!

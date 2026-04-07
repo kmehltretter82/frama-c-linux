@@ -3,7 +3,7 @@
 int main(void)
 {
   int __retres;
-  /*@ foo 84 ≡ 42 + 42; */
+  /*@ \my_plugin::foo 84 ≡ 42 + 42; */
   {
     __retres = 0;
     goto return_label;
