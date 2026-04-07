@@ -21,7 +21,7 @@ end
 let typer ctxt loc = function
   | [ { lexpr_node = PLnamed ("load", { lexpr_node = PLvar s; _ }) ; _ } ] ->
     let ti = { lt_name = s ; lt_params = [] ; lt_def = None ; lt_attr = []} in
-    ctxt.add_logic_type s ti ;
+    ctxt.add_logic_type loc ti ;
     Ext_id (Ts.add ti)
   | _ ->
     ctxt.error loc "Expected type loader"
