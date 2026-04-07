@@ -27,7 +27,7 @@ module PLoc = struct
 
   let to_value t =
     let loc = Precise_locs.imprecise_location t in
-    `Value (Locations.loc_to_loc_without_size loc)
+    `Value (Locations.loc_addr loc)
 
   let size loc = Precise_locs.loc_size loc
 

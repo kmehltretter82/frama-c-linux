@@ -127,11 +127,11 @@ let reduce_by_valid_loc ~positive access loc typ state =
     then Locations.valid_part access location
     else Locations.invalid_part location
   in
-  let reduced_loc_bytes = Locations.loc_to_loc_without_size reduced_location in
+  let reduced_addr_bytes = Locations.loc_addr reduced_location in
   let reduced_value =
     if positive
-    then Cvalue.V_Or_Uninitialized.initialized reduced_loc_bytes
-    else Cvalue.V_Or_Uninitialized.map (fun _ -> reduced_loc_bytes) value
+    then Cvalue.V_Or_Uninitialized.initialized reduced_addr_bytes
+    else Cvalue.V_Or_Uninitialized.map (fun _ -> reduced_addr_bytes) value
   in
   if Cvalue.V_Or_Uninitialized.equal value reduced_value
   then state
