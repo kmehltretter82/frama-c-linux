@@ -1,0 +1,46 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                        ;;
+;;  SPDX-License-Identifier LGPL-2.1                                      ;;
+;;  Copyright (C)                                                         ;;
+;;  CEA (Commissariat à l'énergie atomique et aux énergies alternatives)  ;;
+;;                                                                        ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Fclib:" %{lib-available:fclib} "\n")
+          (echo "  - dynlink:" %{lib-available:dynlink} "\n")
+          (echo "  - OCamlGraph:" %{lib-available:ocamlgraph} "\n")
+          (echo "  - Zarith:" %{lib-available:zarith} "\n")
+          (echo "  - camlzip:" %{lib-available:zip} "\n")
+          (echo "  - yojson:" %{lib-available:yojson} "\n")
+          (echo "  - ppx_deriving.eq:" %{lib-available:ppx_deriving.eq} "\n")
+          (echo "  - ppx_deriving.show:" %{lib-available:ppx_deriving.show} "\n")
+          (echo "  - ppx_deriving.ord:" %{lib-available:ppx_deriving.ord} "\n")
+          (echo "  - ppx_deriving.make:" %{lib-available:ppx_deriving.make} "\n")
+          (echo "  - ppx_inline_test:" %{lib-available:ppx_inline_test} "\n")
+          (echo "  - ppx_z_literals:" %{lib-available:frama-c.ppx_z_literals} "\n"))))
+
+(rule
+ (alias install)
+ (enabled_if
+  (and
+   (= %{env:FRAMAC_DEVELOPER=no} "yes")
+   (not %{lib-available:fclib})))
+ (action (echo "WARNING: Fclib disabled. Run 'dune build @frama-c-configure' for more details\n"))
+)
+
+(library
+  (name fclib)
+  (public_name frama-c.fclib)
+  (foreign_stubs (language c) (names c_bindings floating_point))
+  (flags :standard -w -9)
+  (libraries dynlink ocamlgraph str yojson zarith zip frama-c.fc_internal_z)
+  (instrumentation (backend landmarks))
+  (instrumentation (backend bisect_ppx))
+  (inline_tests)
+  (preprocess (pps ppx_deriving.eq ppx_deriving.show ppx_deriving.ord ppx_deriving.make ppx_inline_test frama-c.ppx_z_literals)))
+
+(include_subdirs unqualified)
