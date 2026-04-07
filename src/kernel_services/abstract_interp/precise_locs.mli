@@ -7,7 +7,7 @@
 (**************************************************************************)
 
 (** This module provides transient datastructures that may be more precise
-    than an {!Ival.t}, {!Locations.Location_Bits.t} and {!Locations.location}
+    than an {!Ival.t}, {!Addresses.Bits.t} and {!Locations.location}
     respectively, typically for l-values such as [t[i][j]], [p->t[i]], etc.
     Those structures do not have a lattice structure, and cannot be stored
     as an abstract domain. However, they can be use to model more precisely

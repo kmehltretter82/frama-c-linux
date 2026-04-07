@@ -388,8 +388,8 @@ let empty_logic_deps =
   Logic_label.Map.add lbl_here Memory_zone.bottom Logic_label.Map.empty
 
 (* Type holding the result of an evaluation. Currently, 'a is either
-   [Cvalue.V.t] for [eval_term], and [Location_Bits.t] for [eval_tlval_as_loc],
-   and [Ival.t] for [eval_toffset].
+   [Cvalue.V.t] for [eval_term], and [Addresses.Bits.t] for
+   [eval_tlval_as_loc], and [Ival.t] for [eval_toffset].
 
    [eover] is an over-approximation of the evaluation. [eunder] is an
    under-approximation, under the hypothesis that the state in which we

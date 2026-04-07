@@ -25,7 +25,7 @@ module V : sig
 
   (** Values are essentially bytes-indexed locations, the NULL base
       representing basic integers or float. Operations that are not related to
-      locations (ie that are not present in [Location_Bytes]) are  defined
+      locations (ie that are not present in [Addresses.Bytes]) are defined
       below. *)
   include module type of Addresses.Bytes
     (* Too many aliases, and OCaml module system is not able to keep track
