@@ -40,6 +40,12 @@ val is_bottom_loc: location -> bool
 val make_loc : Addresses.Bits.t -> Z_or_top.t -> location
 
 val loc_equal : location -> location -> bool
+
+(** [loc_addr l] returns the address set corresponding to the given
+    location, i.e. the location without the size information.
+    @before Frama-C+dev was named loc_to_loc_without_size *)
+val loc_addr : location -> Addresses.Bytes.t
+
 val loc_size : location -> Z_or_top.t
 
 (** Kind of memory access. *)
@@ -90,6 +96,8 @@ val pretty_english : prefix:bool -> Format.formatter -> location -> unit
    floats.) The last one can return an over-approximation, and has an
    under-approximating counterpart. *)
 val loc_to_loc_without_size : location -> Addresses.Bytes.t
+[@@deprecated "Use loc_addr instead"]
+[@@migrate { repl = Rel.loc_addr }]
 val loc_bytes_to_loc_bits : Addresses.Bytes.t -> Addresses.Bits.t
 [@@deprecated "Use Addresses.Bits.of_bytes instead"]
 [@@migrate { repl = Addresses.Bits.of_bytes }]

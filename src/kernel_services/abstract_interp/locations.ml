@@ -76,7 +76,8 @@ let loc_bits_to_loc_bytes x = Addresses.Bits.to_bytes x
 let loc_bits_to_loc_bytes_under x = Addresses.Bits.to_bytes_under x
 
 
-let loc_to_loc_without_size {loc = loc} = loc_bits_to_loc_bytes loc
+let loc_to_loc_without_size { loc } = Addresses.Bits.to_bytes loc
+let loc_addr { loc } = Addresses.Bits.to_bytes loc
 let loc_size { size = size } = size
 
 let make_loc loc_bits size = { loc = loc_bits; size = size }
