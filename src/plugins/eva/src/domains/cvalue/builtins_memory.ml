@@ -223,8 +223,8 @@ let frama_c_memcpy name state actuals =
     in
     (* Convert locations and size into bits. *)
     let size = Ival.scale (Bit_utils.sizeofchar ()) size in
-    let src = loc_bytes_to_loc_bits src_cvalue in
-    let dst = loc_bytes_to_loc_bits dst_cvalue in
+    let src = Addresses.Bits.of_bytes src_cvalue in
+    let dst = Addresses.Bits.of_bytes dst_cvalue in
     (* Remove invalid locations. *)
     let src = reduce_to_valid_loc src size Locations.Read in
     let dst = reduce_to_valid_loc dst size Locations.Write in
@@ -526,7 +526,7 @@ let frama_c_memset state actuals =
       in
       (* Convert locations and size into bits. *)
       let size = Ival.scale (Bit_utils.sizeofchar ()) size in
-      let dst = Locations.loc_bytes_to_loc_bits dst_cvalue in
+      let dst = Addresses.Bits.of_bytes dst_cvalue in
       (* Remove read-only destinations *)
       let dst = reduce_to_valid_loc dst size Locations.Write in
       (* Keep only the first byte of the value argument *)

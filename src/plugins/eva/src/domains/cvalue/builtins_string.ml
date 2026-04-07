@@ -295,7 +295,7 @@ let return_pointer ~zero basemap =
       (fun base t acc -> Addresses.Bits.add base t.offset acc)
       basemap Addresses.Bits.bottom
   in
-  let cvalue = Locations.loc_bits_to_loc_bytes loc_bits in
+  let cvalue = Addresses.Bits.to_bytes loc_bits in
   if zero || Base.Map.exists (fun _base t -> t.null) basemap
   then Cvalue.V.add Base.null Ival.zero cvalue
   else cvalue
@@ -323,7 +323,7 @@ let search_char kind ~length state str =
 (* Reduces a pointer to a string to its valid part. Also returns a boolean
    indicating whether the pointer was completely valid or not. *)
 let reduce_by_validity ~size cvalue =
-  let loc_bits = Locations.loc_bytes_to_loc_bits cvalue in
+  let loc_bits = Addresses.Bits.of_bytes cvalue in
   let loc = Locations.make_loc loc_bits (`Value size) in
   if Locations.(is_valid Read loc)
   then

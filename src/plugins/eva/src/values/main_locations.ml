@@ -97,7 +97,7 @@ module PLoc = struct
     else `Value loc
 
   let join_loc value loc =
-    let loc = Locations.(Addresses.Bits.join loc (loc_bytes_to_loc_bits value)) in
+    let loc = Addresses.Bits.join loc (Addresses.Bits.of_bytes value) in
     Precise_locs.inject_location_bits loc
 
   let forward_variable typ_offset host offset =
@@ -112,7 +112,7 @@ module PLoc = struct
       make_precise_loc loc_pr typ_offset
 
   let forward_pointer typ_offset loc_lv offset =
-    let loc_bits = Locations.loc_bytes_to_loc_bits loc_lv in
+    let loc_bits = Addresses.Bits.of_bytes loc_lv in
     match offset with
     | Precise offset ->
       let loc_pr = Precise_locs.combine_loc_precise_offset loc_bits offset in
@@ -165,13 +165,13 @@ module PLoc = struct
       (* new_off = location - (mem * 8)
          As the offset does not contain addresses, we can make the pointwise
          subtraction between the two locations. *)
-      let value_bits = Locations.loc_bytes_to_loc_bits mem in
+      let value_bits = Addresses.Bits.of_bytes mem in
       let new_off = Addresses.Bits.sub_pointwise loc value_bits in
       let new_off = Ival.narrow new_off off_ival in
       let new_off = Precise_locs.inject_ival new_off in
       (* new_mem = (location - offset) * 8 *)
       let new_mem = Addresses.Bits.shift (Ival.neg_int off_ival) loc in
-      let new_mem = Locations.loc_bits_to_loc_bytes new_mem in
+      let new_mem = Addresses.Bits.to_bytes new_mem in
       if Cvalue.V.is_bottom new_mem || Precise_locs.is_bottom_offset new_off
       then `Bottom
       else `Value (new_mem, Precise new_off)

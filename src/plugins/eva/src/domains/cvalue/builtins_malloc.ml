@@ -742,7 +742,7 @@ let realloc_alloc_copy weak bases_to_realloc null_in_arg sizev state =
      to bottom everywhere *)
   let dst_state = add_uninitialized state base Z.minus_one in
   let ret = V.inject base Ival.zero in
-  let loc_bits = Locations.loc_bytes_to_loc_bits ret in
+  let loc_bits = Addresses.Bits.of_bytes ret in
   (* get bases to free and copy *)
   let lbases = Base.Hptset.elements bases_to_realloc in
   let dst_state =

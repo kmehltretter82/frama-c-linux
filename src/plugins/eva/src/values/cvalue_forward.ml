@@ -78,7 +78,7 @@ let are_comparable_string v1 v2 =
    when their offset is 0. For object pointers, the offset is checked
    against the validity of each base, taking past-one into account. *)
 let possible_pointer access location =
-  let location = Locations.loc_bytes_to_loc_bits location in
+  let location = Addresses.Bits.of_bytes location in
   let is_possible_offset base offs =
     if Base.is_function base
     then Ival.is_zero offs

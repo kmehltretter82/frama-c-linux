@@ -1057,16 +1057,16 @@ let rec eval_term ~alarm_mode env t =
     let r = eval_tlval ~alarm_mode env tlval in
     { etype = Cil_const.mk_tptr r.etype;
       ldeps = r.ldeps;
-      eunder = loc_bits_to_loc_bytes_under r.eunder;
-      eover = loc_bits_to_loc_bytes r.eover;
+      eunder = Addresses.Bits.to_bytes_under r.eunder;
+      eover = Addresses.Bits.to_bytes r.eover;
       empty = r.empty; }
 
   | TStartOf tlval ->
     let r = eval_tlval ~alarm_mode env tlval in
     { etype = Cil_const.mk_tptr (Ast_types.direct_element_type r.etype);
       ldeps = r.ldeps;
-      eunder = loc_bits_to_loc_bytes_under r.eunder;
-      eover = loc_bits_to_loc_bytes r.eover;
+      eunder = Addresses.Bits.to_bytes_under r.eunder;
+      eover = Addresses.Bits.to_bytes r.eover;
       empty = r.empty; }
 
   (* Special case for the constants \pi, \e, \infinity and \NaN. *)
@@ -1745,8 +1745,8 @@ and eval_tlhost ~alarm_mode env lv =
     in
     { etype = tres;
       ldeps = r.ldeps;
-      eunder = loc_bytes_to_loc_bits r.eunder;
-      eover = loc_bytes_to_loc_bits r.eover;
+      eunder = Addresses.Bits.of_bytes r.eunder;
+      eover = Addresses.Bits.of_bytes r.eover;
       empty = r.empty; }
 
 and eval_toffset ~alarm_mode env typ toffset =
@@ -1968,7 +1968,7 @@ and reduce_by_valid env positive access (tset: term) =
       (* [p] is the range that we attempt to reduce *)
       let alarm_mode = alarm_reduce_mode () in
       let p_orig = find_or_alarm ~alarm_mode state lvloc in
-      let pb = Locations.loc_bytes_to_loc_bits p_orig in
+      let pb = Addresses.Bits.of_bytes p_orig in
       let shifted_p = Addresses.Bits.shift offs pb in
       let lshifted_p = make_loc shifted_p (Eval_typ.sizeof_lval_typ offs_typ) in
       let valid = (* reduce the shifted pointer to the wanted part *)
@@ -1983,7 +1983,7 @@ and reduce_by_valid env positive access (tset: term) =
         (* Shift back *)
         let shift = Ival.neg_int offs in
         let pb = Addresses.Bits.shift shift valid in
-        let p = Locations.loc_bits_to_loc_bytes pb in
+        let p = Addresses.Bits.to_bytes pb in
         (* Store the result *)
         let state = Model.reduce_previous_binding state lvloc p in
         overwrite_current_state env state
@@ -2548,7 +2548,7 @@ and eval_predicate env pred =
           then if empty then True else False
           else
             let size = Eval_typ.sizeof_lval_typ typ_pointed in
-            let make_loc l = make_loc (loc_bytes_to_loc_bits l) size in
+            let make_loc l = make_loc (Addresses.Bits.of_bytes l) size in
             let loc_over = make_loc eover in
             (* The predicate holds if [eover] is entirely valid. It is false if
                [eover] is entirely invalid or if [eunder] contains an invalid

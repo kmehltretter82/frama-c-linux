@@ -27,7 +27,7 @@ class virtual do_it_ = object(self)
       | Mem e ->
         let stmt = Option.get self#current_stmt in
         let r = Eva.Results.(before stmt |> eval_exp e |> as_cvalue) in
-        let loc = loc_bytes_to_loc_bits r in
+        let loc = Addresses.Bits.of_bytes r in
         let size = Bit_utils.sizeof_lval lv in
         self#join
           (enumerate_valid_bits Read (make_loc loc size))
