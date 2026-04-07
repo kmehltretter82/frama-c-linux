@@ -35,21 +35,38 @@ val shift_offset_by_singleton : Z.t -> precise_offset -> precise_offset
 val shift_offset : Ival.t -> precise_offset -> precise_offset
 
 
-(** {2 Precise location_bits} *)
+(** {2 Precise Address_set.Bits} *)
+
+type precise_addr_bits
+val pretty_addr_bits : Format.formatter -> precise_addr_bits -> unit
+val bottom_addr_bits : precise_addr_bits
+
+val inject_addr_bits : Addresses.Bits.t -> precise_addr_bits
+val combine_base_precise_offset : Base.t -> precise_offset -> precise_addr_bits
+val combine_addr_precise_offset :
+  Addresses.Bits.t -> precise_offset -> precise_addr_bits
+
+val imprecise_addr_bits : precise_addr_bits -> Addresses.Bits.t
 
 type precise_location_bits
-val pretty_loc_bits : Format.formatter -> precise_location_bits -> unit
-val bottom_location_bits : precise_location_bits
-
-val inject_location_bits : Addresses.Bits.t -> precise_location_bits
-val combine_base_precise_offset :
-  Base.t -> precise_offset -> precise_location_bits
+[@@deprecated "Use precise_addr_bits instead"]
+val pretty_loc_bits : Format.formatter -> precise_addr_bits -> unit
+[@@deprecated "Use pretty_addr_bits instead"]
+[@@migrate { repl = Rel.pretty_addr_bits }]
+val bottom_location_bits : precise_addr_bits
+[@@deprecated "Use bottom_addr_bits instead"]
+[@@migrate { repl = Rel.bottom_addr_bits }]
+val inject_location_bits : Addresses.Bits.t -> precise_addr_bits
+[@@deprecated "Use inject_addr_bits instead"]
+[@@migrate { repl = Rel.inject_addr_bits }]
 val combine_loc_precise_offset :
-  Addresses.Bits.t -> precise_offset -> precise_location_bits
-
+  Addresses.Bits.t -> precise_offset -> precise_addr_bits
+[@@deprecated "Use combine_addr_precise_offset instead"]
+[@@migrate { repl = Rel.combine_addr_precise_offset }]
 val imprecise_location_bits :
-  precise_location_bits -> Addresses.Bits.t
-
+  precise_addr_bits -> Addresses.Bits.t
+[@@deprecated "Use imprecise_addr_bits instead"]
+[@@migrate { repl = Rel.imprecise_addr_bits }]
 
 (** {2 Precise locations} *)
 
@@ -60,7 +77,7 @@ val equal_loc: precise_location -> precise_location -> bool
 val loc_size: precise_location -> Z_or_top.t
 
 val make_precise_loc :
-  precise_location_bits -> size:Z_or_top.t -> precise_location
+  precise_addr_bits -> size:Z_or_top.t -> precise_location
 
 val imprecise_location : precise_location -> Locations.location
 
