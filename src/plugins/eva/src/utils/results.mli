@@ -97,7 +97,8 @@ val before_kinstr : Cil_types.kinstr -> request
       the position's callstack;
     - global init: at the start of the analysis, but after the initialization
       of globals;
-    - root call: at the start of the position's function. *)
+    - root call: at the start of the position's function, with an empty
+      callstack in the position's thread. *)
 val before_pos : Position.t -> request
 
 (** Just after the given position:
@@ -105,7 +106,8 @@ val before_pos : Position.t -> request
       position's callstack;
     - global init: at the end of the analysis, after the main function has
       returned;
-    - root call: at the end of the position's function. *)
+    - root call: at the end of the position's function, with an empty callstack
+      in the position's thread.. *)
 val after_pos : Position.t -> request
 
 (** Evaluation in a given cvalue state. Callstacks selection are silently

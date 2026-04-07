@@ -73,8 +73,9 @@ let in_cvalue_state cvalue = Cvalue cvalue
 
 let before_pos pos =
   match pos with
-  | Position.RootCall { entry_point; _ } ->
+  | Position.RootCall { thread; entry_point } ->
     at_start_of entry_point
+    |> in_callstack (Callstack.init ~thread ~entry_point)
   | Position.GlobalInit _ ->
     at_start
   | Position.Local local ->
@@ -83,8 +84,9 @@ let before_pos pos =
 
 let after_pos pos =
   match pos with
-  | Position.RootCall { entry_point; _ } ->
+  | Position.RootCall { thread; entry_point } ->
     at_end_of entry_point
+    |> in_callstack (Callstack.init ~thread ~entry_point)
   | Position.GlobalInit _ ->
     at_end ()
   | Position.Local local ->
