@@ -20,6 +20,8 @@ val comparison_to_exp: loc:location -> kernel_function -> Env.t ->
 (********************** Forward references ********************************)
 (**************************************************************************)
 
-val translate_rte_ref:
-  (?filter:(code_annotation -> bool) -> kernel_function -> Env.t -> exp ->
-   Env.t) ref
+module Translate_rtes : sig
+  val exp_ref:
+    (?filter:(code_annotation -> bool) -> kernel_function -> Env.t -> exp ->
+     Env.t) ref
+end

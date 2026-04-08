@@ -9,14 +9,17 @@
 open Cil_types
 
 (* Forward references *)
-let translate_rte_ref:
-  (?filter:(code_annotation -> bool) -> kernel_function -> Env.t -> exp ->
-   Env.t) ref =
-  let func ?filter _kf _env _e =
-    let _ = filter in
-    Extlib.mk_labeled_fun "translate_rte_ref"
-  in
-  ref func
+module Translate_rtes = struct
+  let exp_ref:
+    (?filter:(code_annotation -> bool) -> kernel_function -> Env.t -> exp ->
+     Env.t) ref =
+    let func ?filter _kf _env _e =
+      let _ = filter in
+      Extlib.mk_labeled_fun "translate_rte_ref"
+    in
+    ref func
+  let exp ?filter kf env e = !exp_ref ?filter kf env e
+end
 
 (** Retrieve the length of the [array] expression in a new variable [name] and
     return it as an expression.
@@ -34,7 +37,7 @@ let length_exp ~loc kf env ~name array =
     (Cil.kinteger64 ~loc len), env
   with Cil.LenOfArray _ ->
     (* check RTE on the array before accessing its block length and offset *)
-    let env = !translate_rte_ref kf env array in
+    let env = Translate_rtes.exp kf env array in
     (* helper function *)
     let rtl env name =
       Env.rtl_call_to_new_var
@@ -173,8 +176,8 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
       when Datatype.String.equal hd index_bound -> false
     | _ -> true
   in
-  let env = !translate_rte_ref ~filter kf env array1_iter_e in
-  let env = !translate_rte_ref ~filter kf env array2_iter_e in
+  let env = Translate_rtes.exp ~filter kf env array1_iter_e in
+  let env = Translate_rtes.exp ~filter kf env array2_iter_e in
   (* Create the condition *)
   let cond = Misc.make_binop ~loc Ne array1_iter_e array2_iter_e in
   (* Create the statement representing the body of the for loop *)
