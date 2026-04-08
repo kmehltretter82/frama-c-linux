@@ -13,7 +13,7 @@ import { Icon } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import {
   Checkbox,
-  IconButton,
+  Button,
   SelectMenu,
   Spinner
 } from 'dome/controls/buttons';
@@ -60,13 +60,13 @@ function Tools(): JSX.Element {
   const stop = (): void => { Server.send(WP.cancelProofTasks, null); };
   return (
     <Hbox>
-      <IconButton
+      <Button
         icon="MEDIA.PLAY"
         title="Start WP"
         onClick={run}
         disabled={running}
       />
-      <IconButton
+      <Button
         icon="MEDIA.STOP"
         title="Stop proof tasks"
         onClick={stop}
