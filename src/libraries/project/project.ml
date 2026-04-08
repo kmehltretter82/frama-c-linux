@@ -7,6 +7,17 @@
 (**************************************************************************)
 
 (* ************************************************************************** *)
+(** {2 Version} *)
+(* ************************************************************************** *)
+
+(* Version is used when saving/loading projects to make sure they are
+   we can load them safely. *)
+
+let version = Extlib.mk_fun "Project.version"
+
+let set_version s = version := fun () -> s
+
+(* ************************************************************************** *)
 (** {2 Warning, debug and feedback} *)
 (* ************************************************************************** *)
 
@@ -513,7 +524,7 @@ let save_projects ?(compress = !compress_saved_session) selection projects
     (filename : Filepath.t) =
   let open Filesystem.Operators in
   let$ cout = Filesystem.Compressed.with_open_out_exn ~compress filename in
-  Channel.output_value cout System_config.Version.id;
+  Channel.output_value cout (!version ());
   Channel.output_value cout magic;
   Channel.output_value cout !Graph.Blocks.cpt_vertex;
   let states : (t * (string * State.state_on_disk) list) list =
@@ -671,7 +682,7 @@ let load_projects ~project_under_copy selection ?name (filename : Filepath.t) =
           raise (IOError s)
         end
       in
-      check_magic "%S" System_config.Version.id;
+      check_magic "%S" (!version ());
       check_magic "magic number %d" magic;
       let ocamlgraph_counter = Channel.input_value cin in
       let pre_existing_projects = Descr.init project_under_copy in

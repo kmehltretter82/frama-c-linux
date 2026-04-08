@@ -34,6 +34,13 @@ type project = Project_skeleton.t =
 (** {2 Options} *)
 (* ************************************************************************* *)
 
+(** Set the version of the tool which load/save projects. This MUST be set
+    once before doing any operations on projects.
+    @since Frama-C+dev
+*)
+val set_version: string -> unit
+[@@alert project_version "This must be set once before using projects."]
+
 (** If set to [true], prints debug information about projects.
     @since Frama-C+dev
 *)

@@ -27,6 +27,9 @@
 (** {2 Global declarations} *)
 (* ************************************************************************* *)
 
+let () =
+  Project.set_version System_config.Version.id [@@alert "-project_version"]
+
 module Debug_level = Log.Make_level(struct let default = 0 end)
 module Verbose_level = Log.Make_level(struct let default = 1 end)
 
