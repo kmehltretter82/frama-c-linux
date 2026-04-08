@@ -286,10 +286,10 @@ function useFilterLocal(filters: Ast.filter[], kind: FilterKind)
     else return 'all';
   }
 
-  const localFilters = filters.map(f => {
+  const localFilters = React.useMemo(() => filters.map(f => {
     const value = savedFilters[`${f.id}`] ?? getValue(f);
     return { ...f, value };
-  });
+  }), [filters, savedFilters]);
 
   return [localFilters, setFilterValue];
 }
