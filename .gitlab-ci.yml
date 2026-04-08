@@ -811,7 +811,7 @@ release-wiki:
 # Do not forget to trigger the target only on schedules, so that all public
 # repositories stay synchronized.
 
-publish-frama-c:
+.publish-frama-c_template: &publish-frama-c_template
   stage: publish
   variables:
     BRANCH: "master"
@@ -823,7 +823,14 @@ publish-frama-c:
   <<: *when_publish
   interruptible: false
 
-publish-fclang:
+publish-frama-c:
+  <<: *publish-frama-c_template
+
+publish-frama-c_manual:
+  <<: *publish-frama-c_template
+  when: manual
+
+.publish-fclang: &publish-fclang_template
   stage: publish
   variables:
     BRANCH: "master"
@@ -834,7 +841,14 @@ publish-fclang:
   <<: *when_publish
   interruptible: false
 
-publish-meta:
+publish-fclang:
+  <<: *publish-fclang_template
+
+publish-fclang_manual:
+  <<: *publish-fclang_template
+  when: manual
+
+.publish-meta: &publish-meta_template
   stage: publish
   variables:
     BRANCH: "master"
@@ -845,7 +859,14 @@ publish-meta:
   <<: *when_publish
   interruptible: false
 
-publish-frama-c-api:
+publish-meta:
+  <<: *publish-meta_template
+
+publish-meta_manual:
+  <<: *publish-meta_template
+  when: manual
+
+.publish-frama-c-api: &publish-frama-c-api_template
   stage: publish
   <<: *prepare_ssh_template
   script:
@@ -854,3 +875,10 @@ publish-frama-c-api:
     variables:
       - $PUBLISH == "yes"
   interruptible: false
+
+publish-frama-c-api:
+  <<: *publish-frama-c-api_template
+
+publish-frama-c-api_manual:
+  <<: *publish-frama-c-api_template
+  when: manual
