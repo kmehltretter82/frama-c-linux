@@ -233,7 +233,7 @@ Ivette.registerStatusbar({
 Ivette.registerSidebar({
   id: 'frama-c.plugins.wp-sidebar',
   label: 'WP',
-  icon: 'TARGET',
+  icon: 'WP',
   title: 'WP',
   children: <SideBar />
 });
