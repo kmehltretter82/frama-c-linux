@@ -491,8 +491,14 @@ module Macros = struct
     let deprecate macro msg action deprecated =
       StringMap.add macro { macro; msg; action; } deprecated
     in
+    (* ignore "unused variable deprecate" warning if no macros are currently
+       deprecated *)
+    ignore deprecate;
     StringMap.empty
-    |> deprecate "PTEST_RESULT" "Please use PTEST_RESULT_DIR instead" `Fail
+  (* Use deprecate function to add deprecated macro. The last argument is
+     either `Fail or `Continue depending on if ptests should stop immediately
+     or continue:
+     |> deprecate "MACRO" "Message to display" `Fail *)
 
   let warn_if_deprecated file macro =
     try
@@ -710,7 +716,6 @@ end = struct
         "PTEST_CONFIG", ptest_config;
         "PTEST_DIR", ".";
         "PTEST_SHARE_DIR", "../../../share";
-        "PTEST_RESULT", ".";
         "PTEST_RESULT_DIR", ".";
         "PTEST_SUITE_DIR", "..";
         "PTEST_FILE", ptest_file;
