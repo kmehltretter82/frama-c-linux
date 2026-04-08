@@ -75,6 +75,90 @@ void arrays() {
   /*ERROR: assert e != (int*){[0] = 1, [1] = 2, [2] = 3}; */
 }
 
+void matrices(void) {
+  // Pure logic matrices
+  // (Unsupported at the moment by the kernel)
+  // /*@ assert
+  //     {[0] = {[0] = 1, [1] = 2}, [1] = {[0] = 3, [1] = 4}, [2] = {[0] = 5, [1] = 6}}
+  //     ==
+  //     {[0] = {[0] = 1, [1] = 2}, [1] = {[0] = 3, [1] = 4}, [2] = {[0] = 5, [1] = 6}}; */
+  // /*@ assert
+  //     {[0] = {[0] = 1, [1] = 2}, [1] = {[0] = 3, [1] = 4}, [2] = {[0] = 5, [1] = 6}}
+  //     !=
+  //     {[0] = {[0] = 7, [1] = 8}, [1] = {[0] = 9, [1] = 10}, [2] = {[0] = 11, [1] = 12}}; */
+  // /*@ assert
+  //     {[0] = {[0] = 1, [1] = 2}, [1] = {[0] = 3, [1] = 4}, [2] = {[0] = 5, [1] = 6}}
+  //     !=
+  //     {[0] = {[0] = 1, [1] = 2}, [1] = {[0] = 3, [1] = 4}, [2] = {[0] = 5, [1] = 6}, [3] = {[0] = 7, [1] = 8}}; */
+
+  // C matrices
+  int a[][2] = {{1, 2}, {3, 4}, {5, 6}};
+  int b[][2] = {{7, 8}, {9, 10}, {11, 12}};
+  int c[][2] = {{1, 2}, {3, 4}, {5, 6}};
+  int d[][2] = {{1, 2}, {3, 4}, {5, 6}, {7, 8}};
+  /*@ assert a != b; */
+  /*@ assert a == c; */
+  /*@ assert a != d; */
+
+  // Pointers to matrices
+  int (*e)[2] = a;
+  int (*f)[2] = b;
+  int (*g)[2] = c;
+  int (*h)[2] = a;
+  /*@ assert e != f; */
+  /*@ assert e != g; */
+  /*@ assert e == h; */
+
+  // Comparison between C matrices, logic matrices and pointer to matrices
+  // /*@ assert
+  //       a == {[0] = {[0] = 1, [1] = 2}, [1] = {[0] = 3, [1] = 4}, [2] = {[0] = 5, [1] = 6}};
+  //  */// UNSUPPORTED by the kernel
+  /*@ assert e == (int (*)[2]) a; */
+  /*@ assert e != (int (*)[2]) c; */
+  // /*@ assert
+  //       (int[3][2])e == {[0] = {[0] = 1, [1] = 2}, [1] = {[0] = 3, [1] = 4}, [2] = {[0] = 5, [1] = 6}};
+  //  */// UNSUPPORTED by the kernel
+  // /*@ assert
+  //       (int[][2])e == {[0] = {[0] = 1, [1] = 2}, [1] = {[0] = 3, [1] = 4}, [2] = {[0] = 5, [1] = 6}};
+  //  */// UNSUPPORTED by the kernel
+  /*@ assert a == (int[3][2])g; */
+  /*@ assert a == (int[][2])g; */
+  /*@ assert a != (int[3][2])f; */
+  /*@ assert a != (int[][2])f; */
+
+  // Comparison between sub-matrices
+  int i[][2] = {{1, 2}, {3, 4}, {5, 6}, {7, 8}};
+  int j[][2] = {{5, 6}, {7, 8}, {1, 2}, {3, 4}};
+  int k[][2] = {{5, 6}, {7, 8}, {5, 6}, {7, 8}};
+  /*@ assert i != j; */
+  /*@ assert i != k; */
+  /*@ assert j != k; */
+  int (*l)[2] = &i[2];
+  int (*m)[2] = &j[2];
+  int (*n)[2] = &k[2];
+  /*@ assert (int[2][2])l != (int[2][2])m; */
+  /*@ assert (int[2][2])l == (int[2][2])n; */
+
+  // Matrix truncation
+  /*@ assert (int[2][2])i != (int[2][2])k; */
+  /*@ assert (int[2][2])j == (int[2][2])k; */
+  /*@ assert (int[1][2])l != (int[1][2])m; */
+  /*@ assert (int[1][2])l == (int[1][2])n; */
+
+  // Errors if trying a matrix extension
+  /*ERROR assert (int[10][2])i != (int[10][2])k; */
+  /*ERROR assert (int[10][2])j != (int[10][2])k; */
+  /*ERROR assert (int[6][2])l != (int[6][2])m; */
+  /*ERROR assert (int[6][2])l == (int[6][2])n; */
+
+  // Errors while comparing a pointer to matrix with a matrix (logic or C)
+  /*ERROR assert e == a; */
+  /*ERROR assert e == {[0] = {[0] = 1, [1] = 2}, [1] = {[0] = 3, [1] = 4}, [2] = {[0] = 5, [1] = 6}}; */
+
+  // Error while casting a logic matrix to a pointer to matrix
+  /*ERROR assert e != (int(*)[2]){[0] = {[0] = 1, [1] = 2}, [1] = {[0] = 3, [1] = 4}, [2] = {[0] = 5, [1] = 6}}; */
+}
+
 void vlas(int n) {
   // FIXME: There is currently an error with the support of VLA in E-ACSL
   // https://git.frama-c.com/frama-c/e-acsl/-/issues/119
@@ -112,6 +196,7 @@ int main(void) {
 
   arrays();
   vlas(3);
+  matrices();
 
   return 0;
 }
