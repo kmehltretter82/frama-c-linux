@@ -40,7 +40,7 @@ interface PanelProps extends DivProps {
   title?: string;
 }
 
-function PanelBlock(props: PanelProps) : JSX.Element {
+function PanelBlock(props: PanelProps): JSX.Element {
   const { children, title, ...others } = props;
   return (
     <Vbox className={Utils.classes('wp-panel-block')} {...others}>
@@ -80,10 +80,11 @@ interface ProverConfig {
   prover: WP.prover;
   up: boolean;
   name: string;
+  version: string;
 }
 
 function Prover(props: ProverConfig): JSX.Element {
-  const { prover, up, name } = props;
+  const { prover, up, name, version } = props;
   const [checked, setChecked] = React.useState(up);
 
   const onClick = (): void => {
@@ -93,6 +94,7 @@ function Prover(props: ProverConfig): JSX.Element {
   const icon = checked ? 'SWITCH.ON' : 'SWITCH.OFF';
   const iconKind = checked ? 'positive' : 'default';
   const className = Utils.classes('wp-panel-prover-label');
+  const label = name + ' (' + version + ')';
   return (
     <Hbox key={prover}>
       <Icon
@@ -101,7 +103,7 @@ function Prover(props: ProverConfig): JSX.Element {
         onClick={onClick}
         size={16}
       />
-      <Label label={name} title={name} className={className} />
+      <Label label={label} className={className} />
     </Hbox>
   );
 }
@@ -210,17 +212,28 @@ export function SideBar(): JSX.Element {
           </PanelBlock>
           <PanelBlock title='Automatic Provers'>
             {
-              autoPrvs.map((p) =>
-                <Prover
-                  key={p}
-                  prover={p}
-                  up={proversInfo(p)?.active ?? false}
-                  name={proversInfo(p)?.name ?? ''}
+              autoPrvs.length !== 0 ?
+                autoPrvs.map((p) =>
+                  <Prover
+                    key={p}
+                    prover={p}
+                    up={proversInfo(p)?.active ?? false}
+                    name={proversInfo(p)?.name ?? ''}
+                    version={proversInfo(p)?.version ?? ''}
+                  />
+                )
+                :
+                <Label
+                  label='No automatic provers detected'
+                  icon='WARNING'
+                  kind='negative'
                 />
-              )
             }
           </PanelBlock>
-          <PanelBlock title='Interactive Provers'>
+          <PanelBlock
+            title='Interactive Provers'
+            display={interPrvs.length !== 0}
+          >
             <InteractiveSelector />
             {
               interPrvs.map((p) =>
@@ -229,10 +242,15 @@ export function SideBar(): JSX.Element {
                   prover={p}
                   up={proversInfo(p)?.active ?? false}
                   name={proversInfo(p)?.name ?? ''}
+                  version={proversInfo(p)?.version ?? ''}
                 />
               )
             }
           </PanelBlock>
+          <PanelBlock
+            title='No Interactive Provers'
+            display={interPrvs.length === 0}
+          />
           <PanelBlock title='Proof Strategies'>
             <TipSelector />
             <Checkbox
