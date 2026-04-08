@@ -29,7 +29,8 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import * as ASTview from 'frama-c/kernel/ASTview';
 import * as Values from 'frama-c/plugins/eva/api/values';
 import { current as currentProject } from 'frama-c/kernel/api/project';
-import { MarkerText, Modifier, selectMarker } from 'frama-c/richtext';
+import { MarkerText, Modifier, selectMarker, textToString }
+  from 'frama-c/richtext';
 
 import { EvaReady, EvaStatus } from './components/AnalysisStatus';
 import { evaComputationValue } from './components/Tools';
@@ -443,7 +444,7 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
     const { value = '', pointedVars = [] } = evaluation ?? {};
     const items: Dome.PopupMenuItem[] = [];
     const copy = (): void => {
-      if (value) navigator.clipboard.writeText(value.toString());
+      if (value) navigator.clipboard.writeText(textToString(value));
     };
     if (value !== '') items.push({ label: 'Copy to clipboard', onClick: copy });
     if (items.length > 0 && pointedVars.length > 0) items.push('separator');
