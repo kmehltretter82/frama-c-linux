@@ -186,6 +186,9 @@ let comparison_to_exp
   in
   e, env
 
+let () =
+  Logic_array.Translate_utils.comparison_to_exp_ref := comparison_to_exp
+
 let conditional_to_exp ?(name="if") ~loc kf t_opt e1 (e2, env2) (e3, env3) =
   let env = Env.pop (Env.pop env3) in
   match e1.enode with

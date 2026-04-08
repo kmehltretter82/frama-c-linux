@@ -21,6 +21,18 @@ module Translate_rtes = struct
   let exp ?filter kf env e = !exp_ref ?filter kf env e
 end
 
+module Translate_utils = struct
+  let comparison_to_exp_ref:
+    (loc:location -> kernel_function -> Env.t -> Analyses_types.number_ty ->
+     binop -> exp -> exp -> ?name:string -> term option -> exp * Env.t) ref =
+    let func ~loc:_ _kf _env _ity _binop _e1 _e2 ?name:_ _topt =
+      Extlib.mk_labeled_fun "utils_comparison_to_exp_ref"
+    in
+    ref func
+  let comparison_to_exp ~loc kf env ity binop e1 e2 ?name topt =
+    !comparison_to_exp_ref ~loc kf env ity binop e1 e2 ?name topt
+end
+
 (** Retrieve the length of the [array] expression in a new variable [name] and
     return it as an expression.
     If the length is present in the type then the function directly assigns the
@@ -179,7 +191,18 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
   let env = Translate_rtes.exp ~filter kf env array1_iter_e in
   let env = Translate_rtes.exp ~filter kf env array2_iter_e in
   (* Create the condition *)
-  let cond = Misc.make_binop ~loc Ne array1_iter_e array2_iter_e in
+  let cond, env =
+    let ty_array1_iter = Cil.typeOf array1_iter_e in
+    let ty_array2_iter = Cil.typeOf array2_iter_e in
+    let ity =
+      let ty1 = Typing.number_ty_of_typ ~post:true ty_array1_iter in
+      let ty2 = Typing.number_ty_of_typ ~post:true ty_array2_iter in
+      Typing.join ty1 ty2
+    in
+    Translate_utils.comparison_to_exp ~loc kf env ity
+      ~name:"inner_ne"
+      Ne array1_iter_e array2_iter_e None
+  in
   (* Create the statement representing the body of the for loop *)
   let body =
     Smart_stmt.if_stmt

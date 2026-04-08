@@ -25,3 +25,9 @@ module Translate_rtes : sig
     (?filter:(code_annotation -> bool) -> kernel_function -> Env.t -> exp ->
      Env.t) ref
 end
+
+module Translate_utils : sig
+  val comparison_to_exp_ref:
+    (loc:location -> kernel_function -> Env.t -> Analyses_types.number_ty ->
+     binop -> exp -> exp -> ?name:string -> term option -> exp * Env.t) ref
+end
