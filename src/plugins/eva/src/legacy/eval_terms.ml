@@ -204,9 +204,6 @@ let add_init states =
   | `Bottom | `Top -> states
   | `Value state -> add_logic Logic_const.init_label state states
 
-let add_logic_var env lv cvalue =
-  { env with logic_vars = LogicVarEnv.add lv cvalue env.logic_vars }
-
 let make_env logic_env state =
   let transfer label map =
     Logic_label.Map.add label (logic_env.Abstract_domain.states label) map
@@ -290,23 +287,32 @@ let bind_logic_vars env lvs =
   let state, logic_vars = List.fold_left bind_one (state, env.logic_vars) lvs in
   overwrite_current_state { env with logic_vars } state
 
+let add_logic_var env lvar value =
+  match Ast_types.unroll_logic lvar.lv_type with
+  | Linteger | Lreal ->
+    let logic_vars = LogicVarEnv.add lvar value env.logic_vars in
+    { env with logic_vars }
+  | Ctype _ ->
+    let base = Base.of_c_logic_var lvar in
+    let loc = Locations.loc_of_base base in
+    let state = env_current_state env in
+    Model.add_binding ~exact:true state loc value
+    |> overwrite_current_state env
+  | _ -> unsupported_lvar lvar
+
+let find_logic_var env lvar =
+  match Ast_types.unroll_logic lvar.lv_type with
+  | Linteger | Lreal -> LogicVarEnv.find lvar env.logic_vars
+  | Ctype _ ->
+    let base = Base.of_c_logic_var lvar in
+    let loc = Locations.loc_of_base base in
+    Model.find (env_current_state env) loc
+  | _ -> unsupported_lvar lvar
+
 let copy_logic_vars ~src ~dst lvars =
-  let copy_one env lvar =
-    match Ast_types.unroll_logic lvar.lv_type with
-    | Linteger | Lreal ->
-      let value = LogicVarEnv.find lvar src.logic_vars in
-      let logic_vars = LogicVarEnv.add lvar value env.logic_vars in
-      { env with logic_vars }
-    | Ctype _ ->
-      begin
-        let base = Base.of_c_logic_var lvar in
-        match Model.find_base base (env_current_state src) with
-        | `Bottom | `Top -> env
-        | `Value offsm ->
-          let state = Model.add_base base offsm (env_current_state env) in
-          overwrite_current_state env state
-      end
-    | _ -> unsupported_lvar lvar
+  let copy_one dst lvar =
+    let value = find_logic_var src lvar in
+    add_logic_var dst lvar value
   in
   List.fold_left copy_one dst lvars
 
