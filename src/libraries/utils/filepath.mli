@@ -254,22 +254,30 @@ val all_symbolic_dirs: unit -> (string * t) list
 
 (** Describes a position in a source file.
     @since 18.0-Argon *)
-type position =
-  {
-    pos_path : t;
-    pos_lnum : int;
-    pos_bol : int;
-    pos_cnum : int;
-  }
+type position = {
+  pos_path : t;   [@deprecated "use Filepos.pos_path instead."]
+  pos_lnum : int; [@deprecated "use Filepos.pos_lnum instead."]
+  pos_bol : int;  [@deprecated "use Filepos.pos_bol instead."]
+  pos_cnum : int; [@deprecated "use Filepos.pos_cnum instead."]
+}
+[@@deprecated "use Filepos.t instead"]
+
+[@@@alert "-deprecated"]
 
 (** Empty position, used as 'dummy' for [Cil_datatype.Position].
     @since 30.0-Zinc *)
 val empty_pos : position
+[@@deprecated "use Filepos.unknown instead"]
+[@@migrate { repl = Filepos.unknown } ]
 
 (** Pretty-prints a position, in the format file:line.
     @since 18.0-Argon *)
 val pp_pos : Format.formatter -> position -> unit
+[@@deprecated "use Filepos.pretty instead"]
+[@@migrate { repl = Filepos.pretty } ]
 
 (** Return true if the given position is the empty position.
     @since 30.0-Zinc *)
 val is_empty_pos : position -> bool
+[@@deprecated "use Filepos.is_unknown instead"]
+[@@migrate { repl = Filepos.is_unknown } ]

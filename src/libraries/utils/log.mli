@@ -16,7 +16,7 @@ type event = {
   evt_kind : kind ;
   evt_plugin : string ;
   evt_category : string option ; (** message or warning category *)
-  evt_source : Filepath.position option ;
+  evt_source : Filepos.t option ;
   evt_message : Rich_text.t ;
 }
 (** @since Beryllium-20090601-beta1 *)
@@ -36,7 +36,7 @@ sig
 end
 
 type 'a pretty_printer =
-  ?current:bool -> ?source:Filepath.position ->
+  ?current:bool -> ?source:Filepos.t ->
   ?emitwith:(event -> unit) -> ?echo:bool -> ?once:bool ->
   ?append:(Format.formatter -> unit) ->
   ('a,Format.formatter,unit) format -> 'a
@@ -58,7 +58,7 @@ type 'a pretty_printer =
      @since Beryllium-20090601-beta1 *)
 
 type ('a,'b) pretty_aborter =
-  ?current:bool -> ?source:Filepath.position -> ?echo:bool ->
+  ?current:bool -> ?source:Filepos.t -> ?echo:bool ->
   ?append:(Format.formatter -> unit) ->
   ('a,Format.formatter,unit,'b) format4 -> 'a
 (** Same as {!Log.pretty_printer} except that channels having this type
@@ -82,7 +82,7 @@ exception AbortFatal of string
     name of the plugin.
     @since Beryllium-20090601-beta1 *)
 
-exception FeatureRequest of Filepath.position option * string * string
+exception FeatureRequest of Filepos.t option * string * string
 (** Raised by [not_yet_implemented].
     You may catch [FeatureRequest(s,p,r)] to support degenerated behavior.
     The (optional) source location is s, the responsible plugin is 'p'
@@ -150,7 +150,7 @@ sig
   (** @since Beryllium-20090601-beta1 *)
 
   val printf : ?level:int -> ?dkey:category ->
-    ?current:bool -> ?source:Filepath.position ->
+    ?current:bool -> ?source:Filepos.t ->
     ?append:(Format.formatter -> unit) ->
     ?header:(Format.formatter -> unit) ->
     ('a,Format.formatter,unit) format -> 'a
@@ -214,7 +214,7 @@ sig
       @since Beryllium-20090601-beta1
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-  val not_yet_implemented : ?current:bool -> ?source:Filepath.position ->
+  val not_yet_implemented : ?current:bool -> ?source:Filepos.t ->
     ('a,Format.formatter,unit,'b) format4 -> 'a
   (** raises [FeatureRequest] but {i does not} send any message.
       If the exception is not caught, Frama-C displays a feature-request
@@ -512,10 +512,10 @@ val kernel_label_name: string
 [@@deprecated "Use Kernel_log.kernel_label_name instead."]
 [@@migrate { repl = Kernel_log.kernel_label_name } ]
 
-val source : file:Filepath.t -> line:int -> Filepath.position
+val source : file:Filepath.t -> line:int -> Filepos.t
 (** @since Chlorine-20180501 *)
 
-val get_current_source : unit -> Filepath.position
+val get_current_source : unit -> Filepos.t
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Terminal interface}
@@ -560,7 +560,7 @@ val print_delayed : (Format.formatter -> unit) -> unit
 
 (**/**)
 
-val set_current_source : (unit -> Filepath.position) -> unit
+val set_current_source : (unit -> Filepos.t) -> unit
 (** Forward reference to the function returning the current location,
     used when [~current:true] is set on printers. Currently set
     in {!Cil}. Not for the casual user. *)

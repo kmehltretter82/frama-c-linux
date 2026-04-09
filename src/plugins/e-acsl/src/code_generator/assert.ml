@@ -252,7 +252,7 @@ let runtime_check_with_msg ~adata ~loc ?(name="") msg ~pred_kind kind kf env pre
     Cil.mkAddrOrStartOf ~loc
       (Cil.var
          (Globals.Vars.add_string_literal ~loc
-            (Str (Filepath.to_string start_pos.Filepath.pos_path))))
+            (Str (Filepath.to_string start_pos.pos_path))))
   in
   let fct =
     Cil.mkAddrOrStartOf ~loc
@@ -260,7 +260,7 @@ let runtime_check_with_msg ~adata ~loc ?(name="") msg ~pred_kind kind kf env pre
          (Globals.Vars.add_string_literal ~loc
             (Str (Functions.RTL.get_original_name kf))))
   in
-  let line = Cil.integer ~loc start_pos.Filepath.pos_lnum in
+  let line = Cil.integer ~loc start_pos.pos_lnum in
   let stmts =
     [ Smart_stmt.assigns_field ~loc data_vi "line" line;
       Smart_stmt.assigns_field ~loc data_vi "fct" fct;

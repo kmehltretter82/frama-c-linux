@@ -663,7 +663,7 @@ end = struct
            | None -> ()
            | Some (name,symb) ->
              let file = Filepath.to_string
-                 (fst (Cil_datatype.Global.loc glob)).Filepath.pos_path
+                 (fst (Cil_datatype.Global.loc glob)).pos_path
              in
              let index na sy =
                let code = Symbol.symbol_code sy in
@@ -900,15 +900,19 @@ let set_buff_loc line =
 (** Get location of the first character of
     the string to parse with acsl parser *)
 let get_buff_loc () =
-  {Cil_datatype.Position.unknown with
-   Filepath.pos_path= !prop_file;
-   Filepath.pos_lnum = !buff_line}
+  Filepos.{
+    unknown with
+    pos_path= !prop_file;
+    pos_lnum = !buff_line
+  }
 
 (** Get location of the first property token *)
 let get_prop_loc () =
-  {Cil_datatype.Position.unknown with
-   Filepath.pos_path= !prop_file;
-   Filepath.pos_lnum = !prop_line}
+  Filepos.{
+    unknown with
+    pos_path= !prop_file;
+    pos_lnum = !prop_line
+  }
 
 (*-----------------------------------------------------------------------*)
 let basename_chop_extension file =

@@ -20,7 +20,7 @@
 ** Types
 *)
 
-type cabsloc = Filepath.position * Filepath.position
+type cabsloc = Filepos.t * Filepos.t
 
 type typeSpecifier = (* Merge all specifiers into one type *)
   | Tvoid                             (* Type specifier ISO 6.7.2 *)

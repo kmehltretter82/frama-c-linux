@@ -2,7 +2,7 @@ open Cil_types
 
 let print_pos fmt pos =
   Format.fprintf
-    fmt "line %d, char %d" pos.Filepath.pos_lnum (pos.pos_cnum - pos.pos_bol)
+    fmt "line %d, char %d" pos.Filepos.pos_lnum (pos.pos_cnum - pos.pos_bol)
 
 class print_term = object(self)
   inherit Visitor.frama_c_inplace

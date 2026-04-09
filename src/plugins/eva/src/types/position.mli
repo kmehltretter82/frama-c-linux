@@ -23,7 +23,7 @@ module type S = sig
   val loc : t -> Cil_types.location
   (** [loc p] returns the source location of the given position. *)
 
-  val pos : t -> Filepath.position
+  val pos : t -> Filepos.t
   (** [pos p] returns the source file of the given position. *)
 
   val kinstr : t -> Cil_types.kinstr

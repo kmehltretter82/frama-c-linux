@@ -156,7 +156,7 @@ module Cabs_file = struct
         type t = Cabs.file
         let name = "Cabs_file"
         let reprs =
-          let loc = Filepath.(empty_pos, empty_pos) in
+          let loc = Filepos.(unknown, unknown) in
           let dummy_def =
             Cabs.DECDEF (None, ([SpecType Tint], [("dummy", JUSTBASE, [], loc),
                                                   NO_INIT]), loc)
@@ -173,39 +173,8 @@ end
 (**************************************************************************)
 
 module Position =  struct
-  let pretty_ref = ref Filepath.pp_pos
-  let unknown = Filepath.empty_pos
+  include Filepos
   let dummy = unknown
-  let of_lexing_pos p = {
-    Filepath.pos_path = Filepath.of_string p.Lexing.pos_fname;
-    pos_lnum = p.Lexing.pos_lnum;
-    pos_bol = p.Lexing.pos_bol;
-    pos_cnum = p.Lexing.pos_cnum;
-  }
-  let to_lexing_pos p = {
-    Lexing.pos_fname = Filepath.to_string_abs p.Filepath.pos_path;
-    pos_lnum = p.Filepath.pos_lnum;
-    pos_bol = p.Filepath.pos_bol;
-    pos_cnum = p.Filepath.pos_cnum;
-  }
-  include Make_with_collections
-      (struct
-        type t = Filepath.position
-        let name = "Position"
-        let reprs = [ dummy ]
-        let compare: t -> t -> int = (=?=)
-        let hash = Hashtbl.hash
-        let copy = Datatype.identity
-        let equal: t -> t -> bool = ( = )
-        let pretty = Filepath.pp_pos
-      end)
-  let pp_with_col fmt pos =
-    Format.fprintf fmt "%a char %d" pretty pos
-      (pos.Filepath.pos_cnum - pos.Filepath.pos_bol)
-  let pretty_debug fmt pos =
-    Format.fprintf fmt "%a:%d:%d"
-      Filepath.pretty pos.Filepath.pos_path
-      pos.Filepath.pos_lnum pos.Filepath.pos_cnum
 end
 
 module Location = struct
@@ -219,23 +188,23 @@ module Location = struct
         let name = "Location"
         let reprs = [ dummy ]
         let compare: location -> location -> int = (=?=)
-        let hash (b, _e) = Hashtbl.hash (b.Filepath.pos_path, b.Filepath.pos_lnum)
+        let hash (b, _e) = Hashtbl.hash Filepos.(b.pos_path, b.pos_lnum)
         let copy = Datatype.identity (* immutable strings *)
         let equal : t -> t -> bool = ( = )
         let pretty fmt loc = !pretty_ref fmt loc
       end)
 
   let pretty_long fmt loc =
-    let path = (fst loc).Filepath.pos_path in
+    let path = (fst loc).Filepos.pos_path in
     if path = Filepath.empty then Format.fprintf fmt "generated"
     else
-      let line = (fst loc).Filepath.pos_lnum in
+      let line = (fst loc).pos_lnum in
       if line > 0 then
         Format.fprintf fmt "file %a, line %d"
           Filepath.pretty path line
 
   let pretty_line fmt loc =
-    let line = (fst loc).Filepath.pos_lnum in
+    let line = (fst loc).Filepos.pos_lnum in
     if line > 0 then
       Format.fprintf fmt "line %d" line
     else
@@ -251,7 +220,7 @@ module Location = struct
     Position.to_lexing_pos pos1, Position.to_lexing_pos pos2
 
   let compare_start_semantic (pos1, _) (pos2, _) =
-    let c = Filepath.compare pos1.Filepath.pos_path pos2.Filepath.pos_path in
+    let c = Filepath.compare pos1.Filepos.pos_path pos2.Filepos.pos_path in
     if c <> 0 then c else
       let c = pos1.pos_lnum - pos2.pos_lnum in
       if c <> 0 then c else

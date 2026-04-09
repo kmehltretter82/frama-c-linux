@@ -48,12 +48,12 @@ let parse ~iDir ~pfile ~init_module_from_file_name ~init_typenames ast =
       with
       | Failure s ->
         Options.abort
-          ~source:(Cil_datatype.Position.of_lexing_pos lexbuf.Lexing.lex_curr_p)
+          ~source:(Filepos.of_lexing_pos lexbuf.Lexing.lex_curr_p)
           "[Failure while parsing] %s."
           s
       | Sys_error s ->
         Options.abort
-          ~source:(Cil_datatype.Position.of_lexing_pos lexbuf.Lexing.lex_curr_p)
+          ~source:(Filepos.of_lexing_pos lexbuf.Lexing.lex_curr_p)
           "[System error while parsing] %s."
           s
       | Logic_utils.Not_well_formed(loc, s)         ->
@@ -62,7 +62,7 @@ let parse ~iDir ~pfile ~init_module_from_file_name ~init_typenames ast =
           (Lexing.lexeme lexbuf)
       | Parsing.Parse_error ->
         Options.abort
-          ~source:(Cil_datatype.Position.of_lexing_pos lexbuf.Lexing.lex_curr_p)
+          ~source:(Filepos.of_lexing_pos lexbuf.Lexing.lex_curr_p)
           "[Syntax error] %s."
           (Lexing.lexeme lexbuf)
     with

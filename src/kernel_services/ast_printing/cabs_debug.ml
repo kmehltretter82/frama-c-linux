@@ -11,8 +11,8 @@ open Cabs
 open Format
 
 let pp_cabsloc fmt (pos1 , _pos2) =
-  fprintf fmt "%d,%a" pos1.Filepath.pos_lnum
-    Filepath.pretty_abs pos1.Filepath.pos_path
+  fprintf fmt "%d,%a" pos1.Filepos.pos_lnum
+    Filepath.pretty_abs pos1.Filepos.pos_path
 
 let pp_storage  fmt = function
   |     NO_STORAGE -> fprintf fmt "NO_STORAGE"

@@ -491,7 +491,7 @@ let fallback alt =
   | Strategy s -> resolve_strategy s
   | Tactic _ | Auto _ | Provers _ -> None
   | Default ->
-    let loc = Position.(unknown, unknown) in
+    let loc = Filepos.(unknown, unknown) in
     Some {
       name = { value = "\\default" ; loc } ;
       alternatives =

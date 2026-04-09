@@ -15,7 +15,7 @@ val error : ?source:string -> ('a,Format.formatter,unit,'b) format4 -> 'a
 (** Warning Manager *)
 
 type t = {
-  loc : Filepath.position ;
+  loc : Filepos.t ;
   severe : bool ;
   source : string ;
   reason : string ;

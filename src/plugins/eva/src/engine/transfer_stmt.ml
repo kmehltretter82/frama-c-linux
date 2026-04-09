@@ -628,8 +628,7 @@ module Make (Engine: Engine_Subset) = struct
     Self.feedback ~dkey:Self.dkey_show ~pos ~stacktrace:true
       "Dumping state in file '%a'" Filepath.pretty file;
     Format.fprintf fmt "DUMPING STATE at file %a line %d@."
-      Filepath.pretty l.Filepath.pos_path
-      l.Filepath.pos_lnum;
+      Filepath.pretty l.pos_path l.pos_lnum;
     let pretty_args = pretty_arguments ~subdivnb state in
     if arguments <> []
     then Format.fprintf fmt "Args: %a@." pretty_args arguments;

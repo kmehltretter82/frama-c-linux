@@ -43,7 +43,7 @@ let () = Annotations.add_hook_on_change ast_changed
 
 module Position =
 struct
-  type t = Filepath.position
+  type t = Filepos.t
 
   let jtype = Data.declare ~package ~name:"source"
       ~descr:(Md.plain "Source file positions.")
@@ -55,17 +55,17 @@ struct
         ])
 
   let to_json p =
-    let path = Filepath.(to_string p.pos_path) in
+    let path = Filepath.to_string p.Filepos.pos_path in
     let file =
       if Server_parameters.has_relative_filepath ()
       then path
-      else (Filepath.to_string_abs p.Filepath.pos_path)
+      else (Filepath.to_string_abs p.pos_path)
     in
     `Assoc [
       "dir"  , `String (Filename.dirname path) ;
       "base" , `String (Filename.basename path) ;
       "file" , `String file ;
-      "line" , `Int p.Filepath.pos_lnum ;
+      "line" , `Int p.Filepos.pos_lnum ;
     ]
 
   let of_json js =
@@ -610,7 +610,7 @@ struct
   let () =
     let get (tag, _) =
       let pos = fst (Printer_tag.loc_of_localizable tag) in
-      if Cil_datatype.Position.(equal unknown pos) then None else Some pos
+      if Filepos.(equal unknown pos) then None else Some pos
     in
     States.option
       ~name:"sloc"
@@ -1065,7 +1065,7 @@ let () = Information.register
       let pos = fst @@ Printer_tag.loc_of_localizable loc in
       if Filepath.is_empty pos.pos_path then
         raise Not_found ;
-      Filepath.pp_pos fmt pos
+      Filepos.pretty fmt pos
     end
 
 let () = Information.register
@@ -1214,7 +1214,7 @@ let get_marker_at ~file ~line ~col =
   if file="" then None else
     let pos_path = Filepath.of_string file in
     let pos =
-      Filepath.{ pos_path; pos_lnum = line; pos_cnum = col; pos_bol = 0; }
+      Filepos.{ pos_path; pos_lnum = line; pos_cnum = col; pos_bol = 0; }
     in
     Printer_tag.loc_to_localizable ~precise_col:true pos
 

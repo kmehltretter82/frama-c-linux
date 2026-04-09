@@ -610,7 +610,7 @@ class cil_printer () = object (self)
   method private may_be_skipped s = s.labels = [] && s.sattr = []
 
   method location fmt loc =
-    Format.fprintf fmt "%a" Filepath.pp_pos (fst loc)
+    Format.fprintf fmt "%a" Filepos.pretty (fst loc)
 
   (* constant *)
   method constant fmt = function
@@ -1409,10 +1409,10 @@ class cil_printer () = object (self)
   method line_directive ?(forcefile=false) fmt l =
     match state.line_directive_style with
     | None -> ()
-    | Some _ when (fst l).Filepath.pos_lnum <= 0 -> ()
+    | Some _ when (fst l).pos_lnum <= 0 -> ()
 
     (* Do not print lineComment if the same line as above *)
-    | Some Line_comment_sparse when (fst l).Filepath.pos_lnum = lastLineNumber ->
+    | Some Line_comment_sparse when (fst l).pos_lnum = lastLineNumber ->
       ()
 
     | Some style  ->
@@ -1422,17 +1422,17 @@ class cil_printer () = object (self)
         | Line_preprocessor_output | Line_preprocessor_input -> "#line"
       in
       let pos = fst l in
-      lastLineNumber <- pos.Filepath.pos_lnum;
+      lastLineNumber <- pos.pos_lnum;
       let filename =
-        if forcefile || pos.Filepath.pos_path <> lastFileName then begin
-          lastFileName <- pos.Filepath.pos_path;
+        if forcefile || pos.pos_path <> lastFileName then begin
+          lastFileName <- pos.pos_path;
           Format.asprintf " \"%a\""
-            Filepath.pretty pos.Filepath.pos_path
+            Filepath.pretty pos.pos_path
         end else
           ""
       in
       fprintf fmt "@[@<0>\n@<0>%s@<0> @<0>%d@<0> @<0>%s@]@\n"
-        directive (fst l).Filepath.pos_lnum filename
+        directive (fst l).Filepos.pos_lnum filename
 
   (* Print a recovered while condition from Loop *)
   method pp_while_head fmt cond =

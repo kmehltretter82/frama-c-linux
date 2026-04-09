@@ -71,14 +71,14 @@ val paste_at_global : clause:string -> unit
 val find_kf: string -> Kernel_function.t
 exception Kf_not_found
 exception Stmt_not_found of Kernel_function.t
-val find_stmt_set_from_sid: ?source:Filepath.position -> int -> Cil_datatype.Stmt.Set.t
-val find_stmt_set_from_label: ?source:Filepath.position -> string -> Cil_datatype.Stmt.Set.t
-val find_stmt_set_from_return: ?source:Filepath.position -> unit -> Cil_datatype.Stmt.Set.t
-val find_stmt_set_from_call_to: ?source:Filepath.position -> Kernel_function.t option -> int -> Cil_datatype.Stmt.Set.t
-val find_stmt_set_from_call_number: ?source:Filepath.position -> int -> Cil_datatype.Stmt.Set.t
-val find_stmt_set_from_asm_number: ?source:Filepath.position -> int -> Cil_datatype.Stmt.Set.t
-val find_loop_stmt_set_from_loop_number: ?source:Filepath.position -> int -> Cil_datatype.Stmt.Set.t
-val find_loop_body_set_from_loop_number: ?source:Filepath.position -> int -> Cil_datatype.Stmt.Set.t
+val find_stmt_set_from_sid: ?source:Filepos.t -> int -> Cil_datatype.Stmt.Set.t
+val find_stmt_set_from_label: ?source:Filepos.t -> string -> Cil_datatype.Stmt.Set.t
+val find_stmt_set_from_return: ?source:Filepos.t -> unit -> Cil_datatype.Stmt.Set.t
+val find_stmt_set_from_call_to: ?source:Filepos.t -> Kernel_function.t option -> int -> Cil_datatype.Stmt.Set.t
+val find_stmt_set_from_call_number: ?source:Filepos.t -> int -> Cil_datatype.Stmt.Set.t
+val find_stmt_set_from_asm_number: ?source:Filepos.t -> int -> Cil_datatype.Stmt.Set.t
+val find_loop_stmt_set_from_loop_number: ?source:Filepos.t -> int -> Cil_datatype.Stmt.Set.t
+val find_loop_body_set_from_loop_number: ?source:Filepos.t -> int -> Cil_datatype.Stmt.Set.t
 
 val loop_number_attr_name: int -> string
 val loop_body_attr_name: int -> string

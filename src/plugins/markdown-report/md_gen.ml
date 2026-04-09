@@ -283,7 +283,7 @@ let gen_coverage env =
   in
   header :: content
 
-let string_of_pos pos = Format.asprintf "%a" Filepath.pp_pos pos
+let string_of_pos pos = Format.asprintf "%a" Filepos.pretty pos
 
 let string_of_pos_opt =
   function

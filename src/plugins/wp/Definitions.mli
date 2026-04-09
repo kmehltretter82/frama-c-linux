@@ -14,7 +14,7 @@ open Lang.F
 type cluster
 
 val dummy : unit -> cluster
-val cluster : id:string -> ?title:string -> ?position:Filepath.position -> unit -> cluster
+val cluster : id:string -> ?title:string -> ?position:Filepos.t -> unit -> cluster
 val axiomatic : axiomatic -> cluster
 val section : logic_section -> cluster
 val compinfo : compinfo -> cluster
@@ -23,7 +23,7 @@ val matrix : unit -> cluster
 val cluster_id : cluster -> string (** Unique *)
 
 val cluster_title : cluster -> string
-val cluster_position : cluster -> Filepath.position option
+val cluster_position : cluster -> Filepos.t option
 val cluster_age : cluster -> int
 val cluster_compare : cluster -> cluster -> int
 val pp_cluster : Format.formatter -> cluster -> unit

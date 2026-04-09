@@ -221,13 +221,12 @@ let all_symbolic_dirs () =
 (* --- Position in source file                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-type position =
-  {
-    pos_path : t;
-    pos_lnum : int;
-    pos_bol : int;
-    pos_cnum : int;
-  }
+type position = {
+  pos_path : t;
+  pos_lnum : int;
+  pos_bol : int;
+  pos_cnum : int;
+}
 
 let empty_pos = {
   pos_path = empty;

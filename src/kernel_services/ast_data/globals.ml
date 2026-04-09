@@ -554,7 +554,7 @@ module FileIndex = struct
       Cil.iterGlobals
         (Ast.get ())
         (fun glob ->
-           let f = (fst (Global.loc glob)).Filepath.pos_path in
+           let f = (fst (Global.loc glob)).pos_path in
            Kernel.debug ~dkey:Kernel.dkey_globals "Indexing global in file %a@."
              Filepath.pretty f;
            ignore
@@ -564,7 +564,7 @@ module FileIndex = struct
     State_builder.apply_once "Globals.FileIndex.compute" [ S.self ] compute
 
   let remove_global_annotations a =
-    let f = (fst (Global_annotation.loc a)).Filepath.pos_path in
+    let f = (fst (Global_annotation.loc a)).pos_path in
     try
       let l = S.find f in
       let l =
@@ -654,8 +654,7 @@ module FileIndex = struct
         else false
       | _ -> false
     in
-    let file = (fst x.Cil_types.vdecl).Filepath.pos_path
-    in
+    let file = (fst x.Cil_types.vdecl).pos_path in
     match List.find pred (S.find file) with
     | Cil_types.GFun (fundec, _) ->
       Functions.get fundec.Cil_types.svar, !is_param
@@ -710,7 +709,7 @@ module Syntactic_search = struct
       let symbols,_ = List.split (FileIndex.get_globals file) in
       List.find_opt global_has_name symbols |> lookup Program
     | Formal kf ->
-      let file = (fst (get_location kf)).Filepath.pos_path in
+      let file = (fst (get_location kf)).Filepos.pos_path in
       List.find_opt has_name (get_formals kf) |>
       lookup (Translation_unit file)
     | Whole_function kf ->
@@ -925,15 +924,15 @@ module Comments_stmt_cache =
 
 let get_comments_global g =
   let last_pos (f : Filepath.t) =
-    { Filepath.pos_path = f;
-      Filepath.pos_lnum = max_int;
-      Filepath.pos_cnum = max_int;
-      Filepath.pos_bol = max_int
+    { Filepos.pos_path = f;
+      pos_lnum = max_int;
+      pos_cnum = max_int;
+      pos_bol = max_int
     }
   in
   let add g =
     let my_loc = Cil_datatype.Global.loc g in
-    let file = (fst my_loc).Filepath.pos_path in
+    let file = (fst my_loc).pos_path in
     let globs = FileIndex.get_symbols file in
     let globs = List.sort
         (fun g1 g2 ->
@@ -949,10 +948,10 @@ let get_comments_global g =
           Cil_printer.pp_global g
           Filepath.pretty file
       | g' :: l when Cil_datatype.Global.equal g g' ->
-        { Filepath.pos_path = file;
-          Filepath.pos_lnum = 1;
-          Filepath.pos_cnum = 0;
-          Filepath.pos_bol = 0; }, l = []
+        { Filepos.pos_path = file;
+          pos_lnum = 1;
+          pos_cnum = 0;
+          pos_bol = 0; }, l = []
       | g' :: g'' :: l when Cil_datatype.Global.equal g'' g ->
         snd (Cil_datatype.Global.loc g'), l = []
       | _ :: l -> find_prev l

@@ -199,7 +199,7 @@ let pp_ki_loc fmt ki =
   match ki with
   | Kglobal -> (* no location, print 'global' *)
     Format.fprintf fmt "global"
-  | Kstmt st -> Filepath.pp_pos fmt (fst @@ Stmt.loc st)
+  | Kstmt st -> Filepos.pretty fmt (fst @@ Stmt.loc st)
 
 let pp_debug fmt = function
   | PStmtStart (_, s) ->
@@ -513,7 +513,7 @@ let localizable_of_declaration = function
   | SGAnnot ga -> PGlobal (GAnnot (ga, loc_of_global_annotation ga))
 
 (* -------------------------------------------------------------------------- *)
-(* --- Find localizable at a Filepath.position                            --- *)
+(* --- Find localizable at a Filepos.t                            --- *)
 (* -------------------------------------------------------------------------- *)
 
 let dkey = Kernel.dkey_pretty_source
@@ -546,13 +546,13 @@ class pos_to_localizable =
     method add_range loc (localizable : localizable) =
       if not (Location.equal loc Location.unknown) then (
         let p1, p2 = loc in
-        if p1.Filepath.pos_path <> p2.Filepath.pos_path then
+        if p1.pos_path <> p2.pos_path then
           Kernel.debug ~once:true ~dkey
             "Localizable over two files: %a and %a; %a"
-            Filepath.pretty p1.Filepath.pos_path
-            Filepath.pretty p2.Filepath.pos_path
+            Filepath.pretty p1.pos_path
+            Filepath.pretty p2.pos_path
             Localizable.pretty localizable;
-        let file = p1.Filepath.pos_path in
+        let file = p1.pos_path in
         let hfile =
           try MappingLineLocalizable.find file
           with Not_found ->
@@ -560,7 +560,7 @@ class pos_to_localizable =
             MappingLineLocalizable.add file h;
             h
         in
-        for i = p1.Filepath.pos_lnum to p2.Filepath.pos_lnum do
+        for i = p1.pos_lnum to p2.pos_lnum do
           LineToLocalizable.add hfile i (loc, localizable);
         done
       );
@@ -633,8 +633,8 @@ class pos_to_localizable =
 let location_contains_col loc col =
   let (pos_start, pos_end) = loc in
   let (col_start, col_end) =
-    pos_start.Filepath.pos_cnum - pos_start.Filepath.pos_bol,
-    pos_end.Filepath.pos_cnum - pos_end.Filepath.pos_bol
+    pos_start.Filepos.pos_cnum - pos_start.Filepos.pos_bol,
+    pos_end.Filepos.pos_cnum - pos_end.Filepos.pos_bol
   in
   col_start <= col && col <= col_end
 
@@ -645,7 +645,7 @@ let location_contains_col loc col =
    Some heuristics may return an empty list, in which case a fallback is
    later used to return a better choice. *)
 let apply_location_heuristics precise_col possible_locs loc =
-  let col = loc.Filepath.pos_cnum - loc.Filepath.pos_bol in
+  let col = loc.Filepos.pos_cnum - loc.Filepos.pos_bol in
   Kernel.debug ~dkey
     "apply_location_heuristics (precise_col:%b): loc: %a, col: %d@\n\
      possible_locs:@ %a"
@@ -699,9 +699,9 @@ let loc_to_localizable ?(precise_col=false) loc =
   );
   try
     (* Find the mapping from this file to locs-by-line *)
-    let hfile = MappingLineLocalizable.find loc.Filepath.pos_path in
+    let hfile = MappingLineLocalizable.find loc.Filepos.pos_path in
     (* Find the localizable for this line *)
-    let all = LineToLocalizable.find_all hfile loc.Filepath.pos_lnum in
+    let all = LineToLocalizable.find_all hfile loc.Filepos.pos_lnum in
     match apply_location_heuristics precise_col all loc with
     | Some locz ->
       Kernel.feedback ~dkey "loc: %a -> locz: %a"
