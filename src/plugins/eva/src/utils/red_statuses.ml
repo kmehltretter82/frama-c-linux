@@ -163,10 +163,10 @@ let compute_information (kinstr, alarm_or_prop, contexts) =
 
 let print_information fmt { loc; kf; alarm; kind; text; status; contexts } =
   let pos = fst loc in
-  let file = pos.Filepath.pos_path in
+  let file = pos.pos_path in
   let dir = Filepath.(dirname file |> to_string_rel) in
   let file = Filepath.basename file in
-  let lnum = pos.Filepath.pos_lnum in
+  let lnum = pos.pos_lnum in
   let kf = Kernel_function.get_name kf in
   let alarm = if alarm then "Alarm" else "Property" in
   let status = Description.status_feedback status in

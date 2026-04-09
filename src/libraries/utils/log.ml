@@ -27,7 +27,7 @@ type event = {
   evt_kind : kind ;
   evt_plugin : string ;
   evt_category : string option;
-  evt_source : Filepath.position option ;
+  evt_source : Filepos.t option ;
   evt_message : Rich_text.t ;
 }
 
@@ -35,7 +35,7 @@ type event = {
 (* --- Exception Management                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-exception FeatureRequest of Filepath.position option * string * string
+exception FeatureRequest of Filepos.t option * string * string
 exception AbortError of string (* plug-in *)
 exception AbortFatal of string (* plug-in *)
 
@@ -220,7 +220,7 @@ struct
   let pp_source fmt = function
     | None -> ()
     | Some pos ->
-      Format.fprintf fmt "%a: @?" Filepath.pp_pos pos
+      Format.fprintf fmt "%a: @?" Filepos.pretty pos
 
   let pp_category fmt = function
     | None -> ()
@@ -299,7 +299,7 @@ let do_transient terminal ~plugin message =
 (* -------------------------------------------------------------------------- *)
 
 let source ~file ~line =
-  Filepath.{ pos_path = file ; pos_lnum = line ; pos_bol = 0 ; pos_cnum = 0 }
+  Filepos.{ pos_path = file ; pos_lnum = line ; pos_bol = 0 ; pos_cnum = 0 }
 
 let current_loc = ref (fun () -> raise Not_found)
 
@@ -561,7 +561,7 @@ let deferred_raise ~fatal event msg =
   (* reset deferred flag. *)
   let () = deferred_exn := DNo_exn in
   let channel = new_channel event.evt_plugin in
-  let pp_pos fmt pos = Format.fprintf fmt "%a: " Filepath.pp_pos pos in
+  let pp_pos fmt pos = Format.fprintf fmt "%a: " Filepos.pretty pos in
   let pp_pos_opt = Pretty_utils.pp_opt pp_pos in
   let print_event fmt =
     Format.fprintf fmt "@\n%a%a"
@@ -601,13 +601,13 @@ let treat_deferred_error () =
 (* -------------------------------------------------------------------------- *)
 
 type 'a pretty_printer =
-  ?current:bool -> ?source:Filepath.position ->
+  ?current:bool -> ?source:Filepos.t ->
   ?emitwith:(event -> unit) -> ?echo:bool -> ?once:bool ->
   ?append:(Format.formatter -> unit) ->
   ('a,Format.formatter,unit) format -> 'a
 
 type ('a,'b) pretty_aborter =
-  ?current:bool -> ?source:Filepath.position -> ?echo:bool ->
+  ?current:bool -> ?source:Filepos.t -> ?echo:bool ->
   ?append:(Format.formatter -> unit) ->
   ('a,Format.formatter,unit,'b) format4 -> 'a
 
@@ -833,7 +833,7 @@ sig
   val debug_atleast: int -> bool
 
   val printf : ?level:int -> ?dkey:category ->
-    ?current:bool -> ?source:Filepath.position ->
+    ?current:bool -> ?source:Filepos.t ->
     ?append:(Format.formatter -> unit) ->
     ?header:(Format.formatter -> unit) ->
     ('a,Format.formatter,unit) format -> 'a
@@ -849,7 +849,7 @@ sig
   val fatal   : ('a,'b) pretty_aborter
   val verify  : bool -> ('a,bool) pretty_aborter
 
-  val not_yet_implemented : ?current:bool -> ?source:Filepath.position ->
+  val not_yet_implemented : ?current:bool -> ?source:Filepos.t ->
     ('a,Format.formatter,unit,'b) format4 -> 'a
   val deprecated : string -> now:string -> ('a -> 'b) -> 'a -> 'b
 

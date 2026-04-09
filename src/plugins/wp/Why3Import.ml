@@ -124,19 +124,18 @@ let convert_location (wloc : Why3.Loc.position option) : C.location =
   | Some loc ->
     let (file,lstart,cstart,lend,cend) = Why3.Loc.get loc in
     let pstart = {
-      Filepath.pos_path = F.of_string file;
+      Filepos.pos_path = F.of_string file;
       pos_lnum = lstart;
       pos_bol = 0;
       pos_cnum = cstart;
     }  in
     let pend = {
-      Filepath.pos_path = F.of_string file;
+      Filepos.pos_path = F.of_string file;
       pos_lnum = lend;
       pos_bol = 0;
       pos_cnum = cend;
     } in (pstart, pend)
-  | None ->
-    (Position.unknown, Position.unknown)
+  | None -> (Filepos.unknown, Filepos.unknown)
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Type conversion                                                 --- *)

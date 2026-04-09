@@ -25,12 +25,12 @@ let cabslu = Cil_datatype.Location.unknown
 module Comments =
 struct
   module MapDest = struct
-    include Datatype.List(Datatype.Pair(Cil_datatype.Position)(Datatype.String))
+    include Datatype.List(Datatype.Pair(Filepos)(Datatype.String))
     let fast_equal (_:t) (_:t) = false
   end
   module MyTable =
     Rangemap.Make
-      (Cil_datatype.Position)
+      (Filepos)
       (MapDest)
   module MyState =
     State_builder.Ref
@@ -51,24 +51,21 @@ struct
     MyState.set ((MyTable.add first ((last,comment)::acc)) state)
 
   let get (first,last) =
-    let open Cil_datatype in
     Kernel.debug ~dkey:Kernel.dkey_comments
       "Searching for comments between positions %a and %a@."
-      Position.pretty first
-      Position.pretty last;
-    if Position.equal first Position.unknown ||
-       Position.equal last Position.unknown
+      Filepos.pretty first Filepos.pretty last;
+    if Filepos.is_unknown first || Filepos.is_unknown last
     then begin
       Kernel.debug ~dkey:Kernel.dkey_comments "skipping dummy position@.";
       []
     end else
       let r = MyTable.fold_range
           (fun pos ->
-             match Cil_datatype.Position.compare first pos with
+             match Filepos.compare first pos with
              | n when n > 0 -> Rangemap.Below
              | 0 -> Rangemap.Match
              | _ ->
-               if Cil_datatype.Position.compare pos last <= 0 then
+               if Filepos.compare pos last <= 0 then
                  Rangemap.Match
                else
                  Rangemap.Above)
@@ -179,7 +176,7 @@ let valueOfDigit chr =
 
 
 let d_cabsloc fmt cl =
-  Format.fprintf fmt "%a" Filepath.pp_pos (fst cl)
+  Format.fprintf fmt "%a" Filepos.pretty (fst cl)
 
 type attr_test = Normal | Test
 let state_stack = Stack.create ()

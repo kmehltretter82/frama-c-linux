@@ -20,7 +20,7 @@
       (start_pos, end_pos)
 
   let pos pos =
-    Cil_datatype.Position.of_lexing_pos pos
+    Filepos.of_lexing_pos pos
 
   let loc_info lexpr_loc x = { lexpr_node = x; lexpr_loc }
   let loc_start x = fst x.lexpr_loc

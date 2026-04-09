@@ -583,12 +583,7 @@ and pp_extended_asm fmt extended_asm =
     (pp_list pp_string) extended_asm.asm_clobbers
     (pp_list (pp_ref pp_stmt)) extended_asm.asm_gotos
 
-and pp_filepath_position fmt filepath_position =
-  Format.fprintf fmt "{pos_path=%a;pos_lnum=%d;pos_bol=%d;pos_cnum=%d}"
-    Filepath.pretty_abs filepath_position.Filepath.pos_path
-    filepath_position.Filepath.pos_lnum
-    filepath_position.Filepath.pos_bol
-    filepath_position.Filepath.pos_cnum
+and pp_filepath_position fmt pos = Filepos.pretty_debug fmt pos
 
 and pp_lexing_position fmt lexing_position =
   Format.fprintf fmt "{pos_fname=%s;pos_lnum=%d;pos_bol=%d;pos_cnum=%d}"
@@ -597,11 +592,10 @@ and pp_lexing_position fmt lexing_position =
 
 and pp_location fmt (pos_start,pos_end) =
   let p = if print_locations then Format.fprintf else Format.ifprintf in
-  p fmt "(%a,%a)" pp_filepath_position pos_start pp_filepath_position pos_end
+  p fmt "(%a,%a)" Filepos.pretty_debug pos_start Filepos.pretty_debug pos_end
 
 and pp_if_loc_known prefix suffix fmt loc =
-  if print_locations &&
-     not (Filepath.is_empty (fst loc).Filepath.pos_path)
+  if print_locations && not (Filepath.is_empty (fst loc).Filepos.pos_path)
   then Format.fprintf fmt "%s%a%s" prefix pp_location loc suffix
   else ()
 

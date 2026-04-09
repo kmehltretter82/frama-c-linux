@@ -1354,7 +1354,7 @@ and extended_asm =
   }
 
 (** Describes a location in a source file *)
-and location = Filepath.position * Filepath.position
+and location = Filepos.t * Filepos.t
 
 (** {1 Abstract syntax trees for annotations} *)
 
@@ -1409,7 +1409,7 @@ and logic_label =
 (** Logic terms. *)
 and term = {
   term_node : term_node; (** kind of term. *)
-  term_loc : Filepath.position * Filepath.position;
+  term_loc : Filepos.t * Filepos.t;
   (** position in the source file. *)
   term_type : logic_type; (** type of the term. *)
   term_name: string list;

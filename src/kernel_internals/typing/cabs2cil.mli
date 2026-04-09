@@ -195,7 +195,7 @@ val fieldsToInit: Cil_types.compinfo -> string option -> Cil_types.offset list
 
    @since 25.0-Manganese
 *)
-val func_locs : unit -> (Filepath.position * Filepath.position * string) list
+val func_locs : unit -> (Filepos.t * Filepos.t * string) list
 
 (** Deprecated  *)
 

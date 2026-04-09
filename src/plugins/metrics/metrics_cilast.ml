@@ -421,7 +421,7 @@ let compute_files_defining_globals gvars =
           Metrics_parameters.feedback ~dkey "found %s at: %a"
             (if is_def then "definition" else "declaration")
             Printer.pp_location loc;
-          Filepath.Set.add ((fst loc).Filepath.pos_path) acc
+          Filepath.Set.add ((fst loc).pos_path) acc
         end
       else acc
     ) (Filepath.Set.empty) gvars
@@ -452,7 +452,7 @@ let get_filenames_in_funspec kf =
           (Visitor.visitFramacBehavior (visitor :> Visitor.frama_c_visitor) b);
         let locs = visitor#get_locs in
         Cil_datatype.Location.Set.fold (fun loc acc' ->
-            let path = (fst loc).Filepath.pos_path in
+            let path = (fst loc).pos_path in
             Metrics_parameters.feedback ~dkey ~once:true
               "found annotation in: %a"
               Filepath.pretty path;

@@ -55,7 +55,7 @@ type logic_lemma = {
 
 type axiomatic = {
   ax_name : string ;
-  ax_position : Filepath.position ;
+  ax_position : Filepos.t ;
   ax_property : Property.t ;
   mutable ax_types : logic_type_info list ;
   mutable ax_logics : logic_info list ;

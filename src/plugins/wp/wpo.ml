@@ -234,7 +234,7 @@ struct
 
   let pp_effect fmt s e =
     let loc = fst (Stmt.loc s) in
-    let line = loc.Filepath.pos_lnum in
+    let line = loc.pos_lnum in
     let desc = match e with
       | Mcfg.FromCode -> "Effect"
       | Mcfg.FromCall -> "Call Effect"
@@ -244,7 +244,7 @@ struct
 
   let pp_terminates fmt  s e =
     let loc = fst (Stmt.loc s) in
-    let line = loc.Filepath.pos_lnum in
+    let line = loc.pos_lnum in
     let desc = match e with
       | Mcfg.Loop -> "Loop termination"
       | Mcfg.Terminates -> "Call terminates"

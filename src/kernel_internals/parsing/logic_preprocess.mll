@@ -88,8 +88,10 @@
   let annot_end_comment = "////////////////__ANNOT_END_COMMENT__"
 
   let abort_preprocess reason =
-    let source = {Cil_datatype.Position.unknown with Filepath.pos_path = Filepath.of_string !curr_file;
-                  pos_lnum = !curr_line;}
+    let source = Filepos.{ unknown with
+        pos_path = Filepath.of_string !curr_file;
+        pos_lnum = !curr_line
+      }
     in
     Kernel.error ~source
       "Can't preprocess annotation: %s\nSome annotations will be kept as is"

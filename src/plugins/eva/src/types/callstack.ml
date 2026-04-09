@@ -138,7 +138,7 @@ let rec iter f cs =
 
 let stmt_hash s =
   let pos = fst (Cil_datatype.Stmt.loc s) in
-  stable_hash (pos.Filepath.pos_path, pos.Filepath.pos_lnum)
+  stable_hash (pos.pos_path, pos.pos_lnum)
 
 let kf_hash kf = stable_hash (Kernel_function.get_name kf)
 

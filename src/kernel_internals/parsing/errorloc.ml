@@ -121,7 +121,7 @@ let pp_context_from_file ?(ctx=2) fmt ((start_pos, pos) as loc) =
   if Cil_datatype.Location.is_unknown loc then ()
   else
     let start_pos =
-      if Filepath.equal start_pos.Filepath.pos_path pos.Filepath.pos_path
+      if Filepath.equal start_pos.pos_path pos.pos_path
       then start_pos
       else pos
     in
@@ -216,28 +216,29 @@ let pp_context_from_file ?(ctx=2) fmt ((start_pos, pos) as loc) =
 
 
 let pp_pos fmt pos =
-  if pos = Cil_datatype.Position.unknown then Format.fprintf fmt "<unknown>"
-  else Format.fprintf fmt "%d:%d" pos.Filepath.pos_lnum
-      (pos.Filepath.pos_cnum - pos.Filepath.pos_bol)
+  if pos = Filepos.unknown then Format.fprintf fmt "<unknown>"
+  else Format.fprintf fmt "%d:%d" pos.pos_lnum
+      (pos.pos_cnum - pos.pos_bol)
 
 let pp_location fmt (pos_start, pos_end) =
-  if pos_start.Filepath.pos_path = pos_end.Filepath.pos_path then
-    if pos_start.Filepath.pos_lnum = pos_end.Filepath.pos_lnum then
-      if pos_start.Filepath.pos_cnum = pos_end.Filepath.pos_cnum then
+  let open Filepos in
+  if pos_start.pos_path = pos_end.pos_path then
+    if pos_start.pos_lnum = pos_end.pos_lnum then
+      if pos_start.pos_cnum = pos_end.pos_cnum then
         (* same location, do not print twice. *)
         Format.fprintf fmt "Location: line %d, column %d"
-          pos_start.Filepath.pos_lnum
-          (pos_start.Filepath.pos_cnum - pos_start.Filepath.pos_bol)
+          pos_start.pos_lnum
+          (pos_start.pos_cnum - pos_start.pos_bol)
       else
         (* single file, single line *)
         Format.fprintf fmt "Location: line %d, between columns %d and %d"
-          pos_start.Filepath.pos_lnum
-          (pos_start.Filepath.pos_cnum - pos_start.Filepath.pos_bol)
-          (pos_end.Filepath.pos_cnum - pos_end.Filepath.pos_bol)
+          pos_start.pos_lnum
+          (pos_start.pos_cnum - pos_start.pos_bol)
+          (pos_end.pos_cnum - pos_end.pos_bol)
     else
       (* single file, multiple lines *)
       Format.fprintf fmt "Location: between lines %d and %d"
-        pos_start.Filepath.pos_lnum pos_end.Filepath.pos_lnum
+        pos_start.pos_lnum pos_end.pos_lnum
   else (* multiple files (very rare) *)
     Format.fprintf fmt "Location: between %a and %a"
       pp_pos pos_start pp_pos pos_end

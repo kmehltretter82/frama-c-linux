@@ -200,9 +200,7 @@
         "writes", (fun _ -> WRITES);
         "__FC_FILENAME__",
         (fun loc ->
-           let filename =
-             Filepath.(to_string (fst loc).pos_path)
-           in
+           let filename = Filepath.to_string (fst loc).Filepos.pos_path in
            STRING_LITERAL (false,filename));
       ];
     List.iter (fun (x, y) -> Hashtbl.add type_kw x y)
@@ -572,7 +570,7 @@ and hash = parse
                    with Failure _ ->
                      (* the int is too big. *)
                      Kernel.warning
-                       ~source:(Cil_datatype.Position.of_lexing_pos lexbuf.lex_start_p)
+                       ~source:(Filepos.of_lexing_pos lexbuf.lex_start_p)
                        "Bad line number in preprocessed file: %s"  s;
                      (-1)
                  in
@@ -615,13 +613,13 @@ and comment = parse
     dest_lexbuf.Lexing.lex_curr_p <- src_pos;
     dest_lexbuf.lex_abs_pos <- src_pos.pos_cnum
 
-  let parse_from_position f (pos, s : Filepath.position * string) =
+  let parse_from_position f (pos, s : Filepos.t * string) =
     let open Current_loc.Operators in
     let lb = from_string s in
-    let get_loc () = Cil_datatype.Position.of_lexing_pos lb.Lexing.lex_curr_p in
+    let get_loc () = Filepos.of_lexing_pos lb.Lexing.lex_curr_p in
     let<> UpdatedCurrentLoc = (pos, pos) in
     let warn = Kernel.warning ~wkey:Kernel.wkey_annot_error in
-    set_initial_position lb (Cil_datatype.Position.to_lexing_pos pos);
+    set_initial_position lb (Filepos.to_lexing_pos pos);
     try
       let res = f token lb in
       Some (get_loc (), res)
@@ -655,7 +653,7 @@ and comment = parse
     let work () = Logic_parser.ext_spec token lexbuf in
     Fun.protect ~finally work
 
-  type 'a parse = Filepath.position * string -> (Filepath.position * 'a) option
+  type 'a parse = Filepos.t * string -> (Filepos.t * 'a) option
 
   let chr lexbuf =
     let buf = Buffer.create 16 in

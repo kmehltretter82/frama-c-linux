@@ -213,15 +213,15 @@ let parse_string s =
   let pos_lnum =
     let i = ref 0 in
     String.iter (function '\n' -> incr i | _ -> ()) s ; !i in
-  let pbeg = { Filepath.empty_pos with pos_path ; pos_cnum = 0 } in
-  let pend = { Filepath.empty_pos with pos_path ; pos_cnum ; pos_lnum } in
+  let pbeg = { Filepos.unknown with pos_path ; pos_cnum = 0 } in
+  let pend = { Filepos.unknown with pos_path ; pos_cnum ; pos_lnum } in
   let lb = Lexing.from_string s in
   let get_loc () =
-    Cil_datatype.Position.of_lexing_pos @@ Lexing.lexeme_start_p lb,
-    Cil_datatype.Position.of_lexing_pos @@ Lexing.lexeme_end_p lb
+    Filepos.of_lexing_pos @@ Lexing.lexeme_start_p lb,
+    Filepos.of_lexing_pos @@ Lexing.lexeme_end_p lb
   in
   let<> UpdatedCurrentLoc = (pbeg, pend) in
-  set_initial_position lb (Cil_datatype.Position.to_lexing_pos pbeg);
+  set_initial_position lb (Filepos.to_lexing_pos pbeg);
   try Logic_parser.lexpr_list_eof Logic_lexer.token lb
   with
   | Logic_utils.Not_well_formed (loc, msg) ->

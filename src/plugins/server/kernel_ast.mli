@@ -13,7 +13,7 @@
 open Cil_types
 
 (** Represented by a Json record with file, dir, basename, line *)
-module Position : Data.S with type t = Filepath.position
+module Position : Data.S with type t = Filepos.t
 
 (* -------------------------------------------------------------------------- *)
 (** Ast Markers *)

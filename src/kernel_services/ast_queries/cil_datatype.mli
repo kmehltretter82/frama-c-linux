@@ -50,7 +50,7 @@ end
     @since Nitrogen-20111001
 *)
 module Position: sig
-  include S_with_collections_pretty with type t = Filepath.position
+  include S_with_collections with type t = Filepos.t
   val unknown : t
   val pp_with_col : Format.formatter -> t -> unit
   val of_lexing_pos : Lexing.position -> t
@@ -61,6 +61,7 @@ module Position: sig
   *)
   val pretty_debug: t Pretty_utils.formatter
 end
+[@@deprecated "Use Filepos module directly, which is its own datatype."]
 
 (** Cil locations. *)
 module Location: sig

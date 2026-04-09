@@ -25,7 +25,7 @@ struct
     Hashtbl.Make(struct
       type t = Cil_datatype.Location.t
       let equal = Cil_datatype.Location.equal_start_semantic
-      let hash (b, _e) = Hashtbl.hash (b.Filepath.pos_path, b.Filepath.pos_lnum)
+      let hash (b, _e) = Hashtbl.hash (b.Filepos.pos_path, b.Filepos.pos_lnum)
     end)
   let is_empty tbl = length tbl = 0
   let keys tbl =
@@ -101,7 +101,7 @@ class stmt_count_visitor =
    location-based approach. *)
 let located_within_framac_libc loc =
   let pos = fst loc in
-  Filepath.is_relative ~base:System_config.Share.libc pos.Filepath.pos_path
+  Filepath.is_relative ~base:System_config.Share.libc pos.Filepos.pos_path
 
 class fun_cabs_visitor print_libc = object(self)
   inherit Cabsvisit.nopCabsVisitor

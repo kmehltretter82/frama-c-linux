@@ -27,7 +27,7 @@ let rec rev_iter f = function
 type cluster = {
   c_id : string ;
   c_title : string ;
-  c_position : Filepath.position option ;
+  c_position : Filepos.t option ;
   mutable c_age : int ;
   mutable c_records : compinfo list ;
   mutable c_irecords : compinfo list ;

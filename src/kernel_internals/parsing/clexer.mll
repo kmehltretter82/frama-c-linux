@@ -387,7 +387,7 @@ let annot_lex initial rule lexbuf =
   try rule lexbuf
   with Parsing.Parse_error ->
     let start = Lexing.lexeme_start_p lexbuf in
-    let source = Cil_datatype.Position.of_lexing_pos start in
+    let source = Filepos.of_lexing_pos start in
     Kernel.warning ~wkey:Kernel.wkey_annot_error ~source "skipping annotation" ;
     initial lexbuf
 
@@ -397,7 +397,7 @@ let make_annot ~one_line default lexbuf s =
   (* error occurred and annotation is discarded. Find a normal token. *)
   | None -> default lexbuf
   | Some (stop, token) ->
-    lexbuf.Lexing.lex_curr_p <- Cil_datatype.Position.to_lexing_pos stop ;
+    lexbuf.Lexing.lex_curr_p <- Filepos.to_lexing_pos stop ;
     if one_line then E.newline () ;
     match token with
     | Logic_ptree.Adecl d -> DECL d

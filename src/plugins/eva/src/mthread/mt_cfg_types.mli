@@ -139,7 +139,7 @@ module CfgNode : sig
 
   val node_kind_stmt: node_kind -> stmt list
   val node_stmt: t -> stmt list
-  val node_first_loc: t -> Filepath.position option
+  val node_first_loc: t -> Filepos.t option
 
   val node_kind_succs : node_kind -> t list
   val node_succs: t -> t list

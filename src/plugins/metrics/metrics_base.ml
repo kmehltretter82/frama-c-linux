@@ -304,7 +304,7 @@ let file_of_vinfodef fvinfo =
     match kf.fundec with
     | Definition (_, loc) -> loc
     | Declaration (_, _, _, loc) -> loc
-  in decl_loc1.Filepath.pos_path
+  in decl_loc1.pos_path
 ;;
 
 let file_of_fundef (fun_dec: Cil_types.fundec) =
@@ -325,7 +325,7 @@ let kf_of_cabs_name sname =
 let get_filename fdef =
   match fdef with
   | Cabs.FUNDEF(_, _, _, (loc1, _), _loc2) ->
-    loc1.Filepath.pos_path
+    loc1.Filepos.pos_path
   | _ -> assert false
 ;;
 

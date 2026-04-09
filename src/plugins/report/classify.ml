@@ -26,7 +26,7 @@ let string_of_action = function
 
 let pp_action fmt a = Format.pp_print_string fmt (string_of_action a)
 let pp_source fmt =
-  function None -> () | Some lex -> Cil_datatype.Position.pretty fmt lex
+  function None -> () | Some lex -> Filepos.pretty fmt lex
 
 type rule = {
   r_id: string ;
@@ -189,7 +189,7 @@ type event = {
   e_action : action ;
   e_title : string ;
   e_descr : string ;
-  e_source : Filepath.position option ;
+  e_source : Filepos.t option ;
 }
 
 let unclassified = {
@@ -206,12 +206,12 @@ let json_of_source = function
   | Some pos ->
     let file =
       if R.AbsolutePath.get ()
-      then Filepath.to_string_abs pos.Filepath.pos_path
-      else Filepath.to_string_rel pos.Filepath.pos_path
+      then Filepath.to_string_abs pos.Filepos.pos_path
+      else Filepath.to_string_rel pos.pos_path
     in
     [
       "file" , Json.of_string file ;
-      "line" , Json.of_int pos.Filepath.pos_lnum ;
+      "line" , Json.of_int pos.pos_lnum ;
     ]
 
 let json_of_event e =

@@ -12,10 +12,10 @@ open Lexing
 
 let abort_current lex fmt =
   let start_pos =
-    Cil_datatype.Position.of_lexing_pos (lexeme_start_p lex)
+    Filepos.of_lexing_pos (lexeme_start_p lex)
   in
   let end_pos =
-    Cil_datatype.Position.of_lexing_pos (lexeme_end_p lex)
+    Filepos.of_lexing_pos (lexeme_end_p lex)
   in
   let fmt = "before or at token %s@\n%a@\n" ^^ fmt in
   Aorai_option.abort fmt

@@ -210,12 +210,12 @@ let split_domain = function
 module FunctionAtPos = struct
   let tbl :
     (Filepath.t,
-     (Filepath.position * Filepath.position * string) Array.t)
+     (Filepos.t * Filepos.t * string) Array.t)
       Hashtbl.t =
     Hashtbl.create 16
 
   let binary_search a pos : string option =
-    let cmp = Cil_datatype.Position.compare in
+    let cmp = Filepos.compare in
     let rec aux lo hi =
       if lo > hi then None
       else
@@ -232,7 +232,7 @@ module FunctionAtPos = struct
     let tmp = Hashtbl.create 16 in
     let files =
       List.fold_left (fun acc ((pos1, _, _) as triple) ->
-          let fp = pos1.Filepath.pos_path in
+          let fp = pos1.Filepos.pos_path in
           Hashtbl.add tmp fp triple;
           Filepath.Set.add fp acc
         ) Filepath.Set.empty (Cabs2cil.func_locs ())
@@ -241,14 +241,14 @@ module FunctionAtPos = struct
     Filepath.Set.iter (fun fp ->
         let l =
           List.sort (fun (start1, _, _) (start2, _, _) ->
-              Cil_datatype.Position.compare start1 start2
+              Filepos.compare start1 start2
             ) (Hashtbl.find_all tmp fp)
         in
         Hashtbl.replace tbl fp (Array.of_list l)
       ) files
 
   let find pos =
-    let fp = pos.Filepath.pos_path in
+    let fp = pos.Filepos.pos_path in
     Option.bind (fun a -> binary_search a pos)
       (Hashtbl.find_opt tbl fp)
 
@@ -464,7 +464,7 @@ let visit_messages () =
             match FunctionAtPos.find pos with
             | None -> Metrics_parameters.warning
                         "FUNCTION NOT FOUND FOR NON-GLOBAL MESSAGE POS: %a"
-                        Cil_datatype.Position.pretty_debug pos;
+                        Filepos.pretty_debug pos;
               "<unknown>"
             | Some name -> name
           in

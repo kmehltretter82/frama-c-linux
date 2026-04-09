@@ -17,7 +17,7 @@ val is_call_to_sync: stmt -> bool
 val pretty_succs: Format.formatter -> stmt -> unit
 (** Print the sid of the successors of a statement *)
 
-val kinstr_to_source : kinstr -> Filepath.position option
+val kinstr_to_source : kinstr -> Filepos.t option
 
 (** Calls stacks, and related functions *)
 

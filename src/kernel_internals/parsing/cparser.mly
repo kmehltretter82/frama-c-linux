@@ -295,7 +295,7 @@ let type_to_expr_for_builtin ~loc ~builtin specifier decl_type =
 
 %}
 
-%token <Filepath.position * string> SPEC
+%token <Filepos.t * string> SPEC
 %token <Logic_ptree.decl list> DECL
 %token <Logic_ptree.code_annot * Cabs.cabsloc> CODE_ANNOT
 %token <Logic_ptree.code_annot list * Cabs.cabsloc> LOOP_ANNOT
@@ -957,19 +957,19 @@ statement:
     no_ghost [SWITCH (smooth_expression $2, in_block $loc($3) $3, loc)]
   }
 | opt_loop_annotations WHILE paren_comma_expression annotated_statement {
-    let first = Cil_datatype.Position.of_lexing_pos $startpos($2) in
-    let last = Cil_datatype.Position.of_lexing_pos $endpos in
+    let first = Filepos.of_lexing_pos $startpos($2) in
+    let last = Filepos.of_lexing_pos $endpos in
     no_ghost [WHILE ($1, smooth_expression $3, in_block $loc($4) $4, (first,last))]
   }
 | opt_loop_annotations DO annotated_statement WHILE paren_comma_expression SEMICOLON {
-    let first = Cil_datatype.Position.of_lexing_pos $startpos($2) in
-    let last = Cil_datatype.Position.of_lexing_pos $endpos in
+    let first = Filepos.of_lexing_pos $startpos($2) in
+    let last = Filepos.of_lexing_pos $endpos in
     no_ghost [DOWHILE ($1, smooth_expression $5, in_block $loc($3) $3, (first,last))]
   }
 | opt_loop_annotations FOR LPAREN for_clause opt_expression SEMICOLON
   opt_expression RPAREN annotated_statement {
-    let first = Cil_datatype.Position.of_lexing_pos $startpos($2) in
-    let last = Cil_datatype.Position.of_lexing_pos $endpos in
+    let first = Filepos.of_lexing_pos $startpos($2) in
+    let last = Filepos.of_lexing_pos $endpos in
     no_ghost [FOR ($1, $4, $5, $7, in_block $loc($9) $9, (first,last))]
   }
 | id = id_or_typename_as_id COLON s = annotated_statement {
@@ -1694,8 +1694,8 @@ postfix_attr:
 | id_or_typename_as_id LPAREN RPAREN {
     let loc1 = Cil_datatype.Location.of_lexing_loc $loc($1) in
     let loc2 =
-      Cil_datatype.Position.of_lexing_pos $startpos($2),
-      Cil_datatype.Position.of_lexing_pos $endpos($3)
+      Filepos.of_lexing_pos $startpos($2),
+      Filepos.of_lexing_pos $endpos($3)
     in
     let f = { expr_node = VARIABLE $1; expr_loc = loc1 } in
     let arg = { expr_node = VARIABLE ""; expr_loc = loc2 } in

@@ -36,7 +36,7 @@ module FuncLocs = struct
   include
     State_builder.List_ref
       (Datatype.Triple
-         (Cil_datatype.Position)(Cil_datatype.Position)(Datatype.String)
+         (Filepos)(Filepos)(Datatype.String)
       )
       (struct
         let name = "FuncLocs"
@@ -228,10 +228,8 @@ let check_no_locals_in_initializer i =
 
 (* ---------- source error message handling ------------- *)
 let cabslu s =
-  {Cil_datatype.Position.unknown with
-   pos_path = Filepath.of_string ("Cabs2cil_start" ^ s)},
-  {Cil_datatype.Position.unknown with
-   pos_path = Filepath.of_string ("Cabs2cil_end" ^ s)}
+  {Filepos.unknown with pos_path = Filepath.of_string ("Cabs2cil_start" ^ s)},
+  {Filepos.unknown with pos_path = Filepath.of_string ("Cabs2cil_end" ^ s)}
 
 
 (** Keep a list of the variable ID for the variables that were created to
@@ -637,8 +635,8 @@ let debugLoc = false
 let convLoc (l : cabsloc) =
   if debugLoc then
     Kernel.debug "convLoc at %a: line %d, byte %d\n"
-      Filepath.pretty (fst l).Filepath.pos_path
-      (fst l).Filepath.pos_lnum (fst l).Filepath.pos_bol;
+      Filepath.pretty (fst l).pos_path
+      (fst l).pos_lnum (fst l).pos_bol;
   l
 
 let isOldStyleVarArgName n =
@@ -5262,7 +5260,7 @@ and makeCompType loc ghost (isstruct: bool)
         "field %s occurs multiple times in aggregate %a. \
          Previous occurrence is at line %d."
         f.fname Cil_printer.pp_typ (mk_tcomp comp)
-        (fst oldf.floc).Filepath.pos_lnum
+        (fst oldf.floc).Filepos.pos_lnum
     with Not_found ->
       (* Do not add unnamed bitfields: they can share the empty name. *)
       if f.fname <> "" then Hashtbl.add fld_table f.fname f
