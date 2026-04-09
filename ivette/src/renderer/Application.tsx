@@ -36,15 +36,15 @@ import './style.css';
 // --------------------------------------------------------------------------
 
 export default function Application(): JSX.Element {
-  const [sidebar, flipSidebar] =
+  const [sidebarVisible, flipSidebarVisible] =
     Dome.useFlipSettings('frama-c.sidebar.unfold', true);
-  const [sidebarPanel, setSidebarPanel] =
+  const [panelVisible, setPanelVisible] =
     Dome.useBoolSettings('frama-c.sidebar.panel.unfold', true);
 
   const ToolBar = State.useChildren(TOOLBAR);
   const StatusBar = State.useChildren(STATUSBAR);
 
-  const [ , setChapters ] = useGlobalState(docChapters);
+  const [, setChapters] = useGlobalState(docChapters);
   setChapters(DOCCHAPTER.getElements());
 
   return (
@@ -52,9 +52,9 @@ export default function Application(): JSX.Element {
       <Toolbar.ToolBar>
         <Toolbar.Button
           icon="SIDEBAR"
-          title="Show/Hide side bar"
-          selected={sidebar}
-          onClick={flipSidebar}
+          title={(sidebarVisible ? "Hide" : "Show") + " sidebar"}
+          selected={sidebarVisible}
+          onClick={flipSidebarVisible}
         />
         <Controller.Control />
         <>{ToolBar}</>
@@ -67,17 +67,17 @@ export default function Application(): JSX.Element {
         <Toolbar.IconPinnedMessage />
       </Toolbar.ToolBar>
       <Hfill className="application-workspace">
-        <Sidebar.Buttons
-          display={sidebar}
-          sidebar={sidebarPanel}
-          setSidebar={setSidebarPanel}
+        <Sidebar.Selectors
+          sidebarVisible={sidebarVisible}
+          panelVisible={panelVisible}
+          setPanelVisible={setPanelVisible}
         />
         <div className="sidebar-splitter">
           <LSplit
             settings="frama-c.sidebar.split"
-            unfold={sidebar && sidebarPanel}
+            unfold={sidebarVisible && panelVisible}
           >
-            <Sidebar.Panel />
+            <Sidebar.Panels />
             <Laboratory.LabView />
           </LSplit>
         </div>

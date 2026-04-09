@@ -24,32 +24,47 @@ import * as State from 'ivette/state';
 /* -------------------------------------------------------------------------- */
 
 interface SelectorProps extends SidebarProps {
-  selected: string;
-  setSelected: (item: string) => void;
-  sidebar: boolean;
-  setSidebar: (sidebar: boolean) => void;
+  selectedSidebarId: string;
+  setSelectedSidebarId: (item: string) => void;
+  panelVisible: boolean;
+  setPanelVisible: (visible: boolean) => void;
 }
 
 function Selector(props: SelectorProps): JSX.Element {
-  const { id, icon, selected, setSelected, sidebar, setSidebar, label } = props;
+  const {
+    id,
+    icon,
+    panelVisible,
+    selectedSidebarId,
+    setSelectedSidebarId,
+    setPanelVisible,
+    label
+  } = props;
   const className = classes(
     'sidebar-selector',
     'dome-color-frame',
-    selected === id && 'sidebar-selector-selected',
+    selectedSidebarId === id && 'sidebar-selector-selected',
   );
   const onClick = React.useCallback(() => {
-    if (selected === id) {
-      setSidebar(!sidebar);
+    if (selectedSidebarId === id) {
+      setPanelVisible(!panelVisible);
     } else {
-      setSelected(id);
-      setSidebar(true);
+      setSelectedSidebarId(id);
+      setPanelVisible(true);
     }
-  }, [id, selected, setSelected, setSidebar, sidebar]);
+  },
+  [
+    id,
+    panelVisible,
+    selectedSidebarId,
+    setPanelVisible,
+    setSelectedSidebarId,
+  ]);
   const title = props.title ?? `${label} Sidebar`;
   const component =
     icon
-    ? <Icon size={20} className="sidebar-selector-icon" id={icon}/>
-    : <label className="sidebar-selector-label">{label}</label>;
+      ? <Icon size={20} className="sidebar-selector-icon" id={icon} />
+      : <label className="sidebar-selector-label">{label}</label>;
   return (
     <div className={className} title={title} onClick={onClick}>
       {component}
@@ -70,7 +85,7 @@ function Wrapper(props: WrapperProps): JSX.Element {
 
   return (
     <SideBar className={className}>
-      <div className="sidebar-ruler"/>
+      <div className="sidebar-ruler" />
       <Catch label={props.id}>
         {props.children}
       </Catch>
@@ -79,72 +94,80 @@ function Wrapper(props: WrapperProps): JSX.Element {
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- SideBar Main Component                                             --- */
+/* --- SideBar Main Components                                            --- */
 /* -------------------------------------------------------------------------- */
 
-interface Model {
-  selected: string;
-  setSelected: (item: string) => void;
-  sidebars: SidebarProps[];
+interface SidebarState {
+  selectedSidebarId: string;
+  setSelectedSidebarId: (id: string) => void;
+  registeredSidebars: SidebarProps[];
 }
 
-function useModel(): Model {
-  const [selected, setSelected] =
+function useSidebarState(): SidebarState {
+  const [selectedSidebarId, setSelectedSidebarId] =
     Dome.useStringSettings('ivette.sidebar.selected');
 
-  const sidebars = State.useElements(SIDEBAR);
+  const registeredSidebars = State.useElements(SIDEBAR);
   const sortedSidebars = React.useMemo(() => {
-      const newItems = [...sidebars].sort((a, b) => {
-        const e1 = a.rank ?? 0;
-        const e2 = b.rank ?? 0;
-        return e1 - e2;
-      });
-      return newItems;
-  }, [sidebars]);
+    const newItems = [...registeredSidebars].sort((a, b) => {
+      const e1 = a.rank ?? 0;
+      const e2 = b.rank ?? 0;
+      return e1 - e2;
+    });
+    return newItems;
+  }, [registeredSidebars]);
 
   // Ensures there is one selected sidebar
   React.useEffect(() => {
-    if (sortedSidebars.every((sb) => sb.id !== selected)) {
+    if (sortedSidebars.every((sb) => sb.id !== selectedSidebarId)) {
       const first = sortedSidebars[0];
-      if (first) setSelected(first.id);
+      if (first) setSelectedSidebarId(first.id);
     }
-  }, [sortedSidebars, selected, setSelected]);
+  }, [sortedSidebars, selectedSidebarId, setSelectedSidebarId]);
 
-  return { selected, setSelected, sidebars: sortedSidebars };
+  return {
+    selectedSidebarId,
+    setSelectedSidebarId,
+    registeredSidebars: sortedSidebars,
+  };
 }
 
-interface ButtonsProps {
-  display?: boolean;
-  sidebar: boolean;
-  setSidebar: (sidebar: boolean) => void;
+interface SelectorsProps {
+  sidebarVisible?: boolean;
+  panelVisible: boolean;
+  setPanelVisible: (visible: boolean) => void;
 }
 
-export function Buttons(props: ButtonsProps): JSX.Element {
-  const { display = true, sidebar, setSidebar } = props;
-  const { selected, setSelected, sidebars } = useModel();
-  const items = sidebars.map((sb) => (
+export function Selectors(props: SelectorsProps): JSX.Element {
+  const { sidebarVisible = true, panelVisible, setPanelVisible } = props;
+  const {
+    selectedSidebarId,
+    setSelectedSidebarId,
+    registeredSidebars,
+  } = useSidebarState();
+  const selectors = registeredSidebars.map((sb) => (
     <Selector
       key={sb.id}
-      selected={selected}
-      setSelected={setSelected}
-      sidebar={sidebar}
-      setSidebar={setSidebar}
+      panelVisible={panelVisible}
+      setPanelVisible={setPanelVisible}
+      selectedSidebarId={selectedSidebarId}
+      setSelectedSidebarId={setSelectedSidebarId}
       {...sb} />
   ));
   const selectorClasses = classes(
     'sidebar-items dome-color-frame',
-    (sidebars.length <= 1 || !display) && 'dome-erased'
+    (registeredSidebars.length <= 1 || !sidebarVisible) && 'dome-erased',
   );
 
-  return <div className={selectorClasses}>{items}</div>;
+  return <div className={selectorClasses}>{selectors}</div>;
 }
 
-export function Panel(): JSX.Element {
-  const { selected, sidebars } = useModel();
-  const wrappers = sidebars.map((sb) => (
+export function Panels(): JSX.Element {
+  const { selectedSidebarId, registeredSidebars } = useSidebarState();
+  const wrappers = registeredSidebars.map((sb) => (
     <Wrapper
       key={sb.id}
-      selected={selected}
+      selected={selectedSidebarId}
       {...sb}
     />
   ));
