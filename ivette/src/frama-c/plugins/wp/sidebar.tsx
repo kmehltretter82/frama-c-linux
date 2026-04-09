@@ -166,7 +166,6 @@ function TipSelector(): JSX.Element {
 }
 
 export function SideBar(): JSX.Element {
-  const [rte, setRte] = States.useSyncState(Params.wpRte);
   const [timeout, setTimeout] = States.useSyncState(Params.wpTimeout);
   const [processes, setProcesses] = States.useSyncState(Params.wpPar);
 
@@ -185,15 +184,6 @@ export function SideBar(): JSX.Element {
         <Tools />
       </SidebarTitle>
       <Forms.SidebarForm>
-        <Section
-          label='Properties Selection'
-        >
-          <Checkbox
-            label='Generate RTE guards'
-            onChange={setRte}
-            value={rte}
-          />
-        </Section>
         <Section
           label='Provers Configuration'
         >
