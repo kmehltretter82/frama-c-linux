@@ -2,8 +2,26 @@
 /* --- Main Frame                                                         --- */
 /* -------------------------------------------------------------------------- */
 
+.application-workspace {
+    min-height: 0;
+}
+
+.sidebar-splitter {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+}
+
 .sidebar-view {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.sidebar-items {
     display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;

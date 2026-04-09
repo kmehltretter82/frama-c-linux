@@ -73,7 +73,13 @@ function Wrapper(props: WrapperProps): JSX.Element {
 /* --- SideBar Main Component                                             --- */
 /* -------------------------------------------------------------------------- */
 
-export function Panel(): JSX.Element {
+interface Model {
+  selected: string;
+  setSelected: (item: string) => void;
+  sidebars: SidebarProps[];
+}
+
+function useModel(): Model {
   const [selected, setSelected] =
     Dome.useStringSettings('ivette.sidebar.selected');
 
@@ -95,15 +101,34 @@ export function Panel(): JSX.Element {
     }
   }, [sortedSidebars, selected, setSelected]);
 
-  const items = sortedSidebars.map((sb) => (
+  return { selected, setSelected, sidebars: sortedSidebars };
+}
+
+interface ButtonsProps {
+  display?: boolean;
+}
+
+export function Buttons(props: ButtonsProps): JSX.Element {
+  const { display = true } = props;
+  const { selected, setSelected, sidebars } = useModel();
+  const items = sidebars.map((sb) => (
     <Selector
       key={sb.id}
       selected={selected}
       setSelected={setSelected}
       {...sb} />
   ));
+  const selectorClasses = classes(
+    'sidebar-items dome-color-frame',
+    (sidebars.length <= 1 || !display) && 'dome-erased'
+  );
 
-  const wrappers = sortedSidebars.map((sb) => (
+  return <div className={selectorClasses}>{items}</div>;
+}
+
+export function Panel(): JSX.Element {
+  const { selected, sidebars } = useModel();
+  const wrappers = sidebars.map((sb) => (
     <Wrapper
       key={sb.id}
       selected={selected}
@@ -111,20 +136,7 @@ export function Panel(): JSX.Element {
     />
   ));
 
-  // Hide sidebar if only one of them
-  const selectorClasses = classes(
-    'sidebar-items dome-color-frame',
-    sortedSidebars.length <= 1 && 'dome-erased'
-  );
-
-  return (
-    <div className="sidebar-view">
-      <div className={selectorClasses}>
-        {items}
-      </div>
-      {wrappers}
-    </div>
-  );
+  return <div className="sidebar-view">{wrappers}</div>;
 }
 
 // --------------------------------------------------------------------------
