@@ -27,10 +27,12 @@
 (** {2 Global declarations} *)
 (* ************************************************************************* *)
 
+let () =
+  let seed = "Frama-C." ^ System_config.Version.id_and_codename in
+  Project.init ~seed ~source:"kernel"
+
 module Debug_level = Log.Make_level(struct let default = 0 end)
 module Verbose_level = Log.Make_level(struct let default = 1 end)
-
-let () = Project.set_source "kernel"
 
 let dkey = Kernel_log.dkey_cmdline
 

@@ -266,7 +266,8 @@ let dump ~dir kf reached =
     reached ;
   G.run dot ;
   G.close dot ;
-  let out = G.layout dot in
+  let async = System_config.is_gui () in
+  let out = G.layout ~async dot in
   Wp_parameters.result "Reached Graph: %s" out
 
 (* ---------------------------------------------------------------------- *)

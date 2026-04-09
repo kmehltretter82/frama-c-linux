@@ -398,7 +398,8 @@ let dump_env : type a. name:string -> (_, a) env -> unit = fun ~name env ->
     let$ fout = Filesystem.with_open_out_exn dot_file in
     output_dot fout env;
   end;
-  ignore (Command.Dot.(spawn ~format:Pdf ~output:pdf_file dot_file));
+  let async = System_config.is_gui () in
+  ignore (Command.Dot.(spawn ~async ~format:Pdf ~output:pdf_file dot_file));
   Wp_parameters.debug ~dkey:dumpkey "Saving dump %s into %s.pdf" name file
 
 let env_union env1 env2 =

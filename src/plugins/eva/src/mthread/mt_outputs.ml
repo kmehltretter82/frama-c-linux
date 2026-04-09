@@ -508,7 +508,8 @@ module Html = struct
         s ThreadState.pretty th
     in
     begin
-      match Command.Dot.(spawn ~timeout:60 ~format:Svg ~output dot_file) with
+      let async = System_config.is_gui () in
+      match Command.Dot.(spawn ~async ~timeout:60 ~format:Svg ~output dot_file) with
       | Unix.WEXITED 0 -> ()
       | Unix.WEXITED code ->
         fail (Printf.sprintf "Error (code %d)" code)
@@ -561,7 +562,8 @@ module Html = struct
     let output_ext = Command.Dot.format_to_string format in
     let link_fname = Format.sprintf "%s.%s" name output_ext in
     let output = Filepath.(default_dir / link_fname) in
-    let status = Command.Dot.(spawn ~format ~output dot_file) in
+    let async = System_config.is_gui () in
+    let status = Command.Dot.(spawn ~async ~format ~output dot_file) in
     if status <> Unix.WEXITED 0 then
       Mt_self.error "Something bad happened when running dot";
     Kernel.Unicode.set unicode;
