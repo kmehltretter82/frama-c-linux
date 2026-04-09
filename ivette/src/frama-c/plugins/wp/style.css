@@ -12,7 +12,7 @@
 /* --- Panel                                                              --- */
 /* -------------------------------------------------------------------------- */
 
-.wp-panel-block {
+.wp-sidebar-block {
   max-width: 100%;
   margin: 4px 0 2px 0;
   background-color: var(--background-block-form);
@@ -20,12 +20,16 @@
   border-radius: 4px;
 }
 
-.wp-panel-block-title {
+.wp-sidebar-block-title {
   font-weight: bolder;
 }
 
-.wp-panel-prover-label {
+.wp-sidebar-prover-label {
   margin-top: 4px ;
+}
+
+.wp-sidebar .dome-xForm-section {
+  margin-top: 10px;
 }
 
 /* -------------------------------------------------------------------------- */

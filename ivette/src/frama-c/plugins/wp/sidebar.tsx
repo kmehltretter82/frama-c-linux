@@ -16,7 +16,8 @@ import {
   Checkbox,
   Button,
   SelectMenu,
-  Spinner
+  Spinner,
+  IconButton
 } from 'dome/controls/buttons';
 import { SidebarTitle } from 'dome/frame/sidebars';
 import { DivProps, Hbox, Vbox } from 'dome/layout/boxes';
@@ -37,17 +38,17 @@ function Section(p: Forms.SectionProps): JSX.Element {
   );
 }
 
-interface PanelProps extends DivProps {
+interface SidebarBlockProps extends DivProps {
   title?: string;
 }
 
-function PanelBlock(props: PanelProps): JSX.Element {
+function SidebarBlock(props: SidebarBlockProps): JSX.Element {
   const { children, title, ...others } = props;
   return (
-    <Vbox className={Utils.classes('wp-panel-block')} {...others}>
+    <Vbox className={Utils.classes('wp-sidebar-block')} {...others}>
       <Label
         label={title}
-        className={Utils.classes('wp-panel-block-title')}
+        className={Utils.classes('wp-sidebar-block-title')}
         display={!!title}
       />
       {children}
@@ -59,7 +60,7 @@ function Tools(): JSX.Element {
   const { running } = TIP.useServerActivity();
   const run = (): void => { Server.send(WP.startProofs, null); };
   const stop = (): void => { Server.send(WP.cancelProofTasks, null); };
-  const help = (): void => { showHelp('wp');}
+  const help = (): void => { showHelp('wp'); };
   return (
     <Hbox>
       <Button
@@ -100,7 +101,7 @@ function Prover(props: ProverConfig): JSX.Element {
   };
   const icon = checked ? 'SWITCH.ON' : 'SWITCH.OFF';
   const iconKind = checked ? 'positive' : 'default';
-  const className = Utils.classes('wp-panel-prover-label');
+  const className = Utils.classes('wp-sidebar-prover-label');
   const label = name + ' (' + version + ')';
   return (
     <Hbox key={prover}>
@@ -117,6 +118,8 @@ function Prover(props: ProverConfig): JSX.Element {
 
 function InteractiveSelector(): JSX.Element {
   const [inter, setInter] = States.useSyncState(WP.interactiveMode);
+  const { help } =
+    States.useRequestStable(Params.getParameterInfo, '-wp-interactive');
   const onChange = (value: string | undefined): void => {
     const mode =
       value
@@ -136,12 +139,15 @@ function InteractiveSelector(): JSX.Element {
         value={inter}
         onChange={onChange}
       >{options}</SelectMenu>
+      <IconButton icon='HELP' title={help} />
     </Label>
   );
 }
 
 function TipSelector(): JSX.Element {
   const [tipMode, setTipMode] = States.useSyncState(WP.tipMode);
+  const { help } =
+    States.useRequestStable(Params.getParameterInfo, '-wp-script');
   const onChange = (value: string | undefined): void => {
     const mode =
       value
@@ -161,6 +167,7 @@ function TipSelector(): JSX.Element {
         value={tipMode}
         onChange={onChange}
       >{options}</SelectMenu>
+      <IconButton icon='HELP' title={help} />
     </Label>
   );
 }
@@ -178,16 +185,16 @@ export function SideBar(): JSX.Element {
   const [scripts, setScripts] = States.useSyncState(WP.scripts);
   const [strategies, setStrategies] = States.useSyncState(WP.strategies);
 
+  const barClass = Utils.classes('wp-sidebar');
+
   return (
     <>
       <SidebarTitle label='Weakest Precondition'>
         <Tools />
       </SidebarTitle>
-      <Forms.SidebarForm>
-        <Section
-          label='Provers Configuration'
-        >
-          <PanelBlock title='General configuration'>
+      <Forms.SidebarForm className={barClass}>
+        <Section label='Provers Configuration' >
+          <SidebarBlock title='General configuration'>
             <Label label='Timeout' icon='CLOCK' >
               <Spinner
                 className="wp-config-field wp-config-spinner"
@@ -206,8 +213,8 @@ export function SideBar(): JSX.Element {
                 onChange={setProcesses}
               />
             </Label>
-          </PanelBlock>
-          <PanelBlock title='Automatic Provers'>
+          </SidebarBlock>
+          <SidebarBlock title='Automatic Provers'>
             {
               autoPrvs.length !== 0 ?
                 autoPrvs.map((p) =>
@@ -226,8 +233,8 @@ export function SideBar(): JSX.Element {
                   kind='negative'
                 />
             }
-          </PanelBlock>
-          <PanelBlock
+          </SidebarBlock>
+          <SidebarBlock
             title='Interactive Provers'
             display={interPrvs.length !== 0}
           >
@@ -243,12 +250,12 @@ export function SideBar(): JSX.Element {
                 />
               )
             }
-          </PanelBlock>
-          <PanelBlock
+          </SidebarBlock>
+          <SidebarBlock
             title='No Interactive Provers'
             display={interPrvs.length === 0}
           />
-          <PanelBlock title='Proof Strategies'>
+          <SidebarBlock title='Proof Strategies'>
             <TipSelector />
             <Checkbox
               label='Use scripts'
@@ -260,7 +267,7 @@ export function SideBar(): JSX.Element {
               onChange={setStrategies}
               value={strategies}
             />
-          </PanelBlock>
+          </SidebarBlock>
         </Section>
       </Forms.SidebarForm>
     </>

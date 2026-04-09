@@ -81,6 +81,44 @@ One can select by clicking on it.
 Finally, the right column contains the proof steps, one can navigate through the
 different steps of the script by clicking on the elements of the list.
 
+## Configuration panel {#wp-config}
+
+### Provers configuration {#wp-config-provers}
+
+#### General configuration
+
+- [icon-CLOCK] Timeout: stop provers after N seconds
+- [icon-SETTINGS] Processes: number of parallel prover processes
+
+#### Automatic provers
+
+Enabled automatic provers, if this list is empty it means that Why3 cannot
+detect any installed solvers. The complete list of supported solvers is
+available on Why3's website, we recommend Alt-Ergo, Colibri2, CVC5 and Z3.
+
+#### Interactive provers
+
+Enabled interactive provers, it also provides an option for the selected mode
+for interactive proofs:
+- Batch: check current proof
+- Update: check updated proof
+- Edit: edit current proof
+- Fix: check current proof and edit if needed
+- FixUpdate: update proof, check it and edit if needed
+
+#### Strategies
+
+Customize WP strategies and scripts usage. If "use scripts" is set, proofs
+scripts will be used, if "use strategies" is set, strategies can generate new
+scripts. Disabling scripts also disables strategies, enabling strategies also
+enables scripts.
+
+The mode allows configuring how proofs scripts are updated (or not):
+- Batch: proof scripts are reused but not updated (default for script prover)
+- Update: proof scripts are reused and updated (default for tip prover)
+- Init: proof scripts are generated from scratch and saved
+- Dry: proof scripts are explored from scratch and not saved
+
 ## Strategy debugger {#wp-strat-debug}
 
 **This component is not enabled by default**, it is available in the "Views &

@@ -179,6 +179,13 @@ let () = Request.register
     end
 
 let () = Request.register
+    ~package ~kind:`GET ~name:"getParameterInfo"
+    ~descr:(Md.plain "Return one parameter information")
+    ~input:(module Jstring)
+    ~output:(module ParameterData)
+    Typed_parameter.get
+
+let () = Request.register
     ~package ~kind:`GET ~name:"isSetParameter"
     ~descr:(Md.plain "Has the given parameter been set?")
     ~input:(module Jstring)
