@@ -38,6 +38,8 @@ import './style.css';
 export default function Application(): JSX.Element {
   const [sidebar, flipSidebar] =
     Dome.useFlipSettings('frama-c.sidebar.unfold', true);
+  const [sidebarPanel, setSidebarPanel] =
+    Dome.useBoolSettings('frama-c.sidebar.panel.unfold', true);
 
   const ToolBar = State.useChildren(TOOLBAR);
   const StatusBar = State.useChildren(STATUSBAR);
@@ -65,9 +67,16 @@ export default function Application(): JSX.Element {
         <Toolbar.IconPinnedMessage />
       </Toolbar.ToolBar>
       <Hfill className="application-workspace">
-        <Sidebar.Buttons display={sidebar} />
+        <Sidebar.Buttons
+          display={sidebar}
+          sidebar={sidebarPanel}
+          setSidebar={setSidebarPanel}
+        />
         <div className="sidebar-splitter">
-          <LSplit settings="frama-c.sidebar.split" unfold={sidebar}>
+          <LSplit
+            settings="frama-c.sidebar.split"
+            unfold={sidebar && sidebarPanel}
+          >
             <Sidebar.Panel />
             <Laboratory.LabView />
           </LSplit>

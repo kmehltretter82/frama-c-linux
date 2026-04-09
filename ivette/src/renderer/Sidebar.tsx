@@ -26,16 +26,25 @@ import * as State from 'ivette/state';
 interface SelectorProps extends SidebarProps {
   selected: string;
   setSelected: (item: string) => void;
+  sidebar: boolean;
+  setSidebar: (sidebar: boolean) => void;
 }
 
 function Selector(props: SelectorProps): JSX.Element {
-  const { id, icon, selected, setSelected, label } = props;
+  const { id, icon, selected, setSelected, sidebar, setSidebar, label } = props;
   const className = classes(
     'sidebar-selector',
     'dome-color-frame',
     selected === id && 'sidebar-selector-selected',
   );
-  const onClick = React.useCallback(() => setSelected(id), [setSelected, id]);
+  const onClick = React.useCallback(() => {
+    if (selected === id) {
+      setSidebar(!sidebar);
+    } else {
+      setSelected(id);
+      setSidebar(true);
+    }
+  }, [id, selected, setSelected, setSidebar, sidebar]);
   const title = props.title ?? `${label} Sidebar`;
   const component =
     icon
@@ -106,16 +115,20 @@ function useModel(): Model {
 
 interface ButtonsProps {
   display?: boolean;
+  sidebar: boolean;
+  setSidebar: (sidebar: boolean) => void;
 }
 
 export function Buttons(props: ButtonsProps): JSX.Element {
-  const { display = true } = props;
+  const { display = true, sidebar, setSidebar } = props;
   const { selected, setSelected, sidebars } = useModel();
   const items = sidebars.map((sb) => (
     <Selector
       key={sb.id}
       selected={selected}
       setSelected={setSelected}
+      sidebar={sidebar}
+      setSidebar={setSidebar}
       {...sb} />
   ));
   const selectorClasses = classes(
