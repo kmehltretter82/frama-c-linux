@@ -21,7 +21,8 @@ type index =
 
 module DISK :
 sig
-  val file_goal : pid:prop_id -> model:WpContext.model -> prover:prover -> Filepath.t
+  val file_goal : pid:prop_id -> model:WpContext.model ->
+    Why3.Driver.driver -> Why3Provers.t -> Filepath.t
 end
 
 module GOAL :

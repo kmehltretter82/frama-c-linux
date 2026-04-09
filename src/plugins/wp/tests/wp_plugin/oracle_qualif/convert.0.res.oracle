@@ -2,11 +2,12 @@
 [kernel] Parsing convert.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] 2 goals scheduled
-[wp] [Unsuccess] typed_lemma_ceil (Alt-Ergo) (Cached)
+[wp] [Valid] typed_lemma_ceil (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_lemma_floor (Alt-Ergo) (Cached)
-[wp] Proved goals:    0 / 2
-  Unsuccess:       2
+[wp] Proved goals:    1 / 2
+  Alt-Ergo:        1
+  Unsuccess:       1
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
-  Lemma                     -        -        2       0.0%
+  Lemma                     -        1        2      50.0%
 ------------------------------------------------------------

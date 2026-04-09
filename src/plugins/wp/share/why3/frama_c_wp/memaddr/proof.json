@@ -1,15 +1,15 @@
 {
-  "profile": [ { "prover": "alt-ergo@2.5.4", "size": 16, "time": 0.183 } ],
+  "profile": [],
   "proofs": {
     "MemAddr": {
-      "included_trans": { "prover": "alt-ergo@2.5.4", "time": 0.018 },
-      "separated_1": { "prover": "alt-ergo@2.5.4", "time": 0.01 },
-      "separated_included": { "prover": "alt-ergo@2.5.4", "time": 0.02 },
-      "separated_sym": { "prover": "alt-ergo@2.5.4", "time": 0.009 },
-      "separated_trans": { "prover": "alt-ergo@2.5.4", "time": 0.019 },
+      "included_trans": { "prover": "alt-ergo", "time": 0.021 },
+      "separated_1": { "prover": "alt-ergo", "time": 0.019 },
+      "separated_included": { "prover": "alt-ergo", "time": 0.024 },
+      "separated_sym": { "prover": "alt-ergo", "time": 0.023 },
+      "separated_trans": { "prover": "alt-ergo", "time": 0.016 },
       "valid_pointers_are_statically_allocated": null,
-      "valid_rw_rd": { "prover": "alt-ergo@2.5.4", "time": 0.015 },
-      "valid_string": { "prover": "alt-ergo@2.5.4", "time": 0.017 }
+      "valid_rw_rd": { "prover": "alt-ergo", "time": 0.014 },
+      "valid_string": { "prover": "alt-ergo", "time": 0.012 }
     }
   }
 }

@@ -193,6 +193,7 @@ Options taking a string as argument should preferably be written
                     when the value equals to zero (default: 60).
 -wp-out <dir>       Set working directory for generated files.
                     Defaults to system temporary directory.
+                    Can be also set with FRAMAC_WP_OUT.
 -wp-print           Pretty-prints proof obligations on standard output.
                     (opposite option is -wp-no-print)
 -wp-probes          Activate user-defines probes (@probe) (default: yes) (set

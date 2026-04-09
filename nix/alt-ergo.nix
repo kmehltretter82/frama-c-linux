@@ -12,6 +12,7 @@
 , menhir
 , ocplib-simplex
 , ppx_blob
+, ppx_deriving
 , psmt2-frontend
 , seq
 , stdlib-shims
@@ -21,11 +22,11 @@
 
 let
   pname = "alt-ergo";
-  version = "2.5.4";
+  version = "2.6.2";
 
   src = fetchurl {
     url = "https://github.com/OCamlPro/alt-ergo/releases/download/v${version}/alt-ergo-${version}.tbz";
-    sha256 = "sha256-AsHok5i62vqJ5hK8XRiD8hM6JQaFv3dMxZAcVYEim6w=";
+    sha256 = "sha256-OeLJEop9HonzMuMaJxbzWfO54akl/oHxH6SnSbXSTYI=";
   };
 in
 
@@ -42,6 +43,7 @@ let alt-ergo-lib = buildDunePackage rec {
     fmt
     ocplib-simplex
     ppx_blob
+    ppx_deriving
     seq
     stdlib-shims
     zarith

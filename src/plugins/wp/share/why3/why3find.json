@@ -1,9 +1,9 @@
 {
   "fast": 0.2,
-  "time": 1,
+  "time": 1.0,
   "depth": 4,
   "packages": [],
-  "provers": [ "alt-ergo@2.5.4" ],
+  "provers": [ "alt-ergo" ],
   "tactics": [ "split_vc", "inline_goal" ],
   "drivers": [],
   "warnoff": []

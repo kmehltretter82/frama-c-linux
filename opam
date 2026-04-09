@@ -168,7 +168,6 @@ post-messages: [
 "The Frama-C/WP plug-in requires one or more external prover(s).
 Recommended provers are:
 - Alt-Ergo (https://alt-ergo.ocamlpro.com)
-- CVC4     (https://cvc4.github.io)
 - CVC5     (https://cvc5.github.io)
 - Z3       (https://github.com/Z3Prover/z3)
 " { success }

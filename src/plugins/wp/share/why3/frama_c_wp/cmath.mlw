@@ -43,10 +43,73 @@ end
 
 theory ExpLog [@ W:non_conservative_extension:N]
 
+  use real.Real
   use real.RealInfix
-  use real.ExpLog
+
+  val function exp real : real
+  axiom Exp_zero : exp(0.0) = 1.0
+  axiom Exp_sum : forall x y:real. exp (x+y) = exp x * exp y
+  axiom exp_increasing : forall x y. x <= y -> exp(x) <= exp(y)
+  axiom exp_positive : forall x. exp(x) > 0.0
+  axiom exp_inv : forall x. exp (-x) = inv (exp x)
+  lemma exp_sum_opposite: forall x : real. exp(x) + exp(-x) >= 2.0
+
+  constant e : real = exp 1.0
+
+  val function log real : real
+  axiom Log_one : log 1.0 = 0.0
+  axiom Log_mul :
+    forall x y:real. x > 0.0 /\ y > 0.0 -> log (x*y) = log x + log y
+  axiom log_increasing : forall x y. 0.0 < x <= y -> log(x) <= log(y)
+
+  axiom Log_exp: forall x:real. log (exp x) = x
+
+  axiom Exp_log: forall x:real. x > 0.0 -> exp (log x) = x
+
+  function log2 (x : real) : real = log x / log 2.0
+  function log10 (x : real) : real = log x / log 10.0
+
+  lemma log2_increasing : forall x y. 0. < x <= y -> log2(x) <= log2(y)
+  lemma log10_increasing : forall x y. 0. < x <= y -> log10(x) <= log10(y)
 
   axiom exp_pos : forall x:real. exp x >. 0.
+
+  function pow real real : real
+
+  axiom Pow_def:
+    forall x y:real. x > 0.0 -> pow x y = exp (y * log x)
+
+  lemma Pow_pos:
+    forall x y. x > 0.0 -> pow x y > 0.0
+
+  lemma Pow_plus :
+    forall x y z. z > 0.0 -> pow z (x + y) = pow z x * pow z y
+
+  lemma Pow_mult :
+    forall x y z. x > 0.0 -> pow (pow x y) z = pow x (y * z)
+
+  lemma Pow_x_zero:
+    forall x:real. x > 0.0 -> pow x 0.0 = 1.0
+
+  lemma Pow_x_one:
+    forall x:real. x > 0.0 -> pow x 1.0 = x
+
+  lemma Pow_one_y:
+    forall y:real. pow 1.0 y = 1.0
+
+  use real.Square
+
+  lemma Pow_x_two:
+    forall x:real. x > 0.0 -> pow x 2.0 = sqr x
+
+  lemma Pow_half:
+    forall x:real. x > 0.0 -> pow x 0.5 = sqrt x
+
+  use real.FromInt
+  use int.Power
+
+  lemma pow_from_int: forall x y: int. Int.(<) 0 x -> Int.(<=) 0 y ->
+                      pow (from_int x) (from_int y) = from_int (power x y)
 
 end
 
