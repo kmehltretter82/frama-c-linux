@@ -11,6 +11,7 @@ import * as Utils from 'dome/misc/utils';
 import * as Forms from 'dome/layout/forms';
 import { Icon } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
+import { showHelp } from 'dome/help';
 import {
   Checkbox,
   Button,
@@ -58,19 +59,25 @@ function Tools(): JSX.Element {
   const { running } = TIP.useServerActivity();
   const run = (): void => { Server.send(WP.startProofs, null); };
   const stop = (): void => { Server.send(WP.cancelProofTasks, null); };
+  const help = (): void => { showHelp('wp');}
   return (
     <Hbox>
       <Button
-        icon="MEDIA.PLAY"
-        title="Start WP"
+        icon='MEDIA.PLAY'
+        title='Start WP'
         onClick={run}
         disabled={running}
       />
       <Button
-        icon="MEDIA.STOP"
-        title="Stop proof tasks"
+        icon='MEDIA.STOP'
+        title='Stop proof tasks'
         onClick={stop}
         enabled={running}
+      />
+      <Button
+        icon='HELP'
+        title='WP documentation'
+        onClick={help}
       />
     </Hbox>
   );
