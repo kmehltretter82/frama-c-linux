@@ -100,7 +100,12 @@ val command :
   ?scripts:bool ->
   ?strategies:bool ->
   t Bag.t -> unit
-(** Run the provers with the command-line interface.
-    TODO update
+(** Run proofs on the provided bag of WPOs.
+    The defaults for the different optional variables are obtained from the
+    current configuration status. That is, the command line when in CLI mode,
+    or what has been configured so far by the user in the GUI mode.
+
+    @before Frama-C+dev only provers and tip were configurable and the default
+            were computed from the CLI.
 *)
 (* -------------------------------------------------------------------------- *)

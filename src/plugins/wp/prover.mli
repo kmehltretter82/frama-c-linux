@@ -55,9 +55,9 @@ val of_name : ?fallback:bool -> string -> t option
 (* -------------------------------------------------------------------------- *)
 
 val provers : ?filter :(t -> bool) -> unit -> t list
-(** Returns *all* provers such that satisfy [filter] (which defaults to keep
-    everything). E.g. if you need only enabled solvers, it should be called with
-    the [enabled] function.
+(** Returns *all* provers that satisfy [filter] (which defaults _ -> true)
+    E.g. if you need only enabled solvers, it should be called with the
+    [enabled] function.
 
     @since Frama-C+dev
 *)
@@ -85,10 +85,10 @@ val add_scripts_update_hook : (unit -> unit) -> unit
 
 module InteractiveMode : sig
   type t =
-    | Batch  (** Only check scripts *)
-    | Update (** Check and update scripts *)
-    | Edit   (** Edit then check scripts *)
-    | Fix    (** Try check script, then edit script on non-success *)
+    | Batch     (** Only check scripts *)
+    | Update    (** Check and update scripts *)
+    | Edit      (** Edit then check scripts *)
+    | Fix       (** Try check script, then edit script on non-success *)
     | FixUpdate (** Update & Fix *)
 
   val title : t -> string
