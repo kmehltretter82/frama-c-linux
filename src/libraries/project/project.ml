@@ -7,15 +7,18 @@
 (**************************************************************************)
 
 (* ************************************************************************** *)
-(** {2 Version} *)
+(** {2 Initialization} *)
 (* ************************************************************************** *)
 
-(* Version is used when saving/loading projects to make sure they are
-   we can load them safely. *)
+let not_inilialized () =
+  failwith "Project.init must be called at least once during program initialization"
 
-let version = Extlib.mk_fun "Project.version"
+let get_source = ref not_inilialized
+let get_seed   = ref not_inilialized
 
-let set_version s = version := fun () -> s
+let init ~seed ~source =
+  get_source := (fun () -> source);
+  get_seed := (fun () -> seed)
 
 (* ************************************************************************** *)
 (** {2 Warning, debug and feedback} *)
@@ -23,18 +26,16 @@ let set_version s = version := fun () -> s
 
 let debug = ref false
 let feedback = ref false
-let source = ref "nosource"
 let warning_level = ref 2
 
 let set_debug b = debug := b
 let set_feedback b = feedback := b
-let set_source s = source := s
 let set_warn_level l = warning_level := l
 
 let pretty kind fmt msg =
   let evt = {
     Log.evt_kind = kind;
-    evt_plugin = !source;
+    evt_plugin = !get_source ();
     evt_category = Some "project";
     evt_source = None;
     evt_message = Rich_text.of_string msg;
@@ -524,7 +525,7 @@ let save_projects ?(compress = !compress_saved_session) selection projects
     (filename : Filepath.t) =
   let open Filesystem.Operators in
   let$ cout = Filesystem.Compressed.with_open_out_exn ~compress filename in
-  Channel.output_value cout (!version ());
+  Channel.output_value cout (!get_seed ());
   Channel.output_value cout magic;
   Channel.output_value cout !Graph.Blocks.cpt_vertex;
   let states : (t * (string * State.state_on_disk) list) list =
@@ -682,7 +683,7 @@ let load_projects ~project_under_copy selection ?name (filename : Filepath.t) =
           raise (IOError s)
         end
       in
-      check_magic "%S" (!version ());
+      check_magic "%S" (!get_seed ());
       check_magic "magic number %d" magic;
       let ocamlgraph_counter = Channel.input_value cin in
       let pre_existing_projects = Descr.init project_under_copy in

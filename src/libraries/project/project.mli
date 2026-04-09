@@ -30,16 +30,22 @@ type project = Project_skeleton.t =
 
 (** Type of a project. *)
 
+
+(* ************************************************************************* *)
+(** {2 Initialization} *)
+(* ************************************************************************* *)
+
+(** Initialize the project library. This function MUST be called at least once
+    during program initialization. The [seed] must be unique to a given
+    program (version included). [source] will be used for messages output with
+    the format ["[source:project] ..."].
+    @since Frama-C+dev
+*)
+val init: seed:string -> source:string -> unit
+
 (* ************************************************************************* *)
 (** {2 Options} *)
 (* ************************************************************************* *)
-
-(** Set the version of the tool which load/save projects. This MUST be set
-    once before doing any operations on projects.
-    @since Frama-C+dev
-*)
-val set_version: string -> unit
-[@@alert project_version "This must be set once before using projects."]
 
 (** If set to [true], prints debug information about projects.
     @since Frama-C+dev
@@ -50,11 +56,6 @@ val set_debug: bool -> unit
     @since Frama-C+dev
 *)
 val set_feedback: bool -> unit
-
-(** Set the "source" of printed messages. Defaults to ["nosource"]
-    @since Frama-C+dev
-*)
-val set_source: string -> unit
 
 (** Decide how warnings should be handled:
     - <= 0 -> ignored
