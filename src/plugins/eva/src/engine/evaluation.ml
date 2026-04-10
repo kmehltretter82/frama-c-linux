@@ -435,7 +435,7 @@ module Make
     truncate_lower_bound overflow_kind expr range value >>= fun value ->
     truncate_upper_bound overflow_kind expr range value
 
-  let handle_integer_overflow context expr range value =
+  let handle_integer_overflow ~warn context expr range value =
     let signed = range.Eval_typ.i_signed in
     let signed_overflow = signed && Kernel.SignedOverflow.get () in
     let unsigned_overflow = not signed && Kernel.UnsignedOverflow.get () in
@@ -444,7 +444,7 @@ module Make
       truncate_integer overflow_kind expr range value
     else
       let v = Value.rewrap_integer context range value in
-      if range.Eval_typ.i_signed && not (Value.equal value v) then
+      if warn && range.Eval_typ.i_signed && not (Value.equal value v) then
         Self.warning ~wkey:Self.wkey_signed_overflow
           ~current:true ~once:true "2's complement assumed for overflow" ;
       return v
@@ -501,7 +501,8 @@ module Make
     let range = Eval_typ.pointer_range () in
     Value.rewrap_integer context range value
 
-  let handle_overflow ~may_overflow context expr typ value =
+  (* If [warn] is true, emit warning if assuming 2's complement for overflow. *)
+  let handle_overflow ~warn ~may_overflow context expr typ value =
     match Eval_typ.classify_as_scalar typ with
     | Some (Eval_typ.TSInt range) ->
       (* If the operation cannot overflow, truncates the abstract value to the
@@ -511,7 +512,7 @@ module Make
          the parameters of the analysis. *)
       if not may_overflow
       then fst (truncate_integer Alarms.Signed expr range value), Alarmset.none
-      else handle_integer_overflow context expr range value
+      else handle_integer_overflow ~warn context expr range value
     | Some (Eval_typ.TSFloat fk) -> remove_special_float expr fk value
     | Some (Eval_typ.TSPtr _) -> assume_pointer context expr value
     | None -> return value
@@ -974,7 +975,8 @@ module Make
       let* v, volatile = root_forward_eval env e in
       let* v = forward_unop env.context ~typ_res op (e, v) in
       let may_overflow = op = Neg in
-      let v = handle_overflow ~may_overflow env.context expr typ_res v in
+      let warn = not env.oracle_evaluation in
+      let v = handle_overflow ~warn ~may_overflow env.context expr typ_res v in
       compute_reduction v volatile
 
     | BinOp (op, e1, e2, typ_res) ->
@@ -982,7 +984,8 @@ module Make
       let* v2, volatile2 = root_forward_eval env e2 in
       let* v = forward_binop env.context ~typ_res (e1, v1) op (e2, v2) in
       let may_overflow = may_overflow op in
-      let v = handle_overflow ~may_overflow env.context expr typ_res v in
+      let warn = not env.oracle_evaluation in
+      let v = handle_overflow ~warn ~may_overflow env.context expr typ_res v in
       compute_reduction v (volatile1 || volatile2)
 
     | CastE (dst_typ, e) ->
