@@ -26,7 +26,7 @@ VERSION=$(shell $(SED) -e 's/\\(.*\\)/\\1/' $(FRAMAC_SRC)/VERSION)
 VERSION_CODENAME=$(shell cat $(FRAMAC_SRC)/VERSION_CODENAME)
 VERSION_SAFE=$(subst ~,-,$(VERSION))
 
-ifeq ($(findstring +dev,$(VERSION)),+dev)
+ifeq ($(findstring ~dev,$(VERSION)),~dev)
 
 # Development version, generate the manuals
 default: all
