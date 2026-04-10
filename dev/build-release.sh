@@ -20,7 +20,7 @@
 #   - 'manuals' directory (with all manuals incl. acsl + version text files)
 # Availability of the files is checked when the script starts. The script also
 # checks that:
-#   - the version is stable (VERSION file does not contain '+dev')
+#   - the version is stable (VERSION file does not contain '~dev')
 #   - the commit is tagged with the version (if it contains ~, replaced by -)
 #   - releases/<VERSION_MAJOR>.<VERSION_MINOR>.md exists
 # The script generates the following directories:
@@ -93,7 +93,7 @@ else
 fi
 PREVIOUS_NAME=$(git show "$PREVIOUS_TAG":VERSION_CODENAME)
 
-if [ "$VERSION_MODIFIER" == "+dev" ]; then
+if [ "$VERSION_MODIFIER" == "~dev" ]; then
   echo "Development version ($VERSION)"
   echo_red "Aborting"
   exit 2
