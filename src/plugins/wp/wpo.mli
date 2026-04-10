@@ -83,10 +83,10 @@ val get_label : t -> string
 val get_model : t -> WpContext.model
 val get_scope : t -> WpContext.scope
 val get_context : t -> WpContext.context
-val get_file_logout : t -> prover -> Filepath.t
+val get_file_logout : t -> Prover.t -> Filepath.t
 (** only filename, might not exists *)
 
-val get_file_logerr : t -> prover -> Filepath.t
+val get_file_logerr : t -> Prover.t -> Filepath.t
 (** only filename, might not exists *)
 
 val qed_time : t -> float
@@ -103,7 +103,7 @@ val reduce : t -> bool
 val resolve : t -> bool
 (** tries simplification and set result if valid *)
 
-val set_result : t -> prover -> result -> unit
+val set_result : t -> Prover.t -> result -> unit
 val clear_results : t -> unit
 
 val add_modified_hook : (t -> unit) -> unit
@@ -132,16 +132,16 @@ val compute : t -> Definitions.axioms option * Conditions.sequent
 *)
 
 (** Definite result for this prover (not computing) *)
-val has_verdict : t -> prover -> bool
+val has_verdict : t -> Prover.t -> bool
 
 (** Raw prover result (without any respect to smoke tests) *)
-val get_result : t -> prover -> result
+val get_result : t -> Prover.t -> result
 
 (** Return all results (without any respect to smoke tests). *)
-val get_results : t -> (prover * result) list
+val get_results : t -> (Prover.t * result) list
 
 (** Return all prover results (without any respect to smoke tests). *)
-val get_prover_results : t -> (prover * result) list
+val get_prover_results : t -> (Prover.t * result) list
 
 (** Consolidated wrt to associated property and smoke test. *)
 val get_proof : t -> [`Passed|`Failed|`Unknown] * Property.t

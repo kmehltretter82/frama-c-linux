@@ -6,259 +6,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
-(* --- Library for Running Provers                                        --- *)
-(* -------------------------------------------------------------------------- *)
-
-open Task
-
-let dkey_prover = Wp_parameters.register_category "prover"
-
-(* -------------------------------------------------------------------------- *)
-(* --- Export Printer                                                     --- *)
-(* -------------------------------------------------------------------------- *)
-
-class printer fmt title =
-  let bar = String.make 50 '-' in
-  object(self)
-    val mutable lastpar = true
-    initializer
-      begin
-        Format.fprintf fmt "(* ----%s---- *)@\n" bar ;
-        Format.fprintf fmt "(* --- %-50s --- *)@\n" title ;
-        Format.fprintf fmt "(* ----%s---- *)@\n" bar ;
-      end
-    method paragraph =
-      Format.pp_print_newline fmt () ;
-      lastpar <- true
-    method lines =
-      if lastpar then
-        Format.pp_print_newline fmt () ;
-      lastpar <- false
-    method hline =
-      self#paragraph ;
-      Format.fprintf fmt "(* %s *)@\n" bar
-    method section s =
-      self#paragraph ;
-      Format.fprintf fmt "(* --- %-20s --- *)@\n" s
-    method printf : 'a. ('a,Format.formatter,unit) format -> 'a =
-      fun msg -> Format.fprintf fmt msg
-  end
-
-(* -------------------------------------------------------------------------- *)
-(* --- Buffer Validation                                                  --- *)
-(* -------------------------------------------------------------------------- *)
-
-class type pattern =
-  object
-    method get_after : ?offset:int -> int -> string
-    method get_string : int -> string
-    method get_int : int -> int
-    method get_float : int -> float
-  end
-
-class group text =
-  object
-    method search re pos =
-      ignore (Str.search_forward re text pos)
-
-    method next = Str.match_end ()
-
-    method get_after ?(offset=0) k =
-      try
-        let n = String.length text in
-        let p = Str.group_end k + offset + 1 in
-        if p >= n then "" else String.sub text p (n-p)
-      with Not_found -> ""
-    method get_string k = try Str.matched_group k text with Not_found -> ""
-    method get_int k =
-      try int_of_string (Str.matched_group k text)
-      with Not_found | Failure _ -> 0
-    method get_float k =
-      try float_of_string (Str.matched_group k text)
-      with Not_found | Failure _ -> 0.0
-  end
-
-let rec validate_pattern ((re,all,job) as p) group pos =
-  group#search re pos ;
-  job (group :> pattern) ;
-  if all then validate_pattern p group group#next
-
-let validate_buffer buffer validers =
-  let text = Buffer.contents buffer in
-  let group = new group text in
-  List.iter
-    (fun pattern ->
-       try validate_pattern pattern group 0
-       with Not_found -> ()
-    ) validers
-
-let dump_buffer buffer = function
-  | None -> ()
-  | Some log ->
-    let n = Buffer.length buffer in
-    if n > 0 then
-      Filesystem.with_open_out_exn log
-        (fun out -> Buffer.output_buffer out buffer)
-    else if Wp_parameters.Output.exists () then
-      Filesystem.remove_file log
-
-let echo_buffer buffer =
-  let n = Buffer.length buffer in
-  if n > 0 then
-    Log.print_on_output
-      (fun fmt ->
-         Format.pp_print_string fmt (Buffer.contents buffer) ;
-         Format.pp_print_flush fmt () ;
-      )
-
-let location file line = {
-  Lexing.pos_fname = file ;
-  Lexing.pos_lnum = line ;
-  Lexing.pos_bol = 0 ;
-  Lexing.pos_cnum = 0 ;
-}
-
-let pp_file ~message ~file =
-  if Filesystem.exists file then
-    Log.print_on_output
-      begin fun fmt ->
-        let bar = String.make 60 '-' in
-        Format.fprintf fmt "%s@\n" bar ;
-        Format.fprintf fmt "--- %s :@\n" message ;
-        Format.fprintf fmt "%s@\n" bar ;
-        Command.pp_from_file fmt file ;
-        Format.fprintf fmt "%s@\n" bar ;
-      end
-
-(* -------------------------------------------------------------------------- *)
-(* --- Prover Task                                                        --- *)
-(* -------------------------------------------------------------------------- *)
-
-let p_group p = Printf.sprintf "\\(%s\\)" p
-let p_int = "\\([0-9]+\\)"
-let p_float = "\\([0-9.]+\\)"
-let p_string = "\"\\([^\"]*\\)\""
-let p_until_space = "\\([^ \t\n]*\\)"
-
-type logs = [ `OUT | `ERR | `BOTH ]
-
-let is_out = function `OUT | `BOTH -> true | `ERR -> false
-let is_err = function `ERR | `BOTH -> true | `OUT -> false
-
-let is_opt a = String.length a > 0 && a.[0] = '-'
-
-let rec pp_args fmt = function
-  | [] -> ()
-  | a::b::c::w when is_opt a && not (is_opt b) && not (is_opt c) ->
-    Format.fprintf fmt "@ @[<hov 2>%s@ %S@ %S@]" a b c ;
-    pp_args fmt w
-  | a::b::w when is_opt a && not (is_opt b) ->
-    Format.fprintf fmt "@ @[<hov 2>%s@ %S@]" a b ;
-    pp_args fmt w
-  | a::w when is_opt a ->
-    Format.fprintf fmt "@ %s" a ;
-    pp_args fmt w
-  | a::w->
-    Format.fprintf fmt "@ %S" a ;
-    pp_args fmt w
-
-class command name =
-  object
-
-    val mutable once = true
-    val mutable cmd = name
-    val mutable param : string list = []
-    val mutable timeout = 0.0
-    val mutable validout = []
-    val mutable validerr = []
-    val mutable timers = []
-    val stdout = Buffer.create 256
-    val stderr = Buffer.create 256
-
-    method command = cmd :: param
-    method pretty fmt =
-      Format.pp_print_string fmt cmd ; pp_args fmt param
-
-    method set_command name = cmd <- name
-    method add args = param <- param @ args
-
-    method add_parameter ~name phi =
-      if phi () then param <- param @ [name]
-
-    method add_int ~name ~value =
-      param <- param @ [ name ; string_of_int value ]
-
-    method add_positive ~name ~value =
-      if value > 0 then param <- param @ [ name ; string_of_int value ]
-
-    method add_float ~name ~value =
-      param <- param @ [ name ; string_of_float value ]
-
-    method add_list ~name values =
-      List.iter (fun v -> param <- param @ [ name ; v ]) values
-
-    method timeout t = timeout <- t
-
-    method validate_pattern ?(logs=`BOTH) ?(repeat=false)
-        regexp (handler : pattern -> unit) =
-      begin
-        let v = [regexp,repeat,handler] in
-        if is_out (logs:logs) then validout <- validout @ v ;
-        if is_err (logs:logs) then validerr <- validerr @ v ;
-      end
-
-    method validate_time phi = timers <- timers @ [phi]
-
-    method run ?(echo=false) ?logout ?logerr () : int Task.task =
-      assert once ; once <- false ;
-      let time = ref 0.0 in
-      Buffer.clear stdout ;
-      Buffer.clear stderr ;
-      Task.command ~timeout ~time ~stdout ~stderr cmd param
-      >>?
-      begin fun st -> (* finally *)
-        if Wp_parameters.has_dkey dkey_prover then
-          Log.print_on_output
-            begin fun fmt ->
-              Format.fprintf fmt "@[<hov 2>RUN '%s%a'@]@." cmd pp_args param ;
-              Format.fprintf fmt "RESULT %a@." (Task.pretty Format.pp_print_int) st ;
-              Format.fprintf fmt "OUT:@\n%s" (Buffer.contents stdout) ;
-              Format.fprintf fmt "ERR:@\n%sEND@." (Buffer.contents stderr) ;
-            end ;
-        dump_buffer stdout logout ;
-        dump_buffer stderr logerr ;
-        if echo then
-          begin match st with
-            | Task.Result 0 | Task.Canceled | Task.Timeout _ -> ()
-            | Task.Result 127 ->
-              begin
-                Wp_parameters.error "Command '%s' not found (exit status 127)@." cmd ;
-                echo_buffer stdout ;
-                echo_buffer stderr ;
-              end
-            | Task.Result s ->
-              begin
-                Wp_parameters.error "Command '%s' exits with status [%d]@." cmd s ;
-                echo_buffer stdout ;
-                echo_buffer stderr ;
-              end
-            | Task.Failed exn ->
-              begin
-                Wp_parameters.error "Command '%s' fails: %s@." cmd (Task.error exn) ;
-                echo_buffer stdout ;
-                echo_buffer stderr ;
-              end
-          end ;
-        let t = !time in
-        List.iter (fun phi -> phi t) timers ;
-        validate_buffer stderr validerr ;
-        validate_buffer stdout validout ;
-        Buffer.clear stdout ;
-        Buffer.clear stderr ;
-      end
-
-  end
+let (>>=) = Task.(>>=)
+let (>>>) = Task.(>>>)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Task Server                                                        --- *)
@@ -283,12 +32,25 @@ let server ?procs () =
 (* --- Task Composition                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let schedule task =
-  let server = server () in
-  Task.spawn server (Task.thread task)
+let dispatch ?(config=VCS.default) mode prover wpo =
+  begin
+    match prover with
+    | Prover.Qed | Tactical -> Task.return VCS.no_result
+    | Why3 prover ->
+      let smoke = Wpo.is_smoke_test wpo in
+      let kf = match Wpo.get_scope wpo with
+        | Global -> None
+        | Kf kf -> Some kf
+      in
+      ProverWhy3.prove
+        ~timeout:(VCS.get_timeout ?kf ~smoke config)
+        ~steplimit:(VCS.get_stepout config)
+        ~memlimit:(VCS.get_memlimit config)
+        ~mode ~prover wpo
+  end
 
 let silent _ = ()
-let spawn ?(monitor=silent) ~all ~smoke
+let spawn_task ?(monitor=silent) ~all ~smoke
     (jobs : ('a * bool Task.task) list) =
   if jobs <> [] then
     begin
@@ -323,3 +85,104 @@ let spawn ?(monitor=silent) ~all ~smoke
       let server = server () in
       List.iter (Task.spawn server) !monitored ;
     end
+
+let started ?start wpo =
+  match start with
+  | None -> ()
+  | Some f -> f wpo
+
+let signal ?progress wpo msg =
+  match progress with
+  | None -> ()
+  | Some f -> f wpo msg
+
+let update ?result wpo prover res =
+  Wpo.set_result wpo prover res ;
+  match result with
+  | None -> ()
+  | Some f -> f wpo prover res
+
+let simplify ?start ?result ?(commit=false) wpo =
+  Server.Main.async
+    (fun wpo ->
+       let r = Wpo.get_result wpo Prover.Qed in
+       VCS.( r.verdict == Valid ) ||
+       begin
+         started ?start wpo ;
+         let ok = Wpo.reduce wpo in
+         if commit || ok then
+           let time = Wpo.qed_time wpo in
+           let verdict = if ok then VCS.Valid else VCS.Unknown in
+           let presult = VCS.result ~time verdict in
+           (update ?result wpo Prover.Qed presult ; ok)
+         else false
+       end)
+    wpo
+
+let run_prover wpo ?config ?(mode=Prover.InteractiveMode.Batch) ?progress ?result prover =
+  signal ?progress wpo (Prover.ident prover) ;
+  dispatch ?config mode prover wpo >>>
+  fun status ->
+  let res = match status with
+    | Task.Result r -> r
+    | Task.Canceled -> VCS.no_result
+    | Task.Timeout t -> VCS.timeout t
+    | Task.Failed exn ->
+      let msg = Task.error exn in
+      Wp_parameters.warning ~current:false
+        "@[<hov 2>Goal %s:@ running prover %s failed (%s)@]"
+        (Wpo.get_label wpo) (Prover.ident prover) msg ;
+      VCS.failed msg
+  in
+  let res = { res with solver_time = Wpo.qed_time wpo } in
+  update ?result wpo prover res ;
+  Task.return (VCS.is_valid res)
+
+let prove wpo ?config ?mode ?start ?progress ?result prover =
+  simplify ?start ?result wpo >>= fun succeed ->
+  if succeed
+  then Task.return true
+  else (run_prover wpo ?config ?mode ?progress ?result prover)
+
+let spawn wpo ~delayed
+    ?config ?start ?progress ?result ?success provers =
+  let provers = List.filter (fun (_,p) -> p <> Prover.Qed) provers in
+  if provers<>[] then
+    let monitor = match success with
+      | None -> None
+      | Some on_success ->
+        Some
+          begin function
+            | None -> on_success wpo None
+            | Some prover ->
+              let r = Wpo.get_result wpo Prover.Qed in
+              let prover =
+                if VCS.( r.verdict == Valid ) then Prover.Qed else prover in
+              on_success wpo (Some prover)
+          end in
+    let process (mode,prover) =
+      prove wpo ?config ~mode ?start ?progress ?result prover in
+    let all = Wp_parameters.RunAllProvers.get() in
+    let smoke = Wpo.is_smoke_test wpo in
+    spawn_task ?monitor ~all ~smoke
+      (List.map
+         (fun mp ->
+            let prover = snd mp in
+            let task = if delayed then Task.later process mp else process mp in
+            prover , task
+         ) provers)
+  else
+    let process = simplify ?start ?result ~commit:true wpo >>= fun ok ->
+      begin
+        match success with
+        | None -> ()
+        | Some on_success ->
+          on_success wpo (if ok then Some Prover.Qed else None) ;
+      end ;
+      Task.return ()
+    in
+    let thread = Task.thread process in
+    let server = server () in
+    Task.spawn server thread
+
+(* -------------------------------------------------------------------------- *)

@@ -90,7 +90,7 @@ class engine : #Plang.engine ->
 
     method get_ce_mode : bool
     method set_ce_mode : bool -> unit
-    method update_ce_models : (VCS.prover, VCS.model) Hashtbl.t -> unit
+    method update_ce_models : (Prover.t, VCS.model) Hashtbl.t -> unit
 
   end
 

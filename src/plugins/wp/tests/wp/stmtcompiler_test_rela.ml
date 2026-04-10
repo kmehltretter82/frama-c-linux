@@ -18,20 +18,20 @@ let run () =
 
   let provers =
     List.fold_right
-      (fun pname prvs -> match VCS.parse_prover pname with
+      (fun pname prvs -> match Prover.parse pname with
          | None -> prvs
-         | Some VCS.Tactical -> prvs
-         | Some prv -> (VCS.Batch, prv) :: prvs)
+         | Some Prover.Tactical -> prvs
+         | Some prv -> (Prover.InteractiveMode.Batch, prv) :: prvs)
       ["Alt-Ergo"] []
   in
 
   let spawn goal =
     let result _ prv res =
       Format.printf "[%a] %t@.@\n"
-        VCS.pp_prover prv (VCS.pp_result_qualif prv res)
+        Prover.pretty prv (VCS.pp_result_qualif prv res)
     in
     let server = ProverTask.server () in
-    Prover.spawn goal ~delayed:true ~result provers;
+    ProverTask.spawn goal ~delayed:true ~result provers;
     Task.launch server
   in
 

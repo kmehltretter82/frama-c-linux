@@ -211,7 +211,7 @@ class engine (lang : #Plang.engine) =
 
     val mutable models = Hashtbl.create 1
 
-    method update_ce_models (table: (VCS.prover, VCS.model) Hashtbl.t) =
+    method update_ce_models (table: (Prover.t, VCS.model) Hashtbl.t) =
       models <- table
 
     method private pp_probe_model fmt p =
@@ -224,7 +224,7 @@ class engine (lang : #Plang.engine) =
         let pp_prover_model fmt (p, model) =
           Format.fprintf fmt "= %a (%s)"
             (Pretty_utils.pp_opt ~none:"?" Why3Provers.pp_model) model
-            (VCS.title_of_prover ~version:false p)
+            (Prover.title ~version:false p)
         in
         Format.fprintf fmt " @{<wp:comment>(* %a *)@}"
           (Pretty_utils.pp_list ~sep:", " ~empty:"no model" pp_prover_model)

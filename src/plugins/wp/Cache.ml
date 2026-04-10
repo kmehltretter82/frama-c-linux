@@ -191,7 +191,7 @@ let set_cache_result ~mode hash prover result =
     try
       let file = file_from_hash hash in
       mark_cache ~mode hash ;
-      ProofScript.json_of_result (VCS.Why3 prover) result
+      ProofScript.json_of_result (Prover.Why3 prover) result
       |> Json.save_file file
     with err ->
       Wp_parameters.warning ~current:false ~once:true

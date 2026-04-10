@@ -1343,10 +1343,8 @@ let call_prover_task ~timeout ~steps ~config ~probes prover call =
 (* -------------------------------------------------------------------------- *)
 
 let output_task wpo drv ?(script : Filepath.t option) prover task =
-  let file = Wpo.DISK.file_goal
-      ~pid:wpo.Wpo.po_pid
-      ~model:wpo.Wpo.po_model
-      drv prover in
+  let file =
+    Wpo.DISK.file_goal ~pid:wpo.Wpo.po_pid ~model:wpo.Wpo.po_model drv prover in
   let open Filesystem.Operators in
   let$ fmt = Filesystem.with_formatter_exn file in
   let pp_header fmt msg data =
@@ -1457,7 +1455,7 @@ let compile ~script ~timeout ~memlimit ~config pconf driver prover task =
 
 let prepare ~mode wpo driver task =
   let ext = Filename.extension (Why3.Driver.file_of_task driver "S" "T" task) in
-  let force = mode <> VCS.Batch in
+  let force = mode <> Prover.InteractiveMode.Batch in
   let script = scriptfile ~force wpo ~ext in
   if Filesystem.exists script then Some (script, true) else
   if force then
@@ -1486,23 +1484,23 @@ let interactive ~mode ~config wpo pconf driver prover task =
       (if merge then "Found" else "New")
       Why3.Whyconf.print_prover prover (Filepath.to_string_abs script) ;
     match mode with
-    | VCS.Batch ->
+    | Prover.InteractiveMode.Batch ->
       compile ~script ~timeout ~memlimit ~config pconf driver prover task
-    | VCS.Update ->
+    | Update ->
       if merge then updatescript ~script driver task ;
       compile ~script ~timeout ~memlimit ~config pconf driver prover task
-    | VCS.Edit ->
+    | Edit ->
       let open Task in
       editor ~script ~merge ~config pconf driver task >>= fun _ ->
       compile ~script ~timeout ~memlimit ~config pconf driver prover task
-    | VCS.Fix ->
+    | Fix ->
       let open Task in
       compile ~script ~timeout ~memlimit ~config pconf driver prover task
       >>= fun r ->
       if VCS.is_valid r then return r else
         editor ~script ~merge ~config pconf driver task >>= fun _ ->
         compile ~script ~timeout ~memlimit ~config pconf driver prover task
-    | VCS.FixUpdate ->
+    | FixUpdate ->
       let open Task in
       if merge then updatescript ~script driver task ;
       compile ~script ~timeout ~memlimit ~config pconf driver prover task
@@ -1549,7 +1547,7 @@ let print_debug_task wpo drv prover task =
   else
     Wp_parameters.feedback "%a" pp_task task
 
-let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ?memlimit
+let build_proof_task ?(mode=Prover.InteractiveMode.Batch) ?timeout ?steplimit ?memlimit
     ~prover wpo () =
   try
     (* Always generate common task *)

@@ -535,8 +535,7 @@ let runProvers ?mode ?timeout ?provers node =
     | None -> Wp_parameters.Timeout.get () in
   let mode = match mode with
     | Some mode -> mode
-    | None -> VCS.parse_mode @@ Wp_parameters.Interactive.get () in
-  Kernel.feedback "Run prover with mode %a" VCS.pp_mode mode ;
+    | None -> Prover.InteractiveMode.get () in
   let config =
     let cfg = VCS.current () in
     { cfg with timeout = Some (float timeout) } in
@@ -545,11 +544,11 @@ let runProvers ?mode ?timeout ?provers node =
       (fun prv ->
          let backup = Wpo.get_result wpo prv in
          let result _ p r =
-           if p = VCS.Qed && VCS.is_valid r then
+           if p = Prover.Qed && VCS.is_valid r then
              Wpo.set_result wpo prv VCS.no_result
            else if not @@ VCS.is_verdict r then
              Wpo.set_result wpo prv backup in
-         let process () = Prover.prove ~config ~mode ~result wpo prv in
+         let process () = ProverTask.prove ~config ~mode ~result wpo prv in
          let thread = Task.thread @@ Task.later process () in
          let status = VCS.computing (fun () -> Task.cancel thread) in
          Wpo.set_result wpo prv status ;
@@ -587,7 +586,7 @@ let killProvers ?provers node =
   let filter =
     match provers with
     | None | Some [] -> fun _ -> true
-    | Some prvs -> fun p -> List.exists (VCS.eq_prover p) prvs
+    | Some prvs -> fun p -> List.exists (Prover.equal p) prvs
   in
   List.iter
     (fun (prv,res) ->
@@ -614,7 +613,7 @@ let () =
 
 let clearProvers ?provers node =
   let wpo = ProofEngine.goal node in
-  let clear p = if VCS.is_extern p then Wpo.set_result wpo p VCS.no_result in
+  let clear p = if Prover.is_extern p then Wpo.set_result wpo p VCS.no_result in
   begin
     match provers with
     | None -> List.iter (fun (prv,_) -> clear prv) @@ Wpo.get_results wpo ;

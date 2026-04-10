@@ -97,10 +97,10 @@ struct
     tree : ProofEngine.tree ;
     valid : bool ; (* play valid provers *)
     failed : bool ; (* play failed provers *)
-    provers : VCS.prover list ;
+    provers : Prover.t list ;
     progress : Wpo.t -> string -> unit ;
-    result : Wpo.t -> VCS.prover -> VCS.result -> unit ;
-    success : Wpo.t -> VCS.prover option -> unit ;
+    result : Wpo.t -> Prover.t -> VCS.result -> unit ;
+    success : Wpo.t -> Prover.t option -> unit ;
     depth : int ;
     width : int ;
     auto : Strategy.heuristic list ; (* DEPRECATED *)
@@ -137,7 +137,7 @@ struct
           List.iter
             (fun (prv,res) -> env.result wpo prv res)
             (Wpo.get_results wpo) ;
-          env.success wpo (if proved then Some VCS.Tactical else None)
+          env.success wpo (if proved then Some Prover.Tactical else None)
         end
 
   let goal env = function
@@ -145,7 +145,7 @@ struct
     | None -> ProofEngine.main env.tree
 
   let prove env wpo ?config prover =
-    Prover.prove wpo ?config ~mode:VCS.Batch
+    ProverTask.prove wpo ?config ~mode:Prover.InteractiveMode.Batch
       ~progress:env.progress prover
 
   let backtracking env =
@@ -532,10 +532,10 @@ let task
     ~start ~progress ~result ~success wpo =
   begin fun () ->
     Wp_parameters.debug ~dkey:dkey_pp_allgoals "%a" Wpo.pp_goal_flow wpo ;
-    Prover.simplify ~start ~result wpo >>= fun succeed ->
+    ProverTask.simplify ~start ~result wpo >>= fun succeed ->
     if succeed
     then
-      ( success wpo (Some VCS.Qed) ; Task.return ())
+      ( success wpo (Some Prover.Qed) ; Task.return ())
     else
       let script =
         if scratch then [] else
@@ -557,14 +557,14 @@ let task
 (* -------------------------------------------------------------------------- *)
 
 type 'a process =
-  ?valid:bool -> ?failed:bool -> ?scratch:bool -> ?provers:VCS.prover list ->
+  ?valid:bool -> ?failed:bool -> ?scratch:bool -> ?provers:Prover.t list ->
   ?depth:int -> ?width:int -> ?backtrack:int ->
   ?auto:Strategy.heuristic list ->
   ?strategies:bool ->
   ?start:(Wpo.t -> unit) ->
   ?progress:(Wpo.t -> string -> unit) ->
-  ?result:(Wpo.t -> VCS.prover -> VCS.result -> unit) ->
-  ?success:(Wpo.t -> VCS.prover option -> unit) ->
+  ?result:(Wpo.t -> Prover.t -> VCS.result -> unit) ->
+  ?success:(Wpo.t -> Prover.t option -> unit) ->
   Wpo.t -> 'a
 
 let skip1 _ = ()

@@ -200,29 +200,6 @@ function NavBar(props: NavBarProps): JSX.Element {
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Available Provers                                                  --- */
-/* -------------------------------------------------------------------------- */
-
-interface ProverConfig {
-  available: WP.ProverInfosData[];
-  provers: WP.prover[];
-  setProvers: (prvs: WP.prover[]) => void;
-}
-
-export function popupProvers(config: ProverConfig): void {
-  const { available, provers, setProvers } = config;
-  Dome.popupMenu(
-    available.map(({ prover: id, descr: label }) => {
-      const checked = provers.some(p => p === id);
-      const updated =
-        checked ? provers.filter(p => p !== id) : provers.concat(id);
-      const onClick = (): void => setProvers(updated);
-      return { id, label, checked, onClick };
-    })
-  );
-}
-
-/* -------------------------------------------------------------------------- */
 /* --- Active Tasks                                                       --- */
 /* -------------------------------------------------------------------------- */
 
@@ -466,8 +443,6 @@ export function TIPView(props: TIPProps): JSX.Element {
   const { saved, proof, script } =
     States.useRequestStable(TIP.getScriptStatus, goal);
   // --- provers
-  const available = States.useSyncArrayData(WP.ProverInfos);
-  const [provers = [], setProvers] = States.useSyncState(WP.provers);
   const server = useServerActivity();
   // --- sidebar & toolbar states
   const [copied, setCopied] = React.useState(false);
@@ -517,11 +492,6 @@ export function TIPView(props: TIPProps): JSX.Element {
     setTactic(tac);
     setProver(undefined);
   }, []);
-
-  // --- prover selection
-  const onProverSelection = (): void => {
-    popupProvers({ available, provers, setProvers });
-  };
 
   // --- Delete button
   const deleteAble = locked || children.length > 0;
@@ -626,10 +596,6 @@ export function TIPView(props: TIPProps): JSX.Element {
             title={nextTitle}
             onClick={onNext} />
         </ButtonGroup>
-        <Button
-          icon='SETTINGS'
-          title='Active Provers Selection'
-          onClick={onProverSelection} />
         <Button
           icon='MEDIA.HALT'
           kind='negative'

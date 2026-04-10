@@ -69,15 +69,16 @@ let generate_kf ?model ?bhv ?prop kf =
 let generate_call ?model stmt =
   (generator model)#compute_call stmt
 
+let generate_all ?model ?bhv ?prop () =
+  (generator model)#compute_main ~fct:Fct_all ?bhv ?prop ()
+
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Interface                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let prove = Prover.prove
-let spawn = Prover.spawn ~delayed:true
-
+let prove = ProverTask.prove
+let spawn = ProverTask.spawn ~delayed:true
 let server = ProverTask.server
-let command ?provers ?tip vcs =
-  Register.do_wp_proofs ?provers ?tip vcs
+let command = Register.do_wp_proofs
 
 (* -------------------------------------------------------------------------- *)

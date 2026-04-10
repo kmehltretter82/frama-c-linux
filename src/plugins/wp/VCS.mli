@@ -10,45 +10,6 @@
 (** Verification Condition Status *)
 (* -------------------------------------------------------------------------- *)
 
-(** {2 Prover} *)
-
-type prover =
-  | Why3 of Why3Provers.t (** Prover via WHY *)
-  | Qed           (** Qed Solver *)
-  | Tactical      (** Interactive Prover *)
-
-type mode =
-  | Batch  (** Only check scripts *)
-  | Update (** Check and update scripts *)
-  | Edit   (** Edit then check scripts *)
-  | Fix    (** Try check script, then edit script on non-success *)
-  | FixUpdate (** Update & Fix *)
-
-module Pset : Set.S with type elt = prover
-module Pmap : Map.S with type key = prover
-
-(** Mainstream installed provers *)
-val provers : unit -> prover list
-
-val name_of_prover : prover -> string
-val title_of_prover : ?version:bool -> prover -> string
-val filename_for_prover : prover -> string
-val title_of_mode : mode -> string
-
-val parse_mode : string -> mode
-
-(** For the command line *)
-val parse_prover : string -> prover option
-
-(** For scripts *)
-val prover_of_name : ?fallback:bool -> string -> prover option
-
-val pp_prover : Format.formatter -> prover -> unit
-val pp_mode : Format.formatter -> mode -> unit
-
-val eq_prover : prover -> prover -> bool
-val cmp_prover : prover -> prover -> int
-
 (* -------------------------------------------------------------------------- *)
 (** {2 Config}
     [None] means current WP option default.
@@ -113,11 +74,6 @@ val cached : result -> result (** only for true verdicts *)
 val result : ?model:model -> ?cached:bool ->
   ?solver:float -> ?time:float -> ?steps:int -> verdict -> result
 
-val is_auto : prover -> bool
-val has_counter_examples : prover -> bool
-val is_prover : prover -> bool
-val is_extern : prover -> bool
-
 val is_result : verdict -> bool
 val is_proved: smoke:bool -> verdict -> bool
 
@@ -137,11 +93,9 @@ val name_of_verdict : ?computing:bool -> verdict -> string
 
 val pp_result : Format.formatter -> result -> unit
 val pp_model : Format.formatter -> model -> unit
-val pp_result_qualif : ?updating:bool -> prover -> result ->
+val pp_result_qualif : ?updating:bool -> Prover.t -> result ->
   Format.formatter -> unit
 
 val conjunction : verdict -> verdict -> verdict (* for tactic children *)
 val compare : result -> result -> int (* minimal is best *)
-val best : (prover * result) list -> prover * result
-
-val dkey_shell: Wp_parameters.category
+val best : (Prover.t * result) list -> Prover.t * result

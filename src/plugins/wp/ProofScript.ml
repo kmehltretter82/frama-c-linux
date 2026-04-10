@@ -335,9 +335,9 @@ let verdict_of_json = function
   | `String "invalid" -> VCS.Invalid
   | _ -> VCS.NoResult
 
-let json_of_result (p : VCS.prover) (r : VCS.result) =
+let json_of_result (p : Prover.t) (r : VCS.result) =
   let open VCS in
-  let name = "prover" , `String (VCS.name_of_prover p) in
+  let name = "prover" , `String (Prover.ident p) in
   let verdict = "verdict" , json_of_verdict r.verdict in
   let time = if r.prover_time > 0.0 then [ "time" , `Float r.prover_time ] else [] in
   let steps = if r.prover_steps > 0 then [ "steps" , `Int r.prover_steps ] else [] in
@@ -346,7 +346,7 @@ let json_of_result (p : VCS.prover) (r : VCS.result) =
 let prover_of_json js =
   match js >? "prover" |> Json.string with
   | exception Not_found -> None
-  | pname -> VCS.prover_of_name ~fallback:true pname
+  | pname -> Prover.of_name ~fallback:true pname
 
 let result_of_json js =
   let verdict = try js >? "verdict" |> verdict_of_json with _ -> VCS.NoResult in
@@ -360,7 +360,7 @@ let result_of_json js =
 
 type jscript = alternative list
 and alternative =
-  | Prover of VCS.prover * VCS.result
+  | Prover of Prover.t * VCS.result
   | Tactic of int * jtactic * (string * jscript) list (* pending goals *)
   | Error of string * Json.t
 

@@ -363,7 +363,7 @@ let resolve_auto name =
   with Not_found -> None
 
 let resolve_prover name =
-  VCS.parse_prover name.value
+  Prover.parse name.value
 
 let resolve_tactic name =
   try Some (Tactical.lookup ~id:name.value)

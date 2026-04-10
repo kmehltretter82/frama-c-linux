@@ -17,6 +17,8 @@ module S = Server.States
 module Md = Markdown
 module AST = Server.Kernel_ast
 
+module WP_Prover = Prover
+
 let package = P.package ~plugin:"wp" ~title:"WP Main Services" ()
 
 (* -------------------------------------------------------------------------- *)
@@ -53,17 +55,17 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
-(* --- VCS Provers                                                        --- *)
+(* --- Provers                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
 module Prover =
 struct
-  type t = VCS.prover
+  type t = Prover.t
   let jtype = D.declare ~package ~name:"prover"
       ~descr:(Md.plain "Prover Identifier") (Jkey "prover")
-  let to_json prv = `String (VCS.name_of_prover prv)
+  let to_json prv = `String (WP_Prover.ident prv)
   let of_json js =
-    match VCS.parse_prover @@ Json.string js with
+    match Prover.parse @@ Json.string js with
     | Some prv -> prv
     | None -> D.failure "Unknown prover name"
 end
@@ -71,35 +73,56 @@ end
 module Provers = D.Jlist(Prover)
 
 let signal = ref None
-let provers = ref None
 
 let getProvers () =
-  match !provers with
-  | Some prvs -> prvs
-  | None ->
-    let cmdline =
-      match Wp_parameters.Provers.get () with
-      | [] -> [ "Alt-Ergo" ]
-      | prvs -> prvs in
-    let parse s =
-      match VCS.parse_prover s with
-      | None -> None
-      | Some (Qed | Tactical) -> None
-      | Some prv as result -> if VCS.is_auto prv then result else None in
-    let selection = List.filter_map parse cmdline in
-    provers := Some selection ; selection
-
-let updProvers prv = provers := Some prv
-let setProvers prv = updProvers prv ; Option.iter (fun s -> R.emit s) !signal
+  List.filter WP_Prover.is_extern @@ WP_Prover.provers ()
 
 let () =
+  R.register ~package
+    ~name:"setProverState"
+    ~descr:(Md.plain "Select/unselect prover")
+    ~kind:`SET
+    ~input:(module D.Jpair(Prover)(D.Jbool))
+    ~output:(module D.Junit)
+    begin fun (p, v) ->
+      WP_Prover.set_prover p ~state:v ;
+      Option.iter R.emit !signal
+    end
+
+let _ =
   let s =
-    S.register_state ~package ~name:"provers"
-      ~descr:(Md.plain "Selected Provers")
-      ~data:(module Provers)
-      ~get:getProvers
-      ~set:updProvers ()
-  in signal := Some s
+    S.register_value
+      ~package ~name:"provers"
+      ~descr:(Md.plain "Get all available provers")
+      ~output:(module Provers)
+      ~get:(fun () -> getProvers())
+      ()
+  in
+  signal := Some s
+
+let _ : WP_Prover.t S.array =
+  let model = S.model () in
+  S.column ~name:"name" ~descr:(Md.plain "Prover Name")
+    ~data:(module D.Jalpha) ~get:WP_Prover.name model ;
+  S.column ~name:"version" ~descr:(Md.plain "Prover Version")
+    ~data:(module D.Jalpha) ~get:WP_Prover.version model ;
+  S.column ~name:"descr" ~descr:(Md.plain "Prover Full Name (description)")
+    ~data:(module D.Jalpha) ~get:(WP_Prover.title ~version:true) model ;
+  S.column model ~name:"extern" ~descr:(Md.plain "Why3 or internal")
+    ~data:(module D.Jbool) ~get:WP_Prover.is_extern ;
+  S.column model ~name:"auto" ~descr:(Md.plain "Automatic solver")
+    ~data:(module D.Jbool) ~get:WP_Prover.is_auto ;
+  S.column model ~name:"active" ~descr:(Md.plain "Whether it is enabled")
+    ~data:(module D.Jbool) ~get:WP_Prover.enabled ;
+  S.register_array ~package
+    ~name:"ProverInfos" ~descr:(Md.plain "Available Provers")
+    ~key:WP_Prover.ident
+    ~keyName:"prover"
+    ~keyType:Prover.jtype
+    ~iter:(fun f -> List.iter f @@ WP_Prover.provers ())
+    ~add_update_hook:WP_Prover.add_prover_update_hook
+    ~add_reload_hook:WP_Prover.add_reload_hook
+    model
 
 (* -------------------------------------------------------------------------- *)
 (* --- Server Processes                                                   --- *)
@@ -130,40 +153,6 @@ let _ =
     ~add_hook:Wp_parameters.Timeout.add_hook_on_update ()
 
 (* -------------------------------------------------------------------------- *)
-(* --- Available Provers                                                  --- *)
-(* -------------------------------------------------------------------------- *)
-
-let get_name = function
-  | VCS.Qed -> "Qed"
-  | VCS.Tactical -> "Script"
-  | VCS.Why3 p -> Why3Provers.name p
-
-let get_version = function
-  | VCS.Qed | Tactical -> System_config.Version.id_and_codename
-  | Why3 p -> Why3Provers.version p
-
-let iter_provers fn =
-  List.iter
-    (fun p ->
-       if Why3Provers.is_mainstream p then fn (VCS.Why3 p))
-  @@ Why3Provers.provers ()
-
-let _ : VCS.prover S.array =
-  let model = S.model () in
-  S.column ~name:"name" ~descr:(Md.plain "Prover Name")
-    ~data:(module D.Jalpha) ~get:get_name model ;
-  S.column ~name:"version" ~descr:(Md.plain "Prover Version")
-    ~data:(module D.Jalpha) ~get:get_version model ;
-  S.column ~name:"descr" ~descr:(Md.plain "Prover Full Name (description)")
-    ~data:(module D.Jalpha) ~get:(VCS.title_of_prover ~version:true) model ;
-  S.register_array ~package
-    ~name:"ProverInfos" ~descr:(Md.plain "Available Provers")
-    ~key:VCS.name_of_prover
-    ~keyName:"prover"
-    ~keyType:Prover.jtype
-    ~iter:iter_provers model
-
-(* -------------------------------------------------------------------------- *)
 (* --- Interactive provers                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -173,28 +162,28 @@ let _ =
     ~descr:(Md.plain "Tells whether the prover is interactive")
     ~input:(module Prover)
     ~output:(module D.Jbool)
-    (fun p -> not @@ VCS.is_auto p)
+    (fun p -> not @@ WP_Prover.is_auto p)
 
 module InteractiveMode =
 struct
   include D.Enum
 
-  let dictionary : VCS.mode dictionary = dictionary ()
+  let dictionary : WP_Prover.InteractiveMode.t dictionary = dictionary ()
 
-  let tag name descr value = tag ~name ~descr:(Md.plain descr) ~value dictionary
+  let tag name value = tag ~name ~descr:(Md.plain name) ~value dictionary
 
-  let batch  = tag "batch"  "Batch"     VCS.Batch
-  let update = tag "update" "Update"    VCS.Update
-  let edit   = tag "edit"   "Edit"      VCS.Edit
-  let fix    = tag "fix"    "Fix"       VCS.Fix
-  let fixup  = tag "fixup"  "FixUpdate" VCS.FixUpdate
+  let batch  = tag "Batch"     WP_Prover.InteractiveMode.Batch
+  let update = tag "Update"    WP_Prover.InteractiveMode.Update
+  let edit   = tag "Edit"      WP_Prover.InteractiveMode.Edit
+  let fix    = tag "Fix"       WP_Prover.InteractiveMode.Fix
+  let fixup  = tag "FixUpdate" WP_Prover.InteractiveMode.FixUpdate
 
   let lookup = function
-    | VCS.Batch -> batch
-    | VCS.Update -> update
-    | VCS.Edit -> edit
-    | VCS.Fix -> fix
-    | VCS.FixUpdate -> fixup
+    | WP_Prover.InteractiveMode.Batch -> batch
+    | Update -> update
+    | Edit -> edit
+    | Fix -> fix
+    | FixUpdate -> fixup
 
   let () =
     set_lookup dictionary lookup
@@ -206,6 +195,80 @@ struct
         ~name:"InteractiveMode"
         dictionary)
 end
+
+let _ =
+  S.register_state ~package
+    ~name:"interactiveMode"
+    ~descr:(Md.plain "Current interactive mode")
+    ~data:(module InteractiveMode)
+    ~get:WP_Prover.InteractiveMode.get
+    ~set:WP_Prover.InteractiveMode.set
+    ~add_hook:WP_Prover.InteractiveMode.add_hook_on_update
+    ()
+
+(* -------------------------------------------------------------------------- *)
+(* --- Proof Strategies                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+module TipMode =
+struct
+  include D.Enum
+
+  let dictionary : WP_Prover.TipMode.t dictionary = dictionary ()
+
+  let tag name value = tag ~name ~descr:(Md.plain name) ~value dictionary
+
+  let batch  = tag "Batch"  WP_Prover.TipMode.Batch
+  let update = tag "Update" WP_Prover.TipMode.Update
+  let dry    = tag "Dry"    WP_Prover.TipMode.Dry
+  let init   = tag "Init"   WP_Prover.TipMode.Init
+
+  let lookup = function
+    | WP_Prover.TipMode.Batch -> batch
+    | Update -> update
+    | Dry -> dry
+    | Init -> init
+
+  let () =
+    set_lookup dictionary lookup
+
+  include
+    (val publish
+        ~package
+        ~descr:(Md.plain "TIP mode")
+        ~name:"TipMode"
+        dictionary)
+end
+
+let _ =
+  S.register_state ~package
+    ~name:"tipMode"
+    ~descr:(Md.plain "Current Strategy Mode")
+    ~data:(module TipMode)
+    ~get:WP_Prover.TipMode.get
+    ~set:WP_Prover.TipMode.set
+    ~add_hook:WP_Prover.TipMode.add_hook_on_update
+    ()
+
+let _ =
+  S.register_state ~package
+    ~name:"scripts"
+    ~descr:(Md.plain "Whether scripts are enabled")
+    ~data:(module D.Jbool)
+    ~get:WP_Prover.use_scripts
+    ~set:WP_Prover.set_use_scripts
+    ~add_hook:WP_Prover.add_scripts_update_hook
+    ()
+
+let _ =
+  S.register_state ~package
+    ~name:"strategies"
+    ~descr:(Md.plain "Whether strategies are enabled")
+    ~data:(module D.Jbool)
+    ~get:WP_Prover.use_strategies
+    ~set:WP_Prover.set_use_strategies
+    ~add_hook:WP_Prover.add_scripts_update_hook
+    ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Counter Examples                                                   --- *)
@@ -489,31 +552,35 @@ let is_call stmt =
   | Instr (Call _) | Instr (Local_init (_, ConsInit _, _)) -> true
   | _ -> false
 
+let start_proofs_marker = function
+  | Printer_tag.PExp _  | PTermLval _ | PLval _
+  | PGlobal _ | PType _ | PVDecl (None, _, _) ->
+    (* We cannot run anything here *) ()
+  | PStmtStart (_, stmt) | PStmt (_, stmt) when is_call stmt ->
+    VC.command @@ VC.generate_call stmt
+  | PStmtStart (kf, stmt) | PStmt (kf, stmt) ->
+    let fold_ips _ ca bag =
+      let ids = WpPropId.mk_code_annot_ids kf stmt ca in
+      let props = Bag.ulist @@
+        List.map VC.generate_ip @@
+        List.map WpPropId.property_of_id ids
+      in
+      Bag.concat bag props
+    in
+    VC.command @@ Annotations.fold_code_annot fold_ips stmt Bag.empty
+  | PVDecl (Some kf, _, _) ->
+    VC.command @@ VC.generate_kf kf
+  | PIP property ->
+    VC.command @@ VC.generate_ip property
+
 let () =
   R.register ~package ~kind:`EXEC ~name:"startProofs"
     ~descr:(Md.plain "Generate goals and run provers")
-    ~input:(module AST.Marker)
+    ~input:(module D.Joption(AST.Marker))
     ~output:(module D.Junit)
     begin function
-      | PExp _  | PTermLval _ | PLval _
-      | PGlobal _ | PType _ | PVDecl (None, _, _) ->
-        (* We cannot run anything here *) ()
-      | PStmtStart (_, stmt) | PStmt (_, stmt) when is_call stmt ->
-        VC.command @@ VC.generate_call stmt
-      | PStmtStart (kf, stmt) | PStmt (kf, stmt) ->
-        let fold_ips _ ca bag =
-          let ids = WpPropId.mk_code_annot_ids kf stmt ca in
-          let props = Bag.ulist @@
-            List.map VC.generate_ip @@
-            List.map WpPropId.property_of_id ids
-          in
-          Bag.concat bag props
-        in
-        VC.command @@ Annotations.fold_code_annot fold_ips stmt Bag.empty
-      | PVDecl (Some kf, _, _) ->
-        VC.command @@ VC.generate_kf kf
-      | PIP property ->
-        VC.command @@ VC.generate_ip property
+      | None -> VC.command @@ VC.generate_all ()
+      | Some marker -> start_proofs_marker marker
     end
 
 (* -------------------------------------------------------------------------- *)

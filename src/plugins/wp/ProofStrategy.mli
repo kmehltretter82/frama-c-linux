@@ -68,7 +68,7 @@ val configure:
 val iter : (strategy -> unit) -> unit
 val default : unit -> strategy list
 val alternatives : strategy -> alternative loc list
-val provers : ?default:VCS.prover list -> alternative loc -> VCS.prover list * float
+val provers : ?default:Prover.t list -> alternative loc -> Prover.t list * float
 val auto : alternative loc -> Strategy.heuristic option
 val fallback : alternative loc -> strategy option
 val tactic : tree -> node -> strategy -> alternative loc -> node list option

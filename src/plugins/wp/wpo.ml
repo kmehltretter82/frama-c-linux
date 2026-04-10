@@ -63,7 +63,7 @@ struct
     let fmt = Format.formatter_of_buffer buffer in
     Format.fprintf fmt "%s/%s" (Filepath.to_string_abs mid) id ;
     (match prover with None -> () | Some p ->
-        Format.fprintf fmt "_%s" (filename_for_prover p)) ;
+        Format.fprintf fmt "_%s" (Prover.filename_for p)) ;
     (match suffix with None -> () | Some s ->
         Format.fprintf fmt "_%s" s) ;
     Format.fprintf fmt ".%s" ext ;
@@ -286,7 +286,7 @@ struct
         (fun (prover,result) ->
            if result.verdict <> NoResult then
              Format.fprintf fmt "Prover %a returns %t@\n"
-               pp_prover prover
+               Prover.pretty prover
                (pp_result_qualif prover result) ;
            if Wp_parameters.CounterExamples.get () then
              pp_model fmt result.prover_model
@@ -390,10 +390,10 @@ module WpoType = S
 module ProverType =
   Datatype.Make
     (struct
-      type t = prover
+      type t = Prover.t
       include Datatype.Undefined
       let name = "Wpo.prover"
-      let reprs = [ Qed ]
+      let reprs = [ Prover.Qed ]
     end)
 
 module ResultType =
@@ -431,31 +431,31 @@ module Results =
 struct
 
   type t = {
-    mutable dps : result Pmap.t ;
+    mutable dps : result Prover.Pmap.t ;
   }
 
-  let create () = { dps = Pmap.empty }
+  let create () = { dps = Prover.Pmap.empty }
 
   let get w p =
-    Pmap.find p w.dps
+    Prover.Pmap.find p w.dps
 
   let clear w =
-    Pmap.iter (fun _ r ->
+    Prover.Pmap.iter (fun _ r ->
         match r.verdict with
         | VCS.Computing kill -> kill ()
         | _ -> ()
       ) w.dps ;
-    w.dps <- Pmap.empty
+    w.dps <- Prover.Pmap.empty
 
   let replace w p r =
     begin
-      if p = Qed then
-        (w.dps <- Pmap.filter (fun _ r -> VCS.is_verdict r) w.dps) ;
-      w.dps <- Pmap.add p r w.dps
+      if p = Prover.Qed then
+        (w.dps <- Prover.Pmap.filter (fun _ r -> VCS.is_verdict r) w.dps) ;
+      w.dps <- Prover.Pmap.add p r w.dps
     end
 
   let list w =
-    List.filter (fun (_,r) -> not @@ VCS.is_none r) @@ Pmap.bindings w.dps
+    List.filter (fun (_,r) -> not @@ VCS.is_none r) @@ Prover.Pmap.bindings w.dps
 
 end
 
@@ -592,7 +592,7 @@ let add g =
         Gmap.iter
           (fun _ ws -> WPOset.iter (fun _ -> incr added) ws)
           system.wpo_idx ;
-        if not (Wp_parameters.has_dkey VCS.dkey_shell) then
+        if not (Wp_parameters.has_dkey Prover.dkey_shell) then
           Wp_parameters.feedback ~ontty:`Feedback "Computing [%d goals...]" !added ;
         added := 0 ;
       end ;
@@ -711,7 +711,7 @@ let get_results g =
   with Not_found -> []
 
 let get_prover_results g =
-  List.filter (fun (p,_) -> VCS.is_prover p) @@ get_results g
+  List.filter (fun (p,_) -> not @@ Prover.is_tactical p) @@ get_results g
 
 let is_trivial g =
   VC_Annot.is_trivial g.po_formula
@@ -724,7 +724,7 @@ let resolve g =
   let valid = reduce g in
   if valid then
     let result = VCS.result ~solver:(qed_time g) VCS.Valid in
-    ( set_result g VCS.Qed result ; true )
+    ( set_result g Prover.Qed result ; true )
   else false
 
 let computed g =
@@ -745,7 +745,8 @@ let is_fully_valid g =
 
 let is_locally_valid g =
   is_trivial g ||
-  List.exists (fun (p,r) -> VCS.is_prover p && VCS.is_valid r) @@ get_results g
+  List.exists
+    (fun (p,r) -> not (Prover.is_tactical p) && VCS.is_valid r) @@ get_results g
 
 let all_not_valid g =
   not (is_trivial g) &&
@@ -760,7 +761,8 @@ let is_passed g =
 let has_unknown g =
   not (is_fully_valid g) &&
   List.exists
-    (fun (p,r) -> VCS.is_prover p && VCS.is_verdict r && not (VCS.is_valid r))
+    (fun (p,r) ->
+       not (Prover.is_tactical p) && VCS.is_verdict r && not (VCS.is_valid r))
     (get_results g)
 
 (* -------------------------------------------------------------------------- *)

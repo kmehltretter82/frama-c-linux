@@ -14,7 +14,7 @@ val add_specific_equality:
 
 (** Return NoResult if it is already proved by Qed *)
 val prove :
-  ?mode:VCS.mode ->
+  ?mode:Prover.InteractiveMode.t ->
   ?timeout:float ->
   ?steplimit:int ->
   ?memlimit:int ->
