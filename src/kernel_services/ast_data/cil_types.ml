@@ -39,7 +39,7 @@ type unop =
   | Neg   (** Unary minus *)
   | BNot  (** Bitwise complement (~) *)
   | LNot  (** Logical Not (!) *)
-[@@deriving eq]
+[@@deriving eq, show { with_path = false } ]
 
 (** Binary operations *)
 type binop =
@@ -73,7 +73,7 @@ type binop =
                  {!Machine.use_logical_operators}. *)
   | LOr      (** logical or. Like [LAnd] this operator is removed unless
                  {!Kernel.LogicalOperators} is set. *)
-[@@deriving eq]
+[@@deriving eq, show { with_path = false } ]
 
 (* ************************************************************************* *)
 (** {3 Types} *)
@@ -95,7 +95,7 @@ type ikind =
   | IULongLong  (** [unsigned long long] (or [unsigned _int64] on MSVC) *)
   | IInt128     (** [__int128] (GCC extension) *)
   | IUInt128    (** [unsigned __int128] (GCC extension) *)
-[@@deriving eq]
+[@@deriving eq, show { with_path = false } ]
 
 (** Various kinds of floating-point numbers. Constructors are re-exported here
     so that we only need to open {!Cil_types} to access them, without the
@@ -109,14 +109,14 @@ type fkind = Floating_point.fkind =
   | FFloat64    (** [binary64] *)
   | FDouble     (** [double] *)
   | FLongDouble (** [long double] *)
-[@@deriving eq]
+[@@deriving eq, show { with_path = false } ]
 
 (* ************************************************************************* *)
 (** {3 Logic} *)
 (* ************************************************************************* *)
 
 type predicate_kind = Assert | Check | Admit
-[@@deriving eq]
+[@@deriving eq, show { with_path = false } ]
 
 (** builtin logic labels defined in ACSL. *)
 type logic_builtin_label =
@@ -127,7 +127,7 @@ type logic_builtin_label =
   | LoopEntry
   | LoopCurrent
   | Init
-[@@deriving eq]
+[@@deriving eq, show { with_path = false } ]
 
 (** comparison relations*)
 type relation =
@@ -140,11 +140,11 @@ type relation =
   (** Different
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
   *)
-[@@deriving eq]
+[@@deriving eq, show { with_path = false } ]
 
 (** kind of termination a post-condition applies to. See ACSL manual. *)
 type termination_kind = Normal | Exits | Breaks | Continues | Returns
-[@@deriving eq]
+[@@deriving eq, show { with_path = false } ]
 
 (* ************************************************************************* *)
 (** {3 C implementation} *)
@@ -152,7 +152,7 @@ type termination_kind = Normal | Exits | Breaks | Continues | Returns
 
 type standard_or_gcc =
   [ `Standard | `GCC ]
-[@@deriving eq,ord]
+[@@deriving eq,ord, show { with_path = false } ]
 
 (* ************************************************************************* *)
 (** {2 Root of the AST} *)
@@ -187,6 +187,9 @@ type file = {
       create a global initialization CIL will try to insert code in main to
       call it. *)
 }
+(* This attribute is common for all types in the mutually recursive group of
+   types so we only need to mention it once. *)
+[@@deriving show { with_path = false } ]
 
 (** The main type for representing global declarations and definitions. A list
     of these form a CIL file. The order of globals in the file is generally
@@ -1888,6 +1891,7 @@ and global_annotation =
 type kinstr =
   | Kstmt of stmt
   | Kglobal
+[@@deriving show { with_path = false } ]
 
 (** Internal representation of decorated C functions *)
 type cil_function =
@@ -1898,6 +1902,7 @@ type cil_function =
       with the [TFun] constructor of {!Cil_types.typ}, the arg list is
       optional, to distinguish [void f()] ([None]) from
       [void f(void)] ([Some []]). *)
+[@@deriving show { with_path = false } ]
 
 (** Only field [fundec] can be used directly. Use {!Annotations.funspec},
     [Annotations.add_*] and [Annotations.remove_*] to query or modify field
@@ -1906,6 +1911,7 @@ type kernel_function = {
   mutable fundec : cil_function;
   mutable spec : funspec;
 }
+[@@deriving show { with_path = false } ]
 
 (** Various syntactic scopes through which an identifier might be searched.
     Note that for this purpose static variables are still tied to the block
@@ -1932,3 +1938,4 @@ type syntactic_scope =
       the block to which it is tied, will be considered.
       @since 27.0-Cobalt
   *)
+[@@deriving show { with_path = false } ]

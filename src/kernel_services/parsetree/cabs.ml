@@ -21,6 +21,7 @@
 *)
 
 type cabsloc = Filepos.t * Filepos.t
+[@@deriving show { with_path = false } ]
 
 type typeSpecifier = (* Merge all specifiers into one type *)
   | Tvoid                             (* Type specifier ISO 6.7.2 *)
@@ -48,6 +49,9 @@ type typeSpecifier = (* Merge all specifiers into one type *)
   | Tenum of string * enum_item list option * attribute list
   | TtypeofE of expression                      (* GCC __typeof__ *)
   | TtypeofT of specifier * decl_type       (* GCC __typeof__ *)
+(* This attribute is common for all types in the mutually recursive group of
+   types so we only need to mention it once. *)
+[@@deriving show { with_path = false } ]
 
 and storage =
   | NO_STORAGE | AUTO | STATIC | EXTERN | REGISTER
@@ -303,7 +307,6 @@ and initwhat =
   | INFIELD_INIT of string * initwhat
   | ATINDEX_INIT of expression * initwhat
   | ATINDEXRANGE_INIT of expression * expression
-
 
 (* Each attribute has a name and some
  * optional arguments *)

@@ -897,7 +897,7 @@ let rec global_annot_pass1 g =
 
 (* invalid C name. Can't clash with anything. *)
 let enumInfoName kind =
-  Format.asprintf "!!!%aEnumInfo!!!" Cil_types_debug.pp_ikind kind
+  Format.asprintf "!!!%aEnumInfo!!!" Cil_types.pp_ikind kind
 
 (* Some enumerations have to be turned into an integer. We implement this by
  * introducing a special enumeration type which we'll recognize later to be

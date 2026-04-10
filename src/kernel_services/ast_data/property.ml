@@ -14,106 +14,112 @@ open Cil_types
 open Cil_datatype
 
 type behavior_or_loop =
-    Id_contract of Datatype.String.Set.t * funbehavior
+  | Id_contract of (Datatype.String.Set.t [@printer Datatype.String.Set.pretty])
+                   * funbehavior
   | Id_loop of code_annotation
+[@@deriving show { with_path = false} ]
 
 type identified_code_annotation = {
   ica_kf : kernel_function;
   ica_stmt : stmt;
   ica_ca : code_annotation
-}
+} [@@deriving show { with_path = false} ]
 
 type identified_assigns = {
   ias_kf : kernel_function;
   ias_kinstr : kinstr;
   ias_bhv : behavior_or_loop;
   ias_froms : from list
-}
+} [@@deriving show { with_path = false} ]
 
 type identified_allocation = {
   ial_kf : kernel_function;
   ial_kinstr : kinstr;
   ial_bhv : behavior_or_loop;
   ial_allocs : identified_term list * identified_term list
-}
+} [@@deriving show { with_path = false} ]
 
 type identified_from = {
   if_kf : kernel_function;
   if_kinstr : kinstr;
   if_bhv : behavior_or_loop;
   if_from : from
-}
+} [@@deriving show { with_path = false} ]
 
 type identified_decrease = {
   id_kf : kernel_function;
   id_kinstr : kinstr;
   id_ca : code_annotation option;
   id_variant : variant
-}
+} [@@deriving show { with_path = false} ]
 
 type identified_behavior = {
   ib_kf : kernel_function;
   ib_kinstr : kinstr;
-  ib_active : Datatype.String.Set.t;
+  ib_active : Datatype.String.Set.t; [@printer Datatype.String.Set.pretty]
   ib_bhv : funbehavior
-}
+} [@@deriving show { with_path = false} ]
 
 type identified_complete = {
   ic_kf : kernel_function;
   ic_kinstr : kinstr;
-  ic_active : Datatype.String.Set.t;
-  ic_bhvs : Datatype.String.Set.t
-}
+  ic_active : Datatype.String.Set.t; [@printer Datatype.String.Set.pretty]
+  ic_bhvs : Datatype.String.Set.t [@printer Datatype.String.Set.pretty]
+} [@@deriving show { with_path = false} ]
 
 type identified_disjoint = identified_complete
+[@@deriving show { with_path = false} ]
 
 type predicate_kind =
   | PKRequires of funbehavior
   | PKAssumes of funbehavior
   | PKEnsures of funbehavior * termination_kind
   | PKTerminates
+[@@deriving show { with_path = false} ]
 
 type identified_predicate = {
   ip_kind : predicate_kind;
   ip_kf : kernel_function;
   ip_kinstr : kinstr;
   ip_pred : Cil_types.identified_predicate
-}
+} [@@deriving show { with_path = false} ]
 
-type program_point = Before | After
+type program_point = Before | After [@@deriving show { with_path = false} ]
 
 type identified_reachable = {
   ir_kf : kernel_function option;
   ir_kinstr : kinstr;
   ir_program_point : program_point
-}
+} [@@deriving show { with_path = false} ]
 
 type other_loc =
   | OLContract of kernel_function
   | OLStmt of kernel_function * stmt
   | OLGlob of location
+[@@deriving show { with_path = false} ]
 
 type extended_loc =
   | ELContract of kernel_function
   | ELStmt of kernel_function * stmt
   | ELGlob
+[@@deriving show { with_path = false} ]
 
 type identified_extended = {
   ie_loc : extended_loc;
   ie_ext : Cil_types.acsl_extension
-}
+} [@@deriving show { with_path = false} ]
 
 and identified_axiomatic = {
   iax_name : string;
   iax_props : identified_property list;
   iax_attrs : attributes;
-}
+} [@@deriving show { with_path = false} ]
 
 and identified_module = {
   im_name : string;
   im_props : identified_property list;
   im_attrs : attributes;
-}
+} [@@deriving show { with_path = false} ]
 
 and identified_lemma = {
   il_name : string;
@@ -122,32 +128,32 @@ and identified_lemma = {
   il_pred : toplevel_predicate;
   il_attrs : attributes;
   il_loc : location
-}
+} [@@deriving show { with_path = false} ]
 
 and identified_instance = {
   ii_kf : kernel_function;
   ii_stmt : stmt;
   ii_pred : Cil_types.identified_predicate option;
   ii_ip : identified_property
-}
+} [@@deriving show { with_path = false} ]
 
 and identified_type_invariant = {
   iti_name : string;
   iti_type : typ;
   iti_pred : predicate;
   iti_loc : location
-}
+} [@@deriving show { with_path = false} ]
 
 and identified_global_invariant = {
   igi_name : string;
   igi_pred : predicate;
   igi_loc : location
-}
+} [@@deriving show { with_path = false} ]
 
 and identified_other = {
   io_name : string;
   io_loc : other_loc
-}
+} [@@deriving show { with_path = false} ]
 
 and identified_property =
   | IPPredicate of identified_predicate
@@ -168,6 +174,7 @@ and identified_property =
   | IPTypeInvariant of identified_type_invariant
   | IPGlobalInvariant of identified_global_invariant
   | IPOther of identified_other
+[@@deriving show { with_path = false} ]
 
 let pretty_predicate_kind fmt = function
   | PKRequires _ -> Format.pp_print_string fmt "requires"
@@ -951,160 +958,8 @@ let rec short_pretty fmt p = match p with
       pretty_instance_location (ii_kf, ii_stmt)
   | IPReachable _ | IPOther _ -> pretty fmt p
 
-let pp_behavior_or_loop_debug fmt = function
-  | Id_contract(s,fb) ->
-    Format.fprintf fmt "Id_contract(%a,%a)"
-      Datatype.String.Set.pretty s
-      Cil_types_debug.pp_funbehavior fb
-  | Id_loop ca ->
-    Format.fprintf fmt "Id_loop(%a)"
-      Cil_types_debug.pp_code_annotation ca
-
-let pp_predicate_type_debug fmt = function
-  | PKRequires fb ->
-    Format.fprintf fmt "PKRequires(%a)"
-      Cil_types_debug.pp_funbehavior fb
-  | PKAssumes fb ->
-    Format.fprintf fmt "PKAssumes(%a)"
-      Cil_types_debug.pp_funbehavior fb
-  | PKEnsures (fb, tk) ->
-    Format.fprintf fmt "PKEnsures(%a,%a)"
-      Cil_types_debug.pp_funbehavior fb
-      Cil_types_debug.pp_termination_kind tk
-  | PKTerminates ->
-    Format.fprintf fmt "PKTerminates"
-
-let pp_program_point fmt = function
-  | Before -> Format.fprintf fmt "Before"
-  | After -> Format.fprintf fmt "After"
-
-let pp_extended_loc fmt = function
-  | ELContract kf ->
-    Format.fprintf fmt "ELContract(%a)"
-      Cil_types_debug.pp_kernel_function kf
-  | ELStmt(kf,s) ->
-    Format.fprintf fmt "ELStmt(%a,%a)"
-      Cil_types_debug.pp_kernel_function kf
-      Cil_types_debug.pp_stmt s
-  | ELGlob -> Format.pp_print_string fmt "ELGlob"
-
-let pp_other_loc fmt = function
-  | OLContract kf ->
-    Format.fprintf fmt "ELContract(%a)"
-      Cil_types_debug.pp_kernel_function kf
-  | OLStmt (kf,s) ->
-    Format.fprintf fmt "ELStmt(%a,%a)"
-      Cil_types_debug.pp_kernel_function kf
-      Cil_types_debug.pp_stmt s
-  | OLGlob loc ->
-    Format.fprintf fmt "OLGlob(%a)" Cil_types_debug.pp_location loc
-
-
-let rec pretty_debug fmt = function
-  | IPPredicate {ip_kind;ip_kf;ip_kinstr;ip_pred} ->
-    Format.fprintf fmt "IPPredicate(%a,%a,%a,%a)"
-      pp_predicate_type_debug ip_kind
-      Cil_types_debug.pp_kernel_function ip_kf
-      Cil_types_debug.pp_kinstr ip_kinstr
-      Cil_types_debug.pp_identified_predicate ip_pred
-  | IPExtended {ie_ext;ie_loc} ->
-    Format.fprintf fmt "IPExtended(%a,%a)"
-      pp_extended_loc ie_loc
-      Cil_types_debug.pp_acsl_extension ie_ext
-  | IPCodeAnnot {ica_kf; ica_stmt; ica_ca} ->
-    Format.fprintf fmt "IPCodeAnnot(%a,%a,%a)"
-      Cil_types_debug.pp_kernel_function ica_kf
-      Cil_types_debug.pp_stmt ica_stmt
-      Cil_types_debug.pp_code_annotation ica_ca
-  | IPComplete {ic_kf; ic_kinstr; ic_active; ic_bhvs} ->
-    Format.fprintf fmt "IPComplete(%a,%a,%a,%a)"
-      Cil_types_debug.pp_kernel_function ic_kf
-      Cil_types_debug.pp_kinstr ic_kinstr
-      Datatype.String.Set.pretty ic_active
-      Datatype.String.Set.pretty ic_bhvs
-  | IPDisjoint {ic_kf; ic_kinstr; ic_active; ic_bhvs} ->
-    Format.fprintf fmt "IPDisjoint(%a,%a,%a,%a)"
-      Cil_types_debug.pp_kernel_function ic_kf
-      Cil_types_debug.pp_kinstr ic_kinstr
-      Datatype.String.Set.pretty ic_active
-      Datatype.String.Set.pretty ic_bhvs
-  | IPDecrease {id_kf; id_kinstr; id_ca; id_variant} ->
-    Format.fprintf fmt "IPDecrease(%a,%a,%a,%a)"
-      Cil_types_debug.pp_kernel_function id_kf
-      Cil_types_debug.pp_kinstr id_kinstr
-      (Cil_types_debug.pp_option Cil_types_debug.pp_code_annotation) id_ca
-      Cil_types_debug.pp_variant id_variant
-  | IPAxiomatic {iax_name; iax_props; iax_attrs} ->
-    Format.fprintf fmt "IPAxiomatic(%a,%a,%a)"
-      Cil_types_debug.pp_string iax_name
-      (Cil_types_debug.pp_list pretty_debug) iax_props
-      Cil_types_debug.pp_attributes iax_attrs
-  | IPModule {im_name; im_props; im_attrs} ->
-    Format.fprintf fmt "IPModule(%a,%a,%a)"
-      Cil_types_debug.pp_string im_name
-      (Cil_types_debug.pp_list pretty_debug) im_props
-      Cil_types_debug.pp_attributes im_attrs
-  | IPLemma {il_name; il_labels; il_args; il_pred; il_attrs; il_loc} ->
-    Format.fprintf fmt "IPLemma(%a,%a,%a,%a,%a,%a)"
-      Cil_types_debug.pp_string il_name
-      (Cil_types_debug.pp_list Cil_types_debug.pp_logic_label) il_labels
-      (Cil_types_debug.pp_list Cil_types_debug.pp_string) il_args
-      Cil_types_debug.pp_toplevel_predicate il_pred
-      Cil_types_debug.pp_attributes il_attrs
-      Cil_types_debug.pp_location il_loc
-  | IPTypeInvariant {iti_name; iti_type; iti_pred; iti_loc} ->
-    Format.fprintf fmt "IPTypeInvariant(%a,%a,%a,%a)"
-      Cil_types_debug.pp_string iti_name
-      Cil_types_debug.pp_typ iti_type
-      Cil_types_debug.pp_predicate iti_pred
-      Cil_types_debug.pp_location iti_loc
-  | IPGlobalInvariant {igi_name; igi_pred; igi_loc} ->
-    Format.fprintf fmt "IPGlobalInvariant(%a,%a,%a)"
-      Cil_types_debug.pp_string igi_name
-      Cil_types_debug.pp_predicate igi_pred
-      Cil_types_debug.pp_location igi_loc
-  | IPAllocation {ial_kf; ial_kinstr; ial_bhv; ial_allocs} ->
-    Format.fprintf fmt "IPAllocation(%a,%a,%a,%a)"
-      Cil_types_debug.pp_kernel_function ial_kf
-      Cil_types_debug.pp_kinstr ial_kinstr
-      pp_behavior_or_loop_debug ial_bhv
-      (Cil_types_debug.pp_pair
-         (Cil_types_debug.pp_list Cil_types_debug.pp_identified_term)
-         (Cil_types_debug.pp_list Cil_types_debug.pp_identified_term)
-      ) ial_allocs
-  | IPAssigns {ias_kf; ias_kinstr; ias_bhv; ias_froms} ->
-    Format.fprintf fmt "IPAssigns(%a,%a,%a,%a)"
-      Cil_types_debug.pp_kernel_function ias_kf
-      Cil_types_debug.pp_kinstr ias_kinstr
-      pp_behavior_or_loop_debug ias_bhv
-      (Cil_types_debug.pp_list Cil_types_debug.pp_from) ias_froms
-  | IPFrom {if_kf; if_kinstr; if_bhv; if_from} ->
-    Format.fprintf fmt "IPFrom(%a,%a,%a,%a)"
-      Cil_types_debug.pp_kernel_function if_kf
-      Cil_types_debug.pp_kinstr if_kinstr
-      pp_behavior_or_loop_debug if_bhv
-      Cil_types_debug.pp_from if_from
-  | IPReachable {ir_kf; ir_kinstr; ir_program_point} ->
-    Format.fprintf fmt "IPReachable(%a,%a,%a)"
-      (Cil_types_debug.pp_option Cil_types_debug.pp_kernel_function) ir_kf
-      Cil_types_debug.pp_kinstr ir_kinstr
-      pp_program_point ir_program_point
-  | IPBehavior {ib_kf; ib_kinstr; ib_active; ib_bhv} ->
-    Format.fprintf fmt "IPBehavior(%a,%a,%a,%a)"
-      Cil_types_debug.pp_kernel_function ib_kf
-      Cil_types_debug.pp_kinstr ib_kinstr
-      Datatype.String.Set.pretty ib_active
-      Cil_types_debug.pp_funbehavior ib_bhv
-  | IPPropertyInstance {ii_kf; ii_stmt; ii_pred; ii_ip} ->
-    Format.fprintf fmt "IPPropertyInstance(%a,%a,%a,%a)"
-      Cil_types_debug.pp_kernel_function ii_kf
-      Cil_types_debug.pp_stmt ii_stmt
-      (Cil_types_debug.pp_option Cil_types_debug.pp_identified_predicate)
-      ii_pred pretty_debug ii_ip
-  | IPOther {io_name; io_loc} ->
-    Format.fprintf fmt "IPOther(%a,%a)"
-      Cil_types_debug.pp_string io_name
-      pp_other_loc io_loc
+(* Derived using ppx deriving show. *)
+let pretty_debug = pp_identified_property
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Names                                                     --- *)
