@@ -7,14 +7,14 @@ struct __anonstruct_s1_1 {
    float y ;
 };
 enum __anonenum_2 {
-    BLA = 4,
-    BLI = 12
+    BLA = (unsigned int)4,
+    BLI = (unsigned int)12
 };
 struct __anonstruct_s1_1 s1;
 int f(void)
 {
   int __retres;
-  __retres = BLA + s1.x;
+  __retres = (int)(BLA + (unsigned int)s1.x);
   return __retres;
 }
 

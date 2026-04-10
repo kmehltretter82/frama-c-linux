@@ -35,9 +35,9 @@ union typ6 {
    int tab[sizeof(long)] ;
 };
 enum EN {
-    AB = 0,
-    AC = 1,
-    AD = 2
+    AB = 0U,
+    AC = 1U,
+    AD = 2U
 };
 /*@ requires x ≥ 0; */
 extern int f(int x);

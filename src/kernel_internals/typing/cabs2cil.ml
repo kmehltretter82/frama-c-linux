@@ -4268,44 +4268,14 @@ let rec doSpecList loc ghost
       let res = mk_tenum enum in
       let smallest = ref Z.zero in
       let largest = ref Z.zero in
-      (* Life is fun here. ANSI says: enum constants are ints,
-         and there's an implementation-dependent underlying integer
-         type for the enum, which must be capable of holding all the
-         enum's values.
-         For MSVC, we follow these rules and assume the enum's
-         underlying type is int.
-         GCC allows enum constants that don't fit in int: the enum
-         constant's type is the smallest type (but at least int) that
-         will hold the value, with a preference for unsigned types.
-         The underlying type EI of the enum is picked as follows:
-         – let T be the smallest integer type that holds all the enum's
-           values; T is signed if any enum value is negative, unsigned otherwise
-         – if the enum is packed or sizeof(T) >= sizeof(int), then EI = T
-         – otherwise EI = int if T is signed and unsigned int otherwise
-         Note that these rules make the enum unsigned if possible *)
-      let updateEnum i : ikind =
+      let updateEnum i : unit =
         if Z.lt i !smallest then
           smallest := i;
         if Z.gt i !largest then
           largest := i;
-        if Machine.msvcMode () then
-          IInt
-        else begin
-          match Kernel.Enums.get () with
-          (* gcc-short-enum will try to pack the enum _type_, not the enum
-             constant... *)
-          | "" | "help" | "gcc-enums" | "gcc-short-enums" ->
-            if Cil.fitsInInt IInt i then IInt
-            else if Cil.fitsInInt IUInt i then IUInt
-            else if Cil.fitsInInt ILongLong i then ILongLong
-            else IULongLong (* 128-bit ints not considered here *)
-          | "int" -> IInt
-          | s ->
-            Kernel.fatal ~current:true "Unknown enums representations '%s'" s
-        end
       in
       (* as each name,value pair is determined, this is called *)
-      let rec processName kname (i: exp) loc rest = begin
+      let processName kname (i: exp) loc =
         (* add the name to the environment, but with a faked 'typ' field;
          * we don't know the full type yet (since that includes all of the
          * tag values), but we won't need them in here  *)
@@ -4313,41 +4283,58 @@ let rec doSpecList loc ghost
         (* add this tag to the list so that it ends up in the real
          * environment when we're finished  *)
         let newname, _  = newAlphaName ghost true "" kname in
-        let item = { eiorig_name = kname;
-                     einame = newname;
-                     eival = i;
-                     eiloc = loc;
-                     eihost = enum }
-        in
+        let item = {
+          eiorig_name = kname;
+          einame = newname;
+          eival = i;
+          eiloc = loc;
+          eihost = enum
+        } in
         addLocalToEnv ghost kname (EnvEnum item);
-        (kname, item) :: loop (Cil.increm i 1) rest
-      end
+        Cil.increm i 1, item
+      in
 
-      and loop i = function
-          [] -> []
-        | (kname, { expr_node = Cabs.NOTHING}, cloc) :: rest ->
+      let loop i item =
+        match item with
+        | (kname, { expr_node = Cabs.NOTHING}, cloc) ->
           (* use the passed-in 'i' as the value, since none specified *)
-          processName kname i (convLoc cloc) rest
-
-        | (kname, e, cloc) :: rest ->
+          processName kname i (convLoc cloc)
+        | (kname, e, cloc) ->
           (* constant-eval 'e' to determine tag value *)
           let e' = getIntConstExp ghost e in
-          begin match Cil.constFoldToInt e' with
-            | None ->
-              Errorloc.abort_context
-                "Constant initializer %a not an integer"
-                Cil_printer.pp_exp e'
-            | Some i -> ignore (updateEnum i)
-          end;
-          processName kname e' (convLoc cloc) rest
+          match Cil.constFoldToInt e' with
+          | None ->
+            Errorloc.abort_context
+              "Constant initializer %a not an integer"
+              Cil_printer.pp_exp e'
+          | Some e'' ->
+            updateEnum e'';
+            processName kname e' (convLoc cloc)
       in
 
       (*TODO: find a better loc*)
-      let fields = loop (Cil.zero ~loc:(Current_loc.get())) eil in
-      (* Now set the right set of items *)
-      enum.eitems <- List.map (fun (_, x) -> x) fields;
-      (* Pick the enum's kind - see discussion above *)
+      let init = Cil.zero ~loc:(Current_loc.get()) in
+      (* All item expressions will be retyped with the right type in a second
+         typing phase once we found this enum kind (see below). *)
+      enum.eitems <- snd (List.fold_left_map loop init eil);
+
+      (* Pick the enum's kind. *)
       begin
+        (* Life is fun here. ANSI says: enum constants are ints,
+           and there's an implementation-dependent underlying integer
+           type for the enum, which must be capable of holding all the
+           enum's values.
+           For MSVC, we follow these rules and assume the enum's
+           underlying type is int.
+           GCC allows enum constants that don't fit in int: the enum
+           constant's type is the smallest type (but at least int) that
+           will hold the value, with a preference for unsigned types.
+           The underlying type EI of the enum is picked as follows:
+           – let T be the smallest integer type that holds all the enum's
+             values; T is signed if any enum value is negative, unsigned otherwise
+           – if the enum is packed or sizeof(T) >= sizeof(int), then EI = T
+           – otherwise EI = int if T is signed and unsigned int otherwise
+           Note that these rules make the enum unsigned if possible *)
         let unsigned = Z.geq !smallest Z.zero in
         let smallKind = Cil.intKindForValue !smallest unsigned in
         let largeKind = Cil.intKindForValue !largest unsigned in
@@ -4359,16 +4346,31 @@ let rec doSpecList loc ghost
         in
         let ekind =
           match Kernel.Enums.get () with
-          | "" | "help" | "gcc-enums" ->
+          | Int -> IInt
+          | Default when Machine.msvcMode () -> IInt
+          | Short -> real_kind
+          | Default ->
+            (* This is GCC mode, but use it as a default behavior for anything. *)
             if Ast_attributes.contains "packed" enum.eattr ||
                Cil.bytesSizeOfInt real_kind >= Cil.bytesSizeOfInt IInt
             then real_kind
             else if unsigned then IUInt else IInt
-          | "int" -> IInt
-          | "gcc-short-enums" -> real_kind
-          | s -> Kernel.fatal ~current:true "Unknown enum representation '%s'" s
         in
         enum.ekind <- ekind;
+        (* Now that we found the enum's type, retype every item to this type. *)
+        let newt = mk_tint enum.ekind in
+        let zero = Cil.kinteger ~loc:(Current_loc.get()) enum.ekind 0 in
+        let retype i cabsitem cilitem =
+          match cabsitem with
+          | (_, { expr_node = Cabs.NOTHING}, _) ->
+            cilitem.eival <- i;
+            Cil.increm i 1
+          | (_, cabsexp, _) ->
+            let newival = Cil.mkCast ~newt (getIntConstExp ghost cabsexp) in
+            cilitem.eival <- newival;
+            Cil.increm newival 1
+        in
+        ignore (List.fold_left2 retype zero eil enum.eitems);
       end;
       (* Record the enum name in the environment *)
       addLocalToEnv ghost (kindPlusName "enum" n') (EnvTyp res);

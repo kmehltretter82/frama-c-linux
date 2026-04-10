@@ -59,13 +59,13 @@ typedef struct __anonstruct_T3_1 T3;
 typedef T3 T3_bis;
 typedef T3_bis T3_ter;
 enum E1 {
-    e1 = 0
+    e1 = (unsigned int)0
 };
 enum E2 {
-    e2 = 0
+    e2 = (unsigned int)0
 };
 enum E3 {
-    e3 = 0
+    e3 = (unsigned int)0
 };
 typedef enum E2 E2_bis;
 typedef E2_bis E2_ter;

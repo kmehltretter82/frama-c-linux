@@ -88,8 +88,8 @@
 #include "stddef.h"
 #include "stdio.h"
 enum __anonenum_RC_1 {
-    OK = 0,
-    ERROR = 1
+    OK = 0U,
+    ERROR = 1U
 };
 typedef enum __anonenum_RC_1 RC;
 /*@ requires valid_read_string(format);
@@ -356,8 +356,8 @@ int main(void)
 #include "stddef.h"
 #include "stdio.h"
 enum __anonenum_RC_1 {
-    OK = 0,
-    ERROR = 1
+    OK = 0U,
+    ERROR = 1U
 };
 typedef enum __anonenum_RC_1 RC;
 int main(void)
@@ -513,8 +513,8 @@ int main(void)
 #include "stddef.h"
 #include "stdio.h"
 enum __anonenum_RC_1 {
-    OK = 0,
-    ERROR = 1
+    OK = 0U,
+    ERROR = 1U
 };
 typedef enum __anonenum_RC_1 RC;
 /*@ requires valid_read_string(format);

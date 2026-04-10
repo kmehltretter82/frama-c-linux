@@ -7,8 +7,8 @@
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 enum bool {
-    false = 0,
-    true = 1
+    false = 0U,
+    true = 1U
 };
 int main(void)
 {

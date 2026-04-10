@@ -7,8 +7,8 @@
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 enum RIGHT {
-    CREATE = 0,
-    DELETE = 1
+    CREATE = 0U,
+    DELETE = 1U
 };
 /*@
 predicate p1(integer i, integer j, integer k) =

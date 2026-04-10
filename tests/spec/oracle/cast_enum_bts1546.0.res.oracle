@@ -11,10 +11,10 @@ enum e_v2 {
     V2 = 0
 };
 enum e_u1 {
-    U1 = 0xFFFFFFFFU
+    U1 = (int)0xFFFFFFFFU
 };
 enum e_u2 {
-    U2 = 0xFFFFFFFFU
+    U2 = (int)0xFFFFFFFFU
 };
 enum e_s1 {
     S1 = -1
@@ -23,7 +23,7 @@ enum e_s2 {
     S2 = -1
 };
 enum e_h1 {
-    H1 = 0xFFFFFFFFFFFFFFFFULL
+    H1 = (int)0xFFFFFFFFFFFFFFFFULL
 };
 enum e X;
 /*@ ensures P: X ≡ E0 ∧ \old(x) ≡ E1 ∧ X < \old(x) ∧ E0 ≤ E1 ⇒ \result ≡ E0;
@@ -62,14 +62,14 @@ void us(void)
 {
   u = (unsigned int)s;
   s = (int)u;
-  u = U1;
-  s = (int)U1;
+  u = (unsigned int)U1;
+  s = U1;
   u = (unsigned int)S1;
   s = S1;
   u = (unsigned int)V1;
   s = V1;
   u = (unsigned int)H1;
-  s = (int)H1;
+  s = H1;
   return;
 }
 
@@ -79,13 +79,13 @@ void uu(void)
   uu1 = u1;
   uu1 = U1;
   uu1 = (enum e_u1)u2;
-  uu1 = (enum e_u1)U2;
+  uu1 = U2;
   uu1 = s;
   uu1 = (enum e_u1)s1;
   uu1 = S1;
   uu1 = (enum e_u1)v1;
   uu1 = V1;
-  uu1 = (enum e_u1)H1;
+  uu1 = H1;
   return;
 }
 
@@ -93,7 +93,7 @@ void ss(void)
 {
   ss1 = (enum e_s1)u;
   ss1 = (enum e_s1)u1;
-  ss1 = (enum e_s1)U1;
+  ss1 = U1;
   ss1 = s;
   ss1 = s1;
   ss1 = S1;
@@ -108,9 +108,9 @@ void u_signed(void)
 {
   u1 = (int)u;
   u1 = (int)u1;
-  u1 = (int)U1;
+  u1 = U1;
   u1 = (int)u2;
-  u1 = (int)U2;
+  u1 = U2;
   u1 = s;
   u1 = (int)s1;
   u1 = S1;
@@ -125,9 +125,9 @@ void u_unsigned(void)
 {
   u1 = (enum e_u1)u;
   u1 = (enum e_u1)((unsigned int)u1);
-  u1 = U1;
+  u1 = (enum e_u1)((unsigned int)U1);
   u1 = (enum e_u1)((unsigned int)u2);
-  u1 = (enum e_u1)U2;
+  u1 = (enum e_u1)((unsigned int)U2);
   u1 = (enum e_u1)((unsigned int)s);
   u1 = (enum e_u1)((unsigned int)s1);
   u1 = (enum e_u1)((unsigned int)S1);
@@ -143,9 +143,9 @@ void s_signed(void)
 {
   s1 = (int)u;
   s1 = (int)u1;
-  s1 = (int)U1;
+  s1 = U1;
   s1 = (int)u2;
-  s1 = (int)U2;
+  s1 = U2;
   s1 = s;
   s1 = (int)s1;
   s1 = S1;
@@ -153,7 +153,7 @@ void s_signed(void)
   s1 = S2;
   s1 = (int)v1;
   s1 = V1;
-  s1 = (int)H1;
+  s1 = H1;
   return;
 }
 
@@ -161,9 +161,9 @@ void s_unsigned(void)
 {
   s1 = (enum e_s1)u;
   s1 = (enum e_s1)((unsigned int)u1);
-  s1 = (enum e_s1)U1;
+  s1 = (enum e_s1)((unsigned int)U1);
   s1 = (enum e_s1)((unsigned int)u2);
-  s1 = (enum e_s1)U2;
+  s1 = (enum e_s1)((unsigned int)U2);
   s1 = (enum e_s1)((unsigned int)s);
   s1 = (enum e_s1)((unsigned int)s1);
   s1 = (enum e_s1)((unsigned int)S1);

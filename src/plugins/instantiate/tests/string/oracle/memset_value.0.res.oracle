@@ -44,9 +44,9 @@ struct X {
 };
 typedef int named;
 enum E {
-    A = 0,
-    B = 1,
-    C = 2
+    A = 0U,
+    B = 1U,
+    C = 2U
 };
 struct incomplete;
 /*@ requires in_bounds_value: -128 ≤ value < 128;
@@ -201,9 +201,9 @@ struct X {
 };
 typedef int named;
 enum E {
-    A = 0,
-    B = 1,
-    C = 2
+    A = 0U,
+    B = 1U,
+    C = 2U
 };
 struct incomplete;
 /*@ requires in_bounds_value: -128 ≤ value < 128;
