@@ -1422,7 +1422,7 @@ let editor_command pconf =
     Why3.Whyconf.(default_editor (get_main config))
 
 let scriptfile ~force ~ext wpo =
-  let dir = Wp_parameters.get_session_dir ~force "interactive" in
+  let dir = Wp_parameters.Session.get_dir ~create_path:force "interactive" in
   Filepath.(dir / (wpo.Wpo.po_sid ^ ext))
 
 let updatescript ~script driver task =

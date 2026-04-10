@@ -221,27 +221,21 @@ Options taking a string as argument should preferably be written
 -wp-auto-width <n>  Width of auto-search (-wp-auto only, default 10).
                     Limits the number of pending goals in strategies.
 -wp-cache <mode>    WP cache mode:
-                    - 'none': no cache, run provers (default)
+                    - 'none': no cache, run provers
                     - 'update': use cache or run provers and update cache
+                    (default)
                     - 'cleanup': update mode with garbage collection
                     - 'replay': update mode with no cache update
                     - 'rebuild': always run provers and update cache
-                    - 'offline': use cache but never run provers
-                    See also option -wp-cache-env. (preferably use
-                    -wp-cache="mode")
+                    - 'offline': use cache but never run provers.
+                    It can also be specified using the environment variable
+                    FRAMAC_WP_CACHE. The option is prioritary over the
+                    variable. (preferably use -wp-cache="mode")
 -wp-cache-dir <dir>  Specify global cache directory (no cleanup mode).
                     By default, cache entries are stored in the WP session
-                    directory.
-                    See also option -wp-cache-env. (preferably use
-                    -wp-cache-dir="dir")
--wp-cache-env       Gives environment variables precedence over command
-                    line
-                    for cache management:
-                    - FRAMAC_WP_SCRIPT overrides -wp-script
-                    - FRAMAC_WP_CACHE overrides -wp-cache
-                    - FRAMAC_WP_CACHEDIR overrides -wp-cache-dir
-                    Disabled by default. (opposite option is
-                    -wp-no-cache-env)
+                    directory. This directory can also be configured using
+                    the environment variable FRAMAC_WP_CACHEDIR. The option
+                    is prioritary over the variable.
 -wp-cache-print     Show cache directory (opposite option is
                     -wp-no-cache-print)
 -wp-driver <file,...>  Load drivers for linking to external libraries
@@ -295,9 +289,10 @@ Options taking a string as argument should preferably be written
                     - 'init': proof scripts are generated from scratch and
                     saved
                     - 'dry': proof scripts are explored from scratch and not
-                    saved
-                    See also option -wp-cache-env. (preferably use
-                    -wp-script="mode")
+                    saved.
+                             It can also be specified using the environment
+                    variable FRAMAC_WP_SCRIPT. The option is prioritary over
+                    the variable. (preferably use -wp-script="mode")
 -wp-script-on-stdout  When enabled (default: no), display scripts on stdout
                     instead of writing them on disk. (opposite option is
                     -wp-no-script-on-stdout)

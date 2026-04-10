@@ -19,7 +19,7 @@ let jsonfile (dir:Filepath.t) filename =
   Filepath.(dir / (filename ^ ".json"))
 
 let get_script_dir ~force =
-  Wp_parameters.get_session_dir ~force "script"
+  Wp_parameters.Session.get_dir ~create_path:force "script"
 
 let filename ~force wpo =
   let dscript = get_script_dir ~force in
@@ -27,8 +27,8 @@ let filename ~force wpo =
 
 let legacies wpo =
   let mid = WpContext.MODEL.id wpo.po_model in
-  let dscript = Wp_parameters.get_session_dir ~force:false "script" in
-  let dmodel = Wp_parameters.get_session_dir ~force:false mid in
+  let dscript = Wp_parameters.Session.get_dir "script" in
+  let dmodel = Wp_parameters.Session.get_dir mid in
   [
     jsonfile dscript wpo.po_gid ;
     jsonfile dmodel wpo.po_gid ;
@@ -112,7 +112,7 @@ let save ~stdout wpo js =
       end
 
 let get_marks_dir ~force =
-  let scripts = Wp_parameters.get_session_dir ~force "script" in
+  let scripts = Wp_parameters.Session.get_dir ~create_path:force "script" in
   let path = Filepath.(scripts / ".marks") in
   if force then Wp_parameters.Output.mkdir path ;
   path

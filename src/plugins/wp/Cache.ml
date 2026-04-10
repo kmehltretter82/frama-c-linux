@@ -26,55 +26,6 @@ let mark_cache ~mode hash =
   if mode = Cleanup || Wp_parameters.is_interactive () then
     Hashtbl.replace cleanup hash ()
 
-module CACHEDIR = WpContext.StaticGenerator(Datatype.Unit)
-    (struct
-      type key = unit
-      type data = Filepath.t
-      let name = "Wp.Cache.dir"
-      let compile () =
-        try
-          if not (Wp_parameters.CacheEnv.get()) then
-            raise Not_found ;
-          let gdir = Sys.getenv "FRAMAC_WP_CACHEDIR" in
-          if gdir = "" then raise Not_found ;
-          Filepath.of_string gdir
-        with Not_found ->
-        try
-          let gdir = Wp_parameters.CacheDir.get() in
-          if gdir = "" then raise Not_found ;
-          Filepath.of_string gdir
-        with Not_found ->
-          Wp_parameters.get_session_dir ~force:false "cache"
-    end)
-
-let get_dir () = Filepath.to_string_abs (CACHEDIR.get ())
-
-let is_session_dir path =
-  0 = Filepath.compare
-    path (Wp_parameters.get_session_dir ~force:false "cache")
-
-let get_usable_dir ?(make=false) () =
-  let path = CACHEDIR.get () in
-  let parents = is_session_dir path in
-  if make then
-    Filesystem.make_dir ~parents path;
-  if not (Filesystem.dir_exists path) then begin
-    Wp_parameters.warning ~current:false ~once:true
-      "Cache path %a is not a directory"
-      Filepath.pretty path;
-    raise Not_found
-  end;
-  path
-
-let has_dir () =
-  try
-    if not (Wp_parameters.CacheEnv.get()) then
-      raise Not_found ;
-    Sys.getenv "FRAMAC_WP_CACHEDIR" <> ""
-  with Not_found -> Wp_parameters.CacheDir.get () <> ""
-
-let is_global_cache () = Wp_parameters.CacheDir.get () <> ""
-
 (* -------------------------------------------------------------------------- *)
 (* --- Cache Management                                                   --- *)
 (* -------------------------------------------------------------------------- *)
@@ -86,7 +37,6 @@ let parse_mode ~origin ~fallback = function
   | "rebuild" -> Rebuild
   | "offline" -> Offline
   | "cleanup" -> Cleanup
-  | "" -> raise Not_found
   | m ->
     Wp_parameters.warning ~current:false
       "Unknown %s mode %S (use %s instead)" origin m fallback ;
@@ -98,18 +48,19 @@ module MODE = WpContext.StaticGenerator(Datatype.Unit)
       type data = mode
       let name = "Wp.Cache.mode"
       let compile () =
+        let env = "FRAMAC_WP_CACHE" in
         try
-          if not (Wp_parameters.CacheEnv.get()) then
-            raise Not_found ;
-          let origin = "FRAMAC_WP_CACHE" in
-          parse_mode ~origin ~fallback:"-wp-cache" (Sys.getenv origin)
+          if Wp_parameters.Cache.is_set ()
+          then
+            let mode = Wp_parameters.Cache.get() in
+            parse_mode ~origin:"-wp-cache" ~fallback:env mode
+          else raise Not_found
         with Not_found ->
         try
-          let mode = Wp_parameters.Cache.get() in
-          parse_mode ~origin:"-wp-cache" ~fallback:"none" mode
-        with Not_found ->
-          if Wp_parameters.has_session () || has_dir ()
-          then Update else NoCache
+          match Sys.getenv_opt env with
+          | None | Some "" -> raise Not_found
+          | Some mode -> parse_mode ~origin:env ~fallback:"none" mode
+        with Not_found -> Update
     end)
 
 let get_mode = MODE.get
@@ -160,9 +111,8 @@ let promote ?timeout ?steplimit (res : VCS.result) =
     else (* can be run a longer time or widely *)
       VCS.no_result
 
-let file_from_hash file_hash =
-  let dir = get_usable_dir ~make:true () in
-  Filepath.(dir / (file_hash ^ ".json"))
+let file_from_hash ~create file_hash =
+  Wp_parameters.CacheDir.get_file ~create_path:create (file_hash ^ ".json")
 
 let get_cache_result ~mode hash =
   match mode with
@@ -170,7 +120,7 @@ let get_cache_result ~mode hash =
   | Update | Cleanup | Replay | Offline ->
     try
       let hash = Lazy.force hash in
-      let file = file_from_hash hash in
+      let file = file_from_hash ~create:false hash in
 
       if not (Filesystem.exists file) then VCS.no_result
       else
@@ -189,7 +139,7 @@ let set_cache_result ~mode hash prover result =
   | Rebuild | Update | Cleanup ->
     let hash = Lazy.force hash in
     try
-      let file = file_from_hash hash in
+      let file = file_from_hash ~create:true hash in
       mark_cache ~mode hash ;
       ProofScript.json_of_result (Prover.Why3 prover) result
       |> Json.save_file file
@@ -200,7 +150,7 @@ let set_cache_result ~mode hash prover result =
 let clear_result ~digest prover goal =
   try
     let hash = digest prover goal in
-    let file = file_from_hash hash in
+    let file = file_from_hash ~create:false hash in
     Filesystem.remove_file file
   with err ->
     Wp_parameters.warning ~current:false ~once:true
@@ -210,11 +160,11 @@ let cleanup_cache () =
   let mode = get_mode () in
   if mode = Cleanup && (!hits > 0 || !miss > 0) then
     try
-      let dir = get_usable_dir () in
-      if is_global_cache () then
+      if Wp_parameters.CacheDir.is_set () then
         Wp_parameters.warning ~current:false ~once:true
           "Cleanup mode deactivated with global cache."
       else
+        let dir = Wp_parameters.CacheDir.get () in
         Filesystem.iter_dir
           (fun f ->
              if Filename.check_suffix f ".json" then

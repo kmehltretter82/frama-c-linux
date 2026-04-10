@@ -100,8 +100,7 @@ module ScriptMode: Parameter_sig.String
 module DefaultStrategies: Parameter_sig.String_list
 module RunAllProvers: Parameter_sig.Bool
 module Cache: Parameter_sig.String
-module CacheEnv: Parameter_sig.Bool
-module CacheDir: Parameter_sig.String
+module CacheDir: Parameter_sig.User_dir_opt
 module CachePrint: Parameter_sig.Bool
 module Library: Parameter_sig.Filepath_list
 module Drivers: Parameter_sig.Filepath_list
@@ -150,12 +149,6 @@ module SmokeDeadlocalinit: Parameter_sig.Bool
 module SmokeDeadloop: Parameter_sig.Bool
 module Probes: Parameter_sig.Bool
 module CounterExamples: Parameter_sig.Bool
-
-(** {2 Getters} *)
-
-val has_session : unit -> bool
-val get_session : force:bool -> unit -> Filepath.t
-val get_session_dir : force:bool -> string -> Filepath.t
 
 module Output : sig
   val exists: unit -> bool
