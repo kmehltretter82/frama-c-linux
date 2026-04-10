@@ -103,7 +103,7 @@ let normalize_df ts =
 (*** one step of CNF/DNF ***)
 
 let s_cnf_ite c p q = [e_imply [c] p; e_imply [e_not c] q]
-let s_dnf_ite c p q = [e_and [c;p]; e_and [e_not c;e_not q]]
+let s_dnf_ite c p q = [e_and [c;p]; e_and [e_not c;q]]
 let s_cnf_iff p q = [e_imply [p] q; e_imply [q] p]
 let s_dnf_iff p q = [e_and [p;q]; e_and [e_not p;e_not q]]
 let s_cnf_xor p q = [e_imply [e_not p] q; e_imply [e_not q] p]
