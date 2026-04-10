@@ -896,23 +896,26 @@ let rec global_annot_pass1 g =
          ext ext (Some (l,!currentDeclIdx)))
 
 (* invalid C name. Can't clash with anything. *)
-let intEnumInfoName = "!!!intEnumInfo!!!"
+let enumInfoName kind =
+  Format.asprintf "!!!%aEnumInfo!!!" Cil_types_debug.pp_ikind kind
 
 (* Some enumerations have to be turned into an integer. We implement this by
  * introducing a special enumeration type which we'll recognize later to be
  * an integer *)
-let intEnumInfo kind = {
-  eorig_name = intEnumInfoName;
-  ename = intEnumInfoName;
-  eitems = [];
-  eattr = [];
-  ereferenced = false;
-  ekind = kind;
-}
+let intEnumInfo kind =
+  let name = enumInfoName kind in {
+    eorig_name = name;
+    ename = name;
+    eitems = [];
+    eattr = [];
+    ereferenced = false;
+    ekind = kind;
+  }
 
 (* And add it to the equivalence graph *)
 let intEnumInfoNode kind =
-  EnumMerging.getNode eEq eSyn 0 (intEnumInfo kind) (intEnumInfo kind)
+  let ei = intEnumInfo kind in
+  EnumMerging.getNode eEq eSyn 0 ei ei
     (Some (Cil_datatype.Location.unknown, 0))
 
 
@@ -1036,16 +1039,18 @@ let matchEnumInfoGen (oldei: enuminfo) (ei: enuminfo) : unit =
           "@[multiple definitions of enum %s using different int kind@ (%s);@ int kind %a and@ %a@]"
           oldei.ename msg
           Cil_printer.pp_ikind oldei.ekind Cil_printer.pp_ikind ei.ekind;
+      let oldEnumInfoName = enumInfoName oldei.ekind in
+      let enumInfoName = enumInfoName ei.ekind in
       let enumNode = intEnumInfoNode oldei.ekind in
-      if oldei.ename <> intEnumInfoName && ei.ename <> intEnumInfoName then
+      if oldei.ename <> oldEnumInfoName && ei.ename <> enumInfoName then
         Kernel.warning
           "@[merging definitions of enum %s using int type@ (%s);@ items %a and@ %a@]"
           oldei.ename msg
           pp_items oldei.eitems pp_items ei.eitems;
       (* Get here if you cannot merge two enumeration nodes *)
-      if oldei.ename <> intEnumInfoName then
+      if oldei.ename <> oldEnumInfoName then
         ignore(EnumMerging.union oldeinode enumNode);
-      if ei.ename <> intEnumInfoName then
+      if ei.ename <> enumInfoName then
         ignore(EnumMerging.union einode enumNode)
 
 
@@ -1879,7 +1884,7 @@ class renameVisitorClass =
     match EnumMerging.findReplacement true eEq !currentFidx ei.eihost with
       None -> None
     | Some (enum,_) ->
-      if enum.ename = intEnumInfoName then begin
+      if enum.ename = enumInfoName enum.ekind then begin
         (* Two different enums have been merged into an int type.
            Switch to an integer constant. *)
         match (Cil.constFold true ei.eival).enode with
@@ -2021,7 +2026,7 @@ class renameVisitorClass =
             None -> DoChildren
           | Some (ei', _) ->
             let tattr = Cil.visitCilAttributes (self :> Cil.cilVisitor) t.tattr in
-            if ei'.ename = intEnumInfoName then
+            if ei'.ename = enumInfoName ei'.ekind then
               (* This is actually our friend intEnumInfo *)
               ChangeTo (Cil_const.mk_tint ~tattr ei'.ekind)
             else

@@ -1,5 +1,4 @@
 /* run.config
-   EXIT: 1
    STDOPT: +"%{dep:./enum_merge2.i} %{dep:./enum_merge3.i}"
 */
 
