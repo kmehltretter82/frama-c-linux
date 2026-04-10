@@ -198,9 +198,9 @@ let example_msg =
      # The oracle will be compared from the standard output of the command: cat <test-output-file> | <cmd> .@ \
      # Chaining multiple filter commands is possible by defining several FILTER directives.@ \
      # An empty command drops previous FILTER directives.@ \
-     # Note: in such a command, the macros @@PTEST_ORACLE@@ and @@PTEST_RESULT_FILE@@ are set respectively to the basename of the oracle and the basename of the result.@ \
+     # Note: in such a command, the macros @@PTEST_ORACLE@@ and @@PTEST_RESULT@@ are set respectively to the basename of the oracle and the basename of the result.@ \
      # This allows running a 'diff' command with the oracle/result of another test configuration:@ \
-     #    FILTER: diff --new-file %%{dep:@@PTEST_SUITE_DIR@@/result_configuration/@@PTEST_RESULT_FILE@@} - @]@  \
+     #    FILTER: diff --new-file %%{dep:@@PTEST_SUITE_DIR@@/result_configuration/@@PTEST_RESULT@@} - @]@  \
      # It is recommended to diff against the result of another configuration so that the dependencies between configurations are correctly set up.
      TIMEOUT: <delay>    @[<v 0># Set a timeout for all sub-tests.@]@  \
      NOFRAMAC:           @[<v 0># Drops previous sub-test definitions and considers that there is no defined default sub-test.@]@  \
@@ -217,7 +217,7 @@ let example_msg =
      @@PTEST_SUITE_DIR@@       # Path to the directory containing the source of the test file (../).@  \
      @@PTEST_RESULT_DIR@@      # Shorthand alias to @@PTEST_SUITE_DIR@@/result@@PTEST_CONFIG@@ (the result directory dedicated to the tested configuration).@  \
      @@PTEST_ORACLE@@          # Basename of the current oracle file (macro only usable in FILTER directives).@  \
-     @@PTEST_RESULT_FILE@@     # Basename of the current result file (macro only usable in FILTER directives).@  \
+     @@PTEST_RESULT@@          # Basename of the current result file (macro only usable in FILTER directives).@  \
      @@PTEST_DEFAULT_OPTIONS@@ # Default option list: %s@  \
      @@PTEST_LIBS@@            # Current list of modules defined by the LIBS directive.@  \
      @@PTEST_LIBRARY@@         # Current list of modules defined by the LIBRARY directive.@  \
@@ -491,8 +491,15 @@ module Macros = struct
     let deprecate macro msg action deprecated =
       StringMap.add macro { macro; msg; action; } deprecated
     in
+    (* ignore "unused variable deprecate" warning if no macros are currently
+       deprecated *)
+    ignore deprecate;
     StringMap.empty
-    |> deprecate "PTEST_RESULT" "Please use PTEST_RESULT_DIR instead" `Fail
+    |> deprecate "PTEST_RESULT_FILE" "Please use PTEST_RESULT instead" `Fail
+  (* Use deprecate function to add deprecated macro. The last argument is
+     either `Fail or `Continue depending on if ptests should stop immediately
+     or continue:
+     |> deprecate "MACRO" "Message to display" `Fail *)
 
   let warn_if_deprecated file macro =
     try
@@ -710,7 +717,6 @@ end = struct
         "PTEST_CONFIG", ptest_config;
         "PTEST_DIR", ".";
         "PTEST_SHARE_DIR", "../../../share";
-        "PTEST_RESULT", ".";
         "PTEST_RESULT_DIR", ".";
         "PTEST_SUITE_DIR", "..";
         "PTEST_FILE", ptest_file;
@@ -1518,7 +1524,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     | None -> "","",default_wtest
     | Some filter ->
       let oracle_regexp = Str.regexp "@PTEST_ORACLE@" in
-      let result_regexp = Str.regexp "@PTEST_RESULT_FILE@" in
+      let result_regexp = Str.regexp "@PTEST_RESULT@" in
       let filter_cmd funfiltred foracle fresult =
         let filter = Str.global_replace oracle_regexp foracle filter in
         let filter = Str.global_replace result_regexp fresult filter in

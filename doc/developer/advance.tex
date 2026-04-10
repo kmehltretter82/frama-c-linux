@@ -781,7 +781,7 @@ In the following, we detail some aspects of several directives.
   That allows running a \texttt{diff} command with the oracle or result of
   another test configuration \texttt{config}:
   \begin{code}
-FILTER: diff --new-file %{dep:@PTEST_SUITE_DIR@/result_config/@PTEST_RESULT_FILE@} -
+FILTER: diff --new-file %{dep:@PTEST_SUITE_DIR@/result_config/@PTEST_RESULT@} -
   \end{code}
   It is recommended to run \texttt{diff} against \texttt{@PTEST\_RESULT\_FILE@}
   so that the dependencies between test configuration are correctly set up by
@@ -865,7 +865,7 @@ one for regular tests (if more than one \verb|OPT|).\\
 \hline
 \verb|PTEST_ORACLE| & basename of the current oracle file (macro only usable in FILTER directives)\\
 \hline
-\verb|PTEST_RESULT_FILE| & basename of the current result file (macro only usable in FILTER directives)\\
+\verb|PTEST_RESULT| & basename of the current result file (macro only usable in FILTER directives)\\
 \hline
 \verb|PTEST_DEFAULT_OPTIONS| & the default option list: \verb|-check| \verb|-no-autoload-plugins|\\
 \hline
