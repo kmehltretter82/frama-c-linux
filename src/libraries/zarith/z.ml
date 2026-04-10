@@ -159,6 +159,8 @@ let pretty fmt v =
     if gt (abs v) max then pretty_hex fmt v
     else pp ()
 
+let pp = pp_print
+
 (* ------------- *)
 (* Miscellaneous *)
 (* ------------- *)

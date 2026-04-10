@@ -12,7 +12,7 @@ type t = Filepath.position = {
   pos_lnum : int;
   pos_bol : int;
   pos_cnum : int;
-}
+} [@@deriving show]
 [@@@alert "+deprecated"]
 
 let unknown = {
@@ -45,12 +45,7 @@ let pretty fmt pos =
   else
     Format.fprintf fmt "%a:%d" Filepath.pretty path pos.pos_lnum
 
-let pretty_debug fmt pos =
-  Format.fprintf fmt "{pos_path=%a;pos_lnum=%d;pos_bol=%d;pos_cnum=%d}"
-    Filepath.pretty_abs pos.pos_path
-    pos.pos_lnum
-    pos.pos_bol
-    pos.pos_cnum
+let pretty_debug = pp
 
 let pp_with_col fmt pos =
   Format.fprintf fmt "%a char %d" pretty pos

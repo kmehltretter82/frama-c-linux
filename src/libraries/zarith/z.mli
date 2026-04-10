@@ -229,3 +229,8 @@ val pp_bin : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
     are printed as their 2-complement ([lnot]) with prefix ["1x"].
 *)
 val pp_hex : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
+
+(** Equivalent to {!Z.pp_print} for [deriving show] compatibility.
+    @since Frama-C+dev
+*)
+val pp: t Pretty_utils.formatter

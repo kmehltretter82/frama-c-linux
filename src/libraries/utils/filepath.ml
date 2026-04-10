@@ -88,16 +88,19 @@ let of_format ?existence ?dir format =
 *)
 let dummy = "@dummy_filepath@"
 
-include Datatype.Make_with_collections (struct
+type t = string [@@deriving show]
+
+include (
+  Datatype.Make_with_collections (struct
     include Datatype.Serializable_undefined
-    type nonrec t = string
+    type nonrec t = t
     let name = "Filepath"
     let reprs = [ dummy ]
     let equal = String.equal
     let compare = String.compare
     let hash = Hashtbl.hash (* String.hash only introduced in OCaml 5.0 *)
     let copy = Fun.id
-  end)
+  end) : Datatype.S_with_collections with type t := t)
 
 
 (* -------------------------------------------------------------------------- *)
