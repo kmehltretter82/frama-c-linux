@@ -87,7 +87,7 @@ else
 
   # Opam files
   $SED -i "s/^version: .*/version: \"$NEXT\"/g" opam
-  CURRENT_OPAM_DOC=$CURRENT_MAJOR.$CURRENT_MINOR$(echo $CURRENT_SUFFIX | tr '~' '-' | sed -e 's/+dev//')
+  CURRENT_OPAM_DOC=$CURRENT_MAJOR.$CURRENT_MINOR$(echo $CURRENT_SUFFIX | tr '~' '-' | sed -e 's/~dev//')
   NEXT_OPAM_DOC=$NEXT_MAJOR.$NEXT_MINOR$(tr '~' '-' <<< $NEXT_SUFFIX)
   $SED -i "s/\(.*\)$CURRENT_OPAM_DOC-$CURRENT_CODENAME\(.*\)/\1$NEXT_OPAM_DOC-$NEXT_CODENAME\2/g" opam
 
@@ -122,22 +122,22 @@ else
   fi
 
   # API doc
-  find src -name '*.ml*' -exec $SED -i -e "s/Frama-C+dev/${NEXT_MAJOR}.${NEXT_MINOR}-${NEXT_CODENAME}/gI" '{}' ';'
+  find src -name '*.ml*' -exec $SED -i -e "s/Frama-C\(+\|~\)dev/${NEXT_MAJOR}.${NEXT_MINOR}-${NEXT_CODENAME}/gI" '{}' ';'
 
   # Manuals changes
-  $SED -i "s/\(^\\\\section\*{Frama-C+dev}\)/%\1\n\n\\\\section\*{$NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
+  $SED -i "s/\(^\\\\section\*{Frama-C\(+\|~\)dev}\)/%\1\n\n\\\\section\*{$NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
     doc/userman/user-changes.tex
-  $SED -i "s/\(^\\\\section\*{Frama-C+dev}\)/%\1\n\n\\\\section\*{$NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
+  $SED -i "s/\(^\\\\section\*{Frama-C\(+\|~\)dev}\)/%\1\n\n\\\\section\*{$NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
     doc/developer/changes.tex
-  $SED -i "s/\(^\\\\subsection{Frama-C+dev}\)/%\1\n\n\\\\subsection{Frama-C $NEXT_CODENAME}/g" \
+  $SED -i "s/\(^\\\\subsection{Frama-C\(+\|~\)dev}\)/%\1\n\n\\\\subsection{Frama-C $NEXT_CODENAME}/g" \
     doc/aorai/main.tex
-  $SED -i "s/\(^\\\\section\*{Frama-C+dev}\)/%\1\n\n\\\\section\*{Frama-C $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
+  $SED -i "s/\(^\\\\section\*{Frama-C\(+\|~\)dev}\)/%\1\n\n\\\\section\*{Frama-C $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
     src/plugins/acsl-importer/doc/manual/user-changes.tex
   $SED -i "s/\(^\\\\section\*{E-ACSL \\\\eacslpluginversion \\\\eacslplugincodename}\)/%\1\n\n\\\\section\*{E-ACSL $NEXT_MAJOR.$NEXT_MINOR $NEXT_CODENAME}/g" \
     src/plugins/e-acsl/doc/userman/changes.tex
-  $SED -i "s/\(^\\\\subsection\*{Version Frama-C+dev}\)/%\1\n\n\\\\subsection\*{Version $NEXT_CODENAME-$NEXT_MAJOR}/g" \
+  $SED -i "s/\(^\\\\subsection\*{Version Frama-C\(+\|~\)dev}\)/%\1\n\n\\\\subsection\*{Version $NEXT_CODENAME-$NEXT_MAJOR}/g" \
     src/plugins/e-acsl/doc/refman/changes_modern.tex
-  $SED -i "s/\(^\\\\section\*{Frama-C+dev}\)/%\1\n\n\\\\section\*{Frama-C $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
+  $SED -i "s/\(^\\\\section\*{Frama-C\(+\|~\)dev}\)/%\1\n\n\\\\section\*{Frama-C $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
     src/plugins/volatile/doc/manual/user-changes.tex
 
   # Reference configuration
