@@ -21,8 +21,10 @@ let print_proj basename title n =
   let dot_file = Filepath.of_string (name ^ ".dot") in
   let jpg_file = Filepath.of_string (name ^ ".jpg") in
   Slicing.Api.Project.print_dot ~filepath:dot_file ~title:title;
-  if use_dot then
-    ignore @@ Command.Dot.(spawn ~format:Jpeg ~output:jpg_file dot_file);
+  if use_dot then begin
+    let async = System_config.is_gui () in
+    ignore @@ Command.Dot.(spawn ~async ~format:Jpeg ~output:jpg_file dot_file)
+  end;
   Filesystem.remove_file dot_file;
   n+1
 ;;
