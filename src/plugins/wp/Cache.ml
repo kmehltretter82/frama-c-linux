@@ -63,6 +63,14 @@ module MODE = WpContext.StaticGenerator(Datatype.Unit)
         with Not_found -> Update
     end)
 
+let hooks = ref []
+let add_hook_on_mode_update f = hooks := f :: !hooks
+let clear_then_hooks () = MODE.clear () ; List.iter (fun h -> h ()) !hooks
+
+let () =
+  Wp_parameters.Cache.add_update_hook
+    (fun _ _ -> clear_then_hooks ())
+
 let get_mode = MODE.get
 let set_mode m = MODE.set () m
 
