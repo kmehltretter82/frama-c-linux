@@ -735,6 +735,15 @@ let isRoot g =
     keepTypes
   | _ -> false
 
+(* Test the debug printers when we're inside tests. *)
+let test_debug_printers cabs_files merged_file =
+  if Cmdline.inside_tests then begin
+    let pp_dump pp e = Pretty_utils.with_null (fun _ -> ()) "%a" pp e in
+    List.iter (fun f -> pp_dump Cabs.pp_file f ) cabs_files;
+    pp_dump Cil_types.pp_file merged_file;
+  end
+[@@alert "-deprecated"]
+
 let files_to_cabs_cil files cpp_commands =
   Kernel.feedback ~level:2 "parsing";
   (* Parsing and merging must occur in the very same order.
@@ -759,6 +768,7 @@ let files_to_cabs_cil files cpp_commands =
     Cil_printer.pp_file merged_file;
   if Kernel.UnspecifiedAccess.get () then
     Undefined_sequence.check_sequences merged_file;
+  test_debug_printers cabs_files merged_file;
   merged_file, cabs_files
 
 (* "Implicit" annotations are those added by the kernel with ACSL name
