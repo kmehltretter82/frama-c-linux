@@ -273,7 +273,7 @@ export interface CheckProps {
 
 /** Checkbox button. */
 export const Checkbox = (props: CheckProps): JSX.Element => {
-  const { value, onChange } = props;
+  const { onChange, value = false } = props;
   const disabled = onChange ? DISABLED(props) : true;
   const callback = onChange && (() => onChange(!value));
   const baseClass = disabled ? CHECKBOX_DISABLED : CHECKBOX_ENABLED;
@@ -477,7 +477,7 @@ export interface SelectProps {
 
  */
 export function SelectMenu(props: SelectProps): JSX.Element {
-  const { onChange, placeholder, focus=false } = props;
+  const { onChange, placeholder, focus = false, value = '' } = props;
   const className = classes(
     'dome-xSelect dome-xBoxButton dome-xButton-default dome-xButton-label',
     props.className,
@@ -495,7 +495,7 @@ export function SelectMenu(props: SelectProps): JSX.Element {
       className={className}
       style={props.style}
       title={props.title}
-      value={props.value}
+      value={value}
       onChange={callback}
     >
       {placeholder && <option value="">— {placeholder} —</option>}
@@ -647,7 +647,7 @@ export interface SpinnerProps {
 }
 
 export function Spinner(props: SpinnerProps): JSX.Element {
-  const { onChange } = props;
+  const { onChange, value = '' } = props;
   const className = classes( 'dome-xSpinner', props.className );
   const disabled = onChange ? DISABLED(props) : true;
   const callback = (evt: React.ChangeEvent<HTMLInputElement>): void => {
@@ -661,7 +661,7 @@ export function Spinner(props: SpinnerProps): JSX.Element {
       id={props.id}
       title={props.title}
       type="number"
-      value={props.value}
+      value={value}
       min={props.vmin}
       max={props.vmax}
       step={props.vstep}
