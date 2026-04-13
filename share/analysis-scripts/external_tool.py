@@ -17,7 +17,7 @@ import subprocess
 import sys
 
 # warnings about missing commands are disabled during testing
-emit_warns = os.getenv("PTESTS_TESTING") is None
+emit_warns = os.getenv("FRAMAC_TESTING") is None
 
 # Cache for get_command
 cached_commands: dict[str, Path | None] = {}

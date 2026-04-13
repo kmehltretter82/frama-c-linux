@@ -1,4 +1,4 @@
-  $ PTESTS_TESTING=1 frama-c-script heuristic-detect-recursion heuristic-detect-recursion.i
+  $ FRAMAC_TESTING=yes frama-c-script heuristic-detect-recursion heuristic-detect-recursion.i
   recursive cycle detected: 
     heuristic-detect-recursion.i:44: direct_rec -> direct_rec
   recursive cycle detected: 

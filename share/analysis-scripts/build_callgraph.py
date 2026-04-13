@@ -17,7 +17,7 @@ import sys
 import function_finder
 import source_filter
 
-under_test = os.getenv("PTESTS_TESTING")
+under_test = os.getenv("FRAMAC_TESTING")
 
 debug = os.getenv("DEBUG")
 

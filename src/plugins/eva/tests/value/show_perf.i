@@ -1,7 +1,7 @@
 /* run.config*
    FILTER: sed -e 's/[0-9.]\{1,\}\([%s]\)/?\1/g'
    STDOPT: +"-eva-show-perf"
-   ENV: PTESTS_TESTING 1
+   ENV: FRAMAC_TESTING yes
    ENV: NOGUI 1
    EXECNOW: BIN flamegraph.txt BIN flamegraph.err { %{bin:frama-c} @PTEST_FILE@ -eva -eva-flamegraph flamegraph.txt && %{bin:frama-c-script} flamegraph flamegraph.txt; } 1> @DEV_NULL@ 2> flamegraph.err
 */
