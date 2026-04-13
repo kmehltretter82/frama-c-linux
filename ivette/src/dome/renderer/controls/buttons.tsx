@@ -49,7 +49,7 @@ const LABEL = ({ disabled, label }: LABELprops): JSX.Element => {
     'dome-xButton-label',
     disabled ? 'dome-control-disabled' : 'dome-control-enabled'
   );
-  return <div className={className}>{ label }</div>;
+  return <div className={className}>{label}</div>;
 };
 
 export type ButtonKind =
@@ -531,7 +531,7 @@ export interface SelectButtonProps {
 /** Selection from a group of buttons.
     Only one button from the group can be selected at a time. */
 export function SelectButton(props: SelectButtonProps)
-: React.JSX.Element | null {
+  : React.JSX.Element | null {
   const { buttonList, selected, onSelection,
     disabled = false, verticalSep = true } = props;
 
@@ -542,7 +542,7 @@ export function SelectButton(props: SelectButtonProps)
     props.className
   );
 
-  if(buttonList.length < 2) return null;
+  if (buttonList.length < 2) return null;
   return (
     <div className={className}>
       <ToolBar.ButtonGroup disabled={disabled} verticalSep={verticalSep}>
@@ -581,9 +581,9 @@ export interface ItemProps {
 }
 export type MultiselectItemProps = ItemProps | 'separator'
 
-export function MultiselectItem({ item }: {item: MultiselectItemProps})
-: React.JSX.Element | null {
-  if(item === 'separator')
+export function MultiselectItem({ item }: { item: MultiselectItemProps })
+  : React.JSX.Element | null {
+  if (item === 'separator')
     return <div className='dome-xMenu-Item-separator' />;
 
   const className = classes(
@@ -591,26 +591,26 @@ export function MultiselectItem({ item }: {item: MultiselectItemProps})
     !item.enabled && 'dome-xMenu-Item-disabled'
   );
 
-  if(item.display === false) return null;
+  if (item.display === false) return null;
   return <div title={item.title} className={className} id={item.id}
-      onClick={() => item.enabled && item.onClick()}
-    >
-      <Icon id='CHECK' size={14} visible={item.checked}/>
-      <div>{item.label}</div>
-    </div>;
+    onClick={() => item.enabled && item.onClick()}
+  >
+    <Icon id='CHECK' size={14} visible={item.checked} />
+    <div>{item.label}</div>
+  </div>;
 }
 
 export function Multiselect(
-  { title, children }: {title?: string, children: React.ReactNode}
+  { title, children }: { title?: string, children: React.ReactNode }
 ): React.JSX.Element {
   return (
     <Vbox>
-      { title &&
+      {title &&
         <Vbox className='dome-xMenu-Item-title dome-xMenu-Item-separator'>
           {title}
         </Vbox>
       }
-      { children }
+      {children}
     </Vbox>
   );
 }
@@ -648,7 +648,7 @@ export interface SpinnerProps {
 
 export function Spinner(props: SpinnerProps): JSX.Element {
   const { onChange, value = '' } = props;
-  const className = classes( 'dome-xSpinner', props.className );
+  const className = classes('dome-xSpinner', props.className);
   const disabled = onChange ? DISABLED(props) : true;
   const callback = (evt: React.ChangeEvent<HTMLInputElement>): void => {
     if (onChange) {
