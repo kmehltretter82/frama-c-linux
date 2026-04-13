@@ -812,7 +812,6 @@ release-wiki:
 # repositories stay synchronized.
 
 .build_template: &publish_frama_c_template
-  stage: publish
   variables:
     BRANCH: "master"
     REPOSITORY: "frama-c"
@@ -824,14 +823,15 @@ release-wiki:
   interruptible: false
 
 publish-frama-c:
+  stage: publish
   <<: *publish_frama_c_template
 
 publish-frama-c_manual:
   <<: *publish_frama_c_template
+  stage: release # publish manually even if some jobs from the release stage fail
   when: manual
 
 .publish-fclang: &publish-fclang_template
-  stage: publish
   variables:
     BRANCH: "master"
     REPOSITORY: "frama-clang"
@@ -842,14 +842,15 @@ publish-frama-c_manual:
   interruptible: false
 
 publish-fclang:
+  stage: publish
   <<: *publish-fclang_template
 
 publish-fclang_manual:
   <<: *publish-fclang_template
+  stage: release # publish manually even if some jobs from the release stage fail
   when: manual
 
 .publish-meta: &publish-meta_template
-  stage: publish
   variables:
     BRANCH: "master"
     REPOSITORY: "meta"
@@ -860,14 +861,15 @@ publish-fclang_manual:
   interruptible: false
 
 publish-meta:
+  stage: publish
   <<: *publish-meta_template
 
 publish-meta_manual:
   <<: *publish-meta_template
+  stage: release # publish manually even if some jobs from the release stage fail
   when: manual
 
 .publish-frama-c-api: &publish-frama-c-api_template
-  stage: publish
   <<: *prepare_ssh_template
   script:
     - nix-shell -p coreutils openssh --run './nix/frama-c-public/publish-api.sh'
@@ -877,8 +879,10 @@ publish-meta_manual:
   interruptible: false
 
 publish-frama-c-api:
+  stage: publish
   <<: *publish-frama-c-api_template
 
 publish-frama-c-api_manual:
   <<: *publish-frama-c-api_template
+  stage: release # publish manually even if some jobs from the release stage fail
   when: manual
