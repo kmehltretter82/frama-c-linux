@@ -73,7 +73,7 @@ let pp_regions fmt = function
 
 type env = {
   context: Logic_typing.typing_context ;
-  mutable esource: Filepath.position ;
+  mutable esource: Filepos.t ;
   mutable enamed: string ;
   mutable eflags: Attr.flags ;
   mutable rpaths: path list ;

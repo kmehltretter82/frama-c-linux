@@ -58,7 +58,7 @@ int cast(char *p, int k, int n)
   /*@ check region: mem_access: \valid_read((int *)(p + k)); */
   /*@ check region: path: \valid_region((int *)(p + k), sizeof(int)); */
   /*@ check region: initialized: \initialized((int *)(p + k)); */
-  /*@ check region: aligned: \aligned((int *)(p + k),sizeof(int)); */
+  /*@ check region: aligned: \aligned((int *)(p + k),alignof(int)); */
   __retres = *((int *)(p + k));
   return __retres;
 }

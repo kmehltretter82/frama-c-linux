@@ -40,11 +40,14 @@ type guard =
   | Non_null of addr
   | Valid of addr
   | Valid_read of addr
-  | Valid_object of addr
+  | Valid_pointer of addr
   | Valid_region of (Memory.node [@ compare fun _ _ -> 0]) * addr
   | Initialized of addr
   | Aligned of addr
 [@@ deriving ord]
+
+(* For Valid_region, node is precomputed from addr,
+   hence comparing node is useless. *)
 
 type condition =
   | Forall of Logic_var.t list * condition
@@ -56,9 +59,9 @@ type condition =
 
 let pp_guard fmt = function
   | Bounds(k,n) -> Format.fprintf fmt "0<= %a < %a" pp_value k Z.pretty n
-  | Non_null a -> Format.fprintf fmt "!(%a)" pp_addr a
+  | Non_null a -> Format.fprintf fmt "%a != \null" pp_addr a
   | Valid a -> Format.fprintf fmt "\\valid(%a)" pp_addr a
-  | Valid_object a -> Format.fprintf fmt "\\valid_object(%a)" pp_addr a
+  | Valid_pointer a -> Format.fprintf fmt "\\valid_pointer(%a)" pp_addr a
   | Valid_read a -> Format.fprintf fmt "\\valid_read(%a)" pp_addr a
   | Valid_region(_,a) -> Format.fprintf fmt "\\valid_region(%a)" pp_addr a
   | Initialized a -> Format.fprintf fmt "\\initialized(%a)" pp_addr a
@@ -115,7 +118,7 @@ let of_guard ?loc ?names = function
   | Non_null p -> Condition.pnull ?loc ?names ~eq:false @@ of_addr ?loc p
   | Valid p -> Condition.pvalid ?loc ?names @@ of_addr ?loc p
   | Valid_read p -> Condition.pvalid_read ?loc ?names @@ of_addr ?loc p
-  | Valid_object p -> Condition.pvalid_object ?loc ?names @@ of_addr ?loc p
+  | Valid_pointer p -> Condition.pvalid_pointer ?loc ?names @@ of_addr ?loc p
   | Valid_region(_,p) -> Condition.pvalid_region ?loc ?names @@ of_addr ?loc p
   | Initialized p -> Condition.pinitialized ?loc ?names @@ of_addr ?loc p
   | Aligned p -> Condition.paligned ?loc ?names @@ of_addr ?loc p
@@ -199,12 +202,12 @@ let valid_read env n ?kd a =
     check env "mem_access" (Valid_read a) a @@
     Condition.rvalid env.here n (kindof a kd)
 
-let valid_object env n ?kd a =
+let valid_pointer env n ?kd a =
   if
     Kernel.InvalidPointer.get () &&
     not @@ RteGen.Generator.Pointer_value.is_computed env.kf
   then
-    check env "pointer_value" (Valid_object a) a @@
+    check env "pointer_value" (Valid_pointer a) a @@
     Condition.rvalid env.here n (kindof a kd)
 
 let initialized env n ?kd a =
@@ -313,7 +316,7 @@ let instr env = function
     begin
       match exp env e with
       | None -> ()
-      | Some rp -> valid_object env rp (ADDR e)
+      | Some rp -> valid_pointer env rp (ADDR e)
     end ;
     write env lv ;
   | Call(r,f,es,_) ->

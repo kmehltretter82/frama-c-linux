@@ -31,7 +31,9 @@ val pvalid_region :
   ?loc:location -> ?names:string list -> ?label:logic_label ->
   term -> predicate
 
-val pvalid_object :
+(** [p] is [\null] or [\object_pointer(p)], or [\valid_function(p)]
+    for function pointers *)
+val pvalid_pointer :
   ?loc:location -> ?names:string list -> ?label:logic_label ->
   term -> predicate
 
@@ -39,6 +41,7 @@ val pinitialized :
   ?loc:location -> ?names:string list -> ?label:logic_label ->
   term -> predicate
 
+(** [p] is aligned wrt its pointed type ; for direct access to [*p] only *)
 val paligned :
   ?loc:location -> ?names:string list ->
   term -> predicate

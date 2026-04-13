@@ -21,7 +21,7 @@ type guard =
   | Non_null of addr
   | Valid of addr
   | Valid_read of addr
-  | Valid_object of addr
+  | Valid_pointer of addr
   | Valid_region of node * addr
   | Initialized of addr
   | Aligned of addr
