@@ -333,7 +333,7 @@ and typ_node =
       {!Cil.setFormals}, or {!Cil.setFunctionType}, or
       {!Cil.makeFormalVar} for this purpose. *)
 
-  | TNamed of typeinfo [@printer fun fmt ti -> Format.pp_print_string fmt ti.tname]
+  | TNamed of typeinfo [@printer fun fmt ti -> Format.fprintf fmt "<tname:%S>" ti.tname]
   (** The use of a named type. All uses of the same type name must share the
       typeinfo. Each such type name must be preceded in the file by a [GType]
       global. This is printed as just the type name. The actual referred type
@@ -342,7 +342,7 @@ and typ_node =
       {!Ast_types.unroll}. The attributes are in addition to those given
       when the type name was defined. *)
 
-  | TComp of compinfo [@printer fun fmt ci -> Format.pp_print_string fmt ci.cname]
+  | TComp of compinfo [@printer fun fmt ci -> Format.fprintf fmt "<cname:%S>" ci.cname]
   (** A reference to a struct or a union type. All references to the
       same struct or union must share the same compinfo among them and
       with a [GCompTag] global that precedes all uses (except maybe
@@ -351,7 +351,7 @@ and typ_node =
       addition to the attributes that were given at the definition of
       the type and which are stored in the compinfo.  *)
 
-  | TEnum of enuminfo [@printer fun fmt ei -> Format.pp_print_string fmt ei.ename]
+  | TEnum of enuminfo [@printer fun fmt ei -> Format.fprintf fmt "<ename:%S>" ei.ename]
   (** A reference to an enumeration type. All such references must
       share the enuminfo among them and with a [GEnumTag] global that
       precedes all uses. The attributes refer to this use of the
@@ -484,7 +484,7 @@ and compinfo = {
 (** Information about a struct/union field.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and fieldinfo = {
-  mutable fcomp: compinfo [@printer fun fmt ci -> Format.pp_print_string fmt ci.cname];
+  mutable fcomp: compinfo [@printer fun fmt ci -> Format.fprintf fmt "<cname:%S>" ci.cname];
   (** The host structure that contains this field. There can be only one
       [compinfo] that contains the field. *)
 
@@ -575,7 +575,7 @@ and enumitem = {
 
   mutable eival: exp; (** value of the item. Must be a compile-time constant *)
 
-  mutable eihost: enuminfo; [@printer fun fmt ei -> Format.pp_print_string fmt ei.ename]
+  mutable eihost: enuminfo; [@printer fun fmt ei -> Format.fprintf fmt "<ename:%S>" ei.ename]
   (** the host enumeration in which the item is declared. *)
 
   eiloc: location;
@@ -715,7 +715,7 @@ and varinfo = {
       Those variables do *not* have an associated {!GVar} or {!GVarDecl}. *)
 
   mutable vlogic_var_assoc:
-    (logic_var [@printer fun fmt lv -> Format.pp_print_string fmt lv.lv_name]) option
+    (logic_var [@printer fun fmt lv -> Format.fprintf fmt "<lv_name:%S>" lv.lv_name]) option
     (** Logic variable representing this variable in the logic world. Do not
         access this field directly. Instead, call {!Cil.cvar_to_lvar}. *)
 }
@@ -1164,7 +1164,7 @@ and stmtkind =
 
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-  | Goto of (stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d" s.sid]) ref * location
+  | Goto of (stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d>" s.sid]) ref * location
   (** A goto statement. Appears from actual goto's in the code or from goto's
       that have been inserted during elaboration. The reference points to the
       statement that is the target of the Goto. This means that you have to
@@ -1198,8 +1198,8 @@ and stmtkind =
 
   | Loop of
       code_annotation list * block * location
-      * ((stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d" s.sid]) option)
-      * ((stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d" s.sid]) option)
+      * ((stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d>" s.sid]) option)
+      * ((stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d>" s.sid]) option)
   (** A [while(1)] loop. The termination test is implemented in the body of a
       loop using a [Break] statement. If {!Cfg.prepareCFG} has been called, the
       first stmt option will point to the stmt containing the continue label
@@ -1214,7 +1214,7 @@ and stmtkind =
 
   | UnspecifiedSequence of (stmt * lval list
                             * lval list * lval list
-                            * (stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d" s.sid]) ref list) list
+                            * (stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d>" s.sid]) ref list) list
   (** statements whose order of execution is not specified by
       ISO/C.  This is important for the order of side effects
       during evaluation of expressions. Each statement comes
@@ -1360,7 +1360,7 @@ and extended_asm =
     asm_inputs: (string option * string * exp) list
   (** inputs with optional names and constraints *);
     asm_clobbers: string list (** register clobbers *);
-    asm_gotos: ((stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d" s.sid]) ref) list
+    asm_gotos: ((stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d>" s.sid]) ref) list
   (** list of statements this asm section may jump to. Destination
       must have a label. *);
   }
@@ -1454,7 +1454,7 @@ and term_node =
   | TStartOf of term_lval (** beginning of an array. *)
 
   (* additional constructs *)
-  | Tapp of (logic_info [@printer fun fmt li -> Format.pp_print_string fmt li.l_var_info.lv_name])
+  | Tapp of (logic_info [@printer fun fmt li -> Format.fprintf fmt "<l_var_info.lv_name:%S>" li.l_var_info.lv_name])
             * logic_label list * term list
   (** application of a logic function. *)
   | Tlambda of quantifiers * term (** lambda abstraction. *)
@@ -1562,7 +1562,7 @@ and logic_type_info = {
 (* will be expanded when dealing with concrete types *)
 
 and logic_type_def =
-  | LTsum of (logic_ctor_info [@printer fun fmt li -> Format.pp_print_string fmt li.ctor_name]) list
+  | LTsum of (logic_ctor_info [@printer fun fmt li -> Format.fprintf fmt "<ctor_name:%S>" li.ctor_name]) list
   (** sum type with its constructors. *)
   | LTsyn of logic_type (** Synonym of another type. *)
 
@@ -1612,7 +1612,7 @@ and predicate_node =
   (** [\false] always-false predicate. *)
   | Ptrue
   (** [\true] always-true predicate. *)
-  | Papp of (logic_info [@printer fun fmt li -> Format.pp_print_string fmt li.l_var_info.lv_name])
+  | Papp of (logic_info [@printer fun fmt li -> Format.fprintf fmt "<l_var_info.lv_name:%S>" li.l_var_info.lv_name])
             * logic_label list * term list
   (** [named{l1, ...}(t1, ...)] application of a predicate. *)
   | Pseparated of term list
