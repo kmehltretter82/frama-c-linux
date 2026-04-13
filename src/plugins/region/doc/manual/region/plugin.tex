@@ -245,14 +245,14 @@ of all rows with their offset range and contained fields.
 \section{Adding Region Annotations}
 \label{toc:annotations}
 
-By default, the \textsf{Region} plug-in guess on optimistic aliasing contexts
+By default, the \textsf{Region} plug-in guesses an optimistic aliasing context
 and assumes that pointers have all desirable good properties to avoid any
 unexpected, unspecified or undefined behaviors. The optimistic guess covers the
 following desirable properties:
 \begin{itemize}
 \item pointer variables only have either a null value, or an aligned
   address that fits within some object boundaries, up to the address immediately
-  after (also called off-by-one of array elements);
+  after (also called past-the-end of array elements);
 \item formal parameters with pointer type initially point to valid, separated
   and properly initialized objects of the specified type;
 \item pointed objects are considered to be writable unless their type have an
@@ -316,11 +316,11 @@ analyzed.
 
 \index{region@\verb+region+}
 Region annotations are extended \textsf{ACSL} clauses, introduced by
-\verb+region+ keyword (or \verb+\\region::region+) that follow the syntactic
+\verb+region+ keyword (or \verb+\region::region+) that follow the syntactic
 definitions of Figure~\ref{fig:annotations}. They can be used in function
 contracts, but within the default behavior only, or inside code-annotations.
 
-Each region annotation introduces one or several regions specifications. Region
+Each region annotation introduces one or several regions specifications. A region
 can be anonymous or identified with a \emph{name}. When more than one region is
 specified, the subsequent ones shall be named. Regions, with or without names,
 consists of \emph{paths} and \emph{objects}. Paths are limited forms of
@@ -345,7 +345,7 @@ specification:
 Aliasing paths are regular \textsf{ACSL} term l-values, with the following
 restrictions:
 \begin{itemize}
-\item no arithmetic conversion, only pointer casts are accepted;
+\item no arithmetic conversion, only pointer casts are allowed;
 \item array access shall have an unspecified range of indices;
 \item pointer access are considered like undefined array access.
 \end{itemize}
@@ -420,7 +420,7 @@ using the kernel command-line option \verb+-no-warn-unaligned-pointer+.
 \verb+-warn-invalid-pointer+ has been set, a variable with pointer type shall
 only be assigned the \verb+\null+ value or a pointer to a valid object
 (including the final edge of the object, as formally specified by
-\verb+\valid_object+ in \textsf{ACSL}).
+\verb+\object_pointer+ in \textsf{ACSL}).
 
 \pagebreak
 \section{Generating Side Conditions}
