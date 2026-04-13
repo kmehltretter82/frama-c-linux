@@ -318,16 +318,33 @@ analyzed.
 Region annotations are extended \acsl clauses, introduced by
 \verb+region+ keyword (or \verb+\region::region+) that follow the syntactic
 definitions of Figure~\ref{fig:annotations}. They can be used in function
-contracts, but within the default behavior only, or inside code-annotations.
+contracts (default behavior only) or inside code-annotations.
+Each region annotation introduces one or several regions specifications.
+A typical example is:
 
-Each region annotation introduces one or several regions specifications. A region
-can be anonymous or identified with a \emph{name}. When more than one region is
-specified, the subsequent ones shall be named. Regions, with or without names,
-consists of \emph{paths} and \emph{objects}. Paths are limited forms of
-\acsl terms denoting classes of l-values that might be aliased with
-each others. Objects are used to declare the available arrays through pointer
-arguments from the function calling contexts, together with their properties.
-They can only be declared in function contracts.
+\begin{lstlisting}
+//@ region A: p->f[..], q[..], B: r[0..n], \nullable;
+\end{lstlisting}
+
+Such an annotation introduces two named regions, respectively \verb+A+ and
+\verb+B+. In region named \verb+A+, we will find locations accessible through
+\emph{paths} \verb+p->f[..]+ and \verb+q[..]+ ; hence for instance, l-values
+\verb+p->f[4]+ and \verb+q[k]+ might be aliased. In region named \verb+B+, we
+have a declared \emph{object} that might be available through \verb$r[k]$,
+provided \verb$0<=k<=n$ (the specified range) and \verb$r!=\null$ (because of
+the \verb+\nullable+ flag).
+
+More generally, a region can be anonymous or identified with a \emph{name}.
+Regions, with or without names, consists of \emph{paths} and \emph{objects}.
+Paths are limited forms of \acsl terms denoting classes of l-values that might
+be aliased with each others. They are roughly normal l-values with only
+imprecise array access \verb$p[..]$, like in example region \verb+A+ above.
+Objects are used to declare arrays thaht might be available at the beginning of
+a function from its calling contexts, together with their range and specific
+properties (see below). They are always in form $p[a..b]$ where $p$ is a single
+l-value and $a$ and $b$ two integer values, and can be attributed with different
+property flags, like in example region \verb+B+ above. Objects can only be
+declared in function contracts.
 
 We now describe region specifications, paths and objects in more details.
 
@@ -346,8 +363,8 @@ Aliasing paths are regular \acsl term l-values, with the following
 restrictions:
 \begin{itemize}
 \item no arithmetic conversion, only pointer casts are allowed;
-\item array access shall have an unspecified range of indices;
-\item pointer access are considered like undefined array access.
+\item array access shall have an unspecified range of indices \verb$a[..]$;
+\item pointer access are considered just like undefined array access.
 \end{itemize}
 Should paths \verb+p+ and \verb+q+ are aliased with each other and belong the
 same region $R$, then access paths \verb+*p+ and \verb+*q+ denote the
@@ -357,10 +374,7 @@ same region $R$, then access paths \verb+*p+ and \verb+*q+ denote the
 Aliased fields specifications, for instance \verb+a.f..a.g+, must share the same
 base aliasing path. Given any compound object accessible through path \verb+a+,
 the entire space occupied between fields \verb+f+ and \verb+g+ will be merged
-into the same region. Both fields are included together will all the other
-fields in between, whatever their respective types. Fields \verb+f+ and \verb+g+
-might be declared in any order, hence \verb+a.g..a.f+ is an equivalent
-specification.
+into the same region.
 
 \paragraph{Objects.}
 They shall be only specified in function contracts. An object \verb+a[p..q]+
@@ -386,7 +400,7 @@ overlap with each others.
 \paragraph{Object Properties.}
 By default, any declared object \verb+p[a..b]+ is assumed to be valid and
 properly initialized. Flags can be used in region specifications to downgrade
-those hypotheses to more permissive situations. The available flags for an
+those hypotheses to unusual situations. The available flags for an
 object specification \verb+a[p..q]+ are:
 \index{nullable@\verb+\nullable+}
 \index{allocated@\verb+\allocated+}
