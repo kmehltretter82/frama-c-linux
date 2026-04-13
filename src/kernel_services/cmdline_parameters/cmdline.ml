@@ -501,6 +501,10 @@ let deterministic =
   Option.fold ~none:false ~some:(( = ) "yes")
     (Sys.getenv_opt "FC_DETERMINISTIC")
 
+let inside_tests =
+  Option.fold ~none:false ~some:(( = ) "yes")
+    (Sys.getenv_opt "FRAMAC_TESTING")
+
 let tty = !tty
 let permissive = !permissive
 

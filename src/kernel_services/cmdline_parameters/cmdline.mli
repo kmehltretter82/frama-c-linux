@@ -363,6 +363,13 @@ val deterministic: bool
     are acceptable, as reproducibility is more important.
     @since Aluminium-20160501 *)
 
+val inside_tests: bool
+(** Indicates if the current execution is done inside a test or not. This is
+    determined using ["FRAMAC_TESTING"] environment variable.
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
+    @since Frama-C+dev
+*)
+
 val tty: bool
 (** Indicates whether the standard output should be considered as a tty.
     Defaults to [Unix.isattty Unix.stdout && Ansi_escape.is_supported ()].
