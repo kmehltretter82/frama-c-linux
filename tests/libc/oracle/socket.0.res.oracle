@@ -90,8 +90,8 @@
   function readv: precondition 'valid_fd' got status valid.
 [eva:progress] socket.c:69: 
   function readv: precondition 'initialization,initialized_inputs' got status valid.
-[eva:progress] socket.c:69: 
-  function readv: precondition 'valid_iov' got status valid.
+[eva:alarm] socket.c:69: Warning: 
+  function readv: precondition 'valid_iov' got status unknown.
 [eva:progress] socket.c:69: 
   function readv: precondition 'bounded_iovcnt' got status valid.
 [eva:acsl:unsupported] FRAMAC_SHARE/libc/sys/uio.h:38: 
