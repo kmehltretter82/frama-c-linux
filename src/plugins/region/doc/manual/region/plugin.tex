@@ -1,7 +1,7 @@
 \chapter{User's Guide}
 \label{toc:userguide}
 
-The \FramaC/\textsf{Region} computes a single \emph{memory map} for every
+The \FramaC/\Region computes a single \emph{memory map} for every
 \textsf{C}-function in the source. The computation of memory maps is performed
 on-demand through the \FramaC GUI or through the \textsf{API} or once and for
 all functions by using the \verb$-region$ command-line option.
@@ -11,7 +11,7 @@ difficult to read by normal users. It consists of a text-based dump of all
 regions for all functions with their attributes and properties.
 
 Region maps are visual and interactive data that deserve a graphical user
-interface to be exploited. Hence, the recommended way of using \FramaC/\textsf{Region}
+interface to be exploited. Hence, the recommended way of using \FramaC/\Region
 is \emph{via} the \FramaC GUI and its \textsf{Region Analysis} component:
 
 \begin{logs}
@@ -45,7 +45,7 @@ The User's Guide Section is structured as follows:
 \section{Walking through Region Maps}
 \label{toc:navigation}
 
-A \FramaC/\textsf{Region} memory map consists of different kinds of cells or
+A \FramaC/\Region memory map consists of different kinds of cells or
 \emph{regions}. Intuitively a \emph{region} is a delimited range of memory
 locations with consistent access.
 
@@ -245,7 +245,7 @@ of all rows with their offset range and contained fields.
 \section{Adding Region Annotations}
 \label{toc:annotations}
 
-By default, the \textsf{Region} plug-in guesses an optimistic aliasing context
+By default, the \Region plug-in guesses an optimistic aliasing context
 and assumes that pointers have all desirable good properties to avoid any
 unexpected, unspecified or undefined behaviors. The optimistic guess covers the
 following desirable properties:
@@ -259,7 +259,7 @@ following desirable properties:
   explicit \verb+const+ attribute;
 \end{itemize}
 Would such an optimistic guess be incompatible with some code, the user shall
-provide additional annotations for the \textsf{Region} plug-in to be more
+provide additional annotations for the \Region plug-in to be more
 pessimistic and to consider more problematic cases to be properly handled and
 analyzed.
 
@@ -315,7 +315,7 @@ analyzed.
 \end{figure}
 
 \index{region@\verb+region+}
-Region annotations are extended \textsf{ACSL} clauses, introduced by
+Region annotations are extended \acsl clauses, introduced by
 \verb+region+ keyword (or \verb+\region::region+) that follow the syntactic
 definitions of Figure~\ref{fig:annotations}. They can be used in function
 contracts, but within the default behavior only, or inside code-annotations.
@@ -324,7 +324,7 @@ Each region annotation introduces one or several regions specifications. A regio
 can be anonymous or identified with a \emph{name}. When more than one region is
 specified, the subsequent ones shall be named. Regions, with or without names,
 consists of \emph{paths} and \emph{objects}. Paths are limited forms of
-\textsf{ACSL} terms denoting classes of l-values that might be aliased with
+\acsl terms denoting classes of l-values that might be aliased with
 each others. Objects are used to declare the available arrays through pointer
 arguments from the function calling contexts, together with their properties.
 They can only be declared in function contracts.
@@ -342,7 +342,7 @@ specification:
 \end{itemize}
 
 \paragraph{Aliasing Paths.}
-Aliasing paths are regular \textsf{ACSL} term l-values, with the following
+Aliasing paths are regular \acsl term l-values, with the following
 restrictions:
 \begin{itemize}
 \item no arithmetic conversion, only pointer casts are allowed;
@@ -420,37 +420,37 @@ using the kernel command-line option \verb+-no-warn-unaligned-pointer+.
 \verb+-warn-invalid-pointer+ has been set, a variable with pointer type shall
 only be assigned the \verb+\null+ value or a pointer to a valid object
 (including the final edge of the object, as formally specified by
-\verb+\object_pointer+ in \textsf{ACSL}).
+\verb+\object_pointer+ in \acsl).
 
 \pagebreak
 \section{Generating Side Conditions}
 \label{toc:commandline}
 
 Region specifications are taken as \emph{additional requirements} to other
-\textsf{ACSL} clauses of a function. As such, they are not necessarily verified
+\acsl clauses of a function. As such, they are not necessarily verified
 or preserved by any execution of the function and for any calling context.
 Hence, region specifications necessarily induce some \emph{side conditions} to
-be verified to be correct. The \textsf{Region} plug-in provides two ways for
+be verified to be correct. The \Region plug-in provides two ways for
 generating side-conditions: a programmatic \textsf{API} for other
-\textsf{Frama-C} plug-ins to verify these side conditions on their own, and a
-command-line option to generate regular \textsf{ACSL} clauses that enforce
+\FramaC plug-ins to verify these side conditions on their own, and a
+command-line option to generate regular \acsl clauses that enforce
 side-conditions to be verified.
 
-This behavior is similar to what provides the \textsf{RteGen} plug-in
-(\verb+-rte+). Actually, the side-conditions generated by \textsf{Region}
+This behavior is similar to what provides the \rte plug-in
+(\verb+-rte+). Actually, the side-conditions generated by \Region
 generally subsume necessary side-conditions to prove the absence of some
 categories of \emph{Runtime Errors}, so that \verb+-region+ shall be used
-\emph{before} \textsf{RteGen} to obtain more precise annotations.
+\emph{before} \rte to obtain more precise annotations.
 
 The following command line options can be used to tune the generated side
-conditions of \textsf{Region} plug-in:
+conditions of \Region plug-in:
 
 \begin{description}
 \item[\texttt{-(no)-region}] generate side-conditions by inserting additional
-  \textsf{ACSL} clauses in the code (not by default).
+  \acsl clauses in the code (not by default).
 \item[\texttt{-region-(check|assert)}] generate side-conditions by using respectively
   \verb+check+ (the default) or \verb+assert+ clauses.
-\item[\texttt{-(no)-region-logic}] generate side-conditions for \textsf{ACSL}
+\item[\texttt{-(no)-region-logic}] generate side-conditions for \acsl
   terms and predicates throughout the specifications (not by default).
 \item[\texttt{-(safe|unsafe)-arrays}] generate strict array bounds
   side-conditions whenever possible (safe, by default) or not (unsafe).
