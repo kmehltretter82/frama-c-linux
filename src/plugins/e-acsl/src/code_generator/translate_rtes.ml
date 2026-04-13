@@ -58,4 +58,4 @@ let exp ?filter kf env e =
 let () =
   Translate_terms.translate_rte_exp_ref := exp;
   Translate_predicates.translate_rte_exp_ref := exp;
-  Logic_array.translate_rte_ref := exp
+  Logic_array.Translate_rtes.exp_ref := exp
