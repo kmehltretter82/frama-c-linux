@@ -33,7 +33,7 @@ let get_first_inner_stmt stmt =
     dest_stmt
   | labels, _ ->
     Options.fatal "Unexpected stmt:\nlabels: [%a]\nstmt: %a"
-      (Pretty_utils.pp_list ~sep:"; " Cil_types_debug.pp_label) labels
+      (Pretty_utils.pp_list ~sep:"; " Cil_types.pp_label) labels
       Printer.pp_stmt stmt
 
 (**************************************************************************)

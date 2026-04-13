@@ -12,8 +12,7 @@
 *)
 
 (** A normalized (absolute) path. *)
-type t
-
+type t [@@deriving show]
 
 (* ************************************************************************* *)
 (** {2 Basic datatype functions} *)

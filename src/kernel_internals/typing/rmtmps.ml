@@ -246,7 +246,7 @@ let isExportedRoot global =
         Ast_attributes.contains "FC_BUILTIN" e.eattr ->
       e.ename, true, "has FC_BUILTIN attribute"
     | _ ->
-      (Format.asprintf "%a" Cil_types_debug.pp_global global), false,
+      (Format.asprintf "%a" Cil_types.pp_global global), false,
       "neither fundef nor vardef nor annotation"
   in
   Kernel.debug

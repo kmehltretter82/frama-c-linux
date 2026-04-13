@@ -99,7 +99,7 @@ let rec of_exp exp = match exp.enode with
   | CastE (_, exp) -> of_exp exp
   | e ->
     Options.debug "Varname.of_exp: supply default or extend this function \
-                   to handle enodes like: %a" Cil_types_debug.pp_exp_node e;
+                   to handle enodes like: %a" Cil_types.pp_exp_node e;
     "exp"
 
 and of_lhost = function

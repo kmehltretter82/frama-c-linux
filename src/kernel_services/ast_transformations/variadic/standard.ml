@@ -438,8 +438,8 @@ let find_predicate_by_width typ narrow_name wide_name =
     Kernel.warning ~current:true ~wkey:Kernel.wkey_typing
       "expected single/wide character pointer type, got %a (%a, unrolled %a)"
       Cil_printer.pp_typ typ
-      Cil_types_debug.pp_typ typ
-      Cil_types_debug.pp_typ (Ast_types.unroll_deep typ);
+      Cil_types.pp_typ typ
+      Cil_types.pp_typ (Ast_types.unroll_deep typ);
     raise Not_found
 
 let valid_read_string typ =

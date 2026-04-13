@@ -39,7 +39,7 @@ type unop =
   | Neg   (** Unary minus *)
   | BNot  (** Bitwise complement (~) *)
   | LNot  (** Logical Not (!) *)
-[@@deriving eq]
+[@@deriving eq, show { with_path = false } ]
 
 (** Binary operations *)
 type binop =
@@ -73,7 +73,7 @@ type binop =
                  {!Machine.use_logical_operators}. *)
   | LOr      (** logical or. Like [LAnd] this operator is removed unless
                  {!Kernel.LogicalOperators} is set. *)
-[@@deriving eq]
+[@@deriving eq, show { with_path = false } ]
 
 (* ************************************************************************* *)
 (** {3 Types} *)
@@ -95,7 +95,7 @@ type ikind =
   | IULongLong  (** [unsigned long long] (or [unsigned _int64] on MSVC) *)
   | IInt128     (** [__int128] (GCC extension) *)
   | IUInt128    (** [unsigned __int128] (GCC extension) *)
-[@@deriving eq]
+[@@deriving eq, show { with_path = false } ]
 
 (** Various kinds of floating-point numbers. Constructors are re-exported here
     so that we only need to open {!Cil_types} to access them, without the
@@ -109,14 +109,14 @@ type fkind = Floating_point.fkind =
   | FFloat64    (** [binary64] *)
   | FDouble     (** [double] *)
   | FLongDouble (** [long double] *)
-[@@deriving eq]
+[@@deriving eq, show { with_path = false } ]
 
 (* ************************************************************************* *)
 (** {3 Logic} *)
 (* ************************************************************************* *)
 
 type predicate_kind = Assert | Check | Admit
-[@@deriving eq]
+[@@deriving eq, show { with_path = false } ]
 
 (** builtin logic labels defined in ACSL. *)
 type logic_builtin_label =
@@ -127,7 +127,7 @@ type logic_builtin_label =
   | LoopEntry
   | LoopCurrent
   | Init
-[@@deriving eq]
+[@@deriving eq, show { with_path = false } ]
 
 (** comparison relations*)
 type relation =
@@ -140,11 +140,11 @@ type relation =
   (** Different
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
   *)
-[@@deriving eq]
+[@@deriving eq, show { with_path = false } ]
 
 (** kind of termination a post-condition applies to. See ACSL manual. *)
 type termination_kind = Normal | Exits | Breaks | Continues | Returns
-[@@deriving eq]
+[@@deriving eq, show { with_path = false } ]
 
 (* ************************************************************************* *)
 (** {3 C implementation} *)
@@ -152,7 +152,7 @@ type termination_kind = Normal | Exits | Breaks | Continues | Returns
 
 type standard_or_gcc =
   [ `Standard | `GCC ]
-[@@deriving eq,ord]
+[@@deriving eq,ord, show { with_path = false } ]
 
 (* ************************************************************************* *)
 (** {2 Root of the AST} *)
@@ -187,6 +187,9 @@ type file = {
       create a global initialization CIL will try to insert code in main to
       call it. *)
 }
+(* This attribute is common for all types in the mutually recursive group of
+   types so we only need to mention it once. *)
+[@@deriving show { with_path = false } ]
 
 (** The main type for representing global declarations and definitions. A list
     of these form a CIL file. The order of globals in the file is generally
@@ -330,7 +333,7 @@ and typ_node =
       {!Cil.setFormals}, or {!Cil.setFunctionType}, or
       {!Cil.makeFormalVar} for this purpose. *)
 
-  | TNamed of typeinfo
+  | TNamed of typeinfo [@printer fun fmt ti -> Format.fprintf fmt "<tname:%S>" ti.tname]
   (** The use of a named type. All uses of the same type name must share the
       typeinfo. Each such type name must be preceded in the file by a [GType]
       global. This is printed as just the type name. The actual referred type
@@ -339,7 +342,7 @@ and typ_node =
       {!Ast_types.unroll}. The attributes are in addition to those given
       when the type name was defined. *)
 
-  | TComp of compinfo
+  | TComp of compinfo [@printer fun fmt ci -> Format.fprintf fmt "<cname:%S>" ci.cname]
   (** A reference to a struct or a union type. All references to the
       same struct or union must share the same compinfo among them and
       with a [GCompTag] global that precedes all uses (except maybe
@@ -348,7 +351,7 @@ and typ_node =
       addition to the attributes that were given at the definition of
       the type and which are stored in the compinfo.  *)
 
-  | TEnum of enuminfo
+  | TEnum of enuminfo [@printer fun fmt ei -> Format.fprintf fmt "<ename:%S>" ei.ename]
   (** A reference to an enumeration type. All such references must
       share the enuminfo among them and with a [GEnumTag] global that
       precedes all uses. The attributes refer to this use of the
@@ -481,7 +484,7 @@ and compinfo = {
 (** Information about a struct/union field.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and fieldinfo = {
-  mutable fcomp: compinfo;
+  mutable fcomp: compinfo [@printer fun fmt ci -> Format.fprintf fmt "<cname:%S>" ci.cname];
   (** The host structure that contains this field. There can be only one
       [compinfo] that contains the field. *)
 
@@ -559,6 +562,7 @@ and enuminfo = {
       reference to this [enuminfo] using the [TEnum] type constructor. *)
 
   mutable ereferenced: bool; (** [true] if used. Initially set to [false]. *)
+
   mutable ekind: ikind (** The integer kind used to represent this enum. MSVC
                            always assumes IInt but this is not the case
                            for gcc. See ISO C 6.7.2.2 *)
@@ -566,10 +570,14 @@ and enuminfo = {
 
 and enumitem = {
   eiorig_name: string; (** original name as found in C file. *)
+
   mutable einame: string; (** the name, always non-empty. *)
+
   mutable eival: exp; (** value of the item. Must be a compile-time constant *)
-  mutable eihost: enuminfo; (** the host enumeration in which the item is
-                                declared. *)
+
+  mutable eihost: enuminfo; [@printer fun fmt ei -> Format.fprintf fmt "<ename:%S>" ei.ename]
+  (** the host enumeration in which the item is declared. *)
+
   eiloc: location;
 }
 
@@ -706,9 +714,10 @@ and varinfo = {
       variables with [vsource=false], for example to handle dynamic allocation.
       Those variables do *not* have an associated {!GVar} or {!GVarDecl}. *)
 
-  mutable vlogic_var_assoc: logic_var option
-  (** Logic variable representing this variable in the logic world. Do not
-      access this field directly. Instead, call {!Cil.cvar_to_lvar}. *)
+  mutable vlogic_var_assoc:
+    (logic_var [@printer fun fmt lv -> Format.fprintf fmt "<lv_name:%S>" lv.lv_name]) option
+    (** Logic variable representing this variable in the logic world. Do not
+        access this field directly. Instead, call {!Cil.cvar_to_lvar}. *)
 }
 
 (** Storage-class information *)
@@ -1043,7 +1052,7 @@ and fundec = {
       computed it. range = 0 ...  (smaxstmtid-1). This is computed by
       {!Cfg.cfgFun}. *)
 
-  mutable sallstmts: stmt list;
+  mutable sallstmts: stmt list; [@opaque]
   (** After you call {!Cfg.cfgFun} this field is set to contain all
       statements in the function. *)
 
@@ -1113,12 +1122,12 @@ and stmt = {
   (** A number (>= 0) that is unique in a function. Filled in only after the
       CFG is computed. *)
 
-  mutable succs: stmt list;
+  mutable succs: stmt list; [@opaque]
   (** The successor statements. They can always be computed from the skind and
       the context in which this statement appears. Filled in only after the CFG
       is computed. *)
 
-  mutable preds: stmt list;
+  mutable preds: stmt list; [@opaque]
   (** The inverse of the succs function. *)
 
   mutable ghost : bool;
@@ -1155,7 +1164,7 @@ and stmtkind =
 
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-  | Goto of stmt ref * location
+  | Goto of (stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d>" s.sid]) ref * location
   (** A goto statement. Appears from actual goto's in the code or from goto's
       that have been inserted during elaboration. The reference points to the
       statement that is the target of the Goto. This means that you have to
@@ -1188,7 +1197,9 @@ and stmtkind =
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | Loop of
-      code_annotation list * block * location * (stmt option) * (stmt option)
+      code_annotation list * block * location
+      * ((stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d>" s.sid]) option)
+      * ((stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d>" s.sid]) option)
   (** A [while(1)] loop. The termination test is implemented in the body of a
       loop using a [Break] statement. If {!Cfg.prepareCFG} has been called, the
       first stmt option will point to the stmt containing the continue label
@@ -1202,7 +1213,8 @@ and stmtkind =
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | UnspecifiedSequence of (stmt * lval list
-                            * lval list * lval list * stmt ref list) list
+                            * lval list * lval list
+                            * (stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d>" s.sid]) ref list) list
   (** statements whose order of execution is not specified by
       ISO/C.  This is important for the order of side effects
       during evaluation of expressions. Each statement comes
@@ -1348,7 +1360,7 @@ and extended_asm =
     asm_inputs: (string option * string * exp) list
   (** inputs with optional names and constraints *);
     asm_clobbers: string list (** register clobbers *);
-    asm_gotos: (stmt ref) list
+    asm_gotos: ((stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d>" s.sid]) ref) list
   (** list of statements this asm section may jump to. Destination
       must have a label. *);
   }
@@ -1396,7 +1408,8 @@ and identified_term = {
 
 (** logic label referring to a particular program point. *)
 and logic_label =
-  | StmtLabel of stmt ref (** label of a C statement. *)
+  | StmtLabel of (stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d>" s.sid]) ref
+  (** label of a C statement. *)
   | FormalLabel of string (** label of global annotation. *)
   | BuiltinLabel of logic_builtin_label
 
@@ -1441,7 +1454,8 @@ and term_node =
   | TStartOf of term_lval (** beginning of an array. *)
 
   (* additional constructs *)
-  | Tapp of logic_info * logic_label list * term list
+  | Tapp of (logic_info [@printer fun fmt li -> Format.fprintf fmt "<l_var_info.lv_name:%S>" li.l_var_info.lv_name])
+            * logic_label list * term list
   (** application of a logic function. *)
   | Tlambda of quantifiers * term (** lambda abstraction. *)
   | TDataCons of logic_ctor_info * term list
@@ -1548,7 +1562,8 @@ and logic_type_info = {
 (* will be expanded when dealing with concrete types *)
 
 and logic_type_def =
-  | LTsum of logic_ctor_info list (** sum type with its constructors. *)
+  | LTsum of (logic_ctor_info [@printer fun fmt li -> Format.fprintf fmt "<ctor_name:%S>" li.ctor_name]) list
+  (** sum type with its constructors. *)
   | LTsyn of logic_type (** Synonym of another type. *)
 
 (** origin of a logic variable. *)
@@ -1597,7 +1612,8 @@ and predicate_node =
   (** [\false] always-false predicate. *)
   | Ptrue
   (** [\true] always-true predicate. *)
-  | Papp of logic_info * logic_label list * term list
+  | Papp of (logic_info [@printer fun fmt li -> Format.fprintf fmt "<l_var_info.lv_name:%S>" li.l_var_info.lv_name])
+            * logic_label list * term list
   (** [named{l1, ...}(t1, ...)] application of a predicate. *)
   | Pseparated of term list
   (** [\separated(t1, t2, ...)] pointers to separated locations *)
@@ -1888,6 +1904,7 @@ and global_annotation =
 type kinstr =
   | Kstmt of stmt
   | Kglobal
+[@@deriving show { with_path = false } ]
 
 (** Internal representation of decorated C functions *)
 type cil_function =
@@ -1898,6 +1915,7 @@ type cil_function =
       with the [TFun] constructor of {!Cil_types.typ}, the arg list is
       optional, to distinguish [void f()] ([None]) from
       [void f(void)] ([Some []]). *)
+[@@deriving show { with_path = false } ]
 
 (** Only field [fundec] can be used directly. Use {!Annotations.funspec},
     [Annotations.add_*] and [Annotations.remove_*] to query or modify field
@@ -1906,6 +1924,7 @@ type kernel_function = {
   mutable fundec : cil_function;
   mutable spec : funspec;
 }
+[@@deriving show { with_path = false } ]
 
 (** Various syntactic scopes through which an identifier might be searched.
     Note that for this purpose static variables are still tied to the block
@@ -1932,3 +1951,4 @@ type syntactic_scope =
       the block to which it is tied, will be considered.
       @since 27.0-Cobalt
   *)
+[@@deriving show { with_path = false } ]

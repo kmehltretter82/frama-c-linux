@@ -30,7 +30,7 @@ let subscript ~loc array idx =
     Options.fatal
       ~current:true
       "Trying to create a subscript on an array that is not an Lval: %a"
-      Cil_types_debug.pp_exp
+      Cil_types.pp_exp
       array
 
 let ptr_sizeof ~loc typ =

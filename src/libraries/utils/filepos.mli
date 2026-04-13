@@ -21,7 +21,7 @@ type t = Filepath.position = {
   pos_lnum : int;
   pos_bol : int;
   pos_cnum : int;
-}
+} [@@deriving show]
 
 [@@@alert "+deprecated"]
 
@@ -40,7 +40,7 @@ val to_lexing_pos : t -> Lexing.position
 (** Pretty-prints a position, in the format file:line. *)
 val pretty : Format.formatter -> t -> unit
 
-(** Debug printer. *)
+(** Debug printer, same than {!Filepos.pp}. *)
 val pretty_debug : Format.formatter -> t -> unit
 
 val pp_with_col : Format.formatter -> t -> unit

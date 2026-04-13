@@ -10,16 +10,20 @@
 (* Logic parse trees *)
 
 type location = Cil_types.location
+[@@deriving show { with_path = false } ]
 
 (** comparison operators. *)
 type relation = Lt | Gt | Le | Ge | Eq | Neq
+[@@deriving show { with_path = false } ]
 
 (** arithmetic and logic binary operators. *)
 type binop = Badd | Bsub | Bmul | Bdiv | Bmod | Bbw_and | Bbw_or | Bbw_xor |
              Blshift | Brshift
+[@@deriving show { with_path = false } ]
 
 (** unary operators. *)
 type unop = Uminus | Ustar | Uamp | Ubw_not
+[@@deriving show { with_path = false } ]
 
 (** logic constants. *)
 type constant =
@@ -27,11 +31,15 @@ type constant =
   | FloatConstant of string (** real constant *)
   | StringConstant of string (** string constant *)
   | WStringConstant of string (** wide string constant *)
+[@@deriving show { with_path = false } ]
 
 (** size of logic array.
     @before 31.0-Gallium was a sum type with only integer constants and variables
 *)
 type array_size = lexpr option
+(* This attribute is common for all types in the mutually recursive group of
+   types so we only need to mention it once. *)
+[@@deriving show { with_path = false } ]
 
 (** logic types. *)
 and logic_type =
@@ -151,6 +159,7 @@ and lexpr_node =
 
 type toplevel_predicate =
   { tp_kind: Cil_types.predicate_kind; tp_statement: lexpr }
+[@@deriving show { with_path = false } ]
 
 (** ACSL extension.
     @before 30.0-Zinc Was of type [string * lexpr list].
@@ -159,31 +168,34 @@ type extension = {
   ext_name: string;
   ext_plugin: string;
   ext_content: lexpr list;
-}
+} [@@deriving show { with_path = false } ]
 
 (** type invariant. *)
-type type_annot =  {inv_name: string;
-                    this_type : logic_type;
-                    this_name: string; (** name of its argument. *)
-                    inv: lexpr
-                   }
+type type_annot =  {
+  inv_name: string;
+  this_type : logic_type;
+  this_name: string; (** name of its argument. *)
+  inv: lexpr
+} [@@deriving show { with_path = false } ]
 
 (** model field. *)
-type model_annot =  {model_for_type: logic_type;
-                     model_type : logic_type;
-                     model_name: string; (** name of the model field. *)
-                    }
+type model_annot =  {
+  model_for_type: logic_type;
+  model_type : logic_type;
+  model_name: string; (** name of the model field. *)
+} [@@deriving show { with_path = false } ]
 
 (** Concrete type definition. *)
 type typedef =
   | TDsum of (string * logic_type list) list
   (** sum type, list of constructors *)
   | TDsyn of logic_type (** synonym of an existing type *)
+[@@deriving show { with_path = false } ]
 
 type loader = {
   loader_name: string;
   loader_plugin: string;
-}
+} [@@deriving show { with_path = false } ]
 (** loader type used by module importers.
     @since 30.0-Zinc
 *)
@@ -193,6 +205,10 @@ type decl = {
   decl_node : decl_node; (** kind of declaration. *)
   decl_loc : location (** position in the source code. *)
 }
+(* This attribute is common for all types in the mutually recursive group of
+   types so we only need to mention it once. *)
+[@@deriving show { with_path = false } ]
+
 and decl_node =
   | LDlogic_def of
       string * string list * string list *
@@ -319,7 +335,7 @@ type behavior = {
   mutable b_assigns : assigns; (** assignments. *)
   mutable b_allocation : allocation; (** frees, allocates. *)
   mutable b_extended : extension list (** extensions *)
-}
+} [@@deriving show { with_path = false } ]
 
 (** Function or statement contract. This type shares the name of its
     constructors with {!type:Cil_types.spec}. *)
@@ -340,7 +356,7 @@ type spec = {
   mutable spec_disjoint_behaviors: string list list;
   (** list of disjoint behaviors.
       It is possible to have more than one set of disjoint behaviors *)
-}
+} [@@deriving show { with_path = false } ]
 
 (** all annotations that can be found in the code. This type shares the name of
     its constructors with {!Cil_types.code_annotation_node}. *)
@@ -376,6 +392,7 @@ type code_annot =
   (** extension in a code or loop (when boolean flag is true) annotation.
       @since Silicon-20161101
   *)
+[@@deriving show { with_path = false } ]
 
 (** all kind of annotations*)
 type annot =
@@ -386,18 +403,23 @@ type annot =
            *) (** function specification. *)
   | Acode_annot of location * code_annot (** code annotation. *)
   | Aloop_annot of location * code_annot list (** loop annotation. *)
+[@@deriving show { with_path = false } ]
 
 (** ACSL extension for external spec file **)
 type ext_decl =
   | Ext_decl of decl            (* decl contains a location *)
   | Ext_macro of bool * string * lexpr (* lexpr contains a location *)
   | Ext_include of bool * string * location
+[@@deriving show { with_path = false } ]
 
 type ext_function =
   | Ext_spec of spec * location (* function spec *)
   | Ext_stmt of string list * annot * location (* loop/code annotation. *)
   | Ext_glob of ext_decl
+[@@deriving show { with_path = false } ]
 
 type ext_module = string option * ext_decl list * ((string * location) option * ext_function list) list
+[@@deriving show { with_path = false } ]
 
 type ext_spec = ext_module list
+[@@deriving show { with_path = false } ]
