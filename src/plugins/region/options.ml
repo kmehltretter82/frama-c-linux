@@ -17,8 +17,22 @@ include Plugin.Register
       let shortname = "region"
     end)
 
-module Enabled = False
+module Enabled = Action
     (struct
       let option_name = "-region"
-      let help = "Enable Region Analysis"
+      let help = "Annotate all functions wrt regions"
+    end)
+
+let () = Parameter_customize.set_negative_option_name "-region-check"
+let () = Parameter_customize.set_negative_option_help "Generate ACSL 'check' annotations"
+module Assert = False
+    (struct
+      let option_name = "-region-assert"
+      let help = "Generate ACSL 'assert' annotations instead of checks"
+    end)
+
+module Logic = False
+    (struct
+      let option_name = "-region-logic"
+      let help = "Also generate guards for logic"
     end)

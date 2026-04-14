@@ -41,7 +41,7 @@ struct
   let title (Memory.Cvar r) =
     Format.asprintf "%a (%db)%t"
       Typ.pretty r.cvar.vtype
-      (Memory.bitsSizeOf r.cvar.vtype)
+      (Fields.bitsSizeOf r.cvar.vtype)
       (fun fmt ->
          if r.cells > 1 then Format.fprintf fmt " (%d cells)" r.cells)
 
@@ -202,7 +202,7 @@ struct
     if Buffer.length buffer > 0 then Buffer.contents buffer else "…"
 
   let pp_typ_layout s0 fmt ty =
-    let s = Memory.bitsSizeOf ty in
+    let s = Fields.bitsSizeOf ty in
     if s <> s0 then
       Format.fprintf fmt "(%a)%%%db" Typ.pretty ty s
     else

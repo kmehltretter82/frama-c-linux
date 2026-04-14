@@ -72,6 +72,7 @@ type map = {
   mutable labels: node Lmap.t ;
   mutable roots: (root * node) list ;
   mutable cvars: node Vmap.t ;
+  mutable gvars: Vset.t ;
   mutable lvars: domain LVmap.t ;
   mutable logics: domain Fmap.t ;
   mutable result: node option ;
@@ -80,11 +81,6 @@ type map = {
 (* -------------------------------------------------------------------------- *)
 (* --- Accessors                                                          --- *)
 (* -------------------------------------------------------------------------- *)
-
-let bitsSizeOf ty =
-  try Cil.bitsSizeOf ty with
-  | Cil.SizeOfError (_, { tnode = TFun _ }) -> Machine.Sizeof.func () * 8
-  | Cil.SizeOfError (_, { tnode = TVoid  }) -> Machine.Sizeof.void () * 8
 
 let sizeof = function Blob s | Cell(s,_) | Compound(s,_,_) -> s
 let cranges = function Blob _ | Cell _ -> [] | Compound(_,_,R rs) -> rs
@@ -108,6 +104,7 @@ let ctypes (m : chunk) : typ list =
 let create () = {
   store = UF.create () ;
   roots = [] ;
+  gvars = Vset.empty ;
   cvars = Vmap.empty ;
   labels = Lmap.empty ;
   lvars = LVmap.empty ;
@@ -232,7 +229,7 @@ let new_chunk store ?parent ?(size=0) ?(value=false) ?ptr ?pointed ?(result=fals
     | None ->
       if not value then Blob size else Cell(size,None)
     | Some _ ->
-      Cell(Ranges.gcd size (bitsSizeOf Cil_const.voidPtrType), ptr)
+      Cell(Ranges.gcd size (Cil.bitsSizeOf Cil_const.voidPtrType), ptr)
   in
   let cparents = match parent with None -> [] | Some root -> [root] in
   let cpointed = match pointed with None -> [] | Some ptr -> [ptr] in
@@ -247,9 +244,10 @@ let add_label (m: map) a =
     update n (fun d -> { d with clabels = Lset.singleton a }) ;
     m.labels <- Lmap.add a n m.labels ; n
 
-let add_cvar (m: map) v =
+let add_cvar (m: map) ?(garbage=false) v =
+  (if garbage then m.gvars <- Vset.add v m.gvars) ;
   try Vmap.find v m.cvars with Not_found ->
-    let size = Cil.bitsSizeOf v.vtype in
+    let size = Fields.bitsSizeOf v.vtype in
     let n = new_chunk m.store ~size () in
     update n (fun d -> { d with ccvars = Vset.singleton v }) ;
     m.cvars <- Vmap.add v n m.cvars ; n
@@ -266,14 +264,14 @@ let add_root (m: map) (node : node) (root : root) =
     update node (fun d -> { d with croots = Bag.add root d.croots }) ;
   end
 
-let add_body = ref (fun _ _ _ -> assert false)
+let body = ref (fun _ _ _ -> assert false)
 
 let add_logic (m: map) f =
   try Fmap.find f m.logics with Not_found ->
     let get_type t = Domain.of_ltype (new_chunk m.store) t in
     let d = Option.fold ~none:Domain.pure ~some:get_type f.l_type in
     m.logics <- Fmap.add f d m.logics ;
-    !add_body m f d ; d
+    !body m f d ; d
 
 let add_result (m: map) =
   match m.result with Some r -> r | None ->
@@ -461,7 +459,7 @@ let add_field (r:node) (fd:fieldinfo) : node =
   let ci = fd.fcomp in
   if not ci.cstruct then r else
     let store = UF.store r in
-    let size = bitsSizeOf (Cil_const.mk_tcomp ci) in
+    let size = Fields.bitsSizeOf (Cil_const.mk_tcomp ci) in
     let offset, length = Cil.fieldBitsOffset fd in
     if offset = 0 && size = length then r else
       let data = new_chunk store ~parent:r () in
@@ -477,7 +475,7 @@ let add_field_range (r:node) (f:fieldinfo) (g:fieldinfo) : node =
   if not (cf.cstruct && Compinfo.equal cf cg) then
     raise (Invalid_argument "Region.Memory.add_field_range") ;
   let store = UF.store r in
-  let size = bitsSizeOf (Cil_const.mk_tcomp cf) in
+  let size = Fields.bitsSizeOf (Cil_const.mk_tcomp cf) in
   let a, p = Cil.fieldBitsOffset f in
   let b, q = Cil.fieldBitsOffset g in
   let offset = min a b in
@@ -490,7 +488,7 @@ let add_field_range (r:node) (f:fieldinfo) (g:fieldinfo) : node =
   merge r nc ; data
 
 let add_index (r:node) (ty:typ) : node =
-  let size = bitsSizeOf ty in
+  let size = Fields.bitsSizeOf ty in
   let re = new_chunk (UF.store r) ~size () in
   merge r re ; re
 
@@ -520,7 +518,7 @@ let sized (a:node) ~value (ty: typ) =
   if Ast_types.is_scalar ty then
     let layout = (UF.get a).clayout in
     let sr = sizeof layout in
-    let size = Ranges.gcd sr (bitsSizeOf ty) in
+    let size = Ranges.gcd sr (Fields.bitsSizeOf ty) in
     if size <> sr || (value && not (cvalue layout)) then
       ignore (merge a (new_chunk (UF.store a) ~value ~size ()))
 
@@ -553,6 +551,7 @@ let pointed_by (r : node) = UF.find_all (UF.get r).cpointed
 let cvar (m: map) (v: varinfo) : node = UF.find @@ Vmap.find v m.cvars
 let lvar (m: map) (v: logic_var) = LVmap.find v m.lvars
 let logic (m: map) (l: logic_info) = Fmap.find l m.logics
+let garbage (m: map) (v : varinfo) = Vset.mem v m.gvars
 
 let rec move (r: node) (p: int) (s: int) =
   match (UF.get r).clayout with
@@ -564,7 +563,7 @@ let rec move (r: node) (p: int) (s: int) =
 
 let field (r: node) (fd: fieldinfo) : node =
   if fd.fcomp.cstruct then
-    let s = bitsSizeOf fd.ftype in
+    let s = Fields.bitsSizeOf fd.ftype in
     let (p,_) = Cil.fieldBitsOffset fd in
     move r p s
   else r
@@ -583,7 +582,7 @@ let footprint (r: node) : node list =
     in visit r ; !leaves
   with Not_found -> []
 
-let index (r: node) (ty:typ) : node = move r 0 (bitsSizeOf ty)
+let index (r: node) (ty:typ) : node = move r 0 (Fields.bitsSizeOf ty)
 
 let rec lval (m: map) (h,ofs) : node =
   offset (lhost m h) (Cil.typeOfLhost h) ofs
@@ -630,7 +629,7 @@ let iter_parent_path parent f r =
          if equal r rg.data then f rg.length
       ) rgs
 
-let rec consolidate marked n =
+let rec consolidate gvars marked n =
   if not @@ UF.test_and_mark marked n then
     let node = UF.get n in
     let ps = UF.find_all node.cparents in
@@ -641,8 +640,8 @@ let rec consolidate marked n =
       let path s = node.cpaths <- node.cpaths + (if s = size then 1 else 2) in
       Vset.iter
         (fun v ->
-           path @@ bitsSizeOf v.vtype ;
-           flags @@ Attr.cvar v
+           path @@ Fields.bitsSizeOf v.vtype ;
+           flags @@ Attr.cvar ~garbage:(Vset.mem v gvars) v
         ) node.ccvars ;
       Bag.iter
         (function Root r ->
@@ -651,7 +650,7 @@ let rec consolidate marked n =
         ) node.croots ;
       List.iter
         (fun p ->
-           consolidate marked p ;
+           consolidate gvars marked p ;
            let parent = UF.get p in
            node.cdepth <- max node.cdepth (succ parent.cdepth) ;
            flags parent.cflags ;
@@ -729,7 +728,7 @@ let typed (r:node) =
       match Ast_types.unroll_skel t with
       | TVoid | TFun _ -> ()
       | _ ->
-        if bitsSizeOf t > size then raise Exit ;
+        if Fields.bitsSizeOf t > size then raise Exit ;
         match !types with
         | None -> types := Some t
         | Some t0 -> if not @@ Cil_datatype.Typ.equal t0 t then raise Exit
@@ -741,6 +740,7 @@ let typed (r:node) =
   with Exit -> None
 
 let singleton n = (UF.get n).cpaths = 1
+let flags (r:node) = (UF.get r).cflags
 
 (* -------------------------------------------------------------------------- *)
 (* --- High-Level API                                                     --- *)
@@ -864,7 +864,7 @@ let pp_node fmt n = pp_node fmt n
 (* -------------------------------------------------------------------------- *)
 
 let make_cvar s (v : Cil_types.varinfo) : cvar =
-  let cells = if s = 0 then 0 else bitsSizeOf v.vtype / s in
+  let cells = if s = 0 then 0 else Fields.bitsSizeOf v.vtype / s in
   let label = Format.asprintf "%a%a" Varinfo.pretty v pp_cells cells in
   Cvar { cvar = v ; cells ; label }
 
@@ -914,7 +914,7 @@ let lock m =
   begin
     witer m UF.lock ;
     let marks = UF.marks () in
-    iter m (consolidate marks) ;
+    iter m (consolidate m.gvars marks) ;
   end
 
 (* -------------------------------------------------------------------------- *)

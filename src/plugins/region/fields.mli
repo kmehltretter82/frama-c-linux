@@ -9,6 +9,9 @@
 open Ranges
 open Cil_types
 
+val bitsSizeOf : typ -> int
+val bytesSizeOf : typ -> int
+
 type domain
 type field = fieldinfo range
 type slice = Bits of int | Field of fieldinfo

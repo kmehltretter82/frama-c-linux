@@ -1,12 +1,9 @@
 \documentclass{frama-c-book}
 \usepackage{amsmath}
-\usepackage{longtable}
-\usepackage{pifont}
-
+\usepackage{imakeidx}
+% LTeX: enabled=off
 \input{fc-macros}
-
 \newcommand{\FCVERSION}{\input{VERSION}(\input{VERSION_CODENAME}\unskip)}
-\newcommand{\Region}{\textsf{Region}\xspace}
 
 \title{Region Plug-in Manual}
 \author{Loïc Correnson, Cécile Ruet-Cros}
@@ -14,6 +11,7 @@
 
 \cclicence{by}
 \copyrightstarts{2025}
+\makeindex[intoc]
 
 \begin{document}
 \sloppy
@@ -42,17 +40,20 @@ Project \textsf{CoMeMoV} (ANR-22-CE25-0018)%
 \hbadness=10000
 
 \newcommand{\TODO}[1]{\fbox{\color{red}\textbf{TODO} #1}}
+\newcommand{\Region}{\plugin{Region}}
 
 %% --------------------------------------------------------------------------
 %% -- Main Document
 %% --------------------------------------------------------------------------
 \input{region/intro}
 \input{region/plugin}
+\input{region/reference}
 
 %% --------------------------------------------------------------------------
-%% -- Bibliography
+%% -- Bibliography, Index
 %% --------------------------------------------------------------------------
 %%\bibliographystyle{alpha}
 %%\bibliography{region}
+\printindex
 
 \end{document}

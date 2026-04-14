@@ -24,8 +24,6 @@ type env = {
   context : Access.clause ;
 }
 
-let fresh env () = Memory.fresh env.map
-
 let merge a b = Memory.merge a b ; min a b
 
 let pointer (d:domain) : node =
@@ -111,7 +109,7 @@ let add_term_lval ~loc (env:env) (lv : term_lval) : domain =
         load env lv @@ addr_offset ~loc  env x.vtype r loffset
     end
 
-let add_addr_lval ~loc (env:env) (lv : term_lval) : typ * node =
+let add_addr_lval ~loc (env:env) ?(garbage=false) (lv : term_lval) : typ * node =
   let lhost, loffset = lv in
   match lhost with
   | TMem e ->
@@ -128,23 +126,33 @@ let add_addr_lval ~loc (env:env) (lv : term_lval) : typ * node =
       | VAL _ ->
         Options.fatal "address of logic value (%a)" Printer.pp_term_lval lv ;
       | VAR x ->
-        let r = Memory.add_cvar env.map x in
+        let garbage =
+          garbage && x.vformal && Ast_types.is_struct_or_union x.vtype in
+        let r = Memory.add_cvar ~garbage env.map x in
         addr_offset ~loc env x.vtype r loffset
     end
 
-let rec add_loffset ~loc (env:env) loffest d =
+let rec update_offset ~loc (env:env) loffest d =
   match loffest with
   | TNoOffset -> d
-  | TField(fd,offset) -> Domain.field fd @@ add_loffset ~loc env offset d
+  | TField(fd,offset) -> Domain.field fd @@ update_offset ~loc env offset d
   | TModel _ ->
     Options.not_yet_implemented ~source:(fst loc) "Unsupported model fields"
-  | TIndex(_,offset) -> Domain.array @@ add_loffset ~loc env offset d
+  | TIndex(_,offset) -> Domain.array @@ update_offset ~loc env offset d
 
-let call (env:env) (l:logic_info) (ds:domain list) : domain =
+let call map (l:logic_info) (ds:domain list) : domain =
   let sigma = ref Domain.empty in
   let unify = Domain.unify merge sigma in
-  List.iter2 (fun x -> unify (Memory.add_lvar env.map x)) l.l_profile ds ;
-  Domain.subst !sigma @@ Memory.add_logic env.map l
+  List.iter2 (fun x -> unify (Memory.add_lvar map x)) l.l_profile ds ;
+  Domain.subst !sigma @@ Memory.add_logic map l
+
+let cons map (c:logic_ctor_info) (ds:domain list) : domain =
+  let sigma = ref Domain.empty in
+  let unify = Domain.unify merge sigma in
+  let fresh () = Memory.fresh map in
+  List.iter2 (fun t -> unify (of_ltype fresh t)) c.ctor_params ds ;
+  Domain.logic c.ctor_type @@
+  List.map (Domain.getvar !sigma) c.ctor_type.lt_params
 
 let iadd_logic_var m v = ignore @@ add_lvar m v
 
@@ -169,14 +177,15 @@ let rec add_term (env:env) (t:term) : domain =
     iadd_term env t ; pure
   | TUpdate(lv,o,v) ->
     merge_domain (add_term env lv) @@
-    add_loffset ~loc:t.term_loc env o @@ add_term env v
+    update_offset ~loc:t.term_loc env o @@ add_term env v
   | Tunion ts | Tinter ts ->
     List.fold_left (fun d t -> merge_domain d @@ add_term env t) pure ts
   | Tcomprehension(t,q,p) ->
     Option.iter (add_predicate env) p ;
     List.iter (iadd_logic_var env.map) q ;
     add_term env t
-  | Tapp(f,_,ts) -> call env f @@ List.map (add_term env) ts
+  | Tapp(f,_,ts) -> call env.map f @@ List.map (add_term env) ts
+  | TDataCons(c,ts) -> cons env.map c @@ List.map (add_term env) ts
   | Tlambda(q,t) ->
     Domain.arrow (List.map (Memory.add_lvar env.map) q) @@ add_term env t
   | Tlet({ l_body ; l_var_info=v },b) ->
@@ -194,15 +203,6 @@ let rec add_term (env:env) (t:term) : domain =
       | _ ->
         Options.not_yet_implemented
           ~source:(fst t.term_loc) "Unsupported complex \\let"
-    end
-  | TDataCons(c,ts) ->
-    let ds = List.map (add_term env) ts in
-    let args = List.map (of_ltype (fresh env)) c.ctor_params in
-    let sigma = ref Domain.empty in
-    List.iter2 (unify merge sigma) ds args ;
-    begin match c.ctor_type.lt_def with
-      | Some (LTsyn lt) -> of_ltype (fresh env) lt
-      | None | Some (LTsum _) -> pure
     end
   | TConst _  | TSizeOf _ | TSizeOfE _ | TAlignOf _ | TAlignOfE _
   | Tnull | Tempty_set | Ttypeof _ | Ttype _  | Trange _ -> pure
@@ -243,7 +243,7 @@ and add_predicate (env:env) (p:predicate) = match p.pred_content with
   | Plet _ ->
     Options.not_yet_implemented
       ~source:(fst p.pred_loc) "Unsupported complex \\let-bindings"
-  | Papp(f,_,ts) -> ignore @@ call env f @@ List.map (add_term env) ts
+  | Papp(f,_,ts) -> ignore @@ call env.map f @@ List.map (add_term env) ts
 
 let () = rterm := add_term
 
@@ -253,7 +253,8 @@ let () = rterm := add_term
 
 let add_path (env: env) Spec.{ named ; flags } = function
   | Spec.Alias(loc,lv) ->
-    snd @@ add_addr_lval ~loc env lv
+    let garbage = Attr.mem `Garbage flags in
+    snd @@ add_addr_lval ~loc ~garbage env lv
   | Spec.Field(loc,lv,f,g) ->
     let r = snd @@ add_addr_lval ~loc env lv in
     Memory.add_field_range r f g
@@ -290,6 +291,6 @@ let add_body map (l:logic_info) (d:domain) =
   | LBinductive l ->
     List.iter (fun (_,_,_,t) -> add_predicate env t) l
 
-let () = Memory.add_body := add_body
+let () = Memory.body[@alert "-internal"] := add_body
 
 (* -------------------------------------------------------------------------- *)

@@ -73,6 +73,7 @@ let pp_regions fmt = function
 
 type env = {
   context: Logic_typing.typing_context ;
+  mutable esource: Filepos.t ;
   mutable enamed: string ;
   mutable eflags: Attr.flags ;
   mutable rpaths: path list ;
@@ -146,7 +147,20 @@ let parse_field env p =
   with Not_found ->
     error env ~loc:p.lexpr_loc "Expected field l-value for range path"
 
-let flush env =
+let garbage = Attr.(add `Garbage empty)
+
+let applies flags = function
+  | Range _ -> true
+  | Alias(_,(TVar { lv_origin = Some v },_)) ->
+    flags = garbage && v.vformal && Ast_types.is_struct_or_union v.vtype
+  | Alias _ | Field _ -> false
+
+let flush source env =
+  if env.eflags <> Attr.empty &&
+     not @@ List.exists (applies env.eflags) env.rpaths
+  then
+    Options.warning ~source:env.esource "%a has no object to apply on"
+      Attr.pretty env.eflags ;
   if env.rpaths <> [] then
     begin
       env.regions <- {
@@ -154,18 +168,19 @@ let flush env =
         flags = env.eflags ;
         paths = List.rev env.rpaths ;
       } :: env.regions ;
+      env.esource <- source ;
       env.rpaths <- [] ;
       env.eflags <- Attr.empty ;
     end
 
 let rec parse_region (env:env) p =
   match p.lexpr_node with
-  | PLvar "\\nullable" -> env.eflags <- Attr.add `Nullable env.eflags
-  | PLvar "\\dynamic"  -> env.eflags <- Attr.add `Dynamic  env.eflags
-  | PLvar "\\garbage"  -> env.eflags <- Attr.add `Garbage  env.eflags
-  | PLvar "\\readonly" -> env.eflags <- Attr.add `Readonly env.eflags
+  | PLvar "\\nullable"  -> env.eflags <- Attr.add `Nullable  env.eflags
+  | PLvar "\\allocated" -> env.eflags <- Attr.add `Allocated env.eflags
+  | PLvar "\\garbage"   -> env.eflags <- Attr.add `Garbage   env.eflags
+  | PLvar "\\readonly"  -> env.eflags <- Attr.add `Readonly  env.eflags
   | PLnamed( name , p ) ->
-    flush env ;
+    flush (fst p.lexpr_loc) env ;
     env.enamed <- name ;
     parse_region env p
   | PLrange(Some a,Some b) ->
@@ -204,8 +219,9 @@ let of_code_annot = function
 
 let of_behavior bhv = List.concat_map of_extension bhv.b_extended
 
-let typecheck typing_context _loc ps =
+let typecheck typing_context loc ps =
   let env = {
+    esource = fst loc ;
     enamed = "" ;
     eflags = Attr.empty ;
     context = typing_context ;
@@ -213,7 +229,7 @@ let typecheck typing_context _loc ps =
   } in
   List.iter (parse_region env) ps ;
   let id = !kspec in incr kspec ;
-  flush env ;
+  flush (fst loc) env ;
   Hashtbl.add registry id @@ List.rev env.regions ;
   Ext_id id
 

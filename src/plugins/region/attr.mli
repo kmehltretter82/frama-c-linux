@@ -9,7 +9,7 @@
 type flags
 type attr = [
   | `Nullable (** Might be null *)
-  | `Dynamic  (** Might be dynamically allocated *)
+  | `Allocated  (** Might be dynamically allocated *)
   | `Garbage  (** Might be non-initialized *)
   | `Readonly (** Contains only readonly memory *)
 ]
@@ -26,7 +26,7 @@ val bottom : flags
 val merge : flags -> flags -> flags
 (** Combine flags:
     - [`Nullable] if {i either} is readonly
-    - [`Dynamic] if {i either} is dynamic
+    - [`Allocated] if {i either} is allocated
     - [`Garbage] if {i either} is garbage
     - [`Readonly] if {i both} are readonly
 *)
@@ -38,10 +38,10 @@ val pretty : Format.formatter -> flags -> unit
 
 open Cil_types
 
-val cvar : varinfo -> flags
-
-val addrof : loc:location -> lval -> term
-(** Address of the (assignable) lval *)
+val cvar : garbage:bool -> varinfo -> flags
+val is_local : varinfo -> bool
+val is_const : varinfo -> bool
+val is_initialized : garbage:bool -> varinfo -> bool
 
 val readable :
   loc:location -> ?label:logic_label ->
