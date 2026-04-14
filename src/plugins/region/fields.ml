@@ -12,13 +12,13 @@ module Domain = Cil_datatype.Compinfo.Set
 
 let bytesSizeOf ty =
   try Cil.bytesSizeOf ty with
-  | Cil.SizeOfError (_, { tnode = TFun _ }) -> Machine.Sizeof.func ()
-  | Cil.SizeOfError (_, { tnode = TVoid  }) -> Machine.Sizeof.void ()
+  | Cil.SizeOfError (_, { tnode = TFun _ }) -> 1
+  | Cil.SizeOfError (_, { tnode = TVoid  }) -> 1
 
 let bitsSizeOf ty =
   try Cil.bitsSizeOf ty with
-  | Cil.SizeOfError (_, { tnode = TFun _ }) -> Machine.Sizeof.func () * 8
-  | Cil.SizeOfError (_, { tnode = TVoid  }) -> Machine.Sizeof.void () * 8
+  | Cil.SizeOfError (_, { tnode = TFun _ }) -> 8
+  | Cil.SizeOfError (_, { tnode = TVoid  }) -> 8
 
 type field = fieldinfo range
 
