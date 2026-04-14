@@ -39,8 +39,7 @@ let pvalid_pointer ?loc ?names ?(label=Logic_const.here_label) addr =
 let pinitialized ?loc ?names ?(label=Logic_const.here_label) addr =
   Logic_const.pinitialized ?loc ?names (label,addr)
 
-let paligned ?loc ?names addr =
-  let te = Logic_typing.ctype_of_pointed addr.term_type in
+let paligned ?loc ?names addr te =
   let size = Logic_const.term ?loc (TAlignOf te) Linteger in
   Logic_const.paligned ?loc ?names (addr,size)
 

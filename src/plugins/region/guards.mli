@@ -24,7 +24,7 @@ type guard =
   | Valid_pointer of addr
   | Valid_region of node * addr
   | Initialized of addr
-  | Aligned of addr
+  | Aligned of addr * typ
 
 type condition =
   | Forall of quantifiers * condition

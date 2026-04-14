@@ -43,7 +43,7 @@ type guard =
   | Valid_pointer of addr
   | Valid_region of (Memory.node [@ compare fun _ _ -> 0]) * addr
   | Initialized of addr
-  | Aligned of addr
+  | Aligned of addr * Typ.t
 [@@ deriving ord]
 
 (* For Valid_region, node is precomputed from addr,
@@ -65,7 +65,7 @@ let pp_guard fmt = function
   | Valid_read a -> Format.fprintf fmt "\\valid_read(%a)" pp_addr a
   | Valid_region(_,a) -> Format.fprintf fmt "\\valid_region(%a)" pp_addr a
   | Initialized a -> Format.fprintf fmt "\\initialized(%a)" pp_addr a
-  | Aligned a -> Format.fprintf fmt "\\aligned(%a)" pp_addr a
+  | Aligned(a,typ) -> Format.fprintf fmt "\\aligned(%a,%a)" pp_addr a Cil_printer.pp_typ typ
 
 let pp_body fmt = function
   | LBterm t -> Printer.pp_term fmt t
@@ -121,7 +121,7 @@ let of_guard ?loc ?names = function
   | Valid_pointer p -> Condition.pvalid_pointer ?loc ?names @@ of_addr ?loc p
   | Valid_region(_,p) -> Condition.pvalid_region ?loc ?names @@ of_addr ?loc p
   | Initialized p -> Condition.pinitialized ?loc ?names @@ of_addr ?loc p
-  | Aligned p -> Condition.paligned ?loc ?names @@ of_addr ?loc p
+  | Aligned(p,ty) -> Condition.paligned ?loc ?names (of_addr ?loc p) ty
 
 let of_condition ?loc ?(names=[]) p =
   let rec generate = function
@@ -215,13 +215,14 @@ let initialized env n ?kd a =
     check env "initialized" (Initialized a) a @@
     Condition.rinitialized n (kindof a kd)
 
-let aligned env n ?kd a =
+let aligned env n ?kd ?typ a =
   if
     Kernel.UnalignedPointer.get () &&
     not @@ RteGen.Generator.Pointer_alignment.is_computed env.kf
   then
-    let bits = Fields.bitsSizeOf @@ pointed a in
-    check env "aligned" (Aligned a) a @@
+    let typ = match typ with None -> pointed a | Some te -> te in
+    let bits = Fields.bitsSizeOf typ in
+    check env "aligned" (Aligned(a,typ)) a @@
     Condition.raligned n (kindof a kd) ~bits
 
 let valid_region env n ?kd a =

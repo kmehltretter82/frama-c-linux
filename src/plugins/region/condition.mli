@@ -41,10 +41,9 @@ val pinitialized :
   ?loc:location -> ?names:string list -> ?label:logic_label ->
   term -> predicate
 
-(** [p] is aligned wrt its pointed type ; for direct access to [*p] only *)
 val paligned :
   ?loc:location -> ?names:string list ->
-  term -> predicate
+  term -> typ -> predicate
 
 val is_valid_region : logic_info -> bool
 
