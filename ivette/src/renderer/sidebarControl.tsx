@@ -12,6 +12,7 @@ import { SidebarProps, SIDEBAR } from 'ivette';
 import * as State from 'ivette/state';
 
 export const DEFAULT_SIDEBAR_PANEL_WIDTH = 320;
+const SIDEBAR_TOGGLE_MENU_ID = 'ivette.sidebar.toggle';
 
 /* -------------------------------------------------------------------------- */
 /* --- Sidebar Selection State                                            --- */
@@ -54,7 +55,8 @@ export function useSidebarSelectionState(): SidebarSelectionState {
       setSelectorSelected,
       registeredSidebars: sortedSidebars,
     }),
-    [selectorSelected, setSelectorSelected, sortedSidebars],);
+    [selectorSelected, setSelectorSelected, sortedSidebars],
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -80,6 +82,30 @@ export function useSidebarControl(): SidebarPanelVisibility {
     }),
     [sidebarVisible, setSidebarVisible],
   );
+}
+
+/**
+   Hook to register and maintain sidebar-related menu shortcuts.
+ */
+export function useSidebarShortcuts(sp: SidebarPanelVisibility): void {
+  React.useEffect(() => {
+    Dome.addMenuItem({
+      menu: 'View',
+      id: SIDEBAR_TOGGLE_MENU_ID,
+      label: 'Toggle Sidebar',
+      key: 'Cmd+B',
+    });
+    return () => {
+      Dome.setMenuItem({ id: SIDEBAR_TOGGLE_MENU_ID, onClick: null });
+    };
+  }, []);
+
+  React.useEffect(() => {
+    Dome.setMenuItem({
+      id: SIDEBAR_TOGGLE_MENU_ID,
+      onClick: () => sp.setVisible(!sp.visible),
+    });
+  }, [sp]);
 }
 
 // --------------------------------------------------------------------------

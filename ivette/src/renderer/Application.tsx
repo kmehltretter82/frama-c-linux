@@ -38,6 +38,7 @@ import './style.css';
 export default function Application(): JSX.Element {
   const sidebarPanel = SidebarControl.useSidebarControl();
   const sidebarSelection = SidebarControl.useSidebarSelectionState();
+  SidebarControl.useSidebarShortcuts(sidebarPanel);
 
   const ToolBar = State.useChildren(TOOLBAR);
   const StatusBar = State.useChildren(STATUSBAR);
