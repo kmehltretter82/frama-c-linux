@@ -19,13 +19,13 @@ import * as Toolbar from 'dome/frame/toolbars';
 import { docChapters } from 'dome/help';
 import { useGlobalState } from 'dome/data/states';
 import * as Sidebar from './Sidebar';
+import * as SidebarControl from './sidebarControl';
 import * as Controller from './Controller';
 import { TOOLBAR, STATUSBAR, DOCCHAPTER } from 'ivette';
 import * as State from 'ivette/state';
 import * as Search from 'ivette/search';
 import * as Laboratory from 'ivette/laboratory';
 import * as IvettePrefs from 'ivette/prefs';
-import * as SidebarControl from './sidebarControl';
 import './command';
 import './loader';
 import './sandbox';
@@ -53,9 +53,11 @@ export default function Application(): JSX.Element {
           sidebarPanel={sidebarPanel}
         />
         <LSplit
-          position={sidebarPanel.position}
-          onPosition={sidebarPanel.setPosition}
-          allowResizeToZero
+          settings="frama-c.sidebar.panel.width"
+          defaultPosition={SidebarControl.DEFAULT_SIDEBAR_PANEL_WIDTH}
+          unfold={sidebarPanel.visible}
+          foldToZero
+          onUnfold={sidebarPanel.setVisible}
         >
           <Sidebar.Panels
             selectorSelected={sidebarSelection.selectorSelected}

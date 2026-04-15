@@ -45,24 +45,15 @@ export interface SplitterFoldProps extends SplitterBaseProps {
    */
   unfold?: boolean;
   /**
-     Allow the foldable component to be positioned at `0`
-     while keeping the splitter handle visible.
-     Dragging still respects the regular minimum margin.
+     When folded, keep the splitter visible and render the foldable pane at `0`
+     instead of hiding the split entirely.
      Only applies to left, right, top and bottom splitters.
    */
-  allowResizeToZero?: boolean;
+  foldToZero?: boolean;
   /**
-     Controlled splitter position. When omitted, the splitter stores
-     its position in `settings`.
-     For foldable splitters with `allowResizeToZero`, `0` collapses the
-     foldable pane without hiding the splitter handle.
+     Callback used with `foldToZero` when dragging reopens a folded pane.
    */
-  position?: number;
-  /**
-     Callback used together with `position` for controlled splitters.
-     Called with the effective pane size or ratio after dragging.
-   */
-  onPosition?: (position: number) => void;
+  onUnfold?: (unfold: boolean) => void;
 }
 
 export enum Direction {
@@ -138,18 +129,19 @@ const getFlexCSS = (hsplit: boolean, fold: boolean): string => (
 
 const getCSS = (
   unfold: boolean,
-  dragged: boolean,
+  positioned: boolean,
+  collapsed: boolean,
   { hsplit, foldA, foldB }: Layout,
 ): CSS => {
   // FOLDED
-  if (!unfold) return {
+  if (!unfold && !collapsed) return {
     container: BLOCK,
     sideA: foldA ? HIDDEN : BLOCK,
     split: HIDDEN,
     sideB: foldB ? HIDDEN : BLOCK,
   };
   // DRAGGED
-  if (dragged) return {
+  if (positioned || collapsed) return {
     container: BLOCK,
     sideA: hsplit ? HPOSA : VPOSA,
     split: hsplit ? HPOSR : VPOSR,
@@ -239,20 +231,25 @@ interface SplitterEngineProps extends SplitterLayoutProps { size: Size }
 
 function SplitterEngine(props: SplitterEngineProps): JSX.Element {
   const defaultPosition = props.defaultPosition ?? 0;
-  const [storedSettings, setStoredSettings] =
+  const [settings, setSettings] =
     Dome.useNumberSettings(props.settings, defaultPosition);
-  const settings = props.position ?? storedSettings;
-  const setSettings = props.onPosition ?? setStoredSettings;
   const [dragging, setDragging] = React.useState<Dragging>(undefined);
   const { size, margin = 32, layout } = props;
   const { hsplit } = layout;
   const M = Math.max(margin, 32);
   const D = hsplit ? size.width : size.height;
-  const { unfold = true, allowResizeToZero = false } = props;
-  const zeroFold = allowResizeToZero && (layout.foldA || layout.foldB);
+  const {
+    unfold = true,
+    foldToZero = false,
+    onUnfold,
+  } = props;
+  // `zeroFolded` is the unfold-based collapsed state: the pane is logically
+  // folded (`unfold === false`) but still rendered at size 0 with a visible
+  // splitter so dragging can reopen it.
+  const zeroFolded = !unfold && foldToZero && (layout.foldA || layout.foldB);
   const [A, B] = props.children;
-  const dragged = (zeroFold ? settings >= 0 : settings > 0) || !!dragging;
-  const css = getCSS(unfold, dragged, layout);
+  const dragged = settings > 0 || !!dragging;
+  const css = getCSS(unfold, dragged, zeroFolded, layout);
   const cursor = dragging ? (hsplit ? HCURSOR : VCURSOR) : NOCURSOR;
   const container = Utils.classes(css.container, cursor);
   const sideA = Utils.classes(css.sideA, PANEL);
@@ -266,11 +263,12 @@ function SplitterEngine(props: SplitterEngineProps): JSX.Element {
   let styleB: undefined | React.CSSProperties;
   let styleR: undefined | React.CSSProperties;
 
-  if (unfold && dragged) {
-    const P = getPositionFromSettings(dragging, layout, settings, D);
+  if ((unfold || zeroFolded) && (dragged || zeroFolded)) {
+    const P = zeroFolded && !dragging ? 0 :
+      getPositionFromSettings(dragging, layout, settings, D);
     const X = dragging ? dragging.offset - dragging.anchor : 0;
-    const collapsed = zeroFold && !dragging && settings === 0;
-    const reopening = zeroFold && !!dragging && dragging.position === 0;
+    const collapsed = !dragging && zeroFolded;
+    const reopening = !!dragging && dragging.position === 0 && zeroFolded;
     const clampLayout = reopening ? layout : undefined;
     const Q = collapsed ? 0 : inRange(M, D, P + X, clampLayout);
     styleA = hsplit ? { width: Q } : { height: Q };
@@ -297,10 +295,26 @@ function SplitterEngine(props: SplitterEngineProps): JSX.Element {
     (evt, _data) => {
       if (evt.metaKey || evt.altKey || evt.ctrlKey) {
         setSettings(defaultPosition);
-      } else if (unfold && dragging) {
+        // Reset also reopens a zero-folded pane, otherwise the default width
+        // would be restored while the parent still keeps the pane folded.
+        if (zeroFolded) onUnfold?.(true);
+      } else if ((unfold || zeroFolded) && dragging) {
         const offsetPos = dragging.position + dragging.offset - dragging.anchor;
+        // When a drag starts from the zero-folded state, releasing at or
+        // before 0 should keep the pane folded instead of reopening it.
+        if (zeroFolded && offsetPos <= 0) {
+          setDragging(undefined);
+          return;
+        }
+        // Persist the released splitter size using the normal minimum-margin
+        // policy, even if the render path temporarily relaxed constraints while
+        // reopening from 0.
         const newPos = inRange(M, D, offsetPos);
         setSettings(getSettingsFromPosition(layout, newPos, D));
+        // Reopening by drag must also flip the external `unfold` state back
+        // to `true`; otherwise the parent would keep the pane logically folded
+        // and the next render would collapse it again.
+        if (zeroFolded && newPos > 0) onUnfold?.(true);
       }
       setDragging(undefined);
     };

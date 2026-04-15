@@ -17,8 +17,8 @@ import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
 import { SidebarProps } from 'ivette';
 import type {
+  SidebarPanelVisibility,
   SidebarSelectionState,
-  SidebarPanelVisibilityControl,
 } from './sidebarControl';
 
 /* -------------------------------------------------------------------------- */
@@ -28,7 +28,7 @@ import type {
 interface SelectorProps extends SidebarProps {
   selectorSelected: SidebarSelectionState['selectorSelected'];
   setSelectorSelected: SidebarSelectionState['setSelectorSelected'];
-  sidebarPanel: SidebarPanelVisibilityControl;
+  sidebarPanel: SidebarPanelVisibility;
 }
 
 function Selector(props: SelectorProps): JSX.Element {
@@ -81,7 +81,7 @@ function Selector(props: SelectorProps): JSX.Element {
    Dedicated selector-like control used to collapse or expand the sidebar
    panel without changing the currently selected sidebar selector.
  */
-function ToggleSelector(props: SidebarPanelVisibilityControl): JSX.Element {
+function ToggleSelector(props: SidebarPanelVisibility): JSX.Element {
   const { visible, setVisible } = props;
   const className = classes(
     'sidebar-selector',
@@ -107,7 +107,7 @@ function ToggleSelector(props: SidebarPanelVisibilityControl): JSX.Element {
 
 interface SelectorsProps {
   sidebarSelection: SidebarSelectionState;
-  sidebarPanel: SidebarPanelVisibilityControl;
+  sidebarPanel: SidebarPanelVisibility;
 }
 
 export function Selectors(props: SelectorsProps): JSX.Element {
