@@ -1,7 +1,6 @@
 /* run.config
   STDOPT:
   STDOPT: +"-unsafe-arrays"
-  STDOPT: +"-no-warn-unaligned-pointer"
 */
 
 struct S { int f[5]; };

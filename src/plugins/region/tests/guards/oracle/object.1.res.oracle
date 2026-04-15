@@ -5,10 +5,8 @@
 int access(int *p, int k, int n)
 {
   int __retres;
-  /*@ check region: pointer_value: p + k ≡ \null ∨ \object_pointer(p + k); */
   p += k;
-  /*@ check region: mem_access: \valid_read(p); */
-  /*@ check region: initialized: \initialized(p); */
+  /*@ check region: \valid_region(p, sizeof(int)); */
   __retres = *p;
   return __retres;
 }

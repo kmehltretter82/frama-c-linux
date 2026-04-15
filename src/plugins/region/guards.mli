@@ -12,19 +12,12 @@
 
 open Memory
 open Cil_types
-open Condition
 
 type addr = LV of lval | TLV of term_lval | ADDR of exp | TADDR of term
 type value = E of exp | T of term
 type guard =
   | Bounds of value * Z.t
-  | Non_null of addr
-  | Valid of addr
-  | Valid_read of addr
-  | Valid_pointer of addr
   | Valid_region of node * addr
-  | Initialized of addr
-  | Aligned of addr * typ
 
 type condition =
   | Forall of quantifiers * condition
@@ -43,12 +36,9 @@ val of_addr  : ?loc:location -> addr -> term
 val of_guard : ?loc:location -> ?names:string list -> guard -> predicate
 val of_condition : ?loc:location -> ?names:string list -> condition -> predicate
 
-val kind : addr -> lkind
 val pointed : addr -> typ
 
-val guards : kernel_function -> map ->
-  (names:string list -> invalid:bool -> condition -> unit) ->
-  stmt -> unit
+val guards : map -> (condition -> unit) -> stmt -> unit
 
 val add_annotation :
   ?kf:kernel_function ->

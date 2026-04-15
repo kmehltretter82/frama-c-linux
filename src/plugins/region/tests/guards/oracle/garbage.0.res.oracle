@@ -27,7 +27,6 @@ int risky(struct S x)
 {
   int __retres;
   struct S y = x;
-  /*@ check region: initialized: \initialized(&y.f); */
   __retres = y.f;
   return __retres;
 }

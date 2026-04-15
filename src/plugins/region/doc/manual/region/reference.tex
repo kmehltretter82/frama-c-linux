@@ -24,92 +24,18 @@ name. Each category of annotations has also dedicated property names.
 \label{toc:code}
 %% --------------------------------------------------------------------------
 
-Side-conditions are given by alphabetical order or property names with short,
-partial although typical examples. Notice that side-conditions associated with
-kernel alarms are not generated when they are already computed by another
-plug-in, typically \rte or \Eva. Conversely, once annotations
-have been emitted by \Region, the associated kernel alarms are set to be
-computed, hence further plug-ins may not emit them again.
-
-%% --------------------------------------------------------------------------
-\subsection{Aligned}
-\index{aligned@\verb+aligned+}
-
-\begin{lstlisting}
-//@ check region: aligned: \aligned(p, sizeof(int));
-return *p;
-\end{lstlisting}
-
-Generated when reading or writing an l-value. Options and optimizations:
-\begin{itemize}
-  \item option \verb+-no-warn-aligned-pointer+ (skipped);
-  \item statically computed modulus of offset (skipped);
-\end{itemize}
-
 %% --------------------------------------------------------------------------
 \subsection{Bounds}
 \index{bounds@\verb+bounds+}
 
 \begin{lstlisting}
-//@ check region: bounds: 0 <= k < N;
+//@ check region: 0 <= k < N;
 return a[k];
 \end{lstlisting}
 
 Generated when accessing an array element. Options:
 \begin{itemize}
   \item access to array element with option \verb+-unsafe-arrays+ (skipped);
-\end{itemize}
-
-%% --------------------------------------------------------------------------
-\subsection{Initialized}
-\index{initialized@\verb+initialized+}
-
-\begin{lstlisting}
-//@ check region: initialized: \initialized(p);
-return *p;
-\end{lstlisting}
-
-Generated when reading an l-value.
-Optimizations:
-\begin{itemize}
-  \item access to global or initialized local variable (skipped);
-  \item access to formal parameter of primitive type (skipped);
-  \item access to formal parameter of compound type without \verb+\garbage+
-  property (skipped);
-  \item access to \plugin{CIL}-temporary variable (skipped);
-\end{itemize}
-
-%% --------------------------------------------------------------------------
-\subsection{Memory Access}
-\index{memaccess@\verb+mem_access+}
-
-\begin{lstlisting}
-//@ check region: mem_access: \valid(p);
-//@ check region: mem_access: \valid_read(q);
-*p = *q;
-\end{lstlisting}
-
-Generated when accessing an l-value for reading or writing.
-Optimizations:
-\begin{itemize}
-  \item access to a variable within its life-time (skipped);
-  \item access to an array with \verb+-safe-arrays+ (skipped);
-  \item write-access to read-only region (invalid);
-\end{itemize}
-
-%% --------------------------------------------------------------------------
-\subsection{Pointer Value}
-\index{pointervalue@\verb+pointer_value+}
-
-\begin{lstlisting}
-//@ check region: pointer_value: p == \null || \object_pointer(p);
-return *p;
-\end{lstlisting}
-
-Generated when assigning a pointer value. Options and optimizations:
-\begin{itemize}
-  \item option \verb+-no-warn-invalid-pointer+ (skipped);
-  \item address of array element with \verb+-safe-arrays+ (skipped);
 \end{itemize}
 
 %% --------------------------------------------------------------------------
@@ -174,8 +100,6 @@ side-conditions are listed in Figure~\ref{fig:logic-context}.
   \caption{Contexts for Logical Side-Conditions}
   \label{fig:logic-context}
 \end{figure}
-
-%% --------------------------------------------------------------------------
 
 %% --------------------------------------------------------------------------
 \section{Function Pre-Conditions}
