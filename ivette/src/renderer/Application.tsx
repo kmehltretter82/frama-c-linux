@@ -13,7 +13,6 @@
 // --- React & Dome
 
 import React from 'react';
-import * as Dome from 'dome';
 import { Hfill, Vfill } from 'dome/layout/boxes';
 import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
@@ -26,6 +25,7 @@ import * as State from 'ivette/state';
 import * as Search from 'ivette/search';
 import * as Laboratory from 'ivette/laboratory';
 import * as IvettePrefs from 'ivette/prefs';
+import { useSidebarControl } from './sidebarControl';
 import './command';
 import './loader';
 import './sandbox';
@@ -36,10 +36,7 @@ import './style.css';
 // --------------------------------------------------------------------------
 
 export default function Application(): JSX.Element {
-  const [sidebarVisible, flipSidebarVisible] =
-    Dome.useFlipSettings('frama-c.sidebar.unfold', true);
-  const [panelVisible, setPanelVisible] =
-    Dome.useBoolSettings('frama-c.sidebar.panel.unfold', true);
+  const sidebarPanel = useSidebarControl();
 
   const ToolBar = State.useChildren(TOOLBAR);
   const StatusBar = State.useChildren(STATUSBAR);
@@ -52,9 +49,9 @@ export default function Application(): JSX.Element {
       <Toolbar.ToolBar>
         <Toolbar.Button
           icon="SIDEBAR"
-          title={(sidebarVisible ? "Hide" : "Show") + " sidebar"}
-          selected={sidebarVisible}
-          onClick={flipSidebarVisible}
+          title={(sidebarPanel.visible ? "Collapse" : "Expand") + " sidebar"}
+          selected={sidebarPanel.visible}
+          onClick={() => sidebarPanel.setVisible(!sidebarPanel.visible)}
         />
         <Controller.Control />
         <>{ToolBar}</>
@@ -68,13 +65,13 @@ export default function Application(): JSX.Element {
       </Toolbar.ToolBar>
       <Hfill>
         <Sidebar.Selectors
-          sidebarVisible={sidebarVisible}
-          panelVisible={panelVisible}
-          setPanelVisible={setPanelVisible}
+          panelVisible={sidebarPanel.visible}
+          setPanelVisible={sidebarPanel.setVisible}
         />
         <LSplit
-          settings="frama-c.sidebar.split"
-          unfold={sidebarVisible && panelVisible}
+          position={sidebarPanel.position}
+          onPosition={sidebarPanel.setPosition}
+          allowResizeToZero
         >
           <Sidebar.Panels />
           <Laboratory.LabView />

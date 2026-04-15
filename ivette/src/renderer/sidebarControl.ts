@@ -1,0 +1,84 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   SPDX-License-Identifier LGPL-2.1                                       */
+/*   Copyright (C)                                                          */
+/*   CEA (Commissariat à l'énergie atomique et aux énergies alternatives)   */
+/*                                                                          */
+/* ************************************************************************ */
+
+// --------------------------------------------------------------------------
+// --- Sidebar Panel Control
+// --------------------------------------------------------------------------
+
+import * as Dome from 'dome';
+
+const DEFAULT_SIDEBAR_PANEL_WIDTH = 320;
+
+/**
+   Public control surface used by the application to drive the sidebar panel.
+
+   The sidebar panel has two pieces of state:
+   - a visibility flag, used by UI actions such as toolbar and selectors,
+   - a persisted width, used by the splitter when the panel is open.
+
+   The control reconciles both into a single API for the application:
+   - `position` is the effective splitter position,
+   - `visible` is the user-facing open/closed state,
+   - `setPosition` is called by the splitter,
+   - `setVisible` is called by buttons and selectors.
+ */
+export interface SidebarPanelControl {
+  position: number;
+  visible: boolean;
+  setPosition: (width: number) => void;
+  setVisible: (visible: boolean) => void;
+}
+
+/**
+   Hook used by the application to control the sidebar panel.
+
+   The width setting is documented as the "last open width": when the panel
+   is collapsed we keep the width value unchanged, so reopening restores the
+   previous size instead of falling back to a hard-coded width each time.
+ */
+export function useSidebarControl(): SidebarPanelControl {
+  const [sidebarPanelVisible, setSidebarPanelVisible] =
+    Dome.useBoolSettings('frama-c.sidebar.unfold', true);
+  const [sidebarPanelWidth, setSidebarPanelWidth] =
+    Dome.useNumberSettings(
+      'frama-c.sidebar.panel.width',
+      DEFAULT_SIDEBAR_PANEL_WIDTH,
+    );
+  const lastOpenWidth =
+    sidebarPanelWidth > 0 ? sidebarPanelWidth : DEFAULT_SIDEBAR_PANEL_WIDTH;
+
+  const setVisible = (visible: boolean): void => {
+    if (visible) {
+      // Restore the last open width before showing the panel again.
+      setSidebarPanelWidth(lastOpenWidth);
+      setSidebarPanelVisible(true);
+    } else {
+      setSidebarPanelVisible(false);
+    }
+  };
+
+  const setPosition = (width: number): void => {
+    if (width <= 0) {
+      // Dragging to zero collapses the panel but keeps the saved open width.
+      setSidebarPanelVisible(false);
+      return;
+    }
+    setSidebarPanelWidth(width);
+    setSidebarPanelVisible(true);
+  };
+
+  return {
+    // A collapsed panel is represented as a zero-sized foldable pane.
+    position: sidebarPanelVisible ? lastOpenWidth : 0,
+    visible: sidebarPanelVisible,
+    setPosition,
+    setVisible,
+  };
+}
+
+// --------------------------------------------------------------------------
