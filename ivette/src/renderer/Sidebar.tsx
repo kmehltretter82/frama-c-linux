@@ -17,8 +17,8 @@ import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
 import { SidebarProps } from 'ivette';
 import type {
-  SidebarPanelControl,
   SidebarSelectionState,
+  SidebarPanelVisibilityControl,
 } from './sidebarControl';
 
 /* -------------------------------------------------------------------------- */
@@ -28,20 +28,19 @@ import type {
 interface SelectorProps extends SidebarProps {
   selectorSelected: SidebarSelectionState['selectorSelected'];
   setSelectorSelected: SidebarSelectionState['setSelectorSelected'];
-  panelVisible: SidebarPanelControl['visible'];
-  setPanelVisible: SidebarPanelControl['setVisible'];
+  sidebarPanel: SidebarPanelVisibilityControl;
 }
 
 function Selector(props: SelectorProps): JSX.Element {
   const {
     id,
     icon,
-    panelVisible,
     selectorSelected,
     setSelectorSelected,
-    setPanelVisible,
+    sidebarPanel,
     label
   } = props;
+  const { visible, setVisible } = sidebarPanel;
   const className = classes(
     'sidebar-selector',
     'dome-color-frame',
@@ -49,18 +48,18 @@ function Selector(props: SelectorProps): JSX.Element {
   );
   const onClick = React.useCallback(() => {
     if (selectorSelected === id) {
-      setPanelVisible(!panelVisible);
+      setVisible(!visible);
     } else {
       setSelectorSelected(id);
-      setPanelVisible(true);
+      setVisible(true);
     }
   },
     [
       id,
-      panelVisible,
       selectorSelected,
-      setPanelVisible,
+      setVisible,
       setSelectorSelected,
+      visible,
     ]);
   const title = props.title ?? `${label} Sidebar`;
   const component =
@@ -78,29 +77,24 @@ function Selector(props: SelectorProps): JSX.Element {
 /* --- Sidebar Toggle Selector                                            --- */
 /* -------------------------------------------------------------------------- */
 
-interface ToggleSelectorProps {
-  panelVisible: SidebarPanelControl['visible'];
-  setPanelVisible: SidebarPanelControl['setVisible'];
-}
-
 /**
    Dedicated selector-like control used to collapse or expand the sidebar
    panel without changing the currently selected sidebar selector.
  */
-function ToggleSelector(props: ToggleSelectorProps): JSX.Element {
-  const { panelVisible, setPanelVisible } = props;
+function ToggleSelector(props: SidebarPanelVisibilityControl): JSX.Element {
+  const { visible, setVisible } = props;
   const className = classes(
     'sidebar-selector',
     'sidebar-selector-toggle',
     'dome-color-frame',
-    panelVisible && 'sidebar-selector-selected',
+    visible && 'sidebar-selector-selected',
   );
-  const title = `${panelVisible ? 'Collapse' : 'Expand'} sidebar`;
+  const title = `${visible ? 'Collapse' : 'Expand'} sidebar`;
   return (
     <div
       className={className}
       title={title}
-      onClick={() => setPanelVisible(!panelVisible)}
+      onClick={() => setVisible(!visible)}
     >
       <Icon size={20} className="sidebar-selector-icon" id="SIDEBAR" />
     </div>
@@ -111,38 +105,31 @@ function ToggleSelector(props: ToggleSelectorProps): JSX.Element {
 /* --- Sidebar Main Components                                            --- */
 /* -------------------------------------------------------------------------- */
 
-interface SelectorsProps extends SidebarSelectionState {
-  panelVisible: SidebarPanelControl['visible'];
-  setPanelVisible: SidebarPanelControl['setVisible'];
+interface SelectorsProps {
+  sidebarSelection: SidebarSelectionState;
+  sidebarPanel: SidebarPanelVisibilityControl;
 }
 
 export function Selectors(props: SelectorsProps): JSX.Element {
-  const {
-    selectorSelected,
-    setSelectorSelected,
-    registeredSidebars,
-    panelVisible,
-    setPanelVisible,
-  } = props;
-  const selectors = registeredSidebars.map((sb) => (
+  const { sidebarSelection, sidebarPanel } = props;
+  const selectors = sidebarSelection.registeredSidebars.map((sb) => (
     <Selector
       key={sb.id}
-      panelVisible={panelVisible}
-      setPanelVisible={setPanelVisible}
-      selectorSelected={selectorSelected}
-      setSelectorSelected={setSelectorSelected}
+      sidebarPanel={sidebarPanel}
+      selectorSelected={sidebarSelection.selectorSelected}
+      setSelectorSelected={sidebarSelection.setSelectorSelected}
       {...sb} />
   ));
   const selectorsClasses = classes(
-    registeredSidebars.length <= 1 && 'dome-erased',
+    sidebarSelection.registeredSidebars.length <= 1 && 'dome-erased',
   );
 
   return (
     <div className="sidebar-items dome-color-frame">
       <div className={selectorsClasses}>{selectors}</div>
       <ToggleSelector
-        panelVisible={panelVisible}
-        setPanelVisible={setPanelVisible}
+        visible={sidebarPanel.visible}
+        setVisible={sidebarPanel.setVisible}
       />
     </div>
   );

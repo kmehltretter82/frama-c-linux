@@ -59,30 +59,33 @@ export function useSidebarSelectionState(): SidebarSelectionState {
 }
 
 /**
-   Control interface to drive the sidebar panel.
-
-   The sidebar panel has two pieces of state:
-   - a visibility flag, used by UI actions such as toolbar and selectors,
-   - a persisted width, used by the splitter when the panel is open.
-
-   The control reconciles both into a single API for the application:
-   - `position` is the effective splitter position,
-   - `visible` is the user-facing open/closed state,
-   - `setPosition` is called by the splitter,
-   - `setVisible` is called by buttons and selectors.
+   Shared open/closed control for the sidebar panel.
  */
-export interface SidebarPanelControl {
-  position: number;
+export interface SidebarPanelVisibilityControl {
   visible: boolean;
-  setPosition: (width: number) => void;
   setVisible: (visible: boolean) => void;
+}
+
+/**
+   Full control interface for the sidebar panel.
+
+   It extends the visibility-only interface with splitter-specific state:
+   - `position` is the effective width given to a splitter,`,
+   - `setPosition` is called by the splitter while dragging.
+
+   Together with `visible` and `setVisible`, this gives a single control object
+   that can be shared between layout code and sidebar components.
+ */
+export interface SidebarPanelControl extends SidebarPanelVisibilityControl {
+  position: number;
+  setPosition: (width: number) => void;
 }
 
 /**
    Hook used by the application to control the sidebar panel.
 
-   The width setting is documented as the "last open width": when the panel
-   is collapsed we keep the width value unchanged, so reopening restores the
+   The width setting is given as the last open width: when the panel is
+   collapsed we keep the width value unchanged, so reopening restores the
    previous size instead of falling back to a hard-coded width each time.
  */
 export function useSidebarControl(): SidebarPanelControl {
