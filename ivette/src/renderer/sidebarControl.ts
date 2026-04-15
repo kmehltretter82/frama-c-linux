@@ -10,12 +10,56 @@
 // --- Sidebar Panel Control
 // --------------------------------------------------------------------------
 
+import React from 'react';
 import * as Dome from 'dome';
+import { SidebarProps, SIDEBAR } from 'ivette';
+import * as State from 'ivette/state';
 
 const DEFAULT_SIDEBAR_PANEL_WIDTH = 320;
 
 /**
-   Public control surface used by the application to drive the sidebar panel.
+   Shared sidebar selection state used by selector and panel renderers.
+ */
+export interface SidebarSelectionState {
+  selectorSelected: string;
+  setSelectorSelected: (selector: string) => void;
+  registeredSidebars: SidebarProps[];
+}
+
+/**
+   Hook responsible for the currently selected sidebar and the list
+   of registered sidebars, sorted by rank.
+ */
+export function useSidebarSelectionState(): SidebarSelectionState {
+  const [selectorSelected, setSelectorSelected] =
+    Dome.useStringSettings('ivette.sidebar.selected');
+  const registeredSidebars = State.useElements(SIDEBAR);
+  const sortedSidebars = React.useMemo(() => {
+    const newItems = [...registeredSidebars].sort((a, b) => {
+      const e1 = a.rank ?? 0;
+      const e2 = b.rank ?? 0;
+      return e1 - e2;
+    });
+    return newItems;
+  }, [registeredSidebars]);
+
+  // Ensure the selected sidebar always refers to a currently registered one.
+  React.useEffect(() => {
+    if (sortedSidebars.every((sb) => sb.id !== selectorSelected)) {
+      const first = sortedSidebars[0];
+      if (first) setSelectorSelected(first.id);
+    }
+  }, [sortedSidebars, selectorSelected, setSelectorSelected]);
+
+  return {
+    selectorSelected,
+    setSelectorSelected,
+    registeredSidebars: sortedSidebars,
+  };
+}
+
+/**
+   Control interface to drive the sidebar panel.
 
    The sidebar panel has two pieces of state:
    - a visibility flag, used by UI actions such as toolbar and selectors,

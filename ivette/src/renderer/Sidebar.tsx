@@ -11,23 +11,25 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import * as Dome from 'dome';
 import { Icon } from 'dome/controls/icons';
 import { SideBar } from 'dome/frame/sidebars';
 import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
-import { SidebarProps, SIDEBAR } from 'ivette';
-import * as State from 'ivette/state';
+import { SidebarProps } from 'ivette';
+import type {
+  SidebarPanelControl,
+  SidebarSelectionState,
+} from './sidebarControl';
 
 /* -------------------------------------------------------------------------- */
 /* --- Sidebar Classic Selector                                           --- */
 /* -------------------------------------------------------------------------- */
 
 interface SelectorProps extends SidebarProps {
-  selectedSidebarId: string;
-  setSelectedSidebarId: (item: string) => void;
-  panelVisible: boolean;
-  setPanelVisible: (visible: boolean) => void;
+  selectorSelected: SidebarSelectionState['selectorSelected'];
+  setSelectorSelected: SidebarSelectionState['setSelectorSelected'];
+  panelVisible: SidebarPanelControl['visible'];
+  setPanelVisible: SidebarPanelControl['setVisible'];
 }
 
 function Selector(props: SelectorProps): JSX.Element {
@@ -35,30 +37,30 @@ function Selector(props: SelectorProps): JSX.Element {
     id,
     icon,
     panelVisible,
-    selectedSidebarId,
-    setSelectedSidebarId,
+    selectorSelected,
+    setSelectorSelected,
     setPanelVisible,
     label
   } = props;
   const className = classes(
     'sidebar-selector',
     'dome-color-frame',
-    selectedSidebarId === id && 'sidebar-selector-selected',
+    selectorSelected === id && 'sidebar-selector-selected',
   );
   const onClick = React.useCallback(() => {
-    if (selectedSidebarId === id) {
+    if (selectorSelected === id) {
       setPanelVisible(!panelVisible);
     } else {
-      setSelectedSidebarId(id);
+      setSelectorSelected(id);
       setPanelVisible(true);
     }
   },
     [
       id,
       panelVisible,
-      selectedSidebarId,
+      selectorSelected,
       setPanelVisible,
-      setSelectedSidebarId,
+      setSelectorSelected,
     ]);
   const title = props.title ?? `${label} Sidebar`;
   const component =
@@ -77,8 +79,8 @@ function Selector(props: SelectorProps): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 interface ToggleSelectorProps {
-  panelVisible: boolean;
-  setPanelVisible: (visible: boolean) => void;
+  panelVisible: SidebarPanelControl['visible'];
+  setPanelVisible: SidebarPanelControl['setVisible'];
 }
 
 /**
@@ -106,97 +108,37 @@ function ToggleSelector(props: ToggleSelectorProps): JSX.Element {
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- User Sidebar Wrapper                                               --- */
-/* -------------------------------------------------------------------------- */
-
-interface WrapperProps extends SidebarProps {
-  selected: string;
-}
-
-function Wrapper(props: WrapperProps): JSX.Element {
-  const className = props.selected === props.id ? '' : 'dome-erased';
-
-  return (
-    <SideBar className={className}>
-      <div className="sidebar-ruler" />
-      <Catch label={props.id}>
-        {props.children}
-      </Catch>
-    </SideBar>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
 /* --- Sidebar Main Components                                            --- */
 /* -------------------------------------------------------------------------- */
 
-interface SidebarState {
-  selectedSidebarId: string;
-  setSelectedSidebarId: (id: string) => void;
-  registeredSidebars: SidebarProps[];
-}
-
-function useSidebarState(): SidebarState {
-  const [selectedSidebarId, setSelectedSidebarId] =
-    Dome.useStringSettings('ivette.sidebar.selected');
-
-  const registeredSidebars = State.useElements(SIDEBAR);
-  const sortedSidebars = React.useMemo(() => {
-    const newItems = [...registeredSidebars].sort((a, b) => {
-      const e1 = a.rank ?? 0;
-      const e2 = b.rank ?? 0;
-      return e1 - e2;
-    });
-    return newItems;
-  }, [registeredSidebars]);
-
-  // Ensures there is one selected sidebar
-  React.useEffect(() => {
-    if (sortedSidebars.every((sb) => sb.id !== selectedSidebarId)) {
-      const first = sortedSidebars[0];
-      if (first) setSelectedSidebarId(first.id);
-    }
-  }, [sortedSidebars, selectedSidebarId, setSelectedSidebarId]);
-
-  return {
-    selectedSidebarId,
-    setSelectedSidebarId,
-    registeredSidebars: sortedSidebars,
-  };
-}
-
-interface SelectorsProps {
-  sidebarVisible?: boolean;
-  panelVisible: boolean;
-  setPanelVisible: (visible: boolean) => void;
+interface SelectorsProps extends SidebarSelectionState {
+  panelVisible: SidebarPanelControl['visible'];
+  setPanelVisible: SidebarPanelControl['setVisible'];
 }
 
 export function Selectors(props: SelectorsProps): JSX.Element {
-  const { sidebarVisible = true, panelVisible, setPanelVisible } = props;
   const {
-    selectedSidebarId,
-    setSelectedSidebarId,
+    selectorSelected,
+    setSelectorSelected,
     registeredSidebars,
-  } = useSidebarState();
+    panelVisible,
+    setPanelVisible,
+  } = props;
   const selectors = registeredSidebars.map((sb) => (
     <Selector
       key={sb.id}
       panelVisible={panelVisible}
       setPanelVisible={setPanelVisible}
-      selectedSidebarId={selectedSidebarId}
-      setSelectedSidebarId={setSelectedSidebarId}
+      selectorSelected={selectorSelected}
+      setSelectorSelected={setSelectorSelected}
       {...sb} />
   ));
-  const selectorContainerClasses = classes(
-    'sidebar-items dome-color-frame',
-    !sidebarVisible && 'dome-erased',
-  );
   const selectorsClasses = classes(
     registeredSidebars.length <= 1 && 'dome-erased',
   );
 
   return (
-    <div className={selectorContainerClasses}>
+    <div className="sidebar-items dome-color-frame">
       <div className={selectorsClasses}>{selectors}</div>
       <ToggleSelector
         panelVisible={panelVisible}
@@ -206,17 +148,26 @@ export function Selectors(props: SelectorsProps): JSX.Element {
   );
 }
 
-export function Panels(): JSX.Element {
-  const { selectedSidebarId, registeredSidebars } = useSidebarState();
-  const wrappers = registeredSidebars.map((sb) => (
-    <Wrapper
+interface PanelsProps {
+  selectorSelected: SidebarSelectionState['selectorSelected'];
+  registeredSidebars: SidebarSelectionState['registeredSidebars'];
+}
+
+export function Panels(props: PanelsProps): JSX.Element {
+  const { selectorSelected, registeredSidebars } = props;
+  const sidebars = registeredSidebars.map((sb) => (
+    <SideBar
       key={sb.id}
-      selected={selectedSidebarId}
-      {...sb}
-    />
+      className={selectorSelected === sb.id ? '' : 'dome-erased'}
+    >
+      <div className="sidebar-ruler" />
+      <Catch label={sb.id}>
+        {sb.children}
+      </Catch>
+    </SideBar>
   ));
 
-  return <div className="sidebar-view">{wrappers}</div>;
+  return <div className="sidebar-view">{sidebars}</div>;
 }
 
 // --------------------------------------------------------------------------

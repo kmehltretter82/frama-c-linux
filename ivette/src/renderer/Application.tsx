@@ -25,7 +25,10 @@ import * as State from 'ivette/state';
 import * as Search from 'ivette/search';
 import * as Laboratory from 'ivette/laboratory';
 import * as IvettePrefs from 'ivette/prefs';
-import { useSidebarControl } from './sidebarControl';
+import {
+  useSidebarControl,
+  useSidebarSelectionState,
+} from './sidebarControl';
 import './command';
 import './loader';
 import './sandbox';
@@ -37,6 +40,7 @@ import './style.css';
 
 export default function Application(): JSX.Element {
   const sidebarPanel = useSidebarControl();
+  const sidebarSelection = useSidebarSelectionState();
 
   const ToolBar = State.useChildren(TOOLBAR);
   const StatusBar = State.useChildren(STATUSBAR);
@@ -59,6 +63,9 @@ export default function Application(): JSX.Element {
       </Toolbar.ToolBar>
       <Hfill>
         <Sidebar.Selectors
+          selectorSelected={sidebarSelection.selectorSelected}
+          setSelectorSelected={sidebarSelection.setSelectorSelected}
+          registeredSidebars={sidebarSelection.registeredSidebars}
           panelVisible={sidebarPanel.visible}
           setPanelVisible={sidebarPanel.setVisible}
         />
@@ -67,7 +74,10 @@ export default function Application(): JSX.Element {
           onPosition={sidebarPanel.setPosition}
           allowResizeToZero
         >
-          <Sidebar.Panels />
+          <Sidebar.Panels
+            selectorSelected={sidebarSelection.selectorSelected}
+            registeredSidebars={sidebarSelection.registeredSidebars}
+          />
           <Laboratory.LabView />
         </LSplit>
       </Hfill>
