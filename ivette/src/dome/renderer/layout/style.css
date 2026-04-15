@@ -372,7 +372,14 @@
       background-image: none;
     }
 
-    .dome-xButton:hover {
+    .dome-xButton:disabled, .dome-xButton:active:disabled {
+      fill: var(--disabled-text);
+      color: var(--disabled-text);
+      border-color: var(--border-discrete) ;
+      background-image: none;
+    }
+
+    .dome-xButton:hover:not(:disabled) {
       cursor: pointer;
       border-color: var(--text-highlighted);
       color: var(--text-highlighted);
