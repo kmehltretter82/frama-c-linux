@@ -47,17 +47,6 @@ export default function Application(): JSX.Element {
 
   return (
     <Vfill>
-      <Toolbar.ToolBar>
-        <Controller.Control />
-        <>{ToolBar}</>
-        <Toolbar.Filler />
-        <Laboratory.Tabs />
-        <Toolbar.Filler />
-        <IvettePrefs.ThemeSwitchTool />
-        <IvettePrefs.FontTools />
-        <Search.SearchField />
-        <Toolbar.IconPinnedMessage />
-      </Toolbar.ToolBar>
       <Hfill>
         <Sidebar.Selectors
           sidebarSelection={sidebarSelection}
@@ -72,7 +61,20 @@ export default function Application(): JSX.Element {
             selectorSelected={sidebarSelection.selectorSelected}
             registeredSidebars={sidebarSelection.registeredSidebars}
           />
-          <Laboratory.LabView />
+          <Vfill>
+            <Toolbar.ToolBar>
+              <Controller.Control />
+              <>{ToolBar}</>
+              <Toolbar.Filler />
+              <Laboratory.Tabs />
+              <Toolbar.Filler />
+              <IvettePrefs.ThemeSwitchTool />
+              <IvettePrefs.FontTools />
+              <Search.SearchField />
+              <Toolbar.IconPinnedMessage />
+            </Toolbar.ToolBar>
+            <Laboratory.LabView />
+          </Vfill>
         </LSplit>
       </Hfill>
       <Toolbar.ToolBar className="statusbar">
