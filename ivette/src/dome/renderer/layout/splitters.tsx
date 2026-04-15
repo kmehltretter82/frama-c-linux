@@ -195,22 +195,40 @@ function getSettingsFromPosition(L: Layout, P: number, D: number): number {
 /**
    Clamp a splitter position to the valid interval for the current layout.
 
-   The returned position must leave enough room on both sides of the splitter:
-   - `minA` is the minimum size allowed for side A,
-   - `minB` is the minimum size allowed for side B.
+   In the default mode, both sides keep the regular minimum margin `M`.
 
-   Parameters:
-   - `M` is the regular minimum margin kept for a non-collapsed side,
-   - `D` is the total available size of the splitter container,
-   - `P` is the requested splitter position before clamping.
+   When `L` is provided, the minimum of the foldable side is temporarily relaxed
+   to `0`. This relaxed mode is only meant for the transient render phase where
+   a foldable pane is being reopened from a collapsed `0` position. Persisted
+   positions should still use the default mode so released sizes take the normal
+   minimum width.
 
-   When the container itself is smaller than the sum of both margins, the
+   When the container itself is smaller than the sum of both active minima, the
    constraints are impossible to satisfy; in that case we fall back to the
    middle of the available space.
+
+   @param M - regular minimum margin kept for a non-collapsed side
+   @param D - total available size of the splitter container
+   @param P - requested splitter position before clamping
+   @param L - optional layout used to relax the minimum on the foldable side
+     while reopening a foldable pane from `0`
+   @returns the effective splitter position after applying the active minima
  */
-const inRange = (M: number, D: number, P: number): number => (
-  D < M ? D / 2 : Math.min(Math.max(P, M), D - M)
-);
+const inRange = (M: number, D: number, P: number, L?: Layout): number => {
+  // Default mode keeps the regular minimum margin on both sides.
+  // Relaxed mode uses the layout to allow the foldable side to reopen from 0.
+  const minA = L?.foldA ? 0 : M;
+  const minB = L?.foldB ? 0 : M;
+  const minD = minA + minB;
+
+  // If the container is too small to satisfy both active minima, fall back
+  // to a neutral midpoint rather than producing an inconsistent interval.
+  if (D < minD) return D / 2;
+
+  // Otherwise clamp the requested position P inside the feasible interval:
+  //   minA <= result <= D - minB
+  return Math.min(Math.max(P, minA), D - minB);
+};
 
 /* --------------------------------------------------------------------------*/
 /* --- Splitter Engine                                                    ---*/
@@ -252,7 +270,9 @@ function SplitterEngine(props: SplitterEngineProps): JSX.Element {
     const P = getPositionFromSettings(dragging, layout, settings, D);
     const X = dragging ? dragging.offset - dragging.anchor : 0;
     const collapsed = zeroFold && !dragging && settings === 0;
-    const Q = collapsed ? 0 : inRange(M, D, P + X);
+    const reopening = zeroFold && !!dragging && dragging.position === 0;
+    const clampLayout = reopening ? layout : undefined;
+    const Q = collapsed ? 0 : inRange(M, D, P + X, clampLayout);
     styleA = hsplit ? { width: Q } : { height: Q };
     styleR = hsplit ? { left: Q } : { top: Q };
     styleB = hsplit ? { left: Q + 1 } : { top: Q + 1 };
