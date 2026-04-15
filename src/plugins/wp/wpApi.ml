@@ -592,6 +592,19 @@ let () =
     end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Properties filter                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  ignore @@ S.register_state ~package ~name:"filter"
+    ~descr:(Md.plain "Configured properties filter")
+    ~data:(module D.Jlist(D.Jstring))
+    ~get:Wp_parameters.Properties.get
+    ~set:Wp_parameters.Properties.set
+    ~add_hook:(fun f -> Wp_parameters.Properties.add_set_hook (fun _ -> f))
+    ()
+
+(* -------------------------------------------------------------------------- *)
 (* --- Generate goals                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 

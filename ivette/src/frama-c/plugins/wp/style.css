@@ -32,6 +32,41 @@
   margin-top: 10px;
 }
 
+.wp-sidebar-selection-button {
+  margin: 1px;
+  padding: 1px;
+}
+
+.wp-sidebar-selection {
+  padding: 0px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin: 2px;
+  width: fit-content;
+  display: inline-flex;
+}
+
+.wp-sidebar-selection-selected {
+  border: 1px solid var(--text-discrete);
+  background-color: var(--background-softer);
+}
+
+.wp-sidebar-selection-block {
+  margin-bottom: 5px;
+}
+
+.wp-sidebar-selection-commit {
+  padding: 2px;
+  border-radius: 50%;
+  margin: 1px;
+}
+
+.wp-sidebar-title-button {
+  margin: 3px;
+  padding: 0;
+  border-radius: 8px;
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- Pattern Debugger                                                   --- */
 /* -------------------------------------------------------------------------- */

@@ -18,6 +18,7 @@ import {
   SelectMenu,
   Spinner,
   IconButton,
+  Field
 } from 'dome/controls/buttons';
 import { SidebarTitle } from 'dome/frame/sidebars';
 import { DivProps, Hbox, Hfill, Vbox } from 'dome/layout/boxes';
@@ -310,6 +311,159 @@ function ProversConfiguration(): JSX.Element {
   );
 }
 
+interface SelectionProps {
+  name: string;
+  selected: boolean;
+  remove: () => void;
+}
+
+function SelectionButton(props: SelectionProps): JSX.Element {
+  const { name, remove, selected } = props;
+  const className = Utils.classes(
+    'wp-sidebar-selection',
+    (selected && 'wp-sidebar-selection-selected')
+  );
+  return (
+    <div className={className}>
+      <Label label={name} >
+        <Icon
+          id='CROSS'
+          onClick={remove} />
+      </Label>
+    </div>
+  );
+}
+
+function Properties(): JSX.Element {
+  const [rte = false, setRte] = States.useSyncState(Params.wpRte);
+  const [smoke = false, setSmoke] = States.useSyncState(Params.wpSmokeTests);
+
+  const [properties = [], setProperties] = States.useSyncState(WP.filter);
+
+  const [selected, setSelected] = React.useState<string>('');
+  const onChange = (value: string | undefined): void => {
+    setSelected(value ?? '');
+  };
+
+  const [field, setField] = React.useState<string>('');
+
+  const custom = 'Custom:';
+
+  const getName = (add: boolean): string => {
+    const name = selected === custom ? field : selected;
+    return add ? name : '-' + name;
+  };
+
+  const canCommit = (add: boolean): boolean => {
+    if (selected === '') return false;
+    if (selected === custom && field === '') return false;
+    return properties.indexOf(getName(add)) === -1;
+  };
+
+  const remove = (ps: string[], value: string): string[] => {
+    return ps.filter((element) => element !== value);
+  };
+
+  const onCommit = (add: boolean): void => {
+    const toRm = getName(!add);
+    const toAdd = getName(add);
+    const updated =
+      properties.indexOf(toRm) !== -1
+        ? remove(properties, toRm)
+        : [...properties, toAdd];
+    setProperties(updated);
+  };
+  const onKill = (value: string): void => {
+    setProperties(remove(properties, value));
+  };
+
+  const options = [
+    '',
+    '@assert',
+    '@assigns',
+    '@breaks',
+    '@check',
+    '@continues',
+    '@complete',
+    '@decreases',
+    '@disjoint',
+    '@ensures',
+    '@exits',
+    '@invariant',
+    '@lemma',
+    '@requires',
+    '@returns',
+    '@variant',
+    '@terminates',
+    custom
+  ];
+
+  return (
+    <Section label='Properties' >
+      <SidebarBlock title='Side conditions'>
+        <Checkbox
+          label='Generate RTE guards'
+          onChange={setRte}
+          value={rte}
+        />
+        <Checkbox
+          label='Generate smoke tests'
+          onChange={setSmoke}
+          value={smoke}
+        />
+      </SidebarBlock>
+      <SidebarBlock
+        title={'Properties filter'}
+        titleButtons={
+          [
+            <Button
+              key='Reset'
+              label='Reset'
+              className={Utils.classes('wp-sidebar-title-button')}
+              onClick={() => setProperties([])}
+            />
+          ]
+        }
+        foldable={true}
+      >
+        <div className={Utils.classes('wp-sidebar-selection-block')}>
+          {properties.map((value) =>
+            <SelectionButton
+              key={value}
+              name={value}
+              selected={value === getName(true) || value === getName(false)}
+              remove={() => onKill(value)} />)}
+        </div>
+        <Hbox>
+          <Button
+            icon={'PLUS'}
+            enabled={canCommit(true)}
+            onClick={() => { onCommit(true); }}
+            className={Utils.classes('wp-sidebar-selection-commit')}
+          />
+          <Button
+            icon={'MINUS'}
+            enabled={canCommit(false)}
+            onClick={() => { onCommit(false); }}
+            className={Utils.classes('wp-sidebar-selection-commit')}
+          />
+          <SelectMenu
+            value={selected}
+            onChange={onChange}
+          >
+            {options.map((value) =>
+              <option key={value} value={value}>{value}</option>)}
+          </SelectMenu>
+          <Field
+            style={selected !== custom ? { display: 'none' } : {}}
+            onEdited={(value) => { setField(value); }}
+          />
+        </Hbox>
+      </SidebarBlock>
+    </Section>
+  );
+}
+
 export function SideBar(): JSX.Element {
   return (
     <>
@@ -318,6 +472,7 @@ export function SideBar(): JSX.Element {
       </SidebarTitle>
       <Forms.SidebarForm className={Utils.classes('wp-sidebar')}>
         <ProversConfiguration />
+        <Properties />
       </Forms.SidebarForm>
     </>
   );
