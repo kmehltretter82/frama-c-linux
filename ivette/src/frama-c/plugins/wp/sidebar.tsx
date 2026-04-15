@@ -28,17 +28,6 @@ import * as Params from 'frama-c/kernel/api/parameters';
 import * as WP from 'frama-c/plugins/wp/api';
 import * as TIP from './tip';
 
-function Section(p: Forms.SectionProps): JSX.Element {
-  return (
-    <Forms.Section
-      label={p.label}
-      unfold
-    >
-      {p.children}
-    </Forms.Section>
-  );
-}
-
 interface SidebarBlockProps extends DivProps {
   title: string;
   titleButtons?: JSX.Element[];
@@ -229,7 +218,7 @@ function ProversConfiguration(): JSX.Element {
   const [strategies = false, setStrats] = States.useSyncState(WP.strategies);
 
   return (
-    <Section label='Provers Configuration' >
+    <Forms.Section label='Provers Configuration' unfold>
       <SidebarBlock title='General configuration'>
         <Label label='Timeout' icon='CLOCK' >
           <Spinner
@@ -307,7 +296,7 @@ function ProversConfiguration(): JSX.Element {
           value={strategies}
         />
       </SidebarBlock>
-    </Section>
+    </Forms.Section>
   );
 }
 
@@ -460,7 +449,7 @@ function Properties(): JSX.Element {
 
 
   return (
-    <Section label='Properties' >
+    <Forms.Section label='Properties' unfold>
       <SidebarBlock title='Side conditions'>
         <Checkbox
           label='Generate RTE guards'
@@ -474,7 +463,7 @@ function Properties(): JSX.Element {
         />
       </SidebarBlock>
       <PropertiesFilter />
-    </Section>
+    </Forms.Section>
   );
 }
 
