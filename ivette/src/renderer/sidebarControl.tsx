@@ -111,7 +111,8 @@ export function useSidebarControl(): SidebarPanelControl {
 
   const setPosition = (width: number): void => {
     if (width <= 0) {
-      // Dragging to zero collapses the panel but keeps the saved open width.
+      // External callers may collapse the panel to zero while keeping
+      // the last open width unchanged for the next reopen.
       setSidebarPanelVisible(false);
       return;
     }

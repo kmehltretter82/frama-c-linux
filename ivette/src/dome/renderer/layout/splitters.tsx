@@ -45,8 +45,9 @@ export interface SplitterFoldProps extends SplitterBaseProps {
    */
   unfold?: boolean;
   /**
-     Allow the foldable component to be resized down to `0`
+     Allow the foldable component to be positioned at `0`
      while keeping the splitter handle visible.
+     Dragging still respects the regular minimum margin.
      Only applies to left, right, top and bottom splitters.
    */
   allowResizeToZero?: boolean;
@@ -203,31 +204,13 @@ function getSettingsFromPosition(L: Layout, P: number, D: number): number {
    - `D` is the total available size of the splitter container,
    - `P` is the requested splitter position before clamping.
 
-   For foldable layouts, `allowResizeToZero` lets the foldable side shrink to
-   `0` while keeping the opposite side constrained by the regular margin `M`.
-
-   When the container itself is smaller than the sum of both minima, the
+   When the container itself is smaller than the sum of both margins, the
    constraints are impossible to satisfy; in that case we fall back to the
    middle of the available space.
  */
-function inRange(
-  L: Layout,
-  allowResizeToZero: boolean,
-  M: number,
-  D: number,
-  P: number,
-): number {
-  // Compute the minimum size required on each side of the splitter.
-  const minA = allowResizeToZero && L.foldA ? 0 : M;
-  const minB = allowResizeToZero && L.foldB ? 0 : M;
-  const minD = minA + minB;
-
-  // If both minima cannot fit in the container, use a neutral midpoint.
-  if (D < minD) return D / 2;
-
-  // Otherwise clamp the requested position inside the feasible interval.
-  return Math.min(Math.max(P, minA), D - minB);
-}
+const inRange = (M: number, D: number, P: number): number => (
+  D < M ? D / 2 : Math.min(Math.max(P, M), D - M)
+);
 
 /* --------------------------------------------------------------------------*/
 /* --- Splitter Engine                                                    ---*/
@@ -268,7 +251,8 @@ function SplitterEngine(props: SplitterEngineProps): JSX.Element {
   if (unfold && dragged) {
     const P = getPositionFromSettings(dragging, layout, settings, D);
     const X = dragging ? dragging.offset - dragging.anchor : 0;
-    const Q = inRange(layout, zeroFold, M, D, P + X);
+    const collapsed = zeroFold && !dragging && settings === 0;
+    const Q = collapsed ? 0 : inRange(M, D, P + X);
     styleA = hsplit ? { width: Q } : { height: Q };
     styleR = hsplit ? { left: Q } : { top: Q };
     styleB = hsplit ? { left: Q + 1 } : { top: Q + 1 };
@@ -295,7 +279,7 @@ function SplitterEngine(props: SplitterEngineProps): JSX.Element {
         setSettings(defaultPosition);
       } else if (unfold && dragging) {
         const offsetPos = dragging.position + dragging.offset - dragging.anchor;
-        const newPos = inRange(layout, zeroFold, M, D, offsetPos);
+        const newPos = inRange(M, D, offsetPos);
         setSettings(getSettingsFromPosition(layout, newPos, D));
       }
       setDragging(undefined);
