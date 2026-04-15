@@ -334,10 +334,7 @@ function SelectionButton(props: SelectionProps): JSX.Element {
   );
 }
 
-function Properties(): JSX.Element {
-  const [rte = false, setRte] = States.useSyncState(Params.wpRte);
-  const [smoke = false, setSmoke] = States.useSyncState(Params.wpSmokeTests);
-
+function PropertiesFilter(): JSX.Element {
   const [properties = [], setProperties] = States.useSyncState(WP.filter);
 
   const [selected, setSelected] = React.useState<string>('');
@@ -352,6 +349,13 @@ function Properties(): JSX.Element {
   const getName = (add: boolean): string => {
     const name = selected === custom ? field : selected;
     return add ? name : '-' + name;
+  };
+  const displayName = (name: string): string => {
+    switch (name) {
+      case '@disjoint_behaviors': return '@disjoint';
+      case '@complete_behaviors': return '@complete';
+      default: return name;
+    }
   };
 
   const canCommit = (add: boolean): boolean => {
@@ -384,9 +388,9 @@ function Properties(): JSX.Element {
     '@breaks',
     '@check',
     '@continues',
-    '@complete',
+    '@complete_behaviors',
     '@decreases',
-    '@disjoint',
+    '@disjoint_behaviors',
     '@ensures',
     '@exits',
     '@invariant',
@@ -397,6 +401,63 @@ function Properties(): JSX.Element {
     '@terminates',
     custom
   ];
+
+  return (
+    <SidebarBlock
+      title={'Properties filter'}
+      titleButtons={
+        [
+          <Button
+            key='Reset'
+            label='Reset'
+            className={Utils.classes('wp-sidebar-title-button')}
+            onClick={() => setProperties([])}
+          />
+        ]
+      }
+      foldable={true}
+    >
+      <div className={Utils.classes('wp-sidebar-selection-block')}>
+        {properties.map((value) =>
+          <SelectionButton
+            key={value}
+            name={value}
+            selected={value === getName(true) || value === getName(false)}
+            remove={() => onKill(value)} />)}
+      </div>
+      <Hbox>
+        <Button
+          icon={'PLUS'}
+          enabled={canCommit(true)}
+          onClick={() => { onCommit(true); }}
+          className={Utils.classes('wp-sidebar-selection-commit')}
+        />
+        <Button
+          icon={'MINUS'}
+          enabled={canCommit(false)}
+          onClick={() => { onCommit(false); }}
+          className={Utils.classes('wp-sidebar-selection-commit')}
+        />
+        <SelectMenu
+          value={selected}
+          onChange={onChange}
+        >
+          {options.map((value) =>
+            <option key={value} value={value}>{displayName(value)}</option>)}
+        </SelectMenu>
+        <Field
+          style={selected !== custom ? { display: 'none' } : {}}
+          onEdited={(value) => { setField(value); }}
+        />
+      </Hbox>
+    </SidebarBlock>
+  );
+}
+
+function Properties(): JSX.Element {
+  const [rte = false, setRte] = States.useSyncState(Params.wpRte);
+  const [smoke = false, setSmoke] = States.useSyncState(Params.wpSmokeTests);
+
 
   return (
     <Section label='Properties' >
@@ -412,54 +473,7 @@ function Properties(): JSX.Element {
           value={smoke}
         />
       </SidebarBlock>
-      <SidebarBlock
-        title={'Properties filter'}
-        titleButtons={
-          [
-            <Button
-              key='Reset'
-              label='Reset'
-              className={Utils.classes('wp-sidebar-title-button')}
-              onClick={() => setProperties([])}
-            />
-          ]
-        }
-        foldable={true}
-      >
-        <div className={Utils.classes('wp-sidebar-selection-block')}>
-          {properties.map((value) =>
-            <SelectionButton
-              key={value}
-              name={value}
-              selected={value === getName(true) || value === getName(false)}
-              remove={() => onKill(value)} />)}
-        </div>
-        <Hbox>
-          <Button
-            icon={'PLUS'}
-            enabled={canCommit(true)}
-            onClick={() => { onCommit(true); }}
-            className={Utils.classes('wp-sidebar-selection-commit')}
-          />
-          <Button
-            icon={'MINUS'}
-            enabled={canCommit(false)}
-            onClick={() => { onCommit(false); }}
-            className={Utils.classes('wp-sidebar-selection-commit')}
-          />
-          <SelectMenu
-            value={selected}
-            onChange={onChange}
-          >
-            {options.map((value) =>
-              <option key={value} value={value}>{value}</option>)}
-          </SelectMenu>
-          <Field
-            style={selected !== custom ? { display: 'none' } : {}}
-            onEdited={(value) => { setField(value); }}
-          />
-        </Hbox>
-      </SidebarBlock>
+      <PropertiesFilter />
     </Section>
   );
 }
