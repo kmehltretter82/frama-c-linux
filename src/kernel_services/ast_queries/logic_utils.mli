@@ -474,18 +474,23 @@ val complete_types: file -> unit
 
 val plain_arithmetic_type: Cil_types.logic_type -> bool
 [@@deprecated "Use Ast_types.Acsl.is_plain_arithmetic instead"]
+[@@migrate { repl = Ast_types.Acsl.is_plain_arithmetic }]
 
 val plain_integral_type: Cil_types.logic_type -> bool
 [@@deprecated "Use Ast_types.Acsl.is_plain_integral instead"]
+[@@migrate { repl = Ast_types.Acsl.is_plain_integral }]
 
 val plain_fun_ptr: Cil_types.logic_type -> bool
 [@@deprecated "Use Ast_types.Acsl.is_plain_fun_ptr instead"]
+[@@migrate { repl = Ast_types.Acsl.is_plain_fun_ptr }]
 
 val plain_array_type: Cil_types.logic_type -> bool
 [@@deprecated "Use Ast_types.Acsl.is_plain_array instead"]
+[@@migrate { repl = Ast_types.Acsl.is_plain_array }]
 
 val plain_pointer_type: Cil_types.logic_type -> bool
 [@@deprecated "Use Ast_types.Acsl.is_plain_pointer instead"]
+[@@migrate { repl = Ast_types.Acsl.is_plain_pointer }]
 
 (** {4 tests for potential sets}
     [is_xxx t] returns true iff [t] is a [xxx] _or_ a set of [xxx]
@@ -493,28 +498,33 @@ val plain_pointer_type: Cil_types.logic_type -> bool
 
 val is_arithmetic_type: Cil_types.logic_type -> bool
 [@@deprecated "Use Ast_types.Acsl.is_arithmetic instead"]
+[@@migrate { repl = Ast_types.Acsl.is_arithmetic }]
+
 val is_integral_type: Cil_types.logic_type -> bool
 [@@deprecated "Use Ast_types.Acsl.is_integral instead"]
+[@@migrate { repl = Ast_types.Acsl.is_integral }]
+
 val is_fun_ptr: Cil_types.logic_type -> bool
 [@@deprecated "Use Ast_types.Acsl.is_fun_ptr instead"]
+[@@migrate { repl = Ast_types.Acsl.is_fun_ptr }]
+
 val is_array_type: Cil_types.logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_array_type instead"]
+[@@deprecated "Use Ast_types.Acsl.is_array instead"]
+[@@migrate { repl = Ast_types.Acsl.is_array }]
+
 val is_pointer_type: Cil_types.logic_type -> bool
 [@@deprecated "Use Ast_types.Acsl.is_pointer instead"]
+[@@migrate { repl = Ast_types.Acsl.is_pointer }]
 
 (** {4 sets and lists} *)
 
 val is_list_type: Cil_types.logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_list_type instead"]
+[@@deprecated "Use Ast_types.Acsl.is_list instead"]
+[@@migrate { repl = Ast_types.Acsl.is_list }]
+
 val is_set_type: Cil_types.logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_set_type instead"]
-
-(** {4 extract elements} *)
-
-(* val type_of_set_elem: logic_type -> logic_type
-[@@deprecated "Use Ast_types.Acsl.set_element instead"] *)
-(* val type_of_list_elem : logic_type -> logic_type
-[@@deprecated "Use Ast_types.Acsl.list_element instead"] *)
+[@@deprecated "Use Ast_types.Acsl.is_set instead"]
+[@@migrate { repl = Ast_types.Acsl.is_set }]
 
 (** {3 Predefined tests over types} *)
 
@@ -524,22 +534,32 @@ val is_set_type: Cil_types.logic_type -> bool
 *)
 val isLogicType : (typ -> bool) -> logic_type -> bool
 [@@deprecated "Use Ast_types.Acsl.is_logic instead"]
+[@@migrate { repl = Ast_types.Acsl.is_logic }]
 
 val isLogicArrayType : logic_type -> bool
 [@@deprecated "Use Ast_types.Acsl.is_logic_array instead"]
+[@@migrate { repl = Ast_types.Acsl.is_logic_array }]
 
 val isLogicCharType : logic_type -> bool
 [@@deprecated "Use Ast_types.Acsl.is_logic_char instead"]
+[@@migrate { repl = Ast_types.Acsl.is_logic_char }]
 
 (** @since Chlorine-20180501 *)
 val isLogicAnyCharType : logic_type -> bool
 [@@deprecated "Use Ast_types.Acsl.is_logic_any_char instead"]
+[@@migrate { repl = Ast_types.Acsl.is_logic_any_char }]
+
 val isLogicVoidType : logic_type -> bool
 [@@deprecated "Use Ast_types.Acsl.is_logic_void instead"]
+[@@migrate { repl = Ast_types.Acsl.is_logic_void }]
+
 val isLogicPointerType : logic_type -> bool
 [@@deprecated "Use Ast_types.Acsl.is_logic_pointer instead"]
+[@@migrate { repl = Ast_types.Acsl.is_logic_pointer }]
+
 val isLogicVoidPointerType : logic_type -> bool
 [@@deprecated "Use Ast_types.Acsl.is_logic_void_pointer instead"]
+[@@migrate { repl = Ast_types.Acsl.is_logic_void_pointer }]
 
 (** {3 Type conversions} *)
 
@@ -547,19 +567,25 @@ val isLogicVoidPointerType : logic_type -> bool
     @raise Failure if the type is purely logical *)
 val logicCType : logic_type -> typ
 [@@deprecated "Use Ast_types.Acsl.logic_ctype instead"]
+[@@migrate { repl = Ast_types.Acsl.logic_ctype }]
 
 (** removes qualifiers if logic_type is a C type, identity otherwise.
     @since 27.0-Cobalt
 *)
 val logic_type_remove_qualifiers: logic_type -> logic_type
 [@@deprecated "Use Ast_types.Acsl.remove_qualifiers instead"]
+[@@migrate { repl = Ast_types.Acsl.remove_qualifiers }]
 
 (** {4 extract elements} *)
 
 val type_of_set_elem: logic_type -> logic_type
 [@@deprecated "Use Ast_types.Acsl.set_element instead"]
+[@@migrate { repl = Ast_types.Acsl.set_element }]
+
 val type_of_list_elem : logic_type -> logic_type
 [@@deprecated "Use Ast_types.Acsl.list_element instead"]
+[@@migrate { repl = Ast_types.Acsl.list_element }]
 
 val is_same_type : logic_type -> logic_type -> bool
 [@@deprecated "Use Ast_types.Acsl.is_same instead"]
+[@@migrate { repl = Ast_types.Acsl.is_same }]

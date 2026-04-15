@@ -448,7 +448,7 @@ let remove_no_op_coerce t =
 let rec is_singleton t =
   match t.term_node with
   | TCast (true, Ltype ({ lt_name = "set"},_), t') -> is_singleton t'
-  | _ -> not (Ast_types.Acsl.is_set t.term_type)
+  | _ -> not (Ast_types.Acsl.is_plain_set t.term_type)
 
 (* when pretty-printing relation chains, a < b && b' < c, it can happen that
    b has a coercion and b' hasn't or vice-versa (bc c is an integer and a and

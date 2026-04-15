@@ -79,7 +79,7 @@ let rec has_set_as_index = function
   | TNoOffset ->
     false
   | TIndex(t, toffset) ->
-    Ast_types.Acsl.is_set t.term_type || has_set_as_index toffset
+    Ast_types.Acsl.is_plain_set t.term_type || has_set_as_index toffset
   | TModel(_, toffset) | TField(_, toffset) ->
     has_set_as_index toffset
 
@@ -345,7 +345,7 @@ let extract_quantifiers_from_arg ~loc arg =
         in
         let lty_noset =
           Logic_utils.type_of_pointed @@
-          if Ast_types.Acsl.is_set arg.term_type then
+          if Ast_types.Acsl.is_plain_set arg.term_type then
             Ast_types.Acsl.set_element arg.term_type
           else
             arg.term_type
@@ -484,7 +484,7 @@ let call_with_tset
                begin match Logic_utils.last_term_offset off with
                  | TIndex({ term_node = Trange _ } as r, TNoOffset) ->
                    (* Case A *)
-                   assert (Ast_types.Acsl.is_set t.term_type);
+                   assert (Ast_types.Acsl.is_plain_set t.term_type);
                    let lty_noset = Ast_types.Acsl.set_element t.term_type in
                    let ptr =
                      Logic_const.term ~loc (TStartOf (lh, TNoOffset)) lty_noset

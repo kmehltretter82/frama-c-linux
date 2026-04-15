@@ -61,38 +61,6 @@ let is_instance_of vars t1 t2 =
 (** {1 From C to logic}*)
 (* ************************************************************************* *)
 
-let plain_arithmetic_type t = Ast_types.Acsl.is_logic_arithmetic t
-let plain_integral_type t = Ast_types.Acsl.is_logic_integral t
-let plain_fun_ptr t = Ast_types.Acsl.is_logic_fun_ptr t
-
-let is_arithmetic_type = Ast_types.Acsl.plain_or_set plain_arithmetic_type
-let is_integral_type = Ast_types.Acsl.plain_or_set plain_integral_type
-let is_fun_ptr = Ast_types.Acsl.plain_or_set plain_fun_ptr
-
-let is_list_type t =
-  Ast_types.Acsl.is_list (Ast_types.Acsl.unroll_logic t)
-
-let type_of_list_elem t =
-  Ast_types.Acsl.list_element (Ast_types.Acsl.unroll_logic t)
-
-let is_set_type t =
-  Ast_types.Acsl.is_set (Ast_types.Acsl.unroll_logic t)
-let type_of_set_elem t =
-  Ast_types.Acsl.set_element (Ast_types.Acsl.unroll_logic t)
-
-let plain_array_type t =
-  match Ast_types.Acsl.unroll_logic t with
-  | Ctype ct -> Ast_types.is_array ct
-  | _ -> false
-
-let plain_pointer_type t =
-  match Ast_types.Acsl.unroll_logic t with
-  | Ctype ct -> Ast_types.is_ptr ct
-  | _ -> false
-
-let is_array_type = Ast_types.Acsl.plain_or_set plain_array_type
-let is_pointer_type = Ast_types.Acsl.plain_or_set plain_pointer_type
-
 let type_of_array_elem =
   Ast_types.Acsl.transform_element
     (fun t ->
@@ -112,30 +80,6 @@ let type_of_pointed =
        | _ ->
          Kernel.fatal ~current:true "type %a is not a pointer type"
            !Cil.pp_logic_type_ref t)
-
-let isLogicType f t = Ast_types.Acsl.plain_or_set (Ast_types.Acsl.is_logic_ctype f) t
-
-(** true if the type is a C array (or a set of)*)
-let isLogicArrayType = isLogicType Ast_types.is_array
-
-let isLogicCharType = isLogicType Ast_types.is_char
-
-let isLogicAnyCharType = isLogicType Ast_types.is_any_char
-
-let isLogicVoidType = isLogicType Ast_types.is_void
-
-let isLogicPointerType = isLogicType Ast_types.is_ptr
-
-let isLogicVoidPointerType = isLogicType Ast_types.is_void_ptr
-
-let logicCType t =
-  let rec logicCType = function
-    | Ctype t -> t
-    | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-      logicCType (Ast_types.Acsl.unroll_ltdef ty)
-    | Lvar _ -> Cil_const.intType
-    | _ -> failwith "not a C type"
-  in Ast_types.Acsl.plain_or_set logicCType t
 
 let plain_array_to_ptr ty =
   let open Current_loc.Operators in
@@ -170,16 +114,6 @@ let plain_array_to_ptr ty =
   | ty -> ty
 
 let array_to_ptr = Ast_types.Acsl.plain_or_set plain_array_to_ptr
-
-let logic_type_remove_qualifiers =
-  let plain typ =
-    match Ast_types.Acsl.unroll_logic typ with
-    | Ctype t ->
-      let t' = Ast_types.remove_qualifiers t in
-      if Cil_datatype.Typ.equal t t' then typ else Ctype t'
-    | _ -> typ
-  in
-  Ast_types.Acsl.transform_element plain
 
 let coerce_type typ =
   let ty = Ast_types.unroll typ in
@@ -228,7 +162,7 @@ let rec is_C_array t =
     | TMem _ -> true
     | TVar _ -> false
   in
-  isLogicArrayType t.term_type &&
+  Ast_types.Acsl.is_logic_array t.term_type &&
   (match t.term_node with
    | TStartOf (lh,_) -> is_C_array_lhost lh
    | TLval(lh,_) -> is_C_array_lhost lh
@@ -258,7 +192,7 @@ let rec mk_logic_StartOf t =
 let mk_logic_AddrOf ?(loc=Fileloc.unknown) lval typ =
   let lift_set typ =
     Ast_types.Acsl.transform_element
-      (fun typ -> Ctype (Cil_const.mk_tptr (logicCType typ))) typ
+      (fun typ -> Ctype (Cil_const.mk_tptr (Ast_types.Acsl.logic_ctype typ))) typ
   in
   match lval with
   | TMem e, TNoOffset -> Logic_const.term ~loc e.term_node e.term_type
@@ -268,7 +202,7 @@ let mk_logic_AddrOf ?(loc=Fileloc.unknown) lval typ =
     Logic_const.term ~loc (TAddrOf lval) (lift_set typ)
 
 let isLogicPointer t =
-  isLogicPointerType t.term_type || (is_C_array t)
+  Ast_types.Acsl.is_logic_pointer t.term_type || (is_C_array t)
 
 let mk_logic_pointer_or_StartOf t =
   if isLogicPointer t then
@@ -803,8 +737,6 @@ let compare_opt f x1 x2 =
 
 let is_same_c_type t1 t2 =
   Cil_datatype.Logic_type_ByName.equal (Ctype t1) (Ctype t2)
-
-let is_same_type t1 t2 = Cil_datatype.Logic_type_ByName.equal t1 t2
 
 let is_same_string (s1: string) s2  = s1 = s2
 
@@ -2221,7 +2153,7 @@ let lhost_c_type thost =
   let extract_ctype lty =
     let rec get = function
       | Ctype typ -> Some typ
-      | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
+      | Ltype (tdef,_) as ty when Ast_types.Acsl.is_unrollable_ltdef tdef ->
         get (Ast_types.Acsl.unroll_ltdef ty)
       | Ltype _ | Lvar _ | Lboolean | Linteger | Lreal | Larrow _ -> None
     in
@@ -2331,8 +2263,8 @@ class complete_types =
     method! vterm t =
       match t.term_node with
       | TLval (TVar v, TNoOffset)
-        when isLogicType Cil.isCompleteType v.lv_type &&
-             not (isLogicType Cil.isCompleteType t.term_type) ->
+        when Ast_types.Acsl.is_logic Cil.isCompleteType v.lv_type &&
+             not (Ast_types.Acsl.is_logic Cil.isCompleteType t.term_type) ->
         ChangeDoChildrenPost({ t with term_type = v.lv_type }, fun x -> x)
       | _ -> DoChildrenPost self#insert_cast_term
 
@@ -2729,3 +2661,55 @@ class simplify_const_lval global_find_init = object (self)
       end
     | _ -> Cil.DoChildren
 end
+
+
+
+
+let plain_arithmetic_type = Ast_types.Acsl.is_plain_arithmetic
+
+let plain_integral_type = Ast_types.Acsl.is_plain_integral
+
+let plain_fun_ptr = Ast_types.Acsl.is_plain_fun_ptr
+
+let plain_array_type = Ast_types.Acsl.is_plain_array
+
+let plain_pointer_type = Ast_types.Acsl.is_plain_pointer
+
+let is_arithmetic_type = Ast_types.Acsl.is_arithmetic_type
+
+let is_integral_type = Ast_types.Acsl.is_integral_type
+
+let is_fun_ptr = Ast_types.Acsl.is_fun_ptr
+
+let is_array_type = Ast_types.Acsl.is_array
+
+let is_pointer_type = Ast_types.Acsl.is_pointer
+
+let is_list_type = Ast_types.Acsl.is_list
+
+let is_set_type = Ast_types.Acsl.is_set
+
+let type_of_set_elem = Ast_types.Acsl.set_element
+
+let type_of_list_elem = Ast_types.Acsl.list_element
+
+let isLogicType = Ast_types.Acsl.is_logic
+
+(** true if the type is a C array (or a set of)*)
+let isLogicArrayType = Ast_types.Acsl.is_logic_array
+
+let isLogicCharType = Ast_types.Acsl.is_logic_char
+
+let isLogicAnyCharType = Ast_types.Acsl.is_logic_any_char
+
+let isLogicVoidType = Ast_types.Acsl.is_logic_void
+
+let isLogicPointerType = Ast_types.Acsl.is_logic_pointer
+
+let isLogicVoidPointerType = Ast_types.Acsl.is_logic_void_pointer
+
+let logicCType = Ast_types.Acsl.logic_ctype
+
+let logic_type_remove_qualifiers = Ast_types.Acsl.remove_qualifiers
+
+let is_same_type = Ast_types.Acsl.is_same

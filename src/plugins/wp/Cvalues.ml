@@ -486,7 +486,7 @@ let map_logic f = function
   | Lset ls -> Lset (List.map (map_sloc f) ls)
 
 let plain lt e =
-  if Ast_types.Acsl.is_set_type lt then
+  if Ast_types.Acsl.is_set lt then
     let te = Ast_types.Acsl.set_element lt in
     Vset [Vset.Set(tau_of_ltype te,e)]
   else

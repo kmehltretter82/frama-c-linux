@@ -94,7 +94,7 @@ struct
   let collection_of_term env t =
     let v = C.logic env t in
     match v with
-    | Vexp s when Ast_types.Acsl.is_set_type t.term_type ->
+    | Vexp s when Ast_types.Acsl.is_set t.term_type ->
       let te = Ast_types.Acsl.set_element t.term_type in
       Vset [Vset.Set(tau_of_ltype te,s)]
     | w -> w

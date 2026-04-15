@@ -2935,7 +2935,7 @@ let rec typeOfTermLval = function
           end
         | Lboolean | Linteger | Lreal ->
           Kernel.fatal ~current:true "typeOfTermLval: Mem on a logic type"
-        | Ltype (s,_) as ty when is_unrollable_ltdef s ->
+        | Ltype (s,_) as ty when Ast_types.Acsl.is_unrollable_ltdef s ->
           type_of_pointed (Ast_types.Acsl.unroll_ltdef ty)
         | Ltype (s,_) ->
           Kernel.fatal ~current:true
@@ -2960,7 +2960,7 @@ and typeTermOffset basetyp =
       | Lboolean | Linteger | Lreal ->
         Kernel.fatal ~current:true
           "typeTermOffset: Attribute on a logic type"
-      | Ltype (s,_) as ty when is_unrollable_ltdef s ->
+      | Ltype (s,_) as ty when Ast_types.Acsl.is_unrollable_ltdef s ->
         putAttributes (Ast_types.Acsl.unroll_ltdef ty)
       | Ltype (s,_) ->
         Kernel.fatal ~current:true
@@ -2990,7 +2990,7 @@ and typeTermOffset basetyp =
           end
         | Lboolean | Linteger | Lreal ->
           Kernel.fatal ~current:true "typeTermOffset: Index on a logic type"
-        | Ltype (s,_) as ty when is_unrollable_ltdef s ->
+        | Ltype (s,_) as ty when Ast_types.Acsl.is_unrollable_ltdef s ->
           elt_type (Ast_types.Acsl.unroll_ltdef ty)
         | Ltype (s,_) ->
           Kernel.fatal ~current:true "typeTermOffset: Index on a non-C type (%s)" s.lt_name
@@ -3012,7 +3012,7 @@ and typeTermOffset basetyp =
         end
       | Lboolean | Linteger | Lreal ->
         Kernel.fatal ~current:true "typeTermOffset: Field on a logic type"
-      | Ltype (s,_) as ty when is_unrollable_ltdef s ->
+      | Ltype (s,_) as ty when Ast_types.Acsl.is_unrollable_ltdef s ->
         elt_type (Ast_types.Acsl.unroll_ltdef ty)
       | Ltype (s,_) ->
         Kernel.fatal ~current:true "typeTermOffset: Field on a non-C type (%s)" s.lt_name

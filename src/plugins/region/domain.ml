@@ -70,7 +70,7 @@ let record m =
   else Record m
 
 let logic s l =
-  if Logic_const.is_unrollable_ltdef s then invalid_arg "Region.LDomain.logic"
+  if Ast_types.Acsl.is_unrollable_ltdef s then invalid_arg "Region.LDomain.logic"
   else if List.for_all is_pure l then Pure
   else Logic (s,l)
 

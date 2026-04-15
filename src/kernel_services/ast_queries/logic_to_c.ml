@@ -122,7 +122,7 @@ and loc_to_exp ?result {term_node = lnode ; term_type = ltype; term_loc = loc} =
     loc_to_exp ?result t
   | TCast (true, set, t)
     when
-      Ast_types.Acsl.is_set set &&
+      Ast_types.Acsl.is_plain_set set &&
       Ast_types.Acsl.is_same
         (Ast_types.Acsl.set_element set) t.term_type ->
     loc_to_exp ?result t
@@ -151,7 +151,7 @@ let rec loc_to_lval ?result t =
      a coercion to set here.
   *)
   | TCast (true, set, t) when
-      Ast_types.Acsl.is_set_type set &&
+      Ast_types.Acsl.is_set set &&
       Ast_types.Acsl.is_same
         (Ast_types.Acsl.set_element set) t.term_type ->
     loc_to_lval ?result t
