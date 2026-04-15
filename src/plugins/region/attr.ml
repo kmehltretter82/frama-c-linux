@@ -73,7 +73,7 @@ let cvar ~garbage v =
   if not @@ is_initialized ~garbage v then set `Garbage ;
   !flags
 
-let null_or_valid ~loc ~from addr =
+let nullable ~loc ~from addr =
   if mem `Nullable from then
     let null = Logic_const.term ~loc Tnull addr.term_type in
     Logic_const.prel ~loc (Rneq,null,addr)
@@ -84,7 +84,7 @@ let readable ~loc ?(label=Logic_const.here_label) ~from addr =
   if mem `Allocated from then
     Logic_const.pvalid_read ~loc (label, addr)
   else
-    null_or_valid ~loc ~from addr
+    nullable ~loc ~from addr
 
 let writable ~loc ?(label=Logic_const.here_label) ~from addr =
   if mem `Readonly from then
@@ -93,7 +93,7 @@ let writable ~loc ?(label=Logic_const.here_label) ~from addr =
   if mem `Allocated from then
     Logic_const.pvalid ~loc (label, addr)
   else
-    null_or_valid ~loc ~from addr
+    nullable ~loc ~from addr
 
 let requires ~loc ?(label=Logic_const.here_label) ?(readonly=false) ~from ~target addr =
   let valid =

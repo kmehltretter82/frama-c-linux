@@ -12,19 +12,7 @@
 
 open Memory
 open Cil_types
-
-type addr = LV of lval | ADDR of exp
-type guard =
-  | Bounds of exp * Z.t
-  | Valid_region of node * addr
-
-val pp_addr  : Format.formatter -> addr  -> unit
-val pp_guard : Format.formatter -> guard -> unit
-
-val of_addr  : ?loc:location -> addr -> term
-val of_guard : ?loc:location -> ?names:string list -> guard -> predicate
-
-val pointed : addr -> typ
+open Condition
 
 val guards : map -> (guard -> unit) -> stmt -> unit
 

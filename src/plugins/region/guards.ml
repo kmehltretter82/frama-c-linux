@@ -7,41 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil_datatype
-
-(* -------------------------------------------------------------------------- *)
-(* ---  Side Conditions                                                   --- *)
-(* -------------------------------------------------------------------------- *)
-
-type addr =
-  | LV of Lval.t
-  | ADDR of Exp.t
-[@@ deriving eq]
-
-let pp_addr fmt = function
-  | LV lv -> Format.fprintf fmt "&(%a)" Printer.pp_lval lv
-  | ADDR p -> Printer.pp_exp fmt p
-
-type guard =
-  | Bounds of Exp.t * Z.t
-  | Valid_region of (Memory.node [@ equal fun _ _ -> true]) * addr
-[@@ deriving eq]
-
-let pp_guard fmt = function
-  | Bounds(k,n) -> Format.fprintf fmt "0<= %a < %a" Exp.pretty k Z.pretty n
-  | Valid_region(_,a) -> Format.fprintf fmt "\\valid_region(%a)" pp_addr a
-
-let pointed = function
-  | LV lv -> Cil.typeOfLval lv
-  | ADDR p -> Ast_types.pointed_type @@ Cil.typeOf p
-
-let of_addr ?loc = function
-  | LV lval -> Condition.addrof ?loc lval
-  | ADDR ptr -> Logic_utils.expr_to_term ~coerce:true ptr
-
-let of_guard ?loc ?names = function
-  | Bounds(k,n) -> Condition.pbounds ?loc ?names k n
-  | Valid_region(_,p) -> Condition.pvalid_region ?loc ?names @@ of_addr ?loc p
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Side Conditions Generator                                         --- *)
@@ -49,7 +14,7 @@ let of_guard ?loc ?names = function
 
 type env = {
   map: Memory.map ;
-  mutable guards : guard list ;
+  mutable guards : Condition.guard list ;
 }
 
 let create map = { map ; guards = [] }
@@ -156,10 +121,6 @@ let rec stmtkind env = function
     let b = Cil.block_from_unspecified_sequence us in
     List.iter (fun s -> stmtkind env s.skind) b.bstmts
 
-(* -------------------------------------------------------------------------- *)
-(* --- Statement Annotations                                              --- *)
-(* -------------------------------------------------------------------------- *)
-
 let guards map f stmt =
   let env = create map in
   stmtkind env stmt.skind ;
@@ -187,7 +148,7 @@ let add_annotation ?kf ?emitter ?(names=[]) ?(invalid=false) ?(hyps=[]) stmt gua
   let enames = if invalid then "invalid"::names else names in
   let enames = if emitter = None then "region"::enames else enames in
   let e = match emitter with Some e -> e | None -> self () in
-  let a = of_guard ~loc ~names:enames guard in
+  let a = Condition.of_guard ~loc ~names:enames guard in
   let a = Logic_const.toplevel_predicate ~kind a in
   let ca = Logic_const.new_code_annotation (AAssert ([],a)) in
   Annotations.add_code_annot e ?kf stmt ca ;

@@ -50,3 +50,22 @@ val paligned :
   term -> typ -> predicate
 
 val is_valid_region : logic_info -> bool
+
+(* -------------------------------------------------------------------------- *)
+(** {2 Logic Helpers} *)
+(* -------------------------------------------------------------------------- *)
+
+type addr = LV of lval | ADDR of exp
+type guard =
+  | Bounds of exp * Z.t
+  | Valid_region of Memory.node * addr
+
+val pp_addr  : Format.formatter -> addr  -> unit
+val pp_guard : Format.formatter -> guard -> unit
+
+val pointed : addr -> typ
+
+val of_addr  : ?loc:location -> addr -> term
+val of_guard : ?loc:location -> ?names:string list -> guard -> predicate
+
+(* -------------------------------------------------------------------------- *)

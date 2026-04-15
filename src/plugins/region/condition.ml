@@ -75,3 +75,33 @@ let pvalid_region ?loc ?names ?(label=Logic_const.here_label) addr =
   Logic_const.papp ?loc ?names (f,[label],[addr;size])
 
 (* -------------------------------------------------------------------------- *)
+(* ---  Side Conditions                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+type addr = LV of lval | ADDR of exp
+
+let pp_addr fmt = function
+  | LV lv -> Format.fprintf fmt "&(%a)" Printer.pp_lval lv
+  | ADDR p -> Printer.pp_exp fmt p
+
+type guard =
+  | Bounds of exp * Z.t
+  | Valid_region of Memory.node * addr
+
+let pp_guard fmt = function
+  | Bounds(k,n) -> Format.fprintf fmt "0<= %a < %a" Cil_printer.pp_exp k Z.pretty n
+  | Valid_region(_,a) -> Format.fprintf fmt "\\valid_region(%a)" pp_addr a
+
+let pointed = function
+  | LV lv -> Cil.typeOfLval lv
+  | ADDR p -> Ast_types.pointed_type @@ Cil.typeOf p
+
+let of_addr ?loc = function
+  | LV lval -> addrof ?loc lval
+  | ADDR ptr -> Logic_utils.expr_to_term ~coerce:true ptr
+
+let of_guard ?loc ?names = function
+  | Bounds(k,n) -> pbounds ?loc ?names k n
+  | Valid_region(_,p) -> pvalid_region ?loc ?names @@ of_addr ?loc p
+
+(* -------------------------------------------------------------------------- *)
