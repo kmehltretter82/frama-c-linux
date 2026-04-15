@@ -392,54 +392,51 @@ function PropertiesFilter(): JSX.Element {
   ];
 
   return (
-    <SidebarBlock
-      title={'Properties filter'}
-      titleButtons={
-        [
-          <Button
-            key='Reset'
-            label='Reset'
-            className={Utils.classes('wp-sidebar-title-button')}
-            onClick={() => setProperties([])}
-          />
-        ]
-      }
-      foldable={true}
+    <Forms.Section
+      label='Properties filter'
     >
-      <div className={Utils.classes('wp-sidebar-selection-block')}>
-        {properties.map((value) =>
-          <SelectionButton
-            key={value}
-            name={value}
-            selected={value === getName(true) || value === getName(false)}
-            remove={() => onKill(value)} />)}
-      </div>
-      <Hbox>
-        <Button
-          icon={'PLUS'}
-          enabled={canCommit(true)}
-          onClick={() => { onCommit(true); }}
-          className={Utils.classes('wp-sidebar-selection-commit')}
-        />
-        <Button
-          icon={'MINUS'}
-          enabled={canCommit(false)}
-          onClick={() => { onCommit(false); }}
-          className={Utils.classes('wp-sidebar-selection-commit')}
-        />
-        <SelectMenu
-          value={selected}
-          onChange={onChange}
-        >
-          {options.map((value) =>
-            <option key={value} value={value}>{displayName(value)}</option>)}
-        </SelectMenu>
-        <Field
-          style={selected !== custom ? { display: 'none' } : {}}
-          onEdited={(value) => { setField(value); }}
-        />
-      </Hbox>
-    </SidebarBlock>
+      <SidebarBlock>
+        <div className={Utils.classes('wp-sidebar-selection-block')}>
+          {properties.length !== 0 && <Button
+            key='Reset'
+            icon={'TRASH'}
+            className={Utils.classes('wp-sidebar-selection')}
+            onClick={() => setProperties([])}
+          />}
+          {properties.map((value) =>
+            <SelectionButton
+              key={value}
+              name={value}
+              selected={value === getName(true) || value === getName(false)}
+              remove={() => onKill(value)} />)}
+        </div>
+        <Hbox>
+          <Button
+            icon={'PLUS'}
+            enabled={canCommit(true)}
+            onClick={() => { onCommit(true); }}
+            className={Utils.classes('wp-sidebar-selection-commit')}
+          />
+          <Button
+            icon={'MINUS'}
+            enabled={canCommit(false)}
+            onClick={() => { onCommit(false); }}
+            className={Utils.classes('wp-sidebar-selection-commit')}
+          />
+          <SelectMenu
+            value={selected}
+            onChange={onChange}
+          >
+            {options.map((value) =>
+              <option key={value} value={value}>{displayName(value)}</option>)}
+          </SelectMenu>
+          <Field
+            style={selected !== custom ? { display: 'none' } : {}}
+            onEdited={(value) => { setField(value); }}
+          />
+        </Hbox>
+      </SidebarBlock>
+    </Forms.Section>
   );
 }
 
