@@ -698,7 +698,7 @@ export interface FieldProps {
 export const Field = (props: FieldProps): JSX.Element => {
   const { className = '', onChange, onEdited, value = '' } = props;
   const [current, setCurrent] = React.useState<string>(value);
-  const disabled = onChange ? DISABLED(props) : true;
+  const disabled = (onChange || onEdited) ? DISABLED(props) : true;
   const ONCHANGE = (evt: React.ChangeEvent<HTMLInputElement>): void => {
     const text = evt.target.value || '';
     setCurrent(text);
