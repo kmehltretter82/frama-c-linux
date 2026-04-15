@@ -35,9 +35,6 @@ README header_spec=.ignore
 /examples/demo/TODO header_spec=.ignore
 /examples/ensuresec/push-alerts/.env-example header_spec=.ignore
 
-/headers/* header_spec=.ignore
-/license/* header_spec=.ignore
-
 # Becarefull at the order with the previous lines
 /contrib/**/*.c header_spec=.ignore
 
