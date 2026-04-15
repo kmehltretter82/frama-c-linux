@@ -66,21 +66,19 @@ export default function Application(): JSX.Element {
         <Search.SearchField />
         <Toolbar.IconPinnedMessage />
       </Toolbar.ToolBar>
-      <Hfill className="application-workspace">
+      <Hfill>
         <Sidebar.Selectors
           sidebarVisible={sidebarVisible}
           panelVisible={panelVisible}
           setPanelVisible={setPanelVisible}
         />
-        <div className="sidebar-splitter">
-          <LSplit
-            settings="frama-c.sidebar.split"
-            unfold={sidebarVisible && panelVisible}
-          >
-            <Sidebar.Panels />
-            <Laboratory.LabView />
-          </LSplit>
-        </div>
+        <LSplit
+          settings="frama-c.sidebar.split"
+          unfold={sidebarVisible && panelVisible}
+        >
+          <Sidebar.Panels />
+          <Laboratory.LabView />
+        </LSplit>
       </Hfill>
       <Toolbar.ToolBar className="statusbar">
         <Controller.Status />

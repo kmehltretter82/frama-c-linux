@@ -53,13 +53,13 @@ function Selector(props: SelectorProps): JSX.Element {
       setPanelVisible(true);
     }
   },
-  [
-    id,
-    panelVisible,
-    selectedSidebarId,
-    setPanelVisible,
-    setSelectedSidebarId,
-  ]);
+    [
+      id,
+      panelVisible,
+      selectedSidebarId,
+      setPanelVisible,
+      setSelectedSidebarId,
+    ]);
   const title = props.title ?? `${label} Sidebar`;
   const component =
     icon
