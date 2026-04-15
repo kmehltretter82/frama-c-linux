@@ -47,12 +47,6 @@ export default function Application(): JSX.Element {
   return (
     <Vfill>
       <Toolbar.ToolBar>
-        <Toolbar.Button
-          icon="SIDEBAR"
-          title={(sidebarPanel.visible ? "Collapse" : "Expand") + " sidebar"}
-          selected={sidebarPanel.visible}
-          onClick={() => sidebarPanel.setVisible(!sidebarPanel.visible)}
-        />
         <Controller.Control />
         <>{ToolBar}</>
         <Toolbar.Filler />

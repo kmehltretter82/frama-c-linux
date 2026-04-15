@@ -59,6 +59,11 @@
     border-color: var(--selected-button-img);
 }
 
+.sidebar-selector-toggle {
+    margin-top: auto;
+    border-top: solid 1px var(--border-discrete);
+}
+
 .component-info {
     color: var(--text);
     min-width: 50px;

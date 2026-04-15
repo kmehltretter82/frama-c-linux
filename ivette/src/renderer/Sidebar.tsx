@@ -20,7 +20,7 @@ import { SidebarProps, SIDEBAR } from 'ivette';
 import * as State from 'ivette/state';
 
 /* -------------------------------------------------------------------------- */
-/* --- SideBar Selector                                                   --- */
+/* --- Sidebar Classic Selector                                           --- */
 /* -------------------------------------------------------------------------- */
 
 interface SelectorProps extends SidebarProps {
@@ -73,6 +73,39 @@ function Selector(props: SelectorProps): JSX.Element {
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Sidebar Toggle Selector                                            --- */
+/* -------------------------------------------------------------------------- */
+
+interface ToggleSelectorProps {
+  panelVisible: boolean;
+  setPanelVisible: (visible: boolean) => void;
+}
+
+/**
+   Dedicated selector-like control used to collapse or expand the sidebar
+   panel without changing the currently selected sidebar selector.
+ */
+function ToggleSelector(props: ToggleSelectorProps): JSX.Element {
+  const { panelVisible, setPanelVisible } = props;
+  const className = classes(
+    'sidebar-selector',
+    'sidebar-selector-toggle',
+    'dome-color-frame',
+    panelVisible && 'sidebar-selector-selected',
+  );
+  const title = `${panelVisible ? 'Collapse' : 'Expand'} sidebar`;
+  return (
+    <div
+      className={className}
+      title={title}
+      onClick={() => setPanelVisible(!panelVisible)}
+    >
+      <Icon size={20} className="sidebar-selector-icon" id="SIDEBAR" />
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- User Sidebar Wrapper                                               --- */
 /* -------------------------------------------------------------------------- */
 
@@ -94,7 +127,7 @@ function Wrapper(props: WrapperProps): JSX.Element {
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- SideBar Main Components                                            --- */
+/* --- Sidebar Main Components                                            --- */
 /* -------------------------------------------------------------------------- */
 
 interface SidebarState {
@@ -154,12 +187,23 @@ export function Selectors(props: SelectorsProps): JSX.Element {
       setSelectedSidebarId={setSelectedSidebarId}
       {...sb} />
   ));
-  const selectorClasses = classes(
+  const selectorContainerClasses = classes(
     'sidebar-items dome-color-frame',
-    (registeredSidebars.length <= 1 || !sidebarVisible) && 'dome-erased',
+    !sidebarVisible && 'dome-erased',
+  );
+  const selectorsClasses = classes(
+    registeredSidebars.length <= 1 && 'dome-erased',
   );
 
-  return <div className={selectorClasses}>{selectors}</div>;
+  return (
+    <div className={selectorContainerClasses}>
+      <div className={selectorsClasses}>{selectors}</div>
+      <ToggleSelector
+        panelVisible={panelVisible}
+        setPanelVisible={setPanelVisible}
+      />
+    </div>
+  );
 }
 
 export function Panels(): JSX.Element {
