@@ -21,6 +21,11 @@ Open Source Release <next-release>
 o!  Kernel    [2026-04-13] Use ppx_deriving.show to generate debug printers
               for `Cabs` and `Cil_types` ASTs. `Cabs_debug` et `Cil_types_debug`
               are now deprecated.
+-*  Kernel    [2026-04-10] Fix enumeration typing by making sure all items are
+              of type ekind (#@1682)
+o!  Kernel    [2026-04-09] Positions are now handled in a new module `Filepos`
+              (which is also a datatype). `Filepath.position`,
+              `Cil_datatype.Position` and other related code is now deprecated.
 -   Eva       [2026-03-24] Improve performance on dynamic allocation
               with option `-eva-alloc-builtin imprecise`.
 o!  Kernel    [2026-03-24] Rename module `Int_Base` into `Z_or_top`. Change
