@@ -40,8 +40,8 @@ int comp(struct S p, int k)
 int pcomp(struct S *p, int k)
 {
   int __retres;
-  /*@ check region: \valid_region(&p->f[k], sizeof(int)); */
   /*@ check region: \valid_region(p, sizeof(struct S)); */
+  /*@ check region: \valid_region(&p->f[k], sizeof(int)); */
   __retres = p->f[k];
   return __retres;
 }

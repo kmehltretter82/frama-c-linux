@@ -30,9 +30,3 @@ module Assert = False
       let option_name = "-region-assert"
       let help = "Generate ACSL 'assert' annotations instead of checks"
     end)
-
-module Logic = False
-    (struct
-      let option_name = "-region-logic"
-      let help = "Also generate guards for logic"
-    end)

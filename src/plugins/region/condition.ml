@@ -25,6 +25,7 @@ let pnull ?loc ?names ~eq addr =
 let pbounds ?loc ?names k n =
   let z = Logic_const.tinteger ?loc 0 in
   let n = Logic_const.tint ?loc n in
+  let k = Logic_utils.expr_to_term ~coerce:true k in
   let inf = Logic_const.pred ?loc (Prel(Rle,z,k)) in
   let sup = Logic_const.pred ?loc (Prel(Rlt,k,n)) in
   Logic_const.pand ?loc ?names (inf,sup)

@@ -13,4 +13,3 @@ include Log.Messages
 
 module Enabled : Bool
 module Assert : Bool
-module Logic : Bool

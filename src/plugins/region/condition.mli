@@ -21,7 +21,7 @@ val pnull :
 
 val pbounds :
   ?loc:location -> ?names:string list ->
-  term -> Z.t -> predicate
+  exp -> Z.t -> predicate
 
 val pvalid :
   ?loc:location -> ?names:string list -> ?label:logic_label ->
