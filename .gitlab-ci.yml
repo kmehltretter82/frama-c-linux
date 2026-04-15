@@ -800,7 +800,7 @@ release-wiki:
 # publish stage is used to push the current master branch of Frama-C and
 # associated plugins from the internal frama-c group to the public pub group.
 #
-# For that, it uses the 'frama-c to frama-c-public' publish key. Thus, to publish
+# For that, it uses the 'frama-ci-deployment-key' publish key. Thus, to publish
 # a new plugin (while keeping its main repository internal), you can add a new
 # target to this stage, adapting the script for MetAcsl or Frama-Clang to your
 # own plugin.
@@ -810,6 +810,16 @@ release-wiki:
 # must provide write access to the publish key).
 # Do not forget to trigger the target only on schedules, so that all public
 # repositories stay synchronized.
+
+# This template is meant to allow manual publication when runners related to
+# additional architectures are offline and we really want to publish something
+# even if a few tests might be broken on macOS, or ARM, or Windows ...
+.build_template: &manual_publish_condition
+  needs: # we at least want classic distribution components to work on linux
+    - ocaml-versions-nightly
+    - opam-pin-minimal-nightly
+    - opam-pin-nightly
+    - src-distrib-tests-nightly
 
 .build_template: &publish_frama_c_template
   stage: publish
@@ -826,11 +836,12 @@ release-wiki:
 publish-frama-c:
   <<: *publish_frama_c_template
 
-publish-frama-c_manual:
+publish-frama-c-manual:
   <<: *publish_frama_c_template
+  <<: *manual_publish_condition
   when: manual
 
-.publish-fclang: &publish-fclang_template
+.build_template: &publish_fclang_template
   stage: publish
   variables:
     BRANCH: "master"
@@ -842,13 +853,14 @@ publish-frama-c_manual:
   interruptible: false
 
 publish-fclang:
-  <<: *publish-fclang_template
+  <<: *publish_fclang_template
 
-publish-fclang_manual:
-  <<: *publish-fclang_template
+publish-fclang-manual:
+  <<: *publish_fclang_template
+  <<: *manual_publish_condition
   when: manual
 
-.publish-meta: &publish-meta_template
+.build_template: &publish_meta_template
   stage: publish
   variables:
     BRANCH: "master"
@@ -860,13 +872,14 @@ publish-fclang_manual:
   interruptible: false
 
 publish-meta:
-  <<: *publish-meta_template
+  <<: *publish_meta_template
 
-publish-meta_manual:
-  <<: *publish-meta_template
+publish-meta-manual:
+  <<: *publish_meta_template
+  <<: *manual_publish_condition
   when: manual
 
-.publish-frama-c-api: &publish-frama-c-api_template
+.build_template: &publish_frama_c_api_template
   stage: publish
   <<: *prepare_ssh_template
   script:
@@ -877,8 +890,9 @@ publish-meta_manual:
   interruptible: false
 
 publish-frama-c-api:
-  <<: *publish-frama-c-api_template
+  <<: *publish_frama_c_api_template
 
-publish-frama-c-api_manual:
-  <<: *publish-frama-c-api_template
+publish-frama-c-api-manual:
+  <<: *publish_frama_c_api_template
+  <<: *manual_publish_condition
   when: manual
