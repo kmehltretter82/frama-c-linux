@@ -17,10 +17,10 @@ import {
   Button,
   SelectMenu,
   Spinner,
-  IconButton
+  IconButton,
 } from 'dome/controls/buttons';
 import { SidebarTitle } from 'dome/frame/sidebars';
-import { DivProps, Hbox, Vbox } from 'dome/layout/boxes';
+import { DivProps, Hbox, Hfill, Vbox } from 'dome/layout/boxes';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as Params from 'frama-c/kernel/api/parameters';
@@ -39,19 +39,33 @@ function Section(p: Forms.SectionProps): JSX.Element {
 }
 
 interface SidebarBlockProps extends DivProps {
-  title?: string;
+  title: string;
+  titleButtons?: JSX.Element[];
+  foldable?: boolean;
 }
 
 function SidebarBlock(props: SidebarBlockProps): JSX.Element {
-  const { children, title, ...others } = props;
+  const { children, title, titleButtons, foldable = false, ...others } = props;
+
+  const [open, setOpen] = React.useState(!foldable);
+
+  const ftitle = title + (open ? '' : ' ...');
+  const ititle = foldable ? (open ? 'ANGLE.DOWN' : 'ANGLE.RIGHT') : undefined;
+  const onClick = (): void => { setOpen(!open); };
+
   return (
     <Vbox className={Utils.classes('wp-sidebar-block')} {...others}>
-      <Label
-        label={title}
-        className={Utils.classes('wp-sidebar-block-title')}
-        display={!!title}
-      />
-      {children}
+      <Hbox>
+        <Label
+          label={ftitle}
+          className={Utils.classes('wp-sidebar-block-title')}
+          icon={ititle}
+          onClick={onClick}
+        />
+        <Hfill />
+        {titleButtons}
+      </Hbox>
+      {(!foldable || open) && children}
     </Vbox>
   );
 }
@@ -200,9 +214,9 @@ function TipSelector(): JSX.Element {
   );
 }
 
-export function SideBar(): JSX.Element {
-  const [timeout, setTimeout] = States.useSyncState(Params.wpTimeout);
-  const [processes, setProcesses] = States.useSyncState(Params.wpPar);
+function ProversConfiguration(): JSX.Element {
+  const [timeout = 0, setTimeout] = States.useSyncState(Params.wpTimeout);
+  const [processes = 0, setProcesses] = States.useSyncState(Params.wpPar);
 
   const provers = States.useSyncValue(WP.provers) ?? [];
   const proversInfo = States.useSyncArrayGetter(WP.ProverInfos);
@@ -210,96 +224,100 @@ export function SideBar(): JSX.Element {
   const autoPrvs = provers.filter((p) => proversInfo(p)?.auto);
   const interPrvs = provers.filter((p) => !proversInfo(p)?.auto);
 
-  const [scripts, setScripts] = States.useSyncState(WP.scripts);
-  const [strategies, setStrategies] = States.useSyncState(WP.strategies);
+  const [scripts = false, setScripts] = States.useSyncState(WP.scripts);
+  const [strategies = false, setStrats] = States.useSyncState(WP.strategies);
 
-  const barClass = Utils.classes('wp-sidebar');
+  return (
+    <Section label='Provers Configuration' >
+      <SidebarBlock title='General configuration'>
+        <Label label='Timeout' icon='CLOCK' >
+          <Spinner
+            className="wp-config-field wp-config-spinner"
+            value={timeout || 0}
+            vmin={0}
+            vstep={1}
+            onChange={setTimeout}
+          />
+        </Label>
+        <Label label='Processes' icon='SETTINGS'>
+          <Spinner
+            className="wp-config-field wp-config-spinner"
+            value={processes || 0}
+            vmin={0}
+            vstep={1}
+            onChange={setProcesses}
+          />
+        </Label>
+        <Label label='Cache' icon='SERVER'>
+          <CacheSelector />
+        </Label>
+      </SidebarBlock>
+      <SidebarBlock title='Automatic Provers'>
+        {
+          autoPrvs.length !== 0 ?
+            autoPrvs.map((p) =>
+              <Prover
+                key={p}
+                prover={p}
+                up={proversInfo(p)?.active ?? false}
+                name={proversInfo(p)?.name ?? ''}
+                version={proversInfo(p)?.version ?? ''}
+              />
+            )
+            :
+            <Label
+              label='No automatic provers detected'
+              icon='WARNING'
+              kind='negative'
+            />
+        }
+      </SidebarBlock>
+      <SidebarBlock
+        title='Interactive Provers'
+        display={interPrvs.length !== 0}
+      >
+        <InteractiveSelector />
+        {
+          interPrvs.map((p) =>
+            <Prover
+              key={p}
+              prover={p}
+              up={proversInfo(p)?.active ?? false}
+              name={proversInfo(p)?.name ?? ''}
+              version={proversInfo(p)?.version ?? ''}
+            />
+          )
+        }
+      </SidebarBlock>
+      <SidebarBlock
+        title='No Interactive Provers'
+        display={interPrvs.length === 0}
+      />
+      <SidebarBlock title='Proof Strategies'>
+        <TipSelector />
+        <Checkbox
+          label='Use scripts'
+          onChange={setScripts}
+          value={scripts}
+        />
+        <Checkbox
+          label='Use strategies'
+          onChange={setStrats}
+          value={strategies}
+        />
+      </SidebarBlock>
+    </Section>
+  );
+}
 
+export function SideBar(): JSX.Element {
   return (
     <>
       <SidebarTitle label='Weakest Precondition'>
         <Tools />
       </SidebarTitle>
-      <Forms.SidebarForm className={barClass}>
-        <Section label='Provers Configuration' >
-          <SidebarBlock title='General configuration'>
-            <Label label='Timeout' icon='CLOCK' >
-              <Spinner
-                className="wp-config-field wp-config-spinner"
-                value={timeout}
-                vmin={0}
-                vstep={1}
-                onChange={setTimeout}
-              />
-            </Label>
-            <Label label='Processes' icon='SETTINGS'>
-              <Spinner
-                className="wp-config-field wp-config-spinner"
-                value={processes}
-                vmin={0}
-                vstep={1}
-                onChange={setProcesses}
-              />
-            </Label>
-            <Label label='Cache' icon='SERVER'>
-              <CacheSelector/>
-            </Label>
-          </SidebarBlock>
-          <SidebarBlock title='Automatic Provers'>
-            {
-              autoPrvs.length !== 0 ?
-                autoPrvs.map((p) =>
-                  <Prover
-                    key={p}
-                    prover={p}
-                    up={proversInfo(p)?.active ?? false}
-                    name={proversInfo(p)?.name ?? ''}
-                    version={proversInfo(p)?.version ?? ''}
-                  />
-                )
-                :
-                <Label
-                  label='No automatic provers detected'
-                  icon='WARNING'
-                  kind='negative'
-                />
-            }
-          </SidebarBlock>
-          <SidebarBlock
-            title='Interactive Provers'
-            display={interPrvs.length !== 0}
-          >
-            <InteractiveSelector />
-            {
-              interPrvs.map((p) =>
-                <Prover
-                  key={p}
-                  prover={p}
-                  up={proversInfo(p)?.active ?? false}
-                  name={proversInfo(p)?.name ?? ''}
-                  version={proversInfo(p)?.version ?? ''}
-                />
-              )
-            }
-          </SidebarBlock>
-          <SidebarBlock
-            title='No Interactive Provers'
-            display={interPrvs.length === 0}
-          />
-          <SidebarBlock title='Proof Strategies'>
-            <TipSelector />
-            <Checkbox
-              label='Use scripts'
-              onChange={setScripts}
-              value={scripts}
-            />
-            <Checkbox
-              label='Use strategies'
-              onChange={setStrategies}
-              value={strategies}
-            />
-          </SidebarBlock>
-        </Section>
+      <Forms.SidebarForm className={Utils.classes('wp-sidebar')}>
+        <ProversConfiguration />
       </Forms.SidebarForm>
     </>
   );
