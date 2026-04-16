@@ -56,9 +56,20 @@ val is_valid_region : logic_info -> bool
 (* -------------------------------------------------------------------------- *)
 
 type addr = LV of lval | ADDR of exp
+type access = Read | Write | Region | Initialized
+
 type guard =
+  | True | False
+  | Or of guard * guard
+  | And of guard * guard
+  | Imply of guard * guard
   | Bounds of exp * Z.t
-  | Valid_region of Memory.node * addr
+  | Null of bool * addr
+  | Valid of access * Memory.node * addr
+
+val g_or : guard -> guard -> guard
+val g_and : guard -> guard -> guard
+val g_imply : guard -> guard -> guard
 
 val pp_addr  : Format.formatter -> addr  -> unit
 val pp_guard : Format.formatter -> guard -> unit

@@ -84,13 +84,48 @@ let pp_addr fmt = function
   | LV lv -> Format.fprintf fmt "&(%a)" Printer.pp_lval lv
   | ADDR p -> Printer.pp_exp fmt p
 
-type guard =
-  | Bounds of exp * Z.t
-  | Valid_region of Memory.node * addr
+type access = Read | Write | Region | Initialized
 
-let pp_guard fmt = function
+type guard =
+  | True | False
+  | Or of guard * guard
+  | And of guard * guard
+  | Imply of guard * guard
+  | Bounds of exp * Z.t
+  | Null of bool * addr
+  | Valid of access * Memory.node * addr
+
+let rec pp_guard fmt = function
+  | True -> Format.pp_print_string fmt "\\true"
+  | False -> Format.pp_print_string fmt "\\false"
+  | Or(p,q) -> Format.fprintf fmt "(@[<hov 2>%a@ || %a)@]" pp_guard p pp_guard q
+  | And(p,q) -> Format.fprintf fmt "(@[<hov 2>%a@ && %a)@]" pp_guard p pp_guard q
+  | Imply(p,q) -> Format.fprintf fmt "(@[<hov 2>%a@ ==> %a)@]" pp_guard p pp_guard q
   | Bounds(k,n) -> Format.fprintf fmt "0<= %a < %a" Cil_printer.pp_exp k Z.pretty n
-  | Valid_region(_,a) -> Format.fprintf fmt "\\valid_region(%a)" pp_addr a
+  | Null(eq,a) -> Format.fprintf fmt "(%a %c= \\null)" pp_addr a (if eq then '=' else '!')
+  | Valid(Write,_,a) -> Format.fprintf fmt "\\valid(%a)" pp_addr a
+  | Valid(Read,_,a) -> Format.fprintf fmt "\\valid_read(%a)" pp_addr a
+  | Valid(Region,_,a) -> Format.fprintf fmt "\\valid_region(%a)" pp_addr a
+  | Valid(Initialized,_,a) -> Format.fprintf fmt "\\initialized(%a)" pp_addr a
+
+let g_and p q =
+  match p,q with
+  | True,w | w,True -> w
+  | False,_ | _,False -> False
+  | _ -> And(p,q)
+
+let g_or p q =
+  match p,q with
+  | True,_ | _,True -> True
+  | False,w | w,False -> w
+  | _ -> Or(p,q)
+
+let g_imply p q =
+  match p,q with
+  | True,_ -> q
+  | False,_ | _,True -> True
+  | Null(eq,a) , False -> Null(not eq,a)
+  | _ -> Imply(p,q)
 
 let pointed = function
   | LV lv -> Cil.typeOfLval lv
@@ -100,8 +135,18 @@ let of_addr ?loc = function
   | LV lval -> addrof ?loc lval
   | ADDR ptr -> Logic_utils.expr_to_term ~coerce:true ptr
 
-let of_guard ?loc ?names = function
+(* Names are only set at top-level predicate *)
+let rec of_guard ?loc ?names = function
+  | True -> Logic_const.ptrue
+  | False -> Logic_const.pfalse
+  | Or(p,q) -> Logic_const.por ?loc ?names (of_guard ?loc p , of_guard ?loc q)
+  | And(p,q) -> Logic_const.pand ?loc ?names (of_guard ?loc p , of_guard ?loc q)
+  | Imply(p,q) -> Logic_const.pimplies ?loc ?names (of_guard ?loc p , of_guard ?loc q)
   | Bounds(k,n) -> pbounds ?loc ?names k n
-  | Valid_region(_,p) -> pvalid_region ?loc ?names @@ of_addr ?loc p
+  | Null(eq,a) -> pnull ?loc ?names ~eq @@ of_addr ?loc a
+  | Valid(Write,_,p) -> pvalid ?loc ?names @@ of_addr ?loc p
+  | Valid(Read,_,p) -> pvalid_read ?loc ?names @@ of_addr ?loc p
+  | Valid(Region,_,p) -> pvalid_region ?loc ?names @@ of_addr ?loc p
+  | Valid(Initialized,_,p) -> pinitialized ?loc ?names @@ of_addr ?loc p
 
 (* -------------------------------------------------------------------------- *)

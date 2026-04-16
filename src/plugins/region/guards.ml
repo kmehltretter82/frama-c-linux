@@ -25,7 +25,7 @@ let iter f env = List.iter f @@ List.rev env.guards
 (* ---  Valid Conditions                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-let valid_region env n a = add env (Valid_region(n,a))
+let valid env acs n a = add env (Valid(acs,n,a))
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Lval/Exp Side Conditions                                          --- *)
@@ -39,7 +39,7 @@ and lhost env = function
   | Var v -> v.vtype, Memory.cvar env.map v
   | Mem e ->
     let s,r = addr env e in
-    if not s then valid_region env r (ADDR e) ;
+    if not s then valid env Region r (ADDR e) ;
     Ast_types.direct_pointed_type @@ Cil.typeOf e, r
 
 and offset env s t r = function
@@ -66,7 +66,7 @@ and exp env e =
     Some (s,r)
   | Lval lv ->
     let s,_,r = lval env lv in
-    if not s then valid_region env r (LV lv) ;
+    if not s then valid env Region r (LV lv) ;
     Option.map (fun r -> false,r) @@ Memory.points_to r
   | CastE(t,e) when
       Ast_types.is_fun_or_ptr t &&
@@ -84,7 +84,7 @@ and exp env e =
 
 let write env lv =
   let s,_,r = lval env lv in
-  if not s then valid_region env r (LV lv)
+  if not s then valid env Region r (LV lv)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Code Side Conditions                                               --- *)

@@ -13,8 +13,7 @@
   (progn
    (echo "Region:" %{lib-available:frama-c-region.core} "\n")
    (echo "  - Server:" %{lib-available:frama-c-server.core} "\n")
-   (echo "  - UnionFind:" %{lib-available:unionFind} "\n")
-   (echo "  - ppx_deriving.eq:" %{lib-available:ppx_deriving.eq} "\n"))))
+   (echo "  - UnionFind:" %{lib-available:unionFind} "\n"))))
 
 (rule
  (alias install)
@@ -34,7 +33,6 @@
  (public_name frama-c-region.core)
  (flags -open Frama_c_kernel :standard -w -9)
  (libraries frama-c.kernel frama-c-server.core unionFind)
- (preprocess (pps ppx_deriving.eq))
  (instrumentation (backend landmarks))
  (instrumentation (backend bisect_ppx)))
 
