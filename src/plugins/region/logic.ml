@@ -31,18 +31,6 @@ let pointer (d:domain) : node =
   | Some p -> p
   | None -> Options.fatal "Not a pointer value"
 
-type lv_value =
-  | VAL of domain
-  | VAR of varinfo
-
-let logic_var env lv =
-  match lv.lv_origin with
-  | None -> VAL (Memory.add_lvar env.map lv)
-  | Some x ->
-    if x.vformal then
-      try VAL (Varinfo.Map.find x env.formals) with Not_found -> VAR x
-    else VAR x
-
 (* Load a complete value at l-value lv which has type ty and lives in region r *)
 let rec load env lv (ty,r) : domain =
   match Ast_types.unroll_node ty with
@@ -88,49 +76,45 @@ let rec term_offset ~loc (env:env) (d:domain) = function
     ignore @@ !rterm env k ;
     term_offset ~loc env (Domain.get_index merge d) offset
 
-let add_term_lval ~loc (env:env) (lv : term_lval) : domain =
-  let lhost, loffset = lv in
-  match lhost with
-  | TMem e ->
-    let rh = pointer (!rterm env e) in
-    let te = Logic_typing.ctype_of_pointed e.term_type in
-    load env lv @@ addr_offset ~loc env te rh loffset
-  | TResult ty ->
-    begin match env.result with
-      | None -> Options.fatal "\\result undefined" ;
-      | Some node ->
-        load env lv @@ addr_offset ~loc env ty node loffset
-    end
-  | TVar v ->
-    begin match logic_var env v with
-      | VAL d -> term_offset ~loc env d loffset
-      | VAR x ->
-        let r = Memory.add_cvar env.map x in
-        load env lv @@ addr_offset ~loc  env x.vtype r loffset
-    end
+let logic_var env lv =
+  match lv.lv_origin with
+  | None -> Either.Right (Memory.add_lvar env.map lv)
+  | Some x ->
+    if x.vformal then
+      try Either.Right (Varinfo.Map.find x env.formals)
+      with Not_found -> Either.Left x
+    else Either.Left x
 
-let add_addr_lval ~loc (env:env) ?(garbage=false) (lv : term_lval) : typ * node =
+let term_lval ~loc ?(garbage=false) (env:env) (lv : term_lval) =
   let lhost, loffset = lv in
   match lhost with
   | TMem e ->
     let rh = pointer (!rterm env e) in
     let te = Logic_typing.ctype_of_pointed e.term_type in
-    addr_offset ~loc env te rh loffset
+    Either.Left (addr_offset ~loc env te rh loffset)
   | TResult ty ->
     begin match env.result with
       | None -> Options.fatal "\\result undefined" ;
-      | Some node -> addr_offset ~loc env ty node loffset
+      | Some node -> Either.Left (addr_offset ~loc env ty node loffset)
     end
   | TVar v ->
-    begin match logic_var env v with
-      | VAL _ ->
-        Options.fatal "address of logic value (%a)" Printer.pp_term_lval lv ;
-      | VAR x ->
-        let garbage =
-          garbage && x.vformal && Ast_types.is_struct_or_union x.vtype in
-        let r = Memory.add_cvar ~garbage env.map x in
-        addr_offset ~loc env x.vtype r loffset
-    end
+    let left x =
+      let garbage =
+        garbage && x.vformal && Ast_types.is_struct_or_union x.vtype in
+      let r = Memory.add_cvar ~garbage env.map x in
+      addr_offset ~loc  env x.vtype r loffset in
+    let right d =
+      term_offset ~loc env d loffset in
+    Either.map ~left ~right @@ logic_var env v
+
+let add_term_lval ~loc (env:env) (lv : term_lval) : domain =
+  Either.fold ~left:(load env lv) ~right:Fun.id @@ term_lval ~loc env lv
+
+let add_addr_lval ~loc (env:env) ?garbage (lv : term_lval) : typ * node =
+  match term_lval ?garbage ~loc env lv with
+  | Left r -> r
+  | Right _ ->
+    Options.fatal "address of logic value (%a)" Printer.pp_term_lval lv
 
 let rec update_offset ~loc (env:env) loffest d =
   match loffest with
