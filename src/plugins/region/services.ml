@@ -290,9 +290,9 @@ let map_of_localizable (loc : Printer_tag.localizable) =
 let region_of_localizable (m: Memory.map) (loc: Printer_tag.localizable) =
   try
     match loc with
-    | PExp(_,_,e) -> Memory.exp m e
-    | PLval(_,_,lv) -> Some (Memory.lval m lv)
-    | PVDecl(_,_,x) -> Some (Memory.lval m (Var x,NoOffset))
+    | PExp(_,_,e) -> Lookup.exp m e
+    | PLval(_,_,lv) -> Some (Lookup.lval m lv)
+    | PVDecl(_,_,x) -> Some (Lookup.lval m (Var x,NoOffset))
     | PStmt _ | PStmtStart _
     | PTermLval _ | PGlobal _ | PIP _ | PType _ -> None
   with Not_found -> None

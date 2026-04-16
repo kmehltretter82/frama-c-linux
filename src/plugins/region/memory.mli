@@ -103,25 +103,24 @@ val add_write : node -> Access.acs -> unit
 val add_shift : node -> Access.acs -> typ -> unit
 val add_init : node -> Access.acs -> typ -> unit
 
-val domain_of_typ : map -> typ -> domain
-val domain_of_ltyp : map -> ?ctxt:context -> logic_type -> domain
-
 val merge : node -> node -> unit
 val merge_all : node list -> unit
-
-val pure : domain
-val merge_domain : domain -> domain -> domain
-val merge_points_to : domain -> node option
 
 val cvar : map -> varinfo -> node
 val lvar : map -> logic_var -> domain
 val logic : map -> logic_info -> domain
 val field : node -> fieldinfo -> node
 val index : node -> typ -> node
-val lval : map -> lval -> node
-val exp : map -> exp -> node option
 val result : map -> node option
 val garbage : map -> varinfo -> bool
+
+val pure : domain
+val dindex : domain -> domain
+val dfield : domain -> fieldinfo -> domain
+val merge_domain : domain -> domain -> domain
+val merge_points_to : domain -> node option
+val dtyp : map -> typ -> domain
+val ltyp : map -> ?ctxt:context -> logic_type -> domain
 
 val ranges : node -> range list
 val points_to : node -> node option

@@ -278,10 +278,10 @@ let add_result (m: map) =
     let r = new_chunk m.store ~result:true () in
     m.result <- Some r ; r
 
-let domain_of_typ (m:map) (typ:typ) =
+let dtyp (m:map) (typ:typ) =
   Domain.of_typ (new_chunk m.store) typ
 
-let domain_of_ltyp (m:map) ?(ctxt) (lt:logic_type) =
+let ltyp (m:map) ?(ctxt) (lt:logic_type) =
   let d : domain = Domain.of_ltype (new_chunk m.store) lt in
   Option.fold ~none:d ~some:(fun (c:context) -> Domain.subst c d) ctxt
 
@@ -584,37 +584,10 @@ let footprint (r: node) : node list =
 
 let index (r: node) (ty:typ) : node = move r 0 (Fields.bitsSizeOf ty)
 
-let rec lval (m: map) (h,ofs) : node =
-  offset (lhost m h) (Cil.typeOfLhost h) ofs
-
-and lhost (m: map) (h: lhost) : node =
-  match h with
-  | Var x -> cvar m x
-  | Mem e ->
-    match exp m e with
-    | Some r -> r
-    | None -> raise Not_found
-
-and offset (r: node) (ty: typ) (ofs: offset) : node =
-  match ofs with
-  | NoOffset -> UF.find r
-  | Field (fd, ofs) ->
-    offset (field r fd) fd.ftype ofs
-  | Index (_, ofs) ->
-    let te = Ast_types.direct_element_type ty in
-    offset (index r te) te ofs
-
-and exp (m: map) (e: exp) : node option =
-  match e.enode with
-  | Const _
-  | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _ -> None
-  | Lval lv -> points_to @@ lval m lv
-  | AddrOf lv | StartOf lv -> Some (lval m lv)
-  | CastE(_, e) -> exp m e
-  | BinOp((PlusPI|MinusPI),p,_,_) -> exp m p
-  | UnOp (_, _, _) | BinOp (_, _, _, _) -> None
-
 let result (m: map) = m.result
+
+let dindex (d : domain) = Domain.get_index min d
+let dfield (d : domain) fd = Domain.get_field min d fd
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Consolidation                                                     --- *)
