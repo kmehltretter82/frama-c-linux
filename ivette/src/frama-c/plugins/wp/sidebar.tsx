@@ -29,7 +29,7 @@ import * as WP from 'frama-c/plugins/wp/api';
 import * as TIP from './tip';
 
 interface SidebarBlockProps extends DivProps {
-  title: string;
+  title?: string;
   titleButtons?: JSX.Element[];
   foldable?: boolean;
 }
@@ -46,12 +46,12 @@ function SidebarBlock(props: SidebarBlockProps): JSX.Element {
   return (
     <Vbox className={Utils.classes('wp-sidebar-block')} {...others}>
       <Hbox>
-        <Label
+        {title && <Label
           label={ftitle}
           className={Utils.classes('wp-sidebar-block-title')}
           icon={ititle}
           onClick={onClick}
-        />
+        />}
         <Hfill />
         {titleButtons}
       </Hbox>
@@ -392,73 +392,131 @@ function PropertiesFilter(): JSX.Element {
   ];
 
   return (
-    <Forms.Section
-      label='Properties filter'
+    <SidebarBlock
+      title='Filters'
+      titleButtons={
+        [<Button
+          key='Reset'
+          label='Reset'
+          className={Utils.classes('wp-sidebar-title-button')}
+          enabled={properties.length !== -1}
+          onClick={() => setProperties([])}
+        />]
+      }
+      foldable={true}
     >
-      <SidebarBlock>
-        <div className={Utils.classes('wp-sidebar-selection-block')}>
-          {properties.length !== 0 && <Button
-            key='Reset'
-            icon={'TRASH'}
-            className={Utils.classes('wp-sidebar-selection')}
-            onClick={() => setProperties([])}
-          />}
-          {properties.map((value) =>
-            <SelectionButton
-              key={value}
-              name={value}
-              selected={value === getName(true) || value === getName(false)}
-              remove={() => onKill(value)} />)}
-        </div>
-        <Hbox>
-          <Button
-            icon={'PLUS'}
-            enabled={canCommit(true)}
-            onClick={() => { onCommit(true); }}
-            className={Utils.classes('wp-sidebar-selection-commit')}
-          />
-          <Button
-            icon={'MINUS'}
-            enabled={canCommit(false)}
-            onClick={() => { onCommit(false); }}
-            className={Utils.classes('wp-sidebar-selection-commit')}
-          />
-          <SelectMenu
-            value={selected}
-            onChange={onChange}
-          >
-            {options.map((value) =>
-              <option key={value} value={value}>{displayName(value)}</option>)}
-          </SelectMenu>
-          <Field
-            style={selected !== custom ? { display: 'none' } : {}}
-            onEdited={(value) => { setField(value); }}
-          />
-        </Hbox>
-      </SidebarBlock>
-    </Forms.Section>
+      <div className={Utils.classes('wp-sidebar-selection-block')}>
+        {properties.map((value) =>
+          <SelectionButton
+            key={value}
+            name={value}
+            selected={value === getName(true) || value === getName(false)}
+            remove={() => onKill(value)} />)}
+      </div>
+      <Hbox>
+        <Button
+          icon={'PLUS'}
+          enabled={canCommit(true)}
+          onClick={() => { onCommit(true); }}
+          className={Utils.classes('wp-sidebar-selection-commit')}
+        />
+        <Button
+          icon={'MINUS'}
+          enabled={canCommit(false)}
+          onClick={() => { onCommit(false); }}
+          className={Utils.classes('wp-sidebar-selection-commit')}
+        />
+        <SelectMenu
+          value={selected}
+          onChange={onChange}
+        >
+          {options.map((value) =>
+            <option key={value} value={value}>{displayName(value)}</option>)}
+        </SelectMenu>
+        <Field
+          style={selected !== custom ? { display: 'none' } : {}}
+          onEdited={(value) => { setField(value); }}
+        />
+      </Hbox>
+    </SidebarBlock>
+  );
+}
+
+function RTE(): JSX.Element {
+  const [rte = false, setRte] = States.useSyncState(Params.wpRte);
+  const [mem, setMem] = States.useSyncState(Params.rteMem);
+  const [div, setDiv] = States.useSyncState(Params.rteDiv);
+  const [sov, setSov] = States.useSyncState(Params.warnSignedOverflow);
+  const [uov, setUov] = States.useSyncState(Params.warnUnsignedOverflow);
+  const [sdc, setSdc] = States.useSyncState(Params.warnSignedDowncast);
+  const [udc, setUdc] = States.useSyncState(Params.warnUnsignedDowncast);
+  const [bool, setBool] = States.useSyncState(Params.warnInvalidBool);
+  return (
+    <SidebarBlock
+      title='RTE Guards'
+      titleButtons={
+        [<Checkbox
+          key="generate"
+          label='Generate'
+          value={rte}
+          onChange={setRte}
+          className={Utils.classes('wp-sidebar-title-button')}
+        />]
+      }
+      foldable={true}
+    >
+      <Vbox>
+        <Checkbox label='Memory Accesses' onChange={setMem} value={mem} />
+        <Checkbox label='Division by 0' onChange={setDiv} value={div} />
+        <Checkbox label='Signed overflow' onChange={setSov} value={sov} />
+        <Checkbox label='Unsigned overflow' onChange={setUov} value={uov} />
+        <Checkbox label='Signed downcast' onChange={setSdc} value={sdc} />
+        <Checkbox label='Unsigned downcast' onChange={setUdc} value={udc} />
+        <Checkbox label='Invalid bool' onChange={setBool} value={bool} />
+      </Vbox>
+    </SidebarBlock>
+  );
+}
+
+function SmokeTests(): JSX.Element {
+  const [smoke = false, setSmoke] = States.useSyncState(Params.wpSmokeTests);
+  const [assumes, setAssumes] = States.useSyncState(Params.wpSmokeDeadAssumes);
+  const [code, setCode] = States.useSyncState(Params.wpSmokeDeadCode);
+  const [call, setCall] = States.useSyncState(Params.wpSmokeDeadCall);
+  const [loc, setLoc] = States.useSyncState(Params.wpSmokeDeadLocalInit);
+  const [loop, setLoop] = States.useSyncState(Params.wpSmokeDeadLoop);
+
+  return (
+    <SidebarBlock
+      title='Smoke tests'
+      titleButtons={
+        [<Checkbox
+          key="generate"
+          label='Generate'
+          value={smoke}
+          onChange={setSmoke}
+          className={Utils.classes('wp-sidebar-title-button')}
+        />]
+      }
+      foldable={true}
+    >
+      <Vbox>
+        <Checkbox label='Assumes' onChange={setAssumes} value={assumes} />
+        <Checkbox label='Code' onChange={setCode} value={code} />
+        <Checkbox label='Call' onChange={setCall} value={call} />
+        <Checkbox label='Local Initialization' onChange={setLoc} value={loc} />
+        <Checkbox label='Loop' onChange={setLoop} value={loop} />
+      </Vbox>
+    </SidebarBlock>
   );
 }
 
 function Properties(): JSX.Element {
-  const [rte = false, setRte] = States.useSyncState(Params.wpRte);
-  const [smoke = false, setSmoke] = States.useSyncState(Params.wpSmokeTests);
-
 
   return (
     <Forms.Section label='Properties' unfold>
-      <SidebarBlock title='Side conditions'>
-        <Checkbox
-          label='Generate RTE guards'
-          onChange={setRte}
-          value={rte}
-        />
-        <Checkbox
-          label='Generate smoke tests'
-          onChange={setSmoke}
-          value={smoke}
-        />
-      </SidebarBlock>
+      <RTE />
+      <SmokeTests />
       <PropertiesFilter />
     </Forms.Section>
   );

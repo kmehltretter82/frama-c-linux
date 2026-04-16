@@ -62,9 +62,13 @@
 }
 
 .wp-sidebar-title-button {
-  margin: 3px;
+  margin: 4px 3px;
   padding: 0;
-  border-radius: 8px;
+}
+
+.wp-sidebar-title-button input[type="checkbox"] {
+  vertical-align: bottom;
+  margin-bottom: 1px;
 }
 
 /* -------------------------------------------------------------------------- */
