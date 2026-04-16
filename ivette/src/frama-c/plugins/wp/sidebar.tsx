@@ -324,6 +324,8 @@ function SelectionButton(props: SelectionProps): JSX.Element {
 }
 
 function PropertiesFilter(): JSX.Element {
+  const { help } =
+    States.useRequestStable(Params.getParameterInfo, '-wp-prop');
   const [properties = [], setProperties] = States.useSyncState(WP.filter);
 
   const [selected, setSelected] = React.useState<string>('');
@@ -395,24 +397,26 @@ function PropertiesFilter(): JSX.Element {
     <SidebarBlock
       title='Filters'
       titleButtons={
-        [<Button
-          key='Reset'
-          label='Reset'
-          className={Utils.classes('wp-sidebar-title-button')}
-          enabled={properties.length !== -1}
-          onClick={() => setProperties([])}
-        />]
+        [<IconButton icon='HELP' title={help} />]
       }
       foldable={true}
     >
-      <div className={Utils.classes('wp-sidebar-selection-block')}>
-        {properties.map((value) =>
-          <SelectionButton
-            key={value}
-            name={value}
-            selected={value === getName(true) || value === getName(false)}
-            remove={() => onKill(value)} />)}
-      </div>
+      {properties.length !== 0 &&
+        <div className={Utils.classes('wp-sidebar-selection-block')}>
+          <Button
+            key='Reset'
+            icon={'CROSS'}
+            className={Utils.classes('wp-sidebar-selection-commit')}
+            onClick={() => setProperties([])}
+          />,
+          {properties.map((value) =>
+            <SelectionButton
+              key={value}
+              name={value}
+              selected={value === getName(true) || value === getName(false)}
+              remove={() => onKill(value)} />)}
+        </div>
+      }
       <Hbox>
         <Button
           icon={'PLUS'}
