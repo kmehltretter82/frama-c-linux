@@ -19,7 +19,6 @@ import * as Toolbar from 'dome/frame/toolbars';
 import { docChapters } from 'dome/help';
 import { useGlobalState } from 'dome/data/states';
 import * as Sidebar from './Sidebar';
-import * as SidebarControl from './sidebarControl';
 import * as Controller from './Controller';
 import { TOOLBAR, STATUSBAR, DOCCHAPTER } from 'ivette';
 import * as State from 'ivette/state';
@@ -36,9 +35,8 @@ import './style.css';
 // --------------------------------------------------------------------------
 
 export default function Application(): JSX.Element {
-  const sidebarPanel = SidebarControl.useSidebarControl();
-  const sidebarSelection = SidebarControl.useSidebarSelectionState();
-  SidebarControl.useSidebarShortcuts(sidebarPanel);
+  const sidebarState = Sidebar.useSidebarState();
+  Sidebar.useSidebarShortcuts(sidebarState.panel);
 
   const ToolBar = State.useChildren(TOOLBAR);
   const StatusBar = State.useChildren(STATUSBAR);
@@ -60,19 +58,13 @@ export default function Application(): JSX.Element {
         <Toolbar.IconPinnedMessage />
       </Toolbar.ToolBar>
       <Hfill>
-        <Sidebar.Selectors
-          sidebarSelection={sidebarSelection}
-          sidebarPanel={sidebarPanel}
-        />
+        <Sidebar.Selectors {...sidebarState} />
         <LSplit
           settings="frama-c.sidebar.panel.width"
-          defaultPosition={SidebarControl.DEFAULT_SIDEBAR_PANEL_WIDTH}
-          unfold={sidebarPanel.visible}
+          defaultPosition={Sidebar.DEFAULT_SIDEBAR_PANEL_WIDTH}
+          unfold={sidebarState.panel.visible}
         >
-          <Sidebar.Panels
-            selectorSelected={sidebarSelection.selectorSelected}
-            registeredSidebars={sidebarSelection.registeredSidebars}
-          />
+          <Sidebar.Panels {...sidebarState.selection} />
           <Laboratory.LabView />
         </LSplit>
       </Hfill>
