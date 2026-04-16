@@ -370,7 +370,7 @@ let debug fmt = Wp_parameters.debug ~dkey fmt
 let unreachable_proved = ref 0
 let unreachable_failed = ref 0
 
-let wp_unreachable =
+let emitter =
   Emitter.create
     "Unreachable Annotations"
     [ Emitter.Property_status ]
@@ -381,7 +381,7 @@ let set_unreachable pid =
   if WpPropId.is_smoke_test pid then
     begin
       let source = WpPropId.source_of_id pid in
-      set_doomed wp_unreachable pid ;
+      set_doomed emitter pid ;
       incr unreachable_failed ;
       Wp_parameters.warning ~source "Failed smoke-test"
     end
@@ -391,7 +391,7 @@ let set_unreachable pid =
       | IPPredicate {ip_kind = PKAssumes _} -> ()
       | p ->
         debug "unreachable annotation %a@." Property.pretty p;
-        Property_status.emit wp_unreachable ~hyps:[] p Property_status.True
+        Property_status.emit emitter ~hyps:[] p Property_status.True
     in
     let pids = match WpPropId.property_of_id pid with
       | IPPredicate {ip_kind = PKAssumes _} -> []

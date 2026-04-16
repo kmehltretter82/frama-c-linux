@@ -37,4 +37,6 @@ val in_cluster : caller:Kernel_function.t -> Kernel_function.t -> bool
 
 val trivial_terminates : int ref
 
+val emitter: Emitter.t
+
 (**************************************************************************)

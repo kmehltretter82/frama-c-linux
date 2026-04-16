@@ -68,8 +68,12 @@ function SidebarBlock(props: SidebarBlockProps): JSX.Element {
 
 function Tools(): JSX.Element {
   const { running } = TIP.useServerActivity();
+  const { model } = States.useSyncArrayProxy(WP.goals);
+  const goals = model.getRowCount();
+
   const run = (): void => { Server.send(WP.startProofs, null); };
   const stop = (): void => { Server.send(WP.cancelProofTasks, null); };
+  const clear = (): void => { Server.send(WP.clearProofs, null); };
   const help = (): void => { showHelp('wp'); };
   return (
     <Hbox>
@@ -84,6 +88,12 @@ function Tools(): JSX.Element {
         title='Stop proof tasks'
         onClick={stop}
         enabled={running}
+      />
+      <Button
+        icon='TRASH'
+        title='Clear goals'
+        onClick={clear}
+        disabled={running || goals === 0}
       />
       <Button
         icon='HELP'

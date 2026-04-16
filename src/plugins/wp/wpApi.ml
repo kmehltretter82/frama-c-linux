@@ -645,6 +645,27 @@ let () =
     end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Clear goals                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  R.register ~package ~kind:`EXEC ~name:"clearProofs"
+    ~descr:(Md.plain "Clear goals")
+    ~input:(module D.Junit)
+    ~output:(module D.Junit)
+    begin fun () ->
+      Emitter.clear WpReached.emitter ;
+      Emitter.clear CfgInfos.emitter ;
+      CfgInfos.clear ();
+      Wpo.iter_on_goals
+        (fun g ->
+           let emitter = WpContext.get_emitter g.po_model in
+           Emitter.clear emitter) ;
+      Wpo.iter_on_goals Wpo.clear_results ;
+      Wpo.clear ();
+    end
+
+(* -------------------------------------------------------------------------- *)
 (* --- Proof Server                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
