@@ -68,8 +68,6 @@ export default function Application(): JSX.Element {
           settings="frama-c.sidebar.panel.width"
           defaultPosition={SidebarControl.DEFAULT_SIDEBAR_PANEL_WIDTH}
           unfold={sidebarPanel.visible}
-          foldToZero
-          onUnfold={sidebarPanel.setVisible}
         >
           <Sidebar.Panels
             selectorSelected={sidebarSelection.selectorSelected}

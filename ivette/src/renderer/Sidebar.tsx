@@ -124,9 +124,14 @@ export function Selectors(props: SelectorsProps): JSX.Element {
   const selectorsClasses = classes(
     sidebarSelection.registeredSidebars.length <= 1 && 'dome-erased',
   );
+  const itemsClassName = classes(
+    'sidebar-items',
+    'dome-color-frame',
+    !sidebarPanel.visible && 'sidebar-items-collapsed',
+  );
 
   return (
-    <div className="sidebar-items dome-color-frame">
+    <div className={itemsClassName}>
       <div className={selectorsClasses}>{selectors}</div>
       <ToggleSelector
         visible={sidebarPanel.visible}

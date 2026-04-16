@@ -26,6 +26,10 @@
     background: var(--background-intense);
 }
 
+.sidebar-items.dome-color-frame.sidebar-items-collapsed {
+    border-right: solid 1px var(--border-discrete);
+}
+
 .sidebar-selector {
     margin: 0px;
     min-height: 40px;
