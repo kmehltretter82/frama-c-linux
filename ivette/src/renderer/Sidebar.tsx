@@ -90,13 +90,14 @@ function ToggleSelector(props: SidebarPanelVisibility): JSX.Element {
     visible && 'sidebar-selector-selected',
   );
   const title = `${visible ? 'Collapse' : 'Expand'} sidebar`;
+  const id = visible ? "ANGLE.LEFT" : "ANGLE.RIGHT";
   return (
     <div
       className={className}
       title={title}
       onClick={() => setVisible(!visible)}
     >
-      <Icon size={20} className="sidebar-selector-icon" id="SIDEBAR" />
+      <Icon size={20} className="sidebar-selector-icon" id={id} />
     </div>
   );
 }
