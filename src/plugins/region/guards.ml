@@ -87,6 +87,46 @@ let write env lv =
   if not s then valid env Region r (LV lv)
 
 (* -------------------------------------------------------------------------- *)
+(* --- Root Side Conditions                                               --- *)
+(* -------------------------------------------------------------------------- *)
+
+let nullable ~from addr =
+  if Attr.mem `Nullable from then Condition.Null(false,addr)
+  else True
+
+let readable ~node ~from addr =
+  if Attr.mem `Allocated from then Condition.Valid(Read,node,addr)
+  else nullable ~from addr
+
+let writable ~node ~from addr =
+  if Attr.mem `Readonly from then Condition.False else
+  if Attr.mem `Allocated from then Condition.Valid(Write,node,addr)
+  else nullable ~from addr
+
+let requires ~readonly ~node ~from ~target addr =
+  let valid =
+    if readonly || Attr.mem `Readonly target then
+      readable ~node ~from addr
+    else
+      writable ~node ~from addr in
+  let initialized =
+    if Attr.mem `Garbage target || not @@ Attr.mem `Garbage from then
+      Condition.True
+    else
+      Condition.Valid(Initialized,node,addr) in
+  let allocated =
+    if Attr.mem `Allocated target then
+      Condition.g_imply valid initialized
+    else
+      Condition.g_and valid initialized in
+  let nullable =
+    if Attr.mem `Nullable target then
+      Condition.Null(false,addr)
+    else False in
+  Condition.g_or nullable allocated
+[@@ warning "-32"]
+
+(* -------------------------------------------------------------------------- *)
 (* --- Code Side Conditions                                               --- *)
 (* -------------------------------------------------------------------------- *)
 

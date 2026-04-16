@@ -42,19 +42,3 @@ val cvar : garbage:bool -> varinfo -> flags
 val is_local : varinfo -> bool
 val is_const : varinfo -> bool
 val is_initialized : garbage:bool -> varinfo -> bool
-
-val readable :
-  loc:location -> ?label:logic_label ->
-  from:flags -> term -> predicate
-(** Whether the address is readable wrt. [~from] attributes *)
-
-val writable :
-  loc:location -> ?label:logic_label ->
-  from:flags -> term -> predicate
-(** Whether the address is writable wrt. [~from] attributes *)
-
-val requires :
-  loc:location -> ?label:logic_label ->
-  ?readonly:bool -> from:flags -> target:flags -> term -> predicate
-(** Whether the address satisfying [~from] attributes
-    satisfies [~target] attributes. *)
