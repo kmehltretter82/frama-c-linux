@@ -543,12 +543,121 @@ function SmokeTests(): JSX.Element {
 }
 
 function Properties(): JSX.Element {
-
   return (
     <Forms.Section label='Properties' unfold>
       <RTE />
       <SmokeTests />
       <PropertiesFilter />
+    </Forms.Section>
+  );
+}
+
+interface SimplOptionProps {
+  name: string;
+  label: string;
+  state: States.State<boolean>;
+  enabled: boolean;
+  message: string | undefined;
+}
+
+function SimplOption(props: SimplOptionProps): JSX.Element {
+  const { label, name, state, enabled, message } = props;
+  const help = States.useRequestStable(Params.getParameterInfo, name).help;
+  const [value = false, setValue] = States.useSyncState(state);
+  return (
+    <Hbox>
+      <Checkbox
+        label={label}
+        onChange={setValue}
+        title={message}
+        enabled={enabled}
+        value={value}
+      />
+      <IconButton icon='HELP' title={help} />
+    </Hbox>
+  );
+}
+
+function Simplifications(): JSX.Element {
+  const goals = States.useSyncArrayProxy(WP.goals).model.getRowCount();
+
+  const [letify = false, setLetify] = States.useSyncState(Params.wpLet);
+  const [clean = false, setClean] = States.useSyncState(Params.wpClean);
+
+  const simplications: [string, string, States.State<boolean>][] = [
+    ['-wp-core', 'Core', Params.wpCore],
+    ['-wp-extensional', 'Extensional', Params.wpExtensional],
+    ['-wp-filter', 'Filter', Params.wpFilter],
+    ['-wp-filter-init', 'Filter Initialization', Params.wpFilterInit],
+    ['-wp-ground', 'Ground', Params.wpGround],
+    ['-wp-parasite', 'Parasite', Params.wpParasite],
+    ['-wp-prenex', 'Prenex-form', Params.wpPrenex],
+    ['-wp-pruning', 'Pruning', Params.wpPruning],
+    ['-wp-reduce', 'Reduce', Params.wpReduce],
+    ['-wp-simpl', '...', Params.wpSimpl],
+    ['-wp-simplify-forall', 'Forall', Params.wpSimplifyForall],
+    ['-wp-simplify-is-cint', 'Redundant int types', Params.wpSimplifyIsCint],
+    ['-wp-simplify-land-mask', 'Masks', Params.wpSimplifyLandMask],
+    ['-wp-simplify-type', 'Types', Params.wpSimplifyType],
+  ];
+  const makeBox =
+    (value: [string, string, States.State<boolean>]): JSX.Element => {
+      const [name, label, state] = value;
+
+      const message =
+        goals !== 0
+          ? 'Cannot change simplification parameters when goals exist'
+          : !letify
+            ? 'Simplifications are disabled'
+            : undefined;
+      return (
+        <SimplOption
+          key={label}
+          label={label}
+          name={name}
+          state={state}
+          enabled={letify && goals === 0}
+          message={message}
+        />
+      );
+    };
+
+  const globalMessage =
+    goals !== 0
+      ? 'Cannot change simplification parameters when goals exist'
+      : undefined;
+
+  const cleanMessage =
+    goals !== 0
+      ? 'Cannot change simplification parameters when goals exist'
+      : letify
+        ? 'Clean only used when simplifiations are disabled'
+        : undefined;
+
+  return (
+    <Forms.Section label='Sequent Simplifications'>
+      <SidebarBlock
+        title='Simplifications'
+        titleButtons={
+          [<Checkbox
+            key='Enabled'
+            label='Enabled'
+            title={globalMessage}
+            value={letify}
+            enabled={goals === 0}
+            onChange={setLetify}
+          />]
+        }
+      >
+        <Checkbox
+          label='Clean'
+          onChange={setClean}
+          title={cleanMessage}
+          enabled={!letify && goals === 0}
+          value={clean}
+        />
+        {simplications.map(makeBox)}
+      </SidebarBlock>
     </Forms.Section>
   );
 }
@@ -562,6 +671,7 @@ export function SideBar(): JSX.Element {
       <Forms.SidebarForm className={Utils.classes('wp-sidebar')}>
         <ProversConfiguration />
         <Properties />
+        <Simplifications />
       </Forms.SidebarForm>
     </>
   );
