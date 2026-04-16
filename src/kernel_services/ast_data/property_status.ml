@@ -378,6 +378,11 @@ let register_property_add_hook = Register_hook.extend
 module Status_hook = Hook.Build
     (struct type t = emitter_with_properties * Property.t * emitted_status end)
 
+(* Statuses are automatically removed by Emitter.Make_table when a correctness
+   parameter of its emitter changes, in which case update hooks must be applied:
+   the property is not necessarily removed but its status changes. *)
+let () = Status.add_hook_on_remove (fun e ip s -> Status_hook.apply (e, ip, s))
+
 let register_status_update_hook f =
   Status_hook.extend
     (fun (emitter, property, status) -> f emitter property status)
