@@ -657,7 +657,11 @@ struct
       in
       E.Hashtbl.iter (fun e elt -> if is_emitter e then remove e elt) tbl
     in
-    iter clear
+    iter clear;
+    (* Clear all states depending from this table, as for a standard clear
+       from the project library. *)
+    let selection = State_selection.only_dependencies self in
+    Project.clear ~selection ()
 
   let () = register_clear_emitter clear_emitter
 
