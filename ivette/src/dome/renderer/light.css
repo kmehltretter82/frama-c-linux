@@ -16,9 +16,9 @@
     --highlighted-marker: #ffff66;
     --code-bullet: #ddd;
 
-    --splitter: #aaa;
     --border: #afafaf;
     --border-discrete: #d0d0d0;
+    --splitter: var(--border-discrete);
 
     --background: #e6e6e6;
     --background-profound: #c0c0c0;
