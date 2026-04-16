@@ -68,8 +68,7 @@ function SidebarBlock(props: SidebarBlockProps): JSX.Element {
 
 function Tools(): JSX.Element {
   const { running } = TIP.useServerActivity();
-  const { model } = States.useSyncArrayProxy(WP.goals);
-  const goals = model.getRowCount();
+  const goals = States.useSyncArrayProxy(WP.goals).model.getRowCount();
 
   const run = (): void => { Server.send(WP.startProofs, null); };
   const stop = (): void => { Server.send(WP.cancelProofTasks, null); };
@@ -221,8 +220,11 @@ function TipSelector(): JSX.Element {
 }
 
 function ProversConfiguration(): JSX.Element {
+  const goals = States.useSyncArrayProxy(WP.goals).model.getRowCount();
+
   const [timeout = 0, setTimeout] = States.useSyncState(Params.wpTimeout);
   const [processes = 0, setProcesses] = States.useSyncState(Params.wpPar);
+  const [ce = false, setCE] = States.useSyncState(Params.wpCounterExamples);
 
   const provers = States.useSyncValue(WP.provers) ?? [];
   const proversInfo = States.useSyncArrayGetter(WP.ProverInfos);
@@ -259,6 +261,17 @@ function ProversConfiguration(): JSX.Element {
         </Label>
       </SidebarBlock>
       <SidebarBlock title='Automatic Provers'>
+        <Checkbox
+          label='Generate counter-examples'
+          onChange={setCE}
+          value={ce}
+          enabled={goals === 0}
+          title={
+            goals === 0
+              ? undefined
+              : 'Requires to regenerate goals, drop existing results'
+          }
+        />
         {
           autoPrvs.length !== 0 ?
             autoPrvs.map((p) =>
