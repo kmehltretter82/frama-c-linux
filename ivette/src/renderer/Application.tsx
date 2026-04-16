@@ -13,8 +13,7 @@
 // --- React & Dome
 
 import React from 'react';
-import * as Dome from 'dome';
-import { Vfill } from 'dome/layout/boxes';
+import { Hfill, Vfill } from 'dome/layout/boxes';
 import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
 import { docChapters } from 'dome/help';
@@ -36,24 +35,18 @@ import './style.css';
 // --------------------------------------------------------------------------
 
 export default function Application(): JSX.Element {
-  const [sidebar, flipSidebar] =
-    Dome.useFlipSettings('frama-c.sidebar.unfold', true);
+  const sidebarState = Sidebar.useSidebarState();
+  Sidebar.useSidebarShortcuts(sidebarState.panel);
 
   const ToolBar = State.useChildren(TOOLBAR);
   const StatusBar = State.useChildren(STATUSBAR);
 
-  const [ , setChapters ] = useGlobalState(docChapters);
+  const [, setChapters] = useGlobalState(docChapters);
   setChapters(DOCCHAPTER.getElements());
 
   return (
     <Vfill>
       <Toolbar.ToolBar>
-        <Toolbar.Button
-          icon="SIDEBAR"
-          title="Show/Hide side bar"
-          selected={sidebar}
-          onClick={flipSidebar}
-        />
         <Controller.Control />
         <>{ToolBar}</>
         <Toolbar.Filler />
@@ -64,10 +57,17 @@ export default function Application(): JSX.Element {
         <Search.SearchField />
         <Toolbar.IconPinnedMessage />
       </Toolbar.ToolBar>
-      <LSplit settings="frama-c.sidebar.split" unfold={sidebar}>
-        <Sidebar.Panel />
-        <Laboratory.LabView />
-      </LSplit>
+      <Hfill>
+        <Sidebar.Selectors {...sidebarState} />
+        <LSplit
+          settings="frama-c.sidebar.panel.width"
+          defaultPosition={Sidebar.DEFAULT_SIDEBAR_PANEL_WIDTH}
+          unfold={sidebarState.panel.visible}
+        >
+          <Sidebar.Panels {...sidebarState.selection} />
+          <Laboratory.LabView />
+        </LSplit>
+      </Hfill>
       <Toolbar.ToolBar className="statusbar">
         <Controller.Status />
         <>{StatusBar}</>

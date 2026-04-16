@@ -3,7 +3,15 @@
 /* -------------------------------------------------------------------------- */
 
 .sidebar-view {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.sidebar-items {
     display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
@@ -16,6 +24,10 @@
 
 .sidebar-items.dome-color-frame {
     background: var(--background-intense);
+}
+
+.sidebar-items.dome-color-frame.sidebar-items-collapsed {
+    border-right: solid 1px var(--border-discrete);
 }
 
 .sidebar-selector {
@@ -49,6 +61,11 @@
 .sidebar-selector-selected {
     background-color: var(--background-profound);
     border-color: var(--selected-button-img);
+}
+
+.sidebar-selector-toggle {
+    margin-top: auto;
+    border-top: solid 1px var(--border-discrete);
 }
 
 .component-info {

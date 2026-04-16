@@ -173,6 +173,14 @@ function getSettingsFromPosition(L: Layout, P: number, D: number): number {
   return P / D;
 }
 
+/**
+   Clamp a splitter position so both sides keep the regular minimum margin.
+
+   @param M - regular minimum margin kept on each side
+   @param D - total available size of the splitter container
+   @param P - requested splitter position before clamping
+   @returns the effective splitter position after applying the active minima
+ */
 const inRange = (M: number, D: number, P: number): number => (
   D < M ? D / 2 : Math.min(Math.max(P, M), D - M)
 );
@@ -195,7 +203,7 @@ function SplitterEngine(props: SplitterEngineProps): JSX.Element {
   const D = hsplit ? size.width : size.height;
   const { unfold = true } = props;
   const [A, B] = props.children;
-  const dragged = settings > 0 || dragging !== undefined;
+  const dragged = settings > 0 || !!dragging;
   const css = getCSS(unfold, dragged, layout);
   const cursor = dragging ? (hsplit ? HCURSOR : VCURSOR) : NOCURSOR;
   const container = Utils.classes(css.container, cursor);
