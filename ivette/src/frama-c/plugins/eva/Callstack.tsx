@@ -8,7 +8,6 @@
 
 import React from 'react';
 
-import * as Dome from 'dome';
 import * as Tree from 'dome/frame/tree';
 import { addPinnedMessage, Button, delPinnedMessage, PinnedMessage
 } from 'dome/frame/toolbars';
@@ -27,11 +26,6 @@ import { EvaReady } from './components/AnalysisStatus';
 import { CallstackState } from './valuetable';
 
 // ----------------------------------------------------------------------------
-
-const D = new Dome.Debug('eva.sidebar.callstack');
-function error(k: string): void {
-  D.error(`the node ${k} has not been create`);
-}
 
 interface CSNode {
   key: string;
@@ -123,77 +117,61 @@ function CSNodes({ tree, visible, onClick } : CSNodesProps): React.ReactNode {
 // --- Infos Nodes
 // ----------------------------------------------------------------------------
 
-function getNode(key: string, cs: InfosCS): CSNode {
-  const isEntryPoint = cs.stack.length === 0;
-  const decl = isEntryPoint ? cs.entryPoint : cs.stack[0].callee;
-  const parentkey = cs.stack[1]?.rank || cs.entryPoint || undefined;
+function isEntryPoint(cs: InfosCS): boolean { return cs.stack.length === 0; }
+
+function compareStack(a: EvaCS.callsite[], b: EvaCS.callsite[]): boolean {
+  if(a.length !== b.length) return false;
+  return a.every((e, i) => (
+    e.callee === b[i].callee
+    && e.caller === b[i].caller
+    && e.stmt === b[i].stmt
+  ));
+}
+
+function getParentKey(cs: InfosCS, callstacks: InfosCS[]): string | undefined {
+  if(isEntryPoint(cs)) return undefined;
+  return callstacks.find(e => (
+    e.entryPoint === cs.entryPoint
+    && compareStack(e.stack, cs.stack.slice(1))
+  ))?.callstack.toString();
+}
+
+function getNode(key: string, cs: InfosCS, callstacks: InfosCS[]): CSNode {
+  const decl = isEntryPoint(cs) ? cs.entryPoint : cs.stack[0].callee;
+  const parentKey = getParentKey(cs, callstacks);
   const label = getDeclaration(decl).name;
   return {
     key, label, decl,
     callstack: cs,
-    parentKey: parentkey?.toString(),
+    parentKey: parentKey,
     subTree: new Map()
   };
 }
 
 /** Return the Tree */
-function getNodes(
-  callstacks: InfosCS[],
-): NodesMap {
+function getTree( callstacks: InfosCS[]): {nodes: NodesMap, tree: NodesMap} {
   const nodes: NodesMap = new Map();
-
-  callstacks.forEach(cs => {
-    const key = cs.stack.length === 0
-      ? cs.entryPoint
-      : cs.stack[0].rank.toString();
-    const newNode = getNode(key, cs);
-    nodes.set(key, newNode);
-  });
-
-  return nodes;
-}
-
-/** Return the Tree */
-function getTree(nodes: NodesMap): NodesMap {
   const tree: NodesMap = new Map();
 
-  function addChildren(tree: NodesMap, cs: InfosCS, index: number): void {
-    if(index < 0) return;
-    const callsite = cs.stack[index];
-    const key = callsite.rank.toString();
-
-    if(!tree.has(key)) {
-      const node = nodes.get(key);
-      if(node) {
-        tree.set(node.key, node);
-        nodeInTree.push(node.key);
-      }
-    }
-    const currNode = tree.get(key);
-    if(currNode)
-      addChildren(currNode.subTree, cs, index-1);
-    else error(key);
-  }
-  const nodeInTree: string[] = [];
-
-  nodes.forEach(node => {
-    if(nodeInTree.includes(node.key)) return;
-    const cs = node.callstack;
-    const key = cs.entryPoint;
-
-    if(!tree.has(key)) {
-      tree.set(node.key, node);
-      nodeInTree.push(node.key);
-    }
-
-    // treatment of children
-    const currNode = tree.get(key);
-    if(currNode)
-      addChildren(currNode.subTree, cs, cs.stack.length-1);
-    else error(key);
+  // Create nodes and tree
+  callstacks.forEach(cs => {
+    const key = cs.callstack.toString();
+    const newNode = getNode(key, cs, callstacks);
+    nodes.set(key, newNode);
+    // The tree contains only entry point
+    if(isEntryPoint(newNode.callstack))
+      tree.set(key, newNode);
   });
 
-  return tree;
+  // populate subTrees
+  nodes.forEach(node => {
+    if(node.parentKey) {
+      const parent = nodes.get(node.parentKey);
+      parent?.subTree.set(node.key, node);
+    }
+  });
+
+  return { nodes, tree };
 }
 
 /** Get details of callstacks */
@@ -259,31 +237,20 @@ export function useSelectedCS(): UseSelectedCS {
 
 export function CallstackSelection(): React.JSX.Element {
   const [ unfoldCS, setUnfoldCS ] = React.useState<boolean|undefined>(false);
-  const [ selectedOnly, setSelectedOnly ] = React.useState(true);
+  const [ showSelectedOnly, setShowSelectedOnly ] = React.useState(false);
   const { selected, setSelected, reset } = useSelectedCS();
   const CSInfos = useCallstacks();
   const [selectedFromValue, ] = useGlobalState(CallstackState);
-  /** Nodes */
-  const nodes = React.useMemo(() => getNodes(CSInfos), [CSInfos]);
-  /** Tree */
-  const tree = React.useMemo(() => getTree(nodes), [nodes]);
 
-  /** Highlights the selected callstack from EvaValue  */
-  const selectedId = React.useMemo(() => {
-    return [...nodes.entries()]
-      .find(([, v]) => v.callstack.callstack === selectedFromValue)
-      ?.[1].key;
-  }, [selectedFromValue, nodes]);
+  /** Tree */
+  const { nodes, tree } = React.useMemo(() => getTree(CSInfos), [CSInfos]);
 
   /** List of keys for visible nodes */
   const visibleKeys = React.useMemo(() => {
-    if(!selectedOnly || !selected || selected.length === 0)
-      return undefined;
-    const n = [...nodes.entries()];
-    return selected ? selected.map(cs =>
-      n.find(node => node[1].callstack.callstack === cs)?.[0] || ''
-    ) : undefined;
-  }, [selectedOnly, selected, nodes]);
+    return !showSelectedOnly || !selected || selected.length === 0
+      ? undefined
+      : selected.map(s => s.toString());
+  }, [showSelectedOnly, selected]);
 
   return (
     <EvaReady>
@@ -306,25 +273,25 @@ export function CallstackSelection(): React.JSX.Element {
           onClick={() => setUnfoldCS(true)}
         />
         <Button
-          label='Selet all'
+          label='Selected only'
+          title='Show selected callstacks only'
+          disabled={!showSelectedOnly && (!selected || selected.length === 0)}
+          selected={showSelectedOnly}
+          onClick={() => setShowSelectedOnly(e => !e)}
+          />
+        {makeBadge(nodes.size)}
+        <IconButton
+          icon='FILTER'
           title='Select all callstacks'
           disabled={!selected || selected.length === 0}
           onClick={reset}
           />
-        <IconButton
-          icon='FILTER'
-          title='Show selected callstack only'
-          disabled={!selectedOnly && (!selected || selected.length === 0)}
-          selected={selectedOnly}
-          onClick={() => setSelectedOnly(e => !e)}
-          />
-        {makeBadge(nodes.size)}
       </div>
 
       <Tree.Tree
         unfoldAll={unfoldCS}
         setUnfoldAll={setUnfoldCS}
-        selected={selectedId}
+        selected={selectedFromValue.toString()}
         onClick={(id: string) => {
           const node = nodes.get(id);
           if(node) {
