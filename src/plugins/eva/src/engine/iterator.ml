@@ -236,20 +236,13 @@ module Make_Dataflow
     : transfer_function =
     lift' (fun s -> Transfer_stmt.assign ~pos s dest exp)
 
-  (* All variables local to a block are introduced in domain states when
-     entering the block. Variables explicitly initialized at declaration time
-     (for which vi.vdefined is true) enter the scope too early, as they should
-     be introduced on the fly when encountering their [Local_init] instruction.
-     However, goto statements can skip their declaration/initialization, so it
-     is safer to always introduce all local variables (without initialize them)
-     when entering a block. *)
   let transfer_enter ~pos (block : block) : transfer_function =
     let vars = block.blocals in
     if vars = [] then id else lift (Transfer_stmt.enter_scope ~pos vars)
 
-  let transfer_leave ~pos:_ (block : block) : transfer_function =
+  let transfer_leave ~pos (block : block) : transfer_function =
     let vars = block.blocals in
-    if vars = [] then id else lift (Domain.leave_scope kf vars)
+    if vars = [] then id else lift (Transfer_stmt.leave_scope ~pos vars)
 
   let transfer_call ~pos (dest : lval option) (callee : lhost)
       (args : exp list) (key, state : key * state) : (key * state) list =

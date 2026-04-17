@@ -843,11 +843,21 @@ module Make (Engine: Engine_Subset) = struct
     with EBottom alarms -> Alarmset.emit ~pos alarms; `Bottom
 
   (* ------------------------------------------------------------------------ *)
-  (*                               Enter Scope                                *)
+  (*                               Scopes                                     *)
   (* ------------------------------------------------------------------------ *)
 
   (* Makes the local variables [variables] enter the scope in [state].
-     Also initializes volatile variable to top. *)
+     Also initializes volatile variable to top.
+
+     Note:
+
+     All variables local to a block are introduced in domain states when
+     entering the block. Variables explicitly initialized at declaration time
+     (for which vi.vdefined is true) enter the scope too early, as they should
+     be introduced on the fly when encountering their [Local_init] instruction.
+     However, goto statements can skip their declaration/initialization, so it
+     is safer to always introduce all local variables (without initialize them)
+     when entering a block. *)
   let enter_scope ~pos variables state =
     let kf = Position.kf pos |> Option.get in
     let kind = Abstract_domain.Local kf in
@@ -864,4 +874,8 @@ module Make (Engine: Engine_Subset) = struct
       Domain.initialize_variable lval location ~initialized init_value state
     in
     List.fold_left initialize_volatile state vars
+
+  let leave_scope ~pos variables state =
+    let kf = Position.kf pos |> Option.get in
+    Domain.leave_scope kf variables state
 end

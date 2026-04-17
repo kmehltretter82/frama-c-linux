@@ -100,6 +100,8 @@ module type Transfer_stmt = sig
     unit or_bottom
 
   val enter_scope: pos:Position.t -> varinfo list -> state -> state
+
+  val leave_scope: pos:Position.t -> varinfo list -> state -> state
 end
 
 
