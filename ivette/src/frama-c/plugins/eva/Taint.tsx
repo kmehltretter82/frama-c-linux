@@ -48,66 +48,47 @@ function delTaintMessage(): void {
 }
 
 function Taints({ taintNames }: { taintNames: string[] }): React.JSX.Element {
-  const [current, setCurrent] = useSyncState(EvaTaint.currentTaint);
-  const allTaintNamesSelected =
-    // Selecting every taint is equivalent to not filtering at all.
-    React.useMemo(() =>
-      !!current && current.length > 0
-      && taintNames.length > 0
-      && taintNames.every((name) => current.includes(name)),
-      [current, taintNames]
-    );
-  const selectedTaintNames =
-    // Normalize the UI state so "all selected" behaves like "no filter".
-    React.useMemo(
-      () => allTaintNamesSelected ? [] : (current ?? []),
-      [allTaintNamesSelected, current]
-    );
-  const hasSelection = selectedTaintNames.length > 0;
+  /* [current] is the set of currently selected taints, when a filter is active.
+     If it is empty, all taints are selected: no filter is active. */
+  const [current = [], setCurrent] = useSyncState(EvaTaint.currentTaint);
 
   React.useEffect(() => {
-    if (allTaintNamesSelected)
-      setCurrent([]);
-  }, [allTaintNamesSelected, setCurrent]);
-
-  React.useEffect(() => {
-    if (hasSelection)
-      addTaintMessage(selectedTaintNames, () => setCurrent([]));
+    if (current.length > 0)
+      addTaintMessage(current, () => setCurrent([]));
     else
       delTaintMessage();
-  }, [selectedTaintNames, hasSelection, setCurrent]);
-
+  }, [current, setCurrent]);
 
   const onSelection = React.useCallback((v: string) => {
-    const shownTaintNames = hasSelection ? selectedTaintNames : taintNames;
-    if (shownTaintNames.includes(v))
-      setCurrent(shownTaintNames.filter(n => n !== v));
+    if (current.includes(v))
+      setCurrent(current.filter(n => n !== v));
+    else if (current.length === taintNames.length - 1)
+      setCurrent([]); // Remove filter instead of selecting all taint names.
     else
-      setCurrent([...shownTaintNames, v]);
-  }, [selectedTaintNames, hasSelection, setCurrent, taintNames]);
+      setCurrent([...current, v]);
+  }, [current, setCurrent, taintNames]);
 
   return (<>
     <SidebarTitle label='Taints' >
       <Toolbars.Button
         label="Select All"
-        disabled={!hasSelection}
+        disabled={current.length === 0}
         onClick={() => setCurrent([])}
       />
     </SidebarTitle>
     <div className="globals-scrollable-area eva-taint-list">
       {taintNames.map((name) => {
-        const selected = selectedTaintNames.includes(name);
-        const showCheck = selected || !hasSelection;
+        const selected = current.length === 0 || current.includes(name);
         return (
           <div key={name} className="eva-taint-row">
             <Checkbox
               label={name}
               title={name}
-              value={showCheck}
+              value={selected}
               onChange={() => onSelection(name)}
             />
             { // Orange round marker: this taint is currently shown.
-              showCheck && <span aria-hidden className="eva-taint-marker" />}
+              selected && <span aria-hidden className="eva-taint-marker" />}
           </div>
         );
       })
