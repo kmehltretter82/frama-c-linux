@@ -134,10 +134,9 @@ let rec add_term (env:env) (t:term) : domain =
     let df = add_term env cf in
     merge_domain dt df
   | TUnOp(_,t) | TCast(_,_,t) | Tat(t,_) -> add_term env t
-  | TBinOp ((PlusPI|MinusPI),t1,t2) ->
-    let d1 = add_term env t1 in
-    let d2 = add_term env t2 in
-    merge_domain d1 d2
+  | TBinOp ((PlusPI|MinusPI),p,k) ->
+    let dp = add_term env p in
+    iadd_term env k ; dp
   | TBinOp(_,t1,t2) -> iadd_term env t1 ; iadd_term env t2 ; pure
   | Tbase_addr(_,t) | Toffset (_,t) | Tblock_length(_,t) ->
     iadd_term env t ; pure
@@ -165,7 +164,7 @@ let rec add_term (env:env) (t:term) : domain =
       | LBpred p ->
         iadd_logic_var env.map v ;
         add_predicate env p ;
-        add_term env t
+        Domain.pure
       | _ ->
         Options.not_yet_implemented
           ~source:(fst t.term_loc) "Unsupported complex \\let"

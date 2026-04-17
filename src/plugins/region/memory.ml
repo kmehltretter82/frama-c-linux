@@ -440,19 +440,25 @@ let merge_all = function
       do_merge q a b ;
     done
 
+let any a b = if UF.id a <= UF.id b then a else b
 let merge (a: node) (b: node) : unit = merge_all [a;b]
 
+
 (* -------------------------------------------------------------------------- *)
-(* --- Merging Domains                                                    --- *)
+(* --- Domains                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
 let pure : domain = Domain.pure
-let dmin a b = if UF.id a <= UF.id b then a else b
-let merge_node a b = merge a b ; dmin a b
+let dmerge  = Domain.merge any
+let dindex = Domain.get_index any
+let dfield = Domain.get_field any
+let dpointed = Domain.pointed any
+
+let merge_node a b = merge a b ; any a b
 let merge_domain = Domain.merge merge_node
-let merge_pointed = Domain.pointed merge_node
 let merge_field = Domain.get_field merge_node
 let merge_index = Domain.get_index merge_node
+let merge_pointed = Domain.pointed merge_node
 
 (* -------------------------------------------------------------------------- *)
 (* --- Offset                                                             --- *)
@@ -588,10 +594,6 @@ let footprint (r: node) : node list =
 let index (r: node) (ty:typ) : node = move r 0 (Fields.bitsSizeOf ty)
 
 let result (m: map) = m.result
-
-let dindex = Domain.get_index dmin
-let dfield = Domain.get_field dmin
-let dpointed = Domain.pointed dmin
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Consolidation                                                     --- *)

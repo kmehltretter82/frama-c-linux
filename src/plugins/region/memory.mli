@@ -103,6 +103,9 @@ val add_write : node -> Access.acs -> unit
 val add_shift : node -> Access.acs -> typ -> unit
 val add_init : node -> Access.acs -> typ -> unit
 
+(** Not merge, the two nodes are assumed to be equivalent *)
+val any : node -> node -> node
+
 val merge : node -> node -> unit
 val merge_all : node list -> unit
 
@@ -115,6 +118,7 @@ val result : map -> node option
 val garbage : map -> varinfo -> bool
 
 val pure : domain
+val dmerge : domain -> domain -> domain
 val dindex : domain -> domain
 val dfield : domain -> fieldinfo -> domain
 val dpointed : domain -> node option

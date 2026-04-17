@@ -66,6 +66,7 @@ let lvar env lv =
       with Not_found -> Either.Left x
     else Either.Left x
 
+
 (* -------------------------------------------------------------------------- *)
 (* ---  Terms Lookup                                                      --- *)
 (* -------------------------------------------------------------------------- *)
@@ -82,6 +83,31 @@ let rec load env (ty,r) : domain =
       Fmap.empty @@ Option.value ~default:[] cfields
   | _ ->
     Domain.scalar @@ Memory.points_to r
+
+let call map (l:logic_info) (ds:domain list) : domain =
+  let sigma = ref Domain.empty in
+  let unify = Domain.unify any sigma in
+  List.iter2 (fun x -> unify (Memory.lvar map x)) l.l_profile ds ;
+  Domain.subst !sigma @@ Memory.logic map l
+
+let cons (c:logic_ctor_info) (ds:domain list) : domain =
+  (* we need a local unification for polymorphic variables *)
+  let sigma = ref Domain.empty in
+  let pany = Option.merge any in
+  let pfrom = Domain.map (fun r -> Some r) in
+  let unify = Domain.unify pany sigma in
+  let fresh () = None in
+  List.iter2 (fun t d -> unify (Domain.of_ltype fresh t) (pfrom d)) c.ctor_params ds ;
+  let rec resolve = function
+    | Domain.Pure | Ptr None -> Domain.pure
+    | Dvar x -> resolve (Domain.getvar ~default:Domain.pure !sigma x)
+    | Ptr (Some r) -> Domain.ptr r
+    | Array a -> Domain.array @@ resolve a
+    | Record m -> Domain.record @@ Fmap.map resolve m
+    | Logic(t,ds) -> Domain.logic t @@ List.map resolve ds
+    | Arrow(ds,d) -> Domain.arrow (List.map resolve ds) (resolve d)
+  in Domain.logic c.ctor_type @@
+  List.map (fun a -> resolve (Domain.getvar !sigma a)) c.ctor_type.lt_params
 
 let rec dispatch_lval env lv : (typ * node,domain) Either.t =
   let lhost, loffset = lv in
@@ -129,7 +155,33 @@ and term env (t : term) : domain =
   match t.term_node with
   | TLval lval -> term_lval env lval
   | TAddrOf lval | TStartOf lval -> Domain.ptr @@ addr_lval env lval
-  | _ -> assert false
+  | Tif(_,ct,cf) -> Memory.dmerge (term env ct) (term env cf)
+  | TBinOp((PlusPI|MinusPI),p,_) | Tat(p,_) | TCast(_,_,p) -> term env p
+  | TBinOp(_,_,_) | TUnOp _ | Tbase_addr _ | Toffset _ | Tblock_length _
+    -> Domain.pure
+  | TUpdate(r,_,_) -> term env r
+  | Tunion ts | Tinter ts ->
+    List.fold_left (fun w t -> Memory.dmerge w (term env t)) Domain.pure ts
+  | Tcomprehension(t,_,_) -> term env t
+  | Tapp(f,_,ts) -> call env.map f @@ List.map (term env) ts
+  | TDataCons(c,ts) -> cons c @@ List.map (term env) ts
+  | Tlambda(q,t) ->
+    Domain.arrow (List.map (Memory.lvar env.map) q) @@ term env t
+  | Tlet({ l_body ; l_var_info=v },b) ->
+    begin match l_body with
+      | LBterm a ->
+        let dv = Memory.lvar env.map v in
+        let da = term env a in
+        let sigma = ref Domain.empty in
+        Domain.unify any sigma da dv ;
+        Domain.subst !sigma @@ term env b
+      | LBpred _ -> Domain.pure
+      | _ ->
+        Options.not_yet_implemented
+          ~source:(fst t.term_loc) "Unsupported complex \\let"
+    end
+  | TConst _  | TSizeOf _ | TSizeOfE _ | TAlignOf _ | TAlignOfE _
+  | Tnull | Tempty_set | Ttypeof _ | Ttype _  | Trange _ -> pure
 [@@ warning "-32"]
 
 (* -------------------------------------------------------------------------- *)
