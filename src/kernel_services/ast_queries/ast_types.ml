@@ -64,7 +64,7 @@ let () =
   Cil_const.add_attributes_ref := add_attributes
 [@@alert "-add_attributes_ref"]
 
-(**** Look for the presence of an attribute in a type ****)
+(* *** Look for the presence of an attribute in a type *** *)
 
 let has_attribute attr typ =
   Ast_attributes.contains attr (get_attributes typ)
@@ -654,12 +654,9 @@ module Acsl = struct
       is_plain_list (unroll_ltdef ty)
     | _ -> false
 
-  (** build the type list of [ty]. *)
   let make_list ty =
     Ltype(Logic_env.find_logic_type "\\list",[ty])
 
-  (** returns the type of elements of a list type.
-      @raise Failure if the input type is not a list type. *)
   let rec list_element ty = match ty with
     | Ltype ({lt_name = "\\list"},[t]) -> t
     | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
@@ -672,27 +669,19 @@ module Acsl = struct
       is_plain_set (unroll_ltdef ty)
     | _ -> false
 
-  (** converts a type into the corresponding set type if needed. *)
   let make_set ty =
     if is_plain_set ty then ty
     else Ltype(Logic_env.find_logic_type "set",[ty])
 
-  (** [set_conversion ty1 ty2] returns a set type as soon as [ty1] and/or [ty2]
-      is a set. Elements have type [ty1], or the type of the elements of [ty1] if
-      it is itself a set-type ({i.e.} we do not build set of sets that way).*)
   let set_conversion ty1 ty2 =
     if is_plain_set ty2 then make_set ty1 else ty1
 
-  (** returns the type of elements of a set type.
-      @raise Failure if the input type is not a set type. *)
   let rec set_element ty = match ty with
     | Ltype ({lt_name = "set"},[t]) -> t
     | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
       set_element (unroll_ltdef ty)
     | _ -> failwith "not a set type"
 
-  (** [plain_or_set f t] applies [f] to [t] or to the type of elements of [t]
-      if it is a set type *)
   let plain_or_set f = function
     | Ltype ({lt_name = "set"},[t]) -> f t
     | Ltype (tdef,_) as t when is_unrollable_ltdef tdef -> begin
@@ -750,7 +739,6 @@ module Acsl = struct
         (*Cil_printer.pp_logic_type t*)
         Cil_datatype.Logic_type.pretty t
 
-  (** true if the type is a C array (or a set of)*)
   let is_logic_array = is_logic is_array
 
   let is_array = plain_or_set is_plain_array
