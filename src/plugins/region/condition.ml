@@ -101,7 +101,7 @@ let rec pp_guard fmt = function
   | Or(p,q) -> Format.fprintf fmt "(@[<hov 2>%a@ || %a)@]" pp_guard p pp_guard q
   | And(p,q) -> Format.fprintf fmt "(@[<hov 2>%a@ && %a)@]" pp_guard p pp_guard q
   | Imply(p,q) -> Format.fprintf fmt "(@[<hov 2>%a@ ==> %a)@]" pp_guard p pp_guard q
-  | Bounds(k,n) -> Format.fprintf fmt "0<= %a < %a" Cil_printer.pp_exp k Z.pretty n
+  | Bounds(k,n) -> Format.fprintf fmt "0<= %a < %a" Printer.pp_exp k Z.pretty n
   | Null(eq,a) -> Format.fprintf fmt "(%a %c= \\null)" pp_addr a (if eq then '=' else '!')
   | Valid(Write,_,a) -> Format.fprintf fmt "\\valid(%a)" pp_addr a
   | Valid(Read,_,a) -> Format.fprintf fmt "\\valid_read(%a)" pp_addr a

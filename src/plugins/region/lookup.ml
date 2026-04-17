@@ -48,6 +48,7 @@ and exp (m: map) (e: exp) : node option =
 (* -------------------------------------------------------------------------- *)
 
 module Vmap = Cil_datatype.Varinfo.Map
+module Fmap = Cil_datatype.Fieldinfo.Map
 
 type env = {
   map : map ;
@@ -69,24 +70,40 @@ let lvar env lv =
 (* ---  Terms Lookup                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rec term_lval (env : env) (lv : term_lval) : domain =
+let rec load env (ty,r) : domain =
+  match Ast_types.unroll_node ty with
+  | TArray(te,_) ->
+    let re = Memory.add_index r te in
+    Domain.array (load env (te,re))
+  | TComp { cfields } ->
+    Domain.record @@
+    List.fold_left
+      (fun fds fd -> Fmap.add fd (load env (fd.ftype, Memory.field r fd)) fds)
+      Fmap.empty @@ Option.value ~default:[] cfields
+  | _ ->
+    Domain.scalar @@ Memory.points_to r
+
+let rec dispatch_lval env lv : (typ * node,domain) Either.t =
   let lhost, loffset = lv in
   match lhost with
-  | TMem _ -> assert false
+  | TMem e ->
+    let rh = Option.get @@ Memory.dpointed @@ term env e in
+    let te = Logic_typing.ctype_of_pointed e.term_type in
+    Either.Left (addr_offset env rh te loffset)
   | TResult ty ->
     begin match env.result with
       | None -> Options.fatal "\\result undefined"
-      | Some r -> Domain.ptr @@ addr_offset env r ty loffset
+      | Some r -> Either.Left (addr_offset env r ty loffset)
     end
   | TVar v ->
     let left x =
       let r = Memory.cvar env.map x in
-      Domain.ptr @@ addr_offset env r x.vtype loffset in
+      addr_offset env r x.vtype loffset in
     let right d = term_offset env d loffset in
-    Either.fold ~left ~right @@ lvar env v
+    Either.map ~left ~right @@ lvar env v
 
 and addr_offset env r ty = function
-  | TNoOffset -> r
+  | TNoOffset -> ty,r
   | TModel _ -> Options.not_yet_implemented "Unsupported model fields"
   | TField(fd,offset) -> addr_offset env (field r fd) fd.ftype offset
   | TIndex(_,offset) ->
@@ -98,8 +115,21 @@ and term_offset env d = function
   | TModel _ -> Options.not_yet_implemented "Unsupported model fields"
   | TIndex(_,offset) -> term_offset env (Memory.dindex d) offset
   | TField(fd,offset) -> term_offset env (Memory.dfield d fd) offset
-[@@ warning "-32"]
 
-let term _ _ = assert false
+and term_lval env lv : domain =
+  Either.fold ~left:(load env) ~right:Fun.id @@ dispatch_lval env lv
+
+and addr_lval env lv : node =
+  match dispatch_lval env lv with
+  | Left (_,r) -> r
+  | Right _ ->
+    Options.fatal "address of logic value (%a)" Printer.pp_term_lval lv
+
+and term env (t : term) : domain =
+  match t.term_node with
+  | TLval lval -> term_lval env lval
+  | TAddrOf lval | TStartOf lval -> Domain.ptr @@ addr_lval env lval
+  | _ -> assert false
+[@@ warning "-32"]
 
 (* -------------------------------------------------------------------------- *)

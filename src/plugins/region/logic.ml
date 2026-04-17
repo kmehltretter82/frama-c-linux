@@ -47,53 +47,53 @@ let rec load env lv (ty,r) : domain =
 
 let rterm = ref (fun _ _ -> assert false)
 
-let rec addr_offset ~loc (env:env) (ty:typ) (r:node) = function
+let rec add_addr_offset ~loc (env:env) (ty:typ) (r:node) = function
   | TNoOffset -> ty,r
   | TModel _ ->
     Options.not_yet_implemented ~source:(fst loc) "Unsupported model fields"
   | TField (f,offset) ->
-    addr_offset ~loc env f.ftype (Memory.add_field r f) offset
+    add_addr_offset ~loc env f.ftype (Memory.add_field r f) offset
   | TIndex(k,offset) ->
     ignore @@ !rterm env k ;
     let te = Ast_types.direct_element_type ty in
-    addr_offset ~loc env te (Memory.add_index r ty) offset
+    add_addr_offset ~loc env te (Memory.add_index r ty) offset
 
-let rec term_offset ~loc (env:env) (d:domain) = function
+let rec add_term_offset ~loc (env:env) (d:domain) = function
   | TNoOffset -> d
   | TModel _ ->
     Options.not_yet_implemented ~source:(fst loc) "Unsupported model fields"
   | TField (f,offset) ->
-    term_offset ~loc env (merge_field d f) offset
+    add_term_offset ~loc env (merge_field d f) offset
   | TIndex(k,offset) ->
     ignore @@ !rterm env k ;
-    term_offset ~loc env (merge_index d) offset
+    add_term_offset ~loc env (merge_index d) offset
 
-let term_lval ~loc ?(garbage=false) (env:env) (lv : term_lval) =
+let dispatch_term_lval ~loc ?(garbage=false) (env:env) (lv : term_lval) =
   let lhost, loffset = lv in
   match lhost with
   | TMem e ->
     let rh = pointed (!rterm env e) in
     let te = Logic_typing.ctype_of_pointed e.term_type in
-    Either.Left (addr_offset ~loc env te rh loffset)
+    Either.Left (add_addr_offset ~loc env te rh loffset)
   | TResult ty ->
     begin match env.result with
       | None -> Options.fatal "\\result undefined" ;
-      | Some node -> Either.Left (addr_offset ~loc env ty node loffset)
+      | Some node -> Either.Left (add_addr_offset ~loc env ty node loffset)
     end
   | TVar v ->
     let left x =
       let garbage =
         garbage && x.vformal && Ast_types.is_struct_or_union x.vtype in
       let r = Memory.add_cvar ~garbage env.map x in
-      addr_offset ~loc  env x.vtype r loffset in
-    let right d = term_offset ~loc env d loffset in
+      add_addr_offset ~loc  env x.vtype r loffset in
+    let right d = add_term_offset ~loc env d loffset in
     Either.map ~left ~right @@ lvar env v
 
 let add_term_lval ~loc (env:env) (lv : term_lval) : domain =
-  Either.fold ~left:(load env lv) ~right:Fun.id @@ term_lval ~loc env lv
+  Either.fold ~left:(load env lv) ~right:Fun.id @@ dispatch_term_lval ~loc env lv
 
 let add_addr_lval ~loc (env:env) ?garbage (lv : term_lval) : typ * node =
-  match term_lval ?garbage ~loc env lv with
+  match dispatch_term_lval ?garbage ~loc env lv with
   | Left r -> r
   | Right _ ->
     Options.fatal "address of logic value (%a)" Printer.pp_term_lval lv

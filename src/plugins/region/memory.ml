@@ -589,8 +589,9 @@ let index (r: node) (ty:typ) : node = move r 0 (Fields.bitsSizeOf ty)
 
 let result (m: map) = m.result
 
-let dindex (d : domain) = Domain.get_index dmin d
-let dfield (d : domain) fd = Domain.get_field dmin d fd
+let dindex = Domain.get_index dmin
+let dfield = Domain.get_field dmin
+let dpointed = Domain.pointed dmin
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Consolidation                                                     --- *)

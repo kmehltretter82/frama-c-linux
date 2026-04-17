@@ -117,6 +117,7 @@ val garbage : map -> varinfo -> bool
 val pure : domain
 val dindex : domain -> domain
 val dfield : domain -> fieldinfo -> domain
+val dpointed : domain -> node option
 
 val merge_node : node -> node -> node
 val merge_domain : domain -> domain -> domain
