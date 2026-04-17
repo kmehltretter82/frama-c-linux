@@ -211,10 +211,6 @@ module Make_Dataflow
   let lift'' (f : state -> state list) : transfer_function =
     fun (k,x) -> List.map (fun y -> k,y) (f x)
 
-  let sequence (f1 : transfer_function) (f2 : transfer_function)
-    : transfer_function =
-    fun x -> List.concat_map f2 (f1 x)
-
 
   (* Tries to evaluate \assigns … \from … clauses for assembly code. *)
   let transfer_asm ~pos : transfer_function =
@@ -265,21 +261,12 @@ module Make_Dataflow
     Partitioning.call_return ~caller:key result.kind result.states
 
   let transfer_return ~pos (return_exp : exp option) : transfer_function =
-    let result_vi = Library_functions.get_retres_vi kf in
-    (* Check postconditions *)
-    let check_postconditions = fun state ->
-      if Eva_utils.skip_specifications kf then
-        [state]
-      else
-        Transfer_logic.check_fct_postconditions kf active_behaviors Normal
-          ~pre_state:initial_state ~post_states:[state]
-          ~result:result_vi
     (* Assign the return value *)
-    and assign_retval =
+    let assign_retval =
       match return_exp with
       | None -> fun state -> [state]
       | Some return_exp ->
-        let result_vi = Option.get result_vi in
+        let result_vi = Option.get (Library_functions.get_retres_vi kf) in
         let return_lval = Eva_ast.Build.var result_vi in
         fun state ->
           let kind = Abstract_domain.Result kf in
@@ -287,7 +274,7 @@ module Make_Dataflow
           let state' = Transfer_stmt.assign ~pos state return_lval return_exp in
           Bottom.to_list state'
     in
-    sequence (lift'' assign_retval) (lift'' check_postconditions)
+    lift'' assign_retval
 
   let transfer_transition ~pos (t : transition) : transfer_function =
     match t with
@@ -572,13 +559,21 @@ module Make_Dataflow
       if Kernel_function.equal englobing_kf kf then (
         Eva_utils.DegenerationPoints.replace s true)
 
+  let check_postconditions =
+    let result = Library_functions.get_retres_vi kf in
+    fun state ->
+      let pre_state = initial_state and post_states = [state] in
+      Transfer_logic.check_fct_postconditions
+        kf active_behaviors Normal ~pre_state ~post_states ~result
+
   let compute () : (key * state) list =
     if interpreter_mode then
       simulate automaton.entry_point (get_initial_flow ())
     else
       iterate_list automaton.wto;
     let final_store = get_vertex_store automaton.return_point in
-    Partitioning.expanded final_store
+    let post_states = Partitioning.expanded final_store in
+    List.concat_map (lift'' check_postconditions) post_states
 
 
   (* --- Results conversion --- *)
