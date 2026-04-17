@@ -447,9 +447,12 @@ let merge (a: node) (b: node) : unit = merge_all [a;b]
 (* -------------------------------------------------------------------------- *)
 
 let pure : domain = Domain.pure
-let dmerge a b = merge a b ; min a b
-let merge_domain = Domain.merge dmerge
-let merge_points_to = Domain.pointed dmerge
+let dmin a b = if UF.id a <= UF.id b then a else b
+let merge_node a b = merge a b ; dmin a b
+let merge_domain = Domain.merge merge_node
+let merge_pointed = Domain.pointed merge_node
+let merge_field = Domain.get_field merge_node
+let merge_index = Domain.get_index merge_node
 
 (* -------------------------------------------------------------------------- *)
 (* --- Offset                                                             --- *)
@@ -586,8 +589,8 @@ let index (r: node) (ty:typ) : node = move r 0 (Fields.bitsSizeOf ty)
 
 let result (m: map) = m.result
 
-let dindex (d : domain) = Domain.get_index min d
-let dfield (d : domain) fd = Domain.get_field min d fd
+let dindex (d : domain) = Domain.get_index dmin d
+let dfield (d : domain) fd = Domain.get_field dmin d fd
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Consolidation                                                     --- *)

@@ -9,6 +9,7 @@
 open Cil_types
 
 open Memory
+open Lookup
 open Logic
 
 (* -------------------------------------------------------------------------- *)
@@ -34,7 +35,7 @@ let add_write env lv tgt =
   Memory.add_write tgt @@ Access.Term(env.context,lv)
 
 let dpoints_to env deps =
-  merge_points_to @@
+  merge_pointed @@
   List.fold_left
     (fun d t -> merge_domain d (add_iterm env t))
     pure deps

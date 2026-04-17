@@ -117,8 +117,13 @@ val garbage : map -> varinfo -> bool
 val pure : domain
 val dindex : domain -> domain
 val dfield : domain -> fieldinfo -> domain
+
+val merge_node : node -> node -> node
 val merge_domain : domain -> domain -> domain
-val merge_points_to : domain -> node option
+val merge_pointed : domain -> node option
+val merge_index : domain -> domain
+val merge_field : domain -> fieldinfo -> domain
+
 val dtyp : map -> typ -> domain
 val ltyp : map -> ?ctxt:context -> logic_type -> domain
 

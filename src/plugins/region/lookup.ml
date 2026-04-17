@@ -44,20 +44,32 @@ and exp (m: map) (e: exp) : node option =
   | UnOp (_, _, _) | BinOp (_, _, _, _) -> None
 
 (* -------------------------------------------------------------------------- *)
-(* ---  Term Lookup                                                       --- *)
+(* ---  Logic Environment                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* let local map = Logic.{ map ; formals = Varinfo.Map.empty } *)
+module Vmap = Cil_datatype.Varinfo.Map
 
-(* let call map kf params =
-   let formals = List.fold_left2
-      (fun d x e ->
-         Varinfo.Map.add x (Domain.scalar @@ exp map e) d
-      ) Varinfo.Map.empty
-      (Kernel_function.get_formals kf) params
-   in { map ; formals } *)
+type env = {
+  map : map ;
+  result : node option ; (* where returned value is stored *)
+  formals : domain Vmap.t ;
+  context : Access.clause ;
+}
 
-let rec term_lval (env : Logic.env) (lv : term_lval) : domain =
+let lvar env lv =
+  match lv.lv_origin with
+  | None -> Either.Right (Memory.add_lvar env.map lv)
+  | Some x ->
+    if x.vformal then
+      try Either.Right (Vmap.find x env.formals)
+      with Not_found -> Either.Left x
+    else Either.Left x
+
+(* -------------------------------------------------------------------------- *)
+(* ---  Terms Lookup                                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
+let rec term_lval (env : env) (lv : term_lval) : domain =
   let lhost, loffset = lv in
   match lhost with
   | TMem _ -> assert false
@@ -66,7 +78,12 @@ let rec term_lval (env : Logic.env) (lv : term_lval) : domain =
       | None -> Options.fatal "\\result undefined"
       | Some r -> Domain.ptr @@ addr_offset env r ty loffset
     end
-  | TVar _ -> assert false
+  | TVar v ->
+    let left x =
+      let r = Memory.cvar env.map x in
+      Domain.ptr @@ addr_offset env r x.vtype loffset in
+    let right d = term_offset env d loffset in
+    Either.fold ~left ~right @@ lvar env v
 
 and addr_offset env r ty = function
   | TNoOffset -> r

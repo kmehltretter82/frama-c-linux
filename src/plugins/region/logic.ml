@@ -12,22 +12,14 @@ open Cil_datatype
 open Spec
 open Memory
 open Domain
+open Lookup
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Process ACSL logic terms & predicates                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-type env = {
-  map : map ;
-  result : node option ;
-  formals : domain Varinfo.Map.t ;
-  context : Access.clause ;
-}
-
-let merge a b = Memory.merge a b ; min a b
-
-let pointer (d:domain) : node =
-  match Domain.pointed merge d with
+let pointed (d:domain) : node =
+  match merge_pointed d with
   | Some p -> p
   | None -> Options.fatal "Not a pointer value"
 
@@ -71,25 +63,16 @@ let rec term_offset ~loc (env:env) (d:domain) = function
   | TModel _ ->
     Options.not_yet_implemented ~source:(fst loc) "Unsupported model fields"
   | TField (f,offset) ->
-    term_offset ~loc env (Domain.get_field merge d f) offset
+    term_offset ~loc env (merge_field d f) offset
   | TIndex(k,offset) ->
     ignore @@ !rterm env k ;
-    term_offset ~loc env (Domain.get_index merge d) offset
-
-let logic_var env lv =
-  match lv.lv_origin with
-  | None -> Either.Right (Memory.add_lvar env.map lv)
-  | Some x ->
-    if x.vformal then
-      try Either.Right (Varinfo.Map.find x env.formals)
-      with Not_found -> Either.Left x
-    else Either.Left x
+    term_offset ~loc env (merge_index d) offset
 
 let term_lval ~loc ?(garbage=false) (env:env) (lv : term_lval) =
   let lhost, loffset = lv in
   match lhost with
   | TMem e ->
-    let rh = pointer (!rterm env e) in
+    let rh = pointed (!rterm env e) in
     let te = Logic_typing.ctype_of_pointed e.term_type in
     Either.Left (addr_offset ~loc env te rh loffset)
   | TResult ty ->
@@ -103,9 +86,8 @@ let term_lval ~loc ?(garbage=false) (env:env) (lv : term_lval) =
         garbage && x.vformal && Ast_types.is_struct_or_union x.vtype in
       let r = Memory.add_cvar ~garbage env.map x in
       addr_offset ~loc  env x.vtype r loffset in
-    let right d =
-      term_offset ~loc env d loffset in
-    Either.map ~left ~right @@ logic_var env v
+    let right d = term_offset ~loc env d loffset in
+    Either.map ~left ~right @@ lvar env v
 
 let add_term_lval ~loc (env:env) (lv : term_lval) : domain =
   Either.fold ~left:(load env lv) ~right:Fun.id @@ term_lval ~loc env lv
@@ -126,13 +108,13 @@ let rec update_offset ~loc (env:env) loffest d =
 
 let call map (l:logic_info) (ds:domain list) : domain =
   let sigma = ref Domain.empty in
-  let unify = Domain.unify merge sigma in
+  let unify = Domain.unify merge_node sigma in
   List.iter2 (fun x -> unify (Memory.add_lvar map x)) l.l_profile ds ;
   Domain.subst !sigma @@ Memory.add_logic map l
 
 let cons map (c:logic_ctor_info) (ds:domain list) : domain =
   let sigma = ref Domain.empty in
-  let unify = Domain.unify merge sigma in
+  let unify = Domain.unify merge_node sigma in
   let fresh () = Memory.fresh map in
   List.iter2 (fun t -> unify (of_ltype fresh t)) c.ctor_params ds ;
   Domain.logic c.ctor_type @@
@@ -178,7 +160,7 @@ let rec add_term (env:env) (t:term) : domain =
         let dv = add_lvar env.map v in
         let da = add_term env a in
         let sigma = ref Domain.empty in
-        Domain.unify merge sigma da dv ;
+        Domain.unify merge_node sigma da dv ;
         Domain.subst !sigma @@ add_term env b
       | LBpred p ->
         iadd_logic_var env.map v ;
@@ -216,7 +198,7 @@ and add_predicate (env:env) (p:predicate) = match p.pred_content with
     let dv = add_lvar env.map v in
     let dt = add_term env t in
     let sigma = ref empty in
-    Domain.unify merge sigma dt dv ;
+    Domain.unify merge_node sigma dt dv ;
     add_predicate env p2
   | Plet({ l_var_info = v ; l_body = LBpred p1 ; },p2) ->
     iadd_logic_var env.map v ;
@@ -244,7 +226,7 @@ let add_path (env: env) Spec.{ named ; flags } = function
     Memory.add_field_range r f g
   | Spec.Range(_,ptr,typ,inf,sup) ->
     iadd_term env inf ; iadd_term env sup ;
-    let rp = pointer @@ add_term env ptr in
+    let rp = pointed @@ add_term env ptr in
     let re = Memory.add_index rp typ in
     let ip = match env.context with Prop ip -> ip | _ -> assert false in
     let root = Root { ip ; named ; ptr ; typ ; inf ; sup ; flags } in
