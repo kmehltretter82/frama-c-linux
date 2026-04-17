@@ -30,7 +30,8 @@ open Cil_types
 
 type map
 type node
-val map : kernel_function -> map
+
+val get_map : kernel_function -> map
 
 (** Unique id of normalized node.
     This can be considered the unique identifier of the region equivalence
@@ -56,8 +57,11 @@ val reads : node -> typ list
 val writes : node -> typ list
 val shifts : node -> typ list
 
-val typed : node -> typ option
 (** Full-sized cells with unique type access *)
+val typed : node -> typ option
+
+(** Normalized list of leaf nodes. *)
+val footprint : node -> node list
 
 val iter : map -> (node -> unit) -> unit
 
@@ -80,7 +84,6 @@ val included : node -> node -> bool
       can {i never} be aliased.
 *)
 val separated : node -> node -> bool
-
 
 (** [singleton a] returns [true] when node [a] is guaranteed to have only
     one single address in its equivalence class. *)
@@ -115,6 +118,3 @@ val field : node -> fieldinfo -> node
 (** Unormalized.
     @raises Not_found *)
 val index : node -> typ -> node
-
-(** Normalized list of leaf nodes. *)
-val footprint : node -> node list

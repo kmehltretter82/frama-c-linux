@@ -12,7 +12,7 @@
 
 type map = Memory.map
 type node = Memory.node
-let map kf = Analysis.get kf
+let get_map kf = Analysis.get kf
 let id = Memory.id
 let of_id = Memory.of_id
 let pretty = Memory.pp_node
