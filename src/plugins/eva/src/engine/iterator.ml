@@ -261,26 +261,14 @@ module Make_Dataflow
     Partitioning.call_return ~caller:key result.kind result.states
 
   let transfer_return ~pos (return_exp : exp option) : transfer_function =
-    (* Assign the return value *)
-    let assign_retval =
-      match return_exp with
-      | None -> fun state -> [state]
-      | Some return_exp ->
-        let result_vi = Option.get (Library_functions.get_retres_vi kf) in
-        let return_lval = Eva_ast.Build.var result_vi in
-        fun state ->
-          let kind = Abstract_domain.Result kf in
-          let state = Domain.enter_scope kind [result_vi] state in
-          let state' = Transfer_stmt.assign ~pos state return_lval return_exp in
-          Bottom.to_list state'
-    in
-    lift'' assign_retval
+    lift' (Transfer_stmt.return ~pos return_exp)
 
   let transfer_transition ~pos (t : transition) : transfer_function =
     match t with
     | Skip ->
       id
-    | Return (return_exp,_stmt) ->
+    | Return (return_exp,stmt) ->
+      let pos = (stmt, callstack) in
       transfer_return ~pos return_exp
     | Guard (exp,kind,_stmt) ->
       transfer_assume ~pos exp kind

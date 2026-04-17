@@ -90,6 +90,8 @@ module type Transfer_stmt = sig
     pos:Position.local ->
     lval option -> lhost -> exp list -> state -> state call_result
 
+  val return : pos:Position.local -> exp option -> state -> state or_bottom
+
   val check_unspecified_sequence:
     pos:Position.t ->
     state ->

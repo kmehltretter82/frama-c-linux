@@ -755,6 +755,24 @@ module Make (Engine: Engine_Subset) = struct
       in
       List.fold_left process bottom functions
 
+
+  (* ------------------------------------------------------------------------ *)
+  (*                            Return statements                             *)
+  (* ------------------------------------------------------------------------ *)
+
+  let return ~pos return_exp state =
+    let kf = Position.Local.kf pos in
+    match return_exp with
+    | None -> `Value state
+    | Some return_exp ->
+      let result_vi = Option.get (Library_functions.get_retres_vi kf) in
+      let return_lval = Eva_ast.Build.var result_vi in
+      let kind = Abstract_domain.Result kf in
+      let state = Domain.enter_scope kind [result_vi] state in
+      let pos = Position.of_local pos in
+      assign ~pos state return_lval return_exp
+
+
   (* ------------------------------------------------------------------------ *)
   (*                            Unspecified Sequence                          *)
   (* ------------------------------------------------------------------------ *)
