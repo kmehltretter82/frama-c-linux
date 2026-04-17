@@ -88,14 +88,12 @@
 [eva:progress] sys_uio_h.c:39: 
   function writev: precondition 'valid_read_iov' got status valid.
 [eva:alarm] sys_uio_h.c:39: Warning: 
-  function writev: precondition 'valid_read_iov_bases' got status unknown.
+  function writev: precondition 'valid_read_iov_bases' got status invalid.
 [eva:progress] sys_uio_h.c:39: 
-  function writev: precondition 'bounded_iovcnt' got status valid.
-[eva:alarm] sys_uio_h.c:39: Warning: 
-  function writev: precondition 'bounded_lengths' got status unknown.
+  function writev: no state left, precondition 'bounded_iovcnt' got status valid.
+[eva:progress] sys_uio_h.c:39: 
+  function writev: no state left, precondition 'bounded_lengths' got status valid.
 [eva:progress] Done for function writev
-[eva:alarm] sys_uio_h.c:40: Warning: 
-  assertion 'unreachable' got status invalid (stopping propagation).
 [eva:alarm] sys_uio_h.c:43: Warning: 
   signed overflow. assert w + r ≤ 2147483647;
 [eva:progress] Recording results for main

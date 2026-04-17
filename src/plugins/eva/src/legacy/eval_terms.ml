@@ -204,9 +204,6 @@ let add_init states =
   | `Bottom | `Top -> states
   | `Value state -> add_logic Logic_const.init_label state states
 
-let add_logic_var env lv cvalue =
-  { env with logic_vars = LogicVarEnv.add lv cvalue env.logic_vars }
-
 let make_env logic_env state =
   let transfer label map =
     Logic_label.Map.add label (logic_env.Abstract_domain.states label) map
@@ -290,25 +287,54 @@ let bind_logic_vars env lvs =
   let state, logic_vars = List.fold_left bind_one (state, env.logic_vars) lvs in
   overwrite_current_state { env with logic_vars } state
 
+let add_logic_var env lvar value =
+  match Ast_types.unroll_logic lvar.lv_type with
+  | Linteger | Lreal ->
+    let logic_vars = LogicVarEnv.add lvar value env.logic_vars in
+    { env with logic_vars }
+  | Ctype _ ->
+    let base = Base.of_c_logic_var lvar in
+    let loc = Locations.loc_of_base base in
+    let state = env_current_state env in
+    Model.add_binding ~exact:true state loc value
+    |> overwrite_current_state env
+  | _ -> unsupported_lvar lvar
+
+let find_logic_var env lvar =
+  match Ast_types.unroll_logic lvar.lv_type with
+  | Linteger | Lreal -> LogicVarEnv.find lvar env.logic_vars
+  | Ctype _ ->
+    let base = Base.of_c_logic_var lvar in
+    let loc = Locations.loc_of_base base in
+    Model.find (env_current_state env) loc
+  | _ -> unsupported_lvar lvar
+
 let copy_logic_vars ~src ~dst lvars =
-  let copy_one env lvar =
-    match Ast_types.unroll_logic lvar.lv_type with
-    | Linteger | Lreal ->
-      let value = LogicVarEnv.find lvar src.logic_vars in
-      let logic_vars = LogicVarEnv.add lvar value env.logic_vars in
-      { env with logic_vars }
-    | Ctype _ ->
-      begin
-        let base = Base.of_c_logic_var lvar in
-        match Model.find_base base (env_current_state src) with
-        | `Bottom | `Top -> env
-        | `Value offsm ->
-          let state = Model.add_base base offsm (env_current_state env) in
-          overwrite_current_state env state
-      end
-    | _ -> unsupported_lvar lvar
+  let copy_one dst lvar =
+    let value = find_logic_var src lvar in
+    add_logic_var dst lvar value
   in
   List.fold_left copy_one dst lvars
+
+(* Splits values of logic variables [lvars] from [env] into singletons, only for
+   logic variables with less than -ilevel possible concrete values. Returns a
+   list of environments such that an evaluation in [env] can be replaced by the
+   union of evaluations in each returned environment. *)
+let split_logic_vars env lvars =
+  let split_value cvalue =
+    match Cvalue.V.project_ival cvalue |> Ival.project_small_set with
+    | Some list -> Some (List.map Cvalue.V.inject_int list)
+    | None | exception Cvalue.V.Not_based_on_null -> None
+  in
+  let split_one_var env_list lvar =
+    let value = find_logic_var env lvar in
+    match split_value value with
+    | None -> env_list
+    | Some values ->
+      let aux env = List.map (add_logic_var env lvar) values in
+      List.concat_map aux env_list
+  in
+  List.fold_left split_one_var [env] lvars
 
 let unbind_logic_vars env lvs =
   let unbind_one (state, logic_vars) lv =
@@ -2616,13 +2642,15 @@ and eval_predicate env pred =
             match p.pred_content with Pforall _ -> false | _ -> true
           in
           let reduced_env = reduce_by_predicate ~alarm_mode env positive p' in
-          (* Reduce the values of logical variables [varl] in [env] according to
-             [reduced_env]. To be more precise, we could reduce them to
-             singleton values — for instance by using the interval bounds. *)
+          (* Reduce values of logical variables [varl] in [env] according to
+             [reduced_env], and splits those reduced values into singletons
+             if possible. *)
           let env = copy_logic_vars ~src:reduced_env ~dst:env varl in
-          match p.pred_content, do_eval env p' with
-          | Pexists _, True -> True
-          | Pforall _, False -> False
+          let env_list = split_logic_vars env varl in
+          let exists t = List.exists (fun env -> do_eval env p' = t) env_list in
+          match p.pred_content with
+          | Pexists _ when exists True -> True
+          | Pforall _ when exists False -> False
           | _ -> Unknown
       end
 
