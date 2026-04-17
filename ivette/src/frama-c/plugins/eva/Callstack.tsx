@@ -9,11 +9,12 @@
 import React from 'react';
 
 import * as Tree from 'dome/frame/tree';
-import { addPinnedMessage, Button, delPinnedMessage, PinnedMessage
+import { addPinnedMessage, delPinnedMessage, PinnedMessage
 } from 'dome/frame/toolbars';
 import { IconButton } from 'dome/controls/buttons';
 import { useGlobalState } from 'dome/data/states';
 import { makeBadge } from 'dome/frame/sidebars';
+import * as Forms from 'dome/layout/forms';
 
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
@@ -236,21 +237,31 @@ export function useSelectedCS(): UseSelectedCS {
 // ----------------------------------------------------------------------------
 
 export function CallstackSelection(): React.JSX.Element {
+  // Control
   const [ unfoldCS, setUnfoldCS ] = React.useState<boolean|undefined>(false);
-  const [ showSelectedOnly, setShowSelectedOnly ] = React.useState(false);
-  const { selected, setSelected, reset } = useSelectedCS();
+  const [ show, setShow ] = React.useState<string | undefined>('all');
+  const showState: Forms.FieldState<string | undefined> =
+    { value: show, onChanged: setShow };
+  // Data
   const CSInfos = useCallstacks();
+  const { selected, setSelected, reset } = useSelectedCS();
   const [selectedFromValue, ] = useGlobalState(CallstackState);
+  const scope = States.useCurrentScope();
 
   /** Tree */
   const { nodes, tree } = React.useMemo(() => getTree(CSInfos), [CSInfos]);
 
   /** List of keys for visible nodes */
   const visibleKeys = React.useMemo(() => {
-    return !showSelectedOnly || !selected || selected.length === 0
-      ? undefined
-      : selected.map(s => s.toString());
-  }, [showSelectedOnly, selected]);
+    const visible = [];
+    if(show === 'scope' && scope) {
+      visible.push([...nodes].filter(e => e[1].decl === scope).map(e => e[0]));
+    }
+    if(show !== 'all' && selected && selected.length > 0)
+      visible.push(selected.map(s => s.toString()));
+
+    return visible.length === 0 ? undefined : visible.flat();
+  }, [show, selected, scope, nodes]);
 
   return (
     <EvaReady>
@@ -272,13 +283,11 @@ export function CallstackSelection(): React.JSX.Element {
           disabled={unfoldCS}
           onClick={() => setUnfoldCS(true)}
         />
-        <Button
-          label='Selected only'
-          title='Show selected callstacks only'
-          disabled={!showSelectedOnly && (!selected || selected.length === 0)}
-          selected={showSelectedOnly}
-          onClick={() => setShowSelectedOnly(e => !e)}
-          />
+        <Forms.SelectField label='' state={showState}>
+          <option id={"all"} value={'all'}>Show all</option>
+          <option id={"selected"} value={"selected"}>Selected only</option>
+          <option id={"scope"} value={"scope"}>Scope only</option>
+        </Forms.SelectField>
         {makeBadge(nodes.size)}
         <IconButton
           icon='FILTER'
