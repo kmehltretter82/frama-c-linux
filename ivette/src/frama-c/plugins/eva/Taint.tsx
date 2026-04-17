@@ -60,7 +60,9 @@ function Taints({ taintNames }: { taintNames: string[] }): React.JSX.Element {
   }, [current, setCurrent]);
 
   const onSelection = React.useCallback((v: string) => {
-    if (current.includes(v))
+    if (current.length === 0)
+      setCurrent(taintNames.filter((n) => n !== v));
+    else if (current.includes(v))
       setCurrent(current.filter(n => n !== v));
     else if (current.length === taintNames.length - 1)
       setCurrent([]); // Remove filter instead of selecting all taint names.
