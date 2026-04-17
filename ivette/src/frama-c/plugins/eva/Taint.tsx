@@ -14,7 +14,7 @@ import * as EvaTaint from 'frama-c/plugins/eva/api/taint';
 import { registerSidebar } from 'ivette';
 import * as Toolbars from 'dome/frame/toolbars';
 import { Label } from 'dome/controls/labels';
-import { Checkbox, Button, IconButton } from 'dome/controls/buttons';
+import { Checkbox, IconButton } from 'dome/controls/buttons';
 import * as AnalysisStatus from 'frama-c/plugins/eva/components/AnalysisStatus';
 import { domainsToKeyVal } from 'frama-c/plugins/eva/EvaDefinitions';
 import { SidebarTitle } from 'dome/frame/sidebars';
@@ -88,7 +88,7 @@ function Taints({ taintNames }: { taintNames: string[] }): React.JSX.Element {
 
   return (<>
     <SidebarTitle label='Taints' >
-      <Button
+      <Toolbars.Button
         label="Select All"
         disabled={!hasSelection}
         onClick={() => setCurrent([])}
