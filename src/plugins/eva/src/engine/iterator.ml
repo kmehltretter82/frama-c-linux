@@ -227,23 +227,6 @@ module Make_Dataflow
       let assigns = Ast_info.merge_assigns_from_spec ~warn:false spec in
       lift (Engine.Transfer_specification.treat_statement_assigns ~pos assigns)
 
-  let transfer_assume ~pos (exp : exp) (kind : guard_kind)
-    : transfer_function =
-    let positive = (kind = Then) in
-    lift' (fun s -> Transfer_stmt.assume ~pos s exp positive)
-
-  let transfer_assign ~pos (dest : lval) (exp : exp)
-    : transfer_function =
-    lift' (fun s -> Transfer_stmt.assign ~pos s dest exp)
-
-  let transfer_enter ~pos (block : block) : transfer_function =
-    let vars = block.blocals in
-    if vars = [] then id else lift (Transfer_stmt.enter_scope ~pos vars)
-
-  let transfer_leave ~pos (block : block) : transfer_function =
-    let vars = block.blocals in
-    if vars = [] then id else lift (Transfer_stmt.leave_scope ~pos vars)
-
   let transfer_call ~pos (dest : lval option) (callee : lhost)
       (args : exp list) (key, state : key * state) : (key * state) list =
     let result = Transfer_stmt.call ~pos dest callee args state in
@@ -253,38 +236,33 @@ module Make_Dataflow
     (* Recombine callee partitioning keys with caller key *)
     Partitioning.call_return ~caller:key result.kind result.states
 
-  let transfer_return ~pos (return_exp : exp option) : transfer_function =
-    lift' (Transfer_stmt.return ~pos return_exp)
-
   let transfer_transition ~pos (t : transition) : transfer_function =
+    let local stmt = (stmt, callstack) in (* Local position *)
     match t with
     | Skip ->
       id
     | Return (return_exp,stmt) ->
-      let pos = (stmt, callstack) in
-      transfer_return ~pos return_exp
+      lift' @@ Transfer_stmt.return ~pos:(local stmt) return_exp
     | Guard (exp,kind,_stmt) ->
-      transfer_assume ~pos exp kind
+      let positive = (kind = Then) in
+      lift' @@ fun s -> Transfer_stmt.assume ~pos s exp positive
     | Init (vi, exp, _stmt) ->
-      let transfer state =
-        Engine.Initialization.initialize_local_variable ~pos vi exp state
-      in
-      lift' transfer
+      lift' @@  Engine.Initialization.initialize_local_variable ~pos vi exp
     | Assign (dest, exp, _stmt) ->
-      transfer_assign ~pos dest exp
+      lift' @@ fun s -> Transfer_stmt.assign ~pos s dest exp
     | Call (dest, callee, args, stmt) ->
-      let pos = (stmt, callstack) in
-      transfer_call ~pos dest callee args
+      transfer_call ~pos:(local stmt) dest callee args
     | Asm (_,_,_,stmt) ->
-      let pos = (stmt, callstack) in
-      transfer_asm ~pos
-    | Enter (block) ->
-      transfer_enter ~pos block
+      transfer_asm ~pos:(local stmt)
+    | Enter (block) | Leave (block) when block.blocals = [] ->
+      id
     | Leave (block) when blocks_share_locals fundec.sbody block ->
       (* The variables from the toplevel block will be removed by the caller *)
       id
+    | Enter (block) ->
+      lift @@ Transfer_stmt.enter_scope ~pos block.blocals
     | Leave (block) ->
-      transfer_leave ~pos block
+      lift @@ Transfer_stmt.leave_scope ~pos block.blocals
 
   let transfer_annotations (stmt : stmt) ~(record : bool)
     : state -> state list =
