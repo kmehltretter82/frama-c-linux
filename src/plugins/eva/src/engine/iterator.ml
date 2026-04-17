@@ -264,14 +264,8 @@ module Make_Dataflow
     (* Recombine callee partitioning keys with caller key *)
     Partitioning.call_return ~caller:key result.kind result.states
 
-  let transfer_return ~pos (return_exp : exp option)
-    : transfer_function =
-    (* Deconstruct return statement *)
-    let return_var = match return_exp with
-      | Some {node = Lval {node = Var v, NoOffset}} -> Some v
-      | None -> None
-      | _ -> assert false (* Cil invariant *)
-    in
+  let transfer_return ~pos (return_exp : exp option) : transfer_function =
+    let result_vi = Library_functions.get_retres_vi kf in
     (* Check postconditions *)
     let check_postconditions = fun state ->
       if Eva_utils.skip_specifications kf then
@@ -279,21 +273,21 @@ module Make_Dataflow
       else
         Transfer_logic.check_fct_postconditions kf active_behaviors Normal
           ~pre_state:initial_state ~post_states:[state]
-          ~result:return_var
+          ~result:result_vi
     (* Assign the return value *)
     and assign_retval =
       match return_exp with
       | None -> fun state -> [state]
       | Some return_exp ->
-        let vi_ret = Option.get (Library_functions.get_retres_vi kf) in
-        let return_lval = Eva_ast.Build.var vi_ret in
+        let result_vi = Option.get result_vi in
+        let return_lval = Eva_ast.Build.var result_vi in
         fun state ->
           let kind = Abstract_domain.Result kf in
-          let state = Domain.enter_scope kind [vi_ret] state in
+          let state = Domain.enter_scope kind [result_vi] state in
           let state' = Transfer_stmt.assign ~pos state return_lval return_exp in
           Bottom.to_list state'
     in
-    sequence (lift'' check_postconditions) (lift'' assign_retval)
+    sequence (lift'' assign_retval) (lift'' check_postconditions)
 
   let transfer_transition ~pos (t : transition) : transfer_function =
     match t with
