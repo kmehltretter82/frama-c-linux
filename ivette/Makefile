@@ -7,11 +7,11 @@
 ##########################################################################
 
 # --------------------------------------------------------------------------
-APP=Ivette
+APP=Frama-C GUI
 DOME=./src/dome
 DOME_ARGS=--command $$(dirname $$0)/frama-c
 DOME_DEV=
-DOME_CLI=../bin/ivette
+DOME_CLI=../bin/frama-c-gui
 DOME_API=./src/frama-c
 DOME_CUSTOM_ENTRIES= yes
 COPYRIGHT=CEA LIST / LSL

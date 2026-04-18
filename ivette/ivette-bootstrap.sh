@@ -26,7 +26,7 @@ function InstallHelp()
     echo "  - run 'nvm install 24'"
     echo "  - run 'nvm use 24'"
     echo "  - run 'npm install --global yarn'"
-    echo "  - run 'ivette'"
+    echo "  - run 'frama-c-gui'"
 }
 
 # --------------------------------------------------------------------------
@@ -39,7 +39,7 @@ case $NODEJS in
         echo " - node $NODEJS found"
         ;;
     *)
-        echo "Ivette requires node version 24 or later to be installed."
+        echo "The GUI requires node version 24 or later to be installed."
         echo
         InstallHelp
         exit 1 ;;
@@ -51,7 +51,7 @@ case $YARNJS in
         echo " - yarn $YARNJS found"
         ;;
     *)
-        echo "Ivette requires yarn to be installed."
+        echo "The GUI requires yarn to be installed."
         echo
         InstallHelp
         exit 1
@@ -66,12 +66,12 @@ if [ -f $PREFIX/lib/frama-c/ivette.tgz ]
 then
     echo " - prefix $PREFIX"
 else
-    echo "Ivette archive not found ($PREFIX)"
+    echo "GUI archive not found ($PREFIX)"
     exit 1
 fi
 
 # --------------------------------------------------------------------------
-echo "[2/3] Compiling Ivette"
+echo "[2/3] Compiling GUI"
 # --------------------------------------------------------------------------
 
 IVETTE_TMP_DIR=`mktemp -d`
@@ -102,8 +102,8 @@ rm -fr $IVETTE_TMP_DIR
 rm -f $PREFIX/lib/frama-c/ivette.tgz
 
 # --------------------------------------------------------------------------
-echo "Launching Ivette..."
+echo "Launching GUI..."
 # --------------------------------------------------------------------------
-exec $PREFIX/bin/ivette $*
+exec $PREFIX/bin/frama-c-gui $*
 
 # --------------------------------------------------------------------------

@@ -23,5 +23,5 @@
 */
 
 import * as Dome from 'dome/main';
-Dome.setName('Ivette');
+Dome.setName('Frama-C GUI');
 Dome.start();
