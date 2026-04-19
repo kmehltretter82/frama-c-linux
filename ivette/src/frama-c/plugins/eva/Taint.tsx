@@ -29,7 +29,7 @@ function addTaintMessage(names: string[], remove: () => void): void {
   const pinnedMessageButton =
     <IconButton
       icon='TRASH'
-      title='Remove taint filter: show all taints'
+      title='Clear taint selection: show all taints'
       onClick={remove}
     />;
   const message = names.length === 1
@@ -48,8 +48,8 @@ function delTaintMessage(): void {
 }
 
 function Taints({ taintNames }: { taintNames: string[] }): React.JSX.Element {
-  /* [current] is the set of currently selected taints, when a filter is active.
-     If it is empty, all taints are selected: no filter is active. */
+  /* [current] is the set of currently selected taints. If it is empty, all
+     taints are selected. */
   const [current = [], setCurrent] = useSyncState(EvaTaint.currentTaint);
 
   React.useEffect(() => {
@@ -65,7 +65,8 @@ function Taints({ taintNames }: { taintNames: string[] }): React.JSX.Element {
     else if (current.includes(v))
       setCurrent(current.filter(n => n !== v));
     else if (current.length === taintNames.length - 1)
-      setCurrent([]); // Remove filter instead of selecting all taint names.
+      // [v] was last unselected taint: enforce initial invariant on [current].
+      setCurrent([]);
     else
       setCurrent([...current, v]);
   }, [current, setCurrent, taintNames]);
