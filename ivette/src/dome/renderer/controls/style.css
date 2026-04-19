@@ -321,12 +321,20 @@ meter::-webkit-meter-even-less-good-value  {
 .dome-xCheckbox {
     padding: 0 ;
     margin: 1px 4px ;
+    display: flex ;
+    align-items: center ;
+    border-radius: 4px ;
 }
 
 .dome-xCheckbox input {
     margin-right: 8px ;
     position: relative ;
     left: 2px ;
+}
+
+.dome-control-enabled.dome-xCheckbox:hover {
+    cursor: pointer ;
+    background-color: var(--background-softer) ;
 }
 
 .dome-xRadio-group {
