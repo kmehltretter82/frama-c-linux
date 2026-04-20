@@ -752,6 +752,11 @@
     display: none;
   }
 
+  .dome-xTree-node-visible .dome-xTree-node-container,
+  .dome-xTree-node-visible + .dome-xTree-subtree .dome-xTree-node-container {
+    display: block;
+  }
+
   .dome-xTree-node {
     display: flex;
     flex-direction: row;
