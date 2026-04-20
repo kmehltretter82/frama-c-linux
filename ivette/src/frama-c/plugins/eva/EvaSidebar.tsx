@@ -19,7 +19,7 @@ import EvaTools from './components/Tools';
 import { useStringSettings } from 'dome';
 import * as Toolbar from 'dome/frame/toolbars';
 import { SidebarTitle } from 'dome/frame/sidebars';
-import { TaintsSelection } from './Taint';
+import { TaintSidebar } from './Taint';
 import { CallstackSelection } from './Callstack';
 
 const startComputing = new GlobalState<number>(0);
@@ -297,7 +297,7 @@ export function EvaSideBarSelection(): React.JSX.Element {
     </SidebarTitle>
     <div ref={scrollableArea} className="globals-scrollable-area">
       <div style={selected === "taints" ? {} : { display: 'none' }}>
-        <TaintsSelection />
+        <TaintSidebar />
       </div>
       <div style={selected === "callstacks" ? {} : { display: 'none' }}>
         <CallstackSelection />

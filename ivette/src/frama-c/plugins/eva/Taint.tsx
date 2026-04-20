@@ -136,7 +136,7 @@ function NoTaintsMessage(
   );
 }
 
-function TaintSidebar(): JSX.Element {
+export function TaintSidebar(): JSX.Element {
   const evaDomainsValue = useSyncValue(EvaParams.evaDomains);
   const evaDomains = React.useMemo(
     () => evaDomainsValue ?? 'cvalue',
