@@ -32,7 +32,10 @@ function addTaintMessage(names: string[], remove: () => void): void {
       title='Clear taint selection: show all taints'
       onClick={remove}
     />;
-  const message = names.length === 1
+  const message =
+    names.length === 0
+    ? `No taint is currently shown`
+    : names.length === 1
     ? `Only taint "${names[0]}" is currently shown`
     : `Only taints ${names.map(n => `"${n}"`).join(', ')} are currently shown`;
   const pinnedMessage: Toolbars.PinnedMessage = {
@@ -48,28 +51,23 @@ function delTaintMessage(): void {
 }
 
 function Taints({ taintNames }: { taintNames: string[] }): React.JSX.Element {
-  /* [current] is the set of currently selected taints. If it is empty, all
-     taints are selected. */
-  const [current = [], setCurrent] = useSyncState(EvaTaint.currentTaint);
+  /* [current] is the set of currently selected taints. */
+  const [current = taintNames, setCurrent] =
+    useSyncState(EvaTaint.currentTaints);
 
   React.useEffect(() => {
-    if (current.length > 0)
-      addTaintMessage(current, () => setCurrent([]));
-    else
+    if (current.length === taintNames.length)
       delTaintMessage();
-  }, [current, setCurrent]);
+    else
+      addTaintMessage(current, () => setCurrent(taintNames));
+  }, [current, setCurrent, taintNames]);
 
   const onSelection = React.useCallback((v: string) => {
-    if (current.length === 0)
-      setCurrent(taintNames.filter((n) => n !== v));
-    else if (current.includes(v))
+    if (current.includes(v))
       setCurrent(current.filter(n => n !== v));
-    else if (current.length === taintNames.length - 1)
-      // [v] was last unselected taint: enforce initial invariant on [current].
-      setCurrent([]);
     else
       setCurrent([...current, v]);
-  }, [current, setCurrent, taintNames]);
+  }, [current, setCurrent]);
 
   return (<>
     <SidebarTitle label='Taints' >
@@ -81,7 +79,7 @@ function Taints({ taintNames }: { taintNames: string[] }): React.JSX.Element {
     </SidebarTitle>
     <div className="globals-scrollable-area eva-taint-list">
       {taintNames.map((name) => {
-        const selected = current.length === 0 || current.includes(name);
+        const selected = current.includes(name);
         return (
           <div key={name} className="eva-taint-row">
             <Checkbox
