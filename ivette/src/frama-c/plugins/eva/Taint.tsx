@@ -8,6 +8,7 @@
 
 import React from 'react';
 
+import * as Dome from 'dome';
 import { useSyncState, useSyncValue } from 'frama-c/states';
 import * as EvaParams from 'frama-c/kernel/api/parameters';
 import * as EvaTaint from 'frama-c/plugins/eva/api/taint';
@@ -69,12 +70,20 @@ function Taints({ taintNames }: { taintNames: string[] }): React.JSX.Element {
       setCurrent([...current, v]);
   }, [current, setCurrent]);
 
+  const onContextMenu = React.useCallback(() => {
+    const items: Dome.PopupMenuItem[] = [
+      { label: 'Select all', onClick: () => setCurrent(taintNames) },
+      { label: 'Deselect all', onClick: () => setCurrent([]) }
+    ];
+    Dome.popupMenu(items);
+  }, [setCurrent, taintNames]);
+
   return (<>
     <SidebarTitle label='Taints' >
       <Toolbars.Button
-        label="Select All"
-        disabled={current.length === 0}
-        onClick={() => setCurrent([])}
+        icon= 'TUNINGS'
+        title= 'Configure selection'
+        onClick={() => onContextMenu()}
       />
     </SidebarTitle>
     <div className="globals-scrollable-area eva-taint-list">
