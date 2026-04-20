@@ -594,7 +594,7 @@
   border-radius: 50%;
 }
 
-input:checked + .dome-xSwitch-slider:before {
+.dome-xSwitch input:checked + .dome-xSwitch-slider:before {
   -webkit-transform: translateX(13px);
   -ms-transform: translateX(13px);
   transform: translateX(13px);
