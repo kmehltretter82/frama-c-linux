@@ -32,7 +32,7 @@ interface StatusIconProp {
   status?: Eva.computationStateType;
 }
 
-function StatusIcon(props: StatusIconProp):JSX.Element {
+export function StatusIcon(props: StatusIconProp):JSX.Element {
   const { size, status } = props;
   const infosStatus = evaBasicStatus[status || "undefined"];
 

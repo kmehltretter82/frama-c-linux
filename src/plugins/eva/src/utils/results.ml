@@ -731,10 +731,10 @@ let expr_dependencies expr request =
 
 type taint = Taint_domain.taint = Direct | Indirect | Untainted
 
-let is_tainted ?name zone request =
+let is_tainted ?names zone request =
   let module M = Make () in
   let state = M.get_state request Taint_domain.key Taint_domain.join in
-  Result.map (fun state -> Taint_domain.is_tainted ?name state zone) state
+  Result.map (fun state -> Taint_domain.is_tainted ?names state zone) state
 
 type taint_names_by_kind = Taint_domain.taint_names_by_kind =
   { direct_taint_names: Datatype.String.Set.t;

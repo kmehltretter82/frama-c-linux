@@ -8,99 +8,143 @@
 
 import React from 'react';
 
-import { Item, SidebarTitle } from 'dome/frame/sidebars';
-
-import * as Server from 'frama-c/server';
-import { computationState } from 'frama-c/plugins/eva/api/analysis';
 import { useSyncState, useSyncValue } from 'frama-c/states';
-import { currentTaint, getTaintNames } from 'frama-c/plugins/eva/api/taint';
-import {
-  PinnedMessage, addPinnedMessage, Button, delPinnedMessage
-} from 'dome/frame/toolbars';
-import { Icon } from 'dome/controls/icons';
+import * as EvaParams from 'frama-c/kernel/api/parameters';
+import * as EvaTaint from 'frama-c/plugins/eva/api/taint';
 import { registerSidebar } from 'ivette';
-import { IconButton } from 'dome/controls/buttons';
+import * as Toolbars from 'dome/frame/toolbars';
+import { Label } from 'dome/controls/labels';
+import { Checkbox, IconButton } from 'dome/controls/buttons';
+import * as AnalysisStatus from 'frama-c/plugins/eva/components/AnalysisStatus';
+import { domainsToKeyVal } from 'frama-c/plugins/eva/EvaDefinitions';
+import { SidebarTitle } from 'dome/frame/sidebars';
 
 // --------------------------------------------------------------------------
 // --- Globals selection
 // ---------------------------------------------------------------------
 
-async function getTaints(
-  callback: React.Dispatch<React.SetStateAction<string[]>>
-): Promise<void> {
-  const taints = await Server.send(getTaintNames, null);
-  callback(taints);
-}
-
 const pinnedMessageId = 'EvaFilterTaint';
 
-function addTaintMessage(name: string, remove: () => void): void {
+function addTaintMessage(names: string[], remove: () => void): void {
   const pinnedMessageButton =
     <IconButton
       icon='TRASH'
-      title='Remove taint filter: show all taints'
+      title='Clear taint selection: show all taints'
       onClick={remove}
     />;
-  const pinnedMessage: PinnedMessage = {
+  const message = names.length === 1
+    ? `Only taint "${names[0]}" is currently shown`
+    : `Only taints ${names.map(n => `"${n}"`).join(', ')} are currently shown`;
+  const pinnedMessage: Toolbars.PinnedMessage = {
     id: pinnedMessageId,
-    message: `Only taint "${name}" is currently shown`,
+    message,
     actions: pinnedMessageButton
   };
-  addPinnedMessage(pinnedMessage);
+  Toolbars.addPinnedMessage(pinnedMessage);
 }
 
 function delTaintMessage(): void {
-  delPinnedMessage(pinnedMessageId);
+  Toolbars.delPinnedMessage(pinnedMessageId);
 }
 
-function Taints(): React.JSX.Element {
-  const scrollableArea = React.useRef<HTMLDivElement>(null);
-  const evaStatus = useSyncValue(computationState);
-  const [current, setCurrent] = useSyncState(currentTaint);
-  const [taints, setTaints] = React.useState<string[]>([]);
+function Taints({ taintNames }: { taintNames: string[] }): React.JSX.Element {
+  /* [current] is the set of currently selected taints. If it is empty, all
+     taints are selected. */
+  const [current = [], setCurrent] = useSyncState(EvaTaint.currentTaint);
 
   React.useEffect(() => {
-    if (current)
-      addTaintMessage(current, () => setCurrent(''));
+    if (current.length > 0)
+      addTaintMessage(current, () => setCurrent([]));
     else
       delTaintMessage();
   }, [current, setCurrent]);
 
-  React.useEffect(() => {
-    if(evaStatus === 'computed' || evaStatus === 'aborted')
-      getTaints(setTaints);
-    else
-      setTaints([]);
-  }, [evaStatus]);
-
   const onSelection = React.useCallback((v: string) => {
-    if(v === current) setCurrent('');
-    else setCurrent(v);
-  }, [current, setCurrent]);
+    if (current.length === 0)
+      setCurrent(taintNames.filter((n) => n !== v));
+    else if (current.includes(v))
+      setCurrent(current.filter(n => n !== v));
+    else if (current.length === taintNames.length - 1)
+      // [v] was last unselected taint: enforce initial invariant on [current].
+      setCurrent([]);
+    else
+      setCurrent([...current, v]);
+  }, [current, setCurrent, taintNames]);
 
   return (<>
     <SidebarTitle label='Taints' >
-      <Button
-        label='Select All'
-        disabled={current===''}
-        onClick={() => setCurrent('')}
+      <Toolbars.Button
+        label="Select All"
+        disabled={current.length === 0}
+        onClick={() => setCurrent([])}
       />
     </SidebarTitle>
-    <div ref={scrollableArea} className="globals-scrollable-area">
-      { taints.map((name) =>
-          <Item
-            key={name}
-            title={name}
-            label={name}
-            selected={current === name}
-            onSelection={() => onSelection(name)}
-          >{(current === name || current === '') &&
-              <Icon id='CHECK' kind='positive' />
-          }</Item>
-        )
+    <div className="globals-scrollable-area eva-taint-list">
+      {taintNames.map((name) => {
+        const selected = current.length === 0 || current.includes(name);
+        return (
+          <div key={name} className="eva-taint-row">
+            <Checkbox
+              label={name}
+              title={name}
+              value={selected}
+              onChange={() => onSelection(name)}
+            />
+            { // Orange round marker: this taint is currently shown.
+              selected && <span aria-hidden className="eva-taint-marker" />}
+          </div>
+        );
+      })
       }
     </div>
   </>);
+}
+
+function NoTaintsMessage(
+  { taintDomainEnabled }: { taintDomainEnabled: boolean }
+): React.JSX.Element {
+  const status = taintDomainEnabled ? 'computed' : 'not_computed';
+  const title = taintDomainEnabled
+    ? 'No taint results available.'
+    : 'Taint analysis is disabled.';
+  const message = taintDomainEnabled
+    ? 'Nothing to display about taint analysis.'
+    : 'Enable the taint domain and rerun Eva.';
+
+  return (
+    <div className={"eva-status eva-status-" + status}>
+      <div className="eva-status-content">
+        <div className="eva-status-message">{title}</div>
+        <AnalysisStatus.StatusIcon size={50} status={status} />
+        <Label className="eva-status-timer">{message}</Label>
+      </div>
+    </div>
+  );
+}
+
+function TaintSidebar(): JSX.Element {
+  const evaDomainsValue = useSyncValue(EvaParams.evaDomains);
+  const evaDomains = React.useMemo(
+    () => evaDomainsValue ?? 'cvalue',
+    [evaDomainsValue]
+  );
+  const taintDomainEnabled = React.useMemo(
+    () => Boolean(domainsToKeyVal(evaDomains).taint),
+    [evaDomains]
+  );
+  const taintNamesValue = useSyncValue(EvaTaint.taintNames);
+  const taintNames = React.useMemo(
+    () => taintNamesValue ?? [],
+    [taintNamesValue]
+  );
+
+  return (
+    <AnalysisStatus.EvaReady>
+      {taintNames.length > 0
+        ? <Taints taintNames={taintNames} />
+        : <NoTaintsMessage taintDomainEnabled={taintDomainEnabled} />}
+    </AnalysisStatus.EvaReady>
+  );
 }
 
 registerSidebar({
@@ -108,7 +152,7 @@ registerSidebar({
   label: 'Taints',
   icon: 'DROP.EMPTY',
   title: 'Taints',
-  children: <Taints />
+  children: <TaintSidebar />
 });
 
 // --------------------------------------------------------------------------

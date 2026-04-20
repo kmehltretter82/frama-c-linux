@@ -192,10 +192,11 @@ type taint =
   (** No taint: the given memory zone cannot be modified by the attacker. *)
 
 (** Evaluates the taint of a given memory zone, according to the taint domain.
-    Only consider the taint of the given [name], if any. Otherwise,
+    Only consider the taints of the given [names], if any. Otherwise,
     a memory zone is tainted as soon as it is tainted for at least one taint.
     Returns an error if the taint domain was not enabled. *)
-val is_tainted : ?name:string -> Locations.Zone.t -> request -> taint result
+val is_tainted :
+  ?names:string list -> Locations.Zone.t -> request -> taint result
 
 (** Sets of taint names classified by kind of dependency. *)
 type taint_names_by_kind =

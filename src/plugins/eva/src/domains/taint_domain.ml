@@ -1191,15 +1191,19 @@ let () = Abstractions.Hooks.register interpret_taint_logic
 
 type taint = Direct | Indirect | Untainted
 
-let is_tainted ?name state zone =
+let is_tainted ?(names=[]) state zone =
   let taint_state =
-    match state, name with
+    match state, names with
     | `Top, _ -> LatticeSingleTaint.top
-    | `Value state_map, Some name ->
-      LatticeMultiTaint.find_or_empty name state_map
-    | `Value state_map, None ->
+    | `Value state_map, [] ->
       LatticeMultiTaint.fold (fun _name -> LatticeSingleTaint.join)
         state_map LatticeSingleTaint.empty
+    | `Value state_map, names ->
+      List.fold_left
+        (fun acc name ->
+           LatticeSingleTaint.join acc
+             (LatticeMultiTaint.find_or_empty name state_map))
+        LatticeSingleTaint.empty names
   in
   let { locs_data; locs_control } = taint_state in
   if Zone.intersects zone locs_data then Direct

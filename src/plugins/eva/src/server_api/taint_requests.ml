@@ -31,34 +31,32 @@ module CurrentTaint = struct
   module Info = struct
     let name = "Eva.Taint_requests.CurrentTaint"
     let dependencies = [ Self.state ]
-    let default () = ""
+    let default () = []
   end
 
-  include State_builder.Ref (Datatype.String) (Info)
+  include State_builder.Ref (Datatype.List (Datatype.String)) (Info)
 end
 
 let current_taint_signal =
   States.register_framac_state ~package
     ~name:"currentTaint"
-    ~descr:(Markdown.plain "Name of the currently selected taint, if any")
-    ~data:Data.jstring
+    ~descr:(Markdown.plain "Names of the currently selected taints, if any")
+    ~data:(module Data.Jlist (Data.Jstring))
     (module CurrentTaint)
 
-(* Takes into account the current selected taint. *)
+(* Takes into account the currently selected taints. *)
 let is_tainted zone request =
-  let current_name = CurrentTaint.get () in
-  let name = if current_name = "" then None else Some current_name in
-  Results.is_tainted ?name zone request
+  let names = CurrentTaint.get () in
+  Results.is_tainted ~names zone request
 
 let taint_names_by_kind zone request =
   let open Option.Operators in
   let* names = Results.taint_names_by_kind zone request |> Result.to_option in
-  let current_name = CurrentTaint.get () in
-  if current_name = ""
-  then Some names
-  else
-    let current_name = Datatype.String.Set.of_list [ current_name ] in
-    let restrict = Datatype.String.Set.inter current_name in
+  match CurrentTaint.get () with
+  | [] -> Some names
+  | current_names ->
+    let selected = Datatype.String.Set.of_list current_names in
+    let restrict = Datatype.String.Set.inter selected in
     let direct_taint_names = restrict names.direct_taint_names in
     let indirect_taint_names = restrict names.indirect_taint_names in
     Some { direct_taint_names; indirect_taint_names }
