@@ -17,10 +17,11 @@ type env = {
   context : Access.clause ;
 }
 
-val lvar : env -> logic_var -> (varinfo, domain) Either.t
+val local : map -> Property.t -> env
 
 val lval : map -> lval -> node
 val exp : map -> exp -> node option
 
+val lvar : env -> logic_var -> (varinfo,domain) Either.t
+val tval : env -> term_lval -> (node,domain) Either.t
 val term : env -> term -> domain
-val term_lval : env -> term_lval -> domain

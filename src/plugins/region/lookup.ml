@@ -57,6 +57,9 @@ type env = {
   context : Access.clause ;
 }
 
+let local map ip =
+  { map ; result = None ; formals = Vmap.empty ; context = Access.Prop ip }
+
 let lvar env lv =
   match lv.lv_origin with
   | None -> Either.Right (Memory.add_lvar env.map lv)
@@ -128,6 +131,18 @@ let rec dispatch_lval env lv : (typ * node,domain) Either.t =
     let right d = term_offset env d loffset in
     Either.map ~left ~right @@ lvar env v
 
+and tval env lv : (node,domain) Either.t =
+  Either.map_left snd @@ dispatch_lval env lv
+
+and term_lval env lv : domain =
+  Either.fold ~left:(load env) ~right:Fun.id @@ dispatch_lval env lv
+
+and addr_lval env lv : node =
+  match dispatch_lval env lv with
+  | Left (_,r) -> r
+  | Right _ ->
+    Options.fatal "address of logic value (%a)" Printer.pp_term_lval lv
+
 and addr_offset env r ty = function
   | TNoOffset -> ty,r
   | TModel _ -> Options.not_yet_implemented "Unsupported model fields"
@@ -141,15 +156,6 @@ and term_offset env d = function
   | TModel _ -> Options.not_yet_implemented "Unsupported model fields"
   | TIndex(_,offset) -> term_offset env (Memory.dindex d) offset
   | TField(fd,offset) -> term_offset env (Memory.dfield d fd) offset
-
-and term_lval env lv : domain =
-  Either.fold ~left:(load env) ~right:Fun.id @@ dispatch_lval env lv
-
-and addr_lval env lv : node =
-  match dispatch_lval env lv with
-  | Left (_,r) -> r
-  | Right _ ->
-    Options.fatal "address of logic value (%a)" Printer.pp_term_lval lv
 
 and term env (t : term) : domain =
   match t.term_node with
@@ -182,6 +188,5 @@ and term env (t : term) : domain =
     end
   | TConst _  | TSizeOf _ | TSizeOfE _ | TAlignOf _ | TAlignOfE _
   | Tnull | Tempty_set | Ttypeof _ | Ttype _  | Trange _ -> pure
-[@@ warning "-32"]
 
 (* -------------------------------------------------------------------------- *)
