@@ -283,11 +283,11 @@ export const Checkbox = (props: CheckProps): JSX.Element => {
       title={props.title}
       style={props.style}
       className={baseClass + labelClass}
+      onClick={TRIGGER(callback)}
     >
       <Icon
         id={value ? "CHECKBOX.ON" : "CHECKBOX.OFF"}
         kind={disabled ? "disabled" : "default"}
-        onClick={callback}
       />
       {props.label}
     </label>
