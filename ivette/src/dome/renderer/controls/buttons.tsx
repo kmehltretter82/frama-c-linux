@@ -271,9 +271,13 @@ export interface CheckProps {
   onChange?: (newValue: boolean) => void;
 }
 
-/** Checkbox button. */
-export const Checkbox = (props: CheckProps): JSX.Element => {
-  const { onChange, value = false } = props;
+interface GenericCheckProps extends CheckProps {
+  icon: string;
+}
+
+/** Generic Checkbox button. */
+export const GenericCheckbox = (props: GenericCheckProps): JSX.Element => {
+  const { onChange, value = false, icon } = props;
   const disabled = onChange ? DISABLED(props) : true;
   const callback = onChange && (() => onChange(!value));
   const baseClass = disabled ? CHECKBOX_DISABLED : CHECKBOX_ENABLED;
@@ -286,7 +290,7 @@ export const Checkbox = (props: CheckProps): JSX.Element => {
       onClick={TRIGGER(callback)}
     >
       <Icon
-        id={value ? "CHECKBOX.ON" : "CHECKBOX.OFF"}
+        id={value ? icon + '.ON' : icon + '.OFF'}
         kind={disabled ? "disabled" : "default"}
       />
       {props.label}
@@ -294,28 +298,14 @@ export const Checkbox = (props: CheckProps): JSX.Element => {
   );
 };
 
+/** Checkbox button. */
+export const Checkbox = (props: CheckProps): JSX.Element => {
+  return <GenericCheckbox icon='CHECKBOX' {...props} />;
+};
+
 /** Switch button. */
 export const Switch = (props: CheckProps): JSX.Element => {
-  const { onChange, value } = props;
-  const disabled = onChange ? DISABLED(props) : true;
-  const iconId = props.value ? 'SWITCH.ON' : 'SWITCH.OFF';
-  const onClick = onChange && (() => onChange(!value));
-  const className = classes(
-    'dome-xSwitch',
-    (disabled ? 'dome-control-disabled' : 'dome-control-enabled'),
-    props.className,
-  );
-  return (
-    <label
-      title={props.title}
-      style={props.style}
-      className={className}
-      onClick={TRIGGER(onClick)}
-    >
-      <Icon size={16} id={iconId} />
-      {props.label}
-    </label>
-  );
+  return <GenericCheckbox icon='SWITCH' {...props} />;
 };
 
 // --------------------------------------------------------------------------
