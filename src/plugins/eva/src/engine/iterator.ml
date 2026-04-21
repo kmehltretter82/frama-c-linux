@@ -315,13 +315,8 @@ module Make_Dataflow
 
   (* --- Iteration strategy ---*)
 
-  let process_partitioning_transitions (v1 : vertex) (v2 : vertex)
-      (transition : transition) (flow : flow) : flow =
-    (* Split return *)
-    let flow = match transition with
-      | Return (return_exp, _) -> Partitioning.split_return flow return_exp
-      | _ -> flow
-    in
+  let process_partitioning_transitions
+      (v1 : vertex) (v2 : vertex) (flow : flow) : flow =
     (* Loop transitions *)
     let get_loop v = Option.get (Eva_automata.find_loop automaton v) in
     let enter_loop f v =
@@ -359,7 +354,7 @@ module Make_Dataflow
     let flow =
       Partitioning.transfer (transfer_transition ~pos transition) flow
     in
-    let flow = process_partitioning_transitions v1 v2 transition flow in
+    let flow = process_partitioning_transitions v1 v2 flow in
     if not (Partitioning.is_empty_flow flow) then
       record_fireable e;
     flow
@@ -370,7 +365,7 @@ module Make_Dataflow
 
   let call_statement_callbacks (stmt : stmt) (f : flow) : unit =
     (* TODO: apply on all domains. *)
-    let states = Partitioning.contents f in
+    let states = List.map snd (Partitioning.contents f) in
     let cvalue_states = gather_cvalues states in
     Cvalue_callbacks.apply_statement_hooks callstack stmt cvalue_states
 
@@ -519,20 +514,40 @@ module Make_Dataflow
         Eva_utils.DegenerationPoints.replace s true)
 
   let check_postconditions =
-    let result = Library_functions.get_retres_vi kf in
-    fun state ->
-      let pre_state = initial_state and post_states = [state] in
-      Transfer_logic.check_fct_postconditions
-        kf active_behaviors Normal ~pre_state ~post_states ~result
+    if Eva_utils.skip_specifications kf then
+      fun state -> [state]
+    else
+      let result = Library_functions.get_retres_vi kf in
+      fun state ->
+        let pre_state = initial_state and post_states = [state] in
+        Transfer_logic.check_fct_postconditions
+          kf active_behaviors Normal ~pre_state ~post_states ~result
+
+  (* Returns the list of final states and:
+     - check function post-conditions;
+     - apply split_return partitioning action. *)
+  let return_states () =
+    let return_stmt = Kernel_function.find_return kf in
+    let open Current_loc.Operators in
+    let<> UpdatedCurrentLoc = Cil_datatype.Stmt.loc return_stmt in
+    let final_store = get_vertex_store automaton.return_point in
+    let flow = Partitioning.flow final_store in
+    let flow = Partitioning.transfer (lift'' check_postconditions) flow in
+    let flow =
+      match return_stmt.skind with
+      | Return (return_exp, _) ->
+        let eva_exp = Option.map Eva_ast.translate_exp return_exp in
+        Partitioning.split_return flow eva_exp
+      | _ -> assert false
+    in
+    Partitioning.contents flow
 
   let compute () : (key * state) list =
     if interpreter_mode then
       simulate automaton.entry_point (get_initial_flow ())
     else
       iterate_list automaton.wto;
-    let final_store = get_vertex_store automaton.return_point in
-    let post_states = Partitioning.expanded final_store in
-    List.concat_map (lift'' check_postconditions) post_states
+    return_states ()
 
 
   (* --- Results conversion --- *)

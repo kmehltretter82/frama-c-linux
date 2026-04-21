@@ -100,17 +100,17 @@ struct
 
   (* Accessors *)
 
-  let expanded (s : store) : (key * state) list =
-    Partition.to_list s.store_partition
-
   let smashed (s : store) : state Lattice_bounds.or_bottom =
-    match expanded s with
+    match Partition.to_list s.store_partition with
     | [] -> `Bottom
     | (_k, v1) :: l ->
       let f acc (_k, v) = Domain.join acc v in
       `Value (List.fold_left f v1 l)
 
-  let contents (flow : flow) : state list =
+  let flow (s : store) : flow =
+    Flow.of_partition s.store_partition
+
+  let contents (flow : flow) : (key * state) list =
     Flow.to_list flow
 
   let is_empty_store (s : store) : bool =

@@ -193,7 +193,7 @@ sig
   val empty : t
 
   val initial : state list -> t
-  val to_list : t -> state list
+  val to_list : t -> (key * state) list
   val of_partition : state partition -> t
   val to_partition : t -> state partition
 

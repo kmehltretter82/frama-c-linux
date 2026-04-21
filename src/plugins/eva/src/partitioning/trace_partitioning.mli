@@ -42,9 +42,9 @@ sig
 
   (* --- Accessors --- *)
 
-  val expanded : store -> (Partition.key * state) list
   val smashed : store -> state Lattice_bounds.or_bottom
-  val contents : flow -> state list
+  val flow : store -> flow
+  val contents : flow -> (Partition.key * state) list
   val is_empty_store : store -> bool
   val is_empty_flow : flow -> bool
   val is_empty_tank : tank -> bool
