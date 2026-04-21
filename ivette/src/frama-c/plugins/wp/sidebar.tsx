@@ -40,10 +40,10 @@ function SidebarBlock(props: SidebarBlockProps): JSX.Element {
   const { children, title, titleButtons, foldable = false, ...others } = props;
 
   const [open, setOpen] = React.useState(!foldable);
+  const onClick = (): void => { if (foldable) setOpen(!open); };
 
   const ftitle = title + (open ? '' : ' ...');
   const ititle = foldable ? (open ? 'ANGLE.DOWN' : 'ANGLE.RIGHT') : undefined;
-  const onClick = (): void => { setOpen(!open); };
 
   return (
     <Vbox className={Utils.classes('wp-sidebar-block')} {...others}>
@@ -60,7 +60,6 @@ function SidebarBlock(props: SidebarBlockProps): JSX.Element {
         <Hbox>
           {titleButtons}
         </Hbox>
-
       </Hbox>
       {(!foldable || open) && children}
     </Vbox>
