@@ -85,8 +85,8 @@ function Taints({ taintNames }: { taintNames: string[] }): React.JSX.Element {
   return (<>
     <SidebarTitle label='Taints' >
       <Toolbars.Button
-        icon= 'TUNINGS'
-        title= 'Configure selection'
+        icon='TUNINGS'
+        title='Configure selection'
         onClick={() => onContextMenu()}
       />
     </SidebarTitle>
