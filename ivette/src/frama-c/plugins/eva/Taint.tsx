@@ -101,8 +101,11 @@ function Taints({ taintNames }: { taintNames: string[] }): React.JSX.Element {
               value={selected}
               onChange={() => onSelection(name)}
             />
-            { // Orange round marker: this taint is currently shown.
-              selected && <span aria-hidden className="eva-taint-marker" />}
+            <span
+              aria-hidden
+              className="eva-taint-marker"
+              style={{ visibility: selected ? 'visible' : 'hidden' }}
+            />
           </div>
         );
       })
