@@ -28,7 +28,7 @@ import { clipboard } from 'electron';
 // --------------------------------------------------------------------------
 
 /** Development mode flag */
-export const DEVEL = process.env.NODE_ENV !== 'production';
+export const DEVEL = process.env.NODE_ENV === 'development';
 
 export class Debug {
   moduleName: string;
