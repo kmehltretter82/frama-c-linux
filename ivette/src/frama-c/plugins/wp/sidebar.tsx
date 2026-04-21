@@ -14,6 +14,7 @@ import { Label } from 'dome/controls/labels';
 import { showHelp } from 'dome/help';
 import {
   Checkbox,
+  Switch,
   Button,
   SelectMenu,
   Spinner,
@@ -113,25 +114,17 @@ interface ProverConfig {
 function Prover(props: ProverConfig): JSX.Element {
   const { prover, up, name, version } = props;
   const [checked, setChecked] = React.useState(up);
-
-  const onClick = (): void => {
-    setChecked(!checked);
-    Server.send(WP.setProverState, [prover, !checked]);
+  const onChange = (value: boolean): void => {
+    setChecked(value);
+    Server.send(WP.setProverState, [prover, value]);
   };
-  const icon = checked ? 'SWITCH.ON' : 'SWITCH.OFF';
-  const iconKind = checked ? 'positive' : 'default';
-  const className = Utils.classes('wp-sidebar-prover-label');
   const label = name + ' (' + version + ')';
   return (
-    <Hbox key={prover}>
-      <Icon
-        id={icon}
-        kind={iconKind}
-        onClick={onClick}
-        size={16}
-      />
-      <Label label={label} className={className} />
-    </Hbox>
+    <Switch
+      label={label}
+      value={checked}
+      onChange={onChange}
+    />
   );
 }
 
