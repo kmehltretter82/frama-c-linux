@@ -149,6 +149,7 @@ function CacheSelector(): JSX.Element {
       <SelectMenu
         value={cacheMode}
         onChange={onChange}
+        className="wp-config-field wp-config-select"
       >{options}</SelectMenu>
       <IconButton icon='HELP' title={help} />
     </>
@@ -177,6 +178,7 @@ function InteractiveSelector(): JSX.Element {
       <SelectMenu
         value={inter}
         onChange={onChange}
+        className="wp-config-field wp-config-select"
       >{options}</SelectMenu>
       <IconButton icon='HELP' title={help} />
     </Label>
@@ -205,6 +207,7 @@ function TipSelector(): JSX.Element {
       <SelectMenu
         value={tipMode}
         onChange={onChange}
+        className="wp-config-field wp-config-select"
       >{options}</SelectMenu>
       <IconButton icon='HELP' title={help} />
     </Label>

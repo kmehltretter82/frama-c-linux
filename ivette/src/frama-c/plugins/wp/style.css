@@ -318,6 +318,11 @@
   background: var(--background-interaction);
 }
 
+.wp-config-select {
+  padding: 1px;
+  margin: 0 5px 0 4px;
+}
+
 input.wp-config-spinner:disabled {
   color: var(--text-disabled);
   background: var(--background-profound);
