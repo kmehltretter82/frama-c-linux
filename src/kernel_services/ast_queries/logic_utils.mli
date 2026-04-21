@@ -67,9 +67,13 @@ val is_instance_of: string list -> logic_type -> logic_type -> bool
     source type is a set of pointers, returns a set of elements.
 *)
 val type_of_pointed: logic_type -> logic_type
+[@@deprecated "Use Ast_types.Acsl.pointed instead"]
+[@@migrate { repl = Ast_types.Acsl.pointed }]
 
 (** same as {!type_of_pointed} but for arrays (or set of arrays). *)
 val type_of_array_elem: logic_type -> logic_type
+[@@deprecated "Use Ast_types.Acsl.array_element instead"]
+[@@migrate { repl = Ast_types.Acsl.array_element }]
 
 
 
@@ -138,7 +142,6 @@ val remove_logic_coerce: term -> term
     @before 21.0-Scandium was ambiguous (coercion vs. conversion).
 *)
 val numeric_coerce: logic_type -> term -> term
-(*[@@deprecated "Use Ast_types.Acsl.numeric_coerce instead"]*)
 
 (** {2 Predicates} *)
 
@@ -587,5 +590,5 @@ val type_of_list_elem : logic_type -> logic_type
 [@@migrate { repl = Ast_types.Acsl.list_element }]
 
 val is_same_type : logic_type -> logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_same instead"]
-[@@migrate { repl = Ast_types.Acsl.is_same }]
+[@@deprecated "Cil_datatype.Logic_type_ByName.equal instead"]
+[@@migrate { repl = Cil_datatype.Logic_type_ByName.equal }]

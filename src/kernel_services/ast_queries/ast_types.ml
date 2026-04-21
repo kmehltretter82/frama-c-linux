@@ -640,13 +640,13 @@ module Acsl = struct
     is_logic_ctype is_ptr t
 
   let is_logic_fun t =
-    is_logic_ctype is_ptr t
+    is_logic_ctype is_fun t
 
   let is_logic_fun_ptr t =
-    is_logic_ctype is_ptr t
+    is_logic_ctype is_fun_ptr t
 
   let is_logic_fun_or_ptr t =
-    is_logic_ctype is_ptr t
+    is_logic_ctype is_fun_or_ptr t
 
   let rec is_plain_list = function
     | Ltype ({lt_name = "\\list"},[_]) -> true
@@ -730,13 +730,32 @@ module Acsl = struct
 
   let is_logic f t = plain_or_set (is_logic_ctype f) t
 
+  let pointed =
+    transform_element
+      (fun t ->
+         match unroll_logic t with
+           Ctype ty when is_ptr ty ->
+           Ctype (direct_pointed_type ty)
+         | _ ->
+           Kernel.fatal ~current:true "type %a is not a pointer type"
+             Cil_datatype.Logic_type.pretty t)
+
+  let array_element =
+    transform_element
+      (fun t ->
+         match unroll_logic t with
+           Ctype ty when is_array ty ->
+           Ctype (direct_array_element ty)
+         | _ ->
+           Kernel.fatal ~current:true "type %a is not an array type"
+             Cil_datatype.Logic_type.pretty t)
+
   let rec ctype_of_array_elem t =
     match unroll_logic t with
     | Ctype ty when is_array ty -> direct_array_element ty
     | Ltype ({lt_name = "set"},[t]) -> ctype_of_array_elem t
     | _ ->
-      Kernel.fatal ~current:true "type %a is not a pointer type"
-        (*Cil_printer.pp_logic_type t*)
+      Kernel.fatal ~current:true "type %a is not an array type"
         Cil_datatype.Logic_type.pretty t
 
   let is_logic_array = is_logic is_array
@@ -750,18 +769,6 @@ module Acsl = struct
 
   let is_set t =
     is_plain_set (unroll_logic t)
-
-  (*
-  let pointed =
-    transform_element
-      (fun t ->
-         match unroll_logic t with
-           Ctype ty when is_ptr ty ->
-           Ctype (direct_pointed_type ty)
-         | _ ->
-           Kernel.fatal ~current:true "type %a is not a pointer type"
-             !Cil.pp_logic_type_ref t)
-  *)
 
   let is_logic_char = is_logic is_char
 
@@ -826,62 +833,12 @@ module Acsl = struct
     in
     transform_element plain
 
-  (*let mk_coerce ltyp t =
-    Logic_const.term ~loc:t.term_loc (TCast (true, ltyp, t)) ltyp
-
-  let rec numeric_coerce ltyp t =
-    let oldt = unroll_logic t.term_type in
-    match t.term_node with
-    | TCast (true, lt,e) when Cil.no_op_coerce lt e ->
-      (* coercion hidden by the printer, but still present *)
-      numeric_coerce ltyp e
-    | TConst(LEnum _) | TConst(Integer _) when ltyp = Linteger
-      -> { t with term_type = Linteger }
-    | TConst(LReal _ ) when ltyp = Lreal ->
-      { t with term_type = Lreal }
-    | TCast (false, Ctype ty,e) ->
-      begin match ltyp, unroll_node ty, e.term_node with
-        | Linteger, TInt ik, TConst(Integer(v,_))
-          when Cil.fitsInInt ik v -> { e with term_type = Linteger }
-        | Lreal, TFloat fk, TConst(LReal r)
-          when Cil.isExactFloat fk r -> { e with term_type = Lreal }
-        | Linteger, TInt ik, TConst(LEnum { eival }) ->
-          ( match Cil.constFoldToInt eival with
-            | Some i when Cil.fitsInInt ik i -> { e with term_type = Linteger }
-            | _ -> mk_coerce ltyp t )
-        | _ -> mk_coerce ltyp t
-      end
-    | Trange(a,b) ->
-      let ra = numeric_bound ltyp a in
-      let rb = numeric_bound ltyp b in
-      { t with term_node = Trange(ra,rb) ;
-               term_type = make_set ltyp }
-    | Tunion ts ->
-      { t with term_node = Tunion (List.map (numeric_coerce ltyp) ts) ;
-               term_type = make_set ltyp }
-    | Tinter ts ->
-      { t with term_node = Tinter (List.map (numeric_coerce ltyp) ts) ;
-               term_type = make_set ltyp }
-    | Tcomprehension(t,qs,cond) ->
-      { t with term_node = Tcomprehension (numeric_coerce ltyp t,qs,cond) ;
-               term_type = make_set ltyp }
-    | _ ->
-      if Cil_datatype.Logic_type.equal oldt ltyp then t
-      else mk_coerce ltyp t
-
-  and numeric_bound ltyp = function
-    | None -> None
-    | Some a -> Some (numeric_coerce ltyp a)*)
-
-  let is_same t1 t2 = Cil_datatype.Logic_type_ByName.equal t1 t2
-
   let rec ctype_of_pointed t =
     match unroll_logic t with
       Ctype ty when is_ptr ty -> direct_pointed_type ty
     | Ltype ({lt_name = "set"},[t]) -> ctype_of_pointed t
     | _ ->
       Kernel.fatal ~current:true "type %a is not a pointer type"
-        (* Cil_printer.pp_logic_type t *)
         Cil_datatype.Logic_type.pretty t
 
   let rec arithmetic_conversion ty1 ty2 =
@@ -909,7 +866,6 @@ module Acsl = struct
       Kernel.fatal
         ~current:true
         "arithmetic conversion between non arithmetic types %a and %a"
-        (*Cil_printer.pp_logic_type ty1 Cil_printer.pp_logic_type ty2*)
         Cil_datatype.Logic_type.pretty ty1 Cil_datatype.Logic_type.pretty ty2
 end
 

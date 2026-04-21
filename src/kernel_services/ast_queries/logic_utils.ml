@@ -61,26 +61,6 @@ let is_instance_of vars t1 t2 =
 (** {1 From C to logic}*)
 (* ************************************************************************* *)
 
-let type_of_array_elem =
-  Ast_types.Acsl.transform_element
-    (fun t ->
-       match Ast_types.Acsl.unroll_logic t with
-         Ctype ty when Ast_types.is_array ty ->
-         Ctype (Ast_types.direct_array_element ty)
-       | _ ->
-         Kernel.fatal ~current:true "type %a is not an array type"
-           !Cil.pp_logic_type_ref t)
-
-let type_of_pointed =
-  Ast_types.Acsl.transform_element
-    (fun t ->
-       match Ast_types.Acsl.unroll_logic t with
-         Ctype ty when Ast_types.is_ptr ty ->
-         Ctype (Ast_types.direct_pointed_type ty)
-       | _ ->
-         Kernel.fatal ~current:true "type %a is not a pointer type"
-           !Cil.pp_logic_type_ref t)
-
 let plain_array_to_ptr ty =
   let open Current_loc.Operators in
   match Ast_types.Acsl.unroll_logic ty with
@@ -778,7 +758,7 @@ let is_same_attributes l1 l2 = is_same_list is_same_attribute l1 l2
 
 let is_same_var v1 v2 =
   v1.lv_name = v2.lv_name &&
-  Ast_types.Acsl.is_same v1.lv_type v2.lv_type &&
+  Cil_datatype.Logic_type_ByName.equal v1.lv_type v2.lv_type &&
   is_same_attributes v1.lv_attr v2.lv_attr
 
 let compare_var v1 v2 =
@@ -789,7 +769,7 @@ let compare_var v1 v2 =
 
 let is_same_logic_signature l1 l2 =
   l1.l_var_info.lv_name = l2.l_var_info.lv_name &&
-  is_same_opt Ast_types.Acsl.is_same l1.l_type l2.l_type &&
+  is_same_opt Cil_datatype.Logic_type_ByName.equal l1.l_type l2.l_type &&
   is_same_list is_same_string l1.l_tparams l2.l_tparams &&
   is_same_list is_same_var l1.l_profile l2.l_profile &&
   is_same_list is_same_logic_label l1.l_labels l2.l_labels
@@ -813,12 +793,12 @@ let compare_logic_signature l1 l2 =
 
 let is_same_logic_profile l1 l2 =
   l1.l_var_info.lv_name = l2.l_var_info.lv_name &&
-  is_same_list (fun v1 v2 -> Ast_types.Acsl.is_same v1.lv_type v2.lv_type)
+  is_same_list (fun v1 v2 -> Cil_datatype.Logic_type_ByName.equal v1.lv_type v2.lv_type)
     l1.l_profile l2.l_profile
 
 let is_same_builtin_profile l1 l2 =
   l1.bl_name = l2.bl_name &&
-  is_same_list (fun (_,t1) (_,t2) -> Ast_types.Acsl.is_same t1 t2)
+  is_same_list (fun (_,t1) (_,t2) -> Cil_datatype.Logic_type_ByName.equal t1 t2)
     l1.bl_profile l2.bl_profile
 
 let is_qualified a =
@@ -836,7 +816,7 @@ let remove_logic_function = Logic_env.remove_logic_info_gen is_same_logic_profil
 let is_same_logic_ctor_info ci1 ci2 =
   ci1.ctor_name = ci2.ctor_name &&
   ci1.ctor_type.lt_name =  ci2.ctor_type.lt_name &&
-  is_same_list Ast_types.Acsl.is_same ci1.ctor_params ci2.ctor_params
+  is_same_list Cil_datatype.Logic_type_ByName.equal ci1.ctor_params ci2.ctor_params
 
 let compare_logic_ctor_info ci1 ci2 =
   let res = String.compare ci1.ctor_name ci2.ctor_name in
@@ -901,7 +881,7 @@ let rec is_same_term t1 t2 =
   | TBinOp(o1,l1,r1), TBinOp(o2,l2,r2) ->
     is_same_binop o1 o2 && is_same_term l1 l2 && is_same_term r1 r2
   | TCast (b1, ty1,t1), TCast (b2, ty2,t2) ->
-    b1 = b2 && Ast_types.Acsl.is_same ty1 ty2 && is_same_term t1 t2
+    b1 = b2 && Cil_datatype.Logic_type_ByName.equal ty1 ty2 && is_same_term t1 t2
   | TAddrOf l1, TAddrOf l2 -> is_same_tlval l1 l2
   | TStartOf l1, TStartOf l2 -> is_same_tlval l1 l2
   | Tapp(f1,labels1, args1), Tapp(f2, labels2, args2) ->
@@ -1112,7 +1092,7 @@ let is_same_spec spec1 spec2 =
 let is_same_logic_type_def d1 d2 =
   match d1,d2 with
     LTsum l1, LTsum l2 -> is_same_list is_same_logic_ctor_info l1 l2
-  | LTsyn ty1, LTsyn ty2 -> Ast_types.Acsl.is_same ty1 ty2
+  | LTsyn ty1, LTsyn ty2 -> Cil_datatype.Logic_type_ByName.equal ty1 ty2
   | (LTsyn _ | LTsum _), _ -> false
 
 let is_same_logic_type_info t1 t2 =
@@ -1156,7 +1136,7 @@ let is_same_code_annotation (ca1:code_annotation) (ca2:code_annotation) =
 let is_same_model_info mi1 mi2 =
   mi1.mi_name = mi2.mi_name &&
   is_same_c_type mi1.mi_base_type mi2.mi_base_type &&
-  Ast_types.Acsl.is_same mi1.mi_field_type mi2.mi_field_type &&
+  Cil_datatype.Logic_type_ByName.equal mi1.mi_field_type mi2.mi_field_type &&
   is_same_attributes mi1.mi_attr mi2.mi_attr
 
 let rec is_same_global_annotation ga1 ga2 =
@@ -2316,8 +2296,8 @@ let pointer_comparable ?loc ?(label=Logic_const.here_label) t1 t2 =
       List.find
         (function
           | { l_profile = [v1; v2] } ->
-            Ast_types.Acsl.is_same v1.lv_type ty1 &&
-            Ast_types.Acsl.is_same v2.lv_type ty2
+            Cil_datatype.Logic_type_ByName.equal v1.lv_type ty1 &&
+            Cil_datatype.Logic_type_ByName.equal v2.lv_type ty2
           | _ -> false) preds
     with Not_found ->
       Kernel.fatal "built-in predicate \\pointer_comparable not found"
@@ -2693,6 +2673,10 @@ let type_of_set_elem = Ast_types.Acsl.set_element
 
 let type_of_list_elem = Ast_types.Acsl.list_element
 
+let type_of_pointed = Ast_types.Acsl.pointed
+
+let type_of_array_elem = Ast_types.Acsl.array_element
+
 let isLogicType = Ast_types.Acsl.is_logic
 
 (** true if the type is a C array (or a set of)*)
@@ -2712,4 +2696,4 @@ let logicCType = Ast_types.Acsl.logic_ctype
 
 let logic_type_remove_qualifiers = Ast_types.Acsl.remove_qualifiers
 
-let is_same_type = Ast_types.Acsl.is_same
+let is_same_type = Cil_datatype.Logic_type_ByName.equal

@@ -219,7 +219,7 @@ let lift_set f loc =
         { t with term_node = TCast (true, nset, t); term_type = nset }
       in
       (* see whether we have to coerce the set type itself. *)
-      if Ast_types.Acsl.is_same oset nset then singleton_coerce
+      if Cil_datatype.Logic_type_ByName.equal oset nset then singleton_coerce
       else { loc with term_node = TCast (true, oset, singleton_coerce) }
     (* if we a term of type set, try to apply f to each
        element of x by using a comprehension, and see whether we can get
@@ -545,7 +545,7 @@ let get_importer = Extensions.importer
 let mk_mem ?loc t ofs =
   lift_set
     (fun t -> term ?loc (TLval (plain_mk_mem ?loc t ofs))
-        (type_of_pointed t.term_type))
+        (Ast_types.Acsl.pointed t.term_type))
     t
 
 let is_enum_cst e t =
@@ -588,7 +588,7 @@ let typing_error loc =
 
 let location_to_char_ptr t =
   let convert_one_location t =
-    let ptd_type = type_of_pointed t.term_type in
+    let ptd_type = Ast_types.Acsl.pointed t.term_type in
     if Ast_types.Acsl.is_logic_char ptd_type then
       logic_coerce (Ast_types.Acsl.make_set t.term_type) t
     else if Ast_types.Acsl.is_logic_void ptd_type then
@@ -696,7 +696,7 @@ let rec mk_cast_conf integral_cast
     | ty1, Ltype({lt_name="set"},[ty2])
       when Ast_types.Acsl.is_pointer ty1 &&
            Ast_types.Acsl.is_plain_pointer ty2 &&
-           Ast_types.Acsl.is_logic_char (type_of_pointed ty2) ->
+           Ast_types.Acsl.is_logic_char (Ast_types.Acsl.pointed ty2) ->
       location_to_char_ptr e
     | Ltype({lt_name = "set"},[_]), Ltype({lt_name="set"},[ty2]) ->
       let e = lift_set (fun e -> mk_cast e ty2) e in
@@ -1557,7 +1557,7 @@ struct
     | t1, Ltype ({lt_name = "set"},[t2]) when
         Ast_types.Acsl.is_pointer t1 &&
         Ast_types.Acsl.is_plain_pointer t2 &&
-        Ast_types.Acsl.is_logic_char (type_of_pointed t2) ->
+        Ast_types.Acsl.is_logic_char (Ast_types.Acsl.pointed t2) ->
       nt, location_to_char_ptr oterm
     (* can convert implicitly a singleton into a set,
        but not the reverse. *)
@@ -2932,7 +2932,7 @@ struct
       if not (isLogicPointer t) then
         ctxt.error loc "%a is not a pointer" Cil_printer.pp_term t;
       let t = mk_logic_pointer_or_StartOf t in
-      let struct_type = type_of_pointed t.term_type in
+      let struct_type = Ast_types.Acsl.pointed t.term_type in
       let f_ofs, f_type = type_of_field loc f struct_type in
       let f_type =
         if env.Lenv.keep_qualifiers then f_type
@@ -2951,7 +2951,7 @@ struct
             (* memory access need a current label to have some semantics *)
             let t1 = mk_logic_pointer_or_StartOf t1 in
             check_non_void_ptr t1.term_loc t1.term_type;
-            let typ = type_of_pointed t1.term_type in
+            let typ = Ast_types.Acsl.pointed t1.term_type in
             let typ =
               if env.Lenv.keep_qualifiers then typ
               else Ast_types.Acsl.remove_qualifiers typ
@@ -2964,7 +2964,7 @@ struct
           (* memory access need a current label to have some semantics *)
           let t2 = mk_logic_pointer_or_StartOf t2 in
           check_non_void_ptr t2.term_loc t2.term_type;
-          let typ = type_of_pointed t2.term_type in
+          let typ = Ast_types.Acsl.pointed t2.term_type in
           let typ =
             if env.Lenv.keep_qualifiers then typ
             else Ast_types.Acsl.remove_qualifiers typ
@@ -2974,11 +2974,11 @@ struct
         else if (* purely logical array access. *)
           Ast_types.Acsl.is_logic_array t1.term_type && Ast_types.Acsl.is_integral_type t2.term_type
         then
-          mk_logic_access env t1, t2, type_of_array_elem t1.term_type
+          mk_logic_access env t1, t2, Ast_types.Acsl.array_element t1.term_type
         else if
           Ast_types.Acsl.is_logic_array t2.term_type && Ast_types.Acsl.is_integral_type t1.term_type
         then
-          mk_logic_access env t2, t1, type_of_array_elem t2.term_type
+          mk_logic_access env t2, t1, Ast_types.Acsl.array_element t2.term_type
         else (* error *)
         if Ast_types.Acsl.is_logic_array t1.term_type || Ast_types.Acsl.is_logic_array t2.term_type
         then ctxt.error loc "subscript is not an integer range"
@@ -3280,7 +3280,7 @@ struct
       | TAddrOf lv when Ast_types.Acsl.is_fun_ptr t.term_type ->
         f lv
           { t with
-            term_type = type_of_pointed t.term_type;
+            term_type = Ast_types.Acsl.pointed t.term_type;
             term_node = TLval lv }
       | _ -> C.error t.term_loc "not a left value: %a"
                Cil_printer.pp_term t
@@ -3293,7 +3293,7 @@ struct
       | TAddrOf lv when Ast_types.Acsl.is_fun_ptr t.term_type ->
         f lv
           { t with
-            term_type = type_of_pointed t.term_type;
+            term_type = Ast_types.Acsl.pointed t.term_type;
             term_node = TLval lv }
       | TLval lv
       | TCast (true, _,{term_node = TLval lv })

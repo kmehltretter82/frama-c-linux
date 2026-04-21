@@ -330,33 +330,28 @@ val array_elem_type_and_size : typ -> typ * exp option
 
 
 (* ************************************************************************* *)
-(** {2 Logic Type checkers} *)
+(** {2 Logic Types} *)
 (* ************************************************************************* *)
 
-
-(* ************************************************************************* *)
-(** {2 Logic Type utilities} *)
-(* ************************************************************************* *)
-
-(** @since Frama-C+dev *)
+(** This module contains all functions related to logic types
+    @since Frama-C+dev
+*)
 module Acsl : sig
+
+  (** @before Frama-C+dev these functions were in {!Logic_const} *)
 
   (** instantiate type variables in a logic type.
       @before 18.0-Argon was in {!Logic_utils}
-      @before Frama-C+dev was in {!Logic_const}
   *)
   val instantiate:
     (string * logic_type) list ->
     logic_type -> logic_type
 
-  (** @return [true] if the logic type definition can be expanded.
-      @before Frama-C+dev was in {!Logic_const}
-  *)
+  (** @return [true] if the logic type definition can be expanded. *)
   val is_unrollable_ltdef : logic_type_info -> bool
 
   (** expands logic type definitions only.
       To expands both logic part and C part, uses {!Ast_types.Acsl.unroll_logic}.
-      @before Frama-C+dev was in {!Logic_const}
   *)
   val unroll_ltdef: logic_type -> logic_type
 
@@ -401,7 +396,6 @@ module Acsl : sig
 
   (** [is_logic_ctype test typ] is [false] for pure logic types and the result
       of test for C types.
-      @before Frama-C+dev was in {!Logic_const}
   *)
   val is_logic_ctype: (typ -> bool) -> logic_type -> bool
 
@@ -425,201 +419,149 @@ module Acsl : sig
   *)
   val is_logic_fun_or_ptr: logic_type -> bool
 
-  (** returns [true] if the type is a list<t>.
-      @before Frama-C+dev was in {!Logic_const}
-  *)
+  (** returns [true] if the type is a list<t>. *)
   val is_plain_list: logic_type -> bool
 
-  (** [make_list t] returns the type list<[t]>.
-      @before Frama-C+dev was in {!Logic_const}
-  *)
+  (** [make_list t] returns the type list<[t]>. *)
   val make_list: logic_type -> logic_type
 
   (** returns the type of elements of a list type.
       @raise Failure if the input type is not a list type.
-      @before Frama-C+dev was in {!Logic_const}
   *)
   val list_element: logic_type -> logic_type
 
-  (** returns [true] if the type is a set<t>.
-      @before Frama-C+dev was in {!Logic_const}
-  *)
+  (** returns [true] if the type is a set<t>. *)
   val is_plain_set: logic_type -> bool
 
   (** converts a type into the corresponding set type if needed. Does nothing
       if the argument is already a set type.
-      @before Frama-C+dev was in {!Logic_const}
   *)
   val make_set: logic_type -> logic_type
 
   (** [set_conversion ty1 ty2] returns a set type as soon as [ty1] and/or [ty2]
       is a set. Elements have type [ty1], or the type of the elements of [ty1] if
       it is itself a set-type (i.e. we do not build set of sets that way).
-      @before Frama-C+dev was in {!Logic_const}
   *)
   val set_conversion: logic_type -> logic_type -> logic_type
 
   (** returns the type of elements of a set type.
       @raise Failure if the input type is not a set type.
-      @before Frama-C+dev was in {!Logic_const}
   *)
   val set_element: logic_type -> logic_type
 
   (** [plain_or_set f t] applies [f] to [t] or to the type of elements of [t]
       if it is a set type.
-      @before Frama-C+dev was in {!Logic_const}
   *)
   val plain_or_set: (logic_type -> 'a) -> logic_type -> 'a
 
   (** [transform_element f t] is the same as
       [set_conversion (plain_or_set f t) t]
-      @before Frama-C+dev was in {!Logic_const}
   *)
-   val transform_element: (logic_type -> logic_type) -> logic_type -> logic_type
+  val transform_element: (logic_type -> logic_type) -> logic_type -> logic_type
 
-  (** [true] if the argument is not a set type.
-      @before Frama-C+dev was in {!Logic_const}
-   *)
+  (** [true] if the argument is not a set type. *)
   val is_plain: logic_type -> bool
 
   (** [make_arrow args rt] returns a [rt] if [args] is empty or the
       corresponding [Larrow] type.
-      @before Frama-C+dev was in {!Logic_const}
   *)
   val make_arrow: logic_var list -> logic_type -> logic_type
 
-  (** @return true if the argument is the boolean type.
-      @before Frama-C+dev was in {!Logic_const}
-  *)
+  (** @return true if the argument is the boolean type. *)
   val is_boolean: logic_type -> bool
 
+
   (** {3 tests and extraction of element type}
-      @before 31.0-Gallium these function were in {!Logic_typing}
+      @before Frama-C+dev these functions were in {!Logic_utils}
   *)
 
   (** {4 tests for an individual (non set) type}
-      [plain_xxx t] returns [true] iff [t] is a [xxx]
+      [is_plain_xxx t] returns [true] iff [t] is a [xxx]
       @before 31.0-Gallium these functions were not exported
   *)
 
-  (** @before Frama-C+dev was in {!Logic_utils} *)
   val is_plain_arithmetic: Cil_types.logic_type -> bool
 
-  (** @before Frama-C+dev was in {!Logic_utils} *)
   val is_plain_integral: Cil_types.logic_type -> bool
 
-  (** @before Frama-C+dev was in {!Logic_utils} *)
   val is_plain_fun_ptr: Cil_types.logic_type -> bool
 
-  (** @before Frama-C+dev was in {!Logic_utils} *)
   val is_plain_array: Cil_types.logic_type -> bool
 
-  (** @before Frama-C+dev was in {!Logic_utils} *)
   val is_plain_pointer: Cil_types.logic_type -> bool
+
 
   (** {4 tests for potential sets}
       [is_xxx t] returns true iff [t] is a [xxx] _or_ a set of [xxx]
   *)
 
-  (** @before Frama-C+dev was in {!Logic_utils} *)
   val is_arithmetic_type: Cil_types.logic_type -> bool
 
-  (** @before Frama-C+dev was in {!Logic_utils} *)
   val is_integral_type: Cil_types.logic_type -> bool
 
-  (** @before Frama-C+dev was in {!Logic_utils} *)
   val is_fun_ptr: Cil_types.logic_type -> bool
 
-  (** @before Frama-C+dev was in {!Logic_utils} *)
   val is_array: Cil_types.logic_type -> bool
 
-  (** @before Frama-C+dev was in {!Logic_utils} *)
   val is_pointer: Cil_types.logic_type -> bool
+
 
   (** {4 sets and lists} *)
 
-  (** @before Frama-C+dev was in {!Logic_utils} *)
   val is_list: Cil_types.logic_type -> bool
 
-  (** @before Frama-C+dev was in {!Logic_utils} *)
   val is_set: Cil_types.logic_type -> bool
+
+
+  (** {4 extract elements} *)
 
   (** returns the type of the element pointed to by the type. If the
       source type is a set of pointers, returns a set of elements.
   *)
-  (* val pointed: logic_type -> logic_type *)
+  val pointed: logic_type -> logic_type
 
-  (** same as {!type_of_pointed} but for arrays (or set of arrays). *)
-  (*val array_element: logic_type -> logic_type*)
+  (** same as {!pointed} but for arrays (or set of arrays). *)
+  val array_element: logic_type -> logic_type
 
-  (** {3 Predefined tests over types} *)
+
+  (** {4 Predefined tests over types} *)
 
   (** [is_logic test typ] is [false] for pure logic types and the result
       of test for C types.
       In case of a set type, the function tests the element type.
-      @before Frama-C+dev was in {!Logic_utils}
   *)
   val is_logic: (typ -> bool) -> logic_type -> bool
 
-  (** @before Frama-C+dev was in {!Logic_utils} *)
   val is_logic_array : logic_type -> bool
 
-  (** @before Frama-C+dev was in {!Logic_utils} *)
   val is_logic_char : logic_type -> bool
 
-  (** @before Frama-C+dev was in {!Logic_utils}
-  *)
   val is_logic_any_char : logic_type -> bool
 
-  (** @before Frama-C+dev was in {!Logic_utils} *)
   val is_logic_void : logic_type -> bool
 
-  (** @before Frama-C+dev was in {!Logic_utils} *)
   val is_logic_pointer : logic_type -> bool
 
-  (** @before Frama-C+dev was in {!Logic_utils} *)
   val is_logic_void_pointer : logic_type -> bool
 
-  (** {3 Type conversions} *)
+
+  (** {4 Type conversions} *)
 
   (** @return the equivalent C type.
       @raise Failure if the type is purely logical
-      @before Frama-C+dev was in {!Logic_utils}
   *)
   val logic_ctype : logic_type -> typ
 
-  (** transforms an array into pointer. *)
-  (* val array_to_ptr : logic_type -> logic_type *)
-
-  (** removes qualifiers if logic_type is a C type, identity otherwise.
-      @before Frama-C+dev was in {!Logic_utils}
-  *)
+  (** removes qualifiers if logic_type is a C type, identity otherwise. *)
   val remove_qualifiers: logic_type -> logic_type
 
-  (** [numeric_coerce typ t] returns a term with the same value as [t]
-      and of type [typ].  [typ] which should be [Linteger] or
-      [Lreal]. [numeric_coerce] tries to avoid unnecessary type conversions
-      in [t]. In particular, [numeric_coerce (int)cst Linteger], where [cst]
-      fits in int will be directly [cst], without any coercion.
 
-      Also coerce recursively the sub-terms of t-set expressions
-      (range, union, inter and comprehension) and lift the associated
-      set type.
+  (** @before Frama-C+dev these functions were in {!Logic_typing} *)
 
-      @before 21.0-Scandium was ambiguous (coercion vs. conversion).
-  *)
-  (*val numeric_coerce: logic_type -> term -> term*)
-
-  (** @before Frama-C+dev was in {!Logic_utils} *)
-  val is_same : logic_type -> logic_type -> bool
-
-  (** @before Frama-C+dev was in {!Logic_typing} *)
   val ctype_of_pointed: logic_type -> typ
 
-  (** @before Frama-C+dev was in {!Logic_typing} *)
   val ctype_of_array_elem: logic_type -> typ
 
-  (** @before Frama-C+dev was in {!Logic_typing} *)
   val arithmetic_conversion:
     Cil_types.logic_type -> Cil_types.logic_type -> Cil_types.logic_type
 end

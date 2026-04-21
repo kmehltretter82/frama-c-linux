@@ -344,7 +344,7 @@ let extract_quantifiers_from_arg ~loc arg =
           eliminate_ranges_from_index_of_toffset ~loc toffset
         in
         let lty_noset =
-          Logic_utils.type_of_pointed @@
+          Ast_types.Acsl.pointed @@
           if Ast_types.Acsl.is_plain_set arg.term_type then
             Ast_types.Acsl.set_element arg.term_type
           else

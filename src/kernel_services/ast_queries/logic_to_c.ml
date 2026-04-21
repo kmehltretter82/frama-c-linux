@@ -123,7 +123,7 @@ and loc_to_exp ?result {term_node = lnode ; term_type = ltype; term_loc = loc} =
   | TCast (true, set, t)
     when
       Ast_types.Acsl.is_plain_set set &&
-      Ast_types.Acsl.is_same
+      Cil_datatype.Logic_type_ByName.equal
         (Ast_types.Acsl.set_element set) t.term_type ->
     loc_to_exp ?result t
   | Tnull -> [ Cil.mkCast ~newt:(Cil_const.voidPtrType) (Cil.zero ~loc) ]
@@ -152,7 +152,7 @@ let rec loc_to_lval ?result t =
   *)
   | TCast (true, set, t) when
       Ast_types.Acsl.is_set set &&
-      Ast_types.Acsl.is_same
+      Cil_datatype.Logic_type_ByName.equal
         (Ast_types.Acsl.set_element set) t.term_type ->
     loc_to_lval ?result t
   | Tinter _ -> error_lval() (* TODO *)

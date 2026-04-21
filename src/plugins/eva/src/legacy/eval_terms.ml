@@ -1219,7 +1219,7 @@ let rec eval_term ~alarm_mode env t =
        if Ast_types.Acsl.is_boolean ltyp
        && Ast_types.Acsl.is_integral_type t.term_type
        then cast_to_bool r
-       else if Ast_types.Acsl.is_same ltyp t.term_type then
+       else if Cil_datatype.Logic_type_ByName.equal ltyp t.term_type then
          (* coercion from singleton to set *)
          r
        else
