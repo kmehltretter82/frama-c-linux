@@ -28,6 +28,7 @@ import * as Params from 'frama-c/kernel/api/parameters';
 import * as WP from 'frama-c/plugins/wp/api';
 import * as TIP from './tip';
 
+
 interface SidebarBlockProps extends DivProps {
   title?: string;
   titleButtons?: JSX.Element[];
@@ -45,15 +46,20 @@ function SidebarBlock(props: SidebarBlockProps): JSX.Element {
 
   return (
     <Vbox className={Utils.classes('wp-sidebar-block')} {...others}>
-      <Hbox>
-        {title && <Label
-          label={ftitle}
-          className={Utils.classes('wp-sidebar-block-title')}
-          icon={ititle}
-          onClick={onClick}
-        />}
+      <Hbox className={Utils.classes('wp-sidebar-block-title')}>
+        <Hbox>
+          {title && <Label
+            label={ftitle}
+            icon={ititle}
+            className={Utils.classes('wp-sidebar-block-title-label')}
+            onClick={onClick}
+          />}
+        </Hbox>
         <Hfill />
-        {titleButtons}
+        <Hbox>
+          {titleButtons}
+        </Hbox>
+
       </Hbox>
       {(!foldable || open) && children}
     </Vbox>
@@ -397,7 +403,7 @@ function PropertiesFilter(): JSX.Element {
     <SidebarBlock
       title='Filters'
       titleButtons={
-        [<IconButton icon='HELP' title={help} />]
+        [<IconButton key='help' icon='HELP' title={help} />]
       }
       foldable={true}
     >
@@ -464,7 +470,6 @@ function RTE(): JSX.Element {
           label='Generate'
           value={rte}
           onChange={setRte}
-          className={Utils.classes('wp-sidebar-title-button')}
         />]
       }
       foldable={true}
@@ -499,7 +504,6 @@ function SmokeTests(): JSX.Element {
           label='Generate'
           value={smoke}
           onChange={setSmoke}
-          className={Utils.classes('wp-sidebar-title-button')}
         />]
       }
       foldable={true}

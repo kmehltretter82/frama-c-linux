@@ -12,6 +12,9 @@
 /* --- Panel                                                              --- */
 /* -------------------------------------------------------------------------- */
 
+/* Generic sidebar block */
+/* TODO: extract this to Dome */
+
 .wp-sidebar-block {
   max-width: 100%;
   margin: 4px 0 2px 0;
@@ -20,9 +23,24 @@
   border-radius: 4px;
 }
 
-.wp-sidebar-block-title {
-  font-weight: bolder;
+.wp-sidebar-block-title { /* Probably mergeable with xTitleBar */
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 0px;
+
+  .dome-xBoxes-hbox {
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
 }
+
+.wp-sidebar-block-title-label {
+  font-weight: bolder;
+  margin: 1px 4px;
+}
+
+/* end sidebar block */
 
 .wp-sidebar-prover-label {
   margin-top: 4px ;
@@ -59,16 +77,6 @@
   padding: 2px;
   border-radius: 50%;
   margin: 1px;
-}
-
-.wp-sidebar-title-button {
-  margin: 4px 3px;
-  padding: 0;
-}
-
-.wp-sidebar-title-button input[type="checkbox"] {
-  vertical-align: bottom;
-  margin-bottom: 1px;
 }
 
 /* -------------------------------------------------------------------------- */
