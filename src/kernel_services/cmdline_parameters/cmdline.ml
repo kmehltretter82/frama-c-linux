@@ -1097,7 +1097,7 @@ let print_option_help fmt ~plugin ~group name =
 
 let option_intro short =
   let first =
-    if short <> "" then begin
+    if short <> "kernel" then begin
       let short = "-" ^ short in
       Format.sprintf
         "Most options of the form '%s-option-name'@ and without any \
@@ -1127,8 +1127,7 @@ let sort_groups groups =
 
 let plugin_help shortname =
   let p = Plugin.find shortname in
-  if p.Plugin.name <> "" then begin
-    assert (p.Plugin.short <> "");
+  if p.Plugin.short <> "kernel" then begin
     Log.print_on_output
       (fun fmt ->
          Format.fprintf fmt "@[%s:@ %s@]@\n@[%s:@ %s@]@\n"
@@ -1196,7 +1195,7 @@ let list_plugins () =
     begin fun fmt ->
       List.iter
         (fun p ->
-           if p.Plugin.name <> "" then
+           if p.Plugin.short <> "kernel" then
              print_helpline fmt
                (String.capitalize_ascii p.Plugin.name)
                (Printf.sprintf "%s (-%s-h)" p.Plugin.help p.Plugin.short)

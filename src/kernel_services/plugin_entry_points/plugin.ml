@@ -57,7 +57,6 @@ end
 (* ************************************************************************* *)
 
 let kernel = ref false
-let kernel_ongoing = ref false
 
 let register_kernel =
   let used = ref false in
@@ -69,7 +68,7 @@ let register_kernel =
       used := true
     end
 
-let is_kernel () = !kernel
+let registering_kernel () = !kernel
 
 let share_visible_ref = ref false
 let is_share_visible () = share_visible_ref := true
@@ -98,7 +97,7 @@ let reset_plugin () =
 (** {2 Generic functors} *)
 (* ************************************************************************* *)
 
-let kernel_name = "kernel"
+let kernel_shortname = "kernel"
 
 type plugin =
   { p_name: string;
@@ -110,9 +109,9 @@ let plugins: plugin list ref = ref []
 let cmp_plugins p1 p2 =
   (* the kernel is the smallest plug-in *)
   match p1.p_name, p2.p_name with
-  | s1, s2 when s1 = kernel_name && s2 = kernel_name -> 0
-  | s1, _ when s1 = kernel_name -> -1
-  | _, s2 when s2 = kernel_name -> 1
+  | s1, s2 when s1 = kernel_shortname && s2 = kernel_shortname -> 0
+  | s1, _ when s1 = kernel_shortname -> -1
+  | _, s2 when s2 = kernel_shortname -> 1
   | s1, s2 -> String.compare s1 s2
 let iter_on_plugins f =
   List.iter f (List.sort cmp_plugins !plugins)
@@ -126,19 +125,17 @@ let get_from_shortname s = List.find (fun p -> p.p_shortname = s) !plugins
 
 let check_name s =
   let name_reg = Str.regexp {|^[A-Z]|} in
-  if is_kernel () || Str.string_match name_reg s 0 then ()
+  if Str.string_match name_reg s 0 then ()
   else
     let msg = "name '" ^ s ^ "' must start with an uppercase letter" in
     raise (Invalid_argument msg)
 
 let check_shortname s =
   let shortname_reg = Str.regexp {|^[a-z][a-z0-9]*\([-_][a-z0-9]+\)*$|} in
-  if s = "kernel" then
+  if not (registering_kernel ()) && s = "kernel" then
     let msg = "shortname \"kernel\" is reserved by Frama-C" in
     raise (Invalid_argument msg)
-    (* Kernel's name is the empty string, not "kernel", even if the latter is
-       reserved by Frama-C, so we do not want to check its name. *)
-  else if is_kernel () || Str.string_match shortname_reg s 0 then ()
+  else if Str.string_match shortname_reg s 0 then ()
   else
     let msg =
       "shortname '" ^ s
@@ -195,6 +192,8 @@ module Register
      end) =
 struct
 
+  let is_kernel = P.shortname = "kernel" && registering_kernel ()
+
   let verbose_level = Extlib.mk_fun "verbose_level"
   let debug_level = Extlib.mk_fun "debug_level"
 
@@ -247,7 +246,7 @@ struct
   end
 
   module L =
-    (val if is_kernel ()
+    (val if is_kernel
       then (module Auto_log(Kernel_log))
       else (module Auto_log(Plugin_log))
       : Log_skeleton)
@@ -256,10 +255,9 @@ struct
   let () = List.iter L.register_and_add !default_msg_keys_ref
 
   let plugin =
-    let name = if is_kernel () then kernel_name else P.name in
     let tbl = Hashtbl.create 17 in
     Hashtbl.add tbl empty_string [];
-    { p_name = name; p_shortname = P.shortname; p_help = P.help; p_parameters = tbl }
+    { p_name = P.name; p_shortname = P.shortname; p_help = P.help; p_parameters = tbl }
 
   let add_group ?memo name =
     let parameter_groups = plugin.p_parameters in
@@ -274,7 +272,6 @@ struct
        Cmdline.add_plugin P.name ~short:P.shortname ~help:P.help
      with Invalid_argument s ->
        L.abort "cannot register plug-in `%s': %s" P.name s);
-    kernel_ongoing := is_kernel ();
     plugins := plugin :: !plugins
 
   (* ************************************************************************ *)
@@ -291,8 +288,7 @@ struct
         let parameters = plugin.p_parameters
       end)
 
-  let prefix =
-    if P.shortname = empty_string then "-kernel-" else "-" ^ P.shortname ^ "-"
+  let prefix = "-" ^ P.shortname ^ "-"
 
   let plugin_subpath = match !plugin_subpath_ref with
     | None -> P.shortname
@@ -310,7 +306,6 @@ struct
        end)
   =
   struct
-    let is_kernel = is_kernel () (* the side effect must be applied right now *)
 
     let () =
       Parameter_customize.set_cmdline_stage Cmdline.Extended;
@@ -396,7 +391,6 @@ struct
   =
   struct
     let is_visible = D.is_visible
-    let is_kernel = P.name = ""
 
     let () =
       Parameter_customize.set_cmdline_stage Cmdline.Extended;
@@ -497,13 +491,13 @@ struct
 
   let () = Parameter_customize.set_group help
   let () = Parameter_customize.set_cmdline_stage Cmdline.Exiting
-  let () = if is_kernel () then Parameter_customize.set_module_name "Help"
+  let () = if is_kernel then Parameter_customize.set_module_name "Help"
   module Help =
     False
       (struct
         let option_name = prefix ^ "help"
         let help =
-          if is_kernel () then "help of the Frama-C kernel"
+          if is_kernel then "help of " ^ P.name
           else "help of plug-in " ^ P.name
       end)
   let () =
@@ -516,14 +510,13 @@ struct
     Parameter_customize.set_group group;
     Parameter_customize.do_not_projectify ();
     Parameter_customize.is_reconfigurable ();
-    if is_kernel () then begin
+    if is_kernel then begin
       Parameter_customize.set_cmdline_stage Cmdline.Early;
       Parameter_customize.set_module_name modname;
-      "-" ^ kernel_name ^ "-" ^ optname
-    end else begin
-      Parameter_customize.set_cmdline_stage Cmdline.Extended;
-      prefix ^ optname
     end
+    else
+      Parameter_customize.set_cmdline_stage Cmdline.Extended;
+    prefix ^ optname
 
   let logfile_optname = output_mode "LogToFile" "log"
   module LogToFile = struct
@@ -539,8 +532,7 @@ struct
         (struct
           let option_name = logfile_optname
           let arg_name = "K_1:file_1,..."
-          let help = "copy log messages from " ^
-                     (if is_kernel () then "the Frama-C kernel" else P.name) ^
+          let help = "copy log messages from " ^ P.name ^
                      " to a file. <K> is a combination of these characters:\n\
                       a: ALL messages (equivalent to 'dfiruw')\n\
                       d: debug       e: user or internal error (same as 'iu')\n\
@@ -604,10 +596,7 @@ struct
       ) new_entries
 
   let () =
-    LogToFile.add_set_hook
-      (add_new_listeners
-         (if is_kernel () then kernel_name else P.shortname)
-      )
+    LogToFile.add_set_hook (add_new_listeners P.shortname)
 
   let verbose_optname = output_mode "Verbose" "verbose"
   module Verbose = struct
@@ -617,7 +606,7 @@ struct
         let option_name = verbose_optname
         let arg_name = "n"
         let help =
-          (if is_kernel () then "level of verbosity for the Frama-C kernel"
+          (if is_kernel then "level of verbosity for " ^ P.name
            else "level of verbosity for plug-in " ^ P.name)
           ^ " (default to " ^ string_of_int default ^ ")"
       end)
@@ -631,7 +620,7 @@ struct
       verbose_level := get;
       (* line order below matters *)
       set_range ~min:0 ~max:max_int;
-      if is_kernel () then begin
+      if is_kernel then begin
         Kernel_log.kernel_verbose_atleast_ref := (fun n -> get () >= n);
         begin match !Kernel_log.Verbose_level.value_if_set with
           | None -> ()
@@ -651,7 +640,7 @@ struct
         let option_name = debug_optname
         let arg_name = "n"
         let help =
-          (if is_kernel () then "level of debug for the Frama-C kernel"
+          (if is_kernel then "level of debug for " ^ P.name
            else "level of debug for plug-in " ^ P.name)
           ^ " (default to " ^ string_of_int default ^ ")"
       end)
@@ -665,7 +654,7 @@ struct
       debug_level := get;
       (* line order below matters *)
       set_range ~min:0 ~max:max_int;
-      if is_kernel () then begin
+      if is_kernel then begin
         Kernel_log.kernel_debug_atleast_ref := (fun n -> get () >= n);
         begin match !Kernel_log.Debug_level.value_if_set with
           | None -> ()
@@ -688,7 +677,7 @@ struct
            all categories"
     end)
 
-  let parse_category is_kernel _old_s s =
+  let parse_category _old_s s =
     match Log.parse_category s with
     | Category_help ->
       Cmdline.run_after_exiting_stage
@@ -709,9 +698,7 @@ struct
       in
       List.iter action l
 
-  let () =
-    let is_kernel = is_kernel () in
-    Message_category.add_set_hook (parse_category is_kernel)
+  let () = Message_category.add_set_hook parse_category
 
   let warn_category_optname = output_mode "Warn_key" "warn-key"
   module Warn_category =
@@ -727,7 +714,7 @@ struct
            Defaults to warning."
     end)
 
-  let parse_warn_directives is_kernel _old_s s =
+  let parse_warn_directives _old_s s =
     let set_status (warning, status) =
       if is_kernel && not (L.is_registered_category warning) then
         Cmdline.run_after_extended_stage
@@ -742,9 +729,7 @@ struct
         (fun () -> L.pp_all_warn_categories_status (); raise Cmdline.Exit)
     | Set_status l -> List.iter set_status l
 
-  let () =
-    let is_kernel = is_kernel () in
-    Warn_category.add_set_hook (parse_warn_directives is_kernel)
+  let () = Warn_category.add_set_hook parse_warn_directives
 
   let add_plugin_output_aliases ?visible ?deprecated aliases =
     let aliases = List.filter (fun alias -> alias <> "") aliases in
@@ -784,15 +769,6 @@ let%test _ = _test_valid_name check_shortname "abc"
 let%test _ = _test_valid_name check_shortname "e-acsl"
 let%test _ = _test_valid_name check_shortname "a_long_plug-in_shortname"
 let%test _ = _test_valid_name check_shortname "jessie3"
-
-let _test_kernel_name f =
-  kernel := true;
-  let success = _test_valid_name f "" in
-  kernel := false;
-  success
-
-let%test _ = _test_kernel_name check_name
-let%test _ = _test_kernel_name check_shortname
 
 let%test _ = _test_wrong_name check_name ""
 let%test _ = _test_wrong_name check_name "-"
