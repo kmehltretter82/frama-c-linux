@@ -37,7 +37,7 @@ class visitor = object
 
   method! vglob_aux = function
     | GType (ty,_) ->
-      if not (Cil.is_in_libc (Ast_types.get_attributes ty.ttype)) then
+      if not (Cil.is_in_libc (Ast_types.C.get_attributes ty.ttype)) then
         ty.tname <- Dictionary.fresh Obfuscator_kind.Type ty.tname;
       Cil.DoChildren
     | GVarDecl (v, _) | GVar (v, _, _)
@@ -75,7 +75,7 @@ class visitor = object
     then
       Cil.SkipChildren
     else begin
-      if Ast_types.is_fun vi.vtype then begin
+      if Ast_types.C.is_fun vi.vtype then begin
         if vi.vname <> "main"
         && not (Cil_builtins.is_builtin vi)
         && not (Cil.is_in_libc vi.vattr) then

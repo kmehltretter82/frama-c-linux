@@ -85,7 +85,7 @@ let filter_public_zone =
   let base_is_public base =
     match Base.typeof base with
     | None -> false
-    | Some typ -> Ast_types.has_qualifier public_taint_namespace typ
+    | Some typ -> Ast_types.C.has_qualifier public_taint_namespace typ
   in
   Memory_zone.filter_base base_is_public
 
@@ -747,7 +747,7 @@ module Domain = struct
       state
     else
       let namespace = private_taint_namespace in
-      let is_private vi = Ast_types.has_qualifier namespace vi.vtype in
+      let is_private vi = Ast_types.C.has_qualifier namespace vi.vtype in
       match List.filter is_private vars with
       | [] -> state
       | private_vars ->

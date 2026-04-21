@@ -14,7 +14,7 @@ module Make (Model : IEEE754.Modeling) = struct
   include IEEE754.Make (Model)
 
   let track_variable vi =
-    Ast_types.is_float Cil_types.(vi.vtype)
+    Ast_types.C.is_float Cil_types.(vi.vtype)
 
   let of_scalars fkind l u =
     let Format format = format_of_fkind fkind in

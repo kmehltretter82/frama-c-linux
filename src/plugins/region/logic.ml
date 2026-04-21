@@ -25,7 +25,7 @@ let pointed (d:domain) : node =
 
 (* Load a complete value at l-value lv which has type ty and lives in region r *)
 let rec load env lv (ty,r) : domain =
-  match Ast_types.unroll_node ty with
+  match Ast_types.C.unroll_node ty with
   | TArray(te,_) ->
     let re = Memory.add_index r te in
     let ofs = TIndex (Logic_const.trange (None,None), TNoOffset) in
@@ -55,7 +55,7 @@ let rec add_addr_offset ~loc (env:env) (ty:typ) (r:node) = function
     add_addr_offset ~loc env f.ftype (Memory.add_field r f) offset
   | TIndex(k,offset) ->
     ignore @@ !rterm env k ;
-    let te = Ast_types.direct_array_element ty in
+    let te = Ast_types.C.direct_array_element ty in
     add_addr_offset ~loc env te (Memory.add_index r ty) offset
 
 let rec add_term_offset ~loc (env:env) (d:domain) = function
@@ -83,7 +83,7 @@ let dispatch_term_lval ~loc ?(garbage=false) (env:env) (lv : term_lval) =
   | TVar v ->
     let left x =
         let garbage =
-          garbage && x.vformal && Ast_types.is_struct_or_union x.vtype in
+          garbage && x.vformal && Ast_types.C.is_struct_or_union x.vtype in
         let r = Memory.add_cvar ~garbage env.map x in
       add_addr_offset ~loc  env x.vtype r loffset in
     let right d = add_term_offset ~loc env d loffset in

@@ -274,7 +274,7 @@ let bind_logic_vars env lvs =
     match Ast_types.Acsl.unroll_logic lv.lv_type with
     | Linteger -> bind_logic_var Ival.top
     | Lreal -> bind_logic_var top_float
-    | Ctype ctyp when Ast_types.is_integral ctyp ->
+    | Ctype ctyp when Ast_types.C.is_integral ctyp ->
       let base = Base.of_c_logic_var lv in
       let size = Z.of_int (Cil.bitsSizeOf ctyp) in
       let v = Cvalue.V_Or_Uninitialized.initialized V.top_int in
@@ -493,7 +493,7 @@ let rec isLogicNonCompositeType t =
     (try isLogicNonCompositeType (Ast_types.Acsl.set_element t)
      with Failure _ -> false)
   | Lboolean | Linteger | Lreal -> true
-  | Ctype t -> Ast_types.is_scalar t
+  | Ctype t -> Ast_types.C.is_scalar t
 
 let rec infer_type = function
   | Ctype t ->
@@ -514,7 +514,7 @@ let rec infer_type = function
    differences in integer and floating-point sizes, that are meaningless
    in the logic *)
 let same_etype t1 t2 =
-  match Ast_types.unroll_node t1, Ast_types.unroll_node t2 with
+  match Ast_types.C.unroll_node t1, Ast_types.C.unroll_node t2 with
   | (TInt _ | TEnum _), (TInt _ | TEnum _) -> true
   | TFloat _, TFloat _ -> true
   | TPtr p1, TPtr p2 -> Cil_datatype.Typ.equal p1 p2
@@ -523,7 +523,7 @@ let same_etype t1 t2 =
 (* Returns the kind of floating-point represented by a logic type, or None. *)
 let logic_type_fkind = function
   | Ctype typ -> begin
-      match Ast_types.unroll_node typ with
+      match Ast_types.C.unroll_node typ with
       | TFloat fkind -> Some fkind
       | _ -> None
     end
@@ -533,11 +533,11 @@ let infer_binop_res_type op targ =
   match op with
   | PlusA | MinusA | Mult | Div -> targ
   | PlusPI | MinusPI ->
-    assert (Ast_types.is_ptr targ); targ
+    assert (Ast_types.C.is_ptr targ); targ
   | MinusPP -> Cil_const.intType
   | Mod | Shiftlt | Shiftrt | BAnd | BXor | BOr ->
     (* can only be applied on integral arguments *)
-    assert (Ast_types.is_integral targ); Cil_const.intType
+    assert (Ast_types.C.is_integral targ); Cil_const.intType
   | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr ->
     Cil_const.intType (* those operators always return a boolean *)
 
@@ -764,7 +764,7 @@ let reduce_value_with_truth assume value =
    defined unambiguously in ACSL. *)
 let check_logic_alarms ~alarm_mode typ (_v1: V.t eval_result) op v2 =
   match op with
-  | Div | Mod when Ast_types.is_integral_or_pointer typ ->
+  | Div | Mod when Ast_types.C.is_integral_or_pointer typ ->
     let truth = Cvalue_forward.assume_non_zero v2.eover in
     let division_by_zero = not (is_true truth) in
     track_alarms division_by_zero alarm_mode
@@ -1020,7 +1020,7 @@ let forward_binop typ v1 op v2 =
   match op with
   | Eva_ast.Eq | Ne | Le | Lt | Ge | Gt ->
     let comp = Eva_ast.conv_relation op in
-    if Ast_types.is_ptr typ || Cvalue_forward.are_comparable comp v1 v2
+    if Ast_types.C.is_ptr typ || Cvalue_forward.are_comparable comp v1 v2
     then forward_binop_by_type typ v1 op v2
     else Cvalue.V.zero_or_one
   | _ -> forward_binop_by_type typ v1 op v2
@@ -1062,7 +1062,7 @@ let rec eval_term ~alarm_mode env t =
 
   | TStartOf tlval ->
     let r = eval_tlval ~alarm_mode env tlval in
-    { etype = Cil_const.mk_tptr (Ast_types.direct_array_element r.etype);
+    { etype = Cil_const.mk_tptr (Ast_types.C.direct_array_element r.etype);
       ldeps = r.ldeps;
       eunder = Addresses.Bits.to_bytes_under r.eunder;
       eover = Addresses.Bits.to_bytes r.eover;
@@ -1188,7 +1188,7 @@ let rec eval_term ~alarm_mode env t =
     (* See if the cast does something. If not, we can keep eunder as is.*)
     if is_noop_cast ~src_typ:t.term_type ~dst_typ:typ
     then { r with etype = typ }
-    else if Ast_types.is_bool typ
+    else if Ast_types.C.is_bool typ
     then cast_to_bool r
     else
       let eover = cast ~src_typ:r.etype ~dst_typ:typ r.eover in
@@ -1204,7 +1204,7 @@ let rec eval_term ~alarm_mode env t =
     (match Ast_types.Acsl.plain_or_set Fun.id ltyp with
      | Linteger when Ast_types.Acsl.is_integral_type t.term_type
                   || Ast_types.Acsl.is_boolean t.term_type -> r
-     | Ctype typ when Ast_types.is_integral_or_pointer typ -> r
+     | Ctype typ when Ast_types.C.is_integral_or_pointer typ -> r
      | Lreal ->
        let eover =
          if Ast_types.Acsl.is_integral_type t.term_type
@@ -1393,7 +1393,7 @@ and eval_binop ~alarm_mode env op t1 t2 =
   else
     let r1 = eval_term ~alarm_mode env t1 in
     let r2 = eval_term ~alarm_mode env t2 in
-    let te1 = Ast_types.unroll r1.etype in
+    let te1 = Ast_types.C.unroll r1.etype in
     check_logic_alarms ~alarm_mode te1 r1 op r2;
     let typ_res = infer_binop_res_type op te1 in
     let op = Eva_ast.translate_binop op in
@@ -1738,7 +1738,7 @@ and eval_tlhost ~alarm_mode env lv =
      | None -> no_result ())
   | TMem t ->
     let r = eval_term ~alarm_mode env t in
-    let tres = match Ast_types.unroll_node r.etype with
+    let tres = match Ast_types.C.unroll_node r.etype with
       | TPtr t -> t
       | _ -> ast_error "*p where p is not a pointer"
     in
@@ -1757,7 +1757,7 @@ and eval_toffset ~alarm_mode env typ toffset =
       eover = Ival.zero;
       empty = false; }
   | TIndex (idx, remaining) ->
-    let typ_e, size = match Ast_types.unroll_node typ with
+    let typ_e, size = match Ast_types.C.unroll_node typ with
       | TArray (t, size) -> t, size
       | _ -> ast_error "index on a non-array"
     in
@@ -1797,9 +1797,9 @@ and eval_toffset ~alarm_mode env typ toffset =
       try Ival.of_int (fst (Cil.fieldBitsOffset fi))
       with Cil.SizeOfError _ -> default
     in
-    let attrs = Ast_types.get_attributes typ in
+    let attrs = Ast_types.C.get_attributes typ in
     let attrs = Ast_attributes.filter_qualifiers attrs in
-    let typ_fi = Ast_types.add_attributes attrs fi.ftype in
+    let typ_fi = Ast_types.C.add_attributes attrs fi.ftype in
     let offsrem = eval_toffset ~alarm_mode env typ_fi remaining in
     { etype = offsrem.etype;
       ldeps = offsrem.ldeps;
@@ -2046,7 +2046,7 @@ and reduce_by_valid env positive access (tset: term) =
          (* Compute the offsets, that depend on the type of the lval.
             The computed list is exactly what [aux] requires *)
          let roffs =
-           eval_toffset ~alarm_mode env (Ast_types.direct_pointed_type typ) offs
+           eval_toffset ~alarm_mode env (Ast_types.C.direct_pointed_type typ) offs
          in
          let aux env offs = aux lt env (roffs.etype, offs) in
          aux_min_max_offset aux env roffs.eunder
@@ -2063,7 +2063,7 @@ and reduce_by_valid env positive access (tset: term) =
            with V.Not_based_on_null -> raise Exit
          in
          let li = if op = PlusPI then li else Ival.neg_int li in
-         let typ_p = Ast_types.direct_pointed_type rtlv.etype in
+         let typ_p = Ast_types.C.direct_pointed_type rtlv.etype in
          let sbits = Z.of_int (Cil.bitsSizeOf typ_p) in
          (* Compute the offsets expected by [aux], which are [i *
             8 * sizeof( *tlv)] *)
@@ -2568,7 +2568,7 @@ and eval_predicate env pred =
         match funs with
         | `Top -> Unknown
         | `Value funs ->
-          let typ = Ast_types.direct_pointed_type v.etype in
+          let typ = Ast_types.C.direct_pointed_type v.etype in
           let funs, warn' = Eval_typ.compatible_functions typ funs in
           if warn || warn' then
             (* No function possible -> signal hard error. Otherwise, follow

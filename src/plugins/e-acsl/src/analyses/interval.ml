@@ -409,7 +409,7 @@ let rec infer ~force ~logic_env t =
     | TBinOp (MinusPP, t1, t2) ->
       ignore (recurse t1);
       ignore (recurse t2);
-      (match Ast_types.unroll (get_cty t1) with
+      (match Ast_types.C.unroll (get_cty t1) with
        | { tnode = TArray(_, _) } as ta ->
          begin
            try
@@ -427,7 +427,7 @@ let rec infer ~force ~logic_env t =
     | Tblock_length (_, t)
     | Toffset (_, t) ->
       ignore (recurse t);
-      (match Ast_types.unroll (get_cty t) with
+      (match Ast_types.C.unroll (get_cty t) with
        | { tnode = TArray (_, _) } as ta ->
          begin
            try
@@ -636,7 +636,7 @@ and infer_term_host ~force ~logic_env thost =
   | TMem t ->
     ignore (infer ~force ~logic_env t);
     let ty = Ast_types.Acsl.logic_ctype t.term_type in
-    match Ast_types.unroll_node ty with
+    match Ast_types.C.unroll_node ty with
     | TPtr ty | TArray (ty, _) ->
       interv_of_typ ty
     | _ ->

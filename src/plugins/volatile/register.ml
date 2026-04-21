@@ -44,8 +44,8 @@ let dkey_transformation_visit =
     "transformation-visit"
 
 let has_volatile_attr t =
-  Ast_types.get_attributes t |> Ast_attributes.contains "volatile"
-let add_volatile_attr = Ast_types.add_attributes [ ("volatile", []) ]
+  Ast_types.C.get_attributes t |> Ast_attributes.contains "volatile"
+let add_volatile_attr = Ast_types.C.add_attributes [ ("volatile", []) ]
 
 (* This function replaces spaces in type names.
    Note: A previous version also made sure all characters were either a-z, A-Z or
@@ -178,31 +178,31 @@ module BA_TBL = struct
     Options.debug ~level:2 ~dkey:dkey_binding
       "Verifying prototype of function %s: %a@."
       fct.vorig_name Typ.pretty ty;
-    let not_void_or_varg = not (Ast_types.is_void ret_type || is_varg_arg) in
+    let not_void_or_varg = not (Ast_types.C.is_void ret_type || is_varg_arg) in
     match is_wr_access, args with
     | false, Some [_, arg1, _] when
         not_void_or_varg
-        && Ast_types.is_ptr arg1
-        && Typ.equal (Ast_types.direct_pointed_type arg1) volatile_ret_type
+        && Ast_types.C.is_ptr arg1
+        && Typ.equal (Ast_types.C.direct_pointed_type arg1) volatile_ret_type
       -> true (* matching prototype: T fct (volatile T *arg1) *)
     | false, Some [_, arg1, _] when
         not_void_or_varg
-        && Ast_types.is_ptr arg1
-        && Typ.equal (Ast_types.direct_pointed_type arg1) ret_type
-        && Ast_types.is_volatile ret_type
+        && Ast_types.C.is_ptr arg1
+        && Typ.equal (Ast_types.C.direct_pointed_type arg1) ret_type
+        && Ast_types.C.is_volatile ret_type
       -> true (* matching prototype: T fct (T *arg1) when T has some volatile attr. *)
     | true, Some ((_, arg1, _) :: [_, arg2, _]) when
         not_void_or_varg
-        && Ast_types.is_ptr arg1
+        && Ast_types.C.is_ptr arg1
         && Typ.equal arg2 ret_type
-        && Typ.equal (Ast_types.direct_pointed_type arg1) volatile_ret_type
+        && Typ.equal (Ast_types.C.direct_pointed_type arg1) volatile_ret_type
       -> true (* matching prototype: T fct (volatile T *arg1, T arg2) *)
     | true, Some ((_, arg1, _) :: [_, arg2, _]) when
         not_void_or_varg
-        && Ast_types.is_ptr arg1
+        && Ast_types.C.is_ptr arg1
         && Typ.equal arg2 ret_type
-        && Typ.equal (Ast_types.direct_pointed_type arg1) ret_type
-        && Ast_types.is_volatile ret_type
+        && Typ.equal (Ast_types.C.direct_pointed_type arg1) ret_type
+        && Ast_types.C.is_volatile ret_type
       -> true (* matching prototype: T fct (T *arg1, T arg2) when T has some volatile attr.  *)
     | _, _ ->
       Options.debug ~level:2 ~dkey:dkey_binding
@@ -262,7 +262,7 @@ struct
   let empty = M.empty
 
   let basetype t =
-    let t = Ast_types.unroll_deep t in
+    let t = Ast_types.C.unroll_deep t in
     if Options.Base.get () then
       let rec base t' =
         match t'.tnode with
@@ -271,7 +271,7 @@ struct
         | TFloat f -> Cil_const.mk_tfloat f
         | TEnum e -> Cil_const.mk_tint e.ekind
         | TPtr bt -> Cil_const.mk_tptr (base bt)
-        | _ -> Ast_types.remove_attributes_for_c_cast t'
+        | _ -> Ast_types.C.remove_attributes_for_c_cast t'
       in base t
     else t
 
@@ -292,32 +292,32 @@ module B_MAP = struct
       "Verifying prototype of function %s: %a@."
       fct.vorig_name Typ.pretty ty;
     let result is_wr_access arg1 =
-      Some (is_wr_access, (Ast_types.direct_pointed_type arg1))
+      Some (is_wr_access, (Ast_types.C.direct_pointed_type arg1))
     in
     match args with
     | Some [_, arg1, _] when
-        (not (Ast_types.is_void ret_type || is_varg_arg))
-        && Ast_types.is_ptr arg1
-        && Typ.equal (Ast_types.direct_pointed_type arg1) volatile_ret_type
+        (not (Ast_types.C.is_void ret_type || is_varg_arg))
+        && Ast_types.C.is_ptr arg1
+        && Typ.equal (Ast_types.C.direct_pointed_type arg1) volatile_ret_type
       -> result false arg1 (* matching prototype: T fct (volatile T *arg1) *)
     | Some [_, arg1, _] when
-        (not (Ast_types.is_void ret_type || is_varg_arg))
-        && Ast_types.is_ptr arg1
-        && Typ.equal (Ast_types.direct_pointed_type arg1) ret_type
-        && Ast_types.is_volatile ret_type
+        (not (Ast_types.C.is_void ret_type || is_varg_arg))
+        && Ast_types.C.is_ptr arg1
+        && Typ.equal (Ast_types.C.direct_pointed_type arg1) ret_type
+        && Ast_types.C.is_volatile ret_type
       -> result false arg1 (* matching prototype: T fct (T *arg1) when T has some volatile attr*)
     | Some ((_, arg1, _) :: [_, arg2, _]) when
-        (not (Ast_types.is_void ret_type || is_varg_arg))
-        && Ast_types.is_ptr arg1
+        (not (Ast_types.C.is_void ret_type || is_varg_arg))
+        && Ast_types.C.is_ptr arg1
         && Typ.equal arg2 ret_type
-        && Typ.equal (Ast_types.direct_pointed_type arg1) volatile_ret_type
+        && Typ.equal (Ast_types.C.direct_pointed_type arg1) volatile_ret_type
       -> result true arg1 (* matching prototype: T fct (volatile T *arg1, T arg2) *)
     | Some ((_, arg1, _) :: [_, arg2, _]) when
-        (not (Ast_types.is_void ret_type || is_varg_arg))
-        && Ast_types.is_ptr arg1
+        (not (Ast_types.C.is_void ret_type || is_varg_arg))
+        && Ast_types.C.is_ptr arg1
         && Typ.equal arg2 ret_type
-        && Typ.equal (Ast_types.direct_pointed_type arg1) ret_type
-        && Ast_types.is_volatile ret_type
+        && Typ.equal (Ast_types.C.direct_pointed_type arg1) ret_type
+        && Ast_types.C.is_volatile ret_type
       -> result true arg1 (* matching prototype: T fct (T *arg1, T arg2) when T has some volatile attr *)
     | _ -> Options.warning ~once:true ~wkey:wkey_invalid_binding_function
              "Binding function '%s' has an invalid prototype"
@@ -379,7 +379,7 @@ struct
   [@@warning "-32"]
 
   let of_return r =
-    if Ast_types.is_void r then None else Some (CT.object_of r)
+    if Ast_types.C.is_void r then None else Some (CT.object_of r)
 
   let of_type t : t =
     let r, args, va, _ = Cil.splitFunctionType t in
@@ -416,13 +416,13 @@ struct
       if cmp<>0 then cmp else compare_list p1 p2
 
   let stub vf =
-    if Ast_types.is_fun vf.vtype then
+    if Ast_types.C.is_fun vf.vtype then
       let r, args, va, _ = Cil.splitFunctionTypeVI vf in
       match Cil.argsToList args with
       | (_, tf, _) :: ps ->
         let r = of_return r in
         let ts = List.map (fun (_, ty, _) -> CT.object_of ty) ps in
-        let sp = of_type (Ast_types.direct_pointed_type tf) in
+        let sp = of_type (Ast_types.C.direct_pointed_type tf) in
         let sf = (r, ts, va) in
         if compare sp sf <> 0 then None else Some sf
       | _ -> None
@@ -460,7 +460,7 @@ let get_called_ptr = function
 let get_canonical_call ~source f tf =
   let name =
     match tf.tnode with
-    | TNamed ti when Ast_types.is_fun tf -> ti.torig_name
+    | TNamed ti when Ast_types.C.is_fun tf -> ti.torig_name
     | TFun (r, args, va) ->
       let buffer = Buffer.create 80 in
       Buffer.add_string buffer (Options.BindingPrefix.get ());
@@ -488,7 +488,7 @@ let get_canonical_call ~source f tf =
     None
 
 let get_pointer_call ~index ~source f =
-  let tf = Ast_types.direct_pointed_type (Cil.typeOf f) in
+  let tf = Ast_types.C.direct_pointed_type (Cil.typeOf f) in
   let res = INDEX.find_opt (SIG.of_type tf) index in
   match res with
   | Some _ -> res
@@ -498,7 +498,7 @@ let get_pointer_call ~index ~source f =
     else None
 
 let add_eventual_cast_to_expression lval_typ e =
-  let newt = Ast_types.remove_attributes_for_c_cast lval_typ in
+  let newt = Ast_types.C.remove_attributes_for_c_cast lval_typ in
   let e' = Cil.mkCast ~force:false ~newt e in
   if e' != e then
     Options.warning ~source:(fst e.eloc) ~once:true ~wkey:wkey_cast_insertion
@@ -507,7 +507,7 @@ let add_eventual_cast_to_expression lval_typ e =
   e'
 
 let add_eventual_cast_to_param arg_typ param =
-  let newt = Ast_types.remove_attributes_for_c_cast arg_typ in
+  let newt = Ast_types.C.remove_attributes_for_c_cast arg_typ in
   let param' = Cil.mkCast ~force:false ~newt param in
   if param' != param then
     Options.warning ~source:(fst param.eloc) ~once:true
@@ -559,7 +559,7 @@ let find_typename ~is_wr_access kf_tbl typ =
   let open Option.Operators in
   let kf_tbl = Option.value ~default:(BA_TBL.build_kf_table kf_tbl) !kf_tbl in
   let rec find_fct typ =
-    let typ = Ast_types.remove_attributes_for_c_cast typ in
+    let typ = Ast_types.C.remove_attributes_for_c_cast typ in
     let tbl = BA_TBL.get_tbl_access ~is_wr_access kf_tbl in
     let typ_name = typename_access ~is_wr_access typ in
     match StringTbl.find_opt tbl typ_name with
@@ -663,7 +663,7 @@ let get_volatile_access ~is_wr_access fct_name binding_map kf_tbl vol_tbl lval =
       Options.warning ~source ~once:true ~wkey:transformed_key
         "%s function: Introducing a call to '%s' for %s access to %svolatile left-value: %a"
         fct_name fct.vorig_name warn_access warn_complete Lval.pretty lval;
-      Some (fct, (Ast_types.remove_attributes_for_c_cast typ))
+      Some (fct, (Ast_types.C.remove_attributes_for_c_cast typ))
     in
     (* Looking for a volatile function relative to the [lval] access. *)
     Options.debug ~level:2 ~dkey:dkey_binding
@@ -683,7 +683,7 @@ let get_volatile_access ~is_wr_access fct_name binding_map kf_tbl vol_tbl lval =
         | Some fct -> found fct
         | None ->
           let t =
-            Ast_types.remove_attributes_for_c_cast
+            Ast_types.C.remove_attributes_for_c_cast
               (if Options.Base.get () then T_MAP.basetype typ else typ)
           in
           Options.warning ~source ~once:true ~wkey:untransformed_key
@@ -694,7 +694,7 @@ let get_volatile_access ~is_wr_access fct_name binding_map kf_tbl vol_tbl lval =
   try
     if has_volatile_attr typ then
       get_volatile_access ~is_complete:true
-    else if Ast_types.is_volatile typ then
+    else if Ast_types.C.is_volatile typ then
       get_volatile_access ~is_complete:false
     else
       None
@@ -719,7 +719,7 @@ let get_wr_types fct =
 
 let get_cast_type_needed_for_assignation ~ret_typ ~lv =
   let tlv = Cil.typeOfLval lv in
-  let tlv = Ast_types.remove_qualifiers tlv in
+  let tlv = Ast_types.C.remove_qualifiers tlv in
   if Cabs2cil.allow_return_collapse ~tlv ~tf:ret_typ
   then None
   else Some tlv
@@ -884,7 +884,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
               let _, arg1_typ, arg2_typ = get_wr_types wr_fct in
               let wr_fct = Var wr_fct in
               let addr = add_eventual_cast_to_param arg1_typ (Cil.mkAddrOf ~loc lv) in
-              let lvtmp = self#makeTempLval (Ast_types.remove_attributes_for_c_cast typ) in
+              let lvtmp = self#makeTempLval (Ast_types.C.remove_attributes_for_c_cast typ) in
               let instr = Call (Some lvtmp, f, a, loc) in
               let etmp = add_eventual_cast_to_param arg2_typ (Cil.new_exp ~loc (Lval lvtmp)) in
               self#add_instr instr;
@@ -932,20 +932,20 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
               in
               let rd_fct = Var rd_fct in
               let addr = add_eventual_cast_to_param arg1_typ (Cil.mkAddrOf ~loc lv) in
-              let ret_typ = Ast_types.remove_attributes_for_c_cast ret_typ in
+              let ret_typ = Ast_types.C.remove_attributes_for_c_cast ret_typ in
               let lvtmp = self#makeTempLval ret_typ in
               let instr = Call (Some lvtmp, rd_fct, [addr], loc) in
               self#add_instr instr;
               add_eventual_cast_to_expression (Cil.typeOf e) (Cil.new_exp ~loc (Lval lvtmp))
           end
         | CastE (typ, exp) when
-            (match Ast_types.unroll_node typ with
+            (match Ast_types.C.unroll_node typ with
              | TPtr typ_pointed -> not (has_volatile_attr typ_pointed)
              | _ -> false) ->
           begin
             let typ_exp = Cil.typeOf exp in
-            match Ast_types.unroll_node typ_exp with
-            | TPtr typ_pointed when Ast_types.is_volatile typ_pointed ->
+            match Ast_types.C.unroll_node typ_exp with
+            | TPtr typ_pointed when Ast_types.C.is_volatile typ_pointed ->
               Options.warning ~source:(fst (Current_loc.get ())) ~once:true
                 ~wkey:wkey_volatile_cast
                 "Cast from type with volatile attribute (%a) to %a. Detection of \

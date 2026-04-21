@@ -78,10 +78,10 @@ let init_one_wchar vi idx chr =
   Global_observer.add_initializer vi off i
 
 let init_lit_str vi s =
-  if not (Ast_types.is_any_char_array vi.vtype) then
+  if not (Ast_types.C.is_any_char_array vi.vtype) then
     Options.fatal "Literal string can only be used to initialize char arrays";
   let slen = String.length s in
-  let _, alen = Ast_types.array_elem_type_and_size vi.vtype in
+  let _, alen = Ast_types.C.array_elem_type_and_size vi.vtype in
   let alen = Option.bind (Cil.constFoldToInt ~machdep:true) alen in
   let alen = Option.map Z.to_int alen in
   let alen = Option.value ~default:(slen + 1) alen in
@@ -91,11 +91,11 @@ let init_lit_str vi s =
   done
 
 let init_lit_wstr vi s =
-  if not (Ast_types.is_wchar_array vi.vtype) then
+  if not (Ast_types.C.is_wchar_array vi.vtype) then
     Options.fatal
       "Wide Literal string can only be used to initialize wide char arrays";
   let slen = List.length s in
-  let _, alen = Ast_types.array_elem_type_and_size vi.vtype in
+  let _, alen = Ast_types.C.array_elem_type_and_size vi.vtype in
   let alen = Option.bind (Cil.constFoldToInt ~machdep:true) alen in
   let alen = Option.map Z.to_int alen in
   let alen = Option.value ~default:(slen + 1) alen in
@@ -653,7 +653,7 @@ let unghost_vi vi =
      see bts #1392 *)
   if vi.vstorage <> Extern then vi.vghost <- false;
   Cil.update_var_type vi (Misc.unghost_type vi.vtype);
-  match Ast_types.unroll vi.vtype with
+  match Ast_types.C.unroll vi.vtype with
   | { tnode = TFun (res, Some l, va); tattr } ->
     (* unghostify function's parameters *)
     let retype (n, t, a) =
@@ -828,7 +828,7 @@ let inject_mtracking_handler main =
         | [] ->
           (* no arguments to main given *)
           nulls
-        | _argc :: argv :: _ when Ast_types.is_ptr argv.vtype ->
+        | _argc :: argv :: _ when Ast_types.C.is_ptr argv.vtype ->
           (* grab addresses of arguments for a call to the main initialization
              function, i.e., [__e_acsl_memory_init] *)
           List.map Cil.mkAddrOfVi fundec.sformals;

@@ -17,7 +17,7 @@ let main () =
       Format.printf "@[<v2>Variable %s :@;Type  : %a@;Offset: %a@]@."
         x.vname Printer.pp_typ x.vtype Printer.pp_offset offset;
       assert
-        (not (Ast_types.has_attribute "const" (Cil.typeOffset x.vtype offset)))
+        (not (Ast_types.C.has_attribute "const" (Cil.typeOffset x.vtype offset)))
     | _ -> assert false
 
 let () = Boot.Main.extend main

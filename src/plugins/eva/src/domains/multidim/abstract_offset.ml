@@ -106,13 +106,13 @@ let of_var_address vi =
 let rec of_eva_offset (oracle : Eva_ast.exp -> Int_val.t) base_typ = function
   | Eva_ast.NoOffset -> `Value (NoOffset base_typ)
   | Field (fi, sub) ->
-    if Ast_types.has_qualifier "volatile" fi.ftype then
+    if Ast_types.C.has_qualifier "volatile" fi.ftype then
       `Top
     else
       let+ sub' = of_eva_offset oracle fi.ftype sub in
       Field (fi, sub')
   | Index (exp, sub) ->
-    match Ast_types.unroll_node base_typ with
+    match Ast_types.C.unroll_node base_typ with
     | TArray (elem_typ, array_size) ->
       let idx = oracle exp in
       let+ () = assert_valid_index idx array_size
@@ -124,7 +124,7 @@ let rec of_int_val ~base_typ ~typ ival =
   if Int_val.is_zero ival && Bit_utils.type_compatible base_typ typ then
     `Value (NoOffset typ)
   else
-    match Ast_types.unroll_node base_typ with
+    match Ast_types.C.unroll_node base_typ with
     | TArray (elem_typ, array_size) ->
       let* range, rem =
         try
@@ -170,7 +170,7 @@ let rec of_int_val ~base_typ ~typ ival =
                 Int_val.is_included ival range
             in
             if matches then
-              if Ast_types.has_qualifier "volatile" fi.ftype then
+              if Ast_types.C.has_qualifier "volatile" fi.ftype then
                 `Top
               else
                 let sub_ival = Int_val.add_singleton (Z.neg l) ival in
@@ -206,13 +206,13 @@ let index_of_term array_size t = (* Exact constant ranges *)
 let rec of_term_offset base_typ = function
   | Cil_types.TNoOffset -> `Value (NoOffset base_typ)
   | TField (fi, sub) ->
-    if Ast_types.has_qualifier "volatile" fi.ftype then
+    if Ast_types.C.has_qualifier "volatile" fi.ftype then
       `Top
     else
       let+ sub' = of_term_offset fi.ftype sub in
       Field (fi, sub')
   | TIndex (index, sub) ->
-    begin match Ast_types.unroll_node base_typ with
+    begin match Ast_types.C.unroll_node base_typ with
       | TArray (elem_typ, array_size) ->
         let* idx = index_of_term array_size index in
         let+ () = assert_valid_index idx array_size

@@ -134,7 +134,7 @@ let typeof v =
   match v with
   | CLogic_Var (_, ty, _) -> Some ty
   | Null -> None
-  | Var (v,_) | Allocated(v,_,_) -> Some (Ast_types.unroll v.vtype)
+  | Var (v,_) | Allocated(v,_,_) -> Some (Ast_types.C.unroll v.vtype)
 
 let bits_sizeof v =
   match v with
@@ -221,7 +221,7 @@ let validity b =
 
 let is_read_only base =
   match base with
-  | Var (v,_) -> Ast_types.has_qualifier "const" v.vtype
+  | Var (v,_) -> Ast_types.C.has_qualifier "const" v.vtype
   | _ -> false
 
 (* Minor optimization compared to [is_weak (validity b)] *)
@@ -329,7 +329,7 @@ let is_function base =
   match base with
   | Null | CLogic_Var _ | Allocated _ -> false
   | Var(v,_) ->
-    Ast_types.is_fun v.vtype
+    Ast_types.C.is_fun v.vtype
 
 let equal v w = (id v) = (id w)
 
@@ -377,7 +377,7 @@ let is_block_local v block =
   | Allocated _ | CLogic_Var _ | Null -> false
 
 let validity_from_type v =
-  if Ast_types.is_fun v.vtype then Invalid
+  if Ast_types.C.is_fun v.vtype then Invalid
   else
     let max_valid = Bit_utils.sizeof_vid v in
     match max_valid with

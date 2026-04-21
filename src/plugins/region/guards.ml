@@ -35,14 +35,14 @@ and lhost env = function
   | Mem e ->
     let s,r = addr env e in
     if not s then add env @@ g_valid Region (E e) ;
-    Ast_types.direct_pointed_type @@ Cil.typeOf e, r
+    Ast_types.C.direct_pointed_type @@ Cil.typeOf e, r
 
 and offset env s t r = function
   | NoOffset -> s,t,r
   | Field(fd,o) -> offset env s fd.ftype (Memory.field r fd) o
   | Index(k,o) ->
     eval env k ;
-    let te = Ast_types.direct_array_element t in
+    let te = Ast_types.C.direct_array_element t in
     let r = Memory.index r te in
     let s =
       if Kernel.SafeArrays.get () then
@@ -64,8 +64,8 @@ and exp env e =
     if not s then add env @@ g_valid Region (L lv) ;
     Option.map (fun r -> false,r) @@ Memory.points_to r
   | CastE(t,e) when
-      Ast_types.is_fun_or_ptr t &&
-      not (Ast_types.is_fun_or_ptr @@ Cil.typeOf e) ->
+      Ast_types.C.is_fun_or_ptr t &&
+      not (Ast_types.C.is_fun_or_ptr @@ Cil.typeOf e) ->
     Options.not_yet_implemented ~source:(fst e.eloc) "Integral to pointer casts"
   | CastE(_,e) ->
     Option.map (fun (_,r) -> false,r) @@ exp env e

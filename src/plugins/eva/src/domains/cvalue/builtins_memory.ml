@@ -20,7 +20,7 @@ let dkey = Self.register_category "imprecision" ~level:6
 let rec pretty_lval_of_address exp =
   match exp.node with
   | AddrOf lval -> lval
-  | CastE (_typ, exp) when Ast_types.is_ptr exp.typ ->
+  | CastE (_typ, exp) when Ast_types.C.is_ptr exp.typ ->
     (* Removes conversion to void* for more readable messages. *)
     pretty_lval_of_address exp
   | _ -> Eva_ast.Build.mem exp
@@ -372,7 +372,7 @@ let memset_typ_offsm_int full_typ i =
           let vinit = V_Or_Uninitialized.initialized v in
           V_Offsetmap.add bounds (vinit, size, Rel.zero) offsm
         in
-        match Ast_types.unroll_node styp with
+        match Ast_types.C.unroll_node styp with
         | TInt _ | TEnum _ | TPtr _ ->
           let size = Eval_typ.sizeof_lval_typ styp (* handles bitfields *) in
           let size = Z_or_top.project size in

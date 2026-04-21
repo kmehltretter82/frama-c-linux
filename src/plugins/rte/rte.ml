@@ -69,7 +69,7 @@ let lval_assertion ~read_only ~remove_trivial ~on_alarm lv =
       (* Mark that we went through a struct field, then recurse *)
       check_array_access default off fi.ftype true
     | Index (e, off) ->
-      match Ast_types.unroll_node typ with
+      match Ast_types.C.unroll_node typ with
       | TArray (bt, Some size) ->
         if Kernel.SafeArrays.get () || not in_struct then begin
           (* Generate an assertion for this access, then go deeper in
@@ -87,7 +87,7 @@ let lval_assertion ~read_only ~remove_trivial ~on_alarm lv =
   match lv with
   | Var vi , off -> check_array_access false off vi.vtype false
   | (Mem _ as lh), off ->
-    if not (Ast_types.is_fun (Cil.typeOfLval lv)) then
+    if not (Ast_types.C.is_fun (Cil.typeOfLval lv)) then
       check_array_access true off (Cil.typeOfLhost lh) false
 
 (* assertion for lvalue initialization *)
@@ -102,17 +102,17 @@ let lval_initialized_assertion ~remove_trivial:_ ~on_alarm lv =
        - temporary variables (initialized during AST normalization)
     *)
     if not (vi.vglob || vi.vformal || vi.vtemp)
-    && not (Ast_types.is_struct_or_union typ)
+    && not (Ast_types.C.is_struct_or_union typ)
     then
       on_alarm ~invalid:false (Alarms.Uninitialized lv)
   | _ ->
-    if not Ast_types.(is_fun typ || is_struct_or_union typ) then
+    if not Ast_types.C.(is_fun typ || is_struct_or_union typ) then
       on_alarm ~invalid:false (Alarms.Uninitialized lv)
 
 (* assertion for unary minus signed overflow *)
 let uminus_assertion ~remove_trivial ~on_alarm exp =
   (* - expr overflows if exp is TYPE_MIN *)
-  let t = Ast_types.unroll (Cil.typeOf exp) in
+  let t = Ast_types.C.unroll (Cil.typeOf exp) in
   let size = Cil.bitsSizeOf t in
   let min_ty = Cil.min_signed_number size in
   (* alarm is bound <= exp, hence bound must be MIN_INT+1 *)
@@ -136,7 +136,7 @@ let mult_sub_add_assertion ~signed ~remove_trivial ~on_alarm (exp,op,lexp,rexp) 
   (* signed multiplication/addition/subtraction:
      the expression overflows iff its integer value
      is strictly more than [max_ty] or strictly less than [min_ty] *)
-  let t = Ast_types.unroll (Cil.typeOf exp) in
+  let t = Ast_types.C.unroll (Cil.typeOf exp) in
   let size = Cil.bitsSizeOf t in
   let min_ty, max_ty =
     if signed then Cil.min_signed_number size, Cil.max_signed_number size
@@ -221,7 +221,7 @@ let signed_div_assertion ~remove_trivial ~on_alarm (exp, lexp, rexp) =
      and divisor is equal to -1. Under the hypothesis (cf Value) that
      integers are represented in two's complement.
   *)
-  let t = Ast_types.unroll (Cil.typeOf rexp) in
+  let t = Ast_types.C.unroll (Cil.typeOf rexp) in
   let size = Cil.bitsSizeOf t in
   (* check dividend_expr / divisor_expr : if constants ... *)
   (* compute smallest representable "size bits" (signed) integer *)
@@ -284,7 +284,7 @@ let shift_negative_assertion ~remove_trivial ~on_alarm exp =
 (* Assertion for left and right shift overflow: the result should be
    representable in the result type.  *)
 let shift_overflow_assertion ~signed ~remove_trivial ~on_alarm (exp, op, lexp, rexp) =
-  let t = Ast_types.unroll (Cil.typeOf exp) in
+  let t = Ast_types.C.unroll (Cil.typeOf exp) in
   let size = Cil.bitsSizeOf t in
   if size <> Cil.bitsSizeOf (Cil.typeOf lexp) then
     (* size of result type should be size of left (promoted) operand *)
@@ -323,7 +323,7 @@ let downcast_assertion ~remove_trivial ~on_alarm (dst_type, exp) =
   let src_size = Cil.bitsSizeOf src_type in
   let dst_size = Cil.bitsSizeOfBitfield dst_type in
   if (dst_size < src_size || dst_size == src_size && dst_signed <> src_signed)
-  && not Ast_types.(is_ptr src_type && (is_intptr_t dst_type || is_uintptr_t dst_type))
+  && not Ast_types.C.(is_ptr src_type && (is_intptr_t dst_type || is_uintptr_t dst_type))
   then
     let dst_min, dst_max =
       if dst_signed
@@ -331,7 +331,7 @@ let downcast_assertion ~remove_trivial ~on_alarm (dst_type, exp) =
       else Z.zero, Cil.max_unsigned_number dst_size
     in
     let overflow_kind =
-      if Ast_types.is_ptr src_type
+      if Ast_types.C.is_ptr src_type
       then Alarms.Pointer_downcast
       else if dst_signed
       then Alarms.Signed_downcast
@@ -355,7 +355,7 @@ let downcast_assertion ~remove_trivial ~on_alarm (dst_type, exp) =
 
 (* assertion for casting a floating-point value to an integer *)
 let float_to_int_assertion ~remove_trivial ~on_alarm (ty, exp) =
-  let e_typ = Ast_types.unroll (Cil.typeOf exp) in
+  let e_typ = Ast_types.C.unroll (Cil.typeOf exp) in
   match e_typ.tnode, ty.tnode with
   | TFloat _, TInt ikind ->
     let signed = Cil.isSigned ikind in
@@ -423,8 +423,8 @@ let pointer_value ~remove_trivial ~on_alarm expr =
 type verdict = Yes | No | Maybe
 
 let trivially_aligned (expr: Cil_types.exp) target =
-  if Ast_types.is_void target
-  || Ast_types.is_fun target
+  if Ast_types.C.is_void target
+  || Ast_types.C.is_fun target
   then
     (* - From an alignment point of view, casting to void* is always OK
          (except for function pointers, but anyway, the problem is not
@@ -436,10 +436,10 @@ let trivially_aligned (expr: Cil_types.exp) target =
     let t_align = Cil.bytesAlignOf target in
     let expr = Cil.stripCasts expr in
     let orig_t = Cil.typeOf expr in
-    if Ast_types.is_void_ptr orig_t || Ast_types.is_fun_ptr orig_t
+    if Ast_types.C.is_void_ptr orig_t || Ast_types.C.is_fun_ptr orig_t
     then Maybe
     else
-    if Ast_types.is_integral orig_t
+    if Ast_types.C.is_integral orig_t
     then match Cil.constFoldToInt expr with
       | None -> Maybe
       | Some value when Z.(zero = (value mod of_int t_align)) -> Yes
@@ -448,7 +448,7 @@ let trivially_aligned (expr: Cil_types.exp) target =
       match expr.enode with
       | Lval (Var vi, NoOffset) when not vi.vglob && not vi.vaddrof ->
         (* This optimization can be generalized if we check strict aliasing *)
-        if t_align <= Cil.bytesAlignOf @@ Ast_types.direct_pointed_type orig_t
+        if t_align <= Cil.bytesAlignOf @@ Ast_types.C.direct_pointed_type orig_t
         then Yes
         else Maybe
 
@@ -461,8 +461,8 @@ let trivially_aligned (expr: Cil_types.exp) target =
         Maybe
 
 let pointer_alignment ~remove_trivial ~on_alarm (expr, t) =
-  assert (Ast_types.is_ptr t) ;
-  let pointed_to = Ast_types.direct_pointed_type t in
+  assert (Ast_types.C.is_ptr t) ;
+  let pointed_to = Ast_types.C.direct_pointed_type t in
   let expr = Cil.stripCasts expr in
   match trivially_aligned expr pointed_to with
   | Yes ->

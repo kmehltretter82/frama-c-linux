@@ -142,9 +142,9 @@ let is_range_free t =
 let is_bitfield_pointers lty =
   let is_bitfield_pointer = function
     | Ctype typ ->
-      begin match Ast_types.unroll_node typ with
+      begin match Ast_types.C.unroll_node typ with
         | TPtr typ ->
-          let attrs = Ast_types.get_attributes typ in
+          let attrs = Ast_types.C.get_attributes typ in
           Ast_attributes.(contains bitfield_attribute_name attrs)
         | _ ->
           false
@@ -248,4 +248,4 @@ let labels_are_all_here =
   let is_here l = l = BuiltinLabel Here in
   fun labels -> List.for_all is_here labels
 
-let unghost_type = Ast_types.remove_attributes_deep ["ghost"]
+let unghost_type = Ast_types.C.remove_attributes_deep ["ghost"]

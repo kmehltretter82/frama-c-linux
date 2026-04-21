@@ -9,7 +9,7 @@
 open Cil_types
 open Logic_const
 
-let const_of t = Ast_types.add_attributes [("const", [])] t
+let const_of t = Ast_types.C.add_attributes [("const", [])] t
 
 let size_t () =
   Globals.Types.find_type Logic_typing.Typedef "size_t"
@@ -59,7 +59,7 @@ let rec string_of_typ_aux t =
     "arr" ^ (string_of_exp e) ^ "_" ^ string_of_typ t
   | _ ->
     Options.fatal "unsupported type %a" Cil_printer.pp_typ t
-and string_of_typ t = string_of_typ_aux (Ast_types.unroll t)
+and string_of_typ t = string_of_typ_aux (Ast_types.C.unroll t)
 and string_of_exp e = Format.asprintf "%a" Cil_printer.pp_exp e
 
 let size_var ?(name_ext="") t value = {
@@ -78,9 +78,9 @@ let cvar_to_tvar vi = tvar (Cil.cvar_to_lvar vi)
 let tminus ?loc t1 t2 =
   let minus, typ = match t1.term_type, t2.term_type with
     | Ctype(t1), Ctype(t2)
-      when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
+      when Ast_types.C.is_ptr t1 && Ast_types.C.is_ptr t2 ->
       MinusPP, Linteger
-    | Ctype(t), _ when Ast_types.is_ptr t ->
+    | Ctype(t), _ when Ast_types.C.is_ptr t ->
       MinusPI, Ctype(t)
     | t, _ ->
       MinusA, t
@@ -89,7 +89,7 @@ let tminus ?loc t1 t2 =
 
 let tplus ?loc t1 t2 =
   let plus = match t1.term_type with
-    | Ctype(t) when Ast_types.is_ptr t -> PlusPI
+    | Ctype(t) when Ast_types.C.is_ptr t -> PlusPI
     | _ -> PlusA
   in
   term ?loc (TBinOp(plus, t1, t2)) t1.term_type

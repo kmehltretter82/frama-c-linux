@@ -181,7 +181,7 @@ struct
     | FullSplit, _ ->
       Partition.Ration (Partition.new_rationing ~limit:max_int ~merge:false)
     | SplitEqList i, Some return_vi
-      when Ast_types.is_integral_or_pointer return_vi.vtype ->
+      when Ast_types.C.is_integral_or_pointer return_vi.vtype ->
       let return_exp = Eva_ast.Build.var_exp return_vi in
       Partition.Restrict (return_exp, i)
     | (NoSplit | SplitEqList _), _ ->

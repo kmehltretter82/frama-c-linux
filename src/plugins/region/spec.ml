@@ -152,7 +152,7 @@ let garbage = Attr.(add `Garbage empty)
 let applies flags = function
   | Range _ -> true
   | Alias(_,(TVar { lv_origin = Some v },_)) ->
-    flags = garbage && v.vformal && Ast_types.is_struct_or_union v.vtype
+    flags = garbage && v.vformal && Ast_types.C.is_struct_or_union v.vtype
   | Alias _ | Field _ -> false
 
 let flush source env =

@@ -75,7 +75,7 @@ class callableFunctionsVisitor ~libc = object(self)
      consider it is called *)
   method! vvrbl vi =
     if not (self#already_seen vi) then begin
-      if Ast_types.is_fun vi.vtype && Metrics_base.consider_function ~libc vi
+      if Ast_types.C.is_fun vi.vtype && Metrics_base.consider_function ~libc vi
       then begin
         Metrics_parameters.feedback ~dkey:dkey_syn
           "marking %a as callable" Printer.pp_varinfo vi;
@@ -109,7 +109,7 @@ class callableFunctionsVisitor ~libc = object(self)
         begin
           Metrics_parameters.debug "Coverage: visiting %s" vi.vname;
           Varinfo.Hashtbl.add visited vi ();
-          if Ast_types.is_fun vi.vtype then self#visit_function vi
+          if Ast_types.C.is_fun vi.vtype then self#visit_function vi
           else ignore (self#visit_non_function_var vi)
         end;
     done;
@@ -167,7 +167,7 @@ class deadCallsVisitor fmt ~libc cov_metrics =
               Fileloc.pretty (Current_loc.get ())
 
     method! vvrbl vi =
-      if Ast_types.is_fun vi.vtype then self#reached_fun vi;
+      if Ast_types.C.is_fun vi.vtype then self#reached_fun vi;
       Cil.SkipChildren (* no children anyway *)
 
     (* uses initializers *)

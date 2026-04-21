@@ -768,8 +768,8 @@ module VarFilters = struct
     register "stdlib" ((fun vi -> Cil.is_in_libc vi.vattr)) ~default:false;
     register "extern" (fun vi -> vi.vstorage = Extern);
     register "const" (fun vi -> Cil.isGlobalInitConst vi);
-    register "volatile" (fun vi -> Ast_types.is_volatile vi.vtype);
-    register "ghost" (fun vi -> Ast_types.is_ghost vi.vtype);
+    register "volatile" (fun vi -> Ast_types.C.is_volatile vi.vtype);
+    register "ghost" (fun vi -> Ast_types.C.is_ghost vi.vtype);
     register "init" (fun vi -> Option.is_some (Globals.Vars.find vi).init)
       ~labels:("variables with explicit initializer",
                "variables without explicit initializer");
@@ -1114,7 +1114,7 @@ let () = Information.register
       match loc with
       | PType ({ tnode = TNamed _ } as ty)
       | PGlobal (GType({ ttype = ty },_)) ->
-        PrinterTag.pp_typ fmt (Ast_types.unroll ty)
+        PrinterTag.pp_typ fmt (Ast_types.C.unroll ty)
       | _ -> raise Not_found
     end
 
@@ -1126,7 +1126,7 @@ let () = Information.register
       let typ =
         match loc with
         | PType typ -> typ
-        | PVDecl(_,_,vi) when Ast_types.is_object vi.vtype -> vi.vtype
+        | PVDecl(_,_,vi) when Ast_types.C.is_object vi.vtype -> vi.vtype
         | PGlobal (GType(ti,_)) -> ti.ttype
         | PGlobal (GCompTagDecl(ci,_) | GCompTag(ci,_)) -> Cil_const.mk_tcomp ci
         | PGlobal (GEnumTagDecl(ei,_) | GEnumTag(ei,_)) -> Cil_const.mk_tenum ei
@@ -1166,7 +1166,7 @@ let () = Information.register
       | PVDecl (_, _, vi)
       | PLval (_, _, (Var vi, NoOffset))
       | PGlobal (GVarDecl (vi, _) | GVar (vi, _, _))
-        when Ast_types.is_object vi.vtype ->
+        when Ast_types.C.is_object vi.vtype ->
         print "variable" Cil.bytesAlignOfVarinfo vi
       | PLval (_, _, lval) ->
         begin

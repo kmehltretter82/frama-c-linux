@@ -16,7 +16,7 @@ let main () =
     match s.skind with
     | Instr (Set (_,{ enode = Lval (Var x,offset) },_)) ->
       let is_const =
-        Ast_types.has_attribute "const" (Cil.typeOffset x.vtype offset)
+        Ast_types.C.has_attribute "const" (Cil.typeOffset x.vtype offset)
       in
       Format.printf "@[<v2>Variable %s :@;Type  : %a@;Offset: %a@;Is const: %b@]@."
         x.vname Printer.pp_typ x.vtype Printer.pp_offset offset is_const

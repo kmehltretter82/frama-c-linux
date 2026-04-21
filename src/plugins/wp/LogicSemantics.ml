@@ -148,7 +148,7 @@ struct
     | TField(f,offset) ->
       logic_offset env f.ftype (L.field v f) offset
     | TIndex(k,offset) ->
-      let te = Ast_types.direct_array_element typ in
+      let te = Ast_types.C.direct_array_element typ in
       let size = Ctypes.get_array_size (Ctypes.object_of typ) in
       let obj = Ctypes.object_of te in
       let vloc = L.shift v obj ?size (C.logic env k) in
@@ -344,7 +344,7 @@ struct
   let float_of_logic_type lt =
     match Ast_types.Acsl.unroll_logic lt with
     | Ctype ty ->
-      (match Ast_types.unroll_node ty with
+      (match Ast_types.C.unroll_node ty with
        | TFloat f -> Some (Ctypes.c_float f)
        | _ -> None)
     | _ -> None

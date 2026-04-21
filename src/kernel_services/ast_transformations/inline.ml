@@ -190,7 +190,7 @@ let inliner functions_to_inline = object (self)
     if Kernel_function.Set.mem callee functions_to_inline &&
        not (self#recursive_call_limit callee)
     then begin
-      if Ast_types.is_variadic f.vtype then begin
+      if Ast_types.C.is_variadic f.vtype then begin
         Kernel.warning ~wkey:Kernel.wkey_inline ~current:true ~once:true
           "Ignoring inlining option for variadic function %a"
           Printer.pp_varinfo f;
@@ -204,7 +204,7 @@ let inliner functions_to_inline = object (self)
             | None, Some _ -> false, return, args
             | None, None ->
               let rt, _, _,_ = Cil.splitFunctionTypeVI f in
-              if Ast_types.is_void rt then false,return, args
+              if Ast_types.C.is_void rt then false,return, args
               else begin
                 let scope = Stack.top block_stack in
                 let v =
@@ -215,7 +215,7 @@ let inliner functions_to_inline = object (self)
                 true, Some (Cil.var v), args
               end
             | Some Plain_func, Some lv ->
-              let t = Ast_types.remove_attributes ["const"] (Cil.typeOfLval lv) in
+              let t = Ast_types.C.remove_attributes ["const"] (Cil.typeOfLval lv) in
               let scope = Stack.top block_stack in
               let v =
                 Cil.makeLocalVar
@@ -228,7 +228,7 @@ let inliner functions_to_inline = object (self)
                  or const: *)
               r.vdefined <- false;
               Cil.update_var_type
-                r (Ast_types.remove_attributes ["const"] r.vtype);
+                r (Ast_types.C.remove_attributes ["const"] r.vtype);
               false, None, (Cil.mkAddrOf ~loc (Cil.var r)) :: args
             | Some _, _ ->
               Kernel.fatal "Attempt to initialize an inexistent varinfo"

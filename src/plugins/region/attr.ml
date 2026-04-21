@@ -59,11 +59,11 @@ let is_local v =
 let is_initialized ~garbage v =
   v.vglob || v.vdefined ||
   (v.vformal && not garbage) ||
-  (v.vtemp && not @@ Ast_types.is_struct_or_union v.vtype)
+  (v.vtemp && not @@ Ast_types.C.is_struct_or_union v.vtype)
 
 let is_const v =
   (v.vformal || v.vglob || v.vdefined) &&
-  Ast_types.is_const v.vtype
+  Ast_types.C.is_const v.vtype
 
 let cvar ~garbage v =
   let flags = ref empty in

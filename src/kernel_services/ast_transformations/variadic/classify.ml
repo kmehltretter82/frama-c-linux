@@ -156,7 +156,7 @@ let classify_std env vi = match vi.vname with
   | _ -> if is_frama_c_builtin vi then Builtin else Unknown
 
 let classify env vi =
-  if  Ast_types.is_variadic vi.vtype then begin
+  if  Ast_types.C.is_variadic vi.vtype then begin
     Kernel.result ~current:true ~dkey:Kernel.dkey_variadic
       "Declaration of variadic function %s." vi.vname;
     Some {
@@ -169,4 +169,4 @@ let classify env vi =
     None
 
 (* Deprecated *)
-let is_variadic_function vi = Ast_types.is_variadic vi.vtype
+let is_variadic_function vi = Ast_types.C.is_variadic vi.vtype

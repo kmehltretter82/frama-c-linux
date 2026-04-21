@@ -34,7 +34,7 @@ let is_array ty =
 let get_t ty =
   if is_array ty then
     Array
-  else if Ast_types.is_struct_or_union ty then
+  else if Ast_types.C.is_struct_or_union ty then
     StructOrUnion
   else
     NotAggregate

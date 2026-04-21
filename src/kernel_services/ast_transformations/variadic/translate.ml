@@ -271,7 +271,7 @@ let translate_variadics (file : file) =
     method! vexpr exp =
       begin match exp.enode with
         | AddrOf (Var vi, NoOffset)
-          when Ast_types.is_variadic vi.vtype
+          when Ast_types.C.is_variadic vi.vtype
             && Classify.is_frama_c_builtin vi ->
           Kernel.not_yet_implemented
             ~source:(fst exp.eloc)

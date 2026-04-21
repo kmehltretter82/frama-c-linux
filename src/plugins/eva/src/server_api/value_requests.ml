@@ -117,7 +117,7 @@ let with_updated_varinfo_printer eval_point f =
   Fun.protect ~finally f
 
 let print_value fmt loc =
-  let is_scalar = Ast_types.is_scalar in
+  let is_scalar = Ast_types.C.is_scalar in
   let evaluation_point = marker_evaluation_point loc in
   let request = request_at evaluation_point in
   let eval =
@@ -226,8 +226,8 @@ let probe_property = function
 
 let probe_marker = function
   | Printer_tag.PLval (_, _, lval)
-    when Ast_types.is_fun (Cil.typeOfLval lval) -> raise Not_found
-  | PVDecl (_, _, vi) when Ast_types.is_fun vi.vtype -> raise Not_found
+    when Ast_types.C.is_fun (Cil.typeOfLval lval) -> raise Not_found
+  | PVDecl (_, _, vi) when Ast_types.C.is_fun vi.vtype -> raise Not_found
   | PLval (_, _, l) -> Plval l
   | PExp (_, _, e) -> Pexpr e
   | PStmt (_, s) | PStmtStart (_, s) -> probe_stmt s
@@ -333,7 +333,7 @@ let filter_variables bases =
     with Base.Not_a_C_variable -> acc
   in
   let vars = List.rev (Base.Hptset.fold add_var bases []) in
-  List.filter (fun vi -> not (Ast_types.is_fun vi.vtype)) vars
+  List.filter (fun vi -> not (Ast_types.C.is_fun vi.vtype)) vars
 
 (* -------------------------------------------------------------------------- *)
 (* --- EVA Proxy                                                          --- *)
@@ -423,7 +423,7 @@ module Proxy(A : Engine_sig.S_with_results) : EvaProxy = struct
       find_offsetmap cvalue_state precise_loc
 
   let eval_lval (lval : Eva_ast.lval) state =
-    match Ast_types.unroll_node lval.typ with
+    match Ast_types.C.unroll_node lval.typ with
     | TInt _ | TEnum _ | TPtr _ | TFloat _ ->
       A.copy_lvalue state lval >>=: fun value -> Value value
     | _ ->

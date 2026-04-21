@@ -603,7 +603,7 @@ module Make (Engine: Engine_Subset) = struct
   let compute_using_specification ~warn call spec state =
     let kinstr = Callstack.top_callsite call.callstack in
     let vi = Kernel_function.get_vi call.kf in
-    if Ast_types.has_attribute "noreturn" vi.vtype
+    if Ast_types.C.has_attribute "noreturn" vi.vtype
     then []
     else
       (* Initializes the variable returned by the function. *)

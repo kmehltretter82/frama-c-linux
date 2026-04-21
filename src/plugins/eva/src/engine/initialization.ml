@@ -118,7 +118,7 @@ module Make (Engine: Engine_Subset) = struct
      null character and [constant] builds the Eva constant form a character.
      Applies [apply_eva_single_initializer] for each character. *)
   let init_char_array_aux ~source ~pos zero constant lval seq state =
-    let _, size = Ast_types.array_elem_type_and_size lval.typ in
+    let _, size = Ast_types.C.array_elem_type_and_size lval.typ in
     (* Adds [zero] characters to the sequence. *)
     let seq =
       match Option.bind (Cil.constFoldToInt ~machdep:true) size with
@@ -140,7 +140,7 @@ module Make (Engine: Engine_Subset) = struct
 
   (* Initializes array [lval] from string literal [str] in [state]. *)
   let init_char_array ~source ~pos lval str state =
-    if not (Ast_types.is_any_char_array lval.typ) then
+    if not (Ast_types.C.is_any_char_array lval.typ) then
       Self.fatal
         "Initialization of %a of type %a with a string literal, \
          which can only be used to initialize a char array."
@@ -152,7 +152,7 @@ module Make (Engine: Engine_Subset) = struct
 
   (* Initializes array [lval] from wide string literal [list] in [state]. *)
   let init_wchar_array ~source ~pos lval list state =
-    if not (Ast_types.is_wchar_array lval.typ) then
+    if not (Ast_types.C.is_wchar_array lval.typ) then
       Self.fatal
         "Initialization of %a of type %a with a wide string literal, \
          which can only be used to initialize a wide char array."
@@ -171,12 +171,12 @@ module Make (Engine: Engine_Subset) = struct
   (* Applies a single initializer, with the special case of char or wchar arrays
      being initialized with string literals. *)
   let apply_eva_single_initializer_or_str ~source ~pos state lval expr =
-    if Ast_types.is_any_char_array lval.typ then begin
+    if Ast_types.C.is_any_char_array lval.typ then begin
       match get_string_literal expr with
       | Some (Str s) -> init_char_array ~source ~pos lval s state
       | None | Some (Wstr _) ->
         Self.fatal "Single init of a char array can only be a string literal"
-    end else if Ast_types.is_wchar_array lval.typ then begin
+    end else if Ast_types.C.is_wchar_array lval.typ then begin
       match get_string_literal expr with
       | Some (Wstr ws) -> init_wchar_array ~source ~pos lval ws state
       | None | Some (Str _) ->
@@ -188,7 +188,7 @@ module Make (Engine: Engine_Subset) = struct
      to top without applying the initializer. Otherwise, lets the standard
      transfer function on assignments handle volatile locations. *)
   let rec apply_eva_initializer ~pos ~top_volatile lval init state =
-    if top_volatile && Ast_types.has_qualifier "volatile" lval.typ
+    if top_volatile && Ast_types.C.has_qualifier "volatile" lval.typ
     then initialize_top_volatile lval state
     else
       match init with
@@ -217,7 +217,7 @@ module Make (Engine: Engine_Subset) = struct
     ignore (warn_unknown_size vi);
     let source = fst vi.vdecl in
     let lval = Eva_ast.Build.var vi in
-    let volatile_everywhere = Ast_types.has_qualifier "volatile" vi.vtype in
+    let volatile_everywhere = Ast_types.C.has_qualifier "volatile" vi.vtype in
     let state =
       if volatile_everywhere && padding_initialization ~local = `Initialized
       then initialize_top_volatile lval state
@@ -230,7 +230,7 @@ module Make (Engine: Engine_Subset) = struct
            must be different from zero somewhere. This is a not-so minor
            optimization. *)
         if padding_initialization ~local = `Initialized &&
-           not (Ast_types.is_volatile vi.vtype)
+           not (Ast_types.C.is_volatile vi.vtype)
         then state
         else initialize_var_zero_or_volatile ~pos vi state
     in
@@ -250,8 +250,8 @@ module Make (Engine: Engine_Subset) = struct
   let rec apply_cil_const_initializer ~pos state lval = function
     | Cil_types.SingleInit exp ->
       let typ_lval = Cil.typeOfLval lval in
-      if Ast_types.has_qualifier "const" typ_lval &&
-         not (Ast_types.has_qualifier "volatile" typ_lval)
+      if Ast_types.C.has_qualifier "const" typ_lval &&
+         not (Ast_types.C.has_qualifier "volatile" typ_lval)
          && not (Cil.is_mutable_or_initialized lval)
       then
         let lval = Eva_ast.translate_lval lval
@@ -260,7 +260,7 @@ module Make (Engine: Engine_Subset) = struct
         apply_eva_single_initializer_or_str ~pos ~source state lval exp
       else state
     | CompoundInit (typ, l) ->
-      if Ast_types.has_qualifier "volatile" typ || not (Ast_types.is_const typ)
+      if Ast_types.C.has_qualifier "volatile" typ || not (Ast_types.C.is_const typ)
       then state (* initializer is not useful *)
       else
         let doinit offset init _typ state =
@@ -294,7 +294,7 @@ module Make (Engine: Engine_Subset) = struct
        (or generate one if there are none). In the first phase, they have been
        set to generic values. This can only happen for variables partially but
        not fully const, as const variables are initialized differently. *)
-    if Ast_types.is_const vi.vtype && not (vi.vstorage = Extern)
+    if Ast_types.C.is_const vi.vtype && not (vi.vstorage = Extern)
     then
       let init = match init with
         | None -> Cil.makeZeroInit ~loc:vi.vdecl vi.vtype
@@ -371,8 +371,8 @@ module Make (Engine: Engine_Subset) = struct
 
   let is_fully_const vi =
     let frama_c_mutable = Ast_attributes.frama_c_mutable in
-    Ast_types.has_qualifier "const" vi.vtype
-    && not (Ast_types.has_attribute_memory_block frama_c_mutable vi.vtype)
+    Ast_types.C.has_qualifier "const" vi.vtype
+    && not (Ast_types.C.has_attribute_memory_block frama_c_mutable vi.vtype)
 
   let initialize_global_variable ~lib_entry vi init state =
     let open Current_loc.Operators in

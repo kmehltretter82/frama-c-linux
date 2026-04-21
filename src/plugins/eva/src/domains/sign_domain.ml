@@ -12,7 +12,7 @@ module Sign_Value = struct
   include Sign_value
 
   (* In this domain, we only track integer variables. *)
-  let track_variable vi = Ast_types.is_integral vi.vtype
+  let track_variable vi = Ast_types.C.is_integral vi.vtype
 
   (* The base lattice is finite, we can use join to perform widening *)
   let widen _ = join

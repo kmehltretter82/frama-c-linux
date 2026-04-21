@@ -13,7 +13,7 @@ open Cil_types
 open Cil_datatype
 
 let replace_by_zero exp =
-  match Ast_types.unroll_node (Cil.typeOf exp) with
+  match Ast_types.C.unroll_node (Cil.typeOf exp) with
   | TInt ikind | TEnum { ekind = ikind } ->
     Cil.ChangeTo (Cil.kinteger ~loc:exp.eloc ikind 0)
   | TFloat fkind ->
@@ -50,8 +50,8 @@ class constGlobSubstVisitorClass : Cil.cilVisitor = object
              pattern matching. *)
           assert false
       in
-      let typ = Ast_types.unroll_deep vi.vtype in
-      if is_arithmetic_type typ && Ast_types.is_const typ
+      let typ = Ast_types.C.unroll_deep vi.vtype in
+      if is_arithmetic_type typ && Ast_types.C.is_const typ
       then ChangeDoChildrenPost ([g], List.map register)
       else DoChildren
     | GFun _ -> DoChildren

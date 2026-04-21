@@ -284,7 +284,7 @@ let rec object_of typ =
   | TFloat f -> C_float (c_float f)
   | TPtr typ ->
     let typ' =
-      if Ast_types.is_void typ then Cil_const.charType else typ
+      if Ast_types.C.is_void typ then Cil_const.charType else typ
     in
     C_pointer typ'
   | TFun _ -> C_pointer Cil_const.voidType

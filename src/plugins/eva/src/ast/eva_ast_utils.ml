@@ -101,8 +101,8 @@ and to_cil_const : Eva_ast_types.constant -> Cil_types.constant = function
 let is_mutable (lval : lval) : bool =
   let (lhost, offset) = lval.node in
   let rec aux base_mutable typ off =
-    let base_mutable = base_mutable && not (Ast_types.is_const typ) in
-    let typ = Ast_types.unroll typ in
+    let base_mutable = base_mutable && not (Ast_types.C.is_const typ) in
+    let typ = Ast_types.C.unroll typ in
     match typ.tnode, off with
     | _, NoOffset -> base_mutable
     | _, Field (fi, off) ->
@@ -179,7 +179,7 @@ let rec to_integer e =
   | Const (CInt64 (n,_,_)) -> Some n
   | Const (CChr c) -> Some (Cil.charConstToInt c)
   | Const (CEnum ({eival = v}, _)) -> Cil.isInteger v
-  | CastE (typ, e) when Ast_types.is_ptr typ ->
+  | CastE (typ, e) when Ast_types.C.is_ptr typ ->
     begin
       match to_integer e with
       | Some i as r when Cil.fitsInInt (Machine.uintptr_kind ()) i -> r
@@ -193,7 +193,7 @@ let is_zero exp =
   | Some i -> Z.is_zero i
 
 let is_zero_ptr exp =
-  is_zero exp && Ast_types.is_ptr exp.typ
+  is_zero exp && Ast_types.C.is_ptr exp.typ
 
 (* Constant folding *)
 
@@ -236,7 +236,7 @@ let to_value exp =
   | _ -> `None
 
 let type_kind typ =
-  match Ast_types.unroll_node typ with
+  match Ast_types.C.unroll_node typ with
   | TInt ikind | TEnum {ekind = ikind} -> `Int ikind
   | TFloat fkind -> `Float fkind
   | _ -> `None

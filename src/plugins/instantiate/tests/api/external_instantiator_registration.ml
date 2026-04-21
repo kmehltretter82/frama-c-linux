@@ -3,13 +3,13 @@ let function_name = "mine"
 let well_typed_call _ _ = function
   | [ e ] ->
     let t = Cil.typeOf(Cil.stripCasts e) in
-    not (Ast_types.is_void_ptr t) && Ast_types.is_ptr t
+    not (Ast_types.C.is_void_ptr t) && Ast_types.C.is_ptr t
   | _ -> false
 
 let key_from_call _ _ = function
   | [ e ] ->
     let t = Cil.typeOf(Cil.stripCasts e) in
-    Ast_types.direct_pointed_type t
+    Ast_types.C.direct_pointed_type t
   | _ -> assert false
 
 let retype_args _ = function

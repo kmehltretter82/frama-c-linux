@@ -143,7 +143,7 @@ let rec find_lval_vertex ((lhost, offset) : lval) s : V.t =
 let add_field_and_cast f lv =
   let off = Field(f,NoOffset) in
   match lv with
-  | Mem p, NoOffset when Ast_types.is_void_ptr (Cil.typeOf p) ->
+  | Mem p, NoOffset when Ast_types.C.is_void_ptr (Cil.typeOf p) ->
     let newt = Cil_const.(mk_tptr (mk_tcomp f.fcomp)) in
     Mem (Cil.mkCast ~newt p), off
   | _ -> Cil.addOffsetLval off lv
@@ -178,10 +178,10 @@ module Readout = struct
                  | Field f -> add_field_and_cast f lv
                  | Pointer ->
                    let ty = Cil.typeOfLval lv in
-                   if Ast_types.is_array ty then
+                   if Ast_types.C.is_array ty then
                      Cil.addOffsetLval (Index (Simplified.nul_exp, NoOffset)) lv
                    else
-                     let () = if not @@ Ast_types.is_ptr ty then
+                     let () = if not @@ Ast_types.C.is_ptr ty then
                          Options.debug "unexpected type: %a" Printer.pp_typ ty
                      in
                      Mem (Cil.dummy_exp @@ Lval lv), NoOffset
@@ -621,7 +621,7 @@ let assignment s lv exp : state =
   match exp with
   | None -> s
   | Some e ->
-    match Ast_types.is_ptr (Cil.typeOf e), LvalOrRef.from_exp e with
+    match Ast_types.C.is_ptr (Cil.typeOf e), LvalOrRef.from_exp e with
     | false, _ | _, None -> s
     | true, Some y ->
       let v2, s = find_or_create_lval_or_ref_vertex y s in

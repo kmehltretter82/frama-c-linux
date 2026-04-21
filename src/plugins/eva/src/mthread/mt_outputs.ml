@@ -698,7 +698,7 @@ module Html = struct
 
     method! varinfo fmt (v:varinfo) =
       let vclass =
-        if Ast_types.is_fun v.vtype then "varinfo_fun" else "varinfo"
+        if Ast_types.C.is_fun v.vtype then "varinfo_fun" else "varinfo"
       in
       Format.fprintf fmt "@{<a class=\"%s\" href=\"#vid%d\">%a@}"
         vclass v.vid self#varname v.vname

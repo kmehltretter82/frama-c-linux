@@ -22,14 +22,14 @@ end
 
 let rec any_char_composed_type t =
   match t.tnode with
-  | _ when Ast_types.is_any_char t -> true
+  | _ when Ast_types.C.is_any_char t -> true
   | TArray (t, _) -> any_char_composed_type t
   | _ -> false
 
 let rec base_char_type t =
   assert (any_char_composed_type t) ;
   match t.tnode with
-  | _ when Ast_types.is_any_char t -> t
+  | _ when Ast_types.C.is_any_char t -> t
   | TArray (t, _) -> base_char_type t
   | _ -> assert false
 
@@ -165,7 +165,7 @@ let memset_value e =
   | _ -> None
 
 let rec contains_union_type t =
-  match Ast_types.unroll_node t with
+  match Ast_types.C.unroll_node t with
   | TComp { cstruct = false } ->
     true
   | TComp { cfields = Some fields } ->
@@ -180,7 +180,7 @@ let well_typed_call _ret _fct = function
       | (No_pointed | Of_null _) , _ -> false
       | Value_of t , _ when any_char_composed_type t -> true
       | Value_of t , _ when contains_union_type t -> false
-      | Value_of t , _ when Ast_types.is_void t -> false
+      | Value_of t , _ when Ast_types.C.is_void t -> false
       | Value_of t , _ when not (Cil.isCompleteType t) -> false
       | _, None -> false
       | _, Some _ -> true

@@ -30,7 +30,7 @@ and offset (r: node) (ty: typ) (ofs: offset) : node =
   | Field (fd, ofs) ->
     offset (field r fd) fd.ftype ofs
   | Index (_, ofs) ->
-    let te = Ast_types.direct_array_element ty in
+    let te = Ast_types.C.direct_array_element ty in
     offset (index r te) te ofs
 
 and exp (m: map) (e: exp) : node option =
@@ -77,7 +77,7 @@ let lvar env lv =
 (* -------------------------------------------------------------------------- *)
 
 let rec load env (ty,r) : domain =
-  match Ast_types.unroll_node ty with
+  match Ast_types.C.unroll_node ty with
   | TArray(te,_) ->
     let re = Memory.add_index r te in
     Domain.array (load env (te,re))
@@ -149,7 +149,7 @@ and addr_offset env r ty = function
   | TModel _ -> Options.not_yet_implemented "Unsupported model fields"
   | TField(fd,offset) -> addr_offset env (field r fd) fd.ftype offset
   | TIndex(_,offset) ->
-    let te = Ast_types.direct_array_element ty in
+    let te = Ast_types.C.direct_array_element ty in
     addr_offset env (index r ty) te offset
 
 and term_offset env d = function

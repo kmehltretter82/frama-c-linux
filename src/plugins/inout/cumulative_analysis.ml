@@ -17,8 +17,8 @@ open Visitor
    We still need to fold the explicit initializers to collect the inputs. *)
 let fold_implicit_initializer typ =
   not
-    (Ast_types.is_array typ &&
-     (Ast_types.(is_scalar (direct_array_element typ))
+    (Ast_types.C.is_array typ &&
+     (Ast_types.C.(is_scalar (direct_array_element typ))
       || Ast_info.array_size typ > 100z))
 
 let specialize_state_on_call ?stmt kf =

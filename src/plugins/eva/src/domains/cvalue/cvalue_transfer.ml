@@ -56,13 +56,13 @@ let warn_imprecise_offsm_write ?prefix lval offsm =
 (* ---------------------------------------------------------------------- *)
 
 let reduce valuation lval value t =
-  match valuation.Abstract_domain.find_loc lval with
-  | `Value record ->
-    let loc = Precise_locs.imprecise_location record.loc in
-    if Locations.cardinal_zero_or_one loc
-    then Cvalue.Model.reduce_indeterminate_binding t loc value
-    else t
-  | `Top -> t (* Cannot reduce without the location of the lvalue. *)
+    match valuation.Abstract_domain.find_loc lval with
+    | `Value record ->
+      let loc = Precise_locs.imprecise_location record.loc in
+      if Locations.cardinal_zero_or_one loc
+      then Cvalue.Model.reduce_indeterminate_binding t loc value
+      else t
+    | `Top -> t (* Cannot reduce without the location of the lvalue. *)
 
 let is_smaller_value typ v1 v2 =
   let size = Z.of_int (Cil.bitsSizeOf typ) in
@@ -75,7 +75,7 @@ let update valuation t =
   let process exp record t =
     match exp.node with
     | Lval lv ->
-      if record.reductness = Reduced && Ast_types.is_scalar lv.typ
+      if record.reductness = Reduced && Ast_types.C.is_scalar lv.typ
       then
         let {v; initialized; escaping} = record.value in
         let v = unbottomize v in

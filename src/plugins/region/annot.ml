@@ -57,7 +57,7 @@ let add_points_to env tgt = function
     add_dpoints_to env tgt @@ dpoints_to env deps
 
 let rec store env lv ty tgt deps =
-  match Ast_types.unroll_skel ty with
+  match Ast_types.C.unroll_skel ty with
   | TNamed _ | TVoid -> () (* should not occur *)
   | TPtr _ | TFun _ | TBuiltin_va_list ->
     add_write env lv tgt ;
@@ -104,14 +104,14 @@ let add_write_compound env lv ty tgt from =
 
 let add_writes_from ~loc env (lv : term_lval) ~(from:deps) =
   let ty,tgt = add_addr_lval ~loc env lv in
-  if Ast_types.is_arithmetic ty then
+  if Ast_types.C.is_arithmetic ty then
     add_write env lv tgt
-  else if Ast_types.is_fun_or_ptr ty then
+  else if Ast_types.C.is_fun_or_ptr ty then
     begin
       add_write env lv tgt ;
       add_points_to env tgt from ;
     end
-  else if Ast_types.is_struct_or_union ty then
+  else if Ast_types.C.is_struct_or_union ty then
     add_write_compound env lv ty tgt from
   else
     Options.not_yet_implemented
@@ -192,7 +192,7 @@ let add_bassigns ~called ~map ~kf ~ki ~bhv ~formals ~result = function
     | None -> ()
     | Some result ->
       if not !result &&
-         Ast_types.is_fun_or_ptr @@ Kernel_function.get_return_type kf
+         Ast_types.C.is_fun_or_ptr @@ Kernel_function.get_return_type kf
       then
         let loc = Access.location context in
         Options.warning ~wkey ~source:(fst loc)

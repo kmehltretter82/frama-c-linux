@@ -179,7 +179,7 @@ struct
           match Base.typeof base with
           | None -> `Top
           | Some base_typ ->
-            let typ = Ast_types.direct_pointed_type exp.typ in
+            let typ = Ast_types.C.direct_pointed_type exp.typ in
             let* base_offset = Offset.of_ival ~base_typ ~typ ival in
             let* base_offset = match index with
               | None -> `Value (base_offset)
@@ -364,7 +364,7 @@ struct
   let covers_base (tracked : Tracking.t option) (b : base) : bool =
     match b with
     | Base.Var (vi, _) ->
-      not (Ast_types.is_volatile vi.vtype) &&
+      not (Ast_types.C.is_volatile vi.vtype) &&
       Option.fold ~none:true ~some:(Tracking.mem b) tracked
     | Null -> true
     | CLogic_Var _ | Allocated (_, _, _) -> false
@@ -651,7 +651,7 @@ struct
     `Value (Value.top, None), Alarmset.all
 
   let extract_lval ~oracle _context state lv _loc =
-    if Ast_types.is_scalar lv.Eva_ast.typ then
+    if Ast_types.C.is_scalar lv.Eva_ast.typ then
       let oracle = fun exp ->
         match oracle exp with
         | `Value v, alarms when Alarmset.is_empty alarms -> v (* only use values safely evaluated *)
@@ -687,7 +687,7 @@ struct
     let* state = state' in
     let oracle = valuation_to_oracle state valuation in
     match (expr : Eva_ast.exp).node with
-    | Lval lv when Ast_types.is_scalar lv.typ ->
+    | Lval lv when Ast_types.C.is_scalar lv.typ ->
       let value = Value_or_Uninitialized.from_flagged record.value in
       if not (Value.is_topint (Value_or_Uninitialized.get_v value)) then
         match Location.of_lval oracle lv with
@@ -807,7 +807,7 @@ struct
       begin match Location.of_term env arg with
         | `Top -> `Value state (* can't resolve location, ignore *)
         | `Value (loc,typ) ->
-          begin match Ast_types.unroll_node (Ast_types.Acsl.logic_ctype typ) with
+          begin match Ast_types.C.unroll_node (Ast_types.Acsl.logic_ctype typ) with
             | TFloat fkind ->
               let update = Value.backward_is_finite positive fkind
               and oracle = mk_oracle state in

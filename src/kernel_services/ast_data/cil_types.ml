@@ -276,10 +276,10 @@ and global =
     pointer types, and function types. Every type is associated with a list of
     attributes, which are always kept in sorted order. Use
     {!Ast_attributes.add} and {!Ast_attributes.add_list} to construct list of
-    attributes, {!Ast_types.add_attributes} to add them to a type. If you
-    want to inspect a type, you should use {!Ast_types.unroll},
-    {!Ast_types.unroll_node}, {!Ast_types.unroll_skel},
-    {!Ast_types.unroll_deep} or {!Ast_types.unroll_deep_node} to see through
+    attributes, {!Ast_types.C.add_attributes} to add them to a type. If you
+    want to inspect a type, you should use {!Ast_types.C.unroll},
+    {!Ast_types.C.unroll_node}, {!Ast_types.C.unroll_skel},
+    {!Ast_types.C.unroll_deep} or {!Ast_types.C.unroll_deep_node} to see through
     the uses of named types.
 
     CIL is configured at build-time with the sizes and alignments of the
@@ -339,7 +339,7 @@ and typ_node =
       global. This is printed as just the type name. The actual referred type
       is not printed here and is carried only to simplify processing. To see
       through a sequence of named type references, use
-      {!Ast_types.unroll}. The attributes are in addition to those given
+      {!Ast_types.C.unroll}. The attributes are in addition to those given
       when the type name was defined. *)
 
   | TComp of compinfo [@printer fun fmt ci -> Format.fprintf fmt "<cname:%S>" ci.cname]

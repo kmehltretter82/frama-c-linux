@@ -48,7 +48,7 @@ let mk_array_init loc dest src =
     | Str s -> String.length s, to_seq_string loc s
     | Wstr s -> List.length s, to_seq_wstring loc s
   in
-  let _,alen = Ast_types.array_elem_type_and_size dest.vtype in
+  let _,alen = Ast_types.C.array_elem_type_and_size dest.vtype in
   let alen = Option.bind Cil.constFoldToInt alen in
   let alen = Option.value ~default:(Z.of_int (len + 1)) alen in
   let idx = to_seq_idx alen in

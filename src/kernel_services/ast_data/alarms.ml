@@ -494,7 +494,7 @@ let create_predicate ?(loc=Fileloc.unknown) alarm =
 
     | Unaligned_pointer (e, typ) ->
       let e =
-        if not @@ Ast_types.is_ptr @@ Cil.typeOf e
+        if not @@ Ast_types.C.is_ptr @@ Cil.typeOf e
         then Cil.mkCast ~check:false ~newt:Cil_const.voidPtrType e
         else e
       in
@@ -509,7 +509,7 @@ let create_predicate ?(loc=Fileloc.unknown) alarm =
       let null = Logic_const.term ~loc Tnull t.term_type in
       Logic_const.por ~loc
         (Logic_const.prel (Req, null, t),
-         if Ast_types.is_fun_ptr (Cil.typeOf e)
+         if Ast_types.C.is_fun_ptr (Cil.typeOf e)
          then Logic_const.pvalid_function ~loc t
          else Logic_const.pobject_pointer ~loc (Logic_const.here_label, t))
 
@@ -531,7 +531,7 @@ let create_predicate ?(loc=Fileloc.unknown) alarm =
       let t1 = match e1 with
         | None -> begin
             let typ =
-              match Ast_types.unroll_deep_node (Cil.typeOf e2) with
+              match Ast_types.C.unroll_deep_node (Cil.typeOf e2) with
               | TPtr { tnode = TFun _ } ->
                 Cil_const.(mk_tptr (mk_tfun voidType None false))
               | _ -> Cil_const.voidPtrType
@@ -636,7 +636,7 @@ let create_predicate ?(loc=Fileloc.unknown) alarm =
       let loc = e.eloc in
       let t = Cil.typeOf e in
       let e =
-        let t' = Ast_types.unroll_deep t in
+        let t' = Ast_types.C.unroll_deep t in
         match t'.tnode, args with
         | TPtr { tnode = TFun (_, Some _, _) }, _
         | TPtr { tnode = TFun _ }, None -> e

@@ -384,7 +384,7 @@ struct
        the reevaluation of [right_expr] would reduce it incorrectly, by
        removing indeterminate flags without emitting alarms. *)
   let assign_eq (left_lval: Eva_ast.lval) right_expr value valuation state =
-    if not (Ast_types.is_scalar left_lval.typ) || indeterminate_copy value
+    if not (Ast_types.C.is_scalar left_lval.typ) || indeterminate_copy value
     then state
     else
       let right_expr = Eva_ast.const_fold right_expr in
@@ -459,21 +459,21 @@ struct
         if not (is_safe_equality valuation e1 e2)
         || valuation.Abstract_domain.is_volatile (`Expr e1)
         || valuation.Abstract_domain.is_volatile (`Expr e2)
-        || not (Ast_types.is_scalar e1.typ)
-        || (expr_is_cardinal_zero_or_one_loc valuation e1 &&
-            expr_cardinal_zero_or_one valuation e2)
-        || (expr_is_cardinal_zero_or_one_loc valuation e2 &&
-            expr_cardinal_zero_or_one valuation e1)
-        then `Value state
-        else
+          || not (Ast_types.C.is_scalar e1.typ)
+          || (expr_is_cardinal_zero_or_one_loc valuation e1 &&
+              expr_cardinal_zero_or_one valuation e2)
+          || (expr_is_cardinal_zero_or_one_loc valuation e2 &&
+              expr_cardinal_zero_or_one valuation e1)
+          then `Value state
+          else
           let e1 = Eva_ast.const_fold e1
           and e2 = Eva_ast.const_fold e2 in
-          try
-            let a1, a1_lvals, deps = register e1 valuation deps in
-            let a2, a2_lvals, deps = register e2 valuation deps in
-            let eqs = Equality.Set.unite (a1, a1_lvals) (a2, a2_lvals) eqs in
-            `Value (eqs, deps, modified_zone)
-          with Top_location -> `Value state
+            try
+              let a1, a1_lvals, deps = register e1 valuation deps in
+              let a2, a2_lvals, deps = register e2 valuation deps in
+              let eqs = Equality.Set.unite (a1, a1_lvals) (a2, a2_lvals) eqs in
+              `Value (eqs, deps, modified_zone)
+            with Top_location -> `Value state
       end
     | _ -> `Value state
 

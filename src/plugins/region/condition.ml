@@ -91,7 +91,7 @@ let rec falsy = function Invalid p -> p | Named(_,g) -> falsy g | g -> g
 
 let pointed = function
   | L lv -> Cil.typeOfLval lv
-  | E p -> Ast_types.pointed_type @@ Cil.typeOf p
+  | E p -> Ast_types.C.pointed_type @@ Cil.typeOf p
   | T(_,te) | R(_,te,_,_) -> te
 
 let is_zero t =
