@@ -197,23 +197,6 @@ input:focus-visible {
   box-shadow: 0px 0px 1px 1px var(--border);
 }
 
-input[type="checkbox"] {
-  appearance: none;
-  width: 13px;
-  height: 13px;
-  border: 1px solid var(--border);
-  border-radius: 2px;
-  content: "";
-  font-size: 12px;
-  color: var(--text);
-  background-clip: content-box;
-  padding: 1px;
-}
-
-input[type="checkbox"]:checked {
-  background-color: var(--checked-element);
-}
-
 /* -------------------------------------------------------------------------- */
 /* --- Modal                                                              --- */
 /* -------------------------------------------------------------------------- */
