@@ -266,7 +266,7 @@ export function CallstackSelection(): React.JSX.Element {
   return (
     <EvaReady>
       <div
-        className='dome-xTree-actions'
+        className='dome-xTree-actions dome-xSideBarSection-title'
         style={{ justifyContent: "flex-end" }}
       >
         <IconButton
