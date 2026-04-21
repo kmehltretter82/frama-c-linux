@@ -349,6 +349,7 @@ tr:first-of-type > .eva-table-callsite-box {
 }
 
 .eva-taint-list .eva-taint-row > .dome-xCheckbox {
+  display: block;
   flex: 1 1 auto;
 }
 
