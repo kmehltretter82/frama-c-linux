@@ -1,5 +1,6 @@
 /*run.config
-  OPT: -autocomplete=
+  COMMENT: Old kernel name was the empty string. Now it does not print anything.
+  OPT: -autocomplete=""
   COMMENT: the following test ensures kernel options are printed;
   COMMENT: but to avoid instable oracles, we filter almost all output
 FILTER: sed "/-.*$/d"
