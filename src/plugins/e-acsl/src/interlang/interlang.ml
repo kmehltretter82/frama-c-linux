@@ -108,7 +108,6 @@ module Pretty = struct
     | SizeOf ty -> fprintf fmt "SizeOf(@[%a])" Printer.pp_typ ty
 end
 
-
 module Optimization = struct
   let plus e1 e2 =
     match e1.enode, e2.enode with
@@ -192,6 +191,28 @@ module Exp_node = struct
 end
 
 module Exp = struct
+include Datatype.Make_with_hashtbl
+  (struct
+    type t = exp
+
+    let name = "Interlang_exp"
+
+    let reprs = [
+      {enode = True; origin = None}
+    ]
+
+    include Datatype.Undefined
+
+    let hash e = match e.enode with
+    | True -> -1
+    | False -> -2
+    | Integer i -> Hashtbl.hash i
+    | BinOp {binop; op1; op2} -> Hashtbl.hash binop + Hashtbl.hash op1 + Hashtbl.hash op2
+    | Lval l -> Hashtbl.hash l
+    | SizeOf s -> Hashtbl.hash s
+
+    end)
+
 
   let of_exp_node ?origin enode = {enode; origin}
 
