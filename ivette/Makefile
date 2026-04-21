@@ -10,7 +10,7 @@
 APP=Ivette
 DOME=./src/dome
 DOME_ARGS=--command $$(dirname $$0)/frama-c
-DOME_DEV=-server-debug 1
+DOME_DEV=
 DOME_CLI=../bin/ivette
 DOME_API=./src/frama-c
 DOME_CUSTOM_ENTRIES= yes
