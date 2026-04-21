@@ -2,7 +2,7 @@
 # --- Template .gitignore file for Dome
 # --------------------------------------------------------------------------
 
-.ivette
+.frama-c-gui.local
 .frama-c
 .dome-*.stamp
 .dome-*.back

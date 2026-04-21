@@ -358,7 +358,7 @@ function navigateURL(sender: Electron.WebContents) {
 function lookupConfig(pwd = '.'): string {
   const wdir = path.resolve(pwd);
   let cwd = wdir;
-  const cfg = `.${appName.toLowerCase().replace(' ', '-')}`;
+  const cfg = `.${appName.toLowerCase().replace(' ', '-')}.local`;
   for (; ;) {
     const here = path.join(cwd, cfg);
     if (fstat(here)) return here;

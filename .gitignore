@@ -13,7 +13,7 @@ TAGS
 /.frama-c/
 /.merlin
 /bin/frama-c-gui
-.frama-c-gui
+.frama-c-gui.local
 
 #build
 /_opam/
