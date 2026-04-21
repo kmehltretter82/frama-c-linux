@@ -57,7 +57,11 @@ function Taints({ taintNames }: { taintNames: string[] }): React.JSX.Element {
     useSyncState(EvaTaint.currentTaints);
 
   React.useEffect(() => {
-    if (current.length === taintNames.length)
+    /* Note that [current] should always be a subset of taintNames. */
+    const allTaintsSelected =
+      current.length >= taintNames.length
+      && taintNames.every((name) => current.includes(name));
+    if (allTaintsSelected)
       delTaintMessage();
     else
       addTaintMessage(current, () => setCurrent(taintNames));
