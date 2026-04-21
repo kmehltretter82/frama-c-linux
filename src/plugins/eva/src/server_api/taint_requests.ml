@@ -26,44 +26,52 @@ let _signal =
     ~add_hook:Analysis_requests.register_computation_hook
     ()
 
-module CurrentTaint = struct
-
+(* List of currently selected taints. *)
+module CurrentTaints = struct
   module Info = struct
-    let name = "Eva.Taint_requests.CurrentTaint"
+    let name = "Eva.Taint_requests.CurrentTaints"
     let dependencies = [ Self.state ]
-    let default () = []
+    let default = Taint_domain.taint_names
   end
 
   include State_builder.Ref (Datatype.List (Datatype.String)) (Info)
 end
 
+(* At the end of an analysis, select all taint names by default. *)
+let () =
+  Self.ComputationState.add_hook_on_change
+    (fun _ -> CurrentTaints.set (Taint_domain.taint_names ()))
+
 let current_taint_signal =
   States.register_framac_state ~package
-    ~name:"currentTaint"
+    ~name:"currentTaints"
     ~descr:(Markdown.plain "Names of the currently selected taints, if any")
     ~data:(module Data.Jlist (Data.Jstring))
-    (module CurrentTaint)
+    (module CurrentTaints)
 
 (* Takes into account the currently selected taints. *)
 let is_tainted zone request =
-  let names = CurrentTaint.get () in
-  Results.is_tainted ~names zone request
+  match CurrentTaints.get () with
+  | [] -> Ok Results.Untainted
+  | names -> Results.is_tainted ~names zone request
 
 let taint_names_by_kind zone request =
   let open Option.Operators in
-  let* names = Results.taint_names_by_kind zone request |> Result.to_option in
-  match CurrentTaint.get () with
-  | [] -> Some names
+  match CurrentTaints.get () with
+  | [] ->
+    let empty = Datatype.String.Set.empty in
+    Some Results.{ direct_taint_names = empty; indirect_taint_names = empty }
   | current_names ->
+    let+ names = Results.taint_names_by_kind zone request |> Result.to_option in
     let selected = Datatype.String.Set.of_list current_names in
     let restrict = Datatype.String.Set.inter selected in
     let direct_taint_names = restrict names.direct_taint_names in
     let indirect_taint_names = restrict names.indirect_taint_names in
-    Some { direct_taint_names; indirect_taint_names }
+    Results.{ direct_taint_names; indirect_taint_names }
 
 let register_hook f =
   Analysis_requests.register_computation_hook f;
-  CurrentTaint.add_hook_on_change (fun _ -> f ())
+  CurrentTaints.add_hook_on_change (fun _ -> f ())
 
 (* ----- Taint statuses ----------------------------------------------------- *)
 
