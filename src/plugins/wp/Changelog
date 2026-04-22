@@ -24,6 +24,9 @@
 Plugin WP <next-release>
 ###############################################################################
 
+- WP          [2026-04-22] remove -wp-cache-env, options that can be configured
+                           with environment variables now obey the rule
+                           "option first".
 - WP          [2026-02-04] Renamed option -wp-list-provers (replaces -wp-detect)
 - WP          [2026-02-04] New option -wp-why3-config (now optional)
 - WP          [2026-02-04] New option -wp-why3-detect (from $PATH, by default)
