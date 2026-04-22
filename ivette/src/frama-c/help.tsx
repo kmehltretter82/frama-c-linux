@@ -181,8 +181,9 @@ function CreditsModal(): JSX.Element {
       <div ref={scrollableArea} className="globals-scrollable-area">
         <FramaCLogo />
         <Hbox>
-          <p style={{ fontSize: '1.2em', textAlign: "center" }}
-          >Created by:</p>
+          <p style={{ fontSize: '1.2em', textAlign: "center" }}>
+            Created by:
+          </p>
         </Hbox>
         <div className='modal-framac-credits'>
           {authors.map((author, i) => <div key={i} >{author}</div>)}
