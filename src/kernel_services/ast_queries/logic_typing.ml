@@ -1737,8 +1737,8 @@ struct
     | Ltype({lt_name = "set"}, [t1]), t2 ->
       let (env, ot, nt) = partial_unif ~overloaded loc term t1 t2 env in
       env, Ast_types.Acsl.make_set ot, Ast_types.Acsl.make_set nt
-    | t1,t2 when Ast_types.Acsl.is_plain_bool t1
-              && Ast_types.Acsl.is_plain_bool t2 ->
+    | t1,t2 when Ast_types.Acsl.is_plain_boolean t1
+              && Ast_types.Acsl.is_plain_boolean t2 ->
       env,ot,nt
     | ((Ctype _ | Linteger | Lreal | Lboolean),
        (Ctype _ | Linteger | Lreal | Lboolean)) ->
@@ -3374,7 +3374,7 @@ struct
 
   and type_bool_term ctxt env t =
     let tt = ctxt.type_term ctxt env t in
-    if not (Ast_types.Acsl.is_plain_bool tt.term_type) then
+    if not (Ast_types.Acsl.is_plain_boolean tt.term_type) then
       ctxt.error t.lexpr_loc "boolean expected but %a found"
         Cil_printer.pp_logic_type tt.term_type;
     mk_cast tt Lboolean

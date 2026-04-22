@@ -2830,8 +2830,8 @@ let no_op_coerce typ t =
   match typ with
   | Lreal -> Ast_types.Acsl.is_plain_arithmetic t.term_type
   | Linteger -> Ast_types.Acsl.is_plain_integral t.term_type
-  | Ltype _ when Ast_types.Acsl.is_logic_bool typ ->
-    Ast_types.Acsl.is_plain_pure_bool t.term_type
+  | Ltype _ when Ast_types.Acsl.is_logic_boolean typ ->
+    Ast_types.Acsl.is_plain_pure_boolean t.term_type
   | Ltype ({lt_name="set"},_) -> true
   | _ -> false
 

@@ -462,7 +462,7 @@ struct
           Warning.error "@[Logic cast from union (%a) not implemented yet@]"
             Printer.pp_typ src_ctype
       end
-    | Ltype _ as b when Ast_types.Acsl.is_logic_bool b -> L_bool
+    | Ltype _ as b when Ast_types.Acsl.is_logic_boolean b -> L_bool
     | Ltype({lt_name="set"},[elt_ltype]) -> (* lifting or set of elements ? *)
       cvsort_of_ltype elt_ltype
     | (Ltype _ | Lvar _ | Larrow _) as typ ->

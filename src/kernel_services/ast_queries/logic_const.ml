@@ -424,4 +424,4 @@ let is_plain_type = Ast_types.Acsl.is_plain
 
 let make_arrow_type = Ast_types.Acsl.make_arrow
 
-let is_boolean_type = Ast_types.Acsl.is_logic_bool
+let is_boolean_type = Ast_types.Acsl.is_logic_boolean

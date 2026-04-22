@@ -581,24 +581,24 @@ module Acsl = struct
     | Ltype (lti, _) -> unroll_aux is_plain_typetag lti t
     | _ -> false
 
-  let rec is_plain_bool t =
+  let rec is_plain_boolean t =
     match t with
     | Ctype t -> C.is_integral t
     | Lboolean | Linteger -> true
-    | Ltype (lti, _) -> unroll_aux is_plain_bool lti t
+    | Ltype (lti, _) -> unroll_aux is_plain_boolean lti t
     | Lreal | Lvar _ | Larrow _ -> false
 
-  let rec is_plain_pure_bool t =
+  let rec is_plain_pure_boolean t =
     match t with
     | Ctype t -> C.is_bool t
     | Lboolean -> true
-    | Ltype (lti, _) -> unroll_aux is_plain_pure_bool lti t
+    | Ltype (lti, _) -> unroll_aux is_plain_pure_boolean lti t
     | _ -> false
 
-  let rec is_logic_bool = function
+  let rec is_logic_boolean = function
     | Lboolean -> true
     | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-      is_logic_bool (unroll_ltdef ty)
+      is_logic_boolean (unroll_ltdef ty)
     | _ -> false
 
   let rec is_plain_integral t =
@@ -824,9 +824,9 @@ let is_logic_volatile = Acsl.is_plain_volatile
 
 let is_logic_typetag = Acsl.is_plain_typetag
 
-let is_logic_boolean = Acsl.is_plain_bool
+let is_logic_boolean = Acsl.is_plain_boolean
 
-let is_logic_pure_boolean = Acsl.is_plain_pure_bool
+let is_logic_pure_boolean = Acsl.is_plain_pure_boolean
 
 let is_logic_integral = Acsl.is_plain_integral
 

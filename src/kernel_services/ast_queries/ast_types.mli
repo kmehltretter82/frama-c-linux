@@ -823,7 +823,7 @@ module Acsl : sig
   (** @return true if the argument is a [Lboolean] (uses
       {!Ast_types.Acsl.unroll_ltdef} if needed).
   *)
-  val is_logic_bool: logic_type -> bool
+  val is_logic_boolean: logic_type -> bool
 
   (** {4 tests for direct type}
       [is_plain_xxx t] returns true iff [t] is a [xxx] (and not a [set<xxx>].
@@ -841,10 +841,10 @@ module Acsl : sig
   (** True if the argument is a boolean type, either integral C type
       or mathematical boolean one.
   *)
-  val is_plain_bool: logic_type -> bool
+  val is_plain_boolean: logic_type -> bool
 
-  (** True if the argument is [_Bool] or [boolean]. *)
-  val is_plain_pure_bool: logic_type -> bool
+  (** True if the argument is [_Bool] or [Lboolean]. *)
+  val is_plain_pure_boolean: logic_type -> bool
 
   (** True if the argument is an integral type (i.e. integer or enum), either C
       or mathematical one.
@@ -1005,13 +1005,13 @@ val is_logic_typetag : logic_type -> bool
     mathematical boolean one.
 *)
 val is_logic_boolean : logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_plain_bool instead"]
-[@@migrate { repl = Rel.Acsl.is_plain_bool }]
+[@@deprecated "Use Ast_types.Acsl.is_plain_boolean instead"]
+[@@migrate { repl = Rel.Acsl.is_plain_boolean }]
 
-(** True if the argument is [_Bool] or [boolean]. *)
+(** True if the argument is [_Bool] or [Lboolean]. *)
 val is_logic_pure_boolean : logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_plain_pure_bool instead"]
-[@@migrate { repl = Rel.Acsl.is_plain_pure_bool }]
+[@@deprecated "Use Ast_types.Acsl.is_plain_pure_boolean instead"]
+[@@migrate { repl = Rel.Acsl.is_plain_pure_boolean }]
 
 (** True if the argument is an integral type (i.e. integer or enum), either C or
     mathematical one.

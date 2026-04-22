@@ -1203,7 +1203,7 @@ let rec eval_term ~alarm_mode env t =
        type, that require a conversion. *)
     (match Ast_types.Acsl.plain_or_set Fun.id ltyp with
      | Linteger when Ast_types.Acsl.is_integral t.term_type
-                  || Ast_types.Acsl.is_logic_bool t.term_type -> r
+                  || Ast_types.Acsl.is_logic_boolean t.term_type -> r
      | Ctype typ when Ast_types.C.is_integral_or_pointer typ -> r
      | Lreal ->
        let eover =
@@ -1216,7 +1216,7 @@ let rec eval_term ~alarm_mode env t =
          eover; eunder = under_from_over eover;
          empty = r.empty }
      | ltyp ->
-       if Ast_types.Acsl.is_logic_bool ltyp
+       if Ast_types.Acsl.is_logic_boolean ltyp
        && Ast_types.Acsl.is_integral t.term_type
        then cast_to_bool r
        else if Cil_datatype.Logic_type_ByName.equal ltyp t.term_type then
