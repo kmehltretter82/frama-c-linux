@@ -1,5 +1,5 @@
-########################
-# HEADER_SPEC: .ignore #
-########################
+#########################
+# HEADER_SPEC: CEA_LGPL #
+#########################
 
-/META.in header_spec=.ignore
+*.xml header_spec=CEA_LGPL
