@@ -30,6 +30,14 @@ let code_annotation_loc ca stmt =
   | _ -> Cil_datatype.Stmt.loc stmt
 
 
+let iter_normal_ensures f kf =
+  let f bhv _emitter (kind, ensures) =
+    if kind = Normal
+    then f (Property.ip_of_ensures kf Kglobal bhv (kind, ensures))
+  in
+  Annotations.iter_behaviors
+    (fun bhv -> Annotations.iter_ensures (f bhv) kf bhv.b_name) kf
+
 let mark_unreachable () =
   let mark ppt =
     if not (Property_status.automatically_computed ppt) then begin
@@ -44,7 +52,7 @@ let mark_unreachable () =
     end
   in
   (* Mark standard code annotations *)
-  let do_code_annot stmt _emit ca =
+  let mark_code_annot stmt _emit ca =
     if not (Results.is_reachable stmt) then begin
       let kf = Kernel_function.find_englobing_kf stmt in
       let ppts = Property.ip_of_code_annot kf stmt ca in
@@ -52,7 +60,7 @@ let mark_unreachable () =
     end
   in
   (* Mark preconditions of dead calls *)
-  let unreach = object
+  let mark_preconditions = object
     inherit Visitor.frama_c_inplace
 
     method! vstmt_aux stmt =
@@ -91,8 +99,18 @@ let mark_unreachable () =
     method! vcode_annot _ = Cil.SkipChildren
   end
   in
-  Annotations.iter_all_code_annot do_code_annot;
-  Visitor.visitFramacFileFunctions unreach (Ast.get ())
+  (* Mark postconditions of analyzed functions with unreachable return stmt. *)
+  let mark_postconditions kf =
+    match Function_calls.analysis_status kf with
+    | Analyzed _ when not (Eva_utils.skip_specifications kf) ->
+      let return_stmt = Kernel_function.find_return kf in
+      if not (Results.is_reachable return_stmt) then
+        iter_normal_ensures mark kf
+    | _ -> ()
+  in
+  Annotations.iter_all_code_annot mark_code_annot;
+  Visitor.visitFramacFileFunctions mark_preconditions (Ast.get ());
+  Globals.Functions.iter mark_postconditions
 
 let c_labels kf cs =
   let module LabelMap = Cil_datatype.Logic_label.Map in

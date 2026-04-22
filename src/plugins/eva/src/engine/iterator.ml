@@ -127,8 +127,6 @@ module Make_Dataflow
   let get_initial_flow () =
     -1 (* Dummy edge id *), Partitioning.drain initial_tank
 
-  let post_conditions = ref false
-
   (* --- Analysis state --- *)
 
   (* Reference to the current statement processed by the analysis.
@@ -276,7 +274,6 @@ module Make_Dataflow
     in
     (* Check postconditions *)
     let check_postconditions = fun state ->
-      post_conditions := true;
       if Eva_utils.skip_specifications kf then
         [state]
       else
@@ -581,17 +578,11 @@ module Make_Dataflow
       if Kernel_function.equal englobing_kf kf then (
         Eva_utils.DegenerationPoints.replace s true)
 
-  (* If the postconditions have not been evaluated, mark them as true. *)
-  let mark_postconds_as_true () =
-    ignore (Transfer_logic.check_fct_postconditions kf active_behaviors Normal
-              ~pre_state:initial_state ~post_states:[] ~result:None)
-
   let compute () : (key * state) list =
     if interpreter_mode then
       simulate automaton.entry_point (get_initial_flow ())
     else
       iterate_list automaton.wto;
-    if not !post_conditions then mark_postconds_as_true ();
     let final_store = get_vertex_store automaton.return_point in
     Partitioning.expanded final_store
 
