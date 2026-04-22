@@ -384,27 +384,6 @@ meter::-webkit-meter-even-less-good-value  {
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Styling Switches                                                   --- */
-/* -------------------------------------------------------------------------- */
-
-.dome-xSwitch {
-    flex: 0 0 auto ;
-    padding: 0px ;
-    margin: 1px 4px ;
-}
-
-.dome-xSwitch .dome-xIcon {
-    position: relative ;
-    height: 0px ;
-    top: 2px ;
-    margin-right: 3px ;
-}
-
-.dome-xSwitch.dome-control-enabled:hover:not(:disabled) {
-    fill: blue ;
-}
-
-/* -------------------------------------------------------------------------- */
 /* --- Styling Select                                                     --- */
 /* -------------------------------------------------------------------------- */
 
