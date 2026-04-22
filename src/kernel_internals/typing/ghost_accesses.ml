@@ -67,7 +67,7 @@ let get_lvalue = function
   | _ -> None
 
 let rec ghost_term_type t =
-  match (Ast_types.Acsl.unroll_logic t) with
+  match (Ast_types.Acsl.unroll t) with
   | Ctype t -> Ast_types.C.is_ghost t
   | t when Ast_types.Acsl.is_plain_set t ->
     ghost_term_type (Ast_types.Acsl.set_element t)

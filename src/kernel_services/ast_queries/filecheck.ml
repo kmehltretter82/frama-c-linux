@@ -906,7 +906,7 @@ module Base_checker = struct
           self#check_logic_label l; Cil.DoChildren
         | TBinOp (bop, lterm, _) ->
           begin
-            match bop, Ast_types.Acsl.is_logic_pointer lterm.term_type with
+            match bop, Ast_types.Acsl.is_ptr lterm.term_type with
             | (PlusA | MinusA), true ->
               check_abort "PlusA/MinusA operator with pointer argument @[(%a)@]"
                 Printer.pp_logic_type lterm.term_type

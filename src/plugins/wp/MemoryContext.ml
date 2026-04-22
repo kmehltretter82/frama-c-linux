@@ -98,7 +98,7 @@ open Logic_const
 
 let rec ptr_of = function
   | Ctype t -> Ctype (Cil_const.mk_tptr t)
-  | t when Ast_types.Acsl.is_set t ->
+  | t when Ast_types.Acsl.is_plain_set t ->
     let t = Ast_types.Acsl.set_element t in
     Ast_types.Acsl.make_set (ptr_of t)
   | _ -> assert false
@@ -213,7 +213,7 @@ let normalize ps =
 
 let ptrset { term_type = t } =
   let open Ast_types.Acsl in
-  is_pointer t || (is_set t && is_pointer (set_element t))
+  is_ptr t || (is_plain_set t && is_ptr (set_element t))
 
 (* -------------------------------------------------------------------------- *)
 (* --- Partition Helpers                                                  --- *)

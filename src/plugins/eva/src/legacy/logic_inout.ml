@@ -55,7 +55,7 @@ let eval_error_reason fmt e =
 let is_address term =
   match term.term_node with
   | TAddrOf (TVar _, _) | TStartOf (TVar _, _) -> true
-  | TLval (TVar lv, _) when Ast_types.Acsl.is_logic_fun lv.lv_type -> true
+  | TLval (TVar lv, _) when Ast_types.Acsl.is_plain_fun lv.lv_type -> true
   | _ -> false
 
 let eval_tlval_as_zone assigns kind env acc t =

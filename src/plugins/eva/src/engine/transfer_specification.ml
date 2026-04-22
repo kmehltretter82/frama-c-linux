@@ -155,7 +155,7 @@ let reduce_to_valid_location kind term loc =
 let term_as_address term =
   match term.it_content.term_node with
   | TAddrOf (TVar lv, _) | TStartOf (TVar lv, _) -> lv.lv_origin
-  | TLval (TVar lv, _) when Ast_types.Acsl.is_logic_fun lv.lv_type ->
+  | TLval (TVar lv, _) when Ast_types.Acsl.is_plain_fun lv.lv_type ->
     lv.lv_origin
   | _ -> None
 

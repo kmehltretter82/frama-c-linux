@@ -26,7 +26,7 @@ let is_compatible_ltype t1 t2 =
 let is_instance_of vars t1 t2 =
   let rec aux map t1 t2 =
     if is_compatible_ltype t1 t2 then true, map else begin
-      match (Ast_types.Acsl.unroll_logic t1, Ast_types.Acsl.unroll_logic t2) with
+      match (Ast_types.Acsl.unroll t1, Ast_types.Acsl.unroll t2) with
       | _, Lvar s when List.mem s vars ->
         if Datatype.String.Map.mem s map then
           is_compatible_ltype t1 (Datatype.String.Map.find s map),
@@ -63,7 +63,7 @@ let is_instance_of vars t1 t2 =
 
 let plain_array_to_ptr ty =
   let open Current_loc.Operators in
-  match Ast_types.Acsl.unroll_logic ty with
+  match Ast_types.Acsl.unroll ty with
   | Ctype({ tnode = TArray(ty,lo); tattr } as tarr) ->
     let length_attr =
       match lo with
@@ -142,7 +142,7 @@ let rec is_C_array t =
     | TMem _ -> true
     | TVar _ -> false
   in
-  Ast_types.Acsl.is_logic_array t.term_type &&
+  Ast_types.Acsl.is_array t.term_type &&
   (match t.term_node with
    | TStartOf (lh,_) -> is_C_array_lhost lh
    | TLval(lh,_) -> is_C_array_lhost lh
@@ -172,7 +172,7 @@ let rec mk_logic_StartOf t =
 let mk_logic_AddrOf ?(loc=Fileloc.unknown) lval typ =
   let lift_set typ =
     Ast_types.Acsl.transform_element
-      (fun typ -> Ctype (Cil_const.mk_tptr (Ast_types.Acsl.logic_ctype typ))) typ
+      (fun typ -> Ctype (Cil_const.mk_tptr (Ast_types.Acsl.get_ctype typ))) typ
   in
   match lval with
   | TMem e, TNoOffset -> Logic_const.term ~loc e.term_node e.term_type
@@ -182,7 +182,7 @@ let mk_logic_AddrOf ?(loc=Fileloc.unknown) lval typ =
     Logic_const.term ~loc (TAddrOf lval) (lift_set typ)
 
 let isLogicPointer t =
-  Ast_types.Acsl.is_logic_pointer t.term_type || (is_C_array t)
+  Ast_types.Acsl.is_ptr t.term_type || (is_C_array t)
 
 let mk_logic_pointer_or_StartOf t =
   if isLogicPointer t then
@@ -291,7 +291,7 @@ let mk_coerce ltyp t =
   Logic_const.term ~loc:t.term_loc (TCast (true, ltyp, t)) ltyp
 
 let rec numeric_coerce ltyp t =
-  let oldt = Ast_types.Acsl.unroll_logic t.term_type in
+  let oldt = Ast_types.Acsl.unroll t.term_type in
   match t.term_node with
   | TCast (true, lt,e) when Cil.no_op_coerce lt e ->
     (* coercion hidden by the printer, but still present *)
@@ -338,7 +338,7 @@ and numeric_bound ltyp = function
    and scalar_term_to_predicate in sync. *)
 
 let is_zero_comparable t =
-  match Ast_types.Acsl.unroll_logic t.term_type with
+  match Ast_types.Acsl.unroll t.term_type with
   | Ctype { tnode = (TInt _ | TFloat _ | TPtr _  | TArray _ | TFun _ | TEnum _) } -> true
   | Ctype { tnode = (TVoid  | TNamed _ | TComp _ | TBuiltin_va_list) } -> false
   | Linteger | Lreal | Lboolean -> true
@@ -355,7 +355,7 @@ let scalar_term_conversion conversion t =
     conversion ~loc false t (Logic_const.term ~loc Tnull t.term_type) in
   let bool_conversion t =
     conversion ~loc true t (Logic_const.tboolean ~loc true) in
-  match Ast_types.Acsl.unroll_logic t.term_type with
+  match Ast_types.Acsl.unroll t.term_type with
   | Ctype { tnode = (TInt _ | TEnum _) } -> int_conversion t
   | Ctype { tnode = TFloat _ } as ltyp -> real_conversion ~ltyp t
   | Ctype { tnode = TPtr _ } -> ptr_conversion t
@@ -2216,7 +2216,7 @@ class complete_types =
         | _, [] -> if changed then List.rev args' else args
         | { lv_type = typ } :: typs, t :: terms ->
           let t' =
-            match Ast_types.Acsl.unroll_logic typ with
+            match Ast_types.Acsl.unroll typ with
             | Ctype typ -> mk_cast typ t
             | _ -> t
           in
@@ -2243,8 +2243,8 @@ class complete_types =
     method! vterm t =
       match t.term_node with
       | TLval (TVar v, TNoOffset)
-        when Ast_types.Acsl.is_logic Cil.isCompleteType v.lv_type &&
-             not (Ast_types.Acsl.is_logic Cil.isCompleteType t.term_type) ->
+        when Ast_types.Acsl.plain_or_set_ctype Cil.isCompleteType v.lv_type &&
+             not (Ast_types.Acsl.plain_or_set_ctype Cil.isCompleteType t.term_type) ->
         ChangeDoChildrenPost({ t with term_type = v.lv_type }, fun x -> x)
       | _ -> DoChildrenPost self#insert_cast_term
 
@@ -2325,7 +2325,7 @@ let rec constFoldTermToInt ?(machdep=true) (e: term) : Z.t option =
   | TConst (LReal _ | LWStr _ | LStr _) -> None
   | TSizeOf typ -> constFoldSizeOfToInt ~machdep typ
   | TSizeOfE t -> begin
-      match Ast_types.Acsl.unroll_logic t.term_type with
+      match Ast_types.Acsl.unroll t.term_type with
       | Ctype typ -> constFoldSizeOfToInt ~machdep typ
       | _ -> None
     end
@@ -2471,7 +2471,7 @@ and bitsLogicOffset ltyp off : Z.t * Z.t =
         loopOff f.ftype (Z.of_int (Cil.bitsSizeOf f.ftype)) start off
     | TModel _ -> raise (Cil.SizeOfError ("bitsLogicOffset on model field", typ))
   in
-  match Ast_types.Acsl.unroll_logic ltyp with
+  match Ast_types.Acsl.unroll ltyp with
   | Ctype typ -> loopOff typ Z.zero Z.zero off
   | _ -> raise (Cil.SizeOfError ("bitsLogicOffset on logic type", Cil_const.voidPtrType))
 
@@ -2609,7 +2609,7 @@ let eval_term_lval global_find_init (lhost, loff) =
   | TVar lvi -> begin
       (* See if we can evaluate the l-value using the initializer of lvi*)
       let off_type = Cil.typeTermOffset lvi.lv_type loff in
-      if Ast_types.Acsl.plain_or_set Ast_types.Acsl.is_logic_integral off_type then
+      if Ast_types.Acsl.plain_or_set Ast_types.Acsl.is_plain_integral off_type then
         match lvi.lv_origin with
         | Some vi when vi.vglob && Ast_types.C.has_qualifier "const" vi.vtype ->
           find_initial_value (global_find_init vi) loff
@@ -2665,9 +2665,9 @@ let is_array_type = Ast_types.Acsl.is_array
 
 let is_pointer_type = Ast_types.Acsl.is_ptr
 
-let is_list_type = Ast_types.Acsl.is_list
+let is_list_type = Ast_types.Acsl.is_plain_list
 
-let is_set_type = Ast_types.Acsl.is_set
+let is_set_type = Ast_types.Acsl.is_plain_set
 
 let type_of_set_elem = Ast_types.Acsl.set_element
 

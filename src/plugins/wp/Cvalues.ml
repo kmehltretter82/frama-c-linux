@@ -305,7 +305,7 @@ let cdomain obj =
   if is_constrained_obj obj then Some(TYPE.is_obj obj) else None
 
 let ldomain ltype =
-  match Ast_types.Acsl.unroll_logic ~unroll_typedef:false ltype with
+  match Ast_types.Acsl.unroll ~unroll_typedef:false ltype with
   | Ctype typ -> cdomain (Ctypes.object_of typ)
   | Ltype _ | Lvar _ | Lboolean | Linteger | Lreal | Larrow _ -> None
 
@@ -486,7 +486,7 @@ let map_logic f = function
   | Lset ls -> Lset (List.map (map_sloc f) ls)
 
 let plain lt e =
-  if Ast_types.Acsl.is_set lt then
+  if Ast_types.Acsl.is_plain_set lt then
     let te = Ast_types.Acsl.set_element lt in
     Vset [Vset.Set(tau_of_ltype te,e)]
   else
@@ -816,12 +816,12 @@ struct
         | Vset s -> a.vset <- List.rev_append s a.vset
         | Lset s -> a.sloc <- List.rev_append s a.sloc
       ) vs ;
-    flush (Ast_types.Acsl.is_pointer t) a
+    flush (Ast_types.Acsl.is_ptr t) a
 
   let inter t vs =
     match List.map (fun v -> Vset.concretize (vset v)) vs with
     | [] ->
-      if Ast_types.Acsl.is_pointer @@ Ast_types.Acsl.set_element t
+      if Ast_types.Acsl.(is_ptr @@ set_element t)
       then Lset [] else Vset []
     | v::vs ->
       let s = List.fold_left Vset.inter v vs in

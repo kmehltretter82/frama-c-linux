@@ -94,7 +94,7 @@ struct
   let collection_of_term env t =
     let v = C.logic env t in
     match v with
-    | Vexp s when Ast_types.Acsl.is_set t.term_type ->
+    | Vexp s when Ast_types.Acsl.is_plain_set t.term_type ->
       let te = Ast_types.Acsl.set_element t.term_type in
       Vset [Vset.Set(tau_of_ltype te,s)]
     | w -> w
@@ -265,7 +265,7 @@ struct
   and matrixinfo = c_object * int option list
 
   let eqsort_of_type t =
-    match Ast_types.Acsl.unroll_logic ~unroll_typedef:false t with
+    match Ast_types.Acsl.unroll ~unroll_typedef:false t with
     | Ltype({lt_name="set"},[_]) -> EQ_set
     | Lboolean | Linteger | Lreal | Lvar _ | Larrow _ | Ltype _ -> EQ_plain
     | Ctype t ->
@@ -342,7 +342,7 @@ struct
 
 
   let float_of_logic_type lt =
-    match Ast_types.Acsl.unroll_logic lt with
+    match Ast_types.Acsl.unroll lt with
     | Ctype ty ->
       (match Ast_types.C.unroll_node ty with
        | TFloat f -> Some (Ctypes.c_float f)
@@ -350,7 +350,7 @@ struct
     | _ -> None
 
   let compare_term env vrel lrel frel a b =
-    if Ast_types.Acsl.is_pointer a.term_type then
+    if Ast_types.Acsl.is_ptr a.term_type then
       lrel (loc_of_term env a) (loc_of_term env b)
     else match float_of_logic_type a.term_type with
       | Some f -> frel f (val_of_term env a) (val_of_term env b)
@@ -379,8 +379,8 @@ struct
   let arith env fint freal a b =
     let va = C.logic env a in
     let vb = C.logic env b in
-    let ta = Ast_types.Acsl.is_integral_type a.term_type in
-    let tb = Ast_types.Acsl.is_integral_type b.term_type in
+    let ta = Ast_types.Acsl.is_integral a.term_type in
+    let tb = Ast_types.Acsl.is_integral b.term_type in
     if ta && tb
     then fint va vb
     else freal (toreal ta va) (toreal tb vb)
@@ -444,7 +444,7 @@ struct
     | L_array of arrayinfo
 
   let rec cvsort_of_ltype src_ltype =
-    match Ast_types.Acsl.unroll_logic ~unroll_typedef:false src_ltype with
+    match Ast_types.Acsl.unroll ~unroll_typedef:false src_ltype with
     | Lboolean -> L_bool
     | Linteger -> L_integer
     | Lreal -> L_real
@@ -462,7 +462,7 @@ struct
           Warning.error "@[Logic cast from union (%a) not implemented yet@]"
             Printer.pp_typ src_ctype
       end
-    | Ltype _ as b when Ast_types.Acsl.is_boolean b -> L_bool
+    | Ltype _ as b when Ast_types.Acsl.is_logic_bool b -> L_bool
     | Ltype({lt_name="set"},[elt_ltype]) -> (* lifting or set of elements ? *)
       cvsort_of_ltype elt_ltype
     | (Ltype _ | Lvar _ | Larrow _) as typ ->
@@ -543,7 +543,7 @@ struct
         Printer.pp_typ dst_ctype Printer.pp_logic_type t.term_type
 
   let term_cast_to_real env t =
-    let src_ltype = Ast_types.Acsl.unroll_logic ~unroll_typedef:false t.term_type in
+    let src_ltype = Ast_types.Acsl.unroll ~unroll_typedef:false t.term_type in
     match cvsort_of_ltype src_ltype with
     | L_cint _ ->
       L.map (fun x -> Cmath.real_of_int (Cint.to_integer x)) (C.logic env t)
@@ -557,7 +557,7 @@ struct
         Printer.pp_logic_type src_ltype Printer.pp_logic_type Lreal
 
   let term_cast_to_integer env t =
-    let src_ltype = Ast_types.Acsl.unroll_logic ~unroll_typedef:false t.term_type in
+    let src_ltype = Ast_types.Acsl.unroll ~unroll_typedef:false t.term_type in
     match cvsort_of_ltype src_ltype with
     | L_real ->
       L.map Cmath.int_of_real (C.logic env t)
@@ -575,7 +575,7 @@ struct
         Printer.pp_logic_type src_ltype Printer.pp_logic_type Linteger
 
   let term_cast_to_boolean env t =
-    let src_ltype = Ast_types.Acsl.unroll_logic ~unroll_typedef:false t.term_type in
+    let src_ltype = Ast_types.Acsl.unroll ~unroll_typedef:false t.term_type in
     match cvsort_of_ltype src_ltype with
     | L_bool -> C.logic env t
     | L_integer | L_cint _ ->
@@ -585,7 +585,7 @@ struct
         Printer.pp_logic_type src_ltype Printer.pp_logic_type Lboolean
 
   let rec term_cast_to_ltype env dst_ltype t =
-    match Ast_types.Acsl.unroll_logic ~unroll_typedef:false dst_ltype with
+    match Ast_types.Acsl.unroll ~unroll_typedef:false dst_ltype with
     | Ctype typ-> term_cast_to_ctype env typ t
     | Lboolean -> term_cast_to_boolean env t
     | Linteger -> term_cast_to_integer env t
@@ -593,7 +593,7 @@ struct
     | Ltype({lt_name="set"},[elt_ltype]) -> (* lifting, set of elements ? *)
       term_cast_to_ltype env elt_ltype t
     | (Ltype _ | Lvar _ | Larrow _) as dst_ltype ->
-      let src_ltype = Ast_types.Acsl.unroll_logic ~unroll_typedef:false t.term_type in
+      let src_ltype = Ast_types.Acsl.unroll ~unroll_typedef:false t.term_type in
       Warning.error "@[Logic cast to (%a) from (%a) not implemented yet@]"
         Printer.pp_logic_type dst_ltype Printer.pp_logic_type src_ltype
 
@@ -645,13 +645,13 @@ struct
       begin
         let lt = Cil.typeOfTermLval lval in
         let base = addr_lval env lval in
-        match Ast_types.Acsl.unroll_logic lt with
+        match Ast_types.Acsl.unroll lt with
         | Ctype ct ->
           L.map_loc (fun l -> Cvalues.startof ~shift:M.shift l ct) base
         | _ -> base
       end
 
-    | TUnOp(Neg,t) when not (Ast_types.Acsl.is_integral_type t.term_type) ->
+    | TUnOp(Neg,t) when not (Ast_types.Acsl.is_integral t.term_type) ->
       L.map F.e_opp (C.logic env t)
     | TUnOp(unop,t) -> term_unop unop (C.logic env t)
     | TBinOp(binop,a,b) -> term_binop env binop a b

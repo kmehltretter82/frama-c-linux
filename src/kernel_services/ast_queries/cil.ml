@@ -2828,10 +2828,10 @@ let setReturnType (f:fundec) (t:typ) =
 
 let no_op_coerce typ t =
   match typ with
-  | Lreal -> Ast_types.Acsl.is_logic_arithmetic t.term_type
-  | Linteger -> Ast_types.Acsl.is_logic_integral t.term_type
-  | Ltype _ when Ast_types.Acsl.is_boolean typ ->
-    Ast_types.Acsl.is_logic_pure_boolean t.term_type
+  | Lreal -> Ast_types.Acsl.is_plain_arithmetic t.term_type
+  | Linteger -> Ast_types.Acsl.is_plain_integral t.term_type
+  | Ltype _ when Ast_types.Acsl.is_logic_bool typ ->
+    Ast_types.Acsl.is_plain_pure_bool t.term_type
   | Ltype ({lt_name="set"},_) -> true
   | _ -> false
 
@@ -3030,7 +3030,7 @@ let isGlobalInitConst vi =
 
 let isVolatileLval lv = Ast_types.C.is_volatile (typeOfLval lv)
 let isVolatileTermLval lv =
-  Ast_types.Acsl.plain_or_set Ast_types.Acsl.is_logic_volatile (typeOfTermLval lv)
+  Ast_types.Acsl.(plain_or_set is_plain_volatile (typeOfTermLval lv))
 
 (**** MACHINE DEPENDENT PART ****)
 

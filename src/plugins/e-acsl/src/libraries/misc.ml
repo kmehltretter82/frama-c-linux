@@ -121,7 +121,7 @@ let term_of_li li =  match li.l_body with
 let is_set_of_ptr_or_array lty =
   if Ast_types.Acsl.is_plain_set lty then
     let lty = Ast_types.Acsl.set_element lty in
-    Ast_types.Acsl.is_logic_pointer lty || Ast_types.Acsl.is_logic_array lty
+    Ast_types.Acsl.is_ptr lty || Ast_types.Acsl.is_array lty
   else
     false
 

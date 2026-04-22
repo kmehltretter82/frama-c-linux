@@ -906,7 +906,7 @@ let extract_typ t ty =
   try typ_of_number_ty ty
   with Not_a_number ->
   match t.term_type with
-  | Ctype _ as lty -> Ast_types.Acsl.logic_ctype lty
+  | Ctype _ as lty -> Ast_types.Acsl.get_ctype lty
   | Lboolean | Linteger | Lreal ->
     Options.fatal "unexpected context NaN for term %a" Printer.pp_term t
   | Ltype _ -> Error.not_yet "unsupported logic type: user-defined type"

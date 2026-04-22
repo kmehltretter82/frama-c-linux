@@ -271,7 +271,7 @@ let bind_logic_vars env lvs =
     let bind_logic_var ival =
       state, LogicVarEnv.add lv (Cvalue.V.inject_ival ival) logic_vars
     in
-    match Ast_types.Acsl.unroll_logic lv.lv_type with
+    match Ast_types.Acsl.unroll lv.lv_type with
     | Linteger -> bind_logic_var Ival.top
     | Lreal -> bind_logic_var top_float
     | Ctype ctyp when Ast_types.C.is_integral ctyp ->
@@ -287,7 +287,7 @@ let bind_logic_vars env lvs =
   overwrite_current_state { env with logic_vars } state
 
 let add_logic_var env lvar value =
-  match Ast_types.Acsl.unroll_logic lvar.lv_type with
+  match Ast_types.Acsl.unroll lvar.lv_type with
   | Linteger | Lreal ->
     let logic_vars = LogicVarEnv.add lvar value env.logic_vars in
     { env with logic_vars }
@@ -300,7 +300,7 @@ let add_logic_var env lvar value =
   | _ -> unsupported_lvar lvar
 
 let find_logic_var env lvar =
-  match Ast_types.Acsl.unroll_logic lvar.lv_type with
+  match Ast_types.Acsl.unroll lvar.lv_type with
   | Linteger | Lreal -> LogicVarEnv.find lvar env.logic_vars
   | Ctype _ ->
     let base = Base.of_c_logic_var lvar in
@@ -337,7 +337,7 @@ let split_logic_vars env lvars =
 
 let unbind_logic_vars env lvs =
   let unbind_one (state, logic_vars) lv =
-    match Ast_types.Acsl.unroll_logic lv.lv_type with
+    match Ast_types.Acsl.unroll lv.lv_type with
     | Linteger | Lreal -> state, LogicVarEnv.remove lv logic_vars
     | Ctype _ ->
       let base = Base.of_c_logic_var lv in
@@ -556,10 +556,10 @@ let comes_from_fc_stdlib lvar =
 let is_noop_cast ~src_typ ~dst_typ =
   let src_typ = Ast_types.Acsl.plain_or_set
       (fun lt ->
-         match Ast_types.Acsl.unroll_logic lt with
+         match Ast_types.Acsl.unroll lt with
          | Ctype typ -> Eval_typ.classify_as_scalar typ
          | _ -> None
-      ) (Ast_types.Acsl.unroll_logic src_typ)
+      ) (Ast_types.Acsl.unroll src_typ)
   in
   let open Eval_typ in
   match src_typ, Eval_typ.classify_as_scalar dst_typ with
@@ -573,7 +573,7 @@ let is_noop_cast ~src_typ ~dst_typ =
 (* If casting [trm] to [typ] has no effect in terms of the values contained
    in [trm], do nothing. Otherwise, raise [exn]. Adapted from [pass_cast] *)
 let pass_logic_cast exn typ trm =
-  match Ast_types.Acsl.(unroll_logic typ, unroll_logic trm.term_type) with
+  match Ast_types.Acsl.(unroll typ, unroll trm.term_type) with
   | Linteger, Ctype { tnode = (TInt _ | TEnum _) } -> () (* Always inclusion *)
   | Ctype ({ tnode = (TInt _ | TEnum _) } as typ),
     Ctype ({ tnode = (TInt _ | TEnum _) } as typeoftrm) ->
@@ -1202,12 +1202,12 @@ let rec eval_term ~alarm_mode env t =
        nothing to do, AND coercion from an integer type to a floating-point
        type, that require a conversion. *)
     (match Ast_types.Acsl.plain_or_set Fun.id ltyp with
-     | Linteger when Ast_types.Acsl.is_integral_type t.term_type
-                  || Ast_types.Acsl.is_boolean t.term_type -> r
+     | Linteger when Ast_types.Acsl.is_integral t.term_type
+                  || Ast_types.Acsl.is_logic_bool t.term_type -> r
      | Ctype typ when Ast_types.C.is_integral_or_pointer typ -> r
      | Lreal ->
        let eover =
-         if Ast_types.Acsl.is_integral_type t.term_type
+         if Ast_types.Acsl.is_integral t.term_type
          then V.cast_int_to_float Fval.Real r.eover
          else V.cast_float_to_float Fval.Real r.eover
        in
@@ -1216,8 +1216,8 @@ let rec eval_term ~alarm_mode env t =
          eover; eunder = under_from_over eover;
          empty = r.empty }
      | ltyp ->
-       if Ast_types.Acsl.is_boolean ltyp
-       && Ast_types.Acsl.is_integral_type t.term_type
+       if Ast_types.Acsl.is_logic_bool ltyp
+       && Ast_types.Acsl.is_integral t.term_type
        then cast_to_bool r
        else if Cil_datatype.Logic_type_ByName.equal ltyp t.term_type then
          (* coercion from singleton to set *)
@@ -1716,7 +1716,7 @@ and eval_tlhost ~alarm_mode env lv =
   match lv with
   | TVar lvar ->
     let base, typ =
-      match lvar.lv_origin, Ast_types.Acsl.unroll_logic lvar.lv_type with
+      match lvar.lv_origin, Ast_types.Acsl.unroll lvar.lv_type with
       | Some v, _ -> Base.of_varinfo v, v.vtype
       | None, Ctype typ -> Base.of_c_logic_var lvar, typ
       | _ -> unsupported_lvar lvar

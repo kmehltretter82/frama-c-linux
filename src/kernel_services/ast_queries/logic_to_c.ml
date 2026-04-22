@@ -112,13 +112,13 @@ and loc_to_exp ?result {term_node = lnode ; term_type = ltype; term_loc = loc} =
   | Tinter _ | Tcomprehension _ -> error_lval()
   | Tat ({term_node = TAddrOf (TVar _, TNoOffset)} as taddroflval, _) ->
     loc_to_exp ?result taddroflval
-  | TCast (true, Linteger, t) when Ast_types.Acsl.is_integral_type t.term_type ->
+  | TCast (true, Linteger, t) when Ast_types.Acsl.is_integral t.term_type ->
     loc_to_exp ?result t
-  | TCast (true, Lreal, t) when Ast_types.Acsl.is_integral_type t.term_type ->
+  | TCast (true, Lreal, t) when Ast_types.Acsl.is_integral t.term_type ->
     List.map
       (fun x -> Cil.new_exp ~loc (CastE (logic_type_to_typ Lreal, x)))
       (loc_to_exp ?result t)
-  | TCast (true, Lreal, t) when Ast_types.Acsl.is_arithmetic_type t.term_type ->
+  | TCast (true, Lreal, t) when Ast_types.Acsl.is_arithmetic t.term_type ->
     loc_to_exp ?result t
   | TCast (true, set, t)
     when
@@ -151,7 +151,7 @@ let rec loc_to_lval ?result t =
      a coercion to set here.
   *)
   | TCast (true, set, t) when
-      Ast_types.Acsl.is_set set &&
+      Ast_types.Acsl.is_plain_set set &&
       Cil_datatype.Logic_type_ByName.equal
         (Ast_types.Acsl.set_element set) t.term_type ->
     loc_to_lval ?result t

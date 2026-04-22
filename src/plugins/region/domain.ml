@@ -156,7 +156,7 @@ let rec of_typ create ty : 'a t = match ty.tnode with
   | TNamed { ttype } -> of_typ create ttype
 
 let rec of_ltype create lt =
-  match Ast_types.Acsl.unroll_logic ~unroll_typedef:false lt with
+  match Ast_types.Acsl.unroll ~unroll_typedef:false lt with
   | Ctype ty -> of_typ create ty
   | Lvar v -> Dvar v
   | Ltype (ti,ts) -> logic ti @@ List.map (of_ltype create) ts

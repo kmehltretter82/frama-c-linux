@@ -730,8 +730,8 @@ let type_expr metaenv env ?tr ?current e =
       let t1 = e1.term_type in
       let t2 = e2.term_type in
       let t =
-        if Ast_types.Acsl.is_arithmetic_type t1
-        && Ast_types.Acsl.is_arithmetic_type t2
+        if Ast_types.Acsl.is_arithmetic t1
+        && Ast_types.Acsl.is_arithmetic t2
         then
           let t = Ast_types.Acsl.arithmetic_conversion t1 t2 in
           Logic_const.term
@@ -741,28 +741,28 @@ let type_expr metaenv env ?tr ?current e =
           (match bop with
            | Logic_ptree.Badd
              when
-               Ast_types.Acsl.is_integral_type t2
-               && Ast_types.Acsl.is_logic_pointer t1 ->
+               Ast_types.Acsl.is_integral t2
+               && Ast_types.Acsl.is_ptr t1 ->
              Logic_const.term (TBinOp (PlusPI,e1,e2)) t1
            | Logic_ptree.Bsub
              when
-               Ast_types.Acsl.is_integral_type t2
-               && Ast_types.Acsl.is_logic_pointer t1 ->
+               Ast_types.Acsl.is_integral t2
+               && Ast_types.Acsl.is_ptr t1 ->
              Logic_const.term (TBinOp (MinusPI,e1,e2)) t1
            | Logic_ptree.Badd
              when
-               Ast_types.Acsl.is_integral_type t1
-               && Ast_types.Acsl.is_logic_pointer t2 ->
+               Ast_types.Acsl.is_integral t1
+               && Ast_types.Acsl.is_ptr t2 ->
              Logic_const.term (TBinOp (PlusPI,e2,e1)) t2
            | Logic_ptree.Bsub
              when
-               Ast_types.Acsl.is_integral_type t1
-               && Ast_types.Acsl.is_logic_pointer t2 ->
+               Ast_types.Acsl.is_integral t1
+               && Ast_types.Acsl.is_ptr t2 ->
              Logic_const.term (TBinOp (MinusPI,e2,e1)) t2
            | Logic_ptree.Bsub
              when
-               Ast_types.Acsl.is_logic_pointer t1
-               && Ast_types.Acsl.is_logic_pointer t2 ->
+               Ast_types.Acsl.is_ptr t1
+               && Ast_types.Acsl.is_ptr t2 ->
              Logic_const.term
                (TBinOp (MinusPP,e1,LTyping.mk_cast e2 t1))
                Linteger
@@ -777,13 +777,13 @@ let type_expr metaenv env ?tr ?current e =
       env, t, cond
     | PUnop(Logic_ptree.Uminus,e) ->
       let env,t,cond = aux env cond e in
-      if Ast_types.Acsl.is_arithmetic_type t.term_type then
+      if Ast_types.Acsl.is_arithmetic t.term_type then
         env,Logic_const.term (TUnOp (Neg,t)) Linteger,cond
       else Aorai_option.abort
           "Invalid operand for unary -: unexpected %a" Printer.pp_term t
     | PUnop(Logic_ptree.Ubw_not,e) ->
       let env,t,cond = aux env cond e in
-      if Ast_types.Acsl.is_arithmetic_type t.term_type then
+      if Ast_types.Acsl.is_arithmetic t.term_type then
         env,Logic_const.term (TUnOp (BNot,t)) Linteger,cond
       else Aorai_option.abort
           "Invalid operand for bitwise not: unexpected %a" Printer.pp_term t
@@ -803,7 +803,7 @@ let type_expr metaenv env ?tr ?current e =
       )
     | PUnop (Logic_ptree.Ustar,e) ->
       let env, t, cond = aux env cond e in
-      if Ast_types.Acsl.is_logic_pointer t.term_type then
+      if Ast_types.Acsl.is_ptr t.term_type then
         env,
         Logic_const.term
           (TLval (TMem t, TNoOffset))
@@ -815,20 +815,20 @@ let type_expr metaenv env ?tr ?current e =
       let env, t1, cond = aux env cond e1 in
       let env, t2, cond = aux env cond e2 in
       let t =
-        if Ast_types.Acsl.is_logic_pointer t1.term_type
-        && Ast_types.Acsl.is_integral_type t2.term_type
+        if Ast_types.Acsl.is_ptr t1.term_type
+        && Ast_types.Acsl.is_integral t2.term_type
         then
           Logic_const.term
             (TBinOp (PlusPI,t1,t2))
             (Ast_types.Acsl.pointed t1.term_type)
-        else if Ast_types.Acsl.is_logic_pointer t2.term_type
-             && Ast_types.Acsl.is_integral_type t1.term_type
+        else if Ast_types.Acsl.is_ptr t2.term_type
+             && Ast_types.Acsl.is_integral t1.term_type
         then
           Logic_const.term
             (TBinOp (PlusPI,t2,t1))
             (Ast_types.Acsl.pointed t2.term_type)
-        else if Ast_types.Acsl.is_logic_array t1.term_type
-             && Ast_types.Acsl.is_integral_type t2.term_type
+        else if Ast_types.Acsl.is_array t1.term_type
+             && Ast_types.Acsl.is_integral t2.term_type
         then
           (match t1.term_node with
            | TStartOf lv | TLval lv ->
@@ -841,8 +841,8 @@ let type_expr metaenv env ?tr ?current e =
              Aorai_option.fatal
                "Unsupported operation: %a[%a]"
                Printer.pp_term t1 Printer.pp_term t2)
-        else if Ast_types.Acsl.is_logic_array t2.term_type
-             && Ast_types.Acsl.is_integral_type t1.term_type
+        else if Ast_types.Acsl.is_array t2.term_type
+             && Ast_types.Acsl.is_integral t1.term_type
         then
           (match t2.term_node with
            | TStartOf lv | TLval lv ->
@@ -872,7 +872,7 @@ let type_expr metaenv env ?tr ?current e =
            "Unsupported operation: %a.%s" Printer.pp_term t s)
     | PArrow(e,s) ->
       let env, t, cond = aux env cond e in
-      if Ast_types.Acsl.is_logic_pointer t.term_type then begin
+      if Ast_types.Acsl.is_ptr t.term_type then begin
         let off, ty =
           LTyping.type_of_field loc s
             (Ast_types.Acsl.pointed t.term_type)

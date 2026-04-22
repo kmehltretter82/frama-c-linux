@@ -80,7 +80,7 @@ let rec store env lv ty tgt deps =
 let is_ctype lt ty =
   Ast_types.Acsl.plain_or_set
     (fun lt ->
-       match Ast_types.Acsl.unroll_logic lt with
+       match Ast_types.Acsl.unroll lt with
        | Ctype tr -> Cil_datatype.Typ.equal ty tr
        | _ -> false
     ) lt

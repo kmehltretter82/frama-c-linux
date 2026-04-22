@@ -206,12 +206,12 @@ let lift_set f loc =
     (* coercion from a set to another set: keep the current coercion
        over the result of the transformation. *)
     | TCast (true, set,t1)
-      when Ast_types.Acsl.is_set set && Ast_types.Acsl.is_set t1.term_type ->
+      when Ast_types.Acsl.is_plain_set set && Ast_types.Acsl.is_plain_set t1.term_type ->
       let res = aux t1 in
       { loc with term_node = TCast (true, set, res) }
     (* coercion from a singleton to a set: performs the transformation.
     *)
-    | TCast (true, oset, t1) when Ast_types.Acsl.is_set oset ->
+    | TCast (true, oset, t1) when Ast_types.Acsl.is_plain_set oset ->
       let t = f t1 in
       let nset = Ast_types.Acsl.make_set t.term_type in
       (* performs the coercion into a set. *)
@@ -224,7 +224,7 @@ let lift_set f loc =
     (* if we a term of type set, try to apply f to each
        element of x by using a comprehension, and see whether we can get
        rid of said comprehension afterwards. *)
-    | _  when Ast_types.Acsl.is_set loc.term_type ->
+    | _  when Ast_types.Acsl.is_plain_set loc.term_type ->
       let elt_type = Ast_types.Acsl.set_element loc.term_type in
       let x = Cil_const.make_logic_var_quant "_x" elt_type in
       let t = Logic_const.tvar ~loc:loc.term_loc x in
@@ -246,7 +246,7 @@ let lift_set f loc =
 
 let is_same_type t1 t2 =
   Cil_datatype.Logic_type.equal
-    (Ast_types.Acsl.unroll_logic t1) (Ast_types.Acsl.unroll_logic t2)
+    (Ast_types.Acsl.unroll t1) (Ast_types.Acsl.unroll t2)
 
 let type_rel = function
   | Eq -> Cil_types.Req
@@ -433,7 +433,7 @@ let builtin_label = function
 let add_var var info env = Lenv.add_var var info env
 
 let add_result env typ =
-  if Ast_types.Acsl.is_logic_void typ then env
+  if Ast_types.Acsl.is_void typ then env
   else
     let v = Cil_const.make_logic_var_kind "\\result" LVC typ in
     Lenv.add_var "\\result" v env
@@ -573,7 +573,7 @@ let logic_coerce t e =
     | TCast (true,t2,e) when Cil.no_op_coerce t2 e ->
       let e = aux e in
       { e with term_type = real_type; term_node = TCast (true, real_type,e) }
-    | _ when Ast_types.Acsl.is_logic_arithmetic real_type ->
+    | _ when Ast_types.Acsl.is_plain_arithmetic real_type ->
       Logic_utils.numeric_coerce real_type e
     | _ ->
       { e with term_type = real_type; term_node = TCast (true, real_type,e) }
@@ -589,14 +589,14 @@ let typing_error loc =
 let location_to_char_ptr t =
   let convert_one_location t =
     let ptd_type = Ast_types.Acsl.pointed t.term_type in
-    if Ast_types.Acsl.is_logic_char ptd_type then
+    if Ast_types.Acsl.is_char ptd_type then
       logic_coerce (Ast_types.Acsl.make_set t.term_type) t
-    else if Ast_types.Acsl.is_logic_void ptd_type then
+    else if Ast_types.Acsl.is_void ptd_type then
       typing_error t.term_loc
         "can not have a set of void pointers"
     else
       let loc = t.term_loc in
-      let sizeof = term ~loc (TSizeOf (Ast_types.Acsl.logic_ctype ptd_type)) Linteger in
+      let sizeof = term ~loc (TSizeOf (Ast_types.Acsl.get_ctype ptd_type)) Linteger in
       let range = trange ~loc (Some (Cil.lzero ~loc ()), Some sizeof) in
       let converted_type = Ast_types.Acsl.set_conversion (Ctype Cil_const.charPtrType) t.term_type
       in
@@ -621,7 +621,7 @@ let rec c_mk_cast ?(force=false) e oldt newt =
       if not (is_C_array e) then
         typing_error loc "cannot cast logic array to pointer type";
       let e = mk_logic_StartOf e in
-      let oldt = Ast_types.Acsl.logic_ctype e.term_type in
+      let oldt = Ast_types.Acsl.get_ctype e.term_type in
       (* we have converted from array to ptr, but the pointed type might
          differ. Just do another round of conversion. *)
       c_mk_cast e oldt newt
@@ -676,13 +676,13 @@ let rec mk_cast_conf integral_cast
   end else if is_enum_cst e newt then { e with term_type = newt }
   else begin
     match
-      (Ast_types.Acsl.unroll_logic e.term_type),
+      (Ast_types.Acsl.unroll e.term_type),
       (* If any, use the typedef itself in the inserted cast *)
       (Ast_types.Acsl.unroll_ltdef newt)
     with
     | Ctype oldt, Ctype newt ->
       c_mk_cast ~force e oldt newt
-    | t1, Lboolean when Ast_types.Acsl.is_integral_type t1 ->
+    | t1, Lboolean when Ast_types.Acsl.is_integral t1 ->
       let e = mk_cast e Linteger in
       Logic_const.term ~loc (TBinOp(Ne,e,Cil.lzero ~loc())) Lboolean
     | Lboolean, Linteger when explicit ->
@@ -691,12 +691,12 @@ let rec mk_cast_conf integral_cast
       typing_error loc "invalid implicit cast from %a to %a"
         Cil_printer.pp_logic_type e.term_type
         Cil_printer.pp_logic_type newt
-    | Lboolean, Ctype t2 when Ast_types.Acsl.is_integral_type newt && explicit ->
+    | Lboolean, Ctype t2 when Ast_types.Acsl.is_integral newt && explicit ->
       Logic_const.term ~loc (TCast (false, Ctype t2,e)) newt
     | ty1, Ltype({lt_name="set"},[ty2])
-      when Ast_types.Acsl.is_pointer ty1 &&
-           Ast_types.Acsl.is_plain_pointer ty2 &&
-           Ast_types.Acsl.is_logic_char (Ast_types.Acsl.pointed ty2) ->
+      when Ast_types.Acsl.is_ptr ty1 &&
+           Ast_types.Acsl.is_plain_ptr ty2 &&
+           Ast_types.Acsl.is_char (Ast_types.Acsl.pointed ty2) ->
       location_to_char_ptr e
     | Ltype({lt_name = "set"},[_]), Ltype({lt_name="set"},[ty2]) ->
       let e = lift_set (fun e -> mk_cast e ty2) e in
@@ -709,7 +709,7 @@ let rec mk_cast_conf integral_cast
       let e = mk_cast e ty2 in
       logic_coerce (Ast_types.Acsl.make_set e.term_type) e
     | Lboolean, Lboolean | Linteger, Linteger | Lreal, Lreal -> e
-    | Linteger, Ctype t when Ast_types.Acsl.is_logic_pointer newt && Cil.isLogicNull e ->
+    | Linteger, Ctype t when Ast_types.Acsl.is_ptr newt && Cil.isLogicNull e ->
       c_mk_cast ~force e Cil_const.intType t
     | Linteger, (Ctype newt) | Lreal, (Ctype newt) when explicit ->
       Logic_utils.mk_cast ~loc newt e
@@ -1026,21 +1026,16 @@ struct
     { add_logic_type ; add_logic_function }
 
   let check_non_void_ptr loc ty =
-    if Ast_types.Acsl.is_logic_void_pointer ty then
+    if Ast_types.Acsl.is_void_ptr ty then
       C.error loc "Cannot use a pointer to void here"
 
   let check_fun_ptr loc ty =
-    if not (Ast_types.Acsl.is_logic Ast_types.C.is_fun_ptr ty) then
+    if not Ast_types.(Acsl.plain_or_set_ctype C.is_fun_ptr ty) then
       C.error loc "expecting a function pointer, found %a"
         Cil_printer.pp_logic_type ty
 
   let check_object_ptr loc ty =
-    let is_object_ptr t =
-      match Ast_types.C.unroll_node t with
-      | TPtr t when not (Ast_types.C.is_fun t) -> true
-      | _ -> false
-    in
-    if not (Ast_types.Acsl.is_logic is_object_ptr ty) then
+    if not Ast_types.(Acsl.plain_or_set_ctype C.is_object_ptr ty) then
       C.error loc "expecting a pointer to an object, found %a"
         Cil_printer.pp_logic_type ty
 
@@ -1051,7 +1046,7 @@ struct
          a C array and a pointer. Either introduce an explicit \
          cast or take the address of the first element of %a"
         Cil_printer.pp_term t;
-    if not (Ast_types.Acsl.is_logic_pointer t.term_type) then
+    if not (Ast_types.Acsl.is_ptr t.term_type) then
       C.error loc "%a is not a pointer." Cil_printer.pp_term t;
     if check_non_void then check_non_void_ptr t.term_loc t.term_type;
     check_object_ptr t.term_loc t.term_type
@@ -1484,7 +1479,7 @@ struct
     otherwise print an error message with location [loc]
    *)
   let rec implicit_conversion ~overloaded loc oterm ot nt =
-    match (Ast_types.Acsl.unroll_logic ot), (Ast_types.Acsl.unroll_logic nt) with
+    match (Ast_types.Acsl.unroll ot), (Ast_types.Acsl.unroll nt) with
     | Ctype ty1, Ctype ty2 ->
       if is_same_c_type ty1 ty2
       then ot, oterm
@@ -1555,9 +1550,9 @@ struct
          if overloaded then raise Not_applicable
          else C.error loc "%s" s)
     | t1, Ltype ({lt_name = "set"},[t2]) when
-        Ast_types.Acsl.is_pointer t1 &&
-        Ast_types.Acsl.is_plain_pointer t2 &&
-        Ast_types.Acsl.is_logic_char (Ast_types.Acsl.pointed t2) ->
+        Ast_types.Acsl.is_ptr t1 &&
+        Ast_types.Acsl.is_plain_ptr t2 &&
+        Ast_types.Acsl.is_char (Ast_types.Acsl.pointed t2) ->
       nt, location_to_char_ptr oterm
     (* can convert implicitly a singleton into a set,
        but not the reverse. *)
@@ -1600,7 +1595,7 @@ struct
           Cil_printer.pp_logic_type ot Cil_printer.pp_logic_type nt
 
   let rec find_supertype ~overloaded loc t ot nt =
-    match Ast_types.Acsl.unroll_logic ot, Ast_types.Acsl.unroll_logic nt with
+    match Ast_types.Acsl.unroll ot, Ast_types.Acsl.unroll nt with
     | Ctype ot, Ctype nt ->
       if is_same_c_type ot nt then Ctype ot
       else if Ast_types.C.(is_integral ot && is_integral nt) then Linteger
@@ -1655,7 +1650,7 @@ struct
           Cil_printer.pp_logic_type ot Cil_printer.pp_logic_type nt
 
   let rec partial_unif ~overloaded loc term ot nt env =
-    match Ast_types.Acsl.unroll_logic ot, Ast_types.Acsl.unroll_logic nt with
+    match Ast_types.Acsl.unroll ot, Ast_types.Acsl.unroll nt with
     | Lvar s1, Lvar s2 ->
       if generated_var s1 then
         try
@@ -1742,8 +1737,8 @@ struct
     | Ltype({lt_name = "set"}, [t1]), t2 ->
       let (env, ot, nt) = partial_unif ~overloaded loc term t1 t2 env in
       env, Ast_types.Acsl.make_set ot, Ast_types.Acsl.make_set nt
-    | t1,t2 when Ast_types.Acsl.is_logic_boolean t1
-              && Ast_types.Acsl.is_logic_boolean t2 ->
+    | t1,t2 when Ast_types.Acsl.is_plain_bool t1
+              && Ast_types.Acsl.is_plain_bool t2 ->
       env,ot,nt
     | ((Ctype _ | Linteger | Lreal | Lboolean),
        (Ctype _ | Linteger | Lreal | Lboolean)) ->
@@ -1785,7 +1780,7 @@ struct
     res
 
   let convertible_non_null (ty1,t as t1) (ty2,_ as t2) =
-    match (Ast_types.Acsl.unroll_logic ty1, Ast_types.Acsl.unroll_logic ty2) with
+    match (Ast_types.Acsl.unroll ty1, Ast_types.Acsl.unroll ty2) with
     | Ctype ty1, Ctype ty2 when
         Ast_types.C.is_ptr ty1 && Ast_types.C.is_ptr ty2 && Cil.isLogicNull t ->
       Ast_types.C.is_void_ptr ty2
@@ -1829,7 +1824,7 @@ struct
     assert (l <> []); l
 
   let rec logic_arithmetic_promotion t =
-    match Ast_types.Acsl.unroll_logic t with
+    match Ast_types.Acsl.unroll t with
     | Ctype ty when Ast_types.C.is_integral ty -> Linteger
     | Linteger -> Linteger
     | Lreal -> Lreal
@@ -1848,7 +1843,7 @@ struct
         Cil_printer.pp_logic_type t
 
   let rec integral_promotion t =
-    match Ast_types.Acsl.unroll_logic t with
+    match Ast_types.Acsl.unroll t with
     | Ctype ty when Ast_types.C.is_integral ty -> Linteger
     | Linteger -> Linteger
     | Ltype ({lt_name="set"} as lt,[t]) -> Ltype(lt,[integral_promotion t])
@@ -1898,7 +1893,7 @@ struct
 
   let conditional_conversion loc rel t1 t2 =
     let rec aux lty1 lty2 =
-      match (Ast_types.Acsl.unroll_logic lty1), (Ast_types.Acsl.unroll_logic lty2) with
+      match (Ast_types.Acsl.unroll lty1), (Ast_types.Acsl.unroll lty2) with
       | Ctype ty1, Ctype ty2 ->
         if Ast_types.C.is_integral ty1 && Ast_types.C.is_integral ty2 then
           if is_same_type lty1 lty2 then lty1
@@ -1950,8 +1945,8 @@ struct
         when Ast_types.C.is_arithmetic t -> Lreal
       (* In ACSL, you can convert implicitly from integral to boolean =>
          prefer boolean as common type when doing comparison. *)
-      | Lboolean, t when Ast_types.Acsl.is_integral_type t -> Lboolean
-      | t, Lboolean when Ast_types.Acsl.is_integral_type t -> Lboolean
+      | Lboolean, t when Ast_types.Acsl.is_integral t -> Lboolean
+      | t, Lboolean when Ast_types.Acsl.is_integral t -> Lboolean
       | Lreal, Ctype ty | Ctype ty, Lreal
         when Ast_types.C.is_arithmetic ty -> Lreal
       | Ltype (s1,l1), Ltype (s2,l2)
@@ -2002,13 +1997,13 @@ struct
   let location_set_conversion loc transform_pointer_set t ot nt env =
     let ot = Ast_types.Acsl.set_conversion ot nt in
     if is_same_type ot nt then transform_pointer_set, ot
-    else if Ast_types.Acsl.is_integral_type ot && Ast_types.Acsl.is_integral_type nt then
+    else if Ast_types.Acsl.is_integral ot && Ast_types.Acsl.is_integral nt then
       let typ = Ast_types.Acsl.arithmetic_conversion ot nt in IntegralConv, typ
-    else if Ast_types.Acsl.is_arithmetic_type ot && Ast_types.Acsl.is_arithmetic_type nt then
+    else if Ast_types.Acsl.is_arithmetic ot && Ast_types.Acsl.is_arithmetic nt then
       let typ = Ast_types.Acsl.arithmetic_conversion ot nt in ArithConv, typ
-    else if Ast_types.Acsl.is_pointer ot && Ast_types.Acsl.is_pointer nt then
+    else if Ast_types.Acsl.is_ptr ot && Ast_types.Acsl.is_ptr nt then
       let typ = Ctype Cil_const.charPtrType in
-      PointerConv, (if Ast_types.Acsl.is_set ot then Ast_types.Acsl.make_set typ else typ)
+      PointerConv, (if Ast_types.Acsl.is_plain_set ot then Ast_types.Acsl.make_set typ else typ)
     else
       let _,_,t = partial_unif ~overloaded:false loc t ot nt env in
       transform_pointer_set,t
@@ -2022,16 +2017,16 @@ struct
 
   let list_conversion loc t ot nt env =
     if is_same_type ot nt then ot
-    else if Ast_types.Acsl.(is_logic_integral ot && is_logic_integral nt)
+    else if Ast_types.Acsl.(is_plain_integral ot && is_plain_integral nt)
     then ot
-    else if Ast_types.Acsl.(is_logic_arithmetic ot && is_logic_arithmetic nt)
+    else if Ast_types.Acsl.(is_plain_arithmetic ot && is_plain_arithmetic nt)
     then ot
     else let _,_,t = partial_unif ~overloaded:false loc t ot nt env in
       t
 
   let list_promotion typ =
-    if Ast_types.Acsl.is_logic_integral typ then Linteger
-    else if Ast_types.Acsl.is_logic_arithmetic typ then Lreal
+    if Ast_types.Acsl.is_plain_integral typ then Linteger
+    else if Ast_types.Acsl.is_plain_arithmetic typ then Lreal
     else typ
 
   let list_coercion typ t =
@@ -2082,7 +2077,7 @@ struct
     let (tq,env) =
       List.fold_left
         (fun (tq,env) (ty, id) ->
-           let ty = Ast_types.Acsl.unroll_logic (logic_type ctxt loc env ty) in
+           let ty = Ast_types.Acsl.unroll (logic_type ctxt loc env ty) in
            let v = Cil_const.make_logic_var_kind id kind ty in
            (v::tq, Lenv.add_var id v env))
         ([],env) q
@@ -2110,7 +2105,7 @@ struct
       List.find (fun x -> x.l_var_info.lv_id = v.lv_id) l
 
   let eta_expand loc names env v =
-    match (Ast_types.Acsl.unroll_logic v.lv_type) with
+    match (Ast_types.Acsl.unroll v.lv_type) with
       Larrow(args,rt) ->
       let (_,vars) = List.fold_right
           (fun x (i,l) ->
@@ -2156,7 +2151,7 @@ struct
 
   let normalize_lambda_term env term =
     let add_binders quants term =
-      match term.term_node, (Ast_types.Acsl.unroll_logic term.term_type) with
+      match term.term_node, (Ast_types.Acsl.unroll term.term_type) with
       | Tlambda(quants',term), Larrow (args,rt_typ) ->
         let args = List.fold_right (fun x l -> x.lv_type :: l) quants args in
         { term with
@@ -2273,7 +2268,7 @@ struct
 
   let normalize_updated_offset_term idx_typing env loc t normalizing_cont toff =
     let t_type =
-      try Ast_types.Acsl.logic_ctype (Ast_types.Acsl.unroll_logic t.term_type)
+      try Ast_types.Acsl.get_ctype (Ast_types.Acsl.unroll t.term_type)
       with Failure _ ->
         C.error loc "Trying to update field on a non struct type %a"
           Cil_printer.pp_logic_type t.term_type
@@ -2303,7 +2298,7 @@ struct
     in
     let (toff, t_off2, opt_idx_let), ofs_type =
       let check_type typ =
-        Ast_types.Acsl.is_logic_integral  typ
+        Ast_types.Acsl.is_plain_integral  typ
         || C.error loc "range is only allowed for last offset"
       and mk_field f = TField(f,TNoOffset),TField(f,TNoOffset),(fun x -> x)
       and mk_idx idx =
@@ -2436,7 +2431,7 @@ struct
       accept_models = true; accept_func_ptr = true; accept_addrs = true;
       accept_const = true; }
 
-  let is_fct_ptr lv = Ast_types.Acsl.is_logic_fun (Cil.typeOfTermLval lv)
+  let is_fct_ptr lv = Ast_types.Acsl.is_plain_fun (Cil.typeOfTermLval lv)
 
   let check_lval_kind m t =
     let rec aux t = match t.term_node with
@@ -2453,7 +2448,7 @@ struct
           | TField (f, n) ->
             (not (Ast_types.C.is_const f.ftype) || m.accept_const) && offsets n
         in
-        (not (Ast_types.Acsl.is_logic_array t.term_type) || m.accept_array) &&
+        (not (Ast_types.Acsl.is_array t.term_type) || m.accept_array) &&
         (match lhost with
          | TVar v -> begin
              match v.lv_origin with
@@ -2466,7 +2461,7 @@ struct
                           model variables are not supported. *)
              | Some v ->
                (not v.vformal || m.accept_formal) &&
-               (not (Ast_types.C.is_const @@ Ast_types.Acsl.logic_ctype t.term_type) || m.accept_const)
+               (not Ast_types.(C.is_const @@ Acsl.get_ctype t.term_type) || m.accept_const)
            end
          | TResult _ -> m.accept_models
          | _ -> true) &&
@@ -2512,7 +2507,7 @@ struct
     | (toff::tail) as offs ->
       begin
         let t_type =
-          try Ast_types.Acsl.logic_ctype (Ast_types.Acsl.unroll_logic t.term_type)
+          try Ast_types.Acsl.(get_ctype (unroll t.term_type))
           with Failure _ ->
             if ctxt.silent then raise Backtrack;
             ctxt.error loc "Update field on a non-struct type %a"
@@ -2532,7 +2527,7 @@ struct
             and idx_typing idx = ctxt.type_term ctxt env idx
             in
             updated_offset_term
-              idx_typing Ast_types.Acsl.is_integral_type mk_field mk_idx loc t_type toff
+              idx_typing Ast_types.Acsl.is_integral mk_field mk_idx loc t_type toff
           in
           let v = ctxt.type_term ctxt env v in
           let v = mk_cast v ofs_type in
@@ -2588,7 +2583,7 @@ struct
       List.fold_left
         (fun (convert_ptr,locs,typ) t ->
            let t' = ctxt.type_term ctxt env t in
-           if (not lift_set) && Ast_types.Acsl.is_set t'.term_type then begin
+           if (not lift_set) && Ast_types.Acsl.is_plain_set t'.term_type then begin
              if ctxt.silent then raise Backtrack;
              ctxt.error loc "set of sets is not yet implemented" ;
            end;
@@ -2861,24 +2856,24 @@ struct
       in
       begin match op with
         | Bmul | Bdiv
-          when Ast_types.Acsl.is_arithmetic_type ty1 && Ast_types.Acsl.is_arithmetic_type ty2 ->
+          when Ast_types.Acsl.is_arithmetic ty1 && Ast_types.Acsl.is_arithmetic ty2 ->
           binop (type_binop op) (Ast_types.Acsl.arithmetic_conversion ty1 ty2)
-        | Bmod when Ast_types.Acsl.is_integral_type ty1 && Ast_types.Acsl.is_integral_type ty2 ->
+        | Bmod when Ast_types.Acsl.is_integral ty1 && Ast_types.Acsl.is_integral ty2 ->
           binop (type_binop op) (Ast_types.Acsl.arithmetic_conversion ty1 ty2)
         | Badd | Bsub
-          when Ast_types.Acsl.is_arithmetic_type ty1 && Ast_types.Acsl.is_arithmetic_type ty2 ->
+          when Ast_types.Acsl.is_arithmetic ty1 && Ast_types.Acsl.is_arithmetic ty2 ->
           binop (type_binop op) (Ast_types.Acsl.arithmetic_conversion ty1 ty2)
         | Bbw_and | Bbw_or | Bbw_xor
-          when Ast_types.Acsl.is_integral_type ty1 && Ast_types.Acsl.is_integral_type ty2 ->
+          when Ast_types.Acsl.is_integral ty1 && Ast_types.Acsl.is_integral ty2 ->
           binop (type_binop op) (Ast_types.Acsl.arithmetic_conversion ty1 ty2)
         | Bbw_xor
-          when Ast_types.Acsl.is_list ty1 && Ast_types.Acsl.is_list ty2 ->
+          when Ast_types.Acsl.is_plain_list ty1 && Ast_types.Acsl.is_plain_list ty2 ->
           fresh_type#reset ();
           lfun_app ctxt env loc "\\concat" [] [t1;t2]
         | Blshift | Brshift
-          when Ast_types.Acsl.is_integral_type ty1 && Ast_types.Acsl.is_integral_type ty2 ->
+          when Ast_types.Acsl.is_integral ty1 && Ast_types.Acsl.is_integral ty2 ->
           binop (type_binop op) (Ast_types.Acsl.arithmetic_conversion ty1 ty2)
-        | Badd when isLogicPointer t1 && Ast_types.Acsl.is_integral_type ty2 ->
+        | Badd when isLogicPointer t1 && Ast_types.Acsl.is_integral ty2 ->
           let t1 = mk_logic_pointer_or_StartOf t1 in
           let ty1 = t1.term_type in
           (match t1.term_node with
@@ -2889,10 +2884,10 @@ struct
            | _ ->
              TBinOp (PlusPI, t1, mk_cast t2 (integral_promotion ty2))),
           Ast_types.Acsl.set_conversion ty1 ty2
-        | Badd when Ast_types.Acsl.is_integral_type ty1 && isLogicPointer t2 ->
+        | Badd when Ast_types.Acsl.is_integral ty1 && isLogicPointer t2 ->
           let t2 = mk_logic_pointer_or_StartOf t2 in
           let ty2 = t2.term_type in
-          assert (Ast_types.Acsl.is_logic_pointer t2.term_type);
+          assert (Ast_types.Acsl.is_ptr t2.term_type);
           (match t2.term_node with
            | TStartOf lv ->
              TAddrOf (
@@ -2900,7 +2895,7 @@ struct
            | _ ->
              TBinOp (PlusPI, t2, mk_cast t1 (integral_promotion ty1))),
           Ast_types.Acsl.set_conversion ty2 ty1
-        | Bsub when isLogicPointer t1 && Ast_types.Acsl.is_integral_type ty2 ->
+        | Bsub when isLogicPointer t1 && Ast_types.Acsl.is_integral ty2 ->
           let t1 = mk_logic_pointer_or_StartOf t1 in
           TBinOp (MinusPI, t1, mk_cast t2 (integral_promotion ty2)),
           Ast_types.Acsl.set_conversion ty1 ty2
@@ -2945,7 +2940,7 @@ struct
       let t2 = term (drop_qualifiers env) t2 in
       (* access to a C value (either array or pointer) *)
       let t'1, t'2, tres =
-        if isLogicPointer t1 && Ast_types.Acsl.is_integral_type t2.term_type then
+        if isLogicPointer t1 && Ast_types.Acsl.is_integral t2.term_type then
           begin
             check_current_label loc env;
             (* memory access need a current label to have some semantics *)
@@ -2958,7 +2953,7 @@ struct
             in
             (t1, t2, Ast_types.Acsl.set_conversion typ t2.term_type)
           end
-        else if Ast_types.Acsl.is_integral_type t1.term_type && isLogicPointer t2
+        else if Ast_types.Acsl.is_integral t1.term_type && isLogicPointer t2
         then begin
           check_current_label loc env;
           (* memory access need a current label to have some semantics *)
@@ -2972,15 +2967,15 @@ struct
           (t2, t1, Ast_types.Acsl.set_conversion typ t1.term_type)
         end
         else if (* purely logical array access. *)
-          Ast_types.Acsl.is_logic_array t1.term_type && Ast_types.Acsl.is_integral_type t2.term_type
+          Ast_types.Acsl.is_array t1.term_type && Ast_types.Acsl.is_integral t2.term_type
         then
           mk_logic_access env t1, t2, Ast_types.Acsl.array_element t1.term_type
         else if
-          Ast_types.Acsl.is_logic_array t2.term_type && Ast_types.Acsl.is_integral_type t1.term_type
+          Ast_types.Acsl.is_array t2.term_type && Ast_types.Acsl.is_integral t1.term_type
         then
           mk_logic_access env t2, t1, Ast_types.Acsl.array_element t2.term_type
         else (* error *)
-        if Ast_types.Acsl.is_logic_array t1.term_type || Ast_types.Acsl.is_logic_array t2.term_type
+        if Ast_types.Acsl.is_array t1.term_type || Ast_types.Acsl.is_array t2.term_type
         then ctxt.error loc "subscript is not an integer range"
         else
           ctxt.error loc "subscripted value is neither array nor pointer"
@@ -3125,7 +3120,7 @@ struct
     | PLcomprehension(t,quants,pred) ->
       let quants, env = add_quantifiers ctxt loc ~kind:LVQuant quants env in
       let t = term env t in
-      if Ast_types.Acsl.is_set t.term_type then begin
+      if Ast_types.Acsl.is_plain_set t.term_type then begin
         ctxt.error loc "sets of sets are not supported yet"
       end else begin
         let pred = Option.map (predicate env) pred in
@@ -3222,15 +3217,15 @@ struct
       f loc op (mk_cast t1 t) (mk_cast t2 t)
     in
     begin match op with
-      | _ when Ast_types.Acsl.is_logic_arithmetic ty1
-            && Ast_types.Acsl.is_logic_arithmetic ty2 ->
+      | _ when Ast_types.Acsl.is_plain_arithmetic ty1
+            && Ast_types.Acsl.is_plain_arithmetic ty2 ->
         conditional_conversion t1 t2
       | Eq | Neq when isLogicPointer t1 && Cil.isLogicNull t2 ->
         let t1 = mk_logic_pointer_or_StartOf t1 in
         let t2 =
           (* in case of a set, we perform two conversions: first from
              integer to pointer, then from pointer to set of pointer. *)
-          if Ast_types.Acsl.is_set t1.term_type then
+          if Ast_types.Acsl.is_plain_set t1.term_type then
             mk_cast t2 (Ast_types.Acsl.set_element t1.term_type)
           else t2
         in
@@ -3238,12 +3233,12 @@ struct
       | Eq | Neq when isLogicPointer t2 && Cil.isLogicNull t1 ->
         let t2 = mk_logic_pointer_or_StartOf t2 in
         let t1 =
-          if Ast_types.Acsl.is_set t2.term_type then
+          if Ast_types.Acsl.is_plain_set t2.term_type then
             mk_cast t1 (Ast_types.Acsl.set_element t2.term_type)
           else t1
         in
         f loc op (mk_cast t1 t2.term_type) t2
-      | Eq | Neq when Ast_types.Acsl.is_logic_array ty1 && Ast_types.Acsl.is_logic_array ty2 ->
+      | Eq | Neq when Ast_types.Acsl.is_array ty1 && Ast_types.Acsl.is_array ty2 ->
         if is_same_logic_array_type ty1 ty2 then f loc op t1 t2
         else
           ctxt.error loc "comparison of incompatible types %a and %a"
@@ -3253,8 +3248,8 @@ struct
         let t2 = mk_logic_pointer_or_StartOf t2 in
         if is_same_logic_ptr_type ty1 ty2 ||
            ((op = Eq || op = Neq) &&
-            (Ast_types.Acsl.is_logic_void_pointer t1.term_type ||
-             Ast_types.Acsl.is_logic_void_pointer t2.term_type))
+            (Ast_types.Acsl.is_void_ptr t1.term_type ||
+             Ast_types.Acsl.is_void_ptr t2.term_type))
         then f loc op t1 t2
         else if (op=Eq || op = Neq) then conditional_conversion t1 t2
         else
@@ -3372,14 +3367,14 @@ struct
   and type_int_term ctxt env t =
     let module [@warning "-60"] C = struct end in
     let tt = ctxt.type_term ctxt env t in
-    if not (Ast_types.Acsl.is_logic_integral tt.term_type) then
+    if not (Ast_types.Acsl.is_plain_integral tt.term_type) then
       ctxt.error t.lexpr_loc
         "integer expected but %a found" Cil_printer.pp_logic_type tt.term_type;
     tt
 
   and type_bool_term ctxt env t =
     let tt = ctxt.type_term ctxt env t in
-    if not (Ast_types.Acsl.is_logic_boolean tt.term_type) then
+    if not (Ast_types.Acsl.is_plain_bool tt.term_type) then
       ctxt.error t.lexpr_loc "boolean expected but %a found"
         Cil_printer.pp_logic_type tt.term_type;
     mk_cast tt Lboolean
@@ -3393,7 +3388,7 @@ struct
   and type_num_term ctxt env t =
     let module [@warning "-60"] C = struct end in
     let tt = ctxt.type_term ctxt env t in
-    if not (Ast_types.Acsl.is_arithmetic_type tt.term_type) then
+    if not (Ast_types.Acsl.is_arithmetic tt.term_type) then
       ctxt.error t.lexpr_loc "integer or float expected";
     tt
 
@@ -4770,7 +4765,7 @@ struct
       let checks_tsets_type ~reads fct ctyp =
         List.iter
           begin fun t ->
-            let check t = match Ast_types.Acsl.unroll_logic t with
+            let check t = match Ast_types.Acsl.unroll t with
               | Ctype ctyp' ->
                 ( reads || not (Ast_types.C.is_const ctyp') )
                 && Cil_datatype.Typ.equal ctyp

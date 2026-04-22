@@ -616,7 +616,7 @@ struct
       let (host, offset) as tlv' = build_term_lval ~scope ~loc ~restyp tlv
       and t' = build_term ~scope ~loc ~restyp t in
       let lty = Cil.typeOfTermLval tlv' in
-      begin match Ast_types.Acsl.unroll_logic lty with
+      begin match Ast_types.Acsl.unroll lty with
         | Ctype { tnode = TArray _ } ->
           let offset' = Cil_types.(TIndex (t', TNoOffset)) in
           host, Logic_const.addTermOffset offset' offset
@@ -629,7 +629,7 @@ struct
       end
     | (Field (tlv,_) | FieldNamed (tlv,_)) as t ->
       let (host, offset) as tlv' = build_term_lval ~scope ~loc ~restyp tlv in
-      let lty = match Ast_types.Acsl.unroll_logic (Cil.typeOfTermLval tlv') with
+      let lty = match Ast_types.Acsl.unroll (Cil.typeOfTermLval tlv') with
         | Ctype cty -> Cil_types.Ctype (Ast_types.C.unroll_deep cty)
         | lty -> lty
       in

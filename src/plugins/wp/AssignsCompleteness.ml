@@ -113,7 +113,7 @@ let check_assigns kf assigns =
       else acc
     in
     let vfrom acc = function
-      | t, FromAny when Ast_types.Acsl.is_pointer t.it_content.term_type ->
+      | t, FromAny when Ast_types.Acsl.is_ptr t.it_content.term_type ->
         incomplete acc
           begin fun _kf ->
             Wp_parameters.warning ~wkey:wkey_pedantic
