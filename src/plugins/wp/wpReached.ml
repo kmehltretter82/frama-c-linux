@@ -294,7 +294,7 @@ let reachability = FRmap.memo
     begin fun kf ->
       let r = compute kf in
       (if Wp_parameters.has_dkey dkey then
-         let dir = Wp_parameters.get_session_dir ~force:true "reach" in
+         let dir = Wp_parameters.Session.get_dir ~create_path:true "reach" in
          dump ~dir kf r ) ; r
     end
 

@@ -616,8 +616,9 @@ module ScriptMode = String
          - 'batch': proof scripts are reused but not updated (default for script prover)\n\
          - 'update': proof scripts are reused and updated (default for tip prover)\n\
          - 'init': proof scripts are generated from scratch and saved\n\
-         - 'dry': proof scripts are explored from scratch and not saved\n\
-         See also option -wp-cache-env."
+         - 'dry': proof scripts are explored from scratch and not saved.
+         It can also be specified using the environment variable \
+         FRAMAC_WP_SCRIPT. The option is prioritary over the variable."
     end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -648,40 +649,35 @@ module Cache = String
     (struct
       let option_name = "-wp-cache"
       let arg_name = "mode"
-      let default = ""
+      let default = "update"
       let help =
         "WP cache mode:\n\
-         - 'none': no cache, run provers (default)\n\
-         - 'update': use cache or run provers and update cache\n\
+         - 'none': no cache, run provers\n\
+         - 'update': use cache or run provers and update cache (default)\n\
          - 'cleanup': update mode with garbage collection\n\
          - 'replay': update mode with no cache update\n\
          - 'rebuild': always run provers and update cache\n\
-         - 'offline': use cache but never run provers\n\
-         See also option -wp-cache-env."
+         - 'offline': use cache but never run provers.\n\
+         It can also be specified using the environment variable \
+         FRAMAC_WP_CACHE. The option is prioritary over the variable."
     end)
+let () =
+  Cache.set_possible_values
+    [ "none" ; "update" ; "cleanup" ; "replay" ; "rebuild" ; "offline" ]
 
 let () = Parameter_customize.set_group wp_prover
-module CacheDir = String
+module CacheDir = Make_user_dir_opt
+    (Session)
     (struct
       let option_name = "-wp-cache-dir"
+      let env = Some "FRAMAC_WP_CACHEDIR"
+      let dirname = "cache"
       let arg_name = "dir"
-      let default = ""
       let help =
         "Specify global cache directory (no cleanup mode).\n\
-         By default, cache entries are stored in the WP session directory.\n\
-         See also option -wp-cache-env."
-    end)
-
-let () = Parameter_customize.set_group wp_prover
-module CacheEnv = False
-    (struct
-      let option_name = "-wp-cache-env"
-      let help = "Gives environment variables precedence over command line\n\
-                  for cache management:\n\
-                  - FRAMAC_WP_SCRIPT overrides -wp-script\n\
-                  - FRAMAC_WP_CACHE overrides -wp-cache\n\
-                  - FRAMAC_WP_CACHEDIR overrides -wp-cache-dir\n\
-                  Disabled by default."
+         By default, cache entries are stored in the WP session directory. \
+         This directory can also be configured using the environment variable \
+         FRAMAC_WP_CACHEDIR. The option is prioritary over the variable."
     end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -1189,29 +1185,6 @@ struct
   let mkdir = make_output_dir
   let add_update_hook = OutputDir.add_update_hook
 end
-
-(* -------------------------------------------------------------------------- *)
-(* --- Session dir                                                        --- *)
-(* -------------------------------------------------------------------------- *)
-
-let default = Fclib.Filepath.(concat (pwd ()) "/.frama-c")
-
-let has_session () =
-  Session.is_set () || Filesystem.dir_exists default
-
-let get_session ~force () =
-  if force then
-    Session.get_dir "."
-  else
-  if Session.is_set () then
-    Session.get ()
-  else
-    Session.get_dir "."
-
-let get_session_dir ~force d =
-  let base = get_session ~force () in
-  let path = Fclib.Filepath.(base / d) in
-  if force then make_output_dir path ; path
 
 (* -------------------------------------------------------------------------- *)
 (* --- Print Generated                                                    --- *)

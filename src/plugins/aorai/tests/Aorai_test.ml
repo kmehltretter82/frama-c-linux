@@ -108,7 +108,8 @@ let extend () =
              (State_selection.with_codependencies state) selection)
         State_selection.empty
         [ InternalWpShare.self; ProveAuxSpec.self;
-          Wp.Wp_parameters.CacheEnv.self;
+          Wp.Wp_parameters.Cache.self;
+          Wp.Wp_parameters.CacheDir.self;
           Wp.Wp_parameters.Verbose.self;
         ]
     in

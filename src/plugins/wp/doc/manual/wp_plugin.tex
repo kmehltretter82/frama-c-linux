@@ -1388,6 +1388,9 @@ See \texttt{-wp-interactive <mode>} option for details.
     scripts in proof session.
   \item \texttt{"dry"} don't use existing script and don't store any new scripts in proof session.
   \end{itemize}
+  This parameter can be customized using the \verb|FRAMAC_WP_SCRIPT| environment
+  variable. If both the variable and the option are positioned, the option has
+  the priority.
 \item[\tt -wp-interactive <mode>] selects the interaction mode with
   interactive provers such as Coq (while it could work for other interactive
   provers, it has not been tested so far). Five modes are available:
@@ -1400,8 +1403,6 @@ See \texttt{-wp-interactive <mode>} option for details.
   \end{itemize}
   New scripts are created in the \texttt{interactive} directory of \textsf{WP}
   session (see option \texttt{-wp-session <dir>}).
-  In case option \verb|-wp-cache-env| is set, the script mode is taken from environment
-  variable \verb|FRAMAC_WP_SCRIPT| instead.
 \item[\tt -wp-list-provers] lists all available provers.
   The option prints all the available provers from \textsf{Why3} configuration and from
   the current \texttt{PATH} with their respective version and \verb+-wp-prover <p>+
@@ -1880,13 +1881,15 @@ The main option to control cache usage is \verb+-wp-cache+, documented below:
 \begin{description}
 \item[\tt -wp-cache <mode>] selects the cache mode to use with \textsf{Why-3}
   provers. The default mode is \verb'update' if there is \textsf{WP} session
-  available, and \verb+none+ otherwise.
+  available, and \verb+none+ otherwise. The environment variable
+  \verb|FRAMAC_WP_CACHE| can be used for the same purpose, if both the
+  environment variable and the option are configured, the option is prioritary.
+
 \item[\tt -wp-cache-dir <dir>] select the directory where cached results are
   stored. By default, the cache is store in the \textsf{WP} session
-  directory, when available.
-\item[\tt -wp-cache-env] makes environment variables
-  \verb|FRAMAC_WP_CACHE|, \verb|FRAMAC_WP_CACHEDIR| and \verb|FRAMAC_WP_SCRIPT|
-  override command line options \verb|-wp-cache|, \verb|-wp-cachedir| and \verb|-wp-script|, respectively.
+  directory. The environment variable \verb|FRAMAC_WP_CACHEDIR| can be used to
+  customize the directory, if both the environment variable and the option
+  are configured, the option is prioritary.
 \end{description}
 
 The available cache modes are described below:

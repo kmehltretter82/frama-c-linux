@@ -116,6 +116,34 @@ function Prover(props: ProverConfig): JSX.Element {
   );
 }
 
+function CacheSelector(): JSX.Element {
+  const [cacheMode, setCacheMode] = States.useSyncState(WP.cacheMode);
+  const { help } =
+    States.useRequestStable(Params.getParameterInfo, '-wp-cache');
+  const onChange = (value: string | undefined): void => {
+    const mode =
+      value
+        ? WP.CacheMode[value as keyof typeof WP.CacheMode]
+        : undefined;
+    if (mode)
+      setCacheMode(mode);
+  };
+  const options =
+    (Object.keys(WP.CacheMode) as Array<keyof typeof WP.CacheMode>)
+      .map((value) =>
+        <option key={value} value={value}>{value}</option>
+      );
+  return (
+    <>
+      <SelectMenu
+        value={cacheMode}
+        onChange={onChange}
+      >{options}</SelectMenu>
+      <IconButton icon='HELP' title={help} />
+    </>
+  );
+}
+
 function InteractiveSelector(): JSX.Element {
   const [inter, setInter] = States.useSyncState(WP.interactiveMode);
   const { help } =
@@ -212,6 +240,9 @@ export function SideBar(): JSX.Element {
                 vstep={1}
                 onChange={setProcesses}
               />
+            </Label>
+            <Label label='Cache' icon='SERVER'>
+              <CacheSelector/>
             </Label>
           </SidebarBlock>
           <SidebarBlock title='Automatic Provers'>

@@ -659,6 +659,26 @@ struct
         | Some s when s <> "" -> of_string s
         | _ -> Parent.get_dir Info.dirname
 
+    let is_set () =
+      Dir_name.is_set () ||
+      Option.fold ~none:false ~some:((<>) "")
+        (Option.bind Sys.getenv_opt Info.env)
+
+    let cached_value = ref None
+
+    let () =
+      (* In case of reset, we just want to forget everything.
+         So, let's always forget, the next get will update the cache. *)
+      Dir_name.add_set_hook (fun _ _ -> cached_value := None)
+
+    let get () =
+      match !cached_value with
+      | Some value -> value
+      | None ->
+        let value = get () in
+        cached_value := Some value ;
+        value
+
     let expected ~dir path =
       if dir <> Filesystem.dir_exists path then
         P.L.abort "%a is expected to be a %s"

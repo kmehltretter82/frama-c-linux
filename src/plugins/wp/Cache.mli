@@ -8,10 +8,11 @@
 
 type mode = NoCache | Update | Replay | Rebuild | Offline | Cleanup
 
-val get_dir : unit -> string
-
 val set_mode : mode -> unit
 val get_mode : unit -> mode
+val add_hook_on_mode_update: (unit -> unit) -> unit
+
+
 val get_hits : unit -> int
 val get_miss : unit -> int
 val get_removed : unit -> int

@@ -14,9 +14,9 @@
 #
 # - has-wp-proofs (optional, defaults to 'false')
 #   Indicates whether the tests execute WP proofs, if it the case the derivation
-#   receives an additional build-input 'alt-ergo'. Furthermore, it configures
-#   Why3 before build phase and export the WP global cache. Note however that
-#   this cache is used only if the tests use the option '-wp-cache-env'
+#   receives an additional build-input 'alt-ergo'. Furthermore, it export the WP
+#   global cache and associated variables. This can be disabled in a test suite
+#   by overriding the variables.
 #
 # - cover (optional, defaults to 'true')
 #   Indicates whether the tests should generate coverage files. BEWARE! If you

@@ -24,8 +24,8 @@
 # - has-wp-proofs (optional, defaults to 'false')
 #   Indicates whether the plugin execute WP proofs during tests, if it the case
 #   the derivation receives an additional check-input 'alt-ergo'. Furthermore,
-#   it configures Why3 before check phase and export the WP global cache. Note
-#   however that this cache is used only if the tests use the option '-wp-cache-env'
+#   it exports the WP global cache and associated variables. This can be
+#   disabled in a test suite by overriding the variables.
 #
 # - install-opam (optional, default to 'true')
 #   Indicates whether the generated Opam file should be installed. Unless it is
@@ -98,8 +98,6 @@ stdenv.mkDerivation {
   preCheck = ''
     patchShebangs .
   '' + (if has-wp-proofs then ''
-    mkdir home
-    HOME=$(pwd)/home
     export FRAMAC_WP_CACHE=offline
     export FRAMAC_WP_CACHEDIR=$wp_cache
     ''

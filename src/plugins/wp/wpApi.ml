@@ -153,6 +153,54 @@ let _ =
     ~add_hook:Wp_parameters.Timeout.add_hook_on_update ()
 
 (* -------------------------------------------------------------------------- *)
+(* --- Cache mode                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+module CacheMode =
+struct
+  include D.Enum
+
+  let dictionary : Cache.mode dictionary = dictionary ()
+
+  let tag name value = tag ~name ~descr:(Md.plain name) ~value dictionary
+
+  let none = tag "None" NoCache
+  let update = tag "Update" Update
+  let replay = tag "Replay" Replay
+  let rebuild = tag "Rebuild" Rebuild
+  let offline = tag "Offline" Offline
+  let cleanup = tag "Cleanu" Cleanup
+
+  let lookup = function
+    | Cache.NoCache -> none
+    | Update -> update
+    | Replay -> replay
+    | Rebuild -> rebuild
+    | Offline -> offline
+    | Cleanup-> cleanup
+
+  let () =
+    set_lookup dictionary lookup
+
+  include
+    (val publish
+        ~package
+        ~descr:(Md.plain "Cache mode")
+        ~name:"CacheMode"
+        dictionary)
+end
+
+let _ =
+  S.register_state ~package
+    ~name:"cacheMode"
+    ~descr:(Md.plain "Current Cache mode")
+    ~data:(module CacheMode)
+    ~get:Cache.get_mode
+    ~set:Cache.set_mode
+    ~add_hook:Cache.add_hook_on_mode_update
+    ()
+
+(* -------------------------------------------------------------------------- *)
 (* --- Interactive provers                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
