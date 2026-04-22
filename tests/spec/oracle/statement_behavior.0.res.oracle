@@ -8,10 +8,10 @@
   computing for function pfsqopfc <- main.
   Called from statement_behavior.c:23.
 [eva:alarm] statement_behavior.c:17: Warning: assertion got status unknown.
-[eva:alarm] statement_behavior.c:5: Warning: 
-  function pfsqopfc: postcondition got status unknown.
 [eva:alarm] statement_behavior.c:18: Warning: 
   accessing uninitialized left-value. assert \initialized(&five_times);
+[eva:alarm] statement_behavior.c:5: Warning: 
+  function pfsqopfc: postcondition got status unknown.
 [eva:progress] Recording results for pfsqopfc
 [eva:progress] Done for function pfsqopfc
 [eva:progress] Recording results for main
@@ -21,7 +21,7 @@
   
 [eva:final-states] Values at end of function main:
   x ∈ {1}
-  y ∈ [--..--]
+  y ∈ {5}
   __retres ∈ {0}
 [inout] InOut (internal) for function pfsqopfc:
   Operational inputs:
