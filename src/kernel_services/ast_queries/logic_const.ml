@@ -397,7 +397,7 @@ let is_unrollable_ltdef = Ast_types.Acsl.is_unrollable_ltdef
 
 let unroll_ltdef = Ast_types.Acsl.unroll_ltdef
 
-let isLogicCType = Ast_types.Acsl.is_logic_ctype
+let isLogicCType = Ast_types.Acsl.is_plain_ctype
 
 let is_list_type = Ast_types.Acsl.is_plain_list
 
@@ -424,4 +424,4 @@ let is_plain_type = Ast_types.Acsl.is_plain
 
 let make_arrow_type = Ast_types.Acsl.make_arrow
 
-let is_boolean_type = Ast_types.Acsl.is_boolean
+let is_boolean_type = Ast_types.Acsl.is_logic_bool

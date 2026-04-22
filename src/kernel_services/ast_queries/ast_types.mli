@@ -801,65 +801,70 @@ module Acsl : sig
       [true] (this is the default), C typedef will be expanded as well using
       {!Ast_types.Acsl.unroll_ltdef}.
   *)
-  val unroll_logic: ?unroll_typedef:bool -> logic_type -> logic_type
+  val unroll: ?unroll_typedef:bool -> logic_type -> logic_type
 
   (** Check for ["volatile"] qualifier from a logic type using {!is_volatile}. *)
-  val is_logic_volatile: logic_type -> bool
+  val is_plain_volatile: logic_type -> bool
 
   (** True if the argument is the type for reified C types. *)
-  val is_logic_typetag: logic_type -> bool
+  val is_plain_typetag: logic_type -> bool
 
   (** True if the argument is a boolean type, either integral C type
       or mathematical boolean one.
   *)
-  val is_logic_boolean: logic_type -> bool
+  val is_plain_bool: logic_type -> bool
 
   (** True if the argument is [_Bool] or [boolean]. *)
-  val is_logic_pure_boolean: logic_type -> bool
+  val is_plain_pure_bool: logic_type -> bool
 
   (** True if the argument is an integral type (i.e. integer or enum), either C
       or mathematical one.
   *)
-  val is_logic_integral: logic_type -> bool
+  val is_plain_integral: logic_type -> bool
 
   (** True if the argument is a floating point type. *)
-  val is_logic_float: logic_type -> bool
+  val is_plain_float: logic_type -> bool
 
   (** True if the argument is the logic 'real' type. *)
-  val is_logic_real: logic_type -> bool
+  val is_plain_real: logic_type -> bool
 
   (** True if the argument is a C floating point type or logic 'real' type. *)
-  val is_logic_real_or_float: logic_type -> bool
+  val is_plain_real_or_float: logic_type -> bool
 
   (** True if the argument is a logic arithmetic type (i.e. integer, enum or
       floating point, either C or mathematical one.
   *)
-  val is_logic_arithmetic: logic_type -> bool
+  val is_plain_arithmetic: logic_type -> bool
 
   (** [is_logic_ctype test typ] is [false] for pure logic types and the result
       of test for C types.
   *)
-  val is_logic_ctype: (typ -> bool) -> logic_type -> bool
+  val is_plain_ctype: (typ -> bool) -> logic_type -> bool
 
   (** True if the argument is a pointer type. Expands the logic type
       definition if necessary.
   *)
-  val is_logic_ptr: logic_type -> bool
+  val is_plain_ptr: logic_type -> bool
+
+  (** True if the argument is an array type. Expands the logic type
+      definition if necessary.
+  *)
+  val is_plain_array: logic_type -> bool
 
   (** True if the argument is the logic function type. Expands the logic type
       definition if necessary.
   *)
-  val is_logic_fun: logic_type -> bool
+  val is_plain_fun: logic_type -> bool
 
   (** True if the argument is the logic function pointer type. Expands the logic
       type definition if necessary.
   *)
-  val is_logic_fun_ptr: logic_type -> bool
+  val is_plain_fun_ptr: logic_type -> bool
 
   (** True if the argument is a pointer {i or} function type.
       Expands the logic type definition if necessary.
   *)
-  val is_logic_fun_or_ptr: logic_type -> bool
+  val is_plain_fun_or_ptr: logic_type -> bool
 
   (** returns [true] if the type is a list<t>. *)
   val is_plain_list: logic_type -> bool
@@ -910,50 +915,26 @@ module Acsl : sig
   val make_arrow: logic_var list -> logic_type -> logic_type
 
   (** @return true if the argument is the boolean type. *)
-  val is_boolean: logic_type -> bool
+  val is_logic_bool: logic_type -> bool
 
 
   (** {3 tests and extraction of element type}
       @before Frama-C+dev these functions were in {!Logic_utils}
   *)
 
-  (** {4 tests for an individual (non set) type}
-      [is_plain_xxx t] returns [true] iff [t] is a [xxx]
-      @before 31.0-Gallium these functions were not exported
-  *)
-
-  val is_plain_arithmetic: Cil_types.logic_type -> bool
-
-  val is_plain_integral: Cil_types.logic_type -> bool
-
-  val is_plain_fun_ptr: Cil_types.logic_type -> bool
-
-  val is_plain_array: Cil_types.logic_type -> bool
-
-  val is_plain_pointer: Cil_types.logic_type -> bool
-
-
   (** {4 tests for potential sets}
       [is_xxx t] returns true iff [t] is a [xxx] _or_ a set of [xxx]
   *)
 
-  val is_arithmetic_type: Cil_types.logic_type -> bool
+  val is_arithmetic: logic_type -> bool
 
-  val is_integral_type: Cil_types.logic_type -> bool
+  val is_integral: logic_type -> bool
 
-  val is_fun_ptr: Cil_types.logic_type -> bool
+  val is_fun_ptr: logic_type -> bool
 
-  val is_array: Cil_types.logic_type -> bool
+  val is_array: logic_type -> bool
 
-  val is_pointer: Cil_types.logic_type -> bool
-
-
-  (** {4 sets and lists} *)
-
-  val is_list: Cil_types.logic_type -> bool
-
-  val is_set: Cil_types.logic_type -> bool
-
+  val is_ptr: logic_type -> bool
 
   (** {4 extract elements} *)
 
@@ -965,26 +946,21 @@ module Acsl : sig
   (** same as {!pointed} but for arrays (or set of arrays). *)
   val array_element: logic_type -> logic_type
 
-
   (** {4 Predefined tests over types} *)
 
   (** [is_logic test typ] is [false] for pure logic types and the result
       of test for C types.
       In case of a set type, the function tests the element type.
   *)
-  val is_logic: (typ -> bool) -> logic_type -> bool
+  val plain_or_set_ctype: (typ -> bool) -> logic_type -> bool
 
-  val is_logic_array : logic_type -> bool
+  val is_char : logic_type -> bool
 
-  val is_logic_char : logic_type -> bool
+  val is_any_char : logic_type -> bool
 
-  val is_logic_any_char : logic_type -> bool
+  val is_void : logic_type -> bool
 
-  val is_logic_void : logic_type -> bool
-
-  val is_logic_pointer : logic_type -> bool
-
-  val is_logic_void_pointer : logic_type -> bool
+  val is_void_ptr : logic_type -> bool
 
 
   (** {4 Type conversions} *)
@@ -992,7 +968,7 @@ module Acsl : sig
   (** @return the equivalent C type.
       @raise Failure if the type is purely logical
   *)
-  val logic_ctype : logic_type -> typ
+  val get_ctype : logic_type -> typ
 
   (** removes qualifiers if logic_type is a C type, identity otherwise. *)
   val remove_qualifiers: logic_type -> logic_type
@@ -1004,8 +980,7 @@ module Acsl : sig
 
   val ctype_of_array_elem: logic_type -> typ
 
-  val arithmetic_conversion:
-    Cil_types.logic_type -> Cil_types.logic_type -> Cil_types.logic_type
+  val arithmetic_conversion: logic_type -> logic_type -> logic_type
 end
 
 
@@ -1017,86 +992,86 @@ end
     {!Ast_types.Acsl.unroll_ltdef}.
 *)
 val unroll_logic : ?unroll_typedef:bool -> logic_type -> logic_type
-[@@deprecated "Use Ast_types.Acsl.unroll_logic instead"]
-[@@migrate { repl = Rel.Acsl.unroll_logic }]
+[@@deprecated "Use Ast_types.Acsl.unroll instead"]
+[@@migrate { repl = Rel.Acsl.unroll }]
 
 (** Check for ["volatile"] qualifier from a logic type using {!is_volatile}. *)
 val is_logic_volatile : logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_logic_volatile instead"]
-[@@migrate { repl = Rel.Acsl.is_logic_volatile }]
+[@@deprecated "Use Ast_types.Acsl.is_plain_volatile instead"]
+[@@migrate { repl = Rel.Acsl.is_plain_volatile }]
 
 (** True if the argument is the type for reified C types. *)
 val is_logic_typetag : logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_logic_typetag instead"]
-[@@migrate { repl = Rel.Acsl.is_logic_typetag }]
+[@@deprecated "Use Ast_types.Acsl.is_plain_typetag instead"]
+[@@migrate { repl = Rel.Acsl.is_plain_typetag }]
 
 (** True if the argument is a boolean type, either integral C type or
     mathematical boolean one.
 *)
 val is_logic_boolean : logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_logic_boolean instead"]
-[@@migrate { repl = Rel.Acsl.is_logic_boolean }]
+[@@deprecated "Use Ast_types.Acsl.is_plain_bool instead"]
+[@@migrate { repl = Rel.Acsl.is_plain_bool }]
 
 (** True if the argument is [_Bool] or [boolean]. *)
 val is_logic_pure_boolean : logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_logic_pure_boolean instead"]
-[@@migrate { repl = Rel.Acsl.is_logic_pure_boolean }]
+[@@deprecated "Use Ast_types.Acsl.is_plain_pure_bool instead"]
+[@@migrate { repl = Rel.Acsl.is_plain_pure_bool }]
 
 (** True if the argument is an integral type (i.e. integer or enum), either C or
     mathematical one.
 *)
 val is_logic_integral : logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_logic_integral instead"]
-[@@migrate { repl = Rel.Acsl.is_logic_integral }]
+[@@deprecated "Use Ast_types.Acsl.is_plain_integral instead"]
+[@@migrate { repl = Rel.Acsl.is_plain_integral }]
 
 (** True if the argument is a floating point type. *)
 val is_logic_float : logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_logic_float instead"]
-[@@migrate { repl = Rel.Acsl.is_logic_float }]
+[@@deprecated "Use Ast_types.Acsl.is_plain_float instead"]
+[@@migrate { repl = Rel.Acsl.is_plain_float }]
 
 (** True if the argument is the logic 'real' type. *)
 val is_logic_real : logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_logic_real instead"]
-[@@migrate { repl = Rel.Acsl.is_logic_real }]
+[@@deprecated "Use Ast_types.Acsl.is_plain_real instead"]
+[@@migrate { repl = Rel.Acsl.is_plain_real }]
 
 (** True if the argument is a C floating point type or logic 'real' type. *)
 val is_logic_real_or_float : logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_logic_real_or_float instead"]
-[@@migrate { repl = Rel.Acsl.is_logic_real_or_float }]
+[@@deprecated "Use Ast_types.Acsl.is_plain_real_or_float instead"]
+[@@migrate { repl = Rel.Acsl.is_plain_real_or_float }]
 
 (** True if the argument is a logic arithmetic type (i.e. integer, enum or
     floating point, either C or mathematical one.
 *)
 val is_logic_arithmetic : logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_logic_arithmetic instead"]
-[@@migrate { repl = Rel.Acsl.is_logic_arithmetic }]
+[@@deprecated "Use Ast_types.Acsl.is_plain_arithmetic instead"]
+[@@migrate { repl = Rel.Acsl.is_plain_arithmetic }]
 
 (** True if the argument is a pointer type. Expands the logic type
     definition if necessary.
     @since 33.0-Arsenic
 *)
 val is_logic_ptr : logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_logic_ptr instead"]
-[@@migrate { repl = Rel.Acsl.is_logic_ptr }]
+[@@deprecated "Use Ast_types.Acsl.is_plain_ptr instead"]
+[@@migrate { repl = Rel.Acsl.is_plain_ptr }]
 
 (** True if the argument is the logic function type. Expands the logic type
     definition if necessary.
 *)
 val is_logic_fun : logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_logic_fun instead"]
-[@@migrate { repl = Rel.Acsl.is_logic_fun }]
+[@@deprecated "Use Ast_types.Acsl.is_plain_fun instead"]
+[@@migrate { repl = Rel.Acsl.is_plain_fun }]
 
 (** True if the argument is the logic function pointer type. Expands the logic
     type definition if necessary.
 *)
 val is_logic_fun_ptr : logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_logic_fun_ptr instead"]
-[@@migrate { repl = Rel.Acsl.is_logic_fun_ptr }]
+[@@deprecated "Use Ast_types.Acsl.is_plain_fun_ptr instead"]
+[@@migrate { repl = Rel.Acsl.is_plain_fun_ptr }]
 
 (** True if the argument is a pointer {i or} function type.
     Expands the logic type definition if necessary.
     @since 33.0-Arsenic
 *)
 val is_logic_fun_or_ptr : logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_logic_fun_or_ptr instead"]
-[@@migrate { repl = Rel.Acsl.is_logic_fun_or_ptr }]
+[@@deprecated "Use Ast_types.Acsl.is_plain_fun_or_ptr instead"]
+[@@migrate { repl = Rel.Acsl.is_plain_fun_or_ptr }]

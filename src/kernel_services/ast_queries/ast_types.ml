@@ -555,55 +555,61 @@ module Acsl = struct
     | Ltype ({lt_def= Some (LTsum _)},_)
     | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ | Ctype _ as ty  -> ty
 
-  let rec unroll_logic ?(unroll_typedef=true) = function
+  let rec unroll ?(unroll_typedef=true) = function
     | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-      unroll_logic ~unroll_typedef (unroll_ltdef ty)
+      unroll ~unroll_typedef (unroll_ltdef ty)
     | Ctype ty when unroll_typedef -> Ctype (C.unroll ty)
     | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ | Ctype _ | Ltype _ as ty ->
       ty
 
-  let () = Cil_datatype.punrollLogicType := unroll_logic
+  let () = Cil_datatype.punrollLogicType := unroll
 
   (* Utils function for is_logic_* functions. *)
-  let unroll_logic_aux is_logic lti t =
+  let unroll_aux is_logic lti t =
     is_unrollable_ltdef lti && is_logic (unroll_ltdef t)
 
-  let rec is_logic_volatile t =
+  let rec is_plain_volatile t =
     match t with
     | Ctype typ -> C.is_volatile typ
     | Lboolean | Linteger | Lreal | Lvar _ | Larrow _ -> false
-    | Ltype (lti,_) -> unroll_logic_aux is_logic_volatile lti t
+    | Ltype (lti,_) -> unroll_aux is_plain_volatile lti t
 
-  let rec is_logic_typetag t =
+  let rec is_plain_typetag t =
     match t with
     | Ltype ({lt_name = "typetag"}, []) -> true
-    | Ltype (lti, _) -> unroll_logic_aux is_logic_typetag lti t
+    | Ltype (lti, _) -> unroll_aux is_plain_typetag lti t
     | _ -> false
 
-  let rec is_logic_boolean t =
+  let rec is_plain_bool t =
     match t with
     | Ctype t -> C.is_integral t
     | Lboolean | Linteger -> true
-    | Ltype (lti, _) -> unroll_logic_aux is_logic_boolean lti t
+    | Ltype (lti, _) -> unroll_aux is_plain_bool lti t
     | Lreal | Lvar _ | Larrow _ -> false
 
-  let rec is_logic_pure_boolean t =
+  let rec is_plain_pure_bool t =
     match t with
     | Ctype t -> C.is_bool t
     | Lboolean -> true
-    | Ltype (lti, _) -> unroll_logic_aux is_logic_pure_boolean lti t
+    | Ltype (lti, _) -> unroll_aux is_plain_pure_bool lti t
     | _ -> false
 
-  let rec is_logic_integral t =
+  let rec is_logic_bool = function
+    | Lboolean -> true
+    | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
+      is_logic_bool (unroll_ltdef ty)
+    | _ -> false
+
+  let rec is_plain_integral t =
     match t with
     | Ctype t -> C.is_integral t
     | Lboolean -> false
     | Linteger -> true
     | Lreal -> false
-    | Ltype (lti, _) -> unroll_logic_aux is_logic_integral lti t
+    | Ltype (lti, _) -> unroll_aux is_plain_integral lti t
     | Lvar _ | Larrow _ -> false
 
-  let is_logic_float t =
+  let is_plain_float t =
     match t with
     | Ctype t -> C.is_float t
     | Lboolean -> false
@@ -611,48 +617,46 @@ module Acsl = struct
     | Lreal -> false
     | Lvar _ | Ltype _ | Larrow _ -> false
 
-  let rec is_logic_real t =
+  let rec is_plain_real t =
     match t with
     | Ctype _ -> false
     | Lboolean -> false
     | Linteger -> false
     | Lreal -> true
-    | Ltype (lti, _) -> unroll_logic_aux is_logic_real lti t
+    | Ltype (lti, _) -> unroll_aux is_plain_real lti t
     | Lvar _ | Larrow _ -> false
 
-  let rec is_logic_real_or_float t =
+  let rec is_plain_real_or_float t =
     match t with
     | Ctype t -> C.is_float t
     | Lboolean -> false
     | Linteger -> false
     | Lreal -> true
-    | Ltype (lti, _) -> unroll_logic_aux is_logic_real_or_float lti t
+    | Ltype (lti, _) -> unroll_aux is_plain_real_or_float lti t
     | Lvar _ | Larrow _ -> false
 
-  let rec is_logic_arithmetic t =
+  let rec is_plain_arithmetic t =
     match t with
     | Ctype t -> C.is_arithmetic t
     | Linteger | Lreal -> true
-    | Ltype (lti, _) -> unroll_logic_aux is_logic_arithmetic lti t
+    | Ltype (lti, _) -> unroll_aux is_plain_arithmetic lti t
     | Lboolean | Lvar _ | Larrow _ -> false
 
-  let rec is_logic_ctype f = function
+  let rec is_plain_ctype f = function
     | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-      is_logic_ctype f (unroll_ltdef ty)
+      is_plain_ctype f (unroll_ltdef ty)
     | Ltype _ | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ -> false
     | Ctype cty  -> f cty
 
-  let is_logic_ptr t =
-    is_logic_ctype C.is_ptr t
+  let is_plain_ptr = is_plain_ctype C.is_ptr
 
-  let is_logic_fun t =
-    is_logic_ctype C.is_fun t
+  let is_plain_fun = is_plain_ctype C.is_fun
 
-  let is_logic_fun_ptr t =
-    is_logic_ctype C.is_fun_ptr t
+  let is_plain_fun_ptr = is_plain_ctype C.is_fun_ptr
 
-  let is_logic_fun_or_ptr t =
-    is_logic_ctype C.is_fun_or_ptr t
+  let is_plain_fun_or_ptr = is_plain_ctype C.is_fun_or_ptr
+
+  let is_plain_array = is_plain_ctype C.is_array
 
   let rec is_plain_list = function
     | Ltype ({lt_name = "\\list"},[_]) -> true
@@ -706,50 +710,49 @@ module Acsl = struct
     | [] -> rt
     | _ -> Larrow(List.map (fun x -> x.lv_type) args, rt)
 
-  let rec is_boolean = function
-    | Lboolean -> true
-    | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-      is_boolean (unroll_ltdef ty)
-    | _ -> false
+  let is_arithmetic = plain_or_set is_plain_arithmetic
 
-  let is_plain_arithmetic t = is_logic_arithmetic t
+  let is_integral = plain_or_set is_plain_integral
 
-  let is_plain_integral t = is_logic_integral t
+  let plain_or_set_ctype f =
+    plain_or_set (is_plain_ctype f)
 
-  let is_plain_fun_ptr t = is_logic_fun_ptr t
+  let is_char = plain_or_set_ctype C.is_char
 
-  let is_plain_array t =
-    match unroll_logic t with
-    | Ctype ct -> C.is_array ct
-    | _ -> false
+  let is_any_char = plain_or_set_ctype C.is_any_char
 
-  let is_plain_pointer t =
-    match unroll_logic t with
-    | Ctype ct -> C.is_ptr ct
-    | _ -> false
+  let is_void = plain_or_set_ctype C.is_void
 
-  let is_arithmetic_type = plain_or_set is_plain_arithmetic
+  let is_array = plain_or_set is_plain_array
 
-  let is_integral_type = plain_or_set is_plain_integral
+  let is_ptr = plain_or_set is_plain_ptr
 
   let is_fun_ptr = plain_or_set is_plain_fun_ptr
 
-  let is_logic f t = plain_or_set (is_logic_ctype f) t
+  let is_void_ptr = plain_or_set_ctype C.is_void_ptr
 
   let pointed =
     transform_element
       (fun t ->
-         match unroll_logic t with
-           Ctype ty when C.is_ptr ty ->
+         match unroll t with
+         | Ctype ty when C.is_ptr ty ->
            Ctype (C.direct_pointed_type ty)
          | _ ->
            Kernel.fatal ~current:true "type %a is not a pointer type"
              Cil_datatype.Logic_type.pretty t)
 
+  let rec ctype_of_pointed t =
+    match unroll t with
+    | Ctype ty when C.is_ptr ty -> C.direct_pointed_type ty
+    | Ltype ({lt_name = "set"},[t]) -> ctype_of_pointed t
+    | _ ->
+      Kernel.fatal ~current:true "type %a is not a pointer type"
+        Cil_datatype.Logic_type.pretty t
+
   let array_element =
     transform_element
       (fun t ->
-         match unroll_logic t with
+         match unroll t with
          | Ctype ty when C.is_array ty ->
            Ctype (C.direct_array_element ty)
          | _ ->
@@ -757,47 +760,26 @@ module Acsl = struct
              Cil_datatype.Logic_type.pretty t)
 
   let rec ctype_of_array_elem t =
-    match unroll_logic t with
+    match unroll t with
     | Ctype ty when C.is_array ty -> C.direct_array_element ty
     | Ltype ({lt_name = "set"},[t]) -> ctype_of_array_elem t
     | _ ->
       Kernel.fatal ~current:true "type %a is not an array type"
         Cil_datatype.Logic_type.pretty t
 
-  let is_logic_array = is_logic C.is_array
-
-  let is_array = plain_or_set is_plain_array
-
-  let is_pointer = plain_or_set is_plain_pointer
-
-  let is_list t =
-    is_plain_list (unroll_logic t)
-
-  let is_set t =
-    is_plain_set (unroll_logic t)
-
-  let is_logic_char = is_logic C.is_char
-
-  let is_logic_any_char = is_logic C.is_any_char
-
-  let is_logic_void = is_logic C.is_void
-
-  let is_logic_pointer = is_logic C.is_ptr
-
-  let is_logic_void_pointer = is_logic C.is_void_ptr
-
-  let logic_ctype t =
-    let rec logic_ctype = function
+  let get_ctype t =
+    let rec get_aux = function
       | Ctype t -> t
       | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-        logic_ctype (unroll_ltdef ty)
+        get_aux (unroll_ltdef ty)
       | Lvar _ -> Cil_const.intType
       | _ -> failwith "not a C type"
-    in plain_or_set logic_ctype t
+    in
+    plain_or_set get_aux t
 
   (*let plain_array_to_ptr ty =
     let open Current_loc.Operators in
-    match unroll_logic ty with
+    match unroll ty with
     | Ctype({ tnode = TArray(ty,lo); tattr } as tarr) ->
       let length_attr =
         match lo with
@@ -831,7 +813,7 @@ module Acsl = struct
 
   let remove_qualifiers =
     let plain typ =
-      match unroll_logic typ with
+      match unroll typ with
       | Ctype t ->
         let t' = C.remove_qualifiers t in
         if Cil_datatype.Typ.equal t t' then typ else Ctype t'
@@ -839,16 +821,8 @@ module Acsl = struct
     in
     transform_element plain
 
-  let rec ctype_of_pointed t =
-    match unroll_logic t with
-      Ctype ty when C.is_ptr ty -> C.direct_pointed_type ty
-    | Ltype ({lt_name = "set"},[t]) -> ctype_of_pointed t
-    | _ ->
-      Kernel.fatal ~current:true "type %a is not a pointer type"
-        Cil_datatype.Logic_type.pretty t
-
   let rec arithmetic_conversion ty1 ty2 =
-    match unroll_logic ty1, unroll_logic ty2 with
+    match unroll ty1, unroll ty2 with
     | Ctype ty1, Ctype ty2 ->
       if C.is_integral ty1 && C.is_integral ty2
       then Linteger
@@ -875,38 +849,37 @@ module Acsl = struct
         Cil_datatype.Logic_type.pretty ty1 Cil_datatype.Logic_type.pretty ty2
 end
 
-(* ******************** *)
-(* Logic Type checkers. *)
-(* ******************** *)
+(* Deprecate logic functions *)
 
+let unroll_logic = Acsl.unroll
 
-let unroll_logic = Acsl.unroll_logic
+let is_logic_volatile = Acsl.is_plain_volatile
 
-let is_logic_volatile = Acsl.is_logic_volatile
+let is_logic_typetag = Acsl.is_plain_typetag
 
-let is_logic_typetag = Acsl.is_logic_typetag
+let is_logic_boolean = Acsl.is_plain_bool
 
-let is_logic_boolean = Acsl.is_logic_boolean
+let is_logic_pure_boolean = Acsl.is_plain_pure_bool
 
-let is_logic_pure_boolean = Acsl.is_logic_pure_boolean
+let is_logic_integral = Acsl.is_plain_integral
 
-let is_logic_integral = Acsl.is_logic_integral
+let is_logic_float = Acsl.is_plain_float
 
-let is_logic_float = Acsl.is_logic_float
+let is_logic_real = Acsl.is_plain_real
 
-let is_logic_real = Acsl.is_logic_real
+let is_logic_real_or_float = Acsl.is_plain_real_or_float
 
-let is_logic_real_or_float = Acsl.is_logic_real_or_float
+let is_logic_arithmetic = Acsl.is_plain_arithmetic
 
-let is_logic_arithmetic = Acsl.is_logic_arithmetic
+let is_logic_ptr = Acsl.is_plain_ptr
 
-let is_logic_ptr = Acsl.is_logic_ptr
+let is_logic_fun = Acsl.is_plain_fun
 
-let is_logic_fun = Acsl.is_logic_fun
+let is_logic_fun_ptr = Acsl.is_plain_fun_ptr
 
-let is_logic_fun_ptr = Acsl.is_logic_fun_ptr
+let is_logic_fun_or_ptr = Acsl.is_plain_fun_or_ptr
 
-let is_logic_fun_or_ptr = Acsl.is_logic_fun_or_ptr
+(* Deprecated c functions *)
 
 let get_attributes = C.get_attributes
 

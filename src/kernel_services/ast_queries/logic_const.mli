@@ -345,8 +345,8 @@ val unroll_ltdef : logic_type -> logic_type
 (** [isLogicType test typ] is [false] for pure logic types and the result
     of test for C types. *)
 val isLogicCType : (typ -> bool) -> logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_logic_ctype instead"]
-[@@migrate { repl = Ast_types.Acsl.is_logic_ctype }]
+[@@deprecated "Use Ast_types.Acsl.is_plain_ctype instead"]
+[@@migrate { repl = Ast_types.Acsl.is_plain_ctype }]
 
 (** returns [true] if the type is a list<t>.
     @since Aluminium-20160501 *)
@@ -423,5 +423,5 @@ val make_arrow_type: logic_var list -> logic_type -> logic_type
 
 (** @return true if the argument is the boolean type. *)
 val is_boolean_type: logic_type -> bool
-[@@deprecated "Use Ast_types.Acsl.is_boolean instead"]
-[@@migrate { repl = Ast_types.Acsl.is_boolean }]
+[@@deprecated "Use Ast_types.Acsl.is_logic_bool instead"]
+[@@migrate { repl = Ast_types.Acsl.is_logic_bool }]

@@ -358,7 +358,7 @@ and context_insensitive_binop_to_exp_il ~origin bop t1 t2 =
     | PlusA | MinusA | Mult | Div | Mod ->
       let ty = Typing.get_typ ~logic_env origin in
       if not (Gmp_types.Z.is_t ty) && not (Gmp_types.Q.is_t ty) then
-        assert (Ast_types.Acsl.is_integral_type origin.term_type);
+        assert (Ast_types.Acsl.is_integral origin.term_type);
       Some (Typing.get_number_ty ~logic_env origin)
     | LAnd | LOr ->
       Some (Typing.get_number_ty ~logic_env origin)

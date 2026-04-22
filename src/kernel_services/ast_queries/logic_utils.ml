@@ -2653,17 +2653,17 @@ let plain_fun_ptr = Ast_types.Acsl.is_plain_fun_ptr
 
 let plain_array_type = Ast_types.Acsl.is_plain_array
 
-let plain_pointer_type = Ast_types.Acsl.is_plain_pointer
+let plain_pointer_type = Ast_types.Acsl.is_plain_ptr
 
-let is_arithmetic_type = Ast_types.Acsl.is_arithmetic_type
+let is_arithmetic_type = Ast_types.Acsl.is_arithmetic
 
-let is_integral_type = Ast_types.Acsl.is_integral_type
+let is_integral_type = Ast_types.Acsl.is_integral
 
 let is_fun_ptr = Ast_types.Acsl.is_fun_ptr
 
 let is_array_type = Ast_types.Acsl.is_array
 
-let is_pointer_type = Ast_types.Acsl.is_pointer
+let is_pointer_type = Ast_types.Acsl.is_ptr
 
 let is_list_type = Ast_types.Acsl.is_list
 
@@ -2677,22 +2677,22 @@ let type_of_pointed = Ast_types.Acsl.pointed
 
 let type_of_array_elem = Ast_types.Acsl.array_element
 
-let isLogicType = Ast_types.Acsl.is_logic
+let isLogicType = Ast_types.Acsl.plain_or_set_ctype
 
 (** true if the type is a C array (or a set of)*)
-let isLogicArrayType = Ast_types.Acsl.is_logic_array
+let isLogicArrayType = Ast_types.Acsl.is_array
 
-let isLogicCharType = Ast_types.Acsl.is_logic_char
+let isLogicCharType = Ast_types.Acsl.is_char
 
-let isLogicAnyCharType = Ast_types.Acsl.is_logic_any_char
+let isLogicAnyCharType = Ast_types.Acsl.is_any_char
 
-let isLogicVoidType = Ast_types.Acsl.is_logic_void
+let isLogicVoidType = Ast_types.Acsl.is_void
 
-let isLogicPointerType = Ast_types.Acsl.is_logic_pointer
+let isLogicPointerType = Ast_types.Acsl.is_ptr
 
-let isLogicVoidPointerType = Ast_types.Acsl.is_logic_void_pointer
+let isLogicVoidPointerType = Ast_types.Acsl.is_void_ptr
 
-let logicCType = Ast_types.Acsl.logic_ctype
+let logicCType = Ast_types.Acsl.get_ctype
 
 let logic_type_remove_qualifiers = Ast_types.Acsl.remove_qualifiers
 
