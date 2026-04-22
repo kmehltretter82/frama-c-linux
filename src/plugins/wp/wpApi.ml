@@ -169,7 +169,7 @@ struct
   let replay = tag "Replay" Replay
   let rebuild = tag "Rebuild" Rebuild
   let offline = tag "Offline" Offline
-  let cleanup = tag "Cleanu" Cleanup
+  let cleanup = tag "Cleanup" Cleanup
 
   let lookup = function
     | Cache.NoCache -> none
