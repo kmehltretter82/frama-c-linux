@@ -50,5 +50,5 @@ Print statistics file.
   memexec-misses	h		1
   memexec-misses	main		1
   memory-usage			<MEMORY>
-  partitioning-index-misses			162
+  partitioning-index-misses			171
   stmt-coverage			1.

@@ -100,15 +100,15 @@ struct
 
   (* Accessors *)
 
+  let expanded (s : store) : (key * state) list =
+    Partition.to_list s.store_partition
+
   let smashed (s : store) : state Lattice_bounds.or_bottom =
     match Partition.to_list s.store_partition with
     | [] -> `Bottom
     | (_k, v1) :: l ->
       let f acc (_k, v) = Domain.join acc v in
       `Value (List.fold_left f v1 l)
-
-  let flow (s : store) : flow =
-    Flow.of_partition s.store_partition
 
   let contents (flow : flow) : (key * state) list =
     Flow.to_list flow
@@ -153,28 +153,6 @@ struct
 
   let next_loop_iteration (flow : flow) (_loop : stmt) : flow =
     Flow.transfer_keys flow Incr_loop
-
-  let empty_rationing = new_rationing ~limit:0 ~merge:false
-
-  let split_return (flow : flow) (return_exp : Eva_ast.exp option) : flow =
-    let strategy = Split_return.kf_strategy kf in
-    if strategy = Split_strategy.FullSplit
-    then flow
-    else
-      let apply action =
-        Flow.join_duplicate_keys (Flow.transfer_keys flow action)
-      in
-      match Split_return.kf_strategy kf with
-      (* SplitAuto already transformed into SplitEqList. *)
-      | Split_strategy.FullSplit | Split_strategy.SplitAuto -> assert false
-      | Split_strategy.NoSplit -> apply (Ration empty_rationing)
-      | Split_strategy.SplitEqList i ->
-        match return_exp with
-        | None -> apply (Ration empty_rationing)
-        | Some return_exp ->
-          if Ast_types.is_integral_or_pointer return_exp.typ
-          then apply (Restrict (return_exp, i))
-          else apply (Ration empty_rationing)
 
   let call_return ~caller kind result =
     let policy = call_return_policy in

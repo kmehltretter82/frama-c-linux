@@ -384,7 +384,11 @@ module Make_Dataflow
 
   let update_vertex ?(widening : bool = false) (v : vertex)
       (sources : ('branch * flow) list) : bool =
-    let current_stmt = Eva_automata.Vertex.stmt v in
+    let current_stmt =
+      if v == automaton.return_point
+      then Some (Kernel_function.find_return kf)
+      else Eva_automata.Vertex.stmt v
+    in
     Option.iter (fun stmt -> current_ki := Kstmt stmt) current_stmt;
     let current_location = Option.map Cil_datatype.Stmt.loc current_stmt in
     let open Current_loc.Operators in
@@ -526,30 +530,13 @@ module Make_Dataflow
       if Kernel_function.equal englobing_kf kf then (
         Eva_utils.DegenerationPoints.replace s true)
 
-  (* Returns the list of final states and:
-     - check function post-conditions;
-     - apply split_return partitioning action. *)
-  let return_states () =
-    let return_stmt = Kernel_function.find_return kf in
-    let open Current_loc.Operators in
-    let<> UpdatedCurrentLoc = Cil_datatype.Stmt.loc return_stmt in
-    let final_store = get_vertex_store automaton.return_point in
-    let flow = Partitioning.flow final_store in
-    let flow =
-      match return_stmt.skind with
-      | Return (return_exp, _) ->
-        let eva_exp = Option.map Eva_ast.translate_exp return_exp in
-        Partitioning.split_return flow eva_exp
-      | _ -> assert false
-    in
-    Partitioning.contents flow
-
   let compute () : (key * state) list =
     if interpreter_mode then
       simulate automaton.entry_point (get_initial_flow ())
     else
       iterate_list automaton.wto;
-    return_states ()
+    let final_store = get_vertex_store automaton.return_point in
+    Partitioning.expanded final_store
 
 
   (* --- Results conversion --- *)

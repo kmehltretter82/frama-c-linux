@@ -42,8 +42,8 @@ sig
 
   (* --- Accessors --- *)
 
+  val expanded : store -> (Partition.key * state) list
   val smashed : store -> state Lattice_bounds.or_bottom
-  val flow : store -> flow
   val contents : flow -> (Partition.key * state) list
   val is_empty_store : store -> bool
   val is_empty_flow : flow -> bool
@@ -73,7 +73,6 @@ sig
   val enter_loop : flow -> Eva_automata.loop -> flow
   val leave_loop : flow -> Eva_automata.loop -> flow
   val next_loop_iteration : flow -> Cil_types.stmt -> flow
-  val split_return : flow -> Eva_ast.exp option -> flow
 
   (** After the analysis of a function call, recombines callee partitioning keys
       with the caller key. *)
