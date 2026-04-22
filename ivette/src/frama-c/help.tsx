@@ -12,6 +12,7 @@ import { shell } from 'electron';
 import { Modal, showModal } from 'dome/dialogs';
 import { Hbox } from 'dome/layout/boxes';
 import { Button } from 'dome/controls/buttons';
+import { Markdown } from 'dome/text/markdown';
 
 import { registerDocChapter } from 'ivette';
 import { getConfig } from 'frama-c/kernel/api/services';
@@ -139,8 +140,8 @@ function AboutModal(props: AboutProps): JSX.Element {
       <div ref={scrollableArea} className="globals-scrollable-area">
         <FramaCLogo />
         <Hbox className='modal-framac-about'>
-          <pre>version: {props.version}</pre>
-          <pre>{synopsis}</pre>
+          <p>version: {props.version}</p>
+          <p>{synopsis}</p>
           <Hbox>
             <Button
               onClick={() => shell.openExternal(homepage)}
@@ -155,9 +156,11 @@ function AboutModal(props: AboutProps): JSX.Element {
               onClick={() => shell.openExternal(devRepo)}
               label='Git repository' />
           </Hbox>
-          <pre className='framac-about-description'>{description}</pre>
-          <pre>{copyright}</pre>
-          <pre>{license}</pre>
+          <Markdown className='framac-about-description'>
+            {description}
+          </Markdown>
+          <p>{copyright}</p>
+          <p>{license}</p>
         </Hbox>
       </div>
     </Modal>
@@ -178,8 +181,8 @@ function CreditsModal(): JSX.Element {
       <div ref={scrollableArea} className="globals-scrollable-area">
         <FramaCLogo />
         <Hbox>
-          <pre style={{ fontSize: '1.2em', textAlign: "center" }}
-          >Created by:</pre>
+          <p style={{ fontSize: '1.2em', textAlign: "center" }}
+          >Created by:</p>
         </Hbox>
         <div className='modal-framac-credits'>
           {authors.map((author, i) => <div key={i} >{author}</div>)}

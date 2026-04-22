@@ -35,12 +35,13 @@
       text-align: center;
 
       button:hover { cursor: pointer; }
-      pre {
-        user-select: text;
 
-        &.framac-about-description {
-          text-align: justify;
-        }
+      .framac-about-description {
+        text-align: justify;
+      }
+
+      p {
+        margin: 5px 0;
       }
     }
 
