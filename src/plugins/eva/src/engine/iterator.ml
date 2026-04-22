@@ -518,10 +518,8 @@ module Make_Dataflow
       fun state -> [state]
     else
       let result = Library_functions.get_retres_vi kf in
-      fun state ->
-        let pre_state = initial_state and post_states = [state] in
-        Transfer_logic.check_fct_postconditions
-          kf active_behaviors Normal ~pre_state ~post_states ~result
+      Transfer_logic.check_fct_postconditions
+        kf active_behaviors Normal ~pre_state:initial_state ~result
 
   (* Returns the list of final states and:
      - check function post-conditions;

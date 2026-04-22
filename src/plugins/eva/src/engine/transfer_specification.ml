@@ -384,7 +384,7 @@ module Make (Engine: Engine_Subset) = struct
     let states = List.map compute states in
     let states =
       Logic.check_fct_postconditions_for_behaviors kf behaviors status
-        ~result:call.return ~pre_state ~post_states:states
+        ~result:call.return ~pre_state states
     in
     (* Warn on garbled mixes created by specifications, except on builtins. *)
     if warn

@@ -122,13 +122,13 @@ module type Transfer_logic = sig
 
   val check_fct_postconditions_for_behaviors:
     kernel_function -> behavior list -> Alarmset.status ->
-    pre_state:state -> post_states:state list -> result:varinfo option ->
-    state list
+    pre_state:state -> result:varinfo option ->
+    state list -> state list
 
   val check_fct_postconditions:
     kernel_function -> Active_behaviors.t -> termination_kind ->
-    pre_state:state -> post_states:state list -> result:varinfo option ->
-    state list
+    pre_state:state -> result:varinfo option ->
+    state -> state list
 
   val evaluate_assumes_of_behavior: state -> behavior -> Alarmset.status
 

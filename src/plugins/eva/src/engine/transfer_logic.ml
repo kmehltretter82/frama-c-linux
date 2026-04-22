@@ -448,7 +448,7 @@ module Make (Domain: LogicDomain) = struct
       This may result in splitting [post_states] if the postconditions contain
       disjunctions. *)
   let check_fct_postconditions_of_behaviors kf behaviors is_active kind
-      ~per_behavior ~pre_state ~post_states ~result =
+      ~per_behavior ~pre_state ~result post_states =
     if behaviors = [] then post_states
     else
       let build_env s = post_env ~pre:pre_state ~post:s ~result in
@@ -476,7 +476,7 @@ module Make (Domain: LogicDomain) = struct
       the default behavior, treating them separately if [per_behavior] is [true],
       merging them otherwise. *)
   let check_fct_postconditions_for_behaviors kf behaviors status
-      ~pre_state ~post_states ~result =
+      ~pre_state ~result post_states =
     let behaviors =
       if List.exists Cil.is_default_behavior behaviors && behaviors <> []
       then behaviors
@@ -487,17 +487,16 @@ module Make (Domain: LogicDomain) = struct
     let is_active _ = status in
     let kind = Normal in
     check_fct_postconditions_of_behaviors kf behaviors is_active kind
-      ~per_behavior:true ~pre_state ~post_states ~result
+      ~per_behavior:true ~pre_state ~result post_states
 
   (** Check the postcondition of [kf] for every behavior.
       The postcondition of the global behavior is applied for each behavior,
       to help reduce the final state. *)
-  let check_fct_postconditions kf ab kind ~pre_state ~post_states ~result =
+  let check_fct_postconditions kf ab kind ~pre_state ~result state =
     let behaviors = Annotations.behaviors kf in
     let is_active = Active_behaviors.is_active ab in
     check_fct_postconditions_of_behaviors
-      kf behaviors is_active kind ~per_behavior:false
-      ~pre_state ~post_states ~result
+      kf behaviors is_active kind ~per_behavior:false ~pre_state ~result [state]
 
 
   let check_fct_preconditions_of_behaviors call_ki kf ~per_behavior behaviors
