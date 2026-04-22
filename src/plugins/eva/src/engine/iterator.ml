@@ -211,6 +211,9 @@ module Make_Dataflow
   let lift'' (f : state -> state list) : transfer_function =
     fun (k,x) -> List.map (fun y -> k,y) (f x)
 
+  let sequence (f1 : transfer_function) (f2 : transfer_function)
+    : transfer_function =
+    fun x -> List.concat_map f2 (f1 x)
 
   (* Tries to evaluate \assigns … \from … clauses for assembly code. *)
   let transfer_asm ~pos : transfer_function =
@@ -236,13 +239,23 @@ module Make_Dataflow
     (* Recombine callee partitioning keys with caller key *)
     Partitioning.call_return ~caller:key result.kind result.states
 
+  let check_postconditions : state -> state list =
+    if Eva_utils.skip_specifications kf then
+      fun state -> [state]
+    else
+      let result = Library_functions.get_retres_vi kf in
+      Transfer_logic.check_fct_postconditions
+        kf active_behaviors Normal ~pre_state:initial_state ~result
+
   let transfer_transition ~pos (t : transition) : transfer_function =
     let local stmt = (stmt, callstack) in (* Local position *)
     match t with
     | Skip ->
       id
     | Return (return_exp,stmt) ->
-      lift' @@ Transfer_stmt.return ~pos:(local stmt) return_exp
+      sequence
+        (lift' @@ Transfer_stmt.return ~pos:(local stmt) return_exp)
+        (lift'' @@ check_postconditions)
     | Guard (exp,kind,_stmt) ->
       let positive = (kind = Then) in
       lift' @@ fun s -> Transfer_stmt.assume ~pos s exp positive
@@ -513,14 +526,6 @@ module Make_Dataflow
       if Kernel_function.equal englobing_kf kf then (
         Eva_utils.DegenerationPoints.replace s true)
 
-  let check_postconditions =
-    if Eva_utils.skip_specifications kf then
-      fun state -> [state]
-    else
-      let result = Library_functions.get_retres_vi kf in
-      Transfer_logic.check_fct_postconditions
-        kf active_behaviors Normal ~pre_state:initial_state ~result
-
   (* Returns the list of final states and:
      - check function post-conditions;
      - apply split_return partitioning action. *)
@@ -530,7 +535,6 @@ module Make_Dataflow
     let<> UpdatedCurrentLoc = Cil_datatype.Stmt.loc return_stmt in
     let final_store = get_vertex_store automaton.return_point in
     let flow = Partitioning.flow final_store in
-    let flow = Partitioning.transfer (lift'' check_postconditions) flow in
     let flow =
       match return_stmt.skind with
       | Return (return_exp, _) ->
