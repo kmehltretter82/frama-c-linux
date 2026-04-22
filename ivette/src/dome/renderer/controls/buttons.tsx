@@ -290,7 +290,7 @@ export const GenericCheckbox = (props: GenericCheckProps): JSX.Element => {
       onClick={TRIGGER(callback)}
     >
       <Icon
-        id={value ? icon + '.ON' : icon + '.OFF'}
+        id={icon + (value ? '.ON' : '.OFF')}
         kind={disabled ? "disabled" : "default"}
       />
       {props.label}
