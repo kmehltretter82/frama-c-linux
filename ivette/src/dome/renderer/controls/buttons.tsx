@@ -291,6 +291,7 @@ export const GenericCheckbox = (props: GenericCheckProps): JSX.Element => {
       <Icon
         id={icon + (value ? '.ON' : '.OFF')}
         kind={disabled ? "disabled" : "default"}
+        offset={0} // Alignment handled by CSS flex centering.
       />
       {props.label}
     </label>

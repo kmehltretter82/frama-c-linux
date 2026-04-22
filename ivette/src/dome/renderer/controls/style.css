@@ -326,6 +326,14 @@ meter::-webkit-meter-even-less-good-value  {
     border-radius: 4px ;
 }
 
+.dome-xCheckbox > .dome-xIcon {
+    display: inline-flex ;
+    align-items: center ;
+    margin: 0 4px 0 0 ;
+    padding: 0 ;
+    line-height: 0 ;
+}
+
 .dome-control-enabled.dome-xCheckbox:hover {
     cursor: pointer ;
     background-color: var(--background-softer) ;

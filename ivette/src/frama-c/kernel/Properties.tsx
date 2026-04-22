@@ -610,7 +610,6 @@ function CheckField(props: CheckFieldProps): JSX.Element {
   return (
     <Checkbox
       style={{
-        display: 'block',
         color: (props.highlight === value) ? 'red' : '',
       }}
       label={props.label}
