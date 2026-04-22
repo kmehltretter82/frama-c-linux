@@ -19,7 +19,6 @@ import React from 'react';
 import { classes } from 'dome/misc/utils';
 import { Vbox } from 'dome/layout/boxes';
 import { Icon } from './icons';
-import './style.css';
 import * as ToolBar from 'dome/frame/toolbars';
 
 interface EVENT {
