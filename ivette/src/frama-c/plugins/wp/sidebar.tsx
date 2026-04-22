@@ -230,9 +230,19 @@ function ProversConfiguration(): JSX.Element {
   const [scripts = false, setScripts] = States.useSyncState(WP.scripts);
   const [strategies = false, setStrats] = States.useSyncState(WP.strategies);
 
+  const helpGeneral = (): void => { showHelp('wp-config-provers-general'); };
+  const helpAuto = (): void => { showHelp('wp-config-provers-auto'); };
+  const helpInter = (): void => { showHelp('wp-config-provers-inter'); };
+  const helpStrats = (): void => { showHelp('wp-config-provers-strats'); };
+
   return (
     <Forms.Section label='Provers Configuration' unfold>
-      <SidebarBlock title='General configuration'>
+      <SidebarBlock
+        title='General configuration'
+        titleButtons={
+          [<IconButton key='help' icon='HELP' onClick={helpGeneral} />]
+        }
+      >
         <Label label='Timeout' icon='CLOCK' >
           <Spinner
             className="wp-config-field wp-config-spinner"
@@ -255,7 +265,12 @@ function ProversConfiguration(): JSX.Element {
           <CacheSelector />
         </Label>
       </SidebarBlock>
-      <SidebarBlock title='Automatic Provers'>
+      <SidebarBlock
+        title='Automatic Provers'
+        titleButtons={
+          [<IconButton key='help' icon='HELP' onClick={helpAuto} />]
+        }
+      >
         <Checkbox
           label='Generate counter-examples'
           onChange={setCE}
@@ -288,6 +303,9 @@ function ProversConfiguration(): JSX.Element {
       </SidebarBlock>
       <SidebarBlock
         title='Interactive Provers'
+        titleButtons={
+          [<IconButton key='help' icon='HELP' onClick={helpInter} />]
+        }
         display={interPrvs.length !== 0}
       >
         <InteractiveSelector />
@@ -307,7 +325,12 @@ function ProversConfiguration(): JSX.Element {
         title='No Interactive Provers'
         display={interPrvs.length === 0}
       />
-      <SidebarBlock title='Proof Strategies'>
+      <SidebarBlock
+        title='Proof Strategies'
+        titleButtons={
+          [<IconButton key='help' icon='HELP' onClick={helpStrats} />]
+        }
+      >
         <TipSelector />
         <Checkbox
           label='Use scripts'
@@ -348,8 +371,9 @@ function SelectionButton(props: SelectionProps): JSX.Element {
 }
 
 function PropertiesFilter(): JSX.Element {
-  const { help } =
+  const { help: helpMessage } =
     States.useRequestStable(Params.getParameterInfo, '-wp-prop');
+  const help = (): void => { showHelp('wp-config-properties-filters'); };
   const [properties = [], setProperties] = States.useSyncState(WP.filter);
 
   const [selected, setSelected] = React.useState<string>('');
@@ -421,7 +445,12 @@ function PropertiesFilter(): JSX.Element {
     <SidebarBlock
       title='Filters'
       titleButtons={
-        [<IconButton key='help' icon='HELP' title={help} />]
+        [<IconButton
+          key='help'
+          icon='HELP'
+          title={helpMessage}
+          onClick={help}
+        />]
       }
       foldable={true}
     >
@@ -471,6 +500,8 @@ function PropertiesFilter(): JSX.Element {
 }
 
 function RTE(): JSX.Element {
+  const help = (): void => { showHelp('wp-config-properties-rte'); };
+
   const [rte = false, setRte] = States.useSyncState(Params.wpRte);
   const [mem, setMem] = States.useSyncState(Params.rteMem);
   const [div, setDiv] = States.useSyncState(Params.rteDiv);
@@ -483,12 +514,15 @@ function RTE(): JSX.Element {
     <SidebarBlock
       title='RTE Guards'
       titleButtons={
-        [<Checkbox
-          key="generate"
-          label='Generate'
-          value={rte}
-          onChange={setRte}
-        />]
+        [
+          <Checkbox
+            key="generate"
+            label='Generate'
+            value={rte}
+            onChange={setRte}
+          />,
+          <IconButton key='help' icon='HELP' onClick={help} />
+        ]
       }
       foldable={true}
     >
@@ -506,6 +540,7 @@ function RTE(): JSX.Element {
 }
 
 function SmokeTests(): JSX.Element {
+  const help = (): void => { showHelp('wp-config-properties-smoke'); };
   const [smoke = false, setSmoke] = States.useSyncState(Params.wpSmokeTests);
   const [assumes, setAssumes] = States.useSyncState(Params.wpSmokeDeadAssumes);
   const [code, setCode] = States.useSyncState(Params.wpSmokeDeadCode);
@@ -517,12 +552,15 @@ function SmokeTests(): JSX.Element {
     <SidebarBlock
       title='Smoke tests'
       titleButtons={
-        [<Checkbox
-          key="generate"
-          label='Generate'
-          value={smoke}
-          onChange={setSmoke}
-        />]
+        [
+          <Checkbox
+            key="generate"
+            label='Generate'
+            value={smoke}
+            onChange={setSmoke}
+          />,
+          <IconButton key='help' icon='HELP' onClick={help} />
+        ]
       }
       foldable={true}
     >
@@ -574,6 +612,7 @@ function SimplOption(props: SimplOptionProps): JSX.Element {
 }
 
 function Simplifications(): JSX.Element {
+  const help = (): void => { showHelp('wp-config-simpl'); };
   const goals = States.useSyncArrayProxy(WP.goals).model.getRowCount();
 
   const [letify = false, setLetify] = States.useSyncState(Params.wpLet);
@@ -634,14 +673,17 @@ function Simplifications(): JSX.Element {
       <SidebarBlock
         title='Simplifications'
         titleButtons={
-          [<Checkbox
-            key='Enabled'
-            label='Enabled'
-            title={globalMessage}
-            value={letify}
-            enabled={goals === 0}
-            onChange={setLetify}
-          />]
+          [
+            <Checkbox
+              key='Enabled'
+              label='Enabled'
+              title={globalMessage}
+              value={letify}
+              enabled={goals === 0}
+              onChange={setLetify}
+            />,
+            <IconButton key='help' icon='HELP' onClick={help} />
+          ]
         }
       >
         <Checkbox
