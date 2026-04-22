@@ -775,16 +775,14 @@ val array_elem_type_and_size : typ -> typ * exp option
 (** {2 Logic Types} *)
 (* ************************************************************************* *)
 
-(** This module contains all functions related to logic types
+(** This module contains all functions related to logic types.
+    Most of these functions where moved from {!Logic_const} or {!Logic_utils}
+    and renamed for better consistency.
     @since Frama-C+dev
 *)
 module Acsl : sig
 
-  (** @before Frama-C+dev these functions were in {!Logic_const} *)
-
-  (** instantiate type variables in a logic type.
-      @before 18.0-Argon was in {!Logic_utils}
-  *)
+  (** instantiate type variables in a logic type. *)
   val instantiate:
     (string * logic_type) list ->
     logic_type -> logic_type
@@ -793,7 +791,7 @@ module Acsl : sig
   val is_unrollable_ltdef : logic_type_info -> bool
 
   (** expands logic type definitions only.
-      To expands both logic part and C part, uses {!Ast_types.Acsl.unroll_logic}.
+      To expands both logic part and C part, uses {!Ast_types.Acsl.unroll}.
   *)
   val unroll_ltdef: logic_type -> logic_type
 
@@ -803,7 +801,38 @@ module Acsl : sig
   *)
   val unroll: ?unroll_typedef:bool -> logic_type -> logic_type
 
-  (** Check for ["volatile"] qualifier from a logic type using {!is_volatile}. *)
+  (** {3 tests and extraction of element type} *)
+
+  (** [true] if the argument is not a set type. *)
+  val is_plain: logic_type -> bool
+
+  (** returns [true] if the type is a [set<t>]. *)
+  val is_plain_set: logic_type -> bool
+
+  (** [plain_or_set f t] applies [f] to [t] or to the type of elements of [t]
+      if it is a set type.
+  *)
+  val plain_or_set: (logic_type -> 'a) -> logic_type -> 'a
+
+  (** [plain_or_set_ctype test typ] is [false] for pure logic types and the
+      result of test for C types. In case of a set type, the function tests
+      the element type.
+  *)
+  val plain_or_set_ctype: (typ -> bool) -> logic_type -> bool
+
+  (** @return true if the argument is a [Lboolean] (uses
+      {!Ast_types.Acsl.unroll_ltdef} if needed).
+  *)
+  val is_logic_bool: logic_type -> bool
+
+  (** {4 tests for direct type}
+      [is_plain_xxx t] returns true iff [t] is a [xxx] (and not a [set<xxx>].
+      Uses {!Ast_types.Acsl.unroll_ltdef} if needed.
+  *)
+
+  (** Check for ["volatile"] qualifier from a logic type using
+      {!C.is_volatile}.
+  *)
   val is_plain_volatile: logic_type -> bool
 
   (** True if the argument is the type for reified C types. *)
@@ -866,61 +895,8 @@ module Acsl : sig
   *)
   val is_plain_fun_or_ptr: logic_type -> bool
 
-  (** returns [true] if the type is a list<t>. *)
+  (** Returns [true] if the type is a list<t>. *)
   val is_plain_list: logic_type -> bool
-
-  (** [make_list t] returns the type list<[t]>. *)
-  val make_list: logic_type -> logic_type
-
-  (** returns the type of elements of a list type.
-      @raise Failure if the input type is not a list type.
-  *)
-  val list_element: logic_type -> logic_type
-
-  (** returns [true] if the type is a set<t>. *)
-  val is_plain_set: logic_type -> bool
-
-  (** converts a type into the corresponding set type if needed. Does nothing
-      if the argument is already a set type.
-  *)
-  val make_set: logic_type -> logic_type
-
-  (** [set_conversion ty1 ty2] returns a set type as soon as [ty1] and/or [ty2]
-      is a set. Elements have type [ty1], or the type of the elements of [ty1] if
-      it is itself a set-type (i.e. we do not build set of sets that way).
-  *)
-  val set_conversion: logic_type -> logic_type -> logic_type
-
-  (** returns the type of elements of a set type.
-      @raise Failure if the input type is not a set type.
-  *)
-  val set_element: logic_type -> logic_type
-
-  (** [plain_or_set f t] applies [f] to [t] or to the type of elements of [t]
-      if it is a set type.
-  *)
-  val plain_or_set: (logic_type -> 'a) -> logic_type -> 'a
-
-  (** [transform_element f t] is the same as
-      [set_conversion (plain_or_set f t) t]
-  *)
-  val transform_element: (logic_type -> logic_type) -> logic_type -> logic_type
-
-  (** [true] if the argument is not a set type. *)
-  val is_plain: logic_type -> bool
-
-  (** [make_arrow args rt] returns a [rt] if [args] is empty or the
-      corresponding [Larrow] type.
-  *)
-  val make_arrow: logic_var list -> logic_type -> logic_type
-
-  (** @return true if the argument is the boolean type. *)
-  val is_logic_bool: logic_type -> bool
-
-
-  (** {3 tests and extraction of element type}
-      @before Frama-C+dev these functions were in {!Logic_utils}
-  *)
 
   (** {4 tests for potential sets}
       [is_xxx t] returns true iff [t] is a [xxx] _or_ a set of [xxx]
@@ -936,24 +912,6 @@ module Acsl : sig
 
   val is_ptr: logic_type -> bool
 
-  (** {4 extract elements} *)
-
-  (** returns the type of the element pointed to by the type. If the
-      source type is a set of pointers, returns a set of elements.
-  *)
-  val pointed: logic_type -> logic_type
-
-  (** same as {!pointed} but for arrays (or set of arrays). *)
-  val array_element: logic_type -> logic_type
-
-  (** {4 Predefined tests over types} *)
-
-  (** [is_logic test typ] is [false] for pure logic types and the result
-      of test for C types.
-      In case of a set type, the function tests the element type.
-  *)
-  val plain_or_set_ctype: (typ -> bool) -> logic_type -> bool
-
   val is_char : logic_type -> bool
 
   val is_any_char : logic_type -> bool
@@ -962,6 +920,51 @@ module Acsl : sig
 
   val is_void_ptr : logic_type -> bool
 
+  (** {4 constructors} *)
+
+  (** [make_list t] returns the type list<[t]>. *)
+  val make_list: logic_type -> logic_type
+
+  (** converts a type into the corresponding set type if needed. Does nothing
+      if the argument is already a set type.
+  *)
+  val make_set: logic_type -> logic_type
+
+  (** [make_arrow args rt] returns a [rt] if [args] is empty or the
+      corresponding [Larrow] type.
+  *)
+  val make_arrow: logic_var list -> logic_type -> logic_type
+
+  (** [set_conversion ty1 ty2] returns a set type as soon as [ty1] and/or [ty2]
+      is a set. Elements have type [ty1], or the type of the elements of [ty1] if
+      it is itself a set-type (i.e. we do not build set of sets that way).
+  *)
+  val set_conversion: logic_type -> logic_type -> logic_type
+
+  (** [transform_element f t] is the same as
+      [set_conversion (plain_or_set f t) t]
+  *)
+  val transform_element: (logic_type -> logic_type) -> logic_type -> logic_type
+
+  (** {4 extract elements} *)
+
+  (** returns the type of elements of a list type.
+      @raise Failure if the input type is not a list type.
+  *)
+  val list_element: logic_type -> logic_type
+
+  (** returns the type of elements of a set type.
+      @raise Failure if the input type is not a set type.
+  *)
+  val set_element: logic_type -> logic_type
+
+  (** returns the type of the element pointed to by the type. If the
+      source type is a set of pointers, returns a set of elements.
+  *)
+  val pointed: logic_type -> logic_type
+
+  (** same as {!Ast_types.Acsl.pointed} but for arrays (or set of arrays). *)
+  val array_element: logic_type -> logic_type
 
   (** {4 Type conversions} *)
 
@@ -973,19 +976,12 @@ module Acsl : sig
   (** removes qualifiers if logic_type is a C type, identity otherwise. *)
   val remove_qualifiers: logic_type -> logic_type
 
-
-  (** @before Frama-C+dev these functions were in {!Logic_typing} *)
-
   val ctype_of_pointed: logic_type -> typ
 
   val ctype_of_array_elem: logic_type -> typ
 
   val arithmetic_conversion: logic_type -> logic_type -> logic_type
 end
-
-
-
-
 
 (** Expands logic type definitions. If the [unroll_typedef] flag is set to
     [true] (this is the default), C typedef will be expanded as well using
