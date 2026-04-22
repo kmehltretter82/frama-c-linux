@@ -558,6 +558,8 @@ module Acsl = struct
     | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ | Ctype _ | Ltype _ as ty ->
       ty
 
+  let () = Cil_datatype.punrollLogicType := unroll_logic
+
   (* Utils function for is_logic_* functions. *)
   let unroll_logic_aux is_logic lti t =
     is_unrollable_ltdef lti && is_logic (unroll_ltdef t)
@@ -875,8 +877,6 @@ end
 
 
 let unroll_logic = Acsl.unroll_logic
-
-let () = Cil_datatype.punrollLogicType := unroll_logic
 
 let direct_element_type = direct_array_element
 
