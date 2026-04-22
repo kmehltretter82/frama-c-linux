@@ -6,11 +6,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This file contains types related types/functions/values. *)
+(* This module contains types related types/functions/values in the module C
+   and logic_type related functions in the module Acsl. *)
 
 open Cil_types
 
-(* Contaisn all functions related to C types. *)
+(* Contains all functions related to C types. *)
 module C = struct
 
   (* ********** *)
@@ -564,7 +565,7 @@ module Acsl = struct
 
   let () = Cil_datatype.punrollLogicType := unroll
 
-  (* Utils function for is_logic_* functions. *)
+  (* Utils function for is_plain_* functions. *)
   let unroll_aux is_logic lti t =
     is_unrollable_ltdef lti && is_logic (unroll_ltdef t)
 
@@ -815,7 +816,7 @@ module Acsl = struct
         Cil_datatype.Logic_type.pretty ty1 Cil_datatype.Logic_type.pretty ty2
 end
 
-(* Deprecate logic functions *)
+(* Deprecated logic functions *)
 
 let unroll_logic = Acsl.unroll
 
