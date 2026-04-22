@@ -535,7 +535,8 @@ module type S = sig
   class extensible_printer: unit -> extensible_printer_type
   (** Extend this class if you want to obtain a custom pretty-printer. *)
 
-  (** Auxiliary module type for a pretty-printer *)
+  (** Auxiliary module type for a pretty-printer
+      @before Frama-C+dev [printer] class had no [unit] argument *)
   module type PrinterClass = sig
     class printer : unit -> extensible_printer_type
   end
