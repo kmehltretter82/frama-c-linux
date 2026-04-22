@@ -81,7 +81,6 @@ val type_of_array_elem: logic_type -> logic_type
 
 (** transforms an array into pointer. *)
 val array_to_ptr : logic_type -> logic_type
-(* [@@deprecated "Use Ast_types.Acsl.array_to_ptr instead"] *)
 
 (** C type to logic type, with implicit conversion for arithmetic types.
     @since 21.0-Scandium

@@ -777,40 +777,6 @@ module Acsl = struct
     in
     plain_or_set get_aux t
 
-  (*let plain_array_to_ptr ty =
-    let open Current_loc.Operators in
-    match unroll ty with
-    | Ctype({ tnode = TArray(ty,lo); tattr } as tarr) ->
-      let length_attr =
-        match lo with
-        | None -> []
-        | Some e ->
-          let<> UpdatedCurrentLoc = e.eloc in
-          try
-            let len = Cil.bitsSizeOf tarr in
-            let len =
-              if Cil.bitsSizeOf ty == 0 then 0
-              else try len / (Cil.bitsSizeOf ty)
-                with Cil.SizeOfError _ ->
-                  Kernel.fatal
-                    "Inconsistent information: I know the length of \
-                     array type %a, but not of its elements."
-                    !Cil.pp_typ_ref tarr
-            in
-            (* Normally, overflow is checked in bitsSizeOf itself *)
-            let la = AInt (Z.of_int len) in
-            [ ("arraylen",[la]) ]
-          with Cil.SizeOfError _ ->
-            Kernel.warning ~current:true
-              "Cannot represent length of array as an attribute";
-            []
-      in
-      let tattr = Ast_attributes.add_list length_attr tattr in
-      Ctype (Cil_const.mk_tptr ~tattr ty)
-    | ty -> ty*)
-
-  (*let array_to_ptr = plain_or_set plain_array_to_ptr*)
-
   let remove_qualifiers =
     let plain typ =
       match unroll typ with
