@@ -215,6 +215,12 @@ input:focus-visible {
   max-height: calc(100vh - 55px);
   overflow-y: hidden;
 
+  pre {
+    margin: 5px 20px;
+    padding: 5px;
+    background-color: var(--background-interaction);
+  }
+
   .dome-xModal-content {
     display: flex;
     flex-direction: column;
