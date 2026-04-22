@@ -252,8 +252,8 @@
 
 .message-search .dome-xForm-field {
     margin: 0px 4px;
-    display: inline-block;
     min-width: 110px;
+    justify-self: stretch;
 }
 
 .message-search .message-emitter-category {
