@@ -116,18 +116,11 @@ function useTimer(): React.JSX.Element | null {
 
 const startComputing = new GlobalState<number>(0);
 
-export function EvaReady(props: EvaReadyProps): JSX.Element {
-  const { showChildrenForComputingStatus = false, children } = props;
+function EvaStatusPanel(): JSX.Element {
   const timer = useTimer();
   const status = useSyncValue(Eva.computationState);
   const infosStatus = evaBasicStatus[status || "undefined"];
-  const showChildren = Boolean(
-    status === "aborted" || status === "computed" ||
-    (showChildrenForComputingStatus && status === "computing")
-  );
-
-  if(showChildren) return <>{children}</>;
-  else return (
+  return (
     <div className={"eva-status eva-status-"+status}>
       <div className='eva-status-content'>
         <div className="eva-status-message">{infosStatus.message}</div>
@@ -138,6 +131,19 @@ export function EvaReady(props: EvaReadyProps): JSX.Element {
     </div>
   );
 }
+
+export function EvaReady(props: EvaReadyProps): JSX.Element {
+  const { showChildrenForComputingStatus = false, children } = props;
+  const status = useSyncValue(Eva.computationState);
+  const showChildren = Boolean(
+    status === "aborted" || status === "computed" ||
+    (showChildrenForComputingStatus && status === "computing")
+  );
+
+  if(showChildren) return <>{children}</>;
+  else return <EvaStatusPanel/>;
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- Modal                                                              --- */
 /* -------------------------------------------------------------------------- */
@@ -145,7 +151,6 @@ export function EvaReady(props: EvaReadyProps): JSX.Element {
 function EvaModal({ callback }: { callback: () => void })
 : React.JSX.Element {
   const status = useSyncValue(Eva.computationState);
-  const timer = useTimer();
 
   /**
    * The callback function is only called if the Eva modal window is still
@@ -160,23 +165,17 @@ function EvaModal({ callback }: { callback: () => void })
   }, [status, callback]);
 
   return (
-    <Modal className='modal-eva' label={`Eva: Analysis not completed`} >
+    <Modal className='modal-eva' label="Eva analysis required" >
       <div className={"eva-status eva-status-"+status}>
         <div className='eva-status-content'>
-          <div className='eva-status-message'>
-            The requested action requires an Eva analysis.
-          </div>
-          <div className='eva-status-message'>
-            If you run the analysis here, once it is complete,
-            the action will be executed and the modal window will be closed.
-          </div>
-          <div className='eva-status-message'>
-            If the modal window is closed during the analysis,
-            the action will be abandoned.
-          </div>
-          <EvaLaunchButton />
-          <StatusIcon size={50} status={status} />
-          { timer }
+          <EvaStatusPanel />
+          { status === "computing" &&
+            <div className='eva-status-message'>
+              The requested action will be executed once the analysis is
+              complete. <br />
+              Closing this window cancels the action, but not the Eva analysis.
+            </div>
+          }
         </div>
       </div>
     </Modal>
@@ -189,7 +188,7 @@ function showEvaModal(callback: () => void): void {
 
 export async function evaNeeded(callback: () => void): Promise<void> {
   const status = await Server.send(Eva.getComputationState, []);
-  if(status !== "computed")
+  if(status !== "computed" && status !== "aborted")
     showEvaModal(callback);
   else callback();
 }
