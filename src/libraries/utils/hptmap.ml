@@ -959,7 +959,7 @@ struct
       else
         wrap_Branch p m tree0' tree1'
 
-  let rec map' f htr = match htr with
+  let rec filter_map f htr = match htr with
     | Empty -> Empty
     | Leaf (key, data, _) ->
       begin
@@ -968,7 +968,7 @@ struct
         | None -> Empty
       end
     | Branch (p, m, tree0, tree1, _) ->
-      let tree0' = map' f tree0 and tree1' = map' f tree1 in
+      let tree0' = filter_map f tree0 and tree1' = filter_map f tree1 in
       if tree0' == tree0 && tree1' == tree1
       then htr
       else if tree0' == Empty then tree1'
@@ -1181,7 +1181,7 @@ struct
     let decide_none = function
       | Neutral      -> fun t -> t
       | Absorbing    -> fun _ -> Empty
-      | Traversing f -> fun t -> map' f t (* TODO: add a cache? *)
+      | Traversing f -> fun t -> filter_map f t (* TODO: add a cache? *)
     in
     fun ~cache ~symmetric ~idempotent ~decide_both ~decide_left ~decide_right ->
       let decide_both key value leaf value' leaf' =
