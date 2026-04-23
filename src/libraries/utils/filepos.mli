@@ -151,3 +151,17 @@ val is_preprocessed : t -> bool
 (** Returns the list of inclusion positions when the position is in preprocessed
     code; returns nothing if the position is not in an included file. *)
 val inclusions : t -> t list
+
+
+(** {2 Alternative datatype } *)
+
+(** This module provides an alternative datatype where only original positions
+    are considered for [compare], [equal] and [hash]. This is intended for
+    preprocessed code where the same file can be included several times leading
+    to tokens having different position in the preprocessing output but the
+    same original position.
+
+    The comparison, equality and hash functions only
+    consider the path and the line, since the original column is usually not
+    available. *)
+module Original : Datatype.S_with_collections with type t = t

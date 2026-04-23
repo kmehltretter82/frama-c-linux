@@ -16,6 +16,15 @@ include module type of Stdlib.Hashtbl
 module type S = sig
   include S
 
+  (** Return the list of bindings present in the table, respecting the order on
+      keys induced by [cmp].
+
+      If the table contains several bindings for the same key, they
+      are put in the list in reverse order of introduction, that is,
+      the most recent binding is passed first. *)
+  val bindings_sorted:
+    ?cmp:(key -> key -> int) -> 'a t -> (key * 'a) list
+
   (** Iter on the hashtbl, but respecting the order on keys induced
       by [cmp]. Use [Stdlib.compare] if [cmp] not given.
 

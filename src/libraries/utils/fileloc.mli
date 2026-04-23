@@ -72,17 +72,9 @@ val line : t -> int
 val path : t -> Filepath.t
 
 
-(** {2 Start semantic } *)
+(** {2 Alternative datatype } *)
 
-(** Compares two locations semantically, only taking into account their
-    starting position.
-
-    @since 23.0-Vanadium
-*)
-val compare_start_semantic : t -> t -> int
-
-(** Equality using [compare_start_semantic].
-
-    @since 22.0-Titanium
-*)
-val equal_start_semantic : t -> t -> bool
+(** This module provides an alternative datatype where only original location
+    are considered for [compare], [equal] and [hash].
+    See {!Filepos.Original}. *)
+module Original : Datatype.S_with_collections with type t = t

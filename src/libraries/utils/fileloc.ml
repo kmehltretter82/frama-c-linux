@@ -84,13 +84,12 @@ let path loc = fst loc |> Filepos.path
 let line loc = fst loc |> Filepos.line
 
 
-(** {2 Start semantic } *)
+(** {2 Alternative datatype } *)
 
-let compare_start_semantic (pos1, _ : t) (pos2, _ : t) =
-  let c = Filepath.compare (Filepos.path pos1) (Filepos.path pos2) in
-  if c <> 0 then c else
-    let c = Filepos.line pos1 - Filepos.line pos2 in
-    if c <> 0 then c else
-      Filepos.input_column pos1 - Filepos.input_column pos2
-
-let equal_start_semantic l1 l2 = compare_start_semantic l1 l2 = 0
+module Original = Datatype.Make_with_collections (struct
+    include Datatype.Serializable_undefined
+    include Prototype
+    let name = "Fileloc.Original"
+    type t = Filepos.Original.t * Filepos.Original.t [@@deriving eq, ord]
+    let hash loc = fst loc |> Filepos.Original.hash
+  end)

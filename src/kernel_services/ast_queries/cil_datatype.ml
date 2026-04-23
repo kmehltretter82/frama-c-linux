@@ -182,6 +182,8 @@ end
 module Location = struct
   include Fileloc
   let dummy = unknown
+  let compare_start_semantic = compare
+  let equal_start_semantic = equal
 end
 
 module File = struct

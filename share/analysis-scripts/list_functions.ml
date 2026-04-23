@@ -21,20 +21,10 @@ module SemanticLocs : sig
   val elements: 'a t -> (key * 'a) list (* sorted w.r.t. cmp_start_semantic *)
 end =
 struct
-  include
-    Hashtbl.Make(struct
-      type t = Fileloc.t
-      let equal = Fileloc.equal_start_semantic
-      let hash (b, _e) = Hashtbl.hash (Filepos.path b, Filepos.line b)
-    end)
+  include Fileloc.Original.Hashtbl
   let is_empty tbl = length tbl = 0
-  let keys tbl =
-    let l = fold (fun loc _ acc -> loc :: acc) tbl [] in
-    List.sort Fileloc.compare_start_semantic l
-  let elements tbl =
-    let l = fold (fun loc v acc -> (loc, v) :: acc) tbl [] in
-    List.sort (fun (l1, _v1) (l2, _v2) ->
-        Fileloc.compare_start_semantic l1 l2) l
+  let elements tbl = bindings_sorted ~cmp:Fileloc.Original.compare tbl
+  let keys tbl = elements tbl |> List.map fst
 end
 
 module Self = Plugin.Register

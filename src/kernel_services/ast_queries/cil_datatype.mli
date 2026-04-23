@@ -101,19 +101,11 @@ module Location: sig
   val of_lexing_loc : Lexing.position * Lexing.position -> t
   val to_lexing_loc : t -> Lexing.position * Lexing.position
 
-  (** Compares two locations semantically, only taking into account their
-      starting position. Compares normalized filenames, lines and columns,
-      but no absolute character offsets.
-
-      @since 23.0-Vanadium
-  *)
   val compare_start_semantic : location -> location -> int
+  [@@deprecated "Use Fileloc.compare instead"]
 
-  (** Equality using [compare_start_semantic].
-
-      @since 22.0-Titanium
-  *)
   val equal_start_semantic : location -> location -> bool
+  [@@deprecated "Use Fileloc.equal instead"]
 end
 
 module Syntactic_scope: S_with_collections with type t = syntactic_scope

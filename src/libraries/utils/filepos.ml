@@ -26,6 +26,8 @@ module Prototype = struct
   [@@deriving eq, ord, make, show { with_path = false }]
 
   let unknown = make ~origin:Unknown ()
+  let reprs = [ unknown ]
+  let copy = Datatype.identity
 
   (* Generated positions are hash-consed to prevent high memory usage. *)
   module StringHashtbl = Hashtbl.Make (String)
@@ -90,8 +92,6 @@ include Datatype.Make_with_collections (struct
     include Datatype.Serializable_undefined
     include Prototype
     let name = "Filepos"
-    let reprs = [ unknown ]
-    let copy = Datatype.identity
   end)
 
 include Prototype
@@ -188,3 +188,17 @@ let [@tail_mod_cons] rec inclusions pos =
   | Included inclusion_pos ->
     inclusion_pos :: inclusions inclusion_pos
   | _ -> []
+
+
+(** {2 Alternative datatype } *)
+
+module Original = Datatype.Make_with_collections (struct
+    include Datatype.Serializable_undefined
+    include Prototype
+    let name = "Filepos.Original"
+    let compare pos1 pos2 = compare (original pos1) (original pos2)
+    let equal pos1 pos2 = equal (original pos1) (original pos2)
+    let hash pos =
+      let pos = original pos in
+      Stdlib.Hashtbl.hash (Filepath.hash pos.path, pos.line)
+  end)
