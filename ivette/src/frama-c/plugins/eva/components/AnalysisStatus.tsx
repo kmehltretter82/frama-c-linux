@@ -107,8 +107,8 @@ function useTimer(): React.JSX.Element | null {
   React.useEffect(() => {
     // If start ≠ 0, this means the counter has already started.
     // It does not restart during a hot reload, for example.
-    if( status === "computing" && start === 0) setStart(Date.now());
-    else if(status !== "computing") setStart(0);
+    if(status !== "computing") setStart(0);
+    else if(start === 0) setStart(Date.now());
   }, [status, start, setStart]);
 
   return start !== 0 ? <Timer start={start}/> : null;
@@ -139,7 +139,6 @@ export function EvaReady(props: EvaReadyProps): JSX.Element {
     status === "aborted" || status === "computed" ||
     (showChildrenForComputingStatus && status === "computing")
   );
-
   if(showChildren) return <>{children}</>;
   else return <EvaStatusPanel/>;
 }
@@ -148,15 +147,12 @@ export function EvaReady(props: EvaReadyProps): JSX.Element {
 /* --- Modal                                                              --- */
 /* -------------------------------------------------------------------------- */
 
-function EvaModal({ callback }: { callback: () => void })
-: React.JSX.Element {
+function EvaModal({ callback }: { callback: () => void }): React.JSX.Element {
   const status = useSyncValue(Eva.computationState);
 
-  /**
-   * The callback function is only called if the Eva modal window is still
+  /* The callback function is only called if the Eva modal window is still
    * open at the end of the analysis.
-   * Closing the modal window is equivalent to abandoning the action.
-  */
+   * Closing the modal window is equivalent to abandoning the action. */
   React.useEffect(() => {
     if(status === 'computed') {
       callback();
@@ -190,5 +186,6 @@ export async function evaNeeded(callback: () => void): Promise<void> {
   const status = await Server.send(Eva.getComputationState, []);
   if(status !== "computed" && status !== "aborted")
     showEvaModal(callback);
-  else callback();
+  else
+    callback();
 }
