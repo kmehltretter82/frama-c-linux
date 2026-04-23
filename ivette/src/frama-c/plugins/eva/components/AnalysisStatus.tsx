@@ -50,13 +50,15 @@ export function StatusIcon(props: StatusIconProp):JSX.Element {
 }
 
 function EvaLaunchButton(): JSX.Element | null {
-  return <Button
+  return (
+    <Button
       icon="MEDIA.PLAY"
-      label="Launch analysis"
-      title="Click to launch Eva analysis with
-        actual parameters or launch from Eva sidebar."
+      label="Run Eva analysis"
+      title={"Start an Eva analysis. \n"
+        + "The Eva sidebar allows changing some analysis parameters."}
       onClick={() => Server.send(Eva.compute, null)}
-    />;
+    />
+  );
 }
 
 export function EvaStatus(props: EvaStatusProp): JSX.Element | null {
@@ -129,7 +131,7 @@ export function EvaReady(props: EvaReadyProps): JSX.Element {
     <div className={"eva-status eva-status-"+status}>
       <div className='eva-status-content'>
         <div className="eva-status-message">{infosStatus.message}</div>
-        { status !== 'computing' && <EvaLaunchButton /> }
+        { status === 'not_computed' && <EvaLaunchButton /> }
         <StatusIcon size={50} status={status} />
         { timer }
       </div>
