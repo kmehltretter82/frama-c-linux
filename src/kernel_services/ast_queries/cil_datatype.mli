@@ -70,10 +70,14 @@ module Location: sig
   val is_unknown : t -> bool
   val pretty_long : t Pretty_utils.formatter
 
-  (** Pretty the location under the form [file <f>, line <l>], without
+  (** Pretty prints the location under the form [file <f>, line <l>], without
       the full-path to the file. The default pretty-printer [pretty] echoes
       [<dir/f>:<l>] *)
   val pretty_line: t Pretty_utils.formatter
+
+  (** Pretty prints the location under the form  [line <l>, between columns <c1>
+      and <c2>]. *)
+  val pretty_line_range: t Pretty_utils.formatter
 
   (** Pretty-print both location start and end, including file, line and
       character offset.

@@ -214,34 +214,7 @@ let pp_context_from_file ?(ctx=2) fmt ((start_pos, pos) as loc) =
         else (* context after line n, no warning *) ()
     with Sys_error _ -> ()
 
-
-let pp_pos fmt pos =
-  if pos = Filepos.unknown then Format.fprintf fmt "<unknown>"
-  else Format.fprintf fmt "%d:%d" pos.pos_lnum
-      (pos.pos_cnum - pos.pos_bol)
-
-let pp_location fmt (pos_start, pos_end) =
-  let open Filepos in
-  if pos_start.pos_path = pos_end.pos_path then
-    if pos_start.pos_lnum = pos_end.pos_lnum then
-      if pos_start.pos_cnum = pos_end.pos_cnum then
-        (* same location, do not print twice. *)
-        Format.fprintf fmt "Location: line %d, column %d"
-          pos_start.pos_lnum
-          (pos_start.pos_cnum - pos_start.pos_bol)
-      else
-        (* single file, single line *)
-        Format.fprintf fmt "Location: line %d, between columns %d and %d"
-          pos_start.pos_lnum
-          (pos_start.pos_cnum - pos_start.pos_bol)
-          (pos_end.pos_cnum - pos_end.pos_bol)
-    else
-      (* single file, multiple lines *)
-      Format.fprintf fmt "Location: between lines %d and %d"
-        pos_start.pos_lnum pos_end.pos_lnum
-  else (* multiple files (very rare) *)
-    Format.fprintf fmt "Location: between %a and %a"
-      pp_pos pos_start pp_pos pos_end
+let pp_location = Cil_datatype.Location.pretty_line_range
 
 let parse_error ?loc msg =
   let current = Option.get !current in
@@ -287,8 +260,8 @@ let parse_error ?loc msg =
   Format.kasprintf (fun str ->
       Kernel.feedback ~source:(fst loc) "%s:@." str
         ~append:(fun fmt ->
-            Format.fprintf fmt "%a%a\n"
-              pp_location loc
+            Format.fprintf fmt "Location: %a%a\n"
+              Cil_datatype.Location.pretty_line_range loc
               pretty_token (Lexing.lexeme current.lexbuf);
             Format.fprintf fmt "%a@."
               (pp_context_from_file ~ctx:2) loc);

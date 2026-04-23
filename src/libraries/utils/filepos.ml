@@ -39,11 +39,14 @@ let to_lexing_pos p = {
 }
 
 let pretty fmt pos =
-  let path = pos.pos_path in
-  if Filepath.is_empty path || Filepath.is_special_stdout path then
-    Format.fprintf fmt "%a" Filepath.pretty path
+  if is_unknown pos
+  then Format.fprintf fmt "<unknown location>"
   else
-    Format.fprintf fmt "%a:%d" Filepath.pretty path pos.pos_lnum
+    let path = pos.pos_path in
+    if Filepath.is_empty path || Filepath.is_special_stdout path then
+      Format.fprintf fmt "%a" Filepath.pretty path
+    else
+      Format.fprintf fmt "%a:%d" Filepath.pretty path pos.pos_lnum
 
 let pretty_debug = pp
 

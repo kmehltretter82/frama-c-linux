@@ -210,6 +210,29 @@ module Location = struct
     else
       Format.fprintf fmt "generated"
 
+  let pretty_line_range fmt (pos_start, pos_end) =
+    let open Filepos in
+    if pos_start.pos_path = pos_end.pos_path then
+      if pos_start.pos_lnum = pos_end.pos_lnum then
+        if pos_start.pos_cnum = pos_end.pos_cnum then
+          (* same location, do not print twice. *)
+          Format.fprintf fmt "line %d, column %d"
+            pos_start.pos_lnum
+            (pos_start.pos_cnum - pos_start.pos_bol)
+        else
+          (* single file, single line *)
+          Format.fprintf fmt "line %d, between columns %d and %d"
+            pos_start.pos_lnum
+            (pos_start.pos_cnum - pos_start.pos_bol)
+            (pos_end.pos_cnum - pos_end.pos_bol)
+      else
+        (* single file, multiple lines *)
+        Format.fprintf fmt "between lines %d and %d"
+          pos_start.pos_lnum pos_end.pos_lnum
+    else (* multiple files (very rare) *)
+      Format.fprintf fmt "between %a and %a"
+        Filepos.pretty pos_start Filepos.pretty pos_end
+
   let pretty_debug fmt loc =
     Format.fprintf fmt "(%a,%a)"
       Position.pretty_debug (fst loc) Position.pretty_debug (snd loc)
