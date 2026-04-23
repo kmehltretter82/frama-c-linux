@@ -728,41 +728,31 @@ module Acsl = struct
 
   let is_void_ptr = plain_or_set_ctype C.is_void_ptr
 
-  let pointed =
-    transform_element
-      (fun t ->
-         match unroll t with
-         | Ctype ty when C.is_ptr ty ->
-           Ctype (C.direct_pointed_type ty)
-         | _ ->
-           Kernel.fatal ~current:true "type %a is not a pointer type"
-             Cil_datatype.Logic_type.pretty t)
-
-  let rec ctype_of_pointed t =
+  let get_pointed_aux t =
     match unroll t with
-    | Ctype ty when C.is_ptr ty -> C.direct_pointed_type ty
-    | Ltype ({lt_name = "set"},[t]) -> ctype_of_pointed t
+    | Ctype ty when C.is_ptr ty ->
+      C.direct_pointed_type ty
     | _ ->
       Kernel.fatal ~current:true "type %a is not a pointer type"
         Cil_datatype.Logic_type.pretty t
 
-  let array_element =
-    transform_element
-      (fun t ->
-         match unroll t with
-         | Ctype ty when C.is_array ty ->
-           Ctype (C.direct_array_element ty)
-         | _ ->
-           Kernel.fatal ~current:true "type %a is not an array type"
-             Cil_datatype.Logic_type.pretty t)
+  let pointed =
+    transform_element (fun t -> Ctype (get_pointed_aux t))
 
-  let rec ctype_of_array_elem t =
+  let ctype_of_pointed = plain_or_set get_pointed_aux
+
+  let get_array_element_aux t =
     match unroll t with
-    | Ctype ty when C.is_array ty -> C.direct_array_element ty
-    | Ltype ({lt_name = "set"},[t]) -> ctype_of_array_elem t
+    | Ctype ty when C.is_array ty ->
+      C.direct_array_element ty
     | _ ->
       Kernel.fatal ~current:true "type %a is not an array type"
         Cil_datatype.Logic_type.pretty t
+
+  let array_element =
+    transform_element (fun t -> Ctype (get_array_element_aux t))
+
+  let ctype_of_array_elem = plain_or_set get_array_element_aux
 
   let get_ctype t =
     let rec get_aux = function
@@ -770,7 +760,9 @@ module Acsl = struct
       | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
         get_aux (unroll_ltdef ty)
       | Lvar _ -> Cil_const.intType
-      | _ -> failwith "not a C type"
+      | _ ->
+        Kernel.fatal ~current:true "type %a is not a C type"
+          Cil_datatype.Logic_type.pretty t
     in
     plain_or_set get_aux t
 

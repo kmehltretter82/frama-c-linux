@@ -2924,31 +2924,10 @@ let rec typeOfTermLval = function
     in
     typeTermOffset ty off
   | TResult ty, off -> typeTermOffset (Ctype ty) off
-  | TMem addr, off -> begin
-      let rec type_of_pointed = function
-        | Ctype typ ->
-          begin match Ast_types.C.unroll_skel typ with
-            | TPtr t -> typeTermOffset (Ctype t) off
-            | _ ->
-              Kernel.fatal ~current:true
-                "typeOfTermLval: Mem on a non-pointer"
-          end
-        | Lboolean | Linteger | Lreal ->
-          Kernel.fatal ~current:true "typeOfTermLval: Mem on a logic type"
-        | Ltype (s,_) as ty when Ast_types.Acsl.is_unrollable_ltdef s ->
-          type_of_pointed (Ast_types.Acsl.unroll_ltdef ty)
-        | Ltype (s,_) ->
-          Kernel.fatal ~current:true
-            "typeOfTermLval: Mem on a non-C type (%s)" s.lt_name
-        | Lvar s ->
-          Kernel.fatal ~current:true
-            "typeOfTermLval: Mem on a non-C type ('%s)" s
-        | Larrow _ ->
-          Kernel.fatal ~current:true
-            "typeOfTermLval: Mem on a function type"
-      in
-      Ast_types.Acsl.transform_element type_of_pointed addr.term_type
-    end
+  | TMem addr, off ->
+    let t = Ast_types.Acsl.ctype_of_pointed addr.term_type in
+    let lt = typeTermOffset (Ctype t) off in
+    Ast_types.Acsl.set_conversion lt addr.term_type
 
 and typeTermOffset basetyp =
   let blendAttributes baseAttrs t =
