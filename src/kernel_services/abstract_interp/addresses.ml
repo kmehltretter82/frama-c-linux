@@ -66,10 +66,16 @@ module Bytes = struct
   (* Invariant :
      [Top (s, _) must always contain NULL, _and_ at least another base.
      Top ({Null}, _) is replaced by Top_int]. See inject_top_origin_internal
-     below. *)
+     below.
+     In [Map m], m must not contain a binding from a base to [Ival.bottom]. *)
 
   let find_or_bottom = MapLattice.find_or_bottom
   let is_bottom = equal bottom
+
+  (* This function must be used instead of [map] if f can return Ival.bottom. *)
+  let map_or_bottom f =
+    let return ival = if Ival.is_bottom ival then None else Some ival in
+    filter_map (fun _base ival -> return (f ival))
 
   let filter_base = filter_keys
   let fold_bases = fold_keys
@@ -108,7 +114,7 @@ module Bytes = struct
      under-approximation); returns an underapproximation. *)
   let shift_under offset l =
     if Ival.is_bottom offset then bottom
-    else map (Ival.add_int_under offset) l
+    else map_or_bottom (Ival.add_int_under offset) l
 
   let sub_pointwise_map ?(factor=Z.one) m1 m2 =
     let factor = Z.neg factor in
@@ -348,5 +354,5 @@ module Bits = struct
   let to_bytes x =
     map (Ival.scale_div ~pos:true (Bit_utils.sizeofchar())) x
   let to_bytes_under x =
-    map (Ival.scale_div_under ~pos:true (Bit_utils.sizeofchar())) x
+    map_or_bottom (Ival.scale_div_under ~pos:true (Bit_utils.sizeofchar())) x
 end
