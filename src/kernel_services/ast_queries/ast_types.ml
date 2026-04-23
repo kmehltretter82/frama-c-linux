@@ -610,14 +610,6 @@ module Acsl = struct
     | Ltype (lti, _) -> unroll_aux is_plain_integral lti t
     | Lvar _ | Larrow _ -> false
 
-  let is_plain_float t =
-    match t with
-    | Ctype t -> C.is_float t
-    | Lboolean -> false
-    | Linteger -> false
-    | Lreal -> false
-    | Lvar _ | Ltype _ | Larrow _ -> false
-
   let rec is_plain_real t =
     match t with
     | Ctype _ -> false
@@ -643,11 +635,15 @@ module Acsl = struct
     | Ltype (lti, _) -> unroll_aux is_plain_arithmetic lti t
     | Lboolean | Lvar _ | Larrow _ -> false
 
-  let rec is_plain_ctype f = function
+  let rec fold_plain_ctype ~default f = function
     | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-      is_plain_ctype f (unroll_ltdef ty)
-    | Ltype _ | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ -> false
+      fold_plain_ctype ~default f (unroll_ltdef ty)
+    | Ltype _ | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ -> default
     | Ctype cty  -> f cty
+
+  let is_plain_ctype = fold_plain_ctype ~default:false
+
+  let is_plain_float = is_plain_ctype C.is_float
 
   let is_plain_ptr = is_plain_ctype C.is_ptr
 
@@ -716,7 +712,7 @@ module Acsl = struct
   let is_integral = plain_or_set is_plain_integral
 
   let plain_or_set_ctype f =
-    plain_or_set (is_plain_ctype f)
+    plain_or_set (fold_plain_ctype ~default:false f)
 
   let is_char = plain_or_set_ctype C.is_char
 

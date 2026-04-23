@@ -803,6 +803,11 @@ module Acsl : sig
 
   (** {3 tests and extraction of element type} *)
 
+  (** [fold_plain_ctype ~default f t] is [~default] for pure logic types and the
+      result of [f] for C types.
+  *)
+  val fold_plain_ctype: default:'a -> (typ -> 'a) -> logic_type -> 'a
+
   (** [true] if the argument is not a set type. *)
   val is_plain: logic_type -> bool
 
@@ -864,11 +869,6 @@ module Acsl : sig
       floating point, either C or mathematical one.
   *)
   val is_plain_arithmetic: logic_type -> bool
-
-  (** [is_logic_ctype test typ] is [false] for pure logic types and the result
-      of test for C types.
-  *)
-  val is_plain_ctype: (typ -> bool) -> logic_type -> bool
 
   (** True if the argument is a pointer type. Expands the logic type
       definition if necessary.
