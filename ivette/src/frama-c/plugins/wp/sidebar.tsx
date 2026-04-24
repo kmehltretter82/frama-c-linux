@@ -22,7 +22,7 @@ import {
   Field
 } from 'dome/controls/buttons';
 import { SidebarTitle } from 'dome/frame/sidebars';
-import { DivProps, Hbox, Hfill, Vbox } from 'dome/layout/boxes';
+import { DivProps, Hbox, Hfill, Space, Vbox } from 'dome/layout/boxes';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as Params from 'frama-c/kernel/api/parameters';
@@ -65,6 +65,13 @@ function SidebarBlock(props: SidebarBlockProps): JSX.Element {
     </Vbox>
   );
 }
+
+const makeSidebarHelp = (anchor: string): JSX.Element => {
+  const help = (): void => { showHelp(anchor); };
+  return (
+    <IconButton key='help' icon='HELP' onClick={help} offset={-1} />
+  );
+};
 
 function Tools(): JSX.Element {
   const { running } = TIP.useServerActivity();
@@ -230,18 +237,11 @@ function ProversConfiguration(): JSX.Element {
   const [scripts = false, setScripts] = States.useSyncState(WP.scripts);
   const [strategies = false, setStrats] = States.useSyncState(WP.strategies);
 
-  const helpGeneral = (): void => { showHelp('wp-config-provers-general'); };
-  const helpAuto = (): void => { showHelp('wp-config-provers-auto'); };
-  const helpInter = (): void => { showHelp('wp-config-provers-inter'); };
-  const helpStrats = (): void => { showHelp('wp-config-provers-strats'); };
-
   return (
     <Forms.Section label='Provers Configuration' unfold>
       <SidebarBlock
         title='General configuration'
-        titleButtons={
-          [<IconButton key='help' icon='HELP' onClick={helpGeneral} />]
-        }
+        titleButtons={[makeSidebarHelp('wp-config-provers-general')]}
       >
         <Label label='Timeout' icon='CLOCK' >
           <Spinner
@@ -267,9 +267,7 @@ function ProversConfiguration(): JSX.Element {
       </SidebarBlock>
       <SidebarBlock
         title='Automatic Provers'
-        titleButtons={
-          [<IconButton key='help' icon='HELP' onClick={helpAuto} />]
-        }
+        titleButtons={[makeSidebarHelp('wp-config-provers-auto')]}
       >
         <Checkbox
           label='Generate counter-examples'
@@ -282,6 +280,7 @@ function ProversConfiguration(): JSX.Element {
               : 'Requires to regenerate goals, drop existing results'
           }
         />
+        <Space style={{ flexBasis: '8px' }} />
         {
           autoPrvs.length !== 0 ?
             autoPrvs.map((p) =>
@@ -303,12 +302,11 @@ function ProversConfiguration(): JSX.Element {
       </SidebarBlock>
       <SidebarBlock
         title='Interactive Provers'
-        titleButtons={
-          [<IconButton key='help' icon='HELP' onClick={helpInter} />]
-        }
+        titleButtons={[makeSidebarHelp('wp-config-provers-inter')]}
         display={interPrvs.length !== 0}
       >
         <InteractiveSelector />
+        <Space style={{ flexBasis: '8px' }} />
         {
           interPrvs.map((p) =>
             <Prover
@@ -327,17 +325,16 @@ function ProversConfiguration(): JSX.Element {
       />
       <SidebarBlock
         title='Proof Strategies'
-        titleButtons={
-          [<IconButton key='help' icon='HELP' onClick={helpStrats} />]
-        }
+        titleButtons={[makeSidebarHelp('wp-config-provers-strats')]}
       >
         <TipSelector />
-        <Checkbox
+        <Space style={{ flexBasis: '8px' }} />
+        <Switch
           label='Use scripts'
           onChange={setScripts}
           value={scripts}
         />
-        <Checkbox
+        <Switch
           label='Use strategies'
           onChange={setStrats}
           value={strategies}
@@ -371,9 +368,6 @@ function SelectionButton(props: SelectionProps): JSX.Element {
 }
 
 function PropertiesFilter(): JSX.Element {
-  const { help: helpMessage } =
-    States.useRequestStable(Params.getParameterInfo, '-wp-prop');
-  const help = (): void => { showHelp('wp-config-properties-filters'); };
   const [properties = [], setProperties] = States.useSyncState(WP.filter);
 
   const [selected, setSelected] = React.useState<string>('');
@@ -444,14 +438,7 @@ function PropertiesFilter(): JSX.Element {
   return (
     <SidebarBlock
       title='Filters'
-      titleButtons={
-        [<IconButton
-          key='help'
-          icon='HELP'
-          title={helpMessage}
-          onClick={help}
-        />]
-      }
+      titleButtons={[makeSidebarHelp('wp-config-properties-filter')]}
       foldable={true}
     >
       {properties.length !== 0 &&
@@ -500,8 +487,6 @@ function PropertiesFilter(): JSX.Element {
 }
 
 function RTE(): JSX.Element {
-  const help = (): void => { showHelp('wp-config-properties-rte'); };
-
   const [rte = false, setRte] = States.useSyncState(Params.wpRte);
   const [mem, setMem] = States.useSyncState(Params.rteMem);
   const [div, setDiv] = States.useSyncState(Params.rteDiv);
@@ -521,7 +506,7 @@ function RTE(): JSX.Element {
             value={rte}
             onChange={setRte}
           />,
-          <IconButton key='help' icon='HELP' onClick={help} />
+          makeSidebarHelp('wp-config-properties-rte')
         ]
       }
       foldable={true}
@@ -540,7 +525,6 @@ function RTE(): JSX.Element {
 }
 
 function SmokeTests(): JSX.Element {
-  const help = (): void => { showHelp('wp-config-properties-smoke'); };
   const [smoke = false, setSmoke] = States.useSyncState(Params.wpSmokeTests);
   const [assumes, setAssumes] = States.useSyncState(Params.wpSmokeDeadAssumes);
   const [code, setCode] = States.useSyncState(Params.wpSmokeDeadCode);
@@ -559,7 +543,7 @@ function SmokeTests(): JSX.Element {
             value={smoke}
             onChange={setSmoke}
           />,
-          <IconButton key='help' icon='HELP' onClick={help} />
+          makeSidebarHelp('wp-config-properties-smoke')
         ]
       }
       foldable={true}
@@ -612,7 +596,6 @@ function SimplOption(props: SimplOptionProps): JSX.Element {
 }
 
 function Simplifications(): JSX.Element {
-  const help = (): void => { showHelp('wp-config-simpl'); };
   const goals = States.useSyncArrayProxy(WP.goals).model.getRowCount();
 
   const [letify = false, setLetify] = States.useSyncState(Params.wpLet);
@@ -642,7 +625,7 @@ function Simplifications(): JSX.Element {
         goals !== 0
           ? 'Cannot change simplification parameters when goals exist'
           : !letify
-            ? 'Simplifications are disabled'
+            ? 'Goal simplification is disabled'
             : undefined;
       return (
         <SimplOption
@@ -665,7 +648,7 @@ function Simplifications(): JSX.Element {
     goals !== 0
       ? 'Cannot change simplification parameters when goals exist'
       : letify
-        ? 'Clean only used when simplifiations are disabled'
+        ? 'Clean only usable when goal simplifiation is disabled'
         : undefined;
 
   return (
@@ -682,7 +665,7 @@ function Simplifications(): JSX.Element {
               enabled={goals === 0}
               onChange={setLetify}
             />,
-            <IconButton key='help' icon='HELP' onClick={help} />
+            makeSidebarHelp('wp-config-simpl')
           ]
         }
       >
