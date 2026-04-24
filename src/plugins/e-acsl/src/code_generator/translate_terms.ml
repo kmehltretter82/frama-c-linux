@@ -76,7 +76,9 @@ end
 let constant_to_exp_il t c =
   match c with
   | Integer (n, _) ->
-    M.return @@ IL.Exp.of_integer ~origin:t n
+    let* logic_env = M.read_logic_env in
+    let ity = Typing.get_number_ty ~logic_env t in
+    M.return @@ IL.Exp.of_integer ~origin:t ~ity n
   | _ -> M.not_covered Printer.pp_term t
 
 let constant_to_exp_old ~loc env t c =

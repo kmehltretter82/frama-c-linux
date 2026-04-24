@@ -55,7 +55,7 @@ type exp = {enode : exp_node; rtes : rte list; origin : term option}
 and exp_node =
   | True
   | False
-  | Integer of Z.t
+  | Integer of {ity : Analyses_types.number_ty; n : Z.t}
   | BinOp of binop_node
   | Lval of lval
   | SizeOf of typ
@@ -92,7 +92,7 @@ end
 module Exp : sig
   val of_exp_node : ?origin:term -> ?rtes:rte list -> exp_node -> exp
   val of_lval : ?origin:term -> lval -> exp
-  val of_integer : origin:term -> Z.t -> exp
+  val of_integer : origin:term -> ity:Analyses_types.number_ty -> Z.t -> exp
   val of_sizeof : origin:term -> typ -> exp
 
   val to_rte : predicate -> exp -> rte

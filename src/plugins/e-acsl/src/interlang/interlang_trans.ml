@@ -56,8 +56,6 @@ module M = struct
     let* env = read in
     if env.adata_register then m else return ()
 
-  let get_logic_env = let* {env} = get in return @@ Env.Logic_env.get env
-
   let modifying_env f =
     let* {env} as state = get in
     let e, env = f env in
@@ -115,53 +113,30 @@ and compile_context_insensitive {Interlang.enode; origin} =
   match enode with
   | True -> M.return (Cil.one ~loc, None, Some (Analyses_types.C_number, ""))
   | False -> M.return (Cil.zero ~loc, None, Some (Analyses_types.C_number, ""))
-  | Integer n ->
+  | Integer {n; ity} ->
     (* cf Translate_terms.constant_to_exp *)
-    let origin = match origin with
-      | Some o -> o
-      | None -> Options.fatal "Integer is expected to have an associated origin"
-    in
-    let* logic_env = M.get_logic_env in
-    let ity = Typing.get_number_ty ~logic_env origin in
-    let cast = Typing.get_cast ~logic_env origin in
-    let mk_real s =
-      let s = Gmp.Q.normalize_str s in
-      Cil.mkAddrOrStartOf ~loc
-        (Cil.var (Globals.Vars.add_string_literal ~loc (Str s)))
-    in
     let e, strnum =
       let open Analyses_types in
       match ity with
       | Nan -> assert false
       | Real -> Error.not_yet "real number constant"
-      | Rational -> mk_real (Z.to_string n), Str_R
+      | Rational ->
+        let s = Gmp.Q.normalize_str (Z.to_string n) in
+        let vi = Globals.Vars.add_string_literal ~loc @@ Str s in
+        Cil.mkAddrOrStartOf ~loc (Cil.var vi), Str_R
       | Gmpz ->
-        Cil.mkAddrOrStartOf ~loc
-          (Cil.var
-             (Globals.Vars.add_string_literal ~loc
-                (Str (Z.to_string n)))),
-        Str_Z
+        let vi = Globals.Vars.add_string_literal ~loc @@ Str (Z.to_string n) in
+        Cil.mkAddrOrStartOf ~loc (Cil.var vi), Str_Z
       | C_float fkind ->
         Cil.kfloat ~loc fkind (Int64.to_float (Z.to_int64 n)), C_number
       | C_integer kind ->
-        match cast, kind with
-        | Some ty, (ILongLong | IULongLong) when Gmp_types.Z.is_t ty ->
-          (* too large integer *)
-          Cil.mkAddrOrStartOf ~loc
-            (Cil.var
-               (Globals.Vars.add_string_literal ~loc
-                  (Str (Z.to_string n)))),
-          Str_Z
-        | Some ty, _ when Gmp_types.Q.is_t ty ->
-          mk_real (Z.to_string n),  Str_R
-        | (None | Some _), _ ->
-          (* do not keep the initial string representation because the generated
-             constant must reflect its type computed by the type system. For
-             instance, when translating [INT_MAX+1], we must generate a [long
-             long] addition and so [1LL]. If we keep the initial string
-             representation, the kind would be ignored in the generated code and
-             so [1] would be generated. *)
-          Cil.kinteger64 ~loc ~kind n, C_number
+        (* do not keep the initial string representation because the generated
+           constant must reflect its type computed by the type system. For
+           instance, when translating [INT_MAX+1], we must generate a [long
+           long] addition and so [1LL]. If we keep the initial string
+           representation, the kind would be ignored in the generated code and
+           so [1] would be generated. *)
+        Cil.kinteger64 ~loc ~kind n, C_number
     in
     M.return (e, None, Some (strnum, ""))
   | BinOp {ity; binop = Lt | Gt | Le | Ge | Eq | Ne as binop; op1; op2} ->

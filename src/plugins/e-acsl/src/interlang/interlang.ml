@@ -44,7 +44,7 @@ type exp =
 and exp_node =
   | True
   | False
-  | Integer of Z.t
+  | Integer of {ity : Analyses_types.number_ty; n : Z.t}
   | BinOp of binop_node
   | Lval of lval
   | SizeOf of typ
@@ -109,7 +109,8 @@ module Pretty = struct
   and pp_exp_node fmt = function
     | True -> fprintf fmt "true"
     | False -> fprintf fmt "false"
-    | Integer n -> Z.pretty fmt n
+    | Integer {ity; n} ->
+      fprintf fmt "@[%a@]@ :@ @[%a@]" Z.pretty n Analyses_types.pp_number_ty ity;
     | BinOp {binop; op1; op2} ->
       fprintf fmt "@[%a@]@ %a@ @[%a@]" pp_exp op1 pp_binop binop pp_exp op2
     | Lval lval -> pp_lval fmt lval
@@ -125,6 +126,7 @@ end
 
 
 module Optimization = struct
+
   module Aux = struct
     let modulo_coerce e1 e2 =
       let under_coerce e = match e.enode with
@@ -134,80 +136,84 @@ module Optimization = struct
       (under_coerce e1).enode, (under_coerce e2).enode
   end
 
-  let plus e1 e2 =
+  let plus ~ity e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer z1, _ when Z.is_zero z1 -> Some e2.enode
-    | _, Integer z2 when Z.is_zero z2 -> Some e1.enode
-    | Integer z1, Integer z2 -> Some (Integer (Z.add z1 z2))
+    | Integer {n = z1}, _ when Z.is_zero z1 -> Some e2.enode
+    | _, Integer {n = z2} when Z.is_zero z2 -> Some e1.enode
+    | Integer {n = z1}, Integer {n = z2} -> Some (Integer {n = Z.add z1 z2; ity})
     | _ -> None
 
-  let minus e1 e2 =
+  let minus ~ity e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer z1, Integer z2 when Z.is_zero z1 -> Some (Integer (Z.neg z2))
-    | _, Integer z2 when Z.is_zero z2 -> Some e1.enode
-    | Integer z1, Integer z2 -> Some (Integer (Z.sub z1 z2))
+    | Integer {n = z1}, Integer {n = z2} when Z.is_zero z1 ->
+      Some (Integer {n = Z.neg z2; ity})
+    | _, Integer {n = z2} when Z.is_zero z2 -> Some e1.enode
+    | Integer {n = z1}, Integer {n = z2} -> Some (Integer {n = Z.sub z1 z2; ity})
     | _ -> None
 
-  let mult e1 e2 =
+  let mult ~ity e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer z1, _ when Z.is_zero z1 -> Some (Integer Z.zero)
-    | _, Integer z2 when Z.is_zero z2 -> Some (Integer Z.zero)
-    | Integer z1, _ when Z.is_one z1 -> Some e2.enode
-    | _, Integer z2 when Z.is_one z2 -> Some e1.enode
-    | Integer z1, Integer z2 -> Some (Integer (Z.mul z1 z2))
+    | Integer {n = z1}, _ when Z.is_zero z1 -> Some (Integer {n = Z.zero; ity})
+    | _, Integer {n = z2} when Z.is_zero z2 -> Some (Integer {n = Z.zero; ity})
+    | Integer {n = z1}, _ when Z.is_one z1 -> Some e2.enode
+    | _, Integer {n = z2} when Z.is_one z2 -> Some e1.enode
+    | Integer {n = z1}, Integer {n = z2} -> Some (Integer {n = Z.mul z1 z2; ity})
     | _ -> None
 
-  let div e1 e2 =
+  let div ~ity e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer z1, _ when Z.is_zero z1 -> Some (Integer Z.zero)
-    | Integer z1, Integer z2 when not (Z.is_zero z2) ->
-      Some (Integer (Z.ediv z1 z2))
+    | Integer {n = z1}, _ when Z.is_zero z1 -> Some (Integer {n = Z.zero; ity})
+    | Integer {n = z1}, Integer {n = z2} when not (Z.is_zero z2) ->
+      Some (Integer {n = Z.ediv z1 z2; ity})
     | _ -> None
 
-  let modulo e1 e2 =
+  let modulo ~ity e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer z1, _ when Z.is_zero z1 -> Some (Integer Z.zero)
-    | Integer z1, Integer z2 -> Some (Integer (Z.erem z1 z2))
+    | Integer {n = z1}, _ when Z.is_zero z1 -> Some (Integer {n = Z.zero; ity})
+    | Integer {n = z1}, Integer {n = z2} when not (Z.is_zero z2) ->
+      Some (Integer {n = Z.erem z1 z2; ity})
     | _ -> None
 
   let lt e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer z1, Integer z2 -> Some (of_bool @@ Z.leq z1 z2)
+    | Integer {n = z1}, Integer {n = z2} -> Some (of_bool @@ Z.leq z1 z2)
     | _ -> None
+
   let gt e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer z1, Integer z2 -> Some (of_bool @@ Z.gt z1 z2)
+    | Integer {n = z1}, Integer {n = z2} -> Some (of_bool @@ Z.gt z1 z2)
     | _ -> None
+
   let le e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer z1, Integer z2 -> Some (of_bool @@ Z.leq z1 z2)
+    | Integer {n = z1}, Integer {n = z2} -> Some (of_bool @@ Z.leq z1 z2)
     | _ -> None
 
   let ge e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer z1, Integer z2 -> Some (of_bool @@ Z.geq z1 z2)
+    | Integer {n = z1}, Integer {n = z2} -> Some (of_bool @@ Z.geq z1 z2)
     | _ -> None
 
   let eq e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer z1, Integer z2 -> Some (of_bool @@ Z.equal z1 z2)
+    | Integer {n = z1}, Integer {n = z2} -> Some (of_bool @@ Z.equal z1 z2)
     | _ -> None
 
   let ne e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer z1, Integer z2 -> Some (of_bool @@ not @@ Z.equal z1 z2)
+    | Integer {n = z1}, Integer {n = z2} -> Some (of_bool @@ not @@ Z.equal z1 z2)
     | _ -> None
 end
 
 module Exp_node = struct
-  let of_binop bop =
+  let of_binop ~bop ~ity =
     let open Optimization in
     match bop with
-    | Plus -> plus
-    | Minus -> minus
-    | Mult -> mult
-    | Div -> div
-    | Mod -> modulo
+    | Plus -> plus ~ity
+    | Minus -> minus ~ity
+    | Mult -> mult ~ity
+    | Div -> div ~ity
+    | Mod -> modulo ~ity
     | Lt -> lt
     | Gt -> gt
     | Le -> le
@@ -221,7 +227,7 @@ module Exp = struct
   let of_exp_node ?origin ?(rtes=[]) enode = {enode; rtes; origin}
 
   let of_lval ?origin lval = of_exp_node ?origin @@ Lval lval
-  let of_integer ~origin n = of_exp_node ~origin @@ Integer n
+  let of_integer ~origin ~ity n = of_exp_node ~origin @@ Integer {ity; n}
   let of_sizeof ~origin ty = of_exp_node ~origin @@ SizeOf ty
 
   let to_rte p e = {rnode = e.enode; rorigin = p}
@@ -231,7 +237,7 @@ module Exp = struct
   let binop ?origin bop ity e1 e2 =
     let org = BinOp {binop = bop; ity; op1 = e1; op2 = e2} in
     let res = if not @@ Options.Interlang_opt.get () then org
-      else match Exp_node.of_binop bop e1 e2 with
+      else match Exp_node.of_binop ~bop ~ity e1 e2 with
         | Some e ->
           Options.debug ~dkey:Options.Dkey.interlang_print_opt ~level:3
             "@[%a@] => @[%a@]"
