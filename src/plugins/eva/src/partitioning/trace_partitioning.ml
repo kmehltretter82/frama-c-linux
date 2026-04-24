@@ -104,7 +104,7 @@ struct
     Partition.to_list s.store_partition
 
   let smashed (s : store) : state Lattice_bounds.or_bottom =
-    match Partition.to_list s.store_partition with
+    match expanded s with
     | [] -> `Bottom
     | (_k, v1) :: l ->
       let f acc (_k, v) = Domain.join acc v in
