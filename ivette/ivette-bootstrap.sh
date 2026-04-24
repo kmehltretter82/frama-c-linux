@@ -97,6 +97,7 @@ then
     rm -fr $IVETTE_TMP_DIR
     exit 3
 fi
+ln -s $PREFIX/bin/frama-c-gui $PREFIX/bin/ivette
 cd $USERCWD
 rm -fr $IVETTE_TMP_DIR
 rm -f $PREFIX/lib/frama-c/ivette.tgz

@@ -229,8 +229,8 @@ install:
 	@rm -fr $(LIBDIR)/frama-c/ivette
 	@mv $(IVETTE_DIST) $(LIBDIR)/frama-c/ivette
 	@mkdir -p $(BINDIR)
-	@rm -f $(BINDIR)/ivette
-	@ln -s $(LIBDIR)/frama-c/ivette/ivette $(BINDIR)/ivette
+	@rm -f $(BINDIR)/frama-c-gui
+	@ln -s $(LIBDIR)/frama-c/ivette/frama-c-gui $(BINDIR)/frama-c-gui
 
 else ifeq ($(IVETTE_DIST:-arm64=),dist/mac)
 
@@ -244,7 +244,7 @@ install:
 	@echo "  --command $(BINDIR)/frama-c\\" >> dist/ivette.sh
 	@echo "  --working \$$PWD \"\$$@\"" >> dist/ivette.sh
 	@mkdir -p $(BINDIR)
-	@install dist/ivette.sh $(BINDIR)/ivette
+	@install dist/ivette.sh $(BINDIR)/frama-c-gui
 	@rm -fr $(IVETTE_DIST)
 
 else
@@ -271,7 +271,7 @@ ifdef PREFIX
 
 uninstall:
 	@echo "Uninstall Ivette"
-	@rm -f  $(BINDIR)/ivette
+	@rm -f  $(BINDIR)/frama-c-gui
 	@rm -f  $(LIBDIR)/frama-c/ivette.tgz
 	@rm -fr $(LIBDIR)/frama-c/Ivette.app
 	@rm -fr $(LIBDIR)/frama-c/ivette
