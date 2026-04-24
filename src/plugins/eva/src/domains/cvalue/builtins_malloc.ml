@@ -716,7 +716,7 @@ let realloc_copy_one size ~src_state ~dst_state new_base b =
   | `Value offsetmap ->
     if Z.gt size_to_copy Z.zero then
       Cvalue.Model.paste_offsetmap
-        ~from:offsetmap ~dst_loc:new_base ~size:size_to_copy
+        ~from:offsetmap ~dst_addr:new_base ~size:size_to_copy
         ~exact:false dst_state
     else dst_state
 
@@ -742,7 +742,7 @@ let realloc_alloc_copy weak bases_to_realloc null_in_arg sizev state =
      to bottom everywhere *)
   let dst_state = add_uninitialized state base Z.minus_one in
   let ret = V.inject base Ival.zero in
-  let loc_bits = Addresses.Bits.of_bytes ret in
+  let addr_bits = Addresses.Bits.of_bytes ret in
   (* get bases to free and copy *)
   let lbases = Base.Hptset.elements bases_to_realloc in
   let dst_state =
@@ -765,12 +765,12 @@ let realloc_alloc_copy weak bases_to_realloc null_in_arg sizev state =
         else offsm
     in
     Cvalue.Model.paste_offsetmap
-      ~from:offsm ~dst_loc:loc_bits ~size:(Z.succ max_valid) ~exact:false
+      ~from:offsm ~dst_addr:addr_bits ~size:(Z.succ max_valid) ~exact:false
       dst_state
   in
   (* Copy the old bases *)
   let copy_one dst_state b =
-    realloc_copy_one size_max ~src_state:state ~dst_state loc_bits b
+    realloc_copy_one size_max ~src_state:state ~dst_state addr_bits b
   in
   let state = List.fold_left copy_one dst_state lbases in
   ret, state, cacheable

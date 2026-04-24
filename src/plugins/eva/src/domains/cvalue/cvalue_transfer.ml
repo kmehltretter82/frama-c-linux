@@ -147,7 +147,7 @@ let copy_one_loc state left_lv right_lv =
     warn_imprecise_offsm_write left_lval offsetmap;
     `Value
       (Cvalue.Model.paste_offsetmap ~exact:true
-         ~from:offsetmap ~dst_loc:left_loc.Locations.addr ~size state)
+         ~from:offsetmap ~dst_addr:left_loc.Locations.addr ~size state)
 
 let make_determinate value =
   { v = `Value value; initialized = true; escaping = false }

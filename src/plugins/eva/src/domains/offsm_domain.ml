@@ -116,7 +116,7 @@ module D : Abstract_domain.Leaf
           | `Top -> assert false
           | `Value size ->
             Memory.paste_offsetmap
-              ~from:o ~dst_loc:loc.Locations.addr ~size ~exact:true state
+              ~from:o ~dst_addr:loc.addr ~size ~exact:true state
     in
     match state' with
     | Memory.Bottom -> `Bottom

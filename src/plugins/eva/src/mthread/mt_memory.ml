@@ -143,7 +143,7 @@ let replace_value_at_int_pointer p ~before ~after state =
 let write_slice ~p ~sbytes ~slice ~exact state =
   let pointer = Addresses.Bits.of_bytes (location_of_pointer p) in
   Cvalue.Model.paste_offsetmap
-    ~from:slice ~dst_loc:pointer
+    ~from:slice ~dst_addr:pointer
     ~size:(Z.of_int (sbytes * size_char_in_bits))
     ~exact
     state

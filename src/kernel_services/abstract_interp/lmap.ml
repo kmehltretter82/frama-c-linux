@@ -447,8 +447,8 @@ struct
         end;
         r
 
-    let paste_offsetmap ~from ~dst_loc ~size ~exact m =
-      let loc_dst = make_loc dst_loc (`Value size) in
+    let paste_offsetmap ~from ~dst_addr ~size ~exact m =
+      let loc_dst = make_loc dst_addr (`Value size) in
       assert (Z.leq Z.zero size);
       let exact = exact && cardinal_zero_or_one loc_dst in
       (* TODO: do we want to alter exact here? *)
@@ -471,9 +471,9 @@ struct
               add base_dst new_offsetmap acc
             else acc
       in
-      match dst_loc with
+      match dst_addr with
       | Addresses.Bits.Map _ ->
-        let result = Addresses.Bits.fold_i treat_dst dst_loc m in
+        let result = Addresses.Bits.fold_i treat_dst dst_addr m in
         !had_non_bottom, result
       | Addresses.Bits.Top (top, orig) ->
         if not (Base.SetLattice.equal top Base.SetLattice.top) then
@@ -712,13 +712,13 @@ struct
     | Bottom, m -> m
     | Map m1,Map m2 -> Map (M.widen ?priority ?hint m1 m2)
 
-  let paste_offsetmap ~from ~dst_loc ~size ~exact m =
+  let paste_offsetmap ~from ~dst_addr ~size ~exact m =
     match m with
     | Bottom -> m
     | Top -> m
     | Map m ->
       try
-        let non_bottom, r = M.paste_offsetmap ~from ~dst_loc ~size ~exact m in
+        let non_bottom, r = M.paste_offsetmap ~from ~dst_addr ~size ~exact m in
         if non_bottom then Map r else Bottom
       with M.Result_is_top -> Top
 

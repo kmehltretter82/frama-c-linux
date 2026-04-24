@@ -99,7 +99,7 @@ let copy_offsetmap ~name ~exact ~size ~src ~dst ~dst_expr state =
   | `Value offsetmap ->
     check_indeterminate_offsetmap ~name offsetmap;
     warn_imprecise_offsm_write ~name dst_expr offsetmap;
-    Cvalue.Model.paste_offsetmap ~from:offsetmap ~dst_loc:dst ~size ~exact state
+    Cvalue.Model.paste_offsetmap ~from:offsetmap ~dst_addr:dst ~size ~exact state
 
 (* Returns the min and max size of a copy from an Ival.t. *)
 let min_max_size size =
@@ -267,7 +267,7 @@ let frama_c_memset_imprecise state dst_expr dst v size =
       let from = Cvalue.V_Offsetmap.create ~size ~size_v:8z value in
       warn_imprecise_offsm_write ~name:"memset" dst_expr from;
       let state =
-        Cvalue.Model.paste_offsetmap ~from ~size ~exact ~dst_loc:dst state
+        Cvalue.Model.paste_offsetmap ~from ~size ~exact ~dst_addr:dst state
       in
       let loc = make_loc dst (`Value size_min) in
       let written_zone = enumerate_valid_bits Locations.Write loc in
@@ -307,7 +307,7 @@ let frama_c_memset_imprecise state dst_expr dst v size =
           warn_imprecise_offsm_write ~name:"memset" dst_expr from;
           let state =
             Cvalue.Model.paste_offsetmap
-              ~from ~dst_loc:dst_addr ~size:sure ~exact:true state
+              ~from ~dst_addr ~size:sure ~exact:true state
           in
           let sure_loc = make_loc dst_addr (`Value sure) in
           let sure_zone = enumerate_valid_bits Locations.Write sure_loc in
@@ -502,7 +502,7 @@ let frama_c_memset_precise state dst_expr dst v (exp_size, size) =
     warn_imprecise_offsm_write ~name:"memset" dst_expr offsm;
     let state =
       Cvalue.Model.paste_offsetmap
-        ~from:offsm ~dst_loc:dst ~size ~exact:true state
+        ~from:offsm ~dst_addr:dst ~size ~exact:true state
     in
     let dst_location = Locations.make_loc dst (`Value size) in
     let dst_zone = Locations.(enumerate_valid_bits Write dst_location) in

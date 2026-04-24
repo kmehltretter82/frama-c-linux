@@ -122,7 +122,7 @@ module type S = sig
       may be valid are written. *)
   val paste_offsetmap :
     from:offsetmap ->
-    dst_loc:Addresses.Bits.t ->
+    dst_addr:Addresses.Bits.t ->
     size:Z.t ->
     exact:bool ->
     t -> t

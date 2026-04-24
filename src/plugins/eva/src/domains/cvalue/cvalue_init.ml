@@ -248,7 +248,7 @@ let initialize_var_using_type varinfo state =
                  the last location initialized + 1 *)
               state :=
                 Cvalue.Model.paste_offsetmap
-                  ~from:offsm_repeat ~dst_loc:addr ~size:total_size ~exact:true
+                  ~from:offsm_repeat ~dst_addr:addr ~size:total_size ~exact:true
                   !state
             else (
               (* We have probably initialized a struct with different fields.
@@ -263,7 +263,7 @@ let initialize_var_using_type varinfo state =
                     (Ival.inject_singleton size_elt) !addr;
                 state :=
                   Cvalue.Model.paste_offsetmap
-                    ~from:offsm_joined ~dst_loc:!addr ~size:size_elt ~exact:true
+                    ~from:offsm_joined ~dst_addr:!addr ~size:size_elt ~exact:true
                     !state
               done);
           end;
