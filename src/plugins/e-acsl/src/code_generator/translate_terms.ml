@@ -79,7 +79,7 @@ let constant_to_exp_il t c =
     M.return @@ IL.Exp.of_integer ~origin:t n
   | _ -> M.not_covered Printer.pp_term t
 
-let constant_to_exp ~loc env t c =
+let constant_to_exp_old ~loc env t c =
   let mk_real s =
     let s = Gmp.Q.normalize_str s in
     Cil.mkAddrOrStartOf ~loc
@@ -393,7 +393,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
   let logic_env = Env.Logic_env.get env in
   match t.term_node with
   | TConst c ->
-    let c, strnum = constant_to_exp ~loc env t c in
+    let c, strnum = constant_to_exp_old ~loc env t c in
     c, adata, env, strnum, ""
   | TLval lv ->
     let lv, env, name = tlval_to_lval kf env lv in
