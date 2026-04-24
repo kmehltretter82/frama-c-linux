@@ -34,7 +34,10 @@ let get_kf_infos model kf ?bhv ?prop () =
   let smoking =
     Wp_parameters.SmokeTests.get () &&
     Wp_parameters.SmokeDeadcode.get () in
-  let infos = CfgInfos.get kf ~smoking ?bhv ?prop () in
+  let infos =
+    WpContext.on_context (model,WpContext.Kf kf)
+      begin CfgInfos.get kf ~smoking ?bhv ?prop end ()
+  in
   (*TODO: print warning first *)
   if missing then
     Wp_parameters.warning ~current:false ~once:true "Missing RTE guards" ;

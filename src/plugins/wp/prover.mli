@@ -18,6 +18,8 @@ type t =
   | Why3 of Why3Provers.t (** Prover via Why3 *)
   | Qed                   (** Qed Solver *)
   | Tactical              (** Interactive Prover *)
+  | CFG                   (** Used for properties proved only using CFG.
+                              It cannot be disabled/manually enabled. *)
 
 module Pset : Set.S with type elt = t
 module Pmap : Map.S with type key = t
