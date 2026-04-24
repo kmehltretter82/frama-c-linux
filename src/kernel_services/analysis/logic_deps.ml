@@ -443,28 +443,28 @@ let add_results_from_pred ctx results p =
     labels = Logic_label.Set.union (Cil.extract_labels_from_pred p) results.labels
   }
 
-(** Entry point to get the list of [ki] * [Locations.Zone.t]
+(** Entry point to get the list of [ki] * [Memory_zone.t]
     needed to evaluate the list of [terms]
     relative to the [ctx] of interpretation. *)
 let from_terms terms ctx =
   List.fold_left (add_results_from_term ctx) empty_results terms |>
   get_result
 
-(** Entry point to get the list of [ki] * [Locations.Zone.t]
+(** Entry point to get the list of [ki] * [Memory_zone.t]
     needed to evaluate the [term]
     relative to the [ctx] of interpretation. *)
 let from_term term ctx =
   add_results_from_term ctx empty_results term |>
   get_result
 
-(** Entry point to get the list of [ki] * [Locations.Zone.t]
+(** Entry point to get the list of [ki] * [Memory_zone.t]
     needed to evaluate the list of [preds]
     relative to the [ctx] of interpretation. *)
 let from_preds preds ctx =
   List.fold_left (add_results_from_pred ctx) empty_results preds |>
   get_result
 
-(** Entry point to get the list of [ki] * [Locations.Zone.t]
+(** Entry point to get the list of [ki] * [Memory_zone.t]
     needed to evaluate the [pred]
     relative to the [ctx] of interpretation. *)
 let from_pred pred ctx =
@@ -584,19 +584,19 @@ let from_ki_annot annot ((ki, _kf) as stmt) =
   in
   get_zone_from_annot annot stmt real_ki
 
-(** Entry point to get the list of [ki] * [Locations.Zone.t]
+(** Entry point to get the list of [ki] * [Memory_zone.t]
     needed to evaluate the code annotations related to this [stmt]. *)
 let from_stmt_annot annot stmt =
   from_ki_annot annot stmt empty_results |>
   get_annot_result
 
-(** Entry point to get the list of [ki] * [Locations.Zone.t]
+(** Entry point to get the list of [ki] * [Memory_zone.t]
     needed to evaluate the code annotations related to this [stmt]. *)
 let from_stmt_annots code_annot_filter stmt =
   get_from_stmt_annots code_annot_filter stmt empty_results |>
   get_annot_result
 
-(** Entry point to get the list of [ki] * [Locations.Zone.t]
+(** Entry point to get the list of [ki] * [Memory_zone.t]
     needed to evaluate the code annotations related to this [kf]. *)
 let from_func_annots iter_on_kf_stmt code_annot_filter kf =
   let results = ref empty_results in

@@ -48,7 +48,8 @@ let add_loc_node state ~exact loc node =
     let new_info = NodeSetLattice.inject_singleton node in
     let new_loc_info =
       LocInfo.add_binding ~exact state.loc_info loc new_info in
-    let new_outputs = (* Zone.link in the under-approx version of Zone.join *)
+    let new_outputs =
+      (* Memory_zone.link in the under-approx version of Memory_zone.join *)
       if exact then Memory_zone.link state.under_outputs loc
       else state.under_outputs
     in

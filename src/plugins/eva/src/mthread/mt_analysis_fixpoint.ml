@@ -216,7 +216,7 @@ let compute_shared_vars analysis =
          vs.@ \
          @[<hov 2>  %a@]@]"
         Memory_zone.pretty before Memory_zone.pretty all_zones;
-      (* let after = Locations.Zone.join before all_zones in *)
+      (* let after = Memory_zone.join before all_zones in *)
       analysis.precise_concurrent_accesses <- all_zones;
       (* No need to recompute for the moment, this field is not used by
          the analysis *)

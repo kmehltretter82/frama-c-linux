@@ -21,8 +21,8 @@ type node = PdgTypes.Node.t * Memory_zone.t
 val pretty_node: node Pretty_utils.formatter
 
 
-(** Sets of pairs [Node.t * Zone.t], with a special semantics for zones:
-    [add n z (add n z' empty)] results in [(n, Zone.join z z')] instead
+(** Sets of pairs [Node.t * Memory_zone.t], with a special semantics for zones:
+    [add n z (add n z' empty)] results in [(n, Memory_zone.join z z')] instead
     of a set with two different elements. All operations see only  instance
     of a node, with the join of all possible zones. Conversely, a node should
     not be present with an empty zone. *)

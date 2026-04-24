@@ -14,9 +14,11 @@ open Cil_types
 module Location_Bytes = Addresses.Bytes
 [@@deprecated "Use Addresses.Bytes instead"]
 [@@migrate { repl = Addresses.Bytes }]
+
 module Location_Bits = Addresses.Bits
 [@@deprecated "Use Addresses.Bits instead"]
 [@@migrate { repl = Addresses.Bits }]
+
 module Zone = Memory_zone
 [@@deprecated "Use Memory_zone instead"]
 [@@migrate { repl = Memory_zone }]

@@ -109,10 +109,10 @@ module Signature = struct
         else
           begin
               (*
-              if (Locations.Zone.intersects l loc) then
+              if (Memory_zone.intersects l loc) then
                 begin
                   Format.printf "[pdg] implicit inputs intersect : %a and %a\n"
-                    Locations.Zone.pretty l Locations.Zone.pretty loc;
+                    Memory_zone.pretty l Memory_zone.pretty loc;
                   assert false
                 end;
                    *)

@@ -59,13 +59,15 @@ struct
     let definition = Kernel_function.get_definition kf in
     List.iter f definition.sallstmts
 
-  (** Get directly read/written [Zone.t] by the statement.
+  (** Get directly read/written [Memory_zone.t] by the statement.
     * i.e. directly means when [ki] is a call,
       it doesn't don't look at the assigns clause of the called function. *)
-  let get_rw_zone stmt = (* returns [Zone.t read],[Zone.t written] *)
+  let get_rw_zone stmt =
+    (* returns [Memory_zone.t read],[Memory_zone.t written] *)
     assert (Eva.Analysis.is_computed ());
     let lval_process read_zone stmt lv =
-      (* returns [read_zone] joined to [Zone.t read] by [lv], [Zone.t written] by [lv] *)
+      (* returns [read_zone] joined to [Memory_zone.t read] by [lv],
+         [Memory_zone.t written] by [lv] *)
       (* The modified locations are [looking_for], those address are
          function of [deps]. *)
       let zloc = get_lval_zone ~for_writing:true stmt lv in
@@ -73,7 +75,8 @@ struct
       Memory_zone.join read_zone deps, zloc
     in
     let call_process lv f args _loc =
-      (* returns  [Zone.t read] by [lv, f, args], [Zone.t written] by [lv] *)
+      (* returns  [Memory_zone.t read] by [lv, f, args],
+         [Memory_zone.t written] by [lv] *)
       let read_zone = Eva.Results.(before stmt |> lval_deps (f,NoOffset)) in
       let add_args arg inputs =
         Memory_zone.join inputs Eva.Results.(before stmt |> expr_deps arg)
@@ -88,10 +91,10 @@ struct
     match stmt.skind with
     | Switch (exp,_,_,_)
     | If (exp,_,_,_) ->
-      (* returns  [Zone.t read] by condition [exp], [Zone.bottom] *)
+      (* returns  [Memory_zone.t read] by condition [exp], [Memory_zone.bottom] *)
       Eva.Results.(before stmt |> expr_deps exp), Memory_zone.bottom
     | Instr (Set (lv,exp,_)) ->
-      (* returns  [Zone.t read] by [exp, lv], [Zone.t written] by [lv] *)
+      (* returns  [Memory_zone.t read] by [exp, lv], [Memory_zone.t written] by [lv] *)
       let read_zone = Eva.Results.(before stmt |> expr_deps exp) in
       lval_process read_zone stmt lv
     | Instr (Local_init (v, AssignInit i, _)) ->
@@ -112,7 +115,7 @@ struct
     | _ -> Memory_zone.bottom, Memory_zone.bottom
 
   (** Look at intersection of [rd_zone_opt]/[wr_zone_opt] with the
-      directly read/written [Zone.t] by the statement.
+      directly read/written [Memory_zone.t] by the statement.
     * i.e. directly means when [ki] is a call,
       it doesn't don't look at the assigns clause of the called function. *)
   let is_rw_zone (rd_zone_opt, wr_zone_opt) stmt =
@@ -380,8 +383,8 @@ let select_lval_rw set mark ~rd ~wr ~eval kf ki_opt=
                      | None -> ()
                      | Some zone_requested ->
                        (* Format.printf "@\nselect_lval_rw zone_req=%a zone=%a@."
-                          Locations.Zone.pretty zone_requested
-                          Locations.Zone.pretty zone; *)
+                          Memory_zone.pretty zone_requested
+                          Memory_zone.pretty zone; *)
                        if Memory_zone.intersects zone_requested zone
                        then let inter = Memory_zone.narrow zone_requested zone
                          in fsel inter

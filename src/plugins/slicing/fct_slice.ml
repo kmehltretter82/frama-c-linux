@@ -945,22 +945,22 @@ let get_called_needed_input called_kf need_out0 needed_out_zone =
   let froms = From.get called_kf in
   let from_table = froms.Function_Froms.deps_table in
   let acc_in_zones out (default, from_out) in_zones =
-    if  Locations.Zone.valid_intersects needed_out_zone out then
-      let in_zones = Locations.Zone.join in_zones from_out in
+    if  Memory_zone.valid_intersects needed_out_zone out then
+      let in_zones = Memory_zone.join in_zones from_out in
       let in_zones =
-        if default then Locations.Zone.join in_zones out else in_zones
+        if default then Memory_zone.join in_zones out else in_zones
       in in_zones
     else
       in_zones
   in
   let in_zones =
-    Function_Froms.Memory.fold acc_in_zones from_table Locations.Zone.bottom
+    Function_Froms.Memory.fold acc_in_zones from_table Memory_zone.bottom
   in
   let in_zones =
     if need_out0 then
       let from0 = froms.Function_Froms.deps_return in
       let z_return = Function_Froms.Memory.collapse_return from0 in
-        Locations.Zone.join in_zones z_return
+        Memory_zone.join in_zones z_return
     else in_zones
   in in_zones
 
@@ -975,9 +975,9 @@ let get_call_in_nodes called_kf call_info called_in_zone =
     let param_loc = Locations.loc_of_varinfo param in
     let param_zone = Locations.enumerate_valid_bits param_loc in
     let nodes, called_in_zone =
-      if Locations.Zone.valid_intersects param_zone called_in_zone then
+      if Memory_zone.valid_intersects param_zone called_in_zone then
         let node = PdgIndex.Signature.find_input pdg_sig_call n in
-        let called_in_zone =  Locations.Zone.diff called_in_zone param_zone in
+        let called_in_zone =  Memory_zone.diff called_in_zone param_zone in
           ((node, None)::nodes, called_in_zone)
       else
           (nodes, called_in_zone)
@@ -1007,7 +1007,7 @@ let add_spare_call_inputs called_kf call_info =
   let out0, marked_out_zone = SlicingMarks.get_marked_out_zone sig_call in
   let called_in_zone = get_called_needed_input called_kf out0 marked_out_zone in
     SlicingKernel.debug ~level:2 "\tneed %a inputs : %a@." Kernel_function.pretty called_kf
-      Locations.Zone.pretty called_in_zone;
+      Memory_zone.pretty called_in_zone;
   let needed_nodes, undef =
     get_call_in_nodes called_kf call_info called_in_zone in
   let m_spare = SlicingMarks.mk_gen_spare in
@@ -1298,7 +1298,7 @@ let apply_change_call ff call f_to_call =
             let z = op_inputs.Inout_type.over_inputs in
             (*Format.printf "##Call at %a,@ kf %a,@ @[Z %a@]@."
                Cil.d_loc (Cil_datatype.Stmt.loc call)
-               Kernel_function.pretty kf Locations.Zone.pretty z; *)
+               Kernel_function.pretty kf Memory_zone.pretty z; *)
             FctMarks.get_matching_input_marks marks z
           with Not_found ->
             FctMarks.get_all_input_marks marks

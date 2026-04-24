@@ -434,7 +434,7 @@ module Component = struct
                   (* Format.printf "[security of %s] search callers in %s
                      for zone %a@."  (Kernel_function.get_name kf)
                      (Kernel_function.get_name caller)
-                     Locations.Zone.pretty zone;*)
+                     Memory_zone.pretty zone;*)
                   let pdg_caller = Pdg.Api.get caller in
                   let do_call todolist callsite =
                     match kind with

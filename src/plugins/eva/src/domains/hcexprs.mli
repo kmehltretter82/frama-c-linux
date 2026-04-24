@@ -71,7 +71,7 @@ val syntactic_lvalues: Eva_ast.exp -> lvalues
 
 
 (** Maps from symbolic expressions to their memory dependencies, expressed as a
-    {!Locations.Zone.t}. *)
+    {!Memory_zone.t}. *)
 module HCEToZone: sig
   include Hptmap_sig.S with type key = HCE.t
                         and type v = Memory_zone.t

@@ -553,7 +553,7 @@ let free ~exact bases state =
   (* Uncomment this code to simulate the fact that free "writes" the bases
      it deallocates
      Base_hptmap.iter (fun b ->
-      changed := Zone.join !changed (enumerate_bits (loc_of_base b))
+      changed := Memory_zone.join !changed (enumerate_bits (loc_of_base b))
      ) bases; *)
   (* No need to remove the freed bases from the state if [exact] is false,
      because they must remain for the 'inexact' case *)

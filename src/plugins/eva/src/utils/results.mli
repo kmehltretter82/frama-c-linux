@@ -282,11 +282,11 @@ val as_location : address evaluation -> Locations.location
 (** Converts into a C location abstraction. *)
 val as_location_result : address evaluation -> Locations.location result
 
-(** Converts into a Zone. Error cases are converted into bottom or top zones
-    accordingly. *)
+(** Converts into a memory zone. Error cases are converted into bottom or top
+    zones accordingly. *)
 val as_zone : address evaluation -> Memory_zone.t
 
-(** Converts into a Zone result. *)
+(** Converts into a memory zone result. *)
 val as_zone_result : address evaluation -> Memory_zone.t result
 
 (** Converts into a C location abstraction. Error cases are converted into
