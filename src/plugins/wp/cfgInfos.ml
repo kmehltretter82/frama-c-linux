@@ -326,7 +326,7 @@ let set_trivially_terminates p hyps =
   if Wp_parameters.is_interactive ()
   || Wp_parameters.has_dkey Prover.dkey_shell
   then
-    Wp_parameters.feedback "[Valid] Goal %a (Cfg) (Trivial)"
+    Wp_parameters.result "[Valid] Goal %a (Cfg) (Trivial)"
       WpPropId.pp_propid p ;
   let kf = Option.get @@ Property.get_kf @@ WpPropId.property_of_id p in
   let vc_annot = Wpo.VC_Annot.{

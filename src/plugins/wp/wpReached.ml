@@ -434,7 +434,7 @@ let set_unreachable pid =
         if Wp_parameters.is_interactive ()
         || Wp_parameters.has_dkey Prover.dkey_shell
         then
-          Wp_parameters.feedback "[Valid] Goal %a (Cfg) (Unreachable)"
+          Wp_parameters.result "[Valid] Goal %a (Cfg) (Unreachable)"
             WpPropId.pp_propid pid ;
         [p]
     in

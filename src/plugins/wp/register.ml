@@ -399,7 +399,7 @@ let do_report_stats ~shell ~cache ~smoke goal (stats : Stats.stats) =
       | Stepout -> "[Stepout]"
       | Invalid -> "[Invalid]"
   in if status <> "" then
-    Wp_parameters.feedback "%s %s%a%a%a"
+    Wp_parameters.result "%s %s%a%a%a"
       status (Wpo.get_gid goal) (Stats.pp_stats ~shell ~cache) stats
       pp_hasmodel goal pp_warnings goal
 
