@@ -59,6 +59,12 @@ and exp_node =
   | BinOp of binop_node
   | Lval of lval
   | SizeOf of typ
+  | Coerce of {coerce_to : typ; coerced : exp}
+  (** Type coercion stemming from E-ACSL interval and type analysis.
+      A coercion does not correspond directly to C type casts. It merely
+      indicates a _potential_ point where a cast might be necessary. Also, the
+      translation does not necessarily generate a type cast, but potentially a
+      more complicated conversion operation, e.g. [mpz_get_ui]. *)
 
 and binop_node = {ity : number_ty; binop : binop; op1 : exp; op2 : exp}
 
@@ -98,6 +104,8 @@ module Exp : sig
       Not all Cil operators are supported (yet). *)
   val binop :
     ?origin:term -> binop -> Analyses_types.number_ty -> exp -> exp -> exp
+
+  val coerce : ?origin:term -> coerce_to:typ -> exp -> exp
 end
 
 module Lhost : sig

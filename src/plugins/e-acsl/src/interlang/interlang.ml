@@ -48,6 +48,7 @@ and exp_node =
   | BinOp of binop_node
   | Lval of lval
   | SizeOf of typ
+  | Coerce of {coerce_to : typ; coerced : exp}
 
 and binop_node = {ity : Number_ty.t; binop : binop; op1 : exp; op2 : exp}
 
@@ -113,6 +114,8 @@ module Pretty = struct
       fprintf fmt "@[%a@]@ %a@ @[%a@]" pp_exp op1 pp_binop binop pp_exp op2
     | Lval lval -> pp_lval fmt lval
     | SizeOf ty -> fprintf fmt "SizeOf(@[%a])" Printer.pp_typ ty
+    | Coerce {coerce_to = ty; coerced = exp} ->
+      fprintf fmt "Coerce(@[%a@],@ @[%a@])" Printer.pp_typ ty pp_exp exp
 
   let pp_rtes fmt rtes =
     let pp_rte fmt rte = fprintf fmt "%a" pp_exp_node rte.rnode in
@@ -122,66 +125,76 @@ end
 
 
 module Optimization = struct
+  module Aux = struct
+    let modulo_coerce e1 e2 =
+      let under_coerce e = match e.enode with
+        | Coerce {coerced = exp} -> exp
+        | _ -> e
+      in
+      (under_coerce e1).enode, (under_coerce e2).enode
+  end
+
   let plus e1 e2 =
-    match e1.enode, e2.enode with
+    match Aux.modulo_coerce e1 e2 with
     | Integer z1, _ when Z.is_zero z1 -> Some e2.enode
     | _, Integer z2 when Z.is_zero z2 -> Some e1.enode
     | Integer z1, Integer z2 -> Some (Integer (Z.add z1 z2))
     | _ -> None
 
   let minus e1 e2 =
-    match e1.enode, e2.enode with
+    match Aux.modulo_coerce e1 e2 with
     | Integer z1, Integer z2 when Z.is_zero z1 -> Some (Integer (Z.neg z2))
     | _, Integer z2 when Z.is_zero z2 -> Some e1.enode
     | Integer z1, Integer z2 -> Some (Integer (Z.sub z1 z2))
     | _ -> None
 
   let mult e1 e2 =
-    match e1.enode, e2.enode with
+    match Aux.modulo_coerce e1 e2 with
     | Integer z1, _ when Z.is_zero z1 -> Some (Integer Z.zero)
     | _, Integer z2 when Z.is_zero z2 -> Some (Integer Z.zero)
     | Integer z1, _ when Z.is_one z1 -> Some e2.enode
     | _, Integer z2 when Z.is_one z2 -> Some e1.enode
     | Integer z1, Integer z2 -> Some (Integer (Z.mul z1 z2))
     | _ -> None
+
   let div e1 e2 =
-    match e1.enode, e2.enode with
+    match Aux.modulo_coerce e1 e2 with
     | Integer z1, _ when Z.is_zero z1 -> Some (Integer Z.zero)
     | Integer z1, Integer z2 when not (Z.is_zero z2) ->
       Some (Integer (Z.ediv z1 z2))
     | _ -> None
 
   let modulo e1 e2 =
-    match e1.enode, e2.enode with
+    match Aux.modulo_coerce e1 e2 with
     | Integer z1, _ when Z.is_zero z1 -> Some (Integer Z.zero)
     | Integer z1, Integer z2 -> Some (Integer (Z.erem z1 z2))
     | _ -> None
 
   let lt e1 e2 =
-    match e1.enode, e2.enode with
+    match Aux.modulo_coerce e1 e2 with
     | Integer z1, Integer z2 -> Some (of_bool @@ Z.leq z1 z2)
     | _ -> None
   let gt e1 e2 =
-    match e1.enode, e2.enode with
+    match Aux.modulo_coerce e1 e2 with
     | Integer z1, Integer z2 -> Some (of_bool @@ Z.gt z1 z2)
     | _ -> None
   let le e1 e2 =
-    match e1.enode, e2.enode with
+    match Aux.modulo_coerce e1 e2 with
     | Integer z1, Integer z2 -> Some (of_bool @@ Z.leq z1 z2)
     | _ -> None
 
   let ge e1 e2 =
-    match e1.enode, e2.enode with
+    match Aux.modulo_coerce e1 e2 with
     | Integer z1, Integer z2 -> Some (of_bool @@ Z.geq z1 z2)
     | _ -> None
 
   let eq e1 e2 =
-    match e1.enode, e2.enode with
+    match Aux.modulo_coerce e1 e2 with
     | Integer z1, Integer z2 -> Some (of_bool @@ Z.equal z1 z2)
     | _ -> None
 
   let ne e1 e2 =
-    match e1.enode, e2.enode with
+    match Aux.modulo_coerce e1 e2 with
     | Integer z1, Integer z2 -> Some (of_bool @@ not @@ Z.equal z1 z2)
     | _ -> None
 end
@@ -208,9 +221,7 @@ module Exp = struct
   let of_exp_node ?origin ?(rtes=[]) enode = {enode; rtes; origin}
 
   let of_lval ?origin lval = of_exp_node ?origin @@ Lval lval
-
   let of_integer ~origin n = of_exp_node ~origin @@ Integer n
-
   let of_sizeof ~origin ty = of_exp_node ~origin @@ SizeOf ty
 
   let to_rte p e = {rnode = e.enode; rorigin = p}
@@ -228,6 +239,16 @@ module Exp = struct
           e
         | None -> org
     in of_exp_node ?origin res
+
+  let coerce ?origin ~coerce_to exp =
+    let origin =
+      try List.find Option.is_some [origin; exp.origin]
+      with Not_found -> None
+    in
+    match exp with
+    | {enode = Coerce c; origin} as exp -> (* collapse stacked coercions *)
+      {exp with origin; enode = Coerce {c with coerce_to}}
+    | exp -> of_exp_node ?origin @@ Coerce {coerce_to; coerced = exp}
 end
 
 module Lhost = struct

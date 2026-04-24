@@ -29,6 +29,7 @@ Plugin E-ACSL <next-release>
 Plugin E-ACSL 33.0 (Arsenic)
 ###############################################################################
 
+-o E-ACSL     [2026-04-27] Intermediate language: add node for type coercions.
 -  E-ACSL     [2026-04-06] Support built-in predicates in inductive predicates.
 -* E-ACSL     [2026-03-26] Fix crash due to typing not having been performed.
 -* E-ACSL     [2026-03-24] Fix generation of logic functions containing

@@ -976,6 +976,10 @@ and to_exp_il ?inplace t =
   let* rte_guards = Translate_predicates.rte_guards_to_exp_il t in
   let* e = context_insensitive_term_to_exp_il ?inplace t in
   let e = IL.Exp.attach_rtes rte_guards e in
+  let e = match Typing.get_cast ~logic_env:(Env.Logic_env.get env) t with
+    | None -> e
+    | Some typ -> IL.Exp.coerce ?origin:e.origin ~coerce_to:typ e
+  in
   Options.debug ~dkey ~level:4 "to_exp_il {%a} %a = %a (%a)"
     Profile.pretty (Env.Logic_env.get_profile env)
     Printer.pp_term t

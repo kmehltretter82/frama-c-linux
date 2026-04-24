@@ -205,6 +205,10 @@ and compile_context_insensitive {Interlang.enode; origin} =
     let e = Cil.sizeOf ~loc ty in
     let* () = M.Option.iter (assert_register_term ~loc ~force:true e) origin in
     M.return (e, Some (Analyses_types.C_number, "sizeof"))
+  | Coerce {coerce_to = typ; coerced = exp} ->
+    ignore typ; (*TODO*)
+    compile_context_insensitive exp
+
 
 and compile_div_mod ~origin {ity; binop; op1; op2} =
   assert (Interlang.Helpers.is_div_or_mod binop);
