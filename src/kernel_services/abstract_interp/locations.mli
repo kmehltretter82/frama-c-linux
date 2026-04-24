@@ -111,9 +111,6 @@ module Zone = Memory_zone
 [@@deprecated "Use Memory_zone instead"]
 [@@migrate { repl = Memory_zone }]
 
-(* Note: the first two operations are exact (if offsets are not
-   floats.) The last one can return an over-approximation, and has an
-   under-approximating counterpart. *)
 val loc_to_loc_without_size : location -> Addresses.Bytes.t
 [@@deprecated "Use loc_addr instead"]
 [@@migrate { repl = Rel.loc_addr }]

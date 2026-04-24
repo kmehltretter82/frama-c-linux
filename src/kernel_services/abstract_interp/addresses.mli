@@ -220,7 +220,7 @@ module Bits : sig
   (** {2 Conversion functions} *)
 
   (** [of_bytes a] returns the address set [a] with the offset converted from
-      bytes to bits.
+      bytes to bits. The result is exact.
       @before Frama-C+dev was Locations.loc_bytes_to_loc_bits *)
   val of_bytes : Bytes.t -> t
 
