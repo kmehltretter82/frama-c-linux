@@ -86,8 +86,9 @@ let is_valid access {addr; size} =
   not (Z_or_top.is_top size) &&
   let access = base_access ~size access in
   let is_valid_offset = Base.is_valid_offset access in
-  not (Addresses.Bits.is_top addr) &&
-  Addresses.Bits.for_all is_valid_offset addr
+  match addr with
+  | Top _ -> false
+  | Map _ -> Addresses.Bits.for_all is_valid_offset addr
 
 
 let filter_base f loc =

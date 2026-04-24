@@ -51,7 +51,6 @@ module Bytes : sig
 
   val is_zero : t -> bool
   val is_bottom : t -> bool
-  val is_top : t -> bool
 
   val top_int : t
   val top_float : t
@@ -235,4 +234,3 @@ module Bits : sig
       @before Frama-C+dev was Locations.loc_bits_to_loc_bytes_under *)
   val to_bytes_under : t -> Bytes.t
 end
-
