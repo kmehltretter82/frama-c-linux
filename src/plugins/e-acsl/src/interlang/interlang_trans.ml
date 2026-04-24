@@ -85,36 +85,36 @@ let assert_register_term ~loc ?force e t =
   M.modify_adata @@ fun a ->
   Assert.register_term ~loc ?force t e a
 
-let rec compile ?(flush_rtes=false) ({origin} as exp: Interlang.exp) =
-  let add_cast (e, cast_info) =
-    match cast_info, origin with
-    (* The type of [cast_info] specifies what we cast from. *)
-    (* The type of the original term [origin] determines what we cast to. *)
-    | Some (strnum, name), Some t ->
-      let* logic_env = M.get_logic_env in
-      let cast = Typing.get_cast ~logic_env t in
+let rec compile ?(flush_rtes=false) exp =
+  let add_cast ~coerce ~cast_info e =
+    match cast_info with (* [cast_info] specifies type type we cast from. *)
+    | Some (strnum, name) ->
       let name = if name = "" then None else Some name in
-      let* {kf} = M.read in
+      let* {kf; loc} = M.read in
+      let loc = match exp.origin with
+        | Some t -> t.term_loc
+        | None -> loc
+      in
       M.modifying_env (fun env ->
-          Typed_number.add_cast ~loc:t.term_loc
+          Typed_number.add_cast ~loc
             ?name
             env
             kf
-            cast
+            coerce
             strnum
-            (Some t)
+            exp.origin
             e)
-    | Some _, None (* [origin] is [None] when it stems from predicates. *)
-    | None, _ -> M.return e (* no cast required *)
+    | None -> M.return e (* no cast required *)
   in
-  let cil = M.update exp.rtes (compile_context_insensitive exp >>- add_cast) in
+  let* e, coerce, cast_info = compile_context_insensitive exp in
+  let cil = M.update exp.rtes (add_cast ~coerce ~cast_info e) in
   if flush_rtes then compile_rte_guards cil else cil
 
 and compile_context_insensitive {Interlang.enode; origin} =
   let* {kf; loc} = M.read in
   match enode with
-  | True -> M.return (Cil.one ~loc, Some (Analyses_types.C_number, ""))
-  | False -> M.return (Cil.zero ~loc, Some (Analyses_types.C_number, ""))
+  | True -> M.return (Cil.one ~loc, None, Some (Analyses_types.C_number, ""))
+  | False -> M.return (Cil.zero ~loc, None, Some (Analyses_types.C_number, ""))
   | Integer n ->
     (* cf Translate_terms.constant_to_exp *)
     let origin = match origin with
@@ -163,7 +163,7 @@ and compile_context_insensitive {Interlang.enode; origin} =
              so [1] would be generated. *)
           Cil.kinteger64 ~loc ~kind n, C_number
     in
-    M.return (e, Some (strnum, ""))
+    M.return (e, None, Some (strnum, ""))
   | BinOp {ity; binop = Lt | Gt | Le | Ge | Eq | Ne as binop; op1; op2} ->
     let binop = compile_binop binop in
     let* e1 = compile ~flush_rtes:true op1 in
@@ -172,7 +172,7 @@ and compile_context_insensitive {Interlang.enode; origin} =
     let* e = M.modifying_env @@ fun env ->
       Translate_utils.comparison_to_exp ~loc kf env ity binop e1 e2 ~name origin
     in
-    M.return (e, Some (Analyses_types.C_number, name))
+    M.return (e, None, Some (Analyses_types.C_number, name))
   | BinOp {ity; binop = Plus | Minus | Mult as binop; op1; op2} ->
     let binop = compile_binop binop in
     let* e1 = compile op1 in
@@ -191,7 +191,7 @@ and compile_context_insensitive {Interlang.enode; origin} =
         let ty = Typing.typ_of_number_ty ity in
         M.return @@ Cil.new_exp ~loc @@ BinOp (binop, e1, e2, ty)
     in
-    M.return (e, Some (Analyses_types.C_number, Misc.name_of_binop binop))
+    M.return (e, None, Some (Analyses_types.C_number, Misc.name_of_binop binop))
   | BinOp ({binop = Div | Mod} as binop_node) ->
     compile_div_mod ~origin binop_node
   | Lval lval ->
@@ -200,14 +200,15 @@ and compile_context_insensitive {Interlang.enode; origin} =
     let* {loc} = M.read in
     let e = Smart_exp.lval ~loc lval in
     let* () = M.Option.iter (assert_register_term ~loc e) origin in
-    M.return (e, Some (Analyses_types.C_number, name))
+    M.return (e, None, Some (Analyses_types.C_number, name))
   | SizeOf ty ->
     let e = Cil.sizeOf ~loc ty in
     let* () = M.Option.iter (assert_register_term ~loc ~force:true e) origin in
-    M.return (e, Some (Analyses_types.C_number, "sizeof"))
+    M.return (e, None, Some (Analyses_types.C_number, "sizeof"))
   | Coerce {coerce_to = typ; coerced = exp} ->
-    ignore typ; (*TODO*)
-    compile_context_insensitive exp
+    let* e, coerce, cast_info = compile_context_insensitive exp in
+    ignore coerce; (* coerce to A and then B ⇒ just coerce directly to B *)
+    M.return (e, Some typ, cast_info)
 
 
 and compile_div_mod ~origin {ity; binop; op1; op2} =
@@ -238,7 +239,7 @@ and compile_div_mod ~origin {ity; binop; op1; op2} =
       let* e2 = compile op2 in
       M.return @@ Cil.new_exp ~loc @@ BinOp (binop, e1, e2, ty)
   in
-  M.return (e, Some (Analyses_types.C_number, ""))
+  M.return (e, None, Some (Analyses_types.C_number, ""))
 
 and compile_varinfo = function
   | Varinfo.Logic_varinfo varinfo -> M.return varinfo
