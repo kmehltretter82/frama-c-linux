@@ -15,28 +15,28 @@ open Cil_types
 
 (** A {!Addresses.Bits.t} and a size in bits.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-type location = private {
+type t = private {
   addr : Addresses.Bits.t;
   size : Z_or_top.t;
 }
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-module Location: Datatype.S with type t = location
+module Location: Datatype.S with type t = t
 
-val loc_top : location
-val loc_bottom : location
-val is_bottom_loc: location -> bool
+val loc_top : t
+val loc_bottom : t
+val is_bottom_loc: t -> bool
 
-val make_loc : Addresses.Bits.t -> Z_or_top.t -> location
+val make_loc : Addresses.Bits.t -> Z_or_top.t -> t
 
-val loc_equal : location -> location -> bool
+val loc_equal : t -> t -> bool
 
 (** [loc_addr_bytes l] returns the address set corresponding to the given
     location, i.e. the location without the size information.
     @before Frama-C+dev was named loc_to_loc_without_size *)
-val loc_addr_bytes : location -> Addresses.Bytes.t
+val loc_addr_bytes : t -> Addresses.Bytes.t
 
-val loc_size : location -> Z_or_top.t
+val loc_size : t -> Z_or_top.t
 
 (** Kind of memory access. *)
 type access = Read | Write | Object_pointer | Any_pointer
@@ -45,11 +45,11 @@ type access = Read | Write | Object_pointer | Any_pointer
     Accesses of unknown sizes are converted into empty accesses.  *)
 val base_access: size:Z_or_top.t -> access -> Base.access
 
-val is_valid : access -> location -> bool
+val is_valid : access -> t -> bool
 (** Is the given location entirely valid, without any access or as a destination
     for a read or write access. *)
 
-val valid_part : access -> ?bitfield:bool -> location -> location
+val valid_part : access -> ?bitfield:bool -> t -> t
 (** Overapproximation of the valid part of the given location. Beware that
     [is_valid (valid_part loc)] does not necessarily hold, as garbled mix
     may not be reduced by [valid_part].
@@ -58,46 +58,50 @@ val valid_part : access -> ?bitfield:bool -> location -> location
     byte aligned, and its offset (expressed in bits) is reduced to be congruent
     to 0 modulo 8. *)
 
-val invalid_part : location -> location
+val invalid_part : t -> t
 (** Overapproximation of the invalid part of a location *)
 (* Currently, this is the identity function *)
 
-val cardinal_zero_or_one : location -> bool
+val cardinal_zero_or_one : t -> bool
 (** Is the location bottom or a singleton? *)
 
-val valid_cardinal_zero_or_one : for_writing:bool -> location -> bool
+val valid_cardinal_zero_or_one : for_writing:bool -> t -> bool
 (** Is the valid part of the location bottom or a singleton? *)
 
-val filter_base: (Base.t -> bool) -> location -> location
+val filter_base: (Base.t -> bool) -> t -> t
 
-val overlaps: partial:bool -> location -> location -> bool
+val overlaps: partial:bool -> t -> t -> bool
 (** Is there a possibly non-empty intersection between two given locations?
     If [partial] is true, returns true if the two locations may be overlapping
     without being equal. If [partial] is false, also returns true if the two
     locations may be equal. Returns false when the two locations cannot be
     overlapping. *)
 
-val pretty : Format.formatter -> location -> unit
-val pretty_english : prefix:bool -> Format.formatter -> location -> unit
+val pretty : Format.formatter -> t -> unit
+val pretty_english : prefix:bool -> Format.formatter -> t -> unit
 
 (** {2 Conversion functions} *)
 
-val enumerate_bits : location -> Memory_zone.t
-val enumerate_bits_under : location -> Memory_zone.t
+val enumerate_bits : t -> Memory_zone.t
+val enumerate_bits_under : t -> Memory_zone.t
 
-val enumerate_valid_bits : access -> location -> Memory_zone.t
+val enumerate_valid_bits : access -> t -> Memory_zone.t
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-val enumerate_valid_bits_under : access -> location -> Memory_zone.t
+val enumerate_valid_bits_under : access -> t -> Memory_zone.t
 
 val zone_of_varinfo : varinfo -> Memory_zone.t
 (** @since Carbon-20101201 *)
 
-val loc_of_varinfo : varinfo -> location
-val loc_of_base : Base.t -> location
-val loc_of_typoffset : Base.t -> typ -> offset -> location
+val loc_of_varinfo : varinfo -> t
+val loc_of_base : Base.t -> t
+val loc_of_typoffset : Base.t -> typ -> offset -> t
 
 (** {2 Deprecated} *)
+
+type location = t
+[@@deprecated "Use Locations.t instead"]
+[@@migrate { repl = Locations.t }]
 
 module Location_Bytes = Addresses.Bytes
 [@@deprecated "Use Addresses.Bytes instead"]
@@ -111,7 +115,7 @@ module Zone = Memory_zone
 [@@deprecated "Use Memory_zone instead"]
 [@@migrate { repl = Memory_zone }]
 
-val loc_to_loc_without_size : location -> Addresses.Bytes.t
+val loc_to_loc_without_size : t -> Addresses.Bytes.t
 [@@deprecated "Use loc_addr_bytes instead"]
 [@@migrate { repl = Rel.loc_addr_bytes }]
 

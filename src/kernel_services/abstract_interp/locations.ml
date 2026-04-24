@@ -14,7 +14,7 @@ module Location_Bits = Addresses.Bits
 module Zone = Memory_zone
 
 
-type location =
+type t =
   { addr : Addresses.Bits.t;
     size : Z_or_top.t }
 
@@ -264,7 +264,7 @@ module Location =
   Datatype.Make
     (struct
       include Datatype.Serializable_undefined
-      type t = location
+      type nonrec t = t
       let structural_descr =
         Structural_descr.t_record
           [| Addresses.Bits.packed_descr; Z_or_top.packed_descr |]
@@ -284,3 +284,5 @@ module Location =
       let hash = loc_hash
       let pretty = pretty_loc
     end)
+
+type location = t
