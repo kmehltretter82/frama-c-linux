@@ -31,7 +31,7 @@ module Bytes : sig
     (** Garbled mix of the addresses in the set *)
     | Map of M.t (** Precise set of addresses+offsets *)
 
-  (** Those locations have a lattice structure, including standard operations
+  (** Address sets have a lattice structure, including standard operations
       such as [join], [narrow], etc. *)
   include Lattice_type.AI_Lattice_with_cardinal_one with type t := t
 
@@ -61,11 +61,11 @@ module Bytes : sig
   val inject_float : Fval.F.t -> t
 
   val add : Base.t -> Ival.t ->  t ->  t
-  (** [add b i loc] binds [b] to [i] in [loc] when [i] is not {!Ival.bottom},
+  (** [add b i addr] binds [b] to [i] in [addr] when [i] is not {!Ival.bottom},
       and returns {!bottom} otherwise. *)
 
   val replace_base: Base.substitution -> t -> bool * t
-  (** [replace_base subst loc] changes the location [loc] by substituting the
+  (** [replace_base subst addr] changes addresses [addr] by substituting the
       pointed bases according to [subst]. If [substitution] conflates different
       bases, the offsets bound to these bases are joined. *)
 
@@ -90,12 +90,12 @@ module Bytes : sig
   (** Over- and under-approximation of shifting the value by the given Ival. *)
 
   val sub_pointwise: ?factor:Z.t -> t -> t -> Ival.t
-  (** Subtracts the offsets of two locations [loc1] and [loc2].
+  (** Subtracts the offsets of two address sets [addr1] and [addr2].
       Returns the pointwise subtraction of their offsets
       [off1 - factor * off2]. [factor] defaults to [1]. *)
 
   val sub_pointer: t -> t -> t
-  (** Subtracts the offsets of two locations. Same as [sub_pointwise factor:1],
+  (** Subtracts the offsets of two address sets. Same as [sub_pointwise factor:1],
       except that garbled mixes from operands are propagated into the result. *)
 
   val topify: Origin.kind -> t -> t
@@ -116,7 +116,7 @@ module Bytes : sig
   (* {2 Iterators} *)
 
   val fold_bases : (Base.t -> 'a -> 'a) -> t -> 'a -> 'a
-  (** Fold on all the bases of the location, including [Top bases].
+  (** Fold on all the bases of the address sets, including [Top bases].
       @raise Abstract_interp.Error_Top in the case [Top Top]. *)
 
   val fold_i : (Base.t -> Ival.t -> 'a -> 'a) -> t -> 'a -> 'a
@@ -129,14 +129,14 @@ module Bytes : sig
       @raise Abstract_interp.Error_Top in the case [Top Top]. *)
 
   val fold_enum : (t -> 'a -> 'a) -> t -> 'a -> 'a
-  (** [fold_enum f loc acc] enumerates the locations in [acc], and passes
+  (** [fold_enum f addr acc] enumerates addresses in [addr], and passes
       them to [f]. Make sure to call {!cardinal_less_than} before calling
       this function, as all possible combinations of bases/offsets are
-      presented to [f]. Raises {!Abstract_interp.Error_Top} if [loc] is
+      presented to [f]. Raises {!Abstract_interp.Error_Top} if [addr] is
       [Top _] or if one offset cannot be enumerated. *)
 
   val to_seq_i : t -> (Base.t * Ival.t) Seq.t
-  (** Builds a sequence of all bases (with their offsets) of the location.
+  (** Builds a sequence of all bases (with their offsets) of the address set.
       @raise Abstract_interp.Error_Top in the cases [Top _]. *)
 
   val cached_fold:
@@ -151,7 +151,7 @@ module Bytes : sig
   val filter_base : (Base.t -> bool) -> t -> t
 
 
-  (** {2 Number of locations} *)
+  (** {2 Number of addresses} *)
 
   val cardinal_zero_or_one : t -> bool
   val cardinal_less_than : t -> int -> int
@@ -161,12 +161,12 @@ module Bytes : sig
   val cardinal: t -> Z.t option (** None if the cardinal is unbounded *)
 
   val find_lonely_key : t -> Base.t * Ival.t
-  (** if there is only one base [b] in the location, then returns the
+  (** if there is only one base [b] in the address set, then returns the
       pair [b,o] where [o] are the offsets associated to [b].
       @raise Not_found otherwise. *)
 
   val find_lonely_binding : t -> Base.t * Ival.t
-  (** if there is only one binding [b -> o] in the location (that is, only
+  (** if there is only one binding [b -> o] in the address set (that is, only
       one base [b] with [cardinal_zero_or_one o]), returns the pair [b,o].
       @raise Not_found otherwise *)
 
@@ -177,34 +177,34 @@ module Bytes : sig
   val split : Base.t -> t -> Ival.t * t
 
   val get_bases : t -> Base.SetLattice.t
-  (** Returns the bases the location may point to. Never fails, but
+  (** Returns the bases the addresses may point to. Never fails, but
       may return [Base.SetLattice.Top]. *)
 
 
   (** {2 Local variables inside locations} *)
 
   val contains_addresses_of_locals : (M.key -> bool) -> t -> bool
-  (** [contains_addresses_of_locals is_local loc] returns [true]
-      if [loc] contains the address of a variable for which
+  (** [contains_addresses_of_locals is_local addr] returns [true]
+      if [addr] contains the address of a variable for which
       [is_local] returns [true] *)
 
   val remove_escaping_locals : (M.key -> bool) -> t -> bool * t
-  (**  [remove_escaping_locals is_local v] removes from [v] the information
+  (**  [remove_escaping_locals is_local addr] removes from [addr] the information
        associated with bases for which [is_local] returns [true]. The
-       returned boolean indicates that [v] contained some locals. *)
+       returned boolean indicates that [addr] contained some locals. *)
 
   val contains_addresses_of_any_locals : t -> bool
-  (** [contains_addresses_of_any_locals loc] returns [true] iff [loc] contains
+  (** [contains_addresses_of_any_locals addr] returns [true] iff [addr] contains
       the address of a local variable or of a formal variable. *)
 
   (** {2 Misc} *)
 
-  (** [is_relationable loc] returns [true] iff [loc] represents a single
-      memory location. *)
+  (** [is_relationable addr] returns [true] iff [addr] represents a single
+      memory address. *)
   val is_relationable: t -> bool
 
   val may_reach : Base.t -> t -> bool
-  (** [may_reach base loc] is true if [base] might be accessed from [loc]. *)
+  (** [may_reach base addr] is true if [base] might be accessed from [addr]. *)
 
   (**/**)
   val pretty_debug: t Pretty_utils.formatter

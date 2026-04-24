@@ -350,5 +350,3 @@ module Bits = struct
   let to_bytes_under x =
     map (Ival.scale_div_under ~pos:true (Bit_utils.sizeofchar())) x
 end
-
-
