@@ -70,13 +70,11 @@ Frama-C can be run from the command-line, or via its graphical interface.
 The recommended usage for simple files is one of the following lines:
 
     frama-c file.c -<plugin> [options]
-    ivette file.c -<plugin> [options]
+    frama-c-gui file.c -<plugin> [options]
 
 Where `-<plugin>` is one of the several Frama-C plug-ins,
 e.g. `-eva`, or `-wp`, or `-metrics`, etc.
-Plug-ins can also be run directly from the graphical interface,
-`ivette`.
-A legacy version of the GUI (`frama-c-gui`) is also available.
+Plug-ins can also be run directly from the graphical interface.
 
 To list all plug-ins, run:
 
@@ -109,7 +107,7 @@ The results can then be loaded into Frama-C for further analyses or for inspecti
 via the GUI:
 
     frama-c -load parsed.sav -<plugin> [options]
-    ivette -load parsed.sav -<plugin> [options]
+    frama-c-gui -load parsed.sav -<plugin> [options]
 
 ## Further reference
 

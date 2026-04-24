@@ -26,9 +26,9 @@ It is synchronized with the [AST](#framac-ast) component: it is centered
 on the line containing the currently selected AST element;
 when possible, left-clicking on a line selects the related AST element.
 
-Note that Ivette is not an IDE: you cannot edit the source code with it.
+Note that the GUI is not an IDE: you cannot edit the source code with it.
 However, Ctrl+click opens the file in an external editor at the selected
-location. The editor (emacs by default) can be configured in the Ivette
+location. The editor (emacs by default) can be configured in the GUI
 preferences.
 
 Other useful shortcuts are:
@@ -79,7 +79,7 @@ when using these contextual menu entries in the [AST](#framac-ast) component:
 In this case, this component lists all selected elements in a table, with
 their source code location and their scope (the global declaration in which
 they appear).
-Left-clicking on a row globally selects the related AST element in Ivette.
+Left-clicking on a row globally selects the related AST element.
 Above the table, a short label indicates the origin of the selection.
 
 In the component titlebar:
@@ -111,7 +111,7 @@ For instance, it is possible to analyze the same code with different parameters
 in different projects, and to compare the obtained results.
 
 At any time, there is only one _current_ project: all information shown
-in Ivette relates to the current project, and all actions are applied to
+in the GUI relates to the current project, and all actions are applied to
 the current project.
 
 You can manage projects and change the current project via the
@@ -150,7 +150,7 @@ The list of projects is shown below, and these actions are available:
 
 ## Frama-C Parameters {#framac-parameters}
 
-All frama-c parameters can be modified from Ivette via the _Edit_ -> _Parameters_
+All frama-c parameters can be modified from the GUI via the _Edit_ -> _Parameters_
 menu or the _Ctrl+P_ shortcut.
 This opens a modal window listing all available Frama-C plug-ins and their
 parameters.

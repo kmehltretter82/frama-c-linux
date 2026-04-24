@@ -38,9 +38,6 @@ will provide the full list of the plugins that are currently installed.
 **frama-c-gui** is the graphical user interface of **frama-c**.
 It features the same options as the command-line version.
 
-**ivette** is a new, Electron-based graphical user interface for **frama-c**.
-It also features the same options as the command-line version.
-
 By default, Frama-C recognizes *.c* files as C files needing preprocessing
 and *.i* files as C files having been already preprocessed.
 Some plugins may extend the list of recognized files.
