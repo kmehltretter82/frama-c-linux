@@ -89,9 +89,9 @@ module PLoc = struct
   (*                             Locations                                    *)
   (* ------------------------------------------------------------------------ *)
 
-  let make_precise_loc loc typ_offs =
+  let make_precise_loc addr typ_offs =
     let size = Eval_typ.sizeof_lval_typ typ_offs in
-    let loc = Precise_locs.make_precise_loc loc ~size in
+    let loc = Precise_locs.make_precise_loc addr ~size in
     if Precise_locs.is_bottom_loc loc
     then `Bottom
     else `Value loc
@@ -104,8 +104,8 @@ module PLoc = struct
     let base = Base.of_varinfo host in
     match offset with
     | Precise offset ->
-      let loc_pr = Precise_locs.combine_base_precise_offset base offset in
-      make_precise_loc loc_pr typ_offset
+      let addr_pr = Precise_locs.combine_base_precise_offset base offset in
+      make_precise_loc addr_pr typ_offset
     | Imprecise value ->
       let addr_b = Addresses.Bits.inject base Ival.zero in
       let addr_pr = join_addr value addr_b in
@@ -115,8 +115,8 @@ module PLoc = struct
     let addr_bits = Addresses.Bits.of_bytes addr_lv in
     match offset with
     | Precise offset ->
-      let loc_pr = Precise_locs.combine_addr_precise_offset addr_bits offset in
-      make_precise_loc loc_pr typ_offset
+      let addr_pr = Precise_locs.combine_addr_precise_offset addr_bits offset in
+      make_precise_loc addr_pr typ_offset
     | Imprecise value ->
       let addr_pr = join_addr value addr_bits in
       make_precise_loc addr_pr typ_offset

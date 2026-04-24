@@ -77,14 +77,14 @@ let are_comparable_string v1 v2 =
    In practice, function pointers are considered possible or one past
    when their offset is 0. For object pointers, the offset is checked
    against the validity of each base, taking past-one into account. *)
-let possible_pointer access location =
-  let location = Addresses.Bits.of_bytes location in
+let possible_pointer access addr =
+  let addr_bits = Addresses.Bits.of_bytes addr in
   let is_possible_offset base offs =
     if Base.is_function base
     then Ival.is_zero offs
     else Base.is_valid_offset access base offs
   in
-  Addresses.Bits.for_all is_possible_offset location
+  Addresses.Bits.for_all is_possible_offset addr_bits
 
 (* Are [ev1] and [ev2] safely comparable, or does their comparison involves
    invalid pointers, or is undefined (typically pointers in different bases). *)

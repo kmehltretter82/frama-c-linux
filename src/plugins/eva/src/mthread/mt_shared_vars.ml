@@ -436,13 +436,13 @@ struct
         let l = Int_Intervals.project_set itvs in
         let by_size = H.create 4 in
         let aux_itv (ib, ie) =
-          let loc = Addresses.Bits.inject b (Ival.inject_singleton ib) in
+          let addr = Addresses.Bits.inject b (Ival.inject_singleton ib) in
           let size = Z.succ (Z.sub ie ib) in
           try
             let prev = H.find by_size size in
-            let loc = Addresses.Bits.join prev loc in
-            H.replace by_size size loc
-          with Not_found -> H.add by_size size loc
+            let addr = Addresses.Bits.join prev addr in
+            H.replace by_size size addr
+          with Not_found -> H.add by_size size addr
         in
         List.iter aux_itv l;
         H.fold

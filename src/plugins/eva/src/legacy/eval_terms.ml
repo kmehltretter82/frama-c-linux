@@ -1722,19 +1722,19 @@ and eval_tlhost ~alarm_mode env lv =
       | None, Ctype typ -> Base.of_c_logic_var lvar, typ
       | _ -> unsupported_lvar lvar
     in
-    let loc = Addresses.Bits.inject base Ival.zero in
+    let addr = Addresses.Bits.inject base Ival.zero in
     { etype = typ;
       ldeps = empty_logic_deps;
-      eover = loc;
-      eunder = under_loc_from_over loc;
+      eover = addr;
+      eunder = under_loc_from_over addr;
       empty = false; }
   | TResult typ ->
     (match env.result with
      | Some v ->
-       let loc = Addresses.Bits.inject (Base.of_varinfo v) Ival.zero in
+       let addr = Addresses.Bits.inject (Base.of_varinfo v) Ival.zero in
        { etype = typ;
          ldeps = empty_logic_deps;
-         eunder = loc; eover = loc;
+         eunder = addr; eover = addr;
          empty = false; }
      | None -> no_result ())
   | TMem t ->
