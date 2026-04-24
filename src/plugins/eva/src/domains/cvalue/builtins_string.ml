@@ -324,7 +324,7 @@ let search_char kind ~length state str =
    indicating whether the pointer was completely valid or not. *)
 let reduce_by_validity ~size cvalue =
   let addr_bits = Addresses.Bits.of_bytes cvalue in
-  let loc = Locations.make_loc addr_bits (`Value size) in
+  let loc = Locations.make addr_bits (`Value size) in
   if Locations.(is_valid Read loc)
   then
     let is_aligned _base ival =

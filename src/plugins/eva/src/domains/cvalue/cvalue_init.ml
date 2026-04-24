@@ -19,7 +19,7 @@ let make_well hidden_base state loc =
     Cvalue.V.inject_top_origin Origin.well (Base.Hptset.singleton hidden_base)
   in
   let well_loc =
-    Locations.make_loc
+    Locations.make
       (Addresses.Bits.inject hidden_base Ival.zero)
       (`Value size)
   in
@@ -97,7 +97,7 @@ let reject_empty_struct b offset typ =
 let initialize_var_using_type varinfo state =
   let rec add_offsetmap depth b name_desc name typ offset_orig typ_orig state =
     let typ = Ast_types.unroll typ in
-    let loc = lazy (Locations.loc_of_typoffset b typ_orig offset_orig) in
+    let loc = lazy (Locations.of_type_offset b typ_orig offset_orig) in
     let bind_entire_loc ?(state=state) v = (* Shortcut *)
       add_initialized state (Lazy.force loc) v
     in
@@ -200,7 +200,7 @@ let initialize_var_using_type varinfo state =
             let name_desc = name_desc ^ "[" ^ string_of_int i ^ "]" in
             state :=
               add_offsetmap depth b name_desc name typ offset typ_orig !state;
-            let loc = Locations.loc_of_typoffset b typ_orig offset in
+            let loc = Locations.of_type_offset b typ_orig offset in
             locs := loc :: !locs;
           done;
           if max_precise_size < size then begin

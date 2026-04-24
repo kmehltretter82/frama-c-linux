@@ -509,7 +509,7 @@ module TransferSingleTaint = struct
     | `Value value ->
       let addr_bits = Addresses.Bits.of_bytes value in
       let size = Bit_utils.sizeof_pointed arg.formal.vtype in
-      let loc = Locations.make_loc addr_bits size in
+      let loc = Locations.make addr_bits size in
       Locations.enumerate_valid_bits Write loc
 
   let rec get_n_first l n =
@@ -537,7 +537,7 @@ module TransferSingleTaint = struct
   let zone_of_return ret =
     match ret with
     | Some vi ->
-      let loc = Locations.loc_of_varinfo vi in
+      let loc = Locations.of_varinfo vi in
       Locations.enumerate_valid_bits Write loc
     | _ -> Memory_zone.bottom
 

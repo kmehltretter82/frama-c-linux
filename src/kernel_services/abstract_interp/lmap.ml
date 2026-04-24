@@ -447,7 +447,7 @@ struct
         r
 
     let paste_offsetmap ~from ~dst_addr ~size ~exact m =
-      let loc_dst = Locations.make_loc dst_addr (`Value size) in
+      let loc_dst = Locations.make dst_addr (`Value size) in
       assert (Z.leq Z.zero size);
       let exact = exact && Locations.cardinal_zero_or_one loc_dst in
       (* TODO: do we want to alter exact here? *)

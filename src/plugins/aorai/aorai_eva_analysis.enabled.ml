@@ -10,7 +10,7 @@
 
 let show_aorai_variable state fmt var_name =
   let vi = Data_for_aorai.(get_varinfo var_name) in
-  let cvalue = Cvalue.Model.find state (Locations.loc_of_varinfo vi) in
+  let cvalue = Cvalue.Model.find state (Locations.of_varinfo vi) in
   try
     let i = Ival.project_int (Cvalue.V.project_ival cvalue) in
     let state_name = Data_for_aorai.getStateName (Z.to_int i) in

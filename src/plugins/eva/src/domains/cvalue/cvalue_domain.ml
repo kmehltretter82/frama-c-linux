@@ -333,7 +333,7 @@ module State = struct
       Cvalue_init.initialize_var_using_type varinfo state, clob
     | Abstract_domain.Result kf ->
       let value = Library_functions.returned_value kf in
-      let loc = Locations.loc_of_varinfo varinfo in
+      let loc = Locations.of_varinfo varinfo in
       Cvalue.Model.add_binding ~exact:true state loc value, clob
 
   (* ------------------------------------------------------------------------ *)
@@ -355,7 +355,7 @@ module State = struct
 
   let bind_global state varinfo =
     let base = Base.of_varinfo varinfo in
-    let loc = Locations.loc_of_base base in
+    let loc = Locations.of_base base in
     let value = Cvalue.V_Or_Uninitialized.uninitialized in
     Cvalue.Model.add_indeterminate_binding ~exact:true state loc value
 

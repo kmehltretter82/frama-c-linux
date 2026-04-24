@@ -124,7 +124,7 @@ module Queries = struct
     in
     let process_ival base ival (acc_loc, acc_val as acc) =
       let addr_bits = Addresses.Bits.inject base ival in
-      let single_loc = Locations.make_loc addr_bits size in
+      let single_loc = Locations.make addr_bits size in
       let v = eval_one_loc single_loc in
       if Cvalue.V.intersects v value
       then Addresses.Bits.join addr_bits acc_loc, Cvalue.V.join v acc_val
@@ -180,5 +180,5 @@ include Evaluation.Make (Unit_context) (Value) (Main_locations.PLoc) (Domain)
 let lval_to_loc state lval =
   let eval, _alarms = lvaluate ~for_writing:false state lval in
   match eval with
-  | `Bottom -> Locations.loc_bottom
+  | `Bottom -> Locations.bottom
   | `Value (_valuation, ploc) -> Precise_locs.imprecise_location ploc

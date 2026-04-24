@@ -51,13 +51,13 @@ let add_watch make_watch state actuals =
         raise Builtins.Outside_builtin_possibilities
     in
     let addr_bits = Addresses.Bits.of_bytes dst in
-    let loc = Locations.make_loc addr_bits (`Value size) in
+    let loc = Locations.make addr_bits (`Value size) in
     let target_w = make_watch target_value in
     let current = !watch_table in
     if
       List.for_all
         (fun {loc=l; v=w} ->
-           not (Locations.loc_equal l loc && equal_watch w target_w))
+           not (Locations.equal l loc && equal_watch w target_w))
         current
     then
       watch_table :=

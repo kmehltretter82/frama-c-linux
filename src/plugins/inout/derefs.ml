@@ -29,7 +29,7 @@ class virtual do_it_ = object(self)
         let addr = Addresses.Bits.of_bytes r in
         let size = Bit_utils.sizeof_lval lv in
         self#join
-          (Locations.enumerate_valid_bits Read (Locations.make_loc addr size))
+          (Locations.enumerate_valid_bits Read (Locations.make addr size))
     end;
     DoChildren
 

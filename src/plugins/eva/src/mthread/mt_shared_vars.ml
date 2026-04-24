@@ -290,7 +290,7 @@ class do_it cp =
         (* Compute the zones written by the assigns *)
         (match assigns with
          | WritesAny ->
-           let top = Locations.make_loc Addresses.Bits.top Z_or_top.top in
+           let top = Locations.make Addresses.Bits.top Z_or_top.top in
            self#add_access (Write top) Memory_zone.top;
 
          | Writes assigns' ->
@@ -446,13 +446,13 @@ struct
         List.iter aux_itv l;
         H.fold
           (fun size addr_bits acc ->
-             let loc = Locations.make_loc addr_bits (`Value size) in
+             let loc = Locations.make addr_bits (`Value size) in
              f loc v acc
           ) by_size acc
       with Abstract_interp.Error_Top ->
         let addr_bits = Addresses.Bits.inject b Ival.zero in
         let size = Z_or_top.top (* TODO : use validity *) in
-        let loc = Locations.make_loc addr_bits size in
+        let loc = Locations.make addr_bits size in
         f loc v acc
     in
     X.ZoneMap.fold_base

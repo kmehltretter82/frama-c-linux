@@ -121,7 +121,7 @@ let reduce_by_valid_loc ~positive access loc typ state =
   let addr_bytes = Cvalue.V_Or_Uninitialized.get_v value in
   let addr_bits = Addresses.Bits.of_bytes addr_bytes in
   let size = Bit_utils.sizeof_pointed typ in
-  let location = Locations.make_loc addr_bits size in
+  let location = Locations.make addr_bits size in
   let reduced_location =
     if positive
     then Locations.valid_part access location
@@ -154,7 +154,7 @@ let make_loc_contiguous loc =
         let size' = Z.add (Z.sub max min) modu in
         let i = Ival.inject_singleton min in
         let addr_bits = Addresses.Bits.inject base i in
-        Locations.make_loc addr_bits (`Value size')
+        Locations.make addr_bits (`Value size')
       | _ -> loc
   with Not_found -> loc
 
@@ -167,7 +167,7 @@ let apply_on_all_locs f loc state =
     let ilevel = Int_set.get_small_cardinal () in
     let limit = max plevel ilevel in
     let apply_f base ival state =
-      f (Locations.make_loc (Addresses.Bits.inject base ival) size) state
+      f (Locations.make (Addresses.Bits.inject base ival) size) state
     in
     let aux base ival state =
       if Ival.cardinal_is_less_than ival limit

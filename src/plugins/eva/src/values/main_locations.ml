@@ -38,7 +38,7 @@ module PLoc = struct
     let paddr_bits = Precise_locs.inject_addr_bits loc.Locations.addr in
     Precise_locs.make_precise_loc paddr_bits ~size:loc.Locations.size
 
-  let top = make (Locations.make_loc Addresses.Bits.top `Top)
+  let top = make (Locations.make Addresses.Bits.top `Top)
 
   let assume_no_overlap ~partial l1 l2 =
     let loc1 = Precise_locs.imprecise_location l1
@@ -121,7 +121,7 @@ module PLoc = struct
       let addr_pr = join_addr value addr_bits in
       make_precise_loc addr_pr typ_offset
 
-  let eval_varinfo varinfo = make (Locations.loc_of_varinfo varinfo)
+  let eval_varinfo varinfo = make (Locations.of_varinfo varinfo)
 
   let is_valid access loc =
     Locations.is_valid access (Precise_locs.imprecise_location loc)

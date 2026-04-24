@@ -139,9 +139,9 @@ let reduce_to_valid_location kind term loc =
     end
   else
     let valid = Locations.(valid_part Write loc) in
-    if Locations.is_bottom_loc valid then
+    if Locations.is_bottom valid then
       begin
-        if kind = Assign && not (Locations.is_bottom_loc loc) then
+        if kind = Assign && not (Locations.is_bottom loc) then
           Self.warning ~current:true ~once:true
             ~wkey:Self.wkey_invalid_assigns
             "@[Completely invalid destination@ for %a.@ \
@@ -169,7 +169,7 @@ let precise_loc_of_assign env kind term =
       | Free | Allocate ->
         let result = Eval_terms.eval_term ~alarm_mode env term in
         let addr_bits = Addresses.Bits.of_bytes result.eover in
-        Locations.make_loc addr_bits Z_or_top.top
+        Locations.make addr_bits Z_or_top.top
     in
     if kind <> From then reduce_to_valid_location kind term loc else Some loc
   with Eval_terms.LogicEvalError e ->
