@@ -171,9 +171,8 @@ Recommended provers are:
 - CVC5     (https://cvc5.github.io)
 - Z3       (https://github.com/Z3Prover/z3)
 " { success }
-"Ivette is the GUI for Frama-C.
-Run 'ivette' once to finalize installation (requires an internet connection).
-Once finalized, 'ivette' will work offline.
+"Run 'frama-c-gui' once to finalize installation of the GUI (requires an internet connection).
+Once finalized, 'frama-c-gui' will work offline.
 Finalization also requires Node 24 and Yarn:
 - install NVM (https://github.com/nvm-sh/nvm)
 - run 'nvm install 24'

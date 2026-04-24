@@ -8,9 +8,9 @@
         - [Installing Custom Versions of Frama-C](#installing-custom-versions-of-frama-c)
         - [Installing Frama-C on Windows via WSL](#installing-frama-c-on-windows-via-wsl)
         - [Installing Frama-C on macOS](#installing-frama-c-on-macos)
-    - [Installing Ivette via the online packages](#installing-ivette-via-the-online-packages)
-        - [On Linux](#installing-ivette-via-the-online-packages-on-linux)
-        - [On macOS](#installing-ivette-via-the-online-packages-on-macos)
+    - [Installing the GUI via the online packages](#installing-the-gui-via-the-online-packages)
+        - [On Linux](#installing-the-gui-via-the-online-packages-on-linux)
+        - [On macOS](#installing-the-gui-via-the-online-packages-on-macos)
     - [Installing Frama-C via your Linux distribution (Debian/Ubuntu/Fedora)](#installing-frama-c-via-your-linux-distribution-debianubuntufedora)
     - [Compiling from source](#compiling-from-source)
         - [Quick Start](#quick-start)
@@ -55,11 +55,10 @@ an OCaml compiler. Please refer to the opam documentation for details.
 
 The Frama-C package in opam is called `frama-c`. It includes:
 - the command-line `frama-c` executable;
-- the graphical interface, `frama-c-gui` (in supported systems);
-- `ivette`, Frama-C's new Electron-based GUI.
+- the graphical interface, `frama-c-gui`.
 
-Note: Ivette's dependencies are _not_ included in the opam package,
-but downloaded from `npm` when the user runs `ivette` for the first time.
+Note: GUI's dependencies are _not_ included in the opam package,
+but downloaded from `npm` when the user runs `frama-c-gui` for the first time.
 
 `frama-c` has some non-OCaml dependencies, such as GMP. opam includes
 a mechanism (`depext`) to handle such dependencies. It may require
@@ -291,28 +290,25 @@ We highly recommend to rely on it for the installation of Frama-C.
     `conf-` package, the solution will likely involve Homebrew and/or setting
     environment variables, not opam.
 
-4. Install the new Frama-C graphical interface (Ivette).
+4. Install the Frama-C graphical interface.
 
-   **The traditional GTK-based Frama-C GUI no longer works on macOS!**
-
-   You need to use Ivette, the new Frama-C graphical interface.
    Instructions on installing and running it are presented by opam when
-   the `frama-c` package is installed. Follow them to get Ivette running.
+   the `frama-c` package is installed. Follow them to get it running.
 
-## Installing Ivette via the online packages
+## Installing the GUI via the online packages
 
-**Warning:** if you already have an `ivette` script along with `frama-c`, that
-script is used for bootstrapping the installation of Ivette from source through
+**Warning:** if you already have a `frama-c-gui` script along with `frama-c`, that
+script is used for bootstrapping the installation of the GUI from source through
 your internet connection.  The instructions provided here are intended to
 _replace_ the installation procedure from source. Hence, it is highly
-recommended for you to remove the bootstrapping `ivette` script if you want to
-use the binary distribution of Ivette.
+recommended for you to remove the bootstrapping `frama-c-gui` script if you want to
+use the binary distribution of the GUI.
 
 Only stable distributions are available online for now.
-Download the Ivette distribution that corresponds to your version of Frama-C,
+Download the GUI distribution that corresponds to your version of Frama-C,
 following the appropriate link from this page: https://frama-c.com/html/framac-versions.html
 
-### Installing Ivette via the online packages on Linux
+### Installing the GUI via the online packages on Linux
 
 Requirement: libfuse2 must be installed.
 
@@ -320,31 +316,31 @@ Download the binary distribution (for now, only x86-64 and ARM64 are supported).
 Install it wherever you want:
 
 ```sh
-cp frama-c-ivette-linux-<arch>-<version>.AppImage <IVETTE-INSTALL-PATH>/ivette.AppImage
+cp frama-c-gui-linux-<arch>-<version>.AppImage <GUI-INSTALL-PATH>/frama-c-gui.AppImage
 ```
 
-Then add an alias `ivette` that just runs the AppImage:
+Then add an alias `frama-c-gui` that just runs the AppImage:
 
 ```sh
-alias ivette=<ABSOLUTE-IVETTE-INSTALL-PATH>/ivette.AppImage
+alias frama-c-gui=<ABSOLUTE-GUI-INSTALL-PATH>/frama-c-gui.AppImage
 ```
 
-### Installing Ivette via the online packages on macOS
+### Installing the GUI via the online packages on macOS
 
-Download the universal binary distribution of Ivette and install it, typically
-in `/Applications/Ivette.app`. To launch Ivette from the command line, you will
-need your own `ivette` script, like the following one:
+Download the universal binary distribution and install it, typically
+in `/Applications/frama-c-gui.app`. To launch the GUI from the command line, you will
+need your own `frama-c-gui` script, like the following one:
 
 ```sh
 #! /usr/bin/env sh
-exec open -na <IVETTE-INSTALL>/Ivette.app --args\
+exec open -na <GUI-INSTALL>/frama-c-gui.app --args\
   --command <FRAMAC-INSTALL>/frama-c\
   --working $PWD $*
 ```
 
-Simply replace `<IVETTE-INSTALL>` and `<FRAMAC-INSTALL>` in the code above with
-the (absolute) paths to your `Ivette.app` and `frama-c` binaries,
-respectively. Then, make your `ivette` script executable and simply use it like
+Simply replace `<GUI-INSTALL>` and `<FRAMAC-INSTALL>` in the code above with
+the (absolute) paths to your `frama-c-gui.app` and `frama-c` binaries,
+respectively. Then, make your `frama-c-gui` script executable and simply use it like
 the `frama-c` command-line binary!
 
 ## Installing Frama-C via your Linux distribution (Debian/Ubuntu/Fedora)
@@ -509,8 +505,8 @@ Then test your installation by running:
 
 ```shell
 frama-c -eva test/CruiseControl*.c
-# or (if ivette is available)
-ivette -eva test/CruiseControl*.c
+# or (if the GUI is available)
+frama-c-gui -eva test/CruiseControl*.c
 ```
 
 # Available resources
@@ -525,7 +521,6 @@ available:
 - `frama-c-ptests`    testing tool for Frama-c
 - `frama-c-wtests`    testing tool for Frama-c
 - `frama-c-script`    utilities related to e.g. analysis parametrization
-- `ivette`            new graphical interface
 
 ## Shared files: (in `/INSTALL_DIR/share/frama-c` and subdirectories)
 
