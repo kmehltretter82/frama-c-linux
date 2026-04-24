@@ -8,6 +8,12 @@
   Function duplet
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'duplet':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file unit_labels.i, line 5) in 'duplet':
 Let x = Mint_0[pi_0].
 Let a_1 = shift_sint32(a, x).
@@ -26,6 +32,12 @@ Assume {
   Have: m[pj_0] = x_1.
 }
 Prove: P_is_duplet(m, a, x, x_1).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'duplet':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

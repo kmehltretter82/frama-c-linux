@@ -16,6 +16,18 @@ Prove: true.
   Function locally
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'locally':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'locally':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'ko' (file unit_ptrcast.c, line 8):
 Assume { (* Heap *) Type: region(m.base) <= 0. }
 Prove: 0 <= to_sint64(int_of_addr(m)).

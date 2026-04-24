@@ -12,6 +12,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'qed_ok,E0' in 'f':
 Prove: true.
 
@@ -71,8 +77,20 @@ Goal Post-condition 'qed_ok,E11' in 'f':
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function g
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'qed_ok,P3' in 'g':
@@ -90,12 +108,24 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns 'qed_ok' in 'g':
 Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function id
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'id':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'qed_ok,P1' in 'id':
@@ -105,5 +135,11 @@ Prove: true.
 
 Goal Post-condition 'qed_ok,P2' in 'id':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'id':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

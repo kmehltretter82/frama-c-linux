@@ -10,6 +10,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file diff.c, line 13) in 'f':
 Let x = ((4 * i) - (4 * j)) / 4.
 Assume {
@@ -22,6 +28,12 @@ Prove: (j + to_sint32(x)) = i.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'f':
 Effect at line 21
 Prove: true.
@@ -29,6 +41,12 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function g
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file diff.c, line 26) in 'g':
@@ -41,6 +59,12 @@ Assume {
   Probe DIFF = x_1.
 }
 Prove: ((4 * j) + to_sint32(x_1)) = x.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

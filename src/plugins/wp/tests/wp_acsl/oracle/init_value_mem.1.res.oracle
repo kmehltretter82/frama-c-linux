@@ -9,6 +9,12 @@
   Function main
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'P' in 'main':
 Assume {
   Type: IsS1_St(v) /\ IsS1_St(w).
@@ -37,5 +43,11 @@ Assume {
   Init: (w_1.F1_St_b) = 2.
 }
 Prove: EqS1_St(w, w_1).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

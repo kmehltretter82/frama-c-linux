@@ -8,6 +8,12 @@
   Function get
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'get':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file probes.i, line 12) in 'get':
 Let x = -i_2.
 Assume {
@@ -28,6 +34,12 @@ Assume {
   Probe Offset = ((4 * k) + (20 * j) + (80 * i)) / 4.
 }
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'get':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

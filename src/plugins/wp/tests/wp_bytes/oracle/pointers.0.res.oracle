@@ -18,6 +18,18 @@
   Function addr_formal
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'addr_formal':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'addr_formal':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check (file pointers.i, line 26):
 Let a = shift_uint8(global(L_buffer_35), 0).
 Let a_1 = global(P_f_34).
@@ -28,6 +40,18 @@ Prove: addr_of_int(read_uint64(write_uint64(mem_0, a, int_of_addr(a_1)), a)) =
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function addr_glob
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'addr_glob':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'addr_glob':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Check (file pointers.i, line 18):
@@ -42,6 +66,18 @@ Prove: addr_of_int(read_uint64(write_uint64(mem_0, a, int_of_addr(a_1)), a)) =
   Function addr_local_ko
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'addr_local_ko':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'addr_local_ko':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check (file pointers.i, line 48):
 Let a = shift_uint8(global(L_buffer_44), 0).
 Assume { (* Heap *) Type: framed(mem_0) /\ linked(alloc_0) /\ sconst(mem_0).
@@ -53,6 +89,18 @@ Prove: !valid_rw(alloc_0[L_buffer_44 <- 8][L_l_45 <- 0],
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function addr_local_ok
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'addr_local_ok':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'addr_local_ok':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Check 'P' (file pointers.i, line 36):
@@ -72,6 +120,18 @@ Prove: addr_of_int(read_uint64(write_uint64(mem_0, a_1, int_of_addr(a)), a_1)) =
   Function null
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'null':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'null':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check (file pointers.i, line 8):
 Let a = shift_uint8(global(L_buffer_23), 0).
 Assume { (* Heap *) Type: framed(mem_0) /\ sconst(mem_0). }
@@ -80,6 +140,18 @@ Prove: addr_of_int(read_uint64(write_uint64(mem_0, a, 0), a)) = null.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function pointer_param
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'pointer_param':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'pointer_param':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Check (file pointers.i, line 57):

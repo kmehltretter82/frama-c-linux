@@ -12,22 +12,52 @@
   Function extra
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'extra':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'KO' in 'extra':
 Let x = A[2].
 Assume { Type: is_sint32(x). (* Heap *) Type: IsArray_sint32(A). }
 Prove: x = 12.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'extra':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function foreign
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'foreign':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'OK' in 'foreign':
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'foreign':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function job
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'OK' in 'job':
@@ -46,6 +76,12 @@ Assume {
   Have: EqArray_int(20, A, A_1).
 }
 Prove: x = 12.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 ------------------------------------------------------------

@@ -8,6 +8,12 @@
   Function load
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'load':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'F' in 'load':
 Assume { (* Heap *) Type: region(x.base) <= 0. }
 Prove: P_Obs(Mint_0[shiftfield_F1_S_f(x)]).
@@ -27,5 +33,11 @@ Assume {
   Type: region(x.base) <= 0.
 }
 Prove: P_Obs(Mint_0[shift_sint32(shiftfield_F1_S_m(x), i + (5 * j))]).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'load':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

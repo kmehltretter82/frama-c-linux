@@ -10,6 +10,12 @@
   Function swap_aliased
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'swap_aliased':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file swap.i, line 20) in 'swap_aliased':
 Let x = M0002_sint32_0[a].
 Let x_1 = M0002_sint32_0[b].
@@ -32,6 +38,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'swap_aliased':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns (file swap.i, line 22) in 'swap_aliased' (1/2):
 Effect at line 27
 Prove: true.
@@ -47,6 +59,12 @@ Prove: true.
   Function swap_separated
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'swap_separated':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file swap.i, line 5) in 'swap_separated':
 Prove: true.
 
@@ -54,6 +72,12 @@ Prove: true.
 
 Goal Post-condition (file swap.i, line 6) in 'swap_separated':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'swap_separated':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

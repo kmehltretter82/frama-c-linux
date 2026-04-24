@@ -66,6 +66,12 @@ Prove: true.
   Function main
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Pre-condition 'qed_ok' in 'main':
 Prove: true.
 
@@ -290,5 +296,11 @@ logic.i:62: warning from wp:
    Reason: Logic cast to struct (Tint2) from (int [6]) not implemented yet
 Assume { (* Heap *) Type: region(G_tr_36) <= 0. }
 Prove: (w.F3_tab)[1] = 11.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

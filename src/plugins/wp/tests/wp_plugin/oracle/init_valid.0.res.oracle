@@ -10,6 +10,18 @@
   Function validA
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'validA':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'validA':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'OK' (file init_valid.i, line 6):
 Prove: true.
 
@@ -21,6 +33,18 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function validB
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'validB':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'validB':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assertion 'OK' (file init_valid.i, line 13):

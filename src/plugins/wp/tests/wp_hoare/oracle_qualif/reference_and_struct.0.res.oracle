@@ -67,7 +67,7 @@
   Alt-Ergo:        5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  reset                     2        -        2       100%
+  reset                     4        -        4       100%
   call_reset                7        -        7       100%
   call_reset_5              5        1        6       100%
   call_reset_5_tps          5        1        6       100%

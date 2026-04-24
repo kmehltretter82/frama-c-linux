@@ -22,6 +22,6 @@
   Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  swap_separated            4        -        4       100%
-  swap_aliased              3        1        4       100%
+  swap_separated            6        -        6       100%
+  swap_aliased              5        1        6       100%
 ------------------------------------------------------------

@@ -20,6 +20,18 @@
   Function array
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'array':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'array':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 71):
 Prove: true.
 
@@ -104,6 +116,18 @@ Prove: true.
   Function comp
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'comp':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'comp':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 133):
 Prove: true.
 
@@ -186,6 +210,18 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function descr
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'descr':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'descr':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 112):
@@ -370,6 +406,18 @@ Prove: true.
   Function field
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'field':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'field':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 51):
 Prove: true.
 
@@ -440,6 +488,18 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function index
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'index':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'index':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 92):
@@ -520,6 +580,18 @@ Prove: true.
   Function initialize
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'initialize':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'initialize':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 17):
 Prove: true.
 
@@ -573,6 +645,18 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function range
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'range':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'range':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Establishment of Invariant (file assigned_initialized_memvar.i, line 30):

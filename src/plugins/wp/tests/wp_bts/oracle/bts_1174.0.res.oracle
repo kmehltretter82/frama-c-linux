@@ -8,6 +8,18 @@
   Function job
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'qed_ok' (file bts_1174.i, line 11):
 Let r = of_f64(x).
 Assume {

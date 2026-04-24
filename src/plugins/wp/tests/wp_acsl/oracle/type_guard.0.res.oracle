@@ -8,6 +8,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'qed_ok' in 'f':
 Assume { Type: is_uint8(t). }
 Prove: (0 <= t) /\ (t <= 255).
@@ -17,5 +23,11 @@ Prove: (0 <= t) /\ (t <= 255).
 Goal Post-condition 'qed_ko' in 'f':
 Assume { Type: is_uint8(t). }
 Prove: (0 <= t) /\ (t <= 127).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

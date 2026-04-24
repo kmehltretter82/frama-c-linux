@@ -8,6 +8,12 @@
   Function diag
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'diag':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file prenex.i, line 11) in 'diag':
 Assume {
   Type: is_sint32(diag_0) /\ is_sint32(i) /\ is_sint32(j) /\ is_sint32(m) /\
@@ -46,6 +52,12 @@ Prove: (forall i_1 : Z. ((0 <= i_1) -> ((i_1 < n) ->
         (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < m) ->
          (Mint_0[shift_sint32(p, i_1)] < Mint_0[shift_sint32(q, i_2)]))))))) <->
     (diag_0 != 0).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'diag':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

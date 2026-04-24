@@ -12,6 +12,18 @@
   Function complex_struct
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'complex_struct':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'complex_struct':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check 'qed_ok' (file initialized_memvar.i, line 128):
 Prove: true.
 
@@ -108,6 +120,18 @@ Prove: exists i_1,i : Z. (0 < i_1) /\ (i_1 <= 3) /\ (7 <= i) /\ (i <= 9).
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function globals
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'globals':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'globals':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Check 'qed_ok' (file initialized_memvar.i, line 23):
@@ -310,6 +334,18 @@ Prove: i <= 9.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function locals
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'locals':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'locals':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Check 'qed_ok' (file initialized_memvar.i, line 74):

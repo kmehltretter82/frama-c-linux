@@ -8,6 +8,12 @@
   Function mem
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'mem':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file subset.i, line 4) in 'mem':
 Let x = b.base.
 Let x_1 = a.base.
@@ -26,5 +32,11 @@ Assume {
   Else { Have: mem_0 = 0. }
 }
 Prove: included(a, 1, shift_sint32(b, 0), 1 + n) <-> (mem_0 != 0).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'mem':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

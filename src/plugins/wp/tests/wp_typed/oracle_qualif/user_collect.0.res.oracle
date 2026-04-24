@@ -54,9 +54,9 @@
   Alt-Ergo:        9
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  job                       5        -        5       100%
-  job2                      5        -        5       100%
-  job3                      4        1        5       100%
+  job                       7        -        7       100%
+  job2                      7        -        7       100%
+  job3                      6        1        7       100%
   caller                    5        2        7       100%
   caller2                   5        3        8       100%
   caller3                   5        3        8       100%

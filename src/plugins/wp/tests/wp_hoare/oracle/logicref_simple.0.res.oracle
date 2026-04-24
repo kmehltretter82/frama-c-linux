@@ -23,6 +23,12 @@ Function fvpositive: { b }
   Function fsimple
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'fsimple':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file logicref_simple.i, line 14) in 'fsimple':
 Let x = Mint_0[c].
 Assume {
@@ -36,6 +42,12 @@ Prove: x = 0.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'fsimple':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'fsimple':
 Effect at line 15
 Prove: true.
@@ -43,6 +55,12 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function fsimple_array
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'fsimple_array':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file logicref_simple.i, line 19) in 'fsimple_array':
@@ -57,6 +75,12 @@ Prove: x = 0.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'fsimple_array':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'fsimple_array':
 Effect at line 20
 Prove: true.
@@ -64,6 +88,12 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function ftwo_star
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'ftwo_star':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file logicref_simple.i, line 22) in 'ftwo_star':
@@ -79,6 +109,12 @@ Prove: x = 0.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'ftwo_star':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'ftwo_star':
 Effect at line 23
 Prove: true.
@@ -88,8 +124,20 @@ Prove: true.
   Function fvpositive
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'fvpositive':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file logicref_simple.i, line 26) in 'fvpositive':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fvpositive':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

@@ -8,6 +8,18 @@
   Function empty
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'empty':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'empty':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion (file stmtcompiler_test_rela.i, line 9):
 Prove: true.
 

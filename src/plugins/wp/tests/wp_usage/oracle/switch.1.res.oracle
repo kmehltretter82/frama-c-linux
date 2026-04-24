@@ -8,6 +8,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file switch.i, line 12) in 'f':
 Assume {
   Type: is_sint32(f) /\ is_sint32(x).
@@ -25,5 +31,11 @@ Assume {
   }
 }
 Prove: P_P(f).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

@@ -116,6 +116,12 @@ Cluster S1_s {
   
 }
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file struct_array_type.i, line 16) in 'f':
 Let a = t[SynchroId_0].
 Let a_1 = (a.F1_s_b)[0].
@@ -132,5 +138,11 @@ Assume {
   Have: (0 <= SynchroId_0) /\ (SynchroId_0 <= 9).
 }
 Prove: (2 * a_1) <= a_3.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

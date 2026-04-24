@@ -14,12 +14,30 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file refguards.i, line 9) in 'f':
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function g
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file refguards.i, line 17) in 'g':
@@ -34,16 +52,40 @@ Assume {
 Prove: x_1 = x.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function h
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'h':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file refguards.i, line 24) in 'h':
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'h':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function s
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 's':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file refguards.i, line 32) in 's':
@@ -73,6 +115,12 @@ Prove: true.
 
 Goal Post-condition 'KO' in 's':
 Prove: d != c.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 's':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 [wp] refguards.i:10: Warning: 

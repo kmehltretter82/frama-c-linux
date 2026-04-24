@@ -8,6 +8,18 @@
   Function foo
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'foo':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'foo':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'P' (file strat_typing_env.i, line 18):
 Assume { Type: is_sint32(a) /\ is_sint32(b). (* Then *) Have: b != a. }
 Prove: (a % b) = 0.

@@ -8,6 +8,12 @@
   Function job
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'LOCAL' in 'job':
 Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: !valid_rw(Malloc_0[P_formal_27 <- 1][L_local_29 <- 0][P_formal_27
@@ -26,5 +32,11 @@ Goal Post-condition 'GLOBAL' in 'job':
 Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: valid_rw(Malloc_0[P_formal_27 <- 1][L_local_29 <- 0][P_formal_27 <- 0],
          global(G_global_21), 1).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

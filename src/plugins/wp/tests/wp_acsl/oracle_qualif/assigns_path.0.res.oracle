@@ -23,7 +23,7 @@
   Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  job                       9        2       11       100%
+  job                      11        2       13       100%
 ------------------------------------------------------------
 [wp] assigns_path.i:12: Warning: 
   Memory model hypotheses for function 'job':

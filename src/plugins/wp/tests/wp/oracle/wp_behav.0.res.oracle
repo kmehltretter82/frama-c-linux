@@ -20,6 +20,18 @@
   Function assert_needed
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'assert_needed':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'assert_needed':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'ko' (file wp_behav.c, line 59):
 Assume { Type: is_sint32(x). }
 Prove: 0 < x.
@@ -37,6 +49,18 @@ Prove: true.
 Goal Complete behaviors 'neg', 'pos':
 Assume { Type: is_sint32(n). (* Pre-condition *) Have: n != 0. }
 Prove: (0 < n) \/ (n < 0).
+
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'bhv':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'bhv':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -59,6 +83,12 @@ Prove: true.
   Function bts0513
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'bts0513':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'ko1' in 'bts0513':
 Prove: false.
 
@@ -68,8 +98,20 @@ Goal Post-condition 'ko2' in 'bts0513':
 Prove: false.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'bts0513':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function f
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'qed_ok' in 'f':
@@ -80,6 +122,12 @@ Prove: true.
 Goal Post-condition 'qed_ko' in 'f':
 Assume { Type: is_sint32(f) /\ is_sint32(f - 2) /\ is_sint32(f - 1). }
 Prove: 0 < f.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -131,6 +179,18 @@ Goal Disjoint behaviors 'bx', 'by':
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'min':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'min':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function min with behavior bx
 ------------------------------------------------------------
@@ -169,6 +229,18 @@ Prove: false.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function razT
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'razT':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'razT':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Establishment of Invariant 'qed_ok' (file wp_behav.c, line 81):

@@ -8,6 +8,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'ARRAYS' in 'f':
 Prove: true.
 
@@ -26,5 +32,11 @@ Assume {
   Have: valid_rw(Malloc_0, p, 10).
 }
 Prove: valid_rw(Malloc_0, shift_sint32(shiftfield_F1_f(p), 0), 10).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

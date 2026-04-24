@@ -90,8 +90,8 @@
   Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  predicate                29        1       30       100%
-  comparison                9        -        9       100%
-  bitwise                  11        -       11       100%
-  predicate_bitwise         2        -        2       100%
+  predicate                31        1       32       100%
+  comparison               11        -       11       100%
+  bitwise                  13        -       13       100%
+  predicate_bitwise         4        -        4       100%
 ------------------------------------------------------------

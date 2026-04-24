@@ -8,6 +8,12 @@
   Function g
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'P_startof,qed_ok' in 'g':
 Prove: true.
 
@@ -15,5 +21,11 @@ Prove: true.
 
 Goal Post-condition 'P_addr_shift,qed_ok' in 'g':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

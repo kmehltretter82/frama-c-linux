@@ -10,6 +10,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'Pt' in 'f':
 Prove: true.
 
@@ -59,8 +65,20 @@ Goal Post-condition 'Pts1' in 'f':
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function g
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'Pt' in 'g':
@@ -158,5 +176,11 @@ Assume {
       (region(G_x_23) <= 0) /\ linked(Malloc_0).
 }
 Prove: (Malloc_0[G_ts_25] / 5) = (4 * (Malloc_0[G_s_24] / 5)).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

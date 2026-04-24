@@ -10,6 +10,18 @@
   Function double_
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'double_':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'double_':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion (file floats.i, line 14):
 Let a = shift_uint8(global(L_buffer_31), 0).
 Assume { (* Heap *) Type: framed(mem_0) /\ sconst(mem_0). }
@@ -20,6 +32,18 @@ Prove: of_f64(int_to_float64(read_uint64(write_uint64(mem_0, a,
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function float_
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'float_':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'float_':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assertion (file floats.i, line 7):

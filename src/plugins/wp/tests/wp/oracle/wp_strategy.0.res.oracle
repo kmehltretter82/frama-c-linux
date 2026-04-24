@@ -10,6 +10,12 @@
   Function bts0513
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'bts0513':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'qed_ko,ko1' in 'bts0513':
 Prove: false.
 
@@ -19,8 +25,26 @@ Goal Post-condition 'qed_ko,ko2' in 'bts0513':
 Prove: false.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'bts0513':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function bts0513_bis
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'bts0513_bis':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'bts0513_bis':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assertion 'qed_ko,ko1' (file wp_strategy.c, line 27):

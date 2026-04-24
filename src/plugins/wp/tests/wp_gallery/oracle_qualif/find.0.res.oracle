@@ -57,9 +57,9 @@
   Alt-Ergo:       26
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  find                      7        9       16       100%
-  find_ptr                  6       11       17       100%
-  iter_ptr                  2        6        8       100%
+  find                      9        9       18       100%
+  find_ptr                  8       11       19       100%
+  iter_ptr                  4        6       10       100%
 ------------------------------------------------------------
 [wp] Running WP plugin...
 [wp] Warning: Skipped RTE guards: unaligned pointers (\aligned not supported)
@@ -80,7 +80,7 @@
   Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  find                      8       10       18       100%
-  find_ptr                  6       12       18       100%
-  iter_ptr                  2        6        8       100%
+  find                     10       10       20       100%
+  find_ptr                  8       12       20       100%
+  iter_ptr                  4        6       10       100%
 ------------------------------------------------------------

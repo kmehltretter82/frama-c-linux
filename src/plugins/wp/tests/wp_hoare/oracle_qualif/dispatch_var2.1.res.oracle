@@ -57,9 +57,9 @@
   Qed:            42
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  reset                     2        -        2       100%
-  incr                      2        -        2       100%
-  load                      2        -        2       100%
+  reset                     4        -        4       100%
+  incr                      4        -        4       100%
+  load                      4        -        4       100%
   call_global               8        -        8       100%
   call_param               10        -       10       100%
   call_local               10        -       10       100%

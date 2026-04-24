@@ -276,6 +276,18 @@
   Function double_convertible
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'double_convertible':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'double_convertible':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check (file float_const.i, line 20):
 Assume {
   (* Then *)
@@ -314,6 +326,18 @@ Prove: of_f64(to_f64(r)) = r.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function float_convertible
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'float_convertible':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'float_convertible':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Check (file float_const.i, line 11):

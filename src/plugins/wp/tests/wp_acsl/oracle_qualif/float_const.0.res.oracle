@@ -24,6 +24,6 @@
   Alt-Ergo:        8
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  float_convertible         -        4        4       100%
-  double_convertible        -        4        4       100%
+  float_convertible         2        4        6       100%
+  double_convertible        2        4        6       100%
 ------------------------------------------------------------

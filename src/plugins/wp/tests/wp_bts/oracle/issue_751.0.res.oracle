@@ -11,6 +11,18 @@
   Function acquire
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'acquire':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'acquire':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Establishment of Invariant 'RANGE' (file issue_751.i, line 7):
 Prove: true.
 

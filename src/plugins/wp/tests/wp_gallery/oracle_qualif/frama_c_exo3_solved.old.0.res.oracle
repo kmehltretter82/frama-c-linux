@@ -46,7 +46,7 @@
   Alt-Ergo:       13
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  equal_elements           21       13       34       100%
+  equal_elements           23       13       36       100%
 ------------------------------------------------------------
 [wp] frama_c_exo3_solved.old.c:73: Warning: 
   Memory model hypotheses for function 'equal_elements':
@@ -85,5 +85,5 @@
   Alt-Ergo:        3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  equal_elements           34       16       50       100%
+  equal_elements           36       16       52       100%
 ------------------------------------------------------------

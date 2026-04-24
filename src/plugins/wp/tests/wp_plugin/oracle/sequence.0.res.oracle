@@ -236,6 +236,12 @@ Prove: i <= 0.
   Function no_calls
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'no_calls':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'ok,m1' in 'no_calls':
 Prove: true.
 
@@ -312,6 +318,12 @@ Prove: (L_call_nil = nil) \/ (a <= 0).
 
 Goal Post-condition 'ok,bug_why3,n6_ok' in 'no_calls':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'no_calls':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

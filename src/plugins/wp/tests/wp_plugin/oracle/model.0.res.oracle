@@ -95,6 +95,12 @@ Cluster Compound {
   
 }
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file model.i, line 12) in 'f':
 Let x = Mint_0[shift_sint32(p, k)].
 Assume {
@@ -103,6 +109,12 @@ Assume {
   Type: region(p.base) <= 0.
 }
 Prove: P_P(x).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 [wp] Running WP plugin...
@@ -198,6 +210,18 @@ Cluster Compound {
   
 }
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file model.i, line 12) in 'f':
 Let x = Mint_0[shift_sint32(p, k)].
 Assume {
@@ -217,5 +241,11 @@ Assume {
   Type: region(p.base) <= 0.
 }
 Prove: P_P(x).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

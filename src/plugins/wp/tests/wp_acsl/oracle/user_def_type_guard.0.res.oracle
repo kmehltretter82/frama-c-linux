@@ -10,6 +10,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'qed_ok' in 'f':
 Prove: (0 <= L_t) /\ (L_t <= 255).
 
@@ -19,8 +25,20 @@ Goal Post-condition 'qed_ko' in 'f':
 Prove: (0 <= L_t) /\ (L_t <= 127).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function g
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'A' in 'g':
@@ -32,5 +50,11 @@ Assume {
   Type: region(p.base) <= 0.
 }
 Prove: (x = x_1) /\ (x_1 <= 255).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

@@ -27,6 +27,18 @@
   Function ASSIGN_NO_UNFOLD_KO
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'ASSIGN_NO_UNFOLD_KO':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'ASSIGN_NO_UNFOLD_KO':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns (file unfold_assigns.i, line 66) in 'ASSIGN_NO_UNFOLD_KO':
 Effect at line 69
 Assume {
@@ -40,6 +52,18 @@ Prove: false.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function ASSIGN_NO_UNFOLD_OK
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'ASSIGN_NO_UNFOLD_OK':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'ASSIGN_NO_UNFOLD_OK':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assigns (file unfold_assigns.i, line 60) in 'ASSIGN_NO_UNFOLD_OK':

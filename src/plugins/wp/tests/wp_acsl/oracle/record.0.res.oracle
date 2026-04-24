@@ -8,6 +8,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'M1,qed_ok' in 'f':
 Let x = s2_0.F1_T_i.
 Assume {
@@ -77,5 +83,11 @@ Prove: true.
 
 Goal Post-condition 'KP5,qed_ko' in 'f':
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

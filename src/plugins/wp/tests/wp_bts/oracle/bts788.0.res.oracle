@@ -8,6 +8,12 @@
   Function main
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'I0' in 'main':
 Prove: true.
 
@@ -40,5 +46,11 @@ Assume {
   Init: forall i : Z. ((0 < i) -> ((i <= 19) -> (t20_0[i] = 0))).
 }
 Prove: x = 0.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

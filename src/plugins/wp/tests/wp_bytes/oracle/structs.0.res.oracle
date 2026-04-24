@@ -51,6 +51,18 @@ Prove: true.
   Function loader_test
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'loader_test':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'loader_test':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Establishment of Invariant (file structs.c, line 33):
 Prove: true.
 

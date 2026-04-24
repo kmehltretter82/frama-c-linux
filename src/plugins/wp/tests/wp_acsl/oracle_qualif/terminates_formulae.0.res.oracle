@@ -73,10 +73,10 @@
   call_change               1        -        2      50.0%
   call_param_same           2        -        2       100%
   call_param_change         1        -        2      50.0%
-  variant                   2        1        3       100%
-  general_variant           1        1        2       100%
+  variant                   4        1        5       100%
+  general_variant           3        1        4       100%
   general_variant_call      3        1        4       100%
-  no_variant                1        -        2      50.0%
+  no_variant                2        -        3      66.7%
   decreases                 2        1        3       100%
   general_decreases         2        1        3       100%
   no_decreases              2        -        3      66.7%

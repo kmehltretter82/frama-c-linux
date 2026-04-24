@@ -10,15 +10,39 @@
   Function d
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'd':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file float_sign.i, line 5) in 'd':
 Prove: P_is_same_sign_d(d, d).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'd':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file float_sign.i, line 10) in 'f':
 Prove: P_is_same_sign_f(f, f).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
