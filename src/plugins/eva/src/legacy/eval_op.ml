@@ -127,7 +127,7 @@ let reduce_by_valid_loc ~positive access loc typ state =
     then Locations.valid_part access location
     else Locations.invalid_part location
   in
-  let reduced_addr_bytes = Locations.loc_addr_bytes reduced_location in
+  let reduced_addr_bytes = Locations.addr_bytes reduced_location in
   let reduced_value =
     if positive
     then Cvalue.V_Or_Uninitialized.initialized reduced_addr_bytes
@@ -167,7 +167,7 @@ let apply_on_all_locs f loc state =
     let ilevel = Int_set.get_small_cardinal () in
     let limit = max plevel ilevel in
     let apply_f base ival state =
-      f Locations.(make_loc (Addresses.Bits.inject base ival) size) state
+      f (Locations.make_loc (Addresses.Bits.inject base ival) size) state
     in
     let aux base ival state =
       if Ival.cardinal_is_less_than ival limit

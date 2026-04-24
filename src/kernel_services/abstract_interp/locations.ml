@@ -69,18 +69,10 @@ let valid_cardinal_zero_or_one ~for_writing {addr;size} =
   | Abstract_interp.Error_Top | Found_two -> false
 
 
-let loc_bytes_to_loc_bits x = Addresses.Bits.of_bytes x
+let addr_bytes { addr } = Addresses.Bits.to_bytes addr
+let size { size = size } = size
 
-let loc_bits_to_loc_bytes x = Addresses.Bits.to_bytes x
-
-let loc_bits_to_loc_bytes_under x = Addresses.Bits.to_bytes_under x
-
-
-let loc_to_loc_without_size { addr } = Addresses.Bits.to_bytes addr
-let loc_addr_bytes { addr } = Addresses.Bits.to_bytes addr
-let loc_size { size = size } = size
-
-let make_loc addr_bits size = { addr = addr_bits; size = size }
+let make addr_bits size = { addr = addr_bits; size = size }
 
 let is_valid access {addr; size} =
   not (Z_or_top.is_top size) &&
@@ -101,45 +93,44 @@ let size_of_varinfo v =
       "imprecise size for variable %a (%s)" Printer.pp_varinfo v msg;
     Z_or_top.top
 
-let loc_of_varinfo v =
+let of_varinfo v =
   let base = Base.of_varinfo v in
-  make_loc (Addresses.Bits.inject base Ival.zero) (size_of_varinfo v)
+  make (Addresses.Bits.inject base Ival.zero) (size_of_varinfo v)
 
-let loc_of_base v =
-  make_loc (Addresses.Bits.inject v Ival.zero) (Base.bits_sizeof v)
+let of_base v =
+  make (Addresses.Bits.inject v Ival.zero) (Base.bits_sizeof v)
 
-let loc_of_typoffset b typ offset =
+let of_type_offset b typ offset =
   try
     let offs, size = Cil.bitsOffset typ offset in
     let size = Z_or_top.of_int size in
-    make_loc (Addresses.Bits.inject b (Ival.of_int offs)) size
+    make (Addresses.Bits.inject b (Ival.of_int offs)) size
   with Cil.SizeOfError _ as _e ->
-    make_loc (Addresses.Bits.inject b Ival.top) Z_or_top.top
+    make (Addresses.Bits.inject b Ival.top) Z_or_top.top
 
-let loc_top = make_loc Addresses.Bits.top Z_or_top.top
-let loc_bottom = make_loc Addresses.Bits.bottom Z_or_top.top
-let is_bottom_loc l = Addresses.Bits.(equal l.addr bottom)
+let top = make Addresses.Bits.top Z_or_top.top
+let bottom = make Addresses.Bits.bottom Z_or_top.top
+let is_bottom l = Addresses.Bits.(equal l.addr bottom)
 
 let cardinal_zero_or_one { addr ; size = size } =
   Addresses.Bits.cardinal_zero_or_one addr && not (Z_or_top.is_top size)
 
-let loc_equal { addr = addr1 ; size = size1 } { addr = addr2 ; size = size2 } =
+let equal_loc { addr = addr1 ; size = size1 } { addr = addr2 ; size = size2 } =
   Z_or_top.equal size1 size2 &&
   Addresses.Bits.equal addr1 addr2
 
-let loc_hash { addr ; size } =
+let hash_loc { addr ; size } =
   Z_or_top.hash size + 317 * Addresses.Bits.hash addr
 
-let loc_compare { addr = addr1 ; size = size1 } { addr = addr2 ; size = size2 } =
+let compare_loc { addr = addr1 ; size = size1 } { addr = addr2 ; size = size2 } =
   let c1 = Z_or_top.compare size1 size2 in
   if c1 <> 0 then c1
   else Addresses.Bits.compare addr1 addr2
 
-let pretty fmt { addr ; size = size } =
+let pretty_loc fmt { addr ; size = size } =
   Format.fprintf fmt "%a (size:%a)"
     Addresses.Bits.pretty addr
     Z_or_top.pretty size
-let pretty_loc = pretty
 
 let pretty_english ~prefix fmt { addr = m ; size = size } =
   match m with
@@ -227,7 +218,7 @@ let valid_part access ?(bitfield=true) {addr ; size } =
     | Addresses.Bits.Map _ ->
       Addresses.Bits.(fold_topset_ok compute_addr addr bottom)
   in
-  make_loc addr_bits size
+  make addr_bits size
 
 let enumerate_bits_under_over under_over {addr; size} =
   let compute_offset base offs acc =
@@ -248,7 +239,7 @@ let enumerate_bits_under loc =
   | _ -> enumerate_bits_under_over interval_from_ival_under loc
 
 
-let zone_of_varinfo var = enumerate_bits (loc_of_varinfo var)
+let zone_of_varinfo var = enumerate_bits (of_varinfo var)
 
 (** [invalid_part l] is an over-approximation of the invalid part
     of the location [l] *)
@@ -277,12 +268,29 @@ module Datatype_Input = struct
       Addresses.Bits.reprs
   let name = "Locations"
   let mem_project = Datatype.never_any_project
-  let equal = loc_equal
-  let compare = loc_compare
-  let hash = loc_hash
+  let equal = equal_loc
+  let compare = compare_loc
+  let hash = hash_loc
   let pretty = pretty_loc
 end
 
 include (Datatype.Make (Datatype_Input) : Datatype.S with type t := t)
 
+(* Deprecated alias *)
+
 type location = t
+
+let loc_top = top
+let loc_bottom = bottom
+let is_bottom_loc = is_bottom
+let make_loc = make
+let loc_size = size
+let loc_equal = equal
+let loc_of_varinfo = of_varinfo
+let loc_of_base = of_base
+let loc_of_typoffset = of_type_offset
+
+let loc_bytes_to_loc_bits x = Addresses.Bits.of_bytes x
+let loc_bits_to_loc_bytes x = Addresses.Bits.to_bytes x
+let loc_bits_to_loc_bytes_under x = Addresses.Bits.to_bytes_under x
+let loc_to_loc_without_size { addr } = Addresses.Bits.to_bytes addr

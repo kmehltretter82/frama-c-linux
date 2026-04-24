@@ -23,20 +23,18 @@ type t = private {
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 include Datatype.S with type t := t
 
-val loc_top : t
-val loc_bottom : t
-val is_bottom_loc: t -> bool
+val top : t
+val bottom : t
+val is_bottom: t -> bool
 
-val make_loc : Addresses.Bits.t -> Z_or_top.t -> t
+val make: Addresses.Bits.t -> Z_or_top.t -> t
 
-val loc_equal : t -> t -> bool
-
-(** [loc_addr_bytes l] returns the address set corresponding to the given
+(** [addr_bytes l] returns the address set corresponding to the given
     location, i.e. the location without the size information.
     @before Frama-C+dev was named loc_to_loc_without_size *)
-val loc_addr_bytes : t -> Addresses.Bytes.t
+val addr_bytes : t -> Addresses.Bytes.t
 
-val loc_size : t -> Z_or_top.t
+val size : t -> Z_or_top.t
 
 (** Kind of memory access. *)
 type access = Read | Write | Object_pointer | Any_pointer
@@ -93,9 +91,9 @@ val enumerate_valid_bits_under : access -> t -> Memory_zone.t
 val zone_of_varinfo : varinfo -> Memory_zone.t
 (** @since Carbon-20101201 *)
 
-val loc_of_varinfo : varinfo -> t
-val loc_of_base : Base.t -> t
-val loc_of_typoffset : Base.t -> typ -> offset -> t
+val of_varinfo : varinfo -> t
+val of_base : Base.t -> t
+val of_type_offset : Base.t -> typ -> offset -> t
 
 (** {2 Deprecated} *)
 
@@ -116,8 +114,8 @@ module Zone = Memory_zone
 [@@migrate { repl = Memory_zone }]
 
 val loc_to_loc_without_size : t -> Addresses.Bytes.t
-[@@deprecated "Use loc_addr_bytes instead"]
-[@@migrate { repl = Rel.loc_addr_bytes }]
+[@@deprecated "Use addr_bytes instead"]
+[@@migrate { repl = Rel.addr_bytes }]
 
 val loc_bytes_to_loc_bits : Addresses.Bytes.t -> Addresses.Bits.t
 [@@deprecated "Use Addresses.Bits.of_bytes instead"]
@@ -130,3 +128,39 @@ val loc_bits_to_loc_bytes : Addresses.Bits.t -> Addresses.Bytes.t
 val loc_bits_to_loc_bytes_under : Addresses.Bits.t -> Addresses.Bytes.t
 [@@deprecated "Use Addresses.Bits.to_bytes_under instead"]
 [@@migrate { repl = Addresses.Bits.to_bytes_under }]
+
+val loc_top : t
+[@@deprecated "Use top instead"]
+[@@migrate { repl = Rel.top }]
+
+val loc_bottom : t
+[@@deprecated "Use bottom instead"]
+[@@migrate { repl = Rel.bottom }]
+
+val is_bottom_loc: t -> bool
+[@@deprecated "Use is_bottom instead"]
+[@@migrate { repl = Rel.is_bottom }]
+
+val make_loc : Addresses.Bits.t -> Z_or_top.t -> t
+[@@deprecated "Use make instead"]
+[@@migrate { repl = Rel.make }]
+
+val loc_size : t -> Z_or_top.t
+[@@deprecated "Use size instead"]
+[@@migrate { repl = Rel.size }]
+
+val loc_equal : t -> t -> bool
+[@@deprecated "Use equal instead"]
+[@@migrate { repl = Rel.equal }]
+
+val loc_of_varinfo : varinfo -> t
+[@@deprecated "Use of_varinfo instead"]
+[@@migrate { repl = Rel.of_varinfo }]
+
+val loc_of_base : Base.t -> t
+[@@deprecated "Use of_base instead"]
+[@@migrate { repl = Rel.of_base }]
+
+val loc_of_typoffset : Base.t -> typ -> offset -> t
+[@@deprecated "Use of_type_offset instead"]
+[@@migrate { repl = Rel.of_type_offset }]
