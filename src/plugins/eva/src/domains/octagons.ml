@@ -1111,8 +1111,6 @@ end
 (*                               Octagon states                               *)
 (* -------------------------------------------------------------------------- *)
 
-module Zone = Memory_zone
-
 module State = struct
 
   type state =
@@ -1136,13 +1134,13 @@ module State = struct
             [| Octagons.packed_descr;
                Intervals.packed_descr;
                Relations.packed_descr;
-               Zone.packed_descr;
+               Memory_zone.packed_descr;
                Deps.packed_descr |]
         let reprs =
           [ { octagons = Octagons.top;
               intervals = Intervals.empty;
               relations = Relations.empty;
-              modified = Zone.bottom;
+              modified = Memory_zone.bottom;
               deps = Deps.empty; } ]
 
         let compare s1 s2 =
@@ -1151,7 +1149,7 @@ module State = struct
           in
           Octagons.compare s1.octagons s2.octagons <?>
           lazy (Intervals.compare s1.intervals s2.intervals) <?>
-          lazy (Zone.compare s1.modified s2.modified) <?>
+          lazy (Memory_zone.compare s1.modified s2.modified) <?>
           lazy (Deps.compare s1.deps s2.deps)
 
         let equal = Datatype.from_compare
@@ -1159,7 +1157,7 @@ module State = struct
         let hash t =
           Hashtbl.hash (Octagons.hash t.octagons,
                         Intervals.hash t.intervals,
-                        Zone.hash t.modified,
+                        Memory_zone.hash t.modified,
                         Deps.hash t.deps)
 
         let pretty fmt { octagons } =
@@ -1299,20 +1297,20 @@ module State = struct
     { octagons = Octagons.top;
       intervals = Intervals.top;
       relations = Relations.empty;
-      modified = Zone.top;
+      modified = Memory_zone.top;
       deps = Deps.empty }
 
   let empty () =
     { octagons = Octagons.top;
       intervals = Intervals.top;
       relations = Relations.empty;
-      modified = Zone.bottom;
+      modified = Memory_zone.bottom;
       deps = Deps.empty }
 
   let is_included t1 t2 =
     Octagons.is_included t1.octagons t2.octagons
     && Intervals.is_included t1.intervals t2.intervals
-    && Zone.is_included t1.modified t2.modified
+    && Memory_zone.is_included t1.modified t2.modified
     && Deps.is_included t1.deps t2.deps
 
   let join t1 t2 =
@@ -1344,7 +1342,7 @@ module State = struct
     let state =
       { octagons; relations;
         intervals = Intervals.join t1.intervals t2.intervals;
-        modified = Zone.join t1.modified t2.modified;
+        modified = Memory_zone.join t1.modified t2.modified;
         deps = Deps.join t1.deps t2.deps;
       }
     in
@@ -1383,7 +1381,7 @@ module State = struct
     let state =
       { octagons; relations;
         intervals = Intervals.widen t1.intervals t2.intervals;
-        modified = Zone.join t1.modified t2.modified;
+        modified = Memory_zone.join t1.modified t2.modified;
         deps = Deps.join t1.deps t2.deps }
     in
     check "widen" state
@@ -1392,7 +1390,7 @@ module State = struct
     Octagons.narrow t1.octagons t2.octagons >>- fun octagons ->
     Intervals.narrow t1.intervals t2.intervals >>- fun intervals ->
     let relations = Relations.union t1.relations t2.relations in
-    let modified = Zone.narrow t1.modified t2.modified in
+    let modified = Memory_zone.narrow t1.modified t2.modified in
     let deps = Deps.narrow t1.deps t2.deps in
     `Value { octagons; intervals; relations; modified; deps }
 
