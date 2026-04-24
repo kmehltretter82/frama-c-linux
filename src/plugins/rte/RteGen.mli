@@ -49,3 +49,15 @@ end
 
 (** Same result as having [-rte] on the command line *)
 val compute : unit -> unit
+
+module Options : sig
+
+  module DoShift : Parameter_sig.Bool
+  module DoDivMod : Parameter_sig.Bool
+  module DoFloatToInt : Parameter_sig.Bool
+  module DoInitialized : Parameter_sig.Kernel_function_set
+  module DoMemAccess : Parameter_sig.Bool
+  module DoPointerCall : Parameter_sig.Bool
+  module Trivial : Parameter_sig.Bool
+
+end

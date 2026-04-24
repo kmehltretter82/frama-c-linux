@@ -42,6 +42,7 @@ module Dkey: sig
   val prepare: category
   val logic_normalizer: category
   val bound_variables: category
+  val rte: category
   val inductive: category
   val interval: category
   val mtracking: category

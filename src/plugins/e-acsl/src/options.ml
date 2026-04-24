@@ -221,6 +221,7 @@ module Dkey = struct
   let prepare = register_category "preparation"
   let logic_normalizer = register_category "analysis:logic_normalizer"
   let bound_variables = register_category "analysis:bound_variables"
+  let rte = register_category "analysis:rte"
   let inductive =
     let help = "extraction of an executable form from \
                 (certain forms of) inductive predicate definitions" in

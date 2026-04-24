@@ -33,6 +33,28 @@ let translate_rte_exp_ref
   ref (fun ?filter:_ _kf _env _e ->
       Extlib.mk_labeled_fun "translate_rte_exp_ref")
 
+module Translate_predicates = struct
+  let rte_guards_to_exp_old_ref
+    : (loc:location ->
+       kf:kernel_function ->
+       term ->
+       Env.t ->
+       Env.t) ref
+    = ref (fun ~loc:_ ~kf:_ _data _env ->
+        Extlib.mk_labeled_fun
+          "Translate_terms.Translate_predicates.rte_guards_to_exp_old_ref")
+
+  let rte_guards_to_exp_il_ref : (term -> IL.rte list M.t) ref
+    = ref (fun _g ->
+        Extlib.mk_labeled_fun
+          "Translate_terms.Translate_predicates.rte_guards_to_exp_il_ref")
+
+  let rte_guards_to_exp_old ~loc ~kf p env =
+    !rte_guards_to_exp_old_ref ~loc ~kf p env
+
+  let rte_guards_to_exp_il p = !rte_guards_to_exp_il_ref p
+end
+
 (* ************************************************************************** *)
 (* Transforming terms into C expressions (if any) *)
 (* ************************************************************************** *)
@@ -170,8 +192,7 @@ and thost_to_host_il host =
      | Var v -> M.return @@ IL.Lhost.of_varinfo ~name:"result" v
      | _ -> assert false)
   | TMem t ->
-    let* e = to_exp_il t in
-    M.return (IL.Mem e)
+    let+ e = to_exp_il t in IL.Mem e
 
 and toffset_to_offset kf env = function
   | TNoOffset -> NoOffset, env
@@ -191,14 +212,12 @@ and toffset_to_offset_il = function
     M.map (fun offset -> IL.Field(f, offset)) offset
   | TIndex(t, offset) ->
     let* e = to_exp_il t in
-    let* offset = toffset_to_offset_il offset in
-    M.return @@ IL.Index (e, offset)
+    let+ offset = toffset_to_offset_il offset in IL.Index (e, offset)
   | TModel _ as offset -> M.not_covered Printer.pp_term_offset offset
 
 and tlval_to_lval_il (host, offset) =
   let* host_res = thost_to_host_il host in
-  let* offset_res = toffset_to_offset_il offset in
-  M.return (host_res, offset_res)
+  let+ offset_res = toffset_to_offset_il offset in (host_res, offset_res)
 
 and tlval_to_lval kf env (host, offset) =
   let host, env, name = thost_to_host kf env host in
@@ -323,13 +342,12 @@ and context_insensitive_term_to_exp_il ?inplace t =
   | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
     let* logic_env = M.read_logic_env in
     let* e1 = to_exp_il t1 in
-    let* e2 = to_exp_il t2 in
+    let+ e2 = to_exp_il t2 in
     let ity = Typing.get_number_ty ~logic_env t in
     let ty = Typing.get_typ ~logic_env t in
     if not (Gmp_types.Z.is_t ty) && not (Gmp_types.Q.is_t ty) then
       assert (Logic_utils.is_integral_type t.term_type);
-    M.return
-      (Interlang.Exp.binop ~origin:t (Interlang_gen.of_binop bop) ity e1 e2)
+    Interlang.Exp.binop ~origin:t (Interlang_gen.of_binop bop) ity e1 e2
   | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne) as bop, t1, t2) ->
     let* logic_env = M.read_logic_env in
     let ity =
@@ -338,71 +356,24 @@ and context_insensitive_term_to_exp_il ?inplace t =
         (Typing.get_effective_ty ~logic_env t2)
     in
     let* e1 = to_exp_il t1 in
-    let* e2 = to_exp_il t2 in
-    M.return
-      (Interlang.Exp.binop ~origin:t (Interlang_gen.of_binop bop) ity e1 e2)
+    let+ e2 = to_exp_il t2 in
+    Interlang.Exp.binop ~origin:t (Interlang_gen.of_binop bop) ity e1 e2
   | TBinOp (Div | Mod as binop, t1, t2) ->
     let* logic_env = M.read_logic_env in
     let ty = Typing.get_typ ~logic_env t in
     let* e1 = to_exp_il t1 in
-    let* e2 = to_exp_il t2 in
+    let+ e2 = to_exp_il t2 in
     let ity = Typing.get_number_ty ~logic_env t in
     if not (Gmp_types.Z.is_t ty || Gmp_types.Q.is_t ty) then
       assert (Logic_utils.is_integral_type t.term_type);
-    M.return
-      (Interlang.Exp.binop ~origin:t (Interlang_gen.of_binop binop) ity e1 e2)
+    Interlang.Exp.binop ~origin:t (Interlang_gen.of_binop binop) ity e1 e2
   | _ -> M.not_covered Printer.pp_term t
-
-and denominator_zero_guard ~loc ~ctx ~adata ~kf ~env ~name ?root denom =
-  (* Creating a second assertion context that will hold the data
-     contributing to the guard of the denominator. The context will be
-     merged to [adata] afterward so that the calling assertion context holds
-     all data. *)
-  let logic_env = Env.Logic_env.get env in
-  let () = Assert.push_pending_register_data () in
-  let adata2, env = Assert.empty ~loc kf env in
-  let e, adata2, env = to_exp ~adata:adata2 kf env denom in
-  (* TODO: preventing division by zero should not be required anymore.
-     RTE should do this automatically. *)
-  (* [TODO] can now do better since the type system got some info about
-     possible values of [denom] *)
-  (* guarding divisions and modulos *)
-  let zero = Logic_const.tinteger 0 in
-  Typing.preprocess_term ~use_gmp_opt:true ~ctx ~logic_env zero;
-  let guard, env =
-    let zero_exp, _, env = to_exp ~adata:Assert.no_data kf env zero in
-    Translate_utils.comparison_to_exp
-      ~loc
-      kf
-      env
-      ctx
-      ~name:(name ^ "_guard")
-      Ne
-      e
-      zero_exp
-      root
-  in
-  let p = Logic_const.prel ~loc (Rneq, Misc.Id_term.deep_copy denom, zero) in
-  let cond, env =
-    Assert.runtime_check_with_msg
-      ~adata:adata2
-      ~loc
-      ~name:"denominator not zero"
-      (Format.asprintf "%a@?" Printer.pp_predicate p)
-      ~pred_kind:Assert
-      RTE
-      kf
-      env
-      guard
-  in
-  let env = Assert.do_pending_register_data env in
-  let adata, env = Assert.merge_right ~loc env adata2 adata in
-  Env.add_assert kf cond p;
-  e, cond, adata, env
 
 and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
   let t = Logic_normalizer.get_term t in
   let loc = t.term_loc in
+  (* translation of all guards associated to [t] in [Guards.table] *)
+  let env = Translate_predicates.rte_guards_to_exp_old ~loc ~kf t env in
   let open Current_loc.Operators in
   let<> UpdatedCurrentLoc = loc in
   let logic_env = Env.Logic_env.get env in
@@ -506,17 +477,12 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let e1, adata, env = to_exp ~adata kf env t1 in
     let t2_to_exp adata env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
-      let ctx = Typing.get_number_ty ~logic_env t in
-      let e2, cond, adata, env =
-        denominator_zero_guard
-          ~loc ~ctx ~adata ~kf ~env
-          ~name:(Misc.name_of_binop bop) ~root:t t2
-      in
+      let e2, adata, env = t2_to_exp adata env in
       let mk_stmts _v e =
         assert (Gmp_types.Z.is_t ty);
         let name = Gmp.Z.name_arith_bop bop in
         let instr = Smart_stmt.rtl_call ~loc ~prefix:"" name [ e; e1; e2 ] in
-        [ cond; instr ]
+        [ instr ]
       in
       let name = Misc.name_of_binop bop in
       let e, env = Gmp.Z.new_var ~loc ~name env kf (Some t) mk_stmts in
@@ -992,10 +958,15 @@ and to_exp_il ?inplace t =
     then M.not_covered ~pre:"with RTE" Printer.pp_term t
     else M.return ()
   in
+  (* translates RTE guards of the current term *)
+  let* rte_guards = Translate_predicates.rte_guards_to_exp_il t in
   let* e = context_insensitive_term_to_exp_il ?inplace t in
-  Options.debug ~dkey ~level:4 "to_exp_il {%a} %a = %a"
+  let e = IL.Exp.attach_rtes rte_guards e in
+  Options.debug ~dkey ~level:4 "to_exp_il {%a} %a = %a (%a)"
     Profile.pretty (Env.Logic_env.get_profile env)
-    Printer.pp_term t Interlang.Pretty.pp_exp e;
+    Printer.pp_term t
+    Interlang.Pretty.pp_exp e
+    Interlang.Pretty.pp_rtes e.rtes;
   M.return e
 
 (* Convert an ACSL term into a corresponding C expression (if any) in the given

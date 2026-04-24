@@ -34,7 +34,12 @@ end
 
 type varinfo = Varinfo.t
 
-type exp = {enode : exp_node; origin : term option}
+type exp =
+  {
+    enode : exp_node;
+    rtes : rte list;
+    origin : term option
+  }
 
 and exp_node =
   | True
@@ -56,6 +61,8 @@ and offset =
   | NoOffset
   | Field of fieldinfo * offset
   | Index of exp * offset
+
+and rte = {rnode : exp_node; rorigin : predicate}
 
 let of_bool = function
   | true -> True
@@ -106,6 +113,11 @@ module Pretty = struct
       fprintf fmt "@[%a@]@ %a@ @[%a@]" pp_exp op1 pp_binop binop pp_exp op2
     | Lval lval -> pp_lval fmt lval
     | SizeOf ty -> fprintf fmt "SizeOf(@[%a])" Printer.pp_typ ty
+
+  let pp_rtes fmt rtes =
+    let pp_rte fmt rte = fprintf fmt "%a" pp_exp_node rte.rnode in
+    Pretty_utils.pp_list ~pre:"[" ~suf:"]" ~sep:";@ " pp_rte fmt rtes
+
 end
 
 
@@ -193,13 +205,17 @@ end
 
 module Exp = struct
 
-  let of_exp_node ?origin enode = {enode; origin}
+  let of_exp_node ?origin ?(rtes=[]) enode = {enode; rtes; origin}
 
   let of_lval ?origin lval = of_exp_node ?origin @@ Lval lval
 
   let of_integer ~origin n = of_exp_node ~origin @@ Integer n
 
   let of_sizeof ~origin ty = of_exp_node ~origin @@ SizeOf ty
+
+  let to_rte p e = {rnode = e.enode; rorigin = p}
+
+  let attach_rtes rtes e = {e with rtes}
 
   let binop ?origin bop ity e1 e2 =
     let org = BinOp {binop = bop; ity; op1 = e1; op2 = e2} in

@@ -696,9 +696,13 @@ let rec type_term
     Memo.memo ~profile
       (fun t ->
          let ty = infer t in
-         match ctx with
-         | None -> { ty; cast = None }
-         | Some ctx -> coerce ~arith_operand ~ctx ty)
+         let ctx =
+           match ctx with
+           | None -> { ty; cast = None }
+           | Some ctx -> coerce ~arith_operand ~ctx ty
+         in
+         Rte_analysis.iter_on_guards t (type_predicate ~profile);
+         ctx)
       t
   with
   | Result.Ok result ->

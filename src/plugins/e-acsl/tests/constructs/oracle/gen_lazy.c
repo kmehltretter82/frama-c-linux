@@ -39,14 +39,17 @@ int main(void)
     if (x != 0) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
         {.values = (void *)0};
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
-      __gen_e_acsl_assert_data_3.pred_txt = "0 != 0";
-      __gen_e_acsl_assert_data_3.file = "lazy.i";
-      __gen_e_acsl_assert_data_3.fct = "main";
-      __gen_e_acsl_assert_data_3.line = 10;
-      __gen_e_acsl_assert_data_3.name = "division_by_zero";
-      __e_acsl_assert(0,& __gen_e_acsl_assert_data_3);
+      /*@ assert E_ACSL: "division by zero": \false; */
+      {
+        __gen_e_acsl_assert_data_3.blocking = 1;
+        __gen_e_acsl_assert_data_3.kind = "RTE";
+        __gen_e_acsl_assert_data_3.pred_txt = "\\false";
+        __gen_e_acsl_assert_data_3.file = "lazy.i";
+        __gen_e_acsl_assert_data_3.fct = "main";
+        __gen_e_acsl_assert_data_3.line = 10;
+        __gen_e_acsl_assert_data_3.name = "division by zero";
+        __e_acsl_assert(0,& __gen_e_acsl_assert_data_3);
+      }
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"y",0,y);
       __gen_e_acsl_and_2 = y == 1 / 0;
     }
@@ -90,14 +93,17 @@ int main(void)
     else {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
         {.values = (void *)0};
-      __gen_e_acsl_assert_data_6.blocking = 1;
-      __gen_e_acsl_assert_data_6.kind = "RTE";
-      __gen_e_acsl_assert_data_6.pred_txt = "0 != 0";
-      __gen_e_acsl_assert_data_6.file = "lazy.i";
-      __gen_e_acsl_assert_data_6.fct = "main";
-      __gen_e_acsl_assert_data_6.line = 12;
-      __gen_e_acsl_assert_data_6.name = "division_by_zero";
-      __e_acsl_assert(0,& __gen_e_acsl_assert_data_6);
+      /*@ assert E_ACSL: "division by zero": \false; */
+      {
+        __gen_e_acsl_assert_data_6.blocking = 1;
+        __gen_e_acsl_assert_data_6.kind = "RTE";
+        __gen_e_acsl_assert_data_6.pred_txt = "\\false";
+        __gen_e_acsl_assert_data_6.file = "lazy.i";
+        __gen_e_acsl_assert_data_6.fct = "main";
+        __gen_e_acsl_assert_data_6.line = 12;
+        __gen_e_acsl_assert_data_6.name = "division by zero";
+        __e_acsl_assert(0,& __gen_e_acsl_assert_data_6);
+      }
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"y",0,y);
       __gen_e_acsl_or_2 = y == 1 / 0;
     }
@@ -140,14 +146,17 @@ int main(void)
     else {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
         {.values = (void *)0};
-      __gen_e_acsl_assert_data_9.blocking = 1;
-      __gen_e_acsl_assert_data_9.kind = "RTE";
-      __gen_e_acsl_assert_data_9.pred_txt = "0 != 0";
-      __gen_e_acsl_assert_data_9.file = "lazy.i";
-      __gen_e_acsl_assert_data_9.fct = "main";
-      __gen_e_acsl_assert_data_9.line = 14;
-      __gen_e_acsl_assert_data_9.name = "division_by_zero";
-      __e_acsl_assert(0,& __gen_e_acsl_assert_data_9);
+      /*@ assert E_ACSL: "division by zero": \false; */
+      {
+        __gen_e_acsl_assert_data_9.blocking = 1;
+        __gen_e_acsl_assert_data_9.kind = "RTE";
+        __gen_e_acsl_assert_data_9.pred_txt = "\\false";
+        __gen_e_acsl_assert_data_9.file = "lazy.i";
+        __gen_e_acsl_assert_data_9.fct = "main";
+        __gen_e_acsl_assert_data_9.line = 14;
+        __gen_e_acsl_assert_data_9.name = "division by zero";
+        __e_acsl_assert(0,& __gen_e_acsl_assert_data_9);
+      }
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,"y",0,y);
       __gen_e_acsl_implies_2 = y == 1 / 0;
     }

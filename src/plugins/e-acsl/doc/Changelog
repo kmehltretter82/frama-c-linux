@@ -40,6 +40,8 @@ Plugin E-ACSL <next-release>
 -  E-ACSL     [2026-01-18] Improvements around inductive predicate extraction,
                            amongst others simple algebraic inversions
 -* E-ACSL     [2026-03-16] Fix memory tracking for user-defined predicates
+-  E-ACSL     [2026-03-17] Handle "division by zero" RTE in annotations through
+                           a new implementation.
 -* E-ACSL     [2026-03-05] Fix violations of physical term uniqueness. The
                            -check flag now enables a uniqueness verification.
 -* E-ACSL     [2026-02-03] fix typing error occurring on global structs when
@@ -166,8 +168,8 @@ Plugin E-ACSL 26.0 (Iron)
 Plugin E-ACSL 25.0 (Manganese)
 ###############################################################################
 
--* E-ACSL     2022-23-05] Fix crash for quantifications over enum types
-              frama-c/e-acsl#199).
+-* E-ACSL     [2022-23-05] Fix crash for quantifications over enum types
+              (frama-c/e-acsl#199).
 -* E-ACSL     [2022-06-09] Fix wrong cast of pointer to integer
               (frama-c/frama-c#1119).
 -  E-ACSL     [2022-03-04] Improve translation of `\at()` terms and
