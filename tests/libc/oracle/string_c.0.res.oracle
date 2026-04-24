@@ -50,10 +50,6 @@
   function memcpy: precondition 'valid_src' got status invalid.
 [eva:progress] string_c.c:19: 
   function memcpy: no state left, precondition 'separation' got status valid.
-[eva:progress] FRAMAC_SHARE/libc/string.h:134: 
-  function memcpy: no state left, postcondition 'copied_contents' got status valid.
-[eva:progress] FRAMAC_SHARE/libc/string.h:135: 
-  function memcpy: no state left, postcondition 'result_ptr' got status valid.
 [eva:progress] Recording results for memcpy
 [eva:progress] Done for function memcpy
 [eva:progress] 

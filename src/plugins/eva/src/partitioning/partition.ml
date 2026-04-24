@@ -419,8 +419,7 @@ struct
   let initial (p : 'a list) : t =
     List.map (fun state -> Key.empty, state) p
 
-  let to_list (f : t) : state list =
-    List.map snd f
+  let to_list (f : t) : (key * state) list = f
 
   let of_partition (p : state partition) : t =
     KMap.bindings p

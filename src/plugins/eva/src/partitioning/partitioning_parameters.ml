@@ -174,29 +174,40 @@ struct
     Eva_automata.G.iter_vertex add_annotations automaton.graph;
     table
 
+  let split_return_action =
+    match Split_return.kf_strategy kf, Eva_utils.find_return_var kf with
+    | SplitAuto, _ ->
+      assert false (* SplitAuto already transformed into SplitEqList. *)
+    | FullSplit, _ ->
+      Partition.Ration (Partition.new_rationing ~limit:max_int ~merge:false)
+    | SplitEqList i, Some return_vi
+      when Ast_types.is_integral_or_pointer return_vi.vtype ->
+      let return_exp = Eva_ast.Build.var_exp return_vi in
+      Partition.Restrict (return_exp, i)
+    | (NoSplit | SplitEqList _), _ ->
+      Partition.Ration (Partition.new_rationing ~limit:0 ~merge:false)
+
   let flow_actions vertex =
     let flow_actions =
       VertexTable.find_default ~default:[] flow_annotations_table vertex
     in
-    let rationing_parameters =
+    let store_results, rationing_action =
       match Eva_automata.Vertex.stmt vertex with
-      | None -> None
-      | Some stmt ->
+      | None when vertex == automaton.return_point ->
+        true, split_return_action
+      | Some stmt when not (Cil.is_skip stmt.skind && flow_actions <> []) ->
         (* A skip statement is created on each split annotation: do not ration
            states on them to avoid meddling in successive split directives. *)
-        if Cil.is_skip stmt.skind && flow_actions <> []
-        then None
-        else Some (slevel stmt, merge stmt)
-    in
-    let rationing =
-      match rationing_parameters with
-      | None -> Partition.new_rationing ~limit:max_int ~merge:false
-      | Some (limit, merge) -> Partition.new_rationing ~limit ~merge
+        let limit = slevel stmt and merge = merge stmt in
+        true, Ration (Partition.new_rationing ~limit ~merge)
+      | _ ->
+        (* No rationing. *)
+        false, Ration (Partition.new_rationing ~limit:max_int ~merge:false)
     in
     let flow_actions =
-      (Partition.Ration rationing) :: Update_dynamic_splits :: flow_actions
+      rationing_action :: Update_dynamic_splits :: flow_actions
     in
-    flow_actions, rationing_parameters <> None
+    flow_actions, store_results
 
   let call_return_policy =
     Partition.{

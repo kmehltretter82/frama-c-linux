@@ -25,8 +25,6 @@
 [eva:alarm] annot.i:51: Warning: assertion got status unknown.
 [eva:alarm] annot.i:53: Warning: 
   assertion got status invalid (stopping propagation).
-[eva:progress] annot.i:7: 
-  function main: no state left, postcondition got status valid.
 [eva:progress] Recording results for main
 [eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======

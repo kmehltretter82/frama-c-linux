@@ -15,8 +15,6 @@
   function f: precondition 'ReqTrue' got status valid.
 [eva:alarm] disjoint_status.i:8: Warning: 
   assertion 'A1' got status invalid (stopping propagation).
-[eva:progress] disjoint_status.i:6: 
-  function f: no state left, postcondition 'PostTrue' got status valid.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:alarm] disjoint_status.i:19: Warning: assertion got status unknown.

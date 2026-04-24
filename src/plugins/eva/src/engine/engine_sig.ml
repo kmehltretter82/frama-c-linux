@@ -90,6 +90,8 @@ module type Transfer_stmt = sig
     pos:Position.local ->
     lval option -> lhost -> exp list -> state -> state call_result
 
+  val return : pos:Position.local -> exp option -> state -> state or_bottom
+
   val check_unspecified_sequence:
     pos:Position.t ->
     state ->
@@ -97,7 +99,9 @@ module type Transfer_stmt = sig
     (stmt * lval list * lval list * lval list * stmt ref list) list ->
     unit or_bottom
 
-  val enter_scope: pos:Position.t -> varinfo list -> state -> state
+  val enter_scope: Kernel_function.t -> varinfo list -> state -> state
+
+  val leave_scope: Kernel_function.t -> varinfo list -> state -> state
 end
 
 
@@ -118,13 +122,13 @@ module type Transfer_logic = sig
 
   val check_fct_postconditions_for_behaviors:
     kernel_function -> behavior list -> Alarmset.status ->
-    pre_state:state -> post_states:state list -> result:varinfo option ->
-    state list
+    pre_state:state -> result:varinfo option ->
+    state list -> state list
 
   val check_fct_postconditions:
     kernel_function -> Active_behaviors.t -> termination_kind ->
-    pre_state:state -> post_states:state list -> result:varinfo option ->
-    state list
+    pre_state:state -> result:varinfo option ->
+    state -> state list
 
   val evaluate_assumes_of_behavior: state -> behavior -> Alarmset.status
 

@@ -755,6 +755,24 @@ module Make (Engine: Engine_Subset) = struct
       in
       List.fold_left process bottom functions
 
+
+  (* ------------------------------------------------------------------------ *)
+  (*                            Return statements                             *)
+  (* ------------------------------------------------------------------------ *)
+
+  let return ~pos return_exp state =
+    let kf = Position.Local.kf pos in
+    match return_exp with
+    | None -> `Value state
+    | Some return_exp ->
+      let result_vi = Option.get (Library_functions.get_retres_vi kf) in
+      let return_lval = Eva_ast.Build.var result_vi in
+      let kind = Abstract_domain.Result kf in
+      let state = Domain.enter_scope kind [result_vi] state in
+      let pos = Position.of_local pos in
+      assign ~pos state return_lval return_exp
+
+
   (* ------------------------------------------------------------------------ *)
   (*                            Unspecified Sequence                          *)
   (* ------------------------------------------------------------------------ *)
@@ -825,13 +843,22 @@ module Make (Engine: Engine_Subset) = struct
     with EBottom alarms -> Alarmset.emit ~pos alarms; `Bottom
 
   (* ------------------------------------------------------------------------ *)
-  (*                               Enter Scope                                *)
+  (*                               Scopes                                     *)
   (* ------------------------------------------------------------------------ *)
 
   (* Makes the local variables [variables] enter the scope in [state].
-     Also initializes volatile variable to top. *)
-  let enter_scope ~pos variables state =
-    let kf = Position.kf pos |> Option.get in
+     Also initializes volatile variable to top.
+
+     Note:
+
+     All variables local to a block are introduced in domain states when
+     entering the block. Variables explicitly initialized at declaration time
+     (for which vi.vdefined is true) enter the scope too early, as they should
+     be introduced on the fly when encountering their [Local_init] instruction.
+     However, goto statements can skip their declaration/initialization, so it
+     is safer to always introduce all local variables (without initialize them)
+     when entering a block. *)
+  let enter_scope kf variables state =
     let kind = Abstract_domain.Local kf in
     let state = Domain.enter_scope kind variables state in
     let is_volatile varinfo =
@@ -846,4 +873,7 @@ module Make (Engine: Engine_Subset) = struct
       Domain.initialize_variable lval location ~initialized init_value state
     in
     List.fold_left initialize_volatile state vars
+
+  let leave_scope kf variables state =
+    Domain.leave_scope kf variables state
 end

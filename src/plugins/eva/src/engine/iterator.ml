@@ -127,8 +127,6 @@ module Make_Dataflow
   let get_initial_flow () =
     -1 (* Dummy edge id *), Partitioning.drain initial_tank
 
-  let post_conditions = ref false
-
   (* --- Analysis state --- *)
 
   (* Reference to the current statement processed by the analysis.
@@ -217,7 +215,6 @@ module Make_Dataflow
     : transfer_function =
     fun x -> List.concat_map f2 (f1 x)
 
-
   (* Tries to evaluate \assigns … \from … clauses for assembly code. *)
   let transfer_asm ~pos : transfer_function =
     let asm_contracts = Annotations.code_annot (fst pos) in
@@ -233,30 +230,6 @@ module Make_Dataflow
       let assigns = Ast_info.merge_assigns_from_spec ~warn:false spec in
       lift (Engine.Transfer_specification.treat_statement_assigns ~pos assigns)
 
-  let transfer_assume ~pos (exp : exp) (kind : guard_kind)
-    : transfer_function =
-    let positive = (kind = Then) in
-    lift' (fun s -> Transfer_stmt.assume ~pos s exp positive)
-
-  let transfer_assign ~pos (dest : lval) (exp : exp)
-    : transfer_function =
-    lift' (fun s -> Transfer_stmt.assign ~pos s dest exp)
-
-  (* All variables local to a block are introduced in domain states when
-     entering the block. Variables explicitly initialized at declaration time
-     (for which vi.vdefined is true) enter the scope too early, as they should
-     be introduced on the fly when encountering their [Local_init] instruction.
-     However, goto statements can skip their declaration/initialization, so it
-     is safer to always introduce all local variables (without initialize them)
-     when entering a block. *)
-  let transfer_enter ~pos (block : block) : transfer_function =
-    let vars = block.blocals in
-    if vars = [] then id else lift (Transfer_stmt.enter_scope ~pos vars)
-
-  let transfer_leave ~pos:_ (block : block) : transfer_function =
-    let vars = block.blocals in
-    if vars = [] then id else lift (Domain.leave_scope kf vars)
-
   let transfer_call ~pos (dest : lval option) (callee : lhost)
       (args : exp list) (key, state : key * state) : (key * state) list =
     let result = Transfer_stmt.call ~pos dest callee args state in
@@ -266,66 +239,43 @@ module Make_Dataflow
     (* Recombine callee partitioning keys with caller key *)
     Partitioning.call_return ~caller:key result.kind result.states
 
-  let transfer_return ~pos (return_exp : exp option)
-    : transfer_function =
-    (* Deconstruct return statement *)
-    let return_var = match return_exp with
-      | Some {node = Lval {node = Var v, NoOffset}} -> Some v
-      | None -> None
-      | _ -> assert false (* Cil invariant *)
-    in
-    (* Check postconditions *)
-    let check_postconditions = fun state ->
-      post_conditions := true;
-      if Eva_utils.skip_specifications kf then
-        [state]
-      else
-        Transfer_logic.check_fct_postconditions kf active_behaviors Normal
-          ~pre_state:initial_state ~post_states:[state]
-          ~result:return_var
-    (* Assign the return value *)
-    and assign_retval =
-      match return_exp with
-      | None -> fun state -> [state]
-      | Some return_exp ->
-        let vi_ret = Option.get (Library_functions.get_retres_vi kf) in
-        let return_lval = Eva_ast.Build.var vi_ret in
-        fun state ->
-          let kind = Abstract_domain.Result kf in
-          let state = Domain.enter_scope kind [vi_ret] state in
-          let state' = Transfer_stmt.assign ~pos state return_lval return_exp in
-          Bottom.to_list state'
-    in
-    sequence (lift'' check_postconditions) (lift'' assign_retval)
+  let check_postconditions : state -> state list =
+    if Eva_utils.skip_specifications kf then
+      fun state -> [state]
+    else
+      let result = Library_functions.get_retres_vi kf in
+      Transfer_logic.check_fct_postconditions
+        kf active_behaviors Normal ~pre_state:initial_state ~result
 
   let transfer_transition ~pos (t : transition) : transfer_function =
+    let local stmt = (stmt, callstack) in (* Local position *)
     match t with
     | Skip ->
       id
-    | Return (return_exp,_stmt) ->
-      transfer_return ~pos return_exp
+    | Return (return_exp,stmt) ->
+      sequence
+        (lift' @@ Transfer_stmt.return ~pos:(local stmt) return_exp)
+        (lift'' @@ check_postconditions)
     | Guard (exp,kind,_stmt) ->
-      transfer_assume ~pos exp kind
+      let positive = (kind = Then) in
+      lift' @@ fun s -> Transfer_stmt.assume ~pos s exp positive
     | Init (vi, exp, _stmt) ->
-      let transfer state =
-        Engine.Initialization.initialize_local_variable ~pos vi exp state
-      in
-      lift' transfer
+      lift' @@  Engine.Initialization.initialize_local_variable ~pos vi exp
     | Assign (dest, exp, _stmt) ->
-      transfer_assign ~pos dest exp
+      lift' @@ fun s -> Transfer_stmt.assign ~pos s dest exp
     | Call (dest, callee, args, stmt) ->
-      let pos = (stmt, callstack) in
-      transfer_call ~pos dest callee args
+      transfer_call ~pos:(local stmt) dest callee args
     | Asm (_,_,_,stmt) ->
-      let pos = (stmt, callstack) in
-      transfer_asm ~pos
-    | Enter (block) ->
-      transfer_enter ~pos block
+      transfer_asm ~pos:(local stmt)
+    | Enter (block) | Leave (block) when block.blocals = [] ->
+      id
     | Leave (block) when blocks_share_locals fundec.sbody block ->
       (* The variables from the toplevel block will be removed by the caller *)
       id
+    | Enter (block) ->
+      lift @@ Transfer_stmt.enter_scope kf block.blocals
     | Leave (block) ->
-      transfer_leave ~pos block
+      lift @@ Transfer_stmt.leave_scope kf block.blocals
 
   let transfer_annotations (stmt : stmt) ~(record : bool)
     : state -> state list =
@@ -378,13 +328,8 @@ module Make_Dataflow
 
   (* --- Iteration strategy ---*)
 
-  let process_partitioning_transitions (v1 : vertex) (v2 : vertex)
-      (transition : transition) (flow : flow) : flow =
-    (* Split return *)
-    let flow = match transition with
-      | Return (return_exp, _) -> Partitioning.split_return flow return_exp
-      | _ -> flow
-    in
+  let process_partitioning_transitions
+      (v1 : vertex) (v2 : vertex) (flow : flow) : flow =
     (* Loop transitions *)
     let get_loop v = Option.get (Eva_automata.find_loop automaton v) in
     let enter_loop f v =
@@ -422,7 +367,7 @@ module Make_Dataflow
     let flow =
       Partitioning.transfer (transfer_transition ~pos transition) flow
     in
-    let flow = process_partitioning_transitions v1 v2 transition flow in
+    let flow = process_partitioning_transitions v1 v2 flow in
     if not (Partitioning.is_empty_flow flow) then
       record_fireable e;
     flow
@@ -433,13 +378,17 @@ module Make_Dataflow
 
   let call_statement_callbacks (stmt : stmt) (f : flow) : unit =
     (* TODO: apply on all domains. *)
-    let states = Partitioning.contents f in
+    let states = List.map snd (Partitioning.contents f) in
     let cvalue_states = gather_cvalues states in
     Cvalue_callbacks.apply_statement_hooks callstack stmt cvalue_states
 
   let update_vertex ?(widening : bool = false) (v : vertex)
       (sources : ('branch * flow) list) : bool =
-    let current_stmt = Eva_automata.Vertex.stmt v in
+    let current_stmt =
+      if v == automaton.return_point
+      then Some (Kernel_function.find_return kf)
+      else Eva_automata.Vertex.stmt v
+    in
     Option.iter (fun stmt -> current_ki := Kstmt stmt) current_stmt;
     let current_location = Option.map Cil_datatype.Stmt.loc current_stmt in
     let open Current_loc.Operators in
@@ -581,17 +530,11 @@ module Make_Dataflow
       if Kernel_function.equal englobing_kf kf then (
         Eva_utils.DegenerationPoints.replace s true)
 
-  (* If the postconditions have not been evaluated, mark them as true. *)
-  let mark_postconds_as_true () =
-    ignore (Transfer_logic.check_fct_postconditions kf active_behaviors Normal
-              ~pre_state:initial_state ~post_states:[] ~result:None)
-
   let compute () : (key * state) list =
     if interpreter_mode then
       simulate automaton.entry_point (get_initial_flow ())
     else
       iterate_list automaton.wto;
-    if not !post_conditions then mark_postconds_as_true ();
     let final_store = get_vertex_store automaton.return_point in
     Partitioning.expanded final_store
 

@@ -25,8 +25,6 @@
 [eva:progress] 
   computing for function g <- h <- main.
   Called from bts1194.c:26.
-[eva:progress] bts1194.c:20: 
-  function g: no state left, postcondition got status valid.
 [eva:progress] Recording results for g
 [from] Computing for function g
 [from] Done for function g
