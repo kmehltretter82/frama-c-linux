@@ -15,7 +15,7 @@ open Mt_memory.Types
 (* -------------------------------------------------------------------------- *)
 
 
-type rw = Read | Write of Locations.location
+type rw = Read | Write of Locations.t
         | ReadPos of Position.t | WritePos of Position.t
 
 module RW = struct

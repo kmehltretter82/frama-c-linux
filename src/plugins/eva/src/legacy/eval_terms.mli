@@ -9,7 +9,6 @@
 (** Evaluation of terms and predicates *)
 
 open Cil_types
-open Locations
 open Cvalue
 
 (** Evaluating a predicate. [Unknown] is the Top of the lattice *)
@@ -87,7 +86,7 @@ val eval_term :
 
 val eval_tlval_as_location :
   alarm_mode:alarm_mode ->
-  eval_env -> term -> location
+  eval_env -> term -> Locations.t
 
 val eval_tlval_as_zone :
   alarm_mode:alarm_mode ->

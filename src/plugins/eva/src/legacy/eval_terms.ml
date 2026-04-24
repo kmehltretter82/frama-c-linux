@@ -356,7 +356,7 @@ let unbind_logic_vars env lvs =
 (* Result of the evaluation of a term as an exact location (to reduce its value
    in the current state). *)
 type exact_location =
-  | Location of typ * Locations.location
+  | Location of typ * Locations.t
   (* A location represented in the cvalue state. *)
   | Logic_var of logic_var
   (* A logic variable, introduced by a quantifier, and stored in an environment

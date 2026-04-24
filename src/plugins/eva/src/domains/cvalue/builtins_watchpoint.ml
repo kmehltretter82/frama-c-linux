@@ -19,7 +19,7 @@ let equal_watch w1 w2 =
 
 type watchpoint =
   { name_lv : Eva_ast.exp;
-    loc: Locations.location;
+    loc: Locations.t;
     v: watch;
     mutable remaining_count: Z.t;
     mutable stmts: Cil_datatype.Stmt.Set.t }

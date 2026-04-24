@@ -9,7 +9,6 @@
 (** Signature for maps from bases to memory maps. The memory maps are intended
     to be those of the [Offsetmap] module. *)
 
-open Locations
 open Lattice_bounds
 
 module type S = sig
@@ -79,7 +78,7 @@ module type S = sig
 
   (** {2 Finding values} *)
 
-  val find: ?conflate_bottom:bool -> t -> location -> v or_bottom
+  val find: ?conflate_bottom:bool -> t -> Locations.t -> v or_bottom
   (** @raise Error_Top when the location or the state are Top, and there
       is no Top value in the type {!v}. *)
 
@@ -113,7 +112,7 @@ module type S = sig
       is performed.
       Only locations that may be valid are written.
       Returns the resulting memory after the write. *)
-  val add_binding: exact:bool -> t -> location -> v -> t
+  val add_binding: exact:bool -> t -> Locations.t -> v -> t
 
   (** [paste_offsetmap ~from ~dst_loc ~size ~exact m]
       copies [from], which is supposed to be exactly [size] bits, and pastes

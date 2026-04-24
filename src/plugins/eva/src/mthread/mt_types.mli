@@ -12,7 +12,7 @@ open Mt_memory.Types
 
 (** Kind of access to zones *)
 
-type rw = Read | Write of Locations.location
+type rw = Read | Write of Locations.t
         | ReadPos of Position.t | WritePos of Position.t
 module RW: sig
   include Datatype.S with type t = rw

@@ -18,7 +18,7 @@ let offsetmap_of_v ~typ v =
   V_Offsetmap.create ~size v ~size_v:size
 
 let offsetmap_of_loc location state =
-  let aux (loc: Locations.location) offsm_res =
+  let aux (loc: Locations.t) offsm_res =
     (* If the size is unknown, returns the complete offsetmap. *)
     let size =
       try Z_or_top.project loc.size

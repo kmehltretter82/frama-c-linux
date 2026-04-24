@@ -40,7 +40,7 @@ module Memory : sig
   val find_precise_loffset : LOffset.t -> Base.t -> Int_Intervals.t -> Deps.t
 
   val add_binding : exact:bool -> t -> Memory_zone.t -> Deps.t -> t
-  val add_binding_loc : exact:bool -> t -> Locations.location -> Deps.t -> t
+  val add_binding_loc : exact:bool -> t -> Locations.t -> Deps.t -> t
   val add_binding_precise_loc :
     exact:bool -> Locations.access -> t ->
     Precise_locs.precise_location -> Deps.t -> t

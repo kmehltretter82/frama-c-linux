@@ -9,7 +9,6 @@
 (** Representation of Value's abstract memory. *)
 
 open Abstract_interp
-open Locations
 
 (** Estimation of the cardinal of the concretization of an abstract state
     or value. *)
@@ -274,12 +273,12 @@ module Model: sig
       of padding bits. The default value is [true].
   *)
   val find_indeterminate :
-    ?conflate_bottom:bool -> t -> location -> V_Or_Uninitialized.t
+    ?conflate_bottom:bool -> t -> Locations.t -> V_Or_Uninitialized.t
 
   (** [find ?conflate_bottom state loc] returns the same value as
       [find_indeterminate], but removes the indeterminate flags from the
       result. *)
-  val find : ?conflate_bottom:bool -> t -> location -> V.t
+  val find : ?conflate_bottom:bool -> t -> Locations.t -> V.t
 
   (** {2 Writing values into the state} *)
 
@@ -289,9 +288,9 @@ module Model: sig
       {!add_indeterminate_binding} allows to write a possibly indeterminate
       value to [state]. *)
   val add_binding :
-    exact:bool -> t -> location -> V.t -> t
+    exact:bool -> t -> Locations.t -> V.t -> t
   val add_indeterminate_binding :
-    exact:bool -> t -> location -> V_Or_Uninitialized.t -> t
+    exact:bool -> t -> Locations.t -> V_Or_Uninitialized.t -> t
 
 
   (** {2 Reducing the state} *)
@@ -302,11 +301,11 @@ module Model: sig
   (** [reduce_previous_binding state loc v] reduces the value associated to loc
       in state; use with caution, as the inclusion between the new and the
       old value is not checked.  *)
-  val reduce_previous_binding : t -> location -> V.t -> t
+  val reduce_previous_binding : t -> Locations.t -> V.t -> t
 
   (** Same behavior as [reduce_previous_binding], but takes a value
       with 'undefined' and 'escaping addresses' flags. *)
-  val reduce_indeterminate_binding: t -> location -> V_Or_Uninitialized.t -> t
+  val reduce_indeterminate_binding: t -> Locations.t -> V_Or_Uninitialized.t -> t
 
 
   (** {2 Misc} *)
