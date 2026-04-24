@@ -446,14 +446,14 @@ struct
         in
         List.iter aux_itv l;
         H.fold
-          (fun size loc acc ->
-             let loc = Locations.make_loc loc (`Value size) in
+          (fun size addr_bits acc ->
+             let loc = Locations.make_loc addr_bits (`Value size) in
              f loc v acc
           ) by_size acc
       with Abstract_interp.Error_Top ->
-        let locb = Addresses.Bits.inject b Ival.zero in
+        let addr_bits = Addresses.Bits.inject b Ival.zero in
         let size = Z_or_top.top (* TODO : use validity *) in
-        let loc = Locations.make_loc locb size in
+        let loc = Locations.make_loc addr_bits size in
         f loc v acc
     in
     X.ZoneMap.fold_base

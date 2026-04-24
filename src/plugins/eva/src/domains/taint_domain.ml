@@ -508,9 +508,9 @@ module TransferSingleTaint = struct
     match Eval.(value_assigned arg.avalue) with
     | `Bottom -> Memory_zone.bottom (* should not happen *)
     | `Value value ->
-      let loc_bits = Addresses.Bits.of_bytes value in
+      let addr_bits = Addresses.Bits.of_bytes value in
       let size = Bit_utils.sizeof_pointed arg.formal.vtype in
-      let loc = Locations.make_loc loc_bits size in
+      let loc = Locations.make_loc addr_bits size in
       Locations.enumerate_valid_bits Write loc
 
   let rec get_n_first l n =

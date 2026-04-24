@@ -170,8 +170,8 @@ let char_location loc ?(min_size=Z.zero) max_size =
     Ival.inject_interval ~min:(Some min_size) ~max:(Some max)
       ~rem:Z.zero ~modu:size_char
   in
-  let loc = Addresses.Bits.shift shift loc in
-  make_loc loc (`Value size_char)
+  let addr = Addresses.Bits.shift shift loc in
+  make_loc addr (`Value size_char)
 
 let compute_memcpy ~name ~dst_expr ~dst ~src ~size state =
   let size_min, size_max = min_max_size size in
@@ -300,16 +300,16 @@ let frama_c_memset_imprecise state dst_expr dst v size =
         in
         let sure = Z.sub (Z.add minb size_min) maxb in
         if Z.gt sure Z.zero then
-          let dst_loc = Addresses.Bits.inject base (Ival.inject_singleton maxb) in
+          let dst_addr = Addresses.Bits.inject base (Ival.inject_singleton maxb) in
           let vuninit = V_Or_Uninitialized.initialized v in
           let size_v = Bit_utils.sizeofchar () in
           let from = V_Offsetmap.create ~size:sure vuninit ~size_v in
           warn_imprecise_offsm_write ~name:"memset" dst_expr from;
           let state =
             Cvalue.Model.paste_offsetmap
-              ~from ~dst_loc ~size:sure ~exact:true state
+              ~from ~dst_loc:dst_addr ~size:sure ~exact:true state
           in
-          let sure_loc = make_loc dst_loc (`Value sure) in
+          let sure_loc = make_loc dst_addr (`Value sure) in
           let sure_zone = enumerate_valid_bits Locations.Write sure_loc in
           state, sure_zone
         else

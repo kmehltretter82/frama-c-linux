@@ -93,8 +93,8 @@ let location_with_size_aux p sbytes =
   Z.of_int (size_char_in_bits * sbytes)
 
 let location_with_size p sbytes =
-  let locb, size = location_with_size_aux p sbytes in
-  Locations.make_loc locb (`Value size)
+  let addr_bits, size = location_with_size_aux p sbytes in
+  Locations.make_loc addr_bits (`Value size)
 
 let location_of_pointer (p : Types.pointer) =
   Addresses.Bytes.inject

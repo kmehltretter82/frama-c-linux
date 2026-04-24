@@ -118,10 +118,10 @@ let reduce_by_initialized_defined f loc state =
 
 let reduce_by_valid_loc ~positive access loc typ state =
   let value = Cvalue.Model.find_indeterminate state loc in
-  let loc_bytes = Cvalue.V_Or_Uninitialized.get_v value in
-  let loc_bits = Addresses.Bits.of_bytes loc_bytes in
+  let addr_bytes = Cvalue.V_Or_Uninitialized.get_v value in
+  let addr_bits = Addresses.Bits.of_bytes addr_bytes in
   let size = Bit_utils.sizeof_pointed typ in
-  let location = Locations.make_loc loc_bits size in
+  let location = Locations.make_loc addr_bits size in
   let reduced_location =
     if positive
     then Locations.valid_part access location
@@ -153,8 +153,8 @@ let make_loc_contiguous loc =
       | Some min, Some max, `Value size when Z.equal modu size ->
         let size' = Z.add (Z.sub max min) modu in
         let i = Ival.inject_singleton min in
-        let loc_bits = Addresses.Bits.inject base i in
-        Locations.make_loc loc_bits (`Value size')
+        let addr_bits = Addresses.Bits.inject base i in
+        Locations.make_loc addr_bits (`Value size')
       | _ -> loc
   with Not_found -> loc
 

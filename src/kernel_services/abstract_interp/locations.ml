@@ -210,7 +210,7 @@ let enumerate_valid_bits_under access loc =
     of the location [l]. *)
 let valid_part access ?(bitfield=true) {addr ; size } =
   let access = base_access ~size access in
-  let compute_loc base offs acc =
+  let compute_addr base offs acc =
     let valid_offset =
       Ival.narrow offs (Base.valid_offset access ~bitfield base)
     in
@@ -219,15 +219,15 @@ let valid_part access ?(bitfield=true) {addr ; size } =
     else
       Addresses.Bits.add base valid_offset acc
   in
-  let locbits =
+  let addr_bits =
     match addr with
     | Addresses.Bits.Top (Base.SetLattice.Top, _) ->
       addr
     | Addresses.Bits.Top (Base.SetLattice.Set _, _)
     | Addresses.Bits.Map _ ->
-      Addresses.Bits.(fold_topset_ok compute_loc addr bottom)
+      Addresses.Bits.(fold_topset_ok compute_addr addr bottom)
   in
-  make_loc locbits size
+  make_loc addr_bits size
 
 let enumerate_bits_under_over under_over {addr; size} =
   let compute_offset base offs acc =

@@ -50,8 +50,8 @@ let add_watch make_watch state actuals =
       with V.Not_based_on_null | Ival.Not_Singleton_Int ->
         raise Builtins.Outside_builtin_possibilities
     in
-    let loc_bits = Addresses.Bits.of_bytes dst in
-    let loc = Locations.make_loc loc_bits (`Value size) in
+    let addr_bits = Addresses.Bits.of_bytes dst in
+    let loc = Locations.make_loc addr_bits (`Value size) in
     let target_w = make_watch target_value in
     let current = !watch_table in
     if

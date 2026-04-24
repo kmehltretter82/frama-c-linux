@@ -965,7 +965,7 @@ let forall_in_under_location state loc test =
    location satisfy [test]. *)
 let eval_forall_predicate state r test =
   let size_bits = Eval_typ.sizeof_lval_typ r.etype in
-  let make_loc loc = make_loc loc size_bits in
+  let make_loc addr = make_loc addr size_bits in
   let over_loc = make_loc r.eover in
   if not Locations.(is_valid Read over_loc) then c_alarm ();
   match forall_in_over_location state over_loc test with
@@ -2676,10 +2676,10 @@ and eval_predicate env pred =
            let star_tset = deref_tsets tset in
            let rtset = eval_tlval ~alarm_mode env star_tset in
            let size = Eval_typ.sizeof_lval_typ rtset.etype in
-           let loc_over = rtset.eover in
-           let loc_under = rtset.eunder in
-           Locations.enumerate_bits (Locations.make_loc loc_over size),
-           Locations.enumerate_bits_under (Locations.make_loc loc_under size)
+           let addr_over = rtset.eover in
+           let addr_under = rtset.eunder in
+           Locations.enumerate_bits (Locations.make_loc addr_over size),
+           Locations.enumerate_bits_under (Locations.make_loc addr_under size)
          in
          let lz = List.map to_zones ltsets in
          let unknown = ref false in
