@@ -260,29 +260,29 @@ let overlaps ~partial l1 l2 =
     Addresses.Bits.overlaps ~partial ~size l1.addr l2.addr
   with Abstract_interp.Error_Top -> true
 
-module Location =
-  Datatype.Make
-    (struct
-      include Datatype.Serializable_undefined
-      type nonrec t = t
-      let structural_descr =
-        Structural_descr.t_record
-          [| Addresses.Bits.packed_descr; Z_or_top.packed_descr |]
-      let reprs =
-        List.fold_left
-          (fun acc l ->
-             List.fold_left
-               (fun acc n -> { addr = l; size = n } :: acc)
-               acc
-               Z_or_top.reprs)
-          []
-          Addresses.Bits.reprs
-      let name = "Locations.Location"
-      let mem_project = Datatype.never_any_project
-      let equal = loc_equal
-      let compare = loc_compare
-      let hash = loc_hash
-      let pretty = pretty_loc
-    end)
+module Datatype_Input = struct
+  include Datatype.Serializable_undefined
+  type nonrec t = t
+  let structural_descr =
+    Structural_descr.t_record
+      [| Addresses.Bits.packed_descr; Z_or_top.packed_descr |]
+  let reprs =
+    List.fold_left
+      (fun acc l ->
+         List.fold_left
+           (fun acc n -> { addr = l; size = n } :: acc)
+           acc
+           Z_or_top.reprs)
+      []
+      Addresses.Bits.reprs
+  let name = "Locations"
+  let mem_project = Datatype.never_any_project
+  let equal = loc_equal
+  let compare = loc_compare
+  let hash = loc_hash
+  let pretty = pretty_loc
+end
+
+include (Datatype.Make (Datatype_Input) : Datatype.S with type t := t)
 
 type location = t

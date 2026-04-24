@@ -93,7 +93,7 @@ let find_or_alarm ~alarm_mode state loc =
    for a memory access of kind [access]. *)
 let contains_invalid_loc access loc =
   let valid_loc = Locations.valid_part access loc in
-  not (Locations.Location.equal loc valid_loc)
+  not (Locations.equal loc valid_loc)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Evaluation environments.                                           --- *)

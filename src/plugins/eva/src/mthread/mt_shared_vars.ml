@@ -715,7 +715,7 @@ module Precise = struct
       ()
 
   module WriteSeen =
-    Datatype.Triple_with_collections(CfgNode)(Thread)(Locations.Location)
+    Datatype.Triple_with_collections (CfgNode) (Thread) (Locations)
 
   let enumerate_written_vars_value m =
     let aux _b _itvs s acc =

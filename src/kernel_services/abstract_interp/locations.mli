@@ -21,7 +21,7 @@ type t = private {
 }
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-module Location: Datatype.S with type t = t
+include Datatype.S with type t := t
 
 val loc_top : t
 val loc_bottom : t
