@@ -11,18 +11,6 @@
 
 open Cil_types
 
-module Location_Bytes = Addresses.Bytes
-[@@deprecated "Use Addresses.Bytes instead"]
-[@@migrate { repl = Addresses.Bytes }]
-
-module Location_Bits = Addresses.Bits
-[@@deprecated "Use Addresses.Bits instead"]
-[@@migrate { repl = Addresses.Bits }]
-
-module Zone = Memory_zone
-[@@deprecated "Use Memory_zone instead"]
-[@@migrate { repl = Memory_zone }]
-
 (** {2 Locations} *)
 
 (** A {!Addresses.Bits.t} and a size in bits.
@@ -94,6 +82,35 @@ val pretty_english : prefix:bool -> Format.formatter -> location -> unit
 
 (** {2 Conversion functions} *)
 
+val enumerate_bits : location -> Memory_zone.t
+val enumerate_bits_under : location -> Memory_zone.t
+
+val enumerate_valid_bits : access -> location -> Memory_zone.t
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+
+val enumerate_valid_bits_under : access -> location -> Memory_zone.t
+
+val zone_of_varinfo : varinfo -> Memory_zone.t
+(** @since Carbon-20101201 *)
+
+val loc_of_varinfo : varinfo -> location
+val loc_of_base : Base.t -> location
+val loc_of_typoffset : Base.t -> typ -> offset -> location
+
+(** {2 Deprecated} *)
+
+module Location_Bytes = Addresses.Bytes
+[@@deprecated "Use Addresses.Bytes instead"]
+[@@migrate { repl = Addresses.Bytes }]
+
+module Location_Bits = Addresses.Bits
+[@@deprecated "Use Addresses.Bits instead"]
+[@@migrate { repl = Addresses.Bits }]
+
+module Zone = Memory_zone
+[@@deprecated "Use Memory_zone instead"]
+[@@migrate { repl = Memory_zone }]
+
 (* Note: the first two operations are exact (if offsets are not
    floats.) The last one can return an over-approximation, and has an
    under-approximating counterpart. *)
@@ -112,18 +129,3 @@ val loc_bits_to_loc_bytes : Addresses.Bits.t -> Addresses.Bytes.t
 val loc_bits_to_loc_bytes_under : Addresses.Bits.t -> Addresses.Bytes.t
 [@@deprecated "Use Addresses.Bits.to_bytes_under instead"]
 [@@migrate { repl = Addresses.Bits.to_bytes_under }]
-
-val enumerate_bits : location -> Memory_zone.t
-val enumerate_bits_under : location -> Memory_zone.t
-
-val enumerate_valid_bits : access -> location -> Memory_zone.t
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-
-val enumerate_valid_bits_under : access -> location -> Memory_zone.t
-
-val zone_of_varinfo : varinfo -> Memory_zone.t
-(** @since Carbon-20101201 *)
-
-val loc_of_varinfo : varinfo -> location
-val loc_of_base : Base.t -> location
-val loc_of_typoffset : Base.t -> typ -> offset -> location
