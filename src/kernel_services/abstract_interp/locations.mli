@@ -43,10 +43,10 @@ val make_loc : Addresses.Bits.t -> Z_or_top.t -> location
 
 val loc_equal : location -> location -> bool
 
-(** [loc_addr l] returns the address set corresponding to the given
+(** [loc_addr_bytes l] returns the address set corresponding to the given
     location, i.e. the location without the size information.
     @before Frama-C+dev was named loc_to_loc_without_size *)
-val loc_addr : location -> Addresses.Bytes.t
+val loc_addr_bytes : location -> Addresses.Bytes.t
 
 val loc_size : location -> Z_or_top.t
 
@@ -100,12 +100,15 @@ val pretty_english : prefix:bool -> Format.formatter -> location -> unit
 val loc_to_loc_without_size : location -> Addresses.Bytes.t
 [@@deprecated "Use loc_addr instead"]
 [@@migrate { repl = Rel.loc_addr }]
+
 val loc_bytes_to_loc_bits : Addresses.Bytes.t -> Addresses.Bits.t
 [@@deprecated "Use Addresses.Bits.of_bytes instead"]
 [@@migrate { repl = Addresses.Bits.of_bytes }]
+
 val loc_bits_to_loc_bytes : Addresses.Bits.t -> Addresses.Bytes.t
 [@@deprecated "Use Addresses.Bits.to_bytes instead"]
 [@@migrate { repl = Addresses.Bits.to_bytes }]
+
 val loc_bits_to_loc_bytes_under : Addresses.Bits.t -> Addresses.Bytes.t
 [@@deprecated "Use Addresses.Bits.to_bytes_under instead"]
 [@@migrate { repl = Addresses.Bits.to_bytes_under }]
