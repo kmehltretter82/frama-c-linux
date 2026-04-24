@@ -273,9 +273,9 @@ module Make_Dataflow
       (* The variables from the toplevel block will be removed by the caller *)
       id
     | Enter (block) ->
-      lift @@ Transfer_stmt.enter_scope ~pos block.blocals
+      lift @@ Transfer_stmt.enter_scope kf block.blocals
     | Leave (block) ->
-      lift @@ Transfer_stmt.leave_scope ~pos block.blocals
+      lift @@ Transfer_stmt.leave_scope kf block.blocals
 
   let transfer_annotations (stmt : stmt) ~(record : bool)
     : state -> state list =

@@ -858,8 +858,7 @@ module Make (Engine: Engine_Subset) = struct
      However, goto statements can skip their declaration/initialization, so it
      is safer to always introduce all local variables (without initialize them)
      when entering a block. *)
-  let enter_scope ~pos variables state =
-    let kf = Position.kf pos |> Option.get in
+  let enter_scope kf variables state =
     let kind = Abstract_domain.Local kf in
     let state = Domain.enter_scope kind variables state in
     let is_volatile varinfo =
@@ -875,7 +874,6 @@ module Make (Engine: Engine_Subset) = struct
     in
     List.fold_left initialize_volatile state vars
 
-  let leave_scope ~pos variables state =
-    let kf = Position.kf pos |> Option.get in
+  let leave_scope kf variables state =
     Domain.leave_scope kf variables state
 end

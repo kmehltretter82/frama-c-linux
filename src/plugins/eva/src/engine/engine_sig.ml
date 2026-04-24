@@ -99,9 +99,9 @@ module type Transfer_stmt = sig
     (stmt * lval list * lval list * lval list * stmt ref list) list ->
     unit or_bottom
 
-  val enter_scope: pos:Position.t -> varinfo list -> state -> state
+  val enter_scope: Kernel_function.t -> varinfo list -> state -> state
 
-  val leave_scope: pos:Position.t -> varinfo list -> state -> state
+  val leave_scope: Kernel_function.t -> varinfo list -> state -> state
 end
 
 
