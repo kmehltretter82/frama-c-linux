@@ -9,7 +9,6 @@
 open Cil_types
 open Cil_datatype
 open Visitor
-open Locations
 open Mt_cil
 open Mt_memory.Types
 open Mt_types
@@ -653,7 +652,7 @@ module Precise = struct
     let size = Lattice_bounds.Bottom.non_bottom size in
     Cvalue.V_Offsetmap.create_isotropic ~size Cvalue.V_Or_Uninitialized.bottom
 
-  let extract_shared_value node op loc state =
+  let extract_shared_value node op (loc : Locations.t) state =
     match loc.size with
     | `Top ->
       Mt_self.warning ?source:(CfgNode.node_first_loc node)

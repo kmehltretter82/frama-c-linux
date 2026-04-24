@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Abstract_interp
-open Locations
 open Lattice_bounds
 
 type 'a default_contents =
@@ -129,7 +128,7 @@ struct
 
     exception Result_is_top
 
-    let add_binding ~exact mem {addr; size} v =
+    let add_binding ~exact mem (loc: Locations.t) v =
       let had_non_bottom = ref false in
       let result = ref mem in
       let aux origin b offsets =
@@ -138,7 +137,7 @@ struct
         | `Bottom -> ()
         | `Value offm ->
           let offm' =
-            match size with
+            match loc.size with
             | `Top ->
               let orig = Origin.current Origin.Misalign_write in
               Offsetmap.update_imprecise_everywhere ~validity orig v offm
@@ -152,7 +151,7 @@ struct
             had_non_bottom := true;
             if offm != offm' then result := add b offm' !result
       in
-      match addr with
+      match loc.addr with
       | Addresses.Bits.Top (Base.SetLattice.Top, orig) ->
         Abstract_interp.feedback_approximation
           "writing at a completely unknown address @[%a@]"
@@ -166,7 +165,7 @@ struct
         !had_non_bottom, !result
 
     (* may raise Error_Top in the case Top Top. Make sure to annotate callers *)
-    let find ?(conflate_bottom=true) mem {addr ; size} =
+    let find ?(conflate_bottom=true) mem (loc: Locations.t) =
       let open Bottom.Operators in
       let handle_imprecise_base base acc =
         let v =
@@ -175,12 +174,12 @@ struct
         in
         Bottom.join V.join v acc
       in
-      match addr with
+      match loc.addr with
       | Addresses.Bits.Top (Base.SetLattice.Top, _) -> `Value (vtop ())
       | Addresses.Bits.Top (Base.SetLattice.Set s, _) ->
         Base.SetLattice.O.fold handle_imprecise_base s `Bottom
       | Addresses.Bits.Map loc_map -> begin
-          match size with
+          match loc.size with
           | `Top ->
             let aux base _ acc = handle_imprecise_base base acc in
             Addresses.Bits.M.fold aux loc_map `Bottom
@@ -448,9 +447,9 @@ struct
         r
 
     let paste_offsetmap ~from ~dst_addr ~size ~exact m =
-      let loc_dst = make_loc dst_addr (`Value size) in
+      let loc_dst = Locations.make_loc dst_addr (`Value size) in
       assert (Z.leq Z.zero size);
-      let exact = exact && cardinal_zero_or_one loc_dst in
+      let exact = exact && Locations.cardinal_zero_or_one loc_dst in
       (* TODO: do we want to alter exact here? *)
       let had_non_bottom = ref false in
       let treat_dst base_dst i_dst acc =

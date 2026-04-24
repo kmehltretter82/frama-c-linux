@@ -110,8 +110,7 @@ class inout_vis
   method !vstmt stmt =
     let out = Inout.stmt_outputs stmt in
     let filter_out vi =
-      let open Locations in
-      let zone = enumerate_bits (loc_of_varinfo vi) in
+      let zone = Locations.(enumerate_bits (loc_of_varinfo vi)) in
       Memory_zone.intersects out zone
     in
     let stmt_effect =

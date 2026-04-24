@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Locations
 
 (* Computation of over-approximated operational inputs:
    An accurate computation of these inputs needs the computation of

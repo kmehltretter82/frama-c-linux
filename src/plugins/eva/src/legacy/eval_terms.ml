@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Locations
 open Cvalue
 
 (* Truth values for a predicate analyzed by the value analysis *)
@@ -965,7 +964,7 @@ let forall_in_under_location state loc test =
    location satisfy [test]. *)
 let eval_forall_predicate state r test =
   let size_bits = Eval_typ.sizeof_lval_typ r.etype in
-  let make_loc addr = make_loc addr size_bits in
+  let make_loc addr = Locations.make_loc addr size_bits in
   let over_loc = make_loc r.eover in
   if not Locations.(is_valid Read over_loc) then c_alarm ();
   match forall_in_over_location state over_loc test with
@@ -1090,7 +1089,7 @@ let rec eval_term ~alarm_mode env t =
     let typ = lval.etype in
     let size = Eval_typ.sizeof_lval_typ typ in
     let state = env_current_state env in
-    let eover_loc = make_loc (lval.eover) size in
+    let eover_loc = Locations.make_loc (lval.eover) size in
     let eover = find_or_alarm ~alarm_mode state eover_loc in
     let eover = Cvalue_forward.make_volatile ~typ eover in
     let eover = Cvalue_forward.reinterpret typ eover in
@@ -1098,10 +1097,10 @@ let rec eval_term ~alarm_mode env t =
     let deps =
       if Cvalue.Model.is_reachable state then
         add_deps env.e_cur empty_logic_deps
-          (enumerate_valid_bits Locations.Read eover_loc)
+          (Locations.enumerate_valid_bits Read eover_loc)
       else empty_logic_deps
     in
-    let eunder_loc = make_loc (lval.eunder) size in
+    let eunder_loc = Locations.make_loc (lval.eunder) size in
     let eunder =
       match Eval_op.find_under_approximation state eunder_loc with
       | Some eunder ->
@@ -1960,13 +1959,15 @@ and reduce_by_valid env positive access (tset: term) =
          not (Ival.cardinal_zero_or_one offs)
       then raise DoNotReduce;
       let state = env_current_state env in
-      let lvloc = make_loc lv.eover (Eval_typ.sizeof_lval_typ lv.etype) in
+      let lv_size = Eval_typ.sizeof_lval_typ lv.etype in
+      let lvloc = Locations.make_loc lv.eover lv_size in
       (* [p] is the range that we attempt to reduce *)
       let alarm_mode = alarm_reduce_mode () in
       let p_orig = find_or_alarm ~alarm_mode state lvloc in
       let pb = Addresses.Bits.of_bytes p_orig in
       let shifted_p = Addresses.Bits.shift offs pb in
-      let lshifted_p = make_loc shifted_p (Eval_typ.sizeof_lval_typ offs_typ) in
+      let offs_size = Eval_typ.sizeof_lval_typ offs_typ in
+      let lshifted_p = Locations.make_loc shifted_p offs_size in
       let valid = (* reduce the shifted pointer to the wanted part *)
         if positive
         then Locations.valid_part access lshifted_p
@@ -2019,7 +2020,7 @@ and reduce_by_valid env positive access (tset: term) =
       let alarm_mode = alarm_reduce_mode () in
       let r = eval_tlval ~alarm_mode env tlval in
       let typ = match typ with None -> r.etype | Some t -> t in
-      let loc = make_loc r.eunder (Eval_typ.sizeof_lval_typ typ) in
+      let loc = Locations.make_loc r.eunder (Eval_typ.sizeof_lval_typ typ) in
       let r = Eval_op.apply_on_all_locs (aux_one_lval typ) loc env in
       r
     with LogicEvalError _ -> env
@@ -2371,7 +2372,7 @@ and reduce_by_predicate ~alarm_mode env positive p =
             in
             let fred = Eval_op.reduce_by_initialized_defined (fred positive) in
             let state_reduced =
-              let loc = make_loc rlocb.eunder size in
+              let loc = Locations.make_loc rlocb.eunder size in
               let loc = Eval_op.make_loc_contiguous loc in
               Eval_op.apply_on_all_locs fred loc state
             in
@@ -2500,7 +2501,7 @@ and eval_predicate env pred =
     | Pvalid_read (_, tsets)
     | Pobject_pointer (_, tsets) ->
       (* TODO: see same constructor in reduce_by_predicate *)
-      let kind =
+      let kind: Locations.access =
         match p.pred_content with
         | Pvalid_read _ -> Read
         | Pvalid _ -> Write
@@ -2518,7 +2519,8 @@ and eval_predicate env pred =
             (* Do not use [eval_term]: the evaluation would fail if the value of
                [tlval] is uninitialized or escaping. *)
             let r = eval_tlval ~alarm_mode env tlval in
-            let loc = make_loc r.eover (Eval_typ.sizeof_lval_typ r.etype) in
+            let size = Eval_typ.sizeof_lval_typ r.etype in
+            let loc = Locations.make_loc r.eover size in
             let state = env_current_state env in
             let v = find_indeterminate ~alarm_mode state loc in
             let v, indeterminate =
@@ -2535,14 +2537,16 @@ and eval_predicate env pred =
           then if empty then True else False
           else
             let size = Eval_typ.sizeof_lval_typ typ_pointed in
-            let make_loc l = make_loc (Addresses.Bits.of_bytes l) size in
+            let make_loc l =
+              Locations.make_loc (Addresses.Bits.of_bytes l) size
+            in
             let loc_over = make_loc eover in
             (* The predicate holds if [eover] is entirely valid. It is false if
                [eover] is entirely invalid or if [eunder] contains an invalid
                location. Unknown otherwise. *)
             if Locations.is_valid kind loc_over
             then True
-            else if Locations.is_bottom_loc (valid_part kind loc_over)
+            else if Locations.(is_bottom_loc (valid_part kind loc_over))
                  || contains_invalid_loc kind (make_loc eunder)
             then False
             else Unknown
@@ -2812,8 +2816,8 @@ and eval_tsets_deps ~alarm_mode env lbl tsets =
   let star_tsets = deref_tsets tsets in
   let r = eval_tlval ~alarm_mode env star_tsets in
   let size_bits = Eval_typ.sizeof_lval_typ r.etype in
-  let loc = make_loc r.eover size_bits in
-  let zone = enumerate_valid_bits Locations.Read loc in
+  let loc = Locations.make_loc r.eover size_bits in
+  let zone = Locations.enumerate_valid_bits Locations.Read loc in
   Logic_label.Map.add lbl zone r.ldeps
 
 and predicate_deps env pred =
@@ -2900,15 +2904,17 @@ let reduce_by_predicate env positive p =
 let eval_tlval_as_location ~alarm_mode env t =
   let r = eval_term_as_lval ~alarm_mode env t in
   let s = Eval_typ.sizeof_lval_typ r.etype in
-  make_loc r.eover s
+  Locations.make_loc r.eover s
 
 (* Return a pair of (under-approximating, over-approximating) zones. *)
 let eval_tlval_as_zone_under_over ~alarm_mode access env t =
   let r = eval_term_as_lval ~alarm_mode env t in
-  let s = Eval_typ.sizeof_lval_typ r.etype in
-  let under = enumerate_valid_bits_under access (make_loc r.eunder s) in
-  let over = enumerate_valid_bits access (make_loc r.eover s) in
-  (under, over)
+  let size = Eval_typ.sizeof_lval_typ r.etype in
+  let under_loc = Locations.make_loc r.eunder size in
+  let under_zone = Locations.enumerate_valid_bits_under access under_loc in
+  let over_loc = Locations.make_loc r.eover size in
+  let over_zone = Locations.enumerate_valid_bits access over_loc in
+  (under_zone, over_zone)
 
 let eval_tlval_as_zone ~alarm_mode access env t =
   let _under, over =

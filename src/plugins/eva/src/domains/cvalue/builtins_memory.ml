@@ -10,7 +10,6 @@ open Cil_types
 open Eva_ast
 open Cvalue
 open Abstract_interp
-open Locations
 
 let register_builtin = Builtins.register_builtin
 
@@ -171,7 +170,7 @@ let char_location loc ?(min_size=Z.zero) max_size =
       ~rem:Z.zero ~modu:size_char
   in
   let addr = Addresses.Bits.shift shift loc in
-  make_loc addr (`Value size_char)
+  Locations.make_loc addr (`Value size_char)
 
 let compute_memcpy ~name ~dst_expr ~dst ~src ~size state =
   let size_min, size_max = min_max_size size in
@@ -269,8 +268,8 @@ let frama_c_memset_imprecise state dst_expr dst v size =
       let state =
         Cvalue.Model.paste_offsetmap ~from ~size ~exact ~dst_addr:dst state
       in
-      let loc = make_loc dst (`Value size_min) in
-      let written_zone = enumerate_valid_bits Locations.Write loc in
+      let loc = Locations.make_loc dst (`Value size_min) in
+      let written_zone = Locations.enumerate_valid_bits Write loc in
       state, written_zone
     else state, Memory_zone.bottom
   in
@@ -281,7 +280,7 @@ let frama_c_memset_imprecise state dst_expr dst v size =
       let loc = char_location dst ~min_size:size_min size_max in
       warn_imprecise_write ~name:"memset" dst_expr loc v;
       let state = Cvalue.Model.add_binding ~exact:false state loc v in
-      let written_zone = enumerate_valid_bits Locations.Write loc in
+      let written_zone = Locations.enumerate_valid_bits Write loc in
       state, written_zone
     else state, Memory_zone.bottom
   in
@@ -309,8 +308,8 @@ let frama_c_memset_imprecise state dst_expr dst v size =
             Cvalue.Model.paste_offsetmap
               ~from ~dst_addr ~size:sure ~exact:true state
           in
-          let sure_loc = make_loc dst_addr (`Value sure) in
-          let sure_zone = enumerate_valid_bits Locations.Write sure_loc in
+          let sure_loc = Locations.make_loc dst_addr (`Value sure) in
+          let sure_zone = Locations.enumerate_valid_bits Write sure_loc in
           state, sure_zone
         else
           state, Memory_zone.bottom

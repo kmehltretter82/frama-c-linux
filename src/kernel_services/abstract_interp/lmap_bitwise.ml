@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Locations
 open Lattice_bounds
 
 exception Bitwise_cannot_copy
@@ -267,7 +266,7 @@ struct
     | _, Bottom -> Bottom
     | _, Map m -> Map (Memory_zone.fold_topset_ok aux_base_offset loc m)
 
-  let add_binding_loc ~exact m loc v =
+  let add_binding_loc ~exact m (loc: Locations.t) v =
     let size = loc.size in
     let add ~validity = LOffset.add_binding_ival ~validity ~exact ~size in
     let aux_base_offset = add_base_offset add v in

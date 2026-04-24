@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Locations
 
 module Stmt = Cil_datatype.Stmt
 module Logic_label = Cil_datatype.Logic_label

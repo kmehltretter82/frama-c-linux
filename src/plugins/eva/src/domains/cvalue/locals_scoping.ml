@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Locations
 
 type clobbered_set = {
   mutable clob: Base.SetLattice.t
@@ -23,7 +22,7 @@ let top () = { clob = Base.SetLattice.top }
 let remember_bases_with_locals clob new_clob =
   clob.clob <- Base.SetLattice.join new_clob clob.clob
 
-let remember_if_locals_in_value clob left_loc v =
+let remember_if_locals_in_value clob (left_loc : Locations.t) v =
   if Cvalue.V.contains_addresses_of_any_locals v then
     let new_clob = Addresses.Bits.get_bases left_loc.addr in
     remember_bases_with_locals clob new_clob

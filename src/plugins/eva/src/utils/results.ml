@@ -436,12 +436,11 @@ struct
     | None ->
       Result.error DisabledDomain
     | Some get ->
-      let join loc1 loc2 =
-        let open Locations in
+      let join (loc1: Locations.t) (loc2: Locations.t) =
         let size = loc1.size
         and addr = Addresses.Bits.join loc1.addr loc2.addr in
         assert (Z_or_top.equal loc2.size size);
-        make_loc addr size
+        Locations.make_loc addr size
       and extract loc =
         loc >>-: get >>-: Precise_locs.imprecise_location
       in
