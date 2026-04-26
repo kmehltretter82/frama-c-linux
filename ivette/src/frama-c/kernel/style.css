@@ -251,7 +251,7 @@
 }
 
 .message-search .dome-xForm-field {
-    margin: 0px 4px;
+    margin: 2px 4px 0;
     min-width: 110px;
     justify-self: stretch;
 }
