@@ -320,16 +320,17 @@ meter::-webkit-meter-even-less-good-value  {
 
 .dome-xCheckbox {
     padding: 0 ;
-    margin: 1px 4px ;
+    margin: 2px 4px ;
     display: flex ;
     align-items: center ;
+    gap: 4px ;
     border-radius: 4px ;
 }
 
 .dome-xCheckbox > .dome-xIcon {
     display: inline-flex ;
     align-items: center ;
-    margin: 0 4px 0 0 ;
+    margin: 0 ;
     padding: 0 ;
     line-height: 0 ;
 }
