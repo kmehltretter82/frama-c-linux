@@ -256,7 +256,7 @@ interface Handler<A> {
   setter?: Server.SetRequest<A, null>;
 }
 
-enum SyncStatus { OffLine, Loading, Loaded }
+enum SyncStatus { OffLine, OnLine, Loading, Loaded }
 
 export type customSyncError = { name: string, error: string }
 export const syncErrorEvent = 'states:syncError' as const;
@@ -281,11 +281,15 @@ class SyncState<A> extends GlobalState<A | undefined> {
   signal(): Server.Signal { return this.handler.signal; }
 
   online(): void {
-    if (Server.isRunning() && this.status === SyncStatus.OffLine)
+    if (Server.isRunning() && this.status === SyncStatus.OffLine) {
+      this.status = SyncStatus.OnLine;
+      Server.onSignal(this.handler.signal, this.fetch);
       this.fetch();
+    }
   }
 
   offline(): void {
+    Server.offSignal(this.handler.signal, this.fetch);
     this.status = SyncStatus.OffLine;
     this.setValue(undefined);
   }
@@ -361,7 +365,6 @@ export function useSyncState<A>(
 ): [A | undefined, (value: A) => void] {
   Server.useStatus();
   const st = lookupSyncState(state);
-  Server.useSignal(st.signal(), st.fetch);
   st.online();
   const [v] = useGlobalState(st);
   return [v, st.update];
@@ -371,7 +374,6 @@ export function useSyncState<A>(
 export function useSyncValue<A>(value: Value<A>): A | undefined {
   Server.useStatus();
   const st = lookupSyncState(value);
-  Server.useSignal(st.signal(), st.fetch);
   st.online();
   const [v] = useGlobalState(st);
   return v;
@@ -412,6 +414,7 @@ export function useServerField<A>(
 
 class SyncArray<K, A> {
   handler: Array<K, A>;
+  active: boolean;
   upToDate: boolean;
   fetching: boolean;
   signaled: boolean; // during fetching or offline
@@ -419,6 +422,7 @@ class SyncArray<K, A> {
 
   constructor(h: Array<K, A>) {
     this.handler = h;
+    this.active = false;
     this.fetching = false;
     this.upToDate = false;
     this.signaled = false;
@@ -429,11 +433,16 @@ class SyncArray<K, A> {
   }
 
   online(): void {
-    if (!this.upToDate && Server.isRunning())
+    if (!this.active && Server.isRunning()) {
+      this.active = true;
+      Server.onSignal(this.handler.signal, this.fetch);
       this.fetch();
+    }
   }
 
   offline(): void {
+    Server.offSignal(this.handler.signal, this.fetch);
+    this.active = false;
     this.upToDate = false;
     this.model.clear();
   }
@@ -567,7 +576,6 @@ export function useSyncArrayModel<K, A>(
 ): CompactModel<K, A> {
   Server.useStatus();
   const st = currentSyncArray(arr);
-  Server.useSignal(arr.signal, st.fetch);
   st.online();
   return st.model;
 }
