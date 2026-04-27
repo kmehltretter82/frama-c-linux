@@ -464,17 +464,14 @@ let rec type_term
 
     | TCast (false, _,_) -> assert false
 
-    | Tif (t1, t2, t3) ->
-      let ctx1 =
-        mk_ctx ~use_gmp_opt:false c_int (* an int must be generated *)
-      in
-      ignore (type_term ~use_gmp_opt:false ~ctx:ctx1 ~profile t1);
+    | Tif (cond, t1, t2) ->
+      ignore (type_predicate ~profile cond);
       let ctx =
-        ty_of_interv ?ctx (Interval.joins_from_profile ~profile [t3; t2; t])
+        ty_of_interv ?ctx (Interval.joins_from_profile ~profile [t2; t1; t])
       in
       let ctx = mk_ctx ~use_gmp_opt:true ctx in
+      ignore (type_term ~use_gmp_opt:true ~ctx ~profile t1);
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t2);
-      ignore (type_term ~use_gmp_opt:true ~ctx ~profile t3);
       ctx
 
     | Tat (t, _) ->
@@ -819,9 +816,8 @@ and type_predicate ~profile p =
     do_both (on p1) (on p2)
   | Pnot p ->
     type_predicate ~profile p
-  | Pif(t, p1, p2) ->
-    let ctx = mk_ctx ~use_gmp_opt:false c_int in
-    ignore (type_term ~use_gmp_opt:false ~ctx ~profile t);
+  | Pif(c, p1, p2) ->
+    ignore (type_predicate ~profile c);
     let on p  () = type_predicate ~profile p in
     do_both (on p1) (on p2)
   | Plet(li, p) ->

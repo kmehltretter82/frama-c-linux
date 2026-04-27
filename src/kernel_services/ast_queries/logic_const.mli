@@ -156,7 +156,7 @@ val pimplies :
 (** ? : *)
 val pif:
   ?loc:location -> ?names:string list ->
-  term * predicate * predicate -> predicate
+  predicate * predicate * predicate -> predicate
 
 (** <==> *)
 val piff:

@@ -677,7 +677,7 @@ and pp_term_node fmt = function
   | Tlambda(quantifiers,term) -> Format.fprintf fmt "Tlambda(%a,%a)"  pp_quantifiers quantifiers  pp_term term
   | TDataCons(logic_ctor_info,term_list) ->
     Format.fprintf fmt "TDataCons(%a,%a)"  pp_logic_ctor_info logic_ctor_info  (pp_list pp_term) term_list
-  | Tif(term1,term2,term3) -> Format.fprintf fmt "Tif(%a,%a,%a)"  pp_term term1  pp_term term2  pp_term term3
+  | Tif(pred,term1,term2) -> Format.fprintf fmt "Tif(%a,%a,%a)"  pp_predicate pred  pp_term term1  pp_term term2
   | Tat(term,logic_label) ->
     Format.fprintf fmt "Tat(%a,%a)"  pp_term term  pp_logic_label logic_label
   | Tbase_addr(logic_label,term) ->
@@ -839,8 +839,8 @@ and pp_predicate_node fmt = function
     Format.fprintf fmt "Piff(%a,%a)"  pp_predicate predicate1  pp_predicate predicate2
   | Pnot(predicate) ->
     Format.fprintf fmt "Pnot(%a)"  pp_predicate predicate
-  | Pif(term,predicate1,predicate2) ->
-    Format.fprintf fmt "Pif(%a,%a,%a)"  pp_term term  pp_predicate predicate1  pp_predicate predicate2
+  | Pif(predicate0,predicate1,predicate2) ->
+    Format.fprintf fmt "Pif(%a,%a,%a)"  pp_predicate predicate0  pp_predicate predicate1  pp_predicate predicate2
   | Plet(logic_info,predicate) ->
     Format.fprintf fmt "Plet(%a,%a)"  pp_logic_info logic_info  pp_predicate predicate
   | Pforall(quantifiers,predicate) ->

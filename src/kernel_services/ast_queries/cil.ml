@@ -915,7 +915,7 @@ and childrenTermNode vis tn =
     if li' != li || labels' != labels || args' != args then
       Tapp(li',labels',args') else tn
   | Tif(test,ttrue,tfalse) ->
-    let test' = vTerm test in
+    let test' = visitCilPredicate vis test in
     let ttrue' = vTerm ttrue in
     let tfalse' = vTerm tfalse in
     if test' != test || ttrue' != ttrue || tfalse' != tfalse then
@@ -1275,12 +1275,12 @@ and childrenPredicateNode vis p =
   | Pnot p1 ->
     let p1' = vPred p1 in
     if p1' != p1 then Pnot p1' else p
-  | Pif(t,ptrue,pfalse) ->
-    let t' = vTerm t in
+  | Pif(c,ptrue,pfalse) ->
+    let c' = vPred c in
     let ptrue' = vPred ptrue in
     let pfalse' = vPred pfalse in
-    if t' != t || ptrue' != ptrue || pfalse' != pfalse then
-      Pif(t', ptrue',pfalse')
+    if c' != c || ptrue' != ptrue || pfalse' != pfalse then
+      Pif(c', ptrue',pfalse')
     else p
   | Plet(def,p1) ->
     let def' = visitCilLogicInfo vis def in
@@ -6503,12 +6503,12 @@ let rec free_vars_term bound_vars t = match t.term_node with
          (free_vars_term bound_vars t1)
          (free_vars_term_offset bound_vars toff))
       (free_vars_term bound_vars t2)
-  | Tif (t1,t2,t3) ->
+  | Tif (cond,t1,t2) ->
     Logic_var.Set.union
-      (free_vars_term bound_vars t1)
+      (free_vars_predicate bound_vars cond)
       (Logic_var.Set.union
-         (free_vars_term bound_vars t2)
-         (free_vars_term bound_vars t3))
+         (free_vars_term bound_vars t1)
+         (free_vars_term bound_vars t2))
   | TDataCons(_,t) | Tapp (_,_,t) ->
     List.fold_left
       (fun acc t ->
@@ -6622,9 +6622,9 @@ and free_vars_predicate bound_vars p = match p.pred_content with
   | Pat (p,_)
     (*  | Pnamed (_,p) *) ->
     free_vars_predicate bound_vars p
-  | Pif (t,p1,p2) ->
+  | Pif (c,p1,p2) ->
     Logic_var.Set.union
-      (free_vars_term bound_vars t)
+      (free_vars_predicate bound_vars c)
       (Logic_var.Set.union
          (free_vars_predicate bound_vars p1)
          (free_vars_predicate bound_vars p2))

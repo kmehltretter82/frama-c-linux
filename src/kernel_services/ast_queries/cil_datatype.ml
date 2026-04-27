@@ -1762,7 +1762,8 @@ let rec compare_term t1 t2 =
       let cq = compare_ctor f1 f2 in
       if cq <> 0 then cq else compare_list compare_term ts1 ts2
     | Tif(c1,a1,b1) , Tif(c2,a2,b2) ->
-      compare_list compare_term [c1;a1;b1] [c2;a2;b2]
+      let c = compare_predicate c1 c2 in
+      if c <> 0 then c else compare_list compare_term [a1;b1] [a2;b2]
     | Tbase_addr (l1,t1) , Tbase_addr (l2,t2)
     | Tblock_length (l1,t1) , Tblock_length (l2,t2)
     | Toffset (l1,t1) , Toffset (l2,t2)
@@ -1872,12 +1873,7 @@ and compare_predicate p1 p2 =
     | Pnot p1, Pnot p2 ->
       compare_predicate p1 p2
     | Pif (c1,t1,e1), Pif(c2,t2,e2) ->
-      let c = compare_term c1 c2 in
-      if c <> 0 then c
-      else
-        let c = compare_predicate t1 t2 in
-        if c <> 0 then c
-        else compare_predicate e1 e2
+      compare_list compare_predicate [c1;t1;e1] [c2;t2;e2]
     | Plet (d1,p1), Plet(d2,p2) ->
       let c = Logic_info.compare d1 d2 in
       if c <> 0 then c
@@ -1990,10 +1986,10 @@ let rec hash_term (acc,depth,tot) t =
       let hash = acc + 43 + Logic_ctor_info.hash ctor in
       let hash_one_term (acc,tot) t = hash_term (acc,depth-1,tot) t in
       List.fold_left hash_one_term (hash,tot-1) args
-    | Tif(t1,t2,t3) ->
-      let hash1,tot1 = hash_term (acc+47,depth-1,tot) t1 in
-      let hash2,tot2 = hash_term (hash1,depth-1,tot1) t2 in
-      hash_term (hash2,depth-1,tot2) t3
+    | Tif(p,t1,t2) ->
+      let hash1,tot1 = hash_predicate (acc+47,depth-1,tot) p in
+      let hash2,tot2 = hash_term (hash1,depth-1,tot1) t1 in
+      hash_term (hash2,depth-1,tot2) t2
     | Tat(t,l) ->
       let hash = acc + 53 + hash_label l in
       hash_term (hash,depth-1,tot-2) t
@@ -2114,7 +2110,7 @@ and hash_predicate (acc, depth, tot) p =
       hash_predicate (hashlp, depth - 1, totlp) rp
     | Pnot p -> hash_predicate (acc + 29, depth - 1, tot - 1) p
     | Pif (c,t,e) ->
-      let hashc, totc = hash_term (acc + 31, depth - 1, tot - 1) c in
+      let hashc, totc = hash_predicate (acc + 31, depth - 1, tot - 1) c in
       let hasht, tott = hash_predicate (hashc, depth - 1, totc) t in
       hash_predicate (hasht, depth - 1, tott) e
     | Plet (d,p) ->

@@ -396,13 +396,13 @@ let rec infer ~force ~logic_env t =
       Error.map (fun src -> cast ~src ~dst) src
     | TCast (true, _, t) -> get_res (recurse t)
     | TCast (false, _,_) -> assert false
-    | Tif (t1, t2, t3) ->
-      ignore (recurse t1);
+    | Tif (cond, t1, t2) ->
+      ignore (infer_predicate ~logic_env cond);
       let logic_env_tbranch, logic_env_fbranch =
-        compute_logic_env_if_branches logic_env t1
+        compute_logic_env_if_branches logic_env cond
       in
-      let i2 = recurse ~logic_env:logic_env_tbranch t2 in
-      let i3 = recurse ~logic_env:logic_env_fbranch t3 in
+      let i2 = recurse ~logic_env:logic_env_tbranch t1 in
+      let i3 = recurse ~logic_env:logic_env_fbranch t2 in
       Error.map2 join i2 i3
     | Tat (t, _) ->
       get_res (recurse t)
@@ -655,7 +655,7 @@ and infer_term_offset ~force ~logic_env t =
 
 (* Update the interval of variables when they appear in a comparison of the form
    [x op t] or [t op x] *)
-and compute_logic_env_if_branches logic_env t =
+and compute_logic_env_if_branches logic_env p =
   let get_res = Error.map (fun x -> x) in
   let ival v = infer ~force:false ~logic_env v in
   let add_ub logic_env x v =
@@ -672,43 +672,41 @@ and compute_logic_env_if_branches logic_env t =
        slightly less precise but allow for better reusing of the code in the
        case of recursive functions, the main advantage in typing
        conditionals is for recursive functions. *)
-    match t.term_node with
-    | TBinOp(op, {term_node = TLval(TVar x, TNoOffset)}, v) ->
+    match p.pred_content with
+    | Prel (op, {term_node = TLval(TVar x, TNoOffset)}, v) ->
       begin
         match op with
-        | Lt | Le ->
+        | Rlt | Rle ->
           add_ub logic_env x v,
           add_lb logic_env x v
-        | Gt | Ge ->
+        | Rgt | Rge ->
           add_lb logic_env x v,
           add_ub logic_env x v
-        | Eq ->
+        | Req ->
           add_eq logic_env x v,
           logic_env
-        | Ne ->
+        | Rneq ->
           logic_env,
           add_eq logic_env x v
-        | _ -> logic_env, logic_env
       end
     | _ -> logic_env, logic_env
   in
-  match t.term_node with
-  | TBinOp(op, u, {term_node = TLval(TVar y, TNoOffset)}) ->
+  match p.pred_content with
+  | Prel (op, u, {term_node = TLval(TVar y, TNoOffset)}) ->
     begin
       match op with
-      | Lt | Le ->
+      | Rlt | Rle ->
         add_lb t_branch y u,
         add_ub f_branch y u
-      | Gt | Ge ->
+      | Rgt | Rge ->
         add_ub t_branch y u,
         add_lb f_branch y u
-      | Eq ->
+      | Req ->
         add_eq t_branch y u,
         logic_env
-      | Ne ->
+      | Rneq ->
         logic_env,
         add_eq f_branch y u
-      | _ -> t_branch, f_branch
     end
   | _ -> t_branch, f_branch
 
@@ -824,10 +822,10 @@ and infer_predicate ~logic_env p =
     infer_predicate ~logic_env p2
   | Pnot p ->
     infer_predicate ~logic_env p;
-  | Pif(t, p1, p2) ->
-    ignore (infer ~force:false ~logic_env t);
+  | Pif(c, p1, p2) ->
+    infer_predicate ~logic_env c;
     let logic_env_tbranch, logic_env_fbranch =
-      compute_logic_env_if_branches logic_env t
+      compute_logic_env_if_branches logic_env c
     in
     infer_predicate ~logic_env:logic_env_tbranch p1;
     infer_predicate ~logic_env:logic_env_fbranch p2

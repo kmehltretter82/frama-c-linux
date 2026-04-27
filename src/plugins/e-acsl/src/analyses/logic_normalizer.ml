@@ -281,7 +281,7 @@ let preprocess_pred ~loc p =
 let preprocess_term ~loc t =
   Here_inliner.(bind preprocess_term) t @@
   match t.term_node with
-  | Tapp(li, lst, [ t1; t2; {term_node = Tlambda([ k ], predicate)}])
+  | Tapp(li, lst, [ t1; t2; {term_node = Tlambda([ k ], cond)}])
     when li.l_body = LBnone && li.l_var_info.lv_name = "\\numof" ->
     let logic_info = Cil_const.make_logic_info "\\sum" in
     logic_info.l_type <- li.l_type;
@@ -289,9 +289,10 @@ let preprocess_term ~loc t =
     logic_info.l_labels <- li.l_labels;
     logic_info.l_profile <- li.l_profile;
     logic_info.l_body <- li.l_body;
+    let predicate = Logic_utils.scalar_term_to_predicate cond in
     let conditional_term =
       Logic_const.term ~loc
-        (Tif(predicate, Cil.lone (), Cil.lzero ())) Linteger
+        (Tif (predicate, Cil.lone (), Cil.lzero ())) Linteger
     in
     let lambda_term =
       Logic_const.term ~loc (Tlambda([ k ], conditional_term)) Linteger

@@ -19,9 +19,8 @@ end
 module M = Interlang_gen.M
 open Interlang_gen.M.Operators
 
-(**************************************************************************)
+
 (********************** Forward references ********************************)
-(**************************************************************************)
 
 let translate_rte_exp_ref
   : (?filter:(code_annotation -> bool) ->
@@ -34,6 +33,21 @@ let translate_rte_exp_ref
       Extlib.mk_labeled_fun "translate_rte_exp_ref")
 
 module Translate_predicates = struct
+  let to_exp_ref :
+    (adata:Assert.t ->
+     ?inplace:bool ->
+     ?name:string ->
+     kernel_function ->
+     ?rte:bool ->
+     Env.t ->
+     predicate ->
+     exp * Assert.t * Env.t) ref
+    = ref @@ fun ~adata:_ ?inplace:_ ?name:_ _kf ?rte:_ _env _p ->
+    Extlib.mk_labeled_fun "Translate_terms.Translate_predicates.to_exp_ref"
+
+  let to_exp ~adata ?inplace ?name kf ?rte env p =
+    !to_exp_ref ~adata ?inplace ?name kf ?rte env p
+
   let rte_guards_to_exp_old_ref
     : (loc:location ->
        kf:kernel_function ->
@@ -851,19 +865,19 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let exp, adata, env = to_exp ~adata kf env lt in
     exp, adata, env, Analyses_types.C_number, ""
   | TDataCons _ -> Env.not_yet env "constructor"
-  | Tif(t1, t2, t3) ->
+  | Tif(cond, t1, t2) ->
+    let cond = Logic_normalizer.get_pred cond in
     let t1 = Logic_normalizer.get_term t1 in
     let t2 = Logic_normalizer.get_term t2 in
-    let t3 = Logic_normalizer.get_term t3 in
     let (e, adata), env =
       Env.with_params_and_result ~rte:true ~env (fun env ->
-          let e1, adata, env1 = to_exp ~adata kf env t1 in
+          let e1, adata, env1 = Translate_predicates.to_exp ~adata kf env cond in
           let e2, adata, env2 =
-            to_exp ~adata kf (Env.push env1) t2
+            to_exp ~adata kf (Env.push env1) t1
           in
           let res2 = e2, env2 in
           let e3, adata, env3 =
-            to_exp ~adata kf (Env.push env2) t3
+            to_exp ~adata kf (Env.push env2) t2
           in
           let res3 = e3, env3 in
           Extlib.nest

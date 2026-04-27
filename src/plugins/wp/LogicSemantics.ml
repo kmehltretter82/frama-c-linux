@@ -684,7 +684,7 @@ struct
       in Vexp r
 
     | Tif( cond , a , b ) ->
-      let c = val_of_term env cond in
+      let c = e_prop @@ C.pred `NoPolarity env cond in
       let a = val_of_term env a in
       let b = val_of_term env b in
       Cvalues.plain t.term_type (e_if c a b)
@@ -824,8 +824,8 @@ struct
       p_imply (C.pred negated env a) (C.pred polarity env b)
     | Piff(a,b) -> p_equiv (C.pred `NoPolarity  env a) (C.pred `NoPolarity  env b)
     | Pnot a -> p_not (C.pred (Cvalues.negate polarity) env a)
-    | Pif(t,a,b) ->
-      p_if (p_bool (val_of_term env t))
+    | Pif(c,a,b) ->
+      p_if (C.pred `NoPolarity env c)
         (C.pred polarity env a)
         (C.pred polarity env b)
     | Papp({l_var_info = {lv_name = "\\subset"}},_,ts) ->

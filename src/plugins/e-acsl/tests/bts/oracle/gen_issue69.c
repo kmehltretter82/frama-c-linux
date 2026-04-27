@@ -52,6 +52,7 @@ int main(void)
     int __gen_e_acsl_u;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"n",0,n);
     if (n > 0) __gen_e_acsl_if = 4; else __gen_e_acsl_if = 341;
     __gen_e_acsl_m = __gen_e_acsl_if;
     __gen_e_acsl_forall_2 = 1;
@@ -90,7 +91,6 @@ int main(void)
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "\\forall char u; 1 < u < m ==> u > 0",0,
                                  __gen_e_acsl_forall_2);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"n",0,n);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\let m = n > 0 ? 4 : 341; \\forall char u; 1 < u < m ==> u > 0";

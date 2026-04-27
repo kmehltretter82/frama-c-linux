@@ -445,8 +445,8 @@ and term env t =
   | Ttype _ | Ttypeof _
   | TConst _ -> Domain.pure
   | Tif(c,p,q) ->
-    term_eval env c ;
-    let loc = c.term_loc in
+    pred env c ;
+    let loc = c.pred_loc in
     let pos = Logic_const.pif ~loc Logic_const.(c,ptrue,pfalse) in
     let neg = Logic_const.pif ~loc Logic_const.(c,pfalse,ptrue) in
     let dp = assume env pos (term env) p in
@@ -488,8 +488,8 @@ and pred env p =
   | Por(p,q) -> pred env p ; assume env (Logic_const.pnot p) (pred env) q
   | Pxor(p,q) | Piff(p,q) -> pred env p ; pred env q
   | Pif(c,p,q) ->
-    term_eval env c ;
-    let loc = c.term_loc in
+    pred env c ;
+    let loc = c.pred_loc in
     let pos = Logic_const.pif ~loc Logic_const.(c,ptrue,pfalse) in
     let neg = Logic_const.pif ~loc Logic_const.(c,pfalse,ptrue) in
     assume env pos (pred env) p ;

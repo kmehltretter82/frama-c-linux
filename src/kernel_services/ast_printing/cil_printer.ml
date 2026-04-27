@@ -2593,7 +2593,10 @@ class cil_printer () = object (self)
         self#labels labels
         (Pretty_utils.pp_list ~pre:"@[(" ~suf:")@]" ~sep:",@ " self#term) tl
     | Tif (cond,th,el) ->
-      fprintf fmt "@[<2>@[%a@]@ ?@ @[%a@]@ :@ @[%a@]@]" term cond term th term el
+      fprintf fmt "@[<2>@[%a@]@ ?@ @[%a@]@ :@ @[%a@]@]"
+        self#pred_prec_named (current_level, cond)
+        term th
+        term el
     | Tat (t,lab) ->
       let old_label = current_label in
       current_label <- lab;
@@ -2863,9 +2866,9 @@ class cil_printer () = object (self)
     | Pnot a -> fprintf fmt "@[%t%a@]"
                   Unicode.pp_not
                   self#pred_prec_named (current_level,a)
-    | Pif (e, p1, p2) ->
+    | Pif (c, p1, p2) ->
       fprintf fmt "@[<hv 2>@[%a@]@ ?@ @[%a@]@ :@ @[%a@]@]"
-        term e
+        self#pred_prec_named (current_level, c)
         self#pred_prec_named (current_level, p1)
         self#pred_prec_named (current_level, p2)
     | Plet (def, p) ->

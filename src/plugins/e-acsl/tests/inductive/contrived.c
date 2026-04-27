@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: examples forcing the extraction into very specific situations
-   STDOPT: +"-eva-unroll-recursive-calls 9"
+   STDOPT: +"-eva-unroll-recursive-calls 5"
 */
 
 // extracts same function twice using different modes

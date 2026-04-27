@@ -226,6 +226,10 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
       __gen_e_acsl_assert_data_6.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_6);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
+                                     "*\\old(Mtmin_out)",*__gen_e_acsl_at_6);
+      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
+                                     "*\\old(Mtmin_in)",*__gen_e_acsl_at_5);
       if (*__gen_e_acsl_at_6 == *__gen_e_acsl_at_5) {
         __e_acsl_mpq_t __gen_e_acsl_;
         __e_acsl_mpq_t __gen_e_acsl__2;
@@ -244,6 +248,10 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
                    (__e_acsl_mpq_struct const *)(__gen_e_acsl__3));
         __gen_e_acsl_lt = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl_),
                                      (__e_acsl_mpq_struct const *)(__gen_e_acsl_mul));
+        __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
+                                       "*\\old(Mtmin_in)",*__gen_e_acsl_at_4);
+        __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
+                                       "*\\old(Mwmin)",*__gen_e_acsl_at_3);
         __gen_e_acsl_and = __gen_e_acsl_lt < 0;
         __gmpq_clear(__gen_e_acsl_);
         __gmpq_clear(__gen_e_acsl__2);
@@ -304,14 +312,6 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
         __gmpq_clear(__gen_e_acsl_mul_2);
         __gmpq_clear(__gen_e_acsl__6);
       }
-      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                     "*\\old(Mtmin_out)",*__gen_e_acsl_at_6);
-      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                     "*\\old(Mtmin_in)",*__gen_e_acsl_at_5);
-      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                     "*\\old(Mtmin_in)",*__gen_e_acsl_at_4);
-      __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_4,
-                                     "*\\old(Mwmin)",*__gen_e_acsl_at_3);
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Postcondition";
       __gen_e_acsl_assert_data_4.pred_txt = "*\\old(Mtmin_out) == *\\old(Mtmin_in) < 0.85 * *\\old(Mwmin)\n  ?\n  *\\old(Mtmin_in) != 0.\n  :\n  0.85 * *\\old(Mwmin) != 0.";

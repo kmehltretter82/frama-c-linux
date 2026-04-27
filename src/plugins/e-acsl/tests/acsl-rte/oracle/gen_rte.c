@@ -430,6 +430,7 @@ int main(void)
       __e_acsl_assert(c != 0,& __gen_e_acsl_assert_data_21);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_21);
     }
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,"c",0,c);
     if (12 / c != 0) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_22 =
         {.values = (void *)0};
@@ -486,7 +487,6 @@ int main(void)
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,"ff",0,ff);
       __gen_e_acsl_if = (int)(1L / (f / (long)ff - 1L)) > 0;
     }
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,"c",0,c);
     __gen_e_acsl_assert_data_20.blocking = 1;
     __gen_e_acsl_assert_data_20.kind = "Assertion";
     __gen_e_acsl_assert_data_20.pred_txt = "12 / c != 0 ? 1 / t < 3 : 1 / (f / ff - 1) > 0";

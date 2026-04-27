@@ -213,8 +213,7 @@ val expr_to_term : ?coerce:bool -> exp -> term
 
     Remark: when the original expression is a comparison, it is evaluated as
     an [int] or an [integer] depending on the [~coerce] flag.
-    To obtain a boolean or predicate, use [expr_to_boolean] or
-    [expr_to_predicate] instead.
+    To obtain a predicate, use [expr_to_predicate] instead.
 
     @before 21.0-Scandium was unsound in many cases.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
@@ -238,19 +237,6 @@ val expr_to_ipredicate: exp -> identified_predicate
     of the original C-expression.
 
     Identical to [expr_to_predicate e |> Logic_const.new_predicate].
-
-    @raise Fatal error if the expression is not a comparison and cannot be
-           compared to zero.
-    @since Sulfur-20171101
-    @before 21.0-Scandium was unsound in many cases.
-*)
-
-val expr_to_boolean: exp -> term
-(** Returns a boolean term semantically equivalent to the condition
-    of the original C-expression.
-
-    This is different from [expr_to_term e |> scalar_term_to_predicate]
-    since C-relations are translated into logic ones.
 
     @raise Fatal error if the expression is not a comparison and cannot be
            compared to zero.

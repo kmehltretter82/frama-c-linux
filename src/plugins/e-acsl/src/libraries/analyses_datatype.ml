@@ -394,10 +394,14 @@ module Logic_env
            the profile, we add the refined interval in the other bindings,
            which are checked first when finding the interval *)
         Logic_var.Map.add x (!ival_meet_ref i ival) env.let_quantif_bind
-      | None -> Options.abort "updating a variable not in environment"
+      | None -> env.let_quantif_bind
     in
     {env with let_quantif_bind = new_lq_bind}
 
+  let pretty fmt {profile; let_quantif_bind} =
+    Format.fprintf fmt "@[profile: %a@]@[<v 2>let_quantif_bind: %a@]"
+      Profile.pretty profile
+      Profile.pretty let_quantif_bind
 end
 
 (* Imperative environment to perform fixpoint algorithm for recursive
