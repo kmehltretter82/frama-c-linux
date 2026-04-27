@@ -343,13 +343,16 @@ tr:first-of-type > .eva-table-callsite-box {
 /* --- Taint Sidebar                                                      --- */
 /* -------------------------------------------------------------------------- */
 
+.eva-taint-list {
+  padding: 5px;
+}
+
 .eva-taint-row {
   display: flex;
   align-items: center;
 }
 
-.eva-taint-list .eva-taint-row > .dome-xCheckbox {
-  display: block;
+.eva-taint-row > .dome-xCheckbox {
   flex: 1 1 auto;
 }
 
@@ -397,11 +400,13 @@ tr:first-of-type > .eva-table-callsite-box {
     display: flex;
     flex-direction: row-reverse;
     font-size: 1.08em;
-    padding: 5px;
+    padding: 5px 0;
+    margin: 0;
 
     &:hover {
       color: var(--text-highlighted);
       cursor:pointer;
+      background-color: var(--background-sidebar);
       input {
         border: 1px solid var(--text-highlighted);
       }
