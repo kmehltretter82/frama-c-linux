@@ -151,7 +151,21 @@ let rec associate acc ~formals ~concretes =
     let term = Logic_utils.expr_to_term concrete in
     associate ((formal, term) :: acc) ~formals ~concretes
 
-let transpose_pred_at_callsite ~formals ~concretes id_pred =
+let transpose_term_at_callsite ~formals ~concretes term =
+  try
+    let arguments = associate [] ~formals ~concretes in
+    let visitor :> Cil.cilVisitor = replacement_visitor ~arguments in
+    Some (Cil.visitCilTerm visitor term)
+  with Non_Transposable -> None
+
+let transpose_pred_at_callsite ~formals ~concretes pred =
+  try
+    let arguments = associate [] ~formals ~concretes in
+    let visitor :> Cil.cilVisitor = replacement_visitor ~arguments in
+    Some (Cil.visitCilPredicate visitor pred)
+  with Non_Transposable -> None
+
+let transpose_ipred_at_callsite ~formals ~concretes id_pred =
   let pred = Logic_const.pred_of_id_pred id_pred in
   try
     let arguments = associate [] ~formals ~concretes in
@@ -163,7 +177,6 @@ let transpose_pred_at_callsite ~formals ~concretes id_pred =
     let kind = id_pred.ip_content.tp_kind in
     Some (Logic_const.new_predicate ~kind p_named)
   with Non_Transposable -> None
-
 
 (* Map from [requires * stmt] to the specialization of the requires
    at the statement. Only present if the kernel function that contains
@@ -185,7 +198,7 @@ let rec transpose_precondition stmt pid kf func args =
     | Property.IPPredicate {Property.ip_pred} -> ip_pred
     | _ -> assert false
   in
-  let ip = transpose_pred_at_callsite ~formals ~concretes:args ip in
+  let ip = transpose_ipred_at_callsite ~formals ~concretes:args ip in
   let kf_call = Kernel_function.find_englobing_kf stmt in
   let p = Property.ip_property_instance kf_call stmt ip pid in
   PreCondAt.add (pid, stmt) p;
