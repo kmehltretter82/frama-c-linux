@@ -112,8 +112,8 @@ module Zone = Memory_zone
 [@@migrate { repl = Memory_zone }]
 
 val loc_to_loc_without_size : location -> Addresses.Bytes.t
-[@@deprecated "Use loc_addr instead"]
-[@@migrate { repl = Rel.loc_addr }]
+[@@deprecated "Use loc_addr_bytes instead"]
+[@@migrate { repl = Rel.loc_addr_bytes }]
 
 val loc_bytes_to_loc_bits : Addresses.Bytes.t -> Addresses.Bits.t
 [@@deprecated "Use Addresses.Bits.of_bytes instead"]
