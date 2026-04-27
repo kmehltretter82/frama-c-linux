@@ -227,19 +227,19 @@ function AlarmsInfos(probe?: Probe): Request<callstack, JSX.Element> {
 
 
 /* -------------------------------------------------------------------------- */
-/* --- Information on the selected callstack                              --- */
+/* --- Information on the focused callstack                              --- */
 /* -------------------------------------------------------------------------- */
 
 interface StackInfosProps {
   callsites: callsite[];
-  isSelected: boolean;
+  isFocused: boolean;
   close: () => void;
 }
 
 async function StackInfos(props: StackInfosProps): Promise<JSX.Element> {
-  const { callsites, isSelected, close } = props;
-  const selectedClass = isSelected ? 'eva-focused' : '';
-  const className = classes('eva-callsite', selectedClass);
+  const { callsites, isFocused, close } = props;
+  const focusedClass = isFocused ? 'eva-focused' : '';
+  const className = classes('eva-callsite', focusedClass);
   if (callsites.length <= 1) return <></>;
   const makeCallsite = ({ caller, stmt }: callsite): JSX.Element => {
     if (!caller || !stmt) return <></>;
@@ -437,11 +437,11 @@ interface ProbeValuesProps {
   pinProbe: (loc: Ast.marker, pin: boolean) => void;
   isSelected: (c: Callstack.callstack) => boolean;
   flipSelected: (c: Callstack.callstack) => void;
-  isSelectedCallstack: (c: callstack) => boolean;
+  isFocused: (c: callstack) => boolean;
 }
 
 function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
-  const { probe, pinProbe, isSelected, flipSelected, isSelectedCallstack }
+  const { probe, pinProbe, isSelected, flipSelected, isFocused }
     = props;
 
   const onSelected = (marker: Ast.marker, modifier: Modifier): void => {
@@ -481,10 +481,10 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
   return async (callstack: callstack): Promise<JSX.Element> => {
     const evaluation = await probe.evaluate(callstack);
     const { vBefore, vAfter, vThen, vElse } = evaluation;
-    const isSelected = isSelectedCallstack(callstack);
-    const selected = isSelected && callstack !== 'Summary' ? 'eva-focused' : '';
+    const focused = isFocused(callstack) && callstack !== 'Summary';
+    const focusedClass = focused ? 'eva-focused' : '';
     const font = callstack === 'Summary' ? 'eva-italic' : '';
-    const c = classes('eva-table-values', selected, font);
+    const c = classes('eva-table-values', focusedClass, font);
     const kind = callstack === 'Summary' ? 'one' : 'this';
     const title = `At least one alarm is raised in ${kind} callstack`;
     function td(e?: Values.evaluation, colSpan = 1): JSX.Element {
@@ -595,8 +595,8 @@ interface ScopeProps {
   setByCallstacks: (byCallstack: boolean) => void;
   isSelected: (callstack: Callstack.callstack) => boolean;
   flipSelected: (callstack: Callstack.callstack) => void
-  selectCallstack: (callstack: callstack) => void;
-  isSelectedCallstack: (c: callstack) => boolean;
+  setFocused: (callstack: callstack) => void;
+  isFocused: (c: callstack) => boolean;
   locEvt: Dome.Event<Ast.marker>;
   startingCallstack: number;
   changeStartingCallstack: (n: number) => void;
@@ -606,7 +606,7 @@ const PageSize = 99;
 
 async function ScopeSection(props: ScopeProps): Promise<JSX.Element> {
   const {
-    scope, folded, isSelected, flipSelected, isSelectedCallstack, locEvt,
+    scope, folded, isSelected, flipSelected, isFocused, locEvt,
     byCallstacks, getCallsites,
     getCallstacks: getCS, pinProbe,
     setFolded, setByCallstacks, close,
@@ -619,7 +619,7 @@ async function ScopeSection(props: ScopeProps): Promise<JSX.Element> {
   const onClick: (c: callstack) => RowHandler = (c) => (event) => {
     const elt = document.elementFromPoint(event.clientX, event.clientY);
     if (elt?.localName !== 'span')
-      props.selectCallstack(isSelectedCallstack(c) ? 'Summary' : c);
+      props.setFocused(isFocused(c) ? 'Summary' : c);
   };
 
   /* Computes the relevant callstacks */
@@ -654,7 +654,7 @@ async function ScopeSection(props: ScopeProps): Promise<JSX.Element> {
   const descrs = data.map((d) => ProbeDescr(d)).flat();
 
   /* Computes the summary values */
-  const miscs = { pinProbe, isSelectedCallstack, isSelected, flipSelected };
+  const miscs = { pinProbe, isFocused, isSelected, flipSelected };
   const builders = data.map((d: Data) => ProbeValues({ ...d, ...miscs }));
   const summary = await Promise.all(builders.map((b) => b('Summary')));
   const summaryKind = allCallstacks.length === 0 ? 'None' : 'Summary';
@@ -674,8 +674,8 @@ async function ScopeSection(props: ScopeProps): Promise<JSX.Element> {
   const values = await Promise.all(callstacks.map(async (callstack, n) => {
     const index = n + 1;
     if (start > index || stop < index) return <></>;
-    const selectedClass = isSelectedCallstack(callstack) ? 'eva-focused' : '';
-    const callProps = { selectedClass, getCallsites };
+    const focusedClass = isFocused(callstack) ? 'eva-focused' : '';
+    const callProps = { focusedClass, getCallsites };
     const call = await CallsiteCell({ index, callstack, ...callProps });
     const values = await Promise.all(builders.map((b) => b(callstack)));
     return (
@@ -1028,7 +1028,7 @@ function EvaTable(): JSX.Element {
   const functionsPromise = React.useMemo(() => {
     const elts: Promise<JSX.Element>[] = fcts.map((fct: ScopeInfos) => {
       const { byCallstacks, scope, folded } = fct;
-      const isSelectedCallstack = (c: callstack): boolean => c === cs;
+      const isFocused = (c: callstack): boolean => c === cs;
       const setFolded = (folded: boolean): void => {
         fcts.setFolded(scope, folded);
         setTic(tac + 1);
@@ -1062,8 +1062,8 @@ function EvaTable(): JSX.Element {
         setByCallstacks: setByCS,
         isSelected: callstackSelection.isSelected,
         flipSelected: callstackSelection.flipSelected,
-        selectCallstack: (c: callstack) => { setCS(c); setTic(tac + 1); },
-        isSelectedCallstack,
+        setFocused: (c: callstack) => { setCS(c); setTic(tac + 1); },
+        isFocused,
         locEvt,
         startingCallstack: fct.startingCallstack,
         changeStartingCallstack,
@@ -1089,9 +1089,9 @@ function EvaTable(): JSX.Element {
     const callsites = await getCallsites(cs);
     const p = (c: callsite): boolean =>
       c.stmt !== undefined && c.stmt === marker;
-    const isSelected = callsites.find(p) !== undefined;
+    const isFocused = callsites.find(p) !== undefined;
     const close = (): void => setCS('Summary');
-    return StackInfos({ callsites, isSelected, close });
+    return StackInfos({ callsites, isFocused, close });
   }, [cs, setCS, getCallsites, marker]);
   const { result: stackInfos } = Dome.usePromise(stackInfosPromise);
 
