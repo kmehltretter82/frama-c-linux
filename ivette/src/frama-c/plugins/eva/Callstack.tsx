@@ -9,8 +9,7 @@
 import React from 'react';
 
 import * as Tree from 'dome/frame/tree';
-import { addPinnedMessage, delPinnedMessage, PinnedMessage
-} from 'dome/frame/toolbars';
+import * as Toolbars from 'dome/frame/toolbars';
 import { IconButton } from 'dome/controls/buttons';
 import { useGlobalState } from 'dome/data/states';
 import { makeBadge } from 'dome/frame/sidebars';
@@ -22,23 +21,25 @@ import * as EvaAnalysis from 'frama-c/plugins/eva/api/analysis';
 import * as Ast from 'frama-c/kernel/api/ast';
 import { getDeclaration } from 'frama-c/states';
 
-import * as EvaCS from './api/callstack';
+import * as Eva from './api/callstack';
 import { EvaReady } from './components/AnalysisStatus';
 import { CallstackState } from './valuetable';
 
 // ----------------------------------------------------------------------------
 
-interface CSNode {
+interface Info extends Eva.callstackInfo { callstack: Eva.callstack}
+
+interface Node {
   key: string;
   label: string;
   decl: Ast.decl;
-  callstack: InfosCS;
+  callstack: Info;
   parentKey?: string;
   subTree: NodesMap;
 }
-type NodesMap = Map<string, CSNode>;
 
-interface InfosCS extends EvaCS.callstackInfo { callstack: EvaCS.callstack}
+type NodesMap = Map<string, Node>;
+
 
 // ----------------------------------------------------------------------------
 // --- CallstackSelection message
@@ -53,17 +54,17 @@ function addMessage(count: number, remove: () => void): void {
       title='Remove callstack filter: show all callstacks'
       onClick={remove}
     />;
-  const pinnedMessage: PinnedMessage = {
+  const pinnedMessage: Toolbars.PinnedMessage = {
     id: pinnedMessageId,
     message:
       `${count} callstack${count === 1 ? ' is' : 's are'} currently shown`,
     actions: pinnedMessageButton
   };
-  addPinnedMessage(pinnedMessage);
+  Toolbars.addPinnedMessage(pinnedMessage);
 }
 
 function delMessage(): void {
-  delPinnedMessage(pinnedMessageId);
+  Toolbars.delPinnedMessage(pinnedMessageId);
 }
 
 // ----------------------------------------------------------------------------
@@ -71,11 +72,11 @@ function delMessage(): void {
 // ----------------------------------------------------------------------------
 
 function getActions(
-  id: EvaCS.callstack,
-  onClick: (id: EvaCS.callstack) => void,
-  currentCS?: EvaCS.callstack[]
+  id: Eva.callstack,
+  onClick: (id: Eva.callstack) => void,
+  current?: Eva.callstack[]
 ): React.JSX.Element | null {
-  const isSelected = currentCS?.includes(id);
+  const isSelected = current?.includes(id);
   return (<>
     <IconButton
       icon='FILTER'
@@ -88,14 +89,14 @@ function getActions(
   );
 }
 
-interface CSNodesProps {
+interface NodesProps {
   tree: NodesMap,
   visible?: string[],
-  onClick: (id: EvaCS.callstack) => void
+  onClick: (id: Eva.callstack) => void
 }
 
-function CSNodes({ tree, visible, onClick } : CSNodesProps): React.ReactNode {
-  const [currentCS, ] = States.useSyncState(EvaCS.currentCallstacks);
+function Nodes({ tree, visible, onClick } : NodesProps): React.ReactNode {
+  const [current, ] = States.useSyncState(Eva.currentCallstacks);
 
   return [...tree].map(([, { key, label, callstack, subTree }]) => {
     const loc = States.getMarker(callstack.stack[0]?.stmt).sloc;
@@ -103,10 +104,10 @@ function CSNodes({ tree, visible, onClick } : CSNodesProps): React.ReactNode {
     return (
       <Tree.Node key={key} id={key} label={label} title={title}
         visible={visible?.includes(key) ?? true}
-        actions={getActions(callstack.callstack, onClick, currentCS)}
+        actions={getActions(callstack.callstack, onClick, current)}
       >
         { subTree && subTree.size > 0 ?
-          <CSNodes tree={subTree} visible={visible} onClick={onClick} />
+          <Nodes tree={subTree} visible={visible} onClick={onClick} />
           : null
         }
       </Tree.Node>
@@ -118,9 +119,9 @@ function CSNodes({ tree, visible, onClick } : CSNodesProps): React.ReactNode {
 // --- Infos Nodes
 // ----------------------------------------------------------------------------
 
-function isEntryPoint(cs: InfosCS): boolean { return cs.stack.length === 0; }
+function isEntryPoint(cs: Info): boolean { return cs.stack.length === 0; }
 
-function compareStack(a: EvaCS.callsite[], b: EvaCS.callsite[]): boolean {
+function compareStack(a: Eva.callsite[], b: Eva.callsite[]): boolean {
   if(a.length !== b.length) return false;
   return a.every((e, i) => (
     e.callee === b[i].callee
@@ -129,7 +130,7 @@ function compareStack(a: EvaCS.callsite[], b: EvaCS.callsite[]): boolean {
   ));
 }
 
-function getParentKey(cs: InfosCS, callstacks: InfosCS[]): string | undefined {
+function getParentKey(cs: Info, callstacks: Info[]): string | undefined {
   if(isEntryPoint(cs)) return undefined;
   return callstacks.find(e => (
     e.entryPoint === cs.entryPoint
@@ -137,7 +138,7 @@ function getParentKey(cs: InfosCS, callstacks: InfosCS[]): string | undefined {
   ))?.callstack.toString();
 }
 
-function getNode(key: string, cs: InfosCS, callstacks: InfosCS[]): CSNode {
+function getNode(key: string, cs: Info, callstacks: Info[]): Node {
   const decl = isEntryPoint(cs) ? cs.entryPoint : cs.stack[0].callee;
   const parentKey = getParentKey(cs, callstacks);
   const label = getDeclaration(decl).name;
@@ -150,7 +151,7 @@ function getNode(key: string, cs: InfosCS, callstacks: InfosCS[]): CSNode {
 }
 
 /** Return the Tree */
-function getTree( callstacks: InfosCS[]): {nodes: NodesMap, tree: NodesMap} {
+function getTree(callstacks: Info[]): {nodes: NodesMap, tree: NodesMap} {
   const nodes: NodesMap = new Map();
   const tree: NodesMap = new Map();
 
@@ -177,47 +178,47 @@ function getTree( callstacks: InfosCS[]): {nodes: NodesMap, tree: NodesMap} {
 
 /** Get details of callstacks */
 async function getInfosCallstacks(
-  callstacks: EvaCS.callstack[],
-  callback: (a: InfosCS[]) => void
+  callstacks: Eva.callstack[],
+  callback: (a: Info[]) => void
 ): Promise<void> {
   const infos = await Promise.all(callstacks.map(async (cs) => {
-    const info = await Server.send(EvaCS.getCallstackInfo, cs);
+    const info = await Server.send(Eva.getCallstackInfo, cs);
     return { ...info, callstack: cs };
   }));
   callback(infos);
 }
 
-export function useCallstacks(): InfosCS[] {
+export function useCallstacks(): Info[] {
   const status = Server.useStatus();
   const evaComputed = States.useSyncValue(EvaAnalysis.computationState);
 
-  const [callstacks, setCallstacks] = React.useState<EvaCS.callstack[]>([]);
-  const [CSInfos, setCallstacksInfos] = React.useState<InfosCS[]>([]);
+  const [callstacks, setCallstacks] = React.useState<Eva.callstack[]>([]);
+  const [infos, setInfos] = React.useState<Info[]>([]);
 
   React.useEffect(() => {
     if(status === 'ON' && evaComputed === 'computed')
-        Server.send(EvaCS.getAllCallstacks, []).then(a => setCallstacks(a));
+        Server.send(Eva.getAllCallstacks, []).then(setCallstacks);
     else setCallstacks([]);
   }, [evaComputed, status]);
 
   React.useEffect(() => {
-    getInfosCallstacks(callstacks, setCallstacksInfos);
+    getInfosCallstacks(callstacks, setInfos);
   }, [callstacks]);
 
-  return CSInfos;
+  return infos;
 }
 
 interface UseSelectedCS {
-  selected: EvaCS.callstack[] | undefined,
-  setSelected: (id: EvaCS.callstack) => void,
+  selected: Eva.callstack[] | undefined,
+  setSelected: (id: Eva.callstack) => void,
   reset: () => void
 }
 
 export function useSelectedCS(): UseSelectedCS {
-  const [selected, _setSelected] = States.useSyncState(EvaCS.currentCallstacks);
+  const [selected, _setSelected] = States.useSyncState(Eva.currentCallstacks);
   const reset = React.useCallback(() => { _setSelected([]); }, [_setSelected]);
 
-  const setSelected  = React.useCallback((id: EvaCS.callstack): void => {
+  const setSelected  = React.useCallback((id: Eva.callstack): void => {
     if(!selected || selected.length === 0) _setSelected([id]);
     else if(selected.includes(id)) _setSelected(selected.filter(e => e !== id));
     else _setSelected([...selected, id]);
@@ -238,18 +239,18 @@ export function useSelectedCS(): UseSelectedCS {
 
 export function CallstackSelection(): React.JSX.Element {
   // Control
-  const [ unfoldCS, setUnfoldCS ] = React.useState<boolean|undefined>(false);
+  const [ unfold, setUnfold ] = React.useState<boolean|undefined>(false);
   const [ show, setShow ] = React.useState<string | undefined>('all');
   const showState: Forms.FieldState<string | undefined> =
     { value: show, onChanged: setShow };
   // Data
-  const CSInfos = useCallstacks();
+  const infos = useCallstacks();
   const { selected, setSelected, reset } = useSelectedCS();
   const [selectedFromValue, ] = useGlobalState(CallstackState);
   const scope = States.useCurrentScope();
 
   /** Tree */
-  const { nodes, tree } = React.useMemo(() => getTree(CSInfos), [CSInfos]);
+  const { nodes, tree } = React.useMemo(() => getTree(infos), [infos]);
 
   /** List of keys for visible nodes */
   const visibleKeys = React.useMemo(() => {
@@ -273,15 +274,15 @@ export function CallstackSelection(): React.JSX.Element {
           size={16}
           icon={ "CHEVRON.CONTRACT" }
           title="Fold all"
-          disabled={unfoldCS === false}
-          onClick={() => setUnfoldCS(false)}
+          disabled={unfold === false}
+          onClick={() => setUnfold(false)}
         />
         <IconButton
           size={16}
           icon={ "CHEVRON.EXPAND" }
           title="Unfold all"
-          disabled={unfoldCS}
-          onClick={() => setUnfoldCS(true)}
+          disabled={unfold}
+          onClick={() => setUnfold(true)}
         />
         <Forms.SelectField label='' state={showState}>
           <option id={"all"} value={'all'}>Show all</option>
@@ -298,8 +299,8 @@ export function CallstackSelection(): React.JSX.Element {
       </div>
 
       <Tree.Tree
-        unfoldAll={unfoldCS}
-        setUnfoldAll={setUnfoldCS}
+        unfoldAll={unfold}
+        setUnfoldAll={setUnfold}
         selected={selectedFromValue.toString()}
         onClick={(id: string) => {
           const node = nodes.get(id);
@@ -313,7 +314,7 @@ export function CallstackSelection(): React.JSX.Element {
           }
         }}
       >
-        <CSNodes tree={tree} visible={visibleKeys} onClick={setSelected} />
+        <Nodes tree={tree} visible={visibleKeys} onClick={setSelected} />
       </Tree.Tree>
 
     </EvaReady>
