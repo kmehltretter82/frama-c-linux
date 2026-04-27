@@ -208,29 +208,37 @@ export function useCallstacks(): Info[] {
   return infos;
 }
 
-interface UseSelectedCS {
-  selected: Eva.callstack[] | undefined,
-  setSelected: (id: Eva.callstack) => void,
+export interface CallstackSelection {
+  selection: Eva.callstack[],
+  isSelected: (callstack: Eva.callstack) => boolean,
+  flipSelected: (callstack: Eva.callstack) => void,
   reset: () => void
 }
 
-export function useSelectedCS(): UseSelectedCS {
-  const [selected, _setSelected] = States.useSyncState(Eva.currentCallstacks);
-  const reset = React.useCallback(() => { _setSelected([]); }, [_setSelected]);
+export function useCallstackSelection(): CallstackSelection {
+  const [_selection, setSelection] = States.useSyncState(Eva.currentCallstacks);
+  const selection = React.useMemo(() => _selection ?? [], [_selection]);
 
-  const setSelected  = React.useCallback((id: Eva.callstack): void => {
-    if(!selected || selected.length === 0) _setSelected([id]);
-    else if(selected.includes(id)) _setSelected(selected.filter(e => e !== id));
-    else _setSelected([...selected, id]);
-  }, [selected, _setSelected]);
+  const isSelected = React.useCallback((id: Eva.callstack): boolean => {
+    return selection.length > 0 && selection.includes(id);
+  }, [selection]);
+
+  const flipSelected = React.useCallback((id: Eva.callstack): void => {
+    if (isSelected(id))
+      setSelection(selection.filter(e => e !== id));
+    else
+      setSelection([...selection, id]);
+  }, [selection, isSelected, setSelection]);
+
+  const reset = React.useCallback(() => setSelection([]), [setSelection]);
 
   /** update warning when selected change */
   React.useEffect(() => {
-    if (selected && selected.length > 0) addMessage(selected.length, reset);
+    if (selection.length > 0) addMessage(selection.length, reset);
     else delMessage();
-  }, [selected, reset]);
+  }, [selection, reset]);
 
-  return { selected, setSelected, reset };
+  return { selection, isSelected, flipSelected, reset };
 }
 
 // ----------------------------------------------------------------------------
@@ -245,7 +253,7 @@ export function CallstackSelection(): React.JSX.Element {
     { value: show, onChanged: setShow };
   // Data
   const infos = useCallstacks();
-  const { selected, setSelected, reset } = useSelectedCS();
+  const { selection, flipSelected, reset } = useCallstackSelection();
   const [selectedFromValue, ] = useGlobalState(CallstackState);
   const scope = States.useCurrentScope();
 
@@ -258,11 +266,11 @@ export function CallstackSelection(): React.JSX.Element {
     if(show === 'scope' && scope) {
       visible.push([...nodes].filter(e => e[1].decl === scope).map(e => e[0]));
     }
-    if(show !== 'all' && selected && selected.length > 0)
-      visible.push(selected.map(s => s.toString()));
+    if(show !== 'all' && selection.length > 0)
+      visible.push(selection.map(s => s.toString()));
 
     return visible.length === 0 ? undefined : visible.flat();
-  }, [show, selected, scope, nodes]);
+  }, [show, selection, scope, nodes]);
 
   return (
     <EvaReady>
@@ -293,7 +301,7 @@ export function CallstackSelection(): React.JSX.Element {
         <IconButton
           icon='FILTER'
           title='Select all callstacks'
-          disabled={!selected || selected.length === 0}
+          disabled={selection.length === 0}
           onClick={reset}
           />
       </div>
@@ -314,7 +322,7 @@ export function CallstackSelection(): React.JSX.Element {
           }
         }}
       >
-        <Nodes tree={tree} visible={visibleKeys} onClick={setSelected} />
+        <Nodes tree={tree} visible={visibleKeys} onClick={flipSelected} />
       </Tree.Tree>
 
     </EvaReady>

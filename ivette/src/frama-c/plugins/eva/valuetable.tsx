@@ -36,7 +36,7 @@ import { MarkerText, Modifier, selectMarker, textToString }
 
 import { EvaReady, EvaStatus } from './components/AnalysisStatus';
 import { evaComputationValue } from './components/Tools';
-import { useSelectedCS } from './Callstack';
+import { useCallstackSelection } from './Callstack';
 
 /* -------------------------------------------------------------------------- */
 /* --- Miscellaneous definitions                                          --- */
@@ -435,12 +435,14 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
 interface ProbeValuesProps {
   probe: Probe;
   pinProbe: (loc: Ast.marker, pin: boolean) => void;
-  setSelectedCallstack: (c: Callstack.callstack) => void;
+  isSelected: (c: Callstack.callstack) => boolean;
+  flipSelected: (c: Callstack.callstack) => void;
   isSelectedCallstack: (c: callstack) => boolean;
 }
 
 function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
-  const { probe, pinProbe, setSelectedCallstack, isSelectedCallstack } = props;
+  const { probe, pinProbe, isSelected, flipSelected, isSelectedCallstack }
+    = props;
 
   const onSelected = (marker: Ast.marker, modifier: Modifier): void => {
     /* Pin the current probe so that its column is not removed
@@ -450,32 +452,31 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
   };
 
   // Building common parts
-  const onContextMenu = (
-    callstack: callstack,
-    evaluation?: Values.evaluation
-  ) => (): void => {
-    const { value = '', pointedVars = [] } = evaluation ?? {};
-    const items: Dome.PopupMenuItem[] = [];
-    const copy = (): void => {
-      if (value) navigator.clipboard.writeText(textToString(value));
+  const onContextMenu =
+    (callstack: callstack, evaluation?: Values.evaluation) => (): void => {
+      const { value = '', pointedVars = [] } = evaluation ?? {};
+      const items: Dome.PopupMenuItem[] = [];
+      const copy = (): void => {
+        if (value) navigator.clipboard.writeText(textToString(value));
+      };
+      if (value !== '')
+        items.push({ label: 'Copy to clipboard', onClick: copy });
+      if (callstack !== 'Summary') {
+        const selected = isSelected(callstack);
+        const label = (selected ? 'Deselect' : 'Select') + ' this callstack';
+        const onClick = (): void => flipSelected(callstack);
+        items.push('separator');
+        items.push({ label, onClick });
+      }
+      if (items.length > 0 && pointedVars.length > 0) items.push('separator');
+      pointedVars.forEach((lval) => {
+        const [text, lvalMarker] = lval;
+        const label = `Display values for ${text}`;
+        const onItemClick = (): void => onSelected(lvalMarker, 'NORMAL');
+        items.push({ label, onClick: onItemClick });
+      });
+      if (items.length > 0) Dome.popupMenu(items);
     };
-    if (value !== '') items.push({ label: 'Copy to clipboard', onClick: copy });
-    if(callstack !== 'Summary') {
-      items.push('separator');
-      items.push({
-        label: 'Add/Remove this callstack from the selection',
-        onClick: () => setSelectedCallstack(callstack) }
-      );
-    }
-    if (items.length > 0 && pointedVars.length > 0) items.push('separator');
-    pointedVars.forEach((lval) => {
-      const [text, lvalMarker] = lval;
-      const label = `Display values for ${text}`;
-      const onItemClick = (): void => onSelected(lvalMarker, 'NORMAL');
-      items.push({ label, onClick: onItemClick });
-    });
-    if (items.length > 0) Dome.popupMenu(items);
-  };
 
   return async (callstack: callstack): Promise<JSX.Element> => {
     const evaluation = await probe.evaluate(callstack);
@@ -592,7 +593,8 @@ interface ScopeProps {
   byCallstacks: boolean;
   getCallstacks: Request<Ast.marker[], callstack[]>;
   setByCallstacks: (byCallstack: boolean) => void;
-  setSelectedCallstack: (c: Callstack.callstack) => void;
+  isSelected: (callstack: Callstack.callstack) => boolean;
+  flipSelected: (callstack: Callstack.callstack) => void
   selectCallstack: (callstack: callstack) => void;
   isSelectedCallstack: (c: callstack) => boolean;
   locEvt: Dome.Event<Ast.marker>;
@@ -604,7 +606,7 @@ const PageSize = 99;
 
 async function ScopeSection(props: ScopeProps): Promise<JSX.Element> {
   const {
-    scope, folded, setSelectedCallstack, isSelectedCallstack, locEvt,
+    scope, folded, isSelected, flipSelected, isSelectedCallstack, locEvt,
     byCallstacks, getCallsites,
     getCallstacks: getCS, pinProbe,
     setFolded, setByCallstacks, close,
@@ -652,7 +654,7 @@ async function ScopeSection(props: ScopeProps): Promise<JSX.Element> {
   const descrs = data.map((d) => ProbeDescr(d)).flat();
 
   /* Computes the summary values */
-  const miscs = { pinProbe, isSelectedCallstack, setSelectedCallstack };
+  const miscs = { pinProbe, isSelectedCallstack, isSelected, flipSelected };
   const builders = data.map((d: Data) => ProbeValues({ ...d, ...miscs }));
   const summary = await Promise.all(builders.map((b) => b('Summary')));
   const summaryKind = allCallstacks.length === 0 ? 'None' : 'Summary';
@@ -951,7 +953,7 @@ function EvaTable(): JSX.Element {
   const getProbe = useProbe();
   const getCallsites = useCallsites();
   const getCallstacks = useCallstacks();
-  const { setSelected } = useSelectedCS();
+  const callstackSelection = useCallstackSelection();
 
   /* Updates the scope manager when the showCallstacks state changes. */
   React.useEffect(() => {
@@ -1058,7 +1060,8 @@ function EvaTable(): JSX.Element {
         byCallstacks,
         getCallstacks,
         setByCallstacks: setByCS,
-        setSelectedCallstack: setSelected,
+        isSelected: callstackSelection.isSelected,
+        flipSelected: callstackSelection.flipSelected,
         selectCallstack: (c: callstack) => { setCS(c); setTic(tac + 1); },
         isSelectedCallstack,
         locEvt,
@@ -1069,7 +1072,8 @@ function EvaTable(): JSX.Element {
     return Promise.all(elts);
   }, [
     cs, setCS, fcts, focus, setFocus, tac,
-    getCallsites, setLocPin, csFct, setSelected,
+    getCallsites, setLocPin, csFct,
+    callstackSelection.isSelected, callstackSelection.flipSelected,
     getCallstacks, getProbe, remove, locEvt
   ]);
   const { result: functions } = Dome.usePromise(functionsPromise);
