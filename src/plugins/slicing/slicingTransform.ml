@@ -115,7 +115,7 @@ module Visibility (SliceName : sig
       let v = visible_mark m in
       SlicingParameters.debug ~level:2
         "[SlicingTransform.Visibility.data_in_visible] data %a is %svisible"
-        Locations.Zone.pretty data_in (if v then "" else "in");
+        Memory_zone.pretty data_in (if v then "" else "in");
       v
 
   let all_nodes_visible ff nodes =
@@ -150,7 +150,7 @@ module Visibility (SliceName : sig
             | Some z, PdgIndex.Key.SigCallKey
                 (call, PdgIndex.Signature.Out
                    (PdgIndex.Signature.OutLoc out_z)) ->
-              let z = Locations.Zone.narrow z out_z in
+              let z = Memory_zone.narrow z out_z in
               PdgIndex.Key.call_output_key (PdgIndex.Key.call_from_id call) z
             | _, _ -> key
           in

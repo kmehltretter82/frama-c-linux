@@ -35,7 +35,7 @@ module type S = sig
 
   (** Given an access type and a location, return the zone corresponding to the
       valid bits of the location. *)
-  val enumerate_valid_bits : Locations.access -> location -> Locations.Zone.t
+  val enumerate_valid_bits : Locations.access -> location -> Memory_zone.t
 
   (** [replace_base substitution location] replaces the variables represented
       by the [location] according to [substitution]. *)

@@ -49,7 +49,7 @@ let may_be_shared str1 off1 str2 off2 =
 
 (* Checks if all string bases of [v] satisfy [f]. *)
 let for_all_string v f =
-  Locations.Location_Bytes.for_all
+  Addresses.Bytes.for_all
     (fun base off -> match base with
        | Base.Var (vi, _) when Ast_info.is_string_literal vi ->
          (match Globals.Vars.get_string_literal vi with
@@ -77,29 +77,28 @@ let are_comparable_string v1 v2 =
    In practice, function pointers are considered possible or one past
    when their offset is 0. For object pointers, the offset is checked
    against the validity of each base, taking past-one into account. *)
-let possible_pointer access location =
-  let location = Locations.loc_bytes_to_loc_bits location in
+let possible_pointer access addr =
+  let addr_bits = Addresses.Bits.of_bytes addr in
   let is_possible_offset base offs =
     if Base.is_function base
     then Ival.is_zero offs
     else Base.is_valid_offset access base offs
   in
-  Locations.Location_Bits.for_all is_possible_offset location
+  Addresses.Bits.for_all is_possible_offset addr_bits
 
 (* Are [ev1] and [ev2] safely comparable, or does their comparison involves
    invalid pointers, or is undefined (typically pointers in different bases). *)
 let are_comparable_reason kind ev1 ev2 =
-  let open Locations in
   (* If both of the operands have arithmetic type, the comparison is valid. *)
-  if Location_Bytes.is_included ev1 Location_Bytes.top_int
-  && Location_Bytes.is_included ev2 Location_Bytes.top_int
+  if Addresses.Bytes.is_included ev1 Addresses.Bytes.top_int
+  && Addresses.Bytes.is_included ev2 Addresses.Bytes.top_int
   then true, `Ok
   else
-    let null_1, rest_1 = Location_Bytes.split Base.null ev1
-    and null_2, rest_2 = Location_Bytes.split Base.null ev2 in
+    let null_1, rest_1 = Addresses.Bytes.split Base.null ev1
+    and null_2, rest_2 = Addresses.Bytes.split Base.null ev2 in
     (* Note that here, rest_1 and rest_2 cannot be both bottom. *)
-    let is_bottom1 = Location_Bytes.is_bottom rest_1
-    and is_bottom2 = Location_Bytes.is_bottom rest_2 in
+    let is_bottom1 = Addresses.Bytes.is_bottom rest_1
+    and is_bottom2 = Addresses.Bytes.is_bottom rest_2 in
     let arith_compare_ok, reason =
       if kind = Abstract_value.Equality
       then
@@ -134,8 +133,8 @@ let are_comparable_reason kind ev1 ev2 =
       (* If both pointers point to the same base, the comparison is valid. *)
       let single_base_ok =
         try
-          let base_1, _ = Location_Bytes.find_lonely_key rest_1
-          and base_2, _ = Location_Bytes.find_lonely_key rest_2 in
+          let base_1, _ = Addresses.Bytes.find_lonely_key rest_1
+          and base_2, _ = Addresses.Bytes.find_lonely_key rest_2 in
           Base.equal base_1 base_2
         with Not_found -> false
       in
@@ -260,7 +259,7 @@ let assume_pointer loc =
       then Ival.(join zero new_ival), acc_ok && Ival.is_zero ival
       else new_ival, acc_ok && Ival.equal ival new_ival
     in
-    Locations.Location_Bytes.add base ival acc_v, ok
+    Addresses.Bytes.add base ival acc_v, ok
   in
   try
     let loc, ok = Cvalue.V.(fold_topset_ok aux loc (bottom, true)) in
@@ -290,7 +289,7 @@ let assume_aligned modulo loc =
     let reduced_loc =
       if reduced_ival == ival
       then loc_acc
-      else Locations.Location_Bytes.add base reduced_ival loc_acc
+      else Addresses.Bytes.add base reduced_ival loc_acc
     in
     reduced_loc, alarm || alarm_acc
   in

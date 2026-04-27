@@ -19,7 +19,7 @@ module Types : sig
 
   type state = Cvalue.Model.t
   type value = Cvalue.V.t
-  type zone = Locations.Zone.t
+  type zone = Memory_zone.t
   type slice = Cvalue.V_Offsetmap.t
 
   type functions_states = state Cil_datatype.Stmt.Hashtbl.t

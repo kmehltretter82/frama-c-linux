@@ -16,7 +16,7 @@
     Returns None on either an evaluation error or on unsupported construct. *)
 val predicate_deps:
   pre:Cvalue.Model.t -> here:Cvalue.Model.t ->
-  Cil_types.predicate -> Locations.Zone.t option
+  Cil_types.predicate -> Memory_zone.t option
 
 (** Returns the list of behaviors of the given function that are active for
     the given initial state. *)
@@ -26,19 +26,19 @@ val valid_behaviors:
 (** Evaluation of the memory zone read by the \from part of an assigns clause,
     in the given cvalue state.  *)
 val assigns_inputs_to_zone:
-  Cvalue.Model.t -> Cil_types.assigns -> Locations.Zone.t
+  Cvalue.Model.t -> Cil_types.assigns -> Memory_zone.t
 
 (** Evaluation of the memory zone written by an assigns clauses, in the given
     cvalue state. *)
 val assigns_outputs_to_zone:
   result: Cil_types.varinfo option ->
-  Cvalue.Model.t -> Cil_types.assigns -> Locations.Zone.t
+  Cvalue.Model.t -> Cil_types.assigns -> Memory_zone.t
 
 (** Zones of an lvalue term of an assigns clause. *)
 type tlval_zones = {
-  under: Locations.Zone.t; (** Under-approximation of the memory zone. *)
-  over: Locations.Zone.t;  (** Over-approximation of the memory zone. *)
-  deps: Locations.Zone.t;  (** Dependencies needed to evaluate the address. *)
+  under: Memory_zone.t; (** Under-approximation of the memory zone. *)
+  over: Memory_zone.t;  (** Over-approximation of the memory zone. *)
+  deps: Memory_zone.t;  (** Dependencies needed to evaluate the address. *)
 }
 
 (** Context of an evaluation: in a statement annotation or an assigns clause. *)

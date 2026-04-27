@@ -12,16 +12,16 @@ type access = Locations.access
 
 module type DepsOf = sig
   type location
-  val zone_of_exp : (lval -> location) -> exp -> Locations.Zone.t
-  val zone_of_lval : (lval -> location) -> access -> lval -> Locations.Zone.t
-  val indirect_zone_of_lval : (lval -> location) -> lval -> Locations.Zone.t
+  val zone_of_exp : (lval -> location) -> exp -> Memory_zone.t
+  val zone_of_lval : (lval -> location) -> access -> lval -> Memory_zone.t
+  val indirect_zone_of_lval : (lval -> location) -> lval -> Memory_zone.t
   val deps_of_exp : (lval -> location) -> exp -> Deps.t
   val deps_of_lval : (lval -> location) -> access -> lval -> Deps.t
 end
 
 module type DepsOfInput = sig
   type location
-  val enumerate_valid_bits : Locations.access -> location -> Locations.Zone.t
+  val enumerate_valid_bits : Locations.access -> location -> Memory_zone.t
 end
 
 module MakeDepsOf (Loc : DepsOfInput) : DepsOf with type location =
@@ -63,20 +63,20 @@ module MakeDepsOf (Loc : DepsOfInput) : DepsOf with type location =
     let lhost, offset = lval.node in
     let lhost_zone = zone_of_lhost find_loc lhost
     and offset_zone = zone_of_offset find_loc offset in
-    Locations.Zone.join lhost_zone offset_zone
+    Memory_zone.join lhost_zone offset_zone
 
   (* Computation of the inputs of a host. Nothing for a variable, and the
      inputs of [e] for a dereference [*e]. *)
   and zone_of_lhost find_loc = function
-    | Var _ -> Locations.Zone.bottom
+    | Var _ -> Memory_zone.bottom
     | Mem e -> zone_of_exp find_loc e
 
   (* Computation of the inputs of an offset. *)
   and zone_of_offset find_loc = function
-    | NoOffset -> Locations.Zone.bottom
+    | NoOffset -> Memory_zone.bottom
     | Field (_, o) -> zone_of_offset find_loc o
     | Index (e, o) ->
-      Locations.Zone.join
+      Memory_zone.join
         (zone_of_exp find_loc e) (zone_of_offset find_loc o)
 end
 

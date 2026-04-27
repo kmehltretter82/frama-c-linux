@@ -25,13 +25,13 @@ module V : sig
 
   (** Values are essentially bytes-indexed locations, the NULL base
       representing basic integers or float. Operations that are not related to
-      locations (ie that are not present in [Location_Bytes]) are  defined
+      locations (ie that are not present in [Addresses.Bytes]) are defined
       below. *)
-  include module type of Location_Bytes
+  include module type of Addresses.Bytes
     (* Too many aliases, and OCaml module system is not able to keep track
        of all of them. Use some shortcuts *)
-    with type M.t = Location_Bytes.M.t
-     and type t = Location_Bytes.t
+    with type M.t = Addresses.Bytes.M.t
+     and type t = Addresses.Bytes.t
 
   include Offsetmap_lattice_with_isotropy.S
     with type t := t
@@ -156,7 +156,7 @@ module V_Or_Uninitialized : sig
 
   include Offsetmap_lattice_with_isotropy.S
     with type t := t
-     and type widen_hint = Locations.Location_Bytes.widen_hint
+     and type widen_hint = Addresses.Bytes.widen_hint
   include Lattice_type.With_Under_Approximation with type t:= t
   include Lattice_type.With_Narrow with type t := t
   include Lattice_type.With_Top with type t := t

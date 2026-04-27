@@ -42,27 +42,27 @@ module type Location_map_bitwise = sig
 
   val pretty_debug: t Pretty_utils.formatter
 
-  val add_binding : exact:bool -> t -> Zone.t -> v -> t
+  val add_binding : exact:bool -> t -> Memory_zone.t -> v -> t
   val add_binding_loc: exact:bool -> t -> location -> v -> t
   val add_base: Base.t -> LOffset.t -> t -> t
   val remove_base: Base.t -> t -> t
 
-  val find : t -> Zone.t -> v or_bottom
+  val find : t -> Memory_zone.t -> v or_bottom
   val filter_base : (Base.t -> bool) -> t -> t
 
   val map: (v -> v) -> t -> t
 
-  val fold : (Zone.t -> v -> 'a -> 'a) -> map -> 'a -> 'a
+  val fold : (Memory_zone.t -> v -> 'a -> 'a) -> map -> 'a -> 'a
   val fold_base : (Base.t -> LOffset.t -> 'a -> 'a) -> map -> 'a -> 'a
-  val fold_fuse_same : (Zone.t -> v -> 'a -> 'a) -> map -> 'a -> 'a
+  val fold_fuse_same : (Memory_zone.t -> v -> 'a -> 'a) -> map -> 'a -> 'a
 
   val fold_join_zone:
     both:(Int_Intervals.t -> LOffset.t -> 'a) ->
     conv:(Base.t -> 'a -> 'b) ->
-    empty_map:(Locations.Zone.t -> 'b) ->
+    empty_map:(Memory_zone.t -> 'b) ->
     join:('b -> 'b -> 'b) ->
     empty:'b ->
-    Locations.Zone.t -> map -> 'b
+    Memory_zone.t -> map -> 'b
 
   val map2:
     cache:Hptmap_sig.cache_type -> symmetric:bool -> idempotent:bool
@@ -205,14 +205,14 @@ struct
   let is_bottom x = x = Bottom
 
   let fold f m acc =
-    let on_offset base itvs = f (Zone.inject base itvs) in
+    let on_offset base itvs = f (Memory_zone.inject base itvs) in
     let on_base base = LOffset.fold (on_offset base) in
     LBase.fold on_base m acc
 
   let fold_base f m acc = LBase.fold f m acc
 
   let fold_fuse_same f m acc =
-    let on_offset base itvs = f (Zone.inject base itvs) in
+    let on_offset base itvs = f (Memory_zone.inject base itvs) in
     let f' base = LOffset.fold_fuse_same (on_offset base) in
     fold_base f' m acc
 
@@ -221,7 +221,7 @@ struct
     let empty_left _ = empty (* zone over which to fold is empty *) in
     let empty_right z = empty_map z in
     let both b itvs map_b = conv b (both itvs map_b) in
-    Zone.fold2_join_heterogeneous
+    Memory_zone.fold2_join_heterogeneous
       ~cache ~empty_left ~empty_right ~both ~join ~empty
 
   let map f = function
@@ -259,22 +259,23 @@ struct
       LBase.add base new_offsm m
     in Bottom.value ~bottom:m result
 
-  let add_binding ~exact m (loc:Zone.t) v  =
+  let add_binding ~exact m (loc:Memory_zone.t) v  =
     let add ~validity = LOffset.add_binding_intervals ~validity ~exact in
     let aux_base_offset = add_base_offset add v in
     match loc, m with
-    | Zone.Top (Base.SetLattice.Top, _), _ | _, Top -> Top
+    | Memory_zone.Top (Base.SetLattice.Top, _), _ | _, Top -> Top
     | _, Bottom -> Bottom
-    | _, Map m -> Map (Zone.fold_topset_ok aux_base_offset loc m)
+    | _, Map m -> Map (Memory_zone.fold_topset_ok aux_base_offset loc m)
 
   let add_binding_loc ~exact m loc v =
     let size = loc.size in
     let add ~validity = LOffset.add_binding_ival ~validity ~exact ~size in
     let aux_base_offset = add_base_offset add v in
-    match loc.loc, m with
-    | Location_Bits.Top (Base.SetLattice.Top, _), _ | _, Top -> Top
+    match loc.addr, m with
+    | Addresses.Bits.Top (Base.SetLattice.Top, _), _ | _, Top -> Top
     | _, Bottom -> Bottom
-    | _, Map m -> Map (Location_Bits.fold_topset_ok aux_base_offset loc.loc m)
+    | _, Map m ->
+      Map (Addresses.Bits.fold_topset_ok aux_base_offset loc.addr m)
 
   let add_base b offsm = function
     | Bottom | Top as m -> m
@@ -286,9 +287,9 @@ struct
 
   let find m loc =
     match loc, m with
-    | Zone.Top _, _ | _, Top -> `Value V.top
+    | Memory_zone.Top _, _ | _, Top -> `Value V.top
     | _, Bottom -> `Bottom
-    | Zone.Map _, Map m ->
+    | Memory_zone.Map _, Map m ->
       let treat_offset base itvs acc =
         match Base.validity base with
         | Base.Invalid -> acc
@@ -297,7 +298,7 @@ struct
           let* offsetmap = LBase.find base m in
           let v = LOffset.find_iset ~validity itvs offsetmap in
           Bottom.join V.join acc v
-      in Zone.fold_i treat_offset loc `Bottom
+      in Memory_zone.fold_i treat_offset loc `Bottom
 
 
   let top = Top

@@ -206,7 +206,7 @@ let print_sel_marks_list fmt to_select =
     | PdgMarks.SelNode (n, z) -> print_node_mark fmt n z m
     | PdgMarks.SelIn l ->
       Format.fprintf fmt "(UndefIn %a:%a)"
-        Locations.Zone.pretty l SlicingMarks.pretty_mark m
+        Memory_zone.pretty l SlicingMarks.pretty_mark m
   in match to_select with [] -> Format.fprintf fmt "<empty>"
                         | _ -> List.iter print_sel to_select
 

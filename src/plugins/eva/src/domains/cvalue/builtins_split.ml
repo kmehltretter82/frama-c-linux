@@ -57,7 +57,7 @@ let warning warn s =
 let split_v ~warn lv state max_card =
   if Ast_types.is_scalar lv.typ then
     let loc = Cvalue_queries.lval_to_loc state lv in
-    if Locations.Location_Bits.cardinal_zero_or_one loc.Locations.loc then
+    if Addresses.Bits.cardinal_zero_or_one loc.Locations.addr then
       let v_indet = Cvalue.Model.find_indeterminate state loc in
       let v = Cvalue.V_Or_Uninitialized.get_v v_indet in
       if V.is_bottom v then (* Alarm. *)

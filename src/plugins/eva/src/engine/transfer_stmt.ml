@@ -303,7 +303,7 @@ module Make (Engine: Engine_Subset) = struct
       let find_loc lval = Eval.Valuation.find_loc_def valuation lval in
       let expr_zone = EvaAstDeps.zone_of_exp find_loc expr in
       let written_zone = inout.Inout_type.over_outputs_if_termination in
-      not (Locations.Zone.intersects expr_zone written_zone)
+      not (Memory_zone.intersects expr_zone written_zone)
 
   (* Removes from the list of arguments of a call the arguments whose concrete
      or formal argument could have been written during the call, as well as

@@ -129,7 +129,7 @@ struct
 
     exception Result_is_top
 
-    let add_binding ~exact mem {loc; size} v =
+    let add_binding ~exact mem {addr; size} v =
       let had_non_bottom = ref false in
       let result = ref mem in
       let aux origin b offsets =
@@ -152,21 +152,21 @@ struct
             had_non_bottom := true;
             if offm != offm' then result := add b offm' !result
       in
-      match loc with
-      | Location_Bits.Top (Base.SetLattice.Top, orig) ->
+      match addr with
+      | Addresses.Bits.Top (Base.SetLattice.Top, orig) ->
         Abstract_interp.feedback_approximation
           "writing at a completely unknown address @[%a@]"
           Origin.pretty_as_reason orig;
         raise Result_is_top
-      | Location_Bits.Top (Base.SetLattice.Set set, origin) ->
+      | Addresses.Bits.Top (Base.SetLattice.Set set, origin) ->
         Base.Hptset.iter (fun b -> aux (Some origin) b Ival.top) set;
         !had_non_bottom, !result
-      | Location_Bits.Map loc_map ->
-        Location_Bits.M.iter (fun b off -> aux None b off) loc_map;
+      | Addresses.Bits.Map loc_map ->
+        Addresses.Bits.M.iter (fun b off -> aux None b off) loc_map;
         !had_non_bottom, !result
 
     (* may raise Error_Top in the case Top Top. Make sure to annotate callers *)
-    let find ?(conflate_bottom=true) mem {loc ; size} =
+    let find ?(conflate_bottom=true) mem {addr ; size} =
       let open Bottom.Operators in
       let handle_imprecise_base base acc =
         let v =
@@ -175,15 +175,15 @@ struct
         in
         Bottom.join V.join v acc
       in
-      match loc with
-      | Location_Bits.Top (Base.SetLattice.Top, _) -> `Value (vtop ())
-      | Location_Bits.Top (Base.SetLattice.Set s, _) ->
+      match addr with
+      | Addresses.Bits.Top (Base.SetLattice.Top, _) -> `Value (vtop ())
+      | Addresses.Bits.Top (Base.SetLattice.Set s, _) ->
         Base.SetLattice.O.fold handle_imprecise_base s `Bottom
-      | Location_Bits.Map loc_map -> begin
+      | Addresses.Bits.Map loc_map -> begin
           match size with
           | `Top ->
             let aux base _ acc = handle_imprecise_base base acc in
-            Location_Bits.M.fold aux loc_map `Bottom
+            Addresses.Bits.M.fold aux loc_map `Bottom
           | `Value size ->
             let aux_base base offsets acc_v =
               let validity = Base.validity base in
@@ -196,7 +196,7 @@ struct
                 in
                 Bottom.join V.join new_v acc_v
             in
-            Location_Bits.M.fold aux_base loc_map `Bottom
+            Addresses.Bits.M.fold aux_base loc_map `Bottom
         end
 
     (* Internal function for join and widen, that handles efficiently the
@@ -447,8 +447,8 @@ struct
         end;
         r
 
-    let paste_offsetmap ~from ~dst_loc ~size ~exact m =
-      let loc_dst = make_loc dst_loc (`Value size) in
+    let paste_offsetmap ~from ~dst_addr ~size ~exact m =
+      let loc_dst = make_loc dst_addr (`Value size) in
       assert (Z.leq Z.zero size);
       let exact = exact && cardinal_zero_or_one loc_dst in
       (* TODO: do we want to alter exact here? *)
@@ -471,11 +471,11 @@ struct
               add base_dst new_offsetmap acc
             else acc
       in
-      match dst_loc with
-      | Location_Bits.Map _ ->
-        let result = Location_Bits.fold_i treat_dst dst_loc m in
+      match dst_addr with
+      | Addresses.Bits.Map _ ->
+        let result = Addresses.Bits.fold_i treat_dst dst_addr m in
         !had_non_bottom, result
-      | Location_Bits.Top (top, orig) ->
+      | Addresses.Bits.Top (top, orig) ->
         if not (Base.SetLattice.equal top Base.SetLattice.top) then
           Abstract_interp.feedback_approximation
             "writing somewhere in @[%a@]@[%a@]."
@@ -503,7 +503,7 @@ struct
           Bottom.join Offsetmap.join acc copy
       in
       try
-        Location_Bits.fold_topset_ok treat_src src_loc `Bottom
+        Addresses.Bits.fold_topset_ok treat_src src_loc `Bottom
       with Error_Top -> top_offsetmap size
 
   end
@@ -712,13 +712,13 @@ struct
     | Bottom, m -> m
     | Map m1,Map m2 -> Map (M.widen ?priority ?hint m1 m2)
 
-  let paste_offsetmap ~from ~dst_loc ~size ~exact m =
+  let paste_offsetmap ~from ~dst_addr ~size ~exact m =
     match m with
     | Bottom -> m
     | Top -> m
     | Map m ->
       try
-        let non_bottom, r = M.paste_offsetmap ~from ~dst_loc ~size ~exact m in
+        let non_bottom, r = M.paste_offsetmap ~from ~dst_addr ~size ~exact m in
         if non_bottom then Map r else Bottom
       with M.Result_is_top -> Top
 

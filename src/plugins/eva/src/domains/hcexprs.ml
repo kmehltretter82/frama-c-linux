@@ -146,13 +146,13 @@ module HCEToZone = struct
 
   let cache_prefix = "Value.Symbolic_exprs.K2Z"
 
-  include Hptmap.Make (HCE) (Locations.Zone) (Hptmap_Info)
+  include Hptmap.Make (HCE) (Memory_zone) (Hptmap_Info)
 
   let is_included =
     let cache_name = cache_prefix ^ ".is_included" in
     let decide_fst _b _v1 = true in
     let decide_snd _b _v2 = false in
-    let decide_both _ v1 v2 = Locations.Zone.is_included v1 v2 in
+    let decide_both _ v1 v2 = Memory_zone.is_included v1 v2 in
     let decide_fast s t = if s == t then PTrue else PUnknown in
     binary_predicate
       (Hptmap_sig.PersistentCache cache_name) UniversalPredicate
@@ -163,7 +163,7 @@ module HCEToZone = struct
     let cache = Hptmap_sig.PersistentCache cache_name in
     let symmetric = true in
     let idempotent = true in
-    let decide _ v1 v2 = Some (Locations.Zone.join v1 v2) in
+    let decide _ v1 v2 = Some (Memory_zone.join v1 v2) in
     inter ~cache ~symmetric ~idempotent ~decide
 
   let union =
@@ -171,7 +171,7 @@ module HCEToZone = struct
     let cache = Hptmap_sig.PersistentCache cache_name in
     let symmetric = true in
     let idempotent = true in
-    let decide _ v1 v2 = Locations.Zone.join v1 v2 in
+    let decide _ v1 v2 = Memory_zone.join v1 v2 in
     join ~cache ~symmetric ~idempotent ~decide
 
   let merge =

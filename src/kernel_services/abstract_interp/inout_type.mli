@@ -7,12 +7,12 @@
 (**************************************************************************)
 
 type t = {
-  over_inputs: Locations.Zone.t;
-  over_inputs_if_termination: Locations.Zone.t;
-  over_logic_inputs: Locations.Zone.t;
-  under_outputs_if_termination: Locations.Zone.t;
-  over_outputs: Locations.Zone.t;
-  over_outputs_if_termination: Locations.Zone.t;
+  over_inputs: Memory_zone.t;
+  over_inputs_if_termination: Memory_zone.t;
+  over_logic_inputs: Memory_zone.t;
+  under_outputs_if_termination: Memory_zone.t;
+  over_outputs: Memory_zone.t;
+  over_outputs_if_termination: Memory_zone.t;
 }
 
 include Datatype.S with type t := t
@@ -24,7 +24,7 @@ val pretty_operational_inputs: t Pretty_utils.formatter
 val pretty_outputs: t Pretty_utils.formatter
 (** Pretty-print the fields [over_outputs] and [over_outputs_if_termination]. *)
 
-val map: (Locations.Zone.t -> Locations.Zone.t) -> t -> t
+val map: (Memory_zone.t -> Memory_zone.t) -> t -> t
 
 val bottom: t
 val join: t -> t -> t

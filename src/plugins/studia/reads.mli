@@ -14,7 +14,7 @@ type t =
   | Indirect of Cil_types.stmt
   (** Indirect read through a function call. *)
 
-val compute: Locations.Zone.t -> t list
+val compute: Memory_zone.t -> t list
 (** [compute z] finds all the statements that read [z]. The [effects]
     information indicates whether the read occur on the given statement,
     or through an inner call for [Call] instructions. *)

@@ -15,7 +15,7 @@ module Inout: sig
 
   (** Returns the memory zone modified by the given function (including local
       and formal variables). Returns Top if the inout plugin is missing. *)
-  val kf_outputs: Kernel_function.t -> Locations.Zone.t
+  val kf_outputs: Kernel_function.t -> Memory_zone.t
 end
 
 module Callgraph: sig

@@ -15,7 +15,7 @@ type cacheable = Eval.cacheable = Cacheable | NoCache | NoCacheCallers
 type full_result = {
   c_values: (Cvalue.V.t option * Cvalue.Model.t) list;
   c_clobbered: Base.SetLattice.t;
-  c_assigns: (Assigns.t * Locations.Zone.t) option;
+  c_assigns: (Assigns.t * Memory_zone.t) option;
   cacheable: cacheable;
 }
 

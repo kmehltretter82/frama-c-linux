@@ -25,7 +25,7 @@ let remember_bases_with_locals clob new_clob =
 
 let remember_if_locals_in_value clob left_loc v =
   if Cvalue.V.contains_addresses_of_any_locals v then
-    let new_clob = Location_Bits.get_bases left_loc.loc in
+    let new_clob = Addresses.Bits.get_bases left_loc.addr in
     remember_bases_with_locals clob new_clob
 
 let offsetmap_contains_local offm =

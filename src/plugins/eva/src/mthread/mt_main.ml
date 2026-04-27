@@ -93,8 +93,8 @@ let make_analysis_state () =
     curr_events_stack = [];
     memexec_cache = Datatype.Int.Hashtbl.create 16;
     curr_stack = Callstack.init ~thread:(Thread.(id main)) ~entry_point:f_main;
-    concurrent_accesses = Locations.Zone.bottom;
-    precise_concurrent_accesses = Locations.Zone.bottom;
+    concurrent_accesses = Memory_zone.bottom;
+    precise_concurrent_accesses = Memory_zone.bottom;
     concurrent_accesses_by_nodes = [];
   }
 

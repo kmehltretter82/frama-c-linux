@@ -12,8 +12,8 @@ open Cil_datatype
 open Pdg_types
 open PdgIndex
 
-type data_info = ((PdgTypes.Node.t * Locations.Zone.t option) list
-                  * Locations.Zone.t option) option
+type data_info = ((PdgTypes.Node.t * Memory_zone.t option) list
+                  * Memory_zone.t option) option
 
 type ctrl_info = PdgTypes.Node.t list
 
@@ -25,7 +25,7 @@ let zone_info_nodes pdg data_info =
     let before = info.Logic_deps.before in
     let zone = info.Logic_deps.zone in
     Pdg_parameters.debug ~level:2 "[pdg:annotation] need %a %s stmt %d@."
-      Locations.Zone.pretty zone
+      Memory_zone.pretty zone
       (if before then "before" else "after") stmt.sid;
     let nodes, undef_loc =
       Sets.find_location_nodes_at_stmt pdg stmt ~before zone
@@ -33,7 +33,7 @@ let zone_info_nodes pdg data_info =
     let undef_acc = match undef_acc, undef_loc with
       | None, _ -> undef_loc
       | _, None -> undef_acc
-      | Some z1, Some z2 -> Some (Locations.Zone.join z1 z2)
+      | Some z1, Some z2 -> Some (Memory_zone.join z1 z2)
     in
     (nodes @ nodes_acc, undef_acc)
   in match data_info with
@@ -130,7 +130,7 @@ let find_code_annot_nodes pdg stmt annot =
         let p fmt (n,z) = match z with
           | None -> PdgTypes.Node.pretty fmt n
           | Some z -> Format.fprintf fmt "%a(%a)"
-                        PdgTypes.Node.pretty n Locations.Zone.pretty z
+                        PdgTypes.Node.pretty n Memory_zone.pretty z
         in
         let pl fmt l = List.iter (fun n -> Format.fprintf fmt " %a" p n) l in
         Pdg_parameters.debug " ctrl nodes = %a"
@@ -147,7 +147,7 @@ let find_code_annot_nodes pdg stmt annot =
             | None -> ()
             | Some data_undef ->
               Pdg_parameters.debug " data undef = %a"
-                Locations.Zone.pretty data_undef;
+                Memory_zone.pretty data_undef;
           end
       end;
       ctrl_dpds, decl_nodes, data_dpds

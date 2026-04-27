@@ -35,10 +35,10 @@ module Make (Engine : Engine_abstractions_sig.S) = struct
                acc
              | Location from_loc ->
                let read = Location.enumerate_valid_bits Read from_loc in
-               Locations.Zone.join acc read)
-          Locations.Zone.bottom
+               Memory_zone.join acc read)
+          Memory_zone.bottom
           from_deps
-      | _ -> Locations.Zone.bottom
+      | _ -> Memory_zone.bottom
     in
     Inout_access.Access.make ~read ~write ()
 
@@ -51,7 +51,7 @@ module Make (Engine : Engine_abstractions_sig.S) = struct
   let compute_zones to_loc (lval : Eva_ast.lval) =
     match lval.node with
     | Var vi, NoOffset ->
-      Locations.(zone_of_varinfo vi, Zone.bottom)
+      Locations.zone_of_varinfo vi, Memory_zone.bottom
     | _ ->
       let loc = to_loc lval in
       let lv_zone = Location.enumerate_valid_bits Write loc in
@@ -62,7 +62,7 @@ module Make (Engine : Engine_abstractions_sig.S) = struct
     let to_loc = find_loc valuation in
     let written_zone, lv_indirect_zone = compute_zones to_loc lval in
     let exp_zone = EvaAstDeps.zone_of_exp to_loc exp in
-    let read_zone = Locations.Zone.join lv_indirect_zone exp_zone in
+    let read_zone = Memory_zone.join lv_indirect_zone exp_zone in
     Inout_access.Access.make ~read:read_zone ~write:written_zone ()
 
   let register_assign_lval pos valuation lval exp =

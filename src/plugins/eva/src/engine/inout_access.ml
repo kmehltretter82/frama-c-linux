@@ -8,8 +8,8 @@
 
 module Prototype = struct
   type t = {
-    read : Locations.Zone.t;
-    write : Locations.Zone.t;
+    read : Memory_zone.t;
+    write : Memory_zone.t;
   }
   [@@deriving eq,ord]
 end
@@ -27,38 +27,38 @@ module Access = struct
                (fun acc write ->
                   { read ; write } :: acc)
                acc
-               Locations.Zone.reprs)
+               Memory_zone.reprs)
           []
-          Locations.Zone.reprs
+          Memory_zone.reprs
       let pretty fmt access =
         Format.fprintf fmt "@[{ read: %a;@ write: %a; }@]"
-          Locations.Zone.pretty access.read
-          Locations.Zone.pretty access.write
+          Memory_zone.pretty access.read
+          Memory_zone.pretty access.write
     end)
-  let bottom = { read = Locations.Zone.bottom; write = Locations.Zone.bottom }
+  let bottom = { read = Memory_zone.bottom; write = Memory_zone.bottom }
 
   let is_bottom access =
-    Locations.Zone.is_bottom access.read &&
-    Locations.Zone.is_bottom access.write
+    Memory_zone.is_bottom access.read &&
+    Memory_zone.is_bottom access.write
 
   let is_included l r =
-    Locations.Zone.is_included l.read r.read
-    && Locations.Zone.is_included l.write r.write
+    Memory_zone.is_included l.read r.read
+    && Memory_zone.is_included l.write r.write
 
   let join l r =
-    { read = Locations.Zone.join l.read r.read;
-      write = Locations.Zone.join l.write r.write }
+    { read = Memory_zone.join l.read r.read;
+      write = Memory_zone.join l.write r.write }
 
   let make ?read ?write () =
-    let default = Locations.Zone.bottom in
+    let default = Memory_zone.bottom in
     { read = Option.value ~default read;
       write = Option.value ~default write; }
 
   let add_read zone access =
-    { access with read = Locations.Zone.join access.read zone }
+    { access with read = Memory_zone.join access.read zone }
 
   let add_write zone access =
-    { access with write = Locations.Zone.join access.write zone }
+    { access with write = Memory_zone.join access.write zone }
 end
 
 module Cache : sig
@@ -117,7 +117,7 @@ let register pos access =
   Cache.change pos (Access.join access)
 
 let mk_filter ~filter_base =
-  let filter_zone = Locations.Zone.filter_base filter_base in
+  let filter_zone = Memory_zone.filter_base filter_base in
   (fun access ->
      { read = filter_zone access.read;
        write = filter_zone access.write })

@@ -8,13 +8,12 @@
 
 open Cil_types
 open Visitor
-open Locations
 
 class virtual do_it_ = object(self)
-  inherit [Zone.t] Cumulative_analysis.cumulative_visitor as super
-  val mutable outs = Zone.bottom
+  inherit [Memory_zone.t] Cumulative_analysis.cumulative_visitor as super
+  val mutable outs = Memory_zone.bottom
 
-  method bottom = Zone.bottom
+  method bottom = Memory_zone.bottom
 
   method result = outs
 
@@ -29,7 +28,7 @@ class virtual do_it_ = object(self)
     | _ -> super#vstmt_aux s
 
   method join new_ =
-    outs <- Zone.join new_ outs;
+    outs <- Memory_zone.join new_ outs;
 
     (* For local initializations, counts the written variable as an output of the
        function, even if it is const; thus, [for_writing] is false in this case. *)
@@ -64,7 +63,7 @@ class virtual do_it_ = object(self)
                 self#join inout.over_outputs
               in
               List.iter join_outputs callees
-            | Error (Top | DisabledDomain) -> self#join Zone.top
+            | Error (Top | DisabledDomain) -> self#join Memory_zone.top
             | Error Bottom -> ()
           end
         | Local_init (v, AssignInit i, _) ->
@@ -86,7 +85,7 @@ class virtual do_it_ = object(self)
           aux (Cil.var v) i
         | Local_init (v, ConsInit(f, _, _),_) ->
           if Cvalue.Model.is_top Eva.Results.(before stmt |> get_cvalue_model)
-          then self#join Zone.top
+          then self#join Memory_zone.top
           else begin
             let { Inout_type.over_outputs = z }  =
               Operational_inputs.get_external_aux ?stmt:self#current_stmt
@@ -102,7 +101,7 @@ class virtual do_it_ = object(self)
     Cil.SkipChildren
 
   method clean_kf_result kf r =
-    Zone.filter_base
+    Memory_zone.filter_base
       (Eva.Logic_inout.accept_base ~formals:true ~locals:true kf)
       r
 
@@ -117,8 +116,8 @@ module Analysis = Cumulative_analysis.Make(
   struct
     let analysis_name ="outputs"
 
-    type t = Locations.Zone.t
-    module T = Locations.Zone
+    type t = Memory_zone.t
+    module T = Memory_zone
 
     class virtual do_it = do_it_
   end)
@@ -126,12 +125,12 @@ module Analysis = Cumulative_analysis.Make(
 let get_internal = Analysis.kernel_function
 
 let externalize kf x =
-  Zone.filter_base
+  Memory_zone.filter_base
     (Eva.Logic_inout.accept_base ~formals:false ~locals:false kf)
     x
 
 module Externals =
-  Kernel_function.Make_Table(Locations.Zone)
+  Kernel_function.Make_Table(Memory_zone)
     (struct
       let name = "Inout.Outputs.Externals"
       let dependencies = [ Analysis.Memo.self ]
@@ -145,7 +144,7 @@ let pretty_internal fmt kf =
   try
     Format.fprintf fmt "@[Out (internal) for function %a:@\n@[<hov 2>  %a@]@]@\n"
       Kernel_function.pretty kf
-      Zone.pretty (get_internal kf)
+      Memory_zone.pretty (get_internal kf)
   with Not_found ->
     ()
 
@@ -153,7 +152,7 @@ let pretty_external fmt kf =
   try
     Format.fprintf fmt "@[Out (external) for function %a:@\n@[<hov 2>  %a@]@]@\n"
       Kernel_function.pretty kf
-      Zone.pretty (get_external kf)
+      Memory_zone.pretty (get_external kf)
   with Not_found ->
     ()
 
@@ -168,5 +167,5 @@ let _kf_outputs =
     ~comment:"Returns the memory zone modified by a given function."
     ~plugin:Inout_parameters.name
     "kf_outputs"
-    Datatype.(func Kernel_function.ty Zone.ty)
+    Datatype.(func Kernel_function.ty Memory_zone.ty)
     get_internal

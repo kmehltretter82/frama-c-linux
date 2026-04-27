@@ -169,15 +169,15 @@ val print_states : ?filter:Base.Hptset.t -> request -> (string * string) list
 
 (** Computes (an overapproximation of) the memory zones that must be read to
     evaluate the given expression, including all addresses computations. *)
-val expr_deps : Cil_types.exp -> request -> Locations.Zone.t
+val expr_deps : Cil_types.exp -> request -> Memory_zone.t
 
 (** Computes (an overapproximation of) the memory zones that must be read to
     evaluate the given lvalue, including the lvalue zone itself. *)
-val lval_deps : Cil_types.lval -> request -> Locations.Zone.t
+val lval_deps : Cil_types.lval -> request -> Memory_zone.t
 
 (** Computes (an overapproximation of) the memory zones that must be read to
     evaluate the given lvalue, excluding the lvalue zone itself. *)
-val address_deps : Cil_types.lval -> request -> Locations.Zone.t
+val address_deps : Cil_types.lval -> request -> Memory_zone.t
 
 (** Taint of a memory zone, according to the taint domain. *)
 type taint =
@@ -196,7 +196,7 @@ type taint =
     a memory zone is tainted as soon as it is tainted for at least one taint.
     Returns an error if the taint domain was not enabled. *)
 val is_tainted :
-  ?names:string list -> Locations.Zone.t -> request -> taint result
+  ?names:string list -> Memory_zone.t -> request -> taint result
 
 (** Sets of taint names classified by kind of dependency. *)
 type taint_names_by_kind =
@@ -210,7 +210,7 @@ type taint_names_by_kind =
 (** Returns the sets of taint names whose tainted locations intersect the given
     memory zone, classified by kind of dependency (direct or indirect). *)
 val taint_names_by_kind :
-  Locations.Zone.t -> request -> taint_names_by_kind result
+  Memory_zone.t -> request -> taint_names_by_kind result
 
 (** Computes (an overapproximation of) the memory dependencies of an
     expression. *)
@@ -282,12 +282,12 @@ val as_location : address evaluation -> Locations.location
 (** Converts into a C location abstraction. *)
 val as_location_result : address evaluation -> Locations.location result
 
-(** Converts into a Zone. Error cases are converted into bottom or top zones
-    accordingly. *)
-val as_zone : address evaluation -> Locations.Zone.t
+(** Converts into a memory zone. Error cases are converted into bottom or top
+    zones accordingly. *)
+val as_zone : address evaluation -> Memory_zone.t
 
-(** Converts into a Zone result. *)
-val as_zone_result : address evaluation -> Locations.Zone.t result
+(** Converts into a memory zone result. *)
+val as_zone_result : address evaluation -> Memory_zone.t result
 
 (** Converts into a C location abstraction. Error cases are converted into
     bottom or top locations accordingly. *)

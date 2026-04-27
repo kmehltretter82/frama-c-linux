@@ -13,30 +13,30 @@ open Mt_types
 (* Sets of zone accesses (used in cfg nodes) *)
 module SetZoneAccess = struct
 
-  module P = Datatype.Pair(RW)(Locations.Zone)
+  module P = Datatype.Pair(RW)(Memory_zone)
 
   include Datatype.Set(Set.Make(P))(P)
 
   let to_two_zones (s: t) =
     let aux (rw, z) (r, w) =
       match rw with
-      | Read -> (Locations.Zone.join r z, w)
-      | Write _ -> (r, Locations.Zone.join w z)
-      | ReadPos _ -> (Locations.Zone.join r z, w)
-      | WritePos _ -> (r, Locations.Zone.join w z)
+      | Read -> (Memory_zone.join r z, w)
+      | Write _ -> (r, Memory_zone.join w z)
+      | ReadPos _ -> (Memory_zone.join r z, w)
+      | WritePos _ -> (r, Memory_zone.join w z)
     in
-    fold aux s (Locations.Zone.bottom, Locations.Zone.bottom)
+    fold aux s (Memory_zone.bottom, Memory_zone.bottom)
 
 
   let pretty_sep ~sep fmt s =
     let r, w = to_two_zones s in
-    match Locations.Zone.(is_bottom r, is_bottom w) with
+    match Memory_zone.(is_bottom r, is_bottom w) with
     | true, true -> ()
-    | false, true -> Format.fprintf fmt "reads %a" Locations.Zone.pretty r
-    | true, false -> Format.fprintf fmt "writes %a" Locations.Zone.pretty w
+    | false, true -> Format.fprintf fmt "reads %a" Memory_zone.pretty r
+    | true, false -> Format.fprintf fmt "writes %a" Memory_zone.pretty w
     | false, false ->
       Format.fprintf fmt "reads %a%(%)writes %a"
-        Locations.Zone.pretty r sep Locations.Zone.pretty w
+        Memory_zone.pretty r sep Memory_zone.pretty w
 
   let pretty = pretty_sep ~sep:",@,"
 end
@@ -87,7 +87,7 @@ module AccessesByZone = struct
       (fun z s () ->
          if not (SetStmtIdAccess.(equal empty s)) then
            Format.fprintf fmt "@[<hov 2>%a:@ %a@]@ "
-             Locations.Zone.pretty z (SetStmtIdAccess.pretty) s
+             Memory_zone.pretty z (SetStmtIdAccess.pretty) s
       ) m ();
     Format.fprintf fmt "@]";
   ;;

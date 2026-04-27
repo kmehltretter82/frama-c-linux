@@ -195,9 +195,9 @@ struct
         in
         Map.add base offset' map
       in
-      let loc = Locations.loc_bytes_to_loc_bits (oracle exp) in
+      let addr = Addresses.Bits.of_bytes (oracle exp) in
       try
-        `Value (Locations.Location_Bits.fold_topset_ok add loc Map.empty)
+        `Value (Addresses.Bits.fold_topset_ok add addr Map.empty)
       with Abstract_interp.Error_Top ->
         `Top
 
@@ -223,7 +223,7 @@ struct
       let typ = Option.value ~default:Cil_const.voidType (Base.typeof base) in
       Map.add base (`Value (Offset.NoOffset typ)) map
     in
-    Locations.Location_Bits.(fold_bases add_base loc'.loc empty)
+    Addresses.Bits.(fold_bases add_base loc'.addr empty)
 end
 
 

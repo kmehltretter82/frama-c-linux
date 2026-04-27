@@ -16,16 +16,16 @@ type access = Locations.access
 module type DepsOf = sig
   type location
 
-  val zone_of_exp : (lval -> location) -> exp -> Locations.Zone.t
+  val zone_of_exp : (lval -> location) -> exp -> Memory_zone.t
   (** Given a function computing the location of lvalues, computes the memory
       zone on which the value of an expression depends. *)
 
-  val zone_of_lval : (lval -> location) -> access -> lval -> Locations.Zone.t
+  val zone_of_lval : (lval -> location) -> access -> lval -> Memory_zone.t
   (** Given a function computing the location of lvalues, computes the memory
       zone on which the value of an lvalue depends. If [access = Write], this
       function only considers the writable bits of the lvalue. *)
 
-  val indirect_zone_of_lval : (lval -> location) -> lval -> Locations.Zone.t
+  val indirect_zone_of_lval : (lval -> location) -> lval -> Memory_zone.t
   (** Given a function computing the location of lvalues, computes the memory
       zone on which the offset and the pointer expression (if any) of an
       lvalue depend. *)
@@ -43,7 +43,7 @@ end
 (** Input for [MakeDepsOf] functor. *)
 module type DepsOfInput = sig
   type location
-  val enumerate_valid_bits : Locations.access -> location -> Locations.Zone.t
+  val enumerate_valid_bits : Locations.access -> location -> Memory_zone.t
   (** See {!Abstract_location.enumerate_valid_bits} *)
 end
 

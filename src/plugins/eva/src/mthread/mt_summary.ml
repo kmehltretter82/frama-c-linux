@@ -23,8 +23,8 @@ type queue_summary = {
 }
 
 type shared_var_summary = {
-  read : Locations.Zone.Set.t;
-  written : Locations.Zone.Set.t;
+  read : Memory_zone.Set.t;
+  written : Memory_zone.Set.t;
 }
 
 type thread_summary = {
@@ -68,12 +68,12 @@ module SharedVarSummary = struct
 
   type t = shared_var_summary
 
-  let empty = Locations.Zone.Set.{ read = empty; written = empty }
+  let empty = Memory_zone.Set.{ read = empty; written = empty }
 
   let name = "Mt_summary.SharedVarSummary"
   let reprs = [ empty ]
   let structural_descr =
-    let descr = Locations.Zone.Set.packed_descr in
+    let descr = Memory_zone.Set.packed_descr in
     Structural_descr.t_record [| descr; descr; |]
 end
 
@@ -130,12 +130,12 @@ let add_mqueue_sent_to id th_summary =
   { th_summary with mqueues }
 
 let add_shared_var_read zone th_summary =
-  let read = Locations.Zone.Set.add zone th_summary.shared_vars.read in
+  let read = Memory_zone.Set.add zone th_summary.shared_vars.read in
   let shared_vars = { th_summary.shared_vars with read } in
   { th_summary with shared_vars }
 
 let add_shared_var_written zone th_summary =
-  let written = Locations.Zone.Set.add zone th_summary.shared_vars.written in
+  let written = Memory_zone.Set.add zone th_summary.shared_vars.written in
   let shared_vars = { th_summary.shared_vars with written } in
   { th_summary with shared_vars }
 
@@ -224,9 +224,9 @@ module AccessPropertyByZone = struct
   (* Applies [f] on each (zone, access_kind, protection, locations) of [map]. *)
   let iter f map =
     let iter_zone f zone =
-      let apply base itvs () = f (Locations.Zone.inject base itvs) in
-      try Locations.Zone.fold_i apply zone ()
-      with Abstract_interp.Error_Top -> f Locations.Zone.top
+      let apply base itvs () = f (Memory_zone.inject base itvs) in
+      try Memory_zone.fold_i apply zone ()
+      with Abstract_interp.Error_Top -> f Memory_zone.top
     in
     let iter_access f accesses =
       LocationsByAccessProperty.iter
@@ -294,7 +294,7 @@ let compute_threads_summary analysis =
 (* ----- Summary for all accesses ------------------------------------------- *)
 
 module Access =
-  Datatype.Triple_with_collections (Locations.Zone) (AccessKind) (Protection)
+  Datatype.Triple_with_collections (Memory_zone) (AccessKind) (Protection)
 
 type access = Access.t
 

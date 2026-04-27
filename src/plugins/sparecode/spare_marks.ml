@@ -266,7 +266,7 @@ let select_entry_point proj _kf pdg =
 
 let select_all_outputs proj kf pdg =
   let outputs = Inout.kf_external_outputs kf in
-  debug 1 "@[selecting output zones %a@]" Locations.Zone.pretty outputs;
+  debug 1 "@[selecting output zones %a@]" Memory_zone.pretty outputs;
   try
     let nodes, undef = Pdg.Api.find_location_nodes_at_end pdg outputs in
     let nodes =

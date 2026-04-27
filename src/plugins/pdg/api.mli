@@ -12,7 +12,7 @@ type t = PdgTypes.Pdg.t
 (** Program Dependence Graph type *)
 
 type t_nodes_and_undef =
-  ((PdgTypes.Node.t * Locations.Zone.t option) list * Locations.Zone.t option)
+  ((PdgTypes.Node.t * Memory_zone.t option) list * Memory_zone.t option)
 (** type for the return value of many [find_xxx] functions when the
     answer can be a list of [(node, z_part)] and an [undef zone].
     For each node, [z_part] can specify which part of the node
@@ -129,21 +129,21 @@ val find_entry_point_node : t -> PdgTypes.Node.t
     @raise Top if the given pdg is top. *)
 
 val find_location_nodes_at_stmt : t -> Cil_types.stmt -> before:bool ->
-  Locations.Zone.t -> t_nodes_and_undef
+  Memory_zone.t -> t_nodes_and_undef
 (** Find the nodes that define the value of the location at the given
     program point. Also return a zone that might be undefined at that point.
     @raise Not_found if the given statement is unreachable.
     @raise Bottom if given PDG is bottom.
     @raise Top if the given pdg is top. *)
 
-val find_location_nodes_at_end : t -> Locations.Zone.t -> t_nodes_and_undef
+val find_location_nodes_at_end : t -> Memory_zone.t -> t_nodes_and_undef
 (** Same than {!find_location_nodes_at_stmt} for the program point located
     at the end of the function.
     @raise Not_found if the output state is unreachable.
     @raise Bottom if given PDG is bottom.
     @raise Top if the given pdg is top. *)
 
-val find_location_nodes_at_begin : t -> Locations.Zone.t -> t_nodes_and_undef
+val find_location_nodes_at_begin : t -> Memory_zone.t -> t_nodes_and_undef
 (** Same than {!find_location_nodes_at_stmt} for the program point located
     at the beginning of the function.
     Notice that it can only find formal argument nodes.

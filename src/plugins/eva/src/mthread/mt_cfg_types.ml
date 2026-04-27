@@ -389,7 +389,7 @@ module AccessesByZoneNode = struct
       (fun z s () ->
          if not (SetNodeIdAccess.(equal empty s)) then
            Format.fprintf fmt "@[<hov 2>[%a]@ %a@]@ "
-             Locations.Zone.pretty z (SetNodeIdAccess.pretty) s
+             Memory_zone.pretty z (SetNodeIdAccess.pretty) s
       ) m ();
     Format.fprintf fmt "@]";
   ;;

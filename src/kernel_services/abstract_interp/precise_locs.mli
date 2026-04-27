@@ -7,7 +7,7 @@
 (**************************************************************************)
 
 (** This module provides transient datastructures that may be more precise
-    than an {!Ival.t}, {!Locations.Location_Bits.t} and {!Locations.location}
+    than an {!Ival.t}, {!Addresses.Bits.t} and {!Locations.location}
     respectively, typically for l-values such as [t[i][j]], [p->t[i]], etc.
     Those structures do not have a lattice structure, and cannot be stored
     as an abstract domain. However, they can be use to model more precisely
@@ -35,20 +35,18 @@ val shift_offset_by_singleton : Z.t -> precise_offset -> precise_offset
 val shift_offset : Ival.t -> precise_offset -> precise_offset
 
 
-(** {2 Precise location_bits} *)
+(** {2 Precise Address_set.Bits} *)
 
-type precise_location_bits
-val pretty_loc_bits : Format.formatter -> precise_location_bits -> unit
-val bottom_location_bits : precise_location_bits
+type precise_addr_bits
+val pretty_addr_bits : Format.formatter -> precise_addr_bits -> unit
+val bottom_addr_bits : precise_addr_bits
 
-val inject_location_bits : Locations.Location_Bits.t -> precise_location_bits
-val combine_base_precise_offset :
-  Base.t -> precise_offset -> precise_location_bits
-val combine_loc_precise_offset :
-  Locations.Location_Bits.t -> precise_offset -> precise_location_bits
+val inject_addr_bits : Addresses.Bits.t -> precise_addr_bits
+val combine_base_precise_offset : Base.t -> precise_offset -> precise_addr_bits
+val combine_addr_precise_offset :
+  Addresses.Bits.t -> precise_offset -> precise_addr_bits
 
-val imprecise_location_bits :
-  precise_location_bits -> Locations.Location_Bits.t
+val imprecise_addr_bits : precise_addr_bits -> Addresses.Bits.t
 
 
 (** {2 Precise locations} *)
@@ -60,7 +58,7 @@ val equal_loc: precise_location -> precise_location -> bool
 val loc_size: precise_location -> Z_or_top.t
 
 val make_precise_loc :
-  precise_location_bits -> size:Z_or_top.t -> precise_location
+  precise_addr_bits -> size:Z_or_top.t -> precise_location
 
 val imprecise_location : precise_location -> Locations.location
 
@@ -76,7 +74,7 @@ val fold:
   (Locations.location -> 'a -> 'a) -> precise_location -> 'a -> 'a
 
 val enumerate_valid_bits:
-  Locations.access -> precise_location -> Locations.Zone.t
+  Locations.access -> precise_location -> Memory_zone.t
 
 val valid_cardinal_zero_or_one: for_writing:bool -> precise_location -> bool
 (** Is the restriction of the given location to its valid part precise enough
@@ -96,3 +94,31 @@ val valid_part:
     is true by default. If it is set to false, the location is assumed to be
     byte aligned, and its offset (expressed in bits) is reduced to be congruent
     to 0 modulo 8. *)
+
+
+(** {2 Deprecated} *)
+
+type precise_location_bits
+[@@deprecated "Use precise_addr_bits instead"]
+
+val pretty_loc_bits : Format.formatter -> precise_addr_bits -> unit
+[@@deprecated "Use pretty_addr_bits instead"]
+[@@migrate { repl = Rel.pretty_addr_bits }]
+
+val bottom_location_bits : precise_addr_bits
+[@@deprecated "Use bottom_addr_bits instead"]
+[@@migrate { repl = Rel.bottom_addr_bits }]
+
+val inject_location_bits : Addresses.Bits.t -> precise_addr_bits
+[@@deprecated "Use inject_addr_bits instead"]
+[@@migrate { repl = Rel.inject_addr_bits }]
+
+val combine_loc_precise_offset :
+  Addresses.Bits.t -> precise_offset -> precise_addr_bits
+[@@deprecated "Use combine_addr_precise_offset instead"]
+[@@migrate { repl = Rel.combine_addr_precise_offset }]
+
+val imprecise_location_bits :
+  precise_addr_bits -> Addresses.Bits.t
+[@@deprecated "Use imprecise_addr_bits instead"]
+[@@migrate { repl = Rel.imprecise_addr_bits }]

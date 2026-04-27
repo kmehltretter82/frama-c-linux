@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Locations
 
 
 module Tbl =
@@ -46,18 +45,18 @@ module To_Use = struct
       in
       let f b intervs =
         if accept_base b
-        then Zone.inject b intervs
-        else Zone.bottom
+        then Memory_zone.inject b intervs
+        else Memory_zone.bottom
       in
-      let joiner = Zone.join in
+      let joiner = Memory_zone.join in
       let cache = Hptmap_sig.TemporaryCache "from cleanup" in
       let zone_substitution =
-        Zone.cached_fold ~cache ~f ~joiner ~empty:Zone.bottom
+        Memory_zone.cached_fold ~cache ~f ~joiner ~empty:Memory_zone.bottom
       in
       let zone_substitution x =
         try
           zone_substitution x
-        with Abstract_interp.Error_Top -> Zone.top
+        with Abstract_interp.Error_Top -> Memory_zone.top
       in
       let map_zone = Eva.Deps.map zone_substitution in
       { memory = From_memory.map map_zone froms.memory;

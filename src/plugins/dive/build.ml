@@ -110,20 +110,20 @@ struct
     is_tainted zone request |> Result.to_option
 
   let writes zone =
-    Self.debug ~dkey "computing writes for %a" Locations.Zone.pretty zone;
+    Self.debug ~dkey "computing writes for %a" Memory_zone.pretty zone;
     let writes = Studia.Writes.compute zone in
     Self.debug ~dkey "%d found" (List.length writes);
     writes
 
   let reads zone =
-    Self.debug ~dkey "computing reads for %a" Locations.Zone.pretty zone;
+    Self.debug ~dkey "computing reads for %a" Memory_zone.pretty zone;
     let reads = Studia.Reads.compute zone in
     Self.debug ~dkey "%d found" (List.length reads);
     reads
 
   let does_lval_read_zone zone stmt lval =
     let zone' = to_zone (Local (stmt,[])) lval in
-    Locations.Zone.intersects zone' zone
+    Memory_zone.intersects zone' zone
 
   let does_exp_read_zone zone stmt exp =
     List.exists (does_lval_read_zone zone stmt) (EnumLvals.in_exp exp)
@@ -186,7 +186,7 @@ let enumerate_cells ~is_folded_base gstmt lval =
     | Null -> Seq.return AbsoluteMemory
   in
   try
-    Location_Bits.to_seq_i location.loc |> Seq.flat_map map_base
+    Addresses.Bits.to_seq_i location.addr |> Seq.flat_map map_base
   with Abstract_interp.Error_Top ->
   match gstmt with
   | Local (stmt,_) -> Seq.return (Unknown (lval, stmt))

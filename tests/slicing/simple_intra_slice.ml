@@ -49,7 +49,7 @@ let main _ =
     let fct = Globals.Functions.find_by_name fct_name in
     let outs = Inout.kf_external_outputs fct in
     Format.printf "Sorties de la fonction %s = %a\n"
-      fct_name Locations.Zone.pretty outs
+      fct_name Memory_zone.pretty outs
   in
   let kf = get_fct "f1"  in
   Format.printf "@[%a@]@\n" pretty_pdg kf;

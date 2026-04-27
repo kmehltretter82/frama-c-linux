@@ -64,7 +64,7 @@ module DepsOrUnassigned = struct
   let default_is_bottom = false
 
   let to_zone = function
-    | Unassigned -> Locations.Zone.bottom
+    | Unassigned -> Memory_zone.bottom
     | AssignedFrom fd | MaybeAssignedFrom fd -> Deps.to_zone fd
 
   let may_be_unassigned = function
@@ -105,7 +105,7 @@ module Memory = struct
 
   (* Once the base is known, we can obtain something of type [Deps.t] *)
   let convert_find_offsm base fp =
-    let z = Locations.Zone.inject base fp.fo_itvs in
+    let z = Memory_zone.inject base fp.fo_itvs in
     Deps.add_data fp.fo_deps z
 
   let empty_find_offsm = {
@@ -144,7 +144,7 @@ module Memory = struct
       ~cache aux_find_offsm join_find_offsm empty_find_offsm
 
   (* Collecting dependencies on a given zone. *)
-  let find_precise : t -> Locations.Zone.t -> Deps.t =
+  let find_precise : t -> Memory_zone.t -> Deps.t =
     let both = find_precise_offsetmap in
     let conv = convert_find_offsm in
     (* We are querying a zone for which no dependency is stored. Hence, every
@@ -205,13 +205,13 @@ let join x y =
 
 let outputs assigns =
   match assigns.memory with
-  | Memory.Top -> Locations.Zone.top
-  | Memory.Bottom -> Locations.Zone.bottom
+  | Memory.Top -> Memory_zone.top
+  | Memory.Bottom -> Memory_zone.bottom
   | Memory.Map m ->
     Memory.fold
       (fun z v acc ->
          let open DepsOrUnassigned in
          match v with
          | Unassigned -> acc
-         | AssignedFrom _ | MaybeAssignedFrom _ -> Locations.Zone.join z acc)
-      m Locations.Zone.bottom
+         | AssignedFrom _ | MaybeAssignedFrom _ -> Memory_zone.join z acc)
+      m Memory_zone.bottom

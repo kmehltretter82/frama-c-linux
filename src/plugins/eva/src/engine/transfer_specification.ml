@@ -129,7 +129,7 @@ let warn_on_missing_result_assigns kinstr kf spec =
       Kernel_function.pretty kf
 
 let reduce_to_valid_location kind term loc =
-  if Locations.(Location_Bits.(equal top loc.loc)) then
+  if Locations.(Addresses.Bits.(equal top loc.addr)) then
     begin
       Self.error ~once:true ~current:true
         "@[Cannot handle@ %a,@ location is too imprecise@ (%a).@ \
@@ -168,8 +168,8 @@ let precise_loc_of_assign env kind term =
         Eval_terms.eval_tlval_as_location ~alarm_mode env term
       | Free | Allocate ->
         let result = Eval_terms.eval_term ~alarm_mode env term in
-        let loc_bits = Locations.loc_bytes_to_loc_bits result.eover in
-        Locations.make_loc loc_bits Z_or_top.top
+        let addr_bits = Addresses.Bits.of_bytes result.eover in
+        Locations.make_loc addr_bits Z_or_top.top
     in
     if kind <> From then reduce_to_valid_location kind term loc else Some loc
   with Eval_terms.LogicEvalError e ->
@@ -342,8 +342,8 @@ module Make (Engine: Engine_Subset) = struct
       let loc = Option.map Precise_locs.imprecise_location precise_loc in
       match loc with
       | None | Some Locations.{ size = `Top } -> ()
-      | Some Locations.{ loc; size = `Value size } ->
-        let offsm = Cvalue.Model.copy_offsetmap loc size cvalue_state in
+      | Some Locations.{ addr; size = `Value size } ->
+        let offsm = Cvalue.Model.copy_offsetmap addr size cvalue_state in
         let warn v =
           match Cvalue.V_Or_Uninitialized.get_v v with
           | Top (bases, origin) ->

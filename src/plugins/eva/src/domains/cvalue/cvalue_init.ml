@@ -21,7 +21,7 @@ let make_well hidden_base state loc =
   in
   let well_loc =
     Locations.make_loc
-      (Location_Bits.inject hidden_base Ival.zero)
+      (Addresses.Bits.inject hidden_base Ival.zero)
       (`Value size)
   in
   let state = add_initialized state well_loc well in
@@ -216,10 +216,10 @@ let initialize_var_using_type varinfo state =
               | [] -> assert false (* ContextWidth is at least 1*)
               | l :: ll -> l, ll
             in
-            let last_offsm = offsm_of_loc last_loc.loc in
+            let last_offsm = offsm_of_loc last_loc.addr in
             (* Join of the contents of the first elements *)
             let aux_loc offsm loc =
-              Cvalue.V_Offsetmap.join offsm (offsm_of_loc loc.loc)
+              Cvalue.V_Offsetmap.join offsm (offsm_of_loc loc.addr)
             in
             let offsm_joined = List.fold_left aux_loc last_offsm locs in
             (* TODO: add Offsetmap.paste_repeated_slices to Offsetmap, and
@@ -241,14 +241,14 @@ let initialize_var_using_type varinfo state =
               let total_size = Z.mul size_elt (Z.of_int ncells) in
               let offsm_repeat = Cvalue.V_Offsetmap.create
                   ~size_v:modu ~size:total_size v in
-              let loc = Location_Bits.shift
-                  (Ival.inject_singleton size_elt) last_loc.loc;
+              let addr = Addresses.Bits.shift
+                  (Ival.inject_singleton size_elt) last_loc.addr;
               in
               (* paste [size - max_precise_size] elements, starting from
                  the last location initialized + 1 *)
               state :=
                 Cvalue.Model.paste_offsetmap
-                  ~from:offsm_repeat ~dst_loc:loc ~size:total_size ~exact:true
+                  ~from:offsm_repeat ~dst_addr:addr ~size:total_size ~exact:true
                   !state
             else (
               (* We have probably initialized a struct with different fields.
@@ -257,13 +257,13 @@ let initialize_var_using_type varinfo state =
                 Self.result ~once:true ~current:true
                   "Initializing a complex array of %d elements. This may \
                    take some time" size;
-              let loc = ref last_loc.loc in
+              let addr = ref last_loc.addr in
               for _i = max_precise_size to psize do
-                loc := Location_Bits.shift
-                    (Ival.inject_singleton size_elt) !loc;
+                addr := Addresses.Bits.shift
+                    (Ival.inject_singleton size_elt) !addr;
                 state :=
                   Cvalue.Model.paste_offsetmap
-                    ~from:offsm_joined ~dst_loc:!loc ~size:size_elt ~exact:true
+                    ~from:offsm_joined ~dst_addr:!addr ~size:size_elt ~exact:true
                     !state
               done);
           end;

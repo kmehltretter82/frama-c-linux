@@ -125,7 +125,7 @@ module CVal = struct
     in
     try
       let init = [], false in
-      let kfs, alarm = Locations.Location_Bytes.fold_topset_ok aux v init in
+      let kfs, alarm = Addresses.Bytes.fold_topset_ok aux v init in
       `Value kfs, alarm
     with Abstract_interp.Error_Top -> `Top, true
 

@@ -49,12 +49,12 @@ val get_input_mark : sig_marks -> int -> sl_mark
 val get_all_input_marks :
   sig_marks -> (PdgIndex.Signature.in_key * sl_mark) list
 val get_matching_input_marks :
-  sig_marks -> Locations.Zone.t -> (PdgIndex.Signature.in_key * sl_mark) list
+  sig_marks -> Memory_zone.t -> (PdgIndex.Signature.in_key * sl_mark) list
 val merge_inputs_m1_mark : sig_marks -> sl_mark
-val get_input_loc_under_mark : sig_marks -> Locations.Zone.t -> sl_mark
+val get_input_loc_under_mark : sig_marks -> Memory_zone.t -> sl_mark
 val get_in_ctrl_mark : sig_marks -> sl_mark
 val something_visible : sig_marks -> bool
 val some_visible_out : sig_marks -> bool
 val is_topin_visible : sig_marks -> bool
-val get_marked_out_zone : sig_marks -> bool * Locations.Zone.t
+val get_marked_out_zone : sig_marks -> bool * Memory_zone.t
 val pretty_sig : Format.formatter -> sig_marks -> unit

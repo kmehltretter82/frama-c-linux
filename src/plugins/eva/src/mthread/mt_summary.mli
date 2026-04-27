@@ -30,8 +30,8 @@ type queue_summary = {
 }
 
 type shared_var_summary = {
-  read : Locations.Zone.Set.t; (** Shared locations read. *)
-  written : Locations.Zone.Set.t (** Shared locations written. *)
+  read : Memory_zone.Set.t; (** Shared locations read. *)
+  written : Memory_zone.Set.t (** Shared locations written. *)
 }
 
 type thread_summary = {
@@ -52,7 +52,7 @@ module ThreadTable : State_builder.Hashtbl with type key = Thread.t
 type access
 
 (** Memory zone of an access. *)
-val access_zone: access -> Locations.Zone.t
+val access_zone: access -> Memory_zone.t
 
 (** Kind of an access: read or write. *)
 val access_kind: access -> Mt_shared_vars_types.access_kind

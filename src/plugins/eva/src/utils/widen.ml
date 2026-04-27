@@ -426,9 +426,9 @@ let dynamic_bases_of_lval states e offset =
   let lv = Eva_ast.mk_lval (Mem e, offset) in
   List.fold_left (fun acc' state ->
       let location = Cvalue_queries.lval_to_loc state lv in
-      Locations.Location_Bits.fold_bases
+      Addresses.Bits.fold_bases
         (fun base acc'' -> Base.Hptset.add base acc'')
-        location.Locations.loc acc'
+        location.Locations.addr acc'
     ) Base.Hptset.empty states
 
 (* Find syntactically the dynamic hints on [stmt]. *)

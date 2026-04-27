@@ -72,7 +72,7 @@ val get_stmt_mark : fct_slice -> stmt -> pdg_mark
 val get_label_mark : fct_slice -> stmt -> label -> pdg_mark
 val get_param_mark : fct_slice -> int -> pdg_mark
 val get_local_var_mark : fct_slice -> varinfo -> pdg_mark
-val get_input_loc_under_mark : fct_slice -> Locations.Zone.t -> pdg_mark
+val get_input_loc_under_mark : fct_slice -> Memory_zone.t -> pdg_mark
 
 val get_mark_from_src_fun : Kernel_function.t -> pdg_mark
 

@@ -20,8 +20,8 @@ let is_call_stmt stmt =
   | _ -> false
 
 module Signature = struct
-  type in_key = InCtrl | InNum of int | InImpl of Locations.Zone.t
-  type out_key = OutRet | OutLoc of Locations.Zone.t
+  type in_key = InCtrl | InNum of int | InImpl of Memory_zone.t
+  type out_key = OutRet | OutLoc of Memory_zone.t
   type key = In of in_key | Out of out_key
 
   type 'info t =
@@ -30,23 +30,23 @@ module Signature = struct
       (** implicit inputs :
           Maybe we should use [Lmap_bitwise.Make_bitwise] ?
           but that would make things a lot more complicated... :-? *)
-      in_implicits : (Locations.Zone.t * 'info) list ;
+      in_implicits : (Memory_zone.t * 'info) list ;
       out_ret : 'info option ;
-      outputs : (Locations.Zone.t * 'info) list }
+      outputs : (Memory_zone.t * 'info) list }
 
   module Str_descr = struct
     open Structural_descr
-    let in_key = t_sum [| [| p_int |]; [| Locations.Zone.packed_descr |] |]
-    let out_key = t_sum [| [| Locations.Zone.packed_descr |] |]
+    let in_key = t_sum [| [| p_int |]; [| Memory_zone.packed_descr |] |]
+    let out_key = t_sum [| [| Memory_zone.packed_descr |] |]
     let key = t_sum [| [| pack in_key |]; [| pack out_key |] |]
 
     let t d_info = t_record
         [| pack (t_option d_info);
            pack (t_list (t_tuple [| p_int; pack d_info |]));
-           pack (t_list (t_tuple [| Locations.Zone.packed_descr;
+           pack (t_list (t_tuple [| Memory_zone.packed_descr;
                                     pack d_info |]));
            pack (t_option d_info);
-           pack (t_list (t_tuple [| Locations.Zone.packed_descr;
+           pack (t_list (t_tuple [| Memory_zone.packed_descr;
                                     pack d_info |]));
         |]
   end
@@ -57,7 +57,7 @@ module Signature = struct
 
   let in_key n = In (InNum n)
   let in_impl_key loc = In (InImpl loc)
-  let in_top_key = in_impl_key (Locations.Zone.top)
+  let in_top_key = in_impl_key Memory_zone.top
   let in_ctrl_key = In InCtrl
   let out_ret_key = Out OutRet
   let out_key out = Out (OutLoc out)
@@ -68,7 +68,7 @@ module Signature = struct
 
   (** InCtrl < InNum < InImpl *)
   let cmp_in_key k1 k2 = match k1, k2 with
-    | (InImpl z1), (InImpl z2) when Locations.Zone.equal z1 z2 -> 0
+    | (InImpl z1), (InImpl z2) when Memory_zone.equal z1 z2 -> 0
     | (InImpl _), (InImpl _) -> raise Not_equal
     | (InImpl _), _ -> 1
     | _, (InImpl _) -> -1
@@ -82,7 +82,7 @@ module Signature = struct
     | OutRet, OutRet -> 0
     | OutRet, (OutLoc _) -> -1
     | (OutLoc _), OutRet -> 1
-    | OutLoc l1, OutLoc l2 when Locations.Zone.equal l1 l2 -> 0
+    | OutLoc l1, OutLoc l2 when Memory_zone.equal l1 l2 -> 0
     | OutLoc _, OutLoc _ -> raise Not_equal
 
   let equal_out_key k1 k2 =
@@ -104,15 +104,15 @@ module Signature = struct
     let rec add lst = match lst with
       | [] -> [(loc, info)]
       | (l, e)::tl ->
-        if Locations.Zone.equal l loc then
+        if Memory_zone.equal l loc then
           let new_e = merge e info in (loc, new_e)::tl
         else
           begin
               (*
-              if (Locations.Zone.intersects l loc) then
+              if (Memory_zone.intersects l loc) then
                 begin
                   Format.printf "[pdg] implicit inputs intersect : %a and %a\n"
-                    Locations.Zone.pretty l Locations.Zone.pretty loc;
+                    Memory_zone.pretty l Memory_zone.pretty loc;
                   assert false
                 end;
                    *)
@@ -164,7 +164,7 @@ module Signature = struct
     let rec find l = match l with
       | [] -> raise Not_found
       | (loc, e)::tl ->
-        if Locations.Zone.equal out_key loc then e
+        if Memory_zone.equal out_key loc then e
         else find tl
     in
     find sgn.outputs
@@ -183,13 +183,13 @@ module Signature = struct
     let rec find l = match l with
       | [] -> raise Not_found
       | (in_loc, e)::tl ->
-        if Locations.Zone.equal in_loc loc then e
+        if Memory_zone.equal in_loc loc then e
         else find tl
     in
     find sgn.in_implicits
 
   let find_in_top sgn =
-    find_implicit_input sgn Locations.Zone.top
+    find_implicit_input sgn Memory_zone.top
 
   let find_in_info sgn in_key =
     match in_key with
@@ -222,7 +222,7 @@ module Signature = struct
 
   let fold_matching_impl_inputs loc f acc sgn =
     let test acc (in_loc, info) =
-      if (Locations.Zone.intersects in_loc loc) then f acc (in_loc, info)
+      if (Memory_zone.intersects in_loc loc) then f acc (in_loc, info)
       else acc
     in List.fold_left test acc sgn.in_implicits
 
@@ -266,12 +266,12 @@ module Signature = struct
     | (InNum n)  -> Format.fprintf fmt "In%d" n
     | InCtrl -> Format.fprintf fmt "InCtrl"
     | InImpl loc ->
-      Format.fprintf fmt "@[<hv 1>In(%a)@]" Locations.Zone.pretty loc
+      Format.fprintf fmt "@[<hv 1>In(%a)@]" Memory_zone.pretty loc
 
   let pretty_out_key fmt key = match key with
     | OutRet -> Format.fprintf fmt "OutRet"
     | OutLoc loc ->
-      Format.fprintf fmt "@[<hv 1>Out(%a)@]" Locations.Zone.pretty loc
+      Format.fprintf fmt "@[<hv 1>Out(%a)@]" Memory_zone.pretty loc
 
   let pretty_key fmt key = match key with
     | In in_key  -> pretty_in_key fmt in_key

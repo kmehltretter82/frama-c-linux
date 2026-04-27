@@ -8,7 +8,6 @@
 
 open Eval
 open Eva_ast
-open Locations
 
 module K = Hcexprs
 module V = Cvalue.V (* TODO: functorize (with locations too ?) *)
@@ -236,7 +235,7 @@ module Memory = struct
       let s' = K.HCESet.add k s in
       B2K.add b s' deps
     in
-    let deps = Zone.fold_bases add_dep z state.deps in
+    let deps = Memory_zone.fold_bases add_dep z state.deps in
     let bases = Base.Set.union (key_deps k) (v_deps v) in
     let syntactic_deps = Base.Set.fold add_dep bases state.syntactic_deps in
     { state with deps; syntactic_deps }
@@ -284,7 +283,7 @@ module Memory = struct
       in
       (* there exists a dependency associated to k because d(values)=d(zones) *)
       let z = try K2Z.find k state.zones with Not_found -> assert false in
-      let deps = Zone.fold_bases aux_deps z state.deps in
+      let deps = Memory_zone.fold_bases aux_deps z state.deps in
       let syn_deps = Base.Set.union (key_deps k) (v_deps v) in
       let syntactic_deps =
         Base.Set.fold aux_deps syn_deps state.syntactic_deps
@@ -326,7 +325,7 @@ module Memory = struct
     let aux_key k acc =
       try
         let z_k = K2Z.find k state.zones in
-        if Zone.intersects z z_k then f k acc else acc
+        if Memory_zone.intersects z z_k then f k acc else acc
       with Not_found -> acc
     in
     (* Check the keys overwritten among those depending on [b] *)
@@ -336,7 +335,7 @@ module Memory = struct
     in
     try
       (* Check all the keys overwritten *)
-      Zone.fold_bases aux_base z acc
+      Memory_zone.fold_bases aux_base z acc
     with Abstract_interp.Error_Top -> top
 
   (* remove the keys that depend on the variables in [l] *)
@@ -363,12 +362,12 @@ module Memory = struct
       let z_lv_indirect =
         Eva_ast.PreciseDepsOf.indirect_zone_of_lval get_z lv
       in
-      if Locations.Zone.intersects z_lv z_lv_indirect then
+      if Memory_zone.intersects z_lv z_lv_indirect then
         (* The location of [lv] intersects with the zones needed to compute
            itself, the equality would not hold. *)
         state
       else
-        let z = Zone.join z_lv z_lv_indirect in
+        let z = Memory_zone.join z_lv z_lv_indirect in
         add_key k v z state
 
   (* Add the mapping [e --> v] to [state] when possible and useful.

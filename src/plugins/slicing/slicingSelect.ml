@@ -90,14 +90,14 @@ let mk_select pdg sel nodes undef mark =
 
 let select_stmt_zone kf ?(select=empty_db_select kf) stmt ~before loc mark =
   SlicingParameters.debug ~level:1 "[Register.select_stmt_zone] %a %s stmt %d (m=%a)"
-    Locations.Zone.pretty loc
+    Memory_zone.pretty loc
     (if before then "before" else "after") stmt.sid
     SlicingMarks.pretty_mark mark;
   if not (Eva.Results.is_reachable stmt) then
     begin
       SlicingParameters.feedback
         "@[Nothing to select for @[%a@]@ %s unreachable stmt of %a@]"
-        Locations.Zone.pretty loc
+        Memory_zone.pretty loc
         (if before then "before" else "after")
         Kernel_function.pretty kf;
       select
@@ -117,12 +117,12 @@ let select_stmt_zone kf ?(select=empty_db_select kf) stmt ~before loc mark =
       | Not_found -> (* stmt probably unreachable *)
         SlicingParameters.feedback
           "@[Nothing to select for @[%a@]@ %s required stmt in %a@]"
-          Locations.Zone.pretty loc
+          Memory_zone.pretty loc
           (if before then "before" else "after")
           Kernel_function.pretty kf;
         SlicingParameters.debug
           "@[Nothing to select for @[%a@]@ %s stmt %d in %a@]"
-          Locations.Zone.pretty loc
+          Memory_zone.pretty loc
           (if before then "before" else "after") stmt.sid
           Kernel_function.pretty kf;
         select
@@ -135,7 +135,7 @@ let select_stmt_zone kf ?(select=empty_db_select kf) stmt ~before loc mark =
 let select_in_out_zone ~at_end ~use_undef kf select loc mark =
   SlicingParameters.debug
     "[Register.select_in_out_zone] select zone %a (m=%a) at %s of %a"
-    Locations.Zone.pretty loc SlicingMarks.pretty_mark mark
+    Memory_zone.pretty loc SlicingMarks.pretty_mark mark
     (if at_end then "end" else "begin") Kernel_function.pretty kf;
   let fvar, sel = check_kf_db_select kf select in
   match sel with
@@ -154,7 +154,7 @@ let select_in_out_zone ~at_end ~use_undef kf select loc mark =
     | Not_found -> (* in or out unreachable ? *)
       SlicingParameters.feedback
         "@[Nothing to select for zone %a (m=%a) at %s of %a@]"
-        Locations.Zone.pretty loc SlicingMarks.pretty_mark mark
+        Memory_zone.pretty loc SlicingMarks.pretty_mark mark
         (if at_end then "end" else "begin") Kernel_function.pretty kf;
       select
     | Pdg.Api.Top -> top_db_select kf mark

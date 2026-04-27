@@ -49,22 +49,22 @@ end
     in order to propagate information to the callers about undefined data.
 *)
 type select_elem = private
-  | SelNode of PdgTypes.Node.t * Locations.Zone.t option
-  | SelIn of Locations.Zone.t
+  | SelNode of PdgTypes.Node.t * Memory_zone.t option
+  | SelIn of Memory_zone.t
 
 val mk_select_node :
-  ?z_opt:Locations.Zone.t option -> PdgTypes.Node.t -> select_elem
-val mk_select_undef_zone : Locations.Zone.t -> select_elem
+  ?z_opt:Memory_zone.t option -> PdgTypes.Node.t -> select_elem
+val mk_select_undef_zone : Memory_zone.t -> select_elem
 
 type 'tm select = (select_elem * 'tm) list
 
 val add_to_select : 'tm select -> select_elem -> 'tm -> 'tm select
 
 val add_node_to_select :
-  'tm select -> (PdgTypes.Node.t * Locations.Zone.t option) ->
+  'tm select -> (PdgTypes.Node.t * Memory_zone.t option) ->
   'tm -> 'tm select
 val add_undef_in_to_select :
-  'tm select -> Locations.Zone.t option -> 'tm -> 'tm select
+  'tm select -> Memory_zone.t option -> 'tm -> 'tm select
 
 (** we sometime need a list of [t_select] associated with its pdg when dealing
     with several functions at one time. *)

@@ -136,7 +136,7 @@ module Value = struct
       Cvalue.V.pretty value
 
   let fold f cvalue x =
-    try Locations.Location_Bytes.fold_i f cvalue (Result.ok x)
+    try Addresses.Bytes.fold_i f cvalue (Result.ok x)
     with Abstract_interp.Error_Top -> error_not_a_pointer_to_function cvalue
 
   let get_function value var =

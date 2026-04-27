@@ -48,7 +48,9 @@ let get_lval_zone ?(for_writing=false) stmt lval =
 (** Utilities for [kinstr]. *)
 module Kinstr: sig
   val iter_from_func : (stmt -> unit) -> kernel_function -> unit
-  val is_rw_zone : (Locations.Zone.t option * Locations.Zone.t option) -> stmt -> Locations.Zone.t option * Locations.Zone.t option
+  val is_rw_zone :
+    (Memory_zone.t option * Memory_zone.t option) -> stmt ->
+    Memory_zone.t option * Memory_zone.t option
 end
 =
 struct
@@ -57,60 +59,63 @@ struct
     let definition = Kernel_function.get_definition kf in
     List.iter f definition.sallstmts
 
-  (** Get directly read/written [Zone.t] by the statement.
+  (** Get directly read/written [Memory_zone.t] by the statement.
     * i.e. directly means when [ki] is a call,
       it doesn't don't look at the assigns clause of the called function. *)
-  let get_rw_zone stmt = (* returns [Zone.t read],[Zone.t written] *)
+  let get_rw_zone stmt =
+    (* returns [Memory_zone.t read],[Memory_zone.t written] *)
     assert (Eva.Analysis.is_computed ());
     let lval_process read_zone stmt lv =
-      (* returns [read_zone] joined to [Zone.t read] by [lv], [Zone.t written] by [lv] *)
+      (* returns [read_zone] joined to [Memory_zone.t read] by [lv],
+         [Memory_zone.t written] by [lv] *)
       (* The modified locations are [looking_for], those address are
          function of [deps]. *)
       let zloc = get_lval_zone ~for_writing:true stmt lv in
       let deps = Eva.Results.(before stmt |> address_deps lv) in
-      Locations.Zone.join read_zone deps, zloc
+      Memory_zone.join read_zone deps, zloc
     in
     let call_process lv f args _loc =
-      (* returns  [Zone.t read] by [lv, f, args], [Zone.t written] by [lv] *)
+      (* returns  [Memory_zone.t read] by [lv, f, args],
+         [Memory_zone.t written] by [lv] *)
       let read_zone = Eva.Results.(before stmt |> lval_deps (f,NoOffset)) in
       let add_args arg inputs =
-        Locations.Zone.join inputs Eva.Results.(before stmt |> expr_deps arg)
+        Memory_zone.join inputs Eva.Results.(before stmt |> expr_deps arg)
       in
       let read_zone = List.fold_right add_args args read_zone in
       let read_zone,write_zone =
         match lv with
-        | None -> read_zone , Locations.Zone.bottom
+        | None -> read_zone , Memory_zone.bottom
         | Some lv -> lval_process read_zone stmt lv
       in read_zone,write_zone
     in
     match stmt.skind with
     | Switch (exp,_,_,_)
     | If (exp,_,_,_) ->
-      (* returns  [Zone.t read] by condition [exp], [Zone.bottom] *)
-      Eva.Results.(before stmt |> expr_deps exp), Locations.Zone.bottom
+      (* returns  [Memory_zone.t read] by condition [exp], [Memory_zone.bottom] *)
+      Eva.Results.(before stmt |> expr_deps exp), Memory_zone.bottom
     | Instr (Set (lv,exp,_)) ->
-      (* returns  [Zone.t read] by [exp, lv], [Zone.t written] by [lv] *)
+      (* returns  [Memory_zone.t read] by [exp, lv], [Memory_zone.t written] by [lv] *)
       let read_zone = Eva.Results.(before stmt |> expr_deps exp) in
       lval_process read_zone stmt lv
     | Instr (Local_init (v, AssignInit i, _)) ->
       let rec collect zone i =
         match i with
         | SingleInit e ->
-          Locations.Zone.join zone Eva.Results.(before stmt |> expr_deps e)
+          Memory_zone.join zone Eva.Results.(before stmt |> expr_deps e)
         | CompoundInit (_,l) ->
           List.fold_left
             (fun acc (_,i) -> collect acc i) zone l
       in
-      let read_zone = collect Locations.Zone.bottom i in
+      let read_zone = collect Memory_zone.bottom i in
       lval_process read_zone stmt (Cil.var v)
     | Instr (Call (lvaloption,func,argl,l)) ->
       call_process lvaloption func argl l
     | Instr (Local_init(v, ConsInit(f, args, k),l)) ->
       Cil.treat_constructor_as_func call_process v f args k l
-    | _ -> Locations.Zone.bottom, Locations.Zone.bottom
+    | _ -> Memory_zone.bottom, Memory_zone.bottom
 
   (** Look at intersection of [rd_zone_opt]/[wr_zone_opt] with the
-      directly read/written [Zone.t] by the statement.
+      directly read/written [Memory_zone.t] by the statement.
     * i.e. directly means when [ki] is a call,
       it doesn't don't look at the assigns clause of the called function. *)
   let is_rw_zone (rd_zone_opt, wr_zone_opt) stmt =
@@ -119,8 +124,8 @@ struct
       match zone_opt with
       | None -> zone_opt
       | Some zone_requested ->
-        if Locations.Zone.intersects zone_requested zone
-        then let inter = Locations.Zone.narrow zone_requested zone
+        if Memory_zone.intersects zone_requested zone
+        then let inter = Memory_zone.narrow zone_requested zone
           in Some inter
         else None
     in inter_zone rd_zone_opt rd_zone, inter_zone wr_zone_opt wr_zone
@@ -165,11 +170,11 @@ let select_entry_point_and_some_inputs_outputs set ~mark kf ~return ~outputs ~in
     add_to_selection set selection
   in
   let set =
-    if (Locations.Zone.equal Locations.Zone.bottom inputs)
+    if (Memory_zone.equal Memory_zone.bottom inputs)
     then set
     else let selection = SlicingSelect.select_zone_at_entry kf inputs mark in
       add_to_selection set selection
-  in if ((Locations.Zone.equal Locations.Zone.bottom outputs) && not return) ||
+  in if ((Memory_zone.equal Memory_zone.bottom outputs) && not return) ||
         (try
            let stmt = Kernel_function.find_return kf
            in if Eva.Results.is_reachable stmt then
@@ -185,7 +190,7 @@ let select_entry_point_and_some_inputs_outputs set ~mark kf ~return ~outputs ~in
   then set
   else
     let set =
-      if (Locations.Zone.equal Locations.Zone.bottom outputs)
+      if (Memory_zone.equal Memory_zone.bottom outputs)
       then set
       else let selection = SlicingSelect.select_modified_output_zone kf outputs mark in
         add_to_selection set selection
@@ -237,7 +242,7 @@ let select_func_calls_to set ~spare kf =
       select_entry_point_and_some_inputs_outputs set ~mark kf
         ~return:true
         ~outputs
-        ~inputs:Locations.Zone.bottom
+        ~inputs:Memory_zone.bottom
     end
   else
     generic_select_func_calls select_stmt set ~spare kf
@@ -264,8 +269,8 @@ let select_func_return set ~spare kf =
       ~mark
       kf
       ~return:true
-      ~outputs:Locations.Zone.bottom
-      ~inputs:Locations.Zone.bottom
+      ~outputs:Memory_zone.bottom
+      ~inputs:Memory_zone.bottom
 
 (** Registered as a slicing selection function:
     Add a selection of the statement reachability.
@@ -307,9 +312,9 @@ let select_stmt_lval set mark lval_str ~before ki ~eval kf =
              Logic_to_c.term_lval_to_lval lval_term
            in
            let zone = get_lval_zone eval lval in
-           Locations.Zone.join zone acc)
+           Memory_zone.join zone acc)
         lval_str
-        Locations.Zone.bottom
+        Memory_zone.bottom
     in
     select_stmt_zone set mark zone ~before ki kf
 
@@ -336,12 +341,12 @@ let select_lval_rw set mark ~rd ~wr ~eval kf ki_opt=
              let lval_term = Logic_parse_string.term_lval kf lval_str in
              let lval = Logic_to_c.term_lval_to_lval lval_term in
              let zone = get_lval_zone ~for_writing eval lval in
-             Locations.Zone.join zone acc)
-          lval_str Locations.Zone.bottom
+             Memory_zone.join zone acc)
+          lval_str Memory_zone.bottom
       in SlicingParameters.debug ~level:3
         "select_lval_rw %a zone=%a"
         Kernel_function.pretty kf
-        Locations.Zone.pretty zone;
+        Memory_zone.pretty zone;
       Some zone
   in
   let zone_rd_opt = zone_option ~for_writing:false rd in
@@ -358,7 +363,7 @@ let select_lval_rw set mark ~rd ~wr ~eval kf ki_opt=
         | Some zone ->
           SlicingParameters.debug ~level:3
             "select_lval_rw sid=%d before=%b zone=%a"
-            ki.sid before Locations.Zone.pretty zone;
+            ki.sid before Memory_zone.pretty zone;
           select_stmt_zone !ac mark zone ~before ki kf ;
       in
       ac := select_zone ~before:true rd_zone_opt ;
@@ -378,18 +383,18 @@ let select_lval_rw set mark ~rd ~wr ~eval kf ki_opt=
                      | None -> ()
                      | Some zone_requested ->
                        (* Format.printf "@\nselect_lval_rw zone_req=%a zone=%a@."
-                          Locations.Zone.pretty zone_requested
-                          Locations.Zone.pretty zone; *)
-                       if Locations.Zone.intersects zone_requested zone
-                       then let inter = Locations.Zone.narrow zone_requested zone
+                          Memory_zone.pretty zone_requested
+                          Memory_zone.pretty zone; *)
+                       if Memory_zone.intersects zone_requested zone
+                       then let inter = Memory_zone.narrow zone_requested zone
                          in fsel inter
                        else () in
                    let select_wr outputs =
                      ac := select_entry_point_and_some_inputs_outputs !ac ~mark kf
-                         ~return:false ~outputs ~inputs:Locations.Zone.bottom
+                         ~return:false ~outputs ~inputs:Memory_zone.bottom
                    and select_rd inputs =
                      ac := select_entry_point_and_some_inputs_outputs !ac ~mark kf
-                         ~return:false ~inputs ~outputs:Locations.Zone.bottom
+                         ~return:false ~inputs ~outputs:Memory_zone.bottom
 
                    in
                    assert (Eva.Results.is_called kf) ; (* otherwise [!Db.Outputs.get_external kf] gives weird results *)

@@ -10,7 +10,7 @@ open Cil_types
 
 let join_logic_deps logic_deps =
   Cil_datatype.Logic_label.Map.fold
-    (fun _ -> Locations.Zone.join) logic_deps Locations.Zone.bottom
+    (fun _ -> Memory_zone.join) logic_deps Memory_zone.bottom
 
 let predicate_deps ~pre ~here predicate =
   let env = Eval_terms.env_annot ~pre ~here () in
@@ -68,7 +68,7 @@ let eval_tlval_as_zone assigns kind env acc t =
     try
       let alarm_mode = Eval_terms.Ignore in
       let zone = Eval_terms.eval_tlval_as_zone ~alarm_mode kind env term in
-      Locations.Zone.join acc zone
+      Memory_zone.join acc zone
     with Eval_terms.LogicEvalError e ->
       let pp_clause fmt =
         if kind = Read
@@ -79,18 +79,18 @@ let eval_tlval_as_zone assigns kind env acc t =
         "Failed to interpret %sassigns clause '%t'%a"
         (if kind = Read then "inputs in " else "")
         pp_clause eval_error_reason e;
-      Locations.Zone.top
+      Memory_zone.top
 
 let assigns_inputs_to_zone state assigns =
   let env = Eval_terms.env_assigns ~pre:state in
   let treat_asgn acc (_,ins as asgn) =
     match ins with
-    | FromAny -> Locations.Zone.top
+    | FromAny -> Memory_zone.top
     | From l -> List.fold_left (eval_tlval_as_zone asgn Read env) acc l
   in
   match assigns with
-  | WritesAny -> Locations.Zone.top
-  | Writes l  -> List.fold_left treat_asgn Locations.Zone.bottom l
+  | WritesAny -> Memory_zone.top
+  | Writes l  -> List.fold_left treat_asgn Memory_zone.bottom l
 
 let assigns_outputs_to_zone ~result state assigns =
   let env = Eval_terms.env_post_f ~pre:state ~post:state ~result () in
@@ -100,17 +100,17 @@ let assigns_outputs_to_zone ~result state assigns =
     else eval_tlval_as_zone asgn Write env acc out
   in
   match assigns with
-  | WritesAny -> Locations.Zone.top
-  | Writes l  -> List.fold_left treat_asgn Locations.Zone.bottom l
+  | WritesAny -> Memory_zone.top
+  | Writes l  -> List.fold_left treat_asgn Memory_zone.bottom l
 
 type tlval_zones = {
-  under: Locations.Zone.t;
-  over: Locations.Zone.t;
-  deps: Locations.Zone.t;
+  under: Memory_zone.t;
+  over: Memory_zone.t;
+  deps: Memory_zone.t;
 }
 
 let bottom_zones =
-  let bottom = Locations.Zone.bottom in
+  let bottom = Memory_zone.bottom in
   { under = bottom; over = bottom; deps = bottom; }
 
 type annotation = Code_annot | Assigns
@@ -148,7 +148,7 @@ let tlval_to_zones context state access tlval =
 let eval_assigns_from pre_state it =
   let term = it.it_content in
   if Logic_utils.is_result it.it_content then
-    Locations.Zone.bottom
+    Memory_zone.bottom
   else
     try
       let eval_env = Eval_terms.env_assigns ~pre:pre_state in
@@ -157,13 +157,12 @@ let eval_assigns_from pre_state it =
           ~alarm_mode:Eval_terms.Ignore Locations.Read eval_env term
       in
       under
-    with Eval_terms.LogicEvalError _ -> Locations.Zone.bottom
+    with Eval_terms.LogicEvalError _ -> Memory_zone.bottom
 
 (** Compute the validity status for [from] in [pre_state], assuming the
     entire clause is [assigns asgn \from from]. The inferred dependencies
     are [found_froms], while [asgn] evaluates to [assigns_zone]. *)
 let check_from pre_state asgn assigns_zone from found_assigns =
-  let open Locations in
   let found_deps =
     if Logic_utils.is_result asgn.it_content then
       found_assigns.Assigns.return
@@ -175,7 +174,7 @@ let check_from pre_state asgn assigns_zone from found_assigns =
     List.partition filter from
   in
   (* Under-approximation of the union. *)
-  let link zones = List.fold_left Zone.link Zone.bottom zones in
+  let link zones = List.fold_left Memory_zone.link Memory_zone.bottom zones in
   let eval = eval_assigns_from pre_state in
   let stated_indirect_deps = link (List.map eval indirect_deps) in
   let stated_direct_deps = link (List.map eval direct_deps) in
@@ -184,13 +183,13 @@ let check_from pre_state asgn assigns_zone from found_assigns =
   let res_for_unknown txt =
     Self.debug "found_direct deps %a stated_direct_deps %a \
                 found_indirect_deps %a stated_indirect_deps %a"
-      Zone.pretty found_direct_deps Zone.pretty stated_direct_deps
-      Zone.pretty found_indirect_deps Zone.pretty stated_indirect_deps;
+      Memory_zone.pretty found_direct_deps Memory_zone.pretty stated_direct_deps
+      Memory_zone.pretty found_indirect_deps Memory_zone.pretty stated_indirect_deps;
     "unknown (cannot validate "^txt^" dependencies)",
     Alarmset.Unknown
   in
-  match (Zone.is_included found_direct_deps stated_direct_deps,
-         Zone.is_included found_indirect_deps stated_indirect_deps) with
+  match (Memory_zone.is_included found_direct_deps stated_direct_deps,
+         Memory_zone.is_included found_indirect_deps stated_indirect_deps) with
   | true,true -> "valid", Alarmset.True
   | false,true -> res_for_unknown "direct"
   | false,false -> res_for_unknown "direct and indirect"
@@ -219,11 +218,10 @@ let conv_status = function
 
 
 let check_fct_assigns kf ab ~pre_state found_froms =
-  let open Locations in
   let open Alarmset in
   let behaviors = Annotations.behaviors kf in
   (* Under-approximation of the union. *)
-  let link zones = List.fold_left Zone.link Zone.bottom zones in
+  let link zones = List.fold_left Memory_zone.link Memory_zone.bottom zones in
   let outputs = Assigns.outputs found_froms in
   let check_for_behavior b =
     let activity = Active_behaviors.is_active ab b in
@@ -249,12 +247,12 @@ let check_fct_assigns kf ab ~pre_state found_froms =
          let assigns_zones = List.map (eval_assigns_from pre_state) assigns in
          let assigns_union = link assigns_zones in
          let status_txt, vstatus, status =
-           if not (Zone.is_included outputs assigns_union)
+           if not (Memory_zone.is_included outputs assigns_union)
            then (
              Self.debug
                "@[Cannot prove assigns clause@]@ \
                 @[<2>found assigns:  %a@]@ @[<2>stated assigns: %a@]"
-               Zone.pretty outputs Zone.pretty assigns_union;
+               Memory_zone.pretty outputs Memory_zone.pretty assigns_union;
              "unknown", Unknown, Property_status.Dont_know)
            else "valid", True, Property_status.True
          in

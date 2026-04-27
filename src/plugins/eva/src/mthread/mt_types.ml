@@ -95,7 +95,7 @@ type event =
   | CreateQueue of Mqueue.t * int option
   | SendMsg of Mqueue.t * (slice * int)
   | ReceiveMsg of Mqueue.t * pointer * int
-  | VarAccess of rw * Locations.Zone.t
+  | VarAccess of rw * Memory_zone.t
   | Dummy of string * value list
 
 module Event = struct
@@ -137,7 +137,7 @@ module Event = struct
                                      Mqueue.pretty q size Pointer.pretty loc
     | VarAccess (rw, loc) ->
       Format.fprintf fmt "Var access@ %a@ of %a"
-        RW.pretty rw Locations.Zone.pretty loc
+        RW.pretty rw Memory_zone.pretty loc
     | Dummy (s, l) ->
       Format.fprintf fmt "%s %a" s
         (Pretty_utils.pp_list ~sep:"@ " Cvalue.V.pretty) l
@@ -156,7 +156,7 @@ module Event = struct
     | ReceiveMsg (q1, l1, s1), ReceiveMsg (q2, l2, s2) ->
       s1 = s2 && Mqueue.equal q1 q2 && Pointer.equal l1 l2
     | VarAccess (rw1, z1), VarAccess (rw2, z2) ->
-      RW.equal rw1 rw2 && Locations.Zone.equal z1 z2
+      RW.equal rw1 rw2 && Memory_zone.equal z1 z2
     | (CreateThread _ | StartThread _ | SuspendThread _ | CancelThread _
       | ThreadExit _
       | MutexLock _ | MutexRelease _ | CreateQueue _
@@ -186,7 +186,7 @@ module Event = struct
       lazy (Mqueue.compare q1 q2)
     | VarAccess (rw1, z1), VarAccess (rw2, z2) ->
       RW.compare rw1 rw2 <?>
-      lazy (Locations.Zone.compare z1 z2)
+      lazy (Memory_zone.compare z1 z2)
     | Dummy (s1, l1), Dummy (s2, l2) ->
       String.compare s1 s2 <?>
       lazy ((List.compare Cvalue.V.compare) l1 l2)
@@ -206,7 +206,7 @@ module Event = struct
       Hashtbl.hash (Mqueue.hash q, Cvalue.V_Offsetmap.hash v, s, 5)
     | ReceiveMsg (q, l, size) ->
       Hashtbl.hash (Mqueue.hash q, Pointer.hash l, size, 6)
-    | VarAccess (rw, z) -> Hashtbl.hash (RW.hash rw, Locations.Zone.hash z, 7)
+    | VarAccess (rw, z) -> Hashtbl.hash (RW.hash rw, Memory_zone.hash z, 7)
     | ThreadExit v -> Hashtbl.hash (Cvalue.V.hash v, 8)
     | Dummy (s, l) -> Hashtbl.hash (s, List.map Cvalue.V.hash l, 9)
     | StartThread th -> Hashtbl.hash (Thread.hash th, 10)

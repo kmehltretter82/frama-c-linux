@@ -52,7 +52,7 @@ val select_func_calls_into :
 val select_func_zone :
   set ->
   SlicingTypes.sl_mark ->
-  Locations.Zone.t ->
+  Memory_zone.t ->
   kernel_function ->
   set
 
@@ -72,7 +72,7 @@ val select_stmt_ctrl :
 val select_stmt_zone :
   set ->
   SlicingTypes.sl_mark ->
-  Locations.Zone.t ->
+  Memory_zone.t ->
   before:bool ->
   stmt ->
   kernel_function ->

@@ -56,11 +56,11 @@ module Deps = struct
 
   let intersect_bases (_m, i: t) (bases: Base.Hptset.t) = intersect i bases
 
-  let intersect_zone (m, i: t) (z: Locations.Zone.t) =
+  let intersect_zone (m, i: t) (z: Memory_zone.t) =
     let aux_e e acc =
       try
         let z_e = HCEToZone.find e m in
-        if Locations.Zone.intersects z z_e then
+        if Memory_zone.intersects z z_e then
           e :: acc
         else acc
       with Not_found -> acc
@@ -70,7 +70,7 @@ module Deps = struct
       HCESet.fold aux_e set acc
     in
     (* TODO: a recursive descent would be much more effective *)
-    Locations.Zone.fold_topset_ok aux_base z []
+    Memory_zone.fold_topset_ok aux_base z []
 
   let add e z (m, i : t) =
     let aux_base b _ acc =
@@ -78,7 +78,7 @@ module Deps = struct
       let set = HCESet.add e set in
       BaseToHCESet.add b set acc
     in
-    let i = Locations.Zone.fold_topset_ok aux_base z i in
+    let i = Memory_zone.fold_topset_ok aux_base z i in
     let m = HCEToZone.add e z m in
     (m, i : t)
 
@@ -93,7 +93,7 @@ module Deps = struct
         else
           BaseToHCESet.add b s i
       in
-      let i = Locations.Zone.fold_topset_ok aux_base z i in
+      let i = Memory_zone.fold_topset_ok aux_base z i in
       let m = HCEToZone.remove e m in
       (m, i)
     with Not_found -> (* cannot find [e] in [m] *)
@@ -106,7 +106,7 @@ module Deps = struct
         ~cache:(Hptmap_sig.PersistentCache cache_name)
         ~empty_left:(fun _ -> Base.SetLattice.empty)
         ~empty_right:(fun _ -> Base.SetLattice.empty)
-        ~both:(fun _key zone _ -> Locations.Zone.get_bases zone)
+        ~both:(fun _key zone _ -> Memory_zone.get_bases zone)
         ~join:Base.SetLattice.join
         ~empty:Base.SetLattice.empty
     in
@@ -122,7 +122,7 @@ module Internal = struct
   include Datatype.Triple_with_collections
       (Equality.Set)
       (Deps)
-      (Locations.Zone) (* memory zones that have been overwritten since
+      (Memory_zone) (* memory zones that have been overwritten since
                           the beginning of the function. Not used when the
                           state of the caller is used as initial state. *)
 
@@ -136,10 +136,10 @@ module Internal = struct
     Format.fprintf fmt
       "@[<v>@[<hov 2>Eqs: %a@]@.@[<hov 2>Deps: %a@]@.@[<hov 2>Changed: %a@]@]"
       Equality.Set.pretty eqs Deps.pretty deps
-      Locations.Zone.pretty modified
+      Memory_zone.pretty modified
 
-  let empty = Equality.Set.empty, Deps.empty, Locations.Zone.bottom
-  let top = Equality.Set.empty, Deps.empty, Locations.Zone.top
+  let empty = Equality.Set.empty, Deps.empty, Memory_zone.bottom
+  let top = Equality.Set.empty, Deps.empty, Memory_zone.top
 
   let rec fold_tree f t acc =
     match t with
@@ -149,10 +149,10 @@ module Internal = struct
 
   let is_included (a, m, y) (b, n, z) =
     Equality.Set.subset b a && Deps.is_included m n
-    && Locations.Zone.is_included y z
+    && Memory_zone.is_included y z
   let join (e1, d1, z1) (e2, d2, z2) =
     let e' = Equality.Set.inter e1 e2 in
-    let z' = Locations.Zone.join z1 z2 in
+    let z' = Memory_zone.join z1 z2 in
     let removed1 = Equality.Set.lvalues_only_left e1 e' in
     let removed2 = Equality.Set.lvalues_only_left e2 e' in
     let d1' = fold_tree Deps.remove removed1 d1 in
@@ -164,11 +164,11 @@ module Internal = struct
   let widen _kf _stmt a b = join a b
 
   let concat (e1, d1, z1) (e2, d2, z2) =
-    Equality.Set.union e1 e2, Deps.concat d1 d2, Locations.Zone.join z1 z2
+    Equality.Set.union e1 e2, Deps.concat d1 d2, Memory_zone.join z1 z2
 
   let narrow (e1, d1, z1) (e2, d2, z2) =
     if Deps.equal d1 d2
-    then `Value (Equality.Set.union e1 e2, d1, Locations.Zone.narrow z1 z2)
+    then `Value (Equality.Set.union e1 e2, d1, Memory_zone.narrow z1 z2)
     else `Value (e1, d1, z1)
 end
 
@@ -255,13 +255,13 @@ struct
     coop_eval oracle equalities atom_lv
 
   let kill kt zone (equalities, deps, modified_zone) =
-    if Locations.Zone.(equal zone top) then
+    if Memory_zone.(equal zone top) then
       top
     else
       let modified_zone =
         match kt with
-        | Hcexprs.Modified -> Locations.Zone.join modified_zone zone
-        | Hcexprs.Deleted -> Locations.Zone.diff modified_zone zone
+        | Hcexprs.Modified -> Memory_zone.join modified_zone zone
+        | Hcexprs.Deleted -> Memory_zone.diff modified_zone zone
       in
       match Deps.intersect_zone deps zone with
       | [] -> equalities, deps, modified_zone
@@ -282,9 +282,9 @@ struct
   let unscope state vars =
     let aux_vi zones vi =
       let z = Locations.zone_of_varinfo vi in
-      Locations.Zone.join z zones
+      Memory_zone.join z zones
     in
-    let zone = List.fold_left aux_vi Locations.Zone.bottom vars in
+    let zone = List.fold_left aux_vi Memory_zone.bottom vars in
     kill Hcexprs.Deleted zone state
 
   let find_val valuation expr =
@@ -403,7 +403,6 @@ struct
       (equalities, deps, modified_zone: t)
 
   let assign ~pos:_ left_value right_expr value valuation state =
-    let open Locations in
     let left_loc = Precise_locs.imprecise_location left_value.lloc in
     let direct_left_zone = Locations.(enumerate_valid_bits Write left_loc) in
     let state = kill Hcexprs.Modified direct_left_zone state in
@@ -422,8 +421,8 @@ struct
          Moreover, the domain do not store the equality when the abstract
          location of [lv] and the abstract value of [e] are singleton, as in
          this case, the main cvalue domain is able to infer the equality. *)
-      if (Zone.intersects direct_left_zone right_zone) ||
-         (Zone.intersects direct_left_zone indirect_left_zone) ||
+      if (Memory_zone.intersects direct_left_zone right_zone) ||
+         (Memory_zone.intersects direct_left_zone indirect_left_zone) ||
          (is_singleton (Eval.value_assigned value) &&
           Locations.cardinal_zero_or_one left_loc)
       then `Value state
@@ -548,7 +547,7 @@ struct
       Deps.bases_of_set deps related_hce_set
 
   let overwrite bases ~on:state ~by:_ =
-    kill Hcexprs.Modified (Locations.Zone.of_bases bases) state
+    kill Hcexprs.Modified (Memory_zone.of_bases bases) state
 
 end
 

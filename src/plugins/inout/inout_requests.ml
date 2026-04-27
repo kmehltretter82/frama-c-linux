@@ -13,7 +13,7 @@ let kf_of_varinfo (vi: Cil_types.varinfo) =
 
 let aux find_zone vi =
   let kf = kf_of_varinfo vi in
-  Locations.Zone.mem_base (Base.of_varinfo vi) (find_zone kf)
+  Memory_zone.mem_base (Base.of_varinfo vi) (find_zone kf)
 
 let is_read = aux Inputs.get_internal
 let is_written = aux Outputs.get_internal

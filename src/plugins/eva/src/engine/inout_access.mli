@@ -12,31 +12,31 @@
 
 (** Represents a read and write access. *)
 type t = private {
-  read : Locations.Zone.t;
-  write : Locations.Zone.t;
+  read : Memory_zone.t;
+  write : Memory_zone.t;
 }
 
 module Access : sig
   include Lattice_type.Bottom_Bounded_Join_Semi_Lattice with type t := t
 
-  val make : ?read:Locations.Zone.t -> ?write:Locations.Zone.t -> unit -> t
+  val make : ?read:Memory_zone.t -> ?write:Memory_zone.t -> unit -> t
   (** [make ?read ?write ()] creates an [access] with the given [read] and
       [write] as read and written memory locations. *)
 
-  val add_read : Locations.Zone.t -> t -> t
+  val add_read : Memory_zone.t -> t -> t
   (** [add_read zone access] adds [zone] to the read memory locations in
       [access]. *)
 
-  val add_write : Locations.Zone.t -> t -> t
+  val add_write : Memory_zone.t -> t -> t
   (** [add_write zone access] adds [zone] to the written memory locations in
       [access]. *)
 end
 
-val register_read : Position.t -> Locations.Zone.t -> unit
+val register_read : Position.t -> Memory_zone.t -> unit
 (** [register_read pos zone] adds the given [zone] as a "read" memory location
     at the given [pos]. *)
 
-val register_write : Position.t -> Locations.Zone.t -> unit
+val register_write : Position.t -> Memory_zone.t -> unit
 (** [register_write pos zone] adds the given [zone] as a "written" memory
     location at the given [pos]. *)
 

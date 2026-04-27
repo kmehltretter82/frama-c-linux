@@ -8,7 +8,6 @@
 
 open Cil_types
 open Abstract_interp
-open Locations
 open Cvalue
 open Lattice_bounds
 
@@ -550,11 +549,11 @@ let () =
 (* Change all references to bases into ESCAPINGADDR into the given state,
    and remove those bases from the state entirely when [exact] holds *)
 let free ~exact bases state =
-  let changed = ref Locations.Zone.bottom in
+  let changed = ref Memory_zone.bottom in
   (* Uncomment this code to simulate the fact that free "writes" the bases
      it deallocates
      Base_hptmap.iter (fun b ->
-      changed := Zone.join !changed (enumerate_bits (loc_of_base b))
+      changed := Memory_zone.join !changed (enumerate_bits (loc_of_base b))
      ) bases; *)
   (* No need to remove the freed bases from the state if [exact] is false,
      because they must remain for the 'inexact' case *)
@@ -564,8 +563,8 @@ let free ~exact bases state =
   in
   let escaping = bases in
   let on_escaping ~b ~itv ~v:_ =
-    let z = Locations.Zone.inject b (Int_Intervals.inject_itv itv) in
-    changed := Locations.Zone.join !changed z
+    let z = Memory_zone.inject b (Int_Intervals.inject_itv itv) in
+    changed := Memory_zone.join !changed z
   in
   let within = Base.SetLattice.top in
   let state =
@@ -575,7 +574,7 @@ let free ~exact bases state =
     let m = Assigns.Memory.(add_binding ~exact empty !changed Deps.bottom) in
     Assigns.{ memory = m; return = Deps.bottom }
   in
-  state, (from_changed, if exact then !changed else Zone.bottom)
+  state, (from_changed, if exact then !changed else Memory_zone.bottom)
 
 let freeable arg =
   (* Categorizes the bases in arg *)
@@ -711,13 +710,13 @@ let realloc_copy_one size ~src_state ~dst_state new_base b =
 
   in
   let size_to_copy = Z.min (Z.succ up) size_bits in
-  let src = Location_Bits.inject b Ival.zero in
+  let src = Addresses.Bits.inject b Ival.zero in
   match Cvalue.Model.copy_offsetmap src size_to_copy src_state with
   | `Bottom -> assert false
   | `Value offsetmap ->
     if Z.gt size_to_copy Z.zero then
       Cvalue.Model.paste_offsetmap
-        ~from:offsetmap ~dst_loc:new_base ~size:size_to_copy
+        ~from:offsetmap ~dst_addr:new_base ~size:size_to_copy
         ~exact:false dst_state
     else dst_state
 
@@ -743,7 +742,7 @@ let realloc_alloc_copy weak bases_to_realloc null_in_arg sizev state =
      to bottom everywhere *)
   let dst_state = add_uninitialized state base Z.minus_one in
   let ret = V.inject base Ival.zero in
-  let loc_bits = Locations.loc_bytes_to_loc_bits ret in
+  let addr_bits = Addresses.Bits.of_bytes ret in
   (* get bases to free and copy *)
   let lbases = Base.Hptset.elements bases_to_realloc in
   let dst_state =
@@ -766,12 +765,12 @@ let realloc_alloc_copy weak bases_to_realloc null_in_arg sizev state =
         else offsm
     in
     Cvalue.Model.paste_offsetmap
-      ~from:offsm ~dst_loc:loc_bits ~size:(Z.succ max_valid) ~exact:false
+      ~from:offsm ~dst_addr:addr_bits ~size:(Z.succ max_valid) ~exact:false
       dst_state
   in
   (* Copy the old bases *)
   let copy_one dst_state b =
-    realloc_copy_one size_max ~src_state:state ~dst_state loc_bits b
+    realloc_copy_one size_max ~src_state:state ~dst_state addr_bits b
   in
   let state = List.fold_left copy_one dst_state lbases in
   ret, state, cacheable
@@ -896,7 +895,7 @@ let check_if_base_is_leaked base_to_check state =
            if not (Base.equal base_to_check base) then
              Cvalue.V_Offsetmap.iter_on_values
                (fun v ->
-                  if Locations.Location_Bytes.may_reach base_to_check
+                  if Addresses.Bytes.may_reach base_to_check
                       (V_Or_Uninitialized.get_v v) then raise Not_leaked)
                offsetmap)
         m

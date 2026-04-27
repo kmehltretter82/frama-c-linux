@@ -25,7 +25,7 @@ let impact_statement stmt =
   let kf = Kernel_function.find_englobing_kf stmt in
   let skip = Compute_impact.skip () in
   let reason = Options.Reason.get () in
-  let restrict = Locations.Zone.top in
+  let restrict = Memory_zone.top in
   let impact, _initial, _reason =
     Compute_impact.nodes_impacted_by_stmts ~skip ~restrict ~reason kf [stmt]
   in

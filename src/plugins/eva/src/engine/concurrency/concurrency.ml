@@ -84,7 +84,7 @@ module Name = struct
 
   let of_cvalue cvalue =
     try
-      let base, ival = Locations.Location_Bytes.find_lonely_binding cvalue in
+      let base, ival = Addresses.Bytes.find_lonely_binding cvalue in
       let byte_offset = Ival.project_int ival in
       let bits_offset = Z.(mul byte_offset (of_int 8)) in
       of_address base bits_offset

@@ -48,8 +48,8 @@ let typ_kind typ =
   | _ -> assert false
 
 type dependencies = Deps.t = {
-  data: Locations.Zone.t;
-  indirect: Locations.Zone.t;
+  data: Memory_zone.t;
+  indirect: Memory_zone.t;
 }
 
 type evaluator = exp -> Cvalue.V.t or_top
@@ -141,10 +141,10 @@ module Variable : Variable = struct
     | Var vi | Int vi ->
       {
         data = Locations.zone_of_varinfo vi;
-        indirect = Locations.Zone.bottom;
+        indirect = Memory_zone.bottom;
       }
     | StartOf _ ->
-      { data = Locations.Zone.bottom ; indirect = Locations.Zone.bottom }
+      { data = Memory_zone.bottom ; indirect = Memory_zone.bottom }
     | Lval lval ->
       Eva_ast.PreciseDepsOf.deps_of_lval
         eval_loc Read (Option.get (HCE.to_lval lval))
@@ -922,8 +922,8 @@ module BaseToVariables = struct
         | Some (direct, indirect) -> Some (direct, VSet.add v indirect))
 
   let add_deps var deps map =
-    Locations.Zone.fold_bases (add_direct var) deps.data map |>
-    Locations.Zone.fold_bases (add_indirect var) deps.indirect
+    Memory_zone.fold_bases (add_direct var) deps.data map |>
+    Memory_zone.fold_bases (add_indirect var) deps.indirect
 
   let remove_direct v =
     replace (function
@@ -944,8 +944,8 @@ module BaseToVariables = struct
           else Some (direct, indirect))
 
   let remove_deps var deps map =
-    Locations.Zone.fold_bases (remove_direct var) deps.data map |>
-    Locations.Zone.fold_bases (remove_indirect var) deps.indirect
+    Memory_zone.fold_bases (remove_direct var) deps.data map |>
+    Memory_zone.fold_bases (remove_indirect var) deps.indirect
 
   let all_variables m =
     fold (fun _b (dv, iv) acc -> VSet.(union (union dv iv) acc)) m VSet.empty
@@ -978,23 +978,23 @@ module Deps = struct
       try
         let deps = VariableToDeps.find v m in
         let v_zone = if direct then deps.data else deps.indirect in
-        Locations.Zone.intersects v_zone zone
+        Memory_zone.intersects v_zone zone
       with Not_found -> false
     in
     let get_at_base b intervals (data_acc, indirect_acc) =
       let data, indirect = BaseToVariables.find b i in
-      let zone = Locations.Zone.inject b intervals in
+      let zone = Memory_zone.inject b intervals in
       VSet.union data_acc (VSet.filter (filter ~direct:true zone) data),
       VSet.union indirect_acc (VSet.filter (filter ~direct:false zone) indirect)
     in
     let data, indirect =
-      Locations.Zone.fold_topset_ok get_at_base zone (VSet.empty, VSet.empty)
+      Memory_zone.fold_topset_ok get_at_base zone (VSet.empty, VSet.empty)
     in
     VSet.union data indirect |> VSet.elements
 
   (* Does [deps] contains at least the bases from [previous_deps]? *)
   let are_bases_increasing previous_deps deps =
-    let get_bases = Locations.Zone.get_bases in
+    let get_bases = Memory_zone.get_bases in
     let is_increasing previous_zone zone =
       Base.SetLattice.is_included (get_bases previous_zone) (get_bases zone)
     in
@@ -1047,8 +1047,8 @@ module Deps = struct
   let get_var_bases (m, _: t) (var: Variable.t) =
     try
       let deps = VariableToDeps.find var m in
-      let zone = Locations.Zone.join deps.data deps.indirect in
-      Locations.Zone.get_bases zone
+      let zone = Memory_zone.join deps.data deps.indirect in
+      Memory_zone.get_bases zone
     with Not_found -> Base.SetLattice.empty
 
   (* Exact but slower [join]: in the resulting maps (m, i), [i] is exactly the
@@ -1097,7 +1097,7 @@ module Deps = struct
             Base.pretty base Variable.pretty var
       in
       let check_zone fst_or_snd zone =
-        let bases = Locations.Zone.get_bases zone in
+        let bases = Memory_zone.get_bases zone in
         Base.SetLattice.iter (check_base fst_or_snd) bases
       in
       check_zone fst deps.data;
@@ -1111,15 +1111,13 @@ end
 (*                               Octagon states                               *)
 (* -------------------------------------------------------------------------- *)
 
-module Zone = Locations.Zone
-
 module State = struct
 
   type state =
     { octagons: Octagons.t;       (* The intervals for X±Y. *)
       intervals: Intervals.t;     (* The intervals for the variables X,Y… *)
       relations: Relations.t;     (* The related variables in [octagons]. *)
-      modified: Locations.Zone.t; (* The memory zone modified by a function. *)
+      modified: Memory_zone.t; (* The memory zone modified by a function. *)
       deps: Deps.t;
     }
 
@@ -1136,13 +1134,13 @@ module State = struct
             [| Octagons.packed_descr;
                Intervals.packed_descr;
                Relations.packed_descr;
-               Zone.packed_descr;
+               Memory_zone.packed_descr;
                Deps.packed_descr |]
         let reprs =
           [ { octagons = Octagons.top;
               intervals = Intervals.empty;
               relations = Relations.empty;
-              modified = Zone.bottom;
+              modified = Memory_zone.bottom;
               deps = Deps.empty; } ]
 
         let compare s1 s2 =
@@ -1151,7 +1149,7 @@ module State = struct
           in
           Octagons.compare s1.octagons s2.octagons <?>
           lazy (Intervals.compare s1.intervals s2.intervals) <?>
-          lazy (Zone.compare s1.modified s2.modified) <?>
+          lazy (Memory_zone.compare s1.modified s2.modified) <?>
           lazy (Deps.compare s1.deps s2.deps)
 
         let equal = Datatype.from_compare
@@ -1159,7 +1157,7 @@ module State = struct
         let hash t =
           Hashtbl.hash (Octagons.hash t.octagons,
                         Intervals.hash t.intervals,
-                        Zone.hash t.modified,
+                        Memory_zone.hash t.modified,
                         Deps.hash t.deps)
 
         let pretty fmt { octagons } =
@@ -1299,20 +1297,20 @@ module State = struct
     { octagons = Octagons.top;
       intervals = Intervals.top;
       relations = Relations.empty;
-      modified = Zone.top;
+      modified = Memory_zone.top;
       deps = Deps.empty }
 
   let empty () =
     { octagons = Octagons.top;
       intervals = Intervals.top;
       relations = Relations.empty;
-      modified = Zone.bottom;
+      modified = Memory_zone.bottom;
       deps = Deps.empty }
 
   let is_included t1 t2 =
     Octagons.is_included t1.octagons t2.octagons
     && Intervals.is_included t1.intervals t2.intervals
-    && Zone.is_included t1.modified t2.modified
+    && Memory_zone.is_included t1.modified t2.modified
     && Deps.is_included t1.deps t2.deps
 
   let join t1 t2 =
@@ -1344,7 +1342,7 @@ module State = struct
     let state =
       { octagons; relations;
         intervals = Intervals.join t1.intervals t2.intervals;
-        modified = Zone.join t1.modified t2.modified;
+        modified = Memory_zone.join t1.modified t2.modified;
         deps = Deps.join t1.deps t2.deps;
       }
     in
@@ -1383,7 +1381,7 @@ module State = struct
     let state =
       { octagons; relations;
         intervals = Intervals.widen t1.intervals t2.intervals;
-        modified = Zone.join t1.modified t2.modified;
+        modified = Memory_zone.join t1.modified t2.modified;
         deps = Deps.join t1.deps t2.deps }
     in
     check "widen" state
@@ -1392,7 +1390,7 @@ module State = struct
     Octagons.narrow t1.octagons t2.octagons >>- fun octagons ->
     Intervals.narrow t1.intervals t2.intervals >>- fun intervals ->
     let relations = Relations.union t1.relations t2.relations in
-    let modified = Zone.narrow t1.modified t2.modified in
+    let modified = Memory_zone.narrow t1.modified t2.modified in
     let deps = Deps.narrow t1.deps t2.deps in
     `Value { octagons; intervals; relations; modified; deps }
 
@@ -1661,10 +1659,10 @@ module Domain = struct
     | _ -> []
 
   let kill zone state =
-    if Locations.Zone.(equal zone top)
+    if Memory_zone.(equal zone top)
     then top
     else
-      let modified = Locations.Zone.join state.modified zone in
+      let modified = Memory_zone.join state.modified zone in
       let vars = Deps.intersects_zone state.deps zone in
       let state = List.fold_left State.remove state vars in
       { state with modified }
@@ -1737,7 +1735,7 @@ module Domain = struct
     let variable = Variable.make_lval lvalue in
     (* Remove lvals referring to the variable *)
     let lvalue_zone = (eval_deps variable).data in
-    let modified = Locations.Zone.join state.modified lvalue_zone in
+    let modified = Memory_zone.join state.modified lvalue_zone in
     let state = { state with modified } in
     let vars = Deps.intersects_zone state.deps lvalue_zone in
     let vars = List.filter (Fun.negate (Variable.equal variable)) vars in
@@ -1793,7 +1791,7 @@ module Domain = struct
     if intraprocedural ()
     then `Value (empty ())
     else
-      let state = { state with modified = Locations.Zone.bottom } in
+      let state = { state with modified = Memory_zone.bottom } in
       match recursion with
       | Some recursion ->
         (* No relation inferred from the assignment of formal parameters
@@ -1814,7 +1812,7 @@ module Domain = struct
     if intraprocedural ()
     then `Value (kill post.modified pre)
     else
-      let modified = Locations.Zone.join post.modified pre.modified in
+      let modified = Memory_zone.join post.modified pre.modified in
       `Value { post with modified }
 
   let logic_assign _logic_assign location state =

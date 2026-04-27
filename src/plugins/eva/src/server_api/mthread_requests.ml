@@ -73,8 +73,8 @@ let mqueueset_to_keyed_stringlist mqueueset =
     []
 
 let zoneset_to_stringlist zoneset =
-  Locations.Zone.Set.fold
-    (fun zone acc -> Format.asprintf "%a" Locations.Zone.pretty zone :: acc)
+  Memory_zone.Set.fold
+    (fun zone acc -> Format.asprintf "%a" Memory_zone.pretty zone :: acc)
     zoneset
     []
 
@@ -145,7 +145,7 @@ let _shared_var_summary =
     ~data:(module Data.Jstring)
     ~get:(fun (access, _) ->
         let zone = Mt_summary.access_zone access in
-        let bases = Locations.Zone.get_bases zone in
+        let bases = Memory_zone.get_bases zone in
         match bases with
         | Set bases when Base.Hptset.cardinal bases = 1 ->
           let base = Base.Hptset.choose bases in
@@ -161,7 +161,7 @@ let _shared_var_summary =
     ~data:(module Data.Jstring)
     ~get:(fun (access, _) ->
         let zone = Mt_summary.access_zone access in
-        Format.asprintf "%a" Locations.Zone.pretty zone);
+        Format.asprintf "%a" Memory_zone.pretty zone);
 
   States.column model ~name:"accessKind"
     ~descr:(Markdown.plain "Is the access a read or a write?")
