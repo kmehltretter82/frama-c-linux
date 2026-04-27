@@ -39,9 +39,6 @@ let rte_annots pp elt kf env l =
   in
   Env.set_annotation_kind env old_kind
 
-let () =
-  Translate_predicates.translate_rte_annots_ref := rte_annots
-
 let exp ?filter kf env e =
   Assert.push_pending_register_data();
   let stmt = Cil.mkStmtOneInstr ~valid_sid:true (Skip e.eloc) in
@@ -57,5 +54,6 @@ let exp ?filter kf env e =
 
 let () =
   Translate_terms.translate_rte_exp_ref := exp;
-  Translate_predicates.translate_rte_exp_ref := exp;
+  Translate_predicates.Translate_rtes.translate_rte_annots_ref := rte_annots;
+  Translate_predicates.Translate_rtes.translate_rte_exp_ref := exp;
   Logic_array.Translate_rtes.exp_ref := exp
