@@ -1,9 +1,9 @@
 /* run.config
-   OPT: -wp-no-let
+   OPT: -wp-no-qed
 */
 
 /* run.config_qualif
-   OPT: -wp-no-let
+   OPT: -wp-no-qed
 */
 
 

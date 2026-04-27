@@ -1,5 +1,5 @@
 /* run.config
-   OPT:-wp-rte -wp-no-let -wp-gen -wp-prover why3 -wp-msg-key print-generated
+   OPT:-wp-rte -wp-no-qed -wp-gen -wp-prover why3 -wp-msg-key print-generated
 */
 /* run.config_qualif
    DONTRUN:

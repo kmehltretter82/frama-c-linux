@@ -1,11 +1,11 @@
 /* run.config
    OPT: -kernel-msg-key "dyncalls" -wp-skip-fct="guarded_call"
-   OPT: -kernel-msg-key "dyncalls" -wp-fct="guarded_call" -wp-no-let
+   OPT: -kernel-msg-key "dyncalls" -wp-fct="guarded_call" -wp-no-qed
 */
 
 /* run.config_qualif
    OPT: -wp -wp-skip-fct="guarded_call"
-   OPT: -wp -wp-fct="guarded_call" -wp-no-let
+   OPT: -wp -wp-fct="guarded_call" -wp-no-qed
 */
 //-----------------------------------------------------------------------------
 /*@

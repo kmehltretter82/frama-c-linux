@@ -802,7 +802,7 @@ let letify_assume sref (_,step) =
     match step.condition with
     | Type _ | Branch _ | Either _ | State _ | Probe _ -> ()
     | Init p | Have p | When p | Core p ->
-      if Wp_parameters.Simpl.get () then
+      if Wp_parameters.Subst.get () then
         sref := Subst.assume current p
   end ; current
 

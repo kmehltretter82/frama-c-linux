@@ -153,7 +153,7 @@ struct
   ]
 
   let preprocess g =
-    if Wp_parameters.Let.get () then
+    if Wp_parameters.Qed.get () then
       begin
         apply "introduction" Conditions.introduction_eq g ;
         let fold acc (get,solver) = if get () then solver::acc else acc in

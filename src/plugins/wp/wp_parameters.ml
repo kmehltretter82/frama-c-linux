@@ -442,18 +442,24 @@ module TerminatesVariantHyp =
 let wp_simplifier = add_group "Qed Simplifications"
 
 let () = Parameter_customize.set_group wp_simplifier
-module Simpl =
+module Qed =
   True(struct
-    let option_name = "-wp-simpl"
-    let help = "Enable Qed Simplifications."
+    let option_name = "-wp-qed"
+    let help = "Enable Qed simplifications."
   end)
 
+let () =
+  Qed.add_aliases ~deprecated:true ~visible:false ["-wp-let"]
+
 let () = Parameter_customize.set_group wp_simplifier
-module Let =
+module Subst =
   True(struct
-    let option_name = "-wp-let"
-    let help = "Use variable elimination."
+    let option_name = "-wp-subst"
+    let help = "Extract substitutable equalities from proof context."
   end)
+
+let () =
+  Subst.add_aliases ~deprecated:true ~visible:false ["-wp-simpl"]
 
 let () = Parameter_customize.set_group wp_simplifier
 module Core =
@@ -480,7 +486,7 @@ let () = Parameter_customize.set_group wp_simplifier
 module Clean =
   True(struct
     let option_name = "-wp-clean"
-    let help = "Use a simple cleaning in case of -wp-no-let."
+    let help = "Use a simple cleaning in case of -wp-no-qed."
   end)
 
 let () = Parameter_customize.set_group wp_simplifier

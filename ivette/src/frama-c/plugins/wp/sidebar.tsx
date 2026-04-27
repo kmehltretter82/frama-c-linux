@@ -598,7 +598,7 @@ function SimplOption(props: SimplOptionProps): JSX.Element {
 function Simplifications(): JSX.Element {
   const goals = States.useSyncArrayProxy(WP.goals).model.getRowCount();
 
-  const [letify = false, setLetify] = States.useSyncState(Params.wpLet);
+  const [qed = false, setQed] = States.useSyncState(Params.wpQed);
   const [clean = false, setClean] = States.useSyncState(Params.wpClean);
 
   const simplications: [string, string, States.State<boolean>][] = [
@@ -611,11 +611,11 @@ function Simplifications(): JSX.Element {
     ['-wp-prenex', 'Prenex-form', Params.wpPrenex],
     ['-wp-pruning', 'Pruning', Params.wpPruning],
     ['-wp-reduce', 'Reduce', Params.wpReduce],
-    ['-wp-simpl', '...', Params.wpSimpl],
     ['-wp-simplify-forall', 'Forall', Params.wpSimplifyForall],
     ['-wp-simplify-is-cint', 'Redundant int types', Params.wpSimplifyIsCint],
     ['-wp-simplify-land-mask', 'Masks', Params.wpSimplifyLandMask],
     ['-wp-simplify-type', 'Types', Params.wpSimplifyType],
+    ['-wp-subst', 'Substituions', Params.wpSubst],
   ];
   const makeBox =
     (value: [string, string, States.State<boolean>]): JSX.Element => {
@@ -624,7 +624,7 @@ function Simplifications(): JSX.Element {
       const message =
         goals !== 0
           ? 'Cannot change simplification parameters when goals exist'
-          : !letify
+          : !qed
             ? 'Goal simplification is disabled'
             : undefined;
       return (
@@ -633,7 +633,7 @@ function Simplifications(): JSX.Element {
           label={label}
           name={name}
           state={state}
-          enabled={letify && goals === 0}
+          enabled={qed && goals === 0}
           message={message}
         />
       );
@@ -647,7 +647,7 @@ function Simplifications(): JSX.Element {
   const cleanMessage =
     goals !== 0
       ? 'Cannot change simplification parameters when goals exist'
-      : letify
+      : qed
         ? 'Clean only usable when goal simplifiation is disabled'
         : undefined;
 
@@ -661,9 +661,9 @@ function Simplifications(): JSX.Element {
               key='Enabled'
               label='Enabled'
               title={globalMessage}
-              value={letify}
+              value={qed}
               enabled={goals === 0}
-              onChange={setLetify}
+              onChange={setQed}
             />,
             makeSidebarHelp('wp-config-simpl')
           ]
@@ -673,7 +673,7 @@ function Simplifications(): JSX.Element {
           label='Clean'
           onChange={setClean}
           title={cleanMessage}
-          enabled={!letify && goals === 0}
+          enabled={!qed && goals === 0}
           value={clean}
         />
         {simplications.map(makeBox)}
