@@ -87,13 +87,13 @@ let rec load env (ty,r) : domain =
   | _ ->
     Domain.scalar @@ Memory.points_to r
 
-let call map (l:logic_info) (ds:domain list) : domain =
+let logic_call map (l:logic_info) (ds:domain list) : domain =
   let sigma = ref Domain.empty in
   let unify = Domain.unify any sigma in
   List.iter2 (fun x -> unify (Memory.lvar map x)) l.l_profile ds ;
   Domain.subst !sigma @@ Memory.logic map l
 
-let cons (c:logic_ctor_info) (ds:domain list) : domain =
+let logic_ctor (c:logic_ctor_info) (ds:domain list) : domain =
   (* we need a local unification for polymorphic variables *)
   let sigma = ref Domain.empty in
   let pany = Option.merge any in
@@ -169,8 +169,8 @@ and term env (t : term) : domain =
   | Tunion ts | Tinter ts ->
     List.fold_left (fun w t -> Memory.dmerge w (term env t)) Domain.pure ts
   | Tcomprehension(t,_,_) -> term env t
-  | Tapp(f,_,ts) -> call env.map f @@ List.map (term env) ts
-  | TDataCons(c,ts) -> cons c @@ List.map (term env) ts
+  | Tapp(f,_,ts) -> logic_call env.map f @@ List.map (term env) ts
+  | TDataCons(c,ts) -> logic_ctor c @@ List.map (term env) ts
   | Tlambda(q,t) ->
     Domain.arrow (List.map (Memory.lvar env.map) q) @@ term env t
   | Tlet({ l_body ; l_var_info=v },b) ->

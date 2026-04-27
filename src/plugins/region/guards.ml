@@ -210,19 +210,19 @@ let add_annotation ?kf ?emitter ?(names=[]) ?(invalid=false) ?(hyps=[]) stmt gua
 (* ---  Function Annotation                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-module ValidRegion =
+module Computed =
   State_builder.Hashtbl(Kernel_function.Hashtbl)(Datatype.Unit)
     (struct
-      let name = "Region.Guards.ValidRegion"
+      let name = "Region.Guards.Computed"
       let dependencies = [Ast.self]
       let size = 0
     end)
 
-let is_annotated kf = ValidRegion.mem kf
-let set_annotated kf = ValidRegion.add kf ()
+let is_annotated kf = Computed.mem kf
+let set_annotated kf = Computed.add kf ()
 
 let annotate =
-  ValidRegion.memo
+  Computed.memo
     begin fun kf ->
       if Kernel_function.has_definition kf then
         begin

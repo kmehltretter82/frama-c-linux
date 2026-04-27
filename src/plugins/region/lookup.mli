@@ -10,6 +10,13 @@ open Cil_types
 open Cil_datatype
 open Memory
 
+(** {2 Region Lookup for Code} *)
+
+val lval : map -> lval -> node
+val exp : map -> exp -> node option
+
+(** {2 Region Lookup for Logic} *)
+
 type env = {
   map : map ;
   result : node option ; (* where returned value is stored *)
@@ -18,9 +25,6 @@ type env = {
 }
 
 val local : map -> Property.t -> env
-
-val lval : map -> lval -> node
-val exp : map -> exp -> node option
 
 val lvar : env -> logic_var -> (varinfo,domain) Either.t
 val tval : env -> term_lval -> (node,domain) Either.t
