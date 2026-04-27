@@ -304,10 +304,11 @@ let witer (m:map) (f: node -> bool) =
     Option.iter (walk f) m.result ;
   end
 
-let iter m f = witer m (UF.once f)
+let iter f m = witer m (UF.once f)
 let size (r: node) = sizeof (UF.get r).clayout
 let parents (r: node) = UF.find_all (UF.get r).cparents
 let cvars (r: node) = Vset.elements (UF.get r).ccvars
+let roots (r: node) = Bag.elements (UF.get r).croots
 let labels (r: node) = Lset.elements (UF.get r).clabels
 
 (* -------------------------------------------------------------------------- *)
@@ -886,14 +887,14 @@ let region n = make_region n (UF.get n)
 
 let regions map =
   let pool = ref [] in
-  iter map (fun r -> pool := region r :: !pool) ;
+  iter (fun r -> pool := region r :: !pool) map ;
   List.rev !pool
 
 let lock m =
   begin
     witer m UF.lock ;
     let marks = UF.marks () in
-    iter m (consolidate m.gvars marks) ;
+    iter (consolidate m.gvars marks) m ;
   end
 
 (* -------------------------------------------------------------------------- *)

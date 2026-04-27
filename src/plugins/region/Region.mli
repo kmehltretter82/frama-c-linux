@@ -63,7 +63,7 @@ val typed : node -> typ option
 (** Normalized list of leaf nodes. *)
 val footprint : node -> node list
 
-val iter : map -> (node -> unit) -> unit
+val iter : (node -> unit) -> map -> unit
 
 (** {2 Alias Analysis} *)
 

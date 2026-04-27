@@ -80,10 +80,11 @@ val find_all : node list -> node list
 val size : node -> int
 val parents : node -> node list
 val cvars : node -> varinfo list
+val roots : node -> root list
 val labels : node -> string list
 val region : node -> region
 val regions : map -> region list
-val iter : map -> (node -> unit) -> unit
+val iter : (node -> unit) -> map -> unit
 
 val fresh : map -> node
 val add_cvar : map -> ?garbage:bool -> Cil_types.varinfo -> node
