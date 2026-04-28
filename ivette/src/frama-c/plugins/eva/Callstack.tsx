@@ -190,17 +190,18 @@ async function getInfosCallstacks(
 }
 
 export function useCallstacks(): Info[] {
-  const status = Server.useStatus();
-  const evaComputed = States.useSyncValue(EvaAnalysis.computationState);
+  const serverStatus = Server.useStatus();
+  const evaStatus = States.useSyncValue(EvaAnalysis.computationState);
 
   const [callstacks, setCallstacks] = React.useState<Eva.callstack[]>([]);
   const [infos, setInfos] = React.useState<Info[]>([]);
 
   React.useEffect(() => {
-    if(status === 'ON' && evaComputed === 'computed')
-        Server.send(Eva.getAllCallstacks, []).then(setCallstacks);
+    if(serverStatus === 'ON'
+      && (evaStatus === 'computed' || evaStatus === 'aborted'))
+      Server.send(Eva.getAllCallstacks, []).then(setCallstacks);
     else setCallstacks([]);
-  }, [evaComputed, status]);
+  }, [serverStatus, evaStatus]);
 
   React.useEffect(() => {
     getInfosCallstacks(callstacks, setInfos);
