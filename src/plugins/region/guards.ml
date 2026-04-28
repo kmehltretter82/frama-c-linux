@@ -103,9 +103,10 @@ let writable ~node ~from addr =
   if Attr.mem `Allocated from then Condition.Valid(Write,node,addr)
   else nullable ~from addr
 
-let requires ~readonly ~node ~from ~target addr =
+let requires ~node ~target addr =
+  let from = Memory.flags node in
   let valid =
-    if readonly || Attr.mem `Readonly target then
+    if Attr.mem `Readonly target || Memory.readonly node then
       readable ~node ~from addr
     else
       writable ~node ~from addr in
@@ -124,7 +125,74 @@ let requires ~readonly ~node ~from ~target addr =
       Condition.Null(false,addr)
     else False in
   Condition.g_or nullable allocated
-[@@ warning "-32"]
+
+(* -------------------------------------------------------------------------- *)
+(* --- Call Side Conditions                                               --- *)
+(* -------------------------------------------------------------------------- *)
+
+let subst ~loc kf es t =
+  match
+    Statuses_by_call.transpose_term_at_callsite
+      ~formals:(Kernel_function.get_formals kf) ~concretes:es t
+  with Some t -> t | None ->
+    Options.abort ~source:(fst loc)
+      "Can not evaluate term (%a)@ from function %a at call site"
+      Printer.pp_term t Kernel_function.pretty kf
+
+let named a g = if a <> "" then Condition.Named(a,g) else g
+
+let call_kf env stmt kf es =
+  let fct = Kernel_function.get_name kf in
+  let loc = Cil_datatype.Stmt.loc stmt in
+  let tenv = Lookup.callsite env.map stmt kf in
+  let kmap = Analysis.get kf in
+  let objects = ref [] in
+  let globals = ref [] in
+  begin
+    Memory.iter
+      (fun r ->
+         List.iter
+           (fun x ->
+              if x.vglob then
+                let lv = Condition.LV(Var x,NoOffset) in
+                globals := lv :: !globals
+           ) (Memory.cvars r) ;
+         List.iter
+           (function Memory.Root a ->
+              let ptr = subst ~loc kf es a.ptr in
+              let inf = subst ~loc kf es a.inf in
+              let sup = subst ~loc kf es a.sup in
+              let addr = Condition.RANGE(ptr,a.typ,inf,sup) in
+              let node = Lookup.tmem tenv ptr in
+              objects := (a.named,addr) :: !objects ;
+              add env @@ named fct @@ named a.named @@
+              requires ~node ~target:a.flags addr ;
+           ) (Memory.roots r) ;
+      ) kmap ;
+    let globals = List.rev !globals in
+    let objects = List.rev !objects in
+    List.iter
+      (fun global ->
+         List.iter
+           (fun (a,obj) ->
+              add env @@ named fct @@ named a @@ Separated [ obj ; global ]
+           ) objects
+      ) globals ;
+  end
+
+let call env stmt fct es =
+  match Kernel_function.get_called fct with
+  | Some kf -> call_kf env stmt kf es
+  | None ->
+    begin
+      match Dyncall.get stmt with
+      | Some(_,kfs) ->
+        List.iter (fun kf -> call_kf env stmt kf es) kfs
+      | None ->
+        Options.not_yet_implemented
+          ~source:(fst @@ Cil_datatype.Stmt.loc stmt)
+          "Dynamic call without @call annotation"
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Code Side Conditions                                               --- *)
@@ -134,37 +202,36 @@ let rec init env = function
   | SingleInit e -> eval env e
   | CompoundInit(_,ofs) -> List.iter (fun (_,i) -> init env i) ofs
 
-let called env = function
+let evalfun env = function
   | Var _vf -> ()
   | Mem e -> eval env e
 
-let instr env = function
+let instr env stmt = function
   | Set(lv,e,_) ->
     eval env e ;
     write env lv ;
   | Call(r,f,es,_) ->
-    called env f ;
+    evalfun env f ;
     List.iter (eval env) es ;
-    Option.iter (write env) r
+    Option.iter (write env) r ;
+    call env stmt f es
   | Local_init(_,AssignInit i,_) -> init env i
   | Local_init(_,ConsInit(_,es,_),_) -> List.iter (eval env) es
   | Asm _ | Skip _ | Code_annot _ -> ()
 
-let rec stmtkind env = function
-  | Instr i -> instr env i
+let rec stmtkind env stmt = function
+  | Instr i -> instr env stmt i
   | Return(r,_) -> Option.iter (eval env) r
   | If(e,_,_,_) | Switch(e,_,_,_)| Throw (Some(e,_),_) -> eval env e
   | Goto _ | Break _ | Continue _ | Loop _ | Block _
   | Throw(None,_) | TryCatch _ | TryFinally _ -> ()
-  | TryExcept(_,(ks,e),_,_) -> List.iter (instr env) ks ; eval env e
+  | TryExcept(_,(ks,e),_,_) -> List.iter (instr env stmt) ks ; eval env e
   | UnspecifiedSequence us ->
     let b = Cil.block_from_unspecified_sequence us in
-    List.iter (fun s -> stmtkind env s.skind) b.bstmts
+    List.iter (fun s -> stmtkind env stmt s.skind) b.bstmts
 
 let guards map f stmt =
-  let env = create map in
-  stmtkind env stmt.skind ;
-  iter f env
+  let env = create map in stmtkind env stmt stmt.skind ; iter f env
 
 (* -------------------------------------------------------------------------- *)
 (* --- Generate Annotations                                               --- *)

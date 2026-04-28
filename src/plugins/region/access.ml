@@ -12,7 +12,8 @@ open Cil_datatype
 type clause =
   | Body of logic_info
   | Prop of Property.t
-  | Call of stmt * kernel_function * Property.t
+  | CallSite of stmt * kernel_function
+  | CallProp of stmt * kernel_function * Property.t
 
 let compare_clause a b =
   match a, b with
@@ -22,7 +23,12 @@ let compare_clause a b =
   | Prop f , Prop g -> Property.compare f g
   | Prop _ , _ -> (-1)
   | _ , Prop _ -> (+1)
-  | Call(s1,kf1,p1) , Call(s2,kf2,p2) ->
+  | CallSite(s1,kf1), CallSite(s2,kf2) ->
+    let c = Stmt.compare s1 s2 in
+    if c <> 0 then c else Kernel_function.compare kf1 kf2
+  | CallSite _ , _ -> (-1)
+  | _ , CallSite _ -> (+1)
+  | CallProp(s1,kf1,p1) , CallProp(s2,kf2,p2) ->
     let c = Stmt.compare s1 s2 in
     if c <> 0 then c else
       let c = Kernel_function.compare kf1 kf2 in
@@ -81,7 +87,10 @@ let pp_label fmt (s : stmt) =
 let pp_clause fmt = function
   | Body l -> Format.pp_print_string fmt "logic:" ; Logic_info.pretty fmt l
   | Prop p -> Format.pp_print_string fmt @@ Property.Names.get_prop_name_id p
-  | Call(st,kf,prop) ->
+  | CallSite(st,kf) ->
+    Format.fprintf fmt "%a@%a"
+      Kernel_function.pretty kf pp_label st
+  | CallProp(st,kf,prop) ->
     Format.fprintf fmt "%a@%a@%s"
       Kernel_function.pretty kf pp_label st
       (Property.Names.get_prop_name_id prop)
@@ -107,7 +116,7 @@ let pp_access fmt = function
   | Term(Prop _,t) -> Printer.pp_term_lval fmt t
   | Term(Body fn,t) ->
     Format.fprintf fmt "%a { %a }" Logic_info.pretty fn Printer.pp_term_lval t
-  | Term(Call(_,kf,_),t) ->
+  | Term((CallProp(_,kf,_) | CallSite(_,kf)),t) ->
     Format.fprintf fmt "%a { %a }" Kernel_function.pretty kf Printer.pp_term_lval t
 
 let pp_line fmt stmt =
@@ -124,7 +133,7 @@ let pp_source fmt = function
       Format.fprintf fmt "predicate %a" Logic_info.pretty fn
     else
       Format.fprintf fmt "logic %a" Logic_info.pretty fn
-  | Term(Call(stmt,_,_),_) ->
+  | Term((CallProp(stmt,_,_)|CallSite(stmt,_)),_) ->
     Format.fprintf fmt "call at %a" pp_line stmt
 
 let ctype_of = function
@@ -133,7 +142,8 @@ let ctype_of = function
 
 let location = function
   | Body _ -> Location.dummy (* TODO *)
-  | Prop ip | Call(_,_,ip) -> Property.location ip
+  | CallSite(s,_) -> Stmt.loc s
+  | Prop ip | CallProp(_,_,ip) -> Property.location ip
 
 let typeof = function
   | Init(_,lv,_) | Lval(_,lv) -> Cil.typeOfLval lv
@@ -147,12 +157,14 @@ let marker = function
   | Exp(stmt,e) | Ret(stmt,e) -> PExp(None,Kstmt stmt,e)
   | Init (stmt,(Var vi,_),_) -> PVDecl(None,Kstmt stmt,vi)
   | Init (stmt,(Mem e,_),_) -> PExp(None,Kstmt stmt,e)
-  | Lval(stmt,_) | Term (Call (stmt, _, _), _) ->
+  | Lval(stmt,_)
+  | Term (CallSite (stmt, _), _)
+  | Term (CallProp (stmt, _, _), _) ->
     PStmtStart(Kernel_function.find_englobing_kf stmt, stmt)
   | Term (Body fn, _) -> PGlobal(GAnnot(Dfun_or_pred(fn,Location.dummy),Location.dummy))
   | Term (Prop ip, _) -> PIP ip
 
 let rank = function
   | Term (Body _, _) | Term(Prop _, _) -> 0
-  | Exp(s,_) | Ret(s,_) | Init(s,_,_) | Lval(s,_) | Term(Call(s,_,_),_)
-    -> s.sid
+  | Exp(s,_) | Ret(s,_) | Init(s,_,_) | Lval(s,_)
+  | Term(CallSite(s,_),_) | Term(CallProp(s,_,_),_) -> s.sid

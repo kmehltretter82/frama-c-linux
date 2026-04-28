@@ -688,6 +688,9 @@ let writes (r:node) =
   let node = UF.get r in
   List.map Access.typeof @@ Access.Set.elements node.cwrites
 
+let readonly (r:node) =
+  let node = UF.get r in Access.Set.is_empty node.cwrites
+
 let shifts (r:node) =
   let node = UF.get r in
   List.map Access.typeof @@ Access.Set.elements node.cshifts

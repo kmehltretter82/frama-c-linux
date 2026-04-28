@@ -8,64 +8,32 @@
 
 open Cil_types
 
-(* -------------------------------------------------------------------------- *)
-(** {2 Logic Helpers} *)
-(* -------------------------------------------------------------------------- *)
+(** Name of "\valid_region" predicate *)
+val lvalid_region : string
 
-val addrof : ?loc:location -> lval -> term
-val taddrof : ?loc:location -> term_lval -> term
-
-val pnull :
-  ?loc:location -> ?names:string list -> eq:bool ->
-  term -> predicate
-
-val pbounds :
-  ?loc:location -> ?names:string list ->
-  exp -> Z.t -> predicate
-
-val pvalid :
-  ?loc:location -> ?names:string list -> ?label:logic_label ->
-  term -> predicate
-
-val pvalid_read :
-  ?loc:location -> ?names:string list -> ?label:logic_label ->
-  term -> predicate
+val is_valid_region : logic_info -> bool
 
 val pvalid_region :
   ?loc:location -> ?names:string list -> ?label:logic_label ->
   term -> predicate
 
-(** [p] is [\null] or [\object_pointer(p)], or [\valid_function(p)]
-    for function pointers *)
-val pvalid_pointer :
-  ?loc:location -> ?names:string list -> ?label:logic_label ->
-  term -> predicate
-
-val pinitialized :
-  ?loc:location -> ?names:string list -> ?label:logic_label ->
-  term -> predicate
-
-val paligned :
-  ?loc:location -> ?names:string list ->
-  term -> typ -> predicate
-
-val is_valid_region : logic_info -> bool
-
 (* -------------------------------------------------------------------------- *)
 (** {2 Logic Helpers} *)
 (* -------------------------------------------------------------------------- *)
 
-type addr = LV of lval | ADDR of exp
+type addr = LV of lval | ADDR of exp | RANGE of term * typ * term * term
 type access = Read | Write | Region | Initialized
 
 type guard =
   | True | False
+  | Named of string * guard
   | Or of guard * guard
   | And of guard * guard
   | Imply of guard * guard
   | Bounds of exp * Z.t
   | Null of bool * addr
   | Valid of access * Memory.node * addr
+  | Separated of addr list
 
 val g_or : guard -> guard -> guard
 val g_and : guard -> guard -> guard

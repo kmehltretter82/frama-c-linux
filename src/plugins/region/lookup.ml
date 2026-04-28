@@ -60,6 +60,9 @@ type env = {
 let local map ip =
   { map ; result = None ; formals = Vmap.empty ; context = Access.Prop ip }
 
+let callsite map stmt kf =
+  { map ; result = None ; formals = Vmap.empty ; context = Access.CallSite(stmt,kf) }
+
 let lvar env lv =
   match lv.lv_origin with
   | None -> Either.Right (Memory.add_lvar env.map lv)
@@ -68,7 +71,6 @@ let lvar env lv =
       try Either.Right (Vmap.find x env.formals)
       with Not_found -> Either.Left x
     else Either.Left x
-
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Terms Lookup                                                      --- *)
@@ -115,9 +117,9 @@ let logic_ctor (c:logic_ctor_info) (ds:domain list) : domain =
 let rec dispatch_lval env lv : (typ * node,domain) Either.t =
   let lhost, loffset = lv in
   match lhost with
-  | TMem e ->
-    let rh = Option.get @@ Memory.dpointed @@ term env e in
-    let te = Logic_typing.ctype_of_pointed e.term_type in
+  | TMem p ->
+    let rh = tmem env p in
+    let te = Logic_typing.ctype_of_pointed p.term_type in
     Either.Left (addr_offset env rh te loffset)
   | TResult ty ->
     begin match env.result with
@@ -131,12 +133,11 @@ let rec dispatch_lval env lv : (typ * node,domain) Either.t =
     let right d = term_offset env d loffset in
     Either.map ~left ~right @@ lvar env v
 
+and tmem env p = Option.get @@ Memory.dpointed @@ term env p
 and tval env lv : (node,domain) Either.t =
   Either.map_left snd @@ dispatch_lval env lv
-
 and term_lval env lv : domain =
   Either.fold ~left:(load env) ~right:Fun.id @@ dispatch_lval env lv
-
 and addr_lval env lv : node =
   match dispatch_lval env lv with
   | Left (_,r) -> r

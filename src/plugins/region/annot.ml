@@ -162,7 +162,7 @@ let rec add_assigns_from env ~iscalled ~from tgt =
 let context ~called ~kf ip =
   match called with
   | None -> Access.Prop ip
-  | Some stmt -> Access.Call(stmt,kf,ip)
+  | Some stmt -> Access.CallProp(stmt,kf,ip)
 
 let add_requires ~map ~called ~kf ~ki ~bhv ~formals ~result ip =
   let context = context ~called ~kf @@ Property.ip_of_requires kf ki bhv ip in

@@ -25,7 +25,18 @@ type env = {
 }
 
 val local : map -> Property.t -> env
+val callsite : map -> stmt -> kernel_function -> env
 
 val lvar : env -> logic_var -> (varinfo,domain) Either.t
+(** Returns [Left v] when for C-variables and [Right d]
+    for logic variable with domain [d] *)
+
 val tval : env -> term_lval -> (node,domain) Either.t
+(** Returns [Left n] for l-values located in node region [n].
+    Returns [Right d] for logical value in domain [d]. *)
+
+val tmem : env -> term -> node
+(** Evaluate the term as a pointer and returns the node region it points to. *)
+
 val term : env -> term -> domain
+(** Evaluate the term as a logical value and returns its domain. *)

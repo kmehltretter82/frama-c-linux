@@ -13,3 +13,7 @@
   R0005: -RW- tmp_0 (int) 32b (singleton) (allocated) ;
   R0006: --W- \result (int) 32b ;
 [region] annotating function job
+[region] Function foo:
+  R0001: ---- \result 0b ;
+[region] Function bar:
+  R0001: ---- \result 0b ;

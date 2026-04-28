@@ -150,6 +150,7 @@ val inits : node -> typ list
 val types : node -> typ list
 val typed : node -> typ option
 val flags : node -> Attr.flags
+val readonly : node -> bool
 
 (**/**)
 val body : (map -> logic_info -> domain -> unit) ref

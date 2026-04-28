@@ -11,7 +11,8 @@ open Cil_types
 type clause =
   | Body of logic_info
   | Prop of Property.t
-  | Call of stmt * kernel_function * Property.t
+  | CallSite of stmt * kernel_function
+  | CallProp of stmt * kernel_function * Property.t
 
 type acs =
   | Exp of stmt * exp
