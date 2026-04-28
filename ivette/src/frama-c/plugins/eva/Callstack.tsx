@@ -51,13 +51,13 @@ function addMessage(count: number, remove: () => void): void {
   const pinnedMessageButton =
     <IconButton
       icon='TRASH'
-      title='Remove callstack filter: show all callstacks'
+      title='Clear callstack selection: show all callstacks'
       onClick={remove}
     />;
   const pinnedMessage: Toolbars.PinnedMessage = {
     id: pinnedMessageId,
     message:
-      `${count} callstack${count === 1 ? ' is' : 's are'} currently shown`,
+      `Only ${count} callstack${count === 1 ? ' is' : 's are'} currently shown`,
     actions: pinnedMessageButton
   };
   Toolbars.addPinnedMessage(pinnedMessage);
@@ -80,7 +80,7 @@ function getActions(
   return (<>
     <IconButton
       icon='FILTER'
-      title={isSelected ? 'Callstack is selected' : 'Filter the callstack'}
+      title={(isSelected ? 'Deselect' : 'Select') + ' the callstack'}
       kind={isSelected ? 'selected' : 'default'}
       style={isSelected ? {} : { fillOpacity: '0.2' } }
       onClick={() => onClick(id)}
@@ -295,7 +295,7 @@ export function CallstackSelection(): React.JSX.Element {
         <Forms.SelectField label='' state={showState}>
           <option id={"all"} value={'all'}>Show all</option>
           <option id={"selected"} value={"selected"}>Selected only</option>
-          <option id={"scope"} value={"scope"}>Scope only</option>
+          <option id={"scope"} value={"scope"}>Selected and scope only</option>
         </Forms.SelectField>
         {makeBadge(nodes.size)}
         <IconButton
@@ -303,7 +303,7 @@ export function CallstackSelection(): React.JSX.Element {
           title='Select all callstacks'
           disabled={selection.length === 0}
           onClick={reset}
-          />
+        />
       </div>
 
       <Tree.Tree

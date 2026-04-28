@@ -264,9 +264,9 @@ export function EvaSideBar(): JSX.Element {
 
 Ivette.registerSidebar({
   id: 'frama-c.plugins.eva.sidebar.form',
-  label: 'EVA',
+  label: 'Eva',
   icon: 'APPLE',
-  title: 'Eva',
+  title: 'Configuration of the Eva analysis',
   children: <EvaSideBarForm />,
 });
 
@@ -308,8 +308,8 @@ export function EvaSideBarSelection(): React.JSX.Element {
 
 Ivette.registerSidebar({
   id: 'fc.plugins.eva.sidebar.selection',
-  label: 'Selection',
+  label: 'Eva selection',
   icon: 'APPLEMORE',
-  title: 'Eva selection',
+  title: 'Selection of Eva results',
   children: <EvaSideBarSelection />
 });
