@@ -111,6 +111,7 @@ module JCallstackData = struct
           "thread" , Jstring;
           "entryPoint" , Kernel_ast.Decl.jtype;
           "stack" , JStack.jtype;
+          "analyzed", Jboolean;
         ])
 
   let thread_label id =
@@ -118,12 +119,19 @@ module JCallstackData = struct
     | Some thread -> Thread.label thread
     | None -> string_of_int id
 
+  let analyzed callstack =
+    let kf = Callstack.top_kf callstack in
+    match Analysis.status kf with
+    | Analyzed _ -> not (Kernel_function.is_in_libc kf)
+    | Unreachable | SpecUsed | Builtin _ -> false
+
   let to_json (cs: t) =
     let entry_point = cs.entry_point in
     `Assoc [
       "thread", Data.Jstring.to_json (thread_label cs.thread);
       "entryPoint", fct_decl entry_point;
       "stack", JStack.to_json ~entry_point (List.rev cs.stack);
+      "analyzed", Data.Jbool.to_json (analyzed cs);
     ]
 end
 
