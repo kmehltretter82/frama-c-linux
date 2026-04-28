@@ -486,15 +486,61 @@ function PropertiesFilter(): JSX.Element {
   );
 }
 
+interface BoolOptionProps {
+  state: States.State<boolean>;
+  descr: string;
+}
+
+function BoolOption(props: BoolOptionProps): JSX.Element {
+  const { state, descr } = props;
+  const [opt = false, setOpt] = States.useSyncState(state);
+  return (
+    <Checkbox label={descr} onChange={setOpt} value={opt} />
+  );
+}
+
 function RTE(): JSX.Element {
   const [rte = false, setRte] = States.useSyncState(Params.wpRte);
-  const [mem, setMem] = States.useSyncState(Params.rteMem);
-  const [div, setDiv] = States.useSyncState(Params.rteDiv);
-  const [sov, setSov] = States.useSyncState(Params.warnSignedOverflow);
-  const [uov, setUov] = States.useSyncState(Params.warnUnsignedOverflow);
-  const [sdc, setSdc] = States.useSyncState(Params.warnSignedDowncast);
-  const [udc, setUdc] = States.useSyncState(Params.warnUnsignedDowncast);
-  const [bool, setBool] = States.useSyncState(Params.warnInvalidBool);
+
+  const options: [string, string, States.State<boolean>][] = [
+    ["mem", "Invalid memory access", Params.rteMem],
+    ["Odiv", "Division by 0", Params.rteDiv],
+    ["sov", "Signed overflow", Params.warnSignedOverflow],
+    ["uov", "Unsigned overflow", Params.warnUnsignedOverflow],
+    ["sdc", "Signed downcast", Params.warnSignedDowncast],
+    ["udc", "Unsigned downcast", Params.warnUnsignedDowncast],
+    ["shift", "Invalid shift", Params.rteShift],
+    ["lsn", "Left shift on negative", Params.warnLeftShiftNegative],
+    ["rsn", "Right shift on negative", Params.warnRightShiftNegative],
+    ["bool", "Invalid bool", Params.warnInvalidBool],
+    ["pdc", "Pointer downcast", Params.warnPointerDowncast],
+    ["pointer", "Invalid pointer", Params.warnInvalidPointer],
+    ["fti", "Invalid float to int", Params.rteFloatToInt]
+  ]
+
+  const mkOption =
+    (entry: [string, string, States.State<boolean>]): JSX.Element => {
+      const [id, descr, state] = entry;
+      return <BoolOption key={id} state={state} descr={descr} />;
+    };
+
+  /* special treatment for special float */
+  const specialFloats: [string, string][] = [
+    ['none', 'None'],
+    ['nan', 'NaN'],
+    ['non-finite', 'Non finite']
+  ];
+
+  const mkSF = (entry: [string, string]): JSX.Element => {
+    return <option key={entry[0]} value={entry[0]}>{entry[1]}</option>;
+  };
+
+  const [sf = 'non-finite', setSF] =
+    States.useSyncState(Params.warnSpecialFloat);
+
+  /* special treatment for initialization */
+
+
   return (
     <SidebarBlock
       title='RTE Guards'
@@ -512,13 +558,16 @@ function RTE(): JSX.Element {
       foldable={true}
     >
       <Vbox>
-        <Checkbox label='Memory Accesses' onChange={setMem} value={mem} />
-        <Checkbox label='Division by 0' onChange={setDiv} value={div} />
-        <Checkbox label='Signed overflow' onChange={setSov} value={sov} />
-        <Checkbox label='Unsigned overflow' onChange={setUov} value={uov} />
-        <Checkbox label='Signed downcast' onChange={setSdc} value={sdc} />
-        <Checkbox label='Unsigned downcast' onChange={setUdc} value={udc} />
-        <Checkbox label='Invalid bool' onChange={setBool} value={bool} />
+        {options.map(mkOption)}
+        <Label key='sf' label='Special float: '>
+          <SelectMenu
+            value={sf}
+            onChange={(newV) => { if (newV) setSF(newV); }}
+            className='wp-config-field wp-config-select'
+          >
+            {specialFloats.map(mkSF)}
+          </SelectMenu>
+        </Label>
       </Vbox>
     </SidebarBlock>
   );
