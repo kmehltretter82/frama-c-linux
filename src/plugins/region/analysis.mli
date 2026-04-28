@@ -9,10 +9,10 @@
 open Cil_types
 
 (** @raises Not_found *)
-val find : kernel_function -> Code.domain
+val find : kernel_function -> Memory.map
 
 (** Memoized *)
-val get : kernel_function -> Code.domain
+val get : kernel_function -> Memory.map
 
 (** Memoized *)
 val compute : kernel_function -> unit

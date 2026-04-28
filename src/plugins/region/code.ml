@@ -239,9 +239,7 @@ and add_block ~map ~kf ~result b =
 (* --- Function                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-type domain = map
-
-let domain kf =
+let compute kf =
   let map = Memory.create () in
   let result =
     if Kernel_function.returns_void kf
