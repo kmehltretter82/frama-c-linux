@@ -9,7 +9,6 @@
 import React from 'react';
 
 import { Icon } from 'dome/controls/icons';
-import { GlobalState, useGlobalState } from 'dome/data/states';
 import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
 import { Button } from 'dome/controls/buttons';
@@ -19,6 +18,7 @@ import * as Eva from 'frama-c/plugins/eva/api/analysis';
 import { evaBasicStatus } from 'frama-c/plugins/eva/EvaDefinitions';
 import { useSyncValue } from 'frama-c/states';
 import * as Server from 'frama-c/server';
+import { useStartComputing } from '../EvaSidebar';
 
 interface EvaReadyProps {
   children: React.ReactNode;
@@ -84,8 +84,8 @@ function timeToString(time: number): string {
   return hours > 0 ? `${hours}:${strTime}` : strTime;
 }
 
-function Timer({ start }: {start: number}): React.JSX.Element {
-  const [time, setTime] = React.useState(Date.now() - start);
+function Timer({ start }: {start: number}): React.JSX.Element | null {
+  const [time, setTime] = React.useState(0);
 
   const className = classes(
     'eva-status-timer',
@@ -93,6 +93,7 @@ function Timer({ start }: {start: number}): React.JSX.Element {
   );
 
   React.useEffect(() => {
+    if(start === 0) return;
     const interval = setInterval(() => setTime(Date.now() - start), 1000);
     return () => clearInterval(interval);
   }, [start]);
@@ -100,33 +101,18 @@ function Timer({ start }: {start: number}): React.JSX.Element {
   return <Label className={className}>{timeToString(time)}</Label>;
 }
 
-function useTimer(): React.JSX.Element | null {
-  const status = useSyncValue(Eva.computationState);
-  const [start, setStart] = useGlobalState(startComputing);
-
-  React.useEffect(() => {
-    // If start ≠ 0, this means the counter has already started.
-    // It does not restart during a hot reload, for example.
-    if(status !== "computing") setStart(0);
-    else if(start === 0) setStart(Date.now());
-  }, [status, start, setStart]);
-
-  return start !== 0 ? <Timer start={start}/> : null;
-}
-
-const startComputing = new GlobalState<number>(0);
-
 function EvaStatusPanel(): JSX.Element {
-  const timer = useTimer();
+  const start = useStartComputing();
   const status = useSyncValue(Eva.computationState);
   const infosStatus = evaBasicStatus[status || "undefined"];
+
   return (
     <div className={"eva-status eva-status-"+status}>
       <div className='eva-status-content'>
         <div className="eva-status-message">{infosStatus.message}</div>
         { status === 'not_computed' && <EvaLaunchButton /> }
         <StatusIcon size={50} status={status} />
-        { timer }
+        <Timer start={start}/>
       </div>
     </div>
   );
