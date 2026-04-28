@@ -133,7 +133,8 @@ function compareStack(a: Eva.callsite[], b: Eva.callsite[]): boolean {
 function getParentKey(cs: Info, callstacks: Info[]): string | undefined {
   if(isEntryPoint(cs)) return undefined;
   return callstacks.find(e => (
-    e.entryPoint === cs.entryPoint
+    e.thread === cs.thread
+    && e.entryPoint === cs.entryPoint
     && compareStack(e.stack, cs.stack.slice(1))
   ))?.callstack.toString();
 }
