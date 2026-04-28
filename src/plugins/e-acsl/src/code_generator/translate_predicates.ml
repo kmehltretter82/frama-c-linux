@@ -63,8 +63,8 @@ let relation_to_binop = function
 let predicate_content_to_exp_il p =
   let p = Logic_normalizer.get_pred p in
   match p.pred_content with
-  | Ptrue -> M.return @@ IL.Exp.of_exp_node True
-  | Pfalse -> M.return @@ IL.Exp.of_exp_node False
+  | Ptrue -> M.return @@ IL.Exp.mk_true ()
+  | Pfalse -> M.return @@ IL.Exp.mk_false ()
   | Prel(rel, t1, t2) ->
     let* logic_env = M.read_logic_env in
     let t1 = Logic_normalizer.get_term t1 in
@@ -443,7 +443,7 @@ let do_it kf env p =
 
 let rte_guards_to_exp_il t =
   Rte_analysis.fold_guards_il ~default:(M.return []) t @@ fun p guards ->
-  let* e : IL.rte = M.map (Interlang.Exp.to_rte p) @@ to_exp_il ~rte:true p in
+  let* e : IL.rte = M.map (Interlang.Rte.make p) @@ to_exp_il ~rte:true p in
   let* guards = guards in
   M.return (e :: guards)
 

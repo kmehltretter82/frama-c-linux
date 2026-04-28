@@ -48,11 +48,11 @@ end
 
 type varinfo = Varinfo.t
 
-type exp = {enode : exp_node; rtes : rte list; origin : term option}
+type exp = private {enode : exp_node; rtes : rte list; origin : term option}
 (** [origin] is required to calculate casts. Note that [origin] is [None] when
     it stems from a predicate as predicates never require casts. *)
 
-and exp_node =
+and exp_node = private
   | True
   | False
   | Integer of {ity : Analyses_types.number_ty; n : Z.t}
@@ -66,9 +66,9 @@ and exp_node =
       translation does not necessarily generate a type cast, but potentially a
       more complicated conversion operation, e.g. [mpz_get_ui]. *)
 
-and binop_node = {ity : number_ty; binop : binop; op1 : exp; op2 : exp}
+and binop_node = private {ity : number_ty; binop : binop; op1 : exp; op2 : exp}
 
-and lhost = Var of varinfo | Mem of exp
+and lhost = private Var of varinfo | Mem of exp
 and lval = lhost * offset
 
 and offset =
@@ -76,7 +76,8 @@ and offset =
   | Field of fieldinfo * offset
   | Index of exp * offset
 
-and rte = {rnode : exp_node; rorigin: predicate}
+and rte = private {rnode : exp_node; rorigin: predicate}
+
 
 module Pretty : sig
   val pp_varinfo : Format.formatter -> varinfo -> unit
@@ -89,16 +90,16 @@ module Pretty : sig
   val pp_rtes : Format.formatter -> rte list -> unit
 end
 
-module Exp : sig
-  val of_exp_node : ?origin:term -> ?rtes:rte list -> exp_node -> exp
-  val of_lval : ?origin:term -> lval -> exp
-  val of_integer : origin:term -> ity:Analyses_types.number_ty -> Z.t -> exp
-  val of_sizeof : origin:term -> typ -> exp
 
-  val to_rte : predicate -> exp -> rte
-  val attach_rtes : rte list -> exp -> exp
-  (** Attach a list of RTE guards to an expression. The original list is
-      overwritten. *)
+(** smart constructors for generating [exp] nodes *)
+module Exp : sig
+  val lval : ?origin:term -> lval -> exp
+  val integer : origin:term -> ity:Analyses_types.number_ty -> Z.t -> exp
+  val sizeof : origin:term -> typ -> exp
+  val rte : rte -> exp
+
+  val mk_true : ?origin:term -> unit -> exp
+  val mk_false : ?origin:term -> unit -> exp
 
   (** Transforms a Cil binary operator to an {!Interlang} binary operator.
       Not all Cil operators are supported (yet). *)
@@ -108,10 +109,21 @@ module Exp : sig
   val coerce : ?origin:term -> coerce_to:typ -> exp -> exp
 end
 
+(** smart constructors for generating [rte] nodes *)
+module Rte : sig
+  val make : predicate -> exp -> rte
+end
+
+(** smart constructors for generating [lhost] nodes *)
 module Lhost : sig
-  val of_varinfo : ?name:string -> Cil_types.varinfo -> lhost
+  val var : ?name:string -> Cil_types.varinfo -> lhost
+  val mem : exp -> lhost
 end
 
 module Helpers : sig
   val is_div_or_mod : binop -> bool
+
+  val attach_rtes : rte list -> exp -> exp
+  (** Attach a list of RTE guards to an expression. The original list is
+      overwritten. *)
 end

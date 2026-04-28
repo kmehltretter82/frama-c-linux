@@ -223,16 +223,17 @@ module Exp_node = struct
 end
 
 module Exp = struct
+  module Aux = struct
+    let of_exp_node ?origin enode = {enode; rtes = []; origin}
+  end
 
-  let of_exp_node ?origin ?(rtes=[]) enode = {enode; rtes; origin}
+  let lval ?origin lval = Aux.of_exp_node ?origin @@ Lval lval
+  let integer ~origin ~ity n = Aux.of_exp_node ~origin @@ Integer {ity; n}
+  let sizeof ~origin ty = Aux.of_exp_node ~origin @@ SizeOf ty
+  let rte rte = Aux.of_exp_node ?origin:None rte.rnode
 
-  let of_lval ?origin lval = of_exp_node ?origin @@ Lval lval
-  let of_integer ~origin ~ity n = of_exp_node ~origin @@ Integer {ity; n}
-  let of_sizeof ~origin ty = of_exp_node ~origin @@ SizeOf ty
-
-  let to_rte p e = {rnode = e.enode; rorigin = p}
-
-  let attach_rtes rtes e = {e with rtes}
+  let mk_true ?origin () = Aux.of_exp_node ?origin True
+  let mk_false ?origin () = Aux.of_exp_node ?origin False
 
   let binop ?origin bop ity e1 e2 =
     let org = BinOp {binop = bop; ity; op1 = e1; op2 = e2} in
@@ -244,7 +245,7 @@ module Exp = struct
             Pretty.pp_exp_node org Pretty.pp_exp_node e;
           e
         | None -> org
-    in of_exp_node ?origin res
+    in Aux.of_exp_node ?origin res
 
   let coerce ?origin ~coerce_to exp =
     let origin =
@@ -254,16 +255,23 @@ module Exp = struct
     match exp with
     | {enode = Coerce c; origin} as exp -> (* collapse stacked coercions *)
       {exp with origin; enode = Coerce {c with coerce_to}}
-    | exp -> of_exp_node ?origin @@ Coerce {coerce_to; coerced = exp}
+    | exp -> Aux.of_exp_node ?origin @@ Coerce {coerce_to; coerced = exp}
+end
+
+module Rte = struct
+  let make p e = {rnode = e.enode; rorigin = p}
 end
 
 module Lhost = struct
-  let of_varinfo ?name vi =
+  let var ?name vi =
     let name = Option.value ~default:vi.vname name in
     Var (Varinfo.logic {vi with vorig_name = name})
+
+  let mem e = Mem e
 end
 
 module Helpers = struct
+  let attach_rtes rtes e = {e with rtes}
   let is_div_or_mod = function
     | (Div | Mod) -> true | _ -> false
 end

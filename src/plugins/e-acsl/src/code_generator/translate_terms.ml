@@ -78,7 +78,7 @@ let constant_to_exp_il t c =
   | Integer (n, _) ->
     let* logic_env = M.read_logic_env in
     let ity = Typing.get_number_ty ~logic_env t in
-    M.return @@ IL.Exp.of_integer ~origin:t ~ity n
+    M.return @@ IL.Exp.integer ~origin:t ~ity n
   | _ -> M.not_covered Printer.pp_term t
 
 let constant_to_exp_old ~loc env t c =
@@ -198,17 +198,16 @@ and thost_to_host_il host =
   let* {env; kf} = M.read in
   match host with
   | TVar {lv_origin = Some v} ->
-    M.return @@ IL.Lhost.of_varinfo v
+    M.return @@ IL.Lhost.var v
   | TVar ({lv_origin = None} as logic_v) ->
     let v' = Env.Logic_binding.get env logic_v in
-    M.return @@ IL.Lhost.of_varinfo ~name:logic_v.lv_name v'
+    M.return @@ IL.Lhost.var ~name:logic_v.lv_name v'
   | TResult _typ ->
     let lhost = Misc.result_lhost kf in
     (match lhost with
-     | Var v -> M.return @@ IL.Lhost.of_varinfo ~name:"result" v
+     | Var v -> M.return @@ IL.Lhost.var ~name:"result" v
      | _ -> assert false)
-  | TMem t ->
-    let+ e = to_exp_il t in IL.Mem e
+  | TMem t -> M.map IL.Lhost.mem @@ to_exp_il t
 
 and toffset_to_offset kf env = function
   | TNoOffset -> NoOffset, env
@@ -352,8 +351,8 @@ and context_insensitive_term_to_exp_il ?inplace t =
   | TConst c -> constant_to_exp_il t c
   | TLval lv ->
     let* l = tlval_to_lval_il lv in
-    M.return @@ IL.Exp.of_lval ~origin:t l
-  | TSizeOf ty -> M.return @@ IL.Exp.of_sizeof ~origin:t ty
+    M.return @@ IL.Exp.lval ~origin:t l
+  | TSizeOf ty -> M.return @@ IL.Exp.sizeof ~origin:t ty
   | TCast (true, _, t) -> context_insensitive_term_to_exp_il t
   | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
     let* logic_env = M.read_logic_env in
@@ -977,7 +976,7 @@ and to_exp_il ?inplace t =
   (* translates RTE guards of the current term *)
   let* rte_guards = Translate_predicates.rte_guards_to_exp_il t in
   let* e = context_insensitive_term_to_exp_il ?inplace t in
-  let e = IL.Exp.attach_rtes rte_guards e in
+  let e = IL.Helpers.attach_rtes rte_guards e in
   let e = match Typing.get_cast ~logic_env:(Env.Logic_env.get env) t with
     | None -> e
     | Some typ -> IL.Exp.coerce ?origin:e.origin ~coerce_to:typ e

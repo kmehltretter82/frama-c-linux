@@ -259,7 +259,7 @@ and compile_rte_guards cil =
       let adata, env = Assert.empty ~loc kf env in
       Conf.{adata; env}
     in
-    let* cil = compile @@ Interlang.Exp.of_exp_node rte.rnode in
+    let* cil = compile @@ Interlang.Exp.rte rte in
     M.modify @@ fun {adata;env} ->
     let stmt, env =
       Assert.runtime_check
