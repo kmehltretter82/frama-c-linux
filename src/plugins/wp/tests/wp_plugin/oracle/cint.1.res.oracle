@@ -1,6 +1,7 @@
 # frama-c -wp -no-warn-signed-overflow [...]
 [kernel] Parsing cint.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] Warning: -wp-rte can annotate signed overflow because -warn-signed-overflow is not set
 [wp] [Valid] Goal signed_bitwise_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal signed_bitwise_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards

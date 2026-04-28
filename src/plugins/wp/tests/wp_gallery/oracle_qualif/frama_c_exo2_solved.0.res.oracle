@@ -38,6 +38,7 @@
 ------------------------------------------------------------
 [wp] Running WP plugin...
 [rte:annot] annotating function max_subarray
+[wp] Warning: -wp-rte can annotate signed overflow because -warn-signed-overflow is not set
 [wp] [Valid] Goal max_subarray_terminates (Cfg) (Trivial)
 [wp] 1 goal scheduled
 [wp] [Valid] typed_max_subarray_assert_rte_mem_access (Alt-Ergo) (Cached)
