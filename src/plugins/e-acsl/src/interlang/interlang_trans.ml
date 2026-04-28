@@ -216,21 +216,8 @@ and compile_div_mod ~origin {ity; binop; op1; op2} =
   in
   M.return (e, None, Some (Analyses_types.C_number, ""))
 
-and compile_varinfo = function
-  | Varinfo.Logic_varinfo varinfo -> M.return varinfo
-  | Varinfo.(Fresh_varinfo {name; ty; origin}) ->
-    M.with_loc origin.term_loc @@
-    let* {loc; kf} = M.read in
-    M.modifying_env (fun env ->
-        let vi, _, env =
-          Env.new_var ~loc ~name env kf (Some origin) ty (fun _ _ -> [])
-        in
-        vi, env)
-
 and compile_lhost = function
-  | Var vi ->
-    let* v = compile_varinfo vi in
-    M.return (Cil_types.Var v, v.vorig_name)
+  | Var vi -> M.return (Cil_types.Var vi, vi.vorig_name)
   | Mem exp ->
     let* exp = M.without_registering_adata @@ compile exp in
     M.return (Cil_types.Mem exp, "")

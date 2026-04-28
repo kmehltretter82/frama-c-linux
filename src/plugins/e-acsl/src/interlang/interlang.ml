@@ -14,26 +14,6 @@ type binop =
   | Plus | Minus | Mult | Div | Mod
   | Lt | Gt | Le | Ge | Eq | Ne (* arithmetic comparison *)
 
-module Varinfo = struct
-  type t =
-    | Fresh_varinfo of {id : int; ty : typ; name : string; origin : term}
-    | Logic_varinfo of Cil_types.varinfo
-
-  let fresh =
-    let id = ref (-1) in
-    fun ~origin name ty ->
-      id := !id + 1;
-      Fresh_varinfo {id = !id; ty; name; origin}
-
-  let logic vi = Logic_varinfo vi
-
-  let pretty fmt = function
-    | Fresh_varinfo {name} -> Format.pp_print_string fmt name
-    | Logic_varinfo v -> Printer.pp_varinfo fmt v
-end
-
-type varinfo = Varinfo.t
-
 type exp =
   {
     enode : exp_node;
@@ -72,8 +52,6 @@ let of_bool = function
 module Pretty = struct
   open Format
 
-  let pp_varinfo = Varinfo.pretty
-
   let pp_binop fmt b =
     fprintf fmt "%s"
       (match b with
@@ -90,7 +68,7 @@ module Pretty = struct
        | Ne -> "!=")
 
   let rec pp_lhost fmt = function
-    | Var vi -> pp_varinfo fmt vi
+    | Var vi -> Printer.pp_varinfo fmt vi
     | Mem exp -> fprintf fmt "*@[%a@]" pp_exp exp
 
   and pp_lval fmt (host, offset) =
@@ -265,7 +243,7 @@ end
 module Lhost = struct
   let var ?name vi =
     let name = Option.value ~default:vi.vname name in
-    Var (Varinfo.logic {vi with vorig_name = name})
+    Var {vi with vorig_name = name}
 
   let mem e = Mem e
 end

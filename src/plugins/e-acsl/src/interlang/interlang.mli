@@ -34,20 +34,6 @@ type binop =
   | Plus | Minus | Mult | Div | Mod
   | Lt | Gt | Le | Ge | Eq | Ne
 
-module Varinfo : sig
-  type t = private
-    | Fresh_varinfo of {id : int; ty : typ; name : string; origin : term}
-    (** logic variable created in the generation stage *)
-    | Logic_varinfo of varinfo
-    (** reference to a pre-existing logic variable *)
-
-  val fresh : origin:term -> string -> typ -> t
-  val logic : varinfo -> t
-  val pretty : Format.formatter -> t -> unit
-end
-
-type varinfo = Varinfo.t
-
 type exp = private {enode : exp_node; rtes : rte list; origin : term option}
 (** [origin] is required to calculate casts. Note that [origin] is [None] when
     it stems from a predicate as predicates never require casts. *)
@@ -80,7 +66,6 @@ and rte = private {rnode : exp_node; rorigin: predicate}
 
 
 module Pretty : sig
-  val pp_varinfo : Format.formatter -> varinfo -> unit
   val pp_binop : Format.formatter -> binop -> unit
   val pp_lhost : Format.formatter -> lhost -> unit
   val pp_lval : Format.formatter -> lval -> unit
