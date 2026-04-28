@@ -183,7 +183,9 @@ let add_bassigns ~called ~map ~kf ~ki ~bhv ~formals ~result = function
     let ip = Option.get @@ Property.ip_of_assigns kf ki bhv asgn in
     let context = context ~called ~kf ip in
     let env = { map ; context ; formals ; result } in
-    let iscalled = Option.map (fun _ -> ref false) called in
+    let iscalled =
+      if called = None && Kernel_function.has_definition kf
+      then None else Some (ref false) in
     List.iter
       (fun (t,from) -> add_assigns_from env ~iscalled ~from t.it_content) ws ;
     match iscalled with

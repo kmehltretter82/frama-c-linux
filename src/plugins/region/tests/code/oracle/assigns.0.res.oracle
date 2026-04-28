@@ -8,13 +8,17 @@
 [region] annotating function call_byref
 [region] Function byref:
   R0001: -R-- p (int **) 64b (*R0002) (singleton) ;
-  R0002: ---- 0b ;
+  R0002: --W- (int *) 64b (*R0003) ;
+  R0003: ---- 0b ;
+  R0004: -R-- q (int *) 64b (*R0003) (singleton) ;
+  R0005: -R-- k (int) 32b (singleton) ;
 [region] Function call_copy:
   R0001: ---- a b 320b (allocated) (garbage) ;
 [region] annotating function call_copy
 [region] Function copy:
   R0001: -R-- p (struct S *) 64b (*R0002) (singleton) ;
   R0002: ---- 0b ;
+  R0003: -R-- q (struct S *) 64b (*R0002) (singleton) ;
 [region] Function call_field:
   R0001: ---- s 320b { .f: R0002; #256b; } (singleton) (allocated) (garbage) ;
   R0002: --W- (int *) 64b (*R0003) (singleton) (allocated) (garbage) ;
@@ -22,8 +26,10 @@
 [region] annotating function call_field
 [region] Function set_field:
   R0001: -R-- p (struct S *) 64b (*R0002) (singleton) ;
-  R0002: ---- 320b { .f: R0003[…]; #256b; } ;
-  R0003: ---- 0b ;
+  R0002: ---- 320b { .f: R0003; #256b; } ;
+  R0003: --W- (int *) 64b (*R0004) ;
+  R0004: ---- 0b ;
+  R0005: -R-- q (int *) 64b (*R0004) (singleton) ;
 [region:froms] assigns.i:8: Warning: 
   Missing \from in assigns to pointer location(s)
 [region] Function call_imprecise:
@@ -34,9 +40,11 @@
   R0005: -RW- __retres (int) 32b (singleton) (allocated) ;
   R0006: --W- \result (int) 32b ;
 [region] annotating function call_imprecise
+[region:froms] assigns.i:8: Warning: 
+  Missing \from in assigns to pointer location(s)
 [region] Function imprecise:
   R0001: -R-- p (int **) 64b (*R0002) (singleton) ;
-  R0002: ---- 0b ;
+  R0002: --W- (int *) 64b ;
 [region:froms] assigns.i:17: Warning: 
   Missing assigns \result \from for returned pointer
 [region] Function call_imprecise_result:
@@ -46,6 +54,8 @@
   R0004: ---- 0b ;
   R0005: --W- \result (int *) 64b (*R0004) ;
 [region] annotating function call_imprecise_result
+[region:froms] assigns.i:17: Warning: 
+  Missing assigns \result \from for returned pointer
 [region] Function imprecise_result:
   R0001: ---- \result 0b ;
 [region] Function call_malloc:
@@ -55,7 +65,7 @@
   R0004: --W- \result (int *) 64b (*R0003) ;
 [region] annotating function call_malloc
 [region] Function malloc:
-  R0001: ---- \result 0b ;
+  R0001: --W- \result (int *) 64b ;
 [region] Function call_range:
   R0001: ---- s 320b { #64b; .g: R0002[4]; } (singleton) (allocated)
     (garbage) ;
@@ -64,8 +74,10 @@
 [region] annotating function call_range
 [region] Function set_range:
   R0001: -R-- p (struct S *) 64b (*R0002) (singleton) ;
-  R0002: ---- 320b { #64b; .g: R0003; } ;
-  R0003: ---- 256b ;
+  R0002: ---- 320b { #64b; .g: R0003[4]; } ;
+  R0003: --W- (int *) 64b (*R0004) ;
+  R0004: ---- 0b ;
+  R0005: -R-- q (int *) 64b (*R0004) (singleton) ;
 [region:froms] assigns.i:21: Warning: 
   No pointer found in assigns-\from to pointer location(s)
 [region] Function call_suspiscious:
@@ -74,8 +86,11 @@
   R0003: ---- 0b ;
   R0004: --W- \result (int *) 64b (*R0003) ;
 [region] annotating function call_suspiscious
+[region:froms] assigns.i:21: Warning: 
+  No pointer found in assigns-\from to pointer location(s)
 [region] Function suspicious:
-  R0001: ---- \result 0b ;
+  R0001: -R-- p (int) 32b (singleton) ;
+  R0002: --W- \result (int *) 64b ;
 [region] Function call_write:
   R0001: ---- a 320b { .f: R0002; .g: R0004[4]; } (singleton) (allocated)
     (garbage) ;
@@ -85,7 +100,11 @@
 [region] annotating function call_write
 [region] Function write:
   R0001: -R-- p (struct S *) 64b (*R0002) (singleton) ;
-  R0002: ---- 0b ;
+  R0002: ---- 320b { .f: R0003; .g: R0005[4]; } ;
+  R0003: --W- (int *) 64b (*R0004) ;
+  R0004: ---- 0b ;
+  R0005: --W- (int *) 64b (*R0004) ;
+  R0006: -R-- q (int *) 64b (*R0004) (singleton) ;
 [region] Function caller_result:
   R0001: -R-- B[64] (int) 32b ;
   R0002: -R-- k (int) 32b (singleton) ;
