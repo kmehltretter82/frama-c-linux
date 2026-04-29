@@ -37,6 +37,8 @@
   max_subarray             13        9       22       100%
 ------------------------------------------------------------
 [wp] Running WP plugin...
+[wp] Warning: Skipped RTE guards: unaligned pointers (\aligned not supported)
+[wp] Warning: Skipped RTE guards: invalid function pointer calls (\valid_function not supported)
 [rte:annot] annotating function max_subarray
 [wp] Warning: -wp-rte can annotate signed overflow because -warn-signed-overflow is not set
 [wp] [Valid] Goal max_subarray_terminates (Cfg) (Trivial)

@@ -1,6 +1,8 @@
 # frama-c -wp -wp-rte [...]
 [kernel] Parsing bsearch.c (with preprocessing)
 [wp] Running WP plugin...
+[wp] Warning: Skipped RTE guards: unaligned pointers (\aligned not supported)
+[wp] Warning: Skipped RTE guards: invalid function pointer calls (\valid_function not supported)
 [rte:annot] annotating function binary_search
 [wp] [Valid] Goal binary_search_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal binary_search_terminates (Cfg) (Trivial)

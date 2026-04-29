@@ -1,4 +1,6 @@
 # frama-c -wp -wp-rte [...]
+[wp] Warning: Skipped RTE guards: unaligned pointers (\aligned not supported)
+[wp] Warning: Skipped RTE guards: invalid function pointer calls (\valid_function not supported)
 [rte:annot] annotating function swap
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

@@ -11,6 +11,8 @@
 [wp:rte] function job: generate rte for pointer downcast
 [wp:rte] function job: generate rte for float to int
 [wp:rte] function job: generate rte for special float
+[wp] Warning: Skipped RTE guards: unaligned pointers (\aligned not supported)
+[wp] Warning: Skipped RTE guards: invalid function pointer calls (\valid_function not supported)
 [rte:annot] annotating function job
 [wp:rte] function job2: generate rte for memory access
 [wp:rte] function job2: generate rte for division by zero

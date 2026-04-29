@@ -51,7 +51,8 @@ module WrapFiniteFloat = struct
 end
 
 let generator =
-  [
+  [ (* Note: -warn-unaligned-pointer and -rte-pointer-call are not listed here,
+       so that we do not warn for missing RTE guards for them. *)
     { name = "memory access" ; cint = false ;
       option = (module RteGen.Options.DoMemAccess) ;
       status = (module RteGen.Generator.Mem_access) } ;
@@ -115,15 +116,29 @@ let configure_initialized ~update ~generate kf =
     update := !update || not generated
   end
 
+let print_unsupported ~asked message =
+  if asked then
+    Wp_parameters.warning ~once:true ~current:false
+      "Skipped RTE guards: %s" message
+
 let generate model kf =
   let update = ref false in
   let cint = WpContext.on_context (model,WpContext.Kf kf) Cint.current () in
   List.iter (configure ~update ~generate:true kf cint) generator ;
   configure_initialized ~update ~generate:true kf ;
-  if !update then
-    (* we do not support pointer alignment for now *)
-    let flags = { (RteGen.Flags.default ()) with pointer_alignment = false } in
+  if !update then begin
+    print_unsupported ~asked:(Kernel.UnalignedPointer.get ())
+      "unaligned pointers (\\aligned not supported)" ;
+    print_unsupported ~asked:(RteGen.Options.DoPointerCall.get ())
+      "invalid function pointer calls (\\valid_function not supported)" ;
+    let flags =
+      { (RteGen.Flags.default ()) with (* we do not support: *)
+        pointer_alignment = false ;    (* - \aligned *)
+        pointer_call = false ;         (* - \valid_function *)
+      }
+    in
     RteGen.Visit.annotate ~flags kf
+  end
 
 let generate_all model =
   Wp_parameters.iter_kf (generate model)
