@@ -21,10 +21,12 @@ val pvalid_region :
 (** {2 Logic Helpers} *)
 (* -------------------------------------------------------------------------- *)
 
-type addr = LV of lval | ADDR of exp | RANGE of term * typ * term * term
+type addr = L of lval | E of exp | T of term * typ | R of term * typ * term * term
 type access = Read | Write | Region | Initialized
 
-type guard =
+(** Tip: named terms are opaque to smart constructors *)
+
+type guard = private
   | True | False
   | Named of string * guard
   | Or of guard * guard
@@ -32,20 +34,25 @@ type guard =
   | Imply of guard * guard
   | Bounds of exp * Z.t
   | Null of bool * addr
-  | Valid of access * Memory.node * addr
+  | Valid of access * addr
   | Separated of addr * addr
 
+val pointed : addr -> typ
 val trivial : guard -> bool
 
+val g_true : guard
+val g_false : guard
 val g_or : guard -> guard -> guard
 val g_and : guard -> guard -> guard
 val g_imply : guard -> guard -> guard
 val g_name : string -> guard -> guard
+val g_null : ?eq:bool -> addr -> guard
+val g_bounds : exp -> Z.t -> guard
+val g_valid : access -> addr -> guard
+val g_separated : addr -> addr -> guard
 
 val pp_addr  : Format.formatter -> addr  -> unit
 val pp_guard : Format.formatter -> guard -> unit
-
-val pointed : addr -> typ
 
 val of_addr  : ?loc:location -> addr -> term
 val of_guard : ?loc:location -> ?names:string list -> guard -> predicate

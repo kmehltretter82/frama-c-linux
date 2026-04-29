@@ -23,12 +23,6 @@ let add env g = if not @@ trivial g then env.guards <- g :: env.guards
 let iter f env = List.iter f @@ List.rev env.guards
 
 (* -------------------------------------------------------------------------- *)
-(* ---  Valid Conditions                                                  --- *)
-(* -------------------------------------------------------------------------- *)
-
-let valid env acs n a = add env (Valid(acs,n,a))
-
-(* -------------------------------------------------------------------------- *)
 (* ---  Lval/Exp Side Conditions                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -40,7 +34,7 @@ and lhost env = function
   | Var v -> v.vtype, Memory.cvar env.map v
   | Mem e ->
     let s,r = addr env e in
-    if not s then valid env Region r (ADDR e) ;
+    if not s then add env @@ g_valid Region (E e) ;
     Ast_types.direct_pointed_type @@ Cil.typeOf e, r
 
 and offset env s t r = function
@@ -53,7 +47,7 @@ and offset env s t r = function
     let s =
       if Kernel.SafeArrays.get () then
         let n = Ast_info.direct_array_size t in
-        add env (Bounds(k,n)) ; s
+        add env @@ g_bounds k n ; s
       else false
     in offset env s te r o
 
@@ -67,7 +61,7 @@ and exp env e =
     Some (s,r)
   | Lval lv ->
     let s,_,r = lval env lv in
-    if not s then valid env Region r (LV lv) ;
+    if not s then add env @@ g_valid Region (L lv) ;
     Option.map (fun r -> false,r) @@ Memory.points_to r
   | CastE(t,e) when
       Ast_types.is_fun_or_ptr t &&
@@ -84,44 +78,43 @@ and exp env e =
   | Const _ | SizeOf _ | SizeOfE _ | AlignOf (_, _) | AlignOfE (_, _) -> None
 
 let write env lv =
-  let s,_,r = lval env lv in
-  if not s then valid env Region r (LV lv)
+  let safe,_,_ = lval env lv in
+  if not safe then add env @@ g_valid Region (L lv)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Root Side Conditions                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let nullable ~from addr =
-  if Attr.mem `Nullable from then Null(false,addr)
-  else True
+let valid acs node p =
+  let flags = Memory.flags node in
+  match acs with
+  | Initialized when not @@ Attr.mem `Garbage flags -> g_true
+  | Read | Write when not @@ Attr.mem `Allocated flags ->
+    if Attr.mem `Nullable flags then g_null ~eq:false p else g_true
+  | _ -> g_valid acs p
 
-let readable ~node ~from addr =
-  if Attr.mem `Allocated from then Valid(Read,node,addr)
-  else nullable ~from addr
-
-let writable ~node ~from addr =
-  if Attr.mem `Readonly from then False else
-  if Attr.mem `Allocated from then Valid(Write,node,addr)
-  else nullable ~from addr
-
-let requires ~node ~flags addr =
-  let from = Memory.flags node in
-  let valid =
-    if Attr.mem `Readonly flags || Memory.readonly node then
-      readable ~node ~from addr
-    else
-      writable ~node ~from addr in
+let requires flags node addr =
+  let non_null =
+    if Attr.mem `Nullable flags
+    then g_null ~eq:false addr
+    else g_false
+  in
+  let accessible =
+    if Attr.mem `Readonly flags
+    then valid Read node addr
+    else valid Write node addr
+  in
   let initialized =
-    if Attr.mem `Garbage flags || not @@ Attr.mem `Garbage from then
-      True
-    else
-      Valid(Initialized,node,addr) in
+    if Attr.mem `Garbage flags
+    then valid Initialized node addr
+    else g_true
+  in
   let wellformed =
-    if Attr.mem `Allocated flags then
-      g_imply valid initialized
-    else
-      g_and valid initialized
-  in g_imply (nullable ~from:flags addr) wellformed
+    if Attr.mem `Allocated flags
+    then g_imply accessible initialized
+    else g_and accessible initialized
+  in
+  g_imply non_null wellformed
 
 (* -------------------------------------------------------------------------- *)
 (* --- Call Side Conditions                                               --- *)
@@ -149,7 +142,7 @@ let call_kf env stmt kf es =
          List.iter
            (fun x ->
               if x.vglob then
-                let lv = LV(Var x,NoOffset) in
+                let lv = L(Var x,NoOffset) in
                 globals := lv :: !globals
            ) (Memory.cvars from) ;
          List.iter
@@ -157,33 +150,31 @@ let call_kf env stmt kf es =
               let ptr = subst ~loc kf es a.ptr in
               let inf = subst ~loc kf es a.inf in
               let sup = subst ~loc kf es a.sup in
-              let addr = RANGE(ptr,a.typ,inf,sup) in
+              let addr = R(ptr,a.typ,inf,sup) in
               let node = Lookup.tmem tenv ptr in
               Separated.add objmap ~node ~from a.named addr ;
               add env @@ g_name fct @@ g_name a.named @@
-              requires ~node ~flags:a.flags addr ;
+              requires a.flags node addr ;
            ) (Memory.roots from) ;
       ) kmap ;
     let globals = List.rev !globals in
     Separated.iter
       (fun node a p ->
-         let from = Memory.flags node in
          List.iter
            (fun g ->
               add env
               @@ g_name fct @@ g_name a
-              @@ g_imply (readable ~node ~from p)
-              @@ Separated(p,g)
+              @@ g_imply (valid Read node p)
+              @@ g_separated p g
            ) globals
       ) objmap ;
     Separated.iter2
       (fun node a p b q ->
-         let from = Memory.flags node in
          add env
          @@ g_name fct @@ g_name a @@ g_name b
-         @@ g_imply (readable ~node ~from p)
-         @@ g_imply (readable ~node ~from q)
-         @@ Separated(p,q)
+         @@ g_imply (valid Read node p)
+         @@ g_imply (valid Read node q)
+         @@ g_separated p q
       ) objmap ;
   end
 

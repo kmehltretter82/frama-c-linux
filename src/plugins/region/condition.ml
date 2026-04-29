@@ -41,12 +41,13 @@ let pvalid_region ?loc ?names ?(label=Logic_const.here_label) addr =
 (* ---  Side Conditions                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-type addr = LV of lval | ADDR of exp | RANGE of term * typ * term * term
+type addr = L of lval | E of exp | T of term * typ | R of term * typ * term * term
 
 let pp_addr fmt = function
-  | LV lv -> Format.fprintf fmt "&(%a)" Printer.pp_lval lv
-  | ADDR p -> Printer.pp_exp fmt p
-  | RANGE(a,_,p,q) ->
+  | L lv -> Format.fprintf fmt "&(%a)" Printer.pp_lval lv
+  | E p -> Printer.pp_exp fmt p
+  | T(p,_) -> Printer.pp_term fmt p
+  | R(a,_,p,q) ->
     Format.fprintf fmt "&(%a[%a..%a])"
       Printer.pp_term a Printer.pp_term p Printer.pp_term q
 
@@ -60,7 +61,7 @@ type guard =
   | Imply of guard * guard
   | Bounds of exp * Z.t
   | Null of bool * addr
-  | Valid of access * Memory.node * addr
+  | Valid of access * addr
   | Separated of addr * addr
 
 let rec pp_guard fmt = function
@@ -72,15 +73,37 @@ let rec pp_guard fmt = function
   | Imply(p,q) -> Format.fprintf fmt "(@[<hov 2>%a@ ==> %a)@]" pp_guard p pp_guard q
   | Bounds(k,n) -> Format.fprintf fmt "0<= %a < %a" Printer.pp_exp k Z.pretty n
   | Null(eq,a) -> Format.fprintf fmt "(%a %c= \\null)" pp_addr a (if eq then '=' else '!')
-  | Valid(Write,_,a) -> Format.fprintf fmt "\\valid(%a)" pp_addr a
-  | Valid(Read,_,a) -> Format.fprintf fmt "\\valid_read(%a)" pp_addr a
-  | Valid(Region,_,a) -> Format.fprintf fmt "\\valid_region(%a)" pp_addr a
-  | Valid(Initialized,_,a) -> Format.fprintf fmt "\\initialized(%a)" pp_addr a
+  | Valid(Write,a) -> Format.fprintf fmt "\\valid(%a)" pp_addr a
+  | Valid(Read,a) -> Format.fprintf fmt "\\valid_read(%a)" pp_addr a
+  | Valid(Region,a) -> Format.fprintf fmt "\\valid_region(%a)" pp_addr a
+  | Valid(Initialized,a) -> Format.fprintf fmt "\\initialized(%a)" pp_addr a
   | Separated(a,b) -> Format.fprintf fmt "\\separated(%a,%a)" pp_addr a pp_addr b
 
 let rec trivial = function True -> true | Named(_,g) -> trivial g | _ -> false
 
+let pointed = function
+  | L lv -> Cil.typeOfLval lv
+  | E p -> Ast_types.pointed_type @@ Cil.typeOf p
+  | T(_,te) | R(_,te,_,_) -> te
+
+let is_zero t =
+  match t.term_node with
+  | TConst(Integer(z,_)) -> Z.is_zero z
+  | _ -> false
+
+(* -------------------------------------------------------------------------- *)
+(* ---  Smart Constructors                                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+let g_true = True
+let g_false = False
+
 let g_name a g = if a <> "" then Named(a,g) else g
+
+let g_null ?(eq=true) = function
+  | R(p,t,_,_) -> Null(eq,T(p,t))
+  | L(Var _,_) -> if eq then False else True
+  | addr -> Null(eq,addr)
 
 let g_and p q =
   match p,q with
@@ -101,30 +124,30 @@ let g_imply p q =
   | Null(eq,a) , False -> Null(not eq,a)
   | _ -> Imply(p,q)
 
-let pointed = function
-  | LV lv -> Cil.typeOfLval lv
-  | ADDR p -> Ast_types.pointed_type @@ Cil.typeOf p
-  | RANGE(_,t,_,_) -> t
+let g_bounds e n = Bounds(e,n)
+let g_separated p q = Separated(p,q)
 
-let is_zero t =
-  match t.term_node with
-  | TConst(Integer(z,_)) -> Z.is_zero z
-  | _ -> false
+let g_valid acs p = Valid(acs,p)
+
+(* -------------------------------------------------------------------------- *)
+(* ---  Extraction                                                        --- *)
+(* -------------------------------------------------------------------------- *)
 
 let of_addr ?loc = function
-  | LV lv ->
+  | L lv ->
     let lv = Logic_utils.lval_to_term_lval lv in
     Logic_utils.mk_logic_AddrOf ?loc lv @@ Cil.typeOfTermLval lv
-  | ADDR ptr ->
+  | E ptr ->
     Logic_utils.expr_to_term ~coerce:true ptr
-  | RANGE(a,_,p,q) when is_zero p && is_zero q -> a
-  | RANGE(a,t,p,q) ->
-    let index =
-      if Term.equal p q then p
-      else Logic_const.trange ?loc (Some p,Some q)
-    in Logic_const.term ?loc
-      (TBinOp(PlusPI,a,index))
-      (Ctype (Cil_const.mk_tptr t))
+  | T(ptr,_) -> ptr
+  | R(a,t,p,q) ->
+    if is_zero p && is_zero q then a else
+      let index =
+        if Term.equal p q then p
+        else Logic_const.trange ?loc (Some p,Some q)
+      in Logic_const.term ?loc
+        (TBinOp(PlusPI,a,index))
+        (Ctype (Cil_const.mk_tptr t))
 
 (* Names are only set at top-level predicate *)
 let rec of_guard ?loc ?(names=[]) = function
@@ -146,13 +169,13 @@ let rec of_guard ?loc ?(names=[]) = function
     let null = Logic_const.term ?loc Tnull addr.term_type in
     let rel = if eq then Req else Rneq in
     Logic_const.prel ?loc ~names (rel,addr,null)
-  | Valid(Write,_,p) ->
+  | Valid(Write,p) ->
     Logic_const.(pvalid ?loc ~names (here_label, of_addr ?loc p))
-  | Valid(Read,_,p) ->
+  | Valid(Read,p) ->
     Logic_const.(pvalid_read ?loc ~names (here_label, of_addr ?loc p))
-  | Valid(Initialized,_,p) ->
+  | Valid(Initialized,p) ->
     Logic_const.(pinitialized ?loc ~names (here_label, of_addr ?loc p))
-  | Valid(Region,_,p) -> pvalid_region ?loc ~names @@ of_addr ?loc p
+  | Valid(Region,p) -> pvalid_region ?loc ~names @@ of_addr ?loc p
   | Separated(a,b) ->
     Logic_const.pseparated ?loc ~names [ of_addr ?loc a ; of_addr ?loc b ]
 
