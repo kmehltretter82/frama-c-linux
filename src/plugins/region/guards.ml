@@ -7,6 +7,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Condition
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Side Conditions Generator                                         --- *)
@@ -14,7 +15,7 @@ open Cil_types
 
 type env = {
   map: Memory.map ;
-  mutable guards : Condition.guard list ;
+  mutable guards : guard list ;
 }
 
 let create map = { map ; guards = [] }
@@ -91,40 +92,40 @@ let write env lv =
 (* -------------------------------------------------------------------------- *)
 
 let nullable ~from addr =
-  if Attr.mem `Nullable from then Condition.Null(false,addr)
+  if Attr.mem `Nullable from then Null(false,addr)
   else True
 
 let readable ~node ~from addr =
-  if Attr.mem `Allocated from then Condition.Valid(Read,node,addr)
+  if Attr.mem `Allocated from then Valid(Read,node,addr)
   else nullable ~from addr
 
 let writable ~node ~from addr =
-  if Attr.mem `Readonly from then Condition.False else
-  if Attr.mem `Allocated from then Condition.Valid(Write,node,addr)
+  if Attr.mem `Readonly from then False else
+  if Attr.mem `Allocated from then Valid(Write,node,addr)
   else nullable ~from addr
 
-let requires ~node ~target addr =
+let requires ~node ~flags addr =
   let from = Memory.flags node in
   let valid =
-    if Attr.mem `Readonly target || Memory.readonly node then
+    if Attr.mem `Readonly flags || Memory.readonly node then
       readable ~node ~from addr
     else
       writable ~node ~from addr in
   let initialized =
-    if Attr.mem `Garbage target || not @@ Attr.mem `Garbage from then
-      Condition.True
+    if Attr.mem `Garbage flags || not @@ Attr.mem `Garbage from then
+      True
     else
-      Condition.Valid(Initialized,node,addr) in
+      Valid(Initialized,node,addr) in
   let allocated =
-    if Attr.mem `Allocated target then
-      Condition.g_imply valid initialized
+    if Attr.mem `Allocated flags then
+      g_imply valid initialized
     else
-      Condition.g_and valid initialized in
+      g_and valid initialized in
   let nullable =
-    if Attr.mem `Nullable target then
-      Condition.Null(false,addr)
+    if Attr.mem `Nullable flags then
+      Null(false,addr)
     else False in
-  Condition.g_or nullable allocated
+  g_or nullable allocated
 
 (* -------------------------------------------------------------------------- *)
 (* --- Call Side Conditions                                               --- *)
@@ -139,8 +140,6 @@ let subst ~loc kf es t =
       "Can not evaluate term (%a)@ from function %a at call site"
       Printer.pp_term t Kernel_function.pretty kf
 
-let named a g = if a <> "" then Condition.Named(a,g) else g
-
 let call_kf env stmt kf es =
   let fct = Kernel_function.get_name kf in
   let loc = Cil_datatype.Stmt.loc stmt in
@@ -151,25 +150,25 @@ let call_kf env stmt kf es =
   let objmap = Separated.create () in
   begin
     Memory.iter
-      (fun r ->
+      (fun from ->
          List.iter
            (fun x ->
               if x.vglob then
-                let lv = Condition.LV(Var x,NoOffset) in
+                let lv = LV(Var x,NoOffset) in
                 globals := lv :: !globals
-           ) (Memory.cvars r) ;
+           ) (Memory.cvars from) ;
          List.iter
            (function Memory.Root a ->
               let ptr = subst ~loc kf es a.ptr in
               let inf = subst ~loc kf es a.inf in
               let sup = subst ~loc kf es a.sup in
-              let addr = Condition.RANGE(ptr,a.typ,inf,sup) in
+              let addr = RANGE(ptr,a.typ,inf,sup) in
               let node = Lookup.tmem tenv ptr in
               objects := (a.named,addr) :: !objects ;
-              Separated.add objmap node a.named addr ;
-              add env @@ named fct @@ named a.named @@
-              requires ~node ~target:a.flags addr ;
-           ) (Memory.roots r) ;
+              Separated.add objmap ~node ~from a.named addr ;
+              add env @@ g_name fct @@ g_name a.named @@
+              requires ~node ~flags:a.flags addr ;
+           ) (Memory.roots from) ;
       ) kmap ;
     let globals = List.rev !globals in
     let objects = List.rev !objects in
@@ -177,12 +176,12 @@ let call_kf env stmt kf es =
       (fun global ->
          List.iter
            (fun (a,obj) ->
-              add env @@ named fct @@ named a @@ Separated(obj,global)
+              add env @@ g_name fct @@ g_name a @@ Separated(obj,global)
            ) objects
       ) globals ;
     Separated.iter
       (fun a la b lb ->
-         add env @@ named fct @@ named a @@ named b @@ Separated(la,lb)
+         add env @@ g_name fct @@ g_name a @@ g_name b @@ Separated(la,lb)
       ) objmap ;
   end
 
@@ -265,7 +264,7 @@ let add_annotation ?kf ?emitter ?(names=[]) ?(invalid=false) ?(hyps=[]) stmt gua
   let enames = if invalid then "invalid"::names else names in
   let enames = if emitter = None then "region"::enames else enames in
   let e = match emitter with Some e -> e | None -> self () in
-  let a = Condition.of_guard ~loc ~names:enames guard in
+  let a = of_guard ~loc ~names:enames guard in
   let a = Logic_const.toplevel_predicate ~kind a in
   let ca = Logic_const.new_code_annotation (AAssert ([],a)) in
   Annotations.add_code_annot e ?kf stmt ca ;

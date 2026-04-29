@@ -6,11 +6,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Memory
 open Condition
 
 (** Objects map *)
 type objmap
 
 val create : unit -> objmap
-val add : objmap -> Memory.node -> string -> addr -> unit
+val add : objmap -> node:node -> from:node -> string -> addr -> unit
 val iter : (string -> addr -> string -> addr -> unit) -> objmap -> unit

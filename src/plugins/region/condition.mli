@@ -38,6 +38,7 @@ type guard =
 val g_or : guard -> guard -> guard
 val g_and : guard -> guard -> guard
 val g_imply : guard -> guard -> guard
+val g_name : string -> guard -> guard
 
 val pp_addr  : Format.formatter -> addr  -> unit
 val pp_guard : Format.formatter -> guard -> unit

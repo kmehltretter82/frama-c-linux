@@ -9,34 +9,35 @@
 module N = Memory.Nmap
 module L = Datatype.String.Map
 
-type objmap = Condition.addr list L.t N.t ref
+type objmap = (string * Condition.addr) list L.t N.t ref
 
 let create () = ref N.empty
 
-let add (idx : objmap) node name addr =
+let add (idx : objmap) ~node ~from named addr =
+  let lkey = Printf.sprintf "%s#%d" named (Memory.id from) in
   let lbls = try N.find node !idx with Not_found -> L.empty in
-  let objs = try L.find name lbls with Not_found -> [] in
-  idx := N.add node (L.add name (addr :: objs) lbls) !idx
+  let objs = try L.find lkey lbls with Not_found -> [] in
+  idx := N.add node (L.add lkey ((named,addr) :: objs) lbls) !idx
 
 let rec rev_iter f = function
   | [] -> ()
   | x::xs -> rev_iter f xs ; f x
 
-let iter f idx =
+let iter f (idx : objmap) =
   N.iter
     (fun _r lbls ->
        L.iter
-         (fun a la ->
+         (fun k1 objs1 ->
             L.iter
-              (fun b lb ->
-                 if a < b then
+              (fun k2 objs ->
+                 if k1 < k2 then
                    rev_iter
-                     (fun x ->
+                     (fun (a,p) ->
                         rev_iter
-                          (fun y ->
-                             f a x b y
-                          ) lb
-                     ) la
+                          (fun (b,q) ->
+                             f a p b q
+                          ) objs
+                     ) objs1
               ) lbls
          ) lbls
     ) !idx

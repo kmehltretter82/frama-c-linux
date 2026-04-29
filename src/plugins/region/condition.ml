@@ -78,6 +78,8 @@ let rec pp_guard fmt = function
   | Valid(Initialized,_,a) -> Format.fprintf fmt "\\initialized(%a)" pp_addr a
   | Separated(a,b) -> Format.fprintf fmt "\\separated(%a,%a)" pp_addr a pp_addr b
 
+let g_name a g = if a <> "" then Named(a,g) else g
+
 let g_and p q =
   match p,q with
   | True,w | w,True -> w
