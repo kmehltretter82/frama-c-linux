@@ -114,13 +114,12 @@ module Make_Memory (Info: sig val name: string end) (Value: Value) = struct
   let find_or_top b state = try find b state with Not_found -> Value.top
 
   let add loc typ v state =
-    let open Locations in
-    let {addr; size} = Precise_locs.imprecise_location loc in
+    let loc = Precise_locs.imprecise_location loc in
     (* exact means that the location is precise and that we can perform
        a strong update. *)
-    let exact = Addresses.Bits.cardinal_zero_or_one addr in
+    let exact = Addresses.Bits.cardinal_zero_or_one loc.addr in
     let aux_base b o state =
-      match covers_base b o size typ with
+      match covers_base b o loc.size typ with
       | Precise ->
         (* The location exactly matches [b]: we are able to store the result.
            If the location is not exact, performs a weak update: join [v] with
@@ -133,7 +132,7 @@ module Make_Memory (Info: sig val name: string end) (Value: Value) = struct
         else add b v state
       | Imprecise -> remove b state
     in
-    try Addresses.Bits.fold_topset_ok aux_base addr state
+    try Addresses.Bits.fold_topset_ok aux_base loc.addr state
     with Abstract_interp.Error_Top -> empty
 
   let remove_variables vars state =
@@ -145,17 +144,16 @@ module Make_Memory (Info: sig val name: string end) (Value: Value) = struct
     Locations.(Addresses.Bits.fold_bases remove loc.addr state)
 
   let find loc typ state =
-    let open Locations in
-    let {addr; size} = Precise_locs.imprecise_location loc in
+    let loc = Precise_locs.imprecise_location loc in
     let aux_base b o r =
       (* We degenerate to Top as soon as we find an imprecise location,
          or a base which is not bound in the map. *)
-      match covers_base b o size typ with
+      match covers_base b o loc.size typ with
       | Precise -> Bottom.join Value.join r (`Value (find_or_top b state))
       | Imprecise -> `Value Value.top
     in
     try
-      match Addresses.Bits.fold_topset_ok aux_base addr `Bottom with
+      match Addresses.Bits.fold_topset_ok aux_base loc.addr `Bottom with
       | `Bottom -> Value.top (* does not happen if the location is not empty *)
       | `Value v -> v
     with Abstract_interp.Error_Top -> Value.top

@@ -765,7 +765,7 @@ struct
     let bsize = 8 * Ctypes.sizeof_object obj in
     let addr_bits = Addresses.Bits.of_bytes v in
     let size = bsize |> Z_or_top.of_int in
-    let vloc = Locations.make_loc addr_bits size in
+    let vloc = Locations.make addr_bits size in
     Cvalue.Model.find state vloc
 
   let domain v =

@@ -9,7 +9,6 @@
 open Cil_types
 open Cil_datatype
 open Visitor
-open Locations
 open Mt_cil
 open Mt_memory.Types
 open Mt_types
@@ -291,7 +290,7 @@ class do_it cp =
         (* Compute the zones written by the assigns *)
         (match assigns with
          | WritesAny ->
-           let top = Locations.make_loc Addresses.Bits.top Z_or_top.top in
+           let top = Locations.make Addresses.Bits.top Z_or_top.top in
            self#add_access (Write top) Memory_zone.top;
 
          | Writes assigns' ->
@@ -447,13 +446,13 @@ struct
         List.iter aux_itv l;
         H.fold
           (fun size addr_bits acc ->
-             let loc = Locations.make_loc addr_bits (`Value size) in
+             let loc = Locations.make addr_bits (`Value size) in
              f loc v acc
           ) by_size acc
       with Abstract_interp.Error_Top ->
         let addr_bits = Addresses.Bits.inject b Ival.zero in
         let size = Z_or_top.top (* TODO : use validity *) in
-        let loc = Locations.make_loc addr_bits size in
+        let loc = Locations.make addr_bits size in
         f loc v acc
     in
     X.ZoneMap.fold_base
@@ -653,7 +652,7 @@ module Precise = struct
     let size = Lattice_bounds.Bottom.non_bottom size in
     Cvalue.V_Offsetmap.create_isotropic ~size Cvalue.V_Or_Uninitialized.bottom
 
-  let extract_shared_value node op loc state =
+  let extract_shared_value node op (loc : Locations.t) state =
     match loc.size with
     | `Top ->
       Mt_self.warning ?source:(CfgNode.node_first_loc node)
@@ -715,7 +714,7 @@ module Precise = struct
       ()
 
   module WriteSeen =
-    Datatype.Triple_with_collections(CfgNode)(Thread)(Locations.Location)
+    Datatype.Triple_with_collections (CfgNode) (Thread) (Locations)
 
   let enumerate_written_vars_value m =
     let aux _b _itvs s acc =

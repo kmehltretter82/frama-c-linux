@@ -18,7 +18,7 @@ let offsetmap_of_v ~typ v =
   V_Offsetmap.create ~size v ~size_v:size
 
 let offsetmap_of_loc location state =
-  let aux (loc: Locations.location) offsm_res =
+  let aux (loc: Locations.t) offsm_res =
     (* If the size is unknown, returns the complete offsetmap. *)
     let size =
       try Z_or_top.project loc.size
@@ -121,13 +121,13 @@ let reduce_by_valid_loc ~positive access loc typ state =
   let addr_bytes = Cvalue.V_Or_Uninitialized.get_v value in
   let addr_bits = Addresses.Bits.of_bytes addr_bytes in
   let size = Bit_utils.sizeof_pointed typ in
-  let location = Locations.make_loc addr_bits size in
+  let location = Locations.make addr_bits size in
   let reduced_location =
     if positive
     then Locations.valid_part access location
     else Locations.invalid_part location
   in
-  let reduced_addr_bytes = Locations.loc_addr_bytes reduced_location in
+  let reduced_addr_bytes = Locations.addr_bytes reduced_location in
   let reduced_value =
     if positive
     then Cvalue.V_Or_Uninitialized.initialized reduced_addr_bytes
@@ -154,7 +154,7 @@ let make_loc_contiguous loc =
         let size' = Z.add (Z.sub max min) modu in
         let i = Ival.inject_singleton min in
         let addr_bits = Addresses.Bits.inject base i in
-        Locations.make_loc addr_bits (`Value size')
+        Locations.make addr_bits (`Value size')
       | _ -> loc
   with Not_found -> loc
 
@@ -167,7 +167,7 @@ let apply_on_all_locs f loc state =
     let ilevel = Int_set.get_small_cardinal () in
     let limit = max plevel ilevel in
     let apply_f base ival state =
-      f Locations.(make_loc (Addresses.Bits.inject base ival) size) state
+      f (Locations.make (Addresses.Bits.inject base ival) size) state
     in
     let aux base ival state =
       if Ival.cardinal_is_less_than ival limit

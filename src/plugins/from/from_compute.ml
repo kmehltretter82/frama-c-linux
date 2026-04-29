@@ -8,7 +8,6 @@
 
 open Cil_types
 open Cil_datatype
-open Locations
 
 exception Call_did_not_take_place
 
@@ -300,7 +299,7 @@ struct
       let deps_of_deps = Eva.Assigns.Memory.find state.deps_table deps in
       let all_indirect = Memory_zone.join state.additional_deps deps_of_deps in
       let deps = Eva.Deps.add_indirect deps_right all_indirect in
-      let access = if init then Read else Write in
+      let access = if init then Locations.Read else Locations.Write in
       { state with deps_table =
                      Eva.Assigns.Memory.add_binding_precise_loc
                        ~exact access state.deps_table loc deps }

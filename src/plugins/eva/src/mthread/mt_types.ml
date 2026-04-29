@@ -15,7 +15,7 @@ open Mt_memory.Types
 (* -------------------------------------------------------------------------- *)
 
 
-type rw = Read | Write of Locations.location
+type rw = Read | Write of Locations.t
         | ReadPos of Position.t | WritePos of Position.t
 
 module RW = struct
@@ -27,7 +27,7 @@ module RW = struct
       let reprs = [Read]
       let equal rw1 rw2 = match rw1, rw2 with
         | Read, Read -> true
-        | Write l1, Write l2 -> Locations.Location.equal l1 l2
+        | Write l1, Write l2 -> Locations.equal l1 l2
         | Read, Write _ | Write _, Read -> false
         | ReadPos pos1, ReadPos pos2
         | WritePos pos1, WritePos pos2 -> Position.equal pos1 pos2
@@ -36,7 +36,7 @@ module RW = struct
         | (ReadPos _ | WritePos _), (Read | Write _) -> false
       let compare rw1 rw2 = match rw1, rw2 with
         | Read, Read -> 0
-        | Write l1, Write l2 -> Locations.Location.compare l1 l2
+        | Write l1, Write l2 -> Locations.compare l1 l2
         | Read, Write _ -> -1
         | Write _, Read -> 1
         | ReadPos pos1, ReadPos pos2
@@ -48,7 +48,7 @@ module RW = struct
       let hash = function
         | ReadPos pos -> 1 + Hashtbl.hash (1, Position.hash pos)
         | WritePos pos -> 1 + Hashtbl.hash (2, Position.hash pos)
-        | Write l -> 1 + Hashtbl.hash (3, Locations.Location.hash l)
+        | Write l -> 1 + Hashtbl.hash (3, Locations.hash l)
         | Read -> 0
       let pretty fmt rw = Format.fprintf fmt "%s"
           (match rw with
@@ -76,7 +76,7 @@ module RW = struct
   let pretty_loc fmt rw =
     match rw with
     | Read -> Format.fprintf fmt "<noloc>"
-    | Write l -> Locations.Location.pretty fmt l
+    | Write l -> Locations.pretty fmt l
     | ReadPos pos | WritePos pos -> Position.pretty fmt pos
 end
 

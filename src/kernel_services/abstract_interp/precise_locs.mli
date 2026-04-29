@@ -7,7 +7,7 @@
 (**************************************************************************)
 
 (** This module provides transient datastructures that may be more precise
-    than an {!Ival.t}, {!Addresses.Bits.t} and {!Locations.location}
+    than an {!Ival.t}, {!Addresses.Bits.t} and {!Locations.t}
     respectively, typically for l-values such as [t[i][j]], [p->t[i]], etc.
     Those structures do not have a lattice structure, and cannot be stored
     as an abstract domain. However, they can be use to model more precisely
@@ -60,7 +60,7 @@ val loc_size: precise_location -> Z_or_top.t
 val make_precise_loc :
   precise_addr_bits -> size:Z_or_top.t -> precise_location
 
-val imprecise_location : precise_location -> Locations.location
+val imprecise_location : precise_location -> Locations.t
 
 val loc_bottom : precise_location
 val is_bottom_loc: precise_location -> bool
@@ -70,8 +70,7 @@ val is_top_loc: precise_location -> bool
 
 val replace_base: Base.substitution -> precise_location -> precise_location
 
-val fold:
-  (Locations.location -> 'a -> 'a) -> precise_location -> 'a -> 'a
+val fold: (Locations.t -> 'a -> 'a) -> precise_location -> 'a -> 'a
 
 val enumerate_valid_bits:
   Locations.access -> precise_location -> Memory_zone.t

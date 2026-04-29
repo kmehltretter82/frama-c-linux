@@ -436,12 +436,11 @@ struct
     | None ->
       Result.error DisabledDomain
     | Some get ->
-      let join loc1 loc2 =
-        let open Locations in
+      let join (loc1: Locations.t) (loc2: Locations.t) =
         let size = loc1.size
         and addr = Addresses.Bits.join loc1.addr loc2.addr in
         assert (Z_or_top.equal loc2.size size);
-        make_loc addr size
+        Locations.make addr size
       and extract loc =
         loc >>-: get >>-: Precise_locs.imprecise_location
       in
@@ -671,8 +670,8 @@ let as_location_result (Address lvaluation) =
 let as_location address =
   match as_location_result address with
   | Ok loc -> loc
-  | Error Bottom -> Locations.loc_bottom
-  | Error (Top | DisabledDomain) -> Locations.loc_top
+  | Error Bottom -> Locations.bottom
+  | Error (Top | DisabledDomain) -> Locations.top
 
 let as_zone_result (Address lvaluation) =
   let module E = (val lvaluation : Lvaluation) in
@@ -692,7 +691,7 @@ let is_singleton: type a. a evaluation -> bool = function
     Cvalue.V.cardinal_zero_or_one cvalue && not (Cvalue.V.is_bottom cvalue)
   | Address _ as lvaluation ->
     let loc = as_location lvaluation in
-    Locations.cardinal_zero_or_one loc && not (Locations.is_bottom_loc loc)
+    Locations.cardinal_zero_or_one loc && not (Locations.is_bottom loc)
 
 let is_initialized (Value evaluation) =
   let module E = (val evaluation : Evaluation) in

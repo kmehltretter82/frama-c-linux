@@ -277,10 +277,10 @@ val as_cvalue_or_uninitialized : value evaluation -> Cvalue.V_Or_Uninitialized.t
 
 (** Converts into a C location abstraction. Error cases are converted into
     bottom or top locations accordingly. *)
-val as_location : address evaluation -> Locations.location
+val as_location : address evaluation -> Locations.t
 
 (** Converts into a C location abstraction. *)
-val as_location_result : address evaluation -> Locations.location result
+val as_location_result : address evaluation -> Locations.t result
 
 (** Converts into a memory zone. Error cases are converted into bottom or top
     zones accordingly. *)

@@ -163,7 +163,6 @@ let enumerate_cells ~is_folded_base gstmt lval =
   (* If possible, refine the lval to a non-symbolic one *)
   let typ = Cil.typeOfLval lval in
   let location = Eval.to_location gstmt lval in
-  let open Locations in
   let map_base (base,ival) =
     match base with
     | Base.Var (vi,_) | Allocated (vi,_,_) ->

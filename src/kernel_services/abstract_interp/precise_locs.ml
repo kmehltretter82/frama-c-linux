@@ -6,8 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Locations
-
 type precise_offset =
   | POBottom (* No offset *)
   | POZero (* Offset zero *)
@@ -236,7 +234,7 @@ let equal_loc pl1 pl2 =
   equal_addr_bits pl1.addr pl2.addr && Z_or_top.equal pl1.size pl2.size
 
 let imprecise_location pl =
-  make_loc (imprecise_addr_bits pl.addr) pl.size
+  Locations.make (imprecise_addr_bits pl.addr) pl.size
 
 let make_precise_loc addr ~size = { addr; size }
 
@@ -292,11 +290,11 @@ let rec fold_offset f po acc =
 let fold f pl acc =
   match pl.addr with
   | PLBottom -> acc
-  | PLLoc l -> f (make_loc l pl.size) acc
+  | PLLoc l -> f (Locations.make l pl.size) acc
   | PLVarOffset (b, po) ->
     let aux_po ival acc =
       let loc_b = Addresses.Bits.inject b ival in
-      let loc = make_loc loc_b pl.size in
+      let loc = Locations.make loc_b pl.size in
       f loc acc
     in
     fold_offset aux_po po acc
@@ -306,7 +304,7 @@ let fold f pl acc =
         let aux_ival_loc i acc =
           let ival = Ival.add_singleton_int i ival_po in
           let loc_b = Addresses.Bits.inject b ival in
-          let loc = make_loc loc_b pl.size in
+          let loc = Locations.make loc_b pl.size in
           f loc acc
         in
         Ival.fold_int aux_ival_loc ival_loc acc
@@ -316,7 +314,7 @@ let fold f pl acc =
     fold_offset aux_po po acc
 
 let enumerate_valid_bits access loc =
-  let aux loc z = Memory_zone.join z (enumerate_valid_bits access loc) in
+  let aux loc z = Memory_zone.join z (Locations.enumerate_valid_bits access loc) in
   fold aux loc Memory_zone.bottom
 
 
@@ -327,15 +325,15 @@ let valid_cardinal_zero_or_one ~for_writing pl =
   match pl.addr with
   | PLBottom -> true
   | PLLoc lb ->
-    let loc = make_loc lb pl.size in
+    let loc = Locations.make lb pl.size in
     Locations.valid_cardinal_zero_or_one ~for_writing loc
   | _ ->
     try
       ignore
         (fold (fun loc found_one ->
-             let access = if for_writing then Write else Read in
+             let access = Locations.(if for_writing then Write else Read) in
              let valid = Locations.valid_part access loc in
-             if Locations.is_bottom_loc loc then found_one
+             if Locations.is_bottom loc then found_one
              else
              if Locations.cardinal_zero_or_one valid then
                if found_one then raise Exit else true
@@ -375,7 +373,7 @@ let reduce_by_valid_part access ~bitfield precise_loc size =
   match precise_loc with
   | PLBottom -> precise_loc
   | PLLoc addr ->
-    let loc = Locations.make_loc addr size in
+    let loc = Locations.make addr size in
     PLLoc Locations.((valid_part access ~bitfield loc).Locations.addr)
   | PLVarOffset (base, offset) ->
     begin

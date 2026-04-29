@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Locations
 open Lattice_bounds
 
 exception Bitwise_cannot_copy
@@ -43,7 +42,7 @@ module type Location_map_bitwise = sig
   val pretty_debug: t Pretty_utils.formatter
 
   val add_binding : exact:bool -> t -> Memory_zone.t -> v -> t
-  val add_binding_loc: exact:bool -> t -> location -> v -> t
+  val add_binding_loc: exact:bool -> t -> Locations.t -> v -> t
   val add_base: Base.t -> LOffset.t -> t -> t
   val remove_base: Base.t -> t -> t
 
@@ -267,7 +266,7 @@ struct
     | _, Bottom -> Bottom
     | _, Map m -> Map (Memory_zone.fold_topset_ok aux_base_offset loc m)
 
-  let add_binding_loc ~exact m loc v =
+  let add_binding_loc ~exact m (loc: Locations.t) v =
     let size = loc.size in
     let add ~validity = LOffset.add_binding_ival ~validity ~exact ~size in
     let aux_base_offset = add_base_offset add v in

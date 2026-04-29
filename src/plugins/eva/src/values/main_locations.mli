@@ -14,7 +14,7 @@ module PLoc : sig
     with type value = Cvalue.V.t
      and type location = Precise_locs.precise_location
 
-  val make: Locations.location -> location
+  val make: Locations.t -> location
 end
 
 val ploc: PLoc.location Abstract_location.dependencies

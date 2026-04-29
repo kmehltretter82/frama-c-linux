@@ -421,7 +421,7 @@ let reduce_loc_and_eval state loc =
   else if Z_or_top.is_zero loc.Locations.size then Empty
   else
     let loc' = Locations.(valid_part Read loc) in
-    if Locations.is_bottom_loc loc' then InvalidLoc
+    if Locations.is_bottom loc' then InvalidLoc
     else
       try
         let size = Z_or_top.project loc'.Locations.size in

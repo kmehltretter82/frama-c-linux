@@ -9,8 +9,6 @@
 (** Functors making map indexed by zone.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-open Locations
-
 exception Bitwise_cannot_copy
 
 module type Location_map_bitwise = sig
@@ -45,7 +43,7 @@ module type Location_map_bitwise = sig
   val pretty_debug: t Pretty_utils.formatter
 
   val add_binding : exact:bool -> t -> Memory_zone.t -> v -> t
-  val add_binding_loc: exact:bool -> t -> location -> v -> t
+  val add_binding_loc: exact:bool -> t -> Locations.t -> v -> t
   val add_base: Base.t -> LOffset.t -> t -> t
   val remove_base: Base.t -> t -> t
 

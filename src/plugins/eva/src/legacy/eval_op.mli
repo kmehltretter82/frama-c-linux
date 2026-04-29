@@ -27,23 +27,21 @@ val backward_comp_left_from_type:
 
 val reduce_by_initialized_defined :
   (V_Or_Uninitialized.t -> V_Or_Uninitialized.t) ->
-  Locations.location -> Model.t -> Model.t
+  Locations.t -> Model.t -> Model.t
 
 val apply_on_all_locs:
-  (Locations.location -> 'a -> 'a) -> Locations.location -> 'a -> 'a
+  (Locations.t -> 'a -> 'a) -> Locations.t -> 'a -> 'a
 (** [apply_all_locs f loc state] folds [f] on all the atomic locations
     in [loc], provided there are less than [plevel]. Useful mainly
     when [loc] is exact or an over-approximation. *)
 
 val reduce_by_valid_loc:
-  positive:bool ->
-  Locations.access ->
-  Locations.location -> typ -> Model.t -> Model.t
+  positive:bool -> Locations.access -> Locations.t -> typ -> Model.t -> Model.t
 (* [reduce_by_valid_loc positive ~for_writing loc typ state] reduces
    [state] so that [loc] contains a pointer [p] such that [(typ* )p] is
    valid if [positive] holds (or invalid otherwise). *)
 
-val make_loc_contiguous: Locations.location -> Locations.location
+val make_loc_contiguous: Locations.t -> Locations.t
 (** 'Simplify' the location if it represents a contiguous zone: instead
     of multiple offsets with a small size, change it into a single offset
     with a size that covers the entire range. *)
@@ -55,4 +53,4 @@ val pretty_offsetmap: typ -> Format.formatter -> V_Offsetmap.t -> unit
    of the value at this location in the given state.
    Returns None if no under-approximation can be computed. *)
 val find_under_approximation:
-  Cvalue.Model.t -> Locations.location -> Cvalue.V_Or_Uninitialized.t option
+  Cvalue.Model.t -> Locations.t -> Cvalue.V_Or_Uninitialized.t option

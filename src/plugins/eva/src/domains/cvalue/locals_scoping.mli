@@ -25,7 +25,7 @@ val remember_bases_with_locals: clobbered_set -> Base.SetLattice.t -> unit
 (** Add the given set of bases to an existing clobbered set *)
 
 val remember_if_locals_in_value:
-  clobbered_set -> Locations.location -> Cvalue.V.t -> unit
+  clobbered_set -> Locations.t -> Cvalue.V.t -> unit
 (** [remember_locals_in_value clob loc v] adds all bases pointed to by [loc]
     to [clob] if [v] contains the address of a local or formal *)
 

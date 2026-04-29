@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Locations
 
 
 class virtual do_it_ = object(self)
@@ -30,7 +29,7 @@ class virtual do_it_ = object(self)
         let addr = Addresses.Bits.of_bytes r in
         let size = Bit_utils.sizeof_lval lv in
         self#join
-          (enumerate_valid_bits Read (make_loc addr size))
+          (Locations.enumerate_valid_bits Read (Locations.make addr size))
     end;
     DoChildren
 
