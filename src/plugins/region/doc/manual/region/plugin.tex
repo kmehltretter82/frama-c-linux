@@ -355,7 +355,8 @@ specification:
   \item two regions with different names may be merged if they share aliased path;
   \item two objects declared within regions with different names shall be
   separated from each other, even if they finally belong to the same (merged)
-  region.
+  region;
+  \item all declared objects shall be separated from all accessed globals.
 \end{itemize}
 
 \paragraph{Aliasing Paths.}
