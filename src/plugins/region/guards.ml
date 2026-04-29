@@ -19,7 +19,7 @@ type env = {
 }
 
 let create map = { map ; guards = [] }
-let add env guard = env.guards <- guard :: env.guards
+let add env g = if not @@ trivial g then env.guards <- g :: env.guards
 let iter f env = List.iter f @@ List.rev env.guards
 
 (* -------------------------------------------------------------------------- *)

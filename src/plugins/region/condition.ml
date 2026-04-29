@@ -78,6 +78,8 @@ let rec pp_guard fmt = function
   | Valid(Initialized,_,a) -> Format.fprintf fmt "\\initialized(%a)" pp_addr a
   | Separated(a,b) -> Format.fprintf fmt "\\separated(%a,%a)" pp_addr a pp_addr b
 
+let rec trivial = function True -> true | Named(_,g) -> trivial g | _ -> false
+
 let g_name a g = if a <> "" then Named(a,g) else g
 
 let g_and p q =
@@ -128,7 +130,7 @@ let of_addr ?loc = function
 let rec of_guard ?loc ?(names=[]) = function
   | True -> Logic_const.prepend_names ~names @@ Logic_const.ptrue
   | False -> Logic_const.prepend_names ~names @@ Logic_const.pfalse
-  | Named(a,p) -> of_guard ?loc ~names:(a::names) p
+  | Named(a,p) -> of_guard ?loc ~names:(names @ [a]) p
   | Or(p,q) -> Logic_const.por ?loc ~names (of_guard ?loc p , of_guard ?loc q)
   | And(p,q) -> Logic_const.pand ?loc ~names (of_guard ?loc p , of_guard ?loc q)
   | Imply(p,q) -> Logic_const.pimplies ?loc ~names (of_guard ?loc p , of_guard ?loc q)

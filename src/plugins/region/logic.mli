@@ -17,3 +17,4 @@ val add_term : env -> term -> domain
 val add_predicate : env -> predicate -> unit
 val add_path : env -> Spec.region -> Spec.path -> node
 val add_region : env -> Spec.region -> unit
+val add_object : env -> Spec.region -> unit

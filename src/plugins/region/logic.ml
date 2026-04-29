@@ -236,6 +236,18 @@ let add_region (env: env) (r : Spec.region) =
   merge_all @@
   if r.named = "" then rs else add_label env.map r.named :: rs
 
+(* from call context *)
+let add_object (env: env) (r : Spec.region) =
+  List.iter
+    (function
+      | Spec.Range(_,ptr,_,inf,sup) ->
+        iadd_term env inf ;
+        iadd_term env sup ;
+        iadd_term env ptr ;
+      | Spec.Field _ -> ()
+      | Spec.Alias _ -> ()
+    ) r.paths
+
 (* -------------------------------------------------------------------------- *)
 (* ---  Process ACSL logic                                                --- *)
 (* -------------------------------------------------------------------------- *)

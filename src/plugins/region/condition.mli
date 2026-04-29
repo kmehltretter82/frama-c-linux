@@ -35,6 +35,8 @@ type guard =
   | Valid of access * Memory.node * addr
   | Separated of addr * addr
 
+val trivial : guard -> bool
+
 val g_or : guard -> guard -> guard
 val g_and : guard -> guard -> guard
 val g_imply : guard -> guard -> guard
