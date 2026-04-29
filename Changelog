@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2026-04-29] Split module `Locations` into `Addresses`, `Locations`
+              and `Memory_zone`. Rename type `location` and some functions.
 o!  Kernel    [2026-04-13] Use ppx_deriving.show to generate debug printers
               for `Cabs` and `Cil_types` ASTs. `Cabs_debug` et `Cil_types_debug`
               are now deprecated.
