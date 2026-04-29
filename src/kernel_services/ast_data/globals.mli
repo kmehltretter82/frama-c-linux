@@ -276,7 +276,7 @@ module Types : sig
 
   val global: Logic_typing.type_namespace -> string -> global
   (** Find the global that defines the corresponding type.
-      @raise Not_found if no such type has been defined.
+      @raise Not_found if no such type has been defined or declared.
 
       @since Magnesium-20151001 *)
 end

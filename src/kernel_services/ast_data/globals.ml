@@ -801,7 +801,9 @@ module Types = struct
       | GEnumTagDecl (ei, _) ->
         let name_tag = (ei.ename, Logic_typing.Enum) in
         Types.add name_tag (Cil_const.mk_tenum ei);
-        List.iter aux_ei ei.eitems
+        List.iter aux_ei ei.eitems;
+        if not (TypeNameToGlobal.mem name_tag) then
+          TypeNameToGlobal.replace name_tag g
 
       | GCompTag (ci, _loc) ->
         let kind = Logic_typing.(if ci.cstruct then Struct else Union) in
@@ -812,7 +814,9 @@ module Types = struct
       | GCompTagDecl (ci, _) ->
         let kind = Logic_typing.(if ci.cstruct then Struct else Union) in
         let name_tag = (ci.cname, kind) in
-        Types.add name_tag (Cil_const.mk_tcomp ci)
+        Types.add name_tag (Cil_const.mk_tcomp ci);
+        if not (TypeNameToGlobal.mem name_tag) then
+          TypeNameToGlobal.replace name_tag g
 
       | _ -> ()
     in
