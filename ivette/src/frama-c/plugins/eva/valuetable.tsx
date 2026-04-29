@@ -594,7 +594,7 @@ interface ScopeProps {
   getCallstacks: Request<Ast.marker[], callstack[]>;
   setByCallstacks: (byCallstack: boolean) => void;
   isSelected: (callstack: Callstack.callstack) => boolean;
-  flipSelected: (callstack: Callstack.callstack) => void
+  flipSelected: (callstack: Callstack.callstack) => void;
   setFocused: (callstack: callstack) => void;
   isFocused: (c: callstack) => boolean;
   locEvt: Dome.Event<Ast.marker>;

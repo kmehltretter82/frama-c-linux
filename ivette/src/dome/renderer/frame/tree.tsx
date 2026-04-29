@@ -124,9 +124,12 @@ export function Node(props: NodeProps): JSX.Element {
     if(context.unfoldAll !== undefined) setUnfold(context.unfoldAll);
   }, [context.unfoldAll]);
 
-  const className = classes(
+  const classContainer = classes(
+    'dome-xTree-node-container',
+    !visible && 'dome-xTree-node-hidden'
+  );
+  const classNode = classes(
     'dome-xTree-node',
-    visible && 'dome-xTree-node-visible',
     hasSubTree ? "dome-xTree-has-subtree" : "",
     unfold ? 'dome-xTree-show-children' : 'dome-xTree-hide-children',
     context.selected === id && 'dome-xTree-selected'
@@ -159,8 +162,8 @@ export function Node(props: NodeProps): JSX.Element {
       depth: context.depth+1,
       heightSticky: context.heightSticky+height
     }}>
-      <div className='dome-xTree-node-container'>
-        <div ref={ref} className={className} style={style} title={title}
+      <div className={classContainer}>
+        <div ref={ref} className={classNode} style={style} title={title}
           onClick={() => context.onClick ? context.onClick(id) : flipUnfold() }
         >
             <div >

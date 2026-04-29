@@ -8,18 +8,20 @@
 
 import React from 'react';
 
+import { useFlipSettings } from 'dome';
+import { Dropdown } from 'dome/dialogs';
 import * as Tree from 'dome/frame/tree';
 import * as Toolbars from 'dome/frame/toolbars';
-import { Checkbox, IconButton } from 'dome/controls/buttons';
+import * as Buttons from 'dome/controls/buttons';
 import { useGlobalState } from 'dome/data/states';
 import { makeBadge } from 'dome/frame/sidebars';
-import * as Forms from 'dome/layout/forms';
 
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as EvaAnalysis from 'frama-c/plugins/eva/api/analysis';
 import * as Ast from 'frama-c/kernel/api/ast';
 import { getDeclaration } from 'frama-c/states';
+import { menuItem } from 'frama-c/kernel/Globals';
 
 import * as Eva from './api/callstack';
 import { EvaReady } from './components/AnalysisStatus';
@@ -49,7 +51,7 @@ const pinnedMessageId = 'EvaFilterCallstack';
 
 function addMessage(count: number, remove: () => void): void {
   const pinnedMessageButton =
-    <IconButton
+    <Buttons.IconButton
       icon='TRASH'
       title='Clear callstack selection: show all callstacks'
       onClick={remove}
@@ -78,7 +80,7 @@ function getActions(
 ): React.JSX.Element | null {
   const isSelected = current?.includes(id);
   return (
-    <Checkbox
+    <Buttons.Checkbox
       title={(isSelected ? 'Deselect' : 'Select') + ' the callstack'}
       value={isSelected}
       onChange={() => onClick(id)}
@@ -88,7 +90,7 @@ function getActions(
 
 interface NodesProps {
   tree: NodesMap,
-  visible?: string[],
+  visible?: Set<string>,
   onClick: (id: Eva.callstack) => void
 }
 
@@ -100,7 +102,7 @@ function Nodes({ tree, visible, onClick } : NodesProps): React.ReactNode {
     const title = loc ? loc.base+': '+loc.line : '';
     return (
       <Tree.Node key={key} id={key} label={label} title={title}
-        visible={visible?.includes(key) ?? true}
+        visible={visible?.has(key) ?? true}
         actions={getActions(callstack.callstack, onClick, current)}
       >
         { subTree && subTree.size > 0 ?
@@ -244,12 +246,75 @@ export function useCallstackSelection(): CallstackSelection {
 // --- Component CallstackSelection
 // ----------------------------------------------------------------------------
 
+/**
+ * Calculates the visible nodes based on the filters,
+ * then adds parent and child nodes (single level) if necessary.
+ *
+ * All unanalysed nodes are leaves, so parent nodes are not calculated if the
+ * ‘showAnalyzed’ option is selected. Child nodes are only calculated if
+ * neither ‘showAnalyzed’ nor ‘showUnanalyzed’ is selected.
+ */
+function getVisibleKey(
+  nodes: NodesMap,
+  showSelected: boolean,
+  showScope: boolean,
+  showAnalyzed: boolean,
+  showUnanalyzed: boolean,
+  selection: Eva.callstack[],
+  scope: States.Scope
+): Set<string> | undefined {
+  // return ‘undefined’ to display all nodes
+  if(showAnalyzed && showUnanalyzed) return undefined;
+
+  const keys = new Set<string>();
+  if(showScope && scope)
+    [...nodes].filter(e => e[1].decl === scope).forEach(e => keys.add(e[0]));
+  if(showSelected && selection.length > 0)
+    selection.forEach(s => keys.add(s.toString()));
+  if(showAnalyzed)
+    [...nodes].filter(e => e[1].callstack.analyzed)
+      .forEach(e => keys.add(e[0]));
+  if(showUnanalyzed)
+    [...nodes].filter(e => !(e[1].callstack.analyzed))
+      .forEach(e => keys.add(e[0]));
+
+  if(keys.size === 0) return new Set([]);
+
+  /** Get all parents */
+  const parentKeys = new Set<string>();
+  function getParents(curr: string): void {
+    const parentKey = nodes.get(curr)?.parentKey;
+    if(!parentKey) return;
+    parentKeys.add(parentKey);
+    getParents(parentKey);
+  }
+  if(!showAnalyzed) [...keys].forEach(e => getParents(e));
+
+  /** Get a single level of children */
+  const childrenKeys = new Set<string>();
+  function getChildren(curr: string): void {
+    const node = nodes.get(curr);
+    if(!node) return;
+    const children = [...node.subTree.keys()];
+    children.forEach(c => childrenKeys.add(c));
+  }
+  if(!showAnalyzed && !showUnanalyzed) [...keys].forEach(e => getChildren(e));
+
+  return new Set([...keys, ...parentKeys, ...childrenKeys]);
+}
+
 export function CallstackSelection(): React.JSX.Element {
   // Control
   const [ unfold, setUnfold ] = React.useState<boolean|undefined>(false);
-  const [ show, setShow ] = React.useState<string | undefined>('scope');
-  const showState: Forms.FieldState<string | undefined> =
-    { value: show, onChanged: setShow };
+  const showSelectedState = useFlipSettings('callstack.show.selected', true);
+  const [showSelected,] = showSelectedState;
+  const showScopeState = useFlipSettings('callstack.show.scope', true);
+  const [showScope,] = showScopeState;
+  const showAnalyzedState = useFlipSettings('callstack.show.analyzed', false);
+  const [showAnalyzed,] = showAnalyzedState;
+  const showUnanalyzedState =
+    useFlipSettings('callstack.show.unanalyzed', false);
+  const [showUnanalyzed,] = showUnanalyzedState;
   // Data
   const infos = useCallstacks();
   const { selection, flipSelected, reset } = useCallstackSelection();
@@ -259,19 +324,22 @@ export function CallstackSelection(): React.JSX.Element {
   /** Tree */
   const { nodes, tree } = React.useMemo(() => getTree(infos), [infos]);
 
+  /** Filter */
+  const filterItems: Buttons.MultiselectItemProps[] = [
+    menuItem({ label: 'Show selected', state: showSelectedState }),
+    menuItem({ label: 'Show scope', state: showScopeState }),
+    menuItem({ label: 'Show analyzed', state: showAnalyzedState }),
+    menuItem({ label: 'Show unanalyzed', state: showUnanalyzedState }),
+  ];
+  const itemsComp = filterItems.map(
+    (e, i) => <Buttons.MultiselectItem key={i} item={e} />);
+
   /** List of keys for visible nodes */
   const visibleKeys = React.useMemo(() => {
-    if(show === 'all') return undefined;
-
-    const visible = [];
-    if(show === 'scope' && scope) {
-      visible.push([...nodes].filter(e => e[1].decl === scope).map(e => e[0]));
-    }
-    if(selection.length > 0)
-      visible.push(selection.map(s => s.toString()));
-
-    return visible.flat();
-  }, [show, selection, scope, nodes]);
+    return getVisibleKey(nodes, showSelected, showScope,
+      showAnalyzed, showUnanalyzed, selection, scope);
+  }, [nodes, showSelected, showScope,
+      showAnalyzed, showUnanalyzed, selection, scope]);
 
   return (
     <EvaReady>
@@ -279,27 +347,25 @@ export function CallstackSelection(): React.JSX.Element {
         className='dome-xTree-actions dome-xSideBarSection-title'
         style={{ justifyContent: "flex-end" }}
       >
-        <IconButton
+        <Buttons.IconButton
           size={16}
           icon={ "CHEVRON.CONTRACT" }
           title="Fold all"
           disabled={unfold === false}
           onClick={() => setUnfold(false)}
         />
-        <IconButton
+        <Buttons.IconButton
           size={16}
           icon={ "CHEVRON.EXPAND" }
           title="Unfold all"
           disabled={unfold}
           onClick={() => setUnfold(true)}
         />
-        <Forms.SelectField label='' state={showState}>
-          <option id={"all"} value={'all'}>Show all</option>
-          <option id={"selected"} value={"selected"}>Selected only</option>
-          <option id={"scope"} value={"scope"}>Selected and scope only</option>
-        </Forms.SelectField>
         {makeBadge(nodes.size)}
-        <Checkbox
+        <Dropdown control={ <Buttons.IconButton icon='FILTER' size={15}/> }>
+          <Buttons.Multiselect>{itemsComp}</Buttons.Multiselect>
+        </Dropdown>
+        <Buttons.Checkbox
           title='Select all callstacks'
           value={selection.length === 0}
           onChange={reset}
