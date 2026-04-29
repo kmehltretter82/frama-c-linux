@@ -116,16 +116,12 @@ let requires ~node ~flags addr =
       True
     else
       Valid(Initialized,node,addr) in
-  let allocated =
+  let wellformed =
     if Attr.mem `Allocated flags then
       g_imply valid initialized
     else
-      g_and valid initialized in
-  let nullable =
-    if Attr.mem `Nullable flags then
-      Null(false,addr)
-    else False in
-  g_or nullable allocated
+      g_and valid initialized
+  in g_imply (nullable ~from:flags addr) wellformed
 
 (* -------------------------------------------------------------------------- *)
 (* --- Call Side Conditions                                               --- *)
@@ -146,7 +142,6 @@ let call_kf env stmt kf es =
   let tenv = Lookup.callsite env.map stmt kf in
   let kmap = Analysis.get kf in
   let globals = ref [] in
-  let objects = ref [] in
   let objmap = Separated.create () in
   begin
     Memory.iter
@@ -164,24 +159,31 @@ let call_kf env stmt kf es =
               let sup = subst ~loc kf es a.sup in
               let addr = RANGE(ptr,a.typ,inf,sup) in
               let node = Lookup.tmem tenv ptr in
-              objects := (a.named,addr) :: !objects ;
               Separated.add objmap ~node ~from a.named addr ;
               add env @@ g_name fct @@ g_name a.named @@
               requires ~node ~flags:a.flags addr ;
            ) (Memory.roots from) ;
       ) kmap ;
     let globals = List.rev !globals in
-    let objects = List.rev !objects in
-    List.iter
-      (fun global ->
-         List.iter
-           (fun (a,obj) ->
-              add env @@ g_name fct @@ g_name a @@ Separated(obj,global)
-           ) objects
-      ) globals ;
     Separated.iter
-      (fun a la b lb ->
-         add env @@ g_name fct @@ g_name a @@ g_name b @@ Separated(la,lb)
+      (fun node a p ->
+         let from = Memory.flags node in
+         List.iter
+           (fun g ->
+              add env
+              @@ g_name fct @@ g_name a
+              @@ g_imply (readable ~node ~from p)
+              @@ Separated(p,g)
+           ) globals
+      ) objmap ;
+    Separated.iter2
+      (fun node a p b q ->
+         let from = Memory.flags node in
+         add env
+         @@ g_name fct @@ g_name a @@ g_name b
+         @@ g_imply (readable ~node ~from p)
+         @@ g_imply (readable ~node ~from q)
+         @@ Separated(p,q)
       ) objmap ;
   end
 

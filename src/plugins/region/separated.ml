@@ -25,7 +25,13 @@ let rec rev_iter f = function
 
 let iter f (idx : objmap) =
   N.iter
-    (fun _r lbls ->
+    (fun r lbls ->
+       L.iter (fun _ objs -> rev_iter (fun (a,p) -> f r a p) objs) lbls
+    ) !idx
+
+let iter2 f (idx : objmap) =
+  N.iter
+    (fun r lbls ->
        L.iter
          (fun k1 objs1 ->
             L.iter
@@ -35,7 +41,7 @@ let iter f (idx : objmap) =
                      (fun (a,p) ->
                         rev_iter
                           (fun (b,q) ->
-                             f a p b q
+                             f r a p b q
                           ) objs
                      ) objs1
               ) lbls
