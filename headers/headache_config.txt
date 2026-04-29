@@ -79,8 +79,6 @@
 | ".*frama-c.byte" -> skip match:"#!.*"
 | "frama-c.top" -> frame open:"#"  line:"#" close:"#"
 | ".*frama-c.top" -> skip match:"#!.*"
-| "frama-c.debug" -> frame open:"#"  line:"#" close:"#"
-| ".*frama-c.debug" -> skip match:"#!.*"
 | "e-acsl-gcc" -> frame open:"#"  line:"#" close:"#"
 | ".*e-acsl-gcc" -> skip match:"#!.*"
 | "e-acsl-gcc.comp" -> frame open:"#"  line:"#" close:"#"
