@@ -459,7 +459,7 @@ let configure_ocaml_gc n =
 let deprecated_deterministic () =
   Kernel_log.warning
     "'-deterministic' is deprecated and does nothing, use environment \
-     variable 'FC_DETERMINISTIC=yes' instead."
+     variable 'FRAMAC_DETERMINISTIC=yes' instead."
 
 let () =
   let first_parsing_stage () =
@@ -499,7 +499,7 @@ let () =
 let quiet = !quiet_ref
 let deterministic =
   Option.fold ~none:false ~some:(( = ) "yes")
-    (Sys.getenv_opt "FC_DETERMINISTIC")
+    (Sys.getenv_opt "FRAMAC_DETERMINISTIC")
 
 let inside_tests =
   Option.fold ~none:false ~some:(( = ) "yes")
