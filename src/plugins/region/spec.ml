@@ -189,7 +189,11 @@ let rec parse_region (env:env) p =
     if not (Term_lval.equal l1 l2) then
       error env ~loc:p.lexpr_loc "Field range from different region paths" ;
     env.rpaths <- Field(p.lexpr_loc,l1,f,g) :: env.rpaths
-  | PLarrget(p,{ lexpr_node = PLrange(Some a,Some b) }) ->
+  | PLarrget(p,{ lexpr_node = PLrange(Some a,Some b) })
+  | PLunop(Ustar, {
+        lexpr_node = PLbinop(p,Badd, {
+            lexpr_node = PLrange(Some a,Some b)
+          })}) ->
     let te,q = parse_pointer env p in
     let a = parse_integer env a in
     let b = parse_integer env b in

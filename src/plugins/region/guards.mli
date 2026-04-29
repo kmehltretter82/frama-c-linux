@@ -14,6 +14,8 @@ open Memory
 open Cil_types
 open Condition
 
+(** Warning: for unspecified sequence,
+    you shall visit each sub-stmt individually *)
 val guards : map -> (guard -> unit) -> stmt -> unit
 
 val add_annotation :

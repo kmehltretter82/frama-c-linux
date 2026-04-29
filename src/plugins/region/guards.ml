@@ -228,16 +228,14 @@ let instr env stmt = function
       x vf args kind loc
   | Asm _ | Skip _ | Code_annot _ -> ()
 
-let rec stmtkind env stmt = function
+let stmtkind env stmt = function
   | Instr i -> instr env stmt i
   | Return(r,_) -> Option.iter (eval env) r
   | If(e,_,_,_) | Switch(e,_,_,_)| Throw (Some(e,_),_) -> eval env e
   | Goto _ | Break _ | Continue _ | Loop _ | Block _
   | Throw(None,_) | TryCatch _ | TryFinally _ -> ()
   | TryExcept(_,(ks,e),_,_) -> List.iter (instr env stmt) ks ; eval env e
-  | UnspecifiedSequence us ->
-    let b = Cil.block_from_unspecified_sequence us in
-    List.iter (fun s -> stmtkind env stmt s.skind) b.bstmts
+  | UnspecifiedSequence _ -> () (* already visited *)
 
 let guards map f stmt =
   let env = create map in stmtkind env stmt stmt.skind ; iter f env
