@@ -112,3 +112,8 @@
   R0004: -RW- __retres (int) 32b (singleton) (allocated) ;
   R0005: --W- \result (int) 32b ;
 [region] annotating function caller_result
+[region] Function result:
+  R0001: -R-- q (int *) 64b (*R0002) (singleton) ;
+  R0002: ---- 0b ;
+  R0003: -R-- k (int) 32b (singleton) ;
+  R0004: --W- \result (int *) 64b (*R0002) ;

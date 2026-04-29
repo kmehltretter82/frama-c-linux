@@ -222,7 +222,11 @@ let instr env stmt = function
     Option.iter (write env) r ;
     call env stmt f es
   | Local_init(_,AssignInit i,_) -> init env i
-  | Local_init(_,ConsInit(_,es,_),_) -> List.iter (eval env) es
+  | Local_init(x,ConsInit(vf,args,kind),loc) ->
+    List.iter (eval env) args ;
+    Cil.treat_constructor_as_func
+      (fun _res fct args _loc -> call env stmt fct args)
+      x vf args kind loc
   | Asm _ | Skip _ | Code_annot _ -> ()
 
 let rec stmtkind env stmt = function
