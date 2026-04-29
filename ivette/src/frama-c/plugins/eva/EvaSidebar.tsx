@@ -41,7 +41,7 @@ export function useStartComputing(): number {
   return start;
 }
 
-export function EvaSideBar(): JSX.Element {
+function EvaSidebarConfig(): JSX.Element {
   useSyncStartComputing();
   const remote = Forms.useController();
 
@@ -263,19 +263,22 @@ export function EvaSideBar(): JSX.Element {
 }
 
 Ivette.registerSidebar({
-  id: 'frama-c.plugins.eva.sidebar.form',
+  id: 'frama-c.plugins.eva_sidebar.config',
   label: 'Eva',
   icon: 'APPLE',
   title: 'Configuration of the Eva analysis',
-  children: <EvaSideBarForm />,
+  children: <EvaSidebarConfig />,
 });
 
-export function EvaSideBarSelection(): React.JSX.Element {
+function EvaSidebarSelection(): React.JSX.Element {
   const scrollableArea = React.useRef<HTMLDivElement>(null);
 
   // Selection
-  const [selected, setSelected] = useStringSettings(
-    'eva.sidebar.selected', 'callstacks');
+  const [selected, setSelected] =
+    useStringSettings('eva.sidebar.selected', 'callstacks');
+
+  const opened = { height: '100%' };
+  const closed = { display: 'none' };
 
   return (<>
     <SidebarTitle label='Selection' >
@@ -296,10 +299,10 @@ export function EvaSideBarSelection(): React.JSX.Element {
       </Toolbar.ButtonGroup>
     </SidebarTitle>
     <div ref={scrollableArea} className="globals-scrollable-area">
-      <div style={selected === "taints" ? {} : { display: 'none' }}>
+      <div style={selected === "taints" ? opened : closed}>
         <TaintSidebar />
       </div>
-      <div style={selected === "callstacks" ? {} : { display: 'none' }}>
+      <div style={selected === "callstacks" ? opened : closed}>
         <CallstackSelection />
       </div>
     </div>
@@ -307,9 +310,9 @@ export function EvaSideBarSelection(): React.JSX.Element {
 }
 
 Ivette.registerSidebar({
-  id: 'fc.plugins.eva.sidebar.selection',
+  id: 'fc.plugins.eva_sidebar.selection',
   label: 'Eva selection',
   icon: 'APPLEMORE',
   title: 'Selection of Eva results',
-  children: <EvaSideBarSelection />
+  children: <EvaSidebarSelection />
 });

@@ -12,13 +12,11 @@ import * as Dome from 'dome';
 import { useSyncState, useSyncValue } from 'frama-c/states';
 import * as EvaParams from 'frama-c/kernel/api/parameters';
 import * as EvaTaint from 'frama-c/plugins/eva/api/taint';
-import { registerSidebar } from 'ivette';
 import * as Toolbars from 'dome/frame/toolbars';
 import { Label } from 'dome/controls/labels';
 import { Checkbox, IconButton } from 'dome/controls/buttons';
 import * as AnalysisStatus from 'frama-c/plugins/eva/components/AnalysisStatus';
 import { domainsToKeyVal } from 'frama-c/plugins/eva/EvaDefinitions';
-import { SidebarTitle } from 'dome/frame/sidebars';
 
 // --------------------------------------------------------------------------
 // --- Globals selection
@@ -83,14 +81,17 @@ function Taints({ taintNames }: { taintNames: string[] }): React.JSX.Element {
   }, [setCurrent, taintNames]);
 
   return (<>
-    <SidebarTitle label='Taints' >
-      <Toolbars.Button
-        icon='TUNINGS'
-        title='Configure selection'
-        onClick={() => onContextMenu()}
-      />
-    </SidebarTitle>
-    <div className="globals-scrollable-area eva-taint-list">
+    <div className="eva-taint-list">
+      <div
+        className='dome-xTree-actions dome-xSideBarSection-title'
+        style={{ justifyContent: "flex-end" }}
+      >
+        <Toolbars.Button
+          icon='TUNINGS'
+          title='Configure selection'
+          onClick={() => onContextMenu()}
+          />
+      </div>
       {taintNames.map((name) => {
         const selected = current.includes(name);
         return (
@@ -160,13 +161,5 @@ export function TaintSidebar(): JSX.Element {
     </AnalysisStatus.EvaReady>
   );
 }
-
-registerSidebar({
-  id: 'fc.eva.filter.taints',
-  label: 'Taints',
-  icon: 'DROP.EMPTY',
-  title: 'Taints',
-  children: <TaintSidebar />
-});
 
 // --------------------------------------------------------------------------

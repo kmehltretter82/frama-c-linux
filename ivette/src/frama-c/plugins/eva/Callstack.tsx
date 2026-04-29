@@ -10,7 +10,7 @@ import React from 'react';
 
 import * as Tree from 'dome/frame/tree';
 import * as Toolbars from 'dome/frame/toolbars';
-import { IconButton } from 'dome/controls/buttons';
+import { Checkbox, IconButton } from 'dome/controls/buttons';
 import { useGlobalState } from 'dome/data/states';
 import { makeBadge } from 'dome/frame/sidebars';
 import * as Forms from 'dome/layout/forms';
@@ -77,15 +77,12 @@ function getActions(
   current?: Eva.callstack[]
 ): React.JSX.Element | null {
   const isSelected = current?.includes(id);
-  return (<>
-    <IconButton
-      icon='FILTER'
+  return (
+    <Checkbox
       title={(isSelected ? 'Deselect' : 'Select') + ' the callstack'}
-      kind={isSelected ? 'selected' : 'default'}
-      style={isSelected ? {} : { fillOpacity: '0.2' } }
-      onClick={() => onClick(id)}
+      value={isSelected}
+      onChange={() => onClick(id)}
     />
-  </>
   );
 }
 
@@ -161,7 +158,7 @@ function getTree(callstacks: Info[]): {nodes: NodesMap, tree: NodesMap} {
     const key = cs.callstack.toString();
     const newNode = getNode(key, cs, callstacks);
     nodes.set(key, newNode);
-    // The tree contains only entry point
+    // The tree contains only entry points
     if(isEntryPoint(newNode.callstack))
       tree.set(key, newNode);
   });
@@ -250,7 +247,7 @@ export function useCallstackSelection(): CallstackSelection {
 export function CallstackSelection(): React.JSX.Element {
   // Control
   const [ unfold, setUnfold ] = React.useState<boolean|undefined>(false);
-  const [ show, setShow ] = React.useState<string | undefined>('all');
+  const [ show, setShow ] = React.useState<string | undefined>('scope');
   const showState: Forms.FieldState<string | undefined> =
     { value: show, onChanged: setShow };
   // Data
@@ -264,14 +261,16 @@ export function CallstackSelection(): React.JSX.Element {
 
   /** List of keys for visible nodes */
   const visibleKeys = React.useMemo(() => {
+    if(show === 'all') return undefined;
+
     const visible = [];
     if(show === 'scope' && scope) {
       visible.push([...nodes].filter(e => e[1].decl === scope).map(e => e[0]));
     }
-    if(show !== 'all' && selection.length > 0)
+    if(selection.length > 0)
       visible.push(selection.map(s => s.toString()));
 
-    return visible.length === 0 ? undefined : visible.flat();
+    return visible.flat();
   }, [show, selection, scope, nodes]);
 
   return (
@@ -300,11 +299,10 @@ export function CallstackSelection(): React.JSX.Element {
           <option id={"scope"} value={"scope"}>Selected and scope only</option>
         </Forms.SelectField>
         {makeBadge(nodes.size)}
-        <IconButton
-          icon='FILTER'
+        <Checkbox
           title='Select all callstacks'
-          disabled={selection.length === 0}
-          onClick={reset}
+          value={selection.length === 0}
+          onChange={reset}
         />
       </div>
 
