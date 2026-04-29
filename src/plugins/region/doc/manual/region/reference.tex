@@ -13,48 +13,51 @@ follows:
   \item[invalid:] the annotation is assigned a False-if-reachable status;
 \end{description}
 
-\index{region@\verb+region+}
-\index{invalid@\verb+invalid+}
 Annotations generated through the command-line are tagged with \verb"region"
 name. Invalid annotations are tagged with an additional \verb"invalid" property
 name. Each category of annotations has also dedicated property names.
 
 %% --------------------------------------------------------------------------
-\section{Code Conditions}
+\section{Side Conditions}
 \label{toc:code}
 %% --------------------------------------------------------------------------
 
 %% --------------------------------------------------------------------------
 \subsection{Bounds}
-\index{bounds@\verb+bounds+}
 
 \begin{lstlisting}
 //@ check region: 0 <= k < N;
 return a[k];
 \end{lstlisting}
 
-Generated when accessing an array element. Options:
-\begin{itemize}
-  \item access to array element with option \verb+-unsafe-arrays+ (skipped);
-\end{itemize}
+\noindent
+Generated when accessing an array element, unless option \verb+-unsafe-arrays+
+is set.
 
 %% --------------------------------------------------------------------------
 \subsection{Valid Region}
-\index{path@\verb+path+, \verb+\valid_region+}
 
 \begin{lstlisting}
 //@ check region: path: \valid_region(p+k, sizeof(int));
 return *(p+k);
 \end{lstlisting}
 
-Generated when accessing a region with pointer arithmetic.
-Optimizations:
-\begin{itemize}
-  \item access to array element with option \verb+-safe-arrays+ (skipped);
-\end{itemize}
+\noindent
+Generated when accessing a region with pointer arithmetic. Also generated when
+accessing array elements when option \verb+-unsafe-arrays+ is set.
 
 %% --------------------------------------------------------------------------
-\section{Function Pre-Conditions}
-\label{toc:functions}
+\subsection{Separated Objects}
+
+\begin{lstlisting}
+//@ check region: f: A: B: \separated(a,b);
+r = f(a,b);
+\end{lstlisting}
+
+\noindent
+Generated when two distinct objects \verb+A+ and \verb+B+ accessible from function
+\verb+f+ might be aliased at a call site.
+
+\subsection{Others}
 \TODO{To be complete}
 %% --------------------------------------------------------------------------

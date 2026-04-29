@@ -314,7 +314,6 @@ analyzed.
   \label{fig:annotations}
 \end{figure}
 
-\index{region@\verb+region+}
 Region annotations are extended \acsl clauses, introduced by
 \verb+region+ keyword (or \verb+\region::region+) that follow the syntactic
 definitions of Figure~\ref{fig:annotations}. They can be used in function
@@ -403,10 +402,6 @@ By default, any declared object \verb+p[a..b]+ is assumed to be valid and
 properly initialized. Flags can be used in region specifications to downgrade
 those hypotheses to unusual situations. The available flags for an
 object specification \verb+a[p..q]+ are:
-\index{nullable@\verb+\nullable+}
-\index{allocated@\verb+\allocated+}
-\index{garbage@\verb+\garbage+}
-\index{readonly@\verb+\readonly+}
 \begin{itemize}
   \item \verb+\nullable+ allows \verb+a+ to be \verb+\null+;
   \item \verb+\allocated+ allows range \verb$a+(p..q)$ to be valid partially
