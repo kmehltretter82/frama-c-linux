@@ -146,8 +146,9 @@ let call_kf env stmt kf es =
   let loc = Cil_datatype.Stmt.loc stmt in
   let tenv = Lookup.callsite env.map stmt kf in
   let kmap = Analysis.get kf in
-  let objects = ref [] in
   let globals = ref [] in
+  let objects = ref [] in
+  let objmap = Separated.create () in
   begin
     Memory.iter
       (fun r ->
@@ -165,6 +166,7 @@ let call_kf env stmt kf es =
               let addr = Condition.RANGE(ptr,a.typ,inf,sup) in
               let node = Lookup.tmem tenv ptr in
               objects := (a.named,addr) :: !objects ;
+              Separated.add objmap node a.named addr ;
               add env @@ named fct @@ named a.named @@
               requires ~node ~target:a.flags addr ;
            ) (Memory.roots r) ;
@@ -175,9 +177,13 @@ let call_kf env stmt kf es =
       (fun global ->
          List.iter
            (fun (a,obj) ->
-              add env @@ named fct @@ named a @@ Separated [ obj ; global ]
+              add env @@ named fct @@ named a @@ Separated(obj,global)
            ) objects
       ) globals ;
+    Separated.iter
+      (fun a la b lb ->
+         add env @@ named fct @@ named a @@ named b @@ Separated(la,lb)
+      ) objmap ;
   end
 
 let call env stmt fct es =

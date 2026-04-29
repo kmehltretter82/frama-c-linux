@@ -33,7 +33,7 @@ type guard =
   | Bounds of exp * Z.t
   | Null of bool * addr
   | Valid of access * Memory.node * addr
-  | Separated of addr list
+  | Separated of addr * addr
 
 val g_or : guard -> guard -> guard
 val g_and : guard -> guard -> guard

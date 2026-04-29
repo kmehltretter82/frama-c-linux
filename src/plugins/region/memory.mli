@@ -152,6 +152,18 @@ val typed : node -> typ option
 val flags : node -> Attr.flags
 val readonly : node -> bool
 
+module Node :
+sig
+  type t = node
+  val hash : t -> int
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
+end
+
+module Nset : Set.S with type elt = node
+module Nmap : Map.S with type key = node
+module Nhash : Hashtbl.S with type key = node
+
 (**/**)
 val body : (map -> logic_info -> domain -> unit) ref
 [@@alert internal]

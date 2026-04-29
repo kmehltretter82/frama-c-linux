@@ -61,7 +61,7 @@ type guard =
   | Bounds of exp * Z.t
   | Null of bool * addr
   | Valid of access * Memory.node * addr
-  | Separated of addr list
+  | Separated of addr * addr
 
 let rec pp_guard fmt = function
   | True -> Format.pp_print_string fmt "\\true"
@@ -76,7 +76,7 @@ let rec pp_guard fmt = function
   | Valid(Read,_,a) -> Format.fprintf fmt "\\valid_read(%a)" pp_addr a
   | Valid(Region,_,a) -> Format.fprintf fmt "\\valid_region(%a)" pp_addr a
   | Valid(Initialized,_,a) -> Format.fprintf fmt "\\initialized(%a)" pp_addr a
-  | Separated ps -> Format.fprintf fmt "\\separated(%a)" (Pretty_utils.pp_list ~sep:",@ " pp_addr) ps
+  | Separated(a,b) -> Format.fprintf fmt "\\separated(%a,%a)" pp_addr a pp_addr b
 
 let g_and p q =
   match p,q with
@@ -149,7 +149,7 @@ let rec of_guard ?loc ?(names=[]) = function
   | Valid(Initialized,_,p) ->
     Logic_const.(pinitialized ?loc ~names (here_label, of_addr ?loc p))
   | Valid(Region,_,p) -> pvalid_region ?loc ~names @@ of_addr ?loc p
-  | Separated ps ->
-    Logic_const.pseparated ?loc ~names @@ List.map (of_addr ?loc) ps
+  | Separated(a,b) ->
+    Logic_const.pseparated ?loc ~names [ of_addr ?loc a ; of_addr ?loc b ]
 
 (* -------------------------------------------------------------------------- *)

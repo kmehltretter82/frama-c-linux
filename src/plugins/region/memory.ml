@@ -213,10 +213,17 @@ let pp_region fmt (r : node) =
 let id n = (UF.get n).cid
 let of_id m = UF.of_id m.store
 
-module SNode = Set.Make(struct
-    type t = node
-    let compare r1 r2 = Int.compare (id r1) (id r2)
-  end)
+module Node =
+struct
+  type t = node
+  let hash = id
+  let equal a b = (id a = id b)
+  let compare a b = Int.compare (id a) (id b)
+end
+
+module Nset = Set.Make(Node)
+module Nmap = Map.Make(Node)
+module Nhash = Hashtbl.Make(Node)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Chunk Constructors                                                 --- *)
@@ -580,15 +587,17 @@ let field (r: node) (fd: fieldinfo) : node =
 
 let footprint (r: node) : node list =
   try
-    let visited = ref SNode.empty (* set of visited & normalized nodes *) in
+    let visited = Nhash.create 0 (* set of visited & normalized nodes *) in
     let leaves = ref [] (* returned leaves *) in
     let rec visit (r: node) : unit =
       let n = find r in (* normalized node *)
-      if SNode.mem n !visited then () else
-        visited := SNode.add n !visited ;
-      match (UF.get n).clayout with
-      | Compound (_, _, range) -> Ranges.iter visit range
-      | Blob _ | Cell (_,_) -> leaves := n :: !leaves
+      if not (Nhash.mem visited n) then
+        begin
+          Nhash.add visited n () ;
+          match (UF.get n).clayout with
+          | Compound (_, _, range) -> Ranges.iter visit range
+          | Blob _ | Cell (_,_) -> leaves := n :: !leaves
+        end
     in visit r ; !leaves
   with Not_found -> []
 
