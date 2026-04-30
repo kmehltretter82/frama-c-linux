@@ -600,11 +600,11 @@ function lookupHints(hs: Ivette.Hint[], pattern: string): Toolbar.Hint[] {
   const lookupHint = (h: Ivette.Hint, lp: string): boolean => {
     const hn = h.name ?? h.label;
     return hn ? hn.toLowerCase().includes(lp) : false;
-  }
+  };
   const toHint = (h: Ivette.Hint): Toolbar.Hint => {
     const label = h.label ?? h.name ?? String(h.id);
     return { ...h, label };
-  }
+  };
 
   const p = pattern.toLowerCase();
   return hs.filter((h) => lookupHint(h, p)).map(toHint);
@@ -661,7 +661,7 @@ function Initialization(): JSX.Element {
   };
 
   const toSelection = ([decl, name]: [Ast.decl, string]): JSX.Element => {
-    const remove = (): void => { onKill(decl) };
+    const remove = (): void => { onKill(decl); };
     return (
       <SelectionButton key={decl} name={name} remove={remove} />
     );
@@ -683,17 +683,17 @@ function Initialization(): JSX.Element {
         <Button
           label='Only'
           selected={only}
-          onClick={(): void => { setInitOnly(true) }}
+          onClick={(): void => { setInitOnly(true); }}
         />
         <Button
           label='All Except'
           selected={!only}
-          onClick={(): void => { setInitOnly(false) }}
+          onClick={(): void => { setInitOnly(false); }}
         />
         <Button
           label='Clear'
           enabled={elems.length !== 0 || !only}
-          onClick={(): void => { setInit({ only: true, elems: [] }) }}
+          onClick={(): void => { setInit({ only: true, elems: [] }); }}
         />
       </Hbox>
       {
