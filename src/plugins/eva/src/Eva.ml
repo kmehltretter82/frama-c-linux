@@ -6,10 +6,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Eva public API. *)
+(** Eva public API.
+
+    Apart from [Analysis] and [Results], all modules exported here are
+    development interfaces which may change with each Frama-C release. *)
 
 
-(** {2 Main API} *)
+(** {2 Main stable API} *)
 
 (** Run the analysis and check analysis status. *)
 module Analysis = Analysis
