@@ -47,6 +47,28 @@
 
 /* end sidebar block */
 
+/* Generic sidebar function search */
+
+.wp-sidebar-block {
+  .dome-xToolBar-searchComponent {
+    margin: 1px 4px;
+    width: auto;
+  }
+  .dome-xToolBar-searchField {
+    width: auto;
+  }
+  .dome-xToolBar-searchField input[type=search] {
+    width: 100%;
+  }
+}
+
+.wp-sidebar-search {
+  background: var(--primary-button-color);
+  fill: var(--text-discrete);
+}
+
+/* end sidebar search */
+
 .wp-sidebar-prover-label {
   margin-top: 4px ;
 }
@@ -61,7 +83,7 @@
 }
 
 .wp-sidebar-selection {
-  padding: 0px;
+  padding: 0px 0px 0px 3px;
   border-radius: 12px;
   border: 1px solid var(--border);
   margin: 2px;

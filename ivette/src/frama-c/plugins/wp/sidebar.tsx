@@ -29,6 +29,11 @@ import * as Params from 'frama-c/kernel/api/parameters';
 import * as WP from 'frama-c/plugins/wp/api';
 import * as TIP from './tip';
 
+/* function search */
+import * as Ivette from 'ivette';
+import * as Dome from 'dome';
+import * as Toolbar from 'dome/frame/toolbars';
+import * as Ast from 'frama-c/kernel/api/ast';
 
 interface SidebarBlockProps extends DivProps {
   title?: string;
@@ -346,12 +351,12 @@ function ProversConfiguration(): JSX.Element {
 
 interface SelectionProps {
   name: string;
-  selected: boolean;
+  selected?: boolean;
   remove: () => void;
 }
 
 function SelectionButton(props: SelectionProps): JSX.Element {
-  const { name, remove, selected } = props;
+  const { name, remove, selected = false } = props;
   const className = Utils.classes(
     'wp-sidebar-selection',
     (selected && 'wp-sidebar-selection-selected')
@@ -499,6 +504,61 @@ function BoolOption(props: BoolOptionProps): JSX.Element {
   );
 }
 
+function globalHints(selected: Ast.decl[]): Ivette.Hint[] {
+  const globals = States.getSyncArray(Ast.functions).getArray();
+  return globals
+    .filter(({ defined }: Ast.functionsData) => defined)
+    .filter(({ decl }: Ast.functionsData) => !selected.includes(decl))
+    .map((g: Ast.functionsData) => ({
+      id: g.decl,
+      name: g.name,
+      label: g.name,
+    }));
+}
+
+function lookupHints(hs: Ivette.Hint[], pattern: string): Toolbar.Hint[] {
+  const lookupHint = (h: Ivette.Hint, lp: string): boolean => {
+    const hn = h.name ?? h.label;
+    return hn ? hn.toLowerCase().includes(lp) : false;
+  }
+  const toHint = (h: Ivette.Hint): Toolbar.Hint => {
+    const label = h.label ?? h.name ?? String(h.id);
+    return { ...h, label };
+  }
+
+  const p = pattern.toLowerCase();
+  return hs.filter((h) => lookupHint(h, p)).map(toHint);
+}
+
+const focus = new Dome.Event<void>('ivette.wp.functions.focus');
+
+interface SearchFieldProps {
+  onHint: (hint: Ivette.Hint) => void;
+  alreadySelected: Ast.decl[];
+}
+
+/* We want to limit ourselves to the functions */
+function SearchField(props: SearchFieldProps): JSX.Element {
+  const { onHint, alreadySelected } = props;
+  const [pattern, onPattern] = React.useState('');
+  const hints = React.useMemo(() => {
+    return lookupHints(globalHints(alreadySelected), pattern);
+  }, [pattern, alreadySelected]);
+  const onSearch = React.useCallback(() => { focus.emit(); }, []);
+  return (
+    <Toolbar.SearchField
+      title='Look for function definition'
+      className='wp-sidebar-search'
+      placeholder='function name'
+      hints={hints}
+      onHint={onHint}
+      onPattern={onPattern}
+      onSearch={onSearch}
+      focus={focus}
+    />
+  );
+}
+
 function RTE(): JSX.Element {
   const [rte = false, setRte] = States.useSyncState(Params.wpRte);
 
@@ -516,7 +576,7 @@ function RTE(): JSX.Element {
     ["pdc", "Pointer downcast", Params.warnPointerDowncast],
     ["pointer", "Invalid pointer", Params.warnInvalidPointer],
     ["fti", "Invalid float to int", Params.rteFloatToInt]
-  ]
+  ];
 
   const mkOption =
     (entry: [string, string, States.State<boolean>]): JSX.Element => {
@@ -539,7 +599,32 @@ function RTE(): JSX.Element {
     States.useSyncState(Params.warnSpecialFloat);
 
   /* special treatment for initialization */
+  const [init = { only: true, elems: [] }, setInit] =
+    States.useSyncState(WP.initialized);
 
+  const { only, elems } = init;
+
+  const setInitOnly = (value: boolean): void => {
+    setInit({ only: value, elems: elems });
+  };
+
+  const onHint = (hint: Ivette.Hint): void => {
+    const id = hint.id as Ast.decl;
+    const name = hint.label ?? "";
+    setInit({ only: only, elems: [...elems, [id, name]] });
+  };
+
+  const onKill = (value: Ast.decl): void => {
+    const newElems = elems.filter(([d, _]) => value !== d);
+    setInit({ only: only, elems: newElems });
+  };
+
+  const toSelection = ([decl, name]: [Ast.decl, string]): JSX.Element => {
+    const remove = (): void => { onKill(decl) };
+    return (
+      <SelectionButton key={decl} name={name} remove={remove} />
+    );
+  };
 
   return (
     <SidebarBlock
@@ -568,6 +653,31 @@ function RTE(): JSX.Element {
             {specialFloats.map(mkSF)}
           </SelectMenu>
         </Label>
+        <Label key='init' label='Initialization: '></Label>
+        <Hbox>
+          <Button
+            label='Only'
+            selected={only}
+            onClick={(): void => { setInitOnly(true) }}
+          />
+          <Button
+            label='All Except'
+            selected={!only}
+            onClick={(): void => { setInitOnly(false) }}
+          />
+          <Button
+            label='Clear'
+            enabled={elems.length !== 0 || !only}
+            onClick={(): void => { setInit({ only: true, elems: [] }) }}
+          />
+        </Hbox>
+        {elems.length !== 0
+          ? elems.map(toSelection)
+          : <Label label={only ? 'No functions' : 'No exceptions'} />
+        }
+        <SearchField
+          onHint={onHint}
+          alreadySelected={elems.map(([d, _]) => d)} />
       </Vbox>
     </SidebarBlock>
   );
