@@ -5724,10 +5724,14 @@ let rec castReduce fromsource force =
       Ast_types.(remove_attributes_for_c_cast (unroll newt))
     in
     let res e = new_exp ~loc (CastE (Ast_types.remove_qualifiers newt, e)) in
+    let check_res nullptr_cast e =
+      checkCast ~nullptr_cast ~fromsource (typeOf e) newt;
+      res e
+    in
     let oldt' = Ast_types.unroll oldt in
-    let can_hold_ptr is_fun_ptr =
+    let can_hold_ptr () =
       match oldt'.tnode with
-      | TPtr _ -> Ast_types.is_fun_ptr oldt' = is_fun_ptr
+      | TPtr _ -> Ast_types.is_fun_ptr oldt' = Ast_types.is_fun_ptr newt
       | TInt k -> intTypeIncluded (Machine.uintptr_kind()) k
       | _ -> false
     in
@@ -5737,15 +5741,14 @@ let rec castReduce fromsource force =
     | _, TInt newik, Const (CInt64 (i, _, None)) ->
       (* ISO 6.3.1.3.2 *) kinteger64 ~loc ~kind:newik i
 
-    | _, TPtr _, CastE (_, e')
-      when can_hold_ptr (Ast_types.is_fun_ptr normalized_newt) ->
+    | _, TPtr _, CastE (_, e') when can_hold_ptr () ->
       begin
         match Ast_types.unroll (typeOf e'), e'.enode with
         | { tnode = TPtr _ } as typ'', _ ->
           (* Old cast can be removed...*)
-          if need_cast ~force newt typ'' then res e'
+          if need_cast ~force newt typ'' then check_res false e'
           else (* In fact, both casts can be removed. *) e'
-        | _, Const (CInt64 (i, _, _)) when Z.is_zero i -> res e'
+        | _, Const (CInt64 (i, _, _)) when Z.is_zero i -> check_res true e'
         | _ -> res e
       end
 
