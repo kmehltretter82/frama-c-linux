@@ -35,9 +35,13 @@ import * as Dome from 'dome';
 import * as Toolbar from 'dome/frame/toolbars';
 import * as Ast from 'frama-c/kernel/api/ast';
 
+/* ************************************************************************** */
+/* Generic sidebar block */
+/* ************************************************************************** */
+
 interface SidebarBlockProps extends DivProps {
   title?: string;
-  titleButtons?: JSX.Element[];
+  titleButtons?: JSX.Element[]; /* to be displayed after title, right aligned */
   foldable?: boolean;
 }
 
@@ -78,6 +82,10 @@ const makeSidebarHelp = (anchor: string): JSX.Element => {
   );
 };
 
+/* ************************************************************************** */
+/* WP general tools */
+/* ************************************************************************** */
+
 function Tools(): JSX.Element {
   const { running } = TIP.useServerActivity();
   const goals = States.useSyncArrayProxy(WP.goals).model.getRowCount();
@@ -115,6 +123,13 @@ function Tools(): JSX.Element {
   );
 }
 
+/* ************************************************************************** */
+/* Provers section */
+/* ************************************************************************** */
+
+/* Prover */
+/* ************************************************************************** */
+
 interface ProverConfig {
   prover: WP.prover;
   up: boolean;
@@ -138,6 +153,9 @@ function Prover(props: ProverConfig): JSX.Element {
     />
   );
 }
+
+/* Cache Mode */
+/* ************************************************************************** */
 
 function CacheSelector(): JSX.Element {
   const [cacheMode, setCacheMode] = States.useSyncState(WP.cacheMode);
@@ -168,6 +186,9 @@ function CacheSelector(): JSX.Element {
   );
 }
 
+/* Interactive Mode */
+/* ************************************************************************** */
+
 function InteractiveSelector(): JSX.Element {
   const [inter, setInter] = States.useSyncState(WP.interactiveMode);
   const { help } =
@@ -197,6 +218,9 @@ function InteractiveSelector(): JSX.Element {
   );
 }
 
+/* TIP Mode */
+/* ************************************************************************** */
+
 function TipSelector(): JSX.Element {
   const [tipMode, setTipMode] = States.useSyncState(WP.tipMode);
   const { help } =
@@ -225,6 +249,9 @@ function TipSelector(): JSX.Element {
     </Label>
   );
 }
+
+/* Provers Configuration Component */
+/* ************************************************************************** */
 
 function ProversConfiguration(): JSX.Element {
   const goals = States.useSyncArrayProxy(WP.goals).model.getRowCount();
@@ -349,6 +376,10 @@ function ProversConfiguration(): JSX.Element {
   );
 }
 
+/* ************************************************************************** */
+/* Properties section */
+/* ************************************************************************** */
+
 interface SelectionProps {
   name: string;
   selected?: boolean;
@@ -371,6 +402,9 @@ function SelectionButton(props: SelectionProps): JSX.Element {
     </div>
   );
 }
+
+/* Properties Filter */
+/* ************************************************************************** */
 
 function PropertiesFilter(): JSX.Element {
   const [properties = [], setProperties] = States.useSyncState(WP.filter);
@@ -491,6 +525,11 @@ function PropertiesFilter(): JSX.Element {
   );
 }
 
+/* RTE configuration */
+/* ************************************************************************** */
+
+/* Simple options */
+
 interface BoolOptionProps {
   state: States.State<boolean>;
   descr: string;
@@ -503,6 +542,47 @@ function BoolOption(props: BoolOptionProps): JSX.Element {
     <Checkbox label={descr} onChange={setOpt} value={opt} />
   );
 }
+
+/* Special floats */
+
+function SpecialFloats(): JSX.Element {
+  const specialFloats: [string, string][] = [
+    ['none', 'None'],
+    ['nan', 'NaN'],
+    ['non-finite', 'Non finite']
+  ];
+
+  const mkSF = (entry: [string, string]): JSX.Element => {
+    return <option key={entry[0]} value={entry[0]}>{entry[1]}</option>;
+  };
+
+  const [sf = 'non-finite', setSF] =
+    States.useSyncState(Params.warnSpecialFloat);
+  return (
+    <Hbox>
+      <Checkbox
+        key='sf'
+        label='Special float: '
+        style={{ color: 'var(--text-discrete)' }}
+        title={
+          sf !== 'none'
+            ? 'Remove special floats to disable these guards'
+            : 'Add special floats to enable these guards'
+        }
+        value={sf !== 'none'}
+      />
+      <SelectMenu
+        value={sf}
+        onChange={(newV) => { if (newV) setSF(newV); }}
+        className='wp-config-field wp-config-select'
+      >
+        {specialFloats.map(mkSF)}
+      </SelectMenu>
+    </Hbox>
+  );
+}
+
+/* Initialized */
 
 function globalHints(selected: Ast.decl[]): Ivette.Hint[] {
   const globals = States.getSyncArray(Ast.functions).getArray();
@@ -559,46 +639,7 @@ function SearchField(props: SearchFieldProps): JSX.Element {
   );
 }
 
-function RTE(): JSX.Element {
-  const [rte = false, setRte] = States.useSyncState(Params.wpRte);
-
-  const options: [string, string, States.State<boolean>][] = [
-    ["mem", "Invalid memory access", Params.rteMem],
-    ["Odiv", "Division by 0", Params.rteDiv],
-    ["sov", "Signed overflow", Params.warnSignedOverflow],
-    ["uov", "Unsigned overflow", Params.warnUnsignedOverflow],
-    ["sdc", "Signed downcast", Params.warnSignedDowncast],
-    ["udc", "Unsigned downcast", Params.warnUnsignedDowncast],
-    ["shift", "Invalid shift", Params.rteShift],
-    ["lsn", "Left shift on negative", Params.warnLeftShiftNegative],
-    ["rsn", "Right shift on negative", Params.warnRightShiftNegative],
-    ["bool", "Invalid bool", Params.warnInvalidBool],
-    ["pdc", "Pointer downcast", Params.warnPointerDowncast],
-    ["pointer", "Invalid pointer", Params.warnInvalidPointer],
-    ["fti", "Invalid float to int", Params.rteFloatToInt]
-  ];
-
-  const mkOption =
-    (entry: [string, string, States.State<boolean>]): JSX.Element => {
-      const [id, descr, state] = entry;
-      return <BoolOption key={id} state={state} descr={descr} />;
-    };
-
-  /* special treatment for special float */
-  const specialFloats: [string, string][] = [
-    ['none', 'None'],
-    ['nan', 'NaN'],
-    ['non-finite', 'Non finite']
-  ];
-
-  const mkSF = (entry: [string, string]): JSX.Element => {
-    return <option key={entry[0]} value={entry[0]}>{entry[1]}</option>;
-  };
-
-  const [sf = 'non-finite', setSF] =
-    States.useSyncState(Params.warnSpecialFloat);
-
-  /* special treatment for initialization */
+function Initialization(): JSX.Element {
   const [init = { only: true, elems: [] }, setInit] =
     States.useSyncState(WP.initialized);
 
@@ -625,6 +666,77 @@ function RTE(): JSX.Element {
       <SelectionButton key={decl} name={name} remove={remove} />
     );
   };
+  return (
+    <>
+      <Checkbox
+        key='init'
+        label='Initialization:'
+        style={{ color: 'var(--text-discrete)' }}
+        title={
+          elems.length !== 0 || !only
+            ? 'Clear selection to disable these guards'
+            : 'Add functions to the selection to enable these guards'
+        }
+        value={elems.length !== 0 || !only}
+      />
+      <Hbox>
+        <Button
+          label='Only'
+          selected={only}
+          onClick={(): void => { setInitOnly(true) }}
+        />
+        <Button
+          label='All Except'
+          selected={!only}
+          onClick={(): void => { setInitOnly(false) }}
+        />
+        <Button
+          label='Clear'
+          enabled={elems.length !== 0 || !only}
+          onClick={(): void => { setInit({ only: true, elems: [] }) }}
+        />
+      </Hbox>
+      {
+        elems.length !== 0
+          ? elems.map(toSelection)
+          : <Label label={only ? 'No functions' : 'No exceptions'} />
+      }
+      <SearchField
+        onHint={onHint}
+        alreadySelected={elems.map(([d, _]) => d)} />
+    </>
+  );
+}
+
+/* RTE Component */
+
+function RTE(): JSX.Element {
+  const [rte = false, setRte] = States.useSyncState(Params.wpRte);
+
+  const options: [string, string, States.State<boolean>][] = [
+    ["mem", "Invalid memory access", Params.rteMem],
+    ["Odiv", "Division by 0", Params.rteDiv],
+    ["sov", "Signed overflow", Params.warnSignedOverflow],
+    ["uov", "Unsigned overflow", Params.warnUnsignedOverflow],
+    ["sdc", "Signed downcast", Params.warnSignedDowncast],
+    ["udc", "Unsigned downcast", Params.warnUnsignedDowncast],
+    ["shift", "Invalid shift", Params.rteShift],
+    ["lsn", "Left shift on negative", Params.warnLeftShiftNegative],
+    ["rsn", "Right shift on negative", Params.warnRightShiftNegative],
+    ["bool", "Invalid bool", Params.warnInvalidBool],
+    ["pdc", "Pointer downcast", Params.warnPointerDowncast],
+    ["pointer", "Invalid pointer", Params.warnInvalidPointer],
+    ["fti", "Invalid float to int", Params.rteFloatToInt]
+  ];
+
+  const mkOption =
+    (entry: [string, string, States.State<boolean>]): JSX.Element => {
+      const [id, descr, state] = entry;
+      return <BoolOption key={id} state={state} descr={descr} />;
+    };
+
+  /* special treatment for special float */
+
 
   return (
     <SidebarBlock
@@ -644,65 +756,15 @@ function RTE(): JSX.Element {
     >
       <Vbox>
         {options.map(mkOption)}
-        <Hbox>
-          <Checkbox
-            key='sf'
-            label='Special float: '
-            style={{color: 'var(--text-discrete)'}}
-            title={
-              sf !== 'none'
-                ? 'Remove special floats to disable these guards'
-                : 'Add special floats to enable these guards'
-            }
-            value={sf !== 'none'}
-          />
-          <SelectMenu
-            value={sf}
-            onChange={(newV) => { if (newV) setSF(newV); }}
-            className='wp-config-field wp-config-select'
-          >
-            {specialFloats.map(mkSF)}
-          </SelectMenu>
-        </Hbox>
-        <Checkbox
-          key='init'
-          label='Initialization:'
-          style={{color: 'var(--text-discrete)'}}
-          title={
-            elems.length !== 0 || !only
-              ? 'Clear selection to disable these guards'
-              : 'Add functions to the selection to enable these guards'
-          }
-          value={elems.length !== 0 || !only}
-        />
-        <Hbox>
-          <Button
-            label='Only'
-            selected={only}
-            onClick={(): void => { setInitOnly(true) }}
-          />
-          <Button
-            label='All Except'
-            selected={!only}
-            onClick={(): void => { setInitOnly(false) }}
-          />
-          <Button
-            label='Clear'
-            enabled={elems.length !== 0 || !only}
-            onClick={(): void => { setInit({ only: true, elems: [] }) }}
-          />
-        </Hbox>
-        {elems.length !== 0
-          ? elems.map(toSelection)
-          : <Label label={only ? 'No functions' : 'No exceptions'} />
-        }
-        <SearchField
-          onHint={onHint}
-          alreadySelected={elems.map(([d, _]) => d)} />
+        <SpecialFloats />
+        <Initialization />
       </Vbox>
     </SidebarBlock>
   );
 }
+
+/* Smoke tests configuration */
+/* ************************************************************************** */
 
 function SmokeTests(): JSX.Element {
   const [smoke = false, setSmoke] = States.useSyncState(Params.wpSmokeTests);
@@ -739,6 +801,9 @@ function SmokeTests(): JSX.Element {
   );
 }
 
+/* Properties component */
+/* ************************************************************************** */
+
 function Properties(): JSX.Element {
   return (
     <Forms.Section label='Properties' unfold>
@@ -748,6 +813,10 @@ function Properties(): JSX.Element {
     </Forms.Section>
   );
 }
+
+/* ************************************************************************** */
+/* Simplifications section */
+/* ************************************************************************** */
 
 interface SimplOptionProps {
   name: string;
@@ -861,6 +930,11 @@ function Simplifications(): JSX.Element {
     </Forms.Section>
   );
 }
+
+/* ************************************************************************** */
+/* SideBar */
+/* ************************************************************************** */
+
 
 export function SideBar(): JSX.Element {
   return (
