@@ -9,41 +9,31 @@
 module N = Memory.Nmap
 module L = Datatype.String.Map
 
-type objmap = (string * Condition.addr) list L.t N.t ref
+type obj = { named : string ; flags : Attr.flags ; addr : Condition.addr }
+type map = obj list L.t N.t ref
 
 let create () = ref N.empty
 
-let add (idx : objmap) ~node ~from named addr =
-  let lkey = Printf.sprintf "%s#%d" named (Memory.id from) in
+let add (idx : map) ~node ~from obj =
+  let lkey = Printf.sprintf "%s#%d" obj.named (Memory.id from) in
   let lbls = try N.find node !idx with Not_found -> L.empty in
   let objs = try L.find lkey lbls with Not_found -> [] in
-  idx := N.add node (L.add lkey ((named,addr) :: objs) lbls) !idx
+  idx := N.add node (L.add lkey (obj::objs) lbls) !idx
 
-let rec rev_iter f = function
-  | [] -> ()
-  | x::xs -> rev_iter f xs ; f x
+let rec rev_iter f = function [] -> () | x::xs -> rev_iter f xs ; f x
 
-let iter f (idx : objmap) =
-  N.iter
-    (fun r lbls ->
-       L.iter (fun _ objs -> rev_iter (fun (a,p) -> f r a p) objs) lbls
-    ) !idx
+let iter fn (idx : map) =
+  N.iter (fun r lbls -> L.iter (fun _ -> rev_iter (fn r)) lbls) !idx
 
-let iter2 f (idx : objmap) =
+let iter2 fn (idx : map) =
   N.iter
     (fun r lbls ->
        L.iter
-         (fun k1 objs1 ->
+         (fun k1 obj1 ->
             L.iter
-              (fun k2 objs ->
+              (fun k2 obj2 ->
                  if k1 < k2 then
-                   rev_iter
-                     (fun (a,p) ->
-                        rev_iter
-                          (fun (b,q) ->
-                             f r a p b q
-                          ) objs
-                     ) objs1
+                   rev_iter (fun a -> rev_iter (fn r a) obj2) obj1
               ) lbls
          ) lbls
     ) !idx

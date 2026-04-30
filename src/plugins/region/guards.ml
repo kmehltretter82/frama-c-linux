@@ -85,32 +85,32 @@ let write env lv =
 (* --- Root Side Conditions                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let valid acs node p =
-  let flags = Memory.flags node in
+let valid ~flags acs p =
   match acs with
   | Initialized when not @@ Attr.mem `Garbage flags -> g_true
   | Read | Write when not @@ Attr.mem `Allocated flags ->
     if Attr.mem `Nullable flags then g_null ~eq:false p else g_true
   | _ -> g_valid acs p
 
-let requires flags node addr =
+let requires ~spec node addr =
+  let flags = Memory.flags node in
   let non_null =
-    if Attr.mem `Nullable flags
+    if Attr.mem `Nullable spec
     then g_null ~eq:false addr
-    else g_false
+    else g_true
   in
   let accessible =
-    if Attr.mem `Readonly flags
-    then valid Read node addr
-    else valid Write node addr
+    if Attr.mem `Readonly spec
+    then valid ~flags Read addr
+    else valid ~flags Write addr
   in
   let initialized =
-    if Attr.mem `Garbage flags
-    then valid Initialized node addr
+    if Attr.mem `Garbage spec
+    then valid ~flags Initialized addr
     else g_true
   in
   let wellformed =
-    if Attr.mem `Allocated flags
+    if Attr.mem `Allocated spec
     then g_imply accessible initialized
     else g_and accessible initialized
   in
@@ -152,29 +152,30 @@ let call_kf env stmt kf es =
               let sup = subst ~loc kf es a.sup in
               let addr = R(ptr,a.typ,inf,sup) in
               let node = Lookup.tmem tenv ptr in
-              Separated.add objmap ~node ~from a.named addr ;
+              Separated.add objmap ~node ~from
+                { named = a.named ; flags = a.flags ; addr } ;
               add env @@ g_name fct @@ g_name a.named @@
-              requires a.flags node addr ;
+              requires ~spec:a.flags node addr ;
            ) (Memory.roots from) ;
       ) kmap ;
     let globals = List.rev !globals in
     Separated.iter
-      (fun node a p ->
+      (fun _node a ->
          List.iter
            (fun g ->
               add env
-              @@ g_name fct @@ g_name a
-              @@ g_imply (valid Read node p)
-              @@ g_separated p g
+              @@ g_name fct @@ g_name a.named
+              @@ g_imply (valid ~flags:a.flags Read a.addr)
+              @@ g_separated a.addr g
            ) globals
       ) objmap ;
     Separated.iter2
-      (fun node a p b q ->
+      (fun _node a b ->
          add env
-         @@ g_name fct @@ g_name a @@ g_name b
-         @@ g_imply (valid Read node p)
-         @@ g_imply (valid Read node q)
-         @@ g_separated p q
+         @@ g_name fct @@ g_name a.named @@ g_name b.named
+         @@ g_imply (valid ~flags:a.flags Read a.addr)
+         @@ g_imply (valid ~flags:b.flags Read b.addr)
+         @@ g_separated a.addr b.addr
       ) objmap ;
   end
 

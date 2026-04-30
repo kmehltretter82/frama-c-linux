@@ -7,12 +7,11 @@
 (**************************************************************************)
 
 open Memory
-open Condition
 
-(** Objects map *)
-type objmap
+type map
+type obj = { named : string ; flags : Attr.flags ; addr : Condition.addr }
 
-val create : unit -> objmap
-val add : objmap -> node:node -> from:node -> string -> addr -> unit
-val iter : (node -> string -> addr -> unit) -> objmap -> unit
-val iter2 : (node -> string -> addr -> string -> addr -> unit) -> objmap -> unit
+val create : unit -> map
+val add : map -> node:node -> from:node -> obj -> unit
+val iter : (node -> obj -> unit) -> map -> unit
+val iter2 : (node -> obj -> obj -> unit) -> map -> unit
