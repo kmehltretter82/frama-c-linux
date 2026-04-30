@@ -4383,8 +4383,8 @@ locations are also provided. Section~\ref{memory:map} introduces them.
 
 \subsection{Representations}\label{memory:repr}
 
-There are four different representations of \C locations. Actually only three
-are really relevant. They are defined in modules
+There are four different representations of \C locations.
+They are defined in modules
 \texttt{Locations}\codeidxdef{Locations},
 \texttt{Addresses}\codeidxdef{Addresses} and
 \texttt{Memory\_zone}\codeidxdef{Memory\_zone}. They are introduced below.
@@ -4402,18 +4402,18 @@ provided operations on these types:
 The four representations are:
 \begin{itemize}
 \item Type \texttt{Addresses.Bytes.t}\scodeidxdef{Addresses}{Bytes.t}
-  is used to represent values of \C expressions like \texttt{2} (an
-  absolute address) or \texttt{((int) \&a) + 13}. With this
-  representation, there is no way to know the size of a value while it
+  is used to represent sets of values of \C pointers like \texttt{(int*)2}
+  (an absolute address), \texttt{\&a + 13} or any pointer \texttt{p}. With
+  this representation, there is no way to know the size of a value while it
   is still possible to join two values. Roughly speaking it is
   represented by a mapping between \C variables and offsets in bytes.
-\item Type \texttt{Locations.t}\scodeidxdef{Locations}{t} is used to represent the
-  right part of a \C affectation (including bitfields). It is represented by a
-  \texttt{Addresses.Bits.t} (see below) attached to a size. It is possible to
-  join two locations \emph{if and only if they have the same sizes.}
 \item Type \texttt{Addresses.Bits.t}\scodeidxdef{Addresses}{Bits.t} is
   similar to \texttt{Addresses.Bytes.t} with offsets in bits instead of
-  bytes. Actually it should only be used inside a location.
+  bytes. It should only be used inside a location (see below).
+\item Type \texttt{Locations.t}\scodeidxdef{Locations}{t} is used to represent
+  the set of bits accessed through a \C lvalue (including bitfields). It is
+  represented by a \texttt{Addresses.Bits.t} attached to a size. It is possible
+  to join two locations \emph{if and only if they have the same sizes.}
 \item Type \texttt{Memory\_zone.t}\scodeidx{Memory\_zone}{t} is a set of bits (without
   any specific order). It is possible to join two zones \emph{even if they have
     different sizes}.
