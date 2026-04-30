@@ -883,7 +883,7 @@ function Simplifications(): JSX.Element {
     ['-wp-simplify-is-cint', 'Redundant int types', Params.wpSimplifyIsCint],
     ['-wp-simplify-land-mask', 'Masks', Params.wpSimplifyLandMask],
     ['-wp-simplify-type', 'Types', Params.wpSimplifyType],
-    ['-wp-subst', 'Substituions', Params.wpSubst],
+    ['-wp-subst', 'Substitutions', Params.wpSubst],
   ];
   const makeBox =
     (value: [string, string, States.State<boolean>]): JSX.Element => {
