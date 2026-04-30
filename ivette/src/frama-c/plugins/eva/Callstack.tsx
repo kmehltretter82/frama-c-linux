@@ -292,13 +292,15 @@ function getVisibleKey(
 
   /** Get a single level of children */
   const childrenKeys = new Set<string>();
-  function getChildren(curr: string): void {
+  function getAnalyzedChildren(curr: string): void {
     const node = nodes.get(curr);
     if(!node) return;
-    const children = [...node.subTree.keys()];
-    children.forEach(c => childrenKeys.add(c));
+    const children = [...node.subTree.entries()];
+    children.forEach(e => {
+      if (e[1].callstack.analyzed) childrenKeys.add(e[0]);
+    });
   }
-  if(!showAnalyzed && !showUnanalyzed) [...keys].forEach(e => getChildren(e));
+  if(!showAnalyzed) [...keys].forEach(e => getAnalyzedChildren(e));
 
   return new Set([...keys, ...parentKeys, ...childrenKeys]);
 }
