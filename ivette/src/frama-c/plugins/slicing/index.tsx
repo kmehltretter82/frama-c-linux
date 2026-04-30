@@ -15,6 +15,8 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import * as Slicing from 'frama-c/plugins/slicing/api/slicing';
 import * as Eva from 'frama-c/plugins/eva/api/analysis';
 
+import { evaNeeded } from '../eva/components/AnalysisStatus';
+
 function showInfo(message: string, details: string): void {
   const buttons = [{ label: 'Ok' }];
   const kind = 'info';
@@ -78,7 +80,7 @@ function buildMenu(
   function addItem(label: string, slicingRequest: slicingRequest): void {
     submenu.push({
       label,
-      onClick: () => callSlicing(slicingRequest, attr.marker)
+      onClick: () => evaNeeded(() => callSlicing(slicingRequest, attr.marker))
     });
   }
 

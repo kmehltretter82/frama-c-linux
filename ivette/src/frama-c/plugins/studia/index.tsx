@@ -24,7 +24,9 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import * as ASTview from 'frama-c/kernel/ASTview';
 import * as Locations from 'frama-c/kernel/Locations';
 import { getWritesLval, getReadsLval } from 'frama-c/plugins/studia/api/studia';
+
 import './style.css';
+import { evaNeeded, EvaReady } from '../eva/components/AnalysisStatus';
 
 type access = 'Reads' | 'Writes';
 
@@ -78,13 +80,15 @@ export function buildMenu(
       addSubMenu([
         {
           label: `Select reads`,
-          onClick: () =>
+          onClick: () => evaNeeded(() =>
             computeStudiaSelection('Reads', marker, attr.descr, handleError)
+          )
         },
         {
           label: `Select writes`,
-          onClick: () =>
+          onClick: () => evaNeeded(() =>
             computeStudiaSelection('Writes', marker, attr.descr, handleError)
+          )
         }
       ]);
       return;
@@ -107,6 +111,7 @@ interface ModalTextFieldProps {
 function ModalStudiaSearch(props: ModalTextFieldProps) : React.JSX.Element {
   const { attr } = props;
   const state = useState('');
+  const value = state.value;
   const [akind, setAkind] = React.useState<access>('Reads');
   const [error, setError] = React.useState<string | undefined>();
 
@@ -133,41 +138,43 @@ function ModalStudiaSearch(props: ModalTextFieldProps) : React.JSX.Element {
     label={'Studia'}
     actions={helpButton}
   >
-    <div>
-      <Label>
-        Find all statements that may {readOrWrite} the given lvalue:
-      </Label>
-      <Hbox>
-        <ButtonGroup>
-          <Button
-            label='Reads of'
-            selected={akind === 'Reads'}
-            onClick={() => setAkind('Reads')}
-          />
-          <Button
-            label='Writes to'
-            selected={akind === 'Writes'}
-            onClick={() => setAkind('Writes')}
-          />
-        </ButtonGroup>
-        <TextField
-          label=''
-          latency={0}
-          autoFocus={true}
-          state={state as FieldState<string | undefined>}
-          onKeyDown={(e) => { if (e.key === "Enter") onValidate(state.value); }}
-        />
-        <Button
-          label='Search'
-          onClick={() => onValidate(state.value)}
-        />
-      </Hbox>
-      { error &&
+    <EvaReady>
+      <div>
+        <Label>
+          Find all statements that may {readOrWrite} the given lvalue:
+        </Label>
         <Hbox>
-          <Icon id='WARNING' kind='warning' />
-          <span>{error}</span>
-        </Hbox> }
-    </div>
+          <ButtonGroup>
+            <Button
+              label='Reads of'
+              selected={akind === 'Reads'}
+              onClick={() => setAkind('Reads')}
+            />
+            <Button
+              label='Writes to'
+              selected={akind === 'Writes'}
+              onClick={() => setAkind('Writes')}
+            />
+          </ButtonGroup>
+          <TextField
+            label=''
+            latency={0}
+            autoFocus={true}
+            state={state as FieldState<string | undefined>}
+            onKeyDown={(e) => { if (e.key === "Enter") onValidate(value); }}
+          />
+          <Button
+            label='Search'
+            onClick={() => onValidate(value)}
+          />
+        </Hbox>
+        { error &&
+          <Hbox>
+            <Icon id='WARNING' kind='warning' />
+            <span>{error}</span>
+          </Hbox> }
+      </div>
+    </EvaReady>
   </Modal>;
 }
 

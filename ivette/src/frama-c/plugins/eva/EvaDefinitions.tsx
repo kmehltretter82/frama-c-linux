@@ -306,7 +306,7 @@ export const evaBasicStatus: EvaStatus = {
     icon: "CROSS",
   },
   'not_computed': {
-    message: "No Eva analysis.",
+    message: "No Eva analysis performed.",
     title: "No Eva analysis has been run yet.",
     icon: "CROSS",
   },

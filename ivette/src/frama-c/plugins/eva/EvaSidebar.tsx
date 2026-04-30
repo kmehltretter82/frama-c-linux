@@ -8,15 +8,36 @@
 
 import React from 'react';
 import * as Forms from 'dome/layout/forms';
+import { GlobalState, useGlobalState } from 'dome/data/states';
 import * as Ivette from 'ivette';
-import { useServerField, State } from 'frama-c/states';
+import { useServerField, State, useSyncValue } from 'frama-c/states';
+import * as Eva from 'frama-c/plugins/eva/api/analysis';
 import * as Params from 'frama-c/kernel/api/parameters';
 import * as EvaDef from 'frama-c/plugins/eva/EvaDefinitions';
 import { EvaFormOptions } from 'frama-c/plugins/eva/components/Form';
 import EvaTools from './components/Tools';
 
+const startComputing = new GlobalState<number>(0);
+
+/** Management of the EVA analyse start timestamp */
+function useSyncStartComputing(): void {
+  const [start, setStart] = useGlobalState(startComputing);
+  const status = useSyncValue(Eva.computationState);
+  React.useEffect(() => {
+    // If start ≠ 0, this means the counter has already started.
+    // It does not restart during a hot reload, for example.
+    if(status !== "computing") setStart(0);
+    else if(start === 0) setStart(Date.now());
+  }, [status, start, setStart]);
+}
+
+export function useStartComputing(): number {
+  const [start, ] = useGlobalState(startComputing);
+  return start;
+}
 
 export function EvaSideBar(): JSX.Element {
+  useSyncStartComputing();
   const remote = Forms.useController();
 
   function useField<A>(state: State<A>, defaultValue: A) : Forms.FieldState<A> {
