@@ -27,7 +27,8 @@ type access = Read | Write | Region | Initialized
 (** Tip: named terms are opaque to smart constructors *)
 
 type guard = private
-  | True | False
+  | True
+  | Invalid of guard (* original guard *)
   | Named of string * guard
   | Or of guard * guard
   | And of guard * guard
@@ -39,9 +40,11 @@ type guard = private
 
 val pointed : addr -> typ
 val trivial : guard -> bool
+val invalid : guard -> bool
+val falsy : guard -> guard
 
 val g_true : guard
-val g_false : guard
+val g_invalid : guard -> guard
 val g_or : guard -> guard -> guard
 val g_and : guard -> guard -> guard
 val g_imply : guard -> guard -> guard

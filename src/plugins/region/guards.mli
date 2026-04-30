@@ -22,7 +22,6 @@ val add_annotation :
   ?kf:kernel_function ->
   ?emitter:Emitter.t ->
   ?names:string list ->
-  ?invalid:bool ->
   ?hyps:Property.t list ->
   stmt -> guard -> unit
 

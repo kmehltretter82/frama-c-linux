@@ -59,7 +59,7 @@ let pp_addr fmt = function
 type access = Read | Write | Region | Initialized [@@ deriving eq]
 
 type guard =
-  | True | False
+  | True | Invalid of guard
   | Named of string * guard
   | Or of guard * guard
   | And of guard * guard
@@ -72,7 +72,7 @@ type guard =
 
 let rec pp_guard fmt = function
   | True -> Format.pp_print_string fmt "\\true"
-  | False -> Format.pp_print_string fmt "\\false"
+  | Invalid p -> Format.fprintf fmt "\\false/* %a */" pp_guard p
   | Named(a,p) -> Format.fprintf fmt "%s: %a" a pp_guard p
   | Or(p,q) -> Format.fprintf fmt "(@[<hov 2>%a@ || %a)@]" pp_guard p pp_guard q
   | And(p,q) -> Format.fprintf fmt "(@[<hov 2>%a@ && %a)@]" pp_guard p pp_guard q
@@ -86,6 +86,8 @@ let rec pp_guard fmt = function
   | Separated(a,b) -> Format.fprintf fmt "\\separated(%a,%a)" pp_addr a pp_addr b
 
 let rec trivial = function True -> true | Named(_,g) -> trivial g | _ -> false
+let rec invalid = function Invalid _ -> true | Named(_,g) -> invalid g | _ -> false
+let rec falsy = function Invalid p -> p | Named(_,g) -> falsy g | g -> g
 
 let pointed = function
   | L lv -> Cil.typeOfLval lv
@@ -102,25 +104,25 @@ let is_zero t =
 (* -------------------------------------------------------------------------- *)
 
 let g_true = True
-let g_false = False
-
+let g_invalid p = Invalid p
 let g_name a g = if a <> "" then Named(a,g) else g
 
 let g_null ?(eq=true) = function
   | R(p,t,_,_) -> Null(eq,T(p,t))
-  | L(Var _,_) -> if eq then False else True
+  | L(Var _,_) as addr -> if eq then Invalid (Null(eq,addr)) else True
   | addr -> Null(eq,addr)
 
 let g_and p q =
   match p,q with
   | True,w | w,True -> w
-  | False,_ | _,False -> False
+  | Invalid _,_ -> p
+  | _,Invalid _ -> q
   | _ -> And(p,q)
 
 let g_or p q =
   match p,q with
   | True,_ | _,True -> True
-  | False,w | w,False -> w
+  | Invalid _,w | w,Invalid _ -> w
   | _ -> Or(p,q)
 
 let rec filter hyp = function
@@ -136,8 +138,8 @@ let rec filter hyp = function
 let g_imply p q =
   match p,q with
   | True,_ -> q
-  | False,_ | _,True -> True
-  | Null(eq,a) , False -> Null(not eq,a)
+  | Invalid _,_ | _,True -> True
+  | Null(eq,a) , Invalid _ -> Null(not eq,a)
   | _ -> if equal_guard p q then True else Imply(p,filter p q)
 
 let g_bounds e n = Bounds(e,n)
@@ -167,7 +169,7 @@ let of_addr ?loc = function
 (* Names are only set at top-level predicate *)
 let rec of_guard ?loc ?(names=[]) = function
   | True -> Logic_const.prepend_names ~names @@ Logic_const.ptrue
-  | False -> Logic_const.prepend_names ~names @@ Logic_const.pfalse
+  | Invalid p -> of_guard ?loc ~names p
   | Named(a,p) -> of_guard ?loc ~names:(names @ [a]) p
   | Or(p,q) -> Logic_const.por ?loc ~names (of_guard ?loc p , of_guard ?loc q)
   | And(p,q) -> Logic_const.pand ?loc ~names (of_guard ?loc p , of_guard ?loc q)

@@ -92,7 +92,7 @@ let nullable ~flags p =
 
 let valid ~flags acs p =
   match acs with
-  | Write when Attr.mem `Readonly flags -> g_false
+  | Write when Attr.mem `Readonly flags -> g_invalid (g_valid Write p)
   | Read | Write when not @@ Attr.mem `Allocated flags -> nullable ~flags p
   | Initialized when not @@ Attr.mem `Garbage flags -> g_true
   | _ -> g_valid acs p
@@ -247,9 +247,10 @@ let self =
           ~tuning:[] in
       em := Some e ; e
 
-let add_annotation ?kf ?emitter ?(names=[]) ?(invalid=false) ?(hyps=[]) stmt guard =
+let add_annotation ?kf ?emitter ?(names=[]) ?(hyps=[]) stmt guard =
   let loc = Cil_datatype.Stmt.loc stmt in
   let kind = if Options.Assert.get () then Cil_types.Assert else Check in
+  let invalid = invalid guard in
   let enames = if invalid then "invalid"::names else names in
   let enames = if emitter = None then "region"::enames else enames in
   let e = match emitter with Some e -> e | None -> self () in
@@ -262,14 +263,8 @@ let add_annotation ?kf ?emitter ?(names=[]) ?(invalid=false) ?(hyps=[]) stmt gua
     let ips = Property.ip_of_code_annot kf stmt ca in
     let status = Property_status.False_if_reachable in
     List.iter (fun ip -> Property_status.emit e ~hyps ip status) ips ;
-    match names with
-    | [] ->
-      Options.warning ~source:(fst loc) "Invalid side-condition"
-    | [e] ->
-      Options.warning ~source:(fst loc) "Invalid side-condition (%s)" e
-    | es ->
-      Options.warning ~source:(fst loc) "Invalid side-conditions (%s)"
-        (String.concat ", " es)
+    Options.warning ~source:(fst loc) "Invalid side-condition: %a"
+      Printer.pp_predicate (of_guard @@ falsy guard)
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Function Annotation                                               --- *)
