@@ -85,36 +85,30 @@ let write env lv =
 (* --- Root Side Conditions                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
+let nullable ~flags p =
+  if Attr.mem `Nullable flags then g_null ~eq:false p else g_true
+
 let valid ~flags acs p =
   match acs with
   | Initialized when not @@ Attr.mem `Garbage flags -> g_true
-  | Read | Write when not @@ Attr.mem `Allocated flags ->
-    if Attr.mem `Nullable flags then g_null ~eq:false p else g_true
+  | Read | Write when not @@ Attr.mem `Allocated flags -> nullable ~flags p
   | _ -> g_valid acs p
 
-let requires ~spec node addr =
+let requires ~spec node p =
   let flags = Memory.flags node in
-  let non_null =
-    if Attr.mem `Nullable spec
-    then g_null ~eq:false addr
-    else g_true
-  in
-  let accessible =
-    if Attr.mem `Readonly spec
-    then valid ~flags Read addr
-    else valid ~flags Write addr
-  in
   let initialized =
-    if Attr.mem `Garbage spec
-    then valid ~flags Initialized addr
-    else g_true
-  in
-  let wellformed =
-    if Attr.mem `Allocated spec
-    then g_imply accessible initialized
-    else g_and accessible initialized
-  in
-  g_imply non_null wellformed
+    if not @@ Attr.mem `Garbage spec
+    then valid ~flags Initialized p
+    else g_true in
+  if Attr.mem `Allocated spec
+  then g_imply (valid ~flags Read p) initialized
+  else
+    let acs = if Attr.mem `Readonly spec then Read else Write in
+    let accessible = valid ~flags acs p in
+    let wellformed = g_and accessible initialized in
+    if Attr.mem `Nullable spec
+    then g_imply (nullable ~flags p) wellformed
+    else wellformed
 
 (* -------------------------------------------------------------------------- *)
 (* --- Call Side Conditions                                               --- *)
