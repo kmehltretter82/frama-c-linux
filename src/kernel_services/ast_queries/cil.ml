@@ -5725,13 +5725,20 @@ let rec castReduce fromsource force =
     in
     let res e = new_exp ~loc (CastE (Ast_types.remove_qualifiers newt, e)) in
     let oldt' = Ast_types.unroll oldt in
-    match oldt'.tnode, (normalized_newt).tnode, e.enode with
+    let can_hold_ptr is_fun_ptr =
+      match oldt'.tnode with
+      | TPtr _ -> Ast_types.is_fun_ptr oldt' = is_fun_ptr
+      | TInt k -> intTypeIncluded (Machine.uintptr_kind()) k
+      | _ -> false
+    in
+    match oldt'.tnode, normalized_newt.tnode, e.enode with
     (* In the case were we have a representation for the literal,
          explicitly add the cast. *)
     | _, TInt newik, Const (CInt64 (i, _, None)) ->
       (* ISO 6.3.1.3.2 *) kinteger64 ~loc ~kind:newik i
 
-    | _, TPtr _, CastE (_, e') ->
+    | _, TPtr _, CastE (_, e')
+      when can_hold_ptr (Ast_types.is_fun_ptr normalized_newt) ->
       begin
         match Ast_types.unroll (typeOf e'), e'.enode with
         | { tnode = TPtr _ } as typ'', _ ->
