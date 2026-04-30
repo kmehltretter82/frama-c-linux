@@ -125,7 +125,7 @@ let extend () =
     if ProveAuxSpec.get () then begin
       if InternalWpShare.is_set() then
         Wp.Wp_parameters.Share.set (InternalWpShare.get());
-      Wp.Wp_parameters.Let.off();
+      Wp.Wp_parameters.Qed.off();
       Wp.Wp_parameters.SplitBranch.on();
       Wp.Wp_parameters.SplitConj.on();
       Wp.Wp_parameters.SplitMax.set 32;
