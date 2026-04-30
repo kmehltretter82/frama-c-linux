@@ -328,10 +328,20 @@ export function CallstackSelection(): React.JSX.Element {
 
   /** Filter */
   const filterItems: Buttons.MultiselectItemProps[] = [
-    menuItem({ label: 'Show selected', state: showSelectedState }),
-    menuItem({ label: 'Show scope', state: showScopeState }),
-    menuItem({ label: 'Show analyzed', state: showAnalyzedState }),
-    menuItem({ label: 'Show unanalyzed', state: showUnanalyzedState }),
+    menuItem({ label: 'Show selected callstacks',
+               title: 'Show callstacks selected in this list',
+               state: showSelectedState }),
+    menuItem({ label: 'Show callstacks of current function',
+               title: 'Show all callstacks leading to the current function',
+               state: showScopeState, }),
+    menuItem({ label: 'Show callstacks of analyzed functions',
+               title: 'Show all callstacks leading to any analyzed function'
+                    + ' from the source code',
+               state: showAnalyzedState }),
+    menuItem({ label: 'Show callstacks of other functions',
+               title: 'Show all callstacks leading to external functions or'
+                    + ' functions interpreted by a builtin or a specification',
+               state: showUnanalyzedState }),
   ];
   const itemsComp = filterItems.map(
     (e, i) => <Buttons.MultiselectItem key={i} item={e} />);
@@ -349,6 +359,10 @@ export function CallstackSelection(): React.JSX.Element {
       { label: 'Reset selection: show all callstacks', onClick: () => reset() }
     ]);
   }, [reset]);
+
+  const filterButton =
+    <Buttons.IconButton icon='FILTER' size={15}
+      title='Show/hide callstacks in the tree' />;
 
   return (
     <EvaReady>
@@ -371,7 +385,7 @@ export function CallstackSelection(): React.JSX.Element {
           onClick={() => setUnfold(true)}
         />
         {makeBadge(nodes.size)}
-        <Dropdown control={ <Buttons.IconButton icon='FILTER' size={15}/> }>
+        <Dropdown control={filterButton}>
           <Buttons.Multiselect>{itemsComp}</Buttons.Multiselect>
         </Dropdown>
 
