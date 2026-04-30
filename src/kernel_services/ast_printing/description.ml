@@ -203,7 +203,7 @@ let pp_active fmt active =
 let pp_capitalize fmt s =
   Format.pp_print_string fmt (String.capitalize_ascii s)
 
-let pp_acsl_extension fmt {ext_name} = pp_capitalize fmt ext_name
+let pp_acsl_extension = Printer.pp_short_extended
 
 let rec pp_prop kfopt kiopt kloc fmt = function
   | IPLemma {il_name=s; il_pred=p} ->

@@ -300,7 +300,8 @@ let get_prog_state p =
 
 let rec get_names = function
   | IPPredicate ip -> (Logic_const.pred_of_id_pred ip.ip_pred).pred_name
-  | IPExtended { ie_ext = {ext_name = name} }
+  | IPExtended { ie_ext } ->
+    [Format.asprintf "%a" Cil_printer.pp_short_extended ie_ext]
   | IPAxiomatic { iax_name = name }
   | IPModule { im_name = name }
   | IPLemma { il_name = name }
