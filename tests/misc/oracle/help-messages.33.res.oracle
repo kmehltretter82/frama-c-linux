@@ -318,7 +318,7 @@ Options taking a string as argument should preferably be written
 
 -wp-bound-forall-unfolding <n>  Instantiate up to <n> forall-integers
                     hypotheses.
--wp-clean           Use a simple cleaning in case of -wp-no-let. (set by
+-wp-clean           Use a simple cleaning in case of -wp-no-qed. (set by
                     default, opposite option is -wp-no-clean)
 -wp-core            Lift core facts through branches. (set by default,
                     opposite option is -wp-no-core)
@@ -333,19 +333,17 @@ Options taking a string as argument should preferably be written
 -wp-init-summarize-array  Summarize contiguous initializers with quantifiers.
                     (set by default, opposite option is
                     -wp-no-init-summarize-array)
--wp-let             Use variable elimination. (set by default, opposite
-                    option is -wp-no-let)
 -wp-parasite        Use singleton-variable filtering. (set by default,
                     opposite option is -wp-no-parasite)
 -wp-prenex          Normalize nested foralls into prenex-form (opposite
                     option is -wp-no-prenex)
 -wp-pruning         Prune trivial branches. (set by default, opposite option
                     is -wp-no-pruning)
+-wp-qed             Enable Qed simplifications. (set by default, opposite
+                    option is -wp-no-qed)
 -wp-reduce          Reduce function equalities with precedence to
                     constructors. (set by default, opposite option is
                     -wp-no-reduce)
--wp-simpl           Enable Qed Simplifications. (set by default, opposite
-                    option is -wp-no-simpl)
 -wp-simplify-forall  Remove machine integer ranges in quantifiers. (opposite
                     option is -wp-no-simplify-forall)
 -wp-simplify-is-cint  Remove redundant machine integer range hypothesis. (set
@@ -354,6 +352,8 @@ Options taking a string as argument should preferably be written
                     default, opposite option is -wp-no-simplify-land-mask)
 -wp-simplify-type   Remove all `Type` constraints. (opposite option is
                     -wp-no-simplify-type)
+-wp-subst           Extract substitutable equalities from proof context. (set
+                    by default, opposite option is -wp-no-subst)
 
 *** WHY3 OPTIONS
 
