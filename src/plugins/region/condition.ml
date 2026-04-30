@@ -41,7 +41,12 @@ let pvalid_region ?loc ?names ?(label=Logic_const.here_label) addr =
 (* ---  Side Conditions                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-type addr = L of lval | E of exp | T of term * typ | R of term * typ * term * term
+type addr =
+  | L of Lval.t
+  | E of Exp.t
+  | T of Term.t * Typ.t
+  | R of Term.t * Typ.t * Term.t * Term.t
+[@@ deriving eq]
 
 let pp_addr fmt = function
   | L lv -> Format.fprintf fmt "&(%a)" Printer.pp_lval lv
@@ -51,7 +56,7 @@ let pp_addr fmt = function
     Format.fprintf fmt "&(%a[%a..%a])"
       Printer.pp_term a Printer.pp_term p Printer.pp_term q
 
-type access = Read | Write | Region | Initialized
+type access = Read | Write | Region | Initialized [@@ deriving eq]
 
 type guard =
   | True | False
@@ -59,10 +64,11 @@ type guard =
   | Or of guard * guard
   | And of guard * guard
   | Imply of guard * guard
-  | Bounds of exp * Z.t
+  | Bounds of Exp.t * Z.t
   | Null of bool * addr
   | Valid of access * addr
   | Separated of addr * addr
+[@@ deriving eq]
 
 let rec pp_guard fmt = function
   | True -> Format.pp_print_string fmt "\\true"
@@ -122,12 +128,11 @@ let g_imply p q =
   | True,_ -> q
   | False,_ | _,True -> True
   | Null(eq,a) , False -> Null(not eq,a)
-  | _ -> Imply(p,q)
+  | _ -> if equal_guard p q then True else Imply(p,q)
 
 let g_bounds e n = Bounds(e,n)
-let g_separated p q = Separated(p,q)
-
 let g_valid acs p = Valid(acs,p)
+let g_separated p q = Separated(p,q)
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Extraction                                                        --- *)
