@@ -533,13 +533,22 @@ function PropertiesFilter(): JSX.Element {
 interface BoolOptionProps {
   state: States.State<boolean>;
   descr: string;
+  supported: boolean;
 }
 
 function BoolOption(props: BoolOptionProps): JSX.Element {
-  const { state, descr } = props;
+  const { state, descr, supported } = props;
   const [opt = false, setOpt] = States.useSyncState(state);
   return (
-    <Checkbox label={descr} onChange={setOpt} value={opt} />
+    <Hbox title={ !supported ? 'WP does not support this option' : undefined}>
+      <Checkbox
+        label={descr}
+        onChange={setOpt}
+        value={opt}
+        enabled={supported}
+      />
+      {!supported && <Icon id='WARNING' kind='warning'/>}
+    </Hbox>
   );
 }
 
@@ -562,7 +571,7 @@ function SpecialFloats(): JSX.Element {
     <Hbox>
       <Checkbox
         key='sf'
-        label='Special float: '
+        label='Special float '
         style={{ color: 'var(--text-discrete)' }}
         title={
           sf !== 'none'
@@ -670,7 +679,7 @@ function Initialization(): JSX.Element {
     <>
       <Checkbox
         key='init'
-        label='Initialization:'
+        label='Initialization '
         style={{ color: 'var(--text-discrete)' }}
         title={
           elems.length !== 0 || !only
@@ -713,30 +722,40 @@ function Initialization(): JSX.Element {
 function RTE(): JSX.Element {
   const [rte = false, setRte] = States.useSyncState(Params.wpRte);
 
-  const options: [string, string, States.State<boolean>][] = [
-    ["mem", "Invalid memory access", Params.rteMem],
-    ["Odiv", "Division by 0", Params.rteDiv],
-    ["sov", "Signed overflow", Params.warnSignedOverflow],
-    ["uov", "Unsigned overflow", Params.warnUnsignedOverflow],
-    ["sdc", "Signed downcast", Params.warnSignedDowncast],
-    ["udc", "Unsigned downcast", Params.warnUnsignedDowncast],
-    ["shift", "Invalid shift", Params.rteShift],
-    ["lsn", "Left shift on negative", Params.warnLeftShiftNegative],
-    ["rsn", "Right shift on negative", Params.warnRightShiftNegative],
-    ["bool", "Invalid bool", Params.warnInvalidBool],
-    ["pdc", "Pointer downcast", Params.warnPointerDowncast],
-    ["pointer", "Invalid pointer", Params.warnInvalidPointer],
-    ["fti", "Invalid float to int", Params.rteFloatToInt]
+  const options: [string, string, boolean, States.State<boolean>][] = [
+    /* pointers */
+    ["mem", "Invalid memory access", true, Params.rteMem],
+    ["pdc", "Pointer downcast", true, Params.warnPointerDowncast],
+    ["pointer", "Invalid pointer", true, Params.warnInvalidPointer],
+    ["align", "Unaligned pointer", false, Params.warnUnalignedPointer],
+    ["ptr-call", "Function pointer calls", false, Params.rtePointerCall],
+    /* + initialized, see below */
+    /* integers */
+    ["Odiv", "Division by 0", true, Params.rteDiv],
+    ["sov", "Signed overflow", true, Params.warnSignedOverflow],
+    ["uov", "Unsigned overflow", true, Params.warnUnsignedOverflow],
+    ["sdc", "Signed downcast", true, Params.warnSignedDowncast],
+    ["udc", "Unsigned downcast", true, Params.warnUnsignedDowncast],
+    ["shift", "Invalid shift", true, Params.rteShift],
+    ["lsn", "Left shift on negative", true, Params.warnLeftShiftNegative],
+    ["rsn", "Right shift on negative", true, Params.warnRightShiftNegative],
+    /* booleans */
+    ["bool", "Invalid bool", true, Params.warnInvalidBool],
+    /* floats + special values, see below */
+    ["fti", "Invalid float to int", true, Params.rteFloatToInt]
   ];
 
   const mkOption =
-    (entry: [string, string, States.State<boolean>]): JSX.Element => {
-      const [id, descr, state] = entry;
-      return <BoolOption key={id} state={state} descr={descr} />;
+    (entry: [string, string, boolean, States.State<boolean>]): JSX.Element => {
+      const [id, descr, supported, state] = entry;
+      return (
+        <BoolOption
+          key={id}
+          state={state}
+          supported={supported}
+          descr={descr} />
+      );
     };
-
-  /* special treatment for special float */
-
 
   return (
     <SidebarBlock
