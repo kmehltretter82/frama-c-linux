@@ -23,9 +23,6 @@ type acs =
 
 val typeof : acs -> typ
 
-val compare : acs -> acs -> int
-val compare_clause : clause -> clause -> int
-
 val pretty : Format.formatter -> acs -> unit
 val pp_label : Format.formatter -> stmt -> unit
 val pp_clause : Format.formatter -> clause -> unit

@@ -10,72 +10,21 @@ open Cil_types
 open Cil_datatype
 
 type clause =
-  | Body of logic_info
+  | Body of Logic_info.t
   | Prop of Property.t
-  | CallSite of stmt * kernel_function
-  | CallProp of stmt * kernel_function * Property.t
-
-let compare_clause a b =
-  match a, b with
-  | Body f , Body g -> Logic_info.compare f g
-  | Body _ , _ -> (-1)
-  | _ , Body _ -> (+1)
-  | Prop f , Prop g -> Property.compare f g
-  | Prop _ , _ -> (-1)
-  | _ , Prop _ -> (+1)
-  | CallSite(s1,kf1), CallSite(s2,kf2) ->
-    let c = Stmt.compare s1 s2 in
-    if c <> 0 then c else Kernel_function.compare kf1 kf2
-  | CallSite _ , _ -> (-1)
-  | _ , CallSite _ -> (+1)
-  | CallProp(s1,kf1,p1) , CallProp(s2,kf2,p2) ->
-    let c = Stmt.compare s1 s2 in
-    if c <> 0 then c else
-      let c = Kernel_function.compare kf1 kf2 in
-      if c <> 0 then c else
-        Property.compare p1 p2
+  | CallSite of Stmt.t * Kernel_function.t
+  | CallProp of Stmt.t * Kernel_function.t * Property.t
+[@@ deriving ord]
 
 type acs =
-  | Exp of Stmt.t * exp
-  | Ret of Stmt.t * exp
-  | Lval of Stmt.t * lval
-  | Init of Stmt.t * lval * exp
-  | Term of clause * term_lval
+  | Exp of Stmt.t * Exp.t
+  | Ret of Stmt.t * Exp.t
+  | Lval of Stmt.t * Lval.t
+  | Init of Stmt.t * Lval.t * Exp.t
+  | Term of clause * Term_lval.t
+[@@ deriving ord]
 
-let compare a b =
-  match a, b with
-  | Init(sa,la,va), Init(sb,lb,vb) ->
-    let cmp = Stmt.compare sa sb in
-    if cmp <> 0 then cmp else
-      let cmp = Lval.compare la lb in
-      if cmp <> 0 then cmp else
-        Exp.compare va vb
-  | Init _ , _ -> (-1)
-  | _ , Init _ -> (+1)
-
-  | Lval(sa,la), Lval(sb,lb) ->
-    let cmp = Stmt.compare sa sb in
-    if cmp <> 0 then cmp else Lval.compare la lb
-  | Lval _ , _ -> (-1)
-  | _ , Lval _ -> (+1)
-
-  | Exp(sa,ea), Exp(sb,eb) ->
-    let cmp = Stmt.compare sa sb in
-    if cmp <> 0 then cmp else Exp.compare ea eb
-  | Exp _ , _ -> (-1)
-  | _ , Exp _ -> (+1)
-
-  | Ret(sa,ea), Ret(sb,eb) ->
-    let cmp = Stmt.compare sa sb in
-    if cmp <> 0 then cmp else Exp.compare ea eb
-  | Ret _ , _ -> (-1)
-  | _ , Ret _ -> (+1)
-
-  | Term(ca,ta), Term(cb,tb) ->
-    let cmp = compare_clause ca cb in
-    if cmp <> 0 then cmp else Term_lval.compare ta tb
-
-module Set = Set.Make(struct type t = acs let compare = compare end)
+module Set = Set.Make(struct type t = acs let compare = compare_acs end)
 
 let pp_label fmt (s : stmt) =
   match s.labels with
