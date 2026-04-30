@@ -13,7 +13,7 @@ set -e
 # Configuration
 
 if [ -z ${HDRCK+x} ]; then
-  HDRCK="dune exec -- frama-c-hdrck"
+  HDRCK="dune exec --no-print-directory --root tools/hdrck -- frama-c-hdrck"
 fi
 
 if [ -z ${VERSION_CODENAME+x} ]; then
