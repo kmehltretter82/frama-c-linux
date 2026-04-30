@@ -8,7 +8,7 @@
 
 import React from 'react';
 
-import { useFlipSettings } from 'dome';
+import { useFlipSettings, popupMenu } from 'dome';
 import { Dropdown } from 'dome/dialogs';
 import * as Tree from 'dome/frame/tree';
 import * as Toolbars from 'dome/frame/toolbars';
@@ -341,6 +341,13 @@ export function CallstackSelection(): React.JSX.Element {
   }, [nodes, showSelected, showScope,
       showAnalyzed, showUnanalyzed, selection, scope]);
 
+
+  const onResetMenu = React.useCallback(() => {
+    popupMenu([
+      { label: 'Reset selection: show all callstacks', onClick: () => reset() }
+    ]);
+  }, [reset]);
+
   return (
     <EvaReady>
       <div
@@ -365,10 +372,12 @@ export function CallstackSelection(): React.JSX.Element {
         <Dropdown control={ <Buttons.IconButton icon='FILTER' size={15}/> }>
           <Buttons.Multiselect>{itemsComp}</Buttons.Multiselect>
         </Dropdown>
-        <Buttons.Checkbox
-          title='Select all callstacks'
-          value={selection.length === 0}
-          onChange={reset}
+
+        <Buttons.IconButton
+          icon='TUNINGS'
+          title='Configure selection'
+          enabled={selection.length > 0}
+          onClick={onResetMenu}
         />
       </div>
 
