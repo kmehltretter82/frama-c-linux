@@ -1,6 +1,6 @@
 [kernel] Parsing flags.c (with preprocessing)
-[kernel:annot:missing-spec] flags.c:24: Warning: 
-  Neither code nor explicit assigns for function spec_garbage, generating
+[kernel:annot:missing-spec] flags.c:26: Warning: 
+  Neither code nor explicit assigns for function spec_readonly, generating
   default clauses. See -generated-spec-* options for more info.
 [region] annotating function context_allocated
 [region] annotating function context_allocread
@@ -24,13 +24,19 @@ void spec_allocated(int *a);
 /*@ \region::region a[0..0], \nullable, \allocated; */
 void spec_nullalloc(int *a);
 
-/*@ \region::region a[0..0], \garbage;
+/*@ \region::region a[0..0], \readonly;
     assigns *a;
     assigns *a \from *a; */
+void spec_readonly(int *a);
+
+/*@ \region::region a[0..0], \nullable, \readonly; */
+void spec_nullread(int *a);
+
+/*@ \region::region a[0..0], \garbage; */
 void spec_garbage(int *a);
 
-/*@ \region::region a[0..0], \readonly; */
-void spec_readonly(int *a);
+/*@ \region::region a[0..0], \nullable, \garbage; */
+void spec_nullgarb(int *a);
 
 /*@ \region::region a[0..0], \nullable, \allocated, \garbage, \readonly; */
 void spec_dummy(int *a);
@@ -38,62 +44,65 @@ void spec_dummy(int *a);
 /*@ \region::region a_default[0..0]; */
 void context_default(int *a_default)
 {
-  spec_garbage(a_default);
+  spec_readonly(a_default);
   return;
 }
 
 /*@ \region::region a_nullable[0..0], \nullable; */
 void context_nullable(int *a_nullable)
 {
-  /*@ check region: spec_garbage: a_nullable ≢ \null; */
-  spec_garbage(a_nullable);
+  /*@ check region: spec_readonly: a_nullable ≢ \null; */
+  spec_readonly(a_nullable);
   return;
 }
 
 /*@ \region::region a_allocated[0..0], \allocated; */
 void context_allocated(int *a_allocated)
 {
-  /*@ check region: spec_garbage: \valid(a_allocated); */
-  spec_garbage(a_allocated);
+  /*@ check region: spec_readonly: \valid_read(a_allocated); */
+  spec_readonly(a_allocated);
   return;
 }
 
 /*@ \region::region a_allocread[0..0], \allocated, \readonly; */
 void context_allocread(int *a_allocread)
 {
-  /*@ check region: spec_garbage: \valid(a_allocread); */
-  spec_garbage(a_allocread);
+  /*@ check region: spec_readonly: \valid_read(a_allocread); */
+  spec_readonly(a_allocread);
   return;
 }
 
 /*@ \region::region a_nullread[0..0], \nullable, \readonly; */
 void context_nullread(int *a_nullread)
 {
-  /*@ check region: spec_garbage: a_nullread ≢ \null; */
-  spec_garbage(a_nullread);
+  /*@ check region: spec_readonly: a_nullread ≢ \null; */
+  spec_readonly(a_nullread);
   return;
 }
 
 /*@ \region::region a_nullalloc[0..0], \nullable, \allocated; */
 void context_nullalloc(int *a_nullalloc)
 {
-  /*@ check region: spec_garbage: \valid(a_nullalloc); */
-  spec_garbage(a_nullalloc);
+  /*@ check region: spec_readonly: \valid_read(a_nullalloc); */
+  spec_readonly(a_nullalloc);
   return;
 }
 
 /*@ \region::region a_garbage[0..0], \garbage; */
 void context_garbage(int *a_garbage)
 {
-  spec_garbage(a_garbage);
+  /*@ check region: spec_readonly: \initialized(a_garbage); */
+  spec_readonly(a_garbage);
   return;
 }
 
 /*@ \region::region a_nullgarb[0..0], \nullable, \garbage; */
 void context_nullgarb(int *a_nullgarb)
 {
-  /*@ check region: spec_garbage: a_nullgarb ≢ \null; */
-  spec_garbage(a_nullgarb);
+  /*@ check
+        region: spec_readonly: a_nullgarb ≢ \null ∧ \initialized(a_nullgarb);
+  */
+  spec_readonly(a_nullgarb);
   return;
 }
 
@@ -101,8 +110,10 @@ void context_nullgarb(int *a_nullgarb)
  */
 void context_dummy(int *a_dummy)
 {
-  /*@ check region: spec_garbage: \valid(a_dummy); */
-  spec_garbage(a_dummy);
+  /*@ check
+        region: spec_readonly: \valid_read(a_dummy) ∧ \initialized(a_dummy);
+  */
+  spec_readonly(a_dummy);
   return;
 }
 

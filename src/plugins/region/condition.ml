@@ -123,12 +123,22 @@ let g_or p q =
   | False,w | w,False -> w
   | _ -> Or(p,q)
 
+let rec filter hyp = function
+  | Or(p,q) -> g_or (filter hyp p) (filter hyp q)
+  | And(p,q) -> g_and (filter hyp p) (filter hyp q)
+  | Imply(p,q) ->
+    if equal_guard hyp p
+    then filter hyp q
+    else Imply(filter hyp p, filter hyp q)
+  | p ->
+    if equal_guard hyp p then True else p
+
 let g_imply p q =
   match p,q with
   | True,_ -> q
   | False,_ | _,True -> True
   | Null(eq,a) , False -> Null(not eq,a)
-  | _ -> if equal_guard p q then True else Imply(p,q)
+  | _ -> if equal_guard p q then True else Imply(p,filter p q)
 
 let g_bounds e n = Bounds(e,n)
 let g_valid acs p = Valid(acs,p)

@@ -86,7 +86,9 @@ let write env lv =
 (* -------------------------------------------------------------------------- *)
 
 let nullable ~flags p =
-  if Attr.mem `Nullable flags then g_null ~eq:false p else g_true
+  if Attr.mem `Nullable flags || Attr.mem `Allocated flags
+  then g_null ~eq:false p
+  else g_true
 
 let valid ~flags acs p =
   match acs with

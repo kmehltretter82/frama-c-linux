@@ -3,8 +3,10 @@
   OPT: -region -print -cpp-extra-args="-DCALL=spec_null"
   OPT: -region -print -cpp-extra-args="-DCALL=spec_allocated"
   OPT: -region -print -cpp-extra-args="-DCALL=spec_nullalloc"
-  OPT: -region -print -cpp-extra-args="-DCALL=spec_garbage"
   OPT: -region -print -cpp-extra-args="-DCALL=spec_readonly"
+  OPT: -region -print -cpp-extra-args="-DCALL=spec_nullread"
+  OPT: -region -print -cpp-extra-args="-DCALL=spec_garbage"
+  OPT: -region -print -cpp-extra-args="-DCALL=spec_nullgarb"
   OPT: -region -print -cpp-extra-args="-DCALL=spec_dummy"
   */
 
@@ -20,11 +22,17 @@ void spec_allocated(int *a);
 //@ region *a, \nullable, \allocated;
 void spec_nullalloc(int *a);
 
+//@ region *a, \readonly;
+void spec_readonly(int *a);
+
+//@ region *a, \nullable, \readonly;
+void spec_nullread(int *a);
+
 //@ region *a, \garbage;
 void spec_garbage(int *a);
 
-//@ region *a, \readonly;
-void spec_readonly(int *a);
+//@ region *a, \nullable, \garbage;
+void spec_nullgarb(int *a);
 
 //@ region *a, \nullable, \allocated, \readonly, \garbage ;
 void spec_dummy(int *a);

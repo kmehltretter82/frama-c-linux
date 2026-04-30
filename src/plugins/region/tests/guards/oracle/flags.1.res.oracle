@@ -1,5 +1,5 @@
 [kernel] Parsing flags.c (with preprocessing)
-[kernel:annot:missing-spec] flags.c:15: Warning: 
+[kernel:annot:missing-spec] flags.c:17: Warning: 
   Neither code nor explicit assigns for function spec_null, generating default
   clauses. See -generated-spec-* options for more info.
 [region] annotating function context_allocated
@@ -26,11 +26,17 @@ void spec_allocated(int *a);
 /*@ \region::region a[0..0], \nullable, \allocated; */
 void spec_nullalloc(int *a);
 
+/*@ \region::region a[0..0], \readonly; */
+void spec_readonly(int *a);
+
+/*@ \region::region a[0..0], \nullable, \readonly; */
+void spec_nullread(int *a);
+
 /*@ \region::region a[0..0], \garbage; */
 void spec_garbage(int *a);
 
-/*@ \region::region a[0..0], \readonly; */
-void spec_readonly(int *a);
+/*@ \region::region a[0..0], \nullable, \garbage; */
+void spec_nullgarb(int *a);
 
 /*@ \region::region a[0..0], \nullable, \allocated, \garbage, \readonly; */
 void spec_dummy(int *a);
@@ -52,7 +58,7 @@ void context_nullable(int *a_nullable)
 /*@ \region::region a_allocated[0..0], \allocated; */
 void context_allocated(int *a_allocated)
 {
-  /*@ check region: spec_null: \valid(a_allocated); */
+  /*@ check region: spec_null: a_allocated ≢ \null ⇒ \valid(a_allocated); */
   spec_null(a_allocated);
   return;
 }
@@ -60,7 +66,7 @@ void context_allocated(int *a_allocated)
 /*@ \region::region a_allocread[0..0], \allocated, \readonly; */
 void context_allocread(int *a_allocread)
 {
-  /*@ check region: spec_null: \valid(a_allocread); */
+  /*@ check region: spec_null: a_allocread ≢ \null ⇒ \valid(a_allocread); */
   spec_null(a_allocread);
   return;
 }
@@ -91,9 +97,7 @@ void context_garbage(int *a_garbage)
 /*@ \region::region a_nullgarb[0..0], \nullable, \garbage; */
 void context_nullgarb(int *a_nullgarb)
 {
-  /*@ check
-        region: spec_null:
-          a_nullgarb ≢ \null ⇒ a_nullgarb ≢ \null ∧ \initialized(a_nullgarb);
+  /*@ check region: spec_null: a_nullgarb ≢ \null ⇒ \initialized(a_nullgarb);
   */
   spec_null(a_nullgarb);
   return;

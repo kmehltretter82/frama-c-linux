@@ -1,5 +1,5 @@
 [kernel] Parsing flags.c (with preprocessing)
-[kernel:annot:missing-spec] flags.c:21: Warning: 
+[kernel:annot:missing-spec] flags.c:23: Warning: 
   Neither code nor explicit assigns for function spec_nullalloc, generating
   default clauses. See -generated-spec-* options for more info.
 [region] annotating function context_allocated
@@ -27,11 +27,17 @@ void spec_allocated(int *a);
  */
 void spec_nullalloc(int *a);
 
+/*@ \region::region a[0..0], \readonly; */
+void spec_readonly(int *a);
+
+/*@ \region::region a[0..0], \nullable, \readonly; */
+void spec_nullread(int *a);
+
 /*@ \region::region a[0..0], \garbage; */
 void spec_garbage(int *a);
 
-/*@ \region::region a[0..0], \readonly; */
-void spec_readonly(int *a);
+/*@ \region::region a[0..0], \nullable, \garbage; */
+void spec_nullgarb(int *a);
 
 /*@ \region::region a[0..0], \nullable, \allocated, \garbage, \readonly; */
 void spec_dummy(int *a);
