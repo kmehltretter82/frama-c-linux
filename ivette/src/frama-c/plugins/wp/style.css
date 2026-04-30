@@ -23,12 +23,13 @@
   border-radius: 4px;
 
   .dome-xCheckbox {
-    padding: 2px ;
-    margin: 2px 4px ;
+    padding: 2px;
+    margin: 2px 4px;
   }
 }
 
-.wp-sidebar-block-title { /* Probably mergeable with xTitleBar */
+.wp-sidebar-block-title {
+  /* Probably mergeable with xTitleBar */
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
@@ -54,11 +55,23 @@
     margin: 1px 4px;
     width: auto;
   }
+
   .dome-xToolBar-searchField {
     width: auto;
   }
+
   .dome-xToolBar-searchField input[type=search] {
     width: 100%;
+  }
+
+  .dome-control-disabled {
+    color: var(--disabled-text-sidebar);
+    fill: var(--disabled-text-sidebar);
+    font-weight: lighter;
+  }
+
+  .dome-xIcon-disabled {
+    fill: var(--disabled-text-sidebar);
   }
 }
 
@@ -70,7 +83,7 @@
 /* end sidebar search */
 
 .wp-sidebar-prover-label {
-  margin-top: 4px ;
+  margin-top: 4px;
 }
 
 .wp-sidebar .dome-xForm-section {

@@ -644,7 +644,18 @@ function RTE(): JSX.Element {
     >
       <Vbox>
         {options.map(mkOption)}
-        <Label key='sf' label='Special float: '>
+        <Hbox>
+          <Checkbox
+            key='sf'
+            label='Special float: '
+            style={{color: 'var(--text-discrete)'}}
+            title={
+              sf !== 'none'
+                ? 'Remove special floats to disable these guards'
+                : 'Add special floats to enable these guards'
+            }
+            value={sf !== 'none'}
+          />
           <SelectMenu
             value={sf}
             onChange={(newV) => { if (newV) setSF(newV); }}
@@ -652,8 +663,18 @@ function RTE(): JSX.Element {
           >
             {specialFloats.map(mkSF)}
           </SelectMenu>
-        </Label>
-        <Label key='init' label='Initialization: '></Label>
+        </Hbox>
+        <Checkbox
+          key='init'
+          label='Initialization:'
+          style={{color: 'var(--text-discrete)'}}
+          title={
+            elems.length !== 0 || !only
+              ? 'Clear selection to disable these guards'
+              : 'Add functions to the selection to enable these guards'
+          }
+          value={elems.length !== 0 || !only}
+        />
         <Hbox>
           <Button
             label='Only'
