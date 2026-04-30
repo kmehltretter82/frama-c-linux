@@ -66,7 +66,7 @@ void context_allocated(int *a_allocated)
 /*@ \region::region a_allocread[0..0], \allocated, \readonly; */
 void context_allocread(int *a_allocread)
 {
-  /*@ check region: spec_null: a_allocread ≢ \null ⇒ \valid(a_allocread); */
+  /*@ check region: spec_null: a_allocread ≡ \null; */
   spec_null(a_allocread);
   return;
 }
@@ -74,6 +74,7 @@ void context_allocread(int *a_allocread)
 /*@ \region::region a_nullread[0..0], \nullable, \readonly; */
 void context_nullread(int *a_nullread)
 {
+  /*@ check region: spec_null: a_nullread ≡ \null; */
   spec_null(a_nullread);
   return;
 }
@@ -107,10 +108,7 @@ void context_nullgarb(int *a_nullgarb)
  */
 void context_dummy(int *a_dummy)
 {
-  /*@ check
-        region: spec_null:
-          a_dummy ≢ \null ⇒ \valid(a_dummy) ∧ \initialized(a_dummy);
-  */
+  /*@ check region: spec_null: a_dummy ≡ \null; */
   spec_null(a_dummy);
   return;
 }

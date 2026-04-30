@@ -92,8 +92,9 @@ let nullable ~flags p =
 
 let valid ~flags acs p =
   match acs with
-  | Initialized when not @@ Attr.mem `Garbage flags -> g_true
+  | Write when Attr.mem `Readonly flags -> g_false
   | Read | Write when not @@ Attr.mem `Allocated flags -> nullable ~flags p
+  | Initialized when not @@ Attr.mem `Garbage flags -> g_true
   | _ -> g_valid acs p
 
 let requires ~spec node p =
