@@ -5714,7 +5714,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
         !pp_typ_ref oldt !pp_typ_ref newt
   in default_rec
 
-let rec castReduce fromsource force =
+let rec castReduce ?(check=true) fromsource force =
   let dkey = Kernel.dkey_typing_cast in
   let origin = if fromsource then "explicit cast:" else " implicit cast:" in
   let error msg = Errorloc.abort_context ("%s " ^^ msg) origin in
@@ -5725,7 +5725,7 @@ let rec castReduce fromsource force =
     in
     let res e = new_exp ~loc (CastE (Ast_types.remove_qualifiers newt, e)) in
     let check_res nullptr_cast e =
-      checkCast ~nullptr_cast ~fromsource (typeOf e) newt;
+      if check then checkCast ~nullptr_cast ~fromsource (typeOf e) newt;
       res e
     in
     let oldt' = Ast_types.unroll oldt in
@@ -5813,7 +5813,7 @@ and mkCastTGen ?(check=true) ?context ?(fromsource=false) ?(force=false)
     let newt = if fromsource then newt else !typeForInsertedCast e oldt newt in
     let nullptr_cast = is_nullptr e in
     if check then checkCast ?context ~nullptr_cast ~fromsource oldt newt;
-    (newt, castReduce fromsource force oldt newt e)
+    (newt, castReduce ~check fromsource force oldt newt e)
 
 and mkCastT ?(check=true) ?(force=false) ~(oldt: typ) ~(newt: typ) e =
   snd (mkCastTGen ~check ~context:Identical ~force ~oldt ~newt e)

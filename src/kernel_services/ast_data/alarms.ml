@@ -643,7 +643,7 @@ let create_predicate ?(loc=Fileloc.unknown) alarm =
         | TPtr { tnode = TFun (ret, None, var); tattr }, Some args ->
           let ltyps = List.map (fun arg -> "", Cil.typeOf arg, []) args in
           let typ = Cil_const.mk_tfun ~tattr ret (Some ltyps) var in
-          Cil.mkCast ~newt:(Cil_const.mk_tptr typ) e
+          Cil.mkCast ~check:false ~newt:(Cil_const.mk_tptr typ) e
         | _, _ ->
           Kernel.fatal
             "Trying to emit a Function_pointer alarm over expression %a \
