@@ -317,14 +317,13 @@ let pred_with_args ?loc p args =
   | _ ->
     Options.fatal "unsupported predicate: %a" Printer.pp_predicate p
 
-(* [extract_quantifiers ~loc args] iterates over each argument in [args] and if
-   that argument contains a non-explicit range, tries to extract a universal
-   quantifier representing the range and returns an updated argument for this
-   quantifier.
+(* [extract_quantifiers_from_arg ~loc arg] tests if [arg] contains a non-explicit range,
+   tries to extract a universal quantifier representing the range and returns
+   an updated argument for this quantifier.
 
-   The cases in the function comments correspond to the cases described in
+   The cases in the function's comments correspond to the cases described in
    [call_with_tset]. *)
-let extract_quantifiers ~loc args =
+let extract_quantifiers_from_arg ~loc arg =
   let rec is_last_only_trange o =
     match o with
     | TIndex ({ term_node = Trange _ }, TNoOffset) -> true
@@ -332,47 +331,44 @@ let extract_quantifiers ~loc args =
     | TNoOffset -> false
     | TField (_, o) | TIndex (_, o) | TModel (_, o) -> is_last_only_trange o
   in
-  let args = List.rev args in
-  List.fold_left
-    (fun (args, quantifiers) arg ->
-       let arg, quantifiers =
-         match arg.term_node with
-         | TAddrOf(TVar _, toffset) when is_last_only_trange toffset ->
-           (* Case A: explicit range *)
-           arg, quantifiers
-         | TAddrOf(TVar ({ lv_type = Ctype { tnode = TArray _ } } as lv), toffset) ->
-           if has_set_as_index toffset then
-             (* Case B: non-explicit range, try to extract quantifiers with
-                range elimination. *)
-             try
-               let toffset', quantifiers' =
-                 eliminate_ranges_from_index_of_toffset ~loc toffset
-               in
-               let lty_noset =
-                 Logic_utils.type_of_pointed @@
-                 if Logic_const.is_set_type arg.term_type then
-                   Logic_const.type_of_element arg.term_type
-                 else
-                   arg.term_type
-               in
-               let arg' =
-                 Logic_utils.mk_logic_AddrOf ~loc (TVar lv, toffset') lty_noset
-               in
-               arg', quantifiers' @ quantifiers
-             with Range_elimination_exception ->
-               (* Case C: range elimination failed *)
-               arg, quantifiers
-           else
-             (* Case C: no range in the offsets *)
-             arg, quantifiers
-         | _ ->
-           (* Case A or C: either explicit range or no range. *)
-           arg, quantifiers
-       in
-       (arg :: args, quantifiers)
-    )
-    ([], [])
-    args
+  match arg.term_node with
+  | TAddrOf(TVar _, toffset) when is_last_only_trange toffset ->
+    (* Case A: explicit range *)
+    arg, []
+  | TAddrOf(TVar ({ lv_type = Ctype { tnode = TArray _ } } as lv), toffset) ->
+    if has_set_as_index toffset then
+      (* Case B: non-explicit range, try to extract quantifiers with
+         range elimination. *)
+      try
+        let toffset', quantifiers =
+          eliminate_ranges_from_index_of_toffset ~loc toffset
+        in
+        let lty_noset =
+          Logic_utils.type_of_pointed @@
+          if Logic_const.is_set_type arg.term_type then
+            Logic_const.type_of_element arg.term_type
+          else
+            arg.term_type
+        in
+        let arg' =
+          Logic_utils.mk_logic_AddrOf ~loc (TVar lv, toffset') lty_noset
+        in
+        arg', quantifiers
+      with Range_elimination_exception ->
+        (* Case C: range elimination failed *)
+        arg, []
+    else
+      (* Case C: no range in the offsets *)
+      arg, []
+  | _ ->
+    (* Case A or C: either explicit range or no range. *)
+    arg, []
+
+let extract_quantifiers_from_args ~loc args =
+  let args, quantifiers =
+    List.split @@ List.map (extract_quantifiers_from_arg ~loc) args
+  in
+  args, List.concat quantifiers
 
 (* [call_with_tset
       ~loc
@@ -440,7 +436,7 @@ let call_with_tset
     args
     p
   =
-  let args, quantifiers = extract_quantifiers ~loc args in
+  let args, quantifiers = extract_quantifiers_from_args ~loc args in
   let name = name_of_predicate p in
   match quantifiers with
   | _ :: _ ->
