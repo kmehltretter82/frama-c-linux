@@ -20,7 +20,6 @@ import * as API from './api';
 import Cytoscape from 'cytoscape';
 import CytoscapeComponent from 'react-cytoscapejs';
 import './cytoscape_libs';
-import 'cytoscape-panzoom/cytoscape.js-panzoom.css';
 
 import tippy, * as Tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
@@ -50,7 +49,6 @@ interface Cxtcommand {
 
 interface CytoscapeExtended extends Cytoscape.Core {
   cxtmenu(options: unknown): void;
-  panzoom(options: unknown): void;
 }
 
 type Identified = { id: string }
@@ -131,17 +129,6 @@ class Dive {
     this.cy.on('click', 'edge', (event) => this.clickEdge(event.target));
     this.cy.on('double-click', '$node > node', // compound nodes
       (event) => this.doubleClickNode(event.target));
-
-    // Set zoom limits
-    const panzoomDefaults = {
-      minZoom: this.cy.minZoom(),
-      maxZoom: this.cy.maxZoom(),
-      zoomInIcon: 'dive-plus',
-      zoomOutIcon: 'dive-minus',
-      sliderHandleIcon: 'dive-slider',
-      resetIcon: 'dive-reset'
-    };
-    (this.cy as CytoscapeExtended).panzoom(panzoomDefaults);
 
     // Default layout
     this.layout = 'dagre';
