@@ -100,26 +100,26 @@ let eliminate_ranges_from_index_of_term ~loc t =
    Raise [Range_elimination_exception], through [eliminate_ranges_from_
    index_of_term], whether either the operation is unsound or we don't support
    the construction yet. *)
-let rec eliminate_ranges_from_index_of_toffset ~loc toffset quantifiers =
+let rec eliminate_ranges_from_index_of_toffset ~loc toffset =
   match toffset with
   | TIndex(t, toffset') ->
     if Misc.is_range_free t then
-      let toffset', quantifiers' =
-        eliminate_ranges_from_index_of_toffset ~loc toffset' quantifiers
+      let toffset', quantifiers =
+        eliminate_ranges_from_index_of_toffset ~loc toffset'
       in
-      TIndex(t, toffset'), quantifiers'
+      TIndex(t, toffset'), quantifiers
     else
       (* Attempt Range Elimination on [t] *)
       let t1, quantifiers1 =
         eliminate_ranges_from_index_of_term ~loc t
       in
       let toffset2, quantifiers2 =
-        eliminate_ranges_from_index_of_toffset ~loc toffset' quantifiers
+        eliminate_ranges_from_index_of_toffset ~loc toffset'
       in
       let toffset3 = TIndex(t1, toffset2) in
       toffset3, quantifiers1 :: quantifiers2
   | TNoOffset ->
-    toffset, quantifiers
+    toffset, []
   | TModel _ ->
     Error.not_yet "range elimination on TModel"
   | TField _ ->
@@ -346,7 +346,7 @@ let extract_quantifiers ~loc args =
                 range elimination. *)
              try
                let toffset', quantifiers' =
-                 eliminate_ranges_from_index_of_toffset ~loc toffset quantifiers
+                 eliminate_ranges_from_index_of_toffset ~loc toffset
                in
                let lty_noset =
                  Logic_utils.type_of_pointed @@
@@ -358,7 +358,7 @@ let extract_quantifiers ~loc args =
                let arg' =
                  Logic_utils.mk_logic_AddrOf ~loc (TVar lv, toffset') lty_noset
                in
-               arg', quantifiers'
+               arg', quantifiers' @ quantifiers
              with Range_elimination_exception ->
                (* Case C: range elimination failed *)
                arg, quantifiers
