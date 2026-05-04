@@ -5741,7 +5741,7 @@ let rec castReduce ?(check=true) fromsource force =
     | _, TInt newik, Const (CInt64 (i, _, None)) ->
       (* ISO 6.3.1.3.2 *) kinteger64 ~loc ~kind:newik i
 
-    | _, TPtr _, CastE (_, e') when can_hold_ptr () ->
+    | _, TPtr _, CastE (_, e') when is_nullptr e || can_hold_ptr () ->
       begin
         match Ast_types.unroll (typeOf e'), e'.enode with
         | { tnode = TPtr _ } as typ'', _ ->
