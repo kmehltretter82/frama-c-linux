@@ -51,6 +51,11 @@ module Prototype = struct
       Format.fprintf fmt "between %a and %a"
         pp_pos pos_start pp_pos pos_end
 
+  let pretty_long_range fmt loc =
+    pretty_line_range fmt loc;
+    List.pretty ~format:"%t" ~item:",@ included from %a" ~sep:"" ~empty:""
+      Filepos.pretty fmt (Filepos.inclusions (fst loc))
+
 end
 
 

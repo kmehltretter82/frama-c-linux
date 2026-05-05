@@ -144,3 +144,7 @@ val input_offset : t -> int
     then {!original} will likely not be the identity {!path} and {!line} will
     likely to return different results than {!input_path} and {!input_line}. *)
 val is_preprocessed : t -> bool
+
+(** Returns the list of inclusion positions when the position is in preprocessed
+    code; returns nothing if the position is not in an included file. *)
+val inclusions : t -> t list

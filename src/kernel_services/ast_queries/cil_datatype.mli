@@ -88,8 +88,8 @@ module Location: sig
   val pretty_line: t Pretty_utils.formatter
 
   (** Pretty prints the location under the form  [line <l>, between columns <c1>
-      and <c2>]. *)
-  val pretty_line_range: t Pretty_utils.formatter
+      and <c2>] and with the list of inclusion. *)
+  val pretty_long_range: t Pretty_utils.formatter
 
   (** Pretty-prints the ocaml internal representation of a location, for debug
       purposes.

@@ -63,17 +63,20 @@ let finishParsing () =
   | None -> Kernel.fatal "Parsing called while lexbuf is empty"
   | Some _ -> current := None
 
-let update_origins current =
+let find_origin current line =
+  Datatype.Int.Hashtbl.find_opt current.origins line
+
+let set_current_origin current origin =
   let line = current.lexbuf.lex_curr_p.pos_lnum in
-  let add_origin = Datatype.Int.Hashtbl.replace current.origins line in
-  Option.iter add_origin current.current_origin
+  current.current_origin <- Some origin;
+  Datatype.Int.Hashtbl.replace current.origins line origin
 
 (* Call this function to announce a new line *)
 let newline () =
   let current = Option.get !current in
   Lexing.new_line current.lexbuf;
-  current.current_origin <- Option.map Filepos.incr_line current.current_origin;
-  update_origins current
+  let new_origin = Option.map Filepos.incr_line current.current_origin in
+  Option.iter (set_current_origin current) new_origin
 
 let setCurrentWorkingDirectory fp =
   let current = Option.get !current in
@@ -102,12 +105,15 @@ let setCurrentLine ?(filename: string option) (line: int) =
         "ignoring non-existing file '%a', referenced in a line directive"
         Filepath.pretty path
     else
-      let new_origin = match current.current_origin with
+      let new_origin =
+        (* The line directive have been processed, we already are on the next
+           line. Subtract 1 to have the actual inclusion line. *)
+        let inclusion_line = current.lexbuf.lex_curr_p.pos_lnum - 1 in
+        match find_origin current inclusion_line with
         | Some origin -> Filepos.update_line ~path ~line origin
         | None -> Filepos.make ~path ~line ()
       in
-      current.current_origin <- Some new_origin;
-      update_origins current
+      set_current_origin current new_origin
   | None ->
     match current.current_origin with
     | None ->
@@ -118,18 +124,16 @@ let setCurrentLine ?(filename: string option) (line: int) =
         { current.lexbuf.lex_curr_p with
           pos_lnum = line;
           pos_bol = current.lexbuf.lex_curr_p.pos_cnum;
-        };
+        }
     | Some origin ->
       let new_origin = Filepos.update_line ~line origin in
-      current.current_origin <- Some new_origin;
-      update_origins current
+      set_current_origin current new_origin
 
 let convert_pos pos =
   let open Option.Operators in
   let origin =
     let* current = !current in
-    let line = pos.Lexing.pos_lnum in
-    let+ origin = Datatype.Int.Hashtbl.find_opt current.origins line in
+    let+ origin = find_origin current (pos.Lexing.pos_lnum) in
     Filepos.Preprocessed origin
   in
   Filepos.of_lexing_pos ?origin pos
@@ -332,7 +336,7 @@ let pp_context_from_file ?(ctx=2) fmt loc =
   | Sys_error msg ->
     Kernel.warning "%s" msg
 
-let pp_location = Fileloc.pretty_line_range
+let pp_location = Fileloc.pretty_long_range
 
 let parse_error ?loc msg =
   let current = Option.get !current in
@@ -372,13 +376,13 @@ let parse_error ?loc msg =
     let blacklist = ["*/"] in
     if List.mem token blacklist then ()
     else
-      Format.fprintf fmt ", before or at token: %s" token
+      Format.fprintf fmt ",@ before or at token: %s" token
   in
   Format.kasprintf (fun str ->
       Kernel.feedback ~source:(fst loc) "%s:@." str
         ~append:(fun fmt ->
-            Format.fprintf fmt "Location: %a%a\n"
-              Fileloc.pretty_line_range loc
+            Format.fprintf fmt "Location: @[<hv>%a%a@]\n"
+              Fileloc.pretty_long_range loc
               pretty_token (Lexing.lexeme current.lexbuf);
             Format.fprintf fmt "%a@."
               (pp_context_from_file ~ctx:2) loc);

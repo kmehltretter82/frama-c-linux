@@ -180,3 +180,11 @@ let is_preprocessed pos =
   match pos.origin with
   | Preprocessed _ -> true
   | Original | Included _| Unknown | Generated _ -> false
+
+let [@tail_mod_cons] rec inclusions pos =
+  match pos.origin with
+  | Preprocessed origin ->
+    inclusions origin
+  | Included inclusion_pos ->
+    inclusion_pos :: inclusions inclusion_pos
+  | _ -> []
