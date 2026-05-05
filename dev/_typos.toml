@@ -57,6 +57,7 @@ datas = "datas" # has too many occurrences to be fixed
 divde = "divde" # from __builtin_divde, for doubleword extended division
 elemt = "elemt" # variable name
 eles = "eles" # variable name (elements)
+esource = "esource" # variable name
 finitel = "finitel" # C function (finite long double)
 fle = "fle" # floating less than or equal
 flor = "flor" # in Cint, related to f_lor
@@ -118,6 +119,7 @@ uiu = "uiu" # variable name
 undet = "undet" # variable name for a non-deterministic value
 unio = "unio" # variable name for a union
 varity = "varity" # related to variadic arguments
+writeable = "writeable" # alternative spelling
 zerod = "zerod" # variable name (zero with type double)
 
 [files]

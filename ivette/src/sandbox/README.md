@@ -7,7 +7,7 @@ The playground view « Sandbox » is also only visible in DEV mode and can be us
 play with sandboxed components _or_ any other component of the platform.
 
 All files with `*.tsx` extension inside this directory will be automatically loaded
-and shall register sandboxe(s) by using typically:
+and shall register sandbox(es) by using typically:
 
     Ivette.registerSandbox({
         id: 'sandbox.<ident>',
