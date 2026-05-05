@@ -12,8 +12,8 @@ TAGS
 #artifacts from execution
 /.frama-c/
 /.merlin
-/bin/ivette
-.ivette
+/bin/frama-c-gui
+.frama-c-gui.local
 
 #build
 /_opam/

@@ -393,7 +393,7 @@ let cmdline () =
           | Unix.Unix_error (Unix.EADDRINUSE, "bind", _) ->
             (* Note: this does not happen when SO_REUSEPORT is used *)
             Senv.abort "bind failed: EADDRINUSE. Terminate all previous \
-                        Frama-C server processes and restart Ivette."
+                        Frama-C server processes and restart the GUI."
           | _ ->
             Senv.fatal "Server Internet socket failed.@\nError: %s"
               (Printexc.to_string exn)

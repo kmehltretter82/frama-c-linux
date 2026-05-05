@@ -6,7 +6,7 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import { defineConfig, externalizeDepsPlugin } from "electron-vite";
+import { defineConfig } from "electron-vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import commonjsExternals from 'vite-plugin-commonjs-externals';
@@ -27,7 +27,9 @@ function domeDevtools(): string {
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()],
+    build: {
+      externalizeDeps: true
+    },
     resolve: {
       extensions: [".ts", ".tsx", ".js", "jsx", ".json"],
       alias: {
@@ -39,7 +41,9 @@ export default defineConfig({
     },
   },
   preload: {
-    plugins: [externalizeDepsPlugin()],
+    build: {
+      externalizeDeps: true
+    },
   },
   renderer: {
     resolve: {

@@ -41,7 +41,7 @@ FULLPREFIX := $(if ${TMP_DESTDIR},$(patsubst %/,%,${TMP_DESTDIR})/${TMP_PREFIX},
 install:: ivette-api
 	@echo "Installing Ivette to ${FULLPREFIX}"
 	@mkdir -p "${FULLPREFIX}/bin"
-	@install ivette/ivette-bootstrap.sh "${FULLPREFIX}/bin/ivette"
+	@install ivette/ivette-bootstrap.sh "${FULLPREFIX}/bin/frama-c-gui"
 	@mkdir -p "${FULLPREFIX}/lib/frama-c"
 ifeq ($(OS),Windows_NT)
 	@tar zcf "$$(cygpath ${FULLPREFIX}/lib/frama-c/ivette.tgz)" ${FILTER} ivette
@@ -51,6 +51,7 @@ endif
 
 uninstall::
 	@echo "Removing Ivette"
+	@rm -f  "${FULLPREFIX}/bin/frama-c-gui"
 	@rm -f  "${FULLPREFIX}/bin/ivette"
 	@rm -f  "${FULLPREFIX}/lib/frama-c/ivette.tgz"
 	@rm -fr "${FULLPREFIX}/lib/frama-c/Ivette.app"

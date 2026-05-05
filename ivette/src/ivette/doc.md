@@ -1,19 +1,19 @@
-# Ivette {#ivette}
+# Frama-C GUI {#ivette}
 
 Welcome to the documentation of the Frama-C user interface. This chapter
-introduces basic concepts for using **Ivette**. Each plug-in may provide its own
+introduces basic concepts for using the GUI. Each plug-in may provide its own
 dedicated documentation chapter, consult them for more information.
 
-## Launching Ivette {#ivette-launch}
+## Launching the GUI {#ivette-launch}
 
-You may use `ivette` instead of `frama-c` from the command-line,
-with the same options. This will launch Ivette _and_ start a Frama-C session
+You may use `frama-c-gui` instead of `frama-c` from the command-line,
+with the same options. This will launch the GUI _and_ start a Frama-C session
 with the provided options. You can then further modify your command-line options
 by opening the [Console](#ivette-console) view.
 
 ## General Organization {#ivette-general}
 
-The **Ivette** user interface is decomposed into the following main areas:
+The graphical user interface is decomposed into the following main areas:
 
  - The left sidebar, which can be used to navigate between the different views
    and plug-ins of the platform.
@@ -27,7 +27,7 @@ The **Ivette** user interface is decomposed into the following main areas:
  - The "Laboratory" (central area), where the different views and Frama-C
    components are displayed.
 
-Each registered Frama-C plug-in might extend Ivette with additional views,
+Each registered Frama-C plug-in might extend the GUI with additional views,
 laboratory components, sidebar panels, status bar items and menus. Consult
 the associated documentation chapters for more details.
 
@@ -36,24 +36,24 @@ the associated documentation chapters for more details.
 There are actually _several_ sidebars and you can use the large icons on the
 left-most side of the screen to switch from one sidebar to another. The
 [icon-sidebar] button in the top toolbar allows you to hide/show the
-sidebars. Among them, two sidebars are especially dedicated to Ivette:
+sidebars. Among them, two sidebars are especially dedicated to the GUI:
 
 - The [icon-display] sidebar provides access to _all_ registered components and
-  views that you can use in Ivette.
+  views that you can use in the GUI.
 
 - The [icon-search] sidebar provides navigation to the _source declarations_ of
   your project currently analyzed by Frama-C.
 
 ## The Laboratory {#ivette-laboratory}
 
-The Ivette principal area consists of one to four panels that you can arrange as
+The principal area consists of one to four panels that you can arrange as
 you want. Each panel can be resized and configured to display available
 _Components_ from the Frama-C kernel and the registered plug-ins.
 
 The [icon-display] sidebar provides access to all registered _Components_
 and also provides access to some predefined combinations of components, as
 _Views_. When you select a _View_, the Laboratory layout is updated to display
-the relevant predefined components. The main Ivette toolbar provides quick
+the relevant predefined components. The main toolbar provides quick
 access to the _Views_ you already visited. You can also duplicate views and
 configure them independently.
 
@@ -76,7 +76,7 @@ synchronously.
 
 ## The Toolbar {#ivette-toolbar}
 
-The top-most toolbar of Ivette provides you quick access to Tab Views.
+The top-most toolbar provides you quick access to Tab Views.
 Right-clicking on tabs allows you to restore initial view layout or close tabs.
 When restoring a _View_ to its initial layout, the extra components you may have
 added to the laboratory are docked into the status bar for quick access.

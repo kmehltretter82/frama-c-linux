@@ -1,6 +1,6 @@
 {
-  "name": "ivette",
-  "productName": "Ivette",
+  "name": "frama-c-gui",
+  "productName": "Frama-C GUI",
   "version": "32.0.0",
   "repository": {
     "type": "git",
@@ -108,11 +108,12 @@
     "@types/react": "^18"
   },
   "build": {
-    "appId": "com.framac.ivette",
+    "appId": "com.framac.gui",
     "compression": "store",
     "copyright": "Copyright © CEA (Commissariat à l'énergie atomique et aux énergies alternatives)",
     "artifactName": "${productName}-${arch}.${ext}",
     "win": {
+      "executableName": "frama-c-gui",
       "target": [
         {
           "target": "portable",
@@ -126,7 +127,7 @@
       "legalTrademarks": "LGPL-2.1"
     },
     "linux": {
-      "executableName": "ivette",
+      "executableName": "frama-c-gui",
       "target": [
         {
           "target": "AppImage",
@@ -137,11 +138,11 @@
         }
       ],
       "publish": [],
+      "icon": "static/icon.png",
       "synopsis": "Frama-C GUI",
       "category": "Profiling"
     },
     "mac": {
-      "icon": "static/icon.png",
       "identity": null,
       "mergeASARs": true,
       "target": [
@@ -153,11 +154,12 @@
         }
       ],
       "publish": [],
+      "icon": "static/icon.png",
       "type": "distribution",
       "category": "public.app-category.developer-tools"
     },
     "dmg": {
-      "title": "Ivette ${version}",
+      "title": "Frama-C GUI ${version}",
       "publish": []
     }
   }

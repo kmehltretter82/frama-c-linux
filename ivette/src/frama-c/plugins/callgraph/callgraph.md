@@ -105,4 +105,4 @@ and closing it (it can be reopen via the far-right button in the toolbar).
 * On nodes:
   * Left-Click: select node in the graph
   * Ctrl+click: add node to the selected graph nodes (multi-selection)
-  * Alt+click: select the function in all Ivette components
+  * Alt+click: select the function in all GUI components

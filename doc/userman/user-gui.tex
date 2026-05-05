@@ -1,18 +1,18 @@
 \chapter{Graphical User Interface}
 \label{user-gui}
 
-Running \textttuse{ivette} displays the
-\FramaC Graphical User Interface (GUI), Ivette ({\em Integrated Verification
+Running \textttuse{frama-c-gui} displays the
+\FramaC Graphical User Interface (GUI): Ivette ({\em Integrated Verification
   Environment Toolkit for Trusted Execution}).
 
 Ivette is based on the Electron\footnote{\url{https://www.electronjs.org/}}
 framework and is thus not always directly distributed with \FramaC,
 especially if you installed it using your distribution's package manager.
 
-For an Opam-based installation of \FramaC, running \textttuse{ivette} for the
-first time will trigger a script that downloads, compiles, installs and runs
+For an Opam-based installation of \FramaC, running \textttuse{frama-c-gui} for
+the first time will trigger a script that downloads, compiles, installs and runs
 Ivette. This script requires some tools such as Node.js and Yarn.
-Subsequent executions of \textttuse{ivette} will directly run the installed
+Subsequent executions of \textttuse{frama-c-gui} will directly run the installed
 executable.
 
 Note that Ivette is also distributed as a standalone executable in the \FramaC
@@ -32,9 +32,9 @@ button. Clicking on them opens a dialog with the relevant documentation.
 
 \section{Command-line options}
 
-\textttuse{ivette} accepts almost all command-line options that
+\textttuse{frama-c-gui} accepts almost all command-line options that
 \texttt{frama-c} does, so you can usually replace \texttt{frama-c <options>}
-with \texttt{ivette <options>} to run an analysis and see its results.
+with \texttt{frama-c-gui <options>} to run an analysis and see its results.
 
 There are currently a few options that are intercepted by the
 Electron process itself instead of passed on to the underlying \texttt{frama-c}

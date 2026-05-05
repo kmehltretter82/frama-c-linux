@@ -35,6 +35,7 @@ import {
   dialog,
   ipcMain,
   nativeTheme,
+  nativeImage,
   shell,
 } from 'electron';
 import installExtension from 'electron-devtools-installer';
@@ -357,7 +358,7 @@ function navigateURL(sender: Electron.WebContents) {
 function lookupConfig(pwd = '.'): string {
   const wdir = path.resolve(pwd);
   let cwd = wdir;
-  const cfg = `.${appName.toLowerCase()}`;
+  const cfg = `.${appName.toLowerCase().replace(' ', '-')}.local`;
   for (; ;) {
     const here = path.join(cwd, cfg);
     if (fstat(here)) return here;
@@ -387,12 +388,15 @@ function createBrowserWindow(
     : SYS.WINDOW_PREFERENCES_ARGV;
   console.log('[Dome] Browser Arguments', browserArguments);
 
+  const iconPath = path.join(__dirname, '../../static/icon.png');
+  const appIcon = nativeImage.createFromPath(iconPath);
+
   const options: BrowserWindowConstructorOptions = {
     width: 900,
     height: 670,
     show: false,
     backgroundColor: '#f0f0f0',
-    icon: path.join(__dirname, '../../static/icon.png'),
+    icon: appIcon,
     webPreferences: {
       contextIsolation: false,
       nodeIntegration: true,

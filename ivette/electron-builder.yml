@@ -1,7 +1,7 @@
 appId: com.frama-c
-productName: ivette
+productName: Frama-C GUI
 directories:
-  buildResources: build
+  buildResources: static
 files:
   - '!**/.vscode/*'
   - '!src/*'
@@ -14,22 +14,24 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: ivette
+  executableName: frama-c-gui
   target:
     - portable
+  icon: 'static/icon.png'
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
 mac:
-  entitlementsInherit: build/entitlements.mac.plist
+  entitlementsInherit: static/entitlements.mac.plist
   extendInfo:
     - NSCameraUsageDescription: Application requests access to the device's camera.
     - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
+  icon: 'static/icon.png'
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
@@ -38,6 +40,7 @@ linux:
     # - AppImage
     # - snap
     # - deb
+  icon: 'static/icon.png'
   maintainer: electronjs.org
   category: Utility
 appImage:

@@ -41,7 +41,7 @@ Currently, ACSL contracts are not taken into account except for region
 annotations. Function calls are totally incomplete, and aliases that would be
 produces by function calls are not _yet_ taken into account. Use `//@alias` code-annotations as a temporary work around.
 
-## Ivette Support
+## GUI Support
 
 The Region Analysis component can be used to compute and visualize regions.
 Tooltips print access types to each regions.
