@@ -298,7 +298,7 @@ let add_downward_call wl (caller_kf, pdg) (called_kf, called_pdg) stmt =
     let deps = Pdg_aux.all_call_input_nodes ~caller:pdg ~callee stmt in
     wl.downward_calls <-
       KfKfCall.Map.add (caller_kf, called_kf, stmt) deps wl.downward_calls;
-    Options.debug ~level:3 "downard part done"
+    Options.debug ~level:3 "downward part done"
   else
     Options.debug ~level:3 "empty downward part"
 ;;
