@@ -49,3 +49,8 @@
 .diveTree .marker {
     cursor: pointer;
 }
+
+.dive-svg {
+  height: auto !important;
+  max-height: 64px;
+}

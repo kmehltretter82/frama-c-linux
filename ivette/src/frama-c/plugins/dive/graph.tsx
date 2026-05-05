@@ -20,7 +20,6 @@ import * as API from './api';
 import Cytoscape from 'cytoscape';
 import CytoscapeComponent from 'react-cytoscapejs';
 import './cytoscape_libs';
-import 'cytoscape-panzoom/cytoscape.js-panzoom.css';
 
 import tippy, * as Tippy from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
@@ -31,13 +30,14 @@ import './tippy.css';
 import { IconButton } from 'dome/controls/buttons';
 import { Inset } from 'dome/frame/toolbars';
 
-import '@fortawesome/fontawesome-free/js/all';
-
 import { EvaReady, EvaStatus }
   from 'frama-c/plugins/eva/components/AnalysisStatus';
 import style from './style.json';
 import layouts from './layouts.json';
 import './dive.css';
+import { Label } from 'dome/controls/labels';
+import { Vbox } from 'dome/layout/boxes';
+import { SVG } from 'dome/controls/icons';
 
 const Debug = new Dome.Debug('dive');
 
@@ -49,7 +49,6 @@ interface Cxtcommand {
 
 interface CytoscapeExtended extends Cytoscape.Core {
   cxtmenu(options: unknown): void;
-  panzoom(options: unknown): void;
 }
 
 type Identified = { id: string }
@@ -131,13 +130,6 @@ class Dive {
     this.cy.on('double-click', '$node > node', // compound nodes
       (event) => this.doubleClickNode(event.target));
 
-    // Set zoom limits
-    const panzoomDefaults = {
-      minZoom: this.cy.minZoom(),
-      maxZoom: this.cy.maxZoom(),
-    };
-    (this.cy as CytoscapeExtended).panzoom(panzoomDefaults);
-
     // Default layout
     this.layout = 'dagre';
 
@@ -179,20 +171,33 @@ class Dive {
     const data = node.data();
     const commands = [] as Cxtcommand[];
     buildCxtMenu(commands,
-      <><div className="fas fa-binoculars fa-2x" />Explore</>,
+      <Vbox>
+        <SVG id='BINOCULARS' fill='#f8f8ff' className='dive-svg'/>
+        <Label label='Explore' />
+      </Vbox>,
       () => { this.explore(node); });
     if (data.nkind === 'composite')
       buildCxtMenu(commands,
-        <><div className="fa fa-expand-arrows-alt fa-2x" />Unfold</>);
+        <Vbox>
+          <SVG id='ARROWS.CROSSED' fill='#f8f8ff' className='dive-svg'/>
+          <Label label='Unfold' />
+        </Vbox>
+      );
     else
       buildCxtMenu(commands);
     if (data.backward_explored === 'no')
       buildCxtMenu(commands,
-        <div><div className="fa fa-eye fa-2x" />Show</div>,
+        <Vbox>
+          <SVG id='SHOW.ON' fill='#f8f8ff' className='dive-svg'/>
+          <Label label='Show' />
+        </Vbox>,
         () => this.show(node));
     else
       buildCxtMenu(commands,
-        <><div className="fa fa-eye-slash fa-2x" />Hide</>,
+        <Vbox>
+          <SVG id='SHOW.OFF' fill='#f8f8ff' className='dive-svg'/>
+          <Label label='Hide' />
+        </Vbox>,
         () => this.hide(node));
     return commands;
   }

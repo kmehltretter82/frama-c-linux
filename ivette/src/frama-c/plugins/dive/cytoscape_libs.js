@@ -14,7 +14,6 @@ import Cytoscape from 'cytoscape';
 
 import CxtMenu from 'cytoscape-cxtmenu';
 import Popper from 'cytoscape-popper';
-import Panzoom from 'cytoscape-panzoom';
 
 // Layouts
 import Dagre from 'cytoscape-dagre';
@@ -24,7 +23,6 @@ import Klay from 'cytoscape-klay';
 
 Cytoscape.use(Popper);
 Cytoscape.use(CxtMenu);
-Panzoom(Cytoscape); // register extension
 
 Cytoscape.use(Dagre);
 Cytoscape.use(Cola);
