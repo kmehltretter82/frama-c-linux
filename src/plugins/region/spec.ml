@@ -73,9 +73,9 @@ let pp_regions fmt = function
 
 type env = {
   context: Logic_typing.typing_context ;
-  mutable esource: Filepos.t ;
-  mutable enamed: string ;
-  mutable eflags: Attr.flags ;
+  mutable source: Filepos.t ;
+  mutable named: string ;
+  mutable flags: Attr.flags ;
   mutable rpaths: path list ;
   mutable regions: region list ;
 }
@@ -156,32 +156,32 @@ let applies flags = function
   | Alias _ | Field _ -> false
 
 let flush source env =
-  if env.eflags <> Attr.empty &&
-     not @@ List.exists (applies env.eflags) env.rpaths
+  if env.flags <> Attr.empty &&
+     not @@ List.exists (applies env.flags) env.rpaths
   then
-    Options.warning ~source:env.esource "%a has no object to apply on"
-      Attr.pretty env.eflags ;
+    Options.warning ~source:env.source "%a has no object to apply on"
+      Attr.pretty env.flags ;
   if env.rpaths <> [] then
     begin
       env.regions <- {
-        named = env.enamed ;
-        flags = env.eflags ;
+        named = env.named ;
+        flags = env.flags ;
         paths = List.rev env.rpaths ;
       } :: env.regions ;
-      env.esource <- source ;
+      env.source <- source ;
       env.rpaths <- [] ;
-      env.eflags <- Attr.empty ;
+      env.flags <- Attr.empty ;
     end
 
 let rec parse_region (env:env) p =
   match p.lexpr_node with
-  | PLvar "\\nullable"  -> env.eflags <- Attr.add `Nullable  env.eflags
-  | PLvar "\\allocated" -> env.eflags <- Attr.add `Allocated env.eflags
-  | PLvar "\\garbage"   -> env.eflags <- Attr.add `Garbage   env.eflags
-  | PLvar "\\readonly"  -> env.eflags <- Attr.add `Readonly  env.eflags
+  | PLvar "\\nullable"  -> env.flags <- Attr.add `Nullable  env.flags
+  | PLvar "\\allocated" -> env.flags <- Attr.add `Allocated env.flags
+  | PLvar "\\garbage"   -> env.flags <- Attr.add `Garbage   env.flags
+  | PLvar "\\readonly"  -> env.flags <- Attr.add `Readonly  env.flags
   | PLnamed( name , p ) ->
     flush (fst p.lexpr_loc) env ;
-    env.enamed <- name ;
+    env.named <- name ;
     parse_region env p
   | PLrange(Some a,Some b) ->
     let l1,f = parse_field env a in
@@ -225,9 +225,9 @@ let of_behavior bhv = List.concat_map of_extension bhv.b_extended
 
 let typecheck typing_context loc ps =
   let env = {
-    esource = fst loc ;
-    enamed = "" ;
-    eflags = Attr.empty ;
+    source = fst loc ;
+    named = "" ;
+    flags = Attr.empty ;
     context = typing_context ;
     rpaths = [] ; regions = [] ;
   } in
