@@ -42,4 +42,6 @@ val unreachable_failed : int ref
 
 val set_unreachable : WpPropId.prop_id -> unit
 
+val emitter: Emitter.t
+
 (* -------------------------------------------------------------------------- *)

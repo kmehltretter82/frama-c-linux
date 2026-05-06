@@ -24,6 +24,10 @@
 Plugin WP <next-release>
 ###############################################################################
 
+- WP          [2026-05-06] Warnings for unsupported RTEs
+- WP          [2026-05-06] Renamed option -wp-qed (replaces -wp-let)
+- WP          [2026-05-06] Renamed option -wp-subst (replaces -wp-simpl)
+- Gui         [2026-05-06] New configuration sidebar
 - WP          [2026-04-22] remove -wp-cache-env, options that can be configured
                            with environment variables now obey the rule
                            "option first".

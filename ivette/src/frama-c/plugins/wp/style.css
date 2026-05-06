@@ -12,24 +12,111 @@
 /* --- Panel                                                              --- */
 /* -------------------------------------------------------------------------- */
 
+/* Generic sidebar block */
+/* TODO: extract this to Dome */
+
 .wp-sidebar-block {
   max-width: 100%;
   margin: 4px 0 2px 0;
   background-color: var(--background-block-form);
   padding: 2px 8px 2px 2px;
   border-radius: 4px;
+
+  .dome-xCheckbox {
+    padding: 2px;
+    margin: 2px 4px;
+  }
 }
 
 .wp-sidebar-block-title {
-  font-weight: bolder;
+  /* Probably mergeable with xTitleBar */
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 0px;
+
+  .dome-xBoxes-hbox {
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
 }
 
+.wp-sidebar-block-title-label {
+  font-weight: bolder;
+  margin: 1px 4px;
+}
+
+/* end sidebar block */
+
+/* Generic sidebar function search */
+
+.wp-sidebar-block {
+  .dome-xToolBar-searchComponent {
+    margin: 1px 4px;
+    width: auto;
+  }
+
+  .dome-xToolBar-searchField {
+    width: auto;
+  }
+
+  .dome-xToolBar-searchField input[type=search] {
+    width: 100%;
+  }
+
+  .dome-control-disabled {
+    color: var(--disabled-text-sidebar);
+    fill: var(--disabled-text-sidebar);
+    font-weight: lighter;
+  }
+
+  .dome-xIcon-disabled {
+    fill: var(--disabled-text-sidebar);
+  }
+}
+
+.wp-sidebar-search {
+  background: var(--primary-button-color);
+  fill: var(--text-discrete);
+}
+
+/* end sidebar search */
+
 .wp-sidebar-prover-label {
-  margin-top: 4px ;
+  margin-top: 4px;
 }
 
 .wp-sidebar .dome-xForm-section {
   margin-top: 10px;
+}
+
+.wp-sidebar-selection-button {
+  margin: 1px;
+  padding: 1px;
+}
+
+.wp-sidebar-selection {
+  padding: 0px 0px 0px 3px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin: 2px;
+  width: fit-content;
+  display: inline-flex;
+}
+
+.wp-sidebar-selection-selected {
+  border: 1px solid var(--text-discrete);
+  background-color: var(--background-softer);
+}
+
+.wp-sidebar-selection-block {
+  margin-bottom: 5px;
+}
+
+.wp-sidebar-selection-commit {
+  padding: 2px;
+  border-radius: 50%;
+  margin: 1px;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -269,6 +356,11 @@
   width: 60px;
   color: var(--text-discrete);
   background: var(--background-interaction);
+}
+
+.wp-config-select {
+  padding: 1px;
+  margin: 0 5px 0 4px;
 }
 
 input.wp-config-spinner:disabled {

@@ -1,10 +1,10 @@
 /* run.config
 EXIT: 1
-OPT: -wp-model Hoare -wp-no-simpl -wp-prop Rmain
-OPT: -wp-model Hoare -wp-no-simpl -wp-fct main
-OPT: -wp-model Hoare -wp-no-simpl -wp-prop Rf
+OPT: -wp-model Hoare -wp-no-subst -wp-prop Rmain
+OPT: -wp-model Hoare -wp-no-subst -wp-fct main
+OPT: -wp-model Hoare -wp-no-subst -wp-prop Rf
 EXIT: 0
-OPT: -wp-model Hoare -wp-no-simpl -wp-fct double_call
+OPT: -wp-model Hoare -wp-no-subst -wp-fct double_call
 */
 
 /* run.config_qualif

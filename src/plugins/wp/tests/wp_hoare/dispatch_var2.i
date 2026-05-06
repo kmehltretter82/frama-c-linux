@@ -1,21 +1,21 @@
 /* run.config
-   OPT: -wp-model +ref -wp-no-let
-   OPT: -wp-model +ref -wp-let
+   OPT: -wp-model +ref -wp-no-qed
+   OPT: -wp-model +ref -wp-qed
 */
 
 /* run.config_qualif
-   OPT: -wp-model +ref -wp-no-let
-   OPT: -wp-model +ref -wp-let
+   OPT: -wp-model +ref -wp-no-qed
+   OPT: -wp-model +ref -wp-qed
 */
 
-/*@ 
+/*@
     requires \valid(rp);
     assigns *rp;
     ensures *rp == 0;
 */
 void reset (int *rp) {*rp = 0;}
 
-/*@ 
+/*@
     requires \valid(ip);
     assigns *ip;
     ensures *ip == \old(*ip)+1;
@@ -23,52 +23,52 @@ void reset (int *rp) {*rp = 0;}
 void incr (int *ip) {*ip=*ip+1;}
 
 
-/*@ 
+/*@
     requires \valid(lp);
     assigns \nothing;
     ensures \result == *lp ;
 */
-int load (int *lp) {return *lp;} 
+int load (int *lp) {return *lp;}
 
-int x; 
+int x;
 
 /*@
-    assigns x; 
+    assigns x;
     ensures \result == 0;
  */
-int call_global (void) 
+int call_global (void)
 {
- reset(&x); 
+ reset(&x);
  return (load(&x));
 }
 
 /*@ requires \valid(&y);
-    assigns \nothing; 
+    assigns \nothing;
     ensures \result == 0;
  */
-int call_param (int y) 
+int call_param (int y)
 {
- reset(&y); 
+ reset(&y);
  return (load(&y));
 }
 
-/*@ assigns \nothing; 
+/*@ assigns \nothing;
     ensures \result == 0;
  */
-int call_local(void) 
+int call_local(void)
 {
  int z;
- reset(&z); 
+ reset(&z);
  return (load(&z));
 }
 
-/*@ 
+/*@
     requires \valid(q);
-    assigns *q; 
+    assigns *q;
     ensures \result == 0;
  */
 int call_param_ref (int *q)
 {
- reset(q); 
+ reset(q);
  return (load(q));
 }

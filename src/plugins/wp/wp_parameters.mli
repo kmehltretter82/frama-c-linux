@@ -56,8 +56,8 @@ module Init: Parameter_sig.Bool
 module InitWithForall: Parameter_sig.Bool
 module BoundForallUnfolding: Parameter_sig.Int
 module RTE: Parameter_sig.Bool
-module Simpl: Parameter_sig.Bool
-module Let: Parameter_sig.Bool
+module Subst: Parameter_sig.Bool
+module Qed: Parameter_sig.Bool
 module Core: Parameter_sig.Bool
 module Prune: Parameter_sig.Bool
 module FilterInit: Parameter_sig.Bool

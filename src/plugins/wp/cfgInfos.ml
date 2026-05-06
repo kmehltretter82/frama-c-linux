@@ -321,7 +321,7 @@ let collect_loops_no_variant kf stmt =
 
 let trivial_terminates = ref 0
 
-let wp_trivially_terminates =
+let emitter =
   Emitter.create
     "Trivial Termination"
     [Emitter.Property_status]
@@ -335,7 +335,7 @@ let set_trivially_terminates p hyps =
       WpPropId.pp_propid p ;
   let pid = WpPropId.property_of_id p in
   let hyps = Property.Set.elements hyps in
-  Property_status.emit wp_trivially_terminates ~hyps pid Property_status.True
+  Property_status.emit emitter ~hyps pid Property_status.True
 
 (* -------------------------------------------------------------------------- *)
 (* --- Memoization Key                                                    --- *)

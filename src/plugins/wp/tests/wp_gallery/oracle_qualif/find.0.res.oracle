@@ -62,6 +62,8 @@
   iter_ptr                  2        6        8       100%
 ------------------------------------------------------------
 [wp] Running WP plugin...
+[wp] Warning: Skipped RTE guards: unaligned pointers (\aligned not supported)
+[wp] Warning: Skipped RTE guards: invalid function pointer calls (\valid_function not supported)
 [rte:annot] annotating function find
 [rte:annot] annotating function find_ptr
 [rte:annot] annotating function iter_ptr

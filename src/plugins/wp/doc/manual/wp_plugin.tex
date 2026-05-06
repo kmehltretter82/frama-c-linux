@@ -1309,10 +1309,9 @@ sending proof obligations to external provers. The default simplifiers can be
 controlled by the following options:
 
 \begin{description}
-\item[\tt -wp-(no)-simpl] simplifies constant
-  expressions and tautologies (default is: \texttt{yes}).
-\item[\tt -wp-(no)-let] propagates equalities by substitutions
-  and let-bindings (default is: \texttt{yes}).
+\item[\tt -wp-(no)-qed] enable Qed simplifications (default is: \texttt{yes}).
+\item[\tt -wp-(no)-subst] extract and propagate equalities from the proof
+  context (default is: \texttt{yes}).
 \item[\tt -wp-(no)-filter] filter non used variables and related hypotheses
   (default is: \texttt{yes}).
 \item[\tt -wp-(no)-core] factorize common properties between branches
@@ -1320,7 +1319,8 @@ controlled by the following options:
 \item[\tt -wp-(no)-pruning] eliminates trivial branches of conditionals
   (default is: \texttt{yes}).
 \item[\tt -wp-(no)-clean] removes unused terms and variables from
-  proof obligations (default is: \texttt{yes}).
+  proof obligations (only available when qed simplifications are globally
+  disabled) (default is: \texttt{yes}).
 \item[\tt -wp-(no)-ground] replace ground values in equalities
   (default is: \texttt{yes}).
 \item[\tt -wp-(no)-extensional] use extensional equality on compounds

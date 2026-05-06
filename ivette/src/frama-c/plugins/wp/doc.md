@@ -85,18 +85,31 @@ different steps of the script by clicking on the elements of the list.
 
 ### Provers configuration {#wp-config-provers}
 
-#### General configuration
+#### General configuration {#wp-config-provers-general}
 
 - [icon-CLOCK] Timeout: stop provers after N seconds
 - [icon-SETTINGS] Processes: number of parallel prover processes
+- [icon-SERVER] Cache: whether and how the cache should be used:
+    - None: no cache, run provers,
+    - Update: use cache or run provers and update cache,
+    - Cleanup: update mode with garbage collection,
+    - Replay: update mode with no cache update,
+    - Rebuild: always run provers and update cache,
+    - Offline: use cache but never run provers.
 
-#### Automatic provers
+#### Automatic provers {#wp-config-provers-auto}
 
 Enabled automatic provers, if this list is empty it means that Why3 cannot
 detect any installed solvers. The complete list of supported solvers is
 available on Why3's website, we recommend Alt-Ergo, Colibri2, CVC5 and Z3.
 
-#### Interactive provers
+One can also configure solvers in "counter-examples" mode, in this case the
+TIP view can be configured to display counter-examples. This parameter is
+not available when goals have already been generated since WP has to perform
+the WP calculus again with this parameter enabled so that formulas contain all
+required information to generate counter examples.
+
+#### Interactive provers {#wp-config-provers-inter}
 
 Enabled interactive provers, it also provides an option for the selected mode
 for interactive proofs:
@@ -106,7 +119,7 @@ for interactive proofs:
 - Fix: check current proof and edit if needed
 - FixUpdate: update proof, check it and edit if needed
 
-#### Strategies
+#### Strategies {#wp-config-provers-strats}
 
 Customize WP strategies and scripts usage. If "use scripts" is set, proofs
 scripts will be used, if "use strategies" is set, strategies can generate new
@@ -118,6 +131,54 @@ The mode allows configuring how proofs scripts are updated (or not):
 - Update: proof scripts are reused and updated (default for tip prover)
 - Init: proof scripts are generated from scratch and saved
 - Dry: proof scripts are explored from scratch and not saved
+
+### Properties {#wp-config-properties}
+
+#### RTE Guards {#wp-config-properties-rte}
+
+By default, WP does not generate assertions related to *runtime errors*. This
+is controlled by the command line option `-wp-rte` and via the GUI, by the
+"Generate" checkbox of this section. This block can be unfolded to customize
+the exact runtime errors that one wants to check. These items are connected
+to the corresponding kernel and RTE plug-in options.
+
+Note that the available *runtime errors* selectors only include what is
+supported currently by WP.
+
+#### Smoke tests {#wp-config-properties-smoke}
+
+Smoke tests are meant to detect inconsistencies in user-specifications and/or
+dead code. By default, WP does not generate such checks since they can be costly
+to execute. This is controlled by the command line option `-wp-smoke-tests` and
+via the GUI, by the "Generate" checkbox of this section. This block can be
+unfolded to disable some available smoke tests, namely:
+
+- "Assumes": dead assumes clauses because of an invalid requires,
+- "Code": unreachable code,
+- "Call": non-terminating calls,
+- "Local initialization": unreachable local initialization,
+- "Loop": inconsistent loop invariants
+
+#### Filters {#wp-config-properties-filters}
+
+By default, WP tries to prove all properties related to the selected proof
+target. The filters allow selecting properties more precisely. It corresponds
+to the option `-wp-prop`. In the graphical user interface, one can build the
+content of this option interactively. One can select and add/remove:
+- categories of properties,
+- custom properties based on their name.
+Each property can be added in the list positively (using the [icon-PLUS] button)
+or negatively (using the [icon-MINUS] button) if it is not already present in
+the list, in such a case this occurrence can be removed with the opposite button.
+One can also remove all filters using the [icon-CROSS] button.
+
+### Sequent simplification {#wp-config-simpl}
+
+Configure QED simplification for proofs. It is mostly useful for debugging
+purposes (for example to understand performance drops or proofs failures because
+of missing properties that should be available). Please refer to the WP manual
+to configure these elements. Note that these parameters cannot be changed if the
+WP calculus has been executed, results must be dropped first.
 
 ## Strategy debugger {#wp-strat-debug}
 

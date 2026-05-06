@@ -169,7 +169,7 @@ struct
   let replay = tag "Replay" Replay
   let rebuild = tag "Rebuild" Rebuild
   let offline = tag "Offline" Offline
-  let cleanup = tag "Cleanu" Cleanup
+  let cleanup = tag "Cleanup" Cleanup
 
   let lookup = function
     | Cache.NoCache -> none
@@ -592,6 +592,181 @@ let () =
     end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Special case of initialization                                     --- *)
+(* -------------------------------------------------------------------------- *)
+(* NB: this should be factorized between Eva, RTE, Kernel *)
+
+module Initialized_proxy = struct
+
+  type t =
+    | Only of Kernel_function.Set.t
+    | Except of Kernel_function.Set.t
+
+  type elem = All | Kf of Cil_types.kernel_function
+  type init = Add of elem | Remove of elem
+
+  let action set elem =
+    match elem, set with
+    | Add All, _ -> Except Kernel_function.Set.empty
+    | Remove All, _ -> Only Kernel_function.Set.empty
+    | Add (Kf kf), Except set ->
+      Except (Kernel_function.Set.remove kf set)
+    | Add (Kf kf), Only set ->
+      Only (Kernel_function.Set.add kf set)
+    | Remove (Kf kf), Except set ->
+      Except (Kernel_function.Set.add kf set)
+    | Remove (Kf kf), Only set ->
+      Only (Kernel_function.Set.remove kf set)
+
+  let parse name =
+    let add e = Add e and rem e = Remove e in
+    if String.equal name "@default"
+    || String.equal name "+@default"
+    || String.equal name "-@default"
+    then None (* adds or removes nothing *)
+    else if String.equal name "@all"
+         || String.equal name "+@all"
+    then Some (Add All)
+    else if String.equal name "-@all"
+    then Some (Remove All)
+    else if String.starts_with ~prefix:"-" name
+         || String.starts_with ~prefix:"+" name
+    then
+      let op = if String.get name 0 = '+' then add else rem in
+      let name = String.sub name 1 ((String.length name) -1 ) in
+      Some (op (Kf (Globals.Functions.find_by_name name)))
+    else
+      Some (Add (Kf (Globals.Functions.find_by_name name)))
+
+  let parse_action l s =
+    match parse s with
+    | None -> l
+    | Some value -> action l value
+
+  let pp_actions fmt actions =
+    let only, elements = match actions with
+      | Only set -> true, Kernel_function.Set.elements set
+      | Except set -> false, Kernel_function.Set.elements set
+    in
+    let pp fmt kf =
+      if only
+      then Kernel_function.pretty fmt kf
+      else Format.fprintf fmt "-%a" Kernel_function.pretty kf
+    in
+    Format.fprintf fmt "%s%a"
+      (if only then ""
+       else if elements = [] then "@all"
+       else "@all,")
+      (Pretty_utils.pp_list ~sep:"," pp) elements
+
+  let current_init_proxy =
+    ref (Only Kernel_function.Set.empty)
+
+  let hooks = ref []
+  let add_hook_on_update hook =  hooks := hook :: !hooks
+
+  let set_init_proxy value =
+    current_init_proxy := value ;
+    List.iter (fun hook -> hook ()) !hooks
+
+  let update_init_proxy () =
+    (* We force the kernel to compute the value so that we are sure that the
+       internal string contains something that is meaningful for a kernel
+       function set.
+    *)
+    ignore (RteGen.Options.DoInitialized.get ());
+    (* Now the nice thing is that we are sure that list contains only @all,
+       @default or function names (potentially prefixed with - or +), so we can
+       trim spaces and split according to ','. *)
+    let line = RteGen.Options.DoInitialized.As_string.get () in
+    let entries = List.map String.trim @@ String.split_on_char ',' line in
+    let actions =
+      List.fold_left parse_action (Only Kernel_function.Set.empty) entries in
+    set_init_proxy actions
+
+  (* Note that, since we do not update the actual option with the preprocessed
+     list of actions, the proxy is not *exactly* the same as the content of the
+     parameter. But, it has the same meaning.
+  *)
+  let () =
+    RteGen.Options.DoInitialized.add_set_hook
+      (fun _ _ -> update_init_proxy ())
+
+  let set actions =
+    RteGen.Options.DoInitialized.As_string.set
+      (Format.asprintf "%a" pp_actions actions) ;
+    set_init_proxy actions
+
+  let get () =
+    !current_init_proxy
+end
+
+module JInitialized_proxy =
+struct
+  module Decl_list = D.Jlist(D.Jpair(AST.Decl)(D.Jstring))
+
+  type t = Initialized_proxy.t
+
+  let jtype =
+    D.declare ~package ~name:"initializedProxy" @@
+    Jrecord [ "only", Jboolean ; "elems", Decl_list.jtype]
+
+  let to_json s =
+    let only, set = match s with
+      | Initialized_proxy.Only set -> true, set
+      | Initialized_proxy.Except set -> false, set
+    in
+    let elems =
+      List.map
+        (fun kf -> Printer_tag.SFunction kf, Kernel_function.get_name kf)
+        (Kernel_function.Set.elements set)
+    in
+    `Assoc [
+      "only", `Bool only ;
+      "elems", Decl_list.to_json elems
+    ]
+
+  let of_json json =
+    let extract_function = function
+      | Printer_tag.SFunction kf, _ -> kf
+      | _ -> raise Not_found
+    in
+    try
+      match Json.assoc json with
+      | [ (_, only) ; (_, elems) ] ->
+        let only = Json.bool only in
+        let elems = Decl_list.of_json elems in
+        let kfs = List.map extract_function elems in
+        let kfs = Kernel_function.Set.of_list kfs in
+        if only then Initialized_proxy.Only kfs else Except kfs
+      | _ -> raise Not_found
+    with _ ->
+      Wp_parameters.fatal "Cannot parse: %a" Json.pp json
+end
+
+let () =
+  ignore @@ S.register_state ~package ~name:"initialized"
+    ~descr:(Md.plain "Configured properties filter")
+    ~data:(module JInitialized_proxy)
+    ~get:Initialized_proxy.get
+    ~set:Initialized_proxy.set
+    ~add_hook:Initialized_proxy.add_hook_on_update
+    ()
+
+(* -------------------------------------------------------------------------- *)
+(* --- Properties filter                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  ignore @@ S.register_state ~package ~name:"filter"
+    ~descr:(Md.plain "Configured properties filter")
+    ~data:(module D.Jlist(D.Jstring))
+    ~get:Wp_parameters.Properties.get
+    ~set:Wp_parameters.Properties.set
+    ~add_hook:(fun f -> Wp_parameters.Properties.add_set_hook (fun _ -> f))
+    ()
+
+(* -------------------------------------------------------------------------- *)
 (* --- Generate goals                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -629,6 +804,27 @@ let () =
     begin function
       | None -> VC.command @@ VC.generate_all ()
       | Some marker -> start_proofs_marker marker
+    end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Clear goals                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  R.register ~package ~kind:`EXEC ~name:"clearProofs"
+    ~descr:(Md.plain "Clear goals")
+    ~input:(module D.Junit)
+    ~output:(module D.Junit)
+    begin fun () ->
+      Emitter.clear WpReached.emitter ;
+      Emitter.clear CfgInfos.emitter ;
+      CfgInfos.clear ();
+      Wpo.iter_on_goals
+        (fun g ->
+           let emitter = WpContext.get_emitter g.po_model in
+           Emitter.clear emitter) ;
+      Wpo.iter_on_goals Wpo.clear_results ;
+      Wpo.clear ();
     end
 
 (* -------------------------------------------------------------------------- *)
