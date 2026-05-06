@@ -8,7 +8,7 @@
 
 (** Extension of OCaml's {!Stdlib.Set} module.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 
 include module type of Stdlib.Set
@@ -41,7 +41,7 @@ module type S = sig
       @param sep defaults to ",@ "
       @param last defaults to "@ and@ "
       @param empty defaults to "<empty>"
-      @since Frama-C+dev *)
+      @since 33.0-Arsenic *)
   val pretty_text:
     ?format:(Pretty.tformatter -> unit) Pretty.format ->
     ?item:(elt Pretty.aformatter -> elt -> unit) Pretty.format ->

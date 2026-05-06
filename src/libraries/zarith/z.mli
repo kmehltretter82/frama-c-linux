@@ -11,23 +11,23 @@
     shadowing Zarith's module. This solution is a bit ugly and could be
     replace by [root_module] in kernel dune file, but this does not work for
     now...
-    @before Frama-C+dev this module was called [Integer]
+    @before 33.0-Arsenic this module was called [Integer]
 *)
 
 (** Previous version of this file did not include [Z], so many more functions
     and operators are available now.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 include module type of Fc_internal_z with type t = Fc_internal_z.t
   [@@alert "-fc_internal_z"]
 
 (** {!Z.t} is a Frama-C {!Datatype}, and comes with usual {!compare}, {!equal},
     {!hash} and {!pretty} functions.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 include Datatype.S_with_collections with type t := t
 
-(** @since Frama-C+dev *)
+(** @since 33.0-Arsenic *)
 val integer: t Type.t
 
 (**************************************************************************)
@@ -35,7 +35,7 @@ val integer: t Type.t
 (**************************************************************************)
 
 (** This module contains all Z operators.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 module Operators : sig
   include module type of Compare
@@ -88,7 +88,7 @@ module Operators : sig
 end
 
 (** Compare operators are not at top level in Zarith.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 include module type of Compare
 
@@ -129,21 +129,21 @@ val length : t -> t -> t
 
 (** Set a maximum above which pow function raises an overflow. Default value is
     [99999]. It can also be set via the option [-pow-limit].
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val set_pow_exponent_limit: int -> unit
 
 (** [pow n i] computes [n^i]. [?limit] can be used to raise an {!Overflow} if
     the exponent is too big. See {!set_pow_exponent_limit} for default value.
     @raises Overflow if the argument is greater than [?limit]
-    @before Frama-C+dev [?limit] argument was not present and all values were
+    @before 33.0-Arsenic [?limit] argument was not present and all values were
     accepted, potentially leading to memory exhaustion. *)
 val pow : ?limit:int -> t -> int -> t
 
 (** Computes [2^n]. [?limit] can be used to raise an {!Overflow} if the exponent
     is too big. See {!set_pow_exponent_limit} for default value.
     @raises Overflow if the argument is greater than [?limit]
-    @before Frama-C+dev [?limit] argument was not present and all values were
+    @before 33.0-Arsenic [?limit] argument was not present and all values were
     accepted
 *)
 val two_power_of_int : ?limit:int -> int -> t
@@ -152,21 +152,21 @@ val two_power_of_int : ?limit:int -> int -> t
     The default value of [?limit] is set by {!two_power_of_int}.
     @raises Overflow if the argument is greater than limit or if the conversion
     fails
-    @before Frama-C+dev [?limit] argument was not present and fixed at [1024]
+    @before 33.0-Arsenic [?limit] argument was not present and fixed at [1024]
 *)
 val two_power : ?limit:int -> t -> t
 
 (** Convert the second argument via {!of_int} then call {!shift_left}.
     This function was previously called [shift_left] but it was renamed to avoid
     shadowing [Z] function.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val shift_left_z : t -> t -> t
 
 (** Convert the second argument via {!of_int} then call {!shift_right}.
     This function was previously called [shift_right] but it was renamed to
     avoid shadowing [Z] function.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val shift_right_z : t -> t -> t
 
@@ -196,7 +196,7 @@ val cast: size:t -> signed:bool -> value:t -> t
 
 (** Set a maximum above which big ints will be printed in hexadecimal.
     A Negative value turns off this option.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val set_big_ints_hex: int -> unit
 
@@ -208,7 +208,7 @@ val pretty_hex : t Pretty_utils.formatter
 (** Prints the integer in either decimal or hexadecimal depending on
     the value set via {!set_big_ints_hex}.
     @before 25.0-Manganese there was an optional [hexa] argument.
-    @before Frama-C+dev Only printed in decimal
+    @before 33.0-Arsenic Only printed in decimal
 *)
 val pretty : t Pretty_utils.formatter
 
@@ -231,6 +231,6 @@ val pp_bin : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
 val pp_hex : ?nbits:int -> ?sep:string -> t Pretty_utils.formatter
 
 (** Equivalent to {!Z.pp_print} for [deriving show] compatibility.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val pp: t Pretty_utils.formatter

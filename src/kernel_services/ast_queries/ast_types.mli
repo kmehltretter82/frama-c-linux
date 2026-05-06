@@ -255,7 +255,7 @@ val is_wchar_array : typ -> bool
 val is_fun : typ -> bool
 
 (** True if the argument is a variadic function type.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val is_variadic : typ -> bool
 
@@ -263,7 +263,7 @@ val is_variadic : typ -> bool
 val is_fun_ptr : typ -> bool
 
 (** True if the argument is a pointer {i or} a function type.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val is_fun_or_ptr : typ -> bool
 
@@ -276,7 +276,7 @@ val is_scalar : typ -> bool
 val is_object : typ -> bool
 
 (** True if the argument is an object pointer type.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val is_object_ptr : typ -> bool
 
@@ -373,7 +373,7 @@ val is_logic_arithmetic : logic_type -> bool
 
 (** True if the argument is a pointer type. Expands the logic type
     definition if necessary.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val is_logic_ptr : logic_type -> bool
 
@@ -389,6 +389,6 @@ val is_logic_fun_ptr : logic_type -> bool
 
 (** True if the argument is a pointer {i or} function type.
     Expands the logic type definition if necessary.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val is_logic_fun_or_ptr : logic_type -> bool

@@ -8,7 +8,7 @@
 
 (** Extension of OCaml's {!Stdlib.Array} module.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 
 include module type of Stdlib.Array
 

@@ -113,7 +113,7 @@ val of_string: ?existence:existence -> ?base:t -> string -> t
     Cf. documentation of {!of_string} for an explanation of the [existence]
     parameter and some notes on special behaviors.
 
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 val of_format:
   ?existence:existence -> ?dir:t ->
   ('a, Format.formatter, unit, t) format4 -> 'a

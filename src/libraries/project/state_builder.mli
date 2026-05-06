@@ -17,7 +17,7 @@
 (* ************************************************************************** *)
 
 (** If set to [true], prints debug information about states.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val set_debug: bool -> unit
 
@@ -308,7 +308,7 @@ module Hashconsing_tbl_not_weak: Hashconsing_tbl
 
 (** Weak or non-weak hashconsing tables, depending on environment variable
     [FC_DETERMINISTIC] (set to [yes] to enable this).
-    @before Frama-C+dev used {!Cmdline.deterministic} instead of
+    @before 33.0-Arsenic used {!Cmdline.deterministic} instead of
     [FC_DETERMINISTIC].
     @since Aluminium-20160501  *)
 module Hashconsing_tbl: Hashconsing_tbl
@@ -390,7 +390,7 @@ module type Hashtbl = sig
   val pretty: Format.formatter -> unit
   (** Pretty print each value in an user-friendly way. Compatible with ["%t"]
       format.
-      @since Frama-C+dev *)
+      @since 33.0-Arsenic *)
 end
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>

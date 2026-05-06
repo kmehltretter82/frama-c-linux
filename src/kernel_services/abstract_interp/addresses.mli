@@ -10,7 +10,7 @@
 
 (** Association between bases and offsets in byte.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
-    @before Frama-C+dev was Locations.Location_Bytes *)
+    @before 33.0-Arsenic was Locations.Location_Bytes *)
 module Bytes : sig
   (* TODOBY: write an mli for MapLattice, and name the result. Use it there,
      and simplify *)
@@ -213,7 +213,7 @@ end
 
 (** Association between bases and offsets in bits.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
-    @before Frama-C+dev was Locations.Location_Bits *)
+    @before 33.0-Arsenic was Locations.Location_Bits *)
 module Bits : sig
   include module type of Bytes
 
@@ -221,16 +221,16 @@ module Bits : sig
 
   (** [of_bytes a] returns the address set [a] with the offset converted from
       bytes to bits. The result is exact.
-      @before Frama-C+dev was Locations.loc_bytes_to_loc_bits *)
+      @before 33.0-Arsenic was Locations.loc_bytes_to_loc_bits *)
   val of_bytes : Bytes.t -> t
 
   (** [to_bytes a] returns the address set [a] with the offset converted from
       bits to bytes. The result is an over-approximation.
-      @before Frama-C+dev was Locations.loc_bits_to_loc_bytes *)
+      @before 33.0-Arsenic was Locations.loc_bits_to_loc_bytes *)
   val to_bytes : t -> Bytes.t
 
   (** [to_bytes_under a] returns the address set [a] with the offsets
       converted from bits to bytes. The result is an under-approximation.
-      @before Frama-C+dev was Locations.loc_bits_to_loc_bytes_under *)
+      @before 33.0-Arsenic was Locations.loc_bits_to_loc_bytes_under *)
   val to_bytes_under : t -> Bytes.t
 end

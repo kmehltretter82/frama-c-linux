@@ -25,7 +25,7 @@ module Rational = Rational
 
 (** {2 Zarith} *)
 
-(** @since Frama-C+dev *)
+(** @since 33.0-Arsenic *)
 module Z = Z
 
 (** {2 Datatype} *)

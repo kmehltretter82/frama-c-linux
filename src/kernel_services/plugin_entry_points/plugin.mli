@@ -33,7 +33,7 @@ module type S_no_log = sig
   module Warn_category: Parameter_sig.String
 
   (** Handle the specific `lib' directory of the plug-in.
-      @since Frama-C+dev
+      @since 33.0-Arsenic
   *)
   module Lib: Parameter_sig.Site_root
 
@@ -155,7 +155,7 @@ val plugin_subpath: string -> unit
 val set_default_verbose_level: int -> unit
 (** Set the default level of the -<plug-in>-verbose parameter.
     To be called just before applying {!Register} to create plug-in services.
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 
 (* ************************************************************************* *)
 (** {2 Handling plugins} *)

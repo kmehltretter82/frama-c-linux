@@ -17,7 +17,7 @@ type t = private
   { pid: int;
     mutable name: string }
 (** @since Carbon-20101201
-    @before Frama-C+dev Had a mutable field [unique_name]
+    @before 33.0-Arsenic Had a mutable field [unique_name]
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 type project = t

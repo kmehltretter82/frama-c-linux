@@ -270,7 +270,7 @@ module LogicalOperators: Parameter_sig.Bool
 type enum = Default | Int | Short
 
 (** Behavior of option "-enums"
-    @before Frama-C+dev Was of type string
+    @before 33.0-Arsenic Was of type string
 *)
 module Enums: Parameter_sig.S with type t = enum
 
@@ -375,7 +375,7 @@ type attr_info = Default | Class of string | Print of bool | Ignore of bool
 module RegisterAttributes: Parameter_sig.Multiple_map
   with type key = string and type value = attr_info
 (** Behavior of option "-register-attributes"
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 
 (* ************************************************************************* *)
 (** {2 Compilation Database} *)

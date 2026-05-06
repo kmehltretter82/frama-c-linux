@@ -59,7 +59,7 @@ val provers : ?filter :(t -> bool) -> unit -> t list
     E.g. if you need only enabled solvers, it should be called with the
     [enabled] function.
 
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 
 val add_reload_hook : (unit -> unit) -> unit

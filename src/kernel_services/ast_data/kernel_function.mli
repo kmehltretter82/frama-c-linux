@@ -170,7 +170,7 @@ val is_in_libc : t -> bool
 
 val is_variadic : t -> bool
 (** @return true iff the given function is a variadic function
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 
 val has_noreturn_attr : t -> bool
 (** @return true iff the given function contain the noreturn attribute.

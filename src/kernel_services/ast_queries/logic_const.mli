@@ -99,14 +99,14 @@ val init_label: logic_label
 
 (** makes a predicate with the given names and location. Default name is empty
     and default location is unknown.
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 val pred: ?loc:location -> ?names:string list -> predicate_node -> predicate
 
 (** makes a predicate with no name. Default location is unknown.*)
 val unnamed: ?loc:location -> predicate_node -> predicate
 
 (** prepend the given [names] to the the predicate's names.
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 val prepend_names: names:string list -> predicate -> predicate
 
 (** \true *)

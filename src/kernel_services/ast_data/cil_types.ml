@@ -101,7 +101,7 @@ type ikind =
     so that we only need to open {!Cil_types} to access them, without the
     need to open {!Floating_point}.
 
-    @before Frama-C+dev These constructors were not defined in {!Floating_point}
+    @before 33.0-Arsenic These constructors were not defined in {!Floating_point}
 *)
 type fkind = Floating_point.fkind =
   | FFloat      (** [float] *)

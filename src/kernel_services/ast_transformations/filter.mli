@@ -82,7 +82,7 @@ module type RemoveInfo = sig
   (** true if the corresponding functional dependency is visible. *)
   val fun_deps_visible : fct -> identified_term -> bool
 
-  (** since @Frama-C+dev *)
+  (** since @33.0-Arsenic *)
   val fun_extended_visible : fct -> acsl_extension -> bool
 
   (** [called_info] will be called only if the call statement is visible.

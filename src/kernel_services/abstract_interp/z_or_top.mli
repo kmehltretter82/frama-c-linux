@@ -8,7 +8,7 @@
 
 (** Z integers with an additional top element.
 
-    @before Frama-C+dev was named [Int_Base]. *)
+    @before 33.0-Arsenic was named [Int_Base]. *)
 
 include Datatype.S with type t = Z.t Lattice_bounds.or_top
 

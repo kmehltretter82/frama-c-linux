@@ -7,7 +7,7 @@
 (**************************************************************************)
 
 (** {2 Float kinds}
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 type fkind =
   | FFloat      (** [float] *)
@@ -90,7 +90,7 @@ val pretty : Format.formatter -> float -> unit
     "D" (or "F64") for double precision (_Float64), and
     "L" for extended precision.
 
-    @before Frama-C+dev "f32" and "f64" were not accepted.
+    @before 33.0-Arsenic "f32" and "f64" were not accepted.
 *)
 val has_suffix : fkind -> string -> bool
 
@@ -100,7 +100,7 @@ val has_suffix : fkind -> string -> bool
     returns [Some (s, "", FDouble)]. If the suffix is unknown, returns
     [None].
 
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val extract_suffix : string -> (string * string * fkind) option
 

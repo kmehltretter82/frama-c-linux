@@ -309,7 +309,7 @@ sig
 
   val get_category_help: category -> string
   (** returns the category help as a string.
-      @since Frama-C+dev
+      @since 33.0-Arsenic
   *)
 
   val is_registered_category: string -> bool
@@ -403,19 +403,19 @@ val is_subcategory : string list -> string list -> bool
 (** Possible outcomes when parsing categories: printing the category help
     message, or returning the list of category. [bool] specify if the category
     should be added or removed.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 type category_action = Category_help | Change_category of (bool * string) list
 
 (** Parse the given string to find categories to be added or removed via
     {!add_debug_keys} or {!del_debug_keys}.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val parse_category: string -> category_action
 
 (** Possible outcomes when parsing warning categories: printing the warning help
     message, returning the list of warning and their status, or a parsing error.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 type warning_action =
   | Warning_help
@@ -424,18 +424,18 @@ type warning_action =
 
 (** Parse the given string to find warning categories and their status which can
     be set via {!set_warn_status}
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val parse_warning: string -> warning_action
 
-(** @before Frama-C+dev Was in {!Cmdline} *)
+(** @before 33.0-Arsenic Was in {!Cmdline} *)
 module type Level = sig
   val value_if_set: int option ref
   val get: unit -> int
   val set: int -> unit
 end
 
-(** @since Frama-C+dev *)
+(** @since 33.0-Arsenic *)
 module Make_level(_ : sig val default : int end) : Level
 
 (** Each plugin has its own channel to output messages.

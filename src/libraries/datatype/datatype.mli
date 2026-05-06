@@ -386,7 +386,7 @@ end
 
     @before 26.0-Iron the functor had several additional values only used for
             Journalization that has been removed.
-    @before Frama-C+dev the function names in the input module [P] were prefixed
+    @before 33.0-Arsenic the function names in the input module [P] were prefixed
             by [mk_].
 *)
 module Polymorphic
@@ -415,7 +415,7 @@ end
 
     @before 26.0-Iron the functor had several additional values only used for
             Journalization that has been removed.
-    @before Frama-C+dev the function names in the input module [P] were prefixed
+    @before 33.0-Arsenic the function names in the input module [P] were prefixed
             by [mk_].
 *)
 module Polymorphic2
@@ -450,7 +450,7 @@ end
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
     @before 26.0-Iron the functor had several additional values only used for
             Journalization that has been removed.
-    @before Frama-C+dev the function names in the input module [P] were prefixed
+    @before 33.0-Arsenic the function names in the input module [P] were prefixed
             by [mk_].
 *)
 module Polymorphic3
@@ -493,7 +493,7 @@ end
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
     @before 26.0-Iron the functor had several additional values only used for
             Journalization that has been removed.
-    @before Frama-C+dev the function names in the input module [P] were prefixed
+    @before 33.0-Arsenic the function names in the input module [P] were prefixed
             by [mk_].
 *)
 module Polymorphic4

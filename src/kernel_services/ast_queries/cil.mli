@@ -216,7 +216,7 @@ val int64_t: unit -> typ
 (** Any signed integer type of size 128 bits.
     It is equivalent to the (non-ISO C) GCC __int128 type.
     Must only be called if such type exists in the current architecture.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val int128_t: unit -> typ
 
@@ -247,7 +247,7 @@ val uint64_t: unit -> typ
 (** Any unsigned integer type of size 128 bits.
     It is equivalent to the (non-ISO C) GCC unsigned __int128 type.
     Must only be called if such type exists in the current architecture.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val uint128_t: unit -> typ
 
@@ -788,7 +788,7 @@ val constFoldBinOp: loc:location -> bool -> binop -> exp -> exp -> typ -> exp
 
 (** Convert an expression [e] to a boolean expression [e != 0] if [e] is not
     already a boolean.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val expression_to_bool: exp -> exp
 
@@ -851,7 +851,7 @@ val mkMem: addr:exp -> off:offset -> lval
     The [Result.Error] contains an optional [location] to target a specific
     operand and an error message.
 
-    @before Frama-C+dev the function could raise [AbortFatal] instead of using
+    @before 33.0-Arsenic the function could raise [AbortFatal] instead of using
     result type. It still can raise an exception via sub-function calls. The
     parameter [?constfold] was not present and we always applied constant
     folding.
@@ -862,12 +862,12 @@ val mkBinOp: ?constfold:bool -> loc:location -> binop -> exp -> exp ->
 (** Same as {!mkBinOp} but handles [Error] by throwing an exception with the
     given message and current location.
     @raise Abortfatal if {!mkBinOp} fails
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val mkBinOp_exn: ?constfold:bool -> loc:location -> binop -> exp -> exp -> exp
 
 (** Same as {!mkBinOp_exn}
-    @before Frama-C+dev Performed a systematic cast (unless one of the
+    @before 33.0-Arsenic Performed a systematic cast (unless one of the
     arguments was [0]) of pointers into [uintptr_t] during comparisons,
     making such operation defined even if the pointers do not share
     the same base. This was the behavior of {!mkBinOp} prior to the
