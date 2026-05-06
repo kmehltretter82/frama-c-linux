@@ -9,7 +9,7 @@
 (** This module handle positions in a source file. [Filepos.t] is a Frama-C
     datatype, and comes with usual [compare], [equal], [hash] and [pretty]
     functions.
-    @before Frama-C+dev This module was split between {!Filepath} and
+    @before 33.0-Arsenic This module was split between {!Filepath} and
     {!Cil_datatype.Position}.
 *)
 

@@ -64,7 +64,7 @@ val generate_kf : ?model:string -> ?bhv:string list -> ?prop:string list ->
 val generate_call : ?model:string -> Cil_types.stmt -> t Bag.t
 val generate_all : ?model:string -> ?bhv:string list -> ?prop:string list ->
   unit -> t Bag.t
-(** @since Frama-C+dev *)
+(** @since 33.0-Arsenic *)
 
 (** {2 Prover Interface} *)
 
@@ -105,7 +105,7 @@ val command :
     current configuration status. That is, the command line when in CLI mode,
     or what has been configured so far by the user in the GUI mode.
 
-    @before Frama-C+dev only provers and tip were configurable and the default
+    @before 33.0-Arsenic only provers and tip were configurable and the default
             were computed from the CLI.
 *)
 (* -------------------------------------------------------------------------- *)

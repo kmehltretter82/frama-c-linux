@@ -73,7 +73,7 @@ val pp_sub_int : Format.formatter -> int -> unit
 (* Other symbols. *)
 
 val pp_right_arrow : printer (** → *)
-val pp_maps_to : printer (** ↦ @since Frama-C+dev *)
+val pp_maps_to : printer (** ↦ @since 33.0-Arsenic *)
 
 val pp_plus_minus : printer (** ± *)
 val pp_times : printer (** × *)

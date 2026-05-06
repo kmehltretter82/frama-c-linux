@@ -8,7 +8,7 @@
 
 (** This module provides pretty printing utilities. Same as {!Pretty_utils}
     but without dependencies to {!Fclib.List} or {!Fclib.Array}.
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 
 (** Formatter for ["%a"] format *)
 type 'a aformatter = Format.formatter -> 'a -> unit

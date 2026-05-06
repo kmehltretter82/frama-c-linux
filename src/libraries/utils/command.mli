@@ -66,7 +66,7 @@ val spawn :
     @raise Async.Cancel when the computation is interrupted or on timeout
     @before 29.0-Copper Async.Cancel was Db.Cancel
     @before 31.0-Gallium this function was named [command]
-    @before Frama-C+dev [async] was not present and set to true when Frama-C was
+    @before 33.0-Arsenic [async] was not present and set to true when Frama-C was
     in GUI mode.
 *)
 
@@ -89,7 +89,7 @@ sig
       dot file to generate [output] file with output format [format].
       @raise Sys_error when a system error occurs
       @raise Async.Cancel when the computation is interrupted or on timeout
-      @before Frama-C+dev [async] was not present and set to true when Frama-C
+      @before 33.0-Arsenic [async] was not present and set to true when Frama-C
       was in GUI mode. *)
   val spawn : async:bool -> ?timeout:int -> ?layout:string -> format:format ->
     output:Filepath.t -> Filepath.t -> Unix.process_status

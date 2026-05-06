@@ -232,7 +232,7 @@ module Make_based_on_map_with_product (M : Based_on_map_with_product) :
     like lists can be difficult. On the other hand, all iterators
     concerning a monad over an iterable have the same signature, thus
     we provide a generic signature for all three standard iterators.
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 module type Iterators = sig
   type 'a iterable
   type 'a monad

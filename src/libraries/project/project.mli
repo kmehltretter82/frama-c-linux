@@ -39,7 +39,7 @@ type project = Project_skeleton.t =
     during program initialization. The [seed] must be unique to a given
     program (version included). [source] will be used for messages output with
     the format ["[source:project] ..."].
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val init: seed:string -> source:string -> unit
 
@@ -48,12 +48,12 @@ val init: seed:string -> source:string -> unit
 (* ************************************************************************* *)
 
 (** If set to [true], prints debug information about projects.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val set_debug: bool -> unit
 
 (** If set to [true], prints feedbacks about projects.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val set_feedback: bool -> unit
 
@@ -63,7 +63,7 @@ val set_feedback: bool -> unit
     - 2 -> warnings (default)
     - >= 3 -> errors ([Failure])
 
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val set_warn_level: int -> unit
 
@@ -71,7 +71,7 @@ val compress_saved_session: bool ref
 (** This is used to decide if projects should be compressed when saved with
     {!save} and {!save_all} without the [?compress] parameter. Defaults to
     [true].
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 
 val set_keep_current: bool -> unit
 (** [set_keep_current b] keeps the current project forever (even after the end
@@ -107,7 +107,7 @@ val is_current: t -> bool
 (** Check whether the given project is the current one or not. *)
 
 val last_project_created_by_copy: unit -> int option
-(** @since Frama-C+dev *)
+(** @since 33.0-Arsenic *)
 
 val iter_on_projects: (t -> unit) -> unit
 (** iteration on project starting with the current one. *)
@@ -154,17 +154,17 @@ val get_debug_name: t -> string
 val get_current_pid: unit -> int
 (** The current project {!pid}.
     @raise NoProject if there is no project.
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 
 val pid_to_name: int -> string
 (** Return a project name based from its {!pid}.
     @raise Unknown_project if no project has this unique pid.
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 
 val name_to_pid: string -> int option
 (** Return the project {!pid} based on its name. If several projects are found
     with the same name, the most recent one will be picked.
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 
 val set_name: t -> string -> unit
 (** Set the name of the given project.
@@ -207,7 +207,7 @@ val on: ?selection:State_selection.t -> t -> ('a -> 'b) -> 'a -> 'b
 val on_from_pid: ?selection:State_selection.t -> int -> ('a -> 'b) -> 'a -> 'b
 (** Same than {!on} but find the project using its {!pid}.
     @raise Unknown_project if no project with this [pid] is found
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 
 (**/**)
 val set_current_as_last_created: unit -> unit

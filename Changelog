@@ -18,6 +18,10 @@
 Open Source Release <next-release>
 ###############################################################################
 
+###############################################################################
+Open Source Release 33.0 (Arsenic)
+###############################################################################
+
 -!  Ivette    [2026-05-05] `ivette` binary has been renamed `frama-c-gui`
 o!  Kernel    [2026-04-29] Split module `Locations` into `Addresses`, `Locations`
               and `Memory_zone`. Rename type `location` and some functions.

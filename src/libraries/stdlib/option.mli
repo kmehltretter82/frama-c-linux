@@ -16,14 +16,14 @@ include Monad.S_with_product with type 'a t = 'a option
 include module type of Stdlib.Option
 
 (** Make iterators to handle options of monadic elements and monadic options.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 module Make_monadic_iterators (M : Monad.S) : Monad.Iterators
   with type 'a iterable := 'a option
    and type 'a monad := 'a M.t
 
 (** The call [opt <? default] is equivalent to [value ~default opt].
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val ( <? ) : 'a t -> 'a -> 'a
 
@@ -36,18 +36,18 @@ val bind: ('a -> 'b t) -> 'a t -> 'b t
     @raise Exn if the value is [None] and [exn] is specified.
     @raise Invalid_argument if the value is [None] and [exn] is not specified.
     @return v if the value is [Some v].
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val get: ?exn:exn -> 'a option -> 'a
 
 (** [value_or_else ~none o] is similar to {!value} but uses a function to
     compute the default value.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val value_or_else : none:(unit -> 'a) -> 'a option -> 'a
 
 (** Compute a hash for the option given a hash for the element.
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 val hash: ('a -> int) -> 'a option -> int
 
 (** Merges two options such that
@@ -56,7 +56,7 @@ val hash: ('a -> int) -> 'a option -> int
     - [merge None (Some b) = Some b]
     - [merge (Some a) (Some b) = Some (f a b)]
       See also {!product} and {!map2} for other ways to combine options.
-      @since Frama-C+dev *)
+      @since 33.0-Arsenic *)
 val merge: ('a -> 'a -> 'a) -> 'a option -> 'a option -> 'a option
 
 (** Maps two options such that
@@ -65,15 +65,15 @@ val merge: ('a -> 'a -> 'a) -> 'a option -> 'a option -> 'a option
     - [map2 None (Some b) = None]
     - [map2 (Some a) (Some b) = Some (f a b)]
       See also {!product} and {!merge} for other ways to combine options.
-      @since Frama-C+dev *)
+      @since 33.0-Arsenic *)
 val map2: ('a -> 'b -> 'c) -> 'a option -> 'b option -> 'c option
 
 (** Same as {!Stdlib.Option.map} but avoid creating a copy of the option if the
     mapped function returns its argument (tested through physical equality).
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 val map_no_copy: ('a -> 'a) -> 'a option -> 'a option
 
 (** [filter f (Some a)] applies [f] to [a] and returns [Some a] if [f a] is true
     or [None] if [f a] is false. [filter f None] always returns [None].
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 val filter: ('a -> bool) -> 'a option -> 'a option

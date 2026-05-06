@@ -8,7 +8,7 @@
 
 (** This module/library is used to avoid polluting the namespace with generic
     names from Apron library
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 
 include module type of Apron with type 'a Manager.t = 'a Apron.Manager.t

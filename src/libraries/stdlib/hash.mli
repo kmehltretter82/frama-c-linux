@@ -7,7 +7,7 @@
 (**************************************************************************)
 
 (** This module provides hash functions.
-    @since Frama-C+dev *)
+    @since 33.0-Arsenic *)
 
 (** [hash_iter iter hash x] hashes a collection [x] given an [iter] function on
     this collection and a [hash] function on its elements.

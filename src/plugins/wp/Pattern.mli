@@ -21,7 +21,7 @@ exception TypeError of location * string
 val pattern_loc: pattern -> location
 
 (** Creates an empty environment.
-    @before Frama-C+dev the typing context was mandatory.
+    @before 33.0-Arsenic the typing context was mandatory.
 *)
 val context : ?tc:Logic_typing.typing_context -> unit -> context
 
@@ -29,19 +29,19 @@ val context : ?tc:Logic_typing.typing_context -> unit -> context
     Either the typing context has been built with a logic typing context and it
     uses it or it raises an exception.
     @raise TypeError when the context does not have a typing_context
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val error: context -> location -> ('a, Format.formatter, unit, 'b) format4 -> 'a
 
 (** Parse a pattern and enrich the environment with pattern variables
     @raise TypeError in case of error when context does not have typing_context
-    @before Frama-C+dev it used to always use the typing_context for errors
+    @before 33.0-Arsenic it used to always use the typing_context for errors
 *)
 val pa_pattern : context -> lexpr -> pattern
 
 (** Parse value according to the environment
     @raise TypeError in case of error when context does not have typing_context
-    @before Frama-C+dev it used to always use the typing_context for errors
+    @before 33.0-Arsenic it used to always use the typing_context for errors
 *)
 val pa_value : context -> lexpr -> value
 
@@ -100,7 +100,7 @@ val env : ?raise:bool -> unit -> env
     Either the environment has been built with [raise] set to [false] and it
     logs an error, or it was set to [true] and it raises an exception.
     @raise TypeError when the environment has [raise] set to [true]
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val typecheck_error : env -> location -> ('a, Format.formatter, unit, unit) format4 -> 'a
 

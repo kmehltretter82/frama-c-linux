@@ -11,7 +11,7 @@
     on {!Plugin}. It also includes all Kernel debug and warning keys. Unless
     you cannot depend on Frama-C's kernel, always prefer using {!Kernel}
     instead of {!Kernel_log}.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 
 module Debug_level: Log.Level
@@ -41,7 +41,7 @@ include Log.Messages
 val dkey_hptmap: category
 
 val dkey_task: category
-(** @before Frama-C+dev Was in Task library *)
+(** @before 33.0-Arsenic Was in Task library *)
 
 val dkey_project: category
 

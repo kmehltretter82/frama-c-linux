@@ -15,7 +15,7 @@
     Patricia trees. *)
 
 (** If set to [true], prints debug information about hptmaps.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val set_debug: bool -> unit
 

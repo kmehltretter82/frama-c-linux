@@ -158,7 +158,7 @@ val parse : string -> (parsed_result, string) result
 
 (** Calls {!parse} and evaluates the result type.
     @raise Failure if the parsing fails.
-    @before Frama-C+dev emitted a {!Kernel.failure} instead
+    @before 33.0-Arsenic emitted a {!Kernel.failure} instead
 *)
 val parse_exn : string -> parsed_result
 [@@deprecated "Use parse function instead and handle the error if any."]

@@ -10,7 +10,7 @@
     @since Carbon-20101201 *)
 
 (** If set to [true], prints debug information about tasks.
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val set_debug: bool -> unit
 

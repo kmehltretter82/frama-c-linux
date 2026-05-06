@@ -8,7 +8,7 @@
 
 (** Extension of OCaml's {!Stdlib.String} module.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 
 include module type of Stdlib.String
@@ -48,6 +48,6 @@ val html_escape: string -> string
 val percent_encode: string -> string
 
 (** Return [true] if the string is ["yes"], ["true"] or ["1"] (ignore case).
-    @since Frama-C+dev
+    @since 33.0-Arsenic
 *)
 val means_yes: string -> bool

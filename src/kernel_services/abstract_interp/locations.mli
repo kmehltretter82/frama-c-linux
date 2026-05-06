@@ -31,7 +31,7 @@ val make: Addresses.Bits.t -> Z_or_top.t -> t
 
 (** [addr_bytes l] returns the address set corresponding to the given
     location, i.e. the location without the size information.
-    @before Frama-C+dev was named loc_to_loc_without_size *)
+    @before 33.0-Arsenic was named loc_to_loc_without_size *)
 val addr_bytes : t -> Addresses.Bytes.t
 
 val size : t -> Z_or_top.t
