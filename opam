@@ -81,7 +81,7 @@ authors: [
 homepage: "https://frama-c.com/"
 license: "LGPL-2.1-only"
 dev-repo: "git+https://git.frama-c.com/pub/frama-c.git"
-doc: "https://frama-c.com/download/user-manual-33.0-Arsenic.pdf"
+doc: "https://frama-c.com/download/user-manual-32.0-Germanium.pdf"
 bug-reports: "https://git.frama-c.com/pub/frama-c/issues"
 tags: [
   "ACSL"
