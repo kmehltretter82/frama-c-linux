@@ -32,11 +32,10 @@ else
   fi
 fi
 
-CURRENT=$(cat VERSION)
-CURRENT_MAJOR=$(echo "$CURRENT" | $SED -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
-CURRENT_MINOR=$(echo "$CURRENT" | $SED -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
-
 if [[ $NEXT == "dev" ]]; then
+  CURRENT=$(cat VERSION)
+  CURRENT_MAJOR=$(echo "$CURRENT" | $SED -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
+
   DEV_VERSION=$(($CURRENT_MAJOR+1))
   DEV_CODENAME=$(grep "$DEV_VERSION " ./doc/periodic-elements.txt | cut -d " " -f2)
   echo "Set VERSION to $DEV_VERSION~dev"
@@ -79,7 +78,7 @@ else
   echo "$NEXT_CODENAME" >VERSION_CODENAME
 
   # Ivette
-  $SED -i "s/^  \"version\": .*/  \"version\": \"$CURRENT_MAJOR.$CURRENT_MINOR.0\",/g" ivette/package.json
+  $SED -i "s/^  \"version\": .*/  \"version\": \"$NEXT_MAJOR.$NEXT_MINOR.0\",/g" ivette/package.json
 
   # Opam files
   $SED -i "s/^version: .*/version: \"$NEXT\"/g" opam
