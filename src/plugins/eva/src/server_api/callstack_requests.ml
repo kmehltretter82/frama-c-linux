@@ -15,23 +15,23 @@ let package =
 module Results = Eva__Results
 
 
-let rec is_prefix_stack st1 st2 =
+let rec is_compatible_stack st1 st2 =
   match st1, st2 with
   | [], _ | _, [] -> true
   | (kf1, stmt1) :: st1, (kf2, stmt2) :: st2 ->
     Kernel_function.equal kf1 kf2
     && Cil_datatype.Stmt.equal stmt1 stmt2
-    && is_prefix_stack st1 st2
+    && is_compatible_stack st1 st2
 
 (* Returns true if one callstack is prefix of the other. *)
-let is_prefix cs1 cs2 =
+let is_compatible_callstack cs1 cs2 =
   let open Callstack in
   cs1.thread = cs2.thread
   && Kernel_function.equal cs1.entry_point cs2.entry_point
-  && is_prefix_stack (List.rev cs1.stack) (List.rev cs2.stack)
+  && is_compatible_stack (List.rev cs1.stack) (List.rev cs2.stack)
 
 let is_compatible callstacks cs =
-  List.exists (fun cs' -> is_prefix cs cs') callstacks
+  List.exists (fun cs' -> is_compatible_callstack cs cs') callstacks
 
 let compatible_filter () =
   match Update.CurrentCallstacks.get () with
