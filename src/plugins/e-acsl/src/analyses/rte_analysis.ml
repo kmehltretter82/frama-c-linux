@@ -48,8 +48,6 @@ end
 module Flags =
 struct
 
-  let removes_trivial () = Options.O.get () > 0
-
   (** [needs_div_mod ()] @return:
       - [true] if the option [-rte-div] from the RTE plugin is used (default);
       - [false] if the option [-rte-no-div] from the RTE plugin is used. *)
@@ -74,11 +72,9 @@ struct
       is not equal to [Z.zero]. The guard does not contain directly [divider]
       but a copy of it. *)
   let div_by_zero ~loc divider =
-    let smart = Flags.removes_trivial () in
-    let divider_cpy = Smart_term.copy ~smart divider in
+    let divider_cpy = Smart_term.copy divider in
     let pred =
       Smart_predicate.prel
-        ~smart
         ~loc
         ~names:["division by zero"]
         Rneq

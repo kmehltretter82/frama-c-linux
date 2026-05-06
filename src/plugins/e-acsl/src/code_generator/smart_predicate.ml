@@ -12,16 +12,6 @@ let of_bool ?(loc = Fileloc.unknown) ?(names = []) = function
   | true -> Logic_const.pred ~loc ~names Ptrue
   | false -> Logic_const.pred ~loc ~names Pfalse
 
-let extract_integer t =
-  let aux t =
-    match t.term_node with
-    | TConst (Integer (z, _)) -> Some z
-    | _ -> None
-  in
-  match t.term_node with
-  | TCast (_,_,t) -> aux t
-  | _ -> aux t
-
 let prel
     ?(smart = true)
     ?(loc = Fileloc.unknown)
@@ -29,9 +19,9 @@ let prel
     rel
     t1
     t2 =
-  if smart then try
-      let z1 = Option.get @@ extract_integer t1 in
-      let z2 = Option.get @@ extract_integer t2 in
+  if smart && Options.O.get () > 0 then try
+      let z1 = Option.get @@ Terms.extract_integer t1 in
+      let z2 = Option.get @@ Terms.extract_integer t2 in
       of_bool ~loc ~names @@
       match rel with
       | Req -> Z.equal z1 z2
@@ -42,3 +32,8 @@ let prel
       | Rgt -> Z.gt z1 z2
     with _ -> Logic_const.prel ~loc ~names (rel,t1,t2)
   else Logic_const.prel ~loc ~names (rel,t1,t2)
+
+let pand ?(smart = true) ?(loc = Fileloc.unknown) ?(names = []) p1 p2 =
+  if smart && Options.O.get () > 0
+  then Logic_const.pand ~loc ~names (p1,p2)
+  else Logic_const.pred ~loc ~names (Pand (p1,p2))
