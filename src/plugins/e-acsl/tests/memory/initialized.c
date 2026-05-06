@@ -4,6 +4,10 @@
 
 #include <stdlib.h>
 
+struct tab {
+  int t[3];
+};
+
 int A = 0;
 int B;
 
@@ -169,4 +173,17 @@ int main(void) {
   dup[0] = 1;
   dup[0] = 1;
   /* @assert ! \initialized(&dup); */
+
+  /* Initialization check using range. */
+  int t_1[3] = {1, 2, 3};
+  /*@ assert \initialized(&(t_1[0..2])); */
+
+  struct tab s;
+  s.t[0] = 1;
+  s.t[1] = 2;
+  s.t[2] = 3;
+  /*@ assert \initialized(&(s.t[0..2])); */
+
+  int *t_p = t_1;
+  /*@ assert \initialized(&(*((int (*)[3])t_p))[0..2]); */
 }
