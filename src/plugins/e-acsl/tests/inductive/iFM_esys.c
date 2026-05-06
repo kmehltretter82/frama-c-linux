@@ -1,11 +1,9 @@
 /* run.config
    COMMENT: from the paper Towards Formal Verification of a TPM Software Stack
    COMMENT: https://zenodo.org/records/13693011
-   COMMENT: Unsupported in its original form (see unsupported/iFM_esys.c).
-   COMMENT: Replaced \separated and \valid by Pseparated and Pvalid,
-   COMMENT: as for the time being predicates cannot occur in terms.
-   COMMENT: The extracted predicates still contains constructors/lists,
-   COMMENT: which are currently unsupported.
+   COMMENT: Inductive extraction succeeds, but code cannot be generated due to
+   COMMENT: the presence of data constructors, hitherto unsupported by E-ACSL.
+   COMMENT: Simplified version of unsupported/iFM_esys.c.
    COMMENT: This example shows that inductive extraction is capable of
    COMMENT: deriving a predicate, but that E-ACSL is still missing capabilities.
 */
@@ -507,8 +505,6 @@ struct RSRC_NODE_T {
 typedef struct RSRC_NODE_T RSRC_NODE_T;
 
 /*@
-predicate Pseparated(void *ptr1, void *ptr2) = \true;
-predicate Pvalid(void *ptr) = \true;
 predicate ptr_sep_from_list{L}(RSRC_NODE_T *e, \list<RSRC_NODE_T *>  ll) = \true;
 */
 
@@ -516,8 +512,8 @@ predicate ptr_sep_from_list{L}(RSRC_NODE_T *e, \list<RSRC_NODE_T *>  ll) = \true
 inductive linked_ll{L} (RSRC_NODE_T *bl, RSRC_NODE_T *el, \list<RSRC_NODE_T *>  ll) {
   case linked_ll_nil{L}: ∀ RSRC_NODE_T *el; linked_ll(el, el, [| |]);
   case linked_ll_cons{L}: ∀ RSRC_NODE_T *bl, RSRC_NODE_T *el, \list<RSRC_NODE_T *>  tail;
-                            Pseparated(bl, el) ⇒
-                            Pvalid(bl) ⇒
+                            \separated(bl, el) ⇒
+                            \valid(bl) ⇒
                             linked_ll(bl->next, el, tail) ⇒
                             ptr_sep_from_list(bl, tail) ⇒
                             linked_ll(bl, el, \Cons(bl, tail));

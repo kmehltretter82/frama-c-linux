@@ -11,17 +11,15 @@ typedef struct list {
 } list;
 
 /*@
-  predicate Pvalid(list *ptr) = \valid(ptr);
-
   inductive sorted_decr(list* node) {
     case sorted_nil: sorted_decr(\null);
     case sorted_singleton:
     \forall list* node;
-       Pvalid(node) && node->next == \null ==>
+       \valid(node) && node->next == \null ==>
           sorted_decr(node);
     case sorted_next:
     \forall list* node;
-       Pvalid(node) && Pvalid(node->next) &&
+       \valid(node) && \valid(node->next) &&
        node->hd >= node->next->hd &&
           sorted_decr(node->next) ==> sorted_decr(node);
   }
