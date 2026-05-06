@@ -20,8 +20,8 @@ include module type of Stdlib.List
     @since 33.0-Arsenic
 *)
 module Make_monadic_iterators (M : Monad.S) : Monad.Iterators
-  with type 'a iterable := 'a list
-   and type 'a monad := 'a M.t
+  with type 'a iterable = 'a list
+   and type 'a monad = 'a M.t
 
 (** {2 Datatype functions } *)
 
