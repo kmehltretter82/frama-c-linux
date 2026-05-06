@@ -24,7 +24,7 @@ let callsites kf =
     in
     let add' acc cs = List.fold_left add acc cs.Callstack.stack in
     let stmts = List.fold_left add' StmtSet.empty callstacks in
-    let is_compatible stmt = Cil_datatype.Stmt.Set.mem stmt stmts in
+    let is_compatible stmt = StmtSet.mem stmt stmts in
     let filter (kf, stmt_list) =
       match List.filter is_compatible stmt_list with
       | [] -> None
