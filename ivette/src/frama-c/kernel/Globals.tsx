@@ -860,15 +860,15 @@ interface ItemsProps {
   fcts?: Ast.functionsData[],
   vars?: Ast.globalsData[],
   annot?: Ast.declAttributesData[]
-  init?: number; // default to 100 elements
-  step?: number; // default to 100 elements
+  init?: number; // default to 400 elements
+  step?: number; // default to 400 elements
   addIcon?: boolean;
   scope: States.Scope;
 }
 
 function Items(props: ItemsProps): JSX.Element | null {
   const { types, fcts, vars, annot,
-    init = 100, step = 100, addIcon = true, scope } = props;
+    init = 400, step = 400, addIcon = true, scope } = props;
 
   const [maxType, setMaxType] = React.useState(init);
   const [maxFct, setMaxFct] = React.useState(init);
