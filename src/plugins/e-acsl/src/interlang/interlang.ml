@@ -154,7 +154,7 @@ module Optimization = struct
 
   let lt e1 e2 =
     match Aux.modulo_coerce e1 e2 with
-    | Integer {n = z1}, Integer {n = z2} -> Some (of_bool @@ Z.leq z1 z2)
+    | Integer {n = z1}, Integer {n = z2} -> Some (of_bool @@ Z.lt z1 z2)
     | _ -> None
 
   let gt e1 e2 =
