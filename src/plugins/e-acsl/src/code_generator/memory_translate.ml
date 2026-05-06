@@ -156,7 +156,7 @@ let call ~loc kf name ctx env es =
    The case where [!(0 <= size <= SIZE_MAX)] is an UB ==> guard against it.
    Since the case [0 <= size] is already checked before calling this function,
    only [size <= SIZE_MAX] is added as a guard. *)
-let gmp_to_sizet ~adata ~loc ?pp kf env size =
+let gmp_to_sizet ~adata ~loc ?pp kf env size _p =
   !gmp_to_sizet_ref
     ~adata
     ~loc
@@ -170,8 +170,9 @@ let gmp_to_sizet ~adata ~loc ?pp kf env size =
 (* Take a term of the form [ptr + r] where [ptr] is an address and [r] a range
    offset, and return a tuple [(ptr, size, env)] where [ptr] is the address of
    the start of the range, [size] is the size of the range in bytes and [env] is
-   the current environment. *)
-let range_to_ptr_and_size ~adata ~loc kf env ptr r =
+   the current environment.
+   [p] is the predicate under test. *)
+let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
   let n1, n2 = match r.term_node with
     | Trange(Some n1, Some n2) ->
       n1, n2
@@ -260,7 +261,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r =
           Options.fatal
             "translation to GMP code should always return a C variable"
       in
-      gmp_to_sizet ~adata ~loc ~pp:size_term kf env cvar_term
+      gmp_to_sizet ~adata ~loc ~pp:size_term kf env cvar_term p
     | C_integer _ | C_float _ -> Translate_terms.to_exp ~adata kf env size_term
     | Rational | Real | Nan -> assert false
   in
@@ -286,28 +287,35 @@ let term_to_ptr_and_size ~adata ~loc kf env t =
   in
   e, sizeof, adata, env
 
-(* [fname_to_pred name args] returns the memory predicate corresponding to
-   [name] with the given [args]. *)
-let fname_to_pred ?loc name args =
-  match name, args with
-  | "dangling", [ t ] ->
-    Logic_const.pdangling ?loc (Logic_const.here_label, t)
-  | "valid", [ t ] ->
+let name_of_predicate p = match p.pred_content with
+  | Pvalid _ -> "valid"
+  | Pvalid_read _ -> "valid_read"
+  | Pobject_pointer _ -> "object_pointer"
+  | Pseparated _ -> "separated"
+  | Pinitialized _ -> "initialized"
+  | Pdangling _ -> "dangling"
+  | _ -> Options.fatal "unsupported predicate: %a" Printer.pp_predicate p
+
+(* [pred_with_args args] returns a new version of the given memory predicate
+   applied to [args]. *)
+let pred_with_args ?loc p args =
+  match p.pred_content, args with
+  | Pvalid _, [ t ] ->
     Logic_const.pvalid ?loc (Logic_const.here_label, t)
-  | "valid_read", [ t ] ->
+  | Pvalid_read _, [ t ] ->
     Logic_const.pvalid_read ?loc (Logic_const.here_label, t)
-  | "separated", args ->
+  | Pseparated _, args ->
     Logic_const.pseparated ?loc args
-  | "initialized", [ t ] ->
+  | Pinitialized _, [ t ] ->
     Logic_const.pinitialized ?loc (Logic_const.here_label, t)
-  | "dangling", _ | "valid", _ | "valid_read", _ | "initialized", _ ->
+  | Pdangling _, _ | Pvalid _, _ | Pvalid_read _, _ | Pinitialized _, _ ->
     Options.fatal
       "Mismatch between the function name ('%s') and the number of parameters \
        (%d)"
-      name
+      (name_of_predicate p)
       (List.length args)
   | _ ->
-    Options.fatal "Unsupported function '%s'" name
+    Options.fatal "unsupported predicate: %a" Printer.pp_predicate p
 
 (* [extract_quantifiers ~loc args] iterates over each argument in [args] and if
    that argument contains a non-explicit range, tries to extract a universal
@@ -427,17 +435,18 @@ let call_with_tset
     ~arg_from_term
     ?(prepend_n_args=false)
     kf
-    name
     ctx
     env
     args
+    p
   =
   let args, quantifiers = extract_quantifiers ~loc args in
+  let name = name_of_predicate p in
   match quantifiers with
   | _ :: _ ->
     (* Some quantifiers have been extracted from the arguments, we need to build
        a new predicate with these quantifiers and the updated arguments. *)
-    let p_quantified = fname_to_pred ~loc name args in
+    let p_quantified = pred_with_args ~loc p args in
     let p_quantified =
       List.fold_left
         (fun p (tmin, lv, tmax) ->
@@ -474,7 +483,7 @@ let call_with_tset
                    "arithmetic over set of pointers or arrays"
                else
                  (* Case A *)
-                 arg_from_range ~adata ~loc kf env rev_args ptr r
+                 arg_from_range ~adata ~loc kf env rev_args ptr r p
              | TAddrOf(lh, off) ->
                begin match Logic_utils.last_term_offset off with
                  | TIndex({ term_node = Trange _ } as r, TNoOffset) ->
@@ -484,14 +493,14 @@ let call_with_tset
                    let ptr =
                      Logic_const.term ~loc (TStartOf (lh, TNoOffset)) lty_noset
                    in
-                   arg_from_range ~adata ~loc kf env rev_args ptr r
+                   arg_from_range ~adata ~loc kf env rev_args ptr r p
                  | _ ->
                    (* Case A, B with failed range elimination or C *)
-                   arg_from_term ~adata ~loc kf env rev_args t
+                   arg_from_term ~adata ~loc kf env rev_args t p
                end
              | _ ->
                (* Case A, B with failed range elimination or C *)
-               arg_from_term ~adata ~loc kf env rev_args t
+               arg_from_term ~adata ~loc kf env rev_args t p
            in
            let n_args = n_args + 1 in
            n_args, rev_args, adata, env
@@ -522,19 +531,26 @@ let call_with_tset
     e, adata, env
 
 (* \initialized and \separated *)
-let call_with_size ~adata ~loc kf name ctx env args =
-  assert (name = "initialized" || name = "separated");
-  let arg_from_term ~adata ~loc kf env rev_args t =
+let call_with_size ~adata ~loc kf ctx env p =
+  let args = match p.pred_content with
+    | Pinitialized (_,t) -> [t]
+    | Pseparated args -> args
+    | _ -> assert false
+  in
+  let arg_from_term ~adata ~loc kf env rev_args t _p =
     let ptr, size, adata, env = term_to_ptr_and_size ~adata ~loc kf env t in
     size :: ptr :: rev_args, adata, env
   in
-  let arg_from_range ~adata ~loc kf env rev_args ptr r =
+  let arg_from_range ~adata ~loc kf env rev_args ptr r p =
     let ptr, size, adata, env =
-      range_to_ptr_and_size ~adata ~loc kf env ptr r
+      range_to_ptr_and_size ~adata ~loc kf env ptr r p
     in
     size :: ptr :: rev_args, adata, env
   in
-  let prepend_n_args = Datatype.String.equal name "separated" in
+  let prepend_n_args = match p.pred_content with
+    | Pseparated _ -> true
+    | _ -> false
+  in
   call_with_tset
     ~adata
     ~loc
@@ -542,22 +558,25 @@ let call_with_size ~adata ~loc kf name ctx env args =
     ~arg_from_range
     ~prepend_n_args
     kf
-    name
     ctx
     env
     args
+    p
 
 (* \valid, \valid_read, and \object_pointer *)
-let call_valid ~adata ~loc kf name ctx env t =
-  assert (name = "valid" || name = "valid_read" || name = "object_pointer");
-  let arg_from_term ~adata ~loc kf env rev_args t =
+let call_valid ~adata ~loc kf ctx env p =
+  let t = match p.pred_content with
+    | Pvalid (_,t) | Pvalid_read (_,t) | Pobject_pointer (_,t) -> t
+    | _ -> assert false
+  in
+  let arg_from_term ~adata ~loc kf env rev_args t _p =
     let ptr, size, adata, env = term_to_ptr_and_size ~adata ~loc kf env t in
     let base, base_addr = Misc.ptr_base_and_base_addr ~loc ptr in
     base_addr :: base :: size :: ptr :: rev_args, adata, env
   in
-  let arg_from_range ~adata ~loc kf env rev_args ptr r =
+  let arg_from_range ~adata ~loc kf env rev_args ptr r p =
     let ptr, size, adata, env =
-      range_to_ptr_and_size ~adata ~loc kf env ptr r
+      range_to_ptr_and_size ~adata ~loc kf env ptr r p
     in
     let base, base_addr = Misc.ptr_base_and_base_addr ~loc ptr in
     base_addr :: base :: size :: ptr :: rev_args, adata, env
@@ -570,7 +589,7 @@ let call_valid ~adata ~loc kf name ctx env t =
     ~arg_from_range
     ~prepend_n_args
     kf
-    name
     ctx
     env
     [ t ]
+    p
