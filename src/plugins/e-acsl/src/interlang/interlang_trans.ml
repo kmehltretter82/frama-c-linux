@@ -65,8 +65,6 @@ module M = struct
     return e
 end
 
-module ListM = List.Make_monadic_iterators (M)
-
 open M.Operators
 
 let compile_binop = function
@@ -201,13 +199,11 @@ and compile_context_insensitive {Interlang.enode; origin} =
     let* lval, name = M.without_registering_adata @@ compile_lval lval in
     let* {loc} = M.read in
     let e = Smart_exp.lval ~loc lval in
-    let* () = Option.(map (assert_register_term ~loc e) origin <? M.return ()) in
+    let* () = M.Option.iter (assert_register_term ~loc e) origin in
     M.return (e, Some (Analyses_types.C_number, name))
   | SizeOf ty ->
     let e = Cil.sizeOf ~loc ty in
-    let* () =
-      Option.(map (assert_register_term ~loc ~force:true e) origin <? M.return ())
-    in
+    let* () = M.Option.iter (assert_register_term ~loc ~force:true e) origin in
     M.return (e, Some (Analyses_types.C_number, "sizeof"))
 
 and compile_div_mod ~origin {ity; binop; op1; op2} =
@@ -301,7 +297,7 @@ and compile_rte_guards cil =
     {orig_state with env}
   in
   let* (cil,rtes) = M.flush cil in
-  let* () = ListM.iter compile_rte_guard rtes in
+  let* () = M.List.iter compile_rte_guard rtes in
   M.return cil
 
 let generate_and_compile ~loc ~adata ~env ~kf m source =
