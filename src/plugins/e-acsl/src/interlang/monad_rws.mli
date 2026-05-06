@@ -75,6 +75,14 @@ module type S = sig
 
   include Monad.S
 
+  module Option : Monad.Iterators
+    with type 'a iterable = 'a option
+     and type 'a monad = 'a t
+
+  module List : Monad.Iterators
+    with type 'a iterable = 'a list
+     and type 'a monad = 'a t
+
   (** execute state monad with initial environment [env] and initial state [state] *)
   val run : env:env -> state:state -> 'a t -> 'a * out * state
 

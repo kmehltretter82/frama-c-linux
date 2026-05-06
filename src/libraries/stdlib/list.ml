@@ -194,6 +194,8 @@ let combinations k l =
 
 
 module Make_monadic_iterators (M : Monad.S) = struct
+  type 'a iterable = 'a list
+  type 'a monad = 'a M.t
 
   let fold f acc xs =
     let f acc x = M.bind (fun acc -> f acc x) acc in

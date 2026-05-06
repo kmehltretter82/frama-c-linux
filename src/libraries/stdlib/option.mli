@@ -19,8 +19,8 @@ include module type of Stdlib.Option
     @since 33.0-Arsenic
 *)
 module Make_monadic_iterators (M : Monad.S) : Monad.Iterators
-  with type 'a iterable := 'a option
-   and type 'a monad := 'a M.t
+  with type 'a iterable = 'a option
+   and type 'a monad = 'a M.t
 
 (** The call [opt <? default] is equivalent to [value ~default opt].
     @since 33.0-Arsenic
