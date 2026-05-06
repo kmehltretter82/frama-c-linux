@@ -213,7 +213,8 @@ let markers_callstacks markers =
 let () =
   register_list_request
     ~name:"getMarkersCallstacks"
-    ~descr:"Return the list of all callstacks analyzed for"
+    ~descr:"Return the list of analyzed callstacks for the selected markers, \
+            filtered by the selected callstacks."
     ~input:(module Data.Jlist (Kernel_ast.Marker))
     markers_callstacks
 
