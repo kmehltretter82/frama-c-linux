@@ -633,8 +633,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
           Logic_const.pand
             ~loc
             ~names:[bop_name ^ "_rhs_fits_in_mp_bitcnt_t"]
-            (Logic_const.prel ~loc (Rle, zero, Misc.Id_term.deep_copy t2),
-             Logic_const.prel ~loc (Rle, Misc.Id_term.deep_copy t2, max_bitcnt))
+            (Logic_const.prel ~loc (Rle, zero, Terms.Id.deep_copy t2),
+             Logic_const.prel ~loc (Rle, Terms.Id.deep_copy t2, max_bitcnt))
         in
         Typing.preprocess_predicate ~logic_env:(Env.Logic_env.get env) pred;
         let cond, env =
@@ -715,7 +715,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
           let e1_guard_cond, env =
             let pred =
               Logic_const.prel ~loc
-                (Rge, Misc.Id_term.deep_copy t1, Misc.Id_term.deep_copy zero)
+                (Rge, Terms.Id.deep_copy t1, Terms.Id.deep_copy zero)
             in
             Typing.preprocess_predicate ~logic_env:(Env.Logic_env.get env) pred;
             let cond, env =
@@ -994,7 +994,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     (* Translate the term registered to the \let logic variable *)
     let adata, env = Translate_utils.env_of_li ~adata ~loc kf env li in
     (* Register the logic var to the logic scope *)
-    let lvs = Lvs_let(li.l_var_info, Misc.term_of_li li) in
+    let lvs = Lvs_let(li.l_var_info, Terms.of_li li) in
     let env = Env.Logic_scope.extend env lvs in
     (* Translate the body of the \let *)
     let e, adata, env = to_exp ~adata kf env t in

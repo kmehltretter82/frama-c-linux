@@ -112,31 +112,11 @@ let ptr_base_and_base_addr ~loc e =
   let base_addr  = ptr_base_addr ~loc base in
   base, base_addr
 
-(* TODO: should not be in this file *)
-let term_of_li li =  match li.l_body with
-  | LBterm t -> t
-  | LBnone | LBreads _ | LBpred _ | LBinductive _ ->
-    Options.fatal "li.l_body does not match LBterm(t) in Misc.term_of_li"
-
 let is_set_of_ptr_or_array lty =
   if Ast_types.Acsl.is_plain_set lty then
     let lty = Ast_types.Acsl.set_element lty in
     Ast_types.Acsl.is_ptr lty || Ast_types.Acsl.is_array lty
   else
-    false
-
-exception Range_found_exception
-let is_range_free t =
-  try
-    let has_range_visitor = object inherit Visitor.frama_c_inplace
-      method !vterm t = match t.term_node with
-        | Trange _ -> raise Range_found_exception
-        | _ -> Cil.DoChildren
-    end
-    in
-    ignore (Visitor.visitFramacTerm has_range_visitor t);
-    true
-  with Range_found_exception ->
     false
 
 let is_bitfield_pointers lty =
@@ -156,20 +136,6 @@ let is_bitfield_pointers lty =
     is_bitfield_pointer (Ast_types.Acsl.set_element lty)
   else
     is_bitfield_pointer lty
-
-exception Lv_from_vi_found
-let term_has_lv_from_vi t =
-  try
-    let o = object inherit Visitor.frama_c_inplace
-      method !vlogic_var_use lv = match lv.lv_origin with
-        | None -> Cil.DoChildren
-        | Some _ -> raise Lv_from_vi_found
-    end
-    in
-    ignore (Visitor.visitFramacTerm o t);
-    false
-  with Lv_from_vi_found ->
-    true
 
 let finite_min_and_max i = match Ival.min_and_max i with
   | Some min, Some max -> min, max
@@ -210,30 +176,6 @@ let get_term_from_pot = function
   | Analyses_types.PoT_term t -> Some t
 
 let make_binop = Cil.mkBinOp_exn ~constfold:true
-
-module Id_term = struct
-  include Datatype.Make_with_hashtbl
-      (struct
-        include Cil_datatype.Term
-        let name = "E_ACSL.Id_term"
-        let compare = Datatype.undefined
-        let equal (t1:term) t2 = t1 == t2
-        let structural_descr = Structural_descr.t_abstract
-        let rehash = Datatype.identity
-        let mem_project = Datatype.never_any_project
-      end)
-
-  let term_copier = object
-    inherit Visitor.frama_c_inplace
-    method! vterm _ = Cil.DoChildrenPost (fun t -> {t with term_loc = t.term_loc})
-    method! vlogic_type _ =
-      (* optimisation: we copy terms and logic types do not contain terms *)
-      Cil.SkipChildren
-  end
-
-  let deep_copy t = Visitor.visitFramacTerm term_copier t
-  let deep_copy_predicate p = Visitor.visitFramacPredicate term_copier p
-end
 
 let extract_uncoerced_lval e =
   let rec aux e =

@@ -42,7 +42,7 @@ module Pred_or_term =
           List.fold_left
             (fun reprs t -> PoT_term t :: reprs)
             []
-            Misc.Id_term.reprs
+            Terms.Id.reprs
         in
         List.fold_left
           (fun reprs p -> PoT_pred p :: reprs)
@@ -52,18 +52,18 @@ module Pred_or_term =
       include Datatype.Undefined
 
       let compare _ _ =
-        (* see [Misc.Id_term.compare] *)
+        (* see [Terms.Id.compare] *)
         Kernel.fatal "Pred_or_term: comparison undefined (and undefinable)"
 
       let equal pot1 pot2 =
         match pot1, pot2 with
         | PoT_pred p1, PoT_pred p2 -> PredicateStructEq.equal p1 p2
-        | PoT_term t1, PoT_term t2 -> Misc.Id_term.equal t1 t2
+        | PoT_term t1, PoT_term t2 -> Terms.Id.equal t1 t2
         | _ -> false
 
       let hash = function
         | PoT_pred p -> 7 * PredicateStructEq.hash p
-        | PoT_term t -> 97 * Misc.Id_term.hash t
+        | PoT_term t -> 97 * Terms.Id.hash t
 
       let pretty fmt = function
         | PoT_pred p -> Printer.pp_predicate fmt p
@@ -178,7 +178,7 @@ module At_data = struct
         include Datatype.Undefined
 
         let compare _ _ =
-          (* see [Misc.Id_term.compare] *)
+          (* see [Terms.Id.compare] *)
           Kernel.fatal "At_data: comparison undefined (and undefinable)"
 
         let equal
@@ -343,7 +343,7 @@ end
 module Id_term_in_profile =
   Datatype.With_hashtbl
     (Datatype.Pair
-       (Misc.Id_term)
+       (Terms.Id)
        (Profile))
 
 (* Environment to handle recursive functions: this environment stores the logic
@@ -446,10 +446,10 @@ module LF_env
            lv
            (fun m -> match m with
               | Some tbl ->
-                Misc.Id_term.Hashtbl.replace tbl t profile; Some tbl
+                Terms.Id.Hashtbl.replace tbl t profile; Some tbl
               | None ->
-                let tbl = Misc.Id_term.Hashtbl.create 9 in
-                Misc.Id_term.Hashtbl.add tbl t profile;
+                let tbl = Terms.Id.Hashtbl.create 9 in
+                Terms.Id.Hashtbl.add tbl t profile;
                 Some tbl)
            map)
       map

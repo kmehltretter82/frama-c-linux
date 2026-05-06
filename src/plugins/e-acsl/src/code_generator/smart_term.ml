@@ -25,5 +25,5 @@ let copy ?(smart = true) t =
     match t.term_node with
     | TSizeOf typ -> tsizeof ~loc:t.term_loc typ
     | TAlignOf typ -> talignof ~loc:t.term_loc typ
-    | _ -> Misc.Id_term.deep_copy t
-  else Misc.Id_term.deep_copy t
+    | _ -> Terms.Id.deep_copy t
+  else Terms.Id.deep_copy t

@@ -107,8 +107,8 @@ end = struct
        new terms (see module {!Quantif}) which must be typed. The term
        corresponding to the bound variable [x] is actually used twice: once in
        the guard and once for encoding [x+1] when incrementing it. *)
-  let nondep_tbl : ival Error.result Misc.Id_term.Hashtbl.t =
-    Misc.Id_term.Hashtbl.create 97
+  let nondep_tbl : ival Error.result Terms.Id.Hashtbl.t =
+    Terms.Id.Hashtbl.create 97
 
   (* The interval of the logic function
      //@ logic integer f (integer x) = x + 1;
@@ -159,7 +159,7 @@ end = struct
       X.Hashtbl.replace Tbl.tbl x (Ok i)
   end
 
-  module Nondep = Accesses (Misc.Id_term) (struct let tbl = nondep_tbl end)
+  module Nondep = Accesses (Terms.Id) (struct let tbl = nondep_tbl end)
   module Dep = Accesses (Id_term_in_profile) (struct let tbl = dep_tbl end)
 
   let get profile t =
@@ -179,7 +179,7 @@ end = struct
 
   let clear () =
     Options.feedback ~level:4 "clearing the typing tables";
-    Misc.Id_term.Hashtbl.clear nondep_tbl;
+    Terms.Id.Hashtbl.clear nondep_tbl;
     Id_term_in_profile.Hashtbl.clear dep_tbl
 end
 
@@ -203,7 +203,7 @@ let replace_all_args_ival li args_ival =
   List.iter
     (fun x ->
        let i = Logic_var.Map.find x args_ival in
-       (Misc.Id_term.Hashtbl.iter
+       (Terms.Id.Hashtbl.iter
           (fun t profile -> Memo.replace profile t i)
           (Logic_var.Map.find x args_map)))
     li.l_profile
@@ -520,7 +520,7 @@ let rec infer ~force ~logic_env t =
       Options.abort ~current:true "unbounded ranges are not part of E-ACSl"
 
     | Tlet (li,t) ->
-      let li_t = Misc.term_of_li li in
+      let li_t = Terms.of_li li in
       let li_v = li.l_var_info in
       let i1 = recurse li_t in
       let logic_env =
@@ -830,7 +830,7 @@ and infer_predicate ~logic_env p =
     infer_predicate ~logic_env:logic_env_tbranch p1;
     infer_predicate ~logic_env:logic_env_fbranch p2
   | Plet(li, p) ->
-    let li_t = Misc.term_of_li li in
+    let li_t = Terms.of_li li in
     let li_v = li.l_var_info in
     let i = infer ~force:false ~logic_env li_t in
     let logic_env =

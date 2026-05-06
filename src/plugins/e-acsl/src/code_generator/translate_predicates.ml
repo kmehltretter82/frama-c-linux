@@ -240,7 +240,7 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
     (* Translate the term registered to the \let logic variable *)
     let adata, env = Translate_utils.env_of_li ~adata ~loc kf env li in
     (* Register the logic var to the logic scope *)
-    let lvs = Analyses_types.Lvs_let(li.l_var_info, Misc.term_of_li li) in
+    let lvs = Analyses_types.Lvs_let(li.l_var_info, Terms.of_li li) in
     let env = Env.Logic_scope.extend env lvs in
     (* Translate the body of the \let *)
     let e, adata, env = to_exp ~adata kf env p in

@@ -103,7 +103,7 @@ let eliminate_ranges_from_index_of_term ~loc t =
 let rec eliminate_ranges_from_index_of_toffset ~loc toffset =
   match toffset with
   | TIndex(t, toffset') ->
-    if Misc.is_range_free t then
+    if Terms.is_range_free t then
       let toffset', quantifiers =
         eliminate_ranges_from_index_of_toffset ~loc toffset'
       in

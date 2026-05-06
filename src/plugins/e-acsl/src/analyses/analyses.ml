@@ -9,7 +9,7 @@
 let analyses_feedback msg =
   Options.feedback ~level:2 "%s in %a" msg Project.pretty (Project.current ())
 
-module Terms = Misc.Id_term.Hashtbl
+module Terms = Terms.Id.Hashtbl
 module Logic_infos = Cil_datatype.Logic_info.Hashtbl
 
 let check_integrity () =

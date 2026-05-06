@@ -140,8 +140,8 @@ end = struct
        the guard and once for encoding [x+1] when incrementing it. The
        memoization is only useful here and indeed prevent the generation of one
        extra variable in some cases. *)
-  let tbl : computed_info Error.result Misc.Id_term.Hashtbl.t =
-    Misc.Id_term.Hashtbl.create 97
+  let tbl : computed_info Error.result Terms.Id.Hashtbl.t =
+    Terms.Id.Hashtbl.create 97
 
   (* The type of the logic function
      \\@ logic integer f (integer x) = x + 1;
@@ -161,7 +161,7 @@ end = struct
     with Not_found -> Error.not_memoized ()
 
   let get_nondep t =
-    try Misc.Id_term.Hashtbl.find tbl t
+    try Terms.Id.Hashtbl.find tbl t
     with Not_found -> Error.not_memoized ()
 
   let get ~profile t =
@@ -170,13 +170,13 @@ end = struct
     else get_dep profile t
 
   let memo_nondep f t =
-    try Misc.Id_term.Hashtbl.find tbl t
+    try Terms.Id.Hashtbl.find tbl t
     with Not_found ->
       let x =
         try Result.Ok (f t)
         with Error.Not_yet _ | Error.Typing_error _ as exn -> Result.Error exn
       in
-      Misc.Id_term.Hashtbl.add tbl t x;
+      Terms.Id.Hashtbl.add tbl t x;
       x
 
   let memo_dep f t profile =
@@ -197,7 +197,7 @@ end = struct
 
   let clear () =
     Options.debug ~dkey ~level:4 "clearing the typing tables";
-    Misc.Id_term.Hashtbl.clear tbl;
+    Terms.Id.Hashtbl.clear tbl;
     Id_term_in_profile.Hashtbl.clear dep_tbl
 
 end
@@ -662,7 +662,7 @@ let rec type_term
       ty_of_interv ?ctx i
 
     | Tlet(li, t) ->
-      let li_t = Misc.term_of_li li in
+      let li_t = Terms.of_li li in
       ignore (type_term ~use_gmp_opt:true ~profile li_t);
       (type_term ~use_gmp_opt:true ?ctx ~profile t).ty
     | Tlambda ([ _ ],lt) ->
@@ -825,7 +825,7 @@ and type_predicate ~profile p =
     let on p  () = type_predicate ~profile p in
     do_both (on p1) (on p2)
   | Plet(li, p) ->
-    let li_t = Misc.term_of_li li in
+    let li_t = Terms.of_li li in
     ignore (type_term ~use_gmp_opt:true ~profile li_t);
     type_predicate ~profile p
   | Pforall _

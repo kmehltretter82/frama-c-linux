@@ -49,10 +49,10 @@ include struct (* auxiliary functions *)
     method !vterm t = match t with
       | {term_node = TLval (TVar v, offset)} ->
         begin match Logic_var.Map.find_opt v substs, offset with
-          | Some subst, TNoOffset -> Cil.ChangeTo (Misc.Id_term.deep_copy subst)
+          | Some subst, TNoOffset -> Cil.ChangeTo (Terms.Id.deep_copy subst)
           | Some {term_node = TLval (TVar v', TNoOffset)}, offset ->
             let t' =
-              Misc.Id_term.deep_copy {t with term_node = TLval (TVar v', offset)}
+              Terms.Id.deep_copy {t with term_node = TLval (TVar v', offset)}
             in
             Cil.ChangeDoChildrenPost (t', fun x -> x)
           | Some subst, _ ->
@@ -683,7 +683,7 @@ end = struct
          phenomenon that leads to term-size explosion) we need to unshare. We
          deep-copy the entire extracted logic function body, since sharing may
          also occur between two extractions in two different modes. *)
-      let deep_copy = Misc.Id_term.deep_copy
+      let deep_copy = Terms.Id.deep_copy
     end)
 
   let extract_with_mode ~mode:m li =
@@ -708,7 +708,7 @@ end
   module Extractor = Make_extractor (struct
       include Build_pred_or_term.Predicate
       let mk_concl ~mode:_ _ = mk_true None
-      let deep_copy p = Misc.Id_term.deep_copy_predicate p
+      let deep_copy p = Terms.Id.deep_copy_predicate p
     end)
 
   let extract_with_mode ~mode:{Modus.mode} li =

@@ -15,7 +15,7 @@ let dkey = Options.Dkey.rte
 module Guards =
 struct
 
-  module Terms = Misc.Id_term.Hashtbl
+  module Terms = Terms.Id.Hashtbl
 
   let tbl = Terms.create 10
 
