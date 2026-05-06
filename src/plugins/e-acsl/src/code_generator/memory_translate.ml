@@ -156,7 +156,7 @@ let call ~loc kf name ctx env es =
    The case where [!(0 <= size <= SIZE_MAX)] is an UB ==> guard against it.
    Since the case [0 <= size] is already checked before calling this function,
    only [size <= SIZE_MAX] is added as a guard. *)
-let gmp_to_sizet ~adata ~loc ?pp kf env size _p =
+let gmp_to_sizet ~adata ~loc ?pp kf env size =
   !gmp_to_sizet_ref
     ~adata
     ~loc
@@ -170,9 +170,8 @@ let gmp_to_sizet ~adata ~loc ?pp kf env size _p =
 (* Take a term of the form [ptr + r] where [ptr] is an address and [r] a range
    offset, and return a tuple [(ptr, size, env)] where [ptr] is the address of
    the start of the range, [size] is the size of the range in bytes and [env] is
-   the current environment.
-   [p] is the predicate under test. *)
-let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
+   the current environment. *)
+let range_to_ptr_and_size ~adata ~loc kf env ptr r =
   let n1, n2 = match r.term_node with
     | Trange(Some n1, Some n2) ->
       n1, n2
@@ -261,7 +260,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
           Options.fatal
             "translation to GMP code should always return a C variable"
       in
-      gmp_to_sizet ~adata ~loc ~pp:size_term kf env cvar_term p
+      gmp_to_sizet ~adata ~loc ~pp:size_term kf env cvar_term
     | C_integer _ | C_float _ -> Translate_terms.to_exp ~adata kf env size_term
     | Rational | Real | Nan -> assert false
   in
@@ -318,12 +317,19 @@ let fname_to_pred ?loc name args =
    The cases in the function comments correspond to the cases described in
    [call_with_tset]. *)
 let extract_quantifiers ~loc args =
+  let rec is_last_only_trange o =
+    match o with
+    | TIndex ({ term_node = Trange _ }, TNoOffset) -> true
+    | TIndex ({ term_node = Trange _ }, _) -> false
+    | TNoOffset -> false
+    | TField (_, o) | TIndex (_, o) | TModel (_, o) -> is_last_only_trange o
+  in
   let args = List.rev args in
   List.fold_left
     (fun (args, quantifiers) arg ->
        let arg, quantifiers =
          match arg.term_node with
-         | TAddrOf(TVar _, TIndex({ term_node = Trange _ }, TNoOffset)) ->
+         | TAddrOf(TVar _, toffset) when is_last_only_trange toffset ->
            (* Case A: explicit range *)
            arg, quantifiers
          | TAddrOf(TVar ({ lv_type = Ctype { tnode = TArray _ } } as lv), toffset) ->
@@ -425,7 +431,6 @@ let call_with_tset
     ctx
     env
     args
-    p
   =
   let args, quantifiers = extract_quantifiers ~loc args in
   match quantifiers with
@@ -469,18 +474,24 @@ let call_with_tset
                    "arithmetic over set of pointers or arrays"
                else
                  (* Case A *)
-                 arg_from_range ~adata ~loc kf env rev_args ptr r p
-             | TAddrOf(TVar lv, TIndex({ term_node = Trange _ } as r, TNoOffset)) ->
-               (* Case A *)
-               assert (Logic_const.is_set_type t.term_type);
-               let lty_noset = Logic_const.type_of_element t.term_type in
-               let ptr =
-                 Logic_const.term ~loc (TStartOf (TVar lv, TNoOffset)) lty_noset
-               in
-               arg_from_range ~adata ~loc kf env rev_args ptr r p
+                 arg_from_range ~adata ~loc kf env rev_args ptr r
+             | TAddrOf(lh, off) ->
+               begin match Logic_utils.last_term_offset off with
+                 | TIndex({ term_node = Trange _ } as r, TNoOffset) ->
+                   (* Case A *)
+                   assert (Logic_const.is_set_type t.term_type);
+                   let lty_noset = Logic_const.type_of_element t.term_type in
+                   let ptr =
+                     Logic_const.term ~loc (TStartOf (lh, TNoOffset)) lty_noset
+                   in
+                   arg_from_range ~adata ~loc kf env rev_args ptr r
+                 | _ ->
+                   (* Case A, B with failed range elimination or C *)
+                   arg_from_term ~adata ~loc kf env rev_args t
+               end
              | _ ->
                (* Case A, B with failed range elimination or C *)
-               arg_from_term ~adata ~loc kf env rev_args t p
+               arg_from_term ~adata ~loc kf env rev_args t
            in
            let n_args = n_args + 1 in
            n_args, rev_args, adata, env
@@ -511,15 +522,15 @@ let call_with_tset
     e, adata, env
 
 (* \initialized and \separated *)
-let call_with_size ~adata ~loc kf name ctx env args p =
+let call_with_size ~adata ~loc kf name ctx env args =
   assert (name = "initialized" || name = "separated");
-  let arg_from_term ~adata ~loc kf env rev_args t _p =
+  let arg_from_term ~adata ~loc kf env rev_args t =
     let ptr, size, adata, env = term_to_ptr_and_size ~adata ~loc kf env t in
     size :: ptr :: rev_args, adata, env
   in
-  let arg_from_range ~adata ~loc kf env rev_args ptr r p =
+  let arg_from_range ~adata ~loc kf env rev_args ptr r =
     let ptr, size, adata, env =
-      range_to_ptr_and_size ~adata ~loc kf env ptr r p
+      range_to_ptr_and_size ~adata ~loc kf env ptr r
     in
     size :: ptr :: rev_args, adata, env
   in
@@ -535,19 +546,18 @@ let call_with_size ~adata ~loc kf name ctx env args p =
     ctx
     env
     args
-    p
 
 (* \valid, \valid_read, and \object_pointer *)
-let call_valid ~adata ~loc kf name ctx env t p =
+let call_valid ~adata ~loc kf name ctx env t =
   assert (name = "valid" || name = "valid_read" || name = "object_pointer");
-  let arg_from_term ~adata ~loc kf env rev_args t _p =
+  let arg_from_term ~adata ~loc kf env rev_args t =
     let ptr, size, adata, env = term_to_ptr_and_size ~adata ~loc kf env t in
     let base, base_addr = Misc.ptr_base_and_base_addr ~loc ptr in
     base_addr :: base :: size :: ptr :: rev_args, adata, env
   in
-  let arg_from_range ~adata ~loc kf env rev_args ptr r p =
+  let arg_from_range ~adata ~loc kf env rev_args ptr r =
     let ptr, size, adata, env =
-      range_to_ptr_and_size ~adata ~loc kf env ptr r p
+      range_to_ptr_and_size ~adata ~loc kf env ptr r
     in
     let base, base_addr = Misc.ptr_base_and_base_addr ~loc ptr in
     base_addr :: base :: size :: ptr :: rev_args, adata, env
@@ -564,4 +574,3 @@ let call_valid ~adata ~loc kf name ctx env t p =
     ctx
     env
     [ t ]
-    p

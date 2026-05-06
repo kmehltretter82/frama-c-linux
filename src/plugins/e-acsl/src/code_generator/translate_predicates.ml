@@ -236,7 +236,7 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
             | _ -> assert false
           in
           let e, adata, env =
-            Memory_translate.call_valid ~adata ~loc kf name Cil_const.intType env t p
+            Memory_translate.call_valid ~adata ~loc kf name Cil_const.intType env t
           in
           let adata = Assert.register_pred ~loc env p e adata in
           e, adata, env
@@ -278,7 +278,6 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
         Cil_const.intType
         env
         tlist
-        p
     in
     let adata = Assert.register_pred ~loc env p e adata in
     e, adata, env
@@ -331,7 +330,6 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
               Cil_const.intType
               env
               [ t ]
-              p
           in
           let adata = Assert.register_pred ~loc env p e adata in
           e, adata, env

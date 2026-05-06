@@ -302,7 +302,6 @@ let mk_cast ?loc ?(force=false) newt t =
        in order to remove attributes, resulting in a less user-friendly type *)
     Logic_const.term ~loc (TCast (false, Ctype newt, tres)) (Ctype newt')
 
-
 (* -------------------------------------------------------------------------- *)
 (* --- Constant Conversions                                               --- *)
 (* -------------------------------------------------------------------------- *)
@@ -677,6 +676,12 @@ let remove_logic_coerce t =
   match t.term_node with
   | TCast (true, _,t) -> t
   | _ -> t
+
+let rec last_term_offset o =
+  match o with
+  | TNoOffset | TField (_, TNoOffset)
+  | TIndex (_, TNoOffset) | TModel (_, TNoOffset) -> o
+  | TField (_, o) | TIndex (_, o) | TModel (_, o) -> last_term_offset o
 
 let rec remove_term_offset o =
   match o with
