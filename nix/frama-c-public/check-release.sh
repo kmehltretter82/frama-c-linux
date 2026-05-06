@@ -34,7 +34,6 @@ function echo_green {
 VERSION="$(cat VERSION)"
 VERSION_SAFE="$(cat VERSION | sed 's/~/-/')"
 VERSION_OPAM=$(cat opam | grep "^version" | sed 's/version: \"\(.*\)\"/\1/')
-MAN_VERSION_OPAM=$(cat opam | grep "^doc" | sed 's/.*\([1-9][0-9]\.[0-9].*\)\.pdf"/\1/')
 TAG="$(git describe --tag)"
 CODENAME="$(cat VERSION_CODENAME)"
 LOWER_CODENAME="$(echo "$CODENAME" | tr '[:upper:]' '[:lower:]')"
@@ -67,10 +66,4 @@ if [[ "$VERSION" == "$VERSION_OPAM" ]] ; then
   echo_green "Opam version and version are consistent"
 else
   exit_red   "VERSION $VERSION AND OPAM VERSION $VERSION_OPAM ARE NOT CONSISTENT"
-fi
-
-if [[ "$MAN_VERSION_OPAM" == "$VERSION_SAFE-$CODENAME" ]] ; then
-  echo_green "Opam manual version and version are consistent"
-else
-  exit_red   "OPAM MANUAL VERSION $MAN_VERSION_OPAM AND VERSION $VERSION_SAFE-$CODENAME ARE NOT CONSISTENT"
 fi
