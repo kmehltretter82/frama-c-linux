@@ -287,6 +287,9 @@ val parse_float : ?loc:location -> string -> term
 
 (** {2 Various Utilities} *)
 
+(** retrieve the last offset of the input [term_offset] *)
+val last_term_offset : term_offset -> term_offset
+
 (** [remove_term_offset o] returns [o] without its last offset and
     this last offset. *)
 val remove_term_offset :
