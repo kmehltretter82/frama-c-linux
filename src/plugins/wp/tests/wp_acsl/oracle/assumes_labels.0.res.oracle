@@ -26,6 +26,18 @@ Prove: true.
   Function foo
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'foo':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'foo':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns (file assumes_labels.i, line 3) in 'foo':
 Prove: true.
 

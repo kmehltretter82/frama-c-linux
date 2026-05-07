@@ -127,17 +127,17 @@
  Functions                 WP     Alt-Ergo  Total   Success
   call_ref_ctr              6        -        6       100%
   call_ref_ctr2            10        -       10       100%
-  ref_bd                    2        -        2       100%
+  ref_bd                    4        -        4       100%
   call_ref_bd               6        -        6       100%
   call_ref_bd2             10        -       10       100%
   call_ref_valid           13        -       13       100%
-  no_ref_bd                 3        -        3       100%
+  no_ref_bd                 5        -        5       100%
   call_no_ref_bd           11        -       11       100%
   call_ref_ctr_nr          12        -       12       100%
   call_ref_ctr_nstars       8        -        8       100%
   call_two_ref              9        -        9       100%
   g                         6        -        6       100%
-  array_in_struct_param     2        -        2       100%
+  array_in_struct_param     4        -        4       100%
 ------------------------------------------------------------
 [wp] dispatch_var.i:12: Warning: 
   Memory model hypotheses for function 'ref_ctr':

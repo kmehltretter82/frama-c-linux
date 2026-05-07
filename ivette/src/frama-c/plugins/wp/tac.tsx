@@ -176,7 +176,7 @@ export function Provers(props: ProverSelection): JSX.Element {
       );
     });
   const isInactive = (p: WP.prover): boolean => (
-    p !== 'qed' && p !== 'script' && !proversInfo(p)?.active
+    p !== 'qed' && p !== 'cfg' && p !== 'script' && !proversInfo(p)?.active
   );
   const inactive =
     results

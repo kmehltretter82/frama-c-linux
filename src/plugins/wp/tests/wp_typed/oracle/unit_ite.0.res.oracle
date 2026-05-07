@@ -8,7 +8,19 @@
   Function check
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'check':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file unit_ite.i, line 2) in 'check':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'check':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

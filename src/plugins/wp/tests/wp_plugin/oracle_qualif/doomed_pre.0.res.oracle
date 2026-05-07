@@ -49,12 +49,12 @@
   Smoke Tests:     5 / 14
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  requires                  -        -        1       0.0%
-  reqs_assumes              -        1        2      50.0%
-  reqs_2_2_assumes          -        1        2      50.0%
-  reqs_1_2_assumes          -        1        2      50.0%
-  reqs_combined_assumes     -        1        2      50.0%
-  only_assumes              -        -        1       0.0%
-  bhv_requires_assumes      -        -        1       0.0%
-  reqs_massumes             -        1        3      33.3%
+  requires                  2        -        3      66.7%
+  reqs_assumes              2        1        4      75.0%
+  reqs_2_2_assumes          2        1        4      75.0%
+  reqs_1_2_assumes          2        1        4      75.0%
+  reqs_combined_assumes     2        1        4      75.0%
+  only_assumes              2        -        3      66.7%
+  bhv_requires_assumes      2        -        3      66.7%
+  reqs_massumes             2        1        5      60.0%
 ------------------------------------------------------------

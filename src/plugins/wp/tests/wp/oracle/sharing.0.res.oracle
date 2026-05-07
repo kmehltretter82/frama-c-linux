@@ -83,6 +83,12 @@ Cluster Compound {
   
 }
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file sharing.c, line 8) in 'f':
 Let a = shift_sint32(t, 0).
 Let a_1 = shift_sint32(t, x).
@@ -105,5 +111,11 @@ Assume {
       (0 <= Mint_0[shift_sint32(t, i_1)]))).
 }
 Prove: 0 <= m_3[shift_sint32(t, 4) <- m_3[a_1]][shift_sint32(t, i)].
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

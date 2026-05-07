@@ -8,6 +8,12 @@
   Function euclid_gcd
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'euclid_gcd':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file euclid2.c, line 9) in 'euclid_gcd':
 Let x = number.Gcd.gcd(a, b).
 Assume {
@@ -24,6 +30,12 @@ Assume {
   Else { Have: euclid_gcd_0 = a_2. }
 }
 Prove: x = euclid_gcd_0.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'euclid_gcd':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

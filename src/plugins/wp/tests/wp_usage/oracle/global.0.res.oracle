@@ -8,6 +8,18 @@
   Function foo
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'foo':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'foo':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'no_address_taken' (file global.c, line 17):
 Let a = Mptr_0[global(P_a_24)].
 Assume {

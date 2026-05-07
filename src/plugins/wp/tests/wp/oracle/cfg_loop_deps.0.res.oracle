@@ -8,6 +8,18 @@
   Function function
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'function':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'function':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Establishment of Invariant 'Check_Q' (file cfg_loop_deps.i, line 19):
 Assume { (* Invariant 'Inv_P' *) Have: P_P(0). }
 Prove: P_Q(0).

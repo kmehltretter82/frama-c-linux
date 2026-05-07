@@ -11,6 +11,21 @@
 [wp] [Valid] Goal job_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal job_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
+  Function band_bool
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'band_bool':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'band_bool':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function band_bool with behavior false
 ------------------------------------------------------------
 
@@ -45,6 +60,21 @@ Prove: band_bool_0 = 1.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
+  Function bor_bool
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'bor_bool':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'bor_bool':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function bor_bool with behavior false
 ------------------------------------------------------------
 
@@ -74,6 +104,21 @@ Assume {
   Have: retres_0 = bor_bool_0.
 }
 Prove: bor_bool_0 = 1.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function bxor_bool
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'bxor_bool':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'bxor_bool':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -114,6 +159,12 @@ Prove: bxor_bool_0 = 1.
   Function job
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file bool.i, line 10) in 'job':
 Assume {
   Type: is_bool(a) /\ is_bool(b) /\ is_sint32(job_0) /\ is_sint32(retres_0).
@@ -122,5 +173,11 @@ Assume {
   Have: retres_0 = job_0.
 }
 Prove: (0 <= job_0) /\ (job_0 <= 2).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

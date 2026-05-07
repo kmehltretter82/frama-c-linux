@@ -17,6 +17,18 @@
   Function array
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'array':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'array':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check 'ARR' (file object_pointer.i, line 32):
 Assume { Type: is_sint32(k). (* Heap *) Type: linked(Malloc_0). }
 Prove: ((0 <= k) /\ (k <= 25)) <->
@@ -25,6 +37,18 @@ Prove: ((0 <= k) /\ (k <= 25)) <->
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function compound
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'compound':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'compound':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Check 'M1' (file object_pointer.i, line 47):
@@ -87,6 +111,18 @@ Prove: true.
   Function dangling
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'dangling':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'dangling':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check (file object_pointer.i, line 69):
 Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: !valid_obj(Malloc_0[L_l_46 <- 0], global(L_l_46)).
@@ -94,6 +130,18 @@ Prove: !valid_obj(Malloc_0[L_l_46 <- 0], global(L_l_46)).
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function memvar
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'memvar':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'memvar':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Check 'M1' (file object_pointer.i, line 6):
@@ -117,6 +165,18 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function pointer
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'pointer':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'pointer':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Check 'M1' (file object_pointer.i, line 19):

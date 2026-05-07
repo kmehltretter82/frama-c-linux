@@ -11,6 +11,12 @@
   Function dequal
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'dequal':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file float_real.i, line 14) in 'dequal':
 Assume {
   Type: is_sint32(dequal_0).
@@ -23,5 +29,11 @@ Assume {
   Else { Have: dequal_0 = 0. }
 }
 Prove: (RAbs.abs(x - y) < (1.0/100000)) <-> (dequal_0 != 0).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'dequal':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

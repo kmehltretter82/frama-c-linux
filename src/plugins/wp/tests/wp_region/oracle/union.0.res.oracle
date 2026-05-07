@@ -8,6 +8,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file union.i, line 12) in 'f':
 Let a = shiftfield_F1_U_i(p).
 Let a_1 = shiftfield_F1_U_s(p).
@@ -22,6 +28,12 @@ Assume {
   Have: read_sint32(m, a) = (-1).
 }
 Prove: x = 0.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

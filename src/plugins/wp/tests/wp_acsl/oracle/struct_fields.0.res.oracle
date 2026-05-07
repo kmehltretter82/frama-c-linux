@@ -306,6 +306,18 @@ Cluster S1_X {
   
 }
 
+Goal Termination-condition (generated) in 'foo':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'foo':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'rte,mem_access' (file struct_fields.i, line 15):
 Assume {
   Type: IsS1_X(r) /\ is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\

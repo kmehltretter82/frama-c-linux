@@ -10,6 +10,18 @@
   Function automaton_state_accessor
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'automaton_state_accessor':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'automaton_state_accessor':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion (file default-stmt-assigns.i, line 3):
 Prove: false.
 

@@ -46,8 +46,20 @@ Function array_in_struct_param: { sf }
   Function array_in_struct_param
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'array_in_struct_param':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'Pload2' in 'array_in_struct_param':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'array_in_struct_param':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -584,8 +596,20 @@ Prove: true.
   Function no_ref_bd
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'no_ref_bd':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file dispatch_var.i, line 104) in 'no_ref_bd':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'no_ref_bd':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -604,8 +628,20 @@ Prove: true.
   Function ref_bd
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'ref_bd':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file dispatch_var.i, line 42) in 'ref_bd':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'ref_bd':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

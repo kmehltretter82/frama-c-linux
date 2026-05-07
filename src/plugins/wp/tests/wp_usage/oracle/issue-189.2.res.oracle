@@ -14,6 +14,18 @@ Function f: { *ptr src idx }
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns (file issue-189.i, line 14) in 'f' (1/2):
 Prove: true.
 

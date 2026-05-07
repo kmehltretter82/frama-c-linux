@@ -256,6 +256,12 @@ Prove: true.
   Function job
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'K' in 'job':
 Prove: true.
 
@@ -263,6 +269,12 @@ Prove: true.
 
 Goal Post-condition 'P' in 'job':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -286,6 +298,12 @@ Prove: true.
   Function job2
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'job2':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'K' in 'job2':
 Prove: true.
 
@@ -293,6 +311,12 @@ Prove: true.
 
 Goal Post-condition 'Q' in 'job2':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job2':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -316,6 +340,12 @@ Prove: true.
   Function job3
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'job3':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'K' in 'job3':
 Prove: true.
 
@@ -330,6 +360,12 @@ Assume {
   Have: (0 <= k) /\ (k <= 9).
 }
 Prove: EqArray_S1_S(10, m, q[k <- s]).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job3':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

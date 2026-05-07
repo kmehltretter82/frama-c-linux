@@ -10,8 +10,20 @@
   Function pointers_and_companions
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'pointers_and_companions':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'post' in 'pointers_and_companions':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'pointers_and_companions':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -61,8 +73,20 @@ Prove: true.
   Function pointers_and_companions_ulong
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'pointers_and_companions_ulong':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'postul' in 'pointers_and_companions_ulong':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'pointers_and_companions_ulong':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

@@ -817,7 +817,6 @@ let () =
     ~output:(module D.Junit)
     begin fun () ->
       Emitter.clear WpReached.emitter ;
-      Emitter.clear CfgInfos.emitter ;
       CfgInfos.clear ();
       Wpo.iter_on_goals
         (fun g ->

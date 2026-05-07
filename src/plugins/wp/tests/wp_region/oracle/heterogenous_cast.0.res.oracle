@@ -8,6 +8,18 @@
   Function g
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion (file heterogenous_cast.c, line 11):
 Let x = read_sint32(write_sint16(write_sint16(write_sint32(mem_0, p, 42),
                                    shift_sint16(p, 0), -1),

@@ -151,6 +151,18 @@ Prove: P_Rel(n, to_uint32(n - 1)).
   Function general_variant
 ------------------------------------------------------------
 
+Goal Termination-condition (file terminates_formulae.i, line 64) in 'general_variant':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'general_variant':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Loop assigns (file terminates_formulae.i, line 66):
 Prove: true.
 
@@ -230,12 +242,30 @@ Prove: !P_Q.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'no_variant':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Loop assigns (file terminates_formulae.i, line 85):
 Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function variant
+------------------------------------------------------------
+
+Goal Termination-condition (file terminates_formulae.i, line 54) in 'variant':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'variant':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Loop assigns (file terminates_formulae.i, line 56):

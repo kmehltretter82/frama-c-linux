@@ -76,6 +76,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'foo':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Establishment of Invariant 'A' (file doomed_axioms.i, line 24):
 Prove: P_P(0).
 

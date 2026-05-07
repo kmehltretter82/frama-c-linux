@@ -8,8 +8,20 @@
   Function copy
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'copy':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file looplabels.i, line 13) in 'copy':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'copy':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

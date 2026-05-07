@@ -28,6 +28,6 @@
   Alt-Ergo:        4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  pointers_and_companions   5        2        7       100%
-  pointers_and_companions_ulong   5   2       7       100%
+  pointers_and_companions   7        2        9       100%
+  pointers_and_companions_ulong   7   2       9       100%
 ------------------------------------------------------------

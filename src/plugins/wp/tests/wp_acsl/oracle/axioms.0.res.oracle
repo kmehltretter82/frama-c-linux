@@ -8,6 +8,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'P,todo' in 'f':
 Let a_1 = shift_sint32(t, a).
 Let x = -a.
@@ -59,6 +65,12 @@ Assume {
   Have: b < i.
 }
 Prove: P_Q(Malloc_0, a_2, t, a, b).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

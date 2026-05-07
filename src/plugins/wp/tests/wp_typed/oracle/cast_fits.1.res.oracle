@@ -40,6 +40,12 @@
   Function fits1
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'fits1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file cast_fits.i, line 3) in 'fits1':
 Let x = Mint_0[p].
 Let x_1 = Mint_0[shiftfield_F1_i1(p)].
@@ -51,8 +57,20 @@ Assume {
 Prove: x_1 = x.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fits1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function fits2
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'fits2':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file cast_fits.i, line 19) in 'fits2':
@@ -66,8 +84,20 @@ Assume {
 Prove: x_1 = x.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fits2':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function fits3
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'fits3':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file cast_fits.i, line 27) in 'fits3':
@@ -81,8 +111,20 @@ Assume {
 Prove: x_1 = x.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fits3':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function fits4
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'fits4':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file cast_fits.i, line 37) in 'fits4':
@@ -96,8 +138,20 @@ Assume {
 Prove: x_1 = x.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fits4':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function fits5
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'fits5':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file cast_fits.i, line 45) in 'fits5':
@@ -111,8 +165,20 @@ Assume {
 Prove: x_1 = x.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fits5':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function mismatch1
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'mismatch1':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file cast_fits.i, line 11) in 'mismatch1':
@@ -130,8 +196,20 @@ Assume {
 Prove: x_1 = x.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'mismatch1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function mismatch2
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'mismatch2':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file cast_fits.i, line 52) in 'mismatch2':
@@ -149,8 +227,20 @@ Assume {
 Prove: x_1 = x.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'mismatch2':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function mismatch3
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'mismatch3':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file cast_fits.i, line 58) in 'mismatch3':
@@ -166,5 +256,11 @@ Assume {
   Type: region(p.base) <= 0.
 }
 Prove: x_1 = x.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'mismatch3':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

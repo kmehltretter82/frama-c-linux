@@ -26,6 +26,7 @@
   Unsuccess:       4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
+  f                         2        -        2       100%
   local                     3        -        4      75.0%
   global                    2        -        3      66.7%
   localref                  3        -        4      75.0%

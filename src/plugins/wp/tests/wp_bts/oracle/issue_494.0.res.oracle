@@ -8,6 +8,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file issue_494.i, line 4) in 'f':
 Let x = Mint_0[p].
 Let x_1 = 1 + x.
@@ -17,6 +23,12 @@ Assume {
   Type: region(p.base) <= 0.
 }
 Prove: P_R(x, x_1).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 ------------------------------------------------------------

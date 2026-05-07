@@ -22,8 +22,8 @@
   Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  compute_bizarre           1        -        1       100%
-  compute_normal            1        -        1       100%
+  compute_bizarre           3        -        3       100%
+  compute_normal            3        -        3       100%
   main_bizarre_KO           2        -        3      66.7%
   main_normal_KO            2        -        3      66.7%
 ------------------------------------------------------------

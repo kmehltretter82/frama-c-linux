@@ -29,8 +29,20 @@ Prove: true.
   Function f1_simpler
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f1_simpler':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'BUG_LEGACY_WP' in 'f1_simpler':
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f1_simpler':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 ------------------------------------------------------------

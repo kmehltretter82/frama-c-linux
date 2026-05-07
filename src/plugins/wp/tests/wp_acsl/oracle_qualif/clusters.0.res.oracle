@@ -42,6 +42,7 @@
   simpl_rf                  1        -        2      50.0%
   mutual_1                  1        -        2      50.0%
   mutual_2                  1        -        2      50.0%
+  callee_no_r               1        -        1       100%
   caller_no_cluster         1        -        1       100%
   fp                        2        -        3      66.7%
   function                  2        -        3      66.7%

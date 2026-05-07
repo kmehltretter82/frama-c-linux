@@ -10,12 +10,36 @@
   Function foo
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'foo':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'foo':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion (file zero.i, line 14):
 Prove: P_Foo(.0).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function init
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'init':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'init':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Establishment of Invariant (file zero.i, line 24):

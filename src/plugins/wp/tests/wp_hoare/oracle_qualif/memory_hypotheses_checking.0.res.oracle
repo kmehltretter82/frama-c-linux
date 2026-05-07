@@ -89,18 +89,18 @@
   Unsuccess:       7
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  sep                       1        -        1       100%
+  sep                       3        -        3       100%
   call_sep_ok               6        -        6       100%
   call_sep_bad_sep          5        -        6      83.3%
   call_sep_bad_valid        7        -        8      87.5%
-  gptr_sep                  1        -        1       100%
+  gptr_sep                  3        -        3       100%
   call_gptr_sep_ok          5        1        6       100%
   call_gptr_sep_bad         4        1        6      83.3%
-  assigns_ptr               1        -        1       100%
+  assigns_ptr               3        -        3       100%
   call_assigns_ptr_ok       6        -        6       100%
   call_assigns_ptr_bad      5        -        6      83.3%
-  add_return_ok             3        -        3       100%
+  add_return_ok             5        -        5       100%
   call_add_return_ok        7        1        8       100%
   call_add_return_bad       6        -        8      75.0%
-  bad_return_formal         1        -        2      50.0%
+  bad_return_formal         3        -        4      75.0%
 ------------------------------------------------------------

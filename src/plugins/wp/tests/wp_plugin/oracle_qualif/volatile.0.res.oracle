@@ -25,11 +25,11 @@
   Unsuccess:       4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  job_assigns               -        -        1       0.0%
-  job_read                  -        -        1       0.0%
-  job_struct                1        -        1       100%
-  job_struct_assigns        -        -        1       0.0%
-  default_init              -        -        1       0.0%
+  job_assigns               2        -        3      66.7%
+  job_read                  2        -        3      66.7%
+  job_struct                3        -        3       100%
+  job_struct_assigns        2        -        3      66.7%
+  default_init              2        -        3      66.7%
 ------------------------------------------------------------
 [wp] volatile.i:33: Warning: 
   Memory model hypotheses for function 'job_struct_assigns':

@@ -38,7 +38,7 @@
   Alt-Ergo:        8
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  pair                     18        8       26       100%
+  pair                     20        8       28       100%
 ------------------------------------------------------------
 [wp] Running WP plugin...
 [wp] Warning: Skipped RTE guards: unaligned pointers (\aligned not supported)
@@ -61,5 +61,5 @@
   Alt-Ergo:        3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  pair                     24       11       35       100%
+  pair                     26       11       37       100%
 ------------------------------------------------------------

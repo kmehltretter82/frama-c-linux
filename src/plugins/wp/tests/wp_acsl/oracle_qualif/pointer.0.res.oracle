@@ -29,10 +29,10 @@
   Unsuccess:       6
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  array                     3        -        3       100%
-  pointer                   -        -        2       0.0%
-  mixed_array_pointer       -        -        2       0.0%
-  absurd                    -        -        2       0.0%
+  array                     5        -        5       100%
+  pointer                   2        -        4      50.0%
+  mixed_array_pointer       2        -        4      50.0%
+  absurd                    2        -        4      50.0%
 ------------------------------------------------------------
 [wp] pointer.i:73: Warning: 
   Memory model hypotheses for function 'absurd':

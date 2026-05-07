@@ -14,6 +14,18 @@
   Function union_1
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'union_1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'union_1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check (file union.i, line 23):
 Let m = write_uint64(mem_0, shiftfield_F2_U_u(u), 4294967295).
 Let a = shiftfield_F2_U_x(u).
@@ -104,6 +116,18 @@ Prove: x = 4294967295.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function union_2
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'union_2':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'union_2':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Check (file union.i, line 43):
@@ -237,6 +261,18 @@ Prove: x = 4294967295.
   Function union_3
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'union_3':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'union_3':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check (file union.i, line 56):
 Let a = shiftfield_F2_U_u(u).
 Let m = write_uint32(write_uint64(mem_0, a, 4294967295),
@@ -337,6 +373,18 @@ Prove: read_uint8(m, shift_uint8(shiftfield_F2_U_a(u), i)) = 0.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function union_4
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'union_4':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'union_4':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Check (file union.i, line 70):

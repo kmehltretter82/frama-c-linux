@@ -12,6 +12,18 @@
   Function check_acsl
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'check_acsl':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'check_acsl':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check 'ko,A1,absorb_is_cint' (file simpl_is_type.i, line 64):
 Prove: exists i : Z. forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 63) ->
     P_P(i_1, i, 1.0))).
@@ -205,6 +217,12 @@ Prove: exists i : Z. forall i_1 : Z. (is_uint8(i_1) ->
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file simpl_is_type.i, line 17) in 'f':
 Let a = shift_sint32(t, 0).
 Let a_1 = memcpy(Mint_0, a, Mint_undef_0, a, size_0).
@@ -231,6 +249,12 @@ Assume {
   Have: size_0 <= i.
 }
 Prove: 0 < memcpy(Mint_0, a, Mint_undef_0, a, i)[shift_sint32(t, i_1)].
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -402,6 +426,12 @@ Prove: true.
   Function g
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file simpl_is_type.i, line 36) in 'g':
 Let x = Mint_0[shift_sint32(t, i)].
 Assume {
@@ -421,6 +451,12 @@ Prove: exists i_1 : Z. (Mint_0[shift_sint32(t, i_1)] = x) /\ (0 <= i_1) /\
     (i_1 < size_0) /\
     (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
      (Mint_0[shift_sint32(t, i_2)] != x)))).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

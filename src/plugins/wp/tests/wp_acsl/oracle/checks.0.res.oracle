@@ -8,6 +8,18 @@
   Function main
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check 'c1' (file checks.i, line 14):
 Prove: P_P.
 
@@ -65,9 +77,9 @@ Prove: true.
 --------------------------------------------------------------------------------
 
 [  Valid  ] Exit-condition (generated)
-            by Unreachable Annotations.
+            by Wp.typed.
 [  Valid  ] Termination-condition (generated)
-            by Trivial Termination.
+            by Wp.typed.
 [    -    ] Check 'c1' (file checks.i, line 14)
             tried with Eva.
 [    -    ] Assertion 'a1' (file checks.i, line 15)

@@ -27,6 +27,12 @@ Prove: (x / L_fact(n - 1)) = (n * (x / L_fact(n))).
   Function F1
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'F1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file user_rec.i, line 9) in 'F1':
 Assume {
   Type: is_sint32(F1_0) /\ is_sint32(i) /\ is_sint32(n).
@@ -46,6 +52,12 @@ Assume {
   }
 }
 Prove: L_fact(n) = F1_0.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'F1':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -112,6 +124,12 @@ Prove: true.
   Function F2
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'F2':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file user_rec.i, line 24) in 'F2':
 Assume {
   Type: is_sint32(F2_0) /\ is_sint32(i) /\ is_sint32(n).
@@ -127,6 +145,12 @@ Assume {
   Have: n < i.
 }
 Prove: L_fact(n) = F2_0.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'F2':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -203,6 +227,12 @@ Prove: true.
   Function F4
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'F4':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file user_rec.i, line 38) in 'F4':
 Let x = L_fact(n).
 Assume {
@@ -219,6 +249,12 @@ Assume {
   Have: n_1 <= 1.
 }
 Prove: x = F4_0.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'F4':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

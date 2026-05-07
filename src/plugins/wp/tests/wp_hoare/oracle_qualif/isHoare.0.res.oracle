@@ -12,5 +12,5 @@
   Qed:             1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  cmp_invalid_addr_as_int   1        -        1       100%
+  cmp_invalid_addr_as_int   3        -        3       100%
 ------------------------------------------------------------

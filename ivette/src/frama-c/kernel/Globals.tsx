@@ -157,9 +157,9 @@ function List(props: ListProps): JSX.Element {
         <label className='globals-info'>
           All {name}s are filtered. Try adjusting {name} filters.
         </label>
-        { filteringMenu
-            ? <Dropdown control={button}>{filteringMenu}</Dropdown>
-            : button
+        {filteringMenu
+          ? <Dropdown control={button}>{filteringMenu}</Dropdown>
+          : button
         }
       </div>;
   }
@@ -230,7 +230,7 @@ function FctItem(props: FctItemProps): JSX.Element {
     >
       {attributes && <span className="globals-attr">{attributes}</span>}
       {scopes && scopes.includes(decl) &&
-         <Icon id='MULTICHECK' kind='selected'
+        <Icon id='MULTICHECK' kind='selected'
           title={'Selected in the Locations panel: ' + selectionLabel} />
       }
     </Item>
@@ -248,17 +248,17 @@ function isVisible(
   localFilters: LocalFilter[]
 ): boolean {
   return localFilters.every(f => {
-      const current = value.filters.find(([k, ]) => k === f.id);
-      /**
-       * If f.value is ‘all’ or if the filter does not exist in
-       * the current value: returns true.
-       * Otherwise, the returned value depends on the match between
-       * the current value and the selected filter.
-       */
-      return current === undefined || f.value ==="all"
-        || (f.value === f.positive_label && current[1])
-        || (f.value === f.negative_label && !current[1]);
-    });
+    const current = value.filters.find(([k,]) => k === f.id);
+    /**
+     * If f.value is ‘all’ or if the filter does not exist in
+     * the current value: returns true.
+     * Otherwise, the returned value depends on the match between
+     * the current value and the selected filter.
+     */
+    return current === undefined || f.value === "all"
+      || (f.value === f.positive_label && current[1])
+      || (f.value === f.negative_label && !current[1]);
+  });
 }
 
 type FilterKind = 'functions' | 'variables'
@@ -267,7 +267,7 @@ type FilterKind = 'functions' | 'variables'
  * a function to modify the value of a filter.
  */
 function useFilterLocal(filters: Ast.filter[], kind: FilterKind)
-: [LocalFilter[], setFilterValue: (id: string, value: string) => void] {
+  : [LocalFilter[], setFilterValue: (id: string, value: string) => void] {
   const name = `ivette.${kind}.filters`;
   const decode = Json.jDict(Json.jString);
   const [savedFilters, setSavedFilters] = useWindowSettings(name, decode, {});
@@ -277,37 +277,37 @@ function useFilterLocal(filters: Ast.filter[], kind: FilterKind)
       const newObj = structuredClone(savedFilters);
       newObj[id] = value;
       setSavedFilters(newObj);
-  }, [savedFilters, setSavedFilters]);
+    }, [savedFilters, setSavedFilters]);
 
   function getValue(f: Ast.filter): string {
-    if(f.positive_default && f.negative_default) return 'all';
-    else if(f.positive_default) return f.positive_label;
-    else if(f.negative_default) return f.negative_label;
+    if (f.positive_default && f.negative_default) return 'all';
+    else if (f.positive_default) return f.positive_label;
+    else if (f.negative_default) return f.negative_label;
     else return 'all';
   }
 
-  const localFilters = filters.map(f => {
+  const localFilters = React.useMemo(() => filters.map(f => {
     const value = savedFilters[`${f.id}`] ?? getValue(f);
     return { ...f, value };
-  });
+  }), [filters, savedFilters]);
 
   return [localFilters, setFilterValue];
 }
 
 function useFiltersFlipSettings(label: string, type: string, b: boolean)
-: setting {
+  : setting {
   return Dome.useFlipSettings(`ivette.${type}.${label}`, b);
 }
 
 function getSelectElement(descr: string, kind: string)
-: Buttons.SelectButtonElement {
+  : Buttons.SelectButtonElement {
   const label = descr.replace(kind, "").replace(/\s*\([^)]*\)/g, '');
   const title = `Show only ${descr}`;
   return { id: descr, label, title };
 }
 
 function getFilterButtonProps(f: LocalFilter, kind: string)
-: Buttons.SelectButtonElement[] {
+  : Buttons.SelectButtonElement[] {
   const allTitle = `Show both ${f.positive_label} and ${f.negative_label}`;
   return [
     { id: 'all', label: 'All', title: allTitle },
@@ -342,14 +342,14 @@ export function useFunctionFilter(): FunctionFilterRet {
   const filters = States.useRequestStable(Ast.getFunctionsFilters, null);
   const [localFilters, setLocalFilters] = useFilterLocal(filters, 'functions');
   const selectedState = useFiltersFlipSettings('selected', 'functions', false);
-  const [selected, ] = selectedState;
+  const [selected,] = selectedState;
 
   const showFunction = React.useMemo(() => {
     return (fct: Ast.functionsData): boolean => {
-        const visible = isVisible(fct, localFilters);
-        const local = !multipleSelectionActive || !selected || isSelected(fct);
-        return visible && local;
-      };
+      const visible = isVisible(fct, localFilters);
+      const local = !multipleSelectionActive || !selected || isSelected(fct);
+      return visible && local;
+    };
   }, [localFilters, selected, isSelected, multipleSelectionActive
   ]);
 
@@ -363,16 +363,16 @@ export function useFunctionFilter(): FunctionFilterRet {
   );
 
   itemsComp.push(<Toolbar.Button
-      key='selectedOnly'
-      label= 'Selected only'
-      selected={selectedState[0] }
-      onClick={selectedState[1]}
-      title= 'Show only the functions selected in the Locations panel'
-      disabled= {!multipleSelectionActive} />
+    key='selectedOnly'
+    label='Selected only'
+    selected={selectedState[0]}
+    onClick={selectedState[1]}
+    title='Show only the functions selected in the Locations panel'
+    disabled={!multipleSelectionActive} />
   );
 
   const contextFctFilter = <Buttons.Multiselect title="Show functions">
-    { itemsComp }</Buttons.Multiselect>;
+    {itemsComp}</Buttons.Multiselect>;
 
   return { contextFctFilter, multipleSelection, showFunction, isSelected };
 }
@@ -390,7 +390,7 @@ export function Functions(props: ScrollableParent): JSX.Element {
       .filter(showFunction)
       .sort((f, g) => alpha(f.name, g.name))
       .map((fct) =>
-        <FctItem key={fct.decl} fct={fct} scope={scope} addIcon={false}/>);
+        <FctItem key={fct.decl} fct={fct} scope={scope} addIcon={false} />);
 
   return (
     <List
@@ -431,7 +431,7 @@ function VarItem(props: VarItemProps): JSX.Element {
       onSelection={() => States.setCurrentScope(decl)}
     >
       {markers && markers.includes(varMarker) &&
-         <Icon id='MULTICHECK' kind='selected'
+        <Icon id='MULTICHECK' kind='selected'
           title={'Selected in the Locations panel: ' + selectionLabel} />
       }
     </Item>
@@ -464,9 +464,9 @@ export function useVariableFilter(): VariablesFilterRet {
       onSelection={(a: string) => setLocalFilters(e.id, a)}
     />
   );
-  const contextVarFilter =  <Buttons.Multiselect title='Show variables'>
-      { itemsComp }
-    </Buttons.Multiselect>;
+  const contextVarFilter = <Buttons.Multiselect title='Show variables'>
+    {itemsComp}
+  </Buttons.Multiselect>;
 
   return { contextVarFilter, showVariable };
 }
@@ -483,7 +483,7 @@ export function Variables(props: ScrollableParent): JSX.Element {
       .filter(showVariable)
       .sort((v1, v2) => alpha(v1.name, v2.name))
       .map((v) =>
-        <VarItem key={v.decl} scope={scope} variable={v} addIcon={false}/>);
+        <VarItem key={v.decl} scope={scope} variable={v} addIcon={false} />);
 
   return (
     <List
@@ -511,7 +511,7 @@ interface DeclarationsProps {
 }
 
 const isAcsl = (d: Ast.declAttributesData): boolean => {
-  switch(d.kind) {
+  switch (d.kind) {
     case 'TYPEDEF':
     case 'ENUM':
     case 'UNION':
@@ -525,7 +525,7 @@ const isAcsl = (d: Ast.declAttributesData): boolean => {
 };
 
 const getIcon = (d: Ast.declAttributesData): string => {
-  switch(d.kind) {
+  switch (d.kind) {
     case 'TYPEDEF':
     case 'ENUM':
     case 'UNION':
@@ -537,7 +537,7 @@ const getIcon = (d: Ast.declAttributesData): string => {
 };
 
 const getName = (d: Ast.declAttributesData): string => {
-  switch(d.kind) {
+  switch (d.kind) {
     case 'TYPEDEF': return 'typedef ' + d.name;
     case 'ENUM': return 'enum ' + d.name;
     case 'UNION': return 'union ' + d.name;
@@ -582,7 +582,7 @@ export function Declarations(props: DeclarationsProps): JSX.Element {
         .filter(filter)
         .sort((d1, d2) => alpha(d1.name, d2.name))
         .map((d) =>
-          <AttrItem key={d.decl} dattrs={d} scope={scope} addIcon={false}/>)
+          <AttrItem key={d.decl} dattrs={d} scope={scope} addIcon={false} />)
     , [scope, data, filter]
   );
   return (
@@ -650,15 +650,15 @@ export function useAnnotFilter(): AnnotFilterRet {
   const lvolatileState = useFlipSettings('lvolatile', true);
   const slextensionsState = useFlipSettings('lextensions', false);
 
-  const [ltypes, ] = ltypesState;
-  const [lfunPreds, ] = lfunPredsState;
-  const [laxiomatics, ] = laxiomaticsState;
-  const [lemmas, ] = lemmasState;
-  const [lmodules, ] = lmodulesState;
-  const [linvariants, ] = linvariantsState;
-  const [lmodel, ] = lmodelState;
-  const [lvolatile, ] = lvolatileState;
-  const [lextensions, ] = slextensionsState;
+  const [ltypes,] = ltypesState;
+  const [lfunPreds,] = lfunPredsState;
+  const [laxiomatics,] = laxiomaticsState;
+  const [lemmas,] = lemmasState;
+  const [lmodules,] = lmodulesState;
+  const [linvariants,] = linvariantsState;
+  const [lmodel,] = lmodelState;
+  const [lvolatile,] = lvolatileState;
+  const [lextensions,] = slextensionsState;
 
   const showAnnotation = React.useMemo(() => {
     return (d: Ast.declAttributesData): boolean => {
@@ -676,31 +676,49 @@ export function useAnnotFilter(): AnnotFilterRet {
         && (lmodel || d.kind !== 'MODEL')
         && (lvolatile || d.kind !== 'VOLATILE')
         && (lextensions || d.kind !== 'EXTENSION');
-        return visible;
-      };
+      return visible;
+    };
   }, [ltypes, lfunPreds, laxiomatics, lemmas, lmodules,
     linvariants, lmodel, lvolatile, lextensions
   ]);
 
   const contextMenuItems: Buttons.MultiselectItemProps[] = [
-    menuItem({ label: 'Show Logic Types',
-               state: ltypesState }),
-    menuItem({ label: 'Show Predicates and Logic Functions',
-               state: lfunPredsState }),
-    menuItem({ label: 'Show Axiomatic Definitions',
-               state: laxiomaticsState }),
-    menuItem({ label: 'Show Lemmas',
-               state: lemmasState }),
-    menuItem({ label: 'Show Logic Modules',
-               state: lmodulesState }),
-    menuItem({ label: 'Show Invariants',
-               state: linvariantsState }),
-    menuItem({ label: 'Show Model Fields',
-               state: lmodelState }),
-    menuItem({ label: 'Show Volatile Annotations',
-               state: lvolatileState }),
-    menuItem({ label: 'Show ACSL Extensions',
-               state: slextensionsState }),
+    menuItem({
+      label: 'Show Logic Types',
+      state: ltypesState
+    }),
+    menuItem({
+      label: 'Show Predicates and Logic Functions',
+      state: lfunPredsState
+    }),
+    menuItem({
+      label: 'Show Axiomatic Definitions',
+      state: laxiomaticsState
+    }),
+    menuItem({
+      label: 'Show Lemmas',
+      state: lemmasState
+    }),
+    menuItem({
+      label: 'Show Logic Modules',
+      state: lmodulesState
+    }),
+    menuItem({
+      label: 'Show Invariants',
+      state: linvariantsState
+    }),
+    menuItem({
+      label: 'Show Model Fields',
+      state: lmodelState
+    }),
+    menuItem({
+      label: 'Show Volatile Annotations',
+      state: lvolatileState
+    }),
+    menuItem({
+      label: 'Show ACSL Extensions',
+      state: slextensionsState
+    }),
   ];
 
   const itemsComp = contextMenuItems.map(
@@ -794,7 +812,7 @@ interface File {
   vars: Ast.globalsData[],
   annot: Ast.declAttributesData[]
 }
-type FileList = {[key: string]: File };
+type FileList = { [key: string]: File };
 
 
 function Nodes(props: {
@@ -802,7 +820,7 @@ function Nodes(props: {
   scope: States.Scope,
   prevCompact?: boolean
 }): React.ReactNode {
-  const { dir, files, prevCompact  = false, scope } = props;
+  const { dir, files, prevCompact = false, scope } = props;
   const dirComp = dir.map(item =>
     <DirNode key={item.id} dir={item}
       scope={scope} prevCompact={prevCompact} />
@@ -822,18 +840,18 @@ function DirNode(props: {
 }): React.ReactNode {
   const { dir, scope, prevCompact = false } = props;
   const label = prevCompact ? `../${dir.label}` : dir.label;
-  const toCompact =  dir.dir.length === 1 && dir.files.length === 0;
+  const toCompact = dir.dir.length === 1 && dir.files.length === 0;
   const path = `${dir.path.join('/')}/${dir.label}`;
 
   return toCompact ?
     <Nodes key={dir.id} dir={dir.dir} files={dir.files}
-      scope={scope} prevCompact={true}/>
+      scope={scope} prevCompact={true} />
     :
     <Node key={dir.id} icon={'FOLDER'} id={dir.id} label={label} title={path}>
-      { dir.dir.length > 0 || dir.files.length > 0 ?
+      {dir.dir.length > 0 || dir.files.length > 0 ?
         <Nodes dir={dir.dir} files={dir.files}
-        scope={scope} prevCompact={false}/>
-        : null }
+          scope={scope} prevCompact={false} />
+        : null}
     </Node>;
 }
 
@@ -842,29 +860,79 @@ interface ItemsProps {
   fcts?: Ast.functionsData[],
   vars?: Ast.globalsData[],
   annot?: Ast.declAttributesData[]
+  init?: number; // default to 400 elements
+  step?: number; // default to 400 elements
   addIcon?: boolean;
   scope: States.Scope;
 }
 
 function Items(props: ItemsProps): JSX.Element | null {
-  const { types, fcts, vars, annot, addIcon = true, scope } = props;
+  const { types, fcts, vars, annot,
+    init = 400, step = 400, addIcon = true, scope } = props;
+
+  const [maxType, setMaxType] = React.useState(init);
+  const [maxFct, setMaxFct] = React.useState(init);
+  const [maxVar, setMaxVar] = React.useState(init);
+  const [maxAnnot, setMaxAnnot] = React.useState(init);
+
+  // Types
+  const typeList = React.useMemo(() => {
+    if (!types || types.length === 0) return null;
+    return types.map(t =>
+      <AttrItem key={t.decl} dattrs={t} scope={scope} addIcon={addIcon} />);
+  }, [types, scope, addIcon]);
+  const visibleTypes = React.useMemo(
+    () => typeList?.slice(0, maxType) ?? [], [typeList, maxType]);
+  const hasMoretypes = typeList ? typeList.length > maxType : false;
+
+  // Functions
+  const fctList = React.useMemo(() => {
+    if (!fcts || fcts.length === 0) return null;
+    return fcts.map(f =>
+      <FctItem key={f.decl} fct={f} scope={scope} addIcon={addIcon} />);
+  }, [fcts, scope, addIcon]);
+  const visibleFcts = React.useMemo(
+    () => fctList?.slice(0, maxFct) ?? [], [fctList, maxFct]);
+  const hasMoreFcts = fctList ? fctList.length > maxFct : false;
+
+  // Variables
+  const varList = React.useMemo(() => {
+    if (!vars || vars.length === 0) return null;
+    return vars.map(v =>
+      <VarItem key={v.decl} variable={v} scope={scope} addIcon={addIcon} />);
+  }, [vars, scope, addIcon]);
+  const visibleVars = React.useMemo(
+    () => varList?.slice(0, maxVar) ?? [], [varList, maxVar]);
+  const hasMoreVars = varList ? varList.length > maxVar : false;
+
+  // Annotations
+  const annotList = React.useMemo(() => {
+    if (!annot || annot.length === 0) return null;
+    return annot.map(a =>
+      <AttrItem key={a.decl} dattrs={a} scope={scope} addIcon={addIcon} />);
+  }, [annot, scope, addIcon]);
+  const visibleAnnots = React.useMemo(
+    () => annotList?.slice(0, maxAnnot) ?? [], [annotList, maxAnnot]);
+  const hasMoreAnnot = annotList ? annotList.length > maxAnnot : false;
+
+  const getButton = (
+    set: React.Dispatch<React.SetStateAction<number>>,
+    type?: string
+  ): React.JSX.Element => (
+    <Item
+      label={`... show more ${type}`}
+      onSelection={() => set(e => e + step)}
+    />);
+
   return <>
-    { types &&
-      types.map(t =>
-        <AttrItem
-          key={t.decl} dattrs={t} scope={scope} addIcon={addIcon} />)}
-    { fcts &&
-      fcts.map(f =>
-        <FctItem
-          key={f.decl} fct={f} scope={scope} addIcon={addIcon} />) }
-    { vars &&
-      vars.map(v =>
-        <VarItem
-          key={v.decl} variable={v} scope={scope} addIcon={addIcon} />)}
-    { annot &&
-      annot.map(a =>
-        <AttrItem
-          key={a.decl} dattrs={a} scope={scope} addIcon={addIcon} />)}
+    {visibleTypes}
+    {hasMoretypes && getButton(setMaxType, 'types')}
+    {visibleFcts}
+    {hasMoreFcts && getButton(setMaxFct, 'functions')}
+    {visibleVars}
+    {hasMoreVars && getButton(setMaxVar, 'variables')}
+    {visibleAnnots}
+    {hasMoreAnnot && getButton(setMaxAnnot, 'annotations')}
   </>;
 }
 
@@ -891,10 +959,9 @@ export function Files(props: FilesProps): JSX.Element {
     scrollableParent, dispInList, searchByName, unfoldAllState,
     contextFctFilter, contextAnnotFilter, contextVarFilter,
   } = props;
-
   const filterByName = React.useCallback((val: { name: string }): boolean => {
-      return searchByName ? RegExp(searchByName, 'i').test(val.name) : true;
-    }, [searchByName]);
+    return searchByName ? RegExp(searchByName, 'i').test(val.name) : true;
+  }, [searchByName]);
 
   // Hooks
   const scope = States.useCurrentScope();
@@ -903,14 +970,14 @@ export function Files(props: FilesProps): JSX.Element {
   const fcts = States.useSyncArrayData(Ast.functions);
   const fctsSorted = React.useMemo(() =>
     fcts.sort((f, g) => alpha(f.name, g.name)
-  ), [fcts]);
-  const [showFcts, ] = showFctsState;
+    ), [fcts]);
+  const [showFcts,] = showFctsState;
   const _fctsFiltered = React.useMemo(() => {
-    if(!showFcts) return [];
+    if (!showFcts) return [];
     return fctsSorted.filter(showFunction);
   }, [fctsSorted, showFunction, showFcts]);
   const fctsFiltered = React.useMemo(() => {
-    if(!searchByName) return _fctsFiltered;
+    if (!searchByName) return _fctsFiltered;
     return _fctsFiltered.filter(filterByName);
   }, [_fctsFiltered, searchByName, filterByName]);
 
@@ -918,15 +985,15 @@ export function Files(props: FilesProps): JSX.Element {
   const variables = States.useSyncArrayData(Ast.globals);
   const varsSorted = React.useMemo(() =>
     variables.sort((f, g) => alpha(f.name, g.name)
-  ), [variables]);
-  const [showVars, ] = showVarsState;
+    ), [variables]);
+  const [showVars,] = showVarsState;
   const _varsFiltered = React.useMemo(() => {
-    if(!showVars) return [];
+    if (!showVars) return [];
     return varsSorted.filter(showVariable)
       .sort((v1, v2) => alpha(v1.name, v2.name));
   }, [varsSorted, showVariable, showVars]);
   const varsFiltered = React.useMemo(() => {
-    if(!searchByName) return _varsFiltered;
+    if (!searchByName) return _varsFiltered;
     return _varsFiltered.filter(filterByName);
   }, [_varsFiltered, searchByName, filterByName]);
 
@@ -934,30 +1001,30 @@ export function Files(props: FilesProps): JSX.Element {
   const declarations = States.useSyncArrayData(Ast.declAttributes);
   const declarationsSorted = React.useMemo(() =>
     declarations.sort((v1, v2) => {
-        const cmp = alpha(v1.kind, v2.kind);
-        if(cmp !== 0) return cmp;
-        return alpha(v1.name, v2.name);
+      const cmp = alpha(v1.kind, v2.kind);
+      if (cmp !== 0) return cmp;
+      return alpha(v1.name, v2.name);
     }), [declarations]);
 
   // types
-  const [showTypes, ] = showTypesState;
+  const [showTypes,] = showTypesState;
   const _typesFiltered = React.useMemo(() => {
-    if(!showTypes) return [];
+    if (!showTypes) return [];
     return declarationsSorted.filter(filterTypes);
   }, [declarationsSorted, showTypes]);
   const typesFiltered = React.useMemo(() => {
-    if(!searchByName) return _typesFiltered;
+    if (!searchByName) return _typesFiltered;
     return _typesFiltered.filter(filterByName);
   }, [_typesFiltered, searchByName, filterByName]);
 
   // Annotations
-  const [showAnnot, ] = showAnnotState;
+  const [showAnnot,] = showAnnotState;
   const _annotsFiltered = React.useMemo(() => {
-    if(!showAnnot) return [];
+    if (!showAnnot) return [];
     return declarationsSorted.filter(showAnnotation);
   }, [declarationsSorted, showAnnotation, showAnnot]);
   const annotsFiltered = React.useMemo(() => {
-    if(!searchByName) return _annotsFiltered;
+    if (!searchByName) return _annotsFiltered;
     return _annotsFiltered.filter(filterByName);
   }, [_annotsFiltered, searchByName, filterByName]);
 
@@ -1001,14 +1068,14 @@ export function Files(props: FilesProps): JSX.Element {
 
     function addPath(current: Dir[], path: string[], index: number = 0): Dir {
       const dirpath = index === 0 ? [] : path.slice(0, index);
-      const dirId =  `${dirpath.join('/')}/${path[index]}`;
+      const dirId = `${dirpath.join('/')}/${path[index]}`;
 
       const next = current.find(e => e.id === dirId) ??
-          current[current.push(
-            { id: dirId, label: path[index], path: dirpath, files: [], dir: [] }
-          )-1];
+        current[current.push(
+          { id: dirId, label: path[index], path: dirpath, files: [], dir: [] }
+        ) - 1];
 
-      if(path.length === index + 1) return next;
+      if (path.length === index + 1) return next;
       return addPath(next.dir, path, index + 1);
     }
 
@@ -1017,61 +1084,61 @@ export function Files(props: FilesProps): JSX.Element {
     });
 
     return newTree;
-  }, [ files ]);
+  }, [files]);
 
-  const [ unfoldAll, setUnfoldAll ] = unfoldAllState;
+  const [unfoldAll, setUnfoldAll] = unfoldAllState;
   return (
     <Tree
       unfoldAll={unfoldAll}
       setUnfoldAll={setUnfoldAll}
       sticky={true}
       className='sidebar-files-tree'
-      >
+    >
       <div style={dispInList ? { display: 'none' } : { display: 'block' }}>
         <InfiniteScrollList scrollableParent={scrollableParent} >
-          { Object.entries(tree).map(elt =>
-              <DirNode key={elt[0]} dir={elt[1]} scope={scope} />
-            )
+          {Object.entries(tree).map(elt =>
+            <DirNode key={elt[0]} dir={elt[1]} scope={scope} />
+          )
           }
         </InfiniteScrollList >
       </div>
       <div style={dispInList ? { display: 'block' } : { display: 'none' }}>
         <InfiniteScrollList scrollableParent={scrollableParent} >
-            { showTypes ? <Node key='typesFiltered' id='typesFiltered'
-              label={'Types'} title={'Types'}
-              actions={makeBadge(typesFiltered.length)}
-              ><Items types={typesFiltered} scope={scope} addIcon={false}/>
-              </Node> : <></>
-            }
-            { showFcts ? <Node key='fctsFiltered' id='fctsFiltered'
-              label={'Functions'} title={'Functions'}  actions={<>
-                  <Dropdown control={ <Buttons.IconButton icon='FILTER' /> }
-                  >{contextFctFilter}</Dropdown>
-                  {makeBadge(fctsFiltered.length)}
-                </>}
-              ><Items fcts={fctsFiltered} scope={scope} addIcon={false} />
-              </Node> : <></>
-            }
-            { showVars ? <Node key='varsFiltered' id='varsFiltered'
-              label={'Variables'} title={'Variables'}
-              actions={<>
-                  <Dropdown control={ <Buttons.IconButton icon='FILTER' /> }
-                  >{contextVarFilter}</Dropdown>
-                  {makeBadge(varsFiltered.length)}
-                </>}
-              ><Items vars={varsFiltered} scope={scope} addIcon={false} />
-              </Node> : <></>
-            }
-            { showAnnot ? <Node key='annotsFiltered' id='annotsFiltered'
-              label={'Annotations'} title={'Annotations'}
-              actions={<>
-                  <Dropdown control={ <Buttons.IconButton icon='FILTER' /> }
-                  >{contextAnnotFilter}</Dropdown>
-                  {makeBadge(annotsFiltered.length)}
-                </>}
-              ><Items annot={annotsFiltered} scope={scope} addIcon={false} />
-              </Node> : <></>
-            }
+          {showTypes ? <Node key='typesFiltered' id='typesFiltered'
+            label={'Types'} title={'Types'}
+            actions={makeBadge(typesFiltered.length)}
+          ><Items types={typesFiltered} scope={scope} addIcon={false} />
+          </Node> : <></>
+          }
+          {showFcts ? <Node key='fctsFiltered' id='fctsFiltered'
+            label={'Functions'} title={'Functions'} actions={<>
+              <Dropdown control={<Buttons.IconButton icon='FILTER' />}
+              >{contextFctFilter}</Dropdown>
+              {makeBadge(fctsFiltered.length)}
+            </>}
+          ><Items fcts={fctsFiltered} scope={scope} addIcon={false} />
+          </Node> : <></>
+          }
+          {showVars ? <Node key='varsFiltered' id='varsFiltered'
+            label={'Variables'} title={'Variables'}
+            actions={<>
+              <Dropdown control={<Buttons.IconButton icon='FILTER' />}
+              >{contextVarFilter}</Dropdown>
+              {makeBadge(varsFiltered.length)}
+            </>}
+          ><Items vars={varsFiltered} scope={scope} addIcon={false} />
+          </Node> : <></>
+          }
+          {showAnnot ? <Node key='annotsFiltered' id='annotsFiltered'
+            label={'Annotations'} title={'Annotations'}
+            actions={<>
+              <Dropdown control={<Buttons.IconButton icon='FILTER' />}
+              >{contextAnnotFilter}</Dropdown>
+              {makeBadge(annotsFiltered.length)}
+            </>}
+          ><Items annot={annotsFiltered} scope={scope} addIcon={false} />
+          </Node> : <></>
+          }
         </InfiniteScrollList >
       </div>
     </Tree>
@@ -1098,46 +1165,46 @@ function SidebarFilesTools(props: SidebarFilesToolProps): React.JSX.Element {
   const [showAnnot, flipShowAnnot] = props.showAnnotState;
 
   const typesButton = <Toolbar.Button icon="T" title={'Show types'}
-    selected={showTypes}  onClick={() => flipShowTypes()} />;
+    selected={showTypes} onClick={() => flipShowTypes()} />;
   const fctsButton = <Toolbar.Button icon="F" title={'Show functions'}
-    selected={showFcts}  onClick={() => flipShowFcts()} />;
+    selected={showFcts} onClick={() => flipShowFcts()} />;
   const varsButton = <Toolbar.Button icon="V" title={'Show variables'}
-    selected={showVars}  onClick={() => flipShowVars()} />;
+    selected={showVars} onClick={() => flipShowVars()} />;
   const annotsButton = <Toolbar.Button icon="A" title={'Show annotations'}
-    selected={showAnnot}  onClick={() => flipShowAnnot()} />;
+    selected={showAnnot} onClick={() => flipShowAnnot()} />;
 
   return (
     <div className='sidebar-files-tools'>
       <Hbox className='sidebar-files-tools-filter'>
         <Hbox>
-          { typesButton }
+          {typesButton}
           <Toolbar.ButtonGroup>
-            { fctsButton }
-          <Dropdown control={ <Toolbar.Button icon='FILTER' /> }
-          >{props.contextFctFilter}</Dropdown>
+            {fctsButton}
+            <Dropdown control={<Toolbar.Button icon='FILTER' />}
+            >{props.contextFctFilter}</Dropdown>
           </Toolbar.ButtonGroup>
           <Toolbar.ButtonGroup>
-            { varsButton }
-          <Dropdown control={ <Toolbar.Button icon='FILTER' /> }
-          >{props.contextVarFilter}</Dropdown>
+            {varsButton}
+            <Dropdown control={<Toolbar.Button icon='FILTER' />}
+            >{props.contextVarFilter}</Dropdown>
           </Toolbar.ButtonGroup>
           <Toolbar.ButtonGroup>
-            { annotsButton }
-          <Dropdown control={ <Toolbar.Button icon='FILTER' /> }
-          >{props.contextAnnotFilter}</Dropdown>
+            {annotsButton}
+            <Dropdown control={<Toolbar.Button icon='FILTER' />}
+            >{props.contextAnnotFilter}</Dropdown>
           </Toolbar.ButtonGroup>
         </Hbox>
       </Hbox>
       <Forms.TextField
-          label=''
-          placeholder='Search'
-          state={searchByNameState}
-          actions={<Buttons.IconButton
-            icon='TRASH'
-            onClick={() =>
-              searchByNameState.onChanged(undefined, undefined, false)}
-          />}
-        />
+        label=''
+        placeholder='Search'
+        state={searchByNameState}
+        actions={<Buttons.IconButton
+          icon='TRASH'
+          onClick={() =>
+            searchByNameState.onChanged(undefined, undefined, false)}
+        />}
+      />
     </div>
   );
 }
@@ -1154,7 +1221,7 @@ export function GlobalByFiles(): JSX.Element {
     Dome.useFlipSettings('ivette.sidebar.file.disp.inlist', false);
 
   // For input text
-  const searchByNameState = Forms.useState<string|undefined>(undefined);
+  const searchByNameState = Forms.useState<string | undefined>(undefined);
 
   // For unfoldAll tree
   const unfoldAllState = React.useState<boolean | undefined>(true);
@@ -1181,80 +1248,80 @@ export function GlobalByFiles(): JSX.Element {
   const [unfoldAll, setUnfoldAll] = unfoldAllState;
 
   return (<>
-      <SidebarTitle label='Files'>
-        <Hbox>
-          <Toolbar.ButtonGroup>
-            <Toolbar.Button
-              icon="CHEVRON.CONTRACT"
-              title={'Fold all'}
-              disabled={unfoldAll === false}
-              onClick={() => setUnfoldAll(false)}
-              />
-            <Toolbar.Button
-              icon='CHEVRON.EXPAND'
-              title={'Unfold all'}
-              disabled={unfoldAll}
-              onClick={() => setUnfoldAll(true)}
-              />
-          </Toolbar.ButtonGroup>
-          <Toolbar.ButtonGroup>
-            <Toolbar.Button
-              icon="ITEMS.LIST"
-              title={'Display in list'}
-              selected={dispInList}
-              onClick={() => flipDispInList()}
-              />
-            <Toolbar.Button
-              icon='TREE'
-              title={'Display in tree'}
-              selected={!dispInList}
-              onClick={() => flipDispInList()}
-              />
-          </Toolbar.ButtonGroup>
-        </Hbox>
-      </SidebarTitle>
-      <SidebarFilesTools
-        searchByNameState={searchByNameState}
+    <SidebarTitle label='Files'>
+      <Hbox>
+        <Toolbar.ButtonGroup>
+          <Toolbar.Button
+            icon="CHEVRON.CONTRACT"
+            title={'Fold all'}
+            disabled={unfoldAll === false}
+            onClick={() => setUnfoldAll(false)}
+          />
+          <Toolbar.Button
+            icon='CHEVRON.EXPAND'
+            title={'Unfold all'}
+            disabled={unfoldAll}
+            onClick={() => setUnfoldAll(true)}
+          />
+        </Toolbar.ButtonGroup>
+        <Toolbar.ButtonGroup>
+          <Toolbar.Button
+            icon="ITEMS.LIST"
+            title={'Display in list'}
+            selected={dispInList}
+            onClick={() => flipDispInList()}
+          />
+          <Toolbar.Button
+            icon='TREE'
+            title={'Display in tree'}
+            selected={!dispInList}
+            onClick={() => flipDispInList()}
+          />
+        </Toolbar.ButtonGroup>
+      </Hbox>
+    </SidebarTitle>
+    <SidebarFilesTools
+      searchByNameState={searchByNameState}
+      unfoldAllState={unfoldAllState}
+      showTypesState={showTypesState}
+      showFctsState={showFctsState}
+      contextFctFilter={contextFctFilter}
+      showVarsState={showVarsState}
+      contextVarFilter={contextVarFilter}
+      showAnnotState={showAnnotState}
+      contextAnnotFilter={contextAnnotFilter}
+    />
+    <div ref={scrollableArea} className="globals-scrollable-area">
+      <Files scrollableParent={scrollableArea}
+        searchByName={searchByNameState.value}
         unfoldAllState={unfoldAllState}
         showTypesState={showTypesState}
         showFctsState={showFctsState}
-        contextFctFilter={contextFctFilter}
+        showFunction={showFunction}
         showVarsState={showVarsState}
-        contextVarFilter={contextVarFilter}
+        showVariable={showVariable}
         showAnnotState={showAnnotState}
+        showAnnotation={showAnnotation}
+        dispInList={dispInList}
+        contextFctFilter={contextFctFilter}
+        contextVarFilter={contextVarFilter}
         contextAnnotFilter={contextAnnotFilter}
       />
-      <div ref={scrollableArea} className="globals-scrollable-area">
-        <Files scrollableParent={scrollableArea}
-          searchByName={searchByNameState.value}
-          unfoldAllState={unfoldAllState}
-          showTypesState={showTypesState}
-          showFctsState={showFctsState}
-          showFunction={showFunction}
-          showVarsState={showVarsState}
-          showVariable={showVariable}
-          showAnnotState={showAnnotState}
-          showAnnotation={showAnnotation}
-          dispInList={dispInList}
-          contextFctFilter={contextFctFilter}
-          contextVarFilter={contextVarFilter}
-          contextAnnotFilter={contextAnnotFilter}
-        />
-      </div>
-    </>
+    </div>
+  </>
   );
 }
 
 export function GlobalDeclarations(): JSX.Element {
   const scrollableArea = React.useRef<HTMLDivElement>(null);
   return (<>
-      <SidebarTitle label='Global Declarations' />
-      <div ref={scrollableArea} className="globals-scrollable-area">
-        <Types />
-        <Variables scrollableParent={scrollableArea} />
-        <Functions scrollableParent={scrollableArea} />
-        <GlobalAnnots />
-      </div>
-    </>
+    <SidebarTitle label='Global Declarations' />
+    <div ref={scrollableArea} className="globals-scrollable-area">
+      <Types />
+      <Variables scrollableParent={scrollableArea} />
+      <Functions scrollableParent={scrollableArea} />
+      <GlobalAnnots />
+    </div>
+  </>
   );
 }

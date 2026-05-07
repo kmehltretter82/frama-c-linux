@@ -8,6 +8,12 @@
   Function init
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'init':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'qed_ok' in 'init':
 Let a_1 = shift_sint32(t, a).
 Let x = -a.
@@ -34,6 +40,12 @@ Assume {
   Have: b < i.
 }
 Prove: a_2[shift_sint32(t, i_1)] = e.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'init':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

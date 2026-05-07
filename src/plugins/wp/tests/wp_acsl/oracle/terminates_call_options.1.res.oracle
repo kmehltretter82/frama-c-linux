@@ -43,6 +43,18 @@ Prove: true.
   Function definition
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'definition':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'definition':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'definition':
 Prove: true.
 
@@ -85,5 +97,11 @@ Prove: true.
 Goal Termination-condition (generated) in 'no_spec_generates_goal':
 Loop termination at line 33
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'no_spec_generates_goal':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

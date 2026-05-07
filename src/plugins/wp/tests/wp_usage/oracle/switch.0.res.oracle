@@ -8,6 +8,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file switch.i, line 12) in 'f' (1/3):
 Tags: Default.
 Assume {
@@ -33,5 +39,11 @@ Assume {
   Have: (x = 0) \/ (x = 1) \/ (x = 2).
 }
 Prove: P_P(10).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

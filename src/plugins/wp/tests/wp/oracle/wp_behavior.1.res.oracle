@@ -28,9 +28,21 @@ Prove: (!P_CX) \/ (!P_CY).
 
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'behaviors':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file wp_behavior.i, line 24) in 'behaviors':
 Assume { (* Pre-condition *) Have: P_R. (* Assertion *) Have: P_Q. }
 Prove: P_P.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'behaviors':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -293,6 +305,12 @@ Prove: P_R.
   Function main
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Pre-condition (file wp_behavior.i, line 45) in 'main':
 Prove: P_R.
 
@@ -300,6 +318,12 @@ Prove: P_R.
 
 Goal Pre-condition (file wp_behavior.i, line 46) in 'main':
 Prove: P_R1.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -402,6 +426,21 @@ Prove: q = p.
 Goal Assigns for 'Y' (file wp_behavior.i, line 55) in 'main' (2/2):
 Effect at line 59
 Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function unguarded
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'unguarded':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'unguarded':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 ------------------------------------------------------------

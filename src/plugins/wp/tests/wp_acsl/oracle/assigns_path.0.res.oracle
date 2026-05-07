@@ -8,6 +8,12 @@
   Function job
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'N' in 'job':
 Prove: true.
 
@@ -33,6 +39,12 @@ Assume {
   Have: n <= i_1.
 }
 Prove: Mint_0[shift_sint32(b, i)] = v[i].
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

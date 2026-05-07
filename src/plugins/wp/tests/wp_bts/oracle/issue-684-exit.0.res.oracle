@@ -13,7 +13,24 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Post-condition (file issue-684-exit.c, line 4) in 'unconditional_exit':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Exit-condition (file issue-684-exit.c, line 3) in 'unconditional_exit':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns nothing in 'unconditional_exit':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Assigns nothing in 'unconditional_exit':
 Prove: true.
 
 ------------------------------------------------------------

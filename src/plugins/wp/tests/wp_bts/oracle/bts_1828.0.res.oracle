@@ -10,6 +10,12 @@
   Function global_frame
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'global_frame':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'sep_iff_ref' in 'global_frame':
 Assume {
   (* Heap *)
@@ -46,6 +52,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'global_frame':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'ok' (file bts_1828.i, line 60):
 Prove: true.
 
@@ -57,6 +69,18 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function local_frame
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'local_frame':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'local_frame':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assertion 'ok' (file bts_1828.i, line 23):

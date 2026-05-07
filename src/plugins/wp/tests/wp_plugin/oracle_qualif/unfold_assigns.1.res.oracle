@@ -90,8 +90,8 @@
   NO_UNFOLD_KO              4        -        4       100%
   USE_ASSIGN_UNFOLD_OK      4        1        5       100%
   USE_ASSIGN_UNFOLD_KO      4        1        5       100%
-  ASSIGN_NO_UNFOLD_OK       1        -        1       100%
-  ASSIGN_NO_UNFOLD_KO       1        -        1       100%
+  ASSIGN_NO_UNFOLD_OK       3        -        3       100%
+  ASSIGN_NO_UNFOLD_KO       3        -        3       100%
   PARTIAL_ASSIGNS_STATIC    3        1        4       100%
   PARTIAL_ASSIGNS_VARS      3        1        4       100%
   NESTED_ARRAY_STATIC       4        -        4       100%

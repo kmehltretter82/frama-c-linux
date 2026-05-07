@@ -8,6 +8,18 @@
   Function int128
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'int128':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'int128':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check (file gcc_extensions.i, line 12):
 Let a = global(G_i128_1129).
 Let m = write_sint128(mem_0, a, 2469211232873017104).

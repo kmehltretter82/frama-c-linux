@@ -12,6 +12,18 @@
   Function land
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'land':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'land':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check 'A' (file bitwise_idemp.i, line 11):
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(c) /\ is_sint32(x).
@@ -35,6 +47,18 @@ Prove: land(a, land(b, c)) = land(a, b).
   Function lor
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'lor':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'lor':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check 'A' (file bitwise_idemp.i, line 26):
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(c) /\ is_sint32(x).
@@ -56,6 +80,18 @@ Prove: lor(a, lor(b, c)) = lor(a, b).
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function lxor
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'lxor':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'lxor':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Check 'A' (file bitwise_idemp.i, line 40):

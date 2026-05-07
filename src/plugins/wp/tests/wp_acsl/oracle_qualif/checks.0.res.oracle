@@ -16,7 +16,7 @@
   Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  main                      2        -        4      50.0%
+  main                      4        -        6      66.7%
 ------------------------------------------------------------
 [report] Computing properties status...
 --------------------------------------------------------------------------------
@@ -31,9 +31,9 @@
 --------------------------------------------------------------------------------
 
 [  Valid  ] Exit-condition (generated)
-            by Unreachable Annotations.
+            by Wp.typed.
 [  Valid  ] Termination-condition (generated)
-            by Trivial Termination.
+            by Wp.typed.
 [    -    ] Check 'c1' (file checks.i, line 14)
             tried with Wp.typed.
 [    -    ] Assertion 'a1' (file checks.i, line 15)

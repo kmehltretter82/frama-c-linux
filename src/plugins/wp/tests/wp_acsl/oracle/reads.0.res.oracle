@@ -14,6 +14,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'qed_ok' in 'f':
 Assume {
   Type: is_sint32(x) /\ is_sint32(y).
@@ -27,8 +33,20 @@ Assume {
 Prove: P_Q(1 + y, 1 + x).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function g
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'qed_ok' in 'g':
@@ -50,8 +68,20 @@ Assume {
 Prove: P_P(m[v <- 1 + x_2], u, v).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function modifies_x
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'modifies_x':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'qed_ok,F_OK' in 'modifies_x':
@@ -94,8 +124,20 @@ Assume {
 Prove: P_w(y, 1 + x).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'modifies_x':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function modifies_y
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'modifies_y':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'qed_ok,F_OK' in 'modifies_y':
@@ -129,5 +171,11 @@ Assume {
   Have: P_f /\ P_g(x) /\ P_h(y, x) /\ P_w(y, x).
 }
 Prove: P_w(1 + y, x).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'modifies_y':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

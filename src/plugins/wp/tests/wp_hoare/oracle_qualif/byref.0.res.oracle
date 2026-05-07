@@ -34,7 +34,7 @@
   Unsuccess:       1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  f                         2        -        2       100%
+  f                         4        -        4       100%
   wrong_without_ref         3        -        4      75.0%
   pointer                   4        -        4       100%
   local                     4        -        4       100%

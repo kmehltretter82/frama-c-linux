@@ -8,6 +8,12 @@
   Function abs
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'abs':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file abs.i, line 13) in 'abs':
 Assume {
   Type: is_sint32(abs_0) /\ is_sint32(x).
@@ -16,5 +22,11 @@ Assume {
   Else { Have: x = abs_0. }
 }
 Prove: my_abs(x) = abs_0.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'abs':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

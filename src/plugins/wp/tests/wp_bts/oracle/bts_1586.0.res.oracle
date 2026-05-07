@@ -7,11 +7,41 @@
 [wp] [Valid] Goal compute_normal_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal compute_normal_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
+  Function compute_bizarre
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'compute_bizarre':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'compute_bizarre':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function compute_bizarre with behavior Bizarre
 ------------------------------------------------------------
 
 Goal Post-condition for 'Bizarre' 'TRANS' in 'compute_bizarre':
 Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function compute_normal
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'compute_normal':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'compute_normal':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 ------------------------------------------------------------

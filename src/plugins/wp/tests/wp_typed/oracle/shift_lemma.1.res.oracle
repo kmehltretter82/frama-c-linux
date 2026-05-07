@@ -8,6 +8,18 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion (file shift_lemma.i, line 21):
 Let x = Mint_0[shiftfield_F2_s_d(p)].
 Let a = shiftfield_F2_s_u(p).

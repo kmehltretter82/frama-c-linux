@@ -12,6 +12,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'P_startof' in 'f':
 Let a = global(G_G_21).
 Let a_1 = shift_sint32(a, 0).
@@ -51,6 +57,12 @@ Prove: a_1 = f.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Loop assigns 'qed_ok,index':
 Prove: true.
 
@@ -67,6 +79,12 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function f2
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'f2':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'P_startof_shift' in 'f2':
@@ -108,6 +126,12 @@ Prove: a_1 = f2_0.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'f2':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Loop assigns 'qed_ok,index':
 Prove: true.
 
@@ -135,6 +159,12 @@ Prove: ((12 - (4 * v)) / 4) < ((16 - (4 * v)) / 4).
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function g
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'P_addr_startof_shift' in 'g':
@@ -173,6 +203,12 @@ Assume {
   Else { Have: shift_sint32(a, v) = g. }
 }
 Prove: a_1 = g.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

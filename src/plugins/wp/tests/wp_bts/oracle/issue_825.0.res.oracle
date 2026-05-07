@@ -10,6 +10,18 @@
   Function issue
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'issue':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'issue':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check 'ko' (file issue_825.i, line 19):
 Prove: false.
 
@@ -24,9 +36,21 @@ Prove: a = 0.
   Function job
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file issue_825.i, line 2) in 'job':
 Assume { Type: is_sint32(i). (* Else *) Have: 10 <= i. }
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

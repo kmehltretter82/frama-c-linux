@@ -10,6 +10,12 @@
   Function function
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'function':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file chunk_typing.i, line 15) in 'function':
 Let a = shift_uint64(u64_0, 0).
 Let a_1 = memcpy(Mint_5, a, Mint_undef_5, a, 10).
@@ -90,6 +96,12 @@ Assume {
 Prove: (a_16 = (1 + x[i])) /\ (a_17 = (1 + a_16)) /\ (a_18 = (1 + a_19)) /\
     (a_19 = (1 + a_17)) /\ (a_20 = (1 + a_21)) /\ (a_21 = (1 + a_18)) /\
     (a_1[shift_uint64(u64_0, i)] = (1 + a_22)) /\ (a_22 = (1 + a_20)).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'function':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

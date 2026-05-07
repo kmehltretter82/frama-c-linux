@@ -8,6 +8,12 @@
   Function job
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file bts_2159.i, line 5) in 'job':
 Assume {
   Type: is_sint32(s) /\ is_sint32(s_1) /\ is_sint32(x).
@@ -16,5 +22,11 @@ Assume {
   Else { Have: s_1 = s. }
 }
 Prove: (if ((0 <= x) & (x <= 100)) then L_Id(s + x) else L_Id(s)) = s_1.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

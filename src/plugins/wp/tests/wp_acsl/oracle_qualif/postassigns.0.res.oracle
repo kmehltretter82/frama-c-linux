@@ -45,9 +45,9 @@
   Alt-Ergo:        3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  job1                     10        -       10       100%
-  job2                      8        2       10       100%
-  job3                      8        1        9       100%
+  job1                     12        -       12       100%
+  job2                     10        2       12       100%
+  job3                     10        1       11       100%
 ------------------------------------------------------------
 [wp] postassigns.c:7: Warning: 
   Memory model hypotheses for function 'job1':

@@ -137,9 +137,9 @@ Prove: false.
 ------------------------------------------------------------
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  target3_no_match          1        -        2      50.0%
-  target4_exact_match       1        -        2      50.0%
-  target5_extra_match       1        -        2      50.0%
+  target3_no_match          3        -        4      75.0%
+  target4_exact_match       3        -        4      75.0%
+  target5_extra_match       3        -        4      75.0%
 ------------------------------------------------------------
 [wp] Deferred error message was emitted during execution:
   Missing Test Results (1)

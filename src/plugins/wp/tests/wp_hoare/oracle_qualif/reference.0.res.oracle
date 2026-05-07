@@ -50,7 +50,7 @@
   g                         9        -        9       100%
   call_f2                   9        -       11      81.8%
   call_global               7        -        7       100%
-  write                     2        -        2       100%
+  write                     4        -        4       100%
 ------------------------------------------------------------
 [wp] reference.i:14: Warning: 
   Memory model hypotheses for function 'f':

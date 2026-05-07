@@ -11,6 +11,18 @@
   Function nullable_coherence
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'nullable_coherence':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'nullable_coherence':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check 'must_fail' (file nullable.i, line 14):
 Assume { (* Then *) Have: null = pointer_p. }
 Prove: false.
@@ -28,6 +40,18 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function nullable_in_context
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'nullable_in_context':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'nullable_in_context':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assigns (file nullable.i, line 23) in 'nullable_in_context' (1/2):

@@ -17,6 +17,18 @@
   Function main1
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'main1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion (file array_initialized.c, line 71):
 Assume {
   (* Heap *)
@@ -31,6 +43,18 @@ Prove: g[i] = 0.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function main2
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'main2':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main2':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assertion (file array_initialized.c, line 185):
@@ -251,12 +275,36 @@ Prove: h2_0[i] = h1_0[i].
   Function main3
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'main3':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main3':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion (file array_initialized.c, line 194):
 Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function main_pointer
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'main_pointer':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main_pointer':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assertion (file array_initialized.c, line 283):
@@ -276,6 +324,12 @@ Prove: valid_rw(Malloc_0, p[i], 1).
   Function simpl
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'simpl':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file array_initialized.c, line 288) in 'simpl':
 Let x = Mint_0[shift_sint32(t, 0)].
 Assume {
@@ -292,5 +346,11 @@ Assume {
   Else { Have: simpl_0 = 0. }
 }
 Prove: (0 <= Mint_0[shift_sint32(t, i)]) <-> (simpl_0 = 1).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'simpl':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

@@ -8,6 +8,18 @@
   Function default_init
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'default_init':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'default_init':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check 'X' (file init_const_filter.i, line 8):
 Let x = GlobalConst_0[ClientId_0].
 Assume {

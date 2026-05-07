@@ -15,7 +15,7 @@
   Prove: (us_0 % 256) = land(255, us_0).
   
   ------------------------------------------------------------
-[wp] [Valid] typed_check_lemma_and_modulo_us_255 (Tactic) (Qed 2/2)
+[wp] [Unsuccess] typed_check_lemma_and_modulo_us_255 (Tactic) (Qed 1/2)
 [wp:script:allgoals] 
   typed_check_lemma_and_modulo_u subgoal:
   
@@ -30,7 +30,6 @@
   
   Goal Wp.Tactical.typed_check_lemma_and_modulo_u-1 (generated):
   Prove: true.
-  Prover Qed returns Valid
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
@@ -57,6 +56,6 @@
   Prove: exists i : Z. (lsl(1, i) = lsl(1, shift_0)) /\ (0 <= i).
   
   ------------------------------------------------------------
-[wp] [Valid] typed_check_lemma_and_modulo_u (Tactics 4) (Qed 37/37)
-[wp] Proved goals:    2 / 2
-  Script:          2 (Tactics 5) (Qed 39/39)
+[wp] [Unsuccess] typed_check_lemma_and_modulo_u (Tactics 4) (Qed 36/37)
+[wp] Proved goals:    0 / 2
+  Unsuccess:       2

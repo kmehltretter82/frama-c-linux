@@ -8,8 +8,20 @@
   Function strlen
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'strlen':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file user_string.i, line 23) in 'strlen':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'strlen':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

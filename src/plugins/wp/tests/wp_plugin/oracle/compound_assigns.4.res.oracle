@@ -236,6 +236,18 @@ Cluster Shifts {
   
 }
 
+Goal Termination-condition (generated) in 'copy':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'copy':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'Kept' (file compound_assigns.i, line 70):
 Let a = memcpy(M0004_sint32_0, tmp_0, M0004_sint32_0, p, 24).
 Let a_1 = memcpy(M0005_float64_0, tmp_0, M0005_float64_0, p, 24).
@@ -719,6 +731,12 @@ Cluster Shifts {
   
 }
 
+Goal Termination-condition (generated) in 'init':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file compound_assigns.i, line 79) in 'init':
 Let a = Load_R0002_S1_A(p,
           memcpy(M0004_float64_0, p, M0004_float64_0, q, 24),
@@ -758,6 +776,12 @@ Assume {
       (a[shift_sint32(shiftfield_F1_A_f(p), i)]=true))).
 }
 Prove: IsInit_S1_A_R0002(p, a, a_1).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'init':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -954,6 +978,12 @@ Cluster Shifts {
   
 }
 
+Goal Termination-condition (generated) in 'swap':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'P' in 'swap':
 Let a = memcpy(M0003_float64_0, p, M0003_float64_0, q, 24).
 Let a_1 = memcpy(M0002_sint32_0, p, M0002_sint32_0, q, 24).
@@ -997,6 +1027,12 @@ Assume {
   Have: Load_R0001_S1_A(p, a, a_1) = a_2.
 }
 Prove: EqS1_A(a_5, a_6).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'swap':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

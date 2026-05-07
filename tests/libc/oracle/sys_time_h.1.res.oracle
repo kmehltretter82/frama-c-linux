@@ -88,22 +88,28 @@
 [eva:final-states] Values at end of function main:
   i1.it_interval.tv_sec ∈ {1}
     .it_interval.tv_usec ∈ {100}
+    .it_interval.[bits 96 to 127] ∈ {0}
     .it_value.tv_sec ∈ {2}
     .it_value.tv_usec ∈ {200}
+    .it_value.[bits 96 to 127] ∈ {0}
   res ∈ {-1}
   i2.it_interval.tv_sec ∈ [--..--]
     .it_interval.tv_usec ∈ {1000000}
-    .it_value ∈ [--..--]
+    {.it_interval.[bits 96 to 127]; .it_value} ∈ [--..--]
   INVALID_ITIMER ∈ {-1}
   r1 ∈ [--..--]
   tv[0].tv_sec ∈ {10000000}
     [0].tv_usec ∈ {999999}
+    [0].[bits 96 to 127] ∈ {0}
     [1].tv_sec ∈ {-9000000}
     [1].tv_usec ∈ {1}
+    [1].[bits 96 to 127] ∈ {0}
   r2 ∈ [--..--]
   tv2[0].tv_sec ∈ {1234}
      [0].tv_usec ∈ {5678}
+     [0].[bits 96 to 127] ∈ UNINITIALIZED
      [1].tv_sec ∈ {9012}
      [1].tv_usec ∈ {3456}
+     [1].[bits 96 to 127] ∈ UNINITIALIZED
   r3 ∈ [--..--]
   __retres ∈ {0}

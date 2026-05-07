@@ -639,6 +639,12 @@ Cluster Compound {
   
 }
 
+Goal Termination-condition (generated) in 'usable_axiom':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file chunk_typing_usable.i, line 29) in 'usable_axiom':
 Let x = e - 1.
 Assume {
@@ -651,6 +657,12 @@ Assume {
   Have: (b < e) /\ (e <= 1000).
 }
 Prove: L_occ(Mint_0, i, a, b, x) = L_occ(Mint_0, i, a, b, e).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'usable_axiom':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -725,6 +737,12 @@ Cluster Compound {
   
 }
 
+Goal Termination-condition (generated) in 'usable_lemma':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file chunk_typing_usable.i, line 43) in 'usable_lemma':
 Assume {
   Type: is_sint32_chunk(Mint_0) /\ is_uint32(b) /\ is_uint32(e) /\
@@ -738,5 +756,11 @@ Assume {
 }
 Prove: (L_occ(Mint_0, i, a, b, s) + L_occ(Mint_0, i, a, s, e))
          = L_occ(Mint_0, i, a, b, e).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'usable_lemma':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
