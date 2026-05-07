@@ -23,26 +23,30 @@ open M.Operators
 (********************** Forward references ********************************)
 (**************************************************************************)
 
-let translate_rte_annots_ref
-  : ((Format.formatter -> code_annotation -> unit) ->
+module Translate_rtes = struct
+  let translate_rte_annots_ref :
+    ((Format.formatter -> code_annotation -> unit) ->
      code_annotation ->
      kernel_function ->
      Env.t ->
      code_annotation list ->
-     Env.t) ref
-  =
-  ref (fun _pp _elt _kf _env _l ->
-      Extlib.mk_labeled_fun "translate_rte_annots_ref")
+     Env.t) ref =
+    ref (fun _pp _elt _kf _env _l ->
+        Extlib.mk_labeled_fun "translate_rte_annots_ref")
 
-let translate_rte_exp_ref
-  : (?filter:(code_annotation -> bool) ->
+  let translate_rte_annots pp elt kf env l = !translate_rte_annots_ref pp elt kf env l
+
+  let translate_rte_exp_ref :
+    (?filter:(code_annotation -> bool) ->
      kernel_function ->
      Env.t ->
      exp ->
-     Env.t) ref
-  =
-  ref (fun ?filter:_ _kf _env _e ->
-      Extlib.mk_labeled_fun "translate_rte_exp_ref")
+     Env.t) ref =
+    ref (fun ?filter:_ _kf _env _e ->
+        Extlib.mk_labeled_fun "translate_rte_exp_ref")
+
+  let translate_rte_exp ?filter kf env e = !translate_rte_exp_ref ?filter kf env e
+end
 
 (* ************************************************************************** *)
 (* Transforming predicates into C expressions (if any) *)
@@ -59,8 +63,8 @@ let relation_to_binop = function
 let predicate_content_to_exp_il p =
   let p = Logic_normalizer.get_pred p in
   match p.pred_content with
-  | Ptrue -> M.return @@ IL.Exp.of_exp_node True
-  | Pfalse -> M.return @@ IL.Exp.of_exp_node False
+  | Ptrue -> M.return @@ IL.Exp.mk_true ()
+  | Pfalse -> M.return @@ IL.Exp.mk_false ()
   | Prel(rel, t1, t2) ->
     let* logic_env = M.read_logic_env in
     let t1 = Logic_normalizer.get_term t1 in
@@ -259,7 +263,7 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
            let tp = Logic_const.toplevel_predicate ~kind:Assert p in
            let annot = Logic_const.new_code_annotation (AAssert ([],tp)) in
            Typing.preprocess_rte ~logic_env:(Env.Logic_env.get env) annot;
-           !translate_rte_annots_ref
+           Translate_rtes.translate_rte_annots
              Printer.pp_code_annotation
              annot
              kf
@@ -368,7 +372,7 @@ and to_exp_old ~rte ~loc:_ ?inplace ?name ~adata ~env ~kf p =
       let e, adata, env =
         predicate_content_to_exp ?inplace ~adata ?name kf env p
       in
-      let env = if rte then !translate_rte_exp_ref kf env e else env in
+      let env = if rte then Translate_rtes.translate_rte_exp kf env e else env in
       (e, adata), env)
 
 and to_exp_il ~rte p =
@@ -439,7 +443,7 @@ let do_it kf env p =
 
 let rte_guards_to_exp_il t =
   Rte_analysis.fold_guards_il ~default:(M.return []) t @@ fun p guards ->
-  let* e : IL.rte = M.map (Interlang.Exp.to_rte p) @@ to_exp_il ~rte:true p in
+  let* e : IL.rte = M.map (Interlang.Rte.make p) @@ to_exp_il ~rte:true p in
   let* guards = guards in
   M.return (e :: guards)
 
