@@ -610,13 +610,18 @@ tr:first-of-type > .eva-table-callsite-box {
     }
 
     .mthread-element {
-      max-width: 400px;
+      max-width: 500px;
       background-color: var(--background-profound);
       margin: 2px;
       padding: 5px;
       border-radius: 1em;
       display: flex;
       flex-direction: column;
+
+      &.mthread-element-container {
+        flex: 1 1;
+        min-width: 250px;
+      }
 
       .mthread-element-title {
         display: flex;
@@ -629,6 +634,15 @@ tr:first-of-type > .eva-table-callsite-box {
         font-weight: bold;
         margin: 0 5px;
         gap: 5px;
+        max-width: 100%;
+
+        .dome-xButton-led {
+          flex-shrink: 0;
+        }
+        .action {
+          display: flex;
+          flex-wrap: nowrap;
+        }
       }
 
       .mthread-element-content {
@@ -649,8 +663,17 @@ tr:first-of-type > .eva-table-callsite-box {
           flex-direction: column;
         }
 
-        button label {
+        button {
+          max-width: 95%;
           cursor: pointer ;
+
+          label {
+            display: block;
+            width: 100%;
+            cursor: pointer ;
+            overflow: hidden;
+            text-overflow:ellipsis;
+          }
         }
       }
     }
