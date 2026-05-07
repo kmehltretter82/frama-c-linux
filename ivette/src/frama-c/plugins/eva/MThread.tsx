@@ -82,6 +82,7 @@ function MtButton(props: MtButtonProps): React.JSX.Element {
   return <Button
     key={strId}
     label={label}
+    title={label}
     selected={selected}
     onClick={onClick}
   />;
@@ -145,7 +146,11 @@ function Element(props: ElementProps): React.JSX.Element {
     children.some(e => e !== null) : Boolean(children);
 
   const content = <>
-    { title && <div className='mthread-element-title'>{ title }</div> }
+    { title &&
+        typeof(title) === "string" ?
+          <Label title={title}>{title}</Label>
+          : <div className='mthread-element-title'>{ title }</div>
+    }
     { hasChildren && <div className={classesContent}>{ children }</div> }
   </>;
 
@@ -192,7 +197,7 @@ function ErrorContent(props: ContentProps): React.JSX.Element | null {
   const icon = errors.length > 0 ? "WARNING" : undefined;
   const iconKind = errors.length > 0 ? "negative" : undefined;
   const title = <>
-    <Label label={label} />
+    <Label label={label} title={label}/>
     { icon && <Icon id={icon} kind={iconKind} /> }
   </>;
   const content = errors.map((error, i) =>
@@ -309,7 +314,8 @@ function Threads(props: ThreadsProps): React.ReactNode {
       const data = { data: t, showEmpty: showEmpty };
       const [ id, name ] = t.thread;
       return (
-        <Element key={id} title={name} animate={true}>
+        <Element key={id} title={name} animate={true}
+          className='mthread-element-container'>
           {errors && <ErrorContent {...data} />}
           {mutex && <MutexContent {...data} />}
           {message && <MessageContent {...data} />}
@@ -431,17 +437,18 @@ function ItemVarByProtectionKind(
 }
 
 function VarContent(props: VarContentProps): React.JSX.Element | null {
+  const { accessKind } = props;
   const emptyContent = props.data.length === 0;
   const ledStatus = protectionKindInfos[getProtectionByAccesskind(props.data)]
     .LEDStatus;
-  const label = (): string => {
-    if(props.accessKind === "read") return !emptyContent ?
-    'Read' : 'The variable is never read';
-    else return !emptyContent ?
-    'Write' : 'The variable is never written';
-  };
+  const label = React.useMemo(() => {
+      if(accessKind === "read") return !emptyContent ?
+      'Read' : 'The variable is never read';
+      else return !emptyContent ?
+      'Write' : 'The variable is never written';
+  }, [accessKind, emptyContent]);
   const title = <>
-      <Label label={label()} />
+      <Label label={label} title={label} />
       { ledStatus && <LED status={ledStatus} /> }
     </>;
 
@@ -645,8 +652,8 @@ function Variable(props: VariableProps): React.ReactNode {
     const label = isArray ? `${base}[ ]` : base;
     const title = <>
       <LED status={varStatus} />
-      <div>{label}</div>
-      <div>
+      <Label title={label}>{label}</Label>
+      <div className='action'>
         { getSelectionButton(base, data) }
         { isArray && getPinButton(base) }
       </div>
