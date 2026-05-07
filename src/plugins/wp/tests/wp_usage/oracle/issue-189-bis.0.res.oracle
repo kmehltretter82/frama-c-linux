@@ -10,6 +10,12 @@
   Function memcpy_alias_vars
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'memcpy_alias_vars':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'memcpy' in 'memcpy_alias_vars':
 Let a = Mptr_0[global(P_dst_26)].
 Let a_1 = shift_uint8(a, 0).
@@ -76,6 +82,12 @@ Assume {
   Have: len_1 <= 0.
 }
 Prove: a_2[a_5] = Mint_0[a_5].
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'memcpy_alias_vars':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -257,6 +269,12 @@ Prove: true.
   Function memcpy_context_vars
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'memcpy_context_vars':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'memcpy,ok' in 'memcpy_context_vars':
 Let a = Mptr_0[global(P_dst_49)].
 Let a_1 = shift_uint8(a, 0).
@@ -323,6 +341,12 @@ Assume {
   Have: len_1 <= 0.
 }
 Prove: a_2[a_5] = Mint_0[a_5].
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'memcpy_context_vars':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

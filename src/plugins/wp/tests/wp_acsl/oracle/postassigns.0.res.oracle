@@ -12,8 +12,20 @@
   Function job1
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'job1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file postassigns.c, line 4) in 'job1':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job1':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -73,8 +85,20 @@ Prove: true.
   Function job2
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'job2':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file postassigns.c, line 19) in 'job2':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job2':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -148,6 +172,18 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function job3
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'job3':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job3':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Establishment of Invariant (file postassigns.c, line 38):

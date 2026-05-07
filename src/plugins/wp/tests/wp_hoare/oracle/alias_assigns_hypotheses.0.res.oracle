@@ -26,6 +26,12 @@
   Function comprehension_alias
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'comprehension_alias':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file alias_assigns_hypotheses.i, line 90) in 'comprehension_alias':
 Prove: true.
 
@@ -33,6 +39,12 @@ Prove: true.
 
 Goal Post-condition (file alias_assigns_hypotheses.i, line 91) in 'comprehension_alias':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'comprehension_alias':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -45,6 +57,12 @@ Prove: true.
   Function field_alias
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'field_alias':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file alias_assigns_hypotheses.i, line 59) in 'field_alias':
 Prove: true.
 
@@ -52,6 +70,12 @@ Prove: true.
 
 Goal Post-condition (file alias_assigns_hypotheses.i, line 60) in 'field_alias':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'field_alias':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -64,6 +88,12 @@ Prove: true.
   Function field_range_alias
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'field_range_alias':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file alias_assigns_hypotheses.i, line 71) in 'field_range_alias':
 Prove: true.
 
@@ -71,6 +101,12 @@ Prove: true.
 
 Goal Post-condition (file alias_assigns_hypotheses.i, line 72) in 'field_range_alias':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'field_range_alias':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -83,6 +119,12 @@ Prove: true.
   Function formal_alias
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'formal_alias':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file alias_assigns_hypotheses.i, line 30) in 'formal_alias':
 Prove: true.
 
@@ -93,6 +135,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'formal_alias':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns (file alias_assigns_hypotheses.i, line 29) in 'formal_alias':
 Effect at line 33
 Prove: true.
@@ -100,6 +148,12 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function formal_alias_array
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'formal_alias_array':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file alias_assigns_hypotheses.i, line 45) in 'formal_alias_array':
@@ -114,6 +168,12 @@ Prove: true.
 
 Goal Post-condition (file alias_assigns_hypotheses.i, line 47) in 'formal_alias_array':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'formal_alias_array':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -132,8 +192,20 @@ Prove: true.
   Function formal_no_alias
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'formal_no_alias':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file alias_assigns_hypotheses.i, line 38) in 'formal_no_alias':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'formal_no_alias':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -146,6 +218,12 @@ Prove: true.
   Function global_alias
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'global_alias':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file alias_assigns_hypotheses.i, line 15) in 'global_alias':
 Prove: true.
 
@@ -153,6 +231,12 @@ Prove: true.
 
 Goal Post-condition (file alias_assigns_hypotheses.i, line 16) in 'global_alias':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'global_alias':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -165,8 +249,20 @@ Prove: true.
   Function global_no_alias
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'global_no_alias':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file alias_assigns_hypotheses.i, line 23) in 'global_no_alias':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'global_no_alias':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -179,6 +275,12 @@ Prove: true.
   Function set_alias
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'set_alias':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file alias_assigns_hypotheses.i, line 79) in 'set_alias':
 Prove: true.
 
@@ -186,6 +288,12 @@ Prove: true.
 
 Goal Post-condition (file alias_assigns_hypotheses.i, line 80) in 'set_alias':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'set_alias':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -198,6 +306,12 @@ Prove: true.
   Function union_alias
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'union_alias':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file alias_assigns_hypotheses.i, line 100) in 'union_alias':
 Prove: true.
 
@@ -205,6 +319,12 @@ Prove: true.
 
 Goal Post-condition (file alias_assigns_hypotheses.i, line 101) in 'union_alias':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'union_alias':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

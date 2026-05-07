@@ -22,7 +22,7 @@
   Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  compound                  -        2        2       100%
-  local_region              -        1        2      50.0%
-  formal_region             -        1        2      50.0%
+  compound                  2        2        4       100%
+  local_region              2        1        4      75.0%
+  formal_region             2        1        4      75.0%
 ------------------------------------------------------------

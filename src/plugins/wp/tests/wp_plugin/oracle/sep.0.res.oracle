@@ -21,67 +21,178 @@
 [wp] [Valid] Goal f8_pq_a_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal f8_pq_a_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
+  Function escape_addrof_d
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'escape_addrof_d':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'escape_addrof_d':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function f1_none
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'f1_none':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file sep.i, line 13) in 'f1_none':
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f1_none':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function f2_p_a
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'f2_p_a':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file sep.i, line 17) in 'f2_p_a':
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f2_p_a':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function f3_p_ab
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'f3_p_ab':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file sep.i, line 21) in 'f3_p_ab':
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f3_p_ab':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function f4_pq_ab
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'f4_pq_ab':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file sep.i, line 25) in 'f4_pq_ab':
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f4_pq_ab':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function f5_pq
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'f5_pq':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file sep.i, line 29) in 'f5_pq':
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f5_pq':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function f6_Pa
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'f6_Pa':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file sep.i, line 33) in 'f6_Pa':
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f6_Pa':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function f7_pq_ad
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'f7_pq_ad':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file sep.i, line 42) in 'f7_pq_ad':
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f7_pq_ad':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function f8_pq_a
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f8_pq_a':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file sep.i, line 48) in 'f8_pq_a':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f8_pq_a':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 [wp] sep.i:18: Warning: 

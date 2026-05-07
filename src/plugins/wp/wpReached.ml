@@ -360,6 +360,9 @@ let set_doomed emitter pid =
     List.iter (set_invalid emitter) (Property.ip_of_code_annot kf stmt ca)
   | Property.OLGlob _ | Property.OLContract _ -> ()
 
+let () =
+  Wpo.wp_reached_set_doomed := set_doomed
+
 (* -------------------------------------------------------------------------- *)
 (* --- Status of Unreachable Annotations                                  --- *)
 (* -------------------------------------------------------------------------- *)
@@ -391,7 +394,31 @@ let set_unreachable pid =
       | IPPredicate {ip_kind = PKAssumes _} -> ()
       | p ->
         debug "unreachable annotation %a@." Property.pretty p;
-        Property_status.emit emitter ~hyps:[] p Property_status.True
+        let kf = Option.get @@ Property.get_kf @@ WpPropId.property_of_id pid in
+        let vc_annot = Wpo.VC_Annot.{
+            axioms = None;
+            goal = Wpo.GOAL.trivial;
+            tags = [];
+            warn = [];
+            deps = Property.Set.empty;
+            path = Stmt.Set.empty;
+            source = None;
+          } in
+        let model = WpContext.get_model () in
+        let mid = WpContext.MODEL.id model in
+        let po_sid = WpPropId.get_propid pid in
+        let po = Wpo.{
+            po_model = model ;
+            po_pid = pid ;
+            po_sid = WpPropId.get_propid pid ;
+            po_gid = Printf.sprintf "%s_%s" mid po_sid ;
+            po_name = Pretty_utils.to_string WpPropId.pretty_local pid ;
+            po_idx = Wpo.Function(kf, None);
+            po_formula = vc_annot ;
+          }
+        in
+        Wpo.add po ;
+        Wpo.set_result po Prover.CFG (VCS.valid)
     in
     let pids = match WpPropId.property_of_id pid with
       | IPPredicate {ip_kind = PKAssumes _} -> []
@@ -404,8 +431,10 @@ let set_unreachable pid =
          unless we know exactly what is going on. *)
       | p ->
         incr unreachable_proved ;
-        if Wp_parameters.has_dkey Prover.dkey_shell then
-          Wp_parameters.feedback "[Valid] Goal %a (Cfg) (Unreachable)"
+        if Wp_parameters.is_interactive ()
+        || Wp_parameters.has_dkey Prover.dkey_shell
+        then
+          Wp_parameters.result "[Valid] Goal %a (Cfg) (Unreachable)"
             WpPropId.pp_propid pid ;
         [p]
     in

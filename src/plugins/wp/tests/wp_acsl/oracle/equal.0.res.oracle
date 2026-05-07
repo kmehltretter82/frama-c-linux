@@ -18,6 +18,12 @@
   Function simple_array
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'simple_array':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file equal.i, line 22) in 'simple_array':
 Let x = t0_0[0].
 Let x_1 = t0_0[1].
@@ -28,16 +34,40 @@ Assume {
 Prove: EqArray_int(2, t0_0, t1_0[0 <- x][1 <- x_1]).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'simple_array':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function simple_struct
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'simple_struct':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file equal.i, line 16) in 'simple_struct':
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'simple_struct':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function with_array_struct
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'with_array_struct':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file equal.i, line 28) in 'with_array_struct':
@@ -52,8 +82,20 @@ Assume {
 Prove: EqS2_St(st0_0, st1_0).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'with_array_struct':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function with_ptr_and_array_struct
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'with_ptr_and_array_struct':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file equal.i, line 47) in 'with_ptr_and_array_struct':
@@ -74,8 +116,20 @@ Assume {
 Prove: EqS4_Q(q0_0, q1_0).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'with_ptr_and_array_struct':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function with_ptr_array
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'with_ptr_array':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file equal.i, line 40) in 'with_ptr_array':
@@ -89,8 +143,20 @@ Assume {
 Prove: EqArray_ptr(5, tp0_0, tp1_0).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'with_ptr_array':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function with_ptr_struct
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'with_ptr_struct':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file equal.i, line 34) in 'with_ptr_struct':
@@ -103,5 +169,11 @@ Assume {
   When: a = a_1.
 }
 Prove: EqS3_Sp(sp0_0, sp1_0).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'with_ptr_struct':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

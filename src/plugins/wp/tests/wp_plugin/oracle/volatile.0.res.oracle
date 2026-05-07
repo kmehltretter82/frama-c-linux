@@ -16,6 +16,18 @@
   Function default_init
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'default_init':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'default_init':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check 'KO_WHEN_VOLATILE' (file volatile.i, line 46):
 Assume {
   Type: is_sint8(ClientId_0) /\ is_sint32(R1_0).
@@ -29,12 +41,36 @@ Prove: R1_0 = 0.
   Function job_assigns
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'job_assigns':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job_assigns':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'KO_WHEN_VOLATILE' (file volatile.i, line 16):
 Prove: w = 0.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function job_read
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'job_read':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job_read':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assertion 'KO_WHEN_VOLATILE' (file volatile.i, line 22):
@@ -46,12 +82,36 @@ Prove: x = w.
   Function job_struct
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'job_struct':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job_struct':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'ok,dead_code' (file volatile.i, line 30):
 Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function job_struct_assigns
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'job_struct_assigns':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job_struct_assigns':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assertion 'KO_WHEN_VOLATILE' (file volatile.i, line 36):

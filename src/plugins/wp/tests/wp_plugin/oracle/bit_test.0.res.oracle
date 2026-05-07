@@ -12,13 +12,31 @@
   Function check1
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'check1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'ko' in 'check1':
 Assume { Type: is_sint32(order1_0) /\ is_sint32(order2_0). }
 Prove: bit_testb(order2_0, 0) = bit_testb(order1_0, 0).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'check1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function check2
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'check2':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'ko' in 'check2':
@@ -26,12 +44,30 @@ Assume { Type: is_sint32(order1_0) /\ is_sint32(order2_0). }
 Prove: bit_test(order2_0, 0) <-> bit_test(order1_0, 0).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'check2':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function check3
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'check3':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'ko' in 'check3':
 Assume { Type: is_sint32(order1_0) /\ is_sint32(order2_0). }
 Prove: bit_test(order2_0, 0) <-> bit_test(order1_0, 0).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'check3':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

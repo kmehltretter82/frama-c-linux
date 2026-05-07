@@ -8,6 +8,18 @@
   Function f3
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f3':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f3':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns (file bts0843.i, line 12) in 'f3':
 Effect at line 13
 Prove: true.

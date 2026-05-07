@@ -35,7 +35,7 @@ let server ?procs () =
 let dispatch ?(config=VCS.default) mode prover wpo =
   begin
     match prover with
-    | Prover.Qed | Tactical -> Task.return VCS.no_result
+    | Prover.Qed | CFG | Tactical -> Task.return VCS.no_result
     | Why3 prover ->
       let smoke = Wpo.is_smoke_test wpo in
       let kf = match Wpo.get_scope wpo with

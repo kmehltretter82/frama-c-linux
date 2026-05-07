@@ -8,6 +8,18 @@
   Function foo
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'foo':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'foo':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion (file bts_1601.c, line 72):
 Assume {
   Type: is_uint32(tenumRMode_0).

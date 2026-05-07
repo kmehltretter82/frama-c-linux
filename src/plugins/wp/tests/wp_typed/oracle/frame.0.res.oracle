@@ -12,6 +12,18 @@
   Function compound
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'compound':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'compound':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'SEP' (file frame.i, line 10):
 Assume {
   Type: is_sint32(k).
@@ -48,6 +60,18 @@ Prove: x = 1.
   Function formal_region
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'formal_region':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'formal_region':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'A,X' (file frame.i, line 34):
 Let a = Mptr_0[global(L_x_38)].
 Assume {
@@ -75,6 +99,18 @@ Prove: false.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function local_region
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'local_region':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'local_region':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assertion 'A,X' (file frame.i, line 25):

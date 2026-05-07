@@ -18,6 +18,18 @@
   Function copy_struct
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'copy_struct':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'copy_struct':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'provable' (file initialized_memtyped.i, line 115):
 Let a = global(L_y_71).
 Let a_1 = shiftfield_F3_X_x(a).
@@ -153,6 +165,18 @@ Prove: !IsInit_S3_X(a_2, a_5).
   Function formal
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'formal':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'formal':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'provable' (file initialized_memtyped.i, line 85):
 Assume {
   (* Heap *)
@@ -170,6 +194,12 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function glob_arr
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'glob_arr':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'provable' in 'glob_arr':
@@ -194,8 +224,20 @@ Assume {
 Prove: (Init_0[shift_sint32(pga_0, i)]=true).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'glob_arr':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function glob_var
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'glob_var':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'provable' in 'glob_var':
@@ -212,8 +254,26 @@ Assume {
 Prove: (Init_0[px_0]=true).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'glob_var':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function ptr_on_local
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'ptr_on_local':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'ptr_on_local':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assertion 'provable' (file initialized_memtyped.i, line 95):
@@ -234,6 +294,18 @@ Prove: (Init_0[shift_sint32(a, i)]=true).
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function test
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'test':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'test':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Check 'unknown' (file initialized_memtyped.i, line 12):

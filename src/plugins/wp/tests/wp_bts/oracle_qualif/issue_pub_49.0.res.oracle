@@ -53,7 +53,7 @@
   Unsuccess:       4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  is_class                  2        -        2       100%
+  is_class                  4        -        4       100%
   caller1                   9        -       10      90.0%
   caller2                   9        -       10      90.0%
   caller3                   8        -        9      88.9%

@@ -8,6 +8,12 @@
   Function copy
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'copy':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file copy_array.c, line 4) in 'copy':
 Let a_1 = shift_sint32(a, 0).
 Let x = 4 * n.
@@ -32,6 +38,12 @@ Assume {
   Have: n <= i.
 }
 Prove: a_3[shift_sint32(b, i_1)] = a_3[shift_sint32(a, i_1)].
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'copy':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

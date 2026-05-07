@@ -51,6 +51,18 @@ Prove: L_foo(a, s) = [ a ] ^ s.
   Function main
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check 'NotP_ok' (file poly.c, line 57):
 Prove: !P_P(1, [ 1 ]).
 

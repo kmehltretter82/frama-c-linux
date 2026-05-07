@@ -8,6 +8,12 @@
   Function main
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'P' in 'main':
 Let a = global(G_v_21).
 Let a_1 = Load_S1_St(a, Mint_0).
@@ -45,5 +51,11 @@ Assume {
   Init: (w.F1_St_b) = 2.
 }
 Prove: EqS1_St(a_1, w).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

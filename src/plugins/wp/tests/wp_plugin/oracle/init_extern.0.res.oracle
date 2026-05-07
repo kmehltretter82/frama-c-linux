@@ -9,6 +9,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'OK' in 'f':
 Prove: true.
 
@@ -22,5 +28,11 @@ Prove: false.
 Goal Post-condition 'KO' in 'f':
 Assume { Type: is_sint32(b). }
 Prove: b = 0.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

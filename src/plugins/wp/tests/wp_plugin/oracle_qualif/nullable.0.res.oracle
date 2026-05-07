@@ -20,8 +20,8 @@
   Unsuccess:       1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  nullable_coherence        2        -        3      66.7%
-  nullable_in_context       2        -        2       100%
+  nullable_coherence        4        -        5      80.0%
+  nullable_in_context       4        -        4       100%
 ------------------------------------------------------------
 [wp] nullable.i:12: Warning: 
   Memory model hypotheses for function 'nullable_coherence':

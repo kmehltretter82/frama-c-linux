@@ -17,6 +17,18 @@
   Function assignment
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'assignment':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'assignment':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check (file assigns_sep.i, line 9):
 Let x = read_uint32(mem_0, array_0).
 Let x_1 = read_uint32(write_uint8(mem_0, shift_uint8(array_0, 7), 0),

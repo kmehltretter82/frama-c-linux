@@ -77,12 +77,12 @@
   Alt-Ergo:       52
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  unsigned_                 -        8        8       100%
-  signed_pos                -        8        8       100%
-  signed_neg                -        8        8       100%
-  cast_unsigned_signed_pos   -       4        4       100%
-  cast_unsigned_signed_neg   -       4        4       100%
-  cast_from_bytes_to_unsigned   -    7        7       100%
-  cast_from_bytes_to_signed_pos   -   7       7       100%
-  cast_from_bytes_to_signed_neg   -   6       6       100%
+  unsigned_                 2        8       10       100%
+  signed_pos                2        8       10       100%
+  signed_neg                2        8       10       100%
+  cast_unsigned_signed_pos   2       4        6       100%
+  cast_unsigned_signed_neg   2       4        6       100%
+  cast_from_bytes_to_unsigned   2    7        9       100%
+  cast_from_bytes_to_signed_pos   2   7       9       100%
+  cast_from_bytes_to_signed_neg   2   6       8       100%
 ------------------------------------------------------------

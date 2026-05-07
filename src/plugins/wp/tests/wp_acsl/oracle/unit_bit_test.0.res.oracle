@@ -10,6 +10,12 @@
   Function rotate_left
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'rotate_left':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'bit_zero' in 'rotate_left':
 Prove: true.
 
@@ -26,8 +32,20 @@ Prove: (land(lor(x_1, to_uint32(lsl(x, 1))), lsl(1, 1 + i)) != 0) <->
     (land(x, lsl(1, i)) != 0).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'rotate_left':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function sum
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'sum':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'ok' in 'sum':
@@ -39,5 +57,11 @@ Goal Post-condition 'ko' in 'sum':
 Assume { Type: is_sint8(a) /\ is_sint8(b). }
 Prove: (bit_test(a, 1) \/ bit_test(b, 1)) <->
     (bit_test(a, 1) /\ bit_test(b, 1)).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'sum':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

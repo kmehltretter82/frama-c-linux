@@ -34,7 +34,7 @@
   Alt-Ergo:        9
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  max_subarray             13        9       22       100%
+  max_subarray             15        9       24       100%
 ------------------------------------------------------------
 [wp] Running WP plugin...
 [wp] Warning: Skipped RTE guards: unaligned pointers (\aligned not supported)
@@ -49,5 +49,5 @@
   Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  max_subarray             13       10       23       100%
+  max_subarray             15       10       25       100%
 ------------------------------------------------------------

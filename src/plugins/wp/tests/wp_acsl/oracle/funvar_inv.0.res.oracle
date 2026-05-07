@@ -18,6 +18,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'P_startof' in 'f':
 funvar_inv.i:23: warning from Empty Model:
  - Warning: Target turned to False, looking for context inconsistency
@@ -52,6 +58,12 @@ Prove: false.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Loop assigns 'qed_ok,index':
 Prove: true.
 
@@ -68,6 +80,12 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function f2
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'f2':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'P_startof_shift' in 'f2':
@@ -104,6 +122,12 @@ Prove: false.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'f2':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Loop assigns 'qed_ok,index':
 Prove: true.
 
@@ -132,6 +156,12 @@ Prove: ((12 - (4 * i)) / 4) < ((16 - (4 * i)) / 4).
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function g
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'P_addr_startof_shift' in 'g':
@@ -165,6 +195,12 @@ Assume {
   Then { (* Else *) Have: G[i] = 0. }
 }
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

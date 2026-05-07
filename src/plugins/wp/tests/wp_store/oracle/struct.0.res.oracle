@@ -41,8 +41,20 @@ Prove: valid_rw(Malloc_0, a_1, 1).
   Function g
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file struct.i, line 11) in 'g':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -53,6 +65,12 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function main
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'P,qed_ok' in 'main':
@@ -92,5 +110,11 @@ Assume {
   Init: (w.F2_St_b) = 2.
 }
 Prove: EqS2_St(a_1, w).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

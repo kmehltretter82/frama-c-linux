@@ -90,7 +90,7 @@
   Unsuccess:      11
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  globals                  13        7       31      64.5%
-  locals                   21        2       23       100%
-  complex_struct           18        1       19       100%
+  globals                  15        7       33      66.7%
+  locals                   23        2       25       100%
+  complex_struct           20        1       21       100%
 ------------------------------------------------------------

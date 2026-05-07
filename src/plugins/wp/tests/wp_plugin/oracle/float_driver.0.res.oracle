@@ -629,6 +629,12 @@
   Function for_double
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'for_double':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'DBL_RNE' in 'for_double':
 Prove: eq_f64(add_f64(x, to_f64(1.0)), round_double(Rounding.RNE, of_f64(x))).
 
@@ -678,8 +684,20 @@ Goal Post-condition 'DBL_MINF' in 'for_double':
 Prove: is_negative_infinite_f64(add_f64(x, to_f64(1.0))).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'for_double':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function for_float
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'for_float':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'FLT_RNE' in 'for_float':
@@ -729,5 +747,11 @@ Prove: is_positive_infinite_f32(add_f32(x, to_f32(1.0))).
 
 Goal Post-condition 'FLT_MINF' in 'for_float':
 Prove: is_negative_infinite_f32(add_f32(x, to_f32(1.0))).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'for_float':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

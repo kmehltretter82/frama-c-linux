@@ -149,6 +149,18 @@ Cluster Shifts {
   
 }
 
+Goal Termination-condition (generated) in 'copy':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'copy':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'Kept' (file compound_assigns.i, line 70):
 Let a = memcpy(mem_0, tmp_0, mem_0, p, 24).
 Let a_1 = Load_S1_A(s, mem_0).
@@ -584,6 +596,12 @@ Cluster Shifts {
   
 }
 
+Goal Termination-condition (generated) in 'init':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file compound_assigns.i, line 79) in 'init':
 Let a = Load_S1_A(p, memcpy(mem_0, p, mem_0, q, 24)).
 Let a_1 = Load_S1_A(q, mem_0).
@@ -619,6 +637,12 @@ Assume {
       (read_init32(a, shift_sint32(shiftfield_F1_A_f(p), i))=true))).
 }
 Prove: IsInit_S1_A(p, a).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'init':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -789,6 +813,12 @@ Cluster Shifts {
   
 }
 
+Goal Termination-condition (generated) in 'swap':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'P' in 'swap':
 Let a = memcpy(mem_0, p, mem_0, q, 24).
 Let a_1 = Load_S1_A(q, mem_0).
@@ -830,6 +860,12 @@ Assume {
   Have: Load_S1_A(p, a) = a_1.
 }
 Prove: EqS1_A(a_3, a_4).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'swap':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

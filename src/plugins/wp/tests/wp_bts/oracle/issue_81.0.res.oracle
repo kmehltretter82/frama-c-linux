@@ -8,6 +8,12 @@
   Function getMax
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'getMax':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file issue_81.i, line 3) in 'getMax':
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(getMax_0).
@@ -16,5 +22,11 @@ Assume {
   Else { Have: getMax_0 = b. }
 }
 Prove: P_isMax(a, b, getMax_0).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'getMax':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

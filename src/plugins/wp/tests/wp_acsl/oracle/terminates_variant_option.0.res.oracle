@@ -16,6 +16,18 @@
   Function f1
 ------------------------------------------------------------
 
+Goal Termination-condition (file terminates_variant_option.i, line 34) in 'f1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Establishment of Invariant (file terminates_variant_option.i, line 37):
 Prove: true.
 
@@ -71,6 +83,18 @@ Prove: false.
   Function fails_decreases
 ------------------------------------------------------------
 
+Goal Termination-condition (file terminates_variant_option.i, line 23) in 'fails_decreases':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fails_decreases':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Loop assigns (file terminates_variant_option.i, line 26):
 Prove: true.
 
@@ -95,6 +119,18 @@ Prove: i < i_1.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function fails_positive
+------------------------------------------------------------
+
+Goal Termination-condition (file terminates_variant_option.i, line 13) in 'fails_positive':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fails_positive':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Establishment of Invariant (file terminates_variant_option.i, line 15):
@@ -155,6 +191,18 @@ Prove: true.
   Function trivial_variant
 ------------------------------------------------------------
 
+Goal Termination-condition (file terminates_variant_option.i, line 49) in 'trivial_variant':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'trivial_variant':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Loop assigns nothing:
 Prove: true.
 
@@ -171,6 +219,18 @@ Prove: false.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function trivial_variant_default
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'trivial_variant_default':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'trivial_variant_default':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Loop assigns nothing:

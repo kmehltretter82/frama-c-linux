@@ -18,6 +18,18 @@
   Function f1
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'f1' (1/2):
 Effect at line 14
 Prove: false.
@@ -41,6 +53,18 @@ Prove: true.
   Function f2
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f2':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f2':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'f2':
 Effect at line 20
 Prove: true.
@@ -48,6 +72,18 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function f3
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'f3':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f3':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assigns nothing in 'f3':
@@ -65,6 +101,18 @@ Prove: false.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function fp1
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'fp1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fp1':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assigns (file alias_escapes_hypotheses.i, line 28) in 'fp1' (1/2):
@@ -90,6 +138,18 @@ Prove: true.
   Function fp2
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'fp2':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fp2':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns (file alias_escapes_hypotheses.i, line 34) in 'fp2':
 Effect at line 36
 Prove: true.
@@ -97,6 +157,18 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function fp3
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'fp3':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fp3':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assigns (file alias_escapes_hypotheses.i, line 39) in 'fp3':

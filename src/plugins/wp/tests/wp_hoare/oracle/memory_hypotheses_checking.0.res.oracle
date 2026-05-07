@@ -16,8 +16,20 @@
   Function add_return_ok
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'add_return_ok':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file memory_hypotheses_checking.i, line 76) in 'add_return_ok':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'add_return_ok':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -38,12 +50,36 @@ Prove: true.
   Function assigns_ptr
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'assigns_ptr':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'assigns_ptr':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns (file memory_hypotheses_checking.i, line 57) in 'assigns_ptr':
 Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function bad_return_formal
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'bad_return_formal':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'bad_return_formal':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assigns nothing in 'bad_return_formal':
@@ -422,6 +458,18 @@ Prove: true.
   Function gptr_sep
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'gptr_sep':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'gptr_sep':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'gptr_sep':
 Effect at line 40
 Prove: true.
@@ -429,6 +477,18 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function sep
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'sep':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'sep':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assigns nothing in 'sep':

@@ -8,6 +8,12 @@
   Function reset
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'reset':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file caveat_range.i, line 12) in 'reset':
 Let a = global(G_p_23).
 Let a_1 = shift_S1_S(a, 0).
@@ -51,6 +57,12 @@ Assume {
   Have: 10 <= i_1.
 }
 Prove: a_2[shiftfield_F1_S_g(shift_S1_S(a, i))] = 2.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'reset':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

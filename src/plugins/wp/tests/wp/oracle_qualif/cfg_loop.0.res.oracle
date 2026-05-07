@@ -27,6 +27,6 @@
   Qed:            17
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  loop_switch              13        -       13       100%
-  loop_continue             4        -        4       100%
+  loop_switch              14        -       14       100%
+  loop_continue             5        -        5       100%
 ------------------------------------------------------------

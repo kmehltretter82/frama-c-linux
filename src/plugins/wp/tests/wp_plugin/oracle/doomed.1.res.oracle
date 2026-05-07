@@ -18,8 +18,20 @@ Prove: false.
 
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'bar':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file doomed.i, line 34) in 'bar':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'bar':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -31,8 +43,20 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'buzz':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file doomed.i, line 40) in 'buzz':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'buzz':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -48,6 +72,18 @@ Assume {
   Have: x < 0.
 }
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'foo':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'foo':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 ------------------------------------------------------------

@@ -18,13 +18,31 @@
   Function signed_bitwise
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'signed_bitwise':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file cint.i, line 24) in 'signed_bitwise':
 Let x = lnot(a). Assume { Type: is_sint32(a) /\ is_sint32(x). }
 Prove: P_R(x, a).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'signed_bitwise':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function signed_downcast
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'signed_downcast':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file cint.i, line 30) in 'signed_downcast':
@@ -32,8 +50,20 @@ Assume { Type: is_sint32(a). }
 Prove: P_R(to_sint16(a), a).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'signed_downcast':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function signed_overflow
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'signed_overflow':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file cint.i, line 36) in 'signed_overflow':
@@ -41,8 +71,20 @@ Assume { Type: is_sint32(signed_overflow_0). }
 Prove: P_R(signed_overflow_0, signed_overflow_0).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'signed_overflow':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function unsigned_bitwise
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'unsigned_bitwise':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file cint.i, line 42) in 'unsigned_bitwise':
@@ -50,8 +92,20 @@ Assume { Type: is_uint32(a). }
 Prove: P_R(to_uint32(lnot(a)), a).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'unsigned_bitwise':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function unsigned_downcast
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'unsigned_downcast':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file cint.i, line 48) in 'unsigned_downcast':
@@ -59,12 +113,30 @@ Assume { Type: is_sint32(a). }
 Prove: P_R(to_uint32(a), a).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'unsigned_downcast':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function unsigned_overflow
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'unsigned_overflow':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file cint.i, line 54) in 'unsigned_overflow':
 Assume { Type: is_uint32(unsigned_overflow_0). }
 Prove: P_R(unsigned_overflow_0, unsigned_overflow_0).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'unsigned_overflow':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

@@ -238,6 +238,18 @@ Prove: true.
   Function is_class
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'is_class':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'is_class':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns (file issue_pub_49.i, line 15) in 'is_class' (1/2):
 Prove: true.
 

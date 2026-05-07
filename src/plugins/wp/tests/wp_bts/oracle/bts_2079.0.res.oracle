@@ -8,6 +8,12 @@
   Function main
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'Obs,P' in 'main':
 Assume { Type: is_sint32(k). (* Heap *) Type: region(0) <= 0. }
 Prove: P_S(k).
@@ -33,5 +39,11 @@ Prove: true.
 
 Goal Post-condition 'Eval,Q' in 'main':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

@@ -8,6 +8,12 @@
   Function duplet
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'duplet':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file unit_labels.i, line 5) in 'duplet':
 Assume {
   Type: is_sint32(pi_0) /\ is_sint32(pj_0).
@@ -16,6 +22,12 @@ Assume {
 }
 Prove: P_is_duplet(Mint_0[shift_sint32(a, pi_0)
                      <- Mint_0[shift_sint32(a, pj_0)]], a, pi_0, pj_0).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'duplet':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

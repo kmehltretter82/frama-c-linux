@@ -12,6 +12,18 @@
   Function l_array
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'l_array':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'l_array':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'SUCCS' (file initialized_local_init.i, line 9):
 Let x_1 = x[1].
 Let x_2 = x[2].
@@ -61,6 +73,18 @@ Prove: false.
   Function l_int
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'l_int':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'l_int':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'SUCCS' (file initialized_local_init.i, line 3):
 Prove: true.
 
@@ -77,6 +101,18 @@ Prove: false.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function l_struct
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'l_struct':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'l_struct':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assertion 'SUCCS' (file initialized_local_init.i, line 16):

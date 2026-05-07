@@ -10,6 +10,18 @@
   Function bar
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'bar':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'bar':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'bar':
 Effect at line 28
 Prove: true.
@@ -17,6 +29,18 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function foo
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'foo':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'foo':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assigns nothing in 'foo' (1/2):

@@ -33,7 +33,7 @@
   Qed:            22
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  f                         2        -        2       100%
+  f                         4        -        4       100%
   wrong_without_ref         4        -        4       100%
   pointer                   4        -        4       100%
   local                     4        -        4       100%

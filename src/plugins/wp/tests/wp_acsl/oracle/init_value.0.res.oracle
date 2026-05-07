@@ -30,6 +30,12 @@
   Function fa1
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'fa1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'qed_ok' in 'fa1':
 Let x = ta1_0[4].
 Let x_1 = ta1_0[0].
@@ -92,8 +98,20 @@ Assume {
 Prove: x_1 = 1.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fa1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function fa2
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'fa2':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'qed_ok' in 'fa2':
@@ -148,8 +166,20 @@ Assume {
 Prove: x = 1.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fa2':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function fa3
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'fa3':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'qed_ok' in 'fa3':
@@ -308,8 +338,20 @@ Assume {
 Prove: x_2 = 1.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fa3':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function fs1
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'fs1':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'qed_ok' in 'fs1':
@@ -399,8 +441,20 @@ Assume {
 Prove: x_3 = 1.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fs1':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function main
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Pre-condition 'qed_ok,Struct_Simple_a' in 'main':
@@ -2593,5 +2647,26 @@ Assume {
   Init: x = (-1).
 }
 Prove: x = (-1).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function main_ko
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'main_ko':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main_ko':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

@@ -24,6 +24,12 @@
   Function absurd
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'absurd':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'qed_ko,Base_oracle_ko' in 'absurd':
 Assume {
   (* Heap *)
@@ -49,8 +55,20 @@ Assume {
 Prove: i <= i_1.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'absurd':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function array
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'array':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'Lt' in 'array':
@@ -67,8 +85,20 @@ Goal Post-condition 'Eq' in 'array':
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'array':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function compare
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'compare':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'qed_ok,Lt' in 'compare':
@@ -115,8 +145,20 @@ Assume {
 Prove: q = p.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'compare':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function mixed_array_pointer
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'mixed_array_pointer':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'qed_ok,Lt' in 'mixed_array_pointer':
@@ -212,8 +254,20 @@ Assume {
 Prove: addr_le(p, shift_sint32(global(G_t_22), 0)).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'mixed_array_pointer':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function null
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'null':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'qed_ok,Bool' in 'null':
@@ -232,8 +286,20 @@ Goal Post-condition 'qed_ok,IsNull' in 'null':
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'null':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function pointer
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'pointer':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'qed_ok,Lt' in 'pointer':
@@ -269,6 +335,12 @@ Prove: i < i_1.
 
 Goal Post-condition 'qed_ko,Eq_oracle_ko' in 'pointer':
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'pointer':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 [wp] pointer.i:63: Warning: 

@@ -442,6 +442,12 @@ Prove: true.
   Function incr
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'incr':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file dispatch_var2.i, line 21) in 'incr':
 Assume {
   Type: is_sint32(ip_0) /\ is_sint32(ip_1) /\ is_sint32(ip_2).
@@ -452,12 +458,24 @@ Prove: (1 + ip_0) = ip_1.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'incr':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns (file dispatch_var2.i, line 20) in 'incr':
 Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function load
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'load':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition (file dispatch_var2.i, line 29) in 'load':
@@ -470,6 +488,12 @@ Assume {
   Have: retres_0 = load_0.
 }
 Prove: lp_0 = load_0.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'load':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 
@@ -487,9 +511,21 @@ Prove: (ta_retres_0=false).
   Function reset
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'reset':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file dispatch_var2.i, line 14) in 'reset':
 Assume { Type: is_sint32(rp_0). Have: rp_0 = 0. }
 Prove: rp_0 = 0.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'reset':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

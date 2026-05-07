@@ -8,6 +8,18 @@
   Function main
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'ZERO' (file issue-364.i, line 5):
 Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: valid_rd(Malloc_0, shift_sint8(global(K___fc_lit_string1_23), 3), 1).

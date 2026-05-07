@@ -8,6 +8,12 @@
   Function split
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'split':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'Goal_Exist_Or' in 'split':
 Prove: exists i_2,i_1,i : Z. P_Q1(1) \/ P_P1(i_2) \/ P_P2(i_1, i) \/
     (exists i_3 : Z. P_Q2(i_2, i_3)).
@@ -43,5 +49,11 @@ Assume {
       P_R2(i_2, i_1) \/ (forall i_4 : Z. P_Q2(i, i_4)).
 }
 Prove: P_Q1(L_A).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'split':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

@@ -5,6 +5,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file save_load.i, line 16) in 'f':
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(b_1) /\ is_sint32(c).
@@ -13,5 +19,11 @@ Assume {
   Else { Have: (1 + b_1) = b. }
 }
 Prove: 0 < (a + b).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

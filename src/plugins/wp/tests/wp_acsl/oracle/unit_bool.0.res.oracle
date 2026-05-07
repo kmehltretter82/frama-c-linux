@@ -17,6 +17,18 @@ Prove: (L_f(1)=true).
   Function boolean_casts
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'boolean_casts':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'boolean_casts':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check 'C0' (file unit_bool.i, line 12):
 Prove: true.
 

@@ -8,6 +8,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'd0,div_pos_pos' in 'f':
 Prove: P_Peq(1, 1).
 
@@ -172,5 +178,11 @@ Assume {
   When: (x <= 0) /\ (y < 0).
 }
 Prove: (x % y) <= 0.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

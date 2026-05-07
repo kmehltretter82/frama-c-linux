@@ -182,6 +182,12 @@ Prove: false.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'loop':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Establishment of Invariant 'false_but_preserved' (file generalized_checks.i, line 70):
 Prove: false.
 

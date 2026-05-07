@@ -593,7 +593,21 @@ let stat ~config fmt s = function
 
 let pstats ~config fmt s cmd arg =
   match cmd with
-  | "wp" | "qed" -> stat ~config fmt (get_prover s Prover.Qed) arg
+  | "wp" ->
+    let qed = get_prover s Prover.Qed in
+    let cfg = get_prover s Prover.CFG in
+    let stats = stats () in
+    stats.valid <- qed.valid + cfg.valid ;
+    stats.unsuccess <- qed.unsuccess + cfg.unsuccess ;
+    stats.inconclusive <- qed.inconclusive + cfg.inconclusive ;
+    stats.total <- stats.valid + stats.unsuccess + stats.inconclusive ;
+    stats.steps <- qed.steps + cfg.steps ;
+    stats.time <- qed.time +. cfg.time ;
+    stats.rank <- rank stats.steps ;
+    stat ~config fmt stats arg
+
+  | "qed" -> stat ~config fmt (get_prover s Prover.Qed) arg
+  | "cfg" -> stat ~config fmt (get_prover s Prover.CFG) arg
   | cmd when is_stat_name cmd -> stat ~config fmt s.main cmd
   | prover ->
     match (Prover.parse prover) with

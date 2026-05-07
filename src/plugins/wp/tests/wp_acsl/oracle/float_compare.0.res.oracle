@@ -65,6 +65,12 @@ Prove: eq_f32(x, y) \/ lt_f32(y, x).
   Function cmp_dd
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'cmp_dd':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'DEF' in 'cmp_dd':
 Assume { (* Pre-condition *) Have: is_finite_f64(a) /\ is_finite_f64(b). }
 Prove: (if lt_f64b(a, b) then 1 else 0)
@@ -83,8 +89,20 @@ Assume { (* Pre-condition *) Have: is_finite_f64(a) /\ is_finite_f64(b). }
 Prove: lt_f64(a, b) <-> (of_f64(a) < of_f64(b)).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'cmp_dd':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function cmp_fd
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'cmp_fd':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'DEF' in 'cmp_fd':
@@ -133,6 +151,12 @@ Prove: lt_f64(a_1, b) <-> (r < of_f64(b)).
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'cmp_fd':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion (file float_compare.i, line 63):
 Assume { (* Pre-condition *) Have: is_finite_f32(a) /\ is_finite_f64(b). }
 Prove: is_finite_f64(to_f64(of_f32(a))).
@@ -155,6 +179,12 @@ Prove: of_f64(a_1) = r.
   Function cmp_ff
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'cmp_ff':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'DEF' in 'cmp_ff':
 Assume { (* Pre-condition *) Have: is_finite_f32(a) /\ is_finite_f32(b). }
 Prove: (if lt_f32b(a, b) then 1 else 0)
@@ -173,8 +203,20 @@ Assume { (* Pre-condition *) Have: is_finite_f32(a) /\ is_finite_f32(b). }
 Prove: lt_f32(a, b) <-> (of_f32(a) < of_f32(b)).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'cmp_ff':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function cmp_fnan
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'cmp_fnan':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'POS' in 'cmp_fnan':
@@ -184,5 +226,11 @@ Prove: true.
 
 Goal Post-condition 'NEG' in 'cmp_fnan':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'cmp_fnan':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

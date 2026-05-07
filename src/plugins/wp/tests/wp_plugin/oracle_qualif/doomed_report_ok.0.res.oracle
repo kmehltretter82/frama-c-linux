@@ -22,10 +22,11 @@
   Smoke Tests:     3 / 3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  foo                       2        9       11       100%
+  foo                       3        9       12       100%
 ------------------------------------------------------------
                                  Qed Ergo Failed
   foo_terminates                  1    -    -
+  foo_exits                       -    -    -
   foo_loop_assigns                1    -    -
   foo_loop_invariant_A            -    2    -
   foo_loop_invariant_B            -    2    -
@@ -35,7 +36,7 @@
   foo_wp_smoke_dead_loop_s2       -    1    -
 -------------------------------------------------------------
 Success:   100%
-   Total  :     8 properties
-   Valid  :     8
+   Total  :     9 properties
+   Valid  :     9
    Failed :     -
 -------------------------------------------------------------

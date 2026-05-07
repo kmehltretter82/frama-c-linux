@@ -10,6 +10,12 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition 'ko' in 'f':
 Let a = var_0.F1_b.
 Let a_1 = { var_0 with F1_b = a[0 <- y][1 <- x] }.
@@ -25,8 +31,20 @@ Assume { Type: IsS1(var_0) /\ is_uint32(x) /\ is_uint32(y) /\ IsS1(a_1). }
 Prove: EqS1(a_1, { var_0 with F1_b = a[1 <- x][0 <- y] }).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function g
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Post-condition 'ko' in 'g':
@@ -39,5 +57,11 @@ Prove: EqS1(a_1, { var_0 with F1_b = a }).
 
 Goal Post-condition 'ok' in 'g':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

@@ -9,6 +9,18 @@
   Function list_remove
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'list_remove':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'list_remove':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion (file issue-516.c, line 21):
 Let a = Mptr_0[list_0].
 Assume { (* Heap *) Type: (region(list_0.base) <= 0) /\ framed(Mptr_0). }

@@ -8,8 +8,20 @@
   Function LoopCurrent
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'LoopCurrent':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file issue_801.i, line 5) in 'LoopCurrent':
 Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'LoopCurrent':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------
 

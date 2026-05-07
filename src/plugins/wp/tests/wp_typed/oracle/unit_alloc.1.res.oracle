@@ -14,12 +14,36 @@
   Function f
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'f':
 Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function g
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'g':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assigns nothing in 'g':
@@ -31,13 +55,37 @@ Prove: true.
   Function h
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'h':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Post-condition (file unit_alloc.i, line 33) in 'h':
 Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: !valid_rw(Malloc_0[P_x_41 <- 0], global(P_x_41), 1).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'h':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function job
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job':
+Prove: true.
+Prover CFG returns Valid
+
 ------------------------------------------------------------
 
 Goal Assertion (file unit_alloc.i, line 15):

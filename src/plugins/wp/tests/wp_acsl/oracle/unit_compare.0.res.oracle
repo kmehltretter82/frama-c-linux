@@ -8,6 +8,12 @@
   Function main
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Pre-condition 'LE_X_Y' in 'main':
 Assume { Type: is_sint32(x) /\ is_sint32(y). }
 Prove: x <= y.
@@ -113,5 +119,11 @@ Prove: (3 + x) <= y.
 Goal Pre-condition 'LT_Xm1_Y1' in 'main':
 Assume { Type: is_sint32(x) /\ is_sint32(y). }
 Prove: x <= (1 + y).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main':
+Prove: true.
+Prover CFG returns Valid
 
 ------------------------------------------------------------

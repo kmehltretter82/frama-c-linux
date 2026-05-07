@@ -8,6 +8,18 @@
   Function add
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'add':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'add':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Check 'A' (file real.c, line 6):
 Prove: P_EQ(1234567.0, to_f64(1234567.0)).
 

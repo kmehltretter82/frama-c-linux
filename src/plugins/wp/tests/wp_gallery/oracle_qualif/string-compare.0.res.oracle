@@ -66,8 +66,8 @@
   Alt-Ergo:       19
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  stringCompare            20       13       33       100%
-  stringLength             10        4       14       100%
+  stringCompare            21       13       34       100%
+  stringLength             11        4       15       100%
   main                      6        2        8       100%
 ------------------------------------------------------------
 [wp] Running WP plugin...
@@ -90,7 +90,7 @@
   Alt-Ergo:        6
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  stringCompare            22       18       40       100%
-  stringLength             10        5       15       100%
+  stringCompare            23       18       41       100%
+  stringLength             11        5       16       100%
   main                      6        2        8       100%
 ------------------------------------------------------------

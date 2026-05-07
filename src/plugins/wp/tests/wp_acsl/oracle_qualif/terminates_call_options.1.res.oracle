@@ -32,9 +32,9 @@
   Unsuccess:       3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  definition                1        -        1       100%
+  definition                3        -        3       100%
   call_declaration          2        -        2       100%
   call_definition           2        -        2       100%
-  no_spec_generates_goal    -        -        1       0.0%
+  no_spec_generates_goal    1        -        2      50.0%
   libc_call                 3        -        5      60.0%
 ------------------------------------------------------------

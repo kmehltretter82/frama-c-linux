@@ -28,6 +28,18 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'access':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'access':
+Prove: true.
+Prover CFG returns Valid
+
+------------------------------------------------------------
+
 Goal Assertion 'rte,mem_access' (file doomed_localinit.i, line 10):
 Assume {
   (* Heap *)
