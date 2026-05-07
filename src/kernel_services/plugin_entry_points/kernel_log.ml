@@ -159,6 +159,10 @@ let dkey_print_unspecified = register_category "printer:unspecified"
 
 let dkey_print_vid = register_category "printer:vid"
 
+let dkey_print_debug =
+  register_category "printer:debug"
+    ~help:"print internal representation of AST nodes"
+
 let dkey_printer_too_early =
   register_category "printer:too-early"
     ~help:"raise fatal error when Printer is used in early parsing stages, \
