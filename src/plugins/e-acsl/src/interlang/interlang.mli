@@ -109,6 +109,5 @@ module Helpers : sig
   val is_div_or_mod : binop -> bool
 
   val attach_rtes : rte list -> exp -> exp
-  (** Attach a list of RTE guards to an expression. The original list is
-      overwritten. *)
+  (** Attach RTE guards to an expression, adding them to the original list *)
 end

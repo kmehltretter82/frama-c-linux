@@ -249,7 +249,7 @@ module Lhost = struct
 end
 
 module Helpers = struct
-  let attach_rtes rtes e = {e with rtes}
+  let attach_rtes rtes e = {e with rtes = e.rtes @ rtes}
   let is_div_or_mod = function
     | (Div | Mod) -> true | _ -> false
 end
