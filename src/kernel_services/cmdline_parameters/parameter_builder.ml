@@ -799,7 +799,7 @@ struct
 
     module Custom_value =
     struct
-      include Datatype.Make_with_set_and_map (struct
+      include Datatype.Make (struct
           include Datatype.Serializable_undefined
           let name = "Parameter_builder.Enum(" ^ X.option_name ^ ")"
           type t = X.t
