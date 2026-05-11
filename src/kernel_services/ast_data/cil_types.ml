@@ -1504,6 +1504,7 @@ and model_info = {
   (** attributes tied to the field.
       @since Phosphorus-20170501-beta1 *)
 }
+[@@deriving show { with_path = false } ]
 
 (** offset of an lvalue. *)
 and term_offset =
@@ -1706,6 +1707,7 @@ and allocation =
   | FreeAlloc of identified_term list * identified_term list (** tsets. Empty list means \nothing. *)
   | FreeAllocAny (** Nothing specified. Semantics depends on where it
                      is written. *)
+[@@deriving show { with_path = false } ]
 
 (** dependencies of an assigned location. *)
 and deps =
@@ -1713,12 +1715,14 @@ and deps =
   | FromAny (** Nothing specified. Any location can be involved. *)
 
 and from = identified_term * deps
+[@@deriving show { with_path = false } ]
 
 (** zone assigned with its dependencies. *)
 and assigns =
   | WritesAny (** Nothing specified. Anything can be written. *)
   | Writes of from list
   (** list of locations that can be written. Empty list means \nothing. *)
+[@@deriving show { with_path = false } ]
 
 (** Function or statement contract. This type shares the name of its
     constructors with {!Logic_ptree.spec}. *)
@@ -1769,6 +1773,7 @@ and acsl_extension = {
   ext_has_status : bool;
   ext_kind : acsl_extension_kind
 }
+[@@deriving show { with_path = false } ]
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and acsl_extension_kind =

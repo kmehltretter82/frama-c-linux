@@ -151,6 +151,8 @@ val dkey_print_unspecified: category
 
 val dkey_print_vid: category
 
+val dkey_print_debug: category
+
 val dkey_printer_too_early: category
 
 val dkey_prop_status: category
