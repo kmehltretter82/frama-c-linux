@@ -79,6 +79,30 @@
     height: 26px;
 }
 
+.statusbar > .dome-xToolBar-control,
+.statusbar > .dome-xToolBar-buttongroup {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.server-status {
+    flex: 0 0 22px;
+    display: grid;
+    place-items: center;
+    cursor: default;
+    height: 21px;
+    margin: 2px;
+}
+
+.server-status .dome-xIcon {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    margin: 0px;
+    padding: 0px;
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- Styling LabViews                                                   --- */
 /* -------------------------------------------------------------------------- */

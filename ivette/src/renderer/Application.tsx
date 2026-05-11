@@ -47,7 +47,6 @@ export default function Application(): JSX.Element {
   return (
     <Vfill>
       <Toolbar.ToolBar>
-        <Controller.Control />
         <>{ToolBar}</>
         <Toolbar.Filler />
         <Laboratory.Tabs />
@@ -70,6 +69,8 @@ export default function Application(): JSX.Element {
       </Hfill>
       <Toolbar.ToolBar className="statusbar">
         <Controller.Status />
+        <Toolbar.Separator />
+        <Controller.Control />
         <>{StatusBar}</>
         <Toolbar.Filler />
         <Laboratory.Dock />
