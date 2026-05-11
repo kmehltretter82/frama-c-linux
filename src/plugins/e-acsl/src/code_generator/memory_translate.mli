@@ -28,29 +28,25 @@ val call_with_size:
   adata:Assert.t ->
   loc:location ->
   kernel_function ->
-  string ->
   typ ->
   Env.t ->
-  term list ->
+  predicate ->
   exp * Assert.t * Env.t
-(* [call_with_size ~loc kf name ctx env tlist p] creates a call to the E-ACSL
-   memory built-in identified by [name] which requires two arguments per term,
+(* [call_with_size ~loc kf ctx env p] creates a call to the E-ACSL
+   memory built-in identified by [p] which requires two arguments per term,
    namely the pointer under study and a size in bytes.
-   The supported built-ins are: [initialized] and [separated].
-   Each term in [tlist] can denote ranges of memory locations. *)
+   The supported built-ins are: [initialized] and [separated]. *)
 
 val call_valid:
   adata:Assert.t ->
   loc:location ->
   kernel_function ->
-  string ->
   typ ->
   Env.t ->
-  term ->
+  predicate ->
   exp * Assert.t * Env.t
-(* [call_valid ~loc kf name ctx env t p] creates a call to the E-ACSL memory
-   built-in [valid], [valid_read], or [object_pointer] according to [name].
-   [t] can denote ranges of memory locations. *)
+(* [call_valid ~loc kf name ctx env p] creates a call to the E-ACSL memory
+   built-in [valid], [valid_read], or [object_pointer] according to [p]. *)
 
 (**************************************************************************)
 (********************** Forward references ********************************)

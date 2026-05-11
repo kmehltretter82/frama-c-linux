@@ -232,22 +232,16 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
       (* static resolution: \valid_read(stdin) ≡ 1; \valid_read(&errno) ≡ 1; etc. *)
       | Pvalid_read _, Some _spec -> of_bool true, adata, env
       | _ ->
-        let call_valid ~adata t p =
-          let name = match pc with
-            | Pvalid _ -> "valid"
-            | Pvalid_read _ -> "valid_read"
-            | Pobject_pointer _ -> "object_pointer"
-            | _ -> assert false
-          in
+        let call_valid ~adata p =
           let e, adata, env =
-            Memory_translate.call_valid ~adata ~loc kf name Cil_const.intType env t
+            Memory_translate.call_valid ~adata ~loc kf Cil_const.intType env p
           in
           let adata = Assert.register_pred ~loc env p e adata in
           e, adata, env
         in
         (* we already transformed \valid(t) into \initialized(&t) && \valid(t):
            now convert this right-most valid. *)
-        call_valid ~adata t p
+        call_valid ~adata p
     end
   | Pvalid _ -> Env.not_yet env "labeled \\valid"
   | Pvalid_read _ -> Env.not_yet env "labeled \\valid_read"
@@ -278,10 +272,9 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
         ~adata
         ~loc
         kf
-        "separated"
         Cil_const.intType
         env
-        tlist
+        p
     in
     let adata = Assert.register_pred ~loc env p e adata in
     e, adata, env
@@ -330,10 +323,9 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
               ~adata
               ~loc
               kf
-              "initialized"
               Cil_const.intType
               env
-              [ t ]
+              p
           in
           let adata = Assert.register_pred ~loc env p e adata in
           e, adata, env
