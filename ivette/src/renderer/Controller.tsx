@@ -194,13 +194,13 @@ export const Control = (): JSX.Element => {
         icon="RELOAD"
         enabled={reload.enabled}
         onClick={reload.onClick}
-        title="Re-start the server"
+        title="Restart the server"
       />
       <Toolbars.Button
         icon="MEDIA.STOP"
         enabled={stop.enabled}
         onClick={stop.onClick}
-        title="Shut down the server"
+        title="Stop the server"
       />
     </Toolbars.ButtonGroup>
   );
@@ -326,31 +326,31 @@ export function RenderConsole(): JSX.Element {
           display={edited}
           disabled={noTrash}
           onClick={doRemove}
-          title="Discard command from history (irreversible)"
+          title="Remove command from history (irreversible)"
         />
         <Toolbars.Space />
         <IconButton
           icon="RELOAD"
           display={edited}
           onClick={doReload}
-          title="Discard changes"
+          title="Discard command edits"
         />
         <IconButton
           icon="ANGLE.LEFT"
           display={edited}
           onClick={doPrev}
-          title="Previous command"
+          title="Show previous command"
         />
         <IconButton
           icon="ANGLE.RIGHT"
           display={edited}
           onClick={doNext}
-          title="Next command"
+          title="Show next command"
         />
         <Toolbars.Space />
         <Label
           className="component-info"
-          title="History (last command first)"
+          title="Command history (newest first)"
           display={edited}
         >
           {1 + cursor} / {n}
@@ -361,20 +361,20 @@ export function RenderConsole(): JSX.Element {
           display={edited}
           disabled={isEmpty}
           onClick={doExec}
-          title="Execute command"
+          title="Run command"
         />
         <IconButton
           icon="TERMINAL"
           selected={edited}
           onClick={doSwitch}
-          title="Toggle command line editing"
+          title="Toggle command-line editing"
         />
         <IconButton
           icon="MEDIA.NEXT"
           disabled={edited}
           selected={scrolling}
           onClick={flipScrolling}
-          title="Auto scrolling"
+          title="Auto-scroll console"
         />
       </Ivette.TitleBar>
       <TextView
