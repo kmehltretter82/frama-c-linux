@@ -395,7 +395,7 @@ module rec Transfer
     | LBpred _ -> Options.fatal "unexpected predicate"
     | LBinductive _ -> Options.fatal "unexpected inductive definitions"
 
-  let register_object kf state_ref = object
+  let register_object kf state_ref = object(self)
     inherit Visitor.frama_c_inplace
     method !vpredicate_node = function
       | Pvalid(_, t) | Pvalid_read(_, t)
@@ -422,7 +422,13 @@ module rec Transfer
           state_ref := register_term kf !state_ref (Misc.term_of_li li);
           Cil.DoChildren
         end
-    method !vterm term = match term.term_node with
+    method !vterm term =
+      (* registering each guards associated to [term] *)
+      Rte_analysis.iter_on_guards term
+        (fun p ->
+           Error.handle
+             (fun () -> ignore (self#vpredicate_node p.pred_content)) ());
+      match term.term_node with
       | Tbase_addr(_, t) | Toffset(_, t) | Tblock_length(_, t) | Tlet(_, t) ->
         state_ref := register_term kf !state_ref t;
         Cil.DoChildren
