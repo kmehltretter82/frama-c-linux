@@ -31,7 +31,7 @@ void test(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j,
 
 void simple_loop() {
   int sum = 0;
-  int x = 9;
+  int x = 11;
   /*@ loop invariant 0 <= i / x; */
   for (int i = 0; i < 10; i++) {
     sum += i;
@@ -47,9 +47,9 @@ void nested_loop() {
   }
 
   int k;
-  /*@ loop invariant 0 <= k <= 10;
-    @ loop invariant \forall integer i; 0 <= i < k ==> a[i] / i == 1; */
-  for (k = 0; k < 10; k++) {
+  /*@ loop invariant 1 <= k <= 10;
+    @ loop invariant \forall integer i; 1 <= i < k ==> a[i] / i == 1; */
+  for (k = 1; k < 10; k++) {
     a[k] = a[k] / 1;
   }
 }

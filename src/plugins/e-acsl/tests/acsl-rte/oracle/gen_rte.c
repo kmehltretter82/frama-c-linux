@@ -50,7 +50,7 @@ void test(int a, int b, int c, int d, int e, int f, int g, int h, int i,
 void simple_loop(void)
 {
   int sum = 0;
-  int x = 9;
+  int x = 11;
   {
     int i = 0;
     {
@@ -133,14 +133,14 @@ void nested_loop(void)
       i ++;
     }
   }
-  k = 0;
+  k = 1;
   {
     int __gen_e_acsl_forall;
     int __gen_e_acsl_i;
     int __gen_e_acsl_and;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_forall = 1;
-    __gen_e_acsl_i = 0;
+    __gen_e_acsl_i = 1;
     while (1) {
       if (__gen_e_acsl_i < k) ; else break;
       {
@@ -196,11 +196,11 @@ void nested_loop(void)
     }
     e_acsl_end_loop1: ;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "\\forall integer i; 0 <= i < k ==> a[i] / i == 1",
+                                 "\\forall integer i; 1 <= i < k ==> a[i] / i == 1",
                                  0,__gen_e_acsl_forall);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Invariant";
-    __gen_e_acsl_assert_data.pred_txt = "\\forall integer i; 0 <= i < k ==> a[i] / i == 1";
+    __gen_e_acsl_assert_data.pred_txt = "\\forall integer i; 1 <= i < k ==> a[i] / i == 1";
     __gen_e_acsl_assert_data.file = "rte.i";
     __gen_e_acsl_assert_data.fct = "nested_loop";
     __gen_e_acsl_assert_data.line = 51;
@@ -209,22 +209,22 @@ void nested_loop(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"k",0,k);
-    if (0 <= k) {
+    if (1 <= k) {
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"k",0,k);
       __gen_e_acsl_and = k <= 10;
     }
     else __gen_e_acsl_and = 0;
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Invariant";
-    __gen_e_acsl_assert_data_5.pred_txt = "0 <= k <= 10";
+    __gen_e_acsl_assert_data_5.pred_txt = "1 <= k <= 10";
     __gen_e_acsl_assert_data_5.file = "rte.i";
     __gen_e_acsl_assert_data_5.fct = "nested_loop";
     __gen_e_acsl_assert_data_5.line = 50;
     __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
   }
-  /*@ loop invariant 0 <= k <= 10;
-      loop invariant \forall integer i; 0 <= i < k ==> a[i] / i == 1;
+  /*@ loop invariant 1 <= k <= 10;
+      loop invariant \forall integer i; 1 <= i < k ==> a[i] / i == 1;
   */
   while (k < 10) {
     /*@ assert Eva: initialization: \initialized(&a[k]); */
@@ -237,14 +237,14 @@ void nested_loop(void)
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
         {.values = (void *)0};
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"k",0,k);
-      if (0 <= k) {
+      if (1 <= k) {
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"k",0,k);
         __gen_e_acsl_and_2 = k <= 10;
       }
       else __gen_e_acsl_and_2 = 0;
       __gen_e_acsl_assert_data_6.blocking = 1;
       __gen_e_acsl_assert_data_6.kind = "Invariant";
-      __gen_e_acsl_assert_data_6.pred_txt = "0 <= k <= 10";
+      __gen_e_acsl_assert_data_6.pred_txt = "1 <= k <= 10";
       __gen_e_acsl_assert_data_6.file = "rte.i";
       __gen_e_acsl_assert_data_6.fct = "nested_loop";
       __gen_e_acsl_assert_data_6.line = 50;
@@ -253,7 +253,7 @@ void nested_loop(void)
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
         {.values = (void *)0};
       __gen_e_acsl_forall_2 = 1;
-      __gen_e_acsl_i_2 = 0;
+      __gen_e_acsl_i_2 = 1;
       while (1) {
         if (__gen_e_acsl_i_2 < k) ; else break;
         {
@@ -301,6 +301,8 @@ void nested_loop(void)
           __e_acsl_assert(0 <= __gen_e_acsl_i_2,
                           & __gen_e_acsl_assert_data_10);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
+          /*@ assert Eva: initialization: \initialized(&a[__gen_e_acsl_i_2]);
+          */
           if (a[__gen_e_acsl_i_2] / (long)__gen_e_acsl_i_2 == 1L) ;
           else {
             __gen_e_acsl_forall_2 = 0;
@@ -311,11 +313,11 @@ void nested_loop(void)
       }
       e_acsl_end_loop2: ;
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
-                                   "\\forall integer i; 0 <= i < k ==> a[i] / i == 1",
+                                   "\\forall integer i; 1 <= i < k ==> a[i] / i == 1",
                                    0,__gen_e_acsl_forall_2);
       __gen_e_acsl_assert_data_7.blocking = 1;
       __gen_e_acsl_assert_data_7.kind = "Invariant";
-      __gen_e_acsl_assert_data_7.pred_txt = "\\forall integer i; 0 <= i < k ==> a[i] / i == 1";
+      __gen_e_acsl_assert_data_7.pred_txt = "\\forall integer i; 1 <= i < k ==> a[i] / i == 1";
       __gen_e_acsl_assert_data_7.file = "rte.i";
       __gen_e_acsl_assert_data_7.fct = "nested_loop";
       __gen_e_acsl_assert_data_7.line = 51;
@@ -611,6 +613,7 @@ int main(void)
       __e_acsl_assert(v != 0U,& __gen_e_acsl_assert_data_17);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
     }
+    /*@ assert Eva: initialization: \initialized(&x); */
     __gen_e_acsl_aligned = __e_acsl_aligned((void *)x,(size_t)v);
     __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_16,"v",0,v);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_16,"x",(void *)x);
