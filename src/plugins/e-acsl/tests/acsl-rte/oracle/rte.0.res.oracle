@@ -1,22 +1,22 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] rte.i:42: Warning: 
+[eva:alarm] rte.i:67: Warning: 
   signed overflow. assert -2147483648 <= 1 + __gen_e_acsl__2;
-[eva:alarm] rte.i:42: Warning: 
+[eva:alarm] rte.i:67: Warning: 
   signed overflow. assert 1 + __gen_e_acsl__2 <= 2147483647;
-[eva:alarm] rte.i:42: Warning: 
+[eva:alarm] rte.i:67: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] rte.i:13: Warning: 
   assertion 'E_ACSL,division by zero' got status unknown.
-[eva:alarm] rte.i:47: Warning: 
+[eva:alarm] rte.i:72: Warning: 
   non-finite double value. assert \is_finite(__gen_e_acsl__4);
-[eva:alarm] rte.i:47: Warning: 
+[eva:alarm] rte.i:72: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] rte.i:49: Warning: 
+[eva:alarm] rte.i:74: Warning: 
   function __gen_e_acsl_test, behavior bhvr: precondition \forall integer var;
                                                             0 <= var < k ==>
                                                             var % k == var got status unknown.
-[eva:alarm] rte.i:49: Warning: 
+[eva:alarm] rte.i:74: Warning: 
   function __gen_e_acsl_test, behavior bhvr: precondition \exists integer var;
                                                             0 <= var < l &&
                                                             var % l == var got status unknown.
@@ -26,5 +26,9 @@
   assertion 'E_ACSL,division by zero' got status unknown.
 [eva:alarm] rte.i:27: Warning: 
   assertion 'E_ACSL,division by zero' got status unknown.
+[eva:alarm] rte.i:37: Warning: signed overflow. assert sum + i <= 2147483647;
+[eva:alarm] rte.i:35: Warning: division by zero. assert (long)x != 0;
 [eva:alarm] rte.i:53: Warning: 
-  accessing uninitialized left-value. assert \initialized(&x);
+  accessing uninitialized left-value. assert \initialized(&a[k]);
+[eva:alarm] rte.i:51: Warning: 
+  division by zero. assert (long)__gen_e_acsl_i_2 != 0;
