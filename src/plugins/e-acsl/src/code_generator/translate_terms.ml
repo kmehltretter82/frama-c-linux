@@ -353,7 +353,7 @@ and context_insensitive_term_to_exp_il ?inplace t =
     let* l = tlval_to_lval_il lv in
     M.return @@ IL.Exp.lval ~origin:t l
   | TSizeOf ty -> M.return @@ IL.Exp.sizeof ~origin:t ty
-  | TCast (true, _, t) -> context_insensitive_term_to_exp_il t
+  | TCast (true, _, t) -> to_exp_il t
   | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
     let* logic_env = M.read_logic_env in
     let* e1 = to_exp_il t1 in

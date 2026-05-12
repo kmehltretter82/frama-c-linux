@@ -42,6 +42,21 @@ int main(void)
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"x",0,x);
+    /*@ assert E_ACSL: "division by zero": x + 1 != 0; */
+    {
+      __gen_e_acsl_assert_data_4.blocking = 1;
+      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.pred_txt = "x + 1 != 0";
+      __gen_e_acsl_assert_data_4.file = "only_interlang.c";
+      __gen_e_acsl_assert_data_4.fct = "main";
+      __gen_e_acsl_assert_data_4.line = 10;
+      __gen_e_acsl_assert_data_4.name = "division by zero";
+      __e_acsl_assert(x + 1L != 0L,& __gen_e_acsl_assert_data_4);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    }
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"x",0,x);
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";

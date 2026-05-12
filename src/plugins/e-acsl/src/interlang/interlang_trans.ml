@@ -84,29 +84,29 @@ let assert_register_term ~loc ?force e t =
   Assert.register_term ~loc ?force t e a
 
 let rec compile ?(flush_rtes=false) exp =
-  let add_cast ~coerce ~cast_info e =
-    match cast_info with (* [cast_info] specifies type type we cast from. *)
-    | Some (strnum, name) ->
-      let name = if name = "" then None else Some name in
-      let* {kf; loc} = M.read in
-      let loc = match exp.origin with
-        | Some t -> t.term_loc
-        | None -> loc
-      in
-      M.modifying_env (fun env ->
-          Typed_number.add_cast ~loc
-            ?name
-            env
-            kf
-            coerce
-            strnum
-            exp.origin
-            e)
-    | None -> M.return e (* no cast required *)
-  in
-  let* e, coerce, cast_info = compile_context_insensitive exp in
-  let cil = M.update exp.rtes (add_cast ~coerce ~cast_info e) in
-  if flush_rtes then compile_rte_guards cil else cil
+  let* e, coerce, cast_info = compile_with_rtes ~flush_rtes exp in
+  match cast_info with (* [cast_info] specifies type type we cast from. *)
+  | Some (strnum, name) ->
+    let name = if name = "" then None else Some name in
+    let* {kf; loc} = M.read in
+    let loc = match exp.origin with
+      | Some t -> t.term_loc
+      | None -> loc
+    in
+    M.modifying_env (fun env ->
+        Typed_number.add_cast ~loc
+          ?name
+          env
+          kf
+          coerce
+          strnum
+          exp.origin
+          e)
+  | None -> M.return e (* no cast required *)
+
+and compile_with_rtes ?(flush_rtes=false) exp =
+  let res = M.update exp.rtes @@ compile_context_insensitive exp in
+  if flush_rtes then compile_rte_guards res else res
 
 and compile_context_insensitive {Interlang.enode; origin} =
   let* {kf; loc} = M.read in
@@ -181,10 +181,9 @@ and compile_context_insensitive {Interlang.enode; origin} =
     let* () = M.Option.iter (assert_register_term ~loc ~force:true e) origin in
     M.return (e, None, Some (Analyses_types.C_number, "sizeof"))
   | Coerce {coerce_to = typ; coerced = exp} ->
-    let* e, coerce, cast_info = compile_context_insensitive exp in
+    let* e, coerce, cast_info = compile_with_rtes exp in
     ignore coerce; (* coerce to A and then B ⇒ just coerce directly to B *)
     M.return (e, Some typ, cast_info)
-
 
 and compile_div_mod ~origin {ity; binop; op1; op2} =
   assert (Interlang.Helpers.is_div_or_mod binop);
