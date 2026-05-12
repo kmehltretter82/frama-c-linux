@@ -7,6 +7,7 @@
 int main() {
   int x = 1;
   /*@ assert 12 / x > 0; */
+  /*@ assert 12 / (x + 1) == 6; */
 
   return 0;
 }

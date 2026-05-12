@@ -23,7 +23,7 @@ int main(void)
       __gen_e_acsl_assert_data_2.pred_txt = "x != 0";
       __gen_e_acsl_assert_data_2.file = "only_interlang.c";
       __gen_e_acsl_assert_data_2.fct = "main";
-      __gen_e_acsl_assert_data_2.line = 8;
+      __gen_e_acsl_assert_data_2.line = 9;
       __gen_e_acsl_assert_data_2.name = "division by zero";
       __e_acsl_assert(x != 0,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -34,11 +34,25 @@ int main(void)
     __gen_e_acsl_assert_data.pred_txt = "12 / x > 0";
     __gen_e_acsl_assert_data.file = "only_interlang.c";
     __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 8;
+    __gen_e_acsl_assert_data.line = 9;
     __e_acsl_assert(12 / x > 0,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
   /*@ assert 12 / x > 0; */ ;
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"x",0,x);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "12 / (x + 1) == 6";
+    __gen_e_acsl_assert_data_3.file = "only_interlang.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 10;
+    __e_acsl_assert((int)(12L / (x + 1L)) == 6,& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+  }
+  /*@ assert 12 / (x + 1) == 6; */ ;
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;
