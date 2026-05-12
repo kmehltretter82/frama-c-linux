@@ -454,8 +454,7 @@ let rte_guards_to_exp_old ~loc ~kf t env =
       p
   in
   let env = Assert.do_pending_register_data env in
-  let env = Env.add_stmt env stmt in
-  Env.add_assert kf stmt p;
+  let env = Env.add_stmt ~annot:p env stmt in
   env
 
 let predicate_to_exp_without_rte ~adata kf env p =

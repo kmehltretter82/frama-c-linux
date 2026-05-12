@@ -298,7 +298,7 @@ let add_new_block_in_stmt env kf stmt =
       let fargs = Kernel_function.get_formals kf in
       let env = Memory_observer.delete_from_list env kf fargs in
       let b, env =
-        Env.pop_and_get env new_stmt ~global_clear:true Env.After
+        Env.pop_and_get ~kf env new_stmt ~global_clear:true Env.After
       in
       let new_stmt = Smart_stmt.block stmt b in
       new_stmt, env
@@ -306,7 +306,7 @@ let add_new_block_in_stmt env kf stmt =
       (* must generate [pre_block] which includes [stmt] before generating
          [post_block] *)
       let pre_block, env =
-        Env.pop_and_get
+        Env.pop_and_get ~kf
           ~split:true
           env
           new_stmt
@@ -323,7 +323,7 @@ let add_new_block_in_stmt env kf stmt =
         else Env.push env
       in
       let post_block, env =
-        Env.pop_and_get
+        Env.pop_and_get ~kf
           env
           (Smart_stmt.block new_stmt pre_block)
           ~global_clear:false

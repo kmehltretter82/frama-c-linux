@@ -59,13 +59,13 @@ let result_as_extra_argument typ =
 
 (* Generate the block of code containing the statement assigning [e] to [ret_vi]
    (the result). *)
-let generate_return_block ~loc env ret_vi e = match e.enode with
+let generate_return_block ~kf ~loc env ret_vi e = match e.enode with
   | Lval (Var _, NoOffset) ->
     (* the returned value is a variable: Cil invariant preserved;
        no need of [ret_vi] *)
     let return_retres = Cil.mkStmt ~valid_sid:true (Return (Some e, loc)) in
     let b, env =
-      Env.pop_and_get env return_retres ~global_clear:false Env.After
+      Env.pop_and_get ~kf env return_retres ~global_clear:false Env.After
     in
     b.blocals <- b.blocals;
     b.bscoping <- true;
@@ -79,7 +79,7 @@ let generate_return_block ~loc env ret_vi e = match e.enode with
     let return =
       Cil.mkStmt ~valid_sid:true (Return (Some (Cil.evar ~loc ret_vi), loc))
     in
-    let b, env = Env.pop_and_get env set ~global_clear:false Env.Middle in
+    let b, env = Env.pop_and_get ~kf env set ~global_clear:false Env.Middle in
     ret_vi.vdefined <- true;
     b.blocals <- ret_vi :: b.blocals;
     b.bstmts <- b.bstmts @ [ return ];
@@ -91,7 +91,7 @@ let pred_to_block ~loc kf env ret_vi p =
   let e, _, env = !predicate_to_exp_ref ~adata:Assert.no_data kf env p in
   (* for predicate, since the result is either 0 or 1, return it directly (it
      cannot be provided as extra argument *)
-  generate_return_block ~loc env ret_vi e
+  generate_return_block ~kf ~loc env ret_vi e
 
 (* Generate the function's body for terms. *)
 let term_to_block ~loc kf env ret_ty ret_vi t =
@@ -105,12 +105,12 @@ let term_to_block ~loc kf env ret_ty ret_vi t =
       Gmp.init_set ~loc lv_star_ret star_ret e
     in
     let return_void = Cil.mkStmt ~valid_sid:true (Return (None, loc)) in
-    let b, env = Env.pop_and_get env set ~global_clear:false Env.Middle in
+    let b, env = Env.pop_and_get ~kf env set ~global_clear:false Env.Middle in
     b.bstmts <- b.bstmts @ [ return_void ];
     b.bscoping <- true;
     b, env
   else
-    generate_return_block ~loc env ret_vi e
+    generate_return_block ~kf ~loc env ret_vi e
 
 let generate_body ~loc kf env ret_ty ret_vi = function
   | LBterm t -> term_to_block ~loc kf env ret_ty ret_vi t

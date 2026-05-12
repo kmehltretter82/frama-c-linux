@@ -219,11 +219,11 @@ let conditional_to_exp ?(name="if") ~loc kf t_opt e1 (e2, env2) (e3, env3) =
            let affect e = init_set ~loc lv ev e in
            let then_blk, _ =
              let s = affect e2 in
-             Env.pop_and_get env2 s ~global_clear:false Env.Middle
+             Env.pop_and_get ~kf env2 s ~global_clear:false Env.Middle
            in
            let else_blk, _ =
              let s = affect e3 in
-             Env.pop_and_get env3 s ~global_clear:false Env.Middle
+             Env.pop_and_get ~kf env3 s ~global_clear:false Env.Middle
            in
            [ Smart_stmt.if_stmt ~loc ~cond:e1 then_blk ~else_blk ])
     in

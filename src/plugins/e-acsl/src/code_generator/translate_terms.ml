@@ -284,7 +284,7 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
     let env = Env.push env in
     let e_lbd, _, env = to_exp ~adata:Assert.no_data kf env lt in
     let lbd_stmt,env =
-      Env.pop_and_get env
+      Env.pop_and_get ~kf env
         (Gmp.assign ~loc (Cil.var lbd_as_varinfo) lbd_as_exp e_lbd)
         ~global_clear:false Env.Middle
     in
@@ -609,7 +609,6 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
             coerce_guard
             pred
         in
-        Env.add_assert kf cond pred;
         cond, env
       in
       let mk_coerce_stmts vi _e =
@@ -691,7 +690,6 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
                 e1_guard
                 pred
             in
-            Env.add_assert kf cond pred;
             cond, env
           in
           Some e1_guard_cond, env

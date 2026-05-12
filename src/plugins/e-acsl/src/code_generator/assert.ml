@@ -291,7 +291,7 @@ let runtime_check_with_msg ~adata ~loc ?(name="") msg ~pred_kind kind kf env pre
       stmts
   in
   let block, env =
-    Env.pop_and_get
+    Env.pop_and_get ~kf
       env
       (Smart_stmt.block_from_stmts (List.rev stmts))
       ~global_clear:false
