@@ -142,11 +142,6 @@ purge-ptests:
 	find $(PTEST_ALL_DIRS) -name "*.wtests" -print0 \
         | $(XARGS) $(RM)
 
-# Force the full cleaning of the testing environment
-.PHONY: clean-tests
-clean-tests: purge-tests
-	$(RMDIR) $(addprefix _build/default/,$(PTEST_ALL_DIRS))
-
 ##########################################################################
 ## Generates all dune files used for testing
 

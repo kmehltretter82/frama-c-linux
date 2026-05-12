@@ -35,11 +35,6 @@ purge-ptests:
 	@echo "Purge Ptests files"
 	find tests -name dune | grep -e "oracle.*/\|result.*/" | xargs --no-run-if-empty rm
 
-.PHONY: clean-tests
-clean-tests: purge-tests
-	@echo "Clean tests"
-	rm -rf $(ENV_DIR)
-
 .PHONY: %.dune-file
 %.dune-file: purge-ptests
 	@echo "Dune files for $(basename $@)"
@@ -56,7 +51,7 @@ tests: dune-files
 	dune build $(addprefix @tests/,$(addsuffix /tests/ptests,$(TEST_DIRS)))
 
 .PHONY: tests
-force-tests: dune-files clean-tests
+force-tests: dune-files purge-ptests
 	@echo "Run Tests..."
 	dune build $(addprefix @tests/,$(addsuffix /tests/ptests,$(TEST_DIRS)))
 	@echo "Nb .Log files:"
