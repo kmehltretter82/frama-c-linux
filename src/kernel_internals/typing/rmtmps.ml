@@ -145,7 +145,7 @@ let categorizePragmas ast =
         | _ ->
           Kernel.fatal ~current:true
             "Bad alias attribute at %a"
-            Cil_printer.pp_location (Current_loc.get ())
+            Fileloc.pretty (Current_loc.get ())
       end
     | _ ->
       ()

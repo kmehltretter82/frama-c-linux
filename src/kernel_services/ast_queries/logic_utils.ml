@@ -2091,8 +2091,8 @@ let merge_assigns_list l1 l2 =
           Kernel.warning ~once:true ~source:(fst loc1)
             "@[incompatible@ from@ clauses (%a:'%a'@ and@ %a:'%a').@ \
              Keeping@ only@ the first@ one.@]"
-            !Cil.pp_location_ref loc1 !Cil.pp_from_ref cl1
-            !Cil.pp_location_ref loc2 !Cil.pp_from_ref cl2;
+            Fileloc.pretty loc1 !Cil.pp_from_ref cl1
+            Fileloc.pretty loc2 !Cil.pp_from_ref cl2;
           cl1 :: aux q1 q2
         end
   in
@@ -2133,7 +2133,7 @@ let pp_old_loc fmt oldloc =
     Format.ifprintf fmt ""
   else
     Format.fprintf fmt " (old location: %a)"
-      !Cil.pp_location_ref oldloc
+      Fileloc.pretty oldloc
 
 let merge_behaviors ?(oldloc=Fileloc.unknown) ~silent old_behaviors fresh_behaviors =
   old_behaviors @

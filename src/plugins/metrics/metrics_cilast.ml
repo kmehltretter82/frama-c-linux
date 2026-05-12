@@ -420,7 +420,7 @@ let compute_files_defining_globals gvars =
         else begin
           Metrics_parameters.feedback ~dkey "found %s at: %a"
             (if is_def then "definition" else "declaration")
-            Printer.pp_location loc;
+            Fileloc.pretty loc;
           Filepath.Set.add (Fileloc.path loc) acc
         end
       else acc

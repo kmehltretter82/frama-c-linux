@@ -609,9 +609,6 @@ class cil_printer () = object (self)
 
   method private may_be_skipped s = s.labels = [] && s.sattr = []
 
-  method location fmt loc =
-    Format.fprintf fmt "%a" Filepos.pretty (fst loc)
-
   (* constant *)
   method constant fmt = function
     | CInt64(_, _, Some s) when print_as_source s ->
@@ -3482,7 +3479,6 @@ let () = Cil.pp_attributes_ref := pp_attributes
 let () = Cil.pp_term_ref := pp_term
 let () = Cil.pp_logic_type_ref := pp_logic_type
 let () = Cil.pp_identified_term_ref := pp_identified_term
-let () = Cil.pp_location_ref := pp_location
 let () = Cil.pp_from_ref := pp_from
 let () = Cil.pp_behavior_ref := pp_behavior
 let () = Cil.pp_block_ref := pp_block

@@ -49,7 +49,7 @@ let d_nloc fmt (lo: (location * int) option) =
   match lo with
     None -> Format.fprintf fmt "None"
   | Some (l, idx) ->
-    Format.fprintf fmt "Some(%d at %a)" idx Cil_printer.pp_location l
+    Format.fprintf fmt "Some(%d at %a)" idx Fileloc.pretty l
 
 type ('a, 'b) node =
   { nname: 'a;   (* The actual name *)
@@ -275,8 +275,8 @@ struct
            Kernel.warning ~current:true
              "Duplicate definition of node %a(%d) at indices %d(%a) and %d(%a)"
              H.output name fidx old_idx
-             Cil_printer.pp_location old_l idx
-             Cil_printer.pp_location l
+             Fileloc.pretty old_l idx
+             Fileloc.pretty l
        | _, _ -> ());
       Kernel.debug ~dkey "node already found";
       find false res (* No path compression *)
@@ -845,7 +845,7 @@ let rec global_annot_pass1 g =
            annotation at loc %a. Ignoring new binding."
           Cil_printer.pp_identified_term t
           pretty_volatile_kind k
-          Cil_printer.pp_location (fst (Option.get node.nloc))
+          Fileloc.pretty (fst (Option.get node.nloc))
     in
     List.iter
       (fun x ->
@@ -1615,8 +1615,8 @@ let oneFilePass1 (f:file) : unit =
                 "@[<hov>Incompatible declaration for %s:@ %s@\n\
                  First declaration was at %a@\nCurrent declaration is at %a@]"
                 vi.vname reason
-                Cil_printer.pp_location oldloc
-                Cil_printer.pp_location loc
+                Fileloc.pretty oldloc
+                Fileloc.pretty loc
             in
             (* If the new variable is unused and undefined, ignore it,
                unless the old variable is also unused and undefined. *)
@@ -1678,7 +1678,7 @@ let oneFilePass1 (f:file) : unit =
             vi.vname
             Cil_printer.pp_storage vi.vstorage
             Cil_printer.pp_storage oldvi.vstorage
-            Cil_printer.pp_location oldloc
+            Fileloc.pretty oldloc
       in
       newrep.ndata.vstorage <- newstorage;
       (* Special handling for 'weak' attributes: since we cannot properly
@@ -1698,7 +1698,7 @@ let oneFilePass1 (f:file) : unit =
              this non-weak definition. @ \
              Please exchange command-line arguments to put '%a' \
              before '%a'.@."
-            Cil_printer.pp_location oldvi.vdecl
+            Fileloc.pretty oldvi.vdecl
             Filepath.pretty newpath Filepath.pretty oldpath
         end;
       newrep.ndata.vattr <- Ast_attributes.add_list oldvi.vattr vi.vattr;
@@ -2599,7 +2599,7 @@ let oneFilePass2 (f: file) =
           (* Remember the original name *)
           H.add originalVarNames newName vi.vname;
           Kernel.debug ~dkey:Kernel.dkey_linker "renaming %s at %a to %s"
-            vi.vname Cil_printer.pp_location vloc newName;
+            vi.vname Fileloc.pretty vloc newName;
           vi.vname <- newName;
           Cil_const.set_vid vi;
           visit vi;
@@ -2690,7 +2690,7 @@ let oneFilePass2 (f: file) =
               Kernel.error ~current:true
                 "global var %s at %a has different initializer than %a"
                 vi'.vname
-                Cil_printer.pp_location l Cil_printer.pp_location prevLoc;
+                Fileloc.pretty l Fileloc.pretty prevLoc;
               false
             )
         in
@@ -2875,7 +2875,7 @@ let oneFilePass2 (f: file) =
                   "dropping weak def'n of func %s at %a in favor of \
                    that at %a"
                   fdec'.svar.vname
-                  Cil_printer.pp_location l Cil_printer.pp_location prevLoc;
+                  Fileloc.pretty l Fileloc.pretty prevLoc;
                 (* We remove the 'weak' attribute, assuming the 'strong'
                    version overrode it. *)
                 fdec'.svar.vattr <- Ast_attributes.drop "weak" fdec'.svar.vattr;
@@ -2885,7 +2885,7 @@ let oneFilePass2 (f: file) =
                   "dropping duplicate def'n of func %s at %a in favor of \
                    that at %a"
                   fdec'.svar.vname
-                  Cil_printer.pp_location l Cil_printer.pp_location prevLoc
+                  Fileloc.pretty l Fileloc.pretty prevLoc
               else begin
                 (* the checksums differ, so print a warning but keep the
                  * older one to avoid a link error later.  I think this is
@@ -2894,10 +2894,10 @@ let oneFilePass2 (f: file) =
                   "def'n of func %s at %a (sum %d) conflicts with the one \
                    at %a (sum %d); keeping the one at %a."
                   fdec'.svar.vname
-                  Cil_printer.pp_location l
+                  Fileloc.pretty l
                   curSum
-                  Cil_printer.pp_location prevLoc
-                  prevSum Cil_printer.pp_location prevLoc
+                  Fileloc.pretty prevLoc
+                  prevSum Fileloc.pretty prevLoc
               end
           end else begin
             (* not attempting to merge global functions, or it was static

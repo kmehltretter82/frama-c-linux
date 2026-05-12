@@ -136,8 +136,8 @@
               Kernel.warning ~current:false ~wkey:Kernel.wkey_multi_from
                 "Drop '%a' \\from at %a for more precise one at %a"
                 Logic_print.print_lexpr curloc
-                Cil_printer.pp_location d.lexpr_loc
-                Cil_printer.pp_location k.lexpr_loc
+                Fileloc.pretty d.lexpr_loc
+                Fileloc.pretty k.lexpr_loc
             in
             if incl curl newl then begin
               if not (incl newl curl) then drop newloc curloc;

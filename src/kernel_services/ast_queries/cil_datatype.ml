@@ -182,8 +182,6 @@ end
 module Location = struct
   include Fileloc
   let dummy = unknown
-  let pretty_ref = ref (fun _ _ -> assert false)
-  let pretty fmt loc = !pretty_ref fmt loc
 end
 
 module File = struct

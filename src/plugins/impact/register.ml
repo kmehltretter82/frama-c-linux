@@ -31,7 +31,7 @@ let print_results fmt a =
   Pretty_utils.pp_list
     (fun fmt s ->
        Format.fprintf fmt "@[<hov 2>%a (sid %d): %a@]"
-         Printer.pp_location (Stmt.loc s) s.sid pp_stmt s
+         Fileloc.pretty (Stmt.loc s) s.sid pp_stmt s
     ) fmt a
 
 let compute_from_stmt stmt =

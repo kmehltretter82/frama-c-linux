@@ -65,7 +65,7 @@ end
 
 (** Cil locations. *)
 module Location: sig
-  include S_with_collections_pretty with type t = location
+  include S_with_collections with type t = location
   val unknown: t
 
   (** [is_known loc] returns true if the location is neither unknown nor

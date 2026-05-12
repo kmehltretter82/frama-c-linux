@@ -204,10 +204,10 @@ let pp_ki_loc fmt ki =
 let pp_debug fmt = function
   | PStmtStart (_, s) ->
     Format.fprintf fmt "LocalizableStart %d (%a)"
-      s.sid Printer.pp_location (Cil_datatype.Stmt.loc s)
+      s.sid Fileloc.pretty (Cil_datatype.Stmt.loc s)
   | PStmt (_, s) ->
     Format.fprintf fmt "LocalizableStmt %d (%a)"
-      s.sid Printer.pp_location (Cil_datatype.Stmt.loc s)
+      s.sid Fileloc.pretty (Cil_datatype.Stmt.loc s)
   | PLval (_, ki, lv) ->
     Format.fprintf fmt "LocalizableLval %a (%a)"
       Printer.pp_lval lv pp_ki_loc ki
