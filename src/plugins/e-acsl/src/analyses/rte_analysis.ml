@@ -126,6 +126,17 @@ let preprocess ast =
   end else
     Options.feedback ~dkey:dkey "Skip the RTE analysis.%!"
 
+let preprocess_predicate p =
+  if Options.O.get () < 3
+  then begin
+    ignore @@ rte_visitor#visit_predicate p;
+    Options.feedback ~dkey "Result of the RTE analysis on %a.%!"
+      Printer.pp_predicate p;
+    Options.feedback ~dkey:dkey "%a%!" Guards.pretty ()
+  end else
+    Options.feedback ~dkey:dkey "Skip the RTE analysis on %a.%!"
+      Printer.pp_predicate p
+
 let iter_on_guards t f = Guards.apply ~default:() t (List.iter f)
 
 let fold_guards_il ~default t f =

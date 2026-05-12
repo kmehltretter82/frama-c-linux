@@ -27,8 +27,11 @@
 [eva:alarm] rte.i:27: Warning: 
   assertion 'E_ACSL,division by zero' got status unknown.
 [eva:alarm] rte.i:37: Warning: signed overflow. assert sum + i <= 2147483647;
-[eva:alarm] rte.i:35: Warning: division by zero. assert (long)x != 0;
+[eva:alarm] rte.i:35: Warning: 
+  assertion 'E_ACSL,division by zero' got status unknown.
 [eva:alarm] rte.i:53: Warning: 
   accessing uninitialized left-value. assert \initialized(&a[k]);
 [eva:alarm] rte.i:51: Warning: 
-  division by zero. assert (long)__gen_e_acsl_i_2 != 0;
+  assertion 'E_ACSL,division by zero' got status unknown.
+[eva:alarm] rte.i:51: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status invalid.
