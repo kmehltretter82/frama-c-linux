@@ -18,7 +18,7 @@ wtests.exe:
 	dune build --root . wtests.exe
 
 .PHONY: clean
-clean: purge-tests
+clean: purge-ptests
 	dune clean --root .
 
 ##########################################################################
@@ -30,9 +30,9 @@ TEST_DIRS= nothing cmd
 ENV_DIR=../_build/default/ptests/tests
 
 # removes also eventual broken dune files
-.PHONY: purge-tests
-purge-tests:
-	@echo "Purge tests"
+.PHONY: purge-ptests
+purge-ptests:
+	@echo "Purge Ptests files"
 	find tests -name dune | grep -e "oracle.*/\|result.*/" | xargs --no-run-if-empty rm
 
 .PHONY: clean-tests
@@ -41,7 +41,7 @@ clean-tests: purge-tests
 	rm -rf $(ENV_DIR)
 
 .PHONY: %.dune-file
-%.dune-file: purge-tests
+%.dune-file: purge-ptests
 	@echo "Dune files for $(basename $@)"
 	dune exec --root . ./ptests.exe ./tests/$(basename $@)/tests
 	find ./tests/$(basename $@)/tests -name dune -print
