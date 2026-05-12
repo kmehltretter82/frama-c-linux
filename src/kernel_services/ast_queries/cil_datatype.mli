@@ -107,6 +107,7 @@ module Location: sig
   val equal_start_semantic : location -> location -> bool
   [@@deprecated "Use Fileloc.equal instead"]
 end
+[@@deprecated "Use Fileloc module directly, which is its own datatype."]
 
 module Syntactic_scope: S_with_collections with type t = syntactic_scope
 
