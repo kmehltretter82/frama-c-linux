@@ -368,7 +368,7 @@ and to_exp_old ~rte ~loc:_ ?inplace ?name ~adata ~env ~kf p =
       (e, adata), env)
 
 and to_exp_il ~rte p =
-  if rte
+  if rte && not (Options.Interlang_force.get ())
   then M.not_covered ~pre:"with RTE" Printer.pp_predicate p
   else predicate_content_to_exp_il p
 
