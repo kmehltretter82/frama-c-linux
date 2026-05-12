@@ -234,6 +234,13 @@ do
     shift
 done
 
+if [ "$CLEAN" = "yes" ]; then
+    # Since dune 3.23 we cannot clean individual .ml tests in the build
+    # directory, instead we pass --force to dune to force these tests to
+    # be reexecuted as if the build directory were removed.
+    DUNE_OPT+=("--force")
+fi
+
 if [ "$UPDATE" = "yes" ] || [ "$GENERATE" = "yes" ]; then
     DUNE_OPT+=("--auto-promote")
 fi
@@ -395,8 +402,8 @@ function PrepareTests
 
     if [ "$CLEAN" = "yes" ]
     then
-        Head "Cleaning all tests..."
-        Cmd make clean-tests
+        Head "Cleaning all Ptests files..."
+        Cmd make purge-ptests
     fi
     if [ "$PREPARE" = "yes" ]
     then
