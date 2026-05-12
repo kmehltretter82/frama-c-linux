@@ -12,12 +12,18 @@
 
 let stmt ?warn:_ kf stmt =
   RteGen.Visit.get_annotations_stmt
-    ~flags:(RteGen.Flags.default ~div_mod:false ())
+    ~flags:(RteGen.Flags.default
+              ~div_mod:false
+              ~mem_access:false
+              ())
     kf stmt
 
 let exp ?warn:_ kf stmt e =
   RteGen.Visit.get_annotations_exp
-    ~flags:(RteGen.Flags.default ~div_mod:false ())
+    ~flags:(RteGen.Flags.default
+              ~div_mod:false
+              ~mem_access:false
+              ())
     kf stmt e
 
 let get_state_selection_with_dependencies () =

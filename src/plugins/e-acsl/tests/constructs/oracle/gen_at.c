@@ -191,6 +191,9 @@ void f(void)
 
 void g(int *p, int *q)
 {
+  int __gen_e_acsl_at_8;
+  int __gen_e_acsl_at_7;
+  int __gen_e_acsl_at_6;
   int __gen_e_acsl_at_5;
   int __gen_e_acsl_at_4;
   int __gen_e_acsl_at_3;
@@ -215,16 +218,23 @@ void g(int *p, int *q)
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"q",(void *)q);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(int)",
                                    0,sizeof(int));
-    __gen_e_acsl_assert_data.blocking = 1;
-    __gen_e_acsl_assert_data.kind = "RTE";
-    __gen_e_acsl_assert_data.pred_txt = "\\valid_read(q)";
-    __gen_e_acsl_assert_data.file = "at.i";
-    __gen_e_acsl_assert_data.fct = "g";
-    __gen_e_acsl_assert_data.line = 51;
-    __gen_e_acsl_assert_data.name = "mem_access";
-    __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+                                 "\"memory access\": \\valid_read(q)",0,
+                                 __gen_e_acsl_valid_read);
+    /*@ assert E_ACSL: "memory access": \valid_read(q); */
+    {
+      __gen_e_acsl_assert_data.blocking = 1;
+      __gen_e_acsl_assert_data.kind = "RTE";
+      __gen_e_acsl_assert_data.pred_txt = "\\valid_read(q)";
+      __gen_e_acsl_assert_data.file = "at.i";
+      __gen_e_acsl_assert_data.fct = "g";
+      __gen_e_acsl_assert_data.line = 51;
+      __gen_e_acsl_assert_data.name = "memory access";
+      __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+    }
     __gen_e_acsl_at = *q;
+    __gen_e_acsl_at_2 = *q;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)q,sizeof(int),
@@ -232,16 +242,23 @@ void g(int *p, int *q)
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"q",(void *)q);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                    "sizeof(int)",0,sizeof(int));
-    __gen_e_acsl_assert_data_2.blocking = 1;
-    __gen_e_acsl_assert_data_2.kind = "RTE";
-    __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(q)";
-    __gen_e_acsl_assert_data_2.file = "at.i";
-    __gen_e_acsl_assert_data_2.fct = "g";
-    __gen_e_acsl_assert_data_2.line = 49;
-    __gen_e_acsl_assert_data_2.name = "mem_access";
-    __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_2);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    __gen_e_acsl_at_2 = *q;
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                 "\"memory access\": \\valid_read(q)",0,
+                                 __gen_e_acsl_valid_read_2);
+    /*@ assert E_ACSL: "memory access": \valid_read(q); */
+    {
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "RTE";
+      __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(q)";
+      __gen_e_acsl_assert_data_2.file = "at.i";
+      __gen_e_acsl_assert_data_2.fct = "g";
+      __gen_e_acsl_assert_data_2.line = 49;
+      __gen_e_acsl_assert_data_2.name = "memory access";
+      __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    }
+    __gen_e_acsl_at_3 = *q;
+    __gen_e_acsl_at_4 = *q;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
     __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)q,sizeof(int),
@@ -249,16 +266,23 @@ void g(int *p, int *q)
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"q",(void *)q);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                    "sizeof(int)",0,sizeof(int));
-    __gen_e_acsl_assert_data_3.blocking = 1;
-    __gen_e_acsl_assert_data_3.kind = "RTE";
-    __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(q)";
-    __gen_e_acsl_assert_data_3.file = "at.i";
-    __gen_e_acsl_assert_data_3.fct = "g";
-    __gen_e_acsl_assert_data_3.line = 47;
-    __gen_e_acsl_assert_data_3.name = "mem_access";
-    __e_acsl_assert(__gen_e_acsl_valid_read_3,& __gen_e_acsl_assert_data_3);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-    __gen_e_acsl_at_3 = *q;
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
+                                 "\"memory access\": \\valid_read(q)",0,
+                                 __gen_e_acsl_valid_read_3);
+    /*@ assert E_ACSL: "memory access": \valid_read(q); */
+    {
+      __gen_e_acsl_assert_data_3.blocking = 1;
+      __gen_e_acsl_assert_data_3.kind = "RTE";
+      __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(q)";
+      __gen_e_acsl_assert_data_3.file = "at.i";
+      __gen_e_acsl_assert_data_3.fct = "g";
+      __gen_e_acsl_assert_data_3.line = 47;
+      __gen_e_acsl_assert_data_3.name = "memory access";
+      __e_acsl_assert(__gen_e_acsl_valid_read_3,& __gen_e_acsl_assert_data_3);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    }
+    __gen_e_acsl_at_5 = *q;
+    __gen_e_acsl_at_6 = *q;
     __e_acsl_initialize((void *)p,sizeof(int));
   }
   *p = 2;
@@ -272,42 +296,48 @@ void g(int *p, int *q)
     int __gen_e_acsl_aligned;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
-    __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(p + __gen_e_acsl_at_3),
+    __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(p + __gen_e_acsl_at_6),
                                                     sizeof(int),(void *)p,
                                                     (void *)(& p));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"p",(void *)p);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                 "__gen_e_acsl_at_3",0,__gen_e_acsl_at_3);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"\\at(*q,L1)",
+                                 0,__gen_e_acsl_at_6);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                    "sizeof(int)",0,sizeof(int));
-    __gen_e_acsl_assert_data_4.blocking = 1;
-    __gen_e_acsl_assert_data_4.kind = "RTE";
-    __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(p + __gen_e_acsl_at_3)";
-    __gen_e_acsl_assert_data_4.file = "at.i";
-    __gen_e_acsl_assert_data_4.fct = "g";
-    __gen_e_acsl_assert_data_4.line = 47;
-    __gen_e_acsl_assert_data_4.name = "mem_access";
-    __e_acsl_assert(__gen_e_acsl_valid_read_4,& __gen_e_acsl_assert_data_4);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
+                                 "\"memory access\": \\valid_read(p + \\at(*q,L1))",
+                                 0,__gen_e_acsl_valid_read_4);
+    /*@ assert E_ACSL: "memory access": \valid_read(p + \at(*q,L1)); */
+    {
+      __gen_e_acsl_assert_data_4.blocking = 1;
+      __gen_e_acsl_assert_data_4.kind = "RTE";
+      __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(p + \\at(*q,L1))";
+      __gen_e_acsl_assert_data_4.file = "at.i";
+      __gen_e_acsl_assert_data_4.fct = "g";
+      __gen_e_acsl_assert_data_4.line = 47;
+      __gen_e_acsl_assert_data_4.name = "memory access";
+      __e_acsl_assert(__gen_e_acsl_valid_read_4,& __gen_e_acsl_assert_data_4);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    }
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
-    __gen_e_acsl_aligned = __e_acsl_aligned((void *)(p + __gen_e_acsl_at_3),
+    __gen_e_acsl_aligned = __e_acsl_aligned((void *)(p + __gen_e_acsl_at_5),
                                             _Alignof(int));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
                                    "alignof(int)",0,_Alignof(int));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"p",(void *)p);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
-                                 "__gen_e_acsl_at_3",0,__gen_e_acsl_at_3);
+                                 "__gen_e_acsl_at_5",0,__gen_e_acsl_at_5);
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "RTE";
-    __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(p + __gen_e_acsl_at_3,alignof(int))";
+    __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(p + __gen_e_acsl_at_5,alignof(int))";
     __gen_e_acsl_assert_data_5.file = "at.i";
     __gen_e_acsl_assert_data_5.fct = "g";
     __gen_e_acsl_assert_data_5.line = 47;
     __gen_e_acsl_assert_data_5.name = "pointer_alignment";
     __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
-    __gen_e_acsl_at_4 = *(p + __gen_e_acsl_at_3);
+    __gen_e_acsl_at_7 = *(p + __gen_e_acsl_at_5);
   }
   A = 4;
   {
@@ -315,14 +345,14 @@ void g(int *p, int *q)
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
                                  "\\at(*(p + \\at(*q,L1)),L2)",0,
-                                 __gen_e_acsl_at_4);
+                                 __gen_e_acsl_at_7);
     __gen_e_acsl_assert_data_6.blocking = 1;
     __gen_e_acsl_assert_data_6.kind = "Assertion";
     __gen_e_acsl_assert_data_6.pred_txt = "\\at(*(p + \\at(*q,L1)),L2) == 2";
     __gen_e_acsl_assert_data_6.file = "at.i";
     __gen_e_acsl_assert_data_6.fct = "g";
     __gen_e_acsl_assert_data_6.line = 47;
-    __e_acsl_assert(__gen_e_acsl_at_4 == 2,& __gen_e_acsl_assert_data_6);
+    __e_acsl_assert(__gen_e_acsl_at_7 == 2,& __gen_e_acsl_assert_data_6);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
   }
   /*@ assert \at(*(p + \at(*q,L1)),L2) == 2; */ ;
@@ -334,23 +364,29 @@ void g(int *p, int *q)
     int __gen_e_acsl_aligned_3;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
       {.values = (void *)0};
-    __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)(p + __gen_e_acsl_at),
+    __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)(p + __gen_e_acsl_at_2),
                                                     sizeof(int),(void *)p,
                                                     (void *)(& p));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"p",(void *)p);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
-                                 "__gen_e_acsl_at",0,__gen_e_acsl_at);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"\\at(*q,L1)",
+                                 0,__gen_e_acsl_at_2);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
                                    "sizeof(int)",0,sizeof(int));
-    __gen_e_acsl_assert_data_7.blocking = 1;
-    __gen_e_acsl_assert_data_7.kind = "RTE";
-    __gen_e_acsl_assert_data_7.pred_txt = "\\valid_read(p + __gen_e_acsl_at)";
-    __gen_e_acsl_assert_data_7.file = "at.i";
-    __gen_e_acsl_assert_data_7.fct = "g";
-    __gen_e_acsl_assert_data_7.line = 51;
-    __gen_e_acsl_assert_data_7.name = "mem_access";
-    __e_acsl_assert(__gen_e_acsl_valid_read_5,& __gen_e_acsl_assert_data_7);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
+                                 "\"memory access\": \\valid_read(p + \\at(*q,L1))",
+                                 0,__gen_e_acsl_valid_read_5);
+    /*@ assert E_ACSL: "memory access": \valid_read(p + \at(*q,L1)); */
+    {
+      __gen_e_acsl_assert_data_7.blocking = 1;
+      __gen_e_acsl_assert_data_7.kind = "RTE";
+      __gen_e_acsl_assert_data_7.pred_txt = "\\valid_read(p + \\at(*q,L1))";
+      __gen_e_acsl_assert_data_7.file = "at.i";
+      __gen_e_acsl_assert_data_7.fct = "g";
+      __gen_e_acsl_assert_data_7.line = 51;
+      __gen_e_acsl_assert_data_7.name = "memory access";
+      __e_acsl_assert(__gen_e_acsl_valid_read_5,& __gen_e_acsl_assert_data_7);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+    }
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
       {.values = (void *)0};
     __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)(p + __gen_e_acsl_at),
@@ -369,40 +405,47 @@ void g(int *p, int *q)
     __gen_e_acsl_assert_data_8.name = "pointer_alignment";
     __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_8);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
-    __gen_e_acsl_at_5 = *(p + __gen_e_acsl_at);
+    __gen_e_acsl_at_8 = *(p + __gen_e_acsl_at);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
       {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
       {.values = (void *)0};
-    __gen_e_acsl_valid_read_6 = __e_acsl_valid_read((void *)(p + __gen_e_acsl_at_2),
+    __gen_e_acsl_valid_read_6 = __e_acsl_valid_read((void *)(p + __gen_e_acsl_at_4),
                                                     sizeof(int),(void *)p,
                                                     (void *)(& p));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,"p",(void *)p);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,
-                                 "__gen_e_acsl_at_2",0,__gen_e_acsl_at_2);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,"\\at(*q,L1)",
+                                 0,__gen_e_acsl_at_4);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_10,
                                    "sizeof(int)",0,sizeof(int));
-    __gen_e_acsl_assert_data_10.blocking = 1;
-    __gen_e_acsl_assert_data_10.kind = "RTE";
-    __gen_e_acsl_assert_data_10.pred_txt = "\\valid_read(p + __gen_e_acsl_at_2)";
-    __gen_e_acsl_assert_data_10.file = "at.i";
-    __gen_e_acsl_assert_data_10.fct = "g";
-    __gen_e_acsl_assert_data_10.line = 49;
-    __gen_e_acsl_assert_data_10.name = "mem_access";
-    __e_acsl_assert(__gen_e_acsl_valid_read_6,& __gen_e_acsl_assert_data_10);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,
+                                 "\"memory access\": \\valid_read(p + \\at(*q,L1))",
+                                 0,__gen_e_acsl_valid_read_6);
+    /*@ assert E_ACSL: "memory access": \valid_read(p + \at(*q,L1)); */
+    {
+      __gen_e_acsl_assert_data_10.blocking = 1;
+      __gen_e_acsl_assert_data_10.kind = "RTE";
+      __gen_e_acsl_assert_data_10.pred_txt = "\\valid_read(p + \\at(*q,L1))";
+      __gen_e_acsl_assert_data_10.file = "at.i";
+      __gen_e_acsl_assert_data_10.fct = "g";
+      __gen_e_acsl_assert_data_10.line = 49;
+      __gen_e_acsl_assert_data_10.name = "memory access";
+      __e_acsl_assert(__gen_e_acsl_valid_read_6,
+                      & __gen_e_acsl_assert_data_10);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
+    }
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
       {.values = (void *)0};
-    __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)(p + __gen_e_acsl_at_2),
+    __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)(p + __gen_e_acsl_at_3),
                                               _Alignof(int));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_11,
                                    "alignof(int)",0,_Alignof(int));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,"p",(void *)p);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
-                                 "__gen_e_acsl_at_2",0,__gen_e_acsl_at_2);
+                                 "__gen_e_acsl_at_3",0,__gen_e_acsl_at_3);
     __gen_e_acsl_assert_data_11.blocking = 1;
     __gen_e_acsl_assert_data_11.kind = "RTE";
-    __gen_e_acsl_assert_data_11.pred_txt = "\\aligned(p + __gen_e_acsl_at_2,alignof(int))";
+    __gen_e_acsl_assert_data_11.pred_txt = "\\aligned(p + __gen_e_acsl_at_3,alignof(int))";
     __gen_e_acsl_assert_data_11.file = "at.i";
     __gen_e_acsl_assert_data_11.fct = "g";
     __gen_e_acsl_assert_data_11.line = 49;
@@ -411,14 +454,14 @@ void g(int *p, int *q)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
                                  "*(p + \\at(*q,L1))",0,
-                                 *(p + __gen_e_acsl_at_2));
+                                 *(p + __gen_e_acsl_at_3));
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "Assertion";
     __gen_e_acsl_assert_data_9.pred_txt = "\\at(*(p + \\at(*q,L1)),Here) == 2";
     __gen_e_acsl_assert_data_9.file = "at.i";
     __gen_e_acsl_assert_data_9.fct = "g";
     __gen_e_acsl_assert_data_9.line = 49;
-    __e_acsl_assert(*(p + __gen_e_acsl_at_2) == 2,
+    __e_acsl_assert(*(p + __gen_e_acsl_at_3) == 2,
                     & __gen_e_acsl_assert_data_9);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
   }
@@ -428,14 +471,14 @@ void g(int *p, int *q)
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,
                                  "\\at(*(p + \\at(*q,L1)),L3)",0,
-                                 __gen_e_acsl_at_5);
+                                 __gen_e_acsl_at_8);
     __gen_e_acsl_assert_data_12.blocking = 1;
     __gen_e_acsl_assert_data_12.kind = "Assertion";
     __gen_e_acsl_assert_data_12.pred_txt = "\\at(*(p + \\at(*q,L1)),L3) == 2";
     __gen_e_acsl_assert_data_12.file = "at.i";
     __gen_e_acsl_assert_data_12.fct = "g";
     __gen_e_acsl_assert_data_12.line = 51;
-    __e_acsl_assert(__gen_e_acsl_at_5 == 2,& __gen_e_acsl_assert_data_12);
+    __e_acsl_assert(__gen_e_acsl_at_8 == 2,& __gen_e_acsl_assert_data_12);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
   }
   /*@ assert \at(*(p + \at(*q,L1)),L3) == 2; */ ;

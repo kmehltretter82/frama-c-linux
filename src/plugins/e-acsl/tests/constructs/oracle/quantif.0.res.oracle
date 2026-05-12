@@ -108,4 +108,6 @@
 [eva:alarm] quantif.i:115: Warning: 
   assertion 'multiple_linked_upper' got status unknown.
 [eva:alarm] quantif.i:18: Warning: 
+  assertion 'E_ACSL,index out of bounds' got status unknown.
+[eva:alarm] quantif.i:18: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

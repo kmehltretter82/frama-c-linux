@@ -34,6 +34,8 @@
 [eva:alarm] rte.c:55: Warning: 
   accessing uninitialized left-value. assert \initialized(&a[k]);
 [eva:alarm] rte.c:53: Warning: 
+  assertion 'E_ACSL,index out of bounds' got status unknown.
+[eva:alarm] rte.c:53: Warning: 
   assertion 'E_ACSL,division by zero' got status unknown.
 [eva:alarm] rte.c:53: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

@@ -27,5 +27,5 @@ int main(void) {
     G++ ;
     G++ ;
   }*/
-  //@ assert \let x = ghost_int_arr[0]; \true;
+  // //@ assert \let x = ghost_int_arr[0]; \true; array of size zero
 }
