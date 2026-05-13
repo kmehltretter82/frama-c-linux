@@ -142,20 +142,6 @@ module Interlang_opt =
                   language."
     end)
 
-module O =
-  Int
-    (struct
-      let default = 2
-      let option_name = "-e-acsl-o"
-      let arg_name = "n"
-      let help = "Level of optimisation of the intermediate language.\
-                  0 - No optimisation.\
-                  1 - Constant-time optimisations.\
-                  2 - Address-level optimisations.\
-                  3 - May exploit undefined behaviors in user code."
-    end)
-let () = O.set_range ~min:0 ~max:3
-
 module Widening_arguments_base =
   Int
     (struct

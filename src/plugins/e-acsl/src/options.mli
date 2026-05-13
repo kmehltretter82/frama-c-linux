@@ -22,7 +22,6 @@ module Concurrency: Parameter_sig.Bool
 module Interlang: Parameter_sig.Bool
 module Interlang_force: Parameter_sig.Bool
 module Interlang_opt: Parameter_sig.Bool
-module O : Parameter_sig.Int
 
 module Functions: Parameter_sig.Kernel_function_set
 module Instrument: Parameter_sig.Kernel_function_set
