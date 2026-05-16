@@ -14,7 +14,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file intbool.i, line 1) in 'bug':
+Goal Post-condition ("intbool.i", line 1, characters 13-42) in 'bug':
 Prove: true.
 
 ------------------------------------------------------------

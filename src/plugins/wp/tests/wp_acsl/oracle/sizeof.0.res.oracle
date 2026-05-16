@@ -20,12 +20,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'A' (file sizeof.i, line 10):
+Goal Assertion 'A' ("sizeof.i", line 10, characters 17-66):
 Prove: !P_eq(12, 9).
 
 ------------------------------------------------------------
 
-Goal Assertion 'B' (file sizeof.i, line 11):
+Goal Assertion 'B' ("sizeof.i", line 11, characters 17-48):
 Assume { (* Assertion 'A' *) Have: !P_eq(12, 9). }
 Prove: P_eq(48, 48).
 

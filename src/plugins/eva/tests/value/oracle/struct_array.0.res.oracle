@@ -48,7 +48,7 @@
   s3 ∈ {0}
 [eva:progress] 
   computing for function main1 <- main.
-  Called from struct_array.i:56.
+  Called from struct_array.i:56:3-10.
 [eva:alarm] struct_array.i:35: Warning: 
   accessing out of bounds index. assert 0 ≤ v;
 [eva:alarm] struct_array.i:35: Warning: 
@@ -59,7 +59,7 @@
 [eva:progress] Done for function main1
 [eva:progress] 
   computing for function main2 <- main.
-  Called from struct_array.i:57.
+  Called from struct_array.i:57:3-10.
 [eva:show] struct_array.i:41: 
   Frama_C_show_each:
   .a ∈ {1}
@@ -73,7 +73,7 @@
   .b ∈ {9}
 [eva:progress] 
   computing for function f1 <- main2 <- main.
-  Called from struct_array.i:42.
+  Called from struct_array.i:42:11-18.
 [eva] using specification for function f1
 [eva:progress] Done for function f1
 [eva:show] struct_array.i:43: 
@@ -88,7 +88,7 @@
   .b ∈ {9}
 [eva:progress] 
   computing for function f2 <- main2 <- main.
-  Called from struct_array.i:44.
+  Called from struct_array.i:44:11-18.
 [eva] using specification for function f2
 [eva:progress] Done for function f2
 [eva:show] struct_array.i:45: 
@@ -102,7 +102,7 @@
   .b ∈ {9}
 [eva:progress] 
   computing for function f3 <- main2 <- main.
-  Called from struct_array.i:46.
+  Called from struct_array.i:46:11-18.
 [eva] using specification for function f3
 [eva:progress] Done for function f3
 [eva:show] struct_array.i:47: 
@@ -292,7 +292,7 @@
   s3 ∈ {0}
 [eva:progress] 
   computing for function main1 <- main.
-  Called from struct_array.i:56.
+  Called from struct_array.i:56:3-10.
 [eva:alarm] struct_array.i:35: Warning: 
   out of bounds read. assert \valid_read(&T[v].p);
 [eva:alarm] struct_array.i:36: Warning: 
@@ -301,7 +301,7 @@
 [eva:progress] Done for function main1
 [eva:progress] 
   computing for function main2 <- main.
-  Called from struct_array.i:57.
+  Called from struct_array.i:57:3-10.
 [eva:show] struct_array.i:41: 
   Frama_C_show_each:
   .a ∈ {1}
@@ -315,7 +315,7 @@
   .b ∈ {9}
 [eva:progress] 
   computing for function f1 <- main2 <- main.
-  Called from struct_array.i:42.
+  Called from struct_array.i:42:11-18.
 [eva:progress] Done for function f1
 [eva:show] struct_array.i:43: 
   Frama_C_show_each:
@@ -328,7 +328,7 @@
   {.t[5..6]; .b} ∈ [--..--]
 [eva:progress] 
   computing for function f2 <- main2 <- main.
-  Called from struct_array.i:44.
+  Called from struct_array.i:44:11-18.
 [eva:progress] Done for function f2
 [eva:show] struct_array.i:45: 
   Frama_C_show_each:
@@ -340,7 +340,7 @@
   .b ∈ {9}
 [eva:progress] 
   computing for function f3 <- main2 <- main.
-  Called from struct_array.i:46.
+  Called from struct_array.i:46:11-18.
 [eva:progress] Done for function f3
 [eva:show] struct_array.i:47: Frama_C_show_each: [--..--]
 [eva:alarm] struct_array.i:50: Warning: 

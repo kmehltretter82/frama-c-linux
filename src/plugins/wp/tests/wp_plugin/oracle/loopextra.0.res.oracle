@@ -20,91 +20,91 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file loopextra.i, line 6):
+Goal Establishment of Invariant ("loopextra.i", line 6, characters 20-31):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file loopextra.i, line 6):
+Goal Preservation of Invariant ("loopextra.i", line 6, characters 20-31):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file loopextra.i, line 11):
+Goal Assertion ("loopextra.i", line 11, characters 16-37):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file loopextra.i, line 14):
+Goal Establishment of Invariant ("loopextra.i", line 14, characters 22-33):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file loopextra.i, line 14):
+Goal Preservation of Invariant ("loopextra.i", line 14, characters 22-33):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file loopextra.i, line 19):
+Goal Assertion ("loopextra.i", line 19, characters 18-39):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file loopextra.i, line 20):
+Goal Assertion ("loopextra.i", line 20, characters 18-45):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file loopextra.i, line 7) (1/4):
+Goal Loop assigns ("loopextra.i", line 7, characters 18-19) (1/4):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file loopextra.i, line 7) (2/4):
+Goal Loop assigns ("loopextra.i", line 7, characters 18-19) (2/4):
 Effect at line 18
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file loopextra.i, line 7) (3/4):
+Goal Loop assigns ("loopextra.i", line 7, characters 18-19) (3/4):
 Effect at line 18
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file loopextra.i, line 7) (4/4):
+Goal Loop assigns ("loopextra.i", line 7, characters 18-19) (4/4):
 Effect at line 18
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file loopextra.i, line 15) (1/2):
+Goal Loop assigns ("loopextra.i", line 15, characters 20-21) (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file loopextra.i, line 15) (2/2):
+Goal Loop assigns ("loopextra.i", line 15, characters 20-21) (2/2):
 Effect at line 18
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file loopextra.i, line 10):
+Goal Positivity of Loop variant at loop ("loopextra.i", lines 10-22):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file loopextra.i, line 10):
+Goal Decreasing of Loop variant at loop ("loopextra.i", lines 10-22):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file loopextra.i, line 18):
+Goal Positivity of Loop variant at loop ("loopextra.i", lines 18-21):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file loopextra.i, line 18):
+Goal Decreasing of Loop variant at loop ("loopextra.i", lines 18-21):
 Prove: true.
 
 ------------------------------------------------------------

@@ -22,12 +22,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'OK' (file init_valid.i, line 6):
+Goal Assertion 'OK' ("init_valid.i", line 6, characters 18-38):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'OK' (file init_valid.i, line 7):
+Goal Assertion 'OK' ("init_valid.i", line 7, characters 19-34):
 Prove: true.
 
 ------------------------------------------------------------
@@ -47,12 +47,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'OK' (file init_valid.i, line 13):
+Goal Assertion 'OK' ("init_valid.i", line 13, characters 18-38):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'KO' (file init_valid.i, line 14):
+Goal Assertion 'KO' ("init_valid.i", line 14, characters 19-34):
 Prove: false.
 
 ------------------------------------------------------------

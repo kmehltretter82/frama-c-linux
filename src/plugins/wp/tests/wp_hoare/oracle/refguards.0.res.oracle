@@ -20,7 +20,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file refguards.i, line 9) in 'f':
+Goal Post-condition ("refguards.i", line 9, characters 13-28) in 'f':
 Prove: true.
 
 ------------------------------------------------------------
@@ -40,7 +40,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file refguards.i, line 17) in 'g':
+Goal Post-condition ("refguards.i", line 17, characters 13-23) in 'g':
 Let a_1 = shift_sint32(b, k).
 Let x = Mint_0[a_1].
 Let x_1 = Mint_0[shift_sint32(a, k) <- x][a_1].
@@ -68,7 +68,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file refguards.i, line 24) in 'h':
+Goal Post-condition ("refguards.i", line 24, characters 13-28) in 'h':
 Prove: true.
 
 ------------------------------------------------------------
@@ -88,27 +88,27 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file refguards.i, line 32) in 's':
+Goal Post-condition ("refguards.i", line 32, characters 13-28) in 's':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file refguards.i, line 33) in 's':
+Goal Post-condition ("refguards.i", line 33, characters 13-29) in 's':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file refguards.i, line 34) in 's':
+Goal Post-condition ("refguards.i", line 34, characters 13-29) in 's':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file refguards.i, line 35) in 's':
+Goal Post-condition ("refguards.i", line 35, characters 13-29) in 's':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file refguards.i, line 36) in 's':
+Goal Post-condition ("refguards.i", line 36, characters 13-29) in 's':
 Prove: true.
 
 ------------------------------------------------------------

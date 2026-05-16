@@ -18,7 +18,7 @@
   Function fact
 ------------------------------------------------------------
 
-Goal Termination-condition (file decreases.i, line 14) in 'fact':
+Goal Termination-condition ("decreases.i", line 14, characters 16-21) in 'fact':
 Prove: true.
 
 ------------------------------------------------------------
@@ -38,12 +38,12 @@ Prove: (0 <= n) /\ (to_uint32(n - 1) < n).
   Function fact_i
 ------------------------------------------------------------
 
-Goal Termination-condition (file decreases.i, line 37) in 'fact_i' (1/2):
+Goal Termination-condition ("decreases.i", line 37, characters 16-22) in 'fact_i' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Termination-condition (file decreases.i, line 37) in 'fact_i' (2/2):
+Goal Termination-condition ("decreases.i", line 37, characters 16-22) in 'fact_i' (2/2):
 Call terminates at line 40
 Assume {
   Type: is_sint32(n).
@@ -110,12 +110,12 @@ Prove: false.
   Function fails_fact_i
 ------------------------------------------------------------
 
-Goal Termination-condition (file decreases.i, line 43) in 'fails_fact_i' (1/2):
+Goal Termination-condition ("decreases.i", line 43, characters 16-23) in 'fails_fact_i' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Termination-condition (file decreases.i, line 43) in 'fails_fact_i' (2/2):
+Goal Termination-condition ("decreases.i", line 43, characters 16-23) in 'fails_fact_i' (2/2):
 Call terminates at line 46
 Assume {
   Type: is_sint32(n).
@@ -266,12 +266,12 @@ Prove: true.
   Function mt1
 ------------------------------------------------------------
 
-Goal Termination-condition (file decreases.i, line 83) in 'mt1' (1/2):
+Goal Termination-condition ("decreases.i", line 83, characters 16-21) in 'mt1' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Termination-condition (file decreases.i, line 83) in 'mt1' (2/2):
+Goal Termination-condition ("decreases.i", line 83, characters 16-21) in 'mt1' (2/2):
 Call terminates at line 86
 Assume { Type: is_uint32(n). (* Then *) Have: n != 0. }
 Prove: to_uint32(n - 1) <= 10.
@@ -293,12 +293,12 @@ Prove: (0 <= n) /\ (to_uint32(n - 1) < n).
   Function mt2
 ------------------------------------------------------------
 
-Goal Termination-condition (file decreases.i, line 88) in 'mt2' (1/2):
+Goal Termination-condition ("decreases.i", line 88, characters 16-23) in 'mt2' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Termination-condition (file decreases.i, line 88) in 'mt2' (2/2):
+Goal Termination-condition ("decreases.i", line 88, characters 16-23) in 'mt2' (2/2):
 Call terminates at line 92
 Prove: true.
 

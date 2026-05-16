@@ -11,7 +11,7 @@
   i ∈ [--..--]
 [eva:progress] 
   computing for function main1 <- main.
-  Called from sizeof.i:56.
+  Called from sizeof.i:56:3-10.
 [eva:progress] sizeof.i:10: assertion got status valid.
 [eva:progress] sizeof.i:14: assertion got status valid.
 [eva:progress] sizeof.i:17: assertion got status valid.
@@ -19,7 +19,7 @@
 [eva:progress] Done for function main1
 [eva:progress] 
   computing for function main2 <- main.
-  Called from sizeof.i:57.
+  Called from sizeof.i:57:3-10.
 [eva:alarm] sizeof.i:32: Warning: 
   pointer downcast. assert (unsigned int)(&s1) ≤ 2147483647;
 [eva:garbled-mix:write] sizeof.i:32: 
@@ -44,17 +44,17 @@
 [eva:progress] Done for function main2
 [eva:progress] 
   computing for function sizeof_void <- main.
-  Called from sizeof.i:58.
+  Called from sizeof.i:58:3-16.
 [eva:progress] Recording results for sizeof_void
 [eva:progress] Done for function sizeof_void
 [eva:progress] 
   computing for function f <- main.
-  Called from sizeof.i:59.
+  Called from sizeof.i:59:3-20.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function fsize3 <- main.
-  Called from sizeof.i:60.
+  Called from sizeof.i:60:11-20.
 [eva:progress] sizeof.i:51: assertion 'alloca_bounds' got status valid.
 [eva:progress] sizeof.i:51: Call to builtin __fc_vla_alloc
 [eva:malloc:new] sizeof.i:51: allocating variable __malloc_fsize3_l51
@@ -67,7 +67,7 @@
 [eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    sizeof.i:32: arithmetic operation on addresses
+    sizeof.i:32:13-14: arithmetic operation on addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{s1}
 [scope:rm_asserts] removing 1 assertion(s)

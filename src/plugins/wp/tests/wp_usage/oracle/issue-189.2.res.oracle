@@ -26,12 +26,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue-189.i, line 14) in 'f' (1/2):
+Goal Assigns ("issue-189.i", line 14, characters 18-22) in 'f' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue-189.i, line 14) in 'f' (2/2):
+Goal Assigns ("issue-189.i", line 14, characters 18-22) in 'f' (2/2):
 Effect at line 17
 Prove: true.
 

@@ -12,12 +12,12 @@
    [4] ∈ {5}
 [eva:progress] 
   computing for function f <- main.
-  Called from extern_init_2.i:10.
+  Called from extern_init_2.i:10:3-6.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from extern_init_2.i:11.
+  Called from extern_init_2.i:11:3-6.
 [eva] using specification for function g
 [eva:progress] Done for function g
 [eva:progress] Recording results for main

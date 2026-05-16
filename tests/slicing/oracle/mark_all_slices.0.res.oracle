@@ -13,35 +13,35 @@
   D2 ∈ {0}
 [eva:progress] 
   computing for function fA <- main.
-  Called from mark_all_slices.i:23.
+  Called from mark_all_slices.i:23:8-12.
 [eva:progress] 
   computing for function all <- fA <- main.
-  Called from mark_all_slices.i:17.
+  Called from mark_all_slices.i:17:17-24.
 [eva:progress] Recording results for all
 [eva:progress] Done for function all
 [eva:progress] Recording results for fA
 [eva:progress] Done for function fA
 [eva:progress] 
   computing for function fB <- main.
-  Called from mark_all_slices.i:24.
+  Called from mark_all_slices.i:24:8-12.
 [eva:progress] mark_all_slices.i:18: Reusing old results for call to all
 [eva:progress] Recording results for fB
 [eva:progress] Done for function fB
 [eva:progress] 
   computing for function fC <- main.
-  Called from mark_all_slices.i:25.
+  Called from mark_all_slices.i:25:8-12.
 [eva:progress] mark_all_slices.i:19: Reusing old results for call to all
 [eva:progress] Recording results for fC
 [eva:progress] Done for function fC
 [eva:progress] 
   computing for function fD <- main.
-  Called from mark_all_slices.i:26.
+  Called from mark_all_slices.i:26:8-12.
 [eva:progress] mark_all_slices.i:20: Reusing old results for call to all
 [eva:progress] Recording results for fD
 [eva:progress] Done for function fD
 [eva:progress] 
   computing for function all <- main.
-  Called from mark_all_slices.i:27.
+  Called from mark_all_slices.i:27:10-17.
 [eva:progress] Recording results for all
 [eva:progress] Done for function all
 [eva:progress] Recording results for main

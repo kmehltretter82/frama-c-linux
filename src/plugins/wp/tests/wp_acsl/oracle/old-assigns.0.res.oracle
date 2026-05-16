@@ -19,13 +19,13 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file old-assigns.c, line 8) in 'old':
+Goal Assigns ("old-assigns.c", line 8) in 'old':
 Call Effect at line 11
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file old-assigns.c, line 8) in 'old':
+Goal Assigns ("old-assigns.c", line 8) in 'old':
 Call Effect at line 11
 Prove: true.
 

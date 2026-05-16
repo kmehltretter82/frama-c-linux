@@ -1,7 +1,7 @@
 [kernel] Parsing stmt_attributes.c (with preprocessing)
 [kernel] stmt_attributes.c:14: 
   syntax error:
-  Location: line 14, column 59, before or at token: ;
+  Location: "stmt_attributes.c", line 14, before or at token: ;
   12    
   13      #ifdef TOO_MANY_ATTRIBUTES
   14      __attribute__((assume(42))) __attribute__((fallthrough));

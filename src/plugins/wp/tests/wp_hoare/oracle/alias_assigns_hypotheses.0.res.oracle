@@ -32,12 +32,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 90) in 'comprehension_alias':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 90, characters 13-26) in 'comprehension_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 91) in 'comprehension_alias':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 91, characters 13-41) in 'comprehension_alias':
 Prove: true.
 
 ------------------------------------------------------------
@@ -48,7 +48,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file alias_assigns_hypotheses.i, line 89) in 'comprehension_alias':
+Goal Assigns ("alias_assigns_hypotheses.i", line 89, characters 13-65) in 'comprehension_alias':
 Effect at line 93
 Prove: true.
 
@@ -63,12 +63,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 59) in 'field_alias':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 59, characters 13-22) in 'field_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 60) in 'field_alias':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 60, characters 13-41) in 'field_alias':
 Prove: true.
 
 ------------------------------------------------------------
@@ -79,7 +79,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file alias_assigns_hypotheses.i, line 58) in 'field_alias':
+Goal Assigns ("alias_assigns_hypotheses.i", line 58, characters 13-17) in 'field_alias':
 Effect at line 62
 Prove: true.
 
@@ -94,12 +94,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 71) in 'field_range_alias':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 71, characters 13-22) in 'field_range_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 72) in 'field_range_alias':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 72, characters 13-41) in 'field_range_alias':
 Prove: true.
 
 ------------------------------------------------------------
@@ -110,7 +110,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file alias_assigns_hypotheses.i, line 70) in 'field_range_alias':
+Goal Assigns ("alias_assigns_hypotheses.i", line 70, characters 13-22) in 'field_range_alias':
 Effect at line 74
 Prove: true.
 
@@ -125,12 +125,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 30) in 'formal_alias':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 30, characters 13-26) in 'formal_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 31) in 'formal_alias':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 31, characters 13-41) in 'formal_alias':
 Prove: true.
 
 ------------------------------------------------------------
@@ -141,7 +141,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file alias_assigns_hypotheses.i, line 29) in 'formal_alias':
+Goal Assigns ("alias_assigns_hypotheses.i", line 29, characters 13-21) in 'formal_alias':
 Effect at line 33
 Prove: true.
 
@@ -156,17 +156,17 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 45) in 'formal_alias_array':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 45, characters 13-35) in 'formal_alias_array':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 46) in 'formal_alias_array':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 46, characters 13-35) in 'formal_alias_array':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 47) in 'formal_alias_array':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 47, characters 13-41) in 'formal_alias_array':
 Prove: true.
 
 ------------------------------------------------------------
@@ -177,13 +177,13 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file alias_assigns_hypotheses.i, line 44) in 'formal_alias_array' (1/2):
+Goal Assigns ("alias_assigns_hypotheses.i", line 44, characters 13-35) in 'formal_alias_array' (1/2):
 Effect at line 49
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file alias_assigns_hypotheses.i, line 44) in 'formal_alias_array' (2/2):
+Goal Assigns ("alias_assigns_hypotheses.i", line 44, characters 13-35) in 'formal_alias_array' (2/2):
 Effect at line 50
 Prove: true.
 
@@ -198,7 +198,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 38) in 'formal_no_alias':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 38, characters 13-26) in 'formal_no_alias':
 Prove: true.
 
 ------------------------------------------------------------
@@ -209,7 +209,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file alias_assigns_hypotheses.i, line 37) in 'formal_no_alias':
+Goal Assigns ("alias_assigns_hypotheses.i", line 37, characters 13-21) in 'formal_no_alias':
 Effect at line 40
 Prove: true.
 
@@ -224,12 +224,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 15) in 'global_alias':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 15, characters 13-26) in 'global_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 16) in 'global_alias':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 16, characters 13-41) in 'global_alias':
 Prove: true.
 
 ------------------------------------------------------------
@@ -240,7 +240,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file alias_assigns_hypotheses.i, line 14) in 'global_alias':
+Goal Assigns ("alias_assigns_hypotheses.i", line 14, characters 13-21) in 'global_alias':
 Effect at line 18
 Prove: true.
 
@@ -255,7 +255,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 23) in 'global_no_alias':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 23, characters 13-26) in 'global_no_alias':
 Prove: true.
 
 ------------------------------------------------------------
@@ -266,7 +266,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file alias_assigns_hypotheses.i, line 22) in 'global_no_alias':
+Goal Assigns ("alias_assigns_hypotheses.i", line 22, characters 13-21) in 'global_no_alias':
 Effect at line 25
 Prove: true.
 
@@ -281,12 +281,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 79) in 'set_alias':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 79, characters 13-26) in 'set_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 80) in 'set_alias':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 80, characters 13-41) in 'set_alias':
 Prove: true.
 
 ------------------------------------------------------------
@@ -297,7 +297,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file alias_assigns_hypotheses.i, line 78) in 'set_alias':
+Goal Assigns ("alias_assigns_hypotheses.i", line 78, characters 13-35) in 'set_alias':
 Effect at line 82
 Prove: true.
 
@@ -312,12 +312,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 100) in 'union_alias':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 100, characters 13-26) in 'union_alias':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file alias_assigns_hypotheses.i, line 101) in 'union_alias':
+Goal Post-condition ("alias_assigns_hypotheses.i", line 101, characters 13-41) in 'union_alias':
 Prove: true.
 
 ------------------------------------------------------------
@@ -328,7 +328,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file alias_assigns_hypotheses.i, line 99) in 'union_alias':
+Goal Assigns ("alias_assigns_hypotheses.i", line 99, characters 13-39) in 'union_alias':
 Effect at line 103
 Prove: true.
 

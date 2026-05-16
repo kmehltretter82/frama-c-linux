@@ -22,7 +22,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'qed_ko,oracle_ko' (file label_escape.i, line 12):
+Goal Assertion 'qed_ko,oracle_ko' ("label_escape.i", line 12, characters 33-46):
 Assume { Type: is_sint32(x) /\ is_sint32(y). If x != 0 Else { Have: y = 1. }
 }
 Prove: y = 0.
@@ -44,7 +44,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'qed_ok,ok' (file label_escape.i, line 25):
+Goal Assertion 'qed_ok,ok' ("label_escape.i", line 25, characters 28-41):
 Prove: true.
 
 ------------------------------------------------------------

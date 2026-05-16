@@ -9,8 +9,7 @@
   clauses. See -generated-spec-* options for more info.
 [wp] Warning: Missing RTE guards
 [wp] terminates_fp.i:78: Warning: 
-  In 'warns_recursive', no 'calls' specification for statement(s) on line(s): 
-  line 79, 
+  In 'warns_recursive', no 'calls' specification for statement(s) at terminates_fp.i:79:3-8, 
   Assuming that they can call 'warns_recursive'
 [wp] terminates_fp.i:79: Warning: Missing 'calls' for default behavior
 [wp] terminates_fp.i:79: Warning: 
@@ -21,7 +20,7 @@
   Function no_t_spec
 ------------------------------------------------------------
 
-Goal Call point gnt hnt in 'no_t_spec' at instruction (file terminates_fp.i, line 44):
+Goal Call point gnt hnt in 'no_t_spec' at instruction ("terminates_fp.i", line 44, characters 4-8):
 Prove: true.
 
 ------------------------------------------------------------
@@ -42,7 +41,7 @@ Prove: false.
   Function no_t_spec_cond
 ------------------------------------------------------------
 
-Goal Call point gt hnt in 'no_t_spec_cond' at instruction (file terminates_fp.i, line 64):
+Goal Call point gt hnt in 'no_t_spec_cond' at instruction ("terminates_fp.i", line 64, characters 4-8):
 Prove: true.
 
 ------------------------------------------------------------
@@ -63,18 +62,18 @@ Prove: false.
   Function no_t_spec_cond_m
 ------------------------------------------------------------
 
-Goal Call point gt ht in 'no_t_spec_cond_m' at instruction (file terminates_fp.i, line 72):
+Goal Call point gt ht in 'no_t_spec_cond_m' at instruction ("terminates_fp.i", line 72, characters 4-8):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Call point hnt in 'no_t_spec_cond_m' at instruction (file terminates_fp.i, line 75) (1/2):
+Goal Call point hnt in 'no_t_spec_cond_m' at instruction ("terminates_fp.i", line 75, characters 4-8) (1/2):
 Tags: Call gt.
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Call point hnt in 'no_t_spec_cond_m' at instruction (file terminates_fp.i, line 75) (2/2):
+Goal Call point hnt in 'no_t_spec_cond_m' at instruction ("terminates_fp.i", line 75, characters 4-8) (2/2):
 Tags: Call ht.
 Prove: true.
 
@@ -106,7 +105,7 @@ Prove: false.
   Function no_t_spec_in_bhv
 ------------------------------------------------------------
 
-Goal Call point gnt hnt in 'no_t_spec_in_bhv' at instruction (file terminates_fp.i, line 58):
+Goal Call point gnt hnt in 'no_t_spec_in_bhv' at instruction ("terminates_fp.i", line 58, characters 4-8):
 Let a = global(G_hnt_38).
 Let a_1 = global(G_gnt_33).
 Assume {
@@ -148,7 +147,7 @@ Prove: false.
   Function no_t_spec_in_bhv with behavior B1
 ------------------------------------------------------------
 
-Goal Call point gnt hnt in 'no_t_spec_in_bhv' at instruction (file terminates_fp.i, line 58):
+Goal Call point gnt hnt in 'no_t_spec_in_bhv' at instruction ("terminates_fp.i", line 58, characters 4-8):
 Prove: true.
 
 ------------------------------------------------------------
@@ -156,7 +155,7 @@ Prove: true.
   Function no_t_spec_in_bhv with behavior B2
 ------------------------------------------------------------
 
-Goal Call point gnt hnt in 'no_t_spec_in_bhv' at instruction (file terminates_fp.i, line 58):
+Goal Call point gnt hnt in 'no_t_spec_in_bhv' at instruction ("terminates_fp.i", line 58, characters 4-8):
 Prove: true.
 
 ------------------------------------------------------------
@@ -164,7 +163,7 @@ Prove: true.
   Function t_spec
 ------------------------------------------------------------
 
-Goal Call point gt ht in 't_spec' at instruction (file terminates_fp.i, line 24):
+Goal Call point gt ht in 't_spec' at instruction ("terminates_fp.i", line 24, characters 4-8):
 Prove: true.
 
 ------------------------------------------------------------
@@ -177,7 +176,7 @@ Prove: true.
   Function t_spec_in_bhv
 ------------------------------------------------------------
 
-Goal Call point gt hnt in 't_spec_in_bhv' at instruction (file terminates_fp.i, line 38):
+Goal Call point gt hnt in 't_spec_in_bhv' at instruction ("terminates_fp.i", line 38, characters 4-8):
 Let a = global(G_gt_23).
 Let a_1 = global(G_hnt_38).
 Assume {
@@ -218,7 +217,7 @@ Prove: true.
   Function t_spec_in_bhv with behavior B1
 ------------------------------------------------------------
 
-Goal Call point gt hnt in 't_spec_in_bhv' at instruction (file terminates_fp.i, line 38):
+Goal Call point gt hnt in 't_spec_in_bhv' at instruction ("terminates_fp.i", line 38, characters 4-8):
 Prove: true.
 
 ------------------------------------------------------------
@@ -226,7 +225,7 @@ Prove: true.
   Function t_spec_in_bhv with behavior B2
 ------------------------------------------------------------
 
-Goal Call point gt hnt in 't_spec_in_bhv' at instruction (file terminates_fp.i, line 38):
+Goal Call point gt hnt in 't_spec_in_bhv' at instruction ("terminates_fp.i", line 38, characters 4-8):
 Prove: true.
 
 ------------------------------------------------------------

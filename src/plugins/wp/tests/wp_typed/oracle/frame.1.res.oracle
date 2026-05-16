@@ -24,7 +24,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'SEP' (file frame.i, line 10):
+Goal Assertion 'SEP' ("frame.i", line 10, characters 19-45):
 Assume {
   Type: is_sint32(k).
   (* Heap *)
@@ -37,7 +37,7 @@ Prove: (comp_0[k].F1_ptr) != global(L_m_29).
 
 ------------------------------------------------------------
 
-Goal Assertion 'RES' (file frame.i, line 11):
+Goal Assertion 'RES' ("frame.i", line 11, characters 20-26):
 Let a = comp_0[k].F1_ptr.
 Let a_1 = global(L_m_29).
 Let x = Mint_0[a <- 4][a_1].
@@ -72,7 +72,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'A,X' (file frame.i, line 34):
+Goal Assertion 'A,X' ("frame.i", line 34, characters 19-33):
 Let a = Mptr_0[global(L_x_38)].
 Assume {
   (* Heap *)
@@ -84,7 +84,7 @@ Prove: valid_rd(Malloc_0[P_s_37 <- 1][L_x_38 <- 1], a, 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'A,Y' (file frame.i, line 35):
+Goal Assertion 'A,Y' ("frame.i", line 35, characters 20-26):
 Let a = Mptr_0[global(L_x_38)].
 Assume {
   (* Heap *)
@@ -113,7 +113,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'A,X' (file frame.i, line 25):
+Goal Assertion 'A,X' ("frame.i", line 25, characters 19-42):
 Let a = Mptr_0[global(L_x_33)].
 Assume {
   (* Heap *)
@@ -125,7 +125,7 @@ Prove: valid_rd(Malloc_0[L_b_32 <- 4][L_x_33 <- 1], a, 4).
 
 ------------------------------------------------------------
 
-Goal Assertion 'A,Y' (file frame.i, line 26):
+Goal Assertion 'A,Y' ("frame.i", line 26, characters 20-26):
 Let a = Mptr_0[global(L_x_33)].
 Assume {
   (* Heap *)

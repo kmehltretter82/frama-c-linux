@@ -29,7 +29,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file array_initialized.c, line 71):
+Goal Assertion ("array_initialized.c", line 71):
 Let a = global(K_g_21).
 Assume {
   (* Goal *)
@@ -57,7 +57,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file array_initialized.c, line 185):
+Goal Assertion ("array_initialized.c", line 185):
 Let a = global(K_h2_28).
 Let a_1 = global(K_h1_27).
 Assume {
@@ -289,7 +289,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file array_initialized.c, line 194):
+Goal Assertion ("array_initialized.c", lines 194-216):
 Prove: true.
 
 ------------------------------------------------------------
@@ -309,7 +309,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file array_initialized.c, line 283):
+Goal Assertion ("array_initialized.c", line 283):
 Let a = global(K_p_35).
 Assume {
   (* Heap *)
@@ -333,7 +333,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file array_initialized.c, line 288) in 'simpl':
+Goal Post-condition ("array_initialized.c", line 288) in 'simpl':
 Let x = Mint_0[shift_sint32(t, 0)].
 Assume {
   Type: is_sint32(simpl_0) /\ is_sint32(x).

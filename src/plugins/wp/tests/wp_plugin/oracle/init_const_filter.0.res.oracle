@@ -20,7 +20,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Check 'X' (file init_const_filter.i, line 8):
+Goal Check 'X' ("init_const_filter.i", line 8, characters 15-47):
 Let x = GlobalConst_0[ClientId_0].
 Assume {
   Type: is_sint8(ClientId_0) /\ is_sint32(x).

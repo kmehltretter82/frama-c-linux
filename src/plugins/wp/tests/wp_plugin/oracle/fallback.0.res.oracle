@@ -14,7 +14,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file fallback.i, line 6) in 'job':
+Goal Post-condition ("fallback.i", line 6, characters 13-29) in 'job':
 Let x = b + (b * (a - 1)).
 Assume { Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(x). }
 Prove: (a * b) = x.

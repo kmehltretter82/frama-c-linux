@@ -10,7 +10,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function g <- main.
-  Called from undef_function.i:10.
+  Called from undef_function.i:10:3-7.
 [eva] using specification for function g
 [eva:progress] Done for function g
 [eva:progress] Recording results for main
@@ -22,5 +22,6 @@
 [pdg] computing for function g
 [pdg] done for function g
 [impact] impacted statements of stmt(s) 2 are:
-    undef_function.i:10 (sid 3): g(y);undef_function.i:11 (sid 5): return y;
+    undef_function.i:10:3-7 (sid 3): g(y);
+    undef_function.i:11:3-12 (sid 5): return y;
 [impact] analysis done

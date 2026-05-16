@@ -118,7 +118,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text": "reachability of stmt line 27 in getValueFromArray."
+            "text": "reachability of stmt cwe125.c:27 in getValueFromArray."
           },
           "locations": [
             {

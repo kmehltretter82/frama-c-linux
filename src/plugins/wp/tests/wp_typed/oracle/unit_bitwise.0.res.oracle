@@ -214,12 +214,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file unit_bitwise.c, line 116):
+Goal Assertion 'ok' ("unit_bitwise.c", line 116):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file unit_bitwise.c, line 117):
+Goal Assertion 'ok' ("unit_bitwise.c", line 117):
 Prove: true.
 
 ------------------------------------------------------------
@@ -239,12 +239,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file unit_bitwise.c, line 51):
+Goal Assertion 'ok' ("unit_bitwise.c", line 51):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file unit_bitwise.c, line 52):
+Goal Assertion 'ok' ("unit_bitwise.c", line 52):
 Prove: true.
 
 ------------------------------------------------------------
@@ -264,12 +264,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file unit_bitwise.c, line 169):
+Goal Assertion 'ok' ("unit_bitwise.c", line 169):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file unit_bitwise.c, line 170):
+Goal Assertion 'ok' ("unit_bitwise.c", line 170):
 Prove: true.
 
 ------------------------------------------------------------
@@ -289,12 +289,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file unit_bitwise.c, line 164):
+Goal Assertion 'ok' ("unit_bitwise.c", line 164):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file unit_bitwise.c, line 165):
+Goal Assertion 'ok' ("unit_bitwise.c", line 165):
 Prove: true.
 
 ------------------------------------------------------------
@@ -340,12 +340,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file unit_bitwise.c, line 19):
+Goal Assertion 'ok' ("unit_bitwise.c", line 19):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'ko' (file unit_bitwise.c, line 20):
+Goal Assertion 'ko' ("unit_bitwise.c", line 20):
 Assume { Type: is_sint32(a). }
 Prove: land(281, a) <= 172.
 
@@ -679,42 +679,42 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file unit_bitwise.c, line 176):
+Goal Assertion 'ok' ("unit_bitwise.c", line 176):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file unit_bitwise.c, line 177):
+Goal Assertion 'ok' ("unit_bitwise.c", line 177):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file unit_bitwise.c, line 178):
+Goal Assertion 'ok' ("unit_bitwise.c", line 178):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file unit_bitwise.c, line 180):
+Goal Assertion 'ok' ("unit_bitwise.c", line 180):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file unit_bitwise.c, line 181):
+Goal Assertion 'ok' ("unit_bitwise.c", line 181):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file unit_bitwise.c, line 182):
+Goal Assertion 'ok' ("unit_bitwise.c", line 182):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file unit_bitwise.c, line 184):
+Goal Assertion 'ok' ("unit_bitwise.c", line 184):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'ko' (file unit_bitwise.c, line 186):
+Goal Assertion 'ko' ("unit_bitwise.c", line 186):
 Let x = to_sint8(c). Assume { Type: is_uint8(c). }
 Prove: to_uint32(x) = x.
 

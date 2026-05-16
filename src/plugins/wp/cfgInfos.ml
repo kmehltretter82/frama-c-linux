@@ -519,10 +519,10 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
         in
         if warning_locs <> [] then
           Wp_parameters.warning ~once:true
-            "In '%a', no 'calls' specification for statement(s) on \
-             line(s): %a, @\nAssuming that they can call '%a'"
+            "In '%a', no 'calls' specification for statement(s) at %a, @\n\
+             Assuming that they can call '%a'"
             Kernel_function.pretty kf
-            (Pretty_utils.pp_list ~sep:", " Fileloc.pretty_line)
+            (List.pretty_text Fileloc.pretty)
             warning_locs
             Kernel_function.pretty kf ;
         if is_recursive kf then

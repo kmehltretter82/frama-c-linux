@@ -6,13 +6,13 @@
   g ∈ [--..--]
 [eva:progress] 
   computing for function main1 <- main.
-  Called from reduce_formals.i:69.
+  Called from reduce_formals.i:69:3-17.
 [eva:alarm] reduce_formals.i:2: Warning: assertion got status unknown.
 [eva:progress] Recording results for main1
 [eva:progress] Done for function main1
 [eva:progress] 
   computing for function main2 <- main.
-  Called from reduce_formals.i:70.
+  Called from reduce_formals.i:70:3-11.
 [eva] using specification for function main2
 [eva:alarm] reduce_formals.i:70: Warning: 
   function main2: precondition got status unknown.
@@ -29,11 +29,11 @@
   ==END OF DUMP==
 [eva:progress] 
   computing for function main3 <- main.
-  Called from reduce_formals.i:75.
+  Called from reduce_formals.i:75:3-10.
 [eva:progress] reduce_formals.i:18: assertion got status valid.
 [eva:progress] 
   computing for function f_main3 <- main3 <- main.
-  Called from reduce_formals.i:19.
+  Called from reduce_formals.i:19:4-25.
 [eva:progress] Recording results for f_main3
 [eva:progress] Done for function f_main3
 [eva:show] reduce_formals.i:20: Frama_C_show_each: {6}
@@ -41,17 +41,17 @@
 [eva:progress] Done for function main3
 [eva:progress] 
   computing for function main4 <- main.
-  Called from reduce_formals.i:76.
+  Called from reduce_formals.i:76:3-11.
 [eva:progress] 
   computing for function f_main4_1 <- main4 <- main.
-  Called from reduce_formals.i:33.
+  Called from reduce_formals.i:33:5-17.
 [eva:alarm] reduce_formals.i:24: Warning: assertion got status unknown.
 [eva:progress] Recording results for f_main4_1
 [eva:progress] Done for function f_main4_1
 [eva:show] reduce_formals.i:34: Frama_C_show_each_v: {10; 11; 12; 13; 14; 15}
 [eva:progress] 
   computing for function f_main4_2 <- main4 <- main.
-  Called from reduce_formals.i:36.
+  Called from reduce_formals.i:36:5-17.
 [eva:alarm] reduce_formals.i:28: Warning: assertion got status unknown.
 [eva:progress] Recording results for f_main4_2
 [eva:progress] Done for function f_main4_2
@@ -60,13 +60,13 @@
 [eva:progress] Done for function main4
 [eva:progress] 
   computing for function main5 <- main.
-  Called from reduce_formals.i:77.
+  Called from reduce_formals.i:77:3-10.
 [eva:progress] 
   computing for function f_main_1 <- main5 <- main.
-  Called from reduce_formals.i:52.
+  Called from reduce_formals.i:52:3-14.
 [eva:progress] 
   computing for function f_main_2 <- f_main_1 <- main5 <- main.
-  Called from reduce_formals.i:47.
+  Called from reduce_formals.i:47:7-17.
 [eva:progress] Recording results for f_main_2
 [eva:progress] Done for function f_main_2
 [eva:progress] Recording results for f_main_1
@@ -75,11 +75,11 @@
 [eva:progress] Done for function main5
 [eva:progress] 
   computing for function main6 <- main.
-  Called from reduce_formals.i:78.
+  Called from reduce_formals.i:78:3-10.
 [eva:alarm] reduce_formals.i:63: Warning: assertion got status unknown.
 [eva:progress] 
   computing for function f_main6 <- main6 <- main.
-  Called from reduce_formals.i:64.
+  Called from reduce_formals.i:64:4-14.
 [eva:alarm] reduce_formals.i:58: Warning: assertion got status unknown.
 [eva:progress] Recording results for f_main6
 [eva:progress] Done for function f_main6

@@ -37,17 +37,17 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference_and_struct.i, line 98) in 'call_array_in_struct_param':
+Goal Assigns ("reference_and_struct.i", line 98, characters 10-24) in 'call_array_in_struct_param':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference_and_struct.i, line 98) in 'call_array_in_struct_param':
+Goal Assigns ("reference_and_struct.i", line 98, characters 10-24) in 'call_array_in_struct_param':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file reference_and_struct.i, line 83) in 'load_5'' in 'call_array_in_struct_param' at call 'load_5' (file reference_and_struct.i, line 102)
+Goal Instance of 'Pre-condition ("reference_and_struct.i", line 83, characters 14-31) in 'load_5'' in 'call_array_in_struct_param' at call 'load_5' ("reference_and_struct.i", line 102, characters 50-64)
 :
 Prove: true.
 
@@ -81,17 +81,17 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference_and_struct.i, line 91) in 'call_on_array_in_struct_global':
+Goal Assigns ("reference_and_struct.i", line 91, characters 11-25) in 'call_on_array_in_struct_global':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference_and_struct.i, line 91) in 'call_on_array_in_struct_global':
+Goal Assigns ("reference_and_struct.i", line 91, characters 11-25) in 'call_on_array_in_struct_global':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file reference_and_struct.i, line 83) in 'load_5'' in 'call_on_array_in_struct_global' at call 'load_5' (file reference_and_struct.i, line 94)
+Goal Instance of 'Pre-condition ("reference_and_struct.i", line 83, characters 14-31) in 'load_5'' in 'call_on_array_in_struct_global' at call 'load_5' ("reference_and_struct.i", line 94, characters 44-57)
 :
 Prove: true.
 
@@ -105,7 +105,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file reference_and_struct.i, line 20) in 'call_reset':
+Goal Post-condition ("reference_and_struct.i", line 20, characters 14-26) in 'call_reset':
 Prove: true.
 
 ------------------------------------------------------------
@@ -115,23 +115,23 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference_and_struct.i, line 19) in 'call_reset' (1/2):
+Goal Assigns ("reference_and_struct.i", line 19, characters 14-18) in 'call_reset' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference_and_struct.i, line 19) in 'call_reset' (2/2):
+Goal Assigns ("reference_and_struct.i", line 19, characters 14-18) in 'call_reset' (2/2):
 Effect at line 23
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference_and_struct.i, line 19) in 'call_reset':
+Goal Assigns ("reference_and_struct.i", line 19, characters 14-18) in 'call_reset':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file reference_and_struct.i, line 11) in 'reset'' in 'call_reset' at call 'reset' (file reference_and_struct.i, line 23)
+Goal Instance of 'Pre-condition ("reference_and_struct.i", line 11, characters 14-23) in 'reset'' in 'call_reset' at call 'reset' ("reference_and_struct.i", line 23, characters 3-13)
 :
 Prove: true.
 
@@ -162,17 +162,17 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference_and_struct.i, line 63) in 'call_reset_1_5':
+Goal Assigns ("reference_and_struct.i", line 63, characters 12-28) in 'call_reset_1_5':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference_and_struct.i, line 63) in 'call_reset_1_5':
+Goal Assigns ("reference_and_struct.i", line 63, characters 12-28) in 'call_reset_1_5':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file reference_and_struct.i, line 53) in 'reset_1_5'' in 'call_reset_1_5' at call 'reset_1_5' (file reference_and_struct.i, line 67)
+Goal Instance of 'Pre-condition ("reference_and_struct.i", line 53, characters 14-34) in 'reset_1_5'' in 'call_reset_1_5' at call 'reset_1_5' ("reference_and_struct.i", line 67, characters 2-20)
 :
 Prove: true.
 
@@ -208,17 +208,17 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference_and_struct.i, line 35) in 'call_reset_5':
+Goal Assigns ("reference_and_struct.i", line 35, characters 14-22) in 'call_reset_5':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference_and_struct.i, line 35) in 'call_reset_5':
+Goal Assigns ("reference_and_struct.i", line 35, characters 14-22) in 'call_reset_5':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file reference_and_struct.i, line 26) in 'reset_5'' in 'call_reset_5' at call 'reset_5' (file reference_and_struct.i, line 39)
+Goal Instance of 'Pre-condition ("reference_and_struct.i", line 26, characters 14-31) in 'reset_5'' in 'call_reset_5' at call 'reset_5' ("reference_and_struct.i", line 39, characters 3-14)
 :
 Prove: true.
 
@@ -254,17 +254,17 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference_and_struct.i, line 71) in 'call_reset_5_dim2':
+Goal Assigns ("reference_and_struct.i", line 71, characters 12-28) in 'call_reset_5_dim2':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference_and_struct.i, line 71) in 'call_reset_5_dim2':
+Goal Assigns ("reference_and_struct.i", line 71, characters 12-28) in 'call_reset_5_dim2':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file reference_and_struct.i, line 26) in 'reset_5'' in 'call_reset_5_dim2' at call 'reset_5' (file reference_and_struct.i, line 75)
+Goal Instance of 'Pre-condition ("reference_and_struct.i", line 26, characters 14-31) in 'reset_5'' in 'call_reset_5_dim2' at call 'reset_5' ("reference_and_struct.i", line 75, characters 2-21)
 :
 Prove: true.
 
@@ -302,19 +302,19 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference_and_struct.i, line 45) in 'call_reset_5_tps':
+Goal Assigns ("reference_and_struct.i", line 45, characters 13-25) in 'call_reset_5_tps':
 Call Effect at line 49
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference_and_struct.i, line 45) in 'call_reset_5_tps':
+Goal Assigns ("reference_and_struct.i", line 45, characters 13-25) in 'call_reset_5_tps':
 Call Effect at line 49
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file reference_and_struct.i, line 26) in 'reset_5'' in 'call_reset_5_tps' at call 'reset_5' (file reference_and_struct.i, line 49)
+Goal Instance of 'Pre-condition ("reference_and_struct.i", line 26, characters 14-31) in 'reset_5'' in 'call_reset_5_tps' at call 'reset_5' ("reference_and_struct.i", line 49, characters 3-18)
 :
 Prove: true.
 
@@ -329,7 +329,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file reference_and_struct.i, line 13) in 'reset':
+Goal Post-condition ("reference_and_struct.i", line 13, characters 13-22) in 'reset':
 Prove: true.
 
 ------------------------------------------------------------
@@ -340,7 +340,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference_and_struct.i, line 12) in 'reset':
+Goal Assigns ("reference_and_struct.i", line 12, characters 13-17) in 'reset':
 Prove: true.
 
 ------------------------------------------------------------

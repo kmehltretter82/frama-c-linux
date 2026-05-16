@@ -8,7 +8,7 @@
 [wp] [Valid] Goal clear_in_step_terminates (Cfg) (Trivial)
 [wp] 2 goals scheduled
 [wp:script:allgoals] 
-  Goal Post-condition (file clear.i, line 22) in 'clear':
+  Goal Post-condition ("clear.i", line 22, characters 13-19) in 'clear':
   Assume {
     Type: is_sint32(a) /\ is_sint32(a_1) /\ is_sint32(a_2) /\ is_sint32(b) /\
         is_sint32(b_1) /\ is_sint32(b_2).
@@ -26,7 +26,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Check (file clear.i, line 33):
+  Goal Check ("clear.i", line 33, characters 14-19):
   Assume { (* Admit *) Have: P_P /\ P_Q /\ P_R. }
   Prove: P_S(42).
   

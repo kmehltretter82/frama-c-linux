@@ -89,7 +89,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file sharing.c, line 8) in 'f':
+Goal Post-condition ("sharing.c", line 8) in 'f':
 Let a = shift_sint32(t, 0).
 Let a_1 = shift_sint32(t, x).
 Let m = Mint_0[a <- Mint_0[a_1]].

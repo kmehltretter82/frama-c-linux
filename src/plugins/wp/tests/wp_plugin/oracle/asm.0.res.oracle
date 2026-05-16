@@ -20,12 +20,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'OK' (file asm.i, line 10):
+Goal Assertion 'OK' ("asm.i", line 10, characters 18-26):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'KO' (file asm.i, line 11):
+Goal Assertion 'KO' ("asm.i", line 11, characters 19-27):
 Assume { Type: is_sint32(dst_0). }
 Prove: dst_0 = 2.
 

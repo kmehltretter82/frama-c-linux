@@ -10,7 +10,7 @@
   Function access
 ------------------------------------------------------------
 
-Goal Wp_smoke_dead_code in 'access' at instruction (file doomed_localinit.i, line 10):
+Goal Wp_smoke_dead_code in 'access' at instruction ("doomed_localinit.i", line 10, characters 18-20):
 Assume {
   (* Heap *)
   Type: (region(ptr_0.base) <= 0) /\ linked(Malloc_0).
@@ -23,7 +23,7 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Wp_smoke_dead_code in 'access' at initialization of 'tmp' (file doomed_localinit.i, line 11):
+Goal Wp_smoke_dead_code in 'access' at initialization of 'tmp' ("doomed_localinit.i", line 11, characters 8-14):
 Prove: true.
 
 ------------------------------------------------------------
@@ -40,7 +40,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file doomed_localinit.i, line 10):
+Goal Assertion 'rte,mem_access' ("doomed_localinit.i", line 10, characters 18-20):
 Assume {
   (* Heap *)
   Type: (region(ptr_0.base) <= 0) /\ linked(Malloc_0).
@@ -51,7 +51,7 @@ Prove: valid_rw(Malloc_0, ptr_0, 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file doomed_localinit.i, line 11):
+Goal Assertion 'rte,mem_access' ("doomed_localinit.i", line 11, characters 8-14):
 Assume { (* Heap *) Type: region(0) <= 0. }
 Prove: false.
 

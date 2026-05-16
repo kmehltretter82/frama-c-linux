@@ -13,15 +13,15 @@
   M ∈ {0}
 [eva:progress] 
   computing for function f <- main.
-  Called from ex_spec_interproc.i:35.
+  Called from ex_spec_interproc.i:35:9-26.
 [eva:progress] 
   computing for function g <- f <- main.
-  Called from ex_spec_interproc.i:21.
+  Called from ex_spec_interproc.i:21:7-18.
 [eva:progress] Recording results for g
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function g <- f <- main.
-  Called from ex_spec_interproc.i:22.
+  Called from ex_spec_interproc.i:22:7-18.
 [eva:progress] Recording results for g
 [eva:progress] Done for function g
 [eva:progress] Recording results for f

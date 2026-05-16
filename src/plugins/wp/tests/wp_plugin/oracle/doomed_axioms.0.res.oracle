@@ -7,7 +7,7 @@
   Function foo
 ------------------------------------------------------------
 
-Goal Wp_smoke_dead_loop in 'foo' at loop (file doomed_axioms.i, line 29):
+Goal Wp_smoke_dead_loop in 'foo' at loop ("doomed_axioms.i", lines 29-31):
 Assume {
   Type: is_sint32(n).
   (* Invariant 'A' *)
@@ -27,7 +27,7 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Wp_smoke_dead_code in 'foo' at instruction (file doomed_axioms.i, line 30):
+Goal Wp_smoke_dead_code in 'foo' at instruction ("doomed_axioms.i", line 30, characters 5-8):
 Assume {
   Type: is_sint32(n) /\ is_sint32(x).
   (* Invariant 'A' *)
@@ -49,7 +49,7 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Wp_smoke_dead_code in 'foo' at return (file doomed_axioms.i, line 32):
+Goal Wp_smoke_dead_code in 'foo' at return ("doomed_axioms.i", line 32, characters 3-12):
 Assume {
   Type: is_sint32(n) /\ is_sint32(x).
   (* Invariant 'A' *)
@@ -71,7 +71,7 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Termination-condition (file doomed_axioms.i, line 19) in 'foo':
+Goal Termination-condition ("doomed_axioms.i", line 19, characters 16-22) in 'foo':
 Prove: true.
 
 ------------------------------------------------------------
@@ -82,12 +82,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'A' (file doomed_axioms.i, line 24):
+Goal Establishment of Invariant 'A' ("doomed_axioms.i", line 24, characters 23-27):
 Prove: P_P(0).
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'A' (file doomed_axioms.i, line 24):
+Goal Preservation of Invariant 'A' ("doomed_axioms.i", line 24, characters 23-27):
 Let x_1 = 1 + n.
 Assume {
   Type: is_sint32(n) /\ is_sint32(x) /\ is_sint32(x_1).
@@ -110,13 +110,13 @@ Prove: P_P(x_1).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'B' (file doomed_axioms.i, line 25):
+Goal Establishment of Invariant 'B' ("doomed_axioms.i", line 25, characters 23-27):
 Assume { (* Invariant 'A' *) Have: P_P(0). }
 Prove: P_Q(0).
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'B' (file doomed_axioms.i, line 25):
+Goal Preservation of Invariant 'B' ("doomed_axioms.i", line 25, characters 23-27):
 Let x_1 = 1 + n.
 Assume {
   Type: is_sint32(n) /\ is_sint32(x) /\ is_sint32(x_1).
@@ -141,14 +141,14 @@ Prove: P_Q(x_1).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'C' (file doomed_axioms.i, line 26):
+Goal Establishment of Invariant 'C' ("doomed_axioms.i", line 26, characters 23-27):
 Assume { (* Invariant 'A' *) Have: P_P(0). (* Invariant 'B' *) Have: P_Q(0).
 }
 Prove: P_R(0).
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'C' (file doomed_axioms.i, line 26):
+Goal Preservation of Invariant 'C' ("doomed_axioms.i", line 26, characters 23-27):
 Let x_1 = 1 + n.
 Assume {
   Type: is_sint32(n) /\ is_sint32(x) /\ is_sint32(x_1).
@@ -175,7 +175,7 @@ Prove: P_R(x_1).
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file doomed_axioms.i, line 27):
+Goal Loop assigns ("doomed_axioms.i", line 27, characters 18-19):
 Prove: true.
 
 ------------------------------------------------------------

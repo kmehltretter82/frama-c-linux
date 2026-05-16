@@ -14,7 +14,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file unit_labels.i, line 5) in 'duplet':
+Goal Post-condition ("unit_labels.i", line 5, characters 13-33) in 'duplet':
 Let x = Mint_0[pi_0].
 Let a_1 = shift_sint32(a, x).
 Let x_1 = Mint_0[pj_0].
@@ -41,7 +41,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'PI' (file unit_labels.i, line 9):
+Goal Assertion 'PI' ("unit_labels.i", line 9, characters 18-37):
 Let x = Mint_0[pi_0].
 Let a_1 = shift_sint32(a, x).
 Let x_1 = Mint_0[pj_0].
@@ -60,7 +60,7 @@ Prove: x_2 = x.
 
 ------------------------------------------------------------
 
-Goal Assertion 'PJ' (file unit_labels.i, line 10):
+Goal Assertion 'PJ' ("unit_labels.i", line 10, characters 19-38):
 Let x = Mint_0[pi_0].
 Let a_1 = shift_sint32(a, x).
 Let x_1 = Mint_0[pj_0].

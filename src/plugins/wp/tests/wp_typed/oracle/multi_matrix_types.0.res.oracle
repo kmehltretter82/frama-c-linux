@@ -282,7 +282,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file multi_matrix_types.i, line 10) in 'job':
+Goal Post-condition ("multi_matrix_types.i", line 10, characters 13-27) in 'job':
 Let a = Load_S1_S(p, Mint_0, Mint_1, Mint_2).
 Let a_1 = Load_S1_S(p, Mint_0, Mint_1[shiftfield_F1_S_f(p) <- v], Mint_2).
 Assume {

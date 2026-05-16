@@ -6,7 +6,7 @@
   
 [eva:progress] 
   computing for function f_valid <- main.
-  Called from assigns_from_direct.i:14.
+  Called from assigns_from_direct.i:14:3-18.
 [eva:progress] Recording results for f_valid
 [from] Computing for function f_valid
 [from] Done for function f_valid
@@ -17,7 +17,7 @@
 [eva:progress] Done for function f_valid
 [eva:progress] 
   computing for function f_invalid_direct <- main.
-  Called from assigns_from_direct.i:15.
+  Called from assigns_from_direct.i:15:3-27.
 [eva:progress] Recording results for f_invalid_direct
 [from] Computing for function f_invalid_direct
 [from] Done for function f_invalid_direct
@@ -28,7 +28,7 @@
 [eva:progress] Done for function f_invalid_direct
 [eva:progress] 
   computing for function f_invalid_address <- main.
-  Called from assigns_from_direct.i:16.
+  Called from assigns_from_direct.i:16:3-28.
 [eva:progress] Recording results for f_invalid_address
 [from] Computing for function f_invalid_address
 [from] Done for function f_invalid_address
@@ -39,7 +39,7 @@
 [eva:progress] Done for function f_invalid_address
 [eva:progress] 
   computing for function f_invalid_condition <- main.
-  Called from assigns_from_direct.i:17.
+  Called from assigns_from_direct.i:17:3-30.
 [eva:progress] Recording results for f_invalid_condition
 [from] Computing for function f_invalid_condition
 [from] Done for function f_invalid_condition
@@ -50,7 +50,7 @@
 [eva:progress] Done for function f_invalid_condition
 [eva:progress] 
   computing for function f_invalid_all <- main.
-  Called from assigns_from_direct.i:18.
+  Called from assigns_from_direct.i:18:3-24.
 [eva:progress] Recording results for f_invalid_all
 [from] Computing for function f_invalid_all
 [from] Done for function f_invalid_all
@@ -105,15 +105,15 @@
   NO EFFECTS
 [from] ====== END OF DEPENDENCIES ======
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to f_valid at assigns_from_direct.i:14 (by main):
+[from] call to f_valid at assigns_from_direct.i:14:3-18 (by main):
   y FROM a; b; c
-[from] call to f_invalid_direct at assigns_from_direct.i:15 (by main):
+[from] call to f_invalid_direct at assigns_from_direct.i:15:3-27 (by main):
   y FROM a; b; c
-[from] call to f_invalid_address at assigns_from_direct.i:16 (by main):
+[from] call to f_invalid_address at assigns_from_direct.i:16:3-28 (by main):
   y FROM a; b; c
-[from] call to f_invalid_condition at assigns_from_direct.i:17 (by main):
+[from] call to f_invalid_condition at assigns_from_direct.i:17:3-30 (by main):
   y FROM a; b; c
-[from] call to f_invalid_all at assigns_from_direct.i:18 (by main):
+[from] call to f_invalid_all at assigns_from_direct.i:18:3-24 (by main):
   y FROM a; b; c
 [from] entry point:
   NO EFFECTS

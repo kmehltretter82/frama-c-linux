@@ -19,7 +19,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'qed_ok' (file bts_1176.i, line 17):
+Goal Assertion 'qed_ok' ("bts_1176.i", line 17, characters 22-32):
 Prove: true.
 
 ------------------------------------------------------------

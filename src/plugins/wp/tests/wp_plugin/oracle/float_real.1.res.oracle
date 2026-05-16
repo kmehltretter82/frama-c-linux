@@ -17,7 +17,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file float_real.i, line 14) in 'dequal':
+Goal Post-condition ("float_real.i", line 14, characters 11-42) in 'dequal':
 Assume {
   Type: is_sint32(dequal_0).
   If lt_f64(sub_f64(x, y),

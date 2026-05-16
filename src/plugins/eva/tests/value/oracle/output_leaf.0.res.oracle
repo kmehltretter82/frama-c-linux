@@ -16,33 +16,33 @@
   d ∈ {0}
 [eva:progress] 
   computing for function main1 <- main.
-  Called from output_leaf.i:45.
+  Called from output_leaf.i:45:3-11.
 [eva:progress] 
   computing for function crypt <- main1 <- main.
-  Called from output_leaf.i:13.
+  Called from output_leaf.i:13:3-12.
 [eva] using specification for function crypt
 [eva:progress] Done for function crypt
 [eva:progress] Recording results for main1
 [eva:progress] Done for function main1
 [eva:progress] 
   computing for function main2 <- main.
-  Called from output_leaf.i:46.
+  Called from output_leaf.i:46:3-10.
 [eva:progress] 
   computing for function g1 <- main2 <- main.
-  Called from output_leaf.i:31.
+  Called from output_leaf.i:31:3-7.
 [eva:progress] 
   computing for function g <- g1 <- main2 <- main.
-  Called from output_leaf.i:23.
+  Called from output_leaf.i:23:3-11.
 [eva] using specification for function g
 [eva:progress] Done for function g
 [eva:progress] Recording results for g1
 [eva:progress] Done for function g1
 [eva:progress] 
   computing for function g2 <- main2 <- main.
-  Called from output_leaf.i:32.
+  Called from output_leaf.i:32:3-7.
 [eva:progress] 
   computing for function g <- g2 <- main2 <- main.
-  Called from output_leaf.i:27.
+  Called from output_leaf.i:27:3-11.
 [eva:progress] Done for function g
 [eva:progress] Recording results for g2
 [eva:progress] Done for function g2
@@ -50,13 +50,13 @@
 [eva:progress] Done for function main2
 [eva:progress] 
   computing for function main3 <- main.
-  Called from output_leaf.i:47.
+  Called from output_leaf.i:47:3-10.
 [kernel:annot:missing-spec] output_leaf.i:40: Warning: 
   Neither code nor specification for function f, generating default assigns.
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f <- main3 <- main.
-  Called from output_leaf.i:40.
+  Called from output_leaf.i:40:3-8.
 [eva] using specification for function f
 [eva:progress] Done for function f
 [eva:progress] Recording results for main3

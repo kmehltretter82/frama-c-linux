@@ -336,7 +336,7 @@ let pp_context_from_file ?(ctx=2) fmt loc =
   | Sys_error msg ->
     Kernel.warning "%s" msg
 
-let pp_location = Fileloc.pretty_long_range
+let pp_location = Fileloc.pretty_long
 
 let parse_error ?loc msg =
   let current = Option.get !current in
@@ -382,7 +382,7 @@ let parse_error ?loc msg =
       Kernel.feedback ~source:(fst loc) "%s:@." str
         ~append:(fun fmt ->
             Format.fprintf fmt "Location: @[<hv>%a%a@]\n"
-              Fileloc.pretty_long_range loc
+              Fileloc.pretty_long_with_inclusions loc
               pretty_token (Lexing.lexeme current.lexbuf);
             Format.fprintf fmt "%a@."
               (pp_context_from_file ~ctx:2) loc);

@@ -54,10 +54,10 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion 'Eva,pointer_downcast' (file pointer_comparison.c, line 21)
+[    -    ] Assertion 'Eva,pointer_downcast' ("pointer_comparison.c", line 21)
             assert Eva: pointer_downcast: (unsigned int)p ≤ 2147483647;
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_downcast' (file pointer_comparison.c, line 21)
+[    -    ] Assertion 'Eva,pointer_downcast' ("pointer_comparison.c", line 21)
             assert Eva: pointer_downcast: (unsigned int)(&y) ≤ 2147483647;
             tried with Eva.
 
@@ -127,28 +127,28 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion 'Eva,ptr_comparison' (file pointer_comparison.c, line 15)
+[    -    ] Assertion 'Eva,ptr_comparison' ("pointer_comparison.c", line 15)
             assert
               Eva: ptr_comparison:
                 \pointer_comparable((void *)tmp_0, (void *)(&y));
             tried with Eva.
-[    -    ] Assertion 'Eva,ptr_comparison' (file pointer_comparison.c, line 17)
+[    -    ] Assertion 'Eva,ptr_comparison' ("pointer_comparison.c", line 17)
             assert
               Eva: ptr_comparison:
                 \pointer_comparable((void *)tmp_1, (void *)(&y));
             tried with Eva.
-[    -    ] Assertion 'Eva,ptr_comparison' (file pointer_comparison.c, line 19)
+[    -    ] Assertion 'Eva,ptr_comparison' ("pointer_comparison.c", line 19)
             assert
               Eva: ptr_comparison:
                 \pointer_comparable((void *)tmp_2, (void *)(&y));
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_downcast' (file pointer_comparison.c, line 21)
+[    -    ] Assertion 'Eva,pointer_downcast' ("pointer_comparison.c", line 21)
             assert Eva: pointer_downcast: (unsigned int)p ≤ 2147483647;
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_downcast' (file pointer_comparison.c, line 21)
+[    -    ] Assertion 'Eva,pointer_downcast' ("pointer_comparison.c", line 21)
             assert Eva: pointer_downcast: (unsigned int)(&y) ≤ 2147483647;
             tried with Eva.
-[    -    ] Assertion 'Eva,ptr_comparison' (file pointer_comparison.c, line 23)
+[    -    ] Assertion 'Eva,ptr_comparison' ("pointer_comparison.c", line 23)
             assert
               Eva: ptr_comparison:
                 \pointer_comparable((void *)tmp_3, (void *)(&y));
@@ -223,33 +223,33 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion 'Eva,ptr_comparison' (file pointer_comparison.c, line 15)
+[    -    ] Assertion 'Eva,ptr_comparison' ("pointer_comparison.c", line 15)
             assert
               Eva: ptr_comparison:
                 \pointer_comparable((void *)tmp_0, (void *)(&y));
             tried with Eva.
-[    -    ] Assertion 'Eva,ptr_comparison' (file pointer_comparison.c, line 17)
+[    -    ] Assertion 'Eva,ptr_comparison' ("pointer_comparison.c", line 17)
             assert
               Eva: ptr_comparison:
                 \pointer_comparable((void *)tmp_1, (void *)(&y));
             tried with Eva.
-[    -    ] Assertion 'Eva,ptr_comparison' (file pointer_comparison.c, line 19)
+[    -    ] Assertion 'Eva,ptr_comparison' ("pointer_comparison.c", line 19)
             assert
               Eva: ptr_comparison:
                 \pointer_comparable((void *)tmp_2, (void *)(&y));
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_downcast' (file pointer_comparison.c, line 21)
+[    -    ] Assertion 'Eva,pointer_downcast' ("pointer_comparison.c", line 21)
             assert Eva: pointer_downcast: (unsigned int)p ≤ 2147483647;
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_downcast' (file pointer_comparison.c, line 21)
+[    -    ] Assertion 'Eva,pointer_downcast' ("pointer_comparison.c", line 21)
             assert Eva: pointer_downcast: (unsigned int)(&y) ≤ 2147483647;
             tried with Eva.
-[    -    ] Assertion 'Eva,ptr_comparison' (file pointer_comparison.c, line 21)
+[    -    ] Assertion 'Eva,ptr_comparison' ("pointer_comparison.c", line 21)
             assert
               Eva: ptr_comparison:
                 \pointer_comparable((void *)((int)p), (void *)((int)(&y)));
             tried with Eva.
-[    -    ] Assertion 'Eva,ptr_comparison' (file pointer_comparison.c, line 23)
+[    -    ] Assertion 'Eva,ptr_comparison' ("pointer_comparison.c", line 23)
             assert
               Eva: ptr_comparison:
                 \pointer_comparable((void *)tmp_3, (void *)(&y));

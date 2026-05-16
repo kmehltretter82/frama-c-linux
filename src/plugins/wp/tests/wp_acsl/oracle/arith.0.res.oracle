@@ -186,12 +186,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'qed_ok,A1' (file arith.i, line 16):
+Goal Assertion 'qed_ok,A1' ("arith.i", line 16, characters 25-31):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'qed_ok,A2' (file arith.i, line 17):
+Goal Assertion 'qed_ok,A2' ("arith.i", line 17, characters 26-34):
 Prove: true.
 
 ------------------------------------------------------------

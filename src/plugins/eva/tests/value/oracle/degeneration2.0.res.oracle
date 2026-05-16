@@ -27,7 +27,7 @@
 [eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    degeneration2.i:14: arithmetic operation on addresses
+    degeneration2.i:14:7-23: arithmetic operation on addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{B; C; D; E}
 [eva] degeneration2.i:25: 
@@ -36,7 +36,7 @@
 [eva:final-states] Values at end of function main:
   A ∈
    {{ garbled mix of &{B; C; D; E}
-    (origin: Arithmetic {degeneration2.i:14}) }}
+    (origin: Arithmetic {degeneration2.i:14:7-23}) }}
   B ∈ {{ (void *)&C }} or UNINITIALIZED
   C ∈ {{ (void *)&D }} or UNINITIALIZED
   D ∈ {{ (void *)&E }} or UNINITIALIZED

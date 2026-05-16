@@ -42,7 +42,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file wp_eqb.i, line 8) in 'f':
+Goal Post-condition ("wp_eqb.i", line 8, characters 11-46) in 'f':
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(c) /\ is_sint32(d).
   Have: (if (d = c) then 1 else 0) = (if (b = a) then 1 else 0).

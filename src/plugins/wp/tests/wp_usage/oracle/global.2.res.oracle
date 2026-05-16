@@ -20,7 +20,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'no_address_taken' (file global.c, line 17):
+Goal Assertion 'no_address_taken' ("global.c", line 17):
 Prove: true.
 
 ------------------------------------------------------------
@@ -38,7 +38,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file global.c, line 14) in 'foo'' in 'main' at call 'foo' (file global.c, line 21)
+Goal Instance of 'Pre-condition ("global.c", line 14) in 'foo'' in 'main' at call 'foo' ("global.c", line 21)
 :
 Prove: true.
 

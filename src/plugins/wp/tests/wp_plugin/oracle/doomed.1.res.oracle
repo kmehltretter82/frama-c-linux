@@ -24,7 +24,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file doomed.i, line 34) in 'bar':
+Goal Post-condition ("doomed.i", line 34, characters 29-43) in 'bar':
 Prove: true.
 
 ------------------------------------------------------------
@@ -49,7 +49,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file doomed.i, line 40) in 'buzz':
+Goal Post-condition ("doomed.i", line 40, characters 47-61) in 'buzz':
 Prove: true.
 
 ------------------------------------------------------------

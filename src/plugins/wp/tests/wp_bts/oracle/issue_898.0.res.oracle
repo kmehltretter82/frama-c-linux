@@ -14,7 +14,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file issue_898.i, line 8) in 'job':
+Goal Post-condition ("issue_898.i", line 8, characters 11-40) in 'job':
 Let a = job_0.F1_S_value.
 Assume {
   Type: IsS1_S(job_0).

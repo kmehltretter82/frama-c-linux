@@ -6,30 +6,30 @@
   
 [eva:progress] 
   computing for function scanf <- main.
-  Called from unravel-point.i:59.
+  Called from unravel-point.i:59:2-21.
 [eva] using specification for function scanf
 [eva:progress] Done for function scanf
 [eva:alarm] unravel-point.i:60: Warning: 
   accessing uninitialized left-value. assert \initialized(&input1);
 [eva:progress] 
   computing for function scanf <- main.
-  Called from unravel-point.i:61.
+  Called from unravel-point.i:61:2-21.
 [eva:progress] Done for function scanf
 [eva:alarm] unravel-point.i:62: Warning: 
   accessing uninitialized left-value. assert \initialized(&input2);
 [eva:progress] 
   computing for function scanf <- main.
-  Called from unravel-point.i:63.
+  Called from unravel-point.i:63:2-21.
 [eva:progress] Done for function scanf
 [eva:alarm] unravel-point.i:64: Warning: 
   accessing uninitialized left-value. assert \initialized(&input3);
 [eva:progress] 
   computing for function scanf <- main.
-  Called from unravel-point.i:65.
+  Called from unravel-point.i:65:2-20.
 [eva:progress] Done for function scanf
 [eva:progress] 
   computing for function scanf <- main.
-  Called from unravel-point.i:66.
+  Called from unravel-point.i:66:2-20.
 [eva:progress] Done for function scanf
 [eva:alarm] unravel-point.i:68: Warning: 
   accessing uninitialized left-value. assert \initialized(&cond1);
@@ -41,13 +41,13 @@
   signed overflow. assert *y + *x ≤ 2147483647;
 [eva:progress] 
   computing for function send1 <- main.
-  Called from unravel-point.i:75.
+  Called from unravel-point.i:75:2-17.
 [kernel:annot:missing-spec] unravel-point.i:36: Warning: 
   Neither code nor specification for function printf, generating default
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function printf <- send1 <- main.
-  Called from unravel-point.i:36.
+  Called from unravel-point.i:36:3-21.
 [eva] using specification for function printf
 [eva:progress] Done for function printf
 [eva:progress] Recording results for send1
@@ -56,10 +56,10 @@
 [eva:progress] Done for function send1
 [eva:progress] 
   computing for function send2 <- main.
-  Called from unravel-point.i:76.
+  Called from unravel-point.i:76:2-17.
 [eva:progress] 
   computing for function printf <- send2 <- main.
-  Called from unravel-point.i:40.
+  Called from unravel-point.i:40:3-21.
 [eva:progress] Done for function printf
 [eva:progress] Recording results for send2
 [from] Computing for function send2
@@ -67,10 +67,10 @@
 [eva:progress] Done for function send2
 [eva:progress] 
   computing for function send3 <- main.
-  Called from unravel-point.i:77.
+  Called from unravel-point.i:77:2-17.
 [eva:progress] 
   computing for function printf <- send3 <- main.
-  Called from unravel-point.i:44.
+  Called from unravel-point.i:44:3-21.
 [eva:progress] Done for function printf
 [eva:progress] Recording results for send3
 [from] Computing for function send3
@@ -80,10 +80,10 @@
   accessing uninitialized left-value. assert \initialized(&cond2);
 [eva:progress] 
   computing for function send4 <- main.
-  Called from unravel-point.i:78.
+  Called from unravel-point.i:78:2-15.
 [eva:progress] 
   computing for function printf <- send4 <- main.
-  Called from unravel-point.i:48.
+  Called from unravel-point.i:48:3-21.
 [eva:progress] Done for function printf
 [eva:progress] Recording results for send4
 [from] Computing for function send4
@@ -94,36 +94,36 @@
 [from] Done for function main
 [eva:progress] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to printf at unravel-point.i:36 (by send1):
+[from] call to printf at unravel-point.i:36:3-21 (by send1):
   \result FROM __x1; "%d\n"[0..3]
-[from] call to printf at unravel-point.i:40 (by send2):
+[from] call to printf at unravel-point.i:40:3-21 (by send2):
   \result FROM __x1; "%d\n"[0..3]
-[from] call to printf at unravel-point.i:44 (by send3):
+[from] call to printf at unravel-point.i:44:3-21 (by send3):
   \result FROM __x1; "%d\n"[0..3]
-[from] call to printf at unravel-point.i:48 (by send4):
+[from] call to printf at unravel-point.i:48:3-21 (by send4):
   \result FROM __x1; "%d\n"[0..3]
-[from] call to scanf at unravel-point.i:59 (by main):
+[from] call to scanf at unravel-point.i:59:2-21 (by main):
   input1 FROM \nothing
   \result FROM ANYTHING(origin:Unknown)
-[from] call to scanf at unravel-point.i:61 (by main):
+[from] call to scanf at unravel-point.i:61:2-21 (by main):
   input2 FROM \nothing
   \result FROM ANYTHING(origin:Unknown)
-[from] call to scanf at unravel-point.i:63 (by main):
+[from] call to scanf at unravel-point.i:63:2-21 (by main):
   input3 FROM \nothing
   \result FROM ANYTHING(origin:Unknown)
-[from] call to scanf at unravel-point.i:65 (by main):
+[from] call to scanf at unravel-point.i:65:2-20 (by main):
   cond1 FROM \nothing
   \result FROM ANYTHING(origin:Unknown)
-[from] call to scanf at unravel-point.i:66 (by main):
+[from] call to scanf at unravel-point.i:66:2-20 (by main):
   cond2 FROM \nothing
   \result FROM ANYTHING(origin:Unknown)
-[from] call to send1 at unravel-point.i:75 (by main):
+[from] call to send1 at unravel-point.i:75:2-17 (by main):
   \result FROM x
-[from] call to send2 at unravel-point.i:76 (by main):
+[from] call to send2 at unravel-point.i:76:2-17 (by main):
   \result FROM x
-[from] call to send3 at unravel-point.i:77 (by main):
+[from] call to send3 at unravel-point.i:77:2-17 (by main):
   \result FROM x
-[from] call to send4 at unravel-point.i:78 (by main):
+[from] call to send4 at unravel-point.i:78:2-15 (by main):
   \result FROM x
 [from] entry point:
   \result FROM \nothing
@@ -158,30 +158,30 @@
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function scanf <- main.
-  Called from unravel-point.i:59.
+  Called from unravel-point.i:59:2-21.
 [eva] using specification for function scanf
 [eva:progress] Done for function scanf
 [eva:alarm] unravel-point.i:60: Warning: 
   accessing uninitialized left-value. assert \initialized(&input1);
 [eva:progress] 
   computing for function scanf <- main.
-  Called from unravel-point.i:61.
+  Called from unravel-point.i:61:2-21.
 [eva:progress] Done for function scanf
 [eva:alarm] unravel-point.i:62: Warning: 
   accessing uninitialized left-value. assert \initialized(&input2);
 [eva:progress] 
   computing for function scanf <- main.
-  Called from unravel-point.i:63.
+  Called from unravel-point.i:63:2-21.
 [eva:progress] Done for function scanf
 [eva:alarm] unravel-point.i:64: Warning: 
   accessing uninitialized left-value. assert \initialized(&input3);
 [eva:progress] 
   computing for function scanf <- main.
-  Called from unravel-point.i:65.
+  Called from unravel-point.i:65:2-20.
 [eva:progress] Done for function scanf
 [eva:progress] 
   computing for function scanf <- main.
-  Called from unravel-point.i:66.
+  Called from unravel-point.i:66:2-20.
 [eva:progress] Done for function scanf
 [eva:alarm] unravel-point.i:68: Warning: 
   accessing uninitialized left-value. assert \initialized(&cond1);
@@ -191,7 +191,7 @@
   signed overflow. assert *y + *x ≤ 2147483647;
 [eva:progress] 
   computing for function send1_slice_1 <- main.
-  Called from unravel-point.i:75.
+  Called from unravel-point.i:75:2-17.
 [eva:progress] Recording results for send1_slice_1
 [from] Computing for function send1_slice_1
 [from] Done for function send1_slice_1
@@ -200,7 +200,7 @@
   accessing uninitialized left-value. assert \initialized(&cond2);
 [eva:progress] 
   computing for function send4_slice_1 <- main.
-  Called from unravel-point.i:78.
+  Called from unravel-point.i:78:2-15.
 [eva:progress] Recording results for send4_slice_1
 [from] Computing for function send4_slice_1
 [from] Done for function send4_slice_1
@@ -210,24 +210,24 @@
 [from] Done for function main
 [eva:progress] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to scanf at unravel-point.i:59 (by main):
+[from] call to scanf at unravel-point.i:59:2-21 (by main):
   input1 FROM "%d"[0..2]; input1 (and SELF)
   \result FROM "%d"[0..2]; input1
-[from] call to scanf at unravel-point.i:61 (by main):
+[from] call to scanf at unravel-point.i:61:2-21 (by main):
   input2 FROM "%d"[0..2]; input2 (and SELF)
   \result FROM "%d"[0..2]; input2
-[from] call to scanf at unravel-point.i:63 (by main):
+[from] call to scanf at unravel-point.i:63:2-21 (by main):
   input3 FROM "%d"[0..2]; input3 (and SELF)
   \result FROM "%d"[0..2]; input3
-[from] call to scanf at unravel-point.i:65 (by main):
+[from] call to scanf at unravel-point.i:65:2-20 (by main):
   cond1 FROM "%d"[0..2]; cond1 (and SELF)
   \result FROM "%d"[0..2]; cond1
-[from] call to scanf at unravel-point.i:66 (by main):
+[from] call to scanf at unravel-point.i:66:2-20 (by main):
   cond2 FROM "%d"[0..2]; cond2 (and SELF)
   \result FROM "%d"[0..2]; cond2
-[from] call to send1_slice_1 at unravel-point.i:75 (by main):
+[from] call to send1_slice_1 at unravel-point.i:75:2-17 (by main):
   \result FROM x
-[from] call to send4_slice_1 at unravel-point.i:78 (by main):
+[from] call to send4_slice_1 at unravel-point.i:78:2-15 (by main):
   \result FROM x
 [from] entry point:
   NO EFFECTS

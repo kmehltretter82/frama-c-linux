@@ -19,7 +19,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition 'r2' in 'g'' in 'f' at call 'g' (file bts_0896.i, line 22)
+Goal Instance of 'Pre-condition 'r2' in 'g'' in 'f' at call 'g' ("bts_0896.i", line 22, characters 17-20)
 :
 Prove: true.
 
@@ -38,12 +38,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file bts_0896.i, line 18) in 'g':
+Goal Assigns ("bts_0896.i", line 18, characters 32-33) in 'g':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file bts_0896.i, line 18) in 'g':
+Goal Assigns ("bts_0896.i", line 18, characters 32-33) in 'g':
 Prove: true.
 
 ------------------------------------------------------------

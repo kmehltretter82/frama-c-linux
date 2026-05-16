@@ -37,7 +37,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Check 'KO_WHEN_VOLATILE' (file volatile.i, line 46):
+Goal Check 'KO_WHEN_VOLATILE' ("volatile.i", line 46, characters 30-37):
 volatile.i:45: warning from wp:
  - Warning: ignore volatile attribute
    Reason: unsafe read-access to volatile l-value
@@ -70,7 +70,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'KO_WHEN_VOLATILE' (file volatile.i, line 16):
+Goal Assertion 'KO_WHEN_VOLATILE' ("volatile.i", line 16, characters 32-38):
 volatile.i:15: warning from wp:
  - Warning: ignore volatile attribute
    Reason: unsafe write-access to volatile l-value
@@ -96,7 +96,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'KO_WHEN_VOLATILE' (file volatile.i, line 22):
+Goal Assertion 'KO_WHEN_VOLATILE' ("volatile.i", line 22, characters 32-38):
 volatile.i:21: warning from wp:
  - Warning: ignore volatile attribute
    Reason: unsafe read-access to volatile l-value
@@ -122,7 +122,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok,dead_code' (file volatile.i, line 30):
+Goal Assertion 'ok,dead_code' ("volatile.i", line 30, characters 39-45):
 Prove: true.
 
 ------------------------------------------------------------
@@ -142,7 +142,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'KO_WHEN_VOLATILE' (file volatile.i, line 36):
+Goal Assertion 'KO_WHEN_VOLATILE' ("volatile.i", line 36, characters 32-40):
 volatile.i:35: warning from wp:
  - Warning: ignore volatile attribute
    Reason: unsafe read-access to volatile l-value

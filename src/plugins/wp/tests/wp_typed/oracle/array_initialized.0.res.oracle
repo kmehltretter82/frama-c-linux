@@ -29,7 +29,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file array_initialized.c, line 71):
+Goal Assertion ("array_initialized.c", line 71):
 Assume {
   (* Heap *)
   Type: IsArray_sint32(g).
@@ -57,7 +57,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file array_initialized.c, line 185):
+Goal Assertion ("array_initialized.c", line 185):
 Assume {
   (* Heap *)
   Type: IsArray_sint32(h1_0) /\ IsArray_sint32(h2_0).
@@ -287,7 +287,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file array_initialized.c, line 194):
+Goal Assertion ("array_initialized.c", lines 194-216):
 Prove: true.
 
 ------------------------------------------------------------
@@ -307,7 +307,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file array_initialized.c, line 283):
+Goal Assertion ("array_initialized.c", line 283):
 Assume {
   (* Heap *)
   Type: linked(Malloc_0) /\ (forall i_1 : Z. region(p[i_1].base) <= 0).
@@ -330,7 +330,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file array_initialized.c, line 288) in 'simpl':
+Goal Post-condition ("array_initialized.c", line 288) in 'simpl':
 Let x = Mint_0[shift_sint32(t, 0)].
 Assume {
   Type: is_sint32(simpl_0) /\ is_sint32(x).

@@ -20,12 +20,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'a1' (file checks.i, line 15):
+Goal Assertion 'a1' ("checks.i", line 15, characters 18-19):
 Prove: P_P.
 
 ------------------------------------------------------------
 
-Goal Assertion 'a2' (file checks.i, line 17):
+Goal Assertion 'a2' ("checks.i", line 17, characters 18-19):
 Prove: true.
 
 ------------------------------------------------------------

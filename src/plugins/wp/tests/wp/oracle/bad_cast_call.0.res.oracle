@@ -24,7 +24,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'MUST_FAIL' (file bad_cast_call.i, line 9):
+Goal Assertion 'MUST_FAIL' ("bad_cast_call.i", line 9, characters 24-38):
 bad_cast_call.i:8: warning from Typed Model:
  - Warning: Hide \result
    Reason: Cast with incompatible pointers types (source: sint8*) (target: char**)

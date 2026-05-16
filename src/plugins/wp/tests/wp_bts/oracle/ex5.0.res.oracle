@@ -24,17 +24,17 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file ex5.i, line 7):
+Goal Assertion ("ex5.i", line 7, characters 14-77):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file ex5.i, line 9):
+Goal Assertion ("ex5.i", line 9, characters 14-75):
 Prove: exists i_4,i_3,i_2,i_1,i : Z. 7 <= (i + i_1 + i_2 + i_3 + i_4).
 
 ------------------------------------------------------------
 
-Goal Assertion (file ex5.i, line 11):
+Goal Assertion ("ex5.i", line 11, characters 14-59):
 Assume { (* Assertion *) Have: 7 <= (i + i_1 + i_2 + i_3 + i_4). }
 Prove: exists i_5 : Z. 4 <= i_5.
 

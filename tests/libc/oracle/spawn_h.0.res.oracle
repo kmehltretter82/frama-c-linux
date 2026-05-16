@@ -19,7 +19,7 @@
 [eva:progress] Done for function posix_spawn_file_actions_init
 [eva:progress] 
   computing for function posix_spawn_file_actions_addclose <- main.
-  Called from spawn_h.c:47.
+  Called from spawn_h.c:47-48.
 [eva] using specification for function posix_spawn_file_actions_addclose
 [eva:progress] Done for function posix_spawn_file_actions_addclose
 [eva:progress] 
@@ -55,7 +55,7 @@
 [eva:progress] Done for function posix_spawn_file_actions_init
 [eva:progress] 
   computing for function posix_spawn_file_actions_addclose <- main.
-  Called from spawn_h.c:47.
+  Called from spawn_h.c:47-48.
 [eva:progress] Done for function posix_spawn_file_actions_addclose
 [eva:progress] 
   computing for function posix_spawnattr_init <- main.
@@ -133,7 +133,7 @@
   Assigning imprecise value to file because of misaligned read of addresses.
 [eva:progress] 
   computing for function posix_spawnp <- main.
-  Called from spawn_h.c:82.
+  Called from spawn_h.c:82-83.
 [eva] using specification for function posix_spawnp
 [eva:progress] Done for function posix_spawnp
 [eva:progress] 

@@ -30,16 +30,11 @@ val unknown : t
 (** Pretty-prints a location, in the format file:line. *)
 val pretty : Format.formatter -> t -> unit
 
-(** Pretty prints the location under the form [file <f>, line <l>] *)
+(** Pretty prints the location under the form ["<file>", line <line>]. *)
 val pretty_long : t Pretty_utils.formatter
 
-(** Pretty prints the location under the form [line <l>] or a description of
-    the source if it is not a file. *)
-val pretty_line: t Pretty_utils.formatter
-
-(** Pretty prints the location under the form  [line <l>, between columns <c1>
-    and <c2>] and with the list of inclusion. *)
-val pretty_long_range: t Pretty_utils.formatter
+(** Same as {!pretty_long} but also prints the list of inclusion. *)
+val pretty_long_with_inclusions: t Pretty_utils.formatter
 
 (** Pretty-prints the ocaml internal representation of a location, for debug
     purposes.

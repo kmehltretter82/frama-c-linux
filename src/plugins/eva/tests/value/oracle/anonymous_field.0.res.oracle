@@ -6,7 +6,7 @@
   Sa ∈ {0}
 [eva:progress] 
   computing for function set_anonymous_struct <- main.
-  Called from anonymous_field.i:19.
+  Called from anonymous_field.i:19:3-25.
 [eva:progress] anonymous_field.i:10: 
   function set_anonymous_struct: postcondition got status valid.
 [eva:progress] Recording results for set_anonymous_struct

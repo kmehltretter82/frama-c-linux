@@ -14,7 +14,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file subset.i, line 4) in 'mem':
+Goal Post-condition ("subset.i", line 4, characters 11-47) in 'mem':
 Let x = b.base.
 Let x_1 = a.base.
 Assume {

@@ -6,10 +6,10 @@
   c ∈ [--..--]
 [eva:progress] 
   computing for function main <- main1.
-  Called from invalid_loc_return.i:21.
+  Called from invalid_loc_return.i:21:3-9.
 [eva:progress] 
   computing for function foo <- main <- main1.
-  Called from invalid_loc_return.i:17.
+  Called from invalid_loc_return.i:17:11-16.
 [eva:progress] Recording results for foo
 [eva:progress] Done for function foo
 [eva:alarm] invalid_loc_return.i:17: Warning: 
@@ -61,10 +61,10 @@
   c ∈ [--..--]
 [eva:progress] 
   computing for function main <- main2.
-  Called from invalid_loc_return.i:25.
+  Called from invalid_loc_return.i:25:3-9.
 [eva:progress] 
   computing for function foo <- main <- main2.
-  Called from invalid_loc_return.i:17.
+  Called from invalid_loc_return.i:17:11-16.
 [eva:progress] Recording results for foo
 [eva:progress] Done for function foo
 [eva:progress] invalid_loc_return.i:17: Reusing old results for call to foo

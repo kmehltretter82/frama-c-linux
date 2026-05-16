@@ -24,7 +24,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file garbled_opaque_struct.i, line 4):
+Goal Assertion ("garbled_opaque_struct.i", line 4, characters 14-23):
 garbled_opaque_struct.i:3: warning from Typed Model:
  - Warning: Hide \result
    Reason: Cast with incompatible pointers types (source: sint8*) (target: capture*)

@@ -36,10 +36,10 @@
   S_tc[0..1][0..9] ∈ [--..--]
   S_tb[bits 0 to 31] ∈
       {{ garbled mix of &{tb}
-       (origin: Misaligned write {not_ct_array_arg.i:12}) }}
+       (origin: Misaligned write {not_ct_array_arg.i:12:16-25}) }}
       [bits 32 to ..] ∈
       {{ garbled mix of &{tb}
-       (origin: Misaligned write {not_ct_array_arg.i:12}) }} or UNINITIALIZED
+       (origin: Misaligned write {not_ct_array_arg.i:12:16-25}) }} or UNINITIALIZED
   ==END OF DUMP==
 [eva:alarm] not_ct_array_arg.i:14: Warning: 
   out of bounds write. assert \valid(&(*(tc + 1))[1]);
@@ -58,10 +58,10 @@
       [1][2..9] ∈ [--..--]
   S_tb[bits 0 to 31] ∈
       {{ garbled mix of &{tb}
-       (origin: Misaligned write {not_ct_array_arg.i:12}) }}
+       (origin: Misaligned write {not_ct_array_arg.i:12:16-25}) }}
       [bits 32 to ..] ∈
       {{ garbled mix of &{tb}
-       (origin: Misaligned write {not_ct_array_arg.i:12}) }} or UNINITIALIZED
+       (origin: Misaligned write {not_ct_array_arg.i:12:16-25}) }} or UNINITIALIZED
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======

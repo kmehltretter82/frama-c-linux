@@ -44,15 +44,8 @@ include Datatype.S_with_collections with type t := t
 (** Pretty-prints a position, in the format [<file>:<line>]. *)
 val pretty : Format.formatter -> t -> unit
 
-(** Pretty printer in the format [file <file>, line <line]. The optional
-      parameters controls how much is printed.
-    @param file prints the file path, defaults to true
-    @param line prints the line, defaults to true
-    @param column prints the column, defaults to false
-    @param offset prints the offset in bytes, defaults to false *)
-val pretty_long :
-  ?file:bool -> ?line:bool -> ?column:bool -> ?offset:bool ->
-  Format.formatter -> t -> unit
+(** Pretty printer in the format ["<file>", line <line>]. *)
+val pretty_long : Format.formatter -> t -> unit
 
 (** Debug printer. Prints the internal representation of locations. *)
 val pretty_debug : Format.formatter -> t -> unit
@@ -120,6 +113,11 @@ val path : t -> Filepath.t
 (** Get the line of a position, starting at 1. If the position is in a
     preprocessed code, returns the line in the original file. *)
 val line : t -> int
+
+(** Get the column of the position, starting at 1. If the position is in a
+    preprocessed code and as Frama-C cannot track the column in the original
+    file, this function will likely return 0. *)
+val column : t -> int
 
 (** Get the origin of a position. *)
 val origin : t -> origin

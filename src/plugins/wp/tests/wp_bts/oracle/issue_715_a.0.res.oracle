@@ -19,7 +19,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file issue_715_a.i, line 2) in 'dummy'' in 'foo' at call 'dummy' (file issue_715_a.i, line 9)
+Goal Instance of 'Pre-condition ("issue_715_a.i", line 2, characters 12-19) in 'dummy'' in 'foo' at call 'dummy' ("issue_715_a.i", line 9, characters 3-11)
 :
 Prove: true.
 

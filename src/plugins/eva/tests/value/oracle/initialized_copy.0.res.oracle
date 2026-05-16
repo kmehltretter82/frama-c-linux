@@ -84,7 +84,7 @@
   accessing uninitialized left-value. assert \initialized(&a_7);
 [eva:progress] 
   computing for function f <- main.
-  Called from initialized_copy.i:143.
+  Called from initialized_copy.i:143:5-9.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:show] initialized_copy.i:144: 
@@ -102,7 +102,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function g <- main.
-  Called from initialized_copy.i:151.
+  Called from initialized_copy.i:151:5-9.
 [eva] using specification for function g
 [eva:progress] Done for function g
 [eva:show] initialized_copy.i:152: 

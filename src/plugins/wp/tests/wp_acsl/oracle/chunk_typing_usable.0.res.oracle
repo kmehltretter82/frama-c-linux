@@ -645,7 +645,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file chunk_typing_usable.i, line 29) in 'usable_axiom':
+Goal Post-condition ("chunk_typing_usable.i", line 29, characters 11-73) in 'usable_axiom':
 Let x = e - 1.
 Assume {
   Type: is_sint32_chunk(Mint_0) /\ is_uint32(b) /\ is_uint32(e).
@@ -743,7 +743,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file chunk_typing_usable.i, line 43) in 'usable_lemma':
+Goal Post-condition ("chunk_typing_usable.i", line 43, characters 11-70) in 'usable_lemma':
 Assume {
   Type: is_sint32_chunk(Mint_0) /\ is_uint32(b) /\ is_uint32(e) /\
       is_uint32(s).

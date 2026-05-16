@@ -22,12 +22,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Check 'ko' (file issue_825.i, line 19):
+Goal Check 'ko' ("issue_825.i", line 19, characters 18-46):
 Prove: false.
 
 ------------------------------------------------------------
 
-Goal Check 'ko' (file issue_825.i, line 20):
+Goal Check 'ko' ("issue_825.i", line 20, characters 18-72):
 Assume { Type: is_sint32(a). }
 Prove: a = 0.
 
@@ -42,7 +42,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file issue_825.i, line 2) in 'job':
+Goal Post-condition ("issue_825.i", line 2, characters 11-17) in 'job':
 Assume { Type: is_sint32(i). (* Else *) Have: 10 <= i. }
 Prove: false.
 
@@ -54,22 +54,22 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file issue_825.i, line 9):
+Goal Establishment of Invariant ("issue_825.i", line 9, characters 20-59):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file issue_825.i, line 9):
+Goal Preservation of Invariant ("issue_825.i", line 9, characters 20-59):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file issue_825.i, line 10) (1/2):
+Goal Loop assigns ("issue_825.i", line 10, characters 18-19) (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file issue_825.i, line 10) (2/2):
+Goal Loop assigns ("issue_825.i", line 10, characters 18-19) (2/2):
 Effect at line 14
 Assume { Type: is_sint32(i). (* Then *) Have: i <= 9. }
 Prove: false.
@@ -82,12 +82,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file issue_825.i, line 13):
+Goal Positivity of Loop variant at loop ("issue_825.i", lines 13-16):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file issue_825.i, line 13):
+Goal Decreasing of Loop variant at loop ("issue_825.i", lines 13-16):
 Prove: true.
 
 ------------------------------------------------------------

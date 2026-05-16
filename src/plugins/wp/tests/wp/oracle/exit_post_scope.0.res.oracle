@@ -14,12 +14,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file exit_post_scope.i, line 4) in 'foo':
+Goal Post-condition ("exit_post_scope.i", line 4, characters 11-21) in 'foo':
 Prove: false.
 
 ------------------------------------------------------------
 
-Goal Exit-condition (file exit_post_scope.i, line 5) in 'foo':
+Goal Exit-condition ("exit_post_scope.i", line 5, characters 9-19) in 'foo':
 Prove: true.
 
 ------------------------------------------------------------

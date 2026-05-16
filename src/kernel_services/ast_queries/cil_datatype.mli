@@ -87,10 +87,6 @@ module Location: sig
       the source if it is not a file. *)
   val pretty_line: t Pretty_utils.formatter
 
-  (** Pretty prints the location under the form  [line <l>, between columns <c1>
-      and <c2>] and with the list of inclusion. *)
-  val pretty_long_range: t Pretty_utils.formatter
-
   (** Pretty-prints the ocaml internal representation of a location, for debug
       purposes.
 

@@ -22,7 +22,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file bitwise2.i, line 2) in 'job1':
+Goal Post-condition ("bitwise2.i", line 2, characters 13-59) in 'job1':
 Prove: true.
 
 ------------------------------------------------------------
@@ -42,7 +42,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file bitwise2.i, line 7) in 'job1bis':
+Goal Post-condition ("bitwise2.i", line 7, characters 13-45) in 'job1bis':
 Prove: true.
 
 ------------------------------------------------------------
@@ -62,7 +62,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file bitwise2.i, line 12) in 'job2':
+Goal Post-condition ("bitwise2.i", line 12, characters 13-59) in 'job2':
 Prove: true.
 
 ------------------------------------------------------------
@@ -82,7 +82,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file bitwise2.i, line 17) in 'job3':
+Goal Post-condition ("bitwise2.i", line 17, characters 13-59) in 'job3':
 Prove: true.
 
 ------------------------------------------------------------
@@ -102,7 +102,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file bitwise2.i, line 22) in 'job4':
+Goal Post-condition ("bitwise2.i", line 22, characters 13-64) in 'job4':
 Prove: true.
 
 ------------------------------------------------------------

@@ -24,7 +24,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'SUCCS' (file initialized_local_init.i, line 9):
+Goal Assertion 'SUCCS' ("initialized_local_init.i", line 9, characters 21-46):
 Let x_1 = x[1].
 Let x_2 = x[2].
 Assume {
@@ -38,7 +38,7 @@ Prove: (x_1 = 0) /\ (x_2 = 0) /\ (x_2 = x_1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'SUCCS' (file initialized_local_init.i, line 10):
+Goal Assertion 'SUCCS' ("initialized_local_init.i", line 10, characters 22-38):
 Assume {
   (* Goal *)
   When: (0 <= i) /\ (i <= 2).
@@ -57,7 +57,7 @@ Prove: (Init_x_0[i]=true).
 
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file initialized_local_init.i, line 11):
+Goal Check 'FAILS' ("initialized_local_init.i", line 11, characters 21-27):
 Assume {
   (* Initializer *)
   Init: x[0] = 0.
@@ -85,17 +85,17 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'SUCCS' (file initialized_local_init.i, line 3):
+Goal Assertion 'SUCCS' ("initialized_local_init.i", line 3, characters 21-27):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'SUCCS' (file initialized_local_init.i, line 4):
+Goal Assertion 'SUCCS' ("initialized_local_init.i", line 4, characters 22-38):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file initialized_local_init.i, line 5):
+Goal Check 'FAILS' ("initialized_local_init.i", line 5, characters 21-27):
 Prove: false.
 
 ------------------------------------------------------------
@@ -115,17 +115,17 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'SUCCS' (file initialized_local_init.i, line 16):
+Goal Assertion 'SUCCS' ("initialized_local_init.i", line 16, characters 21-49):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'SUCCS' (file initialized_local_init.i, line 17):
+Goal Assertion 'SUCCS' ("initialized_local_init.i", line 17, characters 22-38):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file initialized_local_init.i, line 18):
+Goal Check 'FAILS' ("initialized_local_init.i", line 18, characters 21-27):
 Prove: false.
 
 ------------------------------------------------------------

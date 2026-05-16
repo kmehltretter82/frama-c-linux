@@ -22,7 +22,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file floats.i, line 14):
+Goal Assertion ("floats.i", line 14, characters 14-23):
 Let a = shift_uint8(global(L_buffer_31), 0).
 Assume { (* Heap *) Type: framed(mem_0) /\ sconst(mem_0). }
 Prove: of_f64(int_to_float64(read_uint64(write_uint64(mem_0, a,
@@ -46,7 +46,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file floats.i, line 7):
+Goal Assertion ("floats.i", line 7, characters 14-23):
 Let a = shift_uint8(global(L_buffer_24), 0).
 Assume { (* Heap *) Type: framed(mem_0) /\ sconst(mem_0). }
 Prove: of_f32(int_to_float32(read_uint32(write_uint32(mem_0, a,

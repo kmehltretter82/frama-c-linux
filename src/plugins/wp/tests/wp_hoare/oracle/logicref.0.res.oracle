@@ -16,7 +16,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file logicref.i, line 11) in 'fvrange_n':
+Goal Post-condition ("logicref.i", line 11, characters 59-68) in 'fvrange_n':
 Prove: true.
 
 ------------------------------------------------------------
@@ -27,7 +27,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file logicref.i, line 14):
+Goal Assertion ("logicref.i", line 14, characters 14-25):
 Assume {
   Type: is_sint32(i) /\ is_sint32(k).
   (* Heap *)
@@ -39,7 +39,7 @@ Prove: valid_rw(Malloc_0, shift_sint32(a, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assigns (file logicref.i, line 11) in 'fvrange_n':
+Goal Assigns ("logicref.i", line 11, characters 46-50) in 'fvrange_n':
 Effect at line 15
 Prove: true.
 
@@ -54,7 +54,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file logicref.i, line 23) in 'gcd':
+Goal Post-condition ("logicref.i", line 23, characters 49-59) in 'gcd':
 Prove: true.
 
 ------------------------------------------------------------

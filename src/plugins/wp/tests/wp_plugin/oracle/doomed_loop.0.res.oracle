@@ -7,22 +7,22 @@
   Function foo
 ------------------------------------------------------------
 
-Goal Wp_smoke_dead_loop in 'foo' at loop (file doomed_loop.i, line 22):
+Goal Wp_smoke_dead_loop in 'foo' at loop ("doomed_loop.i", lines 22-24):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Wp_smoke_dead_code in 'foo' at instruction (file doomed_loop.i, line 23):
+Goal Wp_smoke_dead_code in 'foo' at instruction ("doomed_loop.i", line 23, characters 5-8):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Wp_smoke_dead_code in 'foo' at return (file doomed_loop.i, line 25):
+Goal Wp_smoke_dead_code in 'foo' at return ("doomed_loop.i", line 25, characters 3-12):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Termination-condition (file doomed_loop.i, line 13) in 'foo':
+Goal Termination-condition ("doomed_loop.i", line 13, characters 16-22) in 'foo':
 Prove: true.
 
 ------------------------------------------------------------
@@ -33,28 +33,28 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'A' (file doomed_loop.i, line 18):
+Goal Establishment of Invariant 'A' ("doomed_loop.i", line 18, characters 23-27):
 Prove: P_P(0).
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'A' (file doomed_loop.i, line 18):
+Goal Preservation of Invariant 'A' ("doomed_loop.i", line 18, characters 23-27):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'B' (file doomed_loop.i, line 19):
+Goal Establishment of Invariant 'B' ("doomed_loop.i", line 19, characters 23-28):
 Assume { (* Invariant 'A' *) Have: P_P(0). }
 Prove: false.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'B' (file doomed_loop.i, line 19):
+Goal Preservation of Invariant 'B' ("doomed_loop.i", line 19, characters 23-28):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file doomed_loop.i, line 20):
+Goal Loop assigns ("doomed_loop.i", line 20, characters 18-19):
 Prove: true.
 
 ------------------------------------------------------------

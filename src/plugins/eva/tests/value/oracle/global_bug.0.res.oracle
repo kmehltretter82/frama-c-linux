@@ -15,7 +15,7 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[   Bug   ] Assertion 'Eva,shift' (file global_bug.i, line 8)
+[   Bug   ] Assertion 'Eva,shift' ("global_bug.i", line 8, characters 8-10)
             by Eva.
 
 --------------------------------------------------------------------------------

@@ -37,12 +37,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file bts_1828.i, line 60):
+Goal Assertion 'ok' ("bts_1828.i", line 60, characters 18-43):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file bts_1828.i, line 61):
+Goal Assertion 'ok' ("bts_1828.i", line 61, characters 19-45):
 Prove: true.
 
 ------------------------------------------------------------
@@ -62,7 +62,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'ok' (file bts_1828.i, line 23):
+Goal Assertion 'ok' ("bts_1828.i", line 23, characters 18-29):
 Assume {
   (* Heap *)
   Type: (region(one_0.base) <= 0) /\ linked(Malloc_0).

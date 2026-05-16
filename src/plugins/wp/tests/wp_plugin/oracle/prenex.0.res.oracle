@@ -14,7 +14,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file prenex.i, line 11) in 'diag':
+Goal Post-condition ("prenex.i", lines 11-14) in 'diag':
 Assume {
   Type: is_sint32(diag_0) /\ is_sint32(i) /\ is_sint32(j) /\ is_sint32(m) /\
       is_sint32(n).
@@ -61,22 +61,22 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'I' (file prenex.i, line 19):
+Goal Establishment of Invariant 'I' ("prenex.i", line 19, characters 23-34):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'I' (file prenex.i, line 19):
+Goal Preservation of Invariant 'I' ("prenex.i", line 19, characters 23-34):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'PI' (file prenex.i, line 21):
+Goal Establishment of Invariant 'PI' ("prenex.i", lines 21-23):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'PI' (file prenex.i, line 21):
+Goal Preservation of Invariant 'PI' ("prenex.i", lines 21-23):
 Assume {
   Type: is_sint32(i_2) /\ is_sint32(j) /\ is_sint32(m) /\ is_sint32(n) /\
       is_sint32(1 + i_2).
@@ -110,22 +110,22 @@ Prove: Mint_0[shift_sint32(p, i)] < Mint_0[shift_sint32(q, i_1)].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'J' (file prenex.i, line 29):
+Goal Establishment of Invariant 'J' ("prenex.i", line 29, characters 25-36):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'J' (file prenex.i, line 29):
+Goal Preservation of Invariant 'J' ("prenex.i", line 29, characters 25-36):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'PJ' (file prenex.i, line 31):
+Goal Establishment of Invariant 'PJ' ("prenex.i", lines 31-32):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'PJ' (file prenex.i, line 31):
+Goal Preservation of Invariant 'PJ' ("prenex.i", lines 31-32):
 Let x = Mint_0[shift_sint32(p, i)].
 Let x_1 = Mint_0[shift_sint32(q, j)].
 Assume {
@@ -163,38 +163,38 @@ Prove: x < Mint_0[shift_sint32(q, i_1)].
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file prenex.i, line 24) (1/2):
+Goal Loop assigns ("prenex.i", line 24, characters 18-19) (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file prenex.i, line 24) (2/2):
+Goal Loop assigns ("prenex.i", line 24, characters 18-19) (2/2):
 Effect at line 36
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file prenex.i, line 33):
+Goal Loop assigns ("prenex.i", line 33, characters 20-21):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file prenex.i, line 27):
+Goal Positivity of Loop variant at loop ("prenex.i", lines 27-37):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file prenex.i, line 27):
+Goal Decreasing of Loop variant at loop ("prenex.i", lines 27-37):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file prenex.i, line 36):
+Goal Positivity of Loop variant at loop ("prenex.i", lines 36-37):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file prenex.i, line 36):
+Goal Decreasing of Loop variant at loop ("prenex.i", lines 36-37):
 Prove: true.
 
 ------------------------------------------------------------

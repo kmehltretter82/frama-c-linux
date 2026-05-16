@@ -51,22 +51,22 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file caveat2.i, line 21):
+Goal Establishment of Invariant ("caveat2.i", line 21, characters 20-31):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file caveat2.i, line 21):
+Goal Preservation of Invariant ("caveat2.i", line 21, characters 20-31):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file caveat2.i, line 22):
+Goal Establishment of Invariant ("caveat2.i", line 22, characters 20-69):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file caveat2.i, line 22):
+Goal Preservation of Invariant ("caveat2.i", line 22, characters 20-69):
 Let a = global(G_b_27).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(1 + i).
@@ -90,28 +90,28 @@ Prove: v[i <- Mint_0[shift_sint32(a, i)]][i_1] = Mint_0[shift_sint32(a, i_1)].
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file caveat2.i, line 23):
+Goal Loop assigns ("caveat2.i", line 23, characters 18-19):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file caveat2.i, line 15) in 'job' (1/2):
+Goal Assigns ("caveat2.i", line 15, characters 11-13) in 'job' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file caveat2.i, line 15) in 'job' (2/2):
+Goal Assigns ("caveat2.i", line 15, characters 11-13) in 'job' (2/2):
 Effect at line 26
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file caveat2.i, line 26):
+Goal Positivity of Loop variant at loop ("caveat2.i", line 26, characters 3-46):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file caveat2.i, line 26):
+Goal Decreasing of Loop variant at loop ("caveat2.i", line 26, characters 3-46):
 Prove: true.
 
 ------------------------------------------------------------

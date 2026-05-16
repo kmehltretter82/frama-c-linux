@@ -1,7 +1,7 @@
 [kernel] Parsing line_number.c (with preprocessing)
 [kernel] line_number.c:6: 
   syntax error:
-  Location: line 6, column 25
+  Location: "line_number.c", line 6
         /*@ assert \result == 0;*/
                                 ^
   in code pre-processed from the original source

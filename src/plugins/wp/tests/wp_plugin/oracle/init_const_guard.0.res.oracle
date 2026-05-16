@@ -63,13 +63,13 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'Read' (file init_const_guard.i, line 31):
+Goal Assertion 'Read' ("init_const_guard.i", line 31, characters 20-34):
 Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: valid_rd(Malloc_0, global(G_x_21), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'Guard_against_Const' (file init_const_guard.i, line 32):
+Goal Assertion 'Guard_against_Const' ("init_const_guard.i", line 32, characters 36-46):
 Let a = global(G_x_21).
 Assume {
   (* Heap *)

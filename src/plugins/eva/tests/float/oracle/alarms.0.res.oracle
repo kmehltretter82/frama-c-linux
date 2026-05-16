@@ -12,7 +12,7 @@
   rand ∈ [--..--]
 [eva:progress] 
   computing for function main1 <- main.
-  Called from alarms.i:70.
+  Called from alarms.i:70:3-11.
 [eva:alarm] alarms.i:16: Warning: 
   non-finite float value. assert \is_finite(u1.f);
 [eva:alarm] alarms.i:18: Warning: 
@@ -43,7 +43,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function fd <- main1 <- main.
-  Called from alarms.i:21.
+  Called from alarms.i:21:14-18.
 [eva] using specification for function fd
 [eva:progress] Done for function fd
 [eva:alarm] alarms.i:21: Warning: 
@@ -54,7 +54,7 @@
                           (tmp from fd())
 [eva:progress] 
   computing for function fd <- main1 <- main.
-  Called from alarms.i:22.
+  Called from alarms.i:22:15-19.
 [eva:progress] Done for function fd
 [eva:alarm] alarms.i:23: Warning: 
   non-finite double value. assert \is_finite(vd);
@@ -72,7 +72,7 @@
   assert vf < 9223372036854775808;
 [eva:progress] 
   computing for function fd <- main1 <- main.
-  Called from alarms.i:25.
+  Called from alarms.i:25:8-12.
 [eva:progress] Done for function fd
 [eva:alarm] alarms.i:26: Warning: 
   non-finite double value. assert \is_finite(vd);
@@ -80,7 +80,7 @@
 [eva:progress] Done for function main1
 [eva:progress] 
   computing for function main2 <- main.
-  Called from alarms.i:71.
+  Called from alarms.i:71:3-10.
 [eva:alarm] alarms.i:38: Warning: 
   non-finite double value.
   assert \is_finite(\div_double((double)1., (double)0.));
@@ -101,16 +101,16 @@
 [eva:progress] Done for function main2
 [eva:progress] 
   computing for function main3 <- main.
-  Called from alarms.i:72.
+  Called from alarms.i:72:3-10.
 [eva:progress] 
   computing for function fd <- main3 <- main.
-  Called from alarms.i:64.
+  Called from alarms.i:64:14-18.
 [eva:progress] Done for function fd
 [eva:alarm] alarms.i:65: Warning: 
   non-finite double value. assert \is_finite(d_0);
 [eva:progress] 
   computing for function fabs <- main3 <- main.
-  Called from alarms.i:65.
+  Called from alarms.i:65:14-21.
 [eva:progress] Recording results for fabs
 [eva:progress] Done for function fabs
 [eva:progress] Recording results for main3

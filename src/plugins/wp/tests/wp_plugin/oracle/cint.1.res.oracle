@@ -25,7 +25,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file cint.i, line 24) in 'signed_bitwise':
+Goal Post-condition ("cint.i", line 24, characters 13-25) in 'signed_bitwise':
 Let x = lnot(a). Assume { Type: is_sint32(a) /\ is_sint32(x). }
 Prove: P_R(x, a).
 
@@ -46,7 +46,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file cint.i, line 30) in 'signed_downcast':
+Goal Post-condition ("cint.i", line 30, characters 13-25) in 'signed_downcast':
 Assume { Type: is_sint32(a). }
 Prove: P_R(to_sint16(a), a).
 
@@ -67,7 +67,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file cint.i, line 36) in 'signed_overflow':
+Goal Post-condition ("cint.i", line 36, characters 13-27) in 'signed_overflow':
 Let x = a + b. Assume { Type: is_sint32(a) /\ is_sint32(b). }
 Prove: P_R(to_sint32(x), x).
 
@@ -88,7 +88,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file cint.i, line 42) in 'unsigned_bitwise':
+Goal Post-condition ("cint.i", line 42, characters 13-25) in 'unsigned_bitwise':
 Assume { Type: is_uint32(a). }
 Prove: P_R(to_uint32(lnot(a)), a).
 
@@ -109,7 +109,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file cint.i, line 48) in 'unsigned_downcast':
+Goal Post-condition ("cint.i", line 48, characters 13-25) in 'unsigned_downcast':
 Assume { Type: is_sint32(a). }
 Prove: P_R(to_uint32(a), a).
 
@@ -130,7 +130,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file cint.i, line 54) in 'unsigned_overflow':
+Goal Post-condition ("cint.i", line 54, characters 13-27) in 'unsigned_overflow':
 Let x = a + b. Assume { Type: is_uint32(a) /\ is_uint32(b). }
 Prove: P_R(to_uint32(x), x).
 

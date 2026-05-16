@@ -18,7 +18,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check (file assumes_labels.i, line 15):
+Goal Check ("assumes_labels.i", line 15, characters 13-19):
 Prove: true.
 
 ------------------------------------------------------------
@@ -38,7 +38,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file assumes_labels.i, line 3) in 'foo':
+Goal Assigns ("assumes_labels.i", line 3, characters 13-14) in 'foo':
 Prove: true.
 
 ------------------------------------------------------------
@@ -46,7 +46,7 @@ Prove: true.
   Function foo with behavior b1
 ------------------------------------------------------------
 
-Goal Post-condition for 'b1' (file assumes_labels.i, line 6) in 'foo':
+Goal Post-condition for 'b1' ("assumes_labels.i", line 6, characters 15-21) in 'foo':
 Prove: true.
 
 ------------------------------------------------------------

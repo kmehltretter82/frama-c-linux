@@ -93,7 +93,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file assigns_range.i, line 8) in 'assigns_t1_an_element'' in 'call_assigns_all' at call 'assigns_t1_an_element' (file assigns_range.i, line 37)
+Goal Instance of 'Pre-condition ("assigns_range.i", line 8, characters 14-24) in 'assigns_t1_an_element'' in 'call_assigns_all' at call 'assigns_t1_an_element' ("assigns_range.i", line 37, characters 3-27)
 :
 Assume {
   Type: is_sint32(i) /\ is_sint32(j).
@@ -104,19 +104,19 @@ Prove: i <= 19.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file assigns_range.i, line 13) in 'assigns_t2_bound'' in 'call_assigns_all' at call 'assigns_t2_bound' (file assigns_range.i, line 38)
+Goal Instance of 'Pre-condition ("assigns_range.i", line 13, characters 14-40) in 'assigns_t2_bound'' in 'call_assigns_all' at call 'assigns_t2_bound' ("assigns_range.i", line 38, characters 3-24)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file assigns_range.i, line 18) in 'assigns_t3_inf_bound'' in 'call_assigns_all' at call 'assigns_t3_inf_bound' (file assigns_range.i, line 39)
+Goal Instance of 'Pre-condition ("assigns_range.i", line 18, characters 14-25) in 'assigns_t3_inf_bound'' in 'call_assigns_all' at call 'assigns_t3_inf_bound' ("assigns_range.i", line 39, characters 3-26)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file assigns_range.i, line 23) in 'assigns_t4_sup_bound'' in 'call_assigns_all' at call 'assigns_t4_sup_bound' (file assigns_range.i, line 40)
+Goal Instance of 'Pre-condition ("assigns_range.i", line 23, characters 14-24) in 'assigns_t4_sup_bound'' in 'call_assigns_all' at call 'assigns_t4_sup_bound' ("assigns_range.i", line 40, characters 3-26)
 :
 Prove: true.
 
@@ -154,7 +154,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file assigns_range.i, line 8) in 'assigns_t1_an_element'' in 'call_assigns_t1' at call 'assigns_t1_an_element' (file assigns_range.i, line 49)
+Goal Instance of 'Pre-condition ("assigns_range.i", line 8, characters 14-24) in 'assigns_t1_an_element'' in 'call_assigns_t1' at call 'assigns_t1_an_element' ("assigns_range.i", line 49, characters 3-27)
 :
 Assume { Type: is_sint32(i). (* Pre-condition *) Have: (5 <= i) /\ (i <= 7).
 }
@@ -201,7 +201,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file assigns_range.i, line 13) in 'assigns_t2_bound'' in 'call_assigns_t2' at call 'assigns_t2_bound' (file assigns_range.i, line 57)
+Goal Instance of 'Pre-condition ("assigns_range.i", line 13, characters 14-40) in 'assigns_t2_bound'' in 'call_assigns_t2' at call 'assigns_t2_bound' ("assigns_range.i", line 57, characters 3-26)
 :
 Assume { Type: is_sint32(i). (* Pre-condition *) Have: (5 <= i) /\ (i <= 7).
 }
@@ -246,7 +246,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file assigns_range.i, line 23) in 'assigns_t4_sup_bound'' in 'call_assigns_t4' at call 'assigns_t4_sup_bound' (file assigns_range.i, line 65)
+Goal Instance of 'Pre-condition ("assigns_range.i", line 23, characters 14-24) in 'assigns_t4_sup_bound'' in 'call_assigns_t4' at call 'assigns_t4_sup_bound' ("assigns_range.i", line 65, characters 3-26)
 :
 Prove: true.
 

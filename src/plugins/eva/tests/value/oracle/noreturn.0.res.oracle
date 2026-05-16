@@ -6,17 +6,17 @@
   v ∈ [--..--]
 [eva:progress] 
   computing for function warn_may_never_end <- main.
-  Called from noreturn.i:26.
+  Called from noreturn.i:26:10-32.
 [eva:progress] Recording results for warn_may_never_end
 [eva:progress] Done for function warn_may_never_end
 [eva:progress] 
   computing for function warn_may_never_end <- main.
-  Called from noreturn.i:27.
+  Called from noreturn.i:27:10-32.
 [eva:progress] Recording results for warn_may_never_end
 [eva:progress] Done for function warn_may_never_end
 [eva:progress] 
   computing for function warn_never_ends <- main.
-  Called from noreturn.i:28.
+  Called from noreturn.i:28:10-28.
 [eva:progress] Recording results for warn_never_ends
 [eva:progress] Done for function warn_never_ends
 [kernel:annot:missing-spec] noreturn.i:29: Warning: 
@@ -24,7 +24,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function stop <- main.
-  Called from noreturn.i:29.
+  Called from noreturn.i:29:10-16.
 [eva] using specification for function stop
 [eva:progress] Done for function stop
 [kernel:annot:missing-spec] noreturn.i:30: Warning: 
@@ -32,24 +32,24 @@
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function haltme <- main.
-  Called from noreturn.i:30.
+  Called from noreturn.i:30:14-23.
 [eva] using specification for function haltme
 [eva:progress] Done for function haltme
 [eva:progress] 
   computing for function never_ends <- main.
-  Called from noreturn.i:31.
+  Called from noreturn.i:31:10-23.
 [eva:progress] Recording results for never_ends
 [eva:progress] Done for function never_ends
 [eva:progress] 
   computing for function should_never_end <- main.
-  Called from noreturn.i:32.
+  Called from noreturn.i:32:10-30.
 [eva:progress] Recording results for should_never_end
 [eva] noreturn.i:32: Warning: 
   function should_never_end may terminate but has the noreturn attribute
 [eva:progress] Done for function should_never_end
 [eva:progress] 
   computing for function should_never_end <- main.
-  Called from noreturn.i:33.
+  Called from noreturn.i:33:10-30.
 [eva:progress] Recording results for should_never_end
 [eva:progress] Done for function should_never_end
 [eva:progress] Recording results for main

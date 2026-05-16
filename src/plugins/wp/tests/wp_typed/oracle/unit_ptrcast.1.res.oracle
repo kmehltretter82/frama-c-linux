@@ -28,7 +28,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'ko' (file unit_ptrcast.c, line 8):
+Goal Assertion 'ko' ("unit_ptrcast.c", line 8):
 Assume { (* Heap *) Type: region(m.base) <= 0. }
 Prove: 0 <= to_sint64(int_of_addr(m)).
 

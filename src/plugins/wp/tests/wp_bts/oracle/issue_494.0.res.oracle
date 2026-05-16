@@ -14,7 +14,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file issue_494.i, line 4) in 'f':
+Goal Post-condition ("issue_494.i", line 4, characters 11-25) in 'f':
 Let x = Mint_0[p].
 Let x_1 = 1 + x.
 Assume {
@@ -45,7 +45,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'Wrong' (file issue_494.i, line 10):
+Goal Assertion 'Wrong' ("issue_494.i", line 10, characters 20-26):
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1).
   (* Call 'f' *)
@@ -68,7 +68,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'Wrong' (file issue_494.i, line 16):
+Goal Assertion 'Wrong' ("issue_494.i", line 16, characters 20-26):
 Assume {
   Type: is_sint32(y) /\ is_sint32(y_1).
   (* Call 'f' *)

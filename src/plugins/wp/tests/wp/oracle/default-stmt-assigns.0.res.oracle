@@ -22,7 +22,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file default-stmt-assigns.i, line 3):
+Goal Assertion ("default-stmt-assigns.i", line 3, characters 14-20):
 Prove: false.
 
 ------------------------------------------------------------

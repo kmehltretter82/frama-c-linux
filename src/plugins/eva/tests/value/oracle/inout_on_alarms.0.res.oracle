@@ -10,7 +10,7 @@
   c ∈ [--..--]
 [eva:progress] 
   computing for function f <- main.
-  Called from inout_on_alarms.i:37.
+  Called from inout_on_alarms.i:37:5-8.
 [eva:alarm] inout_on_alarms.i:17: Warning: 
   accessing out of bounds index. assert p->i < 10;
 [eva] inout_on_alarms.i:17: Warning: 
@@ -19,7 +19,7 @@
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from inout_on_alarms.i:40.
+  Called from inout_on_alarms.i:40:5-8.
 [eva:alarm] inout_on_alarms.i:21: Warning: 
   accessing out of bounds index. assert i < 10;
 [eva] inout_on_alarms.i:21: Warning: 
@@ -28,7 +28,7 @@
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function h <- main.
-  Called from inout_on_alarms.i:44.
+  Called from inout_on_alarms.i:44:5-10.
 [eva:alarm] inout_on_alarms.i:26: Warning: 
   accessing uninitialized left-value. assert \initialized(q);
 [eva:progress] Recording results for h

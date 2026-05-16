@@ -81,12 +81,12 @@
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f_int <- main.
-  Called from library.i:30.
+  Called from library.i:30:8-16.
 [eva] using specification for function f_int
 [eva:progress] Done for function f_int
 [eva:progress] 
   computing for function f_star_int <- main.
-  Called from library.i:31.
+  Called from library.i:31:8-21.
 [eva] using specification for function f_star_int
 [eva:garbled-mix:assigns] library.i:31: 
   The specification of function f_star_int
@@ -105,7 +105,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function gen <- main.
-  Called from library.i:37.
+  Called from library.i:37:12-17.
 [eva] using specification for function gen
 [eva:progress] Done for function gen
 [eva:alarm] library.i:38: Warning: 
@@ -116,7 +116,7 @@
   pointer to function with incompatible type. assert \valid_function(h);
 [eva:progress] 
   computing for function i <- main.
-  Called from library.i:41.
+  Called from library.i:41:15-18.
 [eva] using specification for function i
 [eva:garbled-mix:assigns] library.i:41: 
   The specification of function i has generated a garbled mix of addresses
@@ -135,7 +135,7 @@
   non-finite float value. assert \is_finite(\add_float(*pf, *pf));
 [eva:progress] 
   computing for function k <- main.
-  Called from library.i:45.
+  Called from library.i:45:16-19.
 [eva] using specification for function k
 [eva:garbled-mix:assigns] library.i:45: 
   The specification of function k has generated a garbled mix of addresses
@@ -148,13 +148,13 @@
 [eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    library.i:31: assigns clause on addresses
+    library.i:31:8-21: assigns clause on addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{S_gpi}
-    library.i:41: assigns clause on addresses
+    library.i:41:15-18: assigns clause on addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{S_gpf}
-    library.i:45: assigns clause on addresses
+    library.i:45:16-19: assigns clause on addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{S_gpd}
 [eva] library.i:38: assertion 'Eva,function_pointer' got final status invalid.

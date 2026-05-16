@@ -1,7 +1,7 @@
 [kernel] Parsing c23-align-kw.c (with preprocessing)
 [kernel] c23-align-kw.c:14: 
   syntax error:
-  Location: line 14, between columns 14 and 15, before or at token: =
+  Location: "c23-align-kw.c", line 14, before or at token: =
   12    #endif
   13    #ifdef ALIGNAS
   14      int alignas = 42;

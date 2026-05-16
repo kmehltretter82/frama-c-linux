@@ -61,7 +61,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file unit_alloc.i, line 33) in 'h':
+Goal Post-condition ("unit_alloc.i", line 33, characters 13-29) in 'h':
 Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: !valid_rw(Malloc_0[P_x_41 <- 0], global(P_x_41), 1).
 
@@ -88,23 +88,23 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file unit_alloc.i, line 15):
+Goal Assertion ("unit_alloc.i", line 15, characters 14-24):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file unit_alloc.i, line 21):
+Goal Assertion ("unit_alloc.i", line 21, characters 16-25):
 Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: valid_rw(Malloc_0[L_y_26 <- 1], global(L_y_26), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion (file unit_alloc.i, line 22):
+Goal Assertion ("unit_alloc.i", line 22, characters 17-27):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file unit_alloc.i, line 24):
+Goal Assertion ("unit_alloc.i", line 24, characters 14-24):
 Let a = global(L_y_26).
 Assume {
   (* Heap *)

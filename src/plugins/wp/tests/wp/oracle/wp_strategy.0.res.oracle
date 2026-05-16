@@ -47,13 +47,13 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'qed_ko,ko1' (file wp_strategy.c, line 27):
+Goal Assertion 'qed_ko,ko1' ("wp_strategy.c", line 27):
 Assume { Type: is_sint32(x). }
 Prove: 0 < x.
 
 ------------------------------------------------------------
 
-Goal Assertion 'qed_ok,ok' (file wp_strategy.c, line 28):
+Goal Assertion 'qed_ok,ok' ("wp_strategy.c", line 28):
 Prove: true.
 
 ------------------------------------------------------------

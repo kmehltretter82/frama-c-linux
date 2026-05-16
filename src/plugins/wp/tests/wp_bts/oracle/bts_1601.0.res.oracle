@@ -20,7 +20,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file bts_1601.c, line 72):
+Goal Assertion ("bts_1601.c", line 72):
 Assume {
   Type: is_uint32(tenumRMode_0).
   (* Residual *)
@@ -32,32 +32,32 @@ Prove: tenumRMode_0 = 1.
 
 ------------------------------------------------------------
 
-Goal Assertion (file bts_1601.c, line 84):
+Goal Assertion ("bts_1601.c", line 84):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file bts_1601.c, line 104):
+Goal Assertion ("bts_1601.c", line 104):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file bts_1601.c, line 136):
+Goal Assertion ("bts_1601.c", line 136):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file bts_1601.c, line 147):
+Goal Assertion ("bts_1601.c", line 147):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file bts_1601.c, line 153):
+Goal Assertion ("bts_1601.c", line 153):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file bts_1601.c, line 157):
+Goal Assertion ("bts_1601.c", line 157):
 Prove: true.
 
 ------------------------------------------------------------
@@ -65,7 +65,7 @@ Prove: true.
   Function foo with behavior basic
 ------------------------------------------------------------
 
-Goal Post-condition for 'basic' (file bts_1601.c, line 46) in 'foo':
+Goal Post-condition for 'basic' ("bts_1601.c", line 46) in 'foo':
 Prove: true.
 
 ------------------------------------------------------------

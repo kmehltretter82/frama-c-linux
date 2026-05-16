@@ -28,7 +28,7 @@
 [eva:progress] Done for function semget
 [eva:progress] 
   computing for function semget <- main.
-  Called from sys_sem_h.c:28.
+  Called from sys_sem_h.c:28-29.
 [eva:progress] Done for function semget
 [eva:progress] 
   computing for function semctl <- main.

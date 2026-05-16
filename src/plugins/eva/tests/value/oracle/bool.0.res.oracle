@@ -6,7 +6,7 @@
   rand ∈ [--..--]
 [eva:progress] 
   computing for function valid_bool <- main.
-  Called from bool.i:71.
+  Called from bool.i:71:3-16.
 [eva:show] bool.i:12: Frama_C_show_each: {0}
 [eva:show] bool.i:14: Frama_C_show_each: {1}
 [eva:show] bool.i:16: Frama_C_show_each: {1}, {2}
@@ -21,7 +21,7 @@
 [eva:progress] Done for function valid_bool
 [eva:progress] 
   computing for function invalid_bool <- main.
-  Called from bool.i:72.
+  Called from bool.i:72:3-18.
 [eva:alarm] bool.i:43: Warning: 
   trap representation of a _Bool lvalue. assert ub.b ≡ 0 ∨ ub.b ≡ 1;
 [eva:show] bool.i:46: Frama_C_show_each_zero: {0}

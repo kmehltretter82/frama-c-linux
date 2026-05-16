@@ -16,7 +16,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file float_sign.i, line 5) in 'd':
+Goal Post-condition ("float_sign.i", line 5, characters 13-46) in 'd':
 Prove: P_is_same_sign_d(d, d).
 
 ------------------------------------------------------------
@@ -36,7 +36,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file float_sign.i, line 10) in 'f':
+Goal Post-condition ("float_sign.i", line 10, characters 13-46) in 'f':
 Prove: P_is_same_sign_f(f, f).
 
 ------------------------------------------------------------

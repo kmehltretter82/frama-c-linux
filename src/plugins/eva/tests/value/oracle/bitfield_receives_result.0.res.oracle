@@ -6,7 +6,7 @@
   s ∈ {0}
 [eva:progress] 
   computing for function f <- main.
-  Called from bitfield_receives_result.i:9.
+  Called from bitfield_receives_result.i:9:9-12.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:show] bitfield_receives_result.i:10: 

@@ -8,7 +8,7 @@
 [wp] 2 goals scheduled
 [wp] [Valid] typed_function_loop_invariant_X_established (Qed)
 [wp:script:allgoals] 
-  Goal Preservation of Invariant 'X' (file induction_typing.i, line 42):
+  Goal Preservation of Invariant 'X' ("induction_typing.i", line 42, characters 21-68):
   Let a = L_list(LIST_0).
   Let a_1 = a ^ [ 1 ].
   Let x = 1 + i.

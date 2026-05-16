@@ -14,7 +14,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file switch.i, line 12) in 'f' (1/3):
+Goal Post-condition ("switch.i", line 12, characters 13-23) in 'f' (1/3):
 Tags: Default.
 Assume {
   Type: is_sint32(x).
@@ -25,13 +25,13 @@ Prove: P_P(30).
 
 ------------------------------------------------------------
 
-Goal Post-condition (file switch.i, line 12) in 'f' (2/3):
+Goal Post-condition ("switch.i", line 12, characters 13-23) in 'f' (2/3):
 Tags: Case 3.
 Prove: P_P(20).
 
 ------------------------------------------------------------
 
-Goal Post-condition (file switch.i, line 12) in 'f' (3/3):
+Goal Post-condition ("switch.i", line 12, characters 13-23) in 'f' (3/3):
 Tags: Cases 0,1,2.
 Assume {
   Type: is_sint32(x).

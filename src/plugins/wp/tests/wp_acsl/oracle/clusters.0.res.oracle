@@ -34,7 +34,7 @@ Prove: true.
   Function fp
 ------------------------------------------------------------
 
-Goal Call point function in 'fp' at instruction (file clusters.i, line 63):
+Goal Call point function in 'fp' at instruction ("clusters.i", line 63, characters 6-16):
 Prove: true.
 
 ------------------------------------------------------------
@@ -76,7 +76,7 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file clusters.i, line 59) in 'fp'' in 'function' at call 'fp' (file clusters.i, line 55)
+Goal Instance of 'Pre-condition ("clusters.i", line 59, characters 14-29) in 'fp'' in 'function' at call 'fp' ("clusters.i", line 55, characters 9-27)
 :
 Prove: true.
 
@@ -118,13 +118,13 @@ Prove: false.
   Function no_decr_ok_term
 ------------------------------------------------------------
 
-Goal Termination-condition (file clusters.i, line 68) in 'no_decr_ok_term' (1/2):
+Goal Termination-condition ("clusters.i", line 68, characters 16-21) in 'no_decr_ok_term' (1/2):
 Call terminates at line 71
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Termination-condition (file clusters.i, line 68) in 'no_decr_ok_term' (2/2):
+Goal Termination-condition ("clusters.i", line 68, characters 16-21) in 'no_decr_ok_term' (2/2):
 Call terminates (missing decreases) at line 71
 Prove: true.
 

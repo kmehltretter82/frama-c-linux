@@ -13,10 +13,10 @@
 ---
 > [eva:alarm] loopinv.c:69: Warning: loop invariant got status unknown.
 155,156d152
-< [    -    ] Assertion 'Eva,signed_overflow' (file loopinv.c, line 45)
+< [    -    ] Assertion 'Eva,signed_overflow' ("loopinv.c", line 45)
 <             tried with Eva.
 173,174d168
-< [    -    ] Assertion 'Eva,signed_overflow' (file loopinv.c, line 73)
+< [    -    ] Assertion 'Eva,signed_overflow' ("loopinv.c", line 73)
 <             tried with Eva.
 180,181c174,175
 <      7 To be validated

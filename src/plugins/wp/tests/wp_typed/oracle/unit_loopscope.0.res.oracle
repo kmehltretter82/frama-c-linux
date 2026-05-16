@@ -22,7 +22,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file unit_loopscope.i, line 13):
+Goal Establishment of Invariant ("unit_loopscope.i", line 13, characters 21-27):
 Assume {
   (* Heap *)
   Type: (region(written_0.base) <= 0) /\ linked(Malloc_0).
@@ -33,17 +33,17 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file unit_loopscope.i, line 13):
+Goal Preservation of Invariant ("unit_loopscope.i", line 13, characters 21-27):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file unit_loopscope.i, line 16):
+Goal Positivity of Loop variant at loop ("unit_loopscope.i", lines 16-18):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file unit_loopscope.i, line 16):
+Goal Decreasing of Loop variant at loop ("unit_loopscope.i", lines 16-18):
 Prove: true.
 
 ------------------------------------------------------------

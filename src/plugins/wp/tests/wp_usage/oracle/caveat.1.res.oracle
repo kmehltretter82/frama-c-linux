@@ -26,17 +26,17 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file caveat.i, line 28) in 'explicit':
+Goal Post-condition ("caveat.i", line 28, characters 11-31) in 'explicit':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file caveat.i, line 29) in 'explicit':
+Goal Post-condition ("caveat.i", line 29, characters 11-31) in 'explicit':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file caveat.i, line 30) in 'explicit':
+Goal Post-condition ("caveat.i", line 30, characters 11-34) in 'explicit':
 Prove: true.
 
 ------------------------------------------------------------
@@ -56,17 +56,17 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file caveat.i, line 13) in 'implicit':
+Goal Post-condition ("caveat.i", line 13, characters 11-31) in 'implicit':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file caveat.i, line 14) in 'implicit':
+Goal Post-condition ("caveat.i", line 14, characters 11-31) in 'implicit':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file caveat.i, line 15) in 'implicit':
+Goal Post-condition ("caveat.i", line 15, characters 11-34) in 'implicit':
 Prove: true.
 
 ------------------------------------------------------------

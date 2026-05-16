@@ -32,13 +32,13 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition 'HP,ok' in 'val_assigns_p'' in 'test' at call 'val_assigns_p' (file range.i, line 32)
+Goal Instance of 'Pre-condition 'HP,ok' in 'val_assigns_p'' in 'test' at call 'val_assigns_p' ("range.i", line 32, characters 3-23)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition 'HQ,ok' in 'val_assigns_q'' in 'test' at call 'val_assigns_q' (file range.i, line 33)
+Goal Instance of 'Pre-condition 'HQ,ok' in 'val_assigns_q'' in 'test' at call 'val_assigns_q' ("range.i", line 33, characters 3-23)
 :
 Prove: true.
 

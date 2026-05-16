@@ -1,7 +1,7 @@
 [kernel] Parsing errorloc-inclusion.c (with preprocessing)
 [kernel] errorloc-inclusion-c.h:4: 
   syntax error:
-  Location: line 4, between columns 10 and 11,
+  Location: "errorloc-inclusion-c.h", line 4,
             included from errorloc-inclusion-b.h:1,
             included from errorloc-inclusion.c:8,
             before or at token: ;

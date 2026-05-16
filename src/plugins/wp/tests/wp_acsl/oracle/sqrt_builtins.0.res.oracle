@@ -22,7 +22,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'KO' (file sqrt_builtins.i, line 25):
+Goal Assertion 'KO' ("sqrt_builtins.i", line 25, characters 18-24):
 Assume { (* Call 'sqrt' *) Have: .0 <= of_f64(sqrt_f64(q)). }
 Prove: false.
 
@@ -41,7 +41,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'KO' (file sqrt_builtins.i, line 16):
+Goal Assertion 'KO' ("sqrt_builtins.i", line 16, characters 18-24):
 Assume { (* Call 'sqrtf' *) Have: .0 <= of_f32(sqrt_f32(q)). }
 Prove: false.
 

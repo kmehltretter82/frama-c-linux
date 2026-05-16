@@ -14,7 +14,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file issue_801.i, line 5) in 'LoopCurrent':
+Goal Post-condition ("issue_801.i", line 5, characters 11-17) in 'LoopCurrent':
 Prove: true.
 
 ------------------------------------------------------------
@@ -25,28 +25,28 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'A' (file issue_801.i, line 11):
+Goal Establishment of Invariant 'A' ("issue_801.i", line 11, characters 23-46):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'A' (file issue_801.i, line 11):
+Goal Preservation of Invariant 'A' ("issue_801.i", line 11, characters 23-46):
 Assume { Type: is_sint32(s). (* Then *) Have: s <= 9. }
 Prove: false.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file issue_801.i, line 10):
+Goal Loop assigns ("issue_801.i", line 10, characters 18-19):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file issue_801.i, line 14):
+Goal Positivity of Loop variant at loop ("issue_801.i", lines 14-17):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file issue_801.i, line 14):
+Goal Decreasing of Loop variant at loop ("issue_801.i", lines 14-17):
 Prove: true.
 
 ------------------------------------------------------------

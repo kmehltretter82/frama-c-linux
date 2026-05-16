@@ -20,7 +20,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file bug_9.c, line 14):
+Goal Assertion ("bug_9.c", line 14):
 Prove: true.
 
 ------------------------------------------------------------

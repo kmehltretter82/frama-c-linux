@@ -11,5 +11,5 @@
   };
   
   First declaration was at alignas_typing_constrains.c:334
-  Current declaration is at alignas_typing_constrains_companion.c:17
+  Current declaration is at alignas_typing_constrains_companion.c:17-19
 [kernel] Frama-C aborted: invalid user input.

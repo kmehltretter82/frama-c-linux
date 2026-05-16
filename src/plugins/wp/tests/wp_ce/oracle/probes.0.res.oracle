@@ -14,7 +14,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file probes.i, line 12) in 'get':
+Goal Post-condition ("probes.i", line 12, characters 13-19) in 'get':
 Let x = -i_2.
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1) /\ is_sint32(i_2) /\ is_sint32(i_3) /\

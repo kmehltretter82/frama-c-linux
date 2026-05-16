@@ -7,30 +7,30 @@
   b ∈ {0}
 [eva:progress] 
   computing for function main <- main_all.
-  Called from dead_inout.i:40.
+  Called from dead_inout.i:40:3-9.
 [eva:progress] 
   computing for function f <- main <- main_all.
-  Called from dead_inout.i:18.
+  Called from dead_inout.i:18:3-7.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main <- main_all.
-  Called from dead_inout.i:19.
+  Called from dead_inout.i:19:3-7.
 [eva:progress] Recording results for g
 [eva:progress] Done for function g
 [eva:progress] Recording results for main
 [eva:progress] Done for function main
 [eva:progress] 
   computing for function main2 <- main_all.
-  Called from dead_inout.i:41.
+  Called from dead_inout.i:41:3-10.
 [eva:progress] 
   computing for function f2 <- main2 <- main_all.
-  Called from dead_inout.i:33.
+  Called from dead_inout.i:33:3-16.
 [eva:progress] Recording results for f2
 [eva:progress] Done for function f2
 [eva:progress] 
   computing for function f2 <- main2 <- main_all.
-  Called from dead_inout.i:34.
+  Called from dead_inout.i:34:3-16.
 [eva:progress] Recording results for f2
 [eva:progress] Done for function f2
 [eva:progress] Recording results for main2

@@ -19,12 +19,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file assign_array.i, line 11) in 'jobA':
+Goal Assigns ("assign_array.i", line 11, characters 13-17) in 'jobA':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file assign_array.i, line 11) in 'jobA':
+Goal Assigns ("assign_array.i", line 11, characters 13-17) in 'jobA':
 Prove: true.
 
 ------------------------------------------------------------
@@ -42,12 +42,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file assign_array.i, line 19) in 'jobG':
+Goal Assigns ("assign_array.i", line 19, characters 13-14) in 'jobG':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file assign_array.i, line 19) in 'jobG':
+Goal Assigns ("assign_array.i", line 19, characters 13-14) in 'jobG':
 Prove: true.
 
 ------------------------------------------------------------

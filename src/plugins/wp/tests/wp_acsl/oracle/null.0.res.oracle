@@ -47,7 +47,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file null.i, line 2) in 'null_is_zero':
+Goal Post-condition ("null.i", line 2, characters 13-25) in 'null_is_zero':
 Prove: true.
 
 ------------------------------------------------------------

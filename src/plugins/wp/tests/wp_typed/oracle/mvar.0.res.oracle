@@ -14,7 +14,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file mvar.i, line 12) in 'Job':
+Goal Post-condition ("mvar.i", line 12, characters 11-24) in 'Job':
 Assume {
   (* Heap *)
   Type: IsArray_sint8(A).

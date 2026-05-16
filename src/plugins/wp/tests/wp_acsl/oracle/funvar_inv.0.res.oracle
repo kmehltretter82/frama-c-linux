@@ -69,12 +69,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file funvar_inv.i, line 32):
+Goal Positivity of Loop variant at loop ("funvar_inv.i", line 32, characters 3-33):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file funvar_inv.i, line 32):
+Goal Decreasing of Loop variant at loop ("funvar_inv.i", line 32, characters 3-33):
 Prove: true.
 
 ------------------------------------------------------------
@@ -133,12 +133,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file funvar_inv.i, line 48):
+Goal Positivity of Loop variant at loop ("funvar_inv.i", line 48, characters 3-43):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file funvar_inv.i, line 48):
+Goal Decreasing of Loop variant at loop ("funvar_inv.i", line 48, characters 3-43):
 Let x = G[i].
 Let x_1 = (-4) * i.
 Assume {
@@ -209,12 +209,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file funvar_inv.i, line 65):
+Goal Positivity of Loop variant at loop ("funvar_inv.i", line 65, characters 3-45):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file funvar_inv.i, line 65):
+Goal Decreasing of Loop variant at loop ("funvar_inv.i", line 65, characters 3-45):
 Let x = G[i].
 Let x_1 = (-16) * i.
 Assume {

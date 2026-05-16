@@ -66,7 +66,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'FALSE' (file bts_1586.i, line 32):
+Goal Assertion 'FALSE' ("bts_1586.i", line 32, characters 23-29):
 Tags: Case 0.
 Prove: false.
 
@@ -85,7 +85,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'FALSE' (file bts_1586.i, line 47):
+Goal Assertion 'FALSE' ("bts_1586.i", line 47, characters 23-29):
 Tags: Case 0.
 Prove: false.
 

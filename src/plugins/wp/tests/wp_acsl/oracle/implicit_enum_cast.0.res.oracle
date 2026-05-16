@@ -14,7 +14,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file implicit_enum_cast.i, line 6) in 'bar':
+Goal Post-condition ("implicit_enum_cast.i", line 6, characters 12-43) in 'bar':
 Prove: true.
 
 ------------------------------------------------------------

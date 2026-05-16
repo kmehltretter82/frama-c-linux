@@ -16,7 +16,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file chunk_typing.i, line 15) in 'function':
+Goal Post-condition ("chunk_typing.i", lines 15-19) in 'function':
 Let a = shift_uint64(u64_0, 0).
 Let a_1 = memcpy(Mint_5, a, Mint_undef_5, a, 10).
 Let a_2 = shift_sint64(i64_0, 0).
@@ -105,22 +105,22 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file chunk_typing.i, line 31):
+Goal Establishment of Invariant ("chunk_typing.i", line 31, characters 20-32):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file chunk_typing.i, line 31):
+Goal Preservation of Invariant ("chunk_typing.i", line 31, characters 20-32):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file chunk_typing.i, line 32):
+Goal Establishment of Invariant ("chunk_typing.i", line 32, characters 20-65):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file chunk_typing.i, line 32):
+Goal Preservation of Invariant ("chunk_typing.i", line 32, characters 20-65):
 Let a = shift_uint64(u64_0, i).
 Let a_1 = shift_sint64(i64_0, i).
 Let a_2 = shift_uint32(u32_0, i).
@@ -225,12 +225,12 @@ Prove: a_24[shift_sint8(i8_0, i_1)] = 1.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file chunk_typing.i, line 33):
+Goal Establishment of Invariant ("chunk_typing.i", line 33, characters 20-65):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file chunk_typing.i, line 33):
+Goal Preservation of Invariant ("chunk_typing.i", line 33, characters 20-65):
 Let a = shift_sint8(i8_0, 0).
 Let a_1 = memcpy(Mchar_0, a, Mchar_undef_0, a, 10).
 Let a_2 = shift_sint8(i8_0, i).
@@ -339,12 +339,12 @@ Prove: a_25[shift_uint8(u8_0, i_1)] = 2.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file chunk_typing.i, line 34):
+Goal Establishment of Invariant ("chunk_typing.i", line 34, characters 20-66):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file chunk_typing.i, line 34):
+Goal Preservation of Invariant ("chunk_typing.i", line 34, characters 20-66):
 Let a = shift_uint8(u8_0, 0).
 Let a_1 = memcpy(Mint_6, a, Mint_undef_6, a, 10).
 Let a_2 = shift_uint8(u8_0, i).
@@ -457,12 +457,12 @@ Prove: a_26[shift_sint16(i16_0, i_1)] = 3.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file chunk_typing.i, line 35):
+Goal Establishment of Invariant ("chunk_typing.i", line 35, characters 20-66):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file chunk_typing.i, line 35):
+Goal Preservation of Invariant ("chunk_typing.i", line 35, characters 20-66):
 Let a = shift_sint16(i16_0, 0).
 Let a_1 = memcpy(Mint_1, a, Mint_undef_1, a, 10).
 Let a_2 = shift_sint16(i16_0, i).
@@ -579,12 +579,12 @@ Prove: a_27[shift_uint16(u16_0, i_1)] = 4.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file chunk_typing.i, line 36):
+Goal Establishment of Invariant ("chunk_typing.i", line 36, characters 20-66):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file chunk_typing.i, line 36):
+Goal Preservation of Invariant ("chunk_typing.i", line 36, characters 20-66):
 Let a = shift_uint16(u16_0, 0).
 Let a_1 = memcpy(Mint_3, a, Mint_undef_3, a, 10).
 Let a_2 = shift_uint16(u16_0, i).
@@ -705,12 +705,12 @@ Prove: a_28[shift_sint32(i32_0, i_1)] = 5.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file chunk_typing.i, line 37):
+Goal Establishment of Invariant ("chunk_typing.i", line 37, characters 20-66):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file chunk_typing.i, line 37):
+Goal Preservation of Invariant ("chunk_typing.i", line 37, characters 20-66):
 Let a = shift_sint32(i32_0, 0).
 Let a_1 = memcpy(Mint_2, a, Mint_undef_2, a, 10).
 Let a_2 = shift_sint32(i32_0, i).
@@ -835,12 +835,12 @@ Prove: a_29[shift_uint32(u32_0, i_1)] = 6.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file chunk_typing.i, line 38):
+Goal Establishment of Invariant ("chunk_typing.i", line 38, characters 20-66):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file chunk_typing.i, line 38):
+Goal Preservation of Invariant ("chunk_typing.i", line 38, characters 20-66):
 Let a = shift_uint32(u32_0, 0).
 Let a_1 = memcpy(Mint_4, a, Mint_undef_4, a, 10).
 Let a_2 = shift_uint32(u32_0, i).
@@ -969,12 +969,12 @@ Prove: a_30[shift_sint64(i64_0, i_1)] = 7.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file chunk_typing.i, line 39):
+Goal Establishment of Invariant ("chunk_typing.i", line 39, characters 20-66):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file chunk_typing.i, line 39):
+Goal Preservation of Invariant ("chunk_typing.i", line 39, characters 20-66):
 Let a = shift_sint64(i64_0, 0).
 Let a_1 = memcpy(Mint_3, a, Mint_undef_3, a, 10).
 Let a_2 = shift_sint64(i64_0, i).
@@ -1107,7 +1107,7 @@ Prove: a_31[shift_uint64(u64_0, i_1)] = 8.
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 45):
+Goal Assertion 'rte,mem_access' ("chunk_typing.i", line 45, characters 13-14):
 Let a = shift_uint64(u64_0, 0).
 Let a_1 = memcpy(Mint_5, a, Mint_undef_5, a, 10).
 Let a_2 = shift_sint64(i64_0, 0).
@@ -1176,7 +1176,7 @@ Prove: valid_rw(Malloc_0, shift_sint8(i8_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 46):
+Goal Assertion 'rte,mem_access' ("chunk_typing.i", line 46, characters 13-14):
 Let a = shift_sint8(i8_0, i).
 Let a_1 = shift_uint64(u64_0, 0).
 Let a_2 = memcpy(Mint_5, a_1, Mint_undef_5, a_1, 10).
@@ -1250,7 +1250,7 @@ Prove: valid_rw(Malloc_0, shift_uint8(u8_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 47):
+Goal Assertion 'rte,mem_access' ("chunk_typing.i", line 47, characters 14-15):
 Let a = shift_uint8(u8_0, i).
 Let a_1 = shift_sint8(i8_0, i).
 Let a_2 = shift_uint64(u64_0, 0).
@@ -1327,7 +1327,7 @@ Prove: valid_rw(Malloc_0, shift_sint16(i16_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 48):
+Goal Assertion 'rte,mem_access' ("chunk_typing.i", line 48, characters 14-15):
 Let a = shift_sint16(i16_0, i).
 Let a_1 = shift_uint8(u8_0, i).
 Let a_2 = shift_sint8(i8_0, i).
@@ -1408,7 +1408,7 @@ Prove: valid_rw(Malloc_0, shift_uint16(u16_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 49):
+Goal Assertion 'rte,mem_access' ("chunk_typing.i", line 49, characters 14-15):
 Let a = shift_uint16(u16_0, i).
 Let a_1 = shift_sint16(i16_0, i).
 Let a_2 = shift_uint8(u8_0, i).
@@ -1492,7 +1492,7 @@ Prove: valid_rw(Malloc_0, shift_sint32(i32_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 50):
+Goal Assertion 'rte,mem_access' ("chunk_typing.i", line 50, characters 14-15):
 Let a = shift_sint32(i32_0, i).
 Let a_1 = shift_uint16(u16_0, i).
 Let a_2 = shift_sint16(i16_0, i).
@@ -1580,7 +1580,7 @@ Prove: valid_rw(Malloc_0, shift_uint32(u32_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 51):
+Goal Assertion 'rte,mem_access' ("chunk_typing.i", line 51, characters 14-15):
 Let a = shift_uint32(u32_0, i).
 Let a_1 = shift_sint32(i32_0, i).
 Let a_2 = shift_uint16(u16_0, i).
@@ -1671,7 +1671,7 @@ Prove: valid_rw(Malloc_0, shift_sint64(i64_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file chunk_typing.i, line 52):
+Goal Assertion 'rte,mem_access' ("chunk_typing.i", line 52, characters 14-15):
 Let a = shift_sint64(i64_0, i).
 Let a_1 = shift_uint32(u32_0, i).
 Let a_2 = shift_sint32(i32_0, i).
@@ -1766,70 +1766,70 @@ Prove: valid_rw(Malloc_0, shift_uint64(u64_0, i), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,signed_overflow' (file chunk_typing.i, line 44):
+Goal Assertion 'rte,signed_overflow' ("chunk_typing.i", line 44, characters 27-30):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file chunk_typing.i, line 40) (1/9):
+Goal Loop assigns ("chunk_typing.i", line 40, characters 18-19) (1/9):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file chunk_typing.i, line 40) (2/9):
+Goal Loop assigns ("chunk_typing.i", line 40, characters 18-19) (2/9):
 Effect at line 45
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file chunk_typing.i, line 40) (3/9):
+Goal Loop assigns ("chunk_typing.i", line 40, characters 18-19) (3/9):
 Effect at line 46
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file chunk_typing.i, line 40) (4/9):
+Goal Loop assigns ("chunk_typing.i", line 40, characters 18-19) (4/9):
 Effect at line 47
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file chunk_typing.i, line 40) (5/9):
+Goal Loop assigns ("chunk_typing.i", line 40, characters 18-19) (5/9):
 Effect at line 48
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file chunk_typing.i, line 40) (6/9):
+Goal Loop assigns ("chunk_typing.i", line 40, characters 18-19) (6/9):
 Effect at line 49
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file chunk_typing.i, line 40) (7/9):
+Goal Loop assigns ("chunk_typing.i", line 40, characters 18-19) (7/9):
 Effect at line 50
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file chunk_typing.i, line 40) (8/9):
+Goal Loop assigns ("chunk_typing.i", line 40, characters 18-19) (8/9):
 Effect at line 51
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file chunk_typing.i, line 40) (9/9):
+Goal Loop assigns ("chunk_typing.i", line 40, characters 18-19) (9/9):
 Effect at line 52
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file chunk_typing.i, line 44):
+Goal Positivity of Loop variant at loop ("chunk_typing.i", lines 44-53):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file chunk_typing.i, line 44):
+Goal Decreasing of Loop variant at loop ("chunk_typing.i", lines 44-53):
 Prove: true.
 
 ------------------------------------------------------------

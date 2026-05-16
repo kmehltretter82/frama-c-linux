@@ -24,6 +24,6 @@
 [pdg] computing for function impact
 [pdg] done for function impact
 [impact] impacted statements of stmt(s) 2 are:
-    first.i:12 (sid 5): x = b + c;first.i:13 (sid 6): y = x + e;
-    first.i:17 (sid 9): z = y + f;first.i:18 (sid 10): w = b;
+    first.i:12:9-14 (sid 5): x = b + c;first.i:13:9-14 (sid 6): y = x + e;
+    first.i:17:7-12 (sid 9): z = y + f;first.i:18:7-8 (sid 10): w = b;
 [impact] analysis done

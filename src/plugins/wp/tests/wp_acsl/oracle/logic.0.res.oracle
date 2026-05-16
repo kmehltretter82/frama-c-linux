@@ -38,7 +38,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file logic.i, line 21) in 'h':
+Goal Post-condition ("logic.i", line 21, characters 31-35) in 'h':
 Let a = global(G_t_30).
 Let m = Array_S1(shift_S1(a, 0), 3, Mint_0).
 Let m_1 = Array_S1(a, 3, Mint_0).

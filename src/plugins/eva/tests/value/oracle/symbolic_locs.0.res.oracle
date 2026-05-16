@@ -8,7 +8,7 @@
   u[0..9] ∈ [--..--]
 [eva:progress] 
   computing for function main2_kill_direct <- main.
-  Called from symbolic_locs.i:119.
+  Called from symbolic_locs.i:119:10-29.
 [eva:alarm] symbolic_locs.i:29: Warning: assertion got status unknown.
 [eva:show] symbolic_locs.i:32: 
   Frama_C_dump_each:
@@ -45,7 +45,7 @@
 [eva:progress] Done for function main2_kill_direct
 [eva:progress] 
   computing for function main3_kill_indirect <- main.
-  Called from symbolic_locs.i:120.
+  Called from symbolic_locs.i:120:10-31.
 [eva:alarm] symbolic_locs.i:41: Warning: assertion got status unknown.
 [eva:show] symbolic_locs.i:44: 
   Frama_C_dump_each:
@@ -84,7 +84,7 @@
 [eva:progress] Done for function main3_kill_indirect
 [eva:progress] 
   computing for function main4_scope_right <- main.
-  Called from symbolic_locs.i:121.
+  Called from symbolic_locs.i:121:10-29.
 [eva:alarm] symbolic_locs.i:51: Warning: assertion got status unknown.
 [eva:alarm] symbolic_locs.i:54: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
@@ -129,7 +129,7 @@
 [eva:progress] Done for function main4_scope_right
 [eva:progress] 
   computing for function main5_scope_lv <- main.
-  Called from symbolic_locs.i:122.
+  Called from symbolic_locs.i:122:10-26.
 [eva:alarm] symbolic_locs.i:63: Warning: assertion got status unknown.
 [eva:show] symbolic_locs.i:65: 
   Frama_C_dump_each:
@@ -165,7 +165,7 @@
 [eva:progress] Done for function main5_scope_lv
 [eva:progress] 
   computing for function main6_ghost_dep <- main.
-  Called from symbolic_locs.i:123.
+  Called from symbolic_locs.i:123:10-27.
 [eva:alarm] symbolic_locs.i:83: Warning: assertion got status unknown.
 [eva:alarm] symbolic_locs.i:86: Warning: assertion got status unknown.
 [eva:show] symbolic_locs.i:98: 
@@ -186,7 +186,7 @@
 [eva:progress] Done for function main6_ghost_dep
 [eva:progress] 
   computing for function main7_widening <- main.
-  Called from symbolic_locs.i:124.
+  Called from symbolic_locs.i:124:10-26.
 [eva:partition] symbolic_locs.i:110: starting to merge loop iterations
 [eva:show] symbolic_locs.i:113: Frama_C_show_each: [10001..2147483647]
 [eva:progress] Recording results for main7_widening

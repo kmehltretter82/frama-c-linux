@@ -21,14 +21,14 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file issue-516.c, line 21):
+Goal Assertion ("issue-516.c", line 21):
 Let a = Mptr_0[list_0].
 Assume { (* Heap *) Type: (region(list_0.base) <= 0) /\ framed(Mptr_0). }
 Prove: (a != null) /\ (a = nth(L_to_logic_list(a, null), 0)).
 
 ------------------------------------------------------------
 
-Goal Assertion 'UNROLL' (file issue-516.c, line 23):
+Goal Assertion 'UNROLL' ("issue-516.c", lines 23-24):
 Let a = Mptr_0[list_0].
 Let a_1 = Mptr_0[shiftfield_F1_list_next(a)].
 Assume {

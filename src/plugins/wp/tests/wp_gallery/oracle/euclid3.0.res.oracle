@@ -14,7 +14,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file euclid3.c, line 11) in 'euclid_gcd':
+Goal Post-condition ("euclid3.c", line 11) in 'euclid_gcd':
 Let x = number.Gcd.gcd(a, b).
 Assume {
   Type: is_sint32(a) /\ is_sint32(a_1) /\ is_sint32(a_2) /\ is_sint32(b) /\
@@ -39,12 +39,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant (file euclid3.c, line 19):
+Goal Establishment of Invariant ("euclid3.c", line 19):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant (file euclid3.c, line 19):
+Goal Preservation of Invariant ("euclid3.c", line 19):
 Let x = number.Gcd.gcd(a_2, b).
 Let x_1 = a_1 % a.
 Assume {
@@ -63,7 +63,7 @@ Prove: number.Gcd.gcd(a, x_1) = x.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file euclid3.c, line 18):
+Goal Loop assigns ("euclid3.c", line 18):
 Prove: true.
 
 ------------------------------------------------------------
@@ -86,12 +86,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file euclid3.c, line 22):
+Goal Positivity of Loop variant at loop ("euclid3.c", lines 22-26):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file euclid3.c, line 22):
+Goal Decreasing of Loop variant at loop ("euclid3.c", lines 22-26):
 Let x = a % a_1.
 Let x_1 = number.Gcd.gcd(a_2, b).
 Assume {
@@ -120,7 +120,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file euclid3.c, line 36) in 'minmax_gcd':
+Goal Post-condition ("euclid3.c", line 36) in 'minmax_gcd':
 Let x = number.Gcd.gcd(tmp_0, tmp_0_0).
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(c) /\ is_sint32(d) /\
@@ -215,13 +215,13 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file euclid3.c, line 8) in 'euclid_gcd'' in 'minmax_gcd' at call 'euclid_gcd' (file euclid3.c, line 42)
+Goal Instance of 'Pre-condition ("euclid3.c", line 8) in 'euclid_gcd'' in 'minmax_gcd' at call 'euclid_gcd' ("euclid3.c", line 42)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file euclid3.c, line 9) in 'euclid_gcd'' in 'minmax_gcd' at call 'euclid_gcd' (file euclid3.c, line 42)
+Goal Instance of 'Pre-condition ("euclid3.c", line 9) in 'euclid_gcd'' in 'minmax_gcd' at call 'euclid_gcd' ("euclid3.c", line 42)
 :
 Prove: true.
 

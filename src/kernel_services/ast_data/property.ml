@@ -537,7 +537,7 @@ let rec pretty_ip fmt = function
   | IPReachable {ir_kf=Some kf; ir_kinstr=Kstmt stmt; ir_program_point=ba} ->
     Format.fprintf fmt "reachability %s stmt %a in %a"
       (match ba with Before -> "of" | After -> "post")
-      Fileloc.pretty_line (Cil_datatype.Stmt.loc stmt)
+      Fileloc.pretty (Cil_datatype.Stmt.loc stmt)
       Kf.pretty kf
   | IPPropertyInstance {ii_kf; ii_stmt; ii_ip} ->
     Format.fprintf fmt "status of '%a'%t %a"

@@ -9,24 +9,24 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f <- h.
-  Called from slice_no_body.i:21.
+  Called from slice_no_body.i:21:11-16.
 [eva] using specification for function f
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- h.
-  Called from slice_no_body.i:22.
+  Called from slice_no_body.i:22:11-16.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- h.
-  Called from slice_no_body.i:23.
+  Called from slice_no_body.i:23:11-16.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- h.
-  Called from slice_no_body.i:24.
+  Called from slice_no_body.i:24:7-12.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- h.
-  Called from slice_no_body.i:26.
+  Called from slice_no_body.i:26:9-14.
 [eva:alarm] slice_no_body.i:12: Warning: 
   signed overflow. assert c + 1 ≤ 2147483647;
 [eva:alarm] slice_no_body.i:13: Warning: 
@@ -35,7 +35,7 @@
   signed overflow. assert c * 2 ≤ 2147483647;
 [eva:progress] 
   computing for function f <- g <- h.
-  Called from slice_no_body.i:15.
+  Called from slice_no_body.i:15:12-17.
 [eva:progress] Done for function f
 [eva:progress] Recording results for g
 [eva:progress] Done for function g

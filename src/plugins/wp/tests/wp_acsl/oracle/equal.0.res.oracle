@@ -24,7 +24,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file equal.i, line 22) in 'simple_array':
+Goal Post-condition ("equal.i", line 22, characters 13-61) in 'simple_array':
 Let x = t0_0[0].
 Let x_1 = t0_0[1].
 Assume {
@@ -50,7 +50,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file equal.i, line 16) in 'simple_struct':
+Goal Post-condition ("equal.i", line 16, characters 13-57) in 'simple_struct':
 Prove: true.
 
 ------------------------------------------------------------
@@ -70,7 +70,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file equal.i, line 28) in 'with_array_struct':
+Goal Post-condition ("equal.i", line 28, characters 13-46) in 'with_array_struct':
 Let a = st0_0.F2_St_tab.
 Let a_1 = st1_0.F2_St_tab.
 Assume {
@@ -98,7 +98,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file equal.i, line 47) in 'with_ptr_and_array_struct':
+Goal Post-condition ("equal.i", lines 47-50) in 'with_ptr_and_array_struct':
 Let a = q1_0.F4_Q_qp.
 Let a_1 = q0_0.F4_Q_qp.
 Let a_2 = q0_0.F4_Q_qs.
@@ -132,7 +132,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file equal.i, line 40) in 'with_ptr_array':
+Goal Post-condition ("equal.i", line 40, characters 13-80) in 'with_ptr_array':
 Assume {
   (* Heap *)
   Type: (forall i : Z. region(tp0_0[i].base) <= 0) /\
@@ -159,7 +159,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file equal.i, line 34) in 'with_ptr_struct':
+Goal Post-condition ("equal.i", line 34, characters 13-42) in 'with_ptr_struct':
 Let a = sp1_0.F3_Sp_p.
 Let a_1 = sp0_0.F3_Sp_p.
 Assume {

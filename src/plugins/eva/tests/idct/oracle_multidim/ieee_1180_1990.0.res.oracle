@@ -261,171 +261,171 @@
 ---
 >     idct_init; idct_mc1[0..7][0..7]; idct_mc2[0..7][0..7]
 1354,1376d1193
-< [    -    ] Assertion 'Eva,initialization' (file idct.c, line 129)
+< [    -    ] Assertion 'Eva,initialization' ("idct.c", line 129)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
-< [    -    ] Assertion 'Eva,initialization' (file idct.c, line 131)
+< [    -    ] Assertion 'Eva,initialization' ("idct.c", line 131)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
-< [    -    ] Assertion 'Eva,initialization' (file idct.c, line 141)
+< [    -    ] Assertion 'Eva,initialization' ("idct.c", line 141)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
-< [    -    ] Assertion 'Eva,initialization' (file idct.c, line 143)
+< [    -    ] Assertion 'Eva,initialization' ("idct.c", line 143)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
-< [    -    ] Assertion 'Eva,initialization' (file idct.c, line 145)
+< [    -    ] Assertion 'Eva,initialization' ("idct.c", line 145)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
-< [ Partial ] Assertion 'Eva,initialization' (file idct.c, line 147)
+< [ Partial ] Assertion 'Eva,initialization' ("idct.c", line 147)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             By RedundantAlarms, with pending:
-<              - Assertion 'Eva,initialization' (file idct.c, line 145)
-< [ Partial ] Assertion 'Eva,initialization' (file idct.c, line 150)
+<              - Assertion 'Eva,initialization' ("idct.c", line 145)
+< [ Partial ] Assertion 'Eva,initialization' ("idct.c", line 150)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             By RedundantAlarms, with pending:
-<              - Assertion 'Eva,initialization' (file idct.c, line 145)
+<              - Assertion 'Eva,initialization' ("idct.c", line 145)
 1380,1402d1196
-< [    -    ] Assertion 'Eva,initialization' (file idct.c, line 163)
+< [    -    ] Assertion 'Eva,initialization' ("idct.c", line 163)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
-< [    -    ] Assertion 'Eva,initialization' (file idct.c, line 166)
+< [    -    ] Assertion 'Eva,initialization' ("idct.c", line 166)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
-< [    -    ] Assertion 'Eva,initialization' (file idct.c, line 176)
+< [    -    ] Assertion 'Eva,initialization' ("idct.c", line 176)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
-< [    -    ] Assertion 'Eva,initialization' (file idct.c, line 178)
+< [    -    ] Assertion 'Eva,initialization' ("idct.c", line 178)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
-< [    -    ] Assertion 'Eva,initialization' (file idct.c, line 180)
+< [    -    ] Assertion 'Eva,initialization' ("idct.c", line 180)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
-< [ Partial ] Assertion 'Eva,initialization' (file idct.c, line 182)
+< [ Partial ] Assertion 'Eva,initialization' ("idct.c", line 182)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             By RedundantAlarms, with pending:
-<              - Assertion 'Eva,initialization' (file idct.c, line 180)
-< [ Partial ] Assertion 'Eva,initialization' (file idct.c, line 185)
+<              - Assertion 'Eva,initialization' ("idct.c", line 180)
+< [ Partial ] Assertion 'Eva,initialization' ("idct.c", line 185)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             By RedundantAlarms, with pending:
-<              - Assertion 'Eva,initialization' (file idct.c, line 180)
+<              - Assertion 'Eva,initialization' ("idct.c", line 180)
 1424,1426d1217
-< [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 109)
+< [    -    ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 109)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
 1430,1463d1220
-< [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 116)
+< [    -    ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 116)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             tried with Eva.
-< [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 117)
+< [    -    ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 117)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             tried with Eva.
-< [ Partial ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 119)
+< [ Partial ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 119)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             By RedundantAlarms, with pending:
-<              - Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 117)
-< [ Partial ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 121)
+<              - Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 117)
+< [ Partial ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 121)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             By RedundantAlarms, with pending:
-<              - Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 117)
-< [ Partial ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 122)
+<              - Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 117)
+< [ Partial ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 122)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             By RedundantAlarms, with pending:
-<              - Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 117)
-< [    -    ] Assertion 'Eva,float_to_int' (file ieee_1180_1990.c, line 122)
+<              - Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 117)
+< [    -    ] Assertion 'Eva,float_to_int' ("ieee_1180_1990.c", line 122)
 <             assert Eva: float_to_int: -2147483649 < tmp2[i][j] + 0.5;
 <             tried with Eva.
-< [    -    ] Assertion 'Eva,float_to_int' (file ieee_1180_1990.c, line 122)
+< [    -    ] Assertion 'Eva,float_to_int' ("ieee_1180_1990.c", line 122)
 <             assert Eva: float_to_int: tmp2[i][j] + 0.5 < 2147483648;
 <             tried with Eva.
-< [ Partial ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 124)
+< [ Partial ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 124)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             By RedundantAlarms, with pending:
-<              - Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 117)
-< [    -    ] Assertion 'Eva,float_to_int' (file ieee_1180_1990.c, line 124)
+<              - Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 117)
+< [    -    ] Assertion 'Eva,float_to_int' ("ieee_1180_1990.c", line 124)
 <             assert Eva: float_to_int: -2147483649 < tmp2[i][j] - 0.5;
 <             tried with Eva.
-< [    -    ] Assertion 'Eva,float_to_int' (file ieee_1180_1990.c, line 124)
+< [    -    ] Assertion 'Eva,float_to_int' ("ieee_1180_1990.c", line 124)
 <             assert Eva: float_to_int: tmp2[i][j] - 0.5 < 2147483648;
 <             tried with Eva.
 1484,1486d1240
-< [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 150)
+< [    -    ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 150)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
 1490,1523d1243
-< [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 157)
+< [    -    ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 157)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             tried with Eva.
-< [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 158)
+< [    -    ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 158)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             tried with Eva.
-< [ Partial ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 160)
+< [ Partial ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 160)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             By RedundantAlarms, with pending:
-<              - Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 158)
-< [ Partial ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 162)
+<              - Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 158)
+< [ Partial ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 162)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             By RedundantAlarms, with pending:
-<              - Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 158)
-< [ Partial ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 163)
+<              - Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 158)
+< [ Partial ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 163)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             By RedundantAlarms, with pending:
-<              - Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 158)
-< [    -    ] Assertion 'Eva,float_to_int' (file ieee_1180_1990.c, line 163)
+<              - Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 158)
+< [    -    ] Assertion 'Eva,float_to_int' ("ieee_1180_1990.c", line 163)
 <             assert Eva: float_to_int: -2147483649 < tmp2[i][j] + 0.5;
 <             tried with Eva.
-< [    -    ] Assertion 'Eva,float_to_int' (file ieee_1180_1990.c, line 163)
+< [    -    ] Assertion 'Eva,float_to_int' ("ieee_1180_1990.c", line 163)
 <             assert Eva: float_to_int: tmp2[i][j] + 0.5 < 2147483648;
 <             tried with Eva.
-< [ Partial ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 165)
+< [ Partial ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 165)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             By RedundantAlarms, with pending:
-<              - Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 158)
-< [    -    ] Assertion 'Eva,float_to_int' (file ieee_1180_1990.c, line 165)
+<              - Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 158)
+< [    -    ] Assertion 'Eva,float_to_int' ("ieee_1180_1990.c", line 165)
 <             assert Eva: float_to_int: -2147483649 < tmp2[i][j] - 0.5;
 <             tried with Eva.
-< [    -    ] Assertion 'Eva,float_to_int' (file ieee_1180_1990.c, line 165)
+< [    -    ] Assertion 'Eva,float_to_int' ("ieee_1180_1990.c", line 165)
 <             assert Eva: float_to_int: tmp2[i][j] - 0.5 < 2147483648;
 <             tried with Eva.
 1623,1639c1343,1349
-< [ Partial ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 358)
+< [ Partial ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 358)
 <             assert Eva: initialization: \initialized(&res[i].pmse[j][k]);
 <             By RedundantAlarms, with pending:
-<              - Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 357)
-< [ Partial ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 369)
+<              - Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 357)
+< [ Partial ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 369)
 <             assert Eva: initialization: \initialized(&res[i].pme[j][k]);
 <             By RedundantAlarms, with pending:
-<              - Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 368)
-< [ Partial ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 369)
+<              - Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 368)
+< [ Partial ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 369)
 <             assert Eva: initialization: \initialized(&res[i].pme[j][k]);
 <             By RedundantAlarms, with pending:
-<              - Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 368)
-< [ Partial ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 369)
+<              - Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 368)
+< [ Partial ] Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 369)
 <             assert Eva: initialization: \initialized(&res[i].pme[j][k]);
 <             By RedundantAlarms, with pending:
-<              - Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 368)
-< [  Valid  ] Instance of 'Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 239)' at call 'printf_va_1' (file ieee_1180_1990.c, line 195)
+<              - Assertion 'Eva,initialization' ("ieee_1180_1990.c", line 368)
+< [  Valid  ] Instance of 'Pre-condition ("FRAMAC_SHARE/libc/stdio.h", line 239)' at call 'printf_va_1' ("ieee_1180_1990.c", line 195)
 ---
-> [Unreachable] Unreachable call 'printf_va_1' (file ieee_1180_1990.c, line 195)
->             reachability of stmt line 195 in main
+> [Unreachable] Unreachable call 'printf_va_1' ("ieee_1180_1990.c", line 195)
+>             reachability of stmt ieee_1180_1990.c:195 in main
 >             by Eva.
-> [Unreachable] Unreachable call 'printf_va_2' (file ieee_1180_1990.c, line 196)
->             reachability of stmt line 196 in main
+> [Unreachable] Unreachable call 'printf_va_2' ("ieee_1180_1990.c", line 196)
+>             reachability of stmt ieee_1180_1990.c:196 in main
 >             by Eva.
-> [  Dead   ] Instance of 'Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 239)' at call 'printf_va_1' (file ieee_1180_1990.c, line 195)
+> [  Dead   ] Instance of 'Pre-condition ("FRAMAC_SHARE/libc/stdio.h", line 239)' at call 'printf_va_1' ("ieee_1180_1990.c", line 195)
 1643,1644c1353,1356
 <             by Eva.
-< [  Valid  ] Instance of 'Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 239)' at call 'printf_va_2' (file ieee_1180_1990.c, line 196)
+< [  Valid  ] Instance of 'Pre-condition ("FRAMAC_SHARE/libc/stdio.h", line 239)' at call 'printf_va_2' ("ieee_1180_1990.c", line 196)
 ---
 >             Locally valid, but unreachable.
 >             By Eva because:
->              - Unreachable call 'printf_va_1' (file ieee_1180_1990.c, line 195)
-> [  Dead   ] Instance of 'Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 239)' at call 'printf_va_2' (file ieee_1180_1990.c, line 196)
+>              - Unreachable call 'printf_va_1' ("ieee_1180_1990.c", line 195)
+> [  Dead   ] Instance of 'Pre-condition ("FRAMAC_SHARE/libc/stdio.h", line 239)' at call 'printf_va_2' ("ieee_1180_1990.c", line 196)
 1648c1360,1362
 <             by Eva.
 ---
 >             Locally valid, but unreachable.
 >             By Eva because:
->              - Unreachable call 'printf_va_2' (file ieee_1180_1990.c, line 196)
+>              - Unreachable call 'printf_va_2' ("ieee_1180_1990.c", line 196)
 1705,1706c1419
 <     36 Completely validated
 <     16 Locally validated

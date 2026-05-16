@@ -65,13 +65,13 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file user_collect.i, line 15) in 'job'' in 'caller' at call 'job' (file user_collect.i, line 57)
+Goal Instance of 'Pre-condition ("user_collect.i", line 15, characters 12-23) in 'job'' in 'caller' at call 'job' ("user_collect.i", line 57, characters 3-10)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file user_collect.i, line 15) in 'job'' in 'caller' at call 'job' (file user_collect.i, line 58)
+Goal Instance of 'Pre-condition ("user_collect.i", line 15, characters 12-23) in 'job'' in 'caller' at call 'job' ("user_collect.i", line 58, characters 3-10)
 :
 Prove: true.
 
@@ -153,13 +153,13 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file user_collect.i, line 26) in 'job2'' in 'caller2' at call 'job2' (file user_collect.i, line 70)
+Goal Instance of 'Pre-condition ("user_collect.i", line 26, characters 12-23) in 'job2'' in 'caller2' at call 'job2' ("user_collect.i", line 70, characters 3-11)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file user_collect.i, line 26) in 'job2'' in 'caller2' at call 'job2' (file user_collect.i, line 71)
+Goal Instance of 'Pre-condition ("user_collect.i", line 26, characters 12-23) in 'job2'' in 'caller2' at call 'job2' ("user_collect.i", line 71, characters 3-11)
 :
 Prove: true.
 
@@ -241,13 +241,13 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file user_collect.i, line 37) in 'job3'' in 'caller3' at call 'job3' (file user_collect.i, line 83)
+Goal Instance of 'Pre-condition ("user_collect.i", line 37, characters 12-23) in 'job3'' in 'caller3' at call 'job3' ("user_collect.i", line 83, characters 3-11)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file user_collect.i, line 37) in 'job3'' in 'caller3' at call 'job3' (file user_collect.i, line 84)
+Goal Instance of 'Pre-condition ("user_collect.i", line 37, characters 12-23) in 'job3'' in 'caller3' at call 'job3' ("user_collect.i", line 84, characters 3-11)
 :
 Prove: true.
 
@@ -278,18 +278,18 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file user_collect.i, line 18) in 'job' (1/3):
+Goal Assigns ("user_collect.i", line 18, characters 11-12) in 'job' (1/3):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file user_collect.i, line 18) in 'job' (2/3):
+Goal Assigns ("user_collect.i", line 18, characters 11-12) in 'job' (2/3):
 Effect at line 22
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file user_collect.i, line 18) in 'job' (3/3):
+Goal Assigns ("user_collect.i", line 18, characters 11-12) in 'job' (3/3):
 Effect at line 22
 Prove: true.
 
@@ -320,18 +320,18 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file user_collect.i, line 29) in 'job2' (1/3):
+Goal Assigns ("user_collect.i", line 29, characters 11-12) in 'job2' (1/3):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file user_collect.i, line 29) in 'job2' (2/3):
+Goal Assigns ("user_collect.i", line 29, characters 11-12) in 'job2' (2/3):
 Effect at line 33
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file user_collect.i, line 29) in 'job2' (3/3):
+Goal Assigns ("user_collect.i", line 29, characters 11-12) in 'job2' (3/3):
 Effect at line 33
 Prove: true.
 
@@ -369,18 +369,18 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file user_collect.i, line 40) in 'job3' (1/3):
+Goal Assigns ("user_collect.i", line 40, characters 11-12) in 'job3' (1/3):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file user_collect.i, line 40) in 'job3' (2/3):
+Goal Assigns ("user_collect.i", line 40, characters 11-12) in 'job3' (2/3):
 Effect at line 44
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file user_collect.i, line 40) in 'job3' (3/3):
+Goal Assigns ("user_collect.i", line 40, characters 11-12) in 'job3' (3/3):
 Effect at line 45
 Prove: true.
 

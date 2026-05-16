@@ -9,17 +9,17 @@
   Function foo
 ------------------------------------------------------------
 
-Goal Wp_smoke_dead_code in 'foo' at instruction (file doomed_unroll.i, line 15):
+Goal Wp_smoke_dead_code in 'foo' at instruction ("doomed_unroll.i", line 15, characters 15-18):
 Prove: false.
 
 ------------------------------------------------------------
 
-Goal Wp_smoke_dead_code in 'foo' at instruction (file doomed_unroll.i, line 15):
+Goal Wp_smoke_dead_code in 'foo' at instruction ("doomed_unroll.i", line 15, characters 15-18):
 Prove: false.
 
 ------------------------------------------------------------
 
-Goal Wp_smoke_dead_code in 'foo' at instruction (file doomed_unroll.i, line 15):
+Goal Wp_smoke_dead_code in 'foo' at instruction ("doomed_unroll.i", line 15, characters 15-18):
 Prove: false.
 
 ------------------------------------------------------------

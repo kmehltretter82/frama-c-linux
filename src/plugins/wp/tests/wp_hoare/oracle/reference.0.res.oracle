@@ -19,7 +19,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file reference.i, line 35) in 'call_f2':
+Goal Post-condition ("reference.i", line 35, characters 13-25) in 'call_f2':
 Prove: true.
 
 ------------------------------------------------------------
@@ -69,7 +69,7 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file reference.i, line 26) in 'f2'' in 'call_f2' at call 'f2' (file reference.i, line 40)
+Goal Instance of 'Pre-condition ("reference.i", line 26, characters 14-37) in 'f2'' in 'call_f2' at call 'f2' ("reference.i", line 40, characters 10-20)
 :
 Prove: true.
 
@@ -83,7 +83,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file reference.i, line 46) in 'call_global':
+Goal Post-condition ("reference.i", line 46, characters 53-67) in 'call_global':
 Prove: true.
 
 ------------------------------------------------------------
@@ -109,7 +109,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file reference.i, line 10) in 'f'' in 'call_global' at call 'f' (file reference.i, line 49)
+Goal Instance of 'Pre-condition ("reference.i", line 10, characters 13-22) in 'f'' in 'call_global' at call 'f' ("reference.i", line 49, characters 10-15)
 :
 Prove: true.
 
@@ -123,7 +123,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file reference.i, line 18) in 'g':
+Goal Post-condition ("reference.i", line 18, characters 11-23) in 'g':
 Prove: true.
 
 ------------------------------------------------------------
@@ -161,7 +161,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file reference.i, line 10) in 'f'' in 'g' at call 'f' (file reference.i, line 22)
+Goal Instance of 'Pre-condition ("reference.i", line 10, characters 13-22) in 'f'' in 'g' at call 'f' ("reference.i", line 22, characters 10-15)
 :
 Prove: true.
 
@@ -176,7 +176,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file reference.i, line 58) in 'write':
+Goal Post-condition ("reference.i", line 58, characters 13-22) in 'write':
 Prove: true.
 
 ------------------------------------------------------------
@@ -187,7 +187,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file reference.i, line 57) in 'write':
+Goal Assigns ("reference.i", line 57, characters 13-16) in 'write':
 Prove: true.
 
 ------------------------------------------------------------

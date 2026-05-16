@@ -20,12 +20,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'qed_ok' (file struct.i, line 21):
+Goal Assertion 'qed_ok' ("struct.i", line 21, characters 22-36):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file struct.i, line 10) in 'g'' in 'f' at call 'g' (file struct.i, line 20)
+Goal Instance of 'Pre-condition ("struct.i", line 10, characters 14-23) in 'g'' in 'f' at call 'g' ("struct.i", line 20, characters 3-17)
 :
 Let a_1 = shift_sint32(shiftfield_F1_t_tab(a), 0).
 Assume {
@@ -47,7 +47,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file struct.i, line 11) in 'g':
+Goal Post-condition ("struct.i", line 11, characters 13-20) in 'g':
 Prove: true.
 
 ------------------------------------------------------------
@@ -58,7 +58,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file struct.i, line 12) in 'g':
+Goal Assigns ("struct.i", line 12, characters 13-15) in 'g':
 Effect at line 15
 Prove: true.
 

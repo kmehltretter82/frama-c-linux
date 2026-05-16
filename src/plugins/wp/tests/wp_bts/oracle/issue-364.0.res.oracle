@@ -20,13 +20,13 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'ZERO' (file issue-364.i, line 5):
+Goal Assertion 'ZERO' ("issue-364.i", line 5, characters 20-36):
 Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: valid_rd(Malloc_0, shift_sint8(global(K___fc_lit_string1_23), 3), 1).
 
 ------------------------------------------------------------
 
-Goal Assertion 'OVER' (file issue-364.i, line 6):
+Goal Assertion 'OVER' ("issue-364.i", line 6, characters 21-38):
 Let a = global(K___fc_lit_string1_23).
 Assume {
   (* Heap *)

@@ -29,10 +29,10 @@
   nulli ∈ [--..--]
 [eva:progress] 
   computing for function f1 <- main.
-  Called from reduce_index.i:130.
+  Called from reduce_index.i:130:3-7.
 [eva:progress] 
   computing for function f1_aux <- f1 <- main.
-  Called from reduce_index.i:11.
+  Called from reduce_index.i:11:9-17.
 [eva:progress] Recording results for f1_aux
 [eva:progress] Done for function f1_aux
 [eva:alarm] reduce_index.i:11: Warning: 
@@ -43,7 +43,7 @@
 [eva:progress] Done for function f1
 [eva:progress] 
   computing for function f2 <- main.
-  Called from reduce_index.i:131.
+  Called from reduce_index.i:131:3-7.
 [eva:alarm] reduce_index.i:17: Warning: 
   accessing out of bounds index. assert 0 ≤ c2;
 [eva:alarm] reduce_index.i:17: Warning: 
@@ -52,7 +52,7 @@
 [eva:progress] Done for function f2
 [eva:progress] 
   computing for function f3 <- main.
-  Called from reduce_index.i:132.
+  Called from reduce_index.i:132:3-7.
 [eva:alarm] reduce_index.i:21: Warning: 
   accessing out of bounds index. assert 0 ≤ c3;
 [eva:alarm] reduce_index.i:21: Warning: 
@@ -61,7 +61,7 @@
 [eva:progress] Done for function f3
 [eva:progress] 
   computing for function f4 <- main.
-  Called from reduce_index.i:133.
+  Called from reduce_index.i:133:3-7.
 [eva:alarm] reduce_index.i:27: Warning: 
   accessing out of bounds index. assert 0 ≤ c4;
 [eva:alarm] reduce_index.i:27: Warning: 
@@ -70,7 +70,7 @@
 [eva:progress] Done for function f4
 [eva:progress] 
   computing for function f5 <- main.
-  Called from reduce_index.i:134.
+  Called from reduce_index.i:134:3-7.
 [eva:alarm] reduce_index.i:35: Warning: 
   accessing out of bounds index. assert 0 ≤ c5;
 [eva:alarm] reduce_index.i:35: Warning: 
@@ -79,7 +79,7 @@
 [eva:progress] Done for function f5
 [eva:progress] 
   computing for function f6 <- main.
-  Called from reduce_index.i:135.
+  Called from reduce_index.i:135:3-7.
 [eva:alarm] reduce_index.i:42: Warning: 
   accessing out of bounds index. assert 0 ≤ c6;
 [eva:alarm] reduce_index.i:42: Warning: 
@@ -90,7 +90,7 @@
 [eva:progress] Done for function f6
 [eva:progress] 
   computing for function f7 <- main.
-  Called from reduce_index.i:136.
+  Called from reduce_index.i:136:3-7.
 [eva:alarm] reduce_index.i:48: Warning: 
   accessing out of bounds index. assert 0 ≤ c7;
 [eva:alarm] reduce_index.i:48: Warning: 
@@ -99,14 +99,14 @@
 [eva:progress] Done for function f7
 [eva:progress] 
   computing for function f8 <- main.
-  Called from reduce_index.i:137.
+  Called from reduce_index.i:137:3-7.
 [eva:alarm] reduce_index.i:64: Warning: 
   out of bounds write. assert \valid(&p8->f1);
 [eva:progress] Recording results for f8
 [eva:progress] Done for function f8
 [eva:progress] 
   computing for function f9 <- main.
-  Called from reduce_index.i:138.
+  Called from reduce_index.i:138:3-7.
 [eva:alarm] reduce_index.i:72: Warning: 
   accessing out of bounds index. assert 0 ≤ c9;
 [eva:alarm] reduce_index.i:72: Warning: 
@@ -115,7 +115,7 @@
 [eva:progress] Done for function f9
 [eva:progress] 
   computing for function f10 <- main.
-  Called from reduce_index.i:139.
+  Called from reduce_index.i:139:3-8.
 [eva:alarm] reduce_index.i:86: Warning: 
   accessing out of bounds index. assert 0 ≤ c10;
 [eva:alarm] reduce_index.i:86: Warning: 
@@ -124,7 +124,7 @@
 [eva:progress] Done for function f10
 [eva:progress] 
   computing for function f11 <- main.
-  Called from reduce_index.i:140.
+  Called from reduce_index.i:140:3-8.
 [eva:alarm] reduce_index.i:93: Warning: 
   accessing out of bounds index. assert 0 ≤ c11;
 [eva:alarm] reduce_index.i:93: Warning: 
@@ -135,7 +135,7 @@
 [eva:progress] Done for function f11
 [eva:progress] 
   computing for function f12 <- main.
-  Called from reduce_index.i:141.
+  Called from reduce_index.i:141:3-8.
 [eva:alarm] reduce_index.i:100: Warning: 
   accessing out of bounds index. assert 0 ≤ c12;
 [eva:alarm] reduce_index.i:100: Warning: 
@@ -144,7 +144,7 @@
 [eva:progress] Done for function f12
 [eva:progress] 
   computing for function pointer_index <- main.
-  Called from reduce_index.i:143.
+  Called from reduce_index.i:143:3-18.
 [eva:alarm] reduce_index.i:110: Warning: 
   out of bounds read. assert \valid_read(p + k1);
 [eva:alarm] reduce_index.i:113: Warning: 
@@ -157,7 +157,7 @@
 [eva:progress] Done for function pointer_index
 [eva:progress] 
   computing for function null_index <- main.
-  Called from reduce_index.i:144.
+  Called from reduce_index.i:144:14-26.
 [eva:alarm] reduce_index.i:126: Warning: 
   out of bounds write. assert \valid((int *)0 + nulli);
 [eva] reduce_index.i:126: Warning: 

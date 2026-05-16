@@ -18,7 +18,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'KO,ax2' (file bts_1776.i, line 14):
+Goal Assertion 'KO,ax2' ("bts_1776.i", line 14, characters 25-30):
 Assume {
   Type: is_sint32(X) /\ is_sint32(X_1) /\ is_sint32(x).
   (* Then *)

@@ -14,7 +14,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file switch.i, line 12) in 'f':
+Goal Post-condition ("switch.i", line 12, characters 13-23) in 'f':
 Assume {
   Type: is_sint32(f) /\ is_sint32(x).
   (* Merge *)

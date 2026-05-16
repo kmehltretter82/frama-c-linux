@@ -23,7 +23,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file unsupported_builtin.i, line 13):
+Goal Assertion ("unsupported_builtin.i", line 13, characters 14-19):
 unsupported_builtin.i:8: warning from wp:
  - Warning: Ignored Hypothesis
    Reason: Builtin unimplemented_builtin not defined

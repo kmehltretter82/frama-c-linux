@@ -7,7 +7,7 @@
   y ∈ {0}
 [eva:progress] 
   computing for function f <- main.
-  Called from assigns.i:13.
+  Called from assigns.i:13:3-6.
 [eva] using specification for function f
 [eva:progress] Done for function f
 [eva:progress] Recording results for main
@@ -15,7 +15,7 @@
 [from] Done for function main
 [eva:progress] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to f at assigns.i:13 (by main):
+[from] call to f at assigns.i:13:3-6 (by main):
   x FROM x (and SELF)
 [from] entry point:
   x FROM \nothing

@@ -17,7 +17,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file dispatch_var2.i, line 37) in 'call_global':
+Goal Post-condition ("dispatch_var2.i", line 37, characters 13-25) in 'call_global':
 Assume {
   Type: is_sint32(call_global_0) /\ is_sint32(load_0) /\ is_sint32(tmp_0) /\
       is_sint32(x).
@@ -43,12 +43,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var2.i, line 36) in 'call_global' (1/2):
+Goal Assigns ("dispatch_var2.i", line 36, characters 13-14) in 'call_global' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var2.i, line 36) in 'call_global' (2/2):
+Goal Assigns ("dispatch_var2.i", line 36, characters 13-14) in 'call_global' (2/2):
 Call Result at line 42
 Assume {
   Type: is_sint32(load_0) /\ is_sint32(tmp_0) /\ is_sint32(x).
@@ -68,18 +68,18 @@ Prove: (ta_tmp_0=false).
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var2.i, line 36) in 'call_global':
+Goal Assigns ("dispatch_var2.i", line 36, characters 13-14) in 'call_global':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file dispatch_var2.i, line 12) in 'reset'' in 'call_global' at call 'reset' (file dispatch_var2.i, line 41)
+Goal Instance of 'Pre-condition ("dispatch_var2.i", line 12, characters 14-24) in 'reset'' in 'call_global' at call 'reset' ("dispatch_var2.i", line 41, characters 2-11)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file dispatch_var2.i, line 27) in 'load'' in 'call_global' at call 'load' (file dispatch_var2.i, line 42)
+Goal Instance of 'Pre-condition ("dispatch_var2.i", line 27, characters 14-24) in 'load'' in 'call_global' at call 'load' ("dispatch_var2.i", line 42, characters 10-18)
 :
 Prove: true.
 
@@ -93,7 +93,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file dispatch_var2.i, line 56) in 'call_local':
+Goal Post-condition ("dispatch_var2.i", line 56, characters 13-25) in 'call_local':
 Assume {
   Type: is_sint32(call_local_0) /\ is_sint32(load_0) /\ is_sint32(tmp_0) /\
       is_sint32(z).
@@ -187,7 +187,7 @@ Prove: (ta_z_0=false).
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file dispatch_var2.i, line 12) in 'reset'' in 'call_local' at call 'reset' (file dispatch_var2.i, line 61)
+Goal Instance of 'Pre-condition ("dispatch_var2.i", line 12, characters 14-24) in 'reset'' in 'call_local' at call 'reset' ("dispatch_var2.i", line 61, characters 2-11)
 :
 Assume {
   (* Block In *)
@@ -197,7 +197,7 @@ Prove: (ta_z_0=true).
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file dispatch_var2.i, line 27) in 'load'' in 'call_local' at call 'load' (file dispatch_var2.i, line 62)
+Goal Instance of 'Pre-condition ("dispatch_var2.i", line 27, characters 14-24) in 'load'' in 'call_local' at call 'load' ("dispatch_var2.i", line 62, characters 10-18)
 :
 Assume {
   Type: is_sint32(z).
@@ -222,7 +222,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file dispatch_var2.i, line 47) in 'call_param':
+Goal Post-condition ("dispatch_var2.i", line 47, characters 13-25) in 'call_param':
 Assume {
   Type: is_sint32(call_param_0) /\ is_sint32(load_0) /\ is_sint32(tmp_0) /\
       is_sint32(y).
@@ -331,7 +331,7 @@ Prove: (ta_y_0=false).
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file dispatch_var2.i, line 12) in 'reset'' in 'call_param' at call 'reset' (file dispatch_var2.i, line 51)
+Goal Instance of 'Pre-condition ("dispatch_var2.i", line 12, characters 14-24) in 'reset'' in 'call_param' at call 'reset' ("dispatch_var2.i", line 51, characters 2-11)
 :
 Assume {
   (* Pre-condition *)
@@ -347,7 +347,7 @@ Prove: (ta_y_0=true).
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file dispatch_var2.i, line 27) in 'load'' in 'call_param' at call 'load' (file dispatch_var2.i, line 52)
+Goal Instance of 'Pre-condition ("dispatch_var2.i", line 27, characters 14-24) in 'load'' in 'call_param' at call 'load' ("dispatch_var2.i", line 52, characters 10-18)
 :
 Assume {
   Type: is_sint32(y).
@@ -375,7 +375,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file dispatch_var2.i, line 68) in 'call_param_ref':
+Goal Post-condition ("dispatch_var2.i", line 68, characters 13-25) in 'call_param_ref':
 Assume {
   Type: is_sint32(call_param_ref_0) /\ is_sint32(load_0) /\ is_sint32(q) /\
       is_sint32(tmp_0).
@@ -399,12 +399,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var2.i, line 67) in 'call_param_ref' (1/2):
+Goal Assigns ("dispatch_var2.i", line 67, characters 13-15) in 'call_param_ref' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var2.i, line 67) in 'call_param_ref' (2/2):
+Goal Assigns ("dispatch_var2.i", line 67, characters 13-15) in 'call_param_ref' (2/2):
 Call Result at line 73
 Assume {
   Type: is_sint32(load_0) /\ is_sint32(q) /\ is_sint32(tmp_0).
@@ -422,18 +422,18 @@ Prove: (ta_tmp_0=false).
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var2.i, line 67) in 'call_param_ref':
+Goal Assigns ("dispatch_var2.i", line 67, characters 13-15) in 'call_param_ref':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file dispatch_var2.i, line 12) in 'reset'' in 'call_param_ref' at call 'reset' (file dispatch_var2.i, line 72)
+Goal Instance of 'Pre-condition ("dispatch_var2.i", line 12, characters 14-24) in 'reset'' in 'call_param_ref' at call 'reset' ("dispatch_var2.i", line 72, characters 2-10)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file dispatch_var2.i, line 27) in 'load'' in 'call_param_ref' at call 'load' (file dispatch_var2.i, line 73)
+Goal Instance of 'Pre-condition ("dispatch_var2.i", line 27, characters 14-24) in 'load'' in 'call_param_ref' at call 'load' ("dispatch_var2.i", line 73, characters 10-17)
 :
 Prove: true.
 
@@ -448,7 +448,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file dispatch_var2.i, line 21) in 'incr':
+Goal Post-condition ("dispatch_var2.i", line 21, characters 13-31) in 'incr':
 Assume {
   Type: is_sint32(ip_0) /\ is_sint32(ip_1) /\ is_sint32(ip_2).
   Have: ip_2 = ip_0.
@@ -464,7 +464,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var2.i, line 20) in 'incr':
+Goal Assigns ("dispatch_var2.i", line 20, characters 13-16) in 'incr':
 Prove: true.
 
 ------------------------------------------------------------
@@ -478,7 +478,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file dispatch_var2.i, line 29) in 'load':
+Goal Post-condition ("dispatch_var2.i", line 29, characters 13-27) in 'load':
 Assume {
   Type: is_sint32(load_0) /\ is_sint32(lp_0) /\ is_sint32(retres_0).
   (* Block In *)
@@ -517,7 +517,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file dispatch_var2.i, line 14) in 'reset':
+Goal Post-condition ("dispatch_var2.i", line 14, characters 13-21) in 'reset':
 Assume { Type: is_sint32(rp_0). Have: rp_0 = 0. }
 Prove: rp_0 = 0.
 
@@ -529,7 +529,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var2.i, line 13) in 'reset':
+Goal Assigns ("dispatch_var2.i", line 13, characters 13-16) in 'reset':
 Prove: true.
 
 ------------------------------------------------------------

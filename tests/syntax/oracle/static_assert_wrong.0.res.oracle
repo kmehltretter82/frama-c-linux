@@ -1,7 +1,7 @@
 [kernel] Parsing static_assert_wrong.i (no preprocessing)
 [kernel] static_assert_wrong.i:6: 
   syntax error:
-  Location: between lines 6 and 8, before or at token: int
+  Location: "static_assert_wrong.i", lines 6-8, before or at token: int
   4     */
   5     
   

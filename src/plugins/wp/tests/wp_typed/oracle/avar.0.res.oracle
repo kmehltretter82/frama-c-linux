@@ -19,7 +19,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file avar.i, line 1) in 'f'' in 'g' at call 'f' (file avar.i, line 4)
+Goal Instance of 'Pre-condition ("avar.i", line 1, characters 14-32) in 'f'' in 'g' at call 'f' ("avar.i", line 4, characters 17-24)
 :
 Prove: true.
 

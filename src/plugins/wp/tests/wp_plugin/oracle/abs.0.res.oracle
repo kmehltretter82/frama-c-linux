@@ -14,7 +14,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file abs.i, line 13) in 'abs':
+Goal Post-condition ("abs.i", line 13, characters 13-30) in 'abs':
 Assume {
   Type: is_sint32(abs_0) /\ is_sint32(x).
   If x < 0

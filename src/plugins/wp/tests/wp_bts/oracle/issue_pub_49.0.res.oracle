@@ -24,42 +24,42 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 25) in 'caller1' (1/6):
+Goal Assigns ("issue_pub_49.i", line 25, characters 11-21) in 'caller1' (1/6):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 25) in 'caller1' (2/6):
+Goal Assigns ("issue_pub_49.i", line 25, characters 11-21) in 'caller1' (2/6):
 Effect at line 33
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 25) in 'caller1' (3/6):
+Goal Assigns ("issue_pub_49.i", line 25, characters 11-21) in 'caller1' (3/6):
 Call Result at line 35
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 25) in 'caller1' (4/6):
+Goal Assigns ("issue_pub_49.i", line 25, characters 11-21) in 'caller1' (4/6):
 Effect at line 35
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 25) in 'caller1' (5/6):
+Goal Assigns ("issue_pub_49.i", line 25, characters 11-21) in 'caller1' (5/6):
 Call Result at line 37
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 25) in 'caller1' (6/6):
+Goal Assigns ("issue_pub_49.i", line 25, characters 11-21) in 'caller1' (6/6):
 Effect at line 37
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 25) in 'caller1':
+Goal Assigns ("issue_pub_49.i", line 25, characters 11-21) in 'caller1':
 Prove: true.
 
 ------------------------------------------------------------
@@ -83,42 +83,42 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 42) in 'caller2' (1/6):
+Goal Assigns ("issue_pub_49.i", line 42, characters 11-21) in 'caller2' (1/6):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 42) in 'caller2' (2/6):
+Goal Assigns ("issue_pub_49.i", line 42, characters 11-21) in 'caller2' (2/6):
 Effect at line 50
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 42) in 'caller2' (3/6):
+Goal Assigns ("issue_pub_49.i", line 42, characters 11-21) in 'caller2' (3/6):
 Call Result at line 52
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 42) in 'caller2' (4/6):
+Goal Assigns ("issue_pub_49.i", line 42, characters 11-21) in 'caller2' (4/6):
 Effect at line 52
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 42) in 'caller2' (5/6):
+Goal Assigns ("issue_pub_49.i", line 42, characters 11-21) in 'caller2' (5/6):
 Call Result at line 54
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 42) in 'caller2' (6/6):
+Goal Assigns ("issue_pub_49.i", line 42, characters 11-21) in 'caller2' (6/6):
 Effect at line 54
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 42) in 'caller2':
+Goal Assigns ("issue_pub_49.i", line 42, characters 11-21) in 'caller2':
 Prove: true.
 
 ------------------------------------------------------------
@@ -142,36 +142,36 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 59) in 'caller3' (1/5):
+Goal Assigns ("issue_pub_49.i", line 59, characters 11-21) in 'caller3' (1/5):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 59) in 'caller3' (2/5):
+Goal Assigns ("issue_pub_49.i", line 59, characters 11-21) in 'caller3' (2/5):
 Call Result at line 69
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 59) in 'caller3' (3/5):
+Goal Assigns ("issue_pub_49.i", line 59, characters 11-21) in 'caller3' (3/5):
 Effect at line 69
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 59) in 'caller3' (4/5):
+Goal Assigns ("issue_pub_49.i", line 59, characters 11-21) in 'caller3' (4/5):
 Call Result at line 71
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 59) in 'caller3' (5/5):
+Goal Assigns ("issue_pub_49.i", line 59, characters 11-21) in 'caller3' (5/5):
 Effect at line 71
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 59) in 'caller3':
+Goal Assigns ("issue_pub_49.i", line 59, characters 11-21) in 'caller3':
 Prove: true.
 
 ------------------------------------------------------------
@@ -195,42 +195,42 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 76) in 'caller4' (1/6):
+Goal Assigns ("issue_pub_49.i", line 76, characters 11-21) in 'caller4' (1/6):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 76) in 'caller4' (2/6):
+Goal Assigns ("issue_pub_49.i", line 76, characters 11-21) in 'caller4' (2/6):
 Effect at line 84
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 76) in 'caller4' (3/6):
+Goal Assigns ("issue_pub_49.i", line 76, characters 11-21) in 'caller4' (3/6):
 Call Result at line 87
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 76) in 'caller4' (4/6):
+Goal Assigns ("issue_pub_49.i", line 76, characters 11-21) in 'caller4' (4/6):
 Effect at line 87
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 76) in 'caller4' (5/6):
+Goal Assigns ("issue_pub_49.i", line 76, characters 11-21) in 'caller4' (5/6):
 Call Result at line 88
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 76) in 'caller4' (6/6):
+Goal Assigns ("issue_pub_49.i", line 76, characters 11-21) in 'caller4' (6/6):
 Effect at line 88
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 76) in 'caller4':
+Goal Assigns ("issue_pub_49.i", line 76, characters 11-21) in 'caller4':
 Prove: true.
 
 ------------------------------------------------------------
@@ -250,12 +250,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 15) in 'is_class' (1/2):
+Goal Assigns ("issue_pub_49.i", line 15, characters 11-21) in 'is_class' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue_pub_49.i, line 15) in 'is_class' (2/2):
+Goal Assigns ("issue_pub_49.i", line 15, characters 11-21) in 'is_class' (2/2):
 Effect at line 20
 Prove: true.
 

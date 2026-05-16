@@ -115,7 +115,7 @@
             by Call Preconditions.
 [  Valid  ] Pre-condition 'c'
             by Call Preconditions.
-[  Valid  ] Invariant (file loopinv.c, line 9)
+[  Valid  ] Invariant ("loopinv.c", line 9)
             by Eva.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -124,16 +124,16 @@
 --- Properties of Function 'main1'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Instance of 'Pre-condition 'valid'' at call 'init' (file loopinv.c, line 22)
+[  Valid  ] Instance of 'Pre-condition 'valid'' at call 'init' ("loopinv.c", line 22)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'c'' at call 'init' (file loopinv.c, line 22)
+[  Valid  ] Instance of 'Pre-condition 'c'' at call 'init' ("loopinv.c", line 22)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid'' at call 'init' (file loopinv.c, line 25)
+[  Valid  ] Instance of 'Pre-condition 'valid'' at call 'init' ("loopinv.c", line 25)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'c'' at call 'init' (file loopinv.c, line 25)
+[  Valid  ] Instance of 'Pre-condition 'c'' at call 'init' ("loopinv.c", line 25)
 
             by Eva.
 
@@ -141,36 +141,36 @@
 --- Properties of Function 'main2'
 --------------------------------------------------------------------------------
 
-[    -    ] Invariant (file loopinv.c, line 32)
+[    -    ] Invariant ("loopinv.c", line 32)
             tried with Eva.
-[  Valid  ] Invariant (file loopinv.c, line 33)
+[  Valid  ] Invariant ("loopinv.c", line 33)
             by Eva.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main3'
 --------------------------------------------------------------------------------
 
-[    -    ] Invariant (file loopinv.c, line 42)
+[    -    ] Invariant ("loopinv.c", line 42)
             tried with Eva.
-[    -    ] Assertion 'Eva,signed_overflow' (file loopinv.c, line 45)
+[    -    ] Assertion 'Eva,signed_overflow' ("loopinv.c", line 45)
             tried with Eva.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main4'
 --------------------------------------------------------------------------------
 
-[    -    ] Invariant (file loopinv.c, line 58)
+[    -    ] Invariant ("loopinv.c", line 58)
             tried with Eva.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main5'
 --------------------------------------------------------------------------------
 
-[    -    ] Invariant (file loopinv.c, line 69)
+[    -    ] Invariant ("loopinv.c", line 69)
             tried with Eva.
-[    -    ] Assertion 'Eva,signed_overflow' (file loopinv.c, line 72)
+[    -    ] Assertion 'Eva,signed_overflow' ("loopinv.c", line 72)
             tried with Eva.
-[    -    ] Assertion 'Eva,signed_overflow' (file loopinv.c, line 73)
+[    -    ] Assertion 'Eva,signed_overflow' ("loopinv.c", line 73)
             tried with Eva.
 
 --------------------------------------------------------------------------------

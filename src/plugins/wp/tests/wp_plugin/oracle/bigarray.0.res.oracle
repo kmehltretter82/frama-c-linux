@@ -22,7 +22,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file bigarray.c, line 16):
+Goal Loop assigns ("bigarray.c", line 16):
 Prove: true.
 
 ------------------------------------------------------------
@@ -33,12 +33,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file bigarray.c, line 19):
+Goal Positivity of Loop variant at loop ("bigarray.c", lines 19-21):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file bigarray.c, line 19):
+Goal Decreasing of Loop variant at loop ("bigarray.c", lines 19-21):
 Prove: true.
 
 ------------------------------------------------------------

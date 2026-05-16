@@ -20,7 +20,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file global_const_dependencies.i, line 5):
+Goal Assertion ("global_const_dependencies.i", line 5, characters 14-20):
 Prove: true.
 
 ------------------------------------------------------------

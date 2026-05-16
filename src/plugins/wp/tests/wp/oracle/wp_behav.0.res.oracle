@@ -32,13 +32,13 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion 'ko' (file wp_behav.c, line 59):
+Goal Assertion 'ko' ("wp_behav.c", line 59):
 Assume { Type: is_sint32(x). }
 Prove: 0 < x.
 
 ------------------------------------------------------------
 
-Goal Assertion 'qed_ok,ok_with_hyp' (file wp_behav.c, line 62):
+Goal Assertion 'qed_ok,ok_with_hyp' ("wp_behav.c", line 62):
 Prove: true.
 
 ------------------------------------------------------------
@@ -144,7 +144,7 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Assertion for 'x1' 'qed_ok' (file wp_behav.c, line 23):
+Goal Assertion for 'x1' 'qed_ok' ("wp_behav.c", line 23):
 Prove: true.
 
 ------------------------------------------------------------
@@ -162,7 +162,7 @@ Prove: false.
 
 ------------------------------------------------------------
 
-Goal Assertion for 'x2' 'qed_ok' (file wp_behav.c, line 24):
+Goal Assertion for 'x2' 'qed_ok' ("wp_behav.c", line 24):
 Prove: true.
 
 ------------------------------------------------------------
@@ -243,12 +243,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'qed_ok' (file wp_behav.c, line 81):
+Goal Establishment of Invariant 'qed_ok' ("wp_behav.c", line 81):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'qed_ok' (file wp_behav.c, line 81):
+Goal Preservation of Invariant 'qed_ok' ("wp_behav.c", line 81):
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(n_1) /\ is_sint32(1 + i).
   (* Goal *)
@@ -264,12 +264,12 @@ Prove: T[i <- 0][i_1] = 0.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file wp_behav.c, line 84):
+Goal Positivity of Loop variant at loop ("wp_behav.c", lines 84-85):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file wp_behav.c, line 84):
+Goal Decreasing of Loop variant at loop ("wp_behav.c", lines 84-85):
 Prove: true.
 
 ------------------------------------------------------------

@@ -19,12 +19,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file overarray.i, line 12) in 'f1_ok':
+Goal Assigns ("overarray.i", line 12, characters 13-20) in 'f1_ok':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file overarray.i, line 12) in 'f1_ok':
+Goal Assigns ("overarray.i", line 12, characters 13-20) in 'f1_ok':
 Prove: true.
 
 ------------------------------------------------------------
@@ -42,12 +42,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file overarray.i, line 15) in 'f2_ok':
+Goal Assigns ("overarray.i", line 15, characters 13-22) in 'f2_ok':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file overarray.i, line 15) in 'f2_ok':
+Goal Assigns ("overarray.i", line 15, characters 13-22) in 'f2_ok':
 Prove: true.
 
 ------------------------------------------------------------

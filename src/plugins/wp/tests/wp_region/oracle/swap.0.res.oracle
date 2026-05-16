@@ -16,7 +16,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file swap.i, line 20) in 'swap_aliased':
+Goal Post-condition ("swap.i", line 20, characters 11-25) in 'swap_aliased':
 Let x = M0002_sint32_0[a].
 Let x_1 = M0002_sint32_0[b].
 Let x_2 = M0002_sint32_0[a <- x_1][b <- x][a].
@@ -33,7 +33,7 @@ Prove: x_2 = x_1.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file swap.i, line 21) in 'swap_aliased':
+Goal Post-condition ("swap.i", line 21, characters 11-25) in 'swap_aliased':
 Prove: true.
 
 ------------------------------------------------------------
@@ -44,13 +44,13 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file swap.i, line 22) in 'swap_aliased' (1/2):
+Goal Assigns ("swap.i", line 22, characters 11-13) in 'swap_aliased' (1/2):
 Effect at line 27
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file swap.i, line 22) in 'swap_aliased' (2/2):
+Goal Assigns ("swap.i", line 22, characters 11-13) in 'swap_aliased' (2/2):
 Effect at line 28
 Prove: true.
 
@@ -65,12 +65,12 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file swap.i, line 5) in 'swap_separated':
+Goal Post-condition ("swap.i", line 5, characters 11-25) in 'swap_separated':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file swap.i, line 6) in 'swap_separated':
+Goal Post-condition ("swap.i", line 6, characters 11-25) in 'swap_separated':
 Prove: true.
 
 ------------------------------------------------------------
@@ -81,13 +81,13 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file swap.i, line 7) in 'swap_separated' (1/2):
+Goal Assigns ("swap.i", line 7, characters 11-13) in 'swap_separated' (1/2):
 Effect at line 12
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file swap.i, line 7) in 'swap_separated' (2/2):
+Goal Assigns ("swap.i", line 7, characters 11-13) in 'swap_separated' (2/2):
 Effect at line 13
 Prove: true.
 

@@ -20,7 +20,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file stmtcompiler_test_rela.i, line 9):
+Goal Assertion ("stmtcompiler_test_rela.i", line 9, characters 14-19):
 Prove: true.
 
 ------------------------------------------------------------

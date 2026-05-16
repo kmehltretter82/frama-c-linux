@@ -14,18 +14,18 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Exit-condition (file postassigns2.c, line 6) in 'mess1':
+Goal Exit-condition ("postassigns2.c", line 6) in 'mess1':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file postassigns2.c, line 7) in 'mess1':
+Goal Assigns ("postassigns2.c", line 7) in 'mess1':
 Call Effect at line 10
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file postassigns2.c, line 7) in 'mess1':
+Goal Assigns ("postassigns2.c", line 7) in 'mess1':
 Call Effect at line 10
 Prove: true.
 

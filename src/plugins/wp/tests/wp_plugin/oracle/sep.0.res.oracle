@@ -45,7 +45,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file sep.i, line 13) in 'f1_none':
+Goal Post-condition ("sep.i", line 13, characters 13-29) in 'f1_none':
 Prove: true.
 
 ------------------------------------------------------------
@@ -65,7 +65,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file sep.i, line 17) in 'f2_p_a':
+Goal Post-condition ("sep.i", line 17, characters 13-30) in 'f2_p_a':
 Prove: true.
 
 ------------------------------------------------------------
@@ -85,7 +85,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file sep.i, line 21) in 'f3_p_ab':
+Goal Post-condition ("sep.i", line 21, characters 13-24) in 'f3_p_ab':
 Prove: true.
 
 ------------------------------------------------------------
@@ -105,7 +105,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file sep.i, line 25) in 'f4_pq_ab':
+Goal Post-condition ("sep.i", line 25, characters 13-51) in 'f4_pq_ab':
 Prove: true.
 
 ------------------------------------------------------------
@@ -125,7 +125,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file sep.i, line 29) in 'f5_pq':
+Goal Post-condition ("sep.i", line 29, characters 13-32) in 'f5_pq':
 Prove: true.
 
 ------------------------------------------------------------
@@ -145,7 +145,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file sep.i, line 33) in 'f6_Pa':
+Goal Post-condition ("sep.i", line 33, characters 13-22) in 'f6_Pa':
 Prove: true.
 
 ------------------------------------------------------------
@@ -165,7 +165,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file sep.i, line 42) in 'f7_pq_ad':
+Goal Post-condition ("sep.i", line 42, characters 13-30) in 'f7_pq_ad':
 Prove: true.
 
 ------------------------------------------------------------
@@ -185,7 +185,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file sep.i, line 48) in 'f8_pq_a':
+Goal Post-condition ("sep.i", line 48, characters 13-29) in 'f8_pq_a':
 Prove: true.
 
 ------------------------------------------------------------

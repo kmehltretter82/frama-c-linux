@@ -20,7 +20,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file bts779.i, line 6):
+Goal Assertion ("bts779.i", line 6, characters 12-22):
 Prove: true.
 
 ------------------------------------------------------------

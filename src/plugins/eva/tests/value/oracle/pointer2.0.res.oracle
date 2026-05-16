@@ -10,7 +10,7 @@
   z ∈ {0}
 [eva:progress] 
   computing for function f <- g.
-  Called from pointer2.i:14.
+  Called from pointer2.i:14:7-12.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:progress] Recording results for g

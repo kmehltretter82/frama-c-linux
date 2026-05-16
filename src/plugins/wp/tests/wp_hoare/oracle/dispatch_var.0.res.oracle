@@ -86,47 +86,47 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 114) in 'call_no_ref_bd' (1/5):
+Goal Assigns ("dispatch_var.i", line 114, characters 13-15) in 'call_no_ref_bd' (1/5):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 114) in 'call_no_ref_bd' (2/5):
+Goal Assigns ("dispatch_var.i", line 114, characters 13-15) in 'call_no_ref_bd' (2/5):
 Effect at line 121
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 114) in 'call_no_ref_bd' (3/5):
+Goal Assigns ("dispatch_var.i", line 114, characters 13-15) in 'call_no_ref_bd' (3/5):
 Call Result at line 122
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 114) in 'call_no_ref_bd' (4/5):
+Goal Assigns ("dispatch_var.i", line 114, characters 13-15) in 'call_no_ref_bd' (4/5):
 Call Result at line 123
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 114) in 'call_no_ref_bd' (5/5):
+Goal Assigns ("dispatch_var.i", line 114, characters 13-15) in 'call_no_ref_bd' (5/5):
 Effect at line 122
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 114) in 'call_no_ref_bd' (1/3):
+Goal Assigns ("dispatch_var.i", line 114, characters 13-15) in 'call_no_ref_bd' (1/3):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 114) in 'call_no_ref_bd' (2/3):
+Goal Assigns ("dispatch_var.i", line 114, characters 13-15) in 'call_no_ref_bd' (2/3):
 Effect at line 121
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 114) in 'call_no_ref_bd' (3/3):
+Goal Assigns ("dispatch_var.i", line 114, characters 13-15) in 'call_no_ref_bd' (3/3):
 Call Result at line 122
 Prove: true.
 
@@ -150,18 +150,18 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 51) in 'call_ref_bd' (1/2):
+Goal Assigns ("dispatch_var.i", line 51, characters 14-16) in 'call_ref_bd' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 51) in 'call_ref_bd' (2/2):
+Goal Assigns ("dispatch_var.i", line 51, characters 14-16) in 'call_ref_bd' (2/2):
 Call Result at line 57
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 51) in 'call_ref_bd':
+Goal Assigns ("dispatch_var.i", line 51, characters 14-16) in 'call_ref_bd':
 Prove: true.
 
 ------------------------------------------------------------
@@ -184,41 +184,41 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 63) in 'call_ref_bd2' (1/5):
+Goal Assigns ("dispatch_var.i", line 63, characters 13-15) in 'call_ref_bd2' (1/5):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 63) in 'call_ref_bd2' (2/5):
+Goal Assigns ("dispatch_var.i", line 63, characters 13-15) in 'call_ref_bd2' (2/5):
 Effect at line 68
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 63) in 'call_ref_bd2' (3/5):
+Goal Assigns ("dispatch_var.i", line 63, characters 13-15) in 'call_ref_bd2' (3/5):
 Call Result at line 70
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 63) in 'call_ref_bd2' (4/5):
+Goal Assigns ("dispatch_var.i", line 63, characters 13-15) in 'call_ref_bd2' (4/5):
 Effect at line 70
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 63) in 'call_ref_bd2' (5/5):
+Goal Assigns ("dispatch_var.i", line 63, characters 13-15) in 'call_ref_bd2' (5/5):
 Effect at line 71
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 63) in 'call_ref_bd2' (1/2):
+Goal Assigns ("dispatch_var.i", line 63, characters 13-15) in 'call_ref_bd2' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 63) in 'call_ref_bd2' (2/2):
+Goal Assigns ("dispatch_var.i", line 63, characters 13-15) in 'call_ref_bd2' (2/2):
 Effect at line 68
 Prove: true.
 
@@ -242,18 +242,18 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 17) in 'call_ref_ctr' (1/2):
+Goal Assigns ("dispatch_var.i", line 17, characters 14-16) in 'call_ref_ctr' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 17) in 'call_ref_ctr' (2/2):
+Goal Assigns ("dispatch_var.i", line 17, characters 14-16) in 'call_ref_ctr' (2/2):
 Call Result at line 23
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 17) in 'call_ref_ctr':
+Goal Assigns ("dispatch_var.i", line 17, characters 14-16) in 'call_ref_ctr':
 Prove: true.
 
 ------------------------------------------------------------
@@ -276,41 +276,41 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 28) in 'call_ref_ctr2' (1/5):
+Goal Assigns ("dispatch_var.i", line 28, characters 13-15) in 'call_ref_ctr2' (1/5):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 28) in 'call_ref_ctr2' (2/5):
+Goal Assigns ("dispatch_var.i", line 28, characters 13-15) in 'call_ref_ctr2' (2/5):
 Effect at line 33
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 28) in 'call_ref_ctr2' (3/5):
+Goal Assigns ("dispatch_var.i", line 28, characters 13-15) in 'call_ref_ctr2' (3/5):
 Call Result at line 35
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 28) in 'call_ref_ctr2' (4/5):
+Goal Assigns ("dispatch_var.i", line 28, characters 13-15) in 'call_ref_ctr2' (4/5):
 Effect at line 35
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 28) in 'call_ref_ctr2' (5/5):
+Goal Assigns ("dispatch_var.i", line 28, characters 13-15) in 'call_ref_ctr2' (5/5):
 Effect at line 36
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 28) in 'call_ref_ctr2' (1/2):
+Goal Assigns ("dispatch_var.i", line 28, characters 13-15) in 'call_ref_ctr2' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 28) in 'call_ref_ctr2' (2/2):
+Goal Assigns ("dispatch_var.i", line 28, characters 13-15) in 'call_ref_ctr2' (2/2):
 Effect at line 33
 Prove: true.
 
@@ -339,47 +339,47 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 139) in 'call_ref_ctr_nr' (1/4):
+Goal Assigns ("dispatch_var.i", line 139, characters 12-14) in 'call_ref_ctr_nr' (1/4):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 139) in 'call_ref_ctr_nr' (2/4):
+Goal Assigns ("dispatch_var.i", line 139, characters 12-14) in 'call_ref_ctr_nr' (2/4):
 Effect at line 147
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 139) in 'call_ref_ctr_nr' (3/4):
+Goal Assigns ("dispatch_var.i", line 139, characters 12-14) in 'call_ref_ctr_nr' (3/4):
 Effect at line 147
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 139) in 'call_ref_ctr_nr' (4/4):
+Goal Assigns ("dispatch_var.i", line 139, characters 12-14) in 'call_ref_ctr_nr' (4/4):
 Call Result at line 148
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 139) in 'call_ref_ctr_nr' (1/3):
+Goal Assigns ("dispatch_var.i", line 139, characters 12-14) in 'call_ref_ctr_nr' (1/3):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 139) in 'call_ref_ctr_nr' (2/3):
+Goal Assigns ("dispatch_var.i", line 139, characters 12-14) in 'call_ref_ctr_nr' (2/3):
 Effect at line 147
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 139) in 'call_ref_ctr_nr' (3/3):
+Goal Assigns ("dispatch_var.i", line 139, characters 12-14) in 'call_ref_ctr_nr' (3/3):
 Effect at line 147
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file dispatch_var.i, line 129) in 'ref_ctr_nr'' in 'call_ref_ctr_nr' at call 'ref_ctr_nr' (file dispatch_var.i, line 148)
+Goal Instance of 'Pre-condition ("dispatch_var.i", line 129, characters 14-25) in 'ref_ctr_nr'' in 'call_ref_ctr_nr' at call 'ref_ctr_nr' ("dispatch_var.i", line 148, characters 10-32)
 :
 Prove: true.
 
@@ -393,7 +393,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file dispatch_var.i, line 162) in 'call_ref_ctr_nstars':
+Goal Post-condition ("dispatch_var.i", line 162, characters 13-25) in 'call_ref_ctr_nstars':
 Prove: true.
 
 ------------------------------------------------------------
@@ -449,59 +449,59 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 87) in 'call_ref_valid' (1/5):
+Goal Assigns ("dispatch_var.i", line 87, characters 13-15) in 'call_ref_valid' (1/5):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 87) in 'call_ref_valid' (2/5):
+Goal Assigns ("dispatch_var.i", line 87, characters 13-15) in 'call_ref_valid' (2/5):
 Effect at line 94
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 87) in 'call_ref_valid' (3/5):
+Goal Assigns ("dispatch_var.i", line 87, characters 13-15) in 'call_ref_valid' (3/5):
 Call Result at line 95
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 87) in 'call_ref_valid' (4/5):
+Goal Assigns ("dispatch_var.i", line 87, characters 13-15) in 'call_ref_valid' (4/5):
 Call Result at line 96
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 87) in 'call_ref_valid' (5/5):
+Goal Assigns ("dispatch_var.i", line 87, characters 13-15) in 'call_ref_valid' (5/5):
 Effect at line 95
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 87) in 'call_ref_valid' (1/3):
+Goal Assigns ("dispatch_var.i", line 87, characters 13-15) in 'call_ref_valid' (1/3):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 87) in 'call_ref_valid' (2/3):
+Goal Assigns ("dispatch_var.i", line 87, characters 13-15) in 'call_ref_valid' (2/3):
 Effect at line 94
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 87) in 'call_ref_valid' (3/3):
+Goal Assigns ("dispatch_var.i", line 87, characters 13-15) in 'call_ref_valid' (3/3):
 Call Result at line 95
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file dispatch_var.i, line 79) in 'ref_valid'' in 'call_ref_valid' at call 'ref_valid' (file dispatch_var.i, line 95)
+Goal Instance of 'Pre-condition ("dispatch_var.i", line 79, characters 14-24) in 'ref_valid'' in 'call_ref_valid' at call 'ref_valid' ("dispatch_var.i", line 95, characters 11-25)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file dispatch_var.i, line 79) in 'ref_valid'' in 'call_ref_valid' at call 'ref_valid' (file dispatch_var.i, line 96)
+Goal Instance of 'Pre-condition ("dispatch_var.i", line 79, characters 14-24) in 'ref_valid'' in 'call_ref_valid' at call 'ref_valid' ("dispatch_var.i", line 96, characters 11-25)
 :
 Prove: true.
 
@@ -515,7 +515,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file dispatch_var.i, line 177) in 'call_two_ref':
+Goal Post-condition ("dispatch_var.i", line 177, characters 13-25) in 'call_two_ref':
 Prove: true.
 
 ------------------------------------------------------------
@@ -525,35 +525,35 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 176) in 'call_two_ref' (1/4):
+Goal Assigns ("dispatch_var.i", line 176, characters 13-15) in 'call_two_ref' (1/4):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 176) in 'call_two_ref' (2/4):
+Goal Assigns ("dispatch_var.i", line 176, characters 13-15) in 'call_two_ref' (2/4):
 Call Result at line 182
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 176) in 'call_two_ref' (3/4):
+Goal Assigns ("dispatch_var.i", line 176, characters 13-15) in 'call_two_ref' (3/4):
 Call Result at line 182
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 176) in 'call_two_ref' (4/4):
+Goal Assigns ("dispatch_var.i", line 176, characters 13-15) in 'call_two_ref' (4/4):
 Effect at line 182
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 176) in 'call_two_ref' (1/2):
+Goal Assigns ("dispatch_var.i", line 176, characters 13-15) in 'call_two_ref' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file dispatch_var.i, line 176) in 'call_two_ref' (2/2):
+Goal Assigns ("dispatch_var.i", line 176, characters 13-15) in 'call_two_ref' (2/2):
 Call Result at line 182
 Prove: true.
 
@@ -567,7 +567,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file dispatch_var.i, line 192) in 'g':
+Goal Post-condition ("dispatch_var.i", line 192, characters 11-23) in 'g':
 Prove: true.
 
 ------------------------------------------------------------
@@ -602,7 +602,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file dispatch_var.i, line 104) in 'no_ref_bd':
+Goal Post-condition ("dispatch_var.i", line 104, characters 13-27) in 'no_ref_bd':
 Prove: true.
 
 ------------------------------------------------------------
@@ -634,7 +634,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file dispatch_var.i, line 42) in 'ref_bd':
+Goal Post-condition ("dispatch_var.i", line 42, characters 13-26) in 'ref_bd':
 Prove: true.
 
 ------------------------------------------------------------

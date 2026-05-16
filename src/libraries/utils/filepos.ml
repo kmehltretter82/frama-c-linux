@@ -59,20 +59,11 @@ module Prototype = struct
   let pretty = pretty_generic @@ fun fmt pos ->
     Format.fprintf fmt "%a:%d" Filepath.pretty pos.path pos.line
 
-  let pretty_long
-      ?(file=true) ?(line=true) ?(column=false) ?(offset=false) =
+  let pretty_long =
     pretty_generic @@ fun fmt pos ->
-    let first = ref true in
-    (* Prints a position component with a comma before if necessary *)
-    let pp format =
-      if not !first then Format.fprintf fmt ", ";
-      first := false;
-      Format.fprintf fmt format
-    in
-    if file then pp "file %a" Filepath.pretty pos.path;
-    if line && pos.line > 0 then pp "line %d" pos.line;
-    if column && pos.column > 0 then pp "character %d" pos.column;
-    if offset && pos.offset >= 0 then pp "byte %d" pos.offset
+    Filepath.pretty fmt pos.path;
+    if pos.line > 0 then Format.fprintf fmt  ", line %d" pos.line;
+    if pos.column > 0 then Format.fprintf fmt  ", character %d" pos.column
 
   let pretty_debug = pp
 
@@ -169,6 +160,7 @@ let original pos =
 
 let path pos = (original pos).path
 let line pos = (original pos).line
+let column pos = (original pos).column
 let origin pos = pos.origin
 
 let is_known pos =

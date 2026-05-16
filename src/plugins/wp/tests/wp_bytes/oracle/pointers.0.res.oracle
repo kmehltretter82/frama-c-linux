@@ -30,7 +30,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Check (file pointers.i, line 26):
+Goal Check ("pointers.i", line 26, characters 13-20):
 Let a = shift_uint8(global(L_buffer_35), 0).
 Let a_1 = global(P_f_34).
 Assume { (* Heap *) Type: framed(mem_0) /\ sconst(mem_0). }
@@ -54,7 +54,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Check (file pointers.i, line 18):
+Goal Check ("pointers.i", line 18, characters 13-20):
 Let a = shift_uint8(global(L_buffer_30), 0).
 Let a_1 = global(G_g_27).
 Assume { (* Heap *) Type: framed(mem_0) /\ sconst(mem_0). }
@@ -78,7 +78,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Check (file pointers.i, line 48):
+Goal Check ("pointers.i", line 48, characters 13-24):
 Let a = shift_uint8(global(L_buffer_44), 0).
 Assume { (* Heap *) Type: framed(mem_0) /\ linked(alloc_0) /\ sconst(mem_0).
 }
@@ -103,7 +103,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Check 'P' (file pointers.i, line 36):
+Goal Check 'P' ("pointers.i", line 36, characters 16-23):
 Let a = global(L_l_39).
 Let a_1 = shift_uint8(global(L_buffer_40), 0).
 Assume {
@@ -132,7 +132,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Check (file pointers.i, line 8):
+Goal Check ("pointers.i", line 8, characters 13-23):
 Let a = shift_uint8(global(L_buffer_23), 0).
 Assume { (* Heap *) Type: framed(mem_0) /\ sconst(mem_0). }
 Prove: addr_of_int(read_uint64(write_uint64(mem_0, a, 0), a)) = null.
@@ -154,7 +154,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Check (file pointers.i, line 57):
+Goal Check ("pointers.i", line 57, characters 13-19):
 Let a = shift_uint8(global(L_buffer_51), 0).
 Assume {
   (* Heap *)

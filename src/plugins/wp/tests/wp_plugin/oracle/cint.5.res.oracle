@@ -24,7 +24,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file cint.i, line 24) in 'signed_bitwise':
+Goal Post-condition ("cint.i", line 24, characters 13-25) in 'signed_bitwise':
 Prove: P_R(lnot(a), a).
 
 ------------------------------------------------------------
@@ -44,7 +44,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file cint.i, line 30) in 'signed_downcast':
+Goal Post-condition ("cint.i", line 30, characters 13-25) in 'signed_downcast':
 Prove: P_R(to_sint16(a), a).
 
 ------------------------------------------------------------
@@ -64,7 +64,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file cint.i, line 36) in 'signed_overflow':
+Goal Post-condition ("cint.i", line 36, characters 13-27) in 'signed_overflow':
 Prove: P_R(signed_overflow_0, signed_overflow_0).
 
 ------------------------------------------------------------
@@ -84,7 +84,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file cint.i, line 42) in 'unsigned_bitwise':
+Goal Post-condition ("cint.i", line 42, characters 13-25) in 'unsigned_bitwise':
 Assume { Type: 0 <= a. }
 Prove: P_R(to_uint32(lnot(a)), a).
 
@@ -105,7 +105,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file cint.i, line 48) in 'unsigned_downcast':
+Goal Post-condition ("cint.i", line 48, characters 13-25) in 'unsigned_downcast':
 Prove: P_R(to_uint32(a), a).
 
 ------------------------------------------------------------
@@ -125,7 +125,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file cint.i, line 54) in 'unsigned_overflow':
+Goal Post-condition ("cint.i", line 54, characters 13-27) in 'unsigned_overflow':
 Let x = a + b. Assume { Type: (0 <= a) /\ (0 <= b). }
 Prove: P_R(to_uint32(x), x).
 

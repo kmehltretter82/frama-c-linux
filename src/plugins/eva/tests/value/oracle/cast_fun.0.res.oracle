@@ -48,7 +48,7 @@
   
 [eva:progress] 
   computing for function f1 <- main.
-  Called from cast_fun.i:60.
+  Called from cast_fun.i:60:9-17.
 [eva] using specification for function f1
 [eva:assigns:missing-result] cast_fun.i:6: Warning: 
   no 'assigns \result \from ...' clause specified for function f1
@@ -57,21 +57,21 @@
   pointer to function with incompatible type. assert \valid_function(p1);
 [eva:progress] 
   computing for function f2 <- main.
-  Called from cast_fun.i:65.
+  Called from cast_fun.i:65:9-17.
 [eva] using specification for function f2
 [eva:assigns:missing-result] cast_fun.i:8: Warning: 
   no 'assigns \result \from ...' clause specified for function f2
 [eva:progress] Done for function f2
 [eva:progress] 
   computing for function f3 <- main.
-  Called from cast_fun.i:70.
+  Called from cast_fun.i:70:9-17.
 [eva] using specification for function f3
 [eva:assigns:missing-result] cast_fun.i:10: Warning: 
   no 'assigns \result \from ...' clause specified for function f3
 [eva:progress] Done for function f3
 [eva:progress] 
   computing for function f3 <- main.
-  Called from cast_fun.i:75.
+  Called from cast_fun.i:75:5-13.
 [eva:progress] Done for function f3
 [eva:alarm] cast_fun.i:80: Warning: 
   pointer to function with incompatible type. assert \valid_function(p1);
@@ -80,7 +80,7 @@
   assert \valid_function((void (*)(int ))p4);
 [eva:progress] 
   computing for function f6 <- main.
-  Called from cast_fun.i:90.
+  Called from cast_fun.i:90:5-13.
 [eva] using specification for function f6
 [eva:progress] Done for function f6
 [eva:alarm] cast_fun.i:95: Warning: 
@@ -89,17 +89,17 @@
   pointer to function with incompatible type. assert \valid_function(p2);
 [eva:progress] 
   computing for function f9 <- main.
-  Called from cast_fun.i:105.
+  Called from cast_fun.i:105:5-15.
 [eva] using specification for function f9
 [eva:progress] Done for function f9
 [eva:progress] 
   computing for function f10 <- main.
-  Called from cast_fun.i:110.
+  Called from cast_fun.i:110:5-15.
 [eva] using specification for function f10
 [eva:progress] Done for function f10
 [eva:progress] 
   computing for function f10 <- main.
-  Called from cast_fun.i:121.
+  Called from cast_fun.i:121:5-15.
 [eva:progress] Done for function f10
 [eva:alarm] cast_fun.i:126: Warning: 
   pointer to function with incompatible type. assert \valid_function(p1);
@@ -107,7 +107,7 @@
   pointer to function with incompatible type. assert \valid_function(p1);
 [eva:progress] 
   computing for function f1 <- main.
-  Called from cast_fun.i:136.
+  Called from cast_fun.i:136:5-13.
 [eva:progress] Done for function f1
 [kernel] Warning: Unknown alignment of base f1: Undefined alignof on a function.
 [eva:alarm] cast_fun.i:140: Warning: 
@@ -116,7 +116,7 @@
   unaligned pointer creation. assert \aligned(y,alignof(int));
 [eva:progress] 
   computing for function f1 <- main.
-  Called from cast_fun.i:142.
+  Called from cast_fun.i:142:5-13.
 [eva:progress] Done for function f1
 [eva:progress] Recording results for main
 [from] Computing for function main
@@ -183,25 +183,25 @@
   NO EFFECTS
 [from] ====== END OF DEPENDENCIES ======
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to f1 at cast_fun.i:60 (by main):
+[from] call to f1 at cast_fun.i:60:9-17 (by main):
   \result FROM ANYTHING(origin:Unknown)
-[from] call to f2 at cast_fun.i:65 (by main):
+[from] call to f2 at cast_fun.i:65:9-17 (by main):
   \result FROM ANYTHING(origin:Unknown)
-[from] call to f3 at cast_fun.i:70 (by main):
+[from] call to f3 at cast_fun.i:70:9-17 (by main):
   \result FROM ANYTHING(origin:Unknown)
-[from] call to f3 at cast_fun.i:75 (by main):
+[from] call to f3 at cast_fun.i:75:5-13 (by main):
   \result FROM ANYTHING(origin:Unknown)
-[from] call to f6 at cast_fun.i:90 (by main):
+[from] call to f6 at cast_fun.i:90:5-13 (by main):
   NO EFFECTS
-[from] call to f9 at cast_fun.i:105 (by main):
+[from] call to f9 at cast_fun.i:105:5-15 (by main):
   NO EFFECTS
-[from] call to f10 at cast_fun.i:110 (by main):
+[from] call to f10 at cast_fun.i:110:5-15 (by main):
   NO EFFECTS
-[from] call to f10 at cast_fun.i:121 (by main):
+[from] call to f10 at cast_fun.i:121:5-15 (by main):
   NO EFFECTS
-[from] call to f1 at cast_fun.i:136 (by main):
+[from] call to f1 at cast_fun.i:136:5-13 (by main):
   \result FROM ANYTHING(origin:Unknown)
-[from] call to f1 at cast_fun.i:142 (by main):
+[from] call to f1 at cast_fun.i:142:5-13 (by main):
   \result FROM ANYTHING(origin:Unknown)
 [from] entry point:
   NO EFFECTS

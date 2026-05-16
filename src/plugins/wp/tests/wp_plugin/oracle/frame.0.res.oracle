@@ -110,7 +110,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'FRAMED' (file frame.i, line 28):
+Goal Assertion 'FRAMED' ("frame.i", line 28, characters 22-37):
 Prove: true.
 
 ------------------------------------------------------------

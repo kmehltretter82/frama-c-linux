@@ -53,7 +53,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'fail' (file opaque_struct.i, line 60):
+Goal Check 'fail' ("opaque_struct.i", line 60, characters 19-48):
 Let a = memcpy(Mint_0, p, Mint_undef_0, p, Length_of_S1_S).
 Let a_1 = memcpy(Mint_3, p, Mint_undef_3, p, Length_of_S1_S).
 Let a_2 = memcpy(Mint_5, p, Mint_undef_5, p, Length_of_S1_S).
@@ -97,12 +97,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'fail' (file opaque_struct.i, line 24):
+Goal Check 'fail' ("opaque_struct.i", line 24, characters 19-36):
 Prove: EqS1_S(S1_0, S1_1).
 
 ------------------------------------------------------------
 
-Goal Check 'succeed' (file opaque_struct.i, line 25):
+Goal Check 'succeed' ("opaque_struct.i", line 25, characters 23-40):
 Prove: true.
 
 ------------------------------------------------------------
@@ -120,7 +120,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'fail' (file opaque_struct.i, line 69):
+Goal Check 'fail' ("opaque_struct.i", line 69, characters 19-37):
 Let x = Mint_0[p].
 Let a_1 = memcpy(Mint_0, a, Mint_undef_0, a, Length_of_S1_S).
 Let a_2 = a_1[p].
@@ -137,7 +137,7 @@ Prove: a_2 = x.
 
 ------------------------------------------------------------
 
-Goal Check 'fail' (file opaque_struct.i, line 70):
+Goal Check 'fail' ("opaque_struct.i", line 70, characters 20-38):
 Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(c.base) <= 0) /\
@@ -150,7 +150,7 @@ Prove: of_f32(memcpy(Mf32_0, a, Mf32_undef_0, a, Length_of_S1_S)[q])
 
 ------------------------------------------------------------
 
-Goal Check 'succeed' (file opaque_struct.i, line 71):
+Goal Check 'succeed' ("opaque_struct.i", line 71, characters 23-41):
 Let x = Mchar_0[c].
 Let a_1 = memcpy(Mchar_0, a, Mchar_undef_0, a, Length_of_S1_S).
 Let a_2 = a_1[c].
@@ -179,12 +179,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file opaque_struct.i, line 81):
+Goal Assertion 'rte,mem_access' ("opaque_struct.i", line 81, characters 9-12):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'rte,mem_access' (file opaque_struct.i, line 81):
+Goal Assertion 'rte,mem_access' ("opaque_struct.i", line 81, characters 9-12):
 Prove: true.
 
 ------------------------------------------------------------
@@ -202,7 +202,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'fails' (file opaque_struct.i, line 38):
+Goal Check 'fails' ("opaque_struct.i", line 38, characters 20-35):
 Assume {
   (* Heap *)
   Type: (region(p.base) <= 0) /\ linked(Malloc_0) /\ scinit(Init_0).
@@ -215,7 +215,7 @@ Prove: IsInit_S1_S(p, memcpy(Init_0, p, Init_undef_0, p, Length_of_S1_S)).
 
 ------------------------------------------------------------
 
-Goal Check 'succeed' (file opaque_struct.i, line 39):
+Goal Check 'succeed' ("opaque_struct.i", line 39, characters 23-44):
 Let x = p.base.
 Assume {
   (* Heap *)
@@ -240,7 +240,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'fail' (file opaque_struct.i, line 54):
+Goal Check 'fail' ("opaque_struct.i", line 54, characters 19-36):
 Assume {
   (* Heap *)
   Type: (region(p.base) <= 0) /\ scinit(Init_0).
@@ -251,7 +251,7 @@ Prove: !IsInit_S1_S(p, memcpy(Init_0, p, Init_undef_0, p, Length_of_S1_S)).
 
 ------------------------------------------------------------
 
-Goal Check 'fail' (file opaque_struct.i, line 55):
+Goal Check 'fail' ("opaque_struct.i", line 55, characters 22-37):
 Assume {
   (* Heap *)
   Type: (region(p.base) <= 0) /\ scinit(Init_0).

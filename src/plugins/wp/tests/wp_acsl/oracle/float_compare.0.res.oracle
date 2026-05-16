@@ -157,13 +157,13 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assertion (file float_compare.i, line 63):
+Goal Assertion ("float_compare.i", line 63, characters 14-35):
 Assume { (* Pre-condition *) Have: is_finite_f32(a) /\ is_finite_f64(b). }
 Prove: is_finite_f64(to_f64(of_f32(a))).
 
 ------------------------------------------------------------
 
-Goal Assertion (file float_compare.i, line 64):
+Goal Assertion ("float_compare.i", line 64, characters 15-46):
 Let r = of_f32(a).
 Let a_1 = to_f64(r).
 Assume {

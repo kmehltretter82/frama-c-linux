@@ -55,7 +55,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Assigns (file ergo_typecheck.i, line 34) in 'f':
+Goal Assigns ("ergo_typecheck.i", line 34, characters 13-16) in 'f':
 Prove: true.
 
 ------------------------------------------------------------

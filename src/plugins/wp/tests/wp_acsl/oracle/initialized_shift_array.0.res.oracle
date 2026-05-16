@@ -19,7 +19,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'fail_cell_after_end' at call 'test' (file initialized_shift_array.i, line 50)
+Goal Instance of 'Pre-condition ("initialized_shift_array.i", line 2, characters 12-48) in 'test'' in 'fail_cell_after_end' at call 'test' ("initialized_shift_array.i", line 50, characters 2-18)
 :
 Prove: false.
 
@@ -38,7 +38,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'fail_cell_before' at call 'test' (file initialized_shift_array.i, line 34)
+Goal Instance of 'Pre-condition ("initialized_shift_array.i", line 2, characters 12-48) in 'test'' in 'fail_cell_before' at call 'test' ("initialized_shift_array.i", line 34, characters 2-18)
 :
 Prove: false.
 
@@ -57,7 +57,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'fail_partial_not_full' at call 'test' (file initialized_shift_array.i, line 55)
+Goal Instance of 'Pre-condition ("initialized_shift_array.i", line 2, characters 12-48) in 'test'' in 'fail_partial_not_full' at call 'test' ("initialized_shift_array.i", line 55, characters 2-18)
 :
 Assume { (* Goal *) When: (0 <= i) /\ (i <= 2). }
 Prove: (([false..])[1 <- true][0 <- true][i]=true).
@@ -77,7 +77,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'fail_too_long' at call 'test' (file initialized_shift_array.i, line 38)
+Goal Instance of 'Pre-condition ("initialized_shift_array.i", line 2, characters 12-48) in 'test'' in 'fail_too_long' at call 'test' ("initialized_shift_array.i", line 38, characters 2-18)
 :
 Prove: false.
 
@@ -96,7 +96,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'fail_too_long_from_1' at call 'test' (file initialized_shift_array.i, line 42)
+Goal Instance of 'Pre-condition ("initialized_shift_array.i", line 2, characters 12-48) in 'test'' in 'fail_too_long_from_1' at call 'test' ("initialized_shift_array.i", line 42, characters 2-18)
 :
 Prove: false.
 
@@ -115,7 +115,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'fail_too_long_from_2' at call 'test' (file initialized_shift_array.i, line 46)
+Goal Instance of 'Pre-condition ("initialized_shift_array.i", line 2, characters 12-48) in 'test'' in 'fail_too_long_from_2' at call 'test' ("initialized_shift_array.i", line 46, characters 3-19)
 :
 Prove: false.
 
@@ -134,7 +134,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'succ_from_1_from_1' at call 'test' (file initialized_shift_array.i, line 23)
+Goal Instance of 'Pre-condition ("initialized_shift_array.i", line 2, characters 12-48) in 'test'' in 'succ_from_1_from_1' at call 'test' ("initialized_shift_array.i", line 23, characters 2-18)
 :
 Assume { (* Goal *) When: (0 < i) /\ (i <= 2). }
 Prove: (([false..])[2 <- true][1 <- true][i]=true).
@@ -154,7 +154,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'succ_full_first_cell' at call 'test' (file initialized_shift_array.i, line 10)
+Goal Instance of 'Pre-condition ("initialized_shift_array.i", line 2, characters 12-48) in 'test'' in 'succ_full_first_cell' at call 'test' ("initialized_shift_array.i", line 10, characters 3-19)
 :
 Prove: true.
 
@@ -173,7 +173,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'succ_full_from_1' at call 'test' (file initialized_shift_array.i, line 18)
+Goal Instance of 'Pre-condition ("initialized_shift_array.i", line 2, characters 12-48) in 'test'' in 'succ_full_from_1' at call 'test' ("initialized_shift_array.i", line 18, characters 2-18)
 :
 Assume {
   (* Goal *)
@@ -201,7 +201,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'succ_full_from_2' at call 'test' (file initialized_shift_array.i, line 27)
+Goal Instance of 'Pre-condition ("initialized_shift_array.i", line 2, characters 12-48) in 'test'' in 'succ_full_from_2' at call 'test' ("initialized_shift_array.i", line 27, characters 2-18)
 :
 Assume {
   (* Goal *)
@@ -229,7 +229,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'succ_full_full' at call 'test' (file initialized_shift_array.i, line 14)
+Goal Instance of 'Pre-condition ("initialized_shift_array.i", line 2, characters 12-48) in 'test'' in 'succ_full_full' at call 'test' ("initialized_shift_array.i", line 14, characters 2-18)
 :
 Assume {
   (* Goal *)

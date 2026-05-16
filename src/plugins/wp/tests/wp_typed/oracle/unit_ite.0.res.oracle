@@ -14,7 +14,7 @@ Prover CFG returns Valid
 
 ------------------------------------------------------------
 
-Goal Post-condition (file unit_ite.i, line 2) in 'check':
+Goal Post-condition ("unit_ite.i", line 2, characters 13-33) in 'check':
 Prove: true.
 
 ------------------------------------------------------------

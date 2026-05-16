@@ -18,18 +18,18 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file user_swap.i, line 25):
+Goal Assertion ("user_swap.i", line 25, characters 14-20):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file user_swap.i, line 6) in 'swap'' in 'main' at call 'swap' (file user_swap.i, line 24)
+Goal Instance of 'Pre-condition ("user_swap.i", line 6, characters 14-23) in 'swap'' in 'main' at call 'swap' ("user_swap.i", line 24, characters 15-26)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file user_swap.i, line 7) in 'swap'' in 'main' at call 'swap' (file user_swap.i, line 24)
+Goal Instance of 'Pre-condition ("user_swap.i", line 7, characters 14-23) in 'swap'' in 'main' at call 'swap' ("user_swap.i", line 24, characters 15-26)
 :
 Prove: true.
 

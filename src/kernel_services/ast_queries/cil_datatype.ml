@@ -175,7 +175,7 @@ end
 module Position =  struct
   include Filepos
   let dummy = unknown
-  let pp_with_col fmt pos = Filepos.pretty_long ~column:true fmt pos
+  let pp_with_col = Filepos.pretty_long
   let of_lexing_pos pos = of_lexing_pos pos (* Erase the optional parameter *)
 end
 
@@ -184,6 +184,7 @@ module Location = struct
   let dummy = unknown
   let compare_start_semantic = compare
   let equal_start_semantic = equal
+  let pretty_line fmt loc = Filepos.pretty_long fmt (fst loc)
 end
 
 module File = struct

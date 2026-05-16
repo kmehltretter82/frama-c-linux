@@ -16,7 +16,7 @@
   clauses from the specification. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function init <- main_init.
-  Called from bts334.i:66.
+  Called from bts334.i:66:13-26.
 [eva] using specification for function init
 [eva:assigns:missing-result] bts334.i:61: Warning: 
   no 'assigns \result \from ...' clause specified for function init
@@ -26,13 +26,13 @@
   accessing uninitialized left-value. assert \initialized(&is_ok);
 [eva:progress] 
   computing for function process <- main_init.
-  Called from bts334.i:67.
+  Called from bts334.i:67:15-30.
 [eva:progress] 
   computing for function loop_body <- process <- main_init.
-  Called from bts334.i:53.
+  Called from bts334.i:53:14-25.
 [eva:progress] 
   computing for function f <- loop_body <- process <- main_init.
-  Called from bts334.i:38.
+  Called from bts334.i:38:10-20.
 [eva:alarm] bts334.i:14: Warning: division by zero. assert kf ≢ 0;
 [eva:alarm] bts334.i:14: Warning: 
   signed overflow. assert -2147483648 ≤ k[i] * (int)(vi - si[i]);
@@ -44,7 +44,7 @@
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- loop_body <- process <- main_init.
-  Called from bts334.i:39.
+  Called from bts334.i:39:10-20.
 [eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -56,10 +56,10 @@
 [eva:partition] bts334.i:53: starting to merge loop iterations
 [eva:progress] 
   computing for function loop_body <- process <- main_init.
-  Called from bts334.i:53.
+  Called from bts334.i:53:14-25.
 [eva:progress] 
   computing for function f <- loop_body <- process <- main_init.
-  Called from bts334.i:38.
+  Called from bts334.i:38:10-20.
 [eva:alarm] bts334.i:14: Warning: 
   signed overflow. assert -2147483648 ≤ vi - si[i];
 [eva:alarm] bts334.i:14: Warning: 
@@ -76,7 +76,7 @@
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- loop_body <- process <- main_init.
-  Called from bts334.i:39.
+  Called from bts334.i:39:10-20.
 [eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -87,10 +87,10 @@
 [eva:progress] Done for function loop_body
 [eva:progress] 
   computing for function loop_body <- process <- main_init.
-  Called from bts334.i:53.
+  Called from bts334.i:53:14-25.
 [eva:progress] 
   computing for function f <- loop_body <- process <- main_init.
-  Called from bts334.i:38.
+  Called from bts334.i:38:10-20.
 [eva:alarm] bts334.i:14: Warning: 
   signed overflow. assert so[i] / kf ≤ 2147483647;
 [eva:progress] Recording results for f
@@ -99,7 +99,7 @@
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- loop_body <- process <- main_init.
-  Called from bts334.i:39.
+  Called from bts334.i:39:10-20.
 [eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -117,25 +117,25 @@
 [from] Done for function main_init
 [eva:progress] Done for function main_init
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to f at bts334.i:38 (by loop_body):
+[from] call to f at bts334.i:38:10-20 (by loop_body):
   si[0] FROM vi; i
   so[0] FROM kf; k[0]; vi; i; si[0]; so[0]
   \result FROM kf; k[0]; vi; i; si[0]; so[0]
-[from] call to f at bts334.i:39 (by loop_body):
+[from] call to f at bts334.i:39:10-20 (by loop_body):
   si[1] FROM vi; i
   so[1] FROM kf; k[1]; vi; i; si[1]; so[1]
   \result FROM kf; k[1]; vi; i; si[1]; so[1]
-[from] call to loop_body at bts334.i:53 (by process):
+[from] call to loop_body at bts334.i:53:14-25 (by process):
   s0 FROM kf; k[0]; e0; si[0]; so[0]
   s1 FROM kf; k[1]; e1; si[1]; so[1]
   si[0] FROM e0
     [1] FROM e1
   so[0] FROM kf; k[0]; e0; si[0]; so[0]
     [1] FROM kf; k[1]; e1; si[1]; so[1]
-[from] call to init at bts334.i:66 (by main_init):
+[from] call to init at bts334.i:66:13-26 (by main_init):
   is_ok FROM \nothing
   \result FROM ANYTHING(origin:Unknown)
-[from] call to process at bts334.i:67 (by main_init):
+[from] call to process at bts334.i:67:15-30 (by main_init):
   NON TERMINATING - NO EFFECTS
 [from] entry point:
   NO EFFECTS

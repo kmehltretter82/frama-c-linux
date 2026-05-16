@@ -19,13 +19,13 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file injector.c, line 13) in 'g'' in 'f' at call 'g' (file injector.c, line 54)
+Goal Instance of 'Pre-condition ("injector.c", line 13) in 'g'' in 'f' at call 'g' ("injector.c", line 54)
 :
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition (file injector.c, line 13) in 'g'' in 'f' at call 'g' (file injector.c, line 56)
+Goal Instance of 'Pre-condition ("injector.c", line 13) in 'g'' in 'f' at call 'g' ("injector.c", line 56)
 :
 Prove: true.
 
