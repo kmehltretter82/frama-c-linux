@@ -1,7 +1,7 @@
 [kernel] Parsing generic.c (with preprocessing)
 [kernel] generic.c:62: 
   syntax error:
-  Location: line 62, column 27, before or at token: int
+  Location: line 62, column 28, before or at token: int
   60    #endif
   61    #ifdef FUNCTION_TYPE
   62      int a = _Generic(1, void(int): 1);

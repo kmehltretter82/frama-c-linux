@@ -128,16 +128,19 @@ val origin : t -> origin
     preprocessed code, it returns the preprocessed output path. *)
 val input_path : t -> Filepath.t
 
-(** Get the line in the input file. Unlike {!line}, if the position is in a
-    preprocessed code, it returns the line in the preprocessed output. *)
+(** Get the line in the input file, starting at 1. Unlike {!line}, if the
+    position is in a preprocessed code, it returns the line in the
+    preprocessed output. *)
 val input_line : t -> int
 
-(** Get the column in the input file. Unlike {!column}, if the position is in a
-    preprocessed code, it returns the column in the preprocessed output. *)
+(** Get the column in the input file, starting at 1. Unlike {!column}, if the
+    position is in a preprocessed code, it returns the column in the
+    preprocessed output. *)
 val input_column : t -> int
 
-(** Get the offset in the input file. Unlike {!offset}, if the position is in a
-    preprocessed code, it returns the offset in the preprocessed output. *)
+(** Get the offset in the input file, starting at 0. Unlike {!offset}, if the
+    position is in a preprocessed code, it returns the offset in the
+    preprocessed output. *)
 val input_offset : t -> int
 
 (** Returns whether the location is an preprocessed file. If [true] is returned

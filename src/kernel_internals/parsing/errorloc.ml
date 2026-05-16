@@ -260,8 +260,8 @@ let pp_context fmt (loc,lines) =
       Format.fprintf fmt "\n";
     (* If exactly one line of error, print upward arrow *)
     if start_line = end_line && i = end_line then
-      let start_col = Filepos.input_column start_pos
-      and end_col = Filepos.input_column end_pos in
+      let start_col = Filepos.input_column start_pos - 1
+      and end_col = Filepos.input_column end_pos - 1 in
       let arrows =
         if start_col < 0 || end_col < 0 then (* columns are not available *)
           String.make (String.length line) '^'

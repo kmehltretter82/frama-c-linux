@@ -1,7 +1,7 @@
 [kernel] Parsing c23-bool-kws.c (with preprocessing)
 [kernel] c23-bool-kws.c:32: 
   syntax error:
-  Location: line 32, between columns 6 and 7, before or at token: b1
+  Location: line 32, between columns 7 and 8, before or at token: b1
           bool b1 = false ;
               ^
   in code pre-processed from the original source

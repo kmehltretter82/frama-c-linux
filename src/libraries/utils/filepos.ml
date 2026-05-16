@@ -14,7 +14,7 @@ module Prototype = struct
     { path : Filepath.t [@default Filepath.empty] [@printer Filepath.pretty];
       offset : int [@default -1];
       line : int [@default 0];
-      column : int [@default -1];
+      column : int [@default 0];
       origin : origin [@default Original];
     }
   and origin =
@@ -69,7 +69,7 @@ module Prototype = struct
     in
     if file then pp "file %a" Filepath.pretty pos.path;
     if line && pos.line > 0 then pp "line %d" pos.line;
-    if column && pos.column >= 0 then pp "character %d" pos.column;
+    if column && pos.column > 0 then pp "character %d" pos.column;
     if offset && pos.offset >= 0 then pp "byte %d" pos.offset
 
   let pretty_debug = pp
@@ -123,14 +123,14 @@ let of_lexing_pos ?(origin=Original) (pos : Lexing.position) : t =
   { origin;
     path = Filepath.of_string pos.pos_fname;
     line = pos.pos_lnum;
-    column = pos.pos_cnum - pos.pos_bol;
+    column = pos.pos_cnum - pos.pos_bol + 1;
     offset = pos.pos_cnum;
   }
 
 let to_lexing_pos (pos : t) : Lexing.position =
   { pos_fname = Filepath.to_string_abs pos.path;
     pos_lnum = pos.line;
-    pos_bol = pos.offset - pos.column;
+    pos_bol = pos.offset - pos.column + 1;
     pos_cnum = pos.offset;
   }
 

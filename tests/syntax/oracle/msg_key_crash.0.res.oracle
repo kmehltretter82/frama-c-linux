@@ -20,17 +20,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 2; vaddrof = false; vreferenced = false; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] 
   isExportedRoot (GFunDecl (
@@ -50,17 +48,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 3; vaddrof = false; vreferenced = false; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] 
   isExportedRoot (GFunDecl (
@@ -77,17 +73,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 5; vaddrof = false; vreferenced = false; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] 
   isExportedRoot (GFunDecl (
@@ -109,17 +103,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 7; vaddrof = false; vreferenced = false; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] 
   isExportedRoot (GFunDecl (
@@ -148,17 +140,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 11; vaddrof = false; vreferenced = false; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] 
   isExportedRoot (GFunDecl (
@@ -188,17 +178,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 14; vaddrof = false; vreferenced = false; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] 
   isExportedRoot (GFunDecl (
@@ -220,17 +208,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 16; vaddrof = false; vreferenced = false; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] 
   isExportedRoot (GFunDecl (
@@ -252,17 +238,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 18; vaddrof = false; vreferenced = false; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] 
   isExportedRoot (GFunDecl (
@@ -285,17 +269,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 20; vaddrof = false; vreferenced = false; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] 
   isExportedRoot __fc_lit_string1 -> true, non-static variable
@@ -327,17 +309,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 2; vaddrof = false; vreferenced = true; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] 
   isExportedRoot (GFunDecl (
@@ -357,17 +337,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 3; vaddrof = false; vreferenced = true; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] 
   isExportedRoot (GFunDecl (
@@ -384,17 +362,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 5; vaddrof = false; vreferenced = true; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] 
   isExportedRoot (GFunDecl (
@@ -416,17 +392,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 7; vaddrof = false; vreferenced = true; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] 
   isExportedRoot (GFunDecl (
@@ -455,17 +429,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 11; vaddrof = false; vreferenced = true; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] 
   isExportedRoot (GFunDecl (
@@ -495,17 +467,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 14; vaddrof = false; vreferenced = true; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] 
   isExportedRoot (GFunDecl (
@@ -527,17 +497,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 16; vaddrof = false; vreferenced = true; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] 
   isExportedRoot (GFunDecl (
@@ -559,17 +527,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 18; vaddrof = false; vreferenced = true; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] 
   isExportedRoot (GFunDecl (
@@ -592,17 +558,15 @@
        vattr = []; vstorage = NoStorage; valignas = None; vglob = true;
        vdefined = false; vformal = false; vinline = false;
        vdecl =
-       ({ path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown },
-        { path = <unknown>; offset = -1; line = 0; column = -1;
-          origin = Unknown });
+       ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          },
+        { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown
+          });
        vid = 20; vaddrof = false; vreferenced = true; vtemp = false;
        vdescr = None; vdescrpure = true; vghost = false; vsource = true;
        vlogic_var_assoc = None },
-     ({ path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        },
-      { path = <unknown>; offset = -1; line = 0; column = -1; origin = Unknown
-        })
+     ({ path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown },
+      { path = <unknown>; offset = -1; line = 0; column = 0; origin = Unknown })
      )) -> false, neither fundef nor vardef nor annotation
 [kernel:parser:rmtmps] removing global: fun decl __builtin_c23_va_start
 [kernel:parser:rmtmps] removing global: fun decl __builtin_next_arg

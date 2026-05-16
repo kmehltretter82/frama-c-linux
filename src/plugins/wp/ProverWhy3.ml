@@ -1116,8 +1116,8 @@ let add_model_trace (probes: Lang.F.term Probe.Map.t) cnv t =
       let loc =
         let (pos1,pos2) = p.loc in
         let path = Filepos.path pos1 |> Filepath.to_string
-        and l1 = Filepos.line pos1 and c1 = Filepos.input_column pos1
-        and l2 = Filepos.line pos2 and c2 = Filepos.input_column pos2 in
+        and l1 = Filepos.line pos1 and c1 = Filepos.input_column pos1 - 1
+        and l2 = Filepos.line pos2 and c2 = Filepos.input_column pos2 - 1 in
         Why3.Loc.user_position path l1 c1 l2 c2
       in Term.create_lsymbol (Ident.id_fresh ~loc ~attrs p.name) [] ty
     in

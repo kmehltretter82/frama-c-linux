@@ -1,7 +1,7 @@
 [kernel] Parsing no-param.i (no preprocessing)
 [kernel] no-param.i:5: 
   syntax error:
-  Location: line 5, column 7, before or at token: ...
+  Location: line 5, column 8, before or at token: ...
   3        STDOPT:
   4     */
   5     void f(...) // f must have at least one argument
