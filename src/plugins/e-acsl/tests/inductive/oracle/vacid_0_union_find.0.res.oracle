@@ -1,12 +1,8 @@
 [e-acsl] beginning translation.
 [e-acsl:analysis:inductive] extracting predicate from repr using mode: complete
-[e-acsl:analysis:inductive] 
-  could not apply substitution link ↦ link to term link[x]
-[e-acsl] Warning: Unable to extract executable code from inductive definition of repr.
-  See language reference manual for details on the supported forms.
-[e-acsl] vacid_0_union_find.c:40: Warning: 
+[e-acsl] vacid_0_union_find.c:13: Warning: 
   E-ACSL construct
-  `inductive definitions outside of subset described in the reference manual'
+  `logic functions or predicates with no definition nor reads clause'
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".

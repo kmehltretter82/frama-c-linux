@@ -50,6 +50,11 @@ include struct (* auxiliary functions *)
       | {term_node = TLval (TVar v, offset)} ->
         begin match Logic_var.Map.find_opt v substs, offset with
           | Some subst, TNoOffset -> Cil.ChangeTo (Misc.Id_term.deep_copy subst)
+          | Some {term_node = TLval (TVar v', TNoOffset)}, offset ->
+            let t' =
+              Misc.Id_term.deep_copy {t with term_node = TLval (TVar v', offset)}
+            in
+            Cil.ChangeDoChildrenPost (t', fun x -> x)
           | Some subst, _ ->
             Options.debug ~dkey "could not apply substitution %a ↦ %a to term %a"
               Printer.pp_logic_var v

@@ -29,6 +29,13 @@ inductive repr(int link[], int dist[], int num, integer x, integer r) {
                     repr(link, dist, num, link[x], r) ==>
                     repr(link, dist, num, x, r);
   }
+ */
+/*@
+predicate repr(int link[], int dist[], int num, integer x, integer r) =
+  (inv(link, dist, num) && 0 <= x < size(link, dist, num) && link[x] == x &&
+   r == x) ||
+  (inv(link, dist, num) && 0 <= x < size(link, dist, num) &&
+   repr(link, dist, num, link[x], r));
 
 */
 int arr[3] = {1, 2, 3};
