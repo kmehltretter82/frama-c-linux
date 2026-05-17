@@ -501,6 +501,7 @@ end = functor (Out : Out_language) -> struct
           Out.mk_if ~loc:conjunction.pred_loc conjunction case_true next_ctor
       in
       let rec compile ~uv ~conds p =
+        Options.debug ~dkey ~level:5 "compile ~uv:%a ~conds %a" Vars.pretty uv Printer.pp_predicate p;
         let recurse ?(uv = uv) ?(conds = conds) =
           (* conds : gathered hypotheses *)
           compile ~uv ~conds in
