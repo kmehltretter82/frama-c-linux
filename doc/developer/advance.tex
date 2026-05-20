@@ -873,9 +873,8 @@ one for regular tests (if more than one \verb|OPT|).\\
 \end{longtable}
 
 \subsection{Testing mode for runtime test execution}\label{sec:testing-mode}
-\index{Test!FRAMAC\_TESTING}
-\index{Test!Cmdline.inside\_tests}
 
+\nscodeidxdef{Test}{FRAMAC\_TESTING}
 \framac uses the environment variable \texttt{FRAMAC\_TESTING} to determine
 whether it is running inside a test or not. When set to \texttt{yes},
 \framac will execute optional inlined test code at runtime, which can
@@ -886,6 +885,7 @@ used: via \ptests \texttt{ENV} directive, via dune \texttt{setenv} action or
 manually exporting this variable before running \framac. It must be set to
 \texttt{yes}.
 
+\scodeidxdef{Cmdline}{inside\_tests}
 This variable controls the value of \texttt{Cmdline.inside\_tests}, which
 is available in \framac's API and can be used to guard tests, for example:
 
