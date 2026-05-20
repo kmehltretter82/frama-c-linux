@@ -16,6 +16,11 @@ module P = Plugin.Register
     end)
 include P
 
+module Group = struct
+  let optimisation = add_group "Optimisation"
+  let widening = add_group "Widening"
+end
+
 module Run =
   False
     (struct
@@ -135,23 +140,59 @@ module Interlang_force =
     end)
 
 
-module O =
-  Int
-    (struct
-      let default = 2
-      let option_name = "-e-acsl-O"
-      let arg_name = "n"
-      let help = "Level of optimisation (defaults to 2). \
-                  0 - No optimisation. \
-                  1 - Constant-time optimisations. \
-                  2 - Moderate-cost optimisations. \
-                  3 - Aggressive optimisations, that may exploit \
-                  undefined behaviours in specification."
-    end)
+let () = Parameter_customize.set_group Group.optimisation
+module O = Int (struct
+    let default = 2
+    let option_name = "-e-acsl-O"
+    let arg_name = "O"
+    let help = "Optimisation level (default: 2). The value O controls which \
+                of the individual optimisations below are active by default. \
+                0: no optimisation. \
+                1: constant-time optimisations. \
+                2: moderate-cost optimisations. \
+                3: aggressive optimisations (which may even exploit \
+                undefined behaviours in specification)."
+  end)
 let () = O.set_range ~min:0 ~max:3
 
-module Widening_arguments_base =
-  Int
+
+module Optimisations = struct
+
+  module type Conf = sig
+    val name : string
+    val level : int
+    val descr : string
+  end
+
+  module Make (C : Conf) : Parameter_sig.Bool
+  = struct
+    let () =
+      let open Parameter_customize in
+      set_group Group.optimisation;
+      set_negative_option_name ("-e-acsl-O-no-" ^ C.name);
+      set_negative_option_help ("opposite of -e-acsl-O-" ^ C.name)
+    module Res = Bool (struct
+        let option_name = "-e-acsl-O-" ^ C.name
+        let help = "(O ≥ " ^ string_of_int C.level ^ ") activate " ^ C.descr
+        let default = O.get_default () >= C.level
+      end)
+    let () = O.add_update_hook
+        (fun _ o -> if not @@ Res.is_set () then Res.set (o >= C.level))
+    include Res
+  end
+
+  module Hypothesis_gathering =
+    Make (struct
+      let name = "hyp-gath"
+      let level = 1
+      let descr = "hypothesis gathering during inductive extraction"
+    end)
+
+end
+
+
+let () = Parameter_customize.set_group Group.widening
+module Widening_arguments_base = Int
     (struct
       let default = 1
       let option_name = "-e-acsl-widening-arguments-base"
@@ -160,6 +201,7 @@ module Widening_arguments_base =
     end)
 let () = Widening_arguments_base.set_range ~min:0 ~max:2
 
+let () = Parameter_customize.set_group Group.widening
 module Widening_arguments =
   String_map
     (Value_int)
@@ -171,16 +213,18 @@ module Widening_arguments =
                   basis."
     end)
 
+let () = Parameter_customize.set_group Group.widening
 module Widening_output_base =
   Int
     (struct
       let default = 1
       let option_name = "-e-acsl-widening-output-base"
       let arg_name = "n"
-      let help = "wideining strategy for output of recursive functions."
+      let help = "widening strategy for output of recursive functions."
     end)
 let () = Widening_output_base.set_range ~min:0 ~max:2
 
+let () = Parameter_customize.set_group Group.widening
 module Widening_output =
   String_map
     (Value_int)

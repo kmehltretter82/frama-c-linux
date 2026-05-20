@@ -512,10 +512,14 @@ end = functor (Out : Out_language) -> struct
           Out.mk_if ~loc:conjunction.pred_loc conjunction case_true next_ctor
       in
       let rec compile ~uv ~conds p =
-        Options.debug ~dkey ~level:5 "compile ~uv:%a ~conds %a" Vars.pretty uv Printer.pp_predicate p;
-        let recurse ?(uv = uv) ?(conds = conds) =
-          (* conds : gathered hypotheses *)
-          compile ~uv ~conds in
+        Options.debug ~dkey ~level:5 "compile ~uv:%a ~conds %a"
+          Vars.pretty uv
+          Printer.pp_predicate p;
+        let recurse ?(uv = uv) ?(conds = conds) p =
+          if Options.Optimisations.Hypothesis_gathering.get ()
+          then compile ~uv ~conds p (* with hypothesis gathering *)
+          else flush_conds ~conds @@ compile ~uv ~conds:[] p (* no hyp. gath. *)
+        in
         match p.pred_content with
         | Pimplies ({pred_content = Pand (p1, p2)} as pl, pr) ->
           (* treat  p ∧ q ⇒ r  as  p ⇒ q ⇒ r *)

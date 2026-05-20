@@ -17,11 +17,6 @@ Options taking a string as argument should preferably be written
 -e-acsl             generate a new project where E-ACSL annotations are
                     translated to executable C code (opposite option is
                     -no-e-acsl)
--e-acsl-O <n>       Level of optimisation (defaults to 2). 0 - No
-                    optimisation. 1 - Constant-time optimisations. 2 -
-                    Moderate-cost optimisations. 3 - Aggressive
-                    optimisations, that may exploit undefined behaviours in
-                    specification.
 -e-acsl-assert-print-data  print data contributing to the failed assertion
                     along with the runtime error message (set by default,
                     opposite option is -e-acsl-no-assert-print-data)
@@ -60,17 +55,6 @@ Options taking a string as argument should preferably be written
 -e-acsl-validate-format-strings  enable runtime validation of stdio.h format
                     functions (opposite option is
                     -e-acsl-no-validate-format-strings)
--e-acsl-widening-arguments <s>  widening strategy for arguments of functions
-                    on a case by case basis. (preferably use
-                    -e-acsl-widening-arguments="")
--e-acsl-widening-arguments-base <n>  widening strategy for arguments of
-                    recursive functions.
--e-acsl-widening-output <s>  widening strategy for output of recursive
-                    functions on a case
-                          by case basis. (preferably use
-                    -e-acsl-widening-output="")
--e-acsl-widening-output-base <n>  wideining strategy for output of recursive
-                    functions.
 
 *** DEBUG
 
@@ -80,6 +64,19 @@ Options taking a string as argument should preferably be written
 
 -e-acsl-help        help of plug-in E-ACSL
 -e-acsl-h           alias for option -e-acsl-help
+
+*** OPTIMISATION
+
+-e-acsl-O <O>       Optimisation level (default: 2). The value O controls
+                    which of the individual optimisations below are active by
+                    default. 0: no optimisation. 1: constant-time
+                    optimisations. 2: moderate-cost optimisations. 3:
+                    aggressive optimisations (which may even exploit
+                    undefined behaviours in specification).
+-e-acsl-O-hyp-gath  (O ≥ 1) activate hypothesis gathering during inductive
+                    extraction (set by default, opposite option is
+                    -e-acsl-O-no-hyp-gath)
+-e-acsl-O-no-hyp-gath  opposite of -e-acsl-O-hyp-gath
 
 *** OUTPUT MESSAGES
 
@@ -104,3 +101,17 @@ Options taking a string as argument should preferably be written
                     warning, error, abort, feedback-once, warning-once,
                     error-once. Defaults to warning. (preferably use
                     -e-acsl-warn-key="k1[=s1][,...,kn[=sn]]")
+
+*** WIDENING
+
+-e-acsl-widening-arguments <s>  widening strategy for arguments of functions
+                    on a case by case basis. (preferably use
+                    -e-acsl-widening-arguments="")
+-e-acsl-widening-arguments-base <n>  widening strategy for arguments of
+                    recursive functions.
+-e-acsl-widening-output <s>  widening strategy for output of recursive
+                    functions on a case
+                          by case basis. (preferably use
+                    -e-acsl-widening-output="")
+-e-acsl-widening-output-base <n>  widening strategy for output of recursive
+                    functions.
