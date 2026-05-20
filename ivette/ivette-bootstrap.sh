@@ -78,7 +78,8 @@ IVETTE_TMP_DIR=`mktemp -d`
 cd $IVETTE_TMP_DIR
 tar zxf $PREFIX/lib/frama-c/ivette.tgz
 cd ivette
-make dist
+echo "[………]"
+make dist > /dev/null 2> /dev/null
 if [ "$?" != "0" ]
 then
     echo "Compilation Failed"
@@ -97,8 +98,7 @@ then
     rm -fr $IVETTE_TMP_DIR
     exit 3
 fi
-ln -s $PREFIX/bin/frama-c-gui $PREFIX/bin/ivette
-cd $USERCWD
+cd "$USERCWD"
 rm -fr $IVETTE_TMP_DIR
 rm -f $PREFIX/lib/frama-c/ivette.tgz
 

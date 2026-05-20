@@ -237,12 +237,12 @@ else ifeq ($(IVETTE_DIST:-arm64=),dist/mac)
 install:
 	@echo "Installing Ivette (macOS)"
 	@mkdir -p $(LIBDIR)/frama-c
-	@rm -fr $(LIBDIR)/frama-c/Ivette.app
-	@mv $(IVETTE_DIST)/Ivette.app $(LIBDIR)/frama-c/
+	@rm -fr $(LIBDIR)/frama-c/*.app
+	@mv "$(IVETTE_DIST)/Frama-C GUI.app" $(LIBDIR)/frama-c/
 	@cp ivette-macos.sh dist/ivette.sh
-	@echo "exec open -na $(LIBDIR)/frama-c/Ivette.app --args\\" >> dist/ivette.sh
-	@echo "  --command $(BINDIR)/frama-c\\" >> dist/ivette.sh
-	@echo "  --working \$$PWD \"\$$@\"" >> dist/ivette.sh
+	@echo "exec open -na \"$(LIBDIR)/frama-c/Frama-C GUI.app\" --args\\" >> dist/ivette.sh
+	@echo "  --command \"$(BINDIR)/frama-c\"\\" >> dist/ivette.sh
+	@echo "  --working \"\$$PWD\" \$$@" >> dist/ivette.sh
 	@mkdir -p $(BINDIR)
 	@install dist/ivette.sh $(BINDIR)/frama-c-gui
 	@rm -fr $(IVETTE_DIST)
