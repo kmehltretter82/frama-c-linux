@@ -201,9 +201,8 @@ dome-dev: dome-pkg dome-templ
 	@echo "export DOME='$(DOME)'" >> $(DOME_CLI)
 	@echo "export DOME_ENV='dev'" >> $(DOME_CLI)
 	@echo 'WDIR=$$PWD' >> $(DOME_CLI)
-	@echo 'ARGV="$(DOME_ARGS) $(DOME_DEV) $$@"' >> $(DOME_CLI)
 	@echo "cd $(CURDIR)" >> $(DOME_CLI)
-	@echo 'exec $(DOME_MK_BIN)/electron-vite dev -- $$WDIR $$ARGV' >> $(DOME_CLI)
+	@echo 'exec $(DOME_MK_BIN)/electron-vite dev -- "$$WDIR" $(DOME_ARGS) $(DOME_DEV) $$@' >> $(DOME_CLI)
 	@chmod 555 $(DOME_CLI)
 
 # --------------------------------------------------------------------------
@@ -220,7 +219,7 @@ dome-app: dome-pkg dome-templ
 	@rm -f $(DOME_CLI)
 	@echo "#!/bin/sh" >> $(DOME_CLI)
 	@echo "export DOME_LOCAL=true" >> $(DOME_CLI)
-	@echo 'exec $(DOME_MK_BIN)/electron $(CURDIR)/out/main/index.js $(DOME_ARGS) "$$@"' >> $(DOME_CLI)
+	@echo 'exec $(DOME_MK_BIN)/electron $(CURDIR)/out/main/index.js $(DOME_ARGS) $$@' >> $(DOME_CLI)
 	@chmod 555 $(DOME_CLI)
 
 # --------------------------------------------------------------------------

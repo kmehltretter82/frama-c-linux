@@ -9,7 +9,7 @@
 # --------------------------------------------------------------------------
 APP=Frama-C GUI
 DOME=./src/dome
-DOME_ARGS=--command $$(dirname $$0)/frama-c
+DOME_ARGS=--command "$$(dirname $$0)/frama-c"
 DOME_DEV=
 DOME_CLI=../bin/frama-c-gui
 DOME_API=./src/frama-c
