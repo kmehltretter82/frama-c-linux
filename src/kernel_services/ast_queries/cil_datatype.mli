@@ -67,29 +67,22 @@ end
 module Location: sig
   include S_with_collections with type t = location
   val unknown: t
+  [@@migrate { repl = Fileloc.unknown }]
 
-  (** [is_known loc] returns true if the location is neither unknown nor
-      generated.
-      @since Frama-C+dev *)
-  val is_known : t -> bool
-
-  (** Get the line of the location.
-      @since Frama-C+dev *)
-  val line : t -> int
-
-  (** Get the file path of the location.
-      @since Frama-C+dev *)
-  val path : t -> Filepath.t
+  val is_unknown : t -> bool
+  [@@migrate { repl = fun loc -> not (Fileloc.is_known loc) }]
 
   (** Pretty prints a position in the format ["<file>", line <line>-<line>] or,
       if on one line and the column number is available, in the format
       ["<file>", line <line>, character <char1>-<char2>]. *)
   val pretty_long : t Pretty_utils.formatter
+  [@@migrate { repl = Fileloc.pretty_long }]
 
   (** Pretty prints a position in the format ["<file>", line <line>] or, if the
       column number is available, in the format
       ["<file>", line <line>, character <char>] *)
   val pretty_line: t Pretty_utils.formatter
+  [@@migrate { repl = fun fmt loc -> Filepos.pretty_long fmt (fst loc) }]
 
   (** Pretty prints the ocaml internal representation of a location, for debug
       purposes.
@@ -97,15 +90,19 @@ module Location: sig
       @since 22.0-Titanium
   *)
   val pretty_debug: t Pretty_utils.formatter
+  [@@migrate { repl = Fileloc.pretty_debug }]
 
   val of_lexing_loc : Lexing.position * Lexing.position -> t
+  [@@migrate { repl = Fileloc.of_lexing_loc }]
+
   val to_lexing_loc : t -> Lexing.position * Lexing.position
+  [@@migrate { repl = Fileloc.to_lexing_loc }]
 
   val compare_start_semantic : location -> location -> int
-  [@@deprecated "Use Fileloc.compare instead"]
+  [@@migrate { repl = Fileloc.Original.compare }]
 
   val equal_start_semantic : location -> location -> bool
-  [@@deprecated "Use Fileloc.equal instead"]
+  [@@migrate { repl = Fileloc.Original.equal }]
 end
 [@@deprecated "Use Fileloc module directly, which is its own datatype."]
 
