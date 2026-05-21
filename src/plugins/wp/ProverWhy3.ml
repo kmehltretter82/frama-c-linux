@@ -1382,10 +1382,15 @@ let run_batch pconf driver ~config
     let config_mem = Why3.Whyconf.memlimit config in
     let config_time = Why3.Whyconf.timelimit config in
     let config_steps = Why3.Call_provers.empty_limits.limit_steps in
+    let limit_mem =
+      if not @@ Why3Provers.is_auto prover
+      then 0
+      else Option.value ~default:config_mem memlimit
+    in
     Why3.Call_provers.{
       limit_time = Option.value ~default:config_time timeout;
       limit_steps = Option.value ~default:config_steps steps;
-      limit_mem = Option.value ~default:config_mem memlimit;
+      limit_mem;
     } in
   let with_steps = match steps, pconf.Why3.Whyconf.command_steps with
     | None, _ -> false
