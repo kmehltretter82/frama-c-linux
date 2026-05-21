@@ -33,33 +33,9 @@ let option_qual =
 let why3_failure msg =
   Format.kasprintf failwith msg
 
-type why3_conf = {
-  env : Why3.Env.env ;
-  config : Why3.Whyconf.main ;
-}
-
-module Conf = WpContext.Index(struct
-    include Datatype.Unit
-    type key = unit
-    type data = why3_conf
-    let name = datatype_name
-  end)
-
-let get_why3_conf = Conf.memoize
-    begin fun () ->
-      let config = Why3Provers.config () in
-      let main = Why3.Whyconf.get_main config in
-      let ctx = Filepath.to_string_abs (WpContext.directory ()) in
-      let wp = Filepath.to_string_abs (Wp_parameters.Share.get_dir "why3") in
-      let user = Filepath.to_string_list (Wp_parameters.Library.get ()) in
-      let why3 = Why3.Whyconf.loadpath main in
-      let ld = ctx :: wp :: (user @ why3) in
-      { env = Why3.Env.create_env ld ; config = main }
-    end
-
 type context = {
-  mutable th : Why3.Theory.theory_uc;
-  conf: why3_conf;
+  mutable th : Why3.Theory.theory_uc ;
+  env: Why3.Env.env ;
 }
 
 type convert = {
@@ -121,14 +97,14 @@ let fold_map map fold = function
 
 let empty_context name : context = {
   th = Why3.Theory.create_theory (Why3.Ident.id_fresh name);
-  conf = get_why3_conf ();
+  env = Why3Provers.env () ;
 }
 
 let empty_cnv ?(polarity=`NoPolarity) (ctx:context) : convert = {
   th = ctx.th;
   subst = Lang.F.Tmap.empty;
   pool = Lang.F.pool ();
-  env = ctx.conf.env;
+  env = ctx.env;
   polarity;
   incomplete_symbols = Hashtbl.create 3;
   incomplete_types = Hashtbl.create 3;
@@ -795,7 +771,7 @@ class visitor (ctx:context) c =
         (if import then "import" else "")
         Why3.Pp.(print_list (Why3.Pp.constant_string ".") string) file
         thy name ;
-      let thy = Why3.Env.read_theory ctx.conf.env file thy in
+      let thy = Why3.Env.read_theory ctx.env file thy in
       let th = ctx.th in
       let th = Why3.Theory.open_scope th name in
       let th = Why3.Theory.use_export th thy in
@@ -1568,8 +1544,9 @@ let build_proof_task ?(mode=Prover.InteractiveMode.Batch) ?timeout ?steplimit ?m
     if Wp_parameters.Generate.get ()
     then Task.return VCS.no_result (* Only generate *)
     else
-      let {config; _ } as conf = WpContext.on_context context get_why3_conf () in
-      let drv , pconf , task = prover_task conf.env prover task in
+      let env = Why3Provers.env () in
+      let config = Why3.Whyconf.get_main @@ Why3Provers.config () in
+      let drv , pconf , task = prover_task env prover task in
       if Wp_parameters.is_debug_key_enabled dkey_pp_task then
         print_debug_task wpo drv prover task ;
       if is_trivial task then

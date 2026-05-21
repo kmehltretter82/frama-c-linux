@@ -13,6 +13,7 @@
 (** {2 Why3 configuration } *)
 
 val why3_version : string
+val env : unit -> Why3.Env.env
 val config : unit -> Why3.Whyconf.config
 val configure : unit -> unit
 val set_procs : int -> unit

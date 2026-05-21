@@ -151,24 +151,24 @@ theory Chunk1
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool1 *)
+  (* use bool.Bool *)
   
-  (* use int.Int1 *)
+  (* use int.Int *)
   
-  (* use int.ComputerDivision1 *)
+  (* use int.ComputerDivision *)
   
-  (* use real.RealInfix1 *)
+  (* use real.RealInfix *)
   
-  (* use frama_c_wp.qed.Qed1 *)
+  (* use frama_c_wp.qed.Qed *)
   
-  (* use map.Map1 *)
+  (* use map.Map *)
   
-  (* use frama_c_wp.memaddr.MemAddr1 *)
+  (* use frama_c_wp.memaddr.MemAddr *)
   
-  (* use frama_c_wp.cint.Cint1 *)
+  (* use frama_c_wp.cint.Cint *)
   
-  predicate is_sint32_chunk1 (m:addr1 -> int) =
-    forall a:addr1. is_sint321 (get1 m a)
+  predicate is_sint32_chunk1 (m:addr -> int) =
+    forall a:addr. is_sint32 (get m a)
   
 end
 ---------------------------------------------
@@ -178,21 +178,21 @@ theory Compound1
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool1 *)
+  (* use bool.Bool *)
   
-  (* use int.Int1 *)
+  (* use int.Int *)
   
-  (* use int.ComputerDivision1 *)
+  (* use int.ComputerDivision *)
   
-  (* use real.RealInfix1 *)
+  (* use real.RealInfix *)
   
-  (* use frama_c_wp.qed.Qed1 *)
+  (* use frama_c_wp.qed.Qed *)
   
-  (* use map.Map1 *)
+  (* use map.Map *)
   
-  (* use frama_c_wp.memaddr.MemAddr1 *)
+  (* use frama_c_wp.memaddr.MemAddr *)
   
-  function shift_sint321 (p:addr1) (k:int) : addr1 = shift1 p k
+  function shift_sint321 (p:addr) (k:int) : addr = shift p k
   
 end
 ---------------------------------------------
@@ -202,50 +202,49 @@ theory A_Occ1
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool1 *)
+  (* use bool.Bool *)
   
-  (* use int.Int1 *)
+  (* use int.Int *)
   
-  (* use int.ComputerDivision1 *)
+  (* use int.ComputerDivision *)
   
-  (* use real.RealInfix1 *)
+  (* use real.RealInfix *)
   
-  (* use frama_c_wp.qed.Qed1 *)
+  (* use frama_c_wp.qed.Qed *)
   
-  (* use map.Map1 *)
+  (* use map.Map *)
   
-  (* use frama_c_wp.memaddr.MemAddr1 *)
+  (* use frama_c_wp.memaddr.MemAddr *)
   
-  function L_occ1 (addr1 -> int) int addr1 int int : int
+  function L_occ1 (addr -> int) int addr int int : int
   
   (* use Chunk1 *)
   
   axiom Q_empty1 :
-    forall mint:addr1 -> int, v:int, p:addr1, f:int, t:int.
-     t <=' f ->
-     is_sint32_chunk1 mint -> is_sint321 v -> L_occ1 mint v p f t = 0
+    forall mint:addr -> int, v:int, p:addr, f:int, t:int.
+     t <= f ->
+     is_sint32_chunk1 mint -> is_sint32 v -> L_occ1 mint v p f t = 0
   
   (* use Compound1 *)
   
   axiom Q_is1 :
-    forall mint:addr1 -> int, v:int, p:addr1, f:int, t:int.
-     let x = (- 1) +' t in
-     let x1 = get1 mint (shift_sint321 p x) in
+    forall mint:addr -> int, v:int, p:addr, f:int, t:int.
+     let x = (- 1) + t in
+     let x1 = get mint (shift_sint321 p x) in
      x1 = v ->
-     f <' t ->
+     f < t ->
      is_sint32_chunk1 mint ->
-     is_sint321 v ->
-     is_sint321 x1 -> (1 +' L_occ1 mint v p f x) = L_occ1 mint v p f t
+     is_sint32 v ->
+     is_sint32 x1 -> (1 + L_occ1 mint v p f x) = L_occ1 mint v p f t
   
   axiom Q_isnt1 :
-    forall mint:addr1 -> int, v:int, p:addr1, f:int, t:int.
-     let x = (- 1) +' t in
-     let x1 = get1 mint (shift_sint321 p x) in
+    forall mint:addr -> int, v:int, p:addr, f:int, t:int.
+     let x = (- 1) + t in
+     let x1 = get mint (shift_sint321 p x) in
      not x1 = v ->
-     f <' t ->
+     f < t ->
      is_sint32_chunk1 mint ->
-     is_sint321 v ->
-     is_sint321 x1 -> L_occ1 mint v p f x = L_occ1 mint v p f t
+     is_sint32 v -> is_sint32 x1 -> L_occ1 mint v p f x = L_occ1 mint v p f t
   
 end
 ---------------------------------------------
@@ -255,31 +254,31 @@ theory Axiomatic1
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool1 *)
+  (* use bool.Bool *)
   
-  (* use int.Int1 *)
+  (* use int.Int *)
   
-  (* use int.ComputerDivision1 *)
+  (* use int.ComputerDivision *)
   
-  (* use real.RealInfix1 *)
+  (* use real.RealInfix *)
   
-  (* use frama_c_wp.qed.Qed1 *)
+  (* use frama_c_wp.qed.Qed *)
   
-  (* use map.Map1 *)
+  (* use map.Map *)
   
-  (* use frama_c_wp.memaddr.MemAddr1 *)
+  (* use frama_c_wp.memaddr.MemAddr *)
   
   (* use Chunk1 *)
   
   (* use A_Occ1 *)
   
   lemma Q_provable_lemma :
-    forall mint:addr1 -> int, v:int, p:addr1, f:int, s:int, t:int.
-     f <=' s ->
-     s <=' t ->
+    forall mint:addr -> int, v:int, p:addr, f:int, s:int, t:int.
+     f <= s ->
+     s <= t ->
      is_sint32_chunk1 mint ->
-     is_sint321 v ->
-     (L_occ1 mint v p f s +' L_occ1 mint v p s t) = L_occ1 mint v p f t
+     is_sint32 v ->
+     (L_occ1 mint v p f s + L_occ1 mint v p s t) = L_occ1 mint v p f t
   
 end
 [wp:print-generated] 
@@ -287,30 +286,30 @@ end
     
     (* use why3.BuiltIn.BuiltIn *)
     
-    (* use bool.Bool1 *)
+    (* use bool.Bool *)
     
-    (* use int.Int1 *)
+    (* use int.Int *)
     
-    (* use int.ComputerDivision1 *)
+    (* use int.ComputerDivision *)
     
-    (* use real.RealInfix1 *)
+    (* use real.RealInfix *)
     
-    (* use frama_c_wp.qed.Qed1 *)
+    (* use frama_c_wp.qed.Qed *)
     
-    (* use map.Map1 *)
+    (* use map.Map *)
     
     (* use Axiomatic1 *)
     
     goal wp_goal :
-      forall t:addr1 -> int, a:addr1, i:int, i1:int, i2:int.
-       let x = (- 1) +' i1 in
-       not get1 t (shift_sint321 a x) = i2 ->
-       i <' i1 ->
-       region (a.base) <=' 0 ->
-       i1 <=' 1000 ->
+      forall t:addr -> int, a:addr, i:int, i1:int, i2:int.
+       let x = (- 1) + i1 in
+       not get t (shift_sint321 a x) = i2 ->
+       i < i1 ->
+       region (a.base) <= 0 ->
+       i1 <= 1000 ->
        is_sint32_chunk1 t ->
        is_uint32 i1 ->
-       is_uint32 i -> is_sint321 i2 -> L_occ1 t i2 a i x = L_occ1 t i2 a i i1
+       is_uint32 i -> is_sint32 i2 -> L_occ1 t i2 a i x = L_occ1 t i2 a i i1
     
   end
 ---------------------------------------------
@@ -320,24 +319,24 @@ theory Chunk2
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool2 *)
+  (* use bool.Bool *)
   
-  (* use int.Int2 *)
+  (* use int.Int *)
   
-  (* use int.ComputerDivision2 *)
+  (* use int.ComputerDivision *)
   
-  (* use real.RealInfix2 *)
+  (* use real.RealInfix *)
   
-  (* use frama_c_wp.qed.Qed2 *)
+  (* use frama_c_wp.qed.Qed *)
   
-  (* use map.Map2 *)
+  (* use map.Map *)
   
-  (* use frama_c_wp.memaddr.MemAddr2 *)
+  (* use frama_c_wp.memaddr.MemAddr *)
   
-  (* use frama_c_wp.cint.Cint2 *)
+  (* use frama_c_wp.cint.Cint *)
   
-  predicate is_sint32_chunk2 (m:addr2 -> int) =
-    forall a:addr2. is_sint322 (get2 m a)
+  predicate is_sint32_chunk2 (m:addr -> int) =
+    forall a:addr. is_sint32 (get m a)
   
 end
 ---------------------------------------------
@@ -347,21 +346,21 @@ theory Compound2
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool2 *)
+  (* use bool.Bool *)
   
-  (* use int.Int2 *)
+  (* use int.Int *)
   
-  (* use int.ComputerDivision2 *)
+  (* use int.ComputerDivision *)
   
-  (* use real.RealInfix2 *)
+  (* use real.RealInfix *)
   
-  (* use frama_c_wp.qed.Qed2 *)
+  (* use frama_c_wp.qed.Qed *)
   
-  (* use map.Map2 *)
+  (* use map.Map *)
   
-  (* use frama_c_wp.memaddr.MemAddr2 *)
+  (* use frama_c_wp.memaddr.MemAddr *)
   
-  function shift_sint322 (p:addr2) (k:int) : addr2 = shift2 p k
+  function shift_sint322 (p:addr) (k:int) : addr = shift p k
   
 end
 ---------------------------------------------
@@ -371,50 +370,49 @@ theory A_Occ2
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool2 *)
+  (* use bool.Bool *)
   
-  (* use int.Int2 *)
+  (* use int.Int *)
   
-  (* use int.ComputerDivision2 *)
+  (* use int.ComputerDivision *)
   
-  (* use real.RealInfix2 *)
+  (* use real.RealInfix *)
   
-  (* use frama_c_wp.qed.Qed2 *)
+  (* use frama_c_wp.qed.Qed *)
   
-  (* use map.Map2 *)
+  (* use map.Map *)
   
-  (* use frama_c_wp.memaddr.MemAddr2 *)
+  (* use frama_c_wp.memaddr.MemAddr *)
   
-  function L_occ2 (addr2 -> int) int addr2 int int : int
+  function L_occ2 (addr -> int) int addr int int : int
   
   (* use Chunk2 *)
   
   axiom Q_empty2 :
-    forall mint:addr2 -> int, v:int, p:addr2, f:int, t:int.
-     t <='' f ->
-     is_sint32_chunk2 mint -> is_sint322 v -> L_occ2 mint v p f t = 0
+    forall mint:addr -> int, v:int, p:addr, f:int, t:int.
+     t <= f ->
+     is_sint32_chunk2 mint -> is_sint32 v -> L_occ2 mint v p f t = 0
   
   (* use Compound2 *)
   
   axiom Q_is2 :
-    forall mint:addr2 -> int, v:int, p:addr2, f:int, t:int.
-     let x = (- 1) +'' t in
-     let x1 = get2 mint (shift_sint322 p x) in
+    forall mint:addr -> int, v:int, p:addr, f:int, t:int.
+     let x = (- 1) + t in
+     let x1 = get mint (shift_sint322 p x) in
      x1 = v ->
-     f <'' t ->
+     f < t ->
      is_sint32_chunk2 mint ->
-     is_sint322 v ->
-     is_sint322 x1 -> (1 +'' L_occ2 mint v p f x) = L_occ2 mint v p f t
+     is_sint32 v ->
+     is_sint32 x1 -> (1 + L_occ2 mint v p f x) = L_occ2 mint v p f t
   
   axiom Q_isnt2 :
-    forall mint:addr2 -> int, v:int, p:addr2, f:int, t:int.
-     let x = (- 1) +'' t in
-     let x1 = get2 mint (shift_sint322 p x) in
+    forall mint:addr -> int, v:int, p:addr, f:int, t:int.
+     let x = (- 1) + t in
+     let x1 = get mint (shift_sint322 p x) in
      not x1 = v ->
-     f <'' t ->
+     f < t ->
      is_sint32_chunk2 mint ->
-     is_sint322 v ->
-     is_sint322 x1 -> L_occ2 mint v p f x = L_occ2 mint v p f t
+     is_sint32 v -> is_sint32 x1 -> L_occ2 mint v p f x = L_occ2 mint v p f t
   
 end
 ---------------------------------------------
@@ -424,31 +422,31 @@ theory Axiomatic11
   
   (* use why3.BuiltIn.BuiltIn *)
   
-  (* use bool.Bool2 *)
+  (* use bool.Bool *)
   
-  (* use int.Int2 *)
+  (* use int.Int *)
   
-  (* use int.ComputerDivision2 *)
+  (* use int.ComputerDivision *)
   
-  (* use real.RealInfix2 *)
+  (* use real.RealInfix *)
   
-  (* use frama_c_wp.qed.Qed2 *)
+  (* use frama_c_wp.qed.Qed *)
   
-  (* use map.Map2 *)
+  (* use map.Map *)
   
-  (* use frama_c_wp.memaddr.MemAddr2 *)
+  (* use frama_c_wp.memaddr.MemAddr *)
   
   (* use Chunk2 *)
   
   (* use A_Occ2 *)
   
   lemma Q_provable_lemma1 :
-    forall mint:addr2 -> int, v:int, p:addr2, f:int, s:int, t:int.
-     f <='' s ->
-     s <='' t ->
+    forall mint:addr -> int, v:int, p:addr, f:int, s:int, t:int.
+     f <= s ->
+     s <= t ->
      is_sint32_chunk2 mint ->
-     is_sint322 v ->
-     (L_occ2 mint v p f s +'' L_occ2 mint v p s t) = L_occ2 mint v p f t
+     is_sint32 v ->
+     (L_occ2 mint v p f s + L_occ2 mint v p s t) = L_occ2 mint v p f t
   
 end
 [wp:print-generated] 
@@ -456,31 +454,31 @@ end
     
     (* use why3.BuiltIn.BuiltIn *)
     
-    (* use bool.Bool2 *)
+    (* use bool.Bool *)
     
-    (* use int.Int2 *)
+    (* use int.Int *)
     
-    (* use int.ComputerDivision2 *)
+    (* use int.ComputerDivision *)
     
-    (* use real.RealInfix2 *)
+    (* use real.RealInfix *)
     
-    (* use frama_c_wp.qed.Qed2 *)
+    (* use frama_c_wp.qed.Qed *)
     
-    (* use map.Map2 *)
+    (* use map.Map *)
     
     (* use Axiomatic11 *)
     
     goal wp_goal :
-      forall t:addr2 -> int, a:addr2, i:int, i1:int, i2:int, i3:int.
-       i3 <='' i1 ->
-       i <'' i3 ->
-       region1 (a.base1) <='' 0 ->
+      forall t:addr -> int, a:addr, i:int, i1:int, i2:int, i3:int.
+       i3 <= i1 ->
+       i < i3 ->
+       region (a.base) <= 0 ->
        is_sint32_chunk2 t ->
-       is_uint321 i3 ->
-       is_uint321 i1 ->
-       is_uint321 i ->
-       is_sint322 i2 ->
-       (L_occ2 t i2 a i i3 +'' L_occ2 t i2 a i3 i1) = L_occ2 t i2 a i i1
+       is_uint32 i3 ->
+       is_uint32 i1 ->
+       is_uint32 i ->
+       is_sint32 i2 ->
+       (L_occ2 t i2 a i i3 + L_occ2 t i2 a i3 i1) = L_occ2 t i2 a i i1
     
   end
 [wp] 3 goals generated

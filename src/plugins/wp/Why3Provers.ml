@@ -14,7 +14,7 @@ open Why3
 
 let why3_version = Why3.Config.version
 
-let file () =
+let config_file () =
   let param = Wp_parameters.Why3Config.get () in
   if Filepath.is_empty param
   then None
@@ -38,16 +38,21 @@ let extend_config config =
   !Whyconf.provers_from_detected_provers config (to_rc provers)
 
 let the_config = ref None
+let the_env = ref None
 
 let () =
-  let must_reload_config _ _ = the_config := None in
+  let must_reload_config _ _ =
+    begin
+      the_config := None ;
+      the_env := None ;
+    end in
   Wp_parameters.Why3Config.add_update_hook must_reload_config ;
   Wp_parameters.Why3ExtraConfig.add_update_hook must_reload_config
 
 let config () =
   if Option.is_none !the_config then
     begin try
-        let file = file () in
+        let file = config_file () in
         let extra_config = Wp_parameters.Why3ExtraConfig.get () in
         let config = Why3.Whyconf.init_config ~extra_config file in
         let auto_detect = Wp_parameters.Why3Autodetect.get () in
@@ -57,6 +62,22 @@ let config () =
         Wp_parameters.abort "%a" Why3.Exn_printer.exn_printer exn
     end ;
   Option.get !the_config
+
+let env () =
+  if Option.is_none !the_env then
+    begin try
+        let config = config () in
+        let main = Why3.Whyconf.get_main config in
+        let wp = Filepath.to_string_abs (Wp_parameters.Share.get_dir "why3") in
+        let user = Filepath.to_string_list (Wp_parameters.Library.get ()) in
+        let why3 = Why3.Whyconf.loadpath main in
+        let loadpath = wp :: (user @ why3) in
+        let env = Why3.Env.create_env loadpath in
+        the_env := Some env ;
+      with exn ->
+        Wp_parameters.abort "%a" Why3.Exn_printer.exn_printer exn
+    end ;
+  Option.get !the_env
 
 let flags_changed = ref true
 

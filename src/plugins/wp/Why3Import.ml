@@ -27,10 +27,6 @@ let dkey =
 (* ---    Why3 Environment                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-let why3_env loadpath =
-  let main = WConf.get_main @@ WConf.read_config None in
-  W.Env.create_env @@ WConf.loadpath main @ F.to_string_list loadpath
-
 let extract_path thname =
   let segments = String.split_on_char '.' thname in
   match List.rev segments with
@@ -323,7 +319,7 @@ module Env = WpContext.StaticGenerator
       type data = env
       let name = "Wp.Why3Import.Env"
       let compile () =
-        let env = create @@ why3_env @@ L.Library.get () in
+        let env = create @@ Why3Provers.env () in
         add_builtins env ; env
     end)
 
