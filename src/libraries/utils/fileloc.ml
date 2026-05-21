@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** {2 Datatype definition} *)
+(* --- Datatype definition --- *)
 
 module Prototype = struct
 
@@ -92,7 +92,7 @@ include Datatype.Make_with_collections (struct
 include Prototype
 
 
-(** {2 Conversion from/to Lexing.position } *)
+(* --- Conversion from/to Lexing.position  --- *)
 
 let of_lexing_loc (pos1, pos2) =
   Filepos.of_lexing_pos pos1, Filepos.of_lexing_pos pos2
@@ -101,14 +101,14 @@ let to_lexing_loc (pos1, pos2) =
   Filepos.to_lexing_pos pos1, Filepos.to_lexing_pos pos2
 
 
-(** {2 Accessors } *)
+(* --- Accessors  --- *)
 
 let path loc = fst loc |> Filepos.path
 
 let line loc = fst loc |> Filepos.line
 
 
-(** {2 Alternative datatype } *)
+(* --- Datatype with comparison/hash on original source positions  --- *)
 
 module Original = Datatype.Make_with_collections (struct
     include Datatype.Serializable_undefined

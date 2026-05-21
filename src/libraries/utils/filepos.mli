@@ -30,10 +30,10 @@ type origin =
   (** The position is in generated input. The string is a name identifying the
       generator. *)
   | Preprocessed of t
-  (* The position is in file that have been produced from a preprocessing at
-     the given position. *)
+  (** The position is in file that have been produced from a preprocessing at
+      the given position. *)
   | Included of t
-  (* The position is in a file included from the given position *)
+  (** The position is in a file included from the given position *)
 [@@deriving show]
 
 include Datatype.S_with_collections with type t := t
@@ -41,10 +41,13 @@ include Datatype.S_with_collections with type t := t
 
 (** {2 Pretty printing } *)
 
-(** Pretty-prints a position, in the format [<file>:<line>]. *)
+(** Pretty prints a position in the format [<file>:<line>] or, if the column
+    number is available, in the format [<file>:<line>:<char>]. *)
 val pretty : Format.formatter -> t -> unit
 
-(** Pretty printer in the format ["<file>", line <line>]. *)
+(** Pretty prints a position in the format ["<file>", line <line>] or, if the
+    column number is available, in the format
+    ["<file>", line <line>, character <char>] *)
 val pretty_long : Format.formatter -> t -> unit
 
 (** Debug printer. Prints the internal representation of locations. *)
@@ -151,7 +154,7 @@ val is_preprocessed : t -> bool
 val inclusions : t -> t list
 
 
-(** {2 Alternative datatype } *)
+(** {2 Datatype with comparison/hash on original source positions} *)
 
 (** This module provides an alternative datatype where only original positions
     are considered for [compare], [equal] and [hash]. This is intended for

@@ -753,7 +753,7 @@ and hash = parse
 
 and ignore_line_end = parse 
   | '\n' { E.newline () }
-  | eof
+  | eof { }
   | _ { ignore_line_end lexbuf }
 
 and file = parse

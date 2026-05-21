@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** {2 Datatype definition} *)
+(* --- Datatype definition --- *)
 
 module Prototype = struct
 
@@ -88,7 +88,7 @@ include Datatype.Make_with_collections (struct
 include Prototype
 
 
-(** {2 Origins } *)
+(* --- Origins --- *)
 
 (** [origin_pos pos] gets the first direct origin position of [pos] if it
     exists. *)
@@ -108,7 +108,7 @@ let rec origin_find (path : Filepath.t) (pos : t) : t option  =
     origin_find path pos'
 
 
-(** {2 Construction and conversion } *)
+(* --- Construction and conversion --- *)
 
 let of_lexing_pos ?(origin=Original) (pos : Lexing.position) : t =
   { origin;
@@ -126,7 +126,7 @@ let to_lexing_pos (pos : t) : Lexing.position =
   }
 
 
-(** {2 Position tracking } *)
+(* --- Position tracking --- *)
 
 let update_line ?path ~line pos =
   let path = Option.value ~default:pos.path path in
@@ -146,7 +146,7 @@ let update_column ~column pos =
   { pos with column }
 
 
-(** {2 Accessors } *)
+(* --- Accessors --- *)
 
 let input_path pos = pos.path
 let input_line pos = pos.line
@@ -182,7 +182,7 @@ let [@tail_mod_cons] rec inclusions pos =
   | _ -> []
 
 
-(** {2 Alternative datatype } *)
+(* --- Datatype with comparison/hash on original source positions --- *)
 
 module Original = Datatype.Make_with_collections (struct
     include Datatype.Serializable_undefined

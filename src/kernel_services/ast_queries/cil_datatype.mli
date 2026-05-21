@@ -81,13 +81,17 @@ module Location: sig
       @since Frama-C+dev *)
   val path : t -> Filepath.t
 
+  (** Pretty prints a position in the format ["<file>", line <line>-<line>] or,
+      if on one line and the column number is available, in the format
+      ["<file>", line <line>, character <char1>-<char2>]. *)
   val pretty_long : t Pretty_utils.formatter
 
-  (** Pretty prints the location under the form [line <l>] or a description of
-      the source if it is not a file. *)
+  (** Pretty prints a position in the format ["<file>", line <line>] or, if the
+      column number is available, in the format
+      ["<file>", line <line>, character <char>] *)
   val pretty_line: t Pretty_utils.formatter
 
-  (** Pretty-prints the ocaml internal representation of a location, for debug
+  (** Pretty prints the ocaml internal representation of a location, for debug
       purposes.
 
       @since 22.0-Titanium

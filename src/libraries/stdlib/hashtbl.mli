@@ -21,7 +21,9 @@ module type S = sig
 
       If the table contains several bindings for the same key, they
       are put in the list in reverse order of introduction, that is,
-      the most recent binding is passed first. *)
+      the most recent binding is passed first.
+
+      @since Frama-C+dev *)
   val bindings_sorted:
     ?cmp:(key -> key -> int) -> 'a t -> (key * 'a) list
 

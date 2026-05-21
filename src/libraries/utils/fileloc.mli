@@ -27,10 +27,14 @@ val unknown : t
 
 (** {2 Pretty printing } *)
 
-(** Pretty-prints a location, in the format file:line. *)
+(** Pretty prints a position in the format [<file>:<line>-<line1>-<line2>] or,
+    if on one line and the column number is available, in the format
+    [<file>:<line>:<char1>-<char2>]. *)
 val pretty : Format.formatter -> t -> unit
 
-(** Pretty prints the location under the form ["<file>", line <line>]. *)
+(** Pretty prints a position in the format ["<file>", line <line>-<line>] or,
+    if on one line and the column number is available, in the format
+    ["<file>", line <line>, character <char1>-<char2>]. *)
 val pretty_long : t Pretty_utils.formatter
 
 (** Same as {!pretty_long} but also prints the list of inclusion. *)
@@ -67,7 +71,7 @@ val line : t -> int
 val path : t -> Filepath.t
 
 
-(** {2 Alternative datatype } *)
+(** {2 Datatype with comparison/hash on original source positions} *)
 
 (** This module provides an alternative datatype where only original location
     are considered for [compare], [equal] and [hash].

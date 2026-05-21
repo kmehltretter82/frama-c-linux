@@ -148,9 +148,11 @@ let convert_loc (pos_start, pos_end) =
    matching a location in the preprocessed file. *)
 
 (* Get the matching column in [dst_line] from a column [col] in [src_line]
-   while ignoring space differences. Return None uf there are differences other
+   while ignoring space differences. Return None if there are differences other
    than spaces. *)
 let matching_column src_line dst_line col =
+  (* is_blank is to be replaced with {!Char.Ascii.is_blank} when the minimal
+     supported OCaml is 5.4 *)
   let is_blank c =
     c = ' ' || c = '\t'
   in
@@ -254,7 +256,7 @@ let pp_context fmt (loc,lines) =
       Format.fprintf fmt "%a%s\n" pp_line i line
     else if i = start_line + inner_context then
       Format.fprintf fmt "%a [... omitted ...]\n"
-        pp_line_range (start_line + inner_context, start_line - inner_context);
+        pp_line_range (start_line + inner_context, end_line - inner_context);
     (* If more than one line of error, print blank line after the error loc *)
     if start_line <> end_line && i = start_line - 1 then
       Format.fprintf fmt "\n";
@@ -279,10 +281,10 @@ let pp_context fmt (loc,lines) =
    plus up to [ctx] lines before and after (if they exist),
    similar to 'grep -C<ctx>'.
    Most exceptions are silently caught and printing is stopped if they occur. *)
-let pp_context_from_file ?(ctx=2) fmt loc =
-  let (ppc_start, ppc_end) as ppc_loc = loc in
+let pp_context_from_file ?(ctx=2) fmt ppc_loc =
+  let (ppc_start, ppc_end) = ppc_loc in
   try
-    match Filepos.origin (fst loc), Filepos.origin (snd loc) with
+    match Filepos.origin ppc_start, Filepos.origin ppc_end with
     | (Unknown | Generated _), _ | _, (Unknown | Generated _) ->
       (* Do not print context for unknown locations *)
       ()
@@ -335,8 +337,6 @@ let pp_context_from_file ?(ctx=2) fmt loc =
   with
   | Sys_error msg ->
     Kernel.warning "%s" msg
-
-let pp_location = Fileloc.pretty_long
 
 let parse_error ?loc msg =
   let current = Option.get !current in
@@ -416,3 +416,6 @@ let set_error (_:Log.event) = hadErrors := true
 let () =
   Kernel.register Log.Error set_error;
   Kernel.register Log.Failure set_error
+
+(* Deprecated *)
+let pp_location = Fileloc.pretty_long
