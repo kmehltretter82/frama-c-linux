@@ -451,13 +451,14 @@ export const Status = (): JSX.Element => {
   }
 
   return (
-    <div
+    <Icon
+      id={icon}
+      size={14}
+      offset={0}
+      spinning={spinning}
       className="server-status"
       title={title}
-      role="status"
-    >
-      <Icon id={icon} size={14} offset={0} spinning={spinning} />
-    </div>
+    />
   );
 };
 

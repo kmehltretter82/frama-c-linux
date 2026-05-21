@@ -90,16 +90,9 @@
     display: grid;
     place-items: center;
     cursor: default;
+    width: 18px;
     height: 21px;
     margin: 2px;
-}
-
-.server-status .dome-xIcon {
-    display: grid;
-    place-items: center;
-    width: 18px;
-    height: 18px;
-    margin: 0px;
     padding: 0px;
 }
 
