@@ -79,20 +79,45 @@
     height: 26px;
 }
 
-.statusbar > .dome-xToolBar-control,
-.statusbar > .dome-xToolBar-buttongroup {
-    margin-top: 2px;
-    margin-bottom: 2px;
+/* Compact group linking the server status indicator and control buttons. */
+.server-controls {
+    flex: 0 0 auto;
+    min-height: 20px;
+    height: 20px;
+    border-radius: 5px;
+    background: var(--background-profound);
+    outline: 1px solid var(--border-discrete);
 }
 
+/* Remove the default toolbar group inset after the status separator. */
+.server-controls .dome-xToolBar-buttongroup {
+    margin: 0px 2px 0px 2px;
+}
+
+/* Keep server control buttons smaller than regular toolbar buttons. */
+.server-controls .dome-xToolBar-control {
+    height: 18px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+/* Keep the separator aligned with the 35px sidebar selector column. */
+.server-controls .dome-xToolBar-separator {
+    flex-basis: 6px;
+}
+
+.server-controls .dome-xToolBar-vrule {
+    left: 0px;
+}
+
+/* Fixed-width status slot prevents icon changes from shifting the controls. */
 .server-status {
-    flex: 0 0 22px;
+    flex: 0 0 30px;
     display: grid;
     place-items: center;
     cursor: default;
-    width: 18px;
-    height: 21px;
-    margin: 2px;
+    height: 18px;
+    margin: 0px;
     padding: 0px;
 }
 

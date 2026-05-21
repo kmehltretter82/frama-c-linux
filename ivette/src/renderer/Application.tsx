@@ -68,9 +68,11 @@ export default function Application(): JSX.Element {
         </LSplit>
       </Hfill>
       <Toolbar.ToolBar className="statusbar">
-        <Controller.Status />
-        <Toolbar.Separator />
-        <Controller.Control />
+        <Toolbar.Group className="server-controls">
+          <Controller.Status />
+          <Toolbar.Separator />
+          <Controller.Control />
+        </Toolbar.Group>
         <>{StatusBar}</>
         <Toolbar.Filler />
         <Laboratory.Dock />
