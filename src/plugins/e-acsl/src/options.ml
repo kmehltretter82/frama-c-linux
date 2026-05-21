@@ -134,13 +134,21 @@ module Interlang_force =
       let help = "crash if interlang compilation fails"
     end)
 
-module Interlang_opt =
-  True
+
+module O =
+  Int
     (struct
-      let option_name = "-e-acsl-interlang-opt"
-      let help = "enables optimisations while generating the intermediate \
-                  language."
+      let default = 2
+      let option_name = "-e-acsl-O"
+      let arg_name = "n"
+      let help = "Level of optimisation (defaults to 2). \
+                  0 - No optimisation. \
+                  1 - Constant-time optimisations. \
+                  2 - Moderate-cost optimisations. \
+                  3 - Potentially expensive optimisations, that may exploit \
+                  undefined behaviours in specification."
     end)
+let () = O.set_range ~min:0 ~max:3
 
 module Widening_arguments_base =
   Int

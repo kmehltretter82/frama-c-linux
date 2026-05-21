@@ -17,6 +17,11 @@ Options taking a string as argument should preferably be written
 -e-acsl             generate a new project where E-ACSL annotations are
                     translated to executable C code (opposite option is
                     -no-e-acsl)
+-e-acsl-O <n>       Level of optimisation (defaults to 2). 0 - No
+                    optimisation. 1 - Constant-time optimisations. 2 -
+                    Moderate-cost optimisations. 3 - Potentially expensive
+                    optimisations, that may exploit undefined behaviours in
+                    specification.
 -e-acsl-assert-print-data  print data contributing to the failed assertion
                     along with the runtime error message (set by default,
                     opposite option is -e-acsl-no-assert-print-data)
@@ -40,9 +45,6 @@ Options taking a string as argument should preferably be written
                     option is -e-acsl-no-interlang)
 -e-acsl-interlang-force  crash if interlang compilation fails (opposite
                     option is -e-acsl-no-interlang-force)
--e-acsl-interlang-opt  enables optimisations while generating the
-                    intermediate language. (set by default, opposite option
-                    is -e-acsl-no-interlang-opt)
 -e-acsl-project <prj>  the name of the generated project is <prj> (default to
                     "e-acsl") (preferably use -e-acsl-project="prj")
 -e-acsl-replace-libc-functions  replace some libc functions (such as strcpy)

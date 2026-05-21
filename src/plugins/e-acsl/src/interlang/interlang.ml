@@ -215,7 +215,7 @@ module Exp = struct
 
   let binop ?origin bop ity e1 e2 =
     let org = BinOp {binop = bop; ity; op1 = e1; op2 = e2} in
-    let res = if not @@ Options.Interlang_opt.get () then org
+    let res = if Options.O.get () < 1 then org
       else match Exp_node.of_binop ~bop ~ity e1 e2 with
         | Some e ->
           Options.debug ~dkey:Options.Dkey.interlang_print_opt ~level:3
