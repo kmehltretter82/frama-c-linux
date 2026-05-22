@@ -88,6 +88,26 @@ let field data fd =
 let by_field (Field a) (Field b) = b.rank - a.rank
 
 (* -------------------------------------------------------------------------- *)
+(* --- Logic Functions & Predicates                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+type lfun = Fun of {
+    th : Why3.Theory.theory ;
+    ls : Why3.Term.lsymbol ;
+    def : Why3.Term.term option ;
+  }
+
+let lfun env name = find_ls env name @@ fun th ls ->
+  Fun {
+    th ; ls ;
+    def =
+      try
+        Option.map Why3.Decl.ls_defn_axiom @@
+        Why3.Decl.find_logic_definition th.th_known ls
+      with _ -> None
+  }
+
+(* -------------------------------------------------------------------------- *)
 (* --- Generic Symbols                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -143,5 +163,15 @@ module Field = Make
       let symbol (Field fd) = fd.ls
       let ident (Field fd) = fd.ls.ls_name
     end)
+
+module Fun = Make
+    (struct
+      type t = lfun
+      type symbol = Why3.Term.lsymbol
+      let theory (Fun fn) = fn.th
+      let symbol (Fun fn) = fn.ls
+      let ident (Fun fn) = fn.ls.ls_name
+    end)
+
 
 (* -------------------------------------------------------------------------- *)

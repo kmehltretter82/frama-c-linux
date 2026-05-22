@@ -19,7 +19,7 @@ val find_pr : env -> string -> (theory -> prsymbol -> 'a) -> 'a
 (** Abstract Data Types *)
 type data
 
-(** @raise Invalid_argument if not found *)
+(** @raise Invalid_argument if undefined *)
 val data : env -> string -> data
 
 (** Returns an empty list for pure ADT *)
@@ -36,6 +36,12 @@ val field : data -> string -> field
 
 (** Ordering with respect to field declaration order in record *)
 val by_field : field -> field -> int
+
+(** Logic Functions *)
+type lfun
+
+(** @raise Invalid_argument if undefined *)
+val lfun : env -> string -> lfun
 
 (** Generic Why3 symbols *)
 module type Symbol =
@@ -58,3 +64,4 @@ end
 
 module Data : Symbol with type t = data and type symbol = Why3.Ty.tysymbol
 module Field : Symbol with type t = field and type symbol = Why3.Term.lsymbol
+module Fun : Symbol with type t = lfun and type symbol = Why3.Term.lsymbol
