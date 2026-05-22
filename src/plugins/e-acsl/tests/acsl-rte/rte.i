@@ -34,6 +34,8 @@ int main(void) {
   long z = 2L;
   int w = 12;
 
+  /*@ assert 4 / 2 == 2; */  // trivial case for division by zero
+
   /*@ assert 4 / y == 2 || 1 / w > 0; */
   /*@ assert 4 / (12 + 3 - 6) < 2; */
 
