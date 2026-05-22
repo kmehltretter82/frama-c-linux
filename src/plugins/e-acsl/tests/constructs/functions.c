@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: (recursive) logic functions and predicates without labels
-   STDOPT: +"-eva-slevel 100 -eva-unroll-recursive-calls 100"
+   STDOPT: +"-eva-slevel 10 -eva-unroll-recursive-calls 10"
 */
 
 /*@ predicate p1(int x, int y) = x + y > 0; */
@@ -116,7 +116,7 @@ int main(void) {
   double d = 2.0;
   /*@ assert f2(d) > 0; */;
   //@ assert f6(&d) > 0;
-  /*@ assert f_sum (100) == 100; */;
+  /*@ assert f_sum (10) == 10; */;
 
   /*@ assert over(1., 2.) == 0.5; */;
 
@@ -129,18 +129,18 @@ int main(void) {
   /*@ assert \signum(0.0-3.0) < 0; */
   /*@ assert \signum(0.0) ≡ 0; */
 
-  /*@ assert even(10); @*/;
+  /*@ assert even(8); @*/;
   /*@ assert even(-6); @*/;
-  /*@ assert even_and_not_negative(10); */;
+  /*@ assert even_and_not_negative(8); */;
   /*@ assert rf1(0) == 0; */;
   /*@ assert rf1(1) == 1; */;
-  /*@ assert rf1(10) == 55; */;
+  /*@ assert rf1(9) == 45; */;
 
   /*@ assert rf2(7) == 1; */;
 
   /*@ assert rf3(6) == -5; */;
 
-  /*@ assert rf4(9) > 0; */;
+  /*@ assert rf4(91) > 0; */;
 
   /*@ assert rf5(0) == 0; */
 

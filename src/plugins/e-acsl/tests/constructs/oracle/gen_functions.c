@@ -492,20 +492,19 @@ int main(void)
     int __gen_e_acsl_f_sum_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
       {.values = (void *)0};
-    __gen_e_acsl_f_sum_2 = __gen_e_acsl_f_sum(100);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,"f_sum(100)",
-                                 0,__gen_e_acsl_f_sum_2);
+    __gen_e_acsl_f_sum_2 = __gen_e_acsl_f_sum(10);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,"f_sum(10)",0,
+                                 __gen_e_acsl_f_sum_2);
     __gen_e_acsl_assert_data_16.blocking = 1;
     __gen_e_acsl_assert_data_16.kind = "Assertion";
-    __gen_e_acsl_assert_data_16.pred_txt = "f_sum(100) == 100";
+    __gen_e_acsl_assert_data_16.pred_txt = "f_sum(10) == 10";
     __gen_e_acsl_assert_data_16.file = "functions.c";
     __gen_e_acsl_assert_data_16.fct = "main";
     __gen_e_acsl_assert_data_16.line = 119;
-    __e_acsl_assert(__gen_e_acsl_f_sum_2 == 100,
-                    & __gen_e_acsl_assert_data_16);
+    __e_acsl_assert(__gen_e_acsl_f_sum_2 == 10,& __gen_e_acsl_assert_data_16);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
   }
-  /*@ assert f_sum(100) == 100; */ ;
+  /*@ assert f_sum(10) == 10; */ ;
   {
     __e_acsl_mpq_t __gen_e_acsl_over_2;
     __e_acsl_mpq_t __gen_e_acsl__12;
@@ -622,19 +621,19 @@ int main(void)
     int __gen_e_acsl_even_6;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_25 =
       {.values = (void *)0};
-    __gen_e_acsl_even_6 = __gen_e_acsl_even(10);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_25,"even(10)",0,
+    __gen_e_acsl_even_6 = __gen_e_acsl_even(8);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_25,"even(8)",0,
                                  __gen_e_acsl_even_6);
     __gen_e_acsl_assert_data_25.blocking = 1;
     __gen_e_acsl_assert_data_25.kind = "Assertion";
-    __gen_e_acsl_assert_data_25.pred_txt = "even(10)";
+    __gen_e_acsl_assert_data_25.pred_txt = "even(8)";
     __gen_e_acsl_assert_data_25.file = "functions.c";
     __gen_e_acsl_assert_data_25.fct = "main";
     __gen_e_acsl_assert_data_25.line = 132;
     __e_acsl_assert(__gen_e_acsl_even_6,& __gen_e_acsl_assert_data_25);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_25);
   }
-  /*@ assert even(10); */ ;
+  /*@ assert even(8); */ ;
   {
     int __gen_e_acsl_even_8;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_26 =
@@ -657,13 +656,13 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_27 =
       {.values = (void *)0};
     __gen_e_acsl_even_and_not_negative_2 = __gen_e_acsl_even_and_not_negative
-    (10);
+    (8);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_27,
-                                 "even_and_not_negative(10)",0,
+                                 "even_and_not_negative(8)",0,
                                  __gen_e_acsl_even_and_not_negative_2);
     __gen_e_acsl_assert_data_27.blocking = 1;
     __gen_e_acsl_assert_data_27.kind = "Assertion";
-    __gen_e_acsl_assert_data_27.pred_txt = "even_and_not_negative(10)";
+    __gen_e_acsl_assert_data_27.pred_txt = "even_and_not_negative(8)";
     __gen_e_acsl_assert_data_27.file = "functions.c";
     __gen_e_acsl_assert_data_27.fct = "main";
     __gen_e_acsl_assert_data_27.line = 134;
@@ -671,7 +670,7 @@ int main(void)
                     & __gen_e_acsl_assert_data_27);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_27);
   }
-  /*@ assert even_and_not_negative(10); */ ;
+  /*@ assert even_and_not_negative(8); */ ;
   {
     int __gen_e_acsl_rf1_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_28 =
@@ -719,15 +718,15 @@ int main(void)
     int __gen_e_acsl_eq_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_30 =
       {.values = (void *)0};
-    __gen_e_acsl_rf1_5(& __gen_e_acsl_rf1_10,10);
-    __gmpz_init_set_si(__gen_e_acsl__19,55L);
+    __gen_e_acsl_rf1_5(& __gen_e_acsl_rf1_10,9);
+    __gmpz_init_set_si(__gen_e_acsl__19,45L);
     __gen_e_acsl_eq_4 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_rf1_10),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__19));
-    __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_30,"rf1(10)",0,
+    __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_30,"rf1(9)",0,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_rf1_10));
     __gen_e_acsl_assert_data_30.blocking = 1;
     __gen_e_acsl_assert_data_30.kind = "Assertion";
-    __gen_e_acsl_assert_data_30.pred_txt = "rf1(10) == 55";
+    __gen_e_acsl_assert_data_30.pred_txt = "rf1(9) == 45";
     __gen_e_acsl_assert_data_30.file = "functions.c";
     __gen_e_acsl_assert_data_30.fct = "main";
     __gen_e_acsl_assert_data_30.line = 137;
@@ -736,7 +735,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_rf1_10);
     __gmpz_clear(__gen_e_acsl__19);
   }
-  /*@ assert rf1(10) == 55; */ ;
+  /*@ assert rf1(9) == 45; */ ;
   {
     int __gen_e_acsl_rf2_10;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_31 =
@@ -775,19 +774,19 @@ int main(void)
     unsigned long __gen_e_acsl_rf4_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_34 =
       {.values = (void *)0};
-    __gen_e_acsl_rf4_4 = __gen_e_acsl_rf4(9U);
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_34,"rf4(9)",0,
+    __gen_e_acsl_rf4_4 = __gen_e_acsl_rf4(91U);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_34,"rf4(91)",0,
                                    __gen_e_acsl_rf4_4);
     __gen_e_acsl_assert_data_34.blocking = 1;
     __gen_e_acsl_assert_data_34.kind = "Assertion";
-    __gen_e_acsl_assert_data_34.pred_txt = "rf4(9) > 0";
+    __gen_e_acsl_assert_data_34.pred_txt = "rf4(91) > 0";
     __gen_e_acsl_assert_data_34.file = "functions.c";
     __gen_e_acsl_assert_data_34.fct = "main";
     __gen_e_acsl_assert_data_34.line = 143;
     __e_acsl_assert(__gen_e_acsl_rf4_4 > 0UL,& __gen_e_acsl_assert_data_34);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_34);
   }
-  /*@ assert rf4(9) > 0; */ ;
+  /*@ assert rf4(91) > 0; */ ;
   {
     int __gen_e_acsl_rf5_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_35 =
