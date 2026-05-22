@@ -33,6 +33,22 @@ let find_ts e = find ~kind:"type" ~lookup:Why3.Theory.ns_find_ts e
 let find_ls e = find ~kind:"function" ~lookup:Why3.Theory.ns_find_ls e
 let find_pr e = find ~kind:"property" ~lookup:Why3.Theory.ns_find_pr e
 
+let rec find_use_opt id (th : Why3.Theory.theory) =
+  if Why3.Ident.Sid.mem id th.th_local then Some th else
+    List.find_map
+      (fun (td : Why3.Theory.tdecl) ->
+         match td.td_node with
+         | Use th when Why3.Ident.Mid.mem id th.th_known -> find_use_opt id th
+         | _ -> None
+      ) th.th_decls
+
+let find_use ~context id =
+  match find_use_opt id context with
+  | Some th -> th
+  | None ->
+    invalid_arg @@
+    Printf.sprintf "Qed: symbol not found in context (%s)" id.id_string
+
 (* -------------------------------------------------------------------------- *)
 (* --- Abstract Data Types                                                --- *)
 (* -------------------------------------------------------------------------- *)
@@ -40,8 +56,8 @@ let find_pr e = find ~kind:"property" ~lookup:Why3.Theory.ns_find_pr e
 type data = Data of {
     th : Why3.Theory.theory ;
     ts : Why3.Ty.tysymbol ;
-    cs : Why3.Decl.constructor list ;
-    mutable fields : field list option ; (* Memoized *)
+    mutable cs : Why3.Decl.constructor list option ; (* Memoized *)
+    mutable fs : field list option ; (* Memoized *)
   }
 
 and field = Field of {
@@ -55,24 +71,29 @@ and field = Field of {
 (* --- Data                                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let data env name = find_ts env name @@ fun th ts ->
-  Data {
-    th ; ts ;
-    fields = None ;
-    cs = try Why3.Decl.find_constructors th.th_known ts with _ -> []
-  }
+let of_ts ~context (ts : Why3.Ty.tysymbol) =
+  Data { ts ; th = find_use ~context ts.ts_name ; cs = None ; fs = None }
 
-let constructors (Data a) = a.cs
+let find_data env name = find_ts env name @@ fun th ts ->
+  Data { th ; ts ; cs = None ; fs = None }
+
+let constructors (Data a) =
+  match a.cs with
+  | Some cs -> cs
+  | None ->
+    let cs = try Why3.Decl.find_constructors a.th.th_known a.ts with _ -> [] in
+    a.cs <- Some cs ; cs
 
 (* -------------------------------------------------------------------------- *)
 (* --- Records                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
 let fields (Data a as data) =
-  match a.fields with Some fds -> fds | None ->
+  match a.fs with Some fds -> fds | None ->
+    let cs = constructors data in
     let fds =
       try
-        match a.cs with
+        match cs with
         | [_,ps] when a.ts.ts_args = [] ->
           List.mapi
             (fun rank p -> match p with None -> raise Not_found | Some ls ->
@@ -80,12 +101,12 @@ let fields (Data a as data) =
             ) ps
         | _ -> []
       with Not_found -> []
-    in a.fields <- Some fds ; fds
+    in a.fs <- Some fds ; fds
 
 let field data fd =
   List.find (function Field f -> f.ls.ls_name.id_string = fd) @@ fields data
 
-let by_field (Field a) (Field b) = b.rank - a.rank
+let by_field_rank (Field a) (Field b) = b.rank - a.rank
 
 (* -------------------------------------------------------------------------- *)
 (* --- Logic Functions & Predicates                                       --- *)
@@ -97,7 +118,10 @@ type lfun = Fun of {
     def : Why3.Term.term option ;
   }
 
-let lfun env name = find_ls env name @@ fun th ls ->
+let of_ls ~context (ls : Why3.Term.lsymbol) =
+  Fun { ls ; th = find_use ~context ls.ls_name ; def = None }
+
+let find_lfun env name = find_ls env name @@ fun th ls ->
   Fun {
     th ; ls ;
     def =
