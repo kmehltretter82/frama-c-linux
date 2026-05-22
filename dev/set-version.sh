@@ -32,13 +32,10 @@ else
   fi
 fi
 
-CURRENT=$(cat VERSION)
-CURRENT_MAJOR=$(echo "$CURRENT" | $SED -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
-CURRENT_MINOR=$(echo "$CURRENT" | $SED -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
-CURRENT_SUFFIX=$(echo "$CURRENT"| $SED -e s/[0-9]*.[0-9]*\\\(.*\\\)/\\1/)
-CURRENT_CODENAME=$(grep "$CURRENT_MAJOR " ./doc/periodic-elements.txt | cut -d " " -f2)
-
 if [[ $NEXT == "dev" ]]; then
+  CURRENT=$(cat VERSION)
+  CURRENT_MAJOR=$(echo "$CURRENT" | $SED -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
+
   DEV_VERSION=$(($CURRENT_MAJOR+1))
   DEV_CODENAME=$(grep "$DEV_VERSION " ./doc/periodic-elements.txt | cut -d " " -f2)
   echo "Set VERSION to $DEV_VERSION~dev"
@@ -53,8 +50,6 @@ if [[ $NEXT == "dev" ]]; then
   echo "$DEV_VERSION~dev" > VERSION
   echo "$DEV_CODENAME" > VERSION_CODENAME
   $SED -i "s/^version: .*/version: \"$DEV_VERSION~dev\"/g" opam
-  # NB: we don't generate manuals for dev branch, so documentation will refer to the last stable
-  $SED -i "s/^\(doc:.*$CURRENT_MAJOR.$CURRENT_MINOR\)$(tr '~' '-' <<< $CURRENT_SUFFIX)\(-$CURRENT_CODENAME.*\)\(.*\)/\1\2/" opam
   $SED -i "s/^version: .*/version: \"$DEV_VERSION~dev\"/g" tools/lint/frama-c-lint.opam
   $SED -i "s/^version: .*/version: \"$DEV_VERSION~dev\"/g" tools/hdrck/frama-c-hdrck.opam
 else
@@ -83,14 +78,10 @@ else
   echo "$NEXT_CODENAME" >VERSION_CODENAME
 
   # Ivette
-  $SED -i "s/^  \"version\": .*/  \"version\": \"$CURRENT_MAJOR.$CURRENT_MINOR.0\",/g" ivette/package.json
+  $SED -i "s/^  \"version\": .*/  \"version\": \"$NEXT_MAJOR.$NEXT_MINOR.0\",/g" ivette/package.json
 
   # Opam files
   $SED -i "s/^version: .*/version: \"$NEXT\"/g" opam
-  CURRENT_OPAM_DOC=$CURRENT_MAJOR.$CURRENT_MINOR$(echo $CURRENT_SUFFIX | tr '~' '-' | sed -e 's/~dev//')
-  NEXT_OPAM_DOC=$NEXT_MAJOR.$NEXT_MINOR$(tr '~' '-' <<< $NEXT_SUFFIX)
-  $SED -i "s/\(.*\)$CURRENT_OPAM_DOC-$CURRENT_CODENAME\(.*\)/\1$NEXT_OPAM_DOC-$NEXT_CODENAME\2/g" opam
-
   $SED -i "s/^version: .*/version: \"$NEXT_MAJOR.$NEXT_MINOR\"/g" tools/lint/frama-c-lint.opam
   $SED -i "s/^version: .*/version: \"$NEXT_MAJOR.$NEXT_MINOR\"/g" tools/hdrck/frama-c-hdrck.opam
 

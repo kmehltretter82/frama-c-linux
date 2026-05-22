@@ -10,7 +10,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f <- main.
-  Called from input.i:7.
+  Called from input.i:7:10-16.
 [eva] using specification for function f
 [eva:progress] Done for function f
 [eva:progress] Recording results for main

@@ -6,47 +6,47 @@
   nondet ∈ [--..--]
 [eva:progress] 
   computing for function callstack <- main.
-  Called from red_alarms.i:96.
+  Called from red_alarms.i:96:3-14.
 [eva:progress] 
   computing for function maybe_swap <- callstack <- main.
-  Called from red_alarms.i:24.
+  Called from red_alarms.i:24:3-21.
 [eva:progress] red_alarms.i:9: check got status valid.
 [eva:progress] red_alarms.i:10: check got status valid.
 [eva:progress] Recording results for maybe_swap
 [eva:progress] Done for function maybe_swap
 [eva:progress] 
   computing for function maybe_swap <- callstack <- main.
-  Called from red_alarms.i:25.
+  Called from red_alarms.i:25:3-21.
 [eva:alarm] red_alarms.i:10: Warning: check got status unknown.
 [eva:progress] Recording results for maybe_swap
 [eva:progress] Done for function maybe_swap
 [eva:progress] 
   computing for function maybe_swap <- callstack <- main.
-  Called from red_alarms.i:26.
+  Called from red_alarms.i:26:3-21.
 [eva:alarm] red_alarms.i:10: Warning: check got status invalid.
 [eva:progress] Recording results for maybe_swap
 [eva:progress] Done for function maybe_swap
 [eva:progress] 
   computing for function maybe_swap <- callstack <- main.
-  Called from red_alarms.i:27.
+  Called from red_alarms.i:27:3-26.
 [eva:alarm] red_alarms.i:12: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
 [eva:progress] Recording results for maybe_swap
 [eva:progress] Done for function maybe_swap
 [eva:progress] 
   computing for function maybe_swap <- callstack <- main.
-  Called from red_alarms.i:28.
+  Called from red_alarms.i:28:3-26.
 [eva:progress] Recording results for maybe_swap
 [eva:progress] Done for function maybe_swap
 [eva:progress] 
   computing for function maybe_swap <- callstack <- main.
-  Called from red_alarms.i:29.
+  Called from red_alarms.i:29:3-20.
 [eva:alarm] red_alarms.i:13: Warning: out of bounds read. assert \valid_read(q);
 [eva:progress] Recording results for maybe_swap
 [eva:progress] Done for function maybe_swap
 [eva:progress] 
   computing for function maybe_swap <- callstack <- main.
-  Called from red_alarms.i:32.
+  Called from red_alarms.i:32:3-19.
 [eva:alarm] red_alarms.i:9: Warning: check got status unknown.
 [eva:alarm] red_alarms.i:12: Warning: out of bounds read. assert \valid_read(p);
 [eva:alarm] red_alarms.i:13: Warning: 
@@ -57,7 +57,7 @@
 [eva:progress] Done for function callstack
 [eva:progress] 
   computing for function partitioning <- main.
-  Called from red_alarms.i:97.
+  Called from red_alarms.i:97:3-17.
 [eva:alarm] red_alarms.i:45: Warning: 
   accessing out of bounds index. assert i < 32;
 [eva:partition] red_alarms.i:47: starting to merge loop iterations
@@ -84,10 +84,10 @@
 [eva:progress] Done for function partitioning
 [eva:progress] 
   computing for function preconditions <- main.
-  Called from red_alarms.i:98.
+  Called from red_alarms.i:98:3-18.
 [eva:progress] 
   computing for function in_bound <- preconditions <- main.
-  Called from red_alarms.i:79.
+  Called from red_alarms.i:79:3-15.
 [eva:progress] red_alarms.i:79: 
   function in_bound: precondition 'positive' got status valid.
 [eva:progress] red_alarms.i:79: 
@@ -96,7 +96,7 @@
 [eva:progress] Done for function in_bound
 [eva:progress] 
   computing for function in_bound <- preconditions <- main.
-  Called from red_alarms.i:80.
+  Called from red_alarms.i:80:3-19.
 [eva:alarm] red_alarms.i:80: Warning: 
   function in_bound: precondition 'positive' got status unknown.
 [eva:alarm] red_alarms.i:80: Warning: 
@@ -105,7 +105,7 @@
 [eva:progress] Done for function in_bound
 [eva:progress] 
   computing for function in_bound <- preconditions <- main.
-  Called from red_alarms.i:82.
+  Called from red_alarms.i:82:5-17.
 [eva:alarm] red_alarms.i:82: Warning: 
   function in_bound: precondition 'positive' got status invalid.
 [eva:progress] red_alarms.i:82: 
@@ -116,7 +116,7 @@
 [eva:progress] Done for function preconditions
 [eva:progress] 
   computing for function user_assertions <- main.
-  Called from red_alarms.i:99.
+  Called from red_alarms.i:99:3-20.
 [eva:alarm] red_alarms.i:87: Warning: check 'indeterminate' got status unknown.
 [eva:progress] red_alarms.i:89: check 'true' got status valid.
 [eva:alarm] red_alarms.i:90: Warning: check 'false' got status invalid.

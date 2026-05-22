@@ -8,7 +8,7 @@
 [eva:alarm] cmp.i:10: Warning: accessing out of bounds index. assert d < 10;
 [eva:progress] 
   computing for function cmp <- main.
-  Called from cmp.i:11.
+  Called from cmp.i:11:11-26.
 [eva:alarm] cmp.i:4: Warning: 
   accessing uninitialized left-value. assert \initialized(s1);
 [eva:alarm] cmp.i:4: Warning: out of bounds read. assert \valid_read(s1);

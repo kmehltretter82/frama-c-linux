@@ -8,13 +8,13 @@
 
 open Cil_types
 
-let tsizeof ?(smart = true) ?(loc = Cil_datatype.Location.unknown) typ =
+let tsizeof ?(smart = true) ?(loc = Fileloc.unknown) typ =
   if smart then
     try Logic_const.tint ~loc @@ Z.of_int @@ Cil.bytesSizeOf typ
     with Cil.SizeOfError _ -> Logic_const.term ~loc (TSizeOf typ) Linteger
   else Logic_const.term ~loc (TSizeOf typ) Linteger
 
-let talignof ?(smart = true) ?(loc = Cil_datatype.Location.unknown) typ =
+let talignof ?(smart = true) ?(loc = Fileloc.unknown) typ =
   if smart then
     try Logic_const.tint ~loc @@ Z.of_int @@ Cil.bytesAlignOf typ
     with Cil.SizeOfError _ -> Logic_const.term ~loc (TAlignOf typ) Linteger

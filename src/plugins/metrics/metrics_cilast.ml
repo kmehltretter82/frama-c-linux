@@ -416,12 +416,12 @@ let compute_files_defining_globals gvars =
       in
       if is_def then
         let loc = Cil_datatype.Global.loc def in
-        if Location.equal loc Location.unknown then acc
+        if Fileloc.equal loc Fileloc.unknown then acc
         else begin
           Metrics_parameters.feedback ~dkey "found %s at: %a"
             (if is_def then "definition" else "declaration")
-            Printer.pp_location loc;
-          Filepath.Set.add ((fst loc).pos_path) acc
+            Fileloc.pretty loc;
+          Filepath.Set.add (Fileloc.path loc) acc
         end
       else acc
     ) (Filepath.Set.empty) gvars
@@ -429,15 +429,15 @@ let compute_files_defining_globals gvars =
 class logic_loc_visitor = object
   inherit Visitor.frama_c_inplace
 
-  val locs = ref Location.Set.empty
+  val locs = ref Fileloc.Set.empty
   method get_locs = !locs
 
   method! vterm t =
-    locs := Cil_datatype.Location.Set.add t.term_loc !locs;
+    locs := Fileloc.Set.add t.term_loc !locs;
     Cil.DoChildren
 
   method! vpredicate p =
-    locs := Cil_datatype.Location.Set.add p.pred_loc !locs;
+    locs := Fileloc.Set.add p.pred_loc !locs;
     Cil.DoChildren
 end
 
@@ -451,8 +451,8 @@ let get_filenames_in_funspec kf =
         ignore
           (Visitor.visitFramacBehavior (visitor :> Visitor.frama_c_visitor) b);
         let locs = visitor#get_locs in
-        Cil_datatype.Location.Set.fold (fun loc acc' ->
-            let path = (fst loc).pos_path in
+        Fileloc.Set.fold (fun loc acc' ->
+            let path = Fileloc.path loc in
             Metrics_parameters.feedback ~dkey ~once:true
               "found annotation in: %a"
               Filepath.pretty path;

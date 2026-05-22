@@ -119,7 +119,7 @@ let requires ~spec node p =
 
 let subst ~loc kf es t =
   match
-    Statuses_by_call.transpose_term_at_callsite
+    Logic_subst.term
       ~formals:(Kernel_function.get_formals kf) ~concretes:es t
   with Some t -> t | None ->
     Options.abort ~source:(fst loc)

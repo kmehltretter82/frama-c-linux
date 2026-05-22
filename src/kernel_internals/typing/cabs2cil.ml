@@ -228,8 +228,8 @@ let check_no_locals_in_initializer i =
 
 (* ---------- source error message handling ------------- *)
 let cabslu s =
-  {Filepos.unknown with pos_path = Filepath.of_string ("Cabs2cil_start" ^ s)},
-  {Filepos.unknown with pos_path = Filepath.of_string ("Cabs2cil_end" ^ s)}
+  Filepos.generated ("Cabs2cil_start" ^ s),
+  Filepos.generated ("Cabs2cil_end" ^ s)
 
 
 (** Keep a list of the variable ID for the variables that were created to
@@ -634,9 +634,7 @@ let transparentUnionArgs : (int * typ) list ref = ref []
 let debugLoc = false
 let convLoc (l : cabsloc) =
   if debugLoc then
-    Kernel.debug "convLoc at %a: line %d, byte %d\n"
-      Filepath.pretty (fst l).pos_path
-      (fst l).pos_lnum (fst l).pos_bol;
+    Kernel.debug "convLoc at %a\n" Fileloc.pretty l;
   l
 
 let isOldStyleVarArgName n =
@@ -1020,7 +1018,7 @@ let newAlphaName
           "redefinition of '%s'%s in the same scope.@ \
            Previous declaration was at %a"
           origname (if is_same_kind kind info then "" else " with different kind")
-          Cil_printer.pp_location oldloc
+          Fileloc.pretty oldloc
     with
     | Not_found -> () (* no clash of identifiers *)
     | Failure _ ->
@@ -1121,7 +1119,7 @@ let alphaConvertVarAndAddToEnv addtoenv vi =
                 Errorloc.abort_context
                   "It seems that we would need to rename global %s (to %s) \
                    because of previous occurrence at %a"
-                  vi.vname newname Cil_printer.pp_location oldloc;
+                  vi.vname newname Fileloc.pretty oldloc;
             end
       end else Cil.copyVarinfo vi newname
     end
@@ -2087,7 +2085,7 @@ struct
         if !defaultSeen then
           Kernel.error ~once:true ~current:true
             "Switch statement at %a has duplicate default entries."
-            Cil_printer.pp_location l;
+            Fileloc.pretty l;
         defaultSeen := true;
         d
       | Label _ as l -> l
@@ -2346,7 +2344,7 @@ class gatherLabelsClass : Cabsvisit.cabsVisitor = object (self)
            | Some oldloc ->
              Kernel.error ~once:true ~current:true
                "Duplicate local label '%s' (previous definition was at %a)"
-               lbl Cil_printer.pp_location oldloc
+               lbl Fileloc.pretty oldloc
            | None ->
              (* Mark this label as defined *)
              H.replace localLabels lbl (Some (Current_loc.get())))
@@ -2357,7 +2355,7 @@ class gatherLabelsClass : Cabsvisit.cabsVisitor = object (self)
           if newname <> lbl then
             Kernel.error ~once:true ~current:true
               "Duplicate label '%s' (previous definition was at %a)"
-              lbl Cil_printer.pp_location oldloc)
+              lbl Fileloc.pretty oldloc)
      | _ -> ());
     Cil.DoChildren
 end
@@ -2468,11 +2466,11 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
       if oldvi.vghost <> vi.vghost then
         Errorloc.abort_context "Inconsistent ghost specification for %s.@ \
                                 Previous declaration was at: %a"
-          vi.vname Cil_printer.pp_location oldloc ;
+          vi.vname Fileloc.pretty oldloc ;
 
       Kernel.debug ~dkey:Kernel.dkey_typing_global
         "  %s(%d) already in the env at loc %a"
-        vi.vname oldvi.vid Cil_printer.pp_location oldloc;
+        vi.vname oldvi.vid Fileloc.pretty oldloc;
       (* It was already declared. We must reuse the varinfo. But clean up the
        * storage.  *)
       let newstorage = (* See 6.2.2 *)
@@ -2491,7 +2489,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
             Kernel.error ~current:true
               "Inconsistent storage specification for %s. \
                Previous declaration: %a"
-              vi.vname Cil_printer.pp_location oldloc;
+              vi.vname Fileloc.pretty oldloc;
           vi.vstorage
       in
       (* if _all_ declaration have the inline specifier, and none
@@ -2517,7 +2515,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                 "%s was previously declared with incompatible _Alignas(%a) at %a"
                 oldvi.vname
                 Cil_printer.pp_exp (Option.get oldvi.valignas)
-                Cil_printer.pp_location oldloc
+                Fileloc.pretty oldloc
             | _ -> ((* Compatible alignas *))
           end
         | Some oldloc ->
@@ -2526,7 +2524,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
             if Option.is_some vi.valignas then
               Kernel.abort ~current:true
                 "%s was previously defined without _Alignas specification at %a"
-                oldvi.vname Cil_printer.pp_location oldloc
+                oldvi.vname Fileloc.pretty oldloc
 
           | Some oldalignas ->
             match vi.valignas with
@@ -2535,7 +2533,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                 "%s was previous defined with incompatible _Alignas(%a) at %a"
                 oldvi.vname
                 Cil_printer.pp_exp oldalignas
-                Cil_printer.pp_location oldloc
+                Fileloc.pretty oldloc
 
             | _ -> ((* Compatible alignas *))
       end ;
@@ -2581,7 +2579,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
           Errorloc.abort_context
             "Declaration of %s does not match previous declaration from \
              %a (%s)."
-            vi.vname Cil_printer.pp_location oldloc reason
+            vi.vname Fileloc.pretty oldloc reason
       end;
       (* Update the storage and vdecl if useful. Do so only after the hooks have
          been applied, as they may need to read those fields *)
@@ -2606,7 +2604,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                       "Function %a redeclared with incompatible ghost status \
                        in formals (original declaration was at %a)"
                       Cil_printer.pp_varinfo vi
-                      Cil_printer.pp_location oldloc
+                      Fileloc.pretty oldloc
                   else if name <> "" then begin
                     Kernel.debug ~dkey:Kernel.dkey_typing_global
                       "replacing formal %s with %s" old.vname name;
@@ -3643,14 +3641,14 @@ let rec compute_from_root f = function
   (* We have a label, perhaps we can jump here *)
   | s :: rest when s.labels <> [] ->
     Kernel.debug ~level:4 "computeFromRoot call f from stmt %a"
-      Cil_printer.pp_location (Cil_datatype.Stmt.loc s);
+      Fileloc.pretty (Cil_datatype.Stmt.loc s);
     f (s :: rest)
 
   | _ :: rest -> compute_from_root f rest
 
 let rec stmtFallsThrough (s: stmt) : bool =
   Kernel.debug ~level:4 "stmtFallsThrough stmt %a"
-    Cil_printer.pp_location (Cil_datatype.Stmt.loc s);
+    Fileloc.pretty (Cil_datatype.Stmt.loc s);
   match s.skind with
   | Instr il -> Cil.instr_falls_through il
   | UnspecifiedSequence seq ->
@@ -3700,7 +3698,7 @@ and blockFallsThrough b =
 (* will we leave this statement or block with a break command? *)
 and stmtCanBreak (s: stmt) : bool =
   Kernel.debug ~level:4 "stmtCanBreak stmt %a"
-    Cil_printer.pp_location (Cil_datatype.Stmt.loc s);
+    Fileloc.pretty (Cil_datatype.Stmt.loc s);
   match s.skind with
   | Instr _ | Return _ | Continue _ | Goto _ | Throw _ -> false
   | Break _ -> true
@@ -3724,7 +3722,7 @@ and blockCanBreak b =
       [] -> false
     | s::tl ->
       Kernel.debug ~level:4 "blockCanBreak from stmt %a"
-        Cil_printer.pp_location (Cil_datatype.Stmt.loc s);
+        Fileloc.pretty (Cil_datatype.Stmt.loc s);
       stmtCanBreak s ||
       (if stmtFallsThrough s then aux tl
        else compute_from_root aux tl)
@@ -5262,7 +5260,7 @@ and makeCompType loc ghost (isstruct: bool)
         "field %s occurs multiple times in aggregate %a. \
          Previous occurrence is at line %d."
         f.fname Cil_printer.pp_typ (mk_tcomp comp)
-        (fst oldf.floc).Filepos.pos_lnum
+        (Fileloc.line oldf.floc)
     with Not_found ->
       (* Do not add unnamed bitfields: they can share the empty name. *)
       if f.fname <> "" then Hashtbl.add fld_table f.fname f
@@ -8466,7 +8464,7 @@ and createGlobal loc ghost logic_spec
     if init != None then begin
       (* function redefinition is taken care of elsewhere. *)
       Kernel.error ~once:true ~current:true
-        "Global %s was already defined at %a" vi.vname Cil_printer.pp_location oldloc;
+        "Global %s was already defined at %a" vi.vname Fileloc.pretty oldloc;
     end;
     Kernel.debug ~dkey:Kernel.dkey_typing_global
       " global %s was already defined" vi.vname;
@@ -9012,7 +9010,7 @@ and doAliasFun ghost vtype (thisname:string) (othername:string)
   (* This prototype declares that name is an alias for
      othername, which must be defined in this file *)
   (*   E.log "%s is alias for %s at %a\n" thisname othername  *)
-  (*     Cil_printer.pp_location !currentLoc; *)
+  (*     Fileloc.pretty !currentLoc; *)
   let rt, formals, isva, _ = Cil.splitFunctionType vtype in
   if isva then Kernel.error ~once:true ~current:true "alias unsupported with varargs";
   let args = List.map
@@ -9073,13 +9071,13 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
            if not (Ast_types.is_fun vtype) || local_env.is_ghost then begin
              Kernel.warning ~current:true
                "%a: CIL only supports attribute((alias)) for C functions."
-               Cil_printer.pp_location (Current_loc.get ());
+               Fileloc.pretty (Current_loc.get ());
              ignore (createGlobal l ghost logic_spec spec_res name)
            end else
              doAliasFun ghost vtype n othername (s, (n,ndt,a,l)) loc
          | _ ->
            Kernel.error ~once:true ~current:true
-             "Bad alias attribute at %a" Cil_printer.pp_location (Current_loc.get()));
+             "Bad alias attribute at %a" Fileloc.pretty (Current_loc.get()));
         acc
       end else
         acc @@@ (createLocal ghost spec_res name, ghost)
@@ -9164,7 +9162,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
       let funloc = fst loc1, snd loc2 in
       let endloc = loc2 in
       Kernel.debug ~dkey:Kernel.dkey_typing_global
-        "Definition of %s at %a\n" n Cil_printer.pp_location idloc;
+        "Definition of %s at %a\n" n Fileloc.pretty idloc;
       FuncLocs.add_loc ?spec loc1 endloc n;
       IH.clear callTempVars;
 
@@ -9241,7 +9239,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
             Errorloc.abort_context
               "There is a definition already for %s \
                (previous definition was at %a)."
-              n Cil_printer.pp_location loc));
+              n Fileloc.pretty loc));
       H.add alreadyDefined !currentFunctionFDEC.svar.vname idloc;
 
       (* makeGlobalVarinfo might have changed the type of the function
@@ -9624,13 +9622,13 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
               Kernel.error ~current:true
                 "redefinition of type '%s' in the same scope with conflicting type.@ \
                  Previous declaration was at %a"
-                n Cil_printer.pp_location oldloc
+                n Fileloc.pretty oldloc
             in
             let warn_c11_redefinition () =
               Kernel.warning ~wkey:Kernel.wkey_c11 ~current:true
                 "redefinition of type '%s' in the same scope is only allowed \
                  in C11.@ Previous declaration was at %a" n
-                Cil_printer.pp_location oldloc
+                Fileloc.pretty oldloc
             in
             (* Tested with GCC+Clang: redefinition of compatible types in same scope:
                - enums are NOT allowed, except if they refer to the exact same
@@ -9692,7 +9690,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
         else if declared_in_current_scope ~ghost n then
           Kernel.error ~current:true
             "redefinition of type '%s' in the same scope with incompatible type.@ \
-             Previous declaration was at %a" n Cil_printer.pp_location oldloc;
+             Previous declaration was at %a" n Fileloc.pretty oldloc;
       end
     else (* effectively create new type *) begin
       let n', _  = newAlphaName ghost true "type" n in

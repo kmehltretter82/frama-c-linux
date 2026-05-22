@@ -6,10 +6,10 @@
   T[0..1] ∈ {0}
 [eva:progress] 
   computing for function g <- main.
-  Called from bts335.i:12.
+  Called from bts335.i:12:28-31.
 [eva:progress] 
   computing for function f <- g <- main.
-  Called from bts335.i:11.
+  Called from bts335.i:11:17-21.
 [eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -20,7 +20,7 @@
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function f <- main.
-  Called from bts335.i:12.
+  Called from bts335.i:12:38-42.
 [eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -30,11 +30,11 @@
 [from] Done for function main
 [eva:progress] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to f at bts335.i:11 (by g):
+[from] call to f at bts335.i:11:17-21 (by g):
   T[0] FROM T[0]; i
-[from] call to g at bts335.i:12 (by main):
+[from] call to g at bts335.i:12:28-31 (by main):
   T[0] FROM T[0]
-[from] call to f at bts335.i:12 (by main):
+[from] call to f at bts335.i:12:38-42 (by main):
   T[1] FROM T[1]; i
 [from] entry point:
   T[0] FROM T[0]; c (and SELF)

@@ -40,40 +40,40 @@
   Z ∈ {0}
 [eva:progress] 
   computing for function string_reads <- main.
-  Called from strings.i:142.
+  Called from strings.i:142:3-18.
 [kernel:annot:missing-spec] strings.i:39: Warning: 
   Neither code nor specification for function u, generating default assigns.
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function u <- string_reads <- main.
-  Called from strings.i:39.
+  Called from strings.i:39:7-10.
 [eva] using specification for function u
 [eva:progress] Done for function u
 [eva:alarm] strings.i:39: Warning: 
   out of bounds read. assert \valid_read(p - 4);
 [eva:progress] 
   computing for function u <- string_reads <- main.
-  Called from strings.i:42.
+  Called from strings.i:42:7-10.
 [eva:progress] Done for function u
 [eva:alarm] strings.i:42: Warning: 
   out of bounds read. assert \valid_read(p + 12);
 [eva:progress] 
   computing for function u <- string_reads <- main.
-  Called from strings.i:44.
+  Called from strings.i:44:7-10.
 [eva:progress] Done for function u
 [eva:progress] 
   computing for function u <- string_reads <- main.
-  Called from strings.i:48.
+  Called from strings.i:48:7-10.
 [eva:progress] Done for function u
 [eva:alarm] strings.i:48: Warning: 
   out of bounds read. assert \valid_read(p - 4);
 [eva:progress] 
   computing for function u <- string_reads <- main.
-  Called from strings.i:53.
+  Called from strings.i:53:9-12.
 [eva:progress] Done for function u
 [eva:progress] 
   computing for function strcpy <- string_reads <- main.
-  Called from strings.i:53.
+  Called from strings.i:53:14-25.
 [eva:alarm] strings.i:23: Warning: 
   out of bounds write.
   assert \valid(tmp_unfold_46);
@@ -84,14 +84,14 @@
 [eva:progress] Done for function strcpy
 [eva:progress] 
   computing for function strlen <- string_reads <- main.
-  Called from strings.i:58.
+  Called from strings.i:58:10-20.
 [eva:progress] Recording results for strlen
 [eva:progress] Done for function strlen
 [eva:progress] Recording results for string_reads
 [eva:progress] Done for function string_reads
 [eva:progress] 
   computing for function string_writes <- main.
-  Called from strings.i:143.
+  Called from strings.i:143:3-19.
 [eva:alarm] strings.i:64: Warning: 
   out of bounds write. assert \valid(tmp);
                        (tmp from nondet?s5 + 2:& c)
@@ -105,71 +105,71 @@
   locals {c} escaping the scope of string_writes through s6
 [eva:progress] 
   computing for function string_comparison <- main.
-  Called from strings.i:144.
+  Called from strings.i:144:3-23.
 [eva:progress] 
   computing for function u <- string_comparison <- main.
-  Called from strings.i:78.
+  Called from strings.i:78:7-10.
 [eva:progress] Done for function u
 [eva:alarm] strings.i:79: Warning: 
   pointer comparison. assert \pointer_comparable((void *)s3, (void *)s4);
 [eva:progress] 
   computing for function u <- string_comparison <- main.
-  Called from strings.i:80.
+  Called from strings.i:80:7-10.
 [eva:progress] Done for function u
 [eva:progress] 
   computing for function u <- string_comparison <- main.
-  Called from strings.i:82.
+  Called from strings.i:82:7-10.
 [eva:progress] Done for function u
 [eva:progress] 
   computing for function u <- string_comparison <- main.
-  Called from strings.i:84.
+  Called from strings.i:84:7-10.
 [eva:progress] Done for function u
 [eva:alarm] strings.i:85: Warning: 
   pointer comparison. assert \pointer_comparable((void *)s7, (void *)s8);
 [eva:progress] 
   computing for function u <- string_comparison <- main.
-  Called from strings.i:86.
+  Called from strings.i:86:7-10.
 [eva:progress] Done for function u
 [eva:progress] 
   computing for function u <- string_comparison <- main.
-  Called from strings.i:88.
+  Called from strings.i:88:7-10.
 [eva:progress] Done for function u
 [eva:alarm] strings.i:89: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)(s7 + 1), (void *)(s8 + 1));
 [eva:progress] 
   computing for function u <- string_comparison <- main.
-  Called from strings.i:90.
+  Called from strings.i:90:7-10.
 [eva:progress] Done for function u
 [eva:progress] 
   computing for function u <- string_comparison <- main.
-  Called from strings.i:92.
+  Called from strings.i:92:10-13.
 [eva:progress] Done for function u
 [eva:progress] 
   computing for function u <- string_comparison <- main.
-  Called from strings.i:93.
+  Called from strings.i:93:7-10.
 [eva:progress] Done for function u
 [eva:progress] 
   computing for function u <- string_comparison <- main.
-  Called from strings.i:94.
+  Called from strings.i:94:11-14.
 [eva:progress] Done for function u
 [eva:progress] 
   computing for function u <- string_comparison <- main.
-  Called from strings.i:95.
+  Called from strings.i:95:9-12.
 [eva:progress] Done for function u
 [eva:progress] 
   computing for function u <- string_comparison <- main.
-  Called from strings.i:95.
+  Called from strings.i:95:14-17.
 [eva:progress] Done for function u
 [eva:progress] 
   computing for function u <- string_comparison <- main.
-  Called from strings.i:96.
+  Called from strings.i:96:7-10.
 [eva:progress] Done for function u
 [eva:alarm] strings.i:97: Warning: 
   pointer comparison. assert \pointer_comparable((void *)s5, (void *)s6);
 [eva:progress] 
   computing for function u <- string_comparison <- main.
-  Called from strings.i:98.
+  Called from strings.i:98:7-10.
 [eva:progress] Done for function u
 [eva:alarm] strings.i:99: Warning: 
   pointer comparison.
@@ -178,7 +178,7 @@
 [eva:progress] Done for function string_comparison
 [eva:progress] 
   computing for function wide_string_comparison <- main.
-  Called from strings.i:145.
+  Called from strings.i:145:3-28.
 [eva:alarm] strings.i:111: Warning: 
   pointer comparison. assert \pointer_comparable((void *)w1, (void *)w2);
 [eva:alarm] strings.i:114: Warning: 
@@ -187,15 +187,15 @@
 [eva:progress] Done for function wide_string_comparison
 [eva:progress] 
   computing for function long_chain <- main.
-  Called from strings.i:146.
+  Called from strings.i:146:3-16.
 [eva:progress] 
   computing for function assigns <- long_chain <- main.
-  Called from strings.i:135.
+  Called from strings.i:135:3-21.
 [eva] using specification for function assigns
 [eva:progress] Done for function assigns
 [eva:progress] 
   computing for function strcmp <- long_chain <- main.
-  Called from strings.i:136.
+  Called from strings.i:136:11-33.
 [eva:alarm] strings.i:123: Warning: 
   out of bounds read. assert \valid_read(tmp_0);
                       (tmp_0 from s2_0++)

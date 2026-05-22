@@ -57,7 +57,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f <- origin.
-  Called from origin.i:124.
+  Called from origin.i:124:9-12.
 [eva] using specification for function f
 [eva:progress] Done for function f
 [eva:garbled-mix:write] origin.i:126: 
@@ -77,7 +77,7 @@
 [eva:progress] Done for function origin
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    origin.i:126: misaligned read of addresses
+    origin.i:126:9-28: misaligned read of addresses
       (read in 1 statement, propagated through 2 statements)
       garbled mix of &{x; y}
 [eva] ====== VALUES COMPUTED ======
@@ -85,15 +85,18 @@
   r.c ∈ [--..--]
    .[bits 8 to 15] ∈ UNINITIALIZED
    .i ∈ [--..--]
-   .p ∈ {{ garbled mix of &{x} (origin: Misaligned read {origin.i:126}) }}
+   .p ∈
+   {{ garbled mix of &{x} (origin: Misaligned read {origin.i:126:9-28}) }}
    .t[0][bits 0 to 7] ∈
-   {{ garbled mix of &{y} (origin: Merge {origin.i:129}) }}
+   {{ garbled mix of &{y} (origin: Merge {origin.i:129:12-14}) }}
    .t[0][bits 8 to 15]# ∈ {{ NULL ; (? *)&y }}%32, bits 24 to 31 
    .t[0][bits 16 to 31] ∈ {0}
-   .t[1] ∈ {{ garbled mix of &{x} (origin: Arithmetic {origin.i:130}) }}
+   .t[1] ∈
+   {{ garbled mix of &{x} (origin: Arithmetic {origin.i:130:12-30}) }}
   q1[bits 0 to 15]# ∈ {{ (? *)&y }}%32, bits 16 to 31 
     [bits 16 to 31] ∈ {0}
-  q2[bits 0 to 7] ∈ {{ garbled mix of &{y} (origin: Merge {origin.i:129}) }}
+  q2[bits 0 to 7] ∈
+    {{ garbled mix of &{y} (origin: Merge {origin.i:129:12-14}) }}
     [bits 8 to 15]# ∈ {{ NULL ; (? *)&y }}%32, bits 24 to 31 
     [bits 16 to 31] ∈ {0}
 [from] Computing for function origin

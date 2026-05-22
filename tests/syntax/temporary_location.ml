@@ -4,7 +4,7 @@ class vis = object(_)
   inherit Visitor.frama_c_inplace
 
   method! vvrbl vi =
-    Kernel.result "%s -> %a" vi.vname Printer.pp_location vi.vdecl;
+    Kernel.result "%s -> %a" vi.vname Fileloc.pretty vi.vdecl;
     Cil.DoChildren
 
 end

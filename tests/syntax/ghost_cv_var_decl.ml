@@ -38,7 +38,7 @@ class visitor = object(_)
 
   method! vvdec v =
     Kernel.feedback "%a@. %a: %a"
-      Cil_datatype.Location.pretty (Current_loc.get())
+      Fileloc.pretty (Current_loc.get())
       Cil_datatype.Varinfo.pretty v
       ghost_status (Cil.var v) ;
     Cil.DoChildren

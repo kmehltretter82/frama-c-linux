@@ -7,7 +7,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil_datatype
 open Logic_ptree
 open Pattern
 module D = Datatype
@@ -295,7 +294,7 @@ let parse_strategy ctxt loc ps =
   try
     let old = Hashtbl.find strategies name.value in
     error ctxt loc "Duplicate strategy definition ('%s', at %a)"
-      name.value Location.pretty old.name.loc
+      name.value Fileloc.pretty old.name.loc
   with Not_found ->
     let alternatives = parse_alternatives ctxt ps in
     let strategy = { name ; alternatives } in

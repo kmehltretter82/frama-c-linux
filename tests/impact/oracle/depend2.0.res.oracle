@@ -7,20 +7,20 @@
   
 [eva:progress] 
   computing for function apply <- main.
-  Called from depend2.i:11.
+  Called from depend2.i:11:11-23.
 [eva:progress] 
   computing for function find <- apply <- main.
-  Called from depend2.i:7.
+  Called from depend2.i:7:33-40.
 [eva:progress] Recording results for find
 [eva:progress] Done for function find
 [eva:progress] Recording results for apply
 [eva:progress] Done for function apply
 [eva:progress] 
   computing for function apply <- main.
-  Called from depend2.i:13.
+  Called from depend2.i:13:11-23.
 [eva:progress] 
   computing for function find <- apply <- main.
-  Called from depend2.i:7.
+  Called from depend2.i:7:33-40.
 [eva:progress] Recording results for find
 [eva:progress] Done for function find
 [eva:progress] Recording results for apply
@@ -36,6 +36,6 @@
 [pdg] computing for function apply
 [pdg] done for function apply
 [impact] impacted statements of stmt(s) 11 are:
-    depend2.i:14 (sid 13): __retres = a + b;
-    depend2.i:14 (sid 18): return __retres;
+    depend2.i:14:3-15 (sid 13): __retres = a + b;
+    depend2.i:14:3-15 (sid 18): return __retres;
 [impact] analysis done

@@ -7,11 +7,11 @@
 (**************************************************************************)
 
 include State_builder.Ref
-    (Cil_datatype.Location)
+    (Fileloc)
     (struct
       let dependencies = []
       let name = "Current_loc"
-      let default () = Cil_datatype.Location.unknown
+      let default () = Fileloc.unknown
     end)
 
 let () = Log.set_current_source (fun () -> fst (get ()))

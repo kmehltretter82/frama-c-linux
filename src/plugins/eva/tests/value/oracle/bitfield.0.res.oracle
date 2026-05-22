@@ -26,7 +26,7 @@
   y ∈ [--..--]
 [eva:progress] 
   computing for function main_old <- main.
-  Called from bitfield.i:164.
+  Called from bitfield.i:164:3-13.
 [eva:show] bitfield.i:113: Frama_C_show_each: {1}
 [eva:show] bitfield.i:117: Frama_C_show_each: {3}
 [eva:alarm] bitfield.i:123: Warning: 
@@ -42,7 +42,7 @@
   signed overflow. assert (int)v.d + 1 ≤ 2147483647;
 [eva:progress] 
   computing for function f <- main_old <- main.
-  Called from bitfield.i:128.
+  Called from bitfield.i:128:3-9.
 [eva:show] bitfield.i:21: 
   Frama_C_dump_each:
   # cvalue:
@@ -70,7 +70,7 @@
   y ∈ [--..--]
   v.a ∈ {0}
    .b ∈ {7}
-   .c ∈ {{ garbled mix of &{v} (origin: Arithmetic {bitfield.i:123}) }}
+   .c ∈ {{ garbled mix of &{v} (origin: Arithmetic {bitfield.i:123:9-17}) }}
    .[bits 28 to 31] ∈ UNINITIALIZED
    .d ∈ {{ &v + {9} }}
   l_161{.f0; .f1[bits 0 to 31]} ∈ {-1}
@@ -89,12 +89,12 @@
   because of arithmetic operation on addresses.
 [eva:progress] 
   computing for function return_8 <- main_old <- main.
-  Called from bitfield.i:133.
+  Called from bitfield.i:133:11-21.
 [eva:progress] Recording results for return_8
 [eva:progress] Done for function return_8
 [eva:progress] 
   computing for function g <- main_old <- main.
-  Called from bitfield.i:136.
+  Called from bitfield.i:136:5-8.
 [eva:progress] Recording results for g
 [eva:progress] Done for function g
 [eva:progress] Recording results for main_old
@@ -103,13 +103,13 @@
   locals {v} escaping the scope of main_old through h
 [eva:progress] 
   computing for function imprecise_bts_1671 <- main.
-  Called from bitfield.i:165.
+  Called from bitfield.i:165:3-23.
 [kernel:annot:missing-spec] bitfield.i:70: Warning: 
   Neither code nor specification for function leaf, generating default assigns.
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function leaf <- imprecise_bts_1671 <- main.
-  Called from bitfield.i:70.
+  Called from bitfield.i:70:7-15.
 [eva] using specification for function leaf
 [eva:garbled-mix:assigns] bitfield.i:70: 
   The specification of function leaf has generated a garbled mix of addresses
@@ -117,13 +117,14 @@
 [eva:progress] Done for function leaf
 [eva:show] bitfield.i:71: 
   Frama_C_show_each:
-  {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
+  {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70:7-15}) }}
 [eva:show] bitfield.i:73: 
   Frama_C_show_each:
-  .next ∈ {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
+  .next ∈
+  {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70:7-15}) }}
   .bitf ∈ {0}
   .[bits 65 to 95] ∈
-  {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
+  {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70:7-15}) }}
 [eva:alarm] bitfield.i:74: Warning: 
   unaligned pointer creation. assert \aligned(c->next.next,alignof(struct A));
 [eva:partition] bitfield.i:69: starting to merge loop iterations
@@ -131,31 +132,31 @@
   unaligned pointer creation. assert \aligned(c,alignof(struct A));
 [eva:progress] 
   computing for function leaf <- imprecise_bts_1671 <- main.
-  Called from bitfield.i:70.
+  Called from bitfield.i:70:7-15.
 [eva:progress] Done for function leaf
 [eva:show] bitfield.i:71: 
   Frama_C_show_each:
-  {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
+  {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70:7-15}) }}
 [eva:alarm] bitfield.i:72: Warning: 
   unaligned pointer creation. assert \aligned(c,alignof(struct A));
 [eva:alarm] bitfield.i:72: Warning: 
   out of bounds write. assert \valid(&c->bitf);
 [eva:show] bitfield.i:73: 
   Frama_C_show_each:
-  {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
+  {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70:7-15}) }}
 [eva:alarm] bitfield.i:74: Warning: 
   unaligned pointer creation. assert \aligned(c,alignof(struct A));
 [eva:alarm] bitfield.i:74: Warning: 
   out of bounds read. assert \valid_read(&c->next.next);
 [eva:progress] 
   computing for function leaf <- imprecise_bts_1671 <- main.
-  Called from bitfield.i:70.
+  Called from bitfield.i:70:7-15.
 [eva:progress] Done for function leaf
 [eva:progress] Recording results for imprecise_bts_1671
 [eva:progress] Done for function imprecise_bts_1671
 [eva:progress] 
   computing for function logic <- main.
-  Called from bitfield.i:166.
+  Called from bitfield.i:166:3-10.
 [eva:show] bitfield.i:89: 
   Frama_C_show_each: .v0_3 ∈ [--..--]
                      .v4 ∈ {0}
@@ -176,7 +177,7 @@
 [eva:progress] Done for function logic
 [eva:progress] 
   computing for function eq_bitfields <- main.
-  Called from bitfield.i:167.
+  Called from bitfield.i:167:3-17.
 [eva:show] bitfield.i:146: 
   Frama_C_dump_each:
   # cvalue:
@@ -205,8 +206,9 @@
   G ∈ {1}
   H ∈ {0}
   b ∈ {0}
-  c ∈ {{ garbled mix of &{b; ee} (origin: Misaligned read {bitfield.i:70}) }}
-  ee ∈ {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
+  c ∈
+   {{ garbled mix of &{b; ee} (origin: Misaligned read {bitfield.i:70:7-15}) }}
+  ee ∈ {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70:7-15}) }}
   foo ∈ [--..--]
   y.v0_3 ∈ [--..--]
    .v4 ∈ {0}
@@ -221,14 +223,14 @@
 [eva:progress] Done for function eq_bitfields
 [eva:progress] 
   computing for function char_short <- main.
-  Called from bitfield.i:168.
+  Called from bitfield.i:168:3-15.
 [eva:progress] Recording results for char_short
 [eva:progress] Done for function char_short
 [eva:progress] Recording results for main
 [eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    bitfield.i:70: misaligned read of addresses
+    bitfield.i:70:7-15: misaligned read of addresses
       (read in 4 statements, propagated through 2 statements)
       garbled mix of &{b; ee}
 [eva] bitfield.i:102: assertion 'Eva,initialization' got final status invalid.
@@ -249,8 +251,11 @@
   r ∈ {1}
 [eva:final-states] Values at end of function imprecise_bts_1671:
   b ∈ {0}
-  c ∈ {{ garbled mix of &{b; ee} (origin: Misaligned read {bitfield.i:70}) }}
-  ee ∈ {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
+  c ∈
+   {{ garbled mix of &{b; ee}
+    (origin: Misaligned read {bitfield.i:70:7-15}) }}
+  ee ∈
+    {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70:7-15}) }}
 [eva:final-states] Values at end of function logic:
   y.v0_3 ∈ [--..--]
    .v4 ∈ {0}
@@ -262,7 +267,7 @@
 [eva:final-states] Values at end of function main_old:
   h.a ∈ {0}
    .b ∈ [--..--]
-   .c ∈ {{ garbled mix of &{v} (origin: Arithmetic {bitfield.i:130}) }}
+   .c ∈ {{ garbled mix of &{v} (origin: Arithmetic {bitfield.i:130:9-22}) }}
    {.d; .[bits 28 to 31]} ∈ {0}
   k8.a ∈ {0}
     .b ∈ {-8}
@@ -278,7 +283,7 @@
   H ∈ {0}
   v.a ∈ {0}
    .b ∈ {7}
-   .c ∈ {{ garbled mix of &{v} (origin: Arithmetic {bitfield.i:123}) }}
+   .c ∈ {{ garbled mix of &{v} (origin: Arithmetic {bitfield.i:123:9-17}) }}
    .[bits 28 to 31] ∈ UNINITIALIZED
    .d ∈ {{ &v + {9} }}
   l_161{.f0; .f1[bits 0 to 31]} ∈ {-1}
@@ -300,8 +305,11 @@
   G ∈ {1}
   H ∈ {0}
   b ∈ {0}
-  c ∈ {{ garbled mix of &{b; ee} (origin: Misaligned read {bitfield.i:70}) }}
-  ee ∈ {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
+  c ∈
+   {{ garbled mix of &{b; ee}
+    (origin: Misaligned read {bitfield.i:70:7-15}) }}
+  ee ∈
+    {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70:7-15}) }}
   y.v0_3 ∈ [--..--]
    .v4 ∈ {0}
    .v5_31 ∈ [--..--]

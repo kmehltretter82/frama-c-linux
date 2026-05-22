@@ -10,18 +10,18 @@
   is_ko ∈ {-1}
 [eva:progress] 
   computing for function init <- main_ter.
-  Called from bts324.i:35.
+  Called from bts324.i:35:3-16.
 [eva] using specification for function init
 [eva:progress] Done for function init
 [eva:progress] 
   computing for function loop_body <- main_ter.
-  Called from bts324.i:39.
+  Called from bts324.i:39:7-19.
 [eva] using specification for function loop_body
 [eva:progress] Done for function loop_body
 [eva:partition] bts324.i:37: starting to merge loop iterations
 [eva:progress] 
   computing for function loop_body <- main_ter.
-  Called from bts324.i:39.
+  Called from bts324.i:39:7-19.
 [eva:progress] Done for function loop_body
 [eva:progress] Recording results for main_ter
 [eva:progress] Done for function main_ter

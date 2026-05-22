@@ -246,7 +246,7 @@ let args_for_original (_t , e) args =
   match e with
   | None -> args
   | Some n ->
-    let loc = Cil_datatype.Location.unknown in
+    let loc = Fileloc.unknown in
     match args with
     | [ ptr ; len ] -> [ ptr ; (Cil.integer ~loc n) ; len]
     | _ ->

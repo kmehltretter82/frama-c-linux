@@ -46,7 +46,7 @@ module ArtifactLocation: sig
 
   val create: uri:string -> ?base:Hpath.base -> unit -> t
 
-  val of_loc: Cil_datatype.Location.t -> t
+  val of_loc: Fileloc.t -> t
 
   val default: t
 
@@ -161,7 +161,7 @@ module Region: sig
 
   val default: t
 
-  val of_loc: Cil_datatype.Location.t -> t
+  val of_loc: Fileloc.t -> t
 end
 
 module Rectangle: sig
@@ -192,7 +192,7 @@ module PhysicalLocation: sig
 
   val default: t
 
-  val of_loc: Cil_datatype.Location.t -> t
+  val of_loc: Fileloc.t -> t
 
 end
 
@@ -215,7 +215,7 @@ module Location: sig
 
   val default: t
 
-  val of_loc: Cil_datatype.Location.t -> t
+  val of_loc: Fileloc.t -> t
 
 end
 

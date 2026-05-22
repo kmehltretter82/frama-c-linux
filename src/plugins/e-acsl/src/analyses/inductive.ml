@@ -67,7 +67,7 @@ include struct (* auxiliary functions *)
     | _ -> None
 
   let pp_logic_info fmt li =
-    Printer.pp_global_annotation fmt (Dfun_or_pred (li, Location.unknown))
+    Printer.pp_global_annotation fmt (Dfun_or_pred (li, Fileloc.unknown))
 
   let freshen_up_logic_var lv = {lv with lv_id = Cil_const.new_raw_vid ()}
 

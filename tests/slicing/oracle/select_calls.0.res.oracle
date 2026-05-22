@@ -11,48 +11,48 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function send <- f.
-  Called from select_calls.i:22.
+  Called from select_calls.i:22:3-10.
 [eva] using specification for function send
 [eva:progress] Done for function send
 [eva:progress] 
   computing for function send <- f.
-  Called from select_calls.i:23.
+  Called from select_calls.i:23:3-10.
 [eva:progress] Done for function send
 [kernel:annot:missing-spec] select_calls.i:24: Warning: 
   Neither code nor specification for function crypt, generating default
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function crypt <- f.
-  Called from select_calls.i:24.
+  Called from select_calls.i:24:3-12.
 [eva] using specification for function crypt
 [eva:progress] Done for function crypt
 [eva:progress] 
   computing for function send <- f.
-  Called from select_calls.i:25.
+  Called from select_calls.i:25:3-10.
 [eva:progress] Done for function send
 [eva:progress] 
   computing for function send <- f.
-  Called from select_calls.i:28.
+  Called from select_calls.i:28:10-17.
 [eva:progress] Done for function send
 [kernel:annot:missing-spec] select_calls.i:30: Warning: 
   Neither code nor specification for function uncrypt, generating default
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function uncrypt <- f.
-  Called from select_calls.i:30.
+  Called from select_calls.i:30:10-21.
 [eva] using specification for function uncrypt
 [eva:progress] Done for function uncrypt
 [eva:progress] 
   computing for function send <- f.
-  Called from select_calls.i:31.
+  Called from select_calls.i:31:3-10.
 [eva:progress] Done for function send
 [eva:progress] 
   computing for function crypt <- f.
-  Called from select_calls.i:33.
+  Called from select_calls.i:33:3-12.
 [eva:progress] Done for function crypt
 [eva:progress] 
   computing for function send <- f.
-  Called from select_calls.i:35.
+  Called from select_calls.i:35:3-10.
 [eva:progress] Done for function send
 [eva:progress] Recording results for f
 [eva:progress] Done for function f

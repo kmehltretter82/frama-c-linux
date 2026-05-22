@@ -88,13 +88,13 @@
 [  Alarm  ] Pre-condition 'i'
             requires i: i ≥ 0
             By Call Preconditions, with pending:
-             - Unreachable instruction (file precond.c, line 40)
+             - Unreachable instruction ("precond.c", line 40)
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'f2'
 --------------------------------------------------------------------------------
 
-[    -    ] Pre-condition (file precond.c, line 15)
+[    -    ] Pre-condition ("precond.c", line 15)
             requires i ≥ 0
             tried with Call Preconditions.
 [    -    ] Assigns nothing
@@ -108,7 +108,7 @@
 --- Properties of Function 'aux'
 --------------------------------------------------------------------------------
 
-[    -    ] Instance of 'Pre-condition (file precond.c, line 15)' at instruction (file precond.c, line 21)
+[    -    ] Instance of 'Pre-condition ("precond.c", line 15)' at instruction ("precond.c", line 21)
 
             status of 'requires i ≥ 0' of f2 at stmt 4
             tried with Eva.
@@ -117,7 +117,7 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[    -    ] Pre-condition (file precond.c, line 24)
+[    -    ] Pre-condition ("precond.c", line 24)
             requires x ≤ 8
             tried with Call Preconditions.
 [    -    ] Assigns nothing
@@ -131,43 +131,43 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Instance of 'Pre-condition 'i_plus_one'' at call 'f' (file precond.c, line 31)
+[  Valid  ] Instance of 'Pre-condition 'i_plus_one'' at call 'f' ("precond.c", line 31)
 
             status of 'requires i_plus_one: i + 1 ≥ 0' of f at stmt 10
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'i'' at call 'f' (file precond.c, line 31)
+[  Valid  ] Instance of 'Pre-condition 'i'' at call 'f' ("precond.c", line 31)
 
             status of 'requires i: i ≥ 0' of f at stmt 10
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'i_plus_one'' at call 'f' (file precond.c, line 32)
+[  Valid  ] Instance of 'Pre-condition 'i_plus_one'' at call 'f' ("precond.c", line 32)
 
             status of 'requires i_plus_one: i + 1 ≥ 0' of f at stmt 13
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'i'' at call 'f' (file precond.c, line 32)
+[  Valid  ] Instance of 'Pre-condition 'i'' at call 'f' ("precond.c", line 32)
 
             status of 'requires i: i ≥ 0' of f at stmt 13
             by Eva.
-[    -    ] Instance of 'Pre-condition (file precond.c, line 24)' at call 'g' (file precond.c, line 34)
+[    -    ] Instance of 'Pre-condition ("precond.c", line 24)' at call 'g' ("precond.c", line 34)
 
             status of 'requires x ≤ 8' of g at stmt 16
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'i_plus_one'' at instruction (file precond.c, line 39)
+[  Valid  ] Instance of 'Pre-condition 'i_plus_one'' at instruction ("precond.c", line 39)
 
             status of 'requires i_plus_one: i + 1 ≥ 0' of f at stmt 19
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'i'' at instruction (file precond.c, line 39)
+[  Valid  ] Instance of 'Pre-condition 'i'' at instruction ("precond.c", line 39)
 
             status of 'requires i: i ≥ 0' of f at stmt 19
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'i_plus_one'' at instruction (file precond.c, line 40)
+[  Valid  ] Instance of 'Pre-condition 'i_plus_one'' at instruction ("precond.c", line 40)
 
             status of 'requires i_plus_one: i + 1 ≥ 0' of f at stmt 20
             by Eva.
-[  Alarm  ] Instance of 'Pre-condition 'i'' at instruction (file precond.c, line 40)
+[  Alarm  ] Instance of 'Pre-condition 'i'' at instruction ("precond.c", line 40)
 
             status of 'requires i: i ≥ 0' of f at stmt 20
             By Eva, with pending:
-             - Unreachable instruction (file precond.c, line 40)
+             - Unreachable instruction ("precond.c", line 40)
 
 --------------------------------------------------------------------------------
 --- Status Report Summary
@@ -189,13 +189,13 @@
 [  Alarm  ] Pre-condition 'i'
             requires i: i ≥ 0
             By Call Preconditions, with pending:
-             - Unreachable instruction (file precond.c, line 40)
+             - Unreachable instruction ("precond.c", line 40)
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'f2'
 --------------------------------------------------------------------------------
 
-[    -    ] Pre-condition (file precond.c, line 15)
+[    -    ] Pre-condition ("precond.c", line 15)
             requires i ≥ 0
             tried with Call Preconditions.
 [    -    ] Assigns nothing
@@ -209,7 +209,7 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[    -    ] Pre-condition (file precond.c, line 24)
+[    -    ] Pre-condition ("precond.c", line 24)
             requires x ≤ 8
             tried with Call Preconditions.
 [    -    ] Assigns nothing

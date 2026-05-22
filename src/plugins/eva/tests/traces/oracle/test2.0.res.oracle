@@ -7,12 +7,12 @@
   
 [eva:progress] 
   computing for function loop <- main.
-  Called from test2.i:18.
+  Called from test2.i:18:9-18.
 [eva:progress] Recording results for loop
 [eva:progress] Done for function loop
 [eva:progress] 
   computing for function loop <- main.
-  Called from test2.i:18.
+  Called from test2.i:18:9-18.
 [eva:progress] Recording results for loop
 [eva:progress] Done for function loop
 [eva:progress] Recording results for main

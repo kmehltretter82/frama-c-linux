@@ -903,7 +903,7 @@ class process_volatile_access project binding_map kf_tbl vol_tbl index =
                 Options.warning ~source:(fst loc) ~once:true
                   ~wkey:wkey_transformed_call
                   "%a: use pointer function '%s'"
-                  Location.pretty loc fn;
+                  Fileloc.pretty loc fn;
                 Call (result, g, ys, loc)
               | None ->
                 Options.warning ~source:(fst loc) ~once:true

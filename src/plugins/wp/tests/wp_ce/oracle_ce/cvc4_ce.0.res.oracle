@@ -28,7 +28,7 @@ Model x = -1
   Function wrong
 ------------------------------------------------------------
 
-Goal Post-condition (file cvc4_ce.i, line 11) in 'wrong':
+Goal Post-condition ("cvc4_ce.i", line 11, characters 13-31) in 'wrong':
 Assume { Type: is_sint32(wrong_0). Probe x = wrong_0. }
 Prove: IAbs.abs(wrong_0) = wrong_0.
 Prover CVC4 returns Unsuccess (Model)
@@ -40,5 +40,5 @@ Model x = -1
   Lemma                     -        -        1       0.0%
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  wrong                     1        -        2      50.0%
+  wrong                     3        -        4      75.0%
 ------------------------------------------------------------

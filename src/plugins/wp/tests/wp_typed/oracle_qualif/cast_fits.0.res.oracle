@@ -52,12 +52,12 @@
   Unsuccess:       3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  fits1                     -        1        1       100%
-  mismatch1                 -        -        1       0.0%
-  fits2                     -        1        1       100%
-  fits3                     -        1        1       100%
-  fits4                     -        1        1       100%
-  fits5                     -        1        1       100%
-  mismatch2                 -        -        1       0.0%
-  mismatch3                 -        -        1       0.0%
+  fits1                     2        1        3       100%
+  mismatch1                 2        -        3      66.7%
+  fits2                     2        1        3       100%
+  fits3                     2        1        3       100%
+  fits4                     2        1        3       100%
+  fits5                     2        1        3       100%
+  mismatch2                 2        -        3      66.7%
+  mismatch3                 2        -        3      66.7%
 ------------------------------------------------------------

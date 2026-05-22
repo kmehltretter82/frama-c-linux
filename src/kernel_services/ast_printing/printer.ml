@@ -280,7 +280,6 @@ end (* class printer_with_annot *)
 include Printer_builder.Make(struct class printer = printer_with_annot end)
 
 (* initializing Cil_datatype's pretty printers *)
-let () = Cil_datatype.Location.pretty_ref := pp_location
 let () = Cil_datatype.Constant.pretty_ref := pp_constant
 let () = Cil_datatype.Exp.pretty_ref := pp_exp
 let () = Cil_datatype.Varinfo.pretty_ref := pp_varinfo

@@ -15,7 +15,6 @@ struct
   let without_annot f fmt x = (printer ())#without_annot f fmt x
   let force_brace f fmt x = (printer ())#force_brace f fmt x
   let pp_varname fmt x = (printer ())#varname fmt x
-  let pp_location fmt x = (printer ())#location fmt x
   let pp_constant fmt x = (printer ())#constant fmt x
   let pp_ikind fmt x = (printer ())#ikind fmt x
   let pp_fkind fmt x = (printer ())#fkind fmt x

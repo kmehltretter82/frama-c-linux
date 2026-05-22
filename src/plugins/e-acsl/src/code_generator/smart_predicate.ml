@@ -8,7 +8,7 @@
 
 open Cil_types
 
-let of_bool ?(loc = Cil_datatype.Location.unknown) ?(names = []) = function
+let of_bool ?(loc = Fileloc.unknown) ?(names = []) = function
   | true -> Logic_const.pred ~loc ~names Ptrue
   | false -> Logic_const.pred ~loc ~names Pfalse
 
@@ -24,7 +24,7 @@ let extract_integer t =
 
 let prel
     ?(smart = true)
-    ?(loc = Cil_datatype.Location.unknown)
+    ?(loc = Fileloc.unknown)
     ?(names = [])
     rel
     t1

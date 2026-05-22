@@ -11,7 +11,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f <- main.
-  Called from pb.i:2.
+  Called from pb.i:2:16-19.
 [eva] using specification for function f
 [eva:progress] Done for function f
 [eva:progress] Recording results for main

@@ -47,23 +47,3 @@ val replace_call_precondition: Property.t -> stmt -> Property.t -> unit
     is the property corresponding to the status of [pre] at call [stmt].
     The previous property, if any, is removed. Beware that this may also
     remove some already proved statuses *)
-
-val transpose_term_at_callsite:
-  formals:varinfo list -> concretes:exp list ->
-  term -> term option
-(** [transpose_pred_at_callsite ~formals ~concretes t] substitutes in term [t]
-    formal parameters with concrete values and move [Pre] labels to [Here].
-    Returns [None] if ever the address of a formal is taken.
-    @since Frama-C+dev *)
-
-val transpose_pred_at_callsite:
-  formals:varinfo list -> concretes:exp list ->
-  predicate -> predicate option
-(** Same as to [transpose_term_at_callsite] for predicates.
-    @since Frama-C+dev *)
-
-val transpose_ipred_at_callsite:
-  formals:varinfo list -> concretes:exp list ->
-  identified_predicate -> identified_predicate option
-(** Same as to [transpose_term_at_callsite] for identified predicates.
-    @since Frama-C+dev *)

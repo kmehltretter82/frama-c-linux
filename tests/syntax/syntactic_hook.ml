@@ -51,7 +51,7 @@ let warn_distinct oldvi vi =
     "[SH]: definition of %a does not use exactly the same prototype as \
      declared on line %d"
     Format.pp_print_string vi.vname
-    (fst oldvi.vdecl).Filepos.pos_lnum
+    (Fileloc.line oldvi.vdecl)
 ;;
 
 Cabs2cil.register_different_decl_hook warn_distinct;;

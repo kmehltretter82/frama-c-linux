@@ -6,7 +6,7 @@
   v ∈ [--..--]
 [eva:progress] 
   computing for function main1 <- main.
-  Called from non_natural.i:63.
+  Called from non_natural.i:63:3-10.
 [eva:show] non_natural.i:11: Frama_C_show_each: {0}
 [eva:show] non_natural.i:11: Frama_C_show_each: {0; 1}
 [eva:show] non_natural.i:11: Frama_C_show_each: {0; 1; 2}
@@ -15,10 +15,10 @@
 [eva:progress] Done for function main1
 [eva:progress] 
   computing for function main2 <- main.
-  Called from non_natural.i:64.
+  Called from non_natural.i:64:3-10.
 [eva:progress] 
   computing for function duff1 <- main2 <- main.
-  Called from non_natural.i:57.
+  Called from non_natural.i:57:3-24.
 [eva:show] non_natural.i:22: Frama_C_show_each: {{ &p2 }}
 [eva:alarm] non_natural.i:23: Warning: 
   accessing uninitialized left-value.
@@ -131,7 +131,7 @@
   accessing out of bounds index. assert o < 100002;
 [eva:progress] 
   computing for function duff2 <- main2 <- main.
-  Called from non_natural.i:59.
+  Called from non_natural.i:59:3-24.
 [eva:show] non_natural.i:38: Frama_C_show_each: {{ &p2 }}
 [eva:alarm] non_natural.i:39: Warning: 
   accessing uninitialized left-value.

@@ -7,11 +7,11 @@
   Y ∈ {0}
 [eva:progress] 
   computing for function f <- main.
-  Called from bts335b.i:20.
+  Called from bts335b.i:20:11-24.
 [eva:alarm] bts335b.i:16: Warning: signed overflow. assert z + 1 ≤ 2147483647;
 [eva:progress] 
   computing for function g <- f <- main.
-  Called from bts335b.i:17.
+  Called from bts335b.i:17:10-20.
 [eva:progress] Recording results for g
 [from] Computing for function g
 [from] Done for function g
@@ -23,7 +23,7 @@
 [eva:alarm] bts335b.i:21: Warning: signed overflow. assert j + 1 ≤ 2147483647;
 [eva:progress] 
   computing for function g <- main.
-  Called from bts335b.i:22.
+  Called from bts335b.i:22:8-21.
 [eva:progress] Recording results for g
 [from] Computing for function g
 [from] Done for function g
@@ -39,15 +39,15 @@
 [from] Done for function main
 [eva:progress] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to g at bts335b.i:17 (by f):
+[from] call to g at bts335b.i:17:10-20 (by f):
   X FROM c; x
   Y FROM c; x
   \result FROM c; x
-[from] call to f at bts335b.i:20 (by main):
+[from] call to f at bts335b.i:20:11-24 (by main):
   X FROM c; x
   Y FROM c; x
   \result FROM c; x
-[from] call to g at bts335b.i:22 (by main):
+[from] call to g at bts335b.i:22:8-21 (by main):
   X FROM c; y
   Y FROM c; y
   \result FROM c; y

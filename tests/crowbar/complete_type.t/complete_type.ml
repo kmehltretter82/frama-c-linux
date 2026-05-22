@@ -1,6 +1,6 @@
 open Cil_types
 
-let loc = Cil_datatype.Location.unknown
+let loc = Fileloc.unknown
 
 let field_name =
   let count = ref 0 in

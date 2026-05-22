@@ -16,19 +16,24 @@ type t =
   | Why3 of Why3Provers.t
   | Qed
   | Tactical
+  | CFG
 
 let equal p q =
   match p,q with
   | Qed,Qed -> true
   | Tactical,Tactical -> true
+  | CFG,CFG -> true
   | Why3 p, Why3 q -> Why3Provers.equal p q
-  | (Why3 _ | Qed | Tactical) , _ -> false
+  | (Why3 _ | CFG | Qed | Tactical) , _ -> false
 
 let compare p q =
   match p,q with
   | Qed , Qed -> 0
   | Qed , _ -> (-1)
   | _ , Qed -> (+1)
+  | CFG , CFG -> 0
+  | CFG , _ -> (-1)
+  | _ , CFG -> (+1)
   | Why3 p , Why3 q -> Why3Provers.compare p q
   | Why3 _ , _ -> (-1)
   | _ , Why3 _ -> (+1)
@@ -37,20 +42,24 @@ let compare p q =
 let hash = function
   | Qed -> 0
   | Tactical -> 1
+  | CFG -> 2
   | Why3 p -> Why3Provers.hash p
 
 let ident = function
   | Why3 s -> Why3Provers.ident_wp s
+  | CFG -> "cfg"
   | Qed -> "qed"
   | Tactical -> "script"
 
 let name = function
   | Why3 s -> Why3Provers.name s
+  | CFG -> "CFG"
   | Qed -> "Qed"
   | Tactical -> "Script"
 
 let shortcut = function
   | Why3 s -> String.lowercase_ascii @@ Why3Provers.name s
+  | CFG -> "cfg"
   | Qed -> "qed"
   | Tactical -> "script"
 
@@ -76,6 +85,7 @@ let title ?version = function
     let version = match version with Some v -> v | None ->
       not (Wp_parameters.has_dkey dkey_shell)
     in Why3Provers.title ~version s
+  | CFG -> "CFG"
   | Qed -> "Qed"
   | Tactical -> "Script"
 
@@ -83,19 +93,20 @@ let pretty fmt p = Format.pp_print_string fmt (title p)
 
 let is_auto = function
   | Qed -> true
+  | CFG -> true
   | Tactical -> false
   | Why3 p -> Why3Provers.is_auto p
 
 let is_tactical = function
-  | Qed | Why3 _ -> false
+  | Qed | CFG | Why3 _ -> false
   | Tactical -> true
 
 let is_extern = function
-  | Qed | Tactical -> false
+  | Qed | CFG | Tactical -> false
   | Why3 _ -> true
 
 let has_counter_examples = function
-  | Qed | Tactical -> false
+  | Qed | CFG | Tactical -> false
   | Why3 p -> Why3Provers.with_counter_examples p <> None
 
 let sanitize_why3 s =
@@ -114,6 +125,7 @@ let sanitize_why3 s =
 
 let filename_for = function
   | Why3 s -> sanitize_why3 (Why3Provers.ident_wp s)
+  | CFG -> "CFG"
   | Qed -> "Qed"
   | Tactical -> "Tactical"
 

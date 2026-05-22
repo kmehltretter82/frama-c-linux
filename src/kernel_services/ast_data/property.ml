@@ -193,7 +193,7 @@ let other_loc_equal le1 le2 =
   match le1, le2 with
   | OLContract kf1, OLContract kf2 -> Kernel_function.equal kf1 kf2
   | OLStmt (_,s1), OLStmt (_,s2) -> Cil_datatype.Stmt.equal s1 s2
-  | OLGlob loc1, OLGlob loc2 -> Cil_datatype.Location.equal loc1 loc2
+  | OLGlob loc1, OLGlob loc2 -> Fileloc.equal loc1 loc2
   | (OLContract _ | OLStmt _ | OLGlob _ ), _ -> false
 
 let other_loc_compare le1 le2 =
@@ -202,7 +202,7 @@ let other_loc_compare le1 le2 =
   | OLContract _, _ -> 1 | _, OLContract _ -> -1
   | OLStmt (_,s1), OLStmt (_,s2) -> Cil_datatype.Stmt.compare s1 s2
   | OLStmt _, _ -> 1 | _, OLStmt _ -> -1
-  | OLGlob loc1, OLGlob loc2 -> Cil_datatype.Location.compare loc1 loc2
+  | OLGlob loc1, OLGlob loc2 -> Fileloc.compare loc1 loc2
 
 (* -------------------------------------------------------------------------- *)
 (* --- Getters                                                            --- *)
@@ -341,7 +341,7 @@ let rec location = function
       match Cil_datatype.Code_annotation.loc ca with
       | None -> Cil_datatype.Stmt.loc s
       | Some loc -> loc)
-  | IPReachable {ir_kf=None; ir_kinstr=Kglobal} -> Cil_datatype.Location.unknown
+  | IPReachable {ir_kf=None; ir_kinstr=Kglobal} -> Fileloc.unknown
   | IPAssigns {ias_kf=kf; ias_kinstr=ki; ias_froms=a} ->
     (match a with
      | [] -> loc_of_kf_ki kf ki
@@ -355,11 +355,11 @@ let rec location = function
   | IPDecrease {id_variant=(t, _)} -> t.term_loc
   | IPAxiomatic {iax_props} ->
     (match iax_props with
-     | [] -> Cil_datatype.Location.unknown
+     | [] -> Fileloc.unknown
      | p :: _ -> location p)
   | IPModule {im_props} ->
     (match im_props with
-     | [] -> Cil_datatype.Location.unknown
+     | [] -> Fileloc.unknown
      | p :: _ -> location p)
   | IPLemma {il_loc} -> il_loc
   | IPExtended {ie_ext={ext_loc}} -> ext_loc
@@ -368,7 +368,7 @@ let rec location = function
 
 let source ip =
   let loc = location ip in
-  if Cil_datatype.Location.equal loc Cil_datatype.Location.unknown
+  if Fileloc.equal loc Fileloc.unknown
   then None
   else Some (fst loc)
 
@@ -537,7 +537,7 @@ let rec pretty_ip fmt = function
   | IPReachable {ir_kf=Some kf; ir_kinstr=Kstmt stmt; ir_program_point=ba} ->
     Format.fprintf fmt "reachability %s stmt %a in %a"
       (match ba with Before -> "of" | After -> "post")
-      Cil_datatype.Location.pretty_line (Cil_datatype.Stmt.loc stmt)
+      Fileloc.pretty (Cil_datatype.Stmt.loc stmt)
       Kf.pretty kf
   | IPPropertyInstance {ii_kf; ii_stmt; ii_ip} ->
     Format.fprintf fmt "status of '%a'%t %a"
@@ -600,7 +600,7 @@ let reprs = [
     il_name="";il_labels=[];il_args=[];
     il_pred=Logic_const.(toplevel_predicate ptrue);
     il_attrs=[];
-    il_loc=Location.unknown
+    il_loc=Fileloc.unknown
   }]
 
 let compare_behavior_or_loop b1 b2 =

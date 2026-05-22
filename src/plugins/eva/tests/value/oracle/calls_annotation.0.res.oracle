@@ -11,50 +11,50 @@
 [eva:progress] calls_annotation.i:49: calls annotation got status valid.
 [eva:progress] 
   computing for function decr <- main.
-  Called from calls_annotation.i:49.
+  Called from calls_annotation.i:49:8-21.
 [eva:progress] Recording results for decr
 [eva:progress] Done for function decr
 [eva:progress] calls_annotation.i:52: calls annotation got status valid.
 [eva:progress] 
   computing for function incr <- main.
-  Called from calls_annotation.i:52.
+  Called from calls_annotation.i:52:8-21.
 [eva:progress] Recording results for incr
 [eva:progress] Done for function incr
 [eva:progress] 
   computing for function decr <- main.
-  Called from calls_annotation.i:52.
+  Called from calls_annotation.i:52:8-21.
 [eva:progress] Recording results for decr
 [eva:progress] Done for function decr
 [eva:progress] 
   computing for function square <- main.
-  Called from calls_annotation.i:52.
+  Called from calls_annotation.i:52:8-21.
 [eva:progress] Recording results for square
 [eva:progress] Done for function square
 [eva:progress] calls_annotation.i:54: calls annotation got status valid.
 [eva:progress] 
   computing for function incr <- main.
-  Called from calls_annotation.i:54.
+  Called from calls_annotation.i:54:8-21.
 [eva:progress] Recording results for incr
 [eva:progress] Done for function incr
 [eva:progress] 
   computing for function decr <- main.
-  Called from calls_annotation.i:54.
+  Called from calls_annotation.i:54:8-21.
 [eva:progress] Recording results for decr
 [eva:progress] Done for function decr
 [eva:progress] 
   computing for function square <- main.
-  Called from calls_annotation.i:54.
+  Called from calls_annotation.i:54:8-21.
 [eva:progress] Recording results for square
 [eva:progress] Done for function square
 [eva:alarm] calls_annotation.i:59: Warning: calls annotation got status unknown.
 [eva:progress] 
   computing for function incr <- main.
-  Called from calls_annotation.i:59.
+  Called from calls_annotation.i:59:8-21.
 [eva:progress] Recording results for incr
 [eva:progress] Done for function incr
 [eva:progress] 
   computing for function decr <- main.
-  Called from calls_annotation.i:59.
+  Called from calls_annotation.i:59:8-21.
 [eva:progress] Recording results for decr
 [eva:progress] Done for function decr
 [eva:show] calls_annotation.i:60: Frama_C_show_each_0_1: {0; 1}
@@ -67,34 +67,34 @@
 [eva:progress] calls_annotation.i:82: calls annotation got status valid.
 [eva:progress] 
   computing for function incr <- main.
-  Called from calls_annotation.i:82.
+  Called from calls_annotation.i:82:10-27.
 [eva:progress] Recording results for incr
 [eva:progress] Done for function incr
 [eva:progress] calls_annotation.i:85: calls annotation got status valid.
 [eva:progress] 
   computing for function incr <- main.
-  Called from calls_annotation.i:85.
+  Called from calls_annotation.i:85:10-23.
 [eva:progress] Recording results for incr
 [eva:progress] Done for function incr
 [eva:progress] calls_annotation.i:88: calls annotation got status valid.
 [eva:progress] 
   computing for function incr <- main.
-  Called from calls_annotation.i:88.
+  Called from calls_annotation.i:88:12-25.
 [eva:progress] Recording results for incr
 [eva:progress] Done for function incr
 [eva:progress] 
   computing for function apply <- main.
-  Called from calls_annotation.i:92.
+  Called from calls_annotation.i:92:11-28.
 [eva:progress] calls_annotation.i:38: calls annotation got status valid.
 [eva:progress] 
   computing for function incr <- apply <- main.
-  Called from calls_annotation.i:38.
+  Called from calls_annotation.i:38:8-16.
 [eva:progress] Recording results for incr
 [eva:progress] Done for function incr
 [eva:progress] calls_annotation.i:40: calls annotation got status valid.
 [eva:progress] 
   computing for function incr <- apply <- main.
-  Called from calls_annotation.i:40.
+  Called from calls_annotation.i:40:8-16.
 [eva:progress] Recording results for incr
 [eva:progress] Done for function incr
 [eva:progress] Recording results for apply
@@ -107,20 +107,20 @@
 [eva:progress] calls_annotation.i:85: Reusing old results for call to decr
 [eva:progress] 
   computing for function decr <- main.
-  Called from calls_annotation.i:88.
+  Called from calls_annotation.i:88:12-25.
 [eva:progress] Recording results for decr
 [eva:progress] Done for function decr
 [eva:progress] 
   computing for function apply <- main.
-  Called from calls_annotation.i:92.
+  Called from calls_annotation.i:92:11-28.
 [eva:progress] 
   computing for function decr <- apply <- main.
-  Called from calls_annotation.i:38.
+  Called from calls_annotation.i:38:8-16.
 [eva:progress] Recording results for decr
 [eva:progress] Done for function decr
 [eva:progress] 
   computing for function decr <- apply <- main.
-  Called from calls_annotation.i:40.
+  Called from calls_annotation.i:40:8-16.
 [eva:progress] Recording results for decr
 [eva:progress] Done for function decr
 [eva:progress] Recording results for apply
@@ -130,30 +130,30 @@
 [eva:progress] calls_annotation.i:85: Reusing old results for call to incr
 [eva:progress] 
   computing for function decr <- main.
-  Called from calls_annotation.i:85.
+  Called from calls_annotation.i:85:10-23.
 [eva:progress] Recording results for decr
 [eva:progress] Done for function decr
 [eva:progress] 
   computing for function square <- main.
-  Called from calls_annotation.i:85.
+  Called from calls_annotation.i:85:10-23.
 [eva:progress] Recording results for square
 [eva:progress] Done for function square
 [eva:progress] 
   computing for function square <- main.
-  Called from calls_annotation.i:88.
+  Called from calls_annotation.i:88:12-25.
 [eva:progress] Recording results for square
 [eva:progress] Done for function square
 [eva:progress] 
   computing for function apply <- main.
-  Called from calls_annotation.i:92.
+  Called from calls_annotation.i:92:11-28.
 [eva:progress] 
   computing for function square <- apply <- main.
-  Called from calls_annotation.i:38.
+  Called from calls_annotation.i:38:8-16.
 [eva:progress] Recording results for square
 [eva:progress] Done for function square
 [eva:progress] 
   computing for function square <- apply <- main.
-  Called from calls_annotation.i:40.
+  Called from calls_annotation.i:40:8-16.
 [eva:progress] Recording results for square
 [eva:progress] Done for function square
 [eva:progress] Recording results for apply
@@ -168,7 +168,7 @@
   calls annotation got status invalid (stopping propagation).
 [eva:progress] 
   computing for function apply <- main.
-  Called from calls_annotation.i:92.
+  Called from calls_annotation.i:92:11-28.
 [eva:alarm] calls_annotation.i:38: Warning: 
   calls annotation got status invalid (stopping propagation).
 [eva:progress] Recording results for apply

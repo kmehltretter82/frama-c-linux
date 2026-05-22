@@ -143,7 +143,7 @@ let ip_is_in_libc ip =
     kf_is_in_libc kf
 
 let opt_physical_location_of_loc loc =
-  if loc = Cil_datatype.Location.unknown then []
+  if loc = Fileloc.unknown then []
   else [ Location.of_loc loc ]
 (* Cil_types *)
 let gen_results remarks =

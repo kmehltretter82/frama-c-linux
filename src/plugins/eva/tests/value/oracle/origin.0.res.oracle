@@ -54,7 +54,7 @@
   S_gpp[0..1] ∈ [--..--]
 [eva:progress] 
   computing for function origin_arithmetic_1 <- main.
-  Called from origin.i:94.
+  Called from origin.i:94:3-24.
 [eva:alarm] origin.i:14: Warning: 
   pointer downcast. assert (unsigned int)(&(ta1[0])) ≤ 2147483647;
 [eva:alarm] origin.i:14: Warning: 
@@ -69,7 +69,7 @@
 [eva:progress] Done for function origin_arithmetic_1
 [eva:progress] 
   computing for function origin_arithmetic_2 <- main.
-  Called from origin.i:95.
+  Called from origin.i:95:3-26.
 [eva:alarm] origin.i:19: Warning: 
   pointer downcast. assert (unsigned int)(&(ta2[0])) ≤ 2147483647;
 [eva:alarm] origin.i:19: Warning: 
@@ -95,7 +95,7 @@
 [eva:progress] Done for function origin_arithmetic_2
 [eva:progress] 
   computing for function origin_arithmetic_3 <- main.
-  Called from origin.i:96.
+  Called from origin.i:96:3-24.
 [eva:alarm] origin.i:25: Warning: 
   pointer downcast. assert (unsigned int)(&(ta3[0])) ≤ 2147483647;
 [eva:alarm] origin.i:25: Warning: 
@@ -110,20 +110,20 @@
 [eva:progress] Done for function origin_arithmetic_3
 [eva:progress] 
   computing for function origin_leaf_1 <- main.
-  Called from origin.i:97.
+  Called from origin.i:97:3-19.
 [kernel:annot:missing-spec] origin.i:38: Warning: 
   Neither code nor specification for function g, generating default assigns.
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function g <- origin_leaf_1 <- main.
-  Called from origin.i:38.
+  Called from origin.i:38:8-11.
 [eva] using specification for function g
 [eva:progress] Done for function g
 [eva:progress] Recording results for origin_leaf_1
 [eva:progress] Done for function origin_leaf_1
 [eva:progress] 
   computing for function g <- main.
-  Called from origin.i:99.
+  Called from origin.i:99:9-12.
 [eva:progress] Done for function g
 [eva:alarm] origin.i:99: Warning: 
   signed overflow. assert -2147483648 ≤ l2 + tmp;
@@ -133,7 +133,7 @@
                    (tmp from g())
 [eva:progress] 
   computing for function gp <- main.
-  Called from origin.i:100.
+  Called from origin.i:100:8-12.
 [eva] using specification for function gp
 [eva:garbled-mix:assigns] origin.i:100: 
   The specification of function gp has generated a garbled mix of addresses
@@ -142,7 +142,7 @@
 [eva:alarm] origin.i:101: Warning: out of bounds read. assert \valid_read(pl);
 [eva:progress] 
   computing for function origin_misalign_1 <- main.
-  Called from origin.i:102.
+  Called from origin.i:102:3-22.
 [eva:garbled-mix:write] origin.i:48: 
   Assigning imprecise value to pm1 because of misaligned read of addresses.
 [eva:alarm] origin.i:49: Warning: out of bounds write. assert \valid(pm1);
@@ -150,12 +150,12 @@
 [eva:progress] Done for function origin_misalign_1
 [eva:progress] 
   computing for function origin_misalign_2 <- main.
-  Called from origin.i:103.
+  Called from origin.i:103:3-22.
 [eva:garbled-mix:write] origin.i:54: 
   Assigning imprecise value to qm2 because of misaligned read of addresses.
 [eva:show] origin.i:55: 
   Frama_C_show_each:
-  {{ garbled mix of &{a; b} (origin: Misaligned read {origin.i:54}) }}
+  {{ garbled mix of &{a; b} (origin: Misaligned read {origin.i:54:9-14}) }}
 [eva:alarm] origin.i:56: Warning: out of bounds write. assert \valid(qm2);
 [eva:alarm] origin.i:56: Warning: 
   pointer downcast. assert (unsigned int)(&a) ≤ 2147483647;
@@ -163,14 +163,14 @@
 [eva:progress] Done for function origin_misalign_2
 [eva:progress] 
   computing for function origin_uninitialized_1 <- main.
-  Called from origin.i:106.
+  Called from origin.i:106:3-29.
 [eva:alarm] origin.i:65: Warning: 
   accessing uninitialized left-value. assert \initialized(&pi);
 [eva:progress] Recording results for origin_uninitialized_1
 [eva:progress] Done for function origin_uninitialized_1
 [eva:progress] 
   computing for function origin_uninitialized_2 <- main.
-  Called from origin.i:107.
+  Called from origin.i:107:3-33.
 [eva:alarm] origin.i:72: Warning: 
   accessing uninitialized left-value. assert \initialized(&pi);
 [eva:alarm] origin.i:75: Warning: 
@@ -179,7 +179,7 @@
 [eva:progress] Done for function origin_uninitialized_2
 [eva:progress] 
   computing for function local_escape_1 <- main.
-  Called from origin.i:108.
+  Called from origin.i:108:3-21.
 [eva:alarm] origin.i:83: Warning: 
   pointer downcast. assert (unsigned int)(&arg) ≤ 2147483647;
 [eva:alarm] origin.i:84: Warning: 
@@ -211,22 +211,22 @@
 [eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    origin.i:19: arithmetic operation on addresses
+    origin.i:19:9-26: arithmetic operation on addresses
       (read in 2 statements, propagated through 2 statements)
       garbled mix of &{ta2; tta2}
-    origin.i:54: misaligned read of addresses
+    origin.i:54:9-14: misaligned read of addresses
       (read in 2 statements, propagated through 1 statement)
       garbled mix of &{a; b}
-    origin.i:14: arithmetic operation on addresses
+    origin.i:14:9-26: arithmetic operation on addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{ta1}
-    origin.i:25: arithmetic operation on addresses
+    origin.i:25:9-26: arithmetic operation on addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{ta3}
-    origin.i:100: assigns clause on addresses
+    origin.i:100:8-12: assigns clause on addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{S_gpp}
-    origin.i:48: misaligned read of addresses
+    origin.i:48:10-36: misaligned read of addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{a; b}
 [eva] origin.i:75: assertion 'Eva,initialization' got final status invalid.
@@ -235,7 +235,7 @@
 [eva:final-states] Values at end of function local_escape_1:
   esc1 ∈ {{ (int)&arg }}
   esc2 ∈ {{ (int)&local1 }}
-  esc3 ∈ {{ garbled mix of &{arg} (origin: Arithmetic {origin.i:85}) }}
+  esc3 ∈ {{ garbled mix of &{arg} (origin: Arithmetic {origin.i:85:10-22}) }}
   esc4 ∈ {{ NULL + {12} ; (int)&local1 }}
   esc5 ∈ {{ (int)&esc1 }}
   local2 ∈ {{ (int)&local1 }}
@@ -243,12 +243,14 @@
   pa1 ∈ {{ &ta1 + [0..36] }}
   ta1[0..9] ∈ {0}
 [eva:final-states] Values at end of function origin_arithmetic_2:
-  pa2 ∈ {{ garbled mix of &{ta2} (origin: Arithmetic {origin.i:19}) }}
+  pa2 ∈ {{ garbled mix of &{ta2} (origin: Arithmetic {origin.i:19:9-26}) }}
   qa2 ∈ {{ &ta2 + [0..36] ; &tta2 + [0..36] }}
   ta2[0..9] ∈
-     {{ garbled mix of &{aa2} (origin: Misaligned write {origin.i:21}) }}
+     {{ garbled mix of &{aa2}
+      (origin: Misaligned write {origin.i:21:10-20}) }}
   tta2[0..9] ∈
-      {{ garbled mix of &{aa2} (origin: Misaligned write {origin.i:21}) }}
+      {{ garbled mix of &{aa2}
+       (origin: Misaligned write {origin.i:21:10-20}) }}
 [eva:final-states] Values at end of function origin_arithmetic_3:
   pa3 ∈ {{ &ta3 + [0..36] }}
   ta3[0..9] ∈ [--..--]
@@ -277,19 +279,23 @@
   p[bits 0 to 15]# ∈ {{ (? *)&a }}%32, bits 16 to 31 
    [bits 16 to 31]# ∈ {{ (? *)&b }}%32, bits 0 to 15 
   pa1 ∈ {{ &ta1 + [0..36] }}
-  pa2 ∈ {{ garbled mix of &{ta2} (origin: Arithmetic {origin.i:19}) }}
+  pa2 ∈ {{ garbled mix of &{ta2} (origin: Arithmetic {origin.i:19:9-26}) }}
   qa2 ∈ {{ &ta2 + [0..36] ; &tta2 + [0..36] }}
   pa3 ∈ {{ &ta3 + [0..36] }}
-  q[bits 0 to 7] ∈ {{ garbled mix of &{a} (origin: Merge {origin.i:106}) }}
+  q[bits 0 to 7] ∈
+   {{ garbled mix of &{a} (origin: Merge {origin.i:106:3-29}) }}
    [bits 8 to 15] ∈
-   {{ garbled mix of &{a; b} (origin: Merge {origin.i:106}) }}
-   [bits 16 to 31] ∈ {{ garbled mix of &{b} (origin: Merge {origin.i:106}) }}
+   {{ garbled mix of &{a; b} (origin: Merge {origin.i:106:3-29}) }}
+   [bits 16 to 31] ∈
+   {{ garbled mix of &{b} (origin: Merge {origin.i:106:3-29}) }}
   ta1[0..9] ∈ {0}
   ta2[0..9] ∈
-     {{ garbled mix of &{aa2} (origin: Misaligned write {origin.i:21}) }}
+     {{ garbled mix of &{aa2}
+      (origin: Misaligned write {origin.i:21:10-20}) }}
   ta3[0..9] ∈ [--..--]
   tta2[0..9] ∈
-      {{ garbled mix of &{aa2} (origin: Misaligned write {origin.i:21}) }}
+      {{ garbled mix of &{aa2}
+       (origin: Misaligned write {origin.i:21:10-20}) }}
   l1 ∈ [--..--]
   l2 ∈ [--..--]
   l3 ∈ [--..--]

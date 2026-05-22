@@ -314,8 +314,8 @@ let stats_to_json g (s : Stats.stats) : Json.t =
     ([
       "goal", `String g.po_gid ;
       "property", `String (Property.Names.get_prop_name_id target) ;
-      "file", `String (Filepath.to_string_abs source.pos_path) ;
-      "line", `Int source.pos_lnum ;
+      "file", `String (Filepos.path source |> Filepath.to_string_abs) ;
+      "line", `Int (Filepos.line source) ;
     ] @ index @ [
         "smoke", `Bool smoke ;
         "passed", `Bool (Wpo.is_passed g) ;
@@ -399,7 +399,7 @@ let do_report_stats ~shell ~cache ~smoke goal (stats : Stats.stats) =
       | Stepout -> "[Stepout]"
       | Invalid -> "[Invalid]"
   in if status <> "" then
-    Wp_parameters.feedback "%s %s%a%a%a"
+    Wp_parameters.result "%s %s%a%a%a"
       status (Wpo.get_gid goal) (Stats.pp_stats ~shell ~cache) stats
       pp_hasmodel goal pp_warnings goal
 

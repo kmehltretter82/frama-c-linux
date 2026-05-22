@@ -1143,45 +1143,45 @@
 
 [  Alarm  ] Pre-condition 'valid_dest'
             By Call Preconditions, with pending:
-             - Unreachable call 'memcpy' (file memcpy.c, line 221)
-             - Instance of 'Pre-condition 'valid_dest'' of 'buggy' at call 'memcpy' (file memcpy.c, line 32)
+             - Unreachable call 'memcpy' ("memcpy.c", line 221)
+             - Instance of 'Pre-condition 'valid_dest'' of 'buggy' at call 'memcpy' ("memcpy.c", line 32)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 74)
+             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' ("memcpy.c", line 74)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 79)
+             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' ("memcpy.c", line 79)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 93)
+             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' ("memcpy.c", line 93)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 95)
+             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' ("memcpy.c", line 95)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 100)
+             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' ("memcpy.c", line 100)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 118)
+             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' ("memcpy.c", line 118)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 126)
+             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' ("memcpy.c", line 126)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 135)
+             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' ("memcpy.c", line 135)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 144)
+             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' ("memcpy.c", line 144)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 149)
+             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' ("memcpy.c", line 149)
 
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 155)
+             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' ("memcpy.c", line 155)
 
 [  Alarm  ] Pre-condition 'valid_src'
             By Call Preconditions, with pending:
-             - Unreachable call 'memcpy' (file memcpy.c, line 222)
-             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' (file memcpy.c, line 74)
+             - Unreachable call 'memcpy' ("memcpy.c", line 222)
+             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' ("memcpy.c", line 74)
 
-             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' (file memcpy.c, line 79)
+             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' ("memcpy.c", line 79)
 
-             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' (file memcpy.c, line 91)
+             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' ("memcpy.c", line 91)
 
-             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' (file memcpy.c, line 100)
+             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' ("memcpy.c", line 100)
 
-             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' (file memcpy.c, line 149)
+             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' ("memcpy.c", line 149)
 
-             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' (file memcpy.c, line 155)
+             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' ("memcpy.c", line 155)
 
 [    -    ] Pre-condition 'separation'
             tried with Call Preconditions.
@@ -1189,11 +1189,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'result_ptr'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 132)
+[ Extern  ] Assigns ("FRAMAC_SHARE/libc/string.h", line 132)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 132)
+[ Extern  ] Froms ("FRAMAC_SHARE/libc/string.h", line 132)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 133)
+[ Extern  ] Froms ("FRAMAC_SHARE/libc/string.h", line 133)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1202,13 +1202,13 @@
 --- Properties of Function 'buggy'
 --------------------------------------------------------------------------------
 
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 32)
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 32)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 32)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 32)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 32)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 32)
 
             by Eva.
 
@@ -1216,33 +1216,33 @@
 --- Properties of Function 'many'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file memcpy.c, line 48)
+[    -    ] Assertion ("memcpy.c", line 48)
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 51)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 51)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 51)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 51)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 51)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 51)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 53)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 53)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 53)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 53)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 53)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 53)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 57)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 57)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 57)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 57)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 57)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 57)
 
             by Eva.
 
@@ -1250,226 +1250,226 @@
 --- Properties of Function 'test'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file memcpy.c, line 71)
+[    -    ] Assertion ("memcpy.c", line 71)
             tried with Eva.
-[    -    ] Assertion (file memcpy.c, line 76)
+[    -    ] Assertion ("memcpy.c", line 76)
             tried with Eva.
-[    -    ] Assertion (file memcpy.c, line 107)
+[    -    ] Assertion ("memcpy.c", line 107)
             tried with Eva.
-[    -    ] Assertion (file memcpy.c, line 154)
+[    -    ] Assertion ("memcpy.c", line 154)
             tried with Eva.
-[    -    ] Assertion (file memcpy.c, line 156)
+[    -    ] Assertion ("memcpy.c", line 156)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_downcast' (file memcpy.c, line 91)
+[    -    ] Assertion 'Eva,pointer_downcast' ("memcpy.c", line 91)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_downcast' (file memcpy.c, line 93)
+[    -    ] Assertion 'Eva,pointer_downcast' ("memcpy.c", line 93)
             tried with Eva.
-[ Partial ] Assertion 'Eva,pointer_downcast' (file memcpy.c, line 94)
+[ Partial ] Assertion 'Eva,pointer_downcast' ("memcpy.c", line 94)
             By RedundantAlarms, with pending:
-             - Assertion 'Eva,pointer_downcast' (file memcpy.c, line 91)
-[    -    ] Assertion 'Eva,pointer_downcast' (file memcpy.c, line 95)
+             - Assertion 'Eva,pointer_downcast' ("memcpy.c", line 91)
+[    -    ] Assertion 'Eva,pointer_downcast' ("memcpy.c", line 95)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 113)
+[    -    ] Assertion 'Eva,pointer_alignment' ("memcpy.c", line 113)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 115)
+[    -    ] Assertion 'Eva,pointer_alignment' ("memcpy.c", line 115)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 118)
+[    -    ] Assertion 'Eva,pointer_alignment' ("memcpy.c", line 118)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 121)
+[    -    ] Assertion 'Eva,pointer_alignment' ("memcpy.c", line 121)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 123)
+[    -    ] Assertion 'Eva,pointer_alignment' ("memcpy.c", line 123)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 126)
+[    -    ] Assertion 'Eva,pointer_alignment' ("memcpy.c", line 126)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 129)
+[    -    ] Assertion 'Eva,pointer_alignment' ("memcpy.c", line 129)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 131)
+[    -    ] Assertion 'Eva,pointer_alignment' ("memcpy.c", line 131)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 132)
+[    -    ] Assertion 'Eva,pointer_alignment' ("memcpy.c", line 132)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 135)
+[    -    ] Assertion 'Eva,pointer_alignment' ("memcpy.c", line 135)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 138)
+[    -    ] Assertion 'Eva,pointer_alignment' ("memcpy.c", line 138)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 140)
+[    -    ] Assertion 'Eva,pointer_alignment' ("memcpy.c", line 140)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 141)
+[    -    ] Assertion 'Eva,pointer_alignment' ("memcpy.c", line 141)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 144)
+[    -    ] Assertion 'Eva,pointer_alignment' ("memcpy.c", line 144)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 148)
+[    -    ] Assertion 'Eva,pointer_alignment' ("memcpy.c", line 148)
             tried with Eva.
-[    -    ] Assertion 'Eva,pointer_alignment' (file memcpy.c, line 149)
+[    -    ] Assertion 'Eva,pointer_alignment' ("memcpy.c", line 149)
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 72)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 72)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 72)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 72)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 72)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 72)
 
             by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 74)
-
-            tried with Eva.
-[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 74)
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 74)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 74)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 77)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 77)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 77)
-
-            by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 79)
+[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 74)
 
             tried with Eva.
-[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 79)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 74)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 77)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 77)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 77)
+
+            by Eva.
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 79)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 79)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 87)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 87)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 87)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 89)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 89)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 89)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 91)
-
-            by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 91)
+[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 79)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 91)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 79)
 
             by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 93)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 87)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 87)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 87)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 89)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 89)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 89)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 91)
+
+            by Eva.
+[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 91)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 93)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 91)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 93)
-
-            by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 95)
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 93)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 95)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 93)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 95)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 93)
 
             by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 100)
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 95)
 
             tried with Eva.
-[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 100)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 95)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 95)
+
+            by Eva.
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 100)
 
             tried with Eva.
-[    -    ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 100)
+[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 100)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 105)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 105)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 105)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 109)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 109)
-
-            by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 109)
-
-            by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 118)
+[    -    ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 100)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 118)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 105)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 118)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 105)
 
             by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 126)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 105)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 109)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 109)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 109)
+
+            by Eva.
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 118)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 126)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 118)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 126)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 118)
 
             by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 135)
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 126)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 135)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 126)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 135)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 126)
 
             by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 144)
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 135)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 144)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 135)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 144)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 135)
 
             by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 149)
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 144)
 
             tried with Eva.
-[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 149)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 144)
+
+            by Eva.
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 144)
+
+            by Eva.
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 149)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 149)
-
-            by Eva.
-[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 155)
+[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 149)
 
             tried with Eva.
-[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 155)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 149)
+
+            by Eva.
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 155)
 
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 155)
+[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 155)
+
+            tried with Eva.
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 155)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 157)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 157)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 157)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 157)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 157)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 157)
 
             by Eva.
 
@@ -1477,11 +1477,11 @@
 --- Properties of Function 'itv'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Post-condition (file memcpy.c, line 162)
+[ Extern  ] Post-condition ("memcpy.c", line 162)
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file memcpy.c, line 161)
+[ Extern  ] Froms ("memcpy.c", line 161)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1490,13 +1490,13 @@
 --- Properties of Function 'make_unknown'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Pre-condition (file memcpy.c, line 165)
+[  Valid  ] Pre-condition ("memcpy.c", line 165)
             by Call Preconditions.
-[ Extern  ] Post-condition (file memcpy.c, line 167)
+[ Extern  ] Post-condition ("memcpy.c", line 167)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file memcpy.c, line 166)
+[ Extern  ] Assigns ("memcpy.c", line 166)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file memcpy.c, line 166)
+[ Extern  ] Froms ("memcpy.c", line 166)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1505,106 +1505,106 @@
 --- Properties of Function 'test_uninit'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file memcpy.c, line 177)
+[  Valid  ] Assertion ("memcpy.c", line 177)
             by Eva.
-[  Valid  ] Assertion (file memcpy.c, line 179)
+[  Valid  ] Assertion ("memcpy.c", line 179)
             by Eva.
-[  Valid  ] Assertion (file memcpy.c, line 184)
+[  Valid  ] Assertion ("memcpy.c", line 184)
             by Eva.
-[  Valid  ] Assertion (file memcpy.c, line 192)
+[  Valid  ] Assertion ("memcpy.c", line 192)
             by Eva.
-[  Valid  ] Assertion (file memcpy.c, line 195)
+[  Valid  ] Assertion ("memcpy.c", line 195)
             by Eva.
-[  Valid  ] Assertion (file memcpy.c, line 203)
+[  Valid  ] Assertion ("memcpy.c", line 203)
             by Eva.
-[    -    ] Assertion 'Eva,initialization' (file memcpy.c, line 186)
+[    -    ] Assertion 'Eva,initialization' ("memcpy.c", line 186)
             tried with Eva.
-[    -    ] Assertion 'Eva,initialization' (file memcpy.c, line 196)
+[    -    ] Assertion 'Eva,initialization' ("memcpy.c", line 196)
             tried with Eva.
-[    -    ] Assertion 'Eva,initialization' (file memcpy.c, line 205)
+[    -    ] Assertion 'Eva,initialization' ("memcpy.c", line 205)
             tried with Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 176)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 176)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 176)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 176)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 176)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 176)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 178)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 178)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 178)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 178)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 178)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 178)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition (file memcpy.c, line 165)' at call 'make_unknown' (file memcpy.c, line 182)
+[  Valid  ] Instance of 'Pre-condition ("memcpy.c", line 165)' at call 'make_unknown' ("memcpy.c", line 182)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 183)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 183)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 183)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 183)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 183)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 183)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 185)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 185)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 185)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 185)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 185)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 185)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition (file memcpy.c, line 165)' at call 'make_unknown' (file memcpy.c, line 189)
+[  Valid  ] Instance of 'Pre-condition ("memcpy.c", line 165)' at call 'make_unknown' ("memcpy.c", line 189)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 191)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 191)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 191)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 191)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 191)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 191)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 194)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 194)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 194)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 194)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 194)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 194)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition (file memcpy.c, line 165)' at call 'make_unknown' (file memcpy.c, line 200)
+[  Valid  ] Instance of 'Pre-condition ("memcpy.c", line 165)' at call 'make_unknown' ("memcpy.c", line 200)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition (file memcpy.c, line 165)' at call 'make_unknown' (file memcpy.c, line 201)
+[  Valid  ] Instance of 'Pre-condition ("memcpy.c", line 165)' at call 'make_unknown' ("memcpy.c", line 201)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 202)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 202)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 202)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 202)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 202)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 202)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 204)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 204)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 204)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 204)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 204)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 204)
 
             by Eva.
 
@@ -1612,13 +1612,13 @@
 --- Properties of Function 'test_local'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 213)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 213)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 213)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 213)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 213)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 213)
 
             by Eva.
 
@@ -1626,24 +1626,24 @@
 --- Properties of Function 'copy_0'
 --------------------------------------------------------------------------------
 
-[  Alarm  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 221)
+[  Alarm  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 221)
 
             By Eva, with pending:
-             - Unreachable call 'memcpy' (file memcpy.c, line 221)
-[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 221)
+             - Unreachable call 'memcpy' ("memcpy.c", line 221)
+[  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 221)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 221)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 221)
 
             by Eva.
-[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 222)
+[  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' ("memcpy.c", line 222)
 
             by Eva.
-[  Alarm  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 222)
+[  Alarm  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' ("memcpy.c", line 222)
 
             By Eva, with pending:
-             - Unreachable call 'memcpy' (file memcpy.c, line 222)
-[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 222)
+             - Unreachable call 'memcpy' ("memcpy.c", line 222)
+[  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' ("memcpy.c", line 222)
 
             by Eva.
 

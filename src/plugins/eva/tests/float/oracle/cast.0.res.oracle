@@ -9,7 +9,7 @@
   non-finite float value. assert \is_finite((float)v);
 [eva:progress] 
   computing for function assert_subnormal <- main.
-  Called from cast.i:15.
+  Called from cast.i:15:3-22.
 [eva] using specification for function assert_subnormal
 [eva:progress] cast.i:15: 
   function assert_subnormal: precondition \is_finite(d) got status valid.

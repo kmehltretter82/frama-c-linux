@@ -6,7 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_datatype
 open Cil_types
 
 open Misc
@@ -134,7 +133,7 @@ let _base_offsets_to_predicate ~loc t (m: Cvalue.V.M.t) =
   | [] -> None
   | ps -> Some (Logic_const.pands ps)
 
-let value_to_predicate_opt ?(loc=Location.unknown) t v =
+let value_to_predicate_opt ?(loc=Fileloc.unknown) t v =
   let open Cvalue.V in
   match v with
   | Top _ -> None
@@ -145,12 +144,12 @@ let value_to_predicate_opt ?(loc=Location.unknown) t v =
     with
     | Not_based_on_null -> (* base_offsets_to_predicate ~loc t m *) None
 
-let exp_to_predicate ?(loc=Location.unknown) stmt e =
+let exp_to_predicate ?(loc=Fileloc.unknown) stmt e =
   let value = Eva.Results.(before stmt |> eval_exp e |> as_ival) in
   let te = Logic_utils.expr_to_term ~coerce:false e in
   Option.bind (ival_to_predicate_opt ~loc te) (Result.to_option value)
 
-let lval_to_predicate ?(loc=Location.unknown) stmt lv =
+let lval_to_predicate ?(loc=Fileloc.unknown) stmt lv =
   let value = Eva.Results.(before stmt |> eval_lval lv |> as_ival) in
   let e = Cil.new_exp ~loc (Lval lv) in
   let te = Logic_utils.expr_to_term ~coerce:false e in

@@ -10,6 +10,10 @@ include Stdlib.Hashtbl
 
 module type S = sig
   include S
+
+  val bindings_sorted:
+    ?cmp:(key -> key -> int) -> 'a t -> (key * 'a) list
+
   val iter_sorted:
     ?cmp:(key -> key -> int) -> (key -> 'a -> unit) -> 'a t -> unit
   val fold_sorted:

@@ -6,8 +6,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let unknown_loc = Cil_datatype.Location.unknown
-
 exception BuildError of string
 
 let error format =
@@ -65,7 +63,7 @@ struct
 
   let array ?size = function
     | (_,Ctype t) as typ ->
-      let to_exp = Cil.integer ~loc:unknown_loc in
+      let to_exp = Cil.integer ~loc:Fileloc.unknown in
       let size = Option.map to_exp size in
       Listed typ,
       Ctype (mk_tarray t size)
@@ -1240,7 +1238,7 @@ struct
 
   let current_loc () =
     match !stack with
-    | [] -> Cil_datatype.Location.unknown
+    | [] -> Fileloc.unknown
     | state :: _ -> state.loc
 
 

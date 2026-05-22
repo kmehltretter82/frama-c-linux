@@ -234,8 +234,7 @@ struct
   let is_trivial vcq = GOAL.is_trivial vcq.goal
 
   let pp_effect fmt s e =
-    let loc = fst (Stmt.loc s) in
-    let line = loc.pos_lnum in
+    let line = Stmt.loc s |> Fileloc.line in
     let desc = match e with
       | Mcfg.FromCode -> "Effect"
       | Mcfg.FromCall -> "Call Effect"
@@ -244,8 +243,7 @@ struct
     Format.fprintf fmt "%s at line %d@\n" desc line
 
   let pp_terminates fmt  s e =
-    let loc = fst (Stmt.loc s) in
-    let line = loc.pos_lnum in
+    let line = Stmt.loc s |> Fileloc.line in
     let desc = match e with
       | Mcfg.Loop -> "Loop termination"
       | Mcfg.Terminates -> "Call terminates"
@@ -650,6 +648,9 @@ let clear_results g =
     modified g ;
   with Not_found -> ()
 
+let wp_reached_set_doomed = ref (fun _ _ -> assert false)
+let set_doomed emitter pid = !wp_reached_set_doomed emitter pid
+
 let set_result g p r =
   let system = SYSTEM.get () in
   let rs =
@@ -691,7 +692,7 @@ let set_result g p r =
       let hyps = if smoke then [] else WpPropId.dependencies proof in
       Property_status.emit emitter ~hyps target status ;
       if smoke && unproved && proved then
-        WpReached.set_doomed emitter g.po_pid ;
+        set_doomed emitter g.po_pid ;
     end ;
   modified g
 
@@ -721,6 +722,7 @@ let reduce g =
   WpContext.on_context (get_context g) (VC_Annot.resolve ~pid) g.po_formula
 
 let resolve g =
+  is_trivial g ||
   let valid = reduce g in
   if valid then
     let result = VCS.result ~solver:(qed_time g) VCS.Valid in

@@ -447,7 +447,7 @@ let is_label_defined label =
 let for_stmt env kf stmt =
   Options.debug ~level:4 "pre-translating ats for stmt %d at %a"
     stmt.sid
-    Printer.pp_location (Stmt.loc stmt);
+    Fileloc.pretty (Stmt.loc stmt);
 
   (* At the start of a function, reset the set of defined C labels. *)
   if Kernel_function.is_first_stmt kf stmt then

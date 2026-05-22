@@ -38,7 +38,7 @@ module M = struct
     let* {loc} = read in
     Options.debug
       ~dkey:Options.Dkey.interlang_not_covered "@[<2>@[%a: %a@]@;@[<2>%a@]@]"
-      Printer.pp_location loc
+      Fileloc.pretty loc
       (Pretty_utils.pp_opt ~suf:": " Format.pp_print_string) pre
       pp x;
     raise Not_covered

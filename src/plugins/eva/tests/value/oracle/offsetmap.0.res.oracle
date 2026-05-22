@@ -25,7 +25,7 @@
   s[0..9999999] ∈ {0}
 [eva:progress] 
   computing for function f <- main.
-  Called from offsetmap.i:108.
+  Called from offsetmap.i:108:3-6.
 [eva:partition] offsetmap.i:19: starting to merge loop iterations
 [eva:partition] offsetmap.i:29: starting to merge loop iterations
 [eva:alarm] offsetmap.i:51: Warning: 
@@ -34,7 +34,7 @@
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from offsetmap.i:109.
+  Called from offsetmap.i:109:3-7.
 [eva:alarm] offsetmap.i:66: Warning: 
   accessing out of bounds index. assert 0 ≤ i_0;
 [eva:alarm] offsetmap.i:66: Warning: 
@@ -43,10 +43,10 @@
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function h <- main.
-  Called from offsetmap.i:110.
+  Called from offsetmap.i:110:3-6.
 [eva:progress] 
   computing for function Frama_C_interval <- h <- main.
-  Called from offsetmap.i:87.
+  Called from offsetmap.i:87:11-33.
 [eva] using specification for function Frama_C_interval
 [eva:progress] Done for function Frama_C_interval
 [eva:show] offsetmap.i:90: Frama_C_show_each_1_256_257: {0; 1; 256; 257}
@@ -55,7 +55,7 @@
 [eva:alarm] offsetmap.i:95: Warning: out of bounds write. assert \valid(q);
 [eva:progress] 
   computing for function Frama_C_interval <- h <- main.
-  Called from offsetmap.i:101.
+  Called from offsetmap.i:101:7-29.
 [eva:progress] Done for function Frama_C_interval
 [eva:show] offsetmap.i:104: Frama_C_show_each_1_256_257: {0; 1; 256; 257}
 [eva:progress] Recording results for h

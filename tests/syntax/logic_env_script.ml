@@ -6,7 +6,7 @@ let emitter =
 let add () =
   let li = Cil_const.make_logic_info "bla" in
   li.l_body <- LBpred Logic_const.ptrue;
-  let glob = Dfun_or_pred (li,Cil_datatype.Location.unknown) in
+  let glob = Dfun_or_pred (li,Fileloc.unknown) in
   Logic_utils.add_logic_function li;
   Annotations.add_global emitter glob
 

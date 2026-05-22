@@ -16,11 +16,10 @@
   open Logic_utils
 
   let loc (start_pos, end_pos) =
-    Cil_datatype.Location.of_lexing_loc
-      (start_pos, end_pos)
+    Errorloc.convert_loc (start_pos, end_pos)
 
   let pos pos =
-    Filepos.of_lexing_pos pos
+    Errorloc.convert_pos pos
 
   let loc_info lexpr_loc x = { lexpr_node = x; lexpr_loc }
   let loc_start x = fst x.lexpr_loc
@@ -137,8 +136,8 @@
               Kernel.warning ~current:false ~wkey:Kernel.wkey_multi_from
                 "Drop '%a' \\from at %a for more precise one at %a"
                 Logic_print.print_lexpr curloc
-                Cil_printer.pp_location d.lexpr_loc
-                Cil_printer.pp_location k.lexpr_loc
+                Fileloc.pretty d.lexpr_loc
+                Fileloc.pretty k.lexpr_loc
             in
             if incl curl newl then begin
               if not (incl newl curl) then drop newloc curloc;

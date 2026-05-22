@@ -5,7 +5,7 @@ let run () =
     (fun vi _ ->
        Kernel.result "global variable %a declared at %a"
          Printer.pp_varinfo vi
-         Printer.pp_location vi.vdecl
+         Fileloc.pretty vi.vdecl
     )
 
 let () = Boot.Main.extend run

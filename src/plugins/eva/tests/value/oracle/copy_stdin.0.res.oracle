@@ -9,7 +9,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function leaf <- main.
-  Called from copy_stdin.i:4.
+  Called from copy_stdin.i:4:11-17.
 [eva] using specification for function leaf
 [eva:progress] Done for function leaf
 [eva:alarm] copy_stdin.i:5: Warning: 

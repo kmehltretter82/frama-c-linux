@@ -136,8 +136,7 @@ module Key = struct
     | Function ->
       Format.fprintf fmt "%s:%a" s.name Kernel_function.pretty x
     | Statement ->
-      let loc = Cil_datatype.Stmt.loc x in
-      Format.fprintf fmt "%s:%a" s.name Cil_datatype.Location.pretty loc
+      Format.fprintf fmt "%s:%a" s.name Fileloc.pretty (Cil_datatype.Stmt.loc x)
 
   module Prototype = struct
     include Datatype.Serializable_undefined
@@ -166,7 +165,7 @@ module Key = struct
   let pretty_stmt fmt (Key (s, x)) =
     match s.kind with
     | Global | Function -> ()
-    | Statement -> Cil_datatype.Location.pretty fmt (Cil_datatype.Stmt.loc x)
+    | Statement -> Fileloc.pretty fmt (Cil_datatype.Stmt.loc x)
 end
 
 (* --- Projectified state --- *)

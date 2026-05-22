@@ -24,48 +24,48 @@
 [eva:partition] undefined_sequence.i:49: starting to merge loop iterations
 [eva:progress] 
   computing for function g <- main.
-  Called from undefined_sequence.i:53.
+  Called from undefined_sequence.i:53:16-20.
 [eva:progress] Recording results for g
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function f <- main.
-  Called from undefined_sequence.i:53.
+  Called from undefined_sequence.i:53:14-23.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:progress] undefined_sequence.i:54: Reusing old results for call to g
 [eva:progress] 
   computing for function f <- main.
-  Called from undefined_sequence.i:54.
+  Called from undefined_sequence.i:54:8-17.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function h <- main.
-  Called from undefined_sequence.i:56.
+  Called from undefined_sequence.i:56:9-13.
 [eva:progress] Recording results for h
 [eva:progress] Done for function h
 [eva:progress] 
   computing for function h <- main.
-  Called from undefined_sequence.i:56.
+  Called from undefined_sequence.i:56:16-20.
 [eva:progress] Recording results for h
 [eva:progress] Done for function h
 [eva:progress] 
   computing for function func <- main.
-  Called from undefined_sequence.i:60.
+  Called from undefined_sequence.i:60-61.
 [eva:progress] Recording results for func
 [eva:progress] Done for function func
 [eva:progress] 
   computing for function ub_ret <- main.
-  Called from undefined_sequence.i:65.
+  Called from undefined_sequence.i:65:17-25.
 [eva:progress] Recording results for ub_ret
 [eva:progress] Done for function ub_ret
 [eva:progress] 
   computing for function f <- main.
-  Called from undefined_sequence.i:67.
+  Called from undefined_sequence.i:67:24-28.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from undefined_sequence.i:67.
+  Called from undefined_sequence.i:67:32-39.
 [eva:progress] Recording results for g
 [eva:progress] Done for function g
 [eva:progress] Recording results for main

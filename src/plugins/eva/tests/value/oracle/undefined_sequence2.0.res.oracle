@@ -45,47 +45,47 @@
   foo ∈ [--..--]
 [eva:progress] 
   computing for function multiple_update_wrong_1 <- main.
-  Called from undefined_sequence2.i:56.
+  Called from undefined_sequence2.i:56:14-45.
 [eva:alarm] undefined_sequence2.i:11: Warning: 
   undefined multiple accesses in expression. assert \separated(x, x);
 [eva:progress] Recording results for multiple_update_wrong_1
 [eva:progress] Done for function multiple_update_wrong_1
 [eva:progress] 
   computing for function multiple_update_wrong_2 <- main.
-  Called from undefined_sequence2.i:58.
+  Called from undefined_sequence2.i:58:14-40.
 [eva:alarm] undefined_sequence2.i:18: Warning: 
   undefined multiple accesses in expression. assert \separated(&i, &i);
 [eva:progress] Recording results for multiple_update_wrong_2
 [eva:progress] Done for function multiple_update_wrong_2
 [eva:progress] 
   computing for function multiple_update_wrong_3 <- main.
-  Called from undefined_sequence2.i:60.
+  Called from undefined_sequence2.i:60:14-40.
 [eva:alarm] undefined_sequence2.i:26: Warning: 
   undefined multiple accesses in expression. assert \separated(&i, &i);
 [eva:progress] Recording results for multiple_update_wrong_3
 [eva:progress] Done for function multiple_update_wrong_3
 [eva:progress] 
   computing for function multiple_update_unsafe <- main.
-  Called from undefined_sequence2.i:62.
+  Called from undefined_sequence2.i:62:14-43.
 [eva:progress] Recording results for multiple_update_unsafe
 [eva:progress] Done for function multiple_update_unsafe
 [eva:show] undefined_sequence2.i:62: Frama_C_show_each_passed4:
 [eva:progress] 
   computing for function multiple_update_unsafe <- main.
-  Called from undefined_sequence2.i:64.
+  Called from undefined_sequence2.i:64:14-44.
 [eva:alarm] undefined_sequence2.i:34: Warning: 
   undefined multiple accesses in expression. assert \separated(x, y);
 [eva:progress] Recording results for multiple_update_unsafe
 [eva:progress] Done for function multiple_update_unsafe
 [eva:progress] 
   computing for function multiple_update_safe <- main.
-  Called from undefined_sequence2.i:66.
+  Called from undefined_sequence2.i:66:14-41.
 [eva:progress] Recording results for multiple_update_safe
 [eva:progress] Done for function multiple_update_safe
 [eva:show] undefined_sequence2.i:66: Frama_C_show_each_passed6:
 [eva:progress] 
   computing for function multiple_update_safe <- main.
-  Called from undefined_sequence2.i:68.
+  Called from undefined_sequence2.i:68:14-41.
 [eva:progress] Recording results for multiple_update_safe
 [eva:progress] Done for function multiple_update_safe
 [eva:show] undefined_sequence2.i:68: Frama_C_show_each_passed7:

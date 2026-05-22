@@ -78,7 +78,7 @@ module Inductive_extractions = struct
 end
 
 let pp_logic_info fmt li =
-  Printer.pp_global_annotation fmt (Dfun_or_pred (li, Location.unknown))
+  Printer.pp_global_annotation fmt (Dfun_or_pred (li, Fileloc.unknown))
 
 (** Retrieve information about generated [logic_info]s and the original forms
     from which they stem. *)

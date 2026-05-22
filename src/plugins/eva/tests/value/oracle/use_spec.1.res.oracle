@@ -11,7 +11,7 @@
   z ∈ {0}
 [eva:progress] 
   computing for function f <- main.
-  Called from use_spec.i:25.
+  Called from use_spec.i:25:3-8.
 [eva] using specification for function f
 [eva:progress] Done for function f
 [kernel:annot:missing-spec] use_spec.i:26: Warning: 
@@ -19,17 +19,17 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function g <- main.
-  Called from use_spec.i:26.
+  Called from use_spec.i:26:3-8.
 [eva] using specification for function g
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function h <- main.
-  Called from use_spec.i:27.
+  Called from use_spec.i:27:3-8.
 [eva] using specification for function h
 [eva:progress] Done for function h
 [eva:progress] 
   computing for function i <- main.
-  Called from use_spec.i:28.
+  Called from use_spec.i:28:3-8.
 [eva] using specification for function i
 [eva:progress] Done for function i
 [eva:progress] Recording results for main
@@ -43,13 +43,13 @@
   y ∈ [--..--]
   z ∈ [--..--]
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to f at use_spec.i:25 (by main):
+[from] call to f at use_spec.i:25:3-8 (by main):
   x FROM direct: x (and SELF)
-[from] call to g at use_spec.i:26 (by main):
+[from] call to g at use_spec.i:26:3-8 (by main):
   y FROM direct: y (and SELF)
-[from] call to h at use_spec.i:27 (by main):
+[from] call to h at use_spec.i:27:3-8 (by main):
   z FROM \nothing
-[from] call to i at use_spec.i:28 (by main):
+[from] call to i at use_spec.i:28:3-8 (by main):
   w FROM \nothing
 [from] entry point:
   w FROM \nothing

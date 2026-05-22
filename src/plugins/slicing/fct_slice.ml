@@ -794,13 +794,13 @@ let add_missing_inputs_actions ff calls to_prop actions =
       SlicingParameters.debug ~level:2
         "[Fct_Slice.add_missing_inputs_actions] call %a, \
          no missing inputs@."
-        Printer.pp_location (Cil_datatype.Stmt.loc call);
+        Fileloc.pretty (Cil_datatype.Stmt.loc call);
       actions
     | _ ->
       SlicingParameters.debug ~level:2
         "[Fct_Slice.add_missing_inputs_actions] call %a, \
          missing inputs@."
-        Printer.pp_location (Cil_datatype.Stmt.loc call);
+        Fileloc.pretty (Cil_datatype.Stmt.loc call);
       let new_action = SlicingActions.mk_crit_missing_inputs
           ff_call call missing_inputs in
       new_action :: actions
@@ -808,7 +808,7 @@ let add_missing_inputs_actions ff calls to_prop actions =
   SlicingParameters.debug ~level:2
     "[Fct_Slice.add_missing_inputs_actions] Called, calls %a"
     (Pretty_utils.pp_list
-       (fun fmt (_, s) -> Printer.pp_location fmt (Cil_datatype.Stmt.loc s)))
+       (fun fmt (_, s) -> Fileloc.pretty fmt (Cil_datatype.Stmt.loc s)))
     calls;
   let actions = List.fold_left check_call actions calls in
   SlicingParameters.debug ~level:2 "[Fct_Slice.add_missing_inputs_actions] %s"

@@ -15,7 +15,7 @@
   s ∈ {{ (int *)"abc" }}
 [eva:progress] 
   computing for function main1 <- main.
-  Called from imprecise_invalid_write.i:26.
+  Called from imprecise_invalid_write.i:26:5-13.
 [eva:alarm] imprecise_invalid_write.i:9: Warning: 
   unaligned pointer creation. assert \aligned((void *)c,alignof(int));
 [eva:alarm] imprecise_invalid_write.i:9: Warning: 
@@ -26,7 +26,7 @@
 [eva:progress] Done for function main1
 [eva:progress] 
   computing for function main2 <- main.
-  Called from imprecise_invalid_write.i:29.
+  Called from imprecise_invalid_write.i:29:5-12.
 [eva:alarm] imprecise_invalid_write.i:13: Warning: 
   pointer downcast. assert (unsigned int)(&main1) ≤ 2147483647;
 [eva:garbled-mix:write] imprecise_invalid_write.i:13: 
@@ -41,7 +41,7 @@
 [eva:progress] Done for function main2
 [eva:progress] 
   computing for function main3 <- main.
-  Called from imprecise_invalid_write.i:32.
+  Called from imprecise_invalid_write.i:32:5-12.
 [eva:alarm] imprecise_invalid_write.i:20: Warning: 
   unaligned pointer creation. assert \aligned(s,alignof(int));
 [eva:alarm] imprecise_invalid_write.i:20: Warning: 
@@ -60,10 +60,10 @@
 [eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    imprecise_invalid_write.i:13: arithmetic operation on addresses
+    imprecise_invalid_write.i:13:9-10: arithmetic operation on addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{main1}
-    imprecise_invalid_write.i:20: arithmetic operation on addresses
+    imprecise_invalid_write.i:20:8-9: arithmetic operation on addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{"abc"}
 [eva] imprecise_invalid_write.i:9: 

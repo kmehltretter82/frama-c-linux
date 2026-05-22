@@ -241,7 +241,7 @@ module CfgNode = struct
     match node_stmt node with
     | [] -> Format.pp_print_string fmt "<no stmt>"
     | stmts ->
-      let pp_loc fmt s = Printer.pp_location fmt (Cil_datatype.Stmt.loc s) in
+      let pp_loc fmt s = Fileloc.pretty fmt (Cil_datatype.Stmt.loc s) in
       Pretty_utils.pp_list ~sep:",@ " pp_loc fmt stmts
 
   let pretty_with_stmts fmt node =

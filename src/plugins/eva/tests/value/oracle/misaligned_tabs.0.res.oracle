@@ -18,7 +18,7 @@
     {.i3; .i4} ∈ {4369}
 [eva:progress] 
   computing for function misaligned_struct <- main.
-  Called from misaligned_tabs.i:62.
+  Called from misaligned_tabs.i:62:3-23.
 [eva:show] misaligned_tabs.i:14: Frama_C_show_each_1: {1}
 [eva:show] misaligned_tabs.i:17: Frama_C_show_each_2: {1}
 [eva:show] misaligned_tabs.i:18: Frama_C_show_each_3: {1}

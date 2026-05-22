@@ -9,7 +9,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f <- main1.
-  Called from leaf_spec.i:27.
+  Called from leaf_spec.i:27:3-15.
 [eva] using specification for function f
 [eva:assigns:invalid-location] leaf_spec.i:27: 
   Completely invalid destination for assigns clause *x. Ignoring.

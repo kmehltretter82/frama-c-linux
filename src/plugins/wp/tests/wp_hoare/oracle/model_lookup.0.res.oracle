@@ -6,7 +6,7 @@
   Function foo
 ------------------------------------------------------------
 
-Goal Check 'C' (file model_lookup.i, line 13):
+Goal Check 'C' ("model_lookup.i", line 13, characters 16-22):
 Assume {
   Type: is_sint32(y).
   (* Assertion *)

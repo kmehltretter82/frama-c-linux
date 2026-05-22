@@ -361,7 +361,7 @@ let () = States.option model ~name:"source"
     ~get:(fun (evt, _) -> evt.Log.evt_source)
 
 let getMarker (evt, _id) =
-  Option.bind Printer_tag.loc_to_localizable evt.Log.evt_source
+  Option.bind Printer_tag.pos_to_localizable evt.Log.evt_source
 
 let getDecl t =
   Option.bind Printer_tag.declaration_of_localizable (getMarker t)

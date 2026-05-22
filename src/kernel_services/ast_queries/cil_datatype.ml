@@ -175,59 +175,17 @@ end
 module Position =  struct
   include Filepos
   let dummy = unknown
+  let pp_with_col = Filepos.pretty_long
+  let of_lexing_pos pos = of_lexing_pos pos (* Erase the optional parameter *)
 end
 
 module Location = struct
-  let unknown = Position.unknown, Position.unknown
-  let is_unknown loc = loc = unknown
+  include Fileloc
   let dummy = unknown
-  let pretty_ref = ref (fun _ _ -> assert false)
-  include Make_with_collections
-      (struct
-        type t = location
-        let name = "Location"
-        let reprs = [ dummy ]
-        let compare: location -> location -> int = (=?=)
-        let hash (b, _e) = Hashtbl.hash Filepos.(b.pos_path, b.pos_lnum)
-        let copy = Datatype.identity (* immutable strings *)
-        let equal : t -> t -> bool = ( = )
-        let pretty fmt loc = !pretty_ref fmt loc
-      end)
-
-  let pretty_long fmt loc =
-    let path = (fst loc).Filepos.pos_path in
-    if path = Filepath.empty then Format.fprintf fmt "generated"
-    else
-      let line = (fst loc).pos_lnum in
-      if line > 0 then
-        Format.fprintf fmt "file %a, line %d"
-          Filepath.pretty path line
-
-  let pretty_line fmt loc =
-    let line = (fst loc).Filepos.pos_lnum in
-    if line > 0 then
-      Format.fprintf fmt "line %d" line
-    else
-      Format.fprintf fmt "generated"
-
-  let pretty_debug fmt loc =
-    Format.fprintf fmt "(%a,%a)"
-      Position.pretty_debug (fst loc) Position.pretty_debug (snd loc)
-
-  let of_lexing_loc (pos1, pos2) =
-    Position.of_lexing_pos pos1, Position.of_lexing_pos pos2
-  let to_lexing_loc (pos1, pos2) =
-    Position.to_lexing_pos pos1, Position.to_lexing_pos pos2
-
-  let compare_start_semantic (pos1, _) (pos2, _) =
-    let c = Filepath.compare pos1.Filepos.pos_path pos2.Filepos.pos_path in
-    if c <> 0 then c else
-      let c = pos1.pos_lnum - pos2.pos_lnum in
-      if c <> 0 then c else
-        (pos1.pos_cnum - pos1.pos_bol) - (pos2.pos_cnum - pos2.pos_bol)
-
-  let equal_start_semantic l1 l2 = compare_start_semantic l1 l2 = 0
-
+  let is_unknown loc = not (is_known loc)
+  let compare_start_semantic = compare
+  let equal_start_semantic = equal
+  let pretty_line fmt loc = Filepos.pretty_long fmt (fst loc)
 end
 
 module File = struct
@@ -257,13 +215,13 @@ end
 module Instr = struct
 
   let pretty_ref = ref (fun _ _ -> assert false)
-  let dummy = Asm([], ["@dummy_instr@"], None, Location.dummy)
+  let dummy = Asm([], ["@dummy_instr@"], None, Fileloc.unknown)
 
   include Make
       (struct
         type t = instr
         let name = "Instr"
-        let reprs = List.map (fun l -> Skip l) Location.reprs
+        let reprs = List.map (fun l -> Skip l) Fileloc.reprs
         let pretty fmt x = !pretty_ref fmt x
       end)
 
@@ -323,9 +281,9 @@ module Stmt = struct
     | TryFinally (_, _, l) | TryExcept (_, _, _, l)
     | Throw (_,l) | TryCatch(_,_,l) -> l
     | Instr hd -> Instr.loc hd
-    | Block b -> (match b.bstmts with [] -> Location.unknown | s :: _ -> loc s)
+    | Block b -> (match b.bstmts with [] -> Fileloc.unknown | s :: _ -> loc s)
     | UnspecifiedSequence ((s,_,_,_,_) :: _) -> loc s
-    | UnspecifiedSequence [] -> Location.unknown
+    | UnspecifiedSequence [] -> Fileloc.unknown
 
   and loc s = loc_skind s.skind
 
@@ -678,7 +636,7 @@ end
 module Exp = struct
   let pretty_ref = ref (fun _ _ -> assert false)
   let zero = CInt64 (Z.zero, IChar, None)
-  let dummy = { eid = -1; enode = Const zero; eloc = Location.dummy }
+  let dummy = { eid = -1; enode = Const zero; eloc = Fileloc.unknown }
   include Make_with_collections
       (struct
         include Datatype.Undefined
@@ -694,29 +652,29 @@ end
 
 module Label = struct
   let pretty_ref = ref (fun _ _ -> assert false)
-  let dummy = Label ("@dummy_label@", Location.dummy, false)
+  let dummy = Label ("@dummy_label@", Fileloc.unknown, false)
 
   include Make_with_collections
       (struct
         type t = label
         let name = "Label"
-        let reprs = [ dummy; Default Location.unknown ]
+        let reprs = [ dummy; Default Fileloc.unknown ]
         let pretty fmt l = !pretty_ref fmt l
         let hash = function
           | Default _ -> 7
           | Case (e, _) -> Exp.hash e
           | Label (s, _, b) -> Hashtbl.hash s + (if b then 13 else 59)
         let compare l1 l2 = match l1, l2 with
-          | Default loc1, Default loc2 -> Location.compare loc1 loc2
+          | Default loc1, Default loc2 -> Fileloc.compare loc1 loc2
           | Case (e1, loc1), Case (e2, loc2) ->
             let c = Exp.compare e1 e2 in
-            if c = 0 then Location.compare loc1 loc2
+            if c = 0 then Fileloc.compare loc1 loc2
             else c
           | Label (s1, loc1, b1), Label (s2, loc2, b2) ->
             let c = s1 =?= s2 in
             if c = 0 then
               let c = b1 =?= b2 in
-              if c = 0 then Location.compare loc1 loc2
+              if c = 0 then Fileloc.compare loc1 loc2
               else c
             else c
           | Label _, (Case _ | Default _)
@@ -741,7 +699,7 @@ module Varinfo_Id = struct
     vdefined = false;
     vformal = false;
     vinline = false;
-    vdecl    = Location.dummy;
+    vdecl = Fileloc.unknown;
     vid = -1;
     vaddrof = false;
     vreferenced = false;
@@ -810,7 +768,7 @@ module Fieldinfo = struct
     fbitfield  = None;
     falignas   = None;
     fattr      = [];
-    floc       = Location.dummy;
+    floc       = Fileloc.unknown;
     faddrof    = false;
     fsize_in_bits   = None;
     foffset_in_bits = None;
@@ -842,7 +800,7 @@ module Fieldinfo = struct
                          }
                          :: acc)
                       acc
-                      Location.reprs)
+                      Fileloc.reprs)
                  acc
                  Typ.reprs)
             []
@@ -885,7 +843,7 @@ module Enumitem = struct
     einame      = "@dummy_enumitem@";
     eival       = Exp.dummy;
     eihost      = Enuminfo.dummy;
-    eiloc       = Location.dummy;
+    eiloc       = Fileloc.unknown;
   }
 
   include Make_with_collections
@@ -900,7 +858,7 @@ module Enumitem = struct
                  einame = "";
                  eival  = Exp.dummy;
                  eihost = i;
-                 eiloc = Location.unknown })
+                 eiloc = Fileloc.unknown })
             Enuminfo.reprs
         let compare v1 v2 = String.compare v1.einame v2.einame
         let hash v = Hashtbl.hash v.einame
@@ -1646,7 +1604,7 @@ module Model_info = struct
     mi_name       = "@dummy_model_info@";
     mi_base_type  = Typ.dummy;
     mi_field_type = Logic_type.dummy;
-    mi_decl       = Location.dummy;
+    mi_decl       = Fileloc.unknown;
     mi_attr       = [];
   }
 
@@ -1661,7 +1619,7 @@ module Model_info = struct
              { mi_name = "dummy";
                mi_base_type = base;
                mi_field_type = field;
-               mi_decl = Location.unknown;
+               mi_decl = Fileloc.unknown;
                mi_attr = [];
              })
           Typ.reprs
@@ -1677,7 +1635,7 @@ module Model_info = struct
         mi_name = mi.mi_name;
         mi_base_type = Typ.copy mi.mi_base_type;
         mi_field_type = Logic_type.copy mi.mi_field_type;
-        mi_decl = Location.copy mi.mi_decl;
+        mi_decl = Fileloc.copy mi.mi_decl;
         mi_attr = List.map Attribute.copy mi.mi_attr
       }
       let pretty fmt t = !pretty_ref fmt t
@@ -2196,7 +2154,7 @@ module Term = struct
   let pretty_ref = ref (fun _ _ -> assert false)
   let dummy = {
     term_node = TConst (LStr "@dummy_term@");
-    term_loc  = Location.dummy;
+    term_loc  = Fileloc.unknown;
     term_type = Logic_type.dummy;
     term_name = []
   }
@@ -2209,7 +2167,7 @@ module Term = struct
           List.map
             (fun t ->
                { term_node = TConst (LStr "");
-                 term_loc = Location.unknown;
+                 term_loc = Fileloc.unknown;
                  term_type =  t;
                  term_name = [] })
             Logic_type.reprs
@@ -2337,13 +2295,13 @@ end
 
 module Global_annotation = struct
   let pretty_ref = ref (fun _ -> assert false)
-  let dummy = Dinvariant (Logic_info.dummy, Location.dummy)
+  let dummy = Dinvariant (Logic_info.dummy, Fileloc.unknown)
 
   include Make_with_collections
       (struct
         type t = global_annotation
         let name = "Global_annotation"
-        let reprs = List.map (fun l -> Daxiomatic ("", [],[], l)) Location.reprs
+        let reprs = List.map (fun l -> Daxiomatic ("", [],[], l)) Fileloc.reprs
         let pretty fmt v = !pretty_ref fmt v
 
         let rec compare g1 g2 =
@@ -2480,10 +2438,10 @@ module Global = struct
           | GFun(f1,_), GFun(f2,_) -> Varinfo.compare f1.svar f2.svar
           | GFun _, _ -> -1
           | _, GFun _ -> 1
-          | GAsm (_,l1), GAsm(_,l2) -> Location.compare l1 l2
+          | GAsm (_,l1), GAsm(_,l2) -> Fileloc.compare l1 l2
           | GAsm _, _ -> -1
           | _, GAsm _ -> 1
-          | GPragma(_,l1), GPragma(_,l2) -> Location.compare l1 l2
+          | GPragma(_,l1), GPragma(_,l2) -> Fileloc.compare l1 l2
           | GPragma _, _ -> -1
           | _, GPragma _ -> 1
           | GText s1, GText s2 -> Datatype.String.compare s1 s2
@@ -2502,10 +2460,10 @@ module Global = struct
           | GVarDecl (v,_) -> 13 * Varinfo.hash v
           | GVar (v,_,_) -> 17 * Varinfo.hash v
           | GFun (f,_) -> 19 * Varinfo.hash f.svar
-          | GAsm (_,l) -> 23 * Location.hash l
+          | GAsm (_,l) -> 23 * Fileloc.hash l
           | GText t -> 29 * Datatype.String.hash t
           | GAnnot (g,_) -> 31 * Global_annotation.hash g
-          | GPragma(_,l) -> 37 * Location.hash l
+          | GPragma(_,l) -> 37 * Fileloc.hash l
           | GFunDecl (_,v,_) -> 43 * Varinfo.hash v
 
         let copy = Datatype.undefined
@@ -2524,7 +2482,7 @@ module Global = struct
     | GAsm(_, l)
     | GPragma(_, l)
     | GAnnot (_, l) -> l
-    | GText _ -> Location.unknown
+    | GText _ -> Fileloc.unknown
 
   let attr = function
     | GVar (vi,_,_) | GFun ({svar = vi},_) | GVarDecl (vi,_) | GFunDecl (_,vi,_)->
@@ -2567,7 +2525,7 @@ module Predicate = struct
   let pretty_ref = ref (fun _ _ -> assert false)
   let dummy = {
     pred_name    = [ "@dummy_predicate@" ];
-    pred_loc     = Location.dummy;
+    pred_loc     = Fileloc.unknown;
     pred_content = Pfalse
   }
 
@@ -2734,7 +2692,7 @@ module Kf = struct
   let id kf = (vi kf).vid
 
   let dummy = {
-    fundec = Definition (Fundec.dummy, Location.dummy);
+    fundec = Definition (Fundec.dummy, Fileloc.unknown);
     spec = Funspec.dummy;
   }
 
@@ -2776,7 +2734,7 @@ module Kf = struct
                  acc
                  Block.reprs)
             []
-            Location.reprs
+            Fileloc.reprs
         let compare k1 k2 = Datatype.Int.compare (id k1) (id k2)
         let equal k1 k2 =
           if k1 != k2 then begin
@@ -2809,7 +2767,7 @@ end
 module Lexpr = struct
   let dummy = Logic_ptree.{
       lexpr_node = PLvar "@dummy_lexpr@";
-      lexpr_loc = Location.dummy;
+      lexpr_loc = Fileloc.unknown;
     }
 
   include Make (struct
@@ -2872,7 +2830,7 @@ module Syntactic_scope = struct
             Format.fprintf fmt "Local variable of %a" Kf.pretty kf
           | Block_scope s ->
             Format.fprintf fmt "Statement at %a:@\n@[%a@]"
-              Location.pretty (Stmt.loc s) Stmt.pretty s
+              Fileloc.pretty (Stmt.loc s) Stmt.pretty s
       end)
 end
 

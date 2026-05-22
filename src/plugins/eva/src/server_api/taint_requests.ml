@@ -133,7 +133,7 @@ end
 
 (* ----- Register Eva taints information ------------------------------------ *)
 
-let expr_of_lval v = Cil.new_exp ~loc:Cil_datatype.Location.unknown (Lval v)
+let expr_of_lval v = Cil.new_exp ~loc:Fileloc.unknown (Lval v)
 
 let term_lval_to_lval kf tlval =
   try

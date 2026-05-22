@@ -9,7 +9,7 @@
   out of bounds read. assert \valid_read(p_str + i);
 [eva:progress] 
   computing for function strlen <- main.
-  Called from top.i:27.
+  Called from top.i:27:10-27.
 [eva:alarm] top.i:21: Warning: out of bounds read. assert \valid_read(q);
 [eva:partition] top.i:21: starting to merge loop iterations
 [eva:alarm] top.i:21: Warning: signed overflow. assert k + 1 ≤ 2147483647;

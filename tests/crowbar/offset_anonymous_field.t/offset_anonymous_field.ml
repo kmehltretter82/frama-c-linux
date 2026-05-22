@@ -1,6 +1,6 @@
 open Cil_types
 
-let loc = Cil_datatype.Location.unknown
+let loc = Fileloc.unknown
 
 let field_name =
   let count = ref 0 in
@@ -49,7 +49,7 @@ let mk_field { mytype } anon =
       | _ -> Cil.missingFieldName
     end else field_name ()
   in
-  name, mytype, None, None, [], Cil_datatype.Location.unknown
+  name, mytype, None, None, [], Fileloc.unknown
 
 let lift_offset cstruct res1 anon1 field1 res2 anon2 field2 res3 anon3 field3 =
   let add_offsets anon field name offsets acc =

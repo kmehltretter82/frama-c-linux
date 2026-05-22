@@ -51,7 +51,7 @@
 [eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    shift.i:52: arithmetic operation on addresses
+    shift.i:52:9-10: arithmetic operation on addresses
       (read in 1 statement, propagated through 2 statements)
       garbled mix of &{t}
 [eva] shift.i:35: assertion 'Eva,shift' got final status invalid.

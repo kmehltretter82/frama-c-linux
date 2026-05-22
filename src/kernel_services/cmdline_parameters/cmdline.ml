@@ -58,10 +58,7 @@ let get_backtrace () =
     let src_text =
       try
         let src = Log.get_current_source () in
-        if Filepos.is_unknown src then
-          "<unknown>"
-        else
-          Format.asprintf "%a" Filepos.pretty src
+        Format.asprintf "%a" Filepos.pretty src
       with Not_found -> "<unset>"
     in
     Format.asprintf "Current source was: %s@." src_text
@@ -102,7 +99,7 @@ let protect = function
     let name = long_plugin_name p in
     let pp_oloc fmt = function
       | None -> Format.fprintf fmt ""
-      | Some loc -> Format.fprintf fmt "%a: " Filepos.pretty loc
+      | Some pos -> Format.fprintf fmt "%a: " Filepos.pretty pos
     in
     Format.asprintf
       "%a%s aborted: unimplemented feature.\n\

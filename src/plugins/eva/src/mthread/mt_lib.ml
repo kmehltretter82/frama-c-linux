@@ -77,7 +77,7 @@ let load_threads_library lib =
 
 let is_pthread_function kf =
   let loc = Kernel_function.get_location kf in
-  let path = (fst loc).pos_path in
+  let path = Fileloc.path loc in
   Filepath.basename path = "pthread.h"
 
 let has_been_parsed lib =

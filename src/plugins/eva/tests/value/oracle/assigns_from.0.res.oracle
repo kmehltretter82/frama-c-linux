@@ -16,10 +16,10 @@
   h[0..99] ∈ {0}
 [eva:progress] 
   computing for function main1 <- main.
-  Called from assigns_from.i:271.
+  Called from assigns_from.i:271:3-10.
 [eva:progress] 
   computing for function f <- main1 <- main.
-  Called from assigns_from.i:30.
+  Called from assigns_from.i:30:3-6.
 [eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -49,7 +49,7 @@
 [eva:progress] Done for function main1
 [eva:progress] 
   computing for function main15 <- main.
-  Called from assigns_from.i:272.
+  Called from assigns_from.i:272:3-11.
 [eva:progress] Recording results for main15
 [from] Computing for function main15
 [from] Done for function main15
@@ -63,7 +63,7 @@
 [eva:progress] Done for function main15
 [eva:progress] 
   computing for function main2 <- main.
-  Called from assigns_from.i:273.
+  Called from assigns_from.i:273:3-10.
 [eva:progress] Recording results for main2
 [from] Computing for function main2
 [from] Done for function main2
@@ -89,12 +89,12 @@
 [eva:progress] Done for function main2
 [eva:progress] 
   computing for function Frama_C_interval <- main.
-  Called from assigns_from.i:274.
+  Called from assigns_from.i:274:11-32.
 [eva] using specification for function Frama_C_interval
 [eva:progress] Done for function Frama_C_interval
 [eva:progress] 
   computing for function main3 <- main.
-  Called from assigns_from.i:275.
+  Called from assigns_from.i:275:3-11.
 [eva:progress] Recording results for main3
 [from] Computing for function main3
 [from] Done for function main3
@@ -104,7 +104,7 @@
 [eva:progress] Done for function main3
 [eva:progress] 
   computing for function main3 <- main.
-  Called from assigns_from.i:276.
+  Called from assigns_from.i:276:3-11.
 [eva:progress] Recording results for main3
 [from] Computing for function main3
 [from] Done for function main3
@@ -113,7 +113,7 @@
 [eva:progress] Done for function main3
 [eva:progress] 
   computing for function main4 <- main.
-  Called from assigns_from.i:277.
+  Called from assigns_from.i:277:3-11.
 [eva:progress] Recording results for main4
 [from] Computing for function main4
 [from] Done for function main4
@@ -128,7 +128,7 @@
 [eva:progress] Done for function main4
 [eva:progress] 
   computing for function main5 <- main.
-  Called from assigns_from.i:278.
+  Called from assigns_from.i:278:3-11.
 [eva:progress] Recording results for main5
 [from] Computing for function main5
 [from] Done for function main5
@@ -143,15 +143,15 @@
 [eva:progress] Done for function main5
 [eva:progress] 
   computing for function Frama_C_interval <- main.
-  Called from assigns_from.i:279.
+  Called from assigns_from.i:279:11-32.
 [eva:progress] Done for function Frama_C_interval
 [eva:progress] 
   computing for function Frama_C_interval <- main.
-  Called from assigns_from.i:280.
+  Called from assigns_from.i:280:11-32.
 [eva:progress] Done for function Frama_C_interval
 [eva:progress] 
   computing for function main6_right <- main.
-  Called from assigns_from.i:281.
+  Called from assigns_from.i:281:3-19.
 [eva:progress] Recording results for main6_right
 [from] Computing for function main6_right
 [from] Done for function main6_right
@@ -160,7 +160,7 @@
 [eva:progress] Done for function main6_right
 [eva:progress] 
   computing for function main6_wrong <- main.
-  Called from assigns_from.i:282.
+  Called from assigns_from.i:282:3-19.
 [eva:progress] Recording results for main6_wrong
 [from] Computing for function main6_wrong
 [from] Done for function main6_wrong
@@ -169,7 +169,7 @@
 [eva:progress] Done for function main6_wrong
 [eva:progress] 
   computing for function main7 <- main.
-  Called from assigns_from.i:283.
+  Called from assigns_from.i:283:3-10.
 [eva:progress] Recording results for main7
 [from] Computing for function main7
 [from] Done for function main7
@@ -180,7 +180,7 @@
 [eva:progress] Done for function main7
 [eva:progress] 
   computing for function main8 <- main.
-  Called from assigns_from.i:286.
+  Called from assigns_from.i:286:3-12.
 [eva:progress] Recording results for main8
 [from] Computing for function main8
 [from] Done for function main8
@@ -190,7 +190,7 @@
 [eva:progress] Done for function main8
 [eva:progress] 
   computing for function main8 <- main.
-  Called from assigns_from.i:288.
+  Called from assigns_from.i:288:3-11.
 [eva:progress] Recording results for main8
 [from] Computing for function main8
 [from] Done for function main8
@@ -199,7 +199,7 @@
 [eva:progress] Done for function main8
 [eva:progress] 
   computing for function main9 <- main.
-  Called from assigns_from.i:290.
+  Called from assigns_from.i:290:3-10.
 [eva:progress] Recording results for main9
 [from] Computing for function main9
 [from] Done for function main9
@@ -207,31 +207,31 @@
 [eva:progress] Done for function main9
 [eva:progress] 
   computing for function main10 <- main.
-  Called from assigns_from.i:291.
+  Called from assigns_from.i:291:3-11.
 [kernel:annot:missing-spec] assigns_from.i:152: Warning: 
   Neither code nor specification for function c, generating default assigns.
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function c <- main10 <- main.
-  Called from assigns_from.i:152.
+  Called from assigns_from.i:152:33-36.
 [eva] using specification for function c
 [eva:progress] Done for function c
 [eva:partition] assigns_from.i:152: starting to merge loop iterations
 [eva:progress] 
   computing for function c <- main10 <- main.
-  Called from assigns_from.i:152.
+  Called from assigns_from.i:152:33-36.
 [eva:progress] Done for function c
 [eva:progress] 
   computing for function c <- main10 <- main.
-  Called from assigns_from.i:152.
+  Called from assigns_from.i:152:33-36.
 [eva:progress] Done for function c
 [eva:progress] 
   computing for function c <- main10 <- main.
-  Called from assigns_from.i:152.
+  Called from assigns_from.i:152:33-36.
 [eva:progress] Done for function c
 [eva:progress] 
   computing for function c <- main10 <- main.
-  Called from assigns_from.i:152.
+  Called from assigns_from.i:152:33-36.
 [eva:progress] Done for function c
 [eva:alarm] assigns_from.i:154: Warning: assertion got status unknown.
 [eva:progress] Recording results for main10
@@ -240,7 +240,7 @@
 [eva:progress] Done for function main10
 [eva:progress] 
   computing for function main11 <- main.
-  Called from assigns_from.i:292.
+  Called from assigns_from.i:292:3-12.
 [eva:progress] Recording results for main11
 [from] Computing for function main11
 [from] Done for function main11
@@ -250,7 +250,7 @@
 [eva:progress] Done for function main11
 [eva:progress] 
   computing for function main11 <- main.
-  Called from assigns_from.i:293.
+  Called from assigns_from.i:293:3-12.
 [eva:progress] Recording results for main11
 [from] Computing for function main11
 [from] Done for function main11
@@ -261,18 +261,18 @@
 [eva:progress] Done for function main11
 [eva:progress] 
   computing for function Frama_C_interval <- main.
-  Called from assigns_from.i:294.
+  Called from assigns_from.i:294:10-31.
 [eva:progress] Done for function Frama_C_interval
 [eva:progress] 
   computing for function main11 <- main.
-  Called from assigns_from.i:294.
+  Called from assigns_from.i:294:3-32.
 [eva:progress] Recording results for main11
 [from] Computing for function main11
 [from] Done for function main11
 [eva:progress] Done for function main11
 [eva:progress] 
   computing for function main12 <- main.
-  Called from assigns_from.i:295.
+  Called from assigns_from.i:295:3-11.
 [eva:progress] Recording results for main12
 [from] Computing for function main12
 [from] Done for function main12
@@ -283,7 +283,7 @@
 [eva:progress] Done for function main12
 [eva:progress] 
   computing for function main13 <- main.
-  Called from assigns_from.i:296.
+  Called from assigns_from.i:296:3-11.
 [eva:progress] Recording results for main13
 [from] Computing for function main13
 [from] Done for function main13
@@ -298,7 +298,7 @@
 [eva:progress] Done for function main13
 [eva:progress] 
   computing for function main14 <- main.
-  Called from assigns_from.i:297.
+  Called from assigns_from.i:297:3-11.
 [eva:partition] assigns_from.i:183: starting to merge loop iterations
 [eva:progress] Recording results for main14
 [from] Computing for function main14
@@ -309,7 +309,7 @@
 [eva:progress] Done for function main14
 [eva:progress] 
   computing for function main16 <- main.
-  Called from assigns_from.i:298.
+  Called from assigns_from.i:298:3-11.
 [eva:partition] assigns_from.i:188: starting to merge loop iterations
 [eva:progress] Recording results for main16
 [from] Computing for function main16
@@ -320,7 +320,7 @@
 [eva:progress] Done for function main16
 [eva:progress] 
   computing for function main17 <- main.
-  Called from assigns_from.i:299.
+  Called from assigns_from.i:299:3-18.
 [eva:partition] assigns_from.i:195: starting to merge loop iterations
 [eva:progress] Recording results for main17
 [from] Computing for function main17
@@ -331,10 +331,10 @@
 [eva:progress] Done for function main17
 [eva:progress] 
   computing for function main18 <- main.
-  Called from assigns_from.i:300.
+  Called from assigns_from.i:300:3-11.
 [eva:progress] 
   computing for function f18 <- main18 <- main.
-  Called from assigns_from.i:215.
+  Called from assigns_from.i:215:3-14.
 [eva] using specification for function f18
 [eva:garbled-mix:assigns] assigns_from.i:215: 
   The specification of function f18 has generated a garbled mix of addresses
@@ -346,10 +346,10 @@
 [eva:progress] Done for function main18
 [eva:progress] 
   computing for function main19 <- main.
-  Called from assigns_from.i:301.
+  Called from assigns_from.i:301:3-11.
 [eva:progress] 
   computing for function get_imprecise_pointer <- main19 <- main.
-  Called from assigns_from.i:255.
+  Called from assigns_from.i:255:7-30.
 [eva] using specification for function get_imprecise_pointer
 [eva:garbled-mix:assigns] assigns_from.i:255: 
   The specification of function get_imprecise_pointer
@@ -357,23 +357,24 @@
 [eva:progress] Done for function get_imprecise_pointer
 [eva:show] assigns_from.i:256: 
   Frama_C_show_each_gm:
-  {{ garbled mix of &{g; h} (origin: Library function {assigns_from.i:255}) }}
+  {{ garbled mix of &{g; h}
+  (origin: Library function {assigns_from.i:255:7-30}) }}
 [eva:progress] 
   computing for function get_exact_pointer <- main19 <- main.
-  Called from assigns_from.i:257.
+  Called from assigns_from.i:257:7-26.
 [eva] using specification for function get_exact_pointer
 [eva:progress] Done for function get_exact_pointer
 [eva:show] assigns_from.i:258: Frama_C_show_each_exact: {{ &g ; &h }}
 [eva:progress] 
   computing for function get_valid_pointer <- main19 <- main.
-  Called from assigns_from.i:259.
+  Called from assigns_from.i:259:7-26.
 [eva] using specification for function get_valid_pointer
 [eva:progress] Done for function get_valid_pointer
 [eva:show] assigns_from.i:260: 
   Frama_C_show_each_valid: {{ &g ; &h + [0..396],0%4 }}
 [eva:progress] 
   computing for function get_function_pointer <- main19 <- main.
-  Called from assigns_from.i:262.
+  Called from assigns_from.i:262:8-30.
 [eva] using specification for function get_function_pointer
 [eva:progress] Done for function get_function_pointer
 [eva:show] assigns_from.i:263: Frama_C_show_each_fct: {{ &fun ; &fun2 }}
@@ -387,7 +388,7 @@
 [eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    assigns_from.i:255: assigns clause on addresses
+    assigns_from.i:255:7-30: assigns clause on addresses
       (read in 1 statement, propagated through 1 statement)
       garbled mix of &{g; h}
 [eva] ====== VALUES COMPUTED ======
@@ -453,17 +454,17 @@
   base_a ∈ {17}
   a_0.addr ∈
      {{ garbled mix of &{base_a; base_b}
-      (origin: Misaligned read {assigns_from.i:215}) }}
+      (origin: Misaligned read {assigns_from.i:215:3-14}) }}
      .i ∈
      {{ garbled mix of &{base_a; base_b}
-      (origin: Misaligned read {assigns_from.i:215}) }} or UNINITIALIZED
+      (origin: Misaligned read {assigns_from.i:215:3-14}) }} or UNINITIALIZED
   base_b ∈ {11}
   b.addr ∈
    {{ garbled mix of &{base_a; base_b}
-    (origin: Misaligned read {assigns_from.i:215}) }}
+    (origin: Misaligned read {assigns_from.i:215:3-14}) }}
    .i ∈
    {{ garbled mix of &{base_a; base_b}
-    (origin: Misaligned read {assigns_from.i:215}) }} or UNINITIALIZED
+    (origin: Misaligned read {assigns_from.i:215:3-14}) }} or UNINITIALIZED
 [eva:final-states] Values at end of function main19:
   g ∈ {0}
   p ∈ {{ &g ; &h + [0..396] }}
@@ -691,89 +692,89 @@
   g FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to f at assigns_from.i:30 (by main1):
+[from] call to f at assigns_from.i:30:3-6 (by main1):
   k FROM u
-[from] call to c at assigns_from.i:152 (by main10):
+[from] call to c at assigns_from.i:152:33-36 (by main10):
   \result FROM \nothing
-[from] call to f18 at assigns_from.i:215 (by main18):
+[from] call to f18 at assigns_from.i:215:3-14 (by main18):
   a_0 FROM a_0; b (and SELF)
   b FROM a_0; b (and SELF)
-[from] call to get_imprecise_pointer at assigns_from.i:255 (by main19):
+[from] call to get_imprecise_pointer at assigns_from.i:255:7-30 (by main19):
   \result FROM \nothing
-[from] call to Frama_C_show_each_gm at assigns_from.i:256 (by main19):
+[from] call to Frama_C_show_each_gm at assigns_from.i:256:3-26 (by main19):
   \result FROM \nothing
-[from] call to get_exact_pointer at assigns_from.i:257 (by main19):
+[from] call to get_exact_pointer at assigns_from.i:257:7-26 (by main19):
   \result FROM \nothing
-[from] call to Frama_C_show_each_exact at assigns_from.i:258 (by main19):
+[from] call to Frama_C_show_each_exact at assigns_from.i:258:3-29 (by main19):
   \result FROM \nothing
-[from] call to get_valid_pointer at assigns_from.i:259 (by main19):
+[from] call to get_valid_pointer at assigns_from.i:259:7-26 (by main19):
   \result FROM \nothing
-[from] call to Frama_C_show_each_valid at assigns_from.i:260 (by main19):
+[from] call to Frama_C_show_each_valid at assigns_from.i:260:3-29 (by main19):
   \result FROM \nothing
-[from] call to get_function_pointer at assigns_from.i:262 (by main19):
+[from] call to get_function_pointer at assigns_from.i:262:8-30 (by main19):
   \result FROM \nothing
-[from] call to Frama_C_show_each_fct at assigns_from.i:263 (by main19):
+[from] call to Frama_C_show_each_fct at assigns_from.i:263:3-28 (by main19):
   \result FROM \nothing
-[from] call to main1 at assigns_from.i:271 (by main):
+[from] call to main1 at assigns_from.i:271:3-10 (by main):
   u FROM v
   k FROM \nothing
-[from] call to main15 at assigns_from.i:272 (by main):
+[from] call to main15 at assigns_from.i:272:3-11 (by main):
   a[3..5] FROM \nothing
-[from] call to main2 at assigns_from.i:273 (by main):
+[from] call to main2 at assigns_from.i:273:3-10 (by main):
   a[3..5] FROM \nothing
-[from] call to Frama_C_interval at assigns_from.i:274 (by main):
+[from] call to Frama_C_interval at assigns_from.i:274:11-32 (by main):
   \result FROM a; b
-[from] call to main3 at assigns_from.i:275 (by main):
+[from] call to main3 at assigns_from.i:275:3-11 (by main):
   a[6] FROM i
-[from] call to main3 at assigns_from.i:276 (by main):
+[from] call to main3 at assigns_from.i:276:3-11 (by main):
   a[0..9] FROM i (and SELF)
-[from] call to main4 at assigns_from.i:277 (by main):
+[from] call to main4 at assigns_from.i:277:3-11 (by main):
   a[2] FROM \nothing
-[from] call to main5 at assigns_from.i:278 (by main):
+[from] call to main5 at assigns_from.i:278:3-11 (by main):
   a[2] FROM a[4]
-[from] call to Frama_C_interval at assigns_from.i:279 (by main):
+[from] call to Frama_C_interval at assigns_from.i:279:11-32 (by main):
   \result FROM a; b
-[from] call to Frama_C_interval at assigns_from.i:280 (by main):
+[from] call to Frama_C_interval at assigns_from.i:280:11-32 (by main):
   \result FROM a; b
-[from] call to main6_right at assigns_from.i:281 (by main):
+[from] call to main6_right at assigns_from.i:281:3-19 (by main):
   a[3..5] FROM \nothing
-[from] call to main6_wrong at assigns_from.i:282 (by main):
+[from] call to main6_wrong at assigns_from.i:282:3-19 (by main):
   a[2..6] FROM \nothing
-[from] call to main7 at assigns_from.i:283 (by main):
+[from] call to main7 at assigns_from.i:283:3-10 (by main):
   a{[2]; [7..8]} FROM \nothing
-[from] call to main8 at assigns_from.i:286 (by main):
+[from] call to main8 at assigns_from.i:286:3-12 (by main):
   c_0 FROM p
-[from] call to main8 at assigns_from.i:288 (by main):
+[from] call to main8 at assigns_from.i:288:3-11 (by main):
   c_0 FROM p (and SELF)
   d FROM p (and SELF)
-[from] call to main9 at assigns_from.i:290 (by main):
+[from] call to main9 at assigns_from.i:290:3-10 (by main):
   NO EFFECTS
-[from] call to main10 at assigns_from.i:291 (by main):
+[from] call to main10 at assigns_from.i:291:3-11 (by main):
   NO EFFECTS
-[from] call to main11 at assigns_from.i:292 (by main):
+[from] call to main11 at assigns_from.i:292:3-12 (by main):
   a[2] FROM \nothing
-[from] call to main11 at assigns_from.i:293 (by main):
+[from] call to main11 at assigns_from.i:293:3-12 (by main):
   a[2] FROM \nothing
-[from] call to main11 at assigns_from.i:294 (by main):
+[from] call to main11 at assigns_from.i:294:3-32 (by main):
   a[2] FROM \nothing
-[from] call to Frama_C_interval at assigns_from.i:294 (by main):
+[from] call to Frama_C_interval at assigns_from.i:294:10-31 (by main):
   \result FROM a; b
-[from] call to main12 at assigns_from.i:295 (by main):
+[from] call to main12 at assigns_from.i:295:3-11 (by main):
   \result FROM \nothing
-[from] call to main13 at assigns_from.i:296 (by main):
+[from] call to main13 at assigns_from.i:296:3-11 (by main):
   \result FROM p_t
-[from] call to main14 at assigns_from.i:297 (by main):
+[from] call to main14 at assigns_from.i:297:3-11 (by main):
   t[2..38] FROM \nothing (and SELF)
-[from] call to main16 at assigns_from.i:298 (by main):
+[from] call to main16 at assigns_from.i:298:3-11 (by main):
   t[1..19] FROM \nothing (and SELF)
-[from] call to main17 at assigns_from.i:299 (by main):
+[from] call to main17 at assigns_from.i:299:3-18 (by main):
   t17{[0][bits 0 to 7]; [1][bits 0 to 7]; [2][bits 0 to 7]; [3][bits 0 to 7];
       [4][bits 0 to 7]; [5][bits 0 to 7]; [6][bits 0 to 7]; [7][bits 0 to 7];
       [8][bits 0 to 7]; [9][bits 0 to 7]}
      FROM p; i (and SELF)
-[from] call to main18 at assigns_from.i:300 (by main):
+[from] call to main18 at assigns_from.i:300:3-11 (by main):
   NO EFFECTS
-[from] call to main19 at assigns_from.i:301 (by main):
+[from] call to main19 at assigns_from.i:301:3-11 (by main):
   g FROM \nothing
 [from] entry point:
   u FROM v

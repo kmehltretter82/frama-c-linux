@@ -11,13 +11,13 @@
   I ∈ [--..--]
 [eva:progress] 
   computing for function k <- g.
-  Called from select_return.i:44.
+  Called from select_return.i:44:11-21.
 [kernel:annot:missing-spec] select_return.i:35: Warning: 
   Neither code nor specification for function get, generating default assigns.
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function get <- k <- g.
-  Called from select_return.i:35.
+  Called from select_return.i:35:14-21.
 [eva] using specification for function get
 [eva:progress] Done for function get
 [kernel:annot:missing-spec] select_return.i:39: Warning: 
@@ -25,50 +25,50 @@
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function send_bis <- k <- g.
-  Called from select_return.i:39.
+  Called from select_return.i:39:5-17.
 [eva] using specification for function send_bis
 [eva:progress] Done for function send_bis
 [eva:progress] Recording results for k
 [eva:progress] Done for function k
 [eva:progress] 
   computing for function f <- g.
-  Called from select_return.i:45.
+  Called from select_return.i:45:3-7.
 [eva:progress] 
   computing for function k <- f <- g.
-  Called from select_return.i:49.
+  Called from select_return.i:49:3-13.
 [eva:progress] 
   computing for function get <- k <- f <- g.
-  Called from select_return.i:35.
+  Called from select_return.i:35:14-21.
 [eva:progress] Done for function get
 [eva:progress] 
   computing for function send_bis <- k <- f <- g.
-  Called from select_return.i:39.
+  Called from select_return.i:39:5-17.
 [eva:progress] Done for function send_bis
 [eva:progress] Recording results for k
 [eva:progress] Done for function k
 [eva:progress] 
   computing for function k <- f <- g.
-  Called from select_return.i:50.
+  Called from select_return.i:50:11-21.
 [eva:progress] 
   computing for function get <- k <- f <- g.
-  Called from select_return.i:35.
+  Called from select_return.i:35:14-21.
 [eva:progress] Done for function get
 [eva:progress] 
   computing for function send_bis <- k <- f <- g.
-  Called from select_return.i:39.
+  Called from select_return.i:39:5-17.
 [eva:progress] Done for function send_bis
 [eva:progress] Recording results for k
 [eva:progress] Done for function k
 [eva:progress] 
   computing for function k <- f <- g.
-  Called from select_return.i:51.
+  Called from select_return.i:51:11-21.
 [eva:progress] 
   computing for function get <- k <- f <- g.
-  Called from select_return.i:35.
+  Called from select_return.i:35:14-21.
 [eva:progress] Done for function get
 [eva:progress] 
   computing for function send_bis <- k <- f <- g.
-  Called from select_return.i:39.
+  Called from select_return.i:39:5-17.
 [eva:progress] Done for function send_bis
 [eva:progress] Recording results for k
 [eva:progress] Done for function k
@@ -77,7 +77,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function send <- f <- g.
-  Called from select_return.i:53.
+  Called from select_return.i:53:4-12.
 [eva] using specification for function send
 [eva:progress] Done for function send
 [eva:progress] Recording results for f

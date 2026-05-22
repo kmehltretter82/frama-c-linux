@@ -21,7 +21,7 @@ let compute_and_print pp str_data =
       Cil_datatype.Stmt.Hptset.iter
         (fun s ->
            Format.printf "%a: %a@\n"
-             Printer.pp_location (Cil_datatype.Stmt.loc s)
+             Fileloc.pretty (Cil_datatype.Stmt.loc s)
              (Printer.without_annot Printer.pp_stmt) s)
         defs
   in

@@ -13,20 +13,20 @@
   cc2 ∈ {0}
 [eva:progress] 
   computing for function k <- main.
-  Called from pointer.i:37.
+  Called from pointer.i:37:3-8.
 [eva:progress] 
   computing for function l <- k <- main.
-  Called from pointer.i:29.
+  Called from pointer.i:29:3-7.
 [eva:progress] Recording results for l
 [eva:progress] Done for function l
 [eva:progress] Recording results for k
 [eva:progress] Done for function k
 [eva:progress] 
   computing for function k <- main.
-  Called from pointer.i:38.
+  Called from pointer.i:38:3-8.
 [eva:progress] 
   computing for function l <- k <- main.
-  Called from pointer.i:29.
+  Called from pointer.i:29:3-7.
 [eva:progress] Recording results for l
 [eva:progress] Done for function l
 [eva:progress] Recording results for k

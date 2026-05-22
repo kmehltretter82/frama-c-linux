@@ -184,8 +184,8 @@ let lookup_rtl_globals rtl_ast =
       do_ty acc l g k ci.cname
     | GEnumTag(ei, _loc) | GEnumTagDecl(ei, _loc) as g :: l  ->
       do_ty acc l g Logic_typing.Enum ei.ename
-    | GVarDecl(vi, (pos, _)) | GVar(vi, _, (pos, _)) as g :: l  ->
-      let tunit = Translation_unit pos.pos_path in
+    | GVarDecl(vi, loc) | GVar(vi, _, loc) as g :: l  ->
+      let tunit = Translation_unit (Fileloc.path loc) in
       let get_old_vi_opt vi =
         Globals.Syntactic_search.find_in_scope vi.vorig_name tunit
       in

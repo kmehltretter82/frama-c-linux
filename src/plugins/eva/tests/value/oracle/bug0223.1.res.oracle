@@ -12,22 +12,22 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function F <- main.
-  Called from bug0223.i:33.
+  Called from bug0223.i:33:10-16.
 [eva] using specification for function F
 [eva:progress] Done for function F
 [eva:progress] 
   computing for function F <- main.
-  Called from bug0223.i:34.
+  Called from bug0223.i:34:11-18.
 [eva:progress] Done for function F
 [eva:progress] 
   computing for function h2 <- main.
-  Called from bug0223.i:35.
+  Called from bug0223.i:35:5-9.
 [kernel:annot:missing-spec] bug0223.i:16: Warning: 
   Neither code nor specification for function my_strcnmp, generating default
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function my_strcnmp <- h2 <- main.
-  Called from bug0223.i:16.
+  Called from bug0223.i:16:13-43.
 [eva] using specification for function my_strcnmp
 [eva:progress] Done for function my_strcnmp
 [eva:progress] Recording results for h2

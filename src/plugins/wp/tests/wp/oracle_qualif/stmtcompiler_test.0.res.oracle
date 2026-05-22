@@ -88,20 +88,20 @@
   Unsuccess:       9
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  empty                     1        -        1       100%
-  one_assign                1        -        1       100%
-  one_if                    1        -        1       100%
-  some_seq                  2        -        2       100%
+  empty                     3        -        3       100%
+  one_assign                3        -        3       100%
+  one_if                    3        -        3       100%
+  some_seq                  4        -        4       100%
   main_ensures_result       3        -        3       100%
-  main                      1        -        1       100%
-  not_main                  -        -        1       0.0%
+  main                      3        -        3       100%
+  not_main                  2        -        3      66.7%
   main_assigns_global       4        -        5      80.0%
-  zloop                     4        -        8      50.0%
+  zloop                     5        -        9      55.6%
   behavior2                 3        -        3       100%
   behavior3                 3        -        3       100%
   behavior4                 3        -        3       100%
   behavior5                 2        -        3      66.7%
-  if_assert                 1        1        4      50.0%
-  compare                   1        -        1       100%
+  if_assert                 3        1        6      66.7%
+  compare                   3        -        3       100%
   exits_and_ensures         3        -        3       100%
 ------------------------------------------------------------

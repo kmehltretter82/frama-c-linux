@@ -23,6 +23,6 @@
   Lemma                     -        -        1       0.0%
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  usable_axiom              -        1        1       100%
-  usable_lemma              -        1        1       100%
+  usable_axiom              2        1        3       100%
+  usable_lemma              2        1        3       100%
 ------------------------------------------------------------

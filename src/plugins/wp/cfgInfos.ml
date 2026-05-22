@@ -321,21 +321,38 @@ let collect_loops_no_variant kf stmt =
 
 let trivial_terminates = ref 0
 
-let emitter =
-  Emitter.create
-    "Trivial Termination"
-    [Emitter.Property_status]
-    ~correctness:[] (* TBC *)
-    ~tuning:[] (* TBC *)
-
 let set_trivially_terminates p hyps =
   incr trivial_terminates ;
-  if Wp_parameters.has_dkey Prover.dkey_shell then
-    Wp_parameters.feedback "[Valid] Goal %a (Cfg) (Trivial)"
+  if Wp_parameters.is_interactive ()
+  || Wp_parameters.has_dkey Prover.dkey_shell
+  then
+    Wp_parameters.result "[Valid] Goal %a (Cfg) (Trivial)"
       WpPropId.pp_propid p ;
-  let pid = WpPropId.property_of_id p in
-  let hyps = Property.Set.elements hyps in
-  Property_status.emit emitter ~hyps pid Property_status.True
+  let kf = Option.get @@ Property.get_kf @@ WpPropId.property_of_id p in
+  let vc_annot = Wpo.VC_Annot.{
+      axioms = None;
+      goal = Wpo.GOAL.trivial;
+      tags = [];
+      warn = [];
+      deps = hyps;
+      path = Sset.empty;
+      source = None;
+    } in
+  let model = WpContext.get_model () in
+  let mid = WpContext.MODEL.id model in
+  let po_sid = WpPropId.get_propid p in
+  let po = Wpo.{
+      po_model = model ;
+      po_pid = p ;
+      po_sid = WpPropId.get_propid p ;
+      po_gid = Printf.sprintf "%s_%s" mid po_sid ;
+      po_name = Pretty_utils.to_string WpPropId.pretty_local p ;
+      po_idx = Wpo.Function(kf, None);
+      po_formula = vc_annot ;
+    }
+  in
+  Wpo.add po ;
+  Wpo.set_result po Prover.CFG (VCS.valid)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Memoization Key                                                    --- *)
@@ -502,10 +519,10 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
         in
         if warning_locs <> [] then
           Wp_parameters.warning ~once:true
-            "In '%a', no 'calls' specification for statement(s) on \
-             line(s): %a, @\nAssuming that they can call '%a'"
+            "In '%a', no 'calls' specification for statement(s) at %a, @\n\
+             Assuming that they can call '%a'"
             Kernel_function.pretty kf
-            (Pretty_utils.pp_list ~sep:", " Cil_datatype.Location.pretty_line)
+            (List.pretty_text Fileloc.pretty)
             warning_locs
             Kernel_function.pretty kf ;
         if is_recursive kf then

@@ -59,16 +59,16 @@
   Qed:            30
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  global_alias              3        -        3       100%
-  global_no_alias           2        -        2       100%
-  formal_alias              3        -        3       100%
-  formal_no_alias           2        -        2       100%
-  formal_alias_array        5        -        5       100%
-  field_alias               3        -        3       100%
-  field_range_alias         3        -        3       100%
-  set_alias                 3        -        3       100%
-  comprehension_alias       3        -        3       100%
-  union_alias               3        -        3       100%
+  global_alias              5        -        5       100%
+  global_no_alias           4        -        4       100%
+  formal_alias              5        -        5       100%
+  formal_no_alias           4        -        4       100%
+  formal_alias_array        7        -        7       100%
+  field_alias               5        -        5       100%
+  field_range_alias         5        -        5       100%
+  set_alias                 5        -        5       100%
+  comprehension_alias       5        -        5       100%
+  union_alias               5        -        5       100%
 ------------------------------------------------------------
 [wp] alias_assigns_hypotheses.i:17: Warning: 
   Memory model hypotheses for function 'global_alias':
