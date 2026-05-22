@@ -52,7 +52,7 @@ module StmtIdAccess = struct
     match op with
     | Read | Write _ ->
       Format.fprintf fmt "%a@ by %a@ at %a"
-        RW.pretty op Thread.pretty th Printer.pp_location loc
+        RW.pretty op Thread.pretty th Fileloc.pretty loc
     | ReadPos _ | WritePos _ ->
       Format.fprintf fmt "%a@ by %a@ at %a"
         RW.pretty_op op

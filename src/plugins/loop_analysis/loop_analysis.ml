@@ -611,7 +611,7 @@ let display_results () =
     Loop_Max_Iteration.iter_sorted
       (fun stmt max ->
          let loc = Cil_datatype.Stmt.loc stmt in
-         Format.fprintf fmt "%a: %i@," Printer.pp_location loc max)
+         Format.fprintf fmt "%a: %i@," Fileloc.pretty loc max)
   in
   Options.result "Maximum number of iterations by loop:@\n@[<v>%a@]"
     pretty_hashtbl ()

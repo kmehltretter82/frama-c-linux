@@ -316,6 +316,19 @@ let iter_lines p job =
     done
   with End_of_file -> ()
 
+let iteri_lines p job =
+  let i = ref 0 in
+  iter_lines p (fun line -> incr i; job !i line)
+
+let iter_line_range p first_line last_line job =
+  let job' i line =
+    if i >= first_line then begin
+      job i line;
+      if i >= last_line then raise Exit
+    end
+  in
+  try iteri_lines p job'  with Exit -> ()
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tests                                                              --- *)

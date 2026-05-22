@@ -31,7 +31,7 @@ let kind_label = function
    source file location. However, that would require passing the current
    statement through any datastructures and operations that can create
    garbled mixes, which would be an invasive change. *)
-type location = Cil_datatype.Location.t
+type location = Fileloc.t
 
 type tt =
   | Origin of { kind: kind; loc: location; }
@@ -48,7 +48,7 @@ module Prototype = struct
     match t1, t2 with
     | Origin o1, Origin o2 ->
       if o1.kind = o2.kind
-      then Cil_datatype.Location.compare o1.loc o2.loc
+      then Fileloc.compare o1.loc o2.loc
       else kind_rank o2.kind - kind_rank o1.kind
     | Well, Well | Unknown, Unknown -> 0
     | Origin _, _ | Well, Unknown -> 1
@@ -60,13 +60,13 @@ module Prototype = struct
     | Well -> 0
     | Unknown -> 1
     | Origin { kind; loc; } ->
-      Hashtbl.hash (kind_rank kind, Cil_datatype.Location.hash loc) + 2
+      Hashtbl.hash (kind_rank kind, Fileloc.hash loc) + 2
 
   let pretty fmt = function
     | Well -> Format.fprintf fmt "Well"
     | Unknown -> Format.fprintf fmt "Unknown"
     | Origin { kind; loc; } ->
-      let pretty_loc = Cil_datatype.Location.pretty in
+      let pretty_loc = Fileloc.pretty in
       Format.fprintf fmt "%s@ {%a}" (kind_label kind) pretty_loc loc
 end
 
@@ -109,7 +109,7 @@ let is_unknown t = t = Unknown
 
    These info are printed at the end of an Eva analysis. *)
 
-module LocSet = Cil_datatype.Location.Set
+module LocSet = Fileloc.Set
 
 module History = struct
 
@@ -165,7 +165,7 @@ let join t1 t2 =
 
 let is_current = function
   | Unknown | Well -> false
-  | Origin { loc } -> Cil_datatype.Location.equal loc (Current_loc.get ())
+  | Origin { loc } -> Fileloc.equal loc (Current_loc.get ())
 
 (* Registers the creation of the garbled mix of some origins: Misalign_write and
    Merge, which are directly written in the cvalue states, and Arith which can
@@ -226,7 +226,7 @@ let pretty_origin fmt origin =
   | Well -> Format.fprintf fmt "Initial state"
   | Origin { loc } ->
     Format.fprintf fmt "%a: %s"
-      Cil_datatype.Location.pretty loc (descr origin)
+      Fileloc.pretty loc (descr origin)
 
 let pretty_history fmt =
   let list = get_history () in

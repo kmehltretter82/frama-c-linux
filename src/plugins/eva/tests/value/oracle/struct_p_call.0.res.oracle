@@ -6,7 +6,7 @@
   
 [eva:progress] 
   computing for function f <- main.
-  Called from struct_p_call.i:14.
+  Called from struct_p_call.i:14:3-9.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:progress] Recording results for main

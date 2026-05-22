@@ -10,21 +10,21 @@
 [eva:progress] tricky_logic.i:56: function main: precondition got status valid.
 [eva:progress] 
   computing for function f1 <- main.
-  Called from tricky_logic.i:58.
+  Called from tricky_logic.i:58:3-7.
 [eva:progress] tricky_logic.i:15: assertion got status valid.
 [eva:progress] tricky_logic.i:16: assertion got status valid.
 [eva:progress] Recording results for f1
 [eva:progress] Done for function f1
 [eva:progress] 
   computing for function f2 <- main.
-  Called from tricky_logic.i:62.
+  Called from tricky_logic.i:62:3-7.
 [eva:progress] tricky_logic.i:23: assertion got status valid.
 [eva:progress] tricky_logic.i:24: assertion got status valid.
 [eva:progress] Recording results for f2
 [eva:progress] Done for function f2
 [eva:progress] 
   computing for function f3 <- main.
-  Called from tricky_logic.i:65.
+  Called from tricky_logic.i:65:3-7.
 [eva:progress] tricky_logic.i:29: assertion got status valid.
 [eva:progress] tricky_logic.i:30: assertion got status valid.
 [eva:alarm] tricky_logic.i:31: Warning: assertion got status unknown.
@@ -32,10 +32,10 @@
 [eva:progress] Done for function f3
 [eva:progress] 
   computing for function f4 <- main.
-  Called from tricky_logic.i:67.
+  Called from tricky_logic.i:67:3-7.
 [eva:progress] 
   computing for function g4 <- f4 <- main.
-  Called from tricky_logic.i:51.
+  Called from tricky_logic.i:51:3-8.
 [eva:progress] tricky_logic.i:38: assertion got status valid.
 [eva:alarm] tricky_logic.i:39: Warning: assertion got status unknown.
 [eva:progress] Recording results for g4

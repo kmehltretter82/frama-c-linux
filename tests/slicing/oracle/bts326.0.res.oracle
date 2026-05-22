@@ -7,17 +7,17 @@
   r ∈ {0}
 [eva:progress] 
   computing for function g <- main.
-  Called from bts326.i:17.
+  Called from bts326.i:17:3-7.
 [eva:progress] 
   computing for function f <- g <- main.
-  Called from bts326.i:12.
+  Called from bts326.i:12:3-7.
 [eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- g <- main.
-  Called from bts326.i:13.
+  Called from bts326.i:13:3-7.
 [eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -31,11 +31,11 @@
 [from] Done for function main
 [eva:progress] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to f at bts326.i:12 (by g):
+[from] call to f at bts326.i:12:3-7 (by g):
   t[0] FROM i
-[from] call to f at bts326.i:13 (by g):
+[from] call to f at bts326.i:13:3-7 (by g):
   t[1] FROM i
-[from] call to g at bts326.i:17 (by main):
+[from] call to g at bts326.i:17:3-7 (by main):
   t[0..1] FROM \nothing
 [from] entry point:
   t[0..1] FROM \nothing

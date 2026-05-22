@@ -11,6 +11,6 @@
      int field ;
   };
   
-  First declaration was at keep-defs-on-incompatibility.i:10
-  Current declaration is at keep-defs-on-incompatibility-companion.i:9
+  First declaration was at keep-defs-on-incompatibility.i:10:10-15
+  Current declaration is at keep-defs-on-incompatibility-companion.i:9-11
 [kernel] Frama-C aborted: invalid user input.

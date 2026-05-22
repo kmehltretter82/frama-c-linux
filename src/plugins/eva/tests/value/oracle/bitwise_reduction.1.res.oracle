@@ -6,7 +6,7 @@
   v ∈ [--..--]
 [eva:progress] 
   computing for function main1 <- main.
-  Called from bitwise_reduction.i:34.
+  Called from bitwise_reduction.i:34:3-10.
 [eva:alarm] bitwise_reduction.i:11: Warning: assertion got status unknown.
 [eva:alarm] bitwise_reduction.i:12: Warning: assertion got status unknown.
 [eva:alarm] bitwise_reduction.i:15: Warning: 

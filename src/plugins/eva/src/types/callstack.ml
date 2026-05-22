@@ -46,7 +46,7 @@ struct
     let pp_call fmt (kf,stmt) =
       Format.fprintf fmt "%a :: %a <-@ "
         Kf.pretty kf
-        Cil_datatype.Location.pretty (Stmt.loc stmt)
+        Fileloc.pretty (Stmt.loc stmt)
     in
     Format.fprintf fmt "@[<hv>";
     List.iter (pp_call fmt) cs.stack;
@@ -137,8 +137,8 @@ let rec iter f cs =
 (* Stable hash and pretty-printing *)
 
 let stmt_hash s =
-  let pos = fst (Cil_datatype.Stmt.loc s) in
-  stable_hash (pos.pos_path, pos.pos_lnum)
+  let loc = Cil_datatype.Stmt.loc s in
+  stable_hash (Fileloc.path loc, Fileloc.line loc)
 
 let kf_hash kf = stable_hash (Kernel_function.get_name kf)
 

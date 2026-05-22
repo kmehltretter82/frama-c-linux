@@ -8,12 +8,12 @@
   undet ∈ [--..--]
 [eva:progress] 
   computing for function main0 <- main.
-  Called from endian.i:101.
+  Called from endian.i:101:3-11.
 [eva:progress] Recording results for main0
 [eva:progress] Done for function main0
 [eva:progress] 
   computing for function interpret_bits <- main.
-  Called from endian.i:102.
+  Called from endian.i:102:3-20.
 [eva:progress] Recording results for interpret_bits
 [eva:progress] Done for function interpret_bits
 [eva:progress] Recording results for main

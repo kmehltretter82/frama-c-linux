@@ -15,12 +15,12 @@
 [eva:progress] jacques.i:29: assertion got status valid.
 [eva:progress] 
   computing for function f <- main.
-  Called from jacques.i:36.
+  Called from jacques.i:36:3-6.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- main.
-  Called from jacques.i:40.
+  Called from jacques.i:40:3-6.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:progress] Recording results for main

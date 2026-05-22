@@ -24,10 +24,10 @@ class annotateFunFromDeclspec =
     let rec aux = function
       | AInt i ->
         Ast_info.constant_term
-          Cil_datatype.Location.unknown i
+          Fileloc.unknown i
       | AUnOp(Neg,AInt i) ->
         Ast_info.constant_term
-          Cil_datatype.Location.unknown (Z.neg i)
+          Fileloc.unknown (Z.neg i)
       | AStr s
       | ACons(s,[]) ->
         begin try
@@ -38,7 +38,7 @@ class annotateFunFromDeclspec =
         mkterm
           (TBinOp(bop,aux attr1,aux attr2))
           Linteger
-          Cil_datatype.Location.unknown
+          Fileloc.unknown
       | ACons _
       | ASizeOf _
       | ASizeOfE _

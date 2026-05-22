@@ -16,7 +16,7 @@
   volatile_d ∈ [--..--]
 [eva:progress] 
   computing for function alarms <- main.
-  Called from summary.i:64.
+  Called from summary.i:64:3-12.
 [eva:alarm] summary.i:28: Warning: 
   assertion 'rte,mem_access' got status unknown.
 [eva:alarm] summary.i:30: Warning: 
@@ -70,7 +70,7 @@
 [eva:progress] Done for function alarms
 [eva:progress] 
   computing for function logic <- main.
-  Called from summary.i:65.
+  Called from summary.i:65:3-11.
 [eva:progress] summary.i:55: assertion got status valid.
 [eva:alarm] summary.i:56: Warning: assertion got status unknown.
 [eva:alarm] summary.i:58: Warning: 
@@ -82,7 +82,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f <- main.
-  Called from summary.i:66.
+  Called from summary.i:66:3-6.
 [eva] using specification for function f
 [eva:progress] Done for function f
 [kernel:annot:missing-spec] summary.i:67: Warning: 
@@ -90,7 +90,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function g <- main.
-  Called from summary.i:67.
+  Called from summary.i:67:3-6.
 [eva] using specification for function g
 [eva:progress] Done for function g
 [eva:progress] Recording results for main

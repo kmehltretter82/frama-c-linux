@@ -534,14 +534,14 @@ val compatibleTypes :
     The [ghost] argument defaults to [false], and corresponds to the field
     [vghost] .
     The [alignas] argument defaults to the alignment of the provided type.
-    The [loc] argument defaults to [Location.unknown], and corresponds to the field
+    The [loc] argument defaults to [Fileloc.unknown], and corresponds to the field
     [vdecl] .
     The first unnamed argument specifies whether the varinfo is for a global and
     the second is for formals.
 *)
 val makeVarinfo:
   ?source:bool -> ?temp:bool -> ?referenced:bool -> ?ghost:bool ->
-  ?alignas:exp -> ?loc:Location.t -> bool -> bool
+  ?alignas:exp -> ?loc:Fileloc.t -> bool -> bool
   -> string -> typ -> varinfo
 
 (** Make a formal variable for a function declaration. Insert it in both the
@@ -558,7 +558,7 @@ val makeVarinfo:
     - when [where] is specified, its status must be the same as the formal to
       insert (else, it cannot be found in the list of ghost or non ghost formals)
 *)
-val makeFormalVar: fundec -> ?ghost:bool -> ?where:string -> ?loc:Location.t -> string -> typ -> varinfo
+val makeFormalVar: fundec -> ?ghost:bool -> ?where:string -> ?loc:Fileloc.t -> string -> typ -> varinfo
 
 (** Make a local variable and add it to a function's slocals and to the given
     block (only if insert = true, which is the default).
@@ -570,7 +570,7 @@ val makeFormalVar: fundec -> ?ghost:bool -> ?where:string -> ?loc:Location.t -> 
 *)
 val makeLocalVar:
   fundec -> ?scope:block -> ?temp:bool -> ?referenced:bool -> ?insert:bool ->
-  ?ghost:bool -> ?loc:Location.t -> string -> typ -> varinfo
+  ?ghost:bool -> ?loc:Fileloc.t -> string -> typ -> varinfo
 
 (** if needed, rename the given varinfo so that its [vname] does not
     clash with the one of a local or formal variable of the given function.
@@ -591,13 +591,13 @@ val refresh_local_name: fundec -> varinfo -> unit
 
 *)
 val makeTempVar: fundec -> ?insert:bool -> ?ghost:bool -> ?name:string ->
-  ?descr:string -> ?descrpure:bool -> ?loc:Location.t -> typ -> varinfo
+  ?descr:string -> ?descrpure:bool -> ?loc:Fileloc.t -> typ -> varinfo
 
 (** Make a global variable. Your responsibility to make sure that the name
     is unique. [source] defaults to [true]. [temp] defaults to [false].
 *)
 val makeGlobalVar: ?source:bool -> ?temp:bool -> ?referenced:bool ->
-  ?ghost:bool -> ?alignas:exp -> ?loc:Location.t -> string -> typ -> varinfo
+  ?ghost:bool -> ?alignas:exp -> ?loc:Fileloc.t -> string -> typ -> varinfo
 
 (** Make a shallow copy of a [varinfo] and assign a new identifier.
     If the original varinfo has an associated logic var, it is copied too and
@@ -661,13 +661,13 @@ val is_modifiable_lval: lval -> bool
 (* Construct integer constants *)
 
 (** 0 *)
-val zero: loc:Location.t -> exp
+val zero: loc:Fileloc.t -> exp
 
 (** 1 *)
-val one: loc:Location.t -> exp
+val one: loc:Fileloc.t -> exp
 
 (** -1 *)
-val mone: loc:Location.t -> exp
+val mone: loc:Fileloc.t -> exp
 
 (** Construct an integer of a given kind without literal representation.
     Truncate the integer if [kind] is given, and the integer does not fit
@@ -2106,7 +2106,6 @@ val pp_attributes_ref: (Format.formatter -> attributes -> unit) ref
 val pp_term_ref: (Format.formatter -> term -> unit) ref
 val pp_logic_type_ref: (Format.formatter -> logic_type -> unit) ref
 val pp_identified_term_ref: (Format.formatter -> identified_term -> unit) ref
-val pp_location_ref: (Format.formatter -> location -> unit) ref
 val pp_from_ref: (Format.formatter -> from -> unit) ref
 val pp_behavior_ref: (Format.formatter -> behavior -> unit) ref
 val pp_block_ref: (Format.formatter -> block -> unit) ref

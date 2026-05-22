@@ -27,7 +27,7 @@
   i2 ∈ [--..--]
 [eva:progress] 
   computing for function pgcd1 <- main.
-  Called from modulo.i:210.
+  Called from modulo.i:210:12-23.
 [eva:alarm] modulo.i:210: Warning: 
   function pgcd1: precondition got status unknown.
 [eva:progress] modulo.i:37: loop invariant got status valid.
@@ -42,7 +42,7 @@
 [eva:progress] Done for function pgcd1
 [eva:progress] 
   computing for function pgcd2 <- main.
-  Called from modulo.i:211.
+  Called from modulo.i:211:12-23.
 [eva:alarm] modulo.i:211: Warning: 
   function pgcd2: precondition got status unknown.
 [eva:progress] modulo.i:50: loop invariant got status valid.
@@ -52,7 +52,7 @@
 [eva:progress] Done for function pgcd2
 [eva:progress] 
   computing for function pgcd3 <- main.
-  Called from modulo.i:212.
+  Called from modulo.i:212:12-23.
 [eva:alarm] modulo.i:212: Warning: 
   function pgcd3: precondition got status unknown.
 [eva:alarm] modulo.i:63: Warning: division by zero. assert b_0 ≢ 0;
@@ -61,7 +61,7 @@
 [eva:progress] Done for function pgcd3
 [eva:progress] 
   computing for function main2 <- main.
-  Called from modulo.i:214.
+  Called from modulo.i:214:3-10.
 [eva:alarm] modulo.i:9: Warning: signed overflow. assert -2147483648 ≤ 4 * i;
 [eva:alarm] modulo.i:9: Warning: signed overflow. assert 4 * i ≤ 2147483647;
 [eva:alarm] modulo.i:10: Warning: signed overflow. assert -2147483648 ≤ 4 * i;
@@ -74,13 +74,13 @@
 [eva:progress] Done for function main2
 [eva:progress] 
   computing for function simultaneous_congruences <- main.
-  Called from modulo.i:215.
+  Called from modulo.i:215:3-29.
 [eva:alarm] modulo.i:76: Warning: assertion got status unknown.
 [eva:progress] Recording results for simultaneous_congruences
 [eva:progress] Done for function simultaneous_congruences
 [eva:progress] 
   computing for function shift_modulo <- main.
-  Called from modulo.i:216.
+  Called from modulo.i:216:3-17.
 [eva:alarm] modulo.i:100: Warning: assertion got status unknown.
 [eva:alarm] modulo.i:103: Warning: 
   signed overflow. assert (int)((int)(i * 12) + 5) << 25 ≤ 2147483647;
@@ -90,13 +90,13 @@
 [eva:progress] Done for function shift_modulo
 [eva:progress] 
   computing for function extract_bits_modulo <- main.
-  Called from modulo.i:217.
+  Called from modulo.i:217:3-24.
 [eva:alarm] modulo.i:109: Warning: assertion got status unknown.
 [eva:progress] Recording results for extract_bits_modulo
 [eva:progress] Done for function extract_bits_modulo
 [eva:progress] 
   computing for function pos_rem <- main.
-  Called from modulo.i:218.
+  Called from modulo.i:218:3-12.
 [eva:alarm] modulo.i:137: Warning: assertion got status unknown.
 [eva:alarm] modulo.i:142: Warning: assertion got status unknown.
 [eva:alarm] modulo.i:146: Warning: assertion got status unknown.
@@ -104,7 +104,7 @@
 [eva:progress] Done for function pos_rem
 [eva:progress] 
   computing for function address_modulo <- main.
-  Called from modulo.i:219.
+  Called from modulo.i:219:3-19.
 [eva:garbled-mix:write] modulo.i:158: 
   Assigning imprecise value to r because of arithmetic operation on addresses.
 [eva:alarm] modulo.i:159: Warning: division by zero. assert i ≢ 0;
@@ -122,7 +122,7 @@
 [eva:progress] Done for function address_modulo
 [eva:progress] 
   computing for function test_overflow_alarms <- main.
-  Called from modulo.i:220.
+  Called from modulo.i:220:3-25.
 [eva:alarm] modulo.i:176: Warning: 
   signed overflow. assert a_0 / b_0 ≤ 2147483647;
 [eva:show] modulo.i:178: Frama_C_show_each: {-2147483648; 10}, {-1; 2}
@@ -155,7 +155,7 @@
   uaddr ∈ {{ (unsigned int)&A ; (unsigned int)&B }}
   addr ∈ {{ (int)&A ; (int)&B }}
   i ∈ [-99..99]
-  r ∈ {{ garbled mix of &{A; B} (origin: Arithmetic {modulo.i:161}) }}
+  r ∈ {{ garbled mix of &{A; B} (origin: Arithmetic {modulo.i:161:7-16}) }}
 [eva:final-states] Values at end of function extract_bits_modulo:
   i ∈ [0..10]
   aa1 ∈ [1291..32011],1291%3072

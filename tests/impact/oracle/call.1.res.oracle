@@ -8,13 +8,13 @@
   X ∈ {0}
 [eva:progress] 
   computing for function call_test <- main2.
-  Called from call.i:36.
+  Called from call.i:36:3-15.
 [eva:progress] 
   computing for function test <- call_test <- main2.
-  Called from call.i:30.
+  Called from call.i:30:3-10.
 [eva:progress] 
   computing for function p1 <- test <- call_test <- main2.
-  Called from call.i:16.
+  Called from call.i:16:10-15.
 [eva] using specification for function p1
 [eva:progress] Done for function p1
 [kernel:annot:missing-spec] call.i:16: Warning: 
@@ -22,7 +22,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function p2 <- test <- call_test <- main2.
-  Called from call.i:16.
+  Called from call.i:16:22-27.
 [eva] using specification for function p2
 [eva:progress] Done for function p2
 [eva:progress] Recording results for test
@@ -50,7 +50,7 @@
 [pdg] computing for function p2
 [pdg] done for function p2
 [impact] impacted statements of stmt(s) 16 are:
-    call.i:16 (sid 2): if(X) <..>call.i:16 (sid 3): p1(1);
-    call.i:16 (sid 4): p2(0);call.i:30 (sid 12): test();
-    call.i:36 (sid 17): call_test();
+    call.i:16:7-8 (sid 2): if(X) <..>call.i:16:10-15 (sid 3): p1(1);
+    call.i:16:22-27 (sid 4): p2(0);call.i:30:3-10 (sid 12): test();
+    call.i:36:3-15 (sid 17): call_test();
 [impact] analysis done

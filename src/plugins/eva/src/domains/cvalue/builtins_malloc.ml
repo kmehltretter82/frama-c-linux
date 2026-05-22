@@ -119,7 +119,7 @@ let extract_size sizev_bytes =
 (* Name of the base that will be given to a malloced variable, determined
    using the callstack. *)
 let base_name prefix cs =
-  let stmt_line stmt = (fst (Cil_datatype.Stmt.loc stmt)).pos_lnum in
+  let stmt_line stmt = Cil_datatype.(Stmt.loc stmt |> Fileloc.line) in
   match cs.Callstack.stack with
   | [] ->
     (* Degenerate case *)

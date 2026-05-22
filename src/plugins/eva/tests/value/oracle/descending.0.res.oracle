@@ -6,10 +6,10 @@
   
 [eva:progress] 
   computing for function test1 <- main.
-  Called from descending.i:33.
+  Called from descending.i:33:3-10.
 [eva:progress] 
   computing for function f <- test1 <- main.
-  Called from descending.i:12.
+  Called from descending.i:12:11-19.
 [eva:partition] descending.i:4: starting to merge loop iterations
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
@@ -21,7 +21,7 @@
 [eva:progress] Done for function test1
 [eva:progress] 
   computing for function test2 <- main.
-  Called from descending.i:34.
+  Called from descending.i:34:3-10.
 [eva:partition] descending.i:22: starting to merge loop iterations
 [eva:alarm] descending.i:28: Warning: 
   accessing out of bounds index. assert j < 33;

@@ -34,12 +34,12 @@
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f_int_int <- main.
-  Called from leaf.i:48.
+  Called from leaf.i:48:8-20.
 [eva] using specification for function f_int_int
 [eva:progress] Done for function f_int_int
 [eva:progress] 
   computing for function f_int_star_int <- main.
-  Called from leaf.i:50.
+  Called from leaf.i:50:12-29.
 [eva] using specification for function f_int_star_int
 [eva:garbled-mix:assigns] leaf.i:50: 
   The specification of function f_int_star_int
@@ -52,7 +52,7 @@
 [eva:show] leaf.i:53: Frama_C_show_each_F: {5}
 [eva:progress] 
   computing for function f_int_star_int_star_int <- main.
-  Called from leaf.i:55.
+  Called from leaf.i:55:14-40.
 [eva] using specification for function f_int_star_int_star_int
 [eva:garbled-mix:assigns] leaf.i:55: 
   The specification of function f_int_star_int_star_int
@@ -67,7 +67,7 @@
   default assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f_star_int_cint <- main.
-  Called from leaf.i:62.
+  Called from leaf.i:62:8-30.
 [eva] using specification for function f_star_int_cint
 [eva:progress] Done for function f_star_int_cint
 [kernel:annot:missing-spec] leaf.i:64: Warning: 
@@ -75,7 +75,7 @@
   default assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f_star_int_int <- main.
-  Called from leaf.i:64.
+  Called from leaf.i:64:3-26.
 [eva] using specification for function f_star_int_int
 [eva:progress] Done for function f_star_int_int
 [kernel:annot:missing-spec] leaf.i:65: Warning: 
@@ -83,7 +83,7 @@
   default assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f_tab3_int_int <- main.
-  Called from leaf.i:65.
+  Called from leaf.i:65:3-24.
 [eva] using specification for function f_tab3_int_int
 [eva:progress] Done for function f_tab3_int_int
 [kernel:annot:missing-spec] leaf.i:66: Warning: 
@@ -91,7 +91,7 @@
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f_tab_int_int <- main.
-  Called from leaf.i:66.
+  Called from leaf.i:66:3-24.
 [eva] using specification for function f_tab_int_int
 [eva:progress] Done for function f_tab_int_int
 [kernel:annot:missing-spec] leaf.i:68: Warning: 
@@ -99,7 +99,7 @@
   generating default assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f_st_star_cint_st_star_cint <- main.
-  Called from leaf.i:68.
+  Called from leaf.i:68:20-63.
 [eva] using specification for function f_st_star_cint_st_star_cint
 [eva:garbled-mix:assigns] leaf.i:68: 
   The specification of function f_st_star_cint_st_star_cint
@@ -110,7 +110,7 @@
   generating default assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f_st_star_int_st_star_int <- main.
-  Called from leaf.i:69.
+  Called from leaf.i:69:20-61.
 [eva] using specification for function f_st_star_int_st_star_int
 [eva:garbled-mix:assigns] leaf.i:69: 
   The specification of function f_st_star_int_st_star_int
@@ -121,7 +121,7 @@
   generating default assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f_st_tab3_int_st_tab3_int <- main.
-  Called from leaf.i:70.
+  Called from leaf.i:70:20-61.
 [eva] using specification for function f_st_tab3_int_st_tab3_int
 [eva:progress] Done for function f_st_tab3_int_st_tab3_int
 [kernel:annot:missing-spec] leaf.i:72: Warning: 
@@ -129,7 +129,7 @@
   generating default assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f_star_st_star_cint_int <- main.
-  Called from leaf.i:72.
+  Called from leaf.i:72:3-43.
 [eva] using specification for function f_star_st_star_cint_int
 [eva:garbled-mix:assigns] leaf.i:72: 
   The specification of function f_star_st_star_cint_int
@@ -140,7 +140,7 @@
   generating default assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f_star_st_star_int_int <- main.
-  Called from leaf.i:73.
+  Called from leaf.i:73:3-42.
 [eva] using specification for function f_star_st_star_int_int
 [eva:garbled-mix:assigns] leaf.i:73: 
   The specification of function f_star_st_star_int_int
@@ -151,17 +151,17 @@
   generating default assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f_star_st_tab3_int_int <- main.
-  Called from leaf.i:74.
+  Called from leaf.i:74:3-42.
 [eva] using specification for function f_star_st_tab3_int_int
 [eva:progress] Done for function f_star_st_tab3_int_int
 [eva:progress] Recording results for main
 [eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    leaf.i:55: assigns clause on addresses
+    leaf.i:55:14-40: assigns clause on addresses
       (read in 4 statements, propagated through 1 statement)
       garbled mix of &{pg}
-    leaf.i:50: assigns clause on addresses
+    leaf.i:50:12-29: assigns clause on addresses
       (read in 2 statements, propagated through 1 statement)
       garbled mix of &{g}
 [eva] ====== VALUES COMPUTED ======
@@ -179,20 +179,21 @@
   g ∈ {5}
   st_star_cint_1 ∈
                 {{ garbled mix of &{cv2}
-                 (origin: Library function {leaf.i:68}) }}
+                 (origin: Library function {leaf.i:68:20-63}) }}
   st_star_cint_3 ∈
                 {{ garbled mix of &{cv3}
-                 (origin: Library function {leaf.i:72}) }}
+                 (origin: Library function {leaf.i:72:3-43}) }}
   st_star_int_1 ∈
                {{ garbled mix of &{v2}
-                (origin: Library function {leaf.i:69}) }}
+                (origin: Library function {leaf.i:69:20-61}) }}
   st_star_int_3 ∈
                {{ garbled mix of &{v3}
-                (origin: Library function {leaf.i:73}) }}
+                (origin: Library function {leaf.i:73:3-42}) }}
   st_tab3_int_1 ∈ [--..--]
   st_tab3_int_3 ∈ [--..--]
   p ∈ {{ &g }}
-  pp ∈ {{ garbled mix of &{pg} (origin: Library function {leaf.i:55}) }}
+  pp ∈
+    {{ garbled mix of &{pg} (origin: Library function {leaf.i:55:14-40}) }}
 [from] Computing for function main
 [from] Computing for function f_int_int <-main
 [from] Done for function f_int_int

@@ -61,7 +61,7 @@ module RW = struct
 
   let loc op =
     match op with
-    | Read | Write _ -> Cil_datatype.Location.unknown
+    | Read | Write _ -> Fileloc.unknown
     | ReadPos pos | WritePos pos -> Position.loc pos
 
   let is_read op =

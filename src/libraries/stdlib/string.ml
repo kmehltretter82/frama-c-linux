@@ -11,6 +11,8 @@ include Stdlib.String
 let compare_ignore_case s1 s2 =
   compare (lowercase_ascii s1) (lowercase_ascii s2)
 
+let hash = Stdlib.Hashtbl.hash
+
 let remove_prefix ?(strict=false) prefix s =
   if starts_with ~prefix s then
     let n = length s in

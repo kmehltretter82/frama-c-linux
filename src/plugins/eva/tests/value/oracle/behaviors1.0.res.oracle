@@ -7,10 +7,10 @@
   T[0..9] ∈ {0}
 [eva:progress] 
   computing for function test_none <- main.
-  Called from behaviors1.i:638.
+  Called from behaviors1.i:638:3-14.
 [eva:progress] 
   computing for function f_none <- test_none <- main.
-  Called from behaviors1.i:328.
+  Called from behaviors1.i:328:22-34.
 [eva] using specification for function f_none
 [eva] behaviors1.i:328: 
   function f_none, behavior b2: assumes got status invalid; behavior not evaluated.
@@ -21,7 +21,7 @@
 [eva:progress] Done for function f_none
 [eva:progress] 
   computing for function f_none <- test_none <- main.
-  Called from behaviors1.i:329.
+  Called from behaviors1.i:329:22-34.
 [eva] behaviors1.i:329: 
   function f_none, behavior b2: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:329: 
@@ -29,7 +29,7 @@
 [eva:progress] Done for function f_none
 [eva:progress] 
   computing for function f_none <- test_none <- main.
-  Called from behaviors1.i:330.
+  Called from behaviors1.i:330:22-34.
 [eva] behaviors1.i:330: 
   function f_none, behavior b3: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:330: 
@@ -37,16 +37,16 @@
 [eva:progress] Done for function f_none
 [eva:progress] 
   computing for function f_none <- test_none <- main.
-  Called from behaviors1.i:331.
+  Called from behaviors1.i:331:22-34.
 [eva:progress] Done for function f_none
 [eva:progress] Recording results for test_none
 [eva:progress] Done for function test_none
 [eva:progress] 
   computing for function test_comp_disj <- main.
-  Called from behaviors1.i:639.
+  Called from behaviors1.i:639:3-19.
 [eva:progress] 
   computing for function f_comp_disj <- test_comp_disj <- main.
-  Called from behaviors1.i:342.
+  Called from behaviors1.i:342:10-27.
 [eva] using specification for function f_comp_disj
 [eva] behaviors1.i:342: 
   function f_comp_disj, behavior b2: assumes got status invalid; behavior not evaluated.
@@ -57,7 +57,7 @@
 [eva:progress] Done for function f_comp_disj
 [eva:progress] 
   computing for function f_comp_disj <- test_comp_disj <- main.
-  Called from behaviors1.i:350.
+  Called from behaviors1.i:350:10-27.
 [eva] behaviors1.i:350: 
   function f_comp_disj, behavior b2: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:350: 
@@ -65,7 +65,7 @@
 [eva:progress] Done for function f_comp_disj
 [eva:progress] 
   computing for function f_comp_disj <- test_comp_disj <- main.
-  Called from behaviors1.i:358.
+  Called from behaviors1.i:358:10-27.
 [eva] behaviors1.i:358: 
   function f_comp_disj, behavior b3: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:358: 
@@ -73,16 +73,16 @@
 [eva:progress] Done for function f_comp_disj
 [eva:progress] 
   computing for function f_comp_disj <- test_comp_disj <- main.
-  Called from behaviors1.i:366.
+  Called from behaviors1.i:366:10-27.
 [eva:progress] Done for function f_comp_disj
 [eva:progress] Recording results for test_comp_disj
 [eva:progress] Done for function test_comp_disj
 [eva:progress] 
   computing for function test_comp <- main.
-  Called from behaviors1.i:640.
+  Called from behaviors1.i:640:3-14.
 [eva:progress] 
   computing for function f_comp <- test_comp <- main.
-  Called from behaviors1.i:388.
+  Called from behaviors1.i:388:22-34.
 [eva] using specification for function f_comp
 [eva] behaviors1.i:388: 
   function f_comp, behavior b2: assumes got status invalid; behavior not evaluated.
@@ -93,7 +93,7 @@
 [eva:progress] Done for function f_comp
 [eva:progress] 
   computing for function f_comp <- test_comp <- main.
-  Called from behaviors1.i:389.
+  Called from behaviors1.i:389:22-34.
 [eva] behaviors1.i:389: 
   function f_comp, behavior b2: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:389: 
@@ -101,7 +101,7 @@
 [eva:progress] Done for function f_comp
 [eva:progress] 
   computing for function f_comp <- test_comp <- main.
-  Called from behaviors1.i:390.
+  Called from behaviors1.i:390:22-34.
 [eva] behaviors1.i:390: 
   function f_comp, behavior b3: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:390: 
@@ -109,16 +109,16 @@
 [eva:progress] Done for function f_comp
 [eva:progress] 
   computing for function f_comp <- test_comp <- main.
-  Called from behaviors1.i:391.
+  Called from behaviors1.i:391:22-34.
 [eva:progress] Done for function f_comp
 [eva:progress] Recording results for test_comp
 [eva:progress] Done for function test_comp
 [eva:progress] 
   computing for function test_disj <- main.
-  Called from behaviors1.i:641.
+  Called from behaviors1.i:641:3-14.
 [eva:progress] 
   computing for function f_disj <- test_disj <- main.
-  Called from behaviors1.i:377.
+  Called from behaviors1.i:377:22-34.
 [eva] using specification for function f_disj
 [eva] behaviors1.i:377: 
   function f_disj, behavior b2: assumes got status invalid; behavior not evaluated.
@@ -129,7 +129,7 @@
 [eva:progress] Done for function f_disj
 [eva:progress] 
   computing for function f_disj <- test_disj <- main.
-  Called from behaviors1.i:378.
+  Called from behaviors1.i:378:22-34.
 [eva] behaviors1.i:378: 
   function f_disj, behavior b2: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:378: 
@@ -137,7 +137,7 @@
 [eva:progress] Done for function f_disj
 [eva:progress] 
   computing for function f_disj <- test_disj <- main.
-  Called from behaviors1.i:379.
+  Called from behaviors1.i:379:22-34.
 [eva] behaviors1.i:379: 
   function f_disj, behavior b3: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:379: 
@@ -145,16 +145,16 @@
 [eva:progress] Done for function f_disj
 [eva:progress] 
   computing for function f_disj <- test_disj <- main.
-  Called from behaviors1.i:380.
+  Called from behaviors1.i:380:22-34.
 [eva:progress] Done for function f_disj
 [eva:progress] Recording results for test_disj
 [eva:progress] Done for function test_disj
 [eva:progress] 
   computing for function test_123_comp_disj <- main.
-  Called from behaviors1.i:642.
+  Called from behaviors1.i:642:3-23.
 [eva:progress] 
   computing for function f_123_comp_disj <- test_123_comp_disj <- main.
-  Called from behaviors1.i:399.
+  Called from behaviors1.i:399:22-43.
 [eva] using specification for function f_123_comp_disj
 [eva] behaviors1.i:399: 
   function f_123_comp_disj, behavior b2: assumes got status invalid; behavior not evaluated.
@@ -165,7 +165,7 @@
 [eva:progress] Done for function f_123_comp_disj
 [eva:progress] 
   computing for function f_123_comp_disj <- test_123_comp_disj <- main.
-  Called from behaviors1.i:400.
+  Called from behaviors1.i:400:22-43.
 [eva] behaviors1.i:400: 
   function f_123_comp_disj, behavior b2: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:400: 
@@ -173,7 +173,7 @@
 [eva:progress] Done for function f_123_comp_disj
 [eva:progress] 
   computing for function f_123_comp_disj <- test_123_comp_disj <- main.
-  Called from behaviors1.i:401.
+  Called from behaviors1.i:401:22-43.
 [eva] behaviors1.i:401: 
   function f_123_comp_disj, behavior b3: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:401: 
@@ -181,17 +181,17 @@
 [eva:progress] Done for function f_123_comp_disj
 [eva:progress] 
   computing for function f_123_comp_disj <- test_123_comp_disj <- main.
-  Called from behaviors1.i:402.
+  Called from behaviors1.i:402:22-43.
 [eva:progress] Done for function f_123_comp_disj
 [eva:progress] Recording results for test_123_comp_disj
 [eva:progress] Done for function test_123_comp_disj
 [eva:progress] 
   computing for function test_123_comp_disj_2345_disj <- main.
-  Called from behaviors1.i:643.
+  Called from behaviors1.i:643:3-33.
 [eva:progress] 
   computing for function f_123_comp_disj_2345_disj <- 
                           test_123_comp_disj_2345_disj <- main.
-  Called from behaviors1.i:410.
+  Called from behaviors1.i:410:22-53.
 [eva] using specification for function f_123_comp_disj_2345_disj
 [eva] behaviors1.i:410: 
   function f_123_comp_disj_2345_disj, behavior b2: assumes got status invalid; behavior not evaluated.
@@ -203,7 +203,7 @@
 [eva:progress] 
   computing for function f_123_comp_disj_2345_disj <- 
                           test_123_comp_disj_2345_disj <- main.
-  Called from behaviors1.i:411.
+  Called from behaviors1.i:411:22-53.
 [eva] behaviors1.i:411: 
   function f_123_comp_disj_2345_disj, behavior b2: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:411: 
@@ -212,7 +212,7 @@
 [eva:progress] 
   computing for function f_123_comp_disj_2345_disj <- 
                           test_123_comp_disj_2345_disj <- main.
-  Called from behaviors1.i:412.
+  Called from behaviors1.i:412:22-53.
 [eva] behaviors1.i:412: 
   function f_123_comp_disj_2345_disj, behavior b3: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:412: 
@@ -221,17 +221,17 @@
 [eva:progress] 
   computing for function f_123_comp_disj_2345_disj <- 
                           test_123_comp_disj_2345_disj <- main.
-  Called from behaviors1.i:413.
+  Called from behaviors1.i:413:22-53.
 [eva:progress] Done for function f_123_comp_disj_2345_disj
 [eva:progress] Recording results for test_123_comp_disj_2345_disj
 [eva:progress] Done for function test_123_comp_disj_2345_disj
 [eva:progress] 
   computing for function test_123_comp_disj_2345_comp <- main.
-  Called from behaviors1.i:644.
+  Called from behaviors1.i:644:3-33.
 [eva:progress] 
   computing for function f_123_comp_disj_2345_comp <- 
                           test_123_comp_disj_2345_comp <- main.
-  Called from behaviors1.i:421.
+  Called from behaviors1.i:421:22-53.
 [eva] using specification for function f_123_comp_disj_2345_comp
 [eva] behaviors1.i:421: 
   function f_123_comp_disj_2345_comp, behavior b2: assumes got status invalid; behavior not evaluated.
@@ -243,7 +243,7 @@
 [eva:progress] 
   computing for function f_123_comp_disj_2345_comp <- 
                           test_123_comp_disj_2345_comp <- main.
-  Called from behaviors1.i:422.
+  Called from behaviors1.i:422:22-53.
 [eva] behaviors1.i:422: 
   function f_123_comp_disj_2345_comp, behavior b2: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:422: 
@@ -252,7 +252,7 @@
 [eva:progress] 
   computing for function f_123_comp_disj_2345_comp <- 
                           test_123_comp_disj_2345_comp <- main.
-  Called from behaviors1.i:423.
+  Called from behaviors1.i:423:22-53.
 [eva] behaviors1.i:423: 
   function f_123_comp_disj_2345_comp, behavior b3: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:423: 
@@ -261,17 +261,17 @@
 [eva:progress] 
   computing for function f_123_comp_disj_2345_comp <- 
                           test_123_comp_disj_2345_comp <- main.
-  Called from behaviors1.i:424.
+  Called from behaviors1.i:424:22-53.
 [eva:progress] Done for function f_123_comp_disj_2345_comp
 [eva:progress] Recording results for test_123_comp_disj_2345_comp
 [eva:progress] Done for function test_123_comp_disj_2345_comp
 [eva:progress] 
   computing for function test_123_disj_2345_comp_disj <- main.
-  Called from behaviors1.i:645.
+  Called from behaviors1.i:645:3-33.
 [eva:progress] 
   computing for function f_123_disj_2345_comp_disj <- 
                           test_123_disj_2345_comp_disj <- main.
-  Called from behaviors1.i:432.
+  Called from behaviors1.i:432:22-53.
 [eva] using specification for function f_123_disj_2345_comp_disj
 [eva] behaviors1.i:432: 
   function f_123_disj_2345_comp_disj, behavior b2: assumes got status invalid; behavior not evaluated.
@@ -283,7 +283,7 @@
 [eva:progress] 
   computing for function f_123_disj_2345_comp_disj <- 
                           test_123_disj_2345_comp_disj <- main.
-  Called from behaviors1.i:433.
+  Called from behaviors1.i:433:22-53.
 [eva] behaviors1.i:433: 
   function f_123_disj_2345_comp_disj, behavior b2: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:433: 
@@ -292,7 +292,7 @@
 [eva:progress] 
   computing for function f_123_disj_2345_comp_disj <- 
                           test_123_disj_2345_comp_disj <- main.
-  Called from behaviors1.i:434.
+  Called from behaviors1.i:434:22-53.
 [eva] behaviors1.i:434: 
   function f_123_disj_2345_comp_disj, behavior b3: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:434: 
@@ -301,17 +301,17 @@
 [eva:progress] 
   computing for function f_123_disj_2345_comp_disj <- 
                           test_123_disj_2345_comp_disj <- main.
-  Called from behaviors1.i:435.
+  Called from behaviors1.i:435:22-53.
 [eva:progress] Done for function f_123_disj_2345_comp_disj
 [eva:progress] Recording results for test_123_disj_2345_comp_disj
 [eva:progress] Done for function test_123_disj_2345_comp_disj
 [eva:progress] 
   computing for function test_123_comp_2345_comp_disj <- main.
-  Called from behaviors1.i:646.
+  Called from behaviors1.i:646:3-33.
 [eva:progress] 
   computing for function f_123_comp_2345_comp_disj <- 
                           test_123_comp_2345_comp_disj <- main.
-  Called from behaviors1.i:443.
+  Called from behaviors1.i:443:22-53.
 [eva] using specification for function f_123_comp_2345_comp_disj
 [eva] behaviors1.i:443: 
   function f_123_comp_2345_comp_disj, behavior b2: assumes got status invalid; behavior not evaluated.
@@ -323,7 +323,7 @@
 [eva:progress] 
   computing for function f_123_comp_2345_comp_disj <- 
                           test_123_comp_2345_comp_disj <- main.
-  Called from behaviors1.i:444.
+  Called from behaviors1.i:444:22-53.
 [eva] behaviors1.i:444: 
   function f_123_comp_2345_comp_disj, behavior b2: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:444: 
@@ -332,7 +332,7 @@
 [eva:progress] 
   computing for function f_123_comp_2345_comp_disj <- 
                           test_123_comp_2345_comp_disj <- main.
-  Called from behaviors1.i:445.
+  Called from behaviors1.i:445:22-53.
 [eva] behaviors1.i:445: 
   function f_123_comp_2345_comp_disj, behavior b3: assumes got status invalid; behavior not evaluated.
 [eva] behaviors1.i:445: 
@@ -341,16 +341,16 @@
 [eva:progress] 
   computing for function f_123_comp_2345_comp_disj <- 
                           test_123_comp_2345_comp_disj <- main.
-  Called from behaviors1.i:446.
+  Called from behaviors1.i:446:22-53.
 [eva:progress] Done for function f_123_comp_2345_comp_disj
 [eva:progress] Recording results for test_123_comp_2345_comp_disj
 [eva:progress] Done for function test_123_comp_2345_comp_disj
 [eva:progress] 
   computing for function test_assigns <- main.
-  Called from behaviors1.i:647.
+  Called from behaviors1.i:647:3-17.
 [eva:progress] 
   computing for function f <- test_assigns <- main.
-  Called from behaviors1.i:473.
+  Called from behaviors1.i:473:14-23.
 [eva] using specification for function f
 [eva:garbled-mix:assigns] behaviors1.i:473: 
   The specification of function f has generated a garbled mix of addresses
@@ -362,7 +362,7 @@
   (tmp from f(& a, & b))
 [eva:progress] 
   computing for function f <- test_assigns <- main.
-  Called from behaviors1.i:474.
+  Called from behaviors1.i:474:14-22.
 [eva:garbled-mix:assigns] behaviors1.i:474: 
   The specification of function f has generated a garbled mix of addresses
   for assigns clause \result.
@@ -373,7 +373,7 @@
   (tmp_0 from f((int *)0, & b))
 [eva:progress] 
   computing for function f <- test_assigns <- main.
-  Called from behaviors1.i:475.
+  Called from behaviors1.i:475:14-21.
 [eva:progress] Done for function f
 [eva:alarm] behaviors1.i:475: Warning: 
   unaligned pointer creation.
@@ -383,10 +383,10 @@
 [eva:progress] Done for function test_assigns
 [eva:progress] 
   computing for function test_assigns2 <- main.
-  Called from behaviors1.i:648.
+  Called from behaviors1.i:648:3-18.
 [eva:progress] 
   computing for function f2 <- test_assigns2 <- main.
-  Called from behaviors1.i:490.
+  Called from behaviors1.i:490:3-11.
 [eva] using specification for function f2
 [eva:progress] behaviors1.i:490: function f2: precondition got status valid.
 [eva:progress] Done for function f2
@@ -394,13 +394,13 @@
 [eva:progress] Done for function test_assigns2
 [eva:progress] 
   computing for function test_small1 <- main.
-  Called from behaviors1.i:649.
+  Called from behaviors1.i:649:3-16.
 [kernel:annot:missing-spec] behaviors1.i:506: Warning: 
   Neither code nor explicit assigns for function f3, generating default
   clauses. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f3 <- test_small1 <- main.
-  Called from behaviors1.i:506.
+  Called from behaviors1.i:506:3-8.
 [eva] using specification for function f3
 [eva:alarm] behaviors1.i:506: Warning: 
   function f3: precondition got status unknown.
@@ -411,13 +411,13 @@
 [eva:progress] Done for function test_small1
 [eva:progress] 
   computing for function test_small2 <- main.
-  Called from behaviors1.i:650.
+  Called from behaviors1.i:650:3-16.
 [kernel:annot:missing-spec] behaviors1.i:521: Warning: 
   Neither code nor explicit assigns for function f4, generating default
   clauses. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f4 <- test_small2 <- main.
-  Called from behaviors1.i:521.
+  Called from behaviors1.i:521:3-8.
 [eva] using specification for function f4
 [eva:alarm] behaviors1.i:521: Warning: 
   function f4: precondition got status unknown.
@@ -432,39 +432,39 @@
 [eva:progress] Done for function test_small2
 [eva:progress] 
   computing for function test_small3 <- main.
-  Called from behaviors1.i:651.
+  Called from behaviors1.i:651:3-16.
 [kernel:annot:missing-spec] behaviors1.i:534: Warning: 
   Neither code nor explicit assigns for function f5, generating default
   clauses. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f5 <- test_small3 <- main.
-  Called from behaviors1.i:534.
+  Called from behaviors1.i:534:11-21.
 [eva] using specification for function f5
 [eva:progress] Done for function f5
 [eva:progress] Recording results for test_small3
 [eva:progress] Done for function test_small3
 [eva:progress] 
   computing for function test_small4 <- main.
-  Called from behaviors1.i:652.
+  Called from behaviors1.i:652:3-16.
 [kernel:annot:missing-spec] behaviors1.i:548: Warning: 
   Neither code nor explicit assigns for function f6, generating default
   clauses. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f6 <- test_small4 <- main.
-  Called from behaviors1.i:548.
+  Called from behaviors1.i:548:11-21.
 [eva] using specification for function f6
 [eva:progress] Done for function f6
 [eva:progress] Recording results for test_small4
 [eva:progress] Done for function test_small4
 [eva:progress] 
   computing for function test_small5 <- main.
-  Called from behaviors1.i:653.
+  Called from behaviors1.i:653:3-16.
 [kernel:annot:missing-spec] behaviors1.i:561: Warning: 
   Neither code nor explicit assigns for function f7, generating default
   clauses. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f7 <- test_small5 <- main.
-  Called from behaviors1.i:561.
+  Called from behaviors1.i:561:11-21.
 [eva] using specification for function f7
 [eva:alarm] behaviors1.i:561: Warning: 
   function f7: precondition got status unknown.
@@ -473,10 +473,10 @@
 [eva:progress] Done for function test_small5
 [eva:progress] 
   computing for function test_small6 <- main.
-  Called from behaviors1.i:654.
+  Called from behaviors1.i:654:3-16.
 [eva:progress] 
   computing for function f8 <- test_small6 <- main.
-  Called from behaviors1.i:576.
+  Called from behaviors1.i:576:12-18.
 [eva] using specification for function f8
 [eva:progress] behaviors1.i:576: function f8: precondition got status valid.
 [eva:progress] Done for function f8
@@ -484,10 +484,10 @@
 [eva:progress] Done for function test_small6
 [eva:progress] 
   computing for function test_small6_bis <- main.
-  Called from behaviors1.i:655.
+  Called from behaviors1.i:655:3-20.
 [eva:progress] 
   computing for function f8_bis <- test_small6_bis <- main.
-  Called from behaviors1.i:591.
+  Called from behaviors1.i:591:12-22.
 [eva] using specification for function f8_bis
 [eva:progress] behaviors1.i:591: function f8_bis: precondition got status valid.
 [eva:progress] Done for function f8_bis
@@ -495,10 +495,10 @@
 [eva:progress] Done for function test_small6_bis
 [eva:progress] 
   computing for function test_promote <- main.
-  Called from behaviors1.i:656.
+  Called from behaviors1.i:656:3-17.
 [eva:progress] 
   computing for function f9 <- test_promote <- main.
-  Called from behaviors1.i:609.
+  Called from behaviors1.i:609:11-21.
 [eva] using specification for function f9
 [eva:acsl:unsupported] behaviors1.i:601: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function length
@@ -509,10 +509,10 @@
 [eva:progress] Done for function test_promote
 [eva:progress] 
   computing for function test_narrow <- main.
-  Called from behaviors1.i:657.
+  Called from behaviors1.i:657:3-16.
 [eva:progress] 
   computing for function f10 <- test_narrow <- main.
-  Called from behaviors1.i:634.
+  Called from behaviors1.i:634:11-22.
 [eva] using specification for function f10
 [eva:acsl:unsupported] behaviors1.i:616: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function fl
@@ -529,10 +529,10 @@
 [eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    behaviors1.i:473: assigns clause on addresses
+    behaviors1.i:473:14-23: assigns clause on addresses
       (read in 1 statement, propagated through 2 statements)
       garbled mix of &{a}
-    behaviors1.i:474: assigns clause on addresses
+    behaviors1.i:474:14-22: assigns clause on addresses
       (read in 1 statement, propagated through 2 statements)
       garbled mix of &{b}
 [eva] ====== VALUES COMPUTED ======
@@ -573,9 +573,11 @@
   c4 ∈ {2; 3; 4; 5} or UNINITIALIZED
 [eva:final-states] Values at end of function test_assigns:
   p1 ∈
-    {{ garbled mix of &{a} (origin: Library function {behaviors1.i:473}) }}
+    {{ garbled mix of &{a}
+     (origin: Library function {behaviors1.i:473:14-23}) }}
   p2 ∈
-    {{ garbled mix of &{b} (origin: Library function {behaviors1.i:474}) }}
+    {{ garbled mix of &{b}
+     (origin: Library function {behaviors1.i:474:14-22}) }}
   p3 ∈ [0..4294967292],0%4
 [eva:final-states] Values at end of function test_assigns2:
   T[0..4] ∈ [--..--]

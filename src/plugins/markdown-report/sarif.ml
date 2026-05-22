@@ -99,7 +99,7 @@ module ArtifactLocation = struct
   let default = create ~uri:"" ()
 
   let of_loc loc =
-    let base, uri = Filepath.to_base_uri (fst loc).Filepos.pos_path in
+    let base, uri = Fileloc.path loc |> Filepath.to_base_uri in
     create ~uri ~base ()
 end
 
@@ -252,11 +252,11 @@ module Region = struct
 
   let of_loc loc =
     let (start, finish) = loc in
-    let startLine = start.Filepos.pos_lnum in
-    let startColumn = start.pos_cnum - start.pos_bol in
-    let endLine = finish.Filepos.pos_lnum in
-    let endColumn = finish.pos_cnum - finish.pos_bol in
-    let byteLength = finish.pos_cnum - start.pos_cnum in
+    let startLine = Filepos.line start in
+    let startColumn = Filepos.input_column start  in
+    let endLine = Filepos.line finish in
+    let endColumn = Filepos.input_column finish in
+    let byteLength = Filepos.input_offset finish - Filepos.input_offset start in
     create ~startLine ~startColumn ~endLine ~endColumn ~byteLength ()
 end
 

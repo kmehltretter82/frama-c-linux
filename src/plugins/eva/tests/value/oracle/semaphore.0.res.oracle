@@ -10,21 +10,21 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function V <- g.
-  Called from semaphore.i:31.
+  Called from semaphore.i:31:9-15.
 [eva] using specification for function V
 [eva:progress] Done for function V
 [eva:partition] semaphore.i:29: starting to merge loop iterations
 [eva:progress] 
   computing for function V <- g.
-  Called from semaphore.i:31.
+  Called from semaphore.i:31:9-15.
 [eva:progress] Done for function V
 [eva:progress] 
   computing for function V <- g.
-  Called from semaphore.i:31.
+  Called from semaphore.i:31:9-15.
 [eva:progress] Done for function V
 [eva:progress] 
   computing for function V <- g.
-  Called from semaphore.i:31.
+  Called from semaphore.i:31:9-15.
 [eva:progress] Done for function V
 [eva:partition] semaphore.i:28: starting to merge loop iterations
 [kernel:annot:missing-spec] semaphore.i:34: Warning: 
@@ -32,43 +32,43 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function P <- g.
-  Called from semaphore.i:34.
+  Called from semaphore.i:34:3-9.
 [eva] using specification for function P
 [eva:progress] Done for function P
 [eva:progress] 
   computing for function P <- g.
-  Called from semaphore.i:35.
+  Called from semaphore.i:35:3-9.
 [eva:progress] Done for function P
 [eva:progress] 
   computing for function V <- g.
-  Called from semaphore.i:37.
+  Called from semaphore.i:37:3-9.
 [eva:progress] Done for function V
 [eva:progress] 
   computing for function V <- g.
-  Called from semaphore.i:38.
+  Called from semaphore.i:38:3-9.
 [eva:progress] Done for function V
 [eva:progress] 
   computing for function f <- g.
-  Called from semaphore.i:40.
+  Called from semaphore.i:40:3-6.
 [eva:progress] 
   computing for function P <- f <- g.
-  Called from semaphore.i:14.
+  Called from semaphore.i:14:5-11.
 [eva:progress] Done for function P
 [eva:progress] 
   computing for function P <- f <- g.
-  Called from semaphore.i:16.
+  Called from semaphore.i:16:3-9.
 [eva:progress] Done for function P
 [eva:progress] 
   computing for function P <- f <- g.
-  Called from semaphore.i:17.
+  Called from semaphore.i:17:3-9.
 [eva:progress] Done for function P
 [eva:progress] 
   computing for function V <- f <- g.
-  Called from semaphore.i:19.
+  Called from semaphore.i:19:3-9.
 [eva:progress] Done for function V
 [eva:progress] 
   computing for function V <- f <- g.
-  Called from semaphore.i:20.
+  Called from semaphore.i:20:3-9.
 [eva:progress] Done for function V
 [eva:progress] Recording results for f
 [eva:progress] Done for function f

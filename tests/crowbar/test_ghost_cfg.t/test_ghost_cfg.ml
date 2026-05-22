@@ -3,7 +3,7 @@ open Cil_types
 (* just here to ensure we load the corresponding transformation. *)
 let _ = Ghost_cfg.transform_category
 
-let loc = Cil_datatype.Location.unknown
+let loc = Fileloc.unknown
 
 let report file_name s =
   let summary =
@@ -455,9 +455,9 @@ let gen_file =
        (env,
         { file with
           globals = [
-            GVarDecl (x,Cil_datatype.Location.unknown);
-            GVarDecl (y,Cil_datatype.Location.unknown);
-            GFun (f, Cil_datatype.Location.unknown)
+            GVarDecl (x,Fileloc.unknown);
+            GVarDecl (y,Fileloc.unknown);
+            GFun (f, Fileloc.unknown)
           ]
         }))
 

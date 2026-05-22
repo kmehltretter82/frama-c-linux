@@ -87,7 +87,7 @@ let dummy_edge = {
   edge_key = -1;
   edge_kinstr = Kglobal;
   edge_transition = Skip;
-  edge_loc = Cil_datatype.Location.unknown;
+  edge_loc = Fileloc.unknown;
 }
 
 (* --- Signatures --- *)
@@ -594,7 +594,7 @@ let stmt_loc stmt =
   Cil_datatype.Stmt.loc stmt
 
 let unknown_loc =
-  Cil_datatype.Location.unknown
+  Fileloc.unknown
 
 let first_loc block =
   let rec f = function

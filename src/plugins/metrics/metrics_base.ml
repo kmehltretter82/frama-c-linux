@@ -300,11 +300,11 @@ let json_of_entry_points m =
 
 let file_of_vinfodef fvinfo =
   let kf = Globals.Functions.get fvinfo in
-  let decl_loc1, _decl_loc2 =
+  let decl_loc =
     match kf.fundec with
     | Definition (_, loc) -> loc
     | Declaration (_, _, _, loc) -> loc
-  in decl_loc1.pos_path
+  in Fileloc.path decl_loc
 ;;
 
 let file_of_fundef (fun_dec: Cil_types.fundec) =
@@ -324,8 +324,8 @@ let kf_of_cabs_name sname =
 
 let get_filename fdef =
   match fdef with
-  | Cabs.FUNDEF(_, _, _, (loc1, _), _loc2) ->
-    loc1.Filepos.pos_path
+  | Cabs.FUNDEF(_, _, _, loc1, _loc2) ->
+    Fileloc.path loc1
   | _ -> assert false
 ;;
 

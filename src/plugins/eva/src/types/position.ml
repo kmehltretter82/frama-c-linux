@@ -33,7 +33,7 @@ struct
       Hashtbl.hash (Stmt.hash stmt, Callstack.hash cs)
     let pretty fmt (stmt,cs) =
       Format.fprintf fmt "%a <-@ %a"
-        Cil_datatype.Location.pretty (Stmt.loc stmt)
+        Fileloc.pretty (Stmt.loc stmt)
         Callstack.pretty cs
   end
 
@@ -49,7 +49,7 @@ struct
     Cil_types.Kstmt (fst lpos)
 
   let pretty_loc fmt lpos =
-    Printer.pp_location fmt (loc lpos)
+    Fileloc.pretty fmt (loc lpos)
 
   let kf (_stmt, cs) =
     Callstack.top_kf cs
@@ -141,7 +141,7 @@ let callstack pos =
   | Local lpos -> Some (Local.callstack lpos)
 
 let pretty_loc fmt pos =
-  Printer.pp_location fmt (loc pos)
+  Fileloc.pretty fmt (loc pos)
 
 let of_kinstr kinstr callstack =
   match kinstr with

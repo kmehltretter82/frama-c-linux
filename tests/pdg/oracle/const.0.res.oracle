@@ -11,14 +11,14 @@
     .M4 ∈ {{ &G3 }}
 [eva:progress] 
   computing for function F2 <- main.
-  Called from const.i:39.
+  Called from const.i:39:3-19.
 [eva:progress] Recording results for F2
 [from] Computing for function F2
 [from] Done for function F2
 [eva:progress] Done for function F2
 [eva:progress] 
   computing for function F1 <- main.
-  Called from const.i:41.
+  Called from const.i:41:3-19.
 [eva:progress] Recording results for F1
 [from] Computing for function F1
 [from] Done for function F1
@@ -58,10 +58,10 @@
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to F2 at const.i:39 (by main):
+[from] call to F2 at const.i:39:3-19 (by main):
   G1.M1 FROM G4; f2
   \result FROM \nothing
-[from] call to F1 at const.i:41 (by main):
+[from] call to F1 at const.i:41:3-19 (by main):
   G3.M2 FROM G2.M2; f1; G5
 [from] entry point:
   G1.M1 FROM G4

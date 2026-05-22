@@ -29,7 +29,7 @@ let main () =
                   p
                   ~hyps:[
                     Property.(
-                      ip_other "Blob" (OLGlob Cil_datatype.Location.unknown))]
+                      ip_other "Blob" (OLGlob Fileloc.unknown))]
                   Property_status.Dont_know;
                 Format.printf "%a@."
                   Property_status.pretty (Property_status.get p))

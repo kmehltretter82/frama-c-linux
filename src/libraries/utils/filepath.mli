@@ -254,10 +254,10 @@ val all_symbolic_dirs: unit -> (string * t) list
 (** Describes a position in a source file.
     @since 18.0-Argon *)
 type position = {
-  pos_path : t;   [@deprecated "use Filepos.pos_path instead."]
-  pos_lnum : int; [@deprecated "use Filepos.pos_lnum instead."]
-  pos_bol : int;  [@deprecated "use Filepos.pos_bol instead."]
-  pos_cnum : int; [@deprecated "use Filepos.pos_cnum instead."]
+  pos_path : t;   [@deprecated "use Filepos.path instead."]
+  pos_lnum : int; [@deprecated "use Filepos.line instead."]
+  pos_bol : int;  [@deprecated "use Filepos.offset - Filepos.input_column instead."]
+  pos_cnum : int; [@deprecated "use Filepos.offset instead."]
 }
 [@@deprecated "use Filepos.t instead"]
 

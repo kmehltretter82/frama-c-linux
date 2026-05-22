@@ -55,17 +55,17 @@ struct
         ])
 
   let to_json p =
-    let path = Filepath.to_string p.Filepos.pos_path in
+    let path = Filepos.path p |> Filepath.to_string in
     let file =
       if Server_parameters.has_relative_filepath ()
       then path
-      else (Filepath.to_string_abs p.pos_path)
+      else Filepos.path p |> Filepath.to_string_abs
     in
     `Assoc [
       "dir"  , `String (Filename.dirname path) ;
       "base" , `String (Filename.basename path) ;
       "file" , `String file ;
-      "line" , `Int p.Filepos.pos_lnum ;
+      "line" , `Int (Filepos.line p) ;
     ]
 
   let of_json js =
@@ -610,7 +610,7 @@ struct
   let () =
     let get (tag, _) =
       let pos = fst (Printer_tag.loc_of_localizable tag) in
-      if Filepos.(equal unknown pos) then None else Some pos
+      if Filepos.is_known pos then Some pos else None
     in
     States.option
       ~name:"sloc"
@@ -1063,7 +1063,7 @@ let () = Information.register
     ~title:"Source file location"
     begin fun fmt loc ->
       let pos = fst @@ Printer_tag.loc_of_localizable loc in
-      if Filepath.is_empty pos.pos_path then
+      if Filepath.is_empty (Filepos.path pos) then
         raise Not_found ;
       Filepos.pretty fmt pos
     end
@@ -1212,11 +1212,9 @@ let () = Server_parameters.Debug.add_hook_on_update
 
 let get_marker_at ~file ~line ~col =
   if file="" then None else
-    let pos_path = Filepath.of_string file in
-    let pos =
-      Filepos.{ pos_path; pos_lnum = line; pos_cnum = col; pos_bol = 0; }
-    in
-    Printer_tag.loc_to_localizable ~precise_col:true pos
+    let path = Filepath.of_string file in
+    let pos = Filepos.make ~path ~line ~column:col ~offset:0 () in
+    Printer_tag.pos_to_localizable ~precise_col:true pos
 
 let () =
   let descr =

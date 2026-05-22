@@ -35,22 +35,22 @@
 --- Properties of Function 'init'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion 'valid' (file clean_abort.i, line 32)
+[  Valid  ] Assertion 'valid' ("clean_abort.i", line 32, characters 21-28)
             by Eva.
-[    -    ] Assertion 'Eva,division_by_zero' (file clean_abort.i, line 28)
+[    -    ] Assertion 'Eva,division_by_zero' ("clean_abort.i", line 28, characters 21-22)
             tried with Eva.
-[    -    ] Assertion 'Eva,index_bound' (file clean_abort.i, line 30)
+[    -    ] Assertion 'Eva,index_bound' ("clean_abort.i", line 30, characters 9-10)
             tried with Eva.
-[    -    ] Assertion 'Eva,index_bound' (file clean_abort.i, line 31)
+[    -    ] Assertion 'Eva,index_bound' ("clean_abort.i", line 31, characters 21-22)
             tried with Eva.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'partial'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion 'valid' (file clean_abort.i, line 37)
+[  Valid  ] Assertion 'valid' ("clean_abort.i", line 37, characters 21-27)
             by Eva.
-[    -    ] Assertion 'Eva,division_by_zero' (file clean_abort.i, line 38)
+[    -    ] Assertion 'Eva,division_by_zero' ("clean_abort.i", line 38, characters 14-15)
             tried with Eva.
 
 --------------------------------------------------------------------------------

@@ -69,7 +69,7 @@
 [eva:progress] Done for function getsockname
 [eva:progress] 
   computing for function sendto <- main.
-  Called from socket_h.c:24.
+  Called from socket_h.c:24-25.
 [eva] using specification for function sendto
 [eva:progress] socket_h.c:24: 
   function sendto: precondition 'available_sockfd' got status valid.
@@ -86,7 +86,7 @@
 [eva:progress] Done for function sendto
 [eva:progress] 
   computing for function recvfrom <- main.
-  Called from socket_h.c:31.
+  Called from socket_h.c:31-33.
 [eva] using specification for function recvfrom
 [eva:progress] socket_h.c:31: 
   function recvfrom: precondition 'valid_sockfd' got status valid.

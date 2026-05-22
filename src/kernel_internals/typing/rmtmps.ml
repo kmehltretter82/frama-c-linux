@@ -145,7 +145,7 @@ let categorizePragmas ast =
         | _ ->
           Kernel.fatal ~current:true
             "Bad alias attribute at %a"
-            Cil_printer.pp_location (Current_loc.get ())
+            Fileloc.pretty (Current_loc.get ())
       end
     | _ ->
       ()
@@ -693,7 +693,7 @@ let labelsToKeep is_removable ll =
       let newlabel', rest' = loop newlabel rest in
       newlabel', (if keepl then l :: rest' else rest')
   in
-  loop ("", Label("", Cil_datatype.Location.unknown, false)) ll
+  loop ("", Label("", Fileloc.unknown, false)) ll
 
 class markUsedLabels is_removable (labelMap: (string, unit) Hashtbl.t) =
   let keep_label dest =

@@ -143,7 +143,7 @@ module Lemmas =
     end)
 
 module Axiomatics =
-  State_builder.Hashtbl(Datatype.String.Hashtbl)(Cil_datatype.Location)
+  State_builder.Hashtbl(Datatype.String.Hashtbl)(Fileloc)
     (struct
       let name = "Logic_env.Axiomatics"
       let dependencies = []
@@ -156,7 +156,7 @@ module ModuleOccurrence =
        (Datatype.Pair
           (Datatype.String) (* external loader name *)
           (Datatype.String))) (* external loader plugin *)
-    (Cil_datatype.Location)
+    (Fileloc)
 
 module Modules =
   State_builder.Hashtbl(Datatype.String.Hashtbl)(ModuleOccurrence)

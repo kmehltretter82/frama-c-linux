@@ -15,7 +15,7 @@
   nondet ∈ [--..--]
 [eva:progress] 
   computing for function f <- main.
-  Called from behavior_statuses.i:26.
+  Called from behavior_statuses.i:26:12-28.
 [eva] using specification for function f
 [kernel:prop-status:emit] 
   Call Preconditions emits status unknown for property requires
@@ -40,7 +40,7 @@
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- main.
-  Called from behavior_statuses.i:27.
+  Called from behavior_statuses.i:27:12-29.
 [eva:progress] behavior_statuses.i:27: 
   function f: precondition got status valid.
 [kernel:prop-status:emit] 

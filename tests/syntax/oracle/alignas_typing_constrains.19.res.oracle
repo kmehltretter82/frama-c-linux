@@ -1,7 +1,8 @@
 [kernel] Parsing alignas_typing_constrains.c (with preprocessing)
 [kernel] alignas_typing_constrains.c:208: 
   syntax error:
-  Location: line 208, between columns 25 and 26, before or at token: _Alignas
+  Location: "alignas_typing_constrains.c", line 208,
+            before or at token: _Alignas
   206   #ifdef ALIGNAS_FUNCTION_1
   207   // note: no smart message, we just check that it is not captured as an attribute
   208   void c17_6_7_5_2_c(int x) _Alignas(8)

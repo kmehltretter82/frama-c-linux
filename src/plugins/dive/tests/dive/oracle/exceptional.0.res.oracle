@@ -24,7 +24,7 @@
   signed overflow. assert (int)(a + x) + (int)c ≤ 2147483647;
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    exceptional.i:5: arithmetic operation on addresses
+    exceptional.i:5:19-61: arithmetic operation on addresses
       (read in 2 statements, propagated through 2 statements)
       garbled mix of &{i}
 [eva:summary] ====== ANALYSIS SUMMARY ======

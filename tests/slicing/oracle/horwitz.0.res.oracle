@@ -6,18 +6,18 @@
   
 [eva:progress] 
   computing for function A <- main.
-  Called from horwitz.i:27.
+  Called from horwitz.i:27:9-18.
 [eva:progress] 
   computing for function add <- A <- main.
-  Called from horwitz.i:18.
+  Called from horwitz.i:18:7-19.
 [eva:progress] Recording results for add
 [eva:progress] Done for function add
 [eva:progress] 
   computing for function incr <- A <- main.
-  Called from horwitz.i:19.
+  Called from horwitz.i:19:3-12.
 [eva:progress] 
   computing for function add <- incr <- A <- main.
-  Called from horwitz.i:15.
+  Called from horwitz.i:15:9-21.
 [eva:progress] Recording results for add
 [eva:progress] Done for function add
 [eva:progress] Recording results for incr
@@ -27,18 +27,18 @@
 [eva:partition] horwitz.i:26: starting to merge loop iterations
 [eva:progress] 
   computing for function A <- main.
-  Called from horwitz.i:27.
+  Called from horwitz.i:27:9-18.
 [eva:progress] 
   computing for function add <- A <- main.
-  Called from horwitz.i:18.
+  Called from horwitz.i:18:7-19.
 [eva:progress] Recording results for add
 [eva:progress] Done for function add
 [eva:progress] 
   computing for function incr <- A <- main.
-  Called from horwitz.i:19.
+  Called from horwitz.i:19:3-12.
 [eva:progress] 
   computing for function add <- incr <- A <- main.
-  Called from horwitz.i:15.
+  Called from horwitz.i:15:9-21.
 [eva:progress] Recording results for add
 [eva:progress] Done for function add
 [eva:progress] Recording results for incr
@@ -47,18 +47,18 @@
 [eva:progress] Done for function A
 [eva:progress] 
   computing for function A <- main.
-  Called from horwitz.i:27.
+  Called from horwitz.i:27:9-18.
 [eva:progress] 
   computing for function add <- A <- main.
-  Called from horwitz.i:18.
+  Called from horwitz.i:18:7-19.
 [eva:progress] Recording results for add
 [eva:progress] Done for function add
 [eva:progress] 
   computing for function incr <- A <- main.
-  Called from horwitz.i:19.
+  Called from horwitz.i:19:3-12.
 [eva:progress] 
   computing for function add <- incr <- A <- main.
-  Called from horwitz.i:15.
+  Called from horwitz.i:15:9-21.
 [eva:progress] Recording results for add
 [eva:progress] Done for function add
 [eva:progress] Recording results for incr
@@ -67,18 +67,18 @@
 [eva:progress] Done for function A
 [eva:progress] 
   computing for function A <- main.
-  Called from horwitz.i:27.
+  Called from horwitz.i:27:9-18.
 [eva:progress] 
   computing for function add <- A <- main.
-  Called from horwitz.i:18.
+  Called from horwitz.i:18:7-19.
 [eva:progress] Recording results for add
 [eva:progress] Done for function add
 [eva:progress] 
   computing for function incr <- A <- main.
-  Called from horwitz.i:19.
+  Called from horwitz.i:19:3-12.
 [eva:progress] 
   computing for function add <- incr <- A <- main.
-  Called from horwitz.i:15.
+  Called from horwitz.i:15:9-21.
 [eva:progress] Recording results for add
 [eva:progress] Done for function add
 [eva:progress] Recording results for incr
@@ -87,10 +87,10 @@
 [eva:progress] Done for function A
 [eva:progress] 
   computing for function A <- main.
-  Called from horwitz.i:27.
+  Called from horwitz.i:27:9-18.
 [eva:progress] 
   computing for function add <- A <- main.
-  Called from horwitz.i:18.
+  Called from horwitz.i:18:7-19.
 [eva:progress] Recording results for add
 [eva:progress] Done for function add
 [eva:progress] horwitz.i:19: Reusing old results for call to incr
@@ -98,10 +98,10 @@
 [eva:progress] Done for function A
 [eva:progress] 
   computing for function A <- main.
-  Called from horwitz.i:27.
+  Called from horwitz.i:27:9-18.
 [eva:progress] 
   computing for function add <- A <- main.
-  Called from horwitz.i:18.
+  Called from horwitz.i:18:7-19.
 [eva:alarm] horwitz.i:12: Warning: signed overflow. assert a + b ≤ 2147483647;
 [eva:progress] Recording results for add
 [eva:progress] Done for function add

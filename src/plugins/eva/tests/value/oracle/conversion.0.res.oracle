@@ -170,7 +170,7 @@
   v ∈ [--..--]
   x ∈ {{ (int)&x }}
   y ∈ [--..--]
-  f ∈ {{ garbled mix of &{x} (origin: Arithmetic {conversion.i:39}) }}
+  f ∈ {{ garbled mix of &{x} (origin: Arithmetic {conversion.i:39:7-19}) }}
   l ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva:show] conversion.i:45: 

@@ -15,12 +15,12 @@
   nondet ∈ [--..--]
 [eva:progress] 
   computing for function join_offsetmap <- main.
-  Called from merge_bits.i:39.
+  Called from merge_bits.i:39:3-20.
 [eva:progress] Recording results for join_offsetmap
 [eva:progress] Done for function join_offsetmap
 [eva:progress] 
   computing for function merge_bits <- main.
-  Called from merge_bits.i:40.
+  Called from merge_bits.i:40:3-16.
 [eva:show] merge_bits.i:28: Frama_C_show_each_F: {1}
 [eva:show] merge_bits.i:29: Frama_C_show_each_F: {16777216}
 [eva:show] merge_bits.i:30: Frama_C_show_each_F: {67305985}

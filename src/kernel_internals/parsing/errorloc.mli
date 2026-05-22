@@ -19,7 +19,7 @@
 
 val newline: unit -> unit  (** Call this function to announce a new line *)
 
-val currentLoc: unit -> Cil_datatype.Location.t
+val currentLoc: unit -> Fileloc.t
 
 (** This function is used especially when the preprocessor has
     generated linemarkers in the output that let us know the current
@@ -27,8 +27,7 @@ val currentLoc: unit -> Cil_datatype.Location.t
     -fworking-directory for GNU CPP). *)
 val setCurrentWorkingDirectory: Filepath.t -> unit
 
-val setCurrentFile: string -> unit
-val setCurrentLine: int -> unit
+val setCurrentLine: ?filename:string -> int -> unit
 
 (** Call this function to start parsing. *)
 val startParsing:
@@ -37,6 +36,15 @@ val startParsing:
 val finishParsing: unit -> unit (** Call this function to finish parsing and
                                     close the input channel *)
 
+(** Convert a {!Lexing.position} to a [Filepos.t] using the current parsing
+    context (taking {!setCurrentLine} into account).
+    @since Frama-C+dev *)
+val convert_pos: Lexing.position -> Filepos.t
+
+(** Convert a pair of {!Lexing.position} to a [Cil_types.location] using the
+    current parsing context (taking {!setCurrentLine} into account).
+    @since Frama-C+dev *)
+val convert_loc: Lexing.position * Lexing.position -> Cil_types.location
 
 (** prints the line(s) identified by the location, together with [ctx] lines
     of context before and after. [ctx] defaults to 2.
@@ -56,6 +64,7 @@ val pp_context_from_file:
 (** prints a readable description of a location
     @since 22.0-Titanium *)
 val pp_location: Format.formatter -> Cil_types.location -> unit
+[@@deprecated "Use Fileloc.pretty_long_range instead"]
 
 (** Emits the corresponding error message with some location information.
     If not given, [location] will be considered to be between the end of

@@ -8,7 +8,7 @@ zgrviewer tests/pdg/dyn_dpds_2.dot ;
 let get_zones str_data (stmt, kf) =
   let lval_term = Logic_parse_string.term_lval kf str_data in
   let lval = Logic_to_c.term_lval_to_lval lval_term in
-  let exp = Cil.new_exp ~loc:Cil_datatype.Location.unknown (Cil_types.Lval lval) in
+  let exp = Cil.new_exp ~loc:Fileloc.unknown (Cil_types.Lval lval) in
   Eva.Results.(before stmt |> expr_deps exp)
 
 let main _ =

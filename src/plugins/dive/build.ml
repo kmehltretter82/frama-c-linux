@@ -149,7 +149,7 @@ let update_node_values context node ?(lval=Node_kind.to_lval node.node_kind) rq 
 (* --- Locations handling --- *)
 
 let get_loc_filename loc =
-  Filepath.(to_string (fst loc).Filepos.pos_path)
+  Fileloc.path loc |> Filepath.to_string
 
 let is_foldable_type typ =
   match Ast_types.unroll_node typ with

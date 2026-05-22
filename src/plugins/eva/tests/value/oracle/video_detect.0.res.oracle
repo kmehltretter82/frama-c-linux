@@ -7,7 +7,7 @@
   G ∈ {0}
 [eva:progress] 
   computing for function detect_video <- main.
-  Called from video_detect.i:36.
+  Called from video_detect.i:36:9-27.
 [eva:progress] Recording results for detect_video
 [eva:progress] Done for function detect_video
 [eva:progress] Recording results for main

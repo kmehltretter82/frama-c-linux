@@ -9,7 +9,7 @@
   r ∈ {0}
 [eva:progress] 
   computing for function f <- main.
-  Called from null_lt_valid.i:27.
+  Called from null_lt_valid.i:27:5-8.
 [eva:alarm] null_lt_valid.i:5: Warning: 
   pointer comparison. assert \pointer_comparable((void *)p, (void *)(&(t[0])));
 [eva:alarm] null_lt_valid.i:6: Warning: out of bounds write. assert \valid(p);
@@ -19,14 +19,14 @@
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from null_lt_valid.i:30.
+  Called from null_lt_valid.i:30:5-8.
 [eva:alarm] null_lt_valid.i:11: Warning: 
   pointer comparison. assert \pointer_comparable((void *)q, (void *)(&t[22]));
 [eva:progress] Recording results for g
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function h <- main.
-  Called from null_lt_valid.i:33.
+  Called from null_lt_valid.i:33:5-8.
 [eva:alarm] null_lt_valid.i:19: Warning: 
   pointer comparison. assert \pointer_comparable((void *)r, (void *)(&t[22]));
 [eva:progress] Recording results for h

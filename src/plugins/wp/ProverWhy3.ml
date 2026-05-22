@@ -1113,11 +1113,12 @@ let add_model_trace (probes: Lang.F.term Probe.Map.t) cnv t =
     let create_id (p:Probe.t) ty =
       let attr = Ident.create_model_trace_attr (string_of_int p.id) in
       let attrs = Ident.Sattr.singleton attr in
-      let loc = match p.loc with
-          (Filepos.{pos_path;pos_lnum=l1;pos_cnum=c1},
-           {pos_lnum=l2;pos_cnum=c2}) ->
-          Why3.Loc.user_position
-            (Filepath.to_string pos_path) l1 c1 l2 c2
+      let loc =
+        let (pos1,pos2) = p.loc in
+        let path = Filepos.path pos1 |> Filepath.to_string
+        and l1 = Filepos.line pos1 and c1 = Filepos.input_column pos1 - 1
+        and l2 = Filepos.line pos2 and c2 = Filepos.input_column pos2 - 1 in
+        Why3.Loc.user_position path l1 c1 l2 c2
       in Term.create_lsymbol (Ident.id_fresh ~loc ~attrs p.name) [] ty
     in
     let fold (p:Probe.t) (term:Lang.F.term) task =

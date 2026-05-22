@@ -10,73 +10,73 @@
   p ∈ {0}
 [eva:progress] 
   computing for function f <- main.
-  Called from callwise.i:39.
+  Called from callwise.i:39:3-12.
 [eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- main.
-  Called from callwise.i:40.
+  Called from callwise.i:40:3-12.
 [eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function choose <- main.
-  Called from callwise.i:42.
+  Called from callwise.i:42:7-23.
 [eva:progress] Recording results for choose
 [from] Computing for function choose
 [from] Done for function choose
 [eva:progress] Done for function choose
 [eva:progress] 
   computing for function choose <- main.
-  Called from callwise.i:43.
+  Called from callwise.i:43:8-24.
 [eva:progress] Recording results for choose
 [from] Computing for function choose
 [from] Done for function choose
 [eva:progress] Done for function choose
 [eva:progress] 
   computing for function fs163_main <- main.
-  Called from callwise.i:45.
+  Called from callwise.i:45:8-23.
 [eva:progress] 
   computing for function fs163_f <- fs163_main <- main.
-  Called from callwise.i:24.
+  Called from callwise.i:24:3-18.
 [eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva:progress] Done for function fs163_f
 [eva:progress] 
   computing for function fs163_f <- fs163_main <- main.
-  Called from callwise.i:25.
+  Called from callwise.i:25:3-18.
 [eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva:progress] Done for function fs163_f
 [eva:progress] 
   computing for function fs163_f <- fs163_main <- main.
-  Called from callwise.i:26.
+  Called from callwise.i:26:3-18.
 [eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva:progress] Done for function fs163_f
 [eva:progress] 
   computing for function fs163_f <- fs163_main <- main.
-  Called from callwise.i:27.
+  Called from callwise.i:27:3-21.
 [eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva:progress] Done for function fs163_f
 [eva:progress] 
   computing for function fs163_f <- fs163_main <- main.
-  Called from callwise.i:28.
+  Called from callwise.i:28:3-21.
 [eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva:progress] Done for function fs163_f
 [eva:progress] 
   computing for function fs163_f <- fs163_main <- main.
-  Called from callwise.i:30.
+  Called from callwise.i:30:5-22.
 [eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
@@ -84,28 +84,28 @@
 [eva:partition] callwise.i:29: starting to merge loop iterations
 [eva:progress] 
   computing for function fs163_f <- fs163_main <- main.
-  Called from callwise.i:30.
+  Called from callwise.i:30:5-22.
 [eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva:progress] Done for function fs163_f
 [eva:progress] 
   computing for function fs163_f <- fs163_main <- main.
-  Called from callwise.i:30.
+  Called from callwise.i:30:5-22.
 [eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva:progress] Done for function fs163_f
 [eva:progress] 
   computing for function fs163_f <- fs163_main <- main.
-  Called from callwise.i:30.
+  Called from callwise.i:30:5-22.
 [eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva:progress] Done for function fs163_f
 [eva:progress] 
   computing for function fs163_f <- fs163_main <- main.
-  Called from callwise.i:30.
+  Called from callwise.i:30:5-22.
 [eva:progress] Recording results for fs163_f
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
@@ -121,27 +121,27 @@
 [from] Done for function main
 [eva:progress] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to fs163_f at callwise.i:24 (by fs163_main):
+[from] call to fs163_f at callwise.i:24:3-18 (by fs163_main):
   A FROM p_0; n
-[from] call to fs163_f at callwise.i:25 (by fs163_main):
+[from] call to fs163_f at callwise.i:25:3-18 (by fs163_main):
   B FROM p_0; n
-[from] call to fs163_f at callwise.i:26 (by fs163_main):
+[from] call to fs163_f at callwise.i:26:3-18 (by fs163_main):
   C FROM p_0; n
-[from] call to fs163_f at callwise.i:27 (by fs163_main):
+[from] call to fs163_f at callwise.i:27:3-21 (by fs163_main):
   T[0] FROM p_0; n
-[from] call to fs163_f at callwise.i:28 (by fs163_main):
+[from] call to fs163_f at callwise.i:28:3-21 (by fs163_main):
   T[1] FROM p_0; n
-[from] call to fs163_f at callwise.i:30 (by fs163_main):
+[from] call to fs163_f at callwise.i:30:5-22 (by fs163_main):
   T[0..4] FROM p_0; n (and SELF)
-[from] call to f at callwise.i:39 (by main):
+[from] call to f at callwise.i:39:3-12 (by main):
   a FROM a; b; p_0; q
-[from] call to f at callwise.i:40 (by main):
+[from] call to f at callwise.i:40:3-12 (by main):
   c FROM c; d; p_0; q
-[from] call to choose at callwise.i:42 (by main):
+[from] call to choose at callwise.i:42:7-23 (by main):
   \result FROM cond; y
-[from] call to choose at callwise.i:43 (by main):
+[from] call to choose at callwise.i:43:8-24 (by main):
   \result FROM cond; x
-[from] call to fs163_main at callwise.i:45 (by main):
+[from] call to fs163_main at callwise.i:45:8-23 (by main):
   \result FROM \nothing
 [from] entry point:
   a FROM a; b

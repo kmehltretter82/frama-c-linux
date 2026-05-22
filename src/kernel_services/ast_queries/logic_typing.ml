@@ -1819,7 +1819,7 @@ struct
       try
         let _ =
           implicit_conversion
-            ~overloaded:true Cil_datatype.Location.unknown t t1 t2
+            ~overloaded:true Fileloc.unknown t t1 t2
         in true
       with Not_applicable -> false
     in
@@ -4689,7 +4689,7 @@ struct
       let change oldloc =
         C.error loc
           "Duplicated axiomatics %s (first occurrence at %a)"
-          id Cil_printer.pp_location oldloc in
+          id Fileloc.pretty oldloc in
       ignore (Logic_env.Axiomatics.memo ~change (fun _ -> loc) id);
       let l = List.filter_map (decl ~context:InAxiomatic) decls in
       Some (Daxiomatic(id,l,[],loc))
@@ -4706,7 +4706,7 @@ struct
       let change (_,oldloc) =
         C.error loc
           "Duplicated module %s (first occurrence at %a)"
-          id Cil_printer.pp_location oldloc in
+          id Fileloc.pretty oldloc in
       ignore (Logic_env.Modules.memo ~change (fun _ -> (None,loc)) name);
       push_imports () ;
       add_import ~current:true name ;
@@ -4725,13 +4725,13 @@ struct
         | None, oldloc ->
           C.error loc
             "Module %s already defined (at %a)"
-            id Cil_printer.pp_location oldloc
+            id Fileloc.pretty oldloc
         | Some (name', plugin'), oldloc ->
           if plugin <> plugin' || name <> name' then
             C.error loc
               "Module %s already imported with loader \\%s::%s (at %a)"
               id plugin' name'
-              Cil_printer.pp_location oldloc
+              Fileloc.pretty oldloc
           else None
         | exception Not_found ->
           let decls = ref [] in
@@ -4772,7 +4772,7 @@ struct
         C.error loc "%a %s is already registered as %a (%a)"
           Cil_printer.pp_lemma_kind kind name
           Cil_printer.pp_lemma_kind old_kind
-          Cil_printer.pp_location old_loc
+          Fileloc.pretty old_loc
       end;
       let labels,env = global_annot_env loc labels poly in
       let p = Logic_const.toplevel_predicate ~kind (predicate env e) in

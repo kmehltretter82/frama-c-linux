@@ -4,7 +4,7 @@
   makeGlobalVarinfo isadef=true vi.vname=x(21), vreferenced=false
 [kernel:typing:global] x not in the env already
 [kernel:typing:global] first definition for x(21)
-[kernel:typing:global] Definition of f at issue-1337-goto-debug.i:7
+[kernel:typing:global] Definition of f at issue-1337-goto-debug.i:7:6-7
 [kernel:typing:global] 
   makeGlobalVarinfo isadef=true vi.vname=f(22), vreferenced=false
 [kernel:typing:global] f not in the env already

@@ -414,7 +414,7 @@ let object_to = function
   | C_comp comp -> Cil_const.mk_tcomp comp
   | C_array { arr_element = elt ; arr_flat = None } -> Cil_const.mk_tarray elt None
   | C_array { arr_element = elt ; arr_flat = Some { arr_size = size } } ->
-    let size = Some (Cil.integer ~loc:Location.unknown size) in
+    let size = Some (Cil.integer ~loc:Fileloc.unknown size) in
     Cil_const.mk_tarray elt size
 
 (* -------------------------------------------------------------------------- *)

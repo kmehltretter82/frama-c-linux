@@ -18,10 +18,9 @@ module Printer_extension(X: Printer.PrinterClass) = struct
     inherit X.printer () as super
 
     method! global fmt g =
-      let loc, _ = Cil_datatype.Global.loc g in
-      let file = loc.Filepos.pos_path in
-      if file = Filepath.empty ||
-         List.exists (fun s -> s = file) (Kernel.Files.get ()) ||
+      let path = Cil_datatype.Global.loc g |> Fileloc.path in
+      if Filepath.is_empty path ||
+         List.exists (Filepath.equal path) (Kernel.Files.get ()) ||
          is_generated g
       then super#global fmt g
 

@@ -9,14 +9,14 @@
   function locks0_good: precondition got status unknown.
 [eva:progress] 
   computing for function acquire_lock <- locks0_good.
-  Called from lock.i:52.
+  Called from lock.i:52:5-25.
 [eva] using specification for function acquire_lock
 [eva:alarm] lock.i:52: Warning: 
   function acquire_lock: precondition got status unknown.
 [eva:progress] Done for function acquire_lock
 [eva:progress] 
   computing for function release_lock <- locks0_good.
-  Called from lock.i:53.
+  Called from lock.i:53:5-25.
 [eva] using specification for function release_lock
 [eva:alarm] lock.i:53: Warning: 
   function release_lock: precondition got status unknown.

@@ -206,12 +206,12 @@ let json_of_source = function
   | Some pos ->
     let file =
       if R.AbsolutePath.get ()
-      then Filepath.to_string_abs pos.Filepos.pos_path
-      else Filepath.to_string_rel pos.pos_path
+      then Filepos.path pos |> Filepath.to_string_abs
+      else Filepos.path pos |> Filepath.to_string_rel
     in
     [
       "file" , Json.of_string file ;
-      "line" , Json.of_int pos.pos_lnum ;
+      "line" , Json.of_int (Filepos.line pos) ;
     ]
 
 let json_of_event e =

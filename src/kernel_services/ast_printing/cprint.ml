@@ -409,7 +409,7 @@ and print_statement fmt stat =
   let loc = Cabshelper.get_statementloc stat in
   let<> UpdatedCurrentLoc = loc in
   if Kernel.debug_atleast 2 then
-    fprintf fmt "@\n/* %a */@\n" Cil_printer.pp_location loc;
+    fprintf fmt "@\n/* %a */@\n" Fileloc.pretty loc;
   match stat.stmt_node with
   | NOP _ -> pp_print_string fmt ";"
   | COMPUTATION (exp,_) -> fprintf fmt "%a;" print_expression exp

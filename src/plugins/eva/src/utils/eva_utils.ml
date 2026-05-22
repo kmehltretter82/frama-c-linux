@@ -59,7 +59,7 @@ let register_new_var v typ =
     Globals.Vars.add_decl v
 
 let create_new_var ?alignas name typ =
-  let loc = Cil_datatype.Location.unknown in
+  let loc = Fileloc.unknown in
   let alignas = Option.map (Cil.integer ~loc) alignas in
   let vi = Cil.makeGlobalVar ~source:false ~temp:false ?alignas name typ in
   register_new_var vi typ;
@@ -115,7 +115,7 @@ module MemoLvalToExp =
 
 let lval_to_exp =
   MemoLvalToExp.memo
-    (fun lv -> Cil.new_exp ~loc:Cil_datatype.Location.unknown (Lval lv))
+    (fun lv -> Cil.new_exp ~loc:Fileloc.unknown (Lval lv))
 
 let rec height_expr expr =
   match expr.enode with

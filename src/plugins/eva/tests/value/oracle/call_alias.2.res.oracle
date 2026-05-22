@@ -13,7 +13,7 @@
   I ∈ {0}
 [eva:progress] 
   computing for function sum <- main2.
-  Called from call_alias.i:33.
+  Called from call_alias.i:33:7-15.
 [eva:progress] Recording results for sum
 [eva:progress] Done for function sum
 [eva:progress] Recording results for main2

@@ -11,16 +11,16 @@
   S ∈ {0}
 [eva:progress] 
   computing for function u <- main.
-  Called from local_variables.i:30.
+  Called from local_variables.i:30:5-8.
 [eva:progress] 
   computing for function w <- u <- main.
-  Called from local_variables.i:11.
+  Called from local_variables.i:11:10-21.
 [kernel:annot:missing-spec] local_variables.i:24: Warning: 
   Neither code nor specification for function unkn, generating default assigns.
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function unkn <- w <- u <- main.
-  Called from local_variables.i:24.
+  Called from local_variables.i:24:7-13.
 [eva] using specification for function unkn
 [eva:progress] Done for function unkn
 [eva:progress] Recording results for w
@@ -29,13 +29,13 @@
 [eva:progress] Done for function u
 [eva:progress] 
   computing for function v <- main.
-  Called from local_variables.i:31.
+  Called from local_variables.i:31:5-8.
 [eva:progress] 
   computing for function w <- v <- main.
-  Called from local_variables.i:18.
+  Called from local_variables.i:18:10-21.
 [eva:progress] 
   computing for function unkn <- w <- v <- main.
-  Called from local_variables.i:24.
+  Called from local_variables.i:24:7-13.
 [eva:progress] Done for function unkn
 [eva:progress] Recording results for w
 [eva:progress] Done for function w

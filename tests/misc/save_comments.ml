@@ -9,8 +9,8 @@ let find_comment () =
     "@[In project %s, searching for comments between %a and %a:@\n%a\
      @\nEnd of comments@."
     (Project.get_name (Project.current()))
-    Printer.pp_location loc1
-    Printer.pp_location loc2
+    Fileloc.pretty loc1
+    Fileloc.pretty loc2
     (Pretty_utils.pp_list ~sep:"@\n" Format.pp_print_string)
     (Cabshelper.Comments.get zone)
 

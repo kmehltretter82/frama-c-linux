@@ -37,7 +37,7 @@ module SortCalls = struct
   type t = stmt
   (* Sort first by original source code location, then by sid *)
   let compare s1 s2 =
-    let r = Cil_datatype.Location.compare
+    let r = Fileloc.compare
         (Cil_datatype.Stmt.loc s1) (Cil_datatype.Stmt.loc s2) in
     if r = 0
     then Cil_datatype.Stmt.compare s1 s2 (* This is not really stable, but no
@@ -99,7 +99,7 @@ let print_calldeps () =
     (fun fmt ->
        Format.fprintf fmt "@[call to %s at %a (by %a)%t:@]"
          f
-         Cil_datatype.Location.pretty (Cil_datatype.Stmt.loc s)
+         Fileloc.pretty (Cil_datatype.Stmt.loc s)
          Kernel_function.pretty caller
          (fun fmt ->
             if From_parameters.debug_atleast 1 then

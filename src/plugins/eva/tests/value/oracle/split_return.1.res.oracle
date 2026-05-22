@@ -23,20 +23,20 @@
   rand ∈ [--..--]
 [eva:progress] 
   computing for function main1 <- main.
-  Called from split_return.i:210.
+  Called from split_return.i:210:3-10.
 [eva:progress] 
   computing for function init <- main1 <- main.
-  Called from split_return.i:23.
+  Called from split_return.i:23:11-19.
 [eva] using specification for function init
 [eva:progress] Done for function init
 [eva:progress] Recording results for main1
 [eva:progress] Done for function main1
 [eva:progress] 
   computing for function main2 <- main.
-  Called from split_return.i:211.
+  Called from split_return.i:211:3-10.
 [eva:progress] 
   computing for function f2 <- main2 <- main.
-  Called from split_return.i:54.
+  Called from split_return.i:54:20-24.
 [eva:progress] Recording results for f2
 [eva:progress] Done for function f2
 [eva:show] split_return.i:55: Frama_C_show_each_f2: {5; 7}, {5}
@@ -48,10 +48,10 @@
 [eva:progress] Done for function main2
 [eva:progress] 
   computing for function main3 <- main.
-  Called from split_return.i:212.
+  Called from split_return.i:212:3-10.
 [eva:progress] 
   computing for function f3 <- main3 <- main.
-  Called from split_return.i:79.
+  Called from split_return.i:79:11-15.
 [eva:progress] Recording results for f3
 [eva:progress] Done for function f3
 [eva:show] split_return.i:80: Frama_C_show_each_f3: {7}, {5}
@@ -62,10 +62,10 @@
 [eva:progress] Done for function main3
 [eva:progress] 
   computing for function main4 <- main.
-  Called from split_return.i:213.
+  Called from split_return.i:213:3-10.
 [eva:progress] 
   computing for function f4 <- main4 <- main.
-  Called from split_return.i:100.
+  Called from split_return.i:100:11-15.
 [eva:progress] Recording results for f4
 [eva:progress] Done for function f4
 [eva:show] split_return.i:101: Frama_C_show_each_f4: {7}, {5}
@@ -76,10 +76,10 @@
 [eva:progress] Done for function main4
 [eva:progress] 
   computing for function main5 <- main.
-  Called from split_return.i:214.
+  Called from split_return.i:214:3-10.
 [eva:progress] 
   computing for function f5 <- main5 <- main.
-  Called from split_return.i:123.
+  Called from split_return.i:123:11-15.
 [eva:progress] Recording results for f5
 [eva:progress] Done for function f5
 [eva:show] split_return.i:124: Frama_C_show_each_f5: {7}, {5}
@@ -90,10 +90,10 @@
 [eva:progress] Done for function main5
 [eva:progress] 
   computing for function main6 <- main.
-  Called from split_return.i:215.
+  Called from split_return.i:215:3-10.
 [eva:progress] 
   computing for function f6 <- main6 <- main.
-  Called from split_return.i:141.
+  Called from split_return.i:141:15-19.
 [eva:alarm] split_return.i:136: Warning: assertion got status unknown.
 [eva] split_return.i:137: cannot properly split on \result == 0
 [eva:progress] Recording results for f6
@@ -102,10 +102,10 @@
 [eva:progress] Done for function main6
 [eva:progress] 
   computing for function main7 <- main.
-  Called from split_return.i:216.
+  Called from split_return.i:216:3-10.
 [eva:progress] 
   computing for function f7 <- main7 <- main.
-  Called from split_return.i:154.
+  Called from split_return.i:154:12-16.
 [eva:progress] Recording results for f7
 [eva:progress] Done for function f7
 [eva:show] split_return.i:159: Frama_C_show_each_NULL: {{ &v }}, {1}
@@ -114,10 +114,10 @@
 [eva:progress] Done for function main7
 [eva:progress] 
   computing for function main8 <- main.
-  Called from split_return.i:217.
+  Called from split_return.i:217:3-10.
 [eva:progress] 
   computing for function f8 <- main8 <- main.
-  Called from split_return.i:177.
+  Called from split_return.i:177:12-21.
 [eva:progress] Recording results for f8
 [eva:progress] Done for function f8
 [eva:show] split_return.i:178: Frama_C_show_each_then8: {4}, {{ &x }}
@@ -126,15 +126,15 @@
 [eva:progress] Done for function main8
 [eva:progress] 
   computing for function main9 <- main.
-  Called from split_return.i:218.
+  Called from split_return.i:218:3-10.
 [eva:progress] 
   computing for function uninit <- main9 <- main.
-  Called from split_return.i:205.
+  Called from split_return.i:205:11-19.
 [eva:progress] Recording results for uninit
 [eva:progress] Done for function uninit
 [eva:progress] 
   computing for function escaping <- main9 <- main.
-  Called from split_return.i:206.
+  Called from split_return.i:206:12-22.
 [eva:locals-escaping] split_return.i:198: Warning: 
   locals {x} escaping the scope of a block of escaping through p
 [eva:progress] Recording results for escaping
@@ -378,13 +378,13 @@
 --- Properties of Function 'init'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Post-condition (file split_return.i, line 18)
+[ Extern  ] Post-condition ("split_return.i", line 18, characters 11-58)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file split_return.i, line 16)
+[ Extern  ] Assigns ("split_return.i", line 16, characters 13-20)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file split_return.i, line 16)
+[ Extern  ] Froms ("split_return.i", line 16, characters 13-20)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file split_return.i, line 17)
+[ Extern  ] Froms ("split_return.i", line 17, characters 11-13)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -393,54 +393,54 @@
 --- Properties of Function 'main1'
 --------------------------------------------------------------------------------
 
-[  Dead   ] Assertion (file split_return.i, line 33)
+[  Dead   ] Assertion ("split_return.i", line 33, characters 16-22)
             Locally valid, but unreachable.
             By Eva because:
-             - Unreachable program point (file split_return.i, line 33)
-[Unreachable] Unreachable program point (file split_return.i, line 33)
+             - Unreachable program point ("split_return.i", line 33, character 23)
+[Unreachable] Unreachable program point ("split_return.i", line 33, character 23)
             by Eva.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main2'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file split_return.i, line 57)
+[  Valid  ] Assertion ("split_return.i", line 57, characters 16-23)
             by Eva.
-[  Valid  ] Assertion (file split_return.i, line 60)
+[  Valid  ] Assertion ("split_return.i", line 60, characters 16-23)
             by Eva.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main3'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file split_return.i, line 82)
+[  Valid  ] Assertion ("split_return.i", line 82, characters 16-23)
             by Eva.
-[  Valid  ] Assertion (file split_return.i, line 84)
+[  Valid  ] Assertion ("split_return.i", line 84, characters 16-23)
             by Eva.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main4'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file split_return.i, line 103)
+[  Valid  ] Assertion ("split_return.i", line 103, characters 16-23)
             by Eva.
-[  Valid  ] Assertion (file split_return.i, line 105)
+[  Valid  ] Assertion ("split_return.i", line 105, characters 16-23)
             by Eva.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'main5'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Assertion (file split_return.i, line 126)
+[  Valid  ] Assertion ("split_return.i", line 126, characters 16-23)
             by Eva.
-[  Valid  ] Assertion (file split_return.i, line 128)
+[  Valid  ] Assertion ("split_return.i", line 128, characters 16-23)
             by Eva.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'f6'
 --------------------------------------------------------------------------------
 
-[    -    ] Assertion (file split_return.i, line 136)
+[    -    ] Assertion ("split_return.i", line 136, characters 14-26)
             tried with Eva.
 
 --------------------------------------------------------------------------------

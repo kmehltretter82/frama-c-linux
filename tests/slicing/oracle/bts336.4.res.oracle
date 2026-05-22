@@ -7,14 +7,14 @@
   x5 ∈ {0}
 [eva:progress] 
   computing for function f <- main.
-  Called from bts336.i:20.
+  Called from bts336.i:20:12-16.
 [eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- main.
-  Called from bts336.i:21.
+  Called from bts336.i:21:12-16.
 [eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -24,10 +24,10 @@
 [from] Done for function main
 [eva:progress] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to f at bts336.i:20 (by main):
+[from] call to f at bts336.i:20:12-16 (by main):
   T[1] FROM T[1]; i
   \result FROM T[1]; i
-[from] call to f at bts336.i:21 (by main):
+[from] call to f at bts336.i:21:12-16 (by main):
   T[2] FROM T[2]; i
   \result FROM T[2]; i
 [from] entry point:

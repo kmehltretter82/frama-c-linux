@@ -2,7 +2,7 @@ open Cabs
 
 [@@@warning "-32-27"]
 
-let loc = Cil_datatype.Location.unknown
+let loc = Fileloc.unknown
 
 let gen_int_type =
   Crowbar.(choose [

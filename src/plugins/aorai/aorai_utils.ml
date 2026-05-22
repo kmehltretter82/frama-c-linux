@@ -12,7 +12,6 @@ open Logic_const
 open Logic_utils
 open Data_for_aorai
 open Cil_types
-open Cil_datatype
 open Automaton_ast
 open Bool3
 
@@ -300,7 +299,7 @@ let make_binop = Cil.mkBinOp_exn ~constfold:true
 
 (** Returns an int constant expression which represents the given int value. *)
 let mk_int_exp value =
-  Cil.new_exp ~loc:Cil_datatype.Location.unknown
+  Cil.new_exp ~loc:Fileloc.unknown
     (Const(CInt64(Z.of_int value,IInt,Some(string_of_int value))))
 
 (** This function rewrites a cross condition into an ACSL expression.
@@ -464,7 +463,7 @@ let get_bhv_aux_fct kf bhv =
   with
   | Some vi -> vi, false
   | None ->
-    let loc = Cil_datatype.Location.unknown in
+    let loc = Fileloc.unknown in
     let ovi = Kernel_function.get_vi kf in
     let vi = Cil_const.copy_with_new_vid ovi in
     vi.vname <- Data_for_aorai.get_fresh (ovi.vname ^ "_bhv_" ^ bhv.b_name);
@@ -548,7 +547,7 @@ let mk_behavior_call generated_kf kf bhv =
           Some (Var res, NoOffset),
           Var aux,
           List.map (fun x -> Cil.evar x) (Kernel_function.get_formals kf),
-          Cil_datatype.Location.unknown))
+          Fileloc.unknown))
   in
   (res, stmt,
    if generated then Cil_datatype.Varinfo.Set.singleton aux
@@ -728,13 +727,13 @@ let mk_global_c_enum_type_tagged name elements_l =
          { eiorig_name = e;
            einame = e;
            eival = mk_integer i;
-           eiloc = Location.unknown;
+           eiloc = Fileloc.unknown;
            eihost = einfo})
       elements_l
   in
   einfo.eitems <- l;
   set_usedinfo name einfo;
-  add_global (GEnumTag(einfo, Location.unknown));
+  add_global (GEnumTag(einfo, Fileloc.unknown));
   einfo
 
 let mk_global_c_enum_type name elements =
@@ -1072,7 +1071,7 @@ let mk_deterministic_lemma () =
     let prop = Logic_const.toplevel_predicate ~kind:Check prop in
     let name = state.Automaton_ast.name ^ "_deterministic_trans" in
     let lemma =
-      Dlemma (name, [label],[],prop,[],Cil_datatype.Location.unknown)
+      Dlemma (name, [label],[],prop,[],Fileloc.unknown)
     in
     Annotations.add_global Aorai_option.emitter lemma
   in
@@ -1097,7 +1096,7 @@ let make_enum_states () =
   enum
 
 let getInitialState () =
-  let loc = Cil_datatype.Location.unknown in
+  let loc = Fileloc.unknown in
   let states = fst (Data_for_aorai.getGraph()) in
   let s = List.find (fun x -> x.Automaton_ast.init = Bool3.True) states in
   Cil.new_exp ~loc (Const (CEnum (find_enum s.nums)))
@@ -1168,9 +1167,9 @@ let initGlobals root complete =
        Daxiomatic
          ("Aorai_pebble_axiomatic",
           List.map
-            (fun li -> Dfun_or_pred(li,Cil_datatype.Location.unknown)) l,
+            (fun li -> Dfun_or_pred(li,Fileloc.unknown)) l,
           [],
-          Cil_datatype.Location.unknown)
+          Fileloc.unknown)
      in
      Annotations.add_global Aorai_option.emitter annot);
   mk_global_comment "//* ";
@@ -2358,7 +2357,7 @@ let possible_states_preds state =
   Data_for_aorai.Aorai_state.Map.fold treat_one_state state []
 
 let update_to_pred ~start ~pre_state ~post_state location bindings =
-  let loc = Cil_datatype.Location.unknown in
+  let loc = Fileloc.unknown in
   let intv =
     Cil_datatype.Term.Map.fold
       (treat_val location) bindings Logic_const.pfalse

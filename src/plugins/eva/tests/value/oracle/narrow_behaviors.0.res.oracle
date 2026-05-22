@@ -6,7 +6,7 @@
   nondet ∈ [--..--]
 [eva:progress] 
   computing for function f1 <- main.
-  Called from narrow_behaviors.i:56.
+  Called from narrow_behaviors.i:56:14-18.
 [eva] using specification for function f1
 [eva:progress] Done for function f1
 [eva:show] narrow_behaviors.i:56: 
@@ -28,7 +28,7 @@
   ==END OF DUMP==
 [eva:progress] 
   computing for function f2 <- main.
-  Called from narrow_behaviors.i:57.
+  Called from narrow_behaviors.i:57:14-18.
 [eva] using specification for function f2
 [eva] narrow_behaviors.i:57: 
   function f2, behavior b: assumes got status invalid; behavior not evaluated.
@@ -37,7 +37,7 @@
 [eva:progress] Done for function f2
 [eva:progress] 
   computing for function f2 <- main.
-  Called from narrow_behaviors.i:57.
+  Called from narrow_behaviors.i:57:14-18.
 [eva:progress] Done for function f2
 [eva:show] narrow_behaviors.i:57: 
   Frama_C_dump_each:
@@ -72,7 +72,7 @@
 [eva:alarm] narrow_behaviors.i:61: Warning: assertion got status unknown.
 [eva:progress] 
   computing for function f1 <- main.
-  Called from narrow_behaviors.i:62.
+  Called from narrow_behaviors.i:62:15-19.
 [eva] narrow_behaviors.i:62: 
   function f1, behavior b: assumes got status invalid; behavior not evaluated.
 [eva] narrow_behaviors.i:62: 
@@ -80,7 +80,7 @@
 [eva:progress] Done for function f1
 [eva:progress] 
   computing for function f1 <- main.
-  Called from narrow_behaviors.i:62.
+  Called from narrow_behaviors.i:62:15-19.
 [eva] narrow_behaviors.i:62: 
   function f1, behavior a: assumes got status invalid; behavior not evaluated.
 [eva] narrow_behaviors.i:62: 
@@ -104,7 +104,7 @@
   ==END OF DUMP==
 [eva:progress] 
   computing for function f2 <- main.
-  Called from narrow_behaviors.i:63.
+  Called from narrow_behaviors.i:63:14-18.
 [eva] narrow_behaviors.i:63: 
   function f2, behavior b: assumes got status invalid; behavior not evaluated.
 [eva] narrow_behaviors.i:63: 
@@ -112,7 +112,7 @@
 [eva:progress] Done for function f2
 [eva:progress] 
   computing for function f2 <- main.
-  Called from narrow_behaviors.i:63.
+  Called from narrow_behaviors.i:63:14-18.
 [eva] narrow_behaviors.i:63: 
   function f2, behavior a: assumes got status invalid; behavior not evaluated.
 [eva] narrow_behaviors.i:63: 

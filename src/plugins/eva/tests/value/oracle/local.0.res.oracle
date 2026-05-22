@@ -11,7 +11,7 @@
   V ∈ {0}
 [eva:progress] 
   computing for function f <- main.
-  Called from local.i:33.
+  Called from local.i:33:7-10.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:locals-escaping] local.i:33: Warning: 
@@ -20,7 +20,7 @@
   locals {b} escaping the scope of f through \result<f>
 [eva:progress] 
   computing for function g <- main.
-  Called from local.i:34.
+  Called from local.i:34:7-10.
 [eva:progress] local.i:13: Reusing old results for call to f
 [eva:locals-escaping] local.i:13: Warning: 
   locals {a} escaping the scope of f through X
@@ -47,12 +47,12 @@
   ==END OF DUMP==
 [eva:progress] 
   computing for function h <- main.
-  Called from local.i:36.
+  Called from local.i:36:7-12.
 [eva:progress] Recording results for h
 [eva:progress] Done for function h
 [eva:progress] 
   computing for function i <- main.
-  Called from local.i:37.
+  Called from local.i:37:3-8.
 [eva:progress] Recording results for i
 [eva:progress] Done for function i
 [eva:progress] Recording results for main

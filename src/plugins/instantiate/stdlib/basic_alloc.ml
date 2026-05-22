@@ -75,7 +75,7 @@ let get_is_allocable loc =
 
 let pis_allocable ?loc size =
   let loc = match loc with
-    | None -> Cil_datatype.Location.unknown
+    | None -> Fileloc.unknown
     | Some l -> l
   in
   let is_allocable = get_is_allocable loc in

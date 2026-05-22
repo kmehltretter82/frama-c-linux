@@ -135,7 +135,7 @@ let kf_of_property ip =
 
 let loc_of_property kf ip =
   let loc = Property.location ip in
-  if Cil_datatype.Location.(equal loc unknown)
+  if Fileloc.(equal loc unknown)
   then Kernel_function.get_location kf
   else loc
 
@@ -163,10 +163,10 @@ let compute_information (kinstr, alarm_or_prop, contexts) =
 
 let print_information fmt { loc; kf; alarm; kind; text; status; contexts } =
   let pos = fst loc in
-  let file = pos.pos_path in
-  let dir = Filepath.(dirname file |> to_string_rel) in
-  let file = Filepath.basename file in
-  let lnum = pos.pos_lnum in
+  let path = Filepos.path pos in
+  let dir = Filepath.(dirname path |> to_string_rel) in
+  let file = Filepath.basename path in
+  let lnum = Filepos.line pos in
   let kf = Kernel_function.get_name kf in
   let alarm = if alarm then "Alarm" else "Property" in
   let status = Description.status_feedback status in

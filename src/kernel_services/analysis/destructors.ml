@@ -201,8 +201,8 @@ class vis flag = object(self)
         Kernel.abort
           "%a, cannot jump from %s statement \
            bypassing initialization of variable %a, declared at %a"
-          Printer.pp_location (Cil_datatype.Stmt.loc s) kind
-          Printer.pp_varinfo v Printer.pp_location v.vdecl
+          Fileloc.pretty (Cil_datatype.Stmt.loc s) kind
+          Printer.pp_varinfo v Fileloc.pretty v.vdecl
     in
     let check_def_domination kind b s v =
       if v.vdefined then begin

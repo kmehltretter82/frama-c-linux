@@ -20,7 +20,7 @@ let getident () =
   nextident := !nextident + 1;
   !nextident
 
-let cabslu = Cil_datatype.Location.unknown
+let cabslu = Fileloc.unknown
 
 module Comments =
 struct
@@ -54,7 +54,7 @@ struct
     Kernel.debug ~dkey:Kernel.dkey_comments
       "Searching for comments between positions %a and %a@."
       Filepos.pretty first Filepos.pretty last;
-    if Filepos.is_unknown first || Filepos.is_unknown last
+    if not (Filepos.is_known first) || not (Filepos.is_known last)
     then begin
       Kernel.debug ~dkey:Kernel.dkey_comments "skipping dummy position@.";
       []

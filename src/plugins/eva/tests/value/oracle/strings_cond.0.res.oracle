@@ -6,7 +6,7 @@
   
 [eva:progress] 
   computing for function foo <- main.
-  Called from strings_cond.i:8.
+  Called from strings_cond.i:8:3-13.
 [eva:show] strings_cond.i:3: 
   Frama_C_dump_each:
   # cvalue:

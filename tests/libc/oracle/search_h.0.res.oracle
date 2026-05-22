@@ -54,7 +54,7 @@
   out of bounds read. assert \valid_read((struct element **)node);
 [eva:progress] 
   computing for function fprintf_va_1 <- main_tdelete <- main.
-  Called from search_h.c:47.
+  Called from search_h.c:47-48.
 [eva] using specification for function fprintf
 [eva:progress] search_h.c:47: 
   function fprintf_va_1: precondition got status valid.
@@ -82,7 +82,7 @@
 [eva:progress] Done for function hcreate
 [eva:progress] 
   computing for function scanf_va_1 <- main_hsearch <- main.
-  Called from search_h.c:113.
+  Called from search_h.c:113-114.
 [eva] using specification for function scanf
 [eva:progress] search_h.c:113: 
   function scanf_va_1: precondition \valid(param1) got status valid.
@@ -102,7 +102,7 @@
 [eva:partition] search_h.c:113: starting to merge loop iterations
 [eva:progress] 
   computing for function scanf_va_1 <- main_hsearch <- main.
-  Called from search_h.c:113.
+  Called from search_h.c:113-114.
 [eva:progress] Done for function scanf_va_1
 [eva:progress] search_h.c:119: Call to builtin strlen
 [eva:progress] 
@@ -111,7 +111,7 @@
 [eva:progress] Done for function hsearch
 [eva:progress] 
   computing for function scanf_va_1 <- main_hsearch <- main.
-  Called from search_h.c:113.
+  Called from search_h.c:113-114.
 [eva:progress] Done for function scanf_va_1
 [eva:progress] search_h.c:119: Call to builtin strlen
 [eva:progress] 
@@ -120,7 +120,7 @@
 [eva:progress] Done for function hsearch
 [eva:progress] 
   computing for function scanf_va_1 <- main_hsearch <- main.
-  Called from search_h.c:113.
+  Called from search_h.c:113-114.
 [kernel:approximation] search_h.c:113: 
   more than 200(5000) locations to update in array. Approximating.
 [eva:progress] Done for function scanf_va_1
@@ -133,7 +133,7 @@
 [eva:progress] Done for function hsearch
 [eva:progress] 
   computing for function scanf_va_1 <- main_hsearch <- main.
-  Called from search_h.c:113.
+  Called from search_h.c:113-114.
 [eva:alarm] search_h.c:113: Warning: 
   function scanf_va_1: precondition \valid(param1) got status unknown.
 [eva:alarm] search_h.c:113: Warning: 
@@ -146,7 +146,7 @@
 [eva:progress] Done for function hsearch
 [eva:progress] 
   computing for function scanf_va_1 <- main_hsearch <- main.
-  Called from search_h.c:113.
+  Called from search_h.c:113-114.
 [eva:progress] Done for function scanf_va_1
 [eva:progress] search_h.c:119: Call to builtin strlen
 [eva:progress] 
@@ -168,7 +168,7 @@
   assert \aligned(found_item->data,alignof(struct info));
 [eva:progress] 
   computing for function printf_va_3 <- main_hsearch <- main.
-  Called from search_h.c:132.
+  Called from search_h.c:132-135.
 [eva] using specification for function printf
 [eva:alarm] search_h.c:132: Warning: 
   function printf_va_3: precondition valid_read_string(param0) got status unknown.
