@@ -969,7 +969,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
 and to_exp_il ?inplace t =
   let* {env} = M.read in
   let* () =
-    if Env.generate_rte env && not (Options.Interlang_force.get ())
+    if Env.generate_rte env
     then M.not_covered ~pre:"with RTE" Printer.pp_term t
     else M.return ()
   in
