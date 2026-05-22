@@ -16,7 +16,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function stop <- stop_f2.
-  Called from loops.i:89.
+  Called from loops.i:89:6-13.
 [eva] using specification for function stop
 [eva:progress] Done for function stop
 [eva:progress] Recording results for stop_f2

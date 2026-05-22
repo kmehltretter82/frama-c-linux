@@ -98,7 +98,7 @@ end = struct
       Format.fprintf fmt "%a from stmt %d at %a"
         Logic_label.pretty label
         from_stmt.sid
-        Printer.pp_location (Stmt.loc from_stmt)
+        Fileloc.pretty (Stmt.loc from_stmt)
     | None ->
       Format.fprintf fmt "%a"
         Logic_label.pretty label

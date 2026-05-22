@@ -292,7 +292,7 @@ let post_iteration analysis =
     if need_sync <> [] then begin
       let pp fmt (stmt, z) =
         Format.fprintf fmt "@[%a (for %a)@]"
-          Cil_datatype.Location.pretty (Cil_datatype.Stmt.loc stmt)
+          Fileloc.pretty (Cil_datatype.Stmt.loc stmt)
           Memory_zone.pretty z
       in
       Mt_self.result "Statements needing manual synchronisation@.%a"

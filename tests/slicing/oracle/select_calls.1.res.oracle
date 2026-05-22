@@ -11,7 +11,7 @@
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function nothing <- g.
-  Called from select_calls.i:42.
+  Called from select_calls.i:42:3-13.
 [eva] using specification for function nothing
 [eva:progress] Done for function nothing
 [eva:progress] Recording results for g

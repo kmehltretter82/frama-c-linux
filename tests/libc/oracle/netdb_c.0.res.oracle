@@ -150,7 +150,7 @@
 [eva:progress] Done for function exit
 [eva:progress] 
   computing for function socket <- main.
-  Called from netdb_c.c:46.
+  Called from netdb_c.c:46-47.
 [eva] using specification for function socket
 [eva:progress] Done for function socket
 [eva:progress] 

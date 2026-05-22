@@ -23,15 +23,15 @@
   S___fc_stdout[0..1] ∈ [--..--]
 [eva:progress] 
   computing for function main1 <- main.
-  Called from cast.i:73.
+  Called from cast.i:73:3-10.
 [eva:progress] 
   computing for function any_int_4 <- main1 <- main.
-  Called from cast.i:33.
+  Called from cast.i:33:5-16.
 [eva:progress] Recording results for any_int_4
 [eva:progress] Done for function any_int_4
 [eva:progress] 
   computing for function printf_va_1 <- main1 <- main.
-  Called from cast.i:46.
+  Called from cast.i:46:3-20.
 [eva] using specification for function printf
 [eva:alarm] cast.i:46: Warning: 
   function printf_va_1: precondition got status unknown.
@@ -40,29 +40,29 @@
 [eva:progress] Done for function main1
 [eva:progress] 
   computing for function main2 <- main.
-  Called from cast.i:74.
+  Called from cast.i:74:3-10.
 [eva:progress] 
   computing for function printf_va_2 <- main2 <- main.
-  Called from cast.i:67.
+  Called from cast.i:67:7-60.
 [eva:alarm] cast.i:67: Warning: 
   function printf_va_2: precondition got status unknown.
 [eva:progress] Done for function printf_va_2
 [eva:partition] cast.i:64: starting to merge loop iterations
 [eva:progress] 
   computing for function printf_va_2 <- main2 <- main.
-  Called from cast.i:67.
+  Called from cast.i:67:7-60.
 [eva:progress] Done for function printf_va_2
 [eva:progress] 
   computing for function printf_va_2 <- main2 <- main.
-  Called from cast.i:67.
+  Called from cast.i:67:7-60.
 [eva:progress] Done for function printf_va_2
 [eva:progress] 
   computing for function printf_va_2 <- main2 <- main.
-  Called from cast.i:67.
+  Called from cast.i:67:7-60.
 [eva:progress] Done for function printf_va_2
 [eva:progress] 
   computing for function printf_va_3 <- main2 <- main.
-  Called from cast.i:69.
+  Called from cast.i:69:3-58.
 [eva:alarm] cast.i:69: Warning: 
   function printf_va_3: precondition got status unknown.
 [eva:progress] Done for function printf_va_3

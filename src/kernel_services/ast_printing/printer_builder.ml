@@ -23,7 +23,6 @@ struct
   let without_annot f fmt x = (printer ())#without_annot f fmt x
   let force_brace f fmt x = (printer ())#force_brace f fmt x
   let pp_varname fmt x = pick Format.pp_print_string (printer ())#varname fmt x
-  let pp_location fmt x = pick Cil_types.pp_location (printer ())#location fmt x
   let pp_constant fmt x = pick Cil_types.pp_constant (printer ())#constant fmt x
   let pp_ikind fmt x = pick Cil_types.pp_ikind (printer ())#ikind fmt x
   let pp_fkind fmt x = pick Cil_types.pp_fkind (printer ())#fkind fmt x

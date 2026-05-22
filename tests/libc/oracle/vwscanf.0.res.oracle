@@ -420,7 +420,7 @@
 [eva:progress] 
   computing for function Frama_C_make_unknown <- __fc_v_wscanf <- vwscanf <- 
                           caller_stub_for_vwscanf <- main.
-  Called from FRAMAC_SHARE/libc/wchar.c:308.
+  Called from FRAMAC_SHARE/libc/wchar.c:308-309.
 [eva] using specification for function Frama_C_make_unknown
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:308: Warning: 
   function Frama_C_make_unknown: precondition 'valid_p' got status unknown.
@@ -444,7 +444,7 @@
 [eva:progress] 
   computing for function Frama_C_make_unknown_wchar <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
-  Called from FRAMAC_SHARE/libc/wchar.c:313.
+  Called from FRAMAC_SHARE/libc/wchar.c:313-314.
 [eva] using specification for function Frama_C_make_unknown_wchar
 [eva:alarm] FRAMAC_SHARE/libc/wchar.c:313: Warning: 
   function Frama_C_make_unknown_wchar: precondition 'valid_p' got status unknown.
@@ -642,7 +642,7 @@
 [eva:progress] 
   computing for function Frama_C_make_unknown <- __fc_v_wscanf <- vwscanf <- 
                           caller_stub_for_vwscanf <- main.
-  Called from FRAMAC_SHARE/libc/wchar.c:308.
+  Called from FRAMAC_SHARE/libc/wchar.c:308-309.
 [eva:progress] Done for function Frama_C_make_unknown
 [eva:progress] 
   computing for function Frama_C_size_t_interval <- __fc_v_wscanf <- 
@@ -652,7 +652,7 @@
 [eva:progress] 
   computing for function Frama_C_make_unknown_wchar <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
-  Called from FRAMAC_SHARE/libc/wchar.c:313.
+  Called from FRAMAC_SHARE/libc/wchar.c:313-314.
 [eva:progress] Done for function Frama_C_make_unknown_wchar
 [eva:progress] 
   computing for function Frama_C_interval <- __fc_v_wscanf <- vwscanf <- 
@@ -758,7 +758,7 @@
 [eva:progress] 
   computing for function Frama_C_make_unknown <- __fc_v_wscanf <- vwscanf <- 
                           caller_stub_for_vwscanf <- main.
-  Called from FRAMAC_SHARE/libc/wchar.c:308.
+  Called from FRAMAC_SHARE/libc/wchar.c:308-309.
 [eva:progress] Done for function Frama_C_make_unknown
 [eva:progress] 
   computing for function Frama_C_size_t_interval <- __fc_v_wscanf <- 
@@ -768,7 +768,7 @@
 [eva:progress] 
   computing for function Frama_C_make_unknown_wchar <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
-  Called from FRAMAC_SHARE/libc/wchar.c:313.
+  Called from FRAMAC_SHARE/libc/wchar.c:313-314.
 [eva:progress] Done for function Frama_C_make_unknown_wchar
 [eva:progress] 
   computing for function Frama_C_interval <- __fc_v_wscanf <- vwscanf <- 
@@ -874,7 +874,7 @@
 [eva:progress] 
   computing for function Frama_C_make_unknown <- __fc_v_wscanf <- vwscanf <- 
                           caller_stub_for_vwscanf <- main.
-  Called from FRAMAC_SHARE/libc/wchar.c:308.
+  Called from FRAMAC_SHARE/libc/wchar.c:308-309.
 [eva:progress] Done for function Frama_C_make_unknown
 [eva:progress] 
   computing for function Frama_C_size_t_interval <- __fc_v_wscanf <- 
@@ -884,7 +884,7 @@
 [eva:progress] 
   computing for function Frama_C_make_unknown_wchar <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
-  Called from FRAMAC_SHARE/libc/wchar.c:313.
+  Called from FRAMAC_SHARE/libc/wchar.c:313-314.
 [eva:progress] Done for function Frama_C_make_unknown_wchar
 [eva:progress] 
   computing for function Frama_C_interval <- __fc_v_wscanf <- vwscanf <- 
@@ -990,7 +990,7 @@
 [eva:progress] 
   computing for function Frama_C_make_unknown <- __fc_v_wscanf <- vwscanf <- 
                           caller_stub_for_vwscanf <- main.
-  Called from FRAMAC_SHARE/libc/wchar.c:308.
+  Called from FRAMAC_SHARE/libc/wchar.c:308-309.
 [eva:progress] Done for function Frama_C_make_unknown
 [eva:progress] 
   computing for function Frama_C_size_t_interval <- __fc_v_wscanf <- 
@@ -1000,7 +1000,7 @@
 [eva:progress] 
   computing for function Frama_C_make_unknown_wchar <- __fc_v_wscanf <- 
                           vwscanf <- caller_stub_for_vwscanf <- main.
-  Called from FRAMAC_SHARE/libc/wchar.c:313.
+  Called from FRAMAC_SHARE/libc/wchar.c:313-314.
 [eva:progress] Done for function Frama_C_make_unknown_wchar
 [eva:progress] Recording results for __fc_v_wscanf
 [eva:progress] Done for function __fc_v_wscanf

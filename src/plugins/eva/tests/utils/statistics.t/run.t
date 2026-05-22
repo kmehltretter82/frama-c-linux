@@ -38,12 +38,12 @@ Print statistics file.
   alarm-count			1
   analysis-time			<TIME>
   fun-coverage			1.
-  iterations	f	statistics.i:4	8
-  iterations	h	statistics.i:12	5
-  iterations	h	statistics.i:14	25
-  max-unrolling	h	statistics.i:12	4
-  max-unrolling	h	statistics.i:14	5
-  max-widenings	f	statistics.i:4	1
+  iterations	f	statistics.i:4-6	8
+  iterations	h	statistics.i:12-17	5
+  iterations	h	statistics.i:14-16	25
+  max-unrolling	h	statistics.i:12-17	4
+  max-unrolling	h	statistics.i:14-16	5
+  max-widenings	f	statistics.i:4-6	1
   memexec-hits	g		3
   memexec-misses	g		5
   memexec-misses	f		2

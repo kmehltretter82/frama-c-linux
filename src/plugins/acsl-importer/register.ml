@@ -57,7 +57,7 @@ let paste_fun_spec =
 
 let get_cfile kf =
   let glob = Kernel_function.get_global kf in
-  let file = (fst (Cil_datatype.Global.loc glob)).pos_path in
+  let file = Cil_datatype.(Global.loc glob |> Fileloc.path) in
   file
 
 let paste_fun_spec

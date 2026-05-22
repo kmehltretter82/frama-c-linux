@@ -26,7 +26,7 @@
 [eva:partition] precise_locations.i:34: starting to merge loop iterations
 [eva:progress] 
   computing for function ct <- main.
-  Called from precise_locations.i:39.
+  Called from precise_locations.i:39:20-24.
 [eva:progress] Recording results for ct
 [eva:progress] Done for function ct
 [eva:partition] precise_locations.i:38: starting to merge loop iterations
@@ -155,14 +155,14 @@
   ==END OF DUMP==
 [eva:progress] 
   computing for function f <- main.
-  Called from precise_locations.i:48.
+  Called from precise_locations.i:48:7-20.
 [eva] using specification for function f
 [eva:progress] precise_locations.i:48: 
   function f: precondition got status valid.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from precise_locations.i:49.
+  Called from precise_locations.i:49:7-22.
 [eva] using specification for function g
 [eva:progress] precise_locations.i:49: 
   function g: precondition got status valid.
@@ -170,54 +170,54 @@
 [eva:partition] precise_locations.i:45: starting to merge loop iterations
 [eva:progress] 
   computing for function f <- main.
-  Called from precise_locations.i:48.
+  Called from precise_locations.i:48:7-20.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from precise_locations.i:49.
+  Called from precise_locations.i:49:7-22.
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function f <- main.
-  Called from precise_locations.i:48.
+  Called from precise_locations.i:48:7-20.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from precise_locations.i:49.
+  Called from precise_locations.i:49:7-22.
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function f <- main.
-  Called from precise_locations.i:48.
+  Called from precise_locations.i:48:7-20.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from precise_locations.i:49.
+  Called from precise_locations.i:49:7-22.
 [eva:progress] Done for function g
 [eva:partition] precise_locations.i:44: starting to merge loop iterations
 [eva:progress] 
   computing for function f <- main.
-  Called from precise_locations.i:48.
+  Called from precise_locations.i:48:7-20.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from precise_locations.i:49.
+  Called from precise_locations.i:49:7-22.
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function f <- main.
-  Called from precise_locations.i:48.
+  Called from precise_locations.i:48:7-20.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from precise_locations.i:49.
+  Called from precise_locations.i:49:7-22.
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function f <- main.
-  Called from precise_locations.i:48.
+  Called from precise_locations.i:48:7-20.
 [eva:alarm] precise_locations.i:48: Warning: 
   function f: precondition got status unknown.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from precise_locations.i:49.
+  Called from precise_locations.i:49:7-22.
 [eva:alarm] precise_locations.i:49: Warning: 
   function g: precondition got status unknown.
 [eva:progress] Done for function g
@@ -394,7 +394,7 @@
 --- Properties of Function 'f'
 --------------------------------------------------------------------------------
 
-[    -    ] Pre-condition (file precise_locations.i, line 18)
+[    -    ] Pre-condition ("precise_locations.i", line 18, characters 14-22)
             tried with Call Preconditions.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
@@ -405,7 +405,7 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[    -    ] Pre-condition (file precise_locations.i, line 21)
+[    -    ] Pre-condition ("precise_locations.i", line 21, characters 14-22)
             tried with Call Preconditions.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
@@ -416,10 +416,10 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[    -    ] Instance of 'Pre-condition (file precise_locations.i, line 18)' at call 'f' (file precise_locations.i, line 48)
+[    -    ] Instance of 'Pre-condition ("precise_locations.i", line 18, characters 14-22)' at call 'f' ("precise_locations.i", line 48, characters 7-20)
 
             tried with Eva.
-[    -    ] Instance of 'Pre-condition (file precise_locations.i, line 21)' at call 'g' (file precise_locations.i, line 49)
+[    -    ] Instance of 'Pre-condition ("precise_locations.i", line 21, characters 14-22)' at call 'g' ("precise_locations.i", line 49, characters 7-22)
 
             tried with Eva.
 
@@ -552,7 +552,7 @@
   ==END OF DUMP==
 [eva:progress] 
   computing for function ct <- main.
-  Called from precise_locations.i:39.
+  Called from precise_locations.i:39:20-24.
 [eva:progress] Recording results for ct
 [eva:progress] Done for function ct
 [eva:progress] precise_locations.i:39: Reusing old results for call to ct
@@ -777,59 +777,59 @@
   ==END OF DUMP==
 [eva:progress] 
   computing for function f <- main.
-  Called from precise_locations.i:48.
+  Called from precise_locations.i:48:7-20.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from precise_locations.i:49.
+  Called from precise_locations.i:49:7-22.
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function f <- main.
-  Called from precise_locations.i:48.
+  Called from precise_locations.i:48:7-20.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from precise_locations.i:49.
+  Called from precise_locations.i:49:7-22.
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function f <- main.
-  Called from precise_locations.i:48.
+  Called from precise_locations.i:48:7-20.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from precise_locations.i:49.
+  Called from precise_locations.i:49:7-22.
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function f <- main.
-  Called from precise_locations.i:48.
+  Called from precise_locations.i:48:7-20.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from precise_locations.i:49.
+  Called from precise_locations.i:49:7-22.
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function f <- main.
-  Called from precise_locations.i:48.
+  Called from precise_locations.i:48:7-20.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from precise_locations.i:49.
+  Called from precise_locations.i:49:7-22.
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function f <- main.
-  Called from precise_locations.i:48.
+  Called from precise_locations.i:48:7-20.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from precise_locations.i:49.
+  Called from precise_locations.i:49:7-22.
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function f <- main.
-  Called from precise_locations.i:48.
+  Called from precise_locations.i:48:7-20.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g <- main.
-  Called from precise_locations.i:49.
+  Called from precise_locations.i:49:7-22.
 [eva:progress] Done for function g
 [eva:progress] Recording results for main
 [eva:progress] Done for function main
@@ -1198,7 +1198,7 @@
 --- Properties of Function 'f'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Pre-condition (file precise_locations.i, line 18)
+[  Valid  ] Pre-condition ("precise_locations.i", line 18, characters 14-22)
             by Call Preconditions.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
@@ -1209,7 +1209,7 @@
 --- Properties of Function 'g'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Pre-condition (file precise_locations.i, line 21)
+[  Valid  ] Pre-condition ("precise_locations.i", line 21, characters 14-22)
             by Call Preconditions.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
@@ -1220,10 +1220,10 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Instance of 'Pre-condition (file precise_locations.i, line 18)' at call 'f' (file precise_locations.i, line 48)
+[  Valid  ] Instance of 'Pre-condition ("precise_locations.i", line 18, characters 14-22)' at call 'f' ("precise_locations.i", line 48, characters 7-20)
 
             by Eva (v2).
-[  Valid  ] Instance of 'Pre-condition (file precise_locations.i, line 21)' at call 'g' (file precise_locations.i, line 49)
+[  Valid  ] Instance of 'Pre-condition ("precise_locations.i", line 21, characters 14-22)' at call 'g' ("precise_locations.i", line 49, characters 7-22)
 
             by Eva (v2).
 

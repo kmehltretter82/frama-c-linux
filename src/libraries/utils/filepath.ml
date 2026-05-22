@@ -124,7 +124,7 @@ let to_string p =
   if is_special_stdout p then
     "<stdout>"
   else if is_empty p then
-    "<unknown location>"
+    "<unknown>"
   else
     match to_base_uri p with
     | Absolute, uri -> uri

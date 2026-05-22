@@ -24,7 +24,7 @@
 [kernel:attrs:unknown] attributes-declarations-definitions.c:21: Warning: 
   Ignoring unknown attribute: arg4
 [kernel] attributes-declarations-definitions.c:21: Warning: 
-  found two contracts (old location: attributes-declarations-definitions.c:13). Merging them
+  found two contracts (old location: attributes-declarations-definitions.c:13-18). Merging them
 [kernel:attrs:unknown] attributes-declarations-definitions.c:23: Warning: 
   Ignoring unknown attribute: tret5
 [kernel:attrs:unknown] attributes-declarations-definitions.c:23: Warning: 

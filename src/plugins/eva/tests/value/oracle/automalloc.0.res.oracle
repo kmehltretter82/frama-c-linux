@@ -9,7 +9,7 @@
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function malloc <- main.
-  Called from automalloc.i:14.
+  Called from automalloc.i:14:26-48.
 [eva] using specification for function malloc
 [eva:progress] Done for function malloc
 [kernel:annot:missing-spec] automalloc.i:15: Warning: 
@@ -17,7 +17,7 @@
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function realloc <- main.
-  Called from automalloc.i:15.
+  Called from automalloc.i:15:21-50.
 [eva] using specification for function realloc
 [eva:progress] Done for function realloc
 [eva:alarm] automalloc.i:17: Warning: 

@@ -8,10 +8,10 @@
   r2 ∈ {0}
 [eva:progress] 
   computing for function g1 <- main.
-  Called from depend4.i:27.
+  Called from depend4.i:27:3-7.
 [eva:progress] 
   computing for function aux <- g1 <- main.
-  Called from depend4.i:19.
+  Called from depend4.i:19:3-13.
 [eva:progress] Recording results for aux
 [from] Computing for function aux
 [from] Done for function aux
@@ -22,17 +22,17 @@
 [eva:progress] Done for function g1
 [eva:progress] 
   computing for function f <- main.
-  Called from depend4.i:29.
+  Called from depend4.i:29:4-7.
 [eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g2 <- main.
-  Called from depend4.i:30.
+  Called from depend4.i:30:3-7.
 [eva:progress] 
   computing for function aux <- g2 <- main.
-  Called from depend4.i:23.
+  Called from depend4.i:23:3-13.
 [eva:progress] Recording results for aux
 [from] Computing for function aux
 [from] Done for function aux
@@ -46,15 +46,15 @@
 [from] Done for function main
 [eva:progress] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to aux at depend4.i:19 (by g1):
+[from] call to aux at depend4.i:19:3-13 (by g1):
   r2 FROM a; p; cond
-[from] call to aux at depend4.i:23 (by g2):
+[from] call to aux at depend4.i:23:3-13 (by g2):
   r1 FROM a; p; cond
-[from] call to g1 at depend4.i:27 (by main):
+[from] call to g1 at depend4.i:27:3-7 (by main):
   r2 FROM a
-[from] call to f at depend4.i:29 (by main):
+[from] call to f at depend4.i:29:4-7 (by main):
   a FROM \nothing
-[from] call to g2 at depend4.i:30 (by main):
+[from] call to g2 at depend4.i:30:3-7 (by main):
   r1 FROM a
 [from] entry point:
   a FROM \nothing
@@ -71,6 +71,6 @@
 [pdg] computing for function aux
 [pdg] done for function aux
 [impact] impacted statements of stmt(s) 18 are:
-    depend4.i:13 (sid 6): r1 = *p;depend4.i:15 (sid 7): r2 = *p;
-    depend4.i:23 (sid 13): aux(& a,1);depend4.i:30 (sid 19): g2();
+    depend4.i:13:10-12 (sid 6): r1 = *p;depend4.i:15:10-12 (sid 7): r2 = *p;
+    depend4.i:23:3-13 (sid 13): aux(& a,1);depend4.i:30:3-7 (sid 19): g2();
 [impact] analysis done

@@ -68,8 +68,8 @@ struct
     Jrecord [ "offset", Jnumber ; "length", Jnumber ]
 
   let to_json (loc : t) =
-    let offset = (fst loc).pos_cnum in
-    let length = (snd loc).pos_cnum - offset in
+    let offset = Filepos.input_offset (fst loc) in
+    let length = Filepos.input_offset (snd loc) - offset in
     `Assoc [ "offset", `Int offset ; "length", `Int length ]
 
   let of_json _ =
@@ -207,14 +207,14 @@ let set_initial_position dest_lexbuf src_pos =
 
 let parse_string s =
   let open Current_loc.Operators in
-  let pos_path = Filepath.of_string "<user-string>" in
+  let path = Filepath.of_string "<user-string>" in
   let s = String.cat s "\n" in
-  let pos_cnum = String.length s in
-  let pos_lnum =
+  let column = String.length s in
+  let line =
     let i = ref 0 in
     String.iter (function '\n' -> incr i | _ -> ()) s ; !i in
-  let pbeg = { Filepos.unknown with pos_path ; pos_cnum = 0 } in
-  let pend = { Filepos.unknown with pos_path ; pos_cnum ; pos_lnum } in
+  let pbeg = Filepos.make ~path ~line:0 ~column:0 ~offset:0 () in
+  let pend = Filepos.make ~path ~line ~column ~offset:0 () in
   let lb = Lexing.from_string s in
   let get_loc () =
     Filepos.of_lexing_pos @@ Lexing.lexeme_start_p lb,
@@ -494,9 +494,9 @@ struct
 
   let equal_alternatives l1 l2 = List.equal equal_alternative l1 l2
 
-  let error = error ~loc:Cil_datatype.Location.unknown
-  let ignored = ignored ~loc:Cil_datatype.Location.unknown
-  let valid = valid ~loc:Cil_datatype.Location.unknown
+  let error = error ~loc:Fileloc.unknown
+  let ignored = ignored ~loc:Fileloc.unknown
+  let valid = valid ~loc:Fileloc.unknown
 
   let debug ?node content () =
     let res = debug ?node content () in

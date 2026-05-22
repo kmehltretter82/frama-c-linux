@@ -6,7 +6,7 @@
   t[0..99] ∈ {0}
 [eva:progress] 
   computing for function f <- main.
-  Called from array_struct.i:18.
+  Called from array_struct.i:18:3-7.
 [eva:alarm] array_struct.i:13: Warning: 
   accessing out of bounds index. assert 0 ≤ c;
 [eva:alarm] array_struct.i:13: Warning: 
@@ -15,7 +15,7 @@
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- main.
-  Called from array_struct.i:19.
+  Called from array_struct.i:19:3-7.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:progress] Recording results for main

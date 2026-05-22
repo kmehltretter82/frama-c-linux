@@ -29,7 +29,7 @@ struct
   include Datatype.Undefined
   let name = "WP.Conditions.Probe.t"
   let reprs = [{
-      loc = Cil_datatype.Location.unknown; stmt = None; name = ""; id=1
+      loc = Fileloc.unknown; stmt = None; name = ""; id=1
     }]
   type t = probe
   let hash x = x.id

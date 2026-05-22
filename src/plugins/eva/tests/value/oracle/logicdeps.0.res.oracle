@@ -11,10 +11,10 @@
 [eva:alarm] logicdeps.i:20: Warning: assertion got status unknown.
 [eva:progress] 
   computing for function g <- main.
-  Called from logicdeps.i:23.
+  Called from logicdeps.i:23:3-6.
 [eva:progress] 
   computing for function f <- g <- main.
-  Called from logicdeps.i:13.
+  Called from logicdeps.i:13:3-6.
 [eva] using specification for function f
 [eva:progress] Done for function f
 [eva:progress] Recording results for g
@@ -23,10 +23,10 @@
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function g <- main.
-  Called from logicdeps.i:24.
+  Called from logicdeps.i:24:3-6.
 [eva:progress] 
   computing for function f <- g <- main.
-  Called from logicdeps.i:13.
+  Called from logicdeps.i:13:3-6.
 [eva:progress] Done for function f
 [eva:progress] Recording results for g
 [from] Computing for function g
@@ -36,10 +36,10 @@
 [eva:progress] logicdeps.i:27: assertion got status valid.
 [eva:progress] 
   computing for function g <- main.
-  Called from logicdeps.i:30.
+  Called from logicdeps.i:30:3-6.
 [eva:progress] 
   computing for function f <- g <- main.
-  Called from logicdeps.i:13.
+  Called from logicdeps.i:13:3-6.
 [eva:progress] Done for function f
 [eva:progress] Recording results for g
 [from] Computing for function g
@@ -47,10 +47,10 @@
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function g <- main.
-  Called from logicdeps.i:31.
+  Called from logicdeps.i:31:3-6.
 [eva:progress] 
   computing for function f <- g <- main.
-  Called from logicdeps.i:13.
+  Called from logicdeps.i:13:3-6.
 [eva:progress] Done for function f
 [eva:progress] Recording results for g
 [from] Computing for function g
@@ -72,24 +72,24 @@
    [41..49] ∈ {0}
   p ∈ {{ &z }}
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to f at logicdeps.i:13 (by g):
+[from] call to f at logicdeps.i:13:3-6 (by g):
   t[20..40] FROM t[0..20] (and SELF)
-[from] call to g at logicdeps.i:23 (by main):
+[from] call to g at logicdeps.i:23:3-6 (by main):
   t[20] FROM t[0..10]
    [21..30] FROM t[0..10] (and SELF)
-[from] call to g at logicdeps.i:24 (by main):
+[from] call to g at logicdeps.i:24:3-6 (by main):
   t[20] FROM t[0..10]
    [21..30] FROM t[0..10] (and SELF)
-[from] call to g at logicdeps.i:25 (by main):
+[from] call to g at logicdeps.i:25:3-6 (by main):
   t[20] FROM t[0..10]
    [21..30] FROM t[0..10] (and SELF)
-[from] call to g at logicdeps.i:30 (by main):
+[from] call to g at logicdeps.i:30:3-6 (by main):
   t{[20]; [36..40]} FROM t[0..20] (and SELF)
    [21..35] FROM t[0..20]
-[from] call to g at logicdeps.i:31 (by main):
+[from] call to g at logicdeps.i:31:3-6 (by main):
   t{[20]; [36..40]} FROM t[0..20] (and SELF)
    [21..35] FROM t[0..20]
-[from] call to g at logicdeps.i:32 (by main):
+[from] call to g at logicdeps.i:32:3-6 (by main):
   t{[20]; [36..40]} FROM t[0..20] (and SELF)
    [21..35] FROM t[0..20]
 [from] entry point:

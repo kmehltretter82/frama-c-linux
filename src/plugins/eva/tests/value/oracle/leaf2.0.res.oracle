@@ -13,7 +13,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f <- main.
-  Called from leaf2.i:6.
+  Called from leaf2.i:6:7-30.
 [eva] using specification for function f
 [eva:garbled-mix:assigns] leaf2.i:6: 
   The specification of function f has generated a garbled mix of addresses
@@ -25,13 +25,13 @@
 [eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    leaf2.i:6: assigns clause on addresses
+    leaf2.i:6:7-30: assigns clause on addresses
       (read in 2 statements, propagated through 2 statements)
       garbled mix of &{I}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  G ∈ {{ garbled mix of &{I} (origin: Library function {leaf2.i:6}) }}
-  H ∈ {{ garbled mix of &{I} (origin: Library function {leaf2.i:6}) }}
+  G ∈ {{ garbled mix of &{I} (origin: Library function {leaf2.i:6:7-30}) }}
+  H ∈ {{ garbled mix of &{I} (origin: Library function {leaf2.i:6:7-30}) }}
 [from] Computing for function main
 [from] Computing for function f <-main
 [from] Done for function f

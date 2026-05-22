@@ -3,10 +3,10 @@
 ---
 > [eva:progress] 
 >   computing for function g <- main.
->   Called from logicdeps.i:25.
+>   Called from logicdeps.i:25:3-6.
 > [eva:progress] 
 >   computing for function f <- g <- main.
->   Called from logicdeps.i:13.
+>   Called from logicdeps.i:13:3-6.
 > [eva:progress] Done for function f
 > [eva:progress] Recording results for g
 > [from] Computing for function g
@@ -17,10 +17,10 @@
 ---
 > [eva:progress] 
 >   computing for function g <- main.
->   Called from logicdeps.i:32.
+>   Called from logicdeps.i:32:3-6.
 > [eva:progress] 
 >   computing for function f <- g <- main.
->   Called from logicdeps.i:13.
+>   Called from logicdeps.i:13:3-6.
 > [eva:progress] Done for function f
 > [eva:progress] Recording results for g
 > [from] Computing for function g

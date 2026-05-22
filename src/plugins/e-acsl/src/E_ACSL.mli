@@ -15,8 +15,8 @@ module Options: sig
 end
 
 module Error: sig
-  exception Typing_error of Cil_datatype.Location.t * Options.category option * string
-  exception Not_yet of Cil_datatype.Location.t * Options.category option * string
+  exception Typing_error of Fileloc.t * Options.category option * string
+  exception Not_yet of Fileloc.t * Options.category option * string
 end
 
 module Translate_terms: sig

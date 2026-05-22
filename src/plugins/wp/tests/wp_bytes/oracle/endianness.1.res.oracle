@@ -6,7 +6,7 @@
   Function cast_from_bytes_to_unsigned
 ------------------------------------------------------------
 
-Goal Check 'big' (file endianness.i, line 33):
+Goal Check 'big' ("endianness.i", line 33, characters 21-51):
 Let a = global(L_array_1131).
 Let a_1 = shift_uint8(a, 0).
 Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
@@ -66,7 +66,7 @@ Prove: x_13 = 1234605616436508552.
 
 ------------------------------------------------------------
 
-Goal Check 'big' (file endianness.i, line 34):
+Goal Check 'big' ("endianness.i", line 34, characters 22-43):
 Let a = global(L_array_1131).
 Let a_1 = shift_uint8(a, 0).
 Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
@@ -126,7 +126,7 @@ Prove: x_11 = 287454020.
 
 ------------------------------------------------------------
 
-Goal Check 'big' (file endianness.i, line 35):
+Goal Check 'big' ("endianness.i", line 35, characters 22-43):
 Let a = global(L_array_1131).
 Let a_1 = shift_uint8(a, 0).
 Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
@@ -186,7 +186,7 @@ Prove: x_9 = 1432778632.
 
 ------------------------------------------------------------
 
-Goal Check 'big' (file endianness.i, line 36):
+Goal Check 'big' ("endianness.i", line 36, characters 22-37):
 Let a = global(L_array_1131).
 Let a_1 = shift_uint8(a, 0).
 Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
@@ -246,7 +246,7 @@ Prove: x_7 = 4386.
 
 ------------------------------------------------------------
 
-Goal Check 'big' (file endianness.i, line 37):
+Goal Check 'big' ("endianness.i", line 37, characters 22-37):
 Let a = global(L_array_1131).
 Let a_1 = shift_uint8(a, 0).
 Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
@@ -306,7 +306,7 @@ Prove: x_5 = 13124.
 
 ------------------------------------------------------------
 
-Goal Check 'big' (file endianness.i, line 38):
+Goal Check 'big' ("endianness.i", line 38, characters 22-37):
 Let a = global(L_array_1131).
 Let a_1 = shift_uint8(a, 0).
 Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
@@ -366,7 +366,7 @@ Prove: x_3 = 21862.
 
 ------------------------------------------------------------
 
-Goal Check 'big' (file endianness.i, line 39):
+Goal Check 'big' ("endianness.i", line 39, characters 22-37):
 Let a = global(L_array_1131).
 Let a_1 = shift_uint8(a, 0).
 Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).

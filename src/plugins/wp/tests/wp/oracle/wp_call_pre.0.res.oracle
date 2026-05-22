@@ -11,7 +11,7 @@
   Function call_main
 ------------------------------------------------------------
 
-Goal Instance of 'Pre-condition 'qed_ok,Rmain' in 'main'' in 'call_main' at call 'main' (file wp_call_pre.c, line 42)
+Goal Instance of 'Pre-condition 'qed_ok,Rmain' in 'main'' in 'call_main' at call 'main' ("wp_call_pre.c", line 42)
 :
 Prove: true.
 

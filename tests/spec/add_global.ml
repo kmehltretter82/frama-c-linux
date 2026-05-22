@@ -16,13 +16,13 @@ class vis prj =
              [ Dlemma(
                    "myaxiom", [], [],
                    Logic_const.(toplevel_predicate ~kind:Admit ptrue),
-                   [], Cil_datatype.Location.unknown)],
-             [], Cil_datatype.Location.unknown)
+                   [], Fileloc.unknown)],
+             [], Fileloc.unknown)
         in
         Queue.add (fun () -> Annotations.add_global emitter ax)
           self#get_filling_actions;
         Cil.ChangeDoChildrenPost
-          ([ GAnnot(ax, Cil_datatype.Location.unknown); g ], fun x -> x)
+          ([ GAnnot(ax, Fileloc.unknown); g ], fun x -> x)
       | _ -> Cil.DoChildren
 
   end

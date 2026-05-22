@@ -315,7 +315,7 @@ let exn_obj_name = "exn_obj"
 
 (* enumeration for all possible exceptions *)
 let generate_exn_enum exns =
-  let loc = Cil_datatype.Location.unknown in
+  let loc = Fileloc.unknown in
   let v = ref 0 in
   let info =
     { eorig_name = "__fc_exn_enum";
@@ -343,7 +343,7 @@ let generate_exn_enum exns =
 
 (* discriminated union (i.e. struct + union) for all possible exceptions. *)
 let generate_exn_union e exns =
-  let loc = Cil_datatype.Location.unknown in
+  let loc = Fileloc.unknown in
   let create_union_fields _ =
     let add_one_field t acc = (get_type_tag t, t, None, None, [], loc) :: acc in
     Some (Cil_datatype.Typ.Set.fold add_one_field exns [])
@@ -548,7 +548,7 @@ class erase_exn =
     method! vfile f =
       let exns = all_exn () in
       if not (Cil_datatype.Typ.Set.is_empty exns) then begin
-        let loc = Cil_datatype.Location.unknown in
+        let loc = Fileloc.unknown in
         let e = generate_exn_enum exns in
         let u,s = generate_exn_union e exns in
         let exn =

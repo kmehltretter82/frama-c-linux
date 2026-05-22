@@ -8,7 +8,7 @@
 [eva:progress] copy_visitor.i:22: assertion got status valid.
 [eva:progress] 
   computing for function f <- main.
-  Called from copy_visitor.i:23.
+  Called from copy_visitor.i:23:3-8.
 [eva:progress] copy_visitor.i:23: function f: precondition got status valid.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f

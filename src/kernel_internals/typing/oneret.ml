@@ -183,7 +183,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
   let hasRet = match Ast_types.unroll_node retTyp with TVoid -> false | _ -> true in
 
   (* Memoize the return result variable. Use only if hasRet *)
-  let lastloc = ref Cil_datatype.Location.unknown in
+  let lastloc = ref Fileloc.unknown in
   let getRetVar =
     let retVar : varinfo option ref = ref None in
     fun loc ->
@@ -195,7 +195,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
         retVar := Some rv;
         rv
       | Some rv ->
-        if rv.vdecl = Cil_datatype.Location.unknown then
+        if rv.vdecl = Fileloc.unknown then
           rv.vdecl <- loc;
         rv
   in
@@ -204,7 +204,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
       inherit Cil.nopCilVisitor
       method! vterm_lhost = function
         | TResult _ ->
-          let v = getRetVar Cil_datatype.Location.unknown in
+          let v = getRetVar Fileloc.unknown in
           ChangeTo (TVar (Cil.cvar_to_lvar v))
         | TMem _ | TVar _ -> DoChildren
     end

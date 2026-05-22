@@ -21,33 +21,33 @@
   u_main4[0..99] ∈ {0}
 [eva:progress] 
   computing for function main1 <- main.
-  Called from assigns.i:110.
+  Called from assigns.i:110:3-10.
 [eva:progress] 
   computing for function F1 <- main1 <- main.
-  Called from assigns.i:46.
+  Called from assigns.i:46:3-8.
 [eva] using specification for function F1
 [eva:progress] Done for function F1
 [eva:progress] 
   computing for function f <- main1 <- main.
-  Called from assigns.i:49.
+  Called from assigns.i:49:5-23.
 [eva] using specification for function f
 [eva:progress] Done for function f
 [eva:partition] assigns.i:48: starting to merge loop iterations
 [eva:progress] 
   computing for function f <- main1 <- main.
-  Called from assigns.i:49.
+  Called from assigns.i:49:5-23.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- main1 <- main.
-  Called from assigns.i:49.
+  Called from assigns.i:49:5-23.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- main1 <- main.
-  Called from assigns.i:49.
+  Called from assigns.i:49:5-23.
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- main1 <- main.
-  Called from assigns.i:49.
+  Called from assigns.i:49:5-23.
 [eva:progress] Done for function f
 [eva:alarm] assigns.i:51: Warning: 
   pointer downcast. assert (unsigned int)(&T) ≤ 2147483647;
@@ -60,7 +60,7 @@
   because of arithmetic operation on addresses.
 [eva:progress] 
   computing for function g <- main1 <- main.
-  Called from assigns.i:51.
+  Called from assigns.i:51:3-20.
 [eva] using specification for function g
 [eva:progress] Done for function g
 [eva:alarm] assigns.i:52: Warning: 
@@ -76,21 +76,21 @@
   Assigning imprecise value to p because of arithmetic operation on addresses.
 [eva:progress] 
   computing for function h <- main1 <- main.
-  Called from assigns.i:52.
+  Called from assigns.i:52:3-28.
 [eva] using specification for function h
 [eva:progress] Done for function h
 [eva:alarm] assigns.i:54: Warning: 
   unaligned pointer creation. assert \aligned(&T[9],alignof(int));
 [eva:progress] 
   computing for function j <- main1 <- main.
-  Called from assigns.i:54.
+  Called from assigns.i:54:3-17.
 [eva] using specification for function j
 [eva:acsl:unsupported] assigns.i:32: 
   Cannot evaluate range bound foo(*p) (unsupported ACSL construct: logic function foo). Approximating.
 [eva:progress] Done for function j
 [eva:progress] 
   computing for function assigns_post <- main1 <- main.
-  Called from assigns.i:56.
+  Called from assigns.i:56:3-19.
 [eva] using specification for function assigns_post
 [eva:assigns:missing] assigns.i:39: Warning: 
   no \from part for clause
@@ -110,17 +110,17 @@
 [eva:progress] Done for function main1
 [eva:progress] 
   computing for function main2 <- main.
-  Called from assigns.i:111.
+  Called from assigns.i:111:3-10.
 [eva:progress] 
   computing for function ff1 <- main2 <- main.
-  Called from assigns.i:76.
+  Called from assigns.i:76:11-16.
 [eva] using specification for function ff1
 [eva:assigns:missing-result] assigns.i:60: Warning: 
   no 'assigns \result \from ...' clause specified for function ff1
 [eva:progress] Done for function ff1
 [eva:progress] 
   computing for function ff3 <- main2 <- main.
-  Called from assigns.i:78.
+  Called from assigns.i:78:3-8.
 [eva] using specification for function ff3
 [eva:assigns:missing] assigns.i:68: Warning: 
   no \from part for clause 'assigns y1, y3;'.
@@ -131,7 +131,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function ff4 <- main2 <- main.
-  Called from assigns.i:79.
+  Called from assigns.i:79:3-8.
 [eva] using specification for function ff4
 [eva:progress] Done for function ff4
 [kernel:annot:missing-spec] assigns.i:80: Warning: 
@@ -139,7 +139,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function ff5 <- main2 <- main.
-  Called from assigns.i:80.
+  Called from assigns.i:80:3-8.
 [eva] using specification for function ff5
 [eva:progress] Done for function ff5
 [kernel:annot:missing-spec] assigns.i:82: Warning: 
@@ -147,12 +147,12 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function ff2 <- main2 <- main.
-  Called from assigns.i:82.
+  Called from assigns.i:82:12-17.
 [eva] using specification for function ff2
 [eva:progress] Done for function ff2
 [eva:progress] 
   computing for function ff2_bis <- main2 <- main.
-  Called from assigns.i:83.
+  Called from assigns.i:83:12-21.
 [eva] using specification for function ff2_bis
 [eva:assigns:missing-result] assigns.i:64: Warning: 
   no 'assigns \result \from ...' clause specified for function ff2_bis
@@ -168,22 +168,22 @@
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function main3 <- main.
-  Called from assigns.i:112.
+  Called from assigns.i:112:3-30.
 [eva] using specification for function main3
 [eva:progress] Done for function main3
 [eva:progress] 
   computing for function main4 <- main.
-  Called from assigns.i:113.
+  Called from assigns.i:113:3-10.
 [eva:progress] 
   computing for function f_main4_1 <- main4 <- main.
-  Called from assigns.i:104.
+  Called from assigns.i:104:3-15.
 [eva] using specification for function f_main4_1
 [kernel:approximation] assigns.i:104: 
   more than 200(1000) locations to update in array. Approximating.
 [eva:progress] Done for function f_main4_1
 [eva:progress] 
   computing for function f_main4_2 <- main4 <- main.
-  Called from assigns.i:105.
+  Called from assigns.i:105:3-14.
 [eva] using specification for function f_main4_2
 [kernel:approximation] assigns.i:105: 
   more than 200(1000) locations to update in array. Approximating.

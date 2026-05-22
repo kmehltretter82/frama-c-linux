@@ -27,10 +27,10 @@ int f(void)
 }
 
 
-In project default, searching for comments between save_comments.i:6 and save_comments.i:9:
+In project default, searching for comments between save_comments.i:6-10 and save_comments.i:9:3-12:
  Hello, I'm the f function 
 End of comments
-In project saved_project, searching for comments between save_comments.i:6 and save_comments.i:9:
+In project saved_project, searching for comments between save_comments.i:6-10 and save_comments.i:9:3-12:
  Hello, I'm the f function 
 End of comments
 Printing saved project (compressed: false):
@@ -75,10 +75,10 @@ int f(void)
 }
 
 
-In project default, searching for comments between save_comments.i:6 and save_comments.i:9:
+In project default, searching for comments between save_comments.i:6-10 and save_comments.i:9:3-12:
  Hello, I'm the f function 
 End of comments
-In project saved_project, searching for comments between save_comments.i:6 and save_comments.i:9:
+In project saved_project, searching for comments between save_comments.i:6-10 and save_comments.i:9:3-12:
  Hello, I'm the f function 
 End of comments
 Printing saved project (compressed: true):

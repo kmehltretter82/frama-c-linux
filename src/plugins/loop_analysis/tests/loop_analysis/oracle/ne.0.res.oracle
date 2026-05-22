@@ -36,19 +36,19 @@
   termination condition may not be reached (infinite loop?)
   loop amounts to: for (i = 0; i != -5; i += 15)
 [loop] Maximum number of iterations by loop:
-  ne.i:2: 43
-  ne.i:6: 146
-  ne.i:10: 51
-  ne.i:14: 154
-  ne.i:18: 46
-  ne.i:22: 46
-  ne.i:26: 54
-  ne.i:30: 54
-  ne.i:34: 4
-  ne.i:42: 4
-  ne.i:50: 1
-  ne.i:58: 1
-  ne.i:66: 1
-  ne.i:74: 6
-  ne.i:82: 4
-  ne.i:90: 1
+  ne.i:2:3-37: 43
+  ne.i:6:3-40: 146
+  ne.i:10:3-37: 51
+  ne.i:14:3-40: 154
+  ne.i:18:3-39: 46
+  ne.i:22:3-42: 46
+  ne.i:26:3-39: 54
+  ne.i:30:3-42: 54
+  ne.i:34:3-32: 4
+  ne.i:42:3-32: 4
+  ne.i:50:3-39: 1
+  ne.i:58:3-39: 1
+  ne.i:66:3-35: 1
+  ne.i:74:3-35: 6
+  ne.i:82:3-42: 4
+  ne.i:90:3-41: 1

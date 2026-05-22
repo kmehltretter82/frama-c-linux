@@ -6,12 +6,12 @@
   nondet ∈ [--..--]
 [eva:progress] 
   computing for function stop <- main.
-  Called from goto.i:32.
+  Called from goto.i:32:10-17.
 [eva:progress] Recording results for stop
 [eva:progress] Done for function stop
 [eva:progress] 
   computing for function skip_declaration <- main.
-  Called from goto.i:34.
+  Called from goto.i:34:3-22.
 [eva:alarm] goto.i:19: Warning: check 'unknown' got status unknown.
 [eva:alarm] goto.i:20: Warning: check 'unknown' got status unknown.
 [eva:alarm] goto.i:21: Warning: check 'unknown' got status unknown.

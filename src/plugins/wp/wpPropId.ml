@@ -48,7 +48,8 @@ type prop_id = {
   p_part : (int * int) option ;
 }
 
-let unknown = Property.OLGlob Cil_datatype.Location.unknown
+let generated_loc = (Filepos.generated "wp", Filepos.generated "wp")
+let unknown = Property.OLGlob generated_loc
 
 let tactical ~gid =
   let ip = "Wp.Tactical." ^ gid in

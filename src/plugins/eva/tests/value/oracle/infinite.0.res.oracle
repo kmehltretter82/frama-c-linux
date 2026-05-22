@@ -9,7 +9,7 @@
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function pause <- main.
-  Called from infinite.i:9.
+  Called from infinite.i:9:7-15.
 [eva] using specification for function pause
 [eva:progress] Done for function pause
 [eva:progress] Recording results for main

@@ -17,7 +17,7 @@
   clauses from the specification. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function init <- main_init.
-  Called from bts334.i:66.
+  Called from bts334.i:66:13-26.
 [eva] using specification for function init
 [eva:assigns:missing-result] bts334.i:61: Warning: 
   no 'assigns \result \from ...' clause specified for function init
@@ -27,13 +27,13 @@
   accessing uninitialized left-value. assert \initialized(&is_ok);
 [eva:progress] 
   computing for function process <- main_init.
-  Called from bts334.i:67.
+  Called from bts334.i:67:15-30.
 [eva:progress] 
   computing for function loop_body <- process <- main_init.
-  Called from bts334.i:53.
+  Called from bts334.i:53:14-25.
 [eva:progress] 
   computing for function f <- loop_body <- process <- main_init.
-  Called from bts334.i:38.
+  Called from bts334.i:38:10-20.
 [eva:alarm] bts334.i:14: Warning: division by zero. assert kf ≢ 0;
 [eva:alarm] bts334.i:14: Warning: 
   signed overflow. assert -2147483648 ≤ k[i] * (int)(vi - si[i]);
@@ -43,7 +43,7 @@
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- loop_body <- process <- main_init.
-  Called from bts334.i:39.
+  Called from bts334.i:39:10-20.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:progress] Recording results for loop_body
@@ -51,10 +51,10 @@
 [eva:partition] bts334.i:53: starting to merge loop iterations
 [eva:progress] 
   computing for function loop_body <- process <- main_init.
-  Called from bts334.i:53.
+  Called from bts334.i:53:14-25.
 [eva:progress] 
   computing for function f <- loop_body <- process <- main_init.
-  Called from bts334.i:38.
+  Called from bts334.i:38:10-20.
 [eva:alarm] bts334.i:14: Warning: 
   signed overflow. assert -2147483648 ≤ vi - si[i];
 [eva:alarm] bts334.i:14: Warning: 
@@ -69,24 +69,24 @@
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- loop_body <- process <- main_init.
-  Called from bts334.i:39.
+  Called from bts334.i:39:10-20.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:progress] Recording results for loop_body
 [eva:progress] Done for function loop_body
 [eva:progress] 
   computing for function loop_body <- process <- main_init.
-  Called from bts334.i:53.
+  Called from bts334.i:53:14-25.
 [eva:progress] 
   computing for function f <- loop_body <- process <- main_init.
-  Called from bts334.i:38.
+  Called from bts334.i:38:10-20.
 [eva:alarm] bts334.i:14: Warning: 
   signed overflow. assert so[i] / kf ≤ 2147483647;
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function f <- loop_body <- process <- main_init.
-  Called from bts334.i:39.
+  Called from bts334.i:39:10-20.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:progress] Recording results for loop_body

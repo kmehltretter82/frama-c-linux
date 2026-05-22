@@ -383,10 +383,6 @@ let pretty_machdep ?fmt ?machdep () =
 (** {2 Initializations} *)
 (* ************************************************************************* *)
 
-let safe_remove_file (f : Filepath.t) =
-  if not (Kernel.KeepTempFiles.get ()) then
-    Filesystem.remove_file f
-
 let cpp_name cmd =
   let cmd = List.hd (String.split_on_char ' ' cmd) in
   Filename.basename cmd
@@ -615,7 +611,6 @@ let parse_cabs cpp_command = function
     Kernel.feedback "Parsing %a (with preprocessing)"
       Filepath.pretty f;
     if Sys.command cpp_command <> 0 then begin
-      safe_remove_file ppf;
       abort_with_detailed_pp_message f cpp_command
     end else
       Kernel.debug ~dkey:Kernel.dkey_pp
@@ -645,16 +640,13 @@ let parse_cabs cpp_command = function
                 (replace_in_cpp_cmd cmdl "")
                 ppf
           with Sys_error msg ->
-            safe_remove_file ppf;
             Kernel.abort "preprocessing of annotations failed (%s)" msg
         in
-        safe_remove_file ppf ;
         ppf'
       end else ppf
     in
     let (cil,(_,defs)) = Frontc.parse ~original:f ppf in
     cil.fileName <- f;
-    safe_remove_file ppf;
     (cil,(f,defs))
   | External (f,suf) ->
     if not (Filesystem.exists f) then
@@ -698,7 +690,6 @@ let () =
     in
     let (cil,(_,defs)) = Frontc.parse ~original:path ppf in
     cil.fileName <- path;
-    safe_remove_file ppf;
     (cil,(path,defs))
   in
   new_file_type ".ci" handle
@@ -895,7 +886,7 @@ let synchronize_source_annot has_new_stmt kf =
             block_with_user_annots := father;
             user_annots_for_next_stmt := [st, annot] ;
           end;
-          Cil.ChangeTo (Cil.mkStmtOneInstr (Skip Cil_datatype.Location.unknown))
+          Cil.ChangeTo (Cil.mkStmtOneInstr (Skip Fileloc.unknown))
         in
         assert (!block_with_user_annots = None
                 || !user_annots_for_next_stmt <> []);
@@ -1487,8 +1478,8 @@ class reorder_ast: Visitor.frama_c_visitor =
                   (Daxiomatic
                      (unique_name_recursive_axiomatic (),
                       entries, attr,
-                      Cil_datatype.Location.unknown),
-                   Cil_datatype.Location.unknown))::res)
+                      Fileloc.unknown),
+                   Fileloc.unknown))::res)
             entries []
         end else begin
           Global_annotation_graph.fold
@@ -1532,12 +1523,12 @@ class reorder_ast: Visitor.frama_c_visitor =
              typedefs
        | TComp ci ->
          if not (Cil_datatype.Compinfo.Set.mem ci known_compinfo) then begin
-           self#add_needed_decl(GCompTagDecl(ci,Cil_datatype.Location.unknown));
+           self#add_needed_decl(GCompTagDecl(ci,Fileloc.unknown));
            self#add_known_compinfo ci
          end
        | TEnum ei ->
          if not (Cil_datatype.Enuminfo.Set.mem ei known_enuminfo) then begin
-           self#add_needed_decl(GEnumTagDecl(ei,Cil_datatype.Location.unknown));
+           self#add_needed_decl(GEnumTagDecl(ei,Fileloc.unknown));
            self#add_known_enuminfo ei
          end);
       DoChildren

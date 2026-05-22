@@ -6,7 +6,7 @@
   Function array
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 69):
+Goal Check 'FAILS' ("assigned_initialized_memtyped.i", line 69, characters 20-35):
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = shift_sint32(a, 0).
 Let a_2 = memcpy(Init_0[shiftfield_F1_S_i(s) <- true], a_1, Init_undef_0,
@@ -50,18 +50,18 @@ Prove: true.
   Function assigned_glob
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 126):
+Goal Check 'FAILS' ("assigned_initialized_memtyped.i", line 126, characters 20-36):
 Assume { (* Heap *) Type: (region(G_glob_83) <= 0) /\ scinit(Init_0). }
 Prove: IsInit_S1_S(global(G_glob_83), Init_0).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'CHECK' (file assigned_initialized_memtyped.i, line 129):
+Goal Establishment of Invariant 'CHECK' ("assigned_initialized_memtyped.i", line 129, characters 27-73):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'CHECK' (file assigned_initialized_memtyped.i, line 129):
+Goal Preservation of Invariant 'CHECK' ("assigned_initialized_memtyped.i", line 129, characters 27-73):
 Let a = shiftfield_F1_S_a(pg_0).
 Let a_1 = shift_sint32(a, 0).
 Let a_2 = memcpy(Init_0[shiftfield_F1_S_i(pg_0) <- true], a_1, Init_undef_0,
@@ -84,7 +84,7 @@ Prove: ((-1) <= i) /\
 
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 142):
+Goal Check 'FAILS' ("assigned_initialized_memtyped.i", line 142, characters 20-36):
 Let a = shiftfield_F1_S_a(pg_0).
 Let a_1 = shift_sint32(a, 0).
 Let a_2 = memcpy(Init_0[shiftfield_F1_S_i(pg_0) <- true], a_1, Init_undef_0,
@@ -109,7 +109,7 @@ Prove: IsInit_S1_S(pg_0, memcpy(a_2, pg_0, Init_undef_1, pg_0, 11)).
 
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 143):
+Goal Check 'FAILS' ("assigned_initialized_memtyped.i", line 143, characters 21-37):
 Let a = shiftfield_F1_S_a(pg_0).
 Let a_1 = shift_sint32(a, 0).
 Let a_2 = memcpy(Init_0[shiftfield_F1_S_i(pg_0) <- true], a_1, Init_undef_0,
@@ -172,7 +172,7 @@ Prove: true.
   Function comp
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 118):
+Goal Check 'FAILS' ("assigned_initialized_memtyped.i", line 118, characters 20-35):
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = shift_sint32(a, 0).
 Let a_2 = memcpy(Init_0[shiftfield_F1_S_i(s) <- true], a_1, Init_undef_0,
@@ -216,7 +216,7 @@ Prove: true.
   Function descr
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 99):
+Goal Check 'FAILS' ("assigned_initialized_memtyped.i", line 99, characters 20-35):
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = shiftfield_F1_S_i(s).
 Let a_2 = shift_sint32(a, 0).
@@ -304,7 +304,7 @@ Prove: true.
   Function field
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 51):
+Goal Check 'FAILS' ("assigned_initialized_memtyped.i", line 51, characters 20-35):
 Let a = shiftfield_F1_S_i(s).
 Let a_1 = shiftfield_F1_S_a(s).
 Let a_2 = shift_sint32(a_1, 0).
@@ -340,7 +340,7 @@ Prove: true.
   Function index
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 84):
+Goal Check 'FAILS' ("assigned_initialized_memtyped.i", line 84, characters 20-35):
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = shift_sint32(a, 0).
 Let a_2 = memcpy(Init_0[shiftfield_F1_S_i(s) <- true], a_1, Init_undef_0,
@@ -382,12 +382,12 @@ Prove: true.
   Function initialize
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'CHECK' (file assigned_initialized_memtyped.i, line 16):
+Goal Establishment of Invariant 'CHECK' ("assigned_initialized_memtyped.i", line 16, characters 27-72):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'CHECK' (file assigned_initialized_memtyped.i, line 16):
+Goal Preservation of Invariant 'CHECK' ("assigned_initialized_memtyped.i", line 16, characters 27-72):
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = shift_sint32(a, 0).
 Let a_2 = memcpy(Init_0[shiftfield_F1_S_i(s) <- true], a_1, Init_undef_0,
@@ -409,7 +409,7 @@ Prove: ((-1) <= i) /\
 
 ------------------------------------------------------------
 
-Goal Check 'CHECK' (file assigned_initialized_memtyped.i, line 21):
+Goal Check 'CHECK' ("assigned_initialized_memtyped.i", line 21, characters 20-35):
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = shift_sint32(a, 0).
 Let a_2 = memcpy(Init_0[shiftfield_F1_S_i(s) <- true], a_1, Init_undef_0,
@@ -449,7 +449,7 @@ Prove: true.
   Function range
 ------------------------------------------------------------
 
-Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 36):
+Goal Check 'FAILS' ("assigned_initialized_memtyped.i", line 36, characters 20-35):
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = shift_sint32(a, 0).
 Let a_2 = memcpy(Init_0[shiftfield_F1_S_i(s) <- true], a_1, Init_undef_0,

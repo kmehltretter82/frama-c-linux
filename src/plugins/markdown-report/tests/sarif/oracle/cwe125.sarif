@@ -82,9 +82,9 @@
                 "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 21,
-                  "startColumn": 8,
+                  "startColumn": 9,
                   "endLine": 21,
-                  "endColumn": 20,
+                  "endColumn": 21,
                   "byteLength": 12
                 }
               }
@@ -104,8 +104,9 @@
                 "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 27,
+                  "startColumn": 1,
                   "endLine": 27,
-                  "endColumn": 38,
+                  "endColumn": 39,
                   "byteLength": 38
                 }
               }
@@ -117,7 +118,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text": "reachability of stmt line 27 in getValueFromArray."
+            "text": "reachability of stmt cwe125.c:27 in getValueFromArray."
           },
           "locations": [
             {
@@ -125,8 +126,9 @@
                 "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 27,
+                  "startColumn": 1,
                   "endLine": 27,
-                  "endColumn": 38,
+                  "endColumn": 39,
                   "byteLength": 38
                 }
               }
@@ -144,9 +146,9 @@
                 "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 36,
-                  "startColumn": 13,
+                  "startColumn": 14,
                   "endLine": 36,
-                  "endColumn": 37,
+                  "endColumn": 38,
                   "byteLength": 24
                 }
               }
@@ -164,8 +166,9 @@
                 "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 27,
+                  "startColumn": 1,
                   "endLine": 27,
-                  "endColumn": 6,
+                  "endColumn": 7,
                   "byteLength": 6
                 }
               }
@@ -183,8 +186,9 @@
                 "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 27,
+                  "startColumn": 1,
                   "endLine": 27,
-                  "endColumn": 6,
+                  "endColumn": 7,
                   "byteLength": 6
                 }
               }
@@ -204,8 +208,9 @@
                 "artifactLocation": { "uri": "cwe125.c", "uriBaseId": "PWD" },
                 "region": {
                   "startLine": 27,
+                  "startColumn": 1,
                   "endLine": 27,
-                  "endColumn": 6,
+                  "endColumn": 7,
                   "byteLength": 6
                 }
               }

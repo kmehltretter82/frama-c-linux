@@ -9,7 +9,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f <- main.
-  Called from f1.i:5.
+  Called from f1.i:5:3-7.
 [eva] using specification for function f
 [eva:progress] Done for function f
 [eva:progress] Recording results for main

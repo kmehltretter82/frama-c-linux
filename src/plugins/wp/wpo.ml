@@ -234,8 +234,7 @@ struct
   let is_trivial vcq = GOAL.is_trivial vcq.goal
 
   let pp_effect fmt s e =
-    let loc = fst (Stmt.loc s) in
-    let line = loc.pos_lnum in
+    let line = Stmt.loc s |> Fileloc.line in
     let desc = match e with
       | Mcfg.FromCode -> "Effect"
       | Mcfg.FromCall -> "Call Effect"
@@ -244,8 +243,7 @@ struct
     Format.fprintf fmt "%s at line %d@\n" desc line
 
   let pp_terminates fmt  s e =
-    let loc = fst (Stmt.loc s) in
-    let line = loc.pos_lnum in
+    let line = Stmt.loc s |> Fileloc.line in
     let desc = match e with
       | Mcfg.Loop -> "Loop termination"
       | Mcfg.Terminates -> "Call terminates"

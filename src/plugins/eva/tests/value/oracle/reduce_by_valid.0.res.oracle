@@ -14,14 +14,14 @@
   S_f1_1_S_vs[0..1] ∈ [--..--]
 [eva:progress] 
   computing for function main1 <- main.
-  Called from reduce_by_valid.i:301.
+  Called from reduce_by_valid.i:301:3-10.
 [eva:alarm] reduce_by_valid.i:18: Warning: assertion got status unknown.
 [eva:alarm] reduce_by_valid.i:21: Warning: assertion got status unknown.
 [eva:progress] Recording results for main1
 [eva:progress] Done for function main1
 [eva:progress] 
   computing for function main2 <- main.
-  Called from reduce_by_valid.i:302.
+  Called from reduce_by_valid.i:302:3-10.
 [eva:alarm] reduce_by_valid.i:33: Warning: assertion got status unknown.
 [eva:alarm] reduce_by_valid.i:35: Warning: assertion got status unknown.
 [eva:alarm] reduce_by_valid.i:37: Warning: assertion got status unknown.
@@ -30,14 +30,14 @@
 [eva:progress] Done for function main2
 [eva:progress] 
   computing for function main3 <- main.
-  Called from reduce_by_valid.i:303.
+  Called from reduce_by_valid.i:303:3-13.
 [eva:progress] reduce_by_valid.i:52: assertion got status valid.
 [eva:alarm] reduce_by_valid.i:53: Warning: assertion got status unknown.
 [eva:progress] Recording results for main3
 [eva:progress] Done for function main3
 [eva:progress] 
   computing for function main4 <- main.
-  Called from reduce_by_valid.i:304.
+  Called from reduce_by_valid.i:304:3-17.
 [eva:alarm] reduce_by_valid.i:58: Warning: assertion got status unknown.
 [eva:alarm] reduce_by_valid.i:59: Warning: assertion got status unknown.
 [eva:alarm] reduce_by_valid.i:61: Warning: assertion got status unknown.
@@ -46,7 +46,7 @@
 [eva:progress] Done for function main4
 [eva:progress] 
   computing for function main5 <- main.
-  Called from reduce_by_valid.i:305.
+  Called from reduce_by_valid.i:305:3-10.
 [eva:locals-escaping] reduce_by_valid.i:76: Warning: 
   locals {x} escaping the scope of a block of main5 through p
 [eva:progress] reduce_by_valid.i:78: assertion got status valid.
@@ -59,7 +59,7 @@
 [eva:progress] Done for function main5
 [eva:progress] 
   computing for function main6 <- main.
-  Called from reduce_by_valid.i:306.
+  Called from reduce_by_valid.i:306:3-12.
 [eva:alarm] reduce_by_valid.i:306: Warning: 
   function main6: precondition 'r1' got status unknown.
 [eva:alarm] reduce_by_valid.i:306: Warning: 
@@ -76,7 +76,7 @@
 [eva:progress] Done for function main6
 [eva:progress] 
   computing for function main7 <- main.
-  Called from reduce_by_valid.i:307.
+  Called from reduce_by_valid.i:307:3-10.
 [eva:progress] reduce_by_valid.i:115: assertion got status valid.
 [eva:progress] reduce_by_valid.i:116: assertion got status valid.
 [eva:progress] reduce_by_valid.i:117: assertion got status valid.
@@ -87,7 +87,7 @@
 [eva:progress] Done for function main7
 [eva:progress] 
   computing for function main8 <- main.
-  Called from reduce_by_valid.i:308.
+  Called from reduce_by_valid.i:308:3-10.
 [eva:alarm] reduce_by_valid.i:141: Warning: assertion got status unknown.
 [eva:progress] reduce_by_valid.i:142: assertion got status valid.
 [eva:alarm] reduce_by_valid.i:145: Warning: assertion got status unknown.
@@ -98,14 +98,14 @@
 [eva:progress] Done for function main8
 [eva:progress] 
   computing for function main9 <- main.
-  Called from reduce_by_valid.i:309.
+  Called from reduce_by_valid.i:309:3-10.
 [eva:alarm] reduce_by_valid.i:166: Warning: assertion got status unknown.
 [eva:progress] reduce_by_valid.i:169: assertion got status valid.
 [eva:progress] Recording results for main9
 [eva:progress] Done for function main9
 [eva:progress] 
   computing for function main10 <- main.
-  Called from reduce_by_valid.i:310.
+  Called from reduce_by_valid.i:310:3-11.
 [eva:alarm] reduce_by_valid.i:180: Warning: 
   out of bounds write. assert \valid((int *)p);
 [eva:show] reduce_by_valid.i:181: 
@@ -143,7 +143,7 @@
 [eva:progress] Done for function main10
 [eva:progress] 
   computing for function main11 <- main.
-  Called from reduce_by_valid.i:311.
+  Called from reduce_by_valid.i:311:3-11.
 [eva:alarm] reduce_by_valid.i:232: Warning: assertion got status unknown.
 [eva:show] reduce_by_valid.i:234: Frama_C_show_each: {{ &TC + [10..410] }}
 [eva:alarm] reduce_by_valid.i:235: Warning: assertion got status unknown.
@@ -160,10 +160,10 @@
 [eva:progress] Done for function main11
 [eva:progress] 
   computing for function main12 <- main.
-  Called from reduce_by_valid.i:312.
+  Called from reduce_by_valid.i:312:3-11.
 [eva:progress] 
   computing for function garbled_mix <- main12 <- main.
-  Called from reduce_by_valid.i:276.
+  Called from reduce_by_valid.i:276:7-21.
 [eva] using specification for function garbled_mix
 [eva:garbled-mix:assigns] reduce_by_valid.i:276: 
   The specification of function garbled_mix
@@ -172,7 +172,7 @@
 [eva:show] reduce_by_valid.i:277: 
   Frama_C_show_each_gm:
   {{ garbled mix of &{x; a}
-  (origin: Library function {reduce_by_valid.i:276}) }}
+  (origin: Library function {reduce_by_valid.i:276:7-21}) }}
 [eva:alarm] reduce_by_valid.i:279: Warning: 
   out of bounds write. assert \valid(p);
 [eva:alarm] reduce_by_valid.i:281: Warning: assertion got status unknown.
@@ -180,19 +180,19 @@
   Frama_C_show_each_reduced_gm: {{ &x ; &a + [0..16] }}
 [eva:progress] 
   computing for function reduced_garbled_mix <- main12 <- main.
-  Called from reduce_by_valid.i:286.
+  Called from reduce_by_valid.i:286:7-29.
 [eva] using specification for function reduced_garbled_mix
 [eva:progress] Done for function reduced_garbled_mix
 [eva:progress] reduce_by_valid.i:287: check got status valid.
 [eva:progress] 
   computing for function reduced_garbled_mix <- main12 <- main.
-  Called from reduce_by_valid.i:291.
+  Called from reduce_by_valid.i:291:9-31.
 [eva:progress] Done for function reduced_garbled_mix
 [eva:alarm] reduce_by_valid.i:292: Warning: 
   out of bounds write. assert \valid(r);
 [eva:progress] 
   computing for function garbled_mix <- main12 <- main.
-  Called from reduce_by_valid.i:294.
+  Called from reduce_by_valid.i:294:9-23.
 [eva:garbled-mix:assigns] reduce_by_valid.i:294: 
   The specification of function garbled_mix
   has generated a garbled mix of addresses for assigns clause \result.
@@ -204,7 +204,7 @@
 [eva:progress] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    reduce_by_valid.i:276: assigns clause on addresses
+    reduce_by_valid.i:276:7-21: assigns clause on addresses
       (read in 2 statements, propagated through 1 statement)
       garbled mix of &{x; a}
 [scope:rm_asserts] removing 12 assertion(s)

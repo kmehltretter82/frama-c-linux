@@ -34,19 +34,19 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
-[  Valid  ] Post-condition (file asm_initialized.i, line 9) at assembly (file asm_initialized.i, line 9)
+[  Valid  ] Post-condition ("asm_initialized.i", line 9, characters 3-44) at assembly ("asm_initialized.i", line 9, characters 3-44)
             by asm_contracts.
-[  Valid  ] Assigns (file asm_initialized.i, line 9) at assembly (file asm_initialized.i, line 9)
+[  Valid  ] Assigns ("asm_initialized.i", line 9, characters 3-44) at assembly ("asm_initialized.i", line 9, characters 3-44)
             by asm_contracts.
-[  Valid  ] Assertion 'inline_stmt_contract' (file asm_initialized.i, line 9)
+[  Valid  ] Assertion 'inline_stmt_contract' ("asm_initialized.i", line 9, characters 3-44)
             by inline_stmt_contract.
-[    -    ] Assertion 'Eva,pointer_alignment' (file asm_initialized.i, line 10)
+[    -    ] Assertion 'Eva,pointer_alignment' ("asm_initialized.i", line 10, characters 15-16)
             tried with Eva.
-[    -    ] Assertion 'Eva,mem_access' (file asm_initialized.i, line 10)
+[    -    ] Assertion 'Eva,mem_access' ("asm_initialized.i", line 10, characters 15-16)
             tried with Eva.
-[  Valid  ] Froms (file asm_initialized.i, line 9) at assembly (file asm_initialized.i, line 9)
+[  Valid  ] Froms ("asm_initialized.i", line 9, characters 3-44) at assembly ("asm_initialized.i", line 9, characters 3-44)
             by asm_contracts.
-[  Valid  ] Default behavior at assembly (file asm_initialized.i, line 9)
+[  Valid  ] Default behavior at assembly ("asm_initialized.i", line 9, characters 3-44)
             by Frama-C kernel.
 
 --------------------------------------------------------------------------------

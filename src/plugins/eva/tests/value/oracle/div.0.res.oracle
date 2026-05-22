@@ -27,7 +27,7 @@
   p ∈ {0}
 [eva:progress] 
   computing for function test <- main.
-  Called from div.i:86.
+  Called from div.i:86:3-9.
 [eva:alarm] div.i:14: Warning: signed overflow. assert c + 1 ≤ 2147483647;
 [eva:alarm] div.i:17: Warning: signed overflow. assert c + 2 ≤ 2147483647;
 [eva:partition] div.i:14: starting to merge loop iterations
@@ -66,7 +66,7 @@
 [eva:progress] Done for function test
 [eva:progress] 
   computing for function test_overflow_alarms <- main.
-  Called from div.i:87.
+  Called from div.i:87:3-25.
 [eva:alarm] div.i:52: Warning: signed overflow. assert a_0 / b_0 ≤ 2147483647;
 [eva:show] div.i:54: Frama_C_show_each: {-2147483648; 10}, {-1; 2}
 [eva:alarm] div.i:57: Warning: 
@@ -105,11 +105,11 @@
   W1 ∈ [-41..111]
   W2 ∈ [-25..66]
   a ∈ [-40000..40000]
-  b ∈ {{ garbled mix of &{Z2} (origin: Arithmetic {div.i:33}) }}
-  d1 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:35}) }}
-  d2 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:34}) }}
-  d0 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:36}) }}
-  e ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:37}) }}
+  b ∈ {{ garbled mix of &{Z2} (origin: Arithmetic {div.i:33:7-20}) }}
+  d1 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:35:8-27}) }}
+  d2 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:34:8-27}) }}
+  d0 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:36:8-23}) }}
+  e ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:37:7-17}) }}
   p ∈ {{ &t[3] }}
   c ∈ [--..--]
 [eva:final-states] Values at end of function test_overflow_alarms:
@@ -132,11 +132,11 @@
   W1 ∈ [-41..111]
   W2 ∈ [-25..66]
   a ∈ [-40000..40000]
-  b ∈ {{ garbled mix of &{Z2} (origin: Arithmetic {div.i:33}) }}
-  d1 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:35}) }}
-  d2 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:34}) }}
-  d0 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:36}) }}
-  e ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:37}) }}
+  b ∈ {{ garbled mix of &{Z2} (origin: Arithmetic {div.i:33:7-20}) }}
+  d1 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:35:8-27}) }}
+  d2 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:34:8-27}) }}
+  d0 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:36:8-23}) }}
+  e ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:37:7-17}) }}
   p ∈ {{ &t[3] }}
 [from] Computing for function test
 [from] Done for function test

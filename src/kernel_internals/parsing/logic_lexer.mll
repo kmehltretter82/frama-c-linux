@@ -200,7 +200,7 @@
         "writes", (fun _ -> WRITES);
         "__FC_FILENAME__",
         (fun loc ->
-           let filename = Filepath.to_string (fst loc).Filepos.pos_path in
+           let filename = Fileloc.path loc |> Filepath.to_string in
            STRING_LITERAL (false,filename));
       ];
     List.iter (fun (x, y) -> Hashtbl.add type_kw x y)
@@ -403,13 +403,13 @@ rule token = parse
          }
   | '\\' (rIdentifier as plugin) "::" (rIdentifier as name) ":" {
      let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
-     let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
+     let cabsloc = Errorloc.convert_loc loc in
      let tok = identifier ~plugin:(Some plugin) name cabsloc in
      check_ext_importer (fst cabsloc) plugin tok
      }
   | '\\' (rIdentifier as plugin) "::" (rIdentifier as name) {
      let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
-     let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
+     let cabsloc = Errorloc.convert_loc loc in
      let tok = identifier ~plugin:(Some plugin) name cabsloc in
      check_ext_plugin (fst cabsloc) plugin tok
      }
@@ -418,7 +418,7 @@ rule token = parse
   | ( rIdentifier "::")+ "(" opIdentifier ")" { longident lexbuf }
   | rIdentifier       {
       let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
-      let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
+      let cabsloc = Errorloc.convert_loc loc in
       let s = lexeme lexbuf in
       let curr_tok = identifier ~plugin:None s cabsloc in
       if curr_tok = CHECK || curr_tok = ADMIT then begin
@@ -570,7 +570,7 @@ and hash = parse
                    with Failure _ ->
                      (* the int is too big. *)
                      Kernel.warning
-                       ~source:(Filepos.of_lexing_pos lexbuf.lex_start_p)
+                       ~source:(Errorloc.convert_pos lexbuf.lex_start_p)
                        "Bad line number in preprocessed file: %s"  s;
                      (-1)
                  in
@@ -596,9 +596,9 @@ and file =  parse
 |	_			{ endline lexbuf}
 
 and endline = parse
-        '\n' 			{ Lexing.new_line lexbuf; token lexbuf}
-|   eof                         { EOF }
-|	_			{ endline lexbuf}
+  '\n' { Lexing.new_line lexbuf; token lexbuf}
+| eof  { EOF }
+| _    { endline lexbuf}
 
 and comment = parse
     '\n' { Lexing.new_line lexbuf; comment lexbuf}
@@ -616,7 +616,7 @@ and comment = parse
   let parse_from_position f (pos, s : Filepos.t * string) =
     let open Current_loc.Operators in
     let lb = from_string s in
-    let get_loc () = Filepos.of_lexing_pos lb.Lexing.lex_curr_p in
+    let get_loc () = Errorloc.convert_pos lb.Lexing.lex_curr_p in
     let<> UpdatedCurrentLoc = (pos, pos) in
     let warn = Kernel.warning ~wkey:Kernel.wkey_annot_error in
     set_initial_position lb (Filepos.to_lexing_pos pos);

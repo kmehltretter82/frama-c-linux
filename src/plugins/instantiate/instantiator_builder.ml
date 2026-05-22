@@ -36,7 +36,7 @@ module type Instantiator = sig
 end
 
 let build_body caller callee args_generator =
-  let loc  = Cil_datatype.Location.unknown in
+  let loc  = Fileloc.unknown in
   let ret_var = match Cil.getReturnType caller.svar.vtype with
     | t when Ast_types.is_void t -> None
     | t -> Some (Cil.makeLocalVar caller "__retres" t)
@@ -71,7 +71,7 @@ module Make_instantiator (G: Generator_sig) = struct
     fd
 
   let build_function key =
-    let loc = Cil_datatype.Location.unknown in
+    let loc = Fileloc.unknown in
     let fd = make_fundec key in
     let spec = Cil.empty_funspec () in
     Globals.Functions.replace_by_definition spec fd loc ;

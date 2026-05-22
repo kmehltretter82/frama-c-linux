@@ -36,7 +36,7 @@ let run () =
   in
   let bhv = Cil.mk_behavior ~post_cond () in
   Annotations.add_behaviors Emitter.end_user kf [ bhv ];
-  let loc = Cil_datatype.Location.unknown in
+  let loc = Fileloc.unknown in
   let dli = Dfun_or_pred (li,loc) in
   let dlj = Dfun_or_pred (lj,loc) in
   let dlk = Dfun_or_pred (lk,loc) in

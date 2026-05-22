@@ -6,7 +6,7 @@
   
 [eva:progress] 
   computing for function f <- main.
-  Called from switch2.i:13.
+  Called from switch2.i:13:48-60.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [kernel:annot:missing-spec] switch2.i:13: Warning: 
@@ -14,7 +14,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function g <- main.
-  Called from switch2.i:13.
+  Called from switch2.i:13:7-64.
 [eva] using specification for function g
 [eva:progress] Done for function g
 [eva:progress] Recording results for main

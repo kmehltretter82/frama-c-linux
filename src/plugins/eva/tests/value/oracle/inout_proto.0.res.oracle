@@ -10,10 +10,10 @@
   u[0..19] ∈ {0}
 [eva:progress] 
   computing for function main <- main_main.
-  Called from inout_proto.i:54.
+  Called from inout_proto.i:54:3-12.
 [eva:progress] 
   computing for function SendBuffer <- main <- main_main.
-  Called from inout_proto.i:19.
+  Called from inout_proto.i:19:4-49.
 [eva] using specification for function SendBuffer
 [eva:garbled-mix:assigns] inout_proto.i:19: 
   The specification of function SendBuffer
@@ -23,37 +23,37 @@
 [eva:progress] Done for function main
 [eva:progress] 
   computing for function main2 <- main_main.
-  Called from inout_proto.i:55.
+  Called from inout_proto.i:55:3-11.
 [eva:progress] 
   computing for function f <- main2 <- main_main.
-  Called from inout_proto.i:46.
+  Called from inout_proto.i:46:3-6.
 [eva] using specification for function f
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function g1 <- main2 <- main_main.
-  Called from inout_proto.i:47.
+  Called from inout_proto.i:47:3-7.
 [eva:progress] 
   computing for function g <- g1 <- main2 <- main_main.
-  Called from inout_proto.i:34.
+  Called from inout_proto.i:34:3-11.
 [eva] using specification for function g
 [eva:progress] Done for function g
 [eva:progress] Recording results for g1
 [eva:progress] Done for function g1
 [eva:progress] 
   computing for function g2 <- main2 <- main_main.
-  Called from inout_proto.i:48.
+  Called from inout_proto.i:48:3-7.
 [eva:progress] 
   computing for function g <- g2 <- main2 <- main_main.
-  Called from inout_proto.i:38.
+  Called from inout_proto.i:38:3-11.
 [eva:progress] Done for function g
 [eva:progress] Recording results for g2
 [eva:progress] Done for function g2
 [eva:progress] 
   computing for function g3 <- main2 <- main_main.
-  Called from inout_proto.i:50.
+  Called from inout_proto.i:50:5-14.
 [eva:progress] 
   computing for function g <- g3 <- main2 <- main_main.
-  Called from inout_proto.i:42.
+  Called from inout_proto.i:42:3-7.
 [eva:progress] Done for function g
 [eva:progress] Recording results for g3
 [eva:progress] Done for function g3

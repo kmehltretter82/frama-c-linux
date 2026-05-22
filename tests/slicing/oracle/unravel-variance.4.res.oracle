@@ -10,14 +10,14 @@
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function scanf <- main.
-  Called from unravel-variance.i:31.
+  Called from unravel-variance.i:31:10-26.
 [eva] using specification for function scanf
 [eva:progress] Done for function scanf
 [eva:alarm] unravel-variance.i:32: Warning: 
   accessing uninitialized left-value. assert \initialized(&n);
 [eva:progress] 
   computing for function scanf <- main.
-  Called from unravel-variance.i:34.
+  Called from unravel-variance.i:34:12-37.
 [eva:progress] Done for function scanf
 [eva:alarm] unravel-variance.i:35: Warning: 
   accessing uninitialized left-value. assert \initialized(&x[i]);
@@ -28,7 +28,7 @@
 [eva:partition] unravel-variance.i:32: starting to merge loop iterations
 [eva:progress] 
   computing for function scanf <- main.
-  Called from unravel-variance.i:34.
+  Called from unravel-variance.i:34:12-37.
 [eva:progress] Done for function scanf
 [eva:alarm] unravel-variance.i:35: Warning: 
   non-finite float value. assert \is_finite(\add_float(t1, x[i]));
@@ -41,15 +41,15 @@
   assert \is_finite(\add_float(ssq, \mul_float(x[i], x[i])));
 [eva:progress] 
   computing for function scanf <- main.
-  Called from unravel-variance.i:34.
+  Called from unravel-variance.i:34:12-37.
 [eva:progress] Done for function scanf
 [eva:progress] 
   computing for function scanf <- main.
-  Called from unravel-variance.i:34.
+  Called from unravel-variance.i:34:12-37.
 [eva:progress] Done for function scanf
 [eva:progress] 
   computing for function scanf <- main.
-  Called from unravel-variance.i:34.
+  Called from unravel-variance.i:34:12-37.
 [eva:progress] Done for function scanf
 [eva:alarm] unravel-variance.i:35: Warning: 
   accessing out of bounds index. assert i < 1024;
@@ -134,7 +134,7 @@
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function printf1 <- main.
-  Called from unravel-variance.i:52.
+  Called from unravel-variance.i:52:10-73.
 [eva] using specification for function printf1
 [eva:progress] Done for function printf1
 [eva:alarm] unravel-variance.i:53: Warning: 
@@ -148,7 +148,7 @@
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function printf2 <- main.
-  Called from unravel-variance.i:53.
+  Called from unravel-variance.i:53:10-67.
 [eva] using specification for function printf2
 [eva:progress] Done for function printf2
 [eva:alarm] unravel-variance.i:54: Warning: 
@@ -162,7 +162,7 @@
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function printf3 <- main.
-  Called from unravel-variance.i:54.
+  Called from unravel-variance.i:54:10-72.
 [eva] using specification for function printf3
 [eva:progress] Done for function printf3
 [eva:alarm] unravel-variance.i:55: Warning: 
@@ -176,7 +176,7 @@
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function printf4 <- main.
-  Called from unravel-variance.i:55.
+  Called from unravel-variance.i:55:10-63.
 [eva] using specification for function printf4
 [eva:progress] Done for function printf4
 [eva:alarm] unravel-variance.i:56: Warning: 
@@ -190,7 +190,7 @@
   assigns. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function printf5 <- main.
-  Called from unravel-variance.i:56.
+  Called from unravel-variance.i:56:10-52.
 [eva] using specification for function printf5
 [eva:progress] Done for function printf5
 [eva:progress] Recording results for main

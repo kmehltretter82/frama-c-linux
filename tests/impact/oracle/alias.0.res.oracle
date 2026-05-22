@@ -21,7 +21,9 @@
 [pdg] computing for function f
 [pdg] done for function f
 [impact] impacted statements of stmt(s) 2 are:
-    alias.i:11 (sid 3): *y = 4;alias.i:12 (sid 4): int a = *(x + 1) + 2;
-    alias.i:13 (sid 5): *y = 2;alias.i:15 (sid 9): __retres = *(x + 1);
-    alias.i:14 (sid 18): return_label: return __retres;
+    alias.i:11:8-9 (sid 3): *y = 4;
+    alias.i:12:7-8 (sid 4): int a = *(x + 1) + 2;
+    alias.i:13:8-9 (sid 5): *y = 2;
+    alias.i:15:5-19 (sid 9): __retres = *(x + 1);
+    alias.i:14:7-8 (sid 18): return_label: return __retres;
 [impact] analysis done

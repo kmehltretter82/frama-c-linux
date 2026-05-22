@@ -37,12 +37,12 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'ok,cpy' (file issue-189-bis.i, line 56):
+Goal Establishment of Invariant 'ok,cpy' ("issue-189-bis.i", lines 56-58):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'ok,cpy' (file issue-189-bis.i, line 56):
+Goal Preservation of Invariant 'ok,cpy' ("issue-189-bis.i", lines 56-58):
 Let a = global(G_dst_49).
 Let a_1 = shift_uint8(a, 0).
 Let a_2 = memcpy(Mint_0, a_1, Mint_undef_0, a_1, len_0).
@@ -72,22 +72,22 @@ Prove: a_4[shift_uint8(a_3, i)] = a_4[shift_uint8(a, i)].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'ok,dst' (file issue-189-bis.i, line 54):
+Goal Establishment of Invariant 'ok,dst' ("issue-189-bis.i", line 54, characters 31-73):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'ok,dst' (file issue-189-bis.i, line 54):
+Goal Preservation of Invariant 'ok,dst' ("issue-189-bis.i", line 54, characters 31-73):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'ok,len' (file issue-189-bis.i, line 52):
+Goal Establishment of Invariant 'ok,len' ("issue-189-bis.i", line 52, characters 31-59):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'ok,len' (file issue-189-bis.i, line 52):
+Goal Preservation of Invariant 'ok,len' ("issue-189-bis.i", line 52, characters 31-59):
 Let a = global(G_dst_49).
 Let a_1 = shift_uint8(a, 0).
 Let a_2 = global(G_src_48).
@@ -112,34 +112,34 @@ Prove: len_0 <= (1 + len_1).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'ok,src' (file issue-189-bis.i, line 53):
+Goal Establishment of Invariant 'ok,src' ("issue-189-bis.i", line 53, characters 31-73):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'ok,src' (file issue-189-bis.i, line 53):
+Goal Preservation of Invariant 'ok,src' ("issue-189-bis.i", line 53, characters 31-73):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file issue-189-bis.i, line 55) (1/4):
+Goal Loop assigns ("issue-189-bis.i", line 55, characters 31-35) (1/4):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file issue-189-bis.i, line 55) (2/4):
+Goal Loop assigns ("issue-189-bis.i", line 55, characters 31-35) (2/4):
 Effect at line 62
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file issue-189-bis.i, line 55) (3/4):
+Goal Loop assigns ("issue-189-bis.i", line 55, characters 31-35) (3/4):
 Effect at line 62
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file issue-189-bis.i, line 55) (4/4):
+Goal Loop assigns ("issue-189-bis.i", line 55, characters 31-35) (4/4):
 Effect at line 62
 Let a = global(G_dst_49).
 Let a_1 = shift_uint8(a, 0).
@@ -175,18 +175,18 @@ Prove: included(tmp_0, 1, a_1, len_0).
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue-189-bis.i, line 45) in 'memcpy_context_vars':
+Goal Assigns ("issue-189-bis.i", line 45, characters 29-46) in 'memcpy_context_vars':
 Effect at line 61
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file issue-189-bis.i, line 61):
+Goal Positivity of Loop variant at loop ("issue-189-bis.i", lines 61-64):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file issue-189-bis.i, line 61):
+Goal Decreasing of Loop variant at loop ("issue-189-bis.i", lines 61-64):
 Prove: true.
 
 ------------------------------------------------------------

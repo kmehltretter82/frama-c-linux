@@ -36,7 +36,7 @@ let cmp_var v1 v2 =
     let kf2 = Project.on prj Kernel_function.find_defining_kf v2 in
     if Option.is_none kf1 || Option.is_none kf2 then
       fatal "Variable %a(%a) is not global but has no associated function"
-        Cil_datatype.Varinfo.pretty v1 Cil_datatype.Location.pretty v1.vdecl;
+        Cil_datatype.Varinfo.pretty v1 Fileloc.pretty v1.vdecl;
     cmp_fun (Option.get kf1) (Option.get kf2)
   end
 

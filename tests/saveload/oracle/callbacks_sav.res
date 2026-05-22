@@ -7,10 +7,10 @@
   y ∈ {0}
 [eva:progress] 
   computing for function g1 <- main1.
-  Called from callbacks.i:27.
+  Called from callbacks.i:27:3-7.
 [eva:progress] 
   computing for function f <- g1 <- main1.
-  Called from callbacks.i:18.
+  Called from callbacks.i:18:3-8.
 [eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -21,10 +21,10 @@
 [eva:progress] Done for function g1
 [eva:progress] 
   computing for function g2 <- main1.
-  Called from callbacks.i:28.
+  Called from callbacks.i:28:3-7.
 [eva:progress] 
   computing for function f <- g2 <- main1.
-  Called from callbacks.i:23.
+  Called from callbacks.i:23:3-8.
 [eva:progress] Recording results for f
 [from] Computing for function f
 [from] Done for function f
@@ -49,13 +49,13 @@
   No logical properties have been reached by the analysis.
   ----------------------------------------------------------------------------
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
-[from] call to f at callbacks.i:18 (by g1):
+[from] call to f at callbacks.i:18:3-8 (by g1):
   x FROM p
-[from] call to f at callbacks.i:23 (by g2):
+[from] call to f at callbacks.i:23:3-8 (by g2):
   y FROM p
-[from] call to g1 at callbacks.i:27 (by main1):
+[from] call to g1 at callbacks.i:27:3-7 (by main1):
   x FROM \nothing
-[from] call to g2 at callbacks.i:28 (by main1):
+[from] call to g2 at callbacks.i:28:3-7 (by main1):
   y FROM \nothing
 [from] entry point:
   x FROM \nothing

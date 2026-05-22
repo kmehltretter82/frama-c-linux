@@ -100,13 +100,14 @@ val kf_of_localizable : localizable -> kernel_function option
 val ki_of_localizable : localizable -> kinstr
 val varinfo_of_localizable : localizable -> varinfo option
 val loc_of_localizable : localizable -> location
-(** Might return [Location.unknown] *)
+(** Might return [Fileloc.unknown] *)
 
-val loc_to_localizable: ?precise_col:bool -> Filepos.t -> localizable option
+val pos_to_localizable: ?precise_col:bool -> Filepos.t -> localizable option
 (** return the (hopefully) most precise localizable that contains the given
     Filepos.t. If [precise_col] is [true], takes the column number into
     account (possibly a more precise, but costly, result).
-    @since 24.0-Chromium *)
+    @since 24.0-Chromium
+    @before Frama-C+dev was [loc_to_localizable] *)
 
 module type Tag =
 sig

@@ -10,123 +10,123 @@
   step ∈ {0}
 [eva:progress] 
   computing for function lecture <- main.
-  Called from bts1768.i:45.
+  Called from bts1768.i:45:3-12.
 [kernel:annot:missing-spec] bts1768.i:18: Warning: 
   Neither code nor explicit assigns for function choisir, generating default
   clauses. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function choisir <- lecture <- main.
-  Called from bts1768.i:18.
+  Called from bts1768.i:18:9-18.
 [eva] using specification for function choisir
 [eva:progress] Done for function choisir
 [eva:progress] Recording results for lecture
 [eva:progress] Done for function lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:partition] bts1768.i:44: starting to merge loop iterations
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:alarm] bts1768.i:51: Warning: 
@@ -134,13 +134,13 @@
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:progress] Recording results for fsm_transition
 [eva:progress] Done for function fsm_transition
 [eva:progress] bts1768.i:45: Reusing old results for call to lecture
 [eva:progress] 
   computing for function fsm_transition <- main.
-  Called from bts1768.i:46.
+  Called from bts1768.i:46:5-21.
 [eva:alarm] bts1768.i:25: Warning: 
   signed overflow. assert cumul + 2 ≤ 2147483647;
 [eva:alarm] bts1768.i:29: Warning: 

@@ -8,14 +8,14 @@
   Frama_C_show_each_f: {4}, {18446603611099103232}, {0}
 [eva:progress] 
   computing for function div64 <- main.
-  Called from long_const.i:37.
+  Called from long_const.i:37:2-15.
 [eva:alarm] long_const.i:37: Warning: 
   function div64: precondition 'num' got status unknown.
 [eva:alarm] long_const.i:37: Warning: 
   function div64: precondition 'denom' got status unknown.
 [eva:progress] 
   computing for function LL_ABS <- div64 <- main.
-  Called from long_const.i:24.
+  Called from long_const.i:24:12-30.
 [eva:progress] Recording results for LL_ABS
 [eva:progress] Done for function LL_ABS
 [eva:progress] long_const.i:25: Reusing old results for call to LL_ABS

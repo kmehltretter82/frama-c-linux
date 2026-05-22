@@ -333,7 +333,7 @@ module Logic_binding = struct
     in
     let v, e, env =
       new_var
-        ~loc:Location.unknown
+        ~loc:Fileloc.unknown
         env
         kf
         ~name:logic_v.lv_name

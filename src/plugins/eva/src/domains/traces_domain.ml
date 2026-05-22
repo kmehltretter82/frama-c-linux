@@ -18,7 +18,7 @@ module Lval = Cil_datatype.Lval
 module ExpStructEq = Cil_datatype.ExpStructEq
 module Varinfo = Cil_datatype.Varinfo
 module Stmt = Cil_datatype.Stmt
-module Location = Cil_datatype.Location
+module Location = Fileloc
 
 open Cil_types
 open Lattice_bounds
@@ -870,7 +870,7 @@ let rec complete_graph (graph:Graph.t) =
     ) graph Graph.empty
 
 
-let dummy_loc = Location.dummy
+let dummy_loc = Fileloc.unknown
 
 let subst_in_full var_mapping =
   let visit = Visitor_behavior.copy (Project.current ()) in

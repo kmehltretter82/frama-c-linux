@@ -9,7 +9,7 @@
   NULL_GLOBAL_LOOSING_BITS_ONE_BY_ONE ∈ {0}
 [eva:progress] 
   computing for function main1 <- main.
-  Called from loop1.i:25.
+  Called from loop1.i:25:3-10.
 [eva:acsl:unsupported] loop1.i:8: 
   cannot evaluate ACSL term, no environment to evaluate \at(_,LoopCurrent)
 [eva:alarm] loop1.i:8: Warning: assertion got status unknown.
@@ -21,7 +21,7 @@
 [eva:progress] Done for function main1
 [eva:progress] 
   computing for function main2 <- main.
-  Called from loop1.i:26.
+  Called from loop1.i:26:3-10.
 [eva:partition] loop1.i:17: starting to merge loop iterations
 [eva:alarm] loop1.i:19: Warning: accessing out of bounds index. assert i < 100;
 [eva:progress] Recording results for main2

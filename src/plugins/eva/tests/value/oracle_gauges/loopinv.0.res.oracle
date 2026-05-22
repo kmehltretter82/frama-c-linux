@@ -8,7 +8,7 @@
 ---
 > [eva:alarm] loopinv.c:69: Warning: loop invariant got status unknown.
 173,174d171
-< [    -    ] Assertion 'Eva,signed_overflow' (file loopinv.c, line 73)
+< [    -    ] Assertion 'Eva,signed_overflow' ("loopinv.c", line 73)
 <             tried with Eva.
 180,181c177,178
 <      7 To be validated

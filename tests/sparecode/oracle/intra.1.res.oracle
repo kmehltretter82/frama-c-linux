@@ -9,39 +9,39 @@
   Y10 ∈ {0}
 [eva:progress] 
   computing for function param <- main.
-  Called from intra.i:82.
+  Called from intra.i:82:10-32.
 [eva:progress] Recording results for param
 [eva:progress] Done for function param
 [eva:progress] 
   computing for function tmp <- main.
-  Called from intra.i:83.
+  Called from intra.i:83:10-17.
 [eva:progress] intra.i:21: assertion got status valid.
 [eva:progress] intra.i:23: assertion got status valid.
 [eva:progress] Recording results for tmp
 [eva:progress] Done for function tmp
 [eva:progress] 
   computing for function spare_called_fct <- main.
-  Called from intra.i:84.
+  Called from intra.i:84:3-23.
 [eva:progress] Recording results for spare_called_fct
 [eva:progress] Done for function spare_called_fct
 [eva:progress] 
   computing for function call_two_outputs <- main.
-  Called from intra.i:85.
+  Called from intra.i:85:10-29.
 [eva:progress] 
   computing for function two_outputs <- call_two_outputs <- main.
-  Called from intra.i:49.
+  Called from intra.i:49:7-25.
 [eva:progress] Recording results for two_outputs
 [eva:progress] Done for function two_outputs
 [eva:progress] 
   computing for function two_outputs <- call_two_outputs <- main.
-  Called from intra.i:53.
+  Called from intra.i:53:13-31.
 [eva:progress] Recording results for two_outputs
 [eva:progress] Done for function two_outputs
 [eva:progress] Recording results for call_two_outputs
 [eva:progress] Done for function call_two_outputs
 [eva:progress] 
   computing for function loop <- main.
-  Called from intra.i:86.
+  Called from intra.i:86:10-27.
 [eva:progress] intra.i:64: assertion got status valid.
 [eva:progress] intra.i:65: loop invariant got status valid.
 [eva:partition] intra.i:67: starting to merge loop iterations
@@ -49,12 +49,12 @@
 [eva:progress] Done for function loop
 [eva:progress] 
   computing for function assign <- main.
-  Called from intra.i:87.
+  Called from intra.i:87:3-26.
 [eva:progress] Recording results for assign
 [eva:progress] Done for function assign
 [eva:progress] 
   computing for function assign <- main.
-  Called from intra.i:88.
+  Called from intra.i:88:3-18.
 [eva:progress] Recording results for assign
 [eva:progress] Done for function assign
 [kernel:annot:missing-spec] intra.i:91: Warning: 
@@ -62,7 +62,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function stop <- main.
-  Called from intra.i:91.
+  Called from intra.i:91:7-14.
 [eva] using specification for function stop
 [eva:progress] Done for function stop
 [eva:progress] Recording results for main

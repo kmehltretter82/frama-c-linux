@@ -7,13 +7,13 @@
   pf ∈ {0}
 [eva:progress] 
   computing for function g <- main.
-  Called from fct_ptr.i:15.
+  Called from fct_ptr.i:15:3-6.
 [kernel:annot:missing-spec] fct_ptr.i:8: Warning: 
   Neither code nor specification for function f, generating default assigns.
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f <- g <- main.
-  Called from fct_ptr.i:8.
+  Called from fct_ptr.i:8:3-8.
 [eva] using specification for function f
 [eva:progress] Done for function f
 [eva:progress] Recording results for g

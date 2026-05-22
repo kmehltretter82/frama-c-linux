@@ -392,7 +392,7 @@ let init_builtins () =
   Queue.iter (fun f -> register_custom_builtin (f())) custom_builtins
 
 (** This is used as the location of the prototypes of builtin functions. *)
-let builtinLoc: location = Location.unknown
+let builtinLoc: location = Fileloc.unknown
 
 let () =
   Machine.init_builtins_ref := init_builtins

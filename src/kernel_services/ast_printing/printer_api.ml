@@ -114,8 +114,6 @@ class type extensible_printer_type = object
   (** {3 Pretty-printing of C code} *)
   (* ******************************************************************* *)
 
-  method location: Format.formatter -> location -> unit
-
   method constant: Format.formatter -> constant -> unit
 
   method varname: Format.formatter -> string -> unit
@@ -409,7 +407,6 @@ module type S_pp = sig
   (** {3 Printer for C constructs} *)
   (* ********************************************************************* *)
 
-  val pp_location: Format.formatter -> location -> unit
   val pp_constant: Format.formatter -> constant -> unit
 
   val pp_storage: Format.formatter -> storage -> unit

@@ -559,7 +559,7 @@ let _debug () =
     (fun stmt ats_ref ->
        Options.feedback ~level:2 "| - stmt %d at %a"
          stmt.sid
-         Printer.pp_location (Stmt.loc stmt);
+         Fileloc.pretty (Stmt.loc stmt);
        List.iter
          (fun at ->
             Options.feedback ~level:2 "|    - at %a"

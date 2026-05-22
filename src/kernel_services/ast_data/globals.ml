@@ -109,7 +109,7 @@ module Vars = struct
       iter_glob
         (fun v ->
            v.vname = name &&
-           Filepath.equal file (fst v.vdecl).pos_path)
+           Filepath.equal file (Fileloc.path v.vdecl))
     | Whole_function kf ->
       List.find (fun v -> v.vname = name) (get_locals kf @ !get_statics kf)
     | Formal kf ->
@@ -434,7 +434,7 @@ module Functions = struct
     vi.vname,
     if vi.vglob then begin
       if vi.vstorage = Static then
-        Translation_unit (fst vi.vdecl).pos_path
+        Translation_unit (Fileloc.path vi.vdecl)
       else
         Program
     end
@@ -554,7 +554,7 @@ module FileIndex = struct
       Cil.iterGlobals
         (Ast.get ())
         (fun glob ->
-           let f = (fst (Global.loc glob)).pos_path in
+           let f = Fileloc.path (Global.loc glob) in
            Kernel.debug ~dkey:Kernel.dkey_globals "Indexing global in file %a@."
              Filepath.pretty f;
            ignore
@@ -564,7 +564,7 @@ module FileIndex = struct
     State_builder.apply_once "Globals.FileIndex.compute" [ S.self ] compute
 
   let remove_global_annotations a =
-    let f = (fst (Global_annotation.loc a)).pos_path in
+    let f = Fileloc.path (Global_annotation.loc a) in
     try
       let l = S.find f in
       let l =
@@ -654,7 +654,7 @@ module FileIndex = struct
         else false
       | _ -> false
     in
-    let file = (fst x.Cil_types.vdecl).pos_path in
+    let file = Fileloc.path x.Cil_types.vdecl in
     match List.find pred (S.find file) with
     | Cil_types.GFun (fundec, _) ->
       Functions.get fundec.Cil_types.svar, !is_param
@@ -709,7 +709,7 @@ module Syntactic_search = struct
       let symbols,_ = List.split (FileIndex.get_globals file) in
       List.find_opt global_has_name symbols |> lookup Program
     | Formal kf ->
-      let file = (fst (get_location kf)).Filepos.pos_path in
+      let file = Fileloc.path (get_location kf) in
       List.find_opt has_name (get_formals kf) |>
       lookup (Translation_unit file)
     | Whole_function kf ->
@@ -927,20 +927,19 @@ module Comments_stmt_cache =
     end)
 
 let get_comments_global g =
-  let last_pos (f : Filepath.t) =
-    { Filepos.pos_path = f;
-      pos_lnum = max_int;
-      pos_cnum = max_int;
-      pos_bol = max_int
-    }
+  let last_pos (path : Filepath.t) =
+    Filepos.make ~path ~line:max_int ~column:max_int ~offset:max_int ()
+  and first_pos (path : Filepath.t) =
+    Filepos.make ~path ~line:1 ~column:0 ~offset:0 ()
   in
   let add g =
     let my_loc = Cil_datatype.Global.loc g in
-    let file = (fst my_loc).pos_path in
-    let globs = FileIndex.get_symbols file in
+    let path = Fileloc.path my_loc in
+    let input_path = Filepos.input_path (fst my_loc) in
+    let globs = FileIndex.get_symbols path in
     let globs = List.sort
         (fun g1 g2 ->
-           Cil_datatype.Location.compare
+           Fileloc.compare
              (Cil_datatype.Global.loc g1)
              (Cil_datatype.Global.loc g2))
         globs
@@ -950,12 +949,9 @@ let get_comments_global g =
       | [] ->
         Kernel.fatal "Cannot find global %a in file %a"
           Cil_printer.pp_global g
-          Filepath.pretty file
+          Filepath.pretty path
       | g' :: l when Cil_datatype.Global.equal g g' ->
-        { Filepos.pos_path = file;
-          pos_lnum = 1;
-          pos_cnum = 0;
-          pos_bol = 0; }, l = []
+        first_pos path, l = []
       | g' :: g'' :: l when Cil_datatype.Global.equal g'' g ->
         snd (Cil_datatype.Global.loc g'), l = []
       | _ :: l -> find_prev l
@@ -969,11 +965,11 @@ let get_comments_global g =
       let comments = Cabshelper.Comments.get (first,last) in
       if is_last then begin
         let first = snd my_loc in
-        let last = last_pos file in
+        let last = last_pos input_path in
         comments @ (Cabshelper.Comments.get (first, last))
       end else comments
     | _ ->
-      let last = if is_last then last_pos file else snd my_loc in
+      let last = if is_last then last_pos input_path else snd my_loc in
       Cabshelper.Comments.get (first,last)
   in Comments_global_cache.memo add g
 

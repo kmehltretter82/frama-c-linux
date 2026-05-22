@@ -24,7 +24,7 @@ val pp_hvars : Format.formatter -> hint_vars -> unit
 type hint_lval = {
   vars : hint_vars;
   names : string list;
-  loc : Cil_datatype.Location.t;
+  loc : Fileloc.t;
 }
 
 type t = hint_lval * term list

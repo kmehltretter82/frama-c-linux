@@ -6,7 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type location = Cil_datatype.Location.t
+type location = Fileloc.t
 
 (** Internal module holding the exception of [Error].
 
@@ -22,12 +22,12 @@ end
 module type S = sig
   type 'a result = ('a, exn) Result.t
   include module type of Exn
-  val make_untypable: ?loc:Cil_datatype.Location.t -> string -> exn
-  val make_not_yet: ?loc:Cil_datatype.Location.t -> string -> exn
-  val make_not_memoized: ?loc:Cil_datatype.Location.t -> unit -> exn
-  val untypable: ?loc:Cil_datatype.Location.t -> string -> 'a
-  val not_yet: ?loc:Cil_datatype.Location.t -> string -> 'a
-  val not_memoized: ?loc:Cil_datatype.Location.t -> unit -> 'a
+  val make_untypable: ?loc:Fileloc.t -> string -> exn
+  val make_not_yet: ?loc:Fileloc.t -> string -> exn
+  val make_not_memoized: ?loc:Fileloc.t -> unit -> exn
+  val untypable: ?loc:Fileloc.t -> string -> 'a
+  val not_yet: ?loc:Fileloc.t -> string -> 'a
+  val not_memoized: ?loc:Fileloc.t -> unit -> 'a
   val print_not_yet: string -> unit
   val handle: ('a -> 'a) -> 'a -> 'a
   val generic_handle: ('a -> 'b) -> 'b -> 'a -> 'b

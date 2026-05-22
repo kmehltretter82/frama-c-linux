@@ -42,7 +42,7 @@ let enter_ghost_code () = ghost_code := true
 let exit_ghost_code () = ghost_code := false
 
 let ghost_annot = ref false
-let ghost_annot_start = ref Cil_datatype.Location.unknown
+let ghost_annot_start = ref Fileloc.unknown
 let is_ghost_annot () = !ghost_annot
 let get_ghost_annot_start () = !ghost_annot_start
 let enter_ghost_annot () =
@@ -50,7 +50,7 @@ let enter_ghost_annot () =
   ghost_annot_start:= currentLoc()
 let exit_ghost_annot () =
   ghost_annot := false;
-  ghost_annot_start := Cil_datatype.Location.unknown
+  ghost_annot_start := Fileloc.unknown
 
 let add_comment c = Cabshelper.Comments.add (currentLoc()) c
 
@@ -98,7 +98,7 @@ let c23_or_later key builder =
 
 let filename_keyword () =
   let convert acc c = int64_of_char c :: acc in
-  let path (loc : Cil_types.location) = (fst loc).pos_path in
+  let path (loc : Cil_types.location) = Filepos.path (fst loc) in
   let filename loc = Filepath.to_string (path loc) in
   let ints loc = List.rev (String.fold_left convert [] (filename loc)) in
   add "__FC_FILENAME__" (fun loc -> CST_STRING (ints loc, loc))
@@ -387,7 +387,7 @@ let annot_lex initial rule lexbuf =
   try rule lexbuf
   with Parsing.Parse_error ->
     let start = Lexing.lexeme_start_p lexbuf in
-    let source = Filepos.of_lexing_pos start in
+    let source = E.convert_pos start in
     Kernel.warning ~wkey:Kernel.wkey_annot_error ~source "skipping annotation" ;
     initial lexbuf
 
@@ -541,7 +541,7 @@ rule initial = parse
     let start = Lexing.lexeme_start_p lexbuf in
     let content = chr lexbuf in
     let last = Lexing.lexeme_end_p lexbuf in
-    CST_CHAR (content, Cil_datatype.Location.of_lexing_loc (start,last))
+    CST_CHAR (content, E.convert_loc (start,last))
     }
 
   | "L'"
@@ -549,7 +549,7 @@ rule initial = parse
     let start = Lexing.lexeme_start_p lexbuf in
     let content = chr lexbuf in
     let last = Lexing.lexeme_end_p lexbuf in
-    CST_WCHAR (content, Cil_datatype.Location.of_lexing_loc (start,last))
+    CST_WCHAR (content, E.convert_loc (start,last))
     }
 
   | '"'
@@ -557,7 +557,7 @@ rule initial = parse
     let start = Lexing.lexeme_start_p lexbuf in
     let content = str lexbuf in
     let last = Lexing.lexeme_end_p lexbuf in
-    CST_STRING (content, Cil_datatype.Location.of_lexing_loc (start,last))
+    CST_STRING (content, E.convert_loc (start,last))
     }
 
   | "L\""
@@ -565,7 +565,7 @@ rule initial = parse
     let start = Lexing.lexeme_start_p lexbuf in
     let content = str lexbuf in
     let last = Lexing.lexeme_end_p lexbuf in
-    CST_WSTRING(content, Cil_datatype.Location.of_lexing_loc (start,last))
+    CST_WSTRING(content, E.convert_loc (start,last))
     }
 
   | floatnum
@@ -729,19 +729,16 @@ and hash = parse
   | '\n' { E.newline (); initial lexbuf}
   | blank { hash lexbuf}
 
-  (* We are seeing a line number. This is the number for the next line *)
-  | intnum
-    {
-    let s = Lexing.lexeme lexbuf in
+  (* #line directive, the "line" before the number can be omitted. *)
+  | ("line" blank +)? (intnum as s)
+    { 
     let msg () = Kernel.warning "Bad line number in preprocessed file: %s" s in
-    let lineno = try int_of_string s with Failure _ -> msg () ; -1 in
-    E.setCurrentLine (lineno - 1) ;
+    let lineno = try int_of_string s with Failure _ -> msg () ; 0 in
     (* A file name may follow *)
-    file lexbuf
+    let filename = file lexbuf in
+    E.setCurrentLine ?filename lineno;
+    initial lexbuf
     }
-
-  (* MSVC line number info *)
-  | "line" { hash lexbuf }
 
   (* For pragmas with irregular syntax, like #pragma warning, we parse them as a
      whole line. *)
@@ -754,28 +751,33 @@ and hash = parse
   | "pragma"  { pragmaLine := true ; PRAGMA (currentLoc ()) }
   | _         { endline lexbuf }
 
+and ignore_line_end = parse 
+  | '\n' { E.newline () }
+  | eof { }
+  | _ { ignore_line_end lexbuf }
 
 and file = parse
-  | '\n'  { E.newline () ; initial lexbuf }
+  | '\n'  { E.newline (); None }
   | blank { file lexbuf }
 
   (* The //-ending file directive is a GCC extension that provides the CWD of
      the preprocessor when the file was preprocessed. *)
   | '"' ([^ '\012' '\t' '"']* as d) "//\""
     {
-    E.setCurrentWorkingDirectory (Filepath.of_string d) ;
-    endline lexbuf
+    E.setCurrentWorkingDirectory (Filepath.of_string d);
+    ignore_line_end lexbuf;
+    None
     }
 
   | '"' (([^ '\012' '\t' '"']|"\\\"")* as f) '"'
     {
     let unescape = Str.regexp_string "\\\"" in
-    let f = Str.global_replace unescape "\"" f in
-    E.setCurrentFile f ;
-    endline lexbuf
+    let filename = Str.global_replace unescape "\"" f in
+    ignore_line_end lexbuf;
+    Some filename
     }
 
-  | _ { endline lexbuf }
+  | _ { ignore_line_end lexbuf; None }
 
 
 and endline = parse

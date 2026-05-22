@@ -18,6 +18,6 @@
 [pdg] computing for function loop
 [pdg] done for function loop
 [impact] impacted statements of stmt(s) 9 are:
-    loop.i:11 (sid 7): z = y + 1;loop.i:13 (sid 9): x ++;
-    loop.i:14 (sid 10): y = x + 1;loop.i:16 (sid 11): w = z;
+    loop.i:11:9-14 (sid 7): z = y + 1;loop.i:13:9-14 (sid 9): x ++;
+    loop.i:14:9-14 (sid 10): y = x + 1;loop.i:16:7-8 (sid 11): w = z;
 [impact] analysis done

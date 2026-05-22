@@ -29,7 +29,7 @@ let run () =
     Kernel.warning "Missing assigns / default behavior in %d function(s):@."
       (List.length todo);
     List.iter (fun (name, loc) ->
-        Format.printf "  %s (%a)@." name Printer.pp_location loc
+        Format.printf "  %s (%a)@." name Fileloc.pretty loc
       ) todo
   end
 

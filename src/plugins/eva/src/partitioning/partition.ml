@@ -27,7 +27,7 @@ type split_term =
 type split_monitor = {
   split_term : split_term;
   split_kind : split_kind;
-  split_loc : Cil_datatype.Location.t;
+  split_loc : Fileloc.t;
   split_limit : int;
   mutable split_values : Z.Set.t;
 }
@@ -81,7 +81,7 @@ module SplitMonitor = Datatype.Make_with_collections (
     let reprs = [{
         split_term = Expression (List.hd Eva_ast.Exp.reprs);
         split_kind = Static;
-        split_loc = Cil_datatype.Location.unknown;
+        split_loc = Fileloc.unknown;
         split_limit = 0;
         split_values = Z.Set.empty
       }]
@@ -92,7 +92,7 @@ module SplitMonitor = Datatype.Make_with_collections (
     let hash m =
       hash (
         SplitTerm.hash m.split_term,
-        Cil_datatype.Location.hash m.split_loc,
+        Fileloc.hash m.split_loc,
         Datatype.Int.hash m.split_limit,
         Values.hash m.split_values)
 

@@ -101,7 +101,7 @@ let cover_errors () =
   Format.printf "Trigger some errors/warnings :@.";
 
   (* Test when a statement is not in a function. *)
-  let loc = Cil_datatype.Location.unknown in
+  let loc = Fileloc.unknown in
   let skip = Cil_builder.Pure.(cil_stmt ~loc skip) in
   try ignore (Dominators.get_postdominators skip) with Log.AbortFatal _ -> ();
 

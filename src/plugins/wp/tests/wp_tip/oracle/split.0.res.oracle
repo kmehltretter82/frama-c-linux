@@ -55,7 +55,7 @@
 [wp] 25 goals scheduled
 [wp] [Valid] typed_test_step_branch_terminates (Qed)
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 37) in 'test_step_branch':
+  Goal Post-condition ("split.i", line 37, characters 13-14) in 'test_step_branch':
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     If a < b
@@ -67,31 +67,31 @@
   ------------------------------------------------------------
 [wp] [Valid] typed_test_step_branch_exits (Qed)
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 47) in 'test_step_or':
+  Goal Post-condition ("split.i", line 47, characters 13-14) in 'test_step_or':
   Assume { (* Pre-condition *) Have: P_P \/ P_Q \/ P_R. }
   Prove: P_S.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 51) in 'test_step_and':
+  Goal Post-condition ("split.i", line 51, characters 13-14) in 'test_step_and':
   Assume { (* Pre-condition *) Have: P_P /\ P_Q /\ P_R. }
   Prove: P_S.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 55) in 'test_step_peq':
+  Goal Post-condition ("split.i", line 55, characters 13-14) in 'test_step_peq':
   Assume { (* Pre-condition *) Have: (L_LQ=true) <-> (L_LP=true). }
   Prove: P_S.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 59) in 'test_step_pneq':
+  Goal Post-condition ("split.i", line 59, characters 13-14) in 'test_step_pneq':
   Assume { (* Pre-condition *) Have: !((L_LQ=true) <-> (L_LP=true)). }
   Prove: P_S.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 63) in 'test_step_neq':
+  Goal Post-condition ("split.i", line 63, characters 13-14) in 'test_step_neq':
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Pre-condition *)
@@ -101,7 +101,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 67) in 'test_step_leq':
+  Goal Post-condition ("split.i", line 67, characters 13-14) in 'test_step_leq':
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Pre-condition *)
@@ -111,14 +111,14 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 71) in 'test_step_lt':
+  Goal Post-condition ("split.i", line 71, characters 13-14) in 'test_step_lt':
   Assume { Type: is_sint32(a) /\ is_sint32(b). (* Pre-condition *) Have: a < b.
   }
   Prove: P_S.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 75) in 'test_step_if':
+  Goal Post-condition ("split.i", line 75, characters 13-14) in 'test_step_if':
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Pre-condition *)
@@ -128,7 +128,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 79) in 'test_step_fa_if':
+  Goal Post-condition ("split.i", line 79, characters 13-14) in 'test_step_fa_if':
   Assume {
     (* Heap *)
     Type: is_sint32(a) /\ is_sint32(b).
@@ -139,7 +139,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 83) in 'test_step_fa_or':
+  Goal Post-condition ("split.i", line 83, characters 13-14) in 'test_step_fa_or':
   Assume {
     (* Pre-condition *)
     Have: forall i : Z. P_P \/ P_Q \/ P_R \/ P_Pi(i) \/ P_Qi(i).
@@ -148,7 +148,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 87) in 'test_step_fa_and':
+  Goal Post-condition ("split.i", line 87, characters 13-14) in 'test_step_fa_and':
   Assume {
     (* Pre-condition *)
     Have: forall i : Z. P_P /\ P_Q /\ P_R /\ P_Pi(i) /\ P_Qi(i).
@@ -157,7 +157,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 91) in 'test_inside_leq':
+  Goal Post-condition ("split.i", line 91, characters 13-14) in 'test_inside_leq':
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Pre-condition *)
@@ -167,7 +167,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 95) in 'test_inside_lt':
+  Goal Post-condition ("split.i", line 95, characters 13-14) in 'test_inside_lt':
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Pre-condition *)
@@ -177,7 +177,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 99) in 'test_inside_neq':
+  Goal Post-condition ("split.i", line 99, characters 13-14) in 'test_inside_neq':
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Pre-condition *)
@@ -187,43 +187,43 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 103) in 'test_goal_and':
+  Goal Post-condition ("split.i", line 103, characters 13-24) in 'test_goal_and':
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: P_P /\ P_Q /\ P_R.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 107) in 'test_goal_eq':
+  Goal Post-condition ("split.i", line 107, characters 13-21) in 'test_goal_eq':
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: (L_LQ=true) <-> (L_LP=true).
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 111) in 'test_goal_neq':
+  Goal Post-condition ("split.i", line 111, characters 13-21) in 'test_goal_neq':
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: !((L_LQ=true) <-> (L_LP=true)).
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 115) in 'test_goal_if':
+  Goal Post-condition ("split.i", line 115, characters 13-28) in 'test_goal_if':
   Assume { Type: is_sint32(a) /\ is_sint32(b). (* Pre-condition *) Have: P_S. }
   Prove: if (a < b) then P_P else P_Q.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 119) in 'test_goal_ex_and':
+  Goal Post-condition ("split.i", line 119, characters 13-57) in 'test_goal_ex_and':
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: exists i : Z. P_P /\ P_Q /\ P_Pi(i) /\ P_Qi(i).
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 123) in 'test_goal_ex_or':
+  Goal Post-condition ("split.i", line 123, characters 13-57) in 'test_goal_ex_or':
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: exists i : Z. P_P \/ P_Q \/ P_Pi(i) \/ P_Qi(i).
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 127) in 'test_goal_ex_if':
+  Goal Post-condition ("split.i", line 127, characters 13-66) in 'test_goal_ex_if':
   Assume {
     (* Heap *)
     Type: is_sint32(a) /\ is_sint32(b).
@@ -234,7 +234,7 @@
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Goal Post-condition (file split.i, line 131) in 'test_goal_ex_imply':
+  Goal Post-condition ("split.i", line 131, characters 13-53) in 'test_goal_ex_imply':
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: exists i : Z. (P_Q -> (P_Pi(i) -> P_Qi(i))).
   
@@ -242,7 +242,7 @@
 [wp:script:allgoals] 
   typed_test_step_branch_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_branch_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_step_branch_ensures-0 (<generated by wp>):
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Then *)
@@ -256,7 +256,7 @@
 [wp:script:allgoals] 
   typed_test_step_branch_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_branch_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_step_branch_ensures-1 (<generated by wp>):
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Else *)
@@ -271,7 +271,7 @@
 [wp:script:allgoals] 
   typed_test_step_or_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_or_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_step_or_ensures-0 (<generated by wp>):
   Assume { (* Case 1/3 *) When: P_P. }
   Prove: P_S.
   
@@ -279,7 +279,7 @@
 [wp:script:allgoals] 
   typed_test_step_or_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_or_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_step_or_ensures-1 (<generated by wp>):
   Assume { (* Case 2/3 *) When: P_Q. }
   Prove: P_S.
   
@@ -287,7 +287,7 @@
 [wp:script:allgoals] 
   typed_test_step_or_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_or_ensures-2 (generated):
+  Goal Wp.Tactical.typed_test_step_or_ensures-2 (<generated by wp>):
   Assume { (* Case 3/3 *) When: P_R. }
   Prove: P_S.
   
@@ -296,7 +296,7 @@
 [wp:script:allgoals] 
   typed_test_step_and_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_and_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_step_and_ensures-0 (<generated by wp>):
   Assume {
     (* Pre-condition *)
     Have: P_P.
@@ -312,7 +312,7 @@
 [wp:script:allgoals] 
   typed_test_step_peq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_peq_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_step_peq_ensures-0 (<generated by wp>):
   Assume { (* Both True *) When: (L_LP=true) /\ (L_LQ=true). }
   Prove: P_S.
   
@@ -320,7 +320,7 @@
 [wp:script:allgoals] 
   typed_test_step_peq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_peq_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_step_peq_ensures-1 (<generated by wp>):
   Assume { (* Both False *) When: (L_LP=false) /\ (L_LQ=false). }
   Prove: P_S.
   
@@ -329,7 +329,7 @@
 [wp:script:allgoals] 
   typed_test_step_pneq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_pneq_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_step_pneq_ensures-0 (<generated by wp>):
   Assume { (* True/False *) When: (L_LP=false) /\ (L_LQ=true). }
   Prove: P_S.
   
@@ -337,7 +337,7 @@
 [wp:script:allgoals] 
   typed_test_step_pneq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_pneq_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_step_pneq_ensures-1 (<generated by wp>):
   Assume { (* False/True *) When: (L_LP=true) /\ (L_LQ=false). }
   Prove: P_S.
   
@@ -346,7 +346,7 @@
 [wp:script:allgoals] 
   typed_test_step_neq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_neq_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_step_neq_ensures-0 (<generated by wp>):
   Assume { Type: is_sint32(a) /\ is_sint32(b). (* Lt *) When: b < a. }
   Prove: P_S.
   
@@ -354,7 +354,7 @@
 [wp:script:allgoals] 
   typed_test_step_neq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_neq_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_step_neq_ensures-1 (<generated by wp>):
   Prove: true.
   Prover Qed returns Valid
   
@@ -362,7 +362,7 @@
 [wp:script:allgoals] 
   typed_test_step_neq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_neq_ensures-2 (generated):
+  Goal Wp.Tactical.typed_test_step_neq_ensures-2 (<generated by wp>):
   Assume { Type: is_sint32(a) /\ is_sint32(b). (* Gt *) When: a < b. }
   Prove: P_S.
   
@@ -371,7 +371,7 @@
 [wp:script:allgoals] 
   typed_test_step_leq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_leq_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_step_leq_ensures-0 (<generated by wp>):
   Assume { Type: is_sint32(a) /\ is_sint32(b). (* Lt *) When: a < b. }
   Prove: P_S.
   
@@ -379,14 +379,14 @@
 [wp:script:allgoals] 
   typed_test_step_leq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_leq_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_step_leq_ensures-1 (<generated by wp>):
   Prove: P_S.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
   typed_test_step_leq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_leq_ensures-2 (generated):
+  Goal Wp.Tactical.typed_test_step_leq_ensures-2 (<generated by wp>):
   Prove: true.
   Prover Qed returns Valid
   
@@ -395,7 +395,7 @@
 [wp:script:allgoals] 
   typed_test_step_lt_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_lt_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_step_lt_ensures-0 (<generated by wp>):
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Lt *)
@@ -409,14 +409,14 @@
 [wp:script:allgoals] 
   typed_test_step_lt_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_lt_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_step_lt_ensures-1 (<generated by wp>):
   Prove: P_S.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
   typed_test_step_lt_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_lt_ensures-2 (generated):
+  Goal Wp.Tactical.typed_test_step_lt_ensures-2 (<generated by wp>):
   Prove: true.
   Prover Qed returns Valid
   
@@ -425,7 +425,7 @@
 [wp:script:allgoals] 
   typed_test_step_if_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_if_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_step_if_ensures-0 (<generated by wp>):
   Assume { Type: is_sint32(a) /\ is_sint32(b). (* Then *) When: P_P /\ (a < b).
   }
   Prove: P_S.
@@ -434,7 +434,7 @@
 [wp:script:allgoals] 
   typed_test_step_if_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_if_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_step_if_ensures-1 (<generated by wp>):
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Else *)
@@ -447,7 +447,7 @@
 [wp:script:allgoals] 
   typed_test_step_fa_if_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_fa_if_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_step_fa_if_ensures-0 (<generated by wp>):
   Assume {
     (* Heap *)
     Type: is_sint32(a) /\ is_sint32(b).
@@ -460,7 +460,7 @@
 [wp:script:allgoals] 
   typed_test_step_fa_if_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_fa_if_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_step_fa_if_ensures-1 (<generated by wp>):
   Assume {
     (* Heap *)
     Type: is_sint32(a) /\ is_sint32(b).
@@ -474,7 +474,7 @@
 [wp:script:allgoals] 
   typed_test_step_fa_or_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_fa_or_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_step_fa_or_ensures-0 (<generated by wp>):
   Assume { (* Goal 1/2 *) When: P_P \/ P_Q \/ P_R. }
   Prove: P_S.
   
@@ -482,7 +482,7 @@
 [wp:script:allgoals] 
   typed_test_step_fa_or_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_fa_or_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_step_fa_or_ensures-1 (<generated by wp>):
   Assume { (* Goal 2/2 *) When: forall i : Z. P_Pi(i) \/ P_Qi(i). }
   Prove: P_S.
   
@@ -491,7 +491,7 @@
 [wp:script:allgoals] 
   typed_test_step_fa_and_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_step_fa_and_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_step_fa_and_ensures-0 (<generated by wp>):
   Assume {
     (* Split (distrib forall and) *)
     When: P_P /\ P_Q /\ P_R /\ (forall i : Z. P_Pi(i)) /\
@@ -504,7 +504,7 @@
 [wp:script:allgoals] 
   typed_test_inside_leq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_inside_leq_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_inside_leq_ensures-0 (<generated by wp>):
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Lt *)
@@ -518,7 +518,7 @@
 [wp:script:allgoals] 
   typed_test_inside_leq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_inside_leq_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_inside_leq_ensures-1 (<generated by wp>):
   Assume { (* Pre-condition *) Have: P_P. }
   Prove: P_Q.
   
@@ -526,7 +526,7 @@
 [wp:script:allgoals] 
   typed_test_inside_leq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_inside_leq_ensures-2 (generated):
+  Goal Wp.Tactical.typed_test_inside_leq_ensures-2 (<generated by wp>):
   Prove: true.
   Prover Qed returns Valid
   
@@ -535,7 +535,7 @@
 [wp:script:allgoals] 
   typed_test_inside_lt_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_inside_lt_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_inside_lt_ensures-0 (<generated by wp>):
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Lt *)
@@ -549,7 +549,7 @@
 [wp:script:allgoals] 
   typed_test_inside_lt_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_inside_lt_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_inside_lt_ensures-1 (<generated by wp>):
   Assume { (* Pre-condition *) Have: P_P. }
   Prove: P_Q.
   
@@ -557,7 +557,7 @@
 [wp:script:allgoals] 
   typed_test_inside_lt_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_inside_lt_ensures-2 (generated):
+  Goal Wp.Tactical.typed_test_inside_lt_ensures-2 (<generated by wp>):
   Prove: true.
   Prover Qed returns Valid
   
@@ -566,7 +566,7 @@
 [wp:script:allgoals] 
   typed_test_inside_neq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_inside_neq_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_inside_neq_ensures-0 (<generated by wp>):
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Lt *)
@@ -580,7 +580,7 @@
 [wp:script:allgoals] 
   typed_test_inside_neq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_inside_neq_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_inside_neq_ensures-1 (<generated by wp>):
   Prove: true.
   Prover Qed returns Valid
   
@@ -588,7 +588,7 @@
 [wp:script:allgoals] 
   typed_test_inside_neq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_inside_neq_ensures-2 (generated):
+  Goal Wp.Tactical.typed_test_inside_neq_ensures-2 (<generated by wp>):
   Assume {
     Type: is_sint32(a) /\ is_sint32(b).
     (* Gt *)
@@ -603,7 +603,7 @@
 [wp:script:allgoals] 
   typed_test_goal_and_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_goal_and_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_goal_and_ensures-0 (<generated by wp>):
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: P_P.
   
@@ -611,7 +611,7 @@
 [wp:script:allgoals] 
   typed_test_goal_and_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_goal_and_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_goal_and_ensures-1 (<generated by wp>):
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: P_Q.
   
@@ -619,7 +619,7 @@
 [wp:script:allgoals] 
   typed_test_goal_and_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_goal_and_ensures-2 (generated):
+  Goal Wp.Tactical.typed_test_goal_and_ensures-2 (<generated by wp>):
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: P_R.
   
@@ -628,7 +628,7 @@
 [wp:script:allgoals] 
   typed_test_goal_eq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_goal_eq_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_goal_eq_ensures-0 (<generated by wp>):
   Assume { Have: (L_LQ=true). (* Pre-condition *) Have: P_S. }
   Prove: (L_LP=true).
   
@@ -636,7 +636,7 @@
 [wp:script:allgoals] 
   typed_test_goal_eq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_goal_eq_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_goal_eq_ensures-1 (<generated by wp>):
   Assume { Have: (L_LP=true). (* Pre-condition *) Have: P_S. }
   Prove: (L_LQ=true).
   
@@ -645,7 +645,7 @@
 [wp:script:allgoals] 
   typed_test_goal_neq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_goal_neq_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_goal_neq_ensures-0 (<generated by wp>):
   Assume { Have: (L_LQ=true). (* Pre-condition *) Have: P_S. }
   Prove: (L_LP=false).
   
@@ -653,7 +653,7 @@
 [wp:script:allgoals] 
   typed_test_goal_neq_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_goal_neq_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_goal_neq_ensures-1 (<generated by wp>):
   Assume { Have: (L_LP=true). (* Pre-condition *) Have: P_S. }
   Prove: (L_LQ=false).
   
@@ -662,7 +662,7 @@
 [wp:script:allgoals] 
   typed_test_goal_if_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_goal_if_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_goal_if_ensures-0 (<generated by wp>):
   Assume {
     Have: a < b.
     Type: is_sint32(a) /\ is_sint32(b).
@@ -675,7 +675,7 @@
 [wp:script:allgoals] 
   typed_test_goal_if_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_goal_if_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_goal_if_ensures-1 (<generated by wp>):
   Assume {
     Have: b <= a.
     Type: is_sint32(a) /\ is_sint32(b).
@@ -689,7 +689,7 @@
 [wp:script:allgoals] 
   typed_test_goal_ex_and_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_goal_ex_and_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_goal_ex_and_ensures-0 (<generated by wp>):
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: P_P /\ P_Q.
   
@@ -697,7 +697,7 @@
 [wp:script:allgoals] 
   typed_test_goal_ex_and_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_goal_ex_and_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_goal_ex_and_ensures-1 (<generated by wp>):
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: exists i : Z. P_Pi(i) /\ P_Qi(i).
   
@@ -706,7 +706,7 @@
 [wp:script:allgoals] 
   typed_test_goal_ex_or_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_goal_ex_or_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_goal_ex_or_ensures-0 (<generated by wp>):
   Assume { (* Pre-condition *) Have: P_S. }
   Prove: P_P \/ P_Q \/ (exists i : Z. P_Pi(i)) \/ (exists i : Z. P_Qi(i)).
   
@@ -715,7 +715,7 @@
 [wp:script:allgoals] 
   typed_test_goal_ex_if_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_goal_ex_if_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_goal_ex_if_ensures-0 (<generated by wp>):
   Assume {
     Have: a < b.
     (* Heap *)
@@ -729,7 +729,7 @@
 [wp:script:allgoals] 
   typed_test_goal_ex_if_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_goal_ex_if_ensures-1 (generated):
+  Goal Wp.Tactical.typed_test_goal_ex_if_ensures-1 (<generated by wp>):
   Assume {
     Have: b <= a.
     (* Heap *)
@@ -744,7 +744,7 @@
 [wp:script:allgoals] 
   typed_test_goal_ex_imply_ensures subgoal:
   
-  Goal Wp.Tactical.typed_test_goal_ex_imply_ensures-0 (generated):
+  Goal Wp.Tactical.typed_test_goal_ex_imply_ensures-0 (<generated by wp>):
   Assume {
     Have: P_Q.
     Have: forall i : Z. P_Pi(i).

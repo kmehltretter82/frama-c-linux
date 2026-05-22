@@ -12,16 +12,16 @@
   S_c2_C[0..1] ∈ [--..--]
 [eva:progress] 
   computing for function main1 <- main.
-  Called from struct_call.i:46.
+  Called from struct_call.i:46:3-10.
 [eva:progress] 
   computing for function g <- main1 <- main.
-  Called from struct_call.i:33.
+  Called from struct_call.i:33:8-16.
 [eva:show] struct_call.i:16: Frama_C_show_each_G: {0}
 [eva:progress] Recording results for g
 [eva:progress] Done for function g
 [eva:progress] 
   computing for function create_A <- main1 <- main.
-  Called from struct_call.i:34.
+  Called from struct_call.i:34:19-29.
 [eva:show] struct_call.i:25: 
   Frama_C_show_each_GG: .x ∈ {1}
                         .y ∈ {0}
@@ -29,7 +29,7 @@
 [eva:progress] Done for function create_A
 [eva:progress] 
   computing for function g <- main1 <- main.
-  Called from struct_call.i:35.
+  Called from struct_call.i:35:10-17.
 [eva:show] struct_call.i:16: 
   Frama_C_show_each_G: .x ∈ {0}
                        .y ∈ {77}
@@ -39,7 +39,7 @@
 [eva:progress] Done for function main1
 [eva:progress] 
   computing for function h <- main.
-  Called from struct_call.i:47.
+  Called from struct_call.i:47:3-7.
 [eva:show] struct_call.i:42: 
   Frama_C_show_each: [-32768..32767], {{ NULL ; &S_c2_C }}
 [eva:progress] Recording results for h

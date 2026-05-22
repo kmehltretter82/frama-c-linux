@@ -104,7 +104,7 @@ struct
         let limit = split_limit
         and term = Partition.Expression (Eva_ast.Build.var_exp vi)
         and kind = Partition.Dynamic
-        and loc = Cil_datatype.Location.unknown in
+        and loc = Fileloc.unknown in
         let monitor = Partition.new_monitor ~limit ~term ~kind ~loc in
         Partition.Split monitor :: l
       with Not_found ->

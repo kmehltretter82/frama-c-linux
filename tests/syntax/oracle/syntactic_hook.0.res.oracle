@@ -35,7 +35,7 @@
   [SH]: side effect of expression x++ occurs in conditional part of
   expression x ? x++ : x++. It is not always executed.
 [kernel] syntactic_hook.i:30: User Error: 
-  Declaration of f does not match previous declaration from syntactic_hook.i:8 (different number of arguments).
+  Declaration of f does not match previous declaration from syntactic_hook.i:8:5-6 (different number of arguments).
   28    }
   29    
   30    int f(int); //error: conflicting decls

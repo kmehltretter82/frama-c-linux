@@ -6,71 +6,71 @@
   
 [eva:progress] 
   computing for function f <- main.
-  Called from bts0506.i:47.
+  Called from bts0506.i:47:7-12.
 [eva:progress] Recording results for f
 [eva:progress] Done for function f
 [eva:progress] 
   computing for function main2 <- main.
-  Called from bts0506.i:49.
+  Called from bts0506.i:49:3-10.
 [kernel:annot:missing-spec] bts0506.i:15: Warning: 
   Neither code nor specification for function f1, generating default assigns.
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f1 <- main2 <- main.
-  Called from bts0506.i:15.
+  Called from bts0506.i:15:13-17.
 [eva] using specification for function f1
 [eva:progress] Done for function f1
 [eva:progress] 
   computing for function f1 <- main2 <- main.
-  Called from bts0506.i:16.
+  Called from bts0506.i:16:14-18.
 [eva:progress] Done for function f1
 [eva:progress] 
   computing for function f1 <- main2 <- main.
-  Called from bts0506.i:17.
+  Called from bts0506.i:17:12-16.
 [eva:progress] Done for function f1
 [eva:progress] 
   computing for function f1 <- main2 <- main.
-  Called from bts0506.i:18.
+  Called from bts0506.i:18:21-25.
 [eva:progress] Done for function f1
 [kernel:annot:missing-spec] bts0506.i:20: Warning: 
   Neither code nor specification for function f2, generating default assigns.
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f2 <- main2 <- main.
-  Called from bts0506.i:20.
+  Called from bts0506.i:20:13-17.
 [eva] using specification for function f2
 [eva:progress] Done for function f2
 [eva:progress] 
   computing for function f2 <- main2 <- main.
-  Called from bts0506.i:21.
+  Called from bts0506.i:21:12-16.
 [eva:progress] Done for function f2
 [eva:progress] 
   computing for function f2 <- main2 <- main.
-  Called from bts0506.i:22.
+  Called from bts0506.i:22:22-26.
 [eva:progress] Done for function f2
 [kernel:annot:missing-spec] bts0506.i:24: Warning: 
   Neither code nor specification for function f3, generating default assigns.
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f3 <- main2 <- main.
-  Called from bts0506.i:24.
+  Called from bts0506.i:24:21-25.
 [eva] using specification for function f3
 [eva:progress] Done for function f3
 [eva:progress] 
   computing for function f3 <- main2 <- main.
-  Called from bts0506.i:25.
+  Called from bts0506.i:25:15-19.
 [eva:progress] Done for function f3
 [kernel:annot:missing-spec] bts0506.i:27: Warning: 
   Neither code nor specification for function f4, generating default assigns.
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f4 <- main2 <- main.
-  Called from bts0506.i:27.
+  Called from bts0506.i:27:14-18.
 [eva] using specification for function f4
 [eva:progress] Done for function f4
 [eva:progress] 
   computing for function f4 <- main2 <- main.
-  Called from bts0506.i:28.
+  Called from bts0506.i:28:16-20.
 [eva:progress] Done for function f4
 [eva:alarm] bts0506.i:28: Warning: 
   non-finite float value. assert \is_finite(tmp_9);
@@ -80,7 +80,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f5 <- main2 <- main.
-  Called from bts0506.i:30.
+  Called from bts0506.i:30:15-19.
 [eva] using specification for function f5
 [eva:progress] Done for function f5
 [eva:alarm] bts0506.i:30: Warning: 
@@ -91,35 +91,35 @@
                           (tmp_10 from f5())
 [eva:progress] 
   computing for function f5 <- main2 <- main.
-  Called from bts0506.i:31.
+  Called from bts0506.i:31:16-20.
 [eva:progress] Done for function f5
 [kernel:annot:missing-spec] bts0506.i:33: Warning: 
   Neither code nor specification for function f6, generating default assigns.
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f6 <- main2 <- main.
-  Called from bts0506.i:33.
+  Called from bts0506.i:33:15-19.
 [eva] using specification for function f6
 [eva:progress] Done for function f6
 [eva:progress] 
   computing for function f6 <- main2 <- main.
-  Called from bts0506.i:34.
+  Called from bts0506.i:34:14-18.
 [eva:progress] Done for function f6
 [eva:progress] 
   computing for function f6 <- main2 <- main.
-  Called from bts0506.i:35.
+  Called from bts0506.i:35:15-19.
 [eva:progress] Done for function f6
 [kernel:annot:missing-spec] bts0506.i:37: Warning: 
   Neither code nor specification for function f7, generating default assigns.
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function f7 <- main2 <- main.
-  Called from bts0506.i:37.
+  Called from bts0506.i:37:15-19.
 [eva] using specification for function f7
 [eva:progress] Done for function f7
 [eva:progress] 
   computing for function f7 <- main2 <- main.
-  Called from bts0506.i:38.
+  Called from bts0506.i:38:14-18.
 [eva:progress] Done for function f7
 [eva:progress] Recording results for main2
 [eva:progress] Done for function main2

@@ -143,7 +143,7 @@ class deadCallsVisitor fmt ~libc cov_metrics =
              Format.fprintf fmt
                "@[<h>%s referenced by an ACSL specification (at %a)@]@ "
                vi.vname
-               Location.pretty (Current_loc.get ())
+               Fileloc.pretty (Current_loc.get ())
            | Some vinit ->
              Format.fprintf fmt
                "@[<h>Initializer of %s references %s (at %t)@]@ "
@@ -164,7 +164,7 @@ class deadCallsVisitor fmt ~libc cov_metrics =
             Format.fprintf fmt
               "@[<h>Function %a %s %s (at %a)@]@ "
               Kernel_function.pretty f mess vi.vname
-              Location.pretty (Current_loc.get ())
+              Fileloc.pretty (Current_loc.get ())
 
     method! vvrbl vi =
       if Ast_types.is_fun vi.vtype then self#reached_fun vi;

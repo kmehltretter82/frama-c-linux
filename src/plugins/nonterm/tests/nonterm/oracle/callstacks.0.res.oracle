@@ -6,16 +6,16 @@
   nondet ∈ [--..--]
 [eva:progress] 
   computing for function h <- main.
-  Called from callstacks.i:23.
+  Called from callstacks.i:23:17-21.
 [eva:progress] 
   computing for function g <- h <- main.
-  Called from callstacks.i:18.
+  Called from callstacks.i:18:17-21.
 [eva:progress] 
   computing for function f <- g <- h <- main.
-  Called from callstacks.i:13.
+  Called from callstacks.i:13:17-21.
 [eva:progress] 
   computing for function nt <- f <- g <- h <- main.
-  Called from callstacks.i:8.
+  Called from callstacks.i:8:17-22.
 [eva:progress] Recording results for nt
 [eva:progress] Done for function nt
 [eva:progress] callstacks.i:9: Reusing old results for call to nt
@@ -43,10 +43,10 @@
   NON TERMINATING FUNCTION
 [nonterm:stmt] callstacks.i:4: Warning: 
   non-terminating loop
-  stack: nt :: callstacks.i:8 <-
-         f :: callstacks.i:13 <-
-         g :: callstacks.i:18 <-
-         h :: callstacks.i:23 <-
+  stack: nt :: callstacks.i:8:17-22 <-
+         f :: callstacks.i:13:17-21 <-
+         g :: callstacks.i:18:17-21 <-
+         h :: callstacks.i:23:17-21 <-
          main
 [nonterm:unreachable] callstacks.i:8: Warning: unreachable return
 [nonterm:unreachable] callstacks.i:13: Warning: unreachable return

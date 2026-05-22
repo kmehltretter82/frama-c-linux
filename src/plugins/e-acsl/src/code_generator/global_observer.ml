@@ -80,11 +80,11 @@ let mk_function name =
       sallstmts = [];
       sspec = spec }
   in
-  let fct = Definition(fundec, Location.unknown) in
+  let fct = Definition(fundec, Fileloc.unknown) in
   (* Create and register the function as kernel function *)
   let kf = { fundec = fct; spec = spec } in
   Globals.Functions.register kf;
-  Globals.Functions.replace_by_definition spec fundec Location.unknown;
+  Globals.Functions.replace_by_definition spec fundec Fileloc.unknown;
   vi, fundec, kf
 
 let mk_init_function () =
@@ -137,7 +137,7 @@ let mk_init_function () =
            in
            (* a global is both allocated and initialized *)
            Smart_stmt.store_stmt vi
-           :: Smart_stmt.initialize ~loc:Location.unknown (Cil.var vi)
+           :: Smart_stmt.initialize ~loc:Fileloc.unknown (Cil.var vi)
            :: stmts
          end)
       stmts
@@ -151,7 +151,7 @@ let mk_init_function () =
   in
   let stmts = Smart_stmt.block_stmt b :: stmts in
   (* prevent multiple calls to [__e_acsl_globals_init] *)
-  let loc = Location.unknown in
+  let loc = Fileloc.unknown in
   let vi_already_run =
     Cil.makeLocalVar
       fundec
@@ -193,7 +193,7 @@ let mk_clean_function () =
        for de-allocation of global variables *)
     let vi, fundec, _kf = mk_function function_clean_name in
     (* Generate delete statements and add them to the function body *)
-    let return = Cil.mkStmt ~valid_sid:true (Return (None, Location.unknown)) in
+    let return = Cil.mkStmt ~valid_sid:true (Return (None, Fileloc.unknown)) in
     let stmts =
       GlobalVars.fold_sorted
         (fun vi _l acc ->

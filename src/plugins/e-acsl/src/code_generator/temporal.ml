@@ -15,7 +15,6 @@ module RTL = Functions.RTL
 module Libc = Functions.Libc
 module Error = Translation_error
 open Cil_types
-open Cil_datatype
 
 let generate = ref false
 let enable param = generate := param
@@ -390,7 +389,7 @@ let track_argument ?(typ) param index env =
   match Ast_types.unroll_node typ with
   | TPtr _
   | TComp _ ->
-    let stmt = Mk.pull_param ~loc:Location.unknown param index in
+    let stmt = Mk.pull_param ~loc:Fileloc.unknown param index in
     Env.add_stmt ~post:false env stmt
   | TInt _ | TFloat _ | TEnum _ | TBuiltin_va_list -> env
   | TNamed _ -> assert false

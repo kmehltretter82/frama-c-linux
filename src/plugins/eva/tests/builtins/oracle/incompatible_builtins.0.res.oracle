@@ -21,12 +21,12 @@
   
 [eva:progress] 
   computing for function pow <- main.
-  Called from incompatible_builtins.i:40.
+  Called from incompatible_builtins.i:40:11-20.
 [eva:progress] Recording results for pow
 [eva:progress] Done for function pow
 [eva:progress] 
   computing for function exp <- main.
-  Called from incompatible_builtins.i:41.
+  Called from incompatible_builtins.i:41:13-22.
 [eva] using specification for function exp
 [eva:progress] Done for function exp
 [kernel:annot:missing-spec] incompatible_builtins.i:42: Warning: 
@@ -34,7 +34,7 @@
   clauses. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function sqrt <- main.
-  Called from incompatible_builtins.i:42.
+  Called from incompatible_builtins.i:42:16-24.
 [eva] using specification for function sqrt
 [eva:progress] incompatible_builtins.i:42: 
   function sqrt: precondition 'finite_positive_arg' got status valid.
@@ -44,7 +44,7 @@
   clauses from the specification. See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function floor <- main.
-  Called from incompatible_builtins.i:43.
+  Called from incompatible_builtins.i:43:18-29.
 [eva] using specification for function floor
 [eva:progress] Done for function floor
 [kernel:annot:missing-spec] incompatible_builtins.i:44: Warning: 
@@ -52,7 +52,7 @@
   See -generated-spec-* options for more info.
 [eva:progress] 
   computing for function ceil <- main.
-  Called from incompatible_builtins.i:44.
+  Called from incompatible_builtins.i:44:17-27.
 [eva] using specification for function ceil
 [eva:progress] Done for function ceil
 [eva:progress] Recording results for main

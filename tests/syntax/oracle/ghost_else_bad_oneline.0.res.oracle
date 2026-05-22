@@ -1,7 +1,8 @@
 [kernel] Parsing ghost_else_bad_oneline.i (no preprocessing)
 [kernel] ghost_else_bad_oneline.i:8: 
   syntax error:
-  Location: line 8, column 18, before or at token: 
+  Location: "ghost_else_bad_oneline.i", line 8, character 19,
+            before or at token: 
   
   6       if (x) {
   7         x++;

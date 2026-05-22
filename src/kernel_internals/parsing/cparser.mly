@@ -39,7 +39,7 @@ let merge_string (c1,(b1,_)) (l2,(_,e2)) = c1 :: l2, (b1,e2)
 
 (* To be called only inside a grammar rule. *)
 let make_expr start_end_pos expr_node =
-  let expr_loc = Cil_datatype.Location.of_lexing_loc start_end_pos in
+  let expr_loc = Errorloc.convert_loc start_end_pos in
   { expr_loc; expr_node }
 
 let currentFunctionName = ref "<outside any function>"
@@ -266,7 +266,7 @@ let ghost_stmt s = {stmt_ghost = true ; stmt_node = s}
 let no_ghost = List.map no_ghost_stmt
 
 let in_block sloc l =
-  let loc = Cil_datatype.Location.of_lexing_loc sloc in
+  let loc = Errorloc.convert_loc sloc in
   match l with
   (* in_block should always called on parsed statement, which cannot return an
       empty list. *)
@@ -482,8 +482,8 @@ global:
     * "declaration". For now we keep it at global scope only because in local
     * scope it looks too much like a function call  *) */
 | f=IDENT LPAREN prms=old_parameter_list_ne RPAREN decls=old_pardef_list SEMICOLON {
-    let dloc = Cil_datatype.Location.of_lexing_loc $loc in
-    let floc = Cil_datatype.Location.of_lexing_loc $loc(f) in
+    let dloc = Errorloc.convert_loc $loc in
+    let floc = Errorloc.convert_loc $loc(f) in
     (* Convert pardecl to new style *)
     let pardecl, isva = doOldParDecl floc prms decls in
     (* Make the function declarator *)
@@ -492,8 +492,8 @@ global:
         [Ast_attributes.fc_oldstyleproto,[]], floc), NO_INIT)]
   }
 | f=IDENT LPAREN RPAREN SEMICOLON {
-    let dloc = Cil_datatype.Location.of_lexing_loc $loc in
-    let floc = Cil_datatype.Location.of_lexing_loc $loc(f) in
+    let dloc = Errorloc.convert_loc $loc in
+    let floc = Errorloc.convert_loc $loc(f) in
     doDeclaration None dloc []
       [((f, PROTO(JUSTBASE,[],[],false),
         [Ast_attributes.fc_oldstyleproto,[]], floc), NO_INIT)]
@@ -534,8 +534,8 @@ postfix_expression:                     /*(* 6.5.2 *)*/
 | BUILTIN_VA_ARG LPAREN expression COMMA type_name RPAREN {
     let builtin = "__builtin_va_arg" in
     let b, d = $5 in
-    let loc = Cil_datatype.Location.of_lexing_loc $loc($5) in
-    let loc_f = Cil_datatype.Location.of_lexing_loc $loc($1) in
+    let loc = Errorloc.convert_loc $loc($5) in
+    let loc_f = Errorloc.convert_loc $loc($1) in
     let type_as_expr = type_to_expr_for_builtin ~loc ~builtin b d in
     make_expr $sloc
       (CALL
@@ -547,9 +547,9 @@ postfix_expression:                     /*(* 6.5.2 *)*/
     let builtin = "__builtin_types_compatible_p" in
     let b1,d1 = $3 in
     let b2,d2 = $5 in
-    let loc_f = Cil_datatype.Location.of_lexing_loc $loc($1) in
-    let loc1 = Cil_datatype.Location.of_lexing_loc $loc($3) in
-    let loc2 = Cil_datatype.Location.of_lexing_loc $loc($5) in
+    let loc_f = Errorloc.convert_loc $loc($1) in
+    let loc1 = Errorloc.convert_loc $loc($3) in
+    let loc2 = Errorloc.convert_loc $loc($5) in
     let type_as_expr1 = type_to_expr_for_builtin ~loc:loc1 ~builtin b1 d1 in
     let type_as_expr2 = type_to_expr_for_builtin ~loc:loc2 ~builtin b2 d2 in
     make_expr $sloc
@@ -559,7 +559,7 @@ postfix_expression:                     /*(* 6.5.2 *)*/
           [ type_as_expr1; type_as_expr2],[]))
   }
 | BUILTIN_OFFSETOF LPAREN type_name COMMA offsetof_member_designator RPAREN {
-    let loc_f = Cil_datatype.Location.of_lexing_loc $loc($1) in
+    let loc_f = Errorloc.convert_loc $loc($1) in
     let arg = transformOffsetOf $3 $5 in
     let builtin = { expr_loc = loc_f;
                     expr_node = VARIABLE "__builtin_offsetof" }
@@ -742,7 +742,7 @@ string_constant:
 /* Now that we know this constant isn't part of a wstring, convert it
    back to a string for easy viewing. */
 | string_list {
-    let loc = Cil_datatype.Location.of_lexing_loc $loc in
+    let loc = Errorloc.convert_loc $loc in
     intlist_to_string ~loc (fst $1), snd $1
   }
 ;
@@ -912,7 +912,7 @@ annotated_statement:
 
 else_part:
 | /* empty */ {
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     no_ghost_stmt (NOP (None, loc))
   }
   %prec if_no_else /* To attach the next else to the current if */
@@ -921,7 +921,7 @@ else_part:
     { in_ghost_block ~battrs:[ (Ast_attributes.frama_c_ghost_else , []) ] $2 }
     %prec ghost_else_no_else /* To force the non ghost else to be attached to the current if */
 | LGHOST_ELSE annotated_statement RGHOST ELSE annotated_statement {
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     Kernel.warning ~wkey:Kernel.wkey_ghost_bad_use ~source:(fst loc)
       "Invalid ghost else ignored" ;
     in_block $loc($5) $5
@@ -944,83 +944,83 @@ statement:
     | None -> bs
   }
 | comma_expression SEMICOLON {
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     no_ghost [COMPUTATION (smooth_expression $1,loc)]
   }
 | block { let (x,y,z) = $1 in no_ghost [BLOCK (x, y, z)] }
 | IF paren_comma_expression annotated_statement else_part {
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     no_ghost [IF (smooth_expression $2, in_block $loc($3) $3, $4, loc)]
   }
 | SWITCH paren_comma_expression annotated_statement {
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     no_ghost [SWITCH (smooth_expression $2, in_block $loc($3) $3, loc)]
   }
 | opt_loop_annotations WHILE paren_comma_expression annotated_statement {
-    let first = Filepos.of_lexing_pos $startpos($2) in
-    let last = Filepos.of_lexing_pos $endpos in
+    let first = Errorloc.convert_pos $startpos($2) in
+    let last = Errorloc.convert_pos $endpos in
     no_ghost [WHILE ($1, smooth_expression $3, in_block $loc($4) $4, (first,last))]
   }
 | opt_loop_annotations DO annotated_statement WHILE paren_comma_expression SEMICOLON {
-    let first = Filepos.of_lexing_pos $startpos($2) in
-    let last = Filepos.of_lexing_pos $endpos in
+    let first = Errorloc.convert_pos $startpos($2) in
+    let last = Errorloc.convert_pos $endpos in
     no_ghost [DOWHILE ($1, smooth_expression $5, in_block $loc($3) $3, (first,last))]
   }
 | opt_loop_annotations FOR LPAREN for_clause opt_expression SEMICOLON
   opt_expression RPAREN annotated_statement {
-    let first = Filepos.of_lexing_pos $startpos($2) in
-    let last = Filepos.of_lexing_pos $endpos in
+    let first = Errorloc.convert_pos $startpos($2) in
+    let last = Errorloc.convert_pos $endpos in
     no_ghost [FOR ($1, $4, $5, $7, in_block $loc($9) $9, (first,last))]
   }
 | id = id_or_typename_as_id COLON s = annotated_statement {
-    let loc = Cil_datatype.Location.of_lexing_loc $loc(id) in
+    let loc = Errorloc.convert_loc $loc(id) in
     match s with
     | [] -> (* should not happen if grammar is written correctly *)
       Errorloc.parse_error ~loc "empty statement after label"
     | s :: others -> no_ghost [LABEL(id,s,loc)] @ others
   }
 | CASE expression COLON annotated_statement {
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     no_ghost [CASE ($2, in_block $loc($4) $4, loc)]
   }
 | CASE expression ELLIPSIS expression COLON annotated_statement {
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     no_ghost [CASERANGE ($2, $4, in_block $loc($6) $6, loc)]
   }
 | DEFAULT COLON annotated_statement {
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     no_ghost [DEFAULT (in_block $loc($3) $3, loc)]
   }
 | RETURN SEMICOLON {
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     no_ghost [RETURN ({ expr_loc = loc; expr_node = NOTHING}, loc)]
   }
 | RETURN comma_expression SEMICOLON {
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     no_ghost [RETURN (smooth_expression $2, loc)]
   }
 | BREAK SEMICOLON {
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     no_ghost [BREAK loc]
   }
 | CONTINUE SEMICOLON {
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     no_ghost [CONTINUE loc]
   }
 | GOTO id_or_typename_as_id SEMICOLON {
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     no_ghost [GOTO ($2, loc)]
   }
 | GOTO STAR comma_expression SEMICOLON {
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     no_ghost [COMPGOTO (smooth_expression $3, loc) ]
   }
 | ASM GOTO asmattr LPAREN asmtemplate asmoutputs RPAREN SEMICOLON {
-    let loc = Cil_datatype.Location.of_lexing_loc $loc in
+    let loc = Errorloc.convert_loc $loc in
     no_ghost [ASM ($3, mk_asm_templates $5, $6, loc)]
   }
 | ASM asmattr LPAREN asmtemplate asmoutputs RPAREN SEMICOLON {
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     no_ghost [ASM ($2, mk_asm_templates $4, $5, loc)]
   }
 ;
@@ -1062,7 +1062,7 @@ ghost_parameter:
 
 declaration:                                /* ISO 6.7.*/
 | spec=ioption(SPEC) specif=decl_spec_list decls=init_declarator_list? SEMICOLON {
-    let loc = Cil_datatype.Location.of_lexing_loc ($symbolstartpos,$endpos) in
+    let loc = Errorloc.convert_loc ($symbolstartpos,$endpos) in
     let decls = Option.value ~default:[] decls in
     if !Lexerhack.is_typedef () && decls = [] then begin
       let source = fst loc in
@@ -1085,7 +1085,7 @@ generic_selection: /* ISO C11 6.5.1.1 */
 | GENERIC LPAREN assignment_expression COMMA generic_association_list RPAREN
     { ($3, $5) }
 | GENERIC LPAREN assignment_expression RPAREN {
-    let loc = Cil_datatype.Location.of_lexing_loc $loc in
+    let loc = Errorloc.convert_loc $loc in
     Errorloc.parse_error ~loc
       "_Generic requires at least one generic association";
   }
@@ -1257,7 +1257,7 @@ type_spec:   /* ISO 6.7.2 */
 | ENUM   just_attributes                LBRACE enum_list maybecomma RBRACE
                                                    { Tenum   ("", Some $4, $2), $1 }
 | NAMED_TYPE      {
-      (Tnamed $1, Cil_datatype.Location.of_lexing_loc $sloc)
+      (Tnamed $1, Errorloc.convert_loc $sloc)
       }
 | TYPEOF LPAREN expression RPAREN     { TtypeofE $3, $1 }
 | TYPEOF LPAREN type_name RPAREN      { let s, d = $3 in
@@ -1270,7 +1270,7 @@ struct_decl_list:
 | /* empty */ { [] }
 | decl_spec_list SEMICOLON struct_decl_list
     {
-      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+      let loc = Errorloc.convert_loc $sloc in
       FIELD (fst $1, [(missingFieldDecl loc, None)]) :: $3
     }
 /*(* GCC allows extra semicolons *)*/
@@ -1303,7 +1303,7 @@ field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
     ((n,decl,al',loc), Some $3)
   }
 | COLON expression {
-      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+      let loc = Errorloc.convert_loc $sloc in
       (missingFieldDecl loc, Some $2)
     }
 ;
@@ -1315,22 +1315,22 @@ enum_list: /* (* ISO 6.7.2.2 *) */
 
 enumerator:
 | IDENT {
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     ($1, { expr_node = NOTHING; expr_loc = loc }, loc)
   }
 | IDENT just_attributes {
     let attrs = $2 in
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     Kernel.warning ~wkey:Kernel.wkey_parser_unsupported_attributes
       ~source:(fst loc)
       "Discarding attributes in enumerator (unsupported feature): %a"
       Cprint.print_attributes attrs;
     ($1, { expr_node = NOTHING; expr_loc = loc }, loc)
   }
-| IDENT EQ expression { ($1, $3, Cil_datatype.Location.of_lexing_loc $sloc) }
+| IDENT EQ expression { ($1, $3, Errorloc.convert_loc $sloc) }
 | IDENT just_attributes EQ expression {
     let attrs = $2 in
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     Kernel.warning ~wkey:Kernel.wkey_parser_unsupported_attributes
       ~source:(fst loc)
       "Discarding attributes in enumerator (unsupported feature): %a"
@@ -1358,7 +1358,7 @@ attributes_or_static: /* 6.7.5.2/3 */
 
 direct_decl: /* (* ISO 6.7.5 *) */
 /* (* We want to be able to redefine named types as variable names *) */
-| id_or_typename { ($1, JUSTBASE, Cil_datatype.Location.of_lexing_loc $sloc) }
+| id_or_typename { ($1, JUSTBASE, Errorloc.convert_loc $sloc) }
 
 | LPAREN attributes declarator RPAREN {
     let (n,decl,al,loc) = $3 in
@@ -1406,11 +1406,11 @@ parameter_decl: /* (* ISO 6.7.5 *) */
 | decl_spec_list declarator    { (fst $1, $2) }
 | decl_spec_list abstract_decl {
     let d, a = $2 in
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     (fst $1, ("", d, a, loc))
   }
 | decl_spec_list {
-    let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+    let loc = Errorloc.convert_loc $sloc in
     (fst $1, ("", JUSTBASE, [], loc))
   }
 | LPAREN parameter_decl RPAREN { $2 }
@@ -1471,7 +1471,7 @@ type_name: /* (* ISO 6.7.6 *) */
 | specif=decl_spec_list name=abstract_decl {
     let d, a = name in
     if a <> [] then begin
-      let loc = Cil_datatype.Location.of_lexing_loc ($loc(name)) in
+      let loc = Errorloc.convert_loc ($loc(name)) in
       Errorloc.parse_error ~loc "attributes in type name"
     end;
     (fst specif, d)
@@ -1538,7 +1538,7 @@ function_def_start: /* (* ISO 6.9.1 *) */
 | IDENT parameter_list_startscope rest_par_list RPAREN ghost_parameter_opt{
     let (params, isva) = $3 in
     let ghost = $5 in
-    let floc = Cil_datatype.Location.of_lexing_loc $loc($1) in
+    let floc = Errorloc.convert_loc $loc($1) in
     let fdec = ($1, PROTO(JUSTBASE, params, ghost, isva), [], floc) in
     announceFunctionName fdec;
     (* Default is int type *)
@@ -1548,7 +1548,7 @@ function_def_start: /* (* ISO 6.9.1 *) */
 /* (* No return type and old-style parameter list *) */
 | IDENT LPAREN old_parameter_list_ne RPAREN old_pardef_list {
     (* Convert pardecl to new style *)
-    let floc = Cil_datatype.Location.of_lexing_loc $loc($1) in
+    let floc = Errorloc.convert_loc $loc($1) in
     let pardecl, isva = doOldParDecl floc $3 $5 in
     (* Make the function declarator *)
     let fdec = ($1, PROTO(JUSTBASE, pardecl,[],isva), [], floc) in
@@ -1557,7 +1557,7 @@ function_def_start: /* (* ISO 6.9.1 *) */
     (floc, [SpecType Tint], fdec)
   }
 | IDENT LPAREN RPAREN ghost_parameter_opt {
-    let floc = Cil_datatype.Location.of_lexing_loc $loc($1) in
+    let floc = Errorloc.convert_loc $loc($1) in
     let fdec = ($1, PROTO(JUSTBASE,[],$4,false),[],floc) in
     announceFunctionName fdec;
     (floc, [SpecType Tint], fdec)
@@ -1584,7 +1584,7 @@ attributes_with_asm:
 | /* empty */                   { [] }
 | attribute attributes_with_asm { fst $1 :: $2 }
 | ASM LPAREN string_constant RPAREN attributes {
-    let loc = Cil_datatype.Location.of_lexing_loc $loc($3) in
+    let loc = Errorloc.convert_loc $loc($3) in
     ("__asm__",
       [{ expr_node = CONSTANT(CONST_STRING (fst $3)); expr_loc = loc}])
     :: $5
@@ -1687,15 +1687,15 @@ primary_attr:
 postfix_attr:
 | primary_attr { $1 }
 | id_or_typename_as_id paren_attr_list_ne {
-    let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
+    let loc = Errorloc.convert_loc $loc($1) in
     make_expr $sloc (CALL({ expr_loc = loc; expr_node = VARIABLE $1}, $2,[]))
   }
 /* (* use a VARIABLE "" so that the parentheses are printed *) */
 | id_or_typename_as_id LPAREN RPAREN {
-    let loc1 = Cil_datatype.Location.of_lexing_loc $loc($1) in
+    let loc1 = Errorloc.convert_loc $loc($1) in
     let loc2 =
-      Filepos.of_lexing_pos $startpos($2),
-      Filepos.of_lexing_pos $endpos($3)
+      Errorloc.convert_pos $startpos($2),
+      Errorloc.convert_pos $endpos($3)
     in
     let f = { expr_node = VARIABLE $1; expr_loc = loc1 } in
     let arg = { expr_node = VARIABLE ""; expr_loc = loc2 } in
@@ -1704,7 +1704,7 @@ postfix_attr:
 /* (* use a VARIABLE "" so that the parameters are printed without
     * parentheses nor comma *) */
 | basic_attr param_attr_list_ne {
-    let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
+    let loc = Errorloc.convert_loc $loc($1) in
     make_expr $sloc (CALL({ expr_node = VARIABLE ""; expr_loc = loc}, $1::$2,[]))
   }
 | postfix_attr ARROW id_or_typename   { make_expr $sloc (MEMBEROFPTR ($1, $3))}
@@ -1848,11 +1848,11 @@ asmattr:
 
 asmtemplate:
 | line=one_string {
-    let loc = Cil_datatype.Location.of_lexing_loc $loc in
+    let loc = Errorloc.convert_loc $loc in
     [intlist_to_string ~loc [fst line]]
   }
 | line=one_string rest=asmtemplate {
-    let loc = Cil_datatype.Location.of_lexing_loc $loc(line) in
+    let loc = Errorloc.convert_loc $loc(line) in
     intlist_to_string ~loc [fst line] :: rest
   }
 ;

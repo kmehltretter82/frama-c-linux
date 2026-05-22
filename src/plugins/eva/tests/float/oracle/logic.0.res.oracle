@@ -38,7 +38,7 @@
   top_int ∈ [--..--]
 [eva:progress] 
   computing for function test_equality <- main.
-  Called from logic.i:189.
+  Called from logic.i:189:3-18.
 [eva:alarm] logic.i:13: Warning: assertion got status unknown.
 [eva:alarm] logic.i:18: Warning: 
   assertion got status invalid (stopping propagation).
@@ -47,11 +47,11 @@
 [eva:progress] Done for function test_equality
 [eva:progress] 
   computing for function test_builtin_comparisons <- main.
-  Called from logic.i:190.
+  Called from logic.i:190:3-29.
 [eva:progress] 
   computing for function test_comparison_evaluation <- 
                           test_builtin_comparisons <- main.
-  Called from logic.i:115.
+  Called from logic.i:115:3-31.
 [eva:progress] logic.i:35: check got status valid.
 [eva:progress] logic.i:36: check got status valid.
 [eva:progress] logic.i:37: check got status valid.
@@ -81,7 +81,7 @@
 [eva:progress] 
   computing for function test_comparison_reduction <- 
                           test_builtin_comparisons <- main.
-  Called from logic.i:117.
+  Called from logic.i:117:3-33.
 [eva:alarm] logic.i:81: Warning: 
   non-finite double value. assert \is_finite(any_double);
 [eva:alarm] logic.i:83: Warning: assertion got status unknown.
@@ -115,7 +115,7 @@
 [eva:progress] 
   computing for function test_comparison_reduction <- 
                           test_builtin_comparisons <- main.
-  Called from logic.i:118.
+  Called from logic.i:118:3-33.
 [eva:show] logic.i:84: 
   Frama_C_show_each_eq:
   {-0x0.0000000000000p0}, [-0x0.0000000000000p0 .. 0x0.0000000000000p0]
@@ -142,7 +142,7 @@
 [eva:progress] 
   computing for function test_comparison_reduction <- 
                           test_builtin_comparisons <- main.
-  Called from logic.i:119.
+  Called from logic.i:119:3-32.
 [eva:show] logic.i:84: 
   Frama_C_show_each_eq: {0}, [-0x0.0000000000000p0 .. 0x0.0000000000000p0]
 [eva:show] logic.i:88: 
@@ -167,7 +167,7 @@
 [eva:progress] 
   computing for function test_comparison_reduction <- 
                           test_builtin_comparisons <- main.
-  Called from logic.i:120.
+  Called from logic.i:120:3-33.
 [eva:show] logic.i:84: 
   Frama_C_show_each_eq: {0x1.999999999999ap-4}, {0x1.999999999999ap-4}
 [eva:show] logic.i:88: 
@@ -192,7 +192,7 @@
 [eva:progress] 
   computing for function test_comparison_reduction <- 
                           test_builtin_comparisons <- main.
-  Called from logic.i:124.
+  Called from logic.i:124:3-35.
 [eva:show] logic.i:84: 
   Frama_C_show_each_eq:
   [-0x1.4000000000000p3 .. -0x1.0000000000000p0],
@@ -226,7 +226,7 @@
 [eva:progress] 
   computing for function test_comparison_reduction <- 
                           test_builtin_comparisons <- main.
-  Called from logic.i:126.
+  Called from logic.i:126:3-35.
 [eva:show] logic.i:84: 
   Frama_C_show_each_eq:
   [-0x1.4000000000000p3 .. -0x0.0000000000000p0],
@@ -260,7 +260,7 @@
 [eva:progress] 
   computing for function test_comparison_reduction <- 
                           test_builtin_comparisons <- main.
-  Called from logic.i:128.
+  Called from logic.i:128:3-35.
 [eva:show] logic.i:84: 
   Frama_C_show_each_eq:
   [-0x1.4000000000000p3 .. 0x0.0000000000000p0],
@@ -294,7 +294,7 @@
 [eva:progress] 
   computing for function test_comparison_reduction <- 
                           test_builtin_comparisons <- main.
-  Called from logic.i:130.
+  Called from logic.i:130:3-35.
 [eva:show] logic.i:84: 
   Frama_C_show_each_eq:
   [-0x1.4000000000000p3 .. 0x1.999999999999ap-4],
@@ -332,32 +332,32 @@
 [eva:progress] Done for function test_builtin_comparisons
 [eva:progress] 
   computing for function test_is_finite <- main.
-  Called from logic.i:191.
+  Called from logic.i:191:3-19.
 [eva:progress] logic.i:157: assertion got status valid.
 [eva:alarm] logic.i:166: Warning: assertion got status unknown.
 [eva:alarm] logic.i:174: Warning: assertion got status unknown.
 [eva:progress] 
   computing for function my_fabs <- test_is_finite <- main.
-  Called from logic.i:177.
+  Called from logic.i:177:14-27.
 [eva] using specification for function my_fabs
 [eva:progress] Done for function my_fabs
 [eva:progress] 
   computing for function my_fabs <- test_is_finite <- main.
-  Called from logic.i:178.
+  Called from logic.i:178:14-26.
 [eva:progress] Done for function my_fabs
 [eva:progress] 
   computing for function my_ratio <- test_is_finite <- main.
-  Called from logic.i:181.
+  Called from logic.i:181:14-28.
 [eva] using specification for function my_ratio
 [eva:assigns:missing-result] logic.i:153: Warning: 
   no 'assigns \result \from ...' clause specified for function my_ratio
 [eva:progress] Done for function my_ratio
 [eva:progress] 
   computing for function my_ratio_body <- test_is_finite <- main.
-  Called from logic.i:184.
+  Called from logic.i:184:14-33.
 [eva:progress] 
   computing for function my_fabs <- my_ratio_body <- test_is_finite <- main.
-  Called from logic.i:148.
+  Called from logic.i:148:41-52.
 [eva:progress] Done for function my_fabs
 [eva:progress] logic.i:146: 
   function my_ratio_body: postcondition got status valid.
