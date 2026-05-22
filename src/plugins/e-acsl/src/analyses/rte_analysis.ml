@@ -45,6 +45,21 @@ struct
       ~item:(format_of_string "%a --> %a") Printer.pp_term pp_data fmt tbl
 end
 
+module Flags =
+struct
+
+  let removes_trivial () = Options.O.get () > 0
+
+  (** [needs_div_mod ()] @return:
+      - [true] if the option [-rte-div] from the RTE plugin is used (default);
+      - [false] if the option [-rte-no-div] from the RTE plugin is used. *)
+  let needs_div_mod () =
+    if RteGen.Options.DoDivMod.is_set ()
+    then RteGen.Options.DoDivMod.get ()
+    else true
+
+end
+
 (** The module [Undefined_behaviours] contains functions that makes a guard for
     each kind of undefined behavior listed below:
     - division by zero *)
@@ -59,9 +74,11 @@ struct
       is not equal to [Z.zero]. The guard does not contain directly [divider]
       but a copy of it. *)
   let div_by_zero ~loc divider =
-    let divider_cpy = Smart_term.copy divider in
+    let smart = Flags.removes_trivial () in
+    let divider_cpy = Smart_term.copy ~smart divider in
     let pred =
       Smart_predicate.prel
+        ~smart
         ~loc
         ~names:["division by zero"]
         Rneq
@@ -70,19 +87,6 @@ struct
     in
     preprocess_guard pred;
     pred
-
-end
-
-module Flags =
-struct
-
-  (** [needs_div_mod ()] @return:
-      - [true] if the option [-rte-div] from the RTE plugin is used (default);
-      - [false] if the option [-rte-no-div] from the RTE plugin is used. *)
-  let needs_div_mod () =
-    if RteGen.Options.DoDivMod.is_set ()
-    then RteGen.Options.DoDivMod.get ()
-    else true
 
 end
 
@@ -114,9 +118,13 @@ let rte_visitor =
   end
 
 let preprocess ast =
-  ignore @@ rte_visitor#visit_file ast;
-  Options.feedback ~dkey:dkey "Result of the RTE analysis.%!";
-  Options.feedback ~dkey:dkey "%a%!" Guards.pretty ()
+  if Options.O.get () < 3
+  then begin
+    ignore @@ rte_visitor#visit_file ast;
+    Options.feedback ~dkey:dkey "Result of the RTE analysis.%!";
+    Options.feedback ~dkey:dkey "%a%!" Guards.pretty ()
+  end else
+    Options.feedback ~dkey:dkey "Skip the RTE analysis.%!"
 
 let iter_on_guards t f = Guards.apply ~default:() t (List.iter f)
 
