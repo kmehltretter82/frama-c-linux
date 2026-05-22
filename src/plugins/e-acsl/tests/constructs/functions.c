@@ -147,8 +147,8 @@ int main(void) {
   /*@ assert even(8); @*/;
   /*@ assert even(-6); @*/;
   /*@ assert even_and_not_negative(8); */;
-  // /*@ assert P(3,8); */
-  // /*@ assert P(-3,8); */
+  /*@ assert P(3,8); */
+  /*@ assert P(-3,8); */
 
   // RECURSIVE FUNCTIONS
   /*@ assert rf1(0) == 0; */;
@@ -158,7 +158,7 @@ int main(void) {
   /*@ assert rf3(6) == -5; */;
   /*@ assert rf4(91) > 0; */;
   /*@ assert rf5(0) == 0; */
-  // /*@ assert rf6(1,0) ≡ 0; */
+  /*@ assert rf6(1,0) ≡ 0; */
 
   /*@ assert (\let n = (0 == 0) ? 0x7fffffffffffffffL : -1; rf5(n) == 0);*/
 }
