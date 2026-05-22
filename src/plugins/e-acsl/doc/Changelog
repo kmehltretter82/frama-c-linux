@@ -29,6 +29,7 @@ Plugin E-ACSL <next-release>
 Plugin E-ACSL 33.0 (Arsenic)
 ###############################################################################
 
+-* E-ACSL     [2026-05-26] Fix bugs and crashes due to new RTE management
 -* E-ACSL     [2026-05-22] Fix crash due to interval analysis failure.
 -  E-ACSL     [2026-04-28] Extend translation of range on array for arrays in
                            structures and dereferenced arrays.
