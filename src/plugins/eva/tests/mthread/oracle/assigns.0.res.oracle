@@ -201,8 +201,8 @@
   b: Read by jobs1, Write by jobs2: unprotected
   a: Read by jobs2, Write by jobs1: unprotected
 [mt] Statements needing manual synchronisation
-  assigns.c:25 (for a)
   assigns.c:20 (for b)
+  assigns.c:25 (for a)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
 [mt] *** Computing thread <main>, iteration 3 (interferences changed)
@@ -303,8 +303,8 @@
   b: Read by jobs1, Write by jobs2: unprotected
   a: Read by jobs2, Write by jobs1: unprotected
 [mt] Statements needing manual synchronisation
-  assigns.c:25 (for a)
   assigns.c:20 (for b)
+  assigns.c:25 (for a)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 4
 [mt] *** Computing thread <main>, iteration 4 (interferences changed)
@@ -351,7 +351,7 @@
   b: Read by jobs1, Write by jobs2: unprotected
   a: Read by jobs2, Write by jobs1: unprotected
 [mt] Statements needing manual synchronisation
-  assigns.c:25 (for a)
   assigns.c:20 (for b)
+  assigns.c:25 (for a)
 [mt] ***** Shared variables computed
 [mt] ******* Analysis performed, 4 iterations

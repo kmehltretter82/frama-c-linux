@@ -630,21 +630,21 @@
     Read by <main>, Write by job3: unprotected
     Read by <main>, Write by job2: unprotected
 [mt] Statements needing manual synchronisation
-  interferences.c:30 (for shared_c)
-  interferences.c:28 (for shared_a; shared_b; shared_c)
-  interferences.c:52 (for shared_c)
-  interferences.c:51 (for shared_b)
-  interferences.c:50 (for shared_a)
-  interferences.c:23 (for shared_a; shared_b)
-  interferences.c:20 (for shared_a; shared_b)
-  interferences.c:67 (for shared_a; shared_b; shared_c)
-  interferences.c:38 (for shared_a; shared_b; shared_c)
-  interferences.c:66 (for shared_a; shared_b; shared_c)
-  interferences.c:16 (for shared_a; shared_b; shared_c)
-  interferences.c:36 (for shared_a; shared_b; shared_c)
   interferences.c:14 (for shared_a; shared_b; shared_c)
+  interferences.c:16 (for shared_a; shared_b; shared_c)
+  interferences.c:20 (for shared_a; shared_b)
+  interferences.c:23 (for shared_a; shared_b)
+  interferences.c:28 (for shared_a; shared_b; shared_c)
+  interferences.c:30 (for shared_c)
   interferences.c:31 (for shared_a; shared_b; shared_c)
+  interferences.c:36 (for shared_a; shared_b; shared_c)
+  interferences.c:38 (for shared_a; shared_b; shared_c)
+  interferences.c:50 (for shared_a)
+  interferences.c:51 (for shared_b)
+  interferences.c:52 (for shared_c)
   interferences.c:56 (for shared_a; shared_b; shared_c)
+  interferences.c:66 (for shared_a; shared_b; shared_c)
+  interferences.c:67 (for shared_a; shared_b; shared_c)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
 [mt] *** Computing thread <main>, iteration 3 (shared vars values changed and
@@ -1011,21 +1011,21 @@
     Read by <main>, Write by job3: unprotected
     Read by <main>, Write by job2: unprotected
 [mt] Statements needing manual synchronisation
-  interferences.c:30 (for shared_c)
-  interferences.c:28 (for shared_a; shared_b; shared_c)
-  interferences.c:52 (for shared_c)
-  interferences.c:51 (for shared_b)
-  interferences.c:50 (for shared_a)
-  interferences.c:23 (for shared_a; shared_b)
-  interferences.c:20 (for shared_a; shared_b)
-  interferences.c:67 (for shared_a; shared_b; shared_c)
-  interferences.c:38 (for shared_a; shared_b; shared_c)
-  interferences.c:66 (for shared_a; shared_b; shared_c)
-  interferences.c:16 (for shared_a; shared_b; shared_c)
-  interferences.c:36 (for shared_a; shared_b; shared_c)
   interferences.c:14 (for shared_a; shared_b; shared_c)
+  interferences.c:16 (for shared_a; shared_b; shared_c)
+  interferences.c:20 (for shared_a; shared_b)
+  interferences.c:23 (for shared_a; shared_b)
+  interferences.c:28 (for shared_a; shared_b; shared_c)
+  interferences.c:30 (for shared_c)
   interferences.c:31 (for shared_a; shared_b; shared_c)
+  interferences.c:36 (for shared_a; shared_b; shared_c)
+  interferences.c:38 (for shared_a; shared_b; shared_c)
+  interferences.c:50 (for shared_a)
+  interferences.c:51 (for shared_b)
+  interferences.c:52 (for shared_c)
   interferences.c:56 (for shared_a; shared_b; shared_c)
+  interferences.c:66 (for shared_a; shared_b; shared_c)
+  interferences.c:67 (for shared_a; shared_b; shared_c)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 4
 [mt] *** Computing thread <main>, iteration 4 (shared vars values changed and
@@ -1347,20 +1347,20 @@
     Read by <main>, Write by job3: unprotected
     Read by <main>, Write by job2: unprotected
 [mt] Statements needing manual synchronisation
-  interferences.c:30 (for shared_c)
-  interferences.c:28 (for shared_a; shared_b; shared_c)
-  interferences.c:52 (for shared_c)
-  interferences.c:51 (for shared_b)
-  interferences.c:50 (for shared_a)
-  interferences.c:23 (for shared_a; shared_b)
-  interferences.c:20 (for shared_a; shared_b)
-  interferences.c:67 (for shared_a; shared_b; shared_c)
-  interferences.c:38 (for shared_a; shared_b; shared_c)
-  interferences.c:66 (for shared_a; shared_b; shared_c)
-  interferences.c:16 (for shared_a; shared_b; shared_c)
-  interferences.c:36 (for shared_a; shared_b; shared_c)
   interferences.c:14 (for shared_a; shared_b; shared_c)
+  interferences.c:16 (for shared_a; shared_b; shared_c)
+  interferences.c:20 (for shared_a; shared_b)
+  interferences.c:23 (for shared_a; shared_b)
+  interferences.c:28 (for shared_a; shared_b; shared_c)
+  interferences.c:30 (for shared_c)
   interferences.c:31 (for shared_a; shared_b; shared_c)
+  interferences.c:36 (for shared_a; shared_b; shared_c)
+  interferences.c:38 (for shared_a; shared_b; shared_c)
+  interferences.c:50 (for shared_a)
+  interferences.c:51 (for shared_b)
+  interferences.c:52 (for shared_c)
   interferences.c:56 (for shared_a; shared_b; shared_c)
+  interferences.c:66 (for shared_a; shared_b; shared_c)
+  interferences.c:67 (for shared_a; shared_b; shared_c)
 [mt] ***** Shared variables computed
 [mt] ******* Analysis performed, 4 iterations
