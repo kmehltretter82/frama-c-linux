@@ -467,12 +467,11 @@ class virtual visitor main =
         end
 
     method vfield = function
-      | Mfield(a,_,_,_) -> self#vlibrary a.ext_library
       | Cfield(f, KValue) -> self#vcomp f.fcomp
       | Cfield(f, KInit) -> self#vicomp f.fcomp
 
     method vadt = function
-      | Mtype a | Mrecord(a,_) -> self#vlibrary a.ext_library
+      | Mtype a -> self#vlibrary a.ext_library
       | Comp(r, KValue) -> self#vcomp r
       | Comp(r, KInit) -> self#vicomp r
       | Atype t -> self#vtype t

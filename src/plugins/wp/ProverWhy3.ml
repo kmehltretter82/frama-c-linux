@@ -129,7 +129,6 @@ let coerce ~cnv sort expected r =
 
 let adt_wname = function
   | Lang.Mtype a -> a.Lang.ext_link
-  | Mrecord(a,_) -> a.Lang.ext_link
   | Comp (c, KValue) -> Lang.comp_id c
   | Comp (c, KInit) -> Lang.comp_init_id c
   | Atype lt -> Lang.type_id lt
@@ -562,7 +561,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
           Why3.Term.t_app ls l (of_tau ~cnv expected)
         | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
       end
-    | (Rdef _, Data ((Mtype _|Mrecord (_, _)|Atype _|Wtype _), _), _)
+    | (Rdef _, Data ((Mtype _|Atype _|Wtype _), _), _)
     | (Rdef _, (Prop|Bool|Int|Real|Tvar _|Array (_, _)), _)
     | (Aset (_, _, _), (Prop|Bool|Int|Real|Tvar _|Record _|Data (_, _)), _)
     | (Neq (_, _), _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))

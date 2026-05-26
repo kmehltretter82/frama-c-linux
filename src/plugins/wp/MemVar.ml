@@ -240,7 +240,7 @@ struct
         let upd = diff (Mstate.field lv fi) f1 f2 in
         let m = F.e_setfield v2 fd f1 in
         Bag.concat upd (diff lv v1 m)
-    | (Lang.Mfield _,_)::_ -> Bag.elt (Mstore(lv,v2))
+    (* | (Lang.Mfield _,_)::_ -> Bag.elt (Mstore(lv,v2)) *)
     | [] -> Bag.empty
 
   let updates (seq : Sigma.state sequence) domain =

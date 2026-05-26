@@ -35,7 +35,6 @@ type datakind = KValue | KInit
 (** A type is never registered in a Definition.t *)
 type adt = private
   | Mtype of mdt (** External type *)
-  | Mrecord of mdt * fields (** External record-type *)
   | Atype of logic_type_info (** Logic Type *)
   | Comp of compinfo * datakind (** C-code struct or union *)
   | Wtype of string list * string * string list (** Why3 imported type *)
@@ -50,9 +49,7 @@ and 'a extern = {
   ext_debug  : string; (** just for printing during debugging *)
 }
 and fields = { mutable fields : field list }
-and field = private
-  | Mfield of mdt * fields * string * tau
-  | Cfield of fieldinfo * datakind
+and field = private Cfield of fieldinfo * datakind
 and tau = (field,adt) Logic.datatype
 
 type t_builtin =
@@ -86,12 +83,11 @@ val is_builtin : logic_type_info -> bool
 val is_builtin_type : name:string -> tau -> bool
 val get_builtin_type : name:string -> adt
 val datatype : library:string -> string -> adt
-val record :
-  link:string -> library:string -> (string * tau) list -> adt
+(* val record : link:string -> library:string -> (string * tau) list -> adt *)
 val comp : compinfo -> adt
 val comp_init : compinfo -> adt
 val cfield : ?kind:datakind -> fieldinfo -> field
-val field : adt -> string -> field
+(* val field : adt -> string -> field *)
 val fields_of_adt : adt -> field list
 val fields_of_tau : tau -> field list
 val fields_of_field : field -> field list

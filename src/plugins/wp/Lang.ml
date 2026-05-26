@@ -96,7 +96,6 @@ type datakind = KValue | KInit
 
 type adt =
   | Mtype of mdt (* Model type *)
-  | Mrecord of mdt * fields (* Model record-type *)
   | Atype of logic_type_info (* Logic Type *)
   | Comp of compinfo * datakind (* C-code struct or union *)
   | Wtype of string list * string * string list (** Why3 imported type *)
@@ -111,7 +110,6 @@ and 'a extern = {
 }
 and fields = { mutable fields : field list }
 and field =
-  | Mfield of mdt * fields * string * tau
   | Cfield of fieldinfo * datakind
 and tau = (field,adt) Logic.datatype
 
@@ -232,7 +230,6 @@ struct
 
   let basename = function
     | Mtype a -> basename "M" a.ext_link
-    | Mrecord(r,_) -> basename "R" r.ext_link
     | Comp (c,KValue) -> basename (if c.cstruct then "S" else "U") c.corig_name
     | Comp (c,KInit) -> basename (if c.cstruct then "IS" else "IU") c.corig_name
     | Atype lt -> basename "A" lt.lt_name
@@ -241,14 +238,13 @@ struct
 
   let debug = function
     | Mtype a -> a.ext_debug
-    | Mrecord(a,_) -> a.ext_debug
     | Comp (c, KValue) -> comp_id c
     | Comp (c, KInit) -> comp_init_id c
     | Atype lt -> type_id lt
     | Wtype(p,m,s) -> String.concat "." (p @ m :: s)
 
   let hash = function
-    | Mtype a | Mrecord(a,_) -> Hashtbl.hash a
+    | Mtype a -> Hashtbl.hash a
     | Comp (c, KValue) -> Compinfo.hash c
     | Comp (c, KInit) -> 13 * Compinfo.hash c
     | Atype lt -> Logic_type_info.hash lt
@@ -260,9 +256,6 @@ struct
       | Mtype a , Mtype b -> ext_compare a b
       | Mtype _ , _ -> (-1)
       | _ , Mtype _ -> (+1)
-      | Mrecord(a,_) , Mrecord(b,_) -> ext_compare a b
-      | Mrecord _ , _ -> (-1)
-      | _ , Mrecord _ -> (+1)
       | Comp (a, KValue) , Comp (b, KValue)
       | Comp (a, KInit)  , Comp (b, KInit) -> Compinfo.compare a b
       | Comp (_, KValue) , Comp (_, KInit) -> (-1)
@@ -323,27 +316,10 @@ let field_observe fd = List.iter (fun k -> k fd) !field_observers ; fd
 let on_field f = field_observers := f :: !field_observers
 
 let cfield ?(kind=KValue) fd = field_observe @@ Cfield(fd,kind)
-
-let record ~link ~library fts =
-  let m = new_extern ~link ~library ~debug:link in
-  let r = { fields = [] } in
-  let fs = List.map (fun (f,t) -> field_observe @@ Mfield(m,r,f,t)) fts in
-  r.fields <- fs ; Mrecord(m,r)
-
-let field t f =
-  match t with
-  | Mrecord(_,r) ->
-    begin
-      try List.find (function Mfield(_,_,g,_) -> f = g | _ -> false) r.fields
-      with Not_found -> Wp_parameters.fatal "No field <%s> in record" f
-    end
-  | _ -> Wp_parameters.fatal "No field <%s> in type '%a'" f ADT.pretty t
-
 let comp c = Comp (c, KValue)
 let comp_init c = Comp (c, KInit)
 
 let fields_of_adt = function
-  | Mrecord(_,r) -> r.fields
   | Comp (c, k) ->
     List.map (fun f -> Cfield (f, k)) (Option.value ~default:[] c.cfields)
   | _ -> []
@@ -354,17 +330,14 @@ let fields_of_tau = function
   | _ -> []
 
 let fields_of_field = function
-  | Mfield(_,r,_,_) -> r.fields
   | Cfield(f, k) ->
     List.map (fun f -> Cfield (f, k)) (Option.value ~default:[] f.fcomp.cfields)
 
 let tau_of_field = function
-  | Mfield(_,_,_,t) -> t
   | Cfield(f, KValue) -> tau_of_ctype f.ftype
   | Cfield(f, KInit) -> init_of_ctype f.ftype
 
 let tau_of_record = function
-  | Mfield(mdt,fs,_,_) -> Logic.Data(Mrecord(mdt,fs),[])
   | Cfield(f, KValue) -> t_comp f.fcomp
   | Cfield(f, KInit) -> t_init f.fcomp
 
@@ -374,21 +347,16 @@ struct
   type t = field
 
   let debug = function
-    | Mfield(_,_,f,_) -> f
     | Cfield(f, KValue) -> field_id f
     | Cfield(f, KInit) -> field_init_id f
 
   let hash = function
-    | Mfield(_,_,f,_) -> Hashtbl.hash f
     | Cfield(f, KValue) -> Fieldinfo.hash f
     | Cfield(f, KInit) -> 13 * Fieldinfo.hash f
 
   let compare f g =
     if f==g then 0 else
       match f , g with
-      | Mfield(_,_,f,_) , Mfield(_,_,g,_) -> String.compare f g
-      | Mfield _ , Cfield _ -> (-1)
-      | Cfield _ , Mfield _ -> (+1)
       | Cfield(f, KValue) , Cfield(g, KValue)
       | Cfield(f, KInit) , Cfield(g, KInit) ->
         Fieldinfo.compare f g
@@ -400,7 +368,6 @@ struct
   let pretty fmt f = Format.pp_print_string fmt (debug f)
 
   let sort = function
-    | Mfield(_,_,_,s) -> Qed.Kind.of_tau s
     | Cfield(f, KValue) -> sort_of_object (Ctypes.object_of f.ftype)
     | Cfield(f, KInit) -> init_sort_of_object (Ctypes.object_of f.ftype)
 
@@ -674,14 +641,12 @@ class virtual idprinting =
 
     method datatype = function
       | Mtype a -> a.ext_link
-      | Mrecord(a,_) -> a.ext_link
       | Comp(c, KValue) -> self#sanitize_type (comp_id c)
       | Comp(c, KInit) -> self#sanitize_type (comp_init_id c)
       | Atype lt -> self#sanitize_type (type_id lt)
       | Wtype(p,m,s) -> String.concat "." (p @ m :: s)
 
     method field = function
-      | Mfield(_,_,f,_) -> self#sanitize_field f
       | Cfield(f, KValue) -> self#sanitize_field (field_id f)
       | Cfield(f, KInit) -> self#sanitize_field (field_init_id f)
 
@@ -707,7 +672,6 @@ let context_of_lfun = function
   | FUN({m_source=Generated(ctxt,_)}) -> ctxt
 
 let name_of_field = function
-  | Mfield(_,_,f,_) -> f
   | Cfield(f, KValue) -> field_id f
   | Cfield(f, KInit) -> field_init_id f
 

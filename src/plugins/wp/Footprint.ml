@@ -39,7 +39,6 @@ let once f e =
 
 let head_fields = function
   | [] -> ""
-  | (Lang.Mfield(mdt,_,_,_),_)::_ -> mdt.Lang.ext_debug
   | (Lang.Cfield(fd, _),_):: _ -> let open Cil_types in fd.fcomp.cname
 
 let head e =
