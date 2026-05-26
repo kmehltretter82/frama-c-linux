@@ -1623,16 +1623,17 @@ module Make
     let find_loc = Valuation.find_loc valuation in
     let find_loc_def = Valuation.find_loc_def valuation in
     let is_volatile term =
-      let compute find node get_volatile_status =
-        match find node with
-        | `Top -> true
-        | `Value r -> get_volatile_status r
+      let volatile =
+        let open Lattice_bounds.Top.Operators in
+        match term with
+        | `Lval lval | `Expr { node = Lval lval } ->
+          let+ report = find_loc lval in
+          report.volatile_lval || report.volatile_loc
+        | `Expr expr ->
+          let+ report = find expr in
+          report.volatile_expr
       in
-      match term with
-      | `Lval lval | `Expr { node = Lval lval} ->
-        compute find_loc lval (fun r -> r.volatile_lval || r.volatile_loc)
-      | `Expr expr ->
-        compute find expr (fun r -> r.volatile_expr)
+      Lattice_bounds.Top.value ~top:true volatile
     in
     let fold f acc =
       let f expr record acc =
