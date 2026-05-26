@@ -175,6 +175,11 @@ let finite_min_and_max i = match Ival.min_and_max i with
   | Some min, Some max -> min, max
   | None, _ | _, None -> assert false
 
+let name_of_unop = function
+  | Neg -> "neg"
+  | LNot -> "not"
+  | BNot -> "bnot"
+
 let name_of_binop = function
   | Lt -> "lt"
   | Gt -> "gt"

@@ -48,18 +48,25 @@ end
 
 type 'a m = 'a M.t
 
+let of_unop : Cil_types.unop -> Interlang.unop = function
+  | Neg -> Neg
+  | LNot -> Not
+  | _ -> raise Not_covered
+
 let of_binop : Cil_types.binop -> Interlang.binop = function
-  | Cil_types.PlusA -> Plus
+  | PlusA -> Plus
   | MinusA -> Minus
   | Mult -> Mult
+  | Div -> Div
+  | Mod -> Mod
   | Lt -> Lt
   | Gt -> Gt
   | Le -> Le
   | Ge -> Ge
   | Eq -> Eq
   | Ne -> Ne
-  | Div -> Div
-  | Mod -> Mod
+  | LAnd -> And
+  | LOr -> Or
   | _ -> raise Not_covered
 
 let of_relation = function

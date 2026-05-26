@@ -33,16 +33,26 @@ open Analyses_types
 type binop =
   | Plus | Minus | Mult | Div | Mod
   | Lt | Gt | Le | Ge | Eq | Ne
+  | And | Or
 
-type exp = private {enode : exp_node; rtes : rte list; origin : term option}
+type unop = Neg | Not
+
+type exp = private
+  {
+    enode : exp_node;
+    rtes : rte list;
+    origin : term option
+  }
 (** [origin] is required to calculate casts. Note that [origin] is [None] when
     it stems from a predicate as predicates never require casts. *)
 
 and exp_node = private
   | True
   | False
-  | Integer of {ity : Analyses_types.number_ty; n : Z.t}
+  | Integer of {ity : number_ty; n : Z.t}
+  | UnOp of unop_node
   | BinOp of binop_node
+  | If of {ity : number_ty; op1 : exp; op2 : exp; op3 : exp}
   | Lval of lval
   | SizeOf of typ
   | Coerce of {coerce_to : typ; coerced : exp}
@@ -52,6 +62,7 @@ and exp_node = private
       translation does not necessarily generate a type cast, but potentially a
       more complicated conversion operation, e.g. [mpz_get_ui]. *)
 
+and unop_node = private {ity : number_ty; unop : unop; op : exp}
 and binop_node = private {ity : number_ty; binop : binop; op1 : exp; op2 : exp}
 
 and lhost = private Var of varinfo | Mem of exp
@@ -63,7 +74,6 @@ and offset =
   | Index of exp * offset
 
 and rte = private {rnode : exp_node; rorigin: predicate}
-
 
 module Pretty : sig
   val pp_binop : Format.formatter -> binop -> unit
@@ -79,17 +89,20 @@ end
 (** smart constructors for generating [exp] nodes *)
 module Exp : sig
   val lval : ?origin:term -> lval -> exp
-  val integer : origin:term -> ity:Analyses_types.number_ty -> Z.t -> exp
+  val integer : origin:term -> ity:number_ty -> Z.t -> exp
   val sizeof : origin:term -> typ -> exp
   val rte : rte -> exp
 
   val mk_true : ?origin:term -> unit -> exp
   val mk_false : ?origin:term -> unit -> exp
 
+  val unop : ?origin:term -> unop -> number_ty -> exp -> exp
+
   (** Transforms a Cil binary operator to an {!Interlang} binary operator.
       Not all Cil operators are supported (yet). *)
-  val binop :
-    ?origin:term -> binop -> Analyses_types.number_ty -> exp -> exp -> exp
+  val binop : ?origin:term -> binop -> number_ty -> exp -> exp -> exp
+
+  val conditional : ?origin:term -> number_ty -> exp -> exp -> exp -> exp
 
   val coerce : ?origin:term -> coerce_to:typ -> exp -> exp
 end
@@ -101,7 +114,7 @@ end
 
 (** smart constructors for generating [lhost] nodes *)
 module Lhost : sig
-  val var : ?name:string -> Cil_types.varinfo -> lhost
+  val var : ?name:string -> varinfo -> lhost
   val mem : exp -> lhost
 end
 
