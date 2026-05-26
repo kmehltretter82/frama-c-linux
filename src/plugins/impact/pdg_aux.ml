@@ -83,7 +83,7 @@ module NS = struct
     fold (fun n z acc -> remove' (n, z) acc) m2 m1
 
   let filter' f =
-    map' (fun n z -> if f (n, z) then Some z else None)
+    filter_map (fun n z -> if f (n, z) then Some z else None)
 
   let fold f =
     fold (fun n z -> f (n, z))

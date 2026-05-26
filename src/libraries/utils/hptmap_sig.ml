@@ -252,7 +252,7 @@ module type S = sig
   (** [map f m] returns the map obtained by composing the map [m] with the
       function [f]; that is, the map $k\mapsto f(m(k))$. *)
 
-  val map': (key -> v -> v option) -> t -> t
+  val filter_map: (key -> v -> v option) -> t -> t
   (** Same as [map], except if [f k v] returns [None]. In this case, [k] is not
       bound in the resulting map. *)
 

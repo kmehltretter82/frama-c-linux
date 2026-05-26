@@ -63,6 +63,7 @@ module type MapSet_Lattice = sig
   val get_keys : t -> set
   val filter_keys : (key -> bool) -> t -> t
   val map: (v -> v) -> t -> t
+  val filter_map: (key -> v -> v option) -> t -> t
   val fold_keys : (key -> 'a -> 'a) -> t -> 'a -> 'a
   val fold : (key -> v -> 'a -> 'a) -> t -> 'a -> 'a
   val cached_fold:
@@ -412,6 +413,10 @@ module Make_MapSet_Lattice
   let map f = function
     | Top _ as t -> t
     | Map m      -> Map (KVMap.map f m)
+
+  let filter_map f = function
+    | Top _ as t -> t
+    | Map m      -> Map (KVMap.filter_map f m)
 
   let fold_keys f t acc =
     match t with
