@@ -75,7 +75,7 @@ let rec transpose_precondition stmt pid kf func args =
     | Property.IPPredicate {Property.ip_pred} -> ip_pred
     | _ -> assert false
   in
-  let ip = Logic_subst.ipred ~formals ~concretes:args ip in
+  let ip = Logic_subst.ipred formals args ip in
   let kf_call = Kernel_function.find_englobing_kf stmt in
   let p = Property.ip_property_instance kf_call stmt ip pid in
   PreCondAt.add (pid, stmt) p;
