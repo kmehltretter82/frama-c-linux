@@ -44,6 +44,10 @@ module Prototype = struct
   }
   [@@deriving eq,ord]
 
+  let structural_descr =
+    Structural_descr.t_record
+      [| Memory_zone.packed_descr; Memory_zone.packed_descr |]
+
   let name = "Deps"
   let pretty fmt d = Memory_zone.pretty fmt (to_zone d)
   let hash fd = Hashtbl.hash Memory_zone.(hash fd.data, hash fd.indirect)

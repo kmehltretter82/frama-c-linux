@@ -20,6 +20,11 @@ module Access = struct
       include Datatype.Serializable_undefined
       include Prototype
       let name = "Eva.Inout_access.Access"
+
+      let structural_descr =
+        Structural_descr.t_record
+          [| Memory_zone.packed_descr; Memory_zone.packed_descr |]
+
       let reprs =
         List.fold_left
           (fun acc read ->
@@ -30,6 +35,7 @@ module Access = struct
                Memory_zone.reprs)
           []
           Memory_zone.reprs
+
       let pretty fmt access =
         Format.fprintf fmt "@[{ read: %a;@ write: %a; }@]"
           Memory_zone.pretty access.read

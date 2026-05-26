@@ -76,7 +76,6 @@ module Status = Datatype.Make (
     type t = analysis_status
     let name = "Function_calls.Status"
     let reprs = [ Unreachable ]
-    let structural_descr = Structural_descr.t_sum [| [| |] |]
     let pretty fmt t =
       let str = match t with
         | Unreachable -> "Unreachable"
