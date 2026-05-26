@@ -90,8 +90,6 @@ let lemma_id l = Printf.sprintf "Q_%s" (avoid_leading_backlash l)
 
 (* -------------------------------------------------------------------------- *)
 
-type library = string
-
 type datakind = KValue | KInit
 
 type adt =
@@ -105,7 +103,7 @@ and mdt = string extern
 and 'a extern = {
   ext_id      : int;
   ext_link : 'a ;
-  ext_library : library; (** a library which it depends on *)
+  ext_library : string; (** a library which it depends on *)
   ext_debug   : string; (** just for printing during debugging *)
 }
 and fields = { mutable fields : field list }

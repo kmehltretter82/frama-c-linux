@@ -13,10 +13,6 @@ open Qed.Logic
 
 (** Logic Language based on Qed *)
 
-(** {2 Library} *)
-
-type library = string
-
 (** {2 Naming - Unique identifiers} *)
 
 val comp_id  : compinfo -> string
@@ -45,7 +41,7 @@ and mdt = string extern
 and 'a extern = {
   ext_id     : int;
   ext_link   : 'a ;
-  ext_library : library; (** a library which it depends on *)
+  ext_library : string; (** a library which it depends on *)
   ext_debug  : string; (** just for printing during debugging *)
 }
 and fields = { mutable fields : field list }
@@ -103,7 +99,7 @@ val acsl : logic_info -> lfun
 val ctor : logic_ctor_info -> lfun
 
 val extern_s :
-  library:library ->
+  library:string ->
   ?link:Engine.link ->
   ?category:lfun category ->
   ?params:sort list ->
@@ -114,7 +110,7 @@ val extern_s :
   string -> lfun
 
 val extern_f :
-  library:library ->
+  library:string ->
   ?link:Engine.link ->
   ?balance:balance ->
   ?category:lfun category ->
@@ -127,7 +123,7 @@ val extern_f :
 (** balance just give a default when link is not specified *)
 
 val extern_p :
-  library:library ->
+  library:string ->
   ?bool:string ->
   ?prop:string ->
   ?link:Engine.link ->
@@ -135,7 +131,7 @@ val extern_p :
   ?coloring:bool ->
   unit -> lfun
 
-val extern_fp : library:library -> ?params:sort list ->
+val extern_fp : library:string -> ?params:sort list ->
   ?link:string -> ?coloring:bool -> string -> lfun
 
 val generated_f : ?context:bool -> ?category:lfun category ->
@@ -145,7 +141,7 @@ val generated_f : ?context:bool -> ?category:lfun category ->
 val generated_p : ?context:bool -> ?coloring:bool -> string -> lfun
 
 val extern_t:
-  string -> link:string -> library:library -> mdt
+  string -> link:string -> library:string -> mdt
 
 val imported_t:
   package:string list -> theory:string -> name:string list -> adt
