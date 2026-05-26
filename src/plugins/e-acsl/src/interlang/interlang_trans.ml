@@ -258,8 +258,7 @@ and compile_rte_guards cil =
         rte.rorigin
     in
     let env = Assert.do_pending_register_data env in
-    let env = Env.add_stmt env stmt in
-    Env.add_assert kf stmt rte.rorigin;
+    let env = Env.add_stmt ~annot:rte.rorigin env stmt in
     {orig_state with env}
   in
   let* (cil,rtes) = M.flush cil in

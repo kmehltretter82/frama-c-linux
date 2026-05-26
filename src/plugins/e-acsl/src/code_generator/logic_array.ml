@@ -133,7 +133,7 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
   (* Helper function: call [Env.pop_and_get] with [global_clear] and [where]
      pre-set *)
   let pop_and_get_env env stmt =
-    Env.pop_and_get
+    Env.pop_and_get ~kf
       env
       stmt
       ~global_clear:false

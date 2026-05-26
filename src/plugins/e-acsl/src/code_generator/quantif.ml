@@ -122,7 +122,7 @@ let convert kf env loc ~is_forall quantif =
               Cil.mkStmt ~valid_sid:true (Goto(end_loop_ref, loc)) ]
         in
         let blk, env =
-          Env.pop_and_get
+          Env.pop_and_get ~kf
             env
             (Smart_stmt.if_stmt ~loc ~cond:(mk_guard test) then_blk ~else_blk)
             ~global_clear:false

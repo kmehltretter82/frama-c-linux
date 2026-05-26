@@ -73,13 +73,11 @@ module Logic_binding: sig
 
 end
 
-val add_assert: kernel_function -> stmt -> predicate -> unit
-(** [add_assert env s p] associates the assertion [p] to the statement [s] in
-    the environment [env]. *)
-
-val add_stmt: ?post:bool -> t -> stmt -> t
+val add_stmt: ?post:bool -> ?annot:predicate -> t -> stmt -> t
 (** [add_stmt env s] extends [env] with the new statement [s].
-    [post] indicates that [stmt] should be added after the target statement. *)
+    [post] indicates that [stmt] should be added after the target statement.
+    If [annot] contains an assertion [p] then it also associates [p] to [stmt]
+    in the local block in [env]. *)
 
 val extend_stmt_in_place: t -> stmt -> label:logic_label -> block -> t
 (** [extend_stmt_in_place env stmt ~label b] modifies [stmt] in place in
@@ -92,7 +90,7 @@ val push: t -> t
 
 type where = Before | Middle | After
 val pop_and_get:
-  ?split:bool -> t -> stmt -> global_clear:bool -> where -> block * t
+  kf:kernel_function -> ?split:bool -> t -> stmt -> global_clear:bool -> where -> block * t
 (** Pop the last local context and get back the corresponding new block
     containing the given [stmt] at the given place ([Before] is before the code
     corresponding to annotations, [After] is after this code and [Middle] is

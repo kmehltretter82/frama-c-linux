@@ -76,7 +76,7 @@ let handle_annotations env kf stmt =
                Smart_stmt.assigns ~loc ~result:(Cil.var vi_old) e
              in
              let blk, env =
-               Env.pop_and_get env stmt ~global_clear:false Env.Middle
+               Env.pop_and_get ~kf env stmt ~global_clear:false Env.Middle
              in
              let stmts = Smart_stmt.block_stmt blk :: stmts in
              stmts, env, Some (t, e_old, measure_opt)
@@ -146,7 +146,7 @@ let handle_annotations env kf stmt =
                 e_tapp
             in
             let blk, env =
-              Env.pop_and_get env stmt ~global_clear:false Env.Middle
+              Env.pop_and_get ~kf env stmt ~global_clear:false Env.Middle
             in
             let stmts = Smart_stmt.block_stmt blk :: stmts in
             stmts, env
@@ -234,7 +234,7 @@ let handle_annotations env kf stmt =
                   e_old_gt_e_stmt ]
             in
             let blk, env =
-              Env.pop_and_get env stmt ~global_clear:false Env.Middle
+              Env.pop_and_get ~kf env stmt ~global_clear:false Env.Middle
             in
             let stmts = Smart_stmt.block_stmt blk :: stmts in
             stmts, env
@@ -252,7 +252,7 @@ let handle_annotations env kf stmt =
           List.fold_left (translate_named_predicate kf) env invariants
         in
         let blk, env =
-          Env.pop_and_get env last ~global_clear:false Env.Before
+          Env.pop_and_get ~kf env last ~global_clear:false Env.Before
         in
         aux (Smart_stmt.block last blk :: stmts, env) []
       | hd :: tl -> aux (hd :: stmts, env) tl
@@ -308,7 +308,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     in
     (* initialize the loop counter to [t1] *)
     let e1, _, env = Translate_terms.to_exp ~adata:Assert.no_data kf (Env.push env) t1 in
-    let init_blk, env = Env.pop_and_get
+    let init_blk, env = Env.pop_and_get ~kf
         env
         (Gmp.assign ~loc:e1.eloc lv_x x e1)
         ~global_clear:false
@@ -337,7 +337,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
       ~logic_env guard;
     let guard_exp, _, env = Translate_terms.to_exp ~adata:Assert.no_data kf (Env.push env) guard in
     let break_stmt = Smart_stmt.break ~loc:guard_exp.eloc in
-    let guard_blk, env = Env.pop_and_get
+    let guard_blk, env = Env.pop_and_get ~kf
         env
         (Smart_stmt.if_stmt
            ~loc:guard_exp.eloc
@@ -352,7 +352,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
        previous typing ensures that [x++] fits type [ty] *)
     let tlv_one = t_plus_one ~ty:ctx tlv in
     let incr, _, env = Translate_terms.to_exp ~adata:Assert.no_data kf (Env.push env) tlv_one in
-    let next_blk, env = Env.pop_and_get
+    let next_blk, env = Env.pop_and_get ~kf
         env
         (Gmp.assign ~loc:incr.eloc lv_x x incr)
         ~global_clear:false
@@ -385,7 +385,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
             e
             p
         in
-        let b, env = Env.pop_and_get env stmt ~global_clear:false Env.After in
+        let b, env = Env.pop_and_get ~kf env stmt ~global_clear:false Env.After in
         let guard_for_small_type = Smart_stmt.block_stmt b in
         guard_for_small_type :: guard :: body @ [ next ], env
     in

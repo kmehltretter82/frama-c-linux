@@ -383,7 +383,7 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
         Smart_stmt.assigns ~loc ~result:lval e
       in
       let block, env =
-        Env.pop_and_get env storing_stmt ~global_clear:false Env.After
+        Env.pop_and_get ~kf env storing_stmt ~global_clear:false Env.After
       in
       (* We CANNOT return [block.bstmts] because it does NOT contain
          variable declarations. *)
@@ -399,7 +399,7 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
             Smart_stmt.assigns ~loc ~result:lval e
           in
           let block, env =
-            Env.pop_and_get env storing_stmt ~global_clear:false Env.After
+            Env.pop_and_get ~kf env storing_stmt ~global_clear:false Env.After
           in
           (* We CANNOT return [block.bstmts] because it does NOT contain
              variable declarations. *)
@@ -418,7 +418,7 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
     Loops.mk_nested_loops ~loc mk_innermost_block kf env lscope_vars
   in
   let storing_loops_block = Cil.mkBlock storing_loops_stmts in
-  let storing_loops_block, env = Env.pop_and_get
+  let storing_loops_block, env = Env.pop_and_get ~kf
       env
       (Smart_stmt.block_stmt storing_loops_block)
       ~global_clear:false
