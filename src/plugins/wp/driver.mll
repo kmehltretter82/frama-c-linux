@@ -17,8 +17,6 @@
   open Cil_types
   open LogicBuiltins
 
-  type bal = [ `Default | `Left | `Right | `Nary ]
-
   type token =
     | EOF
     | KEY of string
@@ -30,7 +28,6 @@
     | KIND of kind
     | ID of string
     | LINK of string
-    | RECLINK of (string * (string * bal)) list
     | FIELD of string * string
 
   let keywords = [
@@ -82,7 +79,6 @@ rule tok = parse
   | "/*" { comment lexbuf }
   | ident as a { ident a }
   | '"' { LINK (string_val (Buffer.create 10) lexbuf) }
-  | '{' { RECLINK(reclink [] lexbuf) }
   | (ident as group) '.' (ident as var) { FIELD(group,var) }
   | _ | ":=" | "+=" { KEY (Lexing.lexeme lexbuf) }
 
@@ -145,31 +141,6 @@ and recorstring = parse
   | '{'    { `RecString (recstring [] lexbuf) }
   | _ as c { failwith (Printf.sprintf "found '%c' instead of \" or {" c) }
 
-and reclink acc = parse
-  | ';' | blank+ { reclink acc lexbuf }
-  | '\n' { newline lexbuf ; reclink acc lexbuf }
-  | '}'  { acc }
-  | ident as field { reclink_bis acc field lexbuf }
-  | _ { failwith "Identifier or '}' expected" }
-and reclink_bis acc field = parse
-  | blank+ { reclink_bis acc field lexbuf }
-  | '\n'   { newline lexbuf ; reclink_bis acc field lexbuf }
-  | '='    { reclink_ter acc field lexbuf }
-  | _      { failwith "'=' expected" }
-and reclink_ter acc field = parse
-  | blank+ { reclink_ter acc field lexbuf }
-  | '\n'   { newline lexbuf ; reclink_ter acc field lexbuf }
-  | ident as name
-      { let link  = name,(bal lexbuf) in
-        reclink ((field,link)::acc) lexbuf
-      }
-  | '"'
-      { let name = string_val (Buffer.create 10) lexbuf in
-        let link = name,(bal lexbuf) in
-        reclink ((field,link)::acc) lexbuf
-      }
-  | _ { failwith "Identifier or String expected" }
-
 and bal = parse
   | '\n' { newline lexbuf ; bal lexbuf }
   | blank+ { bal lexbuf }
@@ -186,7 +157,6 @@ and bal = parse
     | BOOLEAN | INTEGER | REAL | INT _ | FLT _  | KIND _ ->
 	Format.pp_print_string fmt "<type>"
     | FIELD(group,name) -> Format.fprintf fmt "%s.%s" group name
-    | RECLINK _ -> Format.pp_print_string fmt "<reclink>"
 
   type input = {
     lexbuf : Lexing.lexbuf ;
@@ -269,12 +239,6 @@ and bal = parse
       | LINK f | ID f ->
         let link = conv_bal def (f,(bal input.lexbuf)) in
         skip input; link
-      | RECLINK l ->
-        skip input ;
-        begin try conv_bal def (List.assoc "why3" l);
-        with Not_found ->
-          failwith "a link must contain an entry for 'why3'"
-        end
       | _ -> failwith "Missing link symbol"
 
   let linkstring input =
@@ -323,7 +287,7 @@ and bal = parse
 
   let rec op_link op input =
     match token input with
-      | LINK _ | RECLINK _ ->
+      | LINK _ ->
           Operator op, link `Left input
       | ID "associative" -> skip input ; skipkey input ":" ;
 	  op_link { op with associative = true } input
@@ -346,7 +310,7 @@ and bal = parse
 
   let logic_link input =
     match token input with
-      | LINK _ | RECLINK _ ->
+      | LINK _ ->
 	  Function, link `Nary input
       | ID "constructor" ->
 	  skip input ; skipkey input ":" ;

@@ -18,19 +18,19 @@ library minmax_int:
 why3.import += "int.MinMax:Ig";
 logic integer "\\max"(integer,integer) =
       commutative:associative:idempotent:
-      {why3="Ig.max"};
+      "Ig.max";
 logic integer "\\min"(integer,integer) =
       commutative:associative:idempotent:
-      {why3="Ig.min"};
+      "Ig.min";
 
 library minmax_real:
 why3.import += "real.MinMax:Rg";
 logic real "\\max"(real,real) =
       commutative:associative:idempotent:
-      {why3="Rg.max"};
+      "Rg.max";
 logic real "\\min"(real,real) =
       commutative:associative:idempotent:
-      {why3="Rg.min"};
+      "Rg.min";
 
 library cint:
 why3.import += "frama_c_wp.cint.Cint";

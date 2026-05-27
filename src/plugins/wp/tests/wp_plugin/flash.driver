@@ -1,8 +1,8 @@
 library INDEX: memory
 why3.file += "flash.mlw";
 type index = {why3="Flash.t"; } ;
-logic integer INDEX_access( index , addr ) = {why3="Flash.get"; } ;
-logic index   INDEX_update( index , addr ) = {why3="Flash.update"};
+logic integer INDEX_access( index , addr ) = "Flash.get";
+logic index   INDEX_update( index , addr ) = "Flash.update";
 logic index   INDEX_init := "INDEX_init" ;
 
 library RD: INDEX
