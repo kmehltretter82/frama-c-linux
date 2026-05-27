@@ -277,7 +277,7 @@ function EvaSidebarSelection(): React.JSX.Element {
   const [selected, setSelected] =
     useStringSettings('eva.sidebar.selected', 'callstacks');
 
-  const opened = { height: '100%' };
+  const opened = { display: 'block' };
   const closed = { display: 'none' };
 
   return (<>
