@@ -83,6 +83,16 @@ let rec tmap xs = function
   | Data(a,ts) -> Data(a,List.map (tmap xs) ts)
   | Record fts -> Record(List.map (fun (f,t) -> f,tmap xs t) fts)
 
+let rec map_tau fd adt = function
+  | Int -> Int
+  | Real -> Real
+  | Bool -> Bool
+  | Prop -> Prop
+  | Tvar _ as x -> x
+  | Array(a,b) -> Array(map_tau fd adt a,map_tau fd adt b)
+  | Data(a,ts) -> Data(adt a,List.map (map_tau fd adt) ts)
+  | Record fts -> Record(List.map (fun (f,t) -> fd f,map_tau fd adt t) fts)
+
 let type_params n =
   let rec vars k n = if k <= n then Tvar k :: vars (succ k) n else []
   in vars 1 n

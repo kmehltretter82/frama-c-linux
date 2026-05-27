@@ -58,5 +58,10 @@ val compare_tau:
   ('a -> 'a -> int) ->
   ('f,'a) datatype -> ('f,'a) datatype -> int
 
+val map_tau:
+  ('f1 -> 'f2) ->
+  ('a1 -> 'a2) ->
+  ('f1,'a1) datatype -> ('f2,'a2) datatype
+
 module MakeTau(F : Field)(A : Data) :
   Data with type t = (F.t,A.t) datatype

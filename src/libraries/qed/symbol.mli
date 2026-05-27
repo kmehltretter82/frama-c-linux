@@ -36,8 +36,24 @@ val field : data -> string -> field
 (** Ordering with respect to field declaration order in record *)
 val by_field_rank : field -> field -> int
 
+(** Logic Types *)
+
+type tau = (field,data) Logic.datatype
+type sigma = tau Why3.Ty.Mtv.t
+
 (** Logic Functions *)
 type lfun
+
+(** Returns a triple [a,r,vs] with [a] the number of polymorphic variables, [r]
+    the type of result and [vs] the type of arguments. *)
+val signature : lfun -> int * tau * tau list
+
+(**
+   Unifies the polymorphic types of the function with the provided type of
+   arguments and of the result, when available. If you provide a result type, it
+   {i will} be unified with the expected result type of the logic symbol, so use
+   [~result:Prop] for predicates. *)
+val apply : lfun -> ?result:tau -> tau list -> tau
 
 (** Generic Why3 symbols *)
 module type Symbol =
@@ -60,9 +76,11 @@ end
 
 (** Factory *)
 
-
 (** @raise Invalid_argument if undefined in context *)
 val of_ts : context:theory -> tysymbol -> data
+
+(** @raise Invalid_argument if undefined in context *)
+val of_ty : ?sigma:sigma -> context:theory -> ty -> tau
 
 (** @raise Invalid_argument if undefined in context *)
 val of_ls : context:theory -> lsymbol -> lfun
@@ -73,7 +91,12 @@ val find_data : env -> string -> data
 (** @raise Invalid_argument if not found in environment *)
 val find_lfun : env -> string -> lfun
 
-
 module Data : Symbol with type t = data and type symbol = Why3.Ty.tysymbol
 module Field : Symbol with type t = field and type symbol = Why3.Term.lsymbol
 module Fun : Symbol with type t = lfun and type symbol = Why3.Term.lsymbol
+module Tau :
+sig
+  type t = tau
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
+end

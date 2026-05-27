@@ -18,14 +18,14 @@ let fullname (th : Why3.Theory.theory) (id : Why3.Ident.ident) =
 let find ~kind ~lookup env name fn =
   let rec parse lp = function
     | [] ->
-      Format.kasprintf invalid_arg "Qed: invalid why3 identifier (%S)" name
+      Format.kasprintf invalid_arg "Qed.Symbol.find(%S)" name
     | p::ps ->
       if capitalized p then
         try
           let t = Why3.Env.read_theory env (List.rev lp) p in
           fn t @@ lookup t.th_export ps
         with Not_found ->
-          Format.kasprintf invalid_arg "Qed: %s not found (%S)" kind name
+          Format.kasprintf invalid_arg "Qed.Symbol.find_%s(%S)" kind name
       else parse (p::lp) ps
   in parse [] @@ String.split_on_char '.' name
 
@@ -46,8 +46,7 @@ let find_use ~context id =
   match find_use_opt id context with
   | Some th -> th
   | None ->
-    invalid_arg @@
-    Printf.sprintf "Qed: symbol not found in context (%s)" id.id_string
+    Format.kasprintf invalid_arg "Qed.Symbol.find_use(%S)" id.id_string
 
 (* -------------------------------------------------------------------------- *)
 (* --- Abstract Data Types                                                --- *)
@@ -71,8 +70,13 @@ and field = Field of {
 (* --- Data                                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
+let hts : data Why3.Ty.Hts.t = Why3.Ty.Hts.create 0
+
 let of_ts ~context (ts : Why3.Ty.tysymbol) =
-  Data { ts ; th = find_use ~context ts.ts_name ; cs = None ; fs = None }
+  try Why3.Ty.Hts.find hts ts with Not_found ->
+    let d = Data {
+        ts ; th = find_use ~context ts.ts_name ; cs = None ; fs = None
+      } in Why3.Ty.Hts.add hts ts d ; d
 
 let find_data env name = find_ts env name @@ fun th ts ->
   Data { th ; ts ; cs = None ; fs = None }
@@ -197,5 +201,93 @@ module Fun = Make
       let ident (Fun fn) = fn.ls.ls_name
     end)
 
+(* -------------------------------------------------------------------------- *)
+(* --- Types                                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
+type tau = (field,data) Logic.datatype
+
+module Tau =
+struct
+  type t = tau
+  let equal = Kind.eq_tau Field.equal Data.equal
+  let compare = Kind.compare_tau Field.compare Data.compare
+end
+
+let hty : tau Why3.Ty.Hty.t = Why3.Ty.Hty.create 32
+let () =
+  begin
+    Why3.Ty.(Hty.add hty ty_int Int) ;
+    Why3.Ty.(Hty.add hty ty_real Real) ;
+    Why3.Ty.(Hty.add hty ty_bool Bool) ;
+  end
+
+type sigma = tau Why3.Ty.Mtv.t
+
+let rec of_ty ?(sigma=Why3.Ty.Mtv.empty) ~context ty =
+  try Why3.Ty.Hty.find hty ty with Not_found ->
+  match ty.ty_node with
+  | Tyvar x -> Why3.Ty.Mtv.find x sigma
+  | Tyapp (ts, tys) ->
+    let d = of_ts ~context ts in
+    let t = Logic.Data(d, List.map (of_ty ~sigma ~context) tys) in
+    if Why3.Ty.ty_closed ty then Why3.Ty.Hty.add hty ty t ; t
+
+let of_oty ?sigma ~context = function
+  | None -> Logic.Prop
+  | Some ty -> of_ty ?sigma ~context ty
+
+let rec unify sigma (ty : Why3.Ty.ty) (t : tau) =
+  match ty.ty_node, t with
+  | Tyapp(ts,[]) , Int when Why3.Ty.(ts_equal ts ts_int) -> ()
+  | Tyapp(ts,[]) , Real when Why3.Ty.(ts_equal ts ts_real) -> ()
+  | Tyapp(ts,[]) , Bool when Why3.Ty.(ts_equal ts ts_bool) -> ()
+  | Tyapp(ts,[tyk;tyv]) , Array(tk,tv) when Why3.Ty.(ts_equal ts ts_func) ->
+    unify sigma tyk tk ;
+    unify sigma tyv tv ;
+  | Tyapp(ts,tys) , Data(d,tvs) when Why3.Ty.ts_equal ts @@ Data.symbol d ->
+    unify_all sigma tys tvs
+  | Tyvar x, _ ->
+    begin
+      try
+        let u = Why3.Ty.Mtv.find x !sigma in
+        if not @@ Tau.equal u t then invalid_arg "Qed.Symbol.unify_var"
+      with Not_found ->
+        sigma := Why3.Ty.Mtv.add x t !sigma
+    end
+  | _ -> invalid_arg "Qed.Symbol.unify"
+
+and unify_all sigma tys tvs =
+  match tys , tvs with
+  | [], [] -> ()
+  | ty::tys , t::tvs -> unify sigma ty t ; unify_all sigma tys tvs
+  | _ -> invalid_arg "Qed.Symbol.unify_all"
+
+let unify_opt sigma oty tr =
+  match oty with
+  | None -> if tr <> Logic.Prop then invalid_arg "Qed.Symbol.unity_oty"
+  | Some ty -> unify sigma ty tr
+
+let apply (Fun f) ?result ts =
+  let s = ref Why3.Ty.Mtv.empty in
+  unify_all s f.ls.ls_args ts ;
+  Option.iter (unify_opt s f.ls.ls_value) result ;
+  of_oty ~sigma:!s ~context:f.th f.ls.ls_value
+
+let signature (Fun f) =
+  let r = ref 0 in
+  let s = ref Why3.Ty.Mtv.empty in
+  let addv tv =
+    if not @@ Why3.Ty.Mtv.mem tv !s then
+      let k = !r in incr r ;
+      s := Why3.Ty.Mtv.add tv (Logic.Tvar k) !s in
+  let rec addt (t : Why3.Ty.ty) =
+    match t.ty_node with
+    | Tyvar tv -> addv tv
+    | Tyapp(_,ts) -> List.iter addt ts in
+  Option.iter addt f.ls.ls_value ;
+  List.iter addt f.ls.ls_args ;
+  !r, of_oty ~sigma:!s ~context:f.th f.ls.ls_value,
+  List.map (of_ty ~sigma:!s ~context:f.th) f.ls.ls_args
 
 (* -------------------------------------------------------------------------- *)
