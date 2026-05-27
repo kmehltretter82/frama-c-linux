@@ -19,6 +19,7 @@ help::
 	@echo "Installation configuration variables:"
 	@echo "  - PREFIX: target installation prefix (default is OPAM switch or /usr/local)"
 	@echo "  - MANDIR: custom installation for man pages"
+  @echo "  - RELOCATABLE: if 'yes' the installation will be relocatable"
 
 ################################
 ## Man Path
@@ -44,6 +45,12 @@ else
   WORKSPACE_OPT:=
 endif
 
+ifeq ($(RELOCATABLE),yes)
+RELOCATABLE_OPT=--relocatable
+else
+RELOCATABLE_OPT=
+endif
+
 ifneq ($(INSTALL_TARGET),)
 INSTALL_TARGET:="$(INSTALL_TARGET) "
 endif
@@ -60,12 +67,12 @@ endif
 ifeq ($(PREFIX),$(OPAM_SWITCH_PREFIX))
 	@echo "Installing $(INSTALL_TARGET)to current Opam switch"
 	@printf "  Copying and relocating files..."
-	dune install ${WORKSPACE_OPT} --root . ${MANDIR_OPT} 2> /dev/null
+	dune install ${WORKSPACE_OPT} --root . ${MANDIR_OPT} ${RELOCATABLE_OPT} 2> /dev/null
 	@echo " (done)"
 else
 	@echo "Installing $(INSTALL_TARGET)to ${PREFIX}"
 	@printf " Copying and relocating files..."
-	dune install ${WORKSPACE_OPT} --root . --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
+	dune install ${WORKSPACE_OPT} --root . --prefix ${PREFIX} ${MANDIR_OPT} ${RELOCATABLE_OPT} 2> /dev/null
 	@echo " (done)"
 	@echo 'DO NOT FORGET TO EXPAND YOUR OCAMLPATH VARIABLE:'
 	@echo '  export OCAMLPATH="${PREFIX}/lib:$$OCAMLPATH"'
