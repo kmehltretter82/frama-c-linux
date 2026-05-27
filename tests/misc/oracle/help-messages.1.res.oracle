@@ -210,7 +210,7 @@ Options taking a string as argument should preferably be written
                     file (opposite option is -no-dump-interpreted-automata)
 -keep-temp-files    Keep temporary intermediate files (opposite option is
                     -no-keep-temp-files)
--kernel-debug <n>   level of debug for Frama-C's kernel (default to 0)
+-kernel-debug <n>   level of debug for the Frama-C kernel (default to 0)
 -orig-name          prints a message each time a variable is renamed
                     (opposite option is -no-orig-name)
 -print-as-is        when pretty-printing C code, try to print it as close as
@@ -231,7 +231,7 @@ Options taking a string as argument should preferably be written
                     -autocomplete="p1,p2,...")
 -explain            prints the help message for each option given in the
                     command line
--kernel-help        help of Frama-C's kernel
+-kernel-help        help of the Frama-C kernel
 -kernel-h           alias for option -kernel-help
 -print-config       print full config information
 -print-config-json  prints extensive data about Frama-C's configuration, in
@@ -286,7 +286,7 @@ Options taking a string as argument should preferably be written
                     locations, replace (absolute) path with the corresponding
                     symbolic name (preferably use
                     -add-symbolic-path="path_1:name_1,...,path_n:name_n")
--kernel-log <K_1:file_1,...>  copy log messages from Frama-C's kernel to a
+-kernel-log <K_1:file_1,...>  copy log messages from the Frama-C kernel to a
                     file. <K> is a combination of these characters:
                     a: ALL messages (equivalent to 'dfiruw')
                     d: debug       e: user or internal error (same as 'iu')
@@ -299,7 +299,7 @@ Options taking a string as argument should preferably be written
                     <k1>,...,<kn>. Use -kernel-msg-key help to get a list of
                     available categories, and * to enable all categories
                     (preferably use -kernel-msg-key="k1[,...,kn]")
--kernel-verbose <n>  level of verbosity for Frama-C's kernel (default to 1)
+-kernel-verbose <n>  level of verbosity for the Frama-C kernel (default to 1)
 -kernel-warn-key <k1[=s1][,...,kn[=sn]]>  set warning status for category
                     <k1> to <s1>,...,<kn> to <sn>. Use -kernel-warn-key help
                     to get a list of available categories, and * to enable

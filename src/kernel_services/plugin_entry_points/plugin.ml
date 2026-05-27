@@ -497,7 +497,7 @@ struct
       (struct
         let option_name = prefix ^ "help"
         let help =
-          if is_kernel then "help of " ^ P.name
+          if is_kernel then "help of the " ^ P.name
           else "help of plug-in " ^ P.name
       end)
   let () =
@@ -532,7 +532,8 @@ struct
         (struct
           let option_name = logfile_optname
           let arg_name = "K_1:file_1,..."
-          let help = "copy log messages from " ^ P.name ^
+          let help = "copy log messages from " ^
+                     (if is_kernel then "the " else "") ^ P.name ^
                      " to a file. <K> is a combination of these characters:\n\
                       a: ALL messages (equivalent to 'dfiruw')\n\
                       d: debug       e: user or internal error (same as 'iu')\n\
@@ -606,7 +607,7 @@ struct
         let option_name = verbose_optname
         let arg_name = "n"
         let help =
-          (if is_kernel then "level of verbosity for " ^ P.name
+          (if is_kernel then "level of verbosity for the " ^ P.name
            else "level of verbosity for plug-in " ^ P.name)
           ^ " (default to " ^ string_of_int default ^ ")"
       end)
@@ -640,7 +641,7 @@ struct
         let option_name = debug_optname
         let arg_name = "n"
         let help =
-          (if is_kernel then "level of debug for " ^ P.name
+          (if is_kernel then "level of debug for the " ^ P.name
            else "level of debug for plug-in " ^ P.name)
           ^ " (default to " ^ string_of_int default ^ ")"
       end)

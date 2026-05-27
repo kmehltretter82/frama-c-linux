@@ -15,7 +15,7 @@ let () = Plugin.register_kernel ()
 let () = Plugin.is_session_visible ()
 module P = Plugin.Register
     (struct
-      let name = "Frama-C's kernel"
+      let name = "Frama-C kernel"
       let shortname = "kernel"
       let help = "General options provided by the Frama-C kernel"
     end)
