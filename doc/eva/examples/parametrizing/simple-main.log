@@ -2,7 +2,7 @@
 [eva] Analyzing a complete application starting at main
 [eva:initial-state] Values of globals at initialization
   
-[eva] simple-main.c:3: 
+[eva:show] simple-main.c:3: 
   Frama_C_dump_each:
   # cvalue:
   argc ∈ [--..--]

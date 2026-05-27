@@ -2,7 +2,7 @@
 [eva] Analyzing a complete application starting at main
 [eva:initial-state] Values of globals at initialization
   
-[eva] context-width.c:3: 
+[eva:show] context-width.c:3: 
   Frama_C_dump_each:
   # cvalue:
   t ∈ {{ NULL ; &S_t[0] }}
