@@ -677,6 +677,7 @@ int main(void)
     __e_acsl_mpz_t __gen_e_acsl__43;
     __e_acsl_mpz_t __gen_e_acsl_x_9;
     __e_acsl_mpz_t __gen_e_acsl_sub_5;
+    __e_acsl_mpz_t __gen_e_acsl_neg;
     __e_acsl_mpz_t __gen_e_acsl_add_7;
     int __gen_e_acsl_eq_24;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_24 =
@@ -687,9 +688,12 @@ int main(void)
     __gmpz_sub(__gen_e_acsl_sub_5,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl__43),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_x_9));
+    __gmpz_init(__gen_e_acsl_neg);
+    __gmpz_neg(__gen_e_acsl_neg,
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl_x_9));
     __gmpz_init(__gen_e_acsl_add_7);
     __gmpz_add(__gen_e_acsl_add_7,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl_x_9),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl_neg),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl__43));
     __gen_e_acsl_eq_24 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_5),
                                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_7));
@@ -706,6 +710,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl__43);
     __gmpz_clear(__gen_e_acsl_x_9);
     __gmpz_clear(__gen_e_acsl_sub_5);
+    __gmpz_clear(__gen_e_acsl_neg);
     __gmpz_clear(__gen_e_acsl_add_7);
   }
   /*@ assert 1 - x == -x + 1; */ ;

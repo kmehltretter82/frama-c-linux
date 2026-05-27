@@ -104,3 +104,7 @@ val labels_are_all_here : logic_label list -> bool
 
 val unghost_type : typ -> typ
 (** remove all occurrences (also deep ones) of the "ghost" attribute. *)
+
+val get_loc_from_pot : Analyses_types.pred_or_term -> location
+
+val get_term_from_pot : Analyses_types.pred_or_term -> term option

@@ -22,7 +22,7 @@ type exp =
   {
     enode : exp_node;
     rtes : rte list;
-    origin : term option
+    origin : Pred_or_term.t
   }
 
 and exp_node =
@@ -260,18 +260,19 @@ end
 
 module Exp = struct
   module Aux = struct
-    let of_exp_node ?origin enode = {enode; rtes = []; origin}
+    let of_exp_node ~origin enode = {enode; rtes = []; origin}
   end
 
-  let lval ?origin lval = Aux.of_exp_node ?origin @@ Lval lval
+  let lval ~origin lval = Aux.of_exp_node ~origin @@ Lval lval
   let integer ~origin ~ity n = Aux.of_exp_node ~origin @@ Integer {ity; n}
   let sizeof ~origin ty = Aux.of_exp_node ~origin @@ SizeOf ty
-  let rte rte = Aux.of_exp_node ?origin:None rte.rnode
+  let rte rte =
+    Aux.of_exp_node ~origin:(Analyses_types.PoT_pred rte.rorigin) rte.rnode
 
-  let mk_true ?origin () = Aux.of_exp_node ?origin True
-  let mk_false ?origin () = Aux.of_exp_node ?origin False
+  let mk_true ~origin () = Aux.of_exp_node ~origin True
+  let mk_false ~origin () = Aux.of_exp_node ~origin False
 
-  let conditional ?origin ity e1 e2 e3 =
+  let conditional ~origin ity e1 e2 e3 =
     let org = If {ity; op1 = e1; op2 = e2; op3 = e3} in
     let res = if Options.O.get () = 0 then org
       else match Exp_node.of_conditional e1 e2 e3 with
@@ -281,9 +282,9 @@ module Exp = struct
             Pretty.pp_exp_node org Pretty.pp_exp_node e;
           e
         | None -> org
-    in Aux.of_exp_node ?origin res
+    in Aux.of_exp_node ~origin res
 
-  let binop ?origin bop ity e1 e2 =
+  let binop ~origin bop ity e1 e2 =
     let org = BinOp {binop = bop; ity; op1 = e1; op2 = e2} in
     let res = if Options.O.get () < 1 then org
       else match Exp_node.of_binop ~bop ~ity e1 e2 with
@@ -293,9 +294,9 @@ module Exp = struct
             Pretty.pp_exp_node org Pretty.pp_exp_node e;
           e
         | None -> org
-    in Aux.of_exp_node ?origin res
+    in Aux.of_exp_node ~origin res
 
-  let unop ?origin uop ity e =
+  let unop ~origin uop ity e =
     let org = UnOp {unop = uop; ity; op = e} in
     let res = if Options.O.get () = 0 then org
       else match Exp_node.of_unop ~uop ~ity e with
@@ -305,17 +306,13 @@ module Exp = struct
             Pretty.pp_exp_node org Pretty.pp_exp_node e;
           e
         | None -> org
-    in Aux.of_exp_node ?origin res
+    in Aux.of_exp_node ~origin res
 
-  let coerce ?origin ~coerce_to exp =
-    let origin =
-      try List.find Option.is_some [origin; exp.origin]
-      with Not_found -> None
-    in
+  let coerce ~origin ~coerce_to exp =
     match exp with
     | {enode = Coerce c; origin} as exp -> (* collapse stacked coercions *)
       {exp with origin; enode = Coerce {c with coerce_to}}
-    | exp -> Aux.of_exp_node ?origin @@ Coerce {coerce_to; coerced = exp}
+    | exp -> Aux.of_exp_node ~origin @@ Coerce {coerce_to; coerced = exp}
 end
 
 module Rte = struct

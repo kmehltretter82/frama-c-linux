@@ -41,7 +41,7 @@ type exp = private
   {
     enode : exp_node;
     rtes : rte list;
-    origin : term option
+    origin : pred_or_term
   }
 (** [origin] is required to calculate casts. Note that [origin] is [None] when
     it stems from a predicate as predicates never require casts. *)
@@ -88,23 +88,23 @@ end
 
 (** smart constructors for generating [exp] nodes *)
 module Exp : sig
-  val lval : ?origin:term -> lval -> exp
-  val integer : origin:term -> ity:number_ty -> Z.t -> exp
-  val sizeof : origin:term -> typ -> exp
+  val lval : origin:pred_or_term -> lval -> exp
+  val integer : origin:pred_or_term -> ity:number_ty -> Z.t -> exp
+  val sizeof : origin:pred_or_term -> typ -> exp
   val rte : rte -> exp
 
-  val mk_true : ?origin:term -> unit -> exp
-  val mk_false : ?origin:term -> unit -> exp
+  val mk_true : origin:pred_or_term -> unit -> exp
+  val mk_false : origin:pred_or_term -> unit -> exp
 
-  val unop : ?origin:term -> unop -> number_ty -> exp -> exp
+  val unop : origin:pred_or_term -> unop -> number_ty -> exp -> exp
 
   (** Transforms a Cil binary operator to an {!Interlang} binary operator.
       Not all Cil operators are supported (yet). *)
-  val binop : ?origin:term -> binop -> number_ty -> exp -> exp -> exp
+  val binop : origin:pred_or_term -> binop -> number_ty -> exp -> exp -> exp
 
-  val conditional : ?origin:term -> number_ty -> exp -> exp -> exp -> exp
+  val conditional : origin:pred_or_term -> number_ty -> exp -> exp -> exp -> exp
 
-  val coerce : ?origin:term -> coerce_to:typ -> exp -> exp
+  val coerce : origin:pred_or_term -> coerce_to:typ -> exp -> exp
 end
 
 (** smart constructors for generating [rte] nodes *)

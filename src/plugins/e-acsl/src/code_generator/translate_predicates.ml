@@ -62,9 +62,10 @@ let relation_to_binop = function
 
 let rec predicate_content_to_exp_il p =
   let p = Logic_normalizer.get_pred p in
+  let origin = PoT_pred p in
   match p.pred_content with
-  | Ptrue -> M.return @@ IL.Exp.mk_true ()
-  | Pfalse -> M.return @@ IL.Exp.mk_false ()
+  | Ptrue -> M.return @@ IL.Exp.mk_true ~origin ()
+  | Pfalse -> M.return @@ IL.Exp.mk_false ~origin ()
   | Prel(rel, t1, t2) ->
     let* logic_env = M.read_logic_env in
     let t1 = Logic_normalizer.get_term t1 in
@@ -77,23 +78,36 @@ let rec predicate_content_to_exp_il p =
     let rel = Interlang_gen.of_relation rel in
     let* op1 = Translate_terms.to_exp_il t1 in
     let+ op2 = Translate_terms.to_exp_il t2 in
-    Interlang.Exp.binop rel ity op1 op2
+    Interlang.Exp.binop ~origin rel ity op1 op2
   | Pif (p1,p2,p3) ->
     let* e1 = predicate_content_to_exp_il p1 in
     let* e2 = predicate_content_to_exp_il p2 in
     let+ e3 = predicate_content_to_exp_il p3 in
-    Interlang.Exp.conditional (Analyses_types.C_integer IInt) e1 e2 e3
+    Interlang.Exp.conditional ~origin (Analyses_types.C_integer IInt) e1 e2 e3
   | Pand(p1, p2) ->
     let* op1 = predicate_content_to_exp_il p1 in
     let+ op2 = predicate_content_to_exp_il p2 in
-    Interlang.Exp.binop And (Analyses_types.C_integer IInt) op1 op2
+    Interlang.Exp.binop ~origin And (Analyses_types.C_integer IInt) op1 op2
   | Por(p1, p2) ->
     let* op1 = predicate_content_to_exp_il p1 in
     let+ op2 = predicate_content_to_exp_il p2 in
-    Interlang.Exp.binop Or (Analyses_types.C_integer IInt) op1 op2
+    Interlang.Exp.binop ~origin Or (Analyses_types.C_integer IInt) op1 op2
+  | Pimplies(p1, p2) -> (* (p1 ==> p2) <==> !p1 || p2 *)
+    let* op1 = predicate_content_to_exp_il p1 in
+    let+ op2 = predicate_content_to_exp_il p2 in
+    Interlang.Exp.binop
+      ~origin
+      Or
+      (Analyses_types.C_integer IInt)
+      (Interlang.Exp.unop
+         ~origin:(Analyses_types.PoT_pred p1)
+         Not
+         (Analyses_types.C_integer IInt)
+         op1)
+      op2
   | Pnot p ->
     let+ op = predicate_content_to_exp_il p in
-    Interlang.Exp.unop Not (Analyses_types.C_integer IInt) op
+    Interlang.Exp.unop ~origin Not (Analyses_types.C_integer IInt) op
   | _ -> M.not_covered Printer.pp_predicate p
 
 (* Convert an ACSL predicate into a corresponding C expression (if any) in the

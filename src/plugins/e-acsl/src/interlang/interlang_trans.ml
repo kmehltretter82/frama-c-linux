@@ -49,8 +49,6 @@ module M = struct
     with_env (fun env -> {env with adata_register = false}) m
 
   let with_loc loc m = with_env (fun env -> {env with loc}) m
-  let maybe_with_term_loc t_opt m =
-    match t_opt with | None -> m | Some t -> with_loc t.Cil_types.term_loc m
 
   let do_if_registering_adata m =
     let* env = read in
@@ -102,11 +100,8 @@ let rec compile ?(flush_rtes=false) exp =
   match cast_info with (* [cast_info] specifies type type we cast from. *)
   | Some (strnum, name) ->
     let name = if name = "" then None else Some name in
-    let* {kf; loc} = M.read in
-    let loc = match exp.origin with
-      | Some t -> t.term_loc
-      | None -> loc
-    in
+    let* {kf} = M.read in
+    let loc = Misc.get_loc_from_pot exp.origin in
     M.modifying_env (fun env ->
         Typed_number.add_cast ~loc
           ?name
@@ -114,7 +109,7 @@ let rec compile ?(flush_rtes=false) exp =
           kf
           coerce
           strnum
-          exp.origin
+          (Misc.get_term_from_pot exp.origin)
           e)
   | None -> M.return e (* no cast required *)
 
@@ -140,7 +135,7 @@ and compile_conditional ~ity ~origin ?(name = "if") op1 op2 op3 =
       ~name
       env
       kf
-      origin (* /!\ Use the term for optimization *)
+      (Misc.get_term_from_pot origin) (* /!\ Use the term for optimization *)
       ty
       (fun v ev ->
          let lv = Cil.var v in
@@ -197,8 +192,16 @@ and compile_context_insensitive {Interlang.enode; origin} =
     let* e1 = compile ~flush_rtes:true op1 in
     let* e2 = compile ~flush_rtes:true op2 in
     let name = Misc.name_of_binop binop in
-    let* e = M.modifying_env @@ fun env ->
-      Translate_utils.comparison_to_exp ~loc kf env ity binop e1 e2 ~name origin
+    let* e = M.modifying_env @@ fun env -> Translate_utils.comparison_to_exp
+        ~loc
+        kf
+        env
+        ity
+        binop
+        e1
+        e2
+        ~name
+        (Misc.get_term_from_pot origin)
     in
     M.return (e, None, Some (Analyses_types.C_number, name))
   | UnOp {ity; unop = Neg as uop; op} ->
@@ -212,7 +215,7 @@ and compile_context_insensitive {Interlang.enode; origin} =
             env
             kf
             ~name:"neg"
-            op.origin
+            (Misc.get_term_from_pot origin)
             (fun _ ev ->
                [ Smart_stmt.rtl_call ~loc ~prefix:"" "__gmpz_neg" [ ev; e ] ])
         in
@@ -230,6 +233,7 @@ and compile_context_insensitive {Interlang.enode; origin} =
     M.return (Smart_exp.lnot ~loc e, None, Some (Analyses_types.C_number, ""))
   | BinOp {ity; binop = Plus | Minus | Mult | Div | Mod as binop; op1; op2} ->
     let binop = compile_binop binop in
+    let origin = Misc.get_term_from_pot origin in
     let* e1 = compile op1 in
     let* e2 = compile op2 in
     let* e = match ity with
@@ -254,16 +258,20 @@ and compile_context_insensitive {Interlang.enode; origin} =
         ~name:"and"
         op1
         op2
-        (Interlang.Exp.mk_false ())
+        (Interlang.Exp.mk_false ~origin ())
     in
     M.return (e, None, Some (Analyses_types.C_number, ""))
   | BinOp {ity; binop = Or; op1; op2} ->
+    let name = match origin with
+      | Analyses_types.PoT_pred { pred_content = Pimplies _ } -> "implies"
+      | _ -> "or"
+    in
     let* e = compile_conditional
         ~ity
         ~origin
-        ~name:"or"
+        ~name
         op1
-        (Interlang.Exp.mk_true ())
+        (Interlang.Exp.mk_true ~origin ())
         op2
     in
     M.return (e, None, Some (Analyses_types.C_number, ""))
@@ -272,15 +280,23 @@ and compile_context_insensitive {Interlang.enode; origin} =
     let* e = compile_conditional ~ity ~origin op1 op2 op3 in
     M.return (e, None, Some (Analyses_types.C_number, ""))
   | Lval lval ->
-    M.maybe_with_term_loc origin @@
+    M.with_loc (Misc.get_loc_from_pot origin) @@
     let* lval, name = M.without_registering_adata @@ compile_lval lval in
     let* {loc} = M.read in
     let e = Smart_exp.lval ~loc lval in
-    let* () = M.Option.iter (assert_register_term ~loc e) origin in
+    let* () =
+      M.Option.iter
+        (assert_register_term ~loc e)
+        (Misc.get_term_from_pot origin)
+    in
     M.return (e, None, Some (Analyses_types.C_number, name))
   | SizeOf ty ->
     let e = Cil.sizeOf ~loc ty in
-    let* () = M.Option.iter (assert_register_term ~loc ~force:true e) origin in
+    let* () =
+      M.Option.iter
+        (assert_register_term ~loc ~force:true e)
+        (Misc.get_term_from_pot origin)
+    in
     M.return (e, None, Some (Analyses_types.C_number, "sizeof"))
   | Coerce {coerce_to = typ; coerced = exp} ->
     let* e, coerce, cast_info = compile_with_rtes exp in

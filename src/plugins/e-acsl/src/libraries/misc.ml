@@ -201,6 +201,14 @@ let name_of_binop = function
   | MinusA -> "sub"
   | MinusPP | MinusPI | PlusPI -> assert false
 
+let get_loc_from_pot = function
+  | Analyses_types.PoT_pred p -> p.pred_loc
+  | Analyses_types.PoT_term t -> t.term_loc
+
+let get_term_from_pot = function
+  | Analyses_types.PoT_pred _ -> None
+  | Analyses_types.PoT_term t -> Some t
+
 let make_binop = Cil.mkBinOp_exn ~constfold:true
 
 module Id_term = struct
