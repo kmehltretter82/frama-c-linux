@@ -680,23 +680,27 @@ let do_collect_session goals =
   }
 
 let do_update_session script session =
-  let stdout = script.stdout in
-  List.iter
-    begin fun (g, _, s) ->
-      (* we always mark existing scripts *)
-      ProofSession.mark g ;
-      if script.update then ProofSession.save ~stdout g s
-    end
-    session.updated ;
-  List.iter
-    begin fun (g, _, s) ->
-      (* we mark new incomplete scripts only if we save such files *)
-      if script.update then
-        (ProofSession.mark g ; ProofSession.save ~stdout g s)
-    end
-    session.incomplete ;
-  List.iter (fun (g, _) -> ProofSession.remove g) session.removed ;
-  ()
+  begin
+    let stdout = script.stdout in
+    List.iter
+      begin fun (g, _, s) ->
+        (* we always mark existing scripts *)
+        ProofSession.mark g ;
+        if script.update then ProofSession.save ~stdout g s
+      end
+      session.updated ;
+    List.iter
+      begin fun (g, _, s) ->
+        (* we mark new incomplete scripts only if we save such files *)
+        if script.update then
+          (ProofSession.mark g ; ProofSession.save ~stdout g s)
+      end
+      session.incomplete ;
+    List.iter
+      begin fun (g, _) ->
+        if script.update then ProofSession.remove g
+      end session.removed ;
+  end
 
 let do_show_session updated_session session =
   let show enabled kind dkey file =
