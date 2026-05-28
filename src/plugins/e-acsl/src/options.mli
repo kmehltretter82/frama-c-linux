@@ -25,6 +25,7 @@ module Interlang_force: Parameter_sig.Bool
 module O : Parameter_sig.Int
 module Optimisations : sig
   module Hypothesis_gathering : Parameter_sig.Bool
+  module Omit_rte : Parameter_sig.Bool
 end
 
 module Functions: Parameter_sig.Kernel_function_set

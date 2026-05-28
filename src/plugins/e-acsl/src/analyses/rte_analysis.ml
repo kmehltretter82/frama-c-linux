@@ -272,7 +272,7 @@ let rte_visitor =
   end
 
 let preprocess ast =
-  if Options.O.get () < 3
+  if not @@ Options.Optimisations.Omit_rte.get ()
   then begin
     ignore @@ rte_visitor#visit_file ast;
     Options.feedback ~dkey:dkey "Result of the RTE analysis.%!";
@@ -281,7 +281,7 @@ let preprocess ast =
     Options.feedback ~dkey:dkey "Skip the RTE analysis.%!"
 
 let preprocess_predicate p =
-  if Options.O.get () < 3
+  if not @@ Options.Optimisations.Omit_rte.get ()
   then begin
     ignore @@ rte_visitor#visit_predicate p;
     Options.feedback ~dkey "Result of the RTE analysis on %a.%!"

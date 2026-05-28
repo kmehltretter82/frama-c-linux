@@ -398,11 +398,15 @@ and to_exp_old ~rte ~loc:_ ?inplace ?name ~adata ~env ~kf p =
       let e, adata, env =
         predicate_content_to_exp ?inplace ~adata ?name kf env p
       in
-      let env = if rte then Translate_rtes.translate_rte_exp kf env e else env in
+      let env =
+        if rte && not @@ Options.Optimisations.Omit_rte.get () then
+          Translate_rtes.translate_rte_exp kf env e
+        else env
+      in
       (e, adata), env)
 
 and to_exp_il ~rte p =
-  if rte
+  if rte && not @@ Options.Optimisations.Omit_rte.get ()
   then M.not_covered ~pre:"with RTE" Printer.pp_predicate p
   else predicate_content_to_exp_il p
 
