@@ -4,16 +4,16 @@
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [eva:builtins:missing-spec] incompatible_builtins.i:36: Warning: 
   The builtin for function floor will not be used, as its specification has no default behavior.
-[eva:builtins:missing-spec] incompatible_builtins.i:23: Warning: 
-  The builtin for function sqrt will not be used, as its specification has no assigns clause.
-[eva:builtins:missing-spec] incompatible_builtins.i:26: Warning: 
-  The builtin for function ceil will not be used, as its frama-c libc specification is not available.
-[eva:builtins:override] incompatible_builtins.i:8: Warning: 
-  Builtin pow will not be used for function pow of incompatible type int 
-  (int a, int b).
 [eva:builtins:override] incompatible_builtins.i:18: Warning: 
   Builtin exp will not be used for function exp of incompatible type float 
   (float f).
+[eva:builtins:override] incompatible_builtins.i:8: Warning: 
+  Builtin pow will not be used for function pow of incompatible type int 
+  (int a, int b).
+[eva:builtins:missing-spec] incompatible_builtins.i:26: Warning: 
+  The builtin for function ceil will not be used, as its frama-c libc specification is not available.
+[eva:builtins:missing-spec] incompatible_builtins.i:23: Warning: 
+  The builtin for function sqrt will not be used, as its specification has no assigns clause.
 [eva] Analyzing a complete application starting at main
 [eva:progress] Computing initial state
 [eva:progress] Initial state computed
