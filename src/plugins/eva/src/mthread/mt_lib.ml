@@ -61,7 +61,7 @@ let threads_lib_files lib =
 
 let load_threads_library lib =
   Mt_self.feedback "Preparing sources for Mthread with %a" pp_threads_lib lib;
-  (* Add MThread folder to the include path. *)
+  (* Add Mthread folder to the include path. *)
   let mt_include_dir =
     Format.asprintf "-I%a"
       Filepath.pretty_abs (Mt_self.Share.get_dir ".")

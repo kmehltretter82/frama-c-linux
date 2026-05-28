@@ -34,7 +34,7 @@ Options taking a string as argument should preferably be written
                     2: values shown with the stack at which the operation
                     occurs
 -mt-threads-lib <builtins-only|pthreads>  Select which threading library is
-                    stubbed by MThread. Defaults to "builtins-only".
+                    stubbed by Mthread. Defaults to "builtins-only".
 -mt-write-races     Display memory on which there is a write-only race
                     condition (opposite option is -mt-no-write-races)
 

@@ -54,7 +54,7 @@ const animateOption = {
 };
 
 // ----------------------------------------------------------------------------
-// --- MThread buttons
+// --- Mthread buttons
 // ----------------------------------------------------------------------------
 
 interface MtButtonProps {
@@ -106,7 +106,7 @@ function getMtButtons(
 }
 
 // ----------------------------------------------------------------------------
-// --- MThread Element
+// --- Mthread Element
 // ----------------------------------------------------------------------------
 
 interface ElementProps {
@@ -393,7 +393,7 @@ function ItemVarByProtectionKind(
 
   const onClick = (m: marker[], label: string): () => void => {
     return () => Locations.setSelection({
-      plugin: 'MThread',
+      plugin: 'Mthread',
       label: label,
       markers: m
     });
@@ -629,7 +629,7 @@ function Variable(props: VariableProps): React.ReactNode {
   : React.JSX.Element {
     return <IconButton icon='MULTICHECK' title='Select all access'
       onClick={() => Locations.setSelection({
-          plugin: 'MThread',
+          plugin: 'Mthread',
           label: `Accesses for ${base}`,
           markers: getMarker(data, 'all')
         })
@@ -668,7 +668,7 @@ function Variable(props: VariableProps): React.ReactNode {
 }
 
 // ----------------------------------------------------------------------------
-// --- MThread Toolbar
+// --- Mthread Toolbar
 // ----------------------------------------------------------------------------
 
 interface ThreadToolbarProps {
@@ -762,12 +762,12 @@ function VarToolbar(props: VarToolbarProps)
   </>;
 }
 
-interface  MThreadToolbarProps
+interface  MthreadToolbarProps
 extends ThreadToolbarProps, VarToolbarProps {
   displayModeState: State<string>;
 }
 
-function MThreadToolbar(props: MThreadToolbarProps)
+function MthreadToolbar(props: MthreadToolbarProps)
 : React.JSX.Element {
   const [ displayMode, setDisplayMode] = props.displayModeState;
 
@@ -788,10 +788,10 @@ function MThreadToolbar(props: MThreadToolbarProps)
 }
 
 // ----------------------------------------------------------------------------
-// --- MThread component
+// --- Mthread component
 // ----------------------------------------------------------------------------
 
-function MThreadComponent(): JSX.Element {
+function MthreadComponent(): JSX.Element {
   const base = 'ivette.mthread.show';
   const displayModeState = useStringSettings(`${base}.mode`, 'thread');
   const [ displayMode, ] = displayModeState;
@@ -837,7 +837,7 @@ function MThreadComponent(): JSX.Element {
         <EvaStatus />
         <HelpButton id={'eva-mthread'} />
       </Ivette.TitleBar>
-      <MThreadToolbar
+      <MthreadToolbar
         displayModeState={displayModeState}
         showEmptyState={showEmptyState}
         showErrorsState={showErrorsState}
@@ -886,9 +886,9 @@ function MThreadComponent(): JSX.Element {
 
 Ivette.registerComponent({
   id: 'fc.eva.mthread',
-  label: 'Eva MThread',
-  title: 'Eva MThread analysis',
-  children: <MThreadComponent />,
+  label: 'Eva Mthread',
+  title: 'Eva Mthread analysis',
+  children: <MthreadComponent />,
 });
 
 // ----------------------------------------------------------------------------
