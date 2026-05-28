@@ -65,13 +65,16 @@ val make :
   ?origin:origin ->
   unit -> t
 
-
 (** {2 Special positions } *)
 
 (** Make a new position for a generated input. The generator name is given
     as a string. The position is memoized such that two position for the same
-    generator are necessarily physically equal. *)
-val generated : string -> t
+    generator are necessarily physically equal.
+
+    If the location is provided, it is copied (except for its origin), else it
+    is unknown.
+*)
+val generated : ?pos:t -> string -> t
 
 (** Special representation of an unknown position. *)
 val unknown : t

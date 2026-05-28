@@ -99,6 +99,8 @@ include Datatype.Make_with_collections (struct
 
 include Prototype
 
+let of_existing_loc ~origin (pos1, pos2) =
+  (Filepos.generated ~pos:pos1 origin, Filepos.generated ~pos:pos2 origin)
 
 (* --- Conversion from/to Lexing.position  --- *)
 

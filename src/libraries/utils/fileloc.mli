@@ -24,6 +24,9 @@ include Datatype.S_with_collections with type t := t
 (** Special representation of an unknown location. *)
 val unknown : t
 
+(** Creates a location from an existing one, changing only its origin. *)
+val of_existing_loc: origin:string -> t -> t
+
 
 (** {2 Pretty printing } *)
 

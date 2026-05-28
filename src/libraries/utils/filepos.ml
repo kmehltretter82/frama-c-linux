@@ -32,13 +32,23 @@ module Prototype = struct
   (* Generated positions are hash-consed to prevent high memory usage. *)
   module StringHashtbl = Hashtbl.Make (String)
 
-  let generated_positions =  StringHashtbl.create 17
+  let original pos =
+    match pos.origin with
+    | Preprocessed pos -> pos
+    | Original | Included _| Unknown | Generated _ -> pos
 
-  let generated generator_name =
-    StringHashtbl.memo
-      generated_positions
-      generator_name
-      (fun name -> make ~origin:(Generated name) ())
+  let generators = StringHashtbl.create 17
+
+  let generator name = StringHashtbl.memo generators name (fun name -> name)
+
+  let generated ?pos generator_name =
+    let generator = generator generator_name in
+    match pos with
+    | None ->
+      make ~origin:(Generated generator) ()
+    | Some pos ->
+      let pos = original pos in
+      { pos with origin = (Generated generator) }
 
   let rec pretty_generic pp fmt pos =
     match pos.origin with
@@ -152,11 +162,6 @@ let input_path pos = pos.path
 let input_line pos = pos.line
 let input_column pos = pos.column
 let input_offset pos = pos.offset
-
-let original pos =
-  match pos.origin with
-  | Preprocessed pos -> pos
-  | Original | Included _| Unknown | Generated _ -> pos
 
 let path pos = (original pos).path
 let line pos = (original pos).line
