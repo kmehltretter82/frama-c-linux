@@ -242,7 +242,7 @@ install:
 	@cp ivette-macos.sh dist/ivette.sh
 	@echo "exec open -na \"$(LIBDIR)/frama-c/Frama-C GUI.app\" --args\\" >> dist/ivette.sh
 	@echo "  --command \"$(BINDIR)/frama-c\"\\" >> dist/ivette.sh
-	@echo "  --working \"\$$PWD\" \$$@" >> dist/ivette.sh
+	@echo "  --working \"\$$PWD\" \"\$$@\"" >> dist/ivette.sh
 	@mkdir -p $(BINDIR)
 	@install dist/ivette.sh $(BINDIR)/frama-c-gui
 	@rm -fr $(IVETTE_DIST)
