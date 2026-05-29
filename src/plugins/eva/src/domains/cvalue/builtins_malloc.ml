@@ -636,13 +636,12 @@ let frama_c_free state actuals =
   | [ _, arg ] ->
     let bases_to_remove, card_to_remove, _null = resolve_bases_to_free arg in
     let c_clobbered = Base.SetLattice.bottom in
+    let cacheable = Builtins.Cacheable in
     if card_to_remove = 0 then
-      let cacheable = Builtins.Cacheable in
       Builtins.Full { c_values = []; c_clobbered; c_assigns = None; cacheable; }
     else
       let strong = card_to_remove <= 1 in
       let state, changed = free_aux state ~strong bases_to_remove in
-      let cacheable = if strong then Builtins.NoCacheCallers else Cacheable in
       let c_values = [None, state] in
       let c_assigns = Some changed in
       Builtins.Full { c_values; c_clobbered; c_assigns; cacheable; }
@@ -662,7 +661,7 @@ let frama_c_vla_free state actuals =
     let c_values = [None, state] in
     let c_clobbered = Base.SetLattice.bottom in
     let c_assigns = Some changed in
-    let cacheable = Builtins.NoCacheCallers in
+    let cacheable = Builtins.Cacheable in
     Builtins.Full { c_values; c_clobbered; c_assigns; cacheable; }
   | _ -> raise (Builtins.Invalid_nb_of_args 1)
 
