@@ -516,13 +516,6 @@ let rec of_term ~cnv expected t : Why3.Term.term =
               apply_from_ns s [aux l;of_term' cnv a] sort
           in
           aux (List.rev l)
-        | Qed.Engine.F_list (fcons,fnil), _ ->
-          let rec aux = function
-            | [] -> apply_from_ns fnil [] sort
-            | a::l ->
-              apply_from_ns fcons [of_term' cnv a;aux l] sort
-          in
-          aux l
         | Qed.Engine.F_bool_prop (s,_), Bool | Qed.Engine.F_bool_prop (_,s), Prop ->
           apply_from_ns' s l expected
         | Qed.Engine.F_bool_prop (_,_), _ ->

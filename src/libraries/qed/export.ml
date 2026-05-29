@@ -50,8 +50,7 @@ let link_name = function
   | _ -> assert false (** Only normal function call F_call can be declared *)
 
 let debug = function
-  | F_call f | F_proj f | F_left f | F_right f | F_bool_prop(_,f)
-  | F_list(f,_) | F_assoc f -> f
+  | F_call f | F_proj f | F_left f | F_right f | F_assoc f | F_bool_prop(_,f) -> f
 
 (* -------------------------------------------------------------------------- *)
 (* --- Identifiers                                                        --- *)
@@ -427,21 +426,6 @@ struct
               Plib.pp_fold_call_rev ~f self#pp_flow fmt xs
             | CallApply ->
               Plib.pp_fold_apply_rev ~f self#pp_atom fmt xs
-          end
-        | F_list(fc,fn), _ ->
-          begin
-            let rec plist w fmt xs =
-              let style,fc,fn = w in
-              match style , xs with
-              | (CallVar|CallApply) , [] -> pp_print_string fmt fn
-              | CallVoid , [] -> fprintf fmt "%s()" fn
-              | (CallVar|CallVoid) , x::xs ->
-                fprintf fmt "@[<hov 2>%s(@,%a,@,%a)@]"
-                  fc self#pp_flow x (plist w) xs
-              | CallApply , x::xs ->
-                fprintf fmt "@[<hov 2>(%s@ %a @ %a)@]"
-                  fc self#pp_atom x (plist w) xs
-            in plist (self#callstyle,fc,fn) fmt xs
           end
 
       method virtual pp_apply : cmode -> term -> term list printer

@@ -25,7 +25,6 @@ type link =
   | F_proj  of string (** projection function *)
   | F_left  of string (** 2-ary function left-to-right + *)
   | F_right of string (** 2-ary function right-to-left + *)
-  | F_list of string * string (** n-ary function with (cons,nil) constructors *)
   | F_assoc of string (** associative infix operator *)
   | F_bool_prop of string * string (** Has a bool and prop version *)
 
