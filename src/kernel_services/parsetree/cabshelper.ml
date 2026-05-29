@@ -54,7 +54,7 @@ struct
 
   let get (first,last) =
     Kernel.debug ~dkey:Kernel.dkey_comments
-      "Searching for comments between positions %a and %a@."
+      "@[<hv>Searching for comments between positions@ %a and@ %a@.@]"
       Filepos.pretty_debug first Filepos.pretty_debug last;
     if not (Filepos.is_known first) || not (Filepos.is_known last)
     then begin
