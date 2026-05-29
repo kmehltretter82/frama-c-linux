@@ -364,7 +364,7 @@ struct
   let covers_base (tracked : Tracking.t option) (b : base) : bool =
     match b with
     | Base.Var (vi, _) ->
-      not (Ast_types.has_qualifier "volatile" vi.vtype) &&
+      not (Ast_types.is_volatile vi.vtype) &&
       Option.fold ~none:true ~some:(Tracking.mem b) tracked
     | Null -> true
     | CLogic_Var _ | Allocated (_, _, _) -> false
