@@ -497,9 +497,10 @@ let rec of_term ~cnv expected t : Why3.Term.term =
           apply_from_ns s (List.map (fun e -> of_term' cnv e) l)
         in
         match lfun_wname f, expected with
-        | F_call s, _ -> apply_from_ns' s l sort
-        | Qed.Engine.F_subst (s, _), _ -> apply_from_ns' s l sort
-        | Qed.Engine.F_left s, _ | Qed.Engine.F_assoc s, _ ->
+        | F_call s, _
+        | F_proj s, _
+          -> apply_from_ns' s l sort
+        | F_left s, _ | F_assoc s, _ ->
           let rec aux = function
             | [] -> why3_failure "Empty application"
             | [a] -> of_term ~cnv expected a
@@ -507,7 +508,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
               apply_from_ns s [of_term' cnv a; aux l] sort
           in
           aux l
-        | Qed.Engine.F_right s, _ ->
+        | F_right s, _ ->
           let rec aux = function
             | [] -> why3_failure "Empty application"
             | [a] -> of_term ~cnv expected a

@@ -124,8 +124,8 @@ Prover CFG returns Valid
 
 Goal Post-condition ("struct_array_type.i", line 16, characters 12-39) in 'f':
 Let a = t[SynchroId_0].
-Let a_1 = (a.F1_s_b)[0].
-Let a_2 = (a.F1_s_a)[0].
+Let a_1 = a.F1_s_b[0].
+Let a_2 = a.F1_s_a[0].
 Let a_3 = 2 * a_2.
 Assume {
   Type: is_uint32(SynchroId_0) /\ is_sint32(a_2) /\ is_sint32(a_1) /\

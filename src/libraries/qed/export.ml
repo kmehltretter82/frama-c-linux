@@ -50,8 +50,8 @@ let link_name = function
   | _ -> assert false (** Only normal function call F_call can be declared *)
 
 let debug = function
-  | F_call f | F_left f | F_right f | F_bool_prop(_,f)
-  | F_list(f,_) | F_subst (f, _) | F_assoc f -> f
+  | F_call f | F_proj f | F_left f | F_right f | F_bool_prop(_,f)
+  | F_list(f,_) | F_assoc f -> f
 
 (* -------------------------------------------------------------------------- *)
 (* --- Identifiers                                                        --- *)
@@ -400,6 +400,12 @@ struct
 
       method pp_fun cmode fct fmt xs =
         match self#link fct, cmode with
+        | F_proj f, _ ->
+          begin
+            match xs with
+            | [ x ] -> Format.fprintf fmt "%a.%s" self#pp_atom x f
+            | _ -> self#pp_callsorts ~f fmt (Fun.params fct) xs
+          end
         | F_call f, _
         | F_bool_prop (f,_), Cterm
         | F_bool_prop (_,f), Cprop ->
@@ -437,11 +443,6 @@ struct
                   fc self#pp_atom x (plist w) xs
             in plist (self#callstyle,fc,fn) fmt xs
           end
-        | F_subst (_, s), _ ->
-          let print = match self#callstyle with
-            | CallVar | CallVoid -> self#pp_flow
-            | CallApply -> self#pp_atom in
-          Plib.substitute_list print s fmt xs
 
       method virtual pp_apply : cmode -> term -> term list printer
 
@@ -779,10 +780,20 @@ struct
           | _ -> fprintf fmt "(%a=%s)" self#pp_do_atom e (self#e_true Cterm)
         else pp fmt e
 
+      method private is_proj f =
+        match self#link f with F_proj _ -> true | _ -> false
+
+      method private is_atom e =
+        match T.repr e with
+        | Fun(f, [x]) when self#is_proj f -> self#is_atom x
+        | Aget(a,_) -> self#is_atom a
+        | Rget(a,_) -> self#is_atom a
+        | _ -> self#is_atomic e
+
       method private pp_do_atom fmt e =
         try self#pp_var fmt (Tmap.find e index.share)
         with Not_found ->
-          if self#is_atomic e
+          if self#is_atom e
           then self#pp_repr fmt e
           else fprintf fmt "@[<hov 1>(%a)@]" self#pp_repr e ;
           match self#op_scope_for e with

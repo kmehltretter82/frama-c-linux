@@ -22,13 +22,13 @@ Prove: P_Obs(load_0.F1_S_f).
 
 Goal Post-condition 'G' in 'load':
 Assume { Type: IsS1_S(load_0) /\ is_sint32(k). }
-Prove: P_Obs((load_0.F1_S_g)[k]).
+Prove: P_Obs(load_0.F1_S_g[k]).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'H' in 'load':
 Assume { Type: IsS1_S(load_0) /\ is_sint32(i) /\ is_sint32(j). }
-Prove: P_Obs((load_0.F1_S_m)[i][j]).
+Prove: P_Obs(load_0.F1_S_m[i][j]).
 
 ------------------------------------------------------------
 

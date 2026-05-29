@@ -369,7 +369,7 @@ Assume {
   Type: IsArray_S5(ts1_0).
   (* Initializer *)
   Init: forall i : Z. let a_4 = ts1_0[i] in ((0 <= i) -> ((i <= 1) ->
-      (((a_4.F5_a) = 0) /\ ((a_4.F5_b) = 0) /\ ((a_4.F5_c) = 0)))).
+      ((a_4.F5_a = 0) /\ (a_4.F5_b = 0) /\ (a_4.F5_c = 0)))).
   (* Initializer *)
   Init: x_2 = 1.
   (* Initializer *)
@@ -378,7 +378,7 @@ Assume {
   Init: x = 0.
   (* Initializer *)
   Init: forall i : Z. let a_4 = ts1_0[i] in ((3 <= i) -> ((i <= 3) ->
-      (((a_4.F5_a) = 0) /\ ((a_4.F5_b) = 0) /\ ((a_4.F5_c) = 0)))).
+      ((a_4.F5_a = 0) /\ (a_4.F5_b = 0) /\ (a_4.F5_c = 0)))).
 }
 Prove: (x_1 = x_2) /\ EqS5(a_1, a_2) /\ EqS5(a_2, a_3).
 
@@ -398,7 +398,7 @@ Assume {
   Type: IsArray_S5(ts1_0).
   (* Initializer *)
   Init: forall i : Z. let a_2 = ts1_0[i] in ((0 <= i) -> ((i <= 1) ->
-      (((a_2.F5_a) = 0) /\ ((a_2.F5_b) = 0) /\ ((a_2.F5_c) = 0)))).
+      ((a_2.F5_a = 0) /\ (a_2.F5_b = 0) /\ (a_2.F5_c = 0)))).
   (* Initializer *)
   Init: x_2 = 1.
   (* Initializer *)
@@ -407,7 +407,7 @@ Assume {
   Init: x = 0.
   (* Initializer *)
   Init: forall i : Z. let a_2 = ts1_0[i] in ((3 <= i) -> ((i <= 3) ->
-      (((a_2.F5_a) = 0) /\ ((a_2.F5_b) = 0) /\ ((a_2.F5_c) = 0)))).
+      ((a_2.F5_a = 0) /\ (a_2.F5_b = 0) /\ (a_2.F5_c = 0)))).
 }
 Prove: x = 1.
 
@@ -427,7 +427,7 @@ Assume {
   Type: IsArray_S5(ts1_0).
   (* Initializer *)
   Init: forall i : Z. let a_2 = ts1_0[i] in ((0 <= i) -> ((i <= 1) ->
-      (((a_2.F5_a) = 0) /\ ((a_2.F5_b) = 0) /\ ((a_2.F5_c) = 0)))).
+      ((a_2.F5_a = 0) /\ (a_2.F5_b = 0) /\ (a_2.F5_c = 0)))).
   (* Initializer *)
   Init: x_2 = 1.
   (* Initializer *)
@@ -436,7 +436,7 @@ Assume {
   Init: x = 0.
   (* Initializer *)
   Init: forall i : Z. let a_2 = ts1_0[i] in ((3 <= i) -> ((i <= 3) ->
-      (((a_2.F5_a) = 0) /\ ((a_2.F5_b) = 0) /\ ((a_2.F5_c) = 0)))).
+      ((a_2.F5_a = 0) /\ (a_2.F5_b = 0) /\ (a_2.F5_c = 0)))).
 }
 Prove: x_3 = 1.
 
@@ -510,7 +510,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_6[i] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -518,9 +518,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -528,9 +528,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -540,7 +540,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -550,13 +550,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (a[i] = 2))).
   (* Initializer *)
   Init: forall i : Z. ((2 <= i) -> ((i <= 2) -> (a[i] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
@@ -619,7 +619,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_6[i] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -627,9 +627,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -637,9 +637,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -649,7 +649,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -659,13 +659,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (a[i] = 2))).
   (* Initializer *)
   Init: forall i : Z. ((2 <= i) -> ((i <= 2) -> (a[i] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
@@ -728,7 +728,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_6[i] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -736,9 +736,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -746,9 +746,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -758,7 +758,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -768,13 +768,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (a[i] = 2))).
   (* Initializer *)
   Init: forall i : Z. ((2 <= i) -> ((i <= 2) -> (a[i] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
@@ -838,7 +838,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_6[i] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -846,9 +846,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -856,9 +856,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -868,7 +868,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -878,13 +878,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (a[i] = 2))).
   (* Initializer *)
   Init: forall i : Z. ((2 <= i) -> ((i <= 2) -> (a[i] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
@@ -948,7 +948,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_6[i] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -956,9 +956,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -966,9 +966,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -978,7 +978,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -988,13 +988,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (a[i] = 2))).
   (* Initializer *)
   Init: forall i : Z. ((2 <= i) -> ((i <= 2) -> (a[i] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
@@ -1057,7 +1057,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_6[i] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -1065,9 +1065,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -1075,9 +1075,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -1087,7 +1087,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -1097,13 +1097,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (a[i] = 2))).
   (* Initializer *)
   Init: forall i : Z. ((2 <= i) -> ((i <= 2) -> (a[i] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
@@ -1166,7 +1166,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_6[i] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -1174,9 +1174,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -1184,9 +1184,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -1196,7 +1196,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -1206,13 +1206,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (a[i] = 2))).
   (* Initializer *)
   Init: forall i : Z. ((2 <= i) -> ((i <= 2) -> (a[i] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
@@ -1276,7 +1276,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_6[i] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -1284,9 +1284,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -1294,9 +1294,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -1306,7 +1306,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -1316,13 +1316,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (a[i] = 2))).
   (* Initializer *)
   Init: forall i : Z. ((2 <= i) -> ((i <= 2) -> (a[i] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
@@ -1385,7 +1385,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_6[i] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -1393,9 +1393,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -1403,9 +1403,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -1415,7 +1415,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -1425,13 +1425,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (a[i] = 2))).
   (* Initializer *)
   Init: forall i : Z. ((2 <= i) -> ((i <= 2) -> (a[i] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
@@ -1494,7 +1494,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_6[i] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -1502,9 +1502,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -1512,9 +1512,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -1524,7 +1524,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -1534,13 +1534,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (a[i] = 2))).
   (* Initializer *)
   Init: forall i : Z. ((2 <= i) -> ((i <= 2) -> (a[i] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
@@ -1603,7 +1603,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_6[i] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -1611,9 +1611,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -1621,9 +1621,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -1633,7 +1633,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -1643,13 +1643,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (a[i] = 2))).
   (* Initializer *)
   Init: forall i : Z. ((2 <= i) -> ((i <= 2) -> (a[i] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
@@ -1712,7 +1712,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_6[i] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -1720,9 +1720,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -1730,9 +1730,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -1742,7 +1742,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -1752,13 +1752,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (a[i] = 2))).
   (* Initializer *)
   Init: forall i : Z. ((2 <= i) -> ((i <= 2) -> (a[i] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
@@ -1823,7 +1823,7 @@ Assume {
   (* Initializer *)
   Init: forall i_1 : Z. ((4 <= i_1) -> ((i_1 <= 9) -> (a_6[i_1] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -1831,9 +1831,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -1841,9 +1841,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -1853,7 +1853,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -1863,13 +1863,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 1) -> (a[i_1] = 2))).
   (* Initializer *)
   Init: forall i_1 : Z. ((2 <= i_1) -> ((i_1 <= 2) -> (a[i_1] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 31) -> (tab_0[i_1] = 0))).
   (* Initializer *)
@@ -1933,7 +1933,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_6[i] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -1941,9 +1941,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -1951,9 +1951,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -1963,7 +1963,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -1973,13 +1973,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (a[i] = 2))).
   (* Initializer *)
   Init: forall i : Z. ((2 <= i) -> ((i <= 2) -> (a[i] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
@@ -2043,7 +2043,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_6[i] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -2051,9 +2051,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -2061,9 +2061,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -2073,7 +2073,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -2083,13 +2083,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (a[i] = 2))).
   (* Initializer *)
   Init: forall i : Z. ((2 <= i) -> ((i <= 2) -> (a[i] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
@@ -2154,7 +2154,7 @@ Assume {
   (* Initializer *)
   Init: forall i_1 : Z. ((4 <= i_1) -> ((i_1 <= 9) -> (a_6[i_1] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -2162,9 +2162,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -2172,9 +2172,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -2184,7 +2184,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -2194,13 +2194,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 1) -> (a[i_1] = 2))).
   (* Initializer *)
   Init: forall i_1 : Z. ((2 <= i_1) -> ((i_1 <= 2) -> (a[i_1] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 31) -> (tab_0[i_1] = 0))).
   (* Initializer *)
@@ -2263,7 +2263,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_6[i] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -2271,9 +2271,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -2281,9 +2281,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -2293,7 +2293,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -2303,13 +2303,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (a[i] = 2))).
   (* Initializer *)
   Init: forall i : Z. ((2 <= i) -> ((i <= 2) -> (a[i] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)
@@ -2374,7 +2374,7 @@ Assume {
   (* Initializer *)
   Init: forall i_1 : Z. ((4 <= i_1) -> ((i_1 <= 9) -> (a_6[i_1] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -2382,9 +2382,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -2392,9 +2392,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -2404,7 +2404,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -2414,13 +2414,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 1) -> (a[i_1] = 2))).
   (* Initializer *)
   Init: forall i_1 : Z. ((2 <= i_1) -> ((i_1 <= 2) -> (a[i_1] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 31) -> (tab_0[i_1] = 0))).
   (* Initializer *)
@@ -2485,7 +2485,7 @@ Assume {
   (* Initializer *)
   Init: forall i_1 : Z. ((4 <= i_1) -> ((i_1 <= 9) -> (a_6[i_1] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -2493,9 +2493,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -2503,9 +2503,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -2515,7 +2515,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -2525,13 +2525,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 1) -> (a[i_1] = 2))).
   (* Initializer *)
   Init: forall i_1 : Z. ((2 <= i_1) -> ((i_1 <= 2) -> (a[i_1] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i_1 : Z. ((0 <= i_1) -> ((i_1 <= 31) -> (tab_0[i_1] = 0))).
   (* Initializer *)
@@ -2594,7 +2594,7 @@ Assume {
   (* Initializer *)
   Init: forall i : Z. ((4 <= i) -> ((i <= 9) -> (a_6[i] = 0))).
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_a) = 1.
+  Init: sc0_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_5[0] = 2.
   (* Initializer *)
@@ -2602,9 +2602,9 @@ Assume {
   (* Initializer *)
   Init: a_5[2] = 4.
   (* Initializer *)
-  Init: (sc0_0.F3_Sc_c) = 5.
+  Init: sc0_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_a) = 1.
+  Init: sc1_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_4[0] = 2.
   (* Initializer *)
@@ -2612,9 +2612,9 @@ Assume {
   (* Initializer *)
   Init: a_4[2] = 4.
   (* Initializer *)
-  Init: (sc1_0.F3_Sc_c) = 5.
+  Init: sc1_0.F3_Sc_c = 5.
   (* Initializer *)
-  Init: (sc2_0.F3_Sc_a) = 1.
+  Init: sc2_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_3[0] = 2.
   (* Initializer *)
@@ -2624,7 +2624,7 @@ Assume {
   (* Initializer *)
   Init: x_2 = 4.
   (* Initializer *)
-  Init: (sc3_0.F3_Sc_a) = 1.
+  Init: sc3_0.F3_Sc_a = 1.
   (* Initializer *)
   Init: a_1[0] = 2.
   (* Initializer *)
@@ -2634,13 +2634,13 @@ Assume {
   (* Initializer *)
   Init: x_1 = 0.
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_a) = 2.
+  Init: sq0_0.F3_Sc_a = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 1) -> (a[i] = 2))).
   (* Initializer *)
   Init: forall i : Z. ((2 <= i) -> ((i <= 2) -> (a[i] = 0))).
   (* Initializer *)
-  Init: (sq0_0.F3_Sc_c) = 2.
+  Init: sq0_0.F3_Sc_c = 2.
   (* Initializer *)
   Init: forall i : Z. ((0 <= i) -> ((i <= 31) -> (tab_0[i] = 0))).
   (* Initializer *)

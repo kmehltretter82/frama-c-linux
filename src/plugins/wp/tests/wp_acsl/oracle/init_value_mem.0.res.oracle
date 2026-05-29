@@ -26,9 +26,9 @@ Assume {
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_St_b(a)] = 2.
   (* Initializer *)
-  Init: (w.F1_St_a) = 1.
+  Init: w.F1_St_a = 1.
   (* Initializer *)
-  Init: (w.F1_St_b) = 2.
+  Init: w.F1_St_b = 2.
 }
 Prove: EqS1_St(a_1, w).
 
@@ -46,9 +46,9 @@ Assume {
   (* Initializer *)
   Init: Mint_0[shiftfield_F1_St_b(a)] = 2.
   (* Initializer *)
-  Init: (w.F1_St_a) = 1.
+  Init: w.F1_St_a = 1.
   (* Initializer *)
-  Init: (w.F1_St_b) = 2.
+  Init: w.F1_St_b = 2.
 }
 Prove: EqS1_St(a_1, w).
 

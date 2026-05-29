@@ -78,9 +78,9 @@ let library = "memory"
 let a_addr = Lang.datatype ~library "addr"
 let t_addr = Logic.Data(a_addr,[])
 let f_base   = Lang.extern_f ~library ~result:Logic.Int
-    ~link:(Qed.Engine.F_subst ("base", "%1.base")) "base"
+    ~link:(Qed.Engine.F_proj "base") "base"
 let f_offset = Lang.extern_f ~library ~result:Logic.Int
-    ~link:(Qed.Engine.F_subst ("offset", "%1.offset")) "offset"
+    ~link:(Qed.Engine.F_proj "offset") "offset"
 let f_shift  = Lang.extern_f ~library ~result:t_addr "shift"
 let f_global = Lang.extern_f ~library ~result:t_addr "global"
 let f_null   = Lang.extern_f ~library ~result:t_addr "null"

@@ -22,9 +22,7 @@ type op =
 
 type link =
   | F_call  of string (** n-ary function *)
-  | F_subst of string * string (** n-ary function with substitution
-                                   first value is the link name, second is the
-                                   substitution (e.g. "foo(%1,%2)") *)
+  | F_proj  of string (** projection function *)
   | F_left  of string (** 2-ary function left-to-right + *)
   | F_right of string (** 2-ary function right-to-left + *)
   | F_list of string * string (** n-ary function with (cons,nil) constructors *)

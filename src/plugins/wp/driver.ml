@@ -102,18 +102,11 @@ let rec depend input =
     a :: depend input
   | _ -> []
 
-let rec conv_bal default (name,bal) =
-  match bal with
-  | `Default -> conv_bal default (name,default)
-  | `Left  -> Qed.Engine.F_left name
-  | `Right -> Qed.Engine.F_right name
-  | `Nary  -> Qed.Engine.F_call name
-
-let link def input =
+let link ?(op=false) input =
   match token input with
   | LINK f | ID f ->
-    let link = conv_bal def (f,(bal input.lexbuf)) in
-    skip input; link
+    skip input;
+    if op then Qed.Engine.F_left f else Qed.Engine.F_call f
   | _ -> failwith "Missing link symbol"
 
 let linkstring input =
@@ -163,7 +156,7 @@ let op_elt input =
 let rec op_link op input =
   match token input with
   | LINK _ ->
-    Operator op, link `Left input
+    Operator op, link ~op:true input
   | ID "associative" -> skip input ; skipkey input ":" ;
     op_link { op with associative = true } input
   | ID "commutative" -> skip input ; skipkey input ":" ;
@@ -186,13 +179,13 @@ let rec op_link op input =
 let logic_link input =
   match token input with
   | LINK _ ->
-    Function, link `Nary input
+    Function, link input
   | ID "constructor" ->
     skip input ; skipkey input ":" ;
-    Qed.Logic.Constructor, link `Nary input
+    Qed.Logic.Constructor, link input
   | ID "injective" ->
     skip input ; skipkey input ":" ;
-    Injection, link `Nary input
+    Injection, link input
   | _ -> op_link op input
 
 let rec parse ~driver_dir library input =
@@ -221,7 +214,7 @@ let rec parse ~driver_dir library input =
     let source = source input in
     let args = signature input in
     skipkey input "=" ;
-    let link = link `Nary input in
+    let link = link input in
     LogicBuiltins.add_ctor ~source:(Filepos.of_lexing_pos source) name args ~library ~link () ;
     skipkey input ";" ;
     parse ~driver_dir library input

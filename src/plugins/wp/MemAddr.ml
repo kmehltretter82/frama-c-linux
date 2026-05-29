@@ -23,10 +23,10 @@ let t_table = Qed.Logic.Data(Lang.datatype ~library "table",[])
 let t_malloc = Qed.Logic.Array(Qed.Logic.Int, Qed.Logic.Int)
 
 let f_base   = Lang.extern_f ~library ~result:Qed.Logic.Int
-    ~link:(Qed.Engine.F_subst ("base", "%1.base")) "base"
+    ~link:(Qed.Engine.F_proj "base") "base"
 
 let f_offset = Lang.extern_f ~library ~result:Qed.Logic.Int
-    ~link:(Qed.Engine.F_subst ("offset", "%1.offset")) "offset"
+    ~link:(Qed.Engine.F_proj "offset") "offset"
 
 let f_shift  = Lang.extern_f ~library ~result:t_addr "shift"
 let f_global = Lang.extern_f ~library ~result:t_addr ~category:Qed.Logic.Injection "global"

@@ -21,7 +21,7 @@ Assume {
   (* Pre-condition *)
   Have: is_finite_f64(a).
   (* Initializer *)
-  Init: (job_0.F1_S_valid) = 0.
+  Init: job_0.F1_S_valid = 0.
 }
 Prove: eq_f64(a, a).
 

@@ -33,7 +33,7 @@ Assume {
   (* Pre-condition *)
   Have: (0 <= k) /\ (k <= 19).
 }
-Prove: (comp_0[k].F1_ptr) != global(L_m_29).
+Prove: comp_0[k].F1_ptr != global(L_m_29).
 
 ------------------------------------------------------------
 

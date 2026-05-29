@@ -129,13 +129,6 @@ and recorstring = parse
   | '{'    { `RecString (recstring [] lexbuf) }
   | _ as c { failwith (Printf.sprintf "found '%c' instead of \" or {" c) }
 
-and bal = parse
-  | '\n' { newline lexbuf ; bal lexbuf }
-  | blank+ { bal lexbuf }
-  | ('(' "right" ')') { `Right }
-  | ('(' "nary"  ')') { `Nary }
-  | ('(' "left"  ')')? as c { if c = "" then `Default else `Left }
-
 {
 
 }
