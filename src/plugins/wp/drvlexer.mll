@@ -54,10 +54,6 @@
     lexbuf.lex_curr_p <-
       { lexbuf.lex_curr_p with pos_lnum = succ lexbuf.lex_curr_p.pos_lnum }
 
-  (*TODO[LC] Think about projectification ... *)
-  let dkey = Wp_parameters.register_category "includes"
-  let dkey_driver = Wp_parameters.register_category "driver"
-
 }
 
 let blank = [ ' ' '\t' '\r' ]

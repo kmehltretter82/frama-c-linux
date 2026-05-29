@@ -12,8 +12,9 @@
 
 open Qed.Logic
 open Lexing
-open LogicBuiltins
 open Drvlexer
+
+let dkey = Wp_parameters.register_category "driver"
 
 let pretty fmt = function
   | EOF -> Format.pp_print_string fmt "<eof>"
@@ -64,7 +65,9 @@ let ident input = match token input with
   | _ -> failwith "missing identifier"
 
 let kind input =
-  let kd = match token input with
+  let kd =
+    let open LogicBuiltins in
+    match token input with
     | INTEGER -> Z
     | REAL -> R
     | BOOLEAN -> A
@@ -201,7 +204,7 @@ let rec parse ~driver_dir library input =
     ignore (key input ":") ;
     let depends = depend input in
     ignore (key input ";") ;
-    add_library name depends ;
+    LogicBuiltins.add_library name depends ;
     parse ~driver_dir name input
   | KEY "type" ->
     skip input ;
@@ -209,7 +212,7 @@ let rec parse ~driver_dir library input =
     let source = source input in
     noskipkey input "=" ;
     let link = linkstring input in
-    add_type ~source:(Filepos.of_lexing_pos source) name ~library ~link () ;
+    LogicBuiltins.add_type ~source:(Filepos.of_lexing_pos source) name ~library ~link () ;
     skipkey input ";" ;
     parse ~driver_dir library input
   | KEY "ctor" ->
@@ -219,7 +222,7 @@ let rec parse ~driver_dir library input =
     let args = signature input in
     skipkey input "=" ;
     let link = link `Nary input in
-    add_ctor ~source:(Filepos.of_lexing_pos source) name args ~library ~link () ;
+    LogicBuiltins.add_ctor ~source:(Filepos.of_lexing_pos source) name args ~library ~link () ;
     skipkey input ";" ;
     parse ~driver_dir library input
   | KEY "logic" ->
@@ -231,13 +234,13 @@ let rec parse ~driver_dir library input =
     if key input ":=" then
       begin
         let alias = ident input in
-        add_alias ~source:(Filepos.of_lexing_pos source) name args ~alias () ;
+        LogicBuiltins.add_alias ~source:(Filepos.of_lexing_pos source) name args ~alias () ;
       end
     else
       begin
         skipkey input "=" ;
         let category,link = logic_link input in
-        add_logic ~source:(Filepos.of_lexing_pos source) result name args ~library ~category ~link () ;
+        LogicBuiltins.add_logic ~source:(Filepos.of_lexing_pos source) result name args ~library ~category ~link () ;
       end ;
     skipkey input ";" ;
     parse ~driver_dir library input
@@ -249,13 +252,13 @@ let rec parse ~driver_dir library input =
     if key input ":=" then
       begin
         let alias = ident input in
-        add_alias ~source:(Filepos.of_lexing_pos source) name args ~alias () ;
+        LogicBuiltins.add_alias ~source:(Filepos.of_lexing_pos source) name args ~alias () ;
       end
     else
       begin
         noskipkey input "=" ;
         let link = linkstring input in
-        add_predicate ~source:(Filepos.of_lexing_pos source) name args ~library ~link () ;
+        LogicBuiltins.add_predicate ~source:(Filepos.of_lexing_pos source) name args ~library ~link () ;
       end ;
     skipkey input ";" ;
     parse ~driver_dir library input
@@ -264,10 +267,10 @@ let rec parse ~driver_dir library input =
     begin match token input with
       | KEY ":=" ->
         let v = value input in
-        set_option ~driver_dir group var ~library v
+        LogicBuiltins.set_option ~driver_dir group var ~library v
       | KEY "+=" ->
         let v = value input in
-        add_option ~driver_dir group var ~library v
+        LogicBuiltins.add_option ~driver_dir group var ~library v
       | _ -> failwith "Missing ':=' or '+='"
     end;
     skipkey input ";" ;
@@ -276,7 +279,7 @@ let rec parse ~driver_dir library input =
 
 let load_file ?(ontty=`Transient) file =
   try
-    Wp_parameters.feedback ~dkey:dkey_driver ~ontty "Loading driver '%a'"
+    Wp_parameters.feedback ~dkey:dkey ~ontty "Loading driver '%a'"
       Filepath.pretty file;
     let driver_dir = Filepath.dirname file in
     let inc = open_in (Filepath.to_string_abs file) in
@@ -300,7 +303,7 @@ let load_file ?(ontty=`Transient) file =
       ~current:false
       "Error in driver '%a': %s" Filepath.pretty file (Printexc.to_string exn)
 
-let loaded : (Filepath.t list, driver) Hashtbl.t =Hashtbl.create 10
+let loaded : (Filepath.t list, LogicBuiltins.driver) Hashtbl.t =Hashtbl.create 10
 let load_driver () =
   let drivers = Wp_parameters.Drivers.get () in
   begin try
@@ -313,26 +316,7 @@ let load_driver () =
       let drvs = List.map driver_basename drivers in
       let id = String.concat "_" drvs in
       let descr = String.concat "," drvs in
-      let includes =
-        let directories =
-          [Wp_parameters.Share.get_dir "."]
-        in
-        if Wp_parameters.has_dkey dkey then
-          Wp_parameters.debug ~dkey "Included directories:%t"
-            (fun fmt ->
-               List.iter
-                 (fun d -> Format.fprintf fmt "@\n - '%a'" Filepath.pretty d)
-                 directories
-            );
-        directories
-      in
       let configure ()=
-        let drivers =
-          List.map (fun file ->
-              if Filesystem.exists file
-              then file
-              else LogicBuiltins.find_lib file)
-            drivers in
         let default = Wp_parameters.Share.get_file "wp.driver" in
         let membytes =
           Wp_parameters.Share.get_file @@
@@ -346,8 +330,8 @@ let load_driver () =
         load_file ~ontty membytes;
         List.iter load_file drivers
       in
-      let driver = LogicBuiltins.new_driver ~id ~descr ~includes ~configure () in
+      let driver = LogicBuiltins.new_driver ~id ~descr ~configure () in
       Hashtbl.add loaded drivers driver;
-      if Wp_parameters.has_dkey dkey_driver  then LogicBuiltins.dump () ;
+      if Wp_parameters.has_dkey dkey  then LogicBuiltins.dump () ;
       driver
   end

@@ -95,7 +95,6 @@ type sigfun = kind list * builtin
 type driver = {
   driverid : string;
   description : string;
-  includes : Filepath.t list;
   hlogic : (string , sigfun list) Hashtbl.t;
   htypes : (string , t_builtin) Hashtbl.t;
   hdeps : (string, string list) Hashtbl.t;
@@ -276,20 +275,6 @@ let add_option ~driver_dir group name ~library value =
   let l = get_option (group,name) ~library in
   Hashtbl.replace (cdriver_rw ()).hoptions (library,group,name) (l @ [value])
 
-
-(** Includes *)
-
-let find_lib file =
-  if Filesystem.exists file then file else
-    let rec lookup file = function
-      | [] -> Wp_parameters.abort "File '%a' not found"
-                Filepath.pretty file
-      | dir::dirs ->
-        let path = Filepath.(dir / to_string_abs file) in
-        if Filesystem.exists path then path else lookup file dirs
-    in
-    lookup file (cdriver_ro ()).includes
-
 (* -------------------------------------------------------------------------- *)
 (* --- Implemented Builtins                                               --- *)
 (* -------------------------------------------------------------------------- *)
@@ -297,7 +282,6 @@ let find_lib file =
 let builtin_driver = {
   driverid = "builtin driver";
   description = "builtin driver";
-  includes = [];
   hlogic = Hashtbl.create 131;
   htypes = Hashtbl.create 131;
   hdeps  = Hashtbl.create 31;
@@ -344,12 +328,11 @@ let find_type name =
 let () = Context.set Lang.builtin_types find_type
 
 let new_driver ~id ?(base=builtin_driver)
-    ?(descr=id) ?(includes=[]) ?(configure=fun () -> ()) () =
+    ?(descr=id) ?(configure=fun () -> ()) () =
   lock base ;
   let new_driver = {
     driverid = id ;
     description = descr ;
-    includes = includes @ base.includes ;
     hlogic = Hashtbl.copy base.hlogic ;
     htypes = Hashtbl.copy base.htypes ;
     hdeps  = Hashtbl.copy base.hdeps ;
