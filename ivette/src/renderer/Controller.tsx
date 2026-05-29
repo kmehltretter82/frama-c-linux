@@ -54,7 +54,7 @@ function dumpServerConfig(sc: Server.Configuration): string {
         } else
           buffer += ' ';
       }
-      buffer += v;
+      buffer += quote(v);
     });
   }
   return buffer;

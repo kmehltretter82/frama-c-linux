@@ -554,12 +554,9 @@ function stripElectronArgv(cmd: Cmd): Cmd {
   } else if (LOCAL) {
     slice = 2;
   }
-  console.log("CMD", cmd.argv);
   const argv = cmd.argv
     .slice(slice)
     .filter((p) => !!p && p !== "--no-sandbox");
-  console.log("WDIR", wdir);
-  console.log("ARGV", argv);
   return { wdir, argv };
 }
 
