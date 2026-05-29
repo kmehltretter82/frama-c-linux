@@ -30,13 +30,10 @@ type datakind = KValue | KInit
 
 (** A type is never registered in a Definition.t *)
 type adt = private
-  | Mtype of mdt (** External type *)
+  | Mtype of string extern (** External type *)
   | Atype of logic_type_info (** Logic Type *)
   | Comp of compinfo * datakind (** C-code struct or union *)
   | Wtype of string list * string * string list (** Why3 imported type *)
-
-(** name to print to the provers *)
-and mdt = string extern
 
 and 'a extern = {
   ext_id     : int;
@@ -49,7 +46,7 @@ and field = private Cfield of fieldinfo * datakind
 and tau = (field,adt) Logic.datatype
 
 type t_builtin =
-  | E_mdt of mdt
+  | E_mdt of string extern
   | E_why3 of string list * string * string list
   | E_poly of (tau list -> tau)
 
@@ -141,7 +138,7 @@ val generated_f : ?context:bool -> ?category:lfun category ->
 val generated_p : ?context:bool -> ?coloring:bool -> string -> lfun
 
 val extern_t:
-  string -> link:string -> library:string -> mdt
+  string -> link:string -> library:string -> string extern
 
 val imported_t:
   package:string list -> theory:string -> name:string list -> adt

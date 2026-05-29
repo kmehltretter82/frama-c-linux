@@ -93,13 +93,12 @@ let lemma_id l = Printf.sprintf "Q_%s" (avoid_leading_backlash l)
 type datakind = KValue | KInit
 
 type adt =
-  | Mtype of mdt (* Model type *)
+  | Mtype of string extern (* Model type *)
   | Atype of logic_type_info (* Logic Type *)
   | Comp of compinfo * datakind (* C-code struct or union *)
   | Wtype of string list * string * string list (** Why3 imported type *)
 
 (** name to print to the provers *)
-and mdt = string extern
 and 'a extern = {
   ext_id      : int;
   ext_link : 'a ;
@@ -181,7 +180,7 @@ let rec varpoly k x = function
   | y::ys -> if x = y then k else varpoly (succ k) x ys
 
 type t_builtin =
-  | E_mdt of mdt
+  | E_mdt of string extern
   | E_why3 of string list * string * string list
   | E_poly of (tau list -> tau)
 let builtin_types = Context.create "Wp.Lang.builtin_types"
