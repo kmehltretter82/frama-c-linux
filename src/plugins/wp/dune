@@ -52,7 +52,7 @@
 
 (plugin (optional) (name wp) (libraries frama-c-wp.core) (site (frama-c plugins)))
 
-(ocamllex driver rformat script)
+(ocamllex drvlexer rformat script)
 
 (install
   (package frama-c-wp)
