@@ -15,11 +15,10 @@ open Lang.F
 let library = "memaddr"
 
 (* Warning: DO NOT register map types using this constructor: it hides types
-   needed by ProverWhy3 for typing terms of the form x[i].
-*)
+   needed by ProverWhy3 for typing terms of the form x[i]. *)
 
-let t_addr = Qed.Logic.Data(Lang.datatype ~library "addr",[])
-let t_table = Qed.Logic.Data(Lang.datatype ~library "table",[])
+let t_addr = Lang.extern_tau "frama_c_wp.memaddr.MemAddr.addr"
+let t_table = Lang.extern_tau "frama_c_wp.memaddr.MemAddr.addr"
 let t_malloc = Qed.Logic.Array(Qed.Logic.Int, Qed.Logic.Int)
 
 let f_base   = Lang.extern_f ~library ~result:Qed.Logic.Int

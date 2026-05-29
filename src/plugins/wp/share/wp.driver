@@ -41,7 +41,7 @@ why3.import += "frama_c_wp.cbits.Cbits";
 
 library cfloat: cmath sqrt
 why3.import += "frama_c_wp.cfloat.Cfloat";
-type "rounding_mode"   = "Rounding.mode";
+type "rounding_mode"   = "frama_c_wp.cfloat.Cfloat.Rounding.mode";
 ctor "\\Up"()          = "Rounding.RTP";
 ctor "\\Down"()        = "Rounding.RTN";
 ctor "\\ToZero"()      = "Rounding.RTZ";
@@ -59,14 +59,13 @@ predicate "\\is_minus_infinity"(float32) = "is_negative_infinite_f32";
 predicate "\\is_minus_infinity"(float64) = "is_negative_infinite_f64";
 logic float32 "\\round_float"(rounding_mode,real) = "round_float";
 logic float64 "\\round_double"(rounding_mode,real) = "round_double";
-type "sign" = "sign";
+type "sign" = "frama_c_wp.cfloat.Cfloat.sign";
 ctor "\\Positive" = "Positive";
 ctor "\\Negative" = "Negative";
 logic sign "\\sign"(float32) = "sign_f32";
 logic sign "\\sign"(float64) = "sign_f64";
 
 library vset:
-type set = "set";
 why3.import := "frama_c_wp.vset.Vset";
 
 library vlist:

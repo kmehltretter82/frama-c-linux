@@ -64,9 +64,7 @@ val add_library : string -> string list -> unit
 (** Add a new library or update the dependencies of an existing one *)
 
 val add_alias : source:Filepos.t -> string -> kind list -> alias:string -> unit -> unit
-
-val add_type : ?source:Filepos.t -> string -> library:string ->
-  ?link:string -> unit -> unit
+val add_type : ?source:Filepos.t -> string -> link:string -> unit
 
 val add_ctor : source:Filepos.t -> string -> kind list ->
   library:string -> link:Qed.Engine.link -> unit -> unit
@@ -104,10 +102,16 @@ type builtin =
   | LFUN of lfun
   | HACK of (F.term list  -> F.term)
 
+type t_builtin =
+  | ADT of adt
+  | HACKT of (F.tau list -> F.tau)
+
 val logic : logic_info -> builtin
 val ctor : logic_ctor_info -> builtin
 val constant : string -> builtin
 val lookup : string -> kind list -> builtin
+val lookup_t : string -> t_builtin
+val resolve_t : string -> tau list -> tau
 
 (** Replace a logic definition or predicate by a built-in function.
     The LogicSemantics compilers will replace `Pcall` and `Tcall` instances
@@ -116,5 +120,7 @@ val hack : string -> (F.term list -> F.term) -> unit
 
 (** Replace a logic type definition or predicate by a built-in type. *)
 val hack_type : string -> (F.tau list -> F.tau) -> unit
+
+val is_builtin_type : string -> bool
 
 val dump : unit -> unit

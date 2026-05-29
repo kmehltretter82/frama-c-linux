@@ -93,25 +93,24 @@ let lemma_id l = Printf.sprintf "Q_%s" (avoid_leading_backlash l)
 type datakind = KValue | KInit
 
 type adt =
-  | Mtype of string extern (* Model type *)
-  | Atype of logic_type_info (* Logic Type *)
+  | Qdata of Qed.Symbol.data (* Why3/Qed Type *)
+  | Atype of logic_type_info (* ACSL Logic Type *)
   | Comp of compinfo * datakind (* C-code struct or union *)
-  | Wtype of string list * string * string list (** Why3 imported type *)
 
 (** name to print to the provers *)
-and 'a extern = {
+and fields = { mutable fields : field list }
+and field = Cfield of fieldinfo * datakind
+and tau = (field,adt) Logic.datatype
+
+let pointer = Context.create "Lang.pointer"
+let floats = Context.create "Lang.floats"
+
+type 'a extern = {
   ext_id      : int;
   ext_link : 'a ;
   ext_library : string; (** a library which it depends on *)
   ext_debug   : string; (** just for printing during debugging *)
 }
-and fields = { mutable fields : field list }
-and field =
-  | Cfield of fieldinfo * datakind
-and tau = (field,adt) Logic.datatype
-
-let pointer = Context.create "Lang.pointer"
-let floats = Context.create "Lang.floats"
 
 let new_extern_id = ref (-1)
 let new_extern ~debug ~library ~link =
@@ -179,27 +178,10 @@ let rec varpoly k x = function
   | [] -> Warning.error "Unbound type parameter <%s>" x
   | y::ys -> if x = y then k else varpoly (succ k) x ys
 
-type t_builtin =
-  | E_mdt of string extern
-  | E_why3 of string list * string * string list
-  | E_poly of (tau list -> tau)
-let builtin_types = Context.create "Wp.Lang.builtin_types"
-
-let find_builtin name = Context.get builtin_types name
-
-let adt lt =
-  try match find_builtin lt.lt_name with
-    | E_mdt m -> Mtype m
-    | E_why3(p,m,s) -> Wtype(p,m,s)
-    | E_poly _ -> assert false
-  with Not_found -> Atype lt
-
-let atype lt ts =
-  try match find_builtin lt.lt_name with
-    | E_mdt m -> Logic.Data(Mtype m,ts)
-    | E_why3(p,m,s) -> Logic.Data(Wtype(p,m,s),ts)
-    | E_poly ftau -> ftau ts
-  with Not_found -> Logic.Data(Atype lt,ts)
+let hacked_types = Context.create "Wp.Lang.hacked_types"
+let atype lt (ts : tau list) : tau =
+  try Context.get hacked_types lt.lt_name ts
+  with Not_found -> Qed.Logic.Data(Atype lt,ts)
 
 let rec tau_of_ltype t =
   match Ast_types.Acsl.unroll ~unroll_typedef:false t with
@@ -226,33 +208,29 @@ struct
   type t = adt
 
   let basename = function
-    | Mtype a -> basename "M" a.ext_link
+    | Qdata a -> basename "M" @@ Qed.Symbol.Data.name a
     | Comp (c,KValue) -> basename (if c.cstruct then "S" else "U") c.corig_name
     | Comp (c,KInit) -> basename (if c.cstruct then "IS" else "IU") c.corig_name
     | Atype lt -> basename "A" lt.lt_name
-    | Wtype(_,_,s) ->
-      let rec base def = function [] -> def | w::ws -> base w ws in base "w" s
 
   let debug = function
-    | Mtype a -> a.ext_debug
+    | Qdata a -> Qed.Symbol.Data.name a
     | Comp (c, KValue) -> comp_id c
     | Comp (c, KInit) -> comp_init_id c
     | Atype lt -> type_id lt
-    | Wtype(p,m,s) -> String.concat "." (p @ m :: s)
 
   let hash = function
-    | Mtype a -> Hashtbl.hash a
+    | Qdata a -> Qed.Symbol.Data.hash a
     | Comp (c, KValue) -> Compinfo.hash c
     | Comp (c, KInit) -> 13 * Compinfo.hash c
     | Atype lt -> Logic_type_info.hash lt
-    | Wtype(p,m,s) -> Hashtbl.hash @@ (p @ m :: s)
 
   let compare a b =
     if a==b then 0 else
       match a,b with
-      | Mtype a , Mtype b -> ext_compare a b
-      | Mtype _ , _ -> (-1)
-      | _ , Mtype _ -> (+1)
+      | Qdata a , Qdata b -> Qed.Symbol.Data.compare a b
+      | Qdata _ , _ -> (-1)
+      | _ , Qdata _ -> (+1)
       | Comp (a, KValue) , Comp (b, KValue)
       | Comp (a, KInit)  , Comp (b, KInit) -> Compinfo.compare a b
       | Comp (_, KValue) , Comp (_, KInit) -> (-1)
@@ -260,9 +238,6 @@ struct
       | Comp _ , _ -> (-1)
       | _ , Comp _ -> (+1)
       | Atype a , Atype b -> Logic_type_info.compare a b
-      | Atype _ , _ -> (-1)
-      | _ , Atype _ -> (+1)
-      | Wtype(p,m,s), Wtype(p',m',s') -> Stdlib.compare (p,m,s) (p',m',s')
 
   let equal a b = (compare a b = 0)
 
@@ -273,40 +248,6 @@ end
 (* -------------------------------------------------------------------------- *)
 (* --- Datatypes                                                          --- *)
 (* -------------------------------------------------------------------------- *)
-
-let get_builtin_type ~name =
-  match find_builtin name with
-  | E_mdt m -> Mtype m
-  | E_why3(p,m,s) -> Wtype(p,m,s)
-  | E_poly _ -> assert false
-
-let mem_builtin_type ~name =
-  try ignore (find_builtin name) ; true
-  with Not_found -> false
-
-let is_builtin lt = mem_builtin_type ~name:lt.lt_name
-
-let is_builtin_type ~name = function
-  | Data(Mtype m,_) ->
-    begin
-      try match find_builtin name with
-        | E_mdt m0 -> m == m0
-        | _ -> false
-      with Not_found -> false
-    end
-  | Data(Wtype(p,m,s),_) ->
-    begin
-      try match find_builtin name with
-        | E_why3(p0,m0,s0) -> (p,m,s) = (p0,m0,s0)
-        | _ -> false
-      with Not_found -> false
-    end
-  | _ -> false
-
-let datatype ~library name =
-  let m = new_extern ~link:name ~library ~debug:name in
-  Mtype m
-
 
 let field_observers = ref []
 let field_observe fd = List.iter (fun k -> k fd) !field_observers ; fd
@@ -533,11 +474,9 @@ let generated_p ?context ?(coloring=false) name =
     m_coloring = coloring ;
   }
 
-let extern_t name ~link ~library =
-  new_extern ~link ~library ~debug:name
-
-let imported_t ~package ~theory ~name =
-  Wtype(package,theory,name)
+let extern_t name = Qdata (Qed.Symbol.find_data (Why3Provers.env ()) name)
+let extern_tau ?(args=[]) name = Qed.Logic.Data(extern_t name,args)
+let import_t ~context ts = Qdata (Qed.Symbol.of_ts ~context ts)
 
 let imported_f ~package ~theory ~name
     ?(params=[]) ?(result=Logic.Sprop) ?(typecheck=not_found) () =
@@ -637,11 +576,10 @@ class virtual idprinting =
     method sanitize_fun   = self#sanitize
 
     method datatype = function
-      | Mtype a -> a.ext_link
+      | Qdata a -> Qed.Symbol.Data.fullname a
       | Comp(c, KValue) -> self#sanitize_type (comp_id c)
       | Comp(c, KInit) -> self#sanitize_type (comp_init_id c)
       | Atype lt -> self#sanitize_type (type_id lt)
-      | Wtype(p,m,s) -> String.concat "." (p @ m :: s)
 
     method field = function
       | Cfield(f, KValue) -> self#sanitize_field (field_id f)

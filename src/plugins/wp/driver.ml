@@ -205,7 +205,7 @@ let rec parse ~driver_dir library input =
     let source = source input in
     noskipkey input "=" ;
     let link = linkstring input in
-    LogicBuiltins.add_type ~source:(Filepos.of_lexing_pos source) name ~library ~link () ;
+    LogicBuiltins.add_type ~source:(Filepos.of_lexing_pos source) name ~link ;
     skipkey input ";" ;
     parse ~driver_dir library input
   | KEY "ctor" ->

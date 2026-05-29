@@ -414,7 +414,9 @@ class virtual visitor main =
         begin
           types <- DT.add t types ;
           let cluster = section (LogicUsage.section_of_type t) in
-          if self#do_local cluster && not (is_builtin t) then
+          if self#do_local cluster &&
+             not (LogicBuiltins.is_builtin_type t.lt_name)
+          then
             begin
               let def = match t.lt_def with
                 | None -> Qed.Engine.Tabs
@@ -471,11 +473,10 @@ class virtual visitor main =
       | Cfield(f, KInit) -> self#vicomp f.fcomp
 
     method vadt = function
-      | Mtype a -> self#vlibrary a.ext_library
+      | Qdata a -> self#on_data a
       | Comp(r, KValue) -> self#vcomp r
       | Comp(r, KInit) -> self#vicomp r
       | Atype t -> self#vtype t
-      | Wtype(p,m,_) -> self#vtheory p m
 
     method vtau = function
       | Prop | Bool | Int | Real | Tvar _ -> ()
@@ -566,7 +567,7 @@ class virtual visitor main =
           | FUN { m_source = Wsymbol(p,m,_) } -> self#vtheory p m
           | FUN { m_source = Extern e  } -> self#vlibrary e.ext_library
           | FUN { m_source = Generated _ } | ACSL _ -> self#vlfun f
-          | CTOR c -> self#vadt (adt c.ctor_type)
+          | CTOR c -> self#vtype c.ctor_type
         end
 
     method private vtrigger = function
@@ -675,6 +676,7 @@ class virtual visitor main =
     method virtual on_theory : string list -> string -> unit
     method virtual on_library : string -> unit
     method virtual on_cluster : cluster -> unit
+    method virtual on_data : Qed.Symbol.data -> unit
     method virtual on_type : logic_type_info -> typedef -> unit
     method virtual on_comp : compinfo -> (field * tau) list option -> unit
     method virtual on_icomp : compinfo -> (field * tau) list option -> unit

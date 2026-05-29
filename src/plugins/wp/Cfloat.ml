@@ -21,11 +21,10 @@ open Lang.F
 
 let library = "cfloat"
 
-let f32 = datatype ~library "f32"
-let f64 = datatype ~library "f64"
-
-let t32 = Lang.(t_datatype f32 [])
-let t64 = Lang.(t_datatype f64 [])
+let f32 = Lang.extern_t "frama_c_wp.cfloat.Cfloat.f32"
+let f64 = Lang.extern_t "frama_c_wp.cfloat.Cfloat.f64"
+let t32 = Lang.t_datatype f32 []
+let t64 = Lang.t_datatype f64 []
 
 let ftau = function
   | Float32 -> t32

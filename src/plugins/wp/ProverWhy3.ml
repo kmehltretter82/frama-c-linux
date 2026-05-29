@@ -127,13 +127,6 @@ let coerce ~cnv sort expected r =
     t_app ~cnv ~f:["real"] ~l:"FromInt" ~p:["from_int"] [r]
   | _ -> r
 
-let adt_wname = function
-  | Lang.Mtype a -> a.Lang.ext_link
-  | Comp (c, KValue) -> Lang.comp_id c
-  | Comp (c, KInit) -> Lang.comp_init_id c
-  | Atype lt -> Lang.type_id lt
-  | Wtype(p,m,s) -> String.concat "." (p @ m :: s)
-
 let tvar =
   let tvar = Datatype.Int.Hashtbl.create 10 in
   fun i ->
@@ -186,8 +179,14 @@ let wp_why3_lib library =
 
 (* conversion *)
 
+let adt_wname = function
+  | Lang.Qdata _ -> assert false
+  | Comp (c, KValue) -> Lang.comp_id c
+  | Comp (c, KInit) -> Lang.comp_init_id c
+  | Atype lt -> Lang.type_id lt
+
 let of_adt ~cnv = function
-  | Lang.Wtype(f,l,p) -> get_ts ~cnv ~f ~l ~p
+  | Lang.Qdata a -> Qed.Symbol.Data.symbol a
   | adt ->
     let s = adt_wname adt in
     try Hashtbl.find cnv.incomplete_types s
@@ -555,7 +554,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
           Why3.Term.t_app ls l (of_tau ~cnv expected)
         | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
       end
-    | (Rdef _, Data ((Mtype _|Atype _|Wtype _), _), _)
+    | (Rdef _, Data ((Qdata _|Atype _), _), _)
     | (Rdef _, (Prop|Bool|Int|Real|Tvar _|Array (_, _)), _)
     | (Aset (_, _, _), (Prop|Bool|Int|Real|Tvar _|Record _|Data (_, _)), _)
     | (Neq (_, _), _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
@@ -684,8 +683,6 @@ module CLUSTERS = WpContext.Index
       let pretty = Definitions.pp_cluster
     end)
 
-
-
 let filenoext file =
   let basename = Filename.basename file in
   (try Filename.chop_extension basename
@@ -758,17 +755,29 @@ class visitor (ctx:context) c =
     method add_import_file_as file thy name =
       self#add_import_use ~import:false file thy name
 
+    method private add_use thy =
+      let th = ctx.th in
+      if not @@ Why3.Ident.Sid.mem thy.Why3.Theory.th_name th.uc_used then
+        begin
+          let name = "use'" ^ thy.th_name.id_string in
+          Wp_parameters.debug ~dkey:dkey_compile "%s" name ;
+          let th = Why3.Theory.open_scope th name in
+          let th = Why3.Theory.use_export th thy in
+          let th = Why3.Theory.close_scope th ~import:false in
+          ctx.th <- th
+        end
+
     method add_import_use ~import file thy name =
       Wp_parameters.debug ~dkey:dkey_compile
-        "@[use@ %s@ @[%a.%s@]@ as@ %s@]"
-        (if import then "import" else "")
-        Why3.Pp.(print_list (Why3.Pp.constant_string ".") string) file
+        "%s %a.%s as %s"
+        (if import then "use import" else "use")
+        (Pretty_utils.pp_list ~sep:"." Format.pp_print_string) file
         thy name ;
-      let thy = Why3.Env.read_theory ctx.env file thy in
       let th = ctx.th in
+      let thy = Why3.Env.read_theory ctx.env file thy in
       let th = Why3.Theory.open_scope th name in
       let th = Why3.Theory.use_export th thy in
-      let th = Why3.Theory.close_scope th ~import in
+      let th = Why3.Theory.close_scope th ~import:false in
       ctx.th <- th
 
     method on_library thy =
@@ -818,6 +827,8 @@ class visitor (ctx:context) c =
         List.iter iter_import
           (LogicBuiltins.get_option option_import ~library:thy) ;
       end
+
+    method on_data d = self#add_use (Qed.Symbol.Data.theory d)
 
     method on_type lt def =
       match def with

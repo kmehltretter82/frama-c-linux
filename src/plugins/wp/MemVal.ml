@@ -74,9 +74,7 @@ let debug_val = Wp_parameters.debug ~dkey:dkey_val
 (* ---  Logic Memory Wrapper                                              --- *)
 (* -------------------------------------------------------------------------- *)
 let library = "memory"
-
-let a_addr = Lang.datatype ~library "addr"
-let t_addr = Logic.Data(a_addr,[])
+let t_addr = Lang.extern_tau "frama_c_wp.memaddr.MemAddr.addr"
 let f_base   = Lang.extern_f ~library ~result:Logic.Int
     ~link:(Qed.Engine.F_proj "base") "base"
 let f_offset = Lang.extern_f ~library ~result:Logic.Int

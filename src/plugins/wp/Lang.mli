@@ -30,10 +30,9 @@ type datakind = KValue | KInit
 
 (** A type is never registered in a Definition.t *)
 type adt = private
-  | Mtype of string extern (** External type *)
-  | Atype of logic_type_info (** Logic Type *)
-  | Comp of compinfo * datakind (** C-code struct or union *)
-  | Wtype of string list * string * string list (** Why3 imported type *)
+  | Qdata of Qed.Symbol.data (** Qed/Why3 Type *)
+  | Atype of logic_type_info (** ACSL Logic Type *)
+  | Comp of compinfo * datakind (** C-code Struct or Union *)
 
 and 'a extern = {
   ext_id     : int;
@@ -44,11 +43,6 @@ and 'a extern = {
 and fields = { mutable fields : field list }
 and field = private Cfield of fieldinfo * datakind
 and tau = (field,adt) Logic.datatype
-
-type t_builtin =
-  | E_mdt of string extern
-  | E_why3 of string list * string * string list
-  | E_poly of (tau list -> tau)
 
 type lfun = private
   | ACSL of Cil_types.logic_info (** Registered in Definition.t,
@@ -71,12 +65,6 @@ and source =
   | Extern of Engine.link extern
   | Wsymbol of string list * string * string list (** Why3 imported logic symbol *)
 
-val mem_builtin_type : name:string -> bool
-val is_builtin : logic_type_info -> bool
-val is_builtin_type : name:string -> tau -> bool
-val get_builtin_type : name:string -> adt
-val datatype : library:string -> string -> adt
-(* val record : link:string -> library:string -> (string * tau) list -> adt *)
 val comp : compinfo -> adt
 val comp_init : compinfo -> adt
 val cfield : ?kind:datakind -> fieldinfo -> field
@@ -85,7 +73,6 @@ val fields_of_adt : adt -> field list
 val fields_of_tau : tau -> field list
 val fields_of_field : field -> field list
 val atype : logic_type_info -> tau list -> tau
-val adt : logic_type_info -> adt (** Must not be a builtin *)
 
 type balance = Nary | Left | Right
 
@@ -94,6 +81,12 @@ val on_field : (field -> unit) -> unit
 
 val acsl : logic_info -> lfun
 val ctor : logic_ctor_info -> lfun
+
+(** Builders *)
+
+val extern_t: string -> adt
+val extern_tau: ?args:tau list -> string -> tau
+val import_t: context:Why3.Theory.theory -> Why3.Ty.tysymbol -> adt
 
 val extern_s :
   library:string ->
@@ -137,12 +130,6 @@ val generated_f : ?context:bool -> ?category:lfun category ->
 
 val generated_p : ?context:bool -> ?coloring:bool -> string -> lfun
 
-val extern_t:
-  string -> link:string -> library:string -> string extern
-
-val imported_t:
-  package:string list -> theory:string -> name:string list -> adt
-
 val imported_f:
   package:string list -> theory:string -> name:string list ->
   ?params:sort list ->
@@ -184,9 +171,6 @@ val floats : (c_float -> tau) Context.value
 
 val poly : string list Context.value
 (** polymorphism *)
-
-val builtin_types: (string -> t_builtin) Context.value
-(* builtin types *)
 
 val parameters : (lfun -> sort list) -> unit
 (** definitions *)
@@ -738,3 +722,7 @@ module For_export : sig
   val in_state: ('a -> 'b) -> 'a -> 'b
 
 end
+
+(**/**)
+val hacked_types : (string -> tau list -> tau) Context.value
+(**/**)

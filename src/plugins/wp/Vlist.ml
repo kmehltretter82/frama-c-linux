@@ -25,19 +25,15 @@ module E = Qed.Engine
 let library = "vlist"
 
 (*--- Linked Symbols ---*)
-
-let t_list = "\\list"
-let l_list = "list"
 let l_concat = E.F_right "concat"
 let l_elt = E.(F_call "elt")
 let l_repeat = E.(F_call "repeat")
 
 (*--- Typechecking ---*)
-
-let () = LogicBuiltins.add_type t_list ~library ~link:l_list ()
-let a_list = Lang.get_builtin_type ~name:t_list
-
+let a_list = Lang.extern_t "list.List.list"
 let alist e = L.Data(a_list,[e])
+
+let () = LogicBuiltins.add_builtin_type "\\list" a_list
 
 let vlist_get_tau = function
   | None -> invalid_arg "a list operator without result type"
@@ -466,8 +462,8 @@ let () =
 
 let f_list = [ f_nil ; f_cons ; f_elt ; f_repeat ; f_concat ]
 
-let check_tau = Lang.is_builtin_type ~name:t_list
-
+let check_adt = Lang.ADT.equal a_list
+let check_tau = function L.Data(d,_) -> check_adt d | _ -> false
 let check_term e =
   try match F.repr e with
     | L.Fvar x -> check_tau (F.tau_of_var x)
@@ -478,7 +474,7 @@ let check_term e =
 
 let elist (t : tau) =
   match t with
-  | L.Data(_,[e]) when check_tau t -> Some e
+  | L.Data(a,[e]) when check_adt a -> Some e
   | _ -> None
 
 let f_vlist_eq = Lang.extern_f ~library ~sort:L.Sprop "vlist_eq"

@@ -78,9 +78,9 @@ let pretty fmt = function
 (* -------------------------------------------------------------------------- *)
 
 let library = "vset"
-
-let adt_set = Lang.datatype ~library "set"
-let tau_of_set (te:tau) : tau = Logic.Data( adt_set , [te] )
+let t_set = Lang.extern_t "set.Set.set"
+let tau_of_set (te:tau) : tau = Logic.Data( t_set , [te] )
+let () = LogicBuiltins.add_builtin_type "set" t_set
 
 let typecheck_binop (params:tau option list) : tau =
   match params with

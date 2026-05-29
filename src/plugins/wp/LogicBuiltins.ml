@@ -22,6 +22,10 @@ type builtin =
   | LFUN of lfun
   | HACK of (F.term list -> F.term)
 
+type t_builtin =
+  | ADT of adt
+  | HACKT of (F.tau list -> F.tau)
+
 type kind =
   | B (* boolean *)
   | Z (* integer *)
@@ -238,12 +242,11 @@ let add_ctor ~source name kinds ~library ~link () =
   let lfun = Lang.extern_s ~library ~category ~params ~link name in
   register ~source name kinds (LFUN lfun)
 
-let add_type ?source name ~library ?(link=name) () =
-  let mdt = Lang.extern_t name ~link ~library in
-  register_type ?source name (E_mdt mdt)
+let add_type ?source name ~link =
+  register_type ?source name (ADT (Lang.extern_t link))
 
-let hack_type name poly =
-  register_type name (E_poly poly)
+let hack_type name fn =
+  register_type name (HACKT fn)
 
 type sanitizer = driver_dir:string -> string -> string
 let sanitizers : ( string * string , sanitizer ) Hashtbl.t = Hashtbl.create 10
@@ -297,35 +300,30 @@ let add_builtin name kinds lfun =
     Context.bind driver builtin_driver (register name kinds) phi
 
 let add_builtin_type name adt =
-  let bt =
-    match adt with
-    | Mtype m -> E_mdt m
-    | Wtype(p,m,s) -> E_why3(p,m,s)
-    | _ -> assert false
-  in
   if Context.defined driver then
-    register_type name bt
+    register_type name (ADT adt)
   else
-    Context.bind driver builtin_driver (register_type name) bt
-
-let add_type ?source name ~library ?link () =
-  if Context.defined driver then
-    add_type ?source name ~library ?link ()
-  else
-    Context.bind driver builtin_driver
-      (add_type ?source name ~library ?link) ()
+    Context.bind driver builtin_driver (register_type name) (ADT adt)
 
 let hack_type name poly =
   if Context.defined driver then hack_type name poly
   else Context.bind driver builtin_driver hack_type name poly
 
-let find_type name =
-  Hashtbl.find (cdriver_ro ()).htypes name
-let find_type name =
-  if Context.defined driver then find_type name
-  else Context.bind driver builtin_driver find_type name
+let lookup_t =
+  let lookup a = Hashtbl.find (cdriver_ro ()).htypes a in
+  fun name ->
+    if Context.defined driver then lookup name
+    else Context.bind driver builtin_driver lookup name
 
-let () = Context.set Lang.builtin_types find_type
+let resolve_t name ts =
+  match lookup_t name with
+  | ADT adt -> Qed.Logic.Data(adt,ts)
+  | HACKT fn -> fn ts
+
+let is_builtin_type name =
+  try let _ = lookup_t name in true with Not_found -> false
+
+let () = Context.set Lang.hacked_types resolve_t
 
 let new_driver ~id ?(base=builtin_driver)
     ?(descr=id) ?(configure=fun () -> ()) () =

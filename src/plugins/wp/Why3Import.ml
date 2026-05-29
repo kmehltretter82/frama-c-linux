@@ -60,6 +60,7 @@ let pp_id fmt (id: W.Ident.ident) = Format.pp_print_string fmt id.id_string
 type tvars = C.logic_type W.Ty.Mtv.t
 
 type why3module = {
+  theory: Why3.Theory.theory ;
   types : (C.logic_type_info * Fileloc.t) list;
   logics : (C.logic_info * Fileloc.t) list;
 }
@@ -283,9 +284,8 @@ let register_builtin env m =
     in
     let add_builtin_t lti =
       let ty = Logic_type_info.Hashtbl.find env.ltts lti in
-      let (package,theory,name) = T.restore_path ty.ts_name in
       LB.add_builtin_type lti.lt_name @@
-      Lang.imported_t ~package ~theory ~name ;
+      Lang.import_t ~context:m.theory ty ;
       begin match lti.lt_def with
         | Some C.LTsum ctors -> List.iter add_builtin_ctor ctors
         | _ -> ()
@@ -304,7 +304,7 @@ let import_theory env thname =
     let menv : menv = {li = []; lti = []} in
     let theory = get_theory env theory_name theory_path in
     parse_theory env theory menv;
-    let m = { types = List.rev menv.lti; logics =  List.rev menv.li } in
+    let m = { theory ; types = List.rev menv.lti; logics =  List.rev menv.li } in
     Datatype.String.Hashtbl.add env.menv thname m;
     register_builtin env m; m
 

@@ -843,7 +843,7 @@ struct
       if not (Typedefs.mem lt) then
         begin
           Typedefs.update lt None ;
-          if not (Lang.is_builtin lt) then
+          if not (LogicBuiltins.is_builtin_type lt.lt_name) then
             let section = LogicUsage.section_of_type lt in
             let cluster = Definitions.section section in
             match section with
