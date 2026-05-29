@@ -18,7 +18,7 @@ import './Coverage';
 import './DomainStates';
 import './EvaSidebar';
 import './Flamegraph';
-import './MThread';
+import './Mthread';
 import './style.css';
 import './Taint';
 
@@ -60,7 +60,7 @@ Ivette.registerView({
 
 Ivette.registerView({
   id: 'fc.eva.mthread',
-  label: 'Eva MThread',
+  label: 'Eva Mthread',
   layout: {
     'A': 'fc.kernel.astview',
     'B': 'fc.kernel.locations',
