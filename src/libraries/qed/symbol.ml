@@ -212,6 +212,7 @@ struct
   type t = tau
   let equal = Kind.eq_tau Field.equal Data.equal
   let compare = Kind.compare_tau Field.compare Data.compare
+  let pretty = Kind.pp_tau Kind.pp_tvar Field.pretty Data.pretty
 end
 
 let hty : tau Why3.Ty.Hty.t = Why3.Ty.Hty.create 32
@@ -224,13 +225,20 @@ let () =
 
 type sigma = tau Why3.Ty.Mtv.t
 
+let data (Data d as adt) = function
+  | [] when Why3.Ty.(ts_equal d.ts ts_int) -> Logic.Int
+  | [] when Why3.Ty.(ts_equal d.ts ts_real) -> Logic.Real
+  | [] when Why3.Ty.(ts_equal d.ts ts_bool) -> Logic.Bool
+  | [a;b] when Why3.Ty.(ts_equal d.ts ts_func) -> Logic.Array(a,b)
+  | ts -> Logic.Data(adt, ts)
+
 let rec of_ty ?(sigma=Why3.Ty.Mtv.empty) ~context ty =
   try Why3.Ty.Hty.find hty ty with Not_found ->
   match ty.ty_node with
   | Tyvar x -> Why3.Ty.Mtv.find x sigma
   | Tyapp (ts, tys) ->
     let d = of_ts ~context ts in
-    let t = Logic.Data(d, List.map (of_ty ~sigma ~context) tys) in
+    let t = data d @@ List.map (of_ty ~sigma ~context) tys in
     if Why3.Ty.ty_closed ty then Why3.Ty.Hty.add hty ty t ; t
 
 let of_oty ?sigma ~context = function

@@ -102,31 +102,15 @@ let rec depend input =
     a :: depend input
   | _ -> []
 
-let link ?(op=false) input =
+let link input =
   match token input with
-  | LINK f | ID f ->
-    skip input;
-    if op then Qed.Engine.F_left f else Qed.Engine.F_call f
-  | _ -> failwith "Missing link symbol"
-
-let linkstring input =
-  match recorstring input.lexbuf with
-  | `String f ->
-    skip input ; f
-  | `RecString l ->
-    skip input ;
-    begin try List.assoc "why3" l
-      with Not_found ->
-        failwith "a link must contain an entry for 'why3'"
-    end
-  | _ -> failwith "Missing link symbol"
+  | LINK f -> skip input ; f
+  | _ -> failwith "String expected"
 
 let input_string input =
   match token input with
-  | LINK f | ID f ->
-    skip input ; f
+  | LINK f | ID f -> skip input ; f
   | _ -> failwith "String or ident expected"
-
 
 let op = {
   invertible = false ;
@@ -156,7 +140,7 @@ let op_elt input =
 let rec op_link op input =
   match token input with
   | LINK _ ->
-    Operator op, link ~op:true input
+    Operator op, link input
   | ID "associative" -> skip input ; skipkey input ":" ;
     op_link { op with associative = true } input
   | ID "commutative" -> skip input ; skipkey input ":" ;
@@ -204,7 +188,7 @@ let rec parse ~driver_dir library input =
     let name = ident input in
     let source = source input in
     noskipkey input "=" ;
-    let link = linkstring input in
+    let link = link input in
     LogicBuiltins.add_type ~source:(Filepos.of_lexing_pos source) name ~link ;
     skipkey input ";" ;
     parse ~driver_dir library input
@@ -215,7 +199,7 @@ let rec parse ~driver_dir library input =
     let args = signature input in
     skipkey input "=" ;
     let link = link input in
-    LogicBuiltins.add_ctor ~source:(Filepos.of_lexing_pos source) name args ~library ~link () ;
+    LogicBuiltins.add_ctor ~source:(Filepos.of_lexing_pos source) name args ~link ;
     skipkey input ";" ;
     parse ~driver_dir library input
   | KEY "logic" ->
@@ -227,13 +211,17 @@ let rec parse ~driver_dir library input =
     if key input ":=" then
       begin
         let alias = ident input in
-        LogicBuiltins.add_alias ~source:(Filepos.of_lexing_pos source) name args ~alias () ;
+        LogicBuiltins.add_alias
+          ~source:(Filepos.of_lexing_pos source)
+          name args ~alias ;
       end
     else
       begin
         skipkey input "=" ;
         let category,link = logic_link input in
-        LogicBuiltins.add_logic ~source:(Filepos.of_lexing_pos source) result name args ~library ~category ~link () ;
+        LogicBuiltins.add_logic
+          ~source:(Filepos.of_lexing_pos source)
+          ~category result name args ~link ;
       end ;
     skipkey input ";" ;
     parse ~driver_dir library input
@@ -245,13 +233,17 @@ let rec parse ~driver_dir library input =
     if key input ":=" then
       begin
         let alias = ident input in
-        LogicBuiltins.add_alias ~source:(Filepos.of_lexing_pos source) name args ~alias () ;
+        LogicBuiltins.add_alias
+          ~source:(Filepos.of_lexing_pos source)
+          name args ~alias ;
       end
     else
       begin
         noskipkey input "=" ;
-        let link = linkstring input in
-        LogicBuiltins.add_predicate ~source:(Filepos.of_lexing_pos source) name args ~library ~link () ;
+        let link = link input in
+        LogicBuiltins.add_predicate
+          ~source:(Filepos.of_lexing_pos source)
+          name args ~link ;
       end ;
     skipkey input ";" ;
     parse ~driver_dir library input

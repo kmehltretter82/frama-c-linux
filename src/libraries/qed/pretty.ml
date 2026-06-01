@@ -23,7 +23,6 @@ struct
   (* ---  Types                                                             --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let pp_tvarn fmt n = fprintf fmt "?%d" n
   let pp_alpha fmt = function
     | 0 -> pp_print_string fmt "'a"
     | 1 -> pp_print_string fmt "'b"
@@ -33,10 +32,7 @@ struct
     | n -> fprintf fmt "?%d" (n-4)
 
   let pp_tau fmt t =
-    let n = Kind.degree_of_tau t in
-    if 0<=n && n<5
-    then Kind.pp_tau pp_alpha Field.pretty ADT.pretty fmt t
-    else Kind.pp_tau pp_tvarn Field.pretty ADT.pretty fmt t
+    Kind.pp_tau pp_alpha Field.pretty ADT.pretty fmt t
 
   (* -------------------------------------------------------------------------- *)
   (* --- Shareable                                                          --- *)

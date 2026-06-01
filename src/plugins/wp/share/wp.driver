@@ -15,53 +15,47 @@ library const:
 why3.import += "map.Const";
 
 library minmax_int:
-why3.import += "int.MinMax:Ig";
 logic integer "\\max"(integer,integer) =
-      commutative:associative:idempotent:
-      "Ig.max";
+      commutative:associative:idempotent: "int.MinMax.max";
 logic integer "\\min"(integer,integer) =
-      commutative:associative:idempotent:
-      "Ig.min";
+      commutative:associative:idempotent: "int.MinMax.min";
 
 library minmax_real:
-why3.import += "real.MinMax:Rg";
 logic real "\\max"(real,real) =
-      commutative:associative:idempotent:
-      "Rg.max";
+      commutative:associative:idempotent: "real.MinMax.max";
 logic real "\\min"(real,real) =
-      commutative:associative:idempotent:
-      "Rg.min";
+      commutative:associative:idempotent: "real.MinMax.min";
 
 library cint:
 why3.import += "frama_c_wp.cint.Cint";
 
 library cbits: cint
-logic boolean "bit_test"(integer,integer) := \bit_test_stdlib;
+logic boolean "bit_test"(integer,integer) := \bit_test;
 why3.import += "frama_c_wp.cbits.Cbits";
 
 library cfloat: cmath sqrt
 why3.import += "frama_c_wp.cfloat.Cfloat";
 type "rounding_mode"   = "frama_c_wp.cfloat.Cfloat.Rounding.mode";
-ctor "\\Up"()          = "Rounding.RTP";
-ctor "\\Down"()        = "Rounding.RTN";
-ctor "\\ToZero"()      = "Rounding.RTZ";
-ctor "\\NearestAway"() = "Rounding.RNA";
-ctor "\\NearestEven"() = "Rounding.RNE";
-predicate "\\is_finite"(float32) = "is_finite_f32";
-predicate "\\is_finite"(float64) = "is_finite_f64";
-predicate "\\is_NaN"(float32) = "is_NaN_f32";
-predicate "\\is_NaN"(float64) = "is_NaN_f64";
-predicate "\\is_infinite"(float32) = "is_infinite_f32" ;
-predicate "\\is_infinite"(float64) = "is_infinite_f64" ;
-predicate "\\is_plus_infinity"(float32) = "is_positive_infinite_f32";
-predicate "\\is_plus_infinity"(float64) = "is_positive_infinite_f64";
-predicate "\\is_minus_infinity"(float32) = "is_negative_infinite_f32";
-predicate "\\is_minus_infinity"(float64) = "is_negative_infinite_f64";
-logic float32 "\\round_float"(rounding_mode,real) = "round_float";
-logic float64 "\\round_double"(rounding_mode,real) = "round_double";
+ctor "\\Up"()          = "frama_c_wp.cfloat.Cfloat.Rounding.RTP";
+ctor "\\Down"()        = "frama_c_wp.cfloat.Cfloat.Rounding.RTN";
+ctor "\\ToZero"()      = "frama_c_wp.cfloat.Cfloat.Rounding.RTZ";
+ctor "\\NearestAway"() = "frama_c_wp.cfloat.Cfloat.Rounding.RNA";
+ctor "\\NearestEven"() = "frama_c_wp.cfloat.Cfloat.Rounding.RNE";
+predicate "\\is_finite"(float32) = "frama_c_wp.cfloat.Cfloat.is_finite_f32";
+predicate "\\is_finite"(float64) = "frama_c_wp.cfloat.Cfloat.is_finite_f64";
+predicate "\\is_NaN"(float32) = "frama_c_wp.cfloat.Cfloat.is_NaN_f32";
+predicate "\\is_NaN"(float64) = "frama_c_wp.cfloat.Cfloat.is_NaN_f64";
+predicate "\\is_infinite"(float32) = "frama_c_wp.cfloat.Cfloat.is_infinite_f32" ;
+predicate "\\is_infinite"(float64) = "frama_c_wp.cfloat.Cfloat.is_infinite_f64" ;
+predicate "\\is_plus_infinity"(float32) = "frama_c_wp.cfloat.Cfloat.is_positive_infinite_f32";
+predicate "\\is_plus_infinity"(float64) = "frama_c_wp.cfloat.Cfloat.is_positive_infinite_f64";
+predicate "\\is_minus_infinity"(float32) = "frama_c_wp.cfloat.Cfloat.is_negative_infinite_f32";
+predicate "\\is_minus_infinity"(float64) = "frama_c_wp.cfloat.Cfloat.is_negative_infinite_f64";
+logic float32 "\\round_float"(rounding_mode,real) = "frama_c_wp.cfloat.Cfloat.round_float";
+logic float64 "\\round_double"(rounding_mode,real) = "frama_c_wp.cfloat.Cfloat.round_double";
 type "sign" = "frama_c_wp.cfloat.Cfloat.sign";
-ctor "\\Positive" = "Positive";
-ctor "\\Negative" = "Negative";
+ctor "\\Positive" = "frama_c_wp.cfloat.Cfloat.Positive";
+ctor "\\Negative" = "frama_c_wp.cfloat.Cfloat.Negative";
 logic sign "\\sign"(float32) = "sign_f32";
 logic sign "\\sign"(float64) = "sign_f64";
 

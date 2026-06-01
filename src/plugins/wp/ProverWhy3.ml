@@ -67,8 +67,7 @@ let get_ls ~cnv ~f ~l ~p =
       why3_failure "The symbol %a can't be found in %a.%s"
         Why3.Pp.(print_list dot string) p
         Why3.Pp.(print_list dot string) f l
-  in
-  ls
+  in ls
 
 let get_ts ~cnv ~f ~l ~p =
   let th = Why3.Env.read_theory cnv.env f l in
@@ -79,9 +78,7 @@ let get_ts ~cnv ~f ~l ~p =
       why3_failure "The type %a can't be found in %a.%s"
         Why3.Pp.(print_list dot string) p
         Why3.Pp.(print_list dot string) f l
-  in
-  ls
-
+  in ls
 
 let t_app ~cnv ~f ~l ~p tl =
   Why3.Term.t_app_infer (get_ls ~cnv ~f ~l ~p) tl
@@ -113,12 +110,10 @@ let empty_cnv ?(polarity=`NoPolarity) (ctx:context) : convert = {
 
 let lfun_wname (lfun:Lang.lfun) =
   match lfun with
+  | QFUN _ -> assert false
   | ACSL f -> Qed.Engine.F_call (Lang.logic_id f)
   | CTOR c -> Qed.Engine.F_call (Lang.ctor_id c)
-  | FUN({m_source=Generated(_,n)}) -> Qed.Engine.F_call n
-  | FUN({m_source=Extern e}) -> e.Lang.ext_link
-  | FUN({m_source=Wsymbol(p,m,s)}) ->
-    Qed.Engine.F_call (String.concat "." (p @ m :: s))
+  | LFUN l -> Qed.Engine.F_call l.m_name
 
 let coerce ~cnv sort expected r =
   match sort, expected with
@@ -180,13 +175,13 @@ let wp_why3_lib library =
 (* conversion *)
 
 let adt_wname = function
-  | Lang.Qdata _ -> assert false
+  | Lang.QDATA _ -> assert false
   | Comp (c, KValue) -> Lang.comp_id c
   | Comp (c, KInit) -> Lang.comp_init_id c
   | Atype lt -> Lang.type_id lt
 
 let of_adt ~cnv = function
-  | Lang.Qdata a -> Qed.Symbol.Data.symbol a
+  | Lang.QDATA a -> Qed.Symbol.Data.symbol a
   | adt ->
     let s = adt_wname adt in
     try Hashtbl.find cnv.incomplete_types s
@@ -474,10 +469,11 @@ let rec of_term ~cnv expected t : Why3.Term.term =
       coerce ~cnv sort expected $
       t_app' ~cnv ~f:["map"] ~l:"Const" ~p:["const"] [of_term ~cnv vsort v] (of_tau ~cnv sort)
     (* Generic *)
-    | Fun (FUN({m_source=Wsymbol(f,l,p)}),ls), tau, expected ->
+    | Fun (QFUN f,ls), tau, expected ->
       coerce ~cnv sort expected $
-      t_app' ~cnv ~f ~l ~p (List.map (of_term' cnv) ls) (of_tau ~cnv tau)
-
+      Why3.Term.t_app
+        (Qed.Symbol.Fun.symbol f.e_symbol)
+        (List.map (of_term' cnv) ls) (of_tau ~cnv tau)
     | Fun (f,l), _, _ -> begin
         let t_app ls l r  =
           Why3.Term.t_app ls l r
@@ -554,7 +550,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
           Why3.Term.t_app ls l (of_tau ~cnv expected)
         | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
       end
-    | (Rdef _, Data ((Qdata _|Atype _), _), _)
+    | (Rdef _, Data ((QDATA _|Atype _), _), _)
     | (Rdef _, (Prop|Bool|Int|Real|Tvar _|Array (_, _)), _)
     | (Aset (_, _, _), (Prop|Bool|Int|Real|Tvar _|Record _|Data (_, _)), _)
     | (Neq (_, _), _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
@@ -829,6 +825,7 @@ class visitor (ctx:context) c =
       end
 
     method on_data d = self#add_use (Qed.Symbol.Data.theory d)
+    method on_lfun f = self#add_use (Qed.Symbol.Fun.theory f)
 
     method on_type lt def =
       match def with

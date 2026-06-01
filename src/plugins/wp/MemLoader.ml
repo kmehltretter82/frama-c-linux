@@ -409,10 +409,7 @@ struct
           let domain = M.init_footprint obj loc in
           let cluster = cluster () in
           (* Is_init: structural definition *)
-          let name =
-            Format.asprintf "Is%s%a" (Lang.comp_init_id c) pp_rid r
-          in
-          let lfun = Lang.generated_p name in
+          let lfun = Lang.generated_p "Is%s%a" (Lang.comp_init_id c) pp_rid r in
           let xms,chunks,sigma = signature domain in
           let params = x :: xms in
           let def = match c.cfields with
@@ -449,9 +446,10 @@ struct
           let obj = ARRAY_KEY.obj a in
           let loc = M.of_region_pointer r obj v in
           let domain = M.init_footprint obj loc in
-          let name = Format.asprintf "IsInitArray%a_%s%a"
-              pp_rid r (ARRAY_KEY.key a) Matrix.pp_suffix_id ds in
-          let lfun = Lang.generated_p name in
+          let lfun =
+            Lang.generated_p "IsInitArray%a_%s%a"
+              pp_rid r (ARRAY_KEY.key a) Matrix.pp_suffix_id ds
+          in
           let xmem,chunks,sigma = signature domain in
           let env = Matrix.cc_env ds in
           let params = x :: env.size_var @ xmem in

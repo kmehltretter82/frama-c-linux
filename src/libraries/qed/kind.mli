@@ -18,19 +18,13 @@ val of_tau : ('f,'a) datatype -> sort
 val of_poly : (int -> sort) -> ('f,'a) datatype -> sort
 val image : sort -> sort
 
-val degree_of_tau  : ('f,'a) datatype -> int
-val degree_of_list : ('f,'a) datatype list -> int
-val degree_of_sig  : ('f,'a) funtype -> int
-
-val type_params : int -> ('f,'a) datatype list
-
 val merge : sort -> sort -> sort
 val merge_list : ('a -> sort) -> sort -> 'a list -> sort
 
-val tmap : ('a,'f) datatype array -> ('a,'f) datatype -> ('a,'f) datatype
-
 val basename : sort -> string
 val pretty : Format.formatter -> sort -> unit
+
+val pp_tvar : Format.formatter -> int -> unit
 
 val pp_tau :
   (Format.formatter -> int -> unit) ->

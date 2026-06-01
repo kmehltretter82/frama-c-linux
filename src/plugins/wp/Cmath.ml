@@ -11,29 +11,19 @@ open Logic
 open Lang
 open Lang.F
 
-let f_builtin ~library ?(injective=false) ?(result=Real) ?(params=[Real]) ?ext name =
-  assert (name.[0] == '\\') ;
-  let call =
-    match ext with Some call -> call | None ->
-      String.sub name 1 (String.length name - 1) in
-  let link = Engine.F_call call in
+let f_builtin ?(injective=false) ?(params=[LogicBuiltins.R]) name ~link =
   let category =
     let open Qed.Logic in
     if injective then Injection else Function
   in
-  let signature = List.map LogicBuiltins.kind_of_tau params in
-  let params = List.map Kind.of_tau params in
-  let lfun = extern_s ~library ~category ~result ~params ~link name in
-  LogicBuiltins.(add_builtin name signature lfun) ; lfun
+  let lfun = Lang.extern_f ~category "%s" link in
+  LogicBuiltins.add_builtin name params lfun ; lfun
 
 (* -------------------------------------------------------------------------- *)
 (* --- Real Of Int                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let f_real_of_int =
-  extern_f ~library:"qed"
-    ~category:Qed.Logic.Injection
-    ~result:Logic.Real ~params:[Logic.Sint] "real_of_int"
+let f_real_of_int = Lang.extern_f "real.FromInt.from_int"
 
 let builtin_real_of_int e =
   match F.repr e with
@@ -44,9 +34,9 @@ let builtin_real_of_int e =
 (* --- Truncate                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let f_truncate = f_builtin ~library:"truncate" ~result:Int "\\truncate"
-let f_ceil = f_builtin ~library:"truncate" ~result:Int "\\ceil"
-let f_floor = f_builtin ~library:"truncate" ~result:Int "\\floor"
+let f_truncate = f_builtin "\\truncate" ~link:"real.Truncate.truncate"
+let f_ceil = f_builtin "\\ceil" ~link:"real.Truncate.ceil"
+let f_floor = f_builtin "\\floor" ~link:"real.Truncate.floor"
 
 let builtin_truncate f e =
   let open Qed.Logic in
@@ -165,13 +155,8 @@ let builtin_strict_leq lfun ~domain ~zero ~monotonic a b =
 (* --- Absolute                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let f_iabs =
-  extern_f ~library:"cmath" ~link:(Qed.Engine.F_call "IAbs.abs") "\\iabs"
-
-let f_rabs =
-  extern_f ~library:"cmath"
-    ~result:Real ~params:[Sreal]
-    ~link:(Qed.Engine.F_call "RAbs.abs") "\\rabs"
+let f_iabs = Lang.extern_f "int.Abs.abs"
+let f_rabs = Lang.extern_f "real.Abs.abs"
 
 let () =
   begin
@@ -209,7 +194,7 @@ let builtin_rabs_leq = builtin_positive_leq f_rabs
 (* --- Square Root                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let f_sqrt = f_builtin ~library:"sqrt" "\\sqrt"
+let f_sqrt = f_builtin "\\sqrt" ~link:"real.Square.sqrt"
 
 let domain_sqrt x = QED.eval_leq e_zero_real x
 
@@ -232,12 +217,14 @@ let builtin_sqrt_leq = builtin_positive_leq f_sqrt
 (* --- Exponential                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let f_exp = f_builtin ~library:"exponential" ~injective:true "\\exp"
-let f_log = f_builtin ~library:"exponential" "\\log"
-let f_log10 = f_builtin ~library:"exponential" "\\log10"
-let f_pow = f_builtin ~library:"power" ~params:[Real;Real] "\\pow"
+let f_exp = f_builtin ~injective:true "\\exp" ~link:"real.ExpLog.exp"
+let f_log = f_builtin "\\log" ~link:"real.ExpLog.log"
+let f_log10 = f_builtin "\\log10" ~link:"real.ExpLog.log10"
+let f_power = f_builtin ~params:[R;Z] "\\pow" ~link:"real.PowerInt.power"
+let f_pow = f_builtin ~params:[R;R] "\\pow" ~link:"real.PowerReal.pow"
 
 let () = ignore f_log10
+let () = ignore f_power
 
 let domain_exp _x = true
 let domain_log x = QED.eval_lt e_zero_real x
@@ -280,13 +267,13 @@ let builtin_exp_leq = builtin_strict_leq f_exp
 (* --- Trigonometry                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let f_sin = f_builtin ~library:"trigonometry" "\\sin"
-let f_cos = f_builtin ~library:"trigonometry" "\\cos"
-let f_tan = f_builtin ~library:"trigonometry" "\\tan"
+let f_sin = f_builtin "\\sin" ~link:"real.Trigonometry.sin"
+let f_cos = f_builtin "\\cos" ~link:"real.Trigonometry.sin"
+let f_tan = f_builtin "\\tan" ~link:"real.Trigonometry.sin"
 
-let f_asin = f_builtin ~library:"arctrigo" "\\asin"
-let f_acos = f_builtin ~library:"arctrigo" "\\acos"
-let f_atan = f_builtin ~library:"arctrigo" ~injective:true "\\atan"
+let f_asin = f_builtin "\\asin" ~link:"frama_c_wp.cmath.ArgTrigo.asin"
+let f_acos = f_builtin "\\acos" ~link:"frama_c_wp.cmath.ArgTrigo.acos"
+let f_atan = f_builtin "\\atan" ~link:"frama_c_wp.cmath.ArgTrigo.atan"
 
 let domain_asin_acos x =
   QED.eval_leq x e_one_real &&
@@ -305,9 +292,9 @@ let builtin_trigo f_arc ~domain e =
 
 let () =
   begin
-    ignore (f_builtin ~library:"hyperbolic" "\\sinh") ;
-    ignore (f_builtin ~library:"hyperbolic" "\\cosh") ;
-    ignore (f_builtin ~library:"hyperbolic" "\\tanh") ;
+    ignore (f_builtin "\\sinh" ~link:"real.Hyperbolic.sinh") ;
+    ignore (f_builtin "\\cosh" ~link:"real.Hyperbolic.cosh") ;
+    ignore (f_builtin "\\tanh" ~link:"real.Hyperbolic.tanh") ;
   end
 
 (* -------------------------------------------------------------------------- *)
@@ -316,8 +303,8 @@ let () =
 
 let () =
   begin
-    ignore (f_builtin ~library:"polar" ~params:[Real;Real] "\\atan2") ;
-    ignore (f_builtin ~library:"polar" ~params:[Real;Real] "\\hypot") ;
+    ignore (f_builtin ~params:[R;R] "\\atan2" ~link:"real.Polar.atan2") ;
+    ignore (f_builtin ~params:[R;R] "\\hypot" ~link:"real.Polar.hypot") ;
   end
 
 (* -------------------------------------------------------------------------- *)

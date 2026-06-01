@@ -150,6 +150,9 @@ class virtual visitor : cluster ->
     method virtual on_data : Qed.Symbol.data -> unit
     (** External type symbol to import *)
 
+    method virtual on_lfun : Qed.Symbol.lfun -> unit
+    (** External logic symbol to import *)
+
     method virtual on_type : logic_type_info -> typedef -> unit
     (** This local type must be defined *)
 

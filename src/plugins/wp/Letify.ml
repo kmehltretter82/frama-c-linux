@@ -51,13 +51,17 @@ struct
     add_sigma env h e_true ;
     add_sigma env (e_not h) e_false
 
+  let crank = function
+    | Function -> 0
+    | Injection -> 1
+    | Operator _ -> 2
+    | Constructor -> 3
+
   let frank = function
     | ACSL _ -> 0
     | CTOR _ -> 3
-    | FUN { m_category = Function } -> 0
-    | FUN { m_category = Injection } -> 1
-    | FUN { m_category = Operator _ } -> 2
-    | FUN { m_category = Constructor } -> 3
+    | QFUN l -> crank l.e_category
+    | LFUN l -> crank l.m_category
 
   let reduce env a b =
     if F.is_subterm a b then add_sigma env b a else

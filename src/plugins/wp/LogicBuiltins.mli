@@ -63,19 +63,20 @@ val dependencies : string -> string list
 val add_library : string -> string list -> unit
 (** Add a new library or update the dependencies of an existing one *)
 
-val add_alias : source:Filepos.t -> string -> kind list -> alias:string -> unit -> unit
-val add_type : ?source:Filepos.t -> string -> link:string -> unit
+val add_type : ?source:Filepos.t ->
+  string -> link:string -> unit
 
-val add_ctor : source:Filepos.t -> string -> kind list ->
-  library:string -> link:Qed.Engine.link -> unit -> unit
+val add_alias : source:Filepos.t ->
+  string -> kind list -> alias:string -> unit
 
-val add_logic : source:Filepos.t -> kind -> string -> kind list ->
-  library:string -> ?category:category -> link:Qed.Engine.link ->
-  unit -> unit
+val add_ctor : source:Filepos.t ->
+  string -> kind list -> link:string -> unit
 
-val add_predicate : source:Filepos.t -> string -> kind list ->
-  library:string -> link:string ->
-  unit -> unit
+val add_logic : source:Filepos.t ->
+  ?category:category -> kind -> string -> kind list -> link:string -> unit
+
+val add_predicate : source:Filepos.t ->
+  string -> kind list -> link:string -> unit
 
 val add_option :
   driver_dir:string -> string -> string -> library:string -> string -> unit

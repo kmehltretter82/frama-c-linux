@@ -19,8 +19,6 @@ open Lang.F
 (* --- Library                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let library = "cfloat"
-
 let f32 = Lang.extern_t "frama_c_wp.cfloat.Cfloat.f32"
 let f64 = Lang.extern_t "frama_c_wp.cfloat.Cfloat.f64"
 let t32 = Lang.t_datatype f32 []
@@ -33,16 +31,14 @@ let ftau = function
 let ft_suffix = function Float32 -> "f32" | Float64 -> "f64"
 let pp_suffix fmt ft = Format.pp_print_string fmt (ft_suffix ft)
 
-let link phi = Qed.Engine.F_call phi
-
 (* Qed exact representations, linked to f32/f64 *)
-let fq32 = extern_f ~library ~result:t32 ~link:(link "to_f32") "q32"
-let fq64 = extern_f ~library ~result:t64 ~link:(link "to_f64") "q64"
+let fq32 = Lang.extern_f "frama_c_wp.cfloat.Cfloat.to_f32"
+let fq64 = Lang.extern_f "frama_c_wp.cfloat.Cfloat.to_f64"
 
-let f_model ft = extern_f ~library ~result:(ftau ft) "model_%a" pp_suffix ft
-let f_delta ft = extern_f ~library ~result:(ftau ft) "delta_%a" pp_suffix ft
-let f_epsilon ft = extern_f ~library ~result:(ftau ft) "epsilon_%a" pp_suffix ft
-let f_sqrt ft = extern_f ~library ~result:(ftau ft) "sqrt_%a" pp_suffix ft
+let f_model ft = Lang.extern_f "model_%a" pp_suffix ft
+let f_delta ft = Lang.extern_f "delta_%a" pp_suffix ft
+let f_epsilon ft = Lang.extern_f "epsilon_%a" pp_suffix ft
+let f_sqrt ft = Lang.extern_f "sqrt_%a" pp_suffix ft
 
 (* -------------------------------------------------------------------------- *)
 (* --- Model Setting                                                      --- *)
@@ -306,10 +302,6 @@ let compute_real op xs =
   | NE , [ x ; y ] -> F.e_neq x y
   | _ -> raise Not_found
 
-let return_type ft = function
-  | REAL -> Logic.Real
-  | _ -> ftau ft
-
 module Compute = WpContext.StaticGenerator
     (struct
       type t = model * c_float * op
@@ -330,15 +322,7 @@ module Compute = WpContext.StaticGenerator
           | Float -> compute_float op ft
         in
         let name = op_name op in
-        let phi = match op with
-          | LT | EQ | LE | NE ->
-            let prop = Format.asprintf "%s_%a" name pp_suffix ft in
-            let bool = Format.asprintf "%s_%ab" name pp_suffix ft in
-            extern_p ~library ~bool ~prop ()
-          | _ ->
-            let result = return_type ft op in
-            extern_f ~library ~result "%s_%a" name pp_suffix ft
-        in
+        let phi = Lang.extern_f "frama_c_wp.cfloat.Cfloat.%s_%a" name pp_suffix ft in
         Lang.F.set_builtin phi impl ;
         REGISTRY.define phi (op, ft) ;
         (phi, impl)

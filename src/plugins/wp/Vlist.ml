@@ -22,70 +22,32 @@ module E = Qed.Engine
 (* --- Driver                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let library = "vlist"
-
-(*--- Linked Symbols ---*)
-let l_concat = E.F_right "concat"
-let l_elt = E.(F_call "elt")
-let l_repeat = E.(F_call "repeat")
-
 (*--- Typechecking ---*)
 let a_list = Lang.extern_t "list.List.list"
 let alist e = L.Data(a_list,[e])
 
 let () = LogicBuiltins.add_builtin_type "\\list" a_list
 
-let vlist_get_tau = function
-  | None -> invalid_arg "a list operator without result type"
-  | Some t -> t
-
-let ty_nil = function _ -> invalid_arg "All nil must be typed"
-
-let ty_listelt = function
-  | L.Data(_,[t]) -> (t : tau)
-  | _ -> raise Not_found
-
-let ty_cons = function
-  | [ _ ; Some l ] -> l
-  | [ Some e ; _ ] -> alist e
-  | _ -> raise Not_found
-
-let ty_elt = function
-  | [ Some e ] -> alist e
-  | _ -> raise Not_found
-
-let ty_nth = function
-  | Some l :: _ -> ty_listelt l
-  | _ -> raise Not_found
-
-let rec ty_concat = function
-  | Some l :: _ -> l
-  | None :: w -> ty_concat w
-  | [] -> raise Not_found
-
-let ty_repeat = function
-  | Some l :: _ -> l
-  | _ -> raise Not_found
-
 (*--- Qed Symbols ---*)
 
-let f_cons = Lang.extern_f ~library ~typecheck:ty_cons "cons" (* rewritten in concat(elt) *)
-let f_nil  = Lang.extern_f ~library ~typecheck:ty_nil ~category:L.Constructor "nil"
-let f_elt = Lang.extern_f ~library ~category:L.Constructor ~typecheck:ty_elt ~link:l_elt "elt"
+let f_nil = Lang.extern_f ~category:Constructor "frama_c_wp.vlist.Vlist.nil"
+let f_elt = Lang.extern_f ~category:Constructor "frama_c_wp.vlist.Vlist.elt"
+let f_nth = Lang.extern_f "frama_c_wp.vlist.Vlist.nth"
+let f_cons = Lang.extern_f "frama_c_wp.vlist.Vlist.cons"
+let f_length = Lang.extern_f "frama_c_wp.vlist.Vlist.length"
+let f_concat =
+  let category = L.Operator {
+      invertible = true ;
+      associative = true ;
+      commutative = false ;
+      idempotent = false ;
+      neutral = E_fun(f_nil,[]) ;
+      absorbent = E_none ;
+    } in
+  Lang.extern_f ~category "frama_c_wp.vlist.Vlist.concat"
+let f_repeat = Lang.extern_f "frama_c_wp.vlist.Vlist.repeat"
 
-let concatenation = L.(Operator {
-    invertible = true ;
-    associative = true ;
-    commutative = false ;
-    idempotent = false ;
-    neutral = E_fun(f_nil,[]) ;
-    absorbent = E_none ;
-  })
-
-let f_nth    = Lang.extern_f ~library ~typecheck:ty_nth "nth"
-let f_length = Lang.extern_f ~library ~sort:L.Sint "length"
-let f_concat = Lang.extern_f ~library ~category:concatenation ~typecheck:ty_concat ~link:l_concat "concat"
-let f_repeat = Lang.extern_f ~library ~typecheck:ty_repeat ~link:l_repeat "repeat"
+let f_vlist_eq = Lang.extern_f "frama_c_wp.vlist.Vlist.vlist_eq"
 
 (*--- ACSL Builtins ---*)
 
@@ -146,7 +108,7 @@ let repeat s n = v_repeat s n (Lang.F.typeof s)
 (* -------------------------------------------------------------------------- *)
 
 let rewrite_cons a w tau = (* a::w == [a]^w *)
-  v_concat [v_elt a ; w] (vlist_get_tau tau)
+  v_concat [v_elt a ; w] (Option.get tau)
 
 let rewrite_length e =
   match F.repr e with
@@ -477,8 +439,6 @@ let elist (t : tau) =
   | L.Data(a,[e]) when check_adt a -> Some e
   | _ -> None
 
-let f_vlist_eq = Lang.extern_f ~library ~sort:L.Sprop "vlist_eq"
-
 let specialize_eq_list =
   {For_export.for_tau = check_tau;
    mk_new_eq = (fun a b -> Lang.F.e_fun ~result:Qed.Logic.Prop f_vlist_eq [a;b])}
@@ -520,7 +480,7 @@ and apply (engine : #engine) fmt f x es =
 
 let export_rewriter_concat es tau =
   match es with
-  | [] -> v_nil (vlist_get_tau tau)
+  | [] -> v_nil (Option.get tau)
   | e::es ->
     begin match F.repr e with
       | L.Fun( elt , [x] ) when Lang.Fun.equal elt f_elt ->

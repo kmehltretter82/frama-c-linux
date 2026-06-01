@@ -750,7 +750,7 @@ struct
         let frame = logic_frame lt_name [] in
         in_frame frame
           begin fun () ->
-            let lfun = Lang.generated_p ~coloring:true ("is_" ^ lt_name) in
+            let lfun = Lang.generated_p ~coloring:true "is_%s" lt_name in
             let tau_lt = Lang.tau_of_ltype (Ltype(lt, [])) in
             Typedefs.update lt (Some lfun) ;
             let term_constraint ltyp =

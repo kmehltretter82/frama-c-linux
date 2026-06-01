@@ -15,18 +15,11 @@ open Lang.F
 
 module L = Qed.Logic
 
-let library = "memory"
-
-let ty_fst_arg = function
-  | Some l :: _ -> l
-  | _ -> raise Not_found
-
-
-let f_eqmem = Lang.extern_fp ~library "eqmem"
-let f_memcpy = Lang.extern_f ~library ~typecheck:ty_fst_arg "memcpy"
-let p_framed = Lang.extern_fp ~coloring:true ~library "framed" (* ptr-memory -> prop *)
-let p_sconst = Lang.extern_fp ~coloring:true ~library "sconst" (* int-memory -> prop *)
-let p_scinit = Lang.extern_fp ~coloring:true ~library "scinit" (* init-memory -> prop *)
+let f_eqmem = Lang.extern_f "frama_c_wp.memory.Memory.eqmem"
+let f_memcpy = Lang.extern_f "frama_c_wp.memory.Memory.memcpy"
+let p_framed = Lang.extern_f ~coloring:true "frama_c_wp.memory.Memory.framed"
+let p_sconst = Lang.extern_f ~coloring:true "frama_c_wp.memory.Memory.sconst"
+let p_scinit = Lang.extern_f ~coloring:true "frama_c_wp.memory.Memory.scinit"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Utilities                                                          --- *)

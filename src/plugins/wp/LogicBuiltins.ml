@@ -43,12 +43,6 @@ let okind = function
 
 let ckind typ = okind (object_of typ)
 
-let skind = function
-  | B -> Logic.Sbool
-  | I _ | Z -> Logic.Sint
-  | F _ | R -> Logic.Sreal
-  | A -> Logic.Sdata
-
 let rec lkind t =
   match Ast_types.Acsl.unroll ~unroll_typedef:false t with
   | Ctype ty -> ckind ty
@@ -208,8 +202,7 @@ let logic phi =
 let ctor phi =
   lookup phi.ctor_name (List.map lkind phi.ctor_params)
 
-let constant name =
-  lookup name []
+let constant name = lookup name []
 
 (* -------------------------------------------------------------------------- *)
 (* --- Declaration of Builtins                                            --- *)
@@ -222,24 +215,47 @@ let add_library lib deps =
   let others = try dependencies lib with Not_found -> [] in
   Hashtbl.add (cdriver_rw ()).hdeps lib (others @ deps)
 
-let add_alias ~source name kinds ~alias () =
+let add_alias ~source name kinds ~alias =
   register ~source name kinds (lookup alias kinds)
 
-let add_logic ~source result name kinds ~library ?category ~link () =
-  let sort = skind result in
-  let params = List.map skind kinds in
-  let lfun = Lang.extern_s ~library ?category ~sort ~params ~link name in
+let check_param ~source name kind tau =
+  match kind, tau with
+  | (B, (Logic.Bool | Prop)) | (Z, Int) | (R, Real)
+  | (I _, Int) | (F _, Real) | (A, _) -> ()
+  | (F Float32, Data(qf,[])) when Qed.Symbol.Data.name qf = "f32" -> ()
+  | (F Float64, Data(qf,[])) when Qed.Symbol.Data.name qf = "f64" -> ()
+  | _ ->
+    Wp_parameters.error ~source
+      "Incorrect driver for %S (kind %a for type %a)"
+      name pp_kind kind Qed.Symbol.Tau.pretty tau
+
+let check_signature ~source ?(category=Logic.Function) result name kinds lf =
+  begin
+    match lf with
+    | QFUN l ->
+      let _,tr,ts = Qed.Symbol.signature l.e_symbol in
+      begin
+        match category with
+        | Logic.Operator _ -> List.iter (check_param ~source name result) ts ;
+        | _ -> List.iter2 (check_param ~source name) kinds ts ;
+      end ;
+      check_param ~source name result tr ;
+    | _ -> ()
+  end
+
+let add_logic ~source ?category result name kinds ~link =
+  let lfun = Lang.extern_f ?category "%s" link in
+  check_signature ~source ?category result name kinds lfun ;
   register ~source name kinds (LFUN lfun)
 
-let add_predicate ~source name kinds ~library ~link () =
-  let params = List.map skind kinds in
-  let lfun = Lang.extern_fp ~library ~params ~link link in
+let add_predicate ~source name kinds ~link =
+  let lfun = Lang.extern_f "%s" link in
+  check_signature ~source B name kinds lfun ;
   register ~source name kinds (LFUN lfun)
 
-let add_ctor ~source name kinds ~library ~link () =
-  let category = Logic.Constructor in
-  let params = List.map skind kinds in
-  let lfun = Lang.extern_s ~library ~category ~params ~link name in
+let add_ctor ~source name kinds ~link =
+  let lfun = Lang.extern_f ~category:Constructor "%s" link in
+  check_signature ~source A name kinds lfun ;
   register ~source name kinds (LFUN lfun)
 
 let add_type ?source name ~link =

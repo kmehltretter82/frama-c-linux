@@ -69,19 +69,15 @@ let dkey_val = Wp_parameters.register_category "memval:val"
 let debug fmt = Wp_parameters.debug ~dkey fmt
 let debug_val = Wp_parameters.debug ~dkey:dkey_val
 
-
 (* -------------------------------------------------------------------------- *)
 (* ---  Logic Memory Wrapper                                              --- *)
 (* -------------------------------------------------------------------------- *)
-let library = "memory"
 let t_addr = Lang.extern_tau "frama_c_wp.memaddr.MemAddr.addr"
-let f_base   = Lang.extern_f ~library ~result:Logic.Int
-    ~link:(Qed.Engine.F_proj "base") "base"
-let f_offset = Lang.extern_f ~library ~result:Logic.Int
-    ~link:(Qed.Engine.F_proj "offset") "offset"
-let f_shift  = Lang.extern_f ~library ~result:t_addr "shift"
-let f_global = Lang.extern_f ~library ~result:t_addr "global"
-let f_null   = Lang.extern_f ~library ~result:t_addr "null"
+let f_base = Lang.extern_f "frama_c_wp.memaddr.MemAddr.base"
+let f_offset = Lang.extern_f "frama_c_wp.memaddr.MemAddr.offset"
+let f_shift  = Lang.extern_f "frama_c_wp.memaddr.MemAddr.shift"
+let f_global = Lang.extern_f "frama_c_wp.memaddr.MemAddr.global"
+let f_null   = Lang.extern_f "frama_c_wp.memaddr.MemAddr.null"
 
 let a_null = F.constant (F.e_fun f_null []) (* { base = 0; offset = 0 } *)
 let a_base p = F.e_fun f_base [p]           (* p -> p.offset *)

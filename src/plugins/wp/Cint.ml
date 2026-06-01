@@ -40,16 +40,8 @@ let to_cint_map = ref FunMap.empty
 let is_cint f = FunMap.find f !is_cint_map
 let to_cint f = FunMap.find f !to_cint_map
 
-let library = "cint"
-
 let make_fun_int op i =
-  Lang.extern_f ~library ~result:Logic.Int "%s_%a" op Ctypes.pp_int i
-let make_pred_int op i =
-  Lang.extern_f
-    ~library ~result:Logic.Prop ~coloring:true "%s_%a" op Ctypes.pp_int i
-
-(* let fun_int op = Ctypes.imemo (make_fun_int op) *) (* unused for now *)
-(* let pred_int op = Ctypes.imemo (make_pred_int op) *) (* unused for now *)
+  Lang.extern_f "frama_c_wp.cint.Cint.%s_%a" op Ctypes.pp_int i
 
 (* Signature int,int -> int over Z *)
 let ac = {
@@ -61,45 +53,30 @@ let ac = {
   absorbent = E_none ;
 }
 
-(* Functions -> Z *)
-let result = Logic.Int
-
 (* -------------------------------------------------------------------------- *)
 (* --- Library Cbits                                                      --- *)
 (* -------------------------------------------------------------------------- *)
-
-let library = "cbits"
-let balance = Lang.Left
 
 let op_lxor = { ac with neutral = E_int 0 ; invertible = true }
 let op_lor  = { ac with neutral = E_int 0 ; absorbent = E_int (-1); idempotent = true }
 let op_land = { ac with neutral = E_int (-1); absorbent = E_int 0 ; idempotent = true }
 
-let f_lnot = Lang.extern_f ~library ~result "lnot"
-let f_lor  = Lang.extern_f ~library ~result ~category:(Operator op_lor) ~balance "lor"
-let f_land = Lang.extern_f ~library ~result ~category:(Operator op_land) ~balance "land"
-let f_lxor = Lang.extern_f ~library ~result ~category:(Operator op_lxor) ~balance "lxor"
-let f_lsl = Lang.extern_f ~library ~result "lsl"
-let f_lsr = Lang.extern_f ~library ~result "lsr"
+let f_lnot = Lang.extern_f "frama_c_wp.cint.Cint.lnot"
+let f_lor  = Lang.extern_f ~category:(Operator op_lor) "frama_c_wp.cint.Cint.lor"
+let f_land = Lang.extern_f ~category:(Operator op_land) "frama_c_wp.cint.Cint.land"
+let f_lxor = Lang.extern_f ~category:(Operator op_lxor) "frama_c_wp.cint.Cint.lxor"
+let f_lsl = Lang.extern_f "frama_c_wp.cint.Cint.lsl"
+let f_lsr = Lang.extern_f "frama_c_wp.cint.Cint.lsr"
 
 let f_bitwised = [ f_lnot ; f_lor ; f_land ; f_lxor ; f_lsl ; f_lsr ]
 
 (* [f_bit_stdlib] is related to the function [bit_test] of Frama-C StdLib *)
-let f_bit_stdlib   = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
-(* [f_bit_positive] is actually exported in forgoting the fact the position is positive *)
-let f_bit_positive = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
-(* At export, some constructs such as [e & (1 << k)] are written into [f_bit_export] construct *)
-let f_bit_export   = Lang.extern_p ~library ~bool:"bit_testb" ~prop:"bit_test" ()
+let f_bit_test = Lang.extern_f "frama_c_wp.cint.Cint.bit_test"
 
-let () = let open LogicBuiltins in add_builtin "\\bit_test_stdlib" [Z;Z] f_bit_stdlib
-let () = let open LogicBuiltins in add_builtin "\\bit_test" [Z;Z] f_bit_positive
-
-let f_bits = [ f_bit_stdlib ; f_bit_positive ; f_bit_export ]
+let () = let open LogicBuiltins in add_builtin "\\bit_test" [Z;Z] f_bit_test
 
 let bit_test e k =
-  let r = F.e_fun ~result:Logic.Bool
-      (if k <= 0 then f_bit_positive else f_bit_stdlib) [e ; e_int k]
-  in assert (is_prop r) ; r
+  F.e_fun ~result:Logic.Bool f_bit_test [e ; e_int k]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Matching utilities for simplifications                             --- *)
@@ -372,7 +349,7 @@ let simplify_p_is_bounds iota e =
   | _  -> raise Not_found
 
 (* is_<cint> : int -> prop *)
-let p_is_int = Ctypes.i_memo (fun iota -> make_pred_int "is" iota)
+let p_is_int = Ctypes.i_memo (fun iota -> make_fun_int "is" iota)
 
 let configure_is_int iota =
   let f = p_is_int iota in
@@ -487,12 +464,12 @@ let smp2 f zf = (* f(c1,c2) ~> zf(c1,c2),  f(c1,c2,...) ~> f(zf(c1,c2),...) *)
     end
   | _ -> raise Not_found
 
-let bitk_positive k e = F.e_fun ~result:Logic.Bool f_bit_positive [e;k]
+let bitk k e = F.e_fun ~result:Logic.Bool f_bit_test [e;k]
 let smp_mk_bit_stdlib = function
   | [ a ; k ] when is_positive_or_null k ->
     (* No need to expand the logic definition of the ACSL stdlib symbol when
        [k] is positive (the definition must comply with the simplification) *)
-    bitk_positive k a
+    bitk k a
   | [ a ; k ] ->
     (* TODO: expand the current logic definition of the ACSL stdlib symbol *)
     F.e_neq F.e_zero (F.e_fun f_land [a; (F.e_fun f_lsl [F.e_one;k])])
@@ -510,34 +487,34 @@ let smp_bitk_positive = function
         then e_false else e_true
       | Logic.Fun( f , [e;n] ) when Fun.equal f f_lsr
                                  && is_positive_or_null n ->
-        bitk_positive (e_add k n) e
+        bitk (e_add k n) e
       | Logic.Fun( f , [e;n] ) when Fun.equal f f_lsl
                                  && is_positive_or_null n ->
         begin match is_leq n k with
-          | Logic.Yes -> bitk_positive (e_sub k n) e
+          | Logic.Yes -> bitk (e_sub k n) e
           | Logic.No  -> e_false
           | Logic.Maybe -> raise Not_found
         end
       | Logic.Fun( f , es ) when Fun.equal f f_land ->
-        F.e_and (List.map (bitk_positive k) es)
+        F.e_and (List.map (bitk k) es)
       | Logic.Fun( f , es ) when Fun.equal f f_lor ->
-        F.e_or (List.map (bitk_positive k) es)
+        F.e_or (List.map (bitk k) es)
       | Logic.Fun( f , [a;b] ) when Fun.equal f f_lxor ->
-        F.e_neq (bitk_positive k a) (bitk_positive k b)
+        F.e_neq (bitk k a) (bitk k b)
       | Logic.Fun( f , [a] ) when Fun.equal f f_lnot ->
-        F.e_not (bitk_positive k a)
+        F.e_not (bitk k a)
       | Logic.Fun( conv , [a] ) (* when is_to_c_int conv *) ->
         let iota = to_cint conv in
         let range = Ctypes.i_bits iota in
         let signed = Ctypes.signed iota in
         if signed then (* beware of sign-bit *)
           begin match is_leq k (e_int (range-2)) with
-            | Logic.Yes -> bitk_positive k a
+            | Logic.Yes -> bitk k a
             | Logic.No | Logic.Maybe -> raise Not_found
           end
         else begin match is_leq (e_int range) k with
           | Logic.Yes -> e_false
-          | Logic.No -> bitk_positive k a
+          | Logic.No -> bitk k a
           | Logic.Maybe -> raise Not_found
         end
       | _ -> raise Not_found
@@ -547,14 +524,14 @@ let smp_bitk_positive = function
 let introduction_bit_test_positive es b =
   (* introduces bit_test(n,k) only when k>=0 *)
   let k,_,es = match_power2_extraction es in
-  let es' = List.map (bitk_positive k) es in
+  let es' = List.map (bitk k) es in
   if b == e_zero then e_not (e_and es')
   else
     try let k' = match_power2 b in e_and ( e_eq k k' :: es' )
     with Not_found ->
       let bs = match_fun f_land b in
       let k',_,bs = match_power2_extraction bs in
-      let bs' = List.map (bitk_positive k') bs in
+      let bs' = List.map (bitk k') bs in
       match F.is_true (F.e_eq k k') with
       | Logic.Yes -> e_eq (e_and es') (e_and bs')
       | Logic.No  -> e_and [e_not (e_and es'); e_not (e_and bs')]
@@ -567,7 +544,7 @@ let smp_land es =
     let t = match es with
       | x::[] -> x
       | _ -> e_fun f_land es
-    in e_if (bitk_positive k t) e e_zero
+    in e_if (bitk k t) e e_zero
   in
   try let r = smp2 f_land Z.logand es in
     try match F.repr r with
@@ -847,13 +824,12 @@ let smp_leq_with_lsr x y =
 
 
 (* Rewriting at export *)
-let bitk_export k e = F.e_fun ~result:Logic.Bool f_bit_export [e;k]
 let export_eq_with_land a b =
   let es = match_fun f_land a in
   if b == e_zero then
     let k,_,es = match_binop_one_extraction f_lsl es in
     (* e1 & ... & en & (1 << k) = 0   <==> !bit_test(e1 & ... & en, k) *)
-    e_not (bitk_export k (e_fun f_land es))
+    e_not (bitk k (e_fun f_land es))
   else raise Not_found
 
 (* ACSL Semantics *)
@@ -872,8 +848,8 @@ let () =
 
         (* From [smp_mk_bit_stdlib], the built-in [f_bit_stdlib] is such that
            there is no creation of [e_fun f_bit_stdlib args] *)
-        let bi_lbit_stdlib = mk_builtin "f_bit_stdlib" f_bit_stdlib smp_mk_bit_stdlib in
-        let bi_lbit = mk_builtin "f_bit" f_bit_positive smp_bitk_positive in
+        let bi_lbit_stdlib = mk_builtin "f_bit_stdlib" f_bit_test smp_mk_bit_stdlib in
+        let bi_lbit = mk_builtin "f_bit" f_bit_test smp_bitk_positive in
         let bi_lnot = mk_builtin "f_lnot" f_lnot ~eq:smp_eq_with_lnot smp_lnot ~leq:(smp_leq_improved f_lnot) in
         let bi_lxor = mk_builtin "f_lxor" f_lxor ~eq:smp_eq_with_lxor ~leq:(smp_leq_improved f_lxor)
             (smp2 f_lxor Z.logxor) in
@@ -1639,13 +1615,13 @@ module MasksDomain = struct
           let mask = snd (Ctypes.bounds iota) in
           reduce ctx x { Masks.top with unset =Z.lognot mask }
         else ctx
-      | Fun(f,[x;k]) when f == f_bit_positive ->
+      | Fun(f,[x;k]) when f == f_bit_test ->
         let k = match_positive_or_null_integer k in (* may raise Not_found *)
         if Z.leq Z.zero k then
           reduce ctx x { Masks.top with set = two_power_k k }
         else ctx
       | Not x -> begin match F.repr x with
-          | Fun(f,[x;k]) when f == f_bit_positive ->
+          | Fun(f,[x;k]) when f == f_bit_test ->
             let k = match_positive_or_null_integer k in
             if Z.leq Z.zero k then
               reduce ctx x { Masks.top with unset = two_power_k k }
@@ -1667,8 +1643,7 @@ let mask_simplifier =
   let rewrite_cst ~highest ctx e =
     match F.repr e with
     | Kint _ -> e
-    | Fun(f,[x;k]) when highest &&
-                        f == f_bit_positive -> (* rewrites [bit_test(x,k)] *)
+    | Fun(f,[x;k]) when highest && f == f_bit_test -> (* rewrites [bit_test(x,k)] *)
       (try let k = match_positive_or_null_integer k in (* may raise Not_found *)
          let v = MasksDomain.eval ~level:1 ctx x in
          let mask = two_power_k k in (* may raise Not_found *)

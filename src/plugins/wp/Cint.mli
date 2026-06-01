@@ -65,11 +65,10 @@ val f_lor  : lfun
 val f_lsl  : lfun
 val f_lsr  : lfun
 
-val f_bitwised : lfun list
-(** All except f_bit_positive *)
+val f_bit_test : lfun
 
-val f_bits : lfun list
-(** All bit-test functions *)
+val f_bitwised : lfun list
+(** All bitwise operators *)
 
 val bit_test : term -> int -> term
 

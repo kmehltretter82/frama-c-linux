@@ -41,6 +41,9 @@ val by_field_rank : field -> field -> int
 type tau = (field,data) Logic.datatype
 type sigma = tau Why3.Ty.Mtv.t
 
+val data : data -> tau list -> tau
+(** Converts builtin Qed types from external data symbols *)
+
 (** Logic Functions *)
 type lfun
 
@@ -99,4 +102,5 @@ sig
   type t = tau
   val equal : t -> t -> bool
   val compare : t -> t -> int
+  val pretty : Format.formatter -> t -> unit
 end

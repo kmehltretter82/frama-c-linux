@@ -77,34 +77,19 @@ let pretty fmt = function
 (* --- Set Operations                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-let library = "vset"
 let t_set = Lang.extern_t "set.Set.set"
 let tau_of_set (te:tau) : tau = Logic.Data( t_set , [te] )
 let () = LogicBuiltins.add_builtin_type "set" t_set
 
-let typecheck_binop (params:tau option list) : tau =
-  match params with
-  | [ Some t ; _ ] | [ _ ; Some t ]-> t
-  | _ -> raise (Invalid_argument "WP.Vset.typecheck_binop")
-
-
-let typecheck_singleton (params:tau option list) : tau =
-  match params with
-  | [ Some t ] -> tau_of_set t
-  | _ -> raise (Invalid_argument "WP.Vset.typecheck_unop")
-
-let typecheck_range (_:tau option list) : tau =
-  tau_of_set Logic.Int
-
-let p_member = Lang.extern_p ~library ~bool:"memb" ~prop:"mem" ()
-let f_empty = Lang.extern_f ~library "empty"
-let f_union = Lang.extern_f ~library ~typecheck:typecheck_binop "union"
-let f_inter = Lang.extern_f ~library ~typecheck:typecheck_binop "inter"
-let f_range = Lang.extern_f ~library ~typecheck:typecheck_range "range"
-let f_range_sup = Lang.extern_f ~library ~typecheck:typecheck_range "range_sup"
-let f_range_inf = Lang.extern_f ~library ~typecheck:typecheck_range "range_inf"
-let f_range_all = Lang.extern_f ~library ~typecheck:typecheck_range "range_all"
-let f_singleton = Lang.extern_f ~library ~typecheck:typecheck_singleton "singleton"
+let p_member = Lang.extern_f "set.Set.mem"
+let f_empty = Lang.extern_f "set.Set.empty"
+let f_union = Lang.extern_f "set.Set.union"
+let f_inter = Lang.extern_f "set.Set.inter"
+let f_singleton = Lang.extern_f "set.Set.singleton"
+let f_range = Lang.extern_f "frama_c_wp.vset.Vset.range"
+let f_range_sup = Lang.extern_f "frama_c_wp.vset.Vset.range_sup"
+let f_range_inf = Lang.extern_f "frama_c_wp.vset.Vset.range_inf"
+let f_range_all = Lang.extern_f "frama_c_wp.vset.Vset.range_all"
 
 let single a b = match a,b with
   | Some x , Some y when F.QED.equal x y -> a

@@ -93,7 +93,7 @@ let lemma_id l = Printf.sprintf "Q_%s" (avoid_leading_backlash l)
 type datakind = KValue | KInit
 
 type adt =
-  | Qdata of Qed.Symbol.data (* Why3/Qed Type *)
+  | QDATA of Qed.Symbol.data (* Why3/Qed Type *)
   | Atype of logic_type_info (* ACSL Logic Type *)
   | Comp of compinfo * datakind (* C-code struct or union *)
 
@@ -104,22 +104,7 @@ and tau = (field,adt) Logic.datatype
 
 let pointer = Context.create "Lang.pointer"
 let floats = Context.create "Lang.floats"
-
-type 'a extern = {
-  ext_id      : int;
-  ext_link : 'a ;
-  ext_library : string; (** a library which it depends on *)
-  ext_debug   : string; (** just for printing during debugging *)
-}
-
 let new_extern_id = ref (-1)
-let new_extern ~debug ~library ~link =
-  incr new_extern_id;
-  {ext_id     = !new_extern_id;
-   ext_library = library;
-   ext_debug  = debug;
-   ext_link   = link}
-let ext_compare a b = Datatype.Int.compare a.ext_id b.ext_id
 
 (* -------------------------------------------------------------------------- *)
 (* --- Sorting & Typing                                                   --- *)
@@ -202,25 +187,29 @@ let tau_of_return = function None -> Logic.Prop | Some t -> tau_of_ltype t
 (* --- Datatypes                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
+let import_t ~context ts = QDATA (Qed.Symbol.of_ts ~context ts)
+let extern_t name = QDATA (Qed.Symbol.find_data (Why3Provers.env ()) name)
+let extern_tau ?(args=[]) name = Qed.Logic.Data(extern_t name,args)
+
 module ADT =
 struct
 
   type t = adt
 
   let basename = function
-    | Qdata a -> basename "M" @@ Qed.Symbol.Data.name a
+    | QDATA a -> basename "M" @@ Qed.Symbol.Data.name a
     | Comp (c,KValue) -> basename (if c.cstruct then "S" else "U") c.corig_name
     | Comp (c,KInit) -> basename (if c.cstruct then "IS" else "IU") c.corig_name
     | Atype lt -> basename "A" lt.lt_name
 
   let debug = function
-    | Qdata a -> Qed.Symbol.Data.name a
+    | QDATA a -> Qed.Symbol.Data.name a
     | Comp (c, KValue) -> comp_id c
     | Comp (c, KInit) -> comp_init_id c
     | Atype lt -> type_id lt
 
   let hash = function
-    | Qdata a -> Qed.Symbol.Data.hash a
+    | QDATA a -> Qed.Symbol.Data.hash a
     | Comp (c, KValue) -> Compinfo.hash c
     | Comp (c, KInit) -> 13 * Compinfo.hash c
     | Atype lt -> Logic_type_info.hash lt
@@ -228,9 +217,9 @@ struct
   let compare a b =
     if a==b then 0 else
       match a,b with
-      | Qdata a , Qdata b -> Qed.Symbol.Data.compare a b
-      | Qdata _ , _ -> (-1)
-      | _ , Qdata _ -> (+1)
+      | QDATA a , QDATA b -> Qed.Symbol.Data.compare a b
+      | QDATA _ , _ -> (-1)
+      | _ , QDATA _ -> (+1)
       | Comp (a, KValue) , Comp (b, KValue)
       | Comp (a, KInit)  , Comp (b, KInit) -> Compinfo.compare a b
       | Comp (_, KValue) , Comp (_, KInit) -> (-1)
@@ -317,25 +306,30 @@ end
 
 type lfun =
   | ACSL of Cil_types.logic_info
-  (** Registered in Definition.t, only  *)
+  (* Registered in Definition.t, only  *)
   | CTOR of Cil_types.logic_ctor_info
-  (** Not registered in Definition.t, directly converted/printed *)
-  | FUN of lsymbol
-  (** Generated or External function *)
+  (* Not registered in Definition.t, directly converted/printed *)
+  | LFUN of lsymbol
+  (* Generated function *)
+  | QFUN of esymbol
+  (* External function *)
 
 and lsymbol = {
+  m_id : int ;
+  m_name : string ;
+  m_context : WpContext.context option ;
   m_category : lfun category ;
   m_params : sort list ;
   m_result : sort ;
   m_typeof : tau option list -> tau ;
-  m_source : source ;
   m_coloring : bool ;
 }
 
-and source =
-  | Generated of WpContext.context option * string
-  | Extern of Engine.link extern
-  | Wsymbol of string list * string * string list (* package, module, name *)
+and esymbol = {
+  e_category : lfun category ;
+  e_coloring : bool ;
+  e_symbol : Qed.Symbol.lfun ;
+}
 
 let lfun_observers = ref []
 let lfun_observe lf = List.iter (fun k -> k lf) !lfun_observers ; lf
@@ -343,150 +337,129 @@ let on_lfun f = lfun_observers := f :: !lfun_observers
 
 let acsl lf = lfun_observe (ACSL lf)
 let ctor cf = lfun_observe (CTOR cf)
-let lsymbol m = lfun_observe (FUN m)
+let lsymbol m = lfun_observe (LFUN m)
+
+let of_qtau : Qed.Symbol.tau -> tau =
+  Kind.map_tau (fun _ -> raise Not_found) (fun d -> QDATA d)
+
+let compare_tau = Qed.Kind.compare_tau Field.compare ADT.compare
+
+let typecheck category (tr: tau) (ps : tau list) (ts : tau list) =
+  let s = ref Qed.Intmap.empty in
+  let rec unify_all ps ts =
+    match ps,ts with
+    | [],[] -> ()
+    | p::ps,t::ts -> unify p t ; unify_all ps ts
+    | _ -> raise Not_found
+  and unify p t =
+    match p , t with
+    | _ , Tvar (-1) -> ()
+    | Tvar k , _ -> merge k t
+    | Int , Int -> ()
+    | Real, Real -> ()
+    | Bool, Bool -> ()
+    | Prop, Prop -> ()
+    | Array(a,b), Array(a',b') -> unify a a' ; unify b b'
+    | Data(d,ps) , Data(d',ts) when ADT.equal d d' -> unify_all ps ts
+    | _ -> raise Not_found
+  and merge k t =
+    match Qed.Intmap.find k !s with
+    | exception Not_found -> s := Qed.Intmap.add k t !s
+    | t0 -> if not (compare_tau t0 t = 0) then raise Not_found
+  in
+  begin
+    match category with
+    | Operator _ -> List.iter (unify tr) ts
+    | _ -> unify_all ps ts
+  end ;
+  let rec resolve = function
+    | Int -> Int
+    | Real -> Real
+    | Bool -> Bool
+    | Prop -> Prop
+    | Tvar x -> (try Qed.Intmap.find x !s with Not_found -> Tvar (-1))
+    | Array(a,b) -> Array(resolve a, resolve b)
+    | Record fts -> Record (List.map (fun (f,t) -> f,resolve t) fts)
+    | Data(d,ts) -> Data(d,List.map resolve ts)
+  in resolve tr
 
 let tau_of_lfun phi ts =
   match phi with
   | ACSL f -> tau_of_return f.l_type
   | CTOR c ->
-    if c.ctor_type.lt_params = [] then Logic.Data(Atype c.ctor_type,[])
+    if c.ctor_type.lt_params = []
+    then Logic.Data(Atype c.ctor_type,[])
     else raise Not_found
-  | FUN m -> match m.m_result with
-    | Sint -> Int
-    | Sreal -> Real
-    | Sbool -> Bool
-    | _ -> m.m_typeof ts
+  | LFUN m ->
+    begin
+      match m.m_result with
+      | Sint -> Int
+      | Sreal -> Real
+      | Sbool -> Bool
+      | _ -> m.m_typeof ts
+    end
+  | QFUN f ->
+    try
+      let _,r,ps = Qed.Symbol.signature f.e_symbol in
+      typecheck f.e_category
+        (of_qtau r)
+        (List.map of_qtau ps)
+        (List.map (Option.get ~exn:Not_found) ts)
+    with _ -> raise Not_found
 
 let is_coloring_lfun = function
   | ACSL _ | CTOR _ -> false
-  | FUN { m_coloring } -> m_coloring
+  | LFUN { m_coloring } -> m_coloring
+  | QFUN { e_coloring } -> e_coloring
 
-type balance = Nary | Left | Right
-
-let not_found _ = raise Not_found
-
-let generated ?(context=false) name =
-  let ctxt = if context
-    then Some (WpContext.get_context ())
-    else None in
-  Generated(ctxt,name)
-
-let symbolf
-    ?library
-    ?context
-    ?link
-    ?(balance=Nary) (* specify a default for link *)
+let generated_f
+    ?(context=false)
     ?(category=Logic.Function)
     ?(params=[])
     ?(sort=Logic.Sdata)
     ?(result:tau option)
     ?(coloring=false)
     ?(typecheck:(tau option list -> tau) option)
-    name =
-  let buffer = Buffer.create 80 in
-  Format.kfprintf
-    (fun fmt ->
-       Format.pp_print_flush fmt () ;
-       let name = Buffer.contents buffer in
-       let source = match library with
-         | None ->
-           assert (link = None);
-           generated ?context name
-         | Some th ->
-           let conv n = function
-             | Nary  -> Engine.F_call n
-             | Left  -> Engine.F_left n
-             | Right -> Engine.F_right n
-           in
-           let link = match link with
-             | None -> conv name balance
-             | Some info -> info
-           in
-           Extern (new_extern ~library:th ~link ~debug:name) in
-       let typeof =
-         match typecheck with Some phi -> phi | None ->
-         match result with Some t -> fun _ -> t | None -> not_found in
-       let result =
-         match result with Some t -> Kind.of_tau t | None -> sort in
-       lsymbol {
-         m_category = category ;
-         m_params = params ;
-         m_result = result ;
-         m_typeof = typeof ;
-         m_source = source ;
-         m_coloring = coloring ;
-       }
-    ) (Format.formatter_of_buffer buffer) name
+    descr =
+  Format.kasprintf
+    begin fun name ->
+      let id = incr new_extern_id ; !new_extern_id in
+      let context = if context
+        then Some (WpContext.get_context ())
+        else None in
+      let typeof =
+        match typecheck with Some phi -> phi | None ->
+        match result with Some t -> fun _ -> t | None -> raise Not_found in
+      let result =
+        match result with Some t -> Kind.of_tau t | None -> sort in
+      lsymbol {
+        m_id = id ;
+        m_name = name ;
+        m_category = category ;
+        m_params = params ;
+        m_result = result ;
+        m_typeof = typeof ;
+        m_context = context ;
+        m_coloring = coloring ;
+      }
+    end descr
 
-let extern_s
-    ~library ?link ?category ?params ?sort ?result ?coloring ?typecheck name =
-  symbolf
-    ~library ?category ?params ?sort ?result ?coloring ?typecheck ?link "%s" name
+let generated_p = generated_f ~sort:Sprop ~result:Prop ~typecheck:(fun _ -> Prop)
 
-let extern_f
-    ~library ?link ?balance ?category ?params ?sort ?result ?coloring ?typecheck name =
-  symbolf
-    ~library ?category ?params ?link ?balance ?sort ?result ?coloring ?typecheck name
+let extern_f ?(category=Function) ?(coloring=false) descr =
+  Format.kasprintf
+    begin fun name ->
+      QFUN {
+        e_symbol = Qed.Symbol.find_lfun (Why3Provers.env ()) name ;
+        e_coloring = coloring ;
+        e_category = category ;
+      }
+    end descr
 
-let extern_p ~library ?bool ?prop ?link ?(params=[]) ?(coloring=false) () =
-  let link =
-    match bool,prop,link with
-    | Some b , Some p , None -> Engine.F_bool_prop(b,p)
-    | _ , _ , Some info -> info
-    | _ , _ , _ -> assert false
-  in
-  let debug = Export.debug link in
-  lsymbol {
-    m_category = Logic.Function;
-    m_params = params ;
-    m_result = Logic.Sprop;
-    m_typeof = not_found;
-    m_source = Extern (new_extern ~library ~link ~debug) ;
-    m_coloring = coloring ;
-  }
-
-let extern_fp ~library ?(params=[]) ?link ?(coloring=false) phi =
-  let link = match link with
-    | None -> Engine.F_call phi
-    | Some link -> Engine.F_call link in
-  lsymbol {
-    m_category = Logic.Function ;
-    m_params = params ;
-    m_result = Logic.Sprop;
-    m_typeof = not_found;
-    m_source = Extern (new_extern
-                         ~library
-                         ~link
-                         ~debug:phi) ;
-    m_coloring = coloring ;
-  }
-
-let generated_f ?context ?category ?params ?sort ?result ?coloring name =
-  symbolf ?context ?category ?params ?sort ?result ?coloring name
-
-let generated_p ?context ?(coloring=false) name =
-  lsymbol {
-    m_category = Logic.Function ;
-    m_params = [] ;
-    m_result = Logic.Sprop;
-    m_typeof = not_found;
-    m_source = generated ?context name ;
-    m_coloring = coloring ;
-  }
-
-let extern_t name = Qdata (Qed.Symbol.find_data (Why3Provers.env ()) name)
-let extern_tau ?(args=[]) name = Qed.Logic.Data(extern_t name,args)
-let import_t ~context ts = Qdata (Qed.Symbol.of_ts ~context ts)
-
-let imported_f ~package ~theory ~name
-    ?(params=[]) ?(result=Logic.Sprop) ?(typecheck=not_found) () =
-  lsymbol {
-    m_category = Logic.Function ;
-    m_params = params ;
-    m_result = result ;
-    m_typeof = typecheck ;
-    m_source = Wsymbol(package,theory,name) ;
-    m_coloring = false ;
+let import_f ~context ls = QFUN {
+    e_symbol = Qed.Symbol.of_ls ~context ls ;
+    e_category = Function ;
+    e_coloring = false ;
   }
 
 module Fun =
@@ -497,45 +470,24 @@ struct
   let debug = function
     | ACSL f -> logic_id f
     | CTOR c -> ctor_id c
-    | FUN({m_source=Generated(_,n)}) -> n
-    | FUN({m_source=Extern e}) -> e.ext_debug
-    | FUN({m_source=Wsymbol(p,m,s)}) -> String.concat "." (p @ m :: s)
+    | LFUN l -> l.m_name
+    | QFUN f -> Qed.Symbol.Fun.name f.e_symbol
 
   let hash = function
     | ACSL f -> Logic_info.hash f
     | CTOR c -> Logic_ctor_info.hash c
-    | FUN({m_source=Generated(_,n)}) -> Datatype.String.hash n
-    | FUN({m_source=Extern e}) -> e.ext_id
-    | FUN({m_source=Wsymbol(p,m,s)}) ->
-      Datatype.String.hash @@ String.concat "." (p @ m :: s)
-
-  let compare_context c1 c2 =
-    match c1 , c2 with
-    | None , None -> 0
-    | None , _ -> (-1)
-    | _ , None -> (+1)
-    | Some c1 , Some c2 -> WpContext.S.compare c1 c2
-
-  let compare_source s1 s2 =
-    match s1 , s2 with
-    | Generated(m1,f1), Generated(m2,f2) ->
-      let cmp = String.compare f1 f2 in
-      if cmp<>0 then cmp else compare_context m1 m2
-    | Generated _, _ -> (-1)
-    | _, Generated _ -> (+1)
-    | Extern f , Extern g ->
-      ext_compare f g
-    | Extern _ , _ -> (-1)
-    | _ , Extern _ -> (+1)
-    | Wsymbol(p,m,s) , Wsymbol(p',m',s') ->
-      Stdlib.compare (p,m,s) (p',m',s')
+    | LFUN l -> 7 * l.m_id
+    | QFUN f -> 13 * Qed.Symbol.Fun.hash f.e_symbol
 
   let compare f g =
     if f==g then 0 else
       match f , g with
-      | FUN {m_source=mf} , FUN {m_source=mg} -> compare_source mf mg
-      | FUN _ , _ -> (-1)
-      | _ , FUN _ -> (+1)
+      | LFUN f , LFUN g -> Int.compare f.m_id g.m_id
+      | LFUN _ , _ -> (-1)
+      | _ , LFUN _ -> (+1)
+      | QFUN f , QFUN g -> Qed.Symbol.Fun.compare f.e_symbol g.e_symbol
+      | QFUN _ , _ -> (-1)
+      | _ , QFUN _ -> (+1)
       | ACSL f , ACSL g -> Logic_info.compare f g
       | ACSL _ , _ -> (-1)
       | _ , ACSL _ -> (+1)
@@ -546,26 +498,44 @@ struct
   let pretty fmt f = Format.pp_print_string fmt (debug f)
 
   let category = function
-    | FUN m -> m.m_category
+    | LFUN m -> m.m_category
+    | QFUN _ -> Logic.Function
     | ACSL _ -> Logic.Function
     | CTOR _ -> Logic.Constructor
 
+  let rec sort_of_qtau = function
+    | Int -> Sint
+    | Real -> Sreal
+    | Bool -> Sbool
+    | Prop -> Sprop
+    | Array(_,s) -> Sarray (sort_of_qtau s)
+    | _ -> Sdata
+
   let sort = function
-    | FUN m -> m.m_result
+    | LFUN m -> m.m_result
     | ACSL { l_type=None } -> Logic.Sprop
     | ACSL { l_type=Some t } -> sort_of_ltype t
     | CTOR _ -> Logic.Sdata
+    | QFUN f ->
+      let _, t, _ = Qed.Symbol.signature f.e_symbol in
+      sort_of_qtau t
 
   let parameters = ref (fun _ -> [])
 
   let params = function
-    | FUN m -> m.m_params
+    | LFUN m -> m.m_params
+    | QFUN f ->
+      let _, _, ts = Qed.Symbol.signature f.e_symbol in
+      List.map sort_of_qtau ts
     | CTOR ct -> List.map sort_of_ltype ct.ctor_params
     | (ACSL _) as f -> !parameters f
 
 end
 
 let parameters phi = Fun.parameters := phi
+let associative = function
+  | Operator op -> op.associative
+  | _ -> false
 
 class virtual idprinting =
   object(self)
@@ -576,7 +546,7 @@ class virtual idprinting =
     method sanitize_fun   = self#sanitize
 
     method datatype = function
-      | Qdata a -> Qed.Symbol.Data.fullname a
+      | QDATA a -> Qed.Symbol.Data.fullname a
       | Comp(c, KValue) -> self#sanitize_type (comp_id c)
       | Comp(c, KInit) -> self#sanitize_type (comp_init_id c)
       | Atype lt -> self#sanitize_type (type_id lt)
@@ -588,23 +558,31 @@ class virtual idprinting =
     method link = function
       | ACSL f -> Engine.F_call (self#sanitize_fun (logic_id f))
       | CTOR c -> Engine.F_call (self#sanitize_fun (ctor_id c))
-      | FUN({m_source=Generated(_,n)}) -> Engine.F_call (self#sanitize_fun n)
-      | FUN({m_source=Extern e}) -> e.ext_link
-      | FUN({m_source=Wsymbol(p,m,s)}) ->
-        Engine.F_call (String.concat "." (p @ m :: s))
+      | LFUN l ->
+        if associative l.m_category then
+          Engine.F_assoc (self#sanitize_fun l.m_name)
+        else
+          Engine.F_call (self#sanitize_fun l.m_name)
+      | QFUN l ->
+        let ls = Qed.Symbol.Fun.symbol l.e_symbol in
+        if ls.ls_proj then
+          Engine.F_proj ls.ls_name.id_string
+        else if associative l.e_category then
+          Engine.F_assoc (Qed.Symbol.Fun.name l.e_symbol)
+        else
+          Engine.F_call (Qed.Symbol.Fun.name l.e_symbol)
+
   end
 
 let name_of_lfun = function
   | ACSL f -> logic_id f
   | CTOR c -> ctor_id c
-  | FUN({m_source=Generated(_,f)}) -> f
-  | FUN({m_source=Extern e}) -> e.ext_debug
-  | FUN({m_source=Wsymbol(p,m,s)}) -> String.concat "." (p @ m :: s)
+  | LFUN l -> l.m_name
+  | QFUN l -> Qed.Symbol.Fun.fullname l.e_symbol
 
 let context_of_lfun = function
-  | ACSL _ | CTOR _
-  | FUN({m_source=(Extern _|Wsymbol _)}) -> None
-  | FUN({m_source=Generated(ctxt,_)}) -> ctxt
+  | ACSL _ | CTOR _ | QFUN _ -> None
+  | LFUN l -> l.m_context
 
 let name_of_field = function
   | Cfield(f, KValue) -> field_id f

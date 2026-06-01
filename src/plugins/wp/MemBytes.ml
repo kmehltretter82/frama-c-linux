@@ -16,92 +16,43 @@ module Logic = Qed.Logic
 
 module WBytes =
 struct
-  let library = "membytes"
 
   let t_vblock = Qed.Logic.Array (Qed.Logic.Int, Qed.Logic.Int)
   let t_memory = Qed.Logic.Array (Qed.Logic.Int,t_vblock)
   let t_iblock = Qed.Logic.Array (Qed.Logic.Int, Qed.Logic.Bool)
   let t_init = Qed.Logic.Array   (Qed.Logic.Int,t_iblock)
 
-  let ty_fst_arg = function
-    | Some l :: _ -> l
-    | _ -> raise Not_found
+  let fmap = Hashtbl.create 0
 
-  let f_eqmem = Lang.extern_fp ~library "eqmem"
-  let f_memcpy = Lang.extern_f ~library ~typecheck:ty_fst_arg "memcpy"
+  let membytes ?coloring name =
+    let fn =
+      try Hashtbl.find fmap name with Not_found ->
+        let endian = if Machine.little_endian () then "le" else "be" in
+        let fn =
+          Lang.extern_f ?coloring "frama_c_wp.membytes_%s.%s" endian name in
+        Hashtbl.add fmap name fn ; fn
+    in fn
 
-  let p_sconst = Lang.extern_fp ~coloring:true ~library "sconst"
-  let sconst m = p_call p_sconst [m]
+  let membytes_f descr =
+    Format.kasprintf (fun name -> e_fun (membytes name)) descr
+  let membytes_p ?coloring descr =
+    Format.kasprintf (fun name -> p_call (membytes ?coloring name)) descr
 
-  let p_scinit = Lang.extern_fp ~coloring:true ~library "scinit"
-  let scinit m = p_call p_scinit [m]
-
-  let p_bytes = Lang.extern_fp ~library "bytes"
-  let bytes m = p_call p_bytes [ m ]
+  let eqmem m0 m1 p s = membytes_p "eqmem" [m0;m1;p;s]
+  let memcpy m p m0 p0 s =
+    membytes_f "memcpy" [m;p;m0;p0;s]
+  let sconst m = membytes_p ~coloring:true "sconst" [m]
+  let scinit m = membytes_p ~coloring:true "scinit" [m]
+  let bytes m = membytes_p "bytes" [ m ]
 
   (* read/write *)
-  let f_read_uint8 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_uint8"
-  let read_uint8 m a = e_fun f_read_uint8 [ m ; a ]
-  let f_read_uint16 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_uint16"
-  let read_uint16 m a = e_fun f_read_uint16 [ m ; a ]
-  let f_read_uint32 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_uint32"
-  let read_uint32 m a = e_fun f_read_uint32 [ m ; a ]
-  let f_read_uint64 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_uint64"
-  let read_uint64 m a = e_fun f_read_uint64 [ m ; a ]
-  let f_read_uint128 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_uint128"
-  let read_uint128 m a = e_fun f_read_uint128 [ m ; a ]
-  let f_read_sint8 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_sint8"
-  let read_sint8 m a = e_fun f_read_sint8 [ m ; a ]
-  let f_read_sint16 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_sint16"
-  let read_sint16 m a = e_fun f_read_sint16 [ m ; a ]
-  let f_read_sint32 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_sint32"
-  let read_sint32 m a = e_fun f_read_sint32 [ m ; a ]
-  let f_read_sint64 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_sint64"
-  let read_sint64 m a = e_fun f_read_sint64 [ m ; a ]
-  let f_read_sint128 = Lang.extern_f ~result:Qed.Logic.Int ~library "read_sint128"
-  let read_sint128 m a = e_fun f_read_sint128 [ m ; a ]
-  let f_write_uint8 = Lang.extern_f ~result:t_memory ~library "write_uint8"
-  let write_uint8 m a v = e_fun f_write_uint8 [ m ; a ; v ]
-  let f_write_uint16 = Lang.extern_f ~result:t_memory ~library "write_uint16"
-  let write_uint16 m a v = e_fun f_write_uint16 [ m ; a ; v ]
-  let f_write_uint32 = Lang.extern_f ~result:t_memory ~library "write_uint32"
-  let write_uint32 m a v = e_fun f_write_uint32 [ m ; a ; v ]
-  let f_write_uint64 = Lang.extern_f ~result:t_memory ~library "write_uint64"
-  let write_uint64 m a v = e_fun f_write_uint64 [ m ; a ; v ]
-  let f_write_uint128 = Lang.extern_f ~result:t_memory ~library "write_uint128"
-  let write_uint128 m a v = e_fun f_write_uint128 [ m ; a ; v ]
-  let f_write_sint8 = Lang.extern_f ~result:t_memory ~library "write_sint8"
-  let write_sint8 m a v = e_fun f_write_sint8 [ m ; a ; v ]
-  let f_write_sint16 = Lang.extern_f ~result:t_memory ~library "write_sint16"
-  let write_sint16 m a v = e_fun f_write_sint16 [ m ; a ; v ]
-  let f_write_sint32 = Lang.extern_f ~result:t_memory ~library "write_sint32"
-  let write_sint32 m a v = e_fun f_write_sint32 [ m ; a ; v ]
-  let f_write_sint64 = Lang.extern_f ~result:t_memory ~library "write_sint64"
-  let write_sint64 m a v = e_fun f_write_sint64 [ m ; a ; v ]
-  let f_write_sint128 = Lang.extern_f ~result:t_memory ~library "write_sint128"
-  let write_sint128 m a v = e_fun f_write_sint128 [ m ; a ; v ]
+  let read m i a = membytes_f "read_%a" Ctypes.pp_int i [ m ; a ]
+  let write m i a v = membytes_f "write_%a" Ctypes.pp_int i [ m ; a ; v ]
 
-  (* init *)
-  let f_read_init8 = Lang.extern_f ~result:Qed.Logic.Bool ~library "read_init8"
-  let read_init8 m a = e_fun f_read_init8 [ m ; a ]
-  let f_read_init16 = Lang.extern_f ~result:Qed.Logic.Bool ~library "read_init16"
-  let read_init16 m a = e_fun f_read_init16 [ m ; a ]
-  let f_read_init32 = Lang.extern_f ~result:Qed.Logic.Bool ~library "read_init32"
-  let read_init32 m a = e_fun f_read_init32 [ m ; a ]
-  let f_read_init64 = Lang.extern_f ~result:Qed.Logic.Bool ~library "read_init64"
-  let read_init64 m a = e_fun f_read_init64 [ m ; a ]
-  let f_read_init128 = Lang.extern_f ~result:Qed.Logic.Bool ~library "read_init128"
-  let read_init128 m a = e_fun f_read_init128 [ m ; a ]
-  let f_write_init8 = Lang.extern_f ~result:t_init ~library "write_init8"
-  let write_init8 m a v = e_fun f_write_init8 [ m ; a ; v ]
-  let f_write_init16 = Lang.extern_f ~result:t_init ~library "write_init16"
-  let write_init16 m a v = e_fun f_write_init16 [ m ; a ; v ]
-  let f_write_init32 = Lang.extern_f ~result:t_init ~library "write_init32"
-  let write_init32 m a v = e_fun f_write_init32 [ m ; a ; v ]
-  let f_write_init64 = Lang.extern_f ~result:t_init ~library "write_init64"
-  let write_init64 m a v = e_fun f_write_init64 [ m ; a ; v ]
-  let f_write_init128 = Lang.extern_f ~result:t_init ~library "write_init128"
-  let write_init128 m a v = e_fun f_write_init128 [ m ; a ; v ]
+  (* read/write init *)
+  let read_init m s a = membytes_f "read_init%d" s [ m ; a ]
+  let write_init m s a v = membytes_f "write_init%d" s [ m ; a ; v ]
+
 end
 
 (* Model *)
@@ -111,13 +62,13 @@ let dkey_model = Wp_parameters.register_category (lc_name ^ ":model")
 
 let configure () =
   begin
+    Hashtbl.clear WBytes.fmap ;
     let orig_pointer = Context.push Lang.pointer MemAddr.t_addr in
     let orig_null    = Context.push Cvalues.null (p_equal MemAddr.null) in
     let rollback () =
       Context.pop Lang.pointer orig_pointer ;
       Context.pop Cvalues.null orig_null ;
-    in
-    rollback
+    in rollback
   end
 let no_binder = { bind = fun _ f v -> f v }
 let configure_ia _ = no_binder
@@ -513,24 +464,9 @@ let float_to_int fkind f =
 let int_to_float fkind f =
   e_fun (snd @@ CODEC_FLOAT.get fkind) [ f ]
 
-let load_int_raw memory kind addr =
-  let read = match kind with
-    | CBool -> WBytes.read_uint8
-    | UInt8 -> WBytes.read_uint8
-    | SInt8 -> WBytes.read_sint8
-    | UInt16 -> WBytes.read_uint16
-    | SInt16 -> WBytes.read_sint16
-    | UInt32 -> WBytes.read_uint32
-    | SInt32 -> WBytes.read_sint32
-    | UInt64 -> WBytes.read_uint64
-    | SInt64 -> WBytes.read_sint64
-    | UInt128 -> WBytes.read_uint128
-    | SInt128 -> WBytes.read_sint128
-  in
-  read memory addr
+let load_int_raw = WBytes.read
 
-let load_int sigma kind addr =
-  load_int_raw (Sigma.value sigma m_mem) kind addr
+let load_int sigma = WBytes.read (Sigma.value sigma m_mem)
 
 let load_float sigma kind addr =
   int_to_float kind @@ load_int sigma (Float.ikind kind) addr
@@ -541,35 +477,10 @@ let load_pointer_raw memory _ty loc =
 let load_pointer sigma _ty loc =
   MemAddr.addr_of_int @@ load_int sigma (Ctypes.c_ptr ()) loc
 
-let load_init_raw memory size loc =
-  match size with
-  | 1 -> WBytes.read_init8  memory loc
-  | 2 -> WBytes.read_init16 memory loc
-  | 4 -> WBytes.read_init32 memory loc
-  | 8 -> WBytes.read_init64 memory loc
-  | 16 -> WBytes.read_init128 memory loc
-  | _ -> assert false
-
 let load_init_atom sigma obj loc =
-  let init_memory = Sigma.value sigma m_init in
-  let size = sizeof_object obj in
-  load_init_raw init_memory size loc
+  WBytes.read_init (Sigma.value sigma m_init) (sizeof_object obj) loc
 
-let store_int sigma kind addr v =
-  let write = match kind with
-    | CBool -> WBytes.write_uint8
-    | UInt8 -> WBytes.write_uint8
-    | SInt8 -> WBytes.write_sint8
-    | UInt16 -> WBytes.write_uint16
-    | SInt16 -> WBytes.write_sint16
-    | UInt32 -> WBytes.write_uint32
-    | SInt32 -> WBytes.write_sint32
-    | UInt64 -> WBytes.write_uint64
-    | SInt64 -> WBytes.write_sint64
-    | UInt128 -> WBytes.write_uint128
-    | SInt128 -> WBytes.write_sint128
-  in
-  m_mem, write (Sigma.value sigma m_mem) addr v
+let store_int sigma i p v = m_mem, WBytes.write (Sigma.value sigma m_mem) i p v
 
 let store_float sigma kind addr v =
   store_int sigma (Float.ikind kind) addr @@ float_to_int kind v
@@ -577,21 +488,8 @@ let store_float sigma kind addr v =
 let store_pointer sigma _kind addr v =
   store_int sigma (Ctypes.c_ptr ()) addr @@ MemAddr.int_of_addr v
 
-let store_init_raw m size loc v =
-  let write = match size with
-    | 1 -> WBytes.write_init8
-    | 2 -> WBytes.write_init16
-    | 4 -> WBytes.write_init32
-    | 8 -> WBytes.write_init64
-    | 16 -> WBytes.write_init128
-    | _ -> assert false
-  in
-  write m loc v
-
 let store_init_atom sigma obj loc v =
-  let init_memory = Sigma.value sigma m_init in
-  let size = sizeof_object obj in
-  m_init, store_init_raw init_memory size loc v
+  m_init, WBytes.write_init (Sigma.value sigma m_init) (sizeof_object obj) loc v
 
 module LOADER =
 struct
@@ -620,8 +518,8 @@ struct
 
   let separated p n p' n' = p_call MemAddr.p_separated [p;n;p';n']
 
-  let eqmem _chunk m0 m1 l n = p_call WBytes.f_eqmem [m0;m1;l;n]
-  let memcpy _chunk m0 l0 m1 l1 n = e_fun WBytes.f_memcpy [m0;l0;m1;l1;n]
+  let eqmem _chunk = WBytes.eqmem
+  let memcpy _chunk = WBytes.memcpy
 
   let load_int = load_int
   let load_float = load_float

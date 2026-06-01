@@ -473,7 +473,7 @@ class virtual visitor main =
       | Cfield(f, KInit) -> self#vicomp f.fcomp
 
     method vadt = function
-      | Qdata a -> self#on_data a
+      | QDATA a -> self#on_data a
       | Comp(r, KValue) -> self#vcomp r
       | Comp(r, KInit) -> self#vicomp r
       | Atype t -> self#vtype t
@@ -551,23 +551,22 @@ class virtual visitor main =
       end ;
       terms <- old_terms
 
-    method private vlfun f =
-      match Symbol.find f with
-      | exception Not_found ->
-        Wp_parameters.fatal "Undefined symbol '%a'" Fun.pretty f
-      | d ->
-        let c = d.d_cluster in
-        if self#do_local c then self#vdfun d
-
     method vsymbol f =
       if not (DF.mem f symbols) then
         begin
           symbols <- DF.add f symbols ;
           match f with
-          | FUN { m_source = Wsymbol(p,m,_) } -> self#vtheory p m
-          | FUN { m_source = Extern e  } -> self#vlibrary e.ext_library
-          | FUN { m_source = Generated _ } | ACSL _ -> self#vlfun f
+          | QFUN l -> self#on_lfun l.e_symbol
           | CTOR c -> self#vtype c.ctor_type
+          | LFUN _ | ACSL _ ->
+            begin
+              match Symbol.find f with
+              | exception Not_found ->
+                Wp_parameters.fatal "Undefined symbol '%a'" Fun.pretty f
+              | d ->
+                let c = d.d_cluster in
+                if self#do_local c then self#vdfun d
+            end
         end
 
     method private vtrigger = function
@@ -677,6 +676,7 @@ class virtual visitor main =
     method virtual on_library : string -> unit
     method virtual on_cluster : cluster -> unit
     method virtual on_data : Qed.Symbol.data -> unit
+    method virtual on_lfun : Qed.Symbol.lfun -> unit
     method virtual on_type : logic_type_info -> typedef -> unit
     method virtual on_comp : compinfo -> (field * tau) list option -> unit
     method virtual on_icomp : compinfo -> (field * tau) list option -> unit

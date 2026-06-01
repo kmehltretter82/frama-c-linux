@@ -30,40 +30,36 @@ type datakind = KValue | KInit
 
 (** A type is never registered in a Definition.t *)
 type adt = private
-  | Qdata of Qed.Symbol.data (** Qed/Why3 Type *)
+  | QDATA of Qed.Symbol.data (** Qed/Why3 Type *)
   | Atype of logic_type_info (** ACSL Logic Type *)
   | Comp of compinfo * datakind (** C-code Struct or Union *)
 
-and 'a extern = {
-  ext_id     : int;
-  ext_link   : 'a ;
-  ext_library : string; (** a library which it depends on *)
-  ext_debug  : string; (** just for printing during debugging *)
-}
 and fields = { mutable fields : field list }
 and field = private Cfield of fieldinfo * datakind
 and tau = (field,adt) Logic.datatype
 
 type lfun = private
-  | ACSL of Cil_types.logic_info (** Registered in Definition.t,
-                                     only  *)
-  | CTOR of Cil_types.logic_ctor_info (** Not registered in Definition.t
-                                          directly converted/printed *)
-  | FUN of lsymbol (** External or Generated logic symbol *)
+  | ACSL of Cil_types.logic_info (** Registered in Definition.t only  *)
+  | CTOR of Cil_types.logic_ctor_info (** Not registered in Definition.t directly converted/printed *)
+  | LFUN of lsymbol (** Generated logic symbol *)
+  | QFUN of esymbol  (** External logic symbol *)
 
 and lsymbol = {
+  m_id : int ;
+  m_name : string ;
+  m_context : WpContext.context option ;
   m_category : lfun category ;
   m_params : sort list ;
   m_result : sort ;
   m_typeof : tau option list -> tau ;
-  m_source : source ;
   m_coloring : bool ;
 }
 
-and source =
-  | Generated of WpContext.context option * string
-  | Extern of Engine.link extern
-  | Wsymbol of string list * string * string list (** Why3 imported logic symbol *)
+and esymbol = {
+  e_category : lfun category ;
+  e_coloring : bool ;
+  e_symbol : Qed.Symbol.lfun ;
+}
 
 val comp : compinfo -> adt
 val comp_init : compinfo -> adt
@@ -74,8 +70,6 @@ val fields_of_tau : tau -> field list
 val fields_of_field : field -> field list
 val atype : logic_type_info -> tau list -> tau
 
-type balance = Nary | Left | Right
-
 val on_lfun : (lfun -> unit) -> unit
 val on_field : (field -> unit) -> unit
 
@@ -84,58 +78,32 @@ val ctor : logic_ctor_info -> lfun
 
 (** Builders *)
 
-val extern_t: string -> adt
-val extern_tau: ?args:tau list -> string -> tau
-val import_t: context:Why3.Theory.theory -> Why3.Ty.tysymbol -> adt
-
-val extern_s :
-  library:string ->
-  ?link:Engine.link ->
-  ?category:lfun category ->
-  ?params:sort list ->
-  ?sort:sort ->
-  ?result:tau ->
-  ?coloring:bool ->
-  ?typecheck:(tau option list -> tau) ->
-  string -> lfun
+val extern_t : string -> adt
+val extern_tau : ?args:tau list -> string -> tau
+val import_t : context:Why3.Theory.theory -> Why3.Ty.tysymbol -> adt
+val import_f : context:Why3.Theory.theory -> Why3.Term.lsymbol -> lfun
 
 val extern_f :
-  library:string ->
-  ?link:Engine.link ->
-  ?balance:balance ->
+  ?category:lfun category ->
+  ?coloring:bool ->
+  ('a, Format.formatter, unit, lfun) format4 -> 'a
+
+val generated_f :
+  ?context:bool ->
   ?category:lfun category ->
   ?params:sort list ->
   ?sort:sort ->
   ?result:tau ->
   ?coloring:bool ->
   ?typecheck:(tau option list -> tau) ->
-  ('a,Format.formatter,unit,lfun) format4 -> 'a
-(** balance just give a default when link is not specified *)
+  ('a, Format.formatter, unit, lfun) format4 -> 'a
 
-val extern_p :
-  library:string ->
-  ?bool:string ->
-  ?prop:string ->
-  ?link:Engine.link ->
+val generated_p :
+  ?context:bool ->
+  ?category:lfun category ->
   ?params:sort list ->
   ?coloring:bool ->
-  unit -> lfun
-
-val extern_fp : library:string -> ?params:sort list ->
-  ?link:string -> ?coloring:bool -> string -> lfun
-
-val generated_f : ?context:bool -> ?category:lfun category ->
-  ?params:sort list -> ?sort:sort -> ?result:tau -> ?coloring:bool ->
-  ('a,Format.formatter,unit,lfun) format4 -> 'a
-
-val generated_p : ?context:bool -> ?coloring:bool -> string -> lfun
-
-val imported_f:
-  package:string list -> theory:string -> name:string list ->
-  ?params:sort list ->
-  ?result:sort ->
-  ?typecheck:(tau option list -> tau) ->
-  unit -> lfun
+  ('a, Format.formatter, unit, lfun) format4 -> 'a
 
 (** {2 Sorting and Typing} *)
 

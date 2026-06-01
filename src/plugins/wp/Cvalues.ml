@@ -228,7 +228,7 @@ struct
 
   and is_record c s =
     Definitions.call_pred
-      (Lang.generated_p ~coloring:true (C.prefix ^ Lang.comp_id c))
+      (Lang.generated_p ~coloring:true "%s%s" C.prefix (Lang.comp_id c))
       (fun lfun ->
          let basename = if c.cstruct then "S" else "U" in
          let s = Lang.freshvar ~basename (Lang.t_comp c) in
@@ -248,7 +248,7 @@ struct
 
   and is_array elt ds t =
     Definitions.call_pred
-      (Lang.generated_p ~coloring:true (array_name elt ds))
+      (Lang.generated_p ~coloring:true "%s" (array_name elt ds))
       (fun lfun ->
          let cluster =
            match elt with
@@ -414,7 +414,7 @@ module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
       type data = lfun
       let compile c =
         (* Contextual Symbol *)
-        let lfun = Lang.generated_p ~context:true ("Eq" ^ Lang.comp_id c) in
+        let lfun = Lang.generated_p ~context:true "Eq%s" (Lang.comp_id c) in
         (* Simplification of the symbol *)
         Lang.F.set_builtin lfun reduce_eqcomp ;
         (* Definition of the symbol *)

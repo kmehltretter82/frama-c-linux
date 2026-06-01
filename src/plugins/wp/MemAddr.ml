@@ -12,55 +12,39 @@ open Lang.F
 (* --- Symbols registration                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let library = "memaddr"
-
 (* Warning: DO NOT register map types using this constructor: it hides types
    needed by ProverWhy3 for typing terms of the form x[i]. *)
 
 let t_addr = Lang.extern_tau "frama_c_wp.memaddr.MemAddr.addr"
-let t_table = Lang.extern_tau "frama_c_wp.memaddr.MemAddr.addr"
 let t_malloc = Qed.Logic.Array(Qed.Logic.Int, Qed.Logic.Int)
 
-let f_base   = Lang.extern_f ~library ~result:Qed.Logic.Int
-    ~link:(Qed.Engine.F_proj "base") "base"
+let f_base = Lang.extern_f "frama_c_wp.memaddr.MemAddr.base"
+let f_offset = Lang.extern_f "frama_c_wp.memaddr.MemAddr.offset"
+let f_shift  = Lang.extern_f "frama_c_wp.memaddr.MemAddr.shift"
+let f_global = Lang.extern_f ~category:Injection "frama_c_wp.memaddr.MemAddr.global"
+let f_null   = Lang.extern_f "frama_c_wp.memaddr.MemAddr.null"
 
-let f_offset = Lang.extern_f ~library ~result:Qed.Logic.Int
-    ~link:(Qed.Engine.F_proj "offset") "offset"
+let p_addr_lt = Lang.extern_f "frama_c_wp.memaddr.MemAddr.addr_lt"
+let p_addr_le = Lang.extern_f "frama_c_wp.memaddr.MemAddr.addr_le"
 
-let f_shift  = Lang.extern_f ~library ~result:t_addr "shift"
-let f_global = Lang.extern_f ~library ~result:t_addr ~category:Qed.Logic.Injection "global"
-let f_null   = Lang.extern_f ~library ~result:t_addr "null"
+let f_addr_of_int = Lang.extern_f "frama_c_wp.memaddr.MemAddr.addr_of_int"
+let f_int_of_addr = Lang.extern_f "frama_c_wp.memaddr.MemAddr.int_of_addr"
 
-let p_addr_lt = Lang.extern_p ~library ~bool:"addr_lt_bool" ~prop:"addr_lt" ()
-let p_addr_le = Lang.extern_p ~library ~bool:"addr_le_bool" ~prop:"addr_le" ()
+let p_statically_allocated = Lang.extern_f "frama_c_wp.memaddr.MemAddr.statically_allocated"
 
-let f_addr_of_int = Lang.extern_f
-    ~library ~result:t_addr "addr_of_int"
+let f_table_of_base = Lang.extern_f "frama_c_wp.memaddr.MemAddr.table_of_base"
+let f_table_to_offset = Lang.extern_f ~category:Injection "frama_c_wp.memaddr.MemAddr.table_to_offset"
 
-let f_int_of_addr = Lang.extern_f
-    ~library ~result:Qed.Logic.Int "int_of_addr"
+let p_valid_rd = Lang.extern_f "frama_c_wp.memaddr.MemAddr.valid_rd"
+let p_valid_rw = Lang.extern_f "frama_c_wp.memaddr.MemAddr.valid_rw"
+let p_valid_obj = Lang.extern_f "frama_c_wp.memaddr.MemAddr.valid_obj"
+let p_invalid = Lang.extern_f "frama_c_wp.memaddr.MemAddr.invalid"
+let p_separated = Lang.extern_f "frama_c_wp.memaddr.MemAddr.separated"
+let p_included = Lang.extern_f "frama_c_wp.memaddr.MemAddr.included"
 
-let p_statically_allocated = Lang.extern_fp ~library "statically_allocated"
-
-let f_table_of_base = Lang.extern_f ~library
-    ~category:Qed.Logic.Function ~result:t_table "table_of_base"
-
-let f_table_to_offset = Lang.extern_f ~library
-    ~category:Qed.Logic.Injection ~result:Qed.Logic.Int "table_to_offset"
-
-let p_valid_rd = Lang.extern_fp ~library "valid_rd"
-let p_valid_rw = Lang.extern_fp ~library "valid_rw"
-let p_valid_obj = Lang.extern_fp ~library "valid_obj"
-let p_invalid = Lang.extern_fp ~library "invalid"
-let p_separated = Lang.extern_fp ~library "separated"
-let p_included = Lang.extern_fp ~library "included"
-
-(* base -> region *)
-let f_region = Lang.extern_f ~coloring:true ~library ~result:Qed.Logic.Int "region"
-(* always initialized bases *)
-let p_binit =  Lang.extern_fp ~coloring:true ~library "binit"
-(* allocation-table -> prop *)
-let p_linked = Lang.extern_fp ~coloring:true ~library "linked"
+let f_region = Lang.extern_f ~coloring:true "frama_c_wp.memaddr.MemAddr.region"
+let p_binit =  Lang.extern_f "frama_c_wp.memaddr.MemAddr.binit"
+let p_linked = Lang.extern_f "frama_c_wp.memaddr.MemAddr.linked"
 
 (* -------------------------------------------------------------------------- *)
 (* --- API                                                                --- *)
