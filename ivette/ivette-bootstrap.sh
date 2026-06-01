@@ -35,7 +35,7 @@ echo "[1/3] Configuring"
 
 NODEJS=`node --version`
 case $NODEJS in
-    v22.*|v23.*|v24.*|v25.*)
+    v22.*|v23.*|v24.*|v25.*|v26.*)
         echo " - node $NODEJS found"
         ;;
     *)
