@@ -83,6 +83,8 @@ struct
   let pp_term_lhost fmt x = (printer ())#term_lhost fmt x
   let pp_fundec fmt x = (printer ())#fundec fmt x
 
+  (* Deprecated function *)
+  let pp_location fmt x = Fileloc.pretty fmt x
 end
 
 
