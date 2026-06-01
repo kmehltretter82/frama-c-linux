@@ -151,20 +151,14 @@ function getNode(key: string, cs: Info, callstacks: Info[]): Node {
 }
 
 /** Return the Tree */
-function getTree(callstacks: Info[]): {nodes: NodesMap, tree: NodesMap} {
+function getNodes(callstacks: Info[]): NodesMap {
   const nodes: NodesMap = new Map();
-  const tree: NodesMap = new Map();
-
   // Create nodes and tree
   callstacks.forEach(cs => {
     const key = cs.callstack.toString();
     const newNode = getNode(key, cs, callstacks);
     nodes.set(key, newNode);
-    // The tree contains only entry points
-    if(isEntryPoint(newNode.callstack))
-      tree.set(key, newNode);
   });
-
   // populate subTrees
   nodes.forEach(node => {
     if(node.parentKey) {
@@ -172,8 +166,30 @@ function getTree(callstacks: Info[]): {nodes: NodesMap, tree: NodesMap} {
       parent?.subTree.set(node.key, node);
     }
   });
+  return nodes;
+}
 
-  return { nodes, tree };
+/** Return the Tree */
+function getTree(nodes: NodesMap, visible: Set<string> | undefined)
+: NodesMap {
+  const filteredNodes: NodesMap = new Map();
+  const tree: NodesMap = new Map();
+  // Create filtered nodes and tree
+  nodes.forEach(node => {
+    const newNode = { ...node, subTree: new Map() };
+    filteredNodes.set(node.key, newNode);
+    // The tree contains only entry points
+    if(isEntryPoint(node.callstack))
+      tree.set(node.key, newNode);
+  });
+  // populate subTrees
+  filteredNodes.forEach(node => {
+    if(node.parentKey && (!visible || visible.has(node.key))) {
+      const parent = filteredNodes.get(node.parentKey);
+      parent?.subTree.set(node.key, { ...node });
+    }
+  });
+  return tree;
 }
 
 /** Get details of callstacks */
@@ -323,8 +339,8 @@ export function CallstackSelection(): React.JSX.Element {
   const [selectedFromValue, ] = useGlobalState(CallstackState);
   const scope = States.useCurrentScope();
 
-  /** Tree */
-  const { nodes, tree } = React.useMemo(() => getTree(infos), [infos]);
+  /** Nodes */
+  const nodes = React.useMemo(() => getNodes(infos), [infos]);
 
   /** Filter */
   const filterItems: Buttons.MultiselectItemProps[] = [
@@ -353,6 +369,11 @@ export function CallstackSelection(): React.JSX.Element {
   }, [nodes, showSelected, showScope,
       showAnalyzed, showUnanalyzed, selection, scope]);
 
+  /** Tree */
+  const tree = React.useMemo(
+    () => getTree(nodes, visibleKeys),
+    [nodes, visibleKeys]
+  );
 
   const onResetMenu = React.useCallback(() => {
     popupMenu([
