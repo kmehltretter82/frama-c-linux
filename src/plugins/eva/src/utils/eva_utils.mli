@@ -62,3 +62,7 @@ val height_lval: lval -> int
 val skip_specifications: kernel_function -> bool
 (** Should we skip the specifications of this function, according to
     [-eva-skip-stdlib-specs] *)
+
+(** Creates an unmarshallable copy of the given datatype. Useful to create
+    {!State_builder} tables which should not be saved on disk. *)
+module Do_Not_Marshal (Input: Datatype.S) : Datatype.S with type t = Input.t

@@ -410,7 +410,7 @@ module Make (Engine: Engine_Subset) = struct
 
   module InitialState =
     State_builder.Option_ref
-      (Bottom.Make_Datatype (Domain))
+      (Eva_utils.Do_Not_Marshal (Bottom.Make_Datatype (Domain)))
       (struct
         let name = "Value.Initialization" ^ "(" ^ string_of_int !counter ^ ")"
         let dependencies = correctness_deps
