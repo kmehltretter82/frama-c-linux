@@ -48,11 +48,6 @@ let skipkey input a = match token input with
   | KEY b when a=b -> skip input
   | _ -> failwith (Printf.sprintf "Missing '%s'" a)
 
-let noskipkey input a = match token input with
-  | KEY b when a=b -> ()
-  | _ -> failwith (Printf.sprintf "Missing '%s'" a)
-
-
 let ident input = match token input with
   | ID x | LINK x -> skip input ; x
   | _ -> failwith "missing identifier"
@@ -164,7 +159,7 @@ let rec parse input =
     skip input ;
     let name = ident input in
     let source = source input in
-    noskipkey input "=" ;
+    skipkey input "=" ;
     let link = link input in
     LogicBuiltins.add_type ~source:(Filepos.of_lexing_pos source) name ~link ;
     skipkey input ";" ;
@@ -183,13 +178,13 @@ let rec parse input =
     skip input ;
     let result = kind input in
     let name = ident input in
-    let source = source input in
+    let src = source input in
     let args = signature input in
     if key input ":=" then
       begin
         let alias = ident input in
         LogicBuiltins.add_alias
-          ~source:(Filepos.of_lexing_pos source)
+          ~source:(Filepos.of_lexing_pos src)
           name args ~alias ;
       end
     else
@@ -197,7 +192,7 @@ let rec parse input =
         skipkey input "=" ;
         let category,link = logic_link input in
         LogicBuiltins.add_logic
-          ~source:(Filepos.of_lexing_pos source)
+          ~source:(Filepos.of_lexing_pos src)
           ~category result name args ~link ;
       end ;
     skipkey input ";" ;
@@ -216,7 +211,7 @@ let rec parse input =
       end
     else
       begin
-        noskipkey input "=" ;
+        skipkey input "=" ;
         let link = link input in
         LogicBuiltins.add_predicate
           ~source:(Filepos.of_lexing_pos source)
@@ -233,16 +228,18 @@ let load_file ?(ontty=`Transient) file =
     let inc = open_in (Filepath.to_string_abs file) in
     let lex = Lexing.from_channel inc in
     let position = {
-      lex.Lexing.lex_curr_p with Lexing.pos_fname = Filepath.to_string_abs file
+      lex.lex_curr_p with pos_fname = Filepath.to_string_abs file
     } in
-    let input = { current = tok lex ; position = position ; lexbuf = lex } in
+    lex.lex_curr_p <- position ;
+    lex.lex_start_p <- position ;
+    let current = tok lex in
+    let input = { current ; position = position ; lexbuf = lex } in
     try
-      lex.Lexing.lex_curr_p <- position ;
       parse input ;
       close_in inc
     with Failure msg ->
       close_in inc ;
-      let source = lex.Lexing.lex_start_p in
+      let source = lex.lex_start_p in
       Wp_parameters.abort ~current:false
         ~source:(Filepos.of_lexing_pos source) "(Driver Error) %s (at %a)" msg
         pretty (token input)
@@ -266,16 +263,9 @@ let load_driver () =
       let descr = String.concat "," drvs in
       let configure ()=
         let default = Wp_parameters.Share.get_file "wp.driver" in
-        let membytes =
-          Wp_parameters.Share.get_file @@
-          if Machine.little_endian ()
-          then "membytes_le.driver"
-          else "membytes_be.driver"
-        in
         let feedback = Wp_parameters.Share.is_set () in
         let ontty = if feedback then `Message else `Transient in
         load_file ~ontty default;
-        load_file ~ontty membytes;
         List.iter load_file drivers
       in
       let driver = LogicBuiltins.new_driver ~id ~descr ~configure () in

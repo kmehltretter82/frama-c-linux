@@ -203,7 +203,7 @@ struct
     | Atype lt -> basename "A" lt.lt_name
 
   let debug = function
-    | QDATA a -> Qed.Symbol.Data.name a
+    | QDATA a -> Qed.Symbol.Data.fullname a
     | Comp (c, KValue) -> comp_id c
     | Comp (c, KInit) -> comp_init_id c
     | Atype lt -> type_id lt
@@ -471,7 +471,7 @@ struct
     | ACSL f -> logic_id f
     | CTOR c -> ctor_id c
     | LFUN l -> l.m_name
-    | QFUN f -> Qed.Symbol.Fun.name f.e_symbol
+    | QFUN f -> Qed.Symbol.Fun.fullname f.e_symbol
 
   let hash = function
     | ACSL f -> Logic_info.hash f

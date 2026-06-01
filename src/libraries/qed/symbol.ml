@@ -11,7 +11,7 @@ let capitalized a =
 
 let fullname (th : Why3.Theory.theory) (id : Why3.Ident.ident) =
   let buffer = Buffer.create 80 in
-  List.iter (Printf.bprintf buffer ".%s") th.th_path ;
+  List.iter (Printf.bprintf buffer "%s.") th.th_path ;
   Printf.bprintf buffer "%s.%s" th.th_name.id_string id.id_string ;
   Buffer.contents buffer
 
@@ -171,7 +171,7 @@ struct
   let compare a b = Why3.Ident.id_compare (ident a) (ident b)
   let name a = (ident a).id_string
   let fullname a = fullname (theory a) (ident a)
-  let pretty fmt a = Format.pp_print_string fmt (ident a).id_string
+  let pretty fmt a = Format.pp_print_string fmt (fullname a)
 end
 
 module Data = Make

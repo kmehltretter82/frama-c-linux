@@ -61,17 +61,16 @@ let op_lxor = { ac with neutral = E_int 0 ; invertible = true }
 let op_lor  = { ac with neutral = E_int 0 ; absorbent = E_int (-1); idempotent = true }
 let op_land = { ac with neutral = E_int (-1); absorbent = E_int 0 ; idempotent = true }
 
-let f_lnot = Lang.extern_f "frama_c_wp.cint.Cint.lnot"
-let f_lor  = Lang.extern_f ~category:(Operator op_lor) "frama_c_wp.cint.Cint.lor"
-let f_land = Lang.extern_f ~category:(Operator op_land) "frama_c_wp.cint.Cint.land"
-let f_lxor = Lang.extern_f ~category:(Operator op_lxor) "frama_c_wp.cint.Cint.lxor"
-let f_lsl = Lang.extern_f "frama_c_wp.cint.Cint.lsl"
-let f_lsr = Lang.extern_f "frama_c_wp.cint.Cint.lsr"
+let f_lnot = Lang.extern_f "frama_c_wp.cbits.Cbits.lnot"
+let f_lor  = Lang.extern_f ~category:(Operator op_lor) "frama_c_wp.cbits.Cbits.lor"
+let f_land = Lang.extern_f ~category:(Operator op_land) "frama_c_wp.cbits.Cbits.land"
+let f_lxor = Lang.extern_f ~category:(Operator op_lxor) "frama_c_wp.cbits.Cbits.lxor"
+let f_lsl = Lang.extern_f "frama_c_wp.cbits.Cbits.lsl"
+let f_lsr = Lang.extern_f "frama_c_wp.cbits.Cbits.lsr"
 
 let f_bitwised = [ f_lnot ; f_lor ; f_land ; f_lxor ; f_lsl ; f_lsr ]
 
-(* [f_bit_stdlib] is related to the function [bit_test] of Frama-C StdLib *)
-let f_bit_test = Lang.extern_f "frama_c_wp.cint.Cint.bit_test"
+let f_bit_test = Lang.extern_f "frama_c_wp.cbits.Cbits.bit_test"
 
 let () = let open LogicBuiltins in add_builtin "\\bit_test" [Z;Z] f_bit_test
 
@@ -465,15 +464,6 @@ let smp2 f zf = (* f(c1,c2) ~> zf(c1,c2),  f(c1,c2,...) ~> f(zf(c1,c2),...) *)
   | _ -> raise Not_found
 
 let bitk k e = F.e_fun ~result:Logic.Bool f_bit_test [e;k]
-let smp_mk_bit_stdlib = function
-  | [ a ; k ] when is_positive_or_null k ->
-    (* No need to expand the logic definition of the ACSL stdlib symbol when
-       [k] is positive (the definition must comply with the simplification) *)
-    bitk k a
-  | [ a ; k ] ->
-    (* TODO: expand the current logic definition of the ACSL stdlib symbol *)
-    F.e_neq F.e_zero (F.e_fun f_land [a; (F.e_fun f_lsl [F.e_one;k])])
-  | _ -> raise Not_found
 
 let smp_bitk_positive = function
   | [ a ; k ] -> (* requires k>=0 *)
@@ -846,9 +836,6 @@ let () =
       begin
         let mk_builtin n f ?eq ?leq smp = n, { f ; eq; leq; smp } in
 
-        (* From [smp_mk_bit_stdlib], the built-in [f_bit_stdlib] is such that
-           there is no creation of [e_fun f_bit_stdlib args] *)
-        let bi_lbit_stdlib = mk_builtin "f_bit_stdlib" f_bit_test smp_mk_bit_stdlib in
         let bi_lbit = mk_builtin "f_bit" f_bit_test smp_bitk_positive in
         let bi_lnot = mk_builtin "f_lnot" f_lnot ~eq:smp_eq_with_lnot smp_lnot ~leq:(smp_leq_improved f_lnot) in
         let bi_lxor = mk_builtin "f_lxor" f_lxor ~eq:smp_eq_with_lxor ~leq:(smp_leq_improved f_lxor)
@@ -872,7 +859,7 @@ let () =
              | None -> ()
              | Some leq -> F.set_builtin_leq f leq)
           end
-          [bi_lbit_stdlib ; bi_lbit; bi_lnot;
+          [bi_lbit; bi_lnot;
            bi_lxor; bi_lor; bi_land; bi_lsl; bi_lsr];
 
         Lang.For_export.set_builtin_eq f_land export_eq_with_land

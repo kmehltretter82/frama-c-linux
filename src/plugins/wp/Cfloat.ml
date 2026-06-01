@@ -35,10 +35,10 @@ let pp_suffix fmt ft = Format.pp_print_string fmt (ft_suffix ft)
 let fq32 = Lang.extern_f "frama_c_wp.cfloat.Cfloat.to_f32"
 let fq64 = Lang.extern_f "frama_c_wp.cfloat.Cfloat.to_f64"
 
-let f_model ft = Lang.extern_f "model_%a" pp_suffix ft
-let f_delta ft = Lang.extern_f "delta_%a" pp_suffix ft
-let f_epsilon ft = Lang.extern_f "epsilon_%a" pp_suffix ft
-let f_sqrt ft = Lang.extern_f "sqrt_%a" pp_suffix ft
+let f_model ft = Lang.extern_f "frama_c_wp.cfloat.Cfloat.model_%a" pp_suffix ft
+let f_delta ft = Lang.extern_f "frama_c_wp.cfloat.Cfloat.delta_%a" pp_suffix ft
+let f_epsilon ft = Lang.extern_f "frama_c_wp.cfloat.Cfloat.error_%a" pp_suffix ft
+let f_sqrt ft = Lang.extern_f "frama_c_wp.cfloat.Cfloat.sqrt_%a" pp_suffix ft
 
 (* -------------------------------------------------------------------------- *)
 (* --- Model Setting                                                      --- *)

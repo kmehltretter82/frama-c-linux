@@ -268,12 +268,12 @@ let builtin_exp_leq = builtin_strict_leq f_exp
 (* -------------------------------------------------------------------------- *)
 
 let f_sin = f_builtin "\\sin" ~link:"real.Trigonometry.sin"
-let f_cos = f_builtin "\\cos" ~link:"real.Trigonometry.sin"
-let f_tan = f_builtin "\\tan" ~link:"real.Trigonometry.sin"
+let f_cos = f_builtin "\\cos" ~link:"real.Trigonometry.cos"
+let f_tan = f_builtin "\\tan" ~link:"real.Trigonometry.tan"
 
-let f_asin = f_builtin "\\asin" ~link:"frama_c_wp.cmath.ArgTrigo.asin"
-let f_acos = f_builtin "\\acos" ~link:"frama_c_wp.cmath.ArgTrigo.acos"
-let f_atan = f_builtin "\\atan" ~link:"frama_c_wp.cmath.ArgTrigo.atan"
+let f_asin = f_builtin "\\asin" ~link:"frama_c_wp.cmath.ArcTrigo.asin"
+let f_acos = f_builtin "\\acos" ~link:"frama_c_wp.cmath.ArcTrigo.acos"
+let f_atan = f_builtin "\\atan" ~link:"frama_c_wp.cmath.ArcTrigo.atan"
 
 let domain_asin_acos x =
   QED.eval_leq x e_one_real &&

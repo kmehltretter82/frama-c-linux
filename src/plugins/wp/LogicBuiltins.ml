@@ -191,12 +191,15 @@ let constant name = lookup name []
 let add_alias ~source name kinds ~alias =
   register ~source name kinds (lookup alias kinds)
 
+let is_float32 qf = Qed.Symbol.Data.fullname qf = "ieee_float.Float32.t"
+let is_float64 qf = Qed.Symbol.Data.fullname qf = "ieee_float.Float64.t"
+
 let check_param ~source name kind tau =
   match kind, tau with
   | (B, (Logic.Bool | Prop)) | (Z, Int) | (R, Real)
   | (I _, Int) | (F _, Real) | (A, _) -> ()
-  | (F Float32, Data(qf,[])) when Qed.Symbol.Data.name qf = "f32" -> ()
-  | (F Float64, Data(qf,[])) when Qed.Symbol.Data.name qf = "f64" -> ()
+  | (F Float32, Data(qf,[])) when is_float32 qf -> ()
+  | (F Float64, Data(qf,[])) when is_float64 qf -> ()
   | _ ->
     Wp_parameters.error ~source
       "Incorrect driver for %S (kind %a for type %a)"

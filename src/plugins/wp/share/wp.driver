@@ -16,8 +16,6 @@ logic real "\\max"(real,real) =
 logic real "\\min"(real,real) =
       commutative:associative:idempotent: "real.MinMax.min";
 
-logic boolean "bit_test"(integer,integer) := \bit_test;
-
 type "rounding_mode"   = "frama_c_wp.cfloat.Cfloat.Rounding.mode";
 ctor "\\Up"()          = "frama_c_wp.cfloat.Cfloat.Rounding.RTP";
 ctor "\\Down"()        = "frama_c_wp.cfloat.Cfloat.Rounding.RTN";

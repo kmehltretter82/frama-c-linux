@@ -70,23 +70,6 @@ let debug fmt = Wp_parameters.debug ~dkey fmt
 let debug_val = Wp_parameters.debug ~dkey:dkey_val
 
 (* -------------------------------------------------------------------------- *)
-(* ---  Logic Memory Wrapper                                              --- *)
-(* -------------------------------------------------------------------------- *)
-let t_addr = Lang.extern_tau "frama_c_wp.memaddr.MemAddr.addr"
-let f_base = Lang.extern_f "frama_c_wp.memaddr.MemAddr.base"
-let f_offset = Lang.extern_f "frama_c_wp.memaddr.MemAddr.offset"
-let f_shift  = Lang.extern_f "frama_c_wp.memaddr.MemAddr.shift"
-let f_global = Lang.extern_f "frama_c_wp.memaddr.MemAddr.global"
-let f_null   = Lang.extern_f "frama_c_wp.memaddr.MemAddr.null"
-
-let a_null = F.constant (F.e_fun f_null []) (* { base = 0; offset = 0 } *)
-let a_base p = F.e_fun f_base [p]           (* p -> p.offset *)
-let a_offset p = F.e_fun f_offset [p]       (* p -> p.base *)
-let a_global b = F.e_fun f_global [b]       (* b -> { base = b; offset = 0 } *)
-let a_shift l k = F.e_fun f_shift [l;k]     (* p k -> { p w/ offset = p.offset + k } *)
-let a_addr b k = a_shift (a_global b) k   (* b k -> { base = b; offset = k } *)
-
-(* -------------------------------------------------------------------------- *)
 (* ---  Cmath Wrapper                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 let a_iabs i = F.e_fun ~result:Logic.Int Cmath.f_iabs [i]    (* x -> |x| *)
@@ -96,44 +79,6 @@ let a_iabs i = F.e_fun ~result:Logic.Int Cmath.f_iabs [i]    (* x -> |x| *)
 (* -------------------------------------------------------------------------- *)
 (* Model utilities *)
 let t_words = Logic.Array (Logic.Int, Logic.Int) (* TODO: A way to abstract this ? *)
-
-(* -------------------------------------------------------------------------- *)
-(* ---  Qed Simplifiers                                                   --- *)
-(* -------------------------------------------------------------------------- *)
-let phi_base t = match F.repr t with
-  | Logic.Fun (f, [p; _]) when f == f_shift -> a_base p
-  | Logic.Fun (f, [b]) when f == f_global -> b
-  | _ -> raise Not_found
-
-let phi_offset t = match F.repr t with
-  | Logic.Fun (f, [p; k]) when f == f_shift -> F.e_add (a_offset p) k
-  | Logic.Fun (f, _) when f == f_global -> F.e_zero
-  | _ -> raise Not_found
-
-let phi_shift p i =
-  if F.is_zero i then p
-  else match F.repr p with
-    | Logic.Fun (f, [q; j]) when f == f_shift -> F.e_fun f [q; F.e_add i j]
-    (* | Logic.Fun (f, [b]) when f == f_global -> a_addr b i *)
-    | _ -> raise Not_found
-
-let _phi_read ~obj ~read ~write mem off = match F.repr mem with
-  | Logic.Fun (f, [_; o; v]) when f == write && off == o -> v
-  (*read_tau (write_tau m o v) o == v*)
-  | Logic.Fun (f, [m; o; _]) when f == write ->
-    let offset = a_iabs (F.e_sub off o) in
-    if F.eval_leq (F.e_int (Ctypes.sizeof_object obj)) offset then
-      F.e_fun read [m; off]
-    else raise Not_found
-  (*read_tau (write_tau m o v) o' == read m o' when |o - o'| <= sizeof(tau)*)
-  | _ -> raise Not_found
-
-let () = Context.register
-    begin fun () ->
-      F.set_builtin_1 f_base phi_base;
-      F.set_builtin_1 f_offset phi_offset;
-      F.set_builtin_2 f_shift phi_shift;
-    end
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Utilities                                                         --- *)
@@ -166,7 +111,7 @@ struct
   let datatype = "MemVal." ^ V.datatype
   let configure () =
     let rollback = V.configure () in
-    let orig_pointer = Context.push Lang.pointer t_addr in
+    let orig_pointer = Context.push Lang.pointer MemAddr.t_addr in
     let rollback () =
       rollback ();
       Context.pop Lang.pointer orig_pointer;
@@ -245,12 +190,12 @@ struct
   (* -------------------------------------------------------------------------- *)
   let null = {
     loc_v = V.null;
-    loc_t = a_null;
+    loc_t = MemAddr.null;
   }
 
   let cvar x = {
     loc_v = V.cvar x;
-    loc_t = a_addr (F.e_int (Base.id (Base.of_varinfo x))) (F.e_zero);
+    loc_t = MemAddr.mk_addr (F.e_int Base.(id @@ of_varinfo x)) F.e_zero;
   }
 
 
@@ -383,7 +328,7 @@ struct
       | [x] -> f x
       | x :: xs ->
         F.e_if
-          (F.e_eq (a_base l.loc_t) (F.e_int (Base.id x)))
+          (F.e_eq (MemAddr.base l.loc_t) (F.e_int (Base.id x)))
           (f x)
           (aux xs)
     in
@@ -395,7 +340,7 @@ struct
       | [x] -> f x
       | x :: xs ->
         F.p_if
-          (F.p_equal (a_base l.loc_t) (F.e_int (Base.id x)))
+          (F.p_equal (MemAddr.base l.loc_t) (F.e_int (Base.id x)))
           (f x)
           (aux xs)
     in
@@ -416,7 +361,7 @@ struct
     let offs = Z.of_int (Ctypes.field_offset fd) in
     {
       loc_v = V.field l.loc_v fd;
-      loc_t = a_shift l.loc_t (F.e_bigint offs);
+      loc_t = MemAddr.shift l.loc_t (F.e_bigint offs);
     }
 
   let shift l obj k =
@@ -424,13 +369,13 @@ struct
     let offs = F.e_times size k in
     {
       loc_v = V.shift l.loc_v obj k;
-      loc_t = a_shift l.loc_t offs;
+      loc_t = MemAddr.shift l.loc_t offs;
     }
 
   let base_addr l =
     {
       loc_v = V.base_addr l.loc_v;
-      loc_t = a_addr (a_base l.loc_t) F.e_zero;
+      loc_t = MemAddr.mk_addr (MemAddr.base l.loc_t) F.e_zero;
     }
 
   let block_length _s _obj l =
@@ -466,7 +411,7 @@ struct
   let load_value sigma obj l =
     let load_base base =
       let mem = State.value sigma base in
-      let offset = a_offset l.loc_t in
+      let offset = MemAddr.offset l.loc_t in
       read obj ~mem ~offset
     in
     let t = fold_ite load_base l in
@@ -479,10 +424,10 @@ struct
   let load_loc ~assume sigma obj l =
     let load_base v' base =
       let mem = State.value sigma base in
-      let offset = a_offset l.loc_t in
+      let offset = MemAddr.offset l.loc_t in
       let rd = read obj ~mem ~offset in
       if assume then begin
-        let pred = V.offset v' (a_offset rd) in
+        let pred = V.offset v' (MemAddr.offset rd) in
         Lang.assume pred (* Yet another mutable. *)
       end;
       rd
@@ -512,17 +457,17 @@ struct
     let mk_write cond base =
       let wpre = State.value seq.pre base in
       let wpost = State.value seq.post base in
-      let write = write obj ~mem:wpre ~offset:(a_offset l.loc_t) ~value:v in
+      let write = write obj ~mem:wpre ~offset:(MemAddr.offset l.loc_t) ~value:v in
       F.p_equal wpost (F.e_if cond write wpre)
     in
     let rec store acc = function
       | [] -> assert false
       | [c] ->
-        let cond = F.e_and ((List.map (F.e_neq (a_base l.loc_t))) acc) in
+        let cond = F.e_and ((List.map (F.e_neq (MemAddr.base l.loc_t))) acc) in
         [ Assert (mk_write cond c) ]
       | c :: cs ->
         let bid = (F.e_int (Base.id c)) in
-        let cond = F.e_eq (a_base l.loc_t) bid in
+        let cond = F.e_eq (MemAddr.base l.loc_t) bid in
         [ Assert (mk_write cond c) ]
         @ store (bid :: acc) cs
     in
@@ -545,16 +490,16 @@ struct
   (* -------------------------------------------------------------------------- *)
   (* ---  Pointer Comparison                                                --- *)
   (* -------------------------------------------------------------------------- *)
-  let is_null l = F.p_equal l.loc_t a_null
+  let is_null l = F.p_equal l.loc_t MemAddr.null
 
   let loc_delta l1 l2 =
-    match F.is_equal (a_base l1.loc_t) (a_base l2.loc_t) with
-    | Logic.Yes -> F.e_sub (a_offset l1.loc_t) (a_offset l2.loc_t)
+    match F.is_equal (MemAddr.base l1.loc_t) (MemAddr.base l2.loc_t) with
+    | Logic.Yes -> F.e_sub (MemAddr.offset l1.loc_t) (MemAddr.offset l2.loc_t)
     | Logic.Maybe | Logic.No ->
       Warning.error "Can only compare pointers with same base."
 
-  let base_eq l1 l2 = F.p_equal (a_base l1.loc_t) (a_base l2.loc_t)
-  let offset_cmp cmpop l1 l2 = cmpop (a_offset l1.loc_t) (a_offset l2.loc_t)
+  let base_eq l1 l2 = F.p_equal (MemAddr.base l1.loc_t) (MemAddr.base l2.loc_t)
+  let offset_cmp cmpop l1 l2 = cmpop (MemAddr.offset l1.loc_t) (MemAddr.offset l2.loc_t)
 
   let loc_diff _obj l1 l2 = loc_delta l1 l2
   let loc_eq l1 l2 = F.p_and (base_eq l1 l2) (offset_cmp F.p_equal l1 l2)
@@ -606,7 +551,7 @@ struct
                                    | OBJ -> true (* TODO:  *) in
     let l, base_offset = match r with
       | LOC (l, n) ->
-        let a = a_offset l.loc_t in
+        let a = MemAddr.offset l.loc_t in
         let b = F.e_add a (F.e_sub n F.e_one) in
         l, Vset.range (Some a) (Some b)
       | RANGE (l, r) -> l, Vset.lift_add (Vset.singleton l.loc_t) r
@@ -666,7 +611,7 @@ struct
   (* -------------------------------------------------------------------------- *)
   let range_to_base_offset = function
     | LOC (l, n) ->
-      let a = a_offset l.loc_t in
+      let a = MemAddr.offset l.loc_t in
       let b = F.e_add a n in
       l, Vset.range (Some a) (Some b)
     | RANGE (l, r) -> l, Vset.lift_add (Vset.singleton l.loc_t) r
@@ -676,7 +621,7 @@ struct
     let l1, vs1 = range_to_base_offset (range_of_rloc s1) in
     let l2, vs2 = range_to_base_offset (range_of_rloc s2) in
     F.p_and
-      (F.p_equal (a_base l1.loc_t) (a_base l2.loc_t))
+      (F.p_equal (MemAddr.base l1.loc_t) (MemAddr.base l2.loc_t))
       (Vset.subset vs1 vs2)
 
   let separated : segment -> segment -> F.pred = fun s1 s2 ->
@@ -684,7 +629,7 @@ struct
     let l1, vs1 = range_to_base_offset (range_of_rloc s1) in
     let l2, vs2 = range_to_base_offset (range_of_rloc s2) in
     F.p_and
-      (F.p_equal (a_base l1.loc_t) (a_base l2.loc_t))
+      (F.p_equal (MemAddr.base l1.loc_t) (MemAddr.base l2.loc_t))
       (Vset.disjoint vs1 vs2)
 
   let initialized _sigma _l = F.p_true (* todo *)
