@@ -56,16 +56,13 @@ let warn_imprecise_offsm_write ?prefix lval offsm =
 (* ---------------------------------------------------------------------- *)
 
 let reduce valuation lval value t =
-  if Ast_types.has_qualifier "volatile" lval.typ
-  then t
-  else
-    match valuation.Abstract_domain.find_loc lval with
-    | `Value record ->
-      let loc = Precise_locs.imprecise_location record.loc in
-      if Locations.cardinal_zero_or_one loc
-      then Cvalue.Model.reduce_indeterminate_binding t loc value
-      else t
-    | `Top -> t (* Cannot reduce without the location of the lvalue. *)
+  match valuation.Abstract_domain.find_loc lval with
+  | `Value record ->
+    let loc = Precise_locs.imprecise_location record.loc in
+    if Locations.cardinal_zero_or_one loc
+    then Cvalue.Model.reduce_indeterminate_binding t loc value
+    else t
+  | `Top -> t (* Cannot reduce without the location of the lvalue. *)
 
 let is_smaller_value typ v1 v2 =
   let size = Z.of_int (Cil.bitsSizeOf typ) in
@@ -108,7 +105,7 @@ let write_abstract_value state (lval, loc) assigned_value =
   let {v; initialized; escaping} = assigned_value in
   let value = unbottomize v in
   let value =
-    if Ast_types.has_qualifier "volatile" lval.typ
+    if Locations.is_volatile loc
     then Cvalue_forward.make_volatile value
     else value
   in
@@ -121,23 +118,19 @@ exception Do_assign_imprecise_copy
 
 let copy_one_loc state left_lv right_lv =
   let left_lval, left_loc = left_lv
-  and right_lval, right_loc = right_lv in
+  and _right_lval, right_loc = right_lv in
   (* top size is tested before this function is called, in which case
      the imprecise copy mode is used. *)
   let size = Z_or_top.project right_loc.Locations.size in
-  let right_addr = right_loc.Locations.addr in
-  let offsetmap = Cvalue.Model.copy_offsetmap right_addr size state in
-  let make_volatile =
-    Ast_types.has_qualifier "volatile" left_lval.typ ||
-    Ast_types.has_qualifier "volatile" right_lval.typ
-  in
+  let right_addr_bits = right_loc.Locations.addr in
+  let offsetmap = Cvalue.Model.copy_offsetmap right_addr_bits size state in
   match offsetmap with
   | `Bottom -> `Bottom
   | `Value offsm ->
     (* TODO: this is the good place to handle partially volatile
        struct, whether as source or destination *)
     let offsetmap =
-      if make_volatile then
+      if Locations.(is_volatile left_loc || is_volatile right_loc) then
         Cvalue.V_Offsetmap.map_on_values
           (Cvalue.V_Or_Uninitialized.map Cvalue_forward.make_volatile) offsm
       else offsm

@@ -90,6 +90,10 @@
   signed overflow. assert -2147483648 ≤ m - l;
 [eva:alarm] volatile.c:59: Warning: 
   signed overflow. assert m - l ≤ 2147483647;
+[eva:volatile] volatile.c:69: Warning: 
+  Lvalue *pv with non-volatile-qualified type may refer to an object defined with a volatile-qualified type.
+[eva:volatile] volatile.c:70: Warning: 
+  Lvalue *pv with non-volatile-qualified type may refer to an object defined with a volatile-qualified type.
 [eva:progress] Recording results for main1
 [eva:progress] Done for function main1
 [eva:progress] 
@@ -368,11 +372,11 @@
 [eva:final-states] Values at end of function main1:
   G ∈ [--..--]
   E ∈ [--..--]
-  X ∈ {2}
+  X ∈ [--..--]
   Y ∈ [--..--]
   pV ∈ {{ &Y }}
   k ∈ [--..--]
-  x ∈ {2}
+  x ∈ [--..--]
   y ∈ [--..--]
   a ∈ {11; 12}
   b ∈ [--..--]
@@ -415,11 +419,11 @@
 [eva:final-states] Values at end of function main:
   G ∈ [--..--]
   E ∈ [--..--]
-  X ∈ {2}
+  X ∈ [--..--]
   Y ∈ [--..--]
   pV ∈ {{ &Y }}
   k ∈ {{ NULL ; (int)&X }}
-  x ∈ {2}
+  x ∈ [--..--]
   y ∈ [--..--]
   a ∈ {11; 12}
   b ∈ [--..--]

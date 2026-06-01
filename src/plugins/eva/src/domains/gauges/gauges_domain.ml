@@ -759,7 +759,7 @@ module G = struct
      | IntraproceduralAll -> not vi.vglob
      | IntraproceduralNonReferenced -> not vi.vglob && not vi.vaddrof
     ) &&
-    not (Ast_types.has_qualifier "volatile" vi.vtype)
+    not (Ast_types.is_volatile vi.vtype)
 
   let kill_base b (ct, l as state: t): t =
     let aux = function

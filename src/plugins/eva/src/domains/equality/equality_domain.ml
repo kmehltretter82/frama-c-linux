@@ -377,20 +377,17 @@ struct
     | Copy (_loc, value) -> not value.initialized || value.escaping
 
   (* Auxiliary function for [assign]. The equality is inferred, unless:
-     - some of the expressions involved are volatile
      - the value has an aggregate type (as the current Eva values have no
        meaning for such type, the equality would be useless or misleading).
      - it is an assignment by copy, and the copied value is possibly
        uninitialized or escaping. In this case, when using the equality later,
        the reevaluation of [right_expr] would reduce it incorrectly, by
        removing indeterminate flags without emitting alarms. *)
-  let assign_eq left_lval right_expr value valuation state =
-    if Eva_ast.lval_contains_volatile left_lval ||
-       Eva_ast.exp_contains_volatile right_expr ||
-       not (Ast_types.is_scalar left_lval.typ) ||
-       indeterminate_copy value
+  let assign_eq (left_lval: Eva_ast.lval) right_expr value valuation state =
+    if not (Ast_types.is_scalar left_lval.typ) || indeterminate_copy value
     then state
     else
+      let right_expr = Eva_ast.const_fold right_expr in
       let (equalities, deps, modified_zone: t) = state in
       let lterm = HCE.of_lval left_lval in
       let lterm_lvals = Hcexprs.empty_lvalues in
@@ -406,7 +403,6 @@ struct
     let left_loc = Precise_locs.imprecise_location left_value.lloc in
     let direct_left_zone = Locations.(enumerate_valid_bits Write left_loc) in
     let state = kill Hcexprs.Modified direct_left_zone state in
-    let right_expr = Eva_ast.const_fold right_expr in
     try
       let indirect_left_zone =
         Eva_ast.PreciseDepsOf.indirect_zone_of_lval
@@ -414,15 +410,18 @@ struct
       and right_zone =
         Eva_ast.PreciseDepsOf.zone_of_exp (find_loc valuation) right_expr
       in
-      (* After an assignment lv = e, the equality [lv == eq] holds iff the value
-         of [e] and the location of [lv] are not modified by the assignment,
-         i.e. iff the dependencies of [e] and of the lhost and offset of [lv]
-         do not intersect the assigned location.
-         Moreover, the domain do not store the equality when the abstract
+      (* After an assignment lv = e, the equality [lv == eq] holds iff:
+         - [e] and [lv] do not depend on volatile memory locations;
+         - the value of [e] and the location of [lv] are not modified by the
+           assignment, i.e. iff the dependencies of [e] and of the lhost and
+           offset of [lv] do not intersect the assigned location. *)
+      (* Moreover, the domain do not store the equality when the abstract
          location of [lv] and the abstract value of [e] are singleton, as in
          this case, the main cvalue domain is able to infer the equality. *)
       if (Memory_zone.intersects direct_left_zone right_zone) ||
          (Memory_zone.intersects direct_left_zone indirect_left_zone) ||
+         valuation.Abstract_domain.is_volatile (`Lval left_value.lval) ||
+         valuation.Abstract_domain.is_volatile (`Expr right_expr) ||
          (is_singleton (Eval.value_assigned value) &&
           Locations.cardinal_zero_or_one left_loc)
       then `Value state
@@ -433,8 +432,9 @@ struct
      at the call. *)
   let assign_formals valuation call state =
     let assign_formal state arg =
-      if is_singleton (Eval.value_assigned arg.avalue) then
-        state
+      if is_singleton (Eval.value_assigned arg.avalue)
+      || valuation.Abstract_domain.is_volatile (`Expr arg.concrete)
+      then state
       else
         try
           let left_value = Eva_ast.Build.var arg.formal in
@@ -457,25 +457,23 @@ struct
     | false, BinOp (Ne, e1, e2, _) ->
       begin
         if not (is_safe_equality valuation e1 e2)
+        || valuation.Abstract_domain.is_volatile (`Expr e1)
+        || valuation.Abstract_domain.is_volatile (`Expr e2)
+        || not (Ast_types.is_scalar e1.typ)
+        || (expr_is_cardinal_zero_or_one_loc valuation e1 &&
+            expr_cardinal_zero_or_one valuation e2)
+        || (expr_is_cardinal_zero_or_one_loc valuation e2 &&
+            expr_cardinal_zero_or_one valuation e1)
         then `Value state
         else
           let e1 = Eva_ast.const_fold e1
           and e2 = Eva_ast.const_fold e2 in
-          if Eva_ast.exp_contains_volatile e1
-          || Eva_ast.exp_contains_volatile e2
-          || not (Ast_types.is_scalar e1.typ)
-          || (expr_is_cardinal_zero_or_one_loc valuation e1 &&
-              expr_cardinal_zero_or_one valuation e2)
-          || (expr_is_cardinal_zero_or_one_loc valuation e2 &&
-              expr_cardinal_zero_or_one valuation e1)
-          then `Value state
-          else
-            try
-              let a1, a1_lvals, deps = register e1 valuation deps in
-              let a2, a2_lvals, deps = register e2 valuation deps in
-              let eqs = Equality.Set.unite (a1, a1_lvals) (a2, a2_lvals) eqs in
-              `Value (eqs, deps, modified_zone)
-            with Top_location -> `Value state
+          try
+            let a1, a1_lvals, deps = register e1 valuation deps in
+            let a2, a2_lvals, deps = register e2 valuation deps in
+            let eqs = Equality.Set.unite (a1, a1_lvals) (a2, a2_lvals) eqs in
+            `Value (eqs, deps, modified_zone)
+          with Top_location -> `Value state
       end
     | _ -> `Value state
 

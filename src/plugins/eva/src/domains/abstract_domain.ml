@@ -202,17 +202,19 @@ type ('value, 'location, 'origin) valuation =
         alarms emitted by its evaluation and whether its value has been reduced.
         Returns `Top if the expression has not been evaluated. *)
     fold: 'a. (exp -> ('value, 'origin) record_val -> 'a -> 'a) -> 'a -> 'a;
-    (** [fold f a] computes (f eN rN ... (f e1 r1 a)...), where e1 ... eN are
-        the evaluated (sub)expressions and r1 ... rN are the computed records
-        for each of these expressions. The record of an expression contains its
+    (** [fold f a] computes (f eN rN ... (f e1 r1 a)...), where e1...eN are the
+        computed non-volatile (sub)expressions and r1...rN are the computed
+        records for each expression. The record of an expression contains its
         value, reduction status, origin and alarms. *)
     find_loc: lval -> 'location record_loc or_top;
     (** Finds the location computed for an lvalue. The returned record also
         contains the lvalue type and the alarms emitted by its evaluation.
         Returns `Top if the lvalue has not been evaluated. *)
-    find_loc_def: lval -> 'location
+    find_loc_def: lval -> 'location;
     (** Finds the location computed for an lvalue. Returns the given top if the
         lvalue has not been evaluated. *)
+    is_volatile: [`Expr of exp | `Lval of lval] -> bool;
+    (** Returns true if the given expression or lvalue may be volatile. *)
   }
 
 (** Transfer function of the domain. *)

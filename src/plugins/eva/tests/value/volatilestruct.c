@@ -1,5 +1,8 @@
 /* run.config*
-   STDOPT: +"-then -no-warn-signed-overflow -eva-no-warn-pointer-subtraction"
+   STDOPT: -cpp-extra-args="-DSTRUCT=volatile -DPTR="
+   STDOPT: -cpp-extra-args="-DSTRUCT=volatile -DPTR=volatile"
+   STDOPT: -cpp-extra-args="-DSTRUCT= -DPTR="
+   STDOPT: -cpp-extra-args="-DSTRUCT= -DPTR=volatile"
 */
 
 struct ss {
@@ -13,8 +16,15 @@ struct s {
   int f5;
 };
 
-volatile struct s *p;
-struct s s2;
+/* The four runs test respectively:
+   - the struct is volatile but the pointer not: warnings about the pointer
+     and the struct values are unknown.
+   - the struct and pointer are volatile: no specific volatile warnings, but
+     the struct values are unknown.
+   - the struct and the pointer are not volatile: no warnings, precise values.
+   - the struct is not volatile but the pointer is: same as above. */
+PTR struct s *p;
+STRUCT struct s s2;
 
 char x;
 int y;

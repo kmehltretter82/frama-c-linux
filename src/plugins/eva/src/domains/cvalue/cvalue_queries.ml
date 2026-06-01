@@ -56,7 +56,6 @@ module Queries = struct
     in
     fun loc (acc_result, acc_alarms) ->
       let result, alarms = eval_one_loc loc in
-      let result = Cvalue_forward.make_volatile ~typ:lval.typ result in
       Cvalue.V.join result acc_result, join_alarms acc_alarms alarms
 
   (* The zero singleton is shared between float and integer representations in
@@ -119,8 +118,7 @@ module Queries = struct
     let loc = Precise_locs.imprecise_location precise_loc in
     let eval_one_loc single_loc =
       let v = Cvalue.Model.find state single_loc in
-      let v = Cvalue_forward.make_volatile ~typ:lval.Eva_ast.typ v in
-      Cvalue_forward.reinterpret lval.typ v
+      Cvalue_forward.reinterpret lval.Eva_ast.typ v
     in
     let process_ival base ival (acc_loc, acc_val as acc) =
       let addr_bits = Addresses.Bits.inject base ival in
