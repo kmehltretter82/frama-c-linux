@@ -29,7 +29,6 @@ class browser ?on_cluster f cluster =
     (* Base Visitor *)
     inherit Definitions.visitor cluster
     method section _ = ()
-    method on_library _ = ()
     method on_theory _ _ = ()
     method on_data _ = ()
     method on_lfun _ = ()

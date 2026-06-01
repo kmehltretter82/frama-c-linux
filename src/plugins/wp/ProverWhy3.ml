@@ -17,19 +17,6 @@ let dkey_model =
     ~help:"Counter examples model variable"
     "why3:model"
 
-let option_file = LogicBuiltins.create_option
-    ~sanitizer:(fun ~driver_dir x -> Filename.concat driver_dir x)
-    "why3" "file"
-
-let option_import = LogicBuiltins.create_option
-    ~sanitizer:(fun ~driver_dir:_ x -> x)
-    "why3" "import"
-
-let option_qual =
-  LogicBuiltins.create_option
-    ~sanitizer:(fun ~driver_dir:_ x -> x)
-    "why3" "qualifier"
-
 let why3_failure msg =
   Format.kasprintf failwith msg
 
@@ -156,21 +143,10 @@ let subterms f e =
   | _ -> Lang.F.lc_iter f e
 
 (* path splitting *)
-let regexp_col = Str.regexp_string ":"
-let regexp_com = Str.regexp_string ","
-let regexp_dot = Str.regexp_string "."
 
-let cut_path s = Str.split_delim regexp_dot s
+let cut_path s = String.split_on_char '.' s
 
-let wp_why3_lib library =
-  match LogicBuiltins.get_option option_qual ~library with
-  | [] -> [library]
-  | [ lib ] -> Str.split_delim regexp_dot lib
-  | l ->
-    let pp_sep fmt () = Format.pp_print_string fmt ", " in
-    Wp_parameters.fatal
-      "too many bindings for WP-specific Why3 theory file %s:@\n%a"
-      library Format.(pp_print_list ~pp_sep pp_print_string) l
+let wp_why3_lib library = [ "frama_c_wp" ; library ]
 
 (* conversion *)
 
@@ -679,11 +655,6 @@ module CLUSTERS = WpContext.Index
       let pretty = Definitions.pp_cluster
     end)
 
-let filenoext file =
-  let basename = Filename.basename file in
-  (try Filename.chop_extension basename
-   with Invalid_argument _ -> basename)
-
 class visitor (ctx:context) c =
   object(self)
 
@@ -697,7 +668,6 @@ class visitor (ctx:context) c =
       self#add_import_file ["int"] "Int" ;
       self#add_import_file ["int"] "ComputerDivision" ;
       self#add_import_file ["real"] "RealInfix" ;
-      self#on_library "qed";
       self#add_import_file ["map"] "Map"
 
     method on_cluster c =
@@ -739,7 +709,7 @@ class visitor (ctx:context) c =
     method section _ = ()
 
     method add_import ?was thy =
-      match Str.split_delim regexp_dot thy with
+      match cut_path thy with
       | [] -> why3_failure "[driver] empty import option"
       | l ->
         let file, thy = Why3.Lists.chop_last l in
@@ -775,54 +745,6 @@ class visitor (ctx:context) c =
       let th = Why3.Theory.use_export th thy in
       let th = Why3.Theory.close_scope th ~import:false in
       ctx.th <- th
-
-    method on_library thy =
-      let copy_file source =
-        if not (Filepath.equal
-                  (Filepath.dirname source)
-                  (Wp_parameters.Share.get_dir "."))
-        then
-          let tgtdir = WpContext.directory () in
-          let why3src = Filepath.basename source in
-          let target = Filepath.(tgtdir / why3src) in
-          Filesystem.copy_file source target
-      in
-      let iter_file opt =
-        match Str.split_delim regexp_col opt with
-        | [file] ->
-          let path = Filepath.of_string file in
-          let filenoext = filenoext file in
-          copy_file path;
-          self#add_import_file [filenoext]
-            (String.capitalize_ascii filenoext);
-        | [file;lib] ->
-          let path = Filepath.of_string file in
-          copy_file path;
-          self#add_import_file [filenoext file] lib;
-        | [file;lib;name] ->
-          let path = Filepath.of_string file in
-          copy_file path;
-          self#add_import_file_as [filenoext file] lib name;
-        | _ -> why3_failure
-                 "[driver] incorrect why3.file %S for library '%s'"
-                 opt thy
-      in
-      let iter_import opt =
-        List.iter (fun import ->
-            match Str.split_delim regexp_col import with
-            | [ th ] -> self#add_import th
-            | [ th ; was ] -> self#add_import ~was th
-            | _ -> why3_failure
-                     "[driver] incorrect why3.import %S for library '%s'"
-                     opt thy
-          ) (Str.split regexp_com opt)
-      in
-      begin
-        List.iter iter_file
-          (LogicBuiltins.get_option option_file ~library:thy) ;
-        List.iter iter_import
-          (LogicBuiltins.get_option option_import ~library:thy) ;
-      end
 
     method on_data d = self#add_use (Qed.Symbol.Data.theory d)
     method on_lfun f = self#add_use (Qed.Symbol.Fun.theory f)

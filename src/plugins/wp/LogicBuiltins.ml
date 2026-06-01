@@ -73,12 +73,6 @@ let pp_kinds fmt = function
     List.iter (fun t -> Format.fprintf fmt ",%a" pp_kind t) ts ;
     Format.fprintf fmt ")"
 
-let pp_libs fmt = function
-  | [] -> ()
-  | t::ts ->
-    Format.fprintf fmt ": %s" t ;
-    List.iter (fun t -> Format.fprintf fmt ",%s" t) ts
-
 let pp_link fmt = function
   | ACSLDEF -> Format.pp_print_string fmt "(ACSL)"
   | HACK _ -> Format.pp_print_string fmt "(HACK)"
@@ -95,10 +89,6 @@ type driver = {
   description : string;
   hlogic : (string , sigfun list) Hashtbl.t;
   htypes : (string , t_builtin) Hashtbl.t;
-  hdeps : (string, string list) Hashtbl.t;
-  hoptions :
-    (string (* library *) * string (* group *) * string (* name *), string list)
-      Hashtbl.t;
   mutable locked: bool
 }
 
@@ -172,20 +162,10 @@ let iter_table f =
     (cdriver_ro ()).hlogic ;
   List.iter f (List.sort Stdlib.compare !items)
 
-let iter_libs f =
-  let items = ref [] in
-  Hashtbl.iter
-    (fun a libs -> items := (a,libs) :: !items)
-    (cdriver_ro ()).hdeps ;
-  List.iter f (List.sort Stdlib.compare !items)
-
 let dump () =
   Log.print_on_output
     begin fun fmt ->
       Format.fprintf fmt "Builtins:@\n" ;
-      iter_libs
-        (fun (name,libs) -> Format.fprintf fmt " * Library %s%a@\n"
-            name pp_libs libs) ;
       iter_table
         (fun (name,k,lnk) -> Format.fprintf fmt " * Logic %s%a = %a@\n"
             name pp_kinds k pp_link lnk) ;
@@ -207,13 +187,6 @@ let constant name = lookup name []
 (* -------------------------------------------------------------------------- *)
 (* --- Declaration of Builtins                                            --- *)
 (* -------------------------------------------------------------------------- *)
-
-let dependencies lib =
-  Hashtbl.find (cdriver_ro ()).hdeps lib
-
-let add_library lib deps =
-  let others = try dependencies lib with Not_found -> [] in
-  Hashtbl.add (cdriver_rw ()).hdeps lib (others @ deps)
 
 let add_alias ~source name kinds ~alias =
   register ~source name kinds (lookup alias kinds)
@@ -264,36 +237,6 @@ let add_type ?source name ~link =
 let hack_type name fn =
   register_type name (HACKT fn)
 
-type sanitizer = driver_dir:string -> string -> string
-let sanitizers : ( string * string , sanitizer ) Hashtbl.t = Hashtbl.create 10
-
-exception Unknown_option of string * string
-
-let sanitize ~driver_dir group name v =
-  try
-    (Hashtbl.find sanitizers (group,name)) ~driver_dir v
-  with Not_found -> raise (Unknown_option(group,name))
-
-type doption = string * string
-
-let create_option ~sanitizer group name =
-  let option = (group,name) in
-  Hashtbl.replace sanitizers option sanitizer ;
-  option
-
-let get_option (group,name) ~library =
-  try Hashtbl.find (cdriver_ro ()).hoptions (library,group,name)
-  with Not_found -> []
-
-let set_option ~driver_dir group name ~library value =
-  let value = sanitize ~driver_dir group name value in
-  Hashtbl.replace (cdriver_rw ()).hoptions (library,group,name) [value]
-
-let add_option ~driver_dir group name ~library value =
-  let value = sanitize ~driver_dir group name value in
-  let l = get_option (group,name) ~library in
-  Hashtbl.replace (cdriver_rw ()).hoptions (library,group,name) (l @ [value])
-
 (* -------------------------------------------------------------------------- *)
 (* --- Implemented Builtins                                               --- *)
 (* -------------------------------------------------------------------------- *)
@@ -301,10 +244,8 @@ let add_option ~driver_dir group name ~library value =
 let builtin_driver = {
   driverid = "builtin driver";
   description = "builtin driver";
-  hlogic = Hashtbl.create 131;
-  htypes = Hashtbl.create 131;
-  hdeps  = Hashtbl.create 31;
-  hoptions = Hashtbl.create 131;
+  hlogic = Hashtbl.create 32;
+  htypes = Hashtbl.create 32;
   locked = false
 }
 
@@ -349,8 +290,6 @@ let new_driver ~id ?(base=builtin_driver)
     description = descr ;
     hlogic = Hashtbl.copy base.hlogic ;
     htypes = Hashtbl.copy base.htypes ;
-    hdeps  = Hashtbl.copy base.hdeps ;
-    hoptions = Hashtbl.copy base.hoptions ;
     locked = false
   } in
   let old = Context.push driver new_driver in

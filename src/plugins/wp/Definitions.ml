@@ -486,7 +486,7 @@ class virtual visitor main =
 
     method vparam x = self#vtau (tau_of_var x)
 
-    method private repr ~bool t =
+    method private repr t =
       begin
         try self#vtau (typeof t);
         with Not_found ->
@@ -500,17 +500,15 @@ class virtual visitor main =
       | Bind(_,qt,_) -> self#vtau qt
       | True | False | Kint _ | Kreal _ | Bvar _
       | Times _ | Add _ | Mul _ | Div _ | Mod _
-      | Aget _ | Aset _ | Apply _ -> ()
-      | Acst _ -> self#on_library "const"
+      | Aget _ | Aset _ | Acst _ | Apply _
       | Eq _ | Neq _ | Leq _ | Lt _
-      | And _ | Or _ | Not _ | Imply _ | If _ ->
-        if bool then self#on_library "bool"
+      | And _ | Or _ | Not _ | Imply _ | If _ -> ()
 
     method vterm t =
       if not (Tset.mem t terms) then
         begin
           terms <- Tset.add t terms ;
-          self#repr ~bool:true t ;
+          self#repr t ;
           lc_iter self#vterm t ;
         end
 
@@ -518,7 +516,7 @@ class virtual visitor main =
       let t = e_prop p in
       if not (Tset.mem t terms) then
         begin
-          self#repr ~bool:false t ;
+          self#repr t ;
           lc_iter
             (fun e ->
                if is_prop e
@@ -615,19 +613,6 @@ class virtual visitor main =
           self#on_cluster c ;
         end
 
-    method vlibrary lib =
-      if not (DS.mem lib libraries) then
-        begin
-          libraries <- DS.add lib libraries ;
-          try
-            let deps = LogicBuiltins.dependencies lib in
-            List.iter self#vlibrary deps ;
-            self#on_library lib ;
-          with Not_found ->
-            Wp_parameters.fatal
-              ~current:false "Unknown library '%s'" lib
-        end
-
     method vtheory p m =
       if not (DW.mem (p,m) theories) then
         begin
@@ -673,7 +658,6 @@ class virtual visitor main =
 
     method virtual section : string -> unit
     method virtual on_theory : string list -> string -> unit
-    method virtual on_library : string -> unit
     method virtual on_cluster : cluster -> unit
     method virtual on_data : Qed.Symbol.data -> unit
     method virtual on_lfun : Qed.Symbol.lfun -> unit

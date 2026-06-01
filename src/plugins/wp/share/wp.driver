@@ -6,41 +6,25 @@
 /*                                                                        */
 /**************************************************************************/
 
-library qed:
-why3.import += "int.Abs:IAbs";
-why3.import += "frama_c_wp.qed.Qed";
-why3.qualifier := "frama_c_wp.qed";
-
-library const:
-why3.import += "map.Const";
-
-library minmax_int:
 logic integer "\\max"(integer,integer) =
       commutative:associative:idempotent: "int.MinMax.max";
 logic integer "\\min"(integer,integer) =
       commutative:associative:idempotent: "int.MinMax.min";
 
-library minmax_real:
 logic real "\\max"(real,real) =
       commutative:associative:idempotent: "real.MinMax.max";
 logic real "\\min"(real,real) =
       commutative:associative:idempotent: "real.MinMax.min";
 
-library cint:
-why3.import += "frama_c_wp.cint.Cint";
-
-library cbits: cint
 logic boolean "bit_test"(integer,integer) := \bit_test;
-why3.import += "frama_c_wp.cbits.Cbits";
 
-library cfloat: cmath sqrt
-why3.import += "frama_c_wp.cfloat.Cfloat";
 type "rounding_mode"   = "frama_c_wp.cfloat.Cfloat.Rounding.mode";
 ctor "\\Up"()          = "frama_c_wp.cfloat.Cfloat.Rounding.RTP";
 ctor "\\Down"()        = "frama_c_wp.cfloat.Cfloat.Rounding.RTN";
 ctor "\\ToZero"()      = "frama_c_wp.cfloat.Cfloat.Rounding.RTZ";
 ctor "\\NearestAway"() = "frama_c_wp.cfloat.Cfloat.Rounding.RNA";
 ctor "\\NearestEven"() = "frama_c_wp.cfloat.Cfloat.Rounding.RNE";
+
 predicate "\\is_finite"(float32) = "frama_c_wp.cfloat.Cfloat.is_finite_f32";
 predicate "\\is_finite"(float64) = "frama_c_wp.cfloat.Cfloat.is_finite_f64";
 predicate "\\is_NaN"(float32) = "frama_c_wp.cfloat.Cfloat.is_NaN_f32";
@@ -51,53 +35,12 @@ predicate "\\is_plus_infinity"(float32) = "frama_c_wp.cfloat.Cfloat.is_positive_
 predicate "\\is_plus_infinity"(float64) = "frama_c_wp.cfloat.Cfloat.is_positive_infinite_f64";
 predicate "\\is_minus_infinity"(float32) = "frama_c_wp.cfloat.Cfloat.is_negative_infinite_f32";
 predicate "\\is_minus_infinity"(float64) = "frama_c_wp.cfloat.Cfloat.is_negative_infinite_f64";
+
 logic float32 "\\round_float"(rounding_mode,real) = "frama_c_wp.cfloat.Cfloat.round_float";
 logic float64 "\\round_double"(rounding_mode,real) = "frama_c_wp.cfloat.Cfloat.round_double";
+
 type "sign" = "frama_c_wp.cfloat.Cfloat.sign";
 ctor "\\Positive" = "frama_c_wp.cfloat.Cfloat.Positive";
 ctor "\\Negative" = "frama_c_wp.cfloat.Cfloat.Negative";
-logic sign "\\sign"(float32) = "sign_f32";
-logic sign "\\sign"(float64) = "sign_f64";
-
-library vset:
-why3.import := "frama_c_wp.vset.Vset";
-
-library vlist:
-why3.import := "frama_c_wp.vlist.Vlist";
-
-library memaddr:
-why3.import := "frama_c_wp.memaddr.MemAddr";
-
-library memory: memaddr
-why3.import := "frama_c_wp.memory.Memory";
-
-library sequence: sequence
-why3.import := "frama_c_wp.sequence.Seq";
-
-library sqrt: cmath
-why3.import += "real.Square";
-why3.import += "frama_c_wp.cmath.Square";
-
-library exponential: qed
-why3.import += "frama_c_wp.cmath.ExpLog" ;
-
-library power: exponential sqrt
-
-library truncate: qed
-why3.import += "real.Truncate" ;
-
-library cmath: qed
-why3.import += "real.Abs:RAbs" ;
-why3.import += "frama_c_wp.cmath.Cmath";
-
-library trigonometry: sqrt cmath
-why3.import += "real.Trigonometry";
-
-library arctrigo: trigonometry
-why3.import += "frama_c_wp.cmath.ArcTrigo";
-
-library hyperbolic: sqrt exponential
-why3.import += "real.Hyperbolic";
-
-library polar: sqrt trigonometry
-why3.import += "real.Polar";
+logic sign "\\sign"(float32) = "frama_c_wp.cfloat.Cfloat.sign_f32";
+logic sign "\\sign"(float64) = "frama_c_wp.cfloat.Cfloat.sign_f64";

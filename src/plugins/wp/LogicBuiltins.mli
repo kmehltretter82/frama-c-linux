@@ -57,12 +57,6 @@ val descr : driver -> string
 val is_default : driver -> bool
 val compare : driver -> driver -> int
 
-val dependencies : string -> string list
-(** Of external theories. Raises Not_found if undefined *)
-
-val add_library : string -> string list -> unit
-(** Add a new library or update the dependencies of an existing one *)
-
 val add_type : ?source:Filepos.t ->
   string -> link:string -> unit
 
@@ -77,26 +71,6 @@ val add_logic : source:Filepos.t ->
 
 val add_predicate : source:Filepos.t ->
   string -> kind list -> link:string -> unit
-
-val add_option :
-  driver_dir:string -> string -> string -> library:string -> string -> unit
-(** add a value to an option (group, name) *)
-
-val set_option :
-  driver_dir:string -> string -> string -> library:string -> string -> unit
-(** reset and add a value to an option (group, name) *)
-
-type doption
-
-type sanitizer = (driver_dir:string -> string -> string)
-
-val create_option: sanitizer:sanitizer -> string -> string -> doption
-(** [add_option_sanitizer ~driver_dir group name]
-    add a sanitizer for group [group] and option [name] *)
-
-val get_option : doption -> library:string -> string list
-(** return the values of option (group, name),
-    return the empty list if not set *)
 
 type builtin =
   | ACSLDEF

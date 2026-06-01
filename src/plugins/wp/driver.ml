@@ -22,7 +22,6 @@ let pretty fmt = function
   | LINK s -> Format.fprintf fmt "\"%s\"" s
   | BOOLEAN | INTEGER | REAL | INT _ | FLT _  | KIND _ ->
     Format.pp_print_string fmt "<type>"
-  | FIELD(group,name) -> Format.fprintf fmt "%s.%s" group name
 
 type input = {
   lexbuf : Lexing.lexbuf ;
@@ -40,12 +39,6 @@ let skip input =
 let token input = input.current
 
 let source input = input.position
-
-let value input =
-  if input.current = EOF then failwith "Value expected"
-  else
-    let v = value input.lexbuf in
-    skip input; v
 
 let key input a = match token input with
   | KEY b when a=b -> skip input ; true
@@ -93,14 +86,6 @@ let rec parameters input =
 
 let signature input =
   if key input "(" then parameters input else []
-
-let rec depend input =
-  match token input with
-  | ID a | LINK a ->
-    skip input ;
-    ignore (key input ",") ;
-    a :: depend input
-  | _ -> []
 
 let link input =
   match token input with
@@ -172,17 +157,9 @@ let logic_link input =
     Injection, link input
   | _ -> op_link op input
 
-let rec parse ~driver_dir library input =
+let rec parse input =
   match token input with
   | EOF -> ()
-  | KEY "library" ->
-    skip input ;
-    let name = input_string input in
-    ignore (key input ":") ;
-    let depends = depend input in
-    ignore (key input ";") ;
-    LogicBuiltins.add_library name depends ;
-    parse ~driver_dir name input
   | KEY "type" ->
     skip input ;
     let name = ident input in
@@ -191,7 +168,7 @@ let rec parse ~driver_dir library input =
     let link = link input in
     LogicBuiltins.add_type ~source:(Filepos.of_lexing_pos source) name ~link ;
     skipkey input ";" ;
-    parse ~driver_dir library input
+    parse input
   | KEY "ctor" ->
     skip input ;
     let name = ident input in
@@ -201,7 +178,7 @@ let rec parse ~driver_dir library input =
     let link = link input in
     LogicBuiltins.add_ctor ~source:(Filepos.of_lexing_pos source) name args ~link ;
     skipkey input ";" ;
-    parse ~driver_dir library input
+    parse input
   | KEY "logic" ->
     skip input ;
     let result = kind input in
@@ -224,7 +201,7 @@ let rec parse ~driver_dir library input =
           ~category result name args ~link ;
       end ;
     skipkey input ";" ;
-    parse ~driver_dir library input
+    parse input
   | KEY "predicate" ->
     skip input ;
     let name = ident input in
@@ -246,27 +223,13 @@ let rec parse ~driver_dir library input =
           name args ~link ;
       end ;
     skipkey input ";" ;
-    parse ~driver_dir library input
-  | FIELD (group,var) ->
-    skip input ;
-    begin match token input with
-      | KEY ":=" ->
-        let v = value input in
-        LogicBuiltins.set_option ~driver_dir group var ~library v
-      | KEY "+=" ->
-        let v = value input in
-        LogicBuiltins.add_option ~driver_dir group var ~library v
-      | _ -> failwith "Missing ':=' or '+='"
-    end;
-    skipkey input ";" ;
-    parse ~driver_dir library input
+    parse input
   | _ -> failwith "Unexpected entry"
 
 let load_file ?(ontty=`Transient) file =
   try
     Wp_parameters.feedback ~dkey:dkey ~ontty "Loading driver '%a'"
       Filepath.pretty file;
-    let driver_dir = Filepath.dirname file in
     let inc = open_in (Filepath.to_string_abs file) in
     let lex = Lexing.from_channel inc in
     let position = {
@@ -275,7 +238,7 @@ let load_file ?(ontty=`Transient) file =
     let input = { current = tok lex ; position = position ; lexbuf = lex } in
     try
       lex.Lexing.lex_curr_p <- position ;
-      parse ~driver_dir:(Filepath.to_string_abs driver_dir) "qed" input ;
+      parse input ;
       close_in inc
     with Failure msg ->
       close_in inc ;

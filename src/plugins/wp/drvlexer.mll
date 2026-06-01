@@ -27,7 +27,6 @@
     | KIND of kind
     | ID of string
     | LINK of string
-    | FIELD of string * string
 
   let keywords = [
     "library" , KEY "library" ;
@@ -67,7 +66,6 @@ rule tok = parse
   | "/*" { comment lexbuf }
   | ident as a { ident a }
   | '"' { LINK (string_val (Buffer.create 10) lexbuf) }
-  | (ident as group) '.' (ident as var) { FIELD(group,var) }
   | _ | ":=" | "+=" { KEY (Lexing.lexeme lexbuf) }
 
 and comment = parse
