@@ -10,7 +10,7 @@
 THIS_SCRIPT="$0"
 CONFIG="<default>"
 VERBOSE=
-CLEAN=
+FORCE=
 PREPARE=
 USEWPCACHE=
 UPDATE=
@@ -64,7 +64,7 @@ function Usage
     echo "OPTIONS"
     echo ""
     echo "  -n|--name <alias>   set dune alias name (default to ptests)"
-    echo "  -r|--clean          clean (remove all) test results (includes -p)"
+    echo "  -f|--force          force running tests (includes -p)"
     echo "  -p|--ptests         prepare (all) dune files"
     echo "  -w|--wp-cache       use (clone/pull/update) WP-cache"
     echo "  -l|--logs           print output of tests (single file, no diff)"
@@ -165,8 +165,13 @@ do
             CONFIG=$2
             shift
             ;;
+        "-f"|"--force")
+            FORCE=yes
+            PREPARE=yes
+            ;;
         "-r"|"--clean")
-            CLEAN=yes
+            Head "Option -r|--clean deprecated, please use -f|--force instead"
+            FORCE=yes
             PREPARE=yes
             ;;
         "-p"|"--ptests")
@@ -233,6 +238,13 @@ do
     esac
     shift
 done
+
+if [ "$FORCE" = "yes" ]; then
+    # Since dune 3.23 we cannot clean individual .ml tests in the build
+    # directory, instead we pass --force to dune to force these tests to
+    # be reexecuted as if the build directory were removed.
+    DUNE_OPT+=("--force")
+fi
 
 if [ "$UPDATE" = "yes" ] || [ "$GENERATE" = "yes" ]; then
     DUNE_OPT+=("--auto-promote")
@@ -393,10 +405,10 @@ function PrepareTests
         done
     fi
 
-    if [ "$CLEAN" = "yes" ]
+    if [ "$FORCE" = "yes" ]
     then
-        Head "Cleaning all tests..."
-        Cmd make clean-tests
+        Head "Cleaning all Ptests files..."
+        Cmd make purge-ptests
     fi
     if [ "$PREPARE" = "yes" ]
     then

@@ -134,24 +134,19 @@ wtests-help:
 ##########################################################################
 ## Removes all dune files generated for testing
 
-.PHONY: purge-tests
-purge-tests:
+.PHONY: purge-ptests
+purge-ptests:
 	find $(PTEST_ALL_DIRS) -name dune -print0 \
         | $(GREP) -z -e "/oracle.*/dune\|/result.*/dune" \
         | $(XARGS) $(RM)
 	find $(PTEST_ALL_DIRS) -name "*.wtests" -print0 \
         | $(XARGS) $(RM)
 
-# Force the full cleaning of the testing environment
-.PHONY: clean-tests
-clean-tests: purge-tests
-	$(RMDIR) $(addprefix _build/default/,$(PTEST_ALL_DIRS))
-
 ##########################################################################
 ## Generates all dune files used for testing
 
 .PHONY: run-ptests
-run-ptests: $(PTEST_DEPS) purge-tests $(FRAMAC_PTEST) $(FRAMAC_WTEST)
+run-ptests: $(PTEST_DEPS) purge-ptests $(FRAMAC_PTEST) $(FRAMAC_WTEST)
 	$(PTESTS) $(PTEST_OPTS) $(PTEST_DIRS)
 
 .PHONY: run-ptests.replay
