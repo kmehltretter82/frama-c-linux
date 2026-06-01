@@ -1325,6 +1325,7 @@ module Fmt = struct
   let quote pr fmt s = Format.fprintf fmt "%S" (Format.asprintf "%a" pr s)
   let list pr fmt l = List.iter (fun s -> Format.fprintf fmt " %a" pr s) l
   let var_libavailable pr fmt s = Format.fprintf fmt "%%{lib-available:%a}" pr s
+  let var_binavailable pr fmt s = Format.fprintf fmt "%%{bin-available:%a}" pr s
   let package_as_deps pr fmt s = Format.fprintf fmt "(package %a)" pr s
 end
 
@@ -1387,6 +1388,12 @@ let pp_enabled_if fmt deps =
     (if !never_disabled then ";" else "")
     pp_enabled_if_content deps
 
+let pp_enabled_if_bin fmt (bins, deps) =
+  Format.fprintf fmt "%s(enabled_if (and %a%a))"
+    (if !never_disabled then ";" else "")
+    pp_enabled_if_content deps
+    Fmt.(list (var_binavailable Format.pp_print_string)) bins
+
 let pp_command_deps fmt command =
   Format.fprintf fmt "%S %a (package frama-c) %a %a"
     (* the test file *)
@@ -1398,6 +1405,14 @@ let pp_command_deps fmt command =
     (* from LIBRARY directives *)
     Fmt.(list (package_as_deps (quote pp_library_as_package)))
     (list_of_deps command.deps.load_library)
+
+let pp_hyperfine_command fmt (exit, command) =
+  let exit = string_of_int exit in
+  (* echo is used to create a newline before displaying hyperfine's output. *)
+  let command =
+    "echo \"\"; hyperfine --style=full --ignore-failure=" ^ exit ^ " -w 1 '" ^ command ^ "'"
+  in
+  Format.fprintf fmt "%S" command
 
 let show_cmd =
   let regexp_read = Str.regexp "%{read:\\([^}]+\\)}" in
@@ -1694,6 +1709,29 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     pp_env command.env_var
     pp_accepted_exit_code command
     command_string
+    pp_close_env command.env_var
+  ;
+
+  Format.fprintf result_fmt
+    "(rule ; BENCHMARK TEST #%d OF TEST FILE %S\n  \
+     (alias %S)\n  \
+     (deps  %a (universe))\n  \
+     %a\n\
+     (action %a(system %a))%a\n\
+     )@."
+    (* rule: *)
+    command.nth command.file
+    (* alias: *)
+    (subtest_alias ^ ".bench")
+    (* deps: *)
+    pp_command_deps command
+    (* enabled_if: *)
+    pp_enabled_if_bin (["hyperfine"], command.deps)
+    (* action: *)
+    pp_env command.env_var
+    (* No need for pp_accepted_exit_code here, the exit code is used by
+       hyperfine which exit with 0 unless an error occurs. *)
+    pp_hyperfine_command (command.exit_code, command_string)
     pp_close_env command.env_var
   ;
   Format.fprintf result_fmt
