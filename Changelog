@@ -26,6 +26,11 @@ o!  Kernel    [2026-06-11] Refactoring for (logic) type-related functions.
               module, many of which were renamed for better consistency. Code
               related functions are now inside the new `Ast_types.C` module.
               All the old functions are now deprecated.
+o   Kernel    [2026-06-11] It is now possible to tell Frama-C if the current
+              execution is inside a test or not via the environment variable
+              `FRAMAC_TESTING`. Its value can be accessed using
+              `Cmdline.inside_tests` and used to guard additional verifications
+              during execution.
 
 ###############################################################################
 Open Source Release 33.0 (Arsenic)
