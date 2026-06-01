@@ -164,9 +164,9 @@
   Called from search_h.c:129.
 [eva:progress] Done for function hsearch
 [eva:volatile] search_h.c:132: Warning: 
-  Lvalue ((struct info *)found_item->data)->room, whose type has no 'volatile' qualifier, may point to a volatile memory location
+  Lvalue ((struct info *)found_item->data)->room with non-volatile-qualified type may refer to an object defined with a volatile-qualified type.
 [eva:volatile] search_h.c:132: Warning: 
-  Lvalue ((struct info *)found_item->data)->age, whose type has no 'volatile' qualifier, may point to a volatile memory location
+  Lvalue ((struct info *)found_item->data)->age with non-volatile-qualified type may refer to an object defined with a volatile-qualified type.
 [eva:alarm] search_h.c:132: Warning: 
   unaligned pointer creation.
   assert \aligned(found_item->data,alignof(struct info));

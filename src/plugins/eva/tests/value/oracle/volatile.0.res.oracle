@@ -91,9 +91,9 @@
 [eva:alarm] volatile.c:59: Warning: 
   signed overflow. assert m - l ≤ 2147483647;
 [eva:volatile] volatile.c:69: Warning: 
-  Lvalue *pv, whose type has no 'volatile' qualifier, may point to a volatile memory location
+  Lvalue *pv with non-volatile-qualified type may refer to an object defined with a volatile-qualified type.
 [eva:volatile] volatile.c:70: Warning: 
-  Lvalue *pv, whose type has no 'volatile' qualifier, may point to a volatile memory location
+  Lvalue *pv with non-volatile-qualified type may refer to an object defined with a volatile-qualified type.
 [eva:progress] Recording results for main1
 [eva:progress] Done for function main1
 [eva:progress] 

@@ -1039,8 +1039,8 @@ module Make
            && Self.ComputationState.get () = Computing
         then
           Self.warning ~wkey:Self.wkey_volatile ~once:true ~current:true
-            "Lvalue %a, whose type has no 'volatile' qualifier, \
-             may point to a volatile memory location"
+            "Lvalue %a with non-volatile-qualified type \
+             may refer to an object defined with a volatile-qualified type."
             Eva_ast.pp_lval lval;
         let fuel = env.remaining_fuel in
         let record = { loc; volatile_loc; volatile_lval; loc_alarms = alarms }
