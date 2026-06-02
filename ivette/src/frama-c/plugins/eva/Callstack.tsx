@@ -90,11 +90,10 @@ function getActions(
 
 interface NodesProps {
   tree: NodesMap,
-  visible?: Set<string>,
   onClick: (id: Eva.callstack) => void
 }
 
-function Nodes({ tree, visible, onClick } : NodesProps): React.ReactNode {
+function Nodes({ tree, onClick } : NodesProps): React.ReactNode {
   const [current, ] = States.useSyncState(Eva.currentCallstacks);
 
   return [...tree].map(([, { key, label, callstack, subTree }]) => {
@@ -102,11 +101,10 @@ function Nodes({ tree, visible, onClick } : NodesProps): React.ReactNode {
     const title = loc ? loc.base+': '+loc.line : '';
     return (
       <Tree.Node key={key} id={key} label={label} title={title}
-        visible={visible?.has(key) ?? true}
         actions={getActions(callstack.callstack, onClick, current)}
       >
         { subTree && subTree.size > 0 ?
-          <Nodes tree={subTree} visible={visible} onClick={onClick} />
+          <Nodes tree={subTree} onClick={onClick} />
           : null
         }
       </Tree.Node>
@@ -150,14 +148,18 @@ function getNode(key: string, cs: Info, callstacks: Info[]): Node {
   };
 }
 
-/** Return the Tree */
-function getNodes(callstacks: Info[]): NodesMap {
+/** Return the Nodes and the root nodes */
+function getNodes(callstacks: Info[]): [NodesMap, NodesMap] {
   const nodes: NodesMap = new Map();
-  // Create nodes and tree
+  const root: NodesMap = new Map();
+  // Adding the nodes
   callstacks.forEach(cs => {
     const key = cs.callstack.toString();
     const newNode = getNode(key, cs, callstacks);
     nodes.set(key, newNode);
+    // The tree contains only entry points
+    if(isEntryPoint(cs))
+      root.set(key, newNode);
   });
   // populate subTrees
   nodes.forEach(node => {
@@ -166,16 +168,17 @@ function getNodes(callstacks: Info[]): NodesMap {
       parent?.subTree.set(node.key, node);
     }
   });
-  return nodes;
+  return [nodes, root];
 }
 
-/** Return the Tree */
-function getTree(nodes: NodesMap, visible: Set<string> | undefined)
-: NodesMap {
+/** Return the filtered Tree */
+function getTree(nodes: NodesMap, visible: Set<string>): NodesMap {
   const filteredNodes: NodesMap = new Map();
   const tree: NodesMap = new Map();
-  // Create filtered nodes and tree
-  nodes.forEach(node => {
+  // Adding the filtered nodes and tree
+  [...visible].forEach(k => {
+    const node = nodes.get(k);
+    if(!node) return;
     const newNode = { ...node, subTree: new Map() };
     filteredNodes.set(node.key, newNode);
     // The tree contains only entry points
@@ -184,7 +187,7 @@ function getTree(nodes: NodesMap, visible: Set<string> | undefined)
   });
   // populate subTrees
   filteredNodes.forEach(node => {
-    if(node.parentKey && (!visible || visible.has(node.key))) {
+    if(node.parentKey) {
       const parent = filteredNodes.get(node.parentKey);
       parent?.subTree.set(node.key, { ...node });
     }
@@ -340,7 +343,7 @@ export function CallstackSelection(): React.JSX.Element {
   const scope = States.useCurrentScope();
 
   /** Nodes */
-  const nodes = React.useMemo(() => getNodes(infos), [infos]);
+  const [nodes, tree] = React.useMemo(() => getNodes(infos), [infos]);
 
   /** Filter */
   const filterItems: Buttons.MultiselectItemProps[] = [
@@ -369,10 +372,11 @@ export function CallstackSelection(): React.JSX.Element {
   }, [nodes, showSelected, showScope,
       showAnalyzed, showUnanalyzed, selection, scope]);
 
-  /** Tree */
-  const tree = React.useMemo(
-    () => getTree(nodes, visibleKeys),
-    [nodes, visibleKeys]
+  /** Filtered tree */
+  const filteredTree = React.useMemo(() => {
+      if(!visibleKeys) return tree;
+      else return getTree(nodes, visibleKeys);
+    }, [nodes, tree, visibleKeys]
   );
 
   const onResetMenu = React.useCallback(() => {
@@ -434,7 +438,7 @@ export function CallstackSelection(): React.JSX.Element {
           }
         }}
       >
-        <Nodes tree={tree} visible={visibleKeys} onClick={flipSelected} />
+        <Nodes tree={filteredTree} onClick={flipSelected} />
       </Tree.Tree>
 
     </EvaReady>
