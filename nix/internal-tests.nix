@@ -12,7 +12,6 @@
 , findlib
 # Frama-Clang
 , cmake
-, camlp5
 , camlp-streams
 , gnused
 , llvmPackages
@@ -80,7 +79,6 @@ stdenvNoCC.mkDerivation rec {
 
   buildInputs = [
     apron
-    camlp5
     camlp-streams
     camlzip
     clang
