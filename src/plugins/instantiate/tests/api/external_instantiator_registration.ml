@@ -9,7 +9,7 @@ let well_typed_call _ _ = function
 let key_from_call _ _ = function
   | [ e ] ->
     let t = Cil.typeOf(Cil.stripCasts e) in
-    Ast_types.C.direct_pointed_type t
+    Ast_types.C.direct_pointed t
   | _ -> assert false
 
 let retype_args _ = function

@@ -73,7 +73,7 @@ let dispatch_term_lval ~loc ?(garbage=false) (env:env) (lv : term_lval) =
   match lhost with
   | TMem e ->
     let rh = pointed (!rterm env e) in
-    let te = Ast_types.Acsl.ctype_of_pointed e.term_type in
+    let te = Ast_types.Acsl.direct_pointed_ctype e.term_type in
     Either.Left (add_addr_offset ~loc env te rh loffset)
   | TResult ty ->
     begin match env.result with

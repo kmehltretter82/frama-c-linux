@@ -314,12 +314,12 @@ module C : sig
   (** Returns the type directly pointed by the given type.
       @raise AbortFatal it is not a pointer type.
   *)
-  val direct_pointed_type : typ -> typ
+  val direct_pointed : typ -> typ
 
-  (** Returns the pointed type using {!direct_pointed_type}, but if the resulting
+  (** Returns the pointed type using {!direct_pointed}, but if the resulting
       type is an array, returns the element type instead using {!array_element}
   *)
-  val pointed_type : typ -> typ
+  val pointed : typ -> typ
 
   (** Returns the type of the array elements of the given type, and the size
       of the array, if any.
@@ -750,15 +750,15 @@ val element_type : typ -> typ
     @raise AbortFatal it is not a pointer type.
 *)
 val direct_pointed_type : typ -> typ
-[@@deprecated "Use Ast_types.C.direct_pointed_type instead."]
-[@@migrate { repl = Rel.C.direct_pointed_type }]
+[@@deprecated "Use Ast_types.C.direct_pointed instead."]
+[@@migrate { repl = Rel.C.direct_pointed }]
 
-(** Returns the pointed type using {!direct_pointed_type}, but if the resulting
+(** Returns the pointed type using {!direct_pointed}, but if the resulting
     type is an array, returns the element type instead using {!element_type}
 *)
 val pointed_type : typ -> typ
-[@@deprecated "Use Ast_types.C.pointed_type instead."]
-[@@migrate { repl = Rel.C.pointed_type }]
+[@@deprecated "Use Ast_types.C.pointed instead."]
+[@@migrate { repl = Rel.C.pointed }]
 
 (** Returns the type of the array elements of the given type, and the size
     of the array, if any.
@@ -961,10 +961,11 @@ module Acsl : sig
   (** returns the type of the element pointed to by the type. If the
       source type is a set of pointers, returns a set of elements.
   *)
-  val pointed: logic_type -> logic_type
+  val direct_pointed: logic_type -> logic_type
 
-  (** same as {!Ast_types.Acsl.pointed} but for arrays (or set of arrays). *)
-  val array_element: logic_type -> logic_type
+  (** same as {!Ast_types.Acsl.direct_pointed} but for arrays (or set of
+      arrays). *)
+  val direct_array_element: logic_type -> logic_type
 
   (** {4 Type conversions} *)
 
@@ -976,9 +977,9 @@ module Acsl : sig
   (** removes qualifiers if logic_type is a C type, identity otherwise. *)
   val remove_qualifiers: logic_type -> logic_type
 
-  val ctype_of_pointed: logic_type -> typ
+  val direct_pointed_ctype: logic_type -> typ
 
-  val ctype_of_array_elem: logic_type -> typ
+  val direct_array_element_ctype: logic_type -> typ
 
   val arithmetic_conversion: logic_type -> logic_type -> logic_type
 end

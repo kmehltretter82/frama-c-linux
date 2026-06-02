@@ -189,7 +189,7 @@ struct
           load_loc env ty l loffset
       end
     | TMem e ->
-      let te = Ast_types.Acsl.ctype_of_pointed e.term_type in
+      let te = Ast_types.Acsl.direct_pointed_ctype e.term_type in
       let te , lp = logic_offset env te (C.logic env e) loffset in
       L.load (C.current env) (Ctypes.object_of te) lp
     | TVar{lv_name="\\exit_status"} ->
@@ -216,7 +216,7 @@ struct
           Wp_parameters.abort ~current:true "Address of \\result"
       end
     | TMem e ->
-      let te = Ast_types.Acsl.ctype_of_pointed e.term_type in
+      let te = Ast_types.Acsl.direct_pointed_ctype e.term_type in
       logic_offset env te (C.logic env e) loffset
     | TVar lv ->
       begin
@@ -404,15 +404,15 @@ struct
     | PlusPI ->
       let va = C.logic env a in
       let vb = C.logic env b in
-      let te = Ast_types.Acsl.ctype_of_pointed a.term_type in
+      let te = Ast_types.Acsl.direct_pointed_ctype a.term_type in
       L.shift va (Ctypes.object_of te) vb
     | MinusPI ->
       let va = C.logic env a in
       let vb = C.logic env b in
-      let te = Ast_types.Acsl.ctype_of_pointed a.term_type in
+      let te = Ast_types.Acsl.direct_pointed_ctype a.term_type in
       L.shift va (Ctypes.object_of te) (L.map_opp vb)
     | MinusPP ->
-      let te = Ast_types.Acsl.ctype_of_pointed a.term_type in
+      let te = Ast_types.Acsl.direct_pointed_ctype a.term_type in
       let la = loc_of_term env a in
       let lb = loc_of_term env b in
       Vexp(M.loc_diff (Ctypes.object_of te) la lb)
@@ -702,7 +702,7 @@ struct
       L.map_l2t M.base_offset (C.logic env t)
 
     | Tblock_length (label,t) ->
-      let obj = object_of (Ast_types.Acsl.ctype_of_pointed t.term_type) in
+      let obj = object_of (Ast_types.Acsl.direct_pointed_ctype t.term_type) in
       let sigma = C.mem_at env (of_logic label) in
       L.map_l2t (M.block_length sigma obj) (C.logic env t)
 
@@ -758,7 +758,7 @@ struct
       begin
         List.map
           (fun t ->
-             let te = Ast_types.Acsl.ctype_of_pointed t.term_type in
+             let te = Ast_types.Acsl.direct_pointed_ctype t.term_type in
              let obj = Ctypes.object_of te in
              L.region obj (C.logic env t)
           ) ts
@@ -782,13 +782,13 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let valid env acs label t =
-    let te = Ast_types.Acsl.ctype_of_pointed t.term_type in
+    let te = Ast_types.Acsl.direct_pointed_ctype t.term_type in
     let sigma = C.mem_at env (Clabels.of_logic label) in
     let addrs = C.logic env t in
     p_all (L.valid sigma acs) (L.region (Ctypes.object_of te) addrs)
 
   let initialized env label t =
-    let te = Ast_types.Acsl.ctype_of_pointed t.term_type in
+    let te = Ast_types.Acsl.direct_pointed_ctype t.term_type in
     let sigma = C.mem_at env (Clabels.of_logic label) in
     let addrs = C.logic env t in
     p_all (L.initialized sigma) (L.region (Ctypes.object_of te) addrs)

@@ -475,7 +475,7 @@ module Make
     && not (Ast_types.C.is_fun target)
 
   let assume_aligned expr typ value =
-    let target = Ast_types.C.direct_pointed_type typ in
+    let target = Ast_types.C.direct_pointed typ in
     if check_alignment target then
       let target_align = Cil.bytesAlignOf target in
       if target_align > 1 then
@@ -1488,7 +1488,7 @@ module Make
         backward_eval fuel context state expr (Some loc_value)
       | _ ->
         let reduce_valid_index = true in
-        let typ_lval = Ast_types.C.direct_pointed_type expr.typ in
+        let typ_lval = Ast_types.C.direct_pointed expr.typ in
         let* env = fast_eval_environment state in
         let eval = eval_offset env ~reduce_valid_index typ_lval offset in
         let* loc_offset, _ = fst eval in

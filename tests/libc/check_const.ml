@@ -53,7 +53,7 @@ let check_annot kf _ (a: identified_predicate) =
       | TLval (TVar lvi, _) -> begin
           match lvi.lv_origin with
           | Some vi ->
-            warn (Ast_types.C.direct_pointed_type vi.vtype) vi t.term_loc
+            warn (Ast_types.C.direct_pointed vi.vtype) vi t.term_loc
           | _ -> ()
         end
       | _ -> ()

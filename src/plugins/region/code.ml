@@ -54,7 +54,7 @@ and add_exp (m: map) (s:stmt) (e:exp) : value =
   | BinOp((PlusPI|MinusPI),p,k,tr) ->
     add_value m s k ;
     let vp = add_exp m s p in
-    let te = Ast_types.C.pointed_type tr in
+    let te = Ast_types.C.pointed tr in
     Memory.add_shift (pointer vp) (Exp(s,e)) te ; vp
 
   | UnOp(_,e,_) ->

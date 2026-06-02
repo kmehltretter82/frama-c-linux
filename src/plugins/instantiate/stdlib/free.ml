@@ -82,7 +82,7 @@ let key_from_call _ret _fct args =
     let ptr = Cil.stripCasts ptr in
     let ptr_t = Ast_types.C.unroll_deep (Cil.typeOf ptr) in
     let ptr_t = Ast_types.C.remove_qualifiers_deep ptr_t in
-    Ast_types.C.direct_pointed_type ptr_t
+    Ast_types.C.direct_pointed ptr_t
   | _ -> unexpected "trying to generate a key on an ill-typed call"
 
 let retype_args _typ args = List.map Cil.stripCasts args

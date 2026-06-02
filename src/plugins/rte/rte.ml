@@ -448,7 +448,7 @@ let trivially_aligned (expr: Cil_types.exp) target =
       match expr.enode with
       | Lval (Var vi, NoOffset) when not vi.vglob && not vi.vaddrof ->
         (* This optimization can be generalized if we check strict aliasing *)
-        if t_align <= Cil.bytesAlignOf @@ Ast_types.C.direct_pointed_type orig_t
+        if t_align <= Cil.bytesAlignOf @@ Ast_types.C.direct_pointed orig_t
         then Yes
         else Maybe
 
@@ -462,7 +462,7 @@ let trivially_aligned (expr: Cil_types.exp) target =
 
 let pointer_alignment ~remove_trivial ~on_alarm (expr, t) =
   assert (Ast_types.C.is_ptr t) ;
-  let pointed_to = Ast_types.C.direct_pointed_type t in
+  let pointed_to = Ast_types.C.direct_pointed t in
   let expr = Cil.stripCasts expr in
   match trivially_aligned expr pointed_to with
   | Yes ->

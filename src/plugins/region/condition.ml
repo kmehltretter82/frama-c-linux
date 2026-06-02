@@ -33,7 +33,7 @@ let () = Logic_builtin.register {
 
 let pvalid_region ?loc ?names ?(label=Logic_const.here_label) addr =
   let f = List.hd @@ Logic_env.find_all_logic_functions lvalid_region in
-  let te = Ast_types.Acsl.ctype_of_pointed addr.term_type in
+  let te = Ast_types.Acsl.direct_pointed_ctype addr.term_type in
   let size = Logic_const.term ?loc (TSizeOf te) Linteger in
   Logic_const.papp ?loc ?names (f,[label],[addr;size])
 
@@ -91,7 +91,7 @@ let rec falsy = function Invalid p -> p | Named(_,g) -> falsy g | g -> g
 
 let pointed = function
   | L lv -> Cil.typeOfLval lv
-  | E p -> Ast_types.C.pointed_type @@ Cil.typeOf p
+  | E p -> Ast_types.C.pointed @@ Cil.typeOf p
   | T(_,te) | R(_,te,_,_) -> te
 
 let is_zero t =

@@ -67,13 +67,13 @@ val is_instance_of: string list -> logic_type -> logic_type -> bool
     source type is a set of pointers, returns a set of elements.
 *)
 val type_of_pointed: logic_type -> logic_type
-[@@deprecated "Use Ast_types.Acsl.pointed instead"]
-[@@migrate { repl = Ast_types.Acsl.pointed }]
+[@@deprecated "Use Ast_types.Acsl.direct_pointed instead"]
+[@@migrate { repl = Ast_types.Acsl.direct_pointed }]
 
 (** same as {!type_of_pointed} but for arrays (or set of arrays). *)
 val type_of_array_elem: logic_type -> logic_type
-[@@deprecated "Use Ast_types.Acsl.array_element instead"]
-[@@migrate { repl = Ast_types.Acsl.array_element }]
+[@@deprecated "Use Ast_types.Acsl.direct_array_element instead"]
+[@@migrate { repl = Ast_types.Acsl.direct_array_element }]
 
 
 

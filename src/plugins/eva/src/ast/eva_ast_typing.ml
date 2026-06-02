@@ -32,7 +32,7 @@ let rec type_of_offset (basetyp : typ) : offset -> typ = function
 
 let type_of_lhost : lhost -> typ = function
   | Var vi -> vi.vtype
-  | Mem addr -> Ast_types.C.direct_pointed_type addr.typ
+  | Mem addr -> Ast_types.C.direct_pointed addr.typ
 
 let type_of_lval_node (host, offset : lval_node) : typ =
   let basetyp = type_of_lhost host in

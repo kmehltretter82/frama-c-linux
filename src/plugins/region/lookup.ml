@@ -119,7 +119,7 @@ let rec dispatch_lval env lv : (typ * node,domain) Either.t =
   match lhost with
   | TMem p ->
     let rh = tmem env p in
-    let te = Ast_types.Acsl.ctype_of_pointed p.term_type in
+    let te = Ast_types.(C.pointed (Acsl.get_ctype p.term_type)) in
     Either.Left (addr_offset env rh te loffset)
   | TResult ty ->
     begin match env.result with

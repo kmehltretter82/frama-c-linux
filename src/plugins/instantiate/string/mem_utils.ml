@@ -26,13 +26,13 @@ let exp_type_of_pointed x =
   if not (Ast_types.C.is_ptr (Cil.typeOf no_cast)) then
     match Cil.constFoldToInt x with
     | Some t when Z.(equal t (of_int 0)) ->
-      Of_null (Ast_types.C.direct_pointed_type (Cil.typeOf x))
+      Of_null (Ast_types.C.direct_pointed (Cil.typeOf x))
     | _ ->
       No_pointed
   else
     let xt = Ast_types.C.unroll_deep (Cil.typeOf no_cast) in
     let xt = Ast_types.C.remove_qualifiers_deep xt in
-    Value_of (Ast_types.C.direct_pointed_type xt)
+    Value_of (Ast_types.C.direct_pointed xt)
 
 let unexpected = Options.fatal "Mem_utils: %s"
 

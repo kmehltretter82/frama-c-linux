@@ -35,7 +35,7 @@ and lhost env = function
   | Mem e ->
     let s,r = addr env e in
     if not s then add env @@ g_valid Region (E e) ;
-    Ast_types.C.direct_pointed_type @@ Cil.typeOf e, r
+    Ast_types.C.direct_pointed @@ Cil.typeOf e, r
 
 and offset env s t r = function
   | NoOffset -> s,t,r

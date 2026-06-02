@@ -807,7 +807,7 @@ let type_expr metaenv env ?tr ?current e =
         env,
         Logic_const.term
           (TLval (TMem t, TNoOffset))
-          (Ast_types.Acsl.pointed t.term_type),
+          (Ast_types.Acsl.direct_pointed t.term_type),
         cond
       else
         Aorai_option.abort "Cannot dereference term %a" Printer.pp_term t
@@ -820,13 +820,13 @@ let type_expr metaenv env ?tr ?current e =
         then
           Logic_const.term
             (TBinOp (PlusPI,t1,t2))
-            (Ast_types.Acsl.pointed t1.term_type)
+            (Ast_types.Acsl.direct_pointed t1.term_type)
         else if Ast_types.Acsl.is_ptr t2.term_type
              && Ast_types.Acsl.is_integral t1.term_type
         then
           Logic_const.term
             (TBinOp (PlusPI,t2,t1))
-            (Ast_types.Acsl.pointed t2.term_type)
+            (Ast_types.Acsl.direct_pointed t2.term_type)
         else if Ast_types.Acsl.is_array t1.term_type
              && Ast_types.Acsl.is_integral t2.term_type
         then
@@ -836,7 +836,7 @@ let type_expr metaenv env ?tr ?current e =
                (TLval
                   (Logic_const.addTermOffsetLval
                      (TIndex (t2, TNoOffset)) lv))
-               (Ast_types.Acsl.array_element t1.term_type)
+               (Ast_types.Acsl.direct_array_element t1.term_type)
            | _ ->
              Aorai_option.fatal
                "Unsupported operation: %a[%a]"
@@ -849,7 +849,7 @@ let type_expr metaenv env ?tr ?current e =
              Logic_const.term
                (TLval
                   (Logic_const.addTermOffsetLval (TIndex (t1, TNoOffset)) lv))
-               (Ast_types.Acsl.array_element t2.term_type)
+               (Ast_types.Acsl.direct_array_element t2.term_type)
            | _ ->
              Aorai_option.fatal
                "Unsupported operation: %a[%a]"
@@ -875,7 +875,7 @@ let type_expr metaenv env ?tr ?current e =
       if Ast_types.Acsl.is_ptr t.term_type then begin
         let off, ty =
           LTyping.type_of_field loc s
-            (Ast_types.Acsl.pointed t.term_type)
+            (Ast_types.Acsl.direct_pointed t.term_type)
         in
         let lv = Logic_const.addTermOffsetLval off (TMem t,TNoOffset) in
         env, Logic_const.term (TLval lv) ty, cond

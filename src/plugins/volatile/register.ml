@@ -183,25 +183,25 @@ module BA_TBL = struct
     | false, Some [_, arg1, _] when
         not_void_or_varg
         && Ast_types.C.is_ptr arg1
-        && Typ.equal (Ast_types.C.direct_pointed_type arg1) volatile_ret_type
+        && Typ.equal (Ast_types.C.direct_pointed arg1) volatile_ret_type
       -> true (* matching prototype: T fct (volatile T *arg1) *)
     | false, Some [_, arg1, _] when
         not_void_or_varg
         && Ast_types.C.is_ptr arg1
-        && Typ.equal (Ast_types.C.direct_pointed_type arg1) ret_type
+        && Typ.equal (Ast_types.C.direct_pointed arg1) ret_type
         && Ast_types.C.is_volatile ret_type
       -> true (* matching prototype: T fct (T *arg1) when T has some volatile attr. *)
     | true, Some ((_, arg1, _) :: [_, arg2, _]) when
         not_void_or_varg
         && Ast_types.C.is_ptr arg1
         && Typ.equal arg2 ret_type
-        && Typ.equal (Ast_types.C.direct_pointed_type arg1) volatile_ret_type
+        && Typ.equal (Ast_types.C.direct_pointed arg1) volatile_ret_type
       -> true (* matching prototype: T fct (volatile T *arg1, T arg2) *)
     | true, Some ((_, arg1, _) :: [_, arg2, _]) when
         not_void_or_varg
         && Ast_types.C.is_ptr arg1
         && Typ.equal arg2 ret_type
-        && Typ.equal (Ast_types.C.direct_pointed_type arg1) ret_type
+        && Typ.equal (Ast_types.C.direct_pointed arg1) ret_type
         && Ast_types.C.is_volatile ret_type
       -> true (* matching prototype: T fct (T *arg1, T arg2) when T has some volatile attr.  *)
     | _, _ ->
@@ -292,31 +292,31 @@ module B_MAP = struct
       "Verifying prototype of function %s: %a@."
       fct.vorig_name Typ.pretty ty;
     let result is_wr_access arg1 =
-      Some (is_wr_access, (Ast_types.C.direct_pointed_type arg1))
+      Some (is_wr_access, (Ast_types.C.direct_pointed arg1))
     in
     match args with
     | Some [_, arg1, _] when
         (not (Ast_types.C.is_void ret_type || is_varg_arg))
         && Ast_types.C.is_ptr arg1
-        && Typ.equal (Ast_types.C.direct_pointed_type arg1) volatile_ret_type
+        && Typ.equal (Ast_types.C.direct_pointed arg1) volatile_ret_type
       -> result false arg1 (* matching prototype: T fct (volatile T *arg1) *)
     | Some [_, arg1, _] when
         (not (Ast_types.C.is_void ret_type || is_varg_arg))
         && Ast_types.C.is_ptr arg1
-        && Typ.equal (Ast_types.C.direct_pointed_type arg1) ret_type
+        && Typ.equal (Ast_types.C.direct_pointed arg1) ret_type
         && Ast_types.C.is_volatile ret_type
       -> result false arg1 (* matching prototype: T fct (T *arg1) when T has some volatile attr*)
     | Some ((_, arg1, _) :: [_, arg2, _]) when
         (not (Ast_types.C.is_void ret_type || is_varg_arg))
         && Ast_types.C.is_ptr arg1
         && Typ.equal arg2 ret_type
-        && Typ.equal (Ast_types.C.direct_pointed_type arg1) volatile_ret_type
+        && Typ.equal (Ast_types.C.direct_pointed arg1) volatile_ret_type
       -> result true arg1 (* matching prototype: T fct (volatile T *arg1, T arg2) *)
     | Some ((_, arg1, _) :: [_, arg2, _]) when
         (not (Ast_types.C.is_void ret_type || is_varg_arg))
         && Ast_types.C.is_ptr arg1
         && Typ.equal arg2 ret_type
-        && Typ.equal (Ast_types.C.direct_pointed_type arg1) ret_type
+        && Typ.equal (Ast_types.C.direct_pointed arg1) ret_type
         && Ast_types.C.is_volatile ret_type
       -> result true arg1 (* matching prototype: T fct (T *arg1, T arg2) when T has some volatile attr *)
     | _ -> Options.warning ~once:true ~wkey:wkey_invalid_binding_function
@@ -422,7 +422,7 @@ struct
       | (_, tf, _) :: ps ->
         let r = of_return r in
         let ts = List.map (fun (_, ty, _) -> CT.object_of ty) ps in
-        let sp = of_type (Ast_types.C.direct_pointed_type tf) in
+        let sp = of_type (Ast_types.C.direct_pointed tf) in
         let sf = (r, ts, va) in
         if compare sp sf <> 0 then None else Some sf
       | _ -> None
@@ -488,7 +488,7 @@ let get_canonical_call ~source f tf =
     None
 
 let get_pointer_call ~index ~source f =
-  let tf = Ast_types.C.direct_pointed_type (Cil.typeOf f) in
+  let tf = Ast_types.C.direct_pointed (Cil.typeOf f) in
   let res = INDEX.find_opt (SIG.of_type tf) index in
   match res with
   | Some _ -> res

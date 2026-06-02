@@ -355,7 +355,7 @@ let populate_zone ctx visit cil_node current_zones =
         (* Dependencies of [\initialized(p)] or [\dangling(p)] are the
             dependencies of [*p]. *)
         if is_same_label current_label lbl then (
-          let typ = Ast_types.Acsl.pointed t.term_type in
+          let typ = Ast_types.Acsl.direct_pointed t.term_type in
           let tlv = Cil.mkTermMem ~addr:t ~off:TNoOffset in
           let tlv' = Logic_const.term (TLval tlv) typ in
           self#do_term_lval tlv';

@@ -2673,9 +2673,9 @@ let type_of_set_elem = Ast_types.Acsl.set_element
 
 let type_of_list_elem = Ast_types.Acsl.list_element
 
-let type_of_pointed = Ast_types.Acsl.pointed
+let type_of_pointed = Ast_types.Acsl.direct_pointed
 
-let type_of_array_elem = Ast_types.Acsl.array_element
+let type_of_array_elem = Ast_types.Acsl.direct_array_element
 
 let isLogicType = Ast_types.Acsl.plain_or_set_ctype
 

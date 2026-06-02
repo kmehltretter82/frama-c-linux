@@ -216,15 +216,15 @@ struct
     | LAnd    -> Val (Cvalues.bool_and (bool_of_exp env e1) (bool_of_exp env e2))
     | LOr     -> Val (Cvalues.bool_or  (bool_of_exp env e1) (bool_of_exp env e2))
     | PlusPI ->
-      let te = Ast_types.C.direct_pointed_type (Cil.typeOf e1) in
+      let te = Ast_types.C.direct_pointed (Cil.typeOf e1) in
       let obj = Ctypes.object_of te in
       Loc(M.shift (loc_of_exp env e1) obj (val_of_exp env e2))
     | MinusPI ->
-      let te = Ast_types.C.direct_pointed_type (Cil.typeOf e1) in
+      let te = Ast_types.C.direct_pointed (Cil.typeOf e1) in
       let obj = Ctypes.object_of te in
       Loc(M.shift (loc_of_exp env e1) obj (F.e_opp (val_of_exp env e2)))
     | MinusPP ->
-      let te = Ast_types.C.direct_pointed_type (Cil.typeOf e1) in
+      let te = Ast_types.C.direct_pointed (Cil.typeOf e1) in
       let obj = Ctypes.object_of te in
       Val(M.loc_diff obj (loc_of_exp env e1) (loc_of_exp env e2))
 

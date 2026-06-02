@@ -510,13 +510,13 @@ module C = struct
     | TArray (ty_elem, arr_size) -> ty_elem, arr_size
     | _ -> Kernel.fatal "Not an array type %a" Cil_datatype.Typ.pretty t
 
-  let direct_pointed_type t =
+  let direct_pointed t =
     match unroll_skel t with
     | TPtr t -> t
     | _ -> Kernel.fatal "Not a pointer type %a" Cil_datatype.Typ.pretty t
 
-  let pointed_type t =
-    let t' = direct_pointed_type t in
+  let pointed t =
+    let t' = direct_pointed t in
     match unroll_node t' with
     | TArray _ -> array_element t'
     | _ -> t'
@@ -731,15 +731,15 @@ module Acsl = struct
   let get_pointed_aux t =
     match unroll t with
     | Ctype ty when C.is_ptr ty ->
-      C.direct_pointed_type ty
+      C.direct_pointed ty
     | _ ->
       Kernel.fatal ~current:true "type %a is not a pointer type"
         Cil_datatype.Logic_type.pretty t
 
-  let pointed =
+  let direct_pointed =
     transform_element (fun t -> Ctype (get_pointed_aux t))
 
-  let ctype_of_pointed = plain_or_set get_pointed_aux
+  let direct_pointed_ctype = plain_or_set get_pointed_aux
 
   let get_array_element_aux t =
     match unroll t with
@@ -749,10 +749,10 @@ module Acsl = struct
       Kernel.fatal ~current:true "type %a is not an array type"
         Cil_datatype.Logic_type.pretty t
 
-  let array_element =
+  let direct_array_element =
     transform_element (fun t -> Ctype (get_array_element_aux t))
 
-  let ctype_of_array_elem = plain_or_set get_array_element_aux
+  let direct_array_element_ctype = plain_or_set get_array_element_aux
 
   let get_ctype t =
     let rec get_aux = function
@@ -958,6 +958,6 @@ let element_type = C.array_element
 
 let array_elem_type_and_size = C.array_elem_type_and_size
 
-let direct_pointed_type = C.direct_pointed_type
+let direct_pointed_type = C.direct_pointed
 
-let pointed_type = C.pointed_type
+let pointed_type = C.pointed

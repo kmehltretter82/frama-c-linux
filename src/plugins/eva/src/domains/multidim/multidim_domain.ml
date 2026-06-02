@@ -179,7 +179,7 @@ struct
           match Base.typeof base with
           | None -> `Top
           | Some base_typ ->
-            let typ = Ast_types.C.direct_pointed_type exp.typ in
+            let typ = Ast_types.C.direct_pointed exp.typ in
             let* base_offset = Offset.of_ival ~base_typ ~typ ival in
             let* base_offset = match index with
               | None -> `Value (base_offset)

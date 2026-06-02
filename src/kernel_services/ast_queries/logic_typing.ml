@@ -545,7 +545,7 @@ let get_importer = Extensions.importer
 let mk_mem ?loc t ofs =
   lift_set
     (fun t -> term ?loc (TLval (plain_mk_mem ?loc t ofs))
-        (Ast_types.Acsl.pointed t.term_type))
+        (Ast_types.Acsl.direct_pointed t.term_type))
     t
 
 let is_enum_cst e t =
@@ -588,7 +588,7 @@ let typing_error loc =
 
 let location_to_char_ptr t =
   let convert_one_location t =
-    let ptd_type = Ast_types.Acsl.pointed t.term_type in
+    let ptd_type = Ast_types.Acsl.direct_pointed t.term_type in
     if Ast_types.Acsl.is_char ptd_type then
       logic_coerce (Ast_types.Acsl.make_set t.term_type) t
     else if Ast_types.Acsl.is_void ptd_type then
@@ -696,7 +696,7 @@ let rec mk_cast_conf integral_cast
     | ty1, Ltype({lt_name="set"},[ty2])
       when Ast_types.Acsl.is_ptr ty1 &&
            Ast_types.Acsl.is_plain_ptr ty2 &&
-           Ast_types.Acsl.is_char (Ast_types.Acsl.pointed ty2) ->
+           Ast_types.Acsl.is_char (Ast_types.Acsl.direct_pointed ty2) ->
       location_to_char_ptr e
     | Ltype({lt_name = "set"},[_]), Ltype({lt_name="set"},[ty2]) ->
       let e = lift_set (fun e -> mk_cast e ty2) e in
@@ -1387,8 +1387,8 @@ struct
     Ast_types.C.is_ptr ctyp1 &&
     Ast_types.C.is_ptr ctyp2 &&
     is_same_c_type
-      (Ast_types.C.direct_pointed_type ctyp1)
-      (Ast_types.C.direct_pointed_type ctyp2)
+      (Ast_types.C.direct_pointed ctyp1)
+      (Ast_types.C.direct_pointed ctyp2)
 
   let is_same_array_type ctyp1 ctyp2 =
     Ast_types.C.is_array ctyp1 &&
@@ -1409,7 +1409,7 @@ struct
 
   let is_function_pointer cty =
     try
-      Ast_types.C.(is_fun (direct_pointed_type  cty))
+      Ast_types.C.(is_fun (direct_pointed  cty))
     with Assert_failure _ -> false
 
   let is_compatible_funtype ty1 ty2 =
@@ -1430,8 +1430,8 @@ struct
   let is_implicit_pointer_conversion term ctyp1 ctyp2 =
     let same_pointed () =
       is_same_c_type
-        (Ast_types.C.direct_pointed_type ctyp1)
-        (Ast_types.C.direct_pointed_type ctyp2)
+        (Ast_types.C.direct_pointed ctyp1)
+        (Ast_types.C.direct_pointed ctyp2)
     in
     let same_array_elt () =
       is_same_c_type
@@ -1444,8 +1444,8 @@ struct
       ||
       (is_function_pointer ctyp2 && is_function_pointer ctyp1 &&
        is_compatible_funtype
-         (Ast_types.C.direct_pointed_type ctyp1)
-         (Ast_types.C.direct_pointed_type ctyp2))
+         (Ast_types.C.direct_pointed ctyp1)
+         (Ast_types.C.direct_pointed ctyp2))
     in
     Ast_types.C.(is_array ctyp1 && is_array ctyp2 && same_array_elt ())
     || Ast_types.C.(is_ptr ctyp1 && is_ptr ctyp2 &&
@@ -1517,7 +1517,7 @@ struct
         Ast_types.C.is_ptr ty2 &&
         is_same_c_type
           (Ast_types.C.direct_array_element ty1)
-          (Ast_types.C.direct_pointed_type ty2)
+          (Ast_types.C.direct_pointed ty2)
       then
         if Logic_utils.is_C_array oterm then
           C.error loc
@@ -1552,7 +1552,7 @@ struct
     | t1, Ltype ({lt_name = "set"},[t2]) when
         Ast_types.Acsl.is_ptr t1 &&
         Ast_types.Acsl.is_plain_ptr t2 &&
-        Ast_types.Acsl.is_char (Ast_types.Acsl.pointed t2) ->
+        Ast_types.Acsl.is_char (Ast_types.Acsl.direct_pointed t2) ->
       nt, location_to_char_ptr oterm
     (* can convert implicitly a singleton into a set,
        but not the reverse. *)
@@ -2927,7 +2927,7 @@ struct
       if not (isLogicPointer t) then
         ctxt.error loc "%a is not a pointer" Cil_printer.pp_term t;
       let t = mk_logic_pointer_or_StartOf t in
-      let struct_type = Ast_types.Acsl.pointed t.term_type in
+      let struct_type = Ast_types.Acsl.direct_pointed t.term_type in
       let f_ofs, f_type = type_of_field loc f struct_type in
       let f_type =
         if env.Lenv.keep_qualifiers then f_type
@@ -2946,7 +2946,7 @@ struct
             (* memory access need a current label to have some semantics *)
             let t1 = mk_logic_pointer_or_StartOf t1 in
             check_non_void_ptr t1.term_loc t1.term_type;
-            let typ = Ast_types.Acsl.pointed t1.term_type in
+            let typ = Ast_types.Acsl.direct_pointed t1.term_type in
             let typ =
               if env.Lenv.keep_qualifiers then typ
               else Ast_types.Acsl.remove_qualifiers typ
@@ -2959,7 +2959,7 @@ struct
           (* memory access need a current label to have some semantics *)
           let t2 = mk_logic_pointer_or_StartOf t2 in
           check_non_void_ptr t2.term_loc t2.term_type;
-          let typ = Ast_types.Acsl.pointed t2.term_type in
+          let typ = Ast_types.Acsl.direct_pointed t2.term_type in
           let typ =
             if env.Lenv.keep_qualifiers then typ
             else Ast_types.Acsl.remove_qualifiers typ
@@ -2969,11 +2969,11 @@ struct
         else if (* purely logical array access. *)
           Ast_types.Acsl.is_array t1.term_type && Ast_types.Acsl.is_integral t2.term_type
         then
-          mk_logic_access env t1, t2, Ast_types.Acsl.array_element t1.term_type
+          mk_logic_access env t1, t2, Ast_types.Acsl.direct_array_element t1.term_type
         else if
           Ast_types.Acsl.is_array t2.term_type && Ast_types.Acsl.is_integral t1.term_type
         then
-          mk_logic_access env t2, t1, Ast_types.Acsl.array_element t2.term_type
+          mk_logic_access env t2, t1, Ast_types.Acsl.direct_array_element t2.term_type
         else (* error *)
         if Ast_types.Acsl.is_array t1.term_type || Ast_types.Acsl.is_array t2.term_type
         then ctxt.error loc "subscript is not an integer range"
@@ -3275,7 +3275,7 @@ struct
       | TAddrOf lv when Ast_types.Acsl.is_fun_ptr t.term_type ->
         f lv
           { t with
-            term_type = Ast_types.Acsl.pointed t.term_type;
+            term_type = Ast_types.Acsl.direct_pointed t.term_type;
             term_node = TLval lv }
       | _ -> C.error t.term_loc "not a left value: %a"
                Cil_printer.pp_term t
@@ -3288,7 +3288,7 @@ struct
       | TAddrOf lv when Ast_types.Acsl.is_fun_ptr t.term_type ->
         f lv
           { t with
-            term_type = Ast_types.Acsl.pointed t.term_type;
+            term_type = Ast_types.Acsl.direct_pointed t.term_type;
             term_node = TLval lv }
       | TLval lv
       | TCast (true, _,{term_node = TLval lv })
@@ -4788,7 +4788,7 @@ struct
         (* note: type pointed to by arg1 may differ from the
            return type with respect to qualifiers *)
         if not (Ast_types.C.is_ptr arg1) then error ();
-        let vol_typ = Ast_types.C.direct_pointed_type arg1 in
+        let vol_typ = Ast_types.C.direct_pointed arg1 in
         let base_typ = Ast_types.C.remove_qualifiers vol_typ in
         if not (Ast_types.C.is_volatile vol_typ &&
                 ( reads || not (Ast_types.C.is_const vol_typ) ) &&
@@ -4873,8 +4873,8 @@ end
 
 
 
-let ctype_of_pointed = Ast_types.Acsl.ctype_of_pointed
+let ctype_of_pointed = Ast_types.Acsl.direct_pointed_ctype
 
-let ctype_of_array_elem = Ast_types.Acsl.ctype_of_array_elem
+let ctype_of_array_elem = Ast_types.Acsl.direct_array_element_ctype
 
 let arithmetic_conversion = Ast_types.Acsl.arithmetic_conversion

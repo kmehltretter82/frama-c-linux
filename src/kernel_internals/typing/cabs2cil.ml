@@ -6363,7 +6363,7 @@ and doExp local_env
                         doExp (no_paren_local_env local_env) CNoConst a1 AType
                       in
                       clean_up_chunk_locals c;
-                      let t = Ast_types.C.direct_pointed_type t in
+                      let t = Ast_types.C.direct_pointed t in
                       Format.sprintf "%s_%sint%d_t"
                         n
                         (if Cil.isSignedInteger t then "" else "u")
@@ -6403,7 +6403,7 @@ and doExp local_env
                         doExp (no_paren_local_env local_env) CNoConst a1 AType
                       in
                       clean_up_chunk_locals c;
-                      let t = Ast_types.C.direct_pointed_type t in
+                      let t = Ast_types.C.direct_pointed t in
                       Format.sprintf "%s_%d" n (Cil.bytesSizeOf t)
                     | [] ->
                       Kernel.error ~once:true ~current:true
@@ -8851,7 +8851,7 @@ and createLocal ghost ((_, sto, _, _, _) as specs)
         let savelen = alphaConvertVarAndAddToEnv true savelen in
         let se0 = local_var_chunk se0 savelen in
         (* Compute the allocation size *)
-        let elt_type = Ast_types.C.direct_pointed_type vi.vtype in
+        let elt_type = Ast_types.C.direct_pointed vi.vtype in
         let elt_size = Cil.new_exp ~loc (SizeOf elt_type) in
         let alloca_size =
           Cil.new_exp ~loc

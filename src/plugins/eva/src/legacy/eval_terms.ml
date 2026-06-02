@@ -2046,7 +2046,7 @@ and reduce_by_valid env positive access (tset: term) =
          (* Compute the offsets, that depend on the type of the lval.
             The computed list is exactly what [aux] requires *)
          let roffs =
-           eval_toffset ~alarm_mode env (Ast_types.C.direct_pointed_type typ) offs
+           eval_toffset ~alarm_mode env (Ast_types.C.direct_pointed typ) offs
          in
          let aux env offs = aux lt env (roffs.etype, offs) in
          aux_min_max_offset aux env roffs.eunder
@@ -2063,7 +2063,7 @@ and reduce_by_valid env positive access (tset: term) =
            with V.Not_based_on_null -> raise Exit
          in
          let li = if op = PlusPI then li else Ival.neg_int li in
-         let typ_p = Ast_types.C.direct_pointed_type rtlv.etype in
+         let typ_p = Ast_types.C.direct_pointed rtlv.etype in
          let sbits = Z.of_int (Cil.bitsSizeOf typ_p) in
          (* Compute the offsets expected by [aux], which are [i *
             8 * sizeof( *tlv)] *)
@@ -2512,7 +2512,7 @@ and eval_predicate env pred =
         | Pobject_pointer _ -> Object_pointer
         | _ -> assert false
       in
-      let typ_pointed = Ast_types.Acsl.ctype_of_pointed tsets.term_type in
+      let typ_pointed = Ast_types.Acsl.direct_pointed_ctype tsets.term_type in
       (* Check if we are trying to write in a const l-value *)
       if kind = Write && Eva_utils.is_const_write_invalid typ_pointed
       then False
@@ -2568,7 +2568,7 @@ and eval_predicate env pred =
         match funs with
         | `Top -> Unknown
         | `Value funs ->
-          let typ = Ast_types.C.direct_pointed_type v.etype in
+          let typ = Ast_types.C.direct_pointed v.etype in
           let funs, warn' = Eval_typ.compatible_functions typ funs in
           if warn || warn' then
             (* No function possible -> signal hard error. Otherwise, follow

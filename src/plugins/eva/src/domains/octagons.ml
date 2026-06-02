@@ -363,7 +363,7 @@ module Rewriting = struct
               let v2 =
                 if Ast_types.C.is_ptr typ
                 then
-                  let scale = Cil.(bytesSizeOf (Ast_types.C.direct_pointed_type typ)) in
+                  let scale = Cil.(bytesSizeOf (Ast_types.C.direct_pointed typ)) in
                   Arith.mul_integer (Z.of_int scale) v2
                 else v2
               in

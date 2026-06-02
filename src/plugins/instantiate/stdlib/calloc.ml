@@ -124,7 +124,7 @@ let well_typed_call ret _fct args =
   | Some ret, [ _ ; _ ] ->
     let t = Cil.typeOfLval ret in
     Ast_types.C.is_ptr t && not (Ast_types.C.is_void_ptr t) &&
-    Cil.isCompleteType (Ast_types.C.direct_pointed_type t)
+    Cil.isCompleteType (Ast_types.C.direct_pointed t)
   | _ -> false
 
 let key_from_call ret _fct _ =
@@ -132,7 +132,7 @@ let key_from_call ret _fct _ =
   | Some ret ->
     let ret_t = Ast_types.C.unroll_deep (Cil.typeOfLval ret) in
     let ret_t = Ast_types.C.remove_qualifiers_deep ret_t in
-    Ast_types.C.direct_pointed_type ret_t
+    Ast_types.C.direct_pointed ret_t
   | _ -> unexpected "trying to generate a key on an ill-typed call"
 
 let retype_args _typ args = args

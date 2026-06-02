@@ -2887,7 +2887,7 @@ and typeOfLval = function
 
 and typeOfLhost = function
   | Var x -> x.vtype
-  | Mem e -> Ast_types.C.direct_pointed_type (typeOf e)
+  | Mem e -> Ast_types.C.direct_pointed (typeOf e)
 
 and typeOffset basetyp = function
     NoOffset -> basetyp
@@ -2925,7 +2925,7 @@ let rec typeOfTermLval = function
     typeTermOffset ty off
   | TResult ty, off -> typeTermOffset (Ctype ty) off
   | TMem addr, off ->
-    let t = Ast_types.Acsl.ctype_of_pointed addr.term_type in
+    let t = Ast_types.Acsl.direct_pointed_ctype addr.term_type in
     let lt = typeTermOffset (Ctype t) off in
     Ast_types.Acsl.set_conversion lt addr.term_type
 
@@ -5851,7 +5851,7 @@ and mkBinOp ?(constfold=false) ~loc op e1 e2 =
     else side_check ~check:C.is_object_ptr "non-object (function) pointer"
   in
   let check_complete_pointed ~side_check =
-    let is_complete t = isCompleteType (C.direct_pointed_type t) in
+    let is_complete t = isCompleteType (C.direct_pointed t) in
     let check_complete () = side_check ~check:is_complete "incomplete pointer" in
     (* Cf. 6.13.2: GCC allows arithmetic on void pointers. *)
     if Machine.gccMode () then
@@ -5881,8 +5881,8 @@ and mkBinOp ?(constfold=false) ~loc op e1 e2 =
     arith_conv ~tres:None
   in
   let compatible_pointed_types () =
-    let t1p = C.direct_pointed_type t1
-    and t2p = C.direct_pointed_type t2 in
+    let t1p = C.direct_pointed t1
+    and t2p = C.direct_pointed t2 in
     areCompatibleTypes
       (C.remove_qualifiers_deep t1p)
       (C.remove_qualifiers_deep t2p)
