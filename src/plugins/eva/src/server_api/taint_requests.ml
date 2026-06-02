@@ -23,7 +23,7 @@ let _signal =
     ~descr:(Markdown.plain "List of taint names")
     ~output:(module Data.Jlist (Data.Jstring))
     ~get:Taint_domain.taint_names
-    ~add_hook:Analysis_requests.register_computation_hook
+    ~add_hook:Update.add_computation_hook
     ()
 
 (* List of currently selected taints. *)
@@ -70,7 +70,7 @@ let taint_names_by_kind zone request =
     Results.{ direct_taint_names; indirect_taint_names }
 
 let register_hook f =
-  Analysis_requests.register_computation_hook f;
+  Update.add_hook f;
   CurrentTaints.add_hook_on_change (fun _ -> f ())
 
 (* ----- Taint statuses ----------------------------------------------------- *)
@@ -206,7 +206,9 @@ module EvaTaints = struct
       ~id:"eva.taint" ~label:"Taint" ~title:"Taint status according to Eva"
       ~descr:eva_taints_descr ~enable print_taint
 
-  let () = register_hook Server.Kernel_ast.Information.update
+  let () =
+    CurrentTaints.add_hook_on_change
+      (fun _ -> Server.Kernel_ast.Information.update ())
 end
 
 
@@ -254,7 +256,7 @@ module LvalueTaints = struct
       ~descr:(Markdown.plain "Get the tainted lvalues of a given function")
       ~input:(module (Kernel_ast.Decl))
       ~output:(module (Data.Jlist (Status)))
-      ~signals:[Analysis_requests.computation_signal; current_taint_signal]
+      ~signals:(current_taint_signal :: Update.signals)
       (function SFunction kf -> get_tainted_lvals kf | _ -> [])
 
 end

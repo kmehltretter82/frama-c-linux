@@ -158,7 +158,6 @@ let () =
     ~enable:Analysis.is_computed
     print_value
 
-
 (* ----- Detailed values by callstack for the values table ------------------ *)
 
 type term = Pexpr of exp | Plval of lval | Ppred of predicate
@@ -189,12 +188,6 @@ type evaluations = {
   here: evaluation;
   next: evaluation next;
 }
-
-let signal = Request.signal ~package ~name:"changed"
-    ~descr:(Md.plain "Emitted when EVA results has changed")
-
-let () = Analysis.register_computation_hook ~on:Computed
-    (fun _ -> Request.emit signal)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Marker Utilities                                                   --- *)
@@ -249,132 +242,8 @@ let probe marker =
   with Not_found -> None
 
 (* -------------------------------------------------------------------------- *)
-(* --- Stmt Ranking                                                       --- *)
-(* -------------------------------------------------------------------------- *)
-
-module type Ranking_sig = sig
-  val stmt : stmt -> int
-  val sort : Callstack.t list -> Callstack.t list
-end
-
-module Ranking : Ranking_sig = struct
-
-  class ranker = object(self)
-    inherit Visitor.frama_c_inplace
-    (* ranks really starts at 1 *)
-    (* rank < 0 means not computed yet *)
-    val mutable rank = (-1)
-    val rmap = Smap.create 0
-    val fmark = Kmap.create 0
-    val fqueue = Queue.create ()
-
-    method private call kf =
-      if not (Kmap.mem fmark kf) then
-        ( Kmap.add fmark kf () ; Queue.push kf fqueue )
-
-    method private newrank s =
-      let r = succ rank in
-      Smap.add rmap s r ;
-      rank <- r ; r
-
-    method! vlval lv =
-      begin
-        try match fst lv with
-          | Var vi -> self#call (Globals.Functions.get vi)
-          | _ -> ()
-        with Not_found -> ()
-      end ; Cil.DoChildren
-
-    method! vstmt_aux s =
-      ignore (self#newrank s) ;
-      Cil.DoChildren
-
-    method flush =
-      while not (Queue.is_empty fqueue) do
-        let kf = Queue.pop fqueue in
-        ignore (Visitor.(visitFramacKf (self :> frama_c_visitor) kf))
-      done
-
-    method compute =
-      match Globals.entry_point () with
-      | kf , _ -> self#call kf ; self#flush
-      | exception Globals.No_such_entry_point _ -> ()
-
-    method rank s =
-      if rank < 0 then (rank <- 0 ; self#compute) ;
-      try Smap.find rmap s
-      with Not_found ->
-        let kf = Kernel_function.find_englobing_kf s in
-        self#call kf ;
-        self#flush ;
-        try Smap.find rmap s
-        with Not_found -> self#newrank s
-
-  end
-
-  let stmt = let rk = new ranker in rk#rank
-
-  let ranks (cs : Callstack.t) : int list =
-    List.map stmt (Callstack.to_stmt_list cs)
-
-  let order : int list -> int list -> int = Stdlib.compare
-
-  let sort (wcs : Callstack.t list) : Callstack.t list =
-    List.map fst @@
-    List.sort (fun (_,rp) (_,rq) -> order rp rq) @@
-    List.map (fun cs -> cs , ranks cs) wcs
-
-end
-
-(* -------------------------------------------------------------------------- *)
 (* --- Domain Utilities                                                   --- *)
 (* -------------------------------------------------------------------------- *)
-
-module Jcallstack : S with type t = Callstack.t =
-  Data.Index
-    (Callstack.Map)
-    (struct
-      let package = package
-      let name = "callstack"
-      let descr = Md.plain "Callstack identifier"
-    end)
-
-module Jcalls : Request.Output with type t = Callstack.t = struct
-
-  type t = Callstack.t
-
-  let jcallsite = Server.Data.declare ~package
-      ~name:"callsite" ~descr:(Md.plain "Call site infos")
-      (Jrecord [
-          "callee" , Jdecl.jtype ;
-          "caller" , Joption Jdecl.jtype ;
-          "stmt" , Joption Jstmt.jtype ;
-          "rank" , Joption Jnumber ;
-        ])
-
-  let jtype = Package.(Jarray jcallsite)
-
-  let jcallsite ~jcaller ~jcallee stmt =
-    `Assoc [
-      "callee", jcallee ;
-      "caller", jcaller ;
-      "stmt", Jstmt.to_json stmt ;
-      "rank", Jint.to_json (Ranking.stmt stmt) ;
-    ]
-
-  let to_json (cs : t) =
-    let aux (acc, jcaller) (callee, stmt) =
-      let jcallee = Jdecl.to_json (SFunction callee) in
-      jcallsite ~jcaller ~jcallee stmt :: acc, jcallee
-    in
-    let entry_point = Jdecl.to_json (SFunction cs.entry_point) in
-    let l, _last_callee =
-      List.fold_left aux
-        ([`Assoc [ "callee", entry_point ]], entry_point)
-        (List.rev cs.stack)
-    in `List l
-
-end
 
 module Jtruth : Data.S with type t = truth = struct
   type t = truth
@@ -471,7 +340,6 @@ let filter_variables bases =
 (* -------------------------------------------------------------------------- *)
 
 module type EvaProxy = sig
-  val callstacks : Domain_store.control_point -> Callstack.t list
   val evaluate : probe -> Callstack.t option -> evaluations
 end
 
@@ -487,11 +355,6 @@ module Proxy(A : Engine_sig.S_with_results) : EvaProxy = struct
   let get_cvalue =
     let default = fun _ -> Cvalue.V.top in
     Option.value ~default (A.Val.get Main_values.CVal.key)
-
-  let callstacks control_point =
-    match A.callstacks control_point with
-    | `Top -> []
-    | `Value list -> list
 
   let domain_state callstack = function
     | Initial -> A.get_state Initial
@@ -635,67 +498,9 @@ let proxy =
     (module Proxy (val a) : EvaProxy)
   in
   let current = ref (make @@ Engine.current ()) in
-  let hook a = current := make a ; Request.emit signal in
+  let hook a = current := make a in
   Engine.register_hook hook ;
   fun () -> !current
-
-(* -------------------------------------------------------------------------- *)
-(* --- Request getCallstacks                                              --- *)
-(* -------------------------------------------------------------------------- *)
-
-let () =
-  Request.register ~package
-    ~kind:`GET ~name:"getCallstacks"
-    ~descr:(Md.plain "Callstacks for markers")
-    ~input:(module Jlist(Jmarker))
-    ~output:(module Jlist(Jcallstack))
-    begin fun markers ->
-      let module A : EvaProxy = (val proxy ()) in
-      let gather_callstacks cset marker =
-        let list =
-          match probe marker with
-          | Some (_, Stmt (_, stmt)) -> A.callstacks (Before stmt)
-          | Some (_, Pre kf) -> A.callstacks (Start kf)
-          | Some (_, Initial) | None -> []
-        in
-        List.fold_left (fun set elt -> CSet.add elt set) cset list
-      in
-      let cset = List.fold_left gather_callstacks CSet.empty markers in
-      Ranking.sort (CSet.elements cset)
-    end
-
-(* -------------------------------------------------------------------------- *)
-(* --- Request getCallstackInfo                                           --- *)
-(* -------------------------------------------------------------------------- *)
-
-let () =
-  Request.register ~package
-    ~kind:`GET ~name:"getCallstackInfo"
-    ~descr:(Md.plain "Callstack Description")
-    ~input:(module Jcallstack)
-    ~output:(module Jcalls)
-    begin fun cs -> cs end
-
-(* -------------------------------------------------------------------------- *)
-(* --- Request getStmtInfo                                                --- *)
-(* -------------------------------------------------------------------------- *)
-
-let () =
-  let getStmtInfo = Request.signature ~input:(module Jstmt) () in
-  let set_fct = Request.result getStmtInfo ~name:"fct"
-      ~descr:(Md.plain "Function name")
-      (module Jstring)
-  and set_rank = Request.result getStmtInfo ~name:"rank"
-      ~descr:(Md.plain "Global stmt order")
-      (module Jint)
-  in
-  Request.register_sig ~package getStmtInfo
-    ~kind:`GET ~name:"getStmtInfo"
-    ~descr:(Md.plain "Stmt Information")
-    begin fun rq s ->
-      set_fct rq Kernel_function.(get_name @@ find_englobing_kf s) ;
-      set_rank rq (Ranking.stmt s) ;
-    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Request getProbeInfo                                               --- *)
@@ -794,7 +599,7 @@ let () =
       (module Jmarker)
   and get_cs = Request.param_opt getValues ~name:"callstack"
       ~descr:(Md.plain "Callstack to collect (defaults to none)")
-      (module Jcallstack)
+      (module Callstack_requests.JCallstack)
   and set_before = Request.result_opt getValues ~name:"vBefore"
       ~descr:(Md.plain "Domain values before execution")
       (module JEvaluation)
@@ -811,6 +616,7 @@ let () =
   Request.register_sig ~package getValues
     ~kind:`GET ~name:"getValues"
     ~descr:(Md.plain "Abstract values for the given marker")
+    ~signals:Update.signals
     begin fun rq () ->
       let module A : EvaProxy = (val proxy ()) in
       let marker = get_tgt rq and callstack = get_cs rq in

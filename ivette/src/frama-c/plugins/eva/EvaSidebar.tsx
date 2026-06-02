@@ -16,6 +16,11 @@ import * as Params from 'frama-c/kernel/api/parameters';
 import * as EvaDef from 'frama-c/plugins/eva/EvaDefinitions';
 import { EvaFormOptions } from 'frama-c/plugins/eva/components/Form';
 import EvaTools from './components/Tools';
+import { useStringSettings } from 'dome';
+import * as Toolbar from 'dome/frame/toolbars';
+import { SidebarTitle } from 'dome/frame/sidebars';
+import { TaintSidebar } from './Taint';
+import { CallstackSelection } from './Callstack';
 
 const startComputing = new GlobalState<number>(0);
 
@@ -36,7 +41,7 @@ export function useStartComputing(): number {
   return start;
 }
 
-export function EvaSideBar(): JSX.Element {
+function EvaSidebarConfig(): JSX.Element {
   useSyncStartComputing();
   const remote = Forms.useController();
 
@@ -258,9 +263,56 @@ export function EvaSideBar(): JSX.Element {
 }
 
 Ivette.registerSidebar({
-  id: 'frama-c.plugins.eva_sidebar',
-  label: 'EVA',
+  id: 'frama-c.plugins.eva_sidebar.config',
+  label: 'Eva',
   icon: 'APPLE',
-  title: 'Eva',
-  children: <EvaSideBar />,
+  title: 'Configuration of the Eva analysis',
+  children: <EvaSidebarConfig />,
+});
+
+function EvaSidebarSelection(): React.JSX.Element {
+  const scrollableArea = React.useRef<HTMLDivElement>(null);
+
+  // Selection
+  const [selected, setSelected] =
+    useStringSettings('eva.sidebar.selected', 'callstacks');
+
+  const opened = { display: 'block' };
+  const closed = { display: 'none' };
+
+  return (<>
+    <SidebarTitle label='Selection' >
+      <Toolbar.ButtonGroup>
+        <Toolbar.Button
+          key='taints'
+          label='Taints'
+          title='Show taints selection'
+          selected={selected === 'taints'}
+          onClick={() => setSelected('taints')}
+        /><Toolbar.Button
+          key='callstacks'
+          label='Callstacks'
+          title='Show callstacks selection'
+          selected={selected === 'callstacks'}
+          onClick={() => setSelected('callstacks')}
+        />
+      </Toolbar.ButtonGroup>
+    </SidebarTitle>
+    <div ref={scrollableArea} className="globals-scrollable-area">
+      <div style={selected === "taints" ? opened : closed}>
+        <TaintSidebar />
+      </div>
+      <div style={selected === "callstacks" ? opened : closed}>
+        <CallstackSelection />
+      </div>
+    </div>
+  </>);
+}
+
+Ivette.registerSidebar({
+  id: 'fc.plugins.eva_sidebar.selection',
+  label: 'Eva selection',
+  icon: 'APPLEMORE',
+  title: 'Selection of Eva results',
+  children: <EvaSidebarSelection />
 });

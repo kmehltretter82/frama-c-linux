@@ -6,4 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Requests registered to the Frama-C server; nothing is exported. *)
+module JCallsite : Server.Data.S with type t = Callstack.call
+module JCallstack : Server.Data.S with type t = Callstack.t
+
+val compatible_filter: unit -> (Callstack.t -> bool) option

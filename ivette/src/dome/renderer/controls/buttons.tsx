@@ -253,7 +253,7 @@ const CHECKBOX_DISABLED = 'dome-control-disabled dome-xCheckbox ';
 
 export interface CheckProps {
   /** Button label. */
-  label: string;
+  label?: string;
   /** Button tooltip. */
   title?: string;
   /** Additional class. */

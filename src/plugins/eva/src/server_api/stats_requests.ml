@@ -195,7 +195,7 @@ let _computed_signal =
               "Statistics about the last Eva analysis for the whole program")
     ~output:(module Statistics)
     ~get:Summary.compute_stats
-    ~add_hook:Analysis_requests.register_computation_hook
+    ~add_hook:Update.add_computation_hook
     ()
 
 let _functionStats =
