@@ -240,7 +240,7 @@ async function StackInfos(props: StackInfosProps): Promise<JSX.Element> {
   const { callsites, isFocused, close } = props;
   const focusedClass = isFocused ? 'eva-focused' : '';
   const className = classes('eva-callsite', focusedClass);
-  if (callsites.length <= 1) return <></>;
+  if (callsites.length <= 0) return <></>;
   const makeCallsite = ({ caller, stmt }: callsite): JSX.Element => {
     if (!caller || !stmt) return <></>;
     const { name } = States.getDeclaration(caller);
