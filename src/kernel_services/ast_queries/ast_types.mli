@@ -783,9 +783,7 @@ val array_elem_type_and_size : typ -> typ * exp option
 module Acsl : sig
 
   (** instantiate type variables in a logic type. *)
-  val instantiate:
-    (string * logic_type) list ->
-    logic_type -> logic_type
+  val instantiate : (string * logic_type) list -> logic_type -> logic_type
 
   (** @return [true] if the logic type definition can be expanded. *)
   val is_unrollable_ltdef : logic_type_info -> bool
@@ -793,42 +791,42 @@ module Acsl : sig
   (** expands logic type definitions only.
       To expands both logic part and C part, uses {!Ast_types.Acsl.unroll}.
   *)
-  val unroll_ltdef: logic_type -> logic_type
+  val unroll_ltdef : logic_type -> logic_type
 
   (** Expands logic type definitions. If the [unroll_typedef] flag is set to
       [true] (this is the default), C typedef will be expanded as well using
       {!Ast_types.Acsl.unroll_ltdef}.
   *)
-  val unroll: ?unroll_typedef:bool -> logic_type -> logic_type
+  val unroll : ?unroll_typedef:bool -> logic_type -> logic_type
 
   (** {3 tests and extraction of element type} *)
 
   (** [fold_plain_ctype ~default f t] is [~default] for pure logic types and the
       result of [f] for C types.
   *)
-  val fold_plain_ctype: default:'a -> (typ -> 'a) -> logic_type -> 'a
+  val fold_plain_ctype : default:'a -> (typ -> 'a) -> logic_type -> 'a
 
   (** [true] if the argument is not a set type. *)
-  val is_plain: logic_type -> bool
+  val is_plain : logic_type -> bool
 
   (** returns [true] if the type is a [set<t>]. *)
-  val is_plain_set: logic_type -> bool
+  val is_plain_set : logic_type -> bool
 
   (** [plain_or_set f t] applies [f] to [t] or to the type of elements of [t]
       if it is a set type.
   *)
-  val plain_or_set: (logic_type -> 'a) -> logic_type -> 'a
+  val plain_or_set : (logic_type -> 'a) -> logic_type -> 'a
 
   (** [plain_or_set_ctype test typ] is [false] for pure logic types and the
       result of test for C types. In case of a set type, the function tests
       the element type.
   *)
-  val plain_or_set_ctype: (typ -> bool) -> logic_type -> bool
+  val plain_or_set_ctype : (typ -> bool) -> logic_type -> bool
 
   (** @return true if the argument is a [Lboolean] (uses
       {!Ast_types.Acsl.unroll_ltdef} if needed).
   *)
-  val is_logic_boolean: logic_type -> bool
+  val is_logic_boolean : logic_type -> bool
 
   (** {4 tests for direct type}
       [is_plain_xxx t] returns true iff [t] is a [xxx] (and not a [set<xxx>].
@@ -838,79 +836,79 @@ module Acsl : sig
   (** Check for ["volatile"] qualifier from a logic type using
       {!C.is_volatile}.
   *)
-  val is_plain_volatile: logic_type -> bool
+  val is_plain_volatile : logic_type -> bool
 
   (** True if the argument is the type for reified C types. *)
-  val is_plain_typetag: logic_type -> bool
+  val is_plain_typetag : logic_type -> bool
 
   (** True if the argument is a boolean type, either integral C type
       or mathematical boolean one.
   *)
-  val is_plain_boolean: logic_type -> bool
+  val is_plain_boolean : logic_type -> bool
 
   (** True if the argument is [_Bool] or [Lboolean]. *)
-  val is_plain_pure_boolean: logic_type -> bool
+  val is_plain_pure_boolean : logic_type -> bool
 
   (** True if the argument is an integral type (i.e. integer or enum), either C
       or mathematical one.
   *)
-  val is_plain_integral: logic_type -> bool
+  val is_plain_integral : logic_type -> bool
 
   (** True if the argument is a floating point type. *)
-  val is_plain_float: logic_type -> bool
+  val is_plain_float : logic_type -> bool
 
   (** True if the argument is the logic 'real' type. *)
-  val is_plain_real: logic_type -> bool
+  val is_plain_real : logic_type -> bool
 
   (** True if the argument is a C floating point type or logic 'real' type. *)
-  val is_plain_real_or_float: logic_type -> bool
+  val is_plain_real_or_float : logic_type -> bool
 
   (** True if the argument is a logic arithmetic type (i.e. integer, enum or
       floating point, either C or mathematical one.
   *)
-  val is_plain_arithmetic: logic_type -> bool
+  val is_plain_arithmetic : logic_type -> bool
 
   (** True if the argument is a pointer type. Expands the logic type
       definition if necessary.
   *)
-  val is_plain_ptr: logic_type -> bool
+  val is_plain_ptr : logic_type -> bool
 
   (** True if the argument is an array type. Expands the logic type
       definition if necessary.
   *)
-  val is_plain_array: logic_type -> bool
+  val is_plain_array : logic_type -> bool
 
   (** True if the argument is the logic function type. Expands the logic type
       definition if necessary.
   *)
-  val is_plain_fun: logic_type -> bool
+  val is_plain_fun : logic_type -> bool
 
   (** True if the argument is the logic function pointer type. Expands the logic
       type definition if necessary.
   *)
-  val is_plain_fun_ptr: logic_type -> bool
+  val is_plain_fun_ptr : logic_type -> bool
 
   (** True if the argument is a pointer {i or} function type.
       Expands the logic type definition if necessary.
   *)
-  val is_plain_fun_or_ptr: logic_type -> bool
+  val is_plain_fun_or_ptr : logic_type -> bool
 
   (** Returns [true] if the type is a list<t>. *)
-  val is_plain_list: logic_type -> bool
+  val is_plain_list : logic_type -> bool
 
   (** {4 tests for potential sets}
       [is_xxx t] returns true iff [t] is a [xxx] _or_ a set of [xxx]
   *)
 
-  val is_arithmetic: logic_type -> bool
+  val is_arithmetic : logic_type -> bool
 
-  val is_integral: logic_type -> bool
+  val is_integral : logic_type -> bool
 
-  val is_fun_ptr: logic_type -> bool
+  val is_fun_ptr : logic_type -> bool
 
-  val is_array: logic_type -> bool
+  val is_array : logic_type -> bool
 
-  val is_ptr: logic_type -> bool
+  val is_ptr : logic_type -> bool
 
   val is_char : logic_type -> bool
 
@@ -923,49 +921,49 @@ module Acsl : sig
   (** {4 constructors} *)
 
   (** [make_list t] returns the type list<[t]>. *)
-  val make_list: logic_type -> logic_type
+  val make_list : logic_type -> logic_type
 
   (** converts a type into the corresponding set type if needed. Does nothing
       if the argument is already a set type.
   *)
-  val make_set: logic_type -> logic_type
+  val make_set : logic_type -> logic_type
 
   (** [make_arrow args rt] returns a [rt] if [args] is empty or the
       corresponding [Larrow] type.
   *)
-  val make_arrow: logic_var list -> logic_type -> logic_type
+  val make_arrow : logic_var list -> logic_type -> logic_type
 
   (** [set_conversion ty1 ty2] returns a set type as soon as [ty1] and/or [ty2]
       is a set. Elements have type [ty1], or the type of the elements of [ty1] if
       it is itself a set-type (i.e. we do not build set of sets that way).
   *)
-  val set_conversion: logic_type -> logic_type -> logic_type
+  val set_conversion : logic_type -> logic_type -> logic_type
 
   (** [transform_element f t] is the same as
       [set_conversion (plain_or_set f t) t]
   *)
-  val transform_element: (logic_type -> logic_type) -> logic_type -> logic_type
+  val transform_element : (logic_type -> logic_type) -> logic_type -> logic_type
 
   (** {4 extract elements} *)
 
   (** returns the type of elements of a list type.
       @raise Failure if the input type is not a list type.
   *)
-  val list_element: logic_type -> logic_type
+  val list_element : logic_type -> logic_type
 
   (** returns the type of elements of a set type.
       @raise Failure if the input type is not a set type.
   *)
-  val set_element: logic_type -> logic_type
+  val set_element : logic_type -> logic_type
 
   (** returns the type of the element pointed to by the type. If the
       source type is a set of pointers, returns a set of elements.
   *)
-  val direct_pointed: logic_type -> logic_type
+  val direct_pointed : logic_type -> logic_type
 
   (** same as {!Ast_types.Acsl.direct_pointed} but for arrays (or set of
       arrays). *)
-  val direct_array_element: logic_type -> logic_type
+  val direct_array_element : logic_type -> logic_type
 
   (** {4 Type conversions} *)
 
@@ -975,13 +973,13 @@ module Acsl : sig
   val get_ctype : logic_type -> typ
 
   (** removes qualifiers if logic_type is a C type, identity otherwise. *)
-  val remove_qualifiers: logic_type -> logic_type
+  val remove_qualifiers : logic_type -> logic_type
 
-  val direct_pointed_ctype: logic_type -> typ
+  val direct_pointed_ctype : logic_type -> typ
 
-  val direct_array_element_ctype: logic_type -> typ
+  val direct_array_element_ctype : logic_type -> typ
 
-  val arithmetic_conversion: logic_type -> logic_type -> logic_type
+  val arithmetic_conversion : logic_type -> logic_type -> logic_type
 end
 
 (** Expands logic type definitions. If the [unroll_typedef] flag is set to
