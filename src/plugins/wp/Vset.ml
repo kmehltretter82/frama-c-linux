@@ -8,6 +8,7 @@
 
 open Qed
 open Lang
+open Lang.E
 open Lang.F
 
 (* -------------------------------------------------------------------------- *)
@@ -78,8 +79,7 @@ let pretty fmt = function
 (* -------------------------------------------------------------------------- *)
 
 let t_set = Lang.extern_t "set.Set.set"
-let tau_of_set (te:tau) : tau = Logic.Data( t_set , [te] )
-let () = LogicBuiltins.add_builtin_type "set" t_set
+let tau_of_set (te:tau) : tau = Lang.t_data !@t_set [te]
 
 let p_member = Lang.extern_f "set.Set.mem"
 let f_empty = Lang.extern_f "set.Set.empty"
@@ -119,7 +119,7 @@ let ordered ~limit ~strict a b =
 
 let member x xs = p_any
     (function
-      | Set(_,s) -> p_call p_member [x;s]
+      | Set(_,s) -> F.p_call !@p_member [x;s]
       | Singleton e -> p_equal x e
       | Range(a,b) -> in_range x a b
       | Descr(xs,t,p) -> p_exists xs (p_and (p_equal x t) p)
@@ -135,7 +135,7 @@ let descr = function
   | Set(t,s) ->
     let x = Lang.freshvar t in
     let e = e_var x in
-    [x] , e , p_call p_member [e;s]
+    [x] , e , p_call !@p_member [e;s]
   | Singleton e -> ( [] , e , p_true )
   | Range(a,b) ->
     let x = Lang.freshvar ~basename:"k" Logic.Int in
@@ -150,28 +150,28 @@ let descr = function
 
 let concretize_vset = function
   | Set(_,s) -> s
-  | Singleton e -> e_fun f_singleton [e]
-  | Range(None,None) -> e_fun f_range_all []
-  | Range(None,Some b) -> e_fun f_range_inf [b]
-  | Range(Some a,None) -> e_fun f_range_sup [a]
-  | Range(Some a,Some b) -> e_fun f_range [a;b]
+  | Singleton e -> F.e_fun !@ f_singleton [e]
+  | Range(None,None) -> F.e_fun !@f_range_all []
+  | Range(None,Some b) -> F.e_fun !@f_range_inf [b]
+  | Range(Some a,None) -> F.e_fun !@f_range_sup [a]
+  | Range(Some a,Some b) -> F.e_fun !@f_range [a;b]
   | Descr _ ->
     Warning.error "Concretization for comprehension sets not implemented yet"
 
 let concretize = function
-  | [] -> e_fun f_empty []
+  | [] -> F.e_fun !@f_empty []
   | x::xs ->
     List.fold_left
-      (fun w x -> e_fun f_union [w;concretize_vset x])
+      (fun w x -> F.e_fun !@f_union [w;concretize_vset x])
       (concretize_vset x) xs
 
-let inter xs ys = e_fun f_inter [xs;ys]
+let inter xs ys = F.e_fun !@f_inter [xs;ys]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Emptiness                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let p_empty s = p_equal s (e_fun f_empty [])
+let p_empty s = p_equal s (F.e_fun !@f_empty [])
 
 let is_empty xs =
   p_all (function
@@ -211,7 +211,7 @@ let subset xs ys =
       | Set(t,s) ->
         let x = Lang.freshvar t in
         let e = e_var x in
-        p_forall [x] (p_imply (p_call p_member [e;s]) (member e ys))
+        p_forall [x] (p_imply (F.p_call !@p_member [e;s]) (member e ys))
       | Singleton e -> member e ys
       | Descr(xs,t,p) ->
         p_forall xs (p_imply p (member t ys))
@@ -276,7 +276,7 @@ let disjoint_vset x y =
 
   | Singleton e , Set(_,s)
   | Set(_,s) , Singleton e ->
-    p_not (p_call p_member [e;s])
+    p_not (F.p_call !@p_member [e;s])
 
   | Set _ , Set _ ->
     let xs,a,p = descr x in
@@ -285,7 +285,7 @@ let disjoint_vset x y =
 
   | Set(_,s) , w | w , Set(_,s) ->
     let xs,t,p = descr w in
-    let t_in_s = p_call p_member [t;s] in
+    let t_in_s = F.p_call !@p_member [t;s] in
     p_forall xs (p_not (p_and p t_in_s))
 
 let disjoint xs ys =

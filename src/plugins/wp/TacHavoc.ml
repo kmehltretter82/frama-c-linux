@@ -7,6 +7,7 @@
 (**************************************************************************)
 
 open Lang
+open Lang.E
 open Tactical
 open Conditions
 
@@ -22,7 +23,7 @@ let lookup_havoc e =
     begin
       match F.repr m with
       | L.Fun( f , [m_sep;a;m_undef;b;n] )
-        when f == MemMemory.f_memcpy ->
+        when MemMemory.f_memcpy @= f ->
         if F.equal a b then Some( m_sep , m_undef , a , n , p )
         else None
       | _ -> None
@@ -43,7 +44,7 @@ class havoc =
       | None -> Not_applicable
       | Some(m0,mr,a,n,p) ->
         let separated =
-          F.p_call MemAddr.p_separated
+          F.p_call !@MemAddr.p_separated
             [ p ; F.e_int 1 ; a ; n ] in
         let process = Tactical.rewrite ?at [
             "Unassigned" , separated , e , F.e_get m0 p ;
@@ -58,7 +59,7 @@ class havoc =
 
 let separated ?at property =
   match F.e_expr property with
-  | L.Fun( f , [p;n;q;m] ) when f == MemAddr.p_separated ->
+  | L.Fun( f , [p;n;q;m] ) when f == !@MemAddr.p_separated ->
     let base_p = MemAddr.base p in
     let ofs_p = MemAddr.offset p in
     let base_q = MemAddr.base q in
@@ -149,7 +150,7 @@ let included p a q b =
          ]))
 
 let lookup f = function
-  | [p;a;q;b] when f == MemAddr.p_included -> included p a q b
+  | [p;a;q;b] when MemAddr.is_p_included f -> included p a q b
   | [m;p;n] when MemAddr.is_p_invalid f -> invalid m p n
   | [m;p;n] when MemAddr.is_p_valid_rd f -> valid_rd m p n
   | [m;p;n] when MemAddr.is_p_valid_rw f -> valid_rw m p n

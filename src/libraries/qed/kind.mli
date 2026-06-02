@@ -42,6 +42,11 @@ val pp_record:
   (Format.formatter -> 'b -> unit) ->
   Format.formatter -> ?opened:bool -> ('f * 'b) list -> unit
 
+val hash_tau :
+  ('f -> int) ->
+  ('a -> int) ->
+  ('f, 'a) datatype -> int
+
 val eq_tau :
   ('f -> 'f -> bool) ->
   ('a -> 'a -> bool) ->
@@ -56,6 +61,10 @@ val map_tau:
   ('f1 -> 'f2) ->
   ('a1 -> 'a2) ->
   ('f1,'a1) datatype -> ('f2,'a2) datatype
+
+val map_element : ('a -> 'b) -> 'a element -> 'b element
+val map_operator : ('a -> 'b) -> 'a operator -> 'b operator
+val map_category : ('a -> 'b) -> 'a category -> 'b category
 
 module MakeTau(F : Field)(A : Data) :
   Data with type t = (F.t,A.t) datatype

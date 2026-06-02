@@ -13,20 +13,19 @@
 open Ctypes
 open Qed
 open Lang
+open Lang.E
 open Lang.F
 
 (* -------------------------------------------------------------------------- *)
 (* --- Library                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let f32 = Lang.extern_t "frama_c_wp.cfloat.Cfloat.f32"
-let f64 = Lang.extern_t "frama_c_wp.cfloat.Cfloat.f64"
-let t32 = Lang.t_datatype f32 []
-let t64 = Lang.t_datatype f64 []
+let f32 = Lang.extern_tau "frama_c_wp.cfloat.Cfloat.f32"
+let f64 = Lang.extern_tau "frama_c_wp.cfloat.Cfloat.f64"
 
 let ftau = function
-  | Float32 -> t32
-  | Float64 -> t64
+  | Float32 -> !@f32
+  | Float64 -> !@f64
 
 let ft_suffix = function Float32 -> "f32" | Float64 -> "f64"
 let pp_suffix fmt ft = Format.pp_print_string fmt (ft_suffix ft)
@@ -35,10 +34,13 @@ let pp_suffix fmt ft = Format.pp_print_string fmt (ft_suffix ft)
 let fq32 = Lang.extern_f "frama_c_wp.cfloat.Cfloat.to_f32"
 let fq64 = Lang.extern_f "frama_c_wp.cfloat.Cfloat.to_f64"
 
-let f_model ft = Lang.extern_f "frama_c_wp.cfloat.Cfloat.model_%a" pp_suffix ft
-let f_delta ft = Lang.extern_f "frama_c_wp.cfloat.Cfloat.delta_%a" pp_suffix ft
-let f_epsilon ft = Lang.extern_f "frama_c_wp.cfloat.Cfloat.error_%a" pp_suffix ft
-let f_sqrt ft = Lang.extern_f "frama_c_wp.cfloat.Cfloat.sqrt_%a" pp_suffix ft
+let mk_builtin descr =
+  Ctypes.f_memo (Format.kasprintf Lang.extern_f descr pp_suffix)
+
+let f_model = mk_builtin "frama_c_wp.cfloat.Cfloat.model_%a"
+let f_delta = mk_builtin "frama_c_wp.cfloat.Cfloat.delta_%a"
+let f_epsilon = mk_builtin "frama_c_wp.cfloat.Cfloat.error_%a"
+let f_sqrt = mk_builtin "frama_c_wp.cfloat.Cfloat.sqrt_%a"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Model Setting                                                      --- *)
@@ -99,7 +101,7 @@ let op_name = function
 (* --- Registry                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-module REGISTRY = WpContext.Static
+module REGISTRY = WpContext.Index
     (struct
       type key = lfun
       type data = op * c_float
@@ -107,13 +109,12 @@ module REGISTRY = WpContext.Static
       include Lang.Fun
     end)
 
-
 let find = REGISTRY.find
 
 let () = Context.register
     begin fun () ->
-      REGISTRY.define fq32 (EXACT,Float32) ;
-      REGISTRY.define fq64 (EXACT,Float64) ;
+      REGISTRY.define !@fq32 (EXACT,Float32) ;
+      REGISTRY.define !@fq64 (EXACT,Float64) ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -123,8 +124,8 @@ let () = Context.register
 let rfloat = Floating_point.round_to_single_precision
 
 let fmake ulp value = match ulp with
-  | Float32 -> F.e_fun ~result:t32 fq32 [F.e_float (rfloat value)]
-  | Float64 -> F.e_fun ~result:t64 fq64 [F.e_float value]
+  | Float32 -> F.e_fun !@fq32 [F.e_float (rfloat value)]
+  | Float64 -> F.e_fun !@fq64 [F.e_float value]
 
 let qmake ulp q = fmake ulp (Q.to_float q)
 
@@ -178,8 +179,8 @@ let acsl_lit l =
 
 let code_lit ulp value original =
   match Context.get model , ulp , original with
-  | Float , Float32 , _ -> F.e_fun ~result:t32 fq32 [F.e_float value]
-  | Float , Float64 , _ -> F.e_fun ~result:t64 fq64 [F.e_float value]
+  | Float , Float32 , _ -> F.e_fun ~result:!@f32 !@fq32 [F.e_float value]
+  | Float , Float64 , _ -> F.e_fun ~result:!@f64 !@fq64 [F.e_float value]
   | Real , _ , None -> F.e_float value
   | Real , _ , Some r -> F.e_real (parse_literal ~model:Real value r)
 
@@ -256,7 +257,7 @@ let rec exact e =
   match F.repr e with
   | Qed.Logic.Kreal r -> r
   | Qed.Logic.Kint z -> Q.of_bigint z
-  | Qed.Logic.Fun( f , [ q ] ) when f == fq32 || f == fq64 -> exact q
+  | Qed.Logic.Fun( f , [ q ] ) when fq32 @= f || fq64 @= f -> exact q
   | _ -> raise Not_found
 
 let round ulp e =
@@ -305,26 +306,25 @@ let compute_real op xs =
 module Compute = WpContext.StaticGenerator
     (struct
       type t = model * c_float * op
-
       let compare = Stdlib.compare
-
       let pretty fmt (m, ft, op) =
         Format.fprintf fmt "%s_%a_%s" (model_name m) pp_suffix ft (op_name op)
     end)
     (struct
       let name = "Wp.Cfloat.Compute"
       type key = model * c_float * op
-      type data = lfun * (term list -> term)
+      type data = lfun extern * (term list -> term)
 
-      let compile (m, ft, op) =
+      let compile ((m, ft, op) : key) : data =
         let impl = match m with
           | Real  -> compute_real op
           | Float -> compute_float op ft
         in
-        let name = op_name op in
-        let phi = Lang.extern_f "frama_c_wp.cfloat.Cfloat.%s_%a" name pp_suffix ft in
-        Lang.F.set_builtin phi impl ;
-        REGISTRY.define phi (op, ft) ;
+        let phi =
+          Format.kasprintf Lang.extern_f
+            "frama_c_wp.cfloat.Cfloat.%s_%a" (op_name op) pp_suffix ft in
+        Lang.F.set_builtin !@phi impl ;
+        REGISTRY.define !@phi (op, ft) ;
         (phi, impl)
     end)
 
@@ -355,7 +355,7 @@ let builtin kind ft op xs =
     let result = match kind with
       | `Binop | `Unop -> ftau ft
       | `Rel | `ReV -> Logic.Bool
-    in F.e_fun ~result phi xs
+    in F.e_fun ~result !@phi xs
 
 let register_builtins ft =
   begin
@@ -392,8 +392,8 @@ let () = Context.register
 let hack_sqrt_builtin ft =
   let choose xs =
     match Context.get model with
-    | Real -> F.e_fun ~result:t_real Cmath.f_sqrt xs
-    | Float -> F.e_fun ~result:(ftau ft) (f_sqrt ft) xs
+    | Real -> F.e_fun ~result:t_real !@Cmath.f_sqrt xs
+    | Float -> F.e_fun ~result:(ftau ft) !@(f_sqrt ft) xs
   in
   let name = match ft with
     | Float32 -> "sqrtf"
@@ -419,12 +419,12 @@ let () =
 let real_of_float f a =
   match Context.get model with
   | Real -> a
-  | Float -> e_fun ~result:Logic.Real (real_of_flt f) [a]
+  | Float -> e_fun ~result:Logic.Real !@(real_of_flt f) [a]
 
 let float_of_real f a =
   match Context.get model with
   | Real -> a
-  | Float -> e_fun ~result:(ftau f) (flt_of_real f) [a]
+  | Float -> e_fun ~result:(ftau f) !@(flt_of_real f) [a]
 
 let float_of_int f a = float_of_real f (Cmath.real_of_int a)
 
@@ -435,12 +435,12 @@ let float_of_int f a = float_of_real f (Cmath.real_of_int a)
 let fbinop rop fop f x y =
   match Context.get model with
   | Real -> rop x y
-  | Float -> e_fun ~result:(ftau f) (fop f) [x;y]
+  | Float -> e_fun ~result:(ftau f) !@(fop f) [x;y]
 
 let fcmp rop fop f x y =
   match Context.get model with
   | Real -> rop x y
-  | Float -> p_call (fop f) [x;y]
+  | Float -> p_call !@(fop f) [x;y]
 
 let fadd = fbinop e_add flt_add
 let fsub = fbinop e_sub flt_sub
@@ -449,7 +449,7 @@ let fdiv = fbinop e_div flt_div
 let fopp f x =
   match Context.get model with
   | Real -> e_opp x
-  | Float -> e_fun ~result:(ftau f) (flt_neg f) [x]
+  | Float -> e_fun ~result:(ftau f) !@(flt_neg f) [x]
 
 let flt = fcmp p_lt flt_lt
 let fle = fcmp p_leq flt_le

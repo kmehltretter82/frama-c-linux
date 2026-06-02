@@ -138,7 +138,7 @@ let rec occurs x = function
 
 let source = "Tree Model"
 
-let null = Null
+let null = Lang.extern_const Null
 let pointer_loc _t = Warning.error ~source "No Pointer Loc"
 let pointer_val _v = Warning.error ~source "No Pointer Val"
 

@@ -7,6 +7,7 @@
 (**************************************************************************)
 
 open Lang
+open Lang.E
 
 (* Helpers *)
 let is_positive e = F.p_leq F.e_zero e (* 0 <= n *)
@@ -148,8 +149,8 @@ let rec pmatch s p e =
   | LT(p,q) , Lt(a,b)
     -> pmatch s p a ; pmatch s q b
   | INT , Kint n -> s.bound <- n
-  | LAND , Fun(f,es) when f == Cint.f_land -> s.terms <- es
-  | LOR , Fun(f,es) when f == Cint.f_lor -> s.terms <- es
+  | LAND , Fun(f,es) when Cint.f_land @= f -> s.terms <- es
+  | LOR , Fun(f,es)  when Cint.f_lor @= f -> s.terms <- es
   | _ -> raise Exit
 
 let matches s p e = try pmatch s p e ; true with Exit -> false
@@ -261,7 +262,7 @@ let strategy = Strategy.make tactical ~arguments:[]
 let is_bitwised e =
   let open Qed.Logic in
   match F.repr e with
-  | Fun(f,_) -> List.memq f Cint.f_bitwised
+  | Fun(f,_) -> Cint.is_bitwised f
   | _ -> false
 
 class autobitrange =

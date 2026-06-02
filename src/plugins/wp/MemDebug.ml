@@ -92,22 +92,18 @@ struct
   (* ---------------------------------------------------------------------- *)
 
   let null =
-    let l = M.null in debug_cons "null:@, %a" pretty l;
-    M.null
+    Lang.extern_map (fun l -> debug_cons "null:@, %a" pretty l; l) M.null
 
   let cvar x =
     let l = M.cvar x in
-    debug_cons "cvar %a ->@, %a" Varinfo.pretty x pretty l;
-    l
+    debug_cons "cvar %a ->@, %a" Varinfo.pretty x pretty l; l
 
   let pointer_loc e =
     let l = M.pointer_loc e in
-    debug_cons "term2loc %a ->@, %a" pp_term e pretty l;
-    l
+    debug_cons "term2loc %a ->@, %a" pp_term e pretty l; l
   let pointer_val l =
     let e = M.pointer_val l in
-    debug_cons "loc2term %a ->@, %a" pretty l pp_term e;
-    e
+    debug_cons "loc2term %a ->@, %a" pretty l pp_term e; e
 
   (* ---------------------------------------------------------------------- *)
   (* ----  Operations                                                  ---- *)

@@ -24,7 +24,7 @@ let lookup_int e =
 let rec lookup_bittest e =
   match F.repr e with
   | Not e -> lookup_bittest e
-  | Fun(f,[n;ek]) when f == Cint.f_bit_test ->
+  | Fun(f,[n;ek]) when Lang.E.(Cint.f_bit_test @= f) ->
     begin
       match lookup_int ek with
       | Some k when 0 <= k && k < 128 -> Some (n,k)

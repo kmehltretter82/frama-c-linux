@@ -6,27 +6,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Lang
 open Lang.F
 
-(** Smart-constructors for building Qed terms from the MemAddr Why3 module
-    symbols. Types indicates in the documentation are Why3 types, not OCaml
-    types.
-
-    @since 29.0-Copper
-*)
-
-val t_addr : Lang.tau
-(** Pointer type : addr *)
-
-val t_malloc : Lang.tau
-(** Allocation table : [int[base] -> int]
-
-    Note: this is not a binding with the symbol in the theory but the exact same
-    definition, we need this so that Qed knows the underlying type.
-
-    @since 30.0-Zinc
-*)
-
+val t_malloc : tau
+val t_addr : tau extern
+val t_memptr : tau extern (** Array [t_addr -> t_addr] *)
+val t_memory : tau -> tau (** Array [t_addr -> alpha]  *)
 
 (** {2 Basic constructors} *)
 
@@ -36,7 +22,7 @@ val base : term -> term
 val offset : term -> term
 (** [offset(a: addr) : int = a.offset] *)
 
-val null : term
+val null : term extern
 (** [null : addr = { base = 0 ; offset = 0 }] *)
 
 val mk_addr : term -> term -> term
@@ -162,17 +148,18 @@ val separated :
 
 (** {2 Qed symbols identification} *)
 
-val is_p_valid_rd  : Lang.lfun -> bool
-val is_p_valid_rw  : Lang.lfun -> bool
-val is_p_valid_obj : Lang.lfun -> bool
-val is_p_invalid   : Lang.lfun -> bool
-val is_f_global    : Lang.lfun -> bool
+val is_p_valid_rd  : lfun -> bool
+val is_p_valid_rw  : lfun -> bool
+val is_p_valid_obj : lfun -> bool
+val is_p_invalid   : lfun -> bool
+val is_p_included  : lfun -> bool
+val is_f_global    : lfun -> bool
 
 (** {2 Raw Qed symbols} *)
 (** Use them with care, for building terms, prefer above constructors *)
 
-val p_separated : Lang.lfun
-val p_included : Lang.lfun
+val p_separated : lfun extern
+val p_included : lfun extern
 
 (** {2 Qed simplification procedures} *)
 

@@ -13,7 +13,7 @@
 open Cil_types
 open Lang
 
-type category = Lang.lfun Qed.Logic.category
+type category = Lang.lfun Lang.extern Qed.Logic.category
 
 type kind =
   | B                   (** boolean *)
@@ -26,12 +26,12 @@ type kind =
 val kind_of_tau : tau -> kind
 
 (** Add a new builtin. This builtin will be shared with all created drivers. *)
-val add_builtin : string -> kind list -> lfun -> unit
+val add_builtin : string -> kind list -> lfun extern -> unit
 
 (** Add a new builtin type.
     Must be an extern or imported type.
     This builtin will be shared with all created drivers. *)
-val add_builtin_type : string -> adt -> unit
+val add_builtin_type : string -> adt extern -> unit
 
 type driver
 val driver: driver Context.value
@@ -74,11 +74,11 @@ val add_predicate : source:Filepos.t ->
 
 type builtin =
   | ACSLDEF
-  | LFUN of lfun
+  | LFUN of lfun extern
   | HACK of (F.term list  -> F.term)
 
 type t_builtin =
-  | ADT of adt
+  | ADT of adt extern
   | HACKT of (F.tau list -> F.tau)
 
 val logic : logic_info -> builtin

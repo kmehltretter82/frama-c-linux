@@ -14,6 +14,7 @@ open Cil_types
 open Cil_datatype
 open Ctypes
 open Lang
+open Lang.E
 open Sigma
 open Memory
 open Definitions
@@ -31,8 +32,10 @@ let datatype = "MemTyped"
 let hypotheses p = p
 let configure () =
   begin
-    let orig_pointer = Context.push Lang.pointer MemAddr.t_addr in
-    let orig_null    = Context.push Cvalues.null (F.p_equal MemAddr.null) in
+    let ptr = !@MemAddr.t_addr in
+    let is_null = F.p_equal !@MemAddr.null in
+    let orig_pointer = Context.push Lang.pointer ptr in
+    let orig_null    = Context.push Cvalues.null is_null in
     let rollback () =
       Context.pop Lang.pointer orig_pointer ;
       Context.pop Cvalues.null orig_null ;
@@ -148,13 +151,14 @@ struct
   let pretty fmt = function
     | M_int i -> Format.fprintf fmt "M%a" Ctypes.pp_int i
     | m -> Format.pp_print_string fmt (basename_of_chunk m)
+
   let tau_of_chunk = function
-    | M_int _ -> L.Array(MemAddr.t_addr,L.Int)
-    | M_pointer -> L.Array(MemAddr.t_addr,MemAddr.t_addr)
-    | M_f32 -> L.Array(MemAddr.t_addr,Cfloat.tau_of_float Ctypes.Float32)
-    | M_f64 -> L.Array(MemAddr.t_addr,Cfloat.tau_of_float Ctypes.Float64)
+    | M_int _ -> t_mem L.Int
+    | M_f32 -> t_mem (Cfloat.tau_of_float Ctypes.Float32)
+    | M_f64 -> t_mem (Cfloat.tau_of_float Ctypes.Float64)
     | T_alloc -> t_malloc
-    | T_init -> t_init
+    | M_pointer -> !@t_mptr
+    | T_init -> !@t_init
   let is_init = function T_init -> true | _ -> false
   let is_primary _ = false
   let is_framed _ = false
@@ -313,11 +317,11 @@ module ShiftFieldDef = WpContext.StaticGenerator(Cil_datatype.Fieldinfo)
       type data = dfun
 
       let generate f =
-        let result = MemAddr.t_addr in
+        let result = !@MemAddr.t_addr in
         let lfun = Lang.generated_f ~result "shiftfield_%s" (Lang.field_id f) in
         let position = position_of_field f in
         (* Since its a generated it is the unique name given *)
-        let xloc = Lang.freshvar ~basename:"p" MemAddr.t_addr in
+        let xloc = Lang.freshvar ~basename:"p" result in
         let loc = F.e_var xloc in
         let def = MemAddr.shift loc position in
         let dfun = Definitions.Function( result , Def , def) in
@@ -374,11 +378,11 @@ module ShiftGen = WpContext.StaticGenerator(Cobj)
       let c_object_id c = Format.asprintf "%a@?" c_object_id c
 
       let generate obj =
-        let result = MemAddr.t_addr in
+        let result = !@MemAddr.t_addr in
         let shift = Lang.generated_f ~result "shift_%s" (c_object_id obj) in
         let size = length_of_object obj in
         (* Since its a generated it is the unique name given *)
-        let xloc = Lang.freshvar ~basename:"p" MemAddr.t_addr in
+        let xloc = Lang.freshvar ~basename:"p" result in
         let loc = F.e_var xloc in
         let xk = Lang.freshvar ~basename:"k" Qed.Logic.Int in
         let k = F.e_var xk in
@@ -910,7 +914,7 @@ let pp_mismatch fmt s =
       Ctypes.pretty s.pre Ctypes.pretty s.post
 
 let cast s l =
-  if l==null then null else
+  if l == !@null then l else
     begin
       match Context.get pointer with
       | NoCast -> Warning.error ~source:"Typed Model" "%a" pp_mismatch s
@@ -999,12 +1003,13 @@ struct
   let load_init_atom sigma _ l = F.e_get (State.value sigma T_init) l
 
   let fresh _l =
-    let x = Lang.freshvar ~basename:"p" MemAddr.t_addr in
+    let t = !@MemAddr.t_addr in
+    let x = Lang.freshvar ~basename:"p" t in
     [x] , F.e_var x
-  let separated p n p' n' = F.p_call MemAddr.p_separated [p;n;p';n']
+  let separated p n p' n' = F.p_call !@MemAddr.p_separated [p;n;p';n']
 
-  let eqmem _chunk m0 m1 l n = F.p_call f_eqmem [m0;m1;l;n]
-  let memcpy _chunk m l m0 l0 n = F.e_fun f_memcpy [m;l;m0;l0;n]
+  let eqmem _chunk m0 m1 l n = F.p_call !@MemMemory.f_eqmem [m0;m1;l;n]
+  let memcpy _chunk m l m0 l0 n = F.e_fun !@MemMemory.f_memcpy [m;l;m0;l0;n]
 
   let updated sigma c l v = State.chunk c , F.e_set (State.value sigma c) l v
 
@@ -1026,7 +1031,7 @@ let loc_compare f_cmp i_cmp p q =
   | L.Yes -> i_cmp (MemAddr.offset p) (MemAddr.offset q)
   | L.Maybe | L.No -> f_cmp p q
 
-let is_null l = F.p_equal l null
+let is_null p = F.p_equal !@null p
 let loc_eq = F.p_equal
 let loc_neq = F.p_neq
 let loc_lt = loc_compare MemAddr.addr_lt F.p_lt

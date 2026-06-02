@@ -374,7 +374,7 @@ struct
   (* ---  Basic Constructors                                                --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let null = Loc M.null
+  let null = Lang.extern_map (fun null -> Loc null) M.null
 
   let cvar x = match V.param x with
     | NotUsed | ByValue | ByShift -> Val(CVAL,x,[])

@@ -163,7 +163,7 @@ sig
   val occurs : var -> loc -> bool
   (** Test if a location depend on a given logic variable *)
 
-  val null : loc
+  val null : loc Lang.extern
   (** Return the location of the null pointer *)
 
   val cvar : varinfo -> loc

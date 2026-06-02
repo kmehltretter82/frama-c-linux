@@ -933,7 +933,7 @@ struct
         match LogicBuiltins.logic cst with
         | ACSLDEF -> call_fun env result cst [] []
         | HACK phi -> phi []
-        | LFUN phi -> e_fun ~result phi []
+        | LFUN phi -> E.(e_fun ~result !@phi [])
       in Cvalues.plain x.lv_type v
     with Not_found ->
       if Logic_env.is_logic_function x.lv_name then

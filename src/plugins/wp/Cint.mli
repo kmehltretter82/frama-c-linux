@@ -58,17 +58,19 @@ val l_or  : binop
 val l_lsl : binop
 val l_lsr : binop
 
-val f_lnot : lfun
-val f_land : lfun
-val f_lxor : lfun
-val f_lor  : lfun
-val f_lsl  : lfun
-val f_lsr  : lfun
+val f_lnot : lfun extern
+val f_land : lfun extern
+val f_lxor : lfun extern
+val f_lor  : lfun extern
+val f_lsl  : lfun extern
+val f_lsr  : lfun extern
 
-val f_bit_test : lfun
+val f_bit_test : lfun extern
 
-val f_bitwised : lfun list
+val f_bitwised : lfun extern list
 (** All bitwise operators *)
+
+val is_bitwised : lfun -> bool
 
 val bit_test : term -> int -> term
 

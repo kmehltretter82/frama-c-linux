@@ -93,7 +93,7 @@ let lemma_id l = Printf.sprintf "Q_%s" (avoid_leading_backlash l)
 type datakind = KValue | KInit
 
 type adt =
-  | QDATA of Qed.Symbol.data (* Why3/Qed Type *)
+  | Qdata of Qed.Symbol.data (* Why3/Qed Type *)
   | Atype of logic_type_info (* ACSL Logic Type *)
   | Comp of compinfo * datakind (* C-code struct or union *)
 
@@ -138,7 +138,7 @@ let t_comp c = Logic.Data(Comp (c, KValue),[])
 let t_init c = Logic.Data(Comp (c, KInit), [])
 let t_array a = Logic.Array(Logic.Int,a)
 let t_farray a b = Logic.Array(a,b)
-let t_datatype adt ts = Logic.Data(adt,ts)
+let t_data adt ts = Logic.Data(adt,ts)
 let rec t_matrix a n = if n > 0 then t_matrix (t_array a) (pred n) else a
 
 let rec tau_of_object = function
@@ -187,9 +187,30 @@ let tau_of_return = function None -> Logic.Prop | Some t -> tau_of_ltype t
 (* --- Datatypes                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let import_t ~context ts = QDATA (Qed.Symbol.of_ts ~context ts)
-let extern_t name = QDATA (Qed.Symbol.find_data (Why3Provers.env ()) name)
-let extern_tau ?(args=[]) name = Qed.Logic.Data(extern_t name,args)
+type 'a extern = {
+  mutable value : 'a option ;
+  mutable env : Why3.Env.env option ;
+  compute : Why3.Env.env -> 'a ;
+}
+
+let extern = function
+  | { value = Some v ; env = Some e } when e == Why3Provers.env () -> v
+  | r ->
+    let env = Why3Provers.env () in
+    let value = r.compute env in
+    r.env <- Some env ; r.value <- Some value ; value
+
+module E =
+struct
+  let (!@) = extern
+  let (@=) a b = !@a == b
+end
+
+let mk_extern compute = { value = None ; env = None ; compute }
+
+let import_t ~context ts = Qdata (Qed.Symbol.of_ts context ts)
+let extern_c name env = Qdata (Qed.Symbol.find_data env name)
+let extern_t name = mk_extern (extern_c name)
 
 module ADT =
 struct
@@ -197,19 +218,19 @@ struct
   type t = adt
 
   let basename = function
-    | QDATA a -> basename "M" @@ Qed.Symbol.Data.name a
+    | Qdata a -> basename "M" @@ Qed.Symbol.Data.name a
     | Comp (c,KValue) -> basename (if c.cstruct then "S" else "U") c.corig_name
     | Comp (c,KInit) -> basename (if c.cstruct then "IS" else "IU") c.corig_name
     | Atype lt -> basename "A" lt.lt_name
 
   let debug = function
-    | QDATA a -> Qed.Symbol.Data.fullname a
+    | Qdata a -> Qed.Symbol.Data.fullname a
     | Comp (c, KValue) -> comp_id c
     | Comp (c, KInit) -> comp_init_id c
     | Atype lt -> type_id lt
 
   let hash = function
-    | QDATA a -> Qed.Symbol.Data.hash a
+    | Qdata a -> Qed.Symbol.Data.hash a
     | Comp (c, KValue) -> Compinfo.hash c
     | Comp (c, KInit) -> 13 * Compinfo.hash c
     | Atype lt -> Logic_type_info.hash lt
@@ -217,9 +238,9 @@ struct
   let compare a b =
     if a==b then 0 else
       match a,b with
-      | QDATA a , QDATA b -> Qed.Symbol.Data.compare a b
-      | QDATA _ , _ -> (-1)
-      | _ , QDATA _ -> (+1)
+      | Qdata a , Qdata b -> Qed.Symbol.Data.compare a b
+      | Qdata _ , _ -> (-1)
+      | _ , Qdata _ -> (+1)
       | Comp (a, KValue) , Comp (b, KValue)
       | Comp (a, KInit)  , Comp (b, KInit) -> Compinfo.compare a b
       | Comp (_, KValue) , Comp (_, KInit) -> (-1)
@@ -340,7 +361,7 @@ let ctor cf = lfun_observe (CTOR cf)
 let lsymbol m = lfun_observe (LFUN m)
 
 let of_qtau : Qed.Symbol.tau -> tau =
-  Kind.map_tau (fun _ -> raise Not_found) (fun d -> QDATA d)
+  Kind.map_tau (fun _ -> raise Not_found) (fun d -> Qdata d)
 
 let compare_tau = Qed.Kind.compare_tau Field.compare ADT.compare
 
@@ -446,18 +467,17 @@ let generated_f
 
 let generated_p = generated_f ~sort:Sprop ~result:Prop ~typecheck:(fun _ -> Prop)
 
-let extern_f ?(category=Function) ?(coloring=false) descr =
-  Format.kasprintf
-    begin fun name ->
-      QFUN {
-        e_symbol = Qed.Symbol.find_lfun (Why3Provers.env ()) name ;
-        e_coloring = coloring ;
-        e_category = category ;
-      }
-    end descr
+let extern_l ?(category=Function) ?(coloring=false) name env =
+  QFUN {
+    e_symbol = Qed.Symbol.find_lfun env name ;
+    e_coloring = coloring ;
+    e_category = Qed.Kind.map_category extern category ;
+  }
+
+let extern_f ?category ?coloring name = mk_extern (extern_l ?category ?coloring name)
 
 let import_f ~context ls = QFUN {
-    e_symbol = Qed.Symbol.of_ls ~context ls ;
+    e_symbol = Qed.Symbol.of_ls context ls ;
     e_category = Function ;
     e_coloring = false ;
   }
@@ -546,7 +566,7 @@ class virtual idprinting =
     method sanitize_fun   = self#sanitize
 
     method datatype = function
-      | QDATA a -> Qed.Symbol.Data.fullname a
+      | Qdata a -> Qed.Symbol.Data.fullname a
       | Comp(c, KValue) -> self#sanitize_type (comp_id c)
       | Comp(c, KInit) -> self#sanitize_type (comp_init_id c)
       | Atype lt -> self#sanitize_type (type_id lt)
@@ -818,6 +838,14 @@ struct
 end
 
 open F
+
+let extern_data et ts = E.(t_data !@et ts)
+let extern_tau name = mk_extern (fun env -> t_data (extern_c name env) [])
+let extern_val name = mk_extern (fun env -> e_fun (extern_l name env) [])
+let extern_map f e = mk_extern (fun env -> f @@ e.compute env)
+let extern_const c = mk_extern (fun _env -> c)
+let extern_lfun ef es = E.(e_fun !@ef es)
+let extern_pred ef es = E.(p_call !@ef es)
 
 module N = struct
 

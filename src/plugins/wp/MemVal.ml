@@ -14,6 +14,7 @@ open Cil_types
 open Cil_datatype
 open Ctypes
 open Lang
+open Lang.E
 open Sigma
 open Memory
 open Definitions
@@ -72,7 +73,7 @@ let debug_val = Wp_parameters.debug ~dkey:dkey_val
 (* -------------------------------------------------------------------------- *)
 (* ---  Cmath Wrapper                                                     --- *)
 (* -------------------------------------------------------------------------- *)
-let a_iabs i = F.e_fun ~result:Logic.Int Cmath.f_iabs [i]    (* x -> |x| *)
+let a_iabs i = F.e_fun ~result:Logic.Int !@Cmath.f_iabs [i]    (* x -> |x| *)
 
 (* -------------------------------------------------------------------------- *)
 (* ---  MemValue Types                                                     --- *)
@@ -111,7 +112,8 @@ struct
   let datatype = "MemVal." ^ V.datatype
   let configure () =
     let rollback = V.configure () in
-    let orig_pointer = Context.push Lang.pointer MemAddr.t_addr in
+    let t_addr = !@MemAddr.t_addr in
+    let orig_pointer = Context.push Lang.pointer t_addr in
     let rollback () =
       rollback ();
       Context.pop Lang.pointer orig_pointer;
@@ -188,16 +190,13 @@ struct
   (* -------------------------------------------------------------------------- *)
   (* ---  Constructors                                                      --- *)
   (* -------------------------------------------------------------------------- *)
-  let null = {
-    loc_v = V.null;
-    loc_t = MemAddr.null;
-  }
+  let null =
+    Lang.extern_map (fun loc_t -> { loc_v = V.null ; loc_t }) MemAddr.null
 
   let cvar x = {
     loc_v = V.cvar x;
     loc_t = MemAddr.mk_addr (F.e_int Base.(id @@ of_varinfo x)) F.e_zero;
   }
-
 
   (* -------------------------------------------------------------------------- *)
   (* --- Generated Axiomatization                                           --- *)
@@ -390,7 +389,7 @@ struct
   let cast _ l = l
 
   let loc_of_int _ v =
-    if F.is_zero v then null
+    if F.is_zero v then !@null
     else
       (*TODO: Reinterpret integer with Value *)
       Warning.error ~source:"MemVal Model"
@@ -490,7 +489,7 @@ struct
   (* -------------------------------------------------------------------------- *)
   (* ---  Pointer Comparison                                                --- *)
   (* -------------------------------------------------------------------------- *)
-  let is_null l = F.p_equal l.loc_t MemAddr.null
+  let is_null l = F.p_equal l.loc_t !@MemAddr.null
 
   let loc_delta l1 l2 =
     match F.is_equal (MemAddr.base l1.loc_t) (MemAddr.base l2.loc_t) with

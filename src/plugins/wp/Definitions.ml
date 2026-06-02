@@ -473,7 +473,7 @@ class virtual visitor main =
       | Cfield(f, KInit) -> self#vicomp f.fcomp
 
     method vadt = function
-      | QDATA a -> self#on_data a
+      | Qdata a -> self#on_data a
       | Comp(r, KValue) -> self#vcomp r
       | Comp(r, KInit) -> self#vicomp r
       | Atype t -> self#vtype t

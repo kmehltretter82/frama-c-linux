@@ -22,7 +22,7 @@ val find_use : context:theory -> ident -> theory
 type data
 
 (** Returns an empty list for pure ADT *)
-val constructors : data -> Why3.Decl.constructor list
+val constructors : data -> constructor list
 
 (** Record Fields *)
 type field
@@ -51,6 +51,10 @@ type lfun
     the type of result and [vs] the type of arguments. *)
 val signature : lfun -> int * tau * tau list
 
+(** Returns an optional pair [Some(xs,def)] with [xs] the formal parameters
+    and [def] the defining term. Returns [None] when the function is abstract. *)
+val definition : lfun -> (Why3.Term.vsymbol list * Why3.Term.term) option
+
 (**
    Unifies the polymorphic types of the function with the provided type of
    arguments and of the result, when available. If you provide a result type, it
@@ -73,33 +77,43 @@ sig
   val pretty : Format.formatter -> t -> unit
 
   val symbol : t -> symbol
-  val ident : t -> Why3.Ident.ident
-  val theory : t -> Why3.Theory.theory
+  val ident : t -> ident
+  val theory : t -> theory
 end
 
 (** Factory *)
 
-(** @raise Invalid_argument if undefined in context *)
-val of_ts : context:theory -> tysymbol -> data
+(** Memoized.
+    @raise Invalid_argument if undefined in context *)
+val of_ts : theory -> tysymbol -> data
 
-(** @raise Invalid_argument if undefined in context *)
-val of_ty : ?sigma:sigma -> context:theory -> ty -> tau
+(** Memoized.
+    @raise Invalid_argument if undefined in context *)
+val of_ty : theory -> ?sigma:sigma -> ty -> tau
 
-(** @raise Invalid_argument if undefined in context *)
-val of_ls : context:theory -> lsymbol -> lfun
+(** Memoized. [None] means [Prop].
+    @raise Invalid_argument if undefined in context *)
+val of_oty : theory -> ?sigma:sigma -> ty option -> tau
 
-(** @raise Invalid_argument if not found in environment *)
+(** Memoized.
+    @raise Invalid_argument if undefined in context *)
+val of_ls : theory -> lsymbol -> lfun
+
+(** Memoized in environment.
+    @raise Invalid_argument if not found in environment *)
 val find_data : env -> string -> data
 
-(** @raise Invalid_argument if not found in environment *)
+(** Memoized in environment.
+    @raise Invalid_argument if not found in environment *)
 val find_lfun : env -> string -> lfun
 
-module Data : Symbol with type t = data and type symbol = Why3.Ty.tysymbol
-module Field : Symbol with type t = field and type symbol = Why3.Term.lsymbol
-module Fun : Symbol with type t = lfun and type symbol = Why3.Term.lsymbol
+module Data : Symbol with type t = data and type symbol = tysymbol
+module Field : Symbol with type t = field and type symbol = lsymbol
+module Fun : Symbol with type t = lfun and type symbol = lsymbol
 module Tau :
 sig
   type t = tau
+  val hash : t -> int
   val equal : t -> t -> bool
   val compare : t -> t -> int
   val pretty : Format.formatter -> t -> unit

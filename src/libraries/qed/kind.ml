@@ -68,6 +68,20 @@ let rec map_tau fd adt = function
   | Data(a,ts) -> Data(adt a,List.map (map_tau fd adt) ts)
   | Record fts -> Record(List.map (fun (f,t) -> fd f,map_tau fd adt t) fts)
 
+let rec map_element f = function
+  | (E_none | E_true | E_false | E_int _) as elt -> elt
+  | E_fun (a, es) -> E_fun(f a, List.map (map_element f) es)
+
+let map_operator f op =
+  { op with
+    neutral = map_element f op.neutral ;
+    absorbent = map_element f op.absorbent ;
+  }
+
+let map_category f = function
+  | (Function | Constructor | Injection as op) -> op
+  | Operator op -> Operator (map_operator f op)
+
 let pp_data pdata ptau fmt a = function
   | [] -> pdata fmt a
   | [t] -> Format.fprintf fmt "%a %a" ptau t pdata a

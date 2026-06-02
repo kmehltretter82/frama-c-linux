@@ -30,7 +30,7 @@ type datakind = KValue | KInit
 
 (** A type is never registered in a Definition.t *)
 type adt = private
-  | QDATA of Qed.Symbol.data (** Qed/Why3 Type *)
+  | Qdata of Qed.Symbol.data (** Qed/Why3 Type *)
   | Atype of logic_type_info (** ACSL Logic Type *)
   | Comp of compinfo * datakind (** C-code Struct or Union *)
 
@@ -78,15 +78,16 @@ val ctor : logic_ctor_info -> lfun
 
 (** Builders *)
 
-val extern_t : string -> adt
-val extern_tau : ?args:tau list -> string -> tau
+type 'a extern
+
+val extern_t : string -> adt extern
 val import_t : context:Why3.Theory.theory -> Why3.Ty.tysymbol -> adt
 val import_f : context:Why3.Theory.theory -> Why3.Term.lsymbol -> lfun
 
 val extern_f :
-  ?category:lfun category ->
+  ?category:lfun extern category ->
   ?coloring:bool ->
-  ('a, Format.formatter, unit, lfun) format4 -> 'a
+  string -> lfun extern
 
 val generated_f :
   ?context:bool ->
@@ -128,7 +129,7 @@ val t_init : compinfo -> tau
 val t_float : c_float -> tau
 val t_array : tau -> tau
 val t_farray : tau -> tau -> tau
-val t_datatype : adt -> tau list -> tau
+val t_data : adt -> tau list -> tau
 val t_matrix : tau -> int -> tau
 
 val pointer : tau Context.value
@@ -624,6 +625,20 @@ val e_subst : (term -> term) -> term -> term
 val p_subst : (term -> term) -> pred -> pred
 (** uses current pool *)
 
+module E :
+sig
+  val (!@) : 'a extern -> 'a
+  val (@=) : 'a extern -> 'a -> bool
+end
+
+val extern : 'a extern -> 'a
+val extern_tau : string -> tau extern
+val extern_val : string -> term extern
+val extern_map : ('a -> 'b) -> 'a extern -> 'b extern
+val extern_const : 'a -> 'a extern
+val extern_data : adt extern -> tau list -> tau
+val extern_lfun : lfun extern -> term list -> term
+val extern_pred : lfun extern -> term list -> pred
 
 (** {2 Simplifiers} *)
 

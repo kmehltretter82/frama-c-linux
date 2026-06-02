@@ -10,6 +10,7 @@ open Format
 open Qed.Logic
 open Qed.Engine
 open Lang
+open Lang.E
 open Lang.F
 
 (* -------------------------------------------------------------------------- *)
@@ -218,9 +219,9 @@ class engine =
     (* --- Lists --- *)
 
     method! pp_fun cmode fct ts =
-      if fct == Vlist.f_concat then Vlist.pretty self ts else
-      if fct == Vlist.f_elt then Vlist.elements self ts else
-      if fct == Vlist.f_repeat then Vlist.pprepeat self ts else
+      if Vlist.f_elt    @= fct then Vlist.elements self ts else
+      if Vlist.f_repeat @= fct then Vlist.pprepeat self ts else
+      if Vlist.f_concat @= fct then Vlist.pretty self ts else
         super#pp_fun cmode fct ts
 
     (* --- Higher Order --- *)

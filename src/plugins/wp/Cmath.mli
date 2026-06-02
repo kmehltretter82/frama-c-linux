@@ -19,9 +19,9 @@ val bool_of_int : unop
 val int_of_real : term -> term
 val real_of_int : term -> term
 
-val f_real_of_int : lfun
-val f_iabs : lfun
-val f_rabs : lfun
-val f_sqrt : lfun
+val f_real_of_int : lfun extern
+val f_iabs : lfun extern
+val f_rabs : lfun extern
+val f_sqrt : lfun extern
 
 (* -------------------------------------------------------------------------- *)

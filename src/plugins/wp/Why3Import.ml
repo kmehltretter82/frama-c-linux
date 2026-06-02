@@ -256,6 +256,7 @@ let register_builtin env m =
     let add_builtin (ls: W.Term.lsymbol) acsl_name profile =
       let kinds = List.map kind_of_lt profile in
       LB.add_builtin acsl_name kinds @@
+      Lang.extern_const @@
       Lang.import_f ~context:m.theory ls
     in
     let add_builtin_li li =
@@ -271,6 +272,7 @@ let register_builtin env m =
     let add_builtin_t lti =
       let ty = Logic_type_info.Hashtbl.find env.ltts lti in
       LB.add_builtin_type lti.lt_name @@
+      Lang.extern_const @@
       Lang.import_t ~context:m.theory ty ;
       begin match lti.lt_def with
         | Some C.LTsum ctors -> List.iter add_builtin_ctor ctors

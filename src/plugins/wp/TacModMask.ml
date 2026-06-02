@@ -73,7 +73,7 @@ class modmask =
             Applicable (on_cond "Mask Guard" cond @@ replace_with "Mask" n)
         end
 
-      | Fun( f , [ a ; b ] ) when Lang.Fun.equal f Cint.f_land ->
+      | Fun( f , [ a ; b ] ) when Lang.E.(Cint.f_land @= f) ->
         begin
           try
             let a, m =

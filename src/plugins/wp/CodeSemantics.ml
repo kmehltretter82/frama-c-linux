@@ -259,7 +259,7 @@ struct
 
     | C_pointer te , C_int _ ->
       let e = cval ve in
-      Loc(if F.equal e (F.e_zero) then M.null
+      Loc(if F.equal e (F.e_zero) then (Lang.extern M.null)
           else M.loc_of_int (Ctypes.object_of te) e)
 
     | C_int ir , C_pointer _ ->

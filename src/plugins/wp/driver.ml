@@ -102,7 +102,6 @@ let op = {
 }
 
 let op_elt input =
-  ignore (key input ":") ;
   let op = input_string input in
   skipkey input ":" ;
   match op with

@@ -151,13 +151,13 @@ let wp_why3_lib library = [ "frama_c_wp" ; library ]
 (* conversion *)
 
 let adt_wname = function
-  | Lang.QDATA _ -> assert false
+  | Lang.Qdata _ -> assert false
   | Comp (c, KValue) -> Lang.comp_id c
   | Comp (c, KInit) -> Lang.comp_init_id c
   | Atype lt -> Lang.type_id lt
 
 let of_adt ~cnv = function
-  | Lang.QDATA a -> Qed.Symbol.Data.symbol a
+  | Lang.Qdata a -> Qed.Symbol.Data.symbol a
   | adt ->
     let s = adt_wname adt in
     try Hashtbl.find cnv.incomplete_types s
@@ -208,8 +208,9 @@ struct
         [mk_real_int q.num;mk_real_int q.den]
 
   let cfloat_of_tau tau =
-    if      Lang.F.Tau.equal tau Cfloat.t32 then Ctypes.Float32
-    else if Lang.F.Tau.equal tau Cfloat.t64 then Ctypes.Float64
+    let open Lang.E in
+    if      Lang.F.Tau.equal tau !@Cfloat.f32 then Ctypes.Float32
+    else if Lang.F.Tau.equal tau !@Cfloat.f64 then Ctypes.Float64
     else raise Not_found
 
   let re_float = Str.regexp
@@ -234,8 +235,9 @@ struct
     else raise Not_found
 
   let const_float ~cnv tau (repr:Lang.F.QED.repr) =
+    let open Lang.E in
     match repr with
-    | Fun(f, [x]) when Lang.Fun.(equal f Cfloat.fq32 || equal f Cfloat.fq64) ->
+    | Fun(f, [x]) when Cfloat.fq32 @= f || Cfloat.fq64 @= f ->
       begin match Lang.F.repr x with
         | Kreal q -> float_literal_from_q ~cnv tau q
         | _ -> raise Not_found
@@ -526,7 +528,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
           Why3.Term.t_app ls l (of_tau ~cnv expected)
         | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
       end
-    | (Rdef _, Data ((QDATA _|Atype _), _), _)
+    | (Rdef _, Data ((Qdata _|Atype _), _), _)
     | (Rdef _, (Prop|Bool|Int|Real|Tvar _|Array (_, _)), _)
     | (Aset (_, _, _), (Prop|Bool|Int|Real|Tvar _|Record _|Data (_, _)), _)
     | (Neq (_, _), _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))

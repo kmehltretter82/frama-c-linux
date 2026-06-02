@@ -387,13 +387,13 @@ let rec pmatch env (p : pattern) e =
   | Assoc(`And,ps) , And es -> pac env Lang.F.e_and [] ps es
   | Assoc(`Add,ps) , Add es -> pac env Lang.F.e_sum [] ps es
   | Assoc(`Mul,ps) , Mul es -> pac env Lang.F.e_prod [] ps es
-  | Assoc(`Bor,ps) , Fun(lf,es) when lf == Cint.f_lor ->
+  | Assoc(`Bor,ps) , Fun(lf,es) when Lang.E.(Cint.f_lor @= lf) ->
     pac env (Lang.F.e_fun lf) [] ps es
-  | Assoc(`Band,ps) , Fun(lf,es) when lf == Cint.f_land ->
+  | Assoc(`Band,ps) , Fun(lf,es) when Lang.E.(Cint.f_land @= lf) ->
     pac env (Lang.F.e_fun lf) [] ps es
-  | Assoc(`Bxor,ps) , Fun(lf,es) when lf == Cint.f_lxor ->
+  | Assoc(`Bxor,ps) , Fun(lf,es) when Lang.E.(Cint.f_lxor @= lf) ->
     pac env (Lang.F.e_fun lf) [] ps es
-  | Assoc(`Concat,ts) , Fun(lf, es) when lf == Vlist.f_concat ->
+  | Assoc(`Concat,ts) , Fun(lf, es) when Lang.E.(Vlist.f_concat @= lf) ->
     pac env (Lang.F.e_fun lf) [] ts es
   | Binop(p,`Div,q) , Div(a,b) -> pbinop env p q a b
   | Binop(p,`Mod,q) , Mod(a,b) -> pbinop env p q a b
@@ -401,8 +401,8 @@ let rec pmatch env (p : pattern) e =
   | Binop(p,`Ne,q) , Neq(a,b) -> pbinop env p q a b
   | Binop(p,`Lt,q) , Lt(a,b) -> pbinop env p q a b
   | Binop(p,`Le,q) , Leq(a,b) -> pbinop env p q a b
-  | Binop(p,`Lsl,q) , Fun(lf,[a;b]) when lf == Cint.f_lsl -> pbinop env p q a b
-  | Binop(p,`Lsr,q) , Fun(lf,[a;b]) when lf == Cint.f_lsr -> pbinop env p q a b
+  | Binop(p,`Lsl,q) , Fun(lf,[a;b]) when Lang.E.(Cint.f_lsl @= lf) -> pbinop env p q a b
+  | Binop(p,`Lsr,q) , Fun(lf,[a;b]) when Lang.E.(Cint.f_lsr @= lf) -> pbinop env p q a b
   | Implies(hps, cp), Imply(hs, c) ->
     pac env Lang.F.e_and [] hps hs ;
     pmatch env cp c
@@ -432,7 +432,7 @@ let rec pmatch env (p : pattern) e =
           pargs env ps trail es
       | _ -> pargs env ps trail es
     end
-  | Binop(pl,`Repeat,pn) , Fun(lf,[l;n]) when lf == Vlist.f_repeat ->
+  | Binop(pl,`Repeat,pn) , Fun(lf,[l;n]) when Lang.E.(Vlist.f_repeat @= lf) ->
     pmatch env pl l ; pmatch env pn n
   | List _vs , _ -> ()
   | Pany ps , _ ->

@@ -82,7 +82,7 @@ let strategy ?(priority=1.0) selection ~nbits =
 let is_bitwised e =
   let open Qed.Logic in
   match F.repr e with
-  | Fun(f,_) -> List.memq f Cint.f_bitwised
+  | Fun(f,_) -> Cint.is_bitwised f
   | _ -> false
 
 let rec lookup push clause ~nbits ~priority p =

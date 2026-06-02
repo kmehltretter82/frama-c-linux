@@ -9,6 +9,7 @@
 open Qed
 open Logic
 open Lang
+open Lang.E
 open Lang.F
 
 let f_builtin ?(injective=false) ?(params=[LogicBuiltins.R]) name ~link =
@@ -16,7 +17,7 @@ let f_builtin ?(injective=false) ?(params=[LogicBuiltins.R]) name ~link =
     let open Qed.Logic in
     if injective then Injection else Function
   in
-  let lfun = Lang.extern_f ~category "%s" link in
+  let lfun = Lang.extern_f ~category link in
   LogicBuiltins.add_builtin name params lfun ; lfun
 
 (* -------------------------------------------------------------------------- *)
@@ -56,15 +57,15 @@ let builtin_truncate f e =
           base
       with _ -> raise Not_found
     end
-  | Fun( f , [e] ) when f == f_real_of_int -> e
+  | Fun( f , [e] ) when f_real_of_int @= f -> e
   | _ -> raise Not_found
 
 (* -------------------------------------------------------------------------- *)
 (* --- Conversions                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let int_of_real x = e_fun f_truncate [x]
-let real_of_int x = e_fun f_real_of_int [x]
+let int_of_real x = e_fun !@f_truncate [x]
+let real_of_int x = e_fun !@f_real_of_int [x]
 
 let int_of_bool a = e_neq a F.e_zero (* if a != 0 then true else false *)
 let bool_of_int a = e_if a F.e_one F.e_zero (* if a then 1 else 0 *)
@@ -76,6 +77,7 @@ let bool_of_int a = e_if a F.e_one F.e_zero (* if a then 1 else 0 *)
 (* rewrite a=b when a or b is f(x)
    for functions f such as 0 <= f(x) && ( f(x) = 0 <-> x = 0 ) *)
 let builtin_positive_eq lfun ~domain ~zero ~injective a b =
+  let lfun = !@lfun in
   let open Qed.Logic in
   begin match F.repr a , F.repr b with
     | Fun(f,[a]) , Fun(f',[b])
@@ -97,6 +99,7 @@ let builtin_positive_eq lfun ~domain ~zero ~injective a b =
 (* rewrite a<=b when a or b is f(x)
    for functions f such as 0 <= f(x) && f(x) = 0 <-> x = 0 *)
 let builtin_positive_leq lfun ~domain ~zero ~monotonic a b =
+  let lfun = !@lfun in
   let open Qed.Logic in
   begin match F.repr a , F.repr b with
     | Fun(f,[a]) , Fun(f',[b])
@@ -121,6 +124,7 @@ let builtin_positive_leq lfun ~domain ~zero ~monotonic a b =
 (* rewrite a=b when a or b is f(x)
    for functions f such as 0 < f(x) *)
 let builtin_strict_eq lfun ~domain ~zero ~injective a b =
+  let lfun = !@lfun in
   let open Qed.Logic in
   begin match F.repr a , F.repr b with
     | Fun(f,[a]) , Fun(f',[b])
@@ -136,6 +140,7 @@ let builtin_strict_eq lfun ~domain ~zero ~injective a b =
 (* rewrite a<=b when a or b is f(x)
    for functions f such as 0 < f(x) *)
 let builtin_strict_leq lfun ~domain ~zero ~monotonic a b =
+  let lfun = !@lfun in
   let open Qed.Logic in
   begin match F.repr a , F.repr b with
     | Fun(f,[a]) , Fun(f',[b])
@@ -204,7 +209,7 @@ let builtin_sqrt e =
   | Kreal r when r == Q.zero -> F.e_zero_real (* srqt(0)==0 *)
   | Kreal r when r == Q.one -> F.e_one_real (* srqt(1)==1 *)
   | Mul[a;b] when eval_eq a b -> (* a==b ==> sqrt(a*b)==|a| *)
-    e_fun f_rabs [a] (* a is smaller *)
+    e_fun !@f_rabs [a] (* a is smaller *)
   | _ -> raise Not_found
 
 let builtin_sqrt_eq = builtin_positive_eq f_sqrt
@@ -234,8 +239,8 @@ let builtin_exp e =
   match F.repr e with
   | Kreal r when r == Q.zero -> F.e_one_real (* exp(0)==1 *)
   | Times(n,r) when n == Z.minus_one -> (* exp(-r) = 1/exp(r) *)
-    F.e_div F.e_one_real (F.e_fun f_exp [r])
-  | Fun( f , [x] ) when f == f_log && domain_log x ->
+    F.e_div F.e_one_real (F.e_fun !@f_exp [r])
+  | Fun( f , [x] ) when f_log @= f && domain_log x ->
     (* 0<x ==> exp(log(x)) = x *) x
   | _ -> raise Not_found
 
@@ -243,10 +248,10 @@ let builtin_log e =
   let open Qed.Logic in
   match F.repr e with
   | Kreal r when r == Q.one -> F.e_zero_real (* log(1) == 0 *)
-  | Fun( f , [x] ) when f == f_exp -> x (* log(exp(x)) == x *)
-  | Fun( f , [x;n] ) when f == f_pow && domain_log x ->
+  | Fun( f , [x] ) when f_exp @= f -> x (* log(exp(x)) == x *)
+  | Fun( f , [x;n] ) when f_pow @= f && domain_log x ->
     (* 0<x ==> log(x^n) == n*log(x) *)
-    F.e_mul n (F.e_fun f_log [x])
+    F.e_mul n (F.e_fun !@f_log [x])
   | _ -> raise Not_found
 
 (* a^n = e^(n.log a) *)
@@ -314,32 +319,32 @@ let () =
 let () = Context.register
     begin fun () ->
 
-      F.set_builtin_1 f_real_of_int builtin_real_of_int ;
-      F.set_builtin_1 f_truncate (builtin_truncate f_truncate) ;
-      F.set_builtin_1 f_ceil (builtin_truncate f_ceil) ;
-      F.set_builtin_1 f_floor (builtin_truncate f_floor) ;
+      F.set_builtin_1 !@f_real_of_int builtin_real_of_int ;
+      F.set_builtin_1 !@f_truncate (builtin_truncate f_truncate) ;
+      F.set_builtin_1 !@f_ceil (builtin_truncate f_ceil) ;
+      F.set_builtin_1 !@f_floor (builtin_truncate f_floor) ;
 
-      F.set_builtin_1   f_iabs (builtin_abs f_iabs e_zero) ;
-      F.set_builtin_1   f_rabs (builtin_abs f_rabs e_zero_real) ;
-      F.set_builtin_eq  f_iabs builtin_iabs_eq ;
-      F.set_builtin_eq  f_rabs builtin_rabs_eq ;
-      F.set_builtin_leq f_iabs builtin_iabs_leq ;
-      F.set_builtin_leq f_rabs builtin_rabs_leq ;
+      F.set_builtin_1   !@f_iabs (builtin_abs !@f_iabs e_zero) ;
+      F.set_builtin_1   !@f_rabs (builtin_abs !@f_rabs e_zero_real) ;
+      F.set_builtin_eq  !@f_iabs builtin_iabs_eq ;
+      F.set_builtin_eq  !@f_rabs builtin_rabs_eq ;
+      F.set_builtin_leq !@f_iabs builtin_iabs_leq ;
+      F.set_builtin_leq !@f_rabs builtin_rabs_leq ;
 
-      F.set_builtin_1   f_sqrt builtin_sqrt ;
-      F.set_builtin_eq  f_sqrt builtin_sqrt_eq ;
-      F.set_builtin_leq f_sqrt builtin_sqrt_leq ;
+      F.set_builtin_1   !@f_sqrt builtin_sqrt ;
+      F.set_builtin_eq  !@f_sqrt builtin_sqrt_eq ;
+      F.set_builtin_leq !@f_sqrt builtin_sqrt_leq ;
 
-      F.set_builtin_1   f_log builtin_log ;
-      F.set_builtin_1   f_exp builtin_exp ;
-      F.set_builtin_eq  f_exp builtin_exp_eq ;
-      F.set_builtin_leq f_exp builtin_exp_leq ;
+      F.set_builtin_1   !@f_log builtin_log ;
+      F.set_builtin_1   !@f_exp builtin_exp ;
+      F.set_builtin_eq  !@f_exp builtin_exp_eq ;
+      F.set_builtin_leq !@f_exp builtin_exp_leq ;
 
-      F.set_builtin_2   f_pow builtin_pow ;
+      F.set_builtin_2   !@f_pow builtin_pow ;
 
-      F.set_builtin_1 f_sin (builtin_trigo f_asin ~domain:domain_asin_acos) ;
-      F.set_builtin_1 f_cos (builtin_trigo f_acos ~domain:domain_asin_acos) ;
-      F.set_builtin_1 f_tan (builtin_trigo f_atan ~domain:domain_atan) ;
+      F.set_builtin_1 !@f_sin (builtin_trigo !@f_asin ~domain:domain_asin_acos) ;
+      F.set_builtin_1 !@f_cos (builtin_trigo !@f_acos ~domain:domain_asin_acos) ;
+      F.set_builtin_1 !@f_tan (builtin_trigo !@f_atan ~domain:domain_atan) ;
     end
 
 (* -------------------------------------------------------------------------- *)

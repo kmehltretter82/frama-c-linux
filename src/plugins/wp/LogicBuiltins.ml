@@ -12,18 +12,18 @@
 
 open Cil_types
 open Ctypes
-open Qed
 open Lang
+open Lang.E
 
-type category = Lang.lfun Qed.Logic.category
+type category = Lang.lfun Lang.extern Qed.Logic.category
 
 type builtin =
   | ACSLDEF
-  | LFUN of lfun
+  | LFUN of lfun extern
   | HACK of (F.term list -> F.term)
 
 type t_builtin =
-  | ADT of adt
+  | ADT of adt extern
   | HACKT of (F.tau list -> F.tau)
 
 type kind =
@@ -76,7 +76,7 @@ let pp_kinds fmt = function
 let pp_link fmt = function
   | ACSLDEF -> Format.pp_print_string fmt "(ACSL)"
   | HACK _ -> Format.pp_print_string fmt "(HACK)"
-  | LFUN f -> Fun.pretty fmt f
+  | LFUN f -> Fun.pretty fmt !@f
 
 (* -------------------------------------------------------------------------- *)
 (* --- Driver & Lookup & Registry                                         --- *)
@@ -136,7 +136,7 @@ let lookup name kinds =
       try hack es with Not_found ->
       match lookup_driver name kinds with
       | ACSLDEF | HACK _ -> Warning.error "No fallback for hacked '%s'" name
-      | LFUN p -> F.e_fun p es
+      | LFUN p -> F.e_fun !@p es
     in HACK compute
   with Not_found -> lookup_driver name kinds
 
@@ -188,57 +188,26 @@ let constant name = lookup name []
 (* --- Declaration of Builtins                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let add_alias ~source name kinds ~alias =
-  register ~source name kinds (lookup alias kinds)
-
-let is_float32 qf = Qed.Symbol.Data.fullname qf = "ieee_float.Float32.t"
-let is_float64 qf = Qed.Symbol.Data.fullname qf = "ieee_float.Float64.t"
-
-let check_param ~source name kind tau =
-  match kind, tau with
-  | (B, (Logic.Bool | Prop)) | (Z, Int) | (R, Real)
-  | (I _, Int) | (F _, Real) | (A, _) -> ()
-  | (F Float32, Data(qf,[])) when is_float32 qf -> ()
-  | (F Float64, Data(qf,[])) when is_float64 qf -> ()
-  | _ ->
-    Wp_parameters.error ~source
-      "Incorrect driver for %S (kind %a for type %a)"
-      name pp_kind kind Qed.Symbol.Tau.pretty tau
-
-let check_signature ~source ?(category=Logic.Function) result name kinds lf =
-  begin
-    match lf with
-    | QFUN l ->
-      let _,tr,ts = Qed.Symbol.signature l.e_symbol in
-      begin
-        match category with
-        | Logic.Operator _ -> List.iter (check_param ~source name result) ts ;
-        | _ -> List.iter2 (check_param ~source name) kinds ts ;
-      end ;
-      check_param ~source name result tr ;
-    | _ -> ()
-  end
-
-let add_logic ~source ?category result name kinds ~link =
-  let lfun = Lang.extern_f ?category "%s" link in
-  check_signature ~source ?category result name kinds lfun ;
-  register ~source name kinds (LFUN lfun)
-
-let add_predicate ~source name kinds ~link =
-  let lfun = Lang.extern_f "%s" link in
-  check_signature ~source B name kinds lfun ;
-  register ~source name kinds (LFUN lfun)
-
-let add_ctor ~source name kinds ~link =
-  let lfun = Lang.extern_f ~category:Constructor "%s" link in
-  check_signature ~source A name kinds lfun ;
-  register ~source name kinds (LFUN lfun)
+let hack_type name fn =
+  register_type name (HACKT fn)
 
 let add_type ?source name ~link =
   register_type ?source name (ADT (Lang.extern_t link))
 
-let hack_type name fn =
-  register_type name (HACKT fn)
+let add_alias ~source name kinds ~alias =
+  register ~source name kinds (lookup alias kinds)
+
+let add_logic ~source ?category result name kinds ~link =
+  let lfun = Lang.extern_f ?category link in
+  ignore result ; register ~source name kinds (LFUN lfun)
+
+let add_predicate ~source name kinds ~link =
+  let lfun = Lang.extern_f link in
+  register ~source name kinds (LFUN lfun)
+
+let add_ctor ~source name kinds ~link =
+  let lfun = Lang.extern_f ~category:Constructor link in
+  register ~source name kinds (LFUN lfun)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Implemented Builtins                                               --- *)
@@ -260,10 +229,11 @@ let add_builtin name kinds lfun =
     Context.bind driver builtin_driver (register name kinds) phi
 
 let add_builtin_type name adt =
+  let adt = ADT adt in
   if Context.defined driver then
-    register_type name (ADT adt)
+    register_type name adt
   else
-    Context.bind driver builtin_driver (register_type name) (ADT adt)
+    Context.bind driver builtin_driver (register_type name) adt
 
 let hack_type name poly =
   if Context.defined driver then hack_type name poly
@@ -277,7 +247,7 @@ let lookup_t =
 
 let resolve_t name ts =
   match lookup_t name with
-  | ADT adt -> Qed.Logic.Data(adt,ts)
+  | ADT adt -> t_data !@adt ts
   | HACKT fn -> fn ts
 
 let is_builtin_type name =

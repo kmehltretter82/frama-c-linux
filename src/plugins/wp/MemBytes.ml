@@ -6,6 +6,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Lang.E
 open Lang.F
 open Memory
 open Ctypes
@@ -22,36 +23,40 @@ struct
   let t_iblock = Qed.Logic.Array (Qed.Logic.Int, Qed.Logic.Bool)
   let t_init = Qed.Logic.Array   (Qed.Logic.Int,t_iblock)
 
-  let fmap = Hashtbl.create 0
-
-  let membytes ?coloring name =
-    let fn =
-      try Hashtbl.find fmap name with Not_found ->
+  let f_membytes ?coloring descr =
+    Format.kasprintf
+      begin fun name ->
         let endian = if Machine.little_endian () then "le" else "be" in
-        let fn =
-          Lang.extern_f ?coloring "frama_c_wp.membytes_%s.%s" endian name in
-        Hashtbl.add fmap name fn ; fn
-    in fn
+        let name = Printf.sprintf "frama_c_wp.membytes_%s.%s" endian name in
+        Lang.extern_f ?coloring name
+      end descr
 
-  let membytes_f descr =
-    Format.kasprintf (fun name -> e_fun (membytes name)) descr
-  let membytes_p ?coloring descr =
-    Format.kasprintf (fun name -> p_call (membytes ?coloring name)) descr
+  let f_eqmem = f_membytes "eqmem"
+  let f_memcpy = f_membytes "memcpy"
+  let f_sconst = f_membytes ~coloring:true "sconst"
+  let f_scinit = f_membytes ~coloring:true "scinit"
+  let f_bytes = f_membytes "bytes"
 
-  let eqmem m0 m1 p s = membytes_p "eqmem" [m0;m1;p;s]
-  let memcpy m p m0 p0 s =
-    membytes_f "memcpy" [m;p;m0;p0;s]
-  let sconst m = membytes_p ~coloring:true "sconst" [m]
-  let scinit m = membytes_p ~coloring:true "scinit" [m]
-  let bytes m = membytes_p "bytes" [ m ]
+  let eqmem m0 m1 p s = p_call !@f_eqmem [m0;m1;p;s]
+  let memcpy m p m0 p0 s = e_fun !@f_memcpy [m;p;m0;p0;s]
+  let sconst m = p_call !@f_sconst [m]
+  let scinit m = p_call !@f_scinit [m]
+  let bytes m = p_call !@f_bytes [m]
 
   (* read/write *)
-  let read m i a = membytes_f "read_%a" Ctypes.pp_int i [ m ; a ]
-  let write m i a v = membytes_f "write_%a" Ctypes.pp_int i [ m ; a ; v ]
+
+  let readi = Ctypes.i_memo (f_membytes "read_%a" Ctypes.pp_int)
+  let writei = Ctypes.i_memo (f_membytes "write_%a" Ctypes.pp_int)
+
+  let read m i a = e_fun !@(readi i) [ m ; a ]
+  let write m i a v = e_fun !@(writei i) [ m ; a ; v ]
 
   (* read/write init *)
-  let read_init m s a = membytes_f "read_init%d" s [ m ; a ]
-  let write_init m s a v = membytes_f "write_init%d" s [ m ; a ; v ]
+  let read_initd = Why3.Wstdlib.Hint.memo 0 (f_membytes "read_init%d")
+  let write_initd = Why3.Wstdlib.Hint.memo 0 (f_membytes "write_init%d")
+
+  let read_init m s a = e_fun !@(read_initd s) [ m ; a ]
+  let write_init m s a v = e_fun !@(write_initd s) [ m ; a ; v ]
 
 end
 
@@ -62,9 +67,10 @@ let dkey_model = Wp_parameters.register_category (lc_name ^ ":model")
 
 let configure () =
   begin
-    Hashtbl.clear WBytes.fmap ;
-    let orig_pointer = Context.push Lang.pointer MemAddr.t_addr in
-    let orig_null    = Context.push Cvalues.null (p_equal MemAddr.null) in
+    let ptr = !@MemAddr.t_addr in
+    let null p = p_equal p !@MemAddr.null in
+    let orig_pointer = Context.push Lang.pointer ptr in
+    let orig_null    = Context.push Cvalues.null null in
     let rollback () =
       Context.pop Lang.pointer orig_pointer ;
       Context.pop Cvalues.null orig_null ;
@@ -210,10 +216,10 @@ module ShiftFieldDef = WpContext.StaticGenerator(Cil_datatype.Fieldinfo)
       type data = Definitions.dfun
 
       let generate f =
-        let result = MemAddr.t_addr in
+        let result = !@MemAddr.t_addr in
         let lfun = Lang.generated_f ~result "shiftfield_%s" (Lang.field_id f) in
         (* Since its a generated it is the unique name given *)
-        let p = Lang.freshvar ~basename:"p" MemAddr.t_addr in
+        let p = Lang.freshvar ~basename:"p" result in
         let tp = e_var p in
         let position = e_int @@ field_offset f.fcomp f in
         let def = MemAddr.shift tp position in
@@ -271,11 +277,11 @@ module ShiftGen = WpContext.StaticGenerator(Cobj)
       let c_object_id c = Format.asprintf "%a@?" c_object_id c
 
       let generate obj =
-        let result = MemAddr.t_addr in
+        let result = !@MemAddr.t_addr in
         let shift = Lang.generated_f ~result "shift_%s" (c_object_id obj) in
         let size = protected_sizeof_object obj in
         (* Since its a generated it is the unique name given *)
-        let p = Lang.freshvar ~basename:"p" MemAddr.t_addr in
+        let p = Lang.freshvar ~basename:"p" result in
         let tp = e_var p in
         let k = Lang.freshvar ~basename:"k" Qed.Logic.Int in
         let tk = e_var k in
@@ -513,10 +519,11 @@ struct
     e_sub (e_div (allocated sigma l) n) e_one
 
   let fresh _l =
-    let x = Lang.freshvar ~basename:"p" MemAddr.t_addr in
+    let t = !@MemAddr.t_addr in
+    let x = Lang.freshvar ~basename:"p" t in
     [x] , e_var x
 
-  let separated p n p' n' = p_call MemAddr.p_separated [p;n;p';n']
+  let separated p n p' n' = p_call !@MemAddr.p_separated [p;n;p';n']
 
   let eqmem _chunk = WBytes.eqmem
   let memcpy _chunk = WBytes.memcpy
@@ -840,7 +847,7 @@ let int_of_loc _ loc =
 
 let domain _ _ = Sigma.Domain.of_list [ m_init ; m_mem ]
 
-let is_null = p_equal null
+let is_null p = p_equal p !@null
 let loc_eq = p_equal
 let loc_lt = MemAddr.addr_lt
 let loc_leq = MemAddr.addr_le
@@ -861,7 +868,7 @@ module PointersProperties = WpContext.Generator(Datatype.Unit)
       type data = Lang.lfun
 
       let ranges () =
-        let a = Lang.freshvar ~basename:"a" MemAddr.t_addr in
+        let a = Lang.freshvar ~basename:"a" (!@MemAddr.t_addr) in
         let prop = MemAddr.in_uintptr_range (e_var a) in
         Definitions.define_lemma {
           l_kind = Admit ; l_name = "pointers_int_range" ;
@@ -873,7 +880,7 @@ module PointersProperties = WpContext.Generator(Datatype.Unit)
       let compile () =
         let lfun = Lang.generated_p "framed" in
         let m = Lang.freshvar ~basename:"m" WBytes.t_memory in
-        let a = Lang.freshvar ~basename:"a" MemAddr.t_addr in
+        let a = Lang.freshvar ~basename:"a" (!@MemAddr.t_addr) in
         let p = load_pointer_raw (e_var m) (Cil_const.voidPtrType) (e_var a) in
         let ba = MemAddr.base (e_var a) and bp = MemAddr.base p in
         let body =
