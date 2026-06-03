@@ -49,9 +49,8 @@ and lsymbol = {
   m_name : string ;
   m_context : WpContext.context option ;
   m_category : lfun category ;
-  m_params : sort list ;
-  m_result : sort ;
-  m_typeof : tau option list -> tau ;
+  m_result : tau ;
+  m_params : tau list ;
   m_coloring : bool ;
 }
 
@@ -92,18 +91,16 @@ val extern_f :
 val generated_f :
   ?context:bool ->
   ?category:lfun category ->
-  ?params:sort list ->
-  ?sort:sort ->
-  ?result:tau ->
   ?coloring:bool ->
-  ?typecheck:(tau option list -> tau) ->
+  result:tau ->
+  params:tau list ->
   ('a, Format.formatter, unit, lfun) format4 -> 'a
 
 val generated_p :
   ?context:bool ->
   ?category:lfun category ->
-  ?params:sort list ->
   ?coloring:bool ->
+  params:tau list ->
   ('a, Format.formatter, unit, lfun) format4 -> 'a
 
 (** {2 Sorting and Typing} *)

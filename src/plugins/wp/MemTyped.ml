@@ -317,18 +317,21 @@ module ShiftFieldDef = WpContext.StaticGenerator(Cil_datatype.Fieldinfo)
       type data = dfun
 
       let generate f =
-        let result = !@MemAddr.t_addr in
-        let lfun = Lang.generated_f ~result "shiftfield_%s" (Lang.field_id f) in
+        let addr = !@MemAddr.t_addr in
+        let d_lfun =
+          Lang.generated_f
+            ~result:addr ~params:[addr]
+            "shiftfield_%s" (Lang.field_id f) in
         let position = position_of_field f in
         (* Since its a generated it is the unique name given *)
-        let xloc = Lang.freshvar ~basename:"p" result in
+        let xloc = Lang.freshvar ~basename:"p" addr in
         let loc = F.e_var xloc in
         let def = MemAddr.shift loc position in
-        let dfun = Definitions.Function( result , Def , def) in
-        RegisterShift.define lfun (RS_Field(f,position)) ;
-        MemAddr.register ~base:phi_base ~offset:(phi_field position) lfun ;
+        let dfun = Definitions.Function( addr , Def , def) in
+        RegisterShift.define d_lfun (RS_Field(f,position)) ;
+        MemAddr.register ~base:phi_base ~offset:(phi_field position) d_lfun ;
         {
-          d_lfun = lfun ; d_types = 0 ;
+          d_lfun ; d_types = 0 ;
           d_params = [xloc] ;
           d_definition = dfun ;
           d_cluster = Definitions.dummy () ;
@@ -378,16 +381,19 @@ module ShiftGen = WpContext.StaticGenerator(Cobj)
       let c_object_id c = Format.asprintf "%a@?" c_object_id c
 
       let generate obj =
-        let result = !@MemAddr.t_addr in
-        let shift = Lang.generated_f ~result "shift_%s" (c_object_id obj) in
+        let addr = !@MemAddr.t_addr in
+        let shift =
+          Lang.generated_f
+            ~result:addr ~params:[addr;Int]
+            "shift_%s" (c_object_id obj) in
         let size = length_of_object obj in
         (* Since its a generated it is the unique name given *)
-        let xloc = Lang.freshvar ~basename:"p" result in
+        let xloc = Lang.freshvar ~basename:"p" addr in
         let loc = F.e_var xloc in
         let xk = Lang.freshvar ~basename:"k" Qed.Logic.Int in
         let k = F.e_var xk in
         let def = MemAddr.shift loc (F.e_mul size k) in
-        let dfun = Definitions.Function( result , Def , def) in
+        let dfun = Definitions.Function( addr , Def , def) in
         RegisterShift.define shift (RS_Index size) ;
         MemAddr.register ~base:phi_base ~offset:(phi_index size)
           ~linear:true shift ;
@@ -491,7 +497,7 @@ module STRING = WpContext.Generator(LITERAL)
 
       let compile (_,cst) =
         let eid = fresh () in
-        let lfun = Lang.generated_f ~result:L.Int "Str_%d" eid in
+        let lfun = Lang.generated_f ~result:Int ~params:[] "Str_%d" eid in
         (* Since its a generated it is the unique name given *)
         let prefix = Lang.Fun.debug lfun in
         let base = F.e_fun lfun [] in
@@ -584,14 +590,16 @@ module BASE = WpContext.Generator(Varinfo)
           then if acs_rd then "K" else "G"
           else if x.vformal then "P" else "L" in
         let lfun = Lang.generated_f
-            ~category:L.Constructor ~result:L.Int "%s_%s_%d"
-            prefix x.vorig_name x.vid in
+            ~category:L.Constructor
+            ~result:Int ~params:[]
+            "%s_%s_%d" prefix x.vorig_name x.vid in
         (* Since its a generated it is the unique name given *)
         let prefix = Lang.Fun.debug lfun in
         let vid = if acs_rd then (-x.vid-1) else succ x.vid in
         let dfun = Definitions.Function( L.Int , Def , F.e_int vid ) in
         Definitions.define_symbol {
-          d_lfun = lfun ; d_types = 0 ; d_params = [] ; d_definition = dfun ;
+          d_lfun = lfun ; d_types = 0 ;
+          d_params = [] ; d_definition = dfun ;
           d_cluster = cluster_globals () ;
         } ;
         let base = F.e_fun lfun [] in
@@ -947,20 +955,24 @@ module ChunkContent = WpContext.Generator(Chunk)
 
       let generate c =
         let k = int_kind c in
-        let p = Lang.freshvar ~basename:"m" (Chunk.tau_of_chunk c) in
+        let t = Chunk.tau_of_chunk c in
+        let p = Lang.freshvar ~basename:"m" t in
         let m = F.e_var p in
         let coloring = true in
-        let lfun = Lang.generated_p ~coloring "is_%a_chunk" Ctypes.pp_int k in
+        let d_lfun =
+          Lang.generated_p ~coloring
+            ~params:[t]
+            "is_%a_chunk" Ctypes.pp_int k in
         let l = Lang.freshvar ~basename:"l" (Lang.t_addr()) in
         let is_int = Cint.range k in
         let def = F.p_forall [l] (is_int (F.e_get m (F.e_var l))) in
         Definitions.define_symbol {
-          d_lfun = lfun ; d_types = 0 ;
+          d_lfun ; d_types = 0 ;
           d_params = [p] ;
           d_definition = Predicate(Def, def) ;
           d_cluster = cluster ~id:"Chunk" ~title:"Chunk type constraint" () ;
         } ;
-        lfun
+        d_lfun
 
       let compile = Lang.local generate
     end)

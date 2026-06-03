@@ -393,7 +393,8 @@ struct
 
         let compile v =
           let result = t_addr () in
-          let lfun = Lang.generated_f ~result "pointer_%s" v.vname in
+          let lfun =
+            Lang.generated_f ~result ~params:[] "pointer_%s" v.vname in
           let cluster =
             Definitions.cluster ~id:"Globals" ~title:"Context pointers" ()
           in

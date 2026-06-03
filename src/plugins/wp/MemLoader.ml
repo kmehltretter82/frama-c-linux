@@ -220,12 +220,13 @@ struct
           let loc = M.of_region_pointer r obj v in (* t_pointer -> loc *)
           let domain = Info.footprint obj loc in
           let result = Info.t_comp c in
-          let lfun =
-            Lang.generated_f ~context:true ~result "Load%a_%s"
-              pp_rid r (Info.comp_id c) in
           let xms,chunks,sigma = signature domain in
-          let prms = x :: xms in
-          let dfun =
+          let d_params = x :: xms in
+          let d_lfun =
+            Lang.generated_f ~context:true
+              ~result ~params:(List.map tau_of_var d_params)
+              "Load%a_%s" pp_rid r (Info.comp_id c) in
+          let d_definition =
             match c.cfields with
             | None -> Definitions.Logic result
             | Some fields ->
@@ -234,20 +235,18 @@ struct
                      let fd = cfield ~kind:Info.kind f in
                      let ft = object_of f.ftype in
                      let fv = Info.load sigma ft (M.field loc f) in
-                     let pr = F.e_apply (F.e_lambda prms fv) in
-                     F.set_builtin_field lfun fd pr ;
+                     let pr = F.e_apply (F.e_lambda d_params fv) in
+                     F.set_builtin_field d_lfun fd pr ;
                      fd,fv
                   ) fields
               in Definitions.Function( result , Def , e_record def )
           in
           Definitions.define_symbol {
-            d_lfun = lfun ; d_types = 0 ;
-            d_params = prms ;
-            d_definition = dfun ;
-            d_cluster = cluster () ;
+            d_lfun ; d_cluster = cluster () ;
+            d_types = 0 ; d_params ; d_definition ;
           } ;
-          frame_lemmas lfun obj loc [v] chunks ;
-          lfun , chunks
+          frame_lemmas d_lfun obj loc [v] chunks ;
+          d_lfun , chunks
 
         let compile = Lang.local generate
       end)
@@ -272,27 +271,26 @@ struct
           let obj = ARRAY_KEY.obj a in
           let loc = M.of_region_pointer r obj v in (* t_pointer -> loc *)
           let domain = Info.footprint obj loc in
-          let result = Matrix.cc_tau (Info.t_array a) ds in
-          let lfun =
-            Lang.generated_f ~result ~context:true "Array%a_%s%a"
-              pp_rid r (Info.array_id a) Matrix.pp_suffix_id ds in
-          let prefix = Lang.Fun.debug lfun in
-          let name = prefix ^ "_access" in
           let xms,chunks,sigma = signature domain in
           let env = Matrix.cc_env ds in
-          let prms = x :: env.size_var @ xms in
-          let phi = e_fun lfun (v :: env.size_val @ List.map e_var xms) in
+          let d_params = x :: env.size_var @ xms in
+          let result = Matrix.cc_tau (Info.t_array a) ds in
+          let d_lfun =
+            Lang.generated_f ~context:true
+              ~result ~params:(List.map tau_of_var d_params)
+              "Array%a_%s%a" pp_rid r
+              (Info.array_id a) Matrix.pp_suffix_id ds in
+          let prefix = Lang.Fun.debug d_lfun in
+          let name = prefix ^ "_access" in
+          let phi = e_fun d_lfun (v :: env.size_val @ List.map e_var xms) in
           let va = List.fold_left e_get phi env.index_val in
           let ofs = e_sum env.index_offset in
           let vm = Info.load sigma obj (M.shift loc obj ofs) in
           let lemma = p_hyps env.index_range (p_equal va vm) in
           let cluster = cluster () in
           Definitions.define_symbol {
-            d_lfun = lfun ;
-            d_types = 0 ;
-            d_params = prms ;
-            d_definition = Logic result ;
-            d_cluster = cluster ;
+            d_lfun ; d_cluster = cluster ;
+            d_types = 0 ; d_params ; d_definition = Logic result ;
           } ;
           Definitions.define_lemma {
             l_kind = Admit ;
@@ -302,9 +300,9 @@ struct
             l_lemma = lemma ;
             l_cluster = cluster ;
           } ;
-          let pr = F.e_lambda (prms @ env.index_var) vm in
+          let pr = F.e_lambda (d_params @ env.index_var) vm in
           let nk = List.length env.index_var in
-          Lang.F.set_builtin_get lfun
+          Lang.F.set_builtin_get d_lfun
             (fun es ks ->
                if List.length ks = nk then
                  F.e_apply pr (es @ ks)
@@ -316,9 +314,9 @@ struct
             | None -> ()
             | Some length ->
               let ns = List.map F.e_var env.size_var in
-              frame_lemmas lfun obj ~length loc (v::ns) chunks
+              frame_lemmas d_lfun obj ~length loc (v::ns) chunks
           end ;
-          lfun , chunks
+          d_lfun , chunks
 
         let compile = Lang.local generate
       end)
@@ -407,12 +405,10 @@ struct
           let obj = C_comp c in
           let loc = M.of_region_pointer r obj (e_var x) in
           let domain = M.init_footprint obj loc in
-          let cluster = cluster () in
-          (* Is_init: structural definition *)
-          let lfun = Lang.generated_p "Is%s%a" (Lang.comp_init_id c) pp_rid r in
           let xms,chunks,sigma = signature domain in
-          let params = x :: xms in
-          let def = match c.cfields with
+          let d_params = x :: xms in
+          (* Is_init: structural definition *)
+          let d_definition = match c.cfields with
             | None -> Logic Lang.t_prop
             | Some fields ->
               let def = p_all
@@ -421,14 +417,18 @@ struct
               in
               Predicate(Def, def)
           in
+          let d_lfun =
+            Lang.generated_p
+              ~params:(List.map tau_of_var d_params)
+              "Is%s%a" (Lang.comp_init_id c) pp_rid r in
           Definitions.define_symbol {
-            d_lfun = lfun ; d_types = 0 ;
-            d_params = params ;
-            d_definition = def ;
-            d_cluster = cluster ;
+            d_lfun = d_lfun ; d_types = 0 ;
+            d_params ;
+            d_definition = d_definition ;
+            d_cluster = cluster () ;
           } ;
-          frame_lemmas lfun obj loc [e_var x] chunks ;
-          lfun , chunks
+          frame_lemmas d_lfun obj loc [e_var x] chunks ;
+          d_lfun , chunks
 
         let compile = Lang.local generate
       end)
@@ -446,32 +446,30 @@ struct
           let obj = ARRAY_KEY.obj a in
           let loc = M.of_region_pointer r obj v in
           let domain = M.init_footprint obj loc in
-          let lfun =
-            Lang.generated_p "IsInitArray%a_%s%a"
-              pp_rid r (ARRAY_KEY.key a) Matrix.pp_suffix_id ds
-          in
           let xmem,chunks,sigma = signature domain in
           let env = Matrix.cc_env ds in
-          let params = x :: env.size_var @ xmem in
+          let d_params = x :: env.size_var @ xmem in
+          let d_lfun =
+            Lang.generated_p ~params:(List.map tau_of_var d_params)
+              "IsInitArray%a_%s%a" pp_rid r
+              (ARRAY_KEY.key a) Matrix.pp_suffix_id ds
+          in
           let ofs = e_sum env.index_offset in
           let vm = !isinitrec sigma obj (M.shift loc obj ofs) in
           let def = p_forall env.index_var (p_hyps env.index_range vm) in
-          let cluster = cluster () in
           (* Is_init: structural definition *)
           Definitions.define_symbol {
-            d_lfun = lfun ; d_types = 0 ;
-            d_params = params ;
-            d_definition = Predicate (Def, def) ;
-            d_cluster = cluster ;
+            d_lfun ; d_cluster = cluster () ;
+            d_types = 0 ; d_params ; d_definition = Predicate (Def, def) ;
           } ;
           begin
             match env.length with
             | None -> ()
             | Some length ->
               let ns = List.map F.e_var env.size_var in
-              frame_lemmas lfun obj ~length loc (v::ns) chunks
+              frame_lemmas d_lfun obj ~length loc (v::ns) chunks
           end ;
-          lfun , chunks
+          d_lfun , chunks
 
         let compile = Lang.local generate
       end)

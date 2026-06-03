@@ -340,9 +340,8 @@ and lsymbol = {
   m_name : string ;
   m_context : WpContext.context option ;
   m_category : lfun category ;
-  m_params : sort list ;
-  m_result : sort ;
-  m_typeof : tau option list -> tau ;
+  m_result : tau ;
+  m_params : tau list ;
   m_coloring : bool ;
 }
 
@@ -413,11 +412,10 @@ let tau_of_lfun phi ts =
     else raise Not_found
   | LFUN m ->
     begin
-      match m.m_result with
-      | Sint -> Int
-      | Sreal -> Real
-      | Sbool -> Bool
-      | _ -> m.m_typeof ts
+      try
+        typecheck m.m_category m.m_result m.m_params
+          (List.map (Option.get ~exn:Not_found) ts)
+      with _ -> raise Not_found
     end
   | QFUN f ->
     try
@@ -436,36 +434,27 @@ let is_coloring_lfun = function
 let generated_f
     ?(context=false)
     ?(category=Logic.Function)
-    ?(params=[])
-    ?(sort=Logic.Sdata)
-    ?(result:tau option)
     ?(coloring=false)
-    ?(typecheck:(tau option list -> tau) option)
-    descr =
+    ~result ~params descr =
   Format.kasprintf
     begin fun name ->
       let id = incr new_extern_id ; !new_extern_id in
       let context = if context
         then Some (WpContext.get_context ())
-        else None in
-      let typeof =
-        match typecheck with Some phi -> phi | None ->
-        match result with Some t -> fun _ -> t | None -> raise Not_found in
-      let result =
-        match result with Some t -> Kind.of_tau t | None -> sort in
+        else None
+      in
       lsymbol {
         m_id = id ;
         m_name = name ;
         m_category = category ;
         m_params = params ;
         m_result = result ;
-        m_typeof = typeof ;
         m_context = context ;
         m_coloring = coloring ;
       }
     end descr
 
-let generated_p = generated_f ~sort:Sprop ~result:Prop ~typecheck:(fun _ -> Prop)
+let generated_p = generated_f ~result:Prop
 
 let extern_l ?(category=Function) ?(coloring=false) name env =
   QFUN {
@@ -523,30 +512,30 @@ struct
     | ACSL _ -> Logic.Function
     | CTOR _ -> Logic.Constructor
 
-  let rec sort_of_qtau = function
+  let rec sort_of_tau = function
     | Int -> Sint
     | Real -> Sreal
     | Bool -> Sbool
     | Prop -> Sprop
-    | Array(_,s) -> Sarray (sort_of_qtau s)
+    | Array(_,s) -> Sarray (sort_of_tau s)
     | _ -> Sdata
 
   let sort = function
-    | LFUN m -> m.m_result
     | ACSL { l_type=None } -> Logic.Sprop
     | ACSL { l_type=Some t } -> sort_of_ltype t
     | CTOR _ -> Logic.Sdata
+    | LFUN m -> sort_of_tau m.m_result
     | QFUN f ->
       let _, t, _ = Qed.Symbol.signature f.e_symbol in
-      sort_of_qtau t
+      sort_of_tau t
 
   let parameters = ref (fun _ -> [])
 
   let params = function
-    | LFUN m -> m.m_params
+    | LFUN m -> List.map sort_of_tau m.m_params
     | QFUN f ->
       let _, _, ts = Qed.Symbol.signature f.e_symbol in
-      List.map sort_of_qtau ts
+      List.map sort_of_tau ts
     | CTOR ct -> List.map sort_of_ltype ct.ctor_params
     | (ACSL _) as f -> !parameters f
 

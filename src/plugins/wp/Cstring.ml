@@ -70,7 +70,8 @@ module LIT = WpContext.Generator(STR)
 
       let compile s =
         let id = lookup (STR.hash s) in
-        let lfun = Lang.generated_f ~result:(Array(Int,Int)) "Lit_%04X" id in
+        let result = Array(Int,Int) in
+        let lfun = Lang.generated_f ~result ~params:[] "Lit_%04X" id in
         (* Since its a generated it is the unique name given ["Lit_%04X" id] *)
         let prefix = Lang.Fun.debug lfun in
         define_symbol {
@@ -78,7 +79,7 @@ module LIT = WpContext.Generator(STR)
           d_cluster = cluster () ;
           d_types = 0 ;
           d_params = [] ;
-          d_definition = Logic (Array(Int,Int)) ;
+          d_definition = Logic result ;
         } ;
         if Wp_parameters.Literals.get () then
           begin match s with

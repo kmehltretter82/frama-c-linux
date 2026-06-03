@@ -227,44 +227,45 @@ struct
   and is_typ typ t = is_obj (Ctypes.object_of typ) t
 
   and is_record c s =
+    let tau = Lang.t_comp c in
     Definitions.call_pred
-      (Lang.generated_p ~coloring:true "%s%s" C.prefix (Lang.comp_id c))
-      (fun lfun ->
+      (Lang.generated_p ~coloring:true ~params:[tau]
+         "%s%s" C.prefix (Lang.comp_id c))
+      (fun d_lfun ->
          let basename = if c.cstruct then "S" else "U" in
-         let s = Lang.freshvar ~basename (Lang.t_comp c) in
-         let dfun =
+         let x = Lang.freshvar ~basename tau in
+         let d_definition =
            match c.cfields with
            | None -> Logic Lang.t_prop
            | Some fields ->
-             let value f = e_getfield (e_var s) (Lang.cfield f) in
+             let value f = e_getfield (e_var x) (Lang.cfield f) in
              let def = p_all (fun f -> is_typ f.ftype (value f)) fields in
              Predicate(Def,def)
          in {
-           d_lfun = lfun ; d_types = 0 ; d_params = [s] ;
-           d_cluster = Definitions.compinfo c ;
-           d_definition = dfun ;
+           d_lfun ; d_types = 0 ; d_params = [x] ;
+           d_cluster = Definitions.compinfo c ; d_definition ;
          })
       [s]
 
   and is_array elt ds t =
+    let dim = List.length ds in
+    let te = Lang.tau_of_object elt in
+    let tm = Lang.t_matrix te dim in
     Definitions.call_pred
-      (Lang.generated_p ~coloring:true "%s" (array_name elt ds))
+      (Lang.generated_p ~coloring:true ~params:[tm] "%s" (array_name elt ds))
       (fun lfun ->
          let cluster =
            match elt with
            | C_comp c -> Definitions.compinfo c
            | _ -> Definitions.matrix () in
-         let te = Lang.tau_of_object elt in
-         let d = List.length ds in
-         let x = Lang.freshvar ~basename:"T" (Lang.t_matrix te d) in
-         let fk _d = Lang.freshvar ~basename:"k" Logic.Int in
+         let x = Lang.freshvar ~basename:"T" tm in
+         let fk = fun _d -> Lang.freshvar ~basename:"k" Logic.Int in
          let ks = List.map fk ds in
-         let e = List.fold_left (fun a k -> e_get a (e_var k)) (e_var x) ks in
-         let def = p_forall ks (is_obj elt e) in
+         let pe = List.fold_left (fun a k -> e_get a (e_var k)) (e_var x) ks in
          {
            d_lfun = lfun ; d_types = 0 ; d_params = [x] ;
            d_cluster = cluster ;
-           d_definition = Predicate(Def,def) ;
+           d_definition = Predicate(Def,p_forall ks (is_obj elt pe)) ;
          }
       ) [t]
 
@@ -376,13 +377,6 @@ module EQARRAY = WpContext.Generator(AKEY)
       type key = AKEY.t
       type data = lfun
       let compile (a,ds) =
-        (* Contextual Symbol *)
-        let lfun = Lang.generated_f
-            ~context:true
-            ~sort:Logic.Sprop
-            "EqArray_%s%a" (AKEY.key a) Matrix.pp_suffix_id ds in
-        (* Simplification of the symbol *)
-        Lang.F.set_builtin lfun reduce_eqcomp ;
         (* Definition of the symbol *)
         let denv = Matrix.cc_env ds in
         let tau = Matrix.cc_tau (AKEY.tau a) ds in
@@ -392,15 +386,24 @@ module EQARRAY = WpContext.Generator(AKEY)
         let tb = e_var xb in
         let ta_xs = List.fold_left e_get ta denv.index_val in
         let tb_xs = List.fold_left e_get tb denv.index_val in
+        let d_params = denv.size_var @ [xa ; xb ] in
         let property = p_hyps (denv.index_range) (AKEY.equal a ta_xs tb_xs) in
         let definition = p_forall denv.index_var property in
+        let d_definition = Predicate(Def,definition) in
+        (* Logic Symbol *)
+        let d_lfun =
+          Lang.generated_p
+            ~params:(List.map tau_of_var d_params)
+            "EqArray_%s%a" (AKEY.key a) Matrix.pp_suffix_id ds
+        in
+        (* Simplification of the symbol *)
+        Lang.F.set_builtin d_lfun reduce_eqcomp ;
         (* Registration *)
         Definitions.define_symbol {
           d_cluster = AKEY.cluster a ;
-          d_lfun = lfun ; d_types = 0 ;
-          d_params = denv.size_var @ [xa ; xb ] ;
-          d_definition = Predicate(Def,definition) ;
-        } ; lfun
+          d_lfun ; d_types = 0 ;
+          d_params ; d_definition ;
+        } ; d_lfun
     end)
 
 (* -------------------------------------------------------------------------- *)
@@ -413,10 +416,6 @@ module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
       type key = compinfo
       type data = lfun
       let compile c =
-        (* Contextual Symbol *)
-        let lfun = Lang.generated_p ~context:true "Eq%s" (Lang.comp_id c) in
-        (* Simplification of the symbol *)
-        Lang.F.set_builtin lfun reduce_eqcomp ;
         (* Definition of the symbol *)
         let basename = if c.cstruct then "S" else "U" in
         let tc = Lang.t_comp c in
@@ -424,6 +423,7 @@ module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
         let xb = Lang.freshvar ~basename tc in
         let ra = e_var xa in
         let rb = e_var xb in
+        let d_params = [xa;xb] in
         let d_definition =
           match c.cfields with
           | None -> Logic Lang.t_prop
@@ -434,14 +434,20 @@ module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
                    !equal_rec (Ctypes.object_of f.ftype)
                      (e_getfield ra fd) (e_getfield rb fd))
                 fields
-            in Predicate(Def, def)
-        in
+            in Predicate(Def, def) in
+        (* Logic Symbol *)
+        let d_lfun =
+          Lang.generated_p ~context:true
+            ~params:(List.map tau_of_var d_params)
+            "Eq%s" (Lang.comp_id c) in
+        (* Simplification of the symbol *)
+        Lang.F.set_builtin d_lfun reduce_eqcomp ;
         (* Registration *)
         Definitions.define_symbol {
           d_cluster = Definitions.compinfo c ;
-          d_lfun = lfun ; d_types = 0 ; d_params = [xa;xb] ;
-          d_definition ;
-        } ; lfun
+          d_lfun ; d_types = 0 ;
+          d_params ; d_definition ;
+        } ; d_lfun
     end)
 
 (* -------------------------------------------------------------------------- *)

@@ -27,8 +27,9 @@ struct
     Format.kasprintf
       begin fun name ->
         let endian = if Machine.little_endian () then "le" else "be" in
-        let name = Printf.sprintf "frama_c_wp.membytes_%s.%s" endian name in
-        Lang.extern_f ?coloring name
+        Format.kasprintf
+          (Lang.extern_f ?coloring)
+          "frama_c_wp.membytes_%s.MemBytes.%s" endian name
       end descr
 
   let f_eqmem = f_membytes "eqmem"
@@ -216,14 +217,16 @@ module ShiftFieldDef = WpContext.StaticGenerator(Cil_datatype.Fieldinfo)
       type data = Definitions.dfun
 
       let generate f =
-        let result = !@MemAddr.t_addr in
-        let lfun = Lang.generated_f ~result "shiftfield_%s" (Lang.field_id f) in
+        let addr = !@MemAddr.t_addr in
+        let lfun =
+          Lang.generated_f ~result:addr ~params:[addr]
+            "shiftfield_%s" (Lang.field_id f) in
         (* Since its a generated it is the unique name given *)
-        let p = Lang.freshvar ~basename:"p" result in
+        let p = Lang.freshvar ~basename:"p" addr in
         let tp = e_var p in
         let position = e_int @@ field_offset f.fcomp f in
         let def = MemAddr.shift tp position in
-        let dfun = Definitions.Function( result , Def , def) in
+        let dfun = Definitions.Function( addr , Def , def) in
         RegisterShift.define lfun (RS_Field(f,position)) ;
         MemAddr.register ~base:phi_base ~offset:(phi_field position) lfun ;
         Definitions.{
@@ -232,7 +235,6 @@ module ShiftFieldDef = WpContext.StaticGenerator(Cil_datatype.Fieldinfo)
           d_definition = dfun ;
           d_cluster = Definitions.dummy () ;
         }
-
       let compile = Lang.local generate
     end)
 
@@ -277,16 +279,19 @@ module ShiftGen = WpContext.StaticGenerator(Cobj)
       let c_object_id c = Format.asprintf "%a@?" c_object_id c
 
       let generate obj =
-        let result = !@MemAddr.t_addr in
-        let shift = Lang.generated_f ~result "shift_%s" (c_object_id obj) in
+        let addr = !@MemAddr.t_addr in
+        let shift =
+          Lang.generated_f
+            ~result:addr ~params:[addr;Int]
+            "shift_%s" (c_object_id obj) in
         let size = protected_sizeof_object obj in
         (* Since its a generated it is the unique name given *)
-        let p = Lang.freshvar ~basename:"p" result in
+        let p = Lang.freshvar ~basename:"p" addr in
         let tp = e_var p in
-        let k = Lang.freshvar ~basename:"k" Qed.Logic.Int in
+        let k = Lang.freshvar ~basename:"k" Int in
         let tk = e_var k in
         let def = MemAddr.shift tp (e_mul size tk) in
-        let dfun = Definitions.Function( result , Def , def) in
+        let dfun = Definitions.Function( addr , Def , def) in
         RegisterShift.define shift (RS_Index size) ;
         MemAddr.register ~base:phi_base ~offset:(phi_index size)
           ~linear:true shift ;
@@ -386,28 +391,30 @@ module CODEC_FLOAT = WpContext.Generator(Float)
       type data = Lang.lfun * Lang.lfun
 
       let decode ft =
-        let result = Cfloat.tau_of_float ft in
-        let f = Lang.freshvar ~basename:"f" Lang.t_int in
+        let flt = Cfloat.tau_of_float ft in
         let decode =
-          Lang.generated_f ~result "int_to_%a" Float.pretty ft in
+          Lang.generated_f
+            ~result:flt ~params:[Int]
+            "int_to_%a" Float.pretty ft in
         Definitions.define_symbol {
           d_lfun = decode ;
           d_cluster = float_cluster () ; d_types = 0 ;
-          d_params = [ f ] ;
-          d_definition = Logic result ;
+          d_params = [ Lang.freshvar ~basename:"x" Int ] ;
+          d_definition = Logic flt ;
         } ;
         decode
 
       let encode ft =
-        let result = Lang.t_int in
-        let f = Lang.freshvar ~basename:"f" @@ Cfloat.tau_of_float ft in
+        let flt = Cfloat.tau_of_float ft in
         let encode =
-          Lang.generated_f ~result "%a_to_int" Float.pretty ft in
+          Lang.generated_f
+            ~result:Int ~params:[flt]
+            "%a_to_int" Float.pretty ft in
         Definitions.define_symbol {
           d_lfun = encode ;
           d_cluster = float_cluster () ; d_types = 0 ;
-          d_params = [ f ] ;
-          d_definition = Logic result ;
+          d_params = [ Lang.freshvar ~basename:"x" flt ] ;
+          d_definition = Logic Int ;
         } ;
         encode
 
@@ -484,7 +491,7 @@ let load_pointer sigma _ty loc =
   MemAddr.addr_of_int @@ load_int sigma (Ctypes.c_ptr ()) loc
 
 let load_init_atom sigma obj loc =
-  WBytes.read_init (Sigma.value sigma m_init) (sizeof_object obj) loc
+  WBytes.read_init (Sigma.value sigma m_init) (bits_sizeof_object obj) loc
 
 let store_int sigma i p v = m_mem, WBytes.write (Sigma.value sigma m_mem) i p v
 
@@ -495,7 +502,7 @@ let store_pointer sigma _kind addr v =
   store_int sigma (Ctypes.c_ptr ()) addr @@ MemAddr.int_of_addr v
 
 let store_init_atom sigma obj loc v =
-  m_init, WBytes.write_init (Sigma.value sigma m_init) (sizeof_object obj) loc v
+  m_init, WBytes.write_init (Sigma.value sigma m_init) (bits_sizeof_object obj) loc v
 
 module LOADER =
 struct
@@ -648,17 +655,19 @@ module BASE = WpContext.Generator(Cil_datatype.Varinfo)
           if vi.vglob
           then if acs_rd then "K" else "G"
           else if vi.vformal then "P" else "L" in
-        let lfun = Lang.generated_f
-            ~category:Logic.Constructor ~result:Logic.Int "%s_%s_%d"
-            prefix vi.vorig_name vi.vid in
+        let d_lfun =
+          Lang.generated_f
+            ~category:Logic.Constructor
+            ~result:Int ~params:[]
+            "%s_%s_%d" prefix vi.vorig_name vi.vid in
         Definitions.define_symbol {
-          d_lfun = lfun ; d_types = 0 ; d_params = [ ] ;
+          d_lfun = d_lfun ; d_types = 0 ; d_params = [] ;
           d_definition = Definitions.Function (result, Def, e_int vi.vid) ;
           d_cluster = cluster_globals () ;
         } ;
-        let prefix = Lang.Fun.debug lfun in
-        let base = e_fun lfun [] in
-        RegisterBASE.define lfun vi ;
+        let prefix = Lang.Fun.debug d_lfun in
+        let base = e_fun d_lfun [] in
+        RegisterBASE.define d_lfun vi ;
         static_alloc prefix base ;
         region prefix vi base ;
         alloc prefix vi base ;
@@ -735,12 +744,12 @@ module STRING = WpContext.Generator(LITERAL)
 
       let compile (_,cst) =
         let eid = fresh () in
-        let lfun = Lang.generated_f ~result:Lang.t_int "Str_%d" eid in
+        let d_lfun = Lang.generated_f ~result:Int ~params:[] "Str_%d" eid in
         (* Since its a generated it is the unique name given *)
-        let prefix = Lang.Fun.debug lfun in
-        let base = Lang.F.e_fun lfun [] in
+        let prefix = Lang.Fun.debug d_lfun in
+        let base = Lang.F.e_fun d_lfun [] in
         Definitions.define_symbol {
-          d_lfun = lfun ; d_types = 0 ; d_params = [] ;
+          d_lfun ; d_types = 0 ; d_params = [] ;
           d_definition = Logic Lang.t_int ;
           d_cluster = Cstring.cluster () ;
         } ;
@@ -878,7 +887,7 @@ module PointersProperties = WpContext.Generator(Datatype.Unit)
         }
 
       let compile () =
-        let lfun = Lang.generated_p "framed" in
+        let lfun = Lang.generated_p ~params:[WBytes.t_memory] "framed" in
         let m = Lang.freshvar ~basename:"m" WBytes.t_memory in
         let a = Lang.freshvar ~basename:"a" (!@MemAddr.t_addr) in
         let p = load_pointer_raw (e_var m) (Cil_const.voidPtrType) (e_var a) in
@@ -890,8 +899,9 @@ module PointersProperties = WpContext.Generator(Datatype.Unit)
         in
         Definitions.define_symbol {
           d_lfun = lfun ;
-          d_cluster = pointer_cluster () ; d_types = 0 ;
-          d_params = [ m ] ; d_definition = Predicate (Def, body)
+          d_cluster = pointer_cluster () ;
+          d_params = [ m ] ; d_types = 0 ;
+          d_definition = Predicate (Def, body)
         };
         ranges () ;
         lfun

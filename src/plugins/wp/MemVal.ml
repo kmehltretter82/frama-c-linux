@@ -221,9 +221,11 @@ struct
 
         let read suffix t_mem t_data  =
           let result = t_data in
-          let lfun = Lang.generated_f ~result "read_%s" suffix in
+          let lfun = Lang.generated_f
+              ~result ~params:[t_mem;Int]
+              "read_%s" suffix in
           let xw = Lang.freshvar ~basename:"w" t_mem in
-          let xo = Lang.freshvar ~basename:"o" Logic.Int in
+          let xo = Lang.freshvar ~basename:"o" Int in
           let dfun = Definitions.Logic result in
           let cluster = cluster () in
           Definitions.define_symbol {
@@ -236,9 +238,11 @@ struct
 
         let write suffix t_mem t_data =
           let result = t_mem in
-          let lfun = Lang.generated_f ~result "write_%s" suffix in
+          let lfun = Lang.generated_f
+              ~result ~params:[t_mem;Int;t_data]
+              "write_%s" suffix in
           let xw = Lang.freshvar ~basename:"w" t_mem in
-          let xo = Lang.freshvar ~basename:"o" Logic.Int in
+          let xo = Lang.freshvar ~basename:"o" Int in
           let xv = Lang.freshvar ~basename:"v" t_data in
           let dfun = Definitions.Logic result in
           let cluster = cluster () in
