@@ -1,0 +1,9 @@
+[e-acsl] beginning translation.
+[e-acsl:analysis:inductive] extracting predicate from repr using mode: complete
+[e-acsl] vacid_0_union_find.c:13: Warning: 
+  E-ACSL construct
+  `logic functions or predicates with no definition nor reads clause'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] translation done in project "e-acsl".
+[eva:alarm] vacid_0_union_find.c:40: Warning: assertion got status unknown.

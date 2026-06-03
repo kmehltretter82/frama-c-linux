@@ -18,6 +18,8 @@ module Vars = struct
   let unions = List.fold_left union empty
 end
 
+exception Unsupported (* predicate form not supported *)
+
 include struct (* auxiliary functions *)
 
   let predicate_has_rec_occurrence ~lv_rec p =
@@ -44,12 +46,23 @@ include struct (* auxiliary functions *)
       | Some (li, li') when Logic_info.equal this_li li -> Cil.ChangeTo li'
       | Some _ | None -> Cil.DoChildren
 
-    method !vterm = function
-      | {term_node = TLval (TVar v, TNoOffset)} ->
-        (try
-           let t = Misc.Id_term.deep_copy @@ Logic_var.Map.find v substs in
-           Cil.ChangeTo t
-         with Not_found -> DoChildren)
+    method !vterm t = match t with
+      | {term_node = TLval (TVar v, offset)} ->
+        begin match Logic_var.Map.find_opt v substs, offset with
+          | Some subst, TNoOffset -> Cil.ChangeTo (Misc.Id_term.deep_copy subst)
+          | Some {term_node = TLval (TVar v', TNoOffset)}, offset ->
+            let t' =
+              Misc.Id_term.deep_copy {t with term_node = TLval (TVar v', offset)}
+            in
+            Cil.ChangeDoChildrenPost (t', fun x -> x)
+          | Some subst, _ ->
+            Options.debug ~dkey "could not apply substitution %a ↦ %a to term %a"
+              Printer.pp_logic_var v
+              Printer.pp_term subst
+              Printer.pp_term t;
+            raise Unsupported
+          | None, _ -> DoChildren
+        end
       | _ -> Cil.DoChildren
   end
 
@@ -81,8 +94,6 @@ include struct (* auxiliary functions *)
 end (* auxiliary functions *)
 
 let is_inductive = function {l_body = LBinductive _; _} -> true | _ -> false
-
-exception Unsupported (* predicate form not supported *)
 
 let unsupported ?loc x y z =
   Options.feedback ~dkey ?source:(Option.map fst loc) x y z;
@@ -501,6 +512,7 @@ end = functor (Out : Out_language) -> struct
           Out.mk_if ~loc:conjunction.pred_loc conjunction case_true next_ctor
       in
       let rec compile ~uv ~conds p =
+        Options.debug ~dkey ~level:5 "compile ~uv:%a ~conds %a" Vars.pretty uv Printer.pp_predicate p;
         let recurse ?(uv = uv) ?(conds = conds) =
           (* conds : gathered hypotheses *)
           compile ~uv ~conds in
