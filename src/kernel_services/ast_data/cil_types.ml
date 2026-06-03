@@ -167,7 +167,7 @@ type standard_or_gcc =
     {!Cil.iterGlobals} and {!Cil.foldGlobals}. You can also use the
     {!Cil_datatype.File.dummy} when you need a {!Cil_types.file} as a
     placeholder. For each global item CIL stores the source location where it
-    appears (using the type {!Cil_types.location})
+    appears (using the type {!Fileloc.t})
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 type file = {
   mutable fileName: Filepath.t;   (** The complete file name *)
@@ -196,12 +196,12 @@ type file = {
     important.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and global =
-  | GType of typeinfo * location
+  | GType of typeinfo * Fileloc.t
   (** A typedef. All uses of type names (through the [TNamed] constructor)
       must be preceded in the file by a definition of the name. The string
       is the defined name and always not-empty. *)
 
-  | GCompTag of compinfo * location
+  | GCompTag of compinfo * Fileloc.t
   (** Defines a struct/union tag with some fields. There must be one of
       these for each struct/union tag that you use (through the [TComp]
       constructor) since this is the only context in which the fields are
@@ -209,28 +209,28 @@ and global =
       broken into individual definitions with the innermost structure
       defined first. *)
 
-  | GCompTagDecl of compinfo * location
+  | GCompTagDecl of compinfo * Fileloc.t
   (** Declares a struct/union tag. Use as a forward declaration. This is
       printed without the fields.  *)
 
-  | GEnumTag of enuminfo * location
+  | GEnumTag of enuminfo * Fileloc.t
   (** Declares an enumeration tag with some fields. There must be one of
       these for each enumeration tag that you use (through the [TEnum]
       constructor) since this is the only context in which the items are
       printed. *)
 
-  | GEnumTagDecl of enuminfo * location
+  | GEnumTagDecl of enuminfo * Fileloc.t
   (** Declares an enumeration tag. Use as a forward declaration. This is
       printed without the items.  *)
 
-  | GVarDecl of varinfo * location
+  | GVarDecl of varinfo * Fileloc.t
   (** A variable declaration (not a definition) for a variable with object
       type. There can be several declarations and at most one definition for
       a given variable. If both forms appear then they must share the same
       varinfo structure. Either has storage Extern or there must be a
       definition in this file *)
 
-  | GFunDecl of funspec * varinfo * location
+  | GFunDecl of funspec * varinfo * Fileloc.t
   (** A variable declaration (not a definition) for a function, i.e. a
       prototype. There can be several declarations and at most one definition
       for a given function. If both forms appear then they must share the same
@@ -238,27 +238,27 @@ and global =
       definition. Either has storage Extern or there must be a definition in
       this file. *)
 
-  | GVar  of varinfo * initinfo * location
+  | GVar  of varinfo * initinfo * Fileloc.t
   (** A variable definition. Can have an initializer. The initializer is
       updateable so that you can change it without requiring to recreate the
       list of globals. There can be at most one definition for a variable in an
       entire program. Cannot have storage Extern or function type. *)
 
-  | GFun of fundec * location
+  | GFun of fundec * Fileloc.t
   (** A function definition.
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-  | GAsm of string * location
+  | GAsm of string * Fileloc.t
   (** Global asm statement. These ones can contain only a template *)
 
-  | GPragma of attribute * location
+  | GPragma of attribute * Fileloc.t
   (** Pragmas at top level. Use the same syntax as attributes *)
 
   | GText of string
   (** Some text (printed verbatim) at top level. E.g., this way you can put
       comments in the output.  *)
 
-  | GAnnot of global_annotation * location
+  | GAnnot of global_annotation * Fileloc.t
   (** a global annotation. Can be
       - an axiom or a lemma
       - a predicate declaration or definition
@@ -518,7 +518,7 @@ and fieldinfo = {
   mutable fattr: attributes;
   (** The attributes for this field (not for its type) *)
 
-  mutable floc: location;
+  mutable floc: Fileloc.t;
   (** The location where this field is defined *)
 
   mutable faddrof: bool;
@@ -578,7 +578,7 @@ and enumitem = {
   mutable eihost: enuminfo; [@printer fun fmt ei -> Format.fprintf fmt "<ename:%S>" ei.ename]
   (** the host enumeration in which the item is declared. *)
 
-  eiloc: location;
+  eiloc: Fileloc.t;
 }
 
 (** Information about a defined type.
@@ -673,7 +673,7 @@ and varinfo = {
   mutable vinline: bool;
   (** Whether this varinfo is for an inline function. *)
 
-  mutable vdecl: location;
+  mutable vdecl: Fileloc.t;
   (** Location of variable declaration. *)
 
   mutable vid: int;
@@ -768,7 +768,7 @@ and storage =
 and exp = {
   eid: int; (** unique identifier *)
   enode: exp_node; (** the expression itself *)
-  eloc: location; (** location of the expression. *)
+  eloc: Fileloc.t; (** location of the expression. *)
 }
 
 and exp_node =
@@ -1139,16 +1139,16 @@ and stmt = {
 
 (** Labels *)
 and label =
-  | Label of string * location * bool
+  | Label of string * Fileloc.t * bool
   (** A real label. If the bool is "true", the label is from the input source
       program. If the bool is "false", the label was created by CIL or some
       other transformation *)
 
-  | Case of exp * location
+  | Case of exp * Fileloc.t
   (** A case statement. This expression is lowered into a constant if
       {!Cil.lowerConstants} is set to [true]. *)
 
-  | Default of location  (** A default statement *)
+  | Default of Fileloc.t  (** A default statement *)
 
 (* The various kinds of statements *)
 and stmtkind =
@@ -1157,14 +1157,14 @@ and stmtkind =
       falls through.
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-  | Return of exp option * location
+  | Return of exp option * Fileloc.t
   (** The return statement. This is a leaf in the CFG.
       After {!Oneret} normalization, the optional expression should be either
       [None] or [Some ({ enode = Lval (Var vi, NoOffset); _ })].
 
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-  | Goto of (stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d>" s.sid]) ref * location
+  | Goto of (stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d>" s.sid]) ref * Fileloc.t
   (** A goto statement. Appears from actual goto's in the code or from goto's
       that have been inserted during elaboration. The reference points to the
       statement that is the target of the Goto. This means that you have to
@@ -1172,21 +1172,21 @@ and stmtkind =
       target statement MUST have at least a label.
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-  | Break of location
+  | Break of Fileloc.t
   (** A break to the end of the nearest enclosing Loop or Switch.
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-  | Continue of location
+  | Continue of Fileloc.t
   (** A continue to the start of the nearest enclosing [Loop].
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-  | If of exp * block * block * location
+  | If of exp * block * block * Fileloc.t
   (** A conditional. Two successors, the "then" and the "else" branches (in
       this order).
       Both branches fall-through to the successor of the If statement.
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-  | Switch of exp * block * (stmt list) * location
+  | Switch of exp * block * (stmt list) * Fileloc.t
   (** A switch statement. [exp] is the index of the switch. [block] is
       the body of the switch. [stmt list] contains the set of
       statements whose [labels] are cases of the switch (i.e. for each
@@ -1197,7 +1197,7 @@ and stmtkind =
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | Loop of
-      code_annotation list * block * location
+      code_annotation list * block * Fileloc.t
       * ((stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d>" s.sid]) option)
       * ((stmt [@printer fun fmt s -> Format.fprintf fmt "<sid:%d>" s.sid]) option)
   (** A [while(1)] loop. The termination test is implemented in the body of a
@@ -1243,7 +1243,7 @@ and stmtkind =
       like a block (see {!Cil.block_from_unspecified_sequence}).
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-  | Throw of (exp * typ) option * location
+  | Throw of (exp * typ) option * Fileloc.t
   (** Throws an exception, C++ style.
       We keep the type of the expression, to match
       it against the appropriate catch clause. A Throw node has
@@ -1252,15 +1252,15 @@ and stmtkind =
       completely separate, as in Jo and Chang, ICSSA 2004.
   *)
 
-  | TryCatch of block * (catch_binder * block) list * location
+  | TryCatch of block * (catch_binder * block) list * Fileloc.t
 
-  | TryFinally of block * block * location
+  | TryFinally of block * block * Fileloc.t
   (** On MSVC we support structured exception handling. This is what you might
       expect. Control can get into the finally block either from the end of the
       body block, or if an exception is thrown.
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-  | TryExcept of block * (instr list * exp) * block * location
+  | TryExcept of block * (instr list * exp) * block * Fileloc.t
   (** On MSVC we support structured exception handling. The try/except
        statement is a bit tricky:
       {@c[ __try { blk } __except (e) { handler } ]}
@@ -1301,11 +1301,11 @@ and catch_binder =
 (** Instructions. They may cause effects directly but may not have control
     flow.*)
 and instr =
-  | Set of lval * exp * location
+  | Set of lval * exp * Fileloc.t
   (** An assignment. A cast is present if the exp has different type from
       lval *)
 
-  | Call of lval option * lhost * exp list * location
+  | Call of lval option * lhost * exp list * Fileloc.t
   (** optional: result is an lval. A cast might be necessary if the declared
       result type of the function is not the same as that of the destination.
       Actual arguments must have a type equivalent (i.e. {!Cil.need_cast} must
@@ -1314,7 +1314,7 @@ and instr =
       the function result then an implicit cast exists.
       @before 32.0-Germanium the function was an expression instead of a lhost.
   *)
-  | Local_init of varinfo * local_init * location
+  | Local_init of varinfo * local_init * Fileloc.t
   (** initialization of a local variable. The corresponding varinfo must
       belong to the [blocals] list of the innermost enclosing block that does
       not have attribute {!Cil.block_no_scope_attr}. Such blocks are purely
@@ -1333,7 +1333,7 @@ and instr =
       attributes (* Really only const and volatile can appear here *)
       * string list (* templates (CR-separated) *)
       * extended_asm option
-      * location
+      * Fileloc.t
   (** An inline assembly instruction. The arguments are
       (1) a list of attributes (only const and volatile can appear here and only
       for GCC)
@@ -1341,9 +1341,9 @@ and instr =
       (3) GCC extended asm information if any
       (4) location information *)
 
-  | Skip of location
+  | Skip of Fileloc.t
 
-  | Code_annot of code_annotation * location
+  | Code_annot of code_annotation * Fileloc.t
 
 (** GNU extended-asm information:
     - a list of outputs, each of which is an lvalue with optional names and
@@ -1364,9 +1364,6 @@ and extended_asm =
   (** list of statements this asm section may jump to. Destination
       must have a label. *);
   }
-
-(** Describes a location in a source file *)
-and location = Fileloc.t
 
 (** {1 Abstract syntax trees for annotations} *)
 
@@ -1499,7 +1496,7 @@ and model_info = {
   mi_name: string; (** name *)
   mi_field_type: logic_type; (** type of the field *)
   mi_base_type: typ; (** type to which the field is associated. *)
-  mi_decl: location; (** where the field has been declared. *)
+  mi_decl: Fileloc.t; (** where the field has been declared. *)
   mutable mi_attr: attributes;
   (** attributes tied to the field.
       @since Phosphorus-20170501-beta1 *)
@@ -1694,7 +1691,7 @@ and toplevel_predicate = {
 (** predicates with a location and an optional list of names *)
 and predicate = {
   pred_name : string list; (** list of given names *)
-  pred_loc : location;     (** position in the source code. *)
+  pred_loc : Fileloc.t;     (** position in the source code. *)
   pred_content : predicate_node;(** content *)
 }
 
@@ -1769,7 +1766,7 @@ and acsl_extension = {
   ext_id : int;
   ext_name : string;
   ext_plugin : string; (** @since 30.0-Zinc *)
-  ext_loc : location;
+  ext_loc : Fileloc.t;
   ext_has_status : bool;
   ext_kind : acsl_extension_kind
 }
@@ -1881,27 +1878,27 @@ and loader = {
 
 (** global annotations, not attached to a statement or a function. *)
 and global_annotation =
-  | Dfun_or_pred of logic_info * location
+  | Dfun_or_pred of logic_info * Fileloc.t
   | Dvolatile of
       identified_term list * varinfo option * varinfo option
-      * attributes * location
+      * attributes * Fileloc.t
   (** associated terms, reading function, writing function *)
-  | Daxiomatic of string * global_annotation list * attributes * location
+  | Daxiomatic of string * global_annotation list * attributes * Fileloc.t
   | Dmodule of
-      string * global_annotation list * attributes * loader option * location
-  | Dtype of logic_type_info * location (** declaration of a logic type. *)
+      string * global_annotation list * attributes * loader option * Fileloc.t
+  | Dtype of logic_type_info * Fileloc.t (** declaration of a logic type. *)
   | Dlemma of
       string * logic_label list * string list *
-      toplevel_predicate * attributes * location
+      toplevel_predicate * attributes * Fileloc.t
   (** definition of all kinds of lemmas (axioms are admit lemmas).  *)
-  | Dinvariant of logic_info * location
+  | Dinvariant of logic_info * Fileloc.t
   (** global invariant. The predicate does not have any argument. *)
-  | Dtype_annot of logic_info * location
+  | Dtype_annot of logic_info * Fileloc.t
   (** type invariant. The predicate has exactly one argument. *)
-  | Dmodel_annot of model_info * location
+  | Dmodel_annot of model_info * Fileloc.t
   (** Model field for a type t, seen as a logic function with one
       argument of type t *)
-  | Dextended of acsl_extension * attributes * location
+  | Dextended of acsl_extension * attributes * Fileloc.t
   (** Extended global clause.
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
   *)
@@ -1913,8 +1910,8 @@ type kinstr =
 
 (** Internal representation of decorated C functions *)
 type cil_function =
-  | Definition of (fundec * location) (** defined function *)
-  | Declaration of (funspec * varinfo * varinfo list option * location)
+  | Definition of (fundec * Fileloc.t) (** defined function *)
+  | Declaration of (funspec * varinfo * varinfo list option * Fileloc.t)
   (** Declaration(spec,f,args,loc) represents a leaf function [f] with
       specification [spec] and arguments [args], at location [loc]. As
       with the [TFun] constructor of {!Cil_types.typ}, the arg list is
@@ -1957,3 +1954,7 @@ type syntactic_scope =
       @since 27.0-Cobalt
   *)
 [@@deriving show { with_path = false } ]
+
+(** Describes a location in a source file *)
+type location = Fileloc.t
+[@@deprecated "use Fileloc.t instead."]
