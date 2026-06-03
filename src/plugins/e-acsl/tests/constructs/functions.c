@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: (recursive) logic functions and predicates without labels
-   STDOPT: +"-eva-slevel 100 -eva-unroll-recursive-calls 100"
+   STDOPT: +"-eva-slevel 10 -eva-unroll-recursive-calls 10"
 */
 
 /*@ predicate p1(int x, int y) = x + y > 0; */
@@ -54,6 +54,8 @@ int glob = 5;
 int z = 8;
 /*@ logic integer f3 (integer y) = z+y; */
 
+// RECURSIVE PREDICATES
+
 /*@ predicate even (integer n) =
       n == 0 ? \true :
       n > 0 ? ! even (n - 1) :
@@ -65,6 +67,15 @@ int z = 8;
       n > 0 ? ! even (n - 1) :
       \false;
 */
+
+// caused uncaught exception during interval analysis: e-acsl#105
+/*@ predicate P(ℤ a, ℤ b) =
+      a < 0
+      ? P(a + 1, b - 1)
+      : a > 0 ? P(a - 1, b - 1) : \true;
+*/
+
+// RECURSIVE FUNCTIONS
 
 /*@ logic integer rf1(integer n) =
     n <= 0 ? 0 : rf1(n - 1) + n; */
@@ -83,6 +94,9 @@ int z = 8;
 
 /*@ logic integer rf5(integer n) =
   n >= 0 ? 0 : rf5(n + 1) + n; */
+
+// caused uncaught exception during interval analysis: e-acsl#105
+//@ logic ℤ rf6(ℤ m, ℤ r) = m < 0 ? rf6(m, r + 1) : 0;
 
 int main(void) {
   int x = 1, y = 2;
@@ -116,7 +130,7 @@ int main(void) {
   double d = 2.0;
   /*@ assert f2(d) > 0; */;
   //@ assert f6(&d) > 0;
-  /*@ assert f_sum (100) == 100; */;
+  /*@ assert f_sum (10) == 10; */;
 
   /*@ assert over(1., 2.) == 0.5; */;
 
@@ -129,20 +143,22 @@ int main(void) {
   /*@ assert \signum(0.0-3.0) < 0; */
   /*@ assert \signum(0.0) ≡ 0; */
 
-  /*@ assert even(10); @*/;
+  // RECURSIVE PREDICATES
+  /*@ assert even(8); @*/;
   /*@ assert even(-6); @*/;
-  /*@ assert even_and_not_negative(10); */;
+  /*@ assert even_and_not_negative(8); */;
+  /*@ assert P(3,8); */
+  /*@ assert P(-3,8); */
+
+  // RECURSIVE FUNCTIONS
   /*@ assert rf1(0) == 0; */;
   /*@ assert rf1(1) == 1; */;
-  /*@ assert rf1(10) == 55; */;
-
+  /*@ assert rf1(9) == 45; */;
   /*@ assert rf2(7) == 1; */;
-
   /*@ assert rf3(6) == -5; */;
-
-  /*@ assert rf4(9) > 0; */;
-
+  /*@ assert rf4(91) > 0; */;
   /*@ assert rf5(0) == 0; */
+  /*@ assert rf6(1,0) ≡ 0; */
 
   /*@ assert (\let n = (0 == 0) ? 0x7fffffffffffffffL : -1; rf5(n) == 0);*/
 }

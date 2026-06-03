@@ -25,11 +25,7 @@
 Plugin E-ACSL <next-release>
 ###############################################################################
 
-
-###############################################################################
-Plugin E-ACSL 34.0 (Selenium)
-###############################################################################
-
+-* E-ACSL     [2026-05-22] Fix crash due to interval analysis failure.
 -  E-ACSL     [2026-05-20] New option -e-acsl-O <n> that configures the level
                            of optimization. Default is 2. Replaces
                            -e-acsl-interlang-opt.
