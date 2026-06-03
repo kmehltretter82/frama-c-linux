@@ -6,8 +6,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-type "set" = "set.Set.set"
-type "\\list" = "list.List.list"
+type "set" = "set.Set.set";
+type "\\list" = "list.List.list";
 
 logic integer "\\max"(integer,integer) =
       commutative:associative:idempotent: "int.MinMax.max";

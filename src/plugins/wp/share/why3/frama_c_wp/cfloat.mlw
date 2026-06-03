@@ -50,6 +50,9 @@ theory Cfloat
 
   function to_f32 real : f32
   function to_f64 real : f64
+  function to_fq32 real : f32
+  function to_fq64 real : f64
+
 
   axiom to_float_is_finite_32: forall f:f32. is_finite_f32(f) -> F32.eq (to_f32( of_f32 f )) f
   axiom to_f32_range_round: forall x. F32.in_range x -> of_f32 (to_f32 x) = F32.round Rounding.RNE x

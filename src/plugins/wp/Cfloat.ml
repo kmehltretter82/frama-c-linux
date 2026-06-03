@@ -31,8 +31,8 @@ let ft_suffix = function Float32 -> "f32" | Float64 -> "f64"
 let pp_suffix fmt ft = Format.pp_print_string fmt (ft_suffix ft)
 
 (* Qed exact representations, linked to f32/f64 *)
-let fq32 = Lang.extern_f "frama_c_wp.cfloat.Cfloat.to_f32"
-let fq64 = Lang.extern_f "frama_c_wp.cfloat.Cfloat.to_f64"
+let fq32 = Lang.extern_f "frama_c_wp.cfloat.Cfloat.to_fq32"
+let fq64 = Lang.extern_f "frama_c_wp.cfloat.Cfloat.to_fq64"
 
 let mk_builtin descr =
   Ctypes.f_memo (Format.kasprintf Lang.extern_f descr pp_suffix)
@@ -81,7 +81,6 @@ type op =
   | ROUND
   | EXACT
 
-[@@@ warning "-32"]
 let op_name = function
   | LT -> "lt"
   | EQ -> "eq"
@@ -95,7 +94,6 @@ let op_name = function
   | REAL -> "of"
   | ROUND -> "to"
   | EXACT -> "exact"
-[@@@ warning "+32"]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Registry                                                           --- *)
