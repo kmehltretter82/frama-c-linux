@@ -6,14 +6,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type attr = [ `Nullable | `Allocated | `Garbage | `Readonly ]
+type attr = [ `Nullable | `Allocated | `Garbage | `Validread ]
 type flags = A of int [@@ unboxed]
 
 let flag = function
   | `Nullable  -> 0b0001
   | `Allocated -> 0b0010
   | `Garbage   -> 0b0100
-  | `Readonly  -> 0b1000
+  | `Validread  -> 0b1000
 
 let empty = A 0
 let add a (A w) = A (flag a lor w)
@@ -24,15 +24,15 @@ let subset (A x) (A y) = (x lor y) = y
 let iter f w =
   List.iter
     (fun a -> if mem a w then f a)
-    [ `Nullable ; `Allocated ; `Garbage ; `Readonly ]
+    [ `Nullable ; `Allocated ; `Garbage ; `Validread ]
 
 let pp_attr fmt = function
   | `Nullable  -> Format.pp_print_string fmt "nullable"
   | `Allocated -> Format.pp_print_string fmt "allocated"
   | `Garbage   -> Format.pp_print_string fmt "garbage"
-  | `Readonly  -> Format.pp_print_string fmt "readonly"
+  | `Validread  -> Format.pp_print_string fmt "validread"
 
-let reversed = flag `Readonly
+let reversed = flag `Validread
 (* flags that shall be merged with land instead of lor *)
 
 let bottom = A reversed
@@ -69,6 +69,6 @@ let cvar ~garbage v =
   let flags = ref empty in
   let set f = flags := add f !flags in
   if is_local v then set `Allocated ;
-  if is_const v then set `Readonly ;
+  if is_const v then set `Validread ;
   if not @@ is_initialized ~garbage v then set `Garbage ;
   !flags

@@ -178,7 +178,7 @@ let rec parse_region (env:env) p =
   | PLvar "\\nullable"  -> env.flags <- Attr.add `Nullable  env.flags
   | PLvar "\\allocated" -> env.flags <- Attr.add `Allocated env.flags
   | PLvar "\\garbage"   -> env.flags <- Attr.add `Garbage   env.flags
-  | PLvar "\\readonly"  -> env.flags <- Attr.add `Readonly  env.flags
+  | PLvar "\\validread"  -> env.flags <- Attr.add `Validread  env.flags
   | PLnamed( name , p ) ->
     flush (fst p.lexpr_loc) env ;
     env.named <- name ;

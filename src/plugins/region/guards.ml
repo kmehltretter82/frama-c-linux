@@ -92,7 +92,7 @@ let nullable ~flags p =
 
 let valid ~flags acs p =
   match acs with
-  | Write when Attr.mem `Readonly flags -> g_valid acs p
+  | Write when Attr.mem `Validread flags -> g_valid acs p
   | Read | Write when not @@ Attr.mem `Allocated flags -> nullable ~flags p
   | Initialized when not @@ Attr.mem `Garbage flags -> g_true
   | _ -> g_valid acs p
@@ -106,7 +106,7 @@ let requires ~spec node p =
   if Attr.mem `Allocated spec
   then g_imply (valid ~flags Read p) initialized
   else
-    let acs = if Attr.mem `Readonly spec then Read else Write in
+    let acs = if Attr.mem `Validread spec then Read else Write in
     let accessible = valid ~flags acs p in
     let wellformed = g_and accessible initialized in
     if Attr.mem `Nullable spec
