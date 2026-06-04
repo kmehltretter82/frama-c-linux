@@ -22,6 +22,14 @@ Open Source Release <next-release>
 Open Source Release 33.0 (Arsenic)
 ###############################################################################
 
+-   Ivette    [2026-06-02] A new sidebar lists callstacks analyzed by Eva.
+              The user can restrict Eva results to a given set of callstacks.
+-   Eva       [2026-06-01] Do not rely on pointer types to know if they can
+              point to volatile memory. Warn when an lvalue with non-volatile
+              type may refer to an object defined with a volatile type.
+-*  Eva       [2026-05-26] Fix bug when evaluating ACSL annotations on pointers
+              to arrays as main arguments or as globals with `-lib-entry`.
+o   Eva       [2026-05-26] Export API to register new abstract domains.
 o!  Kernel    [2026-05-21] Positions and locations are now handled in new
               modules `Filepos` and `Fileloc` (which are also a datatype).
               `Filepath.position`, `Cil_datatype.Position`,
@@ -31,8 +39,16 @@ o!  Kernel    [2026-05-21] Positions and locations are now handled in new
               path of inclusion for header files, hopefully improving error
               reporting to the user.
 -!  Ivette    [2026-05-05] `ivette` binary has been renamed `frama-c-gui`
+-   Ivette    [2026-04-30] Studia and Slicing actions ask confirmation before
+              running an Eva analysis.
 o!  Kernel    [2026-04-29] Split module `Locations` into `Addresses`, `Locations`
               and `Memory_zone`. Rename type `location` and some functions.
+-*  Ivette    [2026-04-20] Fix synchronization issues between Ivette and Frama-C.
+-   Ivette    [2026-04-20] Support selection of multiple taint names at once.
+-   Eva       [2026-04-17] More precise evaluation of ACSL quantifiers in simple
+              cases.
+-   Ivette    [2026-04-16] Improve sidebar behavior: show/hide sidebar with
+              Ctrl+B shortcut or by clicking on the selected sidebar button.
 o!  Kernel    [2026-04-13] Use ppx_deriving.show to generate debug printers
               for `Cabs` and `Cil_types` ASTs. `Cabs_debug` et `Cil_types_debug`
               are now deprecated.
@@ -41,14 +57,21 @@ o!  Kernel    [2026-04-13] Use ppx_deriving.show to generate debug printers
 -   Kernel    [2026-04-06] ACSL ternary operator for terms now permits
               predicates as conditionals: <pred> ? <term> : <term>
 -o  Kernel    [2026-04-06] Pif/Tif conditionals are now predicates (not terms)
+-   Ivette    [2026-03-27] Fix AST blinking during an Eva analysis.
+-   Ivette    [2026-03-27] New modal window for Studia and Evaluate actions.
 -   Eva       [2026-03-24] Improve performance on dynamic allocation
               with option `-eva-alloc-builtin imprecise`.
+-   Eva       [2026-03-24] Avoid unresponsive GUI at the start of an analysis,
+              during the initialization of global variables.
 o!  Kernel    [2026-03-24] Rename module `Int_Base` into `Z_or_top`. Change
               its type to `Z.t Lattice_bounds.or_top`.
 -*  Kernel    [2026-03-19] Gracefully exit when parsing float with an oversized
               exponent instead of exhausting all system memory.
 -   Kernel    [2026-03-19] New flag -pow-limit for setting the greatest
               supported supported exponent in integer exponentiation.
+-   Eva       [2026-03-18] The analysis of a concurrent program is now run by
+              `-eva -mthread` instead of `-mthread` only.
+-   Ivette    [2026-03-18] On Eva taint analysis, show taint names in Inspector.
 o   Ptests    [2026-03-13] Add a new directive ENV to ptests. It is now
               possible to define environment variables for OPT, STDOPT and
               EXECNOW directives via `ENV: <variable-name> <value>`, see
@@ -61,28 +84,55 @@ o!  Kernel    [2026-03-02] Move `Cmdline.Kernel_log` to its own `Kernel_log`
               as well and are now imported in `Kernel`. `Kernel_log` should
               only be used to avoid dependency cycles with `Plugin` or `Cmdline`
               modules, in other cases, use `Kernel` directly.
+-*  Ivette    [2026-02-27] Fix sorting by function names in the Coverage panel.
+-   Ivette    [2026-02-20] New Mthread panel displaying synthetic results about
+              threads, mutexes and shared memory from the Eva analysis of a
+              concurrent program with `-mthread`.
 o   Kernel    [2026-02-17] Change API of extensible printer to avoid too early
               instantiation
 -   Kernel    [2026-02-16] Updated 'frama-c-script configure' to better match
               the target configuration w.r.t. Frama-C's libc.
+-   Eva       [2026-02-14] Reduce analysis time and memory consumption when
+              analyzing concurrent programs with `-mthread`.
+-   Eva       [2026-02-12] `-eva-verbose` configures verbosity from 0 (no
+              message) to 11 (all messages); defaults to 5. This option
+              automatically sets up message categories. See `-eva-msg-key help`
+              for details.
+-   Eva       [2026-02-12] New message categories "show" for Frama_C_show_each
+              and similar directives, and "progress" for messages previously
+              controlled by deprecated parameter `-eva-show-progress`.
 -   Kernel    [2026-02-11] Natively support bool keywords for C23
 o   Ivette    [2026-02-09] Upgrade to node 24 and electron 40.
+-   Ivette    [2026-01-30] Better information about types in the Inspector.
+              AST and Source Code show the definition of the selected type.
+-*  Kernel    [2026-01-26] Fix support of GCC "aligned" attribute on structs
+              and unions.
+-   Eva       [2026-01-23] New annotation "split \cases" to split the analysis
+              according to the next if-then-else or switch statement until
+              an annotation "merge \cases" is encountered.
 -*  Kernel    [2026-01-23] Fixes issue in string literal management (#@2755)
 o   Kernel    [2026-01-23] -check now checks GVar introduces a vdefined varinfo
 -!  Kernel    [2026-01-23] Logic declarations (types, functions, predicates,
               axioms) outside axiomatic blocks are no longer deprecated.
 -!  Users     [2026-01-19] Remove obsolete `Users` plug-in. Please use
               `Callgraph.Uses` instead.
+-   Ivette    [2026-01-13] In Files sidebar, add filters to find global
+              variables never read/written according to Eva analysis.
 -   Eva       [2026-01-13] New `-eva-secure-flow` option to prove
               non-interference properties: emit warnings whenever low-security
               public data may depend on high-security private data. Public and
               private data must be specified using custom attributes.
 -!  Eva       [2026-01-13] Rename option `-eva-auto-taint` to `-eva-taint-auto`.
+-*  Eva       [2026-01-12] Fix the generation of assertions by `-eva-annot` on
+              floating-point types.
+-*  Eva       [2026-01-09] Fix a crash when analyzing concurrent programs
+              with `-mthread` on functions with noreturn attribute.
 -!  Gui       [2026-01-07] Removed GTK GUI
 o   Kernel    [2026-01-07] Expose Lib module in plug-in available features
 -*  Kernel    [2026-01-07] Fixed ghost parameters inlining
 o!  Kernel    [2025-12-17] Added explicit rules for plug-in names and
               shortnames. See developer manual for more information
+-*  Eva       [2025-11-03] Fix a crash on types of very large size.
 o!  Kernel    [2025-10-22] Renamed the module Integer to Z and deprecated
               Integer. Few changes in Z API's compared to Integer, Z is also
               now a Datatype which replaces `Datatype.Integer` (now deprecated
