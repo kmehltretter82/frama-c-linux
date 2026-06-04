@@ -930,7 +930,7 @@ let get_comments_global g =
   let last_pos (path : Filepath.t) =
     Filepos.make ~path ~line:max_int ~column:max_int ~offset:max_int ()
   and first_pos (path : Filepath.t) =
-    Filepos.make ~path ~line:1 ~column:0 ~offset:0 ()
+    Filepos.make ~path ~line:1 ~column:0 ~offset:(-1) ()
   in
   let add g =
     let my_loc = Cil_datatype.Global.loc g in
@@ -951,7 +951,7 @@ let get_comments_global g =
           Cil_printer.pp_global g
           Filepath.pretty path
       | g' :: l when Cil_datatype.Global.equal g g' ->
-        first_pos path, l = []
+        first_pos input_path, l = []
       | g' :: g'' :: l when Cil_datatype.Global.equal g'' g ->
         snd (Cil_datatype.Global.loc g'), l = []
       | _ :: l -> find_prev l

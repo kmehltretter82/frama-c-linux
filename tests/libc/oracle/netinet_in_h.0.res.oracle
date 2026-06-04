@@ -13,8 +13,8 @@
   computing for function printf_va_1 <- main.
   Called from netinet_in_h.c:6.
 [eva] using specification for function printf
-[eva:progress] netinet_in_h.c:6: 
-  function printf_va_1: precondition valid_read_string(param0) got status valid.
+[eva:alarm] netinet_in_h.c:6: Warning: 
+  function printf_va_1: precondition valid_read_string(param0) got status unknown.
 [eva:progress] netinet_in_h.c:6: 
   function printf_va_1: precondition valid_read_string(format) got status valid.
 [eva:progress] Done for function printf_va_1
@@ -22,8 +22,7 @@
 [eva:progress] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  __fc_inet_ntoa[0..14] ∈ [--..--]
-                [15] ∈ {0}
+  __fc_inet_ntoa[0..15] ∈ [--..--]
   addr ∈ {0}
   sockaddr6_any ∈ {0}
   sockaddr6_loopback{.sin6_family; .sin6_port; .sin6_flowinfo; .sin6_addr.s6_addr[0..14]} ∈

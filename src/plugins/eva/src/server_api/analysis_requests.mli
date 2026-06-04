@@ -6,8 +6,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Registers a function called each time the computation state of Eva changes. *)
-val register_computation_hook: (unit -> unit) -> unit
-
-(** Signal emitted each time the computation state of Eva changes. *)
-val computation_signal: Server.Request.signal
+(** Requests registered to the Frama-C server; nothing is exported. *)

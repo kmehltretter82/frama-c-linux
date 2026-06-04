@@ -1272,14 +1272,12 @@ module State = struct
       match exp.node with
       | Lval lval
         when Ast_types.is_integral_or_pointer lval.typ
-          && not (Eva_ast.lval_contains_volatile lval)
           && not (is_singleton (eval exp)) ->
         Some (Variable.make_lval lval, Ival.zero)
 
       | CastE (typ, { node = Lval { node = Var vi, NoOffset } })
         when Ast_types.is_integral typ
           && Ast_types.is_float vi.vtype
-          && not (Ast_types.has_qualifier "volatile" vi.vtype)
           && not (is_singleton (eval exp)) ->
         Some (Variable.make_int vi, Ival.zero)
 
@@ -1686,8 +1684,7 @@ module Domain = struct
     then state
     else
       match expr.node with
-      | Lval lval when Ast_types.is_integral lval.typ
-                    && not (Eva_ast.lval_contains_volatile lval) ->
+      | Lval lval when Ast_types.is_integral lval.typ ->
         let var = Variable.make_lval lval in
         let deps = Deps.add var (eval_deps var) state.deps in
         let intervals = Intervals.add var ival state.intervals in
@@ -1769,7 +1766,8 @@ module Domain = struct
   let assign ~pos left_value expr assigned valuation state =
     if Position.is_local pos
     && Ast_types.is_integral_or_pointer left_value.lval.typ
-    && not (Eva_ast.lval_contains_volatile left_value.lval)
+    && not (valuation.Abstract_domain.is_volatile (`Lval left_value.lval))
+    && not (valuation.Abstract_domain.is_volatile (`Expr expr))
     then assign_variable left_value.lval expr assigned valuation state
     else
       let written_loc = Precise_locs.imprecise_location left_value.lloc in
@@ -1803,6 +1801,7 @@ module Domain = struct
         let assign_formal state { formal; concrete; avalue } =
           let lval = Eva_ast.Build.var formal in
           if Ast_types.is_integral_or_pointer formal.vtype
+          && not (valuation.Abstract_domain.is_volatile (`Expr concrete))
           then state >>- assign_variable lval concrete avalue valuation
           else state
         in

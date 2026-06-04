@@ -160,15 +160,6 @@ and height_offset = function
 
 (* --- Specialized visitors --- *)
 
-let exp_contains_volatile, lval_contains_volatile =
-  let open Eva_ast_visitor.Observe in
-  let neutral = false and combine b1 b2 = b1 || b2 in
-  let observe_lval ~visitor lval =
-    Ast_types.is_volatile lval.typ || default.observe_lval ~visitor lval
-  in
-  let observer = { default with observe_lval } in
-  visit_exp ~neutral ~combine observer, visit_lval ~neutral ~combine observer
-
 let vars_in_exp, vars_in_lval =
   let module VarSet = Cil_datatype.Varinfo.Set in
   let open Eva_ast_visitor.Observe in

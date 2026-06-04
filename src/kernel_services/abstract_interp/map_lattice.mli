@@ -106,6 +106,7 @@ module type MapSet_Lattice = sig
   val filter_keys : (key -> bool) -> t -> t
 
   val map: (v -> v) -> t -> t
+  val filter_map: (key -> v -> v option) -> t -> t
 
   val fold_keys : (key -> 'a -> 'a) -> t -> 'a -> 'a
   val fold : (key -> v -> 'a -> 'a) -> t -> 'a -> 'a

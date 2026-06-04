@@ -142,3 +142,12 @@ let skip_specifications kf =
   Parameters.SkipLibcSpecs.get () &&
   Kernel_function.is_definition kf &&
   Cil.is_in_libc (Kernel_function.get_vi kf).vattr
+
+
+module Do_Not_Marshal (Input: Datatype.S) =
+  Datatype.Make
+    (struct
+      include Datatype.Undefined
+      include Input
+      let name = "Eva_utils.Do_Not_Marshal(" ^ Input.datatype_name ^ ")"
+    end)

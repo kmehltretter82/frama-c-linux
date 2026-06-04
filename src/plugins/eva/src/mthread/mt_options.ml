@@ -70,7 +70,7 @@ module ThreadsLib =
     (struct
       type t = Mt_lib.threads_lib
       let option_name = "-mt-threads-lib"
-      let help = "Select which threading library is stubbed by MThread. \
+      let help = "Select which threading library is stubbed by Mthread. \
                   Defaults to \"builtins-only\"."
       let default = Mt_lib.BuiltinsOnly
       let values = [

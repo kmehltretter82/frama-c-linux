@@ -831,9 +831,11 @@ module Make
   let rec get_influential_vars valuation (exp : Eva_ast.exp) acc =
     match exp.node with
     | Lval ({ node = host, off } as lval)  ->
-      if Ast_types.has_qualifier "volatile" lval.typ then `Value acc
+      let loc = find_loc valuation lval in
+      if Loc.is_volatile loc
+      then `Value acc
       else
-        Loc.to_value (find_loc valuation lval) >>- fun value ->
+        Loc.to_value loc >>- fun value ->
         if Cvalue.V.cardinal_zero_or_one (get_cval value)
         then
           (* no variable in the host or in the offset can be influential. Check

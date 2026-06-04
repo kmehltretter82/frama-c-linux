@@ -91,16 +91,22 @@ let pretty_value_with_flags pp fmt value = match value.v with
 
 (* Data record associated to each evaluated expression. *)
 type ('a, 'origin) record_val = {
-  value : 'a flagged_value;  (* The resulting abstract value *)
+  value : 'a flagged_value; (* The resulting abstract value *)
   origin: 'origin option;   (* The origin of the abstract value *)
   reductness : reductness;  (* The state of reduction. *)
-  val_alarms : Alarmset.t   (* The emitted alarms during the evaluation. *)
+  val_alarms : Alarmset.t;  (* The emitted alarms during the evaluation. *)
+  volatile_expr: bool;
+  (* May the value of the expression depend on a volatile memory location? *)
 }
 
 (* Data record associated to each evaluated left-value. *)
 type 'a record_loc = {
-  loc: 'a;                  (* The location of the left-value. *)
-  loc_alarms: Alarmset.t    (* The emitted alarms during the evaluation. *)
+  loc: 'a;                (* The location of the left-value. *)
+  loc_alarms: Alarmset.t; (* The emitted alarms during the evaluation. *)
+  volatile_loc: bool;
+  (* May the memory location of the lvalue be volatile? *)
+  volatile_lval: bool;
+  (* May the address of the lvalue depend on a volatile memory location? *)
 }
 
 (* Results of an evaluation: the results of all intermediate calculation (the

@@ -19,7 +19,7 @@ let abort exclog =
     print_exc exclog.exn print_funid exclog.funid exclog.msg
 
 let is_relevant_varinfo varinfo =
-  not (Ast_types.has_qualifier "volatile" varinfo.Cil_types.vtype)
+  not (Ast_types.is_volatile varinfo.Cil_types.vtype)
   && (true || not varinfo.vglob)
 
 let is_relevant_lval lval = match lval.node with

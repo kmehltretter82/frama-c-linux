@@ -33,6 +33,11 @@ module type S = sig
   val to_value : location -> value or_bottom
   val size : location -> Z_or_top.t
 
+  (** [is_volatile loc] returns false if none of the concrete locations
+      represented by [loc] are volatile. It must return true if at least one
+      of the represented locations may be volatile. *)
+  val is_volatile: location -> bool
+
   (** Given an access type and a location, return the zone corresponding to the
       valid bits of the location. *)
   val enumerate_valid_bits : Locations.access -> location -> Memory_zone.t

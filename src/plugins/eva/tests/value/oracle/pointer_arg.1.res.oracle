@@ -1,0 +1,33 @@
+[kernel] Parsing pointer_arg.i (no preprocessing)
+[eva] Analyzing a complete application starting at foo
+[eva:progress] Computing initial state
+[eva:progress] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  v ∈ [--..--]
+[eva:alarm] pointer_arg.i:31: Warning: assertion got status unknown.
+[eva:alarm] pointer_arg.i:32: Warning: assertion got status unknown.
+[eva:alarm] pointer_arg.i:35: Warning: 
+  out of bounds read. assert \valid_read(&(*(A + i))[j]);
+[eva:alarm] pointer_arg.i:37: Warning: 
+  out of bounds write. assert \valid(&(*(A + 9))[9]);
+[eva:progress] Recording results for foo
+[eva:progress] Done for function foo
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function foo:
+  i ∈ [0..9]
+  j ∈ [0..9]
+  x ∈ [--..--]
+  S_A[0][0] ∈ {0}
+     {[0][1..9]; [1..8][0..9]; [9][0..8]} ∈ [--..--]
+     [9][9] ∈ {1}
+[from] Computing for function foo
+[from] Done for function foo
+[from] ====== DEPENDENCIES COMPUTED ======
+  These dependencies hold at termination for the executions that terminate:
+[from] Function foo:
+  S_A{[0][0]; [9][9]} FROM A
+[from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function foo:
+    i; j; x; S_A{[0][0]; [9][9]}
+[inout] Inputs for function foo:
+    v; S_A[0..9][0..9]

@@ -45,7 +45,7 @@
         "libc:unsupported-spec", "locals-escaping", "loop-unroll", "malloc",
         "malloc:imprecise", "secure-flow", "secure-flow:condition",
         "secure-flow:direct", "secure-flow:indirect", "signed-overflow",
-        "taint", "unknown-size"
+        "taint", "unknown-size", "volatile"
       ],
       "disabled": [
         "acsl", "acsl:unsupported", "assigns:invalid-location",

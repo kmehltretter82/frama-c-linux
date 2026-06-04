@@ -542,19 +542,12 @@ let forward_cast ~src_type ~dst_type v =
                                   Misc
    -------------------------------------------------------------------------- *)
 
-let make_volatile ?typ v =
-  let is_volatile = match typ with
-    | None -> true
-    | Some typ -> Ast_types.has_qualifier "volatile" typ
-  in
-  if is_volatile && not (V.is_bottom v)
-  then
-    match v with
-    | V.Top _ -> v
-    | V.Map m ->
-      let aux b _ acc = V.join acc (V.inject b Ival.top) in
-      V.M.fold aux m V.bottom
-  else v
+let make_volatile v =
+  match v with
+  | V.Top _ -> v
+  | V.Map m ->
+    let aux b _ acc = V.join acc (V.inject b Ival.top) in
+    V.M.fold aux m V.bottom
 
 let eval_float_constant f fkind fstring =
   if Fc_float.is_nan f

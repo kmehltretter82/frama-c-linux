@@ -164,11 +164,7 @@ struct
     let (host,offset) = lval.node in
     let oracle' = convert_oracle oracle in
     let base_typ = Eva_ast.type_of_lhost host in
-    let offset =
-      if Eva_ast.lval_contains_volatile lval then
-        `Top
-      else
-        Offset.of_eva_offset oracle' base_typ offset in
+    let offset = Offset.of_eva_offset oracle' base_typ offset in
     match host with
     | Var vi ->
       `Value (Map.singleton (Base.of_varinfo vi) offset)
@@ -368,7 +364,7 @@ struct
   let covers_base (tracked : Tracking.t option) (b : base) : bool =
     match b with
     | Base.Var (vi, _) ->
-      not (Ast_types.has_qualifier "volatile" vi.vtype) &&
+      not (Ast_types.is_volatile vi.vtype) &&
       Option.fold ~none:true ~some:(Tracking.mem b) tracked
     | Null -> true
     | CLogic_Var _ | Allocated (_, _, _) -> false

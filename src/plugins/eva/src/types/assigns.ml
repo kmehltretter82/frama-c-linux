@@ -18,6 +18,10 @@ module DepsOrUnassigned = struct
 
     let name = "Eva.Froms.DepsOrUnassigned"
 
+    let structural_descr =
+      Structural_descr.t_sum
+        [| [| Deps.packed_descr |]; [| Deps.packed_descr |] |]
+
     let pretty fmt = function
       | Unassigned -> Format.pp_print_string fmt "UNASSIGNED"
       | AssignedFrom fd -> Deps.pretty_precise fmt fd
@@ -177,6 +181,9 @@ module Datatype_Input = struct
   [@@deriving eq,ord]
 
   let name = "Eva.Froms"
+
+  let structural_descr =
+    Structural_descr.t_record [| Deps.packed_descr; Memory.packed_descr |]
 
   let top = {
     return = Deps.top;

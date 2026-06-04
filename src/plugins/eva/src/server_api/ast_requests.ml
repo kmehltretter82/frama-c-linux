@@ -22,22 +22,6 @@ let package =
 
 (* ----- Callers & Callees -------------------------------------------------- *)
 
-module CallSite =
-struct
-  type t = kernel_function * stmt
-  let jtype = Data.declare ~package ~name:"CallSite"
-      ~descr:(Markdown.plain "Callee function and caller stmt")
-      (Jrecord [
-          "call", Kernel_ast.Decl.jtype;
-          "stmt", Kernel_ast.Stmt.jtype;
-        ])
-  let to_json (kf,stmt) = `Assoc [
-      "call", Kernel_ast.Decl.to_json (SFunction kf);
-      "stmt", Kernel_ast.Stmt.to_json stmt;
-    ]
-  let of_json _ = failwith "CallSite"
-end
-
 let callers = function
   | Printer_tag.SFunction kf ->
     let list = Results.callsites kf in
@@ -47,8 +31,9 @@ let callers = function
 let () = Request.register ~package
     ~kind:`GET ~name:"getCallers"
     ~descr:(Markdown.plain "Get the list of call sites for a function")
-    ~input:(module Kernel_ast.Decl) ~output:(module Data.Jlist (CallSite))
-    ~signals:[Analysis_requests.computation_signal]
+    ~input:(module Kernel_ast.Decl)
+    ~output:(module Data.Jlist (Callstack_requests.JCallsite))
+    ~signals:Update.signals
     callers
 
 let eval_callee stmt f =
@@ -71,7 +56,7 @@ let () = Request.register ~package
               "Return the functions pointed to by a function pointer")
     ~input:(module Kernel_ast.Marker)
     ~output:(module Data.Jlist(Kernel_ast.Decl))
-    ~signals:[Analysis_requests.computation_signal]
+    ~signals:Update.signals
     callees
 
 
@@ -82,7 +67,7 @@ let () =
     ~labels:("functions analyzed by Eva",
              "functions unreached by Eva")
     ~enable:Analysis.is_computed
-    ~add_hook:(fun f -> Analysis.register_computation_hook (fun _ -> f ()))
+    ~add_hook:Update.add_hook
     Results.is_called
 
 
@@ -166,7 +151,7 @@ let () = Request.register ~package
                statements in a function")
     ~input:(module Kernel_ast.Decl)
     ~output:(module Data.Joption (DeadCode))
-    ~signals:[Analysis_requests.computation_signal]
+    ~signals:Update.signals
     dead_code
 
 

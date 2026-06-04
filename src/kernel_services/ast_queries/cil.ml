@@ -5714,7 +5714,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
         !pp_typ_ref oldt !pp_typ_ref newt
   in default_rec
 
-let rec castReduce fromsource force =
+let rec castReduce ?(check=true) fromsource force =
   let dkey = Kernel.dkey_typing_cast in
   let origin = if fromsource then "explicit cast:" else " implicit cast:" in
   let error msg = Errorloc.abort_context ("%s " ^^ msg) origin in
@@ -5724,21 +5724,31 @@ let rec castReduce fromsource force =
       Ast_types.(remove_attributes_for_c_cast (unroll newt))
     in
     let res e = new_exp ~loc (CastE (Ast_types.remove_qualifiers newt, e)) in
+    let check_res nullptr_cast e =
+      if check then checkCast ~nullptr_cast ~fromsource (typeOf e) newt;
+      res e
+    in
     let oldt' = Ast_types.unroll oldt in
-    match oldt'.tnode, (normalized_newt).tnode, e.enode with
+    let can_hold_ptr () =
+      match oldt'.tnode with
+      | TPtr _ -> Ast_types.is_fun_ptr oldt' = Ast_types.is_fun_ptr newt
+      | TInt k -> intTypeIncluded (Machine.uintptr_kind()) k
+      | _ -> false
+    in
+    match oldt'.tnode, normalized_newt.tnode, e.enode with
     (* In the case were we have a representation for the literal,
          explicitly add the cast. *)
     | _, TInt newik, Const (CInt64 (i, _, None)) ->
       (* ISO 6.3.1.3.2 *) kinteger64 ~loc ~kind:newik i
 
-    | _, TPtr _, CastE (_, e') ->
+    | _, TPtr _, CastE (_, e') when is_nullptr e || can_hold_ptr () ->
       begin
         match Ast_types.unroll (typeOf e'), e'.enode with
         | { tnode = TPtr _ } as typ'', _ ->
           (* Old cast can be removed...*)
-          if need_cast ~force newt typ'' then res e'
+          if need_cast ~force newt typ'' then check_res false e'
           else (* In fact, both casts can be removed. *) e'
-        | _, Const (CInt64 (i, _, _)) when Z.is_zero i -> res e'
+        | _, Const (CInt64 (i, _, _)) when Z.is_zero i -> check_res true e'
         | _ -> res e
       end
 
@@ -5803,7 +5813,7 @@ and mkCastTGen ?(check=true) ?context ?(fromsource=false) ?(force=false)
     let newt = if fromsource then newt else !typeForInsertedCast e oldt newt in
     let nullptr_cast = is_nullptr e in
     if check then checkCast ?context ~nullptr_cast ~fromsource oldt newt;
-    (newt, castReduce fromsource force oldt newt e)
+    (newt, castReduce ~check fromsource force oldt newt e)
 
 and mkCastT ?(check=true) ?(force=false) ~(oldt: typ) ~(newt: typ) e =
   snd (mkCastTGen ~check ~context:Identical ~force ~oldt ~newt e)

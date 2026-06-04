@@ -8,6 +8,7 @@ compiling Frama-C 33.0.
 - menhir.20240715
 - ocamlfind.1.9.8
 - ocamlgraph.2.2.0
+- ppx_deriving.6.0.2
 - ppx_deriving_yaml.0.3.0
 - ppx_deriving_yojson.3.9.0
 - ppx_inline_test.v0.16.1

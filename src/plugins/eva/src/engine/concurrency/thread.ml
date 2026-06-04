@@ -179,11 +179,21 @@ struct
     type t = properties
 
     let name = "Eva.Thread.Properties"
+
     let reprs = [{
         entry_point = List.hd Kernel_function.reprs;
         spawn_points = List.hd PosSet.reprs;
         arguments = [List.hd Varinfo.reprs, List.hd Cvalue.V.reprs];
       }]
+
+    let structural_descr =
+      let tuple_list t = Structural_descr.(t_tuple t |> t_list |> pack) in
+      Structural_descr.t_record [|
+        Kernel_function.packed_descr;
+        PosSet.packed_descr;
+        tuple_list [| Varinfo.packed_descr; Cvalue.V.packed_descr |];
+      |]
+
     let pretty fmt properties =
       let spawn_points = PosSet.elements properties.spawn_points in
       let pp_sep fmt () = Format.fprintf fmt ";@ " in

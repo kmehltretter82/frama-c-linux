@@ -7,19 +7,19 @@ digraph G {
   center=1;
   v389 [URL="#", fillcolor="#00000000", shape=box, color="#00000055",
         label="Start: main", style="filled", ];
-  v369 [URL="code.html#sid103", fillcolor="#FFFFFFFF", shape=box,
+  v369 [URL="code.html#sid139", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call queuecreate(& queue,5);",
         style="filled", ];
-  v384 [URL="code.html#sid121", fillcolor="#FFFFFFFF", shape=box,
+  v384 [URL="code.html#sid157", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Creating queue queue (size 5)",
         style="filled", ];
-  v385 [URL="code.html#sid164", fillcolor="#FFFFFFFF", shape=box,
+  v385 [URL="code.html#sid224", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v370 [URL="code.html#sid105", fillcolor="#FFFFFFFF", shape=box,
+  v370 [URL="code.html#sid141", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="while(1)", style="filled", ];
-  v371 [URL="code.html#sid107", fillcolor="#FFFFFFFF", shape=box,
+  v371 [URL="code.html#sid143", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="if (i < 5)", style="filled", ];
-  v379 [URL="code.html#sid109", fillcolor="#FFFFFFFF", shape=box,
+  v379 [URL="code.html#sid145", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF",
         label="Call pthread_create(& jobs[i],(pthread_attr_t const *)0,& job,(void *)i);",
         style="filled", ];
@@ -31,25 +31,25 @@ digraph G {
         color="#FF0000FF",
         label="Start thread jobs[0]\nStart thread jobs[1]\nStart thread jobs[2]\nStart thread jobs[3]\nStart thread jobs[4]",
         style="filled", ];
-  v383 [URL="code.html#sid135", fillcolor="#FFFFFFFF", shape=box,
+  v383 [URL="code.html#sid171", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v372 [URL="code.html#sid111", fillcolor="#FFFFFFFF", shape=box,
+  v372 [URL="code.html#sid147", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="while(1)", style="filled", ];
-  v373 [URL="code.html#sid113", fillcolor="#FFFFFFFF", shape=box,
+  v373 [URL="code.html#sid149", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="if (end[0])", style="filled", ];
-  v377 [URL="code.html#sid116", fillcolor="#CCCCFFFF", shape=box,
+  v377 [URL="code.html#sid152", fillcolor="#CCCCFFFF", shape=box,
         color="#000000FF", label="if (end2)\nreads end2", style="filled", ];
-  v378 [URL="code.html#sid162", fillcolor="#FFFFFFFF", shape=box,
+  v378 [URL="code.html#sid222", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="exit", style="filled", ];
   v366 [URL="#", fillcolor="#FFFFFFFF", shape=plaintext, color="#000000FF",
         label="", style="invis", ];
-  v374 [URL="code.html#sid118", fillcolor="#FFFFFFFF", shape=box,
+  v374 [URL="code.html#sid154", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call msgrcv(queue,2,end);", style="filled", ];
-  v375 [URL="code.html#sid128", fillcolor="#FFFFFFFF", shape=box,
+  v375 [URL="code.html#sid164", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF",
         label="Receiving\nmessage\non queue,\nmax size 2,\nstored in &end.",
         style="filled", ];
-  v376 [URL="code.html#sid129", fillcolor="#FFFFFFFF", shape=box,
+  v376 [URL="code.html#sid165", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
   
   
@@ -85,52 +85,52 @@ digraph G {
   center=1;
   v420 [URL="#", fillcolor="#00000000", shape=box, color="#00000055",
         label="Start: job", style="filled", ];
-  v395 [URL="code.html#sid92", fillcolor="#FFFFFFFF", shape=box,
+  v395 [URL="code.html#sid128", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="while(1)", style="filled", ];
-  v396 [URL="code.html#sid93", fillcolor="#FFFFFFFF", shape=box,
+  v396 [URL="code.html#sid129", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call aux(l,r,p + 1);", style="filled", ];
-  v397 [URL="code.html#sid66", fillcolor="#FFFFFFFF", shape=box,
+  v397 [URL="code.html#sid102", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_lock(& locks[l]);",
         style="filled", ];
   v417 [URL="code.html#sid26", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Lock locks[4]", style="filled", ];
   v419 [URL="code.html#sid31", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v398 [URL="code.html#sid67", fillcolor="#FFFFFFFF", shape=box,
+  v398 [URL="code.html#sid103", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_lock(& locks[r]);",
         style="filled", ];
   v414 [URL="code.html#sid26", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Lock locks[1]", style="filled", ];
   v416 [URL="code.html#sid31", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v399 [URL="code.html#sid69", fillcolor="#FFFFFFFF", shape=box,
+  v399 [URL="code.html#sid105", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="if (tmp)", style="filled", ];
-  v410 [URL="code.html#sid73", fillcolor="#CCCCFFFF", shape=box,
+  v410 [URL="code.html#sid109", fillcolor="#CCCCFFFF", shape=box,
         color="#000000FF", label="end2 = 1;\nwrites end2", style="filled", ];
-  v411 [URL="code.html#sid74", fillcolor="#FFFFFFFF", shape=box,
+  v411 [URL="code.html#sid110", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call msgsnd(queue,(char const *)(buf),2);",
         style="filled", ];
-  v412 [URL="code.html#sid124", fillcolor="#FFFFFFFF", shape=box,
+  v412 [URL="code.html#sid160", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF",
         label="Sending\nmessage\non queue,\ncontent\n[0] IN {1}\n[1] IN UNINITIALIZED",
         style="filled", ];
-  v413 [URL="code.html#sid126", fillcolor="#FFFFFFFF", shape=box,
+  v413 [URL="code.html#sid162", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v400 [URL="code.html#sid77", fillcolor="#FFFFFFFF", shape=box,
+  v400 [URL="code.html#sid113", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_unlock(& locks[r]);",
         style="filled", ];
   v406 [URL="code.html#sid40", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Release locks[1]", style="filled", ];
   v408 [URL="code.html#sid45", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v401 [URL="code.html#sid78", fillcolor="#FFFFFFFF", shape=box,
+  v401 [URL="code.html#sid114", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_unlock(& locks[l]);",
         style="filled", ];
   v403 [URL="code.html#sid40", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Release locks[4]", style="filled", ];
   v405 [URL="code.html#sid45", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v402 [URL="code.html#sid158", fillcolor="#FFFFFFFF", shape=box,
+  v402 [URL="code.html#sid218", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
   
   
@@ -171,39 +171,39 @@ digraph G {
   center=1;
   v447 [URL="#", fillcolor="#00000000", shape=box, color="#00000055",
         label="Start: job", style="filled", ];
-  v426 [URL="code.html#sid92", fillcolor="#FFFFFFFF", shape=box,
+  v426 [URL="code.html#sid128", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="while(1)", style="filled", ];
-  v427 [URL="code.html#sid93", fillcolor="#FFFFFFFF", shape=box,
+  v427 [URL="code.html#sid129", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call aux(l,r,p + 1);", style="filled", ];
-  v428 [URL="code.html#sid66", fillcolor="#FFFFFFFF", shape=box,
+  v428 [URL="code.html#sid102", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_lock(& locks[l]);",
         style="filled", ];
   v444 [URL="code.html#sid26", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Lock locks[0]", style="filled", ];
   v446 [URL="code.html#sid31", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v429 [URL="code.html#sid67", fillcolor="#FFFFFFFF", shape=box,
+  v429 [URL="code.html#sid103", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_lock(& locks[r]);",
         style="filled", ];
   v441 [URL="code.html#sid26", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Lock locks[2]", style="filled", ];
   v443 [URL="code.html#sid31", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v431 [URL="code.html#sid77", fillcolor="#FFFFFFFF", shape=box,
+  v431 [URL="code.html#sid113", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_unlock(& locks[r]);",
         style="filled", ];
   v437 [URL="code.html#sid40", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Release locks[2]", style="filled", ];
   v439 [URL="code.html#sid45", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v432 [URL="code.html#sid78", fillcolor="#FFFFFFFF", shape=box,
+  v432 [URL="code.html#sid114", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_unlock(& locks[l]);",
         style="filled", ];
   v434 [URL="code.html#sid40", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Release locks[0]", style="filled", ];
   v436 [URL="code.html#sid45", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v433 [URL="code.html#sid158", fillcolor="#FFFFFFFF", shape=box,
+  v433 [URL="code.html#sid218", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
   
   
@@ -237,52 +237,52 @@ digraph G {
   center=1;
   v478 [URL="#", fillcolor="#00000000", shape=box, color="#00000055",
         label="Start: job", style="filled", ];
-  v453 [URL="code.html#sid92", fillcolor="#FFFFFFFF", shape=box,
+  v453 [URL="code.html#sid128", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="while(1)", style="filled", ];
-  v454 [URL="code.html#sid93", fillcolor="#FFFFFFFF", shape=box,
+  v454 [URL="code.html#sid129", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call aux(l,r,p + 1);", style="filled", ];
-  v455 [URL="code.html#sid66", fillcolor="#FFFFFFFF", shape=box,
+  v455 [URL="code.html#sid102", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_lock(& locks[l]);",
         style="filled", ];
   v475 [URL="code.html#sid26", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Lock locks[1]", style="filled", ];
   v477 [URL="code.html#sid31", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v456 [URL="code.html#sid67", fillcolor="#FFFFFFFF", shape=box,
+  v456 [URL="code.html#sid103", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_lock(& locks[r]);",
         style="filled", ];
   v472 [URL="code.html#sid26", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Lock locks[3]", style="filled", ];
   v474 [URL="code.html#sid31", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v457 [URL="code.html#sid69", fillcolor="#FFFFFFFF", shape=box,
+  v457 [URL="code.html#sid105", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="if (tmp)", style="filled", ];
-  v468 [URL="code.html#sid73", fillcolor="#CCCCFFFF", shape=box,
+  v468 [URL="code.html#sid109", fillcolor="#CCCCFFFF", shape=box,
         color="#000000FF", label="end2 = 1;\nwrites end2", style="filled", ];
-  v469 [URL="code.html#sid74", fillcolor="#FFFFFFFF", shape=box,
+  v469 [URL="code.html#sid110", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call msgsnd(queue,(char const *)(buf),2);",
         style="filled", ];
-  v470 [URL="code.html#sid124", fillcolor="#FFFFFFFF", shape=box,
+  v470 [URL="code.html#sid160", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF",
         label="Sending\nmessage\non queue,\ncontent\n[0] IN {3}\n[1] IN UNINITIALIZED",
         style="filled", ];
-  v471 [URL="code.html#sid126", fillcolor="#FFFFFFFF", shape=box,
+  v471 [URL="code.html#sid162", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v458 [URL="code.html#sid77", fillcolor="#FFFFFFFF", shape=box,
+  v458 [URL="code.html#sid113", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_unlock(& locks[r]);",
         style="filled", ];
   v464 [URL="code.html#sid40", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Release locks[3]", style="filled", ];
   v466 [URL="code.html#sid45", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v459 [URL="code.html#sid78", fillcolor="#FFFFFFFF", shape=box,
+  v459 [URL="code.html#sid114", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_unlock(& locks[l]);",
         style="filled", ];
   v461 [URL="code.html#sid40", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Release locks[1]", style="filled", ];
   v463 [URL="code.html#sid45", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v460 [URL="code.html#sid158", fillcolor="#FFFFFFFF", shape=box,
+  v460 [URL="code.html#sid218", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
   
   
@@ -323,52 +323,52 @@ digraph G {
   center=1;
   v509 [URL="#", fillcolor="#00000000", shape=box, color="#00000055",
         label="Start: job", style="filled", ];
-  v484 [URL="code.html#sid92", fillcolor="#FFFFFFFF", shape=box,
+  v484 [URL="code.html#sid128", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="while(1)", style="filled", ];
-  v485 [URL="code.html#sid93", fillcolor="#FFFFFFFF", shape=box,
+  v485 [URL="code.html#sid129", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call aux(l,r,p + 1);", style="filled", ];
-  v486 [URL="code.html#sid66", fillcolor="#FFFFFFFF", shape=box,
+  v486 [URL="code.html#sid102", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_lock(& locks[l]);",
         style="filled", ];
   v506 [URL="code.html#sid26", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Lock locks[2]", style="filled", ];
   v508 [URL="code.html#sid31", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v487 [URL="code.html#sid67", fillcolor="#FFFFFFFF", shape=box,
+  v487 [URL="code.html#sid103", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_lock(& locks[r]);",
         style="filled", ];
   v503 [URL="code.html#sid26", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Lock locks[4]", style="filled", ];
   v505 [URL="code.html#sid31", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v488 [URL="code.html#sid69", fillcolor="#FFFFFFFF", shape=box,
+  v488 [URL="code.html#sid105", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="if (tmp)", style="filled", ];
-  v499 [URL="code.html#sid73", fillcolor="#CCCCFFFF", shape=box,
+  v499 [URL="code.html#sid109", fillcolor="#CCCCFFFF", shape=box,
         color="#000000FF", label="end2 = 1;\nwrites end2", style="filled", ];
-  v500 [URL="code.html#sid74", fillcolor="#FFFFFFFF", shape=box,
+  v500 [URL="code.html#sid110", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call msgsnd(queue,(char const *)(buf),2);",
         style="filled", ];
-  v501 [URL="code.html#sid124", fillcolor="#FFFFFFFF", shape=box,
+  v501 [URL="code.html#sid160", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF",
         label="Sending\nmessage\non queue,\ncontent\n[0] IN {4}\n[1] IN UNINITIALIZED",
         style="filled", ];
-  v502 [URL="code.html#sid126", fillcolor="#FFFFFFFF", shape=box,
+  v502 [URL="code.html#sid162", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v489 [URL="code.html#sid77", fillcolor="#FFFFFFFF", shape=box,
+  v489 [URL="code.html#sid113", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_unlock(& locks[r]);",
         style="filled", ];
   v495 [URL="code.html#sid40", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Release locks[4]", style="filled", ];
   v497 [URL="code.html#sid45", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v490 [URL="code.html#sid78", fillcolor="#FFFFFFFF", shape=box,
+  v490 [URL="code.html#sid114", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_unlock(& locks[l]);",
         style="filled", ];
   v492 [URL="code.html#sid40", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Release locks[2]", style="filled", ];
   v494 [URL="code.html#sid45", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v491 [URL="code.html#sid158", fillcolor="#FFFFFFFF", shape=box,
+  v491 [URL="code.html#sid218", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
   
   
@@ -409,52 +409,52 @@ digraph G {
   center=1;
   v540 [URL="#", fillcolor="#00000000", shape=box, color="#00000055",
         label="Start: job", style="filled", ];
-  v515 [URL="code.html#sid92", fillcolor="#FFFFFFFF", shape=box,
+  v515 [URL="code.html#sid128", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="while(1)", style="filled", ];
-  v516 [URL="code.html#sid93", fillcolor="#FFFFFFFF", shape=box,
+  v516 [URL="code.html#sid129", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call aux(l,r,p + 1);", style="filled", ];
-  v517 [URL="code.html#sid66", fillcolor="#FFFFFFFF", shape=box,
+  v517 [URL="code.html#sid102", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_lock(& locks[l]);",
         style="filled", ];
   v537 [URL="code.html#sid26", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Lock locks[3]", style="filled", ];
   v539 [URL="code.html#sid31", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v518 [URL="code.html#sid67", fillcolor="#FFFFFFFF", shape=box,
+  v518 [URL="code.html#sid103", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_lock(& locks[r]);",
         style="filled", ];
   v534 [URL="code.html#sid26", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Lock locks[0]", style="filled", ];
   v536 [URL="code.html#sid31", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v519 [URL="code.html#sid69", fillcolor="#FFFFFFFF", shape=box,
+  v519 [URL="code.html#sid105", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="if (tmp)", style="filled", ];
-  v530 [URL="code.html#sid73", fillcolor="#CCCCFFFF", shape=box,
+  v530 [URL="code.html#sid109", fillcolor="#CCCCFFFF", shape=box,
         color="#000000FF", label="end2 = 1;\nwrites end2", style="filled", ];
-  v531 [URL="code.html#sid74", fillcolor="#FFFFFFFF", shape=box,
+  v531 [URL="code.html#sid110", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call msgsnd(queue,(char const *)(buf),2);",
         style="filled", ];
-  v532 [URL="code.html#sid124", fillcolor="#FFFFFFFF", shape=box,
+  v532 [URL="code.html#sid160", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF",
         label="Sending\nmessage\non queue,\ncontent\n[0] IN {5}\n[1] IN UNINITIALIZED",
         style="filled", ];
-  v533 [URL="code.html#sid126", fillcolor="#FFFFFFFF", shape=box,
+  v533 [URL="code.html#sid162", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v520 [URL="code.html#sid77", fillcolor="#FFFFFFFF", shape=box,
+  v520 [URL="code.html#sid113", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_unlock(& locks[r]);",
         style="filled", ];
   v526 [URL="code.html#sid40", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Release locks[0]", style="filled", ];
   v528 [URL="code.html#sid45", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v521 [URL="code.html#sid78", fillcolor="#FFFFFFFF", shape=box,
+  v521 [URL="code.html#sid114", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_unlock(& locks[l]);",
         style="filled", ];
   v523 [URL="code.html#sid40", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Release locks[3]", style="filled", ];
   v525 [URL="code.html#sid45", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v522 [URL="code.html#sid158", fillcolor="#FFFFFFFF", shape=box,
+  v522 [URL="code.html#sid218", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
   
   

@@ -42,7 +42,6 @@ val all_functions_with_preconditions: stmt -> Kernel_function.Hptset.t
     Those functions are registered when the function {!precondition_at_call}
     is called. *)
 
-
 val replace_call_precondition: Property.t -> stmt -> Property.t -> unit
 (** [replace_for_call pre stmt pre_at_call] states that [pre_at_call]
     is the property corresponding to the status of [pre] at call [stmt].

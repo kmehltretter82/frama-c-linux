@@ -51,6 +51,9 @@ module Make
       (Left.enumerate_valid_bits access l)
       (Right.enumerate_valid_bits access r)
 
+  let is_volatile (l, r) =
+    Left.is_volatile l && Right.is_volatile r
+
   let replace_base subst (l, r) =
     Left.replace_base subst l, Right.replace_base subst r
 

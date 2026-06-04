@@ -806,14 +806,14 @@
     Read by jobs[1], Write by <main>: unprotected
     Read by jobs[0], Write by <main>: unprotected
 [mt] Statements needing manual synchronisation
-  ccfg.c:58 (for d)
-  ccfg.c:99 (for f)
-  ccfg.c:98 (for e)
-  ccfg.c:50 (for e; f)
-  ccfg.c:97 (for d)
   ccfg.c:19 (for global1; global2[0..1])
-  ccfg.c:96 (for c)
+  ccfg.c:50 (for e; f)
+  ccfg.c:58 (for d)
   ccfg.c:68 (for c)
+  ccfg.c:96 (for c)
+  ccfg.c:97 (for d)
+  ccfg.c:98 (for e)
+  ccfg.c:99 (for f)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
 [mt] *** Computing thread <main>, iteration 3 (shared vars values changed and
@@ -1366,14 +1366,14 @@
     Read by jobs[1], Write by <main>: unprotected
     Read by jobs[0], Write by <main>: unprotected
 [mt] Statements needing manual synchronisation
-  ccfg.c:58 (for d)
-  ccfg.c:99 (for f)
-  ccfg.c:98 (for e)
-  ccfg.c:50 (for e; f)
-  ccfg.c:97 (for d)
   ccfg.c:19 (for global1; global2[0..1])
-  ccfg.c:96 (for c)
+  ccfg.c:50 (for e; f)
+  ccfg.c:58 (for d)
   ccfg.c:68 (for c)
+  ccfg.c:96 (for c)
+  ccfg.c:97 (for d)
+  ccfg.c:98 (for e)
+  ccfg.c:99 (for f)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 4
 [mt] *** Computing thread <main>, iteration 4 (interferences changed)
@@ -1792,14 +1792,14 @@
     Read by jobs[1], Write by <main>: unprotected
     Read by jobs[0], Write by <main>: unprotected
 [mt] Statements needing manual synchronisation
-  ccfg.c:58 (for d)
-  ccfg.c:99 (for f)
-  ccfg.c:98 (for e)
-  ccfg.c:50 (for e; f)
-  ccfg.c:97 (for d)
   ccfg.c:19 (for global1; global2[0..1])
-  ccfg.c:96 (for c)
+  ccfg.c:50 (for e; f)
+  ccfg.c:58 (for d)
   ccfg.c:68 (for c)
+  ccfg.c:96 (for c)
+  ccfg.c:97 (for d)
+  ccfg.c:98 (for e)
+  ccfg.c:99 (for f)
 [mt] ***** Shared variables computed
 [mt] ******* Analysis performed, 4 iterations
 [mt] ******* Outputting model for html

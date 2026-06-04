@@ -220,9 +220,9 @@ A dropdown list selects the displayed domain, among domains enabled by the
 
 This component is experimental and intended to help debug Eva issues.
 
-## MThread {#eva-mthread}
+## Mthread {#eva-mthread}
 
-The MThread component is made up of 3 elements:
+The Mthread component is made up of 3 elements:
 
 * a title bar showing the status of eva and the help button,
 * a toolbar for changing the display mode between `thread` and `variable`,
