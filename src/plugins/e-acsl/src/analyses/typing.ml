@@ -698,14 +698,18 @@ let rec type_term
            | None -> { ty; cast = None }
            | Some ctx -> coerce ~arith_operand ~ctx ty
          in
-         Rte_analysis.iter_on_guards t (type_predicate ~profile);
+         (Rte_analysis.iter_on_guards t @@ fun p ->
+          try type_predicate ~profile p
+          with Error.Not_yet _ | Error.Typing_error _ -> ());
          ctx)
       t
   with
   | Result.Ok result ->
     Options.debug ~dkey ~level:5 "%a" pp_call_with_result result;
     result
-  | Result.Error exn -> raise exn
+  | Result.Error exn ->
+    Rte_analysis.remove t;
+    raise exn
 
 and type_term_lval ~profile (host, offset) =
   type_term_lhost ~profile host;
