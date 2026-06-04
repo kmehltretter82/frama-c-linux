@@ -13,6 +13,9 @@ val dkey : Options.category
 val preprocess : file -> unit
 (** compute the RTE table for a given file. *)
 
+val preprocess_predicate : predicate -> unit
+(** compute the RTE table for a given predicate. *)
+
 val iter_on_guards : term -> (predicate -> unit) -> unit
 (** retrieve the list of guards for a given term and, if it exists, iterate over
     all elements applying a given function to them. *)
