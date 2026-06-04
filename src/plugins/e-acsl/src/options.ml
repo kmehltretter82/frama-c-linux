@@ -145,7 +145,7 @@ module O =
                   0 - No optimisation. \
                   1 - Constant-time optimisations. \
                   2 - Moderate-cost optimisations. \
-                  3 - Potentially expensive optimisations, that may exploit \
+                  3 - Aggressive optimisations, that may exploit \
                   undefined behaviours in specification."
     end)
 let () = O.set_range ~min:0 ~max:3

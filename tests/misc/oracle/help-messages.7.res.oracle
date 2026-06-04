@@ -19,7 +19,7 @@ Options taking a string as argument should preferably be written
                     -no-e-acsl)
 -e-acsl-O <n>       Level of optimisation (defaults to 2). 0 - No
                     optimisation. 1 - Constant-time optimisations. 2 -
-                    Moderate-cost optimisations. 3 - Potentially expensive
+                    Moderate-cost optimisations. 3 - Aggressive
                     optimisations, that may exploit undefined behaviours in
                     specification.
 -e-acsl-assert-print-data  print data contributing to the failed assertion
