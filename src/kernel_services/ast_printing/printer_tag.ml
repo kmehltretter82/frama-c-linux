@@ -862,9 +862,10 @@ struct
                      pragmas, for example). *)
           super#term_lval fmt lv
         | Some ip ->
-          Format.fprintf fmt "@{<%s>"
-            (Info.tag
-               (PTermLval (self#current_kf, self#current_kinstr, ip, lv)));
+          let kf = Property.get_kf ip in
+          let kinstr = Property.get_kinstr ip in
+          let localizable = PTermLval (kf, kinstr, ip, lv) in
+          Format.fprintf fmt "@{<%s>" (Info.tag localizable);
           (match lv with
            | TVar vi, (TField _| TIndex _ as o) ->
              self#term_lval fmt (TVar vi, TNoOffset);
