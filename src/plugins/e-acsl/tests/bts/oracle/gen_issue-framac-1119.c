@@ -11,8 +11,6 @@ int find_last_of(int const *a, int len, int value)
   int __retres;
   __e_acsl_store_block((void *)(& a),8UL);
   size_t o = (size_t)len;
-  __e_acsl_store_block((void *)(& o),8UL);
-  __e_acsl_full_init((void *)(& o));
   {
     int __gen_e_acsl_forall;
     __e_acsl_mpz_t __gen_e_acsl_i;
@@ -28,33 +26,8 @@ int find_last_of(int const *a, int len, int value)
     }
     while (1) {
       {
-        int __gen_e_acsl_initialized;
         __e_acsl_mpz_t __gen_e_acsl_o;
         int __gen_e_acsl_lt;
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
-          {.values = (void *)0};
-        __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& o),
-                                                        sizeof(size_t));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"&o",
-                                     (void *)(& o));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
-                                       "sizeof(size_t)",0,sizeof(size_t));
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                     "uninitialized: \\initialized(&o)",0,
-                                     __gen_e_acsl_initialized);
-        /*@ assert E_ACSL: uninitialized: \initialized(&o); */
-        {
-          __gen_e_acsl_assert_data_4.blocking = 1;
-          __gen_e_acsl_assert_data_4.kind = "RTE";
-          __gen_e_acsl_assert_data_4.pred_txt = "\\initialized(&o)";
-          __gen_e_acsl_assert_data_4.file = "issue-framac-1119.c";
-          __gen_e_acsl_assert_data_4.fct = "find_last_of";
-          __gen_e_acsl_assert_data_4.line = 10;
-          __gen_e_acsl_assert_data_4.name = "uninitialized";
-          __e_acsl_assert(__gen_e_acsl_initialized,
-                          & __gen_e_acsl_assert_data_4);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
-        }
         __gmpz_init_set_ui(__gen_e_acsl_o,o);
         __gen_e_acsl_lt = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_i),
                                      (__e_acsl_mpz_struct const *)(__gen_e_acsl_o));
@@ -63,62 +36,9 @@ int find_last_of(int const *a, int len, int value)
       }
       {
         long __gen_e_acsl_i_2;
-        int __gen_e_acsl_valid_read;
-        long __gen_e_acsl_i_3;
-        int __gen_e_acsl_aligned;
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-          {.values = (void *)0};
         __gen_e_acsl_i_2 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_i));
-        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(a + __gen_e_acsl_i_2),
-                                                      sizeof(int const),
-                                                      (void *)a,
-                                                      (void *)(& a));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"a",
-                                     (void *)a);
-        __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_2,"i",0,
-                                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_i));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                       "sizeof(int const)",0,
-                                       sizeof(int const));
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                     "\"memory access\": \\valid_read(a + i)",
-                                     0,__gen_e_acsl_valid_read);
-        /*@ assert E_ACSL: "memory access": \valid_read(a + i); */
-        {
-          __gen_e_acsl_assert_data_2.blocking = 1;
-          __gen_e_acsl_assert_data_2.kind = "RTE";
-          __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(a + i)";
-          __gen_e_acsl_assert_data_2.file = "issue-framac-1119.c";
-          __gen_e_acsl_assert_data_2.fct = "find_last_of";
-          __gen_e_acsl_assert_data_2.line = 10;
-          __gen_e_acsl_assert_data_2.name = "memory access";
-          __e_acsl_assert(__gen_e_acsl_valid_read,
-                          & __gen_e_acsl_assert_data_2);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-        }
-        __gen_e_acsl_i_3 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_i));
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
-          {.values = (void *)0};
-        __gen_e_acsl_aligned = __e_acsl_aligned((void *)(a + __gen_e_acsl_i_3),
-                                                _Alignof(int const));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
-                                       "alignof(int const)",0,
-                                       _Alignof(int const));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"a",
-                                     (void *)a);
-        __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_3,
-                                      "__gen_e_acsl_i_3",0,__gen_e_acsl_i_3);
-        __gen_e_acsl_assert_data_3.blocking = 1;
-        __gen_e_acsl_assert_data_3.kind = "RTE";
-        __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(a + __gen_e_acsl_i_3,alignof(int const))";
-        __gen_e_acsl_assert_data_3.file = "issue-framac-1119.c";
-        __gen_e_acsl_assert_data_3.fct = "find_last_of";
-        __gen_e_acsl_assert_data_3.line = 10;
-        __gen_e_acsl_assert_data_3.name = "pointer_alignment";
-        __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_3);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-        /*@ assert Eva: mem_access: \valid_read(a + __gen_e_acsl_i_3); */
-        if (*(a + __gen_e_acsl_i_3) != value) ;
+        /*@ assert Eva: mem_access: \valid_read(a + __gen_e_acsl_i_2); */
+        if (*(a + __gen_e_acsl_i_2) != value) ;
         else {
           __gen_e_acsl_forall = 0;
           goto e_acsl_end_loop1;
@@ -156,112 +76,34 @@ int find_last_of(int const *a, int len, int value)
   */
   while (len) {
     int __gen_e_acsl_forall_2;
-    __e_acsl_mpz_t __gen_e_acsl_i_4;
+    __e_acsl_mpz_t __gen_e_acsl_i_3;
     len --;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __gen_e_acsl_forall_2 = 1;
-    __gmpz_init(__gen_e_acsl_i_4);
+    __gmpz_init(__gen_e_acsl_i_3);
     {
       __e_acsl_mpz_t __gen_e_acsl_len_2;
       __gmpz_init_set_si(__gen_e_acsl_len_2,(long)len);
-      __gmpz_set(__gen_e_acsl_i_4,
+      __gmpz_set(__gen_e_acsl_i_3,
                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_len_2));
       __gmpz_clear(__gen_e_acsl_len_2);
     }
     while (1) {
       {
-        int __gen_e_acsl_initialized_2;
         __e_acsl_mpz_t __gen_e_acsl_o_2;
         int __gen_e_acsl_lt_2;
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
-          {.values = (void *)0};
-        __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& o),
-                                                          sizeof(size_t));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"&o",
-                                     (void *)(& o));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
-                                       "sizeof(size_t)",0,sizeof(size_t));
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
-                                     "uninitialized: \\initialized(&o)",0,
-                                     __gen_e_acsl_initialized_2);
-        /*@ assert E_ACSL: uninitialized: \initialized(&o); */
-        {
-          __gen_e_acsl_assert_data_8.blocking = 1;
-          __gen_e_acsl_assert_data_8.kind = "RTE";
-          __gen_e_acsl_assert_data_8.pred_txt = "\\initialized(&o)";
-          __gen_e_acsl_assert_data_8.file = "issue-framac-1119.c";
-          __gen_e_acsl_assert_data_8.fct = "find_last_of";
-          __gen_e_acsl_assert_data_8.line = 10;
-          __gen_e_acsl_assert_data_8.name = "uninitialized";
-          __e_acsl_assert(__gen_e_acsl_initialized_2,
-                          & __gen_e_acsl_assert_data_8);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
-        }
         __gmpz_init_set_ui(__gen_e_acsl_o_2,o);
-        __gen_e_acsl_lt_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_i_4),
+        __gen_e_acsl_lt_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_i_3),
                                        (__e_acsl_mpz_struct const *)(__gen_e_acsl_o_2));
         if (__gen_e_acsl_lt_2 < 0) ; else break;
         __gmpz_clear(__gen_e_acsl_o_2);
       }
       {
-        long __gen_e_acsl_i_5;
-        int __gen_e_acsl_valid_read_2;
-        long __gen_e_acsl_i_6;
-        int __gen_e_acsl_aligned_2;
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
-          {.values = (void *)0};
-        __gen_e_acsl_i_5 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_i_4));
-        __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(a + __gen_e_acsl_i_5),
-                                                        sizeof(int const),
-                                                        (void *)a,
-                                                        (void *)(& a));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"a",
-                                     (void *)a);
-        __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_6,"i",0,
-                                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_i_4));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
-                                       "sizeof(int const)",0,
-                                       sizeof(int const));
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
-                                     "\"memory access\": \\valid_read(a + i)",
-                                     0,__gen_e_acsl_valid_read_2);
-        /*@ assert E_ACSL: "memory access": \valid_read(a + i); */
-        {
-          __gen_e_acsl_assert_data_6.blocking = 1;
-          __gen_e_acsl_assert_data_6.kind = "RTE";
-          __gen_e_acsl_assert_data_6.pred_txt = "\\valid_read(a + i)";
-          __gen_e_acsl_assert_data_6.file = "issue-framac-1119.c";
-          __gen_e_acsl_assert_data_6.fct = "find_last_of";
-          __gen_e_acsl_assert_data_6.line = 10;
-          __gen_e_acsl_assert_data_6.name = "memory access";
-          __e_acsl_assert(__gen_e_acsl_valid_read_2,
-                          & __gen_e_acsl_assert_data_6);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
-        }
-        __gen_e_acsl_i_6 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_i_4));
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
-          {.values = (void *)0};
-        __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)(a + __gen_e_acsl_i_6),
-                                                  _Alignof(int const));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
-                                       "alignof(int const)",0,
-                                       _Alignof(int const));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"a",
-                                     (void *)a);
-        __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_7,
-                                      "__gen_e_acsl_i_6",0,__gen_e_acsl_i_6);
-        __gen_e_acsl_assert_data_7.blocking = 1;
-        __gen_e_acsl_assert_data_7.kind = "RTE";
-        __gen_e_acsl_assert_data_7.pred_txt = "\\aligned(a + __gen_e_acsl_i_6,alignof(int const))";
-        __gen_e_acsl_assert_data_7.file = "issue-framac-1119.c";
-        __gen_e_acsl_assert_data_7.fct = "find_last_of";
-        __gen_e_acsl_assert_data_7.line = 10;
-        __gen_e_acsl_assert_data_7.name = "pointer_alignment";
-        __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_7);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
-        /*@ assert Eva: mem_access: \valid_read(a + __gen_e_acsl_i_6); */
-        if (*(a + __gen_e_acsl_i_6) != value) ;
+        long __gen_e_acsl_i_4;
+        __gen_e_acsl_i_4 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_i_3));
+        /*@ assert Eva: mem_access: \valid_read(a + __gen_e_acsl_i_4); */
+        if (*(a + __gen_e_acsl_i_4) != value) ;
         else {
           __gen_e_acsl_forall_2 = 0;
           goto e_acsl_end_loop2;
@@ -273,31 +115,30 @@ int find_last_of(int const *a, int len, int value)
         __gmpz_init_set_str(__gen_e_acsl__2,"1",10);
         __gmpz_init(__gen_e_acsl_add_2);
         __gmpz_add(__gen_e_acsl_add_2,
-                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_i_4),
+                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_i_3),
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
-        __gmpz_set(__gen_e_acsl_i_4,
+        __gmpz_set(__gen_e_acsl_i_3,
                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_add_2));
         __gmpz_clear(__gen_e_acsl__2);
         __gmpz_clear(__gen_e_acsl_add_2);
       }
     }
     e_acsl_end_loop2: ;
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "\\forall integer i; len <= i < o ==> *(a + i) != value",
                                  0,__gen_e_acsl_forall_2);
-    __gen_e_acsl_assert_data_5.blocking = 1;
-    __gen_e_acsl_assert_data_5.kind = "Invariant";
-    __gen_e_acsl_assert_data_5.pred_txt = "\\forall integer i; len <= i < o ==> *(a + i) != value";
-    __gen_e_acsl_assert_data_5.file = "issue-framac-1119.c";
-    __gen_e_acsl_assert_data_5.fct = "find_last_of";
-    __gen_e_acsl_assert_data_5.line = 10;
-    __e_acsl_assert(__gen_e_acsl_forall_2,& __gen_e_acsl_assert_data_5);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
-    __gmpz_clear(__gen_e_acsl_i_4);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Invariant";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\forall integer i; len <= i < o ==> *(a + i) != value";
+    __gen_e_acsl_assert_data_2.file = "issue-framac-1119.c";
+    __gen_e_acsl_assert_data_2.fct = "find_last_of";
+    __gen_e_acsl_assert_data_2.line = 10;
+    __e_acsl_assert(__gen_e_acsl_forall_2,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    __gmpz_clear(__gen_e_acsl_i_3);
   }
   __retres = 2147483647;
   __e_acsl_delete_block((void *)(& a));
-  __e_acsl_delete_block((void *)(& o));
   return __retres;
 }
 

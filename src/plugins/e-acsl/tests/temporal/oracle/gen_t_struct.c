@@ -47,50 +47,9 @@ int main(void)
   __e_acsl_temporal_store_nreferent((void *)(& t1.q),(void *)(& t1.p));
   t1.q = t1.p;
   {
-    int __gen_e_acsl_initialized;
-    int __gen_e_acsl_aligned;
     int __gen_e_acsl_valid;
     int __gen_e_acsl_and;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& t1.p),
-                                                    sizeof(char *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&t1.p",
-                                 (void *)(& t1.p));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                   "sizeof(char *)",0,sizeof(char *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "uninitialized: \\initialized(&t1.p)",0,
-                                 __gen_e_acsl_initialized);
-    /*@ assert E_ACSL: uninitialized: \initialized(&t1.p); */
-    {
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&t1.p)";
-      __gen_e_acsl_assert_data_2.file = "t_struct.c";
-      __gen_e_acsl_assert_data_2.fct = "main";
-      __gen_e_acsl_assert_data_2.line = 30;
-      __gen_e_acsl_assert_data_2.name = "uninitialized";
-      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
-      {.values = (void *)0};
-    __gen_e_acsl_aligned = __e_acsl_aligned((void *)t1.p,_Alignof(char));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
-                                   "alignof(char)",0,_Alignof(char));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"t1.p",
-                                 (void *)t1.p);
-    __gen_e_acsl_assert_data_3.blocking = 1;
-    __gen_e_acsl_assert_data_3.kind = "RTE";
-    __gen_e_acsl_assert_data_3.pred_txt = "\\aligned(t1.p,alignof(char))";
-    __gen_e_acsl_assert_data_3.file = "t_struct.c";
-    __gen_e_acsl_assert_data_3.fct = "main";
-    __gen_e_acsl_assert_data_3.line = 30;
-    __gen_e_acsl_assert_data_3.name = "pointer_alignment";
-    __e_acsl_assert(__gen_e_acsl_aligned,& __gen_e_acsl_assert_data_3);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __gen_e_acsl_valid = __e_acsl_valid((void *)t1.p,sizeof(char),
                                         (void *)t1.p,(void *)(& t1.p));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"t1.p",
@@ -100,49 +59,7 @@ int main(void)
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"\\valid(t1.p)",
                                  0,__gen_e_acsl_valid);
     if (__gen_e_acsl_valid) {
-      int __gen_e_acsl_initialized_2;
-      int __gen_e_acsl_aligned_2;
       int __gen_e_acsl_valid_2;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& t1.q),
-                                                        sizeof(char *));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"&t1.q",
-                                   (void *)(& t1.q));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
-                                     "sizeof(char *)",0,sizeof(char *));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                   "uninitialized: \\initialized(&t1.q)",0,
-                                   __gen_e_acsl_initialized_2);
-      /*@ assert E_ACSL: uninitialized: \initialized(&t1.q); */
-      {
-        __gen_e_acsl_assert_data_4.blocking = 1;
-        __gen_e_acsl_assert_data_4.kind = "RTE";
-        __gen_e_acsl_assert_data_4.pred_txt = "\\initialized(&t1.q)";
-        __gen_e_acsl_assert_data_4.file = "t_struct.c";
-        __gen_e_acsl_assert_data_4.fct = "main";
-        __gen_e_acsl_assert_data_4.line = 30;
-        __gen_e_acsl_assert_data_4.name = "uninitialized";
-        __e_acsl_assert(__gen_e_acsl_initialized_2,
-                        & __gen_e_acsl_assert_data_4);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
-      }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned_2 = __e_acsl_aligned((void *)t1.q,_Alignof(char));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
-                                     "alignof(char)",0,_Alignof(char));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"t1.q",
-                                   (void *)t1.q);
-      __gen_e_acsl_assert_data_5.blocking = 1;
-      __gen_e_acsl_assert_data_5.kind = "RTE";
-      __gen_e_acsl_assert_data_5.pred_txt = "\\aligned(t1.q,alignof(char))";
-      __gen_e_acsl_assert_data_5.file = "t_struct.c";
-      __gen_e_acsl_assert_data_5.fct = "main";
-      __gen_e_acsl_assert_data_5.line = 30;
-      __gen_e_acsl_assert_data_5.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_2,& __gen_e_acsl_assert_data_5);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
       __gen_e_acsl_valid_2 = __e_acsl_valid((void *)t1.q,sizeof(char),
                                             (void *)t1.q,(void *)(& t1.q));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"t1.q",
@@ -165,139 +82,54 @@ int main(void)
   }
   /*@ assert \valid(t1.p) && \valid(t1.q); */ ;
   {
-    int __gen_e_acsl_initialized_3;
+    int __gen_e_acsl_initialized;
     int __gen_e_acsl_and_2;
     int __gen_e_acsl_and_4;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(& t2.p),
-                                                      sizeof(char *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"&t2.p",
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& t2.p),
+                                                    sizeof(char *));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&t2.p",
                                  (void *)(& t2.p));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                    "sizeof(char *)",0,sizeof(char *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "\\initialized(&t2.p)",0,
-                                 __gen_e_acsl_initialized_3);
-    if (__gen_e_acsl_initialized_3) {
-      int __gen_e_acsl_initialized_4;
-      int __gen_e_acsl_aligned_3;
+                                 __gen_e_acsl_initialized);
+    if (__gen_e_acsl_initialized) {
       int __gen_e_acsl_valid_3;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_4 = __e_acsl_initialized((void *)(& t2.p),
-                                                        sizeof(char *));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"&t2.p",
-                                   (void *)(& t2.p));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
-                                     "sizeof(char *)",0,sizeof(char *));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
-                                   "uninitialized: \\initialized(&t2.p)",0,
-                                   __gen_e_acsl_initialized_4);
-      /*@ assert E_ACSL: uninitialized: \initialized(&t2.p); */
-      {
-        __gen_e_acsl_assert_data_7.blocking = 1;
-        __gen_e_acsl_assert_data_7.kind = "RTE";
-        __gen_e_acsl_assert_data_7.pred_txt = "\\initialized(&t2.p)";
-        __gen_e_acsl_assert_data_7.file = "t_struct.c";
-        __gen_e_acsl_assert_data_7.fct = "main";
-        __gen_e_acsl_assert_data_7.line = 31;
-        __gen_e_acsl_assert_data_7.name = "uninitialized";
-        __e_acsl_assert(__gen_e_acsl_initialized_4,
-                        & __gen_e_acsl_assert_data_7);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
-      }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned_3 = __e_acsl_aligned((void *)t2.p,_Alignof(char));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
-                                     "alignof(char)",0,_Alignof(char));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"t2.p",
-                                   (void *)t2.p);
-      __gen_e_acsl_assert_data_8.blocking = 1;
-      __gen_e_acsl_assert_data_8.kind = "RTE";
-      __gen_e_acsl_assert_data_8.pred_txt = "\\aligned(t2.p,alignof(char))";
-      __gen_e_acsl_assert_data_8.file = "t_struct.c";
-      __gen_e_acsl_assert_data_8.fct = "main";
-      __gen_e_acsl_assert_data_8.line = 31;
-      __gen_e_acsl_assert_data_8.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_3,& __gen_e_acsl_assert_data_8);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
       __gen_e_acsl_valid_3 = __e_acsl_valid((void *)t2.p,sizeof(char),
                                             (void *)t2.p,(void *)(& t2.p));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"t2.p",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"t2.p",
                                    (void *)t2.p);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                      "sizeof(char)",0,sizeof(char));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                    "\\valid(t2.p)",0,__gen_e_acsl_valid_3);
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_3;
     }
     else __gen_e_acsl_and_2 = 0;
     if (! __gen_e_acsl_and_2) {
-      int __gen_e_acsl_initialized_5;
+      int __gen_e_acsl_initialized_2;
       int __gen_e_acsl_and_3;
-      __gen_e_acsl_initialized_5 = __e_acsl_initialized((void *)(& t2.q),
+      __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& t2.q),
                                                         sizeof(char *));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"&t2.q",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&t2.q",
                                    (void *)(& t2.q));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                      "sizeof(char *)",0,sizeof(char *));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                    "\\initialized(&t2.q)",0,
-                                   __gen_e_acsl_initialized_5);
-      if (__gen_e_acsl_initialized_5) {
-        int __gen_e_acsl_initialized_6;
-        int __gen_e_acsl_aligned_4;
+                                   __gen_e_acsl_initialized_2);
+      if (__gen_e_acsl_initialized_2) {
         int __gen_e_acsl_valid_4;
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
-          {.values = (void *)0};
-        __gen_e_acsl_initialized_6 = __e_acsl_initialized((void *)(& t2.q),
-                                                          sizeof(char *));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_9,"&t2.q",
-                                     (void *)(& t2.q));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_9,
-                                       "sizeof(char *)",0,sizeof(char *));
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
-                                     "uninitialized: \\initialized(&t2.q)",0,
-                                     __gen_e_acsl_initialized_6);
-        /*@ assert E_ACSL: uninitialized: \initialized(&t2.q); */
-        {
-          __gen_e_acsl_assert_data_9.blocking = 1;
-          __gen_e_acsl_assert_data_9.kind = "RTE";
-          __gen_e_acsl_assert_data_9.pred_txt = "\\initialized(&t2.q)";
-          __gen_e_acsl_assert_data_9.file = "t_struct.c";
-          __gen_e_acsl_assert_data_9.fct = "main";
-          __gen_e_acsl_assert_data_9.line = 31;
-          __gen_e_acsl_assert_data_9.name = "uninitialized";
-          __e_acsl_assert(__gen_e_acsl_initialized_6,
-                          & __gen_e_acsl_assert_data_9);
-          __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
-        }
-        __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
-          {.values = (void *)0};
-        __gen_e_acsl_aligned_4 = __e_acsl_aligned((void *)t2.q,
-                                                  _Alignof(char));
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_10,
-                                       "alignof(char)",0,_Alignof(char));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_10,"t2.q",
-                                     (void *)t2.q);
-        __gen_e_acsl_assert_data_10.blocking = 1;
-        __gen_e_acsl_assert_data_10.kind = "RTE";
-        __gen_e_acsl_assert_data_10.pred_txt = "\\aligned(t2.q,alignof(char))";
-        __gen_e_acsl_assert_data_10.file = "t_struct.c";
-        __gen_e_acsl_assert_data_10.fct = "main";
-        __gen_e_acsl_assert_data_10.line = 31;
-        __gen_e_acsl_assert_data_10.name = "pointer_alignment";
-        __e_acsl_assert(__gen_e_acsl_aligned_4,& __gen_e_acsl_assert_data_10);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
         __gen_e_acsl_valid_4 = __e_acsl_valid((void *)t2.q,sizeof(char),
                                               (void *)t2.q,(void *)(& t2.q));
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"t2.q",
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"t2.q",
                                      (void *)t2.q);
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                        "sizeof(char)",0,sizeof(char));
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                      "\\valid(t2.q)",0,__gen_e_acsl_valid_4);
         __gen_e_acsl_and_3 = __gen_e_acsl_valid_4;
       }
@@ -305,14 +137,14 @@ int main(void)
       __gen_e_acsl_and_4 = ! __gen_e_acsl_and_3;
     }
     else __gen_e_acsl_and_4 = 0;
-    __gen_e_acsl_assert_data_6.blocking = 1;
-    __gen_e_acsl_assert_data_6.kind = "Assertion";
-    __gen_e_acsl_assert_data_6.pred_txt = "!(\\initialized(&t2.p) && \\valid(t2.p)) &&\n!(\\initialized(&t2.q) && \\valid(t2.q))";
-    __gen_e_acsl_assert_data_6.file = "t_struct.c";
-    __gen_e_acsl_assert_data_6.fct = "main";
-    __gen_e_acsl_assert_data_6.line = 31;
-    __e_acsl_assert(__gen_e_acsl_and_4,& __gen_e_acsl_assert_data_6);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Assertion";
+    __gen_e_acsl_assert_data_2.pred_txt = "!(\\initialized(&t2.p) && \\valid(t2.p)) &&\n!(\\initialized(&t2.q) && \\valid(t2.q))";
+    __gen_e_acsl_assert_data_2.file = "t_struct.c";
+    __gen_e_acsl_assert_data_2.fct = "main";
+    __gen_e_acsl_assert_data_2.line = 31;
+    __e_acsl_assert(__gen_e_acsl_and_4,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
   /*@
   assert
@@ -324,123 +156,39 @@ int main(void)
   __e_acsl_temporal_memcpy((void *)(& t2),(void *)(& t1),16UL);
   t2 = t1;
   {
-    int __gen_e_acsl_initialized_7;
-    int __gen_e_acsl_aligned_5;
     int __gen_e_acsl_valid_5;
     int __gen_e_acsl_and_5;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized_7 = __e_acsl_initialized((void *)(& t2.p),
-                                                      sizeof(char *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_12,"&t2.p",
-                                 (void *)(& t2.p));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_12,
-                                   "sizeof(char *)",0,sizeof(char *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,
-                                 "uninitialized: \\initialized(&t2.p)",0,
-                                 __gen_e_acsl_initialized_7);
-    /*@ assert E_ACSL: uninitialized: \initialized(&t2.p); */
-    {
-      __gen_e_acsl_assert_data_12.blocking = 1;
-      __gen_e_acsl_assert_data_12.kind = "RTE";
-      __gen_e_acsl_assert_data_12.pred_txt = "\\initialized(&t2.p)";
-      __gen_e_acsl_assert_data_12.file = "t_struct.c";
-      __gen_e_acsl_assert_data_12.fct = "main";
-      __gen_e_acsl_assert_data_12.line = 34;
-      __gen_e_acsl_assert_data_12.name = "uninitialized";
-      __e_acsl_assert(__gen_e_acsl_initialized_7,
-                      & __gen_e_acsl_assert_data_12);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
-    }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_13 =
-      {.values = (void *)0};
-    __gen_e_acsl_aligned_5 = __e_acsl_aligned((void *)t2.p,_Alignof(char));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_13,
-                                   "alignof(char)",0,_Alignof(char));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_13,"t2.p",
-                                 (void *)t2.p);
-    __gen_e_acsl_assert_data_13.blocking = 1;
-    __gen_e_acsl_assert_data_13.kind = "RTE";
-    __gen_e_acsl_assert_data_13.pred_txt = "\\aligned(t2.p,alignof(char))";
-    __gen_e_acsl_assert_data_13.file = "t_struct.c";
-    __gen_e_acsl_assert_data_13.fct = "main";
-    __gen_e_acsl_assert_data_13.line = 34;
-    __gen_e_acsl_assert_data_13.name = "pointer_alignment";
-    __e_acsl_assert(__gen_e_acsl_aligned_5,& __gen_e_acsl_assert_data_13);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
     __gen_e_acsl_valid_5 = __e_acsl_valid((void *)t2.p,sizeof(char),
                                           (void *)t2.p,(void *)(& t2.p));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,"t2.p",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"t2.p",
                                  (void *)t2.p);
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_11,
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                    "sizeof(char)",0,sizeof(char));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                  "\\valid(t2.p)",0,__gen_e_acsl_valid_5);
     if (__gen_e_acsl_valid_5) {
-      int __gen_e_acsl_initialized_8;
-      int __gen_e_acsl_aligned_6;
       int __gen_e_acsl_valid_6;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_14 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_8 = __e_acsl_initialized((void *)(& t2.q),
-                                                        sizeof(char *));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_14,"&t2.q",
-                                   (void *)(& t2.q));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_14,
-                                     "sizeof(char *)",0,sizeof(char *));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,
-                                   "uninitialized: \\initialized(&t2.q)",0,
-                                   __gen_e_acsl_initialized_8);
-      /*@ assert E_ACSL: uninitialized: \initialized(&t2.q); */
-      {
-        __gen_e_acsl_assert_data_14.blocking = 1;
-        __gen_e_acsl_assert_data_14.kind = "RTE";
-        __gen_e_acsl_assert_data_14.pred_txt = "\\initialized(&t2.q)";
-        __gen_e_acsl_assert_data_14.file = "t_struct.c";
-        __gen_e_acsl_assert_data_14.fct = "main";
-        __gen_e_acsl_assert_data_14.line = 34;
-        __gen_e_acsl_assert_data_14.name = "uninitialized";
-        __e_acsl_assert(__gen_e_acsl_initialized_8,
-                        & __gen_e_acsl_assert_data_14);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
-      }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned_6 = __e_acsl_aligned((void *)t2.q,_Alignof(char));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_15,
-                                     "alignof(char)",0,_Alignof(char));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_15,"t2.q",
-                                   (void *)t2.q);
-      __gen_e_acsl_assert_data_15.blocking = 1;
-      __gen_e_acsl_assert_data_15.kind = "RTE";
-      __gen_e_acsl_assert_data_15.pred_txt = "\\aligned(t2.q,alignof(char))";
-      __gen_e_acsl_assert_data_15.file = "t_struct.c";
-      __gen_e_acsl_assert_data_15.fct = "main";
-      __gen_e_acsl_assert_data_15.line = 34;
-      __gen_e_acsl_assert_data_15.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_6,& __gen_e_acsl_assert_data_15);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
       __gen_e_acsl_valid_6 = __e_acsl_valid((void *)t2.q,sizeof(char),
                                             (void *)t2.q,(void *)(& t2.q));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_11,"t2.q",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"t2.q",
                                    (void *)t2.q);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_11,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                      "sizeof(char)",0,sizeof(char));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                    "\\valid(t2.q)",0,__gen_e_acsl_valid_6);
       __gen_e_acsl_and_5 = __gen_e_acsl_valid_6;
     }
     else __gen_e_acsl_and_5 = 0;
-    __gen_e_acsl_assert_data_11.blocking = 1;
-    __gen_e_acsl_assert_data_11.kind = "Assertion";
-    __gen_e_acsl_assert_data_11.pred_txt = "\\valid(t2.p) && \\valid(t2.q)";
-    __gen_e_acsl_assert_data_11.file = "t_struct.c";
-    __gen_e_acsl_assert_data_11.fct = "main";
-    __gen_e_acsl_assert_data_11.line = 34;
-    __e_acsl_assert(__gen_e_acsl_and_5,& __gen_e_acsl_assert_data_11);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "Assertion";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\valid(t2.p) && \\valid(t2.q)";
+    __gen_e_acsl_assert_data_3.file = "t_struct.c";
+    __gen_e_acsl_assert_data_3.fct = "main";
+    __gen_e_acsl_assert_data_3.line = 34;
+    __e_acsl_assert(__gen_e_acsl_and_5,& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
   }
   /*@ assert \valid(t2.p) && \valid(t2.q); */ ;
   __e_acsl_initialize((void *)(& t2.p),sizeof(char *));
@@ -452,558 +200,208 @@ int main(void)
   t2.q = (char *)malloc(4UL);
   __e_acsl_temporal_store_nblock((void *)(& t2.q),(void *)*(& t2.q));
   {
-    int __gen_e_acsl_initialized_9;
+    int __gen_e_acsl_initialized_3;
     int __gen_e_acsl_and_6;
     int __gen_e_acsl_and_7;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
-    __gen_e_acsl_initialized_9 = __e_acsl_initialized((void *)(& t2.p),
+    __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(& t2.p),
                                                       sizeof(char *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_16,"&t2.p",
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"&t2.p",
                                  (void *)(& t2.p));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_16,
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                    "sizeof(char *)",0,sizeof(char *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
                                  "\\initialized(&t2.p)",0,
-                                 __gen_e_acsl_initialized_9);
-    if (__gen_e_acsl_initialized_9) {
-      int __gen_e_acsl_initialized_10;
-      int __gen_e_acsl_aligned_7;
+                                 __gen_e_acsl_initialized_3);
+    if (__gen_e_acsl_initialized_3) {
       int __gen_e_acsl_valid_7;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_17 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_10 = __e_acsl_initialized((void *)(& t2.p),
-                                                         sizeof(char *));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_17,"&t2.p",
-                                   (void *)(& t2.p));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_17,
-                                     "sizeof(char *)",0,sizeof(char *));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,
-                                   "uninitialized: \\initialized(&t2.p)",0,
-                                   __gen_e_acsl_initialized_10);
-      /*@ assert E_ACSL: uninitialized: \initialized(&t2.p); */
-      {
-        __gen_e_acsl_assert_data_17.blocking = 1;
-        __gen_e_acsl_assert_data_17.kind = "RTE";
-        __gen_e_acsl_assert_data_17.pred_txt = "\\initialized(&t2.p)";
-        __gen_e_acsl_assert_data_17.file = "t_struct.c";
-        __gen_e_acsl_assert_data_17.fct = "main";
-        __gen_e_acsl_assert_data_17.line = 38;
-        __gen_e_acsl_assert_data_17.name = "uninitialized";
-        __e_acsl_assert(__gen_e_acsl_initialized_10,
-                        & __gen_e_acsl_assert_data_17);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
-      }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_18 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned_7 = __e_acsl_aligned((void *)t2.p,_Alignof(char));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_18,
-                                     "alignof(char)",0,_Alignof(char));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_18,"t2.p",
-                                   (void *)t2.p);
-      __gen_e_acsl_assert_data_18.blocking = 1;
-      __gen_e_acsl_assert_data_18.kind = "RTE";
-      __gen_e_acsl_assert_data_18.pred_txt = "\\aligned(t2.p,alignof(char))";
-      __gen_e_acsl_assert_data_18.file = "t_struct.c";
-      __gen_e_acsl_assert_data_18.fct = "main";
-      __gen_e_acsl_assert_data_18.line = 38;
-      __gen_e_acsl_assert_data_18.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_7,& __gen_e_acsl_assert_data_18);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
       __gen_e_acsl_valid_7 = __e_acsl_valid((void *)t2.p,sizeof(char),
                                             (void *)t2.p,(void *)(& t2.p));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_16,"t2.p",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"t2.p",
                                    (void *)t2.p);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_16,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                      "sizeof(char)",0,sizeof(char));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
                                    "\\valid(t2.p)",0,__gen_e_acsl_valid_7);
       __gen_e_acsl_and_6 = __gen_e_acsl_valid_7;
     }
     else __gen_e_acsl_and_6 = 0;
     if (! __gen_e_acsl_and_6) {
-      int __gen_e_acsl_initialized_11;
-      int __gen_e_acsl_aligned_8;
       int __gen_e_acsl_valid_8;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_19 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_11 = __e_acsl_initialized((void *)(& t2.q),
-                                                         sizeof(char *));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_19,"&t2.q",
-                                   (void *)(& t2.q));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_19,
-                                     "sizeof(char *)",0,sizeof(char *));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,
-                                   "uninitialized: \\initialized(&t2.q)",0,
-                                   __gen_e_acsl_initialized_11);
-      /*@ assert E_ACSL: uninitialized: \initialized(&t2.q); */
-      {
-        __gen_e_acsl_assert_data_19.blocking = 1;
-        __gen_e_acsl_assert_data_19.kind = "RTE";
-        __gen_e_acsl_assert_data_19.pred_txt = "\\initialized(&t2.q)";
-        __gen_e_acsl_assert_data_19.file = "t_struct.c";
-        __gen_e_acsl_assert_data_19.fct = "main";
-        __gen_e_acsl_assert_data_19.line = 38;
-        __gen_e_acsl_assert_data_19.name = "uninitialized";
-        __e_acsl_assert(__gen_e_acsl_initialized_11,
-                        & __gen_e_acsl_assert_data_19);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_19);
-      }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_20 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned_8 = __e_acsl_aligned((void *)t2.q,_Alignof(char));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_20,
-                                     "alignof(char)",0,_Alignof(char));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_20,"t2.q",
-                                   (void *)t2.q);
-      __gen_e_acsl_assert_data_20.blocking = 1;
-      __gen_e_acsl_assert_data_20.kind = "RTE";
-      __gen_e_acsl_assert_data_20.pred_txt = "\\aligned(t2.q,alignof(char))";
-      __gen_e_acsl_assert_data_20.file = "t_struct.c";
-      __gen_e_acsl_assert_data_20.fct = "main";
-      __gen_e_acsl_assert_data_20.line = 38;
-      __gen_e_acsl_assert_data_20.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_8,& __gen_e_acsl_assert_data_20);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_20);
       __gen_e_acsl_valid_8 = __e_acsl_valid((void *)t2.q,sizeof(char),
                                             (void *)t2.q,(void *)(& t2.q));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_16,"t2.q",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"t2.q",
                                    (void *)t2.q);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_16,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                      "sizeof(char)",0,sizeof(char));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
                                    "\\valid(t2.q)",0,__gen_e_acsl_valid_8);
       __gen_e_acsl_and_7 = __gen_e_acsl_valid_8;
     }
     else __gen_e_acsl_and_7 = 0;
-    __gen_e_acsl_assert_data_16.blocking = 1;
-    __gen_e_acsl_assert_data_16.kind = "Assertion";
-    __gen_e_acsl_assert_data_16.pred_txt = "!(\\initialized(&t2.p) && \\valid(t2.p)) && \\valid(t2.q)";
-    __gen_e_acsl_assert_data_16.file = "t_struct.c";
-    __gen_e_acsl_assert_data_16.fct = "main";
-    __gen_e_acsl_assert_data_16.line = 38;
-    __e_acsl_assert(__gen_e_acsl_and_7,& __gen_e_acsl_assert_data_16);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "Assertion";
+    __gen_e_acsl_assert_data_4.pred_txt = "!(\\initialized(&t2.p) && \\valid(t2.p)) && \\valid(t2.q)";
+    __gen_e_acsl_assert_data_4.file = "t_struct.c";
+    __gen_e_acsl_assert_data_4.fct = "main";
+    __gen_e_acsl_assert_data_4.line = 38;
+    __e_acsl_assert(__gen_e_acsl_and_7,& __gen_e_acsl_assert_data_4);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
   }
   /*@ assert !(\initialized(&t2.p) && \valid(t2.p)) && \valid(t2.q); */ ;
   __e_acsl_initialize((void *)(& l.t),sizeof(struct temporal_t));
   __e_acsl_temporal_memcpy((void *)(& l.t),(void *)(& t2),16UL);
   l.t = t2;
   {
-    int __gen_e_acsl_initialized_12;
+    int __gen_e_acsl_initialized_4;
     int __gen_e_acsl_and_8;
     int __gen_e_acsl_and_9;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_21 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
-    __gen_e_acsl_initialized_12 = __e_acsl_initialized((void *)(& l.t.p),
-                                                       sizeof(char *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_21,"&l.t.p",
+    __gen_e_acsl_initialized_4 = __e_acsl_initialized((void *)(& l.t.p),
+                                                      sizeof(char *));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"&l.t.p",
                                  (void *)(& l.t.p));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_21,
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
                                    "sizeof(char *)",0,sizeof(char *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_21,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
                                  "\\initialized(&l.t.p)",0,
-                                 __gen_e_acsl_initialized_12);
-    if (__gen_e_acsl_initialized_12) {
-      int __gen_e_acsl_initialized_13;
-      int __gen_e_acsl_aligned_9;
+                                 __gen_e_acsl_initialized_4);
+    if (__gen_e_acsl_initialized_4) {
       int __gen_e_acsl_valid_9;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_22 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_13 = __e_acsl_initialized((void *)(& l.t.p),
-                                                         sizeof(char *));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_22,"&l.t.p",
-                                   (void *)(& l.t.p));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_22,
-                                     "sizeof(char *)",0,sizeof(char *));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_22,
-                                   "uninitialized: \\initialized(&l.t.p)",0,
-                                   __gen_e_acsl_initialized_13);
-      /*@ assert E_ACSL: uninitialized: \initialized(&l.t.p); */
-      {
-        __gen_e_acsl_assert_data_22.blocking = 1;
-        __gen_e_acsl_assert_data_22.kind = "RTE";
-        __gen_e_acsl_assert_data_22.pred_txt = "\\initialized(&l.t.p)";
-        __gen_e_acsl_assert_data_22.file = "t_struct.c";
-        __gen_e_acsl_assert_data_22.fct = "main";
-        __gen_e_acsl_assert_data_22.line = 41;
-        __gen_e_acsl_assert_data_22.name = "uninitialized";
-        __e_acsl_assert(__gen_e_acsl_initialized_13,
-                        & __gen_e_acsl_assert_data_22);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_22);
-      }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_23 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned_9 = __e_acsl_aligned((void *)l.t.p,_Alignof(char));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_23,
-                                     "alignof(char)",0,_Alignof(char));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_23,"l.t.p",
-                                   (void *)l.t.p);
-      __gen_e_acsl_assert_data_23.blocking = 1;
-      __gen_e_acsl_assert_data_23.kind = "RTE";
-      __gen_e_acsl_assert_data_23.pred_txt = "\\aligned(l.t.p,alignof(char))";
-      __gen_e_acsl_assert_data_23.file = "t_struct.c";
-      __gen_e_acsl_assert_data_23.fct = "main";
-      __gen_e_acsl_assert_data_23.line = 41;
-      __gen_e_acsl_assert_data_23.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_9,& __gen_e_acsl_assert_data_23);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_23);
       __gen_e_acsl_valid_9 = __e_acsl_valid((void *)l.t.p,sizeof(char),
                                             (void *)l.t.p,(void *)(& l.t.p));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_21,"l.t.p",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"l.t.p",
                                    (void *)l.t.p);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_21,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
                                      "sizeof(char)",0,sizeof(char));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_21,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
                                    "\\valid(l.t.p)",0,__gen_e_acsl_valid_9);
       __gen_e_acsl_and_8 = __gen_e_acsl_valid_9;
     }
     else __gen_e_acsl_and_8 = 0;
     if (! __gen_e_acsl_and_8) {
-      int __gen_e_acsl_initialized_14;
-      int __gen_e_acsl_aligned_10;
       int __gen_e_acsl_valid_10;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_24 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_14 = __e_acsl_initialized((void *)(& l.t.q),
-                                                         sizeof(char *));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_24,"&l.t.q",
-                                   (void *)(& l.t.q));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_24,
-                                     "sizeof(char *)",0,sizeof(char *));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_24,
-                                   "uninitialized: \\initialized(&l.t.q)",0,
-                                   __gen_e_acsl_initialized_14);
-      /*@ assert E_ACSL: uninitialized: \initialized(&l.t.q); */
-      {
-        __gen_e_acsl_assert_data_24.blocking = 1;
-        __gen_e_acsl_assert_data_24.kind = "RTE";
-        __gen_e_acsl_assert_data_24.pred_txt = "\\initialized(&l.t.q)";
-        __gen_e_acsl_assert_data_24.file = "t_struct.c";
-        __gen_e_acsl_assert_data_24.fct = "main";
-        __gen_e_acsl_assert_data_24.line = 41;
-        __gen_e_acsl_assert_data_24.name = "uninitialized";
-        __e_acsl_assert(__gen_e_acsl_initialized_14,
-                        & __gen_e_acsl_assert_data_24);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_24);
-      }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_25 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned_10 = __e_acsl_aligned((void *)l.t.q,
-                                                 _Alignof(char));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_25,
-                                     "alignof(char)",0,_Alignof(char));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_25,"l.t.q",
-                                   (void *)l.t.q);
-      __gen_e_acsl_assert_data_25.blocking = 1;
-      __gen_e_acsl_assert_data_25.kind = "RTE";
-      __gen_e_acsl_assert_data_25.pred_txt = "\\aligned(l.t.q,alignof(char))";
-      __gen_e_acsl_assert_data_25.file = "t_struct.c";
-      __gen_e_acsl_assert_data_25.fct = "main";
-      __gen_e_acsl_assert_data_25.line = 41;
-      __gen_e_acsl_assert_data_25.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_10,& __gen_e_acsl_assert_data_25);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_25);
       __gen_e_acsl_valid_10 = __e_acsl_valid((void *)l.t.q,sizeof(char),
                                              (void *)l.t.q,(void *)(& l.t.q));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_21,"l.t.q",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"l.t.q",
                                    (void *)l.t.q);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_21,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
                                      "sizeof(char)",0,sizeof(char));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_21,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
                                    "\\valid(l.t.q)",0,__gen_e_acsl_valid_10);
       __gen_e_acsl_and_9 = __gen_e_acsl_valid_10;
     }
     else __gen_e_acsl_and_9 = 0;
-    __gen_e_acsl_assert_data_21.blocking = 1;
-    __gen_e_acsl_assert_data_21.kind = "Assertion";
-    __gen_e_acsl_assert_data_21.pred_txt = "!(\\initialized(&l.t.p) && \\valid(l.t.p)) && \\valid(l.t.q)";
-    __gen_e_acsl_assert_data_21.file = "t_struct.c";
-    __gen_e_acsl_assert_data_21.fct = "main";
-    __gen_e_acsl_assert_data_21.line = 41;
-    __e_acsl_assert(__gen_e_acsl_and_9,& __gen_e_acsl_assert_data_21);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_21);
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "Assertion";
+    __gen_e_acsl_assert_data_5.pred_txt = "!(\\initialized(&l.t.p) && \\valid(l.t.p)) && \\valid(l.t.q)";
+    __gen_e_acsl_assert_data_5.file = "t_struct.c";
+    __gen_e_acsl_assert_data_5.fct = "main";
+    __gen_e_acsl_assert_data_5.line = 41;
+    __e_acsl_assert(__gen_e_acsl_and_9,& __gen_e_acsl_assert_data_5);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
   }
   /*@ assert !(\initialized(&l.t.p) && \valid(l.t.p)) && \valid(l.t.q); */ ;
   __e_acsl_full_init((void *)(& lp));
   __e_acsl_temporal_store_nblock((void *)(& lp),(void *)(& l));
   lp = & l;
   {
-    int __gen_e_acsl_initialized_15;
-    int __gen_e_acsl_initialized_16;
+    int __gen_e_acsl_initialized_5;
     int __gen_e_acsl_and_10;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_26 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_27 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized_15 = __e_acsl_initialized((void *)(& lp),
-                                                       sizeof(larger *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_27,"&lp",
-                                 (void *)(& lp));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_27,
-                                   "sizeof(larger *)",0,sizeof(larger *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_27,
-                                 "uninitialized: \\initialized(&lp)",0,
-                                 __gen_e_acsl_initialized_15);
-    /*@ assert E_ACSL: uninitialized: \initialized(&lp); */
-    {
-      __gen_e_acsl_assert_data_27.blocking = 1;
-      __gen_e_acsl_assert_data_27.kind = "RTE";
-      __gen_e_acsl_assert_data_27.pred_txt = "\\initialized(&lp)";
-      __gen_e_acsl_assert_data_27.file = "t_struct.c";
-      __gen_e_acsl_assert_data_27.fct = "main";
-      __gen_e_acsl_assert_data_27.line = 44;
-      __gen_e_acsl_assert_data_27.name = "uninitialized";
-      __e_acsl_assert(__gen_e_acsl_initialized_15,
-                      & __gen_e_acsl_assert_data_27);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_27);
-    }
-    __gen_e_acsl_initialized_16 = __e_acsl_initialized((void *)(& lp->t.p),
-                                                       sizeof(char *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_26,"&lp->t.p",
+    __gen_e_acsl_initialized_5 = __e_acsl_initialized((void *)(& lp->t.p),
+                                                      sizeof(char *));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"&lp->t.p",
                                  (void *)(& lp->t.p));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_26,
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
                                    "sizeof(char *)",0,sizeof(char *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_26,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
                                  "\\initialized(&lp->t.p)",0,
-                                 __gen_e_acsl_initialized_16);
-    if (__gen_e_acsl_initialized_16) {
-      int __gen_e_acsl_initialized_17;
-      int __gen_e_acsl_valid_read;
-      int __gen_e_acsl_aligned_11;
+                                 __gen_e_acsl_initialized_5);
+    if (__gen_e_acsl_initialized_5) {
       int __gen_e_acsl_valid_11;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_28 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_17 = __e_acsl_initialized((void *)(& lp),
-                                                         sizeof(larger *));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_28,"&lp",
-                                   (void *)(& lp));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_28,
-                                     "sizeof(larger *)",0,sizeof(larger *));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_28,
-                                   "uninitialized: \\initialized(&lp)",0,
-                                   __gen_e_acsl_initialized_17);
-      /*@ assert E_ACSL: uninitialized: \initialized(&lp); */
-      {
-        __gen_e_acsl_assert_data_28.blocking = 1;
-        __gen_e_acsl_assert_data_28.kind = "RTE";
-        __gen_e_acsl_assert_data_28.pred_txt = "\\initialized(&lp)";
-        __gen_e_acsl_assert_data_28.file = "t_struct.c";
-        __gen_e_acsl_assert_data_28.fct = "main";
-        __gen_e_acsl_assert_data_28.line = 44;
-        __gen_e_acsl_assert_data_28.name = "uninitialized";
-        __e_acsl_assert(__gen_e_acsl_initialized_17,
-                        & __gen_e_acsl_assert_data_28);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_28);
-      }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_29 =
-        {.values = (void *)0};
-      __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& lp->t.p),
-                                                    sizeof(char *),
-                                                    (void *)(& lp->t.p),
-                                                    (void *)0);
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_29,"&lp->t.p",
-                                   (void *)(& lp->t.p));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_29,
-                                     "sizeof(char *)",0,sizeof(char *));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_29,
-                                   "\"memory access\": \\valid_read(&lp->t.p)",
-                                   0,__gen_e_acsl_valid_read);
-      /*@ assert E_ACSL: "memory access": \valid_read(&lp->t.p); */
-      {
-        __gen_e_acsl_assert_data_29.blocking = 1;
-        __gen_e_acsl_assert_data_29.kind = "RTE";
-        __gen_e_acsl_assert_data_29.pred_txt = "\\valid_read(&lp->t.p)";
-        __gen_e_acsl_assert_data_29.file = "t_struct.c";
-        __gen_e_acsl_assert_data_29.fct = "main";
-        __gen_e_acsl_assert_data_29.line = 44;
-        __gen_e_acsl_assert_data_29.name = "memory access";
-        __e_acsl_assert(__gen_e_acsl_valid_read,
-                        & __gen_e_acsl_assert_data_29);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_29);
-      }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_30 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned_11 = __e_acsl_aligned((void *)lp->t.p,
-                                                 _Alignof(char));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_30,
-                                     "alignof(char)",0,_Alignof(char));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_30,"lp->t.p",
-                                   (void *)lp->t.p);
-      __gen_e_acsl_assert_data_30.blocking = 1;
-      __gen_e_acsl_assert_data_30.kind = "RTE";
-      __gen_e_acsl_assert_data_30.pred_txt = "\\aligned(lp->t.p,alignof(char))";
-      __gen_e_acsl_assert_data_30.file = "t_struct.c";
-      __gen_e_acsl_assert_data_30.fct = "main";
-      __gen_e_acsl_assert_data_30.line = 44;
-      __gen_e_acsl_assert_data_30.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_11,& __gen_e_acsl_assert_data_30);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_30);
       __gen_e_acsl_valid_11 = __e_acsl_valid((void *)lp->t.p,sizeof(char),
                                              (void *)lp->t.p,
                                              (void *)(& lp->t.p));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_26,"lp->t.p",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"lp->t.p",
                                    (void *)lp->t.p);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_26,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
                                      "sizeof(char)",0,sizeof(char));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_26,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
                                    "\\valid(lp->t.p)",0,
                                    __gen_e_acsl_valid_11);
       __gen_e_acsl_and_10 = __gen_e_acsl_valid_11;
     }
     else __gen_e_acsl_and_10 = 0;
-    __gen_e_acsl_assert_data_26.blocking = 1;
-    __gen_e_acsl_assert_data_26.kind = "Assertion";
-    __gen_e_acsl_assert_data_26.pred_txt = "!(\\initialized(&lp->t.p) && \\valid(lp->t.p))";
-    __gen_e_acsl_assert_data_26.file = "t_struct.c";
-    __gen_e_acsl_assert_data_26.fct = "main";
-    __gen_e_acsl_assert_data_26.line = 44;
-    __e_acsl_assert(! __gen_e_acsl_and_10,& __gen_e_acsl_assert_data_26);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_26);
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "Assertion";
+    __gen_e_acsl_assert_data_6.pred_txt = "!(\\initialized(&lp->t.p) && \\valid(lp->t.p))";
+    __gen_e_acsl_assert_data_6.file = "t_struct.c";
+    __gen_e_acsl_assert_data_6.fct = "main";
+    __gen_e_acsl_assert_data_6.line = 44;
+    __e_acsl_assert(! __gen_e_acsl_and_10,& __gen_e_acsl_assert_data_6);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
   }
   /*@ assert !(\initialized(&lp->t.p) && \valid(lp->t.p)); */ ;
   __e_acsl_initialize((void *)(tarr),sizeof(temporal));
   __e_acsl_temporal_memcpy((void *)(tarr),(void *)(& t2),16UL);
   tarr[0] = t2;
   {
-    int __gen_e_acsl_initialized_18;
+    int __gen_e_acsl_initialized_6;
     int __gen_e_acsl_and_11;
     int __gen_e_acsl_and_12;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_31 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
       {.values = (void *)0};
-    __gen_e_acsl_initialized_18 = __e_acsl_initialized((void *)(& tarr[0].p),
-                                                       sizeof(char *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_31,"&tarr[0].p",
+    __gen_e_acsl_initialized_6 = __e_acsl_initialized((void *)(& tarr[0].p),
+                                                      sizeof(char *));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"&tarr[0].p",
                                  (void *)(& tarr[0].p));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_31,
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
                                    "sizeof(char *)",0,sizeof(char *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_31,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
                                  "\\initialized(&tarr[0].p)",0,
-                                 __gen_e_acsl_initialized_18);
-    if (__gen_e_acsl_initialized_18) {
-      int __gen_e_acsl_initialized_19;
-      int __gen_e_acsl_aligned_12;
+                                 __gen_e_acsl_initialized_6);
+    if (__gen_e_acsl_initialized_6) {
       int __gen_e_acsl_valid_12;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_32 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_19 = __e_acsl_initialized((void *)(& tarr[0].p),
-                                                         sizeof(char *));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_32,
-                                   "&tarr[0].p",(void *)(& tarr[0].p));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_32,
-                                     "sizeof(char *)",0,sizeof(char *));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_32,
-                                   "uninitialized: \\initialized(&tarr[0].p)",
-                                   0,__gen_e_acsl_initialized_19);
-      /*@ assert E_ACSL: uninitialized: \initialized(&tarr[0].p); */
-      {
-        __gen_e_acsl_assert_data_32.blocking = 1;
-        __gen_e_acsl_assert_data_32.kind = "RTE";
-        __gen_e_acsl_assert_data_32.pred_txt = "\\initialized(&tarr[0].p)";
-        __gen_e_acsl_assert_data_32.file = "t_struct.c";
-        __gen_e_acsl_assert_data_32.fct = "main";
-        __gen_e_acsl_assert_data_32.line = 47;
-        __gen_e_acsl_assert_data_32.name = "uninitialized";
-        __e_acsl_assert(__gen_e_acsl_initialized_19,
-                        & __gen_e_acsl_assert_data_32);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_32);
-      }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_33 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned_12 = __e_acsl_aligned((void *)tarr[0].p,
-                                                 _Alignof(char));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_33,
-                                     "alignof(char)",0,_Alignof(char));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_33,"tarr[0].p",
-                                   (void *)tarr[0].p);
-      __gen_e_acsl_assert_data_33.blocking = 1;
-      __gen_e_acsl_assert_data_33.kind = "RTE";
-      __gen_e_acsl_assert_data_33.pred_txt = "\\aligned(tarr[0].p,alignof(char))";
-      __gen_e_acsl_assert_data_33.file = "t_struct.c";
-      __gen_e_acsl_assert_data_33.fct = "main";
-      __gen_e_acsl_assert_data_33.line = 47;
-      __gen_e_acsl_assert_data_33.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_12,& __gen_e_acsl_assert_data_33);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_33);
       __gen_e_acsl_valid_12 = __e_acsl_valid((void *)tarr[0].p,sizeof(char),
                                              (void *)tarr[0].p,
                                              (void *)(& tarr[0].p));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_31,"tarr[0].p",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"tarr[0].p",
                                    (void *)tarr[0].p);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_31,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
                                      "sizeof(char)",0,sizeof(char));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_31,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
                                    "\\valid(tarr[0].p)",0,
                                    __gen_e_acsl_valid_12);
       __gen_e_acsl_and_11 = __gen_e_acsl_valid_12;
     }
     else __gen_e_acsl_and_11 = 0;
     if (! __gen_e_acsl_and_11) {
-      int __gen_e_acsl_initialized_20;
-      int __gen_e_acsl_aligned_13;
       int __gen_e_acsl_valid_13;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_34 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_20 = __e_acsl_initialized((void *)(& tarr[0].q),
-                                                         sizeof(char *));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_34,
-                                   "&tarr[0].q",(void *)(& tarr[0].q));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_34,
-                                     "sizeof(char *)",0,sizeof(char *));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_34,
-                                   "uninitialized: \\initialized(&tarr[0].q)",
-                                   0,__gen_e_acsl_initialized_20);
-      /*@ assert E_ACSL: uninitialized: \initialized(&tarr[0].q); */
-      {
-        __gen_e_acsl_assert_data_34.blocking = 1;
-        __gen_e_acsl_assert_data_34.kind = "RTE";
-        __gen_e_acsl_assert_data_34.pred_txt = "\\initialized(&tarr[0].q)";
-        __gen_e_acsl_assert_data_34.file = "t_struct.c";
-        __gen_e_acsl_assert_data_34.fct = "main";
-        __gen_e_acsl_assert_data_34.line = 47;
-        __gen_e_acsl_assert_data_34.name = "uninitialized";
-        __e_acsl_assert(__gen_e_acsl_initialized_20,
-                        & __gen_e_acsl_assert_data_34);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_34);
-      }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_35 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned_13 = __e_acsl_aligned((void *)tarr[0].q,
-                                                 _Alignof(char));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_35,
-                                     "alignof(char)",0,_Alignof(char));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_35,"tarr[0].q",
-                                   (void *)tarr[0].q);
-      __gen_e_acsl_assert_data_35.blocking = 1;
-      __gen_e_acsl_assert_data_35.kind = "RTE";
-      __gen_e_acsl_assert_data_35.pred_txt = "\\aligned(tarr[0].q,alignof(char))";
-      __gen_e_acsl_assert_data_35.file = "t_struct.c";
-      __gen_e_acsl_assert_data_35.fct = "main";
-      __gen_e_acsl_assert_data_35.line = 47;
-      __gen_e_acsl_assert_data_35.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_13,& __gen_e_acsl_assert_data_35);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_35);
       __gen_e_acsl_valid_13 = __e_acsl_valid((void *)tarr[0].q,sizeof(char),
                                              (void *)tarr[0].q,
                                              (void *)(& tarr[0].q));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_31,"tarr[0].q",
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"tarr[0].q",
                                    (void *)tarr[0].q);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_31,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
                                      "sizeof(char)",0,sizeof(char));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_31,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
                                    "\\valid(tarr[0].q)",0,
                                    __gen_e_acsl_valid_13);
       __gen_e_acsl_and_12 = __gen_e_acsl_valid_13;
     }
     else __gen_e_acsl_and_12 = 0;
-    __gen_e_acsl_assert_data_31.blocking = 1;
-    __gen_e_acsl_assert_data_31.kind = "Assertion";
-    __gen_e_acsl_assert_data_31.pred_txt = "!(\\initialized(&tarr[0].p) && \\valid(tarr[0].p)) && \\valid(tarr[0].q)";
-    __gen_e_acsl_assert_data_31.file = "t_struct.c";
-    __gen_e_acsl_assert_data_31.fct = "main";
-    __gen_e_acsl_assert_data_31.line = 47;
-    __e_acsl_assert(__gen_e_acsl_and_12,& __gen_e_acsl_assert_data_31);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_31);
+    __gen_e_acsl_assert_data_7.blocking = 1;
+    __gen_e_acsl_assert_data_7.kind = "Assertion";
+    __gen_e_acsl_assert_data_7.pred_txt = "!(\\initialized(&tarr[0].p) && \\valid(tarr[0].p)) && \\valid(tarr[0].q)";
+    __gen_e_acsl_assert_data_7.file = "t_struct.c";
+    __gen_e_acsl_assert_data_7.fct = "main";
+    __gen_e_acsl_assert_data_7.line = 47;
+    __e_acsl_assert(__gen_e_acsl_and_12,& __gen_e_acsl_assert_data_7);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
   }
   /*@
   assert
@@ -1014,146 +412,60 @@ int main(void)
   __e_acsl_temporal_memcpy((void *)(larr),(void *)(& l),32UL);
   larr[0] = l;
   {
-    int __gen_e_acsl_initialized_21;
+    int __gen_e_acsl_initialized_7;
     int __gen_e_acsl_and_13;
     int __gen_e_acsl_and_14;
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_36 =
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
       {.values = (void *)0};
-    __gen_e_acsl_initialized_21 = __e_acsl_initialized((void *)(& larr[0].t.p),
-                                                       sizeof(char *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_36,
-                                 "&larr[0].t.p",(void *)(& larr[0].t.p));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_36,
+    __gen_e_acsl_initialized_7 = __e_acsl_initialized((void *)(& larr[0].t.p),
+                                                      sizeof(char *));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,"&larr[0].t.p",
+                                 (void *)(& larr[0].t.p));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
                                    "sizeof(char *)",0,sizeof(char *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_36,
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
                                  "\\initialized(&larr[0].t.p)",0,
-                                 __gen_e_acsl_initialized_21);
-    if (__gen_e_acsl_initialized_21) {
-      int __gen_e_acsl_initialized_22;
-      int __gen_e_acsl_aligned_14;
+                                 __gen_e_acsl_initialized_7);
+    if (__gen_e_acsl_initialized_7) {
       int __gen_e_acsl_valid_14;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_37 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_22 = __e_acsl_initialized((void *)(& larr[0].t.p),
-                                                         sizeof(char *));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_37,
-                                   "&larr[0].t.p",(void *)(& larr[0].t.p));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_37,
-                                     "sizeof(char *)",0,sizeof(char *));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_37,
-                                   "uninitialized: \\initialized(&larr[0].t.p)",
-                                   0,__gen_e_acsl_initialized_22);
-      /*@ assert E_ACSL: uninitialized: \initialized(&larr[0].t.p); */
-      {
-        __gen_e_acsl_assert_data_37.blocking = 1;
-        __gen_e_acsl_assert_data_37.kind = "RTE";
-        __gen_e_acsl_assert_data_37.pred_txt = "\\initialized(&larr[0].t.p)";
-        __gen_e_acsl_assert_data_37.file = "t_struct.c";
-        __gen_e_acsl_assert_data_37.fct = "main";
-        __gen_e_acsl_assert_data_37.line = 50;
-        __gen_e_acsl_assert_data_37.name = "uninitialized";
-        __e_acsl_assert(__gen_e_acsl_initialized_22,
-                        & __gen_e_acsl_assert_data_37);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_37);
-      }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_38 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned_14 = __e_acsl_aligned((void *)larr[0].t.p,
-                                                 _Alignof(char));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_38,
-                                     "alignof(char)",0,_Alignof(char));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_38,
-                                   "larr[0].t.p",(void *)larr[0].t.p);
-      __gen_e_acsl_assert_data_38.blocking = 1;
-      __gen_e_acsl_assert_data_38.kind = "RTE";
-      __gen_e_acsl_assert_data_38.pred_txt = "\\aligned(larr[0].t.p,alignof(char))";
-      __gen_e_acsl_assert_data_38.file = "t_struct.c";
-      __gen_e_acsl_assert_data_38.fct = "main";
-      __gen_e_acsl_assert_data_38.line = 50;
-      __gen_e_acsl_assert_data_38.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_14,& __gen_e_acsl_assert_data_38);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_38);
       __gen_e_acsl_valid_14 = __e_acsl_valid((void *)larr[0].t.p,
                                              sizeof(char),
                                              (void *)larr[0].t.p,
                                              (void *)(& larr[0].t.p));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_36,
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
                                    "larr[0].t.p",(void *)larr[0].t.p);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_36,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
                                      "sizeof(char)",0,sizeof(char));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_36,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
                                    "\\valid(larr[0].t.p)",0,
                                    __gen_e_acsl_valid_14);
       __gen_e_acsl_and_13 = __gen_e_acsl_valid_14;
     }
     else __gen_e_acsl_and_13 = 0;
     if (! __gen_e_acsl_and_13) {
-      int __gen_e_acsl_initialized_23;
-      int __gen_e_acsl_aligned_15;
       int __gen_e_acsl_valid_15;
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_39 =
-        {.values = (void *)0};
-      __gen_e_acsl_initialized_23 = __e_acsl_initialized((void *)(& larr[0].t.q),
-                                                         sizeof(char *));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_39,
-                                   "&larr[0].t.q",(void *)(& larr[0].t.q));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_39,
-                                     "sizeof(char *)",0,sizeof(char *));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_39,
-                                   "uninitialized: \\initialized(&larr[0].t.q)",
-                                   0,__gen_e_acsl_initialized_23);
-      /*@ assert E_ACSL: uninitialized: \initialized(&larr[0].t.q); */
-      {
-        __gen_e_acsl_assert_data_39.blocking = 1;
-        __gen_e_acsl_assert_data_39.kind = "RTE";
-        __gen_e_acsl_assert_data_39.pred_txt = "\\initialized(&larr[0].t.q)";
-        __gen_e_acsl_assert_data_39.file = "t_struct.c";
-        __gen_e_acsl_assert_data_39.fct = "main";
-        __gen_e_acsl_assert_data_39.line = 50;
-        __gen_e_acsl_assert_data_39.name = "uninitialized";
-        __e_acsl_assert(__gen_e_acsl_initialized_23,
-                        & __gen_e_acsl_assert_data_39);
-        __e_acsl_assert_clean(& __gen_e_acsl_assert_data_39);
-      }
-      __e_acsl_assert_data_t __gen_e_acsl_assert_data_40 =
-        {.values = (void *)0};
-      __gen_e_acsl_aligned_15 = __e_acsl_aligned((void *)larr[0].t.q,
-                                                 _Alignof(char));
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_40,
-                                     "alignof(char)",0,_Alignof(char));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_40,
-                                   "larr[0].t.q",(void *)larr[0].t.q);
-      __gen_e_acsl_assert_data_40.blocking = 1;
-      __gen_e_acsl_assert_data_40.kind = "RTE";
-      __gen_e_acsl_assert_data_40.pred_txt = "\\aligned(larr[0].t.q,alignof(char))";
-      __gen_e_acsl_assert_data_40.file = "t_struct.c";
-      __gen_e_acsl_assert_data_40.fct = "main";
-      __gen_e_acsl_assert_data_40.line = 50;
-      __gen_e_acsl_assert_data_40.name = "pointer_alignment";
-      __e_acsl_assert(__gen_e_acsl_aligned_15,& __gen_e_acsl_assert_data_40);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_40);
       __gen_e_acsl_valid_15 = __e_acsl_valid((void *)larr[0].t.q,
                                              sizeof(char),
                                              (void *)larr[0].t.q,
                                              (void *)(& larr[0].t.q));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_36,
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_8,
                                    "larr[0].t.q",(void *)larr[0].t.q);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_36,
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_8,
                                      "sizeof(char)",0,sizeof(char));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_36,
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
                                    "\\valid(larr[0].t.q)",0,
                                    __gen_e_acsl_valid_15);
       __gen_e_acsl_and_14 = __gen_e_acsl_valid_15;
     }
     else __gen_e_acsl_and_14 = 0;
-    __gen_e_acsl_assert_data_36.blocking = 1;
-    __gen_e_acsl_assert_data_36.kind = "Assertion";
-    __gen_e_acsl_assert_data_36.pred_txt = "!(\\initialized(&larr[0].t.p) && \\valid(larr[0].t.p)) && \\valid(larr[0].t.q)";
-    __gen_e_acsl_assert_data_36.file = "t_struct.c";
-    __gen_e_acsl_assert_data_36.fct = "main";
-    __gen_e_acsl_assert_data_36.line = 50;
-    __e_acsl_assert(__gen_e_acsl_and_14,& __gen_e_acsl_assert_data_36);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_36);
+    __gen_e_acsl_assert_data_8.blocking = 1;
+    __gen_e_acsl_assert_data_8.kind = "Assertion";
+    __gen_e_acsl_assert_data_8.pred_txt = "!(\\initialized(&larr[0].t.p) && \\valid(larr[0].t.p)) && \\valid(larr[0].t.q)";
+    __gen_e_acsl_assert_data_8.file = "t_struct.c";
+    __gen_e_acsl_assert_data_8.fct = "main";
+    __gen_e_acsl_assert_data_8.line = 50;
+    __e_acsl_assert(__gen_e_acsl_and_14,& __gen_e_acsl_assert_data_8);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
   }
   /*@
   assert

@@ -12,19 +12,6 @@ int main(void)
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    /*@ assert E_ACSL: "division by zero": 2 != 0; */
-    {
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "2 != 0";
-      __gen_e_acsl_assert_data_2.file = "trivial_rte.i";
-      __gen_e_acsl_assert_data_2.fct = "main";
-      __gen_e_acsl_assert_data_2.line = 8;
-      __gen_e_acsl_assert_data_2.name = "division by zero";
-      __e_acsl_assert(1,& __gen_e_acsl_assert_data_2);
-    }
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "4 / 2 == 2";

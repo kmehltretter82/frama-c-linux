@@ -48,8 +48,6 @@
   Using specification of function __gen_e_acsl_conds_fun3
   for recursive calls of depth 5. Analysis of function __gen_e_acsl_conds_fun3
   is thus incomplete and its soundness relies on the written specification.
-[eva:alarm] contrived.c:30: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status invalid.
 [eva:alarm] contrived.c:80: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] contrived.c:80: Warning: assertion got status unknown.

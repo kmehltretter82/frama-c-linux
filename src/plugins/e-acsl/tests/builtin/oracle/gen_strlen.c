@@ -294,8 +294,6 @@ int main(int argc, char const **argv)
   __e_acsl_globals_init();
   char *empty_str = (char *)"";
   char *heap_str = eacsl_test_strdup("the cat",8UL);
-  __e_acsl_store_block((void *)(& heap_str),8UL);
-  __e_acsl_full_init((void *)(& heap_str));
   char stack_str[8UL] = {'t', 'h', 'e', ' ', 'd', 'o', 'g', '\000'};
   __e_acsl_store_block((void *)(stack_str),8UL);
   __e_acsl_full_init((void *)(& stack_str));
@@ -372,7 +370,6 @@ int main(int argc, char const **argv)
       __e_acsl_delete_block((void *)(& process_status_2));
     }
   }
-  __e_acsl_initialize((void *)(heap_str + 7),sizeof(char));
   *(heap_str + 7) = (char)97;
   __e_acsl_initialize((void *)(& stack_str[7]),sizeof(char));
   stack_str[7] = (char)97;
@@ -434,7 +431,6 @@ int main(int argc, char const **argv)
   }
   __retres = 0;
   __e_acsl_delete_block((void *)(stack_str));
-  __e_acsl_delete_block((void *)(& heap_str));
   __e_acsl_globals_clean();
   __e_acsl_memory_clean();
   return __retres;

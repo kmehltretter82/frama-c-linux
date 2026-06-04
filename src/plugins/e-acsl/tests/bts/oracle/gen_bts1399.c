@@ -27,96 +27,13 @@ int main(void)
   state->bitsInQueue = 16U;
   {
     int __gen_e_acsl_initialized;
-    int __gen_e_acsl_initialized_2;
-    int __gen_e_acsl_valid_read;
-    int __gen_e_acsl_initialized_3;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& state),
-                                                    sizeof(spongeState *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&state",
-                                 (void *)(& state));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                   "sizeof(spongeState *)",0,
-                                   sizeof(spongeState *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "uninitialized: \\initialized(&state)",0,
-                                 __gen_e_acsl_initialized);
-    /*@ assert E_ACSL: uninitialized: \initialized(&state); */
-    {
-      __gen_e_acsl_assert_data_2.blocking = 1;
-      __gen_e_acsl_assert_data_2.kind = "RTE";
-      __gen_e_acsl_assert_data_2.pred_txt = "\\initialized(&state)";
-      __gen_e_acsl_assert_data_2.file = "bts1399.c";
-      __gen_e_acsl_assert_data_2.fct = "main";
-      __gen_e_acsl_assert_data_2.line = 19;
-      __gen_e_acsl_assert_data_2.name = "uninitialized";
-      __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_2);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
-      {.values = (void *)0};
-    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& state),
-                                                      sizeof(spongeState *));
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&state",
-                                 (void *)(& state));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
-                                   "sizeof(spongeState *)",0,
-                                   sizeof(spongeState *));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
-                                 "uninitialized: \\initialized(&state)",0,
-                                 __gen_e_acsl_initialized_2);
-    /*@ assert E_ACSL: uninitialized: \initialized(&state); */
-    {
-      __gen_e_acsl_assert_data_3.blocking = 1;
-      __gen_e_acsl_assert_data_3.kind = "RTE";
-      __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(&state)";
-      __gen_e_acsl_assert_data_3.file = "bts1399.c";
-      __gen_e_acsl_assert_data_3.fct = "main";
-      __gen_e_acsl_assert_data_3.line = 19;
-      __gen_e_acsl_assert_data_3.name = "uninitialized";
-      __e_acsl_assert(__gen_e_acsl_initialized_2,
-                      & __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-    }
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
-      {.values = (void *)0};
     /*@ assert Eva: pointer_alignment: \aligned(state,alignof(spongeState));
     */
-    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& state->bitsInQueue),
-                                                  sizeof(unsigned int),
-                                                  (void *)(& state->bitsInQueue),
-                                                  (void *)0);
-    /*@ assert Eva: pointer_alignment: \aligned(state,alignof(spongeState));
-    */
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
-                                 "&state->bitsInQueue",
-                                 (void *)(& state->bitsInQueue));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
-                                   "sizeof(unsigned int)",0,
-                                   sizeof(unsigned int));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                 "\"memory access\": \\valid_read(&state->bitsInQueue)",
-                                 0,__gen_e_acsl_valid_read);
-    /*@ assert E_ACSL: "memory access": \valid_read(&state->bitsInQueue); */
-    {
-      __gen_e_acsl_assert_data_4.blocking = 1;
-      __gen_e_acsl_assert_data_4.kind = "RTE";
-      __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(&state->bitsInQueue)";
-      __gen_e_acsl_assert_data_4.file = "bts1399.c";
-      __gen_e_acsl_assert_data_4.fct = "main";
-      __gen_e_acsl_assert_data_4.line = 19;
-      __gen_e_acsl_assert_data_4.name = "memory access";
-      __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_4);
-      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
-    }
-    /*@ assert Eva: pointer_alignment: \aligned(state,alignof(spongeState));
-    */
-    __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(& state->dataQueue[
-                                                      state->bitsInQueue / 8U]),
-                                                      sizeof(unsigned char __attribute__((
-                                                      __aligned__(32)))));
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& state->dataQueue[
+                                                    state->bitsInQueue / 8U]),
+                                                    sizeof(unsigned char __attribute__((
+                                                    __aligned__(32)))));
     /*@ assert Eva: pointer_alignment: \aligned(state,alignof(spongeState));
     */
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,
@@ -129,14 +46,14 @@ int main(void)
                                    __aligned__(32)))));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "\\initialized(&state->dataQueue[state->bitsInQueue / 8])",
-                                 0,__gen_e_acsl_initialized_3);
+                                 0,__gen_e_acsl_initialized);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "!\\initialized(&state->dataQueue[state->bitsInQueue / 8])";
     __gen_e_acsl_assert_data.file = "bts1399.c";
     __gen_e_acsl_assert_data.fct = "main";
     __gen_e_acsl_assert_data.line = 19;
-    __e_acsl_assert(! __gen_e_acsl_initialized_3,& __gen_e_acsl_assert_data);
+    __e_acsl_assert(! __gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
   }
   /*@ assert !\initialized(&state->dataQueue[state->bitsInQueue / 8]); */ ;
