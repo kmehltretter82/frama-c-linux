@@ -210,13 +210,7 @@ struct
           | TgProp(f,ts) -> call Cprop f fmt ts
         and call mode f fmt ts =
           match self#link f, mode with
-          | F_call f, _
-          | F_proj f, _
-          | F_bool_prop (f,_), Cterm
-          | F_bool_prop (_,f), Cprop ->
-            Plib.pp_call_apply ~f pretty fmt ts
-          | F_left f, _ -> Plib.pp_fold_apply ~f pretty fmt ts
-          | F_right f, _ -> Plib.pp_fold_apply_rev ~f pretty fmt (List.rev ts)
+          | F_call f, _ | F_proj f, _ -> Plib.pp_fold_apply ~f pretty fmt ts
           | F_assoc op, _ -> Plib.pp_assoc ~op pretty fmt ts
         in fprintf fmt "@[<hov 2>%a@]" pretty t
 

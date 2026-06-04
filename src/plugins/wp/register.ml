@@ -67,16 +67,15 @@ let do_print_goal_status fmt (g : Wpo.t) =
       do_print_index fmt g.po_idx ;
       Wpo.pp_goal fmt g ;
       if ProofSession.exists g then
-        Format.fprintf fmt "Script %a@\n" ProofSession.pp_file
-          (ProofSession.filename ~force:false g) ;
+        Format.fprintf fmt "Script %a@\n"
+          ProofSession.pp_file (ProofSession.filename ~force:false g) ;
       begin
         match ProofEngine.get g with
         | `None | `Script -> ()
         | `Proof | `Saved ->
           let tree = ProofEngine.proof ~main:g in
           match ProofEngine.status tree with
-          | `Unproved | `Invalid | `Proved | `Passed ->
-            Wpo.pp_goal fmt g
+          | `Unproved | `Invalid | `Proved | `Passed -> ()
           | `Pending n | `StillResist n ->
             for i = 0 to n-1 do
               Format.fprintf fmt "%tSubgoal %d/%d:@\n" Wpo.pp_flow (succ i) n ;

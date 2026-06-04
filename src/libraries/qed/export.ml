@@ -45,12 +45,7 @@ let ctau = function
   | Prop -> Cprop
   | _ -> Cterm
 
-let link_name = function
-  | F_call f -> f
-  | _ -> assert false (** Only normal function call F_call can be declared *)
-
-let debug = function
-  | F_call f | F_proj f | F_left f | F_right f | F_assoc f | F_bool_prop(_,f) -> f
+let link_name = function F_call f | F_proj f | F_assoc f -> f
 
 (* -------------------------------------------------------------------------- *)
 (* --- Identifiers                                                        --- *)
@@ -235,12 +230,7 @@ struct
     | Eq _ | Neq _ | Leq _ | Lt _ | Imply _ | And _ | Or _ | If _
     | Bind((Forall|Exists),_,_) | True | False -> true
     | Not a -> has_prop_form link a
-    | Fun(f,_) ->
-      begin
-        match link f with
-        | F_bool_prop _ -> true
-        | _ -> T.Fun.sort f = Sprop
-      end
+    | Fun _ -> true
     | _ -> false
 
   (* -------------------------------------------------------------------------- *)
@@ -405,28 +395,9 @@ struct
             | [ x ] -> Format.fprintf fmt "%a.%s" self#pp_atom x f
             | _ -> self#pp_callsorts ~f fmt (Fun.params fct) xs
           end
-        | F_call f, _
-        | F_bool_prop (f,_), Cterm
-        | F_bool_prop (_,f), Cprop ->
+        | F_call f, _ ->
           self#pp_callsorts ~f fmt (Fun.params fct) xs
         | F_assoc op, _ -> Plib.pp_assoc ~e:"?" ~op self#pp_atom fmt xs
-        | F_left f, _ ->
-          begin
-            match self#callstyle with
-            | CallVar | CallVoid ->
-              Plib.pp_fold_call ~f self#pp_flow fmt xs
-            | CallApply ->
-              Plib.pp_fold_apply ~f self#pp_atom fmt xs
-          end
-        | F_right f, _ ->
-          begin
-            let xs = List.rev xs in
-            match self#callstyle with
-            | CallVar | CallVoid ->
-              Plib.pp_fold_call_rev ~f self#pp_flow fmt xs
-            | CallApply ->
-              Plib.pp_fold_apply_rev ~f self#pp_atom fmt xs
-          end
 
       method virtual pp_apply : cmode -> term -> term list printer
 
@@ -764,12 +735,15 @@ struct
           | _ -> fprintf fmt "(%a=%s)" self#pp_do_atom e (self#e_true Cterm)
         else pp fmt e
 
-      method private is_proj f =
-        match self#link f with F_proj _ -> true | _ -> false
-
       method private is_atom e =
         match T.repr e with
-        | Fun(f, [x]) when self#is_proj f -> self#is_atom x
+        | Fun(f, _) ->
+          begin
+            match self#link f with
+            | F_proj _ -> true
+            | F_assoc _ -> false
+            | F_call _ -> self#callstyle <> CallApply
+          end
         | Aget(a,_) -> self#is_atom a
         | Rget(a,_) -> self#is_atom a
         | _ -> self#is_atomic e

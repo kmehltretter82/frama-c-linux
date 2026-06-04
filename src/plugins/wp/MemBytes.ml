@@ -195,10 +195,10 @@ let phi_index size = function
 
 module RegisterShift = WpContext.Static
     (struct
+      include Lang.Fun
       type key = Lang.lfun
       type data = shift
       let name = "MemBytes.RegisterShift"
-      include Lang.Fun
     end)
 
 let field_offset ci field =
@@ -561,10 +561,10 @@ let formals = 2
 
 module RegisterBASE = WpContext.Index
     (struct
+      include Lang.Fun
       type key = Lang.lfun
       type data = Cil_types.varinfo
       let name = "MemBytes.RegisterBASE"
-      include Lang.Fun
     end)
 
 module BASE = WpContext.Generator(Cil_datatype.Varinfo)
@@ -665,7 +665,7 @@ module BASE = WpContext.Generator(Cil_datatype.Varinfo)
           d_definition = Definitions.Function (result, Def, e_int vi.vid) ;
           d_cluster = cluster_globals () ;
         } ;
-        let prefix = Lang.Fun.debug d_lfun in
+        let prefix = Lang.Fun.name d_lfun in
         let base = e_fun d_lfun [] in
         RegisterBASE.define d_lfun vi ;
         static_alloc prefix base ;
@@ -746,7 +746,7 @@ module STRING = WpContext.Generator(LITERAL)
         let eid = fresh () in
         let d_lfun = Lang.generated_f ~result:Int ~params:[] "Str_%d" eid in
         (* Since its a generated it is the unique name given *)
-        let prefix = Lang.Fun.debug d_lfun in
+        let prefix = Lang.Fun.name d_lfun in
         let base = Lang.F.e_fun d_lfun [] in
         Definitions.define_symbol {
           d_lfun ; d_types = 0 ; d_params = [] ;
@@ -891,11 +891,12 @@ module PointersProperties = WpContext.Generator(Datatype.Unit)
         let m = Lang.freshvar ~basename:"m" WBytes.t_memory in
         let a = Lang.freshvar ~basename:"a" (!@MemAddr.t_addr) in
         let p = load_pointer_raw (e_var m) (Cil_const.voidPtrType) (e_var a) in
-        let ba = MemAddr.base (e_var a) and bp = MemAddr.base p in
+        let base_a = MemAddr.base (e_var a) in
+        let base_p = MemAddr.base p in
         let body =
           p_forall [a] @@ p_imply
-            (p_leq (MemAddr.region ba) e_zero)
-            (p_leq (MemAddr.region bp) e_zero)
+            (p_leq (MemAddr.region base_a) e_zero)
+            (p_leq (MemAddr.region base_p) e_zero)
         in
         Definitions.define_symbol {
           d_lfun = lfun ;

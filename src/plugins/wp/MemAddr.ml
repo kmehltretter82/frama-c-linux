@@ -135,10 +135,10 @@ type addr_builtin = {
 
 module ADDR_BUILTIN = WpContext.Static
     (struct
+      include Lang.Fun
       type key = Lang.lfun
       type data = addr_builtin
       let name = "MemMemory.ADDR_BUILTIN"
-      include Lang.Fun
     end)
 
 type externs = {

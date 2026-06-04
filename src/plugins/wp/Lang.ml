@@ -104,7 +104,6 @@ and tau = (field,adt) Logic.datatype
 
 let pointer = Context.create "Lang.pointer"
 let floats = Context.create "Lang.floats"
-let new_extern_id = ref (-1)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Sorting & Typing                                                   --- *)
@@ -217,13 +216,19 @@ struct
 
   type t = adt
 
+  let name = function
+    | Qdata a -> Qed.Symbol.Data.name a
+    | Comp (c, KValue) -> comp_id c
+    | Comp (c, KInit) -> comp_init_id c
+    | Atype lt -> type_id lt
+
   let basename = function
     | Qdata a -> basename "M" @@ Qed.Symbol.Data.name a
     | Comp (c,KValue) -> basename (if c.cstruct then "S" else "U") c.corig_name
     | Comp (c,KInit) -> basename (if c.cstruct then "IS" else "IU") c.corig_name
     | Atype lt -> basename "A" lt.lt_name
 
-  let debug = function
+  let fullname = function
     | Qdata a -> Qed.Symbol.Data.fullname a
     | Comp (c, KValue) -> comp_id c
     | Comp (c, KInit) -> comp_init_id c
@@ -251,7 +256,7 @@ struct
 
   let equal a b = (compare a b = 0)
 
-  let pretty fmt a = Format.pp_print_string fmt (debug a)
+  let pretty fmt a = Format.pp_print_string fmt @@ name a
 
 end
 
@@ -294,9 +299,11 @@ struct
 
   type t = field
 
-  let debug = function
+  let name = function
     | Cfield(f, KValue) -> field_id f
     | Cfield(f, KInit) -> field_init_id f
+
+  let fullname = name
 
   let hash = function
     | Cfield(f, KValue) -> Fieldinfo.hash f
@@ -313,7 +320,7 @@ struct
 
   let equal f g = (compare f g = 0)
 
-  let pretty fmt f = Format.pp_print_string fmt (debug f)
+  let pretty fmt f = Format.pp_print_string fmt @@ name f
 
   let sort = function
     | Cfield(f, KValue) -> sort_of_object (Ctypes.object_of f.ftype)
@@ -336,13 +343,12 @@ type lfun =
   (* External function *)
 
 and lsymbol = {
-  m_id : int ;
   m_name : string ;
   m_context : WpContext.context option ;
   m_category : lfun category ;
+  m_coloring : bool ;
   m_result : tau ;
   m_params : tau list ;
-  m_coloring : bool ;
 }
 
 and esymbol = {
@@ -438,13 +444,11 @@ let generated_f
     ~result ~params descr =
   Format.kasprintf
     begin fun name ->
-      let id = incr new_extern_id ; !new_extern_id in
-      let context = if context
+      let context =
+        if context
         then Some (WpContext.get_context ())
         else None
-      in
-      lsymbol {
-        m_id = id ;
+      in lsymbol {
         m_name = name ;
         m_category = category ;
         m_params = params ;
@@ -476,7 +480,13 @@ struct
 
   type t = lfun
 
-  let debug = function
+  let name = function
+    | ACSL f -> logic_id f
+    | CTOR c -> ctor_id c
+    | LFUN l -> l.m_name
+    | QFUN f -> Qed.Symbol.Fun.name f.e_symbol
+
+  let fullname = function
     | ACSL f -> logic_id f
     | CTOR c -> ctor_id c
     | LFUN l -> l.m_name
@@ -485,13 +495,16 @@ struct
   let hash = function
     | ACSL f -> Logic_info.hash f
     | CTOR c -> Logic_ctor_info.hash c
-    | LFUN l -> 7 * l.m_id
+    | LFUN l -> 7 * String.hash l.m_name
     | QFUN f -> 13 * Qed.Symbol.Fun.hash f.e_symbol
 
   let compare f g =
     if f==g then 0 else
       match f , g with
-      | LFUN f , LFUN g -> Int.compare f.m_id g.m_id
+      | LFUN f , LFUN g ->
+        let cmp = String.compare f.m_name g.m_name in
+        if cmp <> 0 then cmp else
+          Option.compare WpContext.S.compare f.m_context g.m_context
       | LFUN _ , _ -> (-1)
       | _ , LFUN _ -> (+1)
       | QFUN f , QFUN g -> Qed.Symbol.Fun.compare f.e_symbol g.e_symbol
@@ -504,11 +517,11 @@ struct
 
   let equal f g = (compare f g = 0)
 
-  let pretty fmt f = Format.pp_print_string fmt (debug f)
+  let pretty fmt f = Format.pp_print_string fmt @@ name f
 
   let category = function
     | LFUN m -> m.m_category
-    | QFUN _ -> Logic.Function
+    | QFUN e -> e.e_category
     | ACSL _ -> Logic.Function
     | CTOR _ -> Logic.Constructor
 
@@ -573,29 +586,20 @@ class virtual idprinting =
         else
           Engine.F_call (self#sanitize_fun l.m_name)
       | QFUN l ->
+        let name = Qed.Symbol.Fun.name l.e_symbol in
         let ls = Qed.Symbol.Fun.symbol l.e_symbol in
         if ls.ls_proj then
-          Engine.F_proj ls.ls_name.id_string
+          Engine.F_proj name
         else if associative l.e_category then
-          Engine.F_assoc (Qed.Symbol.Fun.name l.e_symbol)
+          Engine.F_assoc name
         else
-          Engine.F_call (Qed.Symbol.Fun.name l.e_symbol)
+          Engine.F_call name
 
   end
-
-let name_of_lfun = function
-  | ACSL f -> logic_id f
-  | CTOR c -> ctor_id c
-  | LFUN l -> l.m_name
-  | QFUN l -> Qed.Symbol.Fun.fullname l.e_symbol
 
 let context_of_lfun = function
   | ACSL _ | CTOR _ | QFUN _ -> None
   | LFUN l -> l.m_context
-
-let name_of_field = function
-  | Cfield(f, KValue) -> field_id f
-  | Cfield(f, KInit) -> field_init_id f
 
 (* -------------------------------------------------------------------------- *)
 (* --- Terms                                                              --- *)

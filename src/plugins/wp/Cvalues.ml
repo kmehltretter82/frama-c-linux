@@ -229,7 +229,8 @@ struct
   and is_record c s =
     let tau = Lang.t_comp c in
     Definitions.call_pred
-      (Lang.generated_p ~coloring:true ~params:[tau]
+      (Lang.generated_p
+         ~context:true ~coloring:true ~params:[tau]
          "%s%s" C.prefix (Lang.comp_id c))
       (fun d_lfun ->
          let basename = if c.cstruct then "S" else "U" in
@@ -252,7 +253,9 @@ struct
     let te = Lang.tau_of_object elt in
     let tm = Lang.t_matrix te dim in
     Definitions.call_pred
-      (Lang.generated_p ~coloring:true ~params:[tm] "%s" (array_name elt ds))
+      (Lang.generated_p
+         ~context:true ~coloring:true
+         ~params:[tm] "%s" (array_name elt ds))
       (fun lfun ->
          let cluster =
            match elt with
@@ -361,14 +364,14 @@ struct
     | F f -> Lang.t_float f
     | P -> Lang.t_addr ()
     | C c -> Lang.t_comp c
-  let equal = function
+  let eqterm = function
     | I | F _ | P -> F.p_equal
     | C c -> !equal_rec (C_comp c)
   let compare (a,p) (b,q) =
     let cmp = String.compare (key a) (key b) in
     if cmp <> 0 then cmp else Matrix.compare p q
   let pretty fmt (a,ds) =
-    Format.fprintf fmt "%s%a" (key a) Matrix.pp_suffix_id ds
+    Format.fprintf fmt "%s%a" (key a) Matrix.pretty ds
 end
 
 module EQARRAY = WpContext.Generator(AKEY)
@@ -387,12 +390,13 @@ module EQARRAY = WpContext.Generator(AKEY)
         let ta_xs = List.fold_left e_get ta denv.index_val in
         let tb_xs = List.fold_left e_get tb denv.index_val in
         let d_params = denv.size_var @ [xa ; xb ] in
-        let property = p_hyps (denv.index_range) (AKEY.equal a ta_xs tb_xs) in
+        let property = p_hyps (denv.index_range) (AKEY.eqterm a ta_xs tb_xs) in
         let definition = p_forall denv.index_var property in
         let d_definition = Predicate(Def,definition) in
         (* Logic Symbol *)
         let d_lfun =
           Lang.generated_p
+            ~context:true
             ~params:(List.map tau_of_var d_params)
             "EqArray_%s%a" (AKEY.key a) Matrix.pp_suffix_id ds
         in

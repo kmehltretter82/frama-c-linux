@@ -196,12 +196,8 @@ struct
       (fun fmt k -> Format.fprintf fmt "`%d" k)
       F.pretty A.pretty
 
-  let debug f =
-    let buffer = Buffer.create 80 in
-    let fmt = Format.formatter_of_buffer buffer in
-    pretty fmt f ;
-    Format.pp_print_flush fmt () ;
-    Buffer.contents buffer
+  let name = Format.asprintf "%a" pretty
+  let fullname = name
 
   let basename = function
     | Int -> "i"

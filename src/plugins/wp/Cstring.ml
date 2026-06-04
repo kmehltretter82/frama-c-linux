@@ -73,7 +73,7 @@ module LIT = WpContext.Generator(STR)
         let result = Array(Int,Int) in
         let lfun = Lang.generated_f ~result ~params:[] "Lit_%04X" id in
         (* Since its a generated it is the unique name given ["Lit_%04X" id] *)
-        let prefix = Lang.Fun.debug lfun in
+        let prefix = Lang.Fun.name lfun in
         define_symbol {
           d_lfun = lfun ;
           d_cluster = cluster () ;

@@ -45,13 +45,12 @@ type lfun = private
   | QFUN of esymbol  (** External logic symbol *)
 
 and lsymbol = {
-  m_id : int ;
   m_name : string ;
   m_context : WpContext.context option ;
   m_category : lfun category ;
+  m_coloring : bool ;
   m_result : tau ;
   m_params : tau list ;
-  m_coloring : bool ;
 }
 
 and esymbol = {
@@ -141,8 +140,6 @@ val poly : string list Context.value
 val parameters : (lfun -> sort list) -> unit
 (** definitions *)
 
-val name_of_lfun : lfun -> string
-val name_of_field : field -> string
 val context_of_lfun : lfun -> WpContext.context option
 (** LFuns are unique by name and context *)
 

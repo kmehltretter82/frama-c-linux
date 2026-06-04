@@ -304,10 +304,10 @@ let phi_index size = function
 
 module RegisterShift = WpContext.Static
     (struct
+      include Lang.Fun
       type key = lfun
       type data = shift
       let name = "MemTyped.RegisterShift"
-      include Lang.Fun
     end)
 
 module ShiftFieldDef = WpContext.StaticGenerator(Cil_datatype.Fieldinfo)
@@ -499,7 +499,7 @@ module STRING = WpContext.Generator(LITERAL)
         let eid = fresh () in
         let lfun = Lang.generated_f ~result:Int ~params:[] "Str_%d" eid in
         (* Since its a generated it is the unique name given *)
-        let prefix = Lang.Fun.debug lfun in
+        let prefix = Lang.Fun.name lfun in
         let base = F.e_fun lfun [] in
         Definitions.define_symbol {
           d_lfun = lfun ; d_types = 0 ; d_params = [] ;
@@ -526,10 +526,10 @@ module STRING = WpContext.Generator(LITERAL)
 
 module RegisterBASE = WpContext.Index
     (struct
+      include Lang.Fun
       type key = lfun
       type data = varinfo
       let name = "MemTyped.RegisterBASE"
-      include Lang.Fun
     end)
 
 module BASE = WpContext.Generator(Varinfo)
@@ -594,7 +594,7 @@ module BASE = WpContext.Generator(Varinfo)
             ~result:Int ~params:[]
             "%s_%s_%d" prefix x.vorig_name x.vid in
         (* Since its a generated it is the unique name given *)
-        let prefix = Lang.Fun.debug lfun in
+        let prefix = Lang.Fun.name lfun in
         let vid = if acs_rd then (-x.vid-1) else succ x.vid in
         let dfun = Definitions.Function( L.Int , Def , F.e_int vid ) in
         Definitions.define_symbol {

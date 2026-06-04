@@ -473,30 +473,16 @@ let rec of_term ~cnv expected t : Why3.Term.term =
         | F_call s, _
         | F_proj s, _
           -> apply_from_ns' s l sort
-        | F_left s, _ | F_assoc s, _ ->
+        | F_assoc s, _ ->
           let rec aux = function
             | [] -> why3_failure "Empty application"
             | [a] -> of_term ~cnv expected a
             | a::l ->
               apply_from_ns s [of_term' cnv a; aux l] sort
-          in
-          aux l
-        | F_right s, _ ->
-          let rec aux = function
-            | [] -> why3_failure "Empty application"
-            | [a] -> of_term ~cnv expected a
-            | a::l ->
-              apply_from_ns s [aux l;of_term' cnv a] sort
-          in
-          aux (List.rev l)
-        | Qed.Engine.F_bool_prop (s,_), Bool | Qed.Engine.F_bool_prop (_,s), Prop ->
-          apply_from_ns' s l expected
-        | Qed.Engine.F_bool_prop (_,_), _ ->
-          why3_failure "badly expected type %a for term %a"
-            Lang.F.pp_tau expected Lang.F.pp_term t
+          in aux l
       end
     | Rget(a, (Cfield(_,KInit) as f)), _ , tau -> begin
-        let s = Lang.name_of_field f in
+        let s = Lang.Field.name f in
         match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) with
         | ls ->
           begin match tau with
@@ -511,7 +497,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
       end
 
     | Rget(a,f), _ , _ -> begin
-        let s = Lang.name_of_field f in
+        let s = Lang.Field.name f in
         match Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) with
         | ls -> Why3.Term.t_app ls [of_term' cnv a] (of_tau ~cnv expected)
         | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
@@ -670,6 +656,7 @@ class visitor (ctx:context) c =
       self#add_import_file ["int"] "Int" ;
       self#add_import_file ["int"] "ComputerDivision" ;
       self#add_import_file ["real"] "RealInfix" ;
+      self#add_import_file ["frama_c_wp";"qed"] "Qed" ;
       self#add_import_file ["map"] "Map"
 
     method on_cluster c =
@@ -801,7 +788,7 @@ class visitor (ctx:context) c =
         let tv_args = List.map Why3.Ty.ty_var tv_args in
         let return_ty = Why3.Ty.ty_app tys tv_args in
         let fields,args = List.split @@ List.map (fun (f,ty) ->
-            let name = Lang.name_of_field f in
+            let name = Lang.Field.name f in
             let id = Why3.Ident.id_fresh name in
             let ty = Option.get (of_tau ~cnv ty) in
             let ls = Why3.Term.create_fsymbol ~proj:true id [return_ty] ty in
@@ -831,7 +818,7 @@ class visitor (ctx:context) c =
         let cnv = empty_cnv ctx in
         let map (f,tau) =
           let ty_ctr = of_tau ~cnv tau in
-          let id = Why3.Ident.id_fresh (Lang.name_of_field f) in
+          let id = Why3.Ident.id_fresh (Lang.Field.name f) in
           let ls = Why3.Term.create_lsymbol ~proj:true id [ty] ty_ctr in
           (Some ls,Option.get ty_ctr)
         in

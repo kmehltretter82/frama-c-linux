@@ -101,10 +101,10 @@ let op_name = function
 
 module REGISTRY = WpContext.Index
     (struct
+      include Lang.Fun
       type key = lfun
       type data = op * c_float
       let name = "Wp.Cfloat.REGISTRY"
-      include Lang.Fun
     end)
 
 let find = REGISTRY.find

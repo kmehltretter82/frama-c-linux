@@ -416,9 +416,9 @@ let rec pmatch env (p : pattern) e =
     pmatch env pa a ; pmatch env pk k
   | Set(pa,pk,pv) , Aset(a,k,v) ->
     pmatch env pa a ; pmatch env pk k ; pmatch env pv v
-  | Field(pv,fid) , Rget(v,fd) when Lang.name_of_field fd = fid ->
+  | Field(pv,fid) , Rget(v,fd) when Lang.Field.name fd = fid ->
     pmatch env pv v
-  | Call(fid,ps,trail) , Fun(lf,es) when Lang.name_of_lfun lf = fid ->
+  | Call(fid,ps,trail) , Fun(lf,es) when Lang.Fun.fullname lf = fid ->
     begin
       match Lang.Fun.category lf with
       | Operator op ->
@@ -641,13 +641,13 @@ let psequent ctxt sigma (seq : Conditions.sequent) =
 
 let () = Lang.on_lfun
     begin fun lf ->
-      let id = "lf:" ^ Lang.name_of_lfun lf in
+      let id = "lf:" ^ Lang.Fun.fullname lf in
       Tactical.add_computer id (Lang.F.e_fun lf)
     end
 
 let () = Lang.on_field
     begin fun fd ->
-      let id = "fd:" ^ Lang.name_of_field fd in
+      let id = "fd:" ^ Lang.Field.name fd in
       Tactical.add_computer id (fun es -> Lang.F.e_getfield (List.hd es) fd)
     end
 
@@ -891,7 +891,7 @@ let rec typecheck env expected (a : ast) =
         begin
           try
             let (_,ft) =
-              List.find (fun (fd,_) -> Lang.name_of_field fd = fid) fds in
+              List.find (fun (fd,_) -> Lang.Field.name fd = fid) fds in
             tc_merge env ~loc ~expected (Type ft)
           with Not_found -> expected
         end

@@ -41,13 +41,16 @@ let the_config = ref None
 let the_env = ref None
 
 let () =
-  let must_reload_config _ _ =
-    begin
-      the_config := None ;
-      the_env := None ;
-    end in
-  Wp_parameters.Why3Config.add_update_hook must_reload_config ;
-  Wp_parameters.Why3ExtraConfig.add_update_hook must_reload_config
+  begin
+    let must_reload_config _ _ =
+      begin
+        the_config := None ;
+        the_env := None ;
+      end in
+    Wp_parameters.Why3Config.add_update_hook must_reload_config ;
+    Wp_parameters.Why3ExtraConfig.add_update_hook must_reload_config ;
+    Wp_parameters.Library.add_update_hook must_reload_config ;
+  end
 
 let config () =
   if Option.is_none !the_config then
@@ -82,8 +85,10 @@ let env () =
 let flags_changed = ref true
 
 let () =
-  let must_reconfigure _ _ = flags_changed := true in
-  Wp_parameters.Why3Flags.add_update_hook must_reconfigure
+  begin
+    let must_reconfigure _ _ = flags_changed := true in
+    Wp_parameters.Why3Flags.add_update_hook must_reconfigure ;
+  end
 
 let configure =
   begin fun () ->

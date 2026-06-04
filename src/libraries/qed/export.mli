@@ -23,11 +23,9 @@ val pmode : mode -> pmode
 val tmode : ('a,'f) Logic.datatype -> mode
 val ctau  : ('a,'f) Logic.datatype -> cmode
 
+val link_name : link -> string
 val is_identifier : string -> bool
 val sanitize : to_lowercase:bool -> string -> string
-
-val debug : link -> string
-val link_name : link -> string
 
 module Make(T : Term) :
 sig

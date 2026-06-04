@@ -85,7 +85,8 @@ struct
     let equal = (==)
     let compare = POOL.compare
     let pretty = POOL.pretty
-    let debug x = Printf.sprintf "%s_%d" x.vbase x.vid
+    let name x = Printf.sprintf "%s_%d" x.vbase x.vid
+    let fullname = name
     let basename x = x.vbase
     let sort x = Kind.of_tau x.vtau
     let dummy = POOL.dummy
@@ -1005,9 +1006,8 @@ struct
   let prepare_builtin ~force f m =
     release () ;
     if BUILTIN.mem f m && not force then
-      let msg = Printf.sprintf
-          "Builtin already registered for '%s'" (Fun.debug f) in
-      raise (Failure msg)
+      Format.kasprintf failwith
+        "Builtin already registered for '%a'" Fun.pretty f
 
   let set_builtin' ?(force=false) f p =
     begin
@@ -1047,7 +1047,7 @@ struct
         if not force && FIELD.mem fd fmap then
           let msg = Printf.sprintf
               "Builtin already registered for '(%s ...).%s'"
-              (Fun.debug f) (Field.debug fd) in
+              (Fun.fullname f) (Field.name fd) in
           raise (Failure msg)
       end ;
       let fmap = FIELD.add fd p fmap in
@@ -2720,7 +2720,6 @@ struct
     let equal = equal
     let compare = compare
     let pretty = pretty
-    let debug e = Printf.sprintf "E%03d" e.id
   end
 
   (* ------------------------------------------------------------------------ *)

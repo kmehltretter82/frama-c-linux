@@ -69,7 +69,7 @@ let head e =
   | Aset _ -> "[=]"
   | Rget(_,fd) -> Format.asprintf ".%a" Lang.Field.pretty fd
   | Rdef fds -> Format.asprintf "{%s}" (head_fields fds)
-  | Fun(f,_) -> Pretty_utils.to_string Lang.Fun.pretty f
+  | Fun(f,_) -> Lang.Fun.name f
   | Apply _ -> "()"
   | Bind(Forall,_,_) -> "\\F"
   | Bind(Exists,_,_) -> "\\E"

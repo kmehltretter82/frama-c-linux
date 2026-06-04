@@ -75,7 +75,7 @@ let term e : repr =
 
 let pred p = term (Lang.F.e_prop p)
 
-let lfun = Lang.name_of_lfun
-let field = Lang.name_of_field
+let lfun = Lang.Fun.fullname
+let field = Lang.Field.fullname
 
 (* -------------------------------------------------------------------------- *)

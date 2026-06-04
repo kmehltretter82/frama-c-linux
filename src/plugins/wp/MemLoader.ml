@@ -92,7 +92,7 @@ struct
 
   let frame_lemmas phi obj ?(length = F.e_one) loc params chunks =
     begin
-      let prefix = Fun.debug phi in
+      let prefix = Fun.name phi in
       let s1 = Sigma.create () in
       let s2 = Sigma.create () in
       let v1 = e_fun phi (params @ memories s1 chunks) in
@@ -280,7 +280,7 @@ struct
               ~result ~params:(List.map tau_of_var d_params)
               "Array%a_%s%a" pp_rid r
               (Info.array_id a) Matrix.pp_suffix_id ds in
-          let prefix = Lang.Fun.debug d_lfun in
+          let prefix = Lang.Fun.name d_lfun in
           let name = prefix ^ "_access" in
           let phi = e_fun d_lfun (v :: env.size_val @ List.map e_var xms) in
           let va = List.fold_left e_get phi env.index_val in
